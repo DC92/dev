@@ -26,18 +26,18 @@ class listener implements EventSubscriberInterface
 		\phpbb\extension\manager $extension_manager,
 		$root_path
 	) {
-/*
-		$this->db = $db;
-		$this->request = $request;
+//		$this->db = $db;
+//		$this->request = $request;
 		$this->template = $template;
-		$this->user = $user;
-		$this->extension_manager = $extension_manager;
-		$this->root_path = $root_path;
+//		$this->user = $user;
+//		$this->extension_manager = $extension_manager;
+//		$this->root_path = $root_path;
 
 		// Recherche du répertoire de l'extension
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->ext_dir = 'ext/'.$ns[0].'/'.$ns[1].'/';
 
+/*
 		// Inclue les fichiers langages de cette extension
 		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
 
@@ -71,24 +71,24 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-	function geobb_activate_map($vars, $forum_desc, $first_post = true) {
-/*
-		global $config_locale;
+	function geobb_activate_map($vars) {
+//		global $config_locale;
 
-		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc.'[all=accueil]'), $regle);
+		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($vars['forum_desc'].'[all=accueil]'), $regle);
 		switch (@$regle[1]) {
+/*
 			case 'first': // Régle sur le premier post seulement
-				if (!$first_post)
+				if (!$vars['first_post'])
 					break;
+*/
 
 			case 'all': // Régle sur tous les posts
 				$this->template->assign_vars([
 					'EXT_DIR' => $this->ext_dir,
 					'GEO_MAP_TYPE' => $regle[2],
-					'MAP_KEYS' => @$config_locale['keys-js']
+//					'MAP_KEYS' => @$config_locale['keys-js']
 				]);
 		}
-*/
 	}
 
 	/**
@@ -208,8 +208,8 @@ class listener implements EventSubscriberInterface
 			$this->optim_coordinate_array ($g->coordinates, $granularity);
 */
 	}
-/*
 	function optim_coordinate_array (&$cs, $granularity) { // Fonction d'optimisation d'un tableau de coordonnées
+/*
 		if (count ($cs) > 2) { // Pour éviter les "Points" et "Poly" à 2 points
 			$p = $cs[0]; // On positionne le point de référence de mesure de distance à une extrémité
 			$r = []; // La liste de coordonnées optimisées
@@ -425,10 +425,12 @@ class listener implements EventSubscriberInterface
 		$save[] = $vars['post_mode'].':'.implode(',',$apres);
 
 		file_put_contents ('EDIT.log', implode ("\n", $save)."\n\n", FILE_APPEND);
+*/
 	}
 
 	// Permet la saisie d'un POST avec un texte vide
 	function posting_modify_submission_errors($vars) {
+/*
 		$error = $vars['error'];
 
 		foreach ($error AS $k=>$v)	
@@ -436,6 +438,6 @@ class listener implements EventSubscriberInterface
 				unset ($error[$k]);
 
 		$vars['error'] = $error;
-	}
 */
+	}
 }

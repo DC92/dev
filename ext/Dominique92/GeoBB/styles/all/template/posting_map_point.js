@@ -1,3 +1,4 @@
+/*TODO
 var curseur = new L.Marker(
 	map.getCenter(), // Valeur par défaut
 	{
@@ -31,3 +32,4 @@ function gotogps () {
 curseur.snapediting = new L.Handler.MarkerSnap(map, curseur);
 curseur.snapediting.addGuideLayer(gis);
 curseur.snapediting.enable();
+*/

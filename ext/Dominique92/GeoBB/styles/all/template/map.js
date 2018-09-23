@@ -1,3 +1,4 @@
+/*TODO
 var map = new ol.Map({
 	target: 'map',
 	//	loadTilesWhileInteracting: true,
@@ -25,7 +26,7 @@ map.addControl(controlLayers(baseLayers, {
 		}
 	})
 }));
-
+*/
 
 /*
 var map = new L.Map('map', {
