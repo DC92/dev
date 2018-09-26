@@ -34,12 +34,12 @@ INSTALLATION
 	Ces icones (fichiers .png 16x16) sont à tansférer dans un répertoire quelconque du serveur.
 		- Exemple: ```ext/Dominique92/GeoBB/types_points/site.png```
 	- Description: Insérer l'une les chaines de caractères suivantes:
-		- ```<map first="point" />``` si vous voulez associer une position à chaque sujet du forum (en fait au premier commentaire de chaque sujet).
-		- ```<map all="point" />``` si vous voulez associer une position à chaque commentaire de chaque sujet.
-		- ```<map first="line" />``` si vous voulez associer des lignes au premier commentaire de chaque sujet.
-		- ```<map all="line" />``` si vous voulez associer des lignes à chaque commentaire de chaque sujet.
-		- ```<map first="surface" />``` si vous voulez associer des surfaces au premier commentaire de chaque sujet.
-		- ```<map all="surface" />``` si vous voulez associer des surfaces à chaque commentaire de chaque sujet.```
+		- ```[first=point]``` si vous voulez associer une position à chaque sujet du forum (en fait au premier commentaire de chaque sujet).
+		- ```[all=point]``` si vous voulez associer une position à chaque commentaire de chaque sujet.
+		- ```[first=line]``` si vous voulez associer des lignes au premier commentaire de chaque sujet.
+		- ```[all=line]``` si vous voulez associer des lignes à chaque commentaire de chaque sujet.
+		- ```[first=surface]``` si vous voulez associer des surfaces au premier commentaire de chaque sujet.
+		- ```[all=surface]``` si vous voulez associer des surfaces à chaque commentaire de chaque sujet.```
 	- Envoyer
 
 * Créer un point:

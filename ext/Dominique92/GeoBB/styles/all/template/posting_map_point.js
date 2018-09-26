@@ -1,4 +1,24 @@
-/*TODO
+/*TODO*/
+
+
+var map = new ol.Map({
+	target: 'map',
+	//	loadTilesWhileInteracting: true,
+	controls: controlsCollection(),
+	/*				view: new ol.View({
+						center: ol.proj.fromLonLat([-4, 48]), // Bretagne
+						//center: ol.proj.fromLonLat([-3.5, 48.25]), // France
+						//center: ol.proj.fromLonLat([7, 47]), // Suisse
+						//center: ol.proj.fromLonLat([9.2, 45.5]), // Milan
+						//center: ol.proj.fromLonLat([7.07, 45.19]), // Rochemelon
+						//center: ol.proj.fromLonLat([-.1, 51.5]), // Londres
+						zoom: 8
+					}),*/
+	layers: overlays
+});
+
+
+
 var curseur = new L.Marker(
 	map.getCenter(), // Valeur par défaut
 	{
@@ -32,4 +52,3 @@ function gotogps () {
 curseur.snapediting = new L.Handler.MarkerSnap(map, curseur);
 curseur.snapediting.addGuideLayer(gis);
 curseur.snapediting.enable();
-*/

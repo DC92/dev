@@ -36,8 +36,6 @@ INSTALLATION
 		- ```<map all="point" />``` si vous voulez associer une position à chaque commentaire de chaque sujet.
 		- ```<map first="line" />``` si vous voulez associer des lignes au premier commentaire de chaque sujet.
 		- ```<map all="line" />``` si vous voulez associer des lignes à chaque commentaire de chaque sujet.
-		- ```<map first="surface" />``` si vous voulez associer des surfaces au premier commentaire de chaque sujet.
-		- ```<map all="surface" />``` si vous voulez associer des surfaces à chaque commentaire de chaque sujet.
 	- Envoyer
 
 * Créer un point:

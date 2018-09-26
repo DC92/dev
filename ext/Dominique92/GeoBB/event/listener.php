@@ -29,7 +29,7 @@ class listener implements EventSubscriberInterface
 //		$this->db = $db;
 //		$this->request = $request;
 		$this->template = $template;
-//		$this->user = $user;
+		$this->user = $user;
 //		$this->extension_manager = $extension_manager;
 //		$this->root_path = $root_path;
 
@@ -76,16 +76,15 @@ class listener implements EventSubscriberInterface
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($vars['forum_desc'].'[all=accueil]'), $regle);
 		switch (@$regle[1]) {
-/*
 			case 'first': // Régle sur le premier post seulement
 				if (!$vars['first_post'])
 					break;
-*/
 
 			case 'all': // Régle sur tous les posts
 				$this->template->assign_vars([
 					'EXT_DIR' => $this->ext_dir,
 					'GEO_MAP_TYPE' => $regle[2],
+					'STYLE_NAME' => $this->user->style['style_name'],
 //					'MAP_KEYS' => @$config_locale['keys-js']
 				]);
 		}
@@ -96,6 +95,7 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
 	function geobb_viewtopic_get_post_data($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('geobb_viewtopic_get_post_data',true).'</pre>';
 /*
 		// Insère la conversion du champ geom en format WKT dans la requette SQL
 		$sql_ary = $vars['sql_ary'];
@@ -106,6 +106,7 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la première passe sur les données des posts qui lit les données SQL de phpbb-posts
 	function viewtopic_post_rowset_data($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('viewtopic_post_rowset_data',true).'</pre>';
 /*
 		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
 		$this->post_data [$vars['row']['post_id']] = $vars['row'];
@@ -114,6 +115,7 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function geobb_viewtopic_modify_post_row($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('geobb_viewtopic_modify_post_row',true).'</pre>';
 /*
 		if (isset ($this->post_data [$vars['row']['post_id']])) {
 			$row = $this->post_data [$vars['row']['post_id']]; // Récupère les données SQL du post 
@@ -153,6 +155,7 @@ class listener implements EventSubscriberInterface
 
 	// Appelé aprés l'assignation de postrow au template. Pour assigner les sous-blocks de postrow
 	function viewtopic_post_row_after($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('viewtopic_post_row_after',true).'</pre>';
 /*
 		global $limite;
 
@@ -181,6 +184,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	function gis_modify_data($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
 /*
 		// Insère l'extraction des données externes dans le flux géographique
 		$row = $vars['row'];
@@ -293,7 +297,6 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
-/*
 		$post_data = $vars['post_data'];
 
 		// Récupère la traduction des données spaciales SQL
@@ -329,26 +332,29 @@ class listener implements EventSubscriberInterface
 				);
 
 		// Assign the forums geom type flags to the template
-		$first_post =
+		$vars['first_post'] =
 			!isset ($post_data['topic_id']) || // Cas de la création d'un nouveau topic
 			$post_data['topic_first_post_id'] == @$post_data['post_id'];
 
-		$this->geobb_activate_map($vars, $post_data['forum_desc'], $first_post);
+		$vars['forum_desc'] = $post_data['forum_desc'];
+		$this->geobb_activate_map($vars);
 
-		// Patch phpbb to accept geom values
-		// HORRIBLE hack mais comment faire autrement tant que les géométries ne sont pas prises en compte par PhpBB ???
-		// DCMM TODO résolu en PhpBB 3.2
-		$file_name = "phpbb/db/driver/driver.php";
-		$file_tag = "\n\t\tif (is_null(\$var))";
-		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') === 0) //GeoBB\n\t\t\treturn \$var;";
-		$file_content = file_get_contents ($file_name);
-		if (strpos($file_content, '{'.$file_tag))
-			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
+						// Patch phpbb to accept geom values
+						// HORRIBLE hack mais comment faire autrement tant que les géométries ne sont pas prises en compte par PhpBB ???
+						// DCMM TODO résolu en PhpBB 3.2
+						$file_name = "phpbb/db/driver/driver.php";
+						$file_tag = "\n\t\tif (is_null(\$var))";
+						$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') === 0) //GeoBB\n\t\t\treturn \$var;";
+						$file_content = file_get_contents ($file_name);
+						if (strpos($file_content, '{'.$file_tag))
+							file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
+/*
 */
 	}
 
 	// Appelé lors de la validation des données à enregistrer
 	function submit_post_modify_sql_data($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('submit_post_modify_sql_data',true).'</pre>';
 /*
 		$sql_data = $vars['sql_data'];
 
@@ -430,6 +436,7 @@ class listener implements EventSubscriberInterface
 
 	// Permet la saisie d'un POST avec un texte vide
 	function posting_modify_submission_errors($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('posting_modify_submission_errors',true).'</pre>';
 /*
 		$error = $vars['error'];
 

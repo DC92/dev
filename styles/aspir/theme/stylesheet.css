@@ -1,0 +1,14 @@
+/*  phpBB3 Style Sheet
+    --------------------------------------------------------------
+	Style name:			aspir
+	Based on style:		prosilver
+	Original author:	Dominique Cavailhez © 2018
+    --------------------------------------------------------------
+*/
+@import url("../../prosilver/theme/stylesheet.css");
+
+
+html, body {
+	background-color: #dfd;
+}
+
