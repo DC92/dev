@@ -116,6 +116,10 @@ class listener implements EventSubscriberInterface
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function geobb_viewtopic_modify_post_row($vars) {
 /*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('geobb_viewtopic_modify_post_row',true).'</pre>';
+
+		$vars['forum_desc'] = $post_data['forum_desc'];
+		$this->geobb_activate_map($vars);
+
 /*
 		if (isset ($this->post_data [$vars['row']['post_id']])) {
 			$row = $this->post_data [$vars['row']['post_id']]; // Récupère les données SQL du post 
@@ -342,13 +346,13 @@ class listener implements EventSubscriberInterface
 						// Patch phpbb to accept geom values
 						// HORRIBLE hack mais comment faire autrement tant que les géométries ne sont pas prises en compte par PhpBB ???
 						// DCMM TODO résolu en PhpBB 3.2
+/*
 						$file_name = "phpbb/db/driver/driver.php";
 						$file_tag = "\n\t\tif (is_null(\$var))";
 						$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') === 0) //GeoBB\n\t\t\treturn \$var;";
 						$file_content = file_get_contents ($file_name);
 						if (strpos($file_content, '{'.$file_tag))
 							file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
-/*
 */
 	}
 
