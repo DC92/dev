@@ -1,7 +1,14 @@
+.wrap {
+	max-width: none;
+	min-width: none;
+}
+.section-posting .fields1 dl:first-child {
+	display: none;
+}
+
 /* Carte */
 #map {
 	width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
-	height: 380px !important;
 	width: 50vw;
 	height: 50vw;
 	max-width: 80vw;
@@ -10,20 +17,6 @@
 	font-size: 16px;
 	background-image: linear-gradient(#9AB4CB, #9BCB9A);
 }
-/* Cas du full screen */
-/*
-.leaflet-fullscreen-on {
-	max-width: 100% !important;
-	max-height: 100% !important;
-}
-@media screen and (device-width: 100vw) and (device-height: 100vh) { /* Cas du full screen / nécéssaire pour chrome */
-/*
-	#map {
-		max-width: 100% !important;
-		max-height: 100% !important;
-	}
-}
-*/
 /* Carte responsive pour mobiles */
 /*
 @media screen and (max-width: 600px) {
@@ -36,24 +29,6 @@
 	.leaflet-fullscreen-on {
 		height: 100% !important;
 	}
-}
-*/
-/* Sélecteur de couches */
-/*
-.leaflet-control-layers {
-	word-wrap: normal;
-}
-.overlay_separator {
-	margin-top: 1px;
-	border-top-width : 1px;
-	border-style: solid;
-}
-*/
-/* Etiquettes dans la carte */
-/*
-.map-reference .leaflet-rrose-content-wrapper,
-.map-reference .leaflet-rrose-tip {
-	background-color: #def;
 }
 */
 
@@ -76,54 +51,5 @@ fieldset .posting-point .fields1 dd {
 }
 fieldset .posting-point .fields1 dt {
 	width: 8em;
-}
-*/
-
-/* Style pour impression */
-/* On ne garde que la carte sans les controles */
-/*
-@page {
-	margin: 0; 
-}
-@media print {
-	html, body {
-		margin: 0; padding: 0;
-		height: 100%;
-	}
-	#wrap > *,
-	#wrap > * > *,
-	.leaflet-control {
-		display: none;
-	}
-	#page-body {
-		margin: 0; padding: 0;
-		display: block;
-	}
-	.leaflet-control-attribution {
-		display: block !important;
-	}
-	.leaflet-control-permalink,
-	.leaflet-control-attribution > a:first-child {
-		display: none !important;
-	}
-	.leaflet-control-attribution::first-letter {
-		color: transparent;
-	}
-
-	#map {
-		margin: 0; padding: 0;
-		display: block;
-		position: absolute !important;
-
-		width: 100%;
-		height: 100%;
-		min-width: 100%;
-		min-height: 100%;
-		max-width: 100%;
-		max-height: 100%;
-
-		background-image: none;
-		background-color: white;
-	}
 }
 */

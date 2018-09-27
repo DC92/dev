@@ -1,43 +1,52 @@
 <!-- Openlayers -->
-<!-- INCLUDEJS assets/MyOl/ol/ol.js -->
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
+<!-- INCLUDEJS assets/MyOl/ol/ol.js -->
 
 <!-- Recherche par nom
-<!-- INCLUDECS assets/MyOl/geocoder/ol-geocoder.css -->
-<!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder-debug.js -->
+<!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
+<!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
 
 <!-- Proj4 projections Swiss & UK
-<!-- INCLUDEJS assets/MyOl/proj4/proj4-src.js -->
+<!-- INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
-<!-- INCLUDEJS assets/MyOl/myol.js -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
+<!-- INCLUDEJS assets/MyOl/myol.js -->
 
 <!-- Style specific maps functions -->
-<!-- INCLUDEJS map_{STYLE_NAME}.js -->
+<!-- INCLUDECSS map.css -->
+<!-- INCLUDEJS map.js -->
 
 <div id="map"></div>
 
-<script>
-	var mapkeys = 888; //TODO
+<h4 class="geo_info">
+	<p>
+		<span id="position-title-lng"></span>{L_COLON} <em id="position-proj-lng"></em>
+		<span id="position-title-lat"></span>{L_COLON} <em id="position-proj-lat"></em>
+		<select id="position-select"></select>
+	</p>
 
+	<!-- IF GEO_ALTITUDE -->
+		<p><span>Altitude</span>{L_COLON} <em>{GEO_ALTITUDE} m</em></p>
+	<!-- ENDIF -->
+	<!-- IF GEO_MASSIF -->
+		<p><span>Massif</span>{L_COLON} <em>{GEO_MASSIF}</em></p>
+	<!-- ENDIF -->
+	<!-- IF GEO_PLACES -->
+		<p><span>Place<!-- IF GEO_PLACES > 1 -->s<!-- ENDIF --></span>{L_COLON} <em>{GEO_PLACES}</em></p>
+	<!-- ENDIF -->
+</h4>
+<hr clear="all" style="border-color:transparent">
+
+<script>
 	window.addEventListener('load', function() {
 		var map = new ol.Map({
 			target: 'map',
-			controls: controlsCollection(),
-			view: new ol.View({
-				center: ol.proj.fromLonLat([6.336, 44.534]), // France
-				zoom: 14
+			controls: controlsCollection({
+				IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
+				thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // https://manage.thunderforest.com
+				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
 			})
 		});
 	});
 </script>
-
-
-
-<!-- TODO -->VIEWTOPIC_BODY_POLL_BEFORE.HTML
-<!-- IF WWW_GEOMJSON and GEO_MAP_TYPE -->
-	<div id="position-json" style="display:none">{GEOMJSON}</div>
-	<!-- INCLUDE viewtopic_map_{GEO_MAP_TYPE}.html -->
-	<hr clear="all" style="border-color:white" />
-<!-- ENDIF -->

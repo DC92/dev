@@ -26,10 +26,10 @@ class listener implements EventSubscriberInterface
 		\phpbb\extension\manager $extension_manager,
 		$root_path
 	) {
-//		$this->db = $db;
+		$this->db = $db;
 //		$this->request = $request;
 		$this->template = $template;
-		$this->user = $user;
+//		$this->user = $user;
 //		$this->extension_manager = $extension_manager;
 //		$this->root_path = $root_path;
 
@@ -51,16 +51,16 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Liste des hooks et des fonctions associées
-	// On trouve le point d'appel en cherchant dans le logiciel de PhpBB 3.1: "event core.<XXX>"
+	// On trouve le point d'appel en cherchant dans le logiciel de PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 		return [
 			// Index
 			'core.index_modify_page_title' => 'geobb_activate_map', //226
 
 			// Viewtopic
-			'core.viewtopic_get_post_data' => 'geobb_viewtopic_get_post_data', //1143
+			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data', //1143
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data', //1240
-			'core.viewtopic_modify_post_row' => 'geobb_viewtopic_modify_post_row', //1949
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row', //1949
 			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after', //1949
 			'geo.gis_modify_data' => 'gis_modify_data', //gis.php
 
@@ -84,7 +84,7 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_vars([
 					'EXT_DIR' => $this->ext_dir,
 					'GEO_MAP_TYPE' => $regle[2],
-					'STYLE_NAME' => $this->user->style['style_name'],
+//					'STYLE_NAME' => $this->user->style['style_name'],
 //					'MAP_KEYS' => @$config_locale['keys-js']
 				]);
 		}
@@ -94,8 +94,8 @@ class listener implements EventSubscriberInterface
 		VIEWTOPIC.PHP
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
-	function geobb_viewtopic_get_post_data($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('geobb_viewtopic_get_post_data',true).'</pre>';
+	function viewtopic_get_post_data($vars) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('viewtopic_get_post_data',true).'</pre>';
 /*
 		// Insère la conversion du champ geom en format WKT dans la requette SQL
 		$sql_ary = $vars['sql_ary'];
@@ -106,25 +106,21 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la première passe sur les données des posts qui lit les données SQL de phpbb-posts
 	function viewtopic_post_rowset_data($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('viewtopic_post_rowset_data',true).'</pre>';
-/*
 		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
 		$this->post_data [$vars['row']['post_id']] = $vars['row'];
-*/
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>vars['row'] = ".var_export($vars['row'],true).'</pre>';
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
-	function geobb_viewtopic_modify_post_row($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('geobb_viewtopic_modify_post_row',true).'</pre>';
-
+	function viewtopic_modify_post_row($vars) {
 		$vars['forum_desc'] = $post_data['forum_desc'];
 		$this->geobb_activate_map($vars);
 
-/*
 		if (isset ($this->post_data [$vars['row']['post_id']])) {
 			$row = $this->post_data [$vars['row']['post_id']]; // Récupère les données SQL du post 
 			$post_row = $vars['post_row'];
 
+/* TODO
 			// Convert the geom info in geoJson format
 			preg_match ('/\[(first|all)=([a-z]+)\]/i', $vars['topic_data']['forum_desc'], $regle);
 			if (count ($regle) == 3 &&
@@ -141,9 +137,10 @@ class listener implements EventSubscriberInterface
 				$this->get_automatic_data($row);
 				$this->geobb_activate_map($vars, $vars['topic_data']['forum_desc']);
 			}
+*/
 
 			foreach ($row AS $k=>$v)
-				if (strpos ($k,'geo') === 0) {
+				if (strstr ($k, 'geo_')) {
 					// Assign the phpbb-posts.geo* SQL data of to each template post area
 					$post_row[strtoupper ($k)] = $v;
 
@@ -154,7 +151,6 @@ class listener implements EventSubscriberInterface
 
 			$vars['post_row'] = $post_row;
 		}
-*/
 	}
 
 	// Appelé aprés l'assignation de postrow au template. Pour assigner les sous-blocks de postrow

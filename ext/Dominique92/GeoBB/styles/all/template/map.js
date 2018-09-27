@@ -111,10 +111,16 @@ function chemineurLayer() {
  * Requires many
  */
 function layersCollection(keys) {
+/*DCMM*/{var _v=keys,_r='';if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
 	return {
-		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		/*
+		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'Topo': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
+		'Satellite': layerGoogle('s')
+		/*
+		'OSMf': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM-outdoors': layerThunderforest('outdoors', keys.thunderforest),
 		'MRI': layerOSM(
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
@@ -128,18 +134,14 @@ function layersCollection(keys) {
 		//'Kompas summer': layerKompass('Summer OSM'),
 		//'Kompas winter': layerKompass('Winter OSM'),
 		//'Kompas luftbild': layerKompass('a'),
-		'OSM-outdoors': layerThunderforest('outdoors', keys.thunderforest),
 		'OSM-cycle': layerThunderforest('cycle', keys.thunderforest),
 		'OSM-landscape': layerThunderforest('landscape', keys.thunderforest),
 		'OSM-transport': layerThunderforest('transport', keys.thunderforest),
 */
-		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 /*		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 */
 		// NOT YET	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
-		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
 /*
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
@@ -152,8 +154,6 @@ function layersCollection(keys) {
 		//'Bing mixte': layerBing ('AerialWithLabels', bingKey),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
-*/
-		'Google photo': layerGoogle('s')/*,
 		'Google hybrid': layerGoogle('s,h'),
 		Stamen: layerStamen('terrain'),
 		Watercolor: layerStamen('watercolor'),
@@ -165,7 +165,7 @@ function layersCollection(keys) {
 /**
  * Controls examples
  */
-function controlsCollection() {
+function controlsCollection(keys) {
 	return [
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
@@ -177,9 +177,7 @@ function controlsCollection() {
 		new ol.control.Attribution({
 			collapsible: false // Attribution always open
 		}),
-		controlLayersSwitcher(layersCollection({
-			IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
-		})),
+		controlLayersSwitcher(layersCollection(keys)),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
 			label: '',
