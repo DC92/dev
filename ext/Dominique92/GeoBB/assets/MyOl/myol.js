@@ -712,19 +712,22 @@ function marqueur(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 var nextButtonTopPos = 6; // Top position of next button (em)
 
 function controlButton(options) {
+	options = options || {
+		className: 'ol-control-hidden'
+	};
 	var buttonElement = document.createElement('button');
 	buttonElement.innerHTML = options.label || '';
-	if (options.action)
-		buttonElement.addEventListener('click', options.action, false);
+	buttonElement.addEventListener('click', options.action, false);
+
 	var divElement = document.createElement('div');
-	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
 	if (options.rightPosition) {
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
-	} else {
+	} else if (options.action) {
 		divElement.style.left = '.5em';
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
 	}
+	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
 	divElement.title = options.title;
 	divElement.appendChild(buttonElement);
 
@@ -891,6 +894,9 @@ function controlPermalink(options) {
  * Requires controlButton
  */
 function controlGPS() {
+	if (!window.location.href.match(/https|localhost/i))
+		return controlButton();
+
 	// The position marker
 	var point_ = new ol.geom.Point([0, 0]),
 		source_ = new ol.source.Vector({

@@ -1,9 +1,16 @@
 /*!
- * OPENLAYERS V4 ADAPTATION - https://openlayers.org/
+ * OPENLAYERS V4+ ADAPTATION - https://openlayers.org/
  * (C) Dominique Cavailhez 2017 - https://github.com/Dominique92/MyOl
  */
 
+.ol-viewport {
+	font-size: 16px;
+}
+
 /* All buttons*/
+.ol-control-hidden {
+	display: none;
+}
 .ol-control {
 	border-radius: 2px;
 	padding: 0;
