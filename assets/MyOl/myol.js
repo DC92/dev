@@ -622,7 +622,7 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-function marqueur(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon, lat], 'id-display', ['format de base', 'format suisse']
+function dragIcon(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon, lat], 'id-display', ['format de base', 'format suisse']
 	var point = new ol.geom.Point(
 			ol.proj.fromLonLat(ll)
 		),
@@ -674,7 +674,7 @@ function marqueur(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 
 		// We integrate coordinates in html format
 		for (var r in p) // === sprinft
-			html = html.replace('{' + r + '}', p[r]);
+			html = html.replace('[' + r + ']', p[r]);
 
 		// We insert the resulting HTML string where it is going
 		var displayElement = document.getElementById(IdDisplay);
@@ -687,13 +687,28 @@ function marqueur(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 
 	// <input> coords edition
 	layer.edit = function(event, nol, projection) {
-		var coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle du marqueur
+		var coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle du dragIcon
 		coord[nol] = parseFloat(event.value); // On change la valeur qui a été modifiée
-		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne le marqueur
+		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne le dragIcon
 	};
 
 	return layer;
 }
+
+// Basic images
+var markerImage =
+	'data:image/svg+xml;utf8,' +
+	'<svg xmlns="http://www.w3.org/2000/svg" width="31" height="43" ' +
+	'style="stroke-width:4;stroke:rgb(255,0,0,.5);fill:rgb(0,0,0,0)">' +
+	'<rect width="31" height="43" />' +
+	'</svg>',
+	targetImage = 'data:image/svg+xml;utf8,' +
+	'<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" ' +
+	'style="stroke-width:3;stroke:rgb(255,208,0);fill:rgb(0,0,0,0)">' +
+	'<circle cx="15" cy="15" r="13.5" />' +
+	'<line x1="15" y1="0" x2="15" y2="30" />' +
+	'<line x1="0" y1="15" x2="30" y2="15" />' +
+	'</svg>';
 
 //******************************************************************************
 // CONTROLS

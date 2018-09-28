@@ -1,11 +1,55 @@
+<!-- Openlayers -->
+<!-- INCLUDECSS assets/MyOl/ol/ol.css -->
+<!-- INCLUDEJS assets/MyOl/ol/ol.js -->
+
+<!-- Recherche par nom
+<!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
+<!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
+
+<!-- Proj4 projections Swiss & UK
+<!-- INCLUDEJS assets/MyOl/proj4/proj4.js -->
+
+<!-- My Openlayers -->
+<!-- INCLUDECSS assets/MyOl/myol.css -->
+<!-- INCLUDEJS assets/MyOl/myol.js -->
+
+<!-- Style specific maps functions -->
+<!-- INCLUDECSS map.css -->
+<!-- INCLUDEJS map.js -->
+
+<div id="map"></div>
+
+<script>
+	var viseur;
+
+	window.addEventListener('load', function() {
+		var map = new ol.Map({
+			target: 'map',
+			controls: controlsCollection({
+				IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
+				thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // https://manage.thunderforest.com
+				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
+			})
+		});
+		viseur = dragIcon(
+			targetImage,
+			[6.15, 46.2],
+			'edit-lonlat', [
+				'Lon <input type="text" onchange="viseur.edit(this,0,4326)" size="10" value="[0]"/> ' +
+				'Lat <input type="text" onchange="viseur.edit(this,1,4326)" size="10" value="[1]"/>',
+				'<br/>Suisse : ' +
+				'X <input type="text" onchange="viseur.edit(this,0,21781)" size="7" value="[2]"/> ' +
+				'Y <input type="text" onchange="viseur.edit(this,1,21781)" size="7" value="[3]"/>'
+			],
+			'edit'
+		);
+		map.addLayer(viseur);
+	});
+</script>
+
 <dl class="posting-point" style="clear: left;">
-	<dt><label><span id="edit-title-lat"></span>{L_COLON}</label></dt>
-	<dd><input type="text" id="edit-proj-lat" size="10" class="inputbox autowidth" /></dd>
-	<dt><label><span id="edit-title-lng"></span>{L_COLON}</label></dt>
-	<dd>
-		<input type="text" id="edit-proj-lng" size="10" class="inputbox autowidth" />
-		<select id="edit-select"><option value="decimal"></option></select>
-	</dd>
+	<div id="edit-lonlat"></div>
+
 	<dd><a style="cursor:pointer" onclick="map.panTo(curseur._latlng)">Recentrer la carte sur le curseur</a></dd>
 	<dd><a style="cursor:pointer" onclick="curseur.setLatLng(map.getCenter())">Remettre le curseur au centre actuel de la carte</a></dd>
 	<dd><a style="cursor:pointer" onclick="gotogps()">Utiliser la position du GPS</a></dd>
