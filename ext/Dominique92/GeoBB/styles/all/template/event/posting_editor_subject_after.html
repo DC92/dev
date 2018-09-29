@@ -20,10 +20,10 @@
 <div id="map"></div>
 
 <script>
-	var viseur;
+	var map, viseur;
 
 	window.addEventListener('load', function() {
-		var map = new ol.Map({
+		map = new ol.Map({
 			target: 'map',
 			controls: controlsCollection({
 				IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
@@ -49,10 +49,10 @@
 
 <dl class="posting-point" style="clear: left;">
 	<div id="edit-lonlat"></div>
-
-	<dd><a style="cursor:pointer" onclick="map.panTo(curseur._latlng)">Recentrer la carte sur le curseur</a></dd>
-	<dd><a style="cursor:pointer" onclick="curseur.setLatLng(map.getCenter())">Remettre le curseur au centre actuel de la carte</a></dd>
-	<dd><a style="cursor:pointer" onclick="gotogps()">Utiliser la position du GPS</a></dd>
+	
+	<dd><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></dd>
+	<dd><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></dd>
+	<dd><a style="cursor:pointer" onclick="controlgps.action()">Utiliser la position du GPS</a></dd>
 
 	<br />
 	<dt><label>Altitude{L_COLON}</label></dt>

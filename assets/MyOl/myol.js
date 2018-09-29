@@ -635,10 +635,11 @@ function dragIcon(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 		iconFeature = new ol.Feature({
 			geometry: point
 		}),
+		source = new ol.source.Vector({
+			features: [iconFeature]
+		}),
 		layer = new ol.layer.Vector({
-			source: new ol.source.Vector({
-				features: [iconFeature]
-			}),
+			source : source,
 			style: iconStyle,
 			zIndex: 2
 		});
@@ -682,14 +683,18 @@ function dragIcon(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 			displayElement.innerHTML = html;
 	}
 
-	// Display coords
+	// Display once at init
 	displayLL(ol.proj.fromLonLat(ll));
 
 	// <input> coords edition
 	layer.edit = function(event, nol, projection) {
-		var coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle du dragIcon
+		var coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
 		coord[nol] = parseFloat(event.value); // On change la valeur qui a été modifiée
-		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne le dragIcon
+		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
+	};
+
+	layer.getPoint = function() {
+		return point;
 	};
 
 	return layer;
@@ -746,10 +751,18 @@ function controlButton(options) {
 	divElement.title = options.title;
 	divElement.appendChild(buttonElement);
 
-	return new ol.control.Control({
+	var control = new ol.control.Control({
 		element: divElement,
 		render: options.render
 	});
+
+	control.action = function () {
+		options.action({
+			target: buttonElement
+		});
+	}
+
+	return control;
 }
 
 /**
@@ -937,10 +950,7 @@ function controlGPS() {
 	});
 
 	var active = false,
-		bouton = controlButton({
-			className: 'gps-button',
-			title: 'Centrer sur la position GPS',
-			action: function(event) {
+		action = function(event) {
 				active ^= 1; // Toggle on / off
 				event.target.style.color = active ? 'black' : 'white'; // Color button
 				geolocation.setTracking(active); // Turn on / off
@@ -948,13 +958,19 @@ function controlGPS() {
 					bouton.getMap().addLayer(layer);
 				else
 					bouton.getMap().removeLayer(layer);
-			}
+			},
+		bouton = controlButton({
+			className: 'gps-button',
+			title: 'Centrer sur la position GPS',
+			action: action
 		});
 
 	geolocation.on('change', function() {
-		var pos = ol.proj.fromLonLat(this.getPosition());
-		bouton.getMap().getView().setCenter(pos);
-		point_.setCoordinates(pos);
+		var position = ol.proj.fromLonLat(this.getPosition());
+		bouton.getMap().getView().setCenter(position);
+		point_.setCoordinates(position);
+		if (typeof bouton.callBack == 'function')
+			bouton.callBack(position);
 	});
 
 	return bouton;

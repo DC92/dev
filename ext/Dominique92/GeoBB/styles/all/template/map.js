@@ -1,5 +1,3 @@
-/*DCMM*/{var _v='ALL MAP.JS',_r='';if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
 /**
  * www.refuges.info areas layer
  * Requires layerVectorURL
@@ -111,7 +109,6 @@ function chemineurLayer() {
  * Requires many
  */
 function layersCollection(keys) {
-/*DCMM*/{var _v=keys,_r='';if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
 	return {
 		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'Topo': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
@@ -165,6 +162,11 @@ function layersCollection(keys) {
 /**
  * Controls examples
  */
+var controlgps = controlGPS();
+controlgps.callBack = function (position) {
+	viseur.getPoint().setCoordinates(position);
+}
+
 function controlsCollection(keys) {
 	return [
 		new ol.control.ScaleLine(),
@@ -197,7 +199,7 @@ function controlsCollection(keys) {
 			keepOpen: true,
 			placeholder: 'Saisir un nom' // Initialization of the input field
 		}),
-		controlGPS()
+		controlgps
 	];
 }
 
