@@ -25,34 +25,31 @@
 	window.addEventListener('load', function() {
 		map = new ol.Map({
 			target: 'map',
-			controls: controlsCollection({
+			controls: geobbControlsCollection({
 				IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
 				thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // https://manage.thunderforest.com
 				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
 			})
 		});
-		viseur = dragIcon(
-			targetImage,
-			[6.15, 46.2],
-			'edit-lonlat', [
-				'Lon <input type="text" onchange="viseur.edit(this,0,4326)" size="10" value="[0]"/> ' +
-				'Lat <input type="text" onchange="viseur.edit(this,1,4326)" size="10" value="[1]"/>',
-				'<br/>Suisse : ' +
-				'X <input type="text" onchange="viseur.edit(this,0,21781)" size="7" value="[2]"/> ' +
-				'Y <input type="text" onchange="viseur.edit(this,1,21781)" size="7" value="[3]"/>'
-			],
-			'edit'
-		);
+		viseur = draggedIcon(targetImage, [6.15, 46.2], 'viseur', true);
 		map.addLayer(viseur);
 	});
 </script>
 
 <dl class="posting-point" style="clear: left;">
-	<div id="edit-lonlat"></div>
+	<input id="viseur-json" name="geomjson" type="text" size="80" value='{"type":"Point","coordinates":[6.15,47.2]}'></input>
+	<dd>
+		Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12" value=""/>
+		Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12" value=""/>
+	</dd>
+	<dd id="viseur-xy">Suisse
+		X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12" value=""/>
+		Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12" value=""/>
+	</dd>
 	
 	<dd><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></dd>
 	<dd><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></dd>
-	<dd><a style="cursor:pointer" onclick="controlgps.action()">Utiliser la position du GPS</a></dd>
+	<dd><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></dd>
 
 	<br />
 	<dt><label>Altitude{L_COLON}</label></dt>

@@ -29,7 +29,7 @@ class listener implements EventSubscriberInterface
 		$this->db = $db;
 //		$this->request = $request;
 		$this->template = $template;
-//		$this->user = $user;
+		$this->user = $user;
 //		$this->extension_manager = $extension_manager;
 //		$this->root_path = $root_path;
 
@@ -58,16 +58,16 @@ class listener implements EventSubscriberInterface
 			'core.index_modify_page_title' => 'geobb_activate_map', //226
 
 			// Viewtopic
-			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data', //1143
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data', //1240
-			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row', //1949
-			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after', //1949
-			'geo.gis_modify_data' => 'gis_modify_data', //gis.php
+			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
+			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
+			'geobb.gis_modify_data' => 'gis_modify_data', //gis.php
 
 			// Posting
-			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data', //21 -> functions_posting.php 1859
-			'core.posting_modify_template_vars' => 'posting_modify_template_vars', //1834
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors', //1248
+			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
+			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
+			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 		];
 	}
 
@@ -339,23 +339,19 @@ class listener implements EventSubscriberInterface
 		$vars['forum_desc'] = $post_data['forum_desc'];
 		$this->geobb_activate_map($vars);
 
-						// Patch phpbb to accept geom values
-						// HORRIBLE hack mais comment faire autrement tant que les géométries ne sont pas prises en compte par PhpBB ???
-						// DCMM TODO résolu en PhpBB 3.2
-/*
-						$file_name = "phpbb/db/driver/driver.php";
-						$file_tag = "\n\t\tif (is_null(\$var))";
-						$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') === 0) //GeoBB\n\t\t\treturn \$var;";
-						$file_content = file_get_contents ($file_name);
-						if (strpos($file_content, '{'.$file_tag))
-							file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
-*/
+		// Patch phpbb to accept geom values
+		// HORRIBLE hack mais comment faire autrement tant que les géométries ne sont pas prises en compte par PhpBB ???
+		// TODO non résolu en PhpBB 3.2 !
+		$file_name = "phpbb/db/driver/driver.php";
+		$file_tag = "\n\t\tif (is_null(\$var))";
+		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') === 0) //GeoBB\n\t\t\treturn \$var;";
+		$file_content = file_get_contents ($file_name);
+		if (strpos($file_content, '{'.$file_tag))
+			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
 	}
 
 	// Appelé lors de la validation des données à enregistrer
 	function submit_post_modify_sql_data($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('submit_post_modify_sql_data',true).'</pre>';
-/*
 		$sql_data = $vars['sql_data'];
 
 		// Enregistre dans phpbb-posts les valeurs de $_POST correspondantes à des champs de phpbb-posts commençant par geo
@@ -365,7 +361,7 @@ class listener implements EventSubscriberInterface
 			$col_name = $row['Field'];
 
 			// Corrige le type de colonne de geom si la table vient d'être crée
-			// TODO DCMM : le mettre dans migration/...
+			// TODO : le mettre dans migration/...
 			if ($col_name == 'geom' && $row['Type'] == 'text')
 				$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' CHANGE geom geom GEOMETRYCOLLECTION NULL');
 
@@ -379,7 +375,7 @@ class listener implements EventSubscriberInterface
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
 				$g = \geoPHP::load (html_entity_decode($json), 'json');
 				if ($g) // Pas de geom
-					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("'.$g->out('wkt').'")';
+					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("GEOMETRYCOLLECTION('.$g->out('wkt').')")';
 			}
 		}
 		$this->db->sql_freeresult($result);
@@ -431,13 +427,10 @@ class listener implements EventSubscriberInterface
 		$save[] = $vars['post_mode'].':'.implode(',',$apres);
 
 		file_put_contents ('EDIT.log', implode ("\n", $save)."\n\n", FILE_APPEND);
-*/
 	}
 
 	// Permet la saisie d'un POST avec un texte vide
 	function posting_modify_submission_errors($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('posting_modify_submission_errors',true).'</pre>';
-/*
 		$error = $vars['error'];
 
 		foreach ($error AS $k=>$v)	
@@ -445,6 +438,5 @@ class listener implements EventSubscriberInterface
 				unset ($error[$k]);
 
 		$vars['error'] = $error;
-*/
 	}
 }

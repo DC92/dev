@@ -123,7 +123,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	/**
 	 * Change properties before sending
 	 *
-	 * @event geo.gis_modify_data
+	 * @event geobb.gis_modify_data
 	 * @var array row
 	 * @var array properties
 	 */
@@ -132,7 +132,7 @@ while ($row = $db->sql_fetchrow($result)) {
 		'properties',
 		'diagBbox', // Line or surface min segment length
 	);
-	extract($phpbb_dispatcher->trigger_event('geo.gis_modify_data', compact($vars)));
+	extract($phpbb_dispatcher->trigger_event('geobb.gis_modify_data', compact($vars)));
 
 	$gjs[] = [
 		'type' => 'Feature',

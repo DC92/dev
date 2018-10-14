@@ -60,6 +60,7 @@ function layerKompass(layer) {
 /**
  * Thunderforest
  * Requires layerOSM
+ * Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(layer, key) {
 	return layerOSM(
@@ -94,7 +95,7 @@ function layerStamen(layer) {
 /**
  * IGN France
  * Doc on http://api.ign.fr
- * Get a free key : http://professionnels.ign.fr/ign/contrats
+ * Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
  */
 function layerIGN(key, layer, format) {
 	var IGNresolutions = [],
@@ -243,6 +244,7 @@ function layerOS(key) {
 
 /**
  * Bing (Microsoft)
+ * Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
  */
 function layerBing(layer, key) {
 	return new ol.layer.Tile({
@@ -618,13 +620,21 @@ function layerOverpass(options) {
 }
 
 /**
- * Marqueurs
+ * Markers
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-function dragIcon(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon, lat], 'id-display', ['format de base', 'format suisse']
+function draggedIcon(imageUrl, llInit, IdDisplay, movable) { // imageUrl, [lon, lat], 'id-display', ['format de base', 'format suisse']
+	var format = new ol.format.GeoJSON(),
+		eljson = document.getElementById(IdDisplay + '-json'),
+		elxy = document.getElementById(IdDisplay + '-xy');
+
+	// Use GeoJson input field value if any
+	if (eljson && eljson.value)
+		llInit = JSON.parse(eljson.value).coordinates;
+
 	var point = new ol.geom.Point(
-			ol.proj.fromLonLat(ll)
+			ol.proj.fromLonLat(llInit)
 		),
 		iconStyle = new ol.style.Style({
 			image: new ol.style.Icon(({
@@ -639,10 +649,11 @@ function dragIcon(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 			features: [iconFeature]
 		}),
 		layer = new ol.layer.Vector({
-			source : source,
+			source: source,
 			style: iconStyle,
 			zIndex: 2
 		});
+
 	layer.on('onadd', function(event) {
 		if (movable) {
 			// Drag and drop
@@ -656,35 +667,46 @@ function dragIcon(imageUrl, ll, IdDisplay, format, movable) { // imageUrl, [lon,
 		}
 	});
 
-	// Show a coordinate
+	// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+	if (typeof proj4 == 'function') {
+		proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+		ol.proj.proj4.register(proj4);
+	}
+
+	// Display a coordinate
 	function displayLL(ll) {
 		var ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
-			html = format[0],
-			p = [Math.round(ll4326[0] * 100000) / 100000, Math.round(ll4326[1] * 100000) / 100000];
-
-		// Adding Swiss coordinates EPSG:21781 (CH1903 / LV03)
-		if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll) && // Si on est dans la zone suisse EPSG:21781
-			format.length >= 2 &&
-			typeof proj4 == 'function') {
-			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-			ol.proj.proj4.register(proj4);
+			values = {
+				lon: Math.round(ll4326[0] * 100000) / 100000,
+				lat: Math.round(ll4326[1] * 100000) / 100000,
+				json: JSON.stringify(format.writeGeometryObject(point, {
+					featureProjection: 'EPSG:3857'
+				}))
+			};
+		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+		if (typeof proj4 == 'function' &&
+			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) { // Si on est dans la zone suisse EPSG:21781
 			var c21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
-			html += format[1];
-			p.push(Math.round(c21781[0]), Math.round(c21781[1]));
+			values.x = Math.round(c21781[0]);
+			values.y = Math.round(c21781[1]);
 		}
-
-		// We integrate coordinates in html format
-		for (var r in p) // === sprinft
-			html = html.replace('[' + r + ']', p[r]);
+		if (elxy)
+			elxy.style.display = values.x ? '' : 'none';
 
 		// We insert the resulting HTML string where it is going
-		var displayElement = document.getElementById(IdDisplay);
-		if (displayElement)
-			displayElement.innerHTML = html;
+		for (var v in values) {
+			var el = document.getElementById(IdDisplay + '-' + v);
+			if (el) {
+				if (el.value !== undefined)
+					el.value = values[v];
+				else
+					el.innerHTML = values[v];
+			}
+		}
 	}
 
 	// Display once at init
-	displayLL(ol.proj.fromLonLat(ll));
+	displayLL(ol.proj.fromLonLat(llInit));
 
 	// <input> coords edition
 	layer.edit = function(event, nol, projection) {
@@ -1370,4 +1392,96 @@ function controlLineEditor(id, snapLayers) {
 	}
 
 	return bouton;
+}
+
+/**
+ * Controls examples
+ */
+var controlgps = controlGPS();
+function controlsCollection() {
+	return [
+		new ol.control.ScaleLine(),
+		new ol.control.MousePosition({
+			coordinateFormat: ol.coordinate.createStringXY(5),
+			projection: 'EPSG:4326',
+			className: 'ol-coordinate',
+			undefinedHTML: String.fromCharCode(0)
+		}),
+		new ol.control.Attribution({
+			collapsible: false // Attribution always open
+		}),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '',
+			labelActive: '',
+			tipLabel: 'Plein écran'
+		}),
+		controlLengthLine(),
+		controlPermalink({
+			init: true,
+			visible: true
+		}),
+		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
+		// Requires hack to display a title on the geocoder
+		new Geocoder('nominatim', {
+			provider: 'osm',
+			lang: 'FR',
+			keepOpen: true,
+			placeholder: 'Saisir un nom' // Initialization of the input field
+		}),
+		controlgps,
+		controlLoadGPX(),
+		controlDownloadGPX(),
+//		controlPrint(),
+	];
+}
+
+/**
+ * Tile layers examples
+ * Requires many
+ */
+function layersCollection(keys) {
+	return {
+		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+		'MRI': layerOSM(
+			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
+			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+		),
+		'Hike & Bike': layerOSM(
+			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
+			'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
+		), // Not on https
+		'Autriche': layerKompass('KOMPASS Touristik'),
+		//'Kompas': layerKompass(, 'KOMPASS'),
+		//'Kompas summer': layerKompass('Summer OSM'),
+		//'Kompas winter': layerKompass('Winter OSM'),
+		//'Kompas luftbild': layerKompass('a'),
+		'OSM-outdoors': layerThunderforest('outdoors', keys.thunderforest),
+		'OSM-cycle': layerThunderforest('cycle', keys.thunderforest),
+		'OSM-landscape': layerThunderforest('landscape', keys.thunderforest),
+		'OSM-transport': layerThunderforest('transport', keys.thunderforest),
+		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		// NOT YET	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
+		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
+		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
+		'Italie': layerIGM(),
+		'Angleterre': layerOS(keys.bing),
+		'Bing': layerBing('Road', keys.bing),
+		'Bing photo': layerBing('Aerial', keys.bing),
+		//'Bing mixte': layerBing ('AerialWithLabels', bingKey),
+		'Google road': layerGoogle('m'),
+		'Google terrain': layerGoogle('p'),
+		'Google photo': layerGoogle('s'),
+		'Google hybrid': layerGoogle('s,h'),
+		Stamen: layerStamen('terrain'),
+		Watercolor: layerStamen('watercolor'),
+		'Neutre': new ol.layer.Tile()
+	};
 }
