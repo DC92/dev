@@ -2,11 +2,11 @@
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
 <!-- INCLUDEJS assets/MyOl/ol/ol.js -->
 
-<!-- Recherche par nom
+<!-- Recherche par nom -->
 <!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
 
-<!-- Proj4 projections Swiss & UK
+<!-- Proj4 projections Swiss & UK -->
 <!-- INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
@@ -31,20 +31,20 @@
 				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
 			})
 		});
-		viseur = draggedIcon(targetImage, [6.15, 46.2], 'viseur', true);
+		viseur = draggedIcon(targetImage, 'viseur', true);
 		map.addLayer(viseur);
 	});
 </script>
 
 <dl class="posting-point" style="clear: left;">
-	<input id="viseur-json" name="geomjson" type="text" size="80" value='{"type":"Point","coordinates":[6.15,47.2]}'></input>
+	<input id="viseur-json" name="geomjson" type="text" size="80" value='{GEOMJSON}' />
 	<dd>
-		Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12" value=""/>
-		Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12" value=""/>
+		Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12"/>
+		Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12"/>
 	</dd>
 	<dd id="viseur-xy">Suisse
-		X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12" value=""/>
-		Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12" value=""/>
+		X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12"/>
+		Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12"/>
 	</dd>
 	
 	<dd><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></dd>

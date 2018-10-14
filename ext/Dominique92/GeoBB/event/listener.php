@@ -95,13 +95,10 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
 	function viewtopic_get_post_data($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('viewtopic_get_post_data',true).'</pre>';
-/*
 		// Insère la conversion du champ geom en format WKT dans la requette SQL
 		$sql_ary = $vars['sql_ary'];
 		$sql_ary['SELECT'] .= ',AsText(geom) AS geomwkt';
 		$vars['sql_ary'] = $sql_ary;
-*/
 	}
 
 	// Appelé lors de la première passe sur les données des posts qui lit les données SQL de phpbb-posts
@@ -120,7 +117,6 @@ class listener implements EventSubscriberInterface
 			$row = $this->post_data [$vars['row']['post_id']]; // Récupère les données SQL du post 
 			$post_row = $vars['post_row'];
 
-/* TODO
 			// Convert the geom info in geoJson format
 			preg_match ('/\[(first|all)=([a-z]+)\]/i', $vars['topic_data']['forum_desc'], $regle);
 			if (count ($regle) == 3 &&
@@ -137,7 +133,6 @@ class listener implements EventSubscriberInterface
 				$this->get_automatic_data($row);
 				$this->geobb_activate_map($vars, $vars['topic_data']['forum_desc']);
 			}
-*/
 
 			foreach ($row AS $k=>$v)
 				if (strstr ($k, 'geo_')) {
@@ -339,12 +334,10 @@ class listener implements EventSubscriberInterface
 		$vars['forum_desc'] = $post_data['forum_desc'];
 		$this->geobb_activate_map($vars);
 
-		// Patch phpbb to accept geom values
-		// HORRIBLE hack mais comment faire autrement tant que les géométries ne sont pas prises en compte par PhpBB ???
-		// TODO non résolu en PhpBB 3.2 !
+		// HORRIBLE phpbb hack to accept geom values / TODO : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
-		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') === 0) //GeoBB\n\t\t\treturn \$var;";
+		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";
 		$file_content = file_get_contents ($file_name);
 		if (strpos($file_content, '{'.$file_tag))
 			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
@@ -363,7 +356,7 @@ class listener implements EventSubscriberInterface
 			// Corrige le type de colonne de geom si la table vient d'être crée
 			// TODO : le mettre dans migration/...
 			if ($col_name == 'geom' && $row['Type'] == 'text')
-				$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' CHANGE geom geom GEOMETRYCOLLECTION NULL');
+				$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' CHANGE geom geom GEOMETRY NULL');
 
 			$val = request_var ($col_name, 'UNDEFINED', true); // Look in $_POST
 			if ($val != 'UNDEFINED')
@@ -375,7 +368,7 @@ class listener implements EventSubscriberInterface
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
 				$g = \geoPHP::load (html_entity_decode($json), 'json');
 				if ($g) // Pas de geom
-					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("GEOMETRYCOLLECTION('.$g->out('wkt').')")';
+					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("'.$g->out('wkt').'")';
 			}
 		}
 		$this->db->sql_freeresult($result);

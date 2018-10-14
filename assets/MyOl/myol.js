@@ -624,12 +624,16 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-function draggedIcon(imageUrl, llInit, IdDisplay, movable) { // imageUrl, [lon, lat], 'id-display', ['format de base', 'format suisse']
+function draggedIcon(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-display', dragged
 	var format = new ol.format.GeoJSON(),
-		eljson = document.getElementById(IdDisplay + '-json'),
-		elxy = document.getElementById(IdDisplay + '-xy');
+		llInit = typeof display == 'object' ? display : [3, 47], // Center of France
+		eljson, ellon, ellat, elxy;
 
-	// Use GeoJson input field value if any
+	if (typeof display == 'string') {
+		eljson = document.getElementById(display + '-json');
+		elxy = document.getElementById(display + '-xy');
+	}
+	// Use json field values if any
 	if (eljson && eljson.value)
 		llInit = JSON.parse(eljson.value).coordinates;
 
@@ -655,7 +659,7 @@ function draggedIcon(imageUrl, llInit, IdDisplay, movable) { // imageUrl, [lon, 
 		});
 
 	layer.on('onadd', function(event) {
-		if (movable) {
+		if (dragged) {
 			// Drag and drop
 			event.target.map_.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([iconFeature]),
@@ -695,7 +699,7 @@ function draggedIcon(imageUrl, llInit, IdDisplay, movable) { // imageUrl, [lon, 
 
 		// We insert the resulting HTML string where it is going
 		for (var v in values) {
-			var el = document.getElementById(IdDisplay + '-' + v);
+			var el = document.getElementById(display + '-' + v);
 			if (el) {
 				if (el.value !== undefined)
 					el.value = values[v];

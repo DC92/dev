@@ -2,11 +2,11 @@
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
 <!-- INCLUDEJS assets/MyOl/ol/ol.js -->
 
-<!-- Recherche par nom
+<!-- Recherche par nom -->
 <!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
 
-<!-- Proj4 projections Swiss & UK
+<!-- Proj4 projections Swiss & UK -->
 <!-- INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
@@ -20,6 +20,10 @@
 <div id="map"></div>
 
 <h4 class="geo_info">
+AAA{GEOMJSON}ZZZ
+	<input id="marqueur-json" type="hidden" value='{GEOMJSON}'></input>
+	<div>Lon <span id="marqueur-lon"></span>, Lat <span id="marqueur-lat"></span></div>
+	<div id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></div>
 	<p>
 		<span id="position-title-lng"></span>{L_COLON} <em id="position-proj-lng"></em>
 		<span id="position-title-lat"></span>{L_COLON} <em id="position-proj-lat"></em>

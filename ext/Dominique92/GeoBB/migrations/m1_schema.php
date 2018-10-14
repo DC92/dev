@@ -37,7 +37,7 @@ class m1_schema extends \phpbb\db\migration\migration
 		return array(
 			'add_columns'	=> array(
 				$this->table_prefix . 'posts'	=> array(
-					'geom' => array('TEXT'),
+					'geom' => array('TEXT'), // Will be transformed into GEOMETRYCOLLECTION by a lister hack
 					'geo_altitude' => array('UINT'),
 					'geo_massif' => array('VCHAR:50'),
 				),
