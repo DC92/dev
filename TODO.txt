@@ -12,6 +12,9 @@ Supprimer install
 
 BUGS
 ====
+IE : pas de SGV
+Edge : Viseur noir
+...OLD :
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
 Plus de delete segment de ligne
 Pas de scroll avec doigt (mobile) sur page avec deplacement de post

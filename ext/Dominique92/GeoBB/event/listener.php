@@ -61,7 +61,6 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
-			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
 			'geobb.gis_modify_data' => 'gis_modify_data', //gis.php
 
 			// Posting
@@ -105,7 +104,6 @@ class listener implements EventSubscriberInterface
 	function viewtopic_post_rowset_data($vars) {
 		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
 		$this->post_data [$vars['row']['post_id']] = $vars['row'];
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>vars['row'] = ".var_export($vars['row'],true).'</pre>';
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
@@ -135,7 +133,7 @@ class listener implements EventSubscriberInterface
 			}
 
 			foreach ($row AS $k=>$v)
-				if (strstr ($k, 'geo_')) {
+				if (strstr ($k, 'geo')) {
 					// Assign the phpbb-posts.geo* SQL data of to each template post area
 					$post_row[strtoupper ($k)] = $v;
 
@@ -146,36 +144,6 @@ class listener implements EventSubscriberInterface
 
 			$vars['post_row'] = $post_row;
 		}
-	}
-
-	// Appelé aprés l'assignation de postrow au template. Pour assigner les sous-blocks de postrow
-	function viewtopic_post_row_after($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('viewtopic_post_row_after',true).'</pre>';
-/*
-		global $limite;
-
-		$row = $vars['row'];
-
-		// Lecture des posts ayant un geom en contact
-		$sql = "
-			SELECT p.post_id, p.post_subject, p.topic_id,
-				f.forum_id, f.forum_name, f.forum_image,
-				AsText(p.geom) AS gp, AsText(l.geom) AS gl
-			FROM ".POSTS_TABLE." AS l
-				JOIN ".POSTS_TABLE." AS p ON (Intersects (l.geom, p.geom))
-				JOIN ".FORUMS_TABLE." AS f ON (p.forum_id = f.forum_id)
-			WHERE p.post_id != l.post_id
-				AND l.post_id = ".$row['post_id']."
-				GROUP BY (p.topic_id)";
-
-		$result = $this->db->sql_query_limit($sql, $limite);
-		while ($row = $this->db->sql_fetchrow($result)) {
-			preg_match ('/([0-9\. ]+)/', $row['gp'], $pp);
-			preg_match_all ('/([0-9\. ]+)/', $row['gl'], $pl);
-			if (in_array ($pp[0], $pl[0])) // Intersects récolte tout les points qui sont dans le bbox des lignes. Il faut trier ceux qui en sont des sommets
-				$this->template->assign_block_vars('postrow.jointif', array_change_key_case ($row, CASE_UPPER));
-		}
-*/
 	}
 
 	function gis_modify_data($vars) {

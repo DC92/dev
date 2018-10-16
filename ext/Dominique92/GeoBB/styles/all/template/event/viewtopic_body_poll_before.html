@@ -19,38 +19,43 @@
 
 <div id="map"></div>
 
-<h4 class="geo_info">
-AAA{GEOMJSON}ZZZ
+<div>
 	<input id="marqueur-json" type="hidden" value='{GEOMJSON}'></input>
-	<div>Lon <span id="marqueur-lon"></span>, Lat <span id="marqueur-lat"></span></div>
-	<div id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></div>
-	<p>
-		<span id="position-title-lng"></span>{L_COLON} <em id="position-proj-lng"></em>
-		<span id="position-title-lat"></span>{L_COLON} <em id="position-proj-lat"></em>
-		<select id="position-select"></select>
-	</p>
+	<p>Longitude <span id="marqueur-lon"></span>, Latitude <span id="marqueur-lat"></span></p>
+	<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
 
 	<!-- IF GEO_ALTITUDE -->
-		<p><span>Altitude</span>{L_COLON} <em>{GEO_ALTITUDE} m</em></p>
+		<p><span>Altitude</span>{L_COLON}{GEO_ALTITUDE} m</p>
 	<!-- ENDIF -->
 	<!-- IF GEO_MASSIF -->
-		<p><span>Massif</span>{L_COLON} <em>{GEO_MASSIF}</em></p>
+		<p><span>Massif</span>{L_COLON}{GEO_MASSIF}</p>
 	<!-- ENDIF -->
 	<!-- IF GEO_PLACES -->
-		<p><span>Place<!-- IF GEO_PLACES > 1 -->s<!-- ENDIF --></span>{L_COLON} <em>{GEO_PLACES}</em></p>
+		<p>Place<!-- IF GEO_PLACES > 1 -->s<!-- ENDIF -->{L_COLON}{GEO_PLACES}</p>
 	<!-- ENDIF -->
-</h4>
+</div>
 <hr clear="all" style="border-color:transparent">
 
 <script>
 	window.addEventListener('load', function() {
-		var map = new ol.Map({
-			target: 'map',
-			controls: controlsCollection({
-				IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
-				thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // https://manage.thunderforest.com
-				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
-			})
-		});
+		var marqueur = draggedIcon(markerImage, 'marqueur'),
+			pos = marqueur.getPoint().getCoordinates(),
+			map = new ol.Map({
+				target: 'map',
+				view: new ol.View({
+					center: pos,
+					zoom: 15
+				}),
+				controls: geobbControlsCollection({
+					IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
+					thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // https://manage.thunderforest.com
+					bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
+				})
+			});
+		map.addControl(controlPermalink({
+			init: false,
+			visible: true
+		}));
+		map.addLayer(marqueur);
 	});
 </script>
