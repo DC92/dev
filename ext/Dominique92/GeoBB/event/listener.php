@@ -147,7 +147,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	function gis_modify_data($vars) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
 /*
 		// Insère l'extraction des données externes dans le flux géographique
 		$row = $vars['row'];
@@ -159,6 +159,7 @@ class listener implements EventSubscriberInterface
 */
 	}
 	function optim (&$g, $granularity) { // Fonction récursive d'optimisation d'un objet PHP contenant des objets géographiques
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim',true).'</pre>';
 /*
 		if (isset ($g->geometries)) // On recurse sur les Collection, ...
 			foreach ($g->geometries AS &$gs)
@@ -176,6 +177,7 @@ class listener implements EventSubscriberInterface
 */
 	}
 	function optim_coordinate_array (&$cs, $granularity) { // Fonction d'optimisation d'un tableau de coordonnées
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim_coordinate_array',true).'</pre>';
 /*
 		if (count ($cs) > 2) { // Pour éviter les "Points" et "Poly" à 2 points
 			$p = $cs[0]; // On positionne le point de référence de mesure de distance à une extrémité
@@ -195,6 +197,7 @@ class listener implements EventSubscriberInterface
 
 	// Calcul des données automatiques
 	function get_automatic_data(&$row) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('get_automatic_data',true).'</pre>';
 /*
 		global $config_locale;
 		preg_match_all('/([0-9\.\-]+)/', $row['geomwkt'], $ll);
@@ -236,6 +239,7 @@ class listener implements EventSubscriberInterface
 
 	// Calcul de la bbox englobante
 	function get_bounds($g) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('get_bounds',true).'</pre>';
 /*
 		$b = $g->getBBox();
 		$m = 0.005; // Marge autour d'un point simple (en °)
