@@ -42,6 +42,7 @@
 			pos = marqueur.getPoint().getCoordinates(),
 			map = new ol.Map({
 				target: 'map',
+				layers: [geoLayer()],
 				view: new ol.View({
 					center: pos,
 					zoom: 15

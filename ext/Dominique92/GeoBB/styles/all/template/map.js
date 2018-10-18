@@ -68,8 +68,7 @@ function geoLayer() {
 			return properties.nom;
 		},
 		click: function(properties) {
-			if (properties.url)
-				window.location.href = properties.url;
+			window.location.href = 'viewtopic.php?t=' + properties.id;
 		}
 	});
 }

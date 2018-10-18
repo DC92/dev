@@ -26,10 +26,11 @@
 		viseur = draggedIcon(targetImage, 'viseur', true);
 		map = new ol.Map({
 			target: 'map',
-				view: new ol.View({
-					center: viseur.getPoint().getCoordinates(),
-					zoom: 15
-				}),
+			layers: [geoLayer()],
+			view: new ol.View({
+				center: viseur.getPoint().getCoordinates(),
+				zoom: 15
+			}),
 			controls: geobbControlsCollection({
 				IGN: 'o6owv8ubhn3vbz2uj8jq5j0z', // localhost
 				thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // https://manage.thunderforest.com

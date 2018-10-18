@@ -12,6 +12,7 @@ Supprimer install
 
 BUGS
 ====
+Inhiber click sur modification
 IE : pas de SGV
 Edge : Viseur noir
 ...OLD :
@@ -34,6 +35,7 @@ Image interdite dans texte
 
 TODO
 ====
+CTRL + Click -> Autre page
 file-total-progress-bar => pupload : masquer "Envoyer"
 Dominique92->Organiser : intégrer mais avec une puce "echanger", sous droit d'édition
 Mettre un gros cache sur leaflet.js...
