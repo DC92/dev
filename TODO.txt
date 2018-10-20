@@ -12,7 +12,6 @@ Supprimer install
 
 BUGS
 ====
-clés IGN sur config.php
 Inhiber click sur modification
 IE : pas de SGV
 Edge : Viseur noir

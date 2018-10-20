@@ -529,31 +529,32 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//BEST restos, wc
 function layerOverpass(options) {
 	var layer = layerVectorURL({
 		url: function(bbox, list, resolution) {
 			var bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 				args = [];
 
-			if (resolution < 30) // Only for small areas
-				for (var l = 0; l < list.length; l++)
-					args.push(
-						'node' + list[l] + bb + // Ask for nodes in the bbox
-						'way' + list[l] + bb // Also ask for areas
-					);
-
+			if (resolution < options.maxResolution || 30) // Only for small areas
+				for (var l = 0; l < list.length; l++) {
+					var lists = list[l].split('+');
+					for (var ls = 0; ls < lists.length; ls++)
+						args.push(
+							'node' + lists[ls] + bb + // Ask for nodes in the bbox
+							'way' + lists[ls] + bb // Also ask for areas
+						);
+				}
 			return options.url +
 				'?data=[timeout:5];(' + // Not too much !
 				args.join('') +
 				');out center;'; // add center of areas
 		},
 		format: new ol.format.OSMXMLPOI(),
-		selector: options.selector,
+		selector: options.selector, // The layer is cleared & reloaded if one selector check is clicked
 		style: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + overpassType(properties) + '.png'
+					src: options.iconUrl + overpassType(properties) + '.png'
 				})
 			};
 		},
@@ -561,47 +562,83 @@ function layerOverpass(options) {
 		label: formatLabel
 	});
 
+	//TODO : afficher erreur 429 (Too Many Requests)
 	function formatLabel(p, f) { // p = properties, f = feature
 		var language = {
 				hotel: 'h&ocirc;tel',
 				camp_site: 'camping',
 				convenience: 'alimentation',
-				supermarket: 'supermarch&egrave;'
+				supermarket: 'supermarch&egrave;',
+				drinking_water: 'point d\'eau',
+				watering_place: 'abreuvoir',
+				fountain: 'fontaine'
 			},
-			type = p.type = overpassType(p),
-			description = [
-				(p.name && p.name.toLowerCase().indexOf(type) ? type : '') +
-				'*'.repeat(p.stars),
-				p.rooms ? p.rooms + ' chambres' : '',
-				p.place ? p.place + ' places' : '',
-				p.capacity ? p.capacity + ' places' : '',
-				p.ele ? parseInt(p.ele, 10) + 'm' : '',
-			].join(' ').replace( // Word translation if necessary
-				new RegExp(Object.keys(language).join('|'), 'gi'),
-				function(m) {
-					return language[m.toLowerCase()];
-				}
-			),
 			phone = p.phone || p['contact:phone'],
 			address = [
-				p['addr:housenumber'],
-				p['addr:street'],
-				p['addr:postcode'],
-				p['addr:city']
+				p.address,
+				p['addr:housenumber'], p.housenumber,
+				p['addr:street'], p.street,
+				p['addr:postcode'], p.postcode,
+				p['addr:city'], p.city
 			],
 			osmUrl = p.url = 'http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId(),
 			popup = [
-				p.name ? '<b>' + p.name + '</b>' : '',
-				description ? description.charAt(0).toUpperCase() + description.substr(1) : '', // Uppercase the first letter
+				(p.name ? '<b>' + p.name + '</b>' : '') +
+				(p.alt_name ? '<b>' + p.alt_name + '</b>' : '') +
+				(p.short_name ? '<b>' + p.short_name + '</b>' : ''),
+				[(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
+					'*'.repeat(p.stars),
+					p.shelter_type == 'basic_hut' ? 'Abri' : '',
+					p.waterway == 'water_point' ? 'Point d\'eau' : '',
+					p.natural == 'spring' ? 'Source' : '',
+					p.man_made == 'water_well' ? 'Puits' : '',
+					language[p.amenity] ? language[p.amenity] : '',
+					p.rooms ? p.rooms + ' chambres' : '',
+					p.beds ? p.beds + ' lits' : '',
+					p.place ? p.place + ' places' : '',
+					p.capacity ? p.capacity + ' places' : '',
+					p.ele ? parseInt(p.ele, 10) + 'm' : '',
+				].join(' '),
 				phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9\+]+/ig, '') + '">' + phone + '</a>' : '',
 				p.email ? '&#9993;<a title="Envoyer un mail" href="mailto:' + p.email + '">' + p.email + '</a>' : '',
 				p['addr:street'] ? address.join(' ') : '',
 				p.website ? '&#8943;<a title="Voir le site web" target="_blank" href="' + p.website + '">' + (p.website.split('/')[2] || p.website) + '</a>' : '',
-				'&copy; Voir sur <a title="Voir la fiche d\'origine sur openstreetmap" target="_blank" href="' + osmUrl + '">OSM</a>'
+				p.opening_hours ? 'ouvert ' + p.opening_hours : '',
+				p.note ? p.note : ''
 			],
-			postLabel = typeof options.label == 'function' ? options.label(p, f) : options.label || '';
+			postLabel = typeof options.label == 'function' ? options.postLabel(p, f) : options.postLabel || '';
 
-		popup = popup.concat(typeof postLabel == 'object' ? postLabel : [postLabel]);
+		var internet = 0,
+			done = [
+				'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
+				'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
+				'opening_hours,description,beds,bus,note',
+				'addr,housenumber,street,postcode,city,bus,public_transport,tactile_paving',
+				'ref,source,wheelchair,leisure,landuse,camp_site,bench,network,brand,bulk_purchase,organic',
+				'compressed_air,fuel,vending,vending_machine',
+				'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
+				'historic,motorcycle,drying,restaurant,hgv',
+				'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
+			].join(',').split(',');
+		for (var k in p) {
+			var k0 = k.split(':')[0];
+			if (!done.includes(k0))
+				switch (k0) {
+					case 'internet_access':
+						if (p[k] != 'no' && !internet++)
+							popup.push('Accès internet');
+						break;
+					default:
+						popup.push(k + ' : ' + p[k]);
+				}
+		}
+
+		popup = popup.concat(
+			typeof postLabel == 'object' ? postLabel : [postLabel], [
+				p.description,
+				'&copy; Voir sur <a title="Voir la fiche d\'origine sur openstreetmap" target="_blank" href="' + osmUrl + '">OSM</a>'
+			]
+		);
 		return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
 	}
 
@@ -609,11 +646,15 @@ function layerOverpass(options) {
 		var checkElements = document.getElementsByName(options.selector);
 		for (var e = 0; e < checkElements.length; e++)
 			if (checkElements[e].checked) {
-				var conditions = checkElements[e].value.split('"');
-				if (properties[conditions[1]] &&
-					properties[conditions[1]].match(conditions[3]))
-					return checkElements[e].id;
+				var tags = checkElements[e].value.split('+');
+				for (var t = 0; t < tags.length; t++) {
+					var conditions = tags[t].split('"');
+					if (properties[conditions[1]] &&
+						properties[conditions[1]].match(conditions[3]))
+						return checkElements[e].id;
+				}
 			}
+		return 'inconnu';
 	}
 
 	return layer;
@@ -1457,18 +1498,18 @@ function layersCollection(keys) {
 			'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
 		), // Not on https
 		'Autriche': layerKompass('KOMPASS Touristik'),
-		//'Kompas': layerKompass(, 'KOMPASS'),
-		//'Kompas summer': layerKompass('Summer OSM'),
-		//'Kompas winter': layerKompass('Winter OSM'),
-		//'Kompas luftbild': layerKompass('a'),
-		'OSM-outdoors': layerThunderforest('outdoors', keys.thunderforest),
-		'OSM-cycle': layerThunderforest('cycle', keys.thunderforest),
-		'OSM-landscape': layerThunderforest('landscape', keys.thunderforest),
-		'OSM-transport': layerThunderforest('transport', keys.thunderforest),
+		'Kompas': layerKompass('KOMPASS'),
+		'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
+		'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
+		'OSM landscape': layerThunderforest('landscape', keys.thunderforest),
+		'OSM transport': layerThunderforest('transport', keys.thunderforest),
 		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+		'IGN Spot': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017'),
+		'IGN plan': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
+		'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 		// NOT YET	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
@@ -1479,7 +1520,7 @@ function layersCollection(keys) {
 		'Angleterre': layerOS(keys.bing),
 		'Bing': layerBing('Road', keys.bing),
 		'Bing photo': layerBing('Aerial', keys.bing),
-		//'Bing mixte': layerBing ('AerialWithLabels', bingKey),
+		'Bing mixte': layerBing ('AerialWithLabels', keys.bing),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google photo': layerGoogle('s'),

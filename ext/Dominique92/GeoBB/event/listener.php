@@ -71,7 +71,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	function geobb_activate_map($vars) {
-//		global $config_locale;
+		global $geo_olkeys;
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($vars['forum_desc'].'[all=accueil]'), $regle);
 		switch (@$regle[1]) {
@@ -83,6 +83,7 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_vars([
 					'EXT_DIR' => $this->ext_dir,
 					'GEO_MAP_TYPE' => $regle[2],
+					'GEO_OLKEYS' => $geo_olkeys,
 //					'STYLE_NAME' => $this->user->style['style_name'],
 //					'MAP_KEYS' => @$config_locale['keys-js']
 				]);
@@ -357,7 +358,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k $v");
 
 		$vars['sql_data'] = $sql_data;
-		exit;
 
 		//-----------------------------------------------------------------
 		// Save modif
