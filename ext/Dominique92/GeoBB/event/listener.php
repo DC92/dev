@@ -319,17 +319,19 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
+		// Redefine basic fields
+		global $post_shema;
+		$post_shema ['geom'] = 'geometry';
+		$post_shema ['geo_altitude'] = 'int(11)';
+		$post_shema ['geo_massif'] = 'varchar(50)';
+
 		// Enregistre dans phpbb-posts les valeurs de $_POST correspondantes à des champs de phpbb-posts commençant par geo
 		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$col_name = $row['Field'];
 
-			// Corrige le type de colonne de geom si la table vient d'être crée
-			// TODO : le mettre dans migration/...
-			if ($col_name == 'geom' && $row['Type'] == 'text')
-				$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' CHANGE geom geom GEOMETRY NULL');
-
+			// Récupère les valeurs du questionnaire
 			$val = request_var ($col_name, 'UNDEFINED', true); // Look in $_POST
 			if ($val != 'UNDEFINED')
 				$sql_data[POSTS_TABLE]['sql'][$col_name] = utf8_normalize_nfc($val) ?: null; // null permet la supression du champ
@@ -342,10 +344,20 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				if ($g) // Pas de geom
 					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("'.$g->out('wkt').'")';
 			}
+
+			// Correct existing columns
+			if ($post_shema[$col_name] && $post_shema[$col_name] != $row['Type'])
+				$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." CHANGE $col_name $col_name ".$post_shema[$col_name]." NULL");
+			unset ($post_shema[$col_name]);
 		}
 		$this->db->sql_freeresult($result);
 
+		// Add missing colums
+		foreach ($post_shema AS $k => $v)
+			$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k $v");
+
 		$vars['sql_data'] = $sql_data;
+		exit;
 
 		//-----------------------------------------------------------------
 		// Save modif

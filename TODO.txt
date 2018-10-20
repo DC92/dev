@@ -12,7 +12,7 @@ Supprimer install
 
 BUGS
 ====
-IE : JS "index size error"  context.drawImage(image, originX, originY, w, h, x, y, w * scale, h * scale);
+clés IGN sur config.php
 Inhiber click sur modification
 IE : pas de SGV
 Edge : Viseur noir
@@ -36,6 +36,7 @@ Image interdite dans texte
 
 TODO
 ====
+favicon aspir
 Voir cartes en responsive repli mobile
 CTRL + Click -> Autre page
 file-total-progress-bar => pupload : masquer "Envoyer"
