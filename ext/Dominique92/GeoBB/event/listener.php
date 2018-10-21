@@ -27,17 +27,40 @@ class listener implements EventSubscriberInterface
 		$root_path
 	) {
 		$this->db = $db;
-//		$this->request = $request;
+		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
 //		$this->extension_manager = $extension_manager;
 //		$this->root_path = $root_path;
+	}
 
-		// Recherche du répertoire de l'extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->ext_dir = 'ext/'.$ns[0].'/'.$ns[1].'/';
+	// Liste des hooks et des fonctions associées
+	// On trouve le point d'appel en cherchant dans le logiciel de PhpBB 3.x: "event core.<XXX>"
+	static public function getSubscribedEvents() {
+		return [
+			// All
+			'core.user_setup' => 'user_setup',
 
+			// Index
+			'core.index_modify_page_title' => 'geobb_activate_map',
+
+			// Viewtopic
+			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
+			'geobb.gis_modify_data' => 'gis_modify_data', // gis.php
+
+			// Posting
+			'core.modify_posting_parameters' => 'modify_posting_parameters',
+			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
+			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
+			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
+		];
+	}
+
+	function user_setup($vars) {
 		// Inclue les fichiers langages de cette extension
+		$ns = explode ('\\', __NAMESPACE__);
 		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
 
 /*
@@ -50,26 +73,6 @@ class listener implements EventSubscriberInterface
 */
 	}
 
-	// Liste des hooks et des fonctions associées
-	// On trouve le point d'appel en cherchant dans le logiciel de PhpBB 3.x: "event core.<XXX>"
-	static public function getSubscribedEvents() {
-		return [
-			// Index
-			'core.index_modify_page_title' => 'geobb_activate_map', //226
-
-			// Viewtopic
-			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
-			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
-			'geobb.gis_modify_data' => 'gis_modify_data', //gis.php
-
-			// Posting
-			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
-			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
-		];
-	}
-
 	function geobb_activate_map($vars) {
 		global $geo_olkeys;
 
@@ -80,8 +83,9 @@ class listener implements EventSubscriberInterface
 					break;
 
 			case 'all': // Régle sur tous les posts
+				$ns = explode ('\\', __NAMESPACE__);
 				$this->template->assign_vars([
-					'EXT_DIR' => $this->ext_dir,
+					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
 					'GEO_OLKEYS' => $geo_olkeys,
 //					'STYLE_NAME' => $this->user->style['style_name'],
@@ -263,6 +267,17 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	/**
 		POSTING.PHP
 	*/
+	// Appelé au début pour altérer les parametres
+	function modify_posting_parameters($vars) {
+		$forum_image = $this->request->variable('type', '');
+		$sql = 'SELECT * FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
+		$result = $this->db->sql_query ($sql);
+		$row = $this->db->sql_fetchrow ($result);
+		if ($row)
+			$vars['forum_id'] = $row ['forum_id']; // Force le forum PhpBB
+		$this->db->sql_freeresult ($result);
+	}
+
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
