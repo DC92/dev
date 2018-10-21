@@ -35,7 +35,7 @@ Image interdite dans texte
 
 TODO
 ====
-favicon aspir
+Editeur de zones
 Voir cartes en responsive repli mobile
 CTRL + Click -> Autre page
 file-total-progress-bar => pupload : masquer "Envoyer"
@@ -54,7 +54,6 @@ BEST TODO
 Ajouter les liens en "voir sur le site" dans l'étiquette
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Mettre ?date dans les liens des libs LL.
-IGN test.chemineur.fr 1nxqfnrnhph73nqh80izju6j
 En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
 OS.GB key for test.chemineur.fr
 Pouvoir trier les posts WRIC
