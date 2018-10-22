@@ -31,3 +31,8 @@
 	}
 }
 */
+
+/* Accueil index.php */
+#news .row:after {
+	content: none;
+}

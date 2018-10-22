@@ -38,9 +38,16 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
+	// Fil d'ariane
 	'FORUM_INDEX' => 'Accueil',
 	'RETURN_TO_INDEX' => 'Accueil',
 	'ACP_SHORT' => 'Administration',
 	'MCP_SHORT' => 'Modération',
+
+	// News
+	'CREATION' => 'Création de',
+	'COMMENT' => 'Commentaire sur',
+
+	// Footer
 	'FINAL_INTEGRATION_BY' => 'Copyright &copy; <a href="https://github.com/Dominique92">Dominique Cavailhez</a> 2016. Sur la base de PhpBB',
 ));

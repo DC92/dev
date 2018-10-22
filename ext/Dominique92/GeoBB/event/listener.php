@@ -42,7 +42,8 @@ class listener implements EventSubscriberInterface
 			'core.user_setup' => 'user_setup',
 
 			// Index
-			'core.index_modify_page_title' => 'geobb_activate_map',
+			'core.index_modify_page_title' => 'index_modify_page_title',
+			'core.display_forums_modify_row' => 'display_forums_modify_row',
 
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
@@ -92,6 +93,68 @@ class listener implements EventSubscriberInterface
 //					'MAP_KEYS' => @$config_locale['keys-js']
 				]);
 		}
+	}
+
+	/**
+		INDEX.PHP
+	*/
+
+	// Ajoute un bouton créer un point en face de la liste des forums
+	function display_forums_modify_row ($vars) {
+		/*
+		global $auth;
+		$row = $vars['row'];
+
+		if ($auth->acl_get('f_post', $row['forum_id']) &&
+			$row['forum_type'] == FORUM_POST)
+			$row['forum_name'] .=
+				' &nbsp; '.
+				'<a href="posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.$row['forum_name'].'">'.
+					'<img style="position:relative;top:4px" src="adm/images/file_new.gif" />'.
+				'</a>';
+
+		$vars['row'] = $row;
+		*/
+	}
+
+	// Affiche les post les plus récents sur la page d'accueil
+	function index_modify_page_title ($vars) {
+		global $auth; //TODO intégrer aux variables du listener ($this->auth)
+
+		$this->geobb_activate_map($vars);
+
+		$news = request_var ('news', 20);
+		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
+
+		$sql = "
+			SELECT t.topic_id, topic_title,
+				t.forum_id, forum_name, forum_image,
+				topic_first_post_id, post_id, post_attachment, topic_posts_approved,
+				username, poster_id, post_time, geo_massif
+			FROM	 ".TOPICS_TABLE." AS t
+				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
+				JOIN ".POSTS_TABLE ." AS p ON (p.post_id = t.topic_last_post_id)
+				JOIN ".USERS_TABLE."  AS u ON (p.poster_id = u.user_id)
+			WHERE post_visibility = ".ITEM_APPROVED."
+			ORDER BY post_time DESC
+			LIMIT ".$news;
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			if ($auth->acl_get('f_read', $row['forum_id'])) {
+				$row ['topic_comments'] = $row['topic_posts_approved'] - 1;
+				$row ['post_time'] = $this->user->format_date ($row['post_time']);
+				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
+				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
+			}
+		$this->db->sql_freeresult($result);
+
+		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
+		// Le texte de ces messages sont dans les posts dont le titre est !style
+		$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
+		$this->db->sql_freeresult($result);
 	}
 
 	/**
@@ -269,12 +332,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	*/
 	// Appelé au début pour altérer les parametres
 	function modify_posting_parameters($vars) {
+		// Création topic avec le nom d'image
 		$forum_image = $this->request->variable('type', '');
 		$sql = 'SELECT * FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
 		$result = $this->db->sql_query ($sql);
 		$row = $this->db->sql_fetchrow ($result);
 		if ($row)
-			$vars['forum_id'] = $row ['forum_id']; // Force le forum PhpBB
+			$vars['forum_id'] = $row ['forum_id']; // Force le forum
 		$this->db->sql_freeresult ($result);
 	}
 
