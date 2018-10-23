@@ -35,6 +35,10 @@ Image interdite dans texte
 
 TODO
 ====
+//http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
+//http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
+
+//geophp simplify : https://github.com/phayes/geoPHP/issues/24
 Editeur de zones
 Voir cartes en responsive repli mobile
 CTRL + Click -> Autre page

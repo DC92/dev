@@ -193,9 +193,9 @@ class listener implements EventSubscriberInterface
 				@$row['geomwkt']
 			) {
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
-				$g = \geoPHP::load($row['geomwkt'],'wkt');
-				$row['geomjson'] = $g->out('json');
-				$this->get_bounds($g);
+				$geophp = \geoPHP::load($row['geomwkt'],'wkt');
+				$row['geomjson'] = $geophp->out('json');
+				$this->get_bounds($geophp);
 				$this->get_automatic_data($row);
 				$this->geobb_activate_map($vars, $vars['topic_data']['forum_desc']);
 			}
@@ -358,9 +358,9 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 			// Traduction en geoJson
 			include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
-			$g = \geoPHP::load($post_data['geomwkt'],'wkt');
-			$this->get_bounds($g);
-			$gp = json_decode ($g->out('json')); // On transforme le GeoJson en objet PHP
+			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
+			$this->get_bounds($geophp);
+			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
 			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
 			$post_data['geomjson'] = json_encode ($gp);
 		}
@@ -399,11 +399,11 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
-		// Redefine basic fields
+		/*/ Redefine basic fields
 		global $post_shema;
 		$post_shema ['geom'] = 'geometry';
 		$post_shema ['geo_altitude'] = 'int(11)';
-		$post_shema ['geo_massif'] = 'varchar(50)';
+		$post_shema ['geo_massif'] = 'varchar(50)';*/
 
 		// Enregistre dans phpbb-posts les valeurs de $_POST correspondantes à des champs de phpbb-posts commençant par geo
 		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
@@ -420,21 +420,21 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$json = request_var ($col_name.'json', ''); // Look in $_POSTS[*json]
 			if ($json) {
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
-				$g = \geoPHP::load (html_entity_decode($json), 'json');
-				if ($g) // Pas de geom
-					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("'.$g->out('wkt').'")';
+				$geophp = \geoPHP::load (html_entity_decode($json), 'json');
+				if ($geophp) // Pas de geom
+					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("'.$geophp->out('wkt').'")';
 			}
 
-			// Correct existing columns
+			/*/ Correct existing columns
 			if ($post_shema[$col_name] && $post_shema[$col_name] != $row['Type'])
 				$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." CHANGE $col_name $col_name ".$post_shema[$col_name]." NULL");
-			unset ($post_shema[$col_name]);
+			unset ($post_shema[$col_name]);*/
 		}
 		$this->db->sql_freeresult($result);
 
-		// Add missing colums
+		/*/ Add missing colums
 		foreach ($post_shema AS $k => $v)
-			$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k $v");
+			$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k $v");*/
 
 		$vars['sql_data'] = $sql_data;
 
