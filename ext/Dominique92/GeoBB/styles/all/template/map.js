@@ -54,6 +54,9 @@ function geoLayer() {
 			return {
 				image: new ol.style.Icon({
 					src: properties.icone
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'red'
 				})
 			};
 		},

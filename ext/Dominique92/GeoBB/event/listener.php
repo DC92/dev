@@ -215,7 +215,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	function gis_modify_data($vars) {
-//if(defined('TRACES_DOM'))//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
+//if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
 /*
 		// Insère l'extraction des données externes dans le flux géographique
 		$row = $vars['row'];
@@ -307,8 +307,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Calcul de la bbox englobante
 	function get_bounds($g) {
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('get_bounds',true).'</pre>';
-/*
 		$b = $g->getBBox();
 		$m = 0.005; // Marge autour d'un point simple (en °)
 		foreach (['x','y'] AS $xy) {
@@ -323,7 +321,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					: $b[$mm.$xy];
 		}
 		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
-*/
 	}
 
 
