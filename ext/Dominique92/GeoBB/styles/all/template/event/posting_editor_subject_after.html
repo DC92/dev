@@ -23,7 +23,7 @@
 	var map, viseur;
 
 	window.addEventListener('load', function() {
-		viseur = draggedIcon(targetImage, 'viseur', true);
+		viseur = marker(targetImage, 'viseur', true);
 		map = new ol.Map({
 			target: 'map',
 			layers: [geoLayer()],
@@ -39,25 +39,22 @@
 
 <dl class="posting-point" style="clear: left;">
 	<input id="viseur-json" name="geomjson" type="hidden" value='{GEOMJSON}' />
-	<dd>
+	<p>
 		Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12"/>
 		Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12"/>
-	</dd>
-	<dd id="viseur-xy">Suisse
+	</p>
+	<p id="viseur-xy">Suisse
 		X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12"/>
 		Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12"/>
-	</dd>
+	</p>
 	
-	<dd><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></dd>
-	<dd><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></dd>
-	<dd><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></dd>
+	<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
+	<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
+	<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
 
 	<br />
-	<dt><label>Altitude{L_COLON}</label></dt>
-	<dd><input type="text" name="geo_altitude" size="10" class="inputbox autowidth" value="{GEO_ALTITUDE}" />*</dd>
-	<dt><label>Massif{L_COLON}</label></dt>
-	<dd><input type="text" name="geo_massif" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" />*</dd>
-	<dt><label>Places{L_COLON}</label></dt>
-	<dd><input type="text" name="geo_places" size="25" class="inputbox autowidth" value="{GEO_PLACES}" /></dd>
-	<dd>* Laisser le champ vide pour que le serveur le détermine automatiquement.</dd>
+	<p>Altitude <input type="text" name="geo_altitude" size="10" class="inputbox autowidth" value="{GEO_ALTITUDE}" />*</p>
+	<p>Massif <input type="text" name="geo_massif" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" />*</p>
+	<p>Places <input type="text" name="geo_places" size="25" class="inputbox autowidth" value="{GEO_PLACES}" /></p>
+	<p>* Laisser le champ vide pour que le serveur le détermine automatiquement.</p>
 </dl>

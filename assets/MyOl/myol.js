@@ -665,7 +665,7 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-function draggedIcon(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-display', dragged
+function marker(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-display', dragged
 	var format = new ol.format.GeoJSON(),
 		llInit = typeof display == 'object' ? display : [3, 47], // Center of France
 		eljson, ellon, ellat, elxy;

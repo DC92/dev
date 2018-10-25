@@ -185,13 +185,13 @@ class listener implements EventSubscriberInterface
 
 			// Convert the geom info in geoJson format
 			preg_match ('/\[(first|all)=([a-z]+)\]/i', $vars['topic_data']['forum_desc'], $regle);
-			if (count ($regle) == 3 &&
-				(
+			if (count ($regle) == 3 && (
 					($regle[1] == 'all') ||
 					($regle[1] == 'first' && ($row['post_id'] == $vars['topic_data']['topic_first_post_id']))
 				) &&
 				@$row['geomwkt']
 			) {
+				$row['geo_topic_type'] = $regle[2];
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
 				$geophp = \geoPHP::load($row['geomwkt'],'wkt');
 				$row['geomjson'] = $geophp->out('json');

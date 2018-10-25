@@ -38,15 +38,16 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var marqueur = draggedIcon(markerImage, 'marqueur'),
+		var marqueur = marker(markerImage, 'marqueur'),
+//TODO if('{GEO_TOPIC_TYPE}' == 'point')
 			pos = marqueur.getPoint().getCoordinates(),
 			map = new ol.Map({
 				target: 'map',
 				layers: [geoLayer()],
-//				view: new ol.View({
-//					center: pos,
-//					zoom: 15
-//				}),
+				view: new ol.View({
+					center: pos,
+					zoom: 15
+				}),
 				controls: geobbControlsCollection({GEO_OLKEYS})
 			});
 		map.addControl(controlPermalink({

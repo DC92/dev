@@ -2,9 +2,9 @@
 	max-width: none;
 	min-width: none;
 }
-.section-posting .fields1 dl:first-child {
+/*.section-posting .fields1 dl:first-child {
 	display: none;
-}
+} TODO DELETE */
 
 /* Carte */
 #map {
