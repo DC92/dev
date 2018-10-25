@@ -97,6 +97,8 @@ $sp = explode ('/', getenv('REQUEST_SCHEME'));
 $ri = explode ('/ext/', getenv('REQUEST_URI'));
 $bu = $sp[0].'://'.getenv('SERVER_NAME').$ri[0].'/';
 
+$lum = 0xC0 / 2; // Luminance constante pour un meilleur contraste
+$pas_angulaire = $pas * 2*M_PI / 6;
 $gjs = [];
 while ($row = $db->sql_fetchrow($result)) {
 
@@ -104,12 +106,20 @@ while ($row = $db->sql_fetchrow($result)) {
 	if (strstr($row['post_subject'],'Pekoa'))
 		continue;
 
+	$color = '#';
+	for ($c = 0; $c < 3; $c++) // Chacune des 3 couleurs primaires
+		$color .= substr (dechex (
+			0x100 + // Pour bénéficier du 0 à gauche quand on passe en hexadécimal
+			$lum * (1 + cos (($pas_angulaire += 49/40*M_PI)))
+		), -2);
+
 	$properties = [
-		'nom' => $row['post_subject'],
+		'name' => $row['post_subject'],
 		'id' => $row['topic_id'],
 		'type_id' => $row['forum_id'],
 		'post_id' => $row['post_id'],
-		'icone' => $bu.$row['forum_image'],
+		'icon' => $bu.$row['forum_image'],
+		'color' => $color,
 	];
 
 	preg_match('/\[color=([a-z]+)\]/i', html_entity_decode ($row['forum_desc']), $colors);
@@ -161,13 +171,13 @@ $json = json_encode ([
 
 if ($format == 'gpx') {
 	$mmav = ["><", '"geoPHP" version="1.0"'];
-	$mmap = [">\n<", '"http://chemineur.fr" xmlns="http://www.topografix.com/GPX/1/0"'];
+	$mmap = [">\n<", 'xmlns="http://www.topografix.com/GPX/1/0"'];
 	// Récupère les noms des points
 	foreach ($gjs AS $gjsv)
 		if ($gjsv['geometry']->type == 'Point') {
 			$ll = 'lat="'.$gjsv['geometry']->coordinates[1].'" lon="'.$gjsv['geometry']->coordinates[0].'"';
 			$mmav [] = "<wpt $ll />";
-			$mmap [] = "<wpt $ll><name>".$gjsv['properties']['nom']."</name></wpt>";
+			$mmap [] = "<wpt $ll><name>".$gjsv['properties']['name']."</name></wpt>";
 	}
 
 	// On transforme l'objet PHP en code gpx

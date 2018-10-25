@@ -1,6 +1,3 @@
-/**
- * Controls
- */
 var geobbControlGps = controlGPS();
 geobbControlGps.callBack = function (position) {
 	viseur.getPoint().setCoordinates(position);
@@ -43,32 +40,32 @@ function geobbControlsCollection(keys) {
 	];
 }
 
-/**
- * POI layer
- * Requires layerVectorURL
- */
 function geoLayer() {
 	return layerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?',
 		style: function(properties) {
+			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
 			return {
 				image: new ol.style.Icon({
-					src: properties.icone
+					src: properties.icon
 				}),
-				stroke: new ol.style.Stroke({
-					color: 'red'
+				fill: new ol.style.Fill({
+					color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)'
 				})
 			};
 		},
 		hover: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: properties.icone
+					src: properties.icon
+				}),
+				fill: new ol.style.Fill({
+					color: properties.color
 				})
 			};
 		},
 		label: function(properties) {
-			return properties.nom;
+			return properties.name;
 		},
 		click: function(properties) {
 			window.location.href = 'viewtopic.php?t=' + properties.id;

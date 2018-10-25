@@ -12,6 +12,7 @@ Supprimer install
 
 BUGS
 ====
+Zones alpages deviennent de moins en moins transparentes
 Inhiber click sur modification
 IE : pas de SGV
 Edge : Viseur noir
