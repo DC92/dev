@@ -107,83 +107,6 @@ function chemineurLayer() {
 }
 
 //***************************************************************
-//***************************************************************
-function geoLayer() {
-	return layerVectorURL({
-		url: '//www.refuges.info/api/polygones?type_polygon=1',
-		style: function(properties) {
-			// Translates the color in RGBA to be transparent
-			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.couleur);
-			return {
-				fill: new ol.style.Fill({
-					color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.1)'
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'black'
-				})
-			};
-		},
-		hover: function(properties) {
-			return {
-				fill: new ol.style.Fill({
-					color: properties.couleur
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'black'
-				})
-			};
-		},
-		label: function(properties) {
-			return properties.nom;
-		},
-		click: function(properties) {
-			if (properties.lien)
-				window.location.href = properties.lien;
-		}
-	});
-/*	return layerVectorURL({
-		url: 'http://localhost/geo/geo323/ext/Dominique92/GeoBB/gis.php?',
-		style: function(properties) {
-			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
-					color= 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
-					
-			return {
-				image: new ol.style.Icon({
-					src: properties.icon
-				}),
-				fill: new ol.style.Fill({
-//					color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)'
-					color: color
-//					color: 'red'
-				}),
-				stroke: new ol.style.Stroke({
-					color: color
-//					color: 'red'
-				})
-			};
-		},
-		hover: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: properties.icon
-				}),
-				fill: new ol.style.Fill({
-					color: properties.color
-				})
-			};
-		},
-		label: function(properties) {
-			return properties.name;
-		},
-		click: function(properties) {
-			window.location.href = 'viewtopic.php?t=' + properties.id;
-		}
-	});*/
-}
-//***************************************************************
-//***************************************************************
-
-//***************************************************************
 // EXAMPLE
 //***************************************************************
 var overpass = layerOverpass({
@@ -210,7 +133,6 @@ var overpass = layerOverpass({
 		layerPointsWri(),
 		chemineurLayer(),
 		layerMassifsWri(),
-		geoLayer(),
 		overpass
 	],
 	map = new ol.Map({

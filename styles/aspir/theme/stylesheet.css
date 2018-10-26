@@ -8,13 +8,15 @@
 @import url("../../prosilver/theme/stylesheet.css");
 
 .site_logo {
-	background-image: none;
+	background-image: url("http://aspir.eu/wp-content/uploads/2016/09/jhu-e1464350442860-75x75.jpg");
+	background-repeat: no-repeat;
+	height: 75px;
 }
-.site_logo::after { 
+/*.site_logo::after { 
 	content: "ASPIR";
 	font-size: 40px;
 	color: white;
-}
+}*/
 
 /* Masquages */
 .search-box,

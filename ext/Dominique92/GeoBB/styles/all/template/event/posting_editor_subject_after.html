@@ -26,14 +26,19 @@
 		viseur = marker(targetImage, 'viseur', true);
 		map = new ol.Map({
 			target: 'map',
-			layers: [geoLayer()],
 			view: new ol.View({
 				center: viseur.getPoint().getCoordinates(),
 				zoom: 15
 			}),
-			controls: geobbControlsCollection({GEO_OLKEYS})
+			layers: [
+				geoLayer(),
+				viseur
+			],
+			controls: geobbControls()
 		});
-		map.addLayer(viseur);
+		map.addControl(controlLayersSwitcher(
+			layers({GEO_OLKEYS})
+		));
 	});
 </script>
 

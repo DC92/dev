@@ -3,7 +3,7 @@ geobbControlGps.callBack = function(position) {
 	viseur.getPoint().setCoordinates(position);
 }
 
-function geobbControlsCollection(keys) {
+function geobbControls() {
 	return [
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
@@ -14,13 +14,6 @@ function geobbControlsCollection(keys) {
 		}),
 		new ol.control.Attribution({
 			collapsible: false // Attribution always open
-		}),
-		controlLayersSwitcher({
-			'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-			'Topo': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-			'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-			'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
-			'Satellite': layerGoogle('s')
 		}),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
@@ -38,6 +31,16 @@ function geobbControlsCollection(keys) {
 		}),
 		geobbControlGps
 	];
+}
+
+function layers(keys) {
+	return {
+		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'Topo': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
+		'Satellite': layerGoogle('s')
+	};
 }
 
 function layerStyle(properties) {

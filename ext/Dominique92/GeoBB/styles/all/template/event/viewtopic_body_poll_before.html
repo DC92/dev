@@ -40,17 +40,14 @@
 	window.addEventListener('load', function() {
 		var map = new ol.Map({
 				target: 'map',
-//				layers: [geoLayer()],
-/*				view: new ol.View({
-//					center: pos,
-					center: [2,45],
-					zoom: 8
-				}),*/
-				controls: geobbControlsCollection({GEO_OLKEYS})
+				controls: geobbControls()
 			});
+		map.addControl(controlLayersSwitcher(
+			layers({GEO_OLKEYS})
+		));
 		map.addControl(controlPermalink({
 			init: false,
-			visible: true
+			visible: false
 		}));
 		
 	<!-- IF GEO_TOPIC_TYPE == 'point' -->

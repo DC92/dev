@@ -20,8 +20,11 @@
 		var map = new ol.Map({
 				target: 'map',
 				layers: [geoLayer()],
-				controls: geobbControlsCollection({GEO_OLKEYS})
+				controls: geobbControls()
 			});
+		map.addControl(controlLayersSwitcher(
+			layers({GEO_OLKEYS})
+		));
 		map.addControl(controlPermalink({
 			init: true,
 			visible: true

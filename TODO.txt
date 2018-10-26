@@ -12,6 +12,7 @@ Supprimer install
 
 BUGS
 ====
+Zones etiquette trop haute => Centrer
 Zones alpages deviennent de moins en moins transparentes
 Inhiber click sur modification
 IE : pas de SGV

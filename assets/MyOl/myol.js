@@ -329,6 +329,7 @@ function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
 			url: function(extent, resolution, projection) {
+				source.clear(); // Redraw the layer
 				var bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 					list = permanentCheckboxList(options.selectorName).filter(function(event) {
 						return event !== 'on'; // Remove the "all" input (default value = "on")
