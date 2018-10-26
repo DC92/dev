@@ -1,5 +1,5 @@
 var geobbControlGps = controlGPS();
-geobbControlGps.callBack = function (position) {
+geobbControlGps.callBack = function(position) {
 	viseur.getPoint().setCoordinates(position);
 }
 
@@ -40,30 +40,31 @@ function geobbControlsCollection(keys) {
 	];
 }
 
+function layerStyle(properties) {
+	return {
+		image: new ol.style.Icon({
+			src: properties.icon
+		}),
+		fill: new ol.style.Fill({
+			color: properties.color
+		}),
+		stroke: new ol.style.Stroke({
+			color: properties.color
+		})
+	};
+}
+
 function geoLayer() {
 	return layerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?',
 		style: function(properties) {
-			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
-			return {
-				image: new ol.style.Icon({
-					src: properties.icon
-				}),
-				fill: new ol.style.Fill({
-					color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)'
-				})
-			};
+			if (properties.color) {
+				var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
+				properties.color = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
+			}
+			return layerStyle(properties);
 		},
-		hover: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: properties.icon
-				}),
-				fill: new ol.style.Fill({
-					color: properties.color
-				})
-			};
-		},
+		hover: layerStyle,
 		label: function(properties) {
 			return properties.name;
 		},

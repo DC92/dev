@@ -166,6 +166,7 @@ header("Cache-Control: max-age=$secondes_de_cache");
 // On transforme l'objet PHP en code geoJson
 $json = json_encode ([
 	'type' => 'FeatureCollection',
+	'timestamp' => date('c'),
 	'features' => $gjs
 ]) . PHP_EOL;
 
@@ -186,13 +187,3 @@ if ($format == 'gpx') {
 }
 
 echo $$format;
-
-/**
- * Execute something after actions
- *
- * @event geo.gis_after
- */
-$vars = array(
-	'bbox',
-);
-extract($phpbb_dispatcher->trigger_event('geo.gis_after', compact($vars)));

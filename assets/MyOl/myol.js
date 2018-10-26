@@ -330,7 +330,7 @@ function layerVectorURL(options) {
 			strategy: ol.loadingstrategy.bboxDependant,
 			url: function(extent, resolution, projection) {
 				var bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
-					list = permanentCheckboxList(options.selector).filter(function(event) {
+					list = permanentCheckboxList(options.selectorName).filter(function(event) {
 						return event !== 'on'; // Remove the "all" input (default value = "on")
 					});
 				return typeof options.url == 'function' ?
@@ -349,8 +349,8 @@ function layerVectorURL(options) {
 		});
 
 	// Optional checkboxes to tune layer parameters
-	if (options.selector) {
-		controlPermanentCheckbox(options.selector, function(event, list) {
+	if (options.selectorName) {
+		controlPermanentCheckbox(options.selectorName, function(event, list) {
 			layer.setVisible(list.length);
 			if (list.length)
 				source.clear(); // Redraw the layer
@@ -363,7 +363,7 @@ function layerVectorURL(options) {
 	return layer;
 }
 
-// We use only one listener for hover and one for click for all vector layers
+// We use only one listener for hover and one for click on all vector layers
 function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 	if (!map.popElement_) { //HACK Only once for all layers
@@ -533,9 +533,10 @@ function layerOverpass(options) {
 	var layer = layerVectorURL({
 		url: function(bbox, list, resolution) {
 			var bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
-				args = [];
+				args = [],
+				elSelector = document.getElementById(options.selectorId);
 
-			if (resolution < options.maxResolution || 30) // Only for small areas
+			if (resolution < (options.maxResolution || 30)) { // Only for small areas
 				for (var l = 0; l < list.length; l++) {
 					var lists = list[l].split('+');
 					for (var ls = 0; ls < lists.length; ls++)
@@ -544,13 +545,21 @@ function layerOverpass(options) {
 							'way' + lists[ls] + bb // Also ask for areas
 						);
 				}
+				if (elSelector)
+					elSelector.style.color =
+					elSelector.title = '';
+			} else if (elSelector) {
+				elSelector.style.color = 'red';
+				elSelector.title = 'Zoom in to enable see the points.';
+			}
+
 			return options.url +
 				'?data=[timeout:5];(' + // Not too much !
 				args.join('') +
 				');out center;'; // add center of areas
 		},
 		format: new ol.format.OSMXMLPOI(),
-		selector: options.selector, // The layer is cleared & reloaded if one selector check is clicked
+		selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked
 		style: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -643,7 +652,7 @@ function layerOverpass(options) {
 	}
 
 	function overpassType(properties) {
-		var checkElements = document.getElementsByName(options.selector);
+		var checkElements = document.getElementsByName(options.selectorName);
 		for (var e = 0; e < checkElements.length; e++)
 			if (checkElements[e].checked) {
 				var tags = checkElements[e].value.split('+');
@@ -661,7 +670,7 @@ function layerOverpass(options) {
 }
 
 /**
- * Markers
+ * Marker
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */

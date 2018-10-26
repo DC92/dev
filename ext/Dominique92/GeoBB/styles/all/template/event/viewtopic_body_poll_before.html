@@ -38,25 +38,35 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var marqueur = marker(markerImage, 'marqueur'),
-//TODO if('{GEO_TOPIC_TYPE}' == 'point')
-			pos = marqueur.getPoint().getCoordinates(),
-			map = new ol.Map({
+		var map = new ol.Map({
 				target: 'map',
-				layers: [geoLayer()],
-				view: new ol.View({
-					center: pos,
-					zoom: 15
-				}),
+//				layers: [geoLayer()],
+/*				view: new ol.View({
+//					center: pos,
+					center: [2,45],
+					zoom: 8
+				}),*/
 				controls: geobbControlsCollection({GEO_OLKEYS})
 			});
 		map.addControl(controlPermalink({
 			init: false,
 			visible: true
 		}));
-		map.addLayer(marqueur);
 		
-		var extent = [{GEO_BBOX_MINX},{GEO_BBOX_MINY},{GEO_BBOX_MAXX},{GEO_BBOX_MAXY}];
-		map.getView().fit(extent);
+	<!-- IF GEO_TOPIC_TYPE == 'point' -->
+		var marqueur = marker(markerImage, 'marqueur'),
+			pos = marqueur.getPoint().getCoordinates();
+		map.addLayer(geoLayer());
+		map.addLayer(marqueur);
+		map.getView().setCenter(pos);
+		map.getView().setZoom(15);
+	<!-- ENDIF -->
+	<!-- IF GEO_TOPIC_TYPE == 'surface' -->
+		map.addLayer(geoLayer());
+		map.getView().setCenter([2,45]);
+		map.getView().setZoom(8);
+//		var extent = [{GEO_BBOX_MINX},{GEO_BBOX_MINY},{GEO_BBOX_MAXX},{GEO_BBOX_MAXY}];
+//		map.getView().fit(extent);
+	<!-- ENDIF -->
 	});
 </script>

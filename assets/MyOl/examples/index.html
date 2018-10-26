@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>My Openlayers</title>
+	<link rel="icon" type="image/x-icon" href="https://openlayers.org/assets/theme/img/favicon.ico" />
+
+	<!-- Openlayers -->
+	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- Recherche par nom -->
+	<link  href="../geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
+	<script src="../geocoder/ol-geocoder-debug.js"></script>
+
+	<!-- Proj4 projections Swiss & UK -->
+	<script src="../proj4/proj4-src.js"></script>
+
+	<!-- My Openleyers -->
+	<link  href="../myol.css" type="text/css" rel="stylesheet">
+	<script src="../myol.js"></script>
+
+	<style>
+		#map {
+			width: 90vw;
+			height: 60vw;
+		}
+		.label-overpass {
+			background: #cde;
+		}
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+
+	<ul id="overpass">
+		<li>OVERPASS<input type="checkbox" name="overpass" checked="checked" /></li>
+		<li><input type="checkbox" name="overpass" id="point_eau" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
+		<li><input type="checkbox" name="overpass" id="telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
+		<li><input type="checkbox" name="overpass" id="wifi" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
+		<li><input type="checkbox" name="overpass" id="ravitaillement" value='["shop"~"supermarket|convenience"]' />Ravitaillement</li>
+		<li><input type="checkbox" name="overpass" id="parking" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
+	</ul>
+	<ul>
+		<li><input type="checkbox" name="overpass" id="refuge" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
+		<li><input type="checkbox" name="overpass" id="cabane" value='["building"="cabin"]' />Cabane non gardée</li>
+		<li><input type="checkbox" name="overpass" id="camping" value='["tourism"="camp_site"]' />Camping</li>
+		<li><input type="checkbox" name="overpass" id="abri" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
+		<li><input type="checkbox" checked="checked" name="overpass" id="hotel" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
+		<li><input type="checkbox" name="overpass" id="restaurant" value='["amenity"="restaurant"]' />Restaurants</li>
+		<li><input type="checkbox" name="overpass" id="bus" value='["highway"="bus_stop"]' />Bus</li>
+		<li><input type="checkbox" name="overpass" id="wc" value='["amenity"="toilets"]' />WC</li>
+	</ul>
+	<ul>
+		<li>WRI<input type="checkbox" name="wri-poi" /></li>
+		<li><input type="checkbox" name="wri-poi" value="7" checked="checked" />cabane non gardée</li>
+		<li><input type="checkbox" name="wri-poi" value="10" />refuge gardé</li>
+		<li><input type="checkbox" name="wri-poi" value="9" checked="checked" />gîte d'étape</li>
+		<li><input type="checkbox" name="wri-poi" value="23" />point d'eau</li>
+		<li><input type="checkbox" name="wri-poi" value="6" checked="checked" />sommet</li>
+		<li><input type="checkbox" name="wri-poi" value="3" />passage délicat</li>
+		<li><input type="checkbox" name="wri-poi" value="28" checked="checked" />bâtiment en montagne</li>
+	</ul>
+	<ul>
+		<li>Chemineur<input type="checkbox" name="chemineur" checked="checked" /></li>
+	</ul>
+	<ul>
+		<li>Massifs<input type="checkbox" name="wri-massifs" /></li>
+	</ul>
+
+	<input id="marqueur-json" type="hidden" value='{"type":"Point","coordinates":[6.575,45.845]}' />
+	<div>Lon <span id="marqueur-lon"></span>, Lat <span id="marqueur-lat"></span></div>
+	<div id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></div>
+
+	<input id="viseur-json" type="text" size="60" value='{"type":"Point","coordinates":[6.15,47.2]}' />
+	<div>
+		Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12" />
+		Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12" />
+	</div>
+	<div id="viseur-xy">Suisse
+		X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12" />
+		Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12" />
+	</div>
+
+	<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
+	<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
+	<p><a style="cursor:pointer" onclick="controlgps.action()">Utiliser la position du GPS</a></p>
+
+	<textarea id="geojson" rows="25" cols="80">
+		{
+			"type": "FeatureCollection",
+			"features": [{
+				"type": "Feature",
+				"geometry": {"type":"MultiLineString","coordinates":[[[-4.35022,47.78254],[-4.3667,47.78992],[-4.32825,47.86368],[-4.47656,47.9778],[-4.72375,48.06965],[-4.31177,48.12101],[-4.26782,48.18332],[-4.56445,48.20163],[-4.63586,48.29308],[-4.23486,48.33326],[-4.49304,48.38436],[-4.86383,48.3111],[-4.84186,48.59164],[-4.46008,48.63546],[-4.00964,48.71164],[-3.76245,48.70439],[-3.57019,48.67901],[-3.58118,48.83834],[-3.14172,48.86364],[-2.6803,48.5228],[-2.79565,47.57172],[-3.13623,47.58284],[-3.66357,47.78992],[-4.14697,47.76408]]]}
+			},{
+				"type": "Feature",
+				"geometry": {"type":"MultiLineString","coordinates":[[[-5.7,48],[-5.6,47.7],[-5.1,47.8]]]}
+			}]
+		}
+	</textarea>
+
+	<script src="index.js"></script>
+</body>
+</html>
