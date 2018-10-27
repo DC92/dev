@@ -118,7 +118,7 @@ while ($row = $db->sql_fetchrow($result)) {
 		'id' => $row['topic_id'],
 		'type_id' => $row['forum_id'],
 		'post_id' => $row['post_id'],
-		'icon' => $bu.$row['forum_image'],
+		'icon' => $row['forum_image'] ? $bu.$row['forum_image'] : null,
 		'color' => $color,
 	];
 

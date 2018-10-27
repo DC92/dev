@@ -370,8 +370,7 @@ function initLayerVectorURLListeners(e) {
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
 		map.popElement_ = document.createElement('div');
-		var dx = 0.4,
-			xAnchor, // Spread too closes icons
+		var dx = 0.4, xAnchor, // Spread too closes icons
 			hovered = [],
 			popup = new ol.Overlay({
 				element: map.popElement_
@@ -418,9 +417,11 @@ function initLayerVectorURLListeners(e) {
 			if (hovered) {
 				// Sort features left to right
 				hovered.sort(function(a, b) {
+					if (a.coordinates.length > 2) return 999; // Lines & surfaces under of the pile !
+					if (b.coordinates.length > 2) return -999;
 					return a.pixel[0] - b.pixel[0];
 				});
-				xAnchor = 0.5 + dx * (hovered.length - 1) / 2;
+				xAnchor = 0.5 + dx * (hovered.length + 1) / 2; // dx left because we begin to remove dx at the first icon
 				hovered.forEach(checkHovered);
 			}
 		}
@@ -431,29 +432,28 @@ function initLayerVectorURLListeners(e) {
 				map.getViewport().style.cursor = 'pointer';
 
 			// Apply hover if any
-			var style = (h.options.hover || h.options.style)(h.feature.getProperties());
+			var style = (h.options.hover || h.options.style)(h.properties);
 
-			// Shift icon if too many grouped here
+			// Spread too closes icons //TODO BUG don't allow to click on the last !!
 			if (hovered.length > 1 &&
-				style.image) {
-				style.image.anchor_[0] = xAnchor;
-				xAnchor -= dx;
-			}
+				style.image)
+				style.image.anchor_[0] = xAnchor -= dx;
 			h.feature.setStyle(new ol.style.Style(style));
 
-			if (!popup.getPosition()) { // Only for the first feature on the hovered stack
+			if (h.options.label &&
+				!popup.getPosition()) { // Only for the first feature on the hovered stack
 				// Calculate the label' anchor
 				if (h.coordinates.length != 2)
 					h.coordinates = h.event.coordinate; // If it's a surface, over the pointer
 				popup.setPosition(map.getView().getCenter()); // For popup size calculation
 
 				// Fill label class & text
-				h.properties.lon = Math.round(h.ll4326[0] * 100000) / 100000;
-				h.properties.lat = Math.round(h.ll4326[1] * 100000) / 100000;
+//TODO DELETE ? h.properties.lon = Math.round(h.ll4326[0] * 100000) / 100000;
+//TODO DELETE ? h.properties.lat = Math.round(h.ll4326[1] * 100000) / 100000;
 				map.popElement_.className = 'popup ' + (h.layer.options_.labelClass || '');
 				map.popElement_.innerHTML = typeof h.options.label == 'function' ?
 					h.options.label(h.properties, h.feature, h.layer) :
-					h.options.label || '';
+					h.options.label;
 
 				// Shift of the label to stay into the map regarding the pointer position
 				if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
@@ -685,8 +685,8 @@ function marker(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-disp
 		elxy = document.getElementById(display + '-xy');
 	}
 	// Use json field values if any
-	if (eljson && eljson.value)
-		llInit = JSON.parse(eljson.value).coordinates;
+	if (eljson)
+		llInit = JSON.parse(eljson.value || eljson.innerHTML).coordinates;
 
 	var point = new ol.geom.Point(
 			ol.proj.fromLonLat(llInit)

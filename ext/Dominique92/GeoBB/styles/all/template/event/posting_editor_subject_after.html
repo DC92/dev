@@ -26,10 +26,10 @@
 		viseur = marker(targetImage, 'viseur', true);
 		map = new ol.Map({
 			target: 'map',
-			view: new ol.View({
+/*			view: new ol.View({
 				center: viseur.getPoint().getCoordinates(),
 				zoom: 15
-			}),
+			}),*/
 			layers: [
 				geoLayer(),
 				viseur
@@ -39,6 +39,10 @@
 		map.addControl(controlLayersSwitcher(
 			layers({GEO_OLKEYS})
 		));
+		map.addControl(controlPermalink({
+			init: true,
+			visible: true
+		}));
 	});
 </script>
 

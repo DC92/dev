@@ -20,9 +20,11 @@
 <div id="map"></div>
 
 <div>
-	<input id="marqueur-json" type="hidden" value='{GEOMJSON}'></input>
-	<p>Longitude <span id="marqueur-lon"></span>, Latitude <span id="marqueur-lat"></span></p>
-	<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
+	<p id="marqueur-json" class="geo-hidden">{GEOMJSON}</p>
+	<!-- IF GEO_TOPIC_TYPE == 'point' -->
+		<p>Longitude <span id="marqueur-lon"></span>, Latitude <span id="marqueur-lat"></span></p>
+		<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
+	<!-- ENDIF -->
 
 	<!-- IF GEO_ALTITUDE -->
 		<p><span>Altitude</span>{L_COLON}{GEO_ALTITUDE} m</p>
@@ -40,6 +42,7 @@
 	window.addEventListener('load', function() {
 		var map = new ol.Map({
 				target: 'map',
+				layers: [geoLayer({TOPIC_ID})],
 				controls: geobbControls()
 			});
 		map.addControl(controlLayersSwitcher(
@@ -49,21 +52,23 @@
 			init: false,
 			visible: false
 		}));
-		
+
 	<!-- IF GEO_TOPIC_TYPE == 'point' -->
 		var marqueur = marker(markerImage, 'marqueur'),
 			pos = marqueur.getPoint().getCoordinates();
-		map.addLayer(geoLayer());
 		map.addLayer(marqueur);
 		map.getView().setCenter(pos);
 		map.getView().setZoom(15);
 	<!-- ENDIF -->
 	<!-- IF GEO_TOPIC_TYPE == 'surface' -->
-		map.addLayer(geoLayer());
-		map.getView().setCenter([2,45]);
-		map.getView().setZoom(8);
-//		var extent = [{GEO_BBOX_MINX},{GEO_BBOX_MINY},{GEO_BBOX_MAXX},{GEO_BBOX_MAXY}];
-//		map.getView().fit(extent);
+		var eljson = document.getElementById('marqueur-json'),
+			format = new ol.format.GeoJSON({
+				featureProjection: "EPSG:3857"
+			}),
+			source = new ol.source.Vector({
+				features: format.readFeatures(eljson.innerHTML)
+			});
+		map.getView().fit(source.getExtent());
 	<!-- ENDIF -->
 	});
 </script>

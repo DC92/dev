@@ -43,13 +43,30 @@ function layers(keys) {
 	};
 }
 
-function layerStyle(properties) {
+function layerStyle(properties, id, hover) {
+	if (properties.icon)
+		return {
+			image: new ol.style.Icon({
+				src: properties.icon
+			})
+		};
+
+	if (properties.id == id)
+		return {
+			fill: new ol.style.Fill({
+				color: 'rgba(0,0,0,0.2)'
+			}),
+			stroke: new ol.style.Stroke({
+				color: 'black',
+				width : 3
+			})
+		};
+
+	var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
+	colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
 	return {
-		image: new ol.style.Icon({
-			src: properties.icon
-		}),
 		fill: new ol.style.Fill({
-			color: properties.color
+			color: hover ? properties.color : colorTr
 		}),
 		stroke: new ol.style.Stroke({
 			color: properties.color
@@ -57,17 +74,15 @@ function layerStyle(properties) {
 	};
 }
 
-function geoLayer() {
+function geoLayer(id) {
 	return layerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?',
 		style: function(properties) {
-			if (properties.color) {
-				var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
-				properties.color = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
-			}
-			return layerStyle(properties);
+			return layerStyle(properties, id);
 		},
-		hover: layerStyle,
+		hover: function(properties) {
+			return layerStyle(properties, id, true);
+		},
 		label: function(properties) {
 			return properties.name;
 		},

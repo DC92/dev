@@ -12,7 +12,9 @@ Supprimer install
 
 BUGS
 ====
-Zones etiquette trop haute => Centrer
+Pas de click sur le label
+Quand click sur plusieurs features, exécute le click en dessous
+Entrée coordonnées change le curseur mais ne recentre pas la carte
 Zones alpages deviennent de moins en moins transparentes
 Inhiber click sur modification
 IE : pas de SGV

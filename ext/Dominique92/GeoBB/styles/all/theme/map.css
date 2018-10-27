@@ -36,6 +36,10 @@
 }
 */
 
+.geo-hidden {
+	display: none;
+}
+
 /* Accueil index.php */
 .section-index li.header dt {
 	font-size: 130%;
