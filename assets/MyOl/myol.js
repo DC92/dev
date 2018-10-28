@@ -402,13 +402,15 @@ function initLayerVectorURLListeners(e) {
 				if (l && l.options_) {
 					var h = {
 						event: event,
+						pixel: event.pixel, // Follow the mouse if line or surface
 						feature: f,
 						layer: l,
 						options: l.options_,
 						properties: f.getProperties(),
 						coordinates: f.getGeometry().flatCoordinates // If it's a point, just over it
 					};
-					h.pixel = map.getPixelFromCoordinate(h.coordinates);
+					if (h.coordinates.length == 2) // Stable if icon
+						h.pixel = map.getPixelFromCoordinate(h.coordinates);
 					h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
 					hovered.push(h);
 				}
@@ -443,13 +445,9 @@ function initLayerVectorURLListeners(e) {
 			if (h.options.label &&
 				!popup.getPosition()) { // Only for the first feature on the hovered stack
 				// Calculate the label' anchor
-				if (h.coordinates.length != 2)
-					h.coordinates = h.event.coordinate; // If it's a surface, over the pointer
 				popup.setPosition(map.getView().getCenter()); // For popup size calculation
 
 				// Fill label class & text
-//TODO DELETE ? h.properties.lon = Math.round(h.ll4326[0] * 100000) / 100000;
-//TODO DELETE ? h.properties.lat = Math.round(h.ll4326[1] * 100000) / 100000;
 				map.popElement_.className = 'popup ' + (h.layer.options_.labelClass || '');
 				map.popElement_.innerHTML = typeof h.options.label == 'function' ?
 					h.options.label(h.properties, h.feature, h.layer) :
