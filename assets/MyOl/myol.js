@@ -766,6 +766,7 @@ function marker(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-disp
 		var coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
 		coord[nol] = parseFloat(event.value); // On change la valeur qui a été modifiée
 		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
+		layer.map_.getView().setCenter(point.getCoordinates());
 	};
 
 	layer.getPoint = function() {

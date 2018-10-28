@@ -30,7 +30,7 @@
 			<!-- IF GEO_MAP_TYPE == 'point' -->
 				viseur,
 			<!-- ENDIF -->
-				geoLayer()
+				geoLayer(0, true)
 			],
 			controls: geobbControls()
 		});
@@ -38,7 +38,7 @@
 			layers({GEO_OLKEYS})
 		));
 		map.addControl(controlPermalink({
-			init: true,
+			init: true, //TODO BUG devrait être calculé !!!
 			visible: true
 		}));
 	});

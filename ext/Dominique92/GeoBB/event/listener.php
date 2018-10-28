@@ -23,6 +23,7 @@ class listener implements EventSubscriberInterface
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
 		\phpbb\user $user,
+		\phpbb\auth\auth $auth,
 		\phpbb\extension\manager $extension_manager,
 		$root_path
 	) {
@@ -30,8 +31,9 @@ class listener implements EventSubscriberInterface
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
-//		$this->extension_manager = $extension_manager;
-//		$this->root_path = $root_path;
+		$this->auth = $auth;
+//TODO		$this->extension_manager = $extension_manager;
+//TODO		$this->root_path = $root_path;
 	}
 
 	// Liste des hooks et des fonctions associées
@@ -99,26 +101,20 @@ class listener implements EventSubscriberInterface
 	*/
 	// Ajoute un bouton créer un point en face de la liste des forums
 	function display_forums_modify_row ($vars) {
-		/*
-		global $auth;
 		$row = $vars['row'];
 
-		if ($auth->acl_get('f_post', $row['forum_id']) &&
+		if ($this->auth->acl_get('f_post', $row['forum_id']) &&
 			$row['forum_type'] == FORUM_POST)
-			$row['forum_name'] .=
-				' &nbsp; '.
-				'<a href="posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.$row['forum_name'].'">'.
+			$row['forum_name'] .= ' &nbsp; '.
+				'<a href="posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">'.
 					'<img style="position:relative;top:4px" src="adm/images/file_new.gif" />'.
 				'</a>';
 
 		$vars['row'] = $row;
-		*/
 	}
 
 	// Affiche les post les plus récents sur la page d'accueil
 	function index_modify_page_title ($vars) {
-		global $auth; //TODO intégrer aux variables du listener ($this->auth)
-
 		$this->geobb_activate_map('[all=accueil]');
 
 		$news = request_var ('news', 20);
@@ -138,7 +134,7 @@ class listener implements EventSubscriberInterface
 			LIMIT ".$news;
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
-			if ($auth->acl_get('f_read', $row['forum_id'])) {
+			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				$row ['topic_comments'] = $row['topic_posts_approved'] - 1;
 				$row ['post_time'] = $this->user->format_date ($row['post_time']);
 				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);

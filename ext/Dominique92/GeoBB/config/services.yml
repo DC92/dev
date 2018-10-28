@@ -6,6 +6,7 @@ services:
             - @request
             - @template
             - @user
+            - @auth
             - @ext.manager
             - %core.root_path%
         tags:

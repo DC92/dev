@@ -74,7 +74,7 @@ function layerStyle(properties, id, hover) {
 	};
 }
 
-function geoLayer(id) {
+function geoLayer(id, noclick) {
 	return layerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?',
 		style: function(properties) {
@@ -87,7 +87,8 @@ function geoLayer(id) {
 			return properties.name;
 		},
 		click: function(properties) {
-			window.location.href = 'viewtopic.php?t=' + properties.id;
+			if (!noclick)
+				window.location.href = 'viewtopic.php?t=' + properties.id;
 		}
 	});
 }

@@ -6,7 +6,7 @@
 	display: none;
 } TODO DELETE */
 
-/* Carte */
+/* MAP */
 #map {
 	width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
 	width: 50vw;
@@ -21,8 +21,7 @@
 	border-left: solid white 10px;
 	border-bottom: solid white 10px;
 }
-/* Carte responsive pour mobiles */
-/*
+/* Responsive map for mobiles */
 @media screen and (max-width: 600px) {
 	#map {
 		width: 100%;
@@ -34,13 +33,12 @@
 		height: 100% !important;
 	}
 }
-*/
 
 .geo-hidden {
 	display: none;
 }
 
-/* Accueil index.php */
+/* INDEX.PHP */
 .section-index li.header dt {
 	font-size: 130%;
 	color: #4C5D77;

@@ -10,13 +10,17 @@ dezipper et uploader https://github.com/Dominique92/GeoBB
 run SITE/install -> Update manuel -> Database only
 Supprimer install
 
+FAIT
+====
+Bouge carte quand saisie lon/lat
+$auth par l'interface listener
+Pas de click en modif
+Carte responsive pour mobiles
+
 BUGS
 ====
 Pas de click sur le label
 Quand click sur plusieurs features, exécute le click en dessous
-Entrée coordonnées change le curseur mais ne recentre pas la carte
-Zones alpages deviennent de moins en moins transparentes
-Inhiber click sur modification
 IE : pas de SGV
 Edge : Viseur noir
 ...OLD :
@@ -41,16 +45,11 @@ TODO
 ====
 //http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
 //http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
-
 //geophp simplify : https://github.com/phayes/geoPHP/issues/24
-Logo aspir
 Editeur de zones
-Voir cartes en responsive repli mobile
-CTRL + Click -> Autre page
 file-total-progress-bar => pupload : masquer "Envoyer"
 Dominique92->Organiser : intégrer mais avec une puce "echanger", sous droit d'édition
 Mettre un gros cache sur leaflet.js...
-Joindre et compresser les js & css
 Changer la phrase de connexion
 Ajouter un lien "mot de passe" et "contact"
 Interface VTTRACK
@@ -60,6 +59,7 @@ Interface VTTRACK
 
 BEST TODO
 =========
+CTRL + Click -> Autre page
 Ajouter les liens en "voir sur le site" dans l'étiquette
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Mettre ?date dans les liens des libs LL.
