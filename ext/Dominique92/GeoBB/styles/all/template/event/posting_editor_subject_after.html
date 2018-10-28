@@ -26,13 +26,11 @@
 		viseur = marker(targetImage, 'viseur', true);
 		map = new ol.Map({
 			target: 'map',
-/*			view: new ol.View({
-				center: viseur.getPoint().getCoordinates(),
-				zoom: 15
-			}),*/
 			layers: [
-				geoLayer(),
-				viseur
+			<!-- IF GEO_MAP_TYPE == 'point' -->
+				viseur,
+			<!-- ENDIF -->
+				geoLayer()
 			],
 			controls: geobbControls()
 		});
@@ -47,21 +45,23 @@
 </script>
 
 <dl class="posting-point" style="clear: left;">
-	<input id="viseur-json" name="geomjson" type="hidden" value='{GEOMJSON}' />
-	<p>
-		Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12"/>
-		Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12"/>
-	</p>
-	<p id="viseur-xy">Suisse
-		X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12"/>
-		Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12"/>
-	</p>
-	
-	<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
-	<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
-	<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
+	<!-- IF GEO_MAP_TYPE == 'point' -->
+		<input id="viseur-json" name="geomjson" type="hidden" value='{GEOMJSON}' />
+		<p>
+			Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12"/>
+			Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12"/>
+		</p>
+		<p id="viseur-xy">Suisse
+			X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12"/>
+			Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12"/>
+		</p>
+		
+		<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
+		<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
+		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
 
-	<br />
+		<br />
+	<!-- ENDIF -->
 	<p>Altitude <input type="text" name="geo_altitude" size="10" class="inputbox autowidth" value="{GEO_ALTITUDE}" />*</p>
 	<p>Massif <input type="text" name="geo_massif" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" />*</p>
 	<p>Places <input type="text" name="geo_places" size="25" class="inputbox autowidth" value="{GEO_PLACES}" /></p>

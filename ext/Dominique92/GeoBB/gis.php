@@ -149,7 +149,7 @@ while ($row = $db->sql_fetchrow($result)) {
 $db->sql_freeresult($result);
 
 // Formatage du header
-$secondes_de_cache = 60;
+$secondes_de_cache = 10;
 $ts = gmdate("D, d M Y H:i:s", time() + $secondes_de_cache) . " GMT";
 header("Content-disposition: filename=chemineur.$format");
 header("Content-Type: application/$format_app; UTF-8"); // rajout du charset

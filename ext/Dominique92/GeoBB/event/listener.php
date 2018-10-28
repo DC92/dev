@@ -42,8 +42,8 @@ class listener implements EventSubscriberInterface
 			'core.user_setup' => 'user_setup',
 
 			// Index
-			'core.index_modify_page_title' => 'index_modify_page_title',
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
+			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
@@ -74,13 +74,13 @@ class listener implements EventSubscriberInterface
 */
 	}
 
-	function geobb_activate_map($vars) {
-		global $geo_olkeys;
+	function geobb_activate_map($forum_desc, $first_post = true) {
+		global $geo_olkeys; // Private / defined in config.php
 
-		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($vars['forum_desc'].'[all=accueil]'), $regle);
+		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
 		switch (@$regle[1]) {
 			case 'first': // Régle sur le premier post seulement
-				if (!$vars['first_post'])
+				if (!$first_post)
 					break;
 
 			case 'all': // Régle sur tous les posts
@@ -90,7 +90,6 @@ class listener implements EventSubscriberInterface
 					'GEO_MAP_TYPE' => $regle[2],
 					'GEO_OLKEYS' => $geo_olkeys,
 //					'STYLE_NAME' => $this->user->style['style_name'],
-//					'MAP_KEYS' => @$config_locale['keys-js']
 				]);
 		}
 	}
@@ -98,7 +97,6 @@ class listener implements EventSubscriberInterface
 	/**
 		INDEX.PHP
 	*/
-
 	// Ajoute un bouton créer un point en face de la liste des forums
 	function display_forums_modify_row ($vars) {
 		/*
@@ -121,7 +119,7 @@ class listener implements EventSubscriberInterface
 	function index_modify_page_title ($vars) {
 		global $auth; //TODO intégrer aux variables du listener ($this->auth)
 
-		$this->geobb_activate_map($vars);
+		$this->geobb_activate_map('[all=accueil]');
 
 		$news = request_var ('news', 20);
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
@@ -176,8 +174,7 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
-		$vars['forum_desc'] = $post_data['forum_desc'];
-		$this->geobb_activate_map($vars);
+		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
 		if (isset ($this->post_data [$vars['row']['post_id']])) {
 			$row = $this->post_data [$vars['row']['post_id']]; // Récupère les données SQL du post 
@@ -191,13 +188,11 @@ class listener implements EventSubscriberInterface
 				) &&
 				@$row['geomwkt']
 			) {
-				$row['geo_topic_type'] = $regle[2];
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
 				$geophp = \geoPHP::load($row['geomwkt'],'wkt');
 				$row['geomjson'] = $geophp->out('json');
 				$this->get_bounds($geophp);
-				$this->get_automatic_data($row);
-				$this->geobb_activate_map($vars, $vars['topic_data']['forum_desc']);
+//TODO				$this->get_automatic_data($row);
 			}
 
 			foreach ($row AS $k=>$v)
@@ -342,6 +337,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
+		$this->geobb_activate_map($post_data['forum_desc']);
 
 		// Récupère la traduction des données spaciales SQL
 		if (isset ($post_data['geom'])) {
@@ -379,9 +375,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$vars['first_post'] =
 			!isset ($post_data['topic_id']) || // Cas de la création d'un nouveau topic
 			$post_data['topic_first_post_id'] == @$post_data['post_id'];
-
-		$vars['forum_desc'] = $post_data['forum_desc'];
-		$this->geobb_activate_map($vars);
 
 		// HORRIBLE phpbb hack to accept geom values / TODO : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
