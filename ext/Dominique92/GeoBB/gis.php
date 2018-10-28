@@ -97,21 +97,17 @@ $sp = explode ('/', getenv('REQUEST_SCHEME'));
 $ri = explode ('/ext/', getenv('REQUEST_URI'));
 $bu = $sp[0].'://'.getenv('SERVER_NAME').$ri[0].'/';
 
-$lum = 0xC0 / 2; // Luminance constante pour un meilleur contraste
-$pas_angulaire = $pas * 2*M_PI / 6;
-$gjs = [];
+$geojson = [];
+$ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
-
-	// Filtre d'une cabane privée
-	if (strstr($row['post_subject'],'Pekoa'))
-		continue;
-
+	// Color calculation
+	preg_match_all('/[0-9\.]+/',$row['geomwkt'],$out);
+	$x[0] = $out[0][0] * 30000 % $ampl; // From lon
+	$x[1] = $out[0][1] * 30000 % $ampl; // From lat
+	$x[2] = $ampl - ($x[0] + $x[1]) / 2;
 	$color = '#';
 	for ($c = 0; $c < 3; $c++) // Chacune des 3 couleurs primaires
-		$color .= substr (dechex (
-			0x100 + // Pour bénéficier du 0 à gauche quand on passe en hexadécimal
-			$lum * (1 + cos (($pas_angulaire += 49/40*M_PI)))
-		), -2);
+		$color .= substr (dechex (0x100 + $x[$c]), -2); // 0x100 for left hex 0 / the 2 last hex int chars
 
 	$properties = [
 		'name' => $row['post_subject'],
@@ -144,7 +140,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	);
 	extract($phpbb_dispatcher->trigger_event('geobb.gis_modify_data', compact($vars)));
 
-	$gjs[] = [
+	$geojson[] = [
 		'type' => 'Feature',
 		'geometry' => $row['geomphp'], // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 		'properties' => $properties,
@@ -167,18 +163,18 @@ header("Cache-Control: max-age=$secondes_de_cache");
 $json = json_encode ([
 	'type' => 'FeatureCollection',
 	'timestamp' => date('c'),
-	'features' => $gjs
+	'features' => $geojson
 ]) . PHP_EOL;
 
 if ($format == 'gpx') {
 	$mmav = ["><", '"geoPHP" version="1.0"'];
 	$mmap = [">\n<", 'xmlns="http://www.topografix.com/GPX/1/0"'];
 	// Récupère les noms des points
-	foreach ($gjs AS $gjsv)
-		if ($gjsv['geometry']->type == 'Point') {
-			$ll = 'lat="'.$gjsv['geometry']->coordinates[1].'" lon="'.$gjsv['geometry']->coordinates[0].'"';
+	foreach ($geojson AS $gj)
+		if ($gj['geometry']->type == 'Point') {
+			$ll = 'lat="'.$gj['geometry']->coordinates[1].'" lon="'.$gj['geometry']->coordinates[0].'"';
 			$mmav [] = "<wpt $ll />";
-			$mmap [] = "<wpt $ll><name>".$gjsv['properties']['name']."</name></wpt>";
+			$mmap [] = "<wpt $ll><name>".$gj['properties']['name']."</name></wpt>";
 	}
 
 	// On transforme l'objet PHP en code gpx
