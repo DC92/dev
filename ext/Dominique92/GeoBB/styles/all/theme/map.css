@@ -32,6 +32,9 @@
 	.leaflet-fullscreen-on {
 		height: 100% !important;
 	}
+	.section-index #map {
+		border: none;
+	}
 }
 
 .geo-hidden {

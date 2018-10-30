@@ -117,9 +117,11 @@ class listener implements EventSubscriberInterface
 	function index_modify_page_title ($vars) {
 		$this->geobb_activate_map('[all=accueil]');
 
+		// More news count
 		$news = request_var ('news', 20);
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
+		// Display news
 		$sql = "
 			SELECT t.topic_id, topic_title,
 				t.forum_id, forum_name, forum_image,
@@ -142,13 +144,13 @@ class listener implements EventSubscriberInterface
 			}
 		$this->db->sql_freeresult($result);
 
-		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
+		/*/ Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
 		// Le texte de ces messages sont dans les posts dont le titre est !style
 		$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
-		$this->db->sql_freeresult($result);
+		$this->db->sql_freeresult($result);*/
 	}
 
 	/**
@@ -318,7 +320,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	/**
 		POSTING.PHP
 	*/
-	// Appelé au début pour altérer les parametres
+	// Appelé au début pour ajouter des parametres de recherche sql
 	function modify_posting_parameters($vars) {
 		// Création topic avec le nom d'image
 		$forum_image = $this->request->variable('type', '');
@@ -361,11 +363,12 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)
-			if (is_string ($v))
-				$this->template->assign_var (
-					strtoupper ($k),
-					strstr($v, '~') == '~' ? null : $v // Efface les champs finissant par ~ pour les recalculer automatiquement
-				);
+			if (!strncmp ($k, 'geo_', 4)
+				&& is_string ($v))
+					$this->template->assign_var (
+						strtoupper ($k),
+						strstr($v, '~') == '~' ? null : $v // Clears fields ending with ~ for automatic recalculation
+					);
 
 		// Assign the forums geom type flags to the template
 		$vars['first_post'] =
@@ -381,55 +384,49 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
 	}
 
-	// Appelé lors de la validation des données à enregistrer
+	// Called when validating the data to be saved
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
-		/*/ Redefine basic fields
-		global $post_shema;
-		$post_shema ['geom'] = 'geometry';
-		$post_shema ['geo_altitude'] = 'int(11)';
-		$post_shema ['geo_massif'] = 'varchar(50)';*/
-
-		// Enregistre dans phpbb-posts les valeurs de $_POST correspondantes à des champs de phpbb-posts commençant par geo
-		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result)) {
-			$col_name = $row['Field'];
-
-			// Récupère les valeurs du questionnaire
-			$val = request_var ($col_name, 'UNDEFINED', true); // Look in $_POST
-			if ($val != 'UNDEFINED')
-				$sql_data[POSTS_TABLE]['sql'][$col_name] = utf8_normalize_nfc($val) ?: null; // null permet la supression du champ
-
-			// Donnée spaciale
-			$json = request_var ($col_name.'json', ''); // Look in $_POSTS[*json]
-			if ($json) {
-				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
-				$geophp = \geoPHP::load (html_entity_decode($json), 'json');
-				if ($geophp) // Pas de geom
-					$sql_data[POSTS_TABLE]['sql'][$col_name] = 'GeomFromText("'.$geophp->out('wkt').'")';
-			}
-
-			/*/ Correct existing columns
-			if ($post_shema[$col_name] && $post_shema[$col_name] != $row['Type'])
-				$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." CHANGE $col_name $col_name ".$post_shema[$col_name]." NULL");
-			unset ($post_shema[$col_name]);*/
+		// Spacial field 'geojson'
+		$json = request_var ('geojson', ''); // Look in $_POSTS[geojson]
+		if ($json) {
+			include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
+			$geophp = \geoPHP::load (html_entity_decode($json), 'json');
+			if ($geophp) // Pas de geom
+				$sql_data[POSTS_TABLE]['sql']['geojson'] = 'GeomFromText("'.$geophp->out('wkt').'")';
 		}
+
+		// Get special field list
+		$special_colums = [];
+		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo_%"';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$special_colums [] = $row['Field'];
 		$this->db->sql_freeresult($result);
 
-		/*/ Add missing colums
-		foreach ($post_shema AS $k => $v)
-			$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k $v");*/
+		// Other specific data
+		$this->request->enable_super_globals();
+		foreach ($_POST AS $k=>$v)
+			if (!strncmp ($k, 'geo_', 4)) {
+				// Create column if it doesn't exists
+				// Create as TEXT - You can modify the type in SQL if needed
+				if (!in_array ($k, $special_colums))
+					$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k TEXT");
+
+					// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
+					$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null permet la supression du champ
+				}
+		$this->request->disable_super_globals();global $_POST;
 
 		$vars['sql_data'] = $sql_data;
 
 		//-----------------------------------------------------------------
-		// Save modif
+		// Save change
 		$data = $vars['data'];
 		$save[] = date('r').' '.$this->user->data['username'];
 
-		// Trace avant
+		// Trace before
 		if ($data['post_id']) {
 			$sql = 'SELECT *, AsText(geom) AS geomwkt FROM '.POSTS_TABLE.' WHERE post_id = '.$data['post_id'];
 			$result = $this->db->sql_query($sql);

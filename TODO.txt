@@ -19,6 +19,7 @@ Carte responsive pour mobiles
 
 BUGS
 ====
+Voir les //TODO
 Pas de click sur le label
 Quand click sur plusieurs features, exécute le click en dessous
 IE : pas de SGV
