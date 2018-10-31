@@ -188,7 +188,7 @@ class listener implements EventSubscriberInterface
 			) {
 				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
 				$geophp = \geoPHP::load($row['geomwkt'],'wkt');
-				$row['geomjson'] = $geophp->out('json');
+				$row['geojson'] = $geophp->out('json');
 				$this->get_bounds($geophp);
 //TODO				$this->get_automatic_data($row);
 			}
@@ -214,7 +214,7 @@ class listener implements EventSubscriberInterface
 		$row = $vars['row'];
 
 		if ($vars['diagBbox'])
-			$this->optim ($row['geomphp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
+//			$this->optim ($row['geophp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
 
 		$vars['row'] = $row;
 */
@@ -352,8 +352,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
 			$this->get_bounds($geophp);
 			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
-			$post_data['geomjson'] = json_encode ($gp);
+//			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
+			$post_data['geojson'] = json_encode ($gp);
 		}
 
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
@@ -363,7 +363,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'geo_', 4)
+			if (!strncmp ($k, 'geo', 3)
 				&& is_string ($v))
 					$this->template->assign_var (
 						strtoupper ($k),
@@ -388,36 +388,39 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
-		// Spacial field 'geojson'
-		$json = request_var ('geojson', ''); // Look in $_POSTS[geojson]
-		if ($json) {
-			include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
-			$geophp = \geoPHP::load (html_entity_decode($json), 'json');
-			if ($geophp) // Pas de geom
-				$sql_data[POSTS_TABLE]['sql']['geojson'] = 'GeomFromText("'.$geophp->out('wkt').'")';
-		}
-
-		// Get special field list
-		$special_colums = [];
-		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo_%"';
+		// Get special columns list
+		$special_columns = [];
+		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
-			$special_colums [] = $row['Field'];
+			$special_columns [] = $row['Field'];
 		$this->db->sql_freeresult($result);
 
-		// Other specific data
+		// Treat specific data
 		$this->request->enable_super_globals();
 		foreach ($_POST AS $k=>$v)
-			if (!strncmp ($k, 'geo_', 4)) {
-				// Create column if it doesn't exists
-				// Create as TEXT - You can modify the type in SQL if needed
-				if (!in_array ($k, $special_colums))
-					$this->db->sql_query("ALTER TABLE ".POSTS_TABLE." ADD $k TEXT");
+			if (!strncmp ($k, 'geo', 3)) {
+				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
+				$ks = split ('-', $k);
 
-					// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-					$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null permet la supression du champ
+				if ($ks[1] == 'geometry') {
+					include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
+					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
+					if ($geophp)
+						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
 				}
-		$this->request->disable_super_globals();global $_POST;
+
+				if (count ($ks) == 3)
+					$ks[2] = '('.$ks[2].')';
+
+				// Create the SQL column if it doesn't exists
+				if(!in_array ($ks[0], $special_columns))
+					$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' ADD '.implode (' ', $ks));
+
+				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
+				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
+			}
+		$this->request->disable_super_globals();
 
 		$vars['sql_data'] = $sql_data;
 

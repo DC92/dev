@@ -123,8 +123,8 @@ while ($row = $db->sql_fetchrow($result)) {
 		$properties['color'] = $colors[1];
 
 	$g = geoPHP::load ($row['geomwkt'], 'wkt'); // On lit le geom en format WKT fourni par MySql
-	$row['geomjson'] = $g->out('json'); // On le transforme en format GeoJson
-	$row['geomphp'] = json_decode ($row['geomjson']); // On transforme le GeoJson en objet PHP
+	$row['geojson'] = $g->out('json'); // On le transforme en format GeoJson
+	$row['geophp'] = json_decode ($row['geojson']); // On transforme le GeoJson en objet PHP
 
 	/**
 	 * Change properties before sending
@@ -142,7 +142,7 @@ while ($row = $db->sql_fetchrow($result)) {
 
 	$geojson[] = [
 		'type' => 'Feature',
-		'geometry' => $row['geomphp'], // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
+		'geometry' => $row['geophp'], // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 		'properties' => $properties,
 	];
 }
