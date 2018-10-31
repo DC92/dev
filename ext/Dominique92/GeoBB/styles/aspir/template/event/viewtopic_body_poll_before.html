@@ -26,7 +26,7 @@
 	<!-- IF FORUM_NAME == 'Alpages' -->
 		<!-- IF GEO_EQUIPEMENT --><p>Autres équipements disponibles : {GEO_EQUIPEMENT}</p><!-- ENDIF -->
 		<!-- IF GEO_TOPOGRAPHIE --><p>Topographie: {GEO_TOPOGRAPHIE}</p><!-- ENDIF -->
-		<!-- IF GEO_SUPERFICIE --><p>Superficie : {GEO_SUPERFICIE}</p><!-- ENDIF -->
+		<!-- IF GEO_SURFACE_ALPAGE --><p>Superficie : {GEO_SURFACE_ALPAGE}</p><!-- ENDIF -->
 		<!-- IF GEO_VEGETATION --><p>Végétation : {GEO_VEGETATION}</p><!-- ENDIF -->
 		<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
 		<!-- IF GEO_OPERATEUR --><p>Opérateur téléphonique recommandé : {GEO_OPERATEUR}</p><!-- ENDIF -->
@@ -42,6 +42,18 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
+		<!-- IF GEO_ETAT_CABANE --><p>État de la cabane: {GEO_ETAT_CABANE}</p><!-- ENDIF -->
+		<!-- IF GEO_DOUCHE --><p>Douche chaude: {GEO_DOUCHE}</p><!-- ENDIF -->
+		<!-- IF GEO_WC --><p>WC: {GEO_WC}</p><!-- ENDIF -->
+		<!-- IF GEO_RANGEMENTS --><p>Rangements: {GEO_RANGEMENTS}</p><!-- ENDIF -->
+		<!-- IF GEO_SURFACE_CABANE --><p>Surface de la cabane: {GEO_SURFACE_CABANE} m<sup>2</sup></p><!-- ENDIF -->
+		<!-- IF GEO_GAZINIERE --><p>Gazinière: {GEO_GAZINIERE}</p><!-- ENDIF -->
+		<!-- IF GEO_GAZ_FOURNI --><p>Gaz fourni par les éleveurs: {GEO_GAZ_FOURNI}</p><!-- ENDIF -->
+		<!-- IF GEO_EAU --><p>Eau potable: {GEO_EAU}</p><!-- ENDIF -->
+		<!-- IF GEO_ELECTRICITE --><p>Électricité: {GEO_ELECTRICITE}</p><!-- ENDIF -->
+		<!-- IF GEO_USTENSILE --><p>Ustensiles cuisine: {GEO_USTENSILE}</p><!-- ENDIF -->
+		<p><!-- IF GEO_CABANE_LITS_NB -->Literie: {GEO_CABANE_LITS_NB} lit<!-- IF GEO_CABANE_LITS_NB > 1-->s<!-- ENDIF --><!-- ENDIF -->
+		<!-- IF GEO_CABANE_LITS_ETAT -->état : {GEO_CABANE_LITS_ETAT}<!-- ENDIF --></p>
 	<!-- ENDIF -->
 </div>
 <hr clear="all" style="border-color:transparent">

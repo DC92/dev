@@ -124,9 +124,9 @@ class listener implements EventSubscriberInterface
 		// Display news
 		$sql = "
 			SELECT t.topic_id, topic_title,
-				t.forum_id, forum_name, forum_image,
+				p.*, t.forum_id, forum_name, forum_image,
 				topic_first_post_id, post_id, post_attachment, topic_posts_approved,
-				username, poster_id, post_time"/* TODO ???? , geo_massif*/."
+				username, poster_id, post_time
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
 				JOIN ".POSTS_TABLE ." AS p ON (p.post_id = t.topic_last_post_id)

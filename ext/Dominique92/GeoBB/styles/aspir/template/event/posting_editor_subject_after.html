@@ -32,40 +32,40 @@
 		<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
 		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
 
-		<p>Altitude <input type="number" name="geo_altitude-int" size="10" class="inputbox autowidth" value="{GEO_ALTITUDE}" />*</p>
+		<p>Altitude <input type="number" name="geo_altitude-int-5" style="width:10px" class="inputbox" value="{GEO_ALTITUDE}" /> m *</p>
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
 		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Équipements
 			<textarea name="geo_equipement-text" rows="4" cols="45" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
 		<p>Topographie<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
-		<p>Superficie <input type="number" name="geo_superficie-int" class="inputbox autowidth" value="{GEO_SUPERFICIE}" />*</p>
-		<p>Végétation <input type="text" name="geo_vegetation-varchar-80" size="80" class="inputbox autowidth" value="{GEO_VEGETATION}" /></p>
-		<p>IGN <input type="text" name="geo_ign-varchar-40" size="25" class="inputbox autowidth" value="{GEO_IGN}" />*</p>
+		<p>Superficie <input type="number" name="geo_surface_alpage-int-5" class="inputbox autowidth" value="{GEO_SURFACE_ALPAGE}" /> *</p>
+		<p>Végétation <input type="text" name="geo_vegetation-varchar-80" class="inputbox autowidth" value="{GEO_VEGETATION}" /></p>
+		<p>IGN <input type="text" name="geo_ign-varchar-40" size="25" class="inputbox autowidth" value="{GEO_IGN}" /> *</p>
 		<p title="Opérateur téléphonique recommandé" >Opérateur <input type="text" name="geo_operateur-varchar-40" size="25" class="inputbox autowidth" value="{GEO_OPERATEUR}" /></p>
-		<p title="Commune sur laquelle est située l'alpage">Commune <input type="text" name="geo_commune-varchar-80" size="25" class="inputbox autowidth" value="{GEO_COMMUNE}" />*</p>
-		<p>Accès <select name="geo_acces-varchar-80">
+		<p title="Commune sur laquelle est située l'alpage">Commune <input type="text" name="geo_commune-varchar-80" size="25" class="inputbox autowidth" value="{GEO_COMMUNE}" /> *</p>
+		<p>Accès <select name="geo_acces-varchar-10">
 			<option value=""></option>
 			<option value="route" <!-- IF GEO_ACCES == 'route' -->selected="selected"<!-- ENDIF -->>route</option> 
 			<option value="piste" <!-- IF GEO_ACCES == 'piste' -->selected="selected"<!-- ENDIF -->>piste</option>
 			<option value="sentier" <!-- IF GEO_ACCES == 'sentier' -->selected="selected"<!-- ENDIF -->>sentier</option>
 		</select></p>
 		<p>Où se garer <input type="text" name="geo_parking-varchar-80" size="25" class="inputbox autowidth" value="{GEO_PARKING}" /></p>
-		<p title="Temps de parcours depuis la vallée jusqu'à la cabane principale">Temps de parcours <input type="number" name="geo_parcours-int" class="inputbox autowidth" value="{GEO_PARCOURS}" /> minutes</p>
+		<p title="Temps de parcours depuis la vallée jusqu'à la cabane principale">Temps de parcours <input type="number" name="geo_parcours-int-5" class="inputbox autowidth" value="{GEO_PARCOURS}" /> minutes</p>
 		<p title="Lieu de ravitaillement le plus proche">Ravitaillement <input type="text" name="geo_ravitaillement-varchar-80" size="25" class="inputbox autowidth" value="{GEO_RAVITAILLEMENT}" /></p>
-		<p>Présence de MAE <select name="geo_mae-varchar-80">
+		<p>Présence de MAE <select name="geo_mae-varchar-20">
 			<option value=""></option>
 			<option value="oui" <!-- IF GEO_MAE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
 			<option value="non" <!-- IF GEO_MAE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 			<option value="ne sait pas" <!-- IF GEO_MAE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
 		</select></p>
-		<p title="Réserve de parc régional ou national">Réserve <select name="geo_reserve-varchar-80">
+		<p title="Réserve de parc régional ou national">Réserve <select name="geo_reserve-varchar-20">
 			<option value=""></option>
 			<option value="oui" <!-- IF GEO_RESERVE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
 			<option value="non" <!-- IF GEO_RESERVE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 			<option value="ne sait pas" <!-- IF GEO_RESERVE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
-		</select>*</p>
-		<p>Présence d'autres usagers <select name="geo_usagers-varchar-80">
+		</select> *</p>
+		<p>Présence d'autres usagers <select name="geo_usagers-varchar-20">
 			<option value=""></option>
 			<option value="VTT" <!-- IF GEO_USAGERS == 'VTT' -->selected="selected"<!-- ENDIF -->>VTT</option> 
 			<option value="GR" <!-- IF GEO_USAGERS == 'GR' -->selected="selected"<!-- ENDIF -->>GR</option> 
@@ -81,12 +81,60 @@
 		</select></p>
 		<p>Héliportage
 			<input type="date" name="geo_heliportage_date-date" class="inputbox autowidth" value="{GEO_HELIPORTAGE_DATE}" /> /
-			<input type="number" name="geo_heliportage_poids-int" class="inputbox autowidth" value="{GEO_HELIPORTAGE_POIDS}" /> kg
+			<input type="number" name="geo_heliportage_poids-int-5" class="inputbox autowidth" value="{GEO_HELIPORTAGE_POIDS}" /> kg
 		</p>
 		<p>* Laisser le champ vide pour que le serveur le détermine automatiquement.</p>
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
+		<p>État de la cabane <select name="geo_etat_cabane-varchar-10">
+			<option value=""></option>
+			<option value="bon" <!-- IF GEO_ETAT_CABANE == 'oui' -->selected="selected"<!-- ENDIF -->>bon</option> 
+			<option value="moyen" <!-- IF GEO_ETAT_CABANE == 'non' -->selected="selected"<!-- ENDIF -->>moyen</option>
+			<option value="mauvais" <!-- IF GEO_ETAT_CABANE == 'non' -->selected="selected"<!-- ENDIF -->>mauvais</option>
+		</select></p>
+		<p>Douche chaude <select name="geo_douche-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_DOUCHE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_DOUCHE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>WC <select name="geo_wc-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_WC == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_WC == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Rangements <select name="geo_rangements-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_RANGEMENTS == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_RANGEMENTS == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Surface <input type="number" name="geo_surface_cabane-int-5" class="inputbox autowidth" value="{GEO_SURFACE_CABANE}" /> m<sup>2</sup></p>
+		<p>Gazinière <select name="geo_gaziniere-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_GAZINIERE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_GAZINIERE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Gaz fourni par les éleveurs <select name="geo_gaz_fourni-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_GAZ_FOURNI == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_GAZ_FOURNI == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Eau potable <select name="geo_eau-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_EAU == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_MAE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Électricité <select name="geo_electricite-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_ELECTRICITE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_ELECTRICITE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Ustensiles cuisine <select name="geo_ustensiles-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_USTENSILE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_USTENSILE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Literie : <input type="number" name="geo_cabane_lits_nb-int-2" class="inputbox autowidth" value="{GEO_CABANE_LITS_NB}" /> lits / état <input type="text" name="geo_cabane_lits_etat-varchar-40" size="25" class="inputbox autowidth" value="{GEO_CABANE_LITS_ETAT}" /></p>
 	<!-- ENDIF -->
 </dl>
 
