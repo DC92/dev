@@ -126,7 +126,7 @@ class listener implements EventSubscriberInterface
 			SELECT t.topic_id, topic_title,
 				t.forum_id, forum_name, forum_image,
 				topic_first_post_id, post_id, post_attachment, topic_posts_approved,
-				username, poster_id, post_time, geo_massif
+				username, poster_id, post_time"/* TODO ???? , geo_massif*/."
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
 				JOIN ".POSTS_TABLE ." AS p ON (p.post_id = t.topic_last_post_id)
@@ -195,12 +195,12 @@ class listener implements EventSubscriberInterface
 
 			foreach ($row AS $k=>$v)
 				if (strstr ($k, 'geo')) {
-					// Assign the phpbb-posts.geo* SQL data of to each template post area
+					// Assign the phpbb_posts.geo* SQL data of to each template post area
 					$post_row[strtoupper ($k)] = $v;
 
-					// Assign the phpbb-posts.geo* SQL data of the first post to the template
+					// Assign the phpbb_posts.geo* SQL data of the first post to the template
 					if ($vars['topic_data']['topic_first_post_id'] == $row['post_id'])
-						$this->template->assign_var (strtoupper ($k), $v);
+						$this->template->assign_var (strtoupper ($k), $v); //TODO Et ça n'écrase pas le précédent ????
 				}
 
 			$vars['post_row'] = $post_row;
@@ -214,7 +214,7 @@ class listener implements EventSubscriberInterface
 		$row = $vars['row'];
 
 		if ($vars['diagBbox'])
-//			$this->optim ($row['geophp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
+//TODO			$this->optim ($row['geophp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
 
 		$vars['row'] = $row;
 */
@@ -352,7 +352,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
 			$this->get_bounds($geophp);
 			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-//			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
+//TODO			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
 			$post_data['geojson'] = json_encode ($gp);
 		}
 

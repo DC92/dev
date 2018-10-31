@@ -1,10 +1,3 @@
-// Overloaded by aspir
-
-var geobbControlGps = controlGPS();
-geobbControlGps.callBack = function(position) {
-	viseur.getPoint().setCoordinates(position);
-}
-
 function geobbControls() {
 	return [
 		new ol.control.ScaleLine(),
@@ -24,14 +17,12 @@ function geobbControls() {
 			tipLabel: 'Plein écran'
 		}),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
-		// Requires hack to display a title on the geocoder //TODO ?????????
 		new Geocoder('nominatim', {
 			provider: 'osm',
 			lang: 'FR',
 			keepOpen: true,
 			placeholder: 'Saisir un nom' // Initialization of the input field
-		}),
-		geobbControlGps
+		})
 	];
 }
 

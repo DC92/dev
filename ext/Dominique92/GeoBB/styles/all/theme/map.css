@@ -2,9 +2,10 @@
 	max-width: none;
 	min-width: none;
 }
-/*.section-posting .fields1 dl:first-child {
+/*TODO DELETE .section-posting .fields1 dl:first-child, { */
+.geo-hidden {
 	display: none;
-} TODO DELETE */
+}
 
 /* MAP */
 #map {
@@ -35,10 +36,6 @@
 	.section-index #map {
 		border: none;
 	}
-}
-
-.geo-hidden {
-	display: none;
 }
 
 /* INDEX.PHP */

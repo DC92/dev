@@ -1,0 +1,116 @@
+<!-- Openlayers -->
+<!-- INCLUDECSS assets/MyOl/ol/ol.css -->
+<!-- INCLUDEJS assets/MyOl/ol/ol.js -->
+
+<!-- Recherche par nom -->
+<!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
+<!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
+
+<!-- My Openlayers -->
+<!-- INCLUDECSS assets/MyOl/myol.css -->
+<!-- INCLUDEJS assets/MyOl/myol.js -->
+
+<!-- Style specific maps functions -->
+<!-- INCLUDECSS map.css -->
+<!-- INCLUDEJS map.js -->
+
+<div id="map"></div>
+
+<dl class="posting-point" style="clear: left;">
+	<!-- IF GEO_MAP_TYPE == 'point' -->
+		<input id="viseur-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
+		<p>
+			Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12"/>
+			Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12"/>
+		</p>
+		<p id="viseur-xy">Suisse
+			X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12"/>
+			Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12"/>
+		</p>
+
+		<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
+		<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
+		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
+
+		<p>Altitude <input type="number" name="geo_altitude-int" size="10" class="inputbox autowidth" value="{GEO_ALTITUDE}" />*</p>
+	<!-- ENDIF -->
+
+	<!-- IF FORUM_NAME == 'Alpages' -->
+		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Équipements
+			<textarea name="geo_equipement-text" rows="4" cols="45" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
+		<p>Topographie<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
+		<p>Superficie <input type="number" name="geo_superficie-int" class="inputbox autowidth" value="{GEO_SUPERFICIE}" />*</p>
+		<p>Végétation <input type="text" name="geo_vegetation-varchar-80" size="80" class="inputbox autowidth" value="{GEO_VEGETATION}" /></p>
+		<p>IGN <input type="text" name="geo_ign-varchar-40" size="25" class="inputbox autowidth" value="{GEO_IGN}" />*</p>
+		<p title="Opérateur téléphonique recommandé" >Opérateur <input type="text" name="geo_operateur-varchar-40" size="25" class="inputbox autowidth" value="{GEO_OPERATEUR}" /></p>
+		<p title="Commune sur laquelle est située l'alpage">Commune <input type="text" name="geo_commune-varchar-80" size="25" class="inputbox autowidth" value="{GEO_COMMUNE}" />*</p>
+		<p>Accès <select name="geo_acces-varchar-80">
+			<option value=""></option>
+			<option value="route" <!-- IF GEO_ACCES == 'route' -->selected="selected"<!-- ENDIF -->>route</option> 
+			<option value="piste" <!-- IF GEO_ACCES == 'piste' -->selected="selected"<!-- ENDIF -->>piste</option>
+			<option value="sentier" <!-- IF GEO_ACCES == 'sentier' -->selected="selected"<!-- ENDIF -->>sentier</option>
+		</select></p>
+		<p>Où se garer <input type="text" name="geo_parking-varchar-80" size="25" class="inputbox autowidth" value="{GEO_PARKING}" /></p>
+		<p title="Temps de parcours depuis la vallée jusqu'à la cabane principale">Temps de parcours <input type="number" name="geo_parcours-int" class="inputbox autowidth" value="{GEO_PARCOURS}" /> minutes</p>
+		<p title="Lieu de ravitaillement le plus proche">Ravitaillement <input type="text" name="geo_ravitaillement-varchar-80" size="25" class="inputbox autowidth" value="{GEO_RAVITAILLEMENT}" /></p>
+		<p>Présence de MAE <select name="geo_mae-varchar-80">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_MAE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_MAE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+			<option value="ne sait pas" <!-- IF GEO_MAE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
+		</select></p>
+		<p title="Réserve de parc régional ou national">Réserve <select name="geo_reserve-varchar-80">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_RESERVE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_RESERVE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+			<option value="ne sait pas" <!-- IF GEO_RESERVE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
+		</select>*</p>
+		<p>Présence d'autres usagers <select name="geo_usagers-varchar-80">
+			<option value=""></option>
+			<option value="VTT" <!-- IF GEO_USAGERS == 'VTT' -->selected="selected"<!-- ENDIF -->>VTT</option> 
+			<option value="GR" <!-- IF GEO_USAGERS == 'GR' -->selected="selected"<!-- ENDIF -->>GR</option> 
+			<option value="Quad" <!-- IF GEO_USAGERS == 'Quad' -->selected="selected"<!-- ENDIF -->>Quad</option> 
+			<option value="4x4," <!-- IF GEO_USAGERS == '4x4,' -->selected="selected"<!-- ENDIF -->>4x4,</option> 
+			<option value="télésièges/ski" <!-- IF GEO_USAGERS == 'télésièges/ski' -->selected="selected"<!-- ENDIF -->>télésièges/ski</option> 
+			<option value="parapentes," <!-- IF GEO_USAGERS == 'parapentes,' -->selected="selected"<!-- ENDIF -->>parapentes,</option> 
+			<option value="refuge" <!-- IF GEO_USAGERS == 'refuge' -->selected="selected"<!-- ENDIF -->>erfuge</option> 
+			<option value="chasseurs" <!-- IF GEO_USAGERS == 'chasseurs' -->selected="selected"<!-- ENDIF -->>chasseurs</option> 
+			<option value="forestiers" <!-- IF GEO_USAGERS == 'forestiers' -->selected="selected"<!-- ENDIF -->>forestiers</option> 
+			<option value="gardes" <!-- IF GEO_USAGERS == 'gardes' -->selected="selected"<!-- ENDIF -->>gardes</option> 
+			<option value="autre..." <!-- IF GEO_USAGERS == 'autre...' -->selected="selected"<!-- ENDIF -->>autre...</option> 
+		</select></p>
+		<p>Héliportage
+			<input type="date" name="geo_heliportage_date-date" class="inputbox autowidth" value="{GEO_HELIPORTAGE_DATE}" /> /
+			<input type="number" name="geo_heliportage_poids-int" class="inputbox autowidth" value="{GEO_HELIPORTAGE_POIDS}" /> kg
+		</p>
+		<p>* Laisser le champ vide pour que le serveur le détermine automatiquement.</p>
+	<!-- ENDIF -->
+
+	<!-- IF FORUM_NAME == 'Cabanes' -->
+	<!-- ENDIF -->
+</dl>
+
+<script>
+	var map, viseur;
+
+	window.addEventListener('load', function() {
+		viseur = marker(targetImage, 'viseur', true);
+		map = new ol.Map({
+			target: 'map',
+			layers: [
+			<!-- IF GEO_MAP_TYPE == 'point' -->
+				viseur,
+			<!-- ENDIF -->
+				geoLayer(0, true)
+			],
+			controls: geobbControls()
+		});
+		map.addControl(controlLayersSwitcher(
+			layers({GEO_OLKEYS})
+		));
+		map.addControl(controlPermalink({
+			init: true, //TODO BUG devrait être calculé !!!
+			visible: true
+		}));
+	});
+</script>

@@ -1,3 +1,5 @@
+<!-- Overloaded by aspir -->
+
 <!-- Openlayers -->
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
 <!-- INCLUDEJS assets/MyOl/ol/ol.js -->
@@ -55,7 +57,7 @@
 			X <input id="viseur-x" type="text" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12"/>
 			Y <input id="viseur-y" type="text" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12"/>
 		</p>
-		
+
 		<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
 		<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
 		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
