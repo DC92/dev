@@ -1,6 +1,24 @@
 <?php
 // Importation des bases enquete-pastorale.irstea
 
+echo"<p>
+<a href='aspir_import.php?d=01'>01</a> &nbsp; 
+<a href='aspir_import.php?d=04'>04</a> &nbsp; 
+<a href='aspir_import.php?d=05'>05</a> &nbsp; 
+<a href='aspir_import.php?d=07'>07</a> &nbsp; 
+<a href='aspir_import.php?d=13'>13</a> &nbsp; 
+<a href='aspir_import.php?d=26'>26</a> &nbsp; 
+<a href='aspir_import.php?d=38'>38</a> &nbsp; 
+<a href='aspir_import.php?d=42'>42</a> &nbsp; 
+<a href='aspir_import.php?d=43'>43</a> &nbsp; 
+<a href='aspir_import.php?d=63'>63</a> &nbsp; 
+<a href='aspir_import.php?d=69'>69</a> &nbsp; 
+<a href='aspir_import.php?d=73'>73</a> &nbsp; 
+<a href='aspir_import.php?d=74'>74</a> &nbsp; 
+<a href='aspir_import.php?d=83'>83</a> &nbsp; 
+<a href='aspir_import.php?d=84'>84</a> &nbsp; 
+</p>";
+
 define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
@@ -17,6 +35,7 @@ use proj4php\Point;
 $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
+$request->enable_super_globals();
 
 // Initialise Proj4
 $proj4 = new Proj4php();
@@ -25,7 +44,7 @@ $projDst = new Proj('EPSG:4326', $proj4);
 
 // http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
 // http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
-$epiphp = json_decode(file_get_contents ('http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38'));
+$epiphp = json_decode(file_get_contents ('http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id='.$_GET['d']));
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>EPIPHP = ".var_export(json_encode($epiphp),true).'</pre>';
 
 conv_3857_to_4326($epiphp);
@@ -51,8 +70,9 @@ function conv_3857_to_4326(&$p){
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>epiphp = ".var_export(count($epiphp),true).'</pre>';
 
 foreach ($epiphp->features as $p) {
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>EEEEEEEEE = ".var_export($p->properties,true).'</pre>';
 	$geophp = \geoPHP::load (html_entity_decode(json_encode($p->geometry)), 'json');
-	/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>properties = ".var_export($p->properties->nom1,true).'</pre>';
+	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>properties = ".var_export($p->properties->nom1,true).'</pre>';
 
 	$geophp = \geoPHP::load (html_entity_decode(json_encode($p->geometry)), 'json');
 	$sql_data = 'GeomFromText("'.$geophp->out('wkt').'")';
@@ -61,9 +81,13 @@ foreach ($epiphp->features as $p) {
 	$post_id = find_create_topic(2, $p->properties->nom1);
 	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($post_id,true).'</pre>';
 
-	$sql = "UPDATE phpbb_posts SET geom = $sql_data WHERE post_id = $post_id";
+	$sql = 'UPDATE phpbb_posts SET geom = '.$sql_data.
+		',geo_enquette_code = "'.$p->properties->code.
+		'",geo_surface = '.$p->properties->surface.
+		',geo_commune = "'.$p->properties->nom_commune.
+	'" WHERE post_id = '.$post_id;
 	$result = $db->sql_query($sql);
-	/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
+	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
 }
 
 function find_create_topic($forum_id, $nom) {
@@ -78,6 +102,7 @@ function find_create_topic($forum_id, $nom) {
 
 	// Création d'une fiche
 	if (!$data) {
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>CREATION = ".var_export($nom,true).'</pre>';
 		$data = [
 			'forum_id' => $forum_id,
 			'post_subject' => $nom,

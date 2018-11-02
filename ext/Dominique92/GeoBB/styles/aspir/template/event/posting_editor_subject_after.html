@@ -39,7 +39,7 @@
 		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Équipements
 			<textarea name="geo_equipement-text" rows="4" cols="45" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
 		<p>Topographie<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
-		<p>Superficie <input type="number" name="geo_surface_alpage-int-5" class="inputbox autowidth" value="{GEO_SURFACE_ALPAGE}" /> *</p>
+		<p>Superficie <input type="number" name="geo_surface-int-10" class="inputbox autowidth" value="{GEO_SURFACE}" /> *</p>
 		<p>Végétation <input type="text" name="geo_vegetation-varchar-80" class="inputbox autowidth" value="{GEO_VEGETATION}" /></p>
 		<p>IGN <input type="text" name="geo_ign-varchar-40" size="25" class="inputbox autowidth" value="{GEO_IGN}" /> *</p>
 		<p title="Opérateur téléphonique recommandé" >Opérateur <input type="text" name="geo_operateur-varchar-40" size="25" class="inputbox autowidth" value="{GEO_OPERATEUR}" /></p>
@@ -108,7 +108,7 @@
 			<option value="oui" <!-- IF GEO_RANGEMENTS == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
 			<option value="non" <!-- IF GEO_RANGEMENTS == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 		</select></p>
-		<p>Surface <input type="number" name="geo_surface_cabane-int-5" class="inputbox autowidth" value="{GEO_SURFACE_CABANE}" /> m<sup>2</sup></p>
+		<p>Surface <input type="number" name="geo_surface-int-10" class="inputbox autowidth" value="{GEO_SURFACE}" /> m<sup>2</sup></p>
 		<p>Gazinière <select name="geo_gaziniere-varchar-5">
 			<option value=""></option>
 			<option value="oui" <!-- IF GEO_GAZINIERE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
@@ -135,6 +135,9 @@
 			<option value="non" <!-- IF GEO_USTENSILE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 		</select></p>
 		<p>Literie : <input type="number" name="geo_cabane_lits_nb-int-2" class="inputbox autowidth" value="{GEO_CABANE_LITS_NB}" /> lits / état <input type="text" name="geo_cabane_lits_etat-varchar-40" size="25" class="inputbox autowidth" value="{GEO_CABANE_LITS_ETAT}" /></p>
+		
+<p title="Nom de l'unité pastorale">Unité pastorale <input type="text" name="geo_up-varchar-80" size="25" class="inputbox autowidth" value="{GEO_UP}" /></p>
+<p><input type="text" name="geo_enquette_code-varchar-80" value="{GEO_ENQUETTE_CODE}" /></p>
 	<!-- ENDIF -->
 </dl>
 
