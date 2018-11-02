@@ -116,14 +116,13 @@
 }
 /*
 @media print {
-	
 	html, body{
 		padding:0px!important;
 		margin:0px!important;
-    wpage-break-before: avoid;
-    wpage-break-after: avoid;
-    width:100%;
-    wheight:100%;
+	wpage-break-before: avoid;
+	wpage-break-after: avoid;
+	width:100%;
+	wheight:100%;
 	}
 	wbody{display:none;}
 .ol-viewport {
@@ -206,5 +205,5 @@
 	margin: 0;
 }
 .overpass-popup p:first-letter {
-    text-transform: uppercase;
+	text-transform: uppercase;
 }

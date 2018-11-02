@@ -51,7 +51,7 @@ function layerStyle(properties, id, hover) {
 			}),
 			stroke: new ol.style.Stroke({
 				color: 'black',
-				width : 3
+				width : 2
 			})
 		};
 

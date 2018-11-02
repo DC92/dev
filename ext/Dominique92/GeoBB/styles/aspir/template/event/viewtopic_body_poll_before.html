@@ -16,7 +16,7 @@
 
 <div id="map"></div>
 
-<div>
+<div class="geo-info">
 	<p id="marqueur-json" class="geo-hidden">{GEOJSON}</p>
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<p>Longitude <span id="marqueur-lon"></span>, Latitude <span id="marqueur-lat"></span></p>
@@ -24,6 +24,16 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
+	<h2>1. L'alpage</h2>
+		<!-- BEGIN contains_point_eau -->
+			<a href="viewtopic.php?t={contains_point_eau.TOPIC_ID}">
+			<h4 class="geo_contain">{contains_point_eau.TOPIC_TITLE} :</h4></a>
+			<ul>
+			<!-- BEGIN point -->
+				<li>{contains_point_eau.point.K} : {contains_point_eau.point.V}</li>
+			<!-- END point -->
+			<br/></ul>
+		<!-- END contains_point_eau -->
 		<!-- IF GEO_EQUIPEMENT --><p>Autres équipements disponibles : {GEO_EQUIPEMENT}</p><!-- ENDIF -->
 		<!-- IF GEO_TOPOGRAPHIE --><p>Topographie: {GEO_TOPOGRAPHIE}</p><!-- ENDIF -->
 		<!-- IF GEO_SURFACE_ALPAGE --><p>Superficie : {GEO_SURFACE_ALPAGE}</p><!-- ENDIF -->
@@ -39,6 +49,18 @@
 		<!-- IF GEO_USAGERS --><p>Présence d'autres usagers : {GEO_USAGERS}</p><!-- ENDIF -->
 		<p><!-- IF GEO_HELIPORTAGE_DATE -->Héliportage : {GEO_HELIPORTAGE_DATE}<!-- ENDIF -->
 		<!-- IF GEO_HELIPORTAGE_POIDS -->poids : {GEO_HELIPORTAGE_POIDS} kg<!-- ENDIF --></p>
+	<h2>2. Logement</h2>
+		<!-- BEGIN contains_cabane -->
+			<a href="viewtopic.php?t={contains_cabane.TOPIC_ID}">
+			<h4 class="geo_contain">{contains_cabane.TOPIC_TITLE} :</h4></a>
+			<ul>
+			<!-- BEGIN point -->
+				<li>{contains_cabane.point.K} : {contains_cabane.point.V}</li>
+			<!-- END point -->
+			<br/></ul>
+		<!-- END contains_cabane -->
+	<h2>3. Les bêtes</h2>
+	<h2>4. Les éleveurs</h2>
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->

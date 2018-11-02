@@ -167,15 +167,44 @@ class listener implements EventSubscriberInterface
 	// Appelé lors de la première passe sur les données des posts qui lit les données SQL de phpbb-posts
 	function viewtopic_post_rowset_data($vars) {
 		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
-		$this->post_data [$vars['row']['post_id']] = $vars['row'];
+		$post_id = $vars['row']['post_id'];
+		$this->post_data [$post_id] = $vars['row'];
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
+		$post_id = $vars['row']['post_id'];
+
 		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
-		if (isset ($this->post_data [$vars['row']['post_id']])) {
-			$row = $this->post_data [$vars['row']['post_id']]; // Récupère les données SQL du post 
+		// Search points included in a surface
+		$sql = "
+			SELECT p.*, t.topic_id, t.topic_title, f.forum_image
+			FROM	 ".POSTS_TABLE ." AS p
+				JOIN ".POSTS_TABLE ." AS v ON (v.post_id = $post_id)
+				JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
+				JOIN ".FORUMS_TABLE." AS f ON (f.forum_id = p.forum_id)
+			WHERE
+				v.forum_id != p.forum_id AND
+				ST_Contains (v.geom, p.geom)
+			";
+		//TODO pour un point, trouver la zone qui le contient
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$block = 'contains_'.basename ($row['forum_image'], '.png');
+			$this->template->assign_block_vars($block, array_change_key_case ($row, CASE_UPPER));
+
+			foreach ($row AS $k=>$v)
+				if ($v && !strncmp ($k, 'geo_', 4))
+					$this->template->assign_block_vars ($block.'.point', array (
+						'K' => ucfirst (str_replace (['geo_', '_'], ['', ' '], $k)),
+						'V' => $v,
+					));
+		}
+		$this->db->sql_freeresult($result);
+
+		if (isset ($this->post_data [$post_id])) {
+			$row = $this->post_data [$post_id]; // Récupère les données SQL du post 
 			$post_row = $vars['post_row'];
 
 			// Convert the geom info in geoJson format
@@ -258,6 +287,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Calcul des données automatiques
 	function get_automatic_data(&$row) {
+//TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
+// TODO surface ?
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('get_automatic_data',true).'</pre>';
 /*
 		global $config_locale;
@@ -475,7 +506,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	function posting_modify_submission_errors($vars) {
 		$error = $vars['error'];
 
-		foreach ($error AS $k=>$v)	
+		foreach ($error AS $k=>$v)
 			if ($v == $this->user->lang['TOO_FEW_CHARS'])
 				unset ($error[$k]);
 

@@ -9,11 +9,11 @@
 
 /* MAP */
 #map {
-	width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
-	width: 50vw;
-	height: 50vw;
+	height: 60vw;
 	max-width: 80vw;
 	max-height: 90vh;
+	width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
+	width: 50vw;
 	float: right;
 	font-size: 16px;
 	background-image: linear-gradient(#9AB4CB, #9BCB9A);
@@ -25,9 +25,9 @@
 /* Responsive map for mobiles */
 @media screen and (max-width: 600px) {
 	#map {
+		height: 70vw;
 		width: 100%;
 		max-width: 100%;
-		height: 100vw;
 		float: none;
 	}
 	.leaflet-fullscreen-on {

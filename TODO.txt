@@ -19,6 +19,7 @@ Carte responsive pour mobiles
 
 BUGS
 ====
+Pas possible créer point
 Voir les //TODO
 Pas de click sur le label
 Quand click sur plusieurs features, exécute le click en dessous
@@ -44,6 +45,7 @@ Image interdite dans texte
 
 TODO
 ====
+Template saisie / affichage pointd'eau
 //http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
 //http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
 //geophp simplify : https://github.com/phayes/geoPHP/issues/24

@@ -44,7 +44,7 @@ $projDst = new Proj('EPSG:4326', $proj4);
 
 // http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
 // http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
-$epiphp = json_decode(file_get_contents ('http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id='.$_GET['d']));
+$epiphp = json_decode(file_get_contents ('http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id='.$_GET['d']));
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>EPIPHP = ".var_export(json_encode($epiphp),true).'</pre>';
 
 conv_3857_to_4326($epiphp);

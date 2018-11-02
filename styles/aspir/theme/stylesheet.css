@@ -36,14 +36,6 @@
 	display: none !important;
 }
 
-#map {
-    width: -webkit-calc(110% - 20px) !important;
-    width:    -moz-calc(100% - 20px) !important;
-    width:         calc(100% - 20px) !important;
-	max-width: 100% !important;
-	height: 66vw !important;
-	float: none !important;
-}
 .leaflet-fullscreen-on {
 	height: 100% !important;
 }
