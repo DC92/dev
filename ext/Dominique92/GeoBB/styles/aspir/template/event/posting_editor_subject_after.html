@@ -16,6 +16,32 @@
 
 <div id="map"></div>
 
+<script>
+	var map, viseur;
+
+	window.addEventListener('load', function() {
+		map = new ol.Map({
+			target: 'map',
+			layers: [
+				geoLayer(0, true)
+			],
+			controls: geobbControls()
+		});
+		map.addControl(controlLayersSwitcher(
+			layers({GEO_OLKEYS})
+		));
+		var permalink = controlPermalink({
+			init: true,
+			visible: true
+		});
+		map.addControl(permalink);
+		<!-- IF GEO_MAP_TYPE == 'point' -->
+			viseur = marker(targetImage, 'viseur', permalink.paramsCenter, true);
+			map.addLayer(viseur);
+		<!-- ENDIF -->
+	});
+</script>
+
 <dl class="posting-point" style="clear: left;">
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<input id="viseur-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
@@ -36,6 +62,7 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
+		<p><b>EDITION DU PERIMETRE DESACTIVÉE</b></p>
 		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Équipements
 			<textarea name="geo_equipement-text" rows="4" cols="45" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
 		<p>Topographie<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
@@ -142,28 +169,3 @@
 
 	<!-- ENDIF -->
 </dl>
-
-<script>
-	var map, viseur;
-
-	window.addEventListener('load', function() {
-		viseur = marker(targetImage, 'viseur', true);
-		map = new ol.Map({
-			target: 'map',
-			layers: [
-			<!-- IF GEO_MAP_TYPE == 'point' -->
-				viseur,
-			<!-- ENDIF -->
-				geoLayer(0, true)
-			],
-			controls: geobbControls()
-		});
-		map.addControl(controlLayersSwitcher(
-			layers({GEO_OLKEYS})
-		));
-		map.addControl(controlPermalink({
-			init: true, //TODO BUG devrait être calculé !!!
-			visible: true
-		}));
-	});
-</script>

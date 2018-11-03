@@ -159,11 +159,13 @@ function layerTileIncomplete(extent, sources) {
 	// Zoom has changed
 	function change() {
 		var view = layer.map_.getView(),
+			center = view.getCenter(),
 			currentResolution = 999999; // Init loop at max resolution
 		sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
-		if (ol.extent.intersects(extent, view.calculateExtent(layer.map_.getSize())))
+		if (center &&
+			ol.extent.intersects(extent, view.calculateExtent(layer.map_.getSize())))
 			currentResolution = Object.keys(sources).filter(function(event) { // HACK : use of filter to perform an action
 				return event > view.getResolution();
 			})[0];
@@ -325,6 +327,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires 'onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
+//TODO BUG Uncaught SyntaxError: Unexpected token < in JSON at position 46735
 function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
@@ -673,10 +676,9 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-function marker(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-display', dragged
+function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
-		llInit = typeof display == 'object' ? display : [3, 47], // Center of France
-		eljson, ellon, ellat, elxy;
+		eljson, json, ellon, ellat, elxy;
 
 	if (typeof display == 'string') {
 		eljson = document.getElementById(display + '-json');
@@ -684,26 +686,28 @@ function marker(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-disp
 	}
 	// Use json field values if any
 	if (eljson)
-		llInit = JSON.parse(eljson.value || eljson.innerHTML).coordinates;
+		json = eljson.value || eljson.innerHTML;
+	if (json)
+		llInit = JSON.parse(json).coordinates;
 
-	var point = new ol.geom.Point(
-			ol.proj.fromLonLat(llInit)
-		),
-		iconStyle = new ol.style.Style({
+	var style = new ol.style.Style({
 			image: new ol.style.Icon(({
 				src: imageUrl,
 				anchor: [0.5, 0.5]
 			}))
 		}),
-		iconFeature = new ol.Feature({
+		point = new ol.geom.Point(
+			ol.proj.fromLonLat(llInit)
+		),
+		feature = new ol.Feature({
 			geometry: point
 		}),
 		source = new ol.source.Vector({
-			features: [iconFeature]
+			features: [feature]
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			style: iconStyle,
+			style: style,
 			zIndex: 2
 		});
 
@@ -711,8 +715,8 @@ function marker(imageUrl, display, dragged) { // imageUrl, [lon, lat] | 'id-disp
 		if (dragged) {
 			// Drag and drop
 			event.target.map_.addInteraction(new ol.interaction.Modify({
-				features: new ol.Collection([iconFeature]),
-				style: iconStyle
+				features: new ol.Collection([feature]),
+				style: style
 			}));
 			point.on('change', function() {
 				displayLL(this.getCoordinates());
@@ -951,11 +955,16 @@ function controlLayersSwitcher(baseLayers) {
 function controlPermalink(options) {
 	var divElement = document.createElement('div'),
 		aElement = document.createElement('a'),
-		params,
 		control = new ol.control.Control({
 			element: divElement,
 			render: render
-		});
+		}),
+		params =
+			location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
+			document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
+			(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
+	control.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
+
 	if (options.visible) {
 		divElement.className = 'ol-permalink';
 		aElement.innerHTML = 'Permalink';
@@ -968,26 +977,23 @@ function controlPermalink(options) {
 
 		// Set the map at the init
 		if (options.init !== false && // If use hash & cookies
-			typeof params == 'undefined') { // Only once
-			params =
-				location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
-				document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
-				(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // Appli default / Final
+			params) { // Only once
 			view.setZoom(params[1]);
-			view.setCenter(ol.proj.transform([parseFloat(params[2]), parseFloat(params[3])], 'EPSG:4326', 'EPSG:3857'));
+			view.setCenter(ol.proj.transform(control.paramsCenter, 'EPSG:4326', 'EPSG:3857'));
+			params = null;
 		}
 
 		// Check the current map zoom & position
-		var ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326');
-		params = [
-			parseInt(view.getZoom()),
-			Math.round(ll4326[0] * 100000) / 100000,
-			Math.round(ll4326[1] * 100000) / 100000
-		];
+		var ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+			newParams = [
+				parseInt(view.getZoom()),
+				Math.round(ll4326[0] * 100000) / 100000,
+				Math.round(ll4326[1] * 100000) / 100000
+			];
 
 		// Set the new permalink
-		aElement.href = '#map=' + params.join('/');
-		document.cookie = 'map=' + params.join('/') + ';path=/';
+		aElement.href = '#map=' + newParams.join('/');
+		document.cookie = 'map=' + newParams.join('/') + ';path=/';
 	}
 
 	return control;

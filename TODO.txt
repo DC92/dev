@@ -19,6 +19,7 @@ Carte responsive pour mobiles
 
 BUGS
 ====
+Click retour à l'accueil sur titre site phpbb
 Pas possible créer point
 Voir les //TODO
 Pas de click sur le label
@@ -45,6 +46,7 @@ Image interdite dans texte
 
 TODO
 ====
+Zone commentaire et réponses / texte des boutons
 Template saisie / affichage pointd'eau
 //http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
 //http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38

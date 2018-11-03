@@ -147,7 +147,7 @@ var overpass = layerOverpass({
 		// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 	}),
 	marqueur = marker(markerImage, 'marqueur'),
-	viseur = marker(targetImage, 'viseur', true);
+	viseur = marker(targetImage, 'viseur', null, true);
 
 map.addLayer(marqueur);
 map.addLayer(viseur);
