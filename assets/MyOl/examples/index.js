@@ -115,10 +115,9 @@ var overpass = layerOverpass({
 		selectorName: 'overpass',
 		labelClass: 'label-overpass',
 		iconUrl : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
-/*TODO
+/* User dependant
 		postLabel: function(p) {
-			return;return ['<hr/><a href="http://chemineur.fr/posting.php?mode=post',
-					'sid=ca86393fbad98908cf443bdeef5a04ca',
+			return ['<hr/><a href="http://chemineur.fr/posting.php?mode=post',
 					'f=' + p.type,
 					'url=' + encodeURI(p.url),
 					'nom=' + p.name,

@@ -15,16 +15,16 @@
 			selectorName: 'overpass',
 			labelClass: 'label-overpass',
 			iconUrl : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
-			postLabel: function(p) { //TODO A DEVELOPPER
-				return ['<hr/><a href="http://chemineur.fr/posting.php?mode=post',
-						'sid=ca86393fbad98908cf443bdeef5a04ca',
+			postLabel: function(p, f) {
+				return ['<a title="Créer une fiche modifiable à partir du point OSM" ' +
+						'href="http://chemineur.fr/posting.php?mode=post',
 						'f=' + p.type,
 						'url=' + encodeURI(p.url),
 						'nom=' + p.name,
 						'lon=' + p.lon,
 						'lat=' + p.lat
 					].join('&') +
-					'">Créer une fiche</a>';
+					'">Créer une fiche Aspir</a>';
 			}
 		});
 	}

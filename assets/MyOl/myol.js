@@ -574,15 +574,19 @@ function layerOverpass(options) {
 	});
 
 	//TODO : afficher erreur 429 (Too Many Requests)
+	//TODO : afficher affichage OK, ...
 	function formatLabel(p, f) { // p = properties, f = feature
 		var language = {
+				alpine_hut: 'Refuge gard&egrave;',
 				hotel: 'h&ocirc;tel',
 				camp_site: 'camping',
 				convenience: 'alimentation',
 				supermarket: 'supermarch&egrave;',
-				drinking_water: 'point d\'eau',
+				drinking_water: 'point d&apos;eau',
 				watering_place: 'abreuvoir',
-				fountain: 'fontaine'
+				fountain: 'fontaine',
+				telephone: 't&egrave;l&egrave;phone',
+				shelter: ''
 			},
 			phone = p.phone || p['contact:phone'],
 			address = [
@@ -592,7 +596,6 @@ function layerOverpass(options) {
 				p['addr:postcode'], p.postcode,
 				p['addr:city'], p.city
 			],
-			osmUrl = p.url = 'http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId(),
 			popup = [
 				(p.name ? '<b>' + p.name + '</b>' : '') +
 				(p.alt_name ? '<b>' + p.alt_name + '</b>' : '') +
@@ -600,10 +603,13 @@ function layerOverpass(options) {
 				[(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
 					'*'.repeat(p.stars),
 					p.shelter_type == 'basic_hut' ? 'Abri' : '',
-					p.waterway == 'water_point' ? 'Point d\'eau' : '',
+					p.building == 'cabin' ? 'Cabane non gard&egrave;e' : '',
+					p.highway == 'bus_stop' ? 'Arr&ecirc;t de bus' : '',
+					p.waterway == 'water_point' ? 'Point d&apos;eau' : '',
 					p.natural == 'spring' ? 'Source' : '',
 					p.man_made == 'water_well' ? 'Puits' : '',
-					language[p.amenity] ? language[p.amenity] : '',
+					p.shop ? 'alimentation' : '',
+					typeof language[p.amenity] == 'string' ? language[p.amenity] : p.amenity,
 					p.rooms ? p.rooms + ' chambres' : '',
 					p.beds ? p.beds + ' lits' : '',
 					p.place ? p.place + ' places' : '',
@@ -616,11 +622,10 @@ function layerOverpass(options) {
 				p.website ? '&#8943;<a title="Voir le site web" target="_blank" href="' + p.website + '">' + (p.website.split('/')[2] || p.website) + '</a>' : '',
 				p.opening_hours ? 'ouvert ' + p.opening_hours : '',
 				p.note ? p.note : ''
-			],
-			postLabel = typeof options.label == 'function' ? options.postLabel(p, f) : options.postLabel || '';
+			];
 
-		var internet = 0,
-			done = [
+		// Other paramaters
+		var done = [ // These that have no added value or already included
 				'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
 				'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
 				'opening_hours,description,beds,bus,note',
@@ -630,13 +635,14 @@ function layerOverpass(options) {
 				'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
 				'historic,motorcycle,drying,restaurant,hgv',
 				'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
-			].join(',').split(',');
+			].join(',').split(','),
+			nbInternet = 0;
 		for (var k in p) {
 			var k0 = k.split(':')[0];
 			if (!done.includes(k0))
 				switch (k0) {
 					case 'internet_access':
-						if (p[k] != 'no' && !internet++)
+						if (p[k] != 'no' && !nbInternet++)
 							popup.push('Accès internet');
 						break;
 					default:
@@ -644,11 +650,13 @@ function layerOverpass(options) {
 				}
 		}
 
-		popup = popup.concat(
-			typeof postLabel == 'object' ? postLabel : [postLabel], [
-				p.description,
-				'&copy; Voir sur <a title="Voir la fiche d\'origine sur openstreetmap" target="_blank" href="' + osmUrl + '">OSM</a>'
-			]
+		// Label tail with OSM reference & user specific function
+		popup.push(
+			p.description,
+			'<hr/><a title="Voir la fiche d\'origine sur openstreetmap" ' +
+			'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '" ' +
+			'target="_blank">Voir sur OSM</a>',
+			typeof options.postLabel == 'function' ? options.postLabel(p, f) : options.postLabel || ''
 		);
 		return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
 	}

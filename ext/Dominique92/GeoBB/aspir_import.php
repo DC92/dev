@@ -110,7 +110,7 @@ function find_create_topic($forum_id, $nom) {
 			'topic_id' => 0, // Le créer
 			'message' => '',
 			'message_md5' => md5(''),
-			'bbcode_bitfield' => 0, //$message_parser->bbcode_bitfield, // TODO DCMM
+			'bbcode_bitfield' => 0, //$message_parser->bbcode_bitfield, //TODO
 			'bbcode_uid' => 0, //$message_parser->bbcode_uid,
 			'icon_id' => 0,
 			'enable_bbcode' => true,

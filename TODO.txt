@@ -1,39 +1,17 @@
-MIGRATION
-=========
-dézipper et uploader le nouveau phpbb
-supprimer ext/wiglink
-dézipper et uploader https://www.phpbb.com/customise/db/extension/collapsible_forum_categories/
-dezipper et uploader https://github.com/Dominique92/GeoBB
-	ext/Dominique92/...
-	style/chemineur/...
-	favicon.ico
-run SITE/install -> Update manuel -> Database only
-Supprimer install
-
-FAIT
-====
-Bouge carte quand saisie lon/lat
-$auth par l'interface listener
-Pas de click en modif
-Carte responsive pour mobiles
-
 BUGS
 ====
+Créer fiche depuis OSM KO (ne trouve pas p.type, P.lon, ...)
 Click retour à l'accueil sur titre site phpbb
 Pas possible créer point
-Voir les //TODO
 Pas de click sur le label
 Quand click sur plusieurs features, exécute le click en dessous
 IE : pas de SGV
 Edge : Viseur noir
 ...OLD :
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
-Plus de delete segment de ligne
-Pas de scroll avec doigt (mobile) sur page avec deplacement de post
 Suppression fichier attach ne supprime pas l'attachment.
 Diapo : ne s'arrête pas sur touche escape
 WRI : Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
-Input fichier GPX sur ligne train ?
 Pas de choix de forum sur rando pedestre
 Posting ligne: pour édit : mettre marqueurs lignes au dessus des icones
 Clear Ajax carte quand ajoute/supprime un lien (les 2 icones restent sur la carte)
@@ -46,15 +24,13 @@ Image interdite dans texte
 
 TODO
 ====
+Voir les //TODO
 Zone commentaire et réponses / texte des boutons
 Template saisie / affichage pointd'eau
-//http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
-//http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
-//geophp simplify : https://github.com/phayes/geoPHP/issues/24
+geophp simplify : https://github.com/phayes/geoPHP/issues/24
 Editeur de zones
 file-total-progress-bar => pupload : masquer "Envoyer"
-Dominique92->Organiser : intégrer mais avec une puce "echanger", sous droit d'édition
-Mettre un gros cache sur leaflet.js...
+	Attendre que le fichier soit chargé avant de valider le post : à sécuriser !
 Changer la phrase de connexion
 Ajouter un lien "mot de passe" et "contact"
 Interface VTTRACK
@@ -65,14 +41,13 @@ Interface VTTRACK
 BEST TODO
 =========
 CTRL + Click -> Autre page
-Ajouter les liens en "voir sur le site" dans l'étiquette
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Mettre ?date dans les liens des libs LL.
 En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
 OS.GB key for test.chemineur.fr
 Pouvoir trier les posts WRIC
-Bug à l'upgrade de version avec /config.php : '{$cles_ign[$_SERVER['HTTP_HOST']]}', : Illegal use of $_SERVER
 Meteo sur chem
+Meteo sur ASPIR
 Initialiser avec carte IGN (puisque init = sur la France)
 GPX : Nommage des tracks / du fichier.
 BUG: function gis_after($vars) : pb de ob_flush sur 1&1
@@ -84,19 +59,17 @@ Editeur Optim geom dès le chargement
 Appli méteo suisse
 Créer les massifs manquants sur WRI
 Import WRI: importer texte fiche ?
-Post d'accueil chemineur
 Ajouter l'origine des pages importées chemineur
 Ajouter des données fiches à volonté (serialized)
 GIS.PHP faire du BBOX une diagonale pour Intersects
 Barmenu: Enveloppe message trop basse dans Chrome
 Mauvaise largeur de carte quand le style est prosilver
-Attendre que le fichier soit chargé avant de valider le post : à sécuriser !
 Diaporama pleine page ? En particulier sur mobile
 	Echap par une touche sur mobile pas pratique
 Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29
 Erreur type de caractères randos Lozerre
 Récup trace diaporamas + chemins chem2
-Récup auteur photo // GEO-TODO DCMM Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
+Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
 Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
 EDIT.log => Trace supprimer le sujet
 	EDIT.log => Segmenter par jour
@@ -132,12 +105,24 @@ Création / Edition de traces
 Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
 Consulter l'historique des éditions
 
+MIGRATION
+=========
+dézipper et uploader le nouveau phpbb
+supprimer ext/wiglink
+dézipper et uploader https://www.phpbb.com/customise/db/extension/collapsible_forum_categories/
+dezipper et uploader https://github.com/Dominique92/GeoBB
+	ext/Dominique92/...
+	style/chemineur/...
+	favicon.ico
+run SITE/install -> Update manuel -> Database only
+Supprimer install
+
+
 MISE EN FORME / INSTALL / DEMOS
 ===============================
 Dépendance des plugins:
 	<!-- INCLUDE reference.html --> => Devrait être un extract
 Compléter un GITHUB READ.ME
-DCMM -> TBD
 Stockage images sur plus d'1 répertoire => ? plugin ?
 Faire executer l'import par le cron
 Intégrer dans les patchs ??? Attendre !

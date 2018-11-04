@@ -236,7 +236,7 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	function gis_modify_data($vars) {
+	function gis_modify_data($vars) { //TODO DELETE
 //if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
 /*
 		// Insère l'extraction des données externes dans le flux géographique
@@ -288,7 +288,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	// Calcul des données automatiques
 	function get_automatic_data(&$row) {
 //TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
-// TODO surface ?
+//TODO surface ?
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('get_automatic_data',true).'</pre>';
 /*
 		global $config_locale;
