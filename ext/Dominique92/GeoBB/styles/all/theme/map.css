@@ -8,17 +8,23 @@
 }
 
 /* MAP */
-#map {
-	height: 60vw;
-	max-width: 80vw;
-	max-height: 90vh;
+.map { /* Englobant de la carte */
 	width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
 	width: 50vw;
 	float: right;
+	background: white;
+}
+.map ul {
+    list-style-type: none;
+}
+#map { /* Zone gérée par OL */
+	height: 60vw;
+	max-width: 80vw;
+	max-height: 90vh;
 	font-size: 16px;
 	background-image: linear-gradient(#9AB4CB, #9BCB9A);
 }
-.section-index #map {
+.section-index .map {
 	border-left: solid white 10px;
 	border-bottom: solid white 10px;
 }

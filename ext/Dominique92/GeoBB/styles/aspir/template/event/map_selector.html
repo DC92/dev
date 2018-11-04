@@ -1,0 +1,31 @@
+<ul id="overpass">
+	<li>Points externes</li>
+	<li><input type="checkbox" name="overpass" id="point_eau" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
+	<li><input type="checkbox" name="overpass" id="telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
+	<li><input type="checkbox" name="overpass" id="wifi" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
+	<li><input type="checkbox" name="overpass" id="ravitaillement" value='["shop"~"supermarket|convenience"]' />Ravitaillement</li>
+	<li><input type="checkbox" name="overpass" id="parking" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
+</ul>
+
+<script>
+	function overlaySelector() {
+		return layerOverpass({
+			url: '//overpass-api.de/api/interpreter',
+			selectorId: 'overpass',
+			selectorName: 'overpass',
+			labelClass: 'label-overpass',
+			iconUrl : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
+			postLabel: function(p) { //TODO A DEVELOPPER
+				return ['<hr/><a href="http://chemineur.fr/posting.php?mode=post',
+						'sid=ca86393fbad98908cf443bdeef5a04ca',
+						'f=' + p.type,
+						'url=' + encodeURI(p.url),
+						'nom=' + p.name,
+						'lon=' + p.lon,
+						'lat=' + p.lat
+					].join('&') +
+					'">Créer une fiche</a>';
+			}
+		});
+	}
+</script>
