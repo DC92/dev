@@ -526,11 +526,12 @@ ol.format.OSMXMLPOI = function() {
 ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
 
 /**
- * OSM overpass poi layer
+ * OSM overpass POI layer
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
+//TODO BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 function layerOverpass(options) {
 	var layer = layerVectorURL({
 		url: function(bbox, list, resolution) {
@@ -565,7 +566,7 @@ function layerOverpass(options) {
 		style: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: options.iconUrl + overpassType(properties) + '.png'
+					src: options.iconUrlPath + overpassType(properties) + '.png'
 				})
 			};
 		},
@@ -656,7 +657,7 @@ function layerOverpass(options) {
 			'<hr/><a title="Voir la fiche d\'origine sur openstreetmap" ' +
 			'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '" ' +
 			'target="_blank">Voir sur OSM</a>',
-			typeof options.postLabel == 'function' ? options.postLabel(p, f) : options.postLabel || ''
+			typeof options.postLabel == 'function' ? options.postLabel(overpassType(p), p, f) : options.postLabel || ''
 		);
 		return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
 	}
@@ -684,6 +685,7 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
+//TODO pointer finger sur la cible
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
 		eljson, json, ellon, ellat, elxy;

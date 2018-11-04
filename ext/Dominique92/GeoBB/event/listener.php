@@ -358,9 +358,14 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$sql = 'SELECT * FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
 		$result = $this->db->sql_query ($sql);
 		$row = $this->db->sql_fetchrow ($result);
-		if ($row)
-			$vars['forum_id'] = $row ['forum_id']; // Force le forum
 		$this->db->sql_freeresult ($result);
+		if ($row) {
+			// Force le forum
+			$vars['forum_id'] = $row ['forum_id'];
+
+			// Initialise subject name
+			$this->template->assign_var ('DRAFT_SUBJECT', $this->request->variable('name', 'NOM'));
+		}
 	}
 
 	// Appelé lors de l'affichage de la page posting

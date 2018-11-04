@@ -14,15 +14,15 @@
 			selectorId: 'overpass',
 			selectorName: 'overpass',
 			labelClass: 'label-overpass',
-			iconUrl : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
-			postLabel: function(p, f) {
+			iconUrlPath : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
+			postLabel: function(t, p, f) {
+			var ll4326 = ol.proj.transform(p.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
 				return ['<a title="Créer une fiche modifiable à partir du point OSM" ' +
-						'href="http://chemineur.fr/posting.php?mode=post',
-						'f=' + p.type,
-						'url=' + encodeURI(p.url),
-						'nom=' + p.name,
-						'lon=' + p.lon,
-						'lat=' + p.lat
+						'href="posting.php?mode=post',
+						'type=' + t,
+						'name=' + p.name,
+						'lon=' + Math.round(ll4326[0] * 100000) / 100000,
+						'lat=' + Math.round(ll4326[0] * 100000) / 100000
 					].join('&') +
 					'">Créer une fiche Aspir</a>';
 			}
