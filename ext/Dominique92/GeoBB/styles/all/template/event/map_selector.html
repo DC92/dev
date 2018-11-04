@@ -1,0 +1,31 @@
+<ul id="overpass">
+	<li>Points externes</li>
+	<li><input type="checkbox" name="overpass" id="point_eau" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
+	<li><input type="checkbox" name="overpass" id="telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
+	<li><input type="checkbox" name="overpass" id="wifi" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
+	<li><input type="checkbox" name="overpass" id="ravitaillement" value='["shop"~"supermarket|convenience"]' />Ravitaillement</li>
+	<li><input type="checkbox" name="overpass" id="parking" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
+</ul>
+
+<script>
+	function overlaySelector() {
+		return layerOverpass({
+			url: '//overpass-api.de/api/interpreter',
+			selectorId: 'overpass',
+			selectorName: 'overpass',
+			labelClass: 'label-overpass',
+			iconUrlPath : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
+			postLabel: function(t, p) {
+			var ll4326 = ol.proj.transform(p.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
+				return ['<a title="Créer une fiche modifiable à partir du point OSM" ' +
+						'href="posting.php?mode=post',
+						'type=' + t,
+						'name=' + p.name,
+						'lon=' + Math.round(ll4326[0] * 100000) / 100000,
+						'lat=' + Math.round(ll4326[0] * 100000) / 100000
+					].join('&') +
+					'">Créer une fiche Aspir</a>';
+			}
+		});
+	}
+</script>

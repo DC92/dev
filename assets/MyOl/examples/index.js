@@ -115,19 +115,17 @@ var overpass = layerOverpass({
 		selectorName: 'overpass',
 		labelClass: 'label-overpass',
 		iconUrlPath : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
-/* User dependant
-//TODO réimplanter en fonction de ce qui est fait dans aspir
-		postLabel: function(p) {
-			return ['<hr/><a href="http://chemineur.fr/posting.php?mode=post',
-					'f=' + p.type,
-					'url=' + encodeURI(p.url),
-					'nom=' + p.name,
-					'lon=' + p.lon,
-					'lat=' + p.lat
+		postLabel: function(t, p) {
+		var ll4326 = ol.proj.transform(p.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
+			return ['<a title="Créer une fiche modifiable à partir du point OSM" ' +
+					'href="posting.php?mode=post',
+					'type=' + t,
+					'name=' + p.name,
+					'lon=' + Math.round(ll4326[0] * 100000) / 100000,
+					'lat=' + Math.round(ll4326[0] * 100000) / 100000
 				].join('&') +
-				'">Créer une fiche</a>';
+				'">Créer une fiche locale</a>';
 		}
-*/
 	}),
 	overlays = [
 		layerPointsWri(),
