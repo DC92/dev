@@ -69,7 +69,7 @@ function layerStyle(properties, id, hover) {
 
 function geoLayer(id, noclick) {
 	return layerVectorURL({
-		url: 'ext/Dominique92/GeoBB/gis.php?',
+		url: 'ext/Dominique92/GeoBB/gis.php?limite=10000&',
 		style: function(properties) {
 			return layerStyle(properties, id);
 		},

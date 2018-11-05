@@ -46,8 +46,10 @@
 </script>
 
 <dl class="posting-point" style="clear: left;">
+	<input id="viseur-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
+	<!-- //TODO pour all : 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" />*</p> -->
+
 	<!-- IF GEO_MAP_TYPE == 'point' -->
-		<input id="viseur-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
 		<p>
 			Lon <input id="viseur-lon" type="text" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12"/>
 			Lat <input id="viseur-lat" type="text" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12"/>
@@ -62,7 +64,6 @@
 		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
 
 		<p>Altitude <input type="number" name="geo_altitude-int-5" style="width:10px" class="inputbox" value="{GEO_ALTITUDE}" /> m *</p>
-<!-- //TODO pour all : 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" />*</p> -->
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
@@ -115,6 +116,11 @@
 			<input type="number" name="geo_heliportage_poids-int-5" class="inputbox autowidth" value="{GEO_HELIPORTAGE_POIDS}" /> kg
 		</p>
 		<p>* Laisser le champ vide pour que le serveur le détermine automatiquement.</p>
+
+	<!-- //TODO DELETE ? -->
+		<input name="geo_irstea_code-varchar-20" type="hidden" value='{GEO_IRSTEA_CODE}' />
+		<input name="geo_irstea_type-varchar-10" type="hidden" value='{GEO_IRSTEA_TYPE}' />
+
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
@@ -166,10 +172,5 @@
 			<option value="non" <!-- IF GEO_USTENSILE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 		</select></p>
 		<p>Literie : <input type="number" name="geo_cabane_lits_nb-int-2" class="inputbox autowidth" value="{GEO_CABANE_LITS_NB}" /> lits / état <input type="text" name="geo_cabane_lits_etat-varchar-40" size="25" class="inputbox autowidth" value="{GEO_CABANE_LITS_ETAT}" /></p>
-
-//TODO
-<p title="Nom de l'unité pastorale">Unité pastorale <input type="text" name="geo_up-varchar-80" size="25" class="inputbox autowidth" value="{GEO_UP}" /></p>
-<p><input type="text" name="geo_enquette_code-varchar-80" value="{GEO_ENQUETTE_CODE}" /></p>
-
 	<!-- ENDIF -->
 </dl>

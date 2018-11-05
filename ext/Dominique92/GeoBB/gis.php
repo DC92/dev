@@ -30,7 +30,7 @@ $bbox_sql =
 $diagBbox = hypot ($bboxs[2] - $bboxs[0], $bboxs[3] - $bboxs[1]); // Hypothènuse de la bbox
 
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
-$limite = request_var ('limite', 150); // Nombre de points maximum
+$limite = request_var ('limite', 250); // Nombre de points maximum
 $format = $format_app = request_var ('format', 'json');
 if ($format == 'gpx') {
 	$limite = 10000;

@@ -35,18 +35,24 @@ use proj4php\Point;
 $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
-$request->enable_super_globals();
+$request->enable_super_globals(); //TODO restreindre
 
 // Initialise Proj4
 $proj4 = new Proj4php();
 $projSrc = new Proj('EPSG:3857', $proj4);
 $projDst = new Proj('EPSG:4326', $proj4);
 
+// Parameters
+$epid = $request->variable('d', '01');
+$upzp = $request->variable('p', 'UP');
+$alp_forum_id = $request->variable('f', 2);
+echo"<pre style='background-color:white;color:black;font-size:14px;'>Import enquete ".var_export($upzp.':'.$epid,true).'</pre>';
+
+// Get irstea list
 // http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
 // http://enquete-pastorale.irstea.fr/getPHP/getZPJSON.php?id=38
-$epiphp = json_decode(file_get_contents ('http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id='.$_GET['d']));
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>EPIPHP = ".var_export(json_encode($epiphp),true).'</pre>';
-
+$epifile = file_get_contents ('http://enquete-pastorale.irstea.fr/getPHP/get'.$upzp.'JSON.php?id='.$epid);
+$epiphp = json_decode($epifile);
 conv_3857_to_4326($epiphp);
 function conv_3857_to_4326(&$p){
 	global $proj4, $projSrc, $projDst;
@@ -67,74 +73,73 @@ function conv_3857_to_4326(&$p){
 				conv_3857_to_4326($p1);
 	}
 }
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>epiphp = ".var_export(count($epiphp),true).'</pre>';
 
-foreach ($epiphp->features as $p) {
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>EEEEEEEEE = ".var_export($p->properties,true).'</pre>';
-	$geophp = \geoPHP::load (html_entity_decode(json_encode($p->geometry)), 'json');
-	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>properties = ".var_export($p->properties->nom1,true).'</pre>';
+foreach ($epiphp->features as $p)
+	if($p->geometry) {
+		// Get geometry
+		$geomjson = json_encode($p->geometry);
+		$geomphp = \geoPHP::load ($geomjson, 'json');
+		$geomsql = 'GeomFromText("'.$geomphp->out('wkt').'")';
 
-	$geophp = \geoPHP::load (html_entity_decode(json_encode($p->geometry)), 'json');
-	$sql_data = 'GeomFromText("'.$geophp->out('wkt').'")';
-	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>sql_data = ".var_export($sql_data,true).'</pre>';
+		// Normalise data
+		$p->properties->nom_commune = str_replace ("'", "\\'", $p->properties->nom_commune);
+		if (!$p->properties->surface)
+			$p->properties->surface = 0;
+		if (!$p->properties->nom1)
+			$p->properties->nom1 = $p->properties->code;
 
-	$post_id = find_create_topic(2, $p->properties->nom1);
-	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($post_id,true).'</pre>';
+		// Check existing subject
+		$sql = "SELECT * FROM phpbb_posts WHERE geo_irstea_code = '{$p->properties->code}'";
+		$result = $db->sql_query($sql);
+		$data = $db->sql_fetchrow($result);
+		$db->sql_freeresult($result);
 
-	$sql = 'UPDATE phpbb_posts SET geom = '.$sql_data.
-		',geo_enquette_code = "'.$p->properties->code.
-		'",geo_surface = '.$p->properties->surface.
-		',geo_commune = "'.$p->properties->nom_commune.
-	'" WHERE post_id = '.$post_id;
-	$result = $db->sql_query($sql);
-	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
-}
+		//  Création d'une fiche
+		if ($geomphp->components->coordinates &&
+			!$data) {
+			echo"<pre style='background-color:white;color:black;font-size:14px;'>CREATION = ".var_export($p->properties->nom1,true).'</pre>';
 
-function find_create_topic($forum_id, $nom) {
-	global $db, $user, $is_authed;
+			$data = [
+				'forum_id' => $alp_forum_id,
+				'topic_id' =>  0, // Le créer
+				'post_id' => 0, // Le créer
+				'post_subject' => $p->properties->nom1,
+				'message' => '',
+				'message_md5' => md5(''),
+				'bbcode_bitfield' => 0, //$message_parser->bbcode_bitfield, //TODO
+				'bbcode_uid' => 0, //$message_parser->bbcode_uid,
+				'icon_id' => 0,
+				'enable_bbcode' => true,
+				'enable_smilies' => true,
+				'poster_id' => $user->data['user_id'],
+				'enable_urls' => true,
+				'enable_sig' => true,
+				'topic_visibility' => true,
+				'post_visibility' => true,
+				'enable_indexing' => true,
+				'post_edit_locked' => false,
+				'notify_set' => false,
+				'notify' => false,
+			];
+			$poll = [];
+			\submit_post(
+				'post',
+				$p->properties->nom1,
+				$user->data['username'],
+				POST_NORMAL,
+				$poll,
+				$data
+			);
+		}
 
-	$sql = 'SELECT * FROM phpbb_posts WHERE post_subject = "'.str_replace('"', '\"', $nom).'" ORDER BY post_time ASC';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
-	$result = $db->sql_query($sql);
-	$data = $db->sql_fetchrow($result);
-	$db->sql_freeresult($result);
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($data,true).'</pre>';
-
-	// Création d'une fiche
-	if (!$data) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>CREATION = ".var_export($nom,true).'</pre>';
-		$data = [
-			'forum_id' => $forum_id,
-			'post_subject' => $nom,
-			'post_id' => 0, // Le créer
-			'topic_id' => 0, // Le créer
-			'message' => '',
-			'message_md5' => md5(''),
-			'bbcode_bitfield' => 0, //$message_parser->bbcode_bitfield, //TODO
-			'bbcode_uid' => 0, //$message_parser->bbcode_uid,
-			'icon_id' => 0,
-			'enable_bbcode' => true,
-			'enable_smilies' => true,
-			'poster_id' => $user->data['user_id'],
-			'enable_urls' => true,
-			'enable_sig' => true,
-			'topic_visibility' => true,
-			'post_visibility' => true,
-			'enable_indexing' => true,
-			'post_edit_locked' => false,
-			'notify_set' => false,
-			'notify' => false,
-		];
-		$poll = [];
-		\submit_post(
-			'post',
-			$nom,
-			$user->data['username'],
-			POST_NORMAL,
-			$poll,
-			$data
-		);
+		// Update geo_ data
+		if ($data['post_id']) {
+			$sql = "UPDATE phpbb_posts SET geom = $geomsql
+					,geo_surface = {$p->properties->surface}
+					,geo_commune = '{$p->properties->nom_commune}'
+					,geo_irstea_code = '{$p->properties->code}'
+					,geo_irstea_type = '$upzp:$epid'
+				WHERE post_id = {$data['post_id']}";
+			$result = $db->sql_query($sql);
+		}
 	}
-	//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($data['post_id'],true).'</pre>';
-	return $data['post_id'];
-}

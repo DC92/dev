@@ -186,8 +186,9 @@ class listener implements EventSubscriberInterface
 				JOIN ".FORUMS_TABLE." AS f ON (f.forum_id = p.forum_id)
 			WHERE
 				v.forum_id != p.forum_id AND
-				ST_Contains (v.geom, p.geom)
+				Contains (v.geom, p.geom)
 			";
+		//TODO en MySQL 5.7+, utiliser ST_Contains
 		//TODO pour un point, trouver la zone qui le contient
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
@@ -395,7 +396,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
 		// TODO : traiter au niveau du formulaire (avertissement de modif ?)
 		if (!$post_data['post_subject'])
-			$post_data['draft_subject'] = 'NEW';
+			$this->template->assign_var ('DRAFT_SUBJECT', 'NEW');
 
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)
@@ -406,10 +407,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						strstr($v, '~') == '~' ? null : $v // Clears fields ending with ~ for automatic recalculation
 					);
 
-		// Assign the forums geom type flags to the template
-		$vars['first_post'] =
-			!isset ($post_data['topic_id']) || // Cas de la création d'un nouveau topic
-			$post_data['topic_first_post_id'] == @$post_data['post_id'];
+		// No $vars return as we have assigned data to the template
 
 		// HORRIBLE phpbb hack to accept geom values / TODO : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
@@ -439,19 +437,18 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
 				$ks = split ('-', $k);
 
-				if ($ks[1] == 'geometry') {
+				// Create the SQL column if it doesn't exists
+				if (count ($ks) == 3)
+					$ks[2] = '('.$ks[2].')';
+				if(!in_array ($ks[0], $special_columns))
+					$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' ADD '.implode (' ', $ks));
+
+				if ($ks[1] == 'geometry' && $v) {
 					include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
 					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
 					if ($geophp)
 						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
 				}
-
-				if (count ($ks) == 3)
-					$ks[2] = '('.$ks[2].')';
-
-				// Create the SQL column if it doesn't exists
-				if(!in_array ($ks[0], $special_columns))
-					$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' ADD '.implode (' ', $ks));
 
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
