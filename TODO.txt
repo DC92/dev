@@ -7,7 +7,6 @@ Edge : Viseur noir
 
 BUGS
 ====
-Masquer les [first={TYPE}]
 Créer fiche depuis OSM KO (ne trouve pas p.type, P.lon, ...)
 Click retour à l'accueil sur titre site phpbb
 ...OLD :
@@ -113,8 +112,9 @@ Consulter l'historique des éditions
 
 RESYNC ASPIR
 ============
+Vider cache / cache de l'explorateur
 structure phpbb_posts -> supprime colonnes geo*
-cree alpage + cabane / valide
+cree cabane / valide PUIS cree alpage / valide
 vide phpbb_posts
 admin -> resync les forums
 aspir_import.php -> cliquer sur tous

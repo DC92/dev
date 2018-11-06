@@ -34,7 +34,8 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
-	<h2>1. L'alpage</h2>
+		<h2>1. L'alpage</h2>
+		<h3>1.1 Équipements</h3>
 		<!-- IF .contains_point_eau -->
 			<p>Point(s) d'eau :</p>
 			<!-- BEGIN contains_point_eau -->
@@ -48,21 +49,34 @@
 			<!-- END contains_point_eau -->
 		<!-- ENDIF -->
 		<!-- IF GEO_EQUIPEMENT --><p>Autres équipements disponibles : {GEO_EQUIPEMENT}</p><!-- ENDIF -->
+
+		<h3>1.2 Caractéristiques</h3>
+		<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
 		<!-- IF GEO_TOPOGRAPHIE --><p>Topographie: {GEO_TOPOGRAPHIE}</p><!-- ENDIF -->
-		<!-- IF GEO_SURFACE_ALPAGE --><p>Superficie : {GEO_SURFACE_ALPAGE}</p><!-- ENDIF -->
+		<!-- IF GEO_SURFACE_ALPAGE --><p>Superficie : {GEO_SURFACE_ALPAGE} ha</p><!-- ENDIF -->
 		<!-- IF GEO_VEGETATION --><p>Végétation : {GEO_VEGETATION}</p><!-- ENDIF -->
 		<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
 		<!-- IF GEO_OPERATEUR --><p>Opérateur téléphonique recommandé : {GEO_OPERATEUR}</p><!-- ENDIF -->
 		<!-- IF GEO_COMMUNE --><p>Commune sur laquelle est située l'alpage : {GEO_COMMUNE}</p><!-- ENDIF -->
+
+		<h3>1.3 Accès</h3>
 		<!-- IF GEO_ACCES --><p>Accès : {GEO_ACCES}</p><!-- ENDIF -->
 		<!-- IF GEO_PARKING --><p>Où se garer : {GEO_PARKING}</p><!-- ENDIF -->
 		<!-- IF GEO_PARCOURS --><p>Temps de parcours : {GEO_PARCOURS} minutes</p><!-- ENDIF -->
+		<!-- IF GEO_RAVITAILLEMENT --><p>Lieu de ravitaillement le plus proche : {GEO_RAVITAILLEMENT}</p><!-- ENDIF -->
+
+		<h3>1.4 Mesures environnementales</h3>
 		<!-- IF GEO_MAE --><p>Présence de MAE : {GEO_MAE}</p><!-- ENDIF -->
 		<!-- IF GEO_RESERVE --><p>Réserve de parc régional ou national : {GEO_RESERVE}</p><!-- ENDIF -->
+
+		<h3>1.5 Autres usagers</h3>
 		<!-- IF GEO_USAGERS --><p>Présence d'autres usagers : {GEO_USAGERS}</p><!-- ENDIF -->
+
+		<h3>1.6 Héliportage</h3>
 		<p><!-- IF GEO_HELIPORTAGE_DATE -->Héliportage : {GEO_HELIPORTAGE_DATE}<!-- ENDIF -->
 		<!-- IF GEO_HELIPORTAGE_POIDS -->poids : {GEO_HELIPORTAGE_POIDS} kg<!-- ENDIF --></p>
-	<h2>2. Logement</h2>
+
+		<h2>2. Logement</h2>
 		<!-- IF .contains_point_eau -->
 			<p>Cabane(s) :</p>
 			<!-- BEGIN contains_cabane -->
@@ -75,8 +89,35 @@
 				<br/></ul>
 			<!-- END contains_cabane -->
 		<!-- ENDIF -->
-	<h2>3. Les bêtes</h2>
-	<h2>4. Les éleveurs</h2>
+
+		<h2>3. Les bêtes</h2>
+		<h3>3.1 Le troupeau</h3>
+		<!-- IF GEO_NB_ELEVEURS --><p>Nombre d'éleveurs: {GEO_NB_ELEVEURS}</p><!-- ENDIF -->
+		<!-- IF GEO_NB_BREBIS --><p>Nombre de brebis: {GEO_NB_BREBIS}</p><!-- ENDIF -->
+		<!-- IF GEO_RACES --><p>Races: {GEO_RACES}</p><!-- ENDIF -->
+		<!-- IF GEO_TRANSHUMANCE --><p>Transhumance: {GEO_TRANSHUMANCE}</p><!-- ENDIF -->
+		<!-- IF GEO_BELIERS --><p>Présence de béliers: {GEO_BELIERS}</p><!-- ENDIF -->
+		<!-- IF GEO_CHEVRES --><p>Présence de chèvres: {GEO_CHEVRES}</p><!-- ENDIF -->
+		<!-- IF GEO_AGNEAUX --><p>Présence d'agneaux: {GEO_AGNEAUX}</p><!-- ENDIF -->
+
+		<h3>3.2 Les soins</h3>
+		<!-- IF GEO_ETAT_TROUPEAU --><p>État général du troupeau: {GEO_ETAT_TROUPEAU}</p><!-- ENDIF -->
+		<!-- IF GEO_SOINS_VETERINAIRES --><p>Soins vétérinaires habituellement pratiqués: {GEO_SOINS_VETERINAIRES}</p><!-- ENDIF -->
+
+		<h3>3.3 La prédation</h3>
+		<!-- IF GEO_LOUPS --><p>Présence avérée de loups: {GEO_LOUPS}</p><!-- ENDIF -->
+		<!-- IF GEO_PROTECTION --><p>Mesures de protection: {GEO_PROTECTION}</p><!-- ENDIF -->
+		<!-- IF GEO_ATTAQUES --><p>Fréquence des attaques: {GEO_ATTAQUES}</p><!-- ENDIF -->
+
+		<h2>4. Les éleveurs</h2>
+		<p>Employeurs : <!-- IF GEO_NOMBRE_EMPLOYEURS -->{GEO_NOMBRE_EMPLOYEURS}<!-- ENDIF -->
+			<!-- IF GEO_SIEGE_EMPLOYEUR -->{GEO_SIEGE_EMPLOYEUR}<!-- ENDIF --></p>
+		<!-- IF GEO_ASSOCIATION_PASTORALE --><p>Association pastorale: {GEO_ASSOCIATION_PASTORALE}</p><!-- ENDIF -->
+		<!-- IF GEO_UNITE_PASTORALE --><p>Nom de l'unité pastorale: {GEO_UNITE_PASTORALE}</p><!-- ENDIF -->
+		<!-- IF GEO_IMPLICATION_ELEVEURS --><p>Implication des éleveurs pendant l'estive: {GEO_IMPLICATION_ELEVEURS}</p><!-- ENDIF -->
+		<!-- IF GEO_CONTACT_GROUPEMENT --><p>Groupement pastoral: {GEO_CONTACT_GROUPEMENT}</p><!-- ENDIF -->
+		<!-- IF GEO_ANCIENS_BERGERS --><p>Contacts anciens bergers: {GEO_ANCIENS_BERGERS}</p><!-- ENDIF -->
+		<!-- IF GEO_CALENDRIER --><p>Calendrier approximatif d'emontagnage et démontagnage: {GEO_CALENDRIER}</p><!-- ENDIF -->
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
@@ -84,14 +125,20 @@
 		<!-- IF GEO_DOUCHE --><p>Douche chaude: {GEO_DOUCHE}</p><!-- ENDIF -->
 		<!-- IF GEO_WC --><p>WC: {GEO_WC}</p><!-- ENDIF -->
 		<!-- IF GEO_RANGEMENTS --><p>Rangements: {GEO_RANGEMENTS}</p><!-- ENDIF -->
-		<!-- IF GEO_SURFACE_CABANE --><p>Surface de la cabane: {GEO_SURFACE_CABANE} m<sup>2</sup></p><!-- ENDIF -->
+		<!-- IF GEO_SURFACE_CABANE --><p>Surface de la cabane: {GEO_SURFACE} m<sup>2</sup></p><!-- ENDIF -->
 		<!-- IF GEO_GAZINIERE --><p>Gazinière: {GEO_GAZINIERE}</p><!-- ENDIF -->
 		<!-- IF GEO_GAZ_FOURNI --><p>Gaz fourni par les éleveurs: {GEO_GAZ_FOURNI}</p><!-- ENDIF -->
 		<!-- IF GEO_EAU --><p>Eau potable: {GEO_EAU}</p><!-- ENDIF -->
 		<!-- IF GEO_ELECTRICITE --><p>Électricité: {GEO_ELECTRICITE}</p><!-- ENDIF -->
 		<!-- IF GEO_USTENSILE --><p>Ustensiles cuisine: {GEO_USTENSILE}</p><!-- ENDIF -->
 		<p><!-- IF GEO_CABANE_LITS_NB -->Literie: {GEO_CABANE_LITS_NB} lit<!-- IF GEO_CABANE_LITS_NB > 1-->s<!-- ENDIF --><!-- ENDIF -->
-		<!-- IF GEO_CABANE_LITS_ETAT -->état : {GEO_CABANE_LITS_ETAT}<!-- ENDIF --></p>
+			<!-- IF GEO_CABANE_LITS_ETAT -->état : {GEO_CABANE_LITS_ETAT}<!-- ENDIF --></p>
+		<!-- IF GEO_BOIS_CHAUFFAGE --><p>Bois de chauffage: {GEO_BOIS_CHAUFFAGE}</p><!-- ENDIF -->
+		<!-- IF GEO_RAVITAILLEMENT --><p>Ravitaillement: {GEO_RAVITAILLEMENT}</p><!-- ENDIF -->
+		<!-- IF GEO_FAMILLE --><p>Logement adéquat pour une famille: {GEO_FAMILLE}</p><!-- ENDIF -->
+		<!-- IF GEO_RESEAU_TELEPHONIQUE --><p>Capte le réseau téléphonique: {GEO_RESEAU_TELEPHONIQUE}</p><!-- ENDIF -->
+		<!-- IF GEO_RESEAU_INTERNET --><p>Capte le réseau Internet: {GEO_RESEAU_INTERNET}</p><!-- ENDIF -->
+		<!-- IF GEO_COMMENTAIRES --><p>{GEO_GAZINIERE}</p><!-- GEO_COMMENTAIRES --><!-- ENDIF -->
 	<!-- ENDIF -->
 </div>
 <hr clear="all" style="border-color:transparent">

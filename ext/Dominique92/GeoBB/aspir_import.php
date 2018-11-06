@@ -95,7 +95,7 @@ foreach ($epiphp->features as $p)
 		$db->sql_freeresult($result);
 
 		//  Création d'une fiche
-		if ($geomphp->components->coordinates &&
+		if ($p->geometry->coordinates &&
 			!$data) {
 			echo"<pre style='background-color:white;color:black;font-size:14px;'>CREATION = ".var_export($p->properties->nom1,true).'</pre>';
 
@@ -134,11 +134,12 @@ foreach ($epiphp->features as $p)
 
 		// Update geo_ data
 		if ($data['post_id']) {
-			$sql = "UPDATE phpbb_posts SET geom = $geomsql
-					,geo_surface = {$p->properties->surface}
-					,geo_commune = '{$p->properties->nom_commune}'
-					,geo_irstea_code = '{$p->properties->code}'
-					,geo_irstea_type = '$upzp:$epid'
+			$sql = "UPDATE phpbb_posts SET geom = $geomsql,
+					geo_unite_pastorale = '".str_replace ("'", "\\'", $p->properties->nom1)."',
+					geo_surface = {$p->properties->surface},
+					geo_commune = '{$p->properties->nom_commune}',
+					geo_irstea_code = '{$p->properties->code}',
+					geo_irstea_type = '$upzp:$epid'
 				WHERE post_id = {$data['post_id']}";
 			$result = $db->sql_query($sql);
 		}
