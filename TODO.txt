@@ -8,7 +8,6 @@ Edge : Viseur noir
 BUGS
 ====
 État de la cabane ne s'affiche pas en retour en modif
-Créer fiche depuis OSM KO (ne trouve pas p.type, P.lon, ...)
 Click retour à l'accueil sur titre site phpbb
 ...OLD :
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
@@ -30,7 +29,6 @@ TODO
 Voir les //TODO
 Présence d'autres usagers : plusieurs séléctions
 Voir les champs commune... (ou est situé / rattachement / enquete VS saisie, ...)
-Afficher altitude ?? + autres manquants ?
 Modification en ligne des types des colonnes SQL geo_
 Zone commentaire et réponses / texte des boutons
 Template saisie / affichage pointd'eau
@@ -47,6 +45,7 @@ Interface VTTRACK
 
 BEST TODO
 =========
+Remove geophp (needed before MySQL 5.7)
 CTRL + Click -> Autre page
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Mettre ?date dans les liens des libs LL.

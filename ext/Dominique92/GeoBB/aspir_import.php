@@ -25,7 +25,7 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 
-include_once('../../../assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
+include_once('../../../assets/geoPHP/geoPHP.inc');
 include_once('../../../assets/proj4php/vendor/autoload.php');
 use proj4php\Proj4php;
 use proj4php\Proj;

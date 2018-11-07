@@ -216,11 +216,11 @@ class listener implements EventSubscriberInterface
 				) &&
 				@$row['geomwkt']
 			) {
-				include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
+				include_once('assets/geoPHP/geoPHP.inc');
 				$geophp = \geoPHP::load($row['geomwkt'],'wkt');
 				$row['geojson'] = $geophp->out('json');
 				$this->get_bounds($geophp);
-//TODO				$this->get_automatic_data($row);
+				$this->get_automatic_data($row);
 			}
 
 			foreach ($row AS $k=>$v)
@@ -288,25 +288,38 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Calcul des données automatiques
 	function get_automatic_data(&$row) {
-//TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
-//TODO surface ?
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('get_automatic_data',true).'</pre>';
-/*
-		global $config_locale;
-		preg_match_all('/([0-9\.\-]+)/', $row['geomwkt'], $ll);
+		global $geo_mapquest_key;
 
-		// Calcul de l'altitude avec mapquest
-		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
-			$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.$config_locale['keys-mapquest']
-					   .'&callback=handleHelloWorldResponse&shapeFormat=raw&latLngCollection='.$ll[1][1].','.$ll[1][0];
-			preg_match_all('/"height":([0-9]+)/', @file_get_contents ($mapquest), $retour);//TODO DCMM preg_match
-			if ($r = @$retour[1][0])
-				$row['geo_altitude'] = // Pour affichage
-				$sql_update['geo_altitude'] = // Pour modification de la base
-					$r.'~'; // ~ indique que la valeur & été déterminée par le serveur
+		include_once('assets/geoPHP/geoPHP.inc');
+		$geophp = \geoPHP::load($row['geomwkt'],'wkt');
+		$centre = $geophp->getCentroid()->coords;
+
+		// Calcul de la surface en ha avec geoPHP
+		if (!$row['geo_surface']) {
+			$row['geo_surface'] = // Pour affichage
+			$sql_update['geo_surface'] = // Pour modification de la base
+				round ($geophp->getArea()
+					* 1111 // hm par ° delta latitude
+					* 1111 * sin ($centre[1] * M_PI / 180) // hm par ° delta longitude
+				);
 		}
 
-		// Détermination du massif par refuges.info
+		// Calcul de l'altitude avec mapquest
+		if (!$row['geo_altitude']) {
+			$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile'.
+				'?key='.$geo_mapquest_key.
+				'&callback=handleHelloWorldResponse'.
+				'&shapeFormat=raw'.
+				'&latLngCollection='.$centre[1].','.$centre[0];
+			preg_match_all ('/"height":([0-9]+)/', @file_get_contents ($mapquest), $retour);
+			$row['geo_altitude'] = // Pour affichage
+			$sql_update['geo_altitude'] = // Pour modification de la base
+				@$retour[1][0];
+		}
+
+
+//TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
+/*/TODO // Détermination du massif par refuges.info
 		if (array_key_exists ('geo_massif', $row) && !$row['geo_massif']) {
 			$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.$ll[1][0].','.$ll[1][1].','.$ll[1][0].','.$ll[1][1];
 			$wri_export = json_decode (@file_get_contents ($f_wri_export));
@@ -320,14 +333,19 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				@$ms[array_keys($ms)[0]].'~'; // ~ indique que la valeur & été déterminée par le serveur
 		}
 
-		// Update de la base
-		if (isset ($sql_update))
-			$this->db->sql_query ('UPDATE '.POSTS_TABLE.' SET '.$this->db->sql_build_array('UPDATE',$sql_update)." WHERE post_id = ".$row['post_id']);
-
-		// N'affiche pas le ~
-		$row['geo_altitude'] = str_replace ('~', '', $row['geo_altitude']);
-		$row['geo_massif'] = str_replace ('~', '', $row['geo_massif']);
 */
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql_update,true).'</pre>';
+		// Update de la base
+		if (isset ($sql_update)) {
+			$sql = 'UPDATE '.POSTS_TABLE.' SET '.$this->db->sql_build_array('UPDATE',$sql_update)." WHERE post_id = ".$row['post_id'];
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
+			$this->db->sql_query ($sql);
+		}
+
+//TODO		// N'affiche pas le ~
+//		$row['geo_altitude'] = str_replace ('~', '', $row['geo_altitude']);
+//		$row['geo_surface'] = str_replace ('~', '', $row['geo_surface']);
+//		$row['geo_massif'] = str_replace ('~', '', $row['geo_massif']);
 	}
 
 	// Calcul de la bbox englobante
@@ -385,7 +403,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$this->db->sql_freeresult($result);
 
 			// Traduction en geoJson
-			include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
+			include_once('assets/geoPHP/geoPHP.inc');
 			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
 			$this->get_bounds($geophp);
 			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
@@ -444,7 +462,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' ADD '.implode (' ', $ks));
 
 				if ($ks[1] == 'geometry' && $v) {
-					include_once('assets/geoPHP/geoPHP.inc'); // Librairie de conversion WKT <-> geoJson (needed before MySQL 5.7)
+					include_once('assets/geoPHP/geoPHP.inc');
 					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
 					if ($geophp)
 						$v = 'GeomFromText("'.$geophp->out('wkt').'")';

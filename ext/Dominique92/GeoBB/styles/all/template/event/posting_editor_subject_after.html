@@ -47,7 +47,7 @@
 
 <dl class="posting-point" style="clear: left;">
 	<input id="viseur-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
-	<!-- //TODO pour all : 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" />*</p> -->
+	<!-- //TODO pour all : 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p> -->
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<p>
@@ -73,13 +73,13 @@
 			<textarea name="geo_equipement-text" rows="6" cols="60" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
 
 		<h3>1.2 Caractéristiques</h3>
-		<p>Altitude <input type="number" name="geo_altitude-int-5" style="width:10px" class="inputbox" value="{GEO_ALTITUDE}" /> m *</p>
 		<p>Topographie<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
-		<p>Superficie <input type="number" name="geo_surface-int-10" class="inputbox autowidth" value="{GEO_SURFACE}" /> ha *</p>
+		<input name="geo_altitude-int-10" type="hidden"/>
+		<input name="geo_surface-int-10" type="hidden"/>
 		<p>Végétation <textarea name="geo_vegetation-text" rows="4" cols="45" class="inputbox autowidth">{GEO_VEGETATION}</textarea></p>
-		<p>IGN <input type="text" name="geo_ign-varchar-40" size="25" class="inputbox autowidth" value="{GEO_IGN}" /> *</p>
+		<p>IGN <input type="text" name="geo_ign-varchar-40" size="25" class="inputbox autowidth" value="{GEO_IGN}" /> (*)</p>
 		<p>Opérateur téléphonique recommandé <input type="text" name="geo_operateur-varchar-40" size="25" class="inputbox autowidth" value="{GEO_OPERATEUR}" /></p>
-		<p>Commune sur laquelle est située l'alpage <input type="text" name="geo_commune-varchar-80" size="25" class="inputbox autowidth" value="{GEO_COMMUNE}" /> *</p>
+		<p>Commune sur laquelle est située l'alpage <input type="text" name="geo_commune-varchar-80" size="25" class="inputbox autowidth" value="{GEO_COMMUNE}" /> (*)</p>
 
 		<h3>1.3 Accès</h3>
 		<p>Accès <select name="geo_acces-varchar-10">
@@ -104,7 +104,7 @@
 			<option value="oui" <!-- IF GEO_RESERVE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
 			<option value="non" <!-- IF GEO_RESERVE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 			<option value="ne sait pas" <!-- IF GEO_RESERVE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
-		</select> *</p>
+		</select> (*)</p>
 
 		<h3>1.5 Autres usagers</h3>
 		<p>Présence d'autres usagers <select name="geo_usagers-varchar-20">
@@ -172,7 +172,7 @@ parcs de nuit...">Mesures de protection<textarea name="geo_protection-text" rows
 		<p>Employeurs : nombre <input type="text" name="geo_nombre_employeurs-varchar-80" size="40" class="inputbox autowidth" value="{GEO_NOMBRE_EMPLOYEURS}" />
 		siège social <input title="Commune + département" type="text" name="geo_siege_employeur-varchar-80" size="40" class="inputbox autowidth" value="{GEO_SIEGE_EMPLOYEUR}" /></p>
 		<p>Association pastorale <input type="text" name="geo_association_pastorale-varchar-80" size="40" class="inputbox autowidth" value="{GEO_ASSOCIATION_PASTORALE}" /></p>
-		<p>Nom de l'unité pastorale <input type="text" name="geo_unite_pastorale-varchar-80" size="40" class="inputbox autowidth" value="{GEO_UNITE_PASTORALE}" /> *</p>
+		<p>Nom de l'unité pastorale <input type="text" name="geo_unite_pastorale-varchar-80" size="40" class="inputbox autowidth" value="{GEO_UNITE_PASTORALE}" /></p>
 		<p>Implication des éleveurs pendant l'estive <input type="text" name="geo_implication_eleveurs-varchar-80" size="40" class="inputbox autowidth" value="{GEO_IMPLICATION_ELEVEURS}" /></p>
 		<p>Nom et numéro de téléphone du groupement pastoral <input type="text" name="geo_contact_groupement-varchar-80" size="40" class="inputbox autowidth" value="{GEO_CONTACT_GROUPEMENT}" /></p>
 		<p>Contacts anciens bergers <input type="text" name="geo_anciens_bergers-varchar-80" size="40" class="inputbox autowidth" value="{GEO_ANCIENS_BERGERS}" /></p>
@@ -261,5 +261,5 @@ parcs de nuit...">Mesures de protection<textarea name="geo_protection-text" rows
 		<p>Autres remarques ou commentaires
 			<textarea name="geo_equipement-text" rows="6" cols="60" class="inputbox autowidth">{GEO_COMMENTAIRES}</textarea></p>
 	<!-- ENDIF -->
-	<p>* Laisser le champ vide pour que le serveur le détermine automatiquement.</p>
+	<p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p>
 </dl>
