@@ -19,19 +19,10 @@
 }*/
 
 /* Masquages */
-.nav-main li:nth-child(2),
-.stat-block,
-.birthday-list,
-.footer-row ,
-.colour_palette,
-.format-buttons,
-.smiley-box,
-.message-box,
-.avertissement,
-#attach-panel-tab,
-#options-panel-tab,
-#poll-panel-tab,
-#options-panel {
+.nav-main li:nth-child(2), /* navbar_header FAQ  */
+.stat-block, /* QUI EST EN LIGNE... */
+.footer-row , /* Lignes copyright en bas */
+#Wpoll-panel-tab { /* Sondages */
 	display: none !important;
 }
 

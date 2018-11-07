@@ -7,6 +7,7 @@ Edge : Viseur noir
 
 BUGS
 ====
+État de la cabane ne s'affiche pas en retour en modif
 Créer fiche depuis OSM KO (ne trouve pas p.type, P.lon, ...)
 Click retour à l'accueil sur titre site phpbb
 ...OLD :
@@ -27,6 +28,7 @@ Image interdite dans texte
 TODO
 ====
 Voir les //TODO
+Présence d'autres usagers : plusieurs séléctions
 Voir les champs commune... (ou est situé / rattachement / enquete VS saisie, ...)
 Afficher altitude ?? + autres manquants ?
 Modification en ligne des types des colonnes SQL geo_
@@ -110,6 +112,12 @@ Création / Edition de traces
 Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
 Consulter l'historique des éditions
 
+ACCEPTER UTILISATEUR ASPIR
+==========================
+Notification -> Activation requise
+-> Administrer le membre -> Outils rapides -> Activer son compte
+Formulaire -> Groupes -> Ajouter ce membre = Modérateurs globaux
+
 RESYNC ASPIR
 ============
 Vider cache / cache de l'explorateur
@@ -123,6 +131,7 @@ CONFIG ASPIR
 ============
 config.php -> clés cartes
 Messages -> Ajouter un bbcode -> [first={TYPE}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
+Permissions -> Permissions des forums -> Tous les forums -> Envoyer -> Utilisateurs enregistrés -> Modifier les permissions
 
 MIGRATION
 =========
