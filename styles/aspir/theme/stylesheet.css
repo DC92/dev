@@ -12,11 +12,6 @@
 	background-repeat: no-repeat;
 	height: 75px;
 }
-/*.site_logo::after { 
-	content: "ASPIR";
-	font-size: 40px;
-	color: white;
-}*/
 
 /* Masquages */
 .nav-main li:nth-child(2), /* navbar_header FAQ  */
@@ -29,9 +24,11 @@
 .avertissement,
 #attach-panel-tab {
 */
+.section-viewforum .bar-top,
 .section-viewtopic .bar-top,
 
-.section-posting #postingbox .fields1 dl:first-child,
+.section-posting input[name="save"],
+.section-posting input[name="preview"],
 .section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
 .section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
@@ -59,4 +56,19 @@ input[type="number"] {
 		width: 100%;
 		float: none;
 	}
+}
+
+/* POSTING.PHP */
+.section-posting #postingbox fieldset.fields1 dt {
+	width: auto;
+}
+.section-posting #postingbox fieldset.fields1 dd {
+	margin-left: auto !important;
+}
+.section-posting .panel {
+	margin-bottom: 0px;
+}
+.section-posting #attach-panel-multi::after {
+	content: "Attendre la fin du chargement des fichiers pour envoyer.";
+	color: red;
 }
