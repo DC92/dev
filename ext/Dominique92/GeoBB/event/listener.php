@@ -306,19 +306,37 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 		// Calcul de l'altitude avec mapquest
 		if (!$row['geo_altitude']) {
-			$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile'.
+			$mapquest = @file_get_contents (
+				'http://open.mapquestapi.com/elevation/v1/profile'.
 				'?key='.$geo_mapquest_key.
 				'&callback=handleHelloWorldResponse'.
 				'&shapeFormat=raw'.
-				'&latLngCollection='.$centre[1].','.$centre[0];
-			preg_match_all ('/"height":([0-9]+)/', @file_get_contents ($mapquest), $retour);
-			$row['geo_altitude'] = // Pour affichage
-			$sql_update['geo_altitude'] = // Pour modification de la base
-				@$retour[1][0];
+				'&latLngCollection='.$centre[1].','.$centre[0]
+			);
+			if ($mapquest) {
+				preg_match ('/"height":([0-9]+)/', $mapquest, $match);
+				$row['geo_altitude'] = // Pour affichage
+				$sql_update['geo_altitude'] = // Pour modification de la base
+					@$match[1];
+			}
 		}
 
+		// Calcul de la carte IGN
+		if (!$row['geo_ign']) {
+			$wri_export = @file_get_contents (
+				'http://www.refuges.info/api/polygones?type_polygon=3'.
+				'&bbox='.$centre[0].','.$centre[1].','.$centre[0].','.$centre[1]
+			);
+			preg_match_all ('/:"(IGN[^"]+)/', serialize(json_decode($wri_export)), $match);
+			$row['geo_ign'] = // Pour affichage
+			$sql_update['geo_ign'] = // Pour modification de la base
+				@implode('<br/>', $match[1]);
+		}
 
 //TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
+
+//TODO Présence de parc : automatiser
+
 /*/TODO // Détermination du massif par refuges.info
 		if (array_key_exists ('geo_massif', $row) && !$row['geo_massif']) {
 			$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.$ll[1][0].','.$ll[1][1].','.$ll[1][0].','.$ll[1][1];
@@ -335,17 +353,26 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 */
 /*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql_update,true).'</pre>';
-		// Update de la base
-		if (isset ($sql_update)) {
-			$sql = 'UPDATE '.POSTS_TABLE.' SET '.$this->db->sql_build_array('UPDATE',$sql_update)." WHERE post_id = ".$row['post_id'];
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
-			$this->db->sql_query ($sql);
+
+		// Filter only existing columns
+		$sql_update_clean = [];
+		if ($sql_update) {
+			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
+			$result = $this->db->sql_query($sql);
+			while ($column = $this->db->sql_fetchrow($result))
+				if (array_key_exists ($column['Field'], $sql_update))
+					$sql_update_clean[$column['Field']] = $sql_update[$column['Field']].
+						($column['Type'][0] == 'i' ? '' : '~'); // Add a special char if the field is automatically filled
+			$this->db->sql_freeresult($result);
 		}
 
-//TODO		// N'affiche pas le ~
-//		$row['geo_altitude'] = str_replace ('~', '', $row['geo_altitude']);
-//		$row['geo_surface'] = str_replace ('~', '', $row['geo_surface']);
-//		$row['geo_massif'] = str_replace ('~', '', $row['geo_massif']);
+		// Update de la base
+		if ($sql_update_clean)
+			$this->db->sql_query (
+				'UPDATE '.POSTS_TABLE.
+				' SET '.$this->db->sql_build_array('UPDATE',$sql_update_clean).
+				' WHERE post_id = '.$row['post_id']
+		);
 	}
 
 	// Calcul de la bbox englobante
@@ -455,12 +482,16 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
 				$ks = split ('-', $k);
 
-				// Create the SQL column if it doesn't exists
+				// Create or modify the SQL column
 				if (count ($ks) == 3)
 					$ks[2] = '('.$ks[2].')';
-				if(!in_array ($ks[0], $special_columns))
-					$this->db->sql_query('ALTER TABLE '.POSTS_TABLE.' ADD '.implode (' ', $ks));
+				$this->db->sql_query(
+					'ALTER TABLE '.POSTS_TABLE.
+					(in_array ($ks[0], $special_columns) ? ' CHANGE '.$ks[0].' ' : ' ADD ').
+					implode (' ', $ks)
+				);
 
+				// Retrieves the values of the geometry, includes them in the phpbb_posts table
 				if ($ks[1] == 'geometry' && $v) {
 					include_once('assets/geoPHP/geoPHP.inc');
 					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
