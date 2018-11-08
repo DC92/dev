@@ -35,7 +35,6 @@ use proj4php\Point;
 $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
-$request->enable_super_globals(); //TODO restreindre
 
 // Initialise Proj4
 $proj4 = new Proj4php();
@@ -106,8 +105,8 @@ foreach ($epiphp->features as $p)
 				'post_subject' => $p->properties->nom1,
 				'message' => '',
 				'message_md5' => md5(''),
-				'bbcode_bitfield' => 0, //$message_parser->bbcode_bitfield, //TODO
-				'bbcode_uid' => 0, //$message_parser->bbcode_uid,
+				'bbcode_bitfield' => 0,
+				'bbcode_uid' => 0,
 				'icon_id' => 0,
 				'enable_bbcode' => true,
 				'enable_smilies' => true,

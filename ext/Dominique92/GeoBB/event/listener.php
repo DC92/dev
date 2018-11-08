@@ -189,7 +189,7 @@ class listener implements EventSubscriberInterface
 				Contains (v.geom, p.geom)
 			";
 		//TODO en MySQL 5.7+, utiliser ST_Contains
-		//TODO pour un point, trouver la zone qui le contient
+		//TODO BUG pour un point, trouver la zone qui le contient
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$block = 'contains_'.basename ($row['forum_image'], '.png');

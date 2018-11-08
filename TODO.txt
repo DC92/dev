@@ -4,6 +4,7 @@ Pas de click sur le label d'ine icone sur la carte
 Quand click sur plusieurs features, exécute le click en dessous
 IE : pas de SGV
 Edge : Viseur noir
+CTRL + Click -> Autre page
 
 BUGS
 ====
@@ -29,14 +30,9 @@ TODO
 Voir les //TODO
 Présence d'autres usagers : plusieurs séléctions
 Voir les champs commune... (ou est situé / rattachement / enquete VS saisie, ...)
-Modification en ligne des types des colonnes SQL geo_
-Zone commentaire et réponses / texte des boutons
 Template saisie / affichage pointd'eau
 geophp simplify : https://github.com/phayes/geoPHP/issues/24
 Editeur de zones
-file-total-progress-bar => pupload : masquer "Envoyer"
-	Attendre que le fichier soit chargé avant de valider le post : à sécuriser !
-Changer la phrase de connexion
 Ajouter un lien "mot de passe" et "contact"
 Interface VTTRACK
 	Icônes KO
@@ -45,8 +41,7 @@ Interface VTTRACK
 
 BEST TODO
 =========
-Remove geophp (needed before MySQL 5.7)
-CTRL + Click -> Autre page
+Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Mettre ?date dans les liens des libs LL.
 En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
@@ -54,12 +49,10 @@ OS.GB key for test.chemineur.fr
 Pouvoir trier les posts WRIC
 Meteo sur chem
 Meteo sur ASPIR
-Initialiser avec carte IGN (puisque init = sur la France)
 GPX : Nommage des tracks / du fichier.
 BUG: function gis_after($vars) : pb de ob_flush sur 1&1
 Mettre les media print dans print.css
 CSS bug chem cadre liens sur largeur fenêtre petite
-Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
 Choix type trace GPS
 Editeur Optim geom dès le chargement
 Appli méteo suisse

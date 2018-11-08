@@ -70,5 +70,4 @@ input[type="number"] {
 }
 .section-posting #attach-panel-multi::after {
 	content: "Attendre la fin du chargement des fichiers pour envoyer.";
-	color: red;
 }
