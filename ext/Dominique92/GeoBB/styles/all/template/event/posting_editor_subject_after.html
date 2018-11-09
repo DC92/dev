@@ -261,7 +261,23 @@ parcs de nuit...">Mesures de protection<textarea name="geo_protection-text" rows
 			<option value="non" <!-- IF GEO_RESEAU_INTERNET == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 		</select></p>
 	<!-- ENDIF -->
-	<p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p>
+
+	<!-- IF FORUM_NAME == "Points d'eau" -->
+		<p>Potable <select name="geo_potable-varchar-5">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_POTABLE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_POTABLE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+		</select></p>
+		<p>Débit <select name="geo_debit-varchar-10">
+			<option value=""></option>
+			<option value="bon" <!-- IF GEO_DEBIT == 'bon' -->selected="selected"<!-- ENDIF -->>bon</option> 
+			<option value="faible" <!-- IF GEO_DEBIT == 'faible' -->selected="selected"<!-- ENDIF -->>faible</option> 
+			<option value="temporaire" <!-- IF GEO_DEBIT == 'temporaire' -->selected="selected"<!-- ENDIF -->>temporaire</option> 
+			<option value="tari" <!-- IF GEO_DEBIT == 'tari' -->selected="selected"<!-- ENDIF -->>tari</option> 
+		</select></p>
+	<!-- ENDIF -->
+
+	<!-- p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p -->
 	<p class="remarques">Autres remarques ou commentaires :</p>
 </dl>
 <!-- ENDIF -->

@@ -1,6 +1,6 @@
 OPENLAYERS
 ==========
-Pas de click sur le label d'ine icone sur la carte
+Pas de click sur le label d'une icone sur la carte
 Quand click sur plusieurs features, exécute le click en dessous
 IE : pas de SGV
 Edge : Viseur noir
@@ -8,6 +8,8 @@ CTRL + Click -> Autre page
 
 BUGS
 ====
+Présence d'autres usagers : plusieurs séléctions
+Mauvaise largeur de carte quand le style est prosilver
 Click retour à l'accueil sur titre site phpbb
 ...OLD :
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
@@ -27,13 +29,11 @@ Image interdite dans texte
 TODO
 ====
 Voir les //TODO
-Boutons modifier cabane et point d'eau sur fiche alpage
-Présence d'autres usagers : plusieurs séléctions
+Meteo sur ASPIR
+Mettre ?date dans les liens des libs LL.
 Voir les champs commune... (ou est situé / rattachement / enquete VS saisie, ...)
-Template saisie / affichage pointd'eau
 geophp simplify : https://github.com/phayes/geoPHP/issues/24
 Editeur de zones
-Ajouter un lien "mot de passe" et "contact"
 Interface VTTRACK
 	Icônes KO
 	Priorité pas aux orris !!
@@ -43,12 +43,9 @@ BEST TODO
 =========
 Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
-Mettre ?date dans les liens des libs LL.
 En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
-OS.GB key for test.chemineur.fr
 Pouvoir trier les posts WRIC
 Meteo sur chem
-Meteo sur ASPIR
 GPX : Nommage des tracks / du fichier.
 BUG: function gis_after($vars) : pb de ob_flush sur 1&1
 Mettre les media print dans print.css
@@ -59,10 +56,8 @@ Appli méteo suisse
 Créer les massifs manquants sur WRI
 Import WRI: importer texte fiche ?
 Ajouter l'origine des pages importées chemineur
-Ajouter des données fiches à volonté (serialized)
 GIS.PHP faire du BBOX une diagonale pour Intersects
 Barmenu: Enveloppe message trop basse dans Chrome
-Mauvaise largeur de carte quand le style est prosilver
 Diaporama pleine page ? En particulier sur mobile
 	Echap par une touche sur mobile pas pratique
 Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29

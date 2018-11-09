@@ -29,9 +29,9 @@
 		<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
 	<!-- ENDIF -->
 
-	<!-- IF GEO_MASSIF -->
-		<p><span>Massif</span>: {GEO_MASSIF}</p>
-	<!-- ENDIF -->
+	<!-- IF GEO_MASSIF --><p><span>Massif</span>: {GEO_MASSIF}</p><!-- ENDIF -->
+	<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
+	<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
 		<h2>1. L'alpage</h2>
@@ -39,23 +39,29 @@
 		<!-- IF .contains_point_eau -->
 			<p>Point(s) d'eau :</p>
 			<!-- BEGIN contains_point_eau -->
-				<a title="Voir / modifier la fiche {contains_point_eau.TOPIC_TITLE}" href="viewtopic.php?t={contains_point_eau.TOPIC_ID}">
-				<h4 class="geo_contain">{contains_point_eau.TOPIC_TITLE}</h4></a>
+				<a title="Voir la fiche {contains_point_eau.TOPIC_TITLE}" href="./viewtopic.php?t={contains_point_eau.TOPIC_ID}">
+					<h4 class="geo_contain">{contains_point_eau.TOPIC_TITLE}</h4>
+				</a>&nbsp;
+				<a href="./posting.php?mode=edit&amp;f={contains_point_eau.FORUM_ID}&amp;p={contains_point_eau.POST_ID}"
+					title="Modifier la fiche {contains_point_eau.TOPIC_TITLE}"
+					class="button button-icon-only">
+					<i class="icon fa-pencil fa-fw"></i>
+					<span class="sr-only">Modifier</span>
+				</a>
 				<ul>
 				<!-- BEGIN point -->
 					<li>{contains_point_eau.point.K} : {contains_point_eau.point.V}</li>
 				<!-- END point -->
-				<br/></ul>
+				</ul><br/>
 			<!-- END contains_point_eau -->
 		<!-- ENDIF -->
+		<p><a href="./posting.php?mode=post&type=point_eau">[Ajouter un point d'eau]</a></p>
 		<!-- IF GEO_EQUIPEMENT --><p>Autres équipements disponibles : {GEO_EQUIPEMENT}</p><!-- ENDIF -->
 
 		<h3>1.2 Caractéristiques</h3>
-		<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
 		<!-- IF GEO_TOPOGRAPHIE --><p>Topographie: {GEO_TOPOGRAPHIE}</p><!-- ENDIF -->
 		<!-- IF GEO_SURFACE --><p>Superficie : {GEO_SURFACE} ha</p><!-- ENDIF -->
 		<!-- IF GEO_VEGETATION --><p>Végétation : {GEO_VEGETATION}</p><!-- ENDIF -->
-		<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
 		<!-- IF GEO_OPERATEUR --><p>Opérateur téléphonique recommandé : {GEO_OPERATEUR}</p><!-- ENDIF -->
 		<!-- IF GEO_COMMUNE --><p>Commune sur laquelle est située l'alpage : {GEO_COMMUNE}</p><!-- ENDIF -->
 
@@ -77,19 +83,27 @@
 		<!-- IF GEO_HELIPORTAGE_POIDS -->poids : {GEO_HELIPORTAGE_POIDS} kg<!-- ENDIF --></p>
 
 		<h2>2. Logement</h2>
-		<!-- IF .contains_point_eau -->
+		<!-- IF .contains_cabane -->
 			<p>Cabane(s) :</p>
 			<!-- BEGIN contains_cabane -->
-				<a title="Voir / modifier la fiche {contains_cabane.TOPIC_TITLE}" href="viewtopic.php?t={contains_cabane.TOPIC_ID}">
-				<h4 class="geo_contain">{contains_cabane.TOPIC_TITLE}</h4></a>
+				<a title="Voir la fiche {contains_cabane.TOPIC_TITLE}" href="./viewtopic.php?t={contains_cabane.TOPIC_ID}">
+					<h4 class="geo_contain">{contains_cabane.TOPIC_TITLE}</h4>
+				</a>&nbsp;
+				<a href="./posting.php?mode=edit&amp;f={contains_cabane.FORUM_ID}&amp;p={contains_cabane.POST_ID}"
+					title="Modifier la fiche {contains_cabane.TOPIC_TITLE}"
+					class="button button-icon-only">
+					<i class="icon fa-pencil fa-fw"></i>
+					<span class="sr-only">Modifier</span>
+				</a>
 				<ul>
 				<!-- BEGIN point -->
 					<li>{contains_cabane.point.K} : {contains_cabane.point.V}</li>
 				<!-- END point -->
-				<br/></ul>
+				</ul><br/>
 			<!-- END contains_cabane -->
 		<!-- ENDIF -->
-
+		<p><a href="./posting.php?mode=post&type=cabane">[Ajouter une cabane]</a></p>
+ 
 		<h2>3. Les bêtes</h2>
 		<h3>3.1 Le troupeau</h3>
 		<!-- IF GEO_NB_ELEVEURS --><p>Nombre d'éleveurs: {GEO_NB_ELEVEURS}</p><!-- ENDIF -->
@@ -121,8 +135,6 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
-		<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
-		<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
 		<!-- IF GEO_COMMUNE --><p>Commune sur laquelle est située l'alpage : {GEO_COMMUNE}</p><!-- ENDIF -->
 		<!-- IF GEO_ETAT_CABANE --><p>État de la cabane: {GEO_ETAT_CABANE}</p><!-- ENDIF -->
 		<!-- IF GEO_DOUCHE --><p>Douche chaude: {GEO_DOUCHE}</p><!-- ENDIF -->
@@ -141,12 +153,16 @@
 		<!-- IF GEO_FAMILLE --><p>Logement adéquat pour une famille: {GEO_FAMILLE}</p><!-- ENDIF -->
 		<!-- IF GEO_RESEAU_TELEPHONIQUE --><p>Capte le réseau téléphonique: {GEO_RESEAU_TELEPHONIQUE}</p><!-- ENDIF -->
 		<!-- IF GEO_RESEAU_INTERNET --><p>Capte le réseau Internet: {GEO_RESEAU_INTERNET}</p><!-- ENDIF -->
-		<!-- IF GEO_COMMENTAIRES --><p>{GEO_GAZINIERE}</p><!-- GEO_COMMENTAIRES --><!-- ENDIF -->
+	<!-- ENDIF -->
+
+	<!-- IF FORUM_NAME == "Points d'eau" -->
+		<!-- IF GEO_POTABLE --><p>Eau potable {GEO_POTABLE}</p><!-- ENDIF -->
+		<!-- IF GEO_DEBIT --><p>Débit {GEO_DEBIT}</p><!-- ENDIF -->
 	<!-- ENDIF -->
 </div>
 
 <div class="action-bar">
-	<a href="posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
+	<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
 	<!-- IF .quickmod -->
 	<div class="quickmod dropdown-container dropdown-container-left dropdown-up dropdown-{S_CONTENT_FLOW_END} dropdown-button-control" id="quickmod">
 		<span title="{L_QUICK_MOD}" class="button button-secondary dropdown-trigger dropdown-select">

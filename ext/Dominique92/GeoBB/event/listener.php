@@ -111,9 +111,12 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('f_post', $row['forum_id']) &&
 			$row['forum_type'] == FORUM_POST)
 			$row['forum_name'] .= ' &nbsp; '.
-				'<a href="posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">'.
-					'<img style="position:relative;top:4px" src="adm/images/file_new.gif" />'.
-				'</a>';
+				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Nouveau</a>';
+
+
+//	<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
+
+
 
 		$vars['row'] = $row;
 	}
@@ -142,8 +145,7 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
-				$row ['topic_comments'] = $row['topic_posts_approved'] - 1;
-				$row ['post_time'] = $this->user->format_date ($row['post_time']);
+				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
 				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
@@ -201,10 +203,11 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_block_vars($block, array_change_key_case ($row, CASE_UPPER));
 
 			foreach ($row AS $k=>$v)
-				if ($v && !strncmp ($k, 'geo_', 4))
+				if ($v && !strncmp ($k, 'geo_', 4) &&
+					$k != 'geo_ign')
 					$this->template->assign_block_vars ($block.'.point', array (
 						'K' => ucfirst (str_replace (['geo_', '_'], ['', ' '], $k)),
-						'V' => $v,
+						'V' => str_replace ('~', '', $v),
 					));
 		}
 		$this->db->sql_freeresult($result);
@@ -232,10 +235,16 @@ class listener implements EventSubscriberInterface
 				if (strstr ($k, 'geo')) {
 					// Assign the phpbb_posts.geo* SQL data of each template post area
 //TODO DELETE ???					$post_row[strtoupper ($k)] = $v; //TODO Et ça n'est pas écrasé par le précédent ????
-
+/*
+		// Assign the phpbb-posts SQL data to the template
+		foreach ($post_data AS $k=>$v)
+			if (!strncmp ($k, 'geo', 3)
+				&& is_string ($v))
+				$page_data[strtoupper ($k)] = strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
+*/
 					// Assign the phpbb_posts.geo* SQL data of the first post to the template
 					if ($vars['topic_data']['topic_first_post_id'] == $row['post_id'])
-						$this->template->assign_var (strtoupper ($k), $v);
+						$this->template->assign_var (strtoupper ($k), str_replace ('~', '', $v));
 				}
 
 			$vars['post_row'] = $post_row;
@@ -459,7 +468,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)
 				&& is_string ($v))
-				$page_data[strtoupper ($k)] = strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
+				$page_data[strtoupper ($k)] =
+					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 
 		// HORRIBLE phpbb hack to accept geom values / TODO : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
