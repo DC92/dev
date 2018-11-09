@@ -29,10 +29,6 @@ Image interdite dans texte
 TODO
 ====
 Voir les //TODO
-Meteo sur ASPIR
-Mettre ?date dans les liens des libs LL.
-Voir les champs commune... (ou est situé / rattachement / enquete VS saisie, ...)
-geophp simplify : https://github.com/phayes/geoPHP/issues/24
 Editeur de zones
 Interface VTTRACK
 	Icônes KO
@@ -41,6 +37,9 @@ Interface VTTRACK
 
 BEST TODO
 =========
+Meteo sur ASPIR
+Mettre ?date dans les liens des libs LL.
+geophp simplify : https://github.com/phayes/geoPHP/issues/24
 Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.

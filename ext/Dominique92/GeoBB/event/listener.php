@@ -112,12 +112,6 @@ class listener implements EventSubscriberInterface
 			$row['forum_type'] == FORUM_POST)
 			$row['forum_name'] .= ' &nbsp; '.
 				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Nouveau</a>';
-
-
-//	<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
-
-
-
 		$vars['row'] = $row;
 	}
 
@@ -329,8 +323,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			);
 			if ($mapquest) {
 				preg_match ('/"height":([0-9]+)/', $mapquest, $match);
-				$row['geo_altitude'] = // Pour affichage
-				$sql_update['geo_altitude'] = // Pour modification de la base
+				$row['geo_altitude'] =
+				$sql_update['geo_altitude'] =
 					@$match[1];
 			}
 		}
@@ -353,7 +347,17 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				@implode('<br/>', $igns);
 		}
 
-//TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
+		// Calcul de la commune
+		if (!$row['geo_commune']) {
+			$context = stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")));
+			$url ='https://nominatim.openstreetmap.org/reverse?format=json&lon='.$centre[0].'&lat='.$centre[1] ;
+			$nominatim = json_decode (@file_get_contents ($url, false, $context
+			));
+			if ($nominatim)
+				$row['geo_commune'] =
+				$sql_update['geo_commune'] =
+					$nominatim->address->postcode.' '.$nominatim->address->town;
+		}
 
 //TODO Présence de parc : automatiser
 
@@ -366,8 +370,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$ms [$f->properties->type->id] = $f->properties->nom;
 			if (isset ($ms))
 				ksort ($ms);
-			$row['geo_massif'] = // Pour affichage
-			$sql_update['geo_massif'] = // Pour modification de la base
+			$row['geo_massif'] =
+			$sql_update['geo_massif'] =
 				@$ms[array_keys($ms)[0]].'~'; // ~ indique que la valeur & été déterminée par le serveur
 		}
 

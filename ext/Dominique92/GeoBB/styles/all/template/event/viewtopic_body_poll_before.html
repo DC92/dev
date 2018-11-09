@@ -29,8 +29,9 @@
 		<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
 	<!-- ENDIF -->
 
-	<!-- IF GEO_MASSIF --><p><span>Massif</span>: {GEO_MASSIF}</p><!-- ENDIF -->
 	<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
+	<!-- IF GEO_COMMUNE --><p>Commune : {GEO_COMMUNE}</p><!-- ENDIF -->
+	<!-- IF GEO_MASSIF --><p><span>Massif</span>: {GEO_MASSIF}</p><!-- ENDIF -->
 	<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
@@ -63,7 +64,6 @@
 		<!-- IF GEO_SURFACE --><p>Superficie : {GEO_SURFACE} ha</p><!-- ENDIF -->
 		<!-- IF GEO_VEGETATION --><p>Végétation : {GEO_VEGETATION}</p><!-- ENDIF -->
 		<!-- IF GEO_OPERATEUR --><p>Opérateur téléphonique recommandé : {GEO_OPERATEUR}</p><!-- ENDIF -->
-		<!-- IF GEO_COMMUNE --><p>Commune sur laquelle est située l'alpage : {GEO_COMMUNE}</p><!-- ENDIF -->
 
 		<h3>1.3 Accès</h3>
 		<!-- IF GEO_ACCES --><p>Accès : {GEO_ACCES}</p><!-- ENDIF -->
@@ -135,7 +135,6 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
-		<!-- IF GEO_COMMUNE --><p>Commune sur laquelle est située l'alpage : {GEO_COMMUNE}</p><!-- ENDIF -->
 		<!-- IF GEO_ETAT_CABANE --><p>État de la cabane: {GEO_ETAT_CABANE}</p><!-- ENDIF -->
 		<!-- IF GEO_DOUCHE --><p>Douche chaude: {GEO_DOUCHE}</p><!-- ENDIF -->
 		<!-- IF GEO_WC --><p>WC: {GEO_WC}</p><!-- ENDIF -->
