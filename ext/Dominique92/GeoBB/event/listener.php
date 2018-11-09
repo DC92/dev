@@ -42,6 +42,7 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 			'core.user_setup' => 'user_setup',
+			'core.page_footer' => 'dump_template',
 
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
@@ -59,6 +60,10 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 		];
+	}
+
+	function dump_template() { // VISUALISATION VARIABLES TEMPLATE
+//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean();
 	}
 
 	function user_setup($vars) {
@@ -174,7 +179,7 @@ class listener implements EventSubscriberInterface
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
 		$post_id = $vars['row']['post_id'];
-
+		$this->template->assign_var ('TOPIC_FIRST_POST_ID', $vars['topic_data']['topic_first_post_id']);
 		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
 		// Search points included in a surface
@@ -225,12 +230,12 @@ class listener implements EventSubscriberInterface
 
 			foreach ($row AS $k=>$v)
 				if (strstr ($k, 'geo')) {
-					// Assign the phpbb_posts.geo* SQL data of to each template post area
-					$post_row[strtoupper ($k)] = $v;
+					// Assign the phpbb_posts.geo* SQL data of each template post area
+//TODO DELETE ???					$post_row[strtoupper ($k)] = $v; //TODO Et ça n'est pas écrasé par le précédent ????
 
 					// Assign the phpbb_posts.geo* SQL data of the first post to the template
 					if ($vars['topic_data']['topic_first_post_id'] == $row['post_id'])
-						$this->template->assign_var (strtoupper ($k), $v); //TODO Et ça n'écrase pas le précédent ????
+						$this->template->assign_var (strtoupper ($k), $v);
 				}
 
 			$vars['post_row'] = $post_row;
@@ -327,10 +332,16 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				'http://www.refuges.info/api/polygones?type_polygon=3'.
 				'&bbox='.$centre[0].','.$centre[1].','.$centre[0].','.$centre[1]
 			);
+			$igns = [];
 			preg_match_all ('/:"(IGN[^"]+)/', serialize(json_decode($wri_export)), $match);
+			if ($match[1])
+				foreach ($match[1] AS $m) {
+					$ms = explode (' ', $m);
+					$igns [] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$m</a>";
+				}
 			$row['geo_ign'] = // Pour affichage
 			$sql_update['geo_ign'] = // Pour modification de la base
-				@implode('<br/>', $match[1]);
+				@implode('<br/>', $igns);
 		}
 
 //TODO commune : https://nominatim.openstreetmap.org/reverse?format=json&lat=48.7&lon=2.5
@@ -352,7 +363,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 
 */
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql_update,true).'</pre>';
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($sql_update,true).'</pre>';
 
 		// Filter only existing columns
 		$sql_update_clean = [];
@@ -417,7 +428,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
-		$this->geobb_activate_map($post_data['forum_desc']);
+		$page_data = $vars['page_data'];
+		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// Récupère la traduction des données spaciales SQL
 		if (isset ($post_data['geom'])) {
@@ -441,18 +453,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
 		// TODO : traiter au niveau du formulaire (avertissement de modif ?)
 		if (!$post_data['post_subject'])
-			$this->template->assign_var ('DRAFT_SUBJECT', 'NEW');
+			$page_data['DRAFT_SUBJECT'] = 'NEW';
 
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)
 				&& is_string ($v))
-					$this->template->assign_var (
-						strtoupper ($k),
-						strstr($v, '~') == '~' ? null : $v // Clears fields ending with ~ for automatic recalculation
-					);
-
-		// No $vars return as we have assigned data to the template
+				$page_data[strtoupper ($k)] = strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 
 		// HORRIBLE phpbb hack to accept geom values / TODO : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
@@ -461,6 +468,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$file_content = file_get_contents ($file_name);
 		if (strpos($file_content, '{'.$file_tag))
 			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
+
+		$vars['page_data'] = $page_data;
 	}
 
 	// Called when validating the data to be saved

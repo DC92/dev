@@ -121,6 +121,9 @@
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
+		<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
+		<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
+		<!-- IF GEO_COMMUNE --><p>Commune sur laquelle est située l'alpage : {GEO_COMMUNE}</p><!-- ENDIF -->
 		<!-- IF GEO_ETAT_CABANE --><p>État de la cabane: {GEO_ETAT_CABANE}</p><!-- ENDIF -->
 		<!-- IF GEO_DOUCHE --><p>Douche chaude: {GEO_DOUCHE}</p><!-- ENDIF -->
 		<!-- IF GEO_WC --><p>WC: {GEO_WC}</p><!-- ENDIF -->
@@ -143,7 +146,7 @@
 </div>
 
 <div class="action-bar">
-	<a href="{postrow.U_EDIT}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
+	<a href="posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
 	<!-- IF .quickmod -->
 	<div class="quickmod dropdown-container dropdown-container-left dropdown-up dropdown-{S_CONTENT_FLOW_END} dropdown-button-control" id="quickmod">
 		<span title="{L_QUICK_MOD}" class="button button-secondary dropdown-trigger dropdown-select">

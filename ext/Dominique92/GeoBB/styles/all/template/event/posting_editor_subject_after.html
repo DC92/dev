@@ -17,6 +17,7 @@
 <!-- INCLUDECSS map.css -->
 <!-- INCLUDEJS map.js -->
 
+<!-- IF GEO_MAP_TYPE  -->
 <div class="map" id="map"></div>
 
 <script>
@@ -184,11 +185,13 @@ parcs de nuit...">Mesures de protection<textarea name="geo_protection-text" rows
 	<!-- ENDIF -->
 
 	<!-- IF FORUM_NAME == 'Cabanes' -->
+		<input name="geo_altitude-int-10" type="hidden"/>
+		<input name="geo_ign-text" type="hidden"/>		
 		<p>État de la cabane <select name="geo_etat_cabane-varchar-10">
 			<option value=""></option>
-			<option value="bon" <!-- IF GEO_ETAT_CABANE == 'oui' -->selected="selected"<!-- ENDIF -->>bon</option> 
-			<option value="moyen" <!-- IF GEO_ETAT_CABANE == 'non' -->selected="selected"<!-- ENDIF -->>moyen</option>
-			<option value="mauvais" <!-- IF GEO_ETAT_CABANE == 'non' -->selected="selected"<!-- ENDIF -->>mauvais</option>
+			<option value="bon" <!-- IF GEO_ETAT_CABANE == 'bon' -->selected="selected"<!-- ENDIF -->>bon</option> 
+			<option value="moyen" <!-- IF GEO_ETAT_CABANE == 'moyen' -->selected="selected"<!-- ENDIF -->>moyen</option>
+			<option value="mauvais" <!-- IF GEO_ETAT_CABANE == 'mauvais' -->selected="selected"<!-- ENDIF -->>mauvais</option>
 		</select></p>
 		<p>Douche chaude <select name="geo_douche-varchar-5">
 			<option value=""></option>
@@ -261,3 +264,4 @@ parcs de nuit...">Mesures de protection<textarea name="geo_protection-text" rows
 	<p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p>
 	<p class="remarques">Autres remarques ou commentaires :</p>
 </dl>
+<!-- ENDIF -->

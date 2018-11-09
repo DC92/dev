@@ -8,7 +8,6 @@ CTRL + Click -> Autre page
 
 BUGS
 ====
-État de la cabane ne s'affiche pas en retour en modif
 Click retour à l'accueil sur titre site phpbb
 ...OLD :
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
@@ -28,6 +27,7 @@ Image interdite dans texte
 TODO
 ====
 Voir les //TODO
+Boutons modifier cabane et point d'eau sur fiche alpage
 Présence d'autres usagers : plusieurs séléctions
 Voir les champs commune... (ou est situé / rattachement / enquete VS saisie, ...)
 Template saisie / affichage pointd'eau
