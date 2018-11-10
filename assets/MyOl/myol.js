@@ -846,11 +846,13 @@ function controlButton(options) {
 		render: options.render
 	});
 
+/* //TODO DELETE ???
 	control.action = function () {
 		options.action({
 			target: buttonElement
 		});
 	}
+*/
 
 	return control;
 }
@@ -1256,7 +1258,8 @@ function controlPrint() {
 	return controlButton({
 		className: 'print-button',
 		title: 'Imprimer la carte',
-		action: function() {
+		action: function(e) {
+//e.preventDefault();//TODO ?????????
 			window.print();
 		}
 	});
@@ -1315,8 +1318,9 @@ function controlLineEditor(id, snapLayers, type) {
 				"Alt+click sur un sommet pour le supprimer\n" +
 				"Alt+click sur un segment pour le supprimer et couper la ligne\n" +
 				"Ctrl+Alt+click sur une ligne pour la supprimer",
-			action: function() {
+			action: function(e) {
 				setMode(editMode ^= 1); // Alternately switch modes
+//e.preventDefault();
 			}
 		}),
 		map;

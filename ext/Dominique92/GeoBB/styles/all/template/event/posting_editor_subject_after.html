@@ -24,11 +24,10 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
+		var overlay = geoLayer(0, true);
 		map = new ol.Map({
 			target: 'map',
-			layers: [
-				geoLayer(0, true)
-			],
+			layers: [overlay],
 			controls: geobbControls()
 		});
 		map.addControl(controlLayersSwitcher(
@@ -44,7 +43,7 @@
 			map.addLayer(editable);
 		<!-- ENDIF -->
 		<!-- IF FORUM_NAME == 'Alpages' -->
-			map.addControl(controlLineEditor('editable-json', null, 'polygon'));
+			map.addControl(controlLineEditor('editable-json', [overlay], 'polygon'));
 		<!-- ENDIF -->
 	});
 </script>
@@ -76,7 +75,6 @@
 	<!-- IF FORUM_NAME == 'Alpages' -->
 		<h2>1. L'alpage</h2>
 		<h3>1.1 Équipements</h3>
-		<p><b>EDITION DU PERIMETRE DESACTIVÉE</b></p>
 		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Autres équipements disponibles
 			<textarea name="geo_equipement-text" rows="6" cols="60" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
 
