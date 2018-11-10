@@ -1267,11 +1267,11 @@ function controlPrint() {
  * Requires controlButton
  * Requires activated controlLengthLine
  */
-function controlLineEditor(id, snapLayers) {
-	var textareaElement = document.getElementById(id), // <textarea> element
+function controlLineEditor(id, snapLayers, type) {
+	var inputEl = document.getElementById(id), // <textarea> element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
-			JSON.parse(textareaElement.textContent), {
+			JSON.parse(inputEl.value), {
 				featureProjection: 'EPSG:3857' // Read/write data as ESPG:4326 by default
 			}
 		),
@@ -1296,7 +1296,7 @@ function controlLineEditor(id, snapLayers) {
 			}),
 			draw: new ol.interaction.Draw({
 				source: source,
-				type: 'LineString'
+				type: type || 'LineString'
 			}),
 			hover: new ol.interaction.Select({
 				layers: [layer],
@@ -1368,7 +1368,7 @@ function controlLineEditor(id, snapLayers) {
 	});
 	source.on(['change'], function() {
 		// Save lines in <EL> as geoJSON at every change
-		textareaElement.textContent = format.writeFeatures(source.getFeatures(), {
+		inputEl.value = format.writeFeatures(source.getFeatures(), {
 			featureProjection: 'EPSG:3857'
 		});
 		map.dispatchEvent('changed'); //HACK Reset hover if any
