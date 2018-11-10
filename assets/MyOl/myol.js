@@ -8,9 +8,9 @@
  * No classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only a pack of JS functions & CSS
  * I know, I know, this is not up to date way of programming but thtat's my choice & you are free to take it, modifiy & adapt as you wish
  */
-//END test with libs non debug / on mobile
-//END http://jsbeautifier.org/ & http://jshint.com
-//BEST Site off line, application
+//TODO END test with libs non debug / on mobile
+//TODO END http://jsbeautifier.org/ & http://jshint.com
+//TODO BEST Site off line, application
 
 /**
  * HACK send 'onAdd' event to layers when added to a map
@@ -270,7 +270,7 @@ function controlPermanentCheckbox(name, callback) {
 		document.cookie.match('map-' + name + '=([^;]*)'); // Then the cookie
 
 	for (var e = 0; e < checkElements.length; e++) {
-		checkElements[e].addEventListener('click', permanentCheckboxClick, false); // Attach the action
+		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
 
 		if (cookie) // Set the checks accordingly with the cookie
 			checkElements[e].checked = cookie[1].split(',').indexOf(checkElements[e].value) !== -1;
@@ -827,7 +827,7 @@ function controlButton(options) {
 	};
 	var buttonElement = document.createElement('button');
 	buttonElement.innerHTML = options.label || '';
-	buttonElement.addEventListener('click', options.action, false);
+	buttonElement.addEventListener('click', options.action);
 
 	var divElement = document.createElement('div');
 	if (options.rightPosition) {
@@ -847,8 +847,9 @@ function controlButton(options) {
 	});
 
 /* //TODO DELETE ???
-	control.action = function () {
+	control.action = function (event) {
 		options.action({
+			event.preventDefault();
 			target: buttonElement
 		});
 	}
@@ -919,7 +920,7 @@ function controlLayersSwitcher(baseLayers) {
 				if (event.clientX < divRect.left || event.clientX > divRect.right ||
 					event.clientY < divRect.top || event.clientY > divRect.bottom)
 					displayLayerSelector();
-			}, false);
+			});
 		}
 	}
 
@@ -1045,14 +1046,15 @@ function controlGPS() {
 
 	var active = false,
 		action = function(event) {
-				active ^= 1; // Toggle on / off
-				event.target.style.color = active ? 'black' : 'white'; // Color button
-				geolocation.setTracking(active); // Turn on / off
-				if (active)
-					bouton.getMap().addLayer(layer);
-				else
-					bouton.getMap().removeLayer(layer);
-			},
+			event.preventDefault();
+			active ^= 1; // Toggle on / off
+			event.target.style.color = active ? 'black' : 'white'; // Color button
+			geolocation.setTracking(active); // Turn on / off
+			if (active)
+				bouton.getMap().addLayer(layer);
+			else
+				bouton.getMap().removeLayer(layer);
+		},
 		bouton = controlButton({
 			className: 'gps-button',
 			title: 'Centrer sur la position GPS',
@@ -1120,7 +1122,8 @@ function controlLoadGPX() {
 		button = controlButton({
 			label: '&uArr;',
 			title: 'Visualiser un fichier GPX sur la carte',
-			action: function() {
+			action: function(event) {
+				event.preventDefault();
 				inputElement.click();
 			}
 		}),
@@ -1175,7 +1178,8 @@ function controlDownloadGPX() {
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX',
 			render: render,
-			action: function() {
+			action: function(event) {
+				event.preventDefault();
 				if (map.sourceEditor) // If there is an active editor
 					download(map.sourceEditor.getFeatures());
 				else if (selectedFeatures.length) // If there are selected features
@@ -1248,7 +1252,7 @@ window.addEventListener('load', function() {
 	var buttonElement = document.getElementById('gcd-button-control');
 	if (buttonElement)
 		buttonElement.title = 'Recherche de lieu par son nom';
-}, true);
+});
 
 /**
  * Print control
@@ -1258,8 +1262,8 @@ function controlPrint() {
 	return controlButton({
 		className: 'print-button',
 		title: 'Imprimer la carte',
-		action: function(e) {
-//e.preventDefault();//TODO ?????????
+		action: function(event) {
+			event.preventDefault();
 			window.print();
 		}
 	});
@@ -1318,9 +1322,9 @@ function controlLineEditor(id, snapLayers, type) {
 				"Alt+click sur un sommet pour le supprimer\n" +
 				"Alt+click sur un segment pour le supprimer et couper la ligne\n" +
 				"Ctrl+Alt+click sur une ligne pour la supprimer",
-			action: function(e) {
+			action: function(event) {
+				event.preventDefault();
 				setMode(editMode ^= 1); // Alternately switch modes
-//e.preventDefault();
 			}
 		}),
 		map;
