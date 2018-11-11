@@ -1204,7 +1204,7 @@ function controlDownloadGPX() {
 					return ol.events.condition.shiftKeyOnly(event) && ol.events.condition.click(event);
 				},
 				filter: function(f) {
-					return f.getGeometry().getType().indexOf('String') !== -1;
+					return f.getGeometry().getType().indexOf('Line') !== -1;
 				},
 				hitTolerance: 6
 			});
@@ -1274,8 +1274,8 @@ function controlPrint() {
  * Requires controlButton
  * Requires activated controlLengthLine
  */
-function controlLineEditor(id, snapLayers, type) {
-	var inputEl = document.getElementById(id), // <textarea> element
+function controlEditor(inputId, snapLayers, type) {
+	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
 			JSON.parse(inputEl.value), {
@@ -1383,17 +1383,17 @@ function controlLineEditor(id, snapLayers, type) {
 	});
 
 	// Removes a line, a segment, and breaks a line in 2
-	interactions.modify.on('modifyend', function(e) {
+	interactions.modify.on('modifyend', function(event) {
 		// We retrieve the list of targeted features
-		var event = e.mapBrowserEvent,
+		var event = event.mapBrowserEvent,
 			features = map.getFeaturesAtPixel(event.pixel, {
 				hitTolerance: 6
 			}),
 			pointer = null,
-			line = null;
+			line = null; // Only for LineString & MultiLineString
 
 		for (var f in features)
-			if (features[f].getGeometry().getType().indexOf('String') !== -1)
+			if (features[f].getGeometry().getType().indexOf('Line') !== -1)
 				line = features[f]; // The targetted line
 			else
 				pointer = features[f]; // The pointer
@@ -1428,13 +1428,13 @@ function controlLineEditor(id, snapLayers, type) {
 	});
 
 	// Join lines with identical ends
-	function stickLines() {
+	function stickLines() { // Only for LineString & MultiLineString
 		var lines = [],
 			fs = source.getFeatures();
 		for (var f in fs)
-			if (fs[f].getGeometry().getType().indexOf('String') !== -1) { // If it contains strings
+			if (fs[f].getGeometry().getType().indexOf('Line') !== -1) { // If it contains strings
 				var cs = fs[f].getGeometry().getCoordinates();
-				if (fs[f].getGeometry().getType().indexOf('String') !== -1)
+				if (fs[f].getGeometry().getType().indexOf('Line') !== -1)
 					cs = [cs];
 				for (var c in cs) {
 					var coordinates = cs[c];
