@@ -1271,9 +1271,9 @@ function controlPrint() {
 }
 
 /**
- * Line Editor
+ * Line & Polygons Editor
  * Requires controlButton
- * Requires activated controlLengthLine
+ * Requires activated controlLengthLine //TODO pourquoi ???
  */
 function controlEditor(inputId, snapLayers, type) {
 	var inputEl = document.getElementById(inputId), // Read data in an html element
@@ -1373,9 +1373,10 @@ function controlEditor(inputId, snapLayers, type) {
 		setMode(true); // We close the creation mode
 	});
 	source.on(['addfeature'], function() {
-		//TODO		editorActions();
+		editorActions();
 	});
 	source.on(['change'], function() {
+//TODO ???		editorActions();
 		// Save lines in <EL> as geoJSON at every change
 		inputEl.value = format.writeFeatures(source.getFeatures(), {
 			featureProjection: 'EPSG:3857'
@@ -1398,115 +1399,110 @@ function controlEditor(inputId, snapLayers, type) {
 	});
 
 	// Makes the required changes / reorganize edited geometries
+	var semaphore = 0;
+
 	function editorActions(pointerPosition) {
-		// Get flattened list of multipoints coords
-		var features = source.getFeatures(),
-			lines = [], polys = [];
-		for (var f in features) {
-			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
-			source.removeFeature(features[f]);
-		}
-		// Sort lines from closed polygons
-		for (var c in lines){
-			if(compareCoords(lines[c])){
-				polys.push([lines[c]]);
-				lines[c]=null;
-		}}
-		
-		//TODO delete feature if "ctrl"
-		
-		// Makes holes if a polygons is include in a biggest one
-		for (var f in polys)
-				if (polys[f]) {
-			var fs = new ol.geom.Polygon(polys[f]);
-			for (var p in polys)
-				if (p !=f &&
-			polys[p]) {
-					var intersects = true;
-					for (var c in polys[p][0])
-						if (!fs.intersectsCoordinate(polys[p][0][c]))
-							intersects = false;
-					if (intersects) {
-						polys[f].push(polys[p][0]);
-						polys[p] = null;
-					}
+		if (!semaphore++) { // Don't reenter when adding features from the function
+
+			// Get flattened list of multipoints coords
+			var features = source.getFeatures(),
+				lines = [],
+				polys = [];
+			for (var f in features)
+				flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+			source.clear(); // And clear the edited layer
+
+			for (var a in lines) {
+				// Exclude 1 coord features (points)
+				if (lines[a] && lines[a].length < 2)
+					lines[a] = null;
+
+				// Treat closed lines as polygons
+				if (compareCoords(lines[a])) {
+					polys.push([lines[a]]);
+					lines[a] = null;
 				}
-		}		
-		
-		// Recreate modified features
-		for (var l in lines)
-			if(lines[l])
-			source.addFeature(new ol.Feature({
-					geometry: new ol.geom.LineString(lines[l])
-				}));
-		for (var p in polys)
-			if(polys[p])
-			source.addFeature(new ol.Feature({
-					geometry: new ol.geom.Polygon(polys[p])
-				}));
+
+				// Merge lines having a common end
+				for (var b in lines)
+					if (a < b) {
+						var m = [a, b];
+						for (var i = 4; i; i--) // 4 times
+							if (lines[m[0]] && lines[m[1]]) {
+								// Shake lines end to explore all possibilities
+								m.reverse();
+								lines[m[0]].reverse();
+								if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+
+									// Merge 2 lines matching ends
+									lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
+									lines[m[1]] = 0;
+
+									// Re-check if the new line is closed
+									if (compareCoords(lines[m[0]])) {
+										polys.push([lines[m[0]]]);
+										lines[m[0]] = null;
+									}
+								}
+							}
+					}
+			}
+
+			//TODO delete feature if "ctrl"
+
+			// Makes holes if a polygon is included in a biggest one
+			for (var f in polys)
+				if (polys[f]) {
+					var fs = new ol.geom.Polygon(polys[f]);
+					for (var p in polys)
+						if (p != f &&
+							polys[p]) {
+							var intersects = true;
+							for (var c in polys[p][0])
+								if (!fs.intersectsCoordinate(polys[p][0][c]))
+									intersects = false;
+							if (intersects) {
+								polys[f].push(polys[p][0]);
+								polys[p] = null;
+							}
+						}
+				}
+
+			// Recreate modified features
+			for (var l in lines)
+				if (lines[l])
+					source.addFeature(new ol.Feature({
+						geometry: new ol.geom.LineString(lines[l])
+					}));
+			for (var p in polys)
+				if (polys[p])
+					source.addFeature(new ol.Feature({
+						geometry: new ol.geom.Polygon(polys[p])
+					}));
+		}
+		semaphore--;
 	}
 
-	//TODO var xx = fs[f].getGeometry().intersectsCoordinate([655129.9999999978,5641362.999999944]);
 	function flatCoord(coords, cs, p) {
 		if (typeof cs[0][0] == 'object')
 			for (var c in cs)
 				flatCoord(coords, cs[c], p);
 		else {
-			coords.push([]);// Increment coords array
+			coords.push([]); // Increment coords array
 			for (var c in cs)
-				if (p && compareCoords(cs[c],p))// If this is the pointed one, forget it &
-					coords.push([]);// Increment coords array
+				if (p && compareCoords(cs[c], p)) // If this is the pointed one, forget it &
+					coords.push([]); // Increment coords array
 				else
-					coords[coords.length - 1].push(cs[c]);// Stack on the last coords array
+					coords[coords.length - 1].push(cs[c]); // Stack on the last coords array
 		}
 	}
 
-	function compareCoords(a,b) {
-			return b
-?			a[0] == b[0] && a[1] == b[1] // 2 coords
-			: compareCoords(a[0],a[a.length-1]); // Compare start with end
-	}
-
-	// Join lines with identical ends
-	function stickLines() {
-		var lines = [],
-			fs = source.getFeatures();
-		for (var f in fs)
-			if (fs[f].getGeometry().getType().indexOf('Line') !== -1) { // If it contains strings
-				var cs = fs[f].getGeometry().getCoordinates();
-//TODO DELETE ?				if (fs[f].getGeometry().getType().indexOf('Line') !== -1) //TODO don't do it twice ???
-//TODO DELETE					cs = [cs];
-				for (var c in cs) {
-					var coordinates = cs[c];
-					if (coordinates.length > 1) // If the line owns at least 2 points
-						for (var i = 0; i < 2; i++) { // Twice (in both directions)
-							lines.push({
-								feature: fs[f],
-								first: coordinates[0], // The first point
-								suite: coordinates.slice(1) // The other points
-							});
-							coordinates = coordinates.reverse(); // And we redo the other way
-						}
-				}
-			}
-
-		for (var l1 in lines)
-			for (var l2 in lines) {
-				if (lines[l1].feature.ol_uid < lines[l2].feature.ol_uid && // Not the same line & not twice
-					lines[l1].first[0] == lines[l2].first[0] && lines[l1].first[1] == lines[l2].first[1]) { // The ends matches
-					// Remove the 2 lines
-					source.removeFeature(lines[l1].feature);
-					source.removeFeature(lines[l2].feature);
-
-					// And add the merged one by gluing the 2 ends
-					source.addFeature(new ol.Feature({
-						geometry: new ol.geom.LineString(lines[l1].suite.reverse().concat([lines[l1].first]).concat(lines[l2].suite))
-					}));
-
-					return stickLines(); // Restart at the beginning
-				}
-			}
-
+	function compareCoords(a, b) {
+		if (!a)
+			return false;
+		if (!b)
+			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
+		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
 
 	return bouton;
