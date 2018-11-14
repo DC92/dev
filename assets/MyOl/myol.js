@@ -263,6 +263,7 @@ function layerBing(layer, key) {
 /**
  * Mem in cookies the checkbox content with name="name"
  */
+//TODO BEST when unchecked, remove cookie
 function controlPermanentCheckbox(name, callback) {
 	var checkElements = document.getElementsByName(name),
 		cookie =
@@ -746,7 +747,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			values = {
 				lon: Math.round(ll4326[0] * 100000) / 100000,
 				lat: Math.round(ll4326[1] * 100000) / 100000,
-				json: JSON.stringify(format.writeGeometryObject(point, {
+				json: JSON.stringify(format.writeGeometryObject(point, { //TODO writeGeometryObject {decimals: 5}
 					featureProjection: 'EPSG:3857'
 				}))
 			};
@@ -1330,7 +1331,7 @@ function controlEditor(inputId, snapLayers, type) {
 		map;
 
 	function render(event) {
-		if (!map) {
+		if (!map) { // Only once
 			map = event.map;
 			map.sourceEditor = source; //HACK to make other control acting differently when there is an editor
 			map.addLayer(layer);
@@ -1369,10 +1370,10 @@ function controlEditor(inputId, snapLayers, type) {
 	}
 
 	interactions.draw.on(['drawend'], function() {
-		setMode(true); // We close the line creation mode
+		setMode(true); // We close the creation mode
 	});
 	source.on(['addfeature'], function() {
-		stickLines();
+		//TODO		editorActions();
 	});
 	source.on(['change'], function() {
 		// Save lines in <EL> as geoJSON at every change
@@ -1382,60 +1383,99 @@ function controlEditor(inputId, snapLayers, type) {
 		map.dispatchEvent('changed'); //HACK Reset hover if any
 	});
 
-	// Removes a line, a segment, and breaks a line in 2
 	interactions.modify.on('modifyend', function(event) {
-		// We retrieve the list of targeted features
-		var event = event.mapBrowserEvent,
-			features = map.getFeaturesAtPixel(event.pixel, {
-				hitTolerance: 6
-			}),
-			pointer = null,
-			line = null; // Only for LineString & MultiLineString
+		var features = map.getFeaturesAtPixel(event.mapBrowserEvent.pixel, {
+			hitTolerance: 6
+		});
 
-		for (var f in features)
-			if (features[f].getGeometry().getType().indexOf('Line') !== -1)
-				line = features[f]; // The targetted line
-			else
-				pointer = features[f]; // The pointer
-
-		if (pointer && line &&
-			event.type == 'pointerup' &&
-			event.originalEvent.altKey) {
-			source.removeFeature(line); // We delete the line
-
-			if (!event.originalEvent.ctrlKey) {
-				var cp = pointer.getGeometry().flatCoordinates, // The coordinates of the cut point marker
-					vc = line.getGeometry().flatCoordinates, // The coordinates of the vertices of the line to be cut
-					cs = [[],[]], // [[],[]], // The coordinates of the 2 cut segments
-					s = 0;
-				for (var cl = 0; cl < vc.length; cl += line.getGeometry().stride)
-					// If we found the cutoff point
-					if (cp[0] == vc[cl] && cp[1] == vc[cl + 1])
-						s++; // We skip it and increment the segment counter
-					else // We add the current point
-						cs[s].push(vc.slice(cl));
-
-				// We draw the 2 ends of lines
-				for (var c in cs)
-					if (cs[c].length > 1) // If they have at least 2 points
-						source.addFeature(new ol.Feature({
-							geometry: new ol.geom.LineString(cs[c], line.getGeometry().layout)
-						}));
-
-			}
-		}
-		stickLines();
+		// Find the pointer himself (who's always at the cursor position !)
+		// Note : A summit has been added to the targeted feature at the cursor position
+		if (event.mapBrowserEvent.type == 'pointerup') // Only once on a middle of a segment
+			for (var f in features)
+				if (event.mapBrowserEvent.originalEvent.altKey &&
+					features[f].getGeometry().getType() == 'Point')
+					editorActions(features[f].getGeometry().getCoordinates());
 	});
 
+	// Makes the required changes / reorganize edited geometries
+	function editorActions(pointerPosition) {
+		// Get flattened list of multipoints coords
+		var features = source.getFeatures(),
+			lines = [], polys = [];
+		for (var f in features) {
+			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+			source.removeFeature(features[f]);
+		}
+		// Sort lines from closed polygons
+		for (var c in lines){
+			if(compareCoords(lines[c])){
+				polys.push([lines[c]]);
+				lines[c]=null;
+		}}
+		
+		//TODO delete feature if "ctrl"
+		
+		// Makes holes if a polygons is include in a biggest one
+		for (var f in polys)
+				if (polys[f]) {
+			var fs = new ol.geom.Polygon(polys[f]);
+			for (var p in polys)
+				if (p !=f &&
+			polys[p]) {
+					var intersects = true;
+					for (var c in polys[p][0])
+						if (!fs.intersectsCoordinate(polys[p][0][c]))
+							intersects = false;
+					if (intersects) {
+						polys[f].push(polys[p][0]);
+						polys[p] = null;
+					}
+				}
+		}		
+		
+		// Recreate modified features
+		for (var l in lines)
+			if(lines[l])
+			source.addFeature(new ol.Feature({
+					geometry: new ol.geom.LineString(lines[l])
+				}));
+		for (var p in polys)
+			if(polys[p])
+			source.addFeature(new ol.Feature({
+					geometry: new ol.geom.Polygon(polys[p])
+				}));
+	}
+
+	//TODO var xx = fs[f].getGeometry().intersectsCoordinate([655129.9999999978,5641362.999999944]);
+	function flatCoord(coords, cs, p) {
+		if (typeof cs[0][0] == 'object')
+			for (var c in cs)
+				flatCoord(coords, cs[c], p);
+		else {
+			coords.push([]);// Increment coords array
+			for (var c in cs)
+				if (p && compareCoords(cs[c],p))// If this is the pointed one, forget it &
+					coords.push([]);// Increment coords array
+				else
+					coords[coords.length - 1].push(cs[c]);// Stack on the last coords array
+		}
+	}
+
+	function compareCoords(a,b) {
+			return b
+?			a[0] == b[0] && a[1] == b[1] // 2 coords
+			: compareCoords(a[0],a[a.length-1]); // Compare start with end
+	}
+
 	// Join lines with identical ends
-	function stickLines() { // Only for LineString & MultiLineString
+	function stickLines() {
 		var lines = [],
 			fs = source.getFeatures();
 		for (var f in fs)
 			if (fs[f].getGeometry().getType().indexOf('Line') !== -1) { // If it contains strings
 				var cs = fs[f].getGeometry().getCoordinates();
-				if (fs[f].getGeometry().getType().indexOf('Line') !== -1)
-					cs = [cs];
+//TODO DELETE ?				if (fs[f].getGeometry().getType().indexOf('Line') !== -1) //TODO don't do it twice ???
+//TODO DELETE					cs = [cs];
 				for (var c in cs) {
 					var coordinates = cs[c];
 					if (coordinates.length > 1) // If the line owns at least 2 points

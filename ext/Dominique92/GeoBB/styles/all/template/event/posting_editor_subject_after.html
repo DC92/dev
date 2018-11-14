@@ -24,10 +24,10 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer(0, true);
+		var overlay = geoLayer(0, true); //TODO exclude edited topic
 		map = new ol.Map({
 			target: 'map',
-			layers: [overlay],
+//TODO DEBUG			layers: [overlay],
 			controls: geobbControls()
 		});
 		map.addControl(controlLayersSwitcher(

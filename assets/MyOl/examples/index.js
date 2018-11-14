@@ -135,6 +135,7 @@ var overpass = layerOverpass({
 	],
 	map = new ol.Map({
 		target: 'map',
+//TODO controls: defaultControls().extend([controlLayersSwitcher(), ...]),
 		controls: controlsCollection(),
 		layers: overlays
 	}),
@@ -154,5 +155,5 @@ controlgps.callBack = function (position) {
 }
 
 map.addControl(controlLayersSwitcher(layers));
-map.addControl(controlEditor('geojson', overlays));
-//map.addControl(controlEditor('geojson', overlays, 'Polygon'));
+//map.addControl(controlEditor('geojson', overlays));
+map.addControl(controlEditor('geojson', overlays, 'Polygon'));
