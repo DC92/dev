@@ -1372,11 +1372,8 @@ function controlEditor(inputId, snapLayers, type) {
 	interactions.draw.on(['drawend'], function() {
 		setMode(true); // We close the creation mode
 	});
-	source.on(['addfeature'], function() {
-		editorActions();
-	});
+
 	source.on(['change'], function() {
-//TODO ???		editorActions();
 		// Save lines in <EL> as geoJSON at every change
 		inputEl.value = format.writeFeatures(source.getFeatures(), {
 			featureProjection: 'EPSG:3857'
@@ -1384,22 +1381,38 @@ function controlEditor(inputId, snapLayers, type) {
 		map.dispatchEvent('changed'); //HACK Reset hover if any
 	});
 
-	interactions.modify.on('modifyend', function(event) {
-		var features = map.getFeaturesAtPixel(event.mapBrowserEvent.pixel, {
-			hitTolerance: 6
-		});
+	source.on(['addfeature'], function() {
+		editorActions();
+	});
 
-		// Find the pointer himself (who's always at the cursor position !)
-		// Note : A summit has been added to the targeted feature at the cursor position
-		if (event.mapBrowserEvent.type == 'pointerup') // Only once on a middle of a segment
-			for (var f in features)
-				if (event.mapBrowserEvent.originalEvent.altKey &&
-					features[f].getGeometry().getType() == 'Point')
-					editorActions(features[f].getGeometry().getCoordinates());
+	//TODO BUG : n'efface que quand le curseur bouge
+	interactions.modify.on('modifyend', function(event) {
+		if (event.mapBrowserEvent.originalEvent.altKey) {
+			// altKey + ctrlKey : delete feature
+			if (event.mapBrowserEvent.originalEvent.ctrlKey)
+				deleteFeatureAt(event.mapBrowserEvent.pixel);
+
+			// altKey : delete segment
+			else
+				editorActions(event.mapBrowserEvent.coordinate);
+		} else
+
+			// Other changes
+			editorActions();
 	});
 
 	// Makes the required changes / reorganize edited geometries
 	var semaphore = 0;
+
+	function deleteFeatureAt(pixel) {
+		var features = map.getFeaturesAtPixel(pixel, {
+			hitTolerance: 6
+		});
+		for (var f in features)
+			if (features[f].getGeometry().getType() != 'Point')
+				source.removeFeature(features[f]); // We delete the pointed feature
+
+	}
 
 	function editorActions(pointerPosition) {
 		if (!semaphore++) { // Don't reenter when adding features from the function
@@ -1448,8 +1461,6 @@ function controlEditor(inputId, snapLayers, type) {
 					}
 			}
 
-			//TODO delete feature if "ctrl"
-
 			// Makes holes if a polygon is included in a biggest one
 			for (var f in polys)
 				if (polys[f]) {
@@ -1483,17 +1494,17 @@ function controlEditor(inputId, snapLayers, type) {
 		semaphore--;
 	}
 
-	function flatCoord(coords, cs, p) {
-		if (typeof cs[0][0] == 'object')
-			for (var c in cs)
-				flatCoord(coords, cs[c], p);
+	function flatCoord(existingCoords, newCoords, pointerPosition) {
+		if (typeof newCoords[0][0] == 'object')
+			for (var c in newCoords)
+				flatCoord(existingCoords, newCoords[c], pointerPosition);
 		else {
-			coords.push([]); // Increment coords array
-			for (var c in cs)
-				if (p && compareCoords(cs[c], p)) // If this is the pointed one, forget it &
-					coords.push([]); // Increment coords array
-				else
-					coords[coords.length - 1].push(cs[c]); // Stack on the last coords array
+			existingCoords.push([]); // Increment existingCoords array
+			for (var c in newCoords)
+				if (pointerPosition && compareCoords(newCoords[c], pointerPosition)) { // If this is the pointed one, forget it &
+					existingCoords.push([]); // Increment existingCoords array
+				} else
+					existingCoords[existingCoords.length - 1].push(newCoords[c]); // Stack on the last existingCoords array
 		}
 	}
 
