@@ -1385,7 +1385,7 @@ function controlEditor(inputId, snapLayers, type) {
 		editorActions();
 	});
 
-	//TODO BUG : n'efface que quand le curseur bouge
+	//TODO BUG : n'efface que quand le curseur bouge / reste quelque chose à cet endroit
 	interactions.modify.on('modifyend', function(event) {
 		if (event.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
@@ -1411,7 +1411,6 @@ function controlEditor(inputId, snapLayers, type) {
 		for (var f in features)
 			if (features[f].getGeometry().getType() != 'Point')
 				source.removeFeature(features[f]); // We delete the pointed feature
-
 	}
 
 	function editorActions(pointerPosition) {
