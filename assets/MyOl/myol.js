@@ -826,35 +826,49 @@ function controlButton(options) {
 	options = options || {
 		className: 'ol-control-hidden'
 	};
-	var buttonElement = document.createElement('button');
-	buttonElement.innerHTML = options.label || '';
-	buttonElement.addEventListener('click', options.action);
 
-	var divElement = document.createElement('div');
+	var buttonElement = document.createElement('button'),
+		divElement = document.createElement('div'),
+		control = new ol.control.Control({
+			element: divElement,
+			render: options.render
+		});
+
+	buttonElement.innerHTML = options.label || '';
+	buttonElement.addEventListener('click', function(event) {
+		event.preventDefault();
+
+		for (c in control.controlGroup)
+			control.controlGroup[c].toggle(!control.active && c == cgIndex)
+	});
+
+	divElement.appendChild(buttonElement);
+	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
+	divElement.title = options.title;
 	if (options.rightPosition) {
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
-	} else if (options.action) {
+	} else {
 		divElement.style.left = '.5em';
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
 	}
-	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
-	divElement.title = options.title;
-	divElement.appendChild(buttonElement);
 
-	var control = new ol.control.Control({
-		element: divElement,
-		render: options.render
-	});
+	// List contols on the same exclusive group
+	var cgIndex = options.label || nextButtonTopPos;
+	control.controlGroup = options.controlGroup || {};
+	control.controlGroup[cgIndex] = control;
+	control.active = false;
 
-/* //TODO DELETE ???
-	control.action = function (event) {
-		options.action({
-			event.preventDefault();
-			target: buttonElement
-		});
+	control.toggle = function(newActive) {
+		if (newActive != control.active) {
+			if (options.toggle || options.controlGroup)
+				control.active = newActive;
+			buttonElement.style.backgroundColor = control.active ? '#ccc' : 'white';
+
+			if (typeof options.activate == 'function')
+				options.activate(control.active);
+		}
 	}
-*/
 
 	return control;
 }
@@ -1018,59 +1032,56 @@ function controlPermalink(options) {
  * Requires controlButton
  */
 function controlGPS() {
+	// Vérify if localisation is available
 	if (!window.location.href.match(/https|localhost/i))
-		return controlButton();
+		return controlButton(); // No button
 
 	// The position marker
 	var point_ = new ol.geom.Point([0, 0]),
-		source_ = new ol.source.Vector({
-			features: [new ol.Feature({
-				geometry: point_
-			})]
-		}),
-		style_ = new ol.style.Style({
-			image: new ol.style.Icon({
-				anchor: [0.5, 0.5], // Picto marking the position on the map
-				src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA7VBMVEUAAAA/X39UVHFMZn9NXnRPX3RMW3VPXXNOXHJOXXNNXHNOXXFPXHNNXXFPXHFOW3NPXHNPXXJPXXFPXXNNXXFNW3NOXHJPW25PXXNRX3NSYHVSYHZ0fIx1fo13gI95hJR6go96g5B7hpZ8hZV9hpZ9h5d/iZiBi5ucoquepa+fpbGhqbSiqbXNbm7Ob2/OcHDOcXHOcnLPdHTQdXXWiIjXiorXjIzenp7eoKDgpKTgpaXgpqbks7TktLTktbXnubnr2drr5+nr6Ons29vs29zs6Ors6ert6uvt6uzu6uz18fH18fL68PD++/v+/Pw8gTaQAAAAFnRSTlMACAkKLjAylJWWmJmdv8HD19ja2/n6GaRWtgAAAMxJREFUGBkFwctqwkAUgOH/nMnVzuDGFhRKKVjf/226cKWbQgNVkphMzFz6fQJQlY0S/boCAqa1AMAwJwRjW4wtcxgS05gEa3HHOYipzxP9ZKot9tR5ZfIff7FetMQcf4tDVexNd1IKbbA+7S59f9mlZGmMVVdpXN+3gwh+RiGLAjkDGTQSjHfhes3OV0+CkXrdL/4gzVunxQ+DYZNvn+Mg6aav35GH8OJS/SUrVTw/9e4FtRvypsbPwmPMAto6AOC+ZASgLBpDmGMA/gHW2Vtk8HXNjQAAAABJRU5ErkJggg=='
+		layer = new ol.layer.Vector({
+			source: new ol.source.Vector({
+				features: [new ol.Feature({
+					geometry: point_
+				})]
+			}),
+			style: new ol.style.Style({
+				image: new ol.style.Icon({
+					anchor: [0.5, 0.5], // Picto marking the position on the map
+					src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA7VBMVEUAAAA/X39UVHFMZn9NXnRPX3RMW3VPXXNOXHJOXXNNXHNOXXFPXHNNXXFPXHFOW3NPXHNPXXJPXXFPXXNNXXFNW3NOXHJPW25PXXNRX3NSYHVSYHZ0fIx1fo13gI95hJR6go96g5B7hpZ8hZV9hpZ9h5d/iZiBi5ucoquepa+fpbGhqbSiqbXNbm7Ob2/OcHDOcXHOcnLPdHTQdXXWiIjXiorXjIzenp7eoKDgpKTgpaXgpqbks7TktLTktbXnubnr2drr5+nr6Ons29vs29zs6Ors6ert6uvt6uzu6uz18fH18fL68PD++/v+/Pw8gTaQAAAAFnRSTlMACAkKLjAylJWWmJmdv8HD19ja2/n6GaRWtgAAAMxJREFUGBkFwctqwkAUgOH/nMnVzuDGFhRKKVjf/226cKWbQgNVkphMzFz6fQJQlY0S/boCAqa1AMAwJwRjW4wtcxgS05gEa3HHOYipzxP9ZKot9tR5ZfIff7FetMQcf4tDVexNd1IKbbA+7S59f9mlZGmMVVdpXN+3gwh+RiGLAjkDGTQSjHfhes3OV0+CkXrdL/4gzVunxQ+DYZNvn+Mg6aav35GH8OJS/SUrVTw/9e4FtRvypsbPwmPMAto6AOC+ZASgLBpDmGMA/gHW2Vtk8HXNjQAAAABJRU5ErkJggg=='
+				})
 			})
 		}),
-		layer = new ol.layer.Vector({
-			source: source_,
-			style: style_
-		});
 
-	// Interface with the system GPS
-	var geolocation = new ol.Geolocation();
+		// The control button
+		button = controlButton({
+			className: 'gps-button',
+			title: 'Centrer sur la position GPS',
+			toggle: true,
+			activate: function(active) {
+				geolocation.setTracking(active);
+				if (active)
+					button.getMap().addLayer(layer);
+				else
+					button.getMap().removeLayer(layer);
+			}
+		}),
+
+		// Interface with the system GPS
+		geolocation = new ol.Geolocation();
+
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
 	});
 
-	var active = false,
-		action = function(event) {
-			event.preventDefault();
-			active ^= 1; // Toggle on / off
-			event.target.style.color = active ? 'black' : 'white'; // Color button
-			geolocation.setTracking(active); // Turn on / off
-			if (active)
-				bouton.getMap().addLayer(layer);
-			else
-				bouton.getMap().removeLayer(layer);
-		},
-		bouton = controlButton({
-			className: 'gps-button',
-			title: 'Centrer sur la position GPS',
-			action: action
-		});
-
 	geolocation.on('change', function() {
 		var position = ol.proj.fromLonLat(this.getPosition());
-		bouton.getMap().getView().setCenter(position);
+		button.getMap().getView().setCenter(position);
 		point_.setCoordinates(position);
-		if (typeof bouton.callBack == 'function')
-			bouton.callBack(position);
+		if (typeof button.callBack == 'function')
+			button.callBack(position);
 	});
 
-	return bouton;
+	return button;
 }
 
 /**
@@ -1123,8 +1134,7 @@ function controlLoadGPX() {
 		button = controlButton({
 			label: '&uArr;',
 			title: 'Visualiser un fichier GPX sur la carte',
-			action: function(event) {
-				event.preventDefault();
+			activate: function() {
 				inputElement.click();
 			}
 		}),
@@ -1179,8 +1189,7 @@ function controlDownloadGPX() {
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX',
 			render: render,
-			action: function(event) {
-				event.preventDefault();
+			activate: function() {
 				if (map.sourceEditor) // If there is an active editor
 					download(map.sourceEditor.getFeatures());
 				else if (selectedFeatures.length) // If there are selected features
@@ -1263,19 +1272,56 @@ function controlPrint() {
 	return controlButton({
 		className: 'print-button',
 		title: 'Imprimer la carte',
-		action: function(event) {
-			event.preventDefault();
+		activate: function(event) {
 			window.print();
 		}
 	});
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Line & Polygons Editor
  * Requires controlButton
  * Requires activated controlLengthLine //TODO pourquoi ???
  */
-function controlEditor(inputId, snapLayers, type) {
+function controlLine(controlEditor) {
+	var	button = controlButton({
+			label: 'L',
+//			render: render,
+			title: "Editeur controlPolygon supprimer" +
+				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
+controlGroup:controlEditor.controlGroup,
+			action: function(event) {
+//				event.preventDefault();
+				controlEditor.activate(button);
+			}
+		});
+
+	//controlEditor.controls.lines=button;
+	
+	return button;
+}
+
+function controlPolygon(controlEditor) {
+	var	button = controlButton({
+			label: 'P',
+//			render: render,
+			title: "Editeur controlPolygon supprimer" +
+				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
+controlGroup:controlEditor.controlGroup,
+			action: function(event) {
+//				event.preventDefault();
+				button.toggle();
+			}
+		});
+
+	//controlEditor.controls.polygons=button;
+	
+	return button;
+}
+
+function controlEdit(inputId, snapLayers) {
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
@@ -1304,7 +1350,7 @@ function controlEditor(inputId, snapLayers, type) {
 			}),
 			draw: new ol.interaction.Draw({
 				source: source,
-				type: type || 'LineString'
+				type: 'LineString'
 			}),
 			hover: new ol.interaction.Select({
 				layers: [layer],
@@ -1312,24 +1358,33 @@ function controlEditor(inputId, snapLayers, type) {
 				hitTolerance: 6
 			})
 		},
-		editMode = true, // Versus false if insert line mode
-		bouton = controlButton({
-			label: 'E',
+		button = controlButton({
+			label: 'M',
 			render: render,
-			title: "Editeur de lignes\n" +
-				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n" +
+			title:
 				"Click sur un sommet puis déplacer pour modifier\n" +
 				"Click sur un segment puis déplacer pour créer un sommet\n" +
 				"Alt+click sur un sommet pour le supprimer\n" +
-				"Alt+click sur un segment pour le supprimer et couper la ligne\n" +
+				"Alt+click sur un segment pour le supprimer et couper la ligne\n" +//TODO only if line creation declared
 				"Ctrl+Alt+click sur une ligne pour la supprimer",
+toggle: true,
 			action: function(event) {
-				event.preventDefault();
-				setMode(editMode ^= 1); // Alternately switch modes
+//				event.preventDefault();
+				button.toggle();
 			}
 		}),
 		map;
-
+		
+		/*
+	button.controls={edit:button};
+	button.activate = function (activatedButton){
+		var bt=activatedButton.toggle();
+				for(c in button.controls)
+					if(bt &&button.controls[c]!=activatedButton)
+					button.controls[c].toggle(false);
+				return bt;
+	}*/
+	
 	function render(event) {
 		if (!map) { // Only once
 			map = event.map;
@@ -1346,7 +1401,7 @@ function controlEditor(inputId, snapLayers, type) {
 				for (var s in snapLayers)
 					snapLayers[s].getSource().on('change', snapFeatures);
 
-			setMode(true); // Set edit mode by default
+			setMode(false); // Set edit mode by default
 		}
 	}
 
@@ -1358,15 +1413,15 @@ function controlEditor(inputId, snapLayers, type) {
 		);
 	}
 
-	function setMode(em) {
-		editMode = em;
-		bouton.element.firstChild.innerHTML = editMode ? 'E' : '+';
-		bouton.element.firstChild.style.color = editMode ? 'white' : 'black';
+	function setMode(editMode) {
 		for (var i in interactions)
 			map.removeInteraction(interactions[i]);
-		map.addInteraction(editMode ? interactions.modify : interactions.draw);
+		if(editMode){
+//		map.addInteraction(editMode ? interactions.modify : interactions.draw);
+		map.addInteraction(interactions.modify);
 		map.addInteraction(interactions.snap);
 		map.addInteraction(interactions.hover);
+	}
 	}
 
 	interactions.draw.on(['drawend'], function() {
@@ -1515,7 +1570,7 @@ function controlEditor(inputId, snapLayers, type) {
 		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
 
-	return bouton;
+	return button;
 }
 
 /**

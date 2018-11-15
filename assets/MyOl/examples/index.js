@@ -156,4 +156,7 @@ controlgps.callBack = function (position) {
 
 map.addControl(controlLayersSwitcher(layers));
 //map.addControl(controlEditor('geojson', overlays));
-map.addControl(controlEditor('geojson', overlays, 'Polygon'));
+var ce = controlEdit('geojson', overlays);
+map.addControl(ce);
+map.addControl(controlLine(ce));
+map.addControl(controlPolygon(ce));
