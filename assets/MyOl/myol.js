@@ -1087,6 +1087,7 @@ function controlGPS() {
 /**
  * Control to displays the length of a line overflown
  */
+//TODO BEST color the measured line
 function controlLengthLine() {
 	var divElement = document.createElement('div'),
 		control = new ol.control.Control({
@@ -1272,55 +1273,16 @@ function controlPrint() {
 	return controlButton({
 		className: 'print-button',
 		title: 'Imprimer la carte',
-		activate: function(event) {
+		activate: function() {
 			window.print();
 		}
 	});
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * Line & Polygons Editor
  * Requires controlButton
- * Requires activated controlLengthLine //TODO pourquoi ???
  */
-function controlLine(controlEditor) {
-	var	button = controlButton({
-			label: 'L',
-//			render: render,
-			title: "Editeur controlPolygon supprimer" +
-				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
-controlGroup:controlEditor.controlGroup,
-			action: function(event) {
-//				event.preventDefault();
-				controlEditor.activate(button);
-			}
-		});
-
-	//controlEditor.controls.lines=button;
-	
-	return button;
-}
-
-function controlPolygon(controlEditor) {
-	var	button = controlButton({
-			label: 'P',
-//			render: render,
-			title: "Editeur controlPolygon supprimer" +
-				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
-controlGroup:controlEditor.controlGroup,
-			action: function(event) {
-//				event.preventDefault();
-				button.toggle();
-			}
-		});
-
-	//controlEditor.controls.polygons=button;
-	
-	return button;
-}
-
 function controlEdit(inputId, snapLayers) {
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
@@ -1337,130 +1299,98 @@ function controlEdit(inputId, snapLayers) {
 			source: source,
 			zIndex: 3
 		}),
-		interactions = {
-			snap: new ol.interaction.Snap({
-				source: source
-			}),
-			modify: new ol.interaction.Modify({
-				source: source,
-				deleteCondition: function(event) {
-					//HACK because the system don't trig singleClick
-					return ol.events.condition.altKeyOnly(event) && ol.events.condition.click(event);
-				}
-			}),
-			draw: new ol.interaction.Draw({
-				source: source,
-				type: 'LineString'
-			}),
-			hover: new ol.interaction.Select({
-				layers: [layer],
-				condition: ol.events.condition.pointerMove,
-				hitTolerance: 6
-			})
-		},
+		hover = new ol.interaction.Select({
+			layers: [layer],
+			condition: ol.events.condition.pointerMove,
+			hitTolerance: 6
+		}),
+		snap = new ol.interaction.Snap({
+			source: source
+		}),
+		modify = new ol.interaction.Modify({
+			source: source,
+			deleteCondition: function(event) {
+				//HACK because the system don't trig singleClick
+				return ol.events.condition.altKeyOnly(event) && ol.events.condition.click(event);
+			}
+		}),
 		button = controlButton({
 			label: 'M',
 			render: render,
-			title:
-				"Click sur un sommet puis déplacer pour modifier\n" +
+			title: "Click sur un sommet puis déplacer pour modifier\n" +
 				"Click sur un segment puis déplacer pour créer un sommet\n" +
 				"Alt+click sur un sommet pour le supprimer\n" +
-				"Alt+click sur un segment pour le supprimer et couper la ligne\n" +//TODO only if line creation declared
+				"Alt+click sur un segment pour le supprimer et couper la ligne\n" + //TODO only if line creation declared
 				"Ctrl+Alt+click sur une ligne pour la supprimer",
-toggle: true,
-			action: function(event) {
-//				event.preventDefault();
-				button.toggle();
+			toggle: true,
+			activate: function(active) {
+				hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
+				//snap.setActive(active);
+				modify.setActive(active);
 			}
 		}),
-		map;
-		
-		/*
-	button.controls={edit:button};
-	button.activate = function (activatedButton){
-		var bt=activatedButton.toggle();
-				for(c in button.controls)
-					if(bt &&button.controls[c]!=activatedButton)
-					button.controls[c].toggle(false);
-				return bt;
-	}*/
-	
+		map_;
+
+	button.getSource = function() {
+		return source;
+	};
+
 	function render(event) {
-		if (!map) { // Only once
-			map = event.map;
-			map.sourceEditor = source; //HACK to make other control acting differently when there is an editor
-			map.addLayer(layer);
+		if (!map_) { // Only once
+			map_ = event.map;
+			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor
+			map_.addLayer(layer);
+
 			//HACK Avoid zooming when you leave the mode by doubleclick
-			map.getInteractions().getArray().forEach(function(i) {
+			map_.getInteractions().getArray().forEach(function(i) {
 				if (i instanceof ol.interaction.DoubleClickZoom)
-					map.removeInteraction(i);
+					map_.removeInteraction(i);
 			});
+
+			map_.addInteraction(hover);
+			map_.addInteraction(modify);
+			modify.setActive(false);
+			map_.addInteraction(snap);
+			//snap.setActive(false);
 
 			// Snap on features external to the editor
 			if (snapLayers)
 				for (var s in snapLayers)
 					snapLayers[s].getSource().on('change', snapFeatures);
-
-			setMode(false); // Set edit mode by default
 		}
 	}
 
 	function snapFeatures() {
-		this.forEachFeature(
-			function(f) {
-				interactions.snap.addFeature(f);
-			}
-		);
+		var fs = this.getFeatures();
+		for (var f in fs)
+			snap.addFeature(fs[f]);
 	}
-
-	function setMode(editMode) {
-		for (var i in interactions)
-			map.removeInteraction(interactions[i]);
-		if(editMode){
-//		map.addInteraction(editMode ? interactions.modify : interactions.draw);
-		map.addInteraction(interactions.modify);
-		map.addInteraction(interactions.snap);
-		map.addInteraction(interactions.hover);
-	}
-	}
-
-	interactions.draw.on(['drawend'], function() {
-		setMode(true); // We close the creation mode
-	});
 
 	source.on(['change'], function() {
 		// Save lines in <EL> as geoJSON at every change
 		inputEl.value = format.writeFeatures(source.getFeatures(), {
 			featureProjection: 'EPSG:3857'
 		});
-		map.dispatchEvent('changed'); //HACK Reset hover if any
 	});
 
-	source.on(['addfeature'], function() {
-		editorActions();
-	});
-
-	//TODO BUG : n'efface que quand le curseur bouge / reste quelque chose à cet endroit
-	interactions.modify.on('modifyend', function(event) {
+	modify.on('modifyend', function(event) {
 		if (event.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
 			if (event.mapBrowserEvent.originalEvent.ctrlKey)
 				deleteFeatureAt(event.mapBrowserEvent.pixel);
-
 			// altKey : delete segment
-			else
-				editorActions(event.mapBrowserEvent.coordinate);
+			else if (event.target.vertexFeature_) // Click on a segment
+				editorActions(event.target.vertexFeature_.getGeometry().getCoordinates());
+			else // Remove a summitt
+				editorActions();
 		} else
-
-			// Other changes
+			// Create or drag summitt
 			editorActions();
 	});
 
 	// Makes the required changes / reorganize edited geometries
-	var semaphore = 0;
-
 	function deleteFeatureAt(pixel) {
-		var features = map.getFeaturesAtPixel(pixel, {
+		var features = map_.getFeaturesAtPixel(pixel, {
 			hitTolerance: 6
 		});
 		for (var f in features)
@@ -1469,83 +1399,80 @@ toggle: true,
 	}
 
 	function editorActions(pointerPosition) {
-		if (!semaphore++) { // Don't reenter when adding features from the function
+		// Get flattened list of multipoints coords
+		var features = source.getFeatures(),
+			lines = [],
+			polys = [];
+		for (var f in features)
+			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+		source.clear(); // And clear the edited layer
 
-			// Get flattened list of multipoints coords
-			var features = source.getFeatures(),
-				lines = [],
-				polys = [];
-			for (var f in features)
-				flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
-			source.clear(); // And clear the edited layer
+		for (var a in lines) {
+			// Exclude 1 coord features (points)
+			if (lines[a] && lines[a].length < 2)
+				lines[a] = null;
 
-			for (var a in lines) {
-				// Exclude 1 coord features (points)
-				if (lines[a] && lines[a].length < 2)
-					lines[a] = null;
-
-				// Treat closed lines as polygons
-				if (compareCoords(lines[a])) {
-					polys.push([lines[a]]);
-					lines[a] = null;
-				}
-
-				// Merge lines having a common end
-				for (var b in lines)
-					if (a < b) {
-						var m = [a, b];
-						for (var i = 4; i; i--) // 4 times
-							if (lines[m[0]] && lines[m[1]]) {
-								// Shake lines end to explore all possibilities
-								m.reverse();
-								lines[m[0]].reverse();
-								if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
-
-									// Merge 2 lines matching ends
-									lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
-									lines[m[1]] = 0;
-
-									// Re-check if the new line is closed
-									if (compareCoords(lines[m[0]])) {
-										polys.push([lines[m[0]]]);
-										lines[m[0]] = null;
-									}
-								}
-							}
-					}
+			// Treat closed lines as polygons
+			if (compareCoords(lines[a])) {
+				polys.push([lines[a]]);
+				lines[a] = null;
 			}
 
-			// Makes holes if a polygon is included in a biggest one
-			for (var f in polys)
-				if (polys[f]) {
-					var fs = new ol.geom.Polygon(polys[f]);
-					for (var p in polys)
-						if (p != f &&
-							polys[p]) {
-							var intersects = true;
-							for (var c in polys[p][0])
-								if (!fs.intersectsCoordinate(polys[p][0][c]))
-									intersects = false;
-							if (intersects) {
-								polys[f].push(polys[p][0]);
-								polys[p] = null;
+			// Merge lines having a common end
+			for (var b in lines)
+				if (a < b) {
+					var m = [a, b];
+					for (var i = 4; i; i--) // 4 times
+						if (lines[m[0]] && lines[m[1]]) {
+							// Shake lines end to explore all possibilities
+							m.reverse();
+							lines[m[0]].reverse();
+							if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+
+								// Merge 2 lines matching ends
+								lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
+								lines[m[1]] = 0;
+
+								// Re-check if the new line is closed
+								if (compareCoords(lines[m[0]])) {
+									polys.push([lines[m[0]]]);
+									lines[m[0]] = null;
+								}
 							}
 						}
 				}
-
-			// Recreate modified features
-			for (var l in lines)
-				if (lines[l])
-					source.addFeature(new ol.Feature({
-						geometry: new ol.geom.LineString(lines[l])
-					}));
-			for (var p in polys)
-				if (polys[p])
-					source.addFeature(new ol.Feature({
-						geometry: new ol.geom.Polygon(polys[p])
-					}));
 		}
-		semaphore--;
+
+		// Makes holes if a polygon is included in a biggest one
+		for (var f in polys)
+			if (polys[f]) {
+				var fs = new ol.geom.Polygon(polys[f]);
+				for (var p in polys)
+					if (p != f &&
+						polys[p]) {
+						var intersects = true;
+						for (var c in polys[p][0])
+							if (!fs.intersectsCoordinate(polys[p][0][c]))
+								intersects = false;
+						if (intersects) {
+							polys[f].push(polys[p][0]);
+							polys[p] = null;
+						}
+					}
+			}
+
+		// Recreate modified features
+		for (var l in lines)
+			if (lines[l]) {
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.LineString(lines[l])
+				}));
+			}
+		for (var p in polys)
+			if (polys[p])
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.Polygon(polys[p])
+				}));
 	}
 
 	function flatCoord(existingCoords, newCoords, pointerPosition) {
@@ -1555,10 +1482,12 @@ toggle: true,
 		else {
 			existingCoords.push([]); // Increment existingCoords array
 			for (var c in newCoords)
-				if (pointerPosition && compareCoords(newCoords[c], pointerPosition)) { // If this is the pointed one, forget it &
-					existingCoords.push([]); // Increment existingCoords array
+				if (pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
+					// If this is the pointed one, forget it &
+					existingCoords.push([]); // & increment existingCoords array
 				} else
-					existingCoords[existingCoords.length - 1].push(newCoords[c]); // Stack on the last existingCoords array
+					// Stack on the last existingCoords array
+					existingCoords[existingCoords.length - 1].push(newCoords[c]);
 		}
 	}
 
@@ -1569,6 +1498,75 @@ toggle: true,
 			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
 		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
+
+	return button;
+}
+
+//TODO conditionner couper ligne à ce controle
+//TODO snap sur création de ligne
+function controlLine(controlEditor) {
+	var draw = new ol.interaction.Draw({
+			source: controlEditor.getSource(),
+			type: 'LineString'
+		}),
+		button = controlButton({
+			label: 'L',
+			render: render,
+			title: "Editeur controlLIGNE supprimer" + //TODO
+				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
+			controlGroup: controlEditor.controlGroup,
+			activate: function(active) {
+				draw.setActive(active);
+			}
+		}),
+		map_;
+
+	function render(event) {
+		if (!map_) { // Only once
+			map_ = event.map;
+
+			map_.addInteraction(draw);
+			draw.setActive(false);
+		}
+	}
+
+	draw.on(['drawend'], function() {
+		button.toggle(false);
+	});
+
+	return button;
+}
+
+//TODO conditionner transformer en poly à ce controle
+function controlPolygon(controlEditor) {
+	var draw = new ol.interaction.Draw({
+			source: controlEditor.getSource(),
+			type: 'Polygon'
+		}),
+		button = controlButton({
+			label: 'P',
+			render: render,
+			title: "Editeur controlPolygon supprimer" + //TODO
+				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
+			controlGroup: controlEditor.controlGroup,
+			activate: function(active) {
+				draw.setActive(active);
+			}
+		}),
+		map_;
+
+	function render(event) {
+		if (!map_) { // Only once
+			map_ = event.map;
+
+			map_.addInteraction(draw);
+			draw.setActive(false);
+		}
+	}
+
+	draw.on(['drawend'], function() {
+		button.toggle(false);
+	});
 
 	return button;
 }
