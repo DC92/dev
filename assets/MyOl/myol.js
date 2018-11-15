@@ -1283,8 +1283,8 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton
  */
-function controlEdit(inputId, snapLayers) {
-	var inputEl = document.getElementById(inputId), // Read data in an html element
+function controlEdit(options) {
+	var inputEl = document.getElementById(options.inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
 			JSON.parse(inputEl.value), {
@@ -1332,7 +1332,7 @@ function controlEdit(inputId, snapLayers) {
 		map_;
 
 	button.getSource = function() {
-		return source;
+		return source; //TODO BEST avoid this HACK
 	};
 
 	function render(event) {
@@ -1354,9 +1354,9 @@ function controlEdit(inputId, snapLayers) {
 			//snap.setActive(false);
 
 			// Snap on features external to the editor
-			if (snapLayers)
-				for (var s in snapLayers)
-					snapLayers[s].getSource().on('change', snapFeatures);
+			if (options.snapLayers)
+				for (var s in options.snapLayers)
+					options.snapLayers[s].getSource().on('change', snapFeatures);
 		}
 	}
 
@@ -1388,7 +1388,7 @@ function controlEdit(inputId, snapLayers) {
 			editorActions();
 	});
 
-	// Makes the required changes / reorganize edited geometries
+	// Make the required changes / reorganize edited geometries
 	function deleteFeatureAt(pixel) {
 		var features = map_.getFeaturesAtPixel(pixel, {
 			hitTolerance: 6
@@ -1413,7 +1413,8 @@ function controlEdit(inputId, snapLayers) {
 				lines[a] = null;
 
 			// Treat closed lines as polygons
-			if (compareCoords(lines[a])) {
+			//TODO BUG : perd tous les polygones
+			if (options.transform && compareCoords(lines[a])) {
 				polys.push([lines[a]]);
 				lines[a] = null;
 			}
@@ -1434,7 +1435,7 @@ function controlEdit(inputId, snapLayers) {
 								lines[m[1]] = 0;
 
 								// Re-check if the new line is closed
-								if (compareCoords(lines[m[0]])) {
+								if (options.transform && compareCoords(lines[m[0]])) {
 									polys.push([lines[m[0]]]);
 									lines[m[0]] = null;
 								}
@@ -1482,7 +1483,7 @@ function controlEdit(inputId, snapLayers) {
 		else {
 			existingCoords.push([]); // Increment existingCoords array
 			for (var c in newCoords)
-				if (pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
+				if (options.transform && pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
 					// If this is the pointed one, forget it &
 					existingCoords.push([]); // & increment existingCoords array
 				} else
@@ -1502,18 +1503,19 @@ function controlEdit(inputId, snapLayers) {
 	return button;
 }
 
-//TODO conditionner couper ligne à ce controle
-//TODO snap sur création de ligne
-function controlLine(controlEditor) {
+//TODO snap sur création
+function controlCreate(controlEditor, type) {
 	var draw = new ol.interaction.Draw({
 			source: controlEditor.getSource(),
-			type: 'LineString'
+			type: type
 		}),
 		button = controlButton({
-			label: 'L',
+			label: type.charAt(0),
 			render: render,
-			title: "Editeur controlLIGNE supprimer" + //TODO
-				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
+			title: type == 'Polygon' ?
+				"Editeur \nPOLYGON" //TODO
+				:
+				"Editeur \nLIGNE", //TODO
 			controlGroup: controlEditor.controlGroup,
 			activate: function(active) {
 				draw.setActive(active);
@@ -1522,7 +1524,7 @@ function controlLine(controlEditor) {
 		map_;
 
 	function render(event) {
-		if (!map_) { // Only once
+		if (!map_) { // Only once //TODO simplifier !
 			map_ = event.map;
 
 			map_.addInteraction(draw);
@@ -1532,40 +1534,7 @@ function controlLine(controlEditor) {
 
 	draw.on(['drawend'], function() {
 		button.toggle(false);
-	});
-
-	return button;
-}
-
-//TODO conditionner transformer en poly à ce controle
-function controlPolygon(controlEditor) {
-	var draw = new ol.interaction.Draw({
-			source: controlEditor.getSource(),
-			type: 'Polygon'
-		}),
-		button = controlButton({
-			label: 'P',
-			render: render,
-			title: "Editeur controlPolygon supprimer" + //TODO
-				"Click sur E pour ajouter ou étendre une ligne, doubleclick pour finir\n",
-			controlGroup: controlEditor.controlGroup,
-			activate: function(active) {
-				draw.setActive(active);
-			}
-		}),
-		map_;
-
-	function render(event) {
-		if (!map_) { // Only once
-			map_ = event.map;
-
-			map_.addInteraction(draw);
-			draw.setActive(false);
-		}
-	}
-
-	draw.on(['drawend'], function() {
-		button.toggle(false);
+		button.controlGroup.M.toggle(true);
 	});
 
 	return button;

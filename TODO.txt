@@ -1,6 +1,5 @@
 OPENLAYERS
 ==========
-Gestion des trous dans les polygones
 Pas de click sur le label d'une icone sur la carte
 Quand click sur plusieurs features, exécute le click en dessous
 IE : pas de SGV
