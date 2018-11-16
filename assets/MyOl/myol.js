@@ -373,7 +373,8 @@ function initLayerVectorURLListeners(e) {
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
 		map.popElement_ = document.createElement('div');
-		var dx = 0.4, xAnchor, // Spread too closes icons
+		var dx = 0.4,
+			xAnchor, // Spread too closes icons
 			hovered = [],
 			popup = new ol.Overlay({
 				element: map.popElement_
@@ -574,8 +575,8 @@ function layerOverpass(options) {
 		label: formatLabel
 	});
 
-	//TODO : afficher erreur 429 (Too Many Requests)
-	//TODO : afficher affichage OK, ...
+//TODO : afficher erreur 429 (Too Many Requests)
+//TODO : afficher affichage OK, ...
 	function formatLabel(p, f) { // p = properties, f = feature
 		var language = {
 				alpine_hut: 'Refuge gard&egrave;',
@@ -986,10 +987,10 @@ function controlPermalink(options) {
 			element: divElement,
 			render: render
 		}),
-		params =
-			location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
+		params = location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 			document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
 			(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
+
 	control.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
 
 	if (options.visible) {
@@ -1320,7 +1321,7 @@ function controlEdit(inputId, snapLayers) {
 			title: 'Activer "M" puis cliquer et déplacer un sommet pour modifier un polygone\n' +
 				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 				'Alt+cliquer sur un sommet pour le supprimer\n' +
-//TODO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
+				//TODO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			toggle: true,
 			activate: function(active) {
@@ -1332,12 +1333,11 @@ function controlEdit(inputId, snapLayers) {
 
 	// Make available to the buttons group
 	button.source = source;
-	button.editorActions = editorActions;
 
 	function render(evt) {
 		if (!map_) { // Only once
 			map_ = evt.map;
-			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor
+			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor //TODO simplifier ?
 			map_.addLayer(layer);
 
 			//HACK Avoid zooming when you leave the mode by doubleclick
@@ -1347,9 +1347,9 @@ function controlEdit(inputId, snapLayers) {
 			});
 
 			//TODO map_.addInteraction(hover);
-			map_.addInteraction(snap);
 			map_.addInteraction(modify);
-			modify.setActive(false);
+			map_.addInteraction(snap);
+			button.toggle(true);
 
 			// Snap on features external to the editor
 			if (snapLayers)
@@ -1367,24 +1367,28 @@ function controlEdit(inputId, snapLayers) {
 	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			if (evt.mapBrowserEvent.originalEvent.ctrlKey)
-				deleteFeatureAt(evt.mapBrowserEvent.pixel);
+			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
+				var features = map_.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+					hitTolerance: 6
+				});
+				for (var f in features)
+					if (features[f].getGeometry().getType() != 'Point')
+						source.removeFeature(features[f]); // We delete the pointed feature
+			}
 			// altKey : delete segment
 			else if (evt.target.vertexFeature_) // Click on a segment
 				return editorActions(evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
+		// Other actions
 		editorActions();
 	});
 
-	// Make the required changes / reorganize edited geometries
-	function deleteFeatureAt(pixel) {
-		var features = map_.getFeaturesAtPixel(pixel, {
-			hitTolerance: 6
-		});
-		for (var f in features)
-			if (features[f].getGeometry().getType() != 'Point')
-				source.removeFeature(features[f]); // We delete the pointed feature
-	}
+	source.on(['change'], function() {
+		if (button.modified) {
+			button.modified = false;
+			editorActions();
+		}
+	});
 
 	function editorActions(pointerPosition) {
 		// Get flattened list of multipoints coords
@@ -1400,7 +1404,7 @@ function controlEdit(inputId, snapLayers) {
 			if (lines[a] && lines[a].length < 2)
 				lines[a] = null;
 
-			// Treat closed lines as polygons
+			// Convert closed lines into polygons
 			if (button.controlGroup.P && // Only if we manage Polygons
 				compareCoords(lines[a])) {
 				polys.push([lines[a]]);
@@ -1525,10 +1529,9 @@ function controlEditCreate(controlEditor, type) {
 	}
 
 	draw.on(['drawend'], function(evt) {
-		controlEditor.source.addFeature(evt.feature); //TODO BUG bugge aprés inclusion ici
 		button.toggle(false);
 		button.controlGroup.M.toggle(true);
-		button.controlGroup.M.editorActions();
+		button.controlGroup.M.modified = true;
 	});
 
 	return button;
@@ -1538,6 +1541,7 @@ function controlEditCreate(controlEditor, type) {
  * Controls examples
  */
 var controlgps = controlGPS();
+
 function controlsCollection() {
 	return [
 		new ol.control.ScaleLine(),
@@ -1572,7 +1576,7 @@ function controlsCollection() {
 		controlgps,
 		controlLoadGPX(),
 		controlDownloadGPX(),
-//		controlPrint(),
+		//TODO controlPrint(),
 	];
 }
 
@@ -1615,7 +1619,7 @@ function layersCollection(keys) {
 		'Angleterre': layerOS(keys.bing),
 		'Bing': layerBing('Road', keys.bing),
 		'Bing photo': layerBing('Aerial', keys.bing),
-		'Bing mixte': layerBing ('AerialWithLabels', keys.bing),
+		'Bing mixte': layerBing('AerialWithLabels', keys.bing),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google photo': layerGoogle('s'),
