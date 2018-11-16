@@ -151,8 +151,8 @@ function layerTileIncomplete(extent, sources) {
 		backgroundSource = new ol.source.Stamen({
 			layer: 'terrain'
 		});
-	layer.on('onadd', function(event) {
-		event.target.map_.getView().on('change', change);
+	layer.on('onadd', function(evt) {
+		evt.target.map_.getView().on('change', change);
 		change(); // At init
 	});
 
@@ -166,8 +166,8 @@ function layerTileIncomplete(extent, sources) {
 		// Search for sources according to the map resolution
 		if (center &&
 			ol.extent.intersects(extent, view.calculateExtent(layer.map_.getSize())))
-			currentResolution = Object.keys(sources).filter(function(event) { // HACK : use of filter to perform an action
-				return event > view.getResolution();
+			currentResolution = Object.keys(sources).filter(function(evt) { // HACK : use of filter to perform an action
+				return evt > view.getResolution();
 			})[0];
 
 		// Update layer if necessary
@@ -280,22 +280,22 @@ function controlPermanentCheckbox(name, callback) {
 	// Call callback once at the init
 	callback(null, permanentCheckboxList(name));
 
-	function permanentCheckboxClick(event) {
-		var list = permanentCheckboxList(name, event);
+	function permanentCheckboxClick(evt) {
+		var list = permanentCheckboxList(name, evt);
 		if (typeof callback == 'function')
-			callback(event, list);
+			callback(evt, list);
 	}
 }
 
-function permanentCheckboxList(name, event) {
+function permanentCheckboxList(name, evt) {
 	var checkElements = document.getElementsByName(name),
 		allChecks = [];
 
 	for (var e = 0; e < checkElements.length; e++) {
 		// Select/deselect all (clicking an <input> without value)
-		if (event) {
-			if (event.target.value == 'on') // The Select/deselect has a default value = "on"
-				checkElements[e].checked = event.target.checked; // Check all if "all" is clicked
+		if (evt) {
+			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
+				checkElements[e].checked = evt.target.checked; // Check all if "all" is clicked
 			else if (checkElements[e].value == 'on')
 				checkElements[e].checked = false; // Reset the "all" checks if another check is clicked
 		}
@@ -335,8 +335,8 @@ function layerVectorURL(options) {
 			url: function(extent, resolution, projection) {
 				source.clear(); // Redraw the layer
 				var bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
-					list = permanentCheckboxList(options.selectorName).filter(function(event) {
-						return event !== 'on'; // Remove the "all" input (default value = "on")
+					list = permanentCheckboxList(options.selectorName).filter(function(evt) {
+						return evt !== 'on'; // Remove the "all" input (default value = "on")
 					});
 				return typeof options.url == 'function' ?
 					options.url(bbox, list, resolution) :
@@ -355,7 +355,7 @@ function layerVectorURL(options) {
 
 	// Optional checkboxes to tune layer parameters
 	if (options.selectorName) {
-		controlPermanentCheckbox(options.selectorName, function(event, list) {
+		controlPermanentCheckbox(options.selectorName, function(evt, list) {
 			layer.setVisible(list.length);
 			if (list.length)
 				source.clear(); // Redraw the layer
@@ -383,14 +383,14 @@ function initLayerVectorURLListeners(e) {
 
 		map.on('pointermove', pointerMove);
 
-		function pointerMove(event) {
+		function pointerMove(evt) {
 			// Reset cursor & popup position
 			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
 
 			var mapRect = map.getTargetElement().getBoundingClientRect(),
 				popupRect = map.popElement_.getBoundingClientRect();
-			if (popupRect.left - 5 > mapRect.x + event.pixel[0] || mapRect.x + event.pixel[0] >= popupRect.right + 5 ||
-				popupRect.top - 5 > mapRect.y + event.pixel[1] || mapRect.y + event.pixel[1] >= popupRect.bottom + 5)
+			if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
+				popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
 				popup.setPosition(undefined); // Hide label by default if none feature or his popup here
 
 			// Reset previous hovered styles
@@ -402,11 +402,11 @@ function initLayerVectorURLListeners(e) {
 
 			// Search the hovered the feature(s)
 			hovered = [];
-			map.forEachFeatureAtPixel(event.pixel, function(f, l) {
+			map.forEachFeatureAtPixel(evt.pixel, function(f, l) {
 				if (l && l.options_) {
 					var h = {
-						event: event,
-						pixel: event.pixel, // Follow the mouse if line or surface
+						event: evt,
+						pixel: evt.pixel, // Follow the mouse if line or surface
 						feature: f,
 						layer: l,
 						options: l.options_,
@@ -472,12 +472,12 @@ function initLayerVectorURLListeners(e) {
 		}
 
 		// Click on a feature
-		map.on('click', function(event) {
-			if (!event.originalEvent.shiftKey &&
-				!event.originalEvent.ctrlKey &&
-				!event.originalEvent.altKey)
+		map.on('click', function(evt) {
+			if (!evt.originalEvent.shiftKey &&
+				!evt.originalEvent.ctrlKey &&
+				!evt.originalEvent.altKey)
 				map.forEachFeatureAtPixel(
-					event.pixel,
+					evt.pixel,
 					function(feature, layer) {
 						if (layer && layer.options_ &&
 							typeof layer.options_.click == 'function')
@@ -722,10 +722,10 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			zIndex: 2
 		});
 
-	layer.on('onadd', function(event) {
+	layer.on('onadd', function(evt) {
 		if (dragged) {
 			// Drag and drop
-			event.target.map_.addInteraction(new ol.interaction.Modify({
+			evt.target.map_.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
 				style: style
 			}));
@@ -777,9 +777,9 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	displayLL(ol.proj.fromLonLat(llInit));
 
 	// <input> coords edition
-	layer.edit = function(event, nol, projection) {
+	layer.edit = function(evt, nol, projection) {
 		var coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
-		coord[nol] = parseFloat(event.value); // On change la valeur qui a été modifiée
+		coord[nol] = parseFloat(evt.value); // On change la valeur qui a été modifiée
 		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
 		layer.map_.getView().setCenter(point.getCoordinates());
 	};
@@ -835,8 +835,8 @@ function controlButton(options) {
 		});
 
 	buttonElement.innerHTML = options.label || '';
-	buttonElement.addEventListener('click', function(event) {
-		event.preventDefault();
+	buttonElement.addEventListener('click', function(evt) {
+		evt.preventDefault();
 
 		for (c in control.controlGroup)
 			control.controlGroup[c].toggle(!control.active && c == cgIndex)
@@ -904,9 +904,9 @@ function controlLayersSwitcher(baseLayers) {
 	// When the map is created & rendered
 	var map;
 
-	function render(event) {
+	function render(evt) {
 		if (!map) { // Only the first time
-			map = event.map; // mem map for further use
+			map = evt.map; // mem map for further use
 
 			// Base layers selector init
 			for (var name in baseLayers) {
@@ -930,25 +930,25 @@ function controlLayersSwitcher(baseLayers) {
 			});
 
 			// Leaving the map close the selector
-			window.addEventListener('mousemove', function(event) {
+			window.addEventListener('mousemove', function(evt) {
 				var divRect = map.getTargetElement().getBoundingClientRect();
-				if (event.clientX < divRect.left || event.clientX > divRect.right ||
-					event.clientY < divRect.top || event.clientY > divRect.bottom)
+				if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+					evt.clientY < divRect.top || evt.clientY > divRect.bottom)
 					displayLayerSelector();
 			});
 		}
 	}
 
-	function displayLayerSelector(event, list) {
+	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
 		if (list && list.length === 0)
 			selectorElement.firstChild.firstChild.checked = true;
 
 		// Leave only one checked except if Ctrl key is on
-		if (event && event.type == 'click' && !event.ctrlKey) {
+		if (evt && evt.type == 'click' && !evt.ctrlKey) {
 			var checkElements = document.getElementsByName('baselayer');
 			for (var e = 0; e < checkElements.length; e++)
-				if (checkElements[e] != event.target)
+				if (checkElements[e] != evt.target)
 					checkElements[e].checked = false;
 		}
 
@@ -964,9 +964,9 @@ function controlLayersSwitcher(baseLayers) {
 			baseLayers[list[1]].setOpacity(rangeElement.value / 100);
 
 		// Refresh control button, range & selector
-		control.element.firstElementChild.style.display = event ? 'none' : '';
-		rangeElement.style.display = event && list.length > 1 ? '' : 'none';
-		selectorElement.style.display = event ? '' : 'none';
+		control.element.firstElementChild.style.display = evt ? 'none' : '';
+		rangeElement.style.display = evt && list.length > 1 ? '' : 'none';
+		selectorElement.style.display = evt ? '' : 'none';
 		selectorElement.style.maxHeight = (map.getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}
 
@@ -1000,8 +1000,8 @@ function controlPermalink(options) {
 		divElement.appendChild(aElement);
 	}
 
-	function render(event) {
-		var view = event.map.getView();
+	function render(evt) {
+		var view = evt.map.getView();
 
 		// Set the map at the init
 		if (options.init !== false && // If use hash & cookies
@@ -1095,14 +1095,14 @@ function controlLengthLine() {
 			render: render
 		});
 
-	function render(event) {
+	function render(evt) {
 		if (!divElement.className) { // Only once
 			divElement.className = 'ol-length-line';
 
-			event.map.on(['pointermove'], function(event) {
+			evt.map.on(['pointermove'], function(evtm) {
 				divElement.innerHTML = ''; // Clear the measure if hover no feature
 
-				event.map.forEachFeatureAtPixel(event.pixel, calculateLength, {
+				evtm.map.forEachFeatureAtPixel(evtm.pixel, calculateLength, {
 					hitTolerance: 6
 				});
 			});
@@ -1205,22 +1205,22 @@ function controlDownloadGPX() {
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	function render(event) {
+	function render(evt) {
 		if (!map) {
-			map = event.map;
+			map = evt.map;
 
 			// Selection of lines
 			var select = new ol.interaction.Select({
-				condition: function(event) {
-					return ol.events.condition.shiftKeyOnly(event) && ol.events.condition.click(event);
+				condition: function(evts) {
+					return ol.events.condition.shiftKeyOnly(evts) && ol.events.condition.click(evts);
 				},
 				filter: function(f) {
 					return f.getGeometry().getType().indexOf('Line') !== -1;
 				},
 				hitTolerance: 6
 			});
-			select.on('select', function(event) {
-				selectedFeatures = event.target.getFeatures().getArray();
+			select.on('select', function(evts) {
+				selectedFeatures = evts.target.getFeatures().getArray();
 			});
 			map.addInteraction(select);
 		}
@@ -1283,8 +1283,8 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton
  */
-function controlEdit(options) {
-	var inputEl = document.getElementById(options.inputId), // Read data in an html element
+function controlEdit(inputId, snapLayers) {
+	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
 			JSON.parse(inputEl.value), {
@@ -1299,6 +1299,7 @@ function controlEdit(options) {
 			source: source,
 			zIndex: 3
 		}),
+		//TODO BUG hover reste aprés l'ajout d'un polygone
 		hover = new ol.interaction.Select({
 			layers: [layer],
 			condition: ol.events.condition.pointerMove,
@@ -1309,9 +1310,9 @@ function controlEdit(options) {
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
-			deleteCondition: function(event) {
+			deleteCondition: function(evt) {
 				//HACK because the system don't trig singleClick
-				return ol.events.condition.altKeyOnly(event) && ol.events.condition.click(event);
+				return ol.events.condition.altKeyOnly(evt) && ol.events.condition.click(evt);
 			}
 		}),
 		button = controlButton({
@@ -1324,20 +1325,19 @@ function controlEdit(options) {
 				"Ctrl+Alt+click sur une ligne pour la supprimer",
 			toggle: true,
 			activate: function(active) {
-				hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
-				//snap.setActive(active);
+				//TODO hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
 				modify.setActive(active);
 			}
 		}),
 		map_;
 
-	button.getSource = function() {
-		return source; //TODO BEST avoid this HACK
-	};
+	// Make available to the buttons group
+	button.source = source;
+	button.editorActions = editorActions;
 
-	function render(event) {
+	function render(evt) {
 		if (!map_) { // Only once
-			map_ = event.map;
+			map_ = evt.map;
 			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor
 			map_.addLayer(layer);
 
@@ -1347,16 +1347,15 @@ function controlEdit(options) {
 					map_.removeInteraction(i);
 			});
 
-			map_.addInteraction(hover);
+			//TODO map_.addInteraction(hover);
+			map_.addInteraction(snap);
 			map_.addInteraction(modify);
 			modify.setActive(false);
-			map_.addInteraction(snap);
-			//snap.setActive(false);
 
 			// Snap on features external to the editor
-			if (options.snapLayers)
-				for (var s in options.snapLayers)
-					options.snapLayers[s].getSource().on('change', snapFeatures);
+			if (snapLayers)
+				for (var s in snapLayers)
+					snapLayers[s].getSource().on('change', snapFeatures);
 		}
 	}
 
@@ -1366,26 +1365,16 @@ function controlEdit(options) {
 			snap.addFeature(fs[f]);
 	}
 
-	source.on(['change'], function() {
-		// Save lines in <EL> as geoJSON at every change
-		inputEl.value = format.writeFeatures(source.getFeatures(), {
-			featureProjection: 'EPSG:3857'
-		});
-	});
-
-	modify.on('modifyend', function(event) {
-		if (event.mapBrowserEvent.originalEvent.altKey) {
+	modify.on('modifyend', function(evt) {
+		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			if (event.mapBrowserEvent.originalEvent.ctrlKey)
-				deleteFeatureAt(event.mapBrowserEvent.pixel);
+			if (evt.mapBrowserEvent.originalEvent.ctrlKey)
+				deleteFeatureAt(evt.mapBrowserEvent.pixel);
 			// altKey : delete segment
-			else if (event.target.vertexFeature_) // Click on a segment
-				editorActions(event.target.vertexFeature_.getGeometry().getCoordinates());
-			else // Remove a summitt
-				editorActions();
-		} else
-			// Create or drag summitt
-			editorActions();
+			else if (evt.target.vertexFeature_) // Click on a segment
+				return editorActions(evt.target.vertexFeature_.getGeometry().getCoordinates());
+		}
+		editorActions();
 	});
 
 	// Make the required changes / reorganize edited geometries
@@ -1413,8 +1402,8 @@ function controlEdit(options) {
 				lines[a] = null;
 
 			// Treat closed lines as polygons
-			//TODO BUG : perd tous les polygones
-			if (options.transform && compareCoords(lines[a])) {
+			if (button.controlGroup.P && // Only if we manage Polygons
+				compareCoords(lines[a])) {
 				polys.push([lines[a]]);
 				lines[a] = null;
 			}
@@ -1435,7 +1424,8 @@ function controlEdit(options) {
 								lines[m[1]] = 0;
 
 								// Re-check if the new line is closed
-								if (options.transform && compareCoords(lines[m[0]])) {
+								if (button.controlGroup.P && // Only if we manage Polygons
+									compareCoords(lines[m[0]])) {
 									polys.push([lines[m[0]]]);
 									lines[m[0]] = null;
 								}
@@ -1474,6 +1464,12 @@ function controlEdit(options) {
 				source.addFeature(new ol.Feature({
 					geometry: new ol.geom.Polygon(polys[p])
 				}));
+
+		// Save lines in <EL> as geoJSON at every change
+		//TODO réduire le nb de décimales
+		inputEl.value = format.writeFeatures(source.getFeatures(), {
+			featureProjection: 'EPSG:3857'
+		});
 	}
 
 	function flatCoord(existingCoords, newCoords, pointerPosition) {
@@ -1483,7 +1479,8 @@ function controlEdit(options) {
 		else {
 			existingCoords.push([]); // Increment existingCoords array
 			for (var c in newCoords)
-				if (options.transform && pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
+				if (button.controlGroup.L && // Only if we manage Lines
+					pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
 					// If this is the pointed one, forget it &
 					existingCoords.push([]); // & increment existingCoords array
 				} else
@@ -1506,35 +1503,31 @@ function controlEdit(options) {
 //TODO snap sur création
 function controlCreate(controlEditor, type) {
 	var draw = new ol.interaction.Draw({
-			source: controlEditor.getSource(),
+			source: controlEditor.source,
 			type: type
 		}),
 		button = controlButton({
 			label: type.charAt(0),
 			render: render,
-			title: type == 'Polygon' ?
-				"Editeur \nPOLYGON" //TODO
-				:
-				"Editeur \nLIGNE", //TODO
+			title: 'Activer puis cliquer sur la carte pour dessiner ' + (type == 'Polygon' ? "un polygone" : "une ligne"),
 			controlGroup: controlEditor.controlGroup,
 			activate: function(active) {
 				draw.setActive(active);
 			}
-		}),
-		map_;
+		});
 
-	function render(event) {
-		if (!map_) { // Only once //TODO simplifier !
-			map_ = event.map;
-
-			map_.addInteraction(draw);
+	function render(evt) {
+		if (!draw.map_) { // Only once
+			evt.map.addInteraction(draw);
 			draw.setActive(false);
 		}
 	}
 
-	draw.on(['drawend'], function() {
+	draw.on(['drawend'], function(evt) {
+		controlEditor.source.addFeature(evt.feature); //TODO BUG bugge aprés inclusion ici
 		button.toggle(false);
 		button.controlGroup.M.toggle(true);
+		button.controlGroup.M.editorActions();
 	});
 
 	return button;

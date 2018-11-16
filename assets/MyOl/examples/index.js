@@ -155,10 +155,7 @@ controlgps.callBack = function (position) {
 }
 
 map.addControl(controlLayersSwitcher(layers));
-var ce = controlEdit({
-	inputId: 'geojson',
-	snapLayers: overlays
-});
+var ce = controlEdit('geojson', overlays);
 map.addControl(ce);
 map.addControl(controlCreate(ce, 'LineString'));
 map.addControl(controlCreate(ce, 'Polygon'));
