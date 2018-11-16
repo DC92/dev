@@ -328,7 +328,6 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires 'onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
-//TODO BUG Uncaught SyntaxError: Unexpected token < in JSON at position 46735
 function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
@@ -1318,11 +1317,11 @@ function controlEdit(inputId, snapLayers) {
 		button = controlButton({
 			label: 'M',
 			render: render,
-			title: "Click sur un sommet puis déplacer pour modifier\n" +
-				"Click sur un segment puis déplacer pour créer un sommet\n" +
-				"Alt+click sur un sommet pour le supprimer\n" +
-				"Alt+click sur un segment pour le supprimer et couper la ligne\n" + //TODO only if line creation declared
-				"Ctrl+Alt+click sur une ligne pour la supprimer",
+			title: 'Activer "M" puis cliquer et déplacer un sommet pour modifier un polygone\n' +
+				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+				'Alt+cliquer sur un sommet pour le supprimer\n' +
+//TODO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
+				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			toggle: true,
 			activate: function(active) {
 				//TODO hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
@@ -1501,7 +1500,7 @@ function controlEdit(inputId, snapLayers) {
 }
 
 //TODO snap sur création
-function controlCreate(controlEditor, type) {
+function controlEditCreate(controlEditor, type) {
 	var draw = new ol.interaction.Draw({
 			source: controlEditor.source,
 			type: type
@@ -1509,7 +1508,9 @@ function controlCreate(controlEditor, type) {
 		button = controlButton({
 			label: type.charAt(0),
 			render: render,
-			title: 'Activer puis cliquer sur la carte pour dessiner ' + (type == 'Polygon' ? "un polygone" : "une ligne"),
+			title: 'Activer "' + type.charAt(0) + '" puis cliquer sur la carte et sur chaque point du tracé pour dessiner ' +
+				(type == 'LineString' ? 'une ligne' :
+					'un polygone\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".'),
 			controlGroup: controlEditor.controlGroup,
 			activate: function(active) {
 				draw.setActive(active);

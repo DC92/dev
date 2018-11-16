@@ -364,7 +364,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 //TODO Présence de parc : automatiser
 
-/*/TODO // Détermination du massif par refuges.info
+/*//TODO Détermination du massif par refuges.info
 		if (array_key_exists ('geo_massif', $row) && !$row['geo_massif']) {
 			$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.$ll[1][0].','.$ll[1][1].','.$ll[1][0].','.$ll[1][1];
 			$wri_export = json_decode (@file_get_contents ($f_wri_export));
@@ -467,7 +467,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
-		// TODO : traiter au niveau du formulaire (avertissement de modif ?)
+		//TODO traiter au niveau du formulaire (avertissement de modif ?)
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = 'NEW';
 
@@ -478,7 +478,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				$page_data[strtoupper ($k)] =
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 
-		// HORRIBLE phpbb hack to accept geom values / TODO : check if done by PhpBB (supposed 3.2)
+		// HORRIBLE phpbb hack to accept geom values //TODO : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
 		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";

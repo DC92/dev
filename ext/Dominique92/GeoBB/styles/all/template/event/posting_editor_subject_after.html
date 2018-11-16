@@ -27,23 +27,26 @@
 		var overlay = geoLayer(0, true); //TODO exclude edited topic
 		map = new ol.Map({
 			target: 'map',
-//TODO DEBUG			layers: [overlay],
 			controls: geobbControls()
 		});
-		map.addControl(controlLayersSwitcher(
-			layers({GEO_OLKEYS})
-		));
 		var permalink = controlPermalink({
-			init: true,
+			init: false,
 			visible: true
 		});
 		map.addControl(permalink);
+		map.addControl(controlLayersSwitcher(
+			layers({GEO_OLKEYS})
+		));
+
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			editable = marker(targetImage, 'editable', permalink.paramsCenter, true);
 			map.addLayer(editable);
 		<!-- ENDIF -->
-		<!-- IF FORUM_NAME == 'Alpages' -->
-			map.addControl(controlEditor('editable-json', [overlay], 'Polygon'));
+		<!-- IF GEO_MAP_TYPE == 'surface' -->
+			var ce = controlEdit('editable-json', [overlay]);
+			map.addControl(ce);
+			map.addControl(controlEditCreate(ce, 'Polygon'));
+			map.getView().fit(ce.source.getExtent());
 		<!-- ENDIF -->
 	});
 </script>

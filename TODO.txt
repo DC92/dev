@@ -8,7 +8,6 @@ CTRL + Click -> Autre page
 
 BUGS
 ====
-Centrer editeur sur le prérimètre à éditer
 TEST : nominatim adresse, ... (=> Commune)
 Aligner les boutons (un trou ! = GPS)
 Présence d'autres usagers : plusieurs séléctions
