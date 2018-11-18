@@ -32,8 +32,8 @@ class listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->user = $user;
 		$this->auth = $auth;
-//TODO		$this->extension_manager = $extension_manager;
-//TODO		$this->root_path = $root_path;
+//TODO BEST		$this->extension_manager = $extension_manager;
+//TODO BEST		$this->root_path = $root_path;
 	}
 
 	// Liste des hooks et des fonctions associées
@@ -189,8 +189,8 @@ class listener implements EventSubscriberInterface
 				v.forum_id != p.forum_id AND
 				Contains (v.geom, p.geom)
 			";
-		//TODO en MySQL 5.7+, utiliser ST_Contains
-		//TODO BUG pour un point, trouver la zone qui le contient
+		//TODO BEST en MySQL 5.7+, utiliser ST_Contains
+		//TODO BEST pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$block = 'contains_'.basename ($row['forum_image'], '.png');
@@ -227,8 +227,7 @@ class listener implements EventSubscriberInterface
 
 			foreach ($row AS $k=>$v)
 				if (strstr ($k, 'geo')) {
-					// Assign the phpbb_posts.geo* SQL data of each template post area
-//TODO DELETE ???					$post_row[strtoupper ($k)] = $v; //TODO Et ça n'est pas écrasé par le précédent ????
+				//TODO BEST [xxx=all] Assign the phpbb_posts.geo* SQL data of each template post area
 /*
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)
@@ -245,18 +244,25 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	function gis_modify_data($vars) { //TODO DELETE
+	function gis_modify_data($vars) { //TODO BEST DELETE
 //if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
 /*
 		// Insère l'extraction des données externes dans le flux géographique
 		$row = $vars['row'];
 
 		if ($vars['diagBbox'])
-//TODO			$this->optim ($row['geophp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
+			$this->optim ($row['geophp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
 
 		$vars['row'] = $row;
 */
 	}
+
+
+	/*//TODO BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
+    $oGeometry = geoPHP::load($sWkt,'wkt');    
+    $reducedGeom = $oGeometry->simplify(1.5);
+    $sWkt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
+	*/
 	function optim (&$g, $granularity) { // Fonction récursive d'optimisation d'un objet PHP contenant des objets géographiques
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim',true).'</pre>';
 /*
@@ -348,13 +354,14 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 
 		// Calcul de la commune
+		//TODO BUG BEST nominatim adresse, ... (=> Commune)
 		if (!$row['geo_commune']) {
 			$nominatim = json_decode (@file_get_contents (
 				'https://nominatim.openstreetmap.org/reverse?format=json&lon='.$centre[0].'&lat='.$centre[1],
 				false, 
 				stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
 			));
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($nominatim->address,true).'</pre>';
+/*//TODO DELETE */echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($nominatim->address,true).'</pre>';
 			if ($nominatim)
 				$row['geo_commune'] =
 				$sql_update['geo_commune'] =
@@ -362,9 +369,9 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					($nominatim->address->town ?: $nominatim->address->city_district ?: $nominatim->address->city ?: $nominatim->address->village);
 		}
 
-//TODO Présence de parc : automatiser
+//TODO ASPIR Présence de parc : automatiser (=> WRI ?)
 
-/*//TODO Détermination du massif par refuges.info
+/*//TODO CHEM Détermination du massif par refuges.info
 		if (array_key_exists ('geo_massif', $row) && !$row['geo_massif']) {
 			$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.$ll[1][0].','.$ll[1][1].','.$ll[1][0].','.$ll[1][1];
 			$wri_export = json_decode (@file_get_contents ($f_wri_export));
@@ -462,12 +469,12 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
 			$this->get_bounds($geophp);
 			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-//TODO			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
+//TODO BEST			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
 			$post_data['geojson'] = json_encode ($gp);
 		}
 
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
-		//TODO traiter au niveau du formulaire (avertissement de modif ?)
+		//TODO BEST traiter au niveau du formulaire (avertissement de modif ?)
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = 'NEW';
 
@@ -478,7 +485,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				$page_data[strtoupper ($k)] =
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 
-		// HORRIBLE phpbb hack to accept geom values //TODO : check if done by PhpBB (supposed 3.2)
+		// HORRIBLE phpbb hack to accept geom values //TODO BEST : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
 		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";

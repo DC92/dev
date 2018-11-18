@@ -7,7 +7,7 @@
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
  
 <!-- Proj4 projections Swiss & UK -->
-<!-- //TODO pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
+<!-- //TODO CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
@@ -158,6 +158,8 @@
 		<!-- IF GEO_POTABLE --><p>Eau potable {GEO_POTABLE}</p><!-- ENDIF -->
 		<!-- IF GEO_DEBIT --><p>Débit {GEO_DEBIT}</p><!-- ENDIF -->
 	<!-- ENDIF -->
+
+	<!-- //TODO BEST météo idem WRI -->
 </div>
 
 <div class="action-bar">
@@ -185,27 +187,32 @@
 <script>
 	window.addEventListener('load', function() {
 		var map = new ol.Map({
-				target: 'map',
-				layers: [geoLayer({TOPIC_ID})],
-				controls: geobbControls()
-			});
-		map.addControl(controlLayersSwitcher(
-			layers({GEO_OLKEYS})
-		));
-		map.addControl(controlPermalink({
-			init: false,
-			visible: false
-		}));
-		if (typeof overlaySelector == 'function')
-			map.addLayer (overlaySelector ());
+			target: 'map',
+			layers: [
+				geoLayer({TOPIC_ID})
+			],
+			controls: geobbControls().concat([
+				controlLayersSwitcher(
+					layers({GEO_OLKEYS}),
+					overlaySelector()
+				),
+				controlPermalink({
+					init: false,
+					visible: false
+				})
+			])
+		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			var marqueur = marker(markerImage, 'marqueur'),
 				pos = marqueur.getPoint().getCoordinates();
 			map.addLayer(marqueur);
+
+		// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
 		<!-- ENDIF -->
+
 		<!-- IF GEO_MAP_TYPE == 'surface' -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
@@ -214,6 +221,8 @@
 				source = new ol.source.Vector({
 					features: format.readFeatures(eljson.innerHTML)
 				});
+
+			// Center the map
 			map.getView().fit(source.getExtent());
 		<!-- ENDIF -->
 	});

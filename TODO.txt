@@ -1,17 +1,5 @@
-OPENLAYERS
-==========
-Pas de click sur le label d'une icone sur la carte
-Quand click sur plusieurs features, exécute le click en dessous
-IE : pas de SGV
-Edge : Viseur noir
-CTRL + Click -> Autre page
-
-BUGS
-====
-TEST : nominatim adresse, ... (=> Commune)
-Aligner les boutons (un trou ! = GPS)
-Présence d'autres usagers : plusieurs séléctions
-...OLD :
+BUGS CHEMINEUR
+==============
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
 Suppression fichier attach ne supprime pas l'attachment.
 Diapo : ne s'arrête pas sur touche escape
@@ -25,29 +13,21 @@ Pourquoi post_attachment = 0 si on a une image ?
 Click sur une icone chem2 plante
 Image interdite dans texte
 	http://chemineur.fr/viewtopic.php?t=10411#p29247
-
-TODO
-====
-geophp simplify : https://github.com/phayes/geoPHP/issues/24
-    $oGeometry = geoPHP::load($sWkt,'wkt');    
-    $reducedGeom = $oGeometry->simplify(1.5);
-    $sWkt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
-Voir les //TODO
 Interface VTTRACK
 	Icônes KO
 	Priorité pas aux orris !!
 	Reprendre interface sur chem3
 
+TODO
+====
+Voir dans myol et /ext : //TODO //BUG //DELETE //BEST //BLOCKING
+
 BEST TODO
 =========
-Meteo sur ASPIR
 Mettre ?date dans les liens des libs LL.
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
-En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
 Pouvoir trier les posts WRIC
 Meteo sur chem
-GPX : Nommage des tracks / du fichier.
-BUG: function gis_after($vars) : pb de ob_flush sur 1&1
 Mettre les media print dans print.css
 CSS bug chem cadre liens sur largeur fenêtre petite
 Choix type trace GPS
@@ -56,7 +36,6 @@ Appli méteo suisse
 Créer les massifs manquants sur WRI
 Import WRI: importer texte fiche ?
 Ajouter l'origine des pages importées chemineur
-GIS.PHP faire du BBOX une diagonale pour Intersects
 Barmenu: Enveloppe message trop basse dans Chrome
 Diaporama pleine page ? En particulier sur mobile
 	Echap par une touche sur mobile pas pratique
@@ -86,7 +65,6 @@ Revenir à la page où on était quand on se connecte
 				$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login&amp;redirect='.$request->server('REQUEST_URI', '')); //GEO Redirige sur la page initiale apres le login
 		//GEO login		$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
 		+++ logout
-Aspect bouton créer un point dans viewforums
 Ajouter bouton permutation sur page point chem
 	View film + permutation
 

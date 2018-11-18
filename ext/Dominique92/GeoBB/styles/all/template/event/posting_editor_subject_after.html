@@ -7,7 +7,7 @@
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
 
 <!-- Proj4 projections Swiss & UK -->
-<!-- //TODO pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
+<!-- //TODO CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
@@ -24,36 +24,44 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer(0, true); //TODO exclude edited topic
+		var overlay = geoLayer(0, true),
+			permalink = controlPermalink({
+				init: false,
+				visible: true
+			}),
+			edit = controlEdit('editable-json', [], true),
+			poly = controlEditCreate('Polygon'); //TODO exclude edited topic
 		map = new ol.Map({
 			target: 'map',
-			controls: geobbControls()
+			controls: geobbControls().concat([
+				controlLayersSwitcher(
+					layers({GEO_OLKEYS})
+				),
+				<!-- IF GEO_MAP_TYPE == 'surface' -->
+					edit,
+					poly,
+				<!-- ENDIF -->
+				permalink
+			])
 		});
-		var permalink = controlPermalink({
-			init: false,
-			visible: true
-		});
-		map.addControl(permalink);
-		map.addControl(controlLayersSwitcher(
-			layers({GEO_OLKEYS})
-		));
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			editable = marker(targetImage, 'editable', permalink.paramsCenter, true);
 			map.addLayer(editable);
 		<!-- ENDIF -->
-		<!-- IF GEO_MAP_TYPE == 'surface' -->
-			var ce = controlEdit('editable-json', [overlay]);
-			map.addControl(ce);
-			map.addControl(controlEditCreate(ce, 'Polygon'));
-			map.getView().fit(ce.source.getExtent());
-		<!-- ENDIF -->
+
+		// Center the map
+		map.getView().fit(
+			edit.source.getExtent(), {
+				maxZoom: 15
+			}
+		);
 	});
 </script>
 
 <dl class="posting-point" style="clear: left;">
 	<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
-	<!-- //TODO pour all : 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p> -->
+	<!-- //TODO CHEM pour all : 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p> -->
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<p>
@@ -112,6 +120,7 @@
 		</select></p>
 
 		<h3>1.5 Autres usagers</h3>
+		<!-- //TODO BLOCKING Présence d'autres usagers : plusieurs séléctions -->
 		<p>Présence d'autres usagers <select name="geo_usagers-varchar-20">
 			<option value=""></option>
 			<option value="VTT" <!-- IF GEO_USAGERS == 'VTT' -->selected="selected"<!-- ENDIF -->>VTT</option> 

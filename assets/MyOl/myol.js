@@ -29,7 +29,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 //***************************************************************
 // TILE LAYERS
 //***************************************************************
-//BEST Superzoom
+//TODO BEST Superzoom
 /**
  * Openstreetmap
  */
@@ -230,7 +230,7 @@ function layerIGM() {
 	});
 }
 
-//BEST éviter d'appeler à l'init https://dev.virtualearth.net sur les cartes BING
+//TODO BEST éviter d'appeler à l'init https://dev.virtualearth.net sur les cartes BING
 /**
  * Ordnance Survey : Great Britain
  * Requires layerTileIncomplete
@@ -372,6 +372,8 @@ function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
+		//TODO Pas de click sur le label d'une icone sur la carte
+		//TODO BLOCKING Quand click sur plusieurs features, exécute le click en dessous
 		map.popElement_ = document.createElement('div');
 		var dx = 0.4,
 			xAnchor, // Spread too closes icons
@@ -440,7 +442,7 @@ function initLayerVectorURLListeners(e) {
 			// Apply hover if any
 			var style = (h.options.hover || h.options.style)(h.properties);
 
-			// Spread too closes icons //TODO BUG don't allow to click on the last !!
+			// Spread too closes icons //TODO BUG BLOCKING don't allow to click on the last !!
 			if (hovered.length > 1 &&
 				style.image)
 				style.image.anchor_[0] = xAnchor -= dx;
@@ -472,6 +474,7 @@ function initLayerVectorURLListeners(e) {
 		}
 
 		// Click on a feature
+		//TODO BEST CTRL + Click -> New navigator tab
 		map.on('click', function(evt) {
 			if (!evt.originalEvent.shiftKey &&
 				!evt.originalEvent.ctrlKey &&
@@ -792,6 +795,8 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 }
 
 // Basic images
+//TODO IE BLOCKING : pas de SGV
+//TODO BLOCKING EDGE centre viseur et marqueur noir
 var markerImage =
 	'data:image/svg+xml;utf8,' +
 	'<svg xmlns="http://www.w3.org/2000/svg" width="31" height="43" ' +
@@ -820,6 +825,7 @@ var markerImage =
  * options.render {function} called when the control is rendered.
  * options.action {function} called when the control is clicked.
  */
+//TODO Aligner les boutons (un trou ! = GPS)
 var nextButtonTopPos = 6, // Top position of next button (em)
 	globalControlGroups = {}; // List of group controls
 
@@ -1093,7 +1099,7 @@ function controlGPS() {
 /**
  * Control to displays the length of a line overflown
  */
-//TODO BEST color the measured line
+//TODO BEST CHEM/RANDO color the measured line
 function controlLengthLine() {
 	var divElement = document.createElement('div'),
 		control = new ol.control.Control({
@@ -1116,7 +1122,7 @@ function controlLengthLine() {
 	}
 
 	function calculateLength(f) {
-/*//TODO idée de hover à développer
+/*//TODO BEST RANDO idée de hover à développer
 		//if(0)//TODO BUG inhibe modify !!!
 		f.setStyle(//TODO mettre en forme / effacer le style quand on quite
       new ol.style.Style({
@@ -1146,7 +1152,8 @@ function controlLengthLine() {
  * GPX file loader control
  * Requires controlButton
  */
-//BEST Pas d'upload/download sur mobile (-> va vers photos !)
+//TODO BEST En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
+//TODO BEST Pas d'upload/download sur mobile (-> va vers photos !)
 function controlLoadGPX() {
 	var inputElement = document.createElement('input'),
 		button = controlButton({
@@ -1199,6 +1206,7 @@ function controlLoadGPX() {
  * GPX file downloader control
  * Requires controlButton
  */
+//TODO BEST Nommage des tracks / du fichier.
 function controlDownloadGPX() {
 	var map,
 		selectedFeatures = [],
@@ -1286,7 +1294,7 @@ window.addEventListener('load', function() {
  * Print control
  */
 function controlPrint() {
-//TODO impression full format page -> CSS
+//TODO CHEM/RANDO impression full format page -> CSS
 	return controlButton({
 		className: 'print-button',
 		title: 'Imprimer la carte',
@@ -1336,13 +1344,13 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			group: 'edit',
 			label: 'M',
 			render: render,
-			title: 'Activer "M" puis cliquer et déplacer un sommet pour modifier un polygone\n' +
+			title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
 				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 				'Alt+cliquer sur un sommet pour le supprimer\n' +
-				//TODO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
+				//TODO CHEM only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			activate: function(active) {
-				//TODO hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
+				//TODO CHEM hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
 				modify.setActive(active);
 			}
 		}),
@@ -1430,7 +1438,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			}
 
 			// Merge lines having a common end
-			//TODO BUG don't merge recursively (join 2 existing lines)
+			//TODO BUG CHEM don't merge recursively (join 2 existing lines)
 			for (var b in lines)
 				if (a < b) {
 					var m = [a, b];
@@ -1488,7 +1496,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 				}));
 
 		// Save lines in <EL> as geoJSON at every change
-		//TODO réduire le nb de décimales
+		//TODO BEST réduire le nb de décimales
 		inputEl.value = format.writeFeatures(source.getFeatures(), {
 			featureProjection: 'EPSG:3857'
 		});
@@ -1596,7 +1604,7 @@ function controlsCollection() {
 		controlgps,
 		controlLoadGPX(),
 		controlDownloadGPX(),
-		//TODO controlPrint(),
+		//TODO CHEM controlPrint(),
 	];
 }
 

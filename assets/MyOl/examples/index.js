@@ -145,8 +145,7 @@ var layerSwitcher = controlLayersSwitcher(layersCollection({
 	],
 	map = new ol.Map({
 		target: 'map',
-		controls: controlsCollection().
-		concat([
+		controls: controlsCollection().concat([
 			layerSwitcher,
 			controlEdit('geojson', overlays, true),
 			controlEditCreate('LineString'),
