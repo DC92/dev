@@ -820,26 +820,37 @@ var markerImage =
  * options.render {function} called when the control is rendered.
  * options.action {function} called when the control is clicked.
  */
-var nextButtonTopPos = 6; // Top position of next button (em)
+var nextButtonTopPos = 6, // Top position of next button (em)
+	globalControlGroups = {}; // List of group controls
 
 function controlButton(options) {
 	options = options || {
 		className: 'ol-control-hidden'
 	};
 
-	var buttonElement = document.createElement('button'),
+	var groupIndex = options.group || nextButtonTopPos, // Arbitrary index of the control controlGroup
+		controlIndex = options.label || nextButtonTopPos, // Arbitrary index of the control in the controlGroup
+		buttonElement = document.createElement('button'),
 		divElement = document.createElement('div'),
 		control = new ol.control.Control({
 			element: divElement,
 			render: options.render
 		});
 
+	// Group button of the same category
+	if (groupIndex) {
+		if (!globalControlGroups[groupIndex])
+			globalControlGroups[groupIndex] = {};
+		globalControlGroups[groupIndex][controlIndex] = control; // List of group controls
+		control.group = globalControlGroups[groupIndex]; // This button is included in the group list
+	}
+
 	buttonElement.innerHTML = options.label || '';
 	buttonElement.addEventListener('click', function(evt) {
 		evt.preventDefault();
 
-		for (c in control.controlGroup)
-			control.controlGroup[c].toggle(!control.active && c == cgIndex)
+		for (c in control.group)
+			control.group[c].toggle(!control.active && c == controlIndex)
 	});
 
 	divElement.appendChild(buttonElement);
@@ -853,15 +864,11 @@ function controlButton(options) {
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
 	}
 
-	// List contols on the same exclusive group
-	var cgIndex = options.label || nextButtonTopPos;
-	control.controlGroup = options.controlGroup || {};
-	control.controlGroup[cgIndex] = control;
-	control.active = false;
-
+	// Toggle the button status & aspect
+	// In case of group buttons, set inactive the other one
 	control.toggle = function(newActive) {
 		if (newActive != control.active) {
-			if (options.toggle || options.controlGroup)
+			if (options.activate || control.group)
 				control.active = newActive;
 			buttonElement.style.backgroundColor = control.active ? '#ccc' : 'white';
 
@@ -1056,7 +1063,6 @@ function controlGPS() {
 		button = controlButton({
 			className: 'gps-button',
 			title: 'Centrer sur la position GPS',
-			toggle: true,
 			activate: function(active) {
 				geolocation.setTracking(active);
 				if (active)
@@ -1110,6 +1116,17 @@ function controlLengthLine() {
 	}
 
 	function calculateLength(f) {
+/*//TODO idée de hover à développer
+		//if(0)//TODO BUG inhibe modify !!!
+		f.setStyle(//TODO mettre en forme / effacer le style quand on quite
+      new ol.style.Style({
+//          fill: new ol.style.Fill({opacity: 0.7}),
+          stroke: new ol.style.Stroke({color: 'blue'
+          })
+      })
+  );
+*/
+		
 		var length = ol.sphere.getLength(f.getGeometry());
 		if (length >= 100000)
 			divElement.innerHTML = (Math.round(length / 1000)) + ' km';
@@ -1283,7 +1300,7 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton
  */
-function controlEdit(inputId, snapLayers) {
+function controlEdit(inputId, snapLayers, enableAtInit) {
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
@@ -1299,12 +1316,12 @@ function controlEdit(inputId, snapLayers) {
 			source: source,
 			zIndex: 3
 		}),
-		//TODO BUG hover reste aprés l'ajout d'un polygone
+		/*//TODO BUG hover reste aprés l'ajout d'un polygone
 		hover = new ol.interaction.Select({
 			layers: [layer],
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6
-		}),
+		}),*/
 		snap = new ol.interaction.Snap({
 			source: source
 		}),
@@ -1316,6 +1333,7 @@ function controlEdit(inputId, snapLayers) {
 			}
 		}),
 		button = controlButton({
+			group: 'edit',
 			label: 'M',
 			render: render,
 			title: 'Activer "M" puis cliquer et déplacer un sommet pour modifier un polygone\n' +
@@ -1323,7 +1341,6 @@ function controlEdit(inputId, snapLayers) {
 				'Alt+cliquer sur un sommet pour le supprimer\n' +
 				//TODO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
-			toggle: true,
 			activate: function(active) {
 				//TODO hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
 				modify.setActive(active);
@@ -1333,12 +1350,13 @@ function controlEdit(inputId, snapLayers) {
 
 	// Make available to the buttons group
 	button.source = source;
+	button.snap = snap;
 
-	function render(evt) {
+	function render(evt) { //HACK to get map ref when the control is added
 		if (!map_) { // Only once
 			map_ = evt.map;
-			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor //TODO simplifier ?
 			map_.addLayer(layer);
+			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor
 
 			//HACK Avoid zooming when you leave the mode by doubleclick
 			map_.getInteractions().getArray().forEach(function(i) {
@@ -1349,7 +1367,7 @@ function controlEdit(inputId, snapLayers) {
 			//TODO map_.addInteraction(hover);
 			map_.addInteraction(modify);
 			map_.addInteraction(snap);
-			button.toggle(true);
+			button.toggle(enableAtInit);
 
 			// Snap on features external to the editor
 			if (snapLayers)
@@ -1384,9 +1402,9 @@ function controlEdit(inputId, snapLayers) {
 	});
 
 	source.on(['change'], function() {
-		if (button.modified) {
+		if (button.modified) { // Only when required to avoid recursive loops
 			button.modified = false;
-			editorActions();
+			editorActions(); // Do it now as a feature has been added or changed
 		}
 	});
 
@@ -1405,13 +1423,14 @@ function controlEdit(inputId, snapLayers) {
 				lines[a] = null;
 
 			// Convert closed lines into polygons
-			if (button.controlGroup.P && // Only if we manage Polygons
+			if (button.group.P && // Only if we manage Polygons
 				compareCoords(lines[a])) {
 				polys.push([lines[a]]);
 				lines[a] = null;
 			}
 
 			// Merge lines having a common end
+			//TODO BUG don't merge recursively (join 2 existing lines)
 			for (var b in lines)
 				if (a < b) {
 					var m = [a, b];
@@ -1427,7 +1446,7 @@ function controlEdit(inputId, snapLayers) {
 								lines[m[1]] = 0;
 
 								// Re-check if the new line is closed
-								if (button.controlGroup.P && // Only if we manage Polygons
+								if (button.group.P && // Only if we manage Polygons
 									compareCoords(lines[m[0]])) {
 									polys.push([lines[m[0]]]);
 									lines[m[0]] = null;
@@ -1482,7 +1501,7 @@ function controlEdit(inputId, snapLayers) {
 		else {
 			existingCoords.push([]); // Increment existingCoords array
 			for (var c in newCoords)
-				if (button.controlGroup.L && // Only if we manage Lines
+				if (button.group.L && // Only if we manage Lines
 					pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
 					// If this is the pointed one, forget it &
 					existingCoords.push([]); // & increment existingCoords array
@@ -1503,35 +1522,36 @@ function controlEdit(inputId, snapLayers) {
 	return button;
 }
 
-//TODO snap sur création
-function controlEditCreate(controlEditor, type) {
-	var draw = new ol.interaction.Draw({
-			source: controlEditor.source,
-			type: type
-		}),
-		button = controlButton({
+function controlEditCreate(type) {
+	var button = controlButton({
+			group: 'edit',
 			label: type.charAt(0),
 			render: render,
 			title: 'Activer "' + type.charAt(0) + '" puis cliquer sur la carte et sur chaque point du tracé pour dessiner ' +
 				(type == 'LineString' ? 'une ligne' :
 					'un polygone\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".'),
-			controlGroup: controlEditor.controlGroup,
 			activate: function(active) {
 				draw.setActive(active);
 			}
-		});
+		}),
+		draw = new ol.interaction.Draw({
+			source: button.group.M.source,
+			type: type
+		})		;
 
-	function render(evt) {
+	function render(evt) { //HACK to get map ref when the control is added
 		if (!draw.map_) { // Only once
+			evt.map.removeInteraction(button.group.M.snap);
 			evt.map.addInteraction(draw);
+			evt.map.addInteraction(button.group.M.snap); // Redo it as snap needs to be added after draw & modify
 			draw.setActive(false);
 		}
 	}
 
 	draw.on(['drawend'], function(evt) {
 		button.toggle(false);
-		button.controlGroup.M.toggle(true);
-		button.controlGroup.M.modified = true;
+		button.group.M.toggle(true);
+		button.group.M.modified = true; // Don't optimize now as the feature is not yet added to the layer
 	});
 
 	return button;
