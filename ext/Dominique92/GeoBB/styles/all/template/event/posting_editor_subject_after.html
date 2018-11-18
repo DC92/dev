@@ -120,21 +120,19 @@
 		</select></p>
 
 		<h3>1.5 Autres usagers</h3>
-		<!-- //TODO BLOCKING Présence d'autres usagers : plusieurs séléctions -->
-		<p>Présence d'autres usagers <select name="geo_usagers-varchar-20">
-			<option value=""></option>
-			<option value="VTT" <!-- IF GEO_USAGERS == 'VTT' -->selected="selected"<!-- ENDIF -->>VTT</option> 
-			<option value="GR" <!-- IF GEO_USAGERS == 'GR' -->selected="selected"<!-- ENDIF -->>GR</option> 
-			<option value="Quad" <!-- IF GEO_USAGERS == 'Quad' -->selected="selected"<!-- ENDIF -->>Quad</option> 
-			<option value="4x4," <!-- IF GEO_USAGERS == '4x4,' -->selected="selected"<!-- ENDIF -->>4x4,</option> 
-			<option value="télésièges/ski" <!-- IF GEO_USAGERS == 'télésièges/ski' -->selected="selected"<!-- ENDIF -->>télésièges/ski</option> 
-			<option value="parapentes," <!-- IF GEO_USAGERS == 'parapentes,' -->selected="selected"<!-- ENDIF -->>parapentes,</option> 
-			<option value="refuge" <!-- IF GEO_USAGERS == 'refuge' -->selected="selected"<!-- ENDIF -->>erfuge</option> 
-			<option value="chasseurs" <!-- IF GEO_USAGERS == 'chasseurs' -->selected="selected"<!-- ENDIF -->>chasseurs</option> 
-			<option value="forestiers" <!-- IF GEO_USAGERS == 'forestiers' -->selected="selected"<!-- ENDIF -->>forestiers</option> 
-			<option value="gardes" <!-- IF GEO_USAGERS == 'gardes' -->selected="selected"<!-- ENDIF -->>gardes</option> 
-			<option value="autre..." <!-- IF GEO_USAGERS == 'autre...' -->selected="selected"<!-- ENDIF -->>autre...</option> 
-		</select></p>
+		
+		<p>Présence d'autres usagers<br />
+			<input type="checkbox" name="geo_usager_vtt-varchar-20" value="VTT," <!-- IF GEO_USAGER_VTT -->checked="checked"<!-- ENDIF --> /> VTT<br />
+			<input type="checkbox" name="geo_usager_gr-varchar-20" value="GR," <!-- IF GEO_USAGER_GR -->checked="checked"<!-- ENDIF --> /> GR<br />
+			<input type="checkbox" name="geo_usager_quad-varchar-20" value="Quad," <!-- IF GEO_USAGER_QUAD -->checked="checked"<!-- ENDIF --> /> Quad<br />
+			<input type="checkbox" name="geo_usager_4x4-varchar-20" value="4x4," <!-- IF GEO_USAGER_4X4 -->checked="checked"<!-- ENDIF --> /> 4x4<br />
+			<input type="checkbox" name="geo_usager_ski-varchar-20" value="télésièges/ski," <!-- IF GEO_USAGER_SKI -->checked="checked"<!-- ENDIF --> /> télésièges/ski<br />
+			<input type="checkbox" name="geo_usager_parapente-varchar-20" value="parapentes," <!-- IF GEO_USAGER_PARAPENTE -->checked="checked"<!-- ENDIF --> /> parapentes<br />
+			<input type="checkbox" name="geo_usager_refuge-varchar-20" value="refuge," <!-- IF GEO_USAGER_REFUGE -->checked="checked"<!-- ENDIF --> /> refuge<br />
+			<input type="checkbox" name="geo_usager_chasseur-varchar-20" value="chasseurs," <!-- IF GEO_USAGER_CHASSEUR -->checked="checked"<!-- ENDIF --> /> chasseurs<br />
+			<input type="checkbox" name="geo_usager_forestier-varchar-20" value="forestiers," <!-- IF GEO_USAGER_FORESTIER -->checked="checked"<!-- ENDIF --> /> forestiers<br />
+			<input type="checkbox" name="geo_usager_garde-varchar-20" value="gardes," <!-- IF GEO_USAGER_GARDE -->checked="checked"<!-- ENDIF --> /> gardes<br />
+			autres <input type="text" name="geo_usager_autre-varchar-80" size="40" class="inputbox autowidth" value="{GEO_USAGER_AUTRE}" /></p>
 
 		<h3>1.6 Héliportage</h3>
 		<p>Héliportage

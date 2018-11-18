@@ -98,7 +98,8 @@ config.php -> clés cartes
 Messages -> Ajouter un bbcode -> [first={TYPE}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
 Permissions -> Permissions des forums -> Tous les forums -> Envoyer -> Utilisateurs enregistrés -> Modifier les permissions
 Général -> Paramètres du serveur -> Activer la compression GZip : oui
-Général -> Configuration du forum -> Libellé du site Internet : 
+Général -> Configuration du forum -> Libellé du site Internet :
+Général -> Paramètres de sécurité -> Autoriser le PHP dans les templates : OUI
 
 MIGRATION
 =========

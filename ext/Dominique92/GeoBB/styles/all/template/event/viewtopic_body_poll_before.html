@@ -76,7 +76,11 @@
 		<!-- IF GEO_RESERVE --><p>Réserve de parc régional ou national : {GEO_RESERVE}</p><!-- ENDIF -->
 
 		<h3>1.5 Autres usagers</h3>
-		<!-- IF GEO_USAGERS --><p>Présence d'autres usagers : {GEO_USAGERS}</p><!-- ENDIF -->
+		<p>Présence d'autres usagers :
+			{GEO_USAGER_VTT} {GEO_USAGER_GR} {GEO_USAGER_QUAD} {GEO_USAGER_4X4}
+			{GEO_USAGER_SKI} {GEO_USAGER_PARAPENTE} {GEO_USAGER_REFUGE} {GEO_USAGER_CHASSEUR}
+			{GEO_USAGER_FORESTIER} {GEO_USAGER_GARDE} {GEO_USAGER_AUTRE}
+		</p>
 
 		<h3>1.6 Héliportage</h3>
 		<p><!-- IF GEO_HELIPORTAGE_DATE -->Héliportage : {GEO_HELIPORTAGE_DATE}<!-- ENDIF -->
