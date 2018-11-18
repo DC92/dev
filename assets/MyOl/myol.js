@@ -372,7 +372,7 @@ function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
-		//TODO Pas de click sur le label d'une icone sur la carte
+		//TODO BEST Pas de click sur le label d'une icone sur la carte
 		//TODO BLOCKING Quand click sur plusieurs features, exécute le click en dessous
 		map.popElement_ = document.createElement('div');
 		var dx = 0.4,
@@ -404,16 +404,16 @@ function initLayerVectorURLListeners(e) {
 
 			// Search the hovered the feature(s)
 			hovered = [];
-			map.forEachFeatureAtPixel(evt.pixel, function(f, l) {
-				if (l && l.options_) {
+			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+				if (layer && layer.options_) {
 					var h = {
 						event: evt,
 						pixel: evt.pixel, // Follow the mouse if line or surface
-						feature: f,
-						layer: l,
-						options: l.options_,
-						properties: f.getProperties(),
-						coordinates: f.getGeometry().flatCoordinates // If it's a point, just over it
+						feature: feature,
+						layer: layer,
+						options: layer.options_,
+						properties: feature.getProperties(),
+						coordinates: feature.getGeometry().flatCoordinates // If it's a point, just over it
 					};
 					if (h.coordinates.length == 2) // Stable if icon
 						h.pixel = map.getPixelFromCoordinate(h.coordinates);
@@ -535,7 +535,7 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
+//TODO BUG BEST quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 function layerOverpass(options) {
 	var layer = layerVectorURL({
 		url: function(bbox, list, resolution) {
@@ -578,8 +578,8 @@ function layerOverpass(options) {
 		label: formatLabel
 	});
 
-//TODO : afficher erreur 429 (Too Many Requests)
-//TODO : afficher affichage OK, ...
+//TODO BEST afficher erreur 429 (Too Many Requests)
+//TODO BEST afficher affichage OK, ...
 	function formatLabel(p, f) { // p = properties, f = feature
 		var language = {
 				alpine_hut: 'Refuge gard&egrave;',
@@ -689,10 +689,10 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-//TODO pointer finger sur la cible
+//TODO BEST pointer finger sur la cible
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
-		eljson, json, ellon, ellat, elxy;
+		eljson, json, elxy;
 
 	if (typeof display == 'string') {
 		eljson = document.getElementById(display + '-json');
@@ -750,7 +750,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			values = {
 				lon: Math.round(ll4326[0] * 100000) / 100000,
 				lat: Math.round(ll4326[1] * 100000) / 100000,
-				json: JSON.stringify(format.writeGeometryObject(point, { //TODO writeGeometryObject {decimals: 5}
+				json: JSON.stringify(format.writeGeometryObject(point, { //TODO BEST writeGeometryObject {decimals: 5}
 					featureProjection: 'EPSG:3857'
 				}))
 			};
@@ -795,7 +795,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 }
 
 // Basic images
-//TODO IE BLOCKING : pas de SGV
+//TODO BLOCKING IE pas de SGV
 //TODO BLOCKING EDGE centre viseur et marqueur noir
 var markerImage =
 	'data:image/svg+xml;utf8,' +
@@ -825,7 +825,7 @@ var markerImage =
  * options.render {function} called when the control is rendered.
  * options.action {function} called when the control is clicked.
  */
-//TODO Aligner les boutons (un trou ! = GPS)
+//TODO BEST Aligner les boutons (un trou ! = GPS)
 var nextButtonTopPos = 6, // Top position of next button (em)
 	globalControlGroups = {}; // List of group controls
 
@@ -855,8 +855,8 @@ function controlButton(options) {
 	buttonElement.addEventListener('click', function(evt) {
 		evt.preventDefault();
 
-		for (c in control.group)
-			control.group[c].toggle(!control.active && c == controlIndex)
+		for (var c in control.group)
+			control.group[c].toggle(!control.active && c == controlIndex);
 	});
 
 	divElement.appendChild(buttonElement);
@@ -881,7 +881,7 @@ function controlButton(options) {
 			if (typeof options.activate == 'function')
 				options.activate(control.active);
 		}
-	}
+	};
 
 	return control;
 }
@@ -1121,10 +1121,9 @@ function controlLengthLine() {
 		}
 	}
 
-	function calculateLength(f) {
-/*//TODO BEST RANDO idée de hover à développer
-		//if(0)//TODO BUG inhibe modify !!!
-		f.setStyle(//TODO mettre en forme / effacer le style quand on quite
+	function calculateLength(feature) {
+/*//TODO BEST RANDO idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
+		f.setStyle(
       new ol.style.Style({
 //          fill: new ol.style.Fill({opacity: 0.7}),
           stroke: new ol.style.Stroke({color: 'blue'
@@ -1133,7 +1132,7 @@ function controlLengthLine() {
   );
 */
 		
-		var length = ol.sphere.getLength(f.getGeometry());
+		var length = ol.sphere.getLength(feature.getGeometry());
 		if (length >= 100000)
 			divElement.innerHTML = (Math.round(length / 1000)) + ' km';
 		else if (length >= 10000)
@@ -1239,8 +1238,8 @@ function controlDownloadGPX() {
 				condition: function(evts) {
 					return ol.events.condition.shiftKeyOnly(evts) && ol.events.condition.click(evts);
 				},
-				filter: function(f) {
-					return f.getGeometry().getType().indexOf('Line') !== -1;
+				filter: function(feature) {
+					return feature.getGeometry().getType().indexOf('Line') !== -1;
 				},
 				hitTolerance: 6
 			});
@@ -1324,7 +1323,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			source: source,
 			zIndex: 3
 		}),
-		/*//TODO BUG hover reste aprés l'ajout d'un polygone
+		/*//TODO BUG CHEM hover reste aprés l'ajout d'un polygone
 		hover = new ol.interaction.Select({
 			layers: [layer],
 			condition: ol.events.condition.pointerMove,
@@ -1372,7 +1371,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 					map_.removeInteraction(i);
 			});
 
-			//TODO map_.addInteraction(hover);
+			//TODO CHEM map_.addInteraction(hover);
 			map_.addInteraction(modify);
 			map_.addInteraction(snap);
 			button.toggle(enableAtInit);
@@ -1465,19 +1464,19 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 		}
 
 		// Makes holes if a polygon is included in a biggest one
-		for (var f in polys)
-			if (polys[f]) {
-				var fs = new ol.geom.Polygon(polys[f]);
-				for (var p in polys)
-					if (p != f &&
-						polys[p]) {
+		for (var p1 in polys)
+			if (polys[p1]) {
+				var fs = new ol.geom.Polygon(polys[p1]);
+				for (var p2 in polys)
+					if (p1 != p2 &&
+						polys[p2]) {
 						var intersects = true;
-						for (var c in polys[p][0])
-							if (!fs.intersectsCoordinate(polys[p][0][c]))
+						for (var c in polys[p2][0])
+							if (!fs.intersectsCoordinate(polys[p2][0][c]))
 								intersects = false;
 						if (intersects) {
-							polys[f].push(polys[p][0]);
-							polys[p] = null;
+							polys[p1].push(polys[p2][0]);
+							polys[p2] = null;
 						}
 					}
 			}
@@ -1504,18 +1503,18 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 
 	function flatCoord(existingCoords, newCoords, pointerPosition) {
 		if (typeof newCoords[0][0] == 'object')
-			for (var c in newCoords)
-				flatCoord(existingCoords, newCoords[c], pointerPosition);
+			for (var c1 in newCoords)
+				flatCoord(existingCoords, newCoords[c1], pointerPosition);
 		else {
 			existingCoords.push([]); // Increment existingCoords array
-			for (var c in newCoords)
+			for (var c2 in newCoords)
 				if (button.group.L && // Only if we manage Lines
-					pointerPosition && compareCoords(newCoords[c], pointerPosition)) {
+					pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
 					// If this is the pointed one, forget it &
 					existingCoords.push([]); // & increment existingCoords array
 				} else
 					// Stack on the last existingCoords array
-					existingCoords[existingCoords.length - 1].push(newCoords[c]);
+					existingCoords[existingCoords.length - 1].push(newCoords[c2]);
 		}
 	}
 

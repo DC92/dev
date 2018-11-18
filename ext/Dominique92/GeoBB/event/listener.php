@@ -369,7 +369,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					($nominatim->address->town ?: $nominatim->address->city_district ?: $nominatim->address->city ?: $nominatim->address->village);
 		}
 
-//TODO ASPIR Présence de parc : automatiser (=> WRI ?)
+//TODO BEST ASPIR Présence de parc : automatiser (=> WRI ?)
 
 /*//TODO CHEM Détermination du massif par refuges.info
 		if (array_key_exists ('geo_massif', $row) && !$row['geo_massif']) {
