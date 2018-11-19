@@ -25,7 +25,7 @@
 	//TODO ASPIR test créer fiche locale
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer({TOPIC_ID}, true), //TODO BUG hover des alpages masque la carte en mode création de point
+		var overlay = geoLayer({TOPIC_ID}, true),
 			edit = controlEdit('editable-json', [], true),
 			poly = controlEditCreate('Polygon'),
 			extent = edit.source.getExtent(),

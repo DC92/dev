@@ -44,14 +44,14 @@ function layerStyle(properties, id, hover) {
 			})
 		};
 
+	// The selected property
 	if (properties.id == id)
 		return {
 			fill: new ol.style.Fill({
-				color: 'rgba(0,0,0,0.2)'
+				color: 'rgba(0,0,0,0.3)'
 			}),
 			stroke: new ol.style.Stroke({
-				color: 'black',
-				width : 2
+				color: 'black'
 			})
 		};
 
@@ -59,10 +59,10 @@ function layerStyle(properties, id, hover) {
 	colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
 	return {
 		fill: new ol.style.Fill({
-			color: hover ? properties.color : colorTr
+			color: hover ? 'rgba(0,0,0,0.3)' : colorTr
 		}),
 		stroke: new ol.style.Stroke({
-			color: 'black'
+			color: hover ? 'black' : colorTr
 		})
 	};
 }
