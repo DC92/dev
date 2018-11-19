@@ -133,8 +133,8 @@ var layerSwitcher = controlLayersSwitcher(layersCollection({
 				'">Créer une fiche locale</a>';
 		}
 	}),
-	marqueur = marker(markerImage, 'marqueur'),
-	viseur = marker(targetImage, 'viseur', null, true),
+	marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
+	viseur = marker('http://www.refuges.info/images/viseur.png', 'viseur', null, true),
 	overlays = [
 		layerPointsWri(),
 		chemineurLayer(),

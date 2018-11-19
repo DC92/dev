@@ -794,23 +794,6 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	return layer;
 }
 
-// Basic images
-//TODO BLOCKING IE pas de SGV
-//TODO BLOCKING EDGE centre viseur et marqueur noir
-var markerImage =
-	'data:image/svg+xml;utf8,' +
-	'<svg xmlns="http://www.w3.org/2000/svg" width="31" height="43" ' +
-	'style="stroke-width:4;stroke:rgb(255,0,0,.5);fill:rgb(0,0,0,0)">' +
-	'<rect width="31" height="43" />' +
-	'</svg>',
-	targetImage = 'data:image/svg+xml;utf8,' +
-	'<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" ' +
-	'style="stroke-width:3;stroke:rgb(255,208,0);fill:rgb(0,0,0,0)">' +
-	'<circle cx="15" cy="15" r="13.5" />' +
-	'<line x1="15" y1="0" x2="15" y2="30" />' +
-	'<line x1="0" y1="15" x2="30" y2="15" />' +
-	'</svg>';
-
 //******************************************************************************
 // CONTROLS
 //******************************************************************************
