@@ -690,6 +690,7 @@ function layerOverpass(options) {
  * Requires 'onadd' layer event
  */
 //TODO BEST pointer finger sur la cible
+//TODO BUG ne se déplace pas lors du premier glissement. besoin de recliquer dessus
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
 		eljson, json, elxy;
@@ -750,8 +751,9 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			values = {
 				lon: Math.round(ll4326[0] * 100000) / 100000,
 				lat: Math.round(ll4326[1] * 100000) / 100000,
-				json: JSON.stringify(format.writeGeometryObject(point, { //TODO BEST writeGeometryObject {decimals: 5}
-					featureProjection: 'EPSG:3857'
+				json: JSON.stringify(format.writeGeometryObject(point, {
+					featureProjection: 'EPSG:3857',
+					decimals: 5
 				}))
 			};
 		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
@@ -1237,7 +1239,8 @@ function controlDownloadGPX() {
 		var fileName = 'trace.gpx',
 			gpx = new ol.format.GPX().writeFeatures(layers, {
 				dataProjection: 'EPSG:4326',
-				featureProjection: 'EPSG:3857'
+				featureProjection: 'EPSG:3857',
+				decimals: 5
 			}),
 			file = new Blob([gpx.replace(/>/g, ">\n")], {
 				type: 'application/gpx+xml'
@@ -1478,9 +1481,9 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 				}));
 
 		// Save lines in <EL> as geoJSON at every change
-		//TODO BEST réduire le nb de décimales
 		inputEl.value = format.writeFeatures(source.getFeatures(), {
-			featureProjection: 'EPSG:3857'
+			featureProjection: 'EPSG:3857',
+			decimals: 5
 		});
 	}
 
@@ -1517,9 +1520,11 @@ function controlEditCreate(type) {
 			group: 'edit',
 			label: type.charAt(0),
 			render: render,
-			title: 'Activer "' + type.charAt(0) + '" puis cliquer sur la carte et sur chaque point du tracé pour dessiner ' +
-				(type == 'LineString' ? 'une ligne' :
-					'un polygone\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".'),
+			title: 'Activer "' + type.charAt(0) + ' puis' +
+				'"\ncliquer sur la carte et sur chaque point du tracé pour dessiner ' +
+				(type == 'Polygon' ? 'un polygone' : 'une ligne') +
+				',\ndouble cliquer pour terminer.' +
+				(type == 'Polygon' ? '\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' : ''),
 			activate: function(active) {
 				draw.setActive(active);
 			}
