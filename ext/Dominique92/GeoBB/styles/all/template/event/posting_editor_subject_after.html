@@ -24,15 +24,17 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer(0, true),
-			permalink = controlPermalink({
-				init: false,
-				visible: true
-			}),
+		var overlay = geoLayer({TOPIC_ID}, true), //TODO BUG hover des alpages masque la carte en mode création de point
 			edit = controlEdit('editable-json', [], true),
-			poly = controlEditCreate('Polygon'); //TODO exclude edited topic
+			poly = controlEditCreate('Polygon'),
+			extent = edit.source.getExtent(),
+			permalink = controlPermalink({
+				init: ol.extent.isEmpty(extent),
+				visible: true
+			});
 		map = new ol.Map({
 			target: 'map',
+			layers: [overlay],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
 					layers({GEO_OLKEYS})
@@ -51,11 +53,12 @@
 		<!-- ENDIF -->
 
 		// Center the map
-		map.getView().fit(
-			edit.source.getExtent(), {
-				maxZoom: 15
-			}
-		);
+		if(!ol.extent.isEmpty(extent))
+			map.getView().fit(
+				extent, {
+					maxZoom: 15
+				}
+			);
 	});
 </script>
 

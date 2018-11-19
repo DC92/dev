@@ -341,7 +341,7 @@ function layerVectorURL(options) {
 					options.url(bbox, list, resolution) :
 					options.url + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 			},
-			format: options.format || new ol.format.GeoJSON()
+			format: options.format || new ol.format.GeoJSON() //TODO BUG JSON error handling : error + URL
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
@@ -702,7 +702,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	if (eljson)
 		json = eljson.value || eljson.innerHTML;
 	if (json)
-		llInit = JSON.parse(json).coordinates;
+		llInit = JSONparse(json).coordinates;
 
 	var style = new ol.style.Style({
 			image: new ol.style.Icon(({
@@ -1294,7 +1294,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
-			JSON.parse(inputEl.value), {
+			JSONparse(inputEl.value || '{"type":"FeatureCollection","features":[]}'), {
 				featureProjection: 'EPSG:3857' // Read/write data as ESPG:4326 by default
 			}
 		),
@@ -1638,4 +1638,18 @@ function layersCollection(keys) {
 		Watercolor: layerStamen('watercolor'),
 		'Neutre': new ol.layer.Tile()
 	};
+}
+
+/**
+ * JSON.parse handling error
+ */
+function JSONparse(json) {
+	if (json)
+		try {
+			var js = JSON.parse(json);
+		} catch (returnCode) {
+			if (returnCode)
+				console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+		}
+	return js;
 }

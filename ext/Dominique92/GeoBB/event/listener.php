@@ -478,6 +478,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = 'NEW';
 
+		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
+
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)
