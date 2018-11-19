@@ -372,8 +372,8 @@ function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
-		//TODO BEST Pas de click sur le label d'une icone sur la carte
-		//TODO BLOCKING Quand click sur plusieurs features, exécute le click en dessous
+		//TODO BEST ASPIR Pas de click sur le label d'une icone sur la carte
+		//TODO BLOCKING ASPIR Quand click sur plusieurs features, exécute le click en dessous
 		map.popElement_ = document.createElement('div');
 		var dx = 0.4,
 			xAnchor, // Spread too closes icons
@@ -442,7 +442,7 @@ function initLayerVectorURLListeners(e) {
 			// Apply hover if any
 			var style = (h.options.hover || h.options.style)(h.properties);
 
-			// Spread too closes icons //TODO BUG BLOCKING don't allow to click on the last !!
+			// Spread too closes icons //TODO BUG BLOCKING ASPIR don't allow to click on the last !!
 			if (hovered.length > 1 &&
 				style.image)
 				style.image.anchor_[0] = xAnchor -= dx;
@@ -808,7 +808,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
  * options.render {function} called when the control is rendered.
  * options.action {function} called when the control is clicked.
  */
-//TODO BEST Aligner les boutons (un trou ! = GPS)
+//TODO BEST ASPIR Aligner les boutons (un trou ! = GPS)
 var nextButtonTopPos = 6, // Top position of next button (em)
 	globalControlGroups = {}; // List of group controls
 

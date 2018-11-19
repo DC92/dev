@@ -190,7 +190,7 @@ class listener implements EventSubscriberInterface
 				Contains (v.geom, p.geom)
 			";
 		//TODO BEST en MySQL 5.7+, utiliser ST_Contains
-		//TODO BEST pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
+		//TODO BEST ASPIR pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$block = 'contains_'.basename ($row['forum_image'], '.png');
@@ -354,7 +354,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 
 		// Calcul de la commune
-		//TODO BUG BEST nominatim adresse, ... (=> Commune)
+		//TODO BUG BEST ASPIR nominatim adresse, ... (=> Commune)
 		if (!$row['geo_commune']) {
 			$nominatim = json_decode (@file_get_contents (
 				'https://nominatim.openstreetmap.org/reverse?format=json&lon='.$centre[0].'&lat='.$centre[1],
