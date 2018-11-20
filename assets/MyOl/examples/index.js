@@ -33,9 +33,8 @@ function layerMassifsWri() {
 		label: function(properties) {
 			return properties.nom;
 		},
-		click: function(properties) {
-			if (properties.lien)
-				window.location.href = properties.lien;
+		href: function(properties) {
+			return properties.lien;
 		}
 	});
 }
@@ -58,9 +57,8 @@ function layerPointsWri() {
 		label: function(properties) {
 			return properties.nom;
 		},
-		click: function(properties) {
-			if (properties.lien)
-				window.location.href = properties.lien;
+		href: function(properties) {
+			return properties.lien;
 		}
 	});
 }
@@ -99,9 +97,8 @@ function chemineurLayer() {
 		label: function(properties) {
 			return properties.nom;
 		},
-		click: function(properties) {
-			if (properties.url)
-				window.location.href = properties.url;
+		href: function(properties) {
+			return properties.url;
 		}
 	});
 }

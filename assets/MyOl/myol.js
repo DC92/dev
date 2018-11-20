@@ -346,8 +346,7 @@ function layerVectorURL(options) {
 			source: source,
 			zIndex: 1, // Above baselayer even if included to the map before
 			style: typeof options.style != 'function' ?
-				ol.style.Style.defaultFunction : 
-				function(feature) {
+				ol.style.Style.defaultFunction : function(feature) {
 					return new ol.style.Style(options.style(feature.getProperties()));
 				}
 		});
@@ -370,11 +369,12 @@ function layerVectorURL(options) {
 // We use only one listener for hover and one for click on all vector layers
 function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
+
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
-		//TODO BEST ASPIR Pas de click sur le label d'une icone sur la carte
 		//TODO BLOCKING ASPIR Quand click sur plusieurs features, exécute le click en dessous
-		map.popElement_ = document.createElement('div');
+		map.popElement_ = document.createElement('a');
+		map.popElement_.style.display = 'block';
 		var dx = 0.4,
 			xAnchor, // Spread too closes icons
 			hovered = [],
@@ -385,115 +385,111 @@ function initLayerVectorURLListeners(e) {
 
 		map.on('pointermove', pointerMove);
 
-		function pointerMove(evt) {
-			// Reset cursor & popup position
-			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
-
-			var mapRect = map.getTargetElement().getBoundingClientRect(),
-				popupRect = map.popElement_.getBoundingClientRect();
-			if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
-				popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
-				popup.setPosition(undefined); // Hide label by default if none feature or his popup here
-
-			// Reset previous hovered styles
-			if (hovered)
-				hovered.forEach(function(h) {
-					if (h.layer && h.options)
-						h.feature.setStyle(new ol.style.Style(h.options.style(h.feature.getProperties())));
+		// Click on a feature
+		map.on('click', function(evt) {
+			map.forEachFeatureAtPixel(
+				evt.pixel,
+				map.popElement_.click(), // Simulate a click on the label
+				{
+					hitTolerance: 6
 				});
+		});
+	}
 
-			// Search the hovered the feature(s)
-			hovered = [];
-			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-				if (layer && layer.options_) {
-					var h = {
-						event: evt,
-						pixel: evt.pixel, // Follow the mouse if line or surface
-						feature: feature,
-						layer: layer,
-						options: layer.options_,
-						properties: feature.getProperties(),
-						coordinates: feature.getGeometry().flatCoordinates // If it's a point, just over it
-					};
-					if (h.coordinates.length == 2) // Stable if icon
-						h.pixel = map.getPixelFromCoordinate(h.coordinates);
-					h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
-					hovered.push(h);
-				}
+	function pointerMove(evt) {
+		// Reset cursor & popup position
+		map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
+
+		var mapRect = map.getTargetElement().getBoundingClientRect(),
+			popupRect = map.popElement_.getBoundingClientRect();
+		if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
+			popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
+			popup.setPosition(undefined); // Hide label by default if none feature or his popup here
+
+		// Reset previous hovered styles
+		if (hovered)
+			hovered.forEach(function(h) {
+				if (h.layer && h.options)
+					h.feature.setStyle(new ol.style.Style(h.options.style(h.feature.getProperties())));
 			});
 
-			if (hovered) {
-				// Sort features left to right
-				hovered.sort(function(a, b) {
-					if (a.coordinates.length > 2) return 999; // Lines & surfaces under of the pile !
-					if (b.coordinates.length > 2) return -999;
-					return a.pixel[0] - b.pixel[0];
-				});
-				xAnchor = 0.5 + dx * (hovered.length + 1) / 2; // dx left because we begin to remove dx at the first icon
-				hovered.forEach(checkHovered);
+		// Search the hovered the feature(s)
+		hovered = [];
+		map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+			if (layer && layer.options_) {
+				var h = {
+					event: evt,
+					pixel: evt.pixel, // Follow the mouse if line or surface
+					feature: feature,
+					layer: layer,
+					options: layer.options_,
+					properties: feature.getProperties(),
+					coordinates: feature.getGeometry().flatCoordinates // If it's a point, just over it
+				};
+				if (typeof layer.options_.href == 'function')
+					h.href = layer.options_.href(h.properties);
+				if (h.coordinates.length == 2) // Stable if icon
+					h.pixel = map.getPixelFromCoordinate(h.coordinates);
+				h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
+				hovered.push(h);
 			}
-		}
-
-		function checkHovered(h) {
-			// Apply hover if any
-			var style = (h.options.hover || h.options.style)(h.properties);
-
-			//TODO BUG déplace aussi si l'un des features est une surface
-			// Spread too closes icons //TODO BUG BLOCKING ASPIR don't allow to click on the last !!
-			if (hovered.length > 1 &&
-				style.image)
-				style.image.anchor_[0] = xAnchor -= dx;
-			h.feature.setStyle(new ol.style.Style(style));
-
-			// Hovering label
-			var label = typeof h.options.label == 'function' ?
-				h.options.label(h.properties, h.feature, h.layer) :
-				h.options.label;
-			if (label &&
-				!popup.getPosition()) { // Only for the first feature on the hovered stack
-				// Calculate the label' anchor
-				popup.setPosition(map.getView().getCenter()); // For popup size calculation
-
-				// Fill label class & text
-				map.popElement_.className = 'popup ' + (h.layer.options_.labelClass || '');
-				map.popElement_.innerHTML = label;
-
-				// Shift of the label to stay into the map regarding the pointer position
-				if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-					h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ?
-						10 :
-						-map.popElement_.clientWidth - 10;
-					h.pixel[1] = 2;
-				} else {
-					h.pixel[0] -= map.popElement_.clientWidth / 2;
-					h.pixel[0] = Math.max(h.pixel[0], 0); // Bord gauche
-					h.pixel[0] = Math.min(h.pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-					h.pixel[1] -= map.popElement_.clientHeight + 10;
-				}
-				popup.setPosition(map.getCoordinateFromPixel(h.pixel));
-
-				// Hover a clikable feature
-				if (h.options.click)
-					map.getViewport().style.cursor = 'pointer';
-			}
-		}
-
-		// Click on a feature
-		//TODO BEST CTRL + Click -> New navigator tab
-		map.on('click', function(evt) {
-			if (!evt.originalEvent.shiftKey &&
-				!evt.originalEvent.ctrlKey &&
-				!evt.originalEvent.altKey)
-				map.forEachFeatureAtPixel(
-					evt.pixel,
-					function(feature, layer) {
-						if (layer && layer.options_ &&
-							typeof layer.options_.click == 'function')
-							layer.options_.click(feature.getProperties());
-					}, {
-						hitTolerance: 6
-					});
 		});
+
+		if (hovered) {
+			// Sort features left to right
+			hovered.sort(function(a, b) {
+				if (a.coordinates.length > 2) return 999; // Lines & surfaces under of the pile !
+				if (b.coordinates.length > 2) return -999;
+				return a.pixel[0] - b.pixel[0];
+			});
+			xAnchor = 0.5 + dx * (hovered.length + 1) / 2; // dx left because we begin to remove dx at the first icon
+			hovered.forEach(checkHovered);
+		}
+	}
+
+	function checkHovered(h) {
+		// Apply hover if any
+		var style = (h.options.hover || h.options.style)(h.properties);
+
+		// Spread too closes icons //TODO BUG BLOCKING ASPIR don't allow to click on the last !!
+		if (hovered.length > 2 &&
+			style.image)
+			style.image.anchor_[0] = xAnchor -= dx;
+		h.feature.setStyle(new ol.style.Style(style));
+
+		// Hovering label
+		var label = typeof h.options.label == 'function' ?
+			h.options.label(h.properties, h.feature, h.layer) :
+			h.options.label;
+		if (label &&
+			!popup.getPosition()) { // Only for the first feature on the hovered stack
+			// Calculate the label' anchor
+			popup.setPosition(map.getView().getCenter()); // For popup size calculation
+
+			// Fill label class & text
+			map.popElement_.className = 'popup ' + (h.layer.options_.labelClass || '');
+			map.popElement_.innerHTML = label;
+			if (h.href)
+				map.popElement_.href = h.href;
+
+			// Shift of the label to stay into the map regarding the pointer position
+			if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
+				h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ?
+					10 :
+					-map.popElement_.clientWidth - 10;
+				h.pixel[1] = 2;
+			} else {
+				h.pixel[0] -= map.popElement_.clientWidth / 2;
+				h.pixel[0] = Math.max(h.pixel[0], 0); // Bord gauche
+				h.pixel[0] = Math.min(h.pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
+				h.pixel[1] -= map.popElement_.clientHeight + 10;
+			}
+			popup.setPosition(map.getCoordinateFromPixel(h.pixel));
+
+			// Hover a clikable feature
+			if (h.href)
+				map.getViewport().style.cursor = 'pointer';
+		}
 	}
 }
 

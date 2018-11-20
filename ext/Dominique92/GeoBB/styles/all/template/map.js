@@ -79,9 +79,8 @@ function geoLayer(id, silent) {
 		label: function(properties) {
 			return silent ? null : properties.name;
 		},
-		click: function(properties) {
-			if (!silent)
-				window.location.href = 'viewtopic.php?t=' + properties.id;
+		href: function(properties) {
+			return 'viewtopic.php?t=' + properties.id;
 		}
 	});
 }
