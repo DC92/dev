@@ -27,13 +27,13 @@
 		var map = new ol.Map({
 			target: 'map',
 			layers: [
-				geoLayer()
+				geoLayer(),
+				overlaySelector()
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
 					layers({GEO_OLKEYS})
 				),
-				overlaySelector(),
 				controlPermalink({
 					init: true,
 					visible: true

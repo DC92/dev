@@ -22,8 +22,6 @@
 
 <script>
 	var map, editable;
-	//TODO ASPIR test créer fiche locale
-	//TODO ASPIR pas de label overpass
 
 	window.addEventListener('load', function() {
 		var overlay = geoLayer({TOPIC_ID}, true),
@@ -36,7 +34,9 @@
 			});
 		map = new ol.Map({
 			target: 'map',
-			layers: [overlay],
+			layers: [
+				overlay
+			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
 					layers({GEO_OLKEYS})

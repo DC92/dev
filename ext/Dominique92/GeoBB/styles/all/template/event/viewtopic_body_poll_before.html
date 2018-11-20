@@ -193,12 +193,12 @@
 		var map = new ol.Map({
 			target: 'map',
 			layers: [
-				geoLayer({TOPIC_ID})
+				geoLayer({TOPIC_ID}),
+				overlaySelector()
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
-					layers({GEO_OLKEYS}),
-					overlaySelector()
+					layers({GEO_OLKEYS})
 				),
 				controlPermalink({
 					init: false,

@@ -67,6 +67,14 @@ Revenir à la page où on était quand on se connecte
 		+++ logout
 Ajouter bouton permutation sur page point chem
 	View film + permutation
+coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
+BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
+CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
+WRI forum : préalables
+	Migrer forum/photos-points
+	mettre en paramètre nom table phpbb_
+	Migration des tables ?
+https://www.phpbb.com/support/docs/en/3.2/ug/upgradeguide/general_conversion/
 
 AIDE
 ====

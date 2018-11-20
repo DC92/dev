@@ -540,6 +540,8 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
+//TODO ASPIR test créer fiche locale
+//TODO BUG créer une fiche => name = undefined
 //TODO BUG BEST quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 function layerOverpass(options) {
 	var layer = layerVectorURL({
@@ -695,7 +697,7 @@ function layerOverpass(options) {
  * Requires 'onadd' layer event
  */
 //TODO BEST pointer finger sur la cible
-//TODO BUG ne se déplace pas lors du premier glissement. besoin de recliquer dessus
+//TODO TESTER ne se déplace pas lors du premier glissement. besoin de recliquer dessus
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
 		eljson, json, elxy;
