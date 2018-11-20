@@ -1410,7 +1410,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
 		source.clear(); // And clear the edited layer
 
-		for (var a in lines) {
+		for (var a = 0; a < lines.length; a++) {
 			// Exclude 1 coord features (points)
 			if (lines[a] && lines[a].length < 2)
 				lines[a] = null;
@@ -1423,30 +1423,25 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			}
 
 			// Merge lines having a common end
-			//TODO BUG CHEM don't merge recursively (join 2 existing lines)
-			for (var b in lines)
-				if (a < b) {
-					var m = [a, b];
-					for (var i = 4; i; i--) // 4 times
-						if (lines[m[0]] && lines[m[1]]) {
-							// Shake lines end to explore all possibilities
-							m.reverse();
-							lines[m[0]].reverse();
-							if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+			for (var b = 0; b < a; b++) { // Once each combination
+				var m = [a, b];
+				for (var i = 4; i; i--) // 4 times
+					if (lines[m[0]] && lines[m[1]]) {
+						// Shake lines end to explore all possibilities
+						m.reverse();
+						lines[m[0]].reverse();
+						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
 
-								// Merge 2 lines matching ends
-								lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
-								lines[m[1]] = 0;
+							// Merge 2 lines matching ends
+							lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
+							lines[m[1]] = 0;
 
-								// Re-check if the new line is closed
-								if (button.group.P && // Only if we manage Polygons
-									compareCoords(lines[m[0]])) {
-									polys.push([lines[m[0]]]);
-									lines[m[0]] = null;
-								}
-							}
+							// Restart all the loops
+							a = -1;
+							break;
 						}
-				}
+					}
+			}
 		}
 
 		// Makes holes if a polygon is included in a biggest one

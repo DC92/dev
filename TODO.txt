@@ -100,6 +100,7 @@ Permissions -> Permissions des forums -> Tous les forums -> Envoyer -> Utilisate
 Général -> Paramètres du serveur -> Activer la compression GZip : oui
 Général -> Configuration du forum -> Libellé du site Internet :
 Général -> Paramètres de sécurité -> Autoriser le PHP dans les templates : OUI
+->3.2.4 : copier full package -> /install/app.php/update -> database only -> delete install
 
 MIGRATION
 =========
