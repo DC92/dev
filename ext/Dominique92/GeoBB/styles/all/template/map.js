@@ -67,7 +67,7 @@ function layerStyle(properties, id, hover) {
 	};
 }
 
-function geoLayer(id, noclick) {
+function geoLayer(id, silent) {
 	return layerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?limite=10000&',
 		style: function(properties) {
@@ -77,10 +77,10 @@ function geoLayer(id, noclick) {
 			return layerStyle(properties, id, true);
 		},
 		label: function(properties) {
-			return properties.name;
+			return silent ? null : properties.name;
 		},
 		click: function(properties) {
-			if (!noclick)
+			if (!silent)
 				window.location.href = 'viewtopic.php?t=' + properties.id;
 		}
 	});

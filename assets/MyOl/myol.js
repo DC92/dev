@@ -8,9 +8,8 @@
  * No classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only a pack of JS functions & CSS
  * I know, I know, this is not up to date way of programming but thtat's my choice & you are free to take it, modifiy & adapt as you wish
  */
-//TODO END test with libs non debug / on mobile
 //TODO END http://jsbeautifier.org/ & http://jshint.com
-//TODO BEST Site off line, application
+//TODO BEST map off line, application
 
 /**
  * HACK send 'onAdd' event to layers when added to a map
@@ -347,7 +346,8 @@ function layerVectorURL(options) {
 			source: source,
 			zIndex: 1, // Above baselayer even if included to the map before
 			style: typeof options.style != 'function' ?
-				ol.style.Style.defaultFunction : function(feature) {
+				ol.style.Style.defaultFunction : 
+				function(feature) {
 					return new ol.style.Style(options.style(feature.getProperties()));
 				}
 		});
@@ -435,33 +435,34 @@ function initLayerVectorURLListeners(e) {
 		}
 
 		function checkHovered(h) {
-			// Hover a clikable feature
-			if (h.options.click)
-				map.getViewport().style.cursor = 'pointer';
-
 			// Apply hover if any
 			var style = (h.options.hover || h.options.style)(h.properties);
 
+			//TODO BUG déplace aussi si l'un des features est une surface
 			// Spread too closes icons //TODO BUG BLOCKING ASPIR don't allow to click on the last !!
 			if (hovered.length > 1 &&
 				style.image)
 				style.image.anchor_[0] = xAnchor -= dx;
 			h.feature.setStyle(new ol.style.Style(style));
 
-			if (h.options.label &&
+			// Hovering label
+			var label = typeof h.options.label == 'function' ?
+				h.options.label(h.properties, h.feature, h.layer) :
+				h.options.label;
+			if (label &&
 				!popup.getPosition()) { // Only for the first feature on the hovered stack
 				// Calculate the label' anchor
 				popup.setPosition(map.getView().getCenter()); // For popup size calculation
 
 				// Fill label class & text
 				map.popElement_.className = 'popup ' + (h.layer.options_.labelClass || '');
-				map.popElement_.innerHTML = typeof h.options.label == 'function' ?
-					h.options.label(h.properties, h.feature, h.layer) :
-					h.options.label;
+				map.popElement_.innerHTML = label;
 
 				// Shift of the label to stay into the map regarding the pointer position
 				if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-					h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ? 10 : -map.popElement_.clientWidth - 10;
+					h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ?
+						10 :
+						-map.popElement_.clientWidth - 10;
 					h.pixel[1] = 2;
 				} else {
 					h.pixel[0] -= map.popElement_.clientWidth / 2;
@@ -470,6 +471,10 @@ function initLayerVectorURLListeners(e) {
 					h.pixel[1] -= map.popElement_.clientHeight + 10;
 				}
 				popup.setPosition(map.getCoordinateFromPixel(h.pixel));
+
+				// Hover a clikable feature
+				if (h.options.click)
+					map.getViewport().style.cursor = 'pointer';
 			}
 		}
 
@@ -723,7 +728,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
-			zIndex: 2
+			zIndex: 10
 		});
 
 	layer.on('onadd', function(evt) {
@@ -814,6 +819,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 var nextButtonTopPos = 6, // Top position of next button (em)
 	globalControlGroups = {}; // List of group controls
 
+//TODO BEST héritage de ol.control.Control ?
 function controlButton(options) {
 	options = options || {
 		className: 'ol-control-hidden'
@@ -1307,7 +1313,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 3
+			zIndex: 20
 		}),
 		/*//TODO BUG CHEM hover reste aprés l'ajout d'un polygone
 		hover = new ol.interaction.Select({

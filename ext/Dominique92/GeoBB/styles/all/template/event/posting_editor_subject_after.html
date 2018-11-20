@@ -23,10 +23,9 @@
 <script>
 	var map, editable;
 	//TODO ASPIR test créer fiche locale
+	//TODO ASPIR pas de label overpass
 
 	window.addEventListener('load', function() {
-		//TODO BUG BLOCKING ASPIR ne pas afficher du tout le topic_id (pb d'étiquette et de sélection)
-		//TODO ASPIR ne pas générer d'étiquettes en mode modif
 		var overlay = geoLayer({TOPIC_ID}, true),
 			edit = controlEdit('editable-json', [], true),
 			poly = controlEditCreate('Polygon'),
