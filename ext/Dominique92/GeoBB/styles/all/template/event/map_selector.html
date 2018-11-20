@@ -17,11 +17,11 @@
 			labelClass: 'label-overpass',
 			iconUrlPath : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 			postLabel: function(t, p) {
-			var ll4326 = ol.proj.transform(p.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
+				var ll4326 = ol.proj.transform(p.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
 				return ['<a title="Créer une fiche modifiable à partir du point OSM" ' +
 						'href="posting.php?mode=post',
 						'type=' + t,
-						'name=' + p.name,
+						'name=' + (p.name ? p.name : t),
 						'lon=' + Math.round(ll4326[0] * 100000) / 100000,
 						'lat=' + Math.round(ll4326[0] * 100000) / 100000
 					].join('&') +

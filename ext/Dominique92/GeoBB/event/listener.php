@@ -444,7 +444,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$vars['forum_id'] = $row ['forum_id'];
 
 			// Initialise subject name
-			$this->template->assign_var ('DRAFT_SUBJECT', $this->request->variable('name', 'NOM'));
+			$this->post_name = $this->request->variable('name', 'NOM');
 		}
 	}
 
@@ -476,7 +476,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
 		//TODO BEST traiter au niveau du formulaire (avertissement de modif ?)
 		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = 'NEW';
+			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'NEW';
 
 		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
 

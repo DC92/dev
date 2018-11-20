@@ -536,9 +536,9 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO ASPIR test créer fiche locale
-//TODO BUG créer une fiche => name = undefined
 //TODO BUG BEST quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
+//TODO BEST afficher erreur 429 (Too Many Requests)
+//TODO BEST afficher affichage OK, ...
 function layerOverpass(options) {
 	var layer = layerVectorURL({
 		url: function(bbox, list, resolution) {
@@ -581,8 +581,6 @@ function layerOverpass(options) {
 		label: formatLabel
 	});
 
-//TODO BEST afficher erreur 429 (Too Many Requests)
-//TODO BEST afficher affichage OK, ...
 	function formatLabel(p, f) { // p = properties, f = feature
 		var language = {
 				alpine_hut: 'Refuge gard&egrave;',
@@ -608,7 +606,8 @@ function layerOverpass(options) {
 				(p.name ? '<b>' + p.name + '</b>' : '') +
 				(p.alt_name ? '<b>' + p.alt_name + '</b>' : '') +
 				(p.short_name ? '<b>' + p.short_name + '</b>' : ''),
-				[(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
+				[
+					(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
 					'*'.repeat(p.stars),
 					p.shelter_type == 'basic_hut' ? 'Abri' : '',
 					p.building == 'cabin' ? 'Cabane non gard&egrave;e' : '',
