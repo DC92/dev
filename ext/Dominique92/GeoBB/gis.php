@@ -126,20 +126,6 @@ while ($row = $db->sql_fetchrow($result)) {
 	$row['geojson'] = $g->out('json'); // On le transforme en format GeoJson
 	$row['geophp'] = json_decode ($row['geojson']); // On transforme le GeoJson en objet PHP
 
-	/**
-	 * Change properties before sending
-	 *
-	 * @event geobb.gis_modify_data
-	 * @var array row
-	 * @var array properties
-	 */
-	$vars = array(
-		'row',
-		'properties',
-		'diagBbox', // Line or surface min segment length
-	);
-	extract($phpbb_dispatcher->trigger_event('geobb.gis_modify_data', compact($vars)));
-
 	$geojson[] = [
 		'type' => 'Feature',
 		'geometry' => $row['geophp'], // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)

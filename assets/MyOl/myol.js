@@ -316,8 +316,8 @@ function permanentCheckboxList(name, evt) {
  * Returns {ol.loadingstrategy} to be used in layer definition
  */
 ol.loadingstrategy.bboxDependant = function(extent, resolution) {
-	if (this.resolution != resolution) // Force loading when zoom in
-		this.clear();
+	if (this.resolution != resolution)
+		this.clear(); // Force loading when zoom in
 	this.resolution = resolution; // Mem resolution for further requests
 	return [extent];
 };
@@ -347,7 +347,9 @@ function layerVectorURL(options) {
 			zIndex: 1, // Above baselayer even if included to the map before
 			style: typeof options.style != 'function' ?
 				ol.style.Style.defaultFunction : function(feature) {
-					return new ol.style.Style(options.style(feature.getProperties()));
+					return new ol.style.Style(
+						options.style(feature.getProperties())
+					);
 				}
 		});
 
@@ -372,7 +374,6 @@ function initLayerVectorURLListeners(e) {
 
 	if (!map.popElement_) { //HACK Only once for all layers
 		// Display a label when hover the feature
-		//TODO BLOCKING ASPIR Quand click sur plusieurs features, exécute le click en dessous
 		map.popElement_ = document.createElement('a');
 		map.popElement_.style.display = 'block';
 		var dx = 0.4,
@@ -389,8 +390,9 @@ function initLayerVectorURLListeners(e) {
 		map.on('click', function(evt) {
 			map.forEachFeatureAtPixel(
 				evt.pixel,
-				map.popElement_.click(), // Simulate a click on the label
-				{
+				function() {
+					map.popElement_.click() // Simulate a click on the label
+				}, {
 					hitTolerance: 6
 				});
 		});
@@ -410,15 +412,17 @@ function initLayerVectorURLListeners(e) {
 		if (hovered)
 			hovered.forEach(function(h) {
 				if (h.layer && h.options)
-					h.feature.setStyle(new ol.style.Style(h.options.style(h.feature.getProperties())));
+					h.feature.setStyle(new ol.style.Style(
+						h.options.style(h.feature.getProperties())
+					));
 			});
 
-		// Search the hovered the feature(s)
+		// Search the hovered feature(s)
 		hovered = [];
 		map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+			//TODO BEST make a separate function / pb : visibility of evt.pixel & hovered[]
 			if (layer && layer.options_) {
 				var h = {
-					event: evt,
 					pixel: evt.pixel, // Follow the mouse if line or surface
 					feature: feature,
 					layer: layer,
@@ -433,6 +437,8 @@ function initLayerVectorURLListeners(e) {
 				h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
 				hovered.push(h);
 			}
+		}, {
+			hitTolerance: 6
 		});
 
 		if (hovered) {
@@ -452,6 +458,7 @@ function initLayerVectorURLListeners(e) {
 		var style = (h.options.hover || h.options.style)(h.properties);
 
 		// Spread too closes icons //TODO BUG BLOCKING ASPIR don't allow to click on the last !!
+		//TODO BEST redo this as only the icon moves (can see), not the feature position (can click)
 		if (hovered.length > 2 &&
 			style.image)
 			style.image.anchor_[0] = xAnchor -= dx;

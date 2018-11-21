@@ -52,7 +52,6 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
-			'geobb.gis_modify_data' => 'gis_modify_data', // gis.php
 
 			// Posting
 			'core.modify_posting_parameters' => 'modify_posting_parameters',
@@ -243,20 +242,6 @@ class listener implements EventSubscriberInterface
 			$vars['post_row'] = $post_row;
 		}
 	}
-
-	function gis_modify_data($vars) { //TODO BEST DELETE
-//if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('gis_modify_data',true).'</pre>';
-/*
-		// Insère l'extraction des données externes dans le flux géographique
-		$row = $vars['row'];
-
-		if ($vars['diagBbox'])
-			$this->optim ($row['geophp'], $vars['diagBbox'] / 200); // La longueur min des segments de lignes & surfaces sera de 1/200 de la diagonale de la BBOX
-
-		$vars['row'] = $row;
-*/
-	}
-
 
 	/*//TODO BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
     $oGeometry = geoPHP::load($sWkt,'wkt');    
