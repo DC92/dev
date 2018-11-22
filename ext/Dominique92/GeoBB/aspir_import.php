@@ -74,6 +74,8 @@ function conv_3857_to_4326(&$p){
 	}
 }
 
+$stay_lower = ['le','la','les','du','de','des','sur','','','','','','','','',];
+
 foreach ($epiphp->features as $p)
 	if($p->geometry) {
 		// Get geometry
@@ -87,6 +89,19 @@ foreach ($epiphp->features as $p)
 			$p->properties->surface = 0;
 		if (!$p->properties->nom1)
 			$p->properties->nom1 = $p->properties->code;
+		$p->properties->nom1 = str_replace('_', ' ',
+		$p->properties->nom1);
+		$p->properties->nom1 = ucfirst (preg_replace_callback (
+			'/([A-Z]+)/',
+			function ($m) {
+				global $stay_lower;
+				$r = strtolower($m[0]);
+				return in_array ($r, $stay_lower) || !$r[1] // l'xxx, d'xxx
+					? $r
+					: ucfirst ($r);
+			},
+			$p->properties->nom1
+		));
 
 		// Check existing subject
 		$sql = "SELECT * FROM phpbb_posts WHERE geo_irstea_code = '{$p->properties->code}'";
@@ -95,14 +110,15 @@ foreach ($epiphp->features as $p)
 		$db->sql_freeresult($result);
 
 		//  Création d'une fiche
-		if ($p->geometry->coordinates &&
-			!$data) {
-			echo"<pre style='background-color:white;color:black;font-size:14px;'>CREATION = ".var_export($p->properties->nom1,true).'</pre>';
+		if ($p->geometry->coordinates) {
+			echo '<pre style="background-color:white;color:black;font-size:14px;">'.
+				($data['topic_id'] ? 'EDITION' : 'CREATION' ).
+				' = '.var_export($p->properties->nom1,true).'</pre>';
 
 			$data = [
 				'forum_id' => $alp_forum_id,
-				'topic_id' =>  0, // Le créer
-				'post_id' => 0, // Le créer
+				'topic_id' => $data['topic_id'] ?: 0, // Le créer
+				'post_id' => $data['post_id'] ?: 0, // Le créer
 				'post_subject' => $p->properties->nom1,
 				'message' => '',
 				'message_md5' => md5(''),
@@ -123,18 +139,29 @@ foreach ($epiphp->features as $p)
 			];
 			$poll = [];
 			\submit_post(
-				'post',
+				$data['topic_id'] ? 'edit' : 'post',
 				$p->properties->nom1,
 				$user->data['username'],
 				POST_NORMAL,
 				$poll,
-				$data
+				$data,
+				true,
+				true
 			);
 		}
 
 		// Update geo_ data
 		if ($data['post_id']) {
-			$sql = "UPDATE phpbb_posts SET geom = $geomsql,
+			$sql = "UPDATE phpbb_topics 
+					SET topic_title = '".str_replace ("'", "\\'", $p->properties->nom1)."'
+					WHERE topic_id = {$data['topic_id']}";
+			$result = $db->sql_query($sql);
+		}
+
+		// Update geo_ data
+		if ($data['post_id']) {
+			$sql = "UPDATE phpbb_posts
+					SET geom = $geomsql,
 					geo_unite_pastorale = '".str_replace ("'", "\\'", $p->properties->nom1)."',
 					geo_surface = {$p->properties->surface},
 					geo_commune = '{$p->properties->nom_commune}',
