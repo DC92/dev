@@ -260,14 +260,14 @@ function layerBing(layer, key) {
 // VECTORS, GEOJSON & AJAX LAYERS
 //***************************************************************
 /**
- * Mem in cookies the checkbox content with name="name"
+ * Mem in cookies the checkbox content with name="selectorName"
  */
 //TODO BEST when unchecked, remove cookie
-function controlPermanentCheckbox(name, callback) {
-	var checkElements = document.getElementsByName(name),
+function controlPermanentCheckbox(selectorName, callback) {
+	var checkElements = document.getElementsByName(selectorName),
 		cookie =
-		location.hash.match('map-' + name + '=([^#,&;]*)') || // Priority to the hash
-		document.cookie.match('map-' + name + '=([^;]*)'); // Then the cookie
+		location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
+		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
 
 	for (var e = 0; e < checkElements.length; e++) {
 		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
@@ -277,17 +277,17 @@ function controlPermanentCheckbox(name, callback) {
 	}
 
 	// Call callback once at the init
-	callback(null, permanentCheckboxList(name));
+	callback(null, permanentCheckboxList(selectorName));
 
 	function permanentCheckboxClick(evt) {
-		var list = permanentCheckboxList(name, evt);
+		var list = permanentCheckboxList(selectorName, evt);
 		if (typeof callback == 'function')
 			callback(evt, list);
 	}
 }
 
-function permanentCheckboxList(name, evt) {
-	var checkElements = document.getElementsByName(name),
+function permanentCheckboxList(selectorName, evt) {
+	var checkElements = document.getElementsByName(selectorName),
 		allChecks = [];
 
 	for (var e = 0; e < checkElements.length; e++) {
@@ -305,7 +305,7 @@ function permanentCheckboxList(name, evt) {
 	}
 
 	// Mem in a cookie
-	document.cookie = 'map-' + name + '=' + allChecks.join(',') + ';path=/';
+	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/';
 
 	return allChecks; // Returns list of checked values or ids
 }
@@ -369,6 +369,7 @@ function layerVectorURL(options) {
 }
 
 // We use only one listener for hover and one for click on all vector layers
+//TODO BEST mettre cette fonction dans layerVectorURL
 function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 
@@ -391,7 +392,7 @@ function initLayerVectorURLListeners(e) {
 			map.forEachFeatureAtPixel(
 				evt.pixel,
 				function() {
-					map.popElement_.click() // Simulate a click on the label
+					map.popElement_.click(); // Simulate a click on the label
 				}, {
 					hitTolerance: 6
 				});
@@ -401,6 +402,7 @@ function initLayerVectorURLListeners(e) {
 	function pointerMove(evt) {
 		// Reset cursor & popup position
 		map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
+		map.popElement_.removeAttribute('href');
 
 		var mapRect = map.getTargetElement().getBoundingClientRect(),
 			popupRect = map.popElement_.getBoundingClientRect();
@@ -422,7 +424,7 @@ function initLayerVectorURLListeners(e) {
 		map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
 			//TODO BEST make a separate function / pb : visibility of evt.pixel & hovered[]
 			if (layer && layer.options_) {
-				var h = {
+				var h = { //TODO BEST simplifier la structure
 					pixel: evt.pixel, // Follow the mouse if line or surface
 					feature: feature,
 					layer: layer,
@@ -462,20 +464,26 @@ function initLayerVectorURLListeners(e) {
 		if (hovered.length > 2 &&
 			style.image)
 			style.image.anchor_[0] = xAnchor -= dx;
-		h.feature.setStyle(new ol.style.Style(style));
+
+		h.feature.setStyle(
+			new ol.style.Style(style)
+		);
 
 		// Hovering label
-		var label = typeof h.options.label == 'function' ?
-			h.options.label(h.properties, h.feature, h.layer) :
-			h.options.label;
+		var label = typeof h.options.label == 'function' ? //TODO BEST faire une fonction englobante d'appel avec arguments...
+			h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO BEST utiliser args...
+			h.options.label || '',
+			postLabel = typeof h.options.postLabel == 'function' ?
+			h.options.postLabel(h.properties, h.feature, h.layer, h.pixel, h.ll4326) :
+			h.options.postLabel || '';
 		if (label &&
 			!popup.getPosition()) { // Only for the first feature on the hovered stack
-			// Calculate the label' anchor
+			// Calculate the label's anchor
 			popup.setPosition(map.getView().getCenter()); // For popup size calculation
 
 			// Fill label class & text
-			map.popElement_.className = 'popup ' + (h.layer.options_.labelClass || '');
-			map.popElement_.innerHTML = label;
+			map.popElement_.className = 'myPopup ' + (h.layer.options_.labelClass || '');
+			map.popElement_.innerHTML = label + postLabel;
 			if (h.href)
 				map.popElement_.href = h.href;
 
@@ -538,6 +546,37 @@ ol.format.OSMXMLPOI = function() {
 ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
 
 /**
+ * www.refuges.info POI layer
+ * Requires layerVectorURL
+ */
+function layerPointsWri(options) {
+	return layerVectorURL({
+		url: '//www.refuges.info/api/bbox?type_points=',
+		selectorName: options.selectorName,
+		style: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+				})
+			};
+		},
+		label: function(properties) {
+			return properties.nom;
+		},
+		postLabel: options.postLabel,
+		href: function(properties) {
+			return properties.lien;
+		},
+		type: function(properties) {
+			return properties.type.icone;
+		},
+		name: function(properties) {
+			return properties.nom;
+		}
+	});
+}
+
+/**
  * OSM overpass POI layer
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
@@ -545,50 +584,70 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  */
 //TODO BUG BEST quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 //TODO BEST afficher erreur 429 (Too Many Requests)
-//TODO BEST afficher affichage OK, ...
 function layerOverpass(options) {
-	var layer = layerVectorURL({
-		url: function(bbox, list, resolution) {
-			var bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
-				args = [],
-				elSelector = document.getElementById(options.selectorId);
+	var defaultOptions = {
+		url: '//overpass-api.de/api/interpreter',
+		maxResolution: 30,
+		selectorId: 'overpass', // Element containing all checkboxes
+		selectorName: 'overpass', // Checboxes
+		labelClass: 'label-overpass',
+		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/'
+	};
+	options = options || {};
+	for (var d in defaultOptions)
+		options[d] = options[d] || defaultOptions[d];
 
-			if (resolution < (options.maxResolution || 30)) { // Only for small areas
-				for (var l = 0; l < list.length; l++) {
-					var lists = list[l].split('+');
-					for (var ls = 0; ls < lists.length; ls++)
-						args.push(
-							'node' + lists[ls] + bb + // Ask for nodes in the bbox
-							'way' + lists[ls] + bb // Also ask for areas
-						);
-				}
-				if (elSelector)
-					elSelector.style.color =
-					elSelector.title = '';
-			} else if (elSelector) {
-				elSelector.style.color = 'red';
-				elSelector.title = 'Zoom in to enable see the points.';
+	var elSelector = document.getElementById(options.selectorId),
+		checkElements = document.getElementsByName(options.selectorName),
+		layer = layerVectorURL({
+			url: overpassUrl,
+			format: new ol.format.OSMXMLPOI(),
+			selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked
+			style: function(properties) {
+				return {
+					image: new ol.style.Icon({
+						src: options.iconUrlPath + overpassType(properties) + '.png'
+					})
+				};
+			},
+			labelClass: options.labelClass,
+			label: formatLabel,
+			postLabel: options.postLabel,
+			type: function(properties) {
+				return overpassType(properties);
+			},
+			name: function(properties) {
+				return properties.name;
 			}
+		});
+	elSelector.className = 'overpass'; // At the biginning
 
-			return options.url +
-				'?data=[timeout:5];(' + // Not too much !
-				args.join('') +
-				');out center;'; // add center of areas
-		},
-		format: new ol.format.OSMXMLPOI(),
-		selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked
-		style: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: options.iconUrlPath + overpassType(properties) + '.png'
-				})
-			};
-		},
-		labelClass: options.labelClass,
-		label: formatLabel
-	});
+	function overpassUrl(bbox, list, resolution) {
+		var bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
+			args = [];
 
-	function formatLabel(p, f) { // p = properties, f = feature
+		if (resolution < (options.maxResolution)) { // Only for small areas
+			for (var l = 0; l < list.length; l++) {
+				var lists = list[l].split('+');
+				for (var ls = 0; ls < lists.length; ls++)
+					args.push(
+						'node' + lists[ls] + bb + // Ask for nodes in the bbox
+						'way' + lists[ls] + bb // Also ask for areas
+					);
+			}
+			if (elSelector)
+				elSelector.className = 'overpass';
+		} else if (elSelector)
+			elSelector.className = 'overpass-zoom-out';
+
+		return options.url +
+			'?data=[timeout:5];(' + // Not too much !
+			args.join('') +
+			');out center;'; // add center of areas
+	}
+
+	function formatLabel(p, f) { // properties, feature
+		p.name = p.name || p.alt_name || p.short_name || '';
 		var language = {
 				alpine_hut: 'Refuge gard&egrave;',
 				hotel: 'h&ocirc;tel',
@@ -610,10 +669,10 @@ function layerOverpass(options) {
 				p['addr:city'], p.city
 			],
 			popup = [
-				(p.name ? '<b>' + p.name + '</b>' : '') +
-				(p.alt_name ? '<b>' + p.alt_name + '</b>' : '') +
-				(p.short_name ? '<b>' + p.short_name + '</b>' : ''),
-				[
+				'<b>' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</b>', [
+					'<a target="_blank"',
+					'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '"',
+					'title="Voir la fiche d\'origine sur openstreetmap">',
 					(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
 					'*'.repeat(p.stars),
 					p.shelter_type == 'basic_hut' ? 'Abri' : '',
@@ -624,11 +683,13 @@ function layerOverpass(options) {
 					p.man_made == 'water_well' ? 'Puits' : '',
 					p.shop ? 'alimentation' : '',
 					typeof language[p.amenity] == 'string' ? language[p.amenity] : p.amenity,
+					'</a>'
+				].join(' '), [
 					p.rooms ? p.rooms + ' chambres' : '',
 					p.beds ? p.beds + ' lits' : '',
 					p.place ? p.place + ' places' : '',
 					p.capacity ? p.capacity + ' places' : '',
-					p.ele ? parseInt(p.ele, 10) + 'm' : '',
+					p.ele ? parseInt(p.ele, 10) + 'm' : ''
 				].join(' '),
 				phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9\+]+/ig, '') + '">' + phone + '</a>' : '',
 				p.email ? '&#9993;<a title="Envoyer un mail" href="mailto:' + p.email + '">' + p.email + '</a>' : '',
@@ -656,7 +717,7 @@ function layerOverpass(options) {
 			if (!done.includes(k0))
 				switch (k0) {
 					case 'internet_access':
-						if (p[k] != 'no' && !nbInternet++)
+						if ((p[k] != 'no') && !(nbInternet++))
 							popup.push('Accès internet');
 						break;
 					default:
@@ -664,19 +725,10 @@ function layerOverpass(options) {
 				}
 		}
 
-		// Label tail with OSM reference & user specific function
-		popup.push(
-			p.description,
-			'<hr/><a title="Voir la fiche d\'origine sur openstreetmap" ' +
-			'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '" ' +
-			'target="_blank">Voir sur OSM</a>',
-			typeof options.postLabel == 'function' ? options.postLabel(overpassType(p), p, f) : options.postLabel || ''
-		);
 		return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
 	}
 
 	function overpassType(properties) {
-		var checkElements = document.getElementsByName(options.selectorName);
 		for (var e = 0; e < checkElements.length; e++)
 			if (checkElements[e].checked) {
 				var tags = checkElements[e].value.split('+');
@@ -996,8 +1048,8 @@ function controlPermalink(options) {
 			render: render
 		}),
 		params = location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
-			document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
-			(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
+		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
+		(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
 
 	control.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
 
@@ -1117,16 +1169,16 @@ function controlLengthLine() {
 	}
 
 	function calculateLength(feature) {
-/*//TODO BEST RANDO idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
-		f.setStyle(
-      new ol.style.Style({
-//          fill: new ol.style.Fill({opacity: 0.7}),
-          stroke: new ol.style.Stroke({color: 'blue'
-          })
-      })
-  );
-*/
-		
+		/*//TODO BEST RANDO idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
+				f.setStyle(
+		      new ol.style.Style({
+		//          fill: new ol.style.Fill({opacity: 0.7}),
+		          stroke: new ol.style.Stroke({color: 'blue'
+		          })
+		      })
+		  );
+		*/
+
 		var length = ol.sphere.getLength(feature.getGeometry());
 		if (length >= 100000)
 			divElement.innerHTML = (Math.round(length / 1000)) + ' km';
@@ -1288,8 +1340,8 @@ window.addEventListener('load', function() {
 /**
  * Print control
  */
-function controlPrint() {
 //TODO CHEM/RANDO impression full format page -> CSS
+function controlPrint() {
 	return controlButton({
 		className: 'print-button',
 		title: 'Imprimer la carte',
@@ -1537,7 +1589,7 @@ function controlEditCreate(type) {
 		draw = new ol.interaction.Draw({
 			source: button.group.M.source,
 			type: type
-		})		;
+		});
 
 	function render(evt) { //HACK to get map ref when the control is added
 		if (!draw.map_) { // Only once
@@ -1654,9 +1706,10 @@ function layersCollection(keys) {
  * JSON.parse handling error
  */
 function JSONparse(json) {
+	var js;
 	if (json)
 		try {
-			var js = JSON.parse(json);
+			js = JSON.parse(json);
 		} catch (returnCode) {
 			if (returnCode)
 				console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);

@@ -28,7 +28,13 @@
 			target: 'map',
 			layers: [
 				geoLayer(),
-				overlaySelector()
+				layerOverpass({
+					postLabel: postLabel
+				}),
+				layerPointsWri({
+					selectorName: 'wri-poi',
+					postLabel: postLabel
+				})
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(

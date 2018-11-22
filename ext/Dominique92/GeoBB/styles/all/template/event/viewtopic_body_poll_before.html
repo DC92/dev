@@ -194,7 +194,13 @@
 			target: 'map',
 			layers: [
 				geoLayer({TOPIC_ID}),
-				overlaySelector()
+				layerOverpass({
+					postLabel: postLabel
+				}),
+				layerPointsWri({
+					selectorName: 'wri-poi',
+					postLabel: postLabel
+				})
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(

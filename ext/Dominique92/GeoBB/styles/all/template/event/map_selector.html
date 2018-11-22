@@ -1,32 +1,16 @@
-<ul id="overpass">
-	<li>Points externes</li>
-	<li><input type="checkbox" name="overpass" id="point_eau" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
-	<li><input type="checkbox" name="overpass" id="telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
-	<li><input type="checkbox" name="overpass" id="wifi" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
-	<li><input type="checkbox" name="overpass" id="ravitaillement" value='["shop"~"supermarket|convenience"]' />Ravitaillement</li>
-	<li><input type="checkbox" name="overpass" id="parking" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
+<ul>
+	<li>Points <a href="http://www.refuges.info">refuges.info</a></li>
+	<li><input type="checkbox" name="wri-poi" value="7" checked="checked" />cabanes non gardée</li>
+	<li><input type="checkbox" name="wri-poi" value="10" />refuges gardés</li>
+	<li><input type="checkbox" name="wri-poi" value="23" />points d'eau</li>
 </ul>
-
-<script>
-	//TODO BEST ASPIR ajouter WRI / Gérer les doublons avec WRI
-	function overlaySelector() {
-		return layerOverpass({
-			url: '//overpass-api.de/api/interpreter',
-			selectorId: 'overpass',
-			selectorName: 'overpass',
-			labelClass: 'label-overpass',
-			iconUrlPath : '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
-			postLabel: function(t, p) {
-				var ll4326 = ol.proj.transform(p.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
-				return ['<a title="Créer une fiche modifiable à partir du point OSM" ' +
-						'href="posting.php?mode=post',
-						'type=' + t,
-						'name=' + (p.name ? p.name : t),
-						'lon=' + Math.round(ll4326[0] * 100000) / 100000,
-						'lat=' + Math.round(ll4326[0] * 100000) / 100000
-					].join('&') +
-					'">Créer une fiche Aspir</a>';
-			}
-		});
-	}
-</script>
+<br/>
+<ul id="overpass">
+	<li class="titre">Points <a href="https://www.openstreetmap.org">OpenStreetMap</a></li>
+	<li class="zoom-out">Zone trop large : zoomer pour voir les points</li>
+	<li><input type="checkbox" name="overpass" id="point_eau" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Points d'eau</li>
+	<li><input type="checkbox" name="overpass" id="telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
+	<li><input type="checkbox" name="overpass" id="wifi" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Cafés internet</li>
+	<li><input type="checkbox" name="overpass" id="ravitaillement" value='["shop"~"supermarket|convenience"]' />Ravitaillements</li>
+	<li><input type="checkbox" name="overpass" id="parking" value='["amenity"="parking"]["access"!="private"]' />Parkings</li>
+</ul>

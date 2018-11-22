@@ -1,5 +1,6 @@
 <?php
 // Importation des bases enquete-pastorale.irstea
+//TODO enlever les _ sur les noms des alpages / Enlever les majuscules ?
 
 echo"<p>
 <a href='aspir_import.php?d=01'>01</a> &nbsp; 

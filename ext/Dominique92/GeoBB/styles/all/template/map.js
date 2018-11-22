@@ -36,6 +36,24 @@ function layers(keys) {
 	};
 }
 
+function postLabel(properties, feature, layer, pixel, ll4326) {
+	var type = typeof layer.options_.type == 'function' ?
+		layer.options_.type(properties, feature, layer, pixel, ll4326) :
+		layer.options_.type || '',
+		name = typeof layer.options_.name == 'function' ?
+		layer.options_.name(properties, feature, layer, pixel, ll4326) :
+		layer.options_.name || '';
+
+	return ['<hr/><a title="Créer une fiche modifiable à partir du point" ' +
+			'href="posting.php?mode=post', //TODO BEST spécifique : passer en argument
+			'type=' + type,
+			'name=' + (name || type),
+			'lon=' + Math.round(ll4326[0] * 100000) / 100000,
+			'lat=' + Math.round(ll4326[0] * 100000) / 100000
+		].join('&') +
+		'">Créer une fiche</a>';
+}
+
 function layerStyle(properties, id, hover) {
 	if (properties.icon)
 		return {
@@ -56,7 +74,7 @@ function layerStyle(properties, id, hover) {
 		};
 
 	var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
-	colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
+		colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
 	return {
 		fill: new ol.style.Fill({
 			color: hover ? 'rgba(0,0,0,0.3)' : colorTr

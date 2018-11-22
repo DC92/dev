@@ -44,3 +44,12 @@
 #news .row:after { /* Avoid only 1 news line at the left of the map */
 	content: none;
 }
+
+.overpass .zoom-out,
+.overpass-zoom-out li {
+	display: none;
+}
+.overpass-zoom-out .titre,
+.overpass-zoom-out .zoom-out {
+	display: list-item;
+}
