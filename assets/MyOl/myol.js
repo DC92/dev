@@ -327,6 +327,8 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires 'onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
+//TODO BUG ne clique pas sur l'étiquette d'un polygone alpage aspir ou massif WRI
+//TODO BUG pas s'étiquette sur IE & EDGE
 function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
@@ -459,7 +461,7 @@ function initLayerVectorURLListeners(e) {
 		// Apply hover if any
 		var style = (h.options.hover || h.options.style)(h.properties);
 
-		// Spread too closes icons //TODO BUG BLOCKING ASPIR don't allow to click on the last !!
+		// Spread too closes icons //TODO BUG don't allow to click on the last !!
 		//TODO BEST redo this as only the icon moves (can see), not the feature position (can click)
 		if (hovered.length > 2 &&
 			style.image)
@@ -582,6 +584,7 @@ function layerPointsWri(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
+//TODO BUG pas d'overpass sur IE
 //TODO BUG BEST quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 //TODO BEST afficher erreur 429 (Too Many Requests)
 function layerOverpass(options) {
@@ -751,7 +754,6 @@ function layerOverpass(options) {
  * Requires 'onadd' layer event
  */
 //TODO BEST pointer finger sur la cible
-//TODO TESTER ne se déplace pas lors du premier glissement. besoin de recliquer dessus
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
 		eljson, json, elxy;

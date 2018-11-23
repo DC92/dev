@@ -1,6 +1,5 @@
 <?php
 // Importation des bases enquete-pastorale.irstea
-//TODO enlever les _ sur les noms des alpages / Enlever les majuscules ?
 
 echo"<p>
 <a href='aspir_import.php?d=01'>01</a> &nbsp; 
@@ -84,7 +83,6 @@ foreach ($epiphp->features as $p)
 		$geomsql = 'GeomFromText("'.$geomphp->out('wkt').'")';
 
 		// Normalise data
-		$p->properties->nom_commune = str_replace ("'", "\\'", $p->properties->nom_commune);
 		if (!$p->properties->surface)
 			$p->properties->surface = 0;
 		if (!$p->properties->nom1)
@@ -164,7 +162,7 @@ foreach ($epiphp->features as $p)
 					SET geom = $geomsql,
 					geo_unite_pastorale = '".str_replace ("'", "\\'", $p->properties->nom1)."',
 					geo_surface = {$p->properties->surface},
-					geo_commune = '{$p->properties->nom_commune}',
+//					geo_commune = '{$p->properties->nom_commune}',
 					geo_irstea_code = '{$p->properties->code}',
 					geo_irstea_type = '$upzp:$epid'
 				WHERE post_id = {$data['post_id']}";

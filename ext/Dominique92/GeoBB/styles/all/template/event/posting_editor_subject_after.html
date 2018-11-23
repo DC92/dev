@@ -24,8 +24,8 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer({TOPIC_ID}, true),
-			edit = controlEdit('editable-json', [], true),
+		var overlay = geoLayer({TOPIC_ID}, true), //TODO BEST ne pas afficher du tout le polygone TOPIC_ID
+			edit = controlEdit('editable-json', [overlay], true),
 			poly = controlEditCreate('Polygon'),
 			extent = edit.source.getExtent(),
 			permalink = controlPermalink({
@@ -87,8 +87,8 @@
 
 	<input name="geo_altitude-int-10" type="hidden"/>
 	<input name="geo_surface-int-10" type="hidden"/>
-	<input name="geo_ign-text" type="hidden"/>		
-	<input name="geo_commune-varchar-80" type="hidden" value="{GEO_COMMUNE}"/>
+	<input name="geo_ign-text" type="hidden"/>	
+	<input name="geo_commune-varchar-80" type="hidden" value=""/>
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
 		<h2>1. L'alpage</h2>
@@ -119,15 +119,10 @@
 			<option value="non" <!-- IF GEO_MAE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
 			<option value="ne sait pas" <!-- IF GEO_MAE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
 		</select></p>
-		<p>Réserve de parc régional ou national <select name="geo_reserve-varchar-20">
-			<option value=""></option>
-			<option value="oui" <!-- IF GEO_RESERVE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
-			<option value="non" <!-- IF GEO_RESERVE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
-			<option value="ne sait pas" <!-- IF GEO_RESERVE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
-		</select></p>
+		<p>Réserve de parc régional ou national <input type="text" name="geo_reserve-varchar-80" size="25" class="inputbox autowidth" value="{GEO_RESERVE}" /></p>
 
 		<h3>1.5 Autres usagers</h3>
-		
+
 		<p>Présence d'autres usagers<br />
 			<input type="checkbox" name="geo_usager_vtt-varchar-20" value="VTT," <!-- IF GEO_USAGER_VTT -->checked="checked"<!-- ENDIF --> /> VTT<br />
 			<input type="checkbox" name="geo_usager_gr-varchar-20" value="GR," <!-- IF GEO_USAGER_GR -->checked="checked"<!-- ENDIF --> /> GR<br />

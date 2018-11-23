@@ -287,16 +287,16 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Calcul des données automatiques
 	function get_automatic_data(&$row) {
-		global $geo_mapquest_key;
+		$update = []; // Datas to be updated
 
+		// Calcul du centre pour toutes les actions
 		include_once('assets/geoPHP/geoPHP.inc');
 		$geophp = \geoPHP::load($row['geomwkt'],'wkt');
 		$centre = $geophp->getCentroid()->coords;
 
 		// Calcul de la surface en ha avec geoPHP
-		if (!$row['geo_surface']) {
-			$row['geo_surface'] = // Pour affichage
-			$sql_update['geo_surface'] = // Pour modification de la base
+		if (array_key_exists ('geo_surface', $row) && !$row['geo_surface']) {
+			$update['geo_surface'] =
 				round ($geophp->getArea()
 					* 1111 // hm par ° delta latitude
 					* 1111 * sin ($centre[1] * M_PI / 180) // hm par ° delta longitude
@@ -304,7 +304,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 
 		// Calcul de l'altitude avec mapquest
-		if (!$row['geo_altitude']) {
+		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
+			global $geo_mapquest_key;
 			$mapquest = @file_get_contents (
 				'http://open.mapquestapi.com/elevation/v1/profile'.
 				'?key='.$geo_mapquest_key.
@@ -314,82 +315,88 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			);
 			if ($mapquest) {
 				preg_match ('/"height":([0-9]+)/', $mapquest, $match);
-				$row['geo_altitude'] =
-				$sql_update['geo_altitude'] =
-					@$match[1];
+				$update['geo_altitude'] = @$match[1];
 			}
 		}
 
 		// Calcul de la carte IGN
-		if (!$row['geo_ign']) {
-			$wri_export = @file_get_contents (
-				'http://www.refuges.info/api/polygones?type_polygon=3'.
-				'&bbox='.$centre[0].','.$centre[1].','.$centre[0].','.$centre[1]
-			);
-			$igns = [];
-			preg_match_all ('/:"(IGN[^"]+)/', serialize(json_decode($wri_export)), $match);
-			if ($match[1])
-				foreach ($match[1] AS $m) {
-					$ms = explode (' ', $m);
-					$igns [] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$m</a>";
-				}
-			$row['geo_ign'] = // Pour affichage
-			$sql_update['geo_ign'] = // Pour modification de la base
-				@implode('<br/>', $igns);
+		if ((array_key_exists('geo_massif', $row) && !$row['geo_massif']) ||
+			(array_key_exists('geo_reserve', $row) && !$row['geo_reserve']) ||
+			(array_key_exists('geo_ign', $row) && !$row['geo_ign'])) {
+			$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$centre[0]},{$centre[1]},{$centre[0]},{$centre[1]}";
+			$wri_export = @file_get_contents($url);
+			if ($wri_export) {
+				$igns = [];
+				$fs = json_decode($wri_export)->features;
+				foreach($fs AS $f)
+					switch ($f->properties->type->type) {
+						case 'massif':
+							if (array_key_exists('geo_massif', $row))
+								$update['geo_massif'] = $f->properties->nom;
+							break;
+						case 'zone réglementée':
+							if (array_key_exists('geo_reserve', $row))
+								$update['geo_reserve'] = $f->properties->nom;
+							break;
+						case 'carte':
+							$ms = explode(' ', $f->properties->nom);
+							$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom</a>";
+							break;
+					}
+			}
 		}
 
 		// Calcul de la commune
-		//TODO BUG BEST ASPIR nominatim adresse, ... (=> Commune)
-		if (!$row['geo_commune']) {
-			$nominatim = json_decode (@file_get_contents (
-				'https://nominatim.openstreetmap.org/reverse?format=json&lon='.$centre[0].'&lat='.$centre[1],
-				false, 
-				stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
-			));
-/*//TODO DELETE */echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($nominatim->address,true).'</pre>';
-			if ($nominatim)
-				$row['geo_commune'] =
-				$sql_update['geo_commune'] =
-					$nominatim->address->postcode.' '.
-					($nominatim->address->town ?: $nominatim->address->city_district ?: $nominatim->address->city ?: $nominatim->address->village);
+		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
+			$ch = curl_init ();
+			curl_setopt ($ch, CURLOPT_URL, 
+				'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
+				http_build_query ( array(
+					'output' => 'json',
+					'xls' =>
+<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<XLS 
+xmlns:xls="http://www.opengis.net/xls"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns="http://www.opengis.net/xls"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2"	xsi:schemaLocation="http://www.opengis.net/xls
+	http://schemas.opengis.net/ols/1.2/olsAll.xsd">
+	<RequestHeader/>
+	<Request requestID="" version="1.2" methodName="LocationUtilityService" maximumResponses="10">
+		<ReverseGeocodeRequest>
+			<Position>
+				<gml:Point>
+					<gml:pos>{$centre[1]} {$centre[0]}</gml:pos>
+				</gml:Point>
+			</Position>
+			<ReverseGeocodePreference>CadastralParcel</ReverseGeocodePreference>
+		</ReverseGeocodeRequest>
+	</Request>
+</XLS>
+XML
+				))
+			);
+			ob_start();
+			curl_exec($ch);
+			$json = ob_get_clean();
+
+			preg_match ('/Municipality\\\">([^<]+)/', $json, $commune);
+			preg_match ('/Departement\\\">([^<]+)/', $json, $departement);
+			if ($commune[1])
+				$update['geo_commune'] = $commune[1].' ('.$departement[1].')';
 		}
 
-//TODO BEST ASPIR Présence de parc : automatiser (=> WRI ?)
+if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
 
-/*//TODO CHEM Détermination du massif par refuges.info
-		if (array_key_exists ('geo_massif', $row) && !$row['geo_massif']) {
-			$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.$ll[1][0].','.$ll[1][1].','.$ll[1][0].','.$ll[1][1];
-			$wri_export = json_decode (@file_get_contents ($f_wri_export));
-			if($wri_export->features)
-				foreach ($wri_export->features AS $f)
-					$ms [$f->properties->type->id] = $f->properties->nom;
-			if (isset ($ms))
-				ksort ($ms);
-			$row['geo_massif'] =
-			$sql_update['geo_massif'] =
-				@$ms[array_keys($ms)[0]].'~'; // ~ indique que la valeur & été déterminée par le serveur
-		}
-
-*/
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($sql_update,true).'</pre>';
-
-		// Filter only existing columns
-		$sql_update_clean = [];
-		if ($sql_update) {
-			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
-			$result = $this->db->sql_query($sql);
-			while ($column = $this->db->sql_fetchrow($result))
-				if (array_key_exists ($column['Field'], $sql_update))
-					$sql_update_clean[$column['Field']] = $sql_update[$column['Field']].
-						($column['Type'][0] == 'i' ? '' : '~'); // Add a special char if the field is automatically filled
-			$this->db->sql_freeresult($result);
-		}
+		// Pour affichage
+		$row = array_merge ($row, $update);
 
 		// Update de la base
-		if ($sql_update_clean)
+		if ($update)
 			$this->db->sql_query (
 				'UPDATE '.POSTS_TABLE.
-				' SET '.$this->db->sql_build_array('UPDATE',$sql_update_clean).
+				' SET '.$this->db->sql_build_array('UPDATE',$update).
 				' WHERE post_id = '.$row['post_id']
 		);
 	}
