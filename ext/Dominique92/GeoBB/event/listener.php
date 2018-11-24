@@ -347,6 +347,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 
 		// Calcul de la commune
+		// Todo code postal
 		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
 			$ch = curl_init ();
 			curl_setopt ($ch, CURLOPT_URL, 

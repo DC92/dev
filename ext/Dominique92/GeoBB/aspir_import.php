@@ -1,6 +1,43 @@
 <?php
 // Importation des bases enquete-pastorale.irstea
 
+/* OPERATIONS
+
+CONFIG ASPIR
+============
+config.php -> clés cartes
+Messages -> Ajouter un bbcode -> [first={TYPE}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
+Permissions -> Permissions des forums -> Tous les forums -> Envoyer -> Utilisateurs enregistrés -> Modifier les permissions
+==> Général -> Paramètres du serveur -> Activer la compression GZip : oui
+Général -> Configuration du forum -> Libellé du site Internet :
+==> NON : Général -> Paramètres de sécurité -> Autoriser le PHP dans les templates : OUI
+==> Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
+
+UPDATE VERSION PHPBB
+====================
+copier full package
+install/app.php/update -> database only
+delete install
+ext/Dominique92/GeoBB/aspir_import.php?d=01
+
+RESYNC ASPIR
+============
+Vider cache / cache de l'explorateur
+structure phpbb_posts -> supprime colonnes geo*
+cree cabane / valide PUIS cree alpage / valide
+vide phpbb_posts
+admin -> resync les forums
+aspir_import.php -> cliquer sur tous
+??? ajouter phrase / code aspir
+
+ACCEPTER MODERATEUR
+===================
+Notification -> Activation requise
+-> Administrer le membre -> Outils rapides -> Activer son compte
+Formulaire -> Groupes -> Ajouter ce membre = Modérateurs globaux
+
+*/
+
 echo"<p>
 <a href='aspir_import.php?d=01'>01</a> &nbsp; 
 <a href='aspir_import.php?d=04'>04</a> &nbsp; 
@@ -108,15 +145,13 @@ foreach ($epiphp->features as $p)
 		$db->sql_freeresult($result);
 
 		//  Création d'une fiche
-		if ($p->geometry->coordinates) {
-			echo '<pre style="background-color:white;color:black;font-size:14px;">'.
-				($data['topic_id'] ? 'EDITION' : 'CREATION' ).
-				' = '.var_export($p->properties->nom1,true).'</pre>';
+		if ($p->geometry->coordinates && !$data['topic_id']) {
+			echo '<pre style="background-color:white;color:black;font-size:14px;">Céation de '.var_export($p->properties->nom1,true).'</pre>';
 
 			$data = [
 				'forum_id' => $alp_forum_id,
-				'topic_id' => $data['topic_id'] ?: 0, // Le créer
-				'post_id' => $data['post_id'] ?: 0, // Le créer
+				'topic_id' => 0, // Le créer
+				'post_id' => 0, // Le créer
 				'post_subject' => $p->properties->nom1,
 				'message' => '',
 				'message_md5' => md5(''),
@@ -137,14 +172,12 @@ foreach ($epiphp->features as $p)
 			];
 			$poll = [];
 			\submit_post(
-				$data['topic_id'] ? 'edit' : 'post',
+				'post',
 				$p->properties->nom1,
 				$user->data['username'],
 				POST_NORMAL,
 				$poll,
-				$data,
-				true,
-				true
+				$data
 			);
 		}
 
@@ -160,9 +193,9 @@ foreach ($epiphp->features as $p)
 		if ($data['post_id']) {
 			$sql = "UPDATE phpbb_posts
 					SET geom = $geomsql,
+					post_subject = '".str_replace ("'", "\\'", $p->properties->nom1)."',
 					geo_unite_pastorale = '".str_replace ("'", "\\'", $p->properties->nom1)."',
 					geo_surface = {$p->properties->surface},
-//					geo_commune = '{$p->properties->nom_commune}',
 					geo_irstea_code = '{$p->properties->code}',
 					geo_irstea_type = '$upzp:$epid'
 				WHERE post_id = {$data['post_id']}";
