@@ -1,3 +1,5 @@
+<!-- IF GEO_MAP_TYPE and POST_ID == TOPIC_FIRST_POST_ID -->
+
 <!-- Openlayers -->
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
 <!-- INCLUDEJS assets/MyOl/ol/ol.js -->
@@ -6,18 +8,19 @@
 <!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
 
+<!-- IF GEO_MAP_TYPE -->
 <!-- Proj4 projections Swiss & UK -->
 <!-- //TODO CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
 <!-- INCLUDEJS assets/MyOl/myol.js -->
+<!-- ENDIF -->
 
 <!-- Style specific maps functions -->
 <!-- INCLUDECSS map.css -->
 <!-- INCLUDEJS map.js -->
 
-<!-- IF GEO_MAP_TYPE  -->
 <div class="map" id="map"></div>
 
 <script>
@@ -39,7 +42,7 @@
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
-					layers({GEO_OLKEYS})
+					layers({GEO_KEYS})
 				),
 				<!-- IF GEO_MAP_TYPE == 'surface' -->
 					edit,
@@ -91,15 +94,64 @@
 	<input name="geo_commune-varchar-80" type="hidden" value=""/>
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
+AAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+		<!-- BEGIN topic_field -->
+			<!-- IF topic_field.TAG == 'input' -->
+				<p>{topic_field.INNER} <{topic_field.TAG} type="{topic_field.TYPE}" name="{topic_field.SQL_NAME}-{topic_field.SQL_TYPE}" size="25" class="inputbox autowidth" value="{topic_field.SQL_NAME_UP}" /></p>
+			<!-- ELSEIF topic_field.TAG == 'h5' -->
+			<!-- ELSE -->
+				<{topic_field.TAG}>{topic_field.INNER}</{topic_field.TAG}>
+			<!-- ENDIF -->
+
+			<!-- BEGIN element -->
+			<!-- END element -->
+		<!-- END topic_field -->
+
+ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 		<h2>1. L'alpage</h2>
 		<h3>1.1 Équipements</h3>
-		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Autres équipements disponibles
+		<p>Pédiluve <select name="geo_pediluve-varchar-20">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_PEDILUVE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_PEDILUVE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+			<option value="ne sait pas" <!-- IF GEO_PEDILUVE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
+		</select></p>
+		<p>Couloir de contention <select name="geo_couloir-varchar-20">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_COULOIR == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_COULOIR == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+			<option value="ne sait pas" <!-- IF GEO_COULOIR == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
+		</select></p>
+		<p>Parc infirmerie en dur <select name="geo_infirmerie-varchar-20">
+			<option value=""></option>
+			<option value="oui" <!-- IF GEO_INFIRMERIE == 'oui' -->selected="selected"<!-- ENDIF -->>oui</option> 
+			<option value="non" <!-- IF GEO_INFIRMERIE == 'non' -->selected="selected"<!-- ENDIF -->>non</option>
+			<option value="ne sait pas" <!-- IF GEO_INFIRMERIE == 'ne sait pas' -->selected="selected"<!-- ENDIF -->>ne sait pas</option>
+		</select></p>
+		<p>Nombre de filets <input type="number" name="geo_filets-int-5" size="25" class="inputbox autowidth" value="{GEO_FILETS}" /></p>
+		<p>Nombre de postes électrique <input type="number" name="geo_postes-int-5" size="25" class="inputbox autowidth" value="{GEO_POSTES}" /></p>
+		<p title="Autres équipements disponibles (équipements de contention ? Nb de filets, postes électriques...)">Autres équipements disponibles :
 			<textarea name="geo_equipement-text" rows="6" cols="60" class="inputbox autowidth">{GEO_EQUIPEMENT}</textarea></p>
 
 		<h3>1.2 Caractéristiques</h3>
 		<p>Topographie<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
+		<p title="vide, chute de pierres, orages violents...">Risques<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_RISQUES}</textarea></p>
+		<p>Climat<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_CLIMAT}</textarea></p>
+		<p title="faune ou flore">Présence espèces remarquables et/ou protégées<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_ESPECES_PROTÉGES}</textarea></p>
+		<p title="en ha ? Qualité de l'herbe ? Note sur 5">Ressource fourragère<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_RESSOURCE_FOURRAGERE}</textarea></p>
+		<p>Points d'eau Marais/zones humides<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_ZONES_HUMIDES</textarea></p>
+		<p title="Hommes / animaux, débit source, rivière, point d'eau permanent ou semi permanent,
+abreuvoirs, impluviums">Eau<textarea name="geo_topographie-text" rows="4" cols="45" class="inputbox autowidth">{GEO_TOPOGRAPHIE}</textarea></p>
 
-		<p>Opérateur téléphonique recommandé <input type="text" name="geo_operateur-varchar-40" size="25" class="inputbox autowidth" value="{GEO_OPERATEUR}" /></p>
+		<p>Opérateur téléphonique recommandé<br />
+		<input type="checkbox" name="geo_operateur__vtt-varchar-20" value="VTT," <!-- IF GEO_operateur__VTT -->checked="checked"<!-- ENDIF --> /> Orange<br />
+		<input type="checkbox" name="geo_operateur__vtt-varchar-20" value="VTT," <!-- IF GEO_operateur__VTT -->checked="checked"<!-- ENDIF --> /> Bouygues Télécom<br />
+		<input type="checkbox" name="geo_operateur__vtt-varchar-20" value="VTT," <!-- IF GEO_operateur__VTT -->checked="checked"<!-- ENDIF --> /> Free<br />
+		<input type="checkbox" name="geo_operateur__vtt-varchar-20" value="VTT," <!-- IF GEO_operateur__VTT -->checked="checked"<!-- ENDIF --> /> SFR<br />
+		<input type="text" name="geo_operateur-varchar-40" size="25" class="inputbox autowidth" value="{GEO_OPERATEUR}" /><br />
+		<input type="checkbox" name="geo_operateur__vtt-varchar-20" value="VTT," <!-- IF GEO_operateur__VTT -->checked="checked"<!-- ENDIF --> /> Ne sait pas<br />
+		</p>
 
 		<h3>1.3 Accès</h3>
 		<p>Accès <select name="geo_acces-varchar-10">
@@ -107,6 +159,12 @@
 			<option value="route" <!-- IF GEO_ACCES == 'route' -->selected="selected"<!-- ENDIF -->>route</option> 
 			<option value="piste" <!-- IF GEO_ACCES == 'piste' -->selected="selected"<!-- ENDIF -->>piste</option>
 			<option value="sentier" <!-- IF GEO_ACCES == 'sentier' -->selected="selected"<!-- ENDIF -->>sentier</option>
+		</select></p>
+		<p>État de l'accès <select name="geo_acces-varchar-10">
+			<option value=""></option>
+			<option value="Bon" <!-- IF GEO_ACCES == 'Bon' -->selected="selected"<!-- ENDIF -->>Bon</option> 
+			<option value="Moyen" <!-- IF GEO_ACCES == 'Moyen' -->selected="selected"<!-- ENDIF -->>Moyen</option>
+			<option value="Mauvais" <!-- IF GEO_ACCES == 'Mauvais' -->selected="selected"<!-- ENDIF -->>Mauvais</option>
 		</select></p>
 		<p>Où se garer <input type="text" name="geo_parking-varchar-80" size="25" class="inputbox autowidth" value="{GEO_PARKING}" /></p>
 		<p title="Temps de parcours depuis la vallée jusqu'à la cabane principale">Temps de parcours <input type="number" name="geo_parcours-int-5" class="inputbox autowidth" value="{GEO_PARCOURS}" /> minutes</p>

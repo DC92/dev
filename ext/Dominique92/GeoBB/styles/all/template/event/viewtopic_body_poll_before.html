@@ -1,3 +1,5 @@
+<!-- IF GEO_MAP_TYPE  -->
+
 <!-- Openlayers -->
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
 <!-- INCLUDEJS assets/MyOl/ol/ol.js -->
@@ -29,10 +31,13 @@
 		<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
 	<!-- ENDIF -->
 
-	<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m</p><!-- ENDIF -->
-	<!-- IF GEO_COMMUNE --><p>Commune : {GEO_COMMUNE}</p><!-- ENDIF -->
-	<!-- IF GEO_MASSIF --><p><span>Massif</span>: {GEO_MASSIF}</p><!-- ENDIF -->
-	<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN}</p><!-- ENDIF -->
+	<!-- IF FORUM_NAME != 'Alpages' -->
+	<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m <a title="Cette information vous est offerte par mapquest.com" href="https://www.mapquest.com/">&copy;mapquest</a></p><!-- ENDIF -->
+	<!-- ENDIF -->
+	<!-- IF GEO_COMMUNE --><p>Commune : {GEO_COMMUNE} <a title="Cette information vous est offerte par IGN OpenLS" href="https://geoservices.ign.fr/documentation/geoservices/geocodage.html">&copy;IGN</a></p><!-- ENDIF -->
+	<!-- IF GEO_MASSIF --><p><span>Massif</span>: {GEO_MASSIF} <a title="Cette information vous est offerte par refuges.info" href="https://www.refuges.info/">&copy;refuges.info</a></p><!-- ENDIF -->
+	<!-- IF GEO_IGN --><p>Carte IGN : {GEO_IGN} <a title="Cette information vous est offerte par refuges.info" href="https://www.refuges.info/">&copy;refuges.info</a></p><!-- ENDIF -->
+	<!-- //TODO &copy; IGN ... -->
 
 	<!-- IF FORUM_NAME == 'Alpages' -->
 		<h2>1. L'alpage</h2>
@@ -57,10 +62,28 @@
 			<!-- END contains_point_eau -->
 		<!-- ENDIF -->
 		<p><a href="./posting.php?mode=post&type=point_eau">[Ajouter un point d'eau]</a></p>
+		<!-- IF GEO_PEDILUVE --><p>Pédiluve : {GEO_PEDILUVE}</p><!-- ENDIF -->
+		<!-- IF GEO_COULOIR --><p>Couloir contention : {GEO_COULOIR}</p><!-- ENDIF -->
+		<!-- IF GEO_INFIRMERIE --><p>Parc infirmerie en dur : {GEO_INFIRMERIE}</p><!-- ENDIF -->
+		<!-- IF GEO_FILETS --><p>Nombre de filets : {GEO_FILETS}</p><!-- ENDIF -->
+		<!-- IF GEO_POSTES --><p>Nombre de postes électrique : {GEO_POSTES}</p><!-- ENDIF -->
 		<!-- IF GEO_EQUIPEMENT --><p>Autres équipements disponibles : {GEO_EQUIPEMENT}</p><!-- ENDIF -->
 
 		<h3>1.2 Caractéristiques</h3>
-		<!-- IF GEO_TOPOGRAPHIE --><p>Topographie: {GEO_TOPOGRAPHIE}</p><!-- ENDIF -->
+		<!-- IF GEO_ALTITUDE --><p>Altitude: {GEO_ALTITUDE} m <a title="Cette information vous est offerte par mapquest.com" href="https://www.mapquest.com/">&copy;mapquest</a></p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Topographie : {GEO_TOPOGRAPHIE}</p><!-- ENDIF -->
+		<!-- IF GEO_RISQUES --><p>Risques : {GEO_RISQUES}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Présence espèces remarquables et/ou protégées : {GEO_ESPECES_PROTÉGES}</p><!-- ENDIF -->
+		<!-- IF GEO_ESPECES_PROTÉGES --><p>Ressource fourragère : {GEO_RESSOURCE_FOURRAGERE}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Points d'eau Marais/zones humides : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Eau : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
+		<!-- IF GEO_TOPOGRAPHIE --><p>Climat : {GEO_CLIMAT}</p><!-- ENDIF -->
 		<!-- IF GEO_SURFACE --><p>Superficie : {GEO_SURFACE} ha</p><!-- ENDIF -->
 		<!-- IF GEO_VEGETATION --><p>Végétation : {GEO_VEGETATION}</p><!-- ENDIF -->
 		<!-- IF GEO_OPERATEUR --><p>Opérateur téléphonique recommandé : {GEO_OPERATEUR}</p><!-- ENDIF -->
@@ -73,7 +96,7 @@
 
 		<h3>1.4 Mesures environnementales</h3>
 		<!-- IF GEO_MAE --><p>Présence de MAE : {GEO_MAE}</p><!-- ENDIF -->
-		<!-- IF GEO_RESERVE --><p>Réserve de parc régional ou national : {GEO_RESERVE}</p><!-- ENDIF -->
+		<!-- IF GEO_RESERVE --><p>Réserve de parc régional ou national : {GEO_RESERVE} <a title="Cette information vous est offerte par refuges.info" href="https://www.refuges.info/">&copy;refuges.info</a></p><!-- ENDIF -->
 
 		<h3>1.5 Autres usagers</h3>
 		<p>Présence d'autres usagers :
@@ -193,18 +216,22 @@
 		var map = new ol.Map({
 			target: 'map',
 			layers: [
-				geoLayer({TOPIC_ID}), //TODO BEST colorier de façon différente (gris) le polygone TOPIC_ID & le polygone survolé
+/*
+//TODO DELETE aspir
+//TODO complete chemineur
 				layerOverpass({
 					postLabel: postLabel
 				}),
 				layerPointsWri({
 					selectorName: 'wri-poi',
 					postLabel: postLabel
-				})
+				}),
+*/
+				geoLayer({TOPIC_ID}) //TODO BEST colorier de façon différente (gris) le polygone TOPIC_ID & le polygone survolé
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
-					layers({GEO_OLKEYS})
+					layers({GEO_KEYS})
 				),
 				controlPermalink({
 					init: false,
@@ -237,3 +264,4 @@
 		<!-- ENDIF -->
 	});
 </script>
+<!-- ENDIF -->

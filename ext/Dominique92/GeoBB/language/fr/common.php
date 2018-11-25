@@ -53,4 +53,6 @@ $lang = array_merge($lang, array(
 
 	// Footer
 	'FINAL_INTEGRATION_BY' => 'Copyright &copy; <a href="https://github.com/Dominique92">Dominique Cavailhez</a> 2016. Sur la base de PhpBB',
+
+	//TODO message à l'inscription
 ));

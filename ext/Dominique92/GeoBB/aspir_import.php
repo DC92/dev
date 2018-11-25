@@ -8,17 +8,18 @@ CONFIG ASPIR
 config.php -> clés cartes
 Messages -> Ajouter un bbcode -> [first={TYPE}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
 Permissions -> Permissions des forums -> Tous les forums -> Envoyer -> Utilisateurs enregistrés -> Modifier les permissions
-==> Général -> Paramètres du serveur -> Activer la compression GZip : oui
+Général -> Paramètres du serveur -> Activer la compression GZip : oui
 Général -> Configuration du forum -> Libellé du site Internet :
-==> NON : Général -> Paramètres de sécurité -> Autoriser le PHP dans les templates : OUI
-==> Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
+Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
+Genéral -> Paramètres des fichiers joints -> Taille maximale du fichier : : 5 Mo
 
 UPDATE VERSION PHPBB
 ====================
 copier full package
 install/app.php/update -> database only
 delete install
-ext/Dominique92/GeoBB/aspir_import.php?d=01
+ext/Dominique92/GeoBB/aspir_import.php?d=07
+administration -> resync les forums
 
 RESYNC ASPIR
 ============
@@ -110,7 +111,7 @@ function conv_3857_to_4326(&$p){
 	}
 }
 
-$stay_lower = ['le','la','les','du','de','des','sur','','','','','','','','',];
+$stay_lower = ['le','la','les','du','de','des','sur'];
 
 foreach ($epiphp->features as $p)
 	if($p->geometry) {

@@ -53,3 +53,8 @@
 .overpass-zoom-out .zoom-out {
 	display: list-item;
 }
+
+.geo_presentation {
+	font-size: 1.2em;
+	margin-bottom: 10px;
+}

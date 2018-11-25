@@ -81,7 +81,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	function geobb_activate_map($forum_desc, $first_post = true) {
-		global $geo_olkeys; // Private / defined in config.php
+		global $geo_keys; // Private / defined in config.php
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
 		switch (@$regle[1]) {
@@ -94,7 +94,7 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_vars([
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
-					'GEO_OLKEYS' => $geo_olkeys,
+					'GEO_KEYS' => $geo_keys,
 //					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
 		}
@@ -144,13 +144,30 @@ class listener implements EventSubscriberInterface
 			}
 		$this->db->sql_freeresult($result);
 
-		/*/ Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
+		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
 		// Le texte de ces messages sont dans les posts dont le titre est !style
-		$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
+		//$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
+		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_id = 1';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
-		$this->db->sql_freeresult($result);*/
+		$this->db->sql_freeresult($result);
+
+/*//TODO DELETE injections SQL pour remetre le premier message
+
+?????? => BOF !
+INSERT INTO `phpbb_forums` (`forum_id`, `parent_id`, `left_id`, `right_id`, `forum_parents`, `forum_name`, `forum_desc`, `forum_desc_bitfield`, `forum_desc_options`, `forum_desc_uid`, `forum_link`, `forum_password`, `forum_style`, `forum_image`, `forum_rules`, `forum_rules_link`, `forum_rules_bitfield`, `forum_rules_options`, `forum_rules_uid`, `forum_topics_per_page`, `forum_type`, `forum_status`, `forum_last_post_id`, `forum_last_poster_id`, `forum_last_post_subject`, `forum_last_post_time`, `forum_last_poster_name`, `forum_last_poster_colour`, `forum_flags`, `display_on_index`, `enable_indexing`, `enable_icons`, `enable_prune`, `prune_next`, `prune_days`, `prune_viewed`, `prune_freq`, `display_subforum_list`, `forum_options`, `forum_posts_approved`, `forum_posts_unapproved`, `forum_posts_softdeleted`, `forum_topics_approved`, `forum_topics_unapproved`, `forum_topics_softdeleted`, `enable_shadow_prune`, `prune_shadow_days`, `prune_shadow_freq`, `prune_shadow_next`) VALUES
+(1, 0, 1, 4, '', 'Votre première catégorie', '', '', 7, '', '', '', 0, '', '', '', '', 7, '', 0, 0, 0, 1, 2, '', 1543072163, 'Dominique', 'AA0000', 32, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 7, 1, 0),
+(2, 1, 2, 3, '', 'Votre premier forum', 'Description de votre premier forum.', '', 7, '', '', '', 0, '', '', '', '', 7, '', 0, 1, 0, 1, 2, 'Bienvenue sur phpBB3', 1543072163, 'Dominique', 'AA0000', 48, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 7, 1, 0);
+
+INSERT INTO `phpbb_topics` (`topic_id`, `forum_id`, `icon_id`, `topic_attachment`, `topic_reported`, `topic_title`, `topic_poster`, `topic_time`, `topic_time_limit`, `topic_views`, `topic_status`, `topic_type`, `topic_first_post_id`, `topic_first_poster_name`, `topic_first_poster_colour`, `topic_last_post_id`, `topic_last_poster_id`, `topic_last_poster_name`, `topic_last_poster_colour`, `topic_last_post_subject`, `topic_last_post_time`, `topic_last_view_time`, `topic_moved_id`, `topic_bumped`, `topic_bumper`, `poll_title`, `poll_start`, `poll_length`, `poll_max_options`, `poll_last_vote`, `poll_vote_change`, `topic_visibility`, `topic_delete_time`, `topic_delete_reason`, `topic_delete_user`, `topic_posts_approved`, `topic_posts_unapproved`, `topic_posts_softdeleted`) VALUES
+(1, 2, 0, 0, 0, 'Bienvenue sur phpBB3', 2, 1543072163, 0, 0, 0, 0, 1, 'Dominique', 'AA0000', 1, 2, 'Dominique', 'AA0000', 'Bienvenue sur phpBB3', 1543072163, 972086460, 0, 0, 0, '', 0, 0, 1, 0, 0, 1, 0, '', 0, 1, 0, 0);
+
+INSERT INTO `phpbb_posts` (`post_id`, `topic_id`, `forum_id`, `poster_id`, `icon_id`, `poster_ip`, `post_time`, `post_reported`, `enable_bbcode`, `enable_smilies`, `enable_magic_url`, `enable_sig`, `post_username`, `post_subject`, `post_text`, `post_checksum`, `post_attachment`, `bbcode_bitfield`, `bbcode_uid`, `post_postcount`, `post_edit_time`, `post_edit_reason`, `post_edit_user`, `post_edit_count`, `post_edit_locked`, `post_visibility`, `post_delete_time`, `post_delete_reason`, `post_delete_user`) VALUES
+(1, 1, 2, 2, 0, '::1', 1543072163, 0, 1, 1, 1, 1, '', 'Bienvenue sur phpBB3', 'Ceci est un exemple de message de votre installation phpBB3. Tout semble fonctionner. Vous pouvez si vous le voulez supprimer ce message et continuer à configurer votre forum. Durant le processus d’installation, votre première catégorie et votre premier forum sont assignés à un ensemble de permissions appropriées aux groupes d’utilisateurs que sont les administrateurs, les robots, les modérateurs globaux, les invités, les utilisateurs enregistrés et les utilisateurs COPPA enregistrés. Si vous choisissez de supprimer également votre première catégorie et votre premier forum, n’oubliez pas de régler les permissions de tous les groupes d’utilisateurs, pour toutes les nouvelles catégories et forums que vous allez créer. Il est recommandé de renommer votre première catégorie et votre premier forum et de copier leurs permissions sur chaque nouvelle catégorie et nouveau forum lors de leur création. Amusez-vous bien !', '5dd683b17f641daf84c040bfefc58ce9', 0, '', '', 1, 0, '', 0, 0, 0, 1, 0, '', 0);
+
+
+*/
 	}
 
 	/**
@@ -319,7 +336,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			}
 		}
 
-		// Calcul de la carte IGN
+		// Infos refuges.info
 		if ((array_key_exists('geo_massif', $row) && !$row['geo_massif']) ||
 			(array_key_exists('geo_reserve', $row) && !$row['geo_reserve']) ||
 			(array_key_exists('geo_ign', $row) && !$row['geo_ign'])) {
@@ -346,8 +363,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			}
 		}
 
-		// Calcul de la commune
-		// Todo code postal
+		// Calcul de la commune (France)
 		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
 			$ch = curl_init ();
 			curl_setopt ($ch, CURLOPT_URL, 
@@ -381,11 +397,19 @@ XML
 			ob_start();
 			curl_exec($ch);
 			$json = ob_get_clean();
-
 			preg_match ('/Municipality\\\">([^<]+)/', $json, $commune);
 			preg_match ('/Departement\\\">([^<]+)/', $json, $departement);
+
+			// Calcul du code postal (France)
+			$nominatim = json_decode (@file_get_contents (
+				'https://nominatim.openstreetmap.org/reverse?format=json&lon='.$centre[0].'&lat='.$centre[1],
+				false, 
+				stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
+			));
+			$code_postal = @$nominatim->address->postcode;
+
 			if ($commune[1])
-				$update['geo_commune'] = $commune[1].' ('.$departement[1].')';
+				$update['geo_commune'] = ($code_postal ?: $departement[1]).' '.$commune[1];
 		}
 
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
@@ -424,6 +448,44 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	/**
 		POSTING.PHP
 	*/
+	function topic_field () {
+		$data = [
+			'1. L\'alpage' => 'h2',
+			'1.1 Équipements' => 'h3',
+	//	<p>Nombre de filets <input type="number" name="geo_filets-int-5" size="25" class="inputbox autowidth" value="{GEO_FILETS}" /></p>
+			'Nombre de filets' => [
+				'tag' => 'input',
+				'type' => 'text',
+//				'type' => 'number',
+				'sql_name' => 'geo_filets',
+				'sql_type' => 'int-5',
+/*				'choice' => [
+				]*/
+			],
+		];
+		foreach ($data AS $k=>$v) {
+			$d = ['INNER' => $k];
+			switch (gettype ($v)) {
+				case 'string':
+					$d['TAG'] = $v;
+					break;
+				case 'array':
+					foreach ($v AS $kv=>$vv) {
+						$d[strtoupper($kv)] = $vv;
+						$d[strtoupper($kv).'_UP'] = strtoupper($vv);
+					}
+			}
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($d,true).'</pre>';
+			$this->template->assign_block_vars('topic_field', $d);
+/*			foreach ($row AS $k=>$v) {
+				$this->template->assign_block_vars ('topic_field.element', array (
+					'K' => ucfirst (str_replace (['geo_', '_'], ['', ' '], $k)),
+					'V' => str_replace ('~', '', $v),
+				));
+			}*/
+		}
+	}
+
 	// Appelé au début pour ajouter des parametres de recherche sql
 	function modify_posting_parameters($vars) {
 		// Création topic avec le nom d'image
@@ -435,14 +497,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		if ($row) {
 			// Force le forum
 			$vars['forum_id'] = $row ['forum_id'];
-
-			// Initialise subject name
-			$this->post_name = $this->request->variable('name', 'NOM');
 		}
 	}
 
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
+		$this->topic_field();
+
 		$post_data = $vars['post_data'];
 		$page_data = $vars['page_data'];
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
@@ -472,6 +533,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'NEW';
 
 		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
+		$page_data['POST_ID'] = $post_data['post_id'] ?: 0;
+		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
 
 		// Assign the phpbb-posts SQL data to the template
 		foreach ($post_data AS $k=>$v)

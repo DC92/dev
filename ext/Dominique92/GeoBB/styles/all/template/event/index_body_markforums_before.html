@@ -20,6 +20,8 @@
 	<div id="map"></div>
 	<!-- EVENT map_selector -->
 </div>
+
+<div class="geo_presentation">{GEO_PRESENTATION}</div>
 <!-- INCLUDE phpbb_news.html -->
 
 <script>
@@ -27,18 +29,22 @@
 		var map = new ol.Map({
 			target: 'map',
 			layers: [
-				geoLayer(),
+/*
+//TODO DELETE aspir
+//TODO complete chemineur
 				layerOverpass({
 					postLabel: postLabel
 				}),
 				layerPointsWri({
 					selectorName: 'wri-poi',
 					postLabel: postLabel
-				})
+				}),
+*/
+				geoLayer()
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
-					layers({GEO_OLKEYS})
+					layers({GEO_KEYS})
 				),
 				controlPermalink({
 					init: true,

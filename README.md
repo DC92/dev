@@ -1,3 +1,9 @@
+ATTENTION : VERSION DU LOGICIEL EN DEVELOPPEMENT
+================================================
+
+NE PAS UTILISER
+===============
+
 Logiciel du site http://chemineur.fr
 
 Dominique92.GeoBB

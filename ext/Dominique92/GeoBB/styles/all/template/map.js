@@ -36,6 +36,9 @@ function layers(keys) {
 	};
 }
 
+/*
+//TODO DELETE aspir
+//TODO complete chemineur
 function postLabel(properties, feature, layer, pixel, ll4326) {
 	var type = typeof layer.options_.type == 'function' ?
 		layer.options_.type(properties, feature, layer, pixel, ll4326) :
@@ -53,6 +56,7 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 		].join('&') +
 		'">Créer une fiche</a>';
 }
+*/
 
 function layerStyle(properties, id, hover) {
 	if (properties.icon)
