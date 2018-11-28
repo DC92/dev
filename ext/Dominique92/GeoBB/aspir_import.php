@@ -12,6 +12,7 @@ Général -> Paramètres du serveur -> Activer la compression GZip : oui
 Général -> Configuration du forum -> Libellé du site Internet :
 Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
 Genéral -> Paramètres des fichiers joints -> Taille maximale du fichier : : 5 Mo
+Forums -> Permissions groupes/forums -> invités + utilisateurs * + robots -> Aucun accès
 
 UPDATE VERSION PHPBB
 ====================

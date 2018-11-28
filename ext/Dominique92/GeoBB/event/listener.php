@@ -281,6 +281,9 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Calcul des données automatiques
 	function get_automatic_data(&$row) {
+		if (!$row['geomwkt'])
+			return;
+
 		$update = []; // Datas to be updated
 
 		// Calcul du centre pour toutes les actions
@@ -429,29 +432,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		POSTING.PHP
 	*/
 	function topic_field ($post_data) {
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($post_data,true).'</pre>';
-		$def_form_point_eau = "
-'Points d\'eau Marais/zones humides' => [
-'tag' => 'textarea',
-'placeholder' => 'zones en défense, sources, ...',
-'sql_name' => 'geo_zones_humides',
-";
-		$def_form_mdp = "
-Chaque ligne représente une donnée. Elle est constituée de champs séparés par des | (sur le clavier : AltGr + 6)
-Champ 1 = { : Début de bloc. Le champ 2 contient alors le titre de ce bloc qui n'est affiché que si le bloc contient des informations valides.
-ou champ 1 = } : fin du bloc (les blocs peuvent être imbriqués).
-ou champ 1 = identifiant de la donnée dans la base : Exclusivement constitué de minuscules non accentuées, de chiffres ou du caractère _. on peut en changer mais il ne faut pas deux fois le même.
-Champ 2 = texte à afficher en début de ligne
-Champ 3 = nature du champ qui peut être :
-- 0 : la saisie sera numérique
-- court : la saisie sera une zone texte de 1 ligne
-- long : la saisie sera une zone de texte compremant plusieurs lignes
-- plusieurs valeurs séparées par une , : liste de choix
-- date : une date
-Champ 4 = Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparait quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
-ou champ 4 = texte affiché aprés la donnée (unité par exemple)
-Un changement peut générer une erreur à la modification d'une fiche. Revenir sur le forum de description et essayer de corriger la dernière modification. Sinon, me contacter.
-";
 		$def_form = "
 {|1. L'alpage
 {|1.1 Équipements
