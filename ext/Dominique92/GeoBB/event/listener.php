@@ -147,27 +147,11 @@ class listener implements EventSubscriberInterface
 		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
 		// Le texte de ces messages sont dans les posts dont le titre est !style
 		//$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
-		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_id = 1';
+		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue"';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
 		$this->db->sql_freeresult($result);
-
-/*//TODO DELETE injections SQL pour remetre le premier message
-
-?????? => BOF !
-INSERT INTO `phpbb_forums` (`forum_id`, `parent_id`, `left_id`, `right_id`, `forum_parents`, `forum_name`, `forum_desc`, `forum_desc_bitfield`, `forum_desc_options`, `forum_desc_uid`, `forum_link`, `forum_password`, `forum_style`, `forum_image`, `forum_rules`, `forum_rules_link`, `forum_rules_bitfield`, `forum_rules_options`, `forum_rules_uid`, `forum_topics_per_page`, `forum_type`, `forum_status`, `forum_last_post_id`, `forum_last_poster_id`, `forum_last_post_subject`, `forum_last_post_time`, `forum_last_poster_name`, `forum_last_poster_colour`, `forum_flags`, `display_on_index`, `enable_indexing`, `enable_icons`, `enable_prune`, `prune_next`, `prune_days`, `prune_viewed`, `prune_freq`, `display_subforum_list`, `forum_options`, `forum_posts_approved`, `forum_posts_unapproved`, `forum_posts_softdeleted`, `forum_topics_approved`, `forum_topics_unapproved`, `forum_topics_softdeleted`, `enable_shadow_prune`, `prune_shadow_days`, `prune_shadow_freq`, `prune_shadow_next`) VALUES
-(1, 0, 1, 4, '', 'Votre première catégorie', '', '', 7, '', '', '', 0, '', '', '', '', 7, '', 0, 0, 0, 1, 2, '', 1543072163, 'Dominique', 'AA0000', 32, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 7, 1, 0),
-(2, 1, 2, 3, '', 'Votre premier forum', 'Description de votre premier forum.', '', 7, '', '', '', 0, '', '', '', '', 7, '', 0, 1, 0, 1, 2, 'Bienvenue sur phpBB3', 1543072163, 'Dominique', 'AA0000', 48, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 7, 1, 0);
-
-INSERT INTO `phpbb_topics` (`topic_id`, `forum_id`, `icon_id`, `topic_attachment`, `topic_reported`, `topic_title`, `topic_poster`, `topic_time`, `topic_time_limit`, `topic_views`, `topic_status`, `topic_type`, `topic_first_post_id`, `topic_first_poster_name`, `topic_first_poster_colour`, `topic_last_post_id`, `topic_last_poster_id`, `topic_last_poster_name`, `topic_last_poster_colour`, `topic_last_post_subject`, `topic_last_post_time`, `topic_last_view_time`, `topic_moved_id`, `topic_bumped`, `topic_bumper`, `poll_title`, `poll_start`, `poll_length`, `poll_max_options`, `poll_last_vote`, `poll_vote_change`, `topic_visibility`, `topic_delete_time`, `topic_delete_reason`, `topic_delete_user`, `topic_posts_approved`, `topic_posts_unapproved`, `topic_posts_softdeleted`) VALUES
-(1, 2, 0, 0, 0, 'Bienvenue sur phpBB3', 2, 1543072163, 0, 0, 0, 0, 1, 'Dominique', 'AA0000', 1, 2, 'Dominique', 'AA0000', 'Bienvenue sur phpBB3', 1543072163, 972086460, 0, 0, 0, '', 0, 0, 1, 0, 0, 1, 0, '', 0, 1, 0, 0);
-
-INSERT INTO `phpbb_posts` (`post_id`, `topic_id`, `forum_id`, `poster_id`, `icon_id`, `poster_ip`, `post_time`, `post_reported`, `enable_bbcode`, `enable_smilies`, `enable_magic_url`, `enable_sig`, `post_username`, `post_subject`, `post_text`, `post_checksum`, `post_attachment`, `bbcode_bitfield`, `bbcode_uid`, `post_postcount`, `post_edit_time`, `post_edit_reason`, `post_edit_user`, `post_edit_count`, `post_edit_locked`, `post_visibility`, `post_delete_time`, `post_delete_reason`, `post_delete_user`) VALUES
-(1, 1, 2, 2, 0, '::1', 1543072163, 0, 1, 1, 1, 1, '', 'Bienvenue sur phpBB3', 'Ceci est un exemple de message de votre installation phpBB3. Tout semble fonctionner. Vous pouvez si vous le voulez supprimer ce message et continuer à configurer votre forum. Durant le processus d’installation, votre première catégorie et votre premier forum sont assignés à un ensemble de permissions appropriées aux groupes d’utilisateurs que sont les administrateurs, les robots, les modérateurs globaux, les invités, les utilisateurs enregistrés et les utilisateurs COPPA enregistrés. Si vous choisissez de supprimer également votre première catégorie et votre premier forum, n’oubliez pas de régler les permissions de tous les groupes d’utilisateurs, pour toutes les nouvelles catégories et forums que vous allez créer. Il est recommandé de renommer votre première catégorie et votre premier forum et de copier leurs permissions sur chaque nouvelle catégorie et nouveau forum lors de leur création. Amusez-vous bien !', '5dd683b17f641daf84c040bfefc58ce9', 0, '', '', 1, 0, '', 0, 0, 0, 1, 0, '', 0);
-
-
-*/
 	}
 
 	/**
@@ -185,7 +169,7 @@ INSERT INTO `phpbb_posts` (`post_id`, `topic_id`, `forum_id`, `poster_id`, `icon
 	function viewtopic_post_rowset_data($vars) {
 		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
 		$post_id = $vars['row']['post_id'];
-		$this->post_data [$post_id] = $vars['row'];
+		$this->all_post_data [$post_id] = $vars['row'];
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
@@ -222,41 +206,34 @@ INSERT INTO `phpbb_posts` (`post_id`, `topic_id`, `forum_id`, `poster_id`, `icon
 		}
 		$this->db->sql_freeresult($result);
 
-		if (isset ($this->post_data [$post_id])) {
-			$row = $this->post_data [$post_id]; // Récupère les données SQL du post 
+		if (isset ($this->all_post_data[$post_id])) {
+			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post 
 			$post_row = $vars['post_row'];
 
 			// Convert the geom info in geoJson format
 			preg_match ('/\[(first|all)=([a-z]+)\]/i', $vars['topic_data']['forum_desc'], $regle);
 			if (count ($regle) == 3 && (
 					($regle[1] == 'all') ||
-					($regle[1] == 'first' && ($row['post_id'] == $vars['topic_data']['topic_first_post_id']))
+					($regle[1] == 'first' && ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']))
 				) &&
-				@$row['geomwkt']
+				@$post_data['geomwkt']
 			) {
 				include_once('assets/geoPHP/geoPHP.inc');
-				$geophp = \geoPHP::load($row['geomwkt'],'wkt');
-				$row['geojson'] = $geophp->out('json');
+				$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
+				$post_data['geojson'] = $geophp->out('json');
 				$this->get_bounds($geophp);
-				$this->get_automatic_data($row);
 			}
 
-			foreach ($row AS $k=>$v)
-				if (strstr ($k, 'geo')) {
-				//TODO BEST [xxx=all] Assign the phpbb_posts.geo* SQL data of each template post area
-/*
-		// Assign the phpbb-posts SQL data to the template
-		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'geo', 3)
-				&& is_string ($v))
-				$page_data[strtoupper ($k)] = strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
-*/
-					// Assign the phpbb_posts.geo* SQL data of the first post to the template
-					if ($vars['topic_data']['topic_first_post_id'] == $row['post_id'])
+			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
+				$this->get_automatic_data($post_data);
+				$this->topic_field($post_data);
+				foreach ($post_data AS $k=>$v)
+					if (strstr ($k, 'geo')
+						&& is_string ($v))
 						$this->template->assign_var (strtoupper ($k), str_replace ('~', '', $v));
-				}
 
-			$vars['post_row'] = $post_row;
+				$vars['post_row'] = $post_row;
+			}
 		}
 	}
 
@@ -412,6 +389,9 @@ XML
 				$update['geo_commune'] = ($code_postal ?: $departement[1]).' '.$commune[1];
 		}
 
+//TODO CHEM		foreach ($update AS $k=>$v)
+//			$update[$k] .= '~';
+
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
 
 		// Pour affichage
@@ -448,41 +428,230 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	/**
 		POSTING.PHP
 	*/
-	function topic_field () {
-		$data = [
-			'1. L\'alpage' => 'h2',
-			'1.1 Équipements' => 'h3',
-	//	<p>Nombre de filets <input type="number" name="geo_filets-int-5" size="25" class="inputbox autowidth" value="{GEO_FILETS}" /></p>
-			'Nombre de filets' => [
-				'tag' => 'input',
-				'type' => 'text',
-//				'type' => 'number',
-				'sql_name' => 'geo_filets',
-				'sql_type' => 'int-5',
-/*				'choice' => [
-				]*/
-			],
-		];
-		foreach ($data AS $k=>$v) {
-			$d = ['INNER' => $k];
-			switch (gettype ($v)) {
-				case 'string':
-					$d['TAG'] = $v;
-					break;
-				case 'array':
-					foreach ($v AS $kv=>$vv) {
-						$d[strtoupper($kv)] = $vv;
-						$d[strtoupper($kv).'_UP'] = strtoupper($vv);
-					}
+	function topic_field ($post_data) {
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($post_data,true).'</pre>';
+		$def_form_point_eau = "
+'Points d\'eau Marais/zones humides' => [
+'tag' => 'textarea',
+'placeholder' => 'zones en défense, sources, ...',
+'sql_name' => 'geo_zones_humides',
+";
+		$def_form_mdp = "
+Chaque ligne représente une donnée. Elle est constituée de champs séparés par des | (sur le clavier : AltGr + 6)
+Champ 1 : identifiant de la donnée dans la base (on peut en changer mais il ne faut pas deux fois le même). Uniquement constitué de minuscules non accentuées, de chiffres ou du caractère _. Si ce champ est vide, il s'agit d'une ligne de titre ou de texte sans valeur saisie
+Champ 2 : texte à afficher en début de ligne
+Champ 3 : nature du champ qui peut être :
+- 0 : la saisie sera numérique
+- court : la saisie sera une zone texte de 1 ligne
+- long : la saisie sera une zone de texte compremant plusieurs lignes
+- plusieurs valeurs séparées par une , : liste de choix
+- date : une date
+Champ 4 : Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparait quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
+";
+		$def_form = "
+|1. L'alpage
+|1.1 Équipements
+|Autres équipements disponibles
+equipements_pediluve|– Pédiluve|oui,non,ne sait pas
+equipements_contention|– Couloir de contention|oui,non,ne sait pas
+equipements_pediluve|– Parc infirmerie en dur|oui,non,ne sait pas
+equipements_filets|– Nombre de filets|0
+equipements_poste|– Nombre de postes électriques|0
+equipements_precisions|– Autres précisions|court
+|1.2 Caractéristiques
+altitude|Altitude|automatique|m
+topographie|Topographie|court
+risques|Risques|court|Vide, chute de pierres, orages violents...
+especes_proteges|Présence espèces remarquables et/ou protégées|court|Faune ou flore
+ressource_fourragere|Ressource fourragère|court|Qualité de l'herbe ? Note sur 5
+operateur|Opérateur téléphonique recommandé|Orange,Bouygues Télécom,Free,SFR,autre,ne sait pas
+operateur_autre|autre opérateur|court
+|1.3 Accès
+acces_par|Accès par|route,piste,sentier
+acces_etat|État de l'accès|Bon,Moyen,mauvais
+acces_bat|Accès avec animaux de bâts|oui,non,ne sait pas
+acces_parking|Où se garer ?|court
+acces_parcours|Temps de parcours|court
+acces_ravitaillement|Lieu de ravitaillement le plus proche|court
+acces_appui|Lieu d'appui aux bergers, lieu de rencontre|court
+|1.4 Mesures environnementales
+maec|Présence de MAEC|oui,non,autre,ne sait pas
+maec_autre|– Autres mesures|court
+parc_national|Réserve naturelle nationale|oui,non,ne sait pas
+parc_regional|Réserve naturelle régionale|oui,non,ne sait pas
+ens|ENS|oui,non,ne sait pas
+natura_2000|Natura 2000|oui,non,ne sait pas
+|1.5 Autres usagers
+|– Récréatif
+usagers_vtt|VTT|Faible,Moyenne,Importante
+usagers_randonnee|Sentiers randonnée|Faible,Moyenne,Importante
+usagers_quad|Quad|Faible,Moyenne,Importante
+usagers_4x4|4x4|Faible,Moyenne,Importante
+usagers_remontees|Remontées mécaniques (fonctionnant l'été)|Faible,Moyenne,Importante
+usagers_chasseurs|Chasseurs|Faible,Moyenne,Importante
+usagers_parapente|Parapentes|Faible,Moyenne,Importante
+usagers_autre|Autre
+|– Professionnel
+usagers_gardes|Gardes|Faible,Moyenne,Importante
+usagers_forestiers|Forestiers|Faible,Moyenne,Importante
+usagers_refuges|Refuges|Faible,Moyenne,Importante
+|1.6 Héliportages
+heliportages_debut|Date approximative début estive|date
+heliportages_fin|Date approximative fin estive|date
+heliportages_poids|Poids à la disposition du berger|0|Kg
+|3. Les bêtes
+|3.1 Le troupeau
+troupeau_nb_eleveurs|Nombre d'éleveurs|0
+troupeau_nb_brebis|Nombre de brebis|0
+|- Eleveur 1 :
+troupeau_nom_eleveur1|Nom éleveur 1|court
+troupeau_nb_brebis1|Nombre brebis 1|0
+troupeau_race1|Race dominante 1|court
+troupeau_exploitation1|Siège exploitation 1|court
+|- Eleveur 2 :
+troupeau_nom_eleveur2|Nom éleveur 2|court
+troupeau_nb_brebis2|Nombre brebis 2|0
+troupeau_race2|Race dominante 2|court
+troupeau_exploitation2|Siège exploitation 2|court
+|- Eleveur 3 :
+troupeau_nom_eleveur3|Nom éleveur 3|court
+troupeau_nb_brebis3|Nombre brebis 3|0
+troupeau_race3|Race dominante 3|court
+troupeau_exploitation3|Siège exploitation 3|court
+|- Eleveur 4 :
+troupeau_nom_eleveur4|Nom éleveur 4|court
+troupeau_nb_brebis4|Nombre brebis 4|0
+troupeau_race4|Race dominante 4|court
+troupeau_exploitation4|Siège exploitation 4|court
+troupeau_transhumance|Transhumance|oui,non,ne sait pas
+troupeau_transhumance_detail|– si oui, itinéraire et durée|court
+troupeau_beliers|Présence de béliers|oui,non,ne sait pas
+troupeau_chevres|Présence de chèvres|oui,non,ne sait pas
+troupeau_agneaux|Présence d'agneaux|oui,non,ne sait pas
+troupeau_tri_empoussees|Date de tri des empoussées|date
+troupeau_precisions|Autres précisions|court
+|3.2 Les soins
+|– État général du troupeau
+troupeau_antiparasitaire|Traitement antiparasitaire avant la montée|oui,non,ne sait pas
+troupeau_bain|Traitement teigne/tique/poux/bain la montée?|oui,non,ne sait pas
+troupeau_pediluve|Pédiluve|oui,non,ne sait pas
+troupeau_maladies|Maladies récurrentes liées à l'alpage|oui,non,ne sait pas
+troupeau_precisions|autres précisions|court
+troupeau_soins|soins vétérinaires habituellement pratiqués|court
+|3.3 La prédation
+predation_loups|Présence avérée de loups|oui,non,ne sait pas
+predation_zonage|Zonage|Cercle 1 (présence du loup détectée ou probable,Cercle 2 (susceptibles d'être colonisé par le loup),ne sait pas
+|Mesures de protection :
+predation_bergers|Nombre de postes de bergers|0
+predation_aides_bergers|Nombre de postes d'aides bergers|0
+predation_parcs|Parcs de nuit|oui,non,ne sait pas
+|Chiens de protection :
+predation_chiens_males|- Nombre de mâle(s)|0
+predation_chiens_femelles|- Nombre de femelle(s)|0
+predation_chiens_races|Race(s)|court
+predation_chiens_castres|Castré(s)|court
+predation_chiens_meute|Meute cohérente|court
+predation_meutes_voisines|Lien meutes voisines|court
+predation_chiens_autre|Autre|court
+|Fréquence des attaques :
+attaques_frequence|- nombre d'attaques|0
+attaques_victimes|- nombre de victimes|0
+attaques_diagnostic|Diagnostic de vulnérabilité à la prédation|oui,non,ne sait pas
+attaques_informations|Informations complémentaires et conseils aux futurs bergers|court
+attaques_arme|Arme à disposition|oui,non,ne sait pas
+attaques_permis|Besoin permis de chasse|oui,non,ne sait pas
+|3.4 La conduite du troupeau
+|Description des quartiers : dates approximatives, principales caractéristiques, spécificités de la garde, conseils...
+quartier1|Quartier 1|court
+quartier2|Quartier 2|court
+quartier3|Quartier 3|court
+|4. les aides
+eleveurs_implication|Implication des éleveurs pendant l'estive|Beaucoup,Un peu,Pas du tout
+eleveurs_soins|Participation éleveurs soins|Beaucoup,Un peu,Pas du tout
+emontagnage_date|Date d'emontagnage|date
+demontagnage_date|Date de démontagnage|date
+";
+$eol = "
+";
+		$def_forms = explode ($eol, $def_form);
+		foreach ($def_forms AS $df) {
+			$dfs = explode ('|', $df.'|||');
+			$vars = $options = [];
+			$vars['TAG1'] = $sqlid = 'p';
+			$sqlid = 'geo_'.$dfs[0];
+			$vars['SQL_TYPE'] = 'text';
+			$vars['INNER'] = $dfs[1];
+			$vars['DISPLAY_VALUE'] = $post_data[$sqlid];
+			$vars['POST_VALUE'] = $post_data[$sqlid];
+
+			// |1.1 Title
+			// |Text
+			if (!$dfs[0] && $dfs[1]) {
+				$dfs1s = explode (' ', $dfs[1]);
+				$dfs1s0s = explode ('.', $dfs1s[0]);
+				$vars['TAG1'] = is_numeric ($dfs1s0s[0]) ? 'h'.(count($dfs1s0s) + 1) : 'p';
 			}
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($d,true).'</pre>';
-			$this->template->assign_block_vars('topic_field', $d);
-/*			foreach ($row AS $k=>$v) {
-				$this->template->assign_block_vars ('topic_field.element', array (
-					'K' => ucfirst (str_replace (['geo_', '_'], ['', ' '], $k)),
-					'V' => str_replace ('~', '', $v),
-				));
-			}*/
+			// sqlid incorrect
+			else if ($dfs[0] && !preg_match ('/^[a-z_0-8]+$/', $dfs[0])) {
+				$vars['TAG1'] = 'p style="color:red"';
+				$vars['INNER'] = 'Identifiant incorrect : "'.$dfs[0].'"';
+			} elseif ($dfs[0]) {
+				// sqlid|titre|choix,choix
+				$options = explode (',', $dfs[2]);
+				$length = 0;
+				if (count($options) > 1) {
+					foreach ($options AS $o)
+						$length = max ($lengt, strlen ($o) + 1);
+					$vars['TAG'] = 'select';
+					$vars['SQL_TYPE'] = 'varchar-'.$length;
+				}
+				// sqlid|titre|0
+				elseif (is_numeric ($dfs[2])) {
+					$vars['TAG'] = 'input';
+					$vars['TYPE'] = 'number';
+					$vars['SQL_TYPE'] = 'int-5';
+					$vars['POSTAMBULE'] = $dfs[3];
+				}
+				// sqlid|titre|automatique
+				elseif (!strcasecmp ($dfs[2], 'automatique')) {
+					$vars['TAG'] = 'input';
+					$vars['STYLE'] = 'display:none'; // Hide all visible
+					$vars['TYPE'] = 'hidden';
+					$vars['POSTAMBULE'] = $dfs[3];
+					$vars['POST_VALUE'] = null; // Set the value to null to ask for recalculation
+				}
+				// sqlid|titre|date
+				elseif (!strcasecmp ($dfs[2], 'date')) {
+					$vars['TAG'] = 'input';
+					$vars['TYPE'] = 'date';
+					$vars['SQL_TYPE'] = 'date';
+				}
+				// sqlid|titre|long|invite
+				elseif (!strcasecmp ($dfs[2], 'long')) {
+					$vars['TAG'] = 'textarea';
+					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
+				}
+				// sqlid|titre|court|invite
+				else {
+					$vars['TAG'] = 'input';
+					$vars['SIZE'] = '40';
+					$vars['CLASS'] = 'inputbox autowidth';
+					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
+				}
+			}
+			$vars['NAME'] = $sqlid.'-'.$vars['SQL_TYPE'];
+
+			$vs = $vars;
+			foreach ($vs AS $k=>$v)
+				if ($v)
+					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>$sqlid = ".var_export($vars['DISPLAY_VALUE'],true).'</pre>';
+			$this->template->assign_block_vars('info', $vars);
+			if (count($options) > 1) {
+				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // Empty one at the beginning
+				foreach ($options AS $o)
+					$this->template->assign_block_vars('info.options', ['OPTION' => $o]);
+			}
 		}
 	}
 
@@ -502,10 +671,9 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
-		$this->topic_field();
-
-		$post_data = $vars['post_data'];
 		$page_data = $vars['page_data'];
+		$post_data = $vars['post_data'];
+		$this->topic_field($post_data);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// Récupère la traduction des données spaciales SQL

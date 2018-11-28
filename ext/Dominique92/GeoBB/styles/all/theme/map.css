@@ -2,9 +2,6 @@
 	max-width: none;
 	min-width: none;
 }
-.geo-hidden {
-	display: none;
-}
 
 /* MAP */
 .map { /* Englobant de la carte */

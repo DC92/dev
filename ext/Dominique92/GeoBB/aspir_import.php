@@ -20,6 +20,8 @@ install/app.php/update -> database only
 delete install
 ext/Dominique92/GeoBB/aspir_import.php?d=07
 administration -> resync les forums
+Ajouter catégorie forum 'forum"
+Ajouter sujet "Bienvenue"
 
 RESYNC ASPIR
 ============
