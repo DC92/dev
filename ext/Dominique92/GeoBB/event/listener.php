@@ -438,27 +438,32 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 ";
 		$def_form_mdp = "
 Chaque ligne représente une donnée. Elle est constituée de champs séparés par des | (sur le clavier : AltGr + 6)
-Champ 1 : identifiant de la donnée dans la base (on peut en changer mais il ne faut pas deux fois le même). Uniquement constitué de minuscules non accentuées, de chiffres ou du caractère _. Si ce champ est vide, il s'agit d'une ligne de titre ou de texte sans valeur saisie
-Champ 2 : texte à afficher en début de ligne
-Champ 3 : nature du champ qui peut être :
+Champ 1 = { : Début de bloc. Le champ 2 contient alors le titre de ce bloc qui n'est affiché que si le bloc contient des informations valides.
+ou champ 1 = } : fin du bloc (les blocs peuvent être imbriqués).
+ou champ 1 = identifiant de la donnée dans la base : Exclusivement constitué de minuscules non accentuées, de chiffres ou du caractère _. on peut en changer mais il ne faut pas deux fois le même.
+Champ 2 = texte à afficher en début de ligne
+Champ 3 = nature du champ qui peut être :
 - 0 : la saisie sera numérique
 - court : la saisie sera une zone texte de 1 ligne
 - long : la saisie sera une zone de texte compremant plusieurs lignes
 - plusieurs valeurs séparées par une , : liste de choix
 - date : une date
-Champ 4 : Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparait quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
+Champ 4 = Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparait quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
+ou champ 4 = texte affiché aprés la donnée (unité par exemple)
+Un changement peut générer une erreur à la modification d'une fiche. Revenir sur le forum de description et essayer de corriger la dernière modification. Sinon, me contacter.
 ";
 		$def_form = "
-|1. L'alpage
-|1.1 Équipements
-|Autres équipements disponibles
-equipements_pediluve|– Pédiluve|oui,non,ne sait pas
-equipements_contention|– Couloir de contention|oui,non,ne sait pas
-equipements_pediluve|– Parc infirmerie en dur|oui,non,ne sait pas
-equipements_filets|– Nombre de filets|0
-equipements_poste|– Nombre de postes électriques|0
-equipements_precisions|– Autres précisions|court
-|1.2 Caractéristiques
+{|1. L'alpage
+{|1.1 Équipements
+{|Autres équipements disponibles
+equipements_pediluve|- Pédiluve|oui,non,ne sait pas
+equipements_contention|- Couloir de contention|oui,non,ne sait pas
+equipements_pediluve|- Parc infirmerie en dur|oui,non,ne sait pas
+equipements_filets|- Nombre de filets|0
+equipements_poste|- Nombre de postes électriques|0
+equipements_precisions|- Autres précisions|court
+}}
+{|1.2 Caractéristiques
 altitude|Altitude|automatique|m
 topographie|Topographie|court
 risques|Risques|court|Vide, chute de pierres, orages violents...
@@ -466,7 +471,8 @@ especes_proteges|Présence espèces remarquables et/ou protégées|court|Faune o
 ressource_fourragere|Ressource fourragère|court|Qualité de l'herbe ? Note sur 5
 operateur|Opérateur téléphonique recommandé|Orange,Bouygues Télécom,Free,SFR,autre,ne sait pas
 operateur_autre|autre opérateur|court
-|1.3 Accès
+}
+{|1.3 Accès
 acces_par|Accès par|route,piste,sentier
 acces_etat|État de l'accès|Bon,Moyen,mauvais
 acces_bat|Accès avec animaux de bâts|oui,non,ne sait pas
@@ -474,15 +480,17 @@ acces_parking|Où se garer ?|court
 acces_parcours|Temps de parcours|court
 acces_ravitaillement|Lieu de ravitaillement le plus proche|court
 acces_appui|Lieu d'appui aux bergers, lieu de rencontre|court
-|1.4 Mesures environnementales
+}
+{|1.4 Mesures environnementales
 maec|Présence de MAEC|oui,non,autre,ne sait pas
-maec_autre|– Autres mesures|court
+maec_autre|- Autres mesures|court
 parc_national|Réserve naturelle nationale|oui,non,ne sait pas
 parc_regional|Réserve naturelle régionale|oui,non,ne sait pas
 ens|ENS|oui,non,ne sait pas
 natura_2000|Natura 2000|oui,non,ne sait pas
-|1.5 Autres usagers
-|– Récréatif
+}
+{|1.5 Autres usagers
+{|- Récréatif
 usagers_vtt|VTT|Faible,Moyenne,Importante
 usagers_randonnee|Sentiers randonnée|Faible,Moyenne,Importante
 usagers_quad|Quad|Faible,Moyenne,Importante
@@ -491,61 +499,70 @@ usagers_remontees|Remontées mécaniques (fonctionnant l'été)|Faible,Moyenne,I
 usagers_chasseurs|Chasseurs|Faible,Moyenne,Importante
 usagers_parapente|Parapentes|Faible,Moyenne,Importante
 usagers_autre|Autre
-|– Professionnel
+}
+{|- Professionnel
 usagers_gardes|Gardes|Faible,Moyenne,Importante
 usagers_forestiers|Forestiers|Faible,Moyenne,Importante
 usagers_refuges|Refuges|Faible,Moyenne,Importante
-|1.6 Héliportages
+}}
+{|1.6 Héliportages
 heliportages_debut|Date approximative début estive|date
 heliportages_fin|Date approximative fin estive|date
 heliportages_poids|Poids à la disposition du berger|0|Kg
-|3. Les bêtes
-|3.1 Le troupeau
+}}
+{|3. Les bêtes
+{|3.1 Le troupeau
 troupeau_nb_eleveurs|Nombre d'éleveurs|0
 troupeau_nb_brebis|Nombre de brebis|0
-|- Eleveur 1 :
+{|- Eleveur 1 :
 troupeau_nom_eleveur1|Nom éleveur 1|court
 troupeau_nb_brebis1|Nombre brebis 1|0
 troupeau_race1|Race dominante 1|court
 troupeau_exploitation1|Siège exploitation 1|court
-|- Eleveur 2 :
+}
+{|- Eleveur 2 :
 troupeau_nom_eleveur2|Nom éleveur 2|court
 troupeau_nb_brebis2|Nombre brebis 2|0
 troupeau_race2|Race dominante 2|court
 troupeau_exploitation2|Siège exploitation 2|court
-|- Eleveur 3 :
+}
+{|- Eleveur 3 :
 troupeau_nom_eleveur3|Nom éleveur 3|court
 troupeau_nb_brebis3|Nombre brebis 3|0
 troupeau_race3|Race dominante 3|court
 troupeau_exploitation3|Siège exploitation 3|court
-|- Eleveur 4 :
+}
+{|- Eleveur 4 :
 troupeau_nom_eleveur4|Nom éleveur 4|court
 troupeau_nb_brebis4|Nombre brebis 4|0
 troupeau_race4|Race dominante 4|court
 troupeau_exploitation4|Siège exploitation 4|court
 troupeau_transhumance|Transhumance|oui,non,ne sait pas
-troupeau_transhumance_detail|– si oui, itinéraire et durée|court
+troupeau_transhumance_detail|- si oui, itinéraire et durée|court
 troupeau_beliers|Présence de béliers|oui,non,ne sait pas
 troupeau_chevres|Présence de chèvres|oui,non,ne sait pas
 troupeau_agneaux|Présence d'agneaux|oui,non,ne sait pas
 troupeau_tri_empoussees|Date de tri des empoussées|date
 troupeau_precisions|Autres précisions|court
-|3.2 Les soins
-|– État général du troupeau
+}}
+{|3.2 Les soins
+{|- État général du troupeau
 troupeau_antiparasitaire|Traitement antiparasitaire avant la montée|oui,non,ne sait pas
 troupeau_bain|Traitement teigne/tique/poux/bain la montée?|oui,non,ne sait pas
 troupeau_pediluve|Pédiluve|oui,non,ne sait pas
 troupeau_maladies|Maladies récurrentes liées à l'alpage|oui,non,ne sait pas
 troupeau_precisions|autres précisions|court
 troupeau_soins|soins vétérinaires habituellement pratiqués|court
-|3.3 La prédation
+}}
+{|3.3 La prédation
 predation_loups|Présence avérée de loups|oui,non,ne sait pas
 predation_zonage|Zonage|Cercle 1 (présence du loup détectée ou probable,Cercle 2 (susceptibles d'être colonisé par le loup),ne sait pas
-|Mesures de protection :
+{|Mesures de protection :
 predation_bergers|Nombre de postes de bergers|0
 predation_aides_bergers|Nombre de postes d'aides bergers|0
 predation_parcs|Parcs de nuit|oui,non,ne sait pas
-|Chiens de protection :
+}
+{|Chiens de protection :
 predation_chiens_males|- Nombre de mâle(s)|0
 predation_chiens_femelles|- Nombre de femelle(s)|0
 predation_chiens_races|Race(s)|court
@@ -553,28 +570,51 @@ predation_chiens_castres|Castré(s)|court
 predation_chiens_meute|Meute cohérente|court
 predation_meutes_voisines|Lien meutes voisines|court
 predation_chiens_autre|Autre|court
-|Fréquence des attaques :
+}
+{|Fréquence des attaques :
 attaques_frequence|- nombre d'attaques|0
 attaques_victimes|- nombre de victimes|0
 attaques_diagnostic|Diagnostic de vulnérabilité à la prédation|oui,non,ne sait pas
 attaques_informations|Informations complémentaires et conseils aux futurs bergers|court
 attaques_arme|Arme à disposition|oui,non,ne sait pas
 attaques_permis|Besoin permis de chasse|oui,non,ne sait pas
-|3.4 La conduite du troupeau
-|Description des quartiers : dates approximatives, principales caractéristiques, spécificités de la garde, conseils...
+}}
+{|3.4 La conduite du troupeau
+{|Description des quartiers : dates approximatives, principales caractéristiques, spécificités de la garde, conseils...
 quartier1|Quartier 1|court
 quartier2|Quartier 2|court
 quartier3|Quartier 3|court
-|4. les aides
+}}
+{|4. les aides
 eleveurs_implication|Implication des éleveurs pendant l'estive|Beaucoup,Un peu,Pas du tout
 eleveurs_soins|Participation éleveurs soins|Beaucoup,Un peu,Pas du tout
 emontagnage_date|Date d'emontagnage|date
 demontagnage_date|Date de démontagnage|date
+}
+{|5. Le berger
+{|- emploi :
+berger_salarie|- salarié|oui,non,ne sait pas
+berger_entrepreneur|- entrepreneur de garde|oui,non,ne sait pas
+berger_eleveur_berger|- éleveur berger|oui,non,ne sait pas
+berger_temps_travail|- temps de travail|court
+berger_contrat|- type de contrat|court
+berger_autre|- autres informations|court
+berger_contact_ancien|- contact ancien berger|court
+}
+}}
+{|5. Le responsable d'alpage
+forme_juridique|- Forme juridique|Groupement pastoral,Groupement d'employeurs pour l'insertion et la qualification,Exploitant individuel,Autre
+forme_juridique_autre|Autre forme juridique|court
+{|Siège social de l'employeur
+forme_juridique_commune|- commune|court
+forme_juridique_departement|- département|court
+}
+|6. Autres informations :
 ";
 $eol = "
 ";
 		$def_forms = explode ($eol, $def_form);
-		foreach ($def_forms AS $df) {
+		foreach ($def_forms AS $kdf=>$df) {
 			$dfs = explode ('|', $df.'|||');
 			$vars = $options = [];
 			$vars['TAG1'] = $sqlid = 'p';
@@ -584,13 +624,33 @@ $eol = "
 			$vars['DISPLAY_VALUE'] = $post_data[$sqlid];
 			$vars['POST_VALUE'] = $post_data[$sqlid];
 
-			// |1.1 Title
-			// |Text
-			if (!$dfs[0] && $dfs[1]) {
+			// {|1.1 Title
+			// {|Text
+			if ($dfs[0] == '{' || !$dfs[0]) {
 				$dfs1s = explode (' ', $dfs[1]);
 				$dfs1s0s = explode ('.', $dfs1s[0]);
-				$vars['TAG1'] = is_numeric ($dfs1s0s[0]) ? 'h'.(count($dfs1s0s) + 1) : 'p';
+				if (is_numeric ($dfs1s0s[0]) )
+					$vars['TAG1'] = 'h'.(count($dfs1s0s) + 1);
+
+				// Block visibility
+				$ndf = implode (' geo_', array_slice ($def_forms, $kdf)); // Find the block beginning
+				$c = $n = 1;
+				$ndfl = strlen ($ndf);
+				$r = '';
+				while ($n && $c < $ndfl) // Find the block end
+					switch ($ndf[$c++]) {
+						case '{': $n++; break;
+						case '}': $n--;
+					}
+				// Check if any value there
+				preg_match_all ('/(geo_[a-z_0-9]+)/', substr ($ndf, 0, $c), $match);
+				foreach ($match[0] AS $m)
+					if ($post_data[$m])
+						$vars['DISPLAY'] = true; // Decide to display the title
 			}
+			// End of block(s)
+			elseif ($dfs[0][0] == '}')
+				;
 			// sqlid incorrect
 			else if ($dfs[0] && !preg_match ('/^[a-z_0-8]+$/', $dfs[0])) {
 				$vars['TAG1'] = 'p style="color:red"';
@@ -645,7 +705,6 @@ $eol = "
 			foreach ($vs AS $k=>$v)
 				if ($v)
 					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>$sqlid = ".var_export($vars['DISPLAY_VALUE'],true).'</pre>';
 			$this->template->assign_block_vars('info', $vars);
 			if (count($options) > 1) {
 				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // Empty one at the beginning

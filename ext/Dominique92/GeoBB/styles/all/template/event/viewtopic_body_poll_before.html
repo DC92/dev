@@ -33,8 +33,8 @@
 
 	<!-- Application specific info -->
 	<!-- BEGIN info -->
-		<!-- IF info.DISPLAY_VALUE or info.TAG1 == 'p' -->
-			<{info.TAG1}>{info.INNER} {info.DISPLAY_VALUE} {info.POSTAMBULE}</{info.TAG1}>
+		<!-- IF info.DISPLAY_VALUE or info.DISPLAY -->
+			<{info.TAG1}>{info.INNER} <!-- IF info.DISPLAY_VALUE -->:<!-- ENDIF --> {info.DISPLAY_VALUE} {info.POSTAMBULE}</{info.TAG1}>
 		<!-- ENDIF -->
 	<!-- END info -->
 
