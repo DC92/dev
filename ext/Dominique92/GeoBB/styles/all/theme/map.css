@@ -1,0 +1,27 @@
+.map { /* Englobant de la carte */
+	width: 50%;
+	float: right;
+	background: white;
+}
+#map { /* Zone gérée par Openlayers */
+	height: 60vw;
+	background-image: linear-gradient(#9AB4CB, #9BCB9A);
+}
+.section-index .map,
+.section-viewtopic .map {
+	border-left: solid white 10px;
+	border-bottom: solid white 10px;
+}
+.map ul { /* Sélecteur d'overlay, en dessous de la carte */
+    list-style-type: none;
+}
+/* Responsive map for mobiles */
+@media screen and (max-width: 600px) {
+	.map {
+		width: 100%;
+		float: none;
+	}
+	.section-index .map,
+	.section-viewtopic .map {		border: none;
+	}
+}

@@ -42,7 +42,7 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 			'core.user_setup' => 'user_setup',
-			'core.page_footer' => 'dump_template',
+			'core.page_footer' => 'page_footer',
 
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
@@ -61,8 +61,15 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-	function dump_template() { // VISUALISATION VARIABLES TEMPLATE
-//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean();
+	function page_footer() {
+//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
+
+		// Help toolbar link
+		$sql = 'SELECT topic_id FROM '.POSTS_TABLE.' WHERE post_subject = "Aide"';
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+		$this->template->assign_var ('GEO_URL_AIDE', 'viewtopic.php?t='.$row['topic_id']);
 	}
 
 	function user_setup($vars) {
@@ -150,8 +157,8 @@ class listener implements EventSubscriberInterface
 		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue"';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
-		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
 		$this->db->sql_freeresult($result);
+		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
 	}
 
 	/**
@@ -226,7 +233,7 @@ class listener implements EventSubscriberInterface
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
 				$this->get_automatic_data($post_data);
-				$this->topic_field($post_data);
+				$this->topic_fields($post_data, $vars['topic_data']['forum_desc']);
 				foreach ($post_data AS $k=>$v)
 					if (strstr ($k, 'geo')
 						&& is_string ($v))
@@ -427,173 +434,19 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
 	}
 
+	// Form management
+	function topic_fields ($post_data, $forum_desc) {
+		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match);
+		if (!$match[1])
+			return;
 
-	/**
-		POSTING.PHP
-	*/
-	function topic_field ($post_data) {
-		$def_form = "
-{|1. L'alpage
-{|1.1 Équipements
-{|Autres équipements disponibles
-equipements_pediluve|- Pédiluve|oui,non,ne sait pas
-equipements_contention|- Couloir de contention|oui,non,ne sait pas
-equipements_pediluve|- Parc infirmerie en dur|oui,non,ne sait pas
-equipements_filets|- Nombre de filets|0
-equipements_poste|- Nombre de postes électriques|0
-equipements_precisions|- Autres précisions|court
-}}
-{|1.2 Caractéristiques
-altitude|Altitude|automatique|m
-topographie|Topographie|court
-risques|Risques|court|Vide, chute de pierres, orages violents...
-especes_proteges|Présence espèces remarquables et/ou protégées|court|Faune ou flore
-ressource_fourragere|Ressource fourragère|court|Qualité de l'herbe ? Note sur 5
-operateur|Opérateur téléphonique recommandé|Orange,Bouygues Télécom,Free,SFR,autre,ne sait pas
-operateur_autre|autre opérateur|court
-}
-{|1.3 Accès
-acces_par|Accès par|route,piste,sentier
-acces_etat|État de l'accès|Bon,Moyen,mauvais
-acces_bat|Accès avec animaux de bâts|oui,non,ne sait pas
-acces_parking|Où se garer ?|court
-acces_parcours|Temps de parcours|court
-acces_ravitaillement|Lieu de ravitaillement le plus proche|court
-acces_appui|Lieu d'appui aux bergers, lieu de rencontre|court
-}
-{|1.4 Mesures environnementales
-maec|Présence de MAEC|oui,non,autre,ne sait pas
-maec_autre|- Autres mesures|court
-parc_national|Réserve naturelle nationale|oui,non,ne sait pas
-parc_regional|Réserve naturelle régionale|oui,non,ne sait pas
-ens|ENS|oui,non,ne sait pas
-natura_2000|Natura 2000|oui,non,ne sait pas
-}
-{|1.5 Autres usagers
-{|- Récréatif
-usagers_vtt|VTT|Faible,Moyenne,Importante
-usagers_randonnee|Sentiers randonnée|Faible,Moyenne,Importante
-usagers_quad|Quad|Faible,Moyenne,Importante
-usagers_4x4|4x4|Faible,Moyenne,Importante
-usagers_remontees|Remontées mécaniques (fonctionnant l'été)|Faible,Moyenne,Importante
-usagers_chasseurs|Chasseurs|Faible,Moyenne,Importante
-usagers_parapente|Parapentes|Faible,Moyenne,Importante
-usagers_autre|Autre
-}
-{|- Professionnel
-usagers_gardes|Gardes|Faible,Moyenne,Importante
-usagers_forestiers|Forestiers|Faible,Moyenne,Importante
-usagers_refuges|Refuges|Faible,Moyenne,Importante
-}}
-{|1.6 Héliportages
-heliportages_debut|Date approximative début estive|date
-heliportages_fin|Date approximative fin estive|date
-heliportages_poids|Poids à la disposition du berger|0|Kg
-}}
-{|3. Les bêtes
-{|3.1 Le troupeau
-troupeau_nb_eleveurs|Nombre d'éleveurs|0
-troupeau_nb_brebis|Nombre de brebis|0
-{|- Eleveur 1 :
-troupeau_nom_eleveur1|Nom éleveur 1|court
-troupeau_nb_brebis1|Nombre brebis 1|0
-troupeau_race1|Race dominante 1|court
-troupeau_exploitation1|Siège exploitation 1|court
-}
-{|- Eleveur 2 :
-troupeau_nom_eleveur2|Nom éleveur 2|court
-troupeau_nb_brebis2|Nombre brebis 2|0
-troupeau_race2|Race dominante 2|court
-troupeau_exploitation2|Siège exploitation 2|court
-}
-{|- Eleveur 3 :
-troupeau_nom_eleveur3|Nom éleveur 3|court
-troupeau_nb_brebis3|Nombre brebis 3|0
-troupeau_race3|Race dominante 3|court
-troupeau_exploitation3|Siège exploitation 3|court
-}
-{|- Eleveur 4 :
-troupeau_nom_eleveur4|Nom éleveur 4|court
-troupeau_nb_brebis4|Nombre brebis 4|0
-troupeau_race4|Race dominante 4|court
-troupeau_exploitation4|Siège exploitation 4|court
-troupeau_transhumance|Transhumance|oui,non,ne sait pas
-troupeau_transhumance_detail|- si oui, itinéraire et durée|court
-troupeau_beliers|Présence de béliers|oui,non,ne sait pas
-troupeau_chevres|Présence de chèvres|oui,non,ne sait pas
-troupeau_agneaux|Présence d'agneaux|oui,non,ne sait pas
-troupeau_tri_empoussees|Date de tri des empoussées|date
-troupeau_precisions|Autres précisions|court
-}}
-{|3.2 Les soins
-{|- État général du troupeau
-troupeau_antiparasitaire|Traitement antiparasitaire avant la montée|oui,non,ne sait pas
-troupeau_bain|Traitement teigne/tique/poux/bain la montée?|oui,non,ne sait pas
-troupeau_pediluve|Pédiluve|oui,non,ne sait pas
-troupeau_maladies|Maladies récurrentes liées à l'alpage|oui,non,ne sait pas
-troupeau_precisions|autres précisions|court
-troupeau_soins|soins vétérinaires habituellement pratiqués|court
-}}
-{|3.3 La prédation
-predation_loups|Présence avérée de loups|oui,non,ne sait pas
-predation_zonage|Zonage|Cercle 1 (présence du loup détectée ou probable,Cercle 2 (susceptibles d'être colonisé par le loup),ne sait pas
-{|Mesures de protection :
-predation_bergers|Nombre de postes de bergers|0
-predation_aides_bergers|Nombre de postes d'aides bergers|0
-predation_parcs|Parcs de nuit|oui,non,ne sait pas
-}
-{|Chiens de protection :
-predation_chiens_males|- Nombre de mâle(s)|0
-predation_chiens_femelles|- Nombre de femelle(s)|0
-predation_chiens_races|Race(s)|court
-predation_chiens_castres|Castré(s)|court
-predation_chiens_meute|Meute cohérente|court
-predation_meutes_voisines|Lien meutes voisines|court
-predation_chiens_autre|Autre|court
-}
-{|Fréquence des attaques :
-attaques_frequence|- nombre d'attaques|0
-attaques_victimes|- nombre de victimes|0
-attaques_diagnostic|Diagnostic de vulnérabilité à la prédation|oui,non,ne sait pas
-attaques_informations|Informations complémentaires et conseils aux futurs bergers|court
-attaques_arme|Arme à disposition|oui,non,ne sait pas
-attaques_permis|Besoin permis de chasse|oui,non,ne sait pas
-}}
-{|3.4 La conduite du troupeau
-{|Description des quartiers : dates approximatives, principales caractéristiques, spécificités de la garde, conseils...
-quartier1|Quartier 1|court
-quartier2|Quartier 2|court
-quartier3|Quartier 3|court
-}}
-{|4. les aides
-eleveurs_implication|Implication des éleveurs pendant l'estive|Beaucoup,Un peu,Pas du tout
-eleveurs_soins|Participation éleveurs soins|Beaucoup,Un peu,Pas du tout
-emontagnage_date|Date d'emontagnage|date
-demontagnage_date|Date de démontagnage|date
-}
-{|5. Le berger
-{|- emploi :
-berger_salarie|- salarié|oui,non,ne sait pas
-berger_entrepreneur|- entrepreneur de garde|oui,non,ne sait pas
-berger_eleveur_berger|- éleveur berger|oui,non,ne sait pas
-berger_temps_travail|- temps de travail|court
-berger_contrat|- type de contrat|court
-berger_autre|- autres informations|court
-berger_contact_ancien|- contact ancien berger|court
-}
-}}
-{|5. Le responsable d'alpage
-forme_juridique|- Forme juridique|Groupement pastoral,Groupement d'employeurs pour l'insertion et la qualification,Exploitant individuel,Autre
-forme_juridique_autre|Autre forme juridique|court
-{|Siège social de l'employeur
-forme_juridique_commune|- commune|court
-forme_juridique_departement|- département|court
-}
-|6. Autres informations :
-";
-$eol = "
-";
-		$def_forms = explode ($eol, $def_form);
+		// Get form fields from the relative post
+		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_subject = "'.$match[1].'"';
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+
+		$def_forms = explode ("\n", str_replace ("\r", "", $row['post_text']));
 		foreach ($def_forms AS $kdf=>$df) {
 			$dfs = explode ('|', $df.'|||');
 			$vars = $options = [];
@@ -694,6 +547,10 @@ $eol = "
 		}
 	}
 
+
+	/**
+		POSTING.PHP
+	*/
 	// Appelé au début pour ajouter des parametres de recherche sql
 	function modify_posting_parameters($vars) {
 		// Création topic avec le nom d'image
@@ -712,7 +569,7 @@ $eol = "
 	function posting_modify_template_vars($vars) {
 		$page_data = $vars['page_data'];
 		$post_data = $vars['post_data'];
-		$this->topic_field($post_data);
+		$this->topic_fields($post_data, $post_data['forum_desc']);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// Récupère la traduction des données spaciales SQL
@@ -735,9 +592,8 @@ $eol = "
 		}
 
 		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
-		//TODO BEST traiter au niveau du formulaire (avertissement de modif ?)
 		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'NEW';
+			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
 
 		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
 		$page_data['POST_ID'] = $post_data['post_id'] ?: 0;
@@ -761,7 +617,7 @@ $eol = "
 		$vars['page_data'] = $page_data;
 	}
 
-	// Called when validating the data to be saved
+	// Call when validating the data to be saved
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
@@ -806,6 +662,7 @@ $eol = "
 
 		//-----------------------------------------------------------------
 		// Save change
+		//TODO BUG ne log pas les modfis de texte de POST (+ titre ?)
 		$data = $vars['data'];
 		$save[] = date('r').' '.$this->user->data['username'];
 
