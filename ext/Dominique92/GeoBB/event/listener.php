@@ -65,7 +65,7 @@ class listener implements EventSubscriberInterface
 //		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
 
 		// Help toolbar link
-		$sql = 'SELECT topic_id FROM '.POSTS_TABLE.' WHERE post_subject = "Aide"';
+		$sql = 'SELECT topic_id FROM '.POSTS_TABLE.' WHERE post_subject = "Aide" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -154,7 +154,7 @@ class listener implements EventSubscriberInterface
 		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
 		// Le texte de ces messages sont dans les posts dont le titre est !style
 		//$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
-		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue"';
+		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -198,10 +198,10 @@ class listener implements EventSubscriberInterface
 			";
 		//TODO BEST en MySQL 5.7+, utiliser ST_Contains
 		//TODO BEST ASPIR pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
+		// Assign the blocks relative to the points included in this one
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$block = 'contains_'.basename ($row['forum_image'], '.png');
-			$this->template->assign_block_vars($block, array_change_key_case ($row, CASE_UPPER));
 
 			foreach ($row AS $k=>$v)
 				if ($v && !strncmp ($k, 'geo_', 4) &&
@@ -214,7 +214,7 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		if (isset ($this->all_post_data[$post_id])) {
-			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post 
+			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post
 			$post_row = $vars['post_row'];
 
 			// Convert the geom info in geoJson format
@@ -245,9 +245,9 @@ class listener implements EventSubscriberInterface
 	}
 
 	/*//TODO BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
-    $oGeometry = geoPHP::load($sWkt,'wkt');    
+    $oGeometry = geoPHP::load($skt,'wkt');
     $reducedGeom = $oGeometry->simplify(1.5);
-    $sWkt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
+    $skt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
 	*/
 	function optim (&$g, $granularity) { // Fonction récursive d'optimisation d'un objet PHP contenant des objets géographiques
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim',true).'</pre>';
@@ -327,10 +327,12 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		if ((array_key_exists('geo_massif', $row) && !$row['geo_massif']) ||
 			(array_key_exists('geo_reserve', $row) && !$row['geo_reserve']) ||
 			(array_key_exists('geo_ign', $row) && !$row['geo_ign'])) {
+			$update['geo_massif'] = null;
+			$update['geo_reserve'] = null;
+			$igns = [];
 			$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$centre[0]},{$centre[1]},{$centre[0]},{$centre[1]}";
 			$wri_export = @file_get_contents($url);
 			if ($wri_export) {
-				$igns = [];
 				$fs = json_decode($wri_export)->features;
 				foreach($fs AS $f)
 					switch ($f->properties->type->type) {
@@ -344,24 +346,25 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 							break;
 						case 'carte':
 							$ms = explode(' ', $f->properties->nom);
-							$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom</a>";
+					$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">{$f->properties->nom}</a>";
 							break;
 					}
 			}
+			$update['geo_ign'] = implode ('<br/>', $igns);
 		}
 
 		// Calcul de la commune (France)
 		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
-			$ch = curl_init ();
-			curl_setopt ($ch, CURLOPT_URL, 
+{/*			$ch = curl_init ();
+			curl_setopt ($ch, CURLOPT_URL,
 				'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
 				http_build_query ( array(
 					'output' => 'json',
 					'xls' =>
 <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
-<XLS 
-xmlns:xls="http://www.opengis.net/xls"
+<XLS
+	xmlns:xls="http://www.opengis.net/xls"
 	xmlns:gml="http://www.opengis.net/gml"
 	xmlns="http://www.opengis.net/xls"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2"	xsi:schemaLocation="http://www.opengis.net/xls
@@ -385,29 +388,57 @@ XML
 			curl_exec($ch);
 			$json = ob_get_clean();
 			preg_match ('/Municipality\\\">([^<]+)/', $json, $commune);
-			preg_match ('/Departement\\\">([^<]+)/', $json, $departement);
 
-			// Calcul du code postal (France)
-			$nominatim = json_decode (@file_get_contents (
-				'https://nominatim.openstreetmap.org/reverse?format=json&lon='.$centre[0].'&lat='.$centre[1],
-				false, 
-				stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
-			));
-			$code_postal = @$nominatim->address->postcode;
+			if ($commune[1]) {
+				curl_setopt ($ch, CURLOPT_URL,
+					'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
+					http_build_query ( array(
+						'output' => 'json',
+						'xls' =>
+<<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<xls:XLS version="1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xls="http://www.opengis.net/xls" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/xls http://schemas.opengis.net/ols/1.2/olsAll.xsd">
+    <xls:RequestHeader srsName="EPSG:4326" />
+    <xls:Request maximumResponses="25" methodName="GeocodeRequest" requestID="282b6805-48af-4e8f-83dc-3c55b2d311b0" version="1.2">
+        <xls:GeocodeRequest returnFreeForm="false">
+            <xls:Address countryCode="StreetAddress">
+		<xls:freeFormAddress>{$commune[1]}</xls:freeFormAddress>
+            </xls:Address>
+        </xls:GeocodeRequest>
+    </xls:Request>
+</xls:XLS>
+XML
+					))
+				);
+				ob_start();
+				curl_exec($ch);
+				$json = ob_get_clean();
+				preg_match ('/PostalCode>([^<]+)/', $json, $postalcode);
 
-			if ($commune[1])
-				$update['geo_commune'] = ($code_postal ?: $departement[1]).' '.$commune[1];
+				if ($postalcode[1])
+					$update['geo_commune'] = $postalcode[1].' '.$commune[1];
+			}
+			if (!$update['geo_commune']) {*/
+				$nominatim = json_decode (@file_get_contents (
+					"https://nominatim.openstreetmap.org/reverse?format=json&lon={$centre[0]}&lat={$centre[1]}",
+					false,
+					stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
+				));
+				$update['geo_commune'] = $nominatim->address->postcode.' '.($nominatim->address->village ?: $nominatim->address->hamlet);
+			}
 		}
 
-//TODO CHEM		foreach ($update AS $k=>$v)
-//			$update[$k] .= '~';
+		// Update de la base
+		foreach ($update AS $k=>$v)
+			if (array_key_exists($k, $row))
+				$update[$k] .= '~';
+			else
+				unset ($update[$k]);
 
 if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
-
 		// Pour affichage
 		$row = array_merge ($row, $update);
 
-		// Update de la base
 		if ($update)
 			$this->db->sql_query (
 				'UPDATE '.POSTS_TABLE.
@@ -441,29 +472,30 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			return;
 
 		// Get form fields from the relative post
-		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_subject = "'.$match[1].'"';
+		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_subject = "'.$match[1].'" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 
-		$def_forms = explode ("\n", str_replace ("\r", "", $row['post_text']));
+		$def_forms = explode ("\n", $row['post_text']);
 		foreach ($def_forms AS $kdf=>$df) {
-			$dfs = explode ('|', $df.'|||');
+			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||'));
 			$vars = $options = [];
 			$vars['TAG1'] = $sqlid = 'p';
 			$sqlid = 'geo_'.$dfs[0];
 			$vars['SQL_TYPE'] = 'text';
 			$vars['INNER'] = $dfs[1];
-			$vars['DISPLAY_VALUE'] = $post_data[$sqlid];
-			$vars['POST_VALUE'] = $post_data[$sqlid];
+			$vars['DISPLAY_VALUE'] =
+			$vars['POST_VALUE'] = str_replace ('~', '', $post_data[$sqlid]);
 
 			// {|1.1 Title
 			// {|Text
 			if ($dfs[0] == '{' || !$dfs[0]) {
 				$dfs1s = explode (' ', $dfs[1]);
-				$dfs1s0s = explode ('.', $dfs1s[0]);
-				if (is_numeric ($dfs1s0s[0]) )
-					$vars['TAG1'] = 'h'.(count($dfs1s0s) + 1);
+
+				// Title tag <h2>..<h4>
+				preg_match_all ('/[0-9]+/', $dfs1s[0], $match);
+				$vars['TAG1'] = 'h'.(count($match[0]) ? count($match[0]) + 1 : 4);
 
 				// Block visibility
 				$ndf = implode (' geo_', array_slice ($def_forms, $kdf)); // Find the block beginning
@@ -540,7 +572,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
 			$this->template->assign_block_vars('info', $vars);
 			if (count($options) > 1) {
-				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // Empty one at the beginning
+				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // One empty at the beginning
 				foreach ($options AS $o)
 					$this->template->assign_block_vars('info.options', ['OPTION' => $o]);
 			}

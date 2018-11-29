@@ -43,7 +43,7 @@
 }
 
 /* Masquages */
-.nav-main li:nth-child(2), /* navbar_header FAQ  */
+/* .nav-main li:nth-child(2), navbar_header FAQ  */
 .stat-block, /* QUI EST EN LIGNE... */
 .footer-row , /* Lignes copyright en bas */
 .birthday-list,
@@ -94,6 +94,10 @@ input[type="number"] {
 .section-posting #attach-panel-multi::after {
 	content: "Attendre la fin du chargement des fichiers pour envoyer.";
 }
+
 .geo-info p {
 	margin: 0;
+}
+.geo-info h4 {
+	margin-top: 5px !important;
 }
