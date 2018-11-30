@@ -328,7 +328,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
 //TODO BUG ne clique pas sur l'étiquette d'un polygone alpage aspir ou massif WRI
-//TODO BUG pas s'étiquette sur IE & EDGE
+//TODO BUG pas d'étiquette sur IE & EDGE
 function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
@@ -342,7 +342,7 @@ function layerVectorURL(options) {
 					options.url(bbox, list, resolution) :
 					options.url + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 			},
-			format: options.format || new ol.format.GeoJSON() //TODO BUG JSON error handling : error + URL
+			format: options.format || new ol.format.GeoJSON() //TODO BEST JSON error handling : error + URL
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
@@ -461,7 +461,7 @@ function initLayerVectorURLListeners(e) {
 		// Apply hover if any
 		var style = (h.options.hover || h.options.style)(h.properties);
 
-		// Spread too closes icons //TODO BUG don't allow to click on the last !!
+		// Spread too closes icons //TODO TEST don't allow to click on the last !!
 		//TODO BEST redo this as only the icon moves (can see), not the feature position (can click)
 		if (hovered.length > 2 &&
 			style.image)

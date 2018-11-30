@@ -16,6 +16,7 @@ Forums -> Permissions groupes/forums -> invités + utilisateurs * + robots -> Au
 
 UPDATE VERSION PHPBB
 ====================
+//TODO ASPIR test 1&1 & migation
 copier full package
 install/app.php/update -> database only
 delete install

@@ -694,7 +694,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 		//-----------------------------------------------------------------
 		// Save change
-		//TODO lien pour lire le .txt
+		//TODO ASPIR lien pour lire le .txt
 		$to_save = [
 			$this->user->data['username'].' '.date('r'),
 			$_SERVER['REQUEST_URI'],
@@ -706,7 +706,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			if ($v && !strncmp ($k, 'geo_', 4))
 				$to_save [] = $k.' = '.$v;
 
-		/*//TODO save attachment_data
+		/*//TODO ASPIR save attachment_data
 			foreach ($data['attachment_data'] AS $a)
 				$attach_apres[] = $a['attach_id'];
 			if (isset ($attach_apres))
