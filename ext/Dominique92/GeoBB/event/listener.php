@@ -234,6 +234,8 @@ class listener implements EventSubscriberInterface
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
 				$this->get_automatic_data($post_data);
 				$this->topic_fields($post_data, $vars['topic_data']['forum_desc']);
+
+				// Assign geo_ vars to template for these used out of topic_fields
 				foreach ($post_data AS $k=>$v)
 					if (strstr ($k, 'geo')
 						&& is_string ($v))
@@ -242,48 +244,6 @@ class listener implements EventSubscriberInterface
 				$vars['post_row'] = $post_row;
 			}
 		}
-	}
-
-	/*//TODO BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
-    $oGeometry = geoPHP::load($skt,'wkt');
-    $reducedGeom = $oGeometry->simplify(1.5);
-    $skt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
-	*/
-	function optim (&$g, $granularity) { // Fonction récursive d'optimisation d'un objet PHP contenant des objets géographiques
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim',true).'</pre>';
-/*
-		if (isset ($g->geometries)) // On recurse sur les Collection, ...
-			foreach ($g->geometries AS &$gs)
-				$this->optim ($gs, $granularity);
-
-		if (isset ($g->features)) // On recurse sur les Feature, ...
-			foreach ($g->features AS &$fs)
-				$this->optim ($fs, $granularity);
-
-		if (preg_match ('/multi/i', $g->type)) {
-			foreach ($g->coordinates AS &$gs)
-				$this->optim_coordinate_array ($gs, $granularity);
-		} elseif (isset ($g->coordinates)) // On a trouvé une liste de coordonnées à optimiser
-			$this->optim_coordinate_array ($g->coordinates, $granularity);
-*/
-	}
-	function optim_coordinate_array (&$cs, $granularity) { // Fonction d'optimisation d'un tableau de coordonnées
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim_coordinate_array',true).'</pre>';
-/*
-		if (count ($cs) > 2) { // Pour éviter les "Points" et "Poly" à 2 points
-			$p = $cs[0]; // On positionne le point de référence de mesure de distance à une extrémité
-			$r = []; // La liste de coordonnées optimisées
-			foreach ($cs AS $k=>$v)
-				if (!$k || // On garde la première extrémité
-					$k == count ($cs) - 1) // Et la dernière
-					$r[] = $v;
-				elseif (hypot ($v[0] - $p[0], $v[1] - $p[1]) > $granularity)
-					$r[] = // On copie ce point
-					$p = // On repositionne le point de référence
-						$v;
-			$cs = $r; // On écrase l'ancienne
-		}
-*/
 	}
 
 	// Calcul des données automatiques
@@ -447,24 +407,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		);
 	}
 
-	// Calcul de la bbox englobante
-	function get_bounds($g) {
-		$b = $g->getBBox();
-		$m = 0.005; // Marge autour d'un point simple (en °)
-		foreach (['x','y'] AS $xy) {
-			if ($b['min'.$xy] == $b['max'.$xy]) {
-				$b['min'.$xy] -= $m;
-				$b['max'.$xy] += $m;
-			}
-			foreach (['max','min'] AS $mm)
-				$this->bbox['geo_bbox_'.$mm.$xy] =
-					isset ($this->bbox['geo_bbox_'.$mm.$xy])
-					? $mm ($this->bbox['geo_bbox_'.$mm.$xy], $b[$mm.$xy])
-					: $b[$mm.$xy];
-		}
-		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
-	}
-
 	// Form management
 	function topic_fields ($post_data, $forum_desc) {
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match);
@@ -579,6 +521,66 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 	}
 
+	/*//TODO BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
+    $oGeometry = geoPHP::load($skt,'wkt');
+    $reducedGeom = $oGeometry->simplify(1.5);
+    $skt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
+	*/
+	function optim (&$g, $granularity) { // Fonction récursive d'optimisation d'un objet PHP contenant des objets géographiques
+if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim',true).'</pre>';
+/*
+		if (isset ($g->geometries)) // On recurse sur les Collection, ...
+			foreach ($g->geometries AS &$gs)
+				$this->optim ($gs, $granularity);
+
+		if (isset ($g->features)) // On recurse sur les Feature, ...
+			foreach ($g->features AS &$fs)
+				$this->optim ($fs, $granularity);
+
+		if (preg_match ('/multi/i', $g->type)) {
+			foreach ($g->coordinates AS &$gs)
+				$this->optim_coordinate_array ($gs, $granularity);
+		} elseif (isset ($g->coordinates)) // On a trouvé une liste de coordonnées à optimiser
+			$this->optim_coordinate_array ($g->coordinates, $granularity);
+*/
+	}
+	function optim_coordinate_array (&$cs, $granularity) { // Fonction d'optimisation d'un tableau de coordonnées
+if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim_coordinate_array',true).'</pre>';
+/*
+		if (count ($cs) > 2) { // Pour éviter les "Points" et "Poly" à 2 points
+			$p = $cs[0]; // On positionne le point de référence de mesure de distance à une extrémité
+			$r = []; // La liste de coordonnées optimisées
+			foreach ($cs AS $k=>$v)
+				if (!$k || // On garde la première extrémité
+					$k == count ($cs) - 1) // Et la dernière
+					$r[] = $v;
+				elseif (hypot ($v[0] - $p[0], $v[1] - $p[1]) > $granularity)
+					$r[] = // On copie ce point
+					$p = // On repositionne le point de référence
+						$v;
+			$cs = $r; // On écrase l'ancienne
+		}
+*/
+	}
+
+	// Calcul de la bbox englobante
+	function get_bounds($g) {
+		$b = $g->getBBox();
+		$m = 0.005; // Marge autour d'un point simple (en °)
+		foreach (['x','y'] AS $xy) {
+			if ($b['min'.$xy] == $b['max'.$xy]) {
+				$b['min'.$xy] -= $m;
+				$b['max'.$xy] += $m;
+			}
+			foreach (['max','min'] AS $mm)
+				$this->bbox['geo_bbox_'.$mm.$xy] =
+					isset ($this->bbox['geo_bbox_'.$mm.$xy])
+					? $mm ($this->bbox['geo_bbox_'.$mm.$xy], $b[$mm.$xy])
+					: $b[$mm.$xy];
+		}
+		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
+	}
+
 
 	/**
 		POSTING.PHP
@@ -688,56 +690,32 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
 			}
-		$this->request->disable_super_globals();
-
 		$vars['sql_data'] = $sql_data;
 
 		//-----------------------------------------------------------------
 		// Save change
-		//TODO BUG ne log pas les modfis de texte de POST (+ titre ?)
-		$data = $vars['data'];
-		$save[] = date('r').' '.$this->user->data['username'];
+		//TODO lien pour lire le .txt
+		$to_save = [
+			$this->user->data['username'].' '.date('r'),
+			$_SERVER['REQUEST_URI'],
+			'post_subject = '.$sql_data[POSTS_TABLE]['sql']['post_subject'],
+			'post_text = '.$sql_data[POSTS_TABLE]['sql']['post_text'],
+			'geom = '.str_replace (['GeomFromText("','")'], '', $sql_data[POSTS_TABLE]['sql']['geom']),
+		];
+		foreach ($sql_data[POSTS_TABLE]['sql'] AS $k=>$v)
+			if ($v && !strncmp ($k, 'geo_', 4))
+				$to_save [] = $k.' = '.$v;
 
-		// Trace before
-		if ($data['post_id']) {
-			$sql = 'SELECT *, AsText(geom) AS geomwkt FROM '.POSTS_TABLE.' WHERE post_id = '.$data['post_id'];
-			$result = $this->db->sql_query($sql);
-			$data_avant = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-
-			$sql = 'SELECT attach_id FROM '.ATTACHMENTS_TABLE.' WHERE post_msg_id = '.$data['post_id'];
-			$result = $this->db->sql_query($sql);
-			while ($rowattchm = $this->db->sql_fetchrow($result))
-				$attach_avant[] = $rowattchm['attach_id'];
-			$this->db->sql_freeresult($result);
-
-			if (isset ($attach_avant))
-				$data_avant['attachments'] = implode ('|', $attach_avant);
-
-			foreach (['forum_id','topic_id','post_id','poster_id','post_subject','post_text','geomwkt','attachments',] AS $k)
-				if (@$data_avant[$k])
-					$avant[] = $k.'='.str_replace("\n","\\n",$data_avant[$k]);
-
-			$save[] = 'avant:'.implode(',',$avant);
-		}
-
-		// Trace aprés
-		if (isset ($data['attachment_data'])) {
+		/*//TODO save attachment_data
 			foreach ($data['attachment_data'] AS $a)
 				$attach_apres[] = $a['attach_id'];
 			if (isset ($attach_apres))
 				$data['attachments'] = implode ('|', $attach_apres);
-		}
-		if (isset ($data['geom']))
-			$data['geom'] = str_replace (['GeomFromText("','")'], '', $sql_data[POSTS_TABLE]['sql']['geom']);
+		*/
 
-		foreach (['forum_id','topic_id','post_id','poster_id','topic_title','message','geom','attachments',] AS $k)
-			if (@$data[$k])
-				$apres[] = $k.'='.str_replace("\n","\\n",$data[$k]);
+		file_put_contents ('LOG/'.$vars['data']['post_id'].'.txt', implode ("\n", $to_save)."\n\n", FILE_APPEND);
 
-		$save[] = $vars['post_mode'].':'.implode(',',$apres);
-
-		file_put_contents ('EDIT.log', implode ("\n", $save)."\n\n", FILE_APPEND);
+		$this->request->disable_super_globals();
 	}
 
 	// Permet la saisie d'un POST avec un texte vide
