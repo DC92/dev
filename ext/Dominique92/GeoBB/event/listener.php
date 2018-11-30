@@ -198,6 +198,7 @@ class listener implements EventSubscriberInterface
 			";
 		//TODO BEST en MySQL 5.7+, utiliser ST_Contains
 		//TODO BEST ASPIR pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
+		//TODO ASPIR URGENT rattacher manuellement une cabane qui ne serait pas dans le périmètre exact de l'alpage
 		// Assign the blocks relative to the points included in this one
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {

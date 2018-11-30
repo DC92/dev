@@ -16,6 +16,9 @@ Champ 4 = Indication à afficher dans la boite de saisie quand elle est vide. Ce
 ou champ 4 = texte affiché aprés la donnée (unité par exemple)
 Un changement peut générer une erreur à la modification d'une fiche. Revenir sur le forum de description et essayer de corriger la dernière modification. Sinon, me contacter.
 
+//TODO ASPIR cabanes
+//TODO ASPIR réimporter texte définitif
+
 ALPAGES
 =======
 {|1. L'alpage
