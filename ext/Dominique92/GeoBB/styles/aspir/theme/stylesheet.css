@@ -92,6 +92,7 @@ input[type="number"] {
 	margin-bottom: 0px;
 }
 .section-posting #attach-panel-multi::after {
+	color: red;
 	content: "Attendre la fin du chargement des fichiers pour envoyer.";
 }
 

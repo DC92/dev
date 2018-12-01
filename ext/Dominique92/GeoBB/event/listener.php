@@ -655,6 +655,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	// Call when validating the data to be saved
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
+		$modifs = $sql_data[POSTS_TABLE]['sql'];
 
 		// Get special columns list
 		$special_columns = [];
@@ -689,30 +690,28 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				}
 
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
+				$modifs[$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
 			}
 		$vars['sql_data'] = $sql_data;
 
 		//-----------------------------------------------------------------
 		// Save change
-		//TODO ASPIR lien pour lire le .txt
 		$to_save = [
 			$this->user->data['username'].' '.date('r'),
 			$_SERVER['REQUEST_URI'],
-			'post_subject = '.$sql_data[POSTS_TABLE]['sql']['post_subject'],
-			'post_text = '.$sql_data[POSTS_TABLE]['sql']['post_text'],
-			'geom = '.str_replace (['GeomFromText("','")'], '', $sql_data[POSTS_TABLE]['sql']['geom']),
+			'post_subject = '.$modifs['post_subject'],
+			'post_text = '.$modifs['post_text'],
+			'geom = '.str_replace (['GeomFromText("','")'], '', $modifs['geom']),
 		];
-		foreach ($sql_data[POSTS_TABLE]['sql'] AS $k=>$v)
+		foreach ($modifs AS $k=>$v)
 			if ($v && !strncmp ($k, 'geo_', 4))
-				$to_save [] = $k.' = '.$v;
+				$to_save [] = substr ($k, 4).' = '.$v;
 
-		/*//TODO ASPIR save attachment_data
-			foreach ($data['attachment_data'] AS $a)
-				$attach_apres[] = $a['attach_id'];
-			if (isset ($attach_apres))
-				$data['attachments'] = implode ('|', $attach_apres);
-		*/
+		// Save attachment_data
+			foreach ($vars['data']['attachment_data'] AS $att)
+				$attach[] = $att['attach_id'].':'.$att['real_filename'];
+			if (isset ($attach))
+				$to_save[] = 'attachments = '.implode (', ', $attach);
 
 		file_put_contents ('LOG/'.$vars['data']['post_id'].'.txt', implode ("\n", $to_save)."\n\n", FILE_APPEND);
 
