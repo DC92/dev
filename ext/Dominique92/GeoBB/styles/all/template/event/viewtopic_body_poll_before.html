@@ -33,8 +33,18 @@
 
 	<!-- Application specific info -->
 	<!-- BEGIN info -->
-		<!-- IF info.DISPLAY_VALUE or info.DISPLAY -->
-			<{info.TAG1}>{info.INNER} <!-- IF info.DISPLAY_VALUE -->:<!-- ENDIF --> {info.DISPLAY_VALUE} {info.POSTAMBULE}</{info.TAG1}>
+		<!-- IF info.DISPLAY_VALUE or info.DISPLAY or info.attaches -->
+			<{info.TAG1}>
+				{info.INNER}
+				<!-- IF info.DISPLAY_VALUE -->:<!-- ENDIF -->
+				{info.DISPLAY_VALUE} {info.POSTAMBULE}
+				<!-- IF info.attaches -->
+					{info.ATTACHES} :
+				<!-- ENDIF -->
+				<!-- BEGIN attaches -->
+					<p> &nbsp; &nbsp; <a href="viewtopic.php?t={attaches.TOPIC_ID}">{attaches.POST_SUBJECT}</a></p>
+				<!-- END attaches -->
+			</{info.TAG1}>
 		<!-- ENDIF -->
 	<!-- END info -->
 

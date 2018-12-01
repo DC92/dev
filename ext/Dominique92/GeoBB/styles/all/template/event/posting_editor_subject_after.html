@@ -56,7 +56,7 @@
 		<!-- IF info.TAG == 'select' -->
 			<select{info.ATT_TYPE}{info.ATT_NAME}>
 			<!-- BEGIN options -->
-				<option value="{options.OPTION}" <!-- IF info.POST_VALUE == options.OPTION -->selected="selected"<!-- ENDIF -->>{options.OPTION}</option> 
+				<option value="{options.VALUE}" <!-- IF info.POST_VALUE == options.OPTION -->selected="selected"<!-- ENDIF -->>{options.OPTION}</option> 
 			<!-- END options -->
 			</select>
 		<!-- ELSEIF info.TAG == 'textarea' -->

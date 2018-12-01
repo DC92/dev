@@ -151,9 +151,8 @@ class listener implements EventSubscriberInterface
 			}
 		$this->db->sql_freeresult($result);
 
-		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
+		// Affiche un message de bienvenue dépendant du style pour ceux qui ne sont pas connectés
 		// Le texte de ces messages sont dans les posts dont le titre est !style
-		//$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
 		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
@@ -185,6 +184,8 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_var ('TOPIC_FIRST_POST_ID', $vars['topic_data']['topic_first_post_id']);
 		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
+//////////////////////////////////////////////////////////
+/*//TODO DELETE
 		// Search points included in a surface
 		$sql = "
 			SELECT p.*, t.topic_id, t.topic_title, f.forum_image
@@ -198,7 +199,6 @@ class listener implements EventSubscriberInterface
 			";
 		//TODO BEST en MySQL 5.7+, utiliser ST_Contains
 		//TODO BEST ASPIR pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
-		//TODO ASPIR URGENT rattacher manuellement une cabane qui ne serait pas dans le périmètre exact de l'alpage
 		// Assign the blocks relative to the points included in this one
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
@@ -213,7 +213,10 @@ class listener implements EventSubscriberInterface
 					));
 		}
 		$this->db->sql_freeresult($result);
+		*/
+//////////////////////////////////////////////////////////
 
+		// Assign the geo values to the template
 		if (isset ($this->all_post_data[$post_id])) {
 			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post
 			$post_row = $vars['post_row'];
@@ -423,13 +426,14 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$def_forms = explode ("\n", $row['post_text']);
 		foreach ($def_forms AS $kdf=>$df) {
 			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||'));
-			$vars = $options = [];
-			$vars['TAG1'] = $sqlid = 'p';
-			$sqlid = 'geo_'.$dfs[0];
+			$vars = $attaches = [];
+			$vars['TAG1'] = $sql_id = 'p';
+			$sql_id = 'geo_'.$dfs[0];
 			$vars['SQL_TYPE'] = 'text';
 			$vars['INNER'] = $dfs[1];
 			$vars['DISPLAY_VALUE'] =
-			$vars['POST_VALUE'] = str_replace ('~', '', $post_data[$sqlid]);
+			$vars['POST_VALUE'] = str_replace ('~', '', $post_data[$sql_id]);
+			$options = $options_values = explode (',', ','.$dfs[2]); // One empty at the beginning
 
 			// {|1.1 Title
 			// {|Text
@@ -456,68 +460,137 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					if ($post_data[$m])
 						$vars['DISPLAY'] = true; // Decide to display the title
 			}
+
 			// End of block(s)
 			elseif ($dfs[0][0] == '}')
 				;
-			// sqlid incorrect
+
+			// sql_id incorrect
 			else if ($dfs[0] && !preg_match ('/^[a-z_0-8]+$/', $dfs[0])) {
 				$vars['TAG1'] = 'p style="color:red"';
 				$vars['INNER'] = 'Identifiant incorrect : "'.$dfs[0].'"';
-			} elseif ($dfs[0]) {
-				// sqlid|titre|choix,choix
-				$options = explode (',', $dfs[2]);
-				$length = 0;
-				if (count($options) > 1) {
+			}
+			elseif ($dfs[0]) {
+				$options = explode (',', ','.$dfs[2]);
+
+				// sql_id|titre|choix,choix
+				if (count($options) > 2) {
+					$length = 0;
 					foreach ($options AS $o)
 						$length = max ($lengt, strlen ($o) + 1);
 					$vars['TAG'] = 'select';
 					$vars['SQL_TYPE'] = 'varchar-'.$length;
 				}
-				// sqlid|titre|0
+
+				// sql_id|titre|proches
+				//TODO ASPIR BUG ne devrait pas lister les points
+				//TODO ASPIR BUG par défaut localise -> sinon, il faut saisir 2 fois !
+				elseif (!strcasecmp ($dfs[2], 'proches')) {
+					$vars['TAG'] = 'select';
+					$options = $options_values = [];
+
+					// Search surfaces closest to a point
+					if ($post_data['post_id']) {
+						//TODO BEST en MySQL 5.7+, utiliser ST_Distance & ST_Centroid
+						$sql = "
+							SELECT p.*,
+								Distance (p.geom, Centroid(v.geom))	AS distance
+							FROM	 ".POSTS_TABLE ." AS p
+								JOIN ".POSTS_TABLE ." AS v ON (v.post_id = {$post_data['post_id']})
+							WHERE
+								v.forum_id != p.forum_id
+								AND p.geom IS NOT NULL
+							ORDER BY distance
+							LIMIT 10
+							";
+						$result = $this->db->sql_query($sql);
+						while ($row = $this->db->sql_fetchrow($result)) {
+//TODO DELETE							$this->template->assign_block_vars('proches', array_change_key_case (, CASE_UPPER));
+							$options[] = $row['post_subject'];
+							$options_values[] = $row['topic_id'];
+							if ($row['topic_id'] == $vars['POST_VALUE'])
+								$vars['POST_VALUE'] = $vars['DISPLAY_VALUE'] = $row['post_subject'];
+						}
+						$this->db->sql_freeresult($result);
+					} else
+						$options[] = 'Vous devez enregistrer ce point une fois avant de voir les proches';
+				}
+
+				// sql_id|titre|attaches
+				elseif (!strcasecmp ($dfs[2], 'attaches')) {
+					$vars['INNER'] = '';
+					$vars['ATTACHES'] = $dfs[1];
+
+					$sql = "
+						SELECT *
+						FROM ".POSTS_TABLE ."
+						WHERE $sql_id = '{$post_data['topic_id']}'
+						";
+					$result = $this->db->sql_query($sql);
+					while ($row = $this->db->sql_fetchrow($result))
+						$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre du formulaire)
+					$this->db->sql_freeresult($result);
+				}
+
+				// sql_id|titre|automatique
+				elseif (!strcasecmp ($dfs[2], 'automatique')) {
+					$vars['TAG'] = 'input';
+					$vars['STYLE'] = 'display:none'; // Hide at posting
+					$vars['TYPE'] = 'hidden';
+					$vars['POSTAMBULE'] = $dfs[3];
+					$vars['POST_VALUE'] = null; // Set the value to null to ask for recalculation
+				}
+
+				// sql_id|titre|0
 				elseif (is_numeric ($dfs[2])) {
 					$vars['TAG'] = 'input';
 					$vars['TYPE'] = 'number';
 					$vars['SQL_TYPE'] = 'int-5';
 					$vars['POSTAMBULE'] = $dfs[3];
 				}
-				// sqlid|titre|automatique
-				elseif (!strcasecmp ($dfs[2], 'automatique')) {
-					$vars['TAG'] = 'input';
-					$vars['STYLE'] = 'display:none'; // Hide all visible
-					$vars['TYPE'] = 'hidden';
-					$vars['POSTAMBULE'] = $dfs[3];
-					$vars['POST_VALUE'] = null; // Set the value to null to ask for recalculation
-				}
-				// sqlid|titre|date
+
+				// sql_id|titre|date
 				elseif (!strcasecmp ($dfs[2], 'date')) {
 					$vars['TAG'] = 'input';
 					$vars['TYPE'] = 'date';
 					$vars['SQL_TYPE'] = 'date';
 				}
-				// sqlid|titre|long|invite
+
+				// sql_id|titre|long|invite
 				elseif (!strcasecmp ($dfs[2], 'long')) {
 					$vars['TAG'] = 'textarea';
 					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 				}
-				// sqlid|titre|court|invite
+
+				// sql_id|titre|court|invite
 				else {
 					$vars['TAG'] = 'input';
 					$vars['SIZE'] = '40';
 					$vars['CLASS'] = 'inputbox autowidth';
 					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 				}
-			}
-			$vars['NAME'] = $sqlid.'-'.$vars['SQL_TYPE'];
+			} //TODO BEST DELETE pourquoi as-ton besoin du test précédent ?
+//else/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_COOKIE,true).'</pre>';
+
+			$vars['NAME'] = $sql_id.'-'.$vars['SQL_TYPE'];
 
 			$vs = $vars;
 			foreach ($vs AS $k=>$v)
 				if ($v)
 					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
+
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($vars,true).'</pre>';
 			$this->template->assign_block_vars('info', $vars);
-			if (count($options) > 1) {
-				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // One empty at the beginning
-				foreach ($options AS $o)
-					$this->template->assign_block_vars('info.options', ['OPTION' => $o]);
+
+			if (count($options)) {
+//TODO DELETE				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // One empty at the beginning
+				foreach ($options AS $k=>$v)
+					$this->template->assign_block_vars('info.options', [
+						'OPTION' => $v,
+						'VALUE' => $options_values[$k] ?: $v,
+					]);
+				foreach ($attaches AS $k=>$v)
+					$this->template->assign_block_vars('info.attaches', array_change_key_case ($v, CASE_UPPER));
 			}
 		}
 	}
@@ -599,7 +672,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$vars['forum_id'] = $row ['forum_id'];
 		}
 	}
-
 	// Appelé lors de l'affichage de la page posting
 	function posting_modify_template_vars($vars) {
 		$page_data = $vars['page_data'];
@@ -654,8 +726,9 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Call when validating the data to be saved
 	function submit_post_modify_sql_data($vars) {
+		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
 		$sql_data = $vars['sql_data'];
-		$modifs = $sql_data[POSTS_TABLE]['sql'];
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_POST,true).'</pre>';exit;
 
 		// Get special columns list
 		$special_columns = [];
@@ -666,7 +739,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$this->db->sql_freeresult($result);
 
 		// Treat specific data
-		$this->request->enable_super_globals();
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)) {
 				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
@@ -689,13 +761,18 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
 				}
 
+				// Force value programmatically
+//TODO ?? DELETE				if (array_key_exists ($k, $_GET)
+//					$v = $_GET[$k];
+
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-				$modifs[$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
+				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
 			}
 		$vars['sql_data'] = $sql_data;
 
 		//-----------------------------------------------------------------
 		// Save change
+		$modifs = $sql_data[POSTS_TABLE]['sql'];
 		$to_save = [
 			$this->user->data['username'].' '.date('r'),
 			$_SERVER['REQUEST_URI'],
@@ -708,10 +785,10 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				$to_save [] = substr ($k, 4).' = '.$v;
 
 		// Save attachment_data
-			foreach ($vars['data']['attachment_data'] AS $att)
-				$attach[] = $att['attach_id'].':'.$att['real_filename'];
-			if (isset ($attach))
-				$to_save[] = 'attachments = '.implode (', ', $attach);
+		foreach ($vars['data']['attachment_data'] AS $att)
+			$attach[] = $att['attach_id'].':'.$att['real_filename'];
+		if (isset ($attach))
+			$to_save[] = 'attachments = '.implode (', ', $attach);
 
 		file_put_contents ('LOG/'.$vars['data']['post_id'].'.txt', implode ("\n", $to_save)."\n\n", FILE_APPEND);
 
