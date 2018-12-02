@@ -1,5 +1,6 @@
 Formulaires
 ===========
+[b][u]MODE D'EMPLOI[/u][/b]
 Chaque type de page est représenté par un post dont le nom est égal au nom du type de fiche (Alpages, Cabanes, ...)
 Chaque ligne représente une donnée. Elle est constituée de champs séparés par des | (sur le clavier : AltGr + 6)
 Champ 1 = { : Début de bloc. Le champ 2 contient alors le titre de ce bloc qui n'est affiché que si le bloc contient des informations valides.
@@ -9,18 +10,22 @@ Champ 2 = texte à afficher en début de ligne
 Champ 3 = nature du champ qui peut être :
 - 0 : la saisie sera numérique
 - court : la saisie sera une zone texte de 1 ligne
-- long : la saisie sera une zone de texte compremant plusieurs lignes
+- long : la saisie sera une zone de texte comprenant plusieurs lignes
 - plusieurs valeurs séparées par une , : liste de choix
 - date : une date
-Champ 4 = Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparait quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
-ou champ 4 = texte affiché aprés la donnée (unité par exemple)
+- proches : la liste des plus proches géographiquement (les alpages)
+- attaches : la liste des points attachés (cabanes ou points d'eau)
+Champ 4 = Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparaît quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
+ou champ 4 = texte affiché après la donnée (unité par exemple)
 Un changement peut générer une erreur à la modification d'une fiche. Revenir sur le forum de description et essayer de corriger la dernière modification. Sinon, me contacter.
+[color=red]Il est important de bien respecter la structure des lignes et des { } et |[/color]
 
-//TODO ASPIR cabanes
-//TODO ASPIR réimporter texte définitif
-
-ALPAGES
+Alpages
 =======
+surface|Surface|automatique|m²
+commune|Commune|automatique
+ign|Carte IGN|automatique
+reserve|Par ou réserve|automatique
 {|1. L'alpage
 {|1.1 Équipements
 {|Autres équipements disponibles
@@ -33,10 +38,11 @@ equipements_precisions|- Autres précisions|court
 }}
 {|1.2 Caractéristiques
 altitude|Altitude|automatique|m
-topographie|Topographie|court
+topographie|Topographie|long
 risques|Risques|court|Vide, chute de pierres, orages violents...
 especes_proteges|Présence espèces remarquables et/ou protégées|court|Faune ou flore
-ressource_fourragere|Ressource fourragère|court|Qualité de l'herbe ? Note sur 5
+ressource_fourragere|Ressource fourragère|long|Qualité de l'herbe ? Note sur 5
+alpage_point_d_eau|Point(s) d'eau|attaches
 operateur|Opérateur téléphonique recommandé|Orange,Bouygues Télécom,Free,SFR,autre,ne sait pas
 operateur_autre|autre opérateur|court
 }
@@ -44,7 +50,7 @@ operateur_autre|autre opérateur|court
 acces_par|Accès par|route,piste,sentier
 acces_etat|État de l'accès|Bon,Moyen,mauvais
 acces_bat|Accès avec animaux de bâts|oui,non,ne sait pas
-acces_parking|Où se garer ?|court
+acces_parking|Où se garer ?|long
 acces_parcours|Temps de parcours|court
 acces_ravitaillement|Lieu de ravitaillement le plus proche|court
 acces_appui|Lieu d'appui aux bergers, lieu de rencontre|court
@@ -78,6 +84,8 @@ heliportages_debut|Date approximative début estive|date
 heliportages_fin|Date approximative fin estive|date
 heliportages_poids|Poids à la disposition du berger|0|Kg
 }}
+|2. Logement
+alpage_cabane|Cabane(s)|attaches
 {|3. Les bêtes
 {|3.1 Le troupeau
 troupeau_nb_eleveurs|Nombre d'éleveurs|0
@@ -111,7 +119,7 @@ troupeau_beliers|Présence de béliers|oui,non,ne sait pas
 troupeau_chevres|Présence de chèvres|oui,non,ne sait pas
 troupeau_agneaux|Présence d'agneaux|oui,non,ne sait pas
 troupeau_tri_empoussees|Date de tri des empoussées|date
-troupeau_precisions|Autres précisions|court
+troupeau_precisions|Autres précisions|long
 }}
 {|3.2 Les soins
 {|- État général du troupeau
@@ -119,8 +127,8 @@ troupeau_antiparasitaire|Traitement antiparasitaire avant la montée|oui,non,ne 
 troupeau_bain|Traitement teigne/tique/poux/bain la montée?|oui,non,ne sait pas
 troupeau_pediluve|Pédiluve|oui,non,ne sait pas
 troupeau_maladies|Maladies récurrentes liées à l'alpage|oui,non,ne sait pas
-troupeau_precisions|autres précisions|court
-troupeau_soins|soins vétérinaires habituellement pratiqués|court
+troupeau_precisions|autres précisions|long
+troupeau_soins|soins vétérinaires habituellement pratiqués|long
 }}
 {|3.3 La prédation
 predation_loups|Présence avérée de loups|oui,non,ne sait pas
@@ -143,7 +151,7 @@ predation_chiens_autre|Autre|court
 attaques_frequence|- nombre d'attaques|0
 attaques_victimes|- nombre de victimes|0
 attaques_diagnostic|Diagnostic de vulnérabilité à la prédation|oui,non,ne sait pas
-attaques_informations|Informations complémentaires et conseils aux futurs bergers|court
+attaques_informations|Informations complémentaires et conseils aux futurs bergers|long
 attaques_arme|Arme à disposition|oui,non,ne sait pas
 attaques_permis|Besoin permis de chasse|oui,non,ne sait pas
 }}
@@ -163,7 +171,7 @@ demontagnage_date|Date de démontagnage|date
 {|- emploi :
 berger_salarie|- salarié|oui,non,ne sait pas
 berger_entrepreneur|- entrepreneur de garde|oui,non,ne sait pas
-berger_eleveur_berger|- éleveur berger|oui,non,ne sait pas
+berger_eleveur|- éleveur berger|oui,non,ne sait pas
 berger_temps_travail|- temps de travail|court
 berger_contrat|- type de contrat|court
 berger_autre|- autres informations|court
@@ -179,15 +187,64 @@ forme_juridique_departement|- département|court
 }
 |6. Autres informations :
 
+Cabanes
+=======
+altitude|Altitude|automatique|m
+alpage_cabane|Alpage d’appartenance|proches
+commune|Commune|automatique
+ign|Carte IGN|automatique
+reserve|Par ou réserve|automatique
+cabane_etat|État général de la cabane|bon,moyen,mauvais
+cabane_etancheite|Étanchéité pluie|oui,non
+cabane_isolation|Isolation vent|oui,non
+cabane_douche|Douche chaude|oui,non
+cabane_chauffage_eau|- Source énergie chauffage eau|court
+cabane_wc|WC|oui,non
+cabane_wc_type|- Type : classique / sec …|
+cabane_rangements|Rangements|oui,non
+cabane_armoire|- Armoire à l'abri des rongeurs|oui,non
+cabane_appentis|- Appentis (rangement filets, cabanes chiens...)|oui,non
+cabane_pieces|Nombre de pièces|0
+cabane_surface|Surface|0|m²
+cabane_gaziniere|Gazinière|oui,non
+cabane_gaziniere_etat|- État|bon,moyen,mauvais
+cabane_four|- Four|oui,non
+cabane_gaz|Gaz fourni par les éleveurs|oui,non
+cabane_gaz_bouteilles|- Nb bouteilles consommée par saison|0
+cabane_eau_courante|Eau courante|oui,non
+cabane_eau_potable|Eau potable|oui,non
+cabane_eau_potable_distance|- Si non, distance à l'eau potable|0|m
+cabane_electricite|Électricité|oui,non
+cabane_electricite_type|- Type|court
+cabane_electricite_equipements|- Équipements nécessaires|court
+cabane_ustensiles|Ustensiles cuisine|oui,non
+cabane_vaisselle|Vaisselle|oui,non
+cabane_chambres|Nombre de chambres|0
+cabane_literie|Literie
+cabane_literie_nombre|– Nombre de lits|0
+cabane_matelas|– État des matelas|bon,moyen,mauvais
+cabane_chauffage|Moyen de chauffage|court
+cabane_poele|– Qualité poêle|bon,moyen,mauvais
+cabane_tirage|– Qualité tirage|bon,moyen,mauvais
+cabane_bois|Bois de chauffage|oui,non
+cabane_bois_a_debiter|– A débiter|oui,non
+cabane_ravitaillement|Ravitaillement|a faire soi même,par les éléveurs
+|Logement adéquat pour
+cabane_famille|– Une famille|oui,non
+cabane_cohabitation|– Cohabitation 2 personnes|oui,non
+cabane_telephone|Capte le réseau téléphonique|oui,non,aléatoire,ne sait pas
+cabane_internet|Capte le réseau Internet|oui,non,aléatoire,ne sait pas
+|Autres remarques ou commentaires
 
-
-$def_form_point_eau = "
-'Points d\'eau Marais/zones humides' => [
-'tag' => 'textarea',
-'placeholder' => 'zones en défense, sources, ...',
-'sql_name' => 'geo_zones_humides',
-";
-		$def_form_mdp = "
-";
-		$def_form = "
-
+Points d'eau
+============
+altitude|Altitude|automatique|m
+alpage_point_d_eau|Alpage d’appartenance|proches
+commune|Commune|automatique
+ign|Carte IGN|automatique
+reserve|Par ou réserve|automatique
+{|Points d'eau Marais/zones humides : Eau (zones en défens, sources, ...)
+point_eau_destination|Destination|hommes,animaux
+point_eau_debit|Débit|source,rivière,point d'eau permanent,point d'eau semi permanent,abreuvoir,impluvium
+|Autres informations :
+}

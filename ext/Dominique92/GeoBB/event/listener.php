@@ -184,38 +184,6 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_var ('TOPIC_FIRST_POST_ID', $vars['topic_data']['topic_first_post_id']);
 		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
-//////////////////////////////////////////////////////////
-/*//TODO DELETE
-		// Search points included in a surface
-		$sql = "
-			SELECT p.*, t.topic_id, t.topic_title, f.forum_image
-			FROM	 ".POSTS_TABLE ." AS p
-				JOIN ".POSTS_TABLE ." AS v ON (v.post_id = $post_id)
-				JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
-				JOIN ".FORUMS_TABLE." AS f ON (f.forum_id = p.forum_id)
-			WHERE
-				v.forum_id != p.forum_id AND
-				Contains (v.geom, p.geom)
-			";
-		//TODO BEST en MySQL 5.7+, utiliser ST_Contains
-		//TODO BEST ASPIR pour un point, trouver la zone qui le contient (ne marche pas pour alpages incluant le point)
-		// Assign the blocks relative to the points included in this one
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result)) {
-			$block = 'contains_'.basename ($row['forum_image'], '.png');
-
-			foreach ($row AS $k=>$v)
-				if ($v && !strncmp ($k, 'geo_', 4) &&
-					$k != 'geo_ign')
-					$this->template->assign_block_vars ($block.'.point', array (
-						'K' => ucfirst (str_replace (['geo_', '_'], ['', ' '], $k)),
-						'V' => str_replace ('~', '', $v),
-					));
-		}
-		$this->db->sql_freeresult($result);
-		*/
-//////////////////////////////////////////////////////////
-
 		// Assign the geo values to the template
 		if (isset ($this->all_post_data[$post_id])) {
 			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post
@@ -261,6 +229,25 @@ class listener implements EventSubscriberInterface
 		include_once('assets/geoPHP/geoPHP.inc');
 		$geophp = \geoPHP::load($row['geomwkt'],'wkt');
 		$centre = $geophp->getCentroid()->coords;
+
+		// Dans quel alpage est contenu (lors de la première init)
+		if (array_key_exists ('geo_contains', $row) &&
+			(!$row['geo_contains'] || $row['geo_contains'] == 'null')) {
+			// Search points included in a surface
+			$sql = "
+				SELECT polygon.*
+				FROM	 ".POSTS_TABLE ." AS polygon
+					JOIN ".POSTS_TABLE ." AS point ON (point.topic_id = {$row['topic_id']})
+				WHERE
+					Contains (polygon.geom, point.geom)
+					AND Dimension(polygon.geom) > 0
+					LIMIT 1
+				";
+			$result = $this->db->sql_query($sql);
+			if ($row_contain = $this->db->sql_fetchrow($result))
+				$update['geo_contains'] = $row_contain['topic_id'];
+			$this->db->sql_freeresult($result);
+		}
 
 		// Calcul de la surface en ha avec geoPHP
 		if (array_key_exists ('geo_surface', $row) && !$row['geo_surface']) {
@@ -432,7 +419,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$vars['SQL_TYPE'] = 'text';
 			$vars['INNER'] = $dfs[1];
 			$vars['DISPLAY_VALUE'] =
-			$vars['POST_VALUE'] = str_replace ('~', '', $post_data[$sql_id]);
+			$vars['POST_VALUE'] =
+				str_replace ('~', '', $post_data[$sql_id]);
 			$options = $options_values = explode (',', ','.$dfs[2]); // One empty at the beginning
 
 			// {|1.1 Title
@@ -483,15 +471,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				}
 
 				// sql_id|titre|proches
-				//TODO ASPIR BUG ne devrait pas lister les points
-				//TODO ASPIR BUG par défaut localise -> sinon, il faut saisir 2 fois !
 				elseif (!strcasecmp ($dfs[2], 'proches')) {
 					$vars['TAG'] = 'select';
 					$options = $options_values = [];
 
 					// Search surfaces closest to a point
 					if ($post_data['post_id']) {
-						//TODO BEST en MySQL 5.7+, utiliser ST_Distance & ST_Centroid
+						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & Dimension
 						$sql = "
 							SELECT p.*,
 								Distance (p.geom, Centroid(v.geom))	AS distance
@@ -500,35 +486,43 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 							WHERE
 								v.forum_id != p.forum_id
 								AND p.geom IS NOT NULL
+								AND Dimension(p.geom) > 0
 							ORDER BY distance
 							LIMIT 10
 							";
 						$result = $this->db->sql_query($sql);
 						while ($row = $this->db->sql_fetchrow($result)) {
-//TODO DELETE							$this->template->assign_block_vars('proches', array_change_key_case (, CASE_UPPER));
 							$options[] = $row['post_subject'];
 							$options_values[] = $row['topic_id'];
 							if ($row['topic_id'] == $vars['POST_VALUE'])
 								$vars['POST_VALUE'] = $vars['DISPLAY_VALUE'] = $row['post_subject'];
 						}
 						$this->db->sql_freeresult($result);
-					} else
-						$options[] = 'Vous devez enregistrer ce point une fois avant de voir les proches';
+					} else {
+						$options = ['Liste des proches non disponible'];
+						$options_values = ['null'];
+					}
 				}
 
 				// sql_id|titre|attaches
+				//TODO BEST ASPIR faire effacer le bloc quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
-					$vars['INNER'] = '';
-					$vars['ATTACHES'] = $dfs[1];
+					$vars['TAG'] = 'input';
+					$vars['TYPE'] = 'hidden';
+					$vars['INNER'] = $dfs[1];
+					$vars['DISPLAY_VALUE'] = ' ';
 
 					$sql = "
-						SELECT *
+						SELECT topic_id, post_subject
 						FROM ".POSTS_TABLE ."
-						WHERE $sql_id = '{$post_data['topic_id']}'
+							JOIN ".FORUMS_TABLE." USING (forum_id)
+						WHERE forum_image LIKE '%{$dfs[3]}.png' AND
+							($sql_id = '{$post_data['topic_id']}' OR
+							 $sql_id = '{$post_data['topic_id']}~')
 						";
 					$result = $this->db->sql_query($sql);
 					while ($row = $this->db->sql_fetchrow($result))
-						$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre du formulaire)
+						$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre des lignes du formulaire)
 					$this->db->sql_freeresult($result);
 				}
 
@@ -579,6 +573,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				if ($v)
 					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
 
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>options = ".var_export($options,true).'</pre>';
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>options_values = ".var_export($options_values,true).'</pre>';
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($vars,true).'</pre>';
 			$this->template->assign_block_vars('info', $vars);
 
