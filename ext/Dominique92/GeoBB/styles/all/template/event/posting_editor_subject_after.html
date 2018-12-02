@@ -29,9 +29,6 @@
 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p>
 	-->
 
-	<!-- IF GEO_MAP_TYPE == 'surface' -->
-		<p>//TODO ASPIR texte explications editeur zones à gauche de la carte</p>
-	<!-- ENDIF -->
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<p>
 			Lon <input id="editable-lon" type="text" onchange="editable.edit(this,0,4326)" size="10" maxlength="12"/>
@@ -45,6 +42,14 @@
 		<p><a style="cursor:pointer" onclick="map.getView().setCenter(editable.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
 		<p><a style="cursor:pointer" onclick="editable.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
 		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
+	<!-- ENDIF -->
+	<!-- IF GEO_MAP_TYPE == 'surface' -->
+		<p>Cliquer et déplacer un sommet pour modifier un polygone</p>
+		<p>Alt+cliquer sur un sommet pour le supprimer</p>
+		<p>Cliquer sur un segment puis déplacer pour créer un sommet</p>
+		<p>Activer "P" puis cliquer sur la carte et sur chaque point du tracé pour dessiner un polygone.
+		Double cliquer pour terminer.</p>
+		<p>Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".</p>
 	<!-- ENDIF -->
 
 	<!-- //TODO CHEM pour all p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p -->
