@@ -22,6 +22,7 @@
 		float: none;
 	}
 	.section-index .map,
-	.section-viewtopic .map {		border: none;
+	.section-viewtopic .map {
+		border: none;
 	}
 }

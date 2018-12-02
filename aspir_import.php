@@ -62,13 +62,13 @@ echo"<p>
 </p>";
 
 define('IN_PHPBB', true);
-$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../';
+$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 
-include_once('../../../assets/geoPHP/geoPHP.inc');
-include_once('../../../assets/proj4php/vendor/autoload.php');
+include_once('./assets/geoPHP/geoPHP.inc');
+include_once('./assets/proj4php/vendor/autoload.php');
 use proj4php\Proj4php;
 use proj4php\Proj;
 use proj4php\Point;
@@ -84,7 +84,7 @@ $projSrc = new Proj('EPSG:3857', $proj4);
 $projDst = new Proj('EPSG:4326', $proj4);
 
 // Parameters
-$epid = $request->variable('d', '01');
+$epid = $request->variable('d', '00');
 $upzp = $request->variable('p', 'UP');
 $alp_forum_id = $request->variable('f', 2);
 echo"<pre style='background-color:white;color:black;font-size:14px;'>Import enquete ".var_export($upzp.':'.$epid,true).'</pre>';

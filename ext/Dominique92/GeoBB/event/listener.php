@@ -55,57 +55,13 @@ class listener implements EventSubscriberInterface
 
 			// Posting
 			'core.modify_posting_parameters' => 'modify_posting_parameters',
+			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
+			'core.submit_post_end' => 'submit_post_end',
 		];
 	}
-
-	function page_footer() {
-//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
-
-		// Help toolbar link
-		$sql = 'SELECT topic_id FROM '.POSTS_TABLE.' WHERE post_subject = "Aide" ORDER BY post_id';
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-		$this->template->assign_var ('GEO_URL_AIDE', 'viewtopic.php?t='.$row['topic_id']);
-	}
-
-	function user_setup($vars) {
-		// Inclue les fichiers langages de cette extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
-
-/*
-		// On recherche les templates aussi dans l'extension
-		$ext = $this->extension_manager->all_enabled();
-		$ext[] = ''; // En dernier lieu, le style de base !
-		foreach ($ext AS $k=>$v)
-			$ext[$k] .= 'styles';
-		$this->template->set_style($ext);
-*/
-	}
-
-	function geobb_activate_map($forum_desc, $first_post = true) {
-		global $geo_keys; // Private / defined in config.php
-
-		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
-		switch (@$regle[1]) {
-			case 'first': // Régle sur le premier post seulement
-				if (!$first_post)
-					break;
-
-			case 'all': // Régle sur tous les posts
-				$ns = explode ('\\', __NAMESPACE__);
-				$this->template->assign_vars([
-					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
-					'GEO_MAP_TYPE' => $regle[2],
-					'GEO_KEYS' => $geo_keys,
-//					'STYLE_NAME' => $this->user->style['style_name'],
-				]);
-		}
-	}
+//TODO ASPIR BUG IE pas de formulaire dans création polynome
 
 	/**
 		INDEX.PHP
@@ -215,6 +171,209 @@ class listener implements EventSubscriberInterface
 
 				$vars['post_row'] = $post_row;
 			}
+		}
+	}
+
+
+	/**
+		POSTING.PHP
+	*/
+	// Appelé au début pour ajouter des parametres de recherche sql
+	function modify_posting_parameters($vars) {
+		// Création topic avec le nom d'image
+		$forum_image = $this->request->variable('type', '');
+		$sql = 'SELECT * FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
+		$result = $this->db->sql_query ($sql);
+		$row = $this->db->sql_fetchrow ($result);
+		$this->db->sql_freeresult ($result);
+		if ($row) {
+			// Force le forum
+			$vars['forum_id'] = $row ['forum_id'];
+		}
+	}
+
+	// Permet la saisie d'un POST avec un texte vide
+	function posting_modify_submission_errors($vars) {
+		$error = $vars['error'];
+
+		foreach ($error AS $k=>$v)
+			if ($v == $this->user->lang['TOO_FEW_CHARS'])
+				unset ($error[$k]);
+
+		$vars['error'] = $error;
+	}
+
+	// Appelé lors de l'affichage de la page posting
+	function posting_modify_template_vars($vars) {
+		$page_data = $vars['page_data'];
+		$post_data = $vars['post_data'];
+		$this->topic_fields($post_data, $post_data['forum_desc']);
+		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
+
+		// Récupère la traduction des données spaciales SQL
+		if (isset ($post_data['geom'])) {
+			// Conversion WKT <-> geoJson
+			$sql = 'SELECT AsText(geom) AS geomwkt
+				FROM ' . POSTS_TABLE . '
+				WHERE post_id = ' . $post_data['post_id'];
+			$result = $this->db->sql_query($sql);
+			$post_data['geomwkt'] = $this->db->sql_fetchfield('geomwkt');
+			$this->db->sql_freeresult($result);
+
+			// Traduction en geoJson
+			include_once('assets/geoPHP/geoPHP.inc');
+			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
+			$this->get_bounds($geophp);
+			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
+//TODO BEST			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
+			$post_data['geojson'] = json_encode ($gp);
+		}
+
+		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
+		if (!$post_data['post_subject'])
+			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
+
+		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
+		$page_data['POST_ID'] = $post_data['post_id'] ?: 0;
+		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
+
+		// Assign the phpbb-posts SQL data to the template
+		foreach ($post_data AS $k=>$v)
+			if (!strncmp ($k, 'geo', 3)
+				&& is_string ($v))
+				$page_data[strtoupper ($k)] =
+					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
+
+		// HORRIBLE phpbb hack to accept geom values //TODO BEST : check if done by PhpBB (supposed 3.2)
+		$file_name = "phpbb/db/driver/driver.php";
+		$file_tag = "\n\t\tif (is_null(\$var))";
+		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";
+		$file_content = file_get_contents ($file_name);
+		if (strpos($file_content, '{'.$file_tag))
+			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
+
+		$vars['page_data'] = $page_data;
+	}
+
+	// Call when validating the data to be saved
+	function submit_post_modify_sql_data($vars) {
+		$sql_data = $vars['sql_data'];
+
+		// Get special columns list
+		$special_columns = [];
+		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$special_columns [] = $row['Field'];
+		$this->db->sql_freeresult($result);
+
+		// Treat specific data
+		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
+		foreach ($_POST AS $k=>$v)
+			if (!strncmp ($k, 'geo', 3)) {
+				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
+				$ks = split ('-', $k);
+
+				// Create or modify the SQL column
+				if (count ($ks) == 3)
+					$ks[2] = '('.$ks[2].')';
+				$this->db->sql_query(
+					'ALTER TABLE '.POSTS_TABLE.
+					(in_array ($ks[0], $special_columns) ? ' CHANGE '.$ks[0].' ' : ' ADD ').
+					implode (' ', $ks)
+				);
+
+				// Retrieves the values of the geometry, includes them in the phpbb_posts table
+				if ($ks[1] == 'geometry' && $v) {
+					include_once('assets/geoPHP/geoPHP.inc');
+					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
+					if ($geophp)
+						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
+				}
+
+				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
+				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
+			}
+		$this->request->disable_super_globals();
+
+		$vars['sql_data'] = $sql_data; // return data
+		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
+	}
+
+	// Call after the post validation
+	function submit_post_end($vars) {
+		// Save change
+		$this->request->enable_super_globals();
+		$to_save = [
+			$this->user->data['username'].' '.date('r'),
+			$_SERVER['REQUEST_URI'],
+			'post_subject = '.$this->modifs['post_subject'],
+			'post_text = '.$this->modifs['post_text'],
+			'geom = '.str_replace (['GeomFromText("','")'], '', $this->modifs['geom']),
+		];
+		$this->request->disable_super_globals();
+		foreach ($this->modifs AS $k=>$v)
+			if ($v && !strncmp ($k, 'geo_', 4))
+				$to_save [] = substr ($k, 4).' = '.$v;
+
+		// Save attachment_data
+		$attach = [];
+		if ($vars['data']['attachment_data'])
+			foreach ($vars['data']['attachment_data'] AS $att)
+				$attach[] = $att['attach_id'].':'.$att['real_filename'];
+		if (isset ($attach))
+			$to_save[] = 'attachments = '.implode (', ', $attach);
+
+		file_put_contents ('LOG/'.$vars['data']['post_id'].'.txt', implode ("\n", $to_save)."\n\n", FILE_APPEND);
+	}
+
+
+	/**
+		COMMON FUNCTIONS
+	*/
+	function page_footer() {
+//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
+
+		// Help toolbar link
+		$sql = 'SELECT topic_id FROM '.POSTS_TABLE.' WHERE post_subject = "Aide" ORDER BY post_id';
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+		$this->template->assign_var ('GEO_URL_AIDE', 'viewtopic.php?t='.$row['topic_id']);
+	}
+
+	function user_setup($vars) {
+		// Inclue les fichiers langages de cette extension
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+
+/*
+		// On recherche les templates aussi dans l'extension
+		$ext = $this->extension_manager->all_enabled();
+		$ext[] = ''; // En dernier lieu, le style de base !
+		foreach ($ext AS $k=>$v)
+			$ext[$k] .= 'styles';
+		$this->template->set_style($ext);
+*/
+	}
+
+	function geobb_activate_map($forum_desc, $first_post = true) {
+		global $geo_keys; // Private / defined in config.php
+
+		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
+		switch (@$regle[1]) {
+			case 'first': // Régle sur le premier post seulement
+				if (!$first_post)
+					break;
+
+			case 'all': // Régle sur tous les posts
+				$ns = explode ('\\', __NAMESPACE__);
+				$this->template->assign_vars([
+					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
+					'GEO_MAP_TYPE' => $regle[2],
+					'GEO_KEYS' => $geo_keys,
+//					'STYLE_NAME' => $this->user->style['style_name'],
+				]);
 		}
 	}
 
@@ -571,13 +730,9 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				if ($v)
 					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
 
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>options = ".var_export($options,true).'</pre>';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>options_values = ".var_export($options_values,true).'</pre>';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($vars,true).'</pre>';
 			$this->template->assign_block_vars('info', $vars);
 
 			if (count($options)) {
-//TODO DELETE				$this->template->assign_block_vars('info.options', ['OPTION' => '']); // One empty at the beginning
 				foreach ($options AS $k=>$v)
 					$this->template->assign_block_vars('info.options', [
 						'OPTION' => $v,
@@ -649,154 +804,4 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
 	}
 
-
-	/**
-		POSTING.PHP
-	*/
-	// Appelé au début pour ajouter des parametres de recherche sql
-	function modify_posting_parameters($vars) {
-		// Création topic avec le nom d'image
-		$forum_image = $this->request->variable('type', '');
-		$sql = 'SELECT * FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
-		$result = $this->db->sql_query ($sql);
-		$row = $this->db->sql_fetchrow ($result);
-		$this->db->sql_freeresult ($result);
-		if ($row) {
-			// Force le forum
-			$vars['forum_id'] = $row ['forum_id'];
-		}
-	}
-	// Appelé lors de l'affichage de la page posting
-	function posting_modify_template_vars($vars) {
-		$page_data = $vars['page_data'];
-		$post_data = $vars['post_data'];
-		$this->topic_fields($post_data, $post_data['forum_desc']);
-		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
-
-		// Récupère la traduction des données spaciales SQL
-		if (isset ($post_data['geom'])) {
-			// Conversion WKT <-> geoJson
-			$sql = 'SELECT AsText(geom) AS geomwkt
-				FROM ' . POSTS_TABLE . '
-				WHERE post_id = ' . $post_data['post_id'];
-			$result = $this->db->sql_query($sql);
-			$post_data['geomwkt'] = $this->db->sql_fetchfield('geomwkt');
-			$this->db->sql_freeresult($result);
-
-			// Traduction en geoJson
-			include_once('assets/geoPHP/geoPHP.inc');
-			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
-			$this->get_bounds($geophp);
-			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-//TODO BEST			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
-			$post_data['geojson'] = json_encode ($gp);
-		}
-
-		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
-		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
-
-		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
-		$page_data['POST_ID'] = $post_data['post_id'] ?: 0;
-		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
-
-		// Assign the phpbb-posts SQL data to the template
-		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'geo', 3)
-				&& is_string ($v))
-				$page_data[strtoupper ($k)] =
-					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
-
-		// HORRIBLE phpbb hack to accept geom values //TODO BEST : check if done by PhpBB (supposed 3.2)
-		$file_name = "phpbb/db/driver/driver.php";
-		$file_tag = "\n\t\tif (is_null(\$var))";
-		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";
-		$file_content = file_get_contents ($file_name);
-		if (strpos($file_content, '{'.$file_tag))
-			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
-
-		$vars['page_data'] = $page_data;
-	}
-
-	// Call when validating the data to be saved
-	function submit_post_modify_sql_data($vars) {
-		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
-		$sql_data = $vars['sql_data'];
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_POST,true).'</pre>';exit;
-
-		// Get special columns list
-		$special_columns = [];
-		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$special_columns [] = $row['Field'];
-		$this->db->sql_freeresult($result);
-
-		// Treat specific data
-		foreach ($_POST AS $k=>$v)
-			if (!strncmp ($k, 'geo', 3)) {
-				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
-				$ks = split ('-', $k);
-
-				// Create or modify the SQL column
-				if (count ($ks) == 3)
-					$ks[2] = '('.$ks[2].')';
-				$this->db->sql_query(
-					'ALTER TABLE '.POSTS_TABLE.
-					(in_array ($ks[0], $special_columns) ? ' CHANGE '.$ks[0].' ' : ' ADD ').
-					implode (' ', $ks)
-				);
-
-				// Retrieves the values of the geometry, includes them in the phpbb_posts table
-				if ($ks[1] == 'geometry' && $v) {
-					include_once('assets/geoPHP/geoPHP.inc');
-					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
-					if ($geophp)
-						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
-				}
-
-				// Force value programmatically
-//TODO ?? DELETE				if (array_key_exists ($k, $_GET)
-//					$v = $_GET[$k];
-
-				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
-			}
-		$vars['sql_data'] = $sql_data;
-
-		//-----------------------------------------------------------------
-		// Save change
-		$modifs = $sql_data[POSTS_TABLE]['sql'];
-		$to_save = [
-			$this->user->data['username'].' '.date('r'),
-			$_SERVER['REQUEST_URI'],
-			'post_subject = '.$modifs['post_subject'],
-			'post_text = '.$modifs['post_text'],
-			'geom = '.str_replace (['GeomFromText("','")'], '', $modifs['geom']),
-		];
-		foreach ($modifs AS $k=>$v)
-			if ($v && !strncmp ($k, 'geo_', 4))
-				$to_save [] = substr ($k, 4).' = '.$v;
-
-		// Save attachment_data
-		foreach ($vars['data']['attachment_data'] AS $att)
-			$attach[] = $att['attach_id'].':'.$att['real_filename'];
-		if (isset ($attach))
-			$to_save[] = 'attachments = '.implode (', ', $attach);
-
-		file_put_contents ('LOG/'.$vars['data']['post_id'].'.txt', implode ("\n", $to_save)."\n\n", FILE_APPEND);
-
-		$this->request->disable_super_globals();
-	}
-
-	// Permet la saisie d'un POST avec un texte vide
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
 }
