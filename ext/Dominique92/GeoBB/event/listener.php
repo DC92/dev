@@ -93,7 +93,7 @@ class listener implements EventSubscriberInterface
 				u.username
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
-				JOIN ".POSTS_TABLE ." AS p ON (p.post_id = t.topic_last_post_id)
+				JOIN ".POSTS_TABLE." AS p ON (p.post_id = t.topic_last_post_id)
 				JOIN ".USERS_TABLE."  AS u ON (p.poster_id = u.user_id)
 			WHERE post_visibility = ".ITEM_APPROVED."
 			ORDER BY post_time DESC
@@ -213,8 +213,8 @@ class listener implements EventSubscriberInterface
 		if (isset ($post_data['geom'])) {
 			// Conversion WKT <-> geoJson
 			$sql = 'SELECT AsText(geom) AS geomwkt
-				FROM ' . POSTS_TABLE . '
-				WHERE post_id = ' . $post_data['post_id'];
+				FROM '.POSTS_TABLE.'
+				WHERE post_id = '.$post_data['post_id'];
 			$result = $this->db->sql_query($sql);
 			$post_data['geomwkt'] = $this->db->sql_fetchfield('geomwkt');
 			$this->db->sql_freeresult($result);
@@ -394,11 +394,11 @@ class listener implements EventSubscriberInterface
 			// Search points included in a surface
 			$sql = "
 				SELECT polygon.topic_id
-				FROM	 ".POSTS_TABLE ." AS polygon
-					JOIN ".POSTS_TABLE ." AS point ON (point.topic_id = {$row['topic_id']})
+				FROM	 ".POSTS_TABLE." AS polygon
+					JOIN ".POSTS_TABLE." AS point ON (point.topic_id = {$row['topic_id']})
 				WHERE
-					Contains (polygon.geom, point.geom)
-					AND Dimension(polygon.geom) > 0
+					".SQL_PRE."Contains (polygon.geom, point.geom)
+					AND ".SQL_PRE."Dimension(polygon.geom) > 0
 					LIMIT 1
 				";
 			$result = $this->db->sql_query($sql);
@@ -558,15 +558,16 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Form management
 	function topic_fields ($post_data, $forum_desc) {
-		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match);
-		if (!$match[1])
-			return;
-
-		// Get form fields from the relative formulaire post
-		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_subject = "'.$match[1].'" ORDER BY post_id';
+		// Get form fields from the relative post
+		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
+		$sql = 'SELECT post_text FROM '.POSTS_TABLE.
+			' WHERE post_subject = "'.($match[1] ?: $post_data['forum_name']). // Try forum name
+			'" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
+		if (!$row) // No form then !
+			return;
 
 		$def_forms = explode ("\n", $row['post_text']);
 		foreach ($def_forms AS $kdf=>$df) {
@@ -634,16 +635,17 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						$vars['TAG'] = 'select';
 
 						// Search surfaces closest to a point
-						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & Dimension
+						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & ST_Dimension
+						//TODO ASPIR reprendre en utilisant MBRIntersects(g1, g2) + un BBOX autour du point + une fonction de tri
 						$sql = "
 							SELECT p.post_subject, p.topic_id,
-								Distance (p.geom, Centroid(v.geom))	AS distance
-							FROM	 ".POSTS_TABLE ." AS p
-								JOIN ".POSTS_TABLE ." AS v ON (v.post_id = {$post_data['post_id']})
+								".SQL_PRE."Distance (p.geom, ".SQL_PRE."Centroid(v.geom)) AS distance
+							FROM	 ".POSTS_TABLE." AS p
+								JOIN ".POSTS_TABLE." AS v ON (v.post_id = {$post_data['post_id']})
 							WHERE
 								v.forum_id != p.forum_id
 								AND p.geom IS NOT NULL
-								AND Dimension(p.geom) > 0
+								AND ".SQL_PRE."Dimension(p.geom) > 0
 							ORDER BY distance
 							LIMIT 10
 							";
@@ -670,7 +672,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 					$sql = "
 						SELECT topic_id, post_subject
-						FROM ".POSTS_TABLE ."
+						FROM ".POSTS_TABLE."
 							JOIN ".FORUMS_TABLE." USING (forum_id)
 						WHERE forum_image LIKE '%{$dfs[3]}.png' AND
 							($sql_id = '{$post_data['topic_id']}' OR
