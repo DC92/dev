@@ -96,6 +96,7 @@ dezipper et uploader https://github.com/Dominique92/GeoBB
 	favicon.ico
 run SITE/install -> Update manuel -> Database only
 Supprimer install
+Tous users -> style = aspir
 
 
 MISE EN FORME / INSTALL / DEMOS

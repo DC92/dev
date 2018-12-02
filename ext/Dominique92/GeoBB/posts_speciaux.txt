@@ -42,7 +42,7 @@ topographie|Topographie|long
 risques|Risques|court|Vide, chute de pierres, orages violents...
 especes_proteges|Présence espèces remarquables et/ou protégées|court|Faune ou flore
 ressource_fourragere|Ressource fourragère|long|Qualité de l'herbe ? Note sur 5
-alpage_point_d_eau|Point(s) d'eau|attaches
+contains|Point(s) d'eau|attaches|point_eau
 operateur|Opérateur téléphonique recommandé|Orange,Bouygues Télécom,Free,SFR,autre,ne sait pas
 operateur_autre|autre opérateur|court
 }
@@ -85,7 +85,7 @@ heliportages_fin|Date approximative fin estive|date
 heliportages_poids|Poids à la disposition du berger|0|Kg
 }}
 |2. Logement
-alpage_cabane|Cabane(s)|attaches
+contains|Cabane(s)|attaches|cabane
 {|3. Les bêtes
 {|3.1 Le troupeau
 troupeau_nb_eleveurs|Nombre d'éleveurs|0
@@ -190,7 +190,7 @@ forme_juridique_departement|- département|court
 Cabanes
 =======
 altitude|Altitude|automatique|m
-alpage_cabane|Alpage d’appartenance|proches
+contains|Alpage d’appartenance|proches
 commune|Commune|automatique
 ign|Carte IGN|automatique
 reserve|Par ou réserve|automatique
@@ -228,7 +228,7 @@ cabane_poele|– Qualité poêle|bon,moyen,mauvais
 cabane_tirage|– Qualité tirage|bon,moyen,mauvais
 cabane_bois|Bois de chauffage|oui,non
 cabane_bois_a_debiter|– A débiter|oui,non
-cabane_ravitaillement|Ravitaillement|a faire soi même,par les éléveurs
+cabane_ravitaillement|Ravitaillement|a faire soi même,par les éleveurs
 |Logement adéquat pour
 cabane_famille|– Une famille|oui,non
 cabane_cohabitation|– Cohabitation 2 personnes|oui,non
@@ -239,7 +239,7 @@ cabane_internet|Capte le réseau Internet|oui,non,aléatoire,ne sait pas
 Points d'eau
 ============
 altitude|Altitude|automatique|m
-alpage_point_d_eau|Alpage d’appartenance|proches
+contains|Alpage d’appartenance|proches
 commune|Commune|automatique
 ign|Carte IGN|automatique
 reserve|Par ou réserve|automatique

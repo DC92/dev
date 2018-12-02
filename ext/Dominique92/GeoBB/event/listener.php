@@ -61,7 +61,7 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_end' => 'submit_post_end',
 		];
 	}
-//TODO ASPIR BUG IE pas de formulaire dans création polynome
+//TODO test protections
 
 	/**
 		INDEX.PHP
@@ -87,22 +87,23 @@ class listener implements EventSubscriberInterface
 
 		// Display news
 		$sql = "
-			SELECT t.topic_id, topic_title,
-				p.*, t.forum_id, forum_name, forum_image,
-				topic_first_post_id, post_id, post_attachment, topic_posts_approved,
-				username, poster_id, post_time
+			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
+				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
+				f.forum_id, f.forum_name, f.forum_image,
+				u.username
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
 				JOIN ".POSTS_TABLE ." AS p ON (p.post_id = t.topic_last_post_id)
 				JOIN ".USERS_TABLE."  AS u ON (p.poster_id = u.user_id)
 			WHERE post_visibility = ".ITEM_APPROVED."
 			ORDER BY post_time DESC
-			LIMIT ".$news;
+			LIMIT $news
+		";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
-				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
+//TODO CHEM				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
@@ -182,14 +183,12 @@ class listener implements EventSubscriberInterface
 	function modify_posting_parameters($vars) {
 		// Création topic avec le nom d'image
 		$forum_image = $this->request->variable('type', '');
-		$sql = 'SELECT * FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
+		$sql = 'SELECT forum_id FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%/'.$forum_image.'.%"';
 		$result = $this->db->sql_query ($sql);
 		$row = $this->db->sql_fetchrow ($result);
 		$this->db->sql_freeresult ($result);
-		if ($row) {
-			// Force le forum
+		if ($row) // Force le forum
 			$vars['forum_id'] = $row ['forum_id'];
-		}
 	}
 
 	// Permet la saisie d'un POST avec un texte vide
@@ -305,7 +304,7 @@ class listener implements EventSubscriberInterface
 		// Save change
 		$this->request->enable_super_globals();
 		$to_save = [
-			$this->user->data['username'].' '.date('r'),
+			$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
 			$_SERVER['REQUEST_URI'],
 			'post_subject = '.$this->modifs['post_subject'],
 			'post_text = '.$this->modifs['post_text'],
@@ -394,7 +393,7 @@ class listener implements EventSubscriberInterface
 			(!$row['geo_contains'] || $row['geo_contains'] == 'null')) {
 			// Search points included in a surface
 			$sql = "
-				SELECT polygon.*
+				SELECT polygon.topic_id
 				FROM	 ".POSTS_TABLE ." AS polygon
 					JOIN ".POSTS_TABLE ." AS point ON (point.topic_id = {$row['topic_id']})
 				WHERE
@@ -563,7 +562,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		if (!$match[1])
 			return;
 
-		// Get form fields from the relative post
+		// Get form fields from the relative formulaire post
 		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_subject = "'.$match[1].'" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
@@ -637,7 +636,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						// Search surfaces closest to a point
 						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & Dimension
 						$sql = "
-							SELECT p.*,
+							SELECT p.post_subject, p.topic_id,
 								Distance (p.geom, Centroid(v.geom))	AS distance
 							FROM	 ".POSTS_TABLE ." AS p
 								JOIN ".POSTS_TABLE ." AS v ON (v.post_id = {$post_data['post_id']})

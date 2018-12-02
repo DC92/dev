@@ -93,7 +93,7 @@ input[type="number"] {
 }
 .section-posting #attach-panel-multi::after {
 	color: red;
-	content: "attendre la fin du chargement des fichiers pour envoyer.";
+	content: "(attendre la fin du chargement des fichiers pour envoyer)";
 }
 
 .geo-info p {
