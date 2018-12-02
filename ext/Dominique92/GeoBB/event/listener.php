@@ -472,11 +472,10 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 				// sql_id|titre|proches
 				elseif (!strcasecmp ($dfs[2], 'proches')) {
-					$vars['TAG'] = 'select';
-					$options = $options_values = [];
-
-					// Search surfaces closest to a point
 					if ($post_data['post_id']) {
+						$vars['TAG'] = 'select';
+
+						// Search surfaces closest to a point
 						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & Dimension
 						$sql = "
 							SELECT p.*,
@@ -491,6 +490,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 							LIMIT 10
 							";
 						$result = $this->db->sql_query($sql);
+						$options = $options_values = [];
 						while ($row = $this->db->sql_fetchrow($result)) {
 							$options[] = $row['post_subject'];
 							$options_values[] = $row['topic_id'];
@@ -498,14 +498,12 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 								$vars['POST_VALUE'] = $vars['DISPLAY_VALUE'] = $row['post_subject'];
 						}
 						$this->db->sql_freeresult($result);
-					} else {
-						$options = ['Liste des proches non disponible'];
-						$options_values = ['null'];
-					}
+					} else
+						$vars['STYLE'] = 'display:none'; // Hide at creation
 				}
 
 				// sql_id|titre|attaches
-				//TODO BEST ASPIR faire effacer le bloc quand il n'y a pas d'attaches
+				//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
 					$vars['TAG'] = 'input';
 					$vars['TYPE'] = 'hidden';
