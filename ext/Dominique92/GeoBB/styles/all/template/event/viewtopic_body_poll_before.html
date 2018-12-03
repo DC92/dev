@@ -37,7 +37,12 @@
 			<{info.TAG1}>
 				{info.INNER}
 				<!-- IF info.DISPLAY_VALUE -->:<!-- ENDIF -->
-				{info.DISPLAY_VALUE} {info.POSTAMBULE}
+				<!-- IF info.HREF -->
+					<a{info.ATT_HREF}>{info.DISPLAY_VALUE}</a>
+				<!-- ELSE -->
+					{info.DISPLAY_VALUE}
+				<!-- ENDIF -->
+				{info.POSTAMBULE}
 				<!-- BEGIN attaches -->
 					<p> &nbsp; &nbsp; <a href="viewtopic.php?t={attaches.TOPIC_ID}">{attaches.POST_SUBJECT}</a></p>
 				<!-- END attaches -->

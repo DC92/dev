@@ -9,6 +9,8 @@
 
 namespace Dominique92\GeoBB\event;
 
+define('SQL_PRE', ''); //TODO MySQL 5.7+ 'ST_'
+
 if (!defined('IN_PHPBB'))
 {
 	exit;
@@ -61,6 +63,7 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_end' => 'submit_post_end',
 		];
 	}
+
 //TODO test protections
 
 	/**
@@ -206,8 +209,6 @@ class listener implements EventSubscriberInterface
 	function posting_modify_template_vars($vars) {
 		$page_data = $vars['page_data'];
 		$post_data = $vars['post_data'];
-		$this->topic_fields($post_data, $post_data['forum_desc']);
-		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// Récupère la traduction des données spaciales SQL
 		if (isset ($post_data['geom'])) {
@@ -242,6 +243,9 @@ class listener implements EventSubscriberInterface
 				&& is_string ($v))
 				$page_data[strtoupper ($k)] =
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
+
+		$this->topic_fields($post_data, $post_data['forum_desc']);
+		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// HORRIBLE phpbb hack to accept geom values //TODO BEST : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
@@ -580,7 +584,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$vars['DISPLAY_VALUE'] =
 			$vars['POST_VALUE'] =
 				str_replace ('~', '', $post_data[$sql_id]);
-			$options = $options_values = explode (',', ','.$dfs[2]); // One empty at the beginning
+			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
 
 			// {|1.1 Title
 			// {|Text
@@ -635,40 +639,42 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						$vars['TAG'] = 'select';
 
 						// Search surfaces closest to a point
+						preg_match_all ('/([0-9\.]+)/', $post_data['geomwkt'], $point);
+						$km = 3;
+						$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
 						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & ST_Dimension
-						//TODO ASPIR reprendre en utilisant MBRIntersects(g1, g2) + un BBOX autour du point + une fonction de tri
 						$sql = "
-							SELECT p.post_subject, p.topic_id,
-								".SQL_PRE."Distance (p.geom, ".SQL_PRE."Centroid(v.geom)) AS distance
-							FROM	 ".POSTS_TABLE." AS p
-								JOIN ".POSTS_TABLE." AS v ON (v.post_id = {$post_data['post_id']})
-							WHERE
-								v.forum_id != p.forum_id
-								AND p.geom IS NOT NULL
-								AND ".SQL_PRE."Dimension(p.geom) > 0
-							ORDER BY distance
-							LIMIT 10
+							SELECT post_subject, topic_id, AsText(Centroid(geom)) AS centre
+							FROM ".POSTS_TABLE."
+							WHERE ".SQL_PRE."Dimension(geom) > 0 AND
+								MBRIntersects(geom, ST_GeomFromText('LineString($bbox)'))
 							";
 						$result = $this->db->sql_query($sql);
-						$options = $options_values = [];
+						$options = ['d0' => []]; // First line empty
 						while ($row = $this->db->sql_fetchrow($result)) {
-							$options[] = $row['post_subject'];
-							$options_values[] = $row['topic_id'];
-							if ($row['topic_id'] == $vars['POST_VALUE'])
-								$vars['POST_VALUE'] = $vars['DISPLAY_VALUE'] = $row['post_subject'];
+							preg_match_all ('/([0-9\.]+)/', $row['centre'], $centre);
+							$dist2 = pow ($centre[0][0] - $point[0][0], 2) + pow ($centre[0][1] - $point[0][1], 2) * 2;
+							$options['d'.$dist2] = $row;
+							if ($row['topic_id'] == $vars['POST_VALUE']) {
+								$vars['POST_VALUE'] = // For posting.pgp initial select
+								$vars['DISPLAY_VALUE'] = // For viewtopic.php display
+									$row['post_subject'];
+								$vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
+							}
 						}
+						ksort ($options);
 						$this->db->sql_freeresult($result);
 					} else
 						$vars['STYLE'] = 'display:none'; // Hide at creation
 				}
 
 				// sql_id|titre|attaches
-				//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
 					$vars['TAG'] = 'input';
 					$vars['TYPE'] = 'hidden';
 					$vars['INNER'] = $dfs[1];
 					$vars['DISPLAY_VALUE'] = ' ';
+					//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 
 					$sql = "
 						SELECT topic_id, post_subject
@@ -736,8 +742,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			if (count($options)) {
 				foreach ($options AS $k=>$v)
 					$this->template->assign_block_vars('info.options', [
-						'OPTION' => $v,
-						'VALUE' => $options_values[$k] ?: $v,
+						'OPTION' => gettype($v) == 'string' ? $v : $v['post_subject'],
+						'VALUE' => gettype($v) == 'string' ? $v : $v['topic_id'],
 					]);
 				foreach ($attaches AS $k=>$v)
 					$this->template->assign_block_vars('info.attaches', array_change_key_case ($v, CASE_UPPER));
