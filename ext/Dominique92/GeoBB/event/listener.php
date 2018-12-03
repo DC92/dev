@@ -65,6 +65,7 @@ class listener implements EventSubscriberInterface
 	}
 
 //TODO test protections
+//TODO test owner import ??? / 3279 notifications
 
 	/**
 		INDEX.PHP
@@ -113,7 +114,7 @@ class listener implements EventSubscriberInterface
 
 		// Affiche un message de bienvenue dépendant du style pour ceux qui ne sont pas connectés
 		// Le texte de ces messages sont dans les posts dont le titre est !style
-		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue" ORDER BY post_id';
+		$sql = 'SELECT post_text, bbcode_uid, bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue" ORDER BY post_id';
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -165,7 +166,7 @@ class listener implements EventSubscriberInterface
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
 				$this->get_automatic_data($post_data);
-				$this->topic_fields($post_data, $vars['topic_data']['forum_desc']);
+				$this->topic_fields($post_data, $vars['topic_data']['forum_desc'], $vars['topic_data']['forum_name']);
 
 				// Assign geo_ vars to template for these used out of topic_fields
 				foreach ($post_data AS $k=>$v)
@@ -244,7 +245,7 @@ class listener implements EventSubscriberInterface
 				$page_data[strtoupper ($k)] =
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 
-		$this->topic_fields($post_data, $post_data['forum_desc']);
+		$this->topic_fields($post_data, $post_data['forum_desc'], $post_data['forum_name']);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// HORRIBLE phpbb hack to accept geom values //TODO BEST : check if done by PhpBB (supposed 3.2)
@@ -561,12 +562,14 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	}
 
 	// Form management
-	function topic_fields ($post_data, $forum_desc) {
+	function topic_fields ($post_data, $forum_desc, $forum_name) {
 		// Get form fields from the relative post
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
-		$sql = 'SELECT post_text FROM '.POSTS_TABLE.
-			' WHERE post_subject = "'.($match[1] ?: $post_data['forum_name']). // Try forum name
-			'" ORDER BY post_id';
+		$sql = "
+			SELECT post_text FROM ".POSTS_TABLE."
+			WHERE post_subject = '".($match[1] ?: $forum_name)."'
+			ORDER BY post_id
+		";
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -622,7 +625,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				$vars['INNER'] = 'Identifiant incorrect : "'.$dfs[0].'"';
 			}
 			elseif ($dfs[0]) {
-				$options = explode (',', ','.$dfs[2]);
+				$options = explode (',', ','.$dfs[2]); // With a first line empty
 
 				// sql_id|titre|choix,choix
 				if (count($options) > 2) {
@@ -647,13 +650,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 							SELECT post_subject, topic_id, AsText(Centroid(geom)) AS centre
 							FROM ".POSTS_TABLE."
 							WHERE ".SQL_PRE."Dimension(geom) > 0 AND
-								MBRIntersects(geom, ST_GeomFromText('LineString($bbox)'))
+								MBRIntersects(geom, ".SQL_PRE."GeomFromText('LineString($bbox)'))
 							";
 						$result = $this->db->sql_query($sql);
 						$options = ['d0' => []]; // First line empty
 						while ($row = $this->db->sql_fetchrow($result)) {
 							preg_match_all ('/([0-9\.]+)/', $row['centre'], $centre);
-							$dist2 = pow ($centre[0][0] - $point[0][0], 2) + pow ($centre[0][1] - $point[0][1], 2) * 2;
+							$dist2 = 1 + pow ($centre[0][0] - $point[0][0], 2) + pow ($centre[0][1] - $point[0][1], 2) * 2;
 							$options['d'.$dist2] = $row;
 							if ($row['topic_id'] == $vars['POST_VALUE']) {
 								$vars['POST_VALUE'] = // For posting.pgp initial select
@@ -676,18 +679,20 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$vars['DISPLAY_VALUE'] = ' ';
 					//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 
-					$sql = "
-						SELECT topic_id, post_subject
-						FROM ".POSTS_TABLE."
-							JOIN ".FORUMS_TABLE." USING (forum_id)
-						WHERE forum_image LIKE '%{$dfs[3]}.png' AND
-							($sql_id = '{$post_data['topic_id']}' OR
-							 $sql_id = '{$post_data['topic_id']}~')
-						";
-					$result = $this->db->sql_query($sql);
-					while ($row = $this->db->sql_fetchrow($result))
-						$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre des lignes du formulaire)
-					$this->db->sql_freeresult($result);
+					if (array_key_exists ($sql_id, $row)) {
+						$sql = "
+							SELECT topic_id, post_subject
+							FROM ".POSTS_TABLE."
+								JOIN ".FORUMS_TABLE." USING (forum_id)
+							WHERE forum_image LIKE '%{$dfs[3]}.png' AND
+								($sql_id = '{$post_data['topic_id']}' OR
+								 $sql_id = '{$post_data['topic_id']}~')
+							";
+						$result = $this->db->sql_query($sql);
+						while ($row = $this->db->sql_fetchrow($result))
+							$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre des lignes du formulaire)
+						$this->db->sql_freeresult($result);
+					}
 				}
 
 				// sql_id|titre|automatique
@@ -740,12 +745,12 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$this->template->assign_block_vars('info', $vars);
 
 			if (count($options)) {
-				foreach ($options AS $k=>$v)
+				foreach ($options AS $v)
 					$this->template->assign_block_vars('info.options', [
 						'OPTION' => gettype($v) == 'string' ? $v : $v['post_subject'],
 						'VALUE' => gettype($v) == 'string' ? $v : $v['topic_id'],
 					]);
-				foreach ($attaches AS $k=>$v)
+				foreach ($attaches AS $v)
 					$this->template->assign_block_vars('info.attaches', array_change_key_case ($v, CASE_UPPER));
 			}
 		}
