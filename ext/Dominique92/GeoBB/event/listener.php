@@ -567,7 +567,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
 		$sql = "
 			SELECT post_text FROM ".POSTS_TABLE."
-			WHERE post_subject = '".($match[1] ?: $forum_name)."'
+			WHERE post_subject = '".str_replace("'","\'",$match[1] ?: $forum_name)."'
 			ORDER BY post_id
 		";
 		$result = $this->db->sql_query($sql);
@@ -679,7 +679,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$vars['DISPLAY_VALUE'] = ' ';
 					//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 
-					if (array_key_exists ($sql_id, $row)) {
+					if (array_key_exists ($sql_id, $post_data)) {
 						$sql = "
 							SELECT topic_id, post_subject
 							FROM ".POSTS_TABLE."

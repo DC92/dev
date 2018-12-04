@@ -22,7 +22,7 @@ Un changement peut générer une erreur à la modification d'une fiche. Revenir 
 
 Alpages
 =======
-surface|Surface|automatique|m²
+surface|Surface|automatique|ha
 commune|Commune|automatique
 ign|Carte IGN|automatique
 reserve|Par ou réserve|automatique
