@@ -469,7 +469,7 @@ class listener implements EventSubscriberInterface
 
 		// Calcul de la commune (France)
 		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
-{/*			$ch = curl_init ();
+{/*//TODO DELETE ???			$ch = curl_init ();
 			curl_setopt ($ch, CURLOPT_URL,
 				'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
 				http_build_query ( array(
@@ -538,7 +538,15 @@ XML
 					false,
 					stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
 				));
-				$update['geo_commune'] = $nominatim->address->postcode.' '.($nominatim->address->village ?: $nominatim->address->hamlet);
+				$update['geo_commune'] = $nominatim->address->postcode.' '.(
+					$nominatim->address->town ?:
+					$nominatim->address->city ?:
+					$nominatim->address->suburb  ?:
+					$nominatim->address->village ?:
+					$nominatim->address->hamlet ?:
+					$nominatim->address->neighbourhood ?:
+					$nominatim->address->quarter 
+				);
 			}
 		}
 
