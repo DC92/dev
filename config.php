@@ -18,10 +18,9 @@ $acm_type = 'phpbb\\cache\\driver\\file';
 
 @define('TRACES_DOM', 'test');
 
-$geo_keys = "{
-IGN: 'd27mzh49fzoki1v3aorusg6y',
-thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e',
-bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'
-}";
-
-$geo_mapquest_key = 'Fmjtd%7Cluur2968n1%2C70%3Do5-90rs04'; // Calcul altitude
+$geo_keys = [
+	'IGN' => 'd27mzh49fzoki1v3aorusg6y',
+	'thunderforest' => 'a54d38a8b23f435fa08cfb1d0d0b266e',
+	'bing' => 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt',
+	'mapquest' => 'Fmjtd%7Cluur2968n1%2C70%3Do5-90rs04', // Calcul altitude
+];

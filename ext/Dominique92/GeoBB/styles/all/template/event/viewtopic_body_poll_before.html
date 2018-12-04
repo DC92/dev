@@ -1,4 +1,4 @@
-<!-- IF GEO_MAP_TYPE  -->
+<!-- IF GEO_MAP_TYPE and GEOJSON -->
 
 <!-- Openlayers -->
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
@@ -34,7 +34,7 @@
 	<!-- Application specific info -->
 	<!-- BEGIN info -->
 		<!-- IF info.DISPLAY_VALUE or info.DISPLAY or info.attaches -->
-			<{info.TAG1}>
+			<{info.TAG1}{info.ATT_STYLE_TAG1}>
 				{info.INNER}
 				<!-- IF info.DISPLAY_VALUE -->:<!-- ENDIF -->
 				<!-- IF info.HREF -->

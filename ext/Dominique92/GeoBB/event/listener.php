@@ -77,7 +77,7 @@ class listener implements EventSubscriberInterface
 		if ($this->auth->acl_get('f_post', $row['forum_id']) &&
 			$row['forum_type'] == FORUM_POST)
 			$row['forum_name'] .= ' &nbsp; '.
-				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Nouveau</a>';
+				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer</a>';
 		$vars['row'] = $row;
 	}
 
@@ -126,10 +126,15 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
 	function viewtopic_get_post_data($vars) {
-		// Insère la conversion du champ geom en format WKT dans la requette SQL
-		$sql_ary = $vars['sql_ary'];
-		$sql_ary['SELECT'] .= ',AsText(geom) AS geomwkt';
-		$vars['sql_ary'] = $sql_ary;
+		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geom"';
+		$result = $this->db->sql_query($sql);
+		if ($this->db->sql_fetchrow($result)) {
+			// Insère la conversion du champ geom en format WKT dans la requette SQL
+			$sql_ary = $vars['sql_ary'];
+			$sql_ary['SELECT'] .= ', AsText(geom) AS geomwkt';
+			$vars['sql_ary'] = $sql_ary;
+		}
+		$this->db->sql_freeresult($result);
 	}
 
 	// Appelé lors de la première passe sur les données des posts qui lit les données SQL de phpbb-posts
@@ -375,7 +380,7 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_vars([
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
-					'GEO_KEYS' => $geo_keys,
+					'GEO_KEYS' => json_encode($geo_keys),
 //					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
 		}
@@ -423,10 +428,10 @@ class listener implements EventSubscriberInterface
 
 		// Calcul de l'altitude avec mapquest
 		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
-			global $geo_mapquest_key;
-			$mapquest = @file_get_contents (
+			global $geo_keys;
+			$mapquest = file_get_contents (
 				'http://open.mapquestapi.com/elevation/v1/profile'.
-				'?key='.$geo_mapquest_key.
+				'?key='.$geo_keys['mapquest'].
 				'&callback=handleHelloWorldResponse'.
 				'&shapeFormat=raw'.
 				'&latLngCollection='.$centre[1].','.$centre[0]
@@ -685,6 +690,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$vars['TYPE'] = 'hidden';
 					$vars['INNER'] = $dfs[1];
 					$vars['DISPLAY_VALUE'] = ' ';
+					//TODO ASPIR BUG Points d'eau et Cabanes s'affichent même quand pas ded'attachés
 					//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 
 					if (array_key_exists ($sql_id, $post_data)) {
@@ -700,6 +706,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						while ($row = $this->db->sql_fetchrow($result))
 							$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre des lignes du formulaire)
 						$this->db->sql_freeresult($result);
+						if (!count ($attaches))
+							$vars['ATT_STYLE_TAG1'] = ' style="display:none"';
 					}
 				}
 
