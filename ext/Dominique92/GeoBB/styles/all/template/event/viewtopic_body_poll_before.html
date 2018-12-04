@@ -1,4 +1,4 @@
-<!-- IF GEO_MAP_TYPE and GEOJSON -->
+<!-- IF GEO_MAP_TYPE -->
 
 <!-- Openlayers -->
 <!-- INCLUDECSS assets/MyOl/ol/ol.css -->
@@ -55,6 +55,7 @@
 
 <div class="action-bar">
 	<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
+	<!-- //TODO ASPIR BEST ne pas afficher quand pas le droit -->
 	<!-- IF .quickmod -->
 	<div class="quickmod dropdown-container dropdown-container-left dropdown-up dropdown-{S_CONTENT_FLOW_END} dropdown-button-control" id="quickmod">
 		<span title="{L_QUICK_MOD}" class="button button-secondary dropdown-trigger dropdown-select">
@@ -77,7 +78,8 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var map = new ol.Map({
+		var geom = false,
+			map = new ol.Map({
 			target: 'map',
 			layers: [
 				geoLayer({TOPIC_ID}) //TODO BEST colorier de façon différente (gris) le polygone TOPIC_ID & le polygone survolé
@@ -85,11 +87,7 @@
 			controls: geobbControls().concat([
 				controlLayersSwitcher(
 					layers({GEO_KEYS})
-				),
-				controlPermalink({
-					init: false,
-					visible: false
-				})
+				)
 			])
 		});
 
@@ -98,12 +96,11 @@
 				pos = marqueur.getPoint().getCoordinates();
 			map.addLayer(marqueur);
 
-		// Center the map
+			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
-		<!-- ENDIF -->
-
-		<!-- IF GEO_MAP_TYPE == 'surface' -->
+			geom = true;
+		<!-- ELSEIF GEO_MAP_TYPE == 'surface' && GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"
@@ -114,7 +111,15 @@
 
 			// Center the map
 			map.getView().fit(source.getExtent());
+			geom = true;
 		<!-- ENDIF -->
+
+		map.addControl(
+			controlPermalink({
+				init: !geom,
+				visible: false
+			})
+		);
 	});
 </script>
 <!-- ENDIF -->

@@ -90,6 +90,7 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
 		// Display news
+		//TODO ASPIR masquer les messages de forums non autorisés.
 		$sql = "
 			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
 				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
@@ -118,7 +119,13 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
-		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
+		$this->template->assign_var (
+			'GEO_PRESENTATION',
+			generate_text_for_display($row['post_text'],
+			$row['bbcode_uid'],
+			$row['bbcode_bitfield'],
+			OPTION_FLAG_BBCODE, true)
+		);
 	}
 
 	/**

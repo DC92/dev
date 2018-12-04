@@ -22,45 +22,48 @@ Général -> Paramètres du serveur -> Activer la compression GZip : oui
 Personnaliser -> Désactiver VigLink
 Personnaliser -> Installation de styles -> Aspir -> Détails -> Définir comme style par défaut
 Personnaliser -> Gérer de styles -> Prosilver -> Désactiver
+Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
+Messages -> Ajouter un bbcode -> [fiche={TEXT}][/fiche] / <span></span> / ne pas oublier [/fiche] dans les forum_desc
 Général -> Gérer les forums -> Créer Alpages, Cabanes, Points d'eau, Forum des utilisateurs
 	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
 	catégorie Bugs et améliorations, Bugs et améliorations résolus
+Permissions -> Permissions des forums -> Coin des modérateurs + Configuration . Bugs * -> Envoyer
+	Robots + Invités + Utilisateurs * enregistrés -> Aucun accès -> Appliquer toutes
+Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
+	Utilisateurs * enregistrés -> Accès standard -> Appliquer toutes
 Créer un item d'Alpage, Cabane, Point d'eau
-
-
-CONFIG ASPIR
-============
-Messages -> Ajouter un bbcode -> [first={TYPE}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
-Permissions -> Permissions des forums -> Tous les forums -> Envoyer -> Utilisateurs enregistrés -> Modifier les permissions
-
-Forums -> Permissions groupes/forums -> invités + utilisateurs * + robots -> Aucun accès
-
-UPDATE VERSION PHPBB
-====================
-//TODO ASPIR test 1&1 & migation
-copier full package
-install/app.php/update -> database only
-delete install
-ext/Dominique92/GeoBB/aspir_import.php?d=07
-administration -> resync les forums
-Ajouter catégorie forum 'forum"
-Ajouter sujet "Bienvenue"
-
-RESYNC ASPIR
-============
-Vider cache / cache de l'explorateur
-structure phpbb_posts -> supprime colonnes geo*
-cree cabane / valide PUIS cree alpage / valide
-vide phpbb_posts
-admin -> resync les forums
-aspir_import.php -> cliquer sur tous
-??? ajouter phrase / code aspir
+Exécuter aspir_import.php ...
+Administration -> Gérer les forums -> Alpages -> Resynchroniser
 
 ACCEPTER MODERATEUR
 ===================
-Notification -> Activation requise
--> Administrer le membre -> Outils rapides -> Activer son compte
-Formulaire -> Groupes -> Ajouter ce membre = Modérateurs globaux
+Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
+
+
+						UPDATE VERSION PHPBB
+						====================
+						//TODO ASPIR test 1&1 & migation
+						copier full package
+						install/app.php/update -> database only
+						delete install
+						ext/Dominique92/GeoBB/aspir_import.php?d=07
+						administration -> resync les forums
+						Ajouter catégorie forum 'forum"
+						Ajouter sujet "Bienvenue"
+
+						RESYNC ASPIR
+						============
+						Vider cache / cache de l'explorateur
+						structure phpbb_posts -> supprime colonnes geo*
+						cree cabane / valide PUIS cree alpage / valide
+						vide phpbb_posts
+						admin -> resync les forums
+						aspir_import.php -> cliquer sur tous
+						??? ajouter phrase / code aspir
+
+						Notification -> Activation requise
+						-> Administrer le membre -> Outils rapides -> Activer son compte
+						Formulaire -> Groupes -> Ajouter ce membre = Modérateurs globaux
 
 Formulaires
 ===========
@@ -90,7 +93,9 @@ Alpages
 =======
 surface|Surface|automatique|ha
 commune|Commune|automatique
-ign|Carte IGN|automatique
+irstea_code|Code Irstea|automatique
+irstea_type|Type Irstea|automatique
+unite_pastorale|Unite Pastorale Irstea|automatiqueign|Carte IGN|automatique
 reserve|Par ou réserve|automatique
 {|1. L'alpage
 {|1.1 Équipements
