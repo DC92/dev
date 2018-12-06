@@ -584,6 +584,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Form management
 	function topic_fields ($post_data, $forum_desc, $forum_name) {
+		//TODO ASPIR URGENT masquer certains champs (ref berger précédent)
 		// Get form fields from the relative post
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
 		$sql = "
