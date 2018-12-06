@@ -1,37 +1,29 @@
-ATTENTION : VERSION DU LOGICIEL EN DEVELOPPEMENT
-================================================
-
-NE PAS UTILISER
-===============
-
-Logiciel du site http://chemineur.fr
-
 Dominique92.GeoBB
 =================
-- GeoBB est une extension cartographique pour forums PhpBB 3.1 associant des points, lignes ou surfaces sur une carte à un sujet dans un forum.
+- GeoBB est une extension cartographique pour forums PhpBB 3.2+ associant des points, lignes ou surfaces sur une carte à un sujet dans un forum.
 - Chaque forum regroupe les éléments de même catégorie (même icône sur la carte).
 - Chaque sujet ou commentaire dans le forum peut être représenté par une icône, des lignes ou des surfaces sur la carte.
 
 DEMO
 ====
-[Voir une DEMO](http://geobb.cavailhez.fr)
+Logiciel du site http://aspir.dc9.fr
 
 INSTALLATION
 ============
 * Pré-requis:
-	- Hébergement PHP 5.3.3 min & MySQL 5.0 min (pour les fonctions géographiques)
+	- Hébergement PHP 5.3.3 min & MySQL 5.5 min (pour les fonctions géographiques)
 
-* Installer un forum PhpBB 3.1:
-	- Télécharger le [pack complet 3.1.x](http://www.phpbb-fr.com/telechargements/)
+* Installer un forum PhpBB 3.x:
+	- Télécharger le [pack complet](http://www.phpbb-fr.com/telechargements/)
 	- Déziper et transférer sur le serveur.
 	Pour en savoir plus: [doc install PhpBB](https://www.phpbb.com/community/docs/INSTALL.html)
 	- Créer une base vide sur MySQL ou utiliser une base existante.
 	- Aller à la racine du forum depuis un explorateur, suivre les instructions.
-	- Pour en savoir plus: [Documentation sur le forum](https://www.phpbb.com/support/docs/en/3.1/ug/)
+	- Pour en savoir plus: [Documentation sur le forum](https://www.phpbb.com/support/docs/en/3.2/ug/)
 
 * Installer GeoBB:
 	- Télécharger cette extension (Bouton "Download ZIP" ci dessus)
-	- Déziper et transférer le répertoire Dominique92 dans le répertoire /ext du forum.
+	- Déziper et transférer à la racine du forum.
 	- Aller dans l'administration du forum (Lien en bas de page du forum) => PERSONALISER => Gérer les extensions => GeoBB => Activer
 	- FORUMS => Gérer les forums => Créer un nouveau forum
 	- Copier les permissions depuis: => Votre premier forum
@@ -57,11 +49,11 @@ INSTALLATION
 (facultatif, pour développeur)
 	- Style:
 		- [Les bases des styles](https://www.phpbb.com/styles/installing/)
-		- [Styles de PhpBB 3.1 téléchargeables](https://www.phpbb.com/customise/db/styles/board_styles-12/3.1?sk=r&sd=d)
+		- [Styles de PhpBB 3.2 téléchargeables](https://www.phpbb.com/customise/db/styles/board_styles-12/3.2?sk=r&sd=d)
 		- [Edition et création de styles](https://www.phpbb.com/styles/create/)
 	- Fonctionnalités:
 		- [Les extensions](https://www.phpbb.com/extensions/)
-		- [Extensions de PhpBB 3.1 téléchargeables](https://www.phpbb.com/customise/db/extensions-36/3.1?sk=r&sd=d)
+		- [Extensions de PhpBB 3.2 téléchargeables](https://www.phpbb.com/customise/db/extensions-36/3.2?sk=r&sd=d)
 		- [Développer une extension](https://www.phpbb.com/extensions/writing/)
 	- Affichage des cartes:
 		- L'affichage des cartes est réalisé par une librairie basée sur Openlayers, un certain nombre de plugins et d'optimisations dont les sources sont disponibles [ICI](https://github.com/Dominique92/MyOl)

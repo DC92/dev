@@ -37,6 +37,7 @@ class listener implements EventSubscriberInterface
 //TODO-BEST		$this->extension_manager = $extension_manager;
 //TODO-BEST		$this->root_path = $root_path;
 //TODO test protections
+//TODO ASPIR ??? recherche par département / commune
 	}
 
 	// Liste des hooks et des fonctions associées
@@ -481,7 +482,7 @@ class listener implements EventSubscriberInterface
 
 		// Calcul de la commune (France)
 		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
-{/*//TODO DELETE ???			$ch = curl_init ();
+{/*//TODO-CHEM DELETE ???			$ch = curl_init ();
 			curl_setopt ($ch, CURLOPT_URL,
 				'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
 				http_build_query ( array(

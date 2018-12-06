@@ -18,16 +18,12 @@ Interface VTTRACK
 	Priorité pas aux orris !!
 	Reprendre interface sur chem3
 
-TODO
-====
-Voir dans myol et /ext : //TODO //BUG //DELETE //BEST //BLOCKING
-
-BEST TODO
-=========
-Mettre ?date dans les liens des libs LL.
+BEST CHEMINEUR
+==============
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Pouvoir trier les posts WRIC
 Meteo sur chem
+Stockage images sur plus d'1 répertoire => ? plugin ?
 Mettre les media print dans print.css
 CSS bug chem cadre liens sur largeur fenêtre petite
 Choix type trace GPS
@@ -98,18 +94,10 @@ run SITE/install -> Update manuel -> Database only
 Supprimer install
 Tous users -> style = aspir
 
-
 MISE EN FORME / INSTALL / DEMOS
 ===============================
 Dépendance des plugins:
 	<!-- INCLUDE reference.html --> => Devrait être un extract
-Compléter un GITHUB READ.ME
-Stockage images sur plus d'1 répertoire => ? plugin ?
-Faire executer l'import par le cron
-Intégrer dans les patchs ??? Attendre !
-	RewriteCond %{REQUEST_SCHEME} ^http$ [NC]
-	RewriteCond %{HTTP_HOST} ^chemineur.fr$ [NC]
-	RewriteRule ^.*$ https://%{SERVER_NAME}/%1 [L]
 Centraliser patchs
 	Passage en https: htaccess / route
 Mettre tous les responsive dans responsive.css
