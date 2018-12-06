@@ -10,7 +10,7 @@
 
 <!-- IF GEO_MAP_TYPE -->
 <!-- Proj4 projections Swiss & UK -->
-<!-- //TODO CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
+<!-- //TODO-CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
@@ -25,7 +25,7 @@
 
 <dl class="posting-point" style="clear: left;">
 	<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
-	<!-- //TODO CHEM pour all :
+	<!-- //TODO-CHEM pour all :
 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p>
 	-->
 
@@ -56,7 +56,7 @@
 		<p>- Ctrl+Alt+cliquer sur un segment d'un polygone pour supprimer ce polygone.</p>
 	<!-- ENDIF -->
 
-	<!-- //TODO CHEM pour all p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p -->
+	<!-- //TODO-CHEM pour all p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p -->
 </dl>
 
 <!-- Application specific info -->
@@ -82,7 +82,7 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer({TOPIC_ID}, true), //TODO BEST ne pas afficher du tout le polygone TOPIC_ID
+		var overlay = geoLayer({TOPIC_ID}, true), //TODO ASPIR ne pas afficher du tout le polygone TOPIC_ID
 			edit = controlEdit('editable-json', [overlay], true),
 			poly = controlEditCreate('Polygon'),
 			extent = edit.source.getExtent(),

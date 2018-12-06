@@ -9,7 +9,7 @@
 
 namespace Dominique92\GeoBB\event;
 
-define('SQL_PRE', ''); //TODO MySQL 5.7+ 'ST_'
+define('SQL_PRE', ''); //TODO-BEST MySQL 5.7+ 'ST_'
 
 if (!defined('IN_PHPBB'))
 {
@@ -34,8 +34,8 @@ class listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->user = $user;
 		$this->auth = $auth;
-//TODO BEST		$this->extension_manager = $extension_manager;
-//TODO BEST		$this->root_path = $root_path;
+//TODO-BEST		$this->extension_manager = $extension_manager;
+//TODO-BEST		$this->root_path = $root_path;
 //TODO test protections
 	}
 
@@ -107,7 +107,7 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
-//TODO CHEM				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
+//TODO-CHEM				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
@@ -237,7 +237,7 @@ class listener implements EventSubscriberInterface
 			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
 			$this->get_bounds($geophp);
 			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-//TODO BEST			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
+//TODO-BEST			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
 			$post_data['geojson'] = json_encode ($gp);
 		}
 
@@ -259,7 +259,7 @@ class listener implements EventSubscriberInterface
 		$this->topic_fields($post_data, $post_data['forum_desc'], $post_data['forum_name']);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
-		// HORRIBLE phpbb hack to accept geom values //TODO BEST : check if done by PhpBB (supposed 3.2)
+		// HORRIBLE phpbb hack to accept geom values //TODO-BEST : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
 		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";
@@ -665,9 +665,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 						preg_match_all ('/([0-9\.]+)/', $post_data['geomwkt'], $point);
 						$km = 3;
 						$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
-						//TODO BEST en MySQL 5.7+, utiliser ST_Distance, ST_Centroid & ST_Dimension
 						$sql = "
-							SELECT post_subject, topic_id, AsText(Centroid(geom)) AS centre
+							SELECT post_subject, topic_id, ".SQL_PRE."AsText(".SQL_PRE."Centroid(geom)) AS centre
 							FROM ".POSTS_TABLE."
 							WHERE ".SQL_PRE."Dimension(geom) > 0 AND
 								MBRIntersects(geom, ".SQL_PRE."GeomFromText('LineString($bbox)'))
@@ -692,13 +691,12 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				}
 
 				// sql_id|titre|attaches
+				//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
 					$vars['TAG'] = 'input';
 					$vars['TYPE'] = 'hidden';
 					$vars['INNER'] = $dfs[1];
 					$vars['DISPLAY_VALUE'] = ' ';
-					//TODO ASPIR BUG Points d'eau et Cabanes s'affichent même quand pas ded'attachés
-					//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 
 					if (array_key_exists ($sql_id, $post_data)) {
 						$sql = "
@@ -755,7 +753,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$vars['CLASS'] = 'inputbox autowidth';
 					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 				}
-			} //TODO BEST DELETE pourquoi as-ton besoin du test précédent ?
+			} //TODO-BEST DELETE pourquoi as-ton besoin du test précédent ?
 //else/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_COOKIE,true).'</pre>';
 
 			$vars['NAME'] = $sql_id.'-'.$vars['SQL_TYPE'];
@@ -779,7 +777,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 	}
 
-	/*//TODO BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
+	/*//TODO-BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
     $oGeometry = geoPHP::load($skt,'wkt');
     $reducedGeom = $oGeometry->simplify(1.5);
     $skt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2

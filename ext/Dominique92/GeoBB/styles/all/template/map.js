@@ -38,8 +38,8 @@ function layers(keys) {
 }
 
 /*
-//TODO DELETE aspir
-//TODO complete chemineur
+//TODO-CHEM DELETE pour aspir
+//TODO-CHEM complete chemineur
 function postLabel(properties, feature, layer, pixel, ll4326) {
 	var type = typeof layer.options_.type == 'function' ?
 		layer.options_.type(properties, feature, layer, pixel, ll4326) :
@@ -49,7 +49,7 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 		layer.options_.name || '';
 
 	return ['<hr/><a title="Créer une fiche modifiable à partir du point" ' +
-			'href="posting.php?mode=post', //TODO BEST spécifique : passer en argument
+			'href="posting.php?mode=post', //TODO-BEST spécifique : passer en argument
 			'type=' + type,
 			'name=' + (name || type),
 			'lon=' + Math.round(ll4326[0] * 100000) / 100000,

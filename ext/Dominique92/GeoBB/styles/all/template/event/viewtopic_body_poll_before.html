@@ -9,7 +9,7 @@
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
  
 <!-- Proj4 projections Swiss & UK -->
-<!-- //TODO CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
+<!-- //TODO-CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
 
 <!-- My Openlayers -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
@@ -50,12 +50,12 @@
 		<!-- ENDIF -->
 	<!-- END info -->
 
-	<!-- //TODO BEST ASPIR CHEM météo idem WRI -->
+	<!-- //TODO-BEST météo idem WRI -->
 </div>
 
 <div class="action-bar">
 	<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
-	<!-- //TODO ASPIR BEST ne pas afficher quand pas le droit -->
+	<!-- //TODO ASPIR ne pas afficher quand pas le droit -->
 	<!-- IF .quickmod -->
 	<div class="quickmod dropdown-container dropdown-container-left dropdown-up dropdown-{S_CONTENT_FLOW_END} dropdown-button-control" id="quickmod">
 		<span title="{L_QUICK_MOD}" class="button button-secondary dropdown-trigger dropdown-select">
@@ -82,7 +82,7 @@
 			map = new ol.Map({
 			target: 'map',
 			layers: [
-				geoLayer({TOPIC_ID}) //TODO BEST colorier de façon différente (gris) le polygone TOPIC_ID & le polygone survolé
+				geoLayer({TOPIC_ID}) //TODO ASPIR colorier de façon différente (gris) le polygone TOPIC_ID & le polygone survolé
 			],
 			controls: geobbControls().concat([
 				controlLayersSwitcher(

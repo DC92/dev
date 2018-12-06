@@ -55,7 +55,7 @@ $lang = array_merge($lang, array(
 	'FINAL_INTEGRATION_BY' => 'Copyright &copy; <a href="https://github.com/Dominique92">Dominique Cavailhez</a> 2016. Sur la base de PhpBB',
 ));
 
-//TODO BEST ASPIR prendre dans un forum
+//TODO ASPIR prendre dans un forum
 // Privacy policy and T&C
 $lang = array_merge($lang, array(
 	'TERMS_OF_USE_CONTENT'	=> 'AAAA - En accédant à « %1$s » (désigné ci-après par « nous », « notre », « nos », « %1$s », « %2$s »), vous acceptez d’être légalement responsable des conditions suivantes. Si vous n’acceptez pas d’être légalement responsable de toutes les conditions suivantes, alors n’accédez pas et/ou n’utilisez pas « %1$s ». Nous pouvons modifier celles-ci à n’importe quel moment et nous ferons tout pour que vous en soyez informé, bien qu’il soit prudent de vérifier régulièrement celles-ci par vous-même. Si vous continuez d’utiliser « %1$s » alors que des changements ont été effectués, vous acceptez d’être légalement responsable des conditions découlant des mises à jour et/ou modifications.<br>

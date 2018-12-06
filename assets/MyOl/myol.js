@@ -8,8 +8,8 @@
  * No classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only a pack of JS functions & CSS
  * I know, I know, this is not up to date way of programming but thtat's my choice & you are free to take it, modifiy & adapt as you wish
  */
-//TODO END http://jsbeautifier.org/ & http://jshint.com
-//TODO BEST map off line, application
+//TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
+//TODO-BEST map off line, application
 
 /**
  * HACK send 'onAdd' event to layers when added to a map
@@ -28,7 +28,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 //***************************************************************
 // TILE LAYERS
 //***************************************************************
-//TODO BEST Superzoom
+//TODO-BEST Superzoom
 /**
  * Openstreetmap
  */
@@ -229,7 +229,7 @@ function layerIGM() {
 	});
 }
 
-//TODO BEST éviter d'appeler à l'init https://dev.virtualearth.net sur les cartes BING
+//TODO-BEST éviter d'appeler à l'init https://dev.virtualearth.net sur les cartes BING
 /**
  * Ordnance Survey : Great Britain
  * Requires layerTileIncomplete
@@ -262,7 +262,7 @@ function layerBing(layer, key) {
 /**
  * Mem in cookies the checkbox content with name="selectorName"
  */
-//TODO BEST when unchecked, remove cookie
+//TODO-BEST when unchecked, remove cookie
 function controlPermanentCheckbox(selectorName, callback) {
 	var checkElements = document.getElementsByName(selectorName),
 		cookie =
@@ -327,7 +327,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires 'onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
-//TODO BUG URGENT une étiquette une fois sur IE & EDGE puis fixe
+//TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
 function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
@@ -341,7 +341,8 @@ function layerVectorURL(options) {
 					options.url(bbox, list, resolution) :
 					options.url + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 			},
-			format: options.format || new ol.format.GeoJSON() //TODO BEST JSON error handling : error + URL
+			format: options.format || new ol.format.GeoJSON()
+			//TODO-BEST JSON error handling : error + URL
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
@@ -370,7 +371,7 @@ function layerVectorURL(options) {
 }
 
 // We use only one listener for hover and one for click on all vector layers
-//TODO BEST mettre cette fonction dans layerVectorURL
+//TODO-BEST mettre cette fonction dans layerVectorURL
 function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 
@@ -392,7 +393,6 @@ function initLayerVectorURLListeners(e) {
 				evt.pixel,
 				function() {
 					map.popElement_.click(); // Simulate a click on the label
-					//TODO BEST : transmit Ctrl keys to this simulation
 				}, {
 					hitTolerance: 6
 				});
@@ -422,9 +422,9 @@ function initLayerVectorURLListeners(e) {
 		// Search the hovered feature(s)
 		hovered = [];
 		map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-			//TODO BEST make a separate function / pb : visibility of evt.pixel & hovered[]
+			//TODO-BEST make a separate function / pb : visibility of evt.pixel & hovered[]
 			if (layer && layer.options_) {
-				var h = { //TODO BEST simplifier la structure
+				var h = { //TODO-BEST simplifier la structure
 					pixel: evt.pixel, // Follow the mouse if line or surface
 					feature: feature,
 					layer: layer,
@@ -454,8 +454,8 @@ function initLayerVectorURLListeners(e) {
 		);
 
 		// Hovering label
-		var label = typeof h.options.label == 'function' ? //TODO BEST faire une fonction englobante d'appel avec arguments...
-			h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO BEST utiliser args...
+		var label = typeof h.options.label == 'function' ? //TODO-BEST faire une fonction englobante d'appel avec arguments...
+			h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO-BEST utiliser args...
 			h.options.label || '',
 			postLabel = typeof h.options.postLabel == 'function' ?
 			h.options.postLabel(h.properties, h.feature, h.layer, h.pixel, h.ll4326) :
@@ -545,7 +545,7 @@ function layerPointsWri(options) {
 			};
 		},
 		label: function(properties) {
-			return '<a href="'+properties.lien+'">'+properties.nom+'<a>';
+			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 		},
 		postLabel: options.postLabel,
 		href: function(properties) {
@@ -566,9 +566,9 @@ function layerPointsWri(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO BUG pas d'overpass sur IE
-//TODO BUG BEST quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
-//TODO BEST afficher erreur 429 (Too Many Requests)
+//TODO-IE BUG pas d'overpass sur IE
+//TODO-BEST BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
+//TODO-BEST afficher erreur 429 (Too Many Requests)
 function layerOverpass(options) {
 	var defaultOptions = {
 		url: '//overpass-api.de/api/interpreter',
@@ -735,7 +735,7 @@ function layerOverpass(options) {
  * Requires proj4.js for swiss coordinates
  * Requires 'onadd' layer event
  */
-//TODO BEST pointer finger sur la cible
+//TODO-BEST pointer finger sur la cible
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	var format = new ol.format.GeoJSON(),
 		eljson, json, elxy;
@@ -855,11 +855,11 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
  * options.render {function} called when the control is rendered.
  * options.action {function} called when the control is clicked.
  */
-//TODO BEST ASPIR Aligner les boutons (un trou ! = GPS)
+//TODO-BEST ASPIR Aligner les boutons (un trou ! = GPS)
 var nextButtonTopPos = 6, // Top position of next button (em)
 	globalControlGroups = {}; // List of group controls
 
-//TODO BEST héritage de ol.control.Control ?
+//TODO-BEST héritage de ol.control.Control ?
 function controlButton(options) {
 	options = options || {
 		className: 'ol-control-hidden'
@@ -1130,7 +1130,7 @@ function controlGPS() {
 /**
  * Control to displays the length of a line overflown
  */
-//TODO BEST CHEM/RANDO color the measured line
+//TODO-CHEM color the measured line
 function controlLengthLine() {
 	var divElement = document.createElement('div'),
 		control = new ol.control.Control({
@@ -1153,7 +1153,7 @@ function controlLengthLine() {
 	}
 
 	function calculateLength(feature) {
-		/*//TODO BEST RANDO idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
+		/*//TODO-CHEM idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
 				f.setStyle(
 		      new ol.style.Style({
 		//          fill: new ol.style.Fill({opacity: 0.7}),
@@ -1182,8 +1182,8 @@ function controlLengthLine() {
  * GPX file loader control
  * Requires controlButton
  */
-//TODO BEST En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
-//TODO BEST Pas d'upload/download sur mobile (-> va vers photos !)
+//TODO-BEST En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
+//TODO-BEST Pas d'upload/download sur mobile (-> va vers photos !)
 function controlLoadGPX() {
 	var inputElement = document.createElement('input'),
 		button = controlButton({
@@ -1236,7 +1236,7 @@ function controlLoadGPX() {
  * GPX file downloader control
  * Requires controlButton
  */
-//TODO BEST Nommage des tracks / du fichier.
+//TODO-BEST Nommage des tracks / du fichier.
 function controlDownloadGPX() {
 	var map,
 		selectedFeatures = [],
@@ -1324,7 +1324,7 @@ window.addEventListener('load', function() {
 /**
  * Print control
  */
-//TODO CHEM/RANDO impression full format page -> CSS
+//TODO-BEST impression full format page -> CSS
 function controlPrint() {
 	return controlButton({
 		className: 'print-button',
@@ -1355,7 +1355,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			source: source,
 			zIndex: 20
 		}),
-		/*//TODO BUG CHEM hover reste aprés l'ajout d'un polygone
+		/*//TODO-CHEM hover reste aprés l'ajout d'un polygone
 		hover = new ol.interaction.Select({
 			layers: [layer],
 			condition: ol.events.condition.pointerMove,
@@ -1378,10 +1378,10 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
 				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 				'Alt+cliquer sur un sommet pour le supprimer\n' +
-				//TODO CHEM only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
+				//TODO-CHEM only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			activate: function(active) {
-				//TODO CHEM hover.setActive(!active); //TODO ne pas réactiver hover sur les éditeurs
+				//TODO-CHEM hover.setActive(!active); //TODO-CHEM ne pas réactiver hover sur les éditeurs
 				modify.setActive(active);
 			}
 		}),
@@ -1403,7 +1403,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 					map_.removeInteraction(i);
 			});
 
-			//TODO CHEM map_.addInteraction(hover);
+			//TODO-CHEM map_.addInteraction(hover);
 			map_.addInteraction(modify);
 			map_.addInteraction(snap);
 			button.toggle(enableAtInit);
@@ -1623,7 +1623,7 @@ function controlsCollection() {
 		}),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
 		// Requires hack to display a title on the geocoder
-		//TODO BUG IE : pas de géocodeur sur IE
+		//TODO-IE BUG : pas de géocodeur sur IE
 		new Geocoder('nominatim', {
 			provider: 'osm',
 			lang: 'FR',
@@ -1633,7 +1633,7 @@ function controlsCollection() {
 		controlgps,
 		controlLoadGPX(),
 		controlDownloadGPX(),
-		//TODO CHEM controlPrint(),
+		//TODO-CHEM controlPrint(),
 	];
 }
 
