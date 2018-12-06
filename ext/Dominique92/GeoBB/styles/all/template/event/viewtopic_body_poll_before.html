@@ -54,7 +54,9 @@
 </div>
 
 <div class="action-bar">
-	<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
+	<!-- IF TOPIC_AUTH_EDIT -->
+		<a href="./posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}" class="button" title="Modifier la fiche {TOPIC_TITLE}">Modifier</a>
+	<!-- ENDIF -->
 	<!-- IF .quickmod -->
 	<div class="quickmod dropdown-container dropdown-container-left dropdown-up dropdown-{S_CONTENT_FLOW_END} dropdown-button-control" id="quickmod">
 		<span title="{L_QUICK_MOD}" class="button button-secondary dropdown-trigger dropdown-select">

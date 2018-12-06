@@ -90,7 +90,6 @@ class listener implements EventSubscriberInterface
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
 		// Display news
-		//TODO ASPIR masquer les messages de forums non autorisés.
 		$sql = "
 			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
 				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
@@ -154,7 +153,10 @@ class listener implements EventSubscriberInterface
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
 		$post_id = $vars['row']['post_id'];
-		$this->template->assign_var ('TOPIC_FIRST_POST_ID', $vars['topic_data']['topic_first_post_id']);
+		$this->template->assign_vars ([
+			'TOPIC_FIRST_POST_ID' => $vars['topic_data']['topic_first_post_id'],
+			'TOPIC_AUTH_EDIT' => $this->auth->acl_get('f_edit', $vars['row']['forum_id']),
+		]);
 		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
 		// Assign the geo values to the template

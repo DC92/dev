@@ -26,9 +26,9 @@ Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas
 Messages -> Ajouter un bbcode -> [fiche={TEXT}][/fiche] / <span></span> / ne pas oublier [/fiche] dans les forum_desc
 Général -> Gérer les forums -> Créer Alpages, Cabanes, Points d'eau, Forum des utilisateurs
 	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
-	catégorie Bugs et améliorations, Bugs et améliorations résolus
-Permissions -> Permissions des forums -> Coin des modérateurs + Configuration . Bugs * -> Envoyer
-	Robots + Invités + Utilisateurs * enregistrés -> Aucun accès -> Appliquer toutes
+	catégorie Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs
+Permissions -> Permissions des forums -> Coin des modérateurs + Configuration + Bugs * + Echanges -> Envoyer
+	Robots + Invités + Utilisateurs * -> Aucun accès -> Appliquer toutes
 Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
 	Utilisateurs * enregistrés -> Accès standard -> Appliquer toutes
 Créer un item d'Alpage, Cabane, Point d'eau
