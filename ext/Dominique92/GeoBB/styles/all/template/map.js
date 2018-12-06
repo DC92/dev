@@ -100,7 +100,7 @@ function geoLayer(id, silent) {
 			return layerStyle(properties, id, true);
 		},
 		label: function(properties) {
-			return silent ? null : properties.name;
+			return silent ? null : '<a href="viewtopic.php?t=' + properties.id+'">'+properties.name+'<a>';
 		},
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;

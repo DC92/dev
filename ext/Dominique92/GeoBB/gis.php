@@ -97,13 +97,13 @@ $sp = explode ('/', getenv('REQUEST_SCHEME'));
 $ri = explode ('/ext/', getenv('REQUEST_URI'));
 $bu = $sp[0].'://'.getenv('SERVER_NAME').$ri[0].'/';
 
-$geojson = [];
+$geojson = $signatures = [];
 $ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
 	// Color calculation
-	preg_match_all('/[0-9\.]+/',$row['geomwkt'],$out);
-	$x[0] = $out[0][0] * 30000 % $ampl; // From lon
-	$x[1] = $out[0][1] * 30000 % $ampl; // From lat
+	preg_match_all('/[0-9\.]+/',$row['geomwkt'],$coords);
+	$x[0] = $coords[0][0] * 30000 % $ampl; // From lon
+	$x[1] = $coords[0][1] * 30000 % $ampl; // From lat
 	$x[2] = $ampl - ($x[0] + $x[1]) / 2;
 	$color = '#';
 	for ($c = 0; $c < 3; $c++) // Chacune des 3 couleurs primaires
@@ -123,16 +123,27 @@ while ($row = $db->sql_fetchrow($result)) {
 		$properties['color'] = $colors[1];
 
 	$g = geoPHP::load ($row['geomwkt'], 'wkt'); // On lit le geom en format WKT fourni par MySql
-	$row['geojson'] = $g->out('json'); // On le transforme en format GeoJson
-	$row['geophp'] = json_decode ($row['geojson']); // On transforme le GeoJson en objet PHP
+	$geophp = json_decode ($g->out('json')); // On le transforme en format GeoJson puis en objet PHP
+
+	// Disjoin points having the same coordinate
+	if ($geophp->type == 'Point') {
+		while (in_array (signature ($geophp->coordinates), $signatures))
+			$geophp->coordinates[0] += 0.00001;
+		$signatures[] = signature ($geophp->coordinates);
+	}
 
 	$geojson[] = [
 		'type' => 'Feature',
-		'geometry' => $row['geophp'], // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
+		'geometry' => $geophp, // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 		'properties' => $properties,
 	];
 }
 $db->sql_freeresult($result);
+
+function signature ($coord) {
+	return round ($coord[0], 5).'_'.round ($coord[1], 5);
+}
+
 
 // Formatage du header
 $secondes_de_cache = 10;

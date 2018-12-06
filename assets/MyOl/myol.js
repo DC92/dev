@@ -327,8 +327,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires 'onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
-//TODO BUG ne clique pas sur l'étiquette d'un polygone alpage aspir ou massif WRI
-//TODO BUG pas d'étiquette sur IE & EDGE
+//TODO BUG URGENT une étiquette une fois sur IE & EDGE puis fixe
 function layerVectorURL(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
@@ -379,10 +378,8 @@ function initLayerVectorURLListeners(e) {
 		// Display a label when hover the feature
 		map.popElement_ = document.createElement('a');
 		map.popElement_.style.display = 'block';
-		var dx = 0.4,
-			xAnchor, // Spread too closes icons
-			hovered = [],
-			popup = new ol.Overlay({
+		var hovered = [], // Mem hovered elements to be able to undisplay them the same time
+			popup = new ol.Overlay({ // Only one popup reused for all hovering
 				element: map.popElement_
 			});
 		map.addOverlay(popup);
@@ -395,6 +392,7 @@ function initLayerVectorURLListeners(e) {
 				evt.pixel,
 				function() {
 					map.popElement_.click(); // Simulate a click on the label
+					//TODO BEST : transmit Ctrl keys to this simulation
 				}, {
 					hitTolerance: 6
 				});
@@ -439,34 +437,18 @@ function initLayerVectorURLListeners(e) {
 				if (h.coordinates.length == 2) // Stable if icon
 					h.pixel = map.getPixelFromCoordinate(h.coordinates);
 				h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
+
+				checkHovered(h);
 				hovered.push(h);
 			}
 		}, {
 			hitTolerance: 6
 		});
-
-		if (hovered) {
-			// Sort features left to right
-			hovered.sort(function(a, b) {
-				if (a.coordinates.length > 2) return 999; // Lines & surfaces under of the pile !
-				if (b.coordinates.length > 2) return -999;
-				return a.pixel[0] - b.pixel[0];
-			});
-			xAnchor = 0.5 + dx * (hovered.length + 1) / 2; // dx left because we begin to remove dx at the first icon
-			hovered.forEach(checkHovered);
-		}
 	}
 
 	function checkHovered(h) {
 		// Apply hover if any
 		var style = (h.options.hover || h.options.style)(h.properties);
-
-		// Spread too closes icons //TODO TEST don't allow to click on the last !!
-		//TODO BEST redo this as only the icon moves (can see), not the feature position (can click)
-		if (hovered.length > 2 &&
-			style.image)
-			style.image.anchor_[0] = xAnchor -= dx;
-
 		h.feature.setStyle(
 			new ol.style.Style(style)
 		);
@@ -563,7 +545,7 @@ function layerPointsWri(options) {
 			};
 		},
 		label: function(properties) {
-			return properties.nom;
+			return '<a href="'+properties.lien+'">'+properties.nom+'<a>';
 		},
 		postLabel: options.postLabel,
 		href: function(properties) {
@@ -1641,6 +1623,7 @@ function controlsCollection() {
 		}),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
 		// Requires hack to display a title on the geocoder
+		//TODO BUG IE : pas de géocodeur sur IE
 		new Geocoder('nominatim', {
 			provider: 'osm',
 			lang: 'FR',

@@ -31,7 +31,7 @@ function layerMassifsWri() {
 			};
 		},
 		label: function(properties) {
-			return properties.nom;
+			return '<a href="'+properties.lien+'">'+properties.nom+'<a>';
 		},
 		href: function(properties) {
 			return properties.lien;
@@ -71,7 +71,7 @@ function chemineurLayer() {
 			};
 		},
 		label: function(properties) {
-			return properties.nom;
+			return '<a href="'+properties.url+'">'+properties.nom+'<a>';
 		},
 		href: function(properties) {
 			return properties.url;

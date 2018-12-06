@@ -36,6 +36,7 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 //TODO BEST		$this->extension_manager = $extension_manager;
 //TODO BEST		$this->root_path = $root_path;
+//TODO test protections
 	}
 
 	// Liste des hooks et des fonctions associées
@@ -64,8 +65,6 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-//TODO test protections
-//TODO test owner import ??? / 3279 notifications
 
 	/**
 		INDEX.PHP
