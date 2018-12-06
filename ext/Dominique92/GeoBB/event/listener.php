@@ -384,6 +384,7 @@ class listener implements EventSubscriberInterface
 			case 'all': // Régle sur tous les posts
 				$ns = explode ('\\', __NAMESPACE__);
 				$this->template->assign_vars([
+					'META_ROBOTS' => META_ROBOTS,
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
 					'GEO_KEYS' => json_encode($geo_keys),

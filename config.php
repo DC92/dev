@@ -17,6 +17,7 @@ $acm_type = 'phpbb\\cache\\driver\\file';
 // @define('DEBUG_CONTAINER', true);
 
 @define('TRACES_DOM', 'test');
+@define('META_ROBOTS', 'noindex, nofollow');
 
 $geo_keys = [
 	'IGN' => 'd27mzh49fzoki1v3aorusg6y',
