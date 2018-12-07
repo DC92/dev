@@ -246,7 +246,7 @@ berger_eleveur|- éleveur berger|oui,non,ne sait pas
 berger_temps_travail|- temps de travail|court
 berger_contrat|- type de contrat|court
 berger_autre|- autres informations|court
-berger_contact_ancien|- contact ancien berger|court
+berger_contact_ancien|- contact ancien berger|confidentiel
 }
 }}
 {|5. Le responsable d'alpage

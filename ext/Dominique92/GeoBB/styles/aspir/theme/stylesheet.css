@@ -94,6 +94,9 @@ input[type="number"] {
 	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
 }
 
+.geo-info {
+	margin-bottom: 20px;
+}
 .geo-info p {
 	margin: 0;
 }

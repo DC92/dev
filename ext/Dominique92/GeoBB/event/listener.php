@@ -586,7 +586,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	// Form management
 	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name) {
-		//TODO ASPIR URGENT masquer certains champs (ref berger précédent)
 		// Get form fields from the relative post
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
 		$sql = "
@@ -604,10 +603,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		foreach ($def_forms AS $kdf=>$df) {
 			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||'));
 			$vars = $attaches = [];
+
+			// Default tags
 			$vars['TAG1'] = $sql_id = 'p';
 			$sql_id = 'geo_'.$dfs[0];
-			$vars['SQL_TYPE'] = 'text';
 			$vars['INNER'] = $dfs[1];
+			$vars['TYPE'] = $dfs[2];
+			$vars['SQL_TYPE'] = 'text';
 			$vars['DISPLAY_VALUE'] =
 			$vars['POST_VALUE'] =
 				str_replace ('~', '', $post_data[$sql_id]);
@@ -626,16 +628,16 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				$ndf = implode (' geo_', array_slice ($def_forms, $kdf)); // Find the block beginning
 				$c = $n = 1;
 				$ndfl = strlen ($ndf);
-				$r = '';
 				while ($n && $c < $ndfl) // Find the block end
 					switch ($ndf[$c++]) {
 						case '{': $n++; break;
 						case '}': $n--;
 					}
 				// Check if any value there
-				preg_match_all ('/(geo_[a-z_0-9]+)/', substr ($ndf, 0, $c), $match);
-				foreach ($match[0] AS $m)
-					if ($post_data[$m])
+				preg_match_all ('/(geo_[a-z_0-9]+)\|[^\|]+\|([a-z]+)/', substr ($ndf, 0, $c), $match);
+				foreach ($match[1] AS $k=>$m)
+					if ($post_data[$m] &&
+						($match[2][$k] != 'confidentiel' || $this->user->data['is_registered']))
 						$vars['DISPLAY'] = true; // Decide to display the title
 			}
 
@@ -751,12 +753,15 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 				}
 
+				// sql_id|titre|confidentiel|invite
 				// sql_id|titre|court|invite
 				else {
 					$vars['TAG'] = 'input';
 					$vars['SIZE'] = '40';
 					$vars['CLASS'] = 'inputbox autowidth';
 					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
+					if ($dfs[2] == 'confidentiel' && !$this->user->data['is_registered'])
+						$vars['DISPLAY_VALUE'] = null;
 				}
 			} //TODO-BEST DELETE pourquoi as-ton besoin du test précédent ?
 //else/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_COOKIE,true).'</pre>';
