@@ -36,7 +36,6 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 //TODO-BEST		$this->extension_manager = $extension_manager;
 //TODO-BEST		$this->root_path = $root_path;
-//TODO test protections
 //TODO ASPIR ??? recherche par département / commune
 	}
 
@@ -155,7 +154,9 @@ class listener implements EventSubscriberInterface
 		$post_id = $vars['row']['post_id'];
 		$this->template->assign_vars ([
 			'TOPIC_FIRST_POST_ID' => $vars['topic_data']['topic_first_post_id'],
-			'TOPIC_AUTH_EDIT' => $this->auth->acl_get('f_edit', $vars['row']['forum_id']),
+			'TOPIC_AUTH_EDIT' =>
+				$this->auth->acl_get('m_edit', $vars['row']['forum_id']) ||
+				$vars['topic_data']['topic_poster'] == $this->user->data['user_id'],
 		]);
 		$this->geobb_activate_map($vars['topic_data']['forum_desc']);
 
