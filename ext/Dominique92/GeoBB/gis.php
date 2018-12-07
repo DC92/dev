@@ -30,10 +30,11 @@ $bbox_sql =
 $diagBbox = hypot ($bboxs[2] - $bboxs[0], $bboxs[3] - $bboxs[1]); // Hypothènuse de la bbox
 
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
-$limite = request_var ('limite', 250); // Nombre de points maximum
+$limit = request_var ('limit', 250); // Nombre de points maximum
+$exclude = request_var ('exclude', 0); // topic_id to exclude
 $format = $format_app = request_var ('format', 'json');
 if ($format == 'gpx') {
-	$limite = 10000;
+	$limit = 10000;
 	$diagBbox = 0; // Pas d'optimisation
 }
 
@@ -57,6 +58,7 @@ $sql_array = [
 		'ON' => 'f.forum_id = p.forum_id',
 	]],
 	'WHERE' => [
+		't.topic_id != '.$exclude,
 		'geom IS NOT NULL',
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))'),geom)",
 		'post_visibility = '.ITEM_APPROVED,
@@ -90,7 +92,7 @@ if (is_array ($sql_array ['WHERE'])) {
 	$sql_array ['WHERE'] = implode (' AND ', $sql_array ['WHERE']);
 }
 $sql = $db->sql_build_query('SELECT', $sql_array);
-$result = $db->sql_query_limit($sql, $limite);
+$result = $db->sql_query_limit($sql, $limit);
 
 // Ajoute l'adresse complète aux images d'icones
 $sp = explode ('/', getenv('REQUEST_SCHEME'));

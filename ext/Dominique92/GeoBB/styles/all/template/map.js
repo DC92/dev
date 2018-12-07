@@ -71,12 +71,13 @@ function layerStyle(properties, id, hover) {
 	if (properties.id == id)
 		return {
 			fill: new ol.style.Fill({
-				color: 'rgba(0,0,0,0.3)'
+				color: 'rgba(255,255,255,0.2)'
 			}),
 			stroke: new ol.style.Stroke({
-				color: 'black'
+				color: '#48C'
 			})
 		};
+	//TODO faire couleur gris + noir par défaut de l'éditeur et celui sélecté.
 
 	var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
 		colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
@@ -90,17 +91,17 @@ function layerStyle(properties, id, hover) {
 	};
 }
 
-function geoLayer(id, silent) {
+function geoLayer(idColor, idExclude, noHover) {
 	return layerVectorURL({
-		url: 'ext/Dominique92/GeoBB/gis.php?limite=10000&',
+		url: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude='+idExclude+'&',
 		style: function(properties) {
-			return layerStyle(properties, id);
+			return layerStyle(properties, idColor);
 		},
 		hover: function(properties) {
-			return layerStyle(properties, id, true);
+			return layerStyle(properties, idColor, !noHover);
 		},
 		label: function(properties) {
-			return silent ? null : '<a href="viewtopic.php?t=' + properties.id+'">'+properties.name+'<a>';
+			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id+'">'+properties.name+'<a>';
 		},
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;

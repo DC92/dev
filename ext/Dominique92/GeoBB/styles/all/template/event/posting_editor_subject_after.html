@@ -82,7 +82,7 @@
 	var map, editable;
 
 	window.addEventListener('load', function() {
-		var overlay = geoLayer({TOPIC_ID}, true), //TODO ASPIR ne pas afficher du tout le polygone TOPIC_ID
+		var overlay = geoLayer(0, {TOPIC_ID}, true),
 			edit = controlEdit('editable-json', [overlay], true),
 			poly = controlEditCreate('Polygon'),
 			extent = edit.source.getExtent(),

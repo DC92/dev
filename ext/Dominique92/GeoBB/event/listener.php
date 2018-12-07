@@ -480,6 +480,7 @@ class listener implements EventSubscriberInterface
 							break;
 					}
 			}
+			//TODO supprimer les - dans le nom ! (sauf " - "
 			$update['geo_ign'] = implode ('<br/>', $igns);
 		}
 
