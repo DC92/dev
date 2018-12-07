@@ -44,13 +44,17 @@
 				<!-- ENDIF -->
 				{info.POSTAMBULE}
 				<!-- BEGIN attaches -->
-					<p> &nbsp; &nbsp; <a href="viewtopic.php?t={attaches.TOPIC_ID}">{attaches.POST_SUBJECT}</a></p>
+					<p> &nbsp; &nbsp; <b><a href="viewtopic.php?t={attaches.TOPIC_ID}" title="voir la fiche">{attaches.POST_SUBJECT}</a></b></p>
+					<!-- BEGIN detail -->
+						<!-- IF detail.DISPLAY_VALUE and detail.DISPLAY_VALUE != TOPIC_ID -->
+							&nbsp; &nbsp; &nbsp; &nbsp; {detail.INNER} : {detail.DISPLAY_VALUE} {info.POSTAMBULE}<br/>
+						<!-- ENDIF -->
+					<!-- END detail -->
 				<!-- END attaches -->
 			</{info.TAG1}>
 		<!-- ENDIF -->
 	<!-- END info -->
-
-	<!-- //TODO-BEST météo idem WRI -->
+	<!-- //TODO-CHEM météo idem WRI -->
 </div>
 
 <div class="action-bar">

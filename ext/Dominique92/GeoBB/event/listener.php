@@ -180,7 +180,7 @@ class listener implements EventSubscriberInterface
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
 				$this->get_automatic_data($post_data);
-				$this->topic_fields($post_data, $vars['topic_data']['forum_desc'], $vars['topic_data']['forum_name']);
+				$this->topic_fields('info', $post_data, $vars['topic_data']['forum_desc'], $vars['topic_data']['forum_name']);
 
 				// Assign geo_ vars to template for these used out of topic_fields
 				foreach ($post_data AS $k=>$v)
@@ -259,7 +259,7 @@ class listener implements EventSubscriberInterface
 				$page_data[strtoupper ($k)] =
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 
-		$this->topic_fields($post_data, $post_data['forum_desc'], $post_data['forum_name']);
+		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name']);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// HORRIBLE phpbb hack to accept geom values //TODO-BEST : check if done by PhpBB (supposed 3.2)
@@ -585,7 +585,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 	}
 
 	// Form management
-	function topic_fields ($post_data, $forum_desc, $forum_name) {
+	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name) {
 		//TODO ASPIR URGENT masquer certains champs (ref berger précédent)
 		// Get form fields from the relative post
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
@@ -704,7 +704,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 					if (array_key_exists ($sql_id, $post_data)) {
 						$sql = "
-							SELECT topic_id, post_subject
+							SELECT *
 							FROM ".POSTS_TABLE."
 								JOIN ".FORUMS_TABLE." USING (forum_id)
 							WHERE forum_image LIKE '%{$dfs[3]}.png' AND
@@ -713,7 +713,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 							";
 						$result = $this->db->sql_query($sql);
 						while ($row = $this->db->sql_fetchrow($result))
-							$attaches[] = $row; //TODO BEST ASPIR expanser les valeurs geo_ (il manque le titre des lignes du formulaire)
+							$attaches[] = $row;
+
 						$this->db->sql_freeresult($result);
 						if (!count ($attaches))
 							$vars['ATT_STYLE_TAG1'] = ' style="display:none"';
@@ -767,16 +768,21 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				if ($v)
 					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
 
-			$this->template->assign_block_vars('info', $vars);
+			$this->template->assign_block_vars($block_name, $vars);
 
-			if (count($options)) {
+			if (count($options) &&
+				count (explode ('.', $block_name)) == 1) {
 				foreach ($options AS $v)
-					$this->template->assign_block_vars('info.options', [
+					$this->template->assign_block_vars($block_name.'.options', [
 						'OPTION' => gettype($v) == 'string' ? $v : $v['post_subject'],
 						'VALUE' => gettype($v) == 'string' ? $v : $v['topic_id'],
 					]);
-				foreach ($attaches AS $v)
-					$this->template->assign_block_vars('info.attaches', array_change_key_case ($v, CASE_UPPER));
+
+				foreach ($attaches AS $v) {
+					$this->template->assign_block_vars($block_name.'.attaches', array_change_key_case ($v, CASE_UPPER));
+					if (count (explode ('.', $block_name)) == 1)
+						$this->topic_fields ($block_name.'.attaches.detail', $v, null, $v['forum_name']);
+				}
 			}
 		}
 	}
