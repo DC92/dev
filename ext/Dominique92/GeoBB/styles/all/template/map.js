@@ -75,7 +75,7 @@ var topicStyleOptions = {
 	})
 };
 
-function layerStyle(properties, id, hover) {
+function layerStyleOptions(properties, id, hover) {
 	if (properties.icon)
 		return {
 			image: new ol.style.Icon({
@@ -91,7 +91,7 @@ function layerStyle(properties, id, hover) {
 		colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',';
 	return {
 		fill: new ol.style.Fill({
-			color: hover ? colorTr + '0.3)' : colorTr + '0.5)'
+			color: hover ? colorTr + '0.2)' : colorTr + '0.5)'
 		}),
 		stroke: new ol.style.Stroke({
 			color: hover ? colorTr + '1)' : colorTr + '0.5)'
@@ -102,11 +102,11 @@ function layerStyle(properties, id, hover) {
 function geoLayer(idColor, idExclude, noHover) {
 	return layerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
-		style: function(properties) {
-			return layerStyle(properties, idColor);
+		styleOptions: function(properties) {
+			return layerStyleOptions(properties, idColor);
 		},
-		hover: function(properties) {
-			return layerStyle(properties, idColor, !noHover);
+		hoverStyleOptions: function(properties) {
+			return layerStyleOptions(properties, idColor, !noHover);
 		},
 		label: function(properties) {
 			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';

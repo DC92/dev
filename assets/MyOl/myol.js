@@ -348,10 +348,10 @@ function layerVectorURL(options) {
 			source: source,
 			zIndex: 1, // Above baselayer even if included to the map before
 			//TODO rename options.style => options.styleOptions
-			style: typeof options.style != 'function' ?
+			style: typeof options.styleOptions != 'function' ?
 				ol.style.Style.defaultFunction : function(feature) {
 					return new ol.style.Style(
-						options.style(feature.getProperties())
+						options.styleOptions(feature.getProperties())
 					);
 				}
 		});
@@ -416,7 +416,7 @@ function initLayerVectorURLListeners(e) {
 			hovered.forEach(function(h) {
 				if (h.layer && h.options)
 					h.feature.setStyle(new ol.style.Style(
-						h.options.style(h.feature.getProperties())
+						h.options.styleOptions(h.feature.getProperties())
 					));
 			});
 
@@ -449,9 +449,9 @@ function initLayerVectorURLListeners(e) {
 
 	function checkHovered(h) {
 		// Apply hover if any
-		var style = (h.options.hover || h.options.style)(h.properties);
+		var styleOptions = (h.options.hoverStyleOptions || h.options.styleOptions)(h.properties);
 		h.feature.setStyle(
-			new ol.style.Style(style)
+			new ol.style.Style(styleOptions)
 		);
 
 		// Hovering label
@@ -538,7 +538,7 @@ function layerPointsWri(options) {
 	return layerVectorURL({
 		url: '//www.refuges.info/api/bbox?type_points=',
 		selectorName: options.selectorName,
-		style: function(properties) {
+		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
 					src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
@@ -589,7 +589,7 @@ function layerOverpass(options) {
 			url: overpassUrl,
 			format: new ol.format.OSMXMLPOI(),
 			selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked
-			style: function(properties) {
+			styleOptions: function(properties) {
 				return {
 					image: new ol.style.Icon({
 						src: options.iconUrlPath + overpassType(properties) + '.png'

@@ -8,7 +8,7 @@ function layerMassifsWri() {
 	return layerVectorURL({
 		url: '//www.refuges.info/api/polygones?type_polygon=1',
 		selectorName: 'wri-massifs',
-		style: function(properties) {
+		styleOptions: function(properties) {
 			// Translates the color in RGBA to be transparent
 			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.couleur);
 			return {
@@ -20,7 +20,7 @@ function layerMassifsWri() {
 				})
 			};
 		},
-		hover: function(properties) {
+		hoverStyleOptions: function(properties) {
 			return {
 				fill: new ol.style.Fill({
 					color: properties.couleur
@@ -47,7 +47,7 @@ function chemineurLayer() {
 	return layerVectorURL({
 		url: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		selectorName: 'chemineur',
-		style: function(properties) {
+		styleOptions: function(properties) {
 			return {
 				// POI
 				image: new ol.style.Icon({
@@ -59,7 +59,7 @@ function chemineurLayer() {
 				})
 			};
 		},
-		hover: function(properties) {
+		hoverStyleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
 					src: properties.icone
