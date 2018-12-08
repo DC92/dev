@@ -80,11 +80,16 @@
 
 <script>
 	var map, editable;
-
 	window.addEventListener('load', function() {
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
-			edit = controlEdit('editable-json', [overlay], true),
-			poly = controlEditCreate('Polygon'),
+			edit = controlEdit('editable-json', {
+				snapLayers: [overlay],
+				editStyleOptions: topicStyleOptions,
+				enableAtInit: true
+			}),
+			poly = controlEditCreate('Polygon', {
+				editStyleOptions: topicStyleOptions
+			}),
 			extent = edit.source.getExtent(),
 			permalink = controlPermalink({
 				init: ol.extent.isEmpty(extent),
@@ -100,20 +105,20 @@
 					layers({GEO_KEYS})
 				),
 				<!-- IF GEO_MAP_TYPE == 'surface' -->
-					edit,
-					poly,
+				edit,
+				poly,
 				<!-- ENDIF -->
 				permalink
 			])
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
-			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permalink.paramsCenter, true);
-			map.addLayer(editable);
+		editable = marker('{EXT_DIR}images/viseur.png', 'editable', permalink.paramsCenter, true);
+		map.addLayer(editable);
 		<!-- ENDIF -->
 
 		// Center the map
-		if(!ol.extent.isEmpty(extent))
+		if (!ol.extent.isEmpty(extent))
 			map.getView().fit(
 				extent, {
 					maxZoom: 15

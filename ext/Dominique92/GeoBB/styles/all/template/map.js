@@ -59,6 +59,22 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 }
 */
 
+// The style of selected & edited topic
+var topicStyleOptions = {
+	image: new ol.style.Circle({
+		radius: 4,
+		fill: new ol.style.Fill({
+			color: 'yellow'
+		})
+	}),
+	fill: new ol.style.Fill({
+		color: 'rgba(0,0,0,0.3)'
+	}),
+	stroke: new ol.style.Stroke({
+		color: 'black'
+	})
+};
+
 function layerStyle(properties, id, hover) {
 	if (properties.icon)
 		return {
@@ -69,31 +85,23 @@ function layerStyle(properties, id, hover) {
 
 	// The selected property
 	if (properties.id == id)
-		return {
-			fill: new ol.style.Fill({
-				color: 'rgba(255,255,255,0.2)'
-			}),
-			stroke: new ol.style.Stroke({
-				color: '#48C'
-			})
-		};
-	//TODO faire couleur gris + noir par défaut de l'éditeur et celui sélecté.
+		return topicStyleOptions;
 
 	var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
-		colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)';
+		colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',';
 	return {
 		fill: new ol.style.Fill({
-			color: hover ? 'rgba(0,0,0,0.3)' : colorTr
+			color: hover ? colorTr + '0.3)' : colorTr + '0.5)'
 		}),
 		stroke: new ol.style.Stroke({
-			color: hover ? 'black' : colorTr
+			color: hover ? colorTr + '1)' : colorTr + '0.5)'
 		})
 	};
 }
 
 function geoLayer(idColor, idExclude, noHover) {
 	return layerVectorURL({
-		url: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude='+idExclude+'&',
+		url: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
 		style: function(properties) {
 			return layerStyle(properties, idColor);
 		},
@@ -101,7 +109,7 @@ function geoLayer(idColor, idExclude, noHover) {
 			return layerStyle(properties, idColor, !noHover);
 		},
 		label: function(properties) {
-			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id+'">'+properties.name+'<a>';
+			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
 		},
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;

@@ -25,9 +25,9 @@ ol.Map.prototype.renderFrame_ = function(time) {
 	ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
-//***************************************************************
+//============
 // TILE LAYERS
-//***************************************************************
+//============
 //TODO-BEST Superzoom
 /**
  * Openstreetmap
@@ -256,9 +256,9 @@ function layerBing(layer, key) {
 	});
 }
 
-//***************************************************************
+//===============================
 // VECTORS, GEOJSON & AJAX LAYERS
-//***************************************************************
+//===============================
 /**
  * Mem in cookies the checkbox content with name="selectorName"
  */
@@ -347,6 +347,7 @@ function layerVectorURL(options) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 1, // Above baselayer even if included to the map before
+			//TODO rename options.style => options.styleOptions
 			style: typeof options.style != 'function' ?
 				ol.style.Style.defaultFunction : function(feature) {
 					return new ol.style.Style(
@@ -841,9 +842,24 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	return layer;
 }
 
-//******************************************************************************
+/**
+ * JSON.parse handling error
+ */
+function JSONparse(json) {
+	var js;
+	if (json)
+		try {
+			js = JSON.parse(json);
+		} catch (returnCode) {
+			if (returnCode)
+				console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+		}
+	return js;
+}
+
+//=========
 // CONTROLS
-//******************************************************************************
+//=========
 /**
  * Control buttons
  * Abstract definition to be used by other control buttons definitions
@@ -907,7 +923,7 @@ function controlButton(options) {
 		if (newActive != control.active) {
 			if (options.activate || control.group)
 				control.active = newActive;
-			buttonElement.style.backgroundColor = control.active ? '#ccc' : 'white';
+			buttonElement.style.backgroundColor = control.active ? '#ef3' : 'white';
 
 			if (typeof options.activate == 'function')
 				options.activate(control.active);
@@ -1339,9 +1355,13 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton
  */
-function controlEdit(inputId, snapLayers, enableAtInit) {
+function controlEdit(inputId, options) {
+	options = options || {};
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
+		editStyleOptions = options.editStyleOptions ?
+		new ol.style.Style(options.editStyleOptions) :
+		null,
 		features = format.readFeatures(
 			JSONparse(inputEl.value || '{"type":"FeatureCollection","features":[]}'), {
 				featureProjection: 'EPSG:3857' // Read/write data as ESPG:4326 by default
@@ -1353,6 +1373,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
+			style: editStyleOptions,
 			zIndex: 20
 		}),
 		/*//TODO-CHEM hover reste aprés l'ajout d'un polygone
@@ -1366,6 +1387,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
+			style: editStyleOptions,
 			deleteCondition: function(evt) {
 				//HACK because the system don't trig singleClick
 				return ol.events.condition.altKeyOnly(evt) && ol.events.condition.click(evt);
@@ -1406,12 +1428,12 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 			//TODO-CHEM map_.addInteraction(hover);
 			map_.addInteraction(modify);
 			map_.addInteraction(snap);
-			button.toggle(enableAtInit);
+			button.toggle(options.enableAtInit);
 
 			// Snap on features external to the editor
-			if (snapLayers)
-				for (var s in snapLayers)
-					snapLayers[s].getSource().on('change', snapFeatures);
+			if (options.snapLayers)
+				for (var s in options.snapLayers)
+					options.snapLayers[s].getSource().on('change', snapFeatures);
 		}
 	}
 
@@ -1556,7 +1578,7 @@ function controlEdit(inputId, snapLayers, enableAtInit) {
 	return button;
 }
 
-function controlEditCreate(type) {
+function controlEditCreate(type, options) {
 	var button = controlButton({
 			group: 'edit',
 			label: type.charAt(0),
@@ -1572,6 +1594,8 @@ function controlEditCreate(type) {
 		}),
 		draw = new ol.interaction.Draw({
 			source: button.group.M.source,
+			style: options && options.editStyleOptions ?
+				new ol.style.Style(options.editStyleOptions) : null,
 			type: type
 		});
 
@@ -1685,19 +1709,4 @@ function layersCollection(keys) {
 		Watercolor: layerStamen('watercolor'),
 		'Neutre': new ol.layer.Tile()
 	};
-}
-
-/**
- * JSON.parse handling error
- */
-function JSONparse(json) {
-	var js;
-	if (json)
-		try {
-			js = JSON.parse(json);
-		} catch (returnCode) {
-			if (returnCode)
-				console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
-		}
-	return js;
 }

@@ -31,7 +31,7 @@ function layerMassifsWri() {
 			};
 		},
 		label: function(properties) {
-			return '<a href="'+properties.lien+'">'+properties.nom+'<a>';
+			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 		},
 		href: function(properties) {
 			return properties.lien;
@@ -71,7 +71,7 @@ function chemineurLayer() {
 			};
 		},
 		label: function(properties) {
-			return '<a href="'+properties.url+'">'+properties.nom+'<a>';
+			return '<a href="' + properties.url + '">' + properties.nom + '<a>';
 		},
 		href: function(properties) {
 			return properties.url;
@@ -82,12 +82,13 @@ function chemineurLayer() {
 //***************************************************************
 // EXAMPLE
 //***************************************************************
-var layerSwitcher = controlLayersSwitcher(layersCollection({
+var geo_keys = {
 		IGN: 'd27mzh49fzoki1v3aorusg6y', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 		thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
 		bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
 		// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
-	})),
+	},
+	layerSwitcher = controlLayersSwitcher(layersCollection(geo_keys)),
 	marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 	viseur = marker('http://www.refuges.info/images/viseur.png', 'viseur', null, true),
 	overlays = [
@@ -99,15 +100,42 @@ var layerSwitcher = controlLayersSwitcher(layersCollection({
 		layerOverpass(),
 		marqueur,
 		viseur
-	];
+	],
+	editStyleOptions = {
+		image: new ol.style.Circle({
+			radius: 4,
+			fill: new ol.style.Fill({
+				color: 'yellow'
+			}),
+			stroke: new ol.style.Stroke({
+				color: 'white',
+				width: 2 / 2
+			})
+		}),
+		fill: new ol.style.Fill({
+			color: 'green'
+		}),
+		stroke: new ol.style.Stroke({
+			color: 'red',
+			width: 2
+		})
+	};
 
 new ol.Map({
 	target: 'map',
 	controls: controlsCollection().concat([
 		layerSwitcher,
-		controlEdit('geojson', overlays, true),
-		controlEditCreate('LineString'),
-		controlEditCreate('Polygon')
+		controlEdit('geojson', {
+			snapLayers: overlays,
+			editStyleOptions: editStyleOptions,
+			enableAtInit: true
+		}),
+		controlEditCreate('LineString', {
+			editStyleOptions: editStyleOptions
+		}),
+		controlEditCreate('Polygon', {
+			editStyleOptions: editStyleOptions
+		})
 	]),
 	layers: overlays
 });
