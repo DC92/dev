@@ -44,7 +44,6 @@ class listener implements EventSubscriberInterface
 	static public function getSubscribedEvents() {
 		return [
 			// All
-			'core.user_setup' => 'user_setup',
 			'core.page_footer' => 'page_footer',
 
 			// Index
@@ -63,6 +62,42 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_end' => 'submit_post_end',
 		];
+	}
+
+	/**
+		ALL
+	*/
+	function page_footer() {
+//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
+
+		// Inclue les fichiers langages de cette extension
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+
+		// Assign post contents to some templates variables
+		$mode = $this-> request->variable('mode', '');
+		$msgs = [
+			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
+			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
+			'Bienvenue' => 'GEO_PRESENTATION',
+			'Aide' => 'GEO_URL_AIDE',
+			$mode == 'terms' ? 'Conditions d\'utilisation' : 'Politique de confidentialité' => 'AGREEMENT_TEXT',
+		];
+		foreach ($msgs AS $k=>$v) {
+			$sql = 'SELECT post_text, bbcode_uid, bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "'.$k.'" ORDER BY post_id';
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+			if ($row) {
+				$this->template->assign_var (
+					$v,
+					generate_text_for_display($row['post_text'],
+					$row['bbcode_uid'],
+					$row['bbcode_bitfield'],
+					OPTION_FLAG_BBCODE, true)
+				);
+			}
+		}
 	}
 
 
@@ -110,20 +145,6 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
-
-		// Affiche un message de bienvenue dépendant du style pour ceux qui ne sont pas connectés
-		// Le texte de ces messages sont dans les posts dont le titre est !style
-		$sql = 'SELECT post_text, bbcode_uid, bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "Bienvenue" ORDER BY post_id';
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-		$this->template->assign_var (
-			'GEO_PRESENTATION',
-			generate_text_for_display($row['post_text'],
-			$row['bbcode_uid'],
-			$row['bbcode_bitfield'],
-			OPTION_FLAG_BBCODE, true)
-		);
 	}
 
 	/**
@@ -350,32 +371,6 @@ class listener implements EventSubscriberInterface
 	/**
 		COMMON FUNCTIONS
 	*/
-	function page_footer() {
-//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
-
-		// Help toolbar link
-		$sql = 'SELECT topic_id FROM '.POSTS_TABLE.' WHERE post_subject = "Aide" ORDER BY post_id';
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-		$this->template->assign_var ('GEO_URL_AIDE', 'viewtopic.php?t='.$row['topic_id']);
-	}
-
-	function user_setup($vars) {
-		// Inclue les fichiers langages de cette extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
-
-/*
-		// On recherche les templates aussi dans l'extension
-		$ext = $this->extension_manager->all_enabled();
-		$ext[] = ''; // En dernier lieu, le style de base !
-		foreach ($ext AS $k=>$v)
-			$ext[$k] .= 'styles';
-		$this->template->set_style($ext);
-*/
-	}
-
 	function geobb_activate_map($forum_desc, $first_post = true) {
 		global $geo_keys; // Private / defined in config.php
 
@@ -475,12 +470,12 @@ class listener implements EventSubscriberInterface
 								$update['geo_reserve'] = $f->properties->nom;
 							break;
 						case 'carte':
-							$ms = explode(' ', $f->properties->nom);
-					$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">{$f->properties->nom}</a>";
+							$ms = explode(' ', str_replace ('-', ' ', $f->properties->nom));
+							$nom_carte = str_replace ('-', ' ', str_replace (' - ', ' : ', $f->properties->nom));
+							$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom_carte</a>";
 							break;
 					}
 			}
-			//TODO supprimer les - dans le nom ! (sauf " - "
 			$update['geo_ign'] = implode ('<br/>', $igns);
 		}
 

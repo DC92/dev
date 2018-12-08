@@ -347,7 +347,6 @@ function layerVectorURL(options) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 1, // Above baselayer even if included to the map before
-			//TODO rename options.style => options.styleOptions
 			style: typeof options.styleOptions != 'function' ?
 				ol.style.Style.defaultFunction : function(feature) {
 					return new ol.style.Style(
