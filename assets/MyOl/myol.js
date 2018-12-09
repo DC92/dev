@@ -30,27 +30,6 @@ ol.MyMap = function(options) {
 
 		return ol.Map.prototype.renderFrame_.call(this, time);
 	};
-
-/*//TODO DELETE	// Make a central check of hovering
-	this.hoveredFeature = null;
-	this.on('pointermove', function(evt) {
-		var hoveredFeature = null;
-		this.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-			hoveredFeature = feature;
-		}, {
-			hitTolerance: 6
-		});
-
-		if (this.hoveredFeature != hoveredFeature) {
-			if (this.hoveredFeature)
-				this.hoveredFeature.dispatchEvent('myol:hoveroff');
-			if (hoveredFeature)
-				hoveredFeature.dispatchEvent('myol:hoveron');
-
-			this.hoveredFeature = hoveredFeature;
-			this.dispatchEvent('myol:hoverchanged');
-		}
-	});*/
 };
 ol.inherits(ol.MyMap, ol.Map);
 
@@ -780,6 +759,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	if (json)
 		llInit = JSONparse(json).coordinates;
 
+	// The marker layer
 	var style = new ol.style.Style({
 			image: new ol.style.Icon(({
 				src: imageUrl,
@@ -1175,7 +1155,6 @@ function controlGPS() {
 /**
  * Control to displays the length of a line overflown
  */
-//TODO-HOVER color the measured line
 function controlLengthLine() {
 	var divElement = document.createElement('div'),
 		control = new ol.control.Control({
@@ -1190,7 +1169,6 @@ function controlLengthLine() {
 			evt.map.on('pointermove', function(evtm) {
 				divElement.innerHTML = ''; // Clear the measure if hover no feature
 
-				//TODO BUG ne détecte pas toujours (lignes chargées par vectorurl
 				evtm.map.forEachFeatureAtPixel(evtm.pixel, calculateLength, {
 					hitTolerance: 6
 				});
@@ -1201,16 +1179,6 @@ function controlLengthLine() {
 	function calculateLength(feature) {
 		if (!feature)
 			return false;
-
-		/*//TODO-HOVER idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
-			feature.setStyle(
-		      new ol.style.Style({
-		//          fill: new ol.style.Fill({opacity: 0.7}),
-		          stroke: new ol.style.Stroke({color: 'green'
-		          })
-		      })
-		  );
-		*/
 
 		var length = ol.sphere.getLength(feature.getGeometry());
 		if (length >= 100000)
@@ -1393,9 +1361,6 @@ function controlEdit(inputId, options) {
 	options = options || {};
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
-		editStyleOptions = options.editStyleOptions ?
-		new ol.style.Style(options.editStyleOptions) :
-		null,
 		features = format.readFeatures(
 			JSONparse(inputEl.value || '{"type":"FeatureCollection","features":[]}'), {
 				featureProjection: 'EPSG:3857' // Read/write data as ESPG:4326 by default
@@ -1407,25 +1372,25 @@ function controlEdit(inputId, options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			style: editStyleOptions,
 			zIndex: 20
-		}),
-		/*//TODO-HOVER hover reste aprés l'ajout d'un polygone
-		hover = new ol.interaction.Select({
+		});
+	if (options.editStyleOptions)
+		layer.setStyle(
+			new ol.style.Style(options.editStyleOptions)
+		);
+	var hover = new ol.interaction.Select({
 			layers: [layer],
+			style: options.hoverStyleOptions ?
+				new ol.style.Style(options.hoverStyleOptions) : null,
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6
-		}),*/
+		}),
 		snap = new ol.interaction.Snap({
 			source: source
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
-			style: editStyleOptions,
-			deleteCondition: function(evt) {
-				//HACK because the system don't trig singleClick
-				return ol.events.condition.altKeyOnly(evt) && ol.events.condition.click(evt);
-			}
+			style: layer.getStyle()
 		}),
 		button = controlButton({
 			group: 'edit',
@@ -1437,7 +1402,6 @@ function controlEdit(inputId, options) {
 				//TODO-CHEM only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			activate: function(active) {
-				//TODO-HOVER hover.setActive(!active); //TODO-CHEM ne pas réactiver hover sur les éditeurs
 				modify.setActive(active);
 			}
 		}),
@@ -1453,16 +1417,19 @@ function controlEdit(inputId, options) {
 			map_.addLayer(layer);
 			map_.sourceEditor = source; //HACK to make other control acting differently when there is an editor
 
+			button.toggle(options.enableAtInit);
+
 			//HACK Avoid zooming when you leave the mode by doubleclick
 			map_.getInteractions().getArray().forEach(function(i) {
 				if (i instanceof ol.interaction.DoubleClickZoom)
 					map_.removeInteraction(i);
 			});
 
-			//TODO-HOVER map_.addInteraction(hover);
 			map_.addInteraction(modify);
 			map_.addInteraction(snap);
-			button.toggle(options.enableAtInit);
+			map_.on('pointermove', function(evt) {
+				map_.addInteraction(hover);
+			});
 
 			// Snap on features external to the editor
 			if (options.snapLayers)
@@ -1478,6 +1445,7 @@ function controlEdit(inputId, options) {
 	}
 
 	modify.on('modifyend', function(evt) {
+		map_.removeInteraction(hover);
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {

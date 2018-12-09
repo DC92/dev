@@ -64,7 +64,7 @@ var topicStyleOptions = {
 	image: new ol.style.Circle({
 		radius: 4,
 		fill: new ol.style.Fill({
-			color: 'yellow'
+			color: 'black'
 		})
 	}),
 	fill: new ol.style.Fill({
@@ -72,6 +72,15 @@ var topicStyleOptions = {
 	}),
 	stroke: new ol.style.Stroke({
 		color: 'black'
+	})
+};
+var editStyleOptions = {
+	fill: new ol.style.Fill({
+		color: 'rgba(0,0,0,0.3)'
+	}),
+	stroke: new ol.style.Stroke({
+		color: 'black',
+		width: 2
 	})
 };
 

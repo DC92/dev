@@ -85,10 +85,11 @@
 			edit = controlEdit('editable-json', {
 				snapLayers: [overlay],
 				editStyleOptions: topicStyleOptions,
+				hoverStyleOptions: editStyleOptions,
 				enableAtInit: true
 			}),
 			poly = controlEditCreate('Polygon', {
-				editStyleOptions: topicStyleOptions
+				editStyleOptions: editStyleOptions
 			}),
 			extent = edit.source.getExtent(),
 			permalink = controlPermalink({

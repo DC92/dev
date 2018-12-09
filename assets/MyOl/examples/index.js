@@ -105,18 +105,19 @@ var geo_keys = {
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
-				color: 'yellow'
-			}),
-			stroke: new ol.style.Stroke({
-				color: 'white',
-				width: 2 / 2
+				color: '#46f'
 			})
 		}),
 		fill: new ol.style.Fill({
-			color: 'green'
+			color: 'rgb(0,0,0,0.3)'
 		}),
 		stroke: new ol.style.Stroke({
-			color: 'red',
+			color: '#46f'
+		})
+	},
+	hoverStyleOptions = {
+		stroke: new ol.style.Stroke({
+			color: '#46f',
 			width: 2
 		})
 	};
@@ -128,13 +129,14 @@ new ol.MyMap({
 		controlEdit('geojson', {
 			snapLayers: overlays,
 			editStyleOptions: editStyleOptions,
+			hoverStyleOptions: hoverStyleOptions,
 			enableAtInit: true
 		}),
 		controlEditCreate('LineString', {
-			editStyleOptions: editStyleOptions
+			editStyleOptions: hoverStyleOptions
 		}),
 		controlEditCreate('Polygon', {
-			editStyleOptions: editStyleOptions
+			editStyleOptions: hoverStyleOptions
 		})
 	]),
 	layers: overlays
