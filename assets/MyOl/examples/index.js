@@ -121,7 +121,7 @@ var geo_keys = {
 		})
 	};
 
-new ol.Map({
+new ol.MyMap({
 	target: 'map',
 	controls: controlsCollection().concat([
 		layerSwitcher,

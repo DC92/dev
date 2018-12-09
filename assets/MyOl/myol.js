@@ -12,22 +12,52 @@
 //TODO-BEST map off line, application
 
 /**
- * HACK send 'onAdd' event to layers when added to a map
+ * Add common functions to the Map object
  */
-ol.Map.prototype.renderFrame_ = function(time) {
-	var layers = this.getLayerGroup().getLayerStatesArray();
-	for (var i = 0, ii = layers.length; i < ii; ++i)
-		if (!layers[i].layer.map_) { // Only once
-			layers[i].layer.map_ = this; // Store the map where the layer is rendered
-			layers[i].layer.dispatchEvent('onadd');
+ol.MyMap = function(options) {
+	ol.Map.call(this, options);
+
+	// Each time we can
+	this.renderFrame_ = function(time) {
+		// Check if there is a new layer
+		var layers = this.getLayerGroup().getLayerStatesArray();
+		for (var i = 0, ii = layers.length; i < ii; ++i)
+			if (!layers[i].layer.map_) { // Only once
+				// Store the map on it & advise it
+				layers[i].layer.map_ = this;
+				layers[i].layer.dispatchEvent('myol:onadd');
+			}
+
+		return ol.Map.prototype.renderFrame_.call(this, time);
+	};
+
+/*//TODO DELETE	// Make a central check of hovering
+	this.hoveredFeature = null;
+	this.on('pointermove', function(evt) {
+		var hoveredFeature = null;
+		this.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+			hoveredFeature = feature;
+		}, {
+			hitTolerance: 6
+		});
+
+		if (this.hoveredFeature != hoveredFeature) {
+			if (this.hoveredFeature)
+				this.hoveredFeature.dispatchEvent('myol:hoveroff');
+			if (hoveredFeature)
+				hoveredFeature.dispatchEvent('myol:hoveron');
+
+			this.hoveredFeature = hoveredFeature;
+			this.dispatchEvent('myol:hoverchanged');
 		}
-
-	ol.PluggableMap.prototype.renderFrame_.call(this, time);
+	});*/
 };
+ol.inherits(ol.MyMap, ol.Map);
 
-//============
-// TILE LAYERS
-//============
+
+/**
+ * TILE LAYERS
+ */
 //TODO-BEST Superzoom
 /**
  * Openstreetmap
@@ -143,14 +173,14 @@ function layerSpain(serveur, layer) {
  * Virtual class
  * Displays OSM outside the zoom area, 
  * Displays blank outside of validity area
- * Requires 'onadd' layer event
+ * Requires 'myol:onadd' layer event
  */
 function layerTileIncomplete(extent, sources) {
 	var layer = new ol.layer.Tile(),
 		backgroundSource = new ol.source.Stamen({
 			layer: 'terrain'
 		});
-	layer.on('onadd', function(evt) {
+	layer.on('myol:onadd', function(evt) {
 		evt.target.map_.getView().on('change', change);
 		change(); // At init
 	});
@@ -256,9 +286,9 @@ function layerBing(layer, key) {
 	});
 }
 
-//===============================
-// VECTORS, GEOJSON & AJAX LAYERS
-//===============================
+/**
+ * VECTORS, GEOJSON & AJAX LAYERS
+ */
 /**
  * Mem in cookies the checkbox content with name="selectorName"
  */
@@ -324,7 +354,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires 'onadd' layer event
+ * Requires 'myol:onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
@@ -365,7 +395,7 @@ function layerVectorURL(options) {
 	}
 
 	layer.options_ = options; //HACK Mem options for interactions
-	layer.on('onadd', initLayerVectorURLListeners);
+	layer.on('myol:onadd', initLayerVectorURLListeners);
 
 	return layer;
 }
@@ -733,7 +763,7 @@ function layerOverpass(options) {
 /**
  * Marker
  * Requires proj4.js for swiss coordinates
- * Requires 'onadd' layer event
+ * Requires 'myol:onadd' layer event
  */
 //TODO-BEST pointer finger sur la cible
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
@@ -771,7 +801,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			zIndex: 10
 		});
 
-	layer.on('onadd', function(evt) {
+	layer.on('myol:onadd', function(evt) {
 		if (dragged) {
 			// Drag and drop
 			evt.target.map_.addInteraction(new ol.interaction.Modify({
@@ -856,9 +886,9 @@ function JSONparse(json) {
 	return js;
 }
 
-//=========
-// CONTROLS
-//=========
+/**
+ * CONTROLS
+ */
 /**
  * Control buttons
  * Abstract definition to be used by other control buttons definitions
@@ -1153,11 +1183,11 @@ function controlLengthLine() {
 			render: render
 		});
 
-	function render(evt) {
+	function render(evt) { //TODO make an onadd evt for controls
 		if (!divElement.className) { // Only once
 			divElement.className = 'ol-length-line';
 
-			evt.map.on(['pointermove'], function(evtm) {
+			evt.map.on('pointermove', function(evtm) {
 				divElement.innerHTML = ''; // Clear the measure if hover no feature
 
 				//TODO BUG ne détecte pas toujours (lignes chargées par vectorurl
@@ -1169,6 +1199,9 @@ function controlLengthLine() {
 	}
 
 	function calculateLength(feature) {
+		if (!feature)
+			return false;
+
 		/*//TODO-HOVER idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
 			feature.setStyle(
 		      new ol.style.Style({
@@ -1331,6 +1364,7 @@ function controlDownloadGPX() {
 }
 
 // HACK to display a title on the geocoder
+//TODO BEST ajuster le zoom geocoder pour le bon niveau IGN top25
 window.addEventListener('load', function() {
 	var buttonElement = document.getElementById('gcd-button-control');
 	if (buttonElement)

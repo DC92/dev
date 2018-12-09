@@ -15,6 +15,7 @@
 <!-- INCLUDEJS map.js -->
 
 <!-- //TODO-BEST Mettre ?date dans les liens des libs -->
+<!-- //TODO-BEST map redimensionnable -->
 
 <div class="map">
 	<div id="map"></div>
@@ -26,7 +27,7 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var map = new ol.Map({
+		var map = new ol.MyMap({
 			target: 'map',
 			layers: [
 /*
