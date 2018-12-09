@@ -447,7 +447,7 @@ function initLayerVectorURLListeners(e) {
 	}
 
 	function checkHovered(h) {
-		// Apply hover if any
+		// Apply hover style if any
 		var styleOptions = (h.options.hoverStyleOptions || h.options.styleOptions)(h.properties);
 		h.feature.setStyle(
 			new ol.style.Style(styleOptions)
@@ -1145,7 +1145,7 @@ function controlGPS() {
 /**
  * Control to displays the length of a line overflown
  */
-//TODO-CHEM color the measured line
+//TODO-HOVER color the measured line
 function controlLengthLine() {
 	var divElement = document.createElement('div'),
 		control = new ol.control.Control({
@@ -1160,6 +1160,7 @@ function controlLengthLine() {
 			evt.map.on(['pointermove'], function(evtm) {
 				divElement.innerHTML = ''; // Clear the measure if hover no feature
 
+				//TODO BUG ne détecte pas toujours (lignes chargées par vectorurl
 				evtm.map.forEachFeatureAtPixel(evtm.pixel, calculateLength, {
 					hitTolerance: 6
 				});
@@ -1168,11 +1169,11 @@ function controlLengthLine() {
 	}
 
 	function calculateLength(feature) {
-		/*//TODO-CHEM idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
-				f.setStyle(
+		/*//TODO-HOVER idée de hover à développer / inhibe modify !!! / effacer le style quand on quite
+			feature.setStyle(
 		      new ol.style.Style({
 		//          fill: new ol.style.Fill({opacity: 0.7}),
-		          stroke: new ol.style.Stroke({color: 'blue'
+		          stroke: new ol.style.Stroke({color: 'green'
 		          })
 		      })
 		  );
@@ -1182,9 +1183,9 @@ function controlLengthLine() {
 		if (length >= 100000)
 			divElement.innerHTML = (Math.round(length / 1000)) + ' km';
 		else if (length >= 10000)
-			divElement.innerHTML = (Math.round(length / 1000 * 10) / 10) + ' km';
+			divElement.innerHTML = (Math.round(length / 100) / 10) + ' km';
 		else if (length >= 1000)
-			divElement.innerHTML = (Math.round(length / 1000 * 100) / 100) + ' km';
+			divElement.innerHTML = (Math.round(length / 10) / 100) + ' km';
 		else if (length >= 1)
 			divElement.innerHTML = (Math.round(length)) + ' m';
 		return false; // Continue detection (for editor that has temporary layers)
@@ -1375,7 +1376,7 @@ function controlEdit(inputId, options) {
 			style: editStyleOptions,
 			zIndex: 20
 		}),
-		/*//TODO-CHEM hover reste aprés l'ajout d'un polygone
+		/*//TODO-HOVER hover reste aprés l'ajout d'un polygone
 		hover = new ol.interaction.Select({
 			layers: [layer],
 			condition: ol.events.condition.pointerMove,
@@ -1402,7 +1403,7 @@ function controlEdit(inputId, options) {
 				//TODO-CHEM only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			activate: function(active) {
-				//TODO-CHEM hover.setActive(!active); //TODO-CHEM ne pas réactiver hover sur les éditeurs
+				//TODO-HOVER hover.setActive(!active); //TODO-CHEM ne pas réactiver hover sur les éditeurs
 				modify.setActive(active);
 			}
 		}),
@@ -1424,7 +1425,7 @@ function controlEdit(inputId, options) {
 					map_.removeInteraction(i);
 			});
 
-			//TODO-CHEM map_.addInteraction(hover);
+			//TODO-HOVER map_.addInteraction(hover);
 			map_.addInteraction(modify);
 			map_.addInteraction(snap);
 			button.toggle(options.enableAtInit);
