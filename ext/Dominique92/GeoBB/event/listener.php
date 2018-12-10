@@ -9,7 +9,7 @@
 
 namespace Dominique92\GeoBB\event;
 
-define('SQL_PRE', ''); //TODO-BEST MySQL 5.7+ 'ST_'
+define('SQL_PRE', ''); //TODO-ARCHI MySQL 5.7+ 'ST_'
 
 if (!defined('IN_PHPBB'))
 {
@@ -36,7 +36,7 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 //TODO-BEST		$this->extension_manager = $extension_manager;
 //TODO-BEST		$this->root_path = $root_path;
-//TODO ASPIR ??? recherche par département / commune
+//TODO-ASPIR ??? recherche par département / commune
 	}
 
 	// Liste des hooks et des fonctions associées
@@ -141,7 +141,7 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
-//TODO-CHEM				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
+//TODO				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
@@ -694,7 +694,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				}
 
 				// sql_id|titre|attaches
-				//TODO BEST ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
+				//TODO-BEST-ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
 					$vars['TAG'] = 'input';
 					$vars['TYPE'] = 'hidden';
@@ -760,7 +760,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 					if ($dfs[2] == 'confidentiel' && !$this->user->data['is_registered'])
 						$vars['DISPLAY_VALUE'] = null;
 				}
-			} //TODO-BEST DELETE pourquoi as-ton besoin du test précédent ?
+			} //TODO-ARCHI DELETE pourquoi as-ton besoin du test précédent ?
 //else/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_COOKIE,true).'</pre>';
 
 			$vars['NAME'] = $sql_id.'-'.$vars['SQL_TYPE'];

@@ -9,7 +9,7 @@
  * I know, I know, this is not up to date way of programming but thtat's my choice & you are free to take it, modifiy & adapt as you wish
  */
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
-//TODO-BEST map off line, application
+//TODO-ARCHI map off line, application
 
 /**
  * Add common functions to the Map object
@@ -271,7 +271,7 @@ function layerBing(layer, key) {
 /**
  * Mem in cookies the checkbox content with name="selectorName"
  */
-//TODO-BEST when unchecked, remove cookie
+//TODO-ARCHI when unchecked, remove cookie
 function controlPermanentCheckbox(selectorName, callback) {
 	var checkElements = document.getElementsByName(selectorName),
 		cookie =
@@ -380,7 +380,7 @@ function layerVectorURL(options) {
 }
 
 // We use only one listener for hover and one for click on all vector layers
-//TODO-BEST mettre cette fonction dans layerVectorURL
+//TODO-ARCHI mettre cette fonction dans layerVectorURL
 function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 
@@ -431,9 +431,9 @@ function initLayerVectorURLListeners(e) {
 		// Search the hovered feature(s)
 		hovered = [];
 		map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-			//TODO-BEST make a separate function / pb : visibility of evt.pixel & hovered[]
+			//TODO-ARCHI make a separate function / pb : visibility of evt.pixel & hovered[]
 			if (layer && layer.options_) {
-				var h = { //TODO-BEST simplifier la structure
+				var h = { //TODO-ARCHI simplifier la structure
 					pixel: evt.pixel, // Follow the mouse if line or surface
 					feature: feature,
 					layer: layer,
@@ -463,8 +463,8 @@ function initLayerVectorURLListeners(e) {
 		);
 
 		// Hovering label
-		var label = typeof h.options.label == 'function' ? //TODO-BEST faire une fonction englobante d'appel avec arguments...
-			h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO-BEST utiliser args...
+		var label = typeof h.options.label == 'function' ? //TODO-ARCHI faire une fonction englobante d'appel avec arguments...
+			h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO-ARCHI utiliser args...
 			h.options.label || '',
 			postLabel = typeof h.options.postLabel == 'function' ?
 			h.options.postLabel(h.properties, h.feature, h.layer, h.pixel, h.ll4326) :
@@ -880,11 +880,11 @@ function JSONparse(json) {
  * options.render {function} called when the control is rendered.
  * options.action {function} called when the control is clicked.
  */
-//TODO-BEST ASPIR Aligner les boutons (un trou ! = GPS)
+//TODO ASPIR Aligner les boutons (un trou ! = GPS)
 var nextButtonTopPos = 6, // Top position of next button (em)
 	globalControlGroups = {}; // List of group controls
 
-//TODO-BEST héritage de ol.control.Control ?
+//TODO-ARCHI héritage de ol.control.Control ?
 function controlButton(options) {
 	options = options || {
 		className: 'ol-control-hidden'
@@ -1162,7 +1162,7 @@ function controlLengthLine() {
 			render: render
 		});
 
-	function render(evt) { //TODO make an onadd evt for controls
+	function render(evt) { //TODO-ARCHI make an onadd evt for controls
 		if (!divElement.className) { // Only once
 			divElement.className = 'ol-length-line';
 
@@ -1332,7 +1332,7 @@ function controlDownloadGPX() {
 }
 
 // HACK to display a title on the geocoder
-//TODO BEST ajuster le zoom geocoder pour le bon niveau IGN top25
+//TODO-BEST ajuster le zoom geocoder pour le bon niveau IGN top25
 window.addEventListener('load', function() {
 	var buttonElement = document.getElementById('gcd-button-control');
 	if (buttonElement)
@@ -1342,7 +1342,7 @@ window.addEventListener('load', function() {
 /**
  * Print control
  */
-//TODO-BEST impression full format page -> CSS
+//TODO-RANDO impression full format page -> CSS
 function controlPrint() {
 	return controlButton({
 		className: 'print-button',
@@ -1399,7 +1399,7 @@ function controlEdit(inputId, options) {
 			title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
 				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 				'Alt+cliquer sur un sommet pour le supprimer\n' +
-				//TODO-CHEM only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
+				//TODO-RANDO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
 				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
 			activate: function(active) {
 				modify.setActive(active);
@@ -1659,7 +1659,7 @@ function controlsCollection() {
 		controlgps,
 		controlLoadGPX(),
 		controlDownloadGPX(),
-		//TODO-CHEM controlPrint(),
+		//TODO-RANDO controlPrint(),
 	];
 }
 
