@@ -2,10 +2,10 @@ var _v=document.cookie,_r='COOKIES : ';if(typeof _v=='array'||typeof _v=='object
 
 /**
  * www.refuges.info areas layer
- * Requires layerVectorURL
+ * Requires ol.layer.LayerVectorURL
  */
 function layerMassifsWri() {
-	return layerVectorURL({
+	return new ol.layer.LayerVectorURL({
 		url: '//www.refuges.info/api/polygones?type_polygon=1',
 		selectorName: 'wri-massifs',
 		styleOptions: function(properties) {
@@ -41,10 +41,10 @@ function layerMassifsWri() {
 
 /**
  * chemineur.fr POI layer
- * Requires layerVectorURL
+ * Requires ol.layer.LayerVectorURL
  */
 function chemineurLayer() {
-	return layerVectorURL({
+	return new ol.layer.LayerVectorURL({
 		url: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		selectorName: 'chemineur',
 		styleOptions: function(properties) {
@@ -115,7 +115,7 @@ var geo_keys = {
 			color: '#46f'
 		})
 	},
-	hoverStyleOptions = {
+	hoverStyleOptions = { //TODO-ARCHI intégrer dans l'éditeur
 		stroke: new ol.style.Stroke({
 			color: '#46f',
 			width: 2

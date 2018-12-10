@@ -75,9 +75,8 @@ var topicStyleOptions = {
 	})
 };
 var editStyleOptions = {
-	fill: new ol.style.Fill({
-		color: 'rgba(0,0,0,0.3)'
-	}),
+	image: topicStyleOptions.image,
+	fill: topicStyleOptions.fill,
 	stroke: new ol.style.Stroke({
 		color: 'black',
 		width: 2
@@ -109,7 +108,7 @@ function layerStyleOptions(properties, id, hover) {
 }
 
 function geoLayer(idColor, idExclude, noHover) {
-	return layerVectorURL({
+	return new ol.layer.LayerVectorURL({
 		url: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
 		styleOptions: function(properties) {
 			return layerStyleOptions(properties, idColor);

@@ -37,7 +37,6 @@ ol.inherits(ol.MyMap, ol.Map);
 /**
  * TILE LAYERS
  */
-//TODO-BEST Superzoom
 /**
  * Openstreetmap
  */
@@ -337,7 +336,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
-function layerVectorURL(options) {
+ol.layer.LayerVectorURL = function(options) {
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
 			url: function(extent, resolution, projection) {
@@ -353,7 +352,9 @@ function layerVectorURL(options) {
 			format: options.format || new ol.format.GeoJSON()
 			//TODO-BEST JSON error handling : error + URL
 		}),
-		layer = new ol.layer.Vector({
+		layer = this;
+		
+	ol.layer.Vector.call(this, {
 			source: source,
 			zIndex: 1, // Above baselayer even if included to the map before
 			style: typeof options.styleOptions != 'function' ?
@@ -364,7 +365,7 @@ function layerVectorURL(options) {
 				}
 		});
 
-	// Optional checkboxes to tune layer parameters
+	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName) {
 		controlPermanentCheckbox(options.selectorName, function(evt, list) {
 			layer.setVisible(list.length);
@@ -372,15 +373,15 @@ function layerVectorURL(options) {
 				source.clear(); // Redraw the layer
 		});
 	}
+	
+	this.on('myol:onadd', initLayerVectorURLListeners);
 
-	layer.options_ = options; //HACK Mem options for interactions
-	layer.on('myol:onadd', initLayerVectorURLListeners);
-
-	return layer;
-}
+	this.options_ = options; //HACK Mem options for interactions
+};
+ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
 
 // We use only one listener for hover and one for click on all vector layers
-//TODO-ARCHI mettre cette fonction dans layerVectorURL
+//TODO-ARCHI mettre cette fonction dans ol.layer.LayerVectorURL
 function initLayerVectorURLListeners(e) {
 	var map = e.target.map_;
 
@@ -540,10 +541,10 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
 
 /**
  * www.refuges.info POI layer
- * Requires layerVectorURL
+ * Requires ol.layer.LayerVectorURL
  */
 function layerPointsWri(options) {
-	return layerVectorURL({
+	return new ol.layer.LayerVectorURL({
 		url: '//www.refuges.info/api/bbox?type_points=',
 		selectorName: options.selectorName,
 		styleOptions: function(properties) {
@@ -573,7 +574,7 @@ function layerPointsWri(options) {
  * OSM overpass POI layer
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
- * Requires layerVectorURL
+ * Requires ol.layer.LayerVectorURL
  */
 //TODO-IE BUG pas d'overpass sur IE
 //TODO-BEST BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
@@ -593,7 +594,7 @@ function layerOverpass(options) {
 
 	var elSelector = document.getElementById(options.selectorId),
 		checkElements = document.getElementsByName(options.selectorName),
-		layer = layerVectorURL({
+		layer = new ol.layer.LayerVectorURL({
 			url: overpassUrl,
 			format: new ol.format.OSMXMLPOI(),
 			selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked

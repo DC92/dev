@@ -91,7 +91,7 @@
 			poly = controlEditCreate('Polygon', {
 				editStyleOptions: editStyleOptions
 			}),
-			extent = edit.source.getExtent(),
+			extent = edit.source.getExtent(), //TODO-ARCHI pas optimal, ne devrait pas avoir besoin d'un éditeur si pas en mode surface
 			permalink = controlPermalink({
 				init: ol.extent.isEmpty(extent),
 				visible: true
@@ -114,8 +114,8 @@
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
-		editable = marker('{EXT_DIR}images/viseur.png', 'editable', permalink.paramsCenter, true);
-		map.addLayer(editable);
+			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permalink.paramsCenter, true);
+			map.addLayer(editable);
 		<!-- ENDIF -->
 
 		// Center the map
