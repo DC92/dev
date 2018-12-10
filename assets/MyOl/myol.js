@@ -337,6 +337,8 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  */
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
 ol.layer.LayerVectorURL = function(options) {
+	this.options_ = options; //HACK Mem options for interactions
+	
 	var source = new ol.source.Vector({
 			strategy: ol.loadingstrategy.bboxDependant,
 			url: function(extent, resolution, projection) {
@@ -352,7 +354,7 @@ ol.layer.LayerVectorURL = function(options) {
 			format: options.format || new ol.format.GeoJSON()
 			//TODO-BEST JSON error handling : error + URL
 		}),
-		layer = this;
+		layer = this; //TODO-ARCHI voir comment récupérer cette variable
 		
 	ol.layer.Vector.call(this, {
 			source: source,
@@ -373,134 +375,129 @@ ol.layer.LayerVectorURL = function(options) {
 				source.clear(); // Redraw the layer
 		});
 	}
-	
-	this.on('myol:onadd', initLayerVectorURLListeners);
 
-	this.options_ = options; //HACK Mem options for interactions
+	// We use only one listener for hover and one for click on all vector layers
+	this.on('myol:onadd', function () {
+		if (!this.map_.popElement_) { //HACK Only once for all layers
+			// Display a label when hover the feature
+			this.map_.popElement_ = document.createElement('a');
+			this.map_.popElement_.style.display = 'block';
+			var hovered = [], // Mem hovered elements to be able to undisplay them the same time
+				popup = new ol.Overlay({ // Only one popup reused for all hovering
+					element: this.map_.popElement_
+				});
+			this.map_.addOverlay(popup);
+
+			// Click on a feature
+		var map = this.map_; //TODO-ARCHI : voir comment passer cette variable !
+			this.map_.on('click', function(evt) {
+				evt.target.forEachFeatureAtPixel(
+					evt.pixel,
+					function() {
+						map.popElement_.click(); // Simulate a click on the label
+					}, {
+						hitTolerance: 6
+					});
+			});
+
+			this.map_.on('pointermove', pointerMove);
+		}
+
+		function pointerMove(evt) {//TODO-ARCHI intégrer à l'objet
+			var map = evt.target;
+			// Reset cursor & popup position
+			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
+			map.popElement_.removeAttribute('href');
+
+			var mapRect = map.getTargetElement().getBoundingClientRect(),
+				popupRect = map.popElement_.getBoundingClientRect();
+			if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
+				popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
+				popup.setPosition(undefined); // Hide label by default if none feature or his popup here
+
+			// Reset previous hovered styles
+			if (hovered)
+				hovered.forEach(function(h) {
+					if (h.layer && h.options)
+						h.feature.setStyle(new ol.style.Style(
+							h.options.styleOptions(h.feature.getProperties())
+						));
+				});
+
+			// Search the hovered feature(s)
+			hovered = [];
+			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+				//TODO-ARCHI make a separate function / pb : visibility of evt.pixel & hovered[]
+				if (layer && layer.options_) {
+					var h = { //TODO-ARCHI simplifier la structure
+						pixel: evt.pixel, // Follow the mouse if line or surface
+						feature: feature,
+						layer: layer,
+						options: layer.options_,
+						properties: feature.getProperties(),
+						coordinates: feature.getGeometry().flatCoordinates // If it's a point, just over it
+					};
+					if (typeof layer.options_.href == 'function')
+						h.href = layer.options_.href(h.properties);
+					if (h.coordinates.length == 2) // Stable if icon
+						h.pixel = map.getPixelFromCoordinate(h.coordinates);
+					h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
+
+					checkHovered(h);
+					hovered.push(h);
+				}
+			}, {
+				hitTolerance: 6
+			});
+		}
+
+		function checkHovered(h) {//TODO-ARCHI intégrer à l'objet
+			// Apply hover style if any
+			var styleOptions = (h.options.hoverStyleOptions || h.options.styleOptions)(h.properties);
+			h.feature.setStyle(
+				new ol.style.Style(styleOptions)
+			);
+
+			// Hovering label
+			var label = typeof h.options.label == 'function' ? //TODO-ARCHI faire une fonction englobante d'appel avec arguments...
+				h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO-ARCHI utiliser args...
+				h.options.label || '',
+				postLabel = typeof h.options.postLabel == 'function' ?
+				h.options.postLabel(h.properties, h.feature, h.layer, h.pixel, h.ll4326) :
+				h.options.postLabel || '';
+			if (label &&
+				!popup.getPosition()) { // Only for the first feature on the hovered stack
+				// Calculate the label's anchor
+				popup.setPosition(map.getView().getCenter()); // For popup size calculation
+
+				// Fill label class & text
+				map.popElement_.className = 'myPopup ' + (h.layer.options_.labelClass || '');
+				map.popElement_.innerHTML = label + postLabel;
+				if (h.href)
+					map.popElement_.href = h.href;
+
+				// Shift of the label to stay into the map regarding the pointer position
+				if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
+					h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ?
+						10 :
+						-map.popElement_.clientWidth - 10;
+					h.pixel[1] = 2;
+				} else {
+					h.pixel[0] -= map.popElement_.clientWidth / 2;
+					h.pixel[0] = Math.max(h.pixel[0], 0); // Bord gauche
+					h.pixel[0] = Math.min(h.pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
+					h.pixel[1] -= map.popElement_.clientHeight + 10;
+				}
+				popup.setPosition(map.getCoordinateFromPixel(h.pixel));
+
+				// Hover a clikable feature
+				if (h.href)
+					map.getViewport().style.cursor = 'pointer';
+			}
+		}
+	});
 };
 ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
-
-// We use only one listener for hover and one for click on all vector layers
-//TODO-ARCHI mettre cette fonction dans ol.layer.LayerVectorURL
-function initLayerVectorURLListeners(e) {
-	var map = e.target.map_;
-
-	if (!map.popElement_) { //HACK Only once for all layers
-		// Display a label when hover the feature
-		map.popElement_ = document.createElement('a');
-		map.popElement_.style.display = 'block';
-		var hovered = [], // Mem hovered elements to be able to undisplay them the same time
-			popup = new ol.Overlay({ // Only one popup reused for all hovering
-				element: map.popElement_
-			});
-		map.addOverlay(popup);
-
-		map.on('pointermove', pointerMove);
-
-		// Click on a feature
-		map.on('click', function(evt) {
-			map.forEachFeatureAtPixel(
-				evt.pixel,
-				function() {
-					map.popElement_.click(); // Simulate a click on the label
-				}, {
-					hitTolerance: 6
-				});
-		});
-	}
-
-	function pointerMove(evt) {
-		// Reset cursor & popup position
-		map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
-		map.popElement_.removeAttribute('href');
-
-		var mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = map.popElement_.getBoundingClientRect();
-		if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
-			popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
-			popup.setPosition(undefined); // Hide label by default if none feature or his popup here
-
-		// Reset previous hovered styles
-		if (hovered)
-			hovered.forEach(function(h) {
-				if (h.layer && h.options)
-					h.feature.setStyle(new ol.style.Style(
-						h.options.styleOptions(h.feature.getProperties())
-					));
-			});
-
-		// Search the hovered feature(s)
-		hovered = [];
-		map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-			//TODO-ARCHI make a separate function / pb : visibility of evt.pixel & hovered[]
-			if (layer && layer.options_) {
-				var h = { //TODO-ARCHI simplifier la structure
-					pixel: evt.pixel, // Follow the mouse if line or surface
-					feature: feature,
-					layer: layer,
-					options: layer.options_,
-					properties: feature.getProperties(),
-					coordinates: feature.getGeometry().flatCoordinates // If it's a point, just over it
-				};
-				if (typeof layer.options_.href == 'function')
-					h.href = layer.options_.href(h.properties);
-				if (h.coordinates.length == 2) // Stable if icon
-					h.pixel = map.getPixelFromCoordinate(h.coordinates);
-				h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
-
-				checkHovered(h);
-				hovered.push(h);
-			}
-		}, {
-			hitTolerance: 6
-		});
-	}
-
-	function checkHovered(h) {
-		// Apply hover style if any
-		var styleOptions = (h.options.hoverStyleOptions || h.options.styleOptions)(h.properties);
-		h.feature.setStyle(
-			new ol.style.Style(styleOptions)
-		);
-
-		// Hovering label
-		var label = typeof h.options.label == 'function' ? //TODO-ARCHI faire une fonction englobante d'appel avec arguments...
-			h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO-ARCHI utiliser args...
-			h.options.label || '',
-			postLabel = typeof h.options.postLabel == 'function' ?
-			h.options.postLabel(h.properties, h.feature, h.layer, h.pixel, h.ll4326) :
-			h.options.postLabel || '';
-		if (label &&
-			!popup.getPosition()) { // Only for the first feature on the hovered stack
-			// Calculate the label's anchor
-			popup.setPosition(map.getView().getCenter()); // For popup size calculation
-
-			// Fill label class & text
-			map.popElement_.className = 'myPopup ' + (h.layer.options_.labelClass || '');
-			map.popElement_.innerHTML = label + postLabel;
-			if (h.href)
-				map.popElement_.href = h.href;
-
-			// Shift of the label to stay into the map regarding the pointer position
-			if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-				h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ?
-					10 :
-					-map.popElement_.clientWidth - 10;
-				h.pixel[1] = 2;
-			} else {
-				h.pixel[0] -= map.popElement_.clientWidth / 2;
-				h.pixel[0] = Math.max(h.pixel[0], 0); // Bord gauche
-				h.pixel[0] = Math.min(h.pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-				h.pixel[1] -= map.popElement_.clientHeight + 10;
-			}
-			popup.setPosition(map.getCoordinateFromPixel(h.pixel));
-
-			// Hover a clikable feature
-			if (h.href)
-				map.getViewport().style.cursor = 'pointer';
-		}
-	}
-}
 
 /**
  * Feature format for reading data in the OSMXML format
