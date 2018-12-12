@@ -83,7 +83,7 @@ var editStyleOptions = {
 	})
 };
 
-function layerStyleOptions(properties, id, hover) {
+function layerStyleOptionsFunction(properties, id, hover) {
 	if (properties.icon)
 		return {
 			image: new ol.style.Icon({
@@ -109,12 +109,12 @@ function layerStyleOptions(properties, id, hover) {
 
 function geoLayer(idColor, idExclude, noHover) {
 	return new ol.layer.LayerVectorURL({
-		url: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
 		styleOptions: function(properties) {
-			return layerStyleOptions(properties, idColor);
+			return layerStyleOptionsFunction(properties, idColor);
 		},
 		hoverStyleOptions: function(properties) {
-			return layerStyleOptions(properties, idColor, !noHover);
+			return layerStyleOptionsFunction(properties, idColor, !noHover);
 		},
 		label: function(properties) {
 			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';

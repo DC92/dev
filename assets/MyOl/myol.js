@@ -5,11 +5,22 @@
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
  * You only have to include openlayers/dist .js & .css files & my 2 & that's it !
- * No classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only a pack of JS functions & CSS
- * I know, I know, this is not up to date way of programming but thtat's my choice & you are free to take it, modifiy & adapt as you wish
+ * A bit of classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only one file of JS functions & CSS
+ * I know, I know, this is not up to date way of programming but that's my choice & you are free to take it, modifiy & adapt as you wish
  */
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
 //TODO-ARCHI map off line, application
+
+/**
+ * Appends objects. The last one has the priority
+ */
+ol.assign = function() {
+	var r = {};
+	for (var a in arguments)
+		for (var v in arguments[a])
+			r[v] = arguments[a][v];
+	return r;
+}
 
 /**
  * Add common functions to the Map object
@@ -336,163 +347,167 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  */
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
-ol.layer.LayerVectorURL = function(options) {
-	this.options_ = options; //HACK Mem options for interactions
-	
-	var source = new ol.source.Vector({
-			strategy: ol.loadingstrategy.bboxDependant,
-			url: function(extent, resolution, projection) {
-				source.clear(); // Redraw the layer
-				var bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
-					list = permanentCheckboxList(options.selectorName).filter(function(evt) {
-						return evt !== 'on'; // Remove the "all" input (default value = "on")
-					});
-				return typeof options.url == 'function' ?
-					options.url(bbox, list, resolution) :
-					options.url + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-			},
-			format: options.format || new ol.format.GeoJSON()
-			//TODO-BEST JSON error handling : error + URL
-		}),
-		layer = this; //TODO-ARCHI voir comment récupérer cette variable
-		
-	ol.layer.Vector.call(this, {
-			source: source,
-			zIndex: 1, // Above baselayer even if included to the map before
-			style: typeof options.styleOptions != 'function' ?
-				ol.style.Style.defaultFunction : function(feature) {
-					return new ol.style.Style(
-						options.styleOptions(feature.getProperties())
-					);
-				}
-		});
+//TODO-BEST JSON error handling : error + URL
+ol.layer.LayerVectorURL = function(o) {
+	// Manage options
+	var this_ = this, // For callback functions
+		options = this.options_ = ol.assign({ // Default options
+			baseUrlFunction: function(bbox, list, resolution) {
+				return options.baseUrl + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
+			}
+		}, o);
+	if (options.styleOptions)
+		options.style = function(feature) {
+			return new ol.style.Style(
+				typeof options.styleOptions == 'function' ?
+				options.styleOptions(feature.getProperties()) :
+				options.styleOptions
+			);
+		}
+	if (options.hoverStyleOptions)
+		options.hoverStyle = function(feature) {
+			return new ol.style.Style(
+				typeof options.hoverStyleOptions == 'function' ?
+				options.hoverStyleOptions(feature.getProperties()) :
+				options.hoverStyleOptions
+			);
+		}
+
+	// Manage source & vector objects
+	var source = new ol.source.Vector(ol.assign({
+		strategy: ol.loadingstrategy.bboxDependant,
+		format: new ol.format.GeoJSON(),
+		url: function(extent, resolution, projection) {
+			source.clear(); // Redraw the layer
+			var bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
+				// Retreive checked parameters
+				list = permanentCheckboxList(options.selectorName).filter(function(evt) {
+					return evt !== 'on'; // Remove the "all" input (default value = "on")
+				});
+			return options.baseUrlFunction(bbox, list, resolution);
+		}
+	}, options));
+
+	ol.layer.Vector.call(this, ol.assign({
+		source: source,
+		zIndex: 1, // Above baselayer even if included to the map before
+		style: ol.style.Style.defaultFunction
+	}, options));
 
 	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName) {
 		controlPermanentCheckbox(options.selectorName, function(evt, list) {
-			layer.setVisible(list.length);
+			this_.setVisible(list.length);
 			if (list.length)
 				source.clear(); // Redraw the layer
 		});
 	}
 
 	// We use only one listener for hover and one for click on all vector layers
-	this.on('myol:onadd', function () {
-		if (!this.map_.popElement_) { //HACK Only once for all layers
+	this.on('myol:onadd', function() {
+		var map = this.map_;
+		if (!map.popElement_) { //HACK Only once for all layers
 			// Display a label when hover the feature
-			this.map_.popElement_ = document.createElement('a');
-			this.map_.popElement_.style.display = 'block';
-			var hovered = [], // Mem hovered elements to be able to undisplay them the same time
+			map.popElement_ = document.createElement('a');
+			map.popElement_.style.display = 'block';
+			var hoveredPixel,
+				hovered = [], // Mem hovered elements to be able to undisplay them the same time
 				popup = new ol.Overlay({ // Only one popup reused for all hovering
-					element: this.map_.popElement_
+					element: map.popElement_
 				});
-			this.map_.addOverlay(popup);
+			map.addOverlay(popup);
 
 			// Click on a feature
-		var map = this.map_; //TODO-ARCHI : voir comment passer cette variable !
-			this.map_.on('click', function(evt) {
+			map.on('click', function(evt) {
 				evt.target.forEachFeatureAtPixel(
 					evt.pixel,
 					function() {
-						map.popElement_.click(); // Simulate a click on the label
+						this_.map_.popElement_.click(); // Simulate a click on the label
 					}, {
 						hitTolerance: 6
 					});
 			});
 
-			this.map_.on('pointermove', pointerMove);
+			map.on('pointermove', pointerMove);
 		}
 
-		function pointerMove(evt) {//TODO-ARCHI intégrer à l'objet
-			var map = evt.target;
-			// Reset cursor & popup position
-			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
+		function pointerMove(evt) { //TODO-ARCHI intégrer à l'objet
+			hoveredPixel = evt.pixel, // Follow the mouse if line or surface
+
+				// Reset cursor & popup position
+				map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
 			map.popElement_.removeAttribute('href');
 
 			var mapRect = map.getTargetElement().getBoundingClientRect(),
 				popupRect = map.popElement_.getBoundingClientRect();
-			if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
-				popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
+			if (popupRect.left - 5 > mapRect.x + hoveredPixel[0] || mapRect.x + hoveredPixel[0] >= popupRect.right + 5 ||
+				popupRect.top - 5 > mapRect.y + hoveredPixel[1] || mapRect.y + hoveredPixel[1] >= popupRect.bottom + 5)
 				popup.setPosition(undefined); // Hide label by default if none feature or his popup here
 
-			// Reset previous hovered styles
+			// Reset previous not hovered styles
 			if (hovered)
 				hovered.forEach(function(h) {
-					if (h.layer && h.options)
-						h.feature.setStyle(new ol.style.Style(
-							h.options.styleOptions(h.feature.getProperties())
-						));
+					h.feature.setStyle(h.layer.options_.style);
 				});
 
 			// Search the hovered feature(s)
 			hovered = [];
-			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-				//TODO-ARCHI make a separate function / pb : visibility of evt.pixel & hovered[]
-				if (layer && layer.options_) {
-					var h = { //TODO-ARCHI simplifier la structure
-						pixel: evt.pixel, // Follow the mouse if line or surface
-						feature: feature,
-						layer: layer,
-						options: layer.options_,
-						properties: feature.getProperties(),
-						coordinates: feature.getGeometry().flatCoordinates // If it's a point, just over it
-					};
-					if (typeof layer.options_.href == 'function')
-						h.href = layer.options_.href(h.properties);
-					if (h.coordinates.length == 2) // Stable if icon
-						h.pixel = map.getPixelFromCoordinate(h.coordinates);
-					h.ll4326 = ol.proj.transform(h.coordinates, 'EPSG:3857', 'EPSG:4326');
-
-					checkHovered(h);
-					hovered.push(h);
-				}
-			}, {
+			map.forEachFeatureAtPixel(hoveredPixel, hovering, {
 				hitTolerance: 6
 			});
 		}
 
-		function checkHovered(h) {//TODO-ARCHI intégrer à l'objet
-			// Apply hover style if any
-			var styleOptions = (h.options.hoverStyleOptions || h.options.styleOptions)(h.properties);
-			h.feature.setStyle(
-				new ol.style.Style(styleOptions)
-			);
+		function hovering(feature, layer) {
+			if (layer && layer.options_) {
+				hovered.push({
+					feature: feature,
+					layer: layer,
+				});
 
-			// Hovering label
-			var label = typeof h.options.label == 'function' ? //TODO-ARCHI faire une fonction englobante d'appel avec arguments...
-				h.options.label(h.properties, h.feature, h.layer, h.pixel, h.ll4326) : //TODO-ARCHI utiliser args...
-				h.options.label || '',
-				postLabel = typeof h.options.postLabel == 'function' ?
-				h.options.postLabel(h.properties, h.feature, h.layer, h.pixel, h.ll4326) :
-				h.options.postLabel || '';
-			if (label &&
-				!popup.getPosition()) { // Only for the first feature on the hovered stack
-				// Calculate the label's anchor
-				popup.setPosition(map.getView().getCenter()); // For popup size calculation
+				var coordinates = feature.getGeometry().flatCoordinates, // If it's a point, just over it
+					ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
+				if (coordinates.length == 2) // Stable if icon
+					hoveredPixel = map.getPixelFromCoordinate(coordinates);
 
-				// Fill label class & text
-				map.popElement_.className = 'myPopup ' + (h.layer.options_.labelClass || '');
-				map.popElement_.innerHTML = label + postLabel;
-				if (h.href)
-					map.popElement_.href = h.href;
+				// Hovering style if any
+				if (layer.options_.hoverStyle)
+					feature.setStyle(layer.options_.hoverStyle);
 
-				// Shift of the label to stay into the map regarding the pointer position
-				if (h.pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-					h.pixel[0] += h.pixel[0] < map.getSize()[0] / 2 ?
-						10 :
-						-map.popElement_.clientWidth - 10;
-					h.pixel[1] = 2;
-				} else {
-					h.pixel[0] -= map.popElement_.clientWidth / 2;
-					h.pixel[0] = Math.max(h.pixel[0], 0); // Bord gauche
-					h.pixel[0] = Math.min(h.pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-					h.pixel[1] -= map.popElement_.clientHeight + 10;
+				// Hovering label
+				var label = typeof layer.options_.label == 'function' ? //TODO-ARCHI faire une fonction englobante d'appel avec arguments...
+					layer.options_.label(feature.getProperties(), feature, layer, hoveredPixel, ll4326) : //TODO-ARCHI utiliser args...
+					layer.options_.label || '',
+					postLabel = typeof layer.options_.postLabel == 'function' ?
+					layer.options_.postLabel(feature.getProperties(), feature, layer, hoveredPixel, ll4326) :
+					layer.options_.postLabel || '';
+
+				if (label &&
+					!popup.getPosition()) { // Only for the first feature on the hovered stack
+					// Calculate the label's anchor
+					popup.setPosition(map.getView().getCenter()); // For popup size calculation
+
+					// Fill label class & text
+					map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
+					map.popElement_.innerHTML = label + postLabel;
+					if (typeof layer.options_.href == 'function') {
+						map.popElement_.href = layer.options_.href(feature.getProperties());
+						map.getViewport().style.cursor = 'pointer';
+					}
+
+					// Shift of the label to stay into the map regarding the pointer position
+					if (hoveredPixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
+						hoveredPixel[0] += hoveredPixel[0] < map.getSize()[0] / 2 ?
+							10 :
+							-map.popElement_.clientWidth - 10;
+						hoveredPixel[1] = 2;
+					} else {
+						hoveredPixel[0] -= map.popElement_.clientWidth / 2;
+						hoveredPixel[0] = Math.max(hoveredPixel[0], 0); // Bord gauche
+						hoveredPixel[0] = Math.min(hoveredPixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
+						hoveredPixel[1] -= map.popElement_.clientHeight + 10;
+					}
+					popup.setPosition(map.getCoordinateFromPixel(hoveredPixel));
 				}
-				popup.setPosition(map.getCoordinateFromPixel(h.pixel));
-
-				// Hover a clikable feature
-				if (h.href)
-					map.getViewport().style.cursor = 'pointer';
 			}
 		}
 	});
@@ -542,7 +557,7 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  */
 function layerPointsWri(options) {
 	return new ol.layer.LayerVectorURL({
-		url: '//www.refuges.info/api/bbox?type_points=',
+		baseUrl: '//www.refuges.info/api/bbox?type_points=',
 		selectorName: options.selectorName,
 		styleOptions: function(properties) {
 			return {
@@ -578,7 +593,7 @@ function layerPointsWri(options) {
 //TODO-BEST afficher erreur 429 (Too Many Requests)
 function layerOverpass(options) {
 	var defaultOptions = {
-		url: '//overpass-api.de/api/interpreter',
+		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30,
 		selectorId: 'overpass', // Element containing all checkboxes
 		selectorName: 'overpass', // Checboxes
@@ -592,7 +607,7 @@ function layerOverpass(options) {
 	var elSelector = document.getElementById(options.selectorId),
 		checkElements = document.getElementsByName(options.selectorName),
 		layer = new ol.layer.LayerVectorURL({
-			url: overpassUrl,
+			baseUrlFunction: overpassUrl,
 			format: new ol.format.OSMXMLPOI(),
 			selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked
 			styleOptions: function(properties) {
@@ -632,7 +647,7 @@ function layerOverpass(options) {
 		} else if (elSelector)
 			elSelector.className = 'overpass-zoom-out';
 
-		return options.url +
+		return options.baseUrl +
 			'?data=[timeout:5];(' + // Not too much !
 			args.join('') +
 			');out center;'; // add center of areas

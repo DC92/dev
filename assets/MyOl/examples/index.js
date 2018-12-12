@@ -6,7 +6,7 @@ var _v=document.cookie,_r='COOKIES : ';if(typeof _v=='array'||typeof _v=='object
  */
 function layerMassifsWri() {
 	return new ol.layer.LayerVectorURL({
-		url: '//www.refuges.info/api/polygones?type_polygon=1',
+		baseUrl: '//www.refuges.info/api/polygones?type_polygon=1',
 		selectorName: 'wri-massifs',
 		styleOptions: function(properties) {
 			// Translates the color in RGBA to be transparent
@@ -45,7 +45,7 @@ function layerMassifsWri() {
  */
 function chemineurLayer() {
 	return new ol.layer.LayerVectorURL({
-		url: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		selectorName: 'chemineur',
 		styleOptions: function(properties) {
 			return {
