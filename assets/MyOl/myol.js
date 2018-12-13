@@ -28,16 +28,18 @@ ol.assign = function() {
 ol.MyMap = function(options) {
 	ol.Map.call(this, options);
 
-	// Each time we can
-	this.renderFrame_ = function(time) {
-		// Check if there is a new layer
-		var layers = this.getLayerGroup().getLayerStatesArray();
-		for (var i = 0, ii = layers.length; i < ii; ++i)
-			if (!layers[i].layer.map_) { // Only once
+	this.renderFrame_ = function() { // Each time we can
+		var map = this;
+		map.getLayers().forEach(setMap);
+		map.getControls().forEach(setMap);
+
+		function setMap(target) {
+			if (!target.map_) { // Only once
 				// Store the map on it & advise it
-				layers[i].layer.map_ = this;
-				layers[i].layer.dispatchEvent('myol:onadd');
+				target.map_ = map;
+				target.dispatchEvent('myol:onadd');
 			}
+		}
 
 		return ol.Map.prototype.renderFrame_.call(this, time);
 	};
@@ -474,8 +476,8 @@ ol.layer.LayerVectorURL = function(o) {
 					feature.setStyle(layer.options_.hoverStyle);
 
 				// Hovering label
-				var label = typeof layer.options_.label == 'function' ? //TODO-ARCHI faire une fonction englobante d'appel avec arguments...
-					layer.options_.label(feature.getProperties(), feature, layer, hoveredPixel, ll4326) : //TODO-ARCHI utiliser args...
+				var label = typeof layer.options_.label == 'function' ?
+					layer.options_.label(feature.getProperties(), feature) :
 					layer.options_.label || '',
 					postLabel = typeof layer.options_.postLabel == 'function' ?
 					layer.options_.postLabel(feature.getProperties(), feature, layer, hoveredPixel, ll4326) :
