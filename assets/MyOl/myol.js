@@ -28,21 +28,19 @@ ol.assign = function() {
 ol.MyMap = function(options) {
 	ol.Map.call(this, options);
 
-	this.renderFrame_ = function() { // Each time we can
-		var map = this;
-		map.getLayers().forEach(setMap);
-		map.getControls().forEach(setMap);
+	this.on('postrender', function() { // Each time we can
+		this.getLayers().forEach(setMap);
+		this.getControls().forEach(setMap);
+	});
 
-		function setMap(target) {
-			if (!target.map_) { // Only once
-				// Store the map on it & advise it
-				target.map_ = map;
-				target.dispatchEvent('myol:onadd');
-			}
+	var map = this;
+	function setMap(target) {
+		if (!target.map_) { // Only once
+			// Store the map on it & advise it
+			target.map_ = map;
+			target.dispatchEvent('myol:onadd');
 		}
-
-		return ol.Map.prototype.renderFrame_.call(this, time);
-	};
+	}
 };
 ol.inherits(ol.MyMap, ol.Map);
 
@@ -558,9 +556,8 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Requires ol.layer.LayerVectorURL
  */
 function layerPointsWri(options) {
-	return new ol.layer.LayerVectorURL({
+	return new ol.layer.LayerVectorURL(ol.assign({
 		baseUrl: '//www.refuges.info/api/bbox?type_points=',
-		selectorName: options.selectorName,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -568,20 +565,13 @@ function layerPointsWri(options) {
 				})
 			};
 		},
-		label: function(properties) {
+		label: function(properties) { // For click on the label
 			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 		},
-		postLabel: options.postLabel,
-		href: function(properties) {
+		href: function(properties) { // For click on icon
 			return properties.lien;
-		},
-		type: function(properties) {
-			return properties.type.icone;
-		},
-		name: function(properties) {
-			return properties.nom;
 		}
-	});
+	}, options));
 }
 
 /**
@@ -593,149 +583,18 @@ function layerPointsWri(options) {
 //TODO-IE BUG pas d'overpass sur IE
 //TODO-BEST BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 //TODO-BEST afficher erreur 429 (Too Many Requests)
-function layerOverpass(options) {
-	var defaultOptions = {
-		baseUrl: '//overpass-api.de/api/interpreter',
-		maxResolution: 30,
-		selectorId: 'overpass', // Element containing all checkboxes
-		selectorName: 'overpass', // Checboxes
-		labelClass: 'label-overpass',
-		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/'
-	};
-	options = options || {};
-	for (var d in defaultOptions)
-		options[d] = options[d] || defaultOptions[d];
-
-	var elSelector = document.getElementById(options.selectorId),
+layerOverpass = function(o) {
+	var options = ol.assign({ // Default options
+			baseUrl: '//overpass-api.de/api/interpreter',
+			maxResolution: 30, // Only call overpass if the map's resolution is lower
+			selectorId: 'overpass', // Element containing all checkboxes
+			selectorName: 'overpass', // Checboxes
+			labelClass: 'label-overpass',
+			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/'
+		}, o),
 		checkElements = document.getElementsByName(options.selectorName),
-		layer = new ol.layer.LayerVectorURL({
-			baseUrlFunction: overpassUrl,
-			format: new ol.format.OSMXMLPOI(),
-			selectorName: options.selectorName, // The layer is cleared & reloaded if one selector check is clicked
-			styleOptions: function(properties) {
-				return {
-					image: new ol.style.Icon({
-						src: options.iconUrlPath + overpassType(properties) + '.png'
-					})
-				};
-			},
-			labelClass: options.labelClass,
-			label: formatLabel,
-			postLabel: options.postLabel,
-			type: function(properties) {
-				return overpassType(properties);
-			},
-			name: function(properties) {
-				return properties.name;
-			}
-		});
+		elSelector = document.getElementById(options.selectorId);
 	elSelector.className = 'overpass'; // At the biginning
-
-	function overpassUrl(bbox, list, resolution) {
-		var bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
-			args = [];
-
-		if (resolution < (options.maxResolution)) { // Only for small areas
-			for (var l = 0; l < list.length; l++) {
-				var lists = list[l].split('+');
-				for (var ls = 0; ls < lists.length; ls++)
-					args.push(
-						'node' + lists[ls] + bb + // Ask for nodes in the bbox
-						'way' + lists[ls] + bb // Also ask for areas
-					);
-			}
-			if (elSelector)
-				elSelector.className = 'overpass';
-		} else if (elSelector)
-			elSelector.className = 'overpass-zoom-out';
-
-		return options.baseUrl +
-			'?data=[timeout:5];(' + // Not too much !
-			args.join('') +
-			');out center;'; // add center of areas
-	}
-
-	function formatLabel(p, f) { // properties, feature
-		p.name = p.name || p.alt_name || p.short_name || '';
-		var language = {
-				alpine_hut: 'Refuge gard&egrave;',
-				hotel: 'h&ocirc;tel',
-				camp_site: 'camping',
-				convenience: 'alimentation',
-				supermarket: 'supermarch&egrave;',
-				drinking_water: 'point d&apos;eau',
-				watering_place: 'abreuvoir',
-				fountain: 'fontaine',
-				telephone: 't&egrave;l&egrave;phone',
-				shelter: ''
-			},
-			phone = p.phone || p['contact:phone'],
-			address = [
-				p.address,
-				p['addr:housenumber'], p.housenumber,
-				p['addr:street'], p.street,
-				p['addr:postcode'], p.postcode,
-				p['addr:city'], p.city
-			],
-			popup = [
-				'<b>' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</b>', [
-					'<a target="_blank"',
-					'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '"',
-					'title="Voir la fiche d\'origine sur openstreetmap">',
-					(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
-					'*'.repeat(p.stars),
-					p.shelter_type == 'basic_hut' ? 'Abri' : '',
-					p.building == 'cabin' ? 'Cabane non gard&egrave;e' : '',
-					p.highway == 'bus_stop' ? 'Arr&ecirc;t de bus' : '',
-					p.waterway == 'water_point' ? 'Point d&apos;eau' : '',
-					p.natural == 'spring' ? 'Source' : '',
-					p.man_made == 'water_well' ? 'Puits' : '',
-					p.shop ? 'alimentation' : '',
-					typeof language[p.amenity] == 'string' ? language[p.amenity] : p.amenity,
-					'</a>'
-				].join(' '), [
-					p.rooms ? p.rooms + ' chambres' : '',
-					p.beds ? p.beds + ' lits' : '',
-					p.place ? p.place + ' places' : '',
-					p.capacity ? p.capacity + ' places' : '',
-					p.ele ? parseInt(p.ele, 10) + 'm' : ''
-				].join(' '),
-				phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9\+]+/ig, '') + '">' + phone + '</a>' : '',
-				p.email ? '&#9993;<a title="Envoyer un mail" href="mailto:' + p.email + '">' + p.email + '</a>' : '',
-				p['addr:street'] ? address.join(' ') : '',
-				p.website ? '&#8943;<a title="Voir le site web" target="_blank" href="' + p.website + '">' + (p.website.split('/')[2] || p.website) + '</a>' : '',
-				p.opening_hours ? 'ouvert ' + p.opening_hours : '',
-				p.note ? p.note : ''
-			];
-
-		// Other paramaters
-		var done = [ // These that have no added value or already included
-				'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
-				'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
-				'opening_hours,description,beds,bus,note',
-				'addr,housenumber,street,postcode,city,bus,public_transport,tactile_paving',
-				'ref,source,wheelchair,leisure,landuse,camp_site,bench,network,brand,bulk_purchase,organic',
-				'compressed_air,fuel,vending,vending_machine',
-				'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
-				'historic,motorcycle,drying,restaurant,hgv',
-				'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
-			].join(',').split(','),
-			nbInternet = 0;
-		for (var k in p) {
-			var k0 = k.split(':')[0];
-			if (!done.includes(k0))
-				switch (k0) {
-					case 'internet_access':
-						if ((p[k] != 'no') && !(nbInternet++))
-							popup.push('Accès internet');
-						break;
-					default:
-						popup.push(k + ' : ' + p[k]);
-				}
-		}
-
-		return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
-	}
 
 	function overpassType(properties) {
 		for (var e = 0; e < checkElements.length; e++)
@@ -751,8 +610,120 @@ function layerOverpass(options) {
 		return 'inconnu';
 	}
 
-	return layer;
-}
+	return new ol.layer.LayerVectorURL(ol.assign({
+		format: new ol.format.OSMXMLPOI(),
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: options.iconUrlPath + overpassType(properties) + '.png'
+				})
+			};
+		},
+		baseUrlFunction: function(bbox, list, resolution) {
+			var bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
+				args = [];
+
+			if (resolution < (options.maxResolution)) { // Only for small areas
+				for (var l = 0; l < list.length; l++) {
+					var lists = list[l].split('+');
+					for (var ls = 0; ls < lists.length; ls++)
+						args.push(
+							'node' + lists[ls] + bb + // Ask for nodes in the bbox
+							'way' + lists[ls] + bb // Also ask for areas
+						);
+				}
+				if (elSelector)
+					elSelector.className = 'overpass';
+			} else if (elSelector)
+				elSelector.className = 'overpass-zoom-out';
+
+			return options.baseUrl +
+				'?data=[timeout:5];(' + // Not too much !
+				args.join('') +
+				');out center;'; // add center of areas
+		},
+		label: function(p, f) { // properties, feature
+			p.name = p.name || p.alt_name || p.short_name || '';
+			var language = {
+					alpine_hut: 'Refuge gard&egrave;',
+					hotel: 'h&ocirc;tel',
+					camp_site: 'camping',
+					convenience: 'alimentation',
+					supermarket: 'supermarch&egrave;',
+					drinking_water: 'point d&apos;eau',
+					watering_place: 'abreuvoir',
+					fountain: 'fontaine',
+					telephone: 't&egrave;l&egrave;phone',
+					shelter: ''
+				},
+				phone = p.phone || p['contact:phone'],
+				address = [
+					p.address,
+					p['addr:housenumber'], p.housenumber,
+					p['addr:street'], p.street,
+					p['addr:postcode'], p.postcode,
+					p['addr:city'], p.city
+				],
+				popup = [
+					'<b>' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</b>', [
+						'<a target="_blank"',
+						'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '"',
+						'title="Voir la fiche d\'origine sur openstreetmap">',
+						(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
+						'*'.repeat(p.stars),
+						p.shelter_type == 'basic_hut' ? 'Abri' : '',
+						p.building == 'cabin' ? 'Cabane non gard&egrave;e' : '',
+						p.highway == 'bus_stop' ? 'Arr&ecirc;t de bus' : '',
+						p.waterway == 'water_point' ? 'Point d&apos;eau' : '',
+						p.natural == 'spring' ? 'Source' : '',
+						p.man_made == 'water_well' ? 'Puits' : '',
+						p.shop ? 'alimentation' : '',
+						typeof language[p.amenity] == 'string' ? language[p.amenity] : p.amenity,
+						'</a>'
+					].join(' '), [
+						p.rooms ? p.rooms + ' chambres' : '',
+						p.beds ? p.beds + ' lits' : '',
+						p.place ? p.place + ' places' : '',
+						p.capacity ? p.capacity + ' places' : '',
+						p.ele ? parseInt(p.ele, 10) + 'm' : ''
+					].join(' '),
+					phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9\+]+/ig, '') + '">' + phone + '</a>' : '',
+					p.email ? '&#9993;<a title="Envoyer un mail" href="mailto:' + p.email + '">' + p.email + '</a>' : '',
+					p['addr:street'] ? address.join(' ') : '',
+					p.website ? '&#8943;<a title="Voir le site web" target="_blank" href="' + p.website + '">' + (p.website.split('/')[2] || p.website) + '</a>' : '',
+					p.opening_hours ? 'ouvert ' + p.opening_hours : '',
+					p.note ? p.note : ''
+				];
+
+			// Other paramaters
+			var done = [ // These that have no added value or already included
+					'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
+					'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
+					'opening_hours,description,beds,bus,note',
+					'addr,housenumber,street,postcode,city,bus,public_transport,tactile_paving',
+					'ref,source,wheelchair,leisure,landuse,camp_site,bench,network,brand,bulk_purchase,organic',
+					'compressed_air,fuel,vending,vending_machine',
+					'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
+					'historic,motorcycle,drying,restaurant,hgv',
+					'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
+				].join(',').split(','),
+				nbInternet = 0;
+			for (var k in p) {
+				var k0 = k.split(':')[0];
+				if (!done.includes(k0))
+					switch (k0) {
+						case 'internet_access':
+							if ((p[k] != 'no') && !(nbInternet++))
+								popup.push('Accès internet');
+							break;
+						default:
+							popup.push(k + ' : ' + p[k]);
+					}
+			}
+			return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
+		}
+	}, options));
+};
 
 /**
  * Marker
