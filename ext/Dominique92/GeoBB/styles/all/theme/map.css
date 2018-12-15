@@ -1,5 +1,6 @@
 /* Englobant de la carte */
-#map-frame {
+#map-frame,
+.section-posting #map {
 	float: right;
 	background: white;
 	border-left: solid white 10px;
@@ -11,18 +12,25 @@
 
 /* Zone gérée par Openlayers */
 #map {
-	width: 50vw;
-	height: 60vw;
+	width: calc(33vw + 266px);
+	height: calc(33vw + 266px);
 	background-image: linear-gradient(#9AB4CB, #9BCB9A);
 }
 
 /* Responsive map for mobiles */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
 	#map-frame {
 		float: none;
-		border: none-left;
+		border-left: none;
 	}
 	#map {
+		width: 100%;
+	}
+}
+@media screen and (max-width: 900px) {
+	.section-posting #map {
+		float: none;
+		border-left: none;
 		width: 100%;
 	}
 }
