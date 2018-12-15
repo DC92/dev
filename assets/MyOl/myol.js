@@ -28,6 +28,9 @@ ol.assign = function() {
 ol.MyMap = function(options) {
 	ol.Map.call(this, options);
 
+	// Add ol.map object reference to the html #map element
+	this.getTargetElement().map_ = this;
+
 	this.on('postrender', function() { // Each time we can
 		this.getLayers().forEach(setMap);
 		this.getControls().forEach(setMap);
@@ -431,7 +434,7 @@ ol.layer.LayerVectorURL = function(o) {
 			map.on('pointermove', pointerMove);
 		}
 
-		function pointerMove(evt) { //TODO-ARCHI intégrer à l'objet
+		function pointerMove(evt) {
 			hoveredPixel = evt.pixel, // Follow the mouse if line or surface
 
 				// Reset cursor & popup position
@@ -1035,6 +1038,7 @@ function controlLayersSwitcher(baseLayers) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * options.defaultPos {<ZOOM>/<LON>/<LAT>/<LAYER>} if nothing else is defined.
  */
+//TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
 function controlPermalink(options) {
 	var divElement = document.createElement('div'),
 		aElement = document.createElement('a'),

@@ -37,6 +37,17 @@ function layers(keys) {
 	};
 }
 
+// Resize
+$('#map').resizable({
+	handles: 's,w,sw', // 2 côtés et 1 coin
+	resize: function(evt, ui) {
+		ui.position.left = ui.originalPosition.left; // Reste à droite de la page
+	},
+	stop: function(evt) {
+		evt.target.map_.updateSize();
+	}
+});
+
 /*
 //TODO-CHEM DELETE pour aspir
 //TODO-CHEM complete chemineur

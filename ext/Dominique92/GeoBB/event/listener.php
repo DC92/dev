@@ -34,8 +34,8 @@ class listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->user = $user;
 		$this->auth = $auth;
-//TODO-BEST		$this->extension_manager = $extension_manager;
-//TODO-BEST		$this->root_path = $root_path;
+//TODO-ARCHI		$this->extension_manager = $extension_manager;
+//TODO-ARCHI		$this->root_path = $root_path;
 //TODO-ASPIR ??? recherche par département / commune
 	}
 
@@ -284,7 +284,7 @@ class listener implements EventSubscriberInterface
 		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name']);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
-		// HORRIBLE phpbb hack to accept geom values //TODO-BEST : check if done by PhpBB (supposed 3.2)
+		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
 		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";
