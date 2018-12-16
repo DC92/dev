@@ -650,6 +650,7 @@ layerOverpass = function(o) {
 			var language = {
 					alpine_hut: 'Refuge gard&egrave;',
 					hotel: 'h&ocirc;tel',
+					guest_house: 'chambre d\'h&ocirc;te',
 					camp_site: 'camping',
 					convenience: 'alimentation',
 					supermarket: 'supermarch&egrave;',
@@ -672,7 +673,12 @@ layerOverpass = function(o) {
 						'<a target="_blank"',
 						'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '"',
 						'title="Voir la fiche d\'origine sur openstreetmap">',
-						(p.name || '').toLowerCase().match(language[p.tourism]) ? '' : p.tourism ? language[p.tourism] : p.tourism,
+						p.name ? (
+							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
+							//TODO BUG ne reconnais pas les lettres accentuées
+						) : (
+							language[p.tourism] || p.tourism
+						),
 						'*'.repeat(p.stars),
 						p.shelter_type == 'basic_hut' ? 'Abri' : '',
 						p.building == 'cabin' ? 'Cabane non gard&egrave;e' : '',

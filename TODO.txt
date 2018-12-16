@@ -72,6 +72,36 @@ WRI forum : préalables
 	Migration des tables ?
 https://www.phpbb.com/support/docs/en/3.2/ug/upgradeguide/general_conversion/
 
+
+TODO WRI
+========
+autoconnexcion => enlever $container
+Faire une fiche de tests
+Mettre le format date sur tous les users
+Tester https//wri... tous les referrers
+Tester WRI avec debug LL
+L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
+	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
+Pas de récup cookies de point-modif vers nav
+Création point : garder les cookies et pas forcer à Salanche (point par défaut dans la base !)
+Possibilité d'agrandir la météo sur mobiles
+Pas de massifs dans l'Atlas ?
+Edition / creation / suppression polygones autres que massif
+Déraciner le wiki / le mettre dans le forum
+
+WRI API
+=======
+Bug remontée MultiPolygon / default : null
+Erreur: sur geom vide dans un polynome
+Durée cache réglable
+Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->geometrie !!
+
+NOTES
+=====
+MultiPolygon multiple => WRI massif 3116
+MultiPolygon avec trou => WRI massif 3127
+
+
 AIDE
 ====
 Fonction glisser les commentaires
