@@ -1,5 +1,6 @@
 <?php
 // Importation des bases enquete-pastorale.irstea
+//TODO DELETE assets/proj4php aprés l'import projet !!!
 
 /* OPERATIONS
 
@@ -347,7 +348,7 @@ include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 
 include_once('./assets/geoPHP/geoPHP.inc');
-include_once('./assets/proj4php/vendor/autoload.php');
+include_once('./aspir_import/proj4php/vendor/autoload.php');
 use proj4php\Proj4php;
 use proj4php\Proj;
 use proj4php\Point;

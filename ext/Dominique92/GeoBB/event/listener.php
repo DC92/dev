@@ -37,7 +37,6 @@ class listener implements EventSubscriberInterface
 //TODO-ARCHI		$this->extension_manager = $extension_manager;
 //TODO-ARCHI		$this->root_path = $root_path;
 //TODO-ASPIR ??? recherche par département / commune
-//TODO c'est quoi assets/proj4php ????
 	}
 
 	// Liste des hooks et des fonctions associées

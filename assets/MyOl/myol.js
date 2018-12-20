@@ -20,7 +20,7 @@ ol.assign = function() {
 		for (var v in arguments[a])
 			r[v] = arguments[a][v];
 	return r;
-}
+};
 
 /**
  * Add common functions to the Map object
@@ -367,7 +367,7 @@ ol.layer.LayerVectorURL = function(o) {
 				options.styleOptions(feature.getProperties()) :
 				options.styleOptions
 			);
-		}
+		};
 	if (options.hoverStyleOptions)
 		options.hoverStyle = function(feature) {
 			return new ol.style.Style(
@@ -375,7 +375,7 @@ ol.layer.LayerVectorURL = function(o) {
 				options.hoverStyleOptions(feature.getProperties()) :
 				options.hoverStyleOptions
 			);
-		}
+		};
 
 	// Manage source & vector objects
 	var source = new ol.source.Vector(ol.assign({
@@ -436,10 +436,10 @@ ol.layer.LayerVectorURL = function(o) {
 		}
 
 		function pointerMove(evt) {
-			hoveredPixel = evt.pixel, // Follow the mouse if line or surface
+			hoveredPixel = evt.pixel; // Follow the mouse if line or surface
 
-				// Reset cursor & popup position
-				map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
+			// Reset cursor & popup position
+			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
 			map.popElement_.removeAttribute('href');
 
 			var mapRect = map.getTargetElement().getBoundingClientRect(),
@@ -1391,17 +1391,17 @@ function controlEdit(inputId, options) {
 				new ol.style.Style(options.editStyleOptions) : null
 		}),
 		button = new ol.control.Button(ol.assign({
-		label: 'M',
-		title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
-			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
-			'Alt+cliquer sur un sommet pour le supprimer\n' +
-			//TODO-RANDO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
-			'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
-		activeBackgroundColor: '#ef3',
-		activate: function(active) {
-			modify.setActive(active);
-		}
-	}, options));
+			label: 'M',
+			title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
+				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+				'Alt+cliquer sur un sommet pour le supprimer\n' +
+				//TODO-RANDO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
+				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
+			activeBackgroundColor: '#ef3',
+			activate: function(active) {
+				modify.setActive(active);
+			}
+		}, options));
 
 	button.source = source; // HACK for ASPIR //TODO DELETE ?
 
@@ -1455,12 +1455,13 @@ function controlEdit(inputId, options) {
 
 		// Snap on features external to the editor
 		if (options.snapLayers)
-			for (var s in options.snapLayers)
-				options.snapLayers[s].getSource().on('change', function() {
+			options.snapLayers.forEach(function(layer) {
+				layer.getSource().on('change', function() {
 					var fs = this.getFeatures();
 					for (var f in fs)
 						snap.addFeature(fs[f]);
 				});
+			});
 	});
 
 	modify.on('modifyend', function(evt) {
