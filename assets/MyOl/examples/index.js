@@ -1,4 +1,4 @@
-var _v=document.cookie,_r='COOKIES : ';if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r);
+-var _v=document.cookie,_r='COOKIES : ';if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r);
 
 /**
  * www.refuges.info areas layer
@@ -101,7 +101,8 @@ var geo_keys = {
 		marqueur,
 		viseur
 	],
-	editStyleOptions = {
+	basicControls = controlsCollection(),
+	editStyleOptions = { //TODO style base + style edit seulement
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
@@ -115,29 +116,35 @@ var geo_keys = {
 			color: '#46f'
 		})
 	},
-	hoverStyleOptions = { //TODO-ARCHI intégrer dans l'éditeur
+	hoverStyleOptions = { //TODO-ARCHI en delta style de base
+		image: new ol.style.Circle({
+			radius: 4,
+			fill: new ol.style.Fill({
+				color: '#46f'
+			})
+		}),
 		stroke: new ol.style.Stroke({
 			color: '#46f',
 			width: 2
 		})
-	};
+	},
+	edit = controlEdit('geojson', {
+		snapLayers: overlays,
+		editStyleOptions: editStyleOptions,
+		hoverStyleOptions: hoverStyleOptions,
+		enableAtInit: true,
+		draw: [{
+			type: 'LineString'
+		}, {
+			type: 'Polygon'
+		}]
+	});
 
 new ol.MyMap({
 	target: 'map',
-	controls: controlsCollection().concat([
+	controls: basicControls.concat([
 		layerSwitcher,
-		controlEdit('geojson', {
-			snapLayers: overlays,
-			editStyleOptions: editStyleOptions,
-			hoverStyleOptions: hoverStyleOptions,
-			enableAtInit: true
-		}),
-		controlEditCreate('LineString', {
-			editStyleOptions: hoverStyleOptions
-		}),
-		controlEditCreate('Polygon', {
-			editStyleOptions: hoverStyleOptions
-		})
+		edit
 	]),
 	layers: overlays
 });

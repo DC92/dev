@@ -75,11 +75,9 @@ https://www.phpbb.com/support/docs/en/3.2/ug/upgradeguide/general_conversion/
 
 TODO WRI
 ========
-autoconnexcion => enlever $container
 Faire une fiche de tests
 Mettre le format date sur tous les users
 Tester https//wri... tous les referrers
-Tester WRI avec debug LL
 L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
 	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
 Pas de récup cookies de point-modif vers nav

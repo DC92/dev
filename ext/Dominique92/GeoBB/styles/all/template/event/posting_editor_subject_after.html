@@ -88,10 +88,10 @@
 				snapLayers: [overlay],
 				editStyleOptions: topicStyleOptions,
 				hoverStyleOptions: editStyleOptions,
-				enableAtInit: true
-			}),
-			poly = controlEditCreate('Polygon', {
-				editStyleOptions: editStyleOptions
+				enableAtInit: true,
+				draw: [{
+					type: 'Polygon'
+				}]
 			}),
 			extent = edit.source.getExtent(), //TODO-ARCHI pas optimal, ne devrait pas avoir besoin d'un éditeur si pas en mode surface
 			permalink = controlPermalink({
@@ -109,7 +109,6 @@
 				),
 				<!-- IF GEO_MAP_TYPE == 'surface' -->
 				edit,
-				poly,
 				<!-- ENDIF -->
 				permalink
 			])
