@@ -941,14 +941,14 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires ol.control.Button & controlPermanentCheckbox
+ * Requires 'myol:onadd' layer event
  */
 function controlLayersSwitcher(baseLayers) {
 	var control = new ol.control.Button({
 		label: '&hellip;',
 		className: 'switch-layer',
 		title: 'Liste des cartes',
-		rightPosition: 0.5,
-		render: render
+		rightPosition: 0.5
 	});
 
 	// Transparency slider (first position)
@@ -965,43 +965,38 @@ function controlLayersSwitcher(baseLayers) {
 	selectorElement.title = 'Ctrl+click : multicouches';
 	control.element.appendChild(selectorElement);
 
-	// When the map is created & rendered
-	var map;
+	control.on('myol:onadd', function(evt) {
+		var map = evt.target.map_;
 
-	function render(evt) { //TODO-ARCHI myol:onadd
-		if (!map) { // Only the first time
-			map = evt.map; // mem map for further use
-
-			// Base layers selector init
-			for (var name in baseLayers) {
-				var baseElement = document.createElement('div');
-				baseElement.innerHTML =
-					'<input type="checkbox" name="baselayer" value="' + name + '">' +
-					'<span title="">' + name + '</span>';
-				selectorElement.appendChild(baseElement);
-				map.addLayer(baseLayers[name]);
-			}
-
-			// Make the selector memorized by cookies
-			controlPermanentCheckbox('baselayer', displayLayerSelector);
-
-			// Hover the button open the selector
-			control.element.firstElementChild.onmouseover = displayLayerSelector;
-
-			// Click or change map size close the selector
-			map.on(['click', 'change:size'], function() {
-				displayLayerSelector();
-			});
-
-			// Leaving the map close the selector
-			window.addEventListener('mousemove', function(evt) {
-				var divRect = map.getTargetElement().getBoundingClientRect();
-				if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-					evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-					displayLayerSelector();
-			});
+		// Base layers selector init
+		for (var name in baseLayers) {
+			var baseElement = document.createElement('div');
+			baseElement.innerHTML =
+				'<input type="checkbox" name="baselayer" value="' + name + '">' +
+				'<span title="">' + name + '</span>';
+			selectorElement.appendChild(baseElement);
+			map.addLayer(baseLayers[name]);
 		}
-	}
+
+		// Make the selector memorized by cookies
+		controlPermanentCheckbox('baselayer', displayLayerSelector);
+
+		// Hover the button open the selector
+		control.element.firstElementChild.onmouseover = displayLayerSelector;
+
+		// Click or change map size close the selector
+		map.on(['click', 'change:size'], function() {
+			displayLayerSelector();
+		});
+
+		// Leaving the map close the selector
+		window.addEventListener('mousemove', function(evt) {
+			var divRect = map.getTargetElement().getBoundingClientRect();
+			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+				displayLayerSelector();
+		});
+	});
 
 	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
@@ -1031,7 +1026,7 @@ function controlLayersSwitcher(baseLayers) {
 		control.element.firstElementChild.style.display = evt ? 'none' : '';
 		rangeElement.style.display = evt && list.length > 1 ? '' : 'none';
 		selectorElement.style.display = evt ? '' : 'none';
-		selectorElement.style.maxHeight = (map.getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
+		selectorElement.style.maxHeight = (control.map_.getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}
 
 	return control;
@@ -1043,14 +1038,14 @@ function controlLayersSwitcher(baseLayers) {
  * options.init {true | false | undefined} use url hash or "controlPermalink" cookie to position the map.
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * options.defaultPos {<ZOOM>/<LON>/<LAT>/<LAYER>} if nothing else is defined.
+ * Requires 'myol:onadd' layer event
  */
 //TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
 function controlPermalink(options) {
 	var divElement = document.createElement('div'),
 		aElement = document.createElement('a'),
 		control = new ol.control.Control({
-			element: divElement,
-			render: render
+			element: divElement
 		}),
 		params = location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
@@ -1065,11 +1060,10 @@ function controlPermalink(options) {
 		divElement.appendChild(aElement);
 	}
 
-	function render(evt) {
-		var view = evt.map.getView();
+	control.on('myol:onadd', function(evt) {
+		var view = evt.target.map_.getView();
 
 		// Set the map at the init
-		//TODO-ARCHI myol:onadd
 		if (options.init !== false && // If use hash & cookies
 			params) { // Only once
 			view.setZoom(params[1]);
@@ -1088,7 +1082,7 @@ function controlPermalink(options) {
 		// Set the new permalink
 		aElement.href = '#map=' + newParams.join('/');
 		document.cookie = 'map=' + newParams.join('/') + ';path=/';
-	}
+	});
 
 	return control;
 }
@@ -1154,27 +1148,27 @@ function controlGPS() {
 
 /**
  * Control to displays the length of a line overflown
+ * Requires 'myol:onadd' layer event
  */
 function controlLengthLine() {
 	var divElement = document.createElement('div'),
 		control = new ol.control.Control({
-			element: divElement,
-			render: render
+			element: divElement
 		});
 
-	function render(evt) { //TODO-ARCHI myol:onadd
-		if (!divElement.className) { // Only once
-			divElement.className = 'ol-length-line';
+	control.on('myol:onadd', function(evt) {
+		var map = evt.target.map_;
 
-			evt.map.on('pointermove', function(evtm) {
-				divElement.innerHTML = ''; // Clear the measure if hover no feature
+		divElement.className = 'ol-length-line';
 
-				evtm.map.forEachFeatureAtPixel(evtm.pixel, calculateLength, {
-					hitTolerance: 6
-				});
+		map.on('pointermove', function(evtMove) {
+			divElement.innerHTML = ''; // Clear the measure if hover no feature
+
+			map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
+				hitTolerance: 6
 			});
-		}
-	}
+		});
+	});
 
 	function calculateLength(feature) {
 		if (!feature)
@@ -1252,6 +1246,7 @@ function controlLoadGPX() {
 /**
  * GPX file downloader control
  * Requires ol.control.Button
+ * Requires 'myol:onadd' layer event
  */
 //TODO-BEST Nommage des tracks / du fichier.
 function controlDownloadGPX() {
@@ -1278,24 +1273,30 @@ function controlDownloadGPX() {
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
+	button.on('myol:onadd', function(evt) {
+		var map = evt.target.map_;
+	});
+	//TODO BUG on ne peut plus sélectioner avec shift / l'édit ne donne pas la trace non plus
+
 	function render(evt) { //TODO-ARCHI myol:onadd
 		if (!map) {
 			map = evt.map;
 
-			// Selection of lines
-			var select = new ol.interaction.Select({
-				condition: function(evts) {
-					return ol.events.condition.shiftKeyOnly(evts) && ol.events.condition.click(evts);
-				},
-				filter: function(feature) {
-					return feature.getGeometry().getType().indexOf('Line') !== -1;
-				},
-				hitTolerance: 6
-			});
-			select.on('select', function(evts) {
-				selectedFeatures = evts.target.getFeatures().getArray();
-			});
-			map.addInteraction(select);
+
+		// Selection of lines
+		var select = new ol.interaction.Select({
+			condition: function(evts) {
+				return ol.events.condition.shiftKeyOnly(evts) && ol.events.condition.click(evts);
+			},
+			filter: function(feature) {
+				return feature.getGeometry().getType().indexOf('Line') !== -1;
+			},
+			hitTolerance: 6
+		});
+		select.on('select', function(evts) {
+			selectedFeatures = evts.target.getFeatures().getArray();
+		});
+		map.addInteraction(select);
 		}
 	}
 
@@ -1357,6 +1358,7 @@ function controlPrint() {
 /**
  * Line & Polygons Editor
  * Requires ol.control.Button
+ * Requires 'myol:onadd' layer event
  */
 function controlEdit(inputId, options) {
 	var inputEl = document.getElementById(inputId), // Read data in an html element
@@ -1376,11 +1378,15 @@ function controlEdit(inputId, options) {
 		}),
 		button = new ol.control.Button(ol.assign({
 			label: 'M',
-			title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
+			title: 'Activer "M" (couleur jaune) puis\n' +
+				'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
 				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 				'Alt+cliquer sur un sommet pour le supprimer\n' +
-				//TODO-RANDO only if line creation declared				'Alt+click sur un segment pour le supprimer et couper la ligne\n' +
-				'Ctrl+Alt+cliquer sur un côté d\'un polygone pour le supprimer',
+				'Alt+cliquer  sur un segment à supprimer dans une ligne pour la couper\n' +
+				'Alt+cliquer  sur un segment à supprimer d\'un polygone pour le transformer en ligne\n' +
+				'Joindre les extrémités deux lignes pour les fusionner\n' +
+				'Joindre les extrémités d\'une ligne pour la transformer en polygone\n' +
+				'Ctrl+Alt+cliquer sur un côté d\'une ligne ou d\'un polygone pour les supprimer',
 			activeBackgroundColor: '#ef3',
 			activate: function(active) {
 				modify.setActive(active);
@@ -1439,12 +1445,11 @@ function controlEdit(inputId, options) {
 			map.addControl(new ol.control.Button(ol.assign({
 				group: button,
 				label: drawOption.type.charAt(0),
-				title: //'Activer "' + options.type.charAt(0) + ' puis' +
-					'"\ncliquer sur la carte et sur chaque point du tracé pour dessiner ' +
-					//TODO				(options.type == 'Polygon' ? 'un polygone' : 'une ligne') +
+				title: 'Activer "' + drawOption.type.charAt(0) + '" puis\n' +
+					'Cliquer sur la carte et sur chaque point du tracé pour dessiner ' +
+					(drawOption.type == 'Polygon' ? 'un polygone' : 'une ligne') +
 					',\ndouble cliquer pour terminer.' +
-					//				(options.type == 'Polygon' ? '\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' : ''),
-					'',
+					(drawOption.type == 'Polygon' ? '\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' : ''),
 				activeBackgroundColor: '#ef3',
 				activate: function(active) {
 					draw.setActive(active);

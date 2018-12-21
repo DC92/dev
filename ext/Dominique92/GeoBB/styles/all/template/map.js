@@ -94,11 +94,7 @@ var topicStyleOptions = {
 	titleEdit = "Cliquer et déplacer un sommet pour modifier un polygone\n"+
 		"Cliquer sur un segment puis déplacer pour créer un sommet\n"+
 		"Alt + cliquer sur un sommet pour le supprimer\n"+
-		"Ctrl + Alt + cliquer sur un côté d 'un polygone pour le supprimer",
-	titleDraw = "Activer \"P\" puis\n"+
-		"cliquer sur la carte et sur chaque point du tracé pour dessiner un polygone,\n"+
-		"Double cliquer pour terminer.\n"+
-		"Si le nouveau polygone est entièrement compris dans un autre, il crée un \"trou\".";
+		"Ctrl + Alt + cliquer sur un côté d 'un polygone pour le supprimer";
 
 function layerStyleOptionsFunction(properties, id, hover) {
 	if (properties.icon)
