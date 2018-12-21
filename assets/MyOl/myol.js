@@ -301,6 +301,7 @@ function controlPermanentCheckbox(selectorName, callback) {
 	}
 
 	// Call callback once at the init
+	//TODO-ARCHI possible fusionner les 3 fonctions ?
 	callback(null, permanentCheckboxList(selectorName));
 
 	function permanentCheckboxClick(evt) {
@@ -1040,12 +1041,12 @@ function controlLayersSwitcher(baseLayers) {
  * options.defaultPos {<ZOOM>/<LON>/<LAT>/<LAYER>} if nothing else is defined.
  * Requires 'myol:onadd' layer event
  */
-//TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
 function controlPermalink(options) {
 	var divElement = document.createElement('div'),
 		aElement = document.createElement('a'),
 		control = new ol.control.Control({
-			element: divElement
+			element: divElement,
+			render: render
 		}),
 		params = location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
@@ -1053,18 +1054,18 @@ function controlPermalink(options) {
 
 	control.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
 
-	if (options.visible) {
+	if (options.visible) { // Default false
 		divElement.className = 'ol-permalink';
 		aElement.innerHTML = 'Permalink';
 		aElement.title = 'Generate a link with map zoom & position';
 		divElement.appendChild(aElement);
 	}
 
-	control.on('myol:onadd', function(evt) {
-		var view = evt.target.map_.getView();
+	function render(evt) {
+		var view = evt.map.getView();
 
-		// Set the map at the init
-		if (options.init !== false && // If use hash & cookies
+		// Set center & zoom at the init
+		if (options.init !== false && // If use hash & cookies // Default true
 			params) { // Only once
 			view.setZoom(params[1]);
 			view.setCenter(ol.proj.transform(control.paramsCenter, 'EPSG:4326', 'EPSG:3857'));
@@ -1072,6 +1073,7 @@ function controlPermalink(options) {
 		}
 
 		// Check the current map zoom & position
+//TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
 		var ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 			newParams = [
 				parseInt(view.getZoom()),
@@ -1082,7 +1084,7 @@ function controlPermalink(options) {
 		// Set the new permalink
 		aElement.href = '#map=' + newParams.join('/');
 		document.cookie = 'map=' + newParams.join('/') + ';path=/';
-	});
+	}
 
 	return control;
 }
@@ -1219,8 +1221,8 @@ function controlLoadGPX() {
 				featureProjection: 'EPSG:3857'
 			});
 
-		if (map.sourceEditor) { // If there is an active editor
-			map.sourceEditor.addFeatures(features); // Add the track to the editor
+		if (map.editSource) { // If there is an active editor
+			map.editSource.addFeatures(features); // Add the track to the editor
 
 			// Zoom the map on the added features
 			var extent = ol.extent.createEmpty();
@@ -1257,11 +1259,11 @@ function controlDownloadGPX() {
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX',
 			render: render,
-			activate: function() {
-				//TODO-ARCHI get map from evt
-				if (map.sourceEditor) // If there is an active editor
-					download(map.sourceEditor.getFeatures());
+			activate: function(evt) {
+				if (button.map_.selectedFeatures_) // If there is an active editor
+					download(button.map_.selectedFeatures_);
 				else if (selectedFeatures.length) // If there are selected features
+				//TODO BUG shift va sur url et ne sélectionne pas
 					download(selectedFeatures);
 				else
 					alert('Sélectionnez une ou plusieurs traces à sauvegarder avec "Shift+Clic"');
@@ -1272,11 +1274,6 @@ function controlDownloadGPX() {
 	hiddenElement.target = '_blank';
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
-
-	button.on('myol:onadd', function(evt) {
-		var map = evt.target.map_;
-	});
-	//TODO BUG on ne peut plus sélectioner avec shift / l'édit ne donne pas la trace non plus
 
 	function render(evt) { //TODO-ARCHI myol:onadd
 		if (!map) {
@@ -1419,6 +1416,9 @@ function controlEdit(inputId, options) {
 
 	button.on('myol:onadd', function(evt) {
 		var map = evt.target.map_;
+		// Save features for who wants to use it
+		map.selectedFeatures_ = features;
+
 		map.addLayer(layer);
 		button.toggle(options.enableAtInit); //TODO BUG : enable quand meme à l'init si toggle(false)
 
