@@ -1359,7 +1359,6 @@ function controlPrint() {
  * Requires ol.control.Button
  */
 function controlEdit(inputId, options) {
-	this.options_ = options;
 	var inputEl = document.getElementById(inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
@@ -1375,21 +1374,6 @@ function controlEdit(inputId, options) {
 			source: source,
 			zIndex: 20
 		}),
-		hover = new ol.interaction.Select({
-			layers: [layer],
-			style: options.hoverStyleOptions ?
-				new ol.style.Style(options.hoverStyleOptions) : null,
-			condition: ol.events.condition.pointerMove,
-			hitTolerance: 6
-		}),
-		snap = new ol.interaction.Snap({
-			source: source
-		}),
-		modify = new ol.interaction.Modify({
-			source: source,
-			style: options.editStyleOptions ?
-				new ol.style.Style(options.editStyleOptions) : null
-		}),
 		button = new ol.control.Button(ol.assign({
 			label: 'M',
 			title: 'Cliquer et déplacer un sommet pour modifier un polygone\n' +
@@ -1403,7 +1387,29 @@ function controlEdit(inputId, options) {
 			}
 		}, options));
 
-	button.source = source; // HACK for ASPIR //TODO DELETE ?
+	if (options.styleOptions) {
+		layer.setStyle(
+			new ol.style.Style(options.styleOptions)
+		);
+		options.editStyle = new ol.style.Style(ol.assign(
+			options.styleOptions,
+			options.editStyleOptions
+		));
+	}
+
+	var hover = new ol.interaction.Select({
+			layers: [layer],
+			style: options.editStyle,
+			condition: ol.events.condition.pointerMove,
+			hitTolerance: 6
+		}),
+		snap = new ol.interaction.Snap({
+			source: source
+		}),
+		modify = new ol.interaction.Modify({
+			source: source,
+			style: options.editStyle
+		});
 
 	button.on('myol:onadd', function(evt) {
 		var map = evt.target.map_;
@@ -1417,12 +1423,11 @@ function controlEdit(inputId, options) {
 		});
 
 		// Add the draw buttons & interaction
-		options.draw.forEach(function(opt) {
+		options.draw.forEach(function(drawOption) {
 			var draw = new ol.interaction.Draw({
+				type: drawOption.type,
 				source: source,
-				style: options && options.editStyleOptions ?
-					new ol.style.Style(options.editStyleOptions) : null,
-				type: opt.type
+				style: options.editStyle
 			});
 			map.addInteraction(draw);
 			draw.setActive(false);
@@ -1433,7 +1438,7 @@ function controlEdit(inputId, options) {
 
 			map.addControl(new ol.control.Button(ol.assign({
 				group: button,
-				label: opt.type.charAt(0),
+				label: drawOption.type.charAt(0),
 				title: //'Activer "' + options.type.charAt(0) + ' puis' +
 					'"\ncliquer sur la carte et sur chaque point du tracé pour dessiner ' +
 					//TODO				(options.type == 'Polygon' ? 'un polygone' : 'une ligne') +
@@ -1444,7 +1449,7 @@ function controlEdit(inputId, options) {
 				activate: function(active) {
 					draw.setActive(active);
 				}
-			}, opt)));
+			}, drawOption)));
 		});
 
 		map.addInteraction(modify);
@@ -1598,6 +1603,8 @@ function controlEdit(inputId, options) {
 			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
 		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
+
+	button.source = source; // HACK for getting info from the edited features
 	return button;
 }
 

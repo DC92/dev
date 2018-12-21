@@ -86,14 +86,17 @@
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
 			edit = controlEdit('editable-json', {
 				snapLayers: [overlay],
-				editStyleOptions: topicStyleOptions,
-				hoverStyleOptions: editStyleOptions,
+				styleOptions: topicStyleOptions,
+				editStyleOptions: editStyleOptions,
 				enableAtInit: true,
+				title: titleEdit,
 				draw: [{
-					type: 'Polygon'
+					type: 'Polygon',
+					title: titleDraw
 				}]
 			}),
-			extent = edit.source.getExtent(), //TODO-ARCHI pas optimal, ne devrait pas avoir besoin d'un éditeur si pas en mode surface
+			extent = edit.source.getExtent(),
+			surface
 			permalink = controlPermalink({
 				init: ol.extent.isEmpty(extent),
 				visible: true
@@ -108,7 +111,7 @@
 					layers({GEO_KEYS})
 				),
 				<!-- IF GEO_MAP_TYPE == 'surface' -->
-				edit,
+					edit,
 				<!-- ENDIF -->
 				permalink
 			])

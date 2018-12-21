@@ -88,7 +88,6 @@ var geo_keys = {
 		bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
 		// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 	},
-	layerSwitcher = controlLayersSwitcher(layersCollection(geo_keys)),
 	marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 	viseur = marker('http://www.refuges.info/images/viseur.png', 'viseur', null, true),
 	overlays = [
@@ -102,36 +101,28 @@ var geo_keys = {
 		viseur
 	],
 	basicControls = controlsCollection(),
-	editStyleOptions = { //TODO style base + style edit seulement
-		image: new ol.style.Circle({
-			radius: 4,
-			fill: new ol.style.Fill({
-				color: '#46f'
-			})
-		}),
-		fill: new ol.style.Fill({
-			color: 'rgb(0,0,0,0.3)'
-		}),
-		stroke: new ol.style.Stroke({
-			color: '#46f'
-		})
-	},
-	hoverStyleOptions = { //TODO-ARCHI en delta style de base
-		image: new ol.style.Circle({
-			radius: 4,
-			fill: new ol.style.Fill({
-				color: '#46f'
-			})
-		}),
-		stroke: new ol.style.Stroke({
-			color: '#46f',
-			width: 2
-		})
-	},
 	edit = controlEdit('geojson', {
 		snapLayers: overlays,
-		editStyleOptions: editStyleOptions,
-		hoverStyleOptions: hoverStyleOptions,
+		styleOptions: {
+			fill: new ol.style.Fill({
+				color: 'rgb(0,0,0,0.3)'
+			}),
+			stroke: new ol.style.Stroke({
+				color: '#46f'
+			})
+		},
+		editStyleOptions: {
+			image: new ol.style.Circle({
+				radius: 4,
+				fill: new ol.style.Fill({
+					color: '#46f'
+				})
+			}),
+			stroke: new ol.style.Stroke({
+				color: '#46f',
+				width: 2
+			})
+		},
 		enableAtInit: true,
 		draw: [{
 			type: 'LineString'
@@ -142,11 +133,11 @@ var geo_keys = {
 
 new ol.MyMap({
 	target: 'map',
+	layers: overlays,
 	controls: basicControls.concat([
-		layerSwitcher,
+		controlLayersSwitcher(layersCollection(geo_keys)),
 		edit
-	]),
-	layers: overlays
+	])
 });
 
 controlgps.callBack = function(position) {

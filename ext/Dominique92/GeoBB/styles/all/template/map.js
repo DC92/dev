@@ -72,27 +72,33 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 
 // The style of selected & edited topic
 var topicStyleOptions = {
-	image: new ol.style.Circle({
-		radius: 4,
+		image: new ol.style.Circle({
+			radius: 4,
+			fill: new ol.style.Fill({
+				color: 'black'
+			})
+		}),
 		fill: new ol.style.Fill({
+			color: 'rgba(0,0,0,0.3)'
+		}),
+		stroke: new ol.style.Stroke({
 			color: 'black'
 		})
-	}),
-	fill: new ol.style.Fill({
-		color: 'rgba(0,0,0,0.3)'
-	}),
-	stroke: new ol.style.Stroke({
-		color: 'black'
-	})
-};
-var editStyleOptions = {
-	image: topicStyleOptions.image,
-	fill: topicStyleOptions.fill,
-	stroke: new ol.style.Stroke({
-		color: 'black',
-		width: 2
-	})
-};
+	},
+	editStyleOptions = {
+		stroke: new ol.style.Stroke({
+			color: 'black',
+			width: 2
+		})
+	},
+	titleEdit = "Cliquer et déplacer un sommet pour modifier un polygone\n"+
+		"Cliquer sur un segment puis déplacer pour créer un sommet\n"+
+		"Alt + cliquer sur un sommet pour le supprimer\n"+
+		"Ctrl + Alt + cliquer sur un côté d 'un polygone pour le supprimer",
+	titleDraw = "Activer \"P\" puis\n"+
+		"cliquer sur la carte et sur chaque point du tracé pour dessiner un polygone,\n"+
+		"Double cliquer pour terminer.\n"+
+		"Si le nouveau polygone est entièrement compris dans un autre, il crée un \"trou\".";
 
 function layerStyleOptionsFunction(properties, id, hover) {
 	if (properties.icon)
