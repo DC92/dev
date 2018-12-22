@@ -301,7 +301,6 @@ function controlPermanentCheckbox(selectorName, callback) {
 	}
 
 	// Call callback once at the init
-	//TODO-ARCHI possible fusionner les 3 fonctions ?
 	callback(null, permanentCheckboxList(selectorName));
 
 	function permanentCheckboxClick(evt) {
@@ -311,6 +310,7 @@ function controlPermanentCheckbox(selectorName, callback) {
 	}
 }
 
+// Global function, called by others
 function permanentCheckboxList(selectorName, evt) {
 	var checkElements = document.getElementsByName(selectorName),
 		allChecks = [];
@@ -351,6 +351,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * GeoJson POI layer
  * Requires 'myol:onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
+ * Requires permanentCheckboxList
  */
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
 //TODO-BEST JSON error handling : error + URL
@@ -424,13 +425,17 @@ ol.layer.LayerVectorURL = function(o) {
 
 			// Click on a feature
 			map.on('click', function(evt) {
-				evt.target.forEachFeatureAtPixel(
-					evt.pixel,
-					function() {
-						map.popElement_.click(); // Simulate a click on the label
-					}, {
-						hitTolerance: 6
-					});
+				if (!evt.pointerEvent.shiftKey &&
+					!evt.pointerEvent.ctrlKey &&
+					!evt.pointerEvent.altKey &&
+					!evt.pointerEvent.metaKey)
+					evt.target.forEachFeatureAtPixel(
+						evt.pixel,
+						function() {
+							map.popElement_.click(); // Simulate a click on the label
+						}, {
+							hitTolerance: 6
+						});
 			});
 
 			map.on('pointermove', pointerMove);
@@ -943,6 +948,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires ol.control.Button & controlPermanentCheckbox
  * Requires 'myol:onadd' layer event
+ * Requires permanentCheckboxList
  */
 function controlLayersSwitcher(baseLayers) {
 	var control = new ol.control.Button({
@@ -1073,7 +1079,7 @@ function controlPermalink(options) {
 		}
 
 		// Check the current map zoom & position
-//TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
+		//TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
 		var ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 			newParams = [
 				parseInt(view.getZoom()),
@@ -1258,12 +1264,11 @@ function controlDownloadGPX() {
 		button = new ol.control.Button({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX',
-			render: render,
 			activate: function(evt) {
 				if (button.map_.selectedFeatures_) // If there is an active editor
 					download(button.map_.selectedFeatures_);
 				else if (selectedFeatures.length) // If there are selected features
-				//TODO BUG shift va sur url et ne sélectionne pas
+					//TODO BUG ne sélectionne pas
 					download(selectedFeatures);
 				else
 					alert('Sélectionnez une ou plusieurs traces à sauvegarder avec "Shift+Clic"');
@@ -1275,12 +1280,11 @@ function controlDownloadGPX() {
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	function render(evt) { //TODO-ARCHI myol:onadd
-		if (!map) {
-			map = evt.map;
-
+	button.on('myol:onadd', function(evt) {
+		var map = evt.target.map_;
 
 		// Selection of lines
+		//TODO BUG ne colore pas car le style est géré par layergeojson
 		var select = new ol.interaction.Select({
 			condition: function(evts) {
 				return ol.events.condition.shiftKeyOnly(evts) && ol.events.condition.click(evts);
@@ -1288,14 +1292,19 @@ function controlDownloadGPX() {
 			filter: function(feature) {
 				return feature.getGeometry().getType().indexOf('Line') !== -1;
 			},
-			hitTolerance: 6
+			hitTolerance: 6,
+			style: new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 2
+				})
+			})
 		});
-		select.on('select', function(evts) {
+		select.on('select', function(evts) { //TODO BUG ne sélectionne pas
 			selectedFeatures = evts.target.getFeatures().getArray();
 		});
 		map.addInteraction(select);
-		}
-	}
+	});
 
 	function download(layers) {
 		var fileName = 'trace.gpx',
@@ -1416,11 +1425,12 @@ function controlEdit(inputId, options) {
 
 	button.on('myol:onadd', function(evt) {
 		var map = evt.target.map_;
+
 		// Save features for who wants to use it
 		map.selectedFeatures_ = features;
 
 		map.addLayer(layer);
-		button.toggle(options.enableAtInit); //TODO BUG : enable quand meme à l'init si toggle(false)
+		button.toggle(options.enableAtInit); //TODO TEST : enable quand meme à l'init si toggle(false)
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
