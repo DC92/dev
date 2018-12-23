@@ -6,56 +6,56 @@
 	--------------------------------------------------------------
 */
 
-.site_logo {
+z.site_logo {
 	background-image: url("http://aspir.eu/wp-content/uploads/2016/09/jhu-e1464350442860-75x75.jpg");
 	background-repeat: no-repeat;
 	height: 75px;
 }
 
 
-.wrap {
+z.wrap {
 	max-width: none;
 	min-width: none;
 }
 
 /* INDEX.PHP NEWS */
-.section-index li.header dt {
+z.section-index li.header dt {
 	font-size: 130%;
 	color: #4C5D77;
 }
-#news .row:after { /* Avoid only 1 news line at the left of the map */
+z#news .row:after { /* Avoid only 1 news line at the left of the map */
 	content: none;
 }
 
-.overpass .zoom-out,
-.overpass-zoom-out li {
+z.overpass .zoom-out,
+z.overpass-zoom-out li {
 	display: none;
 }
-.overpass-zoom-out .titre,
-.overpass-zoom-out .zoom-out {
+z.overpass-zoom-out .titre,
+z.overpass-zoom-out .zoom-out {
 	display: list-item;
 }
 
-.geo_presentation {
+z.geo_presentation {
 	font-size: 1.2em;
 	margin-bottom: 10px;
 }
 
 /* Masquages */
 /* .nav-main li:nth-child(2), navbar_header FAQ  */
-.stat-block, /* QUI EST EN LIGNE... */
-.footer-row , /* Lignes copyright en bas */
-.birthday-list,
-.section-viewforum .bar-top,
-.section-viewtopic .bar-top,
+z.stat-block, /* QUI EST EN LIGNE... */
+z.footer-row , /* Lignes copyright en bas */
+z.birthday-list,
+z.section-viewforum .bar-top,
+z.section-viewtopic .bar-top,
 
-.section-posting input[name="save"],
-.section-posting input[name="preview"],
-.section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
-.section-posting #poll-panel-tab { /* Sondages */
+z.section-posting input[name="save"],
+z.section-posting input[name="preview"],
+z.section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
+z.section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
 }
-.section-posting #attach-panel { /* Onglet de chargement de fichier */
+z.section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
 
@@ -64,55 +64,55 @@ input[type="number"] {
 	text-align: right;
 }
 
-.section-posting .remarques {
+z.section-posting .remarques {
 	margin-top: 1em;
 	margin-bottom: 0;
 }
-.section-posting .format-buttons {
+z.section-posting .format-buttons {
 	margin: 0;
 }
 
 /* Responsive map for mobiles */
 @media screen and (max-width: 600px) {
-	.section-posting #map {
+	z.section-posting #map {
 		width: 100%;
 		float: none;
 	}
 }
 
 /* POSTING.PHP */
-.section-posting #postingbox fieldset.fields1 dt {
+z.section-posting #postingbox fieldset.fields1 dt {
 	width: auto;
 }
-.section-posting #postingbox fieldset.fields1 dd {
+z.section-posting #postingbox fieldset.fields1 dd {
 	margin-left: auto !important;
 }
-.section-posting .panel {
+z.section-posting .panel {
 	margin-bottom: 0px;
 }
-.section-posting #attach-panel-multi::after {
+z.section-posting #attach-panel-multi::after {
 	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
 }
 
-.geo-info {
+z.geo-info {
 	margin-bottom: 20px;
 }
-.geo-info p {
+z.geo-info p {
 	margin: 0;
 }
-.geo-info h4 {
+z.geo-info h4 {
 	margin-top: 5px !important;
 }
 
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+z::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
 	font-size: 10px;
 	color: #36f !important;
 }
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
+z:-ms-input-placeholder { /* Internet Explorer 10-11 */
 	font-size: 10px;
 	color: #36f !important;
 }
-::-ms-input-placeholder { /* Microsoft Edge */
+z::-ms-input-placeholder { /* Microsoft Edge */
 	font-size: 10px;
 	color: #36f !important;
 }

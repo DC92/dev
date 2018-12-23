@@ -1563,7 +1563,7 @@ function controlEdit(inputId, options) {
 /**
  * Controls examples
  */
-var controlgps = controlGPS();
+var controlgps = controlGPS(); //TODO ARCHI intégrer ??
 
 function controlsCollection() {
 	return [
