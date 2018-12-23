@@ -31,21 +31,11 @@
 		new ol.MyMap({
 			target: 'map',
 			layers: [
-/*
-//TODO-CHEM complete chemineur
-				layerOverpass({
-					postLabel: postLabel
-				}),
-				layerPointsWri({
-					selectorName: 'wri-poi',
-					postLabel: postLabel
-				}),
-*/
 				geoLayer()
 			],
-			controls: controlsCollection().concat([
+			controls: geobbControls().concat([
 				controlLayersSwitcher(
-					layersCollection({GEO_KEYS})
+					layers({GEO_KEYS})
 				),
 				controlPermalink({
 					init: true,

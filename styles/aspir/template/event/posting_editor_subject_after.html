@@ -8,9 +8,6 @@
 <!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
 <!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
 
-<!-- Proj4 projections Swiss & UK -->
-<!-- //TODO-CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
-
 <!-- My Openlayers -->
 <!-- INCLUDECSS assets/MyOl/myol.css -->
 <!-- INCLUDEJS assets/MyOl/myol.js -->
@@ -27,24 +24,18 @@
 
 <dl class="posting-point" style="clear: left;">
 	<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
-	<!-- //TODO-CHEM pour all :
-		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p>
-	-->
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<p>
 			Lon <input id="editable-lon" type="text" onchange="editable.edit(this,0,4326)" size="10" maxlength="12"/>
 			Lat <input id="editable-lat" type="text" onchange="editable.edit(this,1,4326)" size="10" maxlength="12"/>
 		</p>
-		<p id="editable-xy">Suisse
-			X <input id="editable-x" type="text" onchange="editable.edit(this,0,21781)" size="7" maxlength="12"/>
-			Y <input id="editable-y" type="text" onchange="editable.edit(this,1,21781)" size="7" maxlength="12"/>
-		</p>
 
 		<p><a style="cursor:pointer" onclick="map.getView().setCenter(editable.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
 		<p><a style="cursor:pointer" onclick="editable.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
 		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
 	<!-- ENDIF -->
+
 	<!-- IF GEO_MAP_TYPE == 'surface' -->
 		<h3>Modification polygone</h3>
 		<p>- Cliquer et déplacer un sommet pour modifier un polygone.<br/>
@@ -57,8 +48,6 @@
 		<h3>Suppression polygone</h3>
 		<p>- Ctrl+Alt+cliquer sur un segment d'un polygone pour supprimer ce polygone.</p>
 	<!-- ENDIF -->
-
-	<!-- //TODO-CHEM pour all p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p -->
 </dl>
 
 <!-- INCLUDE specific_fields_edit.html -->

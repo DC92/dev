@@ -848,6 +848,7 @@ function JSONparse(json) {
  * options.action {function} called when the control is clicked.
  */
 let nextButtonTopPos = 6; // Top position of next button (em)
+//TODO BUG ne passe pas une position avant l'éditeur de ASPIR surface
 
 ol.control.Button = function(o) {
 	const this_ = this, // For callback functions
