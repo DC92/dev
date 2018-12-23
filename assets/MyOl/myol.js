@@ -182,7 +182,7 @@ function layerTileIncomplete(extent, sources) { //TODO-ARCHI faire une classe ??
 	function change() {
 		const view = layer.map_.getView(),
 			center = view.getCenter();
-		let	currentResolution = 999999; // Init loop at max resolution
+		let currentResolution = 999999; // Init loop at max resolution
 		sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
@@ -646,7 +646,7 @@ layerOverpass = function(o) {
 						'title="Voir la fiche d\'origine sur openstreetmap">',
 						p.name ? (
 							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
-							//TODO BUG ne reconnais pas les lettres accentuées
+							//TODO BUG ne reconnais pas les lettres accentuées (hôtel)
 						) : (
 							language[p.tourism] || p.tourism
 						),
@@ -1014,10 +1014,10 @@ function controlLayersSwitcher(baseLayers) {
 function controlPermalink(options) {
 	const divElement = document.createElement('div'),
 		aElement = document.createElement('a');
-	let	this_ = new ol.control.Control({
-			element: divElement,
-			render: render
-		});
+	let this_ = new ol.control.Control({
+		element: divElement,
+		render: render
+	});
 	let params = location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
 		(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
@@ -1220,62 +1220,33 @@ function controlLoadGPX() {
  * Requires ol.control.Button
  * Requires 'myol:onadd' layer event
  */
-//TODO-BEST Nommage des tracks / du fichier.
-//TODO sortir les features visibles
-function controlDownloadGPX() {
-	let map,
-		//		selectedFeatures = [],
-		hiddenElement = document.createElement('a'),
-		this_ = new ol.control.Button({
+function controlDownloadGPX(o) {
+	const options = ol.assign({
 			label: '&dArr;',
-			title: 'Obtenir un fichier GPX',
-			activate: function(evt) {
-				if (this_.map_.selectedFeatures_) // If there is an active editor
-					download(this_.map_.selectedFeatures_);
-				//				else if (selectedFeatures.length) // If there are selected features
-				//TODO BUG ne sélectionne pas
-				//					download(selectedFeatures);
-				else
-					alert('En maintenant "Shift" enfoncé\n' +
-						'cliquez sur une ou plusieurs traces\n' +
-						'puis sur ce contrôle');
-			}
-		});
+			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
+			fileName: 'trace.gpx'
+		}, o),
+		hiddenElement = document.createElement('a');
 
 	//HACK for Moz
 	hiddenElement.target = '_blank';
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	/*//TODO	this_.on('myol:onadd', function(evt) {
-			let map = evt.target.map_;
+	options.activate = function(evt) {
+		let features = [],
+			extent = this.group.map_.getView().calculateExtent();
 
-			// Selection of lines
-			//TODO BUG ne colore pas car le style est géré par layergeojson
-			const select = new ol.interaction.Select({
-				condition: function(selectEvent) {
-					return ol.events.condition.shiftKeyOnly(selectEvent) && ol.events.condition.click(selectEvent);
-				},
-				filter: function(feature) {
-					return feature.getGeometry().getType().indexOf('Line') !== -1;
-				},
-				hitTolerance: 6,
-				style: new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 2
-					})
-				})
-			});
-			select.on('select', function(selectEvent) { //TODO BUG ne sélectionne pas
-				selectedFeatures = selectEvent.target.getFeatures().getArray();
-			});
-			map.addInteraction(select);
-		});*/
+		// Get all visible features
+		this.group.map_.getLayers().forEach(function(layer) {
+			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
+				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
+					features.push(feature);
+				});
+		});
 
-	function download(layers) {
-		const fileName = 'trace.gpx',
-			gpx = new ol.format.GPX().writeFeatures(layers, {
+		// Write in GPX format
+		const gpx = new ol.format.GPX().writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5
@@ -1286,13 +1257,14 @@ function controlDownloadGPX() {
 
 		//HACK for IE/Edge
 		if (typeof navigator.msSaveOrOpenBlob !== 'undefined')
-			return navigator.msSaveOrOpenBlob(file, fileName);
+			return navigator.msSaveOrOpenBlob(file, options.fileName);
 		else if (typeof navigator.msSaveBlob !== 'undefined')
-			return navigator.msSaveBlob(file, fileName);
+			return navigator.msSaveBlob(file, options.fileName);
 
 		hiddenElement.href = URL.createObjectURL(file);
-		hiddenElement.download = fileName;
+		hiddenElement.download = options.fileName;
 
+		// Simulate the click & download the .gpx file
 		if (typeof hiddenElement.click === 'function')
 			hiddenElement.click();
 		else
@@ -1303,7 +1275,7 @@ function controlDownloadGPX() {
 			}));
 	}
 
-	return this_;
+	return new ol.control.Button(options);
 }
 
 // HACK to display a title on the geocoder
@@ -1393,9 +1365,6 @@ function controlEdit(inputId, options) {
 	this_.on('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
-		// Save features for who wants to use it
-		//TODO DELETE		map.selectedFeatures_ = features;
-
 		map.addLayer(layer);
 		this_.toggle(options.enableAtInit); //TODO TEST : enable quand meme à l'init si toggle(false)
 
@@ -1428,8 +1397,8 @@ function controlEdit(inputId, options) {
 					(drawOption.type == 'Polygon' ? 'un polygone' : 'une ligne') +
 					',\ndouble cliquer pour terminer.\n' +
 					(drawOption.type == 'Polygon' ?
-					'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' :
-					'Cliquer sur une extrémité d\'une ligne pour l\'étendre'),
+						'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' :
+						'Cliquer sur une extrémité d\'une ligne pour l\'étendre'),
 				activeBackgroundColor: '#ef3',
 				activate: function(active) {
 					draw.setActive(active);

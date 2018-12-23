@@ -128,7 +128,7 @@ var geo_keys = {
 		snapLayers: overlays,
 		styleOptions: {
 			fill: new ol.style.Fill({
-				color: 'rgb(0,0,0,0.3)'
+				color: 'rgba(0,0,0,0.3)'
 			}),
 			stroke: new ol.style.Stroke({
 				color: '#46f'
