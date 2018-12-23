@@ -1012,8 +1012,12 @@ function controlLayersSwitcher(baseLayers) {
  * options.defaultPos {<ZOOM>/<LON>/<LAT>/<LAYER>} if nothing else is defined.
  * Requires 'myol:onadd' layer event
  */
-function controlPermalink(options) {
-	const divElement = document.createElement('div'),
+function controlPermalink(o) {
+	const options = this.options_ = ol.assign({
+			visible: true,
+			init: true
+		}, o),
+		divElement = document.createElement('div'),
 		aElement = document.createElement('a');
 	let this_ = new ol.control.Control({
 		element: divElement,
@@ -1025,7 +1029,7 @@ function controlPermalink(options) {
 
 	this_.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
 
-	if (options.visible) { // Default false
+	if (options.visible) {
 		divElement.className = 'ol-permalink';
 		aElement.innerHTML = 'Permalink';
 		aElement.title = 'Generate a link with map zoom & position';
@@ -1036,7 +1040,7 @@ function controlPermalink(options) {
 		const view = evt.map.getView();
 
 		// Set center & zoom at the init
-		if (options.init !== false && // If use hash & cookies // Default true
+		if (options.init && // If use hash & cookies
 			params) { // Only once
 			view.setZoom(params[1]);
 			view.setCenter(ol.proj.transform(this_.paramsCenter, 'EPSG:4326', 'EPSG:3857'));

@@ -1,27 +1,5 @@
 <!-- IF GEO_MAP_TYPE and POST_ID == TOPIC_FIRST_POST_ID -->
-
-<!-- Openlayers -->
-<!-- INCLUDECSS assets/MyOl/ol/ol.css -->
-<!-- INCLUDEJS assets/MyOl/ol/ol.js -->
-
-<!-- Recherche par nom -->
-<!-- INCLUDECSS assets/MyOl/geocoder/ol-geocoder.min.css -->
-<!-- INCLUDEJS assets/MyOl/geocoder/ol-geocoder.js -->
-
-<!-- Proj4 projections Swiss & UK -->
-<!-- //TODO-CHEM pour all : INCLUDEJS assets/MyOl/proj4/proj4.js -->
-
-<!-- My Openlayers -->
-<!-- INCLUDECSS assets/MyOl/myol.css -->
-<!-- INCLUDEJS assets/MyOl/myol.js -->
-
-<!-- jquery-ui -->
-<!-- INCLUDECSS assets/jquery-ui/jquery-ui.min.css -->
-<!-- INCLUDEJS assets/jquery-ui/jquery-ui.min.js -->
-
-<!-- GeoBB -->
-<!-- INCLUDECSS geobb.css -->
-<!-- INCLUDEJS geobb.js -->
+<!-- INCLUDE includes.html -->
 
 <div id="map"></div>
 
@@ -32,19 +10,9 @@
 	-->
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
-		<p>
-			Lon <input id="editable-lon" type="text" onchange="editable.edit(this,0,4326)" size="10" maxlength="12"/>
-			Lat <input id="editable-lat" type="text" onchange="editable.edit(this,1,4326)" size="10" maxlength="12"/>
-		</p>
-		<p id="editable-xy">Suisse
-			X <input id="editable-x" type="text" onchange="editable.edit(this,0,21781)" size="7" maxlength="12"/>
-			Y <input id="editable-y" type="text" onchange="editable.edit(this,1,21781)" size="7" maxlength="12"/>
-		</p>
-
-		<p><a style="cursor:pointer" onclick="map.getView().setCenter(editable.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
-		<p><a style="cursor:pointer" onclick="editable.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
-		<p><a style="cursor:pointer" onclick="geobbControlGps.action()">Utiliser la position du GPS</a></p>
+	<!-- INCLUDE position_edit.html -->
 	<!-- ENDIF -->
+
 	<!-- IF GEO_MAP_TYPE == 'surface' -->
 		<h3>Modification polygone</h3>
 		<p>- Cliquer et déplacer un sommet pour modifier un polygone.<br/>
@@ -69,10 +37,7 @@
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
 			edit = controlEdit('editable-json', {
 				snapLayers: [overlay],
-				styleOptions: topicStyleOptions,
-				editStyleOptions: editStyleOptions,
 				enableAtInit: true,
-				title: titleEdit,
 				draw: [{
 					type: 'Polygon'
 				}]
@@ -80,17 +45,16 @@
 			extent = edit.source.getExtent(),
 			surface
 			permalink = controlPermalink({
-				init: ol.extent.isEmpty(extent),
-				visible: true
+				init: ol.extent.isEmpty(extent)
 			});
 		map = new ol.MyMap({
 			target: 'map',
 			layers: [
 				overlay
 			],
-			controls: geobbControls().concat([
+			controls: controlsCollection().concat([
 				controlLayersSwitcher(
-					layers({GEO_KEYS})
+					layersCollection({GEO_KEYS})
 				),
 				<!-- IF GEO_MAP_TYPE == 'surface' -->
 					edit,

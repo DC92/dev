@@ -3,10 +3,10 @@
 
 <div id="map-frame">
 	<div id="map"></div>
+	<!-- INCLUDE map_selector.html -->
 </div>
 
 <!-- INCLUDE specific_fields.html -->
-<!-- //TODO-CHEM météo idem WRI -->
 <!-- INCLUDE edit_topic_button.html -->
 
 <script>
@@ -17,9 +17,9 @@
 			layers: [
 				geoLayer({TOPIC_ID})
 			],
-			controls: controlsCollection().concat([
+			controls: geobbControls().concat([
 				controlLayersSwitcher(
-					layersCollection({GEO_KEYS})
+					layers({GEO_KEYS})
 				)
 			])
 		});

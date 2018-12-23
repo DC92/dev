@@ -389,6 +389,7 @@ class listener implements EventSubscriberInterface
 					'GEO_KEYS' => json_encode($geo_keys),
 //					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
+				$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
 		}
 	}
 

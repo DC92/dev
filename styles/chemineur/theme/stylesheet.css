@@ -113,14 +113,7 @@ z.wrap {
 z.username-coloured {
     text-transform: capitalize;
 }
-z.section-index li.header dt {
-	font-size: 130%;
-	color: #4C5D77;
-}
 /* News */
-#news .row:after { /* Avoid only 1 news line at the left of the map */
-	content: none;
-}
 #news .bg1 {
 	clear: none;
 	background-color: transparent;
