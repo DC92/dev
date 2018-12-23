@@ -79,7 +79,7 @@ class listener implements EventSubscriberInterface
 		$msgs = [
 			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
 			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
-			'Bienvenue' => 'GEO_PRESENTATION',
+			'Bienvenue '.$this->user->style['style_name'] => 'GEO_PRESENTATION',
 			'Aide' => 'GEO_URL_AIDE',
 			$mode == 'terms' ? 'Conditions d\'utilisation' : 'Politique de confidentialité' => 'AGREEMENT_TEXT',
 		];

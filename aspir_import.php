@@ -79,6 +79,7 @@ Champ 3 = nature du champ qui peut être :
 - 0 : la saisie sera numérique
 - court : la saisie sera une zone texte de 1 ligne
 - long : la saisie sera une zone de texte comprenant plusieurs lignes
+- confidentiel : le champs ne sera affiché que si l'utilisateur est connecté
 - plusieurs valeurs séparées par une , : liste de choix
 - date : une date
 - proches : la liste des plus proches géographiquement (les alpages)
@@ -94,10 +95,8 @@ Alpages
 =======
 surface|Surface|automatique|ha
 commune|Commune|automatique
-irstea_code|Code Irstea|automatique
-irstea_type|Type Irstea|automatique
-unite_pastorale|Unite Pastorale Irstea|automatiqueign|Carte IGN|automatique
-reserve|Par ou réserve|automatique
+ign|Carte IGN|automatique
+reserve|Parc ou réserve|automatique
 {|1. L'alpage
 {|1.1 Équipements
 {|Autres équipements disponibles
