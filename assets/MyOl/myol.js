@@ -10,14 +10,15 @@
  */
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
 //TODO-ARCHI map off line, application
+//TODO-ARCHI var -> let / const
 
 /**
  * Appends objects. The last one has the priority
  */
 ol.assign = function() {
 	var r = {};
-	for (var a in arguments)
-		for (var v in arguments[a])
+	for (let a in arguments)
+		for (let v in arguments[a])
 			r[v] = arguments[a][v];
 	return r;
 };
@@ -27,7 +28,7 @@ ol.assign = function() {
  */
 ol.MyMap = function(options) {
 	ol.Map.call(this, options);
-	var map = this;
+	let map = this;
 
 	// Add ol.map object reference to the html #map element
 	this.getTargetElement().map_ = map;
@@ -122,7 +123,7 @@ function layerStamen(layer) {
 function layerIGN(key, layer, format) {
 	var IGNresolutions = [],
 		IGNmatrixIds = [];
-	for (var i = 0; i < 18; i++) {
+	for (let i = 0; i < 18; i++) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 		IGNmatrixIds[i] = i.toString();
 	}
@@ -209,7 +210,7 @@ function layerSwissTopo(layer) {
 	var projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];
-	for (var r = 0; r < 18; ++r) {
+	for (let r = 0; r < 18; ++r) {
 		resolutions[r] = ol.extent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
 		matrixIds[r] = r;
 	}
@@ -293,7 +294,7 @@ function controlPermanentCheckbox(selectorName, callback) {
 		location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
 		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
 
-	for (var e = 0; e < checkElements.length; e++) {
+	for (let e = 0; e < checkElements.length; e++) {
 		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
 
 		if (cookie) // Set the checks accordingly with the cookie
@@ -315,7 +316,7 @@ function permanentCheckboxList(selectorName, evt) {
 	var checkElements = document.getElementsByName(selectorName),
 		allChecks = [];
 
-	for (var e = 0; e < checkElements.length; e++) {
+	for (let e = 0; e < checkElements.length; e++) {
 		// Select/deselect all (clicking an <input> without value)
 		if (evt) {
 			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
@@ -356,7 +357,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
 //TODO-BEST JSON error handling : error + URL
 ol.layer.LayerVectorURL = function(o) {
-	var this_ = this, // For callback functions
+	let this_ = this, // For callback functions
 		options = this.options_ = ol.assign({ // Default options
 			baseUrlFunction: function(bbox, list, resolution) {
 				return options.baseUrl + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
@@ -394,9 +395,10 @@ ol.layer.LayerVectorURL = function(o) {
 		}
 	}, options));
 
+	// Create the layer
 	ol.layer.Vector.call(this, ol.assign({
 		source: source,
-		zIndex: 1 // Above baselayer even if included to the map before
+		zIndex: 1 // Above the baselayer even if included to the map before
 	}, options));
 
 	// Optional : checkboxes to tune layer parameters
@@ -408,144 +410,106 @@ ol.layer.LayerVectorURL = function(o) {
 		});
 	}
 
-	// We use only one listener for hover and one for click on all vector layers
 	this.on('myol:onadd', function() {
-		var map = this.map_;
+		let map = this.map_;
 
+		// Create the label popup
 		if (!map.popElement_) { //HACK Only once for all layers
-			// Display a label when hover the feature
 			map.popElement_ = document.createElement('a');
 			map.popElement_.style.display = 'block';
-			var hoveredPixel,
-				hovered = [], // Mem hovered elements to be able to undisplay them the same time
-				popup = new ol.Overlay({ // Only one popup reused for all hovering
-					element: map.popElement_
-				});
-			map.addOverlay(popup);
+			map.popup_ = new ol.Overlay({
+				element: map.popElement_
+			});
+			map.addOverlay(map.popup_);
 
 			// Click on a feature
 			map.on('click', function(evt) {
-				if (!evt.pointerEvent.shiftKey &&
-					!evt.pointerEvent.ctrlKey &&
-					!evt.pointerEvent.altKey &&
-					!evt.pointerEvent.metaKey)
-					evt.target.forEachFeatureAtPixel(
-						evt.pixel,
-						function() {
-							map.popElement_.click(); // Simulate a click on the label
-						}, {
-							hitTolerance: 6
-						});
+				evt.target.forEachFeatureAtPixel(
+					evt.pixel,
+					function() { // Simulate a click on the label
+						map.popElement_.click();
+					}, {
+						hitTolerance: 6
+					});
 			});
-
-			map.on('pointermove', pointerMove);
 		}
 
-		function pointerMove(evt) {
-			hoveredPixel = evt.pixel; // Follow the mouse if line or surface
+		var select = new ol.interaction.Select({
+			condition: ol.events.condition.pointerMove,
+			filter: function(feature, layer) {
+				return layer == this_;
+			},
+			hitTolerance: 6,
+			style: this_.options_.hoverStyle || this_.options_.style
+		});
+
+		select.on('select', function(selectEvent) {
+			var pixel = selectEvent.mapBrowserEvent.pixel;
 
 			// Reset cursor & popup position
 			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
 			map.popElement_.removeAttribute('href');
-
 			var mapRect = map.getTargetElement().getBoundingClientRect(),
 				popupRect = map.popElement_.getBoundingClientRect();
-			if (popupRect.left - 5 > mapRect.x + hoveredPixel[0] || mapRect.x + hoveredPixel[0] >= popupRect.right + 5 ||
-				popupRect.top - 5 > mapRect.y + hoveredPixel[1] || mapRect.y + hoveredPixel[1] >= popupRect.bottom + 5)
-				popup.setPosition(undefined); // Hide label by default if none feature or his popup here
+			if (popupRect.left - 5 > mapRect.x + pixel[0] || mapRect.x + pixel[0] >= popupRect.right + 5 ||
+				popupRect.top - 5 > mapRect.y + pixel[1] || mapRect.y + pixel[1] >= popupRect.bottom + 5)
+				map.popup_.setPosition(undefined); // Hide label by default if none feature or his popup here
 
-			// Reset previous not hovered styles
-			if (hovered)
-				hovered.forEach(function(hovered) {
-					hovered.feature.setStyle(hovered.layer.options_.style);
-				});
+			// Hover the first selected
+			if (selectEvent.selected.length)
+				hovering(selectEvent.selected[0], this_, pixel);
+		});
 
-			// Search the hovered feature(s)
-			hovered = [];
-			map.forEachFeatureAtPixel(hoveredPixel, hovering, {
-				hitTolerance: 6
-			});
-		}
+		map.addInteraction(select);
+	});
 
-		function hovering(feature, layer) {
-			if (layer && layer.options_) {
-				hovered.push({
-					feature: feature,
-					layer: layer,
-				});
+	function hovering(feature, layer, pixel) {
+		let map = layer.map_;
+		if (feature && layer && layer.options_) {
+			var coordinates = feature.getGeometry().flatCoordinates, // If it's a point, just over it
+				ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
+			if (coordinates.length == 2) // Stable if icon
+				pixel = map.getPixelFromCoordinate(coordinates);
 
-				var coordinates = feature.getGeometry().flatCoordinates, // If it's a point, just over it
-					ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
-				if (coordinates.length == 2) // Stable if icon
-					hoveredPixel = map.getPixelFromCoordinate(coordinates);
+			// Hovering label
+			var label = typeof layer.options_.label == 'function' ?
+				layer.options_.label(feature.getProperties(), feature) :
+				layer.options_.label || '',
+				postLabel = typeof layer.options_.postLabel == 'function' ?
+				layer.options_.postLabel(feature.getProperties(), feature, layer, pixel, ll4326) :
+				layer.options_.postLabel || '';
 
-				// Hovering style if any
-				if (layer.options_.hoverStyle)
-					feature.setStyle(layer.options_.hoverStyle);
+			if (label &&
+				!map.popup_.getPosition()) { // Only for the first feature on the hovered stack
+				// Calculate the label's anchor
+				map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
-				// Hovering label
-				var label = typeof layer.options_.label == 'function' ?
-					layer.options_.label(feature.getProperties(), feature) :
-					layer.options_.label || '',
-					postLabel = typeof layer.options_.postLabel == 'function' ?
-					layer.options_.postLabel(feature.getProperties(), feature, layer, hoveredPixel, ll4326) :
-					layer.options_.postLabel || '';
-
-				if (label &&
-					!popup.getPosition()) { // Only for the first feature on the hovered stack
-					// Calculate the label's anchor
-					popup.setPosition(map.getView().getCenter()); // For popup size calculation
-
-					// Fill label class & text
-					map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
-					map.popElement_.innerHTML = label + postLabel;
-					if (typeof layer.options_.href == 'function') {
-						map.popElement_.href = layer.options_.href(feature.getProperties());
-						map.getViewport().style.cursor = 'pointer';
-					}
-
-					// Shift of the label to stay into the map regarding the pointer position
-					if (hoveredPixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-						hoveredPixel[0] += hoveredPixel[0] < map.getSize()[0] / 2 ?
-							10 :
-							-map.popElement_.clientWidth - 10;
-						hoveredPixel[1] = 2;
-					} else {
-						hoveredPixel[0] -= map.popElement_.clientWidth / 2;
-						hoveredPixel[0] = Math.max(hoveredPixel[0], 0); // Bord gauche
-						hoveredPixel[0] = Math.min(hoveredPixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-						hoveredPixel[1] -= map.popElement_.clientHeight + 10;
-					}
-					popup.setPosition(map.getCoordinateFromPixel(hoveredPixel));
+				// Fill label class & text
+				map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
+				map.popElement_.innerHTML = label + postLabel;
+				if (typeof layer.options_.href == 'function') {
+					map.popElement_.href = layer.options_.href(feature.getProperties());
+					map.getViewport().style.cursor = 'pointer';
 				}
+
+				// Shift of the label to stay into the map regarding the pointer position
+				if (pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
+					pixel[0] += pixel[0] < map.getSize()[0] / 2 ?
+						10 :
+						-map.popElement_.clientWidth - 10;
+					pixel[1] = 2;
+				} else {
+					pixel[0] -= map.popElement_.clientWidth / 2;
+					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
+					pixel[0] = Math.min(pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
+					pixel[1] -= map.popElement_.clientHeight + 10;
+				}
+				map.popup_.setPosition(map.getCoordinateFromPixel(pixel));
 			}
 		}
-	});
+	}
 };
 ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
-
-/**
- * www.refuges.info POI layer
- * Requires ol.layer.LayerVectorURL
- */
-function layerPointsWri(options) {
-	return new ol.layer.LayerVectorURL(ol.assign({
-		baseUrl: '//www.refuges.info/api/bbox?type_points=',
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
-				})
-			};
-		},
-		label: function(properties) { // For click on the label
-			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-		},
-		href: function(properties) { // For click on icon
-			return properties.lien;
-		}
-	}, options));
-}
 
 /**
  * Feature format for reading data in the OSMXML format
@@ -555,7 +519,7 @@ ol.format.OSMXMLPOI = function() {
 	ol.format.OSMXML.call(this);
 
 	this.readFeatures = function(source, opt_options) {
-		for (var node = source.documentElement.firstChild; node; node = node.nextSibling)
+		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
 				var newNode = source.createElement('node');
@@ -568,7 +532,7 @@ ol.format.OSMXMLPOI = function() {
 				newTag.setAttribute('v', 'way');
 				newNode.appendChild(newTag);
 
-				for (var subTagNode = node.firstChild; subTagNode; subTagNode = subTagNode.nextSibling)
+				for (let subTagNode = node.firstChild; subTagNode; subTagNode = subTagNode.nextSibling)
 					switch (subTagNode.nodeName) {
 						case 'center':
 							newNode.setAttribute('lon', subTagNode.getAttribute('lon'));
@@ -594,7 +558,7 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
 //TODO-BEST BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
 //TODO-BEST afficher erreur 429 (Too Many Requests)
 layerOverpass = function(o) {
-	var options = ol.assign({ // Default options
+	let options = ol.assign({ // Default options
 			baseUrl: '//overpass-api.de/api/interpreter',
 			maxResolution: 30, // Only call overpass if the map's resolution is lower
 			selectorId: 'overpass', // Element containing all checkboxes
@@ -607,10 +571,10 @@ layerOverpass = function(o) {
 	elSelector.className = 'overpass'; // At the biginning
 
 	function overpassType(properties) {
-		for (var e = 0; e < checkElements.length; e++)
+		for (let e = 0; e < checkElements.length; e++)
 			if (checkElements[e].checked) {
 				var tags = checkElements[e].value.split('+');
-				for (var t = 0; t < tags.length; t++) {
+				for (let t = 0; t < tags.length; t++) {
 					var conditions = tags[t].split('"');
 					if (properties[conditions[1]] &&
 						properties[conditions[1]].match(conditions[3]))
@@ -634,9 +598,9 @@ layerOverpass = function(o) {
 				args = [];
 
 			if (resolution < (options.maxResolution)) { // Only for small areas
-				for (var l = 0; l < list.length; l++) {
+				for (let l = 0; l < list.length; l++) {
 					var lists = list[l].split('+');
-					for (var ls = 0; ls < lists.length; ls++)
+					for (let ls = 0; ls < lists.length; ls++)
 						args.push(
 							'node' + lists[ls] + bb + // Ask for nodes in the bbox
 							'way' + lists[ls] + bb // Also ask for areas
@@ -724,7 +688,7 @@ layerOverpass = function(o) {
 					'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
 				].join(',').split(','),
 				nbInternet = 0;
-			for (var k in p) {
+			for (let k in p) {
 				var k0 = k.split(':')[0];
 				if (!done.includes(k0))
 					switch (k0) {
@@ -824,7 +788,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			elxy.style.display = values.x ? '' : 'none';
 
 		// We insert the resulting HTML string where it is going
-		for (var v in values) {
+		for (let v in values) {
 			var el = document.getElementById(display + '-' + v);
 			if (el) {
 				if (el.value !== undefined)
@@ -886,7 +850,7 @@ function JSONparse(json) {
 var nextButtonTopPos = 6; // Top position of next button (em)
 
 ol.control.Button = function(o) {
-	var this_ = this, // For callback functions
+	let this_ = this, // For callback functions
 		options = this.options_ = ol.assign({
 			className: '',
 			activeBackgroundColor: 'white',
@@ -976,7 +940,7 @@ function controlLayersSwitcher(baseLayers) {
 		var map = evt.target.map_;
 
 		// Base layers selector init
-		for (var name in baseLayers) {
+		for (let name in baseLayers) {
 			var baseElement = document.createElement('div');
 			baseElement.innerHTML =
 				'<input type="checkbox" name="baselayer" value="' + name + '">' +
@@ -1013,7 +977,7 @@ function controlLayersSwitcher(baseLayers) {
 		// Leave only one checked except if Ctrl key is on
 		if (evt && evt.type == 'click' && !evt.ctrlKey) {
 			var checkElements = document.getElementsByName('baselayer');
-			for (var e = 0; e < checkElements.length; e++)
+			for (let e = 0; e < checkElements.length; e++)
 				if (checkElements[e] != evt.target)
 					checkElements[e].checked = false;
 		}
@@ -1021,7 +985,7 @@ function controlLayersSwitcher(baseLayers) {
 		list = permanentCheckboxList('baselayer');
 
 		// Refresh layers visibility & opacity
-		for (var layerName in baseLayers) {
+		for (let layerName in baseLayers) {
 			baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
 			baseLayers[layerName].setOpacity(0);
 		}
@@ -1232,7 +1196,7 @@ function controlLoadGPX() {
 
 			// Zoom the map on the added features
 			var extent = ol.extent.createEmpty();
-			for (var f in features)
+			for (let f in features)
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
 			button.getMap().getView().fit(extent);
 		} else {
@@ -1257,9 +1221,10 @@ function controlLoadGPX() {
  * Requires 'myol:onadd' layer event
  */
 //TODO-BEST Nommage des tracks / du fichier.
+//TODO sortir les features visibles
 function controlDownloadGPX() {
 	var map,
-		selectedFeatures = [],
+		//		selectedFeatures = [],
 		hiddenElement = document.createElement('a'),
 		button = new ol.control.Button({
 			label: '&dArr;',
@@ -1267,11 +1232,13 @@ function controlDownloadGPX() {
 			activate: function(evt) {
 				if (button.map_.selectedFeatures_) // If there is an active editor
 					download(button.map_.selectedFeatures_);
-				else if (selectedFeatures.length) // If there are selected features
-					//TODO BUG ne sélectionne pas
-					download(selectedFeatures);
+				//				else if (selectedFeatures.length) // If there are selected features
+				//TODO BUG ne sélectionne pas
+				//					download(selectedFeatures);
 				else
-					alert('Sélectionnez une ou plusieurs traces à sauvegarder avec "Shift+Clic"');
+					alert('En maintenant "Shift" enfoncé\n' +
+						'cliquez sur une ou plusieurs traces\n' +
+						'puis sur ce contrôle');
 			}
 		});
 
@@ -1280,31 +1247,31 @@ function controlDownloadGPX() {
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	button.on('myol:onadd', function(evt) {
-		var map = evt.target.map_;
+	/*//TODO	button.on('myol:onadd', function(evt) {
+			var map = evt.target.map_;
 
-		// Selection of lines
-		//TODO BUG ne colore pas car le style est géré par layergeojson
-		var select = new ol.interaction.Select({
-			condition: function(evts) {
-				return ol.events.condition.shiftKeyOnly(evts) && ol.events.condition.click(evts);
-			},
-			filter: function(feature) {
-				return feature.getGeometry().getType().indexOf('Line') !== -1;
-			},
-			hitTolerance: 6,
-			style: new ol.style.Style({
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 2
+			// Selection of lines
+			//TODO BUG ne colore pas car le style est géré par layergeojson
+			var select = new ol.interaction.Select({
+				condition: function(selectEvent) {
+					return ol.events.condition.shiftKeyOnly(selectEvent) && ol.events.condition.click(selectEvent);
+				},
+				filter: function(feature) {
+					return feature.getGeometry().getType().indexOf('Line') !== -1;
+				},
+				hitTolerance: 6,
+				style: new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 2
+					})
 				})
-			})
-		});
-		select.on('select', function(evts) { //TODO BUG ne sélectionne pas
-			selectedFeatures = evts.target.getFeatures().getArray();
-		});
-		map.addInteraction(select);
-	});
+			});
+			select.on('select', function(selectEvent) { //TODO BUG ne sélectionne pas
+				selectedFeatures = selectEvent.target.getFeatures().getArray();
+			});
+			map.addInteraction(select);
+		});*/
 
 	function download(layers) {
 		var fileName = 'trace.gpx',
@@ -1382,6 +1349,7 @@ function controlEdit(inputId, options) {
 			source: source,
 			zIndex: 20
 		}),
+		//TODO ARCHI => this_
 		button = new ol.control.Button(ol.assign({
 			label: 'M',
 			title: 'Activer "M" (couleur jaune) puis\n' +
@@ -1427,12 +1395,13 @@ function controlEdit(inputId, options) {
 		var map = evt.target.map_;
 
 		// Save features for who wants to use it
-		map.selectedFeatures_ = features;
+		//TODO DELETE		map.selectedFeatures_ = features;
 
 		map.addLayer(layer);
 		button.toggle(options.enableAtInit); //TODO TEST : enable quand meme à l'init si toggle(false)
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
+		//TODO-ARCHI ??? options.condition : singleClick;
 		map.getInteractions().getArray().forEach(function(i) {
 			if (i instanceof ol.interaction.DoubleClickZoom)
 				map.removeInteraction(i);
@@ -1456,10 +1425,12 @@ function controlEdit(inputId, options) {
 				group: button,
 				label: drawOption.type.charAt(0),
 				title: 'Activer "' + drawOption.type.charAt(0) + '" puis\n' +
-					'Cliquer sur la carte et sur chaque point du tracé pour dessiner ' +
+					'Cliquer sur la carte et sur chaque désiré pour dessiner ' +
 					(drawOption.type == 'Polygon' ? 'un polygone' : 'une ligne') +
-					',\ndouble cliquer pour terminer.' +
-					(drawOption.type == 'Polygon' ? '\nSi le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' : ''),
+					',\ndouble cliquer pour terminer.\n' +
+					(drawOption.type == 'Polygon' ?
+					'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' :
+					'Cliquer sur une extrémité d\'une ligne pour l\'étendre'),
 				activeBackgroundColor: '#ef3',
 				activate: function(active) {
 					draw.setActive(active);
@@ -1478,7 +1449,7 @@ function controlEdit(inputId, options) {
 			options.snapLayers.forEach(function(layer) {
 				layer.getSource().on('change', function() {
 					var fs = this.getFeatures();
-					for (var f in fs)
+					for (let f in fs)
 						snap.addFeature(fs[f]);
 				});
 			});
@@ -1494,7 +1465,7 @@ function controlEdit(inputId, options) {
 				var features = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6
 				});
-				for (var f in features)
+				for (let f in features)
 					if (features[f].getGeometry().getType() != 'Point')
 						source.removeFeature(features[f]); // We delete the pointed feature
 			}
@@ -1518,11 +1489,11 @@ function controlEdit(inputId, options) {
 		var features = source.getFeatures(),
 			lines = [],
 			polys = [];
-		for (var f in features)
+		for (let f in features)
 			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
 		source.clear(); // And clear the edited layer
 
-		for (var a = 0; a < lines.length; a++) {
+		for (let a = 0; a < lines.length; a++) {
 			// Exclude 1 coord features (points)
 			if (lines[a] && lines[a].length < 2)
 				lines[a] = null;
@@ -1535,9 +1506,9 @@ function controlEdit(inputId, options) {
 			}
 
 			// Merge lines having a common end
-			for (var b = 0; b < a; b++) { // Once each combination
+			for (let b = 0; b < a; b++) { // Once each combination
 				var m = [a, b];
-				for (var i = 4; i; i--) // 4 times
+				for (let i = 4; i; i--) // 4 times
 					if (lines[m[0]] && lines[m[1]]) {
 						// Shake lines end to explore all possibilities
 						m.reverse();
@@ -1557,14 +1528,14 @@ function controlEdit(inputId, options) {
 		}
 
 		// Makes holes if a polygon is included in a biggest one
-		for (var p1 in polys)
+		for (let p1 in polys)
 			if (polys[p1]) {
 				var fs = new ol.geom.Polygon(polys[p1]);
-				for (var p2 in polys)
+				for (let p2 in polys)
 					if (p1 != p2 &&
 						polys[p2]) {
 						var intersects = true;
-						for (var c in polys[p2][0])
+						for (let c in polys[p2][0])
 							if (!fs.intersectsCoordinate(polys[p2][0][c]))
 								intersects = false;
 						if (intersects) {
@@ -1575,13 +1546,13 @@ function controlEdit(inputId, options) {
 			}
 
 		// Recreate modified features
-		for (var l in lines)
+		for (let l in lines)
 			if (lines[l]) {
 				source.addFeature(new ol.Feature({
 					geometry: new ol.geom.LineString(lines[l])
 				}));
 			}
-		for (var p in polys)
+		for (let p in polys)
 			if (polys[p])
 				source.addFeature(new ol.Feature({
 					geometry: new ol.geom.Polygon(polys[p])
@@ -1596,11 +1567,11 @@ function controlEdit(inputId, options) {
 
 	function flatCoord(existingCoords, newCoords, pointerPosition) {
 		if (typeof newCoords[0][0] == 'object')
-			for (var c1 in newCoords)
+			for (let c1 in newCoords)
 				flatCoord(existingCoords, newCoords[c1], pointerPosition);
 		else {
 			existingCoords.push([]); // Increment existingCoords array
-			for (var c2 in newCoords)
+			for (let c2 in newCoords)
 				if ( //button.group.L && // Only if we manage Lines
 					pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
 					// If this is the pointed one, forget it &

@@ -1,6 +1,29 @@
 var _v=document.cookie,_r='COOKIES : ';if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r);
 
 /**
+ * www.refuges.info POI layer
+ * Requires ol.layer.LayerVectorURL
+ */
+function layerPointsWri(options) {
+	return new ol.layer.LayerVectorURL(ol.assign({
+		baseUrl: '//www.refuges.info/api/bbox?type_points=',
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+				})
+			};
+		},
+		label: function(properties) { // For click on the label
+			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+		},
+		href: function(properties) { // For click on icon
+			return properties.lien;
+		}
+	}, options));
+}
+
+/**
  * www.refuges.info areas layer
  * Requires ol.layer.LayerVectorURL
  */
