@@ -16,7 +16,7 @@ config.php -> clés cartes : $geo_keys = [...]
 Paramètres de cookie -> Domaine du cookie : VIDE
 Supprimer install
 Administration ==>
-Genéral -> Paramètres des fichiers joints -> Taille maximale du fichier : : 5 Mo
+Genéral -> Paramètres des fichiers joints -> Quota & taille maximale du fichier : 0
 Général -> Configuration du forum -> Libellé du site Internet :
 Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
 Général -> Paramètres du serveur -> Activer la compression GZip : oui
@@ -35,6 +35,16 @@ Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
 Créer un item d'Alpage, Cabane, Point d'eau
 Exécuter aspir_import.php ...
 Administration -> Gérer les forums -> Alpages -> Resynchroniser
+
+UPDATE PHPBB
+============
+Copy full package sauf config.php & docs
+Run /install/app.php/update (on peut lancer la racine avant)
+Français -> Change
+Mise à jour
+Mettre à jour uniquement la base de données -> Envoyer
+Attendre 100%
+Supprimer /install
 
 ACCEPTER MODERATEUR
 ===================
