@@ -25,18 +25,13 @@ class listener implements EventSubscriberInterface
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
 		\phpbb\user $user,
-		\phpbb\auth\auth $auth,
-		\phpbb\extension\manager $extension_manager,
-		$root_path
+		\phpbb\auth\auth $auth
 	) {
 		$this->db = $db;
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
 		$this->auth = $auth;
-//TODO-ARCHI		$this->extension_manager = $extension_manager;
-//TODO-ARCHI		$this->root_path = $root_path;
-//TODO-ASPIR ??? recherche par département / commune
 	}
 
 	// Liste des hooks et des fonctions associées
@@ -63,6 +58,7 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_end' => 'submit_post_end',
 		];
 	}
+	//TODO-ASPIR ??? recherche par département / commune
 
 	/**
 		ALL
@@ -262,7 +258,6 @@ class listener implements EventSubscriberInterface
 			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
 			$this->get_bounds($geophp);
 			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-//TODO-BEST			$this->optim ($gp, 0.0001); // La longueur min des segments de lignes & surfaces sera de 0.0001 ° = 10 000 km / 90° * 0.0001 = 11m
 			$post_data['geojson'] = json_encode ($gp);
 		}
 
@@ -790,48 +785,6 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 	}
 
-	/*//TODO-BEST geophp simplify : https://github.com/phayes/geoPHP/issues/24
-    $oGeometry = geoPHP::load($skt,'wkt');
-    $reducedGeom = $oGeometry->simplify(1.5);
-    $skt = $reducedGeom->out('wkt');Erradiquer geoPHP ? si SQL >= version 5.7 (inclue JSON) -> Phpbb 3.2
-	*/
-	function optim (&$g, $granularity) { // Fonction récursive d'optimisation d'un objet PHP contenant des objets géographiques
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim',true).'</pre>';
-/*
-		if (isset ($g->geometries)) // On recurse sur les Collection, ...
-			foreach ($g->geometries AS &$gs)
-				$this->optim ($gs, $granularity);
-
-		if (isset ($g->features)) // On recurse sur les Feature, ...
-			foreach ($g->features AS &$fs)
-				$this->optim ($fs, $granularity);
-
-		if (preg_match ('/multi/i', $g->type)) {
-			foreach ($g->coordinates AS &$gs)
-				$this->optim_coordinate_array ($gs, $granularity);
-		} elseif (isset ($g->coordinates)) // On a trouvé une liste de coordonnées à optimiser
-			$this->optim_coordinate_array ($g->coordinates, $granularity);
-*/
-	}
-	function optim_coordinate_array (&$cs, $granularity) { // Fonction d'optimisation d'un tableau de coordonnées
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export('optim_coordinate_array',true).'</pre>';
-/*
-		if (count ($cs) > 2) { // Pour éviter les "Points" et "Poly" à 2 points
-			$p = $cs[0]; // On positionne le point de référence de mesure de distance à une extrémité
-			$r = []; // La liste de coordonnées optimisées
-			foreach ($cs AS $k=>$v)
-				if (!$k || // On garde la première extrémité
-					$k == count ($cs) - 1) // Et la dernière
-					$r[] = $v;
-				elseif (hypot ($v[0] - $p[0], $v[1] - $p[1]) > $granularity)
-					$r[] = // On copie ce point
-					$p = // On repositionne le point de référence
-						$v;
-			$cs = $r; // On écrase l'ancienne
-		}
-*/
-	}
-
 	// Calcul de la bbox englobante
 	function get_bounds($g) {
 		$b = $g->getBBox();
@@ -849,5 +802,4 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		}
 		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
 	}
-
 }

@@ -1,3 +1,14 @@
+UPDATE PHPBB
+============
+Copy full package sauf config.php & docs
+Run /install/app.php/update (on peut lancer la racine avant)
+Français -> Change
+Mise à jour
+Mettre à jour uniquement la base de données -> Envoyer
+Attendre 100%
+Supprimer /install
+
+
 BUGS CHEMINEUR
 ==============
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
