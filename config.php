@@ -4,7 +4,7 @@
 $dbms = 'phpbb\\db\\driver\\mysqli';
 $dbhost = 'localhost';
 $dbport = '';
-$dbname = 'geobb32';
+$dbname = 'geobbt';
 $dbuser = 'root';
 $dbpasswd = '';
 $table_prefix = 'phpbb_';

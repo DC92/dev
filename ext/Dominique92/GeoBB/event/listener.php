@@ -391,7 +391,8 @@ class listener implements EventSubscriberInterface
 					'GEO_KEYS' => json_encode($geo_keys),
 //					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
-				$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
+				if ($geo_keys)
+					$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
 		}
 	}
 
@@ -815,7 +816,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 		RESIZE IMAGES
 	*/
 	// Insère des miniatures des liens.jpg insérés dans les messages
-	function viewtopic_modify_post_row($vars) { // ligne 2006
+	function viewtopic_modify_post_row_2($vars) {
 		global $db;
 		$post_row = $vars['post_row'];
 		preg_match_all('/href="(http[^"]*\.(jpe?g|png))"[^>]*>([^<]*\.(jpe?g|png))<\/a>/i', $post_row['MESSAGE'], $imgs); // Récupère les urls d'images

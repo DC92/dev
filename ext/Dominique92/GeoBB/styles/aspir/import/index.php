@@ -13,28 +13,36 @@ Lancer install
 -> Français -> Change
 Installer -> Installer
 config.php -> clés cartes : $geo_keys = [...]
-Paramètres de cookie -> Domaine du cookie : VIDE
 Supprimer install
 Administration ==>
+Général -> Gérer les forums -> Créer
+	Alpages [first=surface][/first][fiche=Alpages][/fiche]
+	Cabanes [first=point][/first][fiche=Cabanes][/fiche] ext/Dominique92/GeoBB/types_points/cabane.png
+	Points d'eau [first=point][/first][fiche=Points d'eau][/fiche] ext/Dominique92/GeoBB/types_points/point_eau.png
+	Forum des utilisateurs
+	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
+	catégorie Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs
 Genéral -> Paramètres des fichiers joints -> Quota & taille maximale du fichier : 0
 Général -> Configuration du forum -> Libellé du site Internet :
 Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
 Général -> Paramètres du serveur -> Activer la compression GZip : oui
-Personnaliser -> Désactiver VigLink
-Personnaliser -> Installation de styles -> Aspir -> Détails -> Définir comme style par défaut
-Personnaliser -> Gérer de styles -> Prosilver -> Désactiver
+Général -> Paramètres de charge -> Recompiler les différents éléments du style : non
 Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
 Messages -> Ajouter un bbcode -> [fiche={TEXT}][/fiche] / <span></span> / ne pas oublier [/fiche] dans les forum_desc
-Général -> Gérer les forums -> Créer Alpages, Cabanes, Points d'eau, Forum des utilisateurs
-	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
-	catégorie Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs
 Permissions -> Permissions des forums -> Coin des modérateurs + Configuration + Bugs * + Echanges -> Envoyer
 	Robots + Invités + Utilisateurs * -> Aucun accès -> Appliquer toutes
 Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
 	Utilisateurs * enregistrés -> Accès standard -> Appliquer toutes
+Personnaliser -> Désactiver VigLink
+Personnaliser -> Installation de styles -> Aspir -> Détails -> Définir comme style par défaut
+Personnaliser -> Gérer de styles -> Prosilver -> Désactiver
 Créer un item d'Alpage, Cabane, Point d'eau
-Exécuter aspir_import.php ...
+Exécuter ext/Dominique92/GeoBB/styles/aspir/import
+Move ext/Dominique92/GeoBB/styles/aspir/import/LOG/... LOG/
 Administration -> Gérer les forums -> Alpages -> Resynchroniser
+
+Clean
+DELETE FROM phpbb_posts WHERE post_id > 8
 
 UPDATE PHPBB
 ============
@@ -105,6 +113,9 @@ Alpages
 =======
 surface|Surface|automatique|ha
 commune|Commune|automatique
+irstea_code||automatique
+irstea_type||automatique
+unite_pastorale||automatique
 ign|Carte IGN|automatique
 reserve|Parc ou réserve|automatique
 {|1. L'alpage
@@ -333,31 +344,31 @@ point_eau_debit|Débit|source,rivière,point d'eau permanent,point d'eau semi pe
 */
 
 echo"<p>
-<a href='aspir_import.php?d=01'>01</a> &nbsp; 
-<a href='aspir_import.php?d=04'>04</a> &nbsp; 
-<a href='aspir_import.php?d=05'>05</a> &nbsp; 
-<a href='aspir_import.php?d=07'>07</a> &nbsp; 
-<a href='aspir_import.php?d=13'>13</a> &nbsp; 
-<a href='aspir_import.php?d=26'>26</a> &nbsp; 
-<a href='aspir_import.php?d=38'>38</a> &nbsp; 
-<a href='aspir_import.php?d=42'>42</a> &nbsp; 
-<a href='aspir_import.php?d=43'>43</a> &nbsp; 
-<a href='aspir_import.php?d=63'>63</a> &nbsp; 
-<a href='aspir_import.php?d=69'>69</a> &nbsp; 
-<a href='aspir_import.php?d=73'>73</a> &nbsp; 
-<a href='aspir_import.php?d=74'>74</a> &nbsp; 
-<a href='aspir_import.php?d=83'>83</a> &nbsp; 
-<a href='aspir_import.php?d=84'>84</a> &nbsp; 
+<a href='?d=01'>01</a> &nbsp; 
+<a href='?d=04'>04</a> &nbsp; 
+<a href='?d=05'>05</a> &nbsp; 
+<a href='?d=07'>07</a> &nbsp; 
+<a href='?d=13'>13</a> &nbsp; 
+<a href='?d=26'>26</a> &nbsp; 
+<a href='?d=38'>38</a> &nbsp; 
+<a href='?d=42'>42</a> &nbsp; 
+<a href='?d=43'>43</a> &nbsp; 
+<a href='?d=63'>63</a> &nbsp; 
+<a href='?d=69'>69</a> &nbsp; 
+<a href='?d=73'>73</a> &nbsp; 
+<a href='?d=74'>74</a> &nbsp; 
+<a href='?d=83'>83</a> &nbsp; 
+<a href='?d=84'>84</a> &nbsp; 
 </p>";
 
 define('IN_PHPBB', true);
-$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : './';
+$phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../../../../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 
-include_once('./assets/geoPHP/geoPHP.inc');
-include_once('./aspir_import/proj4php/vendor/autoload.php');
+include($phpbb_root_path . 'assets/geoPHP/geoPHP.inc');
+include('./proj4php/vendor/autoload.php');
 use proj4php\Proj4php;
 use proj4php\Proj;
 use proj4php\Point;
@@ -375,8 +386,14 @@ $projDst = new Proj('EPSG:4326', $proj4);
 // Parameters
 $epid = $request->variable('d', '00');
 $upzp = $request->variable('p', 'UP');
-$alp_forum_id = $request->variable('f', 2);
-echo"<pre style='background-color:white;color:black;font-size:14px;'>Import enquete ".var_export($upzp.':'.$epid,true).'</pre>';
+echo 'Import enquete '.var_export($upzp.':'.$epid,true).'<br/>';
+
+// Search alpages forum
+$sql = 'SELECT forum_id FROM phpbb_forums WHERE forum_name LIKE "Alpages"';
+$result = $db->sql_query($sql);
+$forum_data = $db->sql_fetchrow($result);
+$db->sql_freeresult($result);
+$alp_forum_id = $forum_data['forum_id'];
 
 // Get irstea list
 // http://enquete-pastorale.irstea.fr/getPHP/getUPJSON.php?id=38
@@ -440,7 +457,7 @@ foreach ($epiphp->features as $p)
 
 		//  Création d'une fiche
 		if ($p->geometry->coordinates && !$data['topic_id']) {
-			echo '<pre style="background-color:white;color:black;font-size:14px;">Céation de '.var_export($p->properties->nom1,true).'</pre>';
+			echo 'Céation de '.var_export($p->properties->nom1,true).'<br/>';
 
 			$data = [
 				'forum_id' => $alp_forum_id,
@@ -454,7 +471,7 @@ foreach ($epiphp->features as $p)
 				'icon_id' => 0,
 				'enable_bbcode' => true,
 				'enable_smilies' => true,
-				'poster_id' => $user->data['user_id'],
+				'poster_id' => 2, // Mandatory : system $user->data['user_id'],
 				'enable_urls' => true,
 				'enable_sig' => true,
 				'topic_visibility' => true,
