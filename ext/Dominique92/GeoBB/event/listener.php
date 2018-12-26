@@ -57,12 +57,10 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_end' => 'submit_post_end',
 
-/*
 			// Resize images
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
-*/
 		];
 	}
 	//TODO-ASPIR ??? recherche par département / commune
@@ -175,6 +173,8 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
+		$this->viewtopic_modify_post_row_2($vars);
+
 		$post_id = $vars['row']['post_id'];
 		$this->template->assign_vars ([
 			'TOPIC_FIRST_POST_ID' => $vars['topic_data']['topic_first_post_id'],
