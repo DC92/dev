@@ -555,7 +555,7 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Requires ol.layer.LayerVectorURL
  */
 //TODO-IE BUG pas d'overpass sur IE
-//TODO-BEST BUG quand déplace ou zoom aprés avoir changer un sélecteur : affiche des ?
+//TODO-BEST BUG quand déplace ou zoom aprés avoir changé un sélecteur : affiche des ?
 //TODO-BEST afficher erreur 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = ol.assign({ // Default options
@@ -848,7 +848,6 @@ function JSONparse(json) {
  * options.action {function} called when the control is clicked.
  */
 let nextButtonTopPos = 6; // Top position of next button (em)
-//TODO BUG ne passe pas une position avant l'éditeur de ASPIR surface
 
 ol.control.Button = function(o) {
 	const this_ = this, // For callback functions
@@ -879,7 +878,7 @@ ol.control.Button = function(o) {
 	if (options.rightPosition) {
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
-	} else {
+	} else if (options.label) { // Don't book a button if not visible
 		divElement.style.left = '.5em';
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
 	}
@@ -1006,16 +1005,16 @@ function controlLayersSwitcher(baseLayers) {
 
 /**
  * Permalink control
- * options.visible {true | false | undefined} add a controlPermalink button to the map.
- * options.init {true | false | undefined} use url hash or "controlPermalink" cookie to position the map.
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * options.defaultPos {<ZOOM>/<LON>/<LAT>/<LAYER>} if nothing else is defined.
  * Requires 'myol:onadd' layer event
  */
 function controlPermalink(o) {
+	//TODO-ARCHI all : commenter les options, first is default
 	const options = this.options_ = ol.assign({
-			visible: true,
-			init: true
+			hash: '?', // {?, #} the permalink delimiter
+			visible: true, // {true | false} add a controlPermalink button to the map.
+			init: true // {true | false} use url hash or "controlPermalink" cookie to position the map.
 		}, o),
 		divElement = document.createElement('div'),
 		aElement = document.createElement('a');
@@ -1023,7 +1022,7 @@ function controlPermalink(o) {
 		element: divElement,
 		render: render
 	});
-	let params = location.hash.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
+	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
 		(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
 
@@ -1048,7 +1047,6 @@ function controlPermalink(o) {
 		}
 
 		// Check the current map zoom & position
-		//TODO BUG : n'interprete pas le permalink _GET quand on clique sur un signet (chrome)
 		const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 			newParams = [
 				parseInt(view.getZoom()),
@@ -1057,7 +1055,7 @@ function controlPermalink(o) {
 			];
 
 		// Set the new permalink
-		aElement.href = '#map=' + newParams.join('/');
+		aElement.href = options.hash + 'map=' + newParams.join('/');
 		document.cookie = 'map=' + newParams.join('/') + ';path=/';
 	}
 

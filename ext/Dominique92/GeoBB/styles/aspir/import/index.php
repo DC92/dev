@@ -1,6 +1,5 @@
 <?php
 // Importation des bases enquete-pastorale.irstea
-//TODO DELETE assets/proj4php aprés l'import projet !!!
 
 /* OPERATIONS
 
@@ -58,10 +57,8 @@ ACCEPTER MODERATEUR
 ===================
 Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
 
-
 						UPDATE VERSION PHPBB
 						====================
-						//TODO ASPIR test 1&1 & migation
 						copier full package
 						install/app.php/update -> database only
 						delete install

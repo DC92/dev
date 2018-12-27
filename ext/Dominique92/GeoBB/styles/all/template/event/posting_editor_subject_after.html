@@ -1,5 +1,5 @@
 <!-- IF GEO_MAP_TYPE and POST_ID == TOPIC_FIRST_POST_ID -->
-<!-- INCLUDE includes.html -->
+<!-- INCLUDE overall_geobb_includes.html -->
 
 <div id="map"></div>
 
@@ -10,7 +10,10 @@
 	-->
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
-	<!-- INCLUDE position_edit.html -->
+		<!-- INCLUDE posting_point_position.html -->
+	<!-- ENDIF -->
+
+	<!-- IF GEO_MAP_TYPE == 'ligne' -->
 	<!-- ENDIF -->
 
 	<!-- IF GEO_MAP_TYPE == 'surface' -->
@@ -25,21 +28,20 @@
 		<h3>Suppression polygone</h3>
 		<p>- Ctrl+Alt+cliquer sur un segment d'un polygone pour supprimer ce polygone.</p>
 	<!-- ENDIF -->
-
-	<!-- //TODO-CHEM pour all p>(*) Vider le champ ou le laisser vide pour que le serveur le détermine automatiquement.</p -->
 </dl>
 
-<!-- INCLUDE specific_fields_edit.html -->
+<!-- INCLUDE posting_specific_fields.html -->
 
 <script>
 	var map, editable;
 	window.addEventListener('load', function() {
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
+			controls = controlsCollection(),
 			edit = controlEdit('editable-json', {
 				snapLayers: [overlay],
 				enableAtInit: true,
 				draw: [{
-					type: 'Polygon'
+					type: 'LineString'
 				}]
 			}),
 			extent = edit.source.getExtent(),
@@ -52,11 +54,11 @@
 			layers: [
 				overlay
 			],
-			controls: controlsCollection().concat([
+			controls: controls.concat([
 				controlLayersSwitcher(
 					layersCollection({GEO_KEYS})
 				),
-				<!-- IF GEO_MAP_TYPE == 'surface' -->
+				<!-- IF GEO_MAP_TYPE == 'ligne' -->
 					edit,
 				<!-- ENDIF -->
 				permalink

@@ -1,5 +1,5 @@
 <!-- IF GEO_MAP_TYPE and POST_ID == TOPIC_FIRST_POST_ID -->
-<!-- INCLUDE includes.html -->
+<!-- INCLUDE overall_geobb_includes.html -->
 
 <div id="map"></div>
 
@@ -7,7 +7,7 @@
 	<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
-	<!-- INCLUDE position_edit.html -->
+	<!-- INCLUDE posting_point_position.html -->
 	<!-- ENDIF -->
 
 	<!-- IF GEO_MAP_TYPE == 'surface' -->
@@ -24,7 +24,7 @@
 	<!-- ENDIF -->
 </dl>
 
-<!-- INCLUDE specific_fields_edit.html -->
+<!-- INCLUDE posting_specific_fields.html -->
 
 <script>
 	var map, editable;

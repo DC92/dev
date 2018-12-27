@@ -58,7 +58,6 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_end' => 'submit_post_end',
 
 			// Resize images
-			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
 		];
