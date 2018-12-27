@@ -39,6 +39,7 @@ class listener implements EventSubscriberInterface
 	static public function getSubscribedEvents() {
 		return [
 			// All
+			'core.user_setup' => 'user_setup',
 			'core.page_footer' => 'page_footer',
 
 			// Index
@@ -64,9 +65,23 @@ class listener implements EventSubscriberInterface
 	}
 	//TODO-ASPIR ??? recherche par département / commune
 
+
 	/**
 		ALL
 	*/
+	function user_setup($vars) {
+		// Force le style 
+		$style_name = request_var ('style', '');
+		if ($style_name) {
+			$sql = 'SELECT * FROM '.STYLES_TABLE.' WHERE style_name = "'.$style_name.'"';
+			$result = $this->db->sql_query ($sql);
+			$row = $this->db->sql_fetchrow ($result);
+			$this->db->sql_freeresult ($result);
+			if ($row)
+				$vars['style_id'] =  $row ['style_id'];
+		}
+	}
+
 	function page_footer() {
 //		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
 
