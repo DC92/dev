@@ -75,19 +75,19 @@ z.wrap {
 	top: -20px;
 	right: 10px;
 }
-#site-description {
+#site-description-geobb {
 	float: none;
 	width: auto;
 	padding-top: 5px;
 	text-align: center;
 	color: yellow;
 }
-#site-description h1 {
+#site-description-geobb h1 {
 	font-size: 3em;
 	display: inline;
 	color: yellow;
 }
-#site-description p {
+#site-description-geobb p {
 	padding-left: 10px;
 	font-size: 1.8em;
 	display: inline;
