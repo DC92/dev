@@ -40,8 +40,8 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, array(
 //TODO-ARCHI reprendre tous les textes dans GeoBB
 	// Fil d'ariane
-	'FORUM_INDEX' => 'Accueil',
-	'RETURN_TO_INDEX' => 'Accueil',
+	'FORUM_INDEX' => 'Accueil', //TODO DELETE (ne va pas le chercher là !!!)
+	'RETURN_TO_INDEX' => 'Accueil', //TODO DELETE ???
 	'ACP_SHORT' => 'Administration',
 	'MCP_SHORT' => 'Modération',
 

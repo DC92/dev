@@ -20,6 +20,7 @@
 	"extra": {
 		"display-name": "GeoBB",
 		"soft-require": {
+			"//TODO": ">=3.2.0",
 			"phpbb/phpbb": ">=3.1.0,<3.2.*@dev"
 		}
 	}

@@ -86,6 +86,8 @@ https://www.phpbb.com/support/docs/en/3.2/ug/upgradeguide/general_conversion/
 
 TODO WRI
 ========
+Démasquer le CSS "me cacher en ligne"
+Remettre les forums au niveau 1 (supprimer la catégorie WRI)
 Faire une fiche de tests
 Mettre le format date sur tous les users
 Tester https//wri... tous les referrers
@@ -100,6 +102,7 @@ Déraciner le wiki / le mettre dans le forum
 
 WRI API
 =======
+Langage ACP / ADM, ... (menu haut page)
 Bug remontée MultiPolygon / default : null
 Erreur: sur geom vide dans un polynome
 Durée cache réglable

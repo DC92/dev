@@ -5,6 +5,10 @@ $dbms = 'phpbb\\db\\driver\\mysqli';
 $dbhost = 'localhost';
 $dbport = '';
 $dbname = 'geobbt';
+
+if ($_SERVER['SERVER_NAME'] == 'astro')
+	$dbname = 'astro';
+
 $dbuser = 'root';
 $dbpasswd = '';
 $table_prefix = 'phpbb_';
