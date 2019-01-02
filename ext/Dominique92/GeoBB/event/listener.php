@@ -160,6 +160,70 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
+
+		// For docs composition
+		$this->forum_tree(0, '');
+	}
+
+	function forum_tree($parent, $num) {
+		$sql = "
+			SELECT forum_id, forum_name, forum_type
+			FROM ".FORUMS_TABLE."
+			WHERE parent_id = $parent";
+		$result_forum = $this->db->sql_query($sql);
+		$last_num = 1;
+		while ($row_forum = $this->db->sql_fetchrow($result_forum)) {
+			if ($parent) {
+				$forum_num = $num.$last_num++.'.';
+				$this->template->assign_block_vars('forum_tree', [
+					'LEVEL' => count (explode ('.', $forum_num)),
+					'TITLE' => $forum_num.' '.$row_forum['forum_name'],
+				]);
+			}
+			if($row_forum['forum_type']) { // C'est un forum (pas une catégotie)
+				$sql = "
+					SELECT post_id,post_subject,post_text,post_attachment,bbcode_uid,bbcode_bitfield
+					FROM ".POSTS_TABLE." AS p
+						JOIN ".TOPICS_TABLE." AS t USING (topic_id)
+					WHERE p.post_id = t.topic_first_post_id AND
+						p.forum_id = {$row_forum['forum_id']}
+					ORDER BY post_subject";
+				$result_post = $this->db->sql_query($sql);
+				while ($row_post = $this->db->sql_fetchrow($result_post)) {
+					preg_match ('/^([0-9\.]+) (.*)$/', $row_post['post_subject'], $titles);
+					$post_text = generate_text_for_display ($row_post['post_text'],
+						$row_post['bbcode_uid'],
+						$row_post['bbcode_bitfield'],
+						OPTION_FLAG_BBCODE, true);
+					
+					$sql = "
+						SELECT *
+						FROM ". ATTACHMENTS_TABLE ."
+						WHERE post_msg_id = {$row_post['post_id']}
+						ORDER BY filetime DESC";
+					$result_attachement = $this->db->sql_query($sql);
+					$attachments = [];
+					while ($row_attachement = $this->db->sql_fetchrow($result_attachement))
+						$attachments[] = $row_attachement;
+					$this->db->sql_freeresult($result_attachement);
+					$update_count = array();
+					if (count($attachments))
+						parse_attachments(0, $post_text, $attachments, $update_count);
+
+					if (count ($titles)) {
+						$post_num = $forum_num.$titles[1];
+						$this->template->assign_block_vars('forum_tree', [
+							'LEVEL' => count (explode ('.', $post_num)),
+							'TITLE' => $post_num.' '.$titles[2],
+							'TEXT' => $post_text,
+						]);
+					}
+				}
+				$this->db->sql_freeresult($result_post);
+			}
+			$this->forum_tree ($row_forum['forum_id'], $forum_num);
+		}
+		$this->db->sql_freeresult($result_forum);
 	}
 
 	/**

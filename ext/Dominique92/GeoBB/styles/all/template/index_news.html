@@ -34,3 +34,16 @@
 			<a href="?news={PLUS_NOUVELLES}">Plus de news...</a> 
 	</div>
 <!-- ENDIF -->
+
+<style>
+	h1 {
+		color: black;
+	}
+</style>
+
+
+
+<!-- BEGIN forum_tree -->
+	<h{forum_tree.LEVEL}>{forum_tree.TITLE}</h{forum_tree.LEVEL}>
+	<!-- IF forum_tree.TEXT --><p>{forum_tree.TEXT}</p><!-- ENDIF -->
+<!-- END forum_tree -->
