@@ -8,6 +8,12 @@
 
 @import url("../../prosilver/theme/stylesheet.css");
 
+/* index.php */
+.nav-main li:nth-child(2), /* Navbar FAQ  */
+.section-posting #poll-panel-tab { /* Sondages */
+	display: none !important;
+}
+
 /* posting.php */
 .section-posting #attach-panel-multi::after {
 	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";

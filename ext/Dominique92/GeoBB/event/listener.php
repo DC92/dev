@@ -169,22 +169,23 @@ class listener implements EventSubscriberInterface
 
 	// Docs presentation
 	function index_forum_tree($parent, $num) {
+		$last_num = 1;
 		$sql = "
 			SELECT forum_id, forum_name, forum_type
 			FROM ".FORUMS_TABLE."
-			WHERE parent_id = $parent";
+			WHERE parent_id = $parent
+			ORDER BY left_id ASC";
 		$result_forum = $this->db->sql_query($sql);
-		$last_num = 1;
 		while ($row_forum = $this->db->sql_fetchrow($result_forum)) {
-			if ($parent) {
-				$forum_num = $num.$last_num++.'.';
-				$this->template->assign_block_vars('forum_tree', [
-					'LEVEL' => count (explode ('.', $forum_num)) - 1,
-					'TITLE' => $forum_num.' '.$row_forum['forum_name'],
-					'FORUM_ID' => $row_forum['forum_id'],
-					'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
-				]);
-			}
+			$forum_num = $num.$last_num++.'.';
+			$this->template->assign_block_vars('forum_tree', [
+				'FORUM' => $row_forum['forum_type'],
+				'LEVEL' => count (explode ('.', $forum_num)) - 1,
+				'NUM' => $forum_num,
+				'TITLE' => $row_forum['forum_name'],
+				'FORUM_ID' => $row_forum['forum_id'],
+				'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
+			]);
 			if($row_forum['forum_type']) { // C'est un forum (pas une catégotie)
 				$sql = "
 					SELECT post_id, post_subject, post_text, post_attachment, bbcode_uid, bbcode_bitfield, topic_id
@@ -221,19 +222,18 @@ class listener implements EventSubscriberInterface
 					$row_count = $this->db->sql_fetchrow($result_count);
 					$this->db->sql_freeresult($result_count);
 
-					if (count ($titles)) {
-						$post_num = $forum_num.$sub_num++.'.';
-						$this->template->assign_block_vars('forum_tree', [
-							'LEVEL' => count (explode ('.', $post_num)) - 1,
-							'TITLE' => $post_num.' '.$titles[2],
-							'TEXT' => $post_text,
-							'FORUM_ID' => $row_forum['forum_id'],
-							'TOPIC_ID' => $row_post['topic_id'],
-							'POST_ID' => $row_post['post_id'],
-							'NB_COMMENTS' => $row_count['nb_posts'] - 1,
-							'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
-						]);
-					}
+					//$post_num = $forum_num.$sub_num++.'.';
+					$this->template->assign_block_vars('forum_tree', [
+						'LEVEL' => count (explode ('.', $forum_num)),
+						'NUM' => $forum_num.$sub_num++.'.',
+						'TITLE' => count ($titles) ? $titles[2] : $row_post['post_subject'],
+						'TEXT' => $post_text,
+						'FORUM_ID' => $row_forum['forum_id'],
+						'TOPIC_ID' => $row_post['topic_id'],
+						'POST_ID' => $row_post['post_id'],
+						'NB_COMMENTS' => $row_count['nb_posts'] - 1,
+						'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
+					]);
 				}
 				$this->db->sql_freeresult($result_post);
 			}
