@@ -83,9 +83,6 @@ input[type="number"] {
 .section-posting .panel {
 	margin-bottom: 0px;
 }
-.section-posting #attach-panel-multi::after {
-	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
-}
 
 .geo-info {
 	margin-bottom: 20px;

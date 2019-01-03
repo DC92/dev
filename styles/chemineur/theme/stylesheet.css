@@ -174,10 +174,6 @@ z.section-posting #postingbox fieldset.fields1 dd {
 z.section-posting .panel {
 	margin-bottom: 0px;
 }
-.section-posting #attach-panel-multi::after {
-	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
-	background: yellow;
-}
 
 z.geo-info {
 	margin-bottom: 20px;

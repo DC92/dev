@@ -1,0 +1,57 @@
+<!-- IF GEO_MAP_TYPE -->
+<!-- INCLUDE overall_geobb_includes.html -->
+
+<div id="map-frame">
+	<div id="map"></div>
+</div>
+
+<!-- INCLUDE viewtopic_etiquette.html -->
+<!-- //TODO-CHEM météo idem WRI -->
+<!-- INCLUDE viewtopic_edit_button.html -->
+
+<script>
+	window.addEventListener('load', function() {
+		var geom = false,
+			map = new ol.MyMap({
+			target: 'map',
+			layers: [
+				geoLayer({TOPIC_ID})
+			],
+			controls: controlsCollection().concat([
+				controlLayersSwitcher(
+					layersCollection({GEO_KEYS})
+				)
+			])
+		});
+
+		<!-- IF GEO_MAP_TYPE == 'point' -->
+			var marqueur = marker('{EXT_DIR}images/cadre.png', 'marqueur'),
+				pos = marqueur.getPoint().getCoordinates();
+			map.addLayer(marqueur);
+
+			// Center the map
+			map.getView().setCenter(pos);
+			map.getView().setZoom(15);
+			geom = true;
+		<!-- ELSEIF GEO_MAP_TYPE == 'surface' && GEOJSON -->
+			var eljson = document.getElementById('marqueur-json'),
+				format = new ol.format.GeoJSON({
+					featureProjection: "EPSG:3857"
+				}),
+				source = new ol.source.Vector({
+					features: format.readFeatures(eljson.innerHTML)
+				});
+
+			// Center the map
+			map.getView().fit(source.getExtent());
+			geom = true;
+		<!-- ENDIF -->
+
+		map.addControl(
+			controlPermalink({
+				init: !geom
+			})
+		);
+	});
+</script>
+<!-- ENDIF -->

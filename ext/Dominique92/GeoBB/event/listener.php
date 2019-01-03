@@ -119,6 +119,11 @@ class listener implements EventSubscriberInterface
 	/**
 		INDEX.PHP
 	*/
+	function index_modify_page_title ($vars) {
+		$this->index_news ($vars);
+		$this->index_forum_tree(0, '');
+	}
+
 	// Ajoute un bouton créer un point en face de la liste des forums
 	function display_forums_modify_row ($vars) {
 		$row = $vars['row'];
@@ -130,8 +135,8 @@ class listener implements EventSubscriberInterface
 		$vars['row'] = $row;
 	}
 
-	// Affiche les post les plus récents sur la page d'accueil
-	function index_modify_page_title ($vars) {
+	// Show the most recent post on the home page
+	function index_news ($vars) {
 		$this->geobb_activate_map('[all=accueil]');
 
 		// More news count
@@ -160,12 +165,10 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
-
-		// For docs composition
-		$this->forum_tree(0, '');
 	}
 
-	function forum_tree($parent, $num) {
+	// Docs presentation
+	function index_forum_tree($parent, $num) {
 		$sql = "
 			SELECT forum_id, forum_name, forum_type
 			FROM ".FORUMS_TABLE."
@@ -176,29 +179,32 @@ class listener implements EventSubscriberInterface
 			if ($parent) {
 				$forum_num = $num.$last_num++.'.';
 				$this->template->assign_block_vars('forum_tree', [
-					'LEVEL' => count (explode ('.', $forum_num)),
+					'LEVEL' => count (explode ('.', $forum_num)) - 1,
 					'TITLE' => $forum_num.' '.$row_forum['forum_name'],
+					'FORUM_ID' => $row_forum['forum_id'],
+					'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
 				]);
 			}
 			if($row_forum['forum_type']) { // C'est un forum (pas une catégotie)
 				$sql = "
-					SELECT post_id,post_subject,post_text,post_attachment,bbcode_uid,bbcode_bitfield
+					SELECT post_id, post_subject, post_text, post_attachment, bbcode_uid, bbcode_bitfield, topic_id
 					FROM ".POSTS_TABLE." AS p
 						JOIN ".TOPICS_TABLE." AS t USING (topic_id)
 					WHERE p.post_id = t.topic_first_post_id AND
 						p.forum_id = {$row_forum['forum_id']}
 					ORDER BY post_subject";
 				$result_post = $this->db->sql_query($sql);
+				$sub_num = 1;
 				while ($row_post = $this->db->sql_fetchrow($result_post)) {
 					preg_match ('/^([0-9\.]+) (.*)$/', $row_post['post_subject'], $titles);
 					$post_text = generate_text_for_display ($row_post['post_text'],
 						$row_post['bbcode_uid'],
 						$row_post['bbcode_bitfield'],
 						OPTION_FLAG_BBCODE, true);
-					
+
 					$sql = "
 						SELECT *
-						FROM ". ATTACHMENTS_TABLE ."
+						FROM ".ATTACHMENTS_TABLE."
 						WHERE post_msg_id = {$row_post['post_id']}
 						ORDER BY filetime DESC";
 					$result_attachement = $this->db->sql_query($sql);
@@ -210,18 +216,28 @@ class listener implements EventSubscriberInterface
 					if (count($attachments))
 						parse_attachments(0, $post_text, $attachments, $update_count);
 
+					$sql = "SELECT COUNT(*) AS nb_posts FROM ".POSTS_TABLE." WHERE topic_id = {$row_post['topic_id']}";
+					$result_count = $this->db->sql_query($sql);
+					$row_count = $this->db->sql_fetchrow($result_count);
+					$this->db->sql_freeresult($result_count);
+
 					if (count ($titles)) {
-						$post_num = $forum_num.$titles[1];
+						$post_num = $forum_num.$sub_num++.'.';
 						$this->template->assign_block_vars('forum_tree', [
-							'LEVEL' => count (explode ('.', $post_num)),
+							'LEVEL' => count (explode ('.', $post_num)) - 1,
 							'TITLE' => $post_num.' '.$titles[2],
 							'TEXT' => $post_text,
+							'FORUM_ID' => $row_forum['forum_id'],
+							'TOPIC_ID' => $row_post['topic_id'],
+							'POST_ID' => $row_post['post_id'],
+							'NB_COMMENTS' => $row_count['nb_posts'] - 1,
+							'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
 						]);
 					}
 				}
 				$this->db->sql_freeresult($result_post);
 			}
-			$this->forum_tree ($row_forum['forum_id'], $forum_num);
+			$this->index_forum_tree ($row_forum['forum_id'], $forum_num);
 		}
 		$this->db->sql_freeresult($result_forum);
 	}
@@ -958,13 +974,13 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 
 	function download_file_send_to_browser_before($vars) {
 		$attachment = $vars['attachment'];
-		if (!is_dir ('../cache/geo/'))
-			mkdir ('../cache/geo/');
+		if (!is_dir ('../cache/geobb/'))
+			mkdir ('../cache/geobb/');
 
 		// Images externes
 		$purl = parse_url ($attachment ['real_filename']);
 		if (isset ($purl['host'])) { // le fichier est distant
-			$local = '../cache/geo/'.str_replace ('/', '-', $purl['path']);
+			$local = '../cache/geobb/'.str_replace ('/', '-', $purl['path']);
 			if (!file_exists ($local) || !filesize ($local)) {
 				// Recuperation du contenu
 				$url_cache = file_get_contents ($attachment['real_filename']);
@@ -1030,7 +1046,7 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
-				$temporaire = '../cache/geo/'.$pn['basename'].'.'.$max_size.@$pn['extension'];
+				$temporaire = '../cache/geobb/'.$pn['basename'].'.'.$max_size.@$pn['extension'];
 
 				// Si le fichier temporaire n'existe pas, il faut le creer
 				if (!is_file ($temporaire)); {
