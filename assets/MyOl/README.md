@@ -24,7 +24,7 @@ MyOL extension provides supplementary functions to [Openlayers V5](https://openl
 * Multi vendors maps &amp; projections:
 ```
 - OSM, Maps.Refuges.Info
-- ThunderForest Outdoors, Cycles, Landscape, Transport
+- ThunderForest Outdoors, Cycles, Landscape, Transport, ...
 - IGN France, cadastre, photos
 - SwissTopo
 - IDEE España, photos
@@ -35,7 +35,7 @@ MyOL extension provides supplementary functions to [Openlayers V5](https://openl
 - Google maps, photos
 ```
 * Editable position marker with multi-projection position display,
-* Polylines editor.
+* Polylines & polygons editor.
 * Keep position, zoom & zoom on cookies
 [See a DEMO here](https://dominique92.github.io/MyOl/examples/)
 
@@ -46,7 +46,7 @@ Just include myol.js & myos.css after ol/dist, proj4js & geocoder's js & css.
 * Code & all tiled layers use EPSG:3857 spherical mercator projection
 
 The coding rules are volontary simple & don't follow all openlayers's
-* No class, no inheritage, no jquery...
+* Few classes, no inheritage, no jquery...
 * Each adaptation is included in a single JS function that you can include separately (check dependencies if any)
 * Feel free to use, modify & share as you want
 
@@ -56,6 +56,6 @@ FILES
 * geocoder/... : Openlayer geocoder last stable distribution files from [Openlayers geocoder GitHub](https://github.com/jonataswalker/ol-geocoder)
 * proj4/... : Coordinate transformation software last stable distribution files from [Proj4 GitHub](https://github.com/OSGeo/proj.4)
 * examples/... : Demo files or ongoing developments
-* myol.css : Specific CSS presentation
-* myol.js : Specific CSS extensions
+* myol.css : Specific CSS presentation distribution
+* myol.js : Specific CSS extensions distribution
 * index.html : Simple demo

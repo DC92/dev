@@ -1,5 +1,5 @@
 /*!
- * OPENLAYERS V4+ ADAPTATION - https://openlayers.org/
+ * OPENLAYERS V5+ ADAPTATION - https://openlayers.org/
  * (C) Dominique Cavailhez 2017 - https://github.com/Dominique92/MyOl
  */
 
@@ -114,7 +114,7 @@
 .print-button button {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;'%3E%3Cpath d='M8 6l9 0 0 2-9 0z'/%3E%3Cpath d='M5 10l15 0 0 5-15 0z'/%3E%3Cpath d='M8 13l9 0 0 6-9 0z' style='fill:white;'/%3E%3C/svg%3E");
 }
-/*
+/*//TODO
 @media print {
 	html, body{
 		padding:0px!important;
