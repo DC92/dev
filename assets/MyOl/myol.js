@@ -555,7 +555,7 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Requires ol.layer.LayerVectorURL
  */
 //TODO-IE BUG pas d'overpass sur IE
-//TODO-BEST BUG quand déplace ou zoom aprés avoir changé un sélecteur : affiche des ?
+//TODO-BEST BUG quand déplace ou zoom après avoir changé un sélecteur : affiche des ?
 //TODO-BEST afficher erreur 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = ol.assign({ // Default options
@@ -856,6 +856,10 @@ ol.control.Button = function(o) {
 			activeBackgroundColor: 'white',
 			group: this // Main control of a group of controls
 		}, o);
+
+	this.addOption = function ($k, $v) { //TODO utiliser
+		this_.options_[$k] = $v;
+	}
 
 	const buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
@@ -1170,17 +1174,18 @@ function controlLengthLine() {
  */
 //TODO-BEST En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
 //TODO-BEST Pas d'upload/download sur mobile (-> va vers photos !)
-function controlLoadGPX() {
-	const inputElement = document.createElement('input'),
-		this_ = new ol.control.Button({
+function controlLoadGPX(o) {
+	const options = ol.assign({
 			label: '&uArr;',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
 				inputElement.click();
 			}
-		}),
+		}, o),
+		inputElement = document.createElement('input'),
 		format = new ol.format.GPX(),
-		reader = new FileReader();
+		reader = new FileReader(),
+		this_ = new ol.control.Button(options);
 
 	inputElement.type = 'file';
 	inputElement.addEventListener('change', function() {
@@ -1194,8 +1199,8 @@ function controlLoadGPX() {
 				featureProjection: 'EPSG:3857'
 			});
 
-		if (map.editSource) { // If there is an active editor
-			map.editSource.addFeatures(features); // Add the track to the editor
+		if (options.source) { // If there is somewhere to add the feature
+			options.source.addFeatures(features); //TODO utiliser
 
 			// Zoom the map on the added features
 			const extent = ol.extent.createEmpty();
@@ -1438,7 +1443,8 @@ function controlEdit(inputId, options) {
 				});
 				for (let f in features)
 					if (features[f].getGeometry().getType() != 'Point')
-						source.removeFeature(features[f]); // We delete the pointed feature
+						//TODO BUG : sauf en cas de suppression totale du feature
+						source.removeFeature(features[f]); // We delete the selected feature
 			}
 			// altKey : delete segment
 			else if (evt.target.vertexFeature_) // Click on a segment
