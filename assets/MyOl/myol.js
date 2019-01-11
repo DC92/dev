@@ -857,10 +857,6 @@ ol.control.Button = function(o) {
 			group: this // Main control of a group of controls
 		}, o);
 
-	this.addOption = function ($k, $v) { //TODO utiliser
-		this_.options_[$k] = $v;
-	}
-
 	const buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
 
@@ -1172,7 +1168,6 @@ function controlLengthLine() {
  * GPX file loader control
  * Requires ol.control.Button
  */
-//TODO-BEST En cas de chargement de trace GPS, colorier de façon différente des traces de la carte.
 //TODO-BEST Pas d'upload/download sur mobile (-> va vers photos !)
 function controlLoadGPX(o) {
 	const options = ol.assign({
@@ -1180,7 +1175,13 @@ function controlLoadGPX(o) {
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
 				inputElement.click();
-			}
+			},
+			style: new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2
+				})
+			})
 		}, o),
 		inputElement = document.createElement('input'),
 		format = new ol.format.GPX(),
@@ -1199,15 +1200,12 @@ function controlLoadGPX(o) {
 				featureProjection: 'EPSG:3857'
 			});
 
-		if (options.source) { // If there is somewhere to add the feature
-			options.source.addFeatures(features); //TODO utiliser
+		var added = map.dispatchEvent({
+			type: 'myol:onfeatureload',
+			features: features
+		});
 
-			// Zoom the map on the added features
-			const extent = ol.extent.createEmpty();
-			for (let f in features)
-				ol.extent.extend(extent, features[f].getGeometry().getExtent());
-			this_.getMap().getView().fit(extent);
-		} else {
+		if (added !== false) { // If one used the feature
 			// Display the track on the map
 			const source = new ol.source.Vector({
 					format: format,
@@ -1215,18 +1213,19 @@ function controlLoadGPX(o) {
 				}),
 				vector = new ol.layer.Vector({
 					source: source,
-/*//TODO mettre un style d'inclusion
-style: new ol.style.Style({
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 7
-				})
-})*/
+					style: options.style
 				});
 			this_.getMap().addLayer(vector);
 			this_.getMap().getView().fit(source.getExtent());
 		}
+
+		// Zoom the map on the added features
+		const extent = ol.extent.createEmpty();
+		for (let f in features)
+			ol.extent.extend(extent, features[f].getGeometry().getExtent());
+		this_.getMap().getView().fit(extent);
 	};
+
 	return this_;
 }
 
@@ -1381,7 +1380,7 @@ function controlEdit(inputId, options) {
 		const map = evt.target.map_;
 
 		map.addLayer(layer);
-		this_.toggle(options.enableAtInit); //TODO TEST : enable quand meme à l'init si toggle(false)
+		this_.toggle(options.enableAtInit === true);
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		//TODO-ARCHI ??? options.condition : singleClick;
@@ -1436,6 +1435,12 @@ function controlEdit(inputId, options) {
 						snap.addFeature(fs[f]);
 				});
 			});
+
+		// Add features loaded from GPX file
+		map.on('myol:onfeatureload', function(evt) {
+			source.addFeatures(evt.features);
+			return false;
+		});
 	});
 
 	modify.on('modifyend', function(evt) {
@@ -1447,7 +1452,7 @@ function controlEdit(inputId, options) {
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const features = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
-					layerFilter: function (l) {
+					layerFilter: function(l) {
 						return l.ol_uid == layer.ol_uid;
 					}
 				});
@@ -1572,7 +1577,7 @@ function controlEdit(inputId, options) {
 		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
 
-	this_.source = source; // HACK for getting info from the edited features
+	//TODO DELETE ???	this_.source = source; // HACK for getting info from the edited features
 	return this_;
 }
 
