@@ -1214,7 +1214,14 @@ function controlLoadGPX(o) {
 					features: features
 				}),
 				vector = new ol.layer.Vector({
-					source: source
+					source: source,
+/*//TODO mettre un style d'inclusion
+style: new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 7
+				})
+})*/
 				});
 			this_.getMap().addLayer(vector);
 			this_.getMap().getView().fit(source.getExtent());
@@ -1439,14 +1446,15 @@ function controlEdit(inputId, options) {
 			// altKey + ctrlKey : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const features = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
-					hitTolerance: 6
+					hitTolerance: 6,
+					layerFilter: function (l) {
+						return l.ol_uid == layer.ol_uid;
+					}
 				});
 				for (let f in features)
-					if (features[f].getGeometry().getType() != 'Point')
-						//TODO BUG : sauf en cas de suppression totale du feature
-						source.removeFeature(features[f]); // We delete the selected feature
+					source.removeFeature(features[f]); // We delete the selected feature
 			}
-			// altKey : delete segment
+			// Other modify actions : altKey : delete segment
 			else if (evt.target.vertexFeature_) // Click on a segment
 				return editorActions(evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
