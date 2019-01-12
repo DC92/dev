@@ -1490,8 +1490,15 @@ function controlEdit(o) {
 		const features = source.getFeatures(),
 			lines = [],
 			polys = [];
+
 		for (let f in features)
-			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+			if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
+				let geometries = features[f].getGeometry().getGeometries();
+				for (let g in geometries)
+					flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
+			} else
+				flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+		
 		source.clear(); // And clear the edited layer
 
 		for (let a = 0; a < lines.length; a++) {
