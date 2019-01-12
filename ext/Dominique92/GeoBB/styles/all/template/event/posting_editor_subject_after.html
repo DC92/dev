@@ -38,15 +38,17 @@
 	window.addEventListener('load', function() {
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
 			controls = controlsCollection(),
-			edit = controlEdit('editable-json', {
+			edit = controlEdit({
+				inputId: 'editable-json',
 				snapLayers: [overlay],
 //				enableAtInit: true,
 				draw: [{
 					type: 'LineString'
+				},{
+					type: 'Polygon'
 				}]
 			}),
 			extent = edit.source_.getExtent(),
-//TODO DELETE ?			surface
 			permalink = controlPermalink({
 				init: ol.extent.isEmpty(extent)
 			});
@@ -59,7 +61,7 @@
 				controlLayersSwitcher(
 					layersCollection({GEO_KEYS})
 				),
-				<!-- IF GEO_MAP_TYPE == 'line' -->
+				<!-- IF GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface' -->
 					edit,
 				<!-- ENDIF -->
 				permalink

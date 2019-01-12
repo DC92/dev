@@ -30,7 +30,8 @@
 	var map, editable;
 	window.addEventListener('load', function() {
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
-			edit = controlEdit('editable-json', {
+			edit = controlEdit({
+				inputId: 'editable-json',
 				snapLayers: [overlay],
 				styleOptions: topicStyleOptions,
 				editStyleOptions: editStyleOptions,

@@ -1319,8 +1319,12 @@ function controlPrint() {
  * Requires ol.control.Button
  * Requires 'myol:onadd' layer event
  */
-function controlEdit(inputId, options) {
-	const inputEl = document.getElementById(inputId), // Read data in an html element
+function controlEdit(o) {
+	const options = ol.assign({
+			inputId: 'editable-json',
+			enableAtInit: false
+		}, o),
+		inputEl = document.getElementById(options.inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
 		features = format.readFeatures(
 			JSONparse(inputEl.value || '{"type":"FeatureCollection","features":[]}'), {
@@ -1380,10 +1384,9 @@ function controlEdit(inputId, options) {
 		const map = evt.target.map_;
 
 		map.addLayer(layer);
-		this_.toggle(options.enableAtInit === true);
+		this_.toggle(options.enableAtInit);
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
-		//TODO-ARCHI ??? options.condition : singleClick;
 		map.getInteractions().getArray().forEach(function(i) {
 			if (i instanceof ol.interaction.DoubleClickZoom)
 				map.removeInteraction(i);
@@ -1442,6 +1445,8 @@ function controlEdit(inputId, options) {
 			cleanFeatures();
 			return false;
 		});
+
+		cleanFeatures();
 	});
 
 	modify.on('modifyend', function(evt) {
@@ -1464,7 +1469,7 @@ function controlEdit(inputId, options) {
 			else if (evt.target.vertexFeature_) // Click on a segment
 				return cleanFeatures(evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
-		// Other actions
+
 		cleanFeatures();
 	});
 
@@ -1607,10 +1612,10 @@ function controlsCollection() {
 			tipLabel: 'Plein écran'
 		}),
 		controlLengthLine(),
-/*//TODO ARCHI ??? DELETE		controlPermalink({
-			init: true,
-			visible: true
-		}),*/
+		/*//TODO ARCHI ??? DELETE		controlPermalink({
+					init: true,
+					visible: true
+				}),*/
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
 		// Requires hack to display a title on the geocoder
 		//TODO-IE BUG : pas de géocodeur sur IE
