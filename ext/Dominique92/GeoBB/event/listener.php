@@ -889,6 +889,7 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 
 	// Calcul de la bbox englobante
 	function get_bounds($g) {
+		return;//TODO DELETE ???
 		$b = $g->getBBox();
 		$m = 0.005; // Marge autour d'un point simple (en °)
 		foreach (['x','y'] AS $xy) {
@@ -903,6 +904,7 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 					: $b[$mm.$xy];
 		}
 		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($this->bbox,true).'</pre>';
 	}
 
 

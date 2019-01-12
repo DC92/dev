@@ -1607,10 +1607,10 @@ function controlsCollection() {
 			tipLabel: 'Plein écran'
 		}),
 		controlLengthLine(),
-		controlPermalink({
+/*//TODO ARCHI ??? DELETE		controlPermalink({
 			init: true,
 			visible: true
-		}),
+		}),*/
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
 		// Requires hack to display a title on the geocoder
 		//TODO-IE BUG : pas de géocodeur sur IE

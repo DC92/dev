@@ -16,7 +16,7 @@ Suppression fichier attach ne supprime pas l'attachment.
 Diapo : ne s'arrête pas sur touche escape
 WRI : Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
 Pas de choix de forum sur rando pedestre
-Posting ligne: pour édit : mettre marqueurs lignes au dessus des icones
+Posting line: pour édit : mettre marqueurs lignes au dessus des icones
 Clear Ajax carte quand ajoute/supprime un lien (les 2 icones restent sur la carte)
 Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
 Pourquoi ne retourne t'il pas un mail de création d'user à l'admin ?
@@ -62,7 +62,7 @@ Améliorer référencement (-> Prat communal !)
 Pouvoir citer un WRIC
 	Tri des WRIC (actuellement en bas de page) => date par défaut + déplaçable
 ext/GeoBB : ajouter les coordonnées au template print
-Posting: Purger les points des [*=ligne] à la saisie (include fichier dans leaflet) ?
+Posting: Purger les points des [*=line] à la saisie (include fichier dans leaflet) ?
 Import references: osm overpass, LDP
 	Import LDP: view-source:http://www.lacsdespyrenees.com/kml-Bielsa.kml
 Récupérer les smileys tout ronds de WRI

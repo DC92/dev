@@ -33,7 +33,9 @@
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
 			geom = true;
-		<!-- ELSEIF GEO_MAP_TYPE == 'surface' && GEOJSON -->
+		<!-- ENDIF -->
+
+		<!-- IF (GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface') && GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"
