@@ -462,21 +462,26 @@ ol.layer.LayerVectorURL = function(o) {
 		map.addInteraction(select);
 	});
 
-	function hovering(feature, layer, pixel) {
+	function hovering(selected, layer, pixel) {
 		const map = layer.map_;
 
-		if (feature && layer && layer.options_) {
-			const coordinates = feature.getGeometry().flatCoordinates, // If it's a point, just over it
+		let properties = selected.getProperties(),
+			geometry = selected.getGeometry();
+		if (typeof selected.getGeometry().getGeometries == 'function') // GeometryCollection
+			geometry = geometry.getGeometries()[0];
+
+		if (layer && layer.options_) {
+			const coordinates = geometry.flatCoordinates, // If it's a point, just over it
 				ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
 			if (coordinates.length == 2) // Stable if icon
 				pixel = map.getPixelFromCoordinate(coordinates);
 
 			// Hovering label
 			const label = typeof layer.options_.label == 'function' ?
-				layer.options_.label(feature.getProperties(), feature) :
+				layer.options_.label(properties, selected) :
 				layer.options_.label || '',
 				postLabel = typeof layer.options_.postLabel == 'function' ?
-				layer.options_.postLabel(feature.getProperties(), feature, layer, pixel, ll4326) :
+				layer.options_.postLabel(properties, selected, layer, pixel, ll4326) :
 				layer.options_.postLabel || '';
 
 			if (label &&
@@ -488,7 +493,7 @@ ol.layer.LayerVectorURL = function(o) {
 				map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
 				map.popElement_.innerHTML = label + postLabel;
 				if (typeof layer.options_.href == 'function') {
-					map.popElement_.href = layer.options_.href(feature.getProperties());
+					map.popElement_.href = layer.options_.href(properties);
 					map.getViewport().style.cursor = 'pointer';
 				}
 
