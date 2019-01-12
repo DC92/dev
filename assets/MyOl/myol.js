@@ -1439,6 +1439,7 @@ function controlEdit(inputId, options) {
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
 			source.addFeatures(evt.features);
+			cleanFeatures();
 			return false;
 		});
 	});
@@ -1461,20 +1462,20 @@ function controlEdit(inputId, options) {
 			}
 			// Other modify actions : altKey : delete segment
 			else if (evt.target.vertexFeature_) // Click on a segment
-				return editorActions(evt.target.vertexFeature_.getGeometry().getCoordinates());
+				return cleanFeatures(evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
 		// Other actions
-		editorActions();
+		cleanFeatures();
 	});
 
 	source.on(['change'], function() {
 		if (this_.modified) { // Only when required to avoid recursive loops
 			this_.modified = false;
-			editorActions(); // Do it now as a feature has been added or changed
+			cleanFeatures(); // Do it now as a feature has been added or changed
 		}
 	});
 
-	function editorActions(pointerPosition) {
+	function cleanFeatures(pointerPosition) {
 		// Get flattened list of multipoints coords
 		const features = source.getFeatures(),
 			lines = [],
@@ -1577,7 +1578,7 @@ function controlEdit(inputId, options) {
 		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
 
-	//TODO DELETE ???	this_.source = source; // HACK for getting info from the edited features
+	this_.source_ = source; // HACK for getting info from the edited features
 	return this_;
 }
 

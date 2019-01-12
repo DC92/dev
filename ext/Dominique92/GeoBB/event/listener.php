@@ -666,8 +666,6 @@ XML
 				$update[$k] .= '~';
 			else
 				unset ($update[$k]);
-
-if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
 		// Pour affichage
 		$row = array_merge ($row, $update);
 
@@ -677,6 +675,8 @@ if(defined('TRACES_DOM'))/*DCMM*/echo"<pre style='background-color:white;color:b
 				' SET '.$this->db->sql_build_array('UPDATE',$update).
 				' WHERE post_id = '.$row['post_id']
 		);
+
+if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
 	}
 
 	// Form management

@@ -39,13 +39,13 @@
 			controls = controlsCollection(),
 			edit = controlEdit('editable-json', {
 				snapLayers: [overlay],
-				enableAtInit: true,
+//				enableAtInit: true,
 				draw: [{
 					type: 'LineString'
 				}]
 			}),
-			extent = edit.source.getExtent(),
-			surface
+			extent = edit.source_.getExtent(),
+//TODO DELETE ?			surface
 			permalink = controlPermalink({
 				init: ol.extent.isEmpty(extent)
 			});
