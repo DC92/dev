@@ -124,7 +124,8 @@ var geo_keys = {
 		viseur
 	],
 	basicControls = controlsCollection(),
-	edit = controlEdit('geojson', {
+	edit = controlEdit({
+		inputId: 'geojson',
 		snapLayers: overlays,
 		styleOptions: {
 			fill: new ol.style.Fill({

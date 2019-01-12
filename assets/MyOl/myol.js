@@ -5,8 +5,8 @@
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
  * You only have to include openlayers/dist .js & .css files & my 2 & that's it !
- * A bit of classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only one file of JS functions & CSS
- * I know, I know, this is not up to date way of programming but that's my choice & you are free to take it, modifiy & adapt as you wish
+ * Some few classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only one file of JS functions & CSS
+ * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
 //TODO-ARCHI map off line, application
@@ -1267,6 +1267,7 @@ function controlDownloadGPX(o) {
 		});
 
 		// Write in GPX format
+		//TODO BUG geometries are output as routes (<rte>), and MultiLineString as tracks (<trk>).
 		const gpx = new ol.format.GPX().writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
