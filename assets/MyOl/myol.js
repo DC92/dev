@@ -11,6 +11,8 @@
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
 //TODO-ARCHI map off line, application
 
+/* jshint esversion: 6 */
+
 /**
  * Appends objects. The last one has the priority
  */
@@ -1292,7 +1294,7 @@ function controlDownloadGPX(o) {
 				bubbles: true,
 				cancelable: true
 			}));
-	}
+	};
 
 	return new ol.control.Button(options);
 }
@@ -1458,6 +1460,7 @@ function controlEdit(o) {
 		const map = evt.target.map_;
 
 		map.removeInteraction(hover);
+		//TODO BUG BEST ne delete pas le feature si on pointe un sommet
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {

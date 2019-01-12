@@ -30,6 +30,24 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 }
 */
 
+var topicStyleOptions = {
+		image: new ol.style.Circle({
+			radius: 4,
+			fill: new ol.style.Fill({
+				color: 'red'
+			})
+		}),
+		stroke: new ol.style.Stroke({
+			color: 'red',
+			width: 2
+		})
+	},
+	editStyleOptions = {
+		stroke: new ol.style.Stroke({
+			color: 'red',
+			width: 3
+		})
+	};
 
 function layerStyleOptionsFunction(properties, id, hover) {
 	if (properties.icon)
@@ -44,8 +62,8 @@ function layerStyleOptionsFunction(properties, id, hover) {
 			color: 'rgba(255,255,255,'+(hover ? 0.65 : 0.4)+')'
 		}),
 		stroke: new ol.style.Stroke({
-			color: '#39C',
-			width: hover ? 3 : 1.25
+			color: 'blue',
+			width: hover ? 4 : 3
 		})
 	};
 }
