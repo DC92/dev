@@ -1,4 +1,4 @@
-function geobbControls() {
+function geobbControls(options) {
 	return [
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
@@ -16,6 +16,7 @@ function geobbControls() {
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
+		controlPermalink(options.controlPermalink),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
 		new Geocoder('nominatim', {
 			provider: 'osm',

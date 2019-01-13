@@ -14,11 +14,11 @@
 			layers: [
 				geoLayer()
 			],
-			controls: geobbControls().concat([
+			controls: geobbControls({
+			}).concat([
 				controlLayersSwitcher(
 					layers({GEO_KEYS})
-				),
-				controlPermalink()
+				)
 			])
 		});
 	});

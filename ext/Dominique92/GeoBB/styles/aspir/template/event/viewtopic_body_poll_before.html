@@ -17,7 +17,11 @@
 			layers: [
 				geoLayer({TOPIC_ID})
 			],
-			controls: geobbControls().concat([
+			controls: geobbControls({
+				controlPermalink:{
+					init: '{GEO_MAP_TYPE}' == ''
+				}
+			}).concat([
 				controlLayersSwitcher(
 					layers({GEO_KEYS})
 				)
@@ -32,7 +36,6 @@
 			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
-			geom = true;
 		<!-- ELSEIF GEO_MAP_TYPE == 'surface' && GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
@@ -44,14 +47,7 @@
 
 			// Center the map
 			map.getView().fit(source.getExtent());
-			geom = true;
 		<!-- ENDIF -->
-
-		map.addControl(
-			controlPermalink({
-				init: !geom
-			})
-		);
 	});
 </script>
 <!-- ENDIF -->

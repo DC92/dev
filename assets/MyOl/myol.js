@@ -1243,7 +1243,8 @@ function controlDownloadGPX(o) {
 	const options = ol.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
-			fileName: 'trace'
+			fileName: 'trace',
+			extraMetaData: ''
 		}, o),
 		hiddenElement = document.createElement('a');
 
@@ -1281,7 +1282,7 @@ function controlDownloadGPX(o) {
 			}),
 			file = new Blob([gpx
 				.replace(/>/g, ">\n")
-				.replace("<name>\n", "<time>" + new Date().toISOString() + "</time>\n<name>")
+				.replace("<name>\n", "<time>" + new Date().toISOString() + "</time>\n" + options.extraMetaData + "<name>")
 			], {
 				type: 'application/gpx+xml'
 			});
@@ -1309,13 +1310,23 @@ function controlDownloadGPX(o) {
 	return new ol.control.Button(options);
 }
 
-// HACK to display a title on the geocoder
+/**
+ * Geocoder
+ */
+// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
+//TODO-IE BUG : pas de géocodeur sur IE
 //TODO-BEST ajuster le zoom geocoder pour le bon niveau IGN top25
-window.addEventListener('load', function() {
-	const buttonElement = document.getElementById('gcd-button-control');
-	if (buttonElement)
-		buttonElement.title = 'Recherche de lieu par son nom';
-});
+function geocoder() {
+	var gc = new Geocoder('nominatim', {
+		provider: 'osm',
+		lang: 'FR',
+		keepOpen: true,
+		placeholder: 'Saisir un nom' // Initialization of the input field
+	});
+	gc.container.title = 'Recherche de lieu par son nom';
+
+	return gc;
+}
 
 /**
  * Print control
@@ -1632,7 +1643,8 @@ function compareCoords(a, b) {
  */
 var controlgps = controlGPS(); //TODO ARCHI intégrer ??
 
-function controlsCollection() {
+function controlsCollection(options) {
+	options = options || {};
 	return [
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
@@ -1651,22 +1663,11 @@ function controlsCollection() {
 			tipLabel: 'Plein écran'
 		}),
 		controlLengthLine(),
-		/*//TODO ARCHI ??? DELETE		controlPermalink({
-					init: true,
-					visible: true
-				}),*/
-		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
-		// Requires hack to display a title on the geocoder
-		//TODO-IE BUG : pas de géocodeur sur IE
-		new Geocoder('nominatim', {
-			provider: 'osm',
-			lang: 'FR',
-			keepOpen: true,
-			placeholder: 'Saisir un nom' // Initialization of the input field
-		}),
+		controlPermalink(options.controlPermalink),
+		geocoder(),
 		controlgps,
 		controlLoadGPX(),
-		controlDownloadGPX()
+		controlDownloadGPX(options.controlDownloadGPX)
 	];
 }
 

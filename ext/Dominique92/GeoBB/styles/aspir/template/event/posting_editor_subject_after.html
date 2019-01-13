@@ -41,29 +41,29 @@
 					type: 'Polygon'
 				}]
 			}),
-			extent = edit.source.getExtent(),
-			surface
-			permalink = controlPermalink({
-				init: ol.extent.isEmpty(extent)
-			});
+			extent = edit.source_.getExtent();
 		map = new ol.MyMap({
 			target: 'map',
 			layers: [
 				overlay
 			],
-			controls: geobbControls().concat([
+			controls: geobbControls({
+				controlPermalink:{
+					visible: false,
+					init: ol.extent.isEmpty(extent)
+				}
+			}).concat([
 				controlLayersSwitcher(
 					layers({GEO_KEYS})
 				),
 				<!-- IF GEO_MAP_TYPE == 'surface' -->
-					edit,
+					edit
 				<!-- ENDIF -->
-				permalink
 			])
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
-			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permalink.paramsCenter, true);
+			editable = marker('{EXT_DIR}images/viseur.png', 'editable', ol.extent.getCenter(extent), true);
 			map.addLayer(editable);
 		<!-- ENDIF -->
 

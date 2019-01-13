@@ -37,7 +37,6 @@
 	var map, editable;
 	window.addEventListener('load', function() {
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
-			controls = controlsCollection(),
 			edit = controlEdit({
 				inputId: 'editable-json',
 				snapLayers: [overlay],
@@ -51,8 +50,15 @@
 				}]
 			}),
 			extent = edit.source_.getExtent(),
-			permalink = controlPermalink({
-				init: ol.extent.isEmpty(extent)
+			//TODO BUG le bouton edit est avant les boutons upload/download
+			controls = controlsCollection({
+				controlPermalink:{
+					visible: false,
+					init: ol.extent.isEmpty(extent)
+				},
+				controlDownloadGPX: {
+					fileName: 'MON FICH POSTING'
+				}
 			});
 		map = new ol.MyMap({
 			target: 'map',
@@ -64,14 +70,13 @@
 					layersCollection({GEO_KEYS})
 				),
 				<!-- IF GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface' -->
-					edit,
+					edit
 				<!-- ENDIF -->
-				permalink
 			])
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
-			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permalink.paramsCenter, true);
+			editable = marker('{EXT_DIR}images/viseur.png', 'editable', ol.extent.getCenter(extent), true);
 			map.addLayer(editable);
 		<!-- ENDIF -->
 

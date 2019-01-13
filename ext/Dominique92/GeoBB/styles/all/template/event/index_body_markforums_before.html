@@ -25,11 +25,11 @@
 */
 				geoLayer()
 			],
-			controls: controlsCollection().concat([
+			controls: controlsCollection({
+			}).concat([
 				controlLayersSwitcher(
 					layersCollection({GEO_KEYS})
-				),
-				controlPermalink()
+				)
 			])
 		});
 	});

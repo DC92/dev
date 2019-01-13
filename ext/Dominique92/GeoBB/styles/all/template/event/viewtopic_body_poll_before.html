@@ -11,13 +11,20 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var geom = false,
-			map = new ol.MyMap({
+		var map = new ol.MyMap({
 			target: 'map',
 			layers: [
 				geoLayer({TOPIC_ID})
 			],
-			controls: controlsCollection().concat([
+			controls: controlsCollection({
+				controlPermalink:{
+					init: '{GEO_MAP_TYPE}' == ''
+				},
+				controlDownloadGPX: {
+					fileName: 'MON FICH VIEWTOPIC',
+					extraMetaData: "<desc>//TODO description...</desc>\n"
+				}
+			}).concat([
 				controlLayersSwitcher(
 					layersCollection({GEO_KEYS})
 				)
@@ -32,7 +39,6 @@
 			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
-			geom = true;
 		<!-- ENDIF -->
 
 		<!-- IF (GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface') && GEOJSON -->
@@ -46,14 +52,7 @@
 
 			// Center the map
 			map.getView().fit(source.getExtent());
-			geom = true;
 		<!-- ENDIF -->
-
-		map.addControl(
-			controlPermalink({
-				init: !geom
-			})
-		);
 	});
 </script>
 <!-- ENDIF -->
