@@ -168,42 +168,44 @@ function layerSpain(serveur, layer) {
  * Displays blank outside of validity area
  * Requires 'myol:onadd' layer event
  */
-function layerTileIncomplete(extent, sources) { //TODO-ARCHI faire une classe ???
-	const layer = new ol.layer.Tile(),
+ol.layer.LayerTileIncomplete = function(extent, sources) {
+	ol.layer.Tile.call(this);
+
+	const this_ = this,
 		backgroundSource = new ol.source.Stamen({
 			layer: 'terrain'
 		});
-	layer.on('myol:onadd', function(evt) {
+
+	this.on('myol:onadd', function(evt) {
 		evt.target.map_.getView().on('change', change);
 		change(); // At init
 	});
 
 	// Zoom has changed
 	function change() {
-		const view = layer.map_.getView(),
+		const view = this_.map_.getView(),
 			center = view.getCenter();
 		let currentResolution = 999999; // Init loop at max resolution
 		sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
-			ol.extent.intersects(extent, view.calculateExtent(layer.map_.getSize())))
+			ol.extent.intersects(extent, view.calculateExtent(this_.map_.getSize())))
 			currentResolution = Object.keys(sources).filter(function(evt) { // HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
 
 		// Update layer if necessary
-		if (layer.getSource() != sources[currentResolution])
-			layer.setSource(sources[currentResolution]);
+		if (this_.getSource() != sources[currentResolution])
+			this_.setSource(sources[currentResolution]);
 	}
-
-	return layer;
-}
+};
+ol.inherits(ol.layer.LayerTileIncomplete, ol.layer.Tile);
 
 /**
  * Swisstopo https://api.geo.admin.ch/
  * Register your domain: https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
- * Requires layerTileIncomplete
+ * Requires ol.layer.LayerTileIncomplete
  */
 function layerSwissTopo(layer) {
 	let projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
@@ -219,7 +221,7 @@ function layerSwissTopo(layer) {
 		matrixIds: matrixIds
 	});
 
-	return layerTileIncomplete([664577, 5753148, 1167741, 6075303], {
+	return new ol.layer.LayerTileIncomplete([664577, 5753148, 1167741, 6075303], {
 		500: new ol.source.WMTS(({
 			crossOrigin: 'anonymous',
 			url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
@@ -232,7 +234,7 @@ function layerSwissTopo(layer) {
 
 /**
  * Italy IGM
- * Requires layerTileIncomplete
+ * Requires ol.layer.LayerTileIncomplete
  */
 function layerIGM() {
 	function igmSource(url, layer) {
@@ -245,7 +247,7 @@ function layerIGM() {
 		});
 	}
 
-	return layerTileIncomplete([660124, 4131313, 2113957, 5958411], { // EPSG:6875 (Italie)
+	return new ol.layer.LayerTileIncomplete([660124, 4131313, 2113957, 5958411], { // EPSG:6875 (Italie)
 		100: igmSource('IGM_250000', 'CB.IGM250000'),
 		25: igmSource('IGM_100000', 'MB.IGM100000'),
 		5: igmSource('IGM_25000', 'CB.IGM25000')
@@ -255,10 +257,10 @@ function layerIGM() {
 //TODO-BEST éviter d'appeler à l'init https://dev.virtualearth.net sur les cartes BING
 /**
  * Ordnance Survey : Great Britain
- * Requires layerTileIncomplete
+ * Requires ol.layer.LayerTileIncomplete
  */
 function layerOS(key) {
-	return layerTileIncomplete([-841575, 6439351, 198148, 8589177], { // EPSG:27700 (G.B.)
+	return new ol.layer.LayerTileIncomplete([-841575, 6439351, 198148, 8589177], { // EPSG:27700 (G.B.)
 		100: new ol.source.BingMaps({
 			imagerySet: 'ordnanceSurvey',
 			key: key
