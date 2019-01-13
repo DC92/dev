@@ -361,19 +361,20 @@ ol.layer.LayerVectorURL = function(o) {
 	const this_ = this, // For callback functions
 		options = this.options_ = ol.assign({ // Default options
 			baseUrlFunction: function(bbox, list, resolution) {
-				return options.baseUrl + list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
+				return options.baseUrl + // baseUrl is mandatory, no default
+					list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 			}
 		}, o);
-	if (options.styleOptions)
-		options.style = function(feature) {
+	if (options.styleOptions) // Optional
+		options.style = function(feature) { // Optional
 			return new ol.style.Style(
 				typeof options.styleOptions == 'function' ?
 				options.styleOptions(feature.getProperties()) :
 				options.styleOptions
 			);
 		};
-	if (options.hoverStyleOptions)
-		options.hoverStyle = function(feature) {
+	if (options.hoverStyleOptions) // Optional
+		options.hoverStyle = function(feature) { // Optional
 			return new ol.style.Style(
 				typeof options.hoverStyleOptions == 'function' ?
 				options.hoverStyleOptions(feature.getProperties()) :
@@ -389,7 +390,7 @@ ol.layer.LayerVectorURL = function(o) {
 			source.clear(); // Redraw the layer
 			const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 				// Retreive checked parameters
-				list = permanentCheckboxList(options.selectorName).filter(function(evt) {
+				list = permanentCheckboxList(options.selectorName).filter(function(evt) { // selectorName optional
 					return evt !== 'on'; // Remove the "all" input (default value = "on")
 				});
 			return options.baseUrlFunction(bbox, list, resolution);
@@ -403,7 +404,7 @@ ol.layer.LayerVectorURL = function(o) {
 	}, options));
 
 	// Optional : checkboxes to tune layer parameters
-	if (options.selectorName) {
+	if (options.selectorName) { // Optional
 		controlPermanentCheckbox(options.selectorName, function(evt, list) {
 			this_.setVisible(list.length);
 			if (list.length)
@@ -525,7 +526,7 @@ ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
 ol.format.OSMXMLPOI = function() {
 	ol.format.OSMXML.call(this);
 
-	this.readFeatures = function(source, opt_options) {
+	this.readFeatures = function(source, options) {
 		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
@@ -550,7 +551,7 @@ ol.format.OSMXMLPOI = function() {
 							newNode.appendChild(subTagNode.cloneNode());
 					}
 			}
-		return ol.format.OSMXML.prototype.readFeatures.call(this, source, opt_options);
+		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options);
 	};
 };
 ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
@@ -846,20 +847,13 @@ function JSONparse(json) {
 /**
  * Control buttons
  * Abstract definition to be used by other control buttons definitions
- *
- * label {string} character to be displayed in the button.
- * options.className {string} className of the button.
- * options.rightPosition {float} distance to the top when the button is on the right of the map.
- * options.title {string} displayed when the control is hovered.
- * options.render {function} called when the control is rendered.
- * options.action {function} called when the control is clicked.
  */
 let nextButtonTopPos = 6; // Top position of next button (em)
 
 ol.control.Button = function(o) {
 	const this_ = this, // For callback functions
 		options = this.options_ = ol.assign({
-			className: '',
+			className: '', // {string} className of the button.
 			activeBackgroundColor: 'white',
 			group: this // Main control of a group of controls
 		}, o);
@@ -873,7 +867,7 @@ ol.control.Button = function(o) {
 
 	this.active = false;
 
-	buttonElement.innerHTML = options.label || '';
+	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
 		evt.preventDefault();
 		this_.toggle();
@@ -881,8 +875,8 @@ ol.control.Button = function(o) {
 
 	divElement.appendChild(buttonElement);
 	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
-	divElement.title = options.title;
-	if (options.rightPosition) {
+	divElement.title = options.title; // {string} displayed when the control is hovered.
+	if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
 	} else { //TODO DELETE ???? if (options.label) { // Don't book a button if not visible
@@ -949,7 +943,7 @@ function controlLayersSwitcher(options) {
 		const map = evt.target.map_;
 
 		// Base layers selector init
-		for (let name in options.baseLayers) {
+		for (let name in options.baseLayers) { // array of layers, mandatory, no default
 			const baseElement = document.createElement('div');
 			baseElement.innerHTML =
 				'<input type="checkbox" name="baselayer" value="' + name + '">' +
@@ -1015,11 +1009,9 @@ function controlLayersSwitcher(options) {
 /**
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
- * options.defaultPos {<ZOOM>/<LON>/<LAT>/<LAYER>} if nothing else is defined.
  * Requires 'myol:onadd' layer event
  */
 function controlPermalink(o) {
-	//TODO-ARCHI all : commenter les options, first is default
 	const options = this.options_ = ol.assign({
 			hash: '?', // {?, #} the permalink delimiter
 			visible: true, // {true | false} add a controlPermalink button to the map.
@@ -1033,7 +1025,7 @@ function controlPermalink(o) {
 	});
 	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
-		(options.defaultPos || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/);
+		(options.format || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
 
 	this_.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
 
@@ -1048,7 +1040,7 @@ function controlPermalink(o) {
 		const view = evt.map.getView();
 
 		// Set center & zoom at the init
-		if (options.init && // If use hash & cookies
+		if (options.init &&
 			params) { // Only once
 			view.setZoom(params[1]);
 			view.setCenter(ol.proj.transform(this_.paramsCenter, 'EPSG:4326', 'EPSG:3857'));
@@ -1123,7 +1115,7 @@ function controlGPS(options) {
 		const position = ol.proj.fromLonLat(this.getPosition());
 		this_.getMap().getView().setCenter(position);
 		point.setCoordinates(position);
-		if (typeof options.callBack == 'function')
+		if (typeof options.callBack == 'function') // Default undefined
 			options.callBack(position);
 	});
 
@@ -1248,7 +1240,7 @@ function controlDownloadGPX(o) {
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
 			fileName: 'trace',
-			extraMetaData: ''
+			extraMetaData: '' // Additional tags to the GPX file header
 		}, o),
 		hiddenElement = document.createElement('a');
 
@@ -1257,7 +1249,7 @@ function controlDownloadGPX(o) {
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	options.activate = function(evt) {
+	options.activate = function(evt) { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
 			extent = this.group.map_.getView().calculateExtent();
 
@@ -1354,6 +1346,7 @@ function controlPrint() {
 function controlEdit(o) {
 	const options = ol.assign({
 			inputId: 'editable-json',
+			draw: [], // array of additional buttons (lines, polygons, ...)
 			enableAtInit: false
 		}, o),
 		inputEl = document.getElementById(options.inputId), // Read data in an html element
@@ -1388,13 +1381,13 @@ function controlEdit(o) {
 			}
 		}, options));
 
-	if (options.styleOptions) {
+	if (options.styleOptions) { // Optional
 		layer.setStyle(
 			new ol.style.Style(options.styleOptions)
 		);
-		options.editStyle = new ol.style.Style(ol.assign(
+		options.editStyle = new ol.style.Style(ol.assign( // Optional
 			options.styleOptions,
-			options.editStyleOptions
+			options.editStyleOptions // Optional
 		));
 	}
 
@@ -1462,7 +1455,7 @@ function controlEdit(o) {
 		});
 
 		// Snap on features external to the editor
-		if (options.snapLayers)
+		if (options.snapLayers) // Optional
 			options.snapLayers.forEach(function(layer) {
 				layer.getSource().on('change', function() {
 					const fs = this.getFeatures();
