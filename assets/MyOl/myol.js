@@ -8,8 +8,6 @@
  * Some few classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only one file of JS functions & CSS
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
-//TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
-//TODO-ARCHI map off line, application
 
 /* jshint esversion: 6 */
 
@@ -1245,7 +1243,7 @@ function controlDownloadGPX(o) {
 	const options = ol.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
-			fileName: 'trace.gpx'
+			fileName: 'trace'
 		}, o),
 		hiddenElement = document.createElement('a');
 
@@ -1266,14 +1264,25 @@ function controlDownloadGPX(o) {
 				});
 		});
 
+		// Get a MultiLineString geometry with just lines fragments
+		// geometries are output as routes (<rte>) and MultiLineString as tracks (<trk>)
+		var multiLineString = new ol.Feature({
+			geometry: new ol.geom.MultiLineString(
+				sortFeatures(features).lines
+			),
+			name: options.fileName
+		});
+
 		// Write in GPX format
-		//TODO BUG geometries are output as routes (<rte>), and MultiLineString as tracks (<trk>).
-		const gpx = new ol.format.GPX().writeFeatures(features, {
+		const gpx = new ol.format.GPX().writeFeatures([multiLineString], {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5
 			}),
-			file = new Blob([gpx.replace(/>/g, ">\n")], {
+			file = new Blob([gpx
+				.replace(/>/g, ">\n")
+				.replace("<name>\n", "<time>" + new Date().toISOString() + "</time>\n<name>")
+			], {
 				type: 'application/gpx+xml'
 			});
 
@@ -1284,7 +1293,7 @@ function controlDownloadGPX(o) {
 			return navigator.msSaveBlob(file, options.fileName);
 
 		hiddenElement.href = URL.createObjectURL(file);
-		hiddenElement.download = options.fileName;
+		hiddenElement.download = options.fileName + '.gpx';
 
 		// Simulate the click & download the .gpx file
 		if (typeof hiddenElement.click === 'function')
@@ -1491,19 +1500,11 @@ function controlEdit(o) {
 
 	function cleanFeatures(pointerPosition) {
 		// Get flattened list of multipoints coords
-		const features = source.getFeatures(),
-			lines = [],
+		let fs = sortFeatures(source.getFeatures(), pointerPosition),
+			lines = fs.lines,
 			polys = [];
 
-		for (let f in features)
-			if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
-				let geometries = features[f].getGeometry().getGeometries();
-				for (let g in geometries)
-					flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
-			} else
-				flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition);
-		
-		source.clear(); // And clear the edited layer
+		source.clear();
 
 		for (let a = 0; a < lines.length; a++) {
 			// Exclude 1 coord features (points)
@@ -1576,31 +1577,53 @@ function controlEdit(o) {
 		});
 	}
 
-	function flatCoord(existingCoords, newCoords, pointerPosition) {
-		if (typeof newCoords[0][0] == 'object')
-			for (let c1 in newCoords)
-				flatCoord(existingCoords, newCoords[c1], pointerPosition);
-		else {
-			existingCoords.push([]); // Increment existingCoords array
-			for (let c2 in newCoords)
-				if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
-					existingCoords.push([]); // & increment existingCoords array
-				} else
-					// Stack on the last existingCoords array
-					existingCoords[existingCoords.length - 1].push(newCoords[c2]);
-		}
-	}
-
-	function compareCoords(a, b) {
-		if (!a)
-			return false;
-		if (!b)
-			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
-		return a[0] == b[0] && a[1] == b[1]; // 2 coords
-	}
-
 	this_.source_ = source; // HACK for getting info from the edited features
 	return this_;
+}
+
+/* Common functions */
+function sortFeatures(features, pointerPosition) {
+	let fs = {
+		lines: [],
+		polys: [],
+		points: []
+	}
+
+	for (let f in features)
+		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
+			let geometries = features[f].getGeometry().getGeometries();
+			for (let g in geometries)
+				flatCoord(fs.lines, geometries[g].getCoordinates(), pointerPosition);
+		} else if (features[f].getGeometry().getType().match(/point$/i))
+		fs.points.push(features[f]);
+	else
+		flatCoord(fs.lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+
+	return fs;
+}
+
+// Get all lines fragments at the same level & split aif one point = pointerPosition
+function flatCoord(existingCoords, newCoords, pointerPosition) {
+	if (typeof newCoords[0][0] == 'object')
+		for (let c1 in newCoords)
+			flatCoord(existingCoords, newCoords[c1], pointerPosition);
+	else {
+		existingCoords.push([]); // Increment existingCoords array
+		for (let c2 in newCoords)
+			if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
+				existingCoords.push([]); // & increment existingCoords array
+			} else
+				// Stack on the last existingCoords array
+				existingCoords[existingCoords.length - 1].push(newCoords[c2]);
+	}
+}
+
+function compareCoords(a, b) {
+	if (!a)
+		return false;
+	if (!b)
+		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
+	return a[0] == b[0] && a[1] == b[1]; // 2 coords
 }
 
 
@@ -1699,3 +1722,6 @@ function layersCollection(keys) {
 		'Neutre': new ol.layer.Tile()
 	};
 }
+
+//TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
+//TODO-ARCHI map off line, application

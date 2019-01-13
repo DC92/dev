@@ -37,6 +37,9 @@ var topicStyleOptions = {
 				color: 'red'
 			})
 		}),
+		fill: new ol.style.Fill({
+			color: 'rgba(255,196,196,0.5)'
+		}),
 		stroke: new ol.style.Stroke({
 			color: 'red',
 			width: 2
