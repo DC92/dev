@@ -52,14 +52,10 @@
 					visible: false,
 					init: ol.extent.isEmpty(extent)
 				}
-			}).concat([
-				controlLayersSwitcher(
-					layers({GEO_KEYS})
-				),
-				<!-- IF GEO_MAP_TYPE == 'surface' -->
-					edit
-				<!-- ENDIF -->
-			])
+			})
+			<!-- IF GEO_MAP_TYPE == 'surface' -->
+				.concat([edit])
+			<!-- ENDIF -->
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->

@@ -65,14 +65,10 @@
 			layers: [
 				overlay
 			],
-			controls: controls.concat([
-				controlLayersSwitcher(
-					layersCollection({GEO_KEYS})
-				),
-				<!-- IF GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface' -->
-					edit
-				<!-- ENDIF -->
-			])
+			controls: controls
+			<!-- IF GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface' -->
+				.concat([edit])
+			<!-- ENDIF -->
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->

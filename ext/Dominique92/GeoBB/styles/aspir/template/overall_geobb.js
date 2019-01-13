@@ -1,5 +1,9 @@
 function geobbControls(options) {
+	options = options || {};
 	return [
+		controlLayersSwitcher({
+			baseLayers: layersCollection(geo_keys)
+		}),
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
 			coordinateFormat: ol.coordinate.createStringXY(5),

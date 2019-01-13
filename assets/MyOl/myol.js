@@ -919,7 +919,9 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Requires 'myol:onadd' layer event
  * Requires permanentCheckboxList
  */
-function controlLayersSwitcher(baseLayers) {
+function controlLayersSwitcher(options) {
+	options = options || {};
+
 	let this_ = new ol.control.Button({
 		label: '&hellip;',
 		className: 'switch-layer',
@@ -945,13 +947,13 @@ function controlLayersSwitcher(baseLayers) {
 		const map = evt.target.map_;
 
 		// Base layers selector init
-		for (let name in baseLayers) {
+		for (let name in options.baseLayers) {
 			const baseElement = document.createElement('div');
 			baseElement.innerHTML =
 				'<input type="checkbox" name="baselayer" value="' + name + '">' +
 				'<span title="">' + name + '</span>';
 			selectorElement.appendChild(baseElement);
-			map.addLayer(baseLayers[name]);
+			map.addLayer(options.baseLayers[name]);
 		}
 
 		// Make the selector memorized by cookies
@@ -990,13 +992,13 @@ function controlLayersSwitcher(baseLayers) {
 		list = permanentCheckboxList('baselayer');
 
 		// Refresh layers visibility & opacity
-		for (let layerName in baseLayers) {
-			baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
-			baseLayers[layerName].setOpacity(0);
+		for (let layerName in options.baseLayers) {
+			options.baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
+			options.baseLayers[layerName].setOpacity(0);
 		}
-		baseLayers[list[0]].setOpacity(1);
+		options.baseLayers[list[0]].setOpacity(1);
 		if (list.length >= 2)
-			baseLayers[list[1]].setOpacity(rangeElement.value / 100);
+			options.baseLayers[list[1]].setOpacity(rangeElement.value / 100);
 
 		// Refresh control button, range & selector
 		this_.element.firstElementChild.style.display = evt ? 'none' : '';
@@ -1639,37 +1641,6 @@ function compareCoords(a, b) {
 
 
 /**
- * Controls examples
- */
-function controlsCollection(options) {
-	options = options || {};
-	return [
-		new ol.control.ScaleLine(),
-		new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
-			projection: 'EPSG:4326',
-			className: 'ol-coordinate',
-			undefinedHTML: String.fromCharCode(0)
-		}),
-		new ol.control.Attribution({
-			collapsible: false // Attribution always open
-		}),
-		new ol.control.Zoom(),
-		new ol.control.FullScreen({
-			label: '',
-			labelActive: '',
-			tipLabel: 'Plein écran'
-		}),
-		controlLengthLine(),
-		controlPermalink(options.controlPermalink),
-		geocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownloadGPX(options.controlDownloadGPX)
-	];
-}
-
-/**
  * Tile layers examples
  * Requires many
  */
@@ -1720,6 +1691,43 @@ function layersCollection(keys) {
 		Watercolor: layerStamen('watercolor'),
 		'Neutre': new ol.layer.Tile()
 	};
+}
+
+/**
+ * Controls examples
+ */
+function controlsCollection(o) {
+	const options = ol.assign({
+		controlLayersSwitcher: {
+			baseLayers: layersCollection(geo_keys)
+		}
+	}, o);
+
+	return [
+		controlLayersSwitcher(options.controlLayersSwitcher),
+		new ol.control.ScaleLine(),
+		new ol.control.MousePosition({
+			coordinateFormat: ol.coordinate.createStringXY(5),
+			projection: 'EPSG:4326',
+			className: 'ol-coordinate',
+			undefinedHTML: String.fromCharCode(0)
+		}),
+		new ol.control.Attribution({
+			collapsible: false // Attribution always open
+		}),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '',
+			labelActive: '',
+			tipLabel: 'Plein écran'
+		}),
+		controlLengthLine(),
+		controlPermalink(options.controlPermalink),
+		geocoder(),
+		controlGPS(options.controlGPS),
+		controlLoadGPX(),
+		controlDownloadGPX(options.controlDownloadGPX)
+	];
 }
 
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com

@@ -164,8 +164,5 @@ var geo_keys = {
 new ol.MyMap({
 	target: 'map',
 	layers: overlays,
-	controls: basicControls.concat([
-		controlLayersSwitcher(layersCollection(geo_keys)),
-		edit
-	])
+	controls: basicControls.concat([edit])
 });
