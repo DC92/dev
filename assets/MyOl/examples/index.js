@@ -123,7 +123,13 @@ var geo_keys = {
 		marqueur,
 		viseur
 	],
-	basicControls = controlsCollection(),
+	basicControls = controlsCollection({
+		controlGPS: {
+			callBack: function(position) {
+				viseur.getPoint().setCoordinates(position);
+			}
+		}
+	}),
 	edit = controlEdit({
 		inputId: 'geojson',
 		snapLayers: overlays,
@@ -163,7 +169,3 @@ new ol.MyMap({
 		edit
 	])
 });
-
-controlgps.callBack = function(position) {
-	viseur.getPoint().setCoordinates(position);
-}

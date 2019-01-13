@@ -883,7 +883,7 @@ ol.control.Button = function(o) {
 	if (options.rightPosition) {
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
-	} else if (options.label) { // Don't book a button if not visible
+	} else { //TODO DELETE ???? if (options.label) { // Don't book a button if not visible
 		divElement.style.left = '.5em';
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
 	}
@@ -1071,7 +1071,9 @@ function controlPermalink(o) {
  * GPS control
  * Requires ol.control.Button
  */
-function controlGPS() {
+function controlGPS(options) {
+	options = options || {};
+
 	// Vérify if localisation is available
 	if (!window.location.href.match(/https|localhost/i))
 		return new ol.control.Control({ //HACK No button
@@ -1079,11 +1081,11 @@ function controlGPS() {
 		});
 
 	// The position marker
-	const point_ = new ol.geom.Point([0, 0]),
+	const point = new ol.geom.Point([0, 0]),
 		layer = new ol.layer.Vector({
 			source: new ol.source.Vector({
 				features: [new ol.Feature({
-					geometry: point_
+					geometry: point
 				})]
 			}),
 			style: new ol.style.Style({
@@ -1093,7 +1095,6 @@ function controlGPS() {
 				})
 			})
 		}),
-
 		// The control button
 		this_ = new ol.control.Button({
 			className: 'gps-button',
@@ -1107,7 +1108,6 @@ function controlGPS() {
 					this_.getMap().removeLayer(layer);
 			}
 		}),
-
 		// Interface with the system GPS
 		geolocation = new ol.Geolocation();
 
@@ -1118,9 +1118,9 @@ function controlGPS() {
 	geolocation.on('change', function() {
 		const position = ol.proj.fromLonLat(this.getPosition());
 		this_.getMap().getView().setCenter(position);
-		point_.setCoordinates(position);
-		if (typeof this_.callBack == 'function')
-			this_.callBack(position);
+		point.setCoordinates(position);
+		if (typeof options.callBack == 'function')
+			options.callBack(position);
 	});
 
 	return this_;
@@ -1641,8 +1641,6 @@ function compareCoords(a, b) {
 /**
  * Controls examples
  */
-var controlgps = controlGPS(); //TODO ARCHI intégrer ??
-
 function controlsCollection(options) {
 	options = options || {};
 	return [
@@ -1665,7 +1663,7 @@ function controlsCollection(options) {
 		controlLengthLine(),
 		controlPermalink(options.controlPermalink),
 		geocoder(),
-		controlgps,
+		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX)
 	];
