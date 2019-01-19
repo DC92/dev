@@ -445,6 +445,8 @@ ol.layer.LayerVectorURL = function(o) {
 			style: this_.options_.hoverStyle || this_.options_.style
 		});
 
+		//TODO BUG ne selecte plus quand se déplace sur un polygine
+//TODO			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
 		select.on('select', function(selectEvent) {
 			const pixel = selectEvent.mapBrowserEvent.pixel;
 
@@ -1646,6 +1648,10 @@ function layersCollection(keys) {
 		'MRI': layerOSM(
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+		),
+		'OpenTopoMap': layerOSM(
+			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
 		'Hike & Bike': layerOSM(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',

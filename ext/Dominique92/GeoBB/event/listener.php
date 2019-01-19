@@ -95,7 +95,7 @@ class listener implements EventSubscriberInterface
 			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
 			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
 			'Bienvenue '.$this->user->style['style_name'] => 'GEO_PRESENTATION',
-			'Aide' => 'GEO_URL_AIDE',
+			'Aide' => 'GEO_URL_AIDE', //TODO TEST ne marche plus sur ASPIR/localhist
 			$mode == 'terms' ? 'Conditions d\'utilisation' : 'Politique de confidentialité' => 'AGREEMENT_TEXT',
 		];
 		foreach ($msgs AS $k=>$v) {
@@ -437,6 +437,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Call after the post validation
+	//TODO avant écriture SQL ??? 'core.submit_post_modify_sql_data
 	function submit_post_end($vars) {
 		// Save change
 		$this->request->enable_super_globals();
