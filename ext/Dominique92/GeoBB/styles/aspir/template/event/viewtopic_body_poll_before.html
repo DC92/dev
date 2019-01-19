@@ -32,7 +32,7 @@
 			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
-		<!-- ELSEIF GEO_MAP_TYPE == 'surface' && GEOJSON -->
+		<!-- ELSEIF GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"

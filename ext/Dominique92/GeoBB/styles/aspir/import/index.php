@@ -11,7 +11,7 @@ Copier repertoire de GeoBB + aspir_import.php
 Lancer install
 -> Français -> Change
 Installer -> Installer
-config.php -> clés cartes : $geo_keys = [...]
+config.php -> clés cartes : $geoKeys = [...]
 Supprimer install
 Administration ==>
 Général -> Gérer les forums -> Créer

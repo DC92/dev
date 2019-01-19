@@ -288,7 +288,7 @@ function layerBing(layer, key) {
 /**
  * Mem in cookies the checkbox content with name="selectorName"
  */
-//TODO-ARCHI when unchecked, remove cookie
+//TODO-ARCHI BEST when unchecked, remove cookie
 function controlPermanentCheckbox(selectorName, callback) {
 	const checkElements = document.getElementsByName(selectorName),
 		cookie =
@@ -1699,13 +1699,14 @@ function layersCollection(keys) {
  */
 function controlsCollection(o) {
 	const options = ol.assign({
-		controlLayersSwitcher: {
-			baseLayers: layersCollection(geo_keys)
-		}
+		geoKeys: typeof geoKeys == 'object' ? geoKeys : [] // Global variable if any
 	}, o);
 
 	return [
-		controlLayersSwitcher(options.controlLayersSwitcher),
+		controlLayersSwitcher(ol.assign({
+			geoKeys: options.geoKeys,
+			baseLayers: layersCollection(options.geoKeys)
+		}, options.controlLayersSwitcher)),
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
 			coordinateFormat: ol.coordinate.createStringXY(5),

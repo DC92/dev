@@ -2,7 +2,7 @@ function geobbControls(options) {
 	options = options || {};
 	return [
 		controlLayersSwitcher({
-			baseLayers: layersCollection(geo_keys)
+			baseLayers: layersCollection(geoKeys)
 		}),
 		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
