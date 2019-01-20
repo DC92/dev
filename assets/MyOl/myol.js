@@ -446,7 +446,7 @@ ol.layer.LayerVectorURL = function(o) {
 		});
 
 		//TODO BUG ne selecte plus quand se déplace sur un polygine
-//TODO			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+		//TODO			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
 		select.on('select', function(selectEvent) {
 			const pixel = selectEvent.mapBrowserEvent.pixel;
 
@@ -884,6 +884,22 @@ ol.control.Button = function(o) {
 	} else { //TODO DELETE ???? if (options.label) { // Don't book a button if not visible
 		divElement.style.left = '.5em';
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
+	}
+
+	// Add a question on the right of the button
+	if (options.question) {
+		const questionElement = document.createElement('div');
+		questionElement.innerHTML = options.question;
+		questionElement.className = 'ol-control-hidden';
+		divElement.appendChild(questionElement);
+
+		divElement.onmouseover = function() {
+			questionElement.className = 'ol-control-question';
+		};
+
+		divElement.onmouseout = function() {
+			questionElement.className = 'ol-control-hidden';
+		};
 	}
 
 	// Toggle the button status & aspect
@@ -1329,14 +1345,68 @@ function geocoder() {
 /**
  * Print control
  */
+
+var bbb;
+
 //TODO-RANDO impression full format page -> CSS
 function controlPrint() {
-	return new ol.control.Button({
+	var r = new ol.control.Button({
 		className: 'print-button',
-		title: 'Imprimer la carte',
+		//questionElement: questionElement,
+		question: ' &nbsp; ' +
+			'<span onclick="printMap([297,210])" title="Imprimer en mode paysage">paysage</span> / ' +
+			'<span onclick="printMap([210,297])" title="Imprimer en mode portrait">portrait</span>',
+		title: 'Imprimer la carte'
+		/*,//TODO DELETE
 		activate: function() {
-			window.print();
-		}
+		}*/
+	});
+	bbb = r;
+	return r;
+}
+
+function printMap(dim) {
+	var memBodyClass = document.body.className;
+	document.body.className = 'body-print';
+
+	var map = bbb.map_;
+	//exportButton.disabled = true;
+	//document.body.style.cursor = 'progress';
+
+	//      var format = document.getElementById('format').value;
+	var resolution = 30; // dpi //TODO 300
+	//document.getElementById('resolution').value;
+	//        var dim = z;//dims[format];
+	var width = Math.round(dim[0] * resolution / 25.4);
+	var height = Math.round(dim[1] * resolution / 25.4);
+	var size = map.getSize();
+	var extent = map.getView().calculateExtent(size);
+
+	map.once('rendercomplete', function(event) {
+		window.print();
+		/*
+          var canvas = event.context.canvas;
+          var data = canvas.toDataURL('image/jpeg');
+          var pdf = new jsPDF('landscape', undefined, a4);
+          pdf.addImage(data, 'JPEG', 0, 0, dim[0], dim[1]);
+          pdf.save('map.pdf');
+		  */
+
+		// Reset original map size
+		map.setSize(size);
+		map.getView().fit(extent, {
+			size: size
+		});
+		//exportButton.disabled = false;
+		document.body.style.cursor = 'auto';
+		document.body.className = memBodyClass;
+	});
+
+	// Set print size
+	var printSize = [width, height];
+	map.setSize(printSize);
+	map.getView().fit(extent, {
+		size: printSize
 	});
 }
 
@@ -1723,6 +1793,7 @@ function controlsCollection(o) {
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
+		controlPrint(),
 		controlLengthLine(),
 		controlPermalink(options.controlPermalink),
 		geocoder(),
