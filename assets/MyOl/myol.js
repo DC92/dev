@@ -1342,64 +1342,63 @@ function geocoder() {
 	return gc;
 }
 
+/* //TODO EN TEST */
 /**
  * Print control
  */
 
-var bbb;
+var bbb;//TODO set into functions !!!
 
 //TODO-RANDO impression full format page -> CSS
 function controlPrint() {
 	var r = new ol.control.Button({
 		className: 'print-button',
-		//questionElement: questionElement,
+		activate: printMap,
 		question: ' &nbsp; ' +
-			'<span onclick="printMap([297,210])" title="Imprimer en mode paysage">paysage</span> / ' +
-			'<span onclick="printMap([210,297])" title="Imprimer en mode portrait">portrait</span>',
+			'<span onclick="printMap(\'landscape\')" title="Imprimer en mode paysage">paysage</span> / ' +
+			'<span onclick="printMap(\'portrait\')" title="Imprimer en mode portrait">portrait</span>',
 		title: 'Imprimer la carte'
-		/*,//TODO DELETE
-		activate: function() {
-		}*/
 	});
 	bbb = r;
 	return r;
 }
 
-function printMap(dim) {
-	var memBodyClass = document.body.className;
-	document.body.className = 'body-print';
+function printMap(orientation) {
+/*
+	// Set page orientation
+	const css = '@page{size:' + orientation + '}',
+		head = document.head || document.getElementsByTagName('head')[0],
+		style = document.createElement('style');
 
-	var map = bbb.map_;
-	//exportButton.disabled = true;
-	//document.body.style.cursor = 'progress';
+	style.type = 'text/css';
+	style.media = 'print';
 
-	//      var format = document.getElementById('format').value;
-	var resolution = 30; // dpi //TODO 300
-	//document.getElementById('resolution').value;
-	//        var dim = z;//dims[format];
-	var width = Math.round(dim[0] * resolution / 25.4);
-	var height = Math.round(dim[1] * resolution / 25.4);
-	var size = map.getSize();
-	var extent = map.getView().calculateExtent(size);
+	if (style.styleSheet)
+		style.styleSheet.cssText = css;
+	else
+		style.appendChild(document.createTextNode(css));
+	head.appendChild(style);
+*/
+
+	const map = bbb.map_,
+		// Existing parameters
+		size = map.getSize(),
+		extent = map.getView().calculateExtent(size),
+		// Print parameters
+		dim = orientation == 'portrait' ? [210, 297] : [297, 210],
+		width = Math.round(dim[0] * resolution / 25.4),
+		height = Math.round(dim[1] * resolution / 25.4),
+		resolution = 100;
 
 	map.once('rendercomplete', function(event) {
 		window.print();
-		/*
-          var canvas = event.context.canvas;
-          var data = canvas.toDataURL('image/jpeg');
-          var pdf = new jsPDF('landscape', undefined, a4);
-          pdf.addImage(data, 'JPEG', 0, 0, dim[0], dim[1]);
-          pdf.save('map.pdf');
-		  */
 
 		// Reset original map size
 		map.setSize(size);
 		map.getView().fit(extent, {
 			size: size
 		});
-		//exportButton.disabled = false;
 		document.body.style.cursor = 'auto';
-		document.body.className = memBodyClass;
 	});
 
 	// Set print size
@@ -1409,6 +1408,7 @@ function printMap(dim) {
 		size: printSize
 	});
 }
+/* //TODO FIN EN TEST */
 
 /**
  * Line & Polygons Editor
