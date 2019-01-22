@@ -1347,7 +1347,7 @@ function geocoder() {
  * Print control
  */
 
-var bbb;//TODO set into functions !!!
+var bbb; //TODO set into functions !!!
 
 //TODO-RANDO impression full format page -> CSS
 function controlPrint() {
@@ -1355,7 +1355,7 @@ function controlPrint() {
 		className: 'print-button',
 		activate: printMap,
 		question: ' &nbsp; ' +
-			'<span onclick="printMap(\'landscape\')" title="Imprimer en mode paysage">paysage</span> / ' +
+			'<span onclick="printMap()" title="Imprimer en mode paysage">paysage</span> / ' +
 			'<span onclick="printMap(\'portrait\')" title="Imprimer en mode portrait">portrait</span>',
 		title: 'Imprimer la carte'
 	});
@@ -1364,45 +1364,44 @@ function controlPrint() {
 }
 
 function printMap(orientation) {
-/*
-	// Set page orientation
-	const css = '@page{size:' + orientation + '}',
-		head = document.head || document.getElementsByTagName('head')[0],
-		style = document.createElement('style');
-
-	style.type = 'text/css';
-	style.media = 'print';
-
-	if (style.styleSheet)
-		style.styleSheet.cssText = css;
-	else
-		style.appendChild(document.createTextNode(css));
-	head.appendChild(style);
-*/
-
 	const map = bbb.map_,
-		// Existing parameters
-		size = map.getSize(),
-		extent = map.getView().calculateExtent(size),
-		// Print parameters
-		dim = orientation == 'portrait' ? [210, 297] : [297, 210],
-		width = Math.round(dim[0] * resolution / 25.4),
-		height = Math.round(dim[1] * resolution / 25.4),
-		resolution = 100;
+		mapEl = map.getTargetElement();
+
+	// Hide other elements than the map
+	while (document.body.firstChild)
+		document.body.removeChild(document.body.firstChild);
+
+	// Raises the map to the top level
+	document.body.appendChild(mapEl);
+	mapEl.style.width = '100%';
+	mapEl.style.height = '100%';
+
+	// Hide contrpls
+	const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
+	Array.prototype.filter.call(controls, function(el) {
+		el.style.display = 'none';
+	});
+
+	// Add page style for printing
+	const style = document.createElement('style');
+	document.head.appendChild(style);
+	style.appendChild(document.createTextNode(
+		"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
+	));
 
 	map.once('rendercomplete', function(event) {
 		window.print();
-
-		// Reset original map size
-		map.setSize(size);
-		map.getView().fit(extent, {
-			size: size
-		});
-		document.body.style.cursor = 'auto';
+		document.location.reload();
 	});
 
-	// Set print size
-	var printSize = [width, height];
+	// Set print size, which  will render the new map
+	const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
+		resolution = 100,
+		printSize = [
+			Math.round(dim[0] * resolution / 25.4),
+			Math.round(dim[1] * resolution / 25.4)
+		],
+		extent = map.getView().calculateExtent(map.getSize());
 	map.setSize(printSize);
 	map.getView().fit(extent, {
 		size: printSize
