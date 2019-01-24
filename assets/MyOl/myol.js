@@ -878,6 +878,7 @@ ol.control.Button = function(o) {
 	divElement.appendChild(buttonElement);
 	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
 	divElement.title = options.title; // {string} displayed when the control is hovered.
+	divElement.control_ = this; // For callback functions
 	if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
@@ -918,7 +919,7 @@ ol.control.Button = function(o) {
 					control.element.firstChild.style.backgroundColor = control.active ? control.options_.activeBackgroundColor : 'white';
 
 					if (typeof control.options_.activate == 'function')
-						control.options_.activate(control.active);
+						control.options_.activate(control.active, buttonElement);
 				}
 			}
 		});
@@ -1217,12 +1218,11 @@ function controlLoadGPX(o) {
 			features = format.readFeatures(reader.result, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857'
+			}),
+			added = map.dispatchEvent({
+				type: 'myol:onfeatureload',
+				features: features
 			});
-
-		var added = map.dispatchEvent({
-			type: 'myol:onfeatureload',
-			features: features
-		});
 
 		if (added !== false) { // If one used the feature
 			// Display the track on the map
@@ -1257,7 +1257,7 @@ function controlDownloadGPX(o) {
 	const options = ol.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
-			fileName: 'trace',
+			fileName: 'trace', //TODO BEST donner un nom suivantle contexte
 			extraMetaData: '' // Additional tags to the GPX file header
 		}, o),
 		hiddenElement = document.createElement('a');
@@ -1281,7 +1281,7 @@ function controlDownloadGPX(o) {
 
 		// Get a MultiLineString geometry with just lines fragments
 		// geometries are output as routes (<rte>) and MultiLineString as tracks (<trk>)
-		var multiLineString = new ol.Feature({
+		const multiLineString = new ol.Feature({
 			geometry: new ol.geom.MultiLineString(
 				sortFeatures(features).lines
 			),
@@ -1331,7 +1331,7 @@ function controlDownloadGPX(o) {
 //TODO-IE BUG : pas de géocodeur sur IE
 //TODO-BEST ajuster le zoom geocoder pour le bon niveau IGN top25
 function geocoder() {
-	var gc = new Geocoder('nominatim', {
+	const gc = new Geocoder('nominatim', {
 		provider: 'osm',
 		lang: 'FR',
 		keepOpen: true,
@@ -1342,32 +1342,37 @@ function geocoder() {
 	return gc;
 }
 
-/* //TODO EN TEST */
 /**
  * Print control
  */
-
-var bbb; //TODO set into functions !!!
-
-//TODO-RANDO impression full format page -> CSS
 function controlPrint() {
-	var r = new ol.control.Button({
+	return new ol.control.Button({
 		className: 'print-button',
 		activate: printMap,
-		question: ' &nbsp; ' +
-			'<span onclick="printMap()" title="Imprimer en mode paysage">paysage</span> / ' +
-			'<span onclick="printMap(\'portrait\')" title="Imprimer en mode portrait">portrait</span>',
+		question: '<p>Paysage : ' +
+			'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
+			'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
+			'</p> <p>Portrait : ' +
+			'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
+			'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
+			'</p> ',
 		title: 'Imprimer la carte'
 	});
-	bbb = r;
-	return r;
 }
 
-function printMap(orientation) {
-	const map = bbb.map_,
-		mapEl = map.getTargetElement();
+//TODO ARCHI mettre dans controlPrint
+function printMap(orientation, el, resolution) {
+	// Search control div element in the hierarchy
+	while (el.parentElement && !el.control_)
+		el = el.parentElement;
+
+	// Get existing context
+	const map = el.control_.map_,
+		mapEl = map.getTargetElement(),
+		mapCookie = document.cookie.match('map=([^;]*)');
 
 	// Hide other elements than the map
+	document.body.style.cursor = "wait";
 	while (document.body.firstChild)
 		document.body.removeChild(document.body.firstChild);
 
@@ -1390,16 +1395,18 @@ function printMap(orientation) {
 	));
 
 	map.once('rendercomplete', function(event) {
+		//TODO BUG Chrome met 3 pages en landscape
+		//TODO IE11 trés grosse marge
 		window.print();
-		document.location.reload();
+		document.cookie = 'map=' + mapCookie + ';path=/';
+		window.location.href = window.location.href;
 	});
 
-	// Set print size, which  will render the new map
+	// Set print size, which will render the new map
 	const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
-		resolution = 100,
 		printSize = [
-			Math.round(dim[0] * resolution / 25.4),
-			Math.round(dim[1] * resolution / 25.4)
+			Math.round(dim[0] * (resolution || 100) / 25.4),
+			Math.round(dim[1] * (resolution || 100) / 25.4)
 		],
 		extent = map.getView().calculateExtent(map.getSize());
 	map.setSize(printSize);
@@ -1407,7 +1414,7 @@ function printMap(orientation) {
 		size: printSize
 	});
 }
-/* //TODO FIN EN TEST */
+
 
 /**
  * Line & Polygons Editor
@@ -1666,7 +1673,7 @@ function sortFeatures(features, pointerPosition) {
 		lines: [],
 		polys: [],
 		points: []
-	}
+	};
 
 	for (let f in features)
 		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
