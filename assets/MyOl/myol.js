@@ -446,6 +446,7 @@ ol.layer.LayerVectorURL = function(o) {
 		});
 
 		//TODO BUG ne selecte plus quand se déplace sur un polygine
+		//TODO BUG selecte tous les segments si multiligne
 		//TODO			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
 		select.on('select', function(selectEvent) {
 			const pixel = selectEvent.mapBrowserEvent.pixel;
@@ -1189,6 +1190,7 @@ function controlLengthLine() {
  * Requires ol.control.Button
  */
 //TODO-BEST Pas d'upload/download sur mobile (-> va vers photos !)
+//TODO BUG avoir un zoom maximum (1 point rend la carte invisible)
 function controlLoadGPX(o) {
 	const options = ol.assign({
 			label: '&uArr;',
@@ -1395,6 +1397,17 @@ function printMap(orientation, el, resolution) {
 	));
 
 	map.once('rendercomplete', function(event) {
+
+/*//TODO attenre fin du chargement de toutes les couches !
+map.getLayers().forEach(function(layer) {
+	if(layer.getSource())
+//DCMM
+{var _r=' ',_v=layer.getSource().getState();if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+	
+});
+*/
+
+
 		//TODO BUG Chrome met 3 pages en landscape
 		//TODO IE11 trés grosse marge
 		window.print();

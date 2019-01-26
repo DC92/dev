@@ -755,7 +755,9 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 					foreach ($options AS $o)
 						$length = max ($lengt, strlen ($o) + 1);
 					$vars['TAG'] = 'select';
-					$vars['SQL_TYPE'] = 'varchar-'.$length;
+//TODO BUG si data déjà existante mais trop longue dans la colonnes
+					$vars['SQL_TYPE'] = 'text';
+//TODO revoir longueur champs					$vars['SQL_TYPE'] = 'varchar-'.$length;
 				}
 
 				// sql_id|titre|proches

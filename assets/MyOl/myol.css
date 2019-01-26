@@ -129,6 +129,8 @@
 }
 .print-button p {
 	margin: 0;
+	font-size: 14px;
+	font-family: Times New Roman;
 }
 .print-button p span {
 	color: blue;
