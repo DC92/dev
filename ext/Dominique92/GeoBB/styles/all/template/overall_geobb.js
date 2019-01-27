@@ -65,7 +65,7 @@ function layerStyleOptionsFunction(properties, id, hover) {
 			color: 'rgba(255,255,255,'+(hover ? 0.65 : 0.4)+')'
 		}),
 		stroke: new ol.style.Stroke({
-			color: 'blue',
+			color: hover ? 'red' : 'blue',
 			width: hover ? 4 : 3
 		})
 	};

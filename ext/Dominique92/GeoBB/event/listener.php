@@ -423,6 +423,7 @@ class listener implements EventSubscriberInterface
 				if ($ks[1] == 'geometry' && $v) {
 					include_once('assets/geoPHP/geoPHP.inc');
 					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
+					//TODO BUG ne devrait pas optimiser les linestring en multilinestring
 					if ($geophp)
 						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
 				}

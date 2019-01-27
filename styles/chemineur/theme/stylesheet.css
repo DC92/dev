@@ -47,7 +47,7 @@ body,
 	border: 0;
 	padding: 0;
 }
-z.wrap {
+.wrap {
 	max-width: none;
 	min-width: none;
 }

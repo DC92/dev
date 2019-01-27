@@ -1681,6 +1681,7 @@ function controlEdit(o) {
 }
 
 /* Common functions */
+/* Sort Points / Lines (Polygons are treated as Lines) */
 function sortFeatures(features, pointerPosition) {
 	let fs = {
 		lines: [],

@@ -4,28 +4,31 @@
 <div id="map-frame">
 	<div id="map"></div>
 </div>
+<p id="marqueur-json" style="display:none">{GEOJSON}</p>
 
 <!-- INCLUDE viewtopic_specific_fields.html -->
-<!-- //TODO-CHEM météo idem WRI -->
+<!-- IF 0 -->//TODO-CHEM météo idem WRI<!-- ENDIF -->
 <!-- INCLUDE viewtopic_edit_button.html -->
 
 <script>
 	window.addEventListener('load', function() {
 		var map = new ol.MyMap({
-			target: 'map',
-			layers: [
-				geoLayer({TOPIC_ID})
-			],
-			controls: controlsCollection({
-				controlPermalink:{
-					init: '{GEO_MAP_TYPE}' == ''
-				},
-				controlDownloadGPX: {
-					fileName: 'MON FICH VIEWTOPIC',
-					extraMetaData: "<desc>//TODO description...</desc>\n"
-				}
-			})
-		});
+				target: 'map',
+				layers: [
+					geoLayer({TOPIC_ID})
+				],
+				controls: controlsCollection({
+					<!-- IF not GEOJSON -->
+						controlPermalink: {
+							init: false
+						},
+					<!-- ENDIF -->
+					controlDownloadGPX: {
+						fileName: 'MON FICH VIEWTOPIC', //TODO
+						extraMetaData: "<desc>//TODO description...</desc>\n"
+					}
+				})
+			});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			var marqueur = marker('{EXT_DIR}images/cadre.png', 'marqueur'),

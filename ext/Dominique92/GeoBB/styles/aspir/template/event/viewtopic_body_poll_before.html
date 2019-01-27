@@ -5,6 +5,7 @@
 	<div id="map"></div>
 	<!-- INCLUDE overall_map_selector.html -->
 </div>
+<p id="marqueur-json" style="display:none">{GEOJSON}</p>
 
 <!-- INCLUDE viewtopic_specific_fields.html -->
 <!-- INCLUDE viewtopic_edit_button.html -->
@@ -13,21 +14,25 @@
 	window.addEventListener('load', function() {
 		var geom = false,
 			map = new ol.MyMap({
-			target: 'map',
-			layers: [
-				geoLayer({TOPIC_ID})
-			],
-			controls: geobbControls({
-				controlPermalink:{
-					init: '{GEO_MAP_TYPE}' == ''
-				}
-			})
-		});
+				target: 'map',
+				layers: [
+					geoLayer({TOPIC_ID})
+				],
+				controls: geobbControls({
+					<!-- IF not GEOJSON -->
+						controlPermalink: {
+							init: false
+						}
+					<!-- ENDIF -->
+				})
+			});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			var marqueur = marker('{EXT_DIR}images/cadre.png', 'marqueur'),
 				pos = marqueur.getPoint().getCoordinates();
 			map.addLayer(marqueur);
+
+			//TODO si pas encore de position, mettre le curseur au centre de la carte (permalink ou pos par défaut)
 
 			// Center the map
 			map.getView().setCenter(pos);

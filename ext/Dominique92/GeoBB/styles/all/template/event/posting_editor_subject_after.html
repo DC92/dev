@@ -5,16 +5,16 @@
 
 <dl class="posting-point" style="clear: left;">
 	<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
-	<!-- //TODO-CHEM pour all :
+	<!-- IF 0 -->//TODO-CHEM pour all :
 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p>
-	-->
+	<!-- ENDIF -->
 
 	<!-- IF GEO_MAP_TYPE == 'point' -->
 		<!-- INCLUDE posting_point_position.html -->
 	<!-- ENDIF -->
 
 	<!-- IF GEO_MAP_TYPE == 'line' -->
-		<!-- //TODO explication sur la page -->
+		<!-- IF 0 -->//TODO explications sur la page<!-- ENDIF -->
 	<!-- ENDIF -->
 
 	<!-- IF GEO_MAP_TYPE == 'surface' -->

@@ -4,28 +4,32 @@
 <div id="map-frame">
 	<div id="map"></div>
 </div>
+<p id="marqueur-json" style="display:none">{GEOJSON}</p>
 
 <!-- INCLUDE viewtopic_etiquette.html -->
-<!-- //TODO-CHEM météo idem WRI -->
+<!-- IF 0 -->//TODO-CHEM météo idem WRI<!-- ENDIF -->
 <!-- INCLUDE viewtopic_edit_button.html -->
 
 <script>
 	window.addEventListener('load', function() {
 		var geom = false,
 			map = new ol.MyMap({
-			target: 'map',
-			layers: [
-				geoLayer({TOPIC_ID})
-			],
-			controls: controlsCollection({
-				controlPermalink:{
-					init: '{GEO_MAP_TYPE}' == ''
-				},
-				controlDownloadGPX: {
-					fileName: 'MON FICH VIEWTOPIC CHEMINEUR'
-				}
-			})
-		});
+				target: 'map',
+				layers: [
+					geoLayer({TOPIC_ID})
+				],
+				controls: controlsCollection({
+					<!-- IF not GEOJSON -->
+						controlPermalink: {
+							init: false
+						},
+					<!-- ENDIF -->
+					controlDownloadGPX: {
+						fileName: 'MON FICH VIEWTOPIC CHEMINEUR', //TODO
+						extraMetaData: "<desc>//TODO description...</desc>\n"
+					}
+				})
+			});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			var marqueur = marker('{EXT_DIR}images/cadre.png', 'marqueur'),
@@ -35,7 +39,7 @@
 			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
-		<!-- ELSEIF GEO_MAP_TYPE == 'surface' && GEOJSON -->
+		<!-- ELSEIF GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"

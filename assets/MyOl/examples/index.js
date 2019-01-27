@@ -78,7 +78,8 @@ function chemineurLayer() {
 				}),
 				// Traces
 				stroke: new ol.style.Stroke({
-					color: 'blue'
+					color: 'blue',
+					width: 3
 				})
 			};
 		},
