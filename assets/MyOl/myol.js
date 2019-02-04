@@ -117,7 +117,7 @@ function layerStamen(layer) {
 /**
  * IGN France
  * Doc on http://api.ign.fr
- * Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
+ * Get your own (free) IGN key at http://professionnels.ign.fr/user
  */
 function layerIGN(key, layer, format) {
 	const IGNresolutions = [],
@@ -258,6 +258,7 @@ function layerIGM() {
 /**
  * Ordnance Survey : Great Britain
  * Requires ol.layer.LayerTileIncomplete
+ * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerOS(key) {
 	return new ol.layer.LayerTileIncomplete([-841575, 6439351, 198148, 8589177], { // EPSG:27700 (G.B.)
@@ -357,6 +358,7 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  */
 //TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
 //TODO-BEST JSON error handling : error + URL
+//TODO BUG recharge sans clean si agrandi la fenetre. Visible sur les polygones/fill
 ol.layer.LayerVectorURL = function(o) {
 	const this_ = this, // For callback functions
 		options = this.options_ = ol.assign({ // Default options
@@ -445,7 +447,7 @@ ol.layer.LayerVectorURL = function(o) {
 			style: this_.options_.hoverStyle || this_.options_.style
 		});
 
-		//TODO BUG ne selecte plus quand se déplace sur un polygine
+		//TODO BUG ne selecte plus quand se déplace sur un polygone : L'étiquette ne colle plus à la sourtis sur des polygones
 		//TODO BUG selecte tous les segments si multiligne
 		//TODO			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
 		select.on('select', function(selectEvent) {

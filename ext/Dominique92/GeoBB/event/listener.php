@@ -535,7 +535,7 @@ class listener implements EventSubscriberInterface
 		// Calcul de l'altitude avec mapquest
 		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
 			global $geo_keys;
-			$mapquest = file_get_contents (
+			$mapquest = @file_get_contents (
 				'http://open.mapquestapi.com/elevation/v1/profile'.
 				'?key='.$geo_keys['mapquest'].
 				'&callback=handleHelloWorldResponse'.

@@ -267,14 +267,14 @@ berger_autre|- autres informations|court
 berger_contact_ancien|- contact ancien berger|confidentiel
 }
 }}
-{|5. Le responsable d'alpage
+{|6. Le responsable d'alpage
 forme_juridique|- Forme juridique|Groupement pastoral,Groupement d'employeurs pour l'insertion et la qualification,Exploitant individuel,Autre
 forme_juridique_autre|Autre forme juridique|court
 {|Siège social de l'employeur
 forme_juridique_commune|- commune|court
 forme_juridique_departement|- département|court
 }
-|6. Autres informations :
+|7. Autres informations :
 
 Cabanes
 =======

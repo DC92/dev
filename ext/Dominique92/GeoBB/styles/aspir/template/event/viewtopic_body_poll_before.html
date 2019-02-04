@@ -1,5 +1,5 @@
 <!-- IF GEO_MAP_TYPE -->
-<!-- INCLUDE overall_geobb_includes.html -->
+<!-- INCLUDE map.html -->
 
 <div id="map-frame">
 	<div id="map"></div>
@@ -19,11 +19,9 @@
 					geoLayer({TOPIC_ID})
 				],
 				controls: geobbControls({
-					<!-- IF not GEOJSON -->
-						controlPermalink: {
-							init: false
-						}
-					<!-- ENDIF -->
+					controlPermalink: {
+						init: false
+					}
 				})
 			});
 
@@ -31,8 +29,6 @@
 			var marqueur = marker('{EXT_DIR}images/cadre.png', 'marqueur'),
 				pos = marqueur.getPoint().getCoordinates();
 			map.addLayer(marqueur);
-
-			//TODO si pas encore de position, mettre le curseur au centre de la carte (permalink ou pos par défaut)
 
 			// Center the map
 			map.getView().setCenter(pos);
