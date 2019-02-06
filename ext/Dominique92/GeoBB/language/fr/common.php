@@ -52,6 +52,10 @@ $lang = array_merge($lang, array(
 	// Posting
 	'SUBJECT' => 'Nom',
 
+	// Help
+	'FAQ' => 'Aide',
+	'FAQ_EXPLAIN' => 'Documentation des fonctions du site',
+
 	// Footer
 	'FINAL_INTEGRATION_BY' => 'Copyright &copy; <a href="https://github.com/Dominique92">Dominique Cavailhez</a> 2016. Sur la base de PhpBB',
 ));

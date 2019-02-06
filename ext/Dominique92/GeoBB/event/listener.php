@@ -95,7 +95,7 @@ class listener implements EventSubscriberInterface
 			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
 			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
 			'Bienvenue '.$this->user->style['style_name'] => 'GEO_PRESENTATION',
-			'Aide' => 'GEO_URL_AIDE', //TODO TEST ne marche plus sur ASPIR/localhist
+			'Aide' => 'GEO_URL_AIDE',
 			$mode == 'terms' ? 'Conditions d\'utilisation' : 'Politique de confidentialité' => 'AGREEMENT_TEXT',
 		];
 		foreach ($msgs AS $k=>$v) {
@@ -103,7 +103,7 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-			if ($row) {
+			if ($row)
 				$this->template->assign_var (
 					$v,
 					generate_text_for_display($row['post_text'],
@@ -111,7 +111,6 @@ class listener implements EventSubscriberInterface
 					$row['bbcode_bitfield'],
 					OPTION_FLAG_BBCODE, true)
 				);
-			}
 		}
 	}
 
@@ -535,6 +534,7 @@ class listener implements EventSubscriberInterface
 		// Calcul de l'altitude avec mapquest
 		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
 			global $geo_keys;
+			//TODO BUG : ne pas redemander pour les surfaces où c'est 0
 			$mapquest = @file_get_contents (
 				'http://open.mapquestapi.com/elevation/v1/profile'.
 				'?key='.$geo_keys['mapquest'].
