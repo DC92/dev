@@ -426,100 +426,93 @@ ol.layer.LayerVectorURL = function(o) {
 			});
 			map.addOverlay(map.popup_);
 
+			// Label when hovering a feature
+			map.on('pointermove', layerVectorPointerMove);
+
 			// Click on a feature
 			map.on('click', function(evt) {
 				evt.target.forEachFeatureAtPixel(
 					evt.pixel,
-					function() { // Simulate a click on the label
-						map.popElement_.click();
-					}, {
-						hitTolerance: 6
-					});
+					function() {
+						map.popElement_.click(); // Simulate a click on the label
+					}
+				);
 			});
 		}
 
-		const select = new ol.interaction.Select({
+		// Style when hovering a feature
+		//TODO BUG BEST interagit avec l'éditeur
+		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
 			filter: function(feature, layer) {
 				return layer == this_;
 			},
-			hitTolerance: 6,
 			style: this_.options_.hoverStyle || this_.options_.style
-		});
-
-		//TODO PRIO1 BUG ne selecte plus quand se déplace sur un polygone : L'étiquette ne colle plus à la sourtis sur des polygones
-		//TODO BUG selecte tous les segments si multiligne
-		//TODO			map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-		select.on('select', function(selectEvent) {
-			const pixel = selectEvent.mapBrowserEvent.pixel;
-
-			// Reset cursor & popup position
-			map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
-			map.popElement_.removeAttribute('href');
-			const mapRect = map.getTargetElement().getBoundingClientRect(),
-				popupRect = map.popElement_.getBoundingClientRect();
-			if (popupRect.left - 5 > mapRect.x + pixel[0] || mapRect.x + pixel[0] >= popupRect.right + 5 ||
-				popupRect.top - 5 > mapRect.y + pixel[1] || mapRect.y + pixel[1] >= popupRect.bottom + 5)
-				map.popup_.setPosition(undefined); // Hide label by default if none feature or his popup here
-
-			// Hover the first selected
-			if (selectEvent.selected.length)
-				hovering(selectEvent.selected[0], this_, pixel);
-		});
-
-		map.addInteraction(select);
+		}));
 	});
 
-	function hovering(selected, layer, pixel) {
-		const map = layer.map_;
+	function layerVectorPointerMove(evt) {
+		const map = evt.target;
+		let pixel = [evt.pixel[0], evt.pixel[1]];
 
-		let properties = selected.getProperties(),
-			geometry = selected.getGeometry();
-		if (typeof selected.getGeometry().getGeometries == 'function') // GeometryCollection
-			geometry = geometry.getGeometries()[0];
+		// Reset cursor & popup position
+		map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
+		map.popElement_.removeAttribute('href');
+		const mapRect = map.getTargetElement().getBoundingClientRect(),
+			popupRect = map.popElement_.getBoundingClientRect();
+		if (popupRect.left - 5 > mapRect.x + pixel[0] || mapRect.x + pixel[0] >= popupRect.right + 5 ||
+			popupRect.top - 5 > mapRect.y + pixel[1] || mapRect.y + pixel[1] >= popupRect.bottom + 5)
+			map.popup_.setPosition(undefined); // Hide label by default if none feature or his popup here
 
-		if (layer && layer.options_) {
-			const coordinates = geometry.flatCoordinates, // If it's a point, just over it
-				ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
-			if (coordinates.length == 2) // Stable if icon
-				pixel = map.getPixelFromCoordinate(coordinates);
+		evt.target.forEachFeatureAtPixel(
+			pixel,
+			function(feature, layer) {
+				const properties = feature.getProperties(),
+					geometry = feature.getGeometry();
+				if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
+					geometry = geometry.getGeometries()[0];
 
-			// Hovering label
-			const label = typeof layer.options_.label == 'function' ?
-				layer.options_.label(properties, selected) :
-				layer.options_.label || '',
-				postLabel = typeof layer.options_.postLabel == 'function' ?
-				layer.options_.postLabel(properties, selected, layer, pixel, ll4326) :
-				layer.options_.postLabel || '';
+				if (layer && layer.options_) {
+					const coordinates = geometry.flatCoordinates, // If it's a point, just over it
+						ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
+					if (coordinates.length == 2) // Stable if icon
+						pixel = map.getPixelFromCoordinate(coordinates);
 
-			if (label &&
-				!map.popup_.getPosition()) { // Only for the first feature on the hovered stack
-				// Calculate the label's anchor
-				map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
+					// Hovering label
+					const label = typeof layer.options_.label == 'function' ?
+						layer.options_.label(properties, feature) :
+						layer.options_.label || '',
+						postLabel = typeof layer.options_.postLabel == 'function' ?
+						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
+						layer.options_.postLabel || '';
 
-				// Fill label class & text
-				map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
-				map.popElement_.innerHTML = label + postLabel;
-				if (typeof layer.options_.href == 'function') {
-					map.popElement_.href = layer.options_.href(properties);
-					map.getViewport().style.cursor = 'pointer';
+					if (label &&
+						!map.popup_.getPosition()) { // Only for the first feature on the hovered stack
+						// Calculate the label's anchor
+						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
+
+						// Fill label class & text
+						map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
+						map.popElement_.innerHTML = label + postLabel;
+						if (typeof layer.options_.href == 'function') {
+							map.popElement_.href = layer.options_.href(properties);
+							map.getViewport().style.cursor = 'pointer';
+						}
+
+						// Shift of the label to stay into the map regarding the pointer position
+						if (pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
+							pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -map.popElement_.clientWidth - 10;
+							pixel[1] = 2;
+						} else {
+							pixel[0] -= map.popElement_.clientWidth / 2;
+							pixel[0] = Math.max(pixel[0], 0); // Bord gauche
+							pixel[0] = Math.min(pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
+							pixel[1] -= map.popElement_.clientHeight + 10;
+						}
+						map.popup_.setPosition(map.getCoordinateFromPixel(pixel));
+					}
 				}
-
-				// Shift of the label to stay into the map regarding the pointer position
-				if (pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-					pixel[0] += pixel[0] < map.getSize()[0] / 2 ?
-						10 :
-						-map.popElement_.clientWidth - 10;
-					pixel[1] = 2;
-				} else {
-					pixel[0] -= map.popElement_.clientWidth / 2;
-					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-					pixel[0] = Math.min(pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-					pixel[1] -= map.popElement_.clientHeight + 10;
-				}
-				map.popup_.setPosition(map.getCoordinateFromPixel(pixel));
-			}
-		}
+			});
 	}
 };
 ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
@@ -1399,16 +1392,12 @@ function printMap(orientation, el, resolution) {
 	));
 
 	map.once('rendercomplete', function(event) {
-
-/*//TODO attenre fin du chargement de toutes les couches !
-map.getLayers().forEach(function(layer) {
-	if(layer.getSource())
-//DCMM
-{var _r=' ',_v=layer.getSource().getState();if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function')_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-	
-});
-*/
-
+		/*//TODO attenre fin du chargement de toutes les couches !
+		map.getLayers().forEach(function(layer) {
+			if(layer.getSource())
+				;//DCMM
+		});
+		*/
 
 		//TODO BUG Chrome met 3 pages en landscape
 		//TODO IE11 trés grosse marge
