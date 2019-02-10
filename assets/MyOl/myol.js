@@ -870,7 +870,7 @@ function JSONparse(json) {
  * Control buttons
  * Abstract definition to be used by other control buttons definitions
  */
-let nextButtonTopPos = 6; // Top position of next button (em)
+let nextButtonTopPos = 4; // Top position of next button (em)
 
 ol.control.Button = function(o) {
 	const this_ = this, // For callback functions
@@ -1347,11 +1347,17 @@ function controlDownloadGPX(o) {
 
 /**
  * Geocoder
+ * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
-//TODO-IE BUG : pas de géocodeur sur IE
 //TODO-BEST ajuster le zoom geocoder pour le bon niveau IGN top25
 function geocoder() {
+	// Vérify if geocoder is available (not in IE)
+	const ua = navigator.userAgent;
+	if (ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
+		return new ol.control.Control({ //HACK No button
+			element: document.createElement('div'),
+		});
+
 	const gc = new Geocoder('nominatim', {
 		provider: 'osm',
 		lang: 'FR',
@@ -1359,6 +1365,7 @@ function geocoder() {
 		placeholder: 'Saisir un nom' // Initialization of the input field
 	});
 	gc.container.title = 'Recherche de lieu par son nom';
+	gc.container.style.top = (nextButtonTopPos += 2) + 'em';
 
 	return gc;
 }
@@ -1830,13 +1837,13 @@ function controlsCollection(o) {
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
-		controlPrint(),
 		controlLengthLine(),
 		controlPermalink(options.controlPermalink),
 		geocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
-		controlDownloadGPX(options.controlDownloadGPX)
+		controlDownloadGPX(options.controlDownloadGPX),
+		controlPrint()
 	];
 }
 
