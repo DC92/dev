@@ -313,7 +313,6 @@ function layerBing(subLayer, key) {
 /**
  * Mem in cookies the checkbox content with name="selectorName"
  */
-//TODO-ARCHI BEST when unchecked, remove cookie
 function controlPermanentCheckbox(selectorName, callback) {
 	const checkElements = document.getElementsByName(selectorName),
 		cookie =
@@ -356,8 +355,12 @@ function permanentCheckboxList(selectorName, evt) {
 			allChecks.push(checkElements[e].value);
 	}
 
-	// Mem in a cookie
-	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/';
+	// Mem or delete the related cookie
+	document.cookie =
+		'map-' + selectorName + '=' +
+		allChecks.join(',') +
+		';path=/' +
+		(allChecks.length ? '' : ';Max-Age=0;');
 
 	return allChecks; // Returns list of checked values or ids
 }
@@ -741,7 +744,7 @@ layerOverpass = function(o) {
  * Requires proj4.js for swiss coordinates
  * Requires 'myol:onadd' layer event
  */
-//TODO-BEST pointer finger sur la cible
+//TODO-BEST pointer finger sur la cible (select ?)
 //							map.getViewport().style.cursor = 'pointer'; / default
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	let format = new ol.format.GeoJSON(),
@@ -1281,7 +1284,7 @@ function controlDownloadGPX(o) {
 	const options = ol.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
-			fileName: 'trace', //TODO BEST donner un nom suivantle contexte
+			fileName: 'trace', //TODO BEST donner un nom suivant le contexte
 			extraMetaData: '' // Additional tags to the GPX file header
 		}, o),
 		hiddenElement = document.createElement('a');
@@ -1425,7 +1428,7 @@ function printMap(orientation, el, resolution) {
 	));
 
 	map.once('rendercomplete', function(event) {
-		/*//TODO attenre fin du chargement de toutes les couches !
+		/*//TODO attendre fin du chargement de toutes les couches !
 		map.getLayers().forEach(function(layer) {
 			if(layer.getSource())
 				;//DCMM
