@@ -380,7 +380,6 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
-//TODO-IE EDGE BUG une étiquette une fois sur IE & EDGE puis fixe
 //TODO-BEST JSON error handling : error + URL
 //TODO BUG recharge sans clean si agrandit la fenetre. Visible sur les polygones/fill
 ol.layer.LayerVectorURL = function(o) {
@@ -473,6 +472,14 @@ ol.layer.LayerVectorURL = function(o) {
 			},
 			style: this_.options_.hoverStyle || this_.options_.style
 		}));
+
+		// Hide popup when the cursor is out of the map
+		window.addEventListener('mousemove', function(evt) {
+			const divRect = map.getTargetElement().getBoundingClientRect();
+			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+				map.popup_.setPosition();
+		});
 	});
 
 	function layerVectorPointerMove(evt) {
@@ -481,23 +488,18 @@ ol.layer.LayerVectorURL = function(o) {
 
 		// Reset cursor & popup position
 		map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
-		map.popElement_.removeAttribute('href');
-		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = map.popElement_.getBoundingClientRect();
-		if (popupRect.left - 5 > mapRect.x + pixel[0] || mapRect.x + pixel[0] >= popupRect.right + 5 ||
-			popupRect.top - 5 > mapRect.y + pixel[1] || mapRect.y + pixel[1] >= popupRect.bottom + 5)
-			map.popup_.setPosition(undefined); // Hide label by default if none feature or his popup here
+		map.popup_.setPosition(); // Hide label by default if none feature or his popup here
 
 		evt.target.forEachFeatureAtPixel(
 			pixel,
 			function(feature, layer) {
-				const properties = feature.getProperties();
 				let geometry = feature.getGeometry();
 				if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
 					geometry = geometry.getGeometries()[0];
 
 				if (layer && layer.options_) {
-					const coordinates = geometry.flatCoordinates, // If it's a point, just over it
+					const properties = feature.getProperties(),
+						coordinates = geometry.flatCoordinates, // If it's a point, just over it
 						ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
 					if (coordinates.length == 2) // Stable if icon
 						pixel = map.getPixelFromCoordinate(coordinates);
@@ -510,8 +512,7 @@ ol.layer.LayerVectorURL = function(o) {
 						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
 						layer.options_.postLabel || '';
 
-					if (label &&
-						!map.popup_.getPosition()) { // Only for the first feature on the hovered stack
+					if (label && !map.popup_.getPosition()) { // Only for the first feature on the hovered stack
 						// Calculate the label's anchor
 						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
@@ -741,6 +742,7 @@ layerOverpass = function(o) {
  * Requires 'myol:onadd' layer event
  */
 //TODO-BEST pointer finger sur la cible
+//							map.getViewport().style.cursor = 'pointer'; / default
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	let format = new ol.format.GeoJSON(),
 		eljson, json, elxy;
@@ -902,7 +904,7 @@ ol.control.Button = function(o) {
 	if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 		divElement.style.right = '.5em';
 		divElement.style.top = options.rightPosition + 'em';
-	} else { //TODO DELETE ???? if (options.label) { // Don't book a button if not visible
+	} else {
 		divElement.style.left = '.5em';
 		divElement.style.top = (nextButtonTopPos += 2) + 'em';
 	}
@@ -954,6 +956,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Requires 'myol:onadd' layer event
  * Requires permanentCheckboxList
  */
+//TODO BUG EDGE ne garde pas toujours massif
 function controlLayersSwitcher(options) {
 	options = options || {};
 
@@ -1349,7 +1352,6 @@ function controlDownloadGPX(o) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO-BEST ajuster le zoom geocoder pour le bon niveau IGN top25
 function geocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
