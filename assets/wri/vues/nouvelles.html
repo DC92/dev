@@ -1,0 +1,45 @@
+<?// Bloc HTML réalisant l'affichage de la page des news
+
+// Ce fichier est l'unique endroit ou peuvent se trouver des balises HTML
+// Un couple <ouverture de balise> </fermeture de balise> doit se trouver dans le même fichier et avec la même indentation
+// Ce fichier ne contient que des balises HTML et des balises de contrôle PHP
+// $vue contient les données passées par le fichier PHP
+// $config_wri les données communes à tout WRI
+
+// 24/10/11 Dominique : Création
+// 15/02/13 jmb : model->stat-> au lieu de array
+?> 
+<div class="contenu">
+	<h3><?=$vue->stat->nbrefuges?> refuges, <?=$vue->stat->nbcomm?> commentaires et <?=$vue->stat->nbphotos?> photos</h3>
+
+<!-- BLOC NEWS -->
+    <?=$vue->nouvelles_generales?>
+
+    <h4>Les nouvelles</h4>
+    <ul>
+        <?php foreach ($vue->nouvelles as $nouvelle) { ?>
+            <li>
+                <em><?=$nouvelle['date_formatee']?></em>
+                &nbsp;<?=$nouvelle['texte']?>
+            </li>
+        <?php } ?>
+    </ul>
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/?nombre=50&amp;quoi=<?=$_GET['quoi']?>">(Voir les plus anciennes)</a> -
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/?quoi=points">Points</a> -
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/?quoi=refuges">Refuges</a> -
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/?quoi=commentaires">Commentaires</a> -
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/?quoi=forums">Forum</a> -
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/?quoi=commentaires,points">Tout sauf forum</a> -
+    <a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/">Tout</a>
+<!-- FIN BLOC NEWS -->
+<!-- Inutile d'en faire la pub ici vu que ça ne marche plus depuis bien longtemps, mais dès que c'est réparé, je le ré-active
+	<h4>
+		Flux <abbr title='Really Simple Syndication'>RSS</abbr>
+	</h4>
+	<p>
+		La technologie <abbr title='Really Simple Syndication'>RSS</abbr> permet de recevoir directement sur son ordinateur, les dernières nouvelles du site, sans devoir se connecter à <em>www.refuges.info</em>.
+		Pour en bénéficier, il est nécéssaire de télécharger un logiciel spécifique. A noter que le navigateur <a href="http://www.mozilla-europe.org/fr/firefox/">FireFox</a> intégre un support RSS basique d'origine, via les <q>Marque-pages dynamiques</q>.
+		Une fois prêt, vous pouvez vous rendre sur la <a href='/rss/choixrss.php'>page dédiée RSS</a> et séléctionner vos options.
+	</p>
+-->
+</div>	

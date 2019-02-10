@@ -168,10 +168,14 @@ function layerSpain(serveur, layer) {
  * Displays blank outside of validity area
  * Requires 'myol:onadd' layer event
  */
-ol.layer.LayerTileIncomplete = function(extent, sources) {
+ol.layer.LayerTileIncomplete = function(o) {
 	ol.layer.Tile.call(this);
 
-	const this_ = this,
+	const this_ = this, // For callback functions
+		options = this.options_ = ol.assign({ // Default options
+			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
+			sources: {}
+		}, o),
 		backgroundSource = new ol.source.Stamen({
 			layer: 'terrain'
 		});
@@ -186,18 +190,18 @@ ol.layer.LayerTileIncomplete = function(extent, sources) {
 		const view = this_.map_.getView(),
 			center = view.getCenter();
 		let currentResolution = 999999; // Init loop at max resolution
-		sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
+		options.sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
-			ol.extent.intersects(extent, view.calculateExtent(this_.map_.getSize())))
-			currentResolution = Object.keys(sources).filter(function(evt) { // HACK : use of filter to perform an action
+			ol.extent.intersects(options.extent, view.calculateExtent(this_.map_.getSize())))
+			currentResolution = Object.keys(options.sources).filter(function(evt) { // HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
 
 		// Update layer if necessary
-		if (this_.getSource() != sources[currentResolution])
-			this_.setSource(sources[currentResolution]);
+		if (this_.getSource() != options.sources[currentResolution])
+			this_.setSource(options.sources[currentResolution]);
 	}
 };
 ol.inherits(ol.layer.LayerTileIncomplete, ol.layer.Tile);
@@ -221,14 +225,17 @@ function layerSwissTopo(layer) {
 		matrixIds: matrixIds
 	});
 
-	return new ol.layer.LayerTileIncomplete([664577, 5753148, 1167741, 6075303], {
-		500: new ol.source.WMTS(({
-			crossOrigin: 'anonymous',
-			url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-			tileGrid: tileGrid,
-			requestEncoding: 'REST',
-			attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>'
-		}))
+	return new ol.layer.LayerTileIncomplete({
+		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781
+		sources: {
+			500: new ol.source.WMTS(({
+				crossOrigin: 'anonymous',
+				url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
+				tileGrid: tileGrid,
+				requestEncoding: 'REST',
+				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>'
+			}))
+		}
 	});
 }
 
@@ -247,39 +254,56 @@ function layerIGM() {
 		});
 	}
 
-	return new ol.layer.LayerTileIncomplete([660124, 4131313, 2113957, 5958411], { // EPSG:6875 (Italie)
-		100: igmSource('IGM_250000', 'CB.IGM250000'),
-		25: igmSource('IGM_100000', 'MB.IGM100000'),
-		5: igmSource('IGM_25000', 'CB.IGM25000')
+	return new ol.layer.LayerTileIncomplete({
+		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
+		sources: {
+			100: igmSource('IGM_250000', 'CB.IGM250000'),
+			25: igmSource('IGM_100000', 'MB.IGM100000'),
+			5: igmSource('IGM_25000', 'CB.IGM25000')
+		}
 	});
 }
 
-//TODO-BEST éviter d'appeler à l'init https://dev.virtualearth.net sur les cartes BING
 /**
  * Ordnance Survey : Great Britain
  * Requires ol.layer.LayerTileIncomplete
  * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerOS(key) {
-	return new ol.layer.LayerTileIncomplete([-841575, 6439351, 198148, 8589177], { // EPSG:27700 (G.B.)
-		100: new ol.source.BingMaps({
-			imagerySet: 'ordnanceSurvey',
-			key: key
-		})
+	const layer = new ol.layer.LayerTileIncomplete({
+		extent: [-841575, 6439351, 198148, 8589177] // EPSG:27700 (G.B.)
 	});
+
+	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+	layer.on('change:opacity', function(evt) {
+		if (evt.target.getVisible() && !evt.target.options_.sources[75])
+			evt.target.options_.sources[75] = new ol.source.BingMaps({
+				imagerySet: 'ordnanceSurvey',
+				key: key
+			});
+	});
+
+	return layer;
 }
 
 /**
  * Bing (Microsoft)
  * Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
  */
-function layerBing(layer, key) {
-	return new ol.layer.Tile({
-		source: new ol.source.BingMaps({
-			imagerySet: layer,
-			key: key,
-		})
+function layerBing(subLayer, key) {
+	const layer = new ol.layer.Tile();
+
+	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+	layer.on('change:opacity', function(evt) {
+		if (this.getVisible() && !this.getSource()) {
+			layer.setSource(new ol.source.BingMaps({
+				imagerySet: subLayer,
+				key: key,
+			}));
+		}
 	});
+
+	return layer;
 }
 
 
@@ -467,8 +491,8 @@ ol.layer.LayerVectorURL = function(o) {
 		evt.target.forEachFeatureAtPixel(
 			pixel,
 			function(feature, layer) {
-				const properties = feature.getProperties(),
-					geometry = feature.getGeometry();
+				const properties = feature.getProperties();
+				let geometry = feature.getGeometry();
 				if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
 					geometry = geometry.getGeometries()[0];
 
@@ -1589,6 +1613,7 @@ function controlEdit(o) {
 	});
 
 	function cleanFeatures(pointerPosition) {
+		//TODO BEST option ne pas pouvoir couper un polygone
 		// Get flattened list of multipoints coords
 		let fs = sortFeatures(source.getFeatures(), pointerPosition),
 			lines = fs.lines,
@@ -1769,8 +1794,8 @@ function layersCollection(keys) {
 		'Google terrain': layerGoogle('p'),
 		'Google photo': layerGoogle('s'),
 		'Google hybrid': layerGoogle('s,h'),
-		Stamen: layerStamen('terrain'),
-		Watercolor: layerStamen('watercolor'),
+		'Stamen': layerStamen('terrain'),
+		'Watercolor': layerStamen('watercolor'),
 		'Neutre': new ol.layer.Tile()
 	};
 }
@@ -1780,6 +1805,7 @@ function layersCollection(keys) {
  */
 function controlsCollection(o) {
 	const options = ol.assign({
+		//TODO ARCHI incompréhensible !
 		geoKeys: typeof geoKeys == 'object' ? geoKeys : [] // Global variable if any
 	}, o);
 

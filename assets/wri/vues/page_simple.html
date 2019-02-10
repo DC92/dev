@@ -1,0 +1,23 @@
+<?php
+/**
+Cette page permet de présenter un message générique 
+(erreur de captcha, erreur de saisie, erreur d'un truc qui manque, votre action s'est bien passée, etc. 
+on peu lui passer un 
+$vue->titre
+$vue->contenu
+$vue->lien_special
+(avec son :)
+$vue->titre_lien
+rien de bien extraordinaire, faite votre propre vue si vous voulez plus compliqué
+**/
+
+// Pour cette page très simple, elle nous sers aussi à passer les http error code pris sur $vue->http_status_code
+
+
+?>
+<p>
+	<?=$vue->contenu?>
+	<? if ($vue->lien){?>
+		<a href="<?=$vue->lien?>"><?=$vue->titre_lien?></a>
+	<?}?>
+</p>

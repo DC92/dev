@@ -1,0 +1,31 @@
+<?php
+/*************************************************
+Information de type privée à renseigner selon vos 
+paramètres locaux (données de type privées à ne pas publier)
+*************************************************/
+
+// Accès à Postgresql
+$config_wri['utilisateur_pgsql']="???";
+$config_wri['mot_de_passe_pgsql']="???";
+$config_wri['serveur_pgsql']="???";
+
+// Info pour développeurs de notre équipe, la base de prod s'appelle "refuges" mais il n'est pas recommandé de bosser dessus, donc test, c'est celle que j'ai dupliqué
+// et dans laquelle on peut bien faire tout ce qu'on veut sans risques.
+// a noter que les photos qui sont des fichiers sur le disque risque fort de ne plus s'afficher, mais c'est en quelque sorte "logique"
+$config_wri['base_pgsql']="test";
+
+// infos privées qu'on ne veut pas divulger sur github et que vous devez remplir 
+$config_wri['ign_key']='???'; // http://pro.ign.fr/api-web => Service en ligne => S'ABONNER
+$config_wri['bing_key']='???'; // https://www.bingmapsportal.com
+$config_wri['thunderforest_key']='???'; // https://manage.thunderforest.com
+
+// Activera l'affichage d'un peu plus de debug sur certaines fonctions utilisant la fonction erreur();
+// + affichage des erreurs dans le navigateur (commenter les lignes plus bas pour un mixe)
+// sert aussi à afficher les lien de validation xhtml en bas de page (histoire de ne pas ennuier tout le monde avec ça)
+// par défaut à false, à mettre à décommenter pour les développeurs qui le veulent
+// $config_wri['debug']=true;
+
+// Par défaut, le fond de carte est maps.refuges.info, décommenter ça permet de changer le par défaut
+//$config_wri['carte_base'] = 'Outdoors';
+
+?>

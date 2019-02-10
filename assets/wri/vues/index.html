@@ -1,0 +1,78 @@
+<div class="contenu">
+	<!-- PRESENTATION   -->
+
+	<p style="margin-top:0">
+		<?=$vue->contenu_accueil?>
+	</p>
+
+	<!-- CARTE DES MASSIFS -->
+	<div class="tablo">
+		<h4><?=$vue->stat->nbmassifs?> massifs</h4>
+		<div>Passez la souris et cliquez sur un massif</div>
+		<div class="carte" id="carte-accueil"></div>
+		<h5>Et encore...</h5>
+		<ul class="basdepage">
+			<?php if (isset($vue->zones_pour_bandeau)) foreach ($vue->zones_pour_bandeau AS $nom_zone => $lien) {?>
+				<li>
+					<a href="<?=$lien?>"><?=$nom_zone?></a>
+				</li>
+			<?}?>
+		</ul>
+	</div>
+
+	<!-- PHOTOS -->
+	<div id="accueil-photos" class="tablo" style="float:right">
+		<h4><?=$vue->stat->nbphotos?> photos</h4>
+		<br/>
+		<ul>
+			<?php if (isset($vue->photos_recentes)) 
+				foreach ($vue->photos_recentes as $vignette) {?>
+			<li>
+				<a href="<?=$vignette->lien?>" title="<?=$vignette->nom?>">
+					<img alt="photo" src="<?=$vignette->lien_photo['vignette']?>" />
+				</a>
+			</li>
+			<?}?>
+		</ul>
+	</div>
+
+	<!-- NEWS -->
+	<div class="tablo" style="float:none;padding-left:15px">
+		<?=$vue->nouvelles_generales?>
+
+		<h4><?=$vue->stat->nbrefuges?> cabanes et refuges</h4>
+		<ul>
+			<?php foreach ($vue->nouveaux_points as $nouveau_point) { ?>
+				<li>
+					<em><?=$nouveau_point->date_formatee?></em>
+					&nbsp;Ajout <?=$nouveau_point->article_partitif_point_type?> <?=$nouveau_point->nom_type?>
+					<?php if ($nouveau_point->nom_createur!="") { 
+						if ($nouveau_point->id_createur==0) { ?>
+							par <?=$nouveau_point->nom_createur?>
+						<?php } else { ?>
+						par <a href="<?=$config_wri['fiche_utilisateur'].$nouveau_point->id_createur?>"><?=$nouveau_point->nom_createur?></a>
+						<?}?>
+					<?}?>
+						: <a href="<?=$nouveau_point->lien?>"><?=$nouveau_point->nom?></a>
+						<?php if (isset($nouveau_point->id_massif)) { ?>
+						dans le 
+						<a href="<?=lien_polygone($nouveau_point,True)?>">massif <?=$nouveau_point->article_partitif_massif?> <?=$nouveau_point->nom_massif?></a>
+						<?}?>
+				</li>
+			<?}?>
+			<li><a href="<?=$config_wri['sous_dossier_installation']?>point_formulaire_recherche/" title="Recherche d'un points de refuges.info par le nom"><b>Recherche...</b></a></li>
+		</ul>
+		<br/>
+		<h4><?=$vue->stat->nbcomm?> commentaires</h4>
+		<ul>
+			<?php foreach ($vue->nouveaux_commentaires as $nouveau_commentaire) { ?>
+				<li>
+					<em><?=$nouveau_commentaire['date_formatee']?></em>
+					&nbsp;<?=$nouveau_commentaire['texte']?>
+				</li>
+			<?}?>
+				<li><a href="<?=$config_wri['sous_dossier_installation']?>nouvelles/" title="Les dernières entrées dans refuges.info"><b>Plus...</b></a></li>
+		</ul>
+		<br/>
+	</div>
+</div>

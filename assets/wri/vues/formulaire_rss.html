@@ -1,0 +1,69 @@
+<div class="contenu">
+<script type="text/javascript"><? include ($config_wri['chemin_vues']."formulaire_exportations.js");?></script>
+<!-- =========================== -->
+<!-- ======= BARATIN ===== -->
+<h3><?=$vue->titre?></h3> 
+    <dl> 
+      <dt>Options pour le flux RSS</dt>
+      <dd>Veuillez préciser les options des nouvelles et des massifs</dd>
+   </dl>
+<!-- ======= FORMULAIRE ===== -->
+
+  <form class="wri" id='form_export' method='post' action="<?=$config_wri['sous_dossier_installation']?>formulaire_rss/">
+    <fieldset id="types_nouvelles">
+        <legend>Choix des nouvelles à afficher
+            <button type='button' onclick="checkboites('types_nouvelles',true); return false;">☒</button>
+            <button type='button' onclick="checkboites('types_nouvelles',false); return false;">☐</button>
+        </legend>
+        <?php
+        $index = 0;
+        while ($index < sizeof($vue->types_de_nouvelles->checked)) { 
+            $type_nouvelle = $vue->types_de_nouvelles;?>
+        <label>
+           <input type='checkbox' name='id_nouvelle_type[]' value='<?=$type_nouvelle->id_nouvelle_type[$index]?>'<?=($type_nouvelle->checked[$index]?' checked="checked"':'');?> />
+           <?=$type_nouvelle->nom_type[$index]?>
+        </label>
+        <?$index++; }?>
+    </fieldset>
+    
+    <!-- Choix des zones massifs -->
+    <fieldset id="liste_massifs">
+        <legend>Choix des Massifs de la base a exporter
+            <button type='button' onclick="checkboites('liste_massifs',true); return false;">☒</button>
+            <button type='button' onclick="checkboites('liste_massifs',false); return false;">☐</button>
+        </legend>
+        <?php
+        // je laisse tomber l'algo qui gere un nombre d'arborescence variable.
+        // c'est pas encore supporte par infos_polygone.
+        // on fait donc un truc dout simple avec id_zone, qui lui existe déjà.
+        // Attention ! ca suppose que les massifs sont triés par id_zone ! voir requete.
+        $idzone=0; // au depart, ya pas de zone
+        foreach ($vue->massifs as $poly) { 
+            if($idzone != $poly->id_zone) { 
+                if($idzone != 0) { ?>
+                    </fieldset>
+                    <!-- fin de la zone -->
+                <?}
+                $idzone=$poly->id_zone;
+                ?>
+                    <!-- nouvelle zone -->
+                    <fieldset id="<?=$idzone?>">
+                        <legend>
+                            <?=$poly->nom_zone?>
+                            <button type='button' onclick="checkboites(<?=$idzone?>,true); return false;">☒</button>
+                            <button type='button' onclick="checkboites(<?=$idzone?>,false); return false;">☐</button>
+</legend>
+            <?}?>
+                        <label>
+                            <input type='checkbox' name='id_massif[]' value='<?=$poly->id_polygone?>'<?=($poly->checked?' checked="checked"':'');?> />
+                            <?=$poly->nom_polygone?>
+                        </label>
+        <?}?>
+                   <!-- fin de la derniere zone -->
+                    </fieldset>
+    </fieldset>
+
+    <input type='submit' name='validation' value='Obtenir le lien' />
+    
+  </form>
+</div>

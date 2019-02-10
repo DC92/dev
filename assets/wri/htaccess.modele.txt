@@ -1,0 +1,50 @@
+#A renommer en .htaccess
+
+# Blocage de l'accès au site pour maintenance
+order deny,allow
+# Decommenter les deux lignes suivantes pour bloquer l'accès au site
+	#deny from all
+	#ErrorDocument 403 /maintenance.html
+#allow from 2001:cb00:... # Mettre l'adresse du développeur ici
+#allow from 2001:bc8:37ca:101::1 # Mettre l'adresse du serveur (pour les requettes AJAX intra-site)
+<FilesMatch "^maintenance.html$">
+	Allow from all
+</FilesMatch>
+
+AddDefaultCharset UTF-8
+
+RewriteEngine On
+# Ici on détecte si la connexion a lieu par http ou https et on stock dans la variable "proto"
+RewriteCond %{HTTPS} =on
+RewriteRule ^(.*)$ - [env=proto:https]
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ - [env=proto:http]
+
+# On peut ensuite forcer la redirection de refuges.info vers www.refuges.info en préservant le protocol (http ou https)
+RewriteCond %{HTTP_HOST} ^refuges.info$ [NC]
+RewriteRule ^(.*)$ %{ENV:proto}://www.refuges.info/$1 [L,R=301]
+
+#Ces règles de rewrite permettent de faire atterrir tous les appels sur
+#l'unique point d'entrée du site (moins le forum et de vieux truc non
+#converti) sauf ceux pour lesquels il existe un fichier réél ou un dossier
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . ./index.php [L]
+
+php_value short_open_tag 1
+
+#A décommenter pour les développeurs : ça affiche les erreurs à l'écran même celle de parse error
+#php_value display_errors 1
+
+
+#C'est pas une nécessité, mais pour le css et le js ça accélère un peu le
+#chargement. Si le module n'existe pas avec apache, tant pis, on ne fera
+#rien
+<ifmodule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 2 hours"
+  ExpiresByType application/javascript "access plus 2 hours"
+  ExpiresByType image/png "access plus 2 hours"
+  ExpiresByType image/jpg "access plus 2 hours"
+  ExpiresByType image/jpeg "access plus 2 hours"
+</ifmodule>
