@@ -1115,24 +1115,25 @@ function controlPermalink(o) {
 function controlGPS(options) {
 	options = options || {};
 
-	// Vérify if localisation is available
+	// Vérify if geolocation is available
 	if (!window.location.href.match(/https|localhost/i))
 		return new ol.control.Control({ //HACK No button
 			element: document.createElement('div'),
 		});
 
 	// The position marker
-	const point = new ol.geom.Point([0, 0]),
+	const feature = new ol.Feature(),
 		layer = new ol.layer.Vector({
-			source: new ol.source.Vector({
-				features: [new ol.Feature({
-					geometry: point
-				})]
+			source: source = new ol.source.Vector({
+				features: [feature]
 			}),
 			style: new ol.style.Style({
-				image: new ol.style.Icon({
-					anchor: [0.5, 0.5], // Picto marking the position on the map
-					src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA7VBMVEUAAAA/X39UVHFMZn9NXnRPX3RMW3VPXXNOXHJOXXNNXHNOXXFPXHNNXXFPXHFOW3NPXHNPXXJPXXFPXXNNXXFNW3NOXHJPW25PXXNRX3NSYHVSYHZ0fIx1fo13gI95hJR6go96g5B7hpZ8hZV9hpZ9h5d/iZiBi5ucoquepa+fpbGhqbSiqbXNbm7Ob2/OcHDOcXHOcnLPdHTQdXXWiIjXiorXjIzenp7eoKDgpKTgpaXgpqbks7TktLTktbXnubnr2drr5+nr6Ons29vs29zs6Ors6ert6uvt6uzu6uz18fH18fL68PD++/v+/Pw8gTaQAAAAFnRSTlMACAkKLjAylJWWmJmdv8HD19ja2/n6GaRWtgAAAMxJREFUGBkFwctqwkAUgOH/nMnVzuDGFhRKKVjf/226cKWbQgNVkphMzFz6fQJQlY0S/boCAqa1AMAwJwRjW4wtcxgS05gEa3HHOYipzxP9ZKot9tR5ZfIff7FetMQcf4tDVexNd1IKbbA+7S59f9mlZGmMVVdpXN+3gwh+RiGLAjkDGTQSjHfhes3OV0+CkXrdL/4gzVunxQ+DYZNvn+Mg6aav35GH8OJS/SUrVTw/9e4FtRvypsbPwmPMAto6AOC+ZASgLBpDmGMA/gHW2Vtk8HXNjQAAAABJRU5ErkJggg=='
+				fill: new ol.style.Fill({
+					color: 'rgba(128,128,255,0.2)'
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2
 				})
 			})
 		}),
@@ -1149,8 +1150,12 @@ function controlGPS(options) {
 					this_.getMap().removeLayer(layer);
 			}
 		}),
-		// Interface with the system GPS
-		geolocation = new ol.Geolocation();
+		// Interface with the GPS system
+		geolocation = new ol.Geolocation({
+			trackingOptions: {
+				enableHighAccuracy: true
+			}
+		});
 
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
@@ -1159,9 +1164,50 @@ function controlGPS(options) {
 	geolocation.on('change', function() {
 		const position = ol.proj.fromLonLat(this.getPosition());
 		this_.getMap().getView().setCenter(position);
-		point.setCoordinates(position);
+
+		// Redraw the marker
+		feature.setGeometry(new ol.geom.GeometryCollection([
+			// The accurate circle
+			this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857'),
+			// The graticule
+			new ol.geom.MultiLineString([
+				[
+					[position[0], -20000000],
+					[position[0], 20000000]
+				],
+				[
+					[position[0] - 20000000, position[1]],
+					[position[0] + 20000000, position[1]]
+				]
+			])
+		]));
+
 		if (typeof options.callBack == 'function') // Default undefined
 			options.callBack(position);
+	});
+
+	// Keep the map oriented
+	window.addEventListener("deviceorientation", function(evt) {
+		// Magnetic compas
+		let heading = typeof evt.webkitCompassHeading !== "undefined" ?
+			evt.webkitCompassHeading : //iOS non-standard
+			evt.alpha;
+
+		// Browser orientation
+		const orientation = screen.orientation && screen.orientation.type ?
+			screen.orientation.type :
+			screen.orientation || screen.mozOrientation || screen.msOrientation,
+			os = orientation.split("-");
+		if (os[0] === "landscape")
+			heading += 90;
+		else
+			heading += 180;
+		if (os[1] === "secondary")
+			heading -= 180;
+
+		// Orientate the map
+		if (this_.active)
+			this_.getMap().getView().setRotation(heading / 180 * Math.PI);
 	});
 
 	return this_;
@@ -1214,7 +1260,6 @@ function controlLengthLine() {
  * GPX file loader control
  * Requires ol.control.Button
  */
-//TODO-BEST Pas d'upload/download sur mobile (-> va vers photos !)
 //TODO BUG avoir un zoom maximum (1 point rend la carte invisible)
 function controlLoadGPX(o) {
 	const options = ol.assign({
@@ -1827,23 +1872,23 @@ function controlsCollection(o) {
 			baseLayers: layersCollection(options.geoKeys)
 		}, options.controlLayersSwitcher)),
 		new ol.control.ScaleLine(),
+		new ol.control.Attribution({
+			collapsible: false // Attribution always open
+		}),
 		new ol.control.MousePosition({
 			coordinateFormat: ol.coordinate.createStringXY(5),
 			projection: 'EPSG:4326',
 			className: 'ol-coordinate',
 			undefinedHTML: String.fromCharCode(0)
 		}),
-		new ol.control.Attribution({
-			collapsible: false // Attribution always open
-		}),
+		controlLengthLine(),
+		controlPermalink(options.controlPermalink),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
 			label: '',
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
-		controlLengthLine(),
-		controlPermalink(options.controlPermalink),
 		geocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
