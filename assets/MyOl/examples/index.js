@@ -103,9 +103,9 @@ function chemineurLayer() {
 	});
 }
 
-//***************************************************************
-// EXAMPLE
-//***************************************************************
+/**
+ * EXAMPLE
+ */
 var geoKeys = {
 		IGN: 'd27mzh49fzoki1v3aorusg6y', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 		thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
@@ -167,3 +167,9 @@ new ol.MyMap({
 	layers: overlays,
 	controls: basicControls.concat([edit])
 });
+
+/**
+ * GENERAL TODO
+ */
+//TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
+//TODO-ARCHI map off line, application

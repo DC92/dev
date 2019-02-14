@@ -322,6 +322,7 @@ function controlPermanentCheckbox(selectorName, callback) {
 	for (let e = 0; e < checkElements.length; e++) {
 		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
 
+		//TODO BUG EDGE checke et remet à l'init aprés
 		if (cookie) // Set the checks accordingly with the cookie
 			checkElements[e].checked = cookie[1].split(',').indexOf(checkElements[e].value) !== -1;
 	}
@@ -330,16 +331,15 @@ function controlPermanentCheckbox(selectorName, callback) {
 	callback(null, permanentCheckboxList(selectorName));
 
 	function permanentCheckboxClick(evt) {
-		const list = permanentCheckboxList(selectorName, evt);
 		if (typeof callback == 'function')
-			callback(evt, list);
+			callback(evt, permanentCheckboxList(selectorName, evt));
 	}
 }
 
 // Global function, called by others
 function permanentCheckboxList(selectorName, evt) {
-	let checkElements = document.getElementsByName(selectorName),
-		allChecks = [];
+	const checkElements = document.getElementsByName(selectorName);
+	let allChecks = [];
 
 	for (let e = 0; e < checkElements.length; e++) {
 		// Select/deselect all (clicking an <input> without value)
@@ -355,12 +355,9 @@ function permanentCheckboxList(selectorName, evt) {
 			allChecks.push(checkElements[e].value);
 	}
 
-	// Mem or delete the related cookie
-	document.cookie =
-		'map-' + selectorName + '=' +
-		allChecks.join(',') +
-		';path=/' +
-		(allChecks.length ? '' : ';Max-Age=0;');
+	// Mem the related cookie
+	// Keep empty one to keep memory of cancelled subchoices
+	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/';
 
 	return allChecks; // Returns list of checked values or ids
 }
@@ -489,11 +486,17 @@ ol.layer.LayerVectorURL = function(o) {
 		const map = evt.target;
 		let pixel = [evt.pixel[0], evt.pixel[1]];
 
-		// Reset cursor & popup position
-		map.getViewport().style.cursor = 'default'; // To get the default cursor if there is no feature here
-		map.popup_.setPosition(); // Hide label by default if none feature or his popup here
+		// Hide label by default if none feature or his popup here
+		var mapRect = map.getTargetElement().getBoundingClientRect(),
+			popupRect = map.popElement_.getBoundingClientRect();
+		if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
+			popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
+			map.popup_.setPosition();
 
-		evt.target.forEachFeatureAtPixel(
+		// Reset cursor if there is no feature here
+		map.getViewport().style.cursor = 'default';
+
+		map.forEachFeatureAtPixel(
 			pixel,
 			function(feature, layer) {
 				let geometry = feature.getGeometry();
@@ -959,7 +962,6 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Requires 'myol:onadd' layer event
  * Requires permanentCheckboxList
  */
-//TODO BUG EDGE ne garde pas toujours massif
 function controlLayersSwitcher(options) {
 	options = options || {};
 
@@ -1896,6 +1898,3 @@ function controlsCollection(o) {
 		controlPrint()
 	];
 }
-
-//TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
-//TODO-ARCHI map off line, application
