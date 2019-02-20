@@ -15,13 +15,14 @@ $table_prefix = 'phpbb_';
 $phpbb_adm_relative_path = 'adm/';
 $acm_type = 'phpbb\\cache\\driver\\file';
 
-@define('PHPBB_INSTALLED', true);
-// @define('PHPBB_DISPLAY_LOAD_TIME', true);
-@define('PHPBB_ENVIRONMENT', 'production');
-// @define('DEBUG_CONTAINER', true);
+define('PHPBB_INSTALLED', true);
+// define('PHPBB_DISPLAY_LOAD_TIME', true);
+define('PHPBB_ENVIRONMENT', 'production');
+// define('DEBUG_CONTAINER', true);
 
-@define('TRACES_DOM', 'test');
-@define('META_ROBOTS', 'noindex, nofollow');
+define('MYSQL_5_5', true);
+define('TRACES_DOM', 'test');
+define('META_ROBOTS', 'noindex, nofollow');
 
 $geo_keys = [
 //	'IGN' => 'd27mzh49fzoki1v3aorusg6y', // ASPIR Commande n° 207839 Contrat n° 0269018 Expire le 20/10/2019 .*chemineur.fr,.*dc9.fr,.*cavailhez.fr,localhost,.*.github.io,.*refuges.info / 82.165.82.82,90.91.128.17

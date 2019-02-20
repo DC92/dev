@@ -12,8 +12,6 @@ $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../';
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 
-include_once('../../../assets/geoPHP/geoPHP.inc');
-
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
@@ -32,11 +30,6 @@ $diagBbox = hypot ($bboxs[2] - $bboxs[0], $bboxs[3] - $bboxs[1]); // Hypothènus
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $limit = request_var ('limit', 250); // Nombre de points maximum
 $exclude = request_var ('exclude', 0); // topic_id to exclude
-$format = $format_app = request_var ('format', 'json');
-if ($format == 'gpx') {
-	$limit = 10000;
-	$diagBbox = 0; // Pas d'optimisation
-}
 
 // Recherche des points dans la bbox
 $sql_array = [
@@ -47,7 +40,9 @@ $sql_array = [
 		'post_id',
 		'forum_image',
 		'forum_desc',
-		'AsText(geom) AS geomwkt',
+		defined ('MYSQL_5_5')
+			? 'AsText(geom) AS geomwkt'
+			: 'ST_AsGeoJSON(geom) AS geojson',
 	],
 	'FROM' => [POSTS_TABLE => 'p'],
 	'LEFT_JOIN' => [[
@@ -70,17 +65,6 @@ $sql_array = [
 	'ORDER_BY' => "CASE WHEN f.forum_id = $priority THEN 0 ELSE left_id END",
 ];
 
-/**
- * Change SQL query for fetching geographic data
- *
- * @event geo.gis_modify_sql
- * @var array     sql_array    Fully assembled SQL query with keys SELECT, FROM, LEFT_JOIN, WHERE
- */
-$vars = array(
-	'sql_array',
-);
-extract($phpbb_dispatcher->trigger_event('geo.gis_modify_sql', compact($vars)));
-
 // Build query
 if (is_array ($sql_array ['SELECT']))
 	$sql_array ['SELECT'] = implode (',', $sql_array ['SELECT']);
@@ -99,11 +83,17 @@ $sp = explode ('/', getenv('REQUEST_SCHEME'));
 $ri = explode ('/ext/', getenv('REQUEST_URI'));
 $bu = $sp[0].'://'.getenv('SERVER_NAME').$ri[0].'/';
 
-$geojson = $signatures = [];
+$features = $signatures = [];
 $ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
+	if (defined ('MYSQL_5_5')) {
+		include_once('../../../assets/geoPHP/geoPHP.inc');
+		$g = geoPHP::load ($row['geomwkt'], 'wkt');
+		$row['geojson'] = $g->out('json');
+	}
+
 	// Color calculation
-	preg_match_all('/[0-9\.]+/',$row['geomwkt'],$coords);
+	preg_match_all('/[0-9\.]+/',$row['geojson'],$coords);
 	$x[0] = $coords[0][0] * 30000 % $ampl; // From lon
 	$x[1] = $coords[0][1] * 30000 % $ampl; // From lat
 	$x[2] = $ampl - ($x[0] + $x[1]) / 2;
@@ -120,21 +110,20 @@ while ($row = $db->sql_fetchrow($result)) {
 		'color' => $color,
 	];
 
+	// Spécific color defined in forum desc
 	preg_match('/\[color=([a-z]+)\]/i', html_entity_decode ($row['forum_desc']), $colors);
 	if (count ($colors))
 		$properties['color'] = $colors[1];
 
-	$g = geoPHP::load ($row['geomwkt'], 'wkt'); // On lit le geom en format WKT fourni par MySql
-	$geophp = json_decode ($g->out('json')); // On le transforme en format GeoJson puis en objet PHP
-
 	// Disjoin points having the same coordinate
+	$geophp = json_decode ($row['geojson']);
 	if ($geophp->type == 'Point') {
 		while (in_array (signature ($geophp->coordinates), $signatures))
 			$geophp->coordinates[0] += 0.00001;
 		$signatures[] = signature ($geophp->coordinates);
 	}
 
-	$geojson[] = [
+	$features[] = [
 		'type' => 'Feature',
 		'geometry' => $geophp, // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 		'properties' => $properties,
@@ -150,8 +139,8 @@ function signature ($coord) {
 // Formatage du header
 $secondes_de_cache = 10;
 $ts = gmdate("D, d M Y H:i:s", time() + $secondes_de_cache) . " GMT";
-header("Content-disposition: filename=chemineur.$format");
-header("Content-Type: application/$format_app; UTF-8"); // rajout du charset
+header("Content-disposition: filename=geobb.json");
+header("Content-Type: application/json; UTF-8");
 header("Content-Transfer-Encoding: binary");
 header("Pragma: cache");
 header("Expires: $ts");
@@ -159,26 +148,8 @@ header("Access-Control-Allow-Origin: *");
 header("Cache-Control: max-age=$secondes_de_cache");
 
 // On transforme l'objet PHP en code geoJson
-$json = json_encode ([
+echo json_encode ([
 	'type' => 'FeatureCollection',
 	'timestamp' => date('c'),
-	'features' => $geojson
-]) . PHP_EOL;
-
-if ($format == 'gpx') {
-	$mmav = ["><", '"geoPHP" version="1.0"'];
-	$mmap = [">\n<", 'xmlns="http://www.topografix.com/GPX/1/0"'];
-	// Récupère les noms des points
-	foreach ($geojson AS $gj)
-		if ($gj['geometry']->type == 'Point') {
-			$ll = 'lat="'.$gj['geometry']->coordinates[1].'" lon="'.$gj['geometry']->coordinates[0].'"';
-			$mmav [] = "<wpt $ll />";
-			$mmap [] = "<wpt $ll><name>".$gj['properties']['name']."</name></wpt>";
-	}
-
-	// On transforme l'objet PHP en code gpx
-	$gp = geoPHP::load ($json, 'json');
-	$gpx = str_replace ($mmav, $mmap, $gp->out('gpx'));
-}
-
-echo $$format;
+	'features' => $features
+]);

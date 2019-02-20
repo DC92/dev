@@ -9,8 +9,6 @@
 
 namespace Dominique92\GeoBB\event;
 
-define('SQL_PRE', ''); //TODO-ARCHI MySQL 5.7+ 'ST_'
-
 if (!defined('IN_PHPBB'))
 {
 	exit;
@@ -251,7 +249,9 @@ class listener implements EventSubscriberInterface
 		if ($this->db->sql_fetchrow($result)) {
 			// Insère la conversion du champ geom en format WKT dans la requette SQL
 			$sql_ary = $vars['sql_ary'];
-			$sql_ary['SELECT'] .= ', AsText(geom) AS geomwkt';
+			$sql_ary['SELECT'] .= defined ('MYSQL_5_5')
+				? ', AsText(geom) AS geomwkt'
+				: ', ST_AsGeoJSON(geom) AS geojson';
 			$vars['sql_ary'] = $sql_ary;
 		}
 		$this->db->sql_freeresult($result);
@@ -281,19 +281,10 @@ class listener implements EventSubscriberInterface
 		if (isset ($this->all_post_data[$post_id])) {
 			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post
 			$post_row = $vars['post_row'];
-
-			// Convert the geom info in geoJson format
-			preg_match ('/\[(first|all)=([a-z]+)\]/i', $vars['topic_data']['forum_desc'], $regle);
-			if (count ($regle) == 3 && (
-					($regle[1] == 'all') ||
-					($regle[1] == 'first' && ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']))
-				) &&
-				@$post_data['geomwkt']
-			) {
+			if (defined ('MYSQL_5_5') && $post_data['geomwkt']) {
 				include_once('assets/geoPHP/geoPHP.inc');
-				$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
-				$post_data['geojson'] = $geophp->out('json');
-				$this->get_bounds($geophp);
+				$g = \geoPHP::load ($post_data['geomwkt'], 'wkt');
+				$post_data['geojson'] = $g->out('json');
 			}
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
@@ -338,7 +329,7 @@ class listener implements EventSubscriberInterface
 		$vars['error'] = $error;
 	}
 
-	// Appelé lors de l'affichage de la page posting
+	// Called when display post page
 	function posting_modify_template_vars($vars) {
 		$page_data = $vars['page_data'];
 		$post_data = $vars['post_data'];
@@ -346,22 +337,24 @@ class listener implements EventSubscriberInterface
 		// Récupère la traduction des données spaciales SQL
 		if (isset ($post_data['geom'])) {
 			// Conversion WKT <-> geoJson
-			$sql = 'SELECT AsText(geom) AS geomwkt
-				FROM '.POSTS_TABLE.'
-				WHERE post_id = '.$post_data['post_id'];
+			$sql = (defined ('MYSQL_5_5')
+					? 'SELECT AsText(geom) AS geomwkt'
+					: 'SELECT ST_AsGeoJSON(geom) AS geojson').
+				' FROM '.POSTS_TABLE.
+				' WHERE post_id = '.$post_data['post_id'];
 			$result = $this->db->sql_query($sql);
-			$post_data['geomwkt'] = $this->db->sql_fetchfield('geomwkt');
+			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
 
-			// Traduction en geoJson
-			include_once('assets/geoPHP/geoPHP.inc');
-			$geophp = \geoPHP::load($post_data['geomwkt'],'wkt');
-			$this->get_bounds($geophp);
-			$gp = json_decode ($geophp->out('json')); // On transforme le GeoJson en objet PHP
-			$post_data['geojson'] = json_encode ($gp);
+			if (defined ('MYSQL_5_5')) {
+				include_once('assets/geoPHP/geoPHP.inc');
+				$g = \geoPHP::load ($row['geomwkt'], 'wkt');
+				$row['geojson'] = $g->out('json');
+			}
+			$post_data['geojson'] = $row['geojson'];
 		}
 
-		// Pour éviter qu'un titre vide invalide la page et toute la saisie graphique.
+		// To prevent an empty title invalidate the full page and input.
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
 
@@ -382,7 +375,7 @@ class listener implements EventSubscriberInterface
 		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
-		$file_patch = "\n\t\tif (strpos (\$var, 'GeomFromText') !== false) //GeoBB\n\t\t\treturn \$var;";
+		$file_patch = "\n\t\tif (strpos(\$var, 'GeomFrom') !== false)\n\t\t\treturn \$var;";
 		$file_content = file_get_contents ($file_name);
 		if (strpos($file_content, '{'.$file_tag))
 			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
@@ -407,11 +400,12 @@ class listener implements EventSubscriberInterface
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)) {
 				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
-				$ks = split ('-', $k);
+				$ks = explode ('-', $k);
 
 				// Create or modify the SQL column
 				if (count ($ks) == 3)
 					$ks[2] = '('.$ks[2].')';
+				//TODO BUG O2 ne transforme pas la colonne SQL geom en GEOMETRY quand initialise avec 1 seul forum pas geom
 				$this->db->sql_query(
 					'ALTER TABLE '.POSTS_TABLE.
 					(in_array ($ks[0], $special_columns) ? ' CHANGE '.$ks[0].' ' : ' ADD ').
@@ -420,11 +414,15 @@ class listener implements EventSubscriberInterface
 
 				// Retrieves the values of the geometry, includes them in the phpbb_posts table
 				if ($ks[1] == 'geometry' && $v) {
-					include_once('assets/geoPHP/geoPHP.inc');
-					$geophp = \geoPHP::load (html_entity_decode($v), 'json');
-					//TODO BUG ne devrait pas optimiser les linestring en multilinestring
-					if ($geophp)
-						$v = 'GeomFromText("'.$geophp->out('wkt').'")';
+					if (defined ('MYSQL_5_5')) {
+						include_once('assets/geoPHP/geoPHP.inc');
+						$geophp = \geoPHP::load (html_entity_decode($v), 'json');
+						//TODO BUG ne devrait pas optimiser les linestring en multilinestring
+						if ($geophp) //TODO TEST est-ce nécéssaire de tester ? / sinon, voir les autres geoPHP
+							$v = 'GeomFromText("'.$geophp->out('wkt').'")';
+					} else
+						//TODO TEST est-ce qu'il optimise les linestring en multilinestring
+						$v = "ST_GeomFromGeoJSON('$v')";
 				}
 
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
@@ -446,6 +444,7 @@ class listener implements EventSubscriberInterface
 			$_SERVER['REQUEST_URI'],
 			'post_subject = '.$this->modifs['post_subject'],
 			'post_text = '.$this->modifs['post_text'],
+			//TODO TEST : le filtre marche t'il bien en 5.7 ? / Est il necessaire (garder tout le code en save)
 			'geom = '.str_replace (['GeomFromText("','")'], '', $this->modifs['geom']),
 		];
 		$this->request->disable_super_globals();
@@ -480,7 +479,7 @@ class listener implements EventSubscriberInterface
 			case 'all': // Régle sur tous les posts
 				$ns = explode ('\\', __NAMESPACE__);
 				$this->template->assign_vars([
-					'META_ROBOTS' => META_ROBOTS,
+					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
 					'GEO_KEYS' => json_encode($geo_keys),
@@ -492,16 +491,21 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Calcul des données automatiques
+	//TODO revoir et systématiser ~
 	function get_automatic_data(&$row) {
-		if (!$row['geomwkt'])
+		if (!$row['geojson'])
 			return;
 
-		$update = []; // Datas to be updated
-
 		// Calcul du centre pour toutes les actions
-		include_once('assets/geoPHP/geoPHP.inc');
-		$geophp = \geoPHP::load($row['geomwkt'],'wkt');
-		$centre = $geophp->getCentroid()->coords;
+		if (defined ('MYSQL_5_5')) {
+			include_once('assets/geoPHP/geoPHP.inc');
+			$geophp = \geoPHP::load($row['geojson'],'json');
+			$row['center'] = $geophp->getCentroid()->coords;
+			$row['aera'] = $geophp->getArea();
+		}
+		//TODO center & surface en 5.7+
+
+		$update = []; // Datas to be updated
 
 		// Dans quel alpage est contenu (lors de la première init)
 		if (array_key_exists ('geo_contains', $row) &&
@@ -512,8 +516,8 @@ class listener implements EventSubscriberInterface
 				FROM	 ".POSTS_TABLE." AS polygon
 					JOIN ".POSTS_TABLE." AS point ON (point.topic_id = {$row['topic_id']})
 				WHERE
-					".SQL_PRE."Contains (polygon.geom, point.geom)
-					AND ".SQL_PRE."Dimension(polygon.geom) > 0
+					".(defined('MYSQL_5_5')?'':'ST_')."Contains (polygon.geom, point.geom)
+					AND ".(defined('MYSQL_5_5')?'':'ST_')."Dimension(polygon.geom) > 0
 					LIMIT 1
 				";
 			$result = $this->db->sql_query($sql);
@@ -522,12 +526,12 @@ class listener implements EventSubscriberInterface
 			$this->db->sql_freeresult($result);
 		}
 
-		// Calcul de la surface en ha avec geoPHP
+		// Calcul de la surface en ha
 		if (array_key_exists ('geo_surface', $row) && !$row['geo_surface']) {
 			$update['geo_surface'] =
-				round ($geophp->getArea()
+				round ($row['aera']
 					* 1111 // hm par ° delta latitude
-					* 1111 * sin ($centre[1] * M_PI / 180) // hm par ° delta longitude
+					* 1111 * sin ($row['center'][1] * M_PI / 180) // hm par ° delta longitude
 				);
 		}
 
@@ -540,7 +544,7 @@ class listener implements EventSubscriberInterface
 				'?key='.$geo_keys['mapquest'].
 				'&callback=handleHelloWorldResponse'.
 				'&shapeFormat=raw'.
-				'&latLngCollection='.$centre[1].','.$centre[0]
+				'&latLngCollection='.$row['center'][1].','.$row['center'][0]
 			);
 			if ($mapquest) {
 				preg_match ('/"height":([0-9]+)/', $mapquest, $match);
@@ -555,7 +559,7 @@ class listener implements EventSubscriberInterface
 			$update['geo_massif'] = null;
 			$update['geo_reserve'] = null;
 			$igns = [];
-			$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$centre[0]},{$centre[1]},{$centre[0]},{$centre[1]}";
+			$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$row['center'][0]},{$row['center'][1]},{$row['center'][0]},{$row['center'][1]}";
 			$wri_export = @file_get_contents($url);
 			if ($wri_export) {
 				$fs = json_decode($wri_export)->features;
@@ -600,7 +604,7 @@ class listener implements EventSubscriberInterface
 		<ReverseGeocodeRequest>
 			<Position>
 				<gml:Point>
-					<gml:pos>{$centre[1]} {$centre[0]}</gml:pos>
+					<gml:pos>{$row['center'][1]} {$row['center'][0]}</gml:pos>
 				</gml:Point>
 			</Position>
 			<ReverseGeocodePreference>CadastralParcel</ReverseGeocodePreference>
@@ -646,7 +650,7 @@ XML
 			}
 			if (!$update['geo_commune']) {*/
 				$nominatim = json_decode (@file_get_contents (
-					"https://nominatim.openstreetmap.org/reverse?format=json&lon={$centre[0]}&lat={$centre[1]}",
+					"https://nominatim.openstreetmap.org/reverse?format=json&lon={$row['center'][0]}&lat={$row['center'][1]}",
 					false,
 					stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
 				));
@@ -678,7 +682,8 @@ XML
 				' WHERE post_id = '.$row['post_id']
 		);
 
-if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
+		if(defined('TRACES_DOM') && count($update))
+			echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
 	}
 
 	// Form management
@@ -687,7 +692,7 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
 		$sql = "
 			SELECT post_text FROM ".POSTS_TABLE."
-			WHERE post_subject = '".str_replace("'","\'",$match[1] ?: $forum_name)."'
+			WHERE post_subject = '".str_replace ("'", "\'", $match ? $match[1] : $forum_name)."'
 			ORDER BY post_id
 		";
 		$result = $this->db->sql_query($sql);
@@ -770,17 +775,21 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 						preg_match_all ('/([0-9\.]+)/', $post_data['geomwkt'], $point);
 						$km = 3;
 						$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
+						//TODO test en 5.7
+define('SQL_PRE', ''); //TODO-ARCHI MySQL 5.7+ 'ST_'
 						$sql = "
 							SELECT post_subject, topic_id, ".SQL_PRE."AsText(".SQL_PRE."Centroid(geom)) AS centre
 							FROM ".POSTS_TABLE."
 							WHERE ".SQL_PRE."Dimension(geom) > 0 AND
 								MBRIntersects(geom, ".SQL_PRE."GeomFromText('LineString($bbox)'))
 							";
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
 						$result = $this->db->sql_query($sql);
 						$options = ['d0' => []]; // First line empty
 						while ($row = $this->db->sql_fetchrow($result)) {
-							preg_match_all ('/([0-9\.]+)/', $row['centre'], $centre);
-							$dist2 = 1 + pow ($centre[0][0] - $point[0][0], 2) + pow ($centre[0][1] - $point[0][1], 2) * 2;
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($row,true).'</pre>';
+							preg_match_all ('/([0-9\.]+)/', $row['centre'], $row['center']);
+							$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
 							$options['d'.$dist2] = $row;
 							if ($row['topic_id'] == $vars['POST_VALUE']) {
 								$vars['POST_VALUE'] = // For posting.pgp initial select
@@ -863,7 +872,6 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 						$vars['DISPLAY_VALUE'] = null;
 				}
 			} //TODO-ARCHI DELETE pourquoi as-ton besoin du test précédent ?
-//else/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_COOKIE,true).'</pre>';
 
 			$vars['NAME'] = $sql_id.'-'.$vars['SQL_TYPE'];
 
@@ -889,26 +897,6 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 				}
 			}
 		}
-	}
-
-	// Calcul de la bbox englobante
-	function get_bounds($g) {
-		return;//TODO DELETE ???
-		$b = $g->getBBox();
-		$m = 0.005; // Marge autour d'un point simple (en °)
-		foreach (['x','y'] AS $xy) {
-			if ($b['min'.$xy] == $b['max'.$xy]) {
-				$b['min'.$xy] -= $m;
-				$b['max'.$xy] += $m;
-			}
-			foreach (['max','min'] AS $mm)
-				$this->bbox['geo_bbox_'.$mm.$xy] =
-					isset ($this->bbox['geo_bbox_'.$mm.$xy])
-					? $mm ($this->bbox['geo_bbox_'.$mm.$xy], $b[$mm.$xy])
-					: $b[$mm.$xy];
-		}
-		$this->template->assign_vars (array_change_key_case ($this->bbox, CASE_UPPER));
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($this->bbox,true).'</pre>';
 	}
 
 
@@ -945,7 +933,7 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 				$result = $this->db->sql_query_limit($sql_rch, 1);
 				$r = $this->db->sql_fetchrow($result);
 			}
-			
+
 			$post_row['MESSAGE'] = str_replace (
 				$href.'">'.$imgs[3][$k].'<',
 				$href.'"><img title="'.$href.'" alt="'.$href.'" style="border:5px solid #F3E358" src="download/file.php?id='.$r['attach_id'].'&s=200&'.time().'"><',
@@ -963,7 +951,7 @@ if(defined('TRACES_DOM') && count($update))/*DCMM*/echo"<pre style='background-c
 			$this->block_array = $vars['block_array'];
 			$this->block_array['TEXT_SIZE'] = strlen (@$this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
 			$this->block_array['DATE'] = str_replace (' 00:00', '', $this->user->format_date($vars['attachment']['filetime']));
-			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; // GEO-TODO DCMM Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
+			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; //TODO ARCHI Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
 			$this->block_array['EXIF'] = $vars['attachment']['exif'];
 			foreach ($vars['attachment'] AS $k=>$v)
 				$this->block_array[strtoupper($k)] = $v;
