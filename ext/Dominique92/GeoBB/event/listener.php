@@ -249,9 +249,7 @@ class listener implements EventSubscriberInterface
 		if ($this->db->sql_fetchrow($result)) {
 			// Insère la conversion du champ geom en format WKT dans la requette SQL
 			$sql_ary = $vars['sql_ary'];
-			$sql_ary['SELECT'] .= defined ('MYSQL_5_5')
-				? ', AsText(geom) AS geomwkt'
-				: ', ST_AsGeoJSON(geom) AS geojson';
+			$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geojson';
 			$vars['sql_ary'] = $sql_ary;
 		}
 		$this->db->sql_freeresult($result);
@@ -281,11 +279,6 @@ class listener implements EventSubscriberInterface
 		if (isset ($this->all_post_data[$post_id])) {
 			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post
 			$post_row = $vars['post_row'];
-			if (defined ('MYSQL_5_5') && $post_data['geomwkt']) {
-				include_once('assets/geoPHP/geoPHP.inc');
-				$g = \geoPHP::load ($post_data['geomwkt'], 'wkt');
-				$post_data['geojson'] = $g->out('json');
-			}
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
 				$this->get_automatic_data($post_data);
@@ -337,20 +330,12 @@ class listener implements EventSubscriberInterface
 		// Récupère la traduction des données spaciales SQL
 		if (isset ($post_data['geom'])) {
 			// Conversion WKT <-> geoJson
-			$sql = (defined ('MYSQL_5_5')
-					? 'SELECT AsText(geom) AS geomwkt'
-					: 'SELECT ST_AsGeoJSON(geom) AS geojson').
+			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
 				' FROM '.POSTS_TABLE.
 				' WHERE post_id = '.$post_data['post_id'];
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-
-			if (defined ('MYSQL_5_5')) {
-				include_once('assets/geoPHP/geoPHP.inc');
-				$g = \geoPHP::load ($row['geomwkt'], 'wkt');
-				$row['geojson'] = $g->out('json');
-			}
 			$post_data['geojson'] = $row['geojson'];
 		}
 

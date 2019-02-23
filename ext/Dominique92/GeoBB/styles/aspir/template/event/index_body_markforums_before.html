@@ -12,9 +12,11 @@
 		new ol.MyMap({
 			target: 'map',
 			layers: [
-				geoLayer()
+				aspirLayer()
 			],
-			controls: geobbControls()
+			controls: aspirControls({
+				geoKeys: {GEO_KEYS}
+			})
 		});
 	});
 </script>

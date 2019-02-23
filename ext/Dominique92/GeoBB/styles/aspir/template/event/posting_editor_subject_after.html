@@ -26,9 +26,9 @@
 <!-- INCLUDE posting_specific_fields.html -->
 
 <script>
-	var map, editable;
+	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
-		var overlay = geoLayer(0, {TOPIC_ID}, true),
+		var overlay = aspirLayer(0, {TOPIC_ID}, true),
 			edit = controlEdit({
 				inputId: 'editable-json',
 				snapLayers: [overlay],
@@ -39,39 +39,39 @@
 				draw: [{
 					type: 'Polygon'
 				}]
-			}),
-			extent = edit.source_.getExtent();
+			});
+
 		map = new ol.MyMap({
 			target: 'map',
 			layers: [
 				overlay
 			],
-			controls: geobbControls({
+			controls: aspirControls({
+				geoKeys: {GEO_KEYS},
 				controlPermalink:{
 					visible: false,
-					init: ol.extent.isEmpty(extent)
+					init: !{POST_ID},
+					initialCenter: function(c) {
+						permaCenter = c;
+					}
 				}
 			})
-			<!-- IF GEO_MAP_TYPE == 'surface' -->
-				.concat([edit])
-			<!-- ENDIF -->
 		});
 
+		<!-- IF GEO_MAP_TYPE == 'point' -->
+			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
+			map.addLayer(editable);
+		<!-- ELSE -->
+			map.addControl(edit);
+		<!-- ENDIF -->
+
 		// Center the map
-		if (!ol.extent.isEmpty(extent))
+		if ({POST_ID})
 			map.getView().fit(
-				extent, {
+				edit.source_.getExtent(), {
 					maxZoom: 15
 				}
 			);
-
-		<!-- IF GEO_MAP_TYPE == 'point' -->
-			editable = marker('{EXT_DIR}images/viseur.png', 'editable', ol.extent.getCenter(extent), true);
-			map.addLayer(editable);
-			editable.on('myol:onadd', function(evt) {
-				this.getPoint().setCoordinates(evt.target.map_.getView().getCenter());
-			});
-		<!-- ENDIF -->
 	});
 </script>
 

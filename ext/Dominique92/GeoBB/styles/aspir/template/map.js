@@ -1,45 +1,38 @@
-function geobbControls(options) {
+function aspirControls(options) {
 	options = options || {};
 	return [
 		controlLayersSwitcher({
-			baseLayers: layersCollection(geoKeys)
+			baseLayers: {
+				'OSM': layerOSM(
+					'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+					'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+				),
+				'IGN': layerIGN(options.geoKeys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+				'IGN topo': layerIGN(options.geoKeys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+				'Satellite': layerGoogle('s'),
+				'Cadastre': layerIGN(options.geoKeys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png')
+			}
 		}),
 		new ol.control.ScaleLine(),
+		new ol.control.Attribution({
+			collapsible: false // Attribution always open
+		}),
 		new ol.control.MousePosition({
 			coordinateFormat: ol.coordinate.createStringXY(5),
 			projection: 'EPSG:4326',
 			className: 'ol-coordinate',
 			undefinedHTML: String.fromCharCode(0)
 		}),
-		new ol.control.Attribution({
-			collapsible: false // Attribution always open
-		}),
+		controlPermalink(options.controlPermalink),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
 			label: '',
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
-		controlPermalink(options.controlPermalink),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
-		new Geocoder('nominatim', {
-			provider: 'osm',
-			lang: 'FR',
-			keepOpen: true,
-			placeholder: 'Saisir un nom' // Initialization of the input field
-		})
+		geocoder()
 	];
-}
-
-function layers(keys) {
-	return {
-		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-		'Photos': layerGoogle('s'),
-		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN topo': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-		'Google': layerGoogle('p'),
-		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png')
-	};
 }
 
 // Resize
@@ -103,7 +96,7 @@ function layerStyleOptionsFunction(properties, id, hover) {
 	};
 }
 
-function geoLayer(idColor, idExclude, noHover) {
+function aspirLayer(idColor, idExclude, noHover) {
 	return new ol.layer.LayerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
 		styleOptions: function(properties) {

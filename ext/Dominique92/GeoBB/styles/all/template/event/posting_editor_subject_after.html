@@ -34,7 +34,7 @@
 <!-- INCLUDE posting_specific_fields.html -->
 
 <script>
-	var map, editable;
+	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
 		var overlay = geoLayer(0, {TOPIC_ID}, true),
 			edit = controlEdit({
@@ -45,41 +45,42 @@
 				enableAtInit: true,
 				draw: [{
 					type: 'LineString'
-				},{
+				}, {
 					type: 'Polygon'
 				}]
-			}),
-			extent = edit.source_.getExtent(),
-			//TODO BUG le bouton edit est avant les boutons upload/download
-			controls = controlsCollection({
-				controlPermalink:{
-					visible: false,
-					init: ol.extent.isEmpty(extent)
-				},
-				controlDownloadGPX: {
-					fileName: 'MON FICH POSTING'
-				}
 			});
+
 		map = new ol.MyMap({
 			target: 'map',
 			layers: [
 				overlay
 			],
-			controls: controls
-			<!-- IF GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface' -->
-				.concat([edit])
-			<!-- ENDIF -->
+			controls: controlsCollection({
+				geoKeys: {GEO_KEYS},
+				controlPermalink: {
+					visible: false,
+					init: !{POST_ID},
+					initialCenter: function(c) {
+						permaCenter = c;
+					}
+				},
+				controlDownloadGPX: {
+					fileName: 'topic' //TODO name option
+				}
+			})
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
-			editable = marker('{EXT_DIR}images/viseur.png', 'editable', ol.extent.getCenter(extent), true);
+			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
 			map.addLayer(editable);
+		<!-- ELSE -->
+			map.addControl(edit);
 		<!-- ENDIF -->
 
 		// Center the map
-		if (!ol.extent.isEmpty(extent))
+		if ({POST_ID})
 			map.getView().fit(
-				extent, {
+				edit.source_.getExtent(), {
 					maxZoom: 15
 				}
 			);

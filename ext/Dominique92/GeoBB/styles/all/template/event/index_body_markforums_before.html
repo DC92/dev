@@ -13,6 +13,7 @@
 		new ol.MyMap({
 			target: 'map',
 			layers: [
+				geoLayer() // GeoBB overlay
 /*
 //TODO-CHEM complete chemineur
 				layerOverpass({
@@ -23,9 +24,13 @@
 					postLabel: postLabel
 				}),
 */
-				geoLayer()
 			],
-			controls: controlsCollection()
+			controls: controlsCollection({
+				geoKeys: {GEO_KEYS}
+			}),
+			controlDownloadGPX: {
+				fileName: 'topics' //TODO name option
+			}
 		});
 	});
 </script>

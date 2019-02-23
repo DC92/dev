@@ -30,6 +30,7 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 }
 */
 
+/* Overlay vector layer from the GeoBB database */
 var topicStyleOptions = {
 		image: new ol.style.Circle({
 			radius: 4,

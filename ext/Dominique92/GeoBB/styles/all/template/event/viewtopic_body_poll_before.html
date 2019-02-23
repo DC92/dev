@@ -18,14 +18,13 @@
 					geoLayer({TOPIC_ID})
 				],
 				controls: controlsCollection({
-					<!-- IF not GEOJSON -->
-						controlPermalink: {
-							init: false
-						},
-					<!-- ENDIF -->
+					geoKeys: {GEO_KEYS},
+					controlPermalink: {
+						init: false
+					},
 					controlDownloadGPX: {
-						fileName: 'MON FICH VIEWTOPIC', //TODO
-						extraMetaData: "<desc>//TODO description...</desc>\n"
+						fileName: 'topic', //TODO name option
+//TODO						extraMetaData: "<desc>//TODO description...</desc>\n"
 					}
 				})
 			});
@@ -38,9 +37,8 @@
 			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
-		<!-- ENDIF -->
 
-		<!-- IF (GEO_MAP_TYPE == 'line' || GEO_MAP_TYPE == 'surface') && GEOJSON -->
+		<!-- ELSEIF GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"

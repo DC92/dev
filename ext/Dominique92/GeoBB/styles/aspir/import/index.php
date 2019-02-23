@@ -18,6 +18,7 @@ Général -> Gérer les forums -> Créer
 	Alpages [first=surface][/first][fiche=Alpages][/fiche]
 	Cabanes [first=point][/first][fiche=Cabanes][/fiche] ext/Dominique92/GeoBB/types_points/cabane.png
 	Points d'eau [first=point][/first][fiche=Points d'eau][/fiche] ext/Dominique92/GeoBB/types_points/point_eau.png
+	Réseau ....
 	Forum des utilisateurs
 	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
 	catégorie Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs
@@ -39,6 +40,8 @@ Créer un item d'Alpage, Cabane, Point d'eau
 Exécuter ext/Dominique92/GeoBB/styles/aspir/import
 Move ext/Dominique92/GeoBB/styles/aspir/import/LOG/... LOG/
 Administration -> Gérer les forums -> Alpages -> Resynchroniser
+Supprimer assets/geoPHP
+Supprimer ext/.../aspir/import
 
 Clean
 DELETE FROM phpbb_posts WHERE post_id > 8

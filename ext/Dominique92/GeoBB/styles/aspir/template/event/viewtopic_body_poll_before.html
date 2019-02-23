@@ -12,13 +12,13 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var geom = false,
-			map = new ol.MyMap({
+		var map = new ol.MyMap({
 				target: 'map',
 				layers: [
-					geoLayer({TOPIC_ID})
+					aspirLayer({TOPIC_ID})
 				],
-				controls: geobbControls({
+				controls: aspirControls({
+					geoKeys: {GEO_KEYS},
 					controlPermalink: {
 						init: false
 					}
@@ -33,6 +33,7 @@
 			// Center the map
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
+
 		<!-- ELSEIF GEOJSON -->
 			var eljson = document.getElementById('marqueur-json'),
 				format = new ol.format.GeoJSON({

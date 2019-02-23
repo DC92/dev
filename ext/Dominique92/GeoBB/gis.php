@@ -40,9 +40,7 @@ $sql_array = [
 		'post_id',
 		'forum_image',
 		'forum_desc',
-		defined ('MYSQL_5_5')
-			? 'AsText(geom) AS geomwkt'
-			: 'ST_AsGeoJSON(geom) AS geojson',
+		'ST_AsGeoJSON(geom) AS geojson',
 	],
 	'FROM' => [POSTS_TABLE => 'p'],
 	'LEFT_JOIN' => [[
@@ -55,7 +53,7 @@ $sql_array = [
 	'WHERE' => [
 		't.topic_id != '.$exclude,
 		'geom IS NOT NULL',
-		"Intersects (GeomFromText ('POLYGON (($bbox_sql))'),geom)",
+		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",
 		'post_visibility = '.ITEM_APPROVED,
 		'OR' => [
 			't.topic_first_post_id = p.post_id',
@@ -86,12 +84,6 @@ $bu = $sp[0].'://'.getenv('SERVER_NAME').$ri[0].'/';
 $features = $signatures = [];
 $ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
-	if (defined ('MYSQL_5_5')) {
-		include_once('../../../assets/geoPHP/geoPHP.inc');
-		$g = geoPHP::load ($row['geomwkt'], 'wkt');
-		$row['geojson'] = $g->out('json');
-	}
-
 	// Color calculation
 	preg_match_all('/[0-9\.]+/',$row['geojson'],$coords);
 	$x[0] = $coords[0][0] * 30000 % $ampl; // From lon

@@ -886,16 +886,13 @@ ol.control.Button = function(o) {
 			className: '', // {string} className of the button.
 			activeBackgroundColor: 'white',
 			group: this // Main control of a group of controls
-		}, o);
-
-	const buttonElement = document.createElement('button'),
+		}, o),
+		buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
 
 	ol.control.Control.call(this, ol.assign({
 		element: divElement
 	}, options));
-
-	this.active = false;
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
@@ -907,13 +904,16 @@ ol.control.Button = function(o) {
 	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
 	divElement.title = options.title; // {string} displayed when the control is hovered.
 	divElement.control_ = this; // For callback functions
-	if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
-		divElement.style.right = '.5em';
-		divElement.style.top = options.rightPosition + 'em';
-	} else {
-		divElement.style.left = '.5em';
-		divElement.style.top = (nextButtonTopPos += 2) + 'em';
-	}
+
+	this.on('myol:onadd',function(){
+		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
+			divElement.style.right = '.5em';
+			divElement.style.top = options.rightPosition + 'em';
+		} else {
+			divElement.style.left = '.5em';
+			divElement.style.top = (nextButtonTopPos += 2) + 'em';
+		}
+	});
 
 	// Add a question on the right of the button
 	if (options.question) {
@@ -933,6 +933,7 @@ ol.control.Button = function(o) {
 
 	// Toggle the button status & aspect
 	// In case of group buttons, set inactive the other one
+	this.active = false;
 	this.toggle = function(newActive) {
 		this_.map_.getControls().forEach(function(control) {
 			if (control.options_ &&
@@ -1074,13 +1075,15 @@ function controlPermalink(o) {
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
 		(options.format || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
 
-	this_.paramsCenter = [parseFloat(params[2]), parseFloat(params[3])];
-
 	if (options.visible) {
 		divElement.className = 'ol-permalink';
 		aElement.innerHTML = 'Permalink';
 		aElement.title = 'Generate a link with map zoom & position';
 		divElement.appendChild(aElement);
+	}
+
+	if (typeof options.initialCenter == 'function') {
+		options.initialCenter([parseFloat(params[2]), parseFloat(params[3])]);
 	}
 
 	function render(evt) {
@@ -1090,7 +1093,7 @@ function controlPermalink(o) {
 		if (options.init &&
 			params) { // Only once
 			view.setZoom(params[1]);
-			view.setCenter(ol.proj.transform(this_.paramsCenter, 'EPSG:4326', 'EPSG:3857'));
+			view.setCenter(ol.proj.transform([parseFloat(params[2]), parseFloat(params[3])], 'EPSG:4326', 'EPSG:3857'));
 			params = null;
 		}
 
@@ -1803,9 +1806,47 @@ function compareCoords(a, b) {
 
 
 /**
+ * Controls examples
+ */
+function controlsCollection(options) {
+	options = options || {};
+
+	return [
+		controlLayersSwitcher(ol.assign({
+			geoKeys: options.geoKeys,
+			baseLayers: layersCollection(options.geoKeys)
+		}, options.controlLayersSwitcher)),
+		new ol.control.ScaleLine(),
+		new ol.control.Attribution({
+			collapsible: false // Attribution always open
+		}),
+		new ol.control.MousePosition({
+			coordinateFormat: ol.coordinate.createStringXY(5),
+			projection: 'EPSG:4326',
+			className: 'ol-coordinate',
+			undefinedHTML: String.fromCharCode(0)
+		}),
+		controlLengthLine(),
+		controlPermalink(options.controlPermalink),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '',
+			labelActive: '',
+			tipLabel: 'Plein écran'
+		}),
+		geocoder(),
+		controlGPS(options.controlGPS),
+		controlLoadGPX(),
+		controlDownloadGPX(options.controlDownloadGPX),
+		controlPrint()
+	];
+}
+
+/**
  * Tile layers examples
  * Requires many
  */
+//TODO BUG investigate : The connection used to load resources from https://api.ign.fr used TLS 1.0 or TLS 1.1, which are deprecated and will be disabled in the future. Once disabled, users will be prevented from loading these resources. The server should enable TLS 1.2 or later. See https://www.chromestatus.com/feature/5654791610957824 for more information.
 function layersCollection(keys) {
 	return {
 		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
@@ -1857,44 +1898,4 @@ function layersCollection(keys) {
 		'Watercolor': layerStamen('watercolor'),
 		'Neutre': new ol.layer.Tile()
 	};
-}
-
-/**
- * Controls examples
- */
-function controlsCollection(o) {
-	const options = ol.assign({
-		//TODO ARCHI incompréhensible !
-		geoKeys: typeof geoKeys == 'object' ? geoKeys : [] // Global variable if any
-	}, o);
-
-	return [
-		controlLayersSwitcher(ol.assign({
-			geoKeys: options.geoKeys,
-			baseLayers: layersCollection(options.geoKeys)
-		}, options.controlLayersSwitcher)),
-		new ol.control.ScaleLine(),
-		new ol.control.Attribution({
-			collapsible: false // Attribution always open
-		}),
-		new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
-			projection: 'EPSG:4326',
-			className: 'ol-coordinate',
-			undefinedHTML: String.fromCharCode(0)
-		}),
-		controlLengthLine(),
-		controlPermalink(options.controlPermalink),
-		new ol.control.Zoom(),
-		new ol.control.FullScreen({
-			label: '',
-			labelActive: '',
-			tipLabel: 'Plein écran'
-		}),
-		geocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownloadGPX(options.controlDownloadGPX),
-		controlPrint()
-	];
 }
