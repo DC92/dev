@@ -905,7 +905,7 @@ ol.control.Button = function(o) {
 	divElement.title = options.title; // {string} displayed when the control is hovered.
 	divElement.control_ = this; // For callback functions
 
-	this.on('myol:onadd',function(){
+	this.on('myol:onadd', function() {
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.right = '.5em';
 			divElement.style.top = options.rightPosition + 'em';

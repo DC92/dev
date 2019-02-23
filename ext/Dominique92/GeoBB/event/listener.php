@@ -249,7 +249,10 @@ class listener implements EventSubscriberInterface
 		if ($this->db->sql_fetchrow($result)) {
 			// Insère la conversion du champ geom en format WKT dans la requette SQL
 			$sql_ary = $vars['sql_ary'];
-			$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geojson';
+			$sql_ary['SELECT'] .=
+				', ST_AsGeoJSON(geom) AS geojson'.
+				', ST_AsGeoJSON(ST_Centroid(geom)) AS centerwkt'.
+				', ST_Area(geom) AS area';
 			$vars['sql_ary'] = $sql_ary;
 		}
 		$this->db->sql_freeresult($result);
@@ -398,17 +401,9 @@ class listener implements EventSubscriberInterface
 				);
 
 				// Retrieves the values of the geometry, includes them in the phpbb_posts table
-				if ($ks[1] == 'geometry' && $v) {
-					if (defined ('MYSQL_5_5')) {
-						include_once('assets/geoPHP/geoPHP.inc');
-						$geophp = \geoPHP::load (html_entity_decode($v), 'json');
-						//TODO BUG ne devrait pas optimiser les linestring en multilinestring
-						if ($geophp) //TODO TEST est-ce nécéssaire de tester ? / sinon, voir les autres geoPHP
-							$v = 'GeomFromText("'.$geophp->out('wkt').'")';
-					} else
-						//TODO TEST est-ce qu'il optimise les linestring en multilinestring
-						$v = "ST_GeomFromGeoJSON('$v')";
-				}
+				if ($ks[1] == 'geometry' && $v)
+					$v = "ST_GeomFromGeoJSON('$v')";
+					//TODO TEST est-ce qu'il optimise les linestring en multilinestring (ne devrait pas)
 
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
@@ -468,7 +463,7 @@ class listener implements EventSubscriberInterface
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
 					'GEO_KEYS' => json_encode($geo_keys),
-//					'STYLE_NAME' => $this->user->style['style_name'],
+//TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
 				if ($geo_keys)
 					$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
@@ -482,13 +477,8 @@ class listener implements EventSubscriberInterface
 			return;
 
 		// Calcul du centre pour toutes les actions
-		if (defined ('MYSQL_5_5')) {
-			include_once('assets/geoPHP/geoPHP.inc');
-			$geophp = \geoPHP::load($row['geojson'],'json');
-			$row['center'] = $geophp->getCentroid()->coords;
-			$row['aera'] = $geophp->getArea();
-		}
-		//TODO center & surface en 5.7+
+		preg_match_all ('/([0-9\.]+)/', $row['centerwkt'], $center);
+		$row['center'] = $center[0];
 
 		$update = []; // Datas to be updated
 
@@ -501,8 +491,8 @@ class listener implements EventSubscriberInterface
 				FROM	 ".POSTS_TABLE." AS polygon
 					JOIN ".POSTS_TABLE." AS point ON (point.topic_id = {$row['topic_id']})
 				WHERE
-					".(defined('MYSQL_5_5')?'':'ST_')."Contains (polygon.geom, point.geom)
-					AND ".(defined('MYSQL_5_5')?'':'ST_')."Dimension(polygon.geom) > 0
+					ST_Contains (polygon.geom, point.geom)
+					AND ST_Dimension(polygon.geom) > 0
 					LIMIT 1
 				";
 			$result = $this->db->sql_query($sql);
@@ -512,9 +502,9 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Calcul de la surface en ha
-		if (array_key_exists ('geo_surface', $row) && !$row['geo_surface']) {
+		if (array_key_exists ('geo_surface', $row) && !$row['geo_surface']); {
 			$update['geo_surface'] =
-				round ($row['aera']
+				round ($row['area']
 					* 1111 // hm par ° delta latitude
 					* 1111 * sin ($row['center'][1] * M_PI / 180) // hm par ° delta longitude
 				);
@@ -523,7 +513,7 @@ class listener implements EventSubscriberInterface
 		// Calcul de l'altitude avec mapquest
 		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
 			global $geo_keys;
-			//TODO BUG : ne pas redemander pour les surfaces où c'est 0
+			//TODO BLOQUANT BUG : ne pas redemander pour les surfaces où c'est 0
 			$mapquest = @file_get_contents (
 				'http://open.mapquestapi.com/elevation/v1/profile'.
 				'?key='.$geo_keys['mapquest'].
@@ -757,22 +747,18 @@ XML
 						$vars['TAG'] = 'select';
 
 						// Search surfaces closest to a point
-						preg_match_all ('/([0-9\.]+)/', $post_data['geomwkt'], $point);
-						$km = 3;
+						preg_match_all ('/([0-9\.]+)/', $post_data['geojson'], $point);
+						$km = 3; // Search maximum distance
 						$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
-						//TODO test en 5.7
-define('SQL_PRE', ''); //TODO-ARCHI MySQL 5.7+ 'ST_'
 						$sql = "
-							SELECT post_subject, topic_id, ".SQL_PRE."AsText(".SQL_PRE."Centroid(geom)) AS centre
+							SELECT post_subject, topic_id, ST_AsText(ST_Centroid(geom)) AS centre
 							FROM ".POSTS_TABLE."
-							WHERE ".SQL_PRE."Dimension(geom) > 0 AND
-								MBRIntersects(geom, ".SQL_PRE."GeomFromText('LineString($bbox)'))
+							WHERE ST_Dimension(geom) > 0 AND
+								MBRIntersects(geom, ST_GeomFromText('LINESTRING($bbox)',4326))
 							";
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
 						$result = $this->db->sql_query($sql);
 						$options = ['d0' => []]; // First line empty
 						while ($row = $this->db->sql_fetchrow($result)) {
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($row,true).'</pre>';
 							preg_match_all ('/([0-9\.]+)/', $row['centre'], $row['center']);
 							$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
 							$options['d'.$dist2] = $row;
