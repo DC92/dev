@@ -339,7 +339,7 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-			$post_data['geojson'] = @$row['geojson'];
+			$post_data['geojson'] = $row['geojson'];
 		}
 
 		// To prevent an empty title invalidate the full page and input.
@@ -451,7 +451,7 @@ class listener implements EventSubscriberInterface
 		global $geo_keys; // Private / defined in config.php
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
-		switch (@$regle[1]) {
+		switch ($regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
 					break;
@@ -530,7 +530,7 @@ class listener implements EventSubscriberInterface
 			);
 			if ($mapquest) {
 				preg_match ('/"height":([0-9]+)/', $mapquest, $match);
-				$update['geo_altitude'] = @$match[1];
+				$update['geo_altitude'] = $match[1];
 			}
 		}
 
@@ -636,16 +636,15 @@ XML
 					false,
 					stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
 				));
-				if ($nominatim && $nominatim->address)
-					@$update['geo_commune'] = $nominatim->address->postcode.' '.(
-						$nominatim->address->town ?:
-						$nominatim->address->city ?:
-						$nominatim->address->suburb  ?:
-						$nominatim->address->village ?:
-						$nominatim->address->hamlet ?:
-						$nominatim->address->neighbourhood ?:
-						$nominatim->address->quarter 
-					);
+				$update['geo_commune'] = $nominatim->address->postcode.' '.(
+					$nominatim->address->town ?:
+					$nominatim->address->city ?:
+					$nominatim->address->suburb  ?:
+					$nominatim->address->village ?:
+					$nominatim->address->hamlet ?:
+					$nominatim->address->neighbourhood ?:
+					$nominatim->address->quarter 
+				);
 			}
 		}
 
@@ -697,7 +696,7 @@ XML
 			$vars['SQL_TYPE'] = 'text';
 			$vars['DISPLAY_VALUE'] =
 			$vars['POST_VALUE'] =
-				str_replace ('~', '', @$post_data[$sql_id]);
+				str_replace ('~', '', $post_data[$sql_id]);
 			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
 
 			// {|1.1 Title
@@ -721,7 +720,7 @@ XML
 				// Check if any value there
 				preg_match_all ('/(geo_[a-z_0-9]+)\|[^\|]+\|([a-z]+)/', substr ($ndf, 0, $c), $match);
 				foreach ($match[1] AS $k=>$m)
-					if ($post_data[$m] &&
+					if (isset ($post_data[$m]) &&
 						($match[2][$k] != 'confidentiel' || $this->user->data['is_registered']))
 						$vars['DISPLAY'] = true; // Decide to display the title
 			}
@@ -864,8 +863,8 @@ XML
 				count (explode ('.', $block_name)) == 1) {
 				foreach ($options AS $v)
 					$this->template->assign_block_vars($block_name.'.options', [
-						'OPTION' => gettype($v) == 'string' ? $v : @$v['post_subject'],
-						'VALUE' => gettype($v) == 'string' ? $v : @$v['topic_id'],
+						'OPTION' => gettype($v) == 'string' ? $v : $v['post_subject'],
+						'VALUE' => gettype($v) == 'string' ? $v : $v['topic_id'],
 					]);
 
 				foreach ($attaches AS $v) {
@@ -922,12 +921,12 @@ XML
 	}
 
 	function parse_attachments_modify_template_data($vars) {
-		if (@$this->attachments) {
+		if ($this->attachments) {
 			$post_id = $vars['attachment']['post_msg_id'];
 
 			// Assigne les valeurs au template
 			$this->block_array = $vars['block_array'];
-			$this->block_array['TEXT_SIZE'] = strlen (@$this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
+			$this->block_array['TEXT_SIZE'] = strlen ($this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
 			$this->block_array['DATE'] = str_replace (' 00:00', '', $this->user->format_date($vars['attachment']['filetime']));
 			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; //TODO ARCHI Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
 			$this->block_array['EXIF'] = $vars['attachment']['exif'];
@@ -981,23 +980,23 @@ XML
 			$attachment ['physical_filename'] = '../'.$attachment ['real_filename']; // script = download/file.php
 
 		if ($exif = @exif_read_data ('../files/'.$attachment['physical_filename'])) {
-			$fls = explode ('/', @$exif ['FocalLength']);
+			$fls = explode ('/', $exif ['FocalLength']);
 			if (count ($fls) == 2)
 				$info[] = round($fls[0]/$fls[1]).'mm';
 
-			$aps = explode ('/', @$exif ['FNumber']);
+			$aps = explode ('/', $exif ['FNumber']);
 			if (count ($aps) == 2)
 				$info[] = 'f/'.round($aps[0]/$aps[1], 1).'';
 
-			$exs = explode ('/', @$exif ['ExposureTime']);
+			$exs = explode ('/', $exif ['ExposureTime']);
 			if (count ($exs) == 2)
 				$info[] = '1/'.round($exs[1]/$exs[0]).'s';
 
-			if (@$exif['ISOSpeedRatings'])
+			if ($exif['ISOSpeedRatings'])
 				$info[] = $exif['ISOSpeedRatings'].'ASA';
 
-			if (@$exif ['Model']) {
-				if (@$exif ['Make'] &&
+			if ($exif ['Model']) {
+				if ($exif ['Make'] &&
 					strpos ($exif ['Model'], $exif ['Make']) === false)
 					$info[] = $exif ['Make'];
 				$info[] = $exif ['Model'];
@@ -1006,7 +1005,7 @@ XML
 			$this->db->sql_query (implode (' ', [
 				'UPDATE '.ATTACHMENTS_TABLE,
 				'SET exif = "'.implode (' ', $info ?: ['~']).'",',
-					'filetime = '.(strtotime(@$exif['DateTimeOriginal']) ?: @$exif['FileDateTime'] ?: @$attachment['filetime']),
+					'filetime = '.(strtotime($exif['DateTimeOriginal']) ?: $exif['FileDateTime'] ?: $attachment['filetime']),
 				'WHERE attach_id = '.$attachment['attach_id']
 			]));
 		}
@@ -1018,7 +1017,7 @@ XML
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
-				$temporaire = '../cache/geobb/'.$pn['basename'].'.'.$max_size.@$pn['extension'];
+				$temporaire = '../cache/geobb/'.$pn['basename'].'.'.$max_size.$pn['extension'];
 
 				// Si le fichier temporaire n'existe pas, il faut le creer
 				if (!is_file ($temporaire)) {
@@ -1034,7 +1033,7 @@ XML
 						6 => -90,
 						8 =>  90,
 					];
-					$a = @$angle [$exif ['Orientation']];
+					$a = $angle [$exif ['Orientation']];
 					if ($a)
 						$image_src = imagerotate ($image_src, $a, 0);
 					if (abs ($a) == 90) {

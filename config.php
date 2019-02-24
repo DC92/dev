@@ -16,7 +16,7 @@ define('PHPBB_INSTALLED', true);
 define('PHPBB_ENVIRONMENT', 'production');
 // define('DEBUG_CONTAINER', true);
 
-error_reporting(E_ALL);
+error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 'on');
 
 define('TRACES_DOM', 'test');

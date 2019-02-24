@@ -12,7 +12,8 @@
 
 <script>
 	window.addEventListener('load', function() {
-		var map = new ol.MyMap({
+		var eljson = document.getElementById('marqueur-json'),
+			map = new ol.MyMap({
 				target: 'map',
 				layers: [
 					aspirLayer({TOPIC_ID})
@@ -20,7 +21,7 @@
 				controls: aspirControls({
 					geoKeys: {GEO_KEYS},
 					controlPermalink: {
-						init: false
+						init: eljson.innerHTML.search(/[0-9]/) == -1 // If a valid coordinate is specified
 					}
 				})
 			});
@@ -35,8 +36,7 @@
 			map.getView().setZoom(15);
 
 		<!-- ELSEIF GEOJSON -->
-			var eljson = document.getElementById('marqueur-json'),
-				format = new ol.format.GeoJSON({
+			var format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"
 				}),
 				source = new ol.source.Vector({
@@ -44,7 +44,8 @@
 				});
 
 			// Center the map
-			map.getView().fit(source.getExtent());
+			if (!ol.extent.isEmpty(source.getExtent()))
+				map.getView().fit(source.getExtent());
 		<!-- ENDIF -->
 	});
 </script>

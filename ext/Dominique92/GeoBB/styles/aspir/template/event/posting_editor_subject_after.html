@@ -28,7 +28,8 @@
 <script>
 	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
-		var overlay = aspirLayer(0, {TOPIC_ID}, true),
+		var eljson = document.getElementById('editable-json'),
+			overlay = aspirLayer(0, {TOPIC_ID}, true),
 			edit = controlEdit({
 				inputId: 'editable-json',
 				snapLayers: [overlay],
@@ -40,7 +41,7 @@
 					type: 'Polygon'
 				}]
 			});
-
+			
 		map = new ol.MyMap({
 			target: 'map',
 			layers: [
@@ -48,13 +49,14 @@
 			],
 			controls: aspirControls({
 				geoKeys: {GEO_KEYS},
-				controlPermalink:{
+				controlPermalink: {
 					visible: false,
-					init: !{POST_ID},
+					init: eljson.innerHTML.search(/[0-9]/) == -1, // If a valid coordinate is specified
 					initialCenter: function(c) {
 						permaCenter = c;
 					}
 				}
+				
 			})
 		});
 
@@ -63,15 +65,12 @@
 			map.addLayer(editable);
 		<!-- ELSE -->
 			map.addControl(edit);
-		<!-- ENDIF -->
 
-		// Center the map
-		if ({POST_ID})
-			map.getView().fit(
-				edit.source_.getExtent(), {
-					maxZoom: 15
-				}
-			);
+			// Center the map
+			if (!ol.extent.isEmpty(source_.getExtent()))
+				map.getView().fit(
+					edit.source_.getExtent());
+		<!-- ENDIF -->
 	});
 </script>
 
