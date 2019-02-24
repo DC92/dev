@@ -8,6 +8,7 @@
  */
 
 namespace Dominique92\GeoBB\event;
+//TODO all tests with php error all
 
 if (!defined('IN_PHPBB'))
 {
@@ -332,14 +333,13 @@ class listener implements EventSubscriberInterface
 
 		// Récupère la traduction des données spaciales SQL
 		if (isset ($post_data['geom'])) {
-			// Conversion WKT <-> geoJson
 			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
 				' FROM '.POSTS_TABLE.
 				' WHERE post_id = '.$post_data['post_id'];
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-			$post_data['geojson'] = $row['geojson'];
+			$post_data['geojson'] = @$row['geojson'];
 		}
 
 		// To prevent an empty title invalidate the full page and input.
@@ -503,7 +503,10 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Calcul de la surface en ha
-		if (array_key_exists ('geo_surface', $row) && !$row['geo_surface']); {
+		if (array_key_exists ('geo_surface', $row) &&
+			!$row['geo_surface'] &&
+			$row['area'] && $row['center']
+		) {
 			$update['geo_surface'] =
 				round ($row['area']
 					* 1111 // hm par ° delta latitude
@@ -512,7 +515,10 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Calcul de l'altitude avec mapquest
-		if (array_key_exists ('geo_altitude', $row) && !$row['geo_altitude']) {
+		if (array_key_exists ('geo_altitude', $row) &&
+			!$row['geo_altitude'] &&
+			$row['center']
+		) {
 			global $geo_keys;
 			//TODO BLOQUANT BUG : ne pas redemander pour les surfaces où c'est 0
 			$mapquest = @file_get_contents (
@@ -529,9 +535,9 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Infos refuges.info
-		if ((array_key_exists('geo_massif', $row) && !$row['geo_massif']) ||
-			(array_key_exists('geo_reserve', $row) && !$row['geo_reserve']) ||
-			(array_key_exists('geo_ign', $row) && !$row['geo_ign'])) {
+		if ((array_key_exists('geo_massif', $row) && !$row['geo_massif'] && $row['center']) ||
+			(array_key_exists('geo_reserve', $row) && !$row['geo_reserve'] && $row['center']) ||
+			(array_key_exists('geo_ign', $row) && !$row['geo_ign'] && $row['center'])) {
 			$update['geo_massif'] = null;
 			$update['geo_reserve'] = null;
 			$igns = [];
@@ -630,15 +636,16 @@ XML
 					false,
 					stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
 				));
-				$update['geo_commune'] = $nominatim->address->postcode.' '.(
-					$nominatim->address->town ?:
-					$nominatim->address->city ?:
-					$nominatim->address->suburb  ?:
-					$nominatim->address->village ?:
-					$nominatim->address->hamlet ?:
-					$nominatim->address->neighbourhood ?:
-					$nominatim->address->quarter 
-				);
+				if ($nominatim && $nominatim->address)
+					@$update['geo_commune'] = $nominatim->address->postcode.' '.(
+						$nominatim->address->town ?:
+						$nominatim->address->city ?:
+						$nominatim->address->suburb  ?:
+						$nominatim->address->village ?:
+						$nominatim->address->hamlet ?:
+						$nominatim->address->neighbourhood ?:
+						$nominatim->address->quarter 
+					);
 			}
 		}
 
@@ -690,7 +697,7 @@ XML
 			$vars['SQL_TYPE'] = 'text';
 			$vars['DISPLAY_VALUE'] =
 			$vars['POST_VALUE'] =
-				str_replace ('~', '', $post_data[$sql_id]);
+				str_replace ('~', '', @$post_data[$sql_id]);
 			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
 
 			// {|1.1 Title
@@ -735,11 +742,10 @@ XML
 				if (count($options) > 2) {
 					$length = 0;
 					foreach ($options AS $o)
-						$length = max ($lengt, strlen ($o) + 1);
+						$length = max ($length, strlen ($o) + 1);
 					$vars['TAG'] = 'select';
-//TODO BUG si data déjà existante mais trop longue dans la colonnes
 					$vars['SQL_TYPE'] = 'text';
-//TODO revoir longueur champs					$vars['SQL_TYPE'] = 'varchar-'.$length;
+					$vars['SQL_TYPE'] = 'varchar-'.$length;
 				}
 
 				// sql_id|titre|proches
@@ -858,8 +864,8 @@ XML
 				count (explode ('.', $block_name)) == 1) {
 				foreach ($options AS $v)
 					$this->template->assign_block_vars($block_name.'.options', [
-						'OPTION' => gettype($v) == 'string' ? $v : $v['post_subject'],
-						'VALUE' => gettype($v) == 'string' ? $v : $v['topic_id'],
+						'OPTION' => gettype($v) == 'string' ? $v : @$v['post_subject'],
+						'VALUE' => gettype($v) == 'string' ? $v : @$v['topic_id'],
 					]);
 
 				foreach ($attaches AS $v) {
@@ -1015,7 +1021,7 @@ XML
 				$temporaire = '../cache/geobb/'.$pn['basename'].'.'.$max_size.@$pn['extension'];
 
 				// Si le fichier temporaire n'existe pas, il faut le creer
-				if (!is_file ($temporaire)); {
+				if (!is_file ($temporaire)) {
 					$mimetype = explode('/',$attachment['mimetype']);
 
 					// Get source image

@@ -2,6 +2,7 @@ CORRECTIONS aspir.dc9
 =====================
 wifi.png -> reseau.png
 le cafe du village, ...) => Mettre une (
+Nom de fiche : Cabanes -> Cabane
 
 irstea_code||automatique
 irstea_type||automatique
@@ -10,17 +11,21 @@ unite_pastorale||automatique
 Questions :
 Fonds de carte, controles
 Visibilité moteurs recherche
+Titre du site et slogan en haut de page (banière)
 
-INSTALL
-=======
+INSTALL O2
+==========
+Cpanel -> Bases de données MySQL
 Créer BDD
+Ajouter un nouvel utilisateur
+Ajouter un nouvel utilisateur à la base de données
 Copier PhpBB3 sauf doc
 Copier repertoire de GeoBB + aspir_import.php
 Lancer install
 -> Français -> Change
 Installer -> Installer
-config.php -> clés cartes : $geoKeys = [...]
 Supprimer install
+config.php -> clés cartes : $geoKeys = [...]
 Administration ==>
 Général -> Gérer les forums -> Créer
 	Alpages [first=surface][/first][fiche=Alpages][/fiche]
@@ -44,7 +49,8 @@ Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
 Personnaliser -> Désactiver VigLink
 Personnaliser -> Installation de styles -> Aspir -> Détails -> Définir comme style par défaut
 Personnaliser -> Gérer de styles -> Prosilver -> Désactiver
-Créer un item d'Alpage, Cabane, Point d'eau
+Créer les sujets de configuration : Formulaires, Aide, Bienvenue
+Créer un item d'Alpage, Cabane, Point d'eau, Réseau
 Exécuter ext/Dominique92/GeoBB/styles/aspir/import
 Move ext/Dominique92/GeoBB/styles/aspir/import/LOG/... LOG/
 Administration -> Gérer les forums -> Alpages -> Resynchroniser

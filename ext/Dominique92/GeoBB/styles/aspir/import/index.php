@@ -25,7 +25,7 @@ $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 
-include('./geoPHP/geoPHP.inc');
+include($phpbb_root_path . 'assets/geoPHP/geoPHP.inc');
 include('./proj4php/vendor/autoload.php');
 use proj4php\Proj4php;
 use proj4php\Proj;

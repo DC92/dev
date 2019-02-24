@@ -1,18 +1,20 @@
 /* Card's encapsulation */
-#map-frame,
-.section-posting #map {
+#map-frame {
 	float: right;
 	background: white;
-	border-left: solid white 10px;
-	border-bottom: solid white 10px;
 }
 /* Overlay selector, underneath the card */
 #map-frame ul {
     list-style-type: none;
+	margin-left: 10px;
+	margin-bottom: 10px;
 }
 
 /* Map area managed by Openlayers */
 #map {
+	float: right;
+	margin-left: 10px;
+	margin-bottom: 10px;
 	width: calc(33vw + 266px);
 	height: calc(33vw + 266px);
 	background-image: linear-gradient(#9AB4CB, #9BCB9A);

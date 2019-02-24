@@ -16,6 +16,9 @@ define('PHPBB_INSTALLED', true);
 define('PHPBB_ENVIRONMENT', 'production');
 // define('DEBUG_CONTAINER', true);
 
+error_reporting(E_ALL);
+ini_set('display_errors', 'on');
+
 define('TRACES_DOM', 'test');
 define('META_ROBOTS', 'noindex, nofollow');
 
