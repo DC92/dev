@@ -86,7 +86,7 @@ foreach ($epiphp->features as $p)
 		// Get geometry
 		$geomjson = json_encode($p->geometry);
 		$geomphp = \geoPHP::load ($geomjson, 'json');
-		$geomsql = 'GeomFromText("'.$geomphp->out('wkt').'")';
+		$geomsql = 'GeomFromText("'.$geomphp->out('wkt').'",4326)';
 
 		// Normalise data
 		if (!$p->properties->surface)

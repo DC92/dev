@@ -472,6 +472,7 @@ class listener implements EventSubscriberInterface
 
 	// Calcul des données automatiques
 	//TODO revoir et systématiser ~
+	//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
 	function get_automatic_data(&$row) {
 		if (!$row['geojson'])
 			return;

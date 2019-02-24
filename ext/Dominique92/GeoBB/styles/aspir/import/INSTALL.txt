@@ -1,3 +1,16 @@
+CORRECTIONS aspir.dc9
+=====================
+wifi.png -> reseau.png
+le cafe du village, ...) => Mettre une (
+
+irstea_code||automatique
+irstea_type||automatique
+unite_pastorale||automatique
+
+Questions :
+Fonds de carte, controles
+Visibilité moteurs recherche
+
 INSTALL
 =======
 Créer BDD
