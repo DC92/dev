@@ -1,3 +1,7 @@
+BUGS
+====
+Bienvenue ne marche pas
+
 CORRECTIONS aspir.dc9
 =====================
 wifi.png -> reseau.png

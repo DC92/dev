@@ -61,7 +61,7 @@
 				controlPermalink: {
 					visible: false,
 					init: eljson.innerHTML.search(/[0-9]/) == -1, // If a valid coordinate is specified
-					initialCenter: function(c) {
+					initialCenter: function(c) { //TODO ARCHI horible hack !
 						permaCenter = c;
 					}
 				},

@@ -8,7 +8,6 @@
  */
 
 namespace Dominique92\GeoBB\event;
-//TODO all tests with php error all
 
 if (!defined('IN_PHPBB'))
 {
@@ -393,7 +392,6 @@ class listener implements EventSubscriberInterface
 				// Create or modify the SQL column
 				if (count ($ks) == 3)
 					$ks[2] = '('.$ks[2].')';
-				//TODO BUG O2 ne transforme pas la colonne SQL geom en GEOMETRY quand initialise avec 1 seul forum pas geom
 				$this->db->sql_query(
 					'ALTER TABLE '.POSTS_TABLE.
 					(in_array ($ks[0], $special_columns) ? ' CHANGE '.$ks[0].' ' : ' ADD ').

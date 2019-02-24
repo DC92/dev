@@ -29,18 +29,7 @@
 	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
 		var eljson = document.getElementById('editable-json'),
-			overlay = aspirLayer(0, {TOPIC_ID}, true),
-			edit = controlEdit({
-				inputId: 'editable-json',
-				snapLayers: [overlay],
-				styleOptions: topicStyleOptions,
-				editStyleOptions: editStyleOptions,
-				enableAtInit: true,
-				title: titleEdit,
-				draw: [{
-					type: 'Polygon'
-				}]
-			});
+			overlay = aspirLayer(0, {TOPIC_ID}, true);
 			
 		map = new ol.MyMap({
 			target: 'map',
@@ -64,10 +53,22 @@
 			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
 			map.addLayer(editable);
 		<!-- ELSE -->
+			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for O2switch sql bug / still here ?
+			var edit = controlEdit({
+				inputId: 'editable-json',
+				snapLayers: [overlay],
+				styleOptions: topicStyleOptions,
+				editStyleOptions: editStyleOptions,
+				enableAtInit: true,
+				title: titleEdit,
+				draw: [{
+					type: 'Polygon'
+				}]
+			})
 			map.addControl(edit);
 
 			// Center the map
-			if (!ol.extent.isEmpty(source_.getExtent()))
+			if (!ol.extent.isEmpty(edit.source_.getExtent()))
 				map.getView().fit(
 					edit.source_.getExtent());
 		<!-- ENDIF -->

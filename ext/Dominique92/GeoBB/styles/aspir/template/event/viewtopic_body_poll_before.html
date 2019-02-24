@@ -40,7 +40,7 @@
 					featureProjection: "EPSG:3857"
 				}),
 				source = new ol.source.Vector({
-					features: format.readFeatures(eljson.innerHTML)
+					features: format.readFeatures(eljson.innerHTML.replace(':]',':[]')) //TODO hack for O2switch sql bug / still here ?
 				});
 
 			// Center the map

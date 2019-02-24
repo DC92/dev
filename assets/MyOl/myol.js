@@ -858,6 +858,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 /**
  * JSON.parse handling error
  */
+//TODO BEST apply to format.readFeatures
 function JSONparse(json) {
 	let js;
 	if (json)
