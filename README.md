@@ -1,59 +1,59 @@
 Dominique92.GeoBB
 =================
-- GeoBB est une extension cartographique pour forums PhpBB 3.2+ associant des points, lignes ou surfaces sur une carte à un sujet dans un forum.
-- Chaque forum regroupe les éléments de même catégorie (même icône sur la carte).
-- Chaque sujet ou commentaire dans le forum peut être représenté par une icône, des lignes ou des surfaces sur la carte.
+- GeoBB is a map extension for PhpBB 3.2+ forums associating points, lines or surfaces on a map to a topic in a forum.
+- Each forum groups elements of the same category (same icon on the map).
+- Each topic or comment in the forum can be represented by an icon, lines or areas on the map.
 
 DEMO
 ====
-Logiciel du site http://aspir.dc9.fr
+Website software of http://alpages.info
 
 INSTALLATION
 ============
-* Pré-requis:
-	- Hébergement PHP 5.3.3 min & MySQL 5.5 min (pour les fonctions géographiques)
+* Prerequisites:
+	- Hosting PHP 5.4 and above & MySQL 5.7 and above
 
-* Installer un forum PhpBB 3.x:
-	- Télécharger le [pack complet](http://www.phpbb-fr.com/telechargements/)
-	- Déziper et transférer sur le serveur.
-	Pour en savoir plus: [doc install PhpBB](https://www.phpbb.com/community/docs/INSTALL.html)
-	- Créer une base vide sur MySQL ou utiliser une base existante.
-	- Aller à la racine du forum depuis un explorateur, suivre les instructions.
-	- Pour en savoir plus: [Documentation sur le forum](https://www.phpbb.com/support/docs/en/3.2/ug/)
+* Install a PhpBB 3.2.x forum:
+	- Download the [complete pack] (http://www.phpbb-fr.com/telechargements/)
+	- Unzip and transfer it to the server.
+	To learn more: [doc install PhpBB] (https://www.phpbb.com/community/docs/INSTALL.html)
+	- Create an empty MySQL database or use an existing database.
+	- Go to the root of the forum from an explorer, follow the instructions.
+	- To learn more: [Forum Documentation] (https://www.phpbb.com/support/docs/en/3.2/ug/)
 
-* Installer GeoBB:
-	- Télécharger cette extension (Bouton "Download ZIP" ci dessus)
-	- Déziper et transférer à la racine du forum.
-	- Aller dans l'administration du forum (Lien en bas de page du forum) => PERSONALISER => Gérer les extensions => GeoBB => Activer
-	- FORUMS => Gérer les forums => Créer un nouveau forum
-	- Copier les permissions depuis: => Votre premier forum
-	- Nom du forum: Le nom du type des points qui seront dans ce forum.
-	- Image du forum: L'URL de icone qui représentera les points de ce forum (facultatif).
-	Ces icones (fichiers .png 16x16) sont à tansférer dans un répertoire quelconque du serveur.
-		- Exemple: ```ext/Dominique92/GeoBB/types_points/site.png```
-	- Description: Insérer l'une les chaines de caractères suivantes:
-		- ```[first=point]``` si vous voulez associer une position à chaque sujet du forum (en fait au premier commentaire de chaque sujet).
-		- ```[all=point]``` si vous voulez associer une position à chaque commentaire de chaque sujet.
-		- ```[first=line]``` si vous voulez associer des lignes au premier commentaire de chaque sujet.
-		- ```[all=line]``` si vous voulez associer des lignes à chaque commentaire de chaque sujet.
-		- ```[first=surface]``` si vous voulez associer des surfaces au premier commentaire de chaque sujet.
-		- ```[all=surface]``` si vous voulez associer des surfaces à chaque commentaire de chaque sujet.```
-	- Envoyer
+* Install GeoBB:
+	- Download this extension ("Download ZIP" button above)
+	- Unzip and transfer to the root of the forum.
+	- Go to the forum administration (Link at the bottom of the forum) => PERSONALIZE => Manage extensions => GeoBB => Activate
+	- FORUMS => Manage Forums => Create a new forum
+	- Copy permissions from: => Your first forum
+	- Forum Name: The name of the type of points that will be in this forum.
+	- Forum image: The icon URL that will represent the points of this forum (optional).
+	These icons (.png 16x16 files) are to be transferred to any directory of the server.
+		- Example: ```ext/Dominique92/GeoBB/types_points/site.png```
+	- Description: Insert one of the following strings:
+		- ```[first=point]``` if you want to associate a position to each topic of the forum (in fact to the first comment of each subject).
+		- ```[all=point]``` if you want to associate a position with each comment of each topic.
+		- ```[first=line]``` if you want to associate lines with the first comment of each topic.
+		- ```[all=line]``` if you want to associate lines with each comment of each topic.
+		- ```[first=surface]``` if you want to associate surfaces with the first comment of each topic.
+		- ```[all = surface]``` if you want to associate surfaces with each comment of each topic.
+	- Submit
 
-* Créer un point:
-	- Aller sur le site => Dans le nouveau forum => Nouveau sujet
-	- Entrer le nom, un commentaire, faire glisser le curseur jaune sur la carte pour définir la position.
-	- Envoyer
+* Create a point:
+	- Go to the website => In the new forum => New subject
+	- Enter the name, comment, drag the yellow cursor on the map to set the position.
+	- Submit
 
-* Customisation:
-(facultatif, pour développeur)
+* Customization:
+(optional, for developer)
 	- Style:
-		- [Les bases des styles](https://www.phpbb.com/styles/installing/)
-		- [Styles de PhpBB 3.2 téléchargeables](https://www.phpbb.com/customise/db/styles/board_styles-12/3.2?sk=r&sd=d)
-		- [Edition et création de styles](https://www.phpbb.com/styles/create/)
-	- Fonctionnalités:
-		- [Les extensions](https://www.phpbb.com/extensions/)
-		- [Extensions de PhpBB 3.2 téléchargeables](https://www.phpbb.com/customise/db/extensions-36/3.2?sk=r&sd=d)
-		- [Développer une extension](https://www.phpbb.com/extensions/writing/)
-	- Affichage des cartes:
-		- L'affichage des cartes est réalisé par une librairie basée sur Openlayers, un certain nombre de plugins et d'optimisations dont les sources sont disponibles [ICI](https://github.com/Dominique92/MyOl)
+	- [The basics of styles] (https://www.phpbb.com/styles/installing/)
+	- [downloadable PhpBB 3.2 Styles] (https://www.phpbb.com/customise/db/styles/board_styles-12/3.2?sk=r&sd=d)
+	- [Editing and creating styles] (https://www.phpbb.com/styles/create/)
+	- Features:
+	- [The extensions] (https://www.phpbb.com/extensions/)
+	- [Downloadable PhpBB 3.2 Extensions] (https://www.phpbb.com/customise/db/extensions-36/3.2?sk=r&sd=d)
+	- [Develop an extension] (https://www.phpbb.com/extensions/writing/)
+	- Display of maps:
+	- The map display is realized by a library based on Openlayers, a number of plugins and optimizations whose sources are available [HERE] (https://github.com/Dominique92/MyOl)
