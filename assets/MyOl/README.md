@@ -1,6 +1,7 @@
 Dominique92.MyOl
 ================
 This package intent to make you able to implement an [openlayer map](https://openlayers.org/) in your own website.
+It is deployed on http://alpages.info
 
 SIMPLE EXAMPLE
 ==============
@@ -23,7 +24,7 @@ MyOL extension provides supplementary functions to [Openlayers V5](https://openl
 * GeoJson ajax layers,
 * Multi vendors maps &amp; projections:
 ```
-- OSM, Maps.Refuges.Info
+- OSM, OSM-FR, Maps.Refuges.Info
 - ThunderForest Outdoors, Cycles, Landscape, Transport, ...
 - IGN France, cadastre, photos
 - SwissTopo
@@ -49,6 +50,13 @@ The coding rules are volontary simple & don't follow all openlayers's
 * Few classes, no inheritage, no jquery...
 * Each adaptation is included in a single JS function that you can include separately (check dependencies if any)
 * Feel free to use, modify & share as you want
+
+DEPENDENCIES
+============
+This package includes :
+* openlayers v5.3.0
+* proj4js 2.5.0
+* ol-geocoder v3.2.0
 
 FILES
 =====

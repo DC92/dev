@@ -8,6 +8,11 @@ DEMO
 ====
 Website software of http://alpages.info
 
+DEPENDENCIES
+============
+This package includes : https://github.com/Dominique92/MyOl
+This package is tested with : PhpBB 3.2.5
+
 INSTALLATION
 ============
 * Prerequisites:
