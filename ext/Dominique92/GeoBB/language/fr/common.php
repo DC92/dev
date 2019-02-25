@@ -57,5 +57,8 @@ $lang = array_merge($lang, array(
 	'FAQ_EXPLAIN' => 'Documentation des fonctions du site',
 
 	// Footer
-	'FINAL_INTEGRATION_BY' => 'Copyright &copy; <a href="https://github.com/Dominique92">Dominique Cavailhez</a> 2016. Sur la base de PhpBB',
+	'FINAL_INTEGRATION_BY' =>
+		'&copy; Dominique Cavailhez 2016 <a href="https://github.com/Dominique92/GeoBB32">GeoBB32</a> &amp; '.
+		'<a href="https://github.com/Dominique92/MyOl">MyOl</a>, '.
+		'based on <a href="https://www.phpbb.com/">phpBB</a>',
 ));

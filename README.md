@@ -42,7 +42,7 @@ INSTALLATION
 		- ```[first=line]``` if you want to associate lines with the first comment of each topic.
 		- ```[all=line]``` if you want to associate lines with each comment of each topic.
 		- ```[first=surface]``` if you want to associate surfaces with the first comment of each topic.
-		- ```[all = surface]``` if you want to associate surfaces with each comment of each topic.
+		- ```[all=surface]``` if you want to associate surfaces with each comment of each topic.
 	- Submit
 
 * Create a point:
