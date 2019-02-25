@@ -773,10 +773,10 @@ XML
 								$vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
 							}
 						}
-						ksort ($options);
+						ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du centre
 						$this->db->sql_freeresult($result);
 					} else
-						$vars['STYLE'] = 'display:none'; // Hide at creation
+						$vars['INNER'] .= ' : <span style="color:red">indisponible en création<span>';
 				}
 
 				// sql_id|titre|attaches

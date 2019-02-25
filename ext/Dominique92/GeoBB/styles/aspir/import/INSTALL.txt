@@ -1,21 +1,20 @@
-BUGS
-====
-Bienvenue ne marche pas
-
 CORRECTIONS aspir.dc9
 =====================
 wifi.png -> reseau.png
 le cafe du village, ...) => Mettre une (
 Nom de fiche : Cabanes -> Cabane
+Beinvenue += aspir
 
 irstea_code||automatique
 irstea_type||automatique
 unite_pastorale||automatique
 
-Questions :
+Questions
+=========
 Fonds de carte, controles
 Visibilité moteurs recherche
 Titre du site et slogan en haut de page (banière)
+Style du site (couleur, banière, icone, photos de fond, ...)
 
 INSTALL O2
 ==========
