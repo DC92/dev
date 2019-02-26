@@ -1,7 +1,7 @@
 Dominique92.MyOl
 ================
-This package adds many features to [openlayer map](https://openlayers.org/).
-It is deployed on http://alpages.info
+* This package adds many features to [openlayer map](https://openlayers.org/).
+* It is deployed on http://alpages.info
 
 SIMPLE EXAMPLE
 ==============
@@ -22,7 +22,7 @@ FULL FUNCTIONS
 ==============
 MyOL extension provides supplementary functions to [Openlayers V5](https://openlayers.org/)
 * GeoJson ajax layers,
-* Multi vendors maps &amp; projections:
+* Multi vendors maps :
 ```
 - OSM, OSM-FR, Maps.Refuges.Info
 - ThunderForest Outdoors, OpenTopoMap, Cycles, Landscape, Transport, ...

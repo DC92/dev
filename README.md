@@ -10,8 +10,8 @@ Website software of http://alpages.info
 
 DEPENDENCIES
 ============
-This package includes : https://github.com/Dominique92/MyOl
-This package is tested with : PhpBB 3.2.5
+* This package includes : https://github.com/Dominique92/MyOl
+* This package is tested with : PhpBB 3.2.5
 
 INSTALLATION
 ============
@@ -38,11 +38,8 @@ INSTALLATION
 		- Example: ```ext/Dominique92/GeoBB/types_points/site.png```
 	- Description: Insert one of the following strings:
 		- ```[first=point]``` if you want to associate a position to each topic of the forum (in fact to the first comment of each subject).
-		- ```[all=point]``` if you want to associate a position with each comment of each topic.
 		- ```[first=line]``` if you want to associate lines with the first comment of each topic.
-		- ```[all=line]``` if you want to associate lines with each comment of each topic.
 		- ```[first=surface]``` if you want to associate surfaces with the first comment of each topic.
-		- ```[all=surface]``` if you want to associate surfaces with each comment of each topic.
 	- Submit
 
 * Create a point:

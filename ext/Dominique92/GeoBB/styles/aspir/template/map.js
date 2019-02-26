@@ -1,3 +1,5 @@
+//TODO BEST : carte par défaut zoome sur les alpages existants (France sud est)
+
 function aspirControls(options) {
 	options = options || {};
 	return [
