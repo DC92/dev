@@ -97,7 +97,7 @@ function layerThunderforest(layer, key) {
 function layerGoogle(layer) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
-			url: '//mt{0-3}.google.com/vt/lyrs=' + layer + '&x={x}&y={y}&z={z}',
+			url: '//mt{0-3}.google.com/vt/lyrs=' + layer + '&hl=fr&x={x}&y={y}&z={z}',
 			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>'
 		})
 	});

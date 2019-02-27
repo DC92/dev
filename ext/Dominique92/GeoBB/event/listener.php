@@ -6,6 +6,7 @@
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
+//TODO ASPIR ajouter champs enregistrement : ucp_register.html
 
 namespace Dominique92\GeoBB\event;
 
@@ -512,6 +513,7 @@ class listener implements EventSubscriberInterface
 				);
 		}
 
+//TODO BUG  $row['geo_altitude'] n'existe pas
 		// Calcul de l'altitude avec mapquest
 		if (array_key_exists ('geo_altitude', $row) &&
 			!$row['geo_altitude'] &&

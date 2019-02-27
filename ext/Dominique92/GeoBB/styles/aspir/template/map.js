@@ -1,18 +1,16 @@
-//TODO BEST : carte par défaut zoome sur les alpages existants (France sud est)
-
 function aspirControls(options) {
 	options = options || {};
 	return [
 		controlLayersSwitcher({
 			baseLayers: {
+				'Satellite': layerGoogle('s'),
+				'Google hybrid': layerGoogle('s,h'),
 				'OSM': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 				'OSM topo': layerOSM(
 					'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 					'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 				),
 				'IGN': layerIGN(options.geoKeys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-				'IGN topo': layerIGN(options.geoKeys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-				'Satellite': layerGoogle('s'),
 				'Cadastre': layerIGN(options.geoKeys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png')
 			}
 		}),

@@ -1,3 +1,5 @@
+//TODO enlever /assets/wri
+
 UPDATE PHPBB
 ============
 Copy full package sauf config.php & docs
