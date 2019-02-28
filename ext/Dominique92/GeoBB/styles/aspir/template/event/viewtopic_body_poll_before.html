@@ -15,7 +15,9 @@
 			map = new ol.MyMap({
 				target: 'map',
 				layers: [
-					aspirLayer({TOPIC_ID})
+					aspirLayer({
+						topidIdSelect: {TOPIC_ID}
+					})
 				],
 				controls: aspirControls({
 					geoKeys: {GEO_KEYS},
@@ -34,7 +36,7 @@
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
 
-		<!-- ELSEIF GEOJSON -->
+		<!-- ELSEIF GEOJSON --> // line / surface
 			var format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"
 				}),

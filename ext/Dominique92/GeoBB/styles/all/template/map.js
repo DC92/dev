@@ -63,7 +63,7 @@ function layerStyleOptionsFunction(properties, id, hover) {
 
 	return {
 		fill: new ol.style.Fill({
-			color: 'rgba(255,255,255,'+(hover ? 0.65 : 0.4)+')'
+			color: 'rgba(255,255,255,' + (hover ? 0.65 : 0.4) + ')'
 		}),
 		stroke: new ol.style.Stroke({
 			color: hover ? 'red' : 'blue',
@@ -72,7 +72,7 @@ function layerStyleOptionsFunction(properties, id, hover) {
 	};
 }
 
-function geoLayer(idColor, idExclude, noHover) {
+function geoLayer(idColor, idExclude, noHover) { // topic_id à colorier, topic_id à exclure, hover / non
 	return new ol.layer.LayerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
 		styleOptions: function(properties) {

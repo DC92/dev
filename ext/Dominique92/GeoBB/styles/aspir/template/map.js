@@ -24,7 +24,9 @@ function aspirControls(options) {
 			className: 'ol-coordinate',
 			undefinedHTML: String.fromCharCode(0)
 		}),
-		controlPermalink(options.controlPermalink),
+		controlPermalink(ol.assign({
+			default: '7/5/45'
+		}, options.controlPermalink)),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
 			label: '',
@@ -56,24 +58,24 @@ var topicStyleOptions = {
 			})
 		}),
 		fill: new ol.style.Fill({
-			color: 'rgba(0,0,0,0.3)'
+			color: 'rgba(0,0,255,0.3)'
 		}),
 		stroke: new ol.style.Stroke({
-			color: 'black'
+			color: 'white'
 		})
 	},
 	editStyleOptions = {
 		stroke: new ol.style.Stroke({
-			color: 'black',
+			color: 'blue',
 			width: 2
 		})
 	},
-	titleEdit = "Cliquer et déplacer un sommet pour modifier un polygone\n"+
-		"Cliquer sur un segment puis déplacer pour créer un sommet\n"+
-		"Alt + cliquer sur un sommet pour le supprimer\n"+
-		"Ctrl + Alt + cliquer sur un côté d 'un polygone pour le supprimer";
+	titleEdit = "Cliquer et déplacer un sommet pour modifier un polygone\n" +
+	"Cliquer sur un segment puis déplacer pour créer un sommet\n" +
+	"Alt + cliquer sur un sommet pour le supprimer\n" +
+	"Ctrl + Alt + cliquer sur un côté d 'un polygone pour le supprimer";
 
-function layerStyleOptionsFunction(properties, id, hover) {
+function layerStyleOptionsFunction(properties, idSelect, transparency /* [fill, stroke] */ ) {
 	if (properties.icon)
 		return {
 			image: new ol.style.Icon({
@@ -82,32 +84,39 @@ function layerStyleOptionsFunction(properties, id, hover) {
 		};
 
 	// The selected property
-	if (properties.id == id)
+	if (properties.id == idSelect)
 		return topicStyleOptions;
 
 	var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
-		colorTr = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',';
+		featureRGBA = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',';
 	return {
 		fill: new ol.style.Fill({
-			color: hover ? colorTr + '0.2)' : colorTr + '0.5)'
+			color: featureRGBA + transparency[0] + ')'
 		}),
 		stroke: new ol.style.Stroke({
-			color: hover ? colorTr + '1)' : colorTr + '0.5)'
+			color: featureRGBA + transparency[1] + ')'
 		})
 	};
 }
+//TODO BUG ne centre pas le curseur sur création point
 
-function aspirLayer(idColor, idExclude, noHover) {
+function aspirLayer(o) {
+	const options = ol.assign({
+		topidIdExclude: '',
+		transparency: [0.5, 0.5],
+		hoverTransparency: [0.2, 1]
+	}, o);
+
 	return new ol.layer.LayerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + options.topidIdExclude + '&',
 		styleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, idColor);
+			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.transparency);
 		},
 		hoverStyleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, idColor, !noHover);
+			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.hoverTransparency);
 		},
 		label: function(properties) {
-			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
+			return options.noLabel ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
 		},
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;

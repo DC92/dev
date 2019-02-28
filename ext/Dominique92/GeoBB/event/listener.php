@@ -513,7 +513,6 @@ class listener implements EventSubscriberInterface
 				);
 		}
 
-//TODO BUG  $row['geo_altitude'] n'existe pas
 		// Calcul de l'altitude avec mapquest
 		if (array_key_exists ('geo_altitude', $row) &&
 			!$row['geo_altitude'] &&
@@ -521,6 +520,7 @@ class listener implements EventSubscriberInterface
 		) {
 			global $geo_keys;
 			//TODO BLOQUANT BUG : ne pas redemander pour les surfaces où c'est 0
+			//TODO BLOQUANT BUG : mapquestapi est limité en nb de requettes !!!
 			$mapquest = @file_get_contents (
 				'http://open.mapquestapi.com/elevation/v1/profile'.
 				'?key='.$geo_keys['mapquest'].
@@ -778,7 +778,7 @@ XML
 						ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du centre
 						$this->db->sql_freeresult($result);
 					} else
-						$vars['INNER'] .= ' : <span style="color:red">indisponible en création<span>';
+						$vars['STYLE'] = 'display:none'; // Hide at posting
 				}
 
 				// sql_id|titre|attaches

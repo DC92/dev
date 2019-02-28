@@ -29,8 +29,12 @@
 	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
 		var eljson = document.getElementById('editable-json'),
-			overlay = aspirLayer(0, {TOPIC_ID}, true);
-			
+			overlay = aspirLayer({
+				topidIdExclude: {TOPIC_ID},
+				hoverTransparency:[0, 1],
+				noLabel: true
+			});
+
 		map = new ol.MyMap({
 			target: 'map',
 			layers: [
@@ -52,8 +56,9 @@
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
 			map.addLayer(editable);
-		<!-- ELSE -->
-			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for O2switch sql bug / still here ?
+
+		<!-- ELSE --> // line / surface
+			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for O2switch sql MariaDB bug / still here ?
 			var edit = controlEdit({
 				inputId: 'editable-json',
 				snapLayers: [overlay],
