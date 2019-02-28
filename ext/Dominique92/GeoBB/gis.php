@@ -17,6 +17,11 @@ $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
 
+$forums = request_var ('forums', ''); // List of forum to include "1,2,3"
+$priority = request_var ('priority', 0); // topic_id à affichage prioritaire
+$exclude = request_var ('exclude', 0); // topic_id to exclude
+$limit = request_var ('limit', 250); // Nombre de points maximum
+
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
 $bbox_sql =
 	$bboxs[0].' '.$bboxs[1].','.
@@ -27,17 +32,13 @@ $bbox_sql =
 
 $diagBbox = hypot ($bboxs[2] - $bboxs[0], $bboxs[3] - $bboxs[1]); // Hypothènuse de la bbox
 
-$priority = request_var ('priority', 0); // topic_id à affichage prioritaire
-$limit = request_var ('limit', 250); // Nombre de points maximum
-$exclude = request_var ('exclude', 0); // topic_id to exclude
-
 // Recherche des points dans la bbox
 $sql_array = [
 	'SELECT' => [
 		'post_subject',
-		'f.forum_id',
-		't.topic_id',
 		'post_id',
+		't.topic_id',
+		'f.forum_id',
 		'forum_image',
 		'forum_desc',
 		'ST_AsGeoJSON(geom) AS geojson',
@@ -51,6 +52,7 @@ $sql_array = [
 		'ON' => 'f.forum_id = p.forum_id',
 	]],
 	'WHERE' => [
+		$forums ? "f.forum_id IN ($forums)" : 'TRUE',
 		't.topic_id != '.$exclude,
 		'geom IS NOT NULL',
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",

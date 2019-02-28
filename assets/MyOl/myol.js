@@ -1098,17 +1098,18 @@ function controlPermalink(o) {
 			params = null;
 		}
 
-		// Check the current map zoom & position
-		const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
-			newParams = [
-				parseInt(view.getZoom()),
-				Math.round(ll4326[0] * 100000) / 100000,
-				Math.round(ll4326[1] * 100000) / 100000
-			];
+		// Set the permalink with current map zoom & position
+		if (view.getCenter()) {
+			const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+				newParams = [
+					parseInt(view.getZoom()),
+					Math.round(ll4326[0] * 100000) / 100000,
+					Math.round(ll4326[1] * 100000) / 100000
+				];
 
-		// Set the new permalink
-		aElement.href = options.hash + 'map=' + newParams.join('/');
-		document.cookie = 'map=' + newParams.join('/') + ';path=/';
+			aElement.href = options.hash + 'map=' + newParams.join('/');
+			document.cookie = 'map=' + newParams.join('/') + ';path=/';
+		}
 	}
 
 	return this_;

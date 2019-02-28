@@ -58,7 +58,7 @@ var topicStyleOptions = {
 			})
 		}),
 		fill: new ol.style.Fill({
-			color: 'rgba(0,0,255,0.3)'
+			color: 'rgba(0,0,0,0.3)'
 		}),
 		stroke: new ol.style.Stroke({
 			color: 'white'
@@ -66,7 +66,7 @@ var topicStyleOptions = {
 	},
 	editStyleOptions = {
 		stroke: new ol.style.Stroke({
-			color: 'blue',
+			color: 'white',
 			width: 2
 		})
 	},
@@ -94,21 +94,22 @@ function layerStyleOptionsFunction(properties, idSelect, transparency /* [fill, 
 			color: featureRGBA + transparency[0] + ')'
 		}),
 		stroke: new ol.style.Stroke({
-			color: featureRGBA + transparency[1] + ')'
+			color: featureRGBA + transparency[1] + ')',
+			width: transparency[2] || 1
 		})
 	};
 }
-//TODO BUG ne centre pas le curseur sur création point
 
 function aspirLayer(o) {
 	const options = ol.assign({
 		topidIdExclude: '',
 		transparency: [0.5, 0.5],
-		hoverTransparency: [0.2, 1]
+		hoverTransparency: [0, 1]
 	}, o);
 
 	return new ol.layer.LayerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + options.topidIdExclude + '&',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + options.topidIdExclude + '&forums=',
+		selectorName: 'couches-alpages',
 		styleOptions: function(properties) {
 			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.transparency);
 		},
