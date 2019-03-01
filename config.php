@@ -30,6 +30,7 @@ $geo_keys = [
 	'bing' => 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt',
 	'mapquest' => 'Fmjtd%7Cluur2968n1%2C70%3Do5-90rs04', // Calcul altitude
 //	'EPSG21781' => true, // Coordonnées suisses
+	'initialFit' => '7/5/45',
 ];
 
 /*

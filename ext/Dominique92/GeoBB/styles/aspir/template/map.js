@@ -25,7 +25,7 @@ function aspirControls(options) {
 			undefinedHTML: String.fromCharCode(0)
 		}),
 		controlPermalink(ol.assign({
-			default: '7/5/45'
+			initialFit: options.geoKeys.initialFit
 		}, options.controlPermalink)),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
