@@ -381,7 +381,6 @@ ol.loadingstrategy.bboxDependant = function(extent, resolution) {
  * Requires permanentCheckboxList
  */
 //TODO-BEST JSON error handling : error + URL
-//TODO BUG recharge sans clean si agrandit la fenetre. Visible sur les polygones/fill
 ol.layer.LayerVectorURL = function(o) {
 	const this_ = this, // For callback functions
 		options = this.options_ = ol.assign({ // Default options
@@ -407,12 +406,20 @@ ol.layer.LayerVectorURL = function(o) {
 			);
 		};
 
+	// HACK to clear the layer when the xhr response is received
+	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
+	const format = new ol.format.GeoJSON();
+	format.readFeatures = function(s, o) {
+		if (source.featuresRtree_)
+			source.featuresRtree_.clear();
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
+	};
+
 	// Manage source & vector objects
 	const source = new ol.source.Vector(ol.assign({
 		strategy: ol.loadingstrategy.bboxDependant,
-		format: new ol.format.GeoJSON(),
+		format: format,
 		url: function(extent, resolution, projection) {
-			source.clear(); // Redraw the layer
 			const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 				// Retreive checked parameters
 				list = permanentCheckboxList(options.selectorName).filter(function(evt) { // selectorName optional
