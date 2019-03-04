@@ -519,19 +519,10 @@ class listener implements EventSubscriberInterface
 			$row['center']
 		) {
 			global $geo_keys;
-			//TODO BLOQUANT BUG : ne pas redemander pour les surfaces où c'est 0
-			//TODO BLOQUANT BUG : mapquestapi est limité en nb de requettes !!!
-			$mapquest = @file_get_contents (
-				'http://open.mapquestapi.com/elevation/v1/profile'.
-				'?key='.$geo_keys['mapquest'].
-				'&callback=handleHelloWorldResponse'.
-				'&shapeFormat=raw'.
-				'&latLngCollection='.$row['center'][1].','.$row['center'][0]
-			);
-			if ($mapquest) {
-				preg_match ('/"height":([0-9]+)/', $mapquest, $match);
+			$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$row['center'][0]}&lat={$row['center'][1]}&zonly=true";
+			preg_match ('/([0-9]+)/', @file_get_contents($api), $match);
+			if ($match)
 				$update['geo_altitude'] = $match[1];
-			}
 		}
 
 		// Infos refuges.info

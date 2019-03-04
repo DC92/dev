@@ -140,8 +140,7 @@ function layerIGN(key, layer, format) {
 			format: format || 'image/jpeg',
 			tileGrid: IGNtileGrid,
 			style: 'normal',
-			attributions: '<a href="http://www.geoportail.fr/" target="_blank">' +
-				'<img src="https://api.ign.fr/geoportail/api/js/latest/theme/geoportal/img/logo_gp.gif"></a>'
+			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>'
 		})
 	});
 }

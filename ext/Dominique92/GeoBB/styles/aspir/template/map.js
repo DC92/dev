@@ -34,7 +34,8 @@ function aspirControls(options) {
 			tipLabel: 'Plein écran'
 		}),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
-		geocoder()
+		geocoder(),
+		controlGPS()
 	];
 }
 
