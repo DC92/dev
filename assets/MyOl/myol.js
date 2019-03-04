@@ -1159,8 +1159,10 @@ function controlGPS(options) {
 				geolocation.setTracking(active);
 				if (active)
 					this_.getMap().addLayer(layer);
-				else
+				else {
 					this_.getMap().removeLayer(layer);
+					this_.getMap().getView().setRotation(0);
+				}
 			}
 		}),
 		// Interface with the GPS system
@@ -1175,8 +1177,14 @@ function controlGPS(options) {
 	});
 
 	geolocation.on('change', function() {
-		const position = ol.proj.fromLonLat(this.getPosition());
-		this_.getMap().getView().setCenter(position);
+		const position = ol.proj.fromLonLat(this.getPosition()),
+			view = this_.getMap().getView();
+		view.setCenter(position);
+
+		if (!this.done) { // Only once
+			this.done = true;
+			view.setZoom(17); // Zoom on the area
+		}
 
 		// Redraw the marker
 		feature.setGeometry(new ol.geom.GeometryCollection([
