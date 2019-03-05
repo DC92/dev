@@ -6,7 +6,7 @@ Dominique92.GeoBB
 
 DEMO
 ====
-Website software of http://alpages.info
+Website software of https://alpages.info
 
 DEPENDENCIES
 ============

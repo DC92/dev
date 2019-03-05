@@ -137,7 +137,7 @@ function layerIGN(key, layer, format) {
 			url: '//wxs.ign.fr/' + key + '/wmts',
 			layer: layer,
 			matrixSet: 'PM',
-			format: format || 'image/jpeg',
+			format: 'image/' + (format || 'jpeg'),
 			tileGrid: IGNtileGrid,
 			style: 'normal',
 			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>'
@@ -1862,7 +1862,6 @@ function controlsCollection(options) {
  * Tile layers examples
  * Requires many
  */
-//TODO BUG investigate : The connection used to load resources from https://api.ign.fr used TLS 1.0 or TLS 1.1, which are deprecated and will be disabled in the future. Once disabled, users will be prevented from loading these resources. The server should enable TLS 1.2 or later. See https://www.chromestatus.com/feature/5654791610957824 for more information.
 function layersCollection(keys) {
 	return {
 		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
@@ -1892,11 +1891,23 @@ function layersCollection(keys) {
 		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-		'IGN Spot': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017'),
-		'IGN plan': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
-		'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
-		// NOT YET	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+//403		'IGN Spot': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
+//Double		'SCAN25TOUR': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
+		'IGN 1950': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
 		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
+		'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
+//400		'ETATMAJOR10': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10', 'png'),
+//400		'IGN.SCAN-OACI': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-OACI', 'png'),
+		'IGN plan': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
+		'IGN route': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
+		'IGN noms': layerIGN(keys.IGN, 'GEOGRAPHICALNAMES.NAMES', 'png'),
+		'IGN rail': layerIGN(keys.IGN, 'TRANSPORTNETWORKS.RAILWAYS', 'png'),
+		'IGN forêt': layerIGN(keys.IGN, 'LANDCOVER.FORESTAREAS', 'png'),
+		'IGN limites': layerIGN(keys.IGN, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
+//403		'SHADOW': layerIGN(keys.IGN, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
+//404		'PN': layerIGN(keys.IGN, 'PROTECTEDAREAS.PN', 'png'),
+//404		'PNR': layerIGN(keys.IGN, 'PROTECTEDAREAS.PNR', 'png'),
+//403		'Avalanches':	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
