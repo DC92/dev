@@ -27,22 +27,9 @@
 		border-left: none;
 	}
 	#map {
+		float: none;
 		width: 100%;
 		margin: 0;
-	}
-}
-/* Responsive map for mobiles */
-@media screen and (max-width: 60px) {
-	.section-posting #map {
-		width: 100%;
-		float: none;
-	}
-}
-@media screen and (max-width: 90px) {
-	.section-posting #map {
-		float: none;
-		border-left: none;
-		width: 100%;
 	}
 }
 
