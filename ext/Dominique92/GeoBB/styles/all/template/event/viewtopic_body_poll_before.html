@@ -3,6 +3,7 @@
 
 <div id="map-frame">
 	<div id="map"></div>
+	<!-- EVENT map_selector -->
 </div>
 <p id="marqueur-json" style="display:none">{GEOJSON}</p>
 
@@ -15,17 +16,14 @@
 		var eljson = document.getElementById('marqueur-json'),
 			map = new ol.MyMap({
 				target: 'map',
-				layers: [
-					geoLayer({TOPIC_ID})
-				],
-				controls: controlsCollection({
+				layers: geoOverlays({
+					view: true,
+					topidIdSelect: {TOPIC_ID}
+				}),
+				controls: geoControls({
 					geoKeys: {GEO_KEYS},
 					controlPermalink: {
 						init: eljson.innerHTML.search(/[0-9]/) == -1 // If a valid coordinate is specified
-					},
-					controlDownloadGPX: {
-						fileName: 'topic', //TODO
-//TODO						extraMetaData: "<desc>description...</desc>\n"
 					}
 				})
 			});
@@ -39,12 +37,12 @@
 			map.getView().setCenter(pos);
 			map.getView().setZoom(15);
 
-		<!-- ELSEIF GEOJSON -->
+		<!-- ELSEIF GEOJSON --> // line / surface
 			var format = new ol.format.GeoJSON({
 					featureProjection: "EPSG:3857"
 				}),
 				source = new ol.source.Vector({
-					features: format.readFeatures(eljson.innerHTML)
+					features: format.readFeatures(eljson.innerHTML.replace(':]',':[]')) //TODO hack for O2switch sql bug / still here ?
 				});
 
 			// Center the map

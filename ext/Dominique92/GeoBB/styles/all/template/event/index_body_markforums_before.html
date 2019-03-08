@@ -2,36 +2,22 @@
 
 <div id="map-frame">
 	<div id="map"></div>
-	<!-- INCLUDE overall_map_selector.html -->
+	<!-- EVENT map_selector -->
 </div>
 
 <div class="geo_presentation">{GEO_PRESENTATION}</div>
-<!-- //TODO BUG grande zone vide sur mobile quand pas de bienvenue -->
 <!-- INCLUDE index_news.html -->
 
 <script>
 	window.addEventListener('load', function() {
 		new ol.MyMap({
 			target: 'map',
-			layers: [
-				geoLayer() // GeoBB overlay
-/*
-//TODO-CHEM complete chemineur
-				layerOverpass({
-					postLabel: postLabel
-				}),
-				layerPointsWri({
-					selectorName: 'wri-poi',
-					postLabel: postLabel
-				}),
-*/
-			],
-			controls: controlsCollection({
-				geoKeys: {GEO_KEYS}
+			layers: geoOverlays({
+				index: true
 			}),
-			controlDownloadGPX: {
-				fileName: 'topics' //TODO name option
-			}
+			controls: geoControls({
+				geoKeys: {GEO_KEYS}
+			})
 		});
 	});
 </script>

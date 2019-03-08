@@ -1,4 +1,15 @@
-function aspirControls(options) {
+// Resize
+$('#map').resizable({
+	handles: 's,w,sw', // 2 côtés et 1 coin
+	resize: function(evt, ui) {
+		ui.position.left = ui.originalPosition.left; // Reste à droite de la page
+	},
+	stop: function(evt) {
+		evt.target.map_.updateSize();
+	}
+});
+
+function geoControls(options) {
 	options = options || {};
 	return [
 		controlLayersSwitcher({
@@ -39,22 +50,14 @@ function aspirControls(options) {
 	];
 }
 
-// Resize
-$('#map').resizable({
-	handles: 's,w,sw', // 2 côtés et 1 coin
-	resize: function(evt, ui) {
-		ui.position.left = ui.originalPosition.left; // Reste à droite de la page
-	},
-	stop: function(evt) {
-		evt.target.map_.updateSize();
-	}
-});
-
 // The style of selected & edited topic
 var topicStyleOptions = {
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
+				color: 'white'
+			}),
+			stroke: new ol.style.Stroke({
 				color: 'black'
 			})
 		}),
@@ -101,14 +104,14 @@ function layerStyleOptionsFunction(properties, idSelect, transparency /* [fill, 
 	};
 }
 
-function aspirLayer(o) {
+function geoOverlays(o) {
 	const options = ol.assign({
 		topidIdExclude: '',
 		transparency: [0.5, 0.5],
 		hoverTransparency: [0, 1]
 	}, o);
 
-	return new ol.layer.LayerVectorURL({
+	return [new ol.layer.LayerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + options.topidIdExclude + '&forums=',
 		selectorName: 'couches-alpages',
 		styleOptions: function(properties) {
@@ -123,5 +126,5 @@ function aspirLayer(o) {
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;
 		}
-	});
+	})];
 }

@@ -1,13 +1,14 @@
 /* Card's encapsulation */
 #map-frame {
 	float: right;
-	background: white;
+	background: rgba(0,0,0,0);
 }
 /* Overlay selector, underneath the card */
 #map-frame ul {
     list-style-type: none;
 	margin-left: 10px;
 	margin-bottom: 10px;
+	background: white;
 }
 
 /* Map area managed by Openlayers */
@@ -28,17 +29,9 @@
 	}
 	#map {
 		width: 100%;
-		margin: 0;
 	}
 }
-/* Responsive map for mobiles */
-@media screen and (max-width: 60px) {
-	.section-posting #map {
-		width: 100%;
-		float: none;
-	}
-}
-@media screen and (max-width: 90px) {
+@media screen and (max-width: 900px) {
 	.section-posting #map {
 		float: none;
 		border-left: none;
@@ -54,11 +47,6 @@
 /* Avoid only 1 news line at the left of the map */
 #news .row:after {
 	content: none;
-}
-
-/* viewtopic.php */
-.topic-edit-button {
-	margin: 5px 0 20px 0;
 }
 
 /* posting.php */

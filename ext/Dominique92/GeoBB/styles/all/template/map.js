@@ -9,6 +9,11 @@ $('#map').resizable({
 	}
 });
 
+var geoControls = controlsCollection;
+/*,
+			controlDownloadGPX: {
+				fileName: 'topics' //TODO name option
+			}*/
 /*
 //TODO-CHEM complete chemineur
 function postLabel(properties, feature, layer, pixel, ll4326) {
@@ -71,9 +76,9 @@ function layerStyleOptionsFunction(properties, id, hover) {
 		})
 	};
 }
-
-function geoLayer(idColor, idExclude, noHover) { // topic_id à colorier, topic_id à exclure, hover / non
-	return new ol.layer.LayerVectorURL({
+//function geoOverlays(options.topidIdSelect, options.topidIdExclude, !options.hoverTransparency
+function geoOverlays(idColor, idExclude, noHover) { // topic_id à colorier, topic_id à exclure, hover / non
+	return [new ol.layer.LayerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
 		styleOptions: function(properties) {
 			return layerStyleOptionsFunction(properties, idColor);
@@ -87,5 +92,15 @@ function geoLayer(idColor, idExclude, noHover) { // topic_id à colorier, topic_
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;
 		}
-	});
+	})];
+/*
+//TODO-CHEM complete chemineur
+				layerOverpass({
+					postLabel: postLabel
+				}),
+				layerPointsWri({
+					selectorName: 'wri-poi',
+					postLabel: postLabel
+				}),
+*/
 }

@@ -1,10 +1,14 @@
 <!-- IF GEO_MAP_TYPE and POST_ID == TOPIC_FIRST_POST_ID -->
 <!-- INCLUDE map.html -->
 
-<div id="map"></div>
+<div id="map-frame">
+	<div id="map"></div>
+	<!-- EVENT map_selector -->
+	<!-- IF 0 -->//TODO BUG Quelques lignes trop longues passent sous la carte<!-- ENDIF -->
+</div>
+<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
 
 <dl class="posting-point" style="clear: left;">
-	<input id="editable-json" name="geom-geometry" type="hidden" value='{GEOJSON}' />
 	<!-- IF 0 -->//TODO-CHEM pour all :
 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p>
 	<!-- ENDIF -->
@@ -16,7 +20,7 @@
 	<!-- IF GEO_MAP_TYPE == 'line' -->
 		<!-- IF 0 -->//TODO explications sur la page<!-- ENDIF -->
 	<!-- ENDIF -->
-
+	
 	<!-- IF GEO_MAP_TYPE == 'surface' -->
 		<h3>Modification polygone</h3>
 		<p>- Cliquer et déplacer un sommet pour modifier un polygone.<br/>
@@ -37,44 +41,50 @@
 	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
 		var eljson = document.getElementById('editable-json'),
-			overlay = geoLayer(0, {TOPIC_ID}, true),
-			edit = controlEdit({
-				inputId: 'editable-json',
-				snapLayers: [overlay],
-				styleOptions: topicStyleOptions,
-				editStyleOptions: editStyleOptions,
-				enableAtInit: true,
-				draw: [{
-					type: 'LineString'
-				}, {
-					type: 'Polygon'
-				}]
+			overlays = geoOverlays({
+				posting: true,
+				topidIdExclude: {TOPIC_ID},
+				<!-- IF GEO_MAP_TYPE == 'surface' -->
+					transparency: [0, 1, 2],
+				<!-- ENDIF -->
+				noLabel: true
 			});
-
+		
 		map = new ol.MyMap({
 			target: 'map',
-			layers: [
-				overlay
-			],
-			controls: controlsCollection({
+			layers: overlays,
+			controls: geoControls({
 				geoKeys: {GEO_KEYS},
 				controlPermalink: {
 					visible: false,
-					init: eljson.innerHTML.search(/[0-9]/) == -1, // If a valid coordinate is specified
-					initialCenter: function(c) { //TODO ARCHI horible hack !
+					init: eljson.value.search(/[0-9]/) == -1, // If a valid coordinate is specified
+					initialCenter: function(c) {
 						permaCenter = c;
 					}
-				},
-				controlDownloadGPX: {
-					fileName: 'topic' //TODO name option
 				}
+				
 			})
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'point' -->
 			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
 			map.addLayer(editable);
-		<!-- ELSE -->
+			map.getView().fit(editable.getSource().getExtent());
+			map.getView().setZoom(15);
+
+		<!-- ELSE --> // line / surface
+			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for O2switch sql MariaDB bug / still here ?
+			var edit = controlEdit({
+				inputId: 'editable-json',
+				snapLayers: overlays,
+				styleOptions: topicStyleOptions,
+				editStyleOptions: editStyleOptions,
+				enableAtInit: true,
+				title: titleEdit,
+				draw: [{
+					type: 'Polygon'
+				}]
+			})
 			map.addControl(edit);
 
 			// Center the map
