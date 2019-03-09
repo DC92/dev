@@ -11,7 +11,10 @@
 /* MASQUAGES */
 .nav-main li:nth-child(2), /* Navbar FAQ  */
 .site_logo,
-w.nav-breadcrumbs,
+.nav-main .quick-links,
+.nav-main .fa-cogs,
+.nav-main .fa-gavel,
+.nav-breadcrumbs,
 .page-body > p, /* Dates & visite */
 .stat-block, /* Qui est en ligne... */
 .footer-row, /* Lignes copyright en bas */
@@ -29,6 +32,21 @@ z.section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
 
+.navbar {
+	padding: 0;
+	background-color: transparent;
+}
+.nav-main {
+	padding: 0 !important;
+}
+.nav-main > li {
+	border: 3px outset #dc0 !important;
+	margin: 0 !important;
+	padding: 0 10px 2px 5px;
+	background-color: #fe0 !important;
+								wwwfloat: right !important;
+}
+
 z input[type="number"] {
 	width: 60px !important;
 	text-align: right;
@@ -43,31 +61,21 @@ z.section-posting .format-buttons {
 }
 body,
 .wrap {
+	max-width: none;
+	min-width: none;
 	margin: 0;
 	border: 0;
 	padding: 0;
-}
-.wrap {
-	max-width: none;
-	min-width: none;
-}
-
-/* Responsive map for mobiles */
-@media screen and (max-width: 600px) {
-	z.section-posting #map {
-		width: 100%;
-		float: none;
-	}
 }
 
 /* ALL */
 /* Bandeau */
 .headerbar {
-	background-image: url("images/banniere.jpg");
 	height: 60px;
 	margin: 0 !important;
-	padding: 0;
 	border-radius: 0;
+	padding: 0;
+	background-image: url("images/banniere.jpg");
 }
 .logo,
 #search-box {
@@ -108,7 +116,9 @@ body,
 }
 #map-frame {
 	margin: 6px 10px 0 5px;
-	border: none !important;
+}
+#map {
+	margin: 0 !important;
 }
 z.username-coloured {
     text-transform: capitalize;
