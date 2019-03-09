@@ -33,6 +33,8 @@ z.section-posting #attach-panel { /* Onglet de chargement de fichier */
 }
 
 .navbar {
+	position: relative;
+	top: -12px;
 	padding: 0;
 	background-color: transparent;
 }
@@ -80,7 +82,7 @@ body,
 .logo,
 #search-box {
 	position: absolute;
-	top: -20px;
+	top: -24px;
 	right: 10px;
 }
 #site-description-geobb {
