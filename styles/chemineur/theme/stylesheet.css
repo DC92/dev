@@ -19,8 +19,8 @@
 .stat-block, /* Qui est en ligne... */
 .footer-row, /* Lignes copyright en bas */
 z.birthday-list,
-zzz.section-viewforum .bar-top,
-.section-viewtopic .bar-top,
+z.section-viewforum .bar-top,
+.section-viewtopic.fiche .bar-top,
 
 z.section-posting input[name="save"],
 z.section-posting input[name="preview"],
@@ -212,10 +212,10 @@ z::-ms-input-placeholder { /* Microsoft Edge */
 
 
 /* Points */
-.section-viewtopic #wrap {
+.section-viewtopic.fiche #wrap {
 	background: url('images/pierre.jpg'); 
 }
-.section-viewtopic .topic-title {
+.section-viewtopic.fiche .topic-title {
 	display: none;; 
 }
 

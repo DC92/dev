@@ -450,6 +450,7 @@ class listener implements EventSubscriberInterface
 		global $geo_keys; // Private / defined in config.php
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
+		preg_match ('/\[(style)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $style);
 		switch ($regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
@@ -459,6 +460,7 @@ class listener implements EventSubscriberInterface
 				$ns = explode ('\\', __NAMESPACE__);
 				$this->template->assign_vars([
 					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
+					'BODY_CLASS' => @$style[2],
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => $regle[2],
 					'GEO_KEYS' => json_encode($geo_keys),
