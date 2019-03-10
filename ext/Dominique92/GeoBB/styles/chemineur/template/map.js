@@ -10,7 +10,8 @@ $('#map').resizable({
 }); //TODO ARCHI centralize in one file
 
 //TODO customize min prosilver / chemineur
-var geoControls = controlsCollection;
+var geoControls = controlsCollection,
+	titleEdit = "//TODO button comment",
 /*,
 			controlDownloadGPX: {
 				fileName: 'topics' //TODO name option
@@ -37,16 +38,16 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 */
 
 /* Overlay vector layer from the GeoBB database */
-var topicStyleOptions = {
+	topicStyleOptions = {
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
 				color: 'red'
 			})
 		}),
-		fill: new ol.style.Fill({
+/*		fill: new ol.style.Fill({
 			color: 'rgba(255,196,196,0.5)'
-		}),
+		}),*/
 		stroke: new ol.style.Stroke({
 			color: 'red',
 			width: 2
@@ -68,12 +69,12 @@ function layerStyleOptionsFunction(properties, id, hover) {
 		};
 
 	return {
-		fill: new ol.style.Fill({
+/*		fill: new ol.style.Fill({
 			color: 'rgba(255,255,255,' + (hover ? 0.65 : 0.4) + ')'
-		}),
+		}),*/
 		stroke: new ol.style.Stroke({
-			color: hover ? 'red' : 'blue',
-			width: hover ? 4 : 3
+			color: 'blue',
+			width: hover ? 4 : 2
 		})
 	};
 }

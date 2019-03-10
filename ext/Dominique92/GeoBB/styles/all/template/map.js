@@ -12,6 +12,7 @@ $('#map').resizable({
 
 //TODO minimize for prosilver
 var geoControls = controlsCollection,
+	//TODO ARCHI ==> 3 variable globales suivantes utilisée dans un aures ficher dans une fonction !!!
 	titleEdit = "//TODO button comment",
 	topicStyleOptions = { /* Editor style */
 		image: new ol.style.Circle({

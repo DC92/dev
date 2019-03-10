@@ -1208,6 +1208,7 @@ function controlGPS(options) {
 	});
 
 	// Keep the map oriented
+	//TODO ARCHI detect if deviceorientation is authorized
 	window.addEventListener("deviceorientation", function(evt) {
 		// Magnetic compas
 		let heading = typeof evt.webkitCompassHeading !== "undefined" ?
