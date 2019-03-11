@@ -69,32 +69,41 @@ function layerStyleOptionsFunction(properties, id, hover) {
 		};
 
 	return {
-/*		fill: new ol.style.Fill({
-			color: 'rgba(255,255,255,' + (hover ? 0.65 : 0.4) + ')'
-		}),*/
+		fill: new ol.style.Fill({
+			color: 'rgba(0,0,255,' + (hover ? 0.2 : 0.1) + ')'
+		}),
 		stroke: new ol.style.Stroke({
 			color: 'blue',
-			width: hover ? 4 : 2
+			width: hover ? 3 : 1.5
 		})
 	};
 }
-//function geoOverlays(options.topidIdSelect, options.topidIdExclude, !options.hoverTransparency
-function geoOverlays(idColor, idExclude, noHover) { // topic_id à colorier, topic_id à exclure, hover / non
+
+//TODO factoriser
+function geoOverlays(o) {
+	const options = ol.assign({
+		topidIdExclude: '',
+		transparency: [0.5, 0.5],
+		hoverTransparency: [0, 1]
+	}, o);
+
 	return [new ol.layer.LayerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + options.topidIdExclude,
 		styleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, idColor);
+			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.transparency);
 		},
 		hoverStyleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, idColor, !noHover);
+			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.hoverTransparency);
 		},
 		label: function(properties) {
-			return noHover ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
+			return options.noLabel ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
 		},
 		href: function(properties) {
 			return 'viewtopic.php?t=' + properties.id;
 		}
 	})];
+}
+
 /*
 //TODO-CHEM complete chemineur
 				layerOverpass({
@@ -105,4 +114,3 @@ function geoOverlays(idColor, idExclude, noHover) { // topic_id à colorier, top
 					postLabel: postLabel
 				}),
 */
-}

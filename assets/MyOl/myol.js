@@ -473,6 +473,7 @@ ol.layer.LayerVectorURL = function(o) {
 		//TODO BUG BEST interagit avec l'éditeur
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
+			hitTolerance: 6,
 			filter: function(feature, layer) {
 				return layer == this_;
 			},
@@ -544,12 +545,15 @@ ol.layer.LayerVectorURL = function(o) {
 							pixel[0] -= map.popElement_.clientWidth / 2;
 							pixel[0] = Math.max(pixel[0], 0); // Bord gauche
 							pixel[0] = Math.min(pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-							pixel[1] -= map.popElement_.clientHeight + 10;
+							pixel[1] -= map.popElement_.clientHeight + 8;
 						}
 						map.popup_.setPosition(map.getCoordinateFromPixel(pixel));
 					}
 				}
-			});
+			}, {
+				hitTolerance: 6,
+			}
+		);
 	}
 };
 ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
@@ -1892,23 +1896,23 @@ function layersCollection(keys) {
 		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-//403		'IGN Spot': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
-//Double		'SCAN25TOUR': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
+		//403		'IGN Spot': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
+		//Double		'SCAN25TOUR': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
 		'IGN 1950': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
 		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
 		'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
-//400		'ETATMAJOR10': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10', 'png'),
-//400		'IGN.SCAN-OACI': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-OACI', 'png'),
+		//400		'ETATMAJOR10': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10', 'png'),
+		//400		'IGN.SCAN-OACI': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-OACI', 'png'),
 		'IGN plan': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
 		'IGN route': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
 		'IGN noms': layerIGN(keys.IGN, 'GEOGRAPHICALNAMES.NAMES', 'png'),
 		'IGN rail': layerIGN(keys.IGN, 'TRANSPORTNETWORKS.RAILWAYS', 'png'),
 		'IGN forêt': layerIGN(keys.IGN, 'LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN(keys.IGN, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
-//403		'SHADOW': layerIGN(keys.IGN, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
-//404		'PN': layerIGN(keys.IGN, 'PROTECTEDAREAS.PN', 'png'),
-//404		'PNR': layerIGN(keys.IGN, 'PROTECTEDAREAS.PNR', 'png'),
-//403		'Avalanches':	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+		//403		'SHADOW': layerIGN(keys.IGN, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
+		//404		'PN': layerIGN(keys.IGN, 'PROTECTEDAREAS.PN', 'png'),
+		//404		'PNR': layerIGN(keys.IGN, 'PROTECTEDAREAS.PNR', 'png'),
+		//403		'Avalanches':	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),

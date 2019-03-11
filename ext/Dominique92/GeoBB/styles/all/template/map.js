@@ -56,7 +56,7 @@ function layerStyleOptionsFunction(properties, id, hover) {
 }
 function geoOverlays(idColor, idExclude, noHover) { // topic_id à colorier, topic_id à exclure, hover / non
 	return [new ol.layer.LayerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + idExclude + '&',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + idExclude + '&',
 		styleOptions: function(properties) {
 			return layerStyleOptionsFunction(properties, idColor);
 		},

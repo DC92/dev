@@ -66,13 +66,13 @@
 			})
 		});
 
-		<!-- IF GEO_MAP_TYPE == 'point' -->
+		<!-- IF GEO_MAP_TYPE == 'Point' -->
 			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
 			map.addLayer(editable);
 			map.getView().fit(editable.getSource().getExtent());
 			map.getView().setZoom(15);
 
-		<!-- ELSE --> // line / surface
+		<!-- ELSE --> // LineString / Polygon
 			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for O2switch sql MariaDB bug / still here ?
 			var edit = controlEdit({
 				inputId: 'editable-json',
@@ -82,7 +82,7 @@
 				enableAtInit: true,
 				title: titleEdit,
 				draw: [{
-					type: 'Polygon'
+					type: '{GEO_MAP_TYPE}'
 				}]
 			})
 			map.addControl(edit);

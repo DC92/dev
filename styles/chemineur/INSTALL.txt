@@ -1,0 +1,10 @@
+Ajouter les smileys WRI
+
+Cabanes
+altitude|Altitude|automatique|m
+massif|Massif|court
+
+
+ASPIR :
+forumdesc : surface => Polygon
+retirer de formulaires : Autres remarques ou commentaires

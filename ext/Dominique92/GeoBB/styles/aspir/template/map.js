@@ -112,7 +112,7 @@ function geoOverlays(o) {
 	}, o);
 
 	return [new ol.layer.LayerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=10000&exclude=' + options.topidIdExclude + '&forums=',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=500&exclude=' + options.topidIdExclude + '&forums=',
 		selectorName: 'couches-alpages',
 		styleOptions: function(properties) {
 			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.transparency);
