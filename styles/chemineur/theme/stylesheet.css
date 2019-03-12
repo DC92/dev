@@ -21,6 +21,7 @@
 z.birthday-list,
 z.section-viewforum .bar-top,
 .section-viewtopic.fiche .bar-top,
+.section-viewtopic.fiche .actions-jump,
 
 z.section-posting input[name="save"],
 z.section-posting input[name="preview"], /*//TODO revoir effet de save et preview sur la saisie d'un point / trace */
@@ -32,7 +33,7 @@ z.section-posting input[name="preview"], /*//TODO revoir effet de save et previe
 	display: block !important;
 }
 
-.navbar {
+#page-header .page-header {
 	position: relative;
 	top: -12px;
 	padding: 0;
@@ -105,7 +106,6 @@ body,
 .search-header {
 	margin-top: 37px;
 }
-/* Bas de page */
 .copyright {
 	background: white;
 }
@@ -176,40 +176,14 @@ z.geo_presentation {
 	margin-bottom: 10px;
 }
 
-/* POSTING.PHP */
-z.section-posting #postingbox fieldset.fields1 dt {
-	width: auto;
-}
-z.section-posting #postingbox fieldset.fields1 dd {
-	margin-left: auto !important;
-}
-z.section-posting .panel {
-	margin-bottom: 0px;
-}
 
-z.geo-info {
-	margin-bottom: 20px;
+/* VIEWTOPIC.PHP */
+.section-viewtopic .pagination {
+	padding: 4px;
+	border: 1px solid white;
+	border-radius: 4px;
+	background: #eee;
 }
-z.geo-info p {
-	margin: 0;
-}
-z.geo-info h4 {
-	margin-top: 5px !important;
-}
-
-z::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-	font-size: 10px;
-	color: #36f !important;
-}
-z:-ms-input-placeholder { /* Internet Explorer 10-11 */
-	font-size: 10px;
-	color: #36f !important;
-}
-z::-ms-input-placeholder { /* Microsoft Edge */
-	font-size: 10px;
-	color: #36f !important;
-}
-
 
 /* Points */
 .section-viewtopic.fiche #wrap {
@@ -217,6 +191,11 @@ z::-ms-input-placeholder { /* Microsoft Edge */
 }
 .section-viewtopic.fiche .topic-title {
 	display: none;; 
+}
+/* Bas de page */
+.page-footer .navbar {
+	background: white;
+	border-radius: 0;
 }
 
 /* Cadres d'affichage */
@@ -312,58 +291,58 @@ z.geo_ref .button {
 }
 
 /* Postits */
-z.point-post {
+.point-post {
 	width: 100%;
 }
-z.point-post td {
+.point-post td {
 	vertical-align: middle;
 	padding: 5px;
 }
-z.point-post table {
+.point-post table {
 	margin-left: auto; margin-right: auto;
 }
 
-z.postit {
+.postit {
 	border-spacing: 0;
 }
-z.postit td {
+.postit td {
 	padding: 0 !important;
 }
-z.postit .hg, .postit .hd, .postit .bg, .postit .bd {
+.postit .hg, .postit .hd, .postit .bg, .postit .bd {
 	height: 2px; min-width: 2px;
 	background: url('images/postit_bg.png');
 }
-z.postit .bd {
+.postit .bd {
 	height: 32px; min-width: 32px;
 }
-z.postit .md {
+.postit .md {
 	vertical-align: bottom;
 }
-z.postit .md img {
+.postit .md img {
 	position: relative; right: -20px; bottom: -5px;
 }
-z.postit .hm, .postit .bm {
+.postit .hm, .postit .bm {
 	background: url('images/postit_v.png');
 	text-align: right;
 	font-family: Arial;
 	font-size: 0.8em;
 }
-z.postit .mg, .postit .md {
+.postit .mg, .postit .md {
 	background: url('images/postit_h.png');
 }
-z.postit .hd {
+.postit .hd {
 	background-position: right top;
 }
-z.postit .bg {
+.postit .bg {
 	background-position: left bottom;
 }
-z.postit .bd, .postit .md, .postit .bm {
+.postit .bd, .postit .md, .postit .bm {
 	background-position: right bottom;
 }
-z.postit .mm {
+.postit .mm {
 	background-color: #F3E358;
 }
-z.postit .mm p {
+.postit .mm p {
 	position: relative; left: 12px; top: 5px;
 	font-family: Arial;
 	font-size: 1em;
@@ -371,11 +350,11 @@ z.postit .mm p {
 	text-indent: 10px;
 	margin-bottom: 0;
 }
-z.postit .mm .titre {
+.postit .mm .titre {
 	font-size: 1.3em;
 	font-weight: bold;
 }
-z.postit .bm p {
+.postit .bm p {
 	font-size: 0.8em;
 	float:right;
 	position: relative; left: 10px;
@@ -458,3 +437,37 @@ z.headerspace h3 {
 	margin: 5px;
 }
 
+
+/* POSTING.PHP */
+z.section-posting #postingbox fieldset.fields1 dt {
+	width: auto;
+}
+z.section-posting #postingbox fieldset.fields1 dd {
+	margin-left: auto !important;
+}
+z.section-posting .panel {
+	margin-bottom: 0px;
+}
+
+z.geo-info {
+	margin-bottom: 20px;
+}
+z.geo-info p {
+	margin: 0;
+}
+z.geo-info h4 {
+	margin-top: 5px !important;
+}
+
+z::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+	font-size: 10px;
+	color: #36f !important;
+}
+z:-ms-input-placeholder { /* Internet Explorer 10-11 */
+	font-size: 10px;
+	color: #36f !important;
+}
+z::-ms-input-placeholder { /* Microsoft Edge */
+	font-size: 10px;
+	color: #36f !important;
+}

@@ -11,7 +11,11 @@ $('#map').resizable({
 
 //TODO customize min prosilver / chemineur
 var geoControls = controlsCollection,
-	titleEdit = "//TODO button comment",
+	titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
+	"Cliquer sur un segment puis déplacer pour créer un sommet\n" +
+	"Alt + cliquer sur un sommet pour le supprimer et applatir la ligne\n" +
+	"Alt + cliquer sur un segment pour le supprimer et couper la ligne en 2\n" +
+	"Ctrl + Alt + cliquer sur un segment d'une ligne pour la supprimer";
 /*,
 			controlDownloadGPX: {
 				fileName: 'topics' //TODO name option
@@ -38,7 +42,7 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 */
 
 /* Overlay vector layer from the GeoBB database */
-	topicStyleOptions = {
+	topicStyleOptions = { //TODO renommer & commenter
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
@@ -53,7 +57,7 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 			width: 2
 		})
 	},
-	editStyleOptions = {
+	editStyleOptions = { //TODO renommer & commenter
 		stroke: new ol.style.Stroke({
 			color: 'red',
 			width: 3
@@ -82,18 +86,16 @@ function layerStyleOptionsFunction(properties, id, hover) {
 //TODO factoriser
 function geoOverlays(o) {
 	const options = ol.assign({
-		topidIdExclude: '',
-		transparency: [0.5, 0.5],
-		hoverTransparency: [0, 1]
+		topidIdExclude: ''
 	}, o);
 
 	return [new ol.layer.LayerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + options.topidIdExclude,
 		styleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.transparency);
+			return layerStyleOptionsFunction(properties, options.topidIdSelect);
 		},
 		hoverStyleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, options.topidIdSelect, options.hoverTransparency);
+			return layerStyleOptionsFunction(properties, options.topidIdSelect, true);
 		},
 		label: function(properties) {
 			return options.noLabel ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';

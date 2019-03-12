@@ -77,7 +77,7 @@ var topicStyleOptions = {
 	titleEdit = "Cliquer et déplacer un sommet pour modifier un polygone\n" +
 	"Cliquer sur un segment puis déplacer pour créer un sommet\n" +
 	"Alt + cliquer sur un sommet pour le supprimer\n" +
-	"Ctrl + Alt + cliquer sur un côté d 'un polygone pour le supprimer";
+	"Ctrl + Alt + cliquer sur un côté d'un polygone pour le supprimer";
 
 function layerStyleOptionsFunction(properties, idSelect, transparency /* [fill, stroke] */ ) {
 	if (properties.icon)

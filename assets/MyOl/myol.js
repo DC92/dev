@@ -1625,7 +1625,7 @@ function controlEdit(o) {
 				group: this_,
 				label: drawOption.type.charAt(0),
 				title: 'Activer "' + drawOption.type.charAt(0) + '" puis\n' +
-					'Cliquer sur la carte et sur chaque désiré pour dessiner ' +
+					'Cliquer sur la carte et sur chaque point désiré pour dessiner ' +
 					(drawOption.type == 'Polygon' ? 'un polygone' : 'une ligne') +
 					',\ndouble cliquer pour terminer.\n' +
 					(drawOption.type == 'Polygon' ?
