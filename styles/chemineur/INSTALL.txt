@@ -1,10 +1,50 @@
-Ajouter les smileys WRI
-
-Cabanes
-altitude|Altitude|automatique|m
-massif|Massif|court
-
-
-ASPIR :
-forumdesc : surface => Polygon
+UPGRADE ASPIR
+=============
+forumdesc : surface => Polygon, point => Point
 retirer de formulaires : Autres remarques ou commentaires
+
+INSTALL O2
+==========
+Cpanel -> Bases de données MySQL
+Créer BDD
+Ajouter un nouvel utilisateur
+Ajouter un nouvel utilisateur à la base de données
+Copier PhpBB3 sauf doc
+Copier repertoire de GeoBB sauf aspir
+Lancer install
+-> Français -> Change
+Installer -> Installer
+Supprimer install
+config.php -> clés cartes : $geoKeys = [...]
+Administration ==>
+Général -> Gérer les forums -> Créer
+	Cabanes [first=point][/first][fiche=Cabanes][/fiche][style=fiche][/style]	 ext/Dominique92/GeoBB/types_points/cabane.png
+	....
+	Renommer votre catégorie / premier forum => Coin des modérateurs, Forum des utilisateurs
+	Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs, Configuration, Bienvenue, Aide, Formulaires
+		Cabanes
+		altitude|Altitude|automatique|m
+		massif|Massif|court
+Genéral -> Paramètres des fichiers joints -> Quota & taille maximale du fichier : 0
+Général -> Configuration du forum -> Libellé du site Internet :
+Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
+Général -> Paramètres du serveur -> Activer la compression GZip : oui
+Général -> Paramètres de charge -> Recompiler les différents éléments du style : non
+Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
+Messages -> Ajouter un bbcode -> [fiche={TEXT}][/fiche] / <span></span> / ne pas oublier [/fiche] dans les forum_desc
+Messages -> Smiley -> Installer un pack de smileys -> Tout conserver -> Installer
+Permissions -> Permissions des forums -> Coin des modérateurs + Configuration + Bugs * + Echanges -> Envoyer
+	Robots + Invités + Utilisateurs * -> Aucun accès -> Appliquer toutes
+Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
+	Utilisateurs * enregistrés -> Accès standard -> Appliquer toutes
+Personnaliser -> Désactiver VigLink
+Personnaliser -> Installation de styles -> Aspir -> Détails -> Définir comme style par défaut
+Personnaliser -> Gérer de styles -> Prosilver -> Désactiver
+Créer les sujets de configuration : Formulaires, Aide, Bienvenue
+Créer un item d'Alpage, Cabane, Point d'eau, Réseau
+Exécuter ext/Dominique92/GeoBB/styles/aspir/import
+Move ext/Dominique92/GeoBB/styles/aspir/import/LOG/... LOG/
+Administration -> Gérer les forums -> Alpages -> Resynchroniser
+Supprimer assets/geoPHP
+Supprimer ext/.../aspir/import
+

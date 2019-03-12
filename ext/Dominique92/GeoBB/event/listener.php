@@ -134,6 +134,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Show the most recent post on the home page
+	//TODO BUG compte dans le nb max les posts des forums cachés.
 	function index_news ($vars) {
 		$this->geobb_activate_map('[all=accueil]');
 

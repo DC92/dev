@@ -23,12 +23,12 @@ z.section-viewforum .bar-top,
 .section-viewtopic.fiche .bar-top,
 
 z.section-posting input[name="save"],
-z.section-posting input[name="preview"],
-z.section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
-z.section-posting #poll-panel-tab { /* Sondages */
+z.section-posting input[name="preview"], /*//TODO revoir effet de save et preview sur la saisie d'un point / trace */
+.section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
+.section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
 }
-z.section-posting #attach-panel { /* Onglet de chargement de fichier */
+.section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
 

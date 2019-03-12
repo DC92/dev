@@ -1351,6 +1351,7 @@ function controlLoadGPX(o) {
  * Requires ol.control.Button
  * Requires 'myol:onadd' layer event
  */
+//TODO BUG n'exporte pas les points
 function controlDownloadGPX(o) {
 	const options = ol.assign({
 			label: '&dArr;',
