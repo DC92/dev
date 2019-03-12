@@ -915,7 +915,8 @@ XML
 	}
 
 	function parse_attachments_modify_template_data($vars) {
-		if ($this->attachments) {
+//TODO BUG duplique le même attachement
+//		if ($this->attachments) {
 			$post_id = $vars['attachment']['post_msg_id'];
 
 			// Assigne les valeurs au template
@@ -934,7 +935,7 @@ XML
 				$this->template->set_filenames ([
 					'attachment_tpl' => $nf
 				]);
-		}
+//		}
 	}
 
 	function download_file_send_to_browser_before($vars) {

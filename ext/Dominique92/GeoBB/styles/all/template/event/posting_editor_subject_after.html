@@ -13,15 +13,15 @@
 		<p>Massif <input type="text" name="geo_massif-varchar-50" size="25" class="inputbox autowidth" value="{GEO_MASSIF}" /> (*)</p>
 	<!-- ENDIF -->
 
-	<!-- IF GEO_MAP_TYPE == 'point' -->
+	<!-- IF GEO_MAP_TYPE == 'Point' -->
 		<!-- INCLUDE posting_point_position.html -->
 	<!-- ENDIF -->
 
-	<!-- IF GEO_MAP_TYPE == 'line' -->
+	<!-- IF GEO_MAP_TYPE == 'LineString' -->
 		<!-- IF 0 -->//TODO explications sur la page<!-- ENDIF -->
 	<!-- ENDIF -->
 	
-	<!-- IF GEO_MAP_TYPE == 'surface' -->
+	<!-- IF GEO_MAP_TYPE == 'Polygon' -->
 		<h3>Modification polygone</h3>
 		<p>- Cliquer et déplacer un sommet pour modifier un polygone.<br/>
 		- Alt+cliquer sur un sommet pour le supprimer.<br/>
@@ -44,7 +44,7 @@
 			overlays = geoOverlays({
 				posting: true,
 				topidIdExclude: {TOPIC_ID},
-				<!-- IF GEO_MAP_TYPE == 'surface' -->
+				<!-- IF GEO_MAP_TYPE == 'Polygon' -->
 					transparency: [0, 1, 2],
 				<!-- ENDIF -->
 				noLabel: true

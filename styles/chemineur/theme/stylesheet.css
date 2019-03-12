@@ -33,7 +33,7 @@ z.section-posting input[name="preview"], /*//TODO revoir effet de save et previe
 	display: block !important;
 }
 
-#page-header .page-header {
+#page-header .navbar {
 	position: relative;
 	top: -12px;
 	padding: 0;
@@ -192,8 +192,11 @@ z.geo_presentation {
 .section-viewtopic.fiche .topic-title {
 	display: none;; 
 }
+.section-viewtopic .post {
+	display: none;
+}
 /* Bas de page */
-.page-footer .navbar {
+.section-viewtopic .page-footer .navbar {
 	background: white;
 	border-radius: 0;
 }
@@ -290,7 +293,6 @@ z.geo_ref .button {
 	top: 6px;
 }
 
-/* Postits */
 .point-post {
 	width: 100%;
 }
@@ -302,6 +304,7 @@ z.geo_ref .button {
 	margin-left: auto; margin-right: auto;
 }
 
+/* Postits */
 .postit {
 	border-spacing: 0;
 }
@@ -365,75 +368,75 @@ z.photo {
 	border-spacing: 0;
 	margin: 5px 0;
 }
-z.photo td {
+.photo td {
 	padding: 0 !important;
 }
-z.photo .hg, .photo .hd, .photo .bg, .photo .bd {
+.photo .hg, .photo .hd, .photo .bg, .photo .bd {
 	height: 10px; min-width: 10px;
 	background: url('images/photo_bg.png');
 }
-z.photo .bd {
+.photo .bd {
 	height: 14px; min-width: 14px;
 }
-z.photo .hm, .photo .bm {
+.photo .hm, .photo .bm {
 	background: url('images/photo_v.png');
 }
-z.photo .bd p {
+.photo .bd p {
 	height: 12px;
 	position: relative;
 	top: -12px;
 	left: -10px;
 }
-z.photo .md {
+.photo .md {
 	vertical-align: bottom;
 }
-z.photo .md img {
+.photo .md img {
 	position: relative; top: -3px; right: -5px;
 }
-z.photo .mm {
+.photo .mm {
 	line-height: 0; /* Sinon, le bord inférieur de la photo à un gap de 2px */
 }
-z.photo .mg, .photo .md {
+.photo .mg, .photo .md {
 	background: url('images/photo_h.png');
 }
-z.photo .hd {
+.photo .hd {
 	background-position: right top;
 }
-z.photo .bg {
+.photo .bg {
 	background-position: left bottom;
 }
-z.photo .bd, .photo .md, .photo .bm {
+.photo .bd, .photo .md, .photo .bm {
 	background-position: right bottom;
 }
-z.photo .hm p, .photo .bm p  {
+.photo .hm p, .photo .bm p  {
 	font-family: Verdana;
 	color: #a00;
 	font-size: 0.8em;
 }
-z.photo .hm p {
+.photo .hm p {
 	font-weight: bold;
 	position: relative; left: -5px;
 	margin: 0;
 }
-z.photo .bm p {
+.photo .bm p {
 	text-align: right;
 	position: relative; top: -2px; right: 10px;
 	margin: 2px;
 }
-z.photo-comment {
+.photo-comment {
 	margin: 10px;
 }
-z.photo-comment span {
+.photo-comment span {
 	background-color: #fff;
 	padding: 3px;
 }
 
-z.headerspace {
+.headerspace {
 	background-color: #ECF3F7;
 	margin: 5px;
 	padding: 5px;
 }
-z.headerspace h3 {
+.headerspace h3 {
 	margin: 5px;
 }
 
