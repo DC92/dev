@@ -190,10 +190,13 @@ z.geo_presentation {
 	background: url('images/pierre.jpg'); 
 }
 .section-viewtopic.fiche .topic-title {
-	display: none;; 
+	display: none;
 }
 .section-viewtopic .post {
 	display: none;
+}
+.section-viewtopic .post-buttons {
+	min-width: 120px;
 }
 /* Bas de page */
 .section-viewtopic .page-footer .navbar {

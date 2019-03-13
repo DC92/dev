@@ -47,6 +47,8 @@ class listener implements EventSubscriberInterface
 
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
+			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
+			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
@@ -58,7 +60,6 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_end' => 'submit_post_end',
 
 			// Resize images
-			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
 		];
 	}
@@ -265,6 +266,20 @@ class listener implements EventSubscriberInterface
 		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
 		$post_id = $vars['row']['post_id'];
 		$this->all_post_data [$post_id] = $vars['row'];
+	}
+
+	// Assign template variables for images attachments
+	function viewtopic_modify_post_data($vars) {
+		$this->attachments = $vars['attachments'];
+	}
+	function viewtopic_post_row_after($vars) {
+		foreach ($this->attachments[$vars['row']['post_id']] as $attachment)
+			if (!strncmp ($attachment['mimetype'], 'image', 5)) {
+				$attachment['DATE'] = str_replace (' 00:00', '', $this->user->format_date($attachment['filetime']));
+				$attachment['TEXT_SIZE'] = strlen ($vars['row']['post_text']) * count($vars['attachments']);
+				$attachment['POSTER'] = $attachment['poster_id']; //TODO rechercher via SQL le vrai nom de l'auteur
+				$this->template->assign_block_vars('postrow.image', array_change_key_case ($attachment, CASE_UPPER));
+			}
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
@@ -914,30 +929,6 @@ XML
 		$vars['post_row'] = $post_row;
 	}
 
-	function parse_attachments_modify_template_data($vars) {
-//TODO BUG duplique le même attachement
-//		if ($this->attachments) {
-			$post_id = $vars['attachment']['post_msg_id'];
-
-			// Assigne les valeurs au template
-			$this->block_array = $vars['block_array'];
-			$this->block_array['TEXT_SIZE'] = strlen ($this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
-			$this->block_array['DATE'] = str_replace (' 00:00', '', $this->user->format_date($vars['attachment']['filetime']));
-			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; //TODO ARCHI Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
-			$this->block_array['EXIF'] = $vars['attachment']['exif'];
-			foreach ($vars['attachment'] AS $k=>$v)
-				$this->block_array[strtoupper($k)] = $v;
-			$vars['block_array'] = $this->block_array;
-
-			// Ceci va assigner un template à {postrow.attachment.DISPLAY_ATTACHMENT}
-			$nf = 'viewtopic_'.request_var('view', 'body').'_photo.html';
-			if (file_exists ($this->root_path.'styles/'.$this->user->style['style_name'].'/template/'.$nf))
-				$this->template->set_filenames ([
-					'attachment_tpl' => $nf
-				]);
-//		}
-	}
-
 	function download_file_send_to_browser_before($vars) {
 		$attachment = $vars['attachment'];
 		if (!is_dir ('../cache/geobb/'))
@@ -1006,7 +997,7 @@ XML
 		}
 
 		// Reduction de la taille de l'image
-		if ($max_size = request_var('s', 0)) {
+		if ($max_size = request_var('size', 0)) {
 			$img_size = @getimagesize ('../files/'.$attachment['physical_filename']);
 			$isx = $img_size [0]; $isy = $img_size [1]; 
 			$reduction = max ($isx / $max_size, $isy / $max_size);
