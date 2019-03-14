@@ -1169,26 +1169,6 @@ function controlGPS(options) {
 					this_.getMap().removeLayer(layer);
 					this_.getMap().getView().setRotation(0);
 				}
-
-				// Activate full screen
-				let element = this_.getMap().getTargetElement();
-				if (active) {
-					if (element.requestFullscreen) element.requestFullscreen();
-					else if (element.msRequestFullscreen) element.msRequestFullscreen();
-					else if (element.mozRequestFullScreen)
-						element.mozRequestFullScreen();
-					else if (element.webkitRequestFullscreen)
-						element.webkitRequestFullscreen();
-				} else {
-					if (document.exitFullscreen)
-						document.exitFullscreen();
-					else if (document.msExitFullscreen)
-						document.msExitFullscreen();
-					else if (document.mozCancelFullScreen)
-						document.mozCancelFullScreen();
-					else if (document.webkitExitFullscreen)
-						document.webkitExitFullscreen();
-				}
 			}
 		}),
 
@@ -1202,11 +1182,11 @@ function controlGPS(options) {
 		alert('Geolocation error: ' + error.message);
 	});
 
-	var heading = 0, // Orientation (radians) of the device since the interface init
-		delta = 0; // Angle (radians) to add to the deviceorientation to get the geographic heading
+	var heading = 0, // Orientation of the device since the interface init
+		delta = 0; // Angle to add to the deviceorientation to get the geographic heading
+	// Angles are in radians and reverse clockwize
 	geolocation.on('change', function() {
 		const position = ol.proj.fromLonLat(this.getPosition()),
-			direction = this.getHeading(), // / Math.PI * 180,//TODO mem radians only
 			view = this_.getMap().getView();
 		view.setCenter(position);
 
@@ -1216,9 +1196,8 @@ function controlGPS(options) {
 		}
 
 		// Calculate the correction to be made
-		if (direction)
-			delta = direction - heading;
-		//		if (direction)var element = document.getElementById('dir'); if(element)element.innerHTML ='direction '+(direction / Math.PI * 180);//TODO DELETE
+		if (this.getHeading()) // Move direction (Clockwize)
+			delta = -this.getHeading() - heading;
 
 		// Redraw the marker
 		feature.setGeometry(new ol.geom.GeometryCollection([
@@ -1242,31 +1221,21 @@ function controlGPS(options) {
 	});
 
 	// Keep the map oriented
-	window.addEventListener("deviceorientation", function(evt) {
-		// Browser orientation
-		const orientation = screen.orientation && screen.orientation.type ?
-			screen.orientation.type :
-			screen.orientation || screen.mozOrientation || screen.msOrientation,
-			os = orientation.split("-");
-
-		// Browser heading from the inertial sensors
-		heading = //typeof evt.webkitCompassHeading !== "undefined" ?
-			evt.webkitCompassHeading || //iOS non-standard
-			evt.alpha; // Android
-		if (os[0] === "landscape")
-			heading += 90;
-		else
-			heading += 180;
-		if (os[1] === "secondary")
-			heading -= 180;
-		heading *= Math.PI / 180;
-		//var element = document.getElementById('dir'); if(element)element.innerHTML ='direction+++ '+(heading / Math.PI * 180);//TODO DELETE
-		//var element = document.getElementById('head'); if(element)element.innerHTML ='TEST ' +' '+(heading / Math.PI * 180)+' '+(delta / Math.PI * 180) ;//TODO DELETE
-
-		// Orientate the map
-		if (this_.active)
-			this_.getMap().getView().setRotation(heading + delta);
+	window.addEventListener('compassneedscalibration', function() {
+		alert('Compass needs calibration');
 	});
+	window.addEventListener(
+		'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation',
+		function(evt) {
+			// Browser heading from the inertial sensors
+			heading = evt.alpha || evt.webkitCompassHeading; // Android iOS
+			heading -= screen.orientation.angle; // Screen portrait / landscape / ...
+			heading *= Math.PI / 180;
+
+			// Orientate the map
+			if (this_.active)
+				this_.getMap().getView().setRotation(heading + (evt.absolute ? 0 : delta));
+		});
 
 	return this_;
 }
