@@ -1225,7 +1225,8 @@ function controlGPS(options) {
 		alert('Compass needs calibration');
 	});
 	window.addEventListener(
-		'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation',
+		'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : // Gives always the magnetic north
+		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
 		function(evt) {
 			// Browser heading from the inertial sensors
 			heading = evt.alpha || evt.webkitCompassHeading; // Android iOS
@@ -1234,7 +1235,10 @@ function controlGPS(options) {
 
 			// Orientate the map
 			if (this_.active && (evt.absolute || delta !== undefined))
-				this_.getMap().getView().setRotation(heading + (evt.absolute ? 0 : delta));
+				this_.getMap().getView().setRotation(
+					heading + // Device orientation
+					(evt.absolute ? 0 : delta) // Gives magnetic north / initial device orientation + correction
+				);
 		});
 
 	return this_;
