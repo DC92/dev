@@ -1133,7 +1133,8 @@ function controlGPS(options) {
 	options = options || {};
 
 	// Vérify if geolocation is available
-	if (!window.location.href.match(/https|localhost/i))
+	if (!navigator.geolocation ||
+		!window.location.href.match(/https|localhost/i))
 		return new ol.control.Control({ //HACK No button
 			element: document.createElement('div'),
 		});
@@ -1160,6 +1161,7 @@ function controlGPS(options) {
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
 			activate: function(active) {
+				// Toggle reticule & rotation
 				geolocation.setTracking(active);
 				if (active)
 					this_.getMap().addLayer(layer);
@@ -1167,28 +1169,56 @@ function controlGPS(options) {
 					this_.getMap().removeLayer(layer);
 					this_.getMap().getView().setRotation(0);
 				}
+
+				// Activate full screen
+				let element = this_.getMap().getTargetElement();
+				if (active) {
+					if (element.requestFullscreen) element.requestFullscreen();
+					else if (element.msRequestFullscreen) element.msRequestFullscreen();
+					else if (element.mozRequestFullScreen)
+						element.mozRequestFullScreen();
+					else if (element.webkitRequestFullscreen)
+						element.webkitRequestFullscreen();
+				} else {
+					if (document.exitFullscreen)
+						document.exitFullscreen();
+					else if (document.msExitFullscreen)
+						document.msExitFullscreen();
+					else if (document.mozCancelFullScreen)
+						document.mozCancelFullScreen();
+					else if (document.webkitExitFullscreen)
+						document.webkitExitFullscreen();
+				}
 			}
 		}),
+
 		// Interface with the GPS system
 		geolocation = new ol.Geolocation({
 			trackingOptions: {
 				enableHighAccuracy: true
 			}
 		});
-
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
 	});
 
+	var heading = 0, // Orientation (radians) of the device since the interface init
+		delta = 0; // Angle (radians) to add to the deviceorientation to get the geographic heading
 	geolocation.on('change', function() {
 		const position = ol.proj.fromLonLat(this.getPosition()),
+			direction = this.getHeading(), // / Math.PI * 180,//TODO mem radians only
 			view = this_.getMap().getView();
 		view.setCenter(position);
 
-		if (!this.done) { // Only once
+		if (!this.done) { // Only once the first time the feature is activated
 			this.done = true;
 			view.setZoom(17); // Zoom on the area
 		}
+
+		// Calculate the correction to be made
+		if (direction)
+			delta = direction - heading;
+		//		if (direction)var element = document.getElementById('dir'); if(element)element.innerHTML ='direction '+(direction / Math.PI * 180);//TODO DELETE
 
 		// Redraw the marker
 		feature.setGeometry(new ol.geom.GeometryCollection([
@@ -1212,28 +1242,30 @@ function controlGPS(options) {
 	});
 
 	// Keep the map oriented
-	//TODO ARCHI detect if deviceorientation is authorized
 	window.addEventListener("deviceorientation", function(evt) {
-		// Magnetic compas
-		let heading = typeof evt.webkitCompassHeading !== "undefined" ?
-			evt.webkitCompassHeading : //iOS non-standard
-			evt.alpha;
-
 		// Browser orientation
 		const orientation = screen.orientation && screen.orientation.type ?
 			screen.orientation.type :
 			screen.orientation || screen.mozOrientation || screen.msOrientation,
 			os = orientation.split("-");
+
+		// Browser heading from the inertial sensors
+		heading = //typeof evt.webkitCompassHeading !== "undefined" ?
+			evt.webkitCompassHeading || //iOS non-standard
+			evt.alpha; // Android
 		if (os[0] === "landscape")
 			heading += 90;
 		else
 			heading += 180;
 		if (os[1] === "secondary")
 			heading -= 180;
+		heading *= Math.PI / 180;
+		//var element = document.getElementById('dir'); if(element)element.innerHTML ='direction+++ '+(heading / Math.PI * 180);//TODO DELETE
+		//var element = document.getElementById('head'); if(element)element.innerHTML ='TEST ' +' '+(heading / Math.PI * 180)+' '+(delta / Math.PI * 180) ;//TODO DELETE
 
 		// Orientate the map
 		if (this_.active)
-			this_.getMap().getView().setRotation(heading / 180 * Math.PI);
+			this_.getMap().getView().setRotation(heading + delta);
 	});
 
 	return this_;

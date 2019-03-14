@@ -3,6 +3,10 @@ UPGRADE ASPIR
 forumdesc : surface => Polygon, point => Point
 retirer de formulaires : Autres remarques ou commentaires
 
+UPGRADE CHEMINEUR
+=================
+Rediriger dc9.fr/chemineur dans WRI
+
 INSTALL O2
 ==========
 Cpanel -> Bases de données MySQL
