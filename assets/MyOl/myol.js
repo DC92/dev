@@ -1183,7 +1183,7 @@ function controlGPS(options) {
 	});
 
 	var heading = 0, // Orientation of the device since the interface init
-		delta = 0; // Angle to add to the deviceorientation to get the geographic heading
+		delta; // Angle to add to the deviceorientation to get the geographic heading
 	// Angles are in radians and reverse clockwize
 	geolocation.on('change', function() {
 		const position = ol.proj.fromLonLat(this.getPosition()),
@@ -1233,7 +1233,7 @@ function controlGPS(options) {
 			heading *= Math.PI / 180;
 
 			// Orientate the map
-			if (this_.active)
+			if (this_.active && (evt.absolute || delta !== undefined))
 				this_.getMap().getView().setRotation(heading + (evt.absolute ? 0 : delta));
 		});
 
