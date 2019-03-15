@@ -1,26 +1,13 @@
-UPGRADE ASPIR
-=============
-forum_desc : surface => Polygon, point => Point
-Retirer de formulaires : Autres remarques ou commentaires
-
-TODO AVANT UPGRADE CHEM
-=======================
-chem3 [first=point] => [first=Point]
-nom config/fiche Cabane-ASPIR : enlever ASPIR
-voir tous les [] des forum_desc dans chemineur.fr :
-	léquels faut il ? [first=point][/first][fiche=Point][/fiche][style=fiche][/style]
-	[style=Cabanes][/style] => [view=Cabanes][/view]
-	les modifier sans que ça gène chem3
+DEV TODO AVANT UPGRADE CHEM
+===========================
+voir les diaporamas : [all=point][view=diapo][exclude=tortillards]
 TODO récupérer les fichiers chem2
-C koi chem3/files/attach ?
-Diaporamas + forum_desc
-Ne pas mettre lon/lat en étiquette de trace
-localhost/Votre premier forum ne devrait pas avoir un format fiche
+	C koi chem3/files/attach ?
+chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php
 Optimiser ne pas générer le template posts quand fiche.
 	masquer <table class="point-post"> quand ce n'est pas une fiche
-chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php
-Voir ce qu'on fait avec cham3/"Voies férrées"
-
+	Ne pas mettre lon/lat en étiquette de trace
+	localhost/Votre premier forum ne devrait pas avoir un format fiche
 
 
 UPGRADE CHEMINEUR

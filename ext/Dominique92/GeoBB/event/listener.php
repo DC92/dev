@@ -70,6 +70,7 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function user_setup($vars) {
+		return;//TODO DELETE ?
 		// Force le style 
 		$style_name = request_var ('style', '');
 		if ($style_name) {
@@ -468,7 +469,7 @@ class listener implements EventSubscriberInterface
 		global $geo_keys; // Private / defined in config.php
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
-		preg_match ('/\[(style)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $style);
+		preg_match ('/\[(style|view)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $style);
 		switch (@$regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
@@ -480,7 +481,10 @@ class listener implements EventSubscriberInterface
 					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
 					'BODY_CLASS' => @$style[2],
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
-					'GEO_MAP_TYPE' => @$regle[2],
+					'GEO_MAP_TYPE' => str_replace(
+						['point','ligne','line','surface',],
+						['Point','LineString','LineString','Polygon',],
+						@$regle[2]),
 					'GEO_KEYS' => json_encode($geo_keys),
 //TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
@@ -540,9 +544,9 @@ class listener implements EventSubscriberInterface
 		) {
 			global $geo_keys;
 			$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$row['center'][0]}&lat={$row['center'][1]}&zonly=true";
-			preg_match ('/([0-9]+)/', @file_get_contents($api), $match);
-			if ($match)
-				$update['geo_altitude'] = $match[1];
+			preg_match ('/([0-9]+)/', @file_get_contents($api), $altitude);
+			if ($altitude)
+				$update['geo_altitude'] = $altitude[1];
 		}
 
 		// Infos refuges.info
@@ -682,10 +686,10 @@ XML
 	// Form management
 	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name) {
 		// Get form fields from the relative post
-		preg_match ('/\[fiche=([^\]]+)\]/i', $forum_desc, $match); // Try in forum_desc [fiche=Alpages][/fiche]
+		preg_match ('/\[(form|fiche)=([^\]]+)\]/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
 		$sql = "
 			SELECT post_text FROM ".POSTS_TABLE."
-			WHERE post_subject = '".str_replace ("'", "\'", $match ? $match[1] : $forum_name)."'
+			WHERE post_subject = '".str_replace ("'", "\'", $form ? $form[2] : $forum_name)."'
 			ORDER BY post_id
 		";
 		$result = $this->db->sql_query($sql);
@@ -716,8 +720,8 @@ XML
 				$dfs1s = explode (' ', $dfs[1]);
 
 				// Title tag <h2>..<h4>
-				preg_match_all ('/[0-9]+/', $dfs1s[0], $match);
-				$block_vars['TAG1'] = 'h'.(count($match[0]) ? count($match[0]) + 1 : 4);
+				preg_match_all ('/[0-9]+/', $dfs1s[0], $title);
+				$block_vars['TAG1'] = 'h'.(count($title[0]) ? count($title[0]) + 1 : 4);
 
 				// Block visibility
 				$ndf = implode (' geo_', array_slice ($def_forms, $kdf)); // Find the block beginning
@@ -729,10 +733,10 @@ XML
 						case '}': $n--;
 					}
 				// Check if any value there
-				preg_match_all ('/(geo_[a-z_0-9]+)\|[^\|]+\|([a-z]+)/', substr ($ndf, 0, $c), $match);
-				foreach ($match[1] AS $k=>$m)
+				preg_match_all ('/(geo_[a-z_0-9]+)\|[^\|]+\|([a-z]+)/', substr ($ndf, 0, $c), $name);
+				foreach ($name[1] AS $k=>$m)
 					if (isset ($post_data[$m]) &&
-						($match[2][$k] != 'confidentiel' || $this->user->data['is_registered']))
+						($name[2][$k] != 'confidentiel' || $this->user->data['is_registered']))
 						$block_vars['DISPLAY'] = true; // Decide to display the title
 			}
 

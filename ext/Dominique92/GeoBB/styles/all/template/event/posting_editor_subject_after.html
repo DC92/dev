@@ -73,7 +73,7 @@
 			map.getView().setZoom(15);
 
 		<!-- ELSE --> // LineString / Polygon
-			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for O2switch sql MariaDB bug / still here ?
+			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for bug in O2switch sql MariaDB / still here ?
 			var edit = controlEdit({
 				inputId: 'editable-json',
 				snapLayers: overlays,
