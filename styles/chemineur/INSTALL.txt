@@ -1,11 +1,56 @@
 UPGRADE ASPIR
 =============
-forumdesc : surface => Polygon, point => Point
-retirer de formulaires : Autres remarques ou commentaires
+forum_desc : surface => Polygon, point => Point
+Retirer de formulaires : Autres remarques ou commentaires
+
+TODO AVANT UPGRADE CHEM
+=======================
+chem3 [first=point] => [first=Point]
+nom config/fiche Cabane-ASPIR : enlever ASPIR
+voir tous les [] des forum_desc dans chemineur.fr :
+	léquels faut il ? [first=point][/first][fiche=Point][/fiche][style=fiche][/style]
+	[style=Cabanes][/style] => [view=Cabanes][/view]
+	les modifier sans que ça gène chem3
+TODO récupérer les fichiers chem2
+C koi chem3/files/attach ?
+Diaporamas + forum_desc
+Ne pas mettre lon/lat en étiquette de trace
+localhost/Votre premier forum ne devrait pas avoir un format fiche
+Optimiser ne pas générer le template posts quand fiche.
+	masquer <table class="point-post"> quand ce n'est pas une fiche
+chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php
+Voir ce qu'on fait avec cham3/"Voies férrées"
+
+
 
 UPGRADE CHEMINEUR
 =================
+Fermer le site
+Vider cache
+phpadmin export database
+Cpanel -> Bases de données MySQL
+Créer BDD
+Ajouter un nouvel utilisateur à la base de données
+phpadmin import database
+Copier PhpBB3 sauf doc
+Copier repertoires de GeoBB
+Copier cmem3/files
+Mise à jour config.php
+Lancer admin -> Upgrade
+Supprimer répertoire install
+Désactiver styles et extensions /supprimer les données (y compris collapsible cactégories)
+Supprimer /styles/... /ext/phpbb/Collapsible... /ext/Dominique92/...autre que GeoBB /ext/Dominique92/GeoBB/... autres que GeoBB
+Administration ==>
+Général -> Gérer les forums -> Tous forums : [style=fiche][/style]
+enlever [exclude=tortillards]
+
 Rediriger dc9.fr/chemineur dans WRI
+
+	Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs, Configuration, Bienvenue, Aide, Formulaires
+		Cabanes
+		altitude|Altitude|automatique|m
+		massif|Massif|court
+
 
 INSTALL O2
 ==========
@@ -21,14 +66,7 @@ Installer -> Installer
 Supprimer install
 config.php -> clés cartes : $geoKeys = [...]
 Administration ==>
-Général -> Gérer les forums -> Créer
-	Cabanes [first=point][/first][fiche=Cabanes][/fiche][style=fiche][/style]	 ext/Dominique92/GeoBB/types_points/cabane.png
-	....
-	Renommer votre catégorie / premier forum => Coin des modérateurs, Forum des utilisateurs
-	Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs, Configuration, Bienvenue, Aide, Formulaires
-		Cabanes
-		altitude|Altitude|automatique|m
-		massif|Massif|court
+Général -> Gérer les forums -> Tous forums : [style=fiche][/style]
 Genéral -> Paramètres des fichiers joints -> Quota & taille maximale du fichier : 0
 Général -> Configuration du forum -> Libellé du site Internet :
 Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE

@@ -192,7 +192,7 @@ z.geo_presentation {
 .section-viewtopic.fiche .topic-title {
 	display: none;
 }
-.section-viewtopic .post {
+.section-viewtopic.fiche .post {
 	display: none;
 }
 .section-viewtopic .post-buttons {

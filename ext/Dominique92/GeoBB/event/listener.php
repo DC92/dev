@@ -120,7 +120,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function index_modify_page_title ($vars) {
 		$this->index_news ($vars);
-		$this->index_forum_tree(0, '');
+//TODO DELETE		$this->index_forum_tree(0, '');
 	}
 
 	// Ajoute un bouton créer un point en face de la liste des forums
@@ -168,6 +168,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Docs presentation
+	/*//TODO DELETE ??? (utilisé dans doc)
 	function index_forum_tree($parent, $num) {
 		$last_num = 1;
 		$sql = "
@@ -240,7 +241,7 @@ class listener implements EventSubscriberInterface
 			$this->index_forum_tree ($row_forum['forum_id'], $forum_num);
 		}
 		$this->db->sql_freeresult($result_forum);
-	}
+	}*/
 
 	/**
 		VIEWTOPIC.PHP
@@ -273,18 +274,19 @@ class listener implements EventSubscriberInterface
 		$this->attachments = $vars['attachments'];
 	}
 	function viewtopic_post_row_after($vars) {
-		foreach ($this->attachments[$vars['row']['post_id']] as $attachment)
-			if (!strncmp ($attachment['mimetype'], 'image', 5)) {
-				$attachment['DATE'] = str_replace (' 00:00', '', $this->user->format_date($attachment['filetime']));
-				$attachment['TEXT_SIZE'] = strlen ($vars['row']['post_text']) * count($vars['attachments']);
-				$attachment['POSTER'] = $attachment['poster_id']; //TODO rechercher via SQL le vrai nom de l'auteur
-				$this->template->assign_block_vars('postrow.image', array_change_key_case ($attachment, CASE_UPPER));
-			}
+		if (isset ($this->attachments[$vars['row']['post_id']]))
+			foreach ($this->attachments[$vars['row']['post_id']] as $attachment)
+				if (!strncmp ($attachment['mimetype'], 'image', 5)) {
+					$attachment['DATE'] = str_replace (' 00:00', '', $this->user->format_date($attachment['filetime']));
+					$attachment['TEXT_SIZE'] = strlen ($vars['row']['post_text']) * count($vars['attachments']);
+					$attachment['POSTER'] = $attachment['poster_id']; //TODO rechercher via SQL le vrai nom de l'auteur
+					$this->template->assign_block_vars('postrow.image', array_change_key_case ($attachment, CASE_UPPER));
+				}
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
-		$this->viewtopic_modify_post_row_2($vars);
+//TODO DELETE		$this->viewtopic_modify_post_row_2($vars);
 
 		$post_id = $vars['row']['post_id'];
 		$this->template->assign_vars ([
@@ -467,7 +469,7 @@ class listener implements EventSubscriberInterface
 
 		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
 		preg_match ('/\[(style)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $style);
-		switch ($regle[1]) {
+		switch (@$regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
 					break;
@@ -478,7 +480,7 @@ class listener implements EventSubscriberInterface
 					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
 					'BODY_CLASS' => @$style[2],
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
-					'GEO_MAP_TYPE' => $regle[2],
+					'GEO_MAP_TYPE' => @$regle[2],
 					'GEO_KEYS' => json_encode($geo_keys),
 //TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
@@ -695,16 +697,16 @@ XML
 		$def_forms = explode ("\n", $row['post_text']);
 		foreach ($def_forms AS $kdf=>$df) {
 			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||'));
-			$vars = $attaches = [];
+			$block_vars = $attaches = [];
 
 			// Default tags
-			$vars['TAG1'] = $sql_id = 'p';
+			$block_vars['TAG1'] = $sql_id = 'p';
 			$sql_id = 'geo_'.$dfs[0];
-			$vars['INNER'] = $dfs[1];
-			$vars['TYPE'] = $dfs[2];
-			$vars['SQL_TYPE'] = 'text';
-			$vars['DISPLAY_VALUE'] =
-			$vars['POST_VALUE'] =
+			$block_vars['INNER'] = $dfs[1];
+			$block_vars['TYPE'] = $dfs[2];
+			$block_vars['SQL_TYPE'] = 'text';
+			$block_vars['DISPLAY_VALUE'] =
+			$block_vars['POST_VALUE'] =
 				str_replace ('~', '', $post_data[$sql_id]);
 			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
 
@@ -715,7 +717,7 @@ XML
 
 				// Title tag <h2>..<h4>
 				preg_match_all ('/[0-9]+/', $dfs1s[0], $match);
-				$vars['TAG1'] = 'h'.(count($match[0]) ? count($match[0]) + 1 : 4);
+				$block_vars['TAG1'] = 'h'.(count($match[0]) ? count($match[0]) + 1 : 4);
 
 				// Block visibility
 				$ndf = implode (' geo_', array_slice ($def_forms, $kdf)); // Find the block beginning
@@ -731,7 +733,7 @@ XML
 				foreach ($match[1] AS $k=>$m)
 					if (isset ($post_data[$m]) &&
 						($match[2][$k] != 'confidentiel' || $this->user->data['is_registered']))
-						$vars['DISPLAY'] = true; // Decide to display the title
+						$block_vars['DISPLAY'] = true; // Decide to display the title
 			}
 
 			// End of block(s)
@@ -740,8 +742,8 @@ XML
 
 			// sql_id incorrect
 			else if ($dfs[0] && !preg_match ('/^[a-z_0-8]+$/', $dfs[0])) {
-				$vars['TAG1'] = 'p style="color:red"';
-				$vars['INNER'] = 'Identifiant incorrect : "'.$dfs[0].'"';
+				$block_vars['TAG1'] = 'p style="color:red"';
+				$block_vars['INNER'] = 'Identifiant incorrect : "'.$dfs[0].'"';
 			}
 			elseif ($dfs[0]) {
 				$options = explode (',', ','.$dfs[2]); // With a first line empty
@@ -751,15 +753,15 @@ XML
 					$length = 0;
 					foreach ($options AS $o)
 						$length = max ($length, strlen ($o) + 1);
-					$vars['TAG'] = 'select';
-					$vars['SQL_TYPE'] = 'text';
-					$vars['SQL_TYPE'] = 'varchar-'.$length;
+					$block_vars['TAG'] = 'select';
+					$block_vars['SQL_TYPE'] = 'text';
+					$block_vars['SQL_TYPE'] = 'varchar-'.$length;
 				}
 
 				// sql_id|titre|proches
 				elseif (!strcasecmp ($dfs[2], 'proches')) {
 					if ($post_data['post_id']) {
-						$vars['TAG'] = 'select';
+						$block_vars['TAG'] = 'select';
 
 						// Search surfaces closest to a point
 						preg_match_all ('/([0-9\.]+)/', $post_data['geojson'], $point);
@@ -777,26 +779,26 @@ XML
 							preg_match_all ('/([0-9\.]+)/', $row['centre'], $row['center']);
 							$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
 							$options['d'.$dist2] = $row;
-							if ($row['topic_id'] == $vars['POST_VALUE']) {
-								$vars['POST_VALUE'] = // For posting.pgp initial select
-								$vars['DISPLAY_VALUE'] = // For viewtopic.php display
+							if ($row['topic_id'] == $block_vars['POST_VALUE']) {
+								$block_vars['POST_VALUE'] = // For posting.pgp initial select
+								$block_vars['DISPLAY_VALUE'] = // For viewtopic.php display
 									$row['post_subject'];
-								$vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
+								$block_vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
 							}
 						}
 						ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du centre
 						$this->db->sql_freeresult($result);
 					} else
-						$vars['STYLE'] = 'display:none'; // Hide at posting
+						$block_vars['STYLE'] = 'display:none'; // Hide at posting
 				}
 
 				// sql_id|titre|attaches
 				//TODO-BEST-ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
-					$vars['TAG'] = 'input';
-					$vars['TYPE'] = 'hidden';
-					$vars['INNER'] = $dfs[1];
-					$vars['DISPLAY_VALUE'] = ' ';
+					$block_vars['TAG'] = 'input';
+					$block_vars['TYPE'] = 'hidden';
+					$block_vars['INNER'] = $dfs[1];
+					$block_vars['DISPLAY_VALUE'] = ' ';
 
 					if (array_key_exists ($sql_id, $post_data)) {
 						$sql = "
@@ -813,60 +815,60 @@ XML
 
 						$this->db->sql_freeresult($result);
 						if (!count ($attaches))
-							$vars['ATT_STYLE_TAG1'] = ' style="display:none"';
+							$block_vars['ATT_STYLE_TAG1'] = ' style="display:none"';
 					}
 				}
 
 				// sql_id|titre|automatique
 				elseif (!strcasecmp ($dfs[2], 'automatique')) {
-					$vars['TAG'] = 'input';
-					$vars['STYLE'] = 'display:none'; // Hide at posting
-					$vars['TYPE'] = 'hidden';
-					$vars['POSTAMBULE'] = $dfs[3];
-					$vars['POST_VALUE'] = null; // Set the value to null to ask for recalculation
+					$block_vars['TAG'] = 'input';
+					$block_vars['STYLE'] = 'display:none'; // Hide at posting
+					$block_vars['TYPE'] = 'hidden';
+					$block_vars['POSTAMBULE'] = $dfs[3];
+					$block_vars['POST_VALUE'] = null; // Set the value to null to ask for recalculation
 				}
 
 				// sql_id|titre|0
 				elseif (is_numeric ($dfs[2])) {
-					$vars['TAG'] = 'input';
-					$vars['TYPE'] = 'number';
-					$vars['SQL_TYPE'] = 'int-5';
-					$vars['POSTAMBULE'] = $dfs[3];
+					$block_vars['TAG'] = 'input';
+					$block_vars['TYPE'] = 'number';
+					$block_vars['SQL_TYPE'] = 'int-5';
+					$block_vars['POSTAMBULE'] = $dfs[3];
 				}
 
 				// sql_id|titre|date
 				elseif (!strcasecmp ($dfs[2], 'date')) {
-					$vars['TAG'] = 'input';
-					$vars['TYPE'] = 'date';
-					$vars['SQL_TYPE'] = 'date';
+					$block_vars['TAG'] = 'input';
+					$block_vars['TYPE'] = 'date';
+					$block_vars['SQL_TYPE'] = 'date';
 				}
 
 				// sql_id|titre|long|invite
 				elseif (!strcasecmp ($dfs[2], 'long')) {
-					$vars['TAG'] = 'textarea';
-					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
+					$block_vars['TAG'] = 'textarea';
+					$block_vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 				}
 
 				// sql_id|titre|confidentiel|invite
 				// sql_id|titre|court|invite
 				else {
-					$vars['TAG'] = 'input';
-					$vars['SIZE'] = '40';
-					$vars['CLASS'] = 'inputbox autowidth';
-					$vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
+					$block_vars['TAG'] = 'input';
+					$block_vars['SIZE'] = '40';
+					$block_vars['CLASS'] = 'inputbox autowidth';
+					$block_vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 					if ($dfs[2] == 'confidentiel' && !$this->user->data['is_registered'])
-						$vars['DISPLAY_VALUE'] = null;
+						$block_vars['DISPLAY_VALUE'] = null;
 				}
 			} //TODO-ARCHI DELETE pourquoi as-ton besoin du test précédent ?
 
-			$vars['NAME'] = $sql_id.'-'.$vars['SQL_TYPE'];
+			$block_vars['NAME'] = $sql_id.'-'.$block_vars['SQL_TYPE'];
 
-			$vs = $vars;
+			$vs = $block_vars;
 			foreach ($vs AS $k=>$v)
 				if ($v)
-					$vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
+					$block_vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
 
-			$this->template->assign_block_vars($block_name, $vars);
+			$this->template->assign_block_vars($block_name, $block_vars);
 
 			if (count($options) &&
 				count (explode ('.', $block_name)) == 1) {
@@ -890,6 +892,7 @@ XML
 		RESIZE IMAGES
 	*/
 	// Insère des miniatures des liens.jpg insérés dans les messages
+	/*//TODO DELETE ??
 	function viewtopic_modify_post_row_2($vars) {
 		global $db;
 		$post_row = $vars['post_row'];
@@ -927,7 +930,7 @@ XML
 			);
 		}
 		$vars['post_row'] = $post_row;
-	}
+	}*/
 
 	function download_file_send_to_browser_before($vars) {
 		$attachment = $vars['attachment'];
