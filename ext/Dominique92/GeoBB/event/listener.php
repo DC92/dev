@@ -57,7 +57,7 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.submit_post_end' => 'submit_post_end',
+			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 
 			// Resize images
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
@@ -361,6 +361,9 @@ class listener implements EventSubscriberInterface
 			$post_data['geojson'] = $row['geojson'];
 		}
 
+		// Créate a log file with the existing data if there is none
+		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
+
 		// To prevent an empty title invalidate the full page and input.
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
@@ -430,36 +433,43 @@ class listener implements EventSubscriberInterface
 
 		$vars['sql_data'] = $sql_data; // return data
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
+		$this->modifs['geojson'] = str_replace (['ST_GeomFromGeoJSON(\'','\')'], '', $this->modifs['geom']);
 	}
 
 	// Call after the post validation
-	//TODO avant écriture SQL ??? 'core.submit_post_modify_sql_data
-	//TODO save also before if there is no save file (may be at desplay ?)
-	function submit_post_end($vars) {
-		// Save change
+	function modify_submit_notification_data($vars) {
+		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
+	}
+
+	// Save changes
+	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null) {
 		$this->request->enable_super_globals();
 		$to_save = [
 			$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
 			$_SERVER['REQUEST_URI'],
-			'post_subject = '.$this->modifs['post_subject'],
-			'post_text = '.$this->modifs['post_text'],
-			//TODO TEST : le filtre marche t'il bien en 5.7 ? / Est il necessaire (garder tout le code en save)
-			'geom = '.str_replace (['GeomFromText("','")'], '', $this->modifs['geom']),
+			'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
+			'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
+			'post_subject = '.$post_data['post_subject'],
+			'post_text = '.$post_data['post_text'],
+			'geojson = '.$geo_data['geojson'],
 		];
-		$this->request->disable_super_globals();
-		foreach ($this->modifs AS $k=>$v)
+		foreach ($geo_data AS $k=>$v)
 			if ($v && !strncmp ($k, 'geo_', 4))
-				$to_save [] = substr ($k, 4).' = '.$v;
+				$to_save [] = "$k = $v";
 
 		// Save attachment_data
 		$attach = [];
-		if ($vars['data']['attachment_data'])
-			foreach ($vars['data']['attachment_data'] AS $att)
-				$attach[] = $att['attach_id'].':'.$att['real_filename'];
+		if ($attachment_data)
+			foreach ($attachment_data AS $att)
+				$attach[] = $att['attach_id'].' : '.$att['real_filename'];
 		if (isset ($attach))
 			$to_save[] = 'attachments = '.implode (', ', $attach);
 
-		file_put_contents ('LOG/'.$vars['data']['post_id'].'.txt', implode ("\n", $to_save)."\n\n", FILE_APPEND);
+		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+		if (!$create_if_null || !file_exists($file_name))
+			file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
+
+		$this->request->disable_super_globals();
 	}
 
 
