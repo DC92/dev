@@ -99,9 +99,7 @@ body,
 	color: yellow;
 }
 #site-description-geobb p {
-	padding-left: 10px;
-	font-size: 1.8em;
-	display: inline;
+	display: none;
 }
 .search-header {
 	margin-top: 37px;
