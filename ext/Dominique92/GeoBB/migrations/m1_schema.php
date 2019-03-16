@@ -52,7 +52,8 @@ class m1_schema extends \phpbb\db\migration\migration
 	 * @return array Array of table schema
 	 * @access public
 	 */
-	public function revert_schema()
+//TODO revoir globalement les suppressions de données
+	public function WWWW_revert_schema()
 	{
 		return array(
 			'drop_columns'	=> array(
