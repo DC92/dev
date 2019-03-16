@@ -1139,8 +1139,10 @@ function controlGPS(options) {
 			element: document.createElement('div'),
 		});
 
-	// The position marker
-	const feature = new ol.Feature(),
+	var map, view,
+		gps = {}, compas = {}, // Mem last sensors values
+		// The graticule
+		feature = new ol.Feature(),
 		layer = new ol.layer.Vector({
 			source: source = new ol.source.Vector({
 				features: [feature]
@@ -1161,13 +1163,16 @@ function controlGPS(options) {
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
 			activate: function(active) {
-				// Toggle reticule & rotation
+				map = this_.getMap();
+				view = map.getView();
+
+				// Toggle reticule, position & rotation
 				geolocation.setTracking(active);
 				if (active)
-					this_.getMap().addLayer(layer);
+					map.addLayer(layer);
 				else {
-					this_.getMap().removeLayer(layer);
-					this_.getMap().getView().setRotation(0);
+					map.removeLayer(layer);
+					view.setRotation(0);
 				}
 			}
 		}),
@@ -1181,65 +1186,66 @@ function controlGPS(options) {
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
 	});
-
-	var heading = 0, // Orientation of the device since the interface init
-		delta; // Angle to add to the deviceorientation to get the geographic heading
-	// Angles are in radians and reverse clockwize
 	geolocation.on('change', function() {
-		const position = ol.proj.fromLonLat(this.getPosition()),
-			view = this_.getMap().getView();
-		view.setCenter(position);
-
-		if (!this.done) { // Only once the first time the feature is activated
-			this.done = true;
-			view.setZoom(17); // Zoom on the area
+		gps.position = ol.proj.fromLonLat(this.getPosition());
+		gps.accuracyGeometry = this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
+		if (this.getHeading()) {
+			gps.heading = -this.getHeading(); // Delivered radians, clockwize
+			gps.delta = gps.heading - compas.heading // Freeze delta at this time bewteen the GPS heading & the compas
 		}
 
-		// Calculate the correction to be made
-		if (this.getHeading()) // Move direction (Clockwize)
-			delta = -this.getHeading() - heading;
-
-		// Redraw the marker
-		feature.setGeometry(new ol.geom.GeometryCollection([
-			// The accurate circle
-			this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857'),
-			// The graticule
-			new ol.geom.MultiLineString([
-				[
-					[position[0], -20000000],
-					[position[0], 20000000]
-				],
-				[
-					[position[0] - 20000000, position[1]],
-					[position[0] + 20000000, position[1]]
-				]
-			])
-		]));
-
-		if (typeof options.callBack == 'function') // Default undefined
-			options.callBack(position);
+		renderReticule();
 	});
 
-	// Keep the map oriented
-	window.addEventListener('compassneedscalibration', function() {
-		alert('Compass needs calibration');
-	});
+	// Browser heading from the inertial sensors
 	window.addEventListener(
 		'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : // Gives always the magnetic north
 		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
 		function(evt) {
-			// Browser heading from the inertial sensors
-			heading = evt.alpha || evt.webkitCompassHeading; // Android iOS
-			heading -= screen.orientation.angle; // Screen portrait / landscape / ...
-			heading *= Math.PI / 180;
+			let heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			if (heading)
+				compas = {
+					heading: Math.PI / 180 * // Delivered ° reverse clockwize
+						(heading - screen.orientation.angle), // Screen portrait / landscape
+					absolute: evt.absolute // Gives initial device orientation | magnetic north
+				};
 
-			// Orientate the map
-			if (this_.active && (evt.absolute || delta !== undefined))
-				this_.getMap().getView().setRotation(
-					heading + // Device orientation
-					(evt.absolute ? 0 : delta) // Gives magnetic north / initial device orientation + correction
-				);
+			renderReticule();
 		});
+
+	function renderReticule() {
+		if (this_.active && gps) {
+			if (!feature.getGeometry()) // Only once the first time the feature is activated
+				view.setZoom(17); // Zoom on the area
+
+			view.setCenter(gps.position);
+			// Redraw the marker
+			feature.setGeometry(new ol.geom.GeometryCollection([
+				gps.accuracyGeometry, // The accurate circle
+				new ol.geom.MultiLineString([ // The graticule
+					[
+						[gps.position[0], -20000000],
+						[gps.position[0], 20000000]
+					],
+					[
+						[gps.position[0] - 20000000, gps.position[1]],
+						[gps.position[0] + 20000000, gps.position[1]]
+					]
+				])
+			]));
+
+			// Map orientation (Radians and reverse clockwize)
+			view.setRotation(
+				compas.absolute ? compas.heading : // Use magnetic compas value
+				compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
+				0
+			);
+
+			// Optional callback function
+			if (typeof options.callBack == 'function') // Default undefined
+				options.callBack(gps.position);
+		}
+	}
 
 	return this_;
 }

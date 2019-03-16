@@ -26,7 +26,7 @@ Mise à jour config.php
 Lancer admin -> Upgrade
 Supprimer répertoire install
 Désactiver styles et extensions /supprimer les données (y compris collapsible cactégories)
-Supprimer /styles/... /ext/phpbb/Collapsible... /ext/Dominique92/...autre que GeoBB /ext/Dominique92/GeoBB/... autres que GeoBB
+Revoir contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
 Administration ==>
 Général -> Gérer les forums -> Tous forums : [style=fiche][/style]
 enlever [exclude=tortillards]
