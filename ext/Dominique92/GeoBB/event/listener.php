@@ -434,6 +434,7 @@ class listener implements EventSubscriberInterface
 
 	// Call after the post validation
 	//TODO avant écriture SQL ??? 'core.submit_post_modify_sql_data
+	//TODO save also before if there is no save file (may be at desplay ?)
 	function submit_post_end($vars) {
 		// Save change
 		$this->request->enable_super_globals();
