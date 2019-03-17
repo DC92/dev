@@ -3,11 +3,7 @@ DEV TODO AVANT UPGRADE CHEM
 voir les diaporamas : [all=point][view=diapo][exclude=tortillards]
 TODO récupérer les fichiers chem2
 	C koi chem3/files/attach ?
-chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php
-Optimiser ne pas générer le template posts quand fiche.
-	masquer <table class="point-post"> quand ce n'est pas une fiche
-	Ne pas mettre lon/lat en étiquette de trace
-	localhost/Votre premier forum ne devrait pas avoir un format fiche
+chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
 
 
 UPGRADE CHEMINEUR

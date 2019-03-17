@@ -22,13 +22,15 @@ z.birthday-list,
 z.section-viewforum .bar-top,
 .section-viewtopic.fiche .bar-top,
 .section-viewtopic.fiche .actions-jump,
-
+.section-viewtopic.fiche .post, /* Masque les formats habituels de post en format fiches */
+.section-viewtopic .fiche-post, /* Masque le format fiche de posts normaux */
 z.section-posting input[name="save"],
 z.section-posting input[name="preview"], /*//TODO revoir effet de save et preview sur la saisie d'un point / trace */
 .section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
 .section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
 }
+.section-viewtopic.fiche .fiche-post, /* Masque le format fiche de posts normaux */
 .section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
@@ -203,7 +205,7 @@ z.geo_presentation {
 }
 
 /* Cadres d'affichage */
-#etiquette {
+.section-viewtopic.fiche .etiquette {
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 10px;
@@ -211,58 +213,58 @@ z.geo_presentation {
 	border-spacing: 0;
 }
 @media screen and (max-width: 600px) {
-	#etiquette {
+	.section-viewtopic.fiche .etiquette {
 		width: 100%;
 		top: 0;
 	}
 }
 
-#etiquette td {
+.section-viewtopic.fiche .etiquette td {
 	padding: 0;
 }
-#etiquette .hg, #etiquette .hd, #etiquette .bg, #etiquette .bd {
+.section-viewtopic.fiche .etiquette .hg, .section-viewtopic.fiche .etiquette .hd, .section-viewtopic.fiche .etiquette .bg, .section-viewtopic.fiche .etiquette .bd {
 	height: 36px;
 	min-width: 36px;
 	background: url('images/etiquette_bg.png');
 }
-#etiquette .hm, #etiquette .bm {
+.section-viewtopic.fiche .etiquette .hm, .section-viewtopic.fiche .etiquette .bm {
 	background: url('images/etiquette_v.png');
 	text-align: right;
 }
-#etiquette .md {
+.section-viewtopic.fiche .etiquette .md {
 	vertical-align: bottom;
 }
-#etiquette .md img {
+.section-viewtopic.fiche .etiquette .md img {
 	position: relative; right: -27px; bottom: -5px;
 }
-#etiquette .mg, #etiquette .md {
+.section-viewtopic.fiche .etiquette .mg, .section-viewtopic.fiche .etiquette .md {
 	background: url('images/etiquette_h.png');
 }
-#etiquette .hd {
+.section-viewtopic.fiche .etiquette .hd {
 	background-position: right top;
 }
-#etiquette .bg {
+.section-viewtopic.fiche .etiquette .bg {
 	height: 0;
 	background-position: left bottom;
 }
-#etiquette .bd, #etiquette .md, #etiquette .bm {
+.section-viewtopic.fiche .etiquette .bd, .section-viewtopic.fiche .etiquette .md, .section-viewtopic.fiche .etiquette .bm {
 	background-position: right bottom;
 }
-#etiquette .mm {
+.section-viewtopic.fiche .etiquette .mm {
 	background-color: white;
 }
-#etiquette h1 {
+.section-viewtopic.fiche .etiquette h1 {
 	color: #105289;
 	margin-right: 0;
 	margin-top: 0;
 	font-size: 20px;
 }
-#etiquette h1 span {
+.section-viewtopic.fiche .etiquette h1 span {
 	color: #105289;
 	font-size: 16px;
 }
-#etiquette h3,
-#etiquette .action-bar {
+.section-viewtopic.fiche .etiquette h3,
+.section-viewtopic.fiche .etiquette .action-bar {
 	text-transform: none;
 	padding: 0 2px;
 	font-size: 10px;
@@ -294,14 +296,14 @@ z.geo_ref .button {
 	top: 6px;
 }
 
-.point-post {
+.fiche-post {
 	width: 100%;
 }
-.point-post td {
+.fiche-post td {
 	vertical-align: middle;
 	padding: 5px;
 }
-.point-post table {
+.fiche-post table {
 	margin-left: auto; margin-right: auto;
 }
 

@@ -38,7 +38,7 @@ class listener implements EventSubscriberInterface
 	static public function getSubscribedEvents() {
 		return [
 			// All
-			'core.user_setup' => 'user_setup',
+//			'core.user_setup' => 'user_setup',
 			'core.page_footer' => 'page_footer',
 
 			// Index
@@ -64,11 +64,13 @@ class listener implements EventSubscriberInterface
 		];
 	}
 	//TODO-ASPIR ??? recherche par département / commune
+	//TODO mettre dans modération : déplacer les fichiers la permutaion des posts => event/mcp_topic_postrow_post_before.html
 
 
 	/**
 		ALL
 	*/
+	/*
 	function user_setup($vars) {
 		return;//TODO DELETE ?
 		// Force le style 
@@ -81,7 +83,7 @@ class listener implements EventSubscriberInterface
 			if ($row)
 				$vars['style_id'] =  $row ['style_id'];
 		}
-	}
+	}*/
 
 	function page_footer() {
 //		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
