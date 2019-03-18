@@ -122,7 +122,7 @@ class listener implements EventSubscriberInterface
 		INDEX.PHP
 	*/
 	function index_modify_page_title ($vars) {
-		$this->index_news ($vars);
+		$this->index_news ($vars); //TODO aller directement à la fonction
 //TODO DELETE		$this->index_forum_tree(0, '');
 	}
 
@@ -491,18 +491,21 @@ class listener implements EventSubscriberInterface
 			case 'all': // Régle sur tous les posts
 				$ns = explode ('\\', __NAMESPACE__);
 				$this->template->assign_vars([
-					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
-					'BODY_CLASS' => @$style[2],
-					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 					'GEO_MAP_TYPE' => str_replace(
 						['point','ligne','line','surface',],
 						['Point','LineString','LineString','Polygon',],
 						@$regle[2]),
 					'GEO_KEYS' => json_encode($geo_keys),
-//TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
 				if ($geo_keys)
 					$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
+				default:
+				$this->template->assign_vars([
+					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
+					'BODY_CLASS' => @$style[2],
+					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
+//TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
+				]);
 		}
 	}
 

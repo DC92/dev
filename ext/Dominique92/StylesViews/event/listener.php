@@ -89,6 +89,7 @@ $styles = array (
 		}
 
 		// Assigne au body une classe dépendant de la vue
+		//TODO reprendre classe / style / choix par l'utilisateur, ??????? / style=fiche ou point ????
 		$this->template->assign_var ('BODY_CLASS', 'view-'.request_var('view', ''));
 	}
 

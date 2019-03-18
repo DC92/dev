@@ -175,5 +175,3 @@ new ol.MyMap({
 //TODO-BEST END http://jsbeautifier.org/ & http://jshint.com
 //TODO-ARCHI map off line, application
 //TODO-ARCHI replace var by const / let
-//TODO-ARCHI for(event of eventList) { / vérifier si IE / autres ?)
-

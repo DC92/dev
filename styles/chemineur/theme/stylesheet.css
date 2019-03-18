@@ -23,14 +23,14 @@ z.section-viewforum .bar-top,
 .section-viewtopic.fiche .bar-top,
 .section-viewtopic.fiche .actions-jump,
 .section-viewtopic.fiche .post, /* Masque les formats habituels de post en format fiches */
-.section-viewtopic .fiche-post, /* Masque le format fiche de posts normaux */
+DELETE.section-viewtopic .fiche-post, /* Masque le format fiche de posts normaux */
 z.section-posting input[name="save"],
 z.section-posting input[name="preview"], /*//TODO revoir effet de save et preview sur la saisie d'un point / trace */
 .section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
 .section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
 }
-.section-viewtopic.fiche .fiche-post, /* Masque le format fiche de posts normaux */
+DELETE.section-viewtopic.fiche .fiche-post, /* Masque le format fiche de posts normaux */
 .section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
