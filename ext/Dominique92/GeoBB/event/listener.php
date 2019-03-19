@@ -7,6 +7,11 @@
  *
  */
 //TODO ASPIR ajouter champs enregistrement : ucp_register.html
+//TODO revoir nommage fiches
+//TODO permutations POSTS dans le template modération
+//TODO Chemineur choix du type de point en haut de formulaire
+//TODO Voir nommage GeoBB ou GeoBB32 !
+//TODO ne pas afficher les points en doublon (flux wri, prc, c2c)
 
 namespace Dominique92\GeoBB\event;
 
@@ -64,7 +69,7 @@ class listener implements EventSubscriberInterface
 		];
 	}
 	//TODO-ASPIR ??? recherche par département / commune
-	//TODO mettre dans modération : déplacer les fichiers la permutaion des posts => event/mcp_topic_postrow_post_before.html
+	//TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 
 
 	/**
@@ -126,7 +131,7 @@ class listener implements EventSubscriberInterface
 //TODO DELETE		$this->index_forum_tree(0, '');
 	}
 
-	// Ajoute un bouton créer un point en face de la liste des forums
+	// Add a button to create a topic in front of the list of forums
 	function display_forums_modify_row ($vars) {
 		$row = $vars['row'];
 
@@ -143,7 +148,7 @@ class listener implements EventSubscriberInterface
 		$this->geobb_activate_map('[all=accueil]');
 
 		// More news count
-		$news = request_var ('news', 20);
+		$news = request_var ('news', 10);
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
 		// Display news
@@ -363,7 +368,7 @@ class listener implements EventSubscriberInterface
 			$post_data['geojson'] = $row['geojson'];
 		}
 
-		// Créate a log file with the existing data if there is none
+		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
 
 		// To prevent an empty title invalidate the full page and input.

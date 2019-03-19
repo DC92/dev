@@ -122,6 +122,13 @@ body,
 #map {
 	margin: 0 !important;
 }
+#map-selector {
+	background-color: #EEF5F9 !important;
+}
+#map-selector ul {
+	float: left;
+}
+
 z.username-coloured {
     text-transform: capitalize;
 }

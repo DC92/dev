@@ -131,30 +131,75 @@ function geoOverlays(o) {
 		topidIdExclude: ''
 	}, o);
 
-	return [new ol.layer.LayerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + options.topidIdExclude,
-		styleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, options.topidIdSelect);
-		},
-		hoverStyleOptions: function(properties) {
-			return layerStyleOptionsFunction(properties, options.topidIdSelect, true);
-		},
-		label: function(properties) {
-			return options.noLabel ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
-		},
-		href: function(properties) {
-			return 'viewtopic.php?t=' + properties.id;
-		}
-	})];
+	//TODO label avec create point
+	return [
+		new ol.layer.LayerVectorURL({
+			baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + options.topidIdExclude,
+			styleOptions: function(properties) {
+				return layerStyleOptionsFunction(properties, options.topidIdSelect);
+			},
+			hoverStyleOptions: function(properties) {
+				return layerStyleOptionsFunction(properties, options.topidIdSelect, true);
+			},
+			label: function(properties) {
+				return options.noLabel ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
+			},
+			href: function(properties) {
+				return 'viewtopic.php?t=' + properties.id;
+			}
+		}),
+
+		// refuges.info
+		new ol.layer.LayerVectorURL({
+			baseUrl: '//www.refuges.info/api/bbox?type_points=',
+			styleOptions: function(properties) {
+				return {
+					image: new ol.style.Icon({
+						src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+					})
+				};
+			},
+			label: function(properties) { // For click on the label
+				return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+			},
+			href: function(properties) { // For click on icon
+				return properties.lien;
+			},
+			selectorName: 'wri-poi'
+		}),
+
+		// alpages.info
+		new ol.layer.LayerVectorURL({
+			baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=200',
+			selectorName: 'alpi',
+			styleOptions: function(properties) {
+				if (properties.icon)
+					return {
+						image: new ol.style.Icon({
+							src: properties.icon
+						})
+					};
+
+				var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
+				return {
+					fill: new ol.style.Fill({
+						color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.3)'
+					})
+				};
+			},
+			label: function(properties) {
+				return '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
+			},
+			href: function(properties) {
+				return 'viewtopic.php?t=' + properties.id;
+			}
+		}),
+	];
 }
 
 /*
 //TODO-CHEM complete chemineur
 				layerOverpass({
-					postLabel: postLabel
-				}),
-				layerPointsWri({
-					selectorName: 'wri-poi',
 					postLabel: postLabel
 				}),
 */

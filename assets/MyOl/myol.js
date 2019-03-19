@@ -1451,9 +1451,9 @@ function geocoder() {
 		provider: 'osm',
 		lang: 'FR',
 		keepOpen: true,
-		placeholder: 'Saisir un nom' // Initialization of the input field
+		placeholder: 'Recherche sur la carte' // Initialization of the input field
 	});
-	gc.container.title = 'Recherche de lieu par son nom';
+	gc.container.title = 'Recherche sur la carte';
 	gc.container.style.top = (nextButtonTopPos += 2) + 'em';
 
 	return gc;
