@@ -4,7 +4,10 @@ voir les diaporamas : [all=point][view=diapo][exclude=tortillards]
 TODO récupérer les fichiers chem2
 	C koi chem3/files/attach ?
 chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
-
+Fiche cabane : carte IGN, commune, ...²
+Voir /TODO.txt (à la racine de GeoBB)
+//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70 
+Retester ASPIR avec cette version
 
 UPGRADE CHEMINEUR
 =================

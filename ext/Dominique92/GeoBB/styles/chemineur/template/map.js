@@ -10,8 +10,50 @@ $('#map').resizable({
 }); //TODO ARCHI centralize in one file
 
 //TODO customize min prosilver / chemineur
-var geoControls = controlsCollection,
-	titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
+function geoControls(options) {
+	const keys = options.geoKeys;
+
+	return controlsCollection(ol.assign({
+		baseLayers: {
+			'OpenTopo': layerOSM(
+				'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+				'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			),
+			'MRI': layerOSM(
+				'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
+				'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+			),
+			'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+			'OSM contraste': layerThunderforest('mobile-atlas', keys.thunderforest),
+			'Hike & Bike': layerOSM(
+				'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
+				'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
+			), // Not on https
+			'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
+			'OSM trains': layerThunderforest('pioneer', keys.thunderforest),
+			'OSM transport': layerThunderforest('transport', keys.thunderforest),
+			'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
+			'Autriche': layerKompass('KOMPASS Touristik'),
+			'Kompas': layerKompass('KOMPASS'),
+			'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+			'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+			'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+			'IGN 1950': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
+			'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
+			'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
+			'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+			'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
+			'Espagne': layerSpain('mapa-raster', 'MTN'),
+			'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
+			'Italie': layerIGM(),
+			'Angleterre': layerOS(keys.bing),
+			'Google': layerGoogle('p'),
+			'Google photo': layerGoogle('s'),
+			'Bing photo': layerBing('Aerial', keys.bing),
+		}
+	}, options));
+}
+var titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
 	"Cliquer sur un segment puis déplacer pour créer un sommet\n" +
 	"Alt + cliquer sur un sommet pour le supprimer et applatir la ligne\n" +
 	"Alt + cliquer sur un segment pour le supprimer et couper la ligne en 2\n" +
@@ -42,16 +84,16 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 */
 
 /* Overlay vector layer from the GeoBB database */
-	topicStyleOptions = { //TODO renommer & commenter
+topicStyleOptions = { //TODO renommer & commenter
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
 				color: 'red'
 			})
 		}),
-/*		fill: new ol.style.Fill({
-			color: 'rgba(255,196,196,0.5)'
-		}),*/
+		/*		fill: new ol.style.Fill({
+					color: 'rgba(255,196,196,0.5)'
+				}),*/
 		stroke: new ol.style.Stroke({
 			color: 'red',
 			width: 2

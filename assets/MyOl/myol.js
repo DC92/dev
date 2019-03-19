@@ -1140,7 +1140,8 @@ function controlGPS(options) {
 		});
 
 	var map, view,
-		gps = {}, compas = {}, // Mem last sensors values
+		gps = {},
+		compas = {}, // Mem last sensors values
 		// The graticule
 		feature = new ol.Feature(),
 		layer = new ol.layer.Vector({
@@ -1514,7 +1515,7 @@ function printMap(orientation, el, resolution) {
 		/*//TODO attendre fin du chargement de toutes les couches !
 		map.getLayers().forEach(function(layer) {
 			if(layer.getSource())
-				;//DCMM
+				;
 		});
 		*/
 
@@ -1843,11 +1844,13 @@ function compareCoords(a, b) {
  */
 function controlsCollection(options) {
 	options = options || {};
+	if (!options.baseLayers)
+		options.baseLayers = layersCollection(options.geoKeys);
 
 	return [
 		controlLayersSwitcher(ol.assign({
 			geoKeys: options.geoKeys,
-			baseLayers: layersCollection(options.geoKeys)
+			baseLayers: options.baseLayers
 		}, options.controlLayersSwitcher)),
 		new ol.control.ScaleLine(),
 		new ol.control.Attribution({
@@ -1887,7 +1890,7 @@ function layersCollection(keys) {
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 		),
-		'OpenTopoMap': layerOSM(
+		'OpenTopo': layerOSM(
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),

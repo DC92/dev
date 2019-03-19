@@ -10,7 +10,6 @@ $('#map').resizable({
 });
 
 function geoControls(options) {
-	options = options || {};
 	return [
 		controlLayersSwitcher({
 			baseLayers: {
