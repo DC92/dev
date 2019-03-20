@@ -53,7 +53,7 @@ function geoControls(options) {
 		}
 	}, options));
 }
-var titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
+const titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
 	"Cliquer sur un segment puis déplacer pour créer un sommet\n" +
 	"Alt + cliquer sur un sommet pour le supprimer et applatir la ligne\n" +
 	"Alt + cliquer sur un segment pour le supprimer et couper la ligne en 2\n" +
@@ -65,7 +65,7 @@ var titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
 /*
 //TODO-CHEM complete chemineur
 function postLabel(properties, feature, layer, pixel, ll4326) {
-	var type = typeof layer.options_.type == 'function' ?
+	const type = typeof layer.options_.type == 'function' ?
 		layer.options_.type(properties, feature, layer, pixel, ll4326) :
 		layer.options_.type || '',
 		name = typeof layer.options_.name == 'function' ?
@@ -146,45 +146,45 @@ function geoOverlays(o) {
 				return properties.lien;
 			}
 		}),
-/*
-		// camptocamp.org
-		new ol.layer.LayerVectorURL({
-			baseUrl: 'assets/proxy/?url=https://api.camptocamp.org/waypoints?pl=fr',
-			selectorName: 'c2c-poi',
-			styleOptions: function(properties) {
-				return {
-					image: new ol.style.Icon({
-						src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
-					})
-				};
-			},
-			label: function(properties) { // For click on the label
-				return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-			},
-			href: function(properties) { // For click on icon
-				return properties.lien;
-			}
-		}),
+		/*
+				// camptocamp.org
+				new ol.layer.LayerVectorURL({
+					baseUrl: 'assets/proxy/?url=https://api.camptocamp.org/waypoints?pl=fr',
+					selectorName: 'c2c-poi',
+					styleOptions: function(properties) {
+						return {
+							image: new ol.style.Icon({
+								src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+							})
+						};
+					},
+					label: function(properties) { // For click on the label
+						return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+					},
+					href: function(properties) { // For click on icon
+						return properties.lien;
+					}
+				}),
 
-		// pyrenees-refuges.com
-		new ol.layer.LayerVectorURL({
-			baseUrl: 'assets/miniProxy/miniProxy.php?http://www.pyrenees-refuges.com/lib/refuges.js',
-			selectorName: 'prc-poi',
-			styleOptions: function(properties) {
-				return {
-					image: new ol.style.Icon({
-						src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
-					})
-				};
-			},
-			label: function(properties) { // For click on the label
-				return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-			},
-			href: function(properties) { // For click on icon
-				return properties.lien;
-			}
-		}),
-*/
+				// pyrenees-refuges.com
+				new ol.layer.LayerVectorURL({
+					baseUrl: 'assets/miniProxy/miniProxy.php?http://www.pyrenees-refuges.com/lib/refuges.js',
+					selectorName: 'prc-poi',
+					styleOptions: function(properties) {
+						return {
+							image: new ol.style.Icon({
+								src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+							})
+						};
+					},
+					label: function(properties) { // For click on the label
+						return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+					},
+					href: function(properties) { // For click on icon
+						return properties.lien;
+					}
+				}),
+		*/
 		// alpages.info
 		new ol.layer.LayerVectorURL({
 			baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=200',
@@ -197,7 +197,7 @@ function geoOverlays(o) {
 						})
 					};
 
-				var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
+				const cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
 				return {
 					fill: new ol.style.Fill({
 						color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)'

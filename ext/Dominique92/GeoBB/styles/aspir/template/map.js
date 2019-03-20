@@ -90,7 +90,7 @@ function layerStyleOptionsFunction(properties, idSelect, transparency /* [fill, 
 	if (properties.id == idSelect)
 		return topicStyleOptions;
 
-	var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
+	const cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color),
 		featureRGBA = 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',';
 	return {
 		fill: new ol.style.Fill({

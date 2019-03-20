@@ -494,7 +494,7 @@ ol.layer.LayerVectorURL = function(o) {
 		let pixel = [evt.pixel[0], evt.pixel[1]];
 
 		// Hide label by default if none feature or his popup here
-		var mapRect = map.getTargetElement().getBoundingClientRect(),
+		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			popupRect = map.popElement_.getBoundingClientRect();
 		if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
 			popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
@@ -1139,7 +1139,7 @@ function controlGPS(options) {
 			element: document.createElement('div'),
 		});
 
-	var map, view,
+	let map, view,
 		gps = {},
 		compas = {}, // Mem last sensors values
 		// The graticule
@@ -1192,7 +1192,7 @@ function controlGPS(options) {
 		gps.accuracyGeometry = this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
 		if (this.getHeading()) {
 			gps.heading = -this.getHeading(); // Delivered radians, clockwize
-			gps.delta = gps.heading - compas.heading // Freeze delta at this time bewteen the GPS heading & the compas
+			gps.delta = gps.heading - compas.heading; // Freeze delta at this time bewteen the GPS heading & the compas
 		}
 
 		renderReticule();
