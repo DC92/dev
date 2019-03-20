@@ -83,30 +83,7 @@ function postLabel(properties, feature, layer, pixel, ll4326) {
 }
 */
 
-/* Overlay vector layer from the GeoBB database */
-topicStyleOptions = { //TODO renommer & commenter
-		image: new ol.style.Circle({
-			radius: 4,
-			fill: new ol.style.Fill({
-				color: 'red'
-			})
-		}),
-		/*		fill: new ol.style.Fill({
-					color: 'rgba(255,196,196,0.5)'
-				}),*/
-		stroke: new ol.style.Stroke({
-			color: 'red',
-			width: 2
-		})
-	},
-	editStyleOptions = { //TODO renommer & commenter
-		stroke: new ol.style.Stroke({
-			color: 'red',
-			width: 3
-		})
-	};
-
-function layerStyleOptionsFunction(properties, id, hover) {
+function layerStyleOptionsFunction(properties, hover) {
 	if (properties.icon)
 		return {
 			image: new ol.style.Icon({
@@ -131,18 +108,18 @@ function geoOverlays(o) {
 		topidIdExclude: ''
 	}, o);
 
-	//TODO label avec create point
 	return [
+		// chemineur.fr
 		new ol.layer.LayerVectorURL({
-			baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + options.topidIdExclude,
+			baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300',
 			styleOptions: function(properties) {
-				return layerStyleOptionsFunction(properties, options.topidIdSelect);
+				return layerStyleOptionsFunction(properties);
 			},
 			hoverStyleOptions: function(properties) {
-				return layerStyleOptionsFunction(properties, options.topidIdSelect, true);
+				return layerStyleOptionsFunction(properties, true);
 			},
 			label: function(properties) {
-				return options.noLabel ? null : '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
+				return '<a href="viewtopic.php?t=' + properties.id + '">' + properties.name + '<a>';
 			},
 			href: function(properties) {
 				return 'viewtopic.php?t=' + properties.id;
@@ -150,6 +127,7 @@ function geoOverlays(o) {
 		}),
 
 		// refuges.info
+		//TODO label avec create point
 		new ol.layer.LayerVectorURL({
 			baseUrl: '//www.refuges.info/api/bbox?type_points=',
 			styleOptions: function(properties) {
@@ -167,7 +145,45 @@ function geoOverlays(o) {
 			},
 			selectorName: 'wri-poi'
 		}),
+/*
+		// camptocamp.org
+		new ol.layer.LayerVectorURL({
+			baseUrl: 'assets/proxy/?url=https://api.camptocamp.org/waypoints?pl=fr',
+			styleOptions: function(properties) {
+				return {
+					image: new ol.style.Icon({
+						src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+					})
+				};
+			},
+			label: function(properties) { // For click on the label
+				return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+			},
+			href: function(properties) { // For click on icon
+				return properties.lien;
+			},
+			selectorName: 'c2c-poi'
+		}),
 
+		// pyrenees-refuges.com
+		new ol.layer.LayerVectorURL({
+			baseUrl: 'assets/miniProxy/miniProxy.php?http://www.pyrenees-refuges.com/lib/refuges.js',
+			styleOptions: function(properties) {
+				return {
+					image: new ol.style.Icon({
+						src: '//www.refuges.info/images/icones/' + properties.type.icone + '.png'
+					})
+				};
+			},
+			label: function(properties) { // For click on the label
+				return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+			},
+			href: function(properties) { // For click on icon
+				return properties.lien;
+			},
+			selectorName: 'prc-poi'
+		}),
+*/
 		// alpages.info
 		new ol.layer.LayerVectorURL({
 			baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=200',
@@ -183,7 +199,7 @@ function geoOverlays(o) {
 				var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.color);
 				return {
 					fill: new ol.style.Fill({
-						color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.3)'
+						color: 'rgba(' + parseInt(cs[1], 16) + ',' + parseInt(cs[2], 16) + ',' + parseInt(cs[3], 16) + ',0.5)'
 					})
 				};
 			},
