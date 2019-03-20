@@ -100,7 +100,7 @@ body,
 	background: white;
 }
 
-/* INDEX.PHP NEWS */
+/* INDEX.PHP */
 .section-index > div {
 	background: url('images/coin_ciel.jpg'); 
 	background-repeat: no-repeat ;
@@ -117,6 +117,11 @@ body,
 }
 #map-selector ul {
 	float: left;
+	margin: 3px;
+}
+#map-selector p {
+	font-weight: bold;
+	margin-bottom: 4px;
 }
 
 z.username-coloured {

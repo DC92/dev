@@ -111,7 +111,8 @@ function geoOverlays(o) {
 	return [
 		// chemineur.fr
 		new ol.layer.LayerVectorURL({
-			baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300',
+			baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&forums=',
+			selectorName: 'chem-cat',
 			styleOptions: function(properties) {
 				return layerStyleOptionsFunction(properties);
 			},
@@ -130,6 +131,7 @@ function geoOverlays(o) {
 		//TODO label avec create point
 		new ol.layer.LayerVectorURL({
 			baseUrl: '//www.refuges.info/api/bbox?type_points=',
+			selectorName: 'wri-poi',
 			styleOptions: function(properties) {
 				return {
 					image: new ol.style.Icon({
@@ -142,13 +144,13 @@ function geoOverlays(o) {
 			},
 			href: function(properties) { // For click on icon
 				return properties.lien;
-			},
-			selectorName: 'wri-poi'
+			}
 		}),
 /*
 		// camptocamp.org
 		new ol.layer.LayerVectorURL({
 			baseUrl: 'assets/proxy/?url=https://api.camptocamp.org/waypoints?pl=fr',
+			selectorName: 'c2c-poi',
 			styleOptions: function(properties) {
 				return {
 					image: new ol.style.Icon({
@@ -161,13 +163,13 @@ function geoOverlays(o) {
 			},
 			href: function(properties) { // For click on icon
 				return properties.lien;
-			},
-			selectorName: 'c2c-poi'
+			}
 		}),
 
 		// pyrenees-refuges.com
 		new ol.layer.LayerVectorURL({
 			baseUrl: 'assets/miniProxy/miniProxy.php?http://www.pyrenees-refuges.com/lib/refuges.js',
+			selectorName: 'prc-poi',
 			styleOptions: function(properties) {
 				return {
 					image: new ol.style.Icon({
@@ -180,8 +182,7 @@ function geoOverlays(o) {
 			},
 			href: function(properties) { // For click on icon
 				return properties.lien;
-			},
-			selectorName: 'prc-poi'
+			}
 		}),
 */
 		// alpages.info
@@ -210,12 +211,11 @@ function geoOverlays(o) {
 				return 'viewtopic.php?t=' + properties.id;
 			}
 		}),
+		/*
+		//TODO-CHEM complete chemineur
+						layerOverpass({
+							postLabel: postLabel
+						}),
+		*/
 	];
 }
-
-/*
-//TODO-CHEM complete chemineur
-				layerOverpass({
-					postLabel: postLabel
-				}),
-*/

@@ -12,6 +12,9 @@
 //TODO Chemineur choix du type de point en haut de formulaire
 //TODO Voir nommage GeoBB ou GeoBB32 !
 //TODO ne pas afficher les points en doublon (flux wri, prc, c2c)
+//TODO ASPIR modifier le mail de bienvenue à la connexion
+//TODO-ASPIR ??? recherche par département / commune
+//TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 
 namespace Dominique92\GeoBB\event;
 
@@ -68,8 +71,6 @@ class listener implements EventSubscriberInterface
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
 		];
 	}
-	//TODO-ASPIR ??? recherche par département / commune
-	//TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 
 
 	/**
@@ -92,6 +93,27 @@ class listener implements EventSubscriberInterface
 
 	function page_footer() {
 //		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
+
+		// list of gis.php arguments for chemineur layer selector
+		$sql = "
+			SELECT category.forum_id AS category_id,
+				category.forum_name AS category_name,
+				forum.forum_id, forum.forum_name, forum.forum_desc
+			FROM ".FORUMS_TABLE." AS forum
+			JOIN ".FORUMS_TABLE." AS category ON category.forum_id = forum.parent_id
+			WHERE forum.forum_desc LIKE '%[first=%'
+			ORDER BY forum.left_id
+		";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$cats [$row['category_name']] [] = $row['forum_id'];
+		$this->db->sql_freeresult($result);
+
+		foreach($cats AS $k=>$v)
+			$this->template->assign_block_vars('chemcat', [
+				'CAT' => $k,
+				'ARGS' => implode (',', $v),
+			]);
 
 		// Inclue les fichiers langages de cette extension
 		$ns = explode ('\\', __NAMESPACE__);
