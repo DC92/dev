@@ -494,6 +494,7 @@ class listener implements EventSubscriberInterface
 		if (isset ($attach))
 			$to_save[] = 'attachments = '.implode (', ', $attach);
 
+		//TODO ARCHI création /LOG et index.html ?
 		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 		if (!$create_if_null || !file_exists($file_name))
 			file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
