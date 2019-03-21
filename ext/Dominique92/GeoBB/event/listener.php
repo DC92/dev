@@ -109,11 +109,12 @@ class listener implements EventSubscriberInterface
 			$cats [$row['category_name']] [] = $row['forum_id'];
 		$this->db->sql_freeresult($result);
 
-		foreach($cats AS $k=>$v)
-			$this->template->assign_block_vars('chemcat', [
-				'CAT' => $k,
-				'ARGS' => implode (',', $v),
-			]);
+		if($cats)
+			foreach($cats AS $k=>$v)
+				$this->template->assign_block_vars('chemcat', [
+					'CAT' => $k,
+					'ARGS' => implode (',', $v),
+				]);
 
 		// Inclue les fichiers langages de cette extension
 		$ns = explode ('\\', __NAMESPACE__);
@@ -471,7 +472,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Save changes
-	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null) {
+	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null = false) {
 		$this->request->enable_super_globals();
 		$to_save = [
 			$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
