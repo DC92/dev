@@ -14,14 +14,14 @@ z.section-viewforum .bar-top,
 .section-viewtopic.fiche .bar-top,
 .section-viewtopic.fiche .actions-jump,
 .section-viewtopic.fiche .post, /* Masque les formats habituels de post en format fiches */
-DELETE.section-viewtopic .fiche-post, /* Masque le format fiche de posts normaux */
+DELETE.section-viewtopic .form-post, /* Masque le format fiche de posts normaux */
 z.section-posting input[name="save"],
 z.section-posting input[name="preview"], /*//TODO revoir effet de save et preview sur la saisie d'un point / trace */
 .section-posting #options-panel-tab, .section-posting #options-panel, /* Options d'édition */
 .section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
 }
-DELETE.section-viewtopic.fiche .fiche-post, /* Masque le format fiche de posts normaux */
+DELETE.section-viewtopic.fiche .form-post, /* Masque le format fiche de posts normaux */
 .section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
@@ -299,14 +299,14 @@ z.geo_ref .button {
 	top: 6px;
 }
 
-.fiche-post {
+.form-post {
 	width: 100%;
 }
-.fiche-post td {
+.form-post td {
 	vertical-align: middle;
 	padding: 5px;
 }
-.fiche-post table {
+.form-post table {
 	margin-left: auto; margin-right: auto;
 }
 

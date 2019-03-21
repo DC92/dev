@@ -13,9 +13,9 @@ Supprimer install
 config.php -> clés cartes : $geoKeys = [...]
 Administration ==>
 Général -> Gérer les forums -> Créer
-	Alpages [first=surface][/first][fiche=Alpages][/fiche]
-	Cabanes [first=point][/first][fiche=Cabanes][/fiche] ext/Dominique92/GeoBB/types_points/cabane.png
-	Points d'eau [first=point][/first][fiche=Points d'eau][/fiche] ext/Dominique92/GeoBB/types_points/point_eau.png
+	Alpages [first=surface][/first][form=Alpages][/form]
+	Cabanes [first=point][/first][form=Cabanes][/form] ext/Dominique92/GeoBB/types_points/cabane.png
+	Points d'eau [first=point][/first][form=Points d'eau][/form] ext/Dominique92/GeoBB/types_points/point_eau.png
 	Réseau ....
 	Forum des utilisateurs
 	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
@@ -26,7 +26,7 @@ Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
 Général -> Paramètres du serveur -> Activer la compression GZip : oui
 Général -> Paramètres de charge -> Recompiler les différents éléments du style : non
 Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
-Messages -> Ajouter un bbcode -> [fiche={TEXT}][/fiche] / <span></span> / ne pas oublier [/fiche] dans les forum_desc
+Messages -> Ajouter un bbcode -> [form={TEXT}][/form] / <span></span> / ne pas oublier [/form] dans les forum_desc
 Permissions -> Permissions des forums -> Coin des modérateurs + Configuration + Bugs * + Echanges -> Envoyer
 	Robots + Invités + Utilisateurs * -> Aucun accès -> Appliquer toutes
 Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
@@ -86,7 +86,7 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 Formulaires
 ===========
 [b][u]MODE D'EMPLOI[/u][/b]
-Chaque type de page est représenté par un post dont le nom est égal au nom du type de fiche (Alpages, Cabanes, ...)
+Chaque type de page est représenté par un post dont le nom est égal au nom du type de form (Alpages, Cabanes, ...)
 Chaque ligne représente une donnée. Elle est constituée de champs séparés par des | (sur le clavier : AltGr + 6)
 Champ 1 = { : Début de bloc. Le champ 2 contient alors le titre de ce bloc qui n'est affiché que si le bloc contient des informations valides.
 ou champ 1 = } : fin du bloc (les blocs peuvent être imbriqués).
@@ -103,7 +103,7 @@ Champ 3 = nature du champ qui peut être :
 - attaches : la liste des points attachés (cabanes ou points d'eau)
 Champ 4 = Indication à afficher dans la boite de saisie quand elle est vide. Cette indication disparaît quand on entre dans la boite de saisie et n'est jamais enregistrée dans la base.
 ou champ 4 = texte affiché après la donnée (unité par exemple)
-Un changement peut générer une erreur à la modification d'une fiche. Revenir sur le forum de description et essayer de corriger la dernière modification. Sinon, me contacter.
+Un changement peut générer une erreur à la modification d'une form. Revenir sur le forum de description et essayer de corriger la dernière modification. Sinon, me contacter.
 [color=red]Il est important de bien respecter la structure des lignes et des { } et |[/color]
 
 Vous pouvez modifier ces formulaires en cliquant sur le petit crayon en haut à droite.

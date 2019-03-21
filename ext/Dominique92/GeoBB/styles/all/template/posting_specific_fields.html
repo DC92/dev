@@ -3,15 +3,15 @@
 		<!-- IF info.TAG == 'select' -->
 			<select{info.ATT_TYPE}{info.ATT_NAME}>
 			<!-- BEGIN options -->
-				<option value="{options.VALUE}" <!-- IF info.POST_VALUE == options.OPTION -->selected="selected"<!-- ENDIF -->>{options.OPTION}</option> 
+				<option value="{options.VALUE}" <!-- IF info.VALUE == options.OPTION -->selected="selected"<!-- ENDIF -->>{options.OPTION}</option> 
 			<!-- END options -->
 			</select>
 		<!-- ELSEIF info.TAG == 'textarea' -->
 			<br/><textarea{info.ATT_NAME}{info.ATT_ROWS} cols="60" class="inputbox autowidth"
-			{info.ATT_PLACEHOLDER}>{info.POST_VALUE}</textarea>
+			{info.ATT_PLACEHOLDER}>{info.VALUE}</textarea>
 		<!-- ELSEIF info.TAG -->
 			<{info.TAG}{info.ATT_NAME}{info.ATT_TYPE}{info.ATT_SIZE}{info.ATT_CLASS}
-			{info.ATT_PLACEHOLDER}{info.ATT_POST_VALUE}></{info.TAG}> {info.POSTAMBULE}
+			{info.ATT_PLACEHOLDER}{info.ATT_VALUE}></{info.TAG}> {info.POSTAMBULE}
 		<!-- ENDIF -->
 	</{info.TAG1}>
 <!-- END info -->

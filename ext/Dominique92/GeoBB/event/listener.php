@@ -729,10 +729,10 @@ XML
 	// Form management
 	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name) {
 		// Get form fields from the relative post
-		preg_match ('/\[(form|fiche)=([^\]]+)\]/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
+		preg_match ('/\[form=([^\]]+)\]/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
 		$sql = "
 			SELECT post_text FROM ".POSTS_TABLE."
-			WHERE post_subject = '".str_replace ("'", "\'", $form ? $form[2] : $forum_name)."'
+			WHERE post_subject = '".str_replace ("'", "\'", $form ? $form[1] : $forum_name)."'
 			ORDER BY post_id
 		";
 		$result = $this->db->sql_query($sql);
@@ -753,7 +753,7 @@ XML
 			$block_vars['TYPE'] = $dfs[2];
 			$block_vars['SQL_TYPE'] = 'text';
 			$block_vars['DISPLAY_VALUE'] =
-			$block_vars['POST_VALUE'] =
+			$block_vars['VALUE'] =
 				str_replace ('~', '', $post_data[$sql_id]);
 			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
 
@@ -826,8 +826,8 @@ XML
 							preg_match_all ('/([0-9\.]+)/', $row['centre'], $row['center']);
 							$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
 							$options['d'.$dist2] = $row;
-							if ($row['topic_id'] == $block_vars['POST_VALUE']) {
-								$block_vars['POST_VALUE'] = // For posting.pgp initial select
+							if ($row['topic_id'] == $block_vars['VALUE']) {
+								$block_vars['VALUE'] = // For posting.pgp initial select
 								$block_vars['DISPLAY_VALUE'] = // For viewtopic.php display
 									$row['post_subject'];
 								$block_vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
@@ -872,7 +872,7 @@ XML
 					$block_vars['STYLE'] = 'display:none'; // Hide at posting
 					$block_vars['TYPE'] = 'hidden';
 					$block_vars['POSTAMBULE'] = $dfs[3];
-					$block_vars['POST_VALUE'] = null; // Set the value to null to ask for recalculation
+					$block_vars['VALUE'] = null; // Set the value to null to ask for recalculation
 				}
 
 				// sql_id|titre|0

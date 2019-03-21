@@ -9,8 +9,13 @@ Voir /TODO.txt (à la racine de GeoBB)
 //TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70 
 Retester ASPIR avec cette version
 
+UPGRADE ASPIR
+=============
+Enlever forum_desc [fiche=...]
+
 UPGRADE CHEMINEUR
 =================
+Changer github/Dominique92/GeoBB -> GeoBB31 ; GeoBB32 -> GeoBB
 Fermer le site
 Vider cache
 phpadmin export database
@@ -59,7 +64,7 @@ Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
 Général -> Paramètres du serveur -> Activer la compression GZip : oui
 Général -> Paramètres de charge -> Recompiler les différents éléments du style : non
 Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
-Messages -> Ajouter un bbcode -> [fiche={TEXT}][/fiche] / <span></span> / ne pas oublier [/fiche] dans les forum_desc
+Messages -> Ajouter un bbcode -> [form={TEXT}][/form] / <span></span> / ne pas oublier [/form] dans les forum_desc
 Messages -> Smiley -> Installer un pack de smileys -> Tout conserver -> Installer
 Permissions -> Permissions des forums -> Coin des modérateurs + Configuration + Bugs * + Echanges -> Envoyer
 	Robots + Invités + Utilisateurs * -> Aucun accès -> Appliquer toutes
