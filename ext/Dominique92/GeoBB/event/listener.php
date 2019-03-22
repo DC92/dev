@@ -196,7 +196,6 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
-//TODO				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
@@ -407,13 +406,15 @@ class listener implements EventSubscriberInterface
 		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
 
 		// Assign the phpbb-posts SQL data to the template
+		/*//TODO DELETE
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)
 				&& is_string ($v))
 				$page_data[strtoupper ($k)] =
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
+					*/
 
-		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name']);
+		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name'], true);
 		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
@@ -543,7 +544,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Calcul des données automatiques
-	//TODO revoir et systématiser ~
 	//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
 	function get_automatic_data(&$row) {
 		if (!$row['geojson'])
@@ -593,7 +593,7 @@ class listener implements EventSubscriberInterface
 		) {
 			global $geo_keys;
 			$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$row['center'][0]}&lat={$row['center'][1]}&zonly=true";
-			preg_match ('/([0-9]+)/', @file_get_contents($api), $altitude);
+			preg_match ('/([0-9]+)/', file_get_contents($api), $altitude);
 			if ($altitude)
 				$update['geo_altitude'] = $altitude[1];
 		}
@@ -714,7 +714,8 @@ XML
 
 		// Update de la base
 		foreach ($update AS $k=>$v)
-			if (array_key_exists($k, $row))
+			if (!$row[$k] &&
+				array_key_exists($k, $row))
 				$update[$k] .= '~';
 			else
 				unset ($update[$k]);
@@ -733,7 +734,7 @@ XML
 	}
 
 	// Form management
-	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name) {
+	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name, $posting = false) {
 		// Get form fields from the relative post
 		preg_match ('/\[form=([^\]]+)(\:|\])/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
 		$sql = "
@@ -749,19 +750,27 @@ XML
 
 		$def_forms = explode ("\n", $row['post_text']);
 		foreach ($def_forms AS $kdf=>$df) {
-			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||'));
+			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
 			$block_vars = $attaches = [];
+			$sql_id = 'geo_'.$dfs[0];
+
+			// Clears fields ending with ~ for automatic recalculation
+			if($posting &&
+				strstr($post_data[$sql_id], '~') == '~')
+				$post_data[$sql_id] = '';
+			else
+				$post_data[$sql_id] = str_replace ('~', '', $post_data[$sql_id]);
 
 			// Default tags
-			$block_vars['TAG1'] = $sql_id = 'p';
-			$sql_id = 'geo_'.$dfs[0];
+			$block_vars['TAG1'] = 'p';
 			$block_vars['INNER'] = $dfs[1];
 			$block_vars['TYPE'] = $dfs[2];
 			$block_vars['SQL_TYPE'] = 'text';
 			$block_vars['DISPLAY_VALUE'] =
-			$block_vars['VALUE'] =
-				str_replace ('~', '', $post_data[$sql_id]);
+			$block_vars['VALUE'] = $post_data[$sql_id];
 			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
+			$block_vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
+			$block_vars['POSTAMBULE'] = $dfs[4] .($posting ? ' '.$dfs[5] : '');
 
 			// {|1.1 Title
 			// {|Text
@@ -850,8 +859,6 @@ XML
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
 					$block_vars['TAG'] = 'input';
 					$block_vars['TYPE'] = 'hidden';
-					$block_vars['INNER'] = $dfs[1];
-					$block_vars['DISPLAY_VALUE'] = ' ';
 
 					if (array_key_exists ($sql_id, $post_data)) {
 						$sql = "
@@ -877,7 +884,6 @@ XML
 					$block_vars['TAG'] = 'input';
 					$block_vars['STYLE'] = 'display:none'; // Hide at posting
 					$block_vars['TYPE'] = 'hidden';
-					$block_vars['POSTAMBULE'] = $dfs[3];
 					$block_vars['VALUE'] = null; // Set the value to null to ask for recalculation
 				}
 
@@ -886,7 +892,6 @@ XML
 					$block_vars['TAG'] = 'input';
 					$block_vars['TYPE'] = 'number';
 					$block_vars['SQL_TYPE'] = 'int-5';
-					$block_vars['POSTAMBULE'] = $dfs[3];
 				}
 
 				// sql_id|titre|date
@@ -899,7 +904,6 @@ XML
 				// sql_id|titre|long|invite
 				elseif (!strcasecmp ($dfs[2], 'long')) {
 					$block_vars['TAG'] = 'textarea';
-					$block_vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 				}
 
 				// sql_id|titre|confidentiel|invite
@@ -908,7 +912,6 @@ XML
 					$block_vars['TAG'] = 'input';
 					$block_vars['SIZE'] = '40';
 					$block_vars['CLASS'] = 'inputbox autowidth';
-					$block_vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
 					if ($dfs[2] == 'confidentiel' && !$this->user->data['is_registered'])
 						$block_vars['DISPLAY_VALUE'] = null;
 				}
