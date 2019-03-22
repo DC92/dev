@@ -94,6 +94,10 @@ class listener implements EventSubscriberInterface
 	function page_footer() {
 //		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
 
+		// For debug, Varnish will not be caching pages where you are setting a cookie
+		if (defined('TRACES_DOM'))
+			setcookie('disable-varnish', microtime(true), time()+600, '/');
+
 		// list of gis.php arguments for chemineur layer selector
 		$sql = "
 			SELECT category.forum_id AS category_id,
