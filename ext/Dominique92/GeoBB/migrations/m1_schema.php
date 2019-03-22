@@ -23,7 +23,7 @@ class m1_schema extends \phpbb\db\migration\migration
 	 */
 	public function effectively_installed()
 	{
-		return $this->db_tools->sql_column_exists($this->table_prefix . 'attachments', 'exif');
+		return $this->db_tools->sql_column_exists($this->table_prefix . 'attachments', 'geom');
 	}
 
 	/**
@@ -41,24 +41,6 @@ class m1_schema extends \phpbb\db\migration\migration
 				),
 				$this->table_prefix . 'attachments'	=> array(
 					'exif'	=> array('TEXT', null),
-				),
-			),
-		);
-	}
-
-	/**
-	 * Drop the exif column from the attachments table
-	 *
-	 * @return array Array of table schema
-	 * @access public
-	 */
-//TODO revoir globalement les suppressions de données
-	public function WWWW_revert_schema()
-	{
-		return array(
-			'drop_columns'	=> array(
-				$this->table_prefix . 'attachments'	=> array(
-					'exif',
 				),
 			),
 		);

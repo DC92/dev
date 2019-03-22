@@ -79,7 +79,7 @@ class listener implements EventSubscriberInterface
 			SELECT DISTINCT c.forum_name, c.forum_id
 			FROM ".FORUMS_TABLE." AS c
 			JOIN ".FORUMS_TABLE." AS f ON (f.parent_id = c.forum_id)
-			WHERE f.forum_desc REGEXP '\[[all|first]=[a-z]+\]'
+			WHERE f.forum_desc REGEXP '\[[all|first]=[a-z]+'
 		";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))

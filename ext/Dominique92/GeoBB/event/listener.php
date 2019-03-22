@@ -175,7 +175,7 @@ class listener implements EventSubscriberInterface
 		$this->geobb_activate_map('[all=accueil]');
 
 		// More news count
-		$news = request_var ('news', 10);
+		$news = request_var ('news', 12);
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
 		// Display news
@@ -514,8 +514,8 @@ class listener implements EventSubscriberInterface
 	function geobb_activate_map($forum_desc, $first_post = true) {
 		global $geo_keys; // Private / defined in config.php
 
-		preg_match ('/\[(first|all)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $regle);
-		preg_match ('/\[(style|view)=([a-z]+)\]/i', html_entity_decode ($forum_desc), $style);
+		preg_match ('/\[(first|all)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $regle);
+		preg_match ('/\[(style|view)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $style);
 		switch (@$regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
@@ -735,7 +735,7 @@ XML
 	// Form management
 	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name) {
 		// Get form fields from the relative post
-		preg_match ('/\[form=([^\]]+)\]/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
+		preg_match ('/\[form=([^\]]+)(\:|\])/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
 		$sql = "
 			SELECT post_text FROM ".POSTS_TABLE."
 			WHERE post_subject = '".str_replace ("'", "\'", $form ? $form[1] : $forum_name)."'

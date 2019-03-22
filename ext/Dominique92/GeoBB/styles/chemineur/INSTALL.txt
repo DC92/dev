@@ -1,11 +1,10 @@
 DEV TODO AVANT UPGRADE CHEM
 ===========================
-voir les diaporamas : [all=point][view=diapo][exclude=tortillards]
+CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]	
 TODO récupérer les fichiers chem2
 	C koi chem3/files/attach ?
 chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
-Fiche cabane : carte IGN, commune, ...²
-Voir /TODO.txt (à la racine de GeoBB)
+Fiche type Point : carte IGN, commune, ...²
 //TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70 
 Retester ASPIR avec cette version
 
@@ -30,17 +29,9 @@ Mise à jour config.php
 Lancer admin -> Upgrade
 Supprimer répertoire install
 Désactiver styles et extensions /supprimer les données (y compris collapsible cactégories)
-Revoir contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
-Administration ==>
-Général -> Gérer les forums -> Tous forums : [style=fiche][/style]
-enlever [exclude=tortillards]
-
+Purger contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
+Modifier forum_desc diaporamas : [all=point][view=diapo][exclude=tortillards] => [view=diapo][/view]
 Rediriger dc9.fr/chemineur dans WRI
-
-	Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs, Configuration, Bienvenue, Aide, Formulaires
-		Cabanes
-		altitude|Altitude|automatique|m
-		massif|Massif|court
 
 
 INSTALL O2
