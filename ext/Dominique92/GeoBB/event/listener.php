@@ -9,7 +9,6 @@
 //TODO ASPIR ajouter champs enregistrement : ucp_register.html
 //TODO revoir nommage fiches
 //TODO permutations POSTS dans le template modération
-//TODO Chemineur choix du type de point en haut de formulaire
 //TODO Voir nommage GeoBB ou GeoBB32 !
 //TODO ne pas afficher les points en doublon (flux wri, prc, c2c)
 //TODO ASPIR modifier le mail de bienvenue à la connexion
@@ -61,6 +60,7 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
+			'core.modify_posting_auth' => 'modify_posting_auth',
 			'core.modify_posting_parameters' => 'modify_posting_parameters',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
@@ -359,6 +359,29 @@ class listener implements EventSubscriberInterface
 	/**
 		POSTING.PHP
 	*/
+	function modify_posting_auth($vars) {
+		// Popule le sélecteur de forum
+		preg_match ('/\[view=[a-z]+/i', $vars['post_data']['forum_desc'], $view);
+		$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
+			FROM ".FORUMS_TABLE."
+			WHERE forum_desc LIKE '%{$view[0]}%'
+			ORDER BY left_id ASC";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$forum_list [] = '<option value="' . $row['forum_id'] . '"' .($row['forum_id'] == $vars['forum_id'] ? ' selected="selected"' : ''). '>' . $row['forum_name'] . '</option>';
+		$this->db->sql_freeresult($result);
+		if (isset ($forum_list))
+			$this->template->assign_var ('S_FORUM_SELECT', implode ('', $forum_list));
+
+		// Assigne le nouveau forum pour la création
+		$vars['forum_id'] = request_var('to_forum_id', $vars['forum_id']);
+
+		// Le bouge
+		if ($vars['mode'] == 'edit' && // S'il existe déjà !
+			$vars['forum_id'] != $vars['forum_id'])
+			move_topics([$vars['post_id']], $vars['forum_id']);
+	}
+
 	// Appelé au début pour ajouter des parametres de recherche sql
 	function modify_posting_parameters($vars) {
 		// Création topic avec le nom d'image
@@ -519,7 +542,7 @@ class listener implements EventSubscriberInterface
 		global $geo_keys; // Private / defined in config.php
 
 		preg_match ('/\[(first|all)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $regle);
-		preg_match ('/\[(style|view)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $style);
+		preg_match ('/\[view=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $view);
 		switch (@$regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
@@ -539,7 +562,7 @@ class listener implements EventSubscriberInterface
 				default:
 				$this->template->assign_vars([
 					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
-					'BODY_CLASS' => @$style[2],
+					'BODY_CLASS' => @$view[1],
 					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
 //TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
 				]);
