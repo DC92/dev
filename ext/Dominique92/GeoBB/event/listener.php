@@ -46,7 +46,7 @@ class listener implements EventSubscriberInterface
 	static public function getSubscribedEvents() {
 		return [
 			// All
-//			'core.user_setup' => 'user_setup',
+			'core.user_setup' => 'user_setup',
 			'core.page_footer' => 'page_footer',
 
 			// Index
@@ -76,8 +76,12 @@ class listener implements EventSubscriberInterface
 	/**
 		ALL
 	*/
-	/*
 	function user_setup($vars) {
+		// For debug, Varnish will not be caching pages where you are setting a cookie
+		if (defined('TRACES_DOM'))
+			setcookie('disable-varnish', microtime(true), time()+600, '/');
+	}
+	/*
 		return;//TODO DELETE ?
 		// Force le style 
 		$style_name = request_var ('style', '');
@@ -89,7 +93,7 @@ class listener implements EventSubscriberInterface
 			if ($row)
 				$vars['style_id'] =  $row ['style_id'];
 		}
-	}*/
+	*/
 
 	function page_footer() {
 //		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
@@ -289,7 +293,7 @@ class listener implements EventSubscriberInterface
 			$sql_ary = $vars['sql_ary'];
 			$sql_ary['SELECT'] .=
 				', ST_AsGeoJSON(geom) AS geojson'.
-				', ST_AsGeoJSON(ST_Centroid(geom)) AS centerwkt'.
+				', ST_AsText(ST_Centroid(ST_Envelope(geom))) AS centerwkt'.
 				', ST_Area(geom) AS area';
 			$vars['sql_ary'] = $sql_ary;
 		}
@@ -500,7 +504,6 @@ class listener implements EventSubscriberInterface
 		if (isset ($attach))
 			$to_save[] = 'attachments = '.implode (', ', $attach);
 
-		//TODO ARCHI création /LOG et index.html ?
 		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 		if (!$create_if_null || !file_exists($file_name))
 			file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
@@ -549,7 +552,7 @@ class listener implements EventSubscriberInterface
 		if (!$row['geojson'])
 			return;
 
-		// Calcul du centre pour toutes les actions
+		// Calculation of the center for all actions
 		preg_match_all ('/([0-9\.]+)/', $row['centerwkt'], $center);
 		$row['center'] = $center[0];
 
@@ -593,7 +596,7 @@ class listener implements EventSubscriberInterface
 		) {
 			global $geo_keys;
 			$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$row['center'][0]}&lat={$row['center'][1]}&zonly=true";
-			preg_match ('/([0-9]+)/', file_get_contents($api), $altitude);
+			preg_match ('/([0-9]+)/', @file_get_contents($api), $altitude);
 			if ($altitude)
 				$update['geo_altitude'] = $altitude[1];
 		}
@@ -830,7 +833,7 @@ XML
 						$km = 3; // Search maximum distance
 						$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
 						$sql = "
-							SELECT post_subject, topic_id, ST_AsText(ST_Centroid(geom)) AS centre
+							SELECT post_subject, topic_id, ST_AsText(ST_Centroid(ST_Envelope((geom))) AS center
 							FROM ".POSTS_TABLE."
 							WHERE ST_Dimension(geom) > 0 AND
 								MBRIntersects(geom, ST_GeomFromText('LINESTRING($bbox)',4326))
@@ -838,7 +841,7 @@ XML
 						$result = $this->db->sql_query($sql);
 						$options = ['d0' => []]; // First line empty
 						while ($row = $this->db->sql_fetchrow($result)) {
-							preg_match_all ('/([0-9\.]+)/', $row['centre'], $row['center']);
+							preg_match_all ('/([0-9\.]+)/', $row['center'], $row['center']);
 							$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
 							$options['d'.$dist2] = $row;
 							if ($row['topic_id'] == $block_vars['VALUE']) {
@@ -848,7 +851,7 @@ XML
 								$block_vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
 							}
 						}
-						ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du centre
+						ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du center
 						$this->db->sql_freeresult($result);
 					} else
 						$block_vars['STYLE'] = 'display:none'; // Hide at posting
