@@ -418,8 +418,13 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-			$post_data['geojson'] = $row['geojson'];
+			$page_data['GEOJSON'] = $row['geojson'];
 		}
+
+		// Unhide geojson field
+		$this->request->enable_super_globals();
+		$page_data['GEOJSON_TYPE'] = $_GET['role'] == 'dev' ? 'text' : 'hidden';
+		$this->request->disable_super_globals();
 
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
