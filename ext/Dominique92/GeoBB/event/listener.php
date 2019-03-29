@@ -862,7 +862,7 @@ XML
 							$km = 3; // Search maximum distance
 							$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
 							$sql = "
-								SELECT post_subject, topic_id, ST_AsText(ST_Centroid(ST_Envelope((geom))) AS center
+								SELECT post_subject, topic_id, ST_AsText(ST_Centroid(ST_Envelope(geom))) AS center
 								FROM ".POSTS_TABLE."
 								WHERE ST_Dimension(geom) > 0 AND
 									MBRIntersects(geom, ST_GeomFromText('LINESTRING($bbox)',4326))
