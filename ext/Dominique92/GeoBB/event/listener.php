@@ -157,11 +157,6 @@ class listener implements EventSubscriberInterface
 	/**
 		INDEX.PHP
 	*/
-	function index_modify_page_title ($vars) {
-		$this->index_news ($vars); //TODO aller directement à la fonction
-//TODO DELETE		$this->index_forum_tree(0, '');
-	}
-
 	// Add a button to create a topic in front of the list of forums
 	function display_forums_modify_row ($vars) {
 		$row = $vars['row'];
@@ -173,36 +168,36 @@ class listener implements EventSubscriberInterface
 		$vars['row'] = $row;
 	}
 
-	// Show the most recent post on the home page
-	//TODO BUG compte dans le nb max les posts des forums cachés.
-	function index_news ($vars) {
+	function index_modify_page_title ($vars) {
 		$this->geobb_activate_map('[all=accueil]');
 
-		// More news count
-		$news = request_var ('news', 12);
+		// Show the most recents posts on the home page
+		$news = request_var ('news', 12); // More news count
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
-		// Display news
 		$sql = "
 			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
 				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
 				f.forum_id, f.forum_name, f.forum_image,
-				u.username
+				u.username,
+				IF(post_edit_time > post_time, post_edit_time, post_time) AS post_or_edit_time
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
 				JOIN ".POSTS_TABLE." AS p ON (p.post_id = t.topic_last_post_id)
 				JOIN ".USERS_TABLE."  AS u ON (p.poster_id = u.user_id)
 			WHERE post_visibility = ".ITEM_APPROVED."
-			ORDER BY post_time DESC
+			ORDER BY post_or_edit_time DESC
 			LIMIT $news
 		";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
+				//TODO BUG compte les posts des forums cachés dans le nb max
 				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
+
 	}
 
 	// Docs presentation
@@ -433,6 +428,7 @@ class listener implements EventSubscriberInterface
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
 
+		$page_data['EDIT_REASON'] = 'Modération'; // For display in news
 		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
 		$page_data['POST_ID'] = $post_data['post_id'] ?: 0;
 		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
