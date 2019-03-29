@@ -418,7 +418,7 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-			$page_data['GEOJSON'] = $row['geojson'];
+			$page_data['GEOJSON'] = $post_data['geojson'] = $row['geojson'];
 		}
 
 		// Unhide geojson field
