@@ -858,29 +858,32 @@ XML
 
 						// Search surfaces closest to a point
 						preg_match_all ('/([0-9\.]+)/', $post_data['geojson'], $point);
-						$km = 3; // Search maximum distance
-						$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
-						$sql = "
-							SELECT post_subject, topic_id, ST_AsText(ST_Centroid(ST_Envelope((geom))) AS center
-							FROM ".POSTS_TABLE."
-							WHERE ST_Dimension(geom) > 0 AND
-								MBRIntersects(geom, ST_GeomFromText('LINESTRING($bbox)',4326))
-							";
-						$result = $this->db->sql_query($sql);
-						$options = ['d0' => []]; // First line empty
-						while ($row = $this->db->sql_fetchrow($result)) {
-							preg_match_all ('/([0-9\.]+)/', $row['center'], $row['center']);
-							$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
-							$options['d'.$dist2] = $row;
-							if ($row['topic_id'] == $block_vars['VALUE']) {
-								$block_vars['VALUE'] = // For posting.pgp initial select
-								$block_vars['DISPLAY_VALUE'] = // For viewtopic.php display
-									$row['post_subject'];
-								$block_vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
+						if(count($point[0])) {
+							$km = 3; // Search maximum distance
+							$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
+							$sql = "
+								SELECT post_subject, topic_id, ST_AsText(ST_Centroid(ST_Envelope((geom))) AS center
+								FROM ".POSTS_TABLE."
+								WHERE ST_Dimension(geom) > 0 AND
+									MBRIntersects(geom, ST_GeomFromText('LINESTRING($bbox)',4326))
+								";
+							$result = $this->db->sql_query($sql);
+							$options = ['d0' => []]; // First line empty
+							while ($row = $this->db->sql_fetchrow($result)) {
+								preg_match_all ('/([0-9\.]+)/', $row['center'], $row['center']);
+								$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
+								$options['d'.$dist2] = $row;
+								if ($row['topic_id'] == $block_vars['VALUE']) {
+									$block_vars['VALUE'] = // For posting.pgp initial select
+									$block_vars['DISPLAY_VALUE'] = // For viewtopic.php display
+										$row['post_subject'];
+									$block_vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
+								}
 							}
-						}
-						ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du center
-						$this->db->sql_freeresult($result);
+							ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du center
+							$this->db->sql_freeresult($result);
+						} else
+							$block_vars['STYLE'] = 'display:none'; // Hide at posting
 					} else
 						$block_vars['STYLE'] = 'display:none'; // Hide at posting
 				}
