@@ -179,7 +179,7 @@ class listener implements EventSubscriberInterface
 			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
 				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
 				f.forum_id, f.forum_name, f.forum_image,
-				u.username,
+				u.username, p.post_edit_time,
 				IF(post_edit_time > post_time, post_edit_time, post_time) AS post_or_edit_time
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)

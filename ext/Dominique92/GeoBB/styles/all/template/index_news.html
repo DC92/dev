@@ -6,7 +6,15 @@
 	<!-- BEGIN news -->
 		<li class="row bg1 ">
 			<dl><dt class="rowbg">
-				<!-- IF news.POST_ID == news.TOPIC_FIRST_POST_ID -->{L_CREATION}<!-- ELSE -->{L_COMMENT}<!-- ENDIF -->
+				<!-- IF news.POST_ID == news.TOPIC_FIRST_POST_ID -->
+					<!-- IF news.POST_EDIT_TIME -->
+						{L_MODIFICATION}
+					<!-- ELSE -->
+						{L_CREATION}
+					<!-- ENDIF -->
+				<!-- ELSE -->
+					{L_COMMENT}
+				<!-- ENDIF -->
 				<!-- IF news.FORUM_IMAGE -->
 					<a href="viewforum.php?f={news.FORUM_ID}" title="{news.FORUM_NAME}"><img src="{news.FORUM_IMAGE}" /></a>
 				<!-- ENDIF -->

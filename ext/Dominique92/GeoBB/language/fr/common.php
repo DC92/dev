@@ -45,6 +45,7 @@ $lang = array_merge($lang, array(
 
 	// News
 	'CREATION' => 'Création de',
+	'MODIFICATION' => 'Modification de',
 	'COMMENT' => 'Commentaire sur',
 
 	// Posting
