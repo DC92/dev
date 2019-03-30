@@ -613,7 +613,7 @@ class listener implements EventSubscriberInterface
 				);
 		}
 
-		// Calcul de l'altitude avec mapquest
+		// Calcul de l'altitude avec IGN
 		if (array_key_exists ('geo_altitude', $row) &&
 			!$row['geo_altitude'] &&
 			$row['center']
@@ -837,7 +837,7 @@ XML
 			elseif ($dfs[0]) {
 				$options = explode (',', ','.$dfs[2]); // With a first line empty
 
-				// sql_id|titre|choix,choix
+				// sql_id|titre|choix,choix|invite|postambule|commentaire saisie
 				if (count($options) > 2) {
 					$length = 0;
 					foreach ($options AS $o)
@@ -847,7 +847,7 @@ XML
 					$block_vars['SQL_TYPE'] = 'varchar-'.$length;
 				}
 
-				// sql_id|titre|proches
+				// sql_id|titre|proches||postambule|commentaire saisie
 				elseif (!strcasecmp ($dfs[2], 'proches')) {
 					if ($post_data['post_id']) {
 						$block_vars['TAG'] = 'select';
@@ -884,7 +884,7 @@ XML
 						$block_vars['STYLE'] = 'display:none'; // Hide at posting
 				}
 
-				// sql_id|titre|attaches
+				// sql_id|titre|attaches||postambule|commentaire saisie
 				//TODO-BEST-ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
 				elseif (!strcasecmp ($dfs[2], 'attaches')) {
 					$block_vars['TAG'] = 'input';
@@ -909,7 +909,7 @@ XML
 					}
 				}
 
-				// sql_id|titre|automatique
+				// sql_id|titre|automatique||postambule
 				elseif (!strcasecmp ($dfs[2], 'automatique')) {
 					$block_vars['TAG'] = 'input';
 					$block_vars['STYLE'] = 'display:none'; // Hide at posting
@@ -917,27 +917,27 @@ XML
 					$block_vars['VALUE'] = null; // Set the value to null to ask for recalculation
 				}
 
-				// sql_id|titre|0
+				// sql_id|titre|0||postambule|commentaire saisie
 				elseif (is_numeric ($dfs[2])) {
 					$block_vars['TAG'] = 'input';
 					$block_vars['TYPE'] = 'number';
 					$block_vars['SQL_TYPE'] = 'int-5';
 				}
 
-				// sql_id|titre|date
+				// sql_id|titre|date||postambule|commentaire saisie
 				elseif (!strcasecmp ($dfs[2], 'date')) {
 					$block_vars['TAG'] = 'input';
 					$block_vars['TYPE'] = 'date';
 					$block_vars['SQL_TYPE'] = 'date';
 				}
 
-				// sql_id|titre|long|invite
+				// sql_id|titre|long|invite|invite|postambule|commentaire saisie
 				elseif (!strcasecmp ($dfs[2], 'long')) {
 					$block_vars['TAG'] = 'textarea';
 				}
 
-				// sql_id|titre|confidentiel|invite
-				// sql_id|titre|court|invite
+				// sql_id|titre|confidentiel|invite|invite|postambule|commentaire saisie
+				// sql_id|titre|court|invite|invite|postambule|commentaire saisie
 				else {
 					$block_vars['TAG'] = 'input';
 					$block_vars['SIZE'] = '40';
@@ -945,7 +945,7 @@ XML
 					if ($dfs[2] == 'confidentiel' && !$this->user->data['is_registered'])
 						$block_vars['DISPLAY_VALUE'] = null;
 				}
-			} //TODO-ARCHI DELETE pourquoi as-ton besoin du test précédent ?
+			} //TODO-ARCHI DELETE pourquoi as-t-on besoin du test précédent ?
 
 			$block_vars['NAME'] = $sql_id.'-'.$block_vars['SQL_TYPE'];
 
