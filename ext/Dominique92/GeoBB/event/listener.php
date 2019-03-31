@@ -9,7 +9,6 @@
 //TODO ASPIR ajouter champs enregistrement : ucp_register.html
 //TODO revoir nommage fiches
 //TODO permutations POSTS dans le template modération
-//TODO Voir nommage GeoBB ou GeoBB32 !
 //TODO ne pas afficher les points en doublon (flux wri, prc, c2c)
 //TODO ASPIR modifier le mail de bienvenue à la connexion
 //TODO-ASPIR ??? recherche par département / commune
@@ -124,9 +123,15 @@ class listener implements EventSubscriberInterface
 					'ARGS' => implode (',', $v),
 				]);
 
-		// Inclue les fichiers langages de cette extension
+		// Includes language files for this extension
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+
+		// Misc template values
+		$this->template->assign_vars([
+			'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
+			'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
+		]);
 
 		// Assign post contents to some templates variables
 		$mode = $this-> request->variable('mode', '');
@@ -358,24 +363,26 @@ class listener implements EventSubscriberInterface
 	function modify_posting_auth($vars) {
 		// Popule le sélecteur de forum
 		preg_match ('/\[view=[a-z]+/i', $vars['post_data']['forum_desc'], $view);
-		$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
-			FROM ".FORUMS_TABLE."
-			WHERE forum_desc LIKE '%{$view[0]}%'
-			ORDER BY left_id ASC";
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$forum_list [] = '<option value="' . $row['forum_id'] . '"' .($row['forum_id'] == $vars['forum_id'] ? ' selected="selected"' : ''). '>' . $row['forum_name'] . '</option>';
-		$this->db->sql_freeresult($result);
-		if (isset ($forum_list))
-			$this->template->assign_var ('S_FORUM_SELECT', implode ('', $forum_list));
+		if (count ($view)) {
+			$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
+				FROM ".FORUMS_TABLE."
+				WHERE forum_desc LIKE '%{$view[0]}%'
+				ORDER BY left_id ASC";
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+				$forum_list [] = '<option value="' . $row['forum_id'] . '"' .($row['forum_id'] == $vars['forum_id'] ? ' selected="selected"' : ''). '>' . $row['forum_name'] . '</option>';
+			$this->db->sql_freeresult($result);
+			if (isset ($forum_list))
+				$this->template->assign_var ('S_FORUM_SELECT', implode ('', $forum_list));
 
-		// Assign the new forum for creation
-		$vars['forum_id'] = request_var('to_forum_id', $vars['forum_id']);
+			// Assign the new forum for creation
+			$vars['forum_id'] = request_var('to_forum_id', $vars['forum_id']);
 
-		// Move it
-		if ($vars['mode'] == 'edit' && // S'il existe déjà !
-			$vars['forum_id'] != $vars['forum_id'])
-			move_topics([$vars['post_id']], $vars['forum_id']);
+			// Move it
+			if ($vars['mode'] == 'edit' && // S'il existe déjà !
+				$vars['forum_id'] != $vars['forum_id'])
+				move_topics([$vars['post_id']], $vars['forum_id']);
+		}
 	}
 
 	// Appelé au début pour ajouter des parametres de recherche sql
@@ -419,7 +426,7 @@ class listener implements EventSubscriberInterface
 
 		// Unhide geojson field
 		$this->request->enable_super_globals();
-		$page_data['GEOJSON_TYPE'] = $_GET['role'] == 'dev' ? 'text' : 'hidden';
+		$page_data['GEOJSON_TYPE'] = isset($_GET['geom']) ? 'text' : 'hidden';
 		$this->request->disable_super_globals();
 
 		// Create a log file with the existing data if there is none
@@ -430,8 +437,8 @@ class listener implements EventSubscriberInterface
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
 
 		$page_data['EDIT_REASON'] = 'Modération'; // For display in news
-		$page_data['TOPIC_ID'] = $post_data['topic_id'] ?: 0;
-		$page_data['POST_ID'] = $post_data['post_id'] ?: 0;
+		$page_data['TOPIC_ID'] = @$post_data['topic_id'];
+		$page_data['POST_ID'] = @$post_data['post_id'];
 		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
 
 		// Assign the phpbb-posts SQL data to the template
@@ -444,7 +451,7 @@ class listener implements EventSubscriberInterface
 					*/
 
 		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name'], true);
-		$this->geobb_activate_map($post_data['forum_desc'], $post_data['post_id'] == $post_data['topic_first_post_id']);
+		$this->geobb_activate_map($post_data['forum_desc'], @$post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
 		$file_name = "phpbb/db/driver/driver.php";
@@ -507,33 +514,35 @@ class listener implements EventSubscriberInterface
 
 	// Save changes
 	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null = false) {
-		$this->request->enable_super_globals();
-		$to_save = [
-			$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
-			$_SERVER['REQUEST_URI'],
-			'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
-			'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
-			'post_subject = '.$post_data['post_subject'],
-			'post_text = '.$post_data['post_text'],
-			'geojson = '.$geo_data['geojson'],
-		];
-		foreach ($geo_data AS $k=>$v)
-			if ($v && !strncmp ($k, 'geo_', 4))
-				$to_save [] = "$k = $v";
+		if (isset ($post_data['post_id'])) {
+			$this->request->enable_super_globals();
+			$to_save = [
+				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
+				$_SERVER['REQUEST_URI'],
+				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
+				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
+				'post_subject = '.$post_data['post_subject'],
+				'post_text = '.$post_data['post_text'],
+				'geojson = '.@$geo_data['geojson'],
+			];
+			foreach ($geo_data AS $k=>$v)
+				if ($v && !strncmp ($k, 'geo_', 4))
+					$to_save [] = "$k = $v";
 
-		// Save attachment_data
-		$attach = [];
-		if ($attachment_data)
-			foreach ($attachment_data AS $att)
-				$attach[] = $att['attach_id'].' : '.$att['real_filename'];
-		if (isset ($attach))
-			$to_save[] = 'attachments = '.implode (', ', $attach);
+			// Save attachment_data
+			$attach = [];
+			if ($attachment_data)
+				foreach ($attachment_data AS $att)
+					$attach[] = $att['attach_id'].' : '.$att['real_filename'];
+			if (isset ($attach))
+				$to_save[] = 'attachments = '.implode (', ', $attach);
 
-		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-		if (!$create_if_null || !file_exists($file_name))
-			file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
+			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+			if (!$create_if_null || !file_exists($file_name))
+				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
 
-		$this->request->disable_super_globals();
+			$this->request->disable_super_globals();
+		}
 	}
 
 
@@ -543,15 +552,20 @@ class listener implements EventSubscriberInterface
 	function geobb_activate_map($forum_desc, $first_post = true) {
 		global $geo_keys; // Private / defined in config.php
 
-		preg_match ('/\[(first|all)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $regle);
 		preg_match ('/\[view=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $view);
-		$ns = explode ('\\', __NAMESPACE__);
+		// Misc template values
+		$this->template->assign_vars([
+			'BODY_CLASS' => @$view[1],
+//TODO DELETE	STYLE_NAME' => $this->user->style['style_name'],
+		]);
+
+		preg_match ('/\[(first|all)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $regle);
 		switch (@$regle[1]) {
-			case 'first': // Régle sur le premier post seulement
+			case 'first': // Rule for the first post only
 				if (!$first_post)
 					break;
 
-			case 'all': // Régle sur tous les posts
+			case 'all': // Rule for all posts
 				$this->template->assign_vars([
 					'GEO_MAP_TYPE' => str_replace(
 						['point','ligne','line','surface',],
@@ -561,18 +575,10 @@ class listener implements EventSubscriberInterface
 				]);
 				if ($geo_keys)
 					$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
-
-			default:
-				$this->template->assign_vars([
-					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
-					'BODY_CLASS' => @$view[1],
-					'EXT_DIR' => 'ext/'.$ns[0].'/'.$ns[1].'/', // Répertoire de l'extension
-//TODO DELETE					'STYLE_NAME' => $this->user->style['style_name'],
-				]);
 		}
 	}
 
-	// Calcul des données automatiques
+	// Automatic data calculation
 	//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
 	function get_automatic_data(&$row) {
 		if (!$row['geojson'])
@@ -658,87 +664,22 @@ class listener implements EventSubscriberInterface
 			$update['geo_ign'] = implode ('<br/>', $igns);
 		}
 
-		// Calcul de la commune (France)
+		// Calcul de la commune
 		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
-{/*//TODO-CHEM DELETE ???			$ch = curl_init ();
-			curl_setopt ($ch, CURLOPT_URL,
-				'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
-				http_build_query ( array(
-					'output' => 'json',
-					'xls' =>
-<<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<XLS
-	xmlns:xls="http://www.opengis.net/xls"
-	xmlns:gml="http://www.opengis.net/gml"
-	xmlns="http://www.opengis.net/xls"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2"	xsi:schemaLocation="http://www.opengis.net/xls
-	http://schemas.opengis.net/ols/1.2/olsAll.xsd">
-	<RequestHeader/>
-	<Request requestID="" version="1.2" methodName="LocationUtilityService" maximumResponses="10">
-		<ReverseGeocodeRequest>
-			<Position>
-				<gml:Point>
-					<gml:pos>{$row['center'][1]} {$row['center'][0]}</gml:pos>
-				</gml:Point>
-			</Position>
-			<ReverseGeocodePreference>CadastralParcel</ReverseGeocodePreference>
-		</ReverseGeocodeRequest>
-	</Request>
-</XLS>
-XML
-				))
+			$nominatim = json_decode (@file_get_contents (
+				"https://nominatim.openstreetmap.org/reverse?format=json&lon={$row['center'][0]}&lat={$row['center'][1]}",
+				false,
+				stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
+			));
+			$update['geo_commune'] = @$nominatim->address->postcode.' '.@(
+				$nominatim->address->town ?:
+				$nominatim->address->city ?:
+				$nominatim->address->suburb  ?:
+				$nominatim->address->village ?:
+				$nominatim->address->hamlet ?:
+				$nominatim->address->neighbourhood ?:
+				$nominatim->address->quarter 
 			);
-			ob_start();
-			curl_exec($ch);
-			$json = ob_get_clean();
-			preg_match ('/Municipality\\\">([^<]+)/', $json, $commune);
-
-			if ($commune[1]) {
-				curl_setopt ($ch, CURLOPT_URL,
-					'http://wxs.ign.fr/d27mzh49fzoki1v3aorusg6y/geoportail/ols?'.
-					http_build_query ( array(
-						'output' => 'json',
-						'xls' =>
-<<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<xls:XLS version="1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xls="http://www.opengis.net/xls" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/xls http://schemas.opengis.net/ols/1.2/olsAll.xsd">
-    <xls:RequestHeader srsName="EPSG:4326" />
-    <xls:Request maximumResponses="25" methodName="GeocodeRequest" requestID="282b6805-48af-4e8f-83dc-3c55b2d311b0" version="1.2">
-        <xls:GeocodeRequest returnFreeForm="false">
-            <xls:Address countryCode="StreetAddress">
-		<xls:freeFormAddress>{$commune[1]}</xls:freeFormAddress>
-            </xls:Address>
-        </xls:GeocodeRequest>
-    </xls:Request>
-</xls:XLS>
-XML
-					))
-				);
-				ob_start();
-				curl_exec($ch);
-				$json = ob_get_clean();
-				preg_match ('/PostalCode>([^<]+)/', $json, $postalcode);
-
-				if ($postalcode[1])
-					$update['geo_commune'] = $postalcode[1].' '.$commune[1];
-			}
-			if (!$update['geo_commune']) {*/
-				$nominatim = json_decode (@file_get_contents (
-					"https://nominatim.openstreetmap.org/reverse?format=json&lon={$row['center'][0]}&lat={$row['center'][1]}",
-					false,
-					stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
-				));
-				$update['geo_commune'] = $nominatim->address->postcode.' '.(
-					$nominatim->address->town ?:
-					$nominatim->address->city ?:
-					$nominatim->address->suburb  ?:
-					$nominatim->address->village ?:
-					$nominatim->address->hamlet ?:
-					$nominatim->address->neighbourhood ?:
-					$nominatim->address->quarter 
-				);
-			}
 		}
 
 		// Update de la base
@@ -768,7 +709,7 @@ XML
 		preg_match ('/\[form=([^\]]+)(\:|\])/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
 		$sql = "
 			SELECT post_text FROM ".POSTS_TABLE."
-			WHERE post_subject = '".str_replace ("'", "\'", $form ? $form[1] : $forum_name)."'
+			WHERE LOWER(post_subject) = '".strtolower( str_replace ("'", "\'", $form ? $form[1] : $forum_name))."'
 			ORDER BY post_id
 		";
 		$result = $this->db->sql_query($sql);

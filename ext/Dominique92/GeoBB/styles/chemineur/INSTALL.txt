@@ -31,7 +31,6 @@ Enlever forum_desc [fiche=...]
 
 UPGRADE CHEMINEUR
 =================
-Changer github/Dominique92/GeoBB -> GeoBB31 ; GeoBB32 -> GeoBB
 Fermer le site
 Vider cache
 phpadmin export database

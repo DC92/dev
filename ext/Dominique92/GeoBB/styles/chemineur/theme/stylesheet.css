@@ -11,9 +11,9 @@
 .footer-row, /* Lignes copyright en bas */
 z.birthday-list,
 z.section-viewforum .bar-top,
-.section-viewtopic.fiche .bar-top,
-.section-viewtopic.fiche .actions-jump,
-.section-viewtopic.fiche .post, /* Masque les formats habituels de post en format fiches */
+.section-viewtopic.point .bar-top,
+.section-viewtopic.point .actions-jump,
+.section-viewtopic.point .post, /* Masque les formats habituels de post en format fiches */
 DELETE.section-viewtopic .form-post, /* Masque le format fiche de posts normaux */
 z.section-posting input[name="save"],
 z.section-posting input[name="preview"], /*//TODO revoir effet de save et preview sur la saisie d'un point / trace */
@@ -21,7 +21,7 @@ z.section-posting input[name="preview"], /*//TODO revoir effet de save et previe
 .section-posting #poll-panel-tab { /* Sondages */
 	display: none !important;
 }
-DELETE.section-viewtopic.fiche .form-post, /* Masque le format fiche de posts normaux */
+DELETE.section-viewtopic.point .form-post, /* Masque le format fiche de posts normaux */
 .section-posting #attach-panel { /* Onglet de chargement de fichier */
 	display: block !important;
 }
@@ -189,13 +189,13 @@ z.geo_presentation {
 }
 
 /* Points */
-.section-viewtopic.fiche #wrap {
+.section-viewtopic.point #wrap {
 	background: url('images/pierre.jpg'); 
 }
-.section-viewtopic.fiche .topic-title {
+.section-viewtopic.point .topic-title {
 	display: none;
 }
-.section-viewtopic.fiche .post {
+.section-viewtopic.point .post {
 	display: none;
 }
 .section-viewtopic .post-buttons {
@@ -208,7 +208,7 @@ z.geo_presentation {
 }
 
 /* Cadres d'affichage */
-.section-viewtopic.fiche .etiquette {
+.section-viewtopic.point .etiquette {
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 10px;
@@ -216,58 +216,58 @@ z.geo_presentation {
 	border-spacing: 0;
 }
 @media screen and (max-width: 600px) {
-	.section-viewtopic.fiche .etiquette {
+	.section-viewtopic.point .etiquette {
 		width: 100%;
 		top: 0;
 	}
 }
 
-.section-viewtopic.fiche .etiquette td {
+.section-viewtopic.point .etiquette td {
 	padding: 0;
 }
-.section-viewtopic.fiche .etiquette .hg, .section-viewtopic.fiche .etiquette .hd, .section-viewtopic.fiche .etiquette .bg, .section-viewtopic.fiche .etiquette .bd {
+.section-viewtopic.point .etiquette .hg, .section-viewtopic.point .etiquette .hd, .section-viewtopic.point .etiquette .bg, .section-viewtopic.point .etiquette .bd {
 	height: 36px;
 	min-width: 36px;
 	background: url('images/etiquette_bg.png');
 }
-.section-viewtopic.fiche .etiquette .hm, .section-viewtopic.fiche .etiquette .bm {
+.section-viewtopic.point .etiquette .hm, .section-viewtopic.point .etiquette .bm {
 	background: url('images/etiquette_v.png');
 	text-align: right;
 }
-.section-viewtopic.fiche .etiquette .md {
+.section-viewtopic.point .etiquette .md {
 	vertical-align: bottom;
 }
-.section-viewtopic.fiche .etiquette .md img {
+.section-viewtopic.point .etiquette .md img {
 	position: relative; right: -27px; bottom: -5px;
 }
-.section-viewtopic.fiche .etiquette .mg, .section-viewtopic.fiche .etiquette .md {
+.section-viewtopic.point .etiquette .mg, .section-viewtopic.point .etiquette .md {
 	background: url('images/etiquette_h.png');
 }
-.section-viewtopic.fiche .etiquette .hd {
+.section-viewtopic.point .etiquette .hd {
 	background-position: right top;
 }
-.section-viewtopic.fiche .etiquette .bg {
+.section-viewtopic.point .etiquette .bg {
 	height: 0;
 	background-position: left bottom;
 }
-.section-viewtopic.fiche .etiquette .bd, .section-viewtopic.fiche .etiquette .md, .section-viewtopic.fiche .etiquette .bm {
+.section-viewtopic.point .etiquette .bd, .section-viewtopic.point .etiquette .md, .section-viewtopic.point .etiquette .bm {
 	background-position: right bottom;
 }
-.section-viewtopic.fiche .etiquette .mm {
+.section-viewtopic.point .etiquette .mm {
 	background-color: white;
 }
-.section-viewtopic.fiche .etiquette h1 {
+.section-viewtopic.point .etiquette h1 {
 	color: #105289;
 	margin-right: 0;
 	margin-top: 0;
 	font-size: 20px;
 }
-.section-viewtopic.fiche .etiquette h1 span {
+.section-viewtopic.point .etiquette h1 span {
 	color: #105289;
 	font-size: 16px;
 }
-.section-viewtopic.fiche .etiquette h3,
-.section-viewtopic.fiche .etiquette .action-bar {
+.section-viewtopic.point .etiquette h3,
+.section-viewtopic.point .etiquette .action-bar {
 	text-transform: none;
 	padding: 0 2px;
 	font-size: 10px;
