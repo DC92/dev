@@ -172,9 +172,10 @@ class listener implements EventSubscriberInterface
 		$this->geobb_activate_map('[all=accueil]');
 
 		// Show the most recents posts on the home page
-		$news = request_var ('news', 12); // More news count
+		$news = request_var ('news', 15); // More news count
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
+		//TODO BUG ne prend pas en compte post_edit_time sur le posts qui ne sont pas les premiers
 		$sql = "
 			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
 				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
@@ -368,10 +369,10 @@ class listener implements EventSubscriberInterface
 		if (isset ($forum_list))
 			$this->template->assign_var ('S_FORUM_SELECT', implode ('', $forum_list));
 
-		// Assigne le nouveau forum pour la création
+		// Assign the new forum for creation
 		$vars['forum_id'] = request_var('to_forum_id', $vars['forum_id']);
 
-		// Le bouge
+		// Move it
 		if ($vars['mode'] == 'edit' && // S'il existe déjà !
 			$vars['forum_id'] != $vars['forum_id'])
 			move_topics([$vars['post_id']], $vars['forum_id']);
@@ -389,7 +390,7 @@ class listener implements EventSubscriberInterface
 			$vars['forum_id'] = $row ['forum_id'];
 	}
 
-	// Permet la saisie d'un POST avec un texte vide
+	// Allows entering a POST with empty text
 	function posting_modify_submission_errors($vars) {
 		$error = $vars['error'];
 
@@ -405,7 +406,7 @@ class listener implements EventSubscriberInterface
 		$page_data = $vars['page_data'];
 		$post_data = $vars['post_data'];
 
-		// Récupère la traduction des données spaciales SQL
+		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {
 			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
 				' FROM '.POSTS_TABLE.
@@ -544,13 +545,13 @@ class listener implements EventSubscriberInterface
 
 		preg_match ('/\[(first|all)=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $regle);
 		preg_match ('/\[view=([a-z]+)(\:|\])/i', html_entity_decode ($forum_desc), $view);
+		$ns = explode ('\\', __NAMESPACE__);
 		switch (@$regle[1]) {
 			case 'first': // Régle sur le premier post seulement
 				if (!$first_post)
 					break;
 
 			case 'all': // Régle sur tous les posts
-				$ns = explode ('\\', __NAMESPACE__);
 				$this->template->assign_vars([
 					'GEO_MAP_TYPE' => str_replace(
 						['point','ligne','line','surface',],
@@ -560,7 +561,8 @@ class listener implements EventSubscriberInterface
 				]);
 				if ($geo_keys)
 					$this->template->assign_vars (array_change_key_case ($geo_keys, CASE_UPPER));
-				default:
+
+			default:
 				$this->template->assign_vars([
 					'META_ROBOTS' => defined('META_ROBOTS') ? META_ROBOTS : '',
 					'BODY_CLASS' => @$view[1],
@@ -780,6 +782,8 @@ XML
 			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
 			$block_vars = $attaches = [];
 			$sql_id = 'geo_'.$dfs[0];
+			if (!isset($post_data[$sql_id]))
+				$post_data[$sql_id] = null;
 
 			// Clears fields ending with ~ for automatic recalculation
 			if($posting &&

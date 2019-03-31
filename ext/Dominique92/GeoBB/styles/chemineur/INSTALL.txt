@@ -1,3 +1,20 @@
+CHEM3-4.1
+=========
+Purger cache
+1&1 chem3.1.10 -> Export
+O2 Cpanel -> Créé BDD
+Ajouter utilisateur
+PhpMyAdmin -> BDD -> Import
+Upload PhpBB 3.2.5
+Upload GeoBB (avec les extensions à désactiver)
+Lancer /install -> Upgrade
+Supprimer /install
+Lancer /adm -> Personnaliser -> Gérer les extensions
+Désactiver et supprimer les données sauf GeoBB
+Supprimer les ext/* sauf GeoBB
+
+
+
 DEV TODO AVANT UPGRADE CHEM
 ===========================
 CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]	
