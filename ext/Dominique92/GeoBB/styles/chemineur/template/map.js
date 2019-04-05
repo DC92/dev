@@ -186,7 +186,7 @@ function geoOverlays(o) {
 				}),
 		*/
 		// alpages.info
-		//TODO ne pas afficher les alpages
+		//TODO filtrer cabanes accessibles + points d'eau ? potables ?
 		new ol.layer.LayerVectorURL({
 			baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=200',
 			selectorName: 'alpi',

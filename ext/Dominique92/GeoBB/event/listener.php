@@ -521,8 +521,8 @@ class listener implements EventSubscriberInterface
 				$_SERVER['REQUEST_URI'],
 				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
 				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
-				'post_subject = '.$post_data['post_subject'],
-				'post_text = '.$post_data['post_text'],
+				'post_subject = '.$geo_data['post_subject'],
+				'post_text = '.$post_data['post_text'].$post_data['message'],
 				'geojson = '.@$geo_data['geojson'],
 			];
 			foreach ($geo_data AS $k=>$v)
@@ -580,6 +580,8 @@ class listener implements EventSubscriberInterface
 
 	// Automatic data calculation
 	//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
+	//TODO remplacer le ~ derrière par un - devant (pb des numériques)
+	//TODO ASPIR ajouter une information automatique sur les fiches alpages : que selon la réponse données au département du siège social de l'employeur (point 7 L'organisation de l'alpage, actuellement en champ libre), s'affiche le lien vers la convention collective qui s'applique ? (il y a une convention différente pour chaque département) http://alpages.info/viewtopic.php?f=9&t=3225
 	function get_automatic_data(&$row) {
 		if (!$row['geojson'])
 			return;
@@ -704,11 +706,12 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Form management
+	//TODO BUG n'expanse pas le contenu des cabanes !
 	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name, $posting = false) {
 		// Get form fields from the relative post
 		preg_match ('/\[form=([^\]]+)(\:|\])/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
 		$sql = "
-			SELECT post_text FROM ".POSTS_TABLE."
+			SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
 			WHERE LOWER(post_subject) = '".strtolower( str_replace ("'", "\'", $form ? $form[1] : $forum_name))."'
 			ORDER BY post_id
 		";
@@ -718,20 +721,22 @@ class listener implements EventSubscriberInterface
 		if (!$row) // No form then !
 			return;
 
-		$def_forms = explode ("\n", $row['post_text']);
+		$def_forms = explode ("\n", generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], 0));
 		foreach ($def_forms AS $kdf=>$df) {
-			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
+//TODO DELETE (utilisté de <[^>]+ ?)			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
+			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]/', '', $df.'|||||'));
 			$block_vars = $attaches = [];
 			$sql_id = 'geo_'.$dfs[0];
 			if (!isset($post_data[$sql_id]))
 				$post_data[$sql_id] = null;
 
-			// Clears fields ending with ~ for automatic recalculation
-			if($posting &&
-				strstr($post_data[$sql_id], '~') == '~')
+			// Clears fields begging with - or ending with ~ for automatic recalculation
+//TODO les champs numériques n'utilisent pas le ~			$trimed = trim ($post_data[$sql_id], '-~');
+			$trimed = rtrim ($post_data[$sql_id], '~');
+			if(!$posting)
+				$post_data[$sql_id] = $trimed;
+			elseif ($post_data[$sql_id] != $trimed)
 				$post_data[$sql_id] = '';
-			else
-				$post_data[$sql_id] = str_replace ('~', '', $post_data[$sql_id]);
 
 			// Default tags
 			$block_vars['TAG1'] = 'p';
@@ -910,7 +915,10 @@ class listener implements EventSubscriberInterface
 					]);
 
 				foreach ($attaches AS $v) {
-					$this->template->assign_block_vars($block_name.'.attaches', array_change_key_case ($v, CASE_UPPER));
+					$this->template->assign_block_vars(
+						$block_name.'.attaches',
+						array_change_key_case ($v, CASE_UPPER)
+					);
 					if (count (explode ('.', $block_name)) == 1)
 						$this->topic_fields ($block_name.'.attaches.detail', $v, null, $v['forum_name']);
 				}
