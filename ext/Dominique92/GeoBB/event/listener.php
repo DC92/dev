@@ -348,6 +348,7 @@ class listener implements EventSubscriberInterface
 				$this->topic_fields('info', $post_data, $vars['topic_data']['forum_desc'], $vars['topic_data']['forum_name']);
 
 				// Assign geo_ vars to template for these used out of topic_fields
+				//TODO ARCHI get_automatic_data devrait enlever les ~ en mode view
 				foreach ($post_data AS $k=>$v)
 					if (strstr ($k, 'geo')
 						&& is_string ($v))
@@ -452,6 +453,7 @@ class listener implements EventSubscriberInterface
 					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
 					*/
 
+		//TODO ARCHI devrait appeler get_automatic_data pour enlever les champs automatiques ~
 		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name'], true);
 		$this->geobb_activate_map($post_data['forum_desc'], @$post_data['post_id'] == $post_data['topic_first_post_id']);
 
@@ -627,6 +629,7 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Calcul de l'altitude avec IGN
+		//TODO CHEM -> Altitude en dehors de la France
 		if (array_key_exists ('geo_altitude', $row) &&
 			!$row['geo_altitude'] &&
 			$row['center']
@@ -734,7 +737,7 @@ class listener implements EventSubscriberInterface
 
 			// Clears fields begging with - or ending with ~ for automatic recalculation
 //TODO les champs numériques n'utilisent pas le ~			$trimed = trim ($post_data[$sql_id], '-~');
-			$trimed = rtrim ($post_data[$sql_id], '~');
+			$trimed = rtrim ($post_data[$sql_id], '~'); //TODO ARCHI c'est quoi ce mélange avec les automatic data ?
 			if(!$posting)
 				$post_data[$sql_id] = $trimed;
 			elseif ($post_data[$sql_id] != $trimed)
@@ -850,7 +853,7 @@ class listener implements EventSubscriberInterface
 							WHERE forum_image LIKE '%{$dfs[3]}.png' AND
 								($sql_id = '{$post_data['topic_id']}' OR
 								 $sql_id = '{$post_data['topic_id']}~')
-							";
+							"; //TODO ARCHI pourquoi ~ ?
 						$result = $this->db->sql_query($sql);
 						while ($row = $this->db->sql_fetchrow($result))
 							$attaches[] = $row;
@@ -862,6 +865,7 @@ class listener implements EventSubscriberInterface
 				}
 
 				// sql_id|titre|automatique||postambule
+				//TODO ARCHI devrait être indépendant de topic_fields
 				elseif (!strcasecmp ($dfs[2], 'automatique')) {
 					$block_vars['TAG'] = 'input';
 					$block_vars['STYLE'] = 'display:none'; // Hide at posting
@@ -1034,7 +1038,7 @@ class listener implements EventSubscriberInterface
 
 			$this->db->sql_query (implode (' ', [
 				'UPDATE '.ATTACHMENTS_TABLE,
-				'SET exif = "'.implode (' ', $info ?: ['~']).'",',
+				'SET exif = "'.implode (' ', $info ?: ['~']).'",', //TODO ARCHI voir si remplacé par - ???
 					'filetime = '.(strtotime($exif['DateTimeOriginal']) ?: $exif['FileDateTime'] ?: $attachment['filetime']),
 				'WHERE attach_id = '.$attachment['attach_id']
 			]));
