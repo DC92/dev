@@ -136,6 +136,7 @@ class listener implements EventSubscriberInterface
 		// Assign post contents to some templates variables
 		$mode = $this-> request->variable('mode', '');
 		$msgs = [
+			//TODO ASPIR Modifier le mail reçu lors de l’inscription
 			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
 			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
 			'Bienvenue '.$this->user->style['style_name'] => 'GEO_PRESENTATION',
@@ -180,7 +181,8 @@ class listener implements EventSubscriberInterface
 		$news = request_var ('news', 15); // More news count
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
-		//TODO BUG ne prend pas en compte post_edit_time sur le posts qui ne sont pas les premiers
+		//TODO BUG ne prend pas en compte post_edit_time sur le posts s'il n'est pas le premier
+		//TODO BUG affiche date de création du POST sur une modif
 		$sql = "
 			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
 				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
@@ -593,6 +595,7 @@ class listener implements EventSubscriberInterface
 		$update = []; // Datas to be updated
 
 		// Dans quel alpage est contenu (lors de la première init)
+		//TODO BUG ASPIR non affichage infos CABANES sur fiche alpage	
 		if (array_key_exists ('geo_contains', $row) &&
 			(!$row['geo_contains'] || $row['geo_contains'] == 'null')) {
 			// Search points included in a surface
@@ -706,7 +709,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Form management
-	//TODO BUG n'expanse pas le contenu des cabanes !
 	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name, $posting = false) {
 		// Get form fields from the relative post
 		preg_match ('/\[form=([^\]]+)(\:|\])/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
@@ -723,7 +725,7 @@ class listener implements EventSubscriberInterface
 
 		$def_forms = explode ("\n", generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], 0));
 		foreach ($def_forms AS $kdf=>$df) {
-//TODO DELETE (utilisté de <[^>]+ ?)			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
+//TODO DELETE (utilité de <[^>]+ ?)			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
 			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]/', '', $df.'|||||'));
 			$block_vars = $attaches = [];
 			$sql_id = 'geo_'.$dfs[0];

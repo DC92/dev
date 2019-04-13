@@ -1477,6 +1477,7 @@ function controlPrint() {
 	});
 }
 
+//TODO ajouter l'échelle dans les cartes imprimées
 //TODO ARCHI mettre dans controlPrint
 function printMap(orientation, el, resolution) {
 	// Search control div element in the hierarchy
