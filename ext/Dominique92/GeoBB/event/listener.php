@@ -7,13 +7,13 @@
  *
  */
 //TODO ASPIR ajouter champs enregistrement : ucp_register.html
-//TODO revoir nommage fiches
-//TODO permutations POSTS dans le template modération
+//TODO BEST permutations POSTS dans le template modération
 //TODO ne pas afficher les points en doublon (flux wri, prc, c2c)
 //TODO ASPIR modifier le mail de bienvenue à la connexion
-//TODO-ASPIR ??? recherche par département / commune
+//TODO-ASPIR BEST recherche par département / commune
 //TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 //TODO ASPIR ARCHI rename ASPIR -> ALPAGES
+//TODO BUG le lien bbcode n'est plus actif dans l'éditeur
 
 namespace Dominique92\GeoBB\event;
 
@@ -525,6 +525,7 @@ class listener implements EventSubscriberInterface
 				$to_save[] = 'attachments = '.implode (', ', $attach);
 
 			//TODO protéger l'accès à ces fichiers
+			//TODO sav avec les balises !
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!$create_if_null || !file_exists($file_name))
 				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
@@ -816,10 +817,18 @@ class listener implements EventSubscriberInterface
 									$sql_id LIKE '{$post_data['topic_id']}%'";
 						$result = $this->db->sql_query($sql);
 						while ($row = $this->db->sql_fetchrow($result))
-							$attaches [$k] [] = $row;
+							$attachments [$k] [] = $row;
 						$this->db->sql_freeresult($result);
 
-						$block [$k]['TYPE'] = 'hidden';
+						$sql = 'SELECT forum_name FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%'.$field[3].'%"';
+						$result = $this->db->sql_query($sql);
+						$row = $this->db->sql_fetchrow($result);
+						$this->db->sql_freeresult($result);
+						$block [$k]['COMMENT'] = 'Pour créer ajouter un '.strtolower($row['forum_name']).
+							', choisissez le <a href="http://alpages.info/viewforum.php?&f='.$post_data['forum_id'].
+							'">ICI</a> et modifiez le champ "Alpage d’appartenance"';
+
+						$block [$k]['TYPE'] = 'hidden'; // Hides the input field
 						$sql_type = 'int(10)'; // topic_id
 						break;
 
@@ -849,7 +858,7 @@ class listener implements EventSubscriberInterface
 /*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>CHANGE $sql_id = ".var_export($sql,true).'</pre>';
 
 				// Pass 1 : Flag title having values on related fields
-				if ($block [$k] ['VALUE'] || $attaches [$k])
+				if ($block [$k] ['VALUE'] || $attachments [$k])
 					for ($stn = $title_num[0]; $stn; array_pop ($stn))
 						$block_value [implode('',$stn)] = true;
 				}
@@ -868,14 +877,14 @@ class listener implements EventSubscriberInterface
 
 			$this->template->assign_block_vars($block_name, $b);
 
-			if ($attaches [$k])
-				foreach ($attaches [$k] AS $a) {
+			if ($attachments [$k])
+				foreach ($attachments [$k] AS $a) {
 					$this->template->assign_block_vars(
-						$block_name.'.attaches',
+						$block_name.'.attachments',
 						array_change_key_case ($a, CASE_UPPER)
 					);
 					if (count (explode ('.', $block_name)) == 1)
-						$this->topic_fields ($block_name.'.attaches.detail', $a, $a['forum_desc']);
+						$this->topic_fields ($block_name.'.attachments.detail', $a, $a['forum_desc']);
 				}
 		}
 	}

@@ -18,37 +18,14 @@
 			{specific_fields.COMMENT}
 		</{specific_fields.FIELD_TAG}>
 	<!-- ENDIF -->
+
+	<!-- BEGIN attachments -->
+		<p>Modifier : <a href="posting.php?mode=edit&f={attachments.FORUM_ID}&p={attachments.POST_ID}">
+			{attachments.POST_SUBJECT}
+		</a></p>
+	<!-- END attachments -->
 <!-- END specific_fields -->
 
 <p style="clear:both">
 	<b>Autres remarques ou commentaires:</b>
 </p>
-
-
-
-
-
-<!-- BEGIN specific_fields_OLD -->
-	<{specific_fields_OLD.TAG_LINE}{specific_fields_OLD.ATT_STYLE}>{specific_fields_OLD.INNER}
-		<!-- IF specific_fields_OLD.TAG == 'select' -->
-			<select{specific_fields_OLD.ATT_TYPE}{specific_fields_OLD.ATT_NAME}>
-			<!-- BEGIN options -->
-				<option value="{options.VALUE}" <!-- IF specific_fields_OLD.VALUE == options.OPTION -->selected="selected"<!-- ENDIF -->>{options.OPTION}</option> 
-			<!-- END options -->
-			</select>
-		<!-- ELSEIF specific_fields_OLD.TAG == 'textarea' -->
-			<br/><textarea{specific_fields_OLD.ATT_NAME}{specific_fields_OLD.ATT_ROWS} cols="60" class="inputbox autowidth"
-			{specific_fields_OLD.ATT_PLACEHOLDER}>{specific_fields_OLD.VALUE}</textarea>
-		<!-- ELSEIF specific_fields_OLD.TAG -->
-			<{specific_fields_OLD.TAG}{specific_fields_OLD.ATT_NAME}{specific_fields_OLD.ATT_TYPE}{specific_fields_OLD.ATT_SIZE}{specific_fields_OLD.ATT_CLASS}
-			{specific_fields_OLD.ATT_PLACEHOLDER}{specific_fields_OLD.ATT_VALUE}></{specific_fields_OLD.TAG}>
-		<!-- ENDIF -->
-		{specific_fields_OLD.POSTAMBULE}
-	</{specific_fields_OLD.TAG_LINE}>
-
-
-
-
-<textarea name="geo_mae_precisions-text"></textarea>
-
-<!-- END specific_fields_OLD -->

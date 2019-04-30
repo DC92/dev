@@ -53,14 +53,6 @@ input[type="number"] {
 	margin-bottom: 10px;
 }
 
-/* Responsive map for mobiles */
-@media screen and (max-width: 60px) {
-	.section-posting #map {
-		width: 100%;
-		float: none;
-	}
-}
-
 /* VIEWTOPIC.PHP */
 .specific-fields p {
 	margin: 0;
@@ -78,6 +70,13 @@ input[type="number"] {
 }
 
 /* POSTING.PHP */
+.section-posting #map-frame {
+	float: none;
+}
+.section-posting #map {
+	width: 100% !important;
+	margin: 0 !important;
+}
 .section-posting #postingbox fieldset.fields1 dt {
 	width: auto;
 }
