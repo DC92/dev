@@ -1,4 +1,7 @@
 //TODO enlever /assets/wri
+//TODO upgrade ASPIR/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
+//TODO upgrade ASPIR AVANT : enlever les ~sur geo_contains
+//TODO upgrade ASPIR APRES : template : supprimer les {}
 
 UPDATE PHPBB
 ============
@@ -92,6 +95,9 @@ WRI forum : préalables
 
 TODO WRI
 ========
+Page point : lien des posts vers le bon post du forum
+Inclure scan_liens.php dans /ressources/outils/...
+Paramétres inclusion posts dans points -> config.php
 Récupérer commentaires de conf_privee.php
 Démasquer le CSS "me cacher en ligne"
 Faire une fiche de tests

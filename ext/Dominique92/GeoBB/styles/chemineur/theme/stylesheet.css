@@ -458,13 +458,13 @@ z.section-posting .panel {
 	margin-bottom: 0px;
 }
 
-z.geo-info {
+z.specific-fields {
 	margin-bottom: 20px;
 }
-z.geo-info p {
+z.specific-fields p {
 	margin: 0;
 }
-z.geo-info h4 {
+z.specific-fields h4 {
 	margin-top: 5px !important;
 }
 

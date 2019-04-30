@@ -61,6 +61,22 @@ input[type="number"] {
 	}
 }
 
+/* VIEWTOPIC.PHP */
+.specific-fields p {
+	margin: 0;
+}
+.specific-fields h4 {
+	margin-top: 5px !important;
+}
+.specific-fields pre {
+	display: inline;
+	font-size: 1.1em;
+}
+.specific-fields a {
+	display: inline;
+	white-space: pre-wrap;
+}
+
 /* POSTING.PHP */
 .section-posting #postingbox fieldset.fields1 dt {
 	width: auto;
@@ -71,14 +87,6 @@ input[type="number"] {
 .section-posting .panel {
 	margin-bottom: 0px;
 }
-
-.geo-info p {
-	margin: 0;
-}
-.geo-info h4 {
-	margin-top: 5px !important;
-}
-
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
 	font-size: 10px;
 	color: #36f !important;

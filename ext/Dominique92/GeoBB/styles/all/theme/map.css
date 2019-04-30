@@ -1,4 +1,5 @@
 /* Card's encapsulation */
+/*//TODO BUG IE la frame est à gauche de la carte en IE */
 #map-frame {
 	float: right;
 	background: white;

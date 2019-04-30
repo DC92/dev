@@ -59,7 +59,7 @@ $sql_array = [
 		'post_visibility = '.ITEM_APPROVED,
 		'OR' => [
 			't.topic_first_post_id = p.post_id',
-			'forum_desc LIKE "%[all=%"',
+			'forum_desc LIKE "%[all=%"', //TODO DELETE ?
 		],
 	],
 	'ORDER_BY' => "CASE WHEN f.forum_id = $priority THEN 0 ELSE left_id END",
@@ -105,6 +105,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	];
 
 	// Spécific color defined in forum desc
+	//TODO DELETE / REVOIR ???
 	preg_match('/\[color=([a-z]+)\]/i', html_entity_decode ($row['forum_desc']), $colors);
 	if (count ($colors))
 		$properties['color'] = $colors[1];

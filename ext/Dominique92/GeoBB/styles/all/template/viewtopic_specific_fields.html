@@ -1,29 +1,20 @@
-<div class="geo-info">
-	<!-- IF GEO_MAP_TYPE == 'point' -->
-		<p>Longitude <span id="marqueur-lon"></span>, Latitude <span id="marqueur-lat"></span></p>
-		<p id="marqueur-xy">(CH1903) X <span id="marqueur-x"></span>, Y <span id="marqueur-y"></span></p>
+<div class="specific-fields">
+<!-- BEGIN specific_fields -->
+	<!-- IF (specific_fields.BLOCK_HAVING_VALUE or specific_fields.VALUE) and specific_fields.COMMENT != 'confidentiel' -->
+		<{specific_fields.FIELD_TAG}>
+			{specific_fields.FIELD_TITLE}:
+			{specific_fields.VALUE}
+			{specific_fields.POSTAMBULE}
+		</{specific_fields.FIELD_TAG}>
 	<!-- ENDIF -->
 
-	<!-- BEGIN info -->
-		<!-- IF info.INNER and (info.DISPLAY_VALUE or info.DISPLAY or info.attaches) -->
-			<{info.TAG1}{info.ATT_STYLE_TAG1}>
-				{info.INNER}
-				<!-- IF info.DISPLAY_VALUE -->:<!-- ENDIF -->
-				<!-- IF info.HREF -->
-					<a{info.ATT_HREF}>{info.DISPLAY_VALUE}</a>
-				<!-- ELSE -->
-					{info.DISPLAY_VALUE}
-				<!-- ENDIF -->
-				{info.POSTAMBULE}
-				<!-- BEGIN attaches -->
-					<p> &nbsp; &nbsp; <b><a href="viewtopic.php?t={attaches.TOPIC_ID}" title="voir la fiche">{attaches.POST_SUBJECT}</a></b></p>
-					<!-- BEGIN detail -->
-						<!-- IF detail.DISPLAY_VALUE and detail.DISPLAY_VALUE != TOPIC_ID -->
-							&nbsp; &nbsp; &nbsp; &nbsp; {detail.INNER} : {detail.DISPLAY_VALUE} {info.POSTAMBULE}<br/>
-						<!-- ENDIF -->
-					<!-- END detail -->
-				<!-- END attaches -->
-			</{info.TAG1}>
-		<!-- ENDIF -->
-	<!-- END info -->
+	<!-- BEGIN attaches -->
+		<p> &nbsp; &nbsp; <b><pre><a href="viewtopic.php?t={attaches.TOPIC_ID}" title="voir la fiche">{attaches.POST_SUBJECT}</a></pre></b></p>
+		<!-- BEGIN detail -->
+			<!-- IF detail.VALUE -->
+				&nbsp; &nbsp; &nbsp; {detail.FIELD_TITLE} : {detail.VALUE} {detail.POSTAMBULE}<br/>
+			<!-- ENDIF -->
+		<!-- END detail -->
+	<!-- END attaches -->
+<!-- END specific_fields -->
 </div>

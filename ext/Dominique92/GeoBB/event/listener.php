@@ -13,6 +13,7 @@
 //TODO ASPIR modifier le mail de bienvenue à la connexion
 //TODO-ASPIR ??? recherche par département / commune
 //TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
+//TODO ASPIR ARCHI rename ASPIR -> ALPAGES
 
 namespace Dominique92\GeoBB\event;
 
@@ -105,10 +106,10 @@ class listener implements EventSubscriberInterface
 		$sql = "
 			SELECT category.forum_id AS category_id,
 				category.forum_name AS category_name,
-				forum.forum_id, forum.forum_name, forum.forum_desc
+				forum.forum_id
 			FROM ".FORUMS_TABLE." AS forum
 			JOIN ".FORUMS_TABLE." AS category ON category.forum_id = forum.parent_id
-			WHERE forum.forum_desc LIKE '%[first=%'
+			WHERE forum.forum_desc LIKE '%first=%'
 			ORDER BY forum.left_id
 		";
 		$result = $this->db->sql_query($sql);
@@ -171,6 +172,7 @@ class listener implements EventSubscriberInterface
 			$row['forum_type'] == FORUM_POST)
 			$row['forum_name'] .= ' &nbsp; '.
 				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer</a>';
+
 		$vars['row'] = $row;
 	}
 
@@ -345,7 +347,7 @@ class listener implements EventSubscriberInterface
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
 				$this->get_automatic_data($post_data);
-				$this->topic_fields('info', $post_data, $vars['topic_data']['forum_desc'], $vars['topic_data']['forum_name']);
+				$this->topic_fields('specific_fields', $post_data, $vars['topic_data']['forum_desc']);
 
 				// Assign geo_ vars to template for these used out of topic_fields
 				//TODO ARCHI get_automatic_data devrait enlever les ~ en mode view
@@ -365,7 +367,8 @@ class listener implements EventSubscriberInterface
 	*/
 	function modify_posting_auth($vars) {
 		// Popule le sélecteur de forum
-		preg_match ('/\[view=[a-z]+/i', $vars['post_data']['forum_desc'], $view);
+		//TODO OBSOLETE ????? Voir dans chem !
+		preg_match ('/\view=[a-z]+/i', $vars['post_data']['forum_desc'], $view);
 		if (count ($view)) {
 			$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
 				FROM ".FORUMS_TABLE."
@@ -454,7 +457,7 @@ class listener implements EventSubscriberInterface
 					*/
 
 		//TODO ARCHI devrait appeler get_automatic_data pour enlever les champs automatiques ~
-		$this->topic_fields('info', $post_data, $post_data['forum_desc'], $post_data['forum_name'], true);
+		$this->topic_fields('specific_fields', $post_data, $post_data['forum_desc'], true);
 		$this->geobb_activate_map($post_data['forum_desc'], @$post_data['post_id'] == $post_data['topic_first_post_id']);
 
 		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
@@ -472,37 +475,17 @@ class listener implements EventSubscriberInterface
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
-		// Get special columns list
-		$special_columns = [];
-		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$special_columns [] = $row['Field'];
-		$this->db->sql_freeresult($result);
-
 		// Treat specific data
 		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)) {
-				// <Input name="..."> : <sql colomn name>-<sql colomn type>-[<sql colomn size>]
-				$ks = explode ('-', $k);
-
-				// Create or modify the SQL column
-				if (count ($ks) == 3)
-					$ks[2] = '('.$ks[2].')';
-				$this->db->sql_query(
-					'ALTER TABLE '.POSTS_TABLE.
-					(in_array ($ks[0], $special_columns) ? ' CHANGE '.$ks[0].' ' : ' ADD ').
-					implode (' ', $ks)
-				);
-
 				// Retrieves the values of the geometry, includes them in the phpbb_posts table
-				if ($ks[1] == 'geometry' && $v)
+				if ($k == 'geom' && $v)
 					$v = "ST_GeomFromGeoJSON('$v')";
 					//TODO TEST est-ce qu'il optimise les linestring en multilinestring (ne devrait pas)
 
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-				$sql_data[POSTS_TABLE]['sql'][$ks[0]] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
+				$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
 			}
 		$this->request->disable_super_globals();
 
@@ -541,6 +524,7 @@ class listener implements EventSubscriberInterface
 			if (isset ($attach))
 				$to_save[] = 'attachments = '.implode (', ', $attach);
 
+			//TODO protéger l'accès à ces fichiers
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!$create_if_null || !file_exists($file_name))
 				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
@@ -598,6 +582,7 @@ class listener implements EventSubscriberInterface
 
 		// Dans quel alpage est contenu (lors de la première init)
 		//TODO BUG ASPIR non affichage infos CABANES sur fiche alpage	
+		/*//TODO BUG : pas besoin et génère un ~ malvenu
 		if (array_key_exists ('geo_contains', $row) &&
 			(!$row['geo_contains'] || $row['geo_contains'] == 'null')) {
 			// Search points included in a surface
@@ -614,7 +599,7 @@ class listener implements EventSubscriberInterface
 			if ($row_contain = $this->db->sql_fetchrow($result))
 				$update['geo_contains'] = $row_contain['topic_id'];
 			$this->db->sql_freeresult($result);
-		}
+		}*/
 
 		// Calcul de la surface en ha
 		if (array_key_exists ('geo_surface', $row) &&
@@ -712,12 +697,19 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Form management
-	function topic_fields ($block_name, $post_data, $forum_desc, $forum_name, $posting = false) {
-		// Get form fields from the relative post
-		preg_match ('/\[form=([^\]]+)(\:|\])/i', $forum_desc, $form); // Try in forum_desc = [form=Post title][/form]
+	function topic_fields ($block_name, $post_data, $forum_desc, $posting = false) {
+		// Get special columns list
+		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$special_columns [$row['Field']] = $row['Type'];
+		$this->db->sql_freeresult($result);
+
+		// Get form fields from the relative post (one post with the title === form=title or the same title than the forum)
+		preg_match ('/form=([[:alnum:]]+)/u', $forum_desc, $form);
 		$sql = "
 			SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
-			WHERE LOWER(post_subject) = '".strtolower( str_replace ("'", "\'", $form ? $form[1] : $forum_name))."'
+			WHERE LOWER(post_subject) LIKE '".strtolower( str_replace ("'", "\'", $form[1]))."'
 			ORDER BY post_id
 		";
 		$result = $this->db->sql_query($sql);
@@ -726,209 +718,165 @@ class listener implements EventSubscriberInterface
 		if (!$row) // No form then !
 			return;
 
+		// Expand bbcodes in field definition
 		$def_forms = explode ("\n", generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], 0));
-		foreach ($def_forms AS $kdf=>$df) {
-//TODO DELETE (utilité de <[^>]+ ?)			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]|<[^>]+>/', '', $df.'|||||'));
-			$dfs = explode ('|', preg_replace ('/[[:cntrl:]]/', '', $df.'|||||'));
-			$block_vars = $attaches = [];
-			$sql_id = 'geo_'.$dfs[0];
-			if (!isset($post_data[$sql_id]))
-				$post_data[$sql_id] = null;
 
-			// Clears fields begging with - or ending with ~ for automatic recalculation
-//TODO les champs numériques n'utilisent pas le ~			$trimed = trim ($post_data[$sql_id], '-~');
-			$trimed = rtrim ($post_data[$sql_id], '~'); //TODO ARCHI c'est quoi ce mélange avec les automatic data ?
-			if(!$posting)
-				$post_data[$sql_id] = $trimed;
-			elseif ($post_data[$sql_id] != $trimed)
-				$post_data[$sql_id] = '';
+		foreach ($def_forms AS $k=>$line) { // Get form definition lines
+			$field = explode ('|', preg_replace ('/[[:cntrl:]]|<br>/', '', $line.'|||||')); // Get form definition fields
+			$title = explode (' ', $field[1], 2); // Extract the title number if any
+			$sql_type = 'varchar(255)';
+			$block [$k] = [ // Init default field template block
+				'FIELD_TAG' => 'p',
+				'FIELD_TITLE' => $field[1],
+				'FIELD_TYPE' => $field[2],
+				'PLACEHOLDER' => $field[3], // Displayed on empty fields
+				'POSTAMBULE' => $field[4], // Displayed after the value
+				'COMMENT' => $field[5], // Displayed on posting
+				'INNER' => '', // Init for loop
+			];
 
-			// Default tags
-			$block_vars['TAG1'] = 'p';
-			$block_vars['INNER'] = $dfs[1];
-			$block_vars['TYPE'] = $dfs[2];
-			$block_vars['SQL_TYPE'] = 'text';
-			$block_vars['DISPLAY_VALUE'] =
-			$block_vars['VALUE'] = $post_data[$sql_id];
-			$options = explode (',', ','.$dfs[2]); // One empty at the beginning
-			$block_vars['PLACEHOLDER'] = str_replace('"', "''", $dfs[3]);
-			$block_vars['POSTAMBULE'] = $dfs[4] .($posting ? ' '.$dfs[5] : '');
-
-			// {|1.1 Title
-			// {|Text
-			if ($dfs[0] == '{' || !$dfs[0]) {
-				$dfs1s = explode (' ', $dfs[1]);
-
-				// Title tag <h2>..<h4>
-				preg_match_all ('/[0-9]+/', $dfs1s[0], $title);
-				$block_vars['TAG1'] = 'h'.(count($title[0]) ? count($title[0]) + 1 : 4);
-
-				// Block visibility
-				$ndf = implode (' geo_', array_slice ($def_forms, $kdf)); // Find the block beginning
-				$c = $n = 1;
-				$ndfl = strlen ($ndf);
-				while ($n && $c < $ndfl) // Find the block end
-					switch ($ndf[$c++]) {
-						case '{': $n++; break;
-						case '}': $n--;
-					}
-				// Check if any value there
-				preg_match_all ('/(geo_[a-z_0-9]+)\|[^\|]+\|([a-z]+)/', substr ($ndf, 0, $c), $name);
-				foreach ($name[1] AS $k=>$m)
-					if (isset ($post_data[$m]) &&
-						($name[2][$k] != 'confidentiel' || $this->user->data['is_registered']))
-						$block_vars['DISPLAY'] = true; // Decide to display the title
+			// Numbered title
+			if (preg_match ('/[0-9]+\./', $title[0])) {
+				preg_match_all ('/[0-9]+\.?/', $title[0], $title_num);
+				$block [$k] ['FIELD_TITLE_NUM'] = $title[0];
+				$block [$k] ['FIELD_TAG'] = 'h'.(count ($title_num[0]) + 1);
 			}
 
-			// End of block(s)
-			elseif ($dfs[0][0] == '}')
-				;
-
-			// sql_id incorrect
-			else if ($dfs[0] && !preg_match ('/^[a-z_0-8]+$/', $dfs[0])) {
-				$block_vars['TAG1'] = 'p style="color:red"';
-				$block_vars['INNER'] = 'Identifiant incorrect : "'.$dfs[0].'"';
-			}
-			elseif ($dfs[0]) {
-				$options = explode (',', ','.$dfs[2]); // With a first line empty
+			// SQL field
+			if (preg_match ('/^([a-z0-9_]+)$/', $field[0])) {
+				$block [$k]['TAG'] = 'input';
+				$block [$k]['NAME'] = $sql_id = 'geo_'.$field[0];
+				$block [$k] ['VALUE'] = trim ($post_data[$sql_id], '~ \t\n\r\0\x0B'); // string utomatic data followed by ~
+				$block [$k] ['VALUE'] = str_replace (['<a ','</a>'], ['<pre><a ','</a></pre>'], $block [$k] ['VALUE']);
+				if ($block [$k] ['VALUE'] < 0) // numeric automatic data is negative
+					$block [$k] ['VALUE'] *= -1;
+				//TODO supprimer VALUE si posting
 
 				// sql_id|titre|choix,choix|invite|postambule|commentaire saisie
+				$options = explode (',', ','.$field[2]); // Add a first option empty
 				if (count($options) > 2) {
+					$block [$k] ['TAG'] = 'select';
+					foreach ($options AS $o)
+						$block [$k] ['INNER'] .=
+							"<option value=\"$o\"".
+							($block [$k] ['VALUE'] == $o ? ' selected="selected"' : '').
+							">$o</option>\n";
+					// Verify SQL type
 					$length = 0;
 					foreach ($options AS $o)
 						$length = max ($length, strlen ($o) + 1);
-					$block_vars['TAG'] = 'select';
-					$block_vars['SQL_TYPE'] = 'text';
-					$block_vars['SQL_TYPE'] = 'varchar-'.$length;
+					$sql_type = "varchar($length)";
 				}
 
-				// sql_id|titre|proches||postambule|commentaire saisie
-				elseif (!strcasecmp ($dfs[2], 'proches')) {
-					if ($post_data['post_id']) {
-						$block_vars['TAG'] = 'select';
+				// sql_id|titre|type|invite|postambule|commentaire
+				else switch ($field[2]) { // type
+					case 'proches':
+						if ($posting) {
+							// Posting : Search surfaces closest to a point
+							if ($post_data['post_id']) {
+								$sql = "SELECT s.topic_id, t.topic_title,
+										ST_Distance_Sphere(ST_Centroid(s.geom),ST_Centroid(p.geom)) AS distance
+										FROM ".POSTS_TABLE." AS s
+											JOIN ".POSTS_TABLE." AS p ON (p.post_id = {$post_data['post_id']})
+											JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = s.topic_id) 
+										WHERE ST_Area(s.geom) > 0
+										ORDER BY distance ASC
+										LIMIT 10";
+								$result = $this->db->sql_query($sql);
+								$block [$k] ['INNER'] = '<option'.($block[$k]['VALUE']?'':' selected="selected"').'></option>';
+								while ($row = $this->db->sql_fetchrow($result))
+									$block [$k] ['INNER'] .=
+										'<option value="'.$row['topic_id'].'"'.
+										($row['topic_id']==$block[$k]['VALUE']?' selected="selected"':'').'>'.
+										$row['topic_title'].
+										'</option>';
+								$this->db->sql_freeresult($result);
 
-						// Search surfaces closest to a point
-						preg_match_all ('/([0-9\.]+)/', $post_data['geojson'], $point);
-						if(count($point[0])) {
-							$km = 3; // Search maximum distance
-							$bbox = ($point[0][0]-.0127*$km).' '.($point[0][1]-.009*$km).",".($point[0][0]+.0127*$km).' '.($point[0][1]+.009*$km);
-							$sql = "
-								SELECT post_subject, topic_id, ST_AsText(ST_Centroid(ST_Envelope(geom))) AS center
-								FROM ".POSTS_TABLE."
-								WHERE ST_Dimension(geom) > 0 AND
-									MBRIntersects(geom, ST_GeomFromText('LINESTRING($bbox)',4326))
-								";
-							$result = $this->db->sql_query($sql);
-							$options = ['d0' => []]; // First line empty
-							while ($row = $this->db->sql_fetchrow($result)) {
-								preg_match_all ('/([0-9\.]+)/', $row['center'], $row['center']);
-								$dist2 = 1 + pow ($row['center'][0][0] - $point[0][0], 2) + pow ($row['center'][0][1] - $point[0][1], 2) * 2;
-								$options['d'.$dist2] = $row;
-								if ($row['topic_id'] == $block_vars['VALUE']) {
-									$block_vars['VALUE'] = // For posting.pgp initial select
-									$block_vars['DISPLAY_VALUE'] = // For viewtopic.php display
-										$row['post_subject'];
-									$block_vars['HREF'] = 'viewtopic.php?t='.$row['topic_id'];
-								}
-							}
-							ksort ($options); //TODO BEST trier en fonction du bord le plus prés / pas du center
-							$this->db->sql_freeresult($result);
+								$block [$k]['TAG'] = 'select';
+								$block [$k]['STYLE'] = 'display:none'; // Hide at posting
+							} else
+								$block [$k]['COMMENT'] = 'automatique'; // Hide at posting if new post
 						} else
-							$block_vars['STYLE'] = 'display:none'; // Hide at posting
-					} else
-						$block_vars['STYLE'] = 'display:none'; // Hide at posting
-				}
+						if ($block[$k]['VALUE']) {
+							// Viewtopic : Get the contains name & url
+							$sql = 'SELECT topic_id,topic_title FROM '.TOPICS_TABLE.' WHERE topic_id = '.$block[$k]['VALUE'];
+							$result = $this->db->sql_query($sql);
+							$row = $this->db->sql_fetchrow($result);
+							$this->db->sql_freeresult($result);
+							$block[$k]['VALUE'] = '<a href="viewtopic.php?t='.$row['topic_id'].'">'.$row['topic_title'].'</a>';
+						}
+						$sql_type = 'int(10)'; // topic_id
+						break;
 
-				// sql_id|titre|attaches||postambule|commentaire saisie
-				//TODO-BEST-ASPIR faire effacer le bloc {} quand il n'y a pas d'attaches
-				elseif (!strcasecmp ($dfs[2], 'attaches')) {
-					$block_vars['TAG'] = 'input';
-					$block_vars['TYPE'] = 'hidden';
-
-					if (array_key_exists ($sql_id, $post_data)) {
-						$sql = "
-							SELECT *
-							FROM ".POSTS_TABLE."
-								JOIN ".FORUMS_TABLE." USING (forum_id)
-							WHERE forum_image LIKE '%{$dfs[3]}.png' AND
-								($sql_id = '{$post_data['topic_id']}' OR
-								 $sql_id = '{$post_data['topic_id']}~')
-							"; //TODO ARCHI pourquoi ~ ?
+					// List topics attached to this one
+					case 'attaches':
+						$sql = "SELECT * FROM ".POSTS_TABLE."
+									JOIN ".FORUMS_TABLE." USING (forum_id)"./* Just to sort forum_image related */"
+								WHERE forum_image LIKE '%/{$field[3]}.%' AND
+									$sql_id LIKE '{$post_data['topic_id']}%'";
 						$result = $this->db->sql_query($sql);
 						while ($row = $this->db->sql_fetchrow($result))
-							$attaches[] = $row;
-
+							$attaches [$k] [] = $row;
 						$this->db->sql_freeresult($result);
-						if (!count ($attaches))
-							$block_vars['ATT_STYLE_TAG1'] = ' style="display:none"';
-					}
+
+						$block [$k]['TYPE'] = 'hidden';
+						$sql_type = 'int(10)'; // topic_id
+						break;
+
+					case 'long':
+						$block [$k]['TAG'] = 'textarea';
+						$sql_type = 'text';
+						break;
+					case 'date':
+						$block [$k]['TYPE'] = 'date';
+						$sql_type = 'date';
+						break;
+					case '0':
+						$block [$k]['TYPE'] = 'number';
+						$sql_type = 'int(5)';
+						break;
+					default:
+						$block [$k]['SIZE'] = '40';
+						$block [$k]['CLASS'] = 'inputbox autowidth';
 				}
 
-				// sql_id|titre|automatique||postambule
-				//TODO ARCHI devrait être indépendant de topic_fields
-				elseif (!strcasecmp ($dfs[2], 'automatique')) {
-					$block_vars['TAG'] = 'input';
-					$block_vars['STYLE'] = 'display:none'; // Hide at posting
-					$block_vars['TYPE'] = 'hidden';
-					$block_vars['VALUE'] = null; // Set the value to null to ask for recalculation
-				}
+				// Correct SQL table structure
+				if ($sql_type != $special_columns[$sql_id]) {
+					$sql = 'ALTER TABLE '.POSTS_TABLE.
+						(array_key_exists ($sql_id, $special_columns) ? ' CHANGE '.$sql_id.' ' : ' ADD ').
+						$sql_id.' '.$sql_type;
+//TODO					$this->db->sql_query($sql);
+/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>CHANGE $sql_id = ".var_export($sql,true).'</pre>';
 
-				// sql_id|titre|0||postambule|commentaire saisie
-				elseif (is_numeric ($dfs[2])) {
-					$block_vars['TAG'] = 'input';
-					$block_vars['TYPE'] = 'number';
-					$block_vars['SQL_TYPE'] = 'int-5';
-				}
-
-				// sql_id|titre|date||postambule|commentaire saisie
-				elseif (!strcasecmp ($dfs[2], 'date')) {
-					$block_vars['TAG'] = 'input';
-					$block_vars['TYPE'] = 'date';
-					$block_vars['SQL_TYPE'] = 'date';
-				}
-
-				// sql_id|titre|long|invite|invite|postambule|commentaire saisie
-				elseif (!strcasecmp ($dfs[2], 'long')) {
-					$block_vars['TAG'] = 'textarea';
-				}
-
-				// sql_id|titre|confidentiel|invite|invite|postambule|commentaire saisie
-				// sql_id|titre|court|invite|invite|postambule|commentaire saisie
-				else {
-					$block_vars['TAG'] = 'input';
-					$block_vars['SIZE'] = '40';
-					$block_vars['CLASS'] = 'inputbox autowidth';
-					if ($dfs[2] == 'confidentiel' && !$this->user->data['is_registered'])
-						$block_vars['DISPLAY_VALUE'] = null;
-				}
-			} //TODO-ARCHI DELETE pourquoi as-t-on besoin du test précédent ?
-
-			$block_vars['NAME'] = $sql_id.'-'.$block_vars['SQL_TYPE'];
-
-			$vs = $block_vars;
-			foreach ($vs AS $k=>$v)
-				if ($v)
-					$block_vars['ATT_'.$k] = ' '.strtolower($k).'="'.str_replace('"','\\\"', $v).'"';
-
-			$this->template->assign_block_vars($block_name, $block_vars);
-
-			if (count($options) &&
-				count (explode ('.', $block_name)) == 1) {
-				foreach ($options AS $v)
-					$this->template->assign_block_vars($block_name.'.options', [
-						'OPTION' => gettype($v) == 'string' ? $v : $v['post_subject'],
-						'VALUE' => gettype($v) == 'string' ? $v : $v['topic_id'],
-					]);
-
-				foreach ($attaches AS $v) {
-					$this->template->assign_block_vars(
-						$block_name.'.attaches',
-						array_change_key_case ($v, CASE_UPPER)
-					);
-					if (count (explode ('.', $block_name)) == 1)
-						$this->topic_fields ($block_name.'.attaches.detail', $v, null, $v['forum_name']);
+				// Pass 1 : Flag title having values on related fields
+				if ($block [$k] ['VALUE'] || $attaches [$k])
+					for ($stn = $title_num[0]; $stn; array_pop ($stn))
+						$block_value [implode('',$stn)] = true;
 				}
 			}
+		}
+
+		// Assign template blocks
+		foreach ($block AS $k=>$b) {
+			// Pass 2 : Flag titles of blocks ahing values on related fields
+			$b['BLOCK_HAVING_VALUE'] = $block_value [$b['FIELD_TITLE_NUM']];
+
+			// Create att="value" template fields
+			foreach ($b AS $kb=>$vb)
+				if ($vb)
+					$b['ATT_'.$kb] = strtolower($kb).'="'.str_replace('"','\\\"', $vb).'"';
+
+			$this->template->assign_block_vars($block_name, $b);
+
+			if ($attaches [$k])
+				foreach ($attaches [$k] AS $a) {
+					$this->template->assign_block_vars(
+						$block_name.'.attaches',
+						array_change_key_case ($a, CASE_UPPER)
+					);
+					if (count (explode ('.', $block_name)) == 1)
+						$this->topic_fields ($block_name.'.attaches.detail', $a, $a['forum_desc']);
+				}
 		}
 	}
 
