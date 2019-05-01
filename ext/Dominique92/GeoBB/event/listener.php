@@ -80,7 +80,7 @@ class listener implements EventSubscriberInterface
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 	}
 	/*//TODO DELETE ?
-		// Force le style 
+		// Force le style
 		$style_name = request_var ('style', '');
 		if ($style_name) {
 			$sql = 'SELECT * FROM '.STYLES_TABLE.' WHERE style_name = "'.$style_name.'"';
@@ -570,27 +570,6 @@ class listener implements EventSubscriberInterface
 
 		$update = []; // Datas to be updated
 
-		// Dans quel alpage est contenu (lors de la première init)
-		//TODO BUG ASPIR non affichage infos CABANES sur fiche alpage	
-		/*//TODO BUG : pas besoin et génère un ~ malvenu
-		if (array_key_exists ('geo_contains', $row) &&
-			(!$row['geo_contains'] || $row['geo_contains'] == 'null')) {
-			// Search points included in a surface
-			$sql = "
-				SELECT polygon.topic_id
-				FROM	 ".POSTS_TABLE." AS polygon
-					JOIN ".POSTS_TABLE." AS point ON (point.topic_id = {$row['topic_id']})
-				WHERE
-					ST_Contains (polygon.geom, point.geom)
-					AND ST_Dimension(polygon.geom) > 0
-					LIMIT 1
-				";
-			$result = $this->db->sql_query($sql);
-			if ($row_contain = $this->db->sql_fetchrow($result))
-				$update['geo_contains'] = $row_contain['topic_id'];
-			$this->db->sql_freeresult($result);
-		}*/
-
 		// Calcul de la surface en ha
 		if (array_key_exists ('geo_surface', $row) &&
 			!$row['geo_surface'] &&
@@ -661,7 +640,7 @@ class listener implements EventSubscriberInterface
 				$nominatim->address->village ?:
 				$nominatim->address->hamlet ?:
 				$nominatim->address->neighbourhood ?:
-				$nominatim->address->quarter 
+				$nominatim->address->quarter
 			);
 		}
 
@@ -768,7 +747,7 @@ class listener implements EventSubscriberInterface
 										ST_Distance_Sphere(ST_Centroid(s.geom),ST_Centroid(p.geom)) AS distance
 										FROM ".POSTS_TABLE." AS s
 											JOIN ".POSTS_TABLE." AS p ON (p.post_id = {$post_data['post_id']})
-											JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = s.topic_id) 
+											JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = s.topic_id)
 										WHERE ST_Area(s.geom) > 0
 										ORDER BY distance ASC
 										LIMIT 10";
@@ -784,18 +763,22 @@ class listener implements EventSubscriberInterface
 
 								$block [$k]['TAG'] = 'select';
 								$block [$k]['STYLE'] = 'display:none'; // Hide at posting
-							} else
-								$block [$k]['COMMENT'] = 'automatique'; // Hide at posting if new post
-						} else
-						if ($block[$k]['VALUE']) {
-							// Viewtopic : Get the contains name & url
+							} else {
+								$block [$k] ['TAG'] = 'span';
+								$block [$k]['COMMENT'] = '(fonction disponible une fois le point créé)';
+							}
+						}
+
+						// Viewtopic : Get the contains name & url
+						elseif ($block[$k]['VALUE']) {
 							$sql = 'SELECT topic_id,topic_title FROM '.TOPICS_TABLE.' WHERE topic_id = '.$block[$k]['VALUE'];
 							$result = $this->db->sql_query($sql);
 							$row = $this->db->sql_fetchrow($result);
 							$this->db->sql_freeresult($result);
 							$block[$k]['VALUE'] = '<a href="viewtopic.php?t='.$row['topic_id'].'">'.$row['topic_title'].'</a>';
 						}
-						$sql_type = 'int(10)'; // topic_id
+						$sql_type = 'int(10)'; // === topic_id
+
 						break;
 
 					// List topics attached to this one
@@ -949,9 +932,9 @@ class listener implements EventSubscriberInterface
 					$im = imagecreate  ($nbcligne * 7 + 10, 12 * count ($cs) + 8);
 					ImageColorAllocate ($im, 0, 0, 200);
 					foreach ($cs AS $k => $v)
-						ImageString ($im, 3, 5, 3 + 12 * $k, $v, ImageColorAllocate ($im, 255, 255, 255)); 
+						ImageString ($im, 3, 5, 3 + 12 * $k, $v, ImageColorAllocate ($im, 255, 255, 255));
 					imagejpeg ($im, $local);
-					ImageDestroy ($im); 
+					ImageDestroy ($im);
 				}
 			}
 			$attachment ['physical_filename'] = $local;
@@ -993,7 +976,7 @@ class listener implements EventSubscriberInterface
 		// Reduction de la taille de l'image
 		if ($max_size = request_var('size', 0)) {
 			$img_size = @getimagesize ('../files/'.$attachment['physical_filename']);
-			$isx = $img_size [0]; $isy = $img_size [1]; 
+			$isx = $img_size [0]; $isy = $img_size [1];
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
@@ -1023,15 +1006,15 @@ class listener implements EventSubscriberInterface
 					}
 
 					// Build destination image
-					$image_dest = imagecreatetruecolor ($isx / $reduction, $isy / $reduction); 
+					$image_dest = imagecreatetruecolor ($isx / $reduction, $isy / $reduction);
 					imagecopyresampled ($image_dest, $image_src, 0,0, 0,0, $isx / $reduction, $isy / $reduction, $isx, $isy);
 
 					// Convert image
 					$imgconv = 'image'.$mimetype[1]; // imagejpeg / imagepng / imagegif
-					$imgconv ($image_dest, $temporaire); 
+					$imgconv ($image_dest, $temporaire);
 
 					// Cleanup
-					imagedestroy ($image_dest); 
+					imagedestroy ($image_dest);
 					imagedestroy ($image_src);
 				}
 				$attachment['physical_filename'] = $temporaire;
