@@ -303,11 +303,111 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 	}
 
-	// Appelé lors de la première passe sur les données des posts qui lit les données SQL de phpbb-posts
+	// Called during first pass on post data that reads phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
-		// Mémorise les données SQL du post pour traitement plus loin (viewtopic procède en 2 fois)
-		$post_id = $vars['row']['post_id'];
-		$this->all_post_data [$post_id] = $vars['row'];
+
+		// Update the database with the automatic data
+		$post_data = $vars['row'];
+
+		// Extraction of the center for all actions
+		preg_match_all ('/([0-9\.]+)/', $post_data['centerwkt'], $center);
+
+		$update = []; // Datas to be updated
+		foreach ($post_data AS $k=>$v)
+			if (!$v)
+				switch ($k) {
+//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
+
+//TODO ASPIR ajouter une information automatique sur les fiches alpages : que selon la réponse données au département du siège social de l'employeur (point 7 L'organisation de l'alpage, actuellement en champ libre), s'affiche le lien vers la convention collective qui s'applique ? (il y a une convention différente pour chaque département) http://alpages.info/viewtopic.php?f=9&t=3225
+
+					case 'geo_surface':
+						if ($post_data['area'] && $center[0])
+							$update[$k] =
+								round ($post_data['area']
+									* 1111 // hm par ° delta latitude
+									* 1111 * sin ($center[0][1] * M_PI / 180) // hm par ° delta longitude
+								);
+						break;
+
+					// Calcul de l'altitude avec IGN
+					//TODO CHEM -> Altitude en dehors de la France
+					case 'geo_altitude':
+						if ($center[0]) {
+							global $geo_keys;
+							$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$center[0][0]}&lat={$center[0][1]}&zonly=true";
+							preg_match ('/([0-9]+)/', @file_get_contents($api), $altitude);
+							if ($altitude)
+								$update[$k] = $altitude[1];
+						}
+						break;
+
+					case 'geo_commune':
+							$nominatim = json_decode (@file_get_contents (
+								"https://nominatim.openstreetmap.org/reverse?format=json&lon={$center[0][0]}&lat={$center[0][1]}",
+								false,
+								stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
+							));
+							$update[$k] = @$nominatim->address->postcode.' '.@(
+								$nominatim->address->town ?:
+								$nominatim->address->city ?:
+								$nominatim->address->suburb  ?:
+								$nominatim->address->village ?:
+								$nominatim->address->hamlet ?:
+								$nominatim->address->neighbourhood ?:
+								$nominatim->address->quarter
+							);
+						break;
+
+					// Infos refuges.info
+					case 'geo_massif':
+					case 'geo_reserve':
+					case 'geo_ign':
+						if ($center[0]) {
+							$update['geo_massif'] = null;
+							$update['geo_reserve'] = null;
+							$igns = [];
+							$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$center[0][0]},{$center[0][1]},{$center[0][0]},{$center[0][1]}";
+							$wri_export = @file_get_contents($url);
+							if ($wri_export) {
+								$fs = json_decode($wri_export)->features;
+								foreach($fs AS $f)
+									switch ($f->properties->type->type) {
+										case 'massif':
+											if (array_key_exists('geo_massif', $post_data))
+												$update['geo_massif'] = $f->properties->nom;
+											break;
+										case 'zone réglementée':
+											if (array_key_exists('geo_reserve', $post_data))
+												$update['geo_reserve'] = $f->properties->nom;
+											break;
+										case 'carte':
+											$ms = explode(' ', str_replace ('-', ' ', $f->properties->nom));
+											$nom_carte = str_replace ('-', ' ', str_replace (' - ', ' : ', $f->properties->nom));
+											$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom_carte</a>";
+											break;
+									}
+								$update['geo_ign'] = implode ('<br/>', $igns);
+							}
+						}
+				}
+
+		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
+		$this->all_post_data [$vars['row']['post_id']] =  array_merge ($post_data, $update);
+
+		// Update de la base
+		if ($update) {
+			foreach ($update AS $k=>$v)
+				$update[$k] .= '~';
+
+			$this->db->sql_query (
+				'UPDATE '.POSTS_TABLE.
+				' SET '.$this->db->sql_build_array('UPDATE',$update).
+				' WHERE post_id = '.$post_data['post_id']
+			);
+
+			if(defined('TRACES_DOM') && count($update))
+				echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
+		}
 	}
 
 	// Assign template variables for images attachments
@@ -341,20 +441,14 @@ class listener implements EventSubscriberInterface
 		// Assign the geo values to the template
 		if (isset ($this->all_post_data[$post_id])) {
 			$post_data = $this->all_post_data[$post_id]; // Récupère les données SQL du post
-			$post_row = $vars['post_row'];
 
 			if ($post_data['post_id'] == $vars['topic_data']['topic_first_post_id']) {
-				$this->get_automatic_data($post_data);
 				$this->topic_fields('specific_fields', $post_data, $vars['topic_data']['forum_desc']);
 
 				// Assign geo_ vars to template for these used out of topic_fields
-				//TODO ARCHI get_automatic_data devrait enlever les ~ en mode view
 				foreach ($post_data AS $k=>$v)
-					if (strstr ($k, 'geo')
-						&& is_string ($v))
-						$this->template->assign_var (strtoupper ($k), str_replace ('~', '', $v));
-
-				$vars['post_row'] = $post_row;
+					if (strstr ($k, 'geo') && is_string ($v))
+						$this->template->assign_var (strtoupper ($k), $v);
 			}
 		}
 	}
@@ -445,7 +539,6 @@ class listener implements EventSubscriberInterface
 		$page_data['POST_ID'] = @$post_data['post_id'];
 		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
 
-		//TODO ARCHI devrait appeler get_automatic_data pour enlever les champs automatiques ~
 		$this->topic_fields('specific_fields', $post_data, $post_data['forum_desc'], true);
 		$this->geobb_activate_map($post_data['forum_desc'], @$post_data['post_id'] == $post_data['topic_first_post_id']);
 
@@ -556,115 +649,6 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	// Automatic data calculation
-	//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
-	//TODO remplacer le ~ derrière par un - devant (pb des numériques)
-	//TODO ASPIR ajouter une information automatique sur les fiches alpages : que selon la réponse données au département du siège social de l'employeur (point 7 L'organisation de l'alpage, actuellement en champ libre), s'affiche le lien vers la convention collective qui s'applique ? (il y a une convention différente pour chaque département) http://alpages.info/viewtopic.php?f=9&t=3225
-	function get_automatic_data(&$row) {
-		if (!$row['geojson'])
-			return;
-
-		// Calculation of the center for all actions
-		preg_match_all ('/([0-9\.]+)/', $row['centerwkt'], $center);
-		$row['center'] = $center[0];
-
-		$update = []; // Datas to be updated
-
-		// Calcul de la surface en ha
-		if (array_key_exists ('geo_surface', $row) &&
-			!$row['geo_surface'] &&
-			$row['area'] && $row['center']
-		) {
-			$update['geo_surface'] =
-				round ($row['area']
-					* 1111 // hm par ° delta latitude
-					* 1111 * sin ($row['center'][1] * M_PI / 180) // hm par ° delta longitude
-				);
-		}
-
-		// Calcul de l'altitude avec IGN
-		//TODO CHEM -> Altitude en dehors de la France
-		if (array_key_exists ('geo_altitude', $row) &&
-			!$row['geo_altitude'] &&
-			$row['center']
-		) {
-			global $geo_keys;
-			$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$row['center'][0]}&lat={$row['center'][1]}&zonly=true";
-			preg_match ('/([0-9]+)/', @file_get_contents($api), $altitude);
-			if ($altitude)
-				$update['geo_altitude'] = $altitude[1];
-		}
-
-		// Infos refuges.info
-		if ((array_key_exists('geo_massif', $row) && !$row['geo_massif'] && $row['center']) ||
-			(array_key_exists('geo_reserve', $row) && !$row['geo_reserve'] && $row['center']) ||
-			(array_key_exists('geo_ign', $row) && !$row['geo_ign'] && $row['center'])) {
-			$update['geo_massif'] = null;
-			$update['geo_reserve'] = null;
-			$igns = [];
-			$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$row['center'][0]},{$row['center'][1]},{$row['center'][0]},{$row['center'][1]}";
-			$wri_export = @file_get_contents($url);
-			if ($wri_export) {
-				$fs = json_decode($wri_export)->features;
-				foreach($fs AS $f)
-					switch ($f->properties->type->type) {
-						case 'massif':
-							if (array_key_exists('geo_massif', $row))
-								$update['geo_massif'] = $f->properties->nom;
-							break;
-						case 'zone réglementée':
-							if (array_key_exists('geo_reserve', $row))
-								$update['geo_reserve'] = $f->properties->nom;
-							break;
-						case 'carte':
-							$ms = explode(' ', str_replace ('-', ' ', $f->properties->nom));
-							$nom_carte = str_replace ('-', ' ', str_replace (' - ', ' : ', $f->properties->nom));
-							$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom_carte</a>";
-							break;
-					}
-			}
-			$update['geo_ign'] = implode ('<br/>', $igns);
-		}
-
-		// Calcul de la commune
-		if (array_key_exists ('geo_commune', $row) && !$row['geo_commune']) {
-			$nominatim = json_decode (@file_get_contents (
-				"https://nominatim.openstreetmap.org/reverse?format=json&lon={$row['center'][0]}&lat={$row['center'][1]}",
-				false,
-				stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
-			));
-			$update['geo_commune'] = @$nominatim->address->postcode.' '.@(
-				$nominatim->address->town ?:
-				$nominatim->address->city ?:
-				$nominatim->address->suburb  ?:
-				$nominatim->address->village ?:
-				$nominatim->address->hamlet ?:
-				$nominatim->address->neighbourhood ?:
-				$nominatim->address->quarter
-			);
-		}
-
-		// Update de la base
-		foreach ($update AS $k=>$v)
-			if (!$row[$k] &&
-				array_key_exists($k, $row))
-				$update[$k] .= '~';
-			else
-				unset ($update[$k]);
-		// Pour affichage
-		$row = array_merge ($row, $update);
-
-		if ($update)
-			$this->db->sql_query (
-				'UPDATE '.POSTS_TABLE.
-				' SET '.$this->db->sql_build_array('UPDATE',$update).
-				' WHERE post_id = '.$row['post_id']
-		);
-
-		if(defined('TRACES_DOM') && count($update))
-			echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
-	}
-
 	// Form management
 	function topic_fields ($block_name, $post_data, $forum_desc, $posting = false) {
 		// Get special columns list
@@ -715,10 +699,8 @@ class listener implements EventSubscriberInterface
 			if (preg_match ('/^([a-z0-9_]+)$/', $field[0])) {
 				$block [$k]['TAG'] = 'input';
 				$block [$k]['NAME'] = $sql_id = 'geo_'.$field[0];
-				$block [$k] ['VALUE'] = trim ($post_data[$sql_id], '~ \t\n\r\0\x0B'); // string utomatic data followed by ~
+				$block [$k] ['VALUE'] = trim ($post_data[$sql_id], '~ \t\n\r\0\x0B'); // string automatic data followed by ~
 				$block [$k] ['VALUE'] = str_replace (['<a ','</a>'], ['<pre><a ','</a></pre>'], $block [$k] ['VALUE']);
-				if ($block [$k] ['VALUE'] < 0) // numeric automatic data is negative
-					$block [$k] ['VALUE'] *= -1;
 				//TODO supprimer VALUE si posting
 
 				// sql_id|titre|choix,choix|invite|postambule|commentaire saisie
