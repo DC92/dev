@@ -6,8 +6,8 @@
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
-//TODO ASPIR modifier le mail de bienvenue à la connexion
-//TODO ASPIR ajouter champs enregistrement : ucp_register.html
+//TODO ASPIR DEMANDE modifier le mail de bienvenue à la connexion
+//TODO ASPIR DEMANDE Ajout donnée automatique : http://alpages.info/viewtopic.php?t=3225
 //TODO ASPIR BEST recherche par département / commune
 //TODO ASPIR ARCHI BEST rename ASPIR -> ALPAGES
 //TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
@@ -79,8 +79,7 @@ class listener implements EventSubscriberInterface
 		if (defined('TRACES_DOM'))
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 	}
-	/*
-		return;//TODO DELETE ?
+	/*//TODO DELETE ?
 		// Force le style 
 		$style_name = request_var ('style', '');
 		if ($style_name) {
@@ -198,7 +197,7 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
-				//TODO BUG compte les posts des forums cachés dans le nb max
+				//TODO BEST BUG compte les posts des forums cachés dans le nb max
 				$row ['post_or_edit_time'] =
 					'<span title="'.$this->user->format_date ($row['post_or_edit_time']).'">'.
 						date ('j M', $row['post_or_edit_time']).
@@ -445,15 +444,6 @@ class listener implements EventSubscriberInterface
 		$page_data['TOPIC_ID'] = @$post_data['topic_id'];
 		$page_data['POST_ID'] = @$post_data['post_id'];
 		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
-
-		// Assign the phpbb-posts SQL data to the template
-		/*//TODO DELETE
-		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'geo', 3)
-				&& is_string ($v))
-				$page_data[strtoupper ($k)] =
-					strstr($v, '~') == '~' ? null : $v; // Clears fields ending with ~ for automatic recalculation
-					*/
 
 		//TODO ARCHI devrait appeler get_automatic_data pour enlever les champs automatiques ~
 		$this->topic_fields('specific_fields', $post_data, $post_data['forum_desc'], true);

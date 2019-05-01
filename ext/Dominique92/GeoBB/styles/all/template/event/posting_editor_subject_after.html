@@ -39,7 +39,9 @@
 		var eljson = document.getElementById('editable-json'),
 			overlays = geoOverlays({
 				posting: true,
-				topidIdExclude: {TOPIC_ID},
+				<!-- IF TOPIC_ID -->
+					topidIdExclude: {TOPIC_ID},
+				<!-- ENDIF -->
 				<!-- IF GEO_MAP_TYPE == 'Polygon' -->
 					transparency: [0, 1, 2],
 				<!-- ENDIF -->
