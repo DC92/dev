@@ -6,14 +6,12 @@
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
-//TODO ASPIR ajouter champs enregistrement : ucp_register.html
-//TODO BEST permutations POSTS dans le template modération
-//TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 //TODO ASPIR modifier le mail de bienvenue à la connexion
-//TODO-ASPIR BEST recherche par département / commune
-//TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
-//TODO ASPIR ARCHI rename ASPIR -> ALPAGES
-//TODO BUG le lien bbcode n'est plus actif dans l'éditeur
+//TODO ASPIR ajouter champs enregistrement : ucp_register.html
+//TODO ASPIR BEST recherche par département / commune
+//TODO ASPIR ARCHI BEST rename ASPIR -> ALPAGES
+//TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
+//TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 
 namespace Dominique92\GeoBB\event;
 
