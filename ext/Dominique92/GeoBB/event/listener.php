@@ -8,7 +8,7 @@
  */
 //TODO ASPIR ajouter champs enregistrement : ucp_register.html
 //TODO BEST permutations POSTS dans le template modération
-//TODO ne pas afficher les points en doublon (flux wri, prc, c2c)
+//TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 //TODO ASPIR modifier le mail de bienvenue à la connexion
 //TODO-ASPIR BEST recherche par département / commune
 //TODO mettre dans modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
@@ -183,13 +183,11 @@ class listener implements EventSubscriberInterface
 		$news = request_var ('news', 15); // More news count
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
-		//TODO BUG ne prend pas en compte post_edit_time sur le posts s'il n'est pas le premier
-		//TODO BUG affiche date de création du POST sur une modif
 		$sql = "
-			SELECT p.post_id, p.post_attachment, p.post_time, p.poster_id,
-				t.topic_id, topic_title,topic_first_post_id, t.topic_posts_approved,
+			SELECT p.post_id, p.poster_id,
+				t.topic_id, topic_title,topic_first_post_id,
 				f.forum_id, f.forum_name, f.forum_image,
-				u.username, p.post_edit_time,
+				u.username,
 				IF(post_edit_time > post_time, post_edit_time, post_time) AS post_or_edit_time
 			FROM	 ".TOPICS_TABLE." AS t
 				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
@@ -203,7 +201,10 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				//TODO BUG compte les posts des forums cachés dans le nb max
-				$row ['post_time'] = '<span title="'.$this->user->format_date ($row['post_time']).'">'.date ('j M', $row['post_time']).'</span>';
+				$row ['post_or_edit_time'] =
+					'<span title="'.$this->user->format_date ($row['post_or_edit_time']).'">'.
+						date ('j M', $row['post_or_edit_time']).
+					'</span>';
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
