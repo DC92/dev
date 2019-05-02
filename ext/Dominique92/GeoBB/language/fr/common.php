@@ -38,7 +38,7 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
-//TODO-ARCHI reprendre tous les textes dans GeoBB
+//TODO ARCHI reprendre tous les textes dans GeoBB
 	// Fil d'ariane
 	'ACP_SHORT' => 'Administration',
 	'MCP_SHORT' => 'Modération',

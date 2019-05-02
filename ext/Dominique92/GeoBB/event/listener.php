@@ -9,7 +9,7 @@
 //TODO ASPIR DEMANDE modifier le mail de bienvenue à la connexion
 //TODO ASPIR DEMANDE Ajout donnée automatique : http://alpages.info/viewtopic.php?t=3225
 //TODO ASPIR BEST recherche par département / commune
-//TODO ASPIR ARCHI BEST rename ASPIR -> ALPAGES
+//TODO ASPIR ARCHI rename ASPIR -> ALPAGES
 //TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 //TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 
@@ -88,7 +88,7 @@ class listener implements EventSubscriberInterface
 			$row = $this->db->sql_fetchrow ($result);
 			$this->db->sql_freeresult ($result);
 			if ($row)
-				$vars['style_id'] =  $row ['style_id'];
+				$vars['style_id'] =  $row['style_id'];
 		}
 	*/
 
@@ -111,7 +111,7 @@ class listener implements EventSubscriberInterface
 		";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
-			$cats [$row['category_name']] [] = $row['forum_id'];
+			$cats[$row['category_name']] [] = $row['forum_id'];
 		$this->db->sql_freeresult($result);
 
 		if($cats)
@@ -198,7 +198,7 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				//TODO BEST BUG compte les posts des forums cachés dans le nb max
-				$row ['post_or_edit_time'] =
+				$row['post_or_edit_time'] =
 					'<span title="'.$this->user->format_date ($row['post_or_edit_time']).'">'.
 						date ('j M', $row['post_or_edit_time']).
 					'</span>';
@@ -316,7 +316,7 @@ class listener implements EventSubscriberInterface
 		foreach ($post_data AS $k=>$v)
 			if (!$v)
 				switch ($k) {
-//TODO Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
+//TODO ASPIR Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
 
 //TODO ASPIR ajouter une information automatique sur les fiches alpages : que selon la réponse données au département du siège social de l'employeur (point 7 L'organisation de l'alpage, actuellement en champ libre), s'affiche le lien vers la convention collective qui s'applique ? (il y a une convention différente pour chaque département) http://alpages.info/viewtopic.php?f=9&t=3225
 
@@ -330,7 +330,7 @@ class listener implements EventSubscriberInterface
 						break;
 
 					// Calcul de l'altitude avec IGN
-					//TODO CHEM -> Altitude en dehors de la France
+					//TODO CHEM Altitude en dehors de la France
 					case 'geo_altitude':
 						if ($center[0]) {
 							global $geo_keys;
@@ -392,7 +392,7 @@ class listener implements EventSubscriberInterface
 				}
 
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
-		$this->all_post_data [$vars['row']['post_id']] =  array_merge ($post_data, $update);
+		$this->all_post_data[$vars['row']['post_id']] =  array_merge ($post_data, $update);
 
 		// Update de la base
 		if ($update) {
@@ -427,8 +427,6 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
-//TODO DELETE		$this->viewtopic_modify_post_row_2($vars);
-
 		$post_id = $vars['row']['post_id'];
 		$this->template->assign_vars ([
 			'TOPIC_FIRST_POST_ID' => $vars['topic_data']['topic_first_post_id'],
@@ -468,7 +466,7 @@ class listener implements EventSubscriberInterface
 				ORDER BY left_id ASC";
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result))
-				$forum_list [] = '<option value="' . $row['forum_id'] . '"' .($row['forum_id'] == $vars['forum_id'] ? ' selected="selected"' : ''). '>' . $row['forum_name'] . '</option>';
+				$forum_list[] = '<option value="' . $row['forum_id'] . '"' .($row['forum_id'] == $vars['forum_id'] ? ' selected="selected"' : ''). '>' . $row['forum_name'] . '</option>';
 			$this->db->sql_freeresult($result);
 			if (isset ($forum_list))
 				$this->template->assign_var ('S_FORUM_SELECT', implode ('', $forum_list));
@@ -492,7 +490,7 @@ class listener implements EventSubscriberInterface
 		$row = $this->db->sql_fetchrow ($result);
 		$this->db->sql_freeresult ($result);
 		if ($row) // Force le forum
-			$vars['forum_id'] = $row ['forum_id'];
+			$vars['forum_id'] = $row['forum_id'];
 	}
 
 	// Allows entering a POST with empty text
@@ -655,7 +653,7 @@ class listener implements EventSubscriberInterface
 		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
-			$special_columns [$row['Field']] = $row['Type'];
+			$special_columns[$row['Field']] = $row['Type'];
 		$this->db->sql_freeresult($result);
 
 		// Get form fields from the relative post (one post with the title === form=title or the same title than the forum)
@@ -678,39 +676,40 @@ class listener implements EventSubscriberInterface
 			$field = explode ('|', preg_replace ('/[[:cntrl:]]|<br>/', '', $line.'|||||')); // Get form definition fields
 			$title = explode (' ', $field[1], 2); // Extract the title number if any
 			$sql_type = 'varchar(255)';
-			$block [$k] = [ // Init default field template block
+			$block[$k] = [ // Init default field template block
 				'FIELD_TAG' => 'p',
 				'FIELD_TITLE' => $field[1],
 				'FIELD_TYPE' => $field[2],
 				'PLACEHOLDER' => $field[3], // Displayed on empty fields
 				'POSTAMBULE' => $field[4], // Displayed after the value
 				'COMMENT' => $field[5], // Displayed on posting
-				'INNER' => '', // Init for loop
 			];
 
 			// Numbered title
 			if (preg_match ('/[0-9]+\./', $title[0])) {
 				preg_match_all ('/[0-9]+\.?/', $title[0], $title_num);
-				$block [$k] ['FIELD_TITLE_NUM'] = $title[0];
-				$block [$k] ['FIELD_TAG'] = 'h'.(count ($title_num[0]) + 1);
+				$block[$k]['FIELD_TITLE_NUM'] = $title[0];
+				$block[$k]['FIELD_TAG'] = 'h'.(count ($title_num[0]) + 1);
 			}
 
 			// SQL field
 			if (preg_match ('/^([a-z0-9_]+)$/', $field[0])) {
-				$block [$k]['TAG'] = 'input';
-				$block [$k]['NAME'] = $sql_id = 'geo_'.$field[0];
-				$block [$k] ['VALUE'] = trim ($post_data[$sql_id], '~ \t\n\r\0\x0B'); // string automatic data followed by ~
-				$block [$k] ['VALUE'] = str_replace (['<a ','</a>'], ['<pre><a ','</a></pre>'], $block [$k] ['VALUE']);
-				//TODO supprimer VALUE si posting
+				$block[$k]['TAG'] = 'input';
+				$block[$k]['NAME'] = $sql_id = 'geo_'.$field[0];
+				$sql_data = $posting && substr ($post_data[$sql_id], -1) == '~'
+					? '' // Don't edit automatic values
+					: trim ($post_data[$sql_id], '~ \t\n\r\0\x0B'); // remove ~following automatic data
+				$sql_data = str_replace (['<a ','</a>'], ['<pre><a ','</a></pre>'], $sql_data);
+				$block[$k]['VALUE'] = $sql_data;
 
 				// sql_id|titre|choix,choix|invite|postambule|commentaire saisie
 				$options = explode (',', ','.$field[2]); // Add a first option empty
 				if (count($options) > 2) {
-					$block [$k] ['TAG'] = 'select';
+					$block[$k]['TAG'] = 'select';
 					foreach ($options AS $o)
-						$block [$k] ['INNER'] .=
+						$block[$k]['INNER'] .=
 							"<option value=\"$o\"".
-							($block [$k] ['VALUE'] == $o ? ' selected="selected"' : '').
+							($sql_data == $o ? ' selected="selected"' : '').
 							">$o</option>\n";
 					// Verify SQL type
 					$length = 0;
@@ -734,26 +733,26 @@ class listener implements EventSubscriberInterface
 										ORDER BY distance ASC
 										LIMIT 10";
 								$result = $this->db->sql_query($sql);
-								$block [$k] ['INNER'] = '<option'.($block[$k]['VALUE']?'':' selected="selected"').'></option>';
+								$block[$k]['VALUE'] = '<option'.($sql_data?'':' selected="selected"').'></option>';
 								while ($row = $this->db->sql_fetchrow($result))
-									$block [$k] ['INNER'] .=
+									$block[$k]['VALUE'] .=
 										'<option value="'.$row['topic_id'].'"'.
-										($row['topic_id']==$block[$k]['VALUE']?' selected="selected"':'').'>'.
+										($row['topic_id'] == $sql_data ? ' selected="selected"' : '').'>'.
 										$row['topic_title'].
 										'</option>';
 								$this->db->sql_freeresult($result);
 
-								$block [$k]['TAG'] = 'select';
-								$block [$k]['STYLE'] = 'display:none'; // Hide at posting
+								$block[$k]['TAG'] = 'select';
+								$block[$k]['STYLE'] = 'display:none'; // Hide at posting
 							} else {
-								$block [$k] ['TAG'] = 'span';
-								$block [$k]['COMMENT'] = '(fonction disponible une fois le point créé)';
+								$block[$k]['TAG'] = 'span';
+								$block[$k]['COMMENT'] = '(fonction disponible une fois le point créé)';
 							}
 						}
 
 						// Viewtopic : Get the contains name & url
-						elseif ($block[$k]['VALUE']) {
-							$sql = 'SELECT topic_id,topic_title FROM '.TOPICS_TABLE.' WHERE topic_id = '.$block[$k]['VALUE'];
+						elseif ($sql_data) {
+							$sql = 'SELECT topic_id,topic_title FROM '.TOPICS_TABLE.' WHERE topic_id = '.$sql_data;
 							$result = $this->db->sql_query($sql);
 							$row = $this->db->sql_fetchrow($result);
 							$this->db->sql_freeresult($result);
@@ -771,36 +770,37 @@ class listener implements EventSubscriberInterface
 									$sql_id LIKE '{$post_data['topic_id']}%'";
 						$result = $this->db->sql_query($sql);
 						while ($row = $this->db->sql_fetchrow($result))
-							$attachments [$k] [] = $row;
+							$attachments[$k][] = $row;
 						$this->db->sql_freeresult($result);
 
 						$sql = 'SELECT forum_name FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%'.$field[3].'%"';
 						$result = $this->db->sql_query($sql);
 						$row = $this->db->sql_fetchrow($result);
 						$this->db->sql_freeresult($result);
-						$block [$k]['COMMENT'] = 'Pour créer ajouter un '.strtolower($row['forum_name']).
+						$block[$k]['COMMENT'] = 'Pour créer ajouter un '.strtolower($row['forum_name']).
 							', choisissez le <a href="http://alpages.info/viewforum.php?&f='.$post_data['forum_id'].
 							'">ICI</a> et modifiez le champ "Alpage d’appartenance"';
 
-						$block [$k]['TYPE'] = 'hidden'; // Hides the input field
+						$block[$k]['TYPE'] = 'hidden'; // Hides the input field
 						$sql_type = 'int(10)'; // topic_id
 						break;
 
 					case 'long':
-						$block [$k]['TAG'] = 'textarea';
+						$block[$k]['TAG'] = 'textarea';
+						$block[$k]['INNER'] = $sql_data;
 						$sql_type = 'text';
 						break;
 					case 'date':
-						$block [$k]['TYPE'] = 'date';
+						$block[$k]['TYPE'] = 'date';
 						$sql_type = 'date';
 						break;
 					case '0':
-						$block [$k]['TYPE'] = 'number';
+						$block[$k]['TYPE'] = 'number';
 						$sql_type = 'int(5)';
 						break;
 					default:
-						$block [$k]['SIZE'] = '40';
-						$block [$k]['CLASS'] = 'inputbox autowidth';
+						$block[$k]['SIZE'] = '40';
+						$block[$k]['CLASS'] = 'inputbox autowidth';
 				}
 
 				// Correct SQL table structure
@@ -812,9 +812,9 @@ class listener implements EventSubscriberInterface
 /*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>CHANGE $sql_id = ".var_export($sql,true).'</pre>';
 
 				// Pass 1 : Flag title having values on related fields
-				if ($block [$k] ['VALUE'] || $attachments [$k])
+				if ($sql_data || $attachments[$k])
 					for ($stn = $title_num[0]; $stn; array_pop ($stn))
-						$block_value [implode('',$stn)] = true;
+						$block_value[implode('',$stn)] = true;
 				}
 			}
 		}
@@ -822,7 +822,7 @@ class listener implements EventSubscriberInterface
 		// Assign template blocks
 		foreach ($block AS $k=>$b) {
 			// Pass 2 : Flag titles of blocks ahing values on related fields
-			$b['BLOCK_HAVING_VALUE'] = $block_value [$b['FIELD_TITLE_NUM']];
+			$b['BLOCK_HAVING_VALUE'] = $block_value[$b['FIELD_TITLE_NUM']];
 
 			// Create att="value" template fields
 			foreach ($b AS $kb=>$vb)
@@ -831,8 +831,8 @@ class listener implements EventSubscriberInterface
 
 			$this->template->assign_block_vars($block_name, $b);
 
-			if ($attachments [$k])
-				foreach ($attachments [$k] AS $a) {
+			if ($attachments[$k])
+				foreach ($attachments[$k] AS $a) {
 					$this->template->assign_block_vars(
 						$block_name.'.attachments',
 						array_change_key_case ($a, CASE_UPPER)
@@ -894,7 +894,7 @@ class listener implements EventSubscriberInterface
 			mkdir ('../cache/geobb/');
 
 		// Images externes
-		$purl = parse_url ($attachment ['real_filename']);
+		$purl = parse_url ($attachment['real_filename']);
 		if (isset ($purl['host'])) { // le fichier est distant
 			$local = '../cache/geobb/'.str_replace ('/', '-', $purl['path']);
 			if (!file_exists ($local) || !filesize ($local)) {
@@ -919,37 +919,37 @@ class listener implements EventSubscriberInterface
 					ImageDestroy ($im);
 				}
 			}
-			$attachment ['physical_filename'] = $local;
+			$attachment['physical_filename'] = $local;
 		}
 		else if (is_file('../'.$attachment['real_filename'])) // Fichier relatif à la racine du site
-			$attachment ['physical_filename'] = '../'.$attachment ['real_filename']; // script = download/file.php
+			$attachment['physical_filename'] = '../'.$attachment['real_filename']; // script = download/file.php
 
 		if ($exif = @exif_read_data ('../files/'.$attachment['physical_filename'])) {
-			$fls = explode ('/', $exif ['FocalLength']);
+			$fls = explode ('/', $exif['FocalLength']);
 			if (count ($fls) == 2)
 				$info[] = round($fls[0]/$fls[1]).'mm';
 
-			$aps = explode ('/', $exif ['FNumber']);
+			$aps = explode ('/', $exif['FNumber']);
 			if (count ($aps) == 2)
 				$info[] = 'f/'.round($aps[0]/$aps[1], 1).'';
 
-			$exs = explode ('/', $exif ['ExposureTime']);
+			$exs = explode ('/', $exif['ExposureTime']);
 			if (count ($exs) == 2)
 				$info[] = '1/'.round($exs[1]/$exs[0]).'s';
 
 			if ($exif['ISOSpeedRatings'])
 				$info[] = $exif['ISOSpeedRatings'].'ASA';
 
-			if ($exif ['Model']) {
-				if ($exif ['Make'] &&
-					strpos ($exif ['Model'], $exif ['Make']) === false)
-					$info[] = $exif ['Make'];
-				$info[] = $exif ['Model'];
+			if ($exif['Model']) {
+				if ($exif['Make'] &&
+					strpos ($exif['Model'], $exif['Make']) === false)
+					$info[] = $exif['Make'];
+				$info[] = $exif['Model'];
 			}
 
 			$this->db->sql_query (implode (' ', [
 				'UPDATE '.ATTACHMENTS_TABLE,
-				'SET exif = "'.implode (' ', $info ?: ['~']).'",', //TODO ARCHI voir si remplacé par - ???
+				'SET exif = "'.implode (' ', $info ?: ['~']).'",',
 					'filetime = '.(strtotime($exif['DateTimeOriginal']) ?: $exif['FileDateTime'] ?: $attachment['filetime']),
 				'WHERE attach_id = '.$attachment['attach_id']
 			]));
@@ -958,7 +958,7 @@ class listener implements EventSubscriberInterface
 		// Reduction de la taille de l'image
 		if ($max_size = request_var('size', 0)) {
 			$img_size = @getimagesize ('../files/'.$attachment['physical_filename']);
-			$isx = $img_size [0]; $isy = $img_size [1];
+			$isx = $img_size[0]; $isy = $img_size[1];
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
@@ -978,7 +978,7 @@ class listener implements EventSubscriberInterface
 						6 => -90,
 						8 =>  90,
 					];
-					$a = $angle [$exif ['Orientation']];
+					$a = $angle[$exif['Orientation']];
 					if ($a)
 						$image_src = imagerotate ($image_src, $a, 0);
 					if (abs ($a) == 90) {
