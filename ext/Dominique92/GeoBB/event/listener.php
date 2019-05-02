@@ -7,7 +7,6 @@
  *
  */
 //TODO ASPIR DEMANDE modifier le mail de bienvenue à la connexion
-//TODO ASPIR DEMANDE Ajout donnée automatique : http://alpages.info/viewtopic.php?t=3225
 //TODO ASPIR BEST recherche par département / commune
 //TODO ASPIR ARCHI rename ASPIR -> ALPAGES
 //TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
@@ -658,11 +657,9 @@ class listener implements EventSubscriberInterface
 
 		// Get form fields from the relative post (one post with the title === form=title or the same title than the forum)
 		preg_match ('/form=([[:alnum:]]+)/u', $forum_desc, $form);
-		$sql = "
-			SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
-			WHERE LOWER(post_subject) LIKE '".strtolower( str_replace ("'", "\'", $form[1]))."'
-			ORDER BY post_id
-		";
+		$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
+				WHERE LOWER(post_subject) LIKE '".strtolower(str_replace ("'", "\'", $form[1]))."'
+				ORDER BY post_id";
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -719,7 +716,28 @@ class listener implements EventSubscriberInterface
 				}
 
 				// sql_id|titre|type|invite|postambule|commentaire
-				else switch ($field[2]) { // type
+				else switch ($field[2]) {
+					case 'liste':
+						$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
+								WHERE LOWER(post_subject) LIKE '".strtolower(str_replace ("'", "\'", $field[3]))."'
+								ORDER BY post_id";
+						$result = $this->db->sql_query($sql);
+						$row = $this->db->sql_fetchrow($result);
+						$this->db->sql_freeresult($result);
+						$rows = explode ("\n", "\n".generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], 0));
+						$block[$k]['TAG'] = 'select';
+						$block[$k]['POSTAMBULE'] = '';
+						foreach ($rows AS $r) {
+							$rowss = explode (' ', $r, 2);
+							$block[$k]['INNER'] .=
+								"<option value=\"{$rowss[0]}\"".
+								($sql_data == $rowss[0] ? ' selected="selected"' : '').
+								">{$rowss[0]}</option>\n";
+							if ($sql_data == $rowss[0])
+								$block[$k]['POSTAMBULE'] = '<br/>'.$field[4].': '.$rowss[1];
+						}
+						break;
+
 					case 'proches':
 						if ($posting) {
 							// Posting : Search surfaces closest to a point
@@ -743,7 +761,7 @@ class listener implements EventSubscriberInterface
 								$this->db->sql_freeresult($result);
 
 								$block[$k]['TAG'] = 'select';
-								$block[$k]['STYLE'] = 'display:none'; // Hide at posting
+								$block[$k]['STYLE'] = 'display:none'; // Hide at posting //TODO TEST sert à quoi ?
 							} else {
 								$block[$k]['TAG'] = 'span';
 								$block[$k]['COMMENT'] = '(fonction disponible une fois le point créé)';
@@ -759,7 +777,6 @@ class listener implements EventSubscriberInterface
 							$block[$k]['VALUE'] = '<a href="viewtopic.php?t='.$row['topic_id'].'">'.$row['topic_title'].'</a>';
 						}
 						$sql_type = 'int(10)'; // === topic_id
-
 						break;
 
 					// List topics attached to this one
