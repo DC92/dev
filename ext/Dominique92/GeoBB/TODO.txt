@@ -2,6 +2,7 @@
 //TODO upgrade ASPIR/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
 //TODO upgrade ASPIR AVANT : enlever les ~sur geo_contains
 //TODO upgrade ASPIR APRES : template : supprimer les {}
+//TODO upgrade ASPIR APRES : post modif mail inscription
 
 UPDATE PHPBB
 ============

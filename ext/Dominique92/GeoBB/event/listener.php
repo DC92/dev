@@ -6,7 +6,6 @@
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
-//TODO ASPIR DEMANDE modifier le mail de bienvenue à la connexion
 //TODO ASPIR BEST recherche par département / commune
 //TODO ASPIR ARCHI rename ASPIR -> ALPAGES
 //TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
@@ -66,6 +65,9 @@ class listener implements EventSubscriberInterface
 
 			// Resize images
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
+
+			// Registration
+			'core.ucp_register_welcome_email_before' => 'ucp_register_welcome_email_before',
 		];
 	}
 
@@ -74,6 +76,7 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function user_setup($vars) {
+if(0)		//TODO TEST DUPLICATE ??
 		// For debug, Varnish will not be caching pages where you are setting a cookie
 		if (defined('TRACES_DOM'))
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
@@ -133,7 +136,6 @@ class listener implements EventSubscriberInterface
 		// Assign post contents to some templates variables
 		$mode = $this-> request->variable('mode', '');
 		$msgs = [
-			//TODO ASPIR Modifier le mail reçu lors de l’inscription
 			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
 			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
 			'Bienvenue '.$this->user->style['style_name'] => 'GEO_PRESENTATION',
@@ -145,14 +147,18 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
-			if ($row)
-				$this->template->assign_var (
-					$v,
-					generate_text_for_display($row['post_text'],
+			if ($row) {
+				$this->messages[$k] = generate_text_for_display($row['post_text'],
 					$row['bbcode_uid'],
 					$row['bbcode_bitfield'],
-					OPTION_FLAG_BBCODE, true)
+					OPTION_FLAG_BBCODE,
+					true
 				);
+				$this->template->assign_var (
+					$v,
+					$this->messages[$k]
+				);
+			}
 		}
 	}
 
@@ -317,8 +323,6 @@ class listener implements EventSubscriberInterface
 				switch ($k) {
 //TODO ASPIR Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
 
-//TODO ASPIR ajouter une information automatique sur les fiches alpages : que selon la réponse données au département du siège social de l'employeur (point 7 L'organisation de l'alpage, actuellement en champ libre), s'affiche le lien vers la convention collective qui s'applique ? (il y a une convention différente pour chaque département) http://alpages.info/viewtopic.php?f=9&t=3225
-
 					case 'geo_surface':
 						if ($post_data['area'] && $center[0])
 							$update[$k] =
@@ -456,7 +460,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function modify_posting_auth($vars) {
 		// Popule le sélecteur de forum
-		//TODO OBSOLETE ????? Voir dans chem !
+return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		preg_match ('/\view=[a-z]+/i', $vars['post_data']['forum_desc'], $view);
 		if (count ($view)) {
 			$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
@@ -647,7 +651,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Form management
-	function topic_fields ($block_name, $post_data, $forum_desc, $posting = false) {
+	function topic_fields($block_name, $post_data, $forum_desc, $posting = false) {
 		// Get special columns list
 		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geo%"';
 		$result = $this->db->sql_query($sql);
@@ -657,17 +661,7 @@ class listener implements EventSubscriberInterface
 
 		// Get form fields from the relative post (one post with the title === form=title or the same title than the forum)
 		preg_match ('/form=([[:alnum:]]+)/u', $forum_desc, $form);
-		$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
-				WHERE LOWER(post_subject) LIKE '".strtolower(str_replace ("'", "\'", $form[1]))."'
-				ORDER BY post_id";
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-		if (!$row) // No form then !
-			return;
-
-		// Expand bbcodes in field definition
-		$def_forms = explode ("\n", generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], 0));
+		$def_forms = $this->get_post_data($form[1]);
 
 		foreach ($def_forms AS $k=>$line) { // Get form definition lines
 			$field = explode ('|', preg_replace ('/[[:cntrl:]]|<br>/', '', $line.'|||||')); // Get form definition fields
@@ -718,13 +712,7 @@ class listener implements EventSubscriberInterface
 				// sql_id|titre|type|invite|postambule|commentaire
 				else switch ($field[2]) {
 					case 'liste':
-						$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE."
-								WHERE LOWER(post_subject) LIKE '".strtolower(str_replace ("'", "\'", $field[3]))."'
-								ORDER BY post_id";
-						$result = $this->db->sql_query($sql);
-						$row = $this->db->sql_fetchrow($result);
-						$this->db->sql_freeresult($result);
-						$rows = explode ("\n", "\n".generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], 0));
+						$rows = $this->get_post_data($field[3], "\n");
 						$block[$k]['TAG'] = 'select';
 						$block[$k]['POSTAMBULE'] = '';
 						foreach ($rows AS $r) {
@@ -858,6 +846,24 @@ class listener implements EventSubscriberInterface
 						$this->topic_fields ($block_name.'.attachments.detail', $a, $a['forum_desc']);
 				}
 		}
+	}
+
+	function get_post_data($post_title, $add_first_line = '') {
+		$sql = 'SELECT post_text,bbcode_uid,bbcode_bitfield FROM '.POSTS_TABLE.
+			' WHERE LOWER(post_subject) LIKE "'.strtolower(str_replace ("'", "\'", $post_title)).'"'.
+			' ORDER BY post_id';
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+
+		return $row 
+			? explode ("\n", $add_first_line.generate_text_for_display(
+				$row['post_text'],
+				$row['bbcode_uid'],
+				$row['bbcode_bitfield'],
+				0)
+			)
+			: [];
 	}
 
 
@@ -1021,6 +1027,13 @@ class listener implements EventSubscriberInterface
 		}
 
 		$vars['attachment'] = $attachment;
+	}
+
+	/**
+		MODIFY INSCRIPTION MAIL
+	*/
+	function ucp_register_welcome_email_before($vars) {
+		$this->messages['Mail inscription'] = implode ("\n", $this->get_post_data('Mail inscription'));
 	}
 
 }
