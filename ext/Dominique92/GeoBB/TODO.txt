@@ -4,6 +4,13 @@
 //TODO upgrade ASPIR APRES : template : supprimer les {}
 //TODO upgrade ASPIR APRES : post modif mail inscription
 
+UPDATE ASPIR
+============
+Copier styles/aspir
+Copier ext/Dominique92/GeoBB
+Copier assets/MyOl
+
+
 UPDATE PHPBB
 ============
 Copy full package sauf config.php & docs

@@ -39,9 +39,12 @@ class listener implements EventSubscriberInterface
 	// Liste des hooks et des fonctions associées
 	// On trouve le point d'appel en cherchant dans le logiciel de PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
+		// For debug, Varnish will not be caching pages where you are setting a cookie
+		if (defined('TRACES_DOM'))
+			setcookie('disable-varnish', microtime(true), time()+600, '/');
+
 		return [
 			// All
-			'core.user_setup' => 'user_setup',
 			'core.page_footer' => 'page_footer',
 
 			// Index
@@ -75,13 +78,10 @@ class listener implements EventSubscriberInterface
 	/**
 		ALL
 	*/
-	function user_setup($vars) {
-if(0)		//TODO TEST DUPLICATE ??
-		// For debug, Varnish will not be caching pages where you are setting a cookie
-		if (defined('TRACES_DOM'))
-			setcookie('disable-varnish', microtime(true), time()+600, '/');
-	}
-	/*//TODO DELETE ?
+	function page_footer() {
+//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
+
+		/*//TODO DELETE ?
 		// Force le style
 		$style_name = request_var ('style', '');
 		if ($style_name) {
@@ -92,14 +92,7 @@ if(0)		//TODO TEST DUPLICATE ??
 			if ($row)
 				$vars['style_id'] =  $row['style_id'];
 		}
-	*/
-
-	function page_footer() {
-//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
-
-		// For debug, Varnish will not be caching pages where you are setting a cookie
-		if (defined('TRACES_DOM'))
-			setcookie('disable-varnish', microtime(true), time()+600, '/');
+		*/
 
 		// list of gis.php arguments for chemineur layer selector
 		$sql = "
@@ -186,7 +179,7 @@ if(0)		//TODO TEST DUPLICATE ??
 		$this->template->assign_var ('PLUS_NOUVELLES', $news * 2);
 
 		$sql = "
-			SELECT p.post_id, p.poster_id,
+			SELECT p.post_id, p.poster_id, p.post_edit_time,
 				t.topic_id, topic_title,topic_first_post_id,
 				f.forum_id, f.forum_name, f.forum_image,
 				u.username,
@@ -731,17 +724,18 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 							// Posting : Search surfaces closest to a point
 							if ($post_data['post_id']) {
 								$sql = "SELECT s.topic_id, t.topic_title,
-										ST_Distance_Sphere(ST_Centroid(s.geom),ST_Centroid(p.geom)) AS distance
+										ST_Distance(s.geom,p.geom) AS distance
 										FROM ".POSTS_TABLE." AS s
 											JOIN ".POSTS_TABLE." AS p ON (p.post_id = {$post_data['post_id']})
 											JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = s.topic_id)
-										WHERE ST_Area(s.geom) > 0
+										WHERE ST_Area(s.geom) > 0 AND
+											ST_Distance(s.geom,p.geom) < 0.1
 										ORDER BY distance ASC
 										LIMIT 10";
 								$result = $this->db->sql_query($sql);
-								$block[$k]['VALUE'] = '<option'.($sql_data?'':' selected="selected"').'></option>';
+								$block[$k]['INNER'] = '<option'.($sql_data?'':' selected="selected"').'></option>';
 								while ($row = $this->db->sql_fetchrow($result))
-									$block[$k]['VALUE'] .=
+									$block[$k]['INNER'] .=
 										'<option value="'.$row['topic_id'].'"'.
 										($row['topic_id'] == $sql_data ? ' selected="selected"' : '').'>'.
 										$row['topic_title'].
@@ -825,27 +819,28 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		}
 
 		// Assign template blocks
-		foreach ($block AS $k=>$b) {
-			// Pass 2 : Flag titles of blocks ahing values on related fields
-			$b['BLOCK_HAVING_VALUE'] = $block_value[$b['FIELD_TITLE_NUM']];
+		if ($block)
+			foreach ($block AS $k=>$b) {
+				// Pass 2 : Flag titles of blocks ahing values on related fields
+				$b['BLOCK_HAVING_VALUE'] = $block_value[$b['FIELD_TITLE_NUM']];
 
-			// Create att="value" template fields
-			foreach ($b AS $kb=>$vb)
-				if ($vb)
-					$b['ATT_'.$kb] = strtolower($kb).'="'.str_replace('"','\\\"', $vb).'"';
+				// Create att="value" template fields
+				foreach ($b AS $kb=>$vb)
+					if ($vb)
+						$b['ATT_'.$kb] = strtolower($kb).'="'.str_replace('"','\\\"', $vb).'"';
 
-			$this->template->assign_block_vars($block_name, $b);
+				$this->template->assign_block_vars($block_name, $b);
 
-			if ($attachments[$k])
-				foreach ($attachments[$k] AS $a) {
-					$this->template->assign_block_vars(
-						$block_name.'.attachments',
-						array_change_key_case ($a, CASE_UPPER)
-					);
-					if (count (explode ('.', $block_name)) == 1)
-						$this->topic_fields ($block_name.'.attachments.detail', $a, $a['forum_desc']);
-				}
-		}
+				if ($attachments[$k])
+					foreach ($attachments[$k] AS $a) {
+						$this->template->assign_block_vars(
+							$block_name.'.attachments',
+							array_change_key_case ($a, CASE_UPPER)
+						);
+						if (count (explode ('.', $block_name)) == 1)
+							$this->topic_fields ($block_name.'.attachments.detail', $a, $a['forum_desc']);
+					}
+			}
 	}
 
 	function get_post_data($post_title, $add_first_line = '') {
