@@ -1028,7 +1028,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		MODIFY INSCRIPTION MAIL
 	*/
 	function ucp_register_welcome_email_before($vars) {
-		$this->messages['Mail inscription'] = implode ("\n", $this->get_post_data('Mail inscription'));
+		$vars['message'] = implode ("\n", $this->get_post_data('Mail inscription'));
 	}
 
 }

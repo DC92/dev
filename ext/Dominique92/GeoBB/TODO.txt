@@ -11,6 +11,10 @@ Copier ext/Dominique92/GeoBB
 Copier assets/MyOl
 
 
+ACCEPTER MODERATEUR
+===================
+Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
+
 UPDATE PHPBB
 ============
 Copy full package sauf config.php & docs
