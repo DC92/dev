@@ -303,7 +303,6 @@ class listener implements EventSubscriberInterface
 
 	// Called during first pass on post data that reads phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
-
 		// Update the database with the automatic data
 		$post_data = $vars['row'];
 
@@ -359,8 +358,6 @@ class listener implements EventSubscriberInterface
 					case 'geo_reserve':
 					case 'geo_ign':
 						if ($center[0]) {
-							$update['geo_massif'] = null;
-							$update['geo_reserve'] = null;
 							$igns = [];
 							$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$center[0][0]},{$center[0][1]},{$center[0][0]},{$center[0][1]}";
 							$wri_export = @file_get_contents($url);
@@ -382,7 +379,8 @@ class listener implements EventSubscriberInterface
 											$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom_carte</a>";
 											break;
 									}
-								$update['geo_ign'] = implode ('<br/>', $igns);
+								if (array_key_exists('geo_ign', $post_data))
+									$update['geo_ign'] = implode ('<br/>', $igns);
 							}
 						}
 				}
