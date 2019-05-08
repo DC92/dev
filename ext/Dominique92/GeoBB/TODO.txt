@@ -1,19 +1,26 @@
 //TODO enlever /assets/wri
 //TODO upgrade ASPIR/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
-//TODO upgrade ASPIR AVANT : enlever les ~sur geo_contains
-//TODO upgrade ASPIR APRES : template : supprimer les {}
-//TODO upgrade ASPIR APRES : post modif mail inscription
+//TODO TEST ASPIR post modif mail inscription
 
 UPDATE ASPIR
 ============
-Copier styles/aspir
-Copier ext/Dominique92/GeoBB
-Copier assets/MyOl
+AVANT
+	enlever les ~sur geo_contains : //TODO la suite ne marche pas !
+	SELECT post_id, geo_contains, REPLACE(geo_contains,'~','') FROM phpbb_posts WHERE geo_contains like "%~" LIMIT 1000
+PENDANT
+	Dézipper phpbb 3.2.7 / sauf doc
+	Copier assets/MyOl + jquery-ui
+	Copier ext/Dominique92/GeoBB / sauf styles/chemineur & doc
+	Copier LOG
+	Copier styles/aspir
+	Copier robots.txt
+APRES
+	template : supprimer les {}
 
-
-ACCEPTER MODERATEUR
+ACCEPTER MODERATEUR //TODO vrai sur ASPIR ???
 ===================
 Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
+Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
 
 UPDATE PHPBB
 ============
@@ -25,9 +32,8 @@ Mettre à jour uniquement la base de données -> Envoyer
 Attendre 100%
 Supprimer /install
 
-
 BUGS CHEMINEUR soldes par chem4
-==============
+===============================
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
 Diapo : ne s'arrête pas sur touche escape
 Pouvoir trier les posts WRIC
@@ -44,8 +50,8 @@ Pouvoir citer un WRIC
 Récupérer les smileys tout ronds de WRI
 https://www.phpbb.com/support/docs/en/3.2/ug/upgradeguide/general_conversion/
 
-BUGS CHEMINEUR
-==============
+//TODO BUGS CHEMINEUR
+=====================
 Voir forum Evolutions & bugs sur chemineur.fr
 Suppression fichier attach ne supprime pas l'attachment.
 WRI : Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
@@ -63,8 +69,8 @@ Interface VTTRACK
 	Priorité pas aux orris !!
 	Reprendre interface sur chem3
 
-BEST CHEMINEUR
-==============
+//TODO BEST CHEMINEUR
+=====================
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Meteo sur chem
 Stockage images sur plus d'1 répertoire => ? plugin ?
@@ -73,7 +79,6 @@ CSS bug chem cadre liens sur largeur fenêtre petite
 Choix type trace GPS
 Editeur Optim geom dès le chargement
 Appli méteo suisse
-Créer les massifs manquants sur WRI
 Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29
 Erreur type de caractères randos Lozerre
 Récup trace diaporamas + chemins chem2
@@ -99,14 +104,41 @@ Ajouter bouton permutation sur page point chem
 coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
 BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
 CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
-WRI forum : préalables
-	Migrer forum/photos-points
-	mettre en paramètre nom table phpbb_
-	Migration des tables ?
 
+UPGRADE CHEMINEUR
+=================
+todo avant upgrade chem
+	CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]	
+	TODO récupérer les fichiers chem2
+		C koi chem3/files/attach ?
+	chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
+	Fiche type Point : carte IGN, commune, ...²
+	//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70 
+	Retester ASPIR avec cette version
+Fermer le site
+Vider cache
+phpadmin export database
+Cpanel -> Bases de données MySQL
+Créer BDD
+Ajouter un nouvel utilisateur à la base de données
+phpadmin import database
+Copier PhpBB3 sauf doc
+Copier repertoires de GeoBB
+Copier cmem3/files
+Mise à jour config.php
+Lancer admin -> Upgrade
+Supprimer répertoire install
+Désactiver styles et extensions /supprimer les données (y compris collapsible cactégories)
+	Lancer /adm -> Personnaliser -> Gérer les extensions
+	Désactiver et supprimer les données sauf GeoBB
+	Supprimer les ext/* sauf GeoBB
+Purger contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
+Modifier forum_desc diaporamas : [all=point][view=diapo][exclude=tortillards] => [view=diapo][/view]
+Rediriger dc9.fr/chemineur dans WRI
 
 TODO WRI
 ========
+Créer les massifs manquants à chemineur
 Page point : lien des posts vers le bon post du forum
 Inclure scan_liens.php dans /ressources/outils/...
 Paramétres inclusion posts dans points -> config.php
@@ -131,118 +163,58 @@ Erreur: sur geom vide dans un polynome
 Durée cache réglable
 Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->geometrie !!
 
-NOTES
-=====
+AIDE TEST
+=========
 MultiPolygon multiple => WRI massif 3116
 MultiPolygon avec trou => WRI massif 3127
 
-
 AIDE
 ====
-Fonction glisser les commentaires
-L'affichage des traces peut être désactivé dans le sélecteur de gauche de la carte (décocher randonnées)
 Un sujet est actif quand il y a eu des contributions récentes.
 Création / Edition de traces
 Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
 Consulter l'historique des éditions
 
-MIGRATION
-=========
-dézipper et uploader le nouveau phpbb
-supprimer ext/wiglink
-dézipper et uploader https://www.phpbb.com/customise/db/extension/collapsible_forum_categories/
-dezipper et uploader https://github.com/Dominique92/GeoBB
-	ext/Dominique92/...
-	style/chemineur/...
-	favicon.ico
-run SITE/install -> Update manuel -> Database only
+HISTORIQUE INSTALL O2
+=====================
+Cpanel -> Bases de données MySQL
+Créer BDD
+Ajouter un nouvel utilisateur
+Ajouter un nouvel utilisateur à la base de données
+Copier PhpBB3 sauf doc
+Copier repertoire de GeoBB + aspir_import.php
+Lancer install
+-> Français -> Change
+Installer -> Installer
 Supprimer install
-Tous users -> style = aspir
-
-MISE EN FORME / INSTALL / DEMOS
-===============================
-Dépendance des plugins:
-	<!-- INCLUDE reference.html --> => Devrait être un extract
-Centraliser patchs
-	Passage en https: htaccess / route
-Mettre tous les responsive dans responsive.css
-Voir nom en français des variables spécifiques ?
-Convergence noms: reference / lien / import / ...
-Demo GeoBB : création 1 point + 1 ligne + 1 surface et forums associés
-Lang sur tous les *.php : faire le tri ! + incorporer tous les textes + traduire en anglais ??
-
-TODO TORTILLARDS - LIGNES
-=========================
-Icône modifier fiche ligne / supprimer
-Ligne n'affiche pas la carte si pas de geom dans le premier post
-Distances points caractéristiques sur la ligne
-Tortillards : Fatal error: Uncaught exception 'Twig_Error_Loader' with message 'Unable to find template "viewtopic_ligne.html" (looked into: ././ext/Dominique92/BarMenu/styles/all/template, 
-Filtrage des forums & catégories suivant le style: -style <==== TBD
-Titre page dépendant du style => Le faire varier pour tortillards => Config ?
-Styles => 1.234em (pas de PX)
-Reprendre tortillards viewtopic_ligne.* suivant nouveaux templates ext/GeoBB
-20160129.gpx : Fatal error:
-	Uncaught exception 'Exception' with message 'Cannot construct a LineString with a single point' in /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/lib/geometry/LineString.class.php:18 Stack trace: #0 /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/lib/adapters/GeoJSON.class.php(71): LineString->__construct(Array) #1 /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/lib/adapters/GeoJSON.class.php(93): GeoJSON->arrayToLineString(Array) #2 /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/lib/adapters/GeoJSON.class.php(54): GeoJSON->arrayToMultiLineString(Array) #3 /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/lib/adapters/GeoJSON.class.php(44): GeoJSON->objToGeom(Object(stdClass)) #4 [internal function]: GeoJSON->read('{"type":"MultiL...') #5 /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/geoPHP.inc(78): call_user_func_array(Array, Array) #6 /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB in /homepages/33/d187913083/htdocs/chem3/ext/Dominique92/GeoBB/geoPHP/lib/geometry/LineString.class.php on line 18
-	Leaflet
-		Purge des points identiques sur un segment
-		Ne pas exporter une ligne ne contenant qu'un point
-
-EXTENSIONS (Ajouter dans les read.me)
-==========
-https://www.phpbb.com/customise/db/extension/upload/
-https://www.phpbb.com/customise/db/extension/auto_database_backup_2/
-https://www.phpbb.com/customise/db/extension/collapsible_forum_categories/
-https://www.phpbb.com/customise/db/extension/recent_topics_2/
-GeoBB
-	- Objets géographiques : DONE
-	- Autres champs liés à un topic / à un post: Sélectionnés par les champs SQL et ext/STYLE/tpl/topic_VIEW.html & .js : DONE
-	- Détermination automatique de massif / altitude : DONE
-	- Permet la saisie d'un POST avec un texte vide : DONE
-StylesViews
-	- Force le style en fonction du domaine : DONE
-	- Force la view en fonction du descripteur de forum: *view : DONE
-	- Filtrage des forums & catégories suivant le style: -style <==== TBD
-BarMenu
-	- Menu mode ligne avec expansion : DONE
-	- liste des types à créer (différentes vues / forum) : DONE
-		NON ?? https://www.phpbb.com/customise/db/extension/breadcrumb_menu/
-		NON ?? https://www.phpbb.com/customise/db/extension/post_new_topic/
-ResizeImg
-	- Photos de taille variable : DONE
-	- Import d'images externes : DONE
-	- Champs EXIF : DONE
-Organiser
-	- Changement de forum par sélection dans posting. : DONE
-	- Réorganiser posts : DONE
-News
-	- News accueil : DONE
-	- Message de bienvenu aux non connectés : DONE
-- Spam: Filtrage suivant localisation IP <==== TBD
-A voir
-	?? https://www.phpbb.com/customise/db/extension/database_optimize_and_repair_tool/
-https://www.phpbb.com/customise/db/extension/shareon/
-https://www.phpbb.com/customise/db/extension/phpbb_3.1_stop_forum_spam/
-https://www.phpbb.com/customise/db/extension/seo_meta_description/
-	https://www.phpbb.com/customise/db/extension/seo_sitemap/
-?? https://www.phpbb.com/customise/db/extension/about_us/
-
-Styles
-======
-chemineur
-tortillards + dates 
-gpx-rando
-	+ stats sur trace
-wri + info cabane / type : TBD
-
-*******************************************************
-http://s201381593.onlinehome.fr/cron/task.php
-*******************************************************
-COPIE SITE
-==========
-Delete all SQL tables
-Import sauvegarde SQL complete
-UPDATE phpbb_config SET config_value = "test.chemineur.fr" WHERE config_name = "cookie_domain";
-UPDATE phpbb_config SET config_value = "phpbb3_71gbo" WHERE config_name = "cookie_name";
-UPDATE phpbb_config SET config_value = "test.chemineur.fr" WHERE config_name = "server_name";
-*******************************************************
-
+config.php -> clés cartes : $geoKeys = [...]
+Administration ==>
+Général -> Gérer les forums -> Créer
+	Alpages [first=surface][/first][form=Alpages][/form]
+	Cabanes [first=point][/first][form=Cabanes][/form] ext/Dominique92/GeoBB/types_points/cabane.png
+	Points d'eau [first=point][/first][form=Points d'eau][/form] ext/Dominique92/GeoBB/types_points/point_eau.png
+	Réseau ....
+	Forum des utilisateurs
+	catégorie Coin des modérateurs, Configuration, Formulaires, Bienvenue, Aide, 
+	catégorie Bugs et améliorations, Bugs et améliorations résolus, Echanges entre modérateurs
+Genéral -> Paramètres des fichiers joints -> Quota & taille maximale du fichier : 0
+Général -> Configuration du forum -> Libellé du site Internet :
+Genéral -> Paramètres de cookie -> Domaine du cookie : VIDE
+Général -> Paramètres du serveur -> Activer la compression GZip : oui
+Général -> Paramètres de charge -> Recompiler les différents éléments du style : non
+Messages -> Ajouter un bbcode -> [first={TEXT}][/first] / <span></span> / ne pas oublier [/first] dans les forum_desc
+Messages -> Ajouter un bbcode -> [form={TEXT}][/form] / <span></span> / ne pas oublier [/form] dans les forum_desc
+Permissions -> Permissions des forums -> Coin des modérateurs + Configuration + Bugs * + Echanges -> Envoyer
+	Robots + Invités + Utilisateurs * -> Aucun accès -> Appliquer toutes
+Permissions -> Permissions des forums -> Alpages + Cabanes + Forum utilisateurs
+	Utilisateurs * enregistrés -> Accès standard -> Appliquer toutes
+Personnaliser -> Désactiver VigLink
+Personnaliser -> Installation de styles -> Aspir -> Détails -> Définir comme style par défaut
+Personnaliser -> Gérer de styles -> Prosilver -> Désactiver
+Créer les sujets de configuration : Formulaires, Aide, Bienvenue
+Créer un item d'Alpage, Cabane, Point d'eau, Réseau
+Exécuter ext/Dominique92/GeoBB/styles/aspir/import
+Move ext/Dominique92/GeoBB/styles/aspir/import/LOG/... LOG/
+Administration -> Gérer les forums -> Alpages -> Resynchroniser
+Supprimer assets/geoPHP
+Supprimer ext/.../aspir/import

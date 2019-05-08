@@ -664,7 +664,10 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 				'FIELD_TYPE' => $field[2],
 				'PLACEHOLDER' => $field[3], // Displayed on empty fields
 				'POSTAMBULE' => $field[4], // Displayed after the value
-				'COMMENT' => $field[5], // Displayed on posting
+				'COMMENT' => $field[5],
+					// Displayed on posting
+					// confidentiel (not displayed on viewtopic if not moderator)
+					// automatique (not displayed on posting)
 			];
 
 			// Numbered title
@@ -756,7 +759,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 							$this->db->sql_freeresult($result);
 							$block[$k]['VALUE'] = '<a href="viewtopic.php?t='.$row['topic_id'].'">'.$row['topic_title'].'</a>';
 						}
-						$sql_type = 'int(10)'; // === topic_id
+//TODO BEST (mais pb base aspir)						$sql_type = 'int(10)'; // === topic_id
 						break;
 
 					// List topics attached to this one
