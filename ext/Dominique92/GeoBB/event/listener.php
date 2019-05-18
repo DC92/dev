@@ -196,10 +196,7 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			if ($this->auth->acl_get('f_read', $row['forum_id'])) {
 				//TODO BEST BUG compte les posts des forums cachés dans le nb max
-				$row['post_or_edit_time'] =
-					'<span title="'.$this->user->format_date ($row['post_or_edit_time']).'">'.
-						date ('j M', $row['post_or_edit_time']).
-					'</span>';
+				$row['post_or_edit_time'] = '<span>'.$this->user->format_date ($row['post_or_edit_time']).'</span>';
 				$this->template->assign_block_vars('news', array_change_key_case ($row, CASE_UPPER));
 			}
 		$this->db->sql_freeresult($result);
