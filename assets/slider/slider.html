@@ -1,0 +1,14 @@
+<div id="slide">
+	<div id="thumbs"></div>
+	<div id="buttons">
+		<a id="prev" title="Précédent" onclick="display(current-1)">&laquo;</a>
+		<a id="scroll" title="Défilement" onclick="switchScroll();display();">&gt;</a>
+		<a id="scroll-fs" title="Défilement plein écran" class="window" onclick="switchScroll();fullscreen()">&gt;</a>
+		<a id="stop" title="Pause" onclick="switchScroll()">&nbsp;</a>
+		<a id="next" title="Suivant" onclick="display(current+1)">&raquo;</a>
+		<a id="download" title="Télécharger l'image courante">&dArr;</a>
+		<a id="window" title="Mode fenêtre" class="fullscreen" onclick="exitFullscreen()">&times;</a>
+		<a id="fullscreen" title="Plein écran" class="window" onclick="fullscreen()">&times;</a>
+	</div>
+	<!-- a slide is a p element -->
+</div>

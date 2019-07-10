@@ -1,0 +1,175 @@
+#slide p {
+	position: absolute;
+	top: 0; left: 0;
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	background: grey;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+
+	-webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+	-moz-animation: fadein 2s; /* Firefox before 16 */
+	-ms-animation: fadein 2s; /* Internet Explorer */
+	-o-animation: fadein 2s; /* Opera before 12.1 */
+	animation: fadein 2s;
+}
+@keyframes fadein {
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
+@-moz-keyframes fadein { /* Firefox */
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
+@-webkit-keyframes fadein { /* Safari and Chrome */
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
+@-o-keyframes fadein { /* Opera */
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
+
+#thumbs {
+	z-index: 1;
+	overflow: auto;
+	position: absolute;
+	top: 0; left: 0;
+	height: 100vh;
+	border-right: 3vw solid rgba(0,0,0,0);
+	transition: opacity 1s;
+}
+#thumbs > a {
+	display: block;
+	height: 5vh;
+	width: 5vw;
+	margin: 0;
+	border: .5px solid black;
+	background: grey;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	cursor: pointer;
+}
+#thumbs > a.highlighted {
+	border: 1px solid yellow;
+}
+
+#buttons > a {
+	z-index: 1;
+	position: absolute;
+	top: calc(50% - 2.5vh);
+	text-align: center;
+	line-height: 3vw;
+	font-size: 5vw;
+	color: yellow;
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity 1s;
+}
+#prev {
+	left: 6vw;
+}
+#next {
+	right: 6vw;
+}
+#stop {
+	left: 48vw;
+	border-style: solid;
+	border-width: 0 5px;
+	border-color: yellow;
+}
+#scroll {
+	left: 47vw;
+}
+#scroll-fs {
+	left: 53vw;
+}
+#download {
+	top: 0 !important;
+	right: 6vw;
+}
+#fullscreen,
+#window {
+	top: 0 !important;
+	right: 0;
+}
+#scroll-fs,
+#fullscreen,
+#window {
+	border: .3vw solid yellow;
+	border-radius: 1vw;
+	background: rgba(128,128,0,.5);
+}
+#fullscreen {
+	color: rgba(0,0,0,0) !important;
+}
+
+/* Show buttons */
+#thumbs,
+#buttons > a {
+	opacity: 0;
+}
+.show-buttons #thumbs,
+.show-buttons #buttons > a ,
+#thumbs:hover,
+#buttons > a:hover {
+	opacity: 1;
+}
+
+/* Display when stop/scroll */
+#stop,
+.scroll #scroll,
+.scroll #scroll-fs {
+	display: none !important;
+}
+.scroll #stop {
+	display: block !important;
+}
+
+/* Display when fullscreen */
+:fullscreen .window { /* FF */
+	display: none !important;
+}
+:-webkit-fullscreen .window { /* Edge */
+	display: none !important;
+}
+:-ms-fullscreen .window { /* IE */
+	display: none !important;
+}
+.fullscreen {
+	display: none !important;
+}
+:fullscreen .fullscreen { /* FF */
+	display: block !important;
+}
+:-webkit-fullscreen .fullscreen { /* Edge */
+	display: block !important;
+}
+:-ms-fullscreen .fullscreen { /* IE */
+	display: block !important;
+}
+
+/* Sliders list */
+.list {
+	margin: auto;
+	width: 70vw;
+}
+.list div {
+	display: inline-block;
+	width: 30vw;
+	height: 30vw;
+	margin: 0;
+	background: grey;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	text-align: center;
+	line-height: 30vw;
+	color: yellow;
+	font-size: 5vw;
+	line-height: 30vw;
+	cursor: pointer;
+}

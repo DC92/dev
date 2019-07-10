@@ -138,6 +138,9 @@ Rediriger dc9.fr/chemineur dans WRI
 
 TODO WRI
 ========
+Bug météo ° ressenti
+Mettre sablier sur attente météo une fois cliqué
+http://www.refuges.info/forum/viewtopic.php?f=2&t=9127 / BUG: cannot click on camp to camp symbol (c) for 'Crête Pilliozan - Agnelin, point 2611 m ©'
 Créer les massifs manquants à chemineur
 Page point : lien des posts vers le bon post du forum
 Inclure scan_liens.php dans /ressources/outils/...
