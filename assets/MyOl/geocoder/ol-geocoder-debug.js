@@ -1,24 +1,24 @@
 /*!
- * ol-geocoder - v3.2.0
+ * ol-geocoder - v3.3.0
  * A geocoder extension for OpenLayers.
  * https://github.com/jonataswalker/ol-geocoder
- * Built: Sat Jul 28 2018 15:24:01 GMT-0300 (Brasilia Standard Time)
+ * Built: Thu Jul 04 2019 07:15:42 GMT-0300 (Brasilia Standard Time)
  */
 
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/layer/Vector'), require('ol/source/Vector'), require('ol/geom/Point'), require('ol/Feature'), require('ol/proj'), require('ol/control/Control'), require('ol/style/Style'), require('ol/style/Icon')) :
-  typeof define === 'function' && define.amd ? define(['ol/layer/Vector', 'ol/source/Vector', 'ol/geom/Point', 'ol/Feature', 'ol/proj', 'ol/control/Control', 'ol/style/Style', 'ol/style/Icon'], factory) :
-  (global.Geocoder = factory(global.ol.layer.Vector,global.ol.source.Vector,global.ol.geom.Point,global.ol.Feature,global.ol.proj,global.ol.control.Control,global.ol.style.Style,global.ol.style.Icon));
-}(this, (function (LayerVector,SourceVector,Point,Feature,proj,Control,Style,Icon) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control'), require('ol/style/Style'), require('ol/style/Icon'), require('ol/layer/Vector'), require('ol/source/Vector'), require('ol/geom/Point'), require('ol/Feature'), require('ol/proj')) :
+  typeof define === 'function' && define.amd ? define(['ol/control/Control', 'ol/style/Style', 'ol/style/Icon', 'ol/layer/Vector', 'ol/source/Vector', 'ol/geom/Point', 'ol/Feature', 'ol/proj'], factory) :
+  (global = global || self, global.Geocoder = factory(global.ol.control.Control, global.ol.style.Style, global.ol.style.Icon, global.ol.layer.Vector, global.ol.source.Vector, global.ol.geom.Point, global.ol.Feature, global.ol.proj));
+}(this, function (Control, Style, Icon, LayerVector, SourceVector, Point, Feature, proj) { 'use strict';
 
+  Control = Control && Control.hasOwnProperty('default') ? Control['default'] : Control;
+  Style = Style && Style.hasOwnProperty('default') ? Style['default'] : Style;
+  Icon = Icon && Icon.hasOwnProperty('default') ? Icon['default'] : Icon;
   LayerVector = LayerVector && LayerVector.hasOwnProperty('default') ? LayerVector['default'] : LayerVector;
   SourceVector = SourceVector && SourceVector.hasOwnProperty('default') ? SourceVector['default'] : SourceVector;
   Point = Point && Point.hasOwnProperty('default') ? Point['default'] : Point;
   Feature = Feature && Feature.hasOwnProperty('default') ? Feature['default'] : Feature;
   proj = proj && proj.hasOwnProperty('default') ? proj['default'] : proj;
-  Control = Control && Control.hasOwnProperty('default') ? Control['default'] : Control;
-  Style = Style && Style.hasOwnProperty('default') ? Style['default'] : Style;
-  Icon = Icon && Icon.hasOwnProperty('default') ? Icon['default'] : Icon;
 
   var containerId = "gcd-container";
   var buttonControlId = "gcd-button-control";
@@ -65,40 +65,37 @@
     inputQueryId: inputQueryId,
     inputResetId: inputResetId,
     cssClasses: cssClasses,
-    default: vars
+    'default': vars
   });
 
-  const VARS = _VARS_;
+  var VARS = _VARS_;
 
-  const EVENT_TYPE = {
-    ADDRESSCHOSEN: 'addresschosen'
+  var EVENT_TYPE = {
+    ADDRESSCHOSEN: 'addresschosen',
   };
 
-  const CONTROL_TYPE = {
+  var CONTROL_TYPE = {
     NOMINATIM: 'nominatim',
-    REVERSE: 'reverse'
+    REVERSE: 'reverse',
   };
 
-  const TARGET_TYPE = {
+  var TARGET_TYPE = {
     GLASS: 'glass-button',
-    INPUT: 'text-input'
+    INPUT: 'text-input',
   };
 
-
-  const FEATURE_SRC =
+  var FEATURE_SRC =
     '//cdn.rawgit.com/jonataswalker/map-utils/master/images/marker.png';
 
-  const PROVIDERS = {
+  var PROVIDERS = {
     OSM: 'osm',
     MAPQUEST: 'mapquest',
-    GOOGLE: 'google',
     PHOTON: 'photon',
     BING: 'bing',
     OPENCAGE: 'opencage',
-    PELIAS: 'pelias'
   };
 
-  const DEFAULT_OPTIONS = {
+  var DEFAULT_OPTIONS = {
     provider: PROVIDERS.OSM,
     placeholder: 'Search for an address',
     featureStyle: null,
@@ -109,18 +106,18 @@
     preventDefault: false,
     autoComplete: false,
     autoCompleteMinLength: 2,
-    debug: false
+    debug: false,
   };
 
   /**
-    * Overwrites obj1's values with obj2's and adds
-    * obj2's if non existent in obj1
-    * @returns obj3 a new object based on obj1 and obj2
-    */
+   * Overwrites obj1's values with obj2's and adds
+   * obj2's if non existent in obj1
+   * @returns obj3 a new object based on obj1 and obj2
+   */
   function mergeOptions(obj1, obj2) {
-    let obj3 = {};
-    for (let attr1 in obj1) { obj3[attr1] = obj1[attr1]; }
-    for (let attr2 in obj2) { obj3[attr2] = obj2[attr2]; }
+    var obj3 = {};
+    for (var attr1 in obj1) { obj3[attr1] = obj1[attr1]; }
+    for (var attr2 in obj2) { obj3[attr2] = obj2[attr2]; }
     return obj3;
   }
 
@@ -142,13 +139,15 @@
       window.performance = {};
     }
 
-    Date.now = (Date.now || function () { // thanks IE8
-      return new Date().getTime();
-    });
+    Date.now =
+      Date.now ||
+      function() {
+        // thanks IE8
+        return new Date().getTime();
+      };
 
     if ('now' in window.performance === false) {
-
-      let nowOffset = Date.now();
+      var nowOffset = Date.now();
 
       if (performance.timing && performance.timing.navigationStart) {
         nowOffset = performance.timing.navigationStart;
@@ -163,14 +162,11 @@
   function flyTo(map, coord, duration, resolution) {
     resolution = resolution || 2.388657133911758;
     duration = duration || 500;
-    map.getView().animate(
-      { duration: duration, resolution: resolution },
-      { duration: duration, center: coord }
-    );
+    map.getView().animate({ duration: duration, resolution: resolution }, { duration: duration, center: coord });
   }
 
   function randomId(prefix) {
-    const id = now().toString(36);
+    var id = now().toString(36);
     return prefix ? prefix + id : id;
   }
 
@@ -190,10 +186,8 @@
       return;
     }
 
-    const array = (Array.isArray(classname))
-      ? classname
-      : classname.split(/\s+/);
-    let i = array.length;
+    var array = Array.isArray(classname) ? classname : classname.split(/\s+/);
+    var i = array.length;
 
     while (i--) {
       if (!hasClass(element, array[i])) {
@@ -214,10 +208,8 @@
       return;
     }
 
-    const array = (Array.isArray(classname))
-      ? classname
-      : classname.split(/\s+/);
-    let i = array.length;
+    var array = Array.isArray(classname) ? classname : classname.split(/\s+/);
+    var i = array.length;
 
     while (i--) {
       if (hasClass(element, array[i])) {
@@ -225,7 +217,6 @@
       }
     }
   }
-
 
   /**
    * @param {Element} element DOM node.
@@ -250,10 +241,10 @@
   function find(selector, context, find_all) {
     if ( context === void 0 ) context = window.document;
 
-    let simpleRe = /^(#?[\w-]+|\.[\w-.]+)$/,
-        periodRe = /\./g,
-        slice = Array.prototype.slice,
-        matches = [];
+    var simpleRe = /^(#?[\w-]+|\.[\w-.]+)$/,
+      periodRe = /\./g,
+      slice = Array.prototype.slice,
+      matches = [];
 
     // Redirect call to the more performant function
     // if it's a simple selector and return an array
@@ -264,8 +255,11 @@
           matches = [$(selector.substr(1))];
           break;
         case '.':
-          matches = slice.call(context.getElementsByClassName(
-            selector.substr(1).replace(periodRe, ' ')));
+          matches = slice.call(
+            context.getElementsByClassName(
+              selector.substr(1).replace(periodRe, ' ')
+            )
+          );
           break;
         default:
           matches = slice.call(context.getElementsByTagName(selector));
@@ -276,11 +270,11 @@
       matches = slice.call(context.querySelectorAll(selector));
     }
 
-    return (find_all) ? matches : matches[0];
+    return find_all ? matches : matches[0];
   }
 
   function $(id) {
-    id = (id[0] === '#') ? id.substr(1, id.length) : id;
+    id = id[0] === '#' ? id.substr(1, id.length) : id;
     return document.getElementById(id);
   }
 
@@ -290,7 +284,7 @@
 
   function template(html, row) {
     return html.replace(/\{ *([\w_-]+) *\}/g, function (htm, key) {
-      let value = (row[key] === undefined) ? '' : row[key];
+      var value = row[key] === undefined ? '' : row[key];
       return htmlEscape(value);
     });
   }
@@ -305,7 +299,7 @@
   }
 
   function createElement(node, html) {
-    let elem;
+    var elem;
     if (Array.isArray(node)) {
       elem = document.createElement(node[0]);
 
@@ -313,9 +307,9 @@
       if (node[1].classname) { elem.className = node[1].classname; }
 
       if (node[1].attr) {
-        let attr = node[1].attr;
+        var attr = node[1].attr;
         if (Array.isArray(attr)) {
-          let i = -1;
+          var i = -1;
           while (++i < attr.length) {
             elem.setAttribute(attr[i].name, attr[i].value);
           }
@@ -327,7 +321,7 @@
       elem = document.createElement(node);
     }
     elem.innerHTML = html;
-    let frag = document.createDocumentFragment();
+    var frag = document.createDocumentFragment();
 
     while (elem.childNodes[0]) { frag.appendChild(elem.childNodes[0]); }
     elem.appendChild(frag);
@@ -355,14 +349,14 @@
     if (el.classList) {
       el.classList.remove(klass);
     } else {
-      el.className = (el.className.replace(classRegex(klass), ' ')).trim();
+      el.className = el.className.replace(classRegex(klass), ' ').trim();
     }
     if (timeout && isNumeric(timeout)) {
       window.setTimeout(function () { return _addClass(el, klass); }, timeout);
     }
   }
 
-  const klasses = VARS.cssClasses;
+  var klasses = VARS.cssClasses;
 
   /**
    * @class Html
@@ -373,7 +367,7 @@
   };
 
   Html.prototype.createControl = function createControl () {
-    let container, containerClass, elements;
+    var container, containerClass, elements;
 
     if (this.options.targetType === TARGET_TYPE.INPUT) {
       containerClass = klasses.namespace + ' ' + klasses.inputText.container;
@@ -386,7 +380,7 @@
         control: find('.' + klasses.inputText.control, container),
         input: find('.' + klasses.inputText.input, container),
         reset: find('.' + klasses.inputText.reset, container),
-        result: find('.' + klasses.inputText.result, container)
+        result: find('.' + klasses.inputText.result, container),
       };
     } else {
       containerClass = (klasses.namespace) + " " + (klasses.glass.container);
@@ -400,7 +394,7 @@
         button: find('.' + klasses.glass.button, container),
         input: find('.' + klasses.glass.input, container),
         reset: find('.' + klasses.glass.reset, container),
-        result: find('.' + klasses.glass.result, container)
+        result: find('.' + klasses.glass.result, container),
       };
     }
     //set placeholder from options
@@ -410,51 +404,84 @@
 
   /* eslint-disable indent */
   Html.glass = [
-    '<div class="', klasses.glass.control, ' ', klasses.olControl, '">',
-      '<button type="button"',
-        ' id="', VARS.buttonControlId, '"',
-        ' class="', klasses.glass.button, '"></button>',
-      '<input type="text"',
-        ' id="', VARS.inputQueryId, '"',
-        ' class="', klasses.glass.input, '"',
-        ' autocomplete="off" placeholder="Search ...">',
-      '<a',
-        ' id="', VARS.inputResetId, '"',
-        ' class="', klasses.glass.reset, ' ', klasses.hidden, '"',
-      '></a>',
+    '<div class="',
+    klasses.glass.control,
+    ' ',
+    klasses.olControl,
+    '">',
+    '<button type="button"',
+    ' id="',
+    VARS.buttonControlId,
+    '"',
+    ' class="',
+    klasses.glass.button,
+    '"></button>',
+    '<input type="text"',
+    ' id="',
+    VARS.inputQueryId,
+    '"',
+    ' class="',
+    klasses.glass.input,
+    '"',
+    ' autocomplete="off" placeholder="Search ...">',
+    '<a',
+    ' id="',
+    VARS.inputResetId,
+    '"',
+    ' class="',
+    klasses.glass.reset,
+    ' ',
+    klasses.hidden,
+    '"',
+    '></a>',
     '</div>',
-    '<ul class="', klasses.glass.result, '"></ul>'
-  ].join('');
+    '<ul class="',
+    klasses.glass.result,
+    '"></ul>' ].join('');
 
   Html.input = [
-    '<div class="', klasses.inputText.control, '">',
-      '<input type="text"',
-        ' id="', VARS.inputQueryId, '"',
-        ' class="', klasses.inputText.input, '"',
-        ' autocomplete="off" placeholder="Search ...">',
-      '<span class="', klasses.inputText.icon, '"></span>',
-      '<button type="button"',
-        ' id="', VARS.inputResetId, '"',
-        ' class="', klasses.inputText.reset, ' ', klasses.hidden, '"',
-      '></button>',
+    '<div class="',
+    klasses.inputText.control,
+    '">',
+    '<input type="text"',
+    ' id="',
+    VARS.inputQueryId,
+    '"',
+    ' class="',
+    klasses.inputText.input,
+    '"',
+    ' autocomplete="off" placeholder="Search ...">',
+    '<span class="',
+    klasses.inputText.icon,
+    '"></span>',
+    '<button type="button"',
+    ' id="',
+    VARS.inputResetId,
+    '"',
+    ' class="',
+    klasses.inputText.reset,
+    ' ',
+    klasses.hidden,
+    '"',
+    '></button>',
     '</div>',
-    '<ul class="', klasses.inputText.result, '"></ul>'
-  ].join('');
+    '<ul class="',
+    klasses.inputText.result,
+    '"></ul>' ].join('');
   /* eslint-enable indent */
 
   /**
    * @class Photon
    */
   var Photon = function Photon() {
-
     this.settings = {
       url: 'https://photon.komoot.de/api/',
       params: {
         q: '',
         limit: 10,
-        lang: 'en'
+        lang: 'en',
       },
-      langs: ['de', 'it', 'fr', 'en']
+      langs: ['de', 'it', 'fr', 'en'],
     };
   };
 
@@ -466,14 +493,17 @@
       params: {
         q: options.query,
         limit: options.limit || this.settings.params.limit,
-        lang: this.settings.langs.indexOf(options.lang) > -1 ?
-          options.lang : this.settings.params.lang
-      }
+        lang:
+          this.settings.langs.indexOf(options.lang) > -1
+            ? options.lang
+            : this.settings.params.lang,
+      },
     };
   };
 
   Photon.prototype.handleResponse = function handleResponse (results) {
-    return results.map(function (result) { return ({
+    if (!results.features.length) { return; }
+    return results.features.map(function (result) { return ({
       lon: result.geometry.coordinates[0],
       lat: result.geometry.coordinates[1],
       address: {
@@ -481,12 +511,12 @@
         postcode: result.properties.postcode,
         city: result.properties.city,
         state: result.properties.state,
-        country: result.properties.country
+        country: result.properties.country,
       },
       original: {
         formatted: result.properties.name,
-        details: result.properties
-      }
+        details: result.properties,
+      },
     }); });
   };
 
@@ -494,7 +524,6 @@
    * @class OpenStreet
    */
   var OpenStreet = function OpenStreet() {
-
     this.settings = {
       url: 'https://nominatim.openstreetmap.org/search/',
       params: {
@@ -503,8 +532,8 @@
         addressdetails: 1,
         limit: 10,
         countrycodes: '',
-        'accept-language': 'en-US'
-      }
+        'accept-language': 'en-US',
+      },
     };
   };
 
@@ -517,12 +546,13 @@
         addressdetails: this.settings.params.addressdetails,
         limit: opt.limit || this.settings.params.limit,
         countrycodes: opt.countrycodes || this.settings.params.countrycodes,
-        'accept-language': opt.lang || this.settings.params['accept-language']
-      }
+        'accept-language': opt.lang || this.settings.params['accept-language'],
+      },
     };
   };
 
   OpenStreet.prototype.handleResponse = function handleResponse (results) {
+    if (!results.length) { return; }
     return results.map(function (result) { return ({
       lon: result.lon,
       lat: result.lat,
@@ -533,12 +563,12 @@
         postcode: result.address.postcode,
         city: result.address.city || result.address.town,
         state: result.address.state,
-        country: result.address.country
+        country: result.address.country,
       },
       original: {
         formatted: result.display_name,
-        details: result.address
-      }
+        details: result.address,
+      },
     }); });
   };
 
@@ -546,7 +576,6 @@
    * @class MapQuest
    */
   var MapQuest = function MapQuest() {
-
     this.settings = {
       url: 'http://open.mapquestapi.com/nominatim/v1/search.php',
       params: {
@@ -556,8 +585,8 @@
         addressdetails: 1,
         limit: 10,
         countrycodes: '',
-        'accept-language': 'en-US'
-      }
+        'accept-language': 'en-US',
+      },
     };
   };
 
@@ -572,12 +601,13 @@
         limit: options.limit || this.settings.params.limit,
         countrycodes: options.countrycodes || this.settings.params.countrycodes,
         'accept-language':
-            options.lang || this.settings.params['accept-language']
-      }
+          options.lang || this.settings.params['accept-language'],
+      },
     };
   };
 
   MapQuest.prototype.handleResponse = function handleResponse (results) {
+    if (!results.length) { return; }
     return results.map(function (result) { return ({
       lon: result.lon,
       lat: result.lat,
@@ -587,56 +617,12 @@
         postcode: result.address.postcode,
         city: result.address.city || result.address.town,
         state: result.address.state,
-        country: result.address.country
+        country: result.address.country,
       },
       original: {
         formatted: result.display_name,
-        details: result.address
-      }
-    }); });
-  };
-
-  /**
-   * @class Pelias
-   */
-  var Pelias = function Pelias() {
-
-    this.settings = {
-      url: 'http://search.mapzen.com/v1/search',
-      params: {
-        size: 10
-      }
-    };
-  };
-
-  Pelias.prototype.getParameters = function getParameters (options) {
-    return {
-      url: this.settings.url,
-      params: {
-        text: options.query,
-        api_key: options.key,
-        size: options.limit || this.settings.params.size
-      }
-    };
-  };
-
-  Pelias.prototype.handleResponse = function handleResponse (results) {
-    return results.map(function (result) { return ({
-      lon: result.geometry.coordinates[0],
-      lat: result.geometry.coordinates[1],
-      address: {
-        name: result.properties.name,
-        house_number: result.properties.housenumber,
-        postcode: result.properties.postalcode,
-        road: result.properties.street,
-        city: result.properties.city,
-        state: result.properties.region,
-        country: result.properties.country
+        details: result.address,
       },
-      original: {
-        formatted: result.properties.label,
-        details: result.properties
-      }
     }); });
   };
 
@@ -651,8 +637,8 @@
         query: '',
         key: '',
         includeNeighborhood: 0,
-        maxResults: 10
-      }
+        maxResults: 10,
+      },
     };
   };
 
@@ -663,24 +649,27 @@
       params: {
         query: options.query,
         key: options.key,
-        includeNeighborhood: options.includeNeighborhood ||
-            this.settings.params.includeNeighborhood,
-        maxResults: options.maxResults || this.settings.params.maxResults
-      }
+        includeNeighborhood:
+          options.includeNeighborhood ||
+          this.settings.params.includeNeighborhood,
+        maxResults: options.maxResults || this.settings.params.maxResults,
+      },
     };
   };
 
   Bing.prototype.handleResponse = function handleResponse (results) {
-    return results.map(function (result) { return ({
+    var resources = results.resourceSets[0].resources;
+    if (!resources.length) { return; }
+    return resources.map(function (result) { return ({
       lon: result.point.coordinates[1],
       lat: result.point.coordinates[0],
       address: {
-        name: result.name
+        name: result.name,
       },
       original: {
         formatted: result.address.formattedAddress,
-        details: result.address
-      }
+        details: result.address,
+      },
     }); });
   };
 
@@ -688,7 +677,6 @@
    * @class OpenCage
    */
   var OpenCage = function OpenCage() {
-
     this.settings = {
       url: 'https://api.opencagedata.com/geocode/v1/json?',
       params: {
@@ -697,8 +685,8 @@
         limit: 10,
         countrycode: '',
         pretty: 1,
-        no_annotations: 1
-      }
+        no_annotations: 1,
+      },
     };
   };
 
@@ -709,13 +697,14 @@
         q: options.query,
         key: options.key,
         limit: options.limit || this.settings.params.limit,
-        countrycode: options.countrycodes || this.settings.params.countrycodes
-      }
+        countrycode: options.countrycodes || this.settings.params.countrycodes,
+      },
     };
   };
 
   OpenCage.prototype.handleResponse = function handleResponse (results) {
-    return results.map(function (result) { return ({
+    if (!results.results.length) { return; }
+    return results.results.map(function (result) { return ({
       lon: result.geometry.lng,
       lat: result.geometry.lat,
       address: {
@@ -724,19 +713,19 @@
         postcode: result.components.postcode,
         city: result.components.city || result.components.town,
         state: result.components.state,
-        country: result.components.country
+        country: result.components.country,
       },
       original: {
         formatted: result.formatted,
-        details: result.components
-      }
+        details: result.components,
+      },
     }); });
   };
 
   function json(obj) {
     return new Promise(function (resolve, reject) {
-      const url = encodeUrlXhr(obj.url, obj.data);
-      const config = {
+      var url = encodeUrlXhr(obj.url, obj.data);
+      var config = {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',
@@ -750,20 +739,20 @@
           .then(resolve)
           .catch(reject);
       }
-
     });
   }
 
-
   function toQueryString(obj) {
-    return Object.keys(obj).reduce(function (a, k) {
-      a.push(
-        typeof obj[k] === 'object'
-          ? toQueryString(obj[k])
-          : ((encodeURIComponent(k)) + "=" + (encodeURIComponent(obj[k])))
-      );
-      return a;
-    }, []).join('&');
+    return Object.keys(obj)
+      .reduce(function (a, k) {
+        a.push(
+          typeof obj[k] === 'object'
+            ? toQueryString(obj[k])
+            : ((encodeURIComponent(k)) + "=" + (encodeURIComponent(obj[k])))
+        );
+        return a;
+      }, [])
+      .join('&');
   }
 
   function encodeUrlXhr(url, data) {
@@ -775,17 +764,19 @@
 
   function jsonp(url, key, callback) {
     // https://github.com/Fresheyeball/micro-jsonp/blob/master/src/jsonp.js
-    let head = document.head,
-        script = document.createElement('script'),
-        // generate minimally unique name for callback function
-        callbackName = 'f' + Math.round(Math.random() * Date.now());
+    var head = document.head,
+      script = document.createElement('script'),
+      // generate minimally unique name for callback function
+      callbackName = 'f' + Math.round(Math.random() * Date.now());
 
     // set request url
-    script.setAttribute('src',
+    script.setAttribute(
+      'src',
       /*  add callback parameter to the url
             where key is the parameter key supplied
             and callbackName is the parameter value */
-      (url + (url.indexOf('?') > 0 ? '&' : '?') + key + '=' + callbackName));
+      url + (url.indexOf('?') > 0 ? '&' : '?') + key + '=' + callbackName
+    );
 
     /*  place jsonp callback on window,
         the script sent by the server should call this
@@ -804,7 +795,7 @@
     head.appendChild(script);
   }
 
-  const klasses$1 = VARS.cssClasses;
+  var klasses$1 = VARS.cssClasses;
 
   /**
    * @class Nominatim
@@ -825,55 +816,48 @@
       typeof this.options.provider === 'string'
         ? this.options.provider.toLowerCase()
         : this.options.provider;
+    this.provider = this.newProvider();
 
     this.els = els;
     this.lastQuery = '';
     this.container = this.els.container;
     this.registeredListeners = { mapClick: false };
     this.setListeners();
-
-    // providers
-    this.Photon = new Photon();
-    this.OpenStreet = new OpenStreet();
-    this.MapQuest = new MapQuest();
-    this.Pelias = new Pelias();
-    this.Bing = new Bing();
-    this.OpenCage = new OpenCage();
   };
 
   Nominatim.prototype.setListeners = function setListeners () {
       var this$1 = this;
 
-    let timeout, lastQuery;
-    const openSearch = function () {
+    var timeout, lastQuery;
+    var openSearch = function () {
       hasClass(this$1.els.control, klasses$1.glass.expanded)
         ? this$1.collapse()
         : this$1.expand();
     };
-    const query = function (evt) {
-      const value = evt.target.value.trim();
-      const hit = evt.key
+    var query = function (evt) {
+      var value = evt.target.value.trim();
+      var hit = evt.key
         ? evt.key === 'Enter'
         : evt.which
-          ? evt.which === 13
-          : evt.keyCode
-            ? evt.keyCode === 13
-            : false;
+        ? evt.which === 13
+        : evt.keyCode
+        ? evt.keyCode === 13
+        : false;
 
       if (hit) {
         evt.preventDefault();
         this$1.query(value);
       }
     };
-    const reset = function (evt) {
+    var reset = function (evt) {
       this$1.els.input.focus();
       this$1.els.input.value = '';
       this$1.lastQuery = '';
       addClass(this$1.els.reset, klasses$1.hidden);
       this$1.clearResults();
     };
-    const handleValue = function (evt) {
-      const value = evt.target.value.trim();
+    var handleValue = function (evt) {
+      var value = evt.target.value.trim();
 
       value.length
         ? removeClass(this$1.els.reset, klasses$1.hidden)
@@ -900,9 +884,13 @@
   Nominatim.prototype.query = function query (q) {
       var this$1 = this;
 
-    const provider = this.getProvider({
+    // lazy provider
+    if (!this.provider) {
+      this.provider = this.newProvider();
+    }
+
+    var parameters = this.provider.getParameters({
       query: q,
-      provider: this.options.provider,
       key: this.options.key,
       lang: this.options.lang,
       countrycodes: this.options.countrycodes,
@@ -915,14 +903,14 @@
     this.clearResults();
     addClass(this.els.reset, klasses$1.spin);
 
-    let ajax = {
-      url: provider.url,
-      data: provider.params,
+    var ajax = {
+      url: parameters.url,
+      data: parameters.params,
     };
 
-    if (provider.callbackName) {
+    if (parameters.callbackName) {
       ajax.jsonp = true;
-      ajax.callbackName = provider.callbackName;
+      ajax.callbackName = parameters.callbackName;
     }
 
     json(ajax)
@@ -933,38 +921,7 @@
         removeClass(this$1.els.reset, klasses$1.spin);
 
         //will be fullfiled according to provider
-        let res_;
-        switch (this$1.options.provider) {
-          case PROVIDERS.OSM:
-            res_ = res.length ? this$1.OpenStreet.handleResponse(res) : undefined;
-            break;
-          case PROVIDERS.MAPQUEST:
-            res_ = res.length ? this$1.MapQuest.handleResponse(res) : undefined;
-            break;
-          case PROVIDERS.PELIAS:
-            res_ = res.features.length
-              ? this$1.Pelias.handleResponse(res.features)
-              : undefined;
-            break;
-          case PROVIDERS.PHOTON:
-            res_ = res.features.length
-              ? this$1.Photon.handleResponse(res.features)
-              : undefined;
-            break;
-          case PROVIDERS.BING:
-            res_ = res.resourceSets[0].resources.length
-              ? this$1.Bing.handleResponse(res.resourceSets[0].resources)
-              : undefined;
-            break;
-          case PROVIDERS.OPENCAGE:
-            res_ = res.results.length
-              ? this$1.OpenCage.handleResponse(res.results)
-              : undefined;
-            break;
-          default:
-            res_ = this$1.options.provider.handleResponse(res);
-            break;
-        }
+        var res_ = this$1.provider.handleResponse(res);
         if (res_) {
           this$1.createList(res_);
           this$1.listenMapClick();
@@ -972,7 +929,7 @@
       })
       .catch(function (err) {
         removeClass(this$1.els.reset, klasses$1.spin);
-        const li = createElement(
+        var li = createElement(
           'li',
           '<h5>Error! No internet connection?</h5>'
         );
@@ -983,10 +940,10 @@
   Nominatim.prototype.createList = function createList (response) {
       var this$1 = this;
 
-    const ul = this.els.result;
+    var ul = this.els.result;
 
     response.forEach(function (row) {
-      let addressHtml;
+      var addressHtml;
 
       switch (this$1.options.provider) {
         case PROVIDERS.OSM:
@@ -996,8 +953,8 @@
           addressHtml = this$1.addressTemplate(row.address);
       }
 
-      const html = "<a href=\"#\">" + addressHtml + "</a>";
-      const li = createElement('li', html);
+      var html = "<a href=\"#\">" + addressHtml + "</a>";
+      var li = createElement('li', html);
 
       li.addEventListener(
         'click',
@@ -1013,16 +970,16 @@
   };
 
   Nominatim.prototype.chosen = function chosen (place, addressHtml, addressObj, addressOriginal) {
-    const map = this.Base.getMap();
-    const coord_ = [parseFloat(place.lon), parseFloat(place.lat)];
-    const projection = map.getView().getProjection();
-    const coord = proj.transform(coord_, 'EPSG:4326', projection);
-    let bbox = place.bbox;
+    var map = this.Base.getMap();
+    var coord_ = [parseFloat(place.lon), parseFloat(place.lat)];
+    var projection = map.getView().getProjection();
+    var coord = proj.transform(coord_, 'EPSG:4326', projection);
+    var bbox = place.bbox;
 
     if (bbox) {
       bbox = proj.transformExtent(bbox, 'EPSG:4326', projection);
     }
-    const address = {
+    var address = {
       formatted: addressHtml,
       details: addressObj,
       original: addressOriginal,
@@ -1043,7 +1000,7 @@
       } else {
         flyTo(map, coord);
       }
-      const feature = this.createFeature(coord, address);
+      var feature = this.createFeature(coord, address);
 
       this.Base.dispatchEvent({
         type: EVENT_TYPE.ADDRESSCHOSEN,
@@ -1056,7 +1013,7 @@
   };
 
   Nominatim.prototype.createFeature = function createFeature (coord) {
-    const feature = new Feature(new Point(coord));
+    var feature = new Feature(new Point(coord));
     this.addLayer();
     feature.setStyle(this.options.featureStyle);
     feature.setId(randomId('geocoder-ft-'));
@@ -1065,7 +1022,7 @@
   };
 
   Nominatim.prototype.addressTemplate = function addressTemplate (address) {
-    let html = [];
+    var html = [];
     if (address.name) {
       html.push(['<span class="', klasses$1.road, '">{name}</span>'].join(''));
     }
@@ -1095,33 +1052,22 @@
     return template(html.join('<br>'), address);
   };
 
-  Nominatim.prototype.getProvider = function getProvider (options) {
-    let provider;
+  Nominatim.prototype.newProvider = function newProvider () {
     /*eslint default-case: 0*/
-    switch (options.provider) {
+    switch (this.options.provider) {
       case PROVIDERS.OSM:
-        provider = this.OpenStreet.getParameters(options);
-        break;
+        return new OpenStreet();
       case PROVIDERS.MAPQUEST:
-        provider = this.MapQuest.getParameters(options);
-        break;
+        return new MapQuest();
       case PROVIDERS.PHOTON:
-        provider = this.Photon.getParameters(options);
-        break;
-      case PROVIDERS.PELIAS:
-        provider = this.Pelias.getParameters(options);
-        break;
+        return new Photon();
       case PROVIDERS.BING:
-        provider = this.Bing.getParameters(options);
-        break;
+        return new Bing();
       case PROVIDERS.OPENCAGE:
-        provider = this.OpenCage.getParameters(options);
-        break;
+        return new OpenCage();
       default:
-        provider = options.provider.getParameters(options);
-        break;
+        return this.options.provider;
     }
-    return provider;
   };
 
   Nominatim.prototype.expand = function expand () {
@@ -1145,15 +1091,15 @@
     // already registered
     if (this.registeredListeners.mapClick) { return; }
 
-    const this_ = this;
-    const mapElement = this.Base.getMap().getTargetElement();
+    var this_ = this;
+    var mapElement = this.Base.getMap().getTargetElement();
     this.registeredListeners.mapClick = true;
 
     //one-time fire click
     mapElement.addEventListener(
       'click',
       {
-        handleEvent: function (evt) {
+        handleEvent: function(evt) {
           this_.clearResults(true);
           mapElement.removeEventListener(evt.type, this, false);
           this_.registeredListeners.mapClick = false;
@@ -1176,8 +1122,8 @@
   Nominatim.prototype.addLayer = function addLayer () {
       var this$1 = this;
 
-    let found = false;
-    const map = this.Base.getMap();
+    var found = false;
+    var map = this.Base.getMap();
 
     map.getLayers().forEach(function (layer) {
       if (layer === this$1.layer) { found = true; }
@@ -1189,7 +1135,7 @@
    * @class Base
    * @extends {ol.control.Control}
    */
-  var Base = (function (Control$$1) {
+  var Base = /*@__PURE__*/(function (Control) {
     function Base(type, options) {
       if ( type === void 0 ) type = CONTROL_TYPE.NOMINATIM;
       if ( options === void 0 ) options = {};
@@ -1209,8 +1155,8 @@
       this.options = mergeOptions(DEFAULT_OPTIONS, options);
       this.container = undefined;
 
-      let $nominatim;
-      const $html = new Html(this);
+      var $nominatim;
+      var $html = new Html(this);
 
       if (type === CONTROL_TYPE.NOMINATIM) {
         this.container = $html.els.container;
@@ -1218,11 +1164,11 @@
         this.layer = $nominatim.layer;
       }
 
-      Control$$1.call(this, { element: this.container });
+      Control.call(this, { element: this.container });
     }
 
-    if ( Control$$1 ) Base.__proto__ = Control$$1;
-    Base.prototype = Object.create( Control$$1 && Control$$1.prototype );
+    if ( Control ) Base.__proto__ = Control;
+    Base.prototype = Object.create( Control && Control.prototype );
     Base.prototype.constructor = Base;
 
     /**
@@ -1260,4 +1206,4 @@
 
   return Base;
 
-})));
+}));
