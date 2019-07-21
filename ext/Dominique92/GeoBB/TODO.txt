@@ -1,6 +1,24 @@
-//TODO enlever /assets/wri
+//TODO ASPIR ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
+
+//TODO AFTER WRI enlever /assets/wri
 //TODO upgrade ASPIR/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
 //TODO TEST ASPIR post modif mail inscription
+
+UPDATE ALPAGES 190720
+=====================
+Save sql aspir_alpages
+recrer aspir_alpages_327 + ajouter utilisateur
+download phpbb & geobb / merge & filtrer doc, ...
+récupérer config.php /files/... /LOG/...
+changer le nom database dans config.php : aspir_alpages => aspir_alpages_327
+transférer sur aspir:alpages.info.test
+lancer test.alpages.info/install => français, update database only
+supprimer /install
+adm / Installer / style / alpages
+adm / général / Configuration du forum / Style par défaut & Styles pour les invités : alpages / Envoyer
+adm / purge cache
+adm / désinstaller / style / aspir
+remove files styles/aspir & ext/.../styles/aspir
 
 UPDATE ASPIR
 ============

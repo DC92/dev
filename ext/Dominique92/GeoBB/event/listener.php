@@ -7,7 +7,7 @@
  *
  */
 //TODO ASPIR BEST recherche par département / commune
-//TODO ASPIR ARCHI rename ASPIR -> ALPAGES
+//TODO AFTER ASPIR delete style/aspir ext/.../style/aspir
 //TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 //TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 
@@ -385,10 +385,30 @@ class listener implements EventSubscriberInterface
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] =  array_merge ($post_data, $update);
 
+		// Clean ~ automatic feilds / replace by -field
+		//TODO AFTER CHEM remove when no more ~
+		$af = ['geo_surface', 'geo_altitude', 'geo_commune', 'geo_massif', 'geo_reserve', 'geo_ign', 'geo_contains'];
+		foreach ($af AS $v)
+			if (array_key_exists ($v, $post_data))
+				$automatic_fields [] = $v;
+		$sql = "SELECT post_id,".implode(',', $automatic_fields).
+			" FROM ".POSTS_TABLE.
+			" WHERE ".implode(" LIKE '%~' OR ", $automatic_fields)." LIKE '%~'";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			foreach ($row AS $k=>$v)
+				if (substr($v, -1) == '~') {
+					$vr = str_replace("'", "\\'", substr($v, 0, -1));
+					$sql = "UPDATE phpbb_posts SET $k = '-$vr' WHERE post_id = ".$row['post_id'];
+					$this->db->sql_query($sql);
+				}
+		$this->db->sql_freeresult($result);
+
 		// Update de la base
 		if ($update) {
+			// Automatic generated begins by -
 			foreach ($update AS $k=>$v)
-				$update[$k] .= '~';
+				$update[$k] = '-'.$update[$k];
 
 			$this->db->sql_query (
 				'UPDATE '.POSTS_TABLE.
@@ -678,9 +698,9 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 			if (preg_match ('/^([a-z0-9_]+)$/', $field[0])) {
 				$block[$k]['TAG'] = 'input';
 				$block[$k]['NAME'] = $sql_id = 'geo_'.$field[0];
-				$sql_data = $posting && substr ($post_data[$sql_id], -1) == '~'
+				$sql_data = $posting && $post_data[$sql_id][0] == '-' //TODO BEST onlu do that if automatic data
 					? '' // Don't edit automatic values
-					: trim ($post_data[$sql_id], '~ \t\n\r\0\x0B'); // remove ~following automatic data
+					: trim ($post_data[$sql_id], '-~ \t\n\r\0\x0B'); // Also remove - before automatic data //TODO AFRET CHEM remove ~ when no more databases with ~
 				$sql_data = str_replace (['<a ','</a>'], ['<pre><a ','</a></pre>'], $sql_data);
 				$block[$k]['VALUE'] = $sql_data;
 
@@ -802,16 +822,16 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 
 				// Correct SQL table structure
 				if ($sql_type != $special_columns[$sql_id]) {
+					// Change the table structure
 					$sql = 'ALTER TABLE '.POSTS_TABLE.
 						(array_key_exists ($sql_id, $special_columns) ? ' CHANGE '.$sql_id.' ' : ' ADD ').
 						$sql_id.' '.$sql_type;
-//TODO					$this->db->sql_query($sql);
-/*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>CHANGE $sql_id = ".var_export($sql,true).'</pre>';
+					$this->db->sql_query($sql);
 
-				// Pass 1 : Flag title having values on related fields
-				if ($sql_data || $attachments[$k])
-					for ($stn = $title_num[0]; $stn; array_pop ($stn))
-						$block_value[implode('',$stn)] = true;
+					// Pass 1 : Flag title having values on related fields
+					if ($sql_data || $attachments[$k])
+						for ($stn = $title_num[0]; $stn; array_pop ($stn))
+							$block_value[implode('',$stn)] = true;
 				}
 			}
 		}
@@ -965,7 +985,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 
 			$this->db->sql_query (implode (' ', [
 				'UPDATE '.ATTACHMENTS_TABLE,
-				'SET exif = "'.implode (' ', $info ?: ['~']).'",',
+				'SET exif = "'.implode (' ', $info ?: ['-']).'",',
 					'filetime = '.(strtotime($exif['DateTimeOriginal']) ?: $exif['FileDateTime'] ?: $attachment['filetime']),
 				'WHERE attach_id = '.$attachment['attach_id']
 			]));
