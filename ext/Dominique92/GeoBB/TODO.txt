@@ -1,15 +1,10 @@
-//TODO ASPIR ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
-
-//TODO AFTER WRI enlever /assets/wri
-//TODO upgrade ASPIR/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
-//TODO TEST ASPIR post modif mail inscription
-
 UPDATE ALPAGES 190720
 =====================
 Save sql aspir_alpages
 recrer aspir_alpages_327 + ajouter utilisateur
 download phpbb & geobb / merge & filtrer doc, ...
 récupérer config.php /files/... /LOG/...
+config.php : define('TRACES_DOM', 'test');
 changer le nom database dans config.php : aspir_alpages => aspir_alpages_327
 transférer sur aspir:alpages.info.test
 lancer test.alpages.info/install => français, update database only
@@ -19,9 +14,14 @@ adm / général / Configuration du forum / Style par défaut & Styles pour les i
 adm / purge cache
 adm / désinstaller / style / aspir
 remove files styles/aspir & ext/.../styles/aspir
+upgrade doc formulaires
+enlever les {} dans les formulaires / reprendre mode emploi
+Réponse http://alpages.info/viewtopic.php?f=9&t=3223
+Réponse http://alpages.info/viewtopic.php?f=9&t=3146
+Réponse http://alpages.info/viewtopic.php?f=9&t=3219 : intégré au code
 
-UPDATE ASPIR
-============
+UPDATE ALPAGES
+==============
 AVANT
 	enlever les ~sur geo_contains : //TODO la suite ne marche pas !
 	SELECT post_id, geo_contains, REPLACE(geo_contains,'~','') FROM phpbb_posts WHERE geo_contains like "%~" LIMIT 1000
@@ -35,7 +35,7 @@ PENDANT
 APRES
 	template : supprimer les {}
 
-ACCEPTER MODERATEUR //TODO vrai sur ASPIR ???
+ACCEPTER MODERATEUR //TODO vrai sur ALPAGES ???
 ===================
 Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
 Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
@@ -132,7 +132,7 @@ todo avant upgrade chem
 	chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
 	Fiche type Point : carte IGN, commune, ...²
 	//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70 
-	Retester ASPIR avec cette version
+	Retester ALPAGES avec cette version
 Fermer le site
 Vider cache
 phpadmin export database

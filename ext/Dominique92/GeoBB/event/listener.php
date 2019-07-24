@@ -6,8 +6,11 @@
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
-//TODO ASPIR BEST recherche par département / commune
-//TODO AFTER ASPIR delete style/aspir ext/.../style/aspir
+//TODO ALPAGES BEST recherche par département / commune
+//TODO TEST ALPAGES post modif mail inscription
+//TODO ALPAGES ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
+//TODO BEST upgrade ALPAGES/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
+//TODO AFTER WRI enlever /assets/wri
 //TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 //TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 
@@ -22,6 +25,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
+	// List of externals
 	public function __construct(
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\request\request_interface $request,
@@ -36,8 +40,8 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 	}
 
-	// Liste des hooks et des fonctions associées
-	// On trouve le point d'appel en cherchant dans le logiciel de PhpBB 3.x: "event core.<XXX>"
+	// List of hooks and related functions
+	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 		// For debug, Varnish will not be caching pages where you are setting a cookie
 		if (defined('TRACES_DOM'))
@@ -310,7 +314,7 @@ class listener implements EventSubscriberInterface
 		foreach ($post_data AS $k=>$v)
 			if (!$v)
 				switch ($k) {
-//TODO ASPIR Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
+//TODO ALPAGES Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
 
 					case 'geo_surface':
 						if ($post_data['area'] && $center[0])
@@ -353,7 +357,7 @@ class listener implements EventSubscriberInterface
 					// Infos refuges.info
 					case 'geo_massif':
 					case 'geo_reserve':
-					case 'geo_ign':
+					case 'geo_ign': //TODO BUG : AUTOMATIC DATA : recherche à chaque fois la carte IGN, ...
 						if ($center[0]) {
 							$igns = [];
 							$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$center[0][0]},{$center[0][1]},{$center[0][0]},{$center[0][1]}";
@@ -698,7 +702,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 			if (preg_match ('/^([a-z0-9_]+)$/', $field[0])) {
 				$block[$k]['TAG'] = 'input';
 				$block[$k]['NAME'] = $sql_id = 'geo_'.$field[0];
-				$sql_data = $posting && $post_data[$sql_id][0] == '-' //TODO BEST onlu do that if automatic data
+				$sql_data = $posting && $post_data[$sql_id][0] == '-' //TODO BEST only do that if automatic data
 					? '' // Don't edit automatic values
 					: trim ($post_data[$sql_id], '-~ \t\n\r\0\x0B'); // Also remove - before automatic data //TODO AFRET CHEM remove ~ when no more databases with ~
 				$sql_data = str_replace (['<a ','</a>'], ['<pre><a ','</a></pre>'], $sql_data);
@@ -776,27 +780,34 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 							$this->db->sql_freeresult($result);
 							$block[$k]['VALUE'] = '<a href="viewtopic.php?t='.$row['topic_id'].'">'.$row['topic_title'].'</a>';
 						}
-//TODO BEST (mais pb base aspir)						$sql_type = 'int(10)'; // === topic_id
+//TODO BEST (mais pb base ALPAGES)						$sql_type = 'int(10)'; // === topic_id
 						break;
 
 					// List topics attached to this one
 					case 'attaches':
-						$sql = "SELECT * FROM ".POSTS_TABLE."
-									JOIN ".FORUMS_TABLE." USING (forum_id)"./* Just to sort forum_image related */"
-								WHERE forum_image LIKE '%/{$field[3]}.%' AND
-									$sql_id LIKE '{$post_data['topic_id']}%'";
-						$result = $this->db->sql_query($sql);
-						while ($row = $this->db->sql_fetchrow($result))
-							$attachments[$k][] = $row;
-						$this->db->sql_freeresult($result);
+						if ($post_data['topic_id']) {
+							$sql = "SELECT * FROM ".POSTS_TABLE."
+										JOIN ".FORUMS_TABLE." USING (forum_id)"./* Just to sort forum_image related */"
+									WHERE forum_image LIKE '%/{$field[3]}.%' AND
+										$sql_id LIKE '{$post_data['topic_id']}%'";
+							$result = $this->db->sql_query($sql);
+							while ($row = $this->db->sql_fetchrow($result))
+								$attachments[$k][] = $row;
+							$this->db->sql_freeresult($result);
+						}
 
 						$sql = 'SELECT forum_name FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%'.$field[3].'%"';
 						$result = $this->db->sql_query($sql);
 						$row = $this->db->sql_fetchrow($result);
 						$this->db->sql_freeresult($result);
-						$block[$k]['COMMENT'] = 'Pour créer ajouter un '.strtolower($row['forum_name']).
-							', choisissez le <a href="http://alpages.info/viewforum.php?&f='.$post_data['forum_id'].
-							'">ICI</a> et modifiez le champ "Alpage d’appartenance"';
+
+						//TODO BEST ARCHI put in an alpage template
+						$block[$k]['COMMENT'] = 'Pour ajouter un '.strtolower($row['forum_name']).
+							', ';
+						$block[$k]['COMMENT'] .= $post_data['post_id']
+							? 'choisissez ou créez le <a target="_BLANK" href="http://alpages.info/viewforum.php?&f='.$post_data['forum_id'].
+							'">ICI</a> et modifiez le champ "Alpage d’appartenance"'
+							: 'enregistrez d\'abord cet alpage.';
 
 						$block[$k]['TYPE'] = 'hidden'; // Hides the input field
 						$sql_type = 'int(10)'; // topic_id
@@ -839,7 +850,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		// Assign template blocks
 		if ($block)
 			foreach ($block AS $k=>$b) {
-				// Pass 2 : Flag titles of blocks ahing values on related fields
+				// Pass 2 : Flag titles of blocks having values on related fields
 				$b['BLOCK_HAVING_VALUE'] = $block_value[$b['FIELD_TITLE_NUM']];
 
 				// Create att="value" template fields
