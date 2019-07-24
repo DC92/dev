@@ -2,7 +2,7 @@ UPDATE ALPAGES 190720
 =====================
 Save sql aspir_alpages
 recrer aspir_alpages_327 + ajouter utilisateur
-download phpbb & geobb / merge & filtrer doc, ...
+download phpbb & geobb / merge & filtrer doc, assets, styles, ext/.../styles, Dominique92, ...
 récupérer config.php /files/... /LOG/...
 config.php : define('TRACES_DOM', 'test');
 changer le nom database dans config.php : aspir_alpages => aspir_alpages_327
@@ -19,21 +19,7 @@ enlever les {} dans les formulaires / reprendre mode emploi
 Réponse http://alpages.info/viewtopic.php?f=9&t=3223
 Réponse http://alpages.info/viewtopic.php?f=9&t=3146
 Réponse http://alpages.info/viewtopic.php?f=9&t=3219 : intégré au code
-
-UPDATE ALPAGES
-==============
-AVANT
-	enlever les ~sur geo_contains : //TODO la suite ne marche pas !
-	SELECT post_id, geo_contains, REPLACE(geo_contains,'~','') FROM phpbb_posts WHERE geo_contains like "%~" LIMIT 1000
-PENDANT
-	Dézipper phpbb 3.2.7 / sauf doc
-	Copier assets/MyOl + jquery-ui
-	Copier ext/Dominique92/GeoBB / sauf styles/chemineur & doc
-	Copier LOG
-	Copier styles/aspir
-	Copier robots.txt
-APRES
-	template : supprimer les {}
+Vérifier charge recompiler = non / GZIP / ...
 
 ACCEPTER MODERATEUR //TODO vrai sur ALPAGES ???
 ===================

@@ -357,9 +357,9 @@ class listener implements EventSubscriberInterface
 					// Infos refuges.info
 					case 'geo_massif':
 					case 'geo_reserve':
-					case 'geo_ign': //TODO BUG : AUTOMATIC DATA : recherche à chaque fois la carte IGN, ...
+					case 'geo_ign':
 						if ($center[0]) {
-							$igns = [];
+							$massif = ''; $reserve = ''; $igns = [];
 							$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$center[0][0]},{$center[0][1]},{$center[0][0]},{$center[0][1]}";
 							$wri_export = @file_get_contents($url);
 							if ($wri_export) {
@@ -367,19 +367,20 @@ class listener implements EventSubscriberInterface
 								foreach($fs AS $f)
 									switch ($f->properties->type->type) {
 										case 'massif':
-											if (array_key_exists('geo_massif', $post_data))
-												$update['geo_massif'] = $f->properties->nom;
+											$massif = $f->properties->nom;
 											break;
 										case 'zone réglementée':
-											if (array_key_exists('geo_reserve', $post_data))
-												$update['geo_reserve'] = $f->properties->nom;
+											$reserve = $f->properties->nom;
 											break;
 										case 'carte':
 											$ms = explode(' ', str_replace ('-', ' ', $f->properties->nom));
 											$nom_carte = str_replace ('-', ' ', str_replace (' - ', ' : ', $f->properties->nom));
 											$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom_carte</a>";
-											break;
 									}
+								if (array_key_exists('geo_massif', $post_data))
+									$update['geo_massif'] = $massif;
+								if (array_key_exists('geo_reserve', $post_data))
+									$update['geo_reserve'] = $reserve;
 								if (array_key_exists('geo_ign', $post_data))
 									$update['geo_ign'] = implode ('<br/>', $igns);
 							}
@@ -671,8 +672,8 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 			$special_columns[$row['Field']] = $row['Type'];
 		$this->db->sql_freeresult($result);
 
-		// Get form fields from the relative post (one post with the title === form=title or the same title than the forum)
-		preg_match ('/form=([[:alnum:]]+)/u', $forum_desc, $form);
+		// Get form fields from the relative post (one post with the title === form=title or the same title than the post discribing the specific fieds)
+		preg_match ('/form=([^\&\>\]]+)/u', str_replace('"', '', html_entity_decode($forum_desc)), $form);
 		$def_forms = $this->get_post_data($form[1]);
 
 		foreach ($def_forms AS $k=>$line) { // Get form definition lines
@@ -768,7 +769,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 								$block[$k]['STYLE'] = 'display:none'; // Hide at posting //TODO TEST sert à quoi ?
 							} else {
 								$block[$k]['TAG'] = 'span';
-								$block[$k]['COMMENT'] = '(fonction disponible une fois le point créé)';
+								$block[$k]['COMMENT'] = '(enregistrez ce point pour accéder à la fonction)';
 							}
 						}
 
@@ -796,7 +797,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 							$this->db->sql_freeresult($result);
 						}
 
-						$sql = 'SELECT forum_name FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%'.$field[3].'%"';
+						$sql = 'SELECT forum_name,forum_id FROM '.FORUMS_TABLE.' WHERE forum_image LIKE "%'.$field[3].'%"';
 						$result = $this->db->sql_query($sql);
 						$row = $this->db->sql_fetchrow($result);
 						$this->db->sql_freeresult($result);
@@ -805,7 +806,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 						$block[$k]['COMMENT'] = 'Pour ajouter un '.strtolower($row['forum_name']).
 							', ';
 						$block[$k]['COMMENT'] .= $post_data['post_id']
-							? 'choisissez ou créez le <a target="_BLANK" href="http://alpages.info/viewforum.php?&f='.$post_data['forum_id'].
+							? 'choisissez ou créez le <a target="_BLANK" href="viewforum.php?&f='.$row['forum_id'].
 							'">ICI</a> et modifiez le champ "Alpage d’appartenance"'
 							: 'enregistrez d\'abord cet alpage.';
 

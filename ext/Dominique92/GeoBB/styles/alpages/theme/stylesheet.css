@@ -73,10 +73,6 @@ input[type="number"] {
 .section-posting #map-frame {
 	float: none;
 }
-.section-posting #map {
-	width: 100% !important;
-	margin: 0 !important;
-}
 .section-posting #postingbox fieldset.fields1 dt {
 	width: auto;
 }

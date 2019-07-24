@@ -4,12 +4,13 @@
 <div id="map-frame">
 	<div id="map"></div>
 	<!-- EVENT map_selector -->
-	<!-- IF 0 -->//TODO BUG Quelques lignes trop longues passent sous la carte<!-- ENDIF -->
 </div>
 <input id="editable-json" name="geom" type="{GEOJSON_TYPE}" value='{GEOJSON}' />
 
-<dl class="posting-point" style="clear: left;">
+<dl class="posting-point">
 	<!-- IF GEO_MAP_TYPE == 'Point' -->
+		<p>Déplacez le curseur pour modifier le position du point</p>
+		<p>Editez "Lon" ou "Lat" pour modifier le position du point</p>
 		<!-- INCLUDE posting_point_position.html -->
 	<!-- ENDIF -->
 
@@ -18,18 +19,19 @@
 	<!-- ENDIF -->
 	
 	<!-- IF GEO_MAP_TYPE == 'Polygon' -->
-		<h3>Modification polygone</h3>
-		<p>- Cliquer et déplacer un sommet pour modifier un polygone.<br/>
-		- Alt+cliquer sur un sommet pour le supprimer.<br/>
-		- Cliquer sur un segment puis déplacer pour créer un sommet.</p>
 		<h3>Création polygone</h3>
 		<p>- Activer "P" puis cliquer sur la carte et sur chaque point du tracé pour dessiner un polygone.
 		Double cliquer pour terminer.<br/>
 		- Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".</p>
+		<h3>Modification polygone</h3>
+		<p>- Cliquer et déplacer un sommet pour modifier un polygone.<br/>
+		- Alt+cliquer sur un sommet pour le supprimer.<br/>
+		- Cliquer sur un segment puis déplacer pour créer un sommet.</p>
 		<h3>Suppression polygone</h3>
 		<p>- Ctrl+Alt+cliquer sur un segment d'un polygone pour supprimer ce polygone.</p>
 	<!-- ENDIF -->
 </dl>
+<hr style="clear:all" />
 
 <!-- INCLUDE posting_specific_fields.html -->
 
