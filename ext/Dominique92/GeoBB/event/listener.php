@@ -338,20 +338,22 @@ class listener implements EventSubscriberInterface
 						break;
 
 					case 'geo_commune':
-							$nominatim = json_decode (@file_get_contents (
-								"https://nominatim.openstreetmap.org/reverse?format=json&lon={$center[0][0]}&lat={$center[0][1]}",
-								false,
-								stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
-							));
-							$update[$k] = @$nominatim->address->postcode.' '.@(
-								$nominatim->address->town ?:
-								$nominatim->address->city ?:
-								$nominatim->address->suburb  ?:
-								$nominatim->address->village ?:
-								$nominatim->address->hamlet ?:
-								$nominatim->address->neighbourhood ?:
-								$nominatim->address->quarter
-							);
+						//TODO BUG : calcule geo_commune sur un post d'un forum normal
+						//TODO BUG BEST : pas de commune = "~ " (un espace de trop)
+						$nominatim = json_decode (@file_get_contents (
+							"https://nominatim.openstreetmap.org/reverse?format=json&lon={$center[0][0]}&lat={$center[0][1]}",
+							false,
+							stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
+						));
+						$update[$k] = @$nominatim->address->postcode.' '.@(
+							$nominatim->address->town ?:
+							$nominatim->address->city ?:
+							$nominatim->address->suburb  ?:
+							$nominatim->address->village ?:
+							$nominatim->address->hamlet ?:
+							$nominatim->address->neighbourhood ?:
+							$nominatim->address->quarter
+						);
 						break;
 
 					// Infos refuges.info
