@@ -787,7 +787,9 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 						break;
 
 					// List topics attached to this one
+					//TODO BUG ASPIR : reste les titres couverture réseau, points d'eau, logement de fonction
 					case 'attaches':
+						$block[$k]['VALUE'] = '';
 						if ($post_data['topic_id']) {
 							$sql = "SELECT * FROM ".POSTS_TABLE."
 										JOIN ".FORUMS_TABLE." USING (forum_id)"./* Just to sort forum_image related */"
