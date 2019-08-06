@@ -1877,7 +1877,9 @@ function controlsCollection(options) {
 		}),
 		controlLengthLine(),
 		controlPermalink(options.controlPermalink),
-		new ol.control.Zoom(),
+		new ol.control.Zoom({
+			zoomOutLabel: '-'
+		}),
 		new ol.control.FullScreen({
 			label: '',
 			labelActive: '',

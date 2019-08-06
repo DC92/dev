@@ -35,6 +35,15 @@ Interface VTTRACK
 	Priorité pas aux orris !!
 	Reprendre interface sur chem3
 
+//TODO BEST MYOL
+================
+ OpenLS-Géoportail - Administratif
+Administratif
+ OpenLS-Géoportail - Adresses
+StreetAddress
+ OpenLS-Géoportail - Parcelles cadastrales
+CadastralParcel
+
 //TODO BEST CHEMINEUR
 =====================
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
