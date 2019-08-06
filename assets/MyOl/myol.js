@@ -49,7 +49,7 @@ ol.MyMap = function(options) {
 	// Set preload of 4 upper level tiles if we are on full screen mode
 	// This prepare the browser to become offline on the same session
 	this.on('change:size', function() {
-		let fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+		const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
 
 		this.getLayers().forEach(function(layer) {
 			if (layer.type == 'TILE')
@@ -771,8 +771,8 @@ layerOverpass = function(o) {
 //TODO-BEST pointer finger sur la cible (select ?)
 //							map.getViewport().style.cursor = 'pointer'; / default
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
-	let format = new ol.format.GeoJSON(),
-		eljson, json, elxy;
+	const format = new ol.format.GeoJSON();
+	let eljson, json, elxy;
 
 	if (typeof display == 'string') {
 		eljson = document.getElementById(display + '-json');
@@ -988,7 +988,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
 function controlLayersSwitcher(options) {
 	options = options || {};
 
-	let this_ = new ol.control.Button({
+	const this_ = new ol.control.Button({
 		label: '&hellip;',
 		className: 'switch-layer',
 		title: 'Liste des cartes',
@@ -1089,11 +1089,11 @@ function controlPermalink(o) {
 		}, o),
 		divElement = document.createElement('div'),
 		aElement = document.createElement('a');
-	let this_ = new ol.control.Control({
+	const this_ = new ol.control.Control({
 			element: divElement,
 			render: render
-		}),
-		params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
+	});
+	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
 		(options.initialFit || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
 
@@ -1216,7 +1216,7 @@ function controlGPS(options) {
 		'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : // Gives always the magnetic north
 		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
 		function(evt) {
-			let heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
 			if (heading)
 				compas = {
 					heading: Math.PI / 180 * // Delivered ° reverse clockwize
@@ -1725,8 +1725,7 @@ function controlEdit(o) {
 	function cleanFeatures(pointerPosition) {
 		//TODO BEST option ne pas pouvoir couper un polygone
 		// Get flattened list of multipoints coords
-		let fs = sortFeatures(source.getFeatures(), pointerPosition),
-			lines = fs.lines,
+		let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 			polys = [];
 
 		source.clear();
@@ -1817,7 +1816,7 @@ function sortFeatures(features, pointerPosition) {
 
 	for (let f in features)
 		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
-			let geometries = features[f].getGeometry().getGeometries();
+			const geometries = features[f].getGeometry().getGeometries();
 			for (let g in geometries)
 				flatCoord(fs.lines, geometries[g].getCoordinates(), pointerPosition);
 		} else if (features[f].getGeometry().getType().match(/point$/i))

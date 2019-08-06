@@ -1,8 +1,3 @@
-ACCEPTER MODERATEUR //TODO vrai sur ALPAGES ???
-===================
-Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
-Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
-
 BUGS CHEMINEUR soldes par chem4
 ===============================
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
@@ -113,6 +108,11 @@ Désactiver styles et extensions /supprimer les données (y compris collapsible 
 Purger contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
 Modifier forum_desc diaporamas : [all=point][view=diapo][exclude=tortillards] => [view=diapo][/view]
 Rediriger dc9.fr/chemineur dans WRI
+
+ACCEPTER MODERATEUR //TODO vrai sur ALPAGES ???
+===================
+Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
+Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
 
 TODO WRI
 ========
