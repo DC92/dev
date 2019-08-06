@@ -4,18 +4,18 @@
 $dbms = 'phpbb\\db\\driver\\mysqli';
 $dbhost = 'localhost';
 $dbport = '';
-$dbname = 'geobb57';
+$dbname = 'geobb32';
 $dbuser = 'root';
 $dbpasswd = '';
 $table_prefix = 'phpbb_';
 $phpbb_adm_relative_path = 'adm/';
 $acm_type = 'phpbb\\cache\\driver\\file';
 
-define('PHPBB_INSTALLED', true);
-// define('PHPBB_DISPLAY_LOAD_TIME', true);
-define('PHPBB_ENVIRONMENT', 'production');
-// define('DEBUG_CONTAINER', true);
-   
+@define('PHPBB_INSTALLED', true);
+// @define('PHPBB_DISPLAY_LOAD_TIME', true);
+@define('PHPBB_ENVIRONMENT', 'production');
+// @define('DEBUG_CONTAINER', true);
+
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 'on');
 

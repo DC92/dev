@@ -45,6 +45,17 @@ ol.MyMap = function(options) {
 			target.dispatchEvent('myol:onadd');
 		}
 	}
+
+	// Set preload of 4 upper level tiles if we are on full screen mode
+	// This prepare the browser to become offline on the same session
+	this.on('change:size', function() {
+		let fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+
+		this.getLayers().forEach(function(layer) {
+			if (layer.type == 'TILE')
+				layer.setPreload(fs ? 4 : 0);
+		});
+	});
 };
 ol.inherits(ol.MyMap, ol.Map);
 
@@ -1142,6 +1153,7 @@ function controlGPS(options) {
 	let map, view,
 		gps = {},
 		compas = {}, // Mem last sensors values
+
 		// The graticule
 		feature = new ol.Feature(),
 		layer = new ol.layer.Vector({
@@ -1158,6 +1170,7 @@ function controlGPS(options) {
 				})
 			})
 		}),
+
 		// The control button
 		this_ = new ol.control.Button({
 			className: 'gps-button',
@@ -1175,12 +1188,6 @@ function controlGPS(options) {
 					map.removeLayer(layer);
 					view.setRotation(0);
 				}
-
-				// Set preload of upper level tiles
-				map.getLayers().forEach(function(layer) {
-					if (layer.type == 'TILE')
-						layer.setPreload(active ? 3 : 0);
-				});
 			}
 		}),
 
@@ -1505,7 +1512,7 @@ function printMap(orientation, el, resolution) {
 	mapEl.style.width = '100%';
 	mapEl.style.height = '100%';
 
-	// Hide contrpls
+	// Hide controls
 	const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
 	Array.prototype.filter.call(controls, function(el) {
 		el.style.display = 'none';
@@ -1891,15 +1898,16 @@ function controlsCollection(options) {
  */
 function layersCollection(keys) {
 	return {
+		'OpenTopo': layerOSM(
+			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+		),
+		'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
 		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOSM(
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-		),
-		'OpenTopo': layerOSM(
-			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
 		'Hike & Bike': layerOSM(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
@@ -1907,7 +1915,6 @@ function layersCollection(keys) {
 		), // Not on https
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
-		'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
 		'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
 		'OSM landscape': layerThunderforest('landscape', keys.thunderforest),
 		'OSM transport': layerThunderforest('transport', keys.thunderforest),

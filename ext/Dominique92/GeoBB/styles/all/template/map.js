@@ -14,7 +14,8 @@ $('#map').resizable({
 var geoControls = controlsCollection,
 	//TODO ARCHI ==> 3 variable globales suivantes utilisée dans un autres ficher dans une fonction !!!
 	titleEdit = "//TODO button comment",
-	topicStyleOptions = { /* Editor style */
+	topicStyleOptions = {
+		/* Editor style */
 		image: new ol.style.Circle({
 			radius: 4,
 			fill: new ol.style.Fill({
@@ -54,6 +55,7 @@ function layerStyleOptionsFunction(properties, id, hover) {
 		})
 	};
 }
+
 function geoOverlays(idColor, idExclude, noHover) { // topic_id à colorier, topic_id à exclure, hover / non
 	return [new ol.layer.LayerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&exclude=' + idExclude + '&',
