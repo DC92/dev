@@ -167,12 +167,3 @@ new ol.MyMap({
 	layers: overlays,
 	controls: basicControls.concat([edit])
 });
-
-
-/**
- * GENERAL TODO
- */
-//TODO-ARCHI map off line, application
-
-//TODO-END http://jsbeautifier.org/ & http://jshint.com
-//TODO-END replace var by const / let

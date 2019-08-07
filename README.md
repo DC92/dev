@@ -11,7 +11,7 @@ Website software of https://alpages.info
 DEPENDENCIES
 ============
 * This package includes : https://github.com/Dominique92/MyOl
-* This package is tested with : PhpBB 3.2.5
+* This package is tested with : PhpBB 3.2.7
 
 INSTALLATION
 ============
