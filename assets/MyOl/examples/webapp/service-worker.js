@@ -1,16 +1,19 @@
 const cacheName = 'myolStaticCache';
 const dataCacheName = 'myolTileCache';
-const dataUrls = ['localhost', 'c92.fr', 'DC92.github.io'];
+//const dataUrls = ['localhost', 'c92.fr', 'DC92.github.io'];
 
 var filesToCache = [
+	'./favicon.png',
 	'./index.html',
-	'./index.js',
-	'../ol/ol.css',
-	'../ol/ol.js',
-	'../geocoder/ol-geocoder.css',
-	'../geocoder/ol-geocoder-debug.js',
-	'../myol.css',
-	'../myol.js'
+	'./map.css',
+	'./map.js',
+	'./app.js',
+	'../../ol/ol.css',
+	'../../ol/ol.js',
+	'../../geocoder/ol-geocoder.css',
+	'../../geocoder/ol-geocoder-debug.js',
+	'../../myol.css',
+	'../../myol.js'
 ];
 
 self.addEventListener('install', function(e) {
@@ -23,7 +26,7 @@ self.addEventListener('install', function(e) {
 		})
 	);
 });
-
+/*
 self.addEventListener('activate', function(e) {
 	//console.log('[ServiceWorker] Activate');
 	e.waitUntil(
@@ -64,5 +67,5 @@ self.addEventListener('fetch', function(e) {
 			})
 		);
 	}
-
 });
+*/
