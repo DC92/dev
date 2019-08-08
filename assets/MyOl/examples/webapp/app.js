@@ -5,7 +5,6 @@ if ('serviceWorker' in navigator)
 else
 	console.log('No service worker');
 
-/*
 if (window.SharedWorker) {
 	var myWorker = new SharedWorker('shared-worker.js');
 
@@ -53,4 +52,4 @@ function debounce(func, wait, immediate) {
 		timeout = setTimeout(later, wait);
 		if (callNow) func.apply(context, args);
 	};
-};*/
+};
