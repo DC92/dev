@@ -26,7 +26,7 @@ self.addEventListener('install', function(e) {
 		})
 	);
 });
-/*
+
 self.addEventListener('activate', function(e) {
 	//console.log('[ServiceWorker] Activate');
 	e.waitUntil(
@@ -68,4 +68,3 @@ self.addEventListener('fetch', function(e) {
 		);
 	}
 });
-*/
