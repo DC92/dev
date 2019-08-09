@@ -15,6 +15,7 @@ self.addEventListener('install', function(e) {
 });
 
 // Remove old caches
+/*//TODO DELETE ?
 self.addEventListener('activate', function(e) {
 	e.waitUntil(
 		caches.keys().then(function(keyList) {
@@ -26,7 +27,7 @@ self.addEventListener('activate', function(e) {
 		})
 	);
 	return self.clients.claim();
-});
+});*/
 
 /* The event.respondWith() method tells the browser to evaluate the result of the event in the future.
    caches.match(event.request) takes the current web request that triggered the fetch event and looks in the cache for a resource that matches.
