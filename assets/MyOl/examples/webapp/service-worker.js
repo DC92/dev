@@ -1,21 +1,15 @@
-const cacheName = 'myolStaticCache',
-	dataCacheName = 'myolTileCache';
-
-var filesToCache = [
-	'./favicon.png',
-	'./index.html',
-	'../../ol/ol.css',
-	'../../ol/ol.js',
-	'../../myol.css',
-	'../../myol.js'
-];
-
 // The first time a user hits the page an install event is triggered.
 self.addEventListener('install', function(e) {
 	e.waitUntil(
-		//https://developer.mozilla.org/en-US/docs/Web/API/ExtendableEvent/waitUntil
-		caches.open(cacheName).then(function(cache) {
-			return cache.addAll(filesToCache);
+		caches.open('myolCache').then(function(cache) {
+			return cache.addAll([
+				'./favicon.png',
+				'./index.html',
+				'../../ol/ol.css',
+				'../../ol/ol.js',
+				'../../myol.css',
+				'../../myol.js'
+			]);
 		})
 	);
 });
@@ -25,7 +19,7 @@ self.addEventListener('activate', function(e) {
 	e.waitUntil(
 		caches.keys().then(function(keyList) {
 			return Promise.all(keyList.map(function(key) {
-				if (key !== cacheName && key !== dataCacheName) {
+				if (key !== 'myolCache') {
 					return caches.delete(key);
 				}
 			}));
