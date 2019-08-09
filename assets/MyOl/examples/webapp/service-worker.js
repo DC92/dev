@@ -1,6 +1,8 @@
 const cacheName = 'myolStaticCache';
 const dataCacheName = 'myolTileCache';
-//const dataUrls = ['localhost', 'c92.fr', 'DC92.github.io'];
+
+//TODO ARCHI soit récupérer url, soit laisser ouvert
+const dataUrls = ['localhost', 'github.io', 'dc9.fr', 'chemineur.fr', 'refuges.info', 'alpages.info'];
 
 var filesToCache = [
 	'./favicon.png',
