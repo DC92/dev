@@ -1863,8 +1863,8 @@ function controlsCollection(options) {
 
 	return [
 		controlLayersSwitcher(ol.assign({
-			geoKeys: options.geoKeys,
-			baseLayers: options.baseLayers
+			baseLayers: options.baseLayers,
+			geoKeys: options.geoKeys
 		}, options.controlLayersSwitcher)),
 		new ol.control.ScaleLine(),
 		new ol.control.Attribution({
