@@ -1090,8 +1090,8 @@ function controlPermalink(o) {
 		divElement = document.createElement('div'),
 		aElement = document.createElement('a');
 	const this_ = new ol.control.Control({
-			element: divElement,
-			render: render
+		element: divElement,
+		render: render
 	});
 	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
