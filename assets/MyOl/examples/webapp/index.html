@@ -73,8 +73,12 @@
 					tipLabel: 'Plein écran'
 				}),
 				controlGPS(),
+				controlLoadGPX(),
 				new ol.control.Button({
 					label: '?',
+					activate: function(active) {
+						alert(this.title);
+					},
 					title: 'Pour utiliser les cartes et le GPS hors connexion internet :\n' +
 						'Installez l\'application web : explorateur -> options -> ajouter à l\'écran d\'accueil\n' +
 						'Choisissez une couche de carte\n' +
@@ -83,8 +87,10 @@
 						'Passez en mode plein écran (mémorise également les échèles supérieures)\n' +
 						'Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles\n' +
 						'Recommencez avec une autre couche de carte si vous voulez en mémoriser plusieurs\n' +
+						'Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
 						'Allez sur le terrain et cliquez sur l\'icône "MyGPS"\n' +
-						'Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur.'
+						'Si vous avez un fichier .gpx dans votre mobile, chargez-le en cliquant sur ⇓\n' +
+						'Cette application ne permet pas d\'enregistrer le parcours.'
 				})
 			]
 		});
