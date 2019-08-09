@@ -7,17 +7,13 @@ const dataUrls = ['localhost', 'github.io', 'dc9.fr', 'chemineur.fr', 'refuges.i
 var filesToCache = [
 	'./favicon.png',
 	'./index.html',
-	'./map.css',
-	'./map.js',
-	'./app.js',
 	'../../ol/ol.css',
 	'../../ol/ol.js',
-	'../../geocoder/ol-geocoder.css',
-	'../../geocoder/ol-geocoder-debug.js',
 	'../../myol.css',
 	'../../myol.js'
 ];
 
+// The first time a user hits the page an install event is triggered.
 self.addEventListener('install', function(e) {
 	//console.log('[ServiceWorker] Install');
 	e.waitUntil(
@@ -29,6 +25,7 @@ self.addEventListener('install', function(e) {
 	);
 });
 
+// The method is enabled to remove old caches
 self.addEventListener('activate', function(e) {
 	//console.log('[ServiceWorker] Activate');
 	e.waitUntil(
@@ -44,10 +41,15 @@ self.addEventListener('activate', function(e) {
 	return self.clients.claim();
 });
 
+/* The event.respondWith() method tells the browser to evaluate the result of the event in the future.
+   caches.match(event.request) takes the current web request that triggered the fetch event and looks in the cache for a resource that matches.
+   The match is performed by looking at the URL string.
+   The match method returns a promise that resolves even if the file is not found in the cache. 
+*/
 self.addEventListener('fetch', function(e) {
 	//console.log('[ServiceWorker] Fetch', e.request.url);
 
-	if (dataUrls.some((url) => e.request.url.indexOf(url) !== -1)) {
+/*	if (dataUrls.some((url) => e.request.url.indexOf(url) !== -1)) {
 		e.respondWith(
 			caches.match(e.request).then(function(response) {
 				if (!response) {
@@ -62,7 +64,7 @@ self.addEventListener('fetch', function(e) {
 				return response;
 			})
 		);
-	} else {
+	} else */ {
 		e.respondWith(
 			caches.match(e.request).then(function(response) {
 				return response || fetch(e.request);

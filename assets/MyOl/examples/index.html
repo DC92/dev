@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+	<title>My Openlayers</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>My Openlayers</title>
 	<link rel="icon" type="image/x-icon" href="https://openlayers.org/assets/theme/img/favicon.ico" />
 
 	<!-- Openlayers -->
@@ -21,6 +22,9 @@
 	<link  href="../myol.css" type="text/css" rel="stylesheet">
 	<script src="../myol.js"></script>
 
+	<!-- Web app definition for installation of an offline simplified version -->
+    <link rel="manifest" href="webapp/manifest.json">
+
 	<style>
 		#map {
 			width: 90vw;
@@ -31,8 +35,11 @@
 		}
 	</style>
 </head>
+
 <body>
 	<div id="map"></div>
+
+	<p>Installation off line : cliquer options / ajouter &agrave; l'&eacute;cran d'accueil</p>
 
 	<ul id="overpass">
 		<li>OVERPASS<input type="checkbox" name="overpass" /></li>
@@ -112,4 +119,5 @@
 
 	<script src="index.js"></script>
 </body>
+
 </html>

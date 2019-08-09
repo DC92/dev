@@ -1455,7 +1455,8 @@ function controlDownloadGPX(o) {
 function geocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
-	if (ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
+	if (typeof Geocoder != 'function' ||
+		ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
 		return new ol.control.Control({ //HACK No button
 			element: document.createElement('div'),
 		});

@@ -2,31 +2,54 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MyGPS</title>
-
-    <link rel="manifest" href="./manifest.json">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 	<!-- Openlayers -->
 	<link  href="../../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../../ol/ol.js"></script>
-
-	<!-- Recherche par nom -->
-	<link  href="../../geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
-	<script src="../../geocoder/ol-geocoder-debug.js"></script>
 
 	<!-- My Openlayers -->
 	<link  href="../../myol.css" type="text/css" rel="stylesheet">
 	<script src="../../myol.js"></script>
 
 	<!-- This app -->
-	<link  href="map.css" type="text/css" rel="stylesheet">
-	<script src="map.js"></script>
-	<script src="app.js"></script>
+    <link rel="manifest" href="./manifest.json">
+	<script>
+		if ('serviceWorker' in navigator)
+			navigator.serviceWorker.register('./service-worker.js')
+				.then(() => console.log('Service worker registered!'))
+	</script>
+
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+		}
+		#map {
+			width: 100vw;
+			height: 100vh;
+		}
+	</style>
 </head>
 
 <body>
     <div id="map"></div>
+
+	<script>
+		// Must be after the <div> tag
+		new ol.MyMap({
+			target: 'map',
+			controls: controlsCollection({
+				geoKeys: {
+					IGN: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
+					thunderforest: 'a54d38a8b23f435fa08cfb1d0d0b266e', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
+					bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+					// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
+				}
+			})
+		});
+	</script>
 </body>
 
 </html>
