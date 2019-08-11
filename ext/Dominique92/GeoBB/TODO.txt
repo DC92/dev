@@ -130,11 +130,10 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
-Bug météo ° ressenti
-Mettre sablier sur attente météo une fois cliqué
-http://www.refuges.info/forum/viewtopic.php?f=2&t=9127 / BUG: cannot click on camp to camp symbol (c) for 'Crête Pilliozan - Agnelin, point 2611 m ©'
+Méteo ne marche pas sur mobile (status 0 / vide)
+Possibilité d'agrandir la météo sur mobiles
 Créer les massifs manquants à chemineur
-Page point : lien des posts vers le bon post du forum
+Pas de massifs dans l'Atlas ?
 Inclure scan_liens.php dans /ressources/outils/...
 Paramétres inclusion posts dans points -> config.php
 Récupérer commentaires de conf_privee.php
@@ -144,11 +143,13 @@ Mettre le format date sur tous les users
 L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
 	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
 Pas de récup cookies de point-modif vers nav
-Création point : garder les cookies et pas forcer à Salanche (point par défaut dans la base !)
-Possibilité d'agrandir la météo sur mobiles
-Pas de massifs dans l'Atlas ?
 Edition / creation / suppression polygones autres que massif
 Déraciner le wiki / le mettre dans le forum
+
+TODO WRI OL
+===========
+Création point : garder les cookies et pas forcer à Salanche (point par défaut dans la base !)
+http://www.refuges.info/forum/viewtopic.php?f=2&t=9127 / BUG: cannot click on camp to camp symbol (c) for 'Crête Pilliozan - Agnelin, point 2611 m ©'
 
 WRI API
 =======

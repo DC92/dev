@@ -1217,7 +1217,7 @@ function controlGPS(options) {
 		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
 		function(evt) {
 			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			if (heading)
+			if (heading) //TODO BUG FF when landscape
 				compas = {
 					heading: Math.PI / 180 * // Delivered ° reverse clockwize
 						(heading - screen.orientation.angle), // Screen portrait / landscape
