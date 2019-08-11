@@ -1154,6 +1154,7 @@ function controlGPS(options) {
 		gps = {},
 		compas = {}, // Mem last sensors values
 
+		//TODO BEST a compas indicator (north map)
 		// The graticule
 		feature = new ol.Feature(),
 		layer = new ol.layer.Vector({
@@ -1197,9 +1198,11 @@ function controlGPS(options) {
 				enableHighAccuracy: true
 			}
 		});
+
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
 	});
+
 	geolocation.on('change', function() {
 		gps.position = ol.proj.fromLonLat(this.getPosition());
 		gps.accuracyGeometry = this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
@@ -1213,14 +1216,16 @@ function controlGPS(options) {
 
 	// Browser heading from the inertial sensors
 	window.addEventListener(
-		'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : // Gives always the magnetic north
+		'ondeviceorientationabsolute' in window ?
+		'deviceorientationabsolute' : // Gives always the magnetic north
 		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
 		function(evt) {
 			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			if (heading) //TODO BUG FF when landscape
+			if (heading)
 				compas = {
-					heading: Math.PI / 180 * // Delivered ° reverse clockwize
-						(heading - screen.orientation.angle), // Screen portrait / landscape
+					heading: screen.orientation.angle && navigator.userAgent.match('Firefox') ?
+						0 : // As orientation # to portrait is unconsistant on FF, we prefer to freze north on top
+						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 					absolute: evt.absolute // Gives initial device orientation | magnetic north
 				};
 
@@ -1229,7 +1234,7 @@ function controlGPS(options) {
 
 	function renderReticule() {
 		if (this_.active && gps) {
-			if (!feature.getGeometry()) // Only once the first time the feature is activated
+			if (!feature.getGeometry()) // Only once the first time the feature is enabled
 				view.setZoom(17); // Zoom on the area
 
 			view.setCenter(gps.position);
@@ -1250,7 +1255,8 @@ function controlGPS(options) {
 
 			// Map orientation (Radians and reverse clockwize)
 			view.setRotation(
-				compas.absolute ? compas.heading : // Use magnetic compas value
+				compas.absolute ?
+				compas.heading : // Use magnetic compas value
 				compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
 				0
 			);

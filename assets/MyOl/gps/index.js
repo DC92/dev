@@ -9,10 +9,10 @@ if (!window.location.pathname.split('/').pop())
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js')
-	// Reload if any app file has been updated
+	// Reload if any app file has been installed or updated
 	.then(reg => {
 		reg.addEventListener('updatefound', () => {
-			document.write('<a href="#" onclick="location.reload(true)">The software has been updated<br/>Click here to reload</a>');
+			document.write('<a href="#" onclick="location.reload(true)">The application has been installed or updated<br/>Click here to reload</a>');
 		})
 	});
 

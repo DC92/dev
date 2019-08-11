@@ -9,10 +9,10 @@ if (!window.location.pathname.split('/').pop())
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
-	// Reload if any app file has been updated
+	// Reload if any app file has been installed or updated
 	.then(reg => {
 		reg.addEventListener('updatefound', () => {
-			document.write('<a href="#" onclick="location.reload(true)">The software has been updated<br/>Click here to reload</a>');
+			document.write('<a href="#" onclick="location.reload(true)">The application has been installed or updated<br/>Click here to reload</a>');
 		})
 	});
 
@@ -49,6 +49,8 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Google': layerGoogle('m'),
+		'Photo Google': layerGoogle('s'),
 		'Photo Bing': layerBing('Aerial', keys.bing),
 		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS')
 	},
