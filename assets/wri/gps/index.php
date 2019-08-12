@@ -24,7 +24,8 @@
 	<!-- other ref="index.php" -->
 	<!-- other ref="service-worker.js.php" -->
 	<script>
-		var keys = {
+		var dateGen = '<?=date('d/m/Y H:i')?>',
+			keys = {
 			ign: '<?=$config_wri['ign_key']?>',
 			thunderforest: '<?=$config_wri['thunderforest_key']?>',
 			bing: '<?=$config_wri['bing_key']?>'

@@ -25,14 +25,16 @@ function geoControls(options) {
 			),
 			'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 			'OSM contraste': layerThunderforest('mobile-atlas', keys.thunderforest),
-			'Hike & Bike': layerOSM(
+			'Hike & Bike': layerOSM( // Not on https
 				'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
 				'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
-			), // Not on https
+			),
+			/* //TODO quota expired
 			'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
 			'OSM trains': layerThunderforest('pioneer', keys.thunderforest),
 			'OSM transport': layerThunderforest('transport', keys.thunderforest),
 			'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
+			*/
 			'Autriche': layerKompass('KOMPASS Touristik'),
 			'Kompas': layerKompass('KOMPASS'),
 			'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),

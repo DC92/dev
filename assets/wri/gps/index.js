@@ -16,7 +16,13 @@ if (!window.location.pathname.split('/').pop())
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register('service-worker.js.php');
+	navigator.serviceWorker.register('service-worker.js.php')
+	// Reload if any app file has been updated
+	.then(reg => {
+		reg.addEventListener('updatefound', () => {
+			location.reload();
+		})
+	});
 
 // Openlayers part
 // Initialise Openlayers vars
@@ -34,7 +40,8 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
 	'* Fonctionne bien avec Chrome, Edge, Samsung Internet. Un peu moins bien sur Firefox\n' +
-	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée par refuges.info',
+	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée\n' +
+	'Logiciel ' + dateGen,
 
 	baseLayers = {
 		'OpenTopoMap': layerOSM(

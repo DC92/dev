@@ -1949,12 +1949,14 @@ function layersCollection(keys) {
 		), // Not on https
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
+		/* //TODO quota expired
 		'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
 		'OSM landscape': layerThunderforest('landscape', keys.thunderforest),
 		'OSM transport': layerThunderforest('transport', keys.thunderforest),
 		'OSM trains': layerThunderforest('pioneer', keys.thunderforest),
 		'OSM villes': layerThunderforest('neighbourhood', keys.thunderforest),
 		'OSM contraste': layerThunderforest('mobile-atlas', keys.thunderforest),
+		*/
 		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
