@@ -30,6 +30,7 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ⇑\n' +
 	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
+	'* Fonctionne bien avec Chrome, Edge, Samsung Internet. Un peu moins bien sur Firefox\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée';
 
 // Load the map when the map DIV is intialised

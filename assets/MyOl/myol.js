@@ -900,7 +900,7 @@ function JSONparse(json) {
  * Control buttons
  * Abstract definition to be used by other control buttons definitions
  */
-let nextButtonTopPos = 4; // Top position of next button (em)
+let nextButtonPos = 2.5; // Top position of next button (em)
 
 ol.control.Button = function(o) {
 	const this_ = this, // For callback functions
@@ -929,11 +929,11 @@ ol.control.Button = function(o) {
 
 	this.on('myol:onadd', function() {
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
-			divElement.style.right = '.5em';
 			divElement.style.top = options.rightPosition + 'em';
+			divElement.style.right = '.5em';
 		} else {
-			divElement.style.left = '.5em';
-			divElement.style.top = (nextButtonTopPos += 2) + 'em';
+			divElement.style.top = '.5em';
+			divElement.style.left = (nextButtonPos += 2) + 'em';
 		}
 	});
 
@@ -1156,10 +1156,11 @@ function controlGPS(options) {
 
 		//TODO BEST a compas indicator (north map)
 		// The graticule
-		feature = new ol.Feature(),
+		graticule = new ol.Feature(),
+		northGraticule = new ol.Feature(),
 		layer = new ol.layer.Vector({
 			source: source = new ol.source.Vector({
-				features: [feature]
+				features: [graticule, northGraticule]
 			}),
 			style: new ol.style.Style({
 				fill: new ol.style.Fill({
@@ -1178,9 +1179,6 @@ function controlGPS(options) {
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
 			activate: function(active) {
-				map = this_.getMap();
-				view = map.getView();
-
 				// Toggle reticule, position & rotation
 				geolocation.setTracking(active);
 				if (active)
@@ -1198,6 +1196,20 @@ function controlGPS(options) {
 				enableHighAccuracy: true
 			}
 		});
+
+	northGraticule.setStyle(new ol.style.Style({
+		stroke: new ol.style.Stroke({
+			color: 'red',
+			width: 2
+		})
+	}));
+
+	this_.on('myol:onadd', function() {
+		map = this_.getMap();
+		view = map.getView();
+
+		map.on('moveend', renderReticule);
+	});
 
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
@@ -1234,21 +1246,35 @@ function controlGPS(options) {
 
 	function renderReticule() {
 		if (this_.active && gps) {
-			if (!feature.getGeometry()) // Only once the first time the feature is enabled
+			if (!graticule.getGeometry()) // Only once the first time the feature is enabled
 				view.setZoom(17); // Zoom on the area
 
 			view.setCenter(gps.position);
-			// Redraw the marker
-			feature.setGeometry(new ol.geom.GeometryCollection([
+
+			// Estimate the viewport size
+			let hg = map.getCoordinateFromPixel([0, 0]),
+				bd = map.getCoordinateFromPixel(map.getSize()),
+				halfPerimeter = bd[0] - hg[0] + hg[1] - bd[1];
+
+			// Redraw the graticule
+			graticule.setGeometry(new ol.geom.GeometryCollection([
 				gps.accuracyGeometry, // The accurate circle
 				new ol.geom.MultiLineString([ // The graticule
 					[
-						[gps.position[0], -20000000],
-						[gps.position[0], 20000000]
+						[gps.position[0], gps.position[1] - halfPerimeter * 10],
+						[gps.position[0], gps.position[1]]
 					],
 					[
-						[gps.position[0] - 20000000, gps.position[1]],
-						[gps.position[0] + 20000000, gps.position[1]]
+						[gps.position[0] - halfPerimeter * 10, gps.position[1]],
+						[gps.position[0] + halfPerimeter * 10, gps.position[1]]
+					]
+				])
+			]));
+			northGraticule.setGeometry(new ol.geom.GeometryCollection([
+				new ol.geom.MultiLineString([ // Color north in red
+					[
+						[gps.position[0], gps.position[1]],
+						[gps.position[0], gps.position[1] + halfPerimeter * 10]
 					]
 				])
 			]));
@@ -1474,7 +1500,8 @@ function geocoder() {
 		placeholder: 'Recherche sur la carte' // Initialization of the input field
 	});
 	gc.container.title = 'Recherche sur la carte';
-	gc.container.style.top = (nextButtonTopPos += 2) + 'em';
+	gc.container.style.top = '.5em';
+	gc.container.style.left = (nextButtonPos += 2) + 'em';
 
 	return gc;
 }

@@ -100,8 +100,8 @@
 
 /* Full screen */
 .ol-full-screen {
-	top: 4em;
-	left: .5em;
+	top: .5em;
+	left: 2.5em;
 	right: auto;
 }
 :-webkit-full-screen { /* HACK bug in Chrome & Edge */

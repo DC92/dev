@@ -1,3 +1,11 @@
+// This software is a progressive web application (PWA)
+// It's composed as a basic web page but includes many services as
+// data storage that make it as powerfull as an installed mobile application
+// See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
+
+// The map is based on https://openlayers.org/
+// With some personal additions https://github.com/Dominique92/MyOl
+
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
 	window.location.href = window.location.href.replace('http:', 'https:');
@@ -12,6 +20,7 @@ if ('serviceWorker' in navigator)
 	// Reload if any app file has been installed or updated
 	.then(reg => {
 		reg.addEventListener('updatefound', () => {
+			//TODO n'afficher que sur un upgrade
 			document.write('<a href="#" onclick="location.reload(true)">The application has been installed or updated<br/>Click here to reload</a>');
 		})
 	});
@@ -31,6 +40,7 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
 	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
+	'* Fonctionne bien avec Chrome, Edge, Samsung Internet. Un peu moins bien sur Firefox\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée par refuges.info',
 
 	baseLayers = {
