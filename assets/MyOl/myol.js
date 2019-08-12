@@ -1227,22 +1227,21 @@ function controlGPS(options) {
 	});
 
 	// Browser heading from the inertial sensors
-	window.addEventListener(
-		'ondeviceorientationabsolute' in window ?
-		'deviceorientationabsolute' : // Gives always the magnetic north
-		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
-		function(evt) {
-			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			if (heading)
-				compas = {
-					heading: screen.orientation.angle && navigator.userAgent.match('Firefox') ?
-						0 : // As orientation # to portrait is unconsistant on FF, we prefer to freze north on top
-						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
-					absolute: evt.absolute // Gives initial device orientation | magnetic north
-				};
+	if (!navigator.userAgent.match('Firefox')) // Except Forefox who dosen't manage magnetic compas
+		window.addEventListener(
+			'ondeviceorientationabsolute' in window ?
+			'deviceorientationabsolute' : // Gives always the magnetic north
+			'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
+			function(evt) {
+				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+				if (heading)
+					compas = {
+						heading: Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
+						absolute: evt.absolute // Gives initial device orientation | magnetic north
+					};
 
-			renderReticule();
-		});
+				renderReticule();
+			});
 
 	function renderReticule() {
 		if (this_.active && gps) {
@@ -1254,19 +1253,19 @@ function controlGPS(options) {
 			// Estimate the viewport size
 			let hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
-				halfPerimeter = bd[0] - hg[0] + hg[1] - bd[1];
+				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
 
 			// Redraw the graticule
 			graticule.setGeometry(new ol.geom.GeometryCollection([
 				gps.accuracyGeometry, // The accurate circle
 				new ol.geom.MultiLineString([ // The graticule
 					[
-						[gps.position[0], gps.position[1] - halfPerimeter * 10],
+						[gps.position[0], gps.position[1] - far],
 						[gps.position[0], gps.position[1]]
 					],
 					[
-						[gps.position[0] - halfPerimeter * 10, gps.position[1]],
-						[gps.position[0] + halfPerimeter * 10, gps.position[1]]
+						[gps.position[0] - far, gps.position[1]],
+						[gps.position[0] + far, gps.position[1]]
 					]
 				])
 			]));
@@ -1274,7 +1273,7 @@ function controlGPS(options) {
 				new ol.geom.MultiLineString([ // Color north in red
 					[
 						[gps.position[0], gps.position[1]],
-						[gps.position[0], gps.position[1] + halfPerimeter * 10]
+						[gps.position[0], gps.position[1] + far]
 					]
 				])
 			]));

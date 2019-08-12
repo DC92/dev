@@ -16,14 +16,7 @@ if (!window.location.pathname.split('/').pop())
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register('service-worker.js.php')
-	// Reload if any app file has been installed or updated
-	.then(reg => {
-		reg.addEventListener('updatefound', () => {
-			//TODO n'afficher que sur un upgrade
-			document.write('<a href="#" onclick="location.reload(true)">The application has been installed or updated<br/>Click here to reload</a>');
-		})
-	});
+	navigator.serviceWorker.register('service-worker.js.php');
 
 // Openlayers part
 // Initialise Openlayers vars
