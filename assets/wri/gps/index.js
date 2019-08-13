@@ -53,7 +53,6 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 		),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'Outdoors': layerThunderforest('outdoors', keys.thunderforest),
 		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
