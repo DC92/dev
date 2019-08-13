@@ -41,7 +41,7 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
 	'* Fonctionne bien avec Chrome, Edge, Samsung Internet. Un peu moins bien sur Firefox\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée\n' +
-	'Logiciel ' + dateGen,
+	'Sw ' + dateGen,
 
 	baseLayers = {
 		'OpenTopoMap': layerOSM(

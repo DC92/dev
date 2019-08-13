@@ -769,7 +769,7 @@ layerOverpass = function(o) {
  * Requires 'myol:onadd' layer event
  */
 //TODO-BEST pointer finger sur la cible (select ?)
-//							map.getViewport().style.cursor = 'pointer'; / default
+// map.getViewport().style.cursor = 'pointer'; / default
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	const format = new ol.format.GeoJSON();
 	let eljson, json, elxy;
@@ -1151,10 +1151,9 @@ function controlGPS(options) {
 		});
 
 	let map, view,
-		gps = {},
-		compas = {}, // Mem last sensors values
+		gps = {}, // Mem last sensors values
+		compas = {},
 
-		//TODO BEST a compas indicator (north map)
 		// The graticule
 		graticule = new ol.Feature(),
 		northGraticule = new ol.Feature(),
@@ -1167,7 +1166,8 @@ function controlGPS(options) {
 					color: 'rgba(128,128,255,0.2)'
 				}),
 				stroke: new ol.style.Stroke({
-					color: 'blue',
+					color: 'black',
+					lineDash: [5, 10],
 					width: 2
 				})
 			})
@@ -1179,6 +1179,9 @@ function controlGPS(options) {
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
 			activate: function(active) {
+				//TODO 3 steps activation : position + reticule + orientation / reticule / none
+				//TODO freeze rotation when inactive
+
 				// Toggle reticule, position & rotation
 				geolocation.setTracking(active);
 				if (active)
@@ -1200,6 +1203,7 @@ function controlGPS(options) {
 	northGraticule.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
 			color: 'red',
+			lineDash: [5, 10],
 			width: 2
 		})
 	}));
@@ -1218,30 +1222,33 @@ function controlGPS(options) {
 	geolocation.on('change', function() {
 		gps.position = ol.proj.fromLonLat(this.getPosition());
 		gps.accuracyGeometry = this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
+		/*//TODO Firefox Update delta only over some speed
+		if (!navigator.userAgent.match('Firefox'))
+
 		if (this.getHeading()) {
 			gps.heading = -this.getHeading(); // Delivered radians, clockwize
 			gps.delta = gps.heading - compas.heading; // Freeze delta at this time bewteen the GPS heading & the compas
-		}
+		} */
 
 		renderReticule();
 	});
 
 	// Browser heading from the inertial sensors
-	if (!navigator.userAgent.match('Firefox')) // Except Forefox who dosen't manage magnetic compas
-		window.addEventListener(
-			'ondeviceorientationabsolute' in window ?
-			'deviceorientationabsolute' : // Gives always the magnetic north
-			'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
-			function(evt) {
-				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-				if (heading)
-					compas = {
-						heading: Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
-						absolute: evt.absolute // Gives initial device orientation | magnetic north
-					};
+	window.addEventListener(
+		'ondeviceorientationabsolute' in window ?
+		'deviceorientationabsolute' : // Gives always the magnetic north
+		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
+		function(evt) {
+			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			if (heading)
+				compas = {
+					heading: Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
+					absolute: evt.absolute // Gives initial device orientation | magnetic north
+				};
 
-				renderReticule();
-			});
+			renderReticule();
+		}
+	);
 
 	function renderReticule() {
 		if (this_.active && gps) {
@@ -1279,12 +1286,14 @@ function controlGPS(options) {
 			]));
 
 			// Map orientation (Radians and reverse clockwize)
-			view.setRotation(
-				compas.absolute ?
-				compas.heading : // Use magnetic compas value
-				compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
-				0
-			);
+			if (compas.absolute)
+				view.setRotation(compas.heading, 0); // Use magnetic compas value
+			/*//TODO Firefox use delta if speed > ??? km/h
+					compas.absolute ?
+					compas.heading : // Use magnetic compas value
+					compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
+					0
+				); */
 
 			// Optional callback function
 			if (typeof options.callBack == 'function') // Default undefined

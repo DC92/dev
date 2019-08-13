@@ -24,7 +24,7 @@
 	<!-- other ref="index.php" -->
 	<!-- other ref="service-worker.js.php" -->
 	<script>
-		var dateGen = '<?=date('d/m/Y H:i')?>',
+		var dateGen = '<?=date('ymd-Hi')?>',
 			keys = {
 			ign: '<?=$config_wri['ign_key']?>',
 			thunderforest: '<?=$config_wri['thunderforest_key']?>',
