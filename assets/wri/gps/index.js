@@ -56,7 +56,6 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Google': layerGoogle('m'),
 		'Photo Google': layerGoogle('s'),

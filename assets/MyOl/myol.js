@@ -81,10 +81,11 @@ function layerOSM(url, attribution) {
 /**
  * Kompas (austria)
  * Requires layerOSM
+ * Not available via https
  */
 function layerKompass(layer) {
 	return layerOSM(
-		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
+		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' +
 		'Experience=ecmaps&MapStyle=' + layer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
@@ -1166,8 +1167,8 @@ function controlGPS(options) {
 					color: 'rgba(128,128,255,0.2)'
 				}),
 				stroke: new ol.style.Stroke({
-					color: 'black',
-					lineDash: [5, 10],
+					color: '#00c',
+					lineDash: [16, 14],
 					width: 2
 				})
 			})
@@ -1202,8 +1203,8 @@ function controlGPS(options) {
 
 	northGraticule.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
-			color: 'red',
-			lineDash: [5, 10],
+			color: '#c00',
+			lineDash: [16, 14],
 			width: 2
 		})
 	}));
@@ -1361,7 +1362,7 @@ function controlLoadGPX(o) {
 			},
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
-					color: 'blue',
+					color: '#0000ff',
 					width: 2
 				})
 			})
@@ -1945,7 +1946,7 @@ function layersCollection(keys) {
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
-		'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
+		//		'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
 		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOSM(
