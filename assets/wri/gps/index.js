@@ -39,7 +39,7 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
 	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
-	'* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet. Un peu moins bien avec Firefox\n' +
+	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée\n' +
 	'Sw ' + dateGen,
 	//TODO BEST dategen = dernière date des fichiers
