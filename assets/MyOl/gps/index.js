@@ -1,3 +1,5 @@
+//TODO retest. Doesn(t work well !
+
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
 	window.location.href = window.location.href.replace('http:', 'https:');

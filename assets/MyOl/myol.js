@@ -1169,7 +1169,7 @@ function controlGPS(options) {
 				stroke: new ol.style.Stroke({
 					color: '#20b',
 					lineDash: [16, 14],
-					width: 2
+					width: 1
 				})
 			})
 		}),
@@ -1206,7 +1206,7 @@ function controlGPS(options) {
 		stroke: new ol.style.Stroke({
 			color: '#c00',
 			lineDash: [16, 14],
-			width: 2
+			width: 1
 		})
 	}));
 
@@ -1367,8 +1367,8 @@ function controlLoadGPX(o) {
 			},
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
-					color: '#0000ff',
-					width: 2
+					color: 'blue',
+					width: 3
 				})
 			})
 		}, o),
