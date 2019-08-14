@@ -1,14 +1,14 @@
 Dominique92.MyOl
 ================
 * This package adds many features to [openlayer map](https://openlayers.org/).
-* It is deployed on http://alpages.info
+* It is deployed on [alpages.info](http://alpages.info) & [refuges.info/gps](https://refuges.info/gps)
 
 SIMPLE EXAMPLE
 ==============
 This [EXAMPLE DEMO](https://dominique92.github.io/MyOl/) implements a single map with the most current maps layers providers.
 * You can download the [DISTRIBUTION ZIPPED PACKAGE](https://github.com/Dominique92/MyOl/archive/master.zip) and unzip it in your website FTP section.
 * See the [FULL FUNCTIONS EXAMPLE DEMO](https://dominique92.github.io/MyOl/examples/)
-* You can include the includes, css & javascript sections of this example on your own page (adjust the include files path to your implementation)
+* You can include the css & js sections of this example on your own page (adjust the include files path to your implementation)
 
 LAYERS KEYS
 ===========
@@ -58,14 +58,14 @@ DEPENDENCIES
 This package includes :
 * openlayers v5.3.0
 * proj4js 2.5.0
-* ol-geocoder v3.2.0
+* ol-geocoder v3.3.0
 
 FILES
 =====
+* myol.css : Specific CSS presentation distribution
+* myol.js : Specific CSS extensions distribution
 * ol/... : Openlayer last stable distribution files from [Openlayers GitHub](https://github.com/openlayers/openlayers)
 * geocoder/... : Openlayer geocoder last stable distribution files from [Openlayers geocoder GitHub](https://github.com/jonataswalker/ol-geocoder)
 * proj4/... : Coordinate transformation software last stable distribution files from [Proj4 GitHub](https://github.com/OSGeo/proj.4)
 * examples/... : Demo files or ongoing developments
-* myol.css : Specific CSS presentation distribution
-* myol.js : Specific CSS extensions distribution
 * index.html : Simple demo
