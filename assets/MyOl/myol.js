@@ -1167,7 +1167,7 @@ function controlGPS(options) {
 					color: 'rgba(128,128,255,0.2)'
 				}),
 				stroke: new ol.style.Stroke({
-					color: '#00c',
+					color: '#20b',
 					lineDash: [16, 14],
 					width: 2
 				})
@@ -1182,6 +1182,7 @@ function controlGPS(options) {
 			activate: function(active) {
 				//TODO 3 steps activation : position + reticule + orientation / reticule / none
 				//TODO freeze rotation when inactive
+				//TODO block screen standby
 
 				// Toggle reticule, position & rotation
 				geolocation.setTracking(active);
@@ -1268,11 +1269,15 @@ function controlGPS(options) {
 				gps.accuracyGeometry, // The accurate circle
 				new ol.geom.MultiLineString([ // The graticule
 					[
-						[gps.position[0], gps.position[1] - far],
-						[gps.position[0], gps.position[1]]
+						[gps.position[0], gps.position[1]],
+						[gps.position[0], gps.position[1] - far]
 					],
 					[
-						[gps.position[0] - far, gps.position[1]],
+						[gps.position[0], gps.position[1]],
+						[gps.position[0] - far, gps.position[1]]
+					],
+					[
+						[gps.position[0], gps.position[1]],
 						[gps.position[0] + far, gps.position[1]]
 					]
 				])
