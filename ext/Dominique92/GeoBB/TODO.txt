@@ -130,6 +130,7 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+Relever la couche IGN sur /gps
 Méteo ne marche pas sur mobile (status 0 / vide)
 Possibilité d'agrandir la météo sur mobiles
 Créer les massifs manquants à chemineur

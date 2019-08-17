@@ -1,4 +1,10 @@
-//TODO retest. Doesn(t work well !
+// This software is a progressive web application (PWA)
+// It's composed as a basic web page but includes many services as
+// data storage that make it as powerfull as an installed mobile application
+// See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
+
+// The map is based on https://openlayers.org/
+// With some personal additions https://github.com/Dominique92/MyOl
 
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
@@ -32,7 +38,7 @@ const help = 'Pour utiliser les cartes et le GPS hors connexion :\n' +
 	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ⇑\n' +
 	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
-	'* Fonctionne bien avec Chrome, Edge, Samsung Internet. Un peu moins bien sur Firefox\n' +
+	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée';
 
 // Load the map when the map DIV is intialised

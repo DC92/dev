@@ -1,6 +1,7 @@
 // The first time a user hits the page an install event is triggered.
-// The other times an update is provided if the remote source is different
+// The other times an update is provided if the remote service-worker source md5 is different
 self.addEventListener('install', function(e) {
+	caches.delete('myolCache');
 	e.waitUntil(
 		caches.open('myolCache').then(function(cache) {
 			return cache.addAll([

@@ -938,22 +938,6 @@ ol.control.Button = function(o) {
 		}
 	});
 
-	// Add a question on the right of the button
-	if (options.question) {
-		const questionElement = document.createElement('div');
-		questionElement.innerHTML = options.question;
-		questionElement.className = 'ol-control-hidden';
-		divElement.appendChild(questionElement);
-
-		divElement.onmouseover = function() {
-			questionElement.className = 'ol-control-question';
-		};
-
-		divElement.onmouseout = function() {
-			questionElement.className = 'ol-control-hidden';
-		};
-	}
-
 	// Toggle the button status & aspect
 	// In case of group buttons, set inactive the other one
 	this.active = false;
