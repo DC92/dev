@@ -1,13 +1,5 @@
-// This software is a progressive web application (PWA)
-// It's composed as a basic web page but includes many services as
-// data storage that make it as powerfull as an installed mobile application
-// See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
-
-// The map is based on https://openlayers.org/
-// With some personal additions https://github.com/Dominique92/MyOl
-
 // Force https to allow web apps and geolocation
-if (window.location.protocol == 'http:')
+if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 	window.location.href = window.location.href.replace('http:', 'https:');
 
 // Force the script name of short url
@@ -75,6 +67,7 @@ window.onload = function() {
 				labelActive: '',
 				tipLabel: 'Plein écran'
 			}),
+			geocoder(),
 			controlGPS(),
 			controlLoadGPX(),
 			new ol.control.Button({
