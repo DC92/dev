@@ -96,7 +96,7 @@ function layerKompass(layer) {
  * Requires layerOSM
  * Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
-function layerThunderforest(layer, key) {
+function layerThunderforest(key, layer) {
 	return layerOSM(
 		'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + key,
 		'<a href="http://www.thunderforest.com">Thunderforest</a>'
@@ -301,7 +301,7 @@ function layerOS(key) {
  * Bing (Microsoft)
  * Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
  */
-function layerBing(subLayer, key) {
+function layerBing(key, subLayer) {
 	const layer = new ol.layer.Tile();
 
 	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
@@ -970,6 +970,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Requires 'myol:onadd' layer event
  * Requires permanentCheckboxList
  */
+//TODO accepter couche null et ne pas la montrer / pendant dans les couches avec clés.
 function controlLayersSwitcher(options) {
 	options = options || {};
 
@@ -1935,7 +1936,7 @@ function layersCollection(keys) {
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
-		//		'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
+		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
 		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOSM(
@@ -1948,44 +1949,44 @@ function layersCollection(keys) {
 		), // Not on https
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
-		/* //TODO quota expired
-		'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
-		'OSM landscape': layerThunderforest('landscape', keys.thunderforest),
-		'OSM transport': layerThunderforest('transport', keys.thunderforest),
-		'OSM trains': layerThunderforest('pioneer', keys.thunderforest),
-		'OSM villes': layerThunderforest('neighbourhood', keys.thunderforest),
-		'OSM contraste': layerThunderforest('mobile-atlas', keys.thunderforest),
-		*/
-		'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-		'IGN classique': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-		'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-		//403		'IGN Spot': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
-		//Double		'SCAN25TOUR': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
-		'IGN 1950': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
-		'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
-		'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
-		//400		'ETATMAJOR10': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10', 'png'),
-		//400		'IGN.SCAN-OACI': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-OACI', 'png'),
-		'IGN plan': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
-		'IGN route': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
-		'IGN noms': layerIGN(keys.IGN, 'GEOGRAPHICALNAMES.NAMES', 'png'),
-		'IGN rail': layerIGN(keys.IGN, 'TRANSPORTNETWORKS.RAILWAYS', 'png'),
-		'IGN forêt': layerIGN(keys.IGN, 'LANDCOVER.FORESTAREAS', 'png'),
-		'IGN limites': layerIGN(keys.IGN, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
-		//403		'SHADOW': layerIGN(keys.IGN, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
-		//404		'PN': layerIGN(keys.IGN, 'PROTECTEDAREAS.PN', 'png'),
-		//404		'PNR': layerIGN(keys.IGN, 'PROTECTEDAREAS.PNR', 'png'),
-		//403		'Avalanches':	layerIGN('IGN avalanches', keys.IGN,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+		'OSM cycle': layerThunderforest(keys.thunderforest, 'cycle'),
+		'OSM landscape': layerThunderforest(keys.thunderforest, 'landscape'),
+		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
+		'OSM trains': layerThunderforest(keys.thunderforest, 'pioneer'),
+		'OSM villes': layerThunderforest(keys.thunderforest, 'neighbourhood'),
+		'OSM contraste': layerThunderforest(keys.thunderforest, 'mobile-atlas'),
+
+		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN TOP 25': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+		'IGN classique': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'IGN photos': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+		//403	'IGN Spot': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
+		//Double		'SCAN25TOUR': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
+		'IGN 1950': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
+		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
+		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
+		'Etat major': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
+		'ETATMAJOR10': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
+		'IGN plan': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
+		'IGN route': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
+		'IGN noms': layerIGN(keys.ign, 'GEOGRAPHICALNAMES.NAMES', 'png'),
+		'IGN rail': layerIGN(keys.ign, 'TRANSPORTNETWORKS.RAILWAYS', 'png'),
+		'IGN forêt': layerIGN(keys.ign, 'LANDCOVER.FORESTAREAS', 'png'),
+		'IGN limites': layerIGN(keys.ign, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
+		//Le style normal n'est pas geré	'SHADOW': layerIGN(keys.ign, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
+		//Le style normal n'est pas geré	'PN': layerIGN(keys.ign, 'PROTECTEDAREAS.PN', 'png'),
+		'PNR': layerIGN(keys.ign, 'PROTECTEDAREAS.PNR', 'png'),
+		//403	'Avalanches':	layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
 		'Angleterre': layerOS(keys.bing),
-		'Bing': layerBing('Road', keys.bing),
-		'Bing photo': layerBing('Aerial', keys.bing),
-		'Bing mixte': layerBing('AerialWithLabels', keys.bing),
+		'Bing': layerBing(keys.bing, 'Road'),
+		'Bing photo': layerBing(keys.bing, 'Aerial'),
+		'Bing mixte': layerBing(keys.bing, 'AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google photo': layerGoogle('s'),

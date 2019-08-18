@@ -21,7 +21,7 @@ function geoControls(options) {
 					'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 				),
 				'IGN': layerIGN(options.geoKeys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-				'Cadastre': layerIGN(options.geoKeys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png')
+				'Cadastre': layerIGN(options.geoKeys.IGN, 'CADASTRALPARCELS.PARCELS', 'png')
 			}
 		}),
 		new ol.control.ScaleLine(),

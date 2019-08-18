@@ -130,7 +130,9 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
-Relever la couche IGN sur /gps
+hors connexion => hors réseau
+/gps Mettre le commentaire dans service_worker
+/gps Relever la couche IGN
 Méteo ne marche pas sur mobile (status 0 / vide)
 Possibilité d'agrandir la météo sur mobiles
 Créer les massifs manquants à chemineur

@@ -19,30 +19,25 @@ function geoControls(options) {
 				'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 				'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 			),
+			'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
 			'MRI': layerOSM(
 				'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 				'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 			),
 			'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-			'OSM contraste': layerThunderforest('mobile-atlas', keys.thunderforest),
+			'OSM contraste': layerThunderforest(keys.thunderforest, 'mobile-atlas'),
 			'Hike & Bike': layerOSM( // Not on https
 				'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
 				'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
 			),
-			/* //TODO quota expired
-			'OSM cycle': layerThunderforest('cycle', keys.thunderforest),
-			'OSM trains': layerThunderforest('pioneer', keys.thunderforest),
-			'OSM transport': layerThunderforest('transport', keys.thunderforest),
-			'OSM outdoors': layerThunderforest('outdoors', keys.thunderforest),
-			*/
 			'Autriche': layerKompass('KOMPASS Touristik'),
 			'Kompas': layerKompass('KOMPASS'),
-			'IGN': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-			'IGN TOP 25': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-			'IGN photos': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-			'IGN 1950': layerIGN(keys.IGN, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
-			'Cadastre': layerIGN(keys.IGN, 'CADASTRALPARCELS.PARCELS', 'image/png'),
-			'Etat major': layerIGN(keys.IGN, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
+			'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+			'IGN TOP 25': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+			'IGN photos': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+			'IGN 1950': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
+			'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
+			'Etat major': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 			'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 			'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 			'Espagne': layerSpain('mapa-raster', 'MTN'),
@@ -51,7 +46,7 @@ function geoControls(options) {
 			'Angleterre': layerOS(keys.bing),
 			'Google': layerGoogle('p'),
 			'Google photo': layerGoogle('s'),
-			'Bing photo': layerBing('Aerial', keys.bing),
+			'Bing photo': layerBing(keys.bing, 'Aerial'),
 		}
 	}, options));
 }

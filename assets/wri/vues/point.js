@@ -16,13 +16,13 @@ function layersCollection2() {
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
-		'outdoors': layerThunderforest('outdoors', '<?=$config_wri['thunderforest_key']?>'),
+		'outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
 		'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo Bing': layerBing('Aerial', '<?=$config_wri['bing_key']?>'),
+		'Photo Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
 		'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
 	};
 }
