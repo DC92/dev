@@ -5,7 +5,7 @@ Dominique92.MyOl
 
 SIMPLE EXAMPLE
 ==============
-This [EXAMPLE DEMO](https://dominique92.github.io/MyOl/) implements a single map with the most current maps layers providers.
+This [EXAMPLE DEMO](https://Dominique92.github.io/MyOl/) implements a single map with the most current maps layers providers.
 * You can download the [DISTRIBUTION ZIPPED PACKAGE](https://github.com/Dominique92/MyOl/archive/master.zip) and unzip it in your website FTP section.
 * You can include the css & js sections of this example on your own page (adjust the include files path to your implementation)
 
@@ -19,7 +19,7 @@ If you want to use external providers layers, you must acquire free keys and rep
 
 SUPPORTED FEATURES
 ==================
-[See a DEMO here](https://dominique92.github.io/MyOl/examples/)
+[See a DEMO here](https://Dominique92.github.io/MyOl/examples/)
 * GeoJson ajax layers,
 * Multi vendors maps :
 ```
@@ -42,7 +42,7 @@ SUPPORTED FEATURES
 
 OFF LINE SUPPORT
 ================
-* [See a DEMO here](https://dominique92.github.io/MyOl/gps/)
+* Open this url : [Dominique92.github.io/MyOl/gps](https://Dominique92.github.io/MyOl/gps/)
 * Browser -> options -> add to the home screen
 * Choose a map layer
 * Place yourself at the starting point of your hike
