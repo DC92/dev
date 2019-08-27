@@ -137,6 +137,7 @@
 	font-size: small;
 	background-color: white !important;
 	border-radius: 5px;
+	z-index: 200;
 }
 .switch-layer div {
 	padding: 2px;

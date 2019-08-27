@@ -28,7 +28,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'- Recommencez avec les couches de cartes que vous voulez mémoriser\n' +
 	'- Allez sur le terrain et cliquez sur l\'icône "MyGPS"\n' +
 	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ⇑\n' +
-	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
+	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur quelques jours\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée',

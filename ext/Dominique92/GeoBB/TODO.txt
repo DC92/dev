@@ -130,6 +130,8 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+Demander une modification => Demander une modification des informations de la fiche
+Hover logo phpbb => devrait rester fond coloré
 hors connexion => hors réseau
 /gps Mettre le commentaire dans service_worker
 /gps Relever la couche IGN
