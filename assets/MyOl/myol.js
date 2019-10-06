@@ -343,7 +343,7 @@ function controlPermanentCheckbox(selectorName, callback) {
 	for (let e = 0; e < checkElements.length; e++) {
 		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
 
-		//TODO BUG EDGE checke et remet à l'init aprés
+		//TODO BUG EDGE check, then retrieve init
 		if (cookie) // Set the checks accordingly with the cookie
 			checkElements[e].checked = cookie[1].split(',').indexOf(checkElements[e].value) !== -1;
 	}
@@ -389,7 +389,7 @@ function permanentCheckboxList(selectorName, evt) {
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
-//TODO-BEST JSON error handling : error + URL
+//TODO BEST JSON error handling : error + URL
 ol.layer.LayerVectorURL = function(o) {
 	const this_ = this, // For callback functions
 		options = this.options_ = ol.assign({ // Default options
@@ -609,9 +609,9 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires ol.layer.LayerVectorURL
  */
-//TODO-IE BUG pas d'overpass sur IE
-//TODO-BEST BUG quand déplace ou zoom après avoir changé un sélecteur : affiche des ?
-//TODO-BEST afficher erreur 429 (Too Many Requests)
+//TODO IE BUG no overpass on IE
+//TODO BEST BUG displays "?" when moves or zooms after changing a selector
+//TODO BEST display error 429 (Too Many Requests)
 //TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 layerOverpass = function(o) {
 	const options = ol.assign({ // Default options
@@ -766,7 +766,7 @@ layerOverpass = function(o) {
  * Requires proj4.js for swiss coordinates
  * Requires 'myol:onadd' layer event
  */
-//TODO-BEST pointer finger sur la cible (select ?)
+//TODO BEST finger cursor when hover the target (select ?)
 // map.getViewport().style.cursor = 'pointer'; / default
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	const format = new ol.format.GeoJSON();
@@ -967,7 +967,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Requires 'myol:onadd' layer event
  * Requires permanentCheckboxList
  */
-//TODO accepter couche null et ne pas la montrer / idem couches avec clés.
+//TODO accept null layer and not show it
 function controlLayersSwitcher(options) {
 	options = options || {};
 
@@ -1341,7 +1341,7 @@ function controlLengthLine() {
  * GPX file loader control
  * Requires ol.control.Button
  */
-//TODO BUG avoir un zoom maximum (1 point rend la carte invisible)
+//TODO BUG have a maximum zoom (1 point makes the map invisible)
 function controlLoadGPX(o) {
 	const options = ol.assign({
 			label: '&uArr;',
@@ -1406,12 +1406,12 @@ function controlLoadGPX(o) {
  * Requires ol.control.Button
  * Requires 'myol:onadd' layer event
  */
-//TODO BUG n'exporte pas les points
+//TODO BUG do not export points
 function controlDownloadGPX(o) {
 	const options = ol.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
-			fileName: 'trace', //TODO BEST donner un nom suivant le contexte
+			fileName: 'trace', //TODO BEST give a name according to the context
 			extraMetaData: '' // Additional tags to the GPX file header
 		}, o),
 		hiddenElement = document.createElement('a');
@@ -1522,8 +1522,8 @@ function controlPrint() {
 	});
 }
 
-//TODO ajouter l'échelle dans les cartes imprimées
-//TODO ARCHI mettre dans controlPrint
+//TODO add scale in printed maps
+//TODO ARCHI incluide in controlPrint
 function printMap(orientation, el, resolution) {
 	// Search control div element in the hierarchy
 	while (el.parentElement && !el.control_)
@@ -1565,8 +1565,8 @@ function printMap(orientation, el, resolution) {
 		});
 		*/
 
-		//TODO BUG Chrome met 3 pages en landscape
-		//TODO IE11 trés grosse marge
+		//TODO BUG Chrome puts 3 pages in landscape
+		//TODO IE11 very big margin
 		window.print();
 		document.cookie = 'map=' + mapCookie + ';path=/';
 		window.location.href = window.location.href;
@@ -1726,7 +1726,7 @@ function controlEdit(o) {
 		const map = evt.target.map_;
 
 		map.removeInteraction(hover);
-		//TODO BUG BEST ne delete pas le feature si on pointe un sommet
+		//TODO BUG BEST do not delete the feature if you point to a summit
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
@@ -1755,7 +1755,7 @@ function controlEdit(o) {
 	});
 
 	function cleanFeatures(pointerPosition) {
-		//TODO BEST option ne pas pouvoir couper un polygone
+		//TODO BEST option not to be able to cut a polygon
 		// Get flattened list of multipoints coords
 		let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 			polys = [];
