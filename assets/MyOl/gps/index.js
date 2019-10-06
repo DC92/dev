@@ -46,6 +46,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
+		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Refuges.info': layerOSM(
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',

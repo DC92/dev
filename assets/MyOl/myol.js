@@ -12,6 +12,16 @@
 /* jshint esversion: 6 */
 
 /**
+ * Inherit the prototype methods from one constructor into another.
+ * Horible hack inherited from OL v5, necessary for OL V6
+ */
+//TODO ARCHI : use standard class or single functions.
+ol.inherits = function(childCtor, parentCtor) {
+	childCtor.prototype = Object.create(parentCtor.prototype);
+	childCtor.prototype.constructor = childCtor;
+}
+
+/**
  * Appends objects. The last one has the priority
  */
 ol.assign = function() {
@@ -374,18 +384,6 @@ function permanentCheckboxList(selectorName, evt) {
 }
 
 /**
- * BBOX dependant strategy
- * Same that bbox but reloads if we zoom in because we delivered more points when zoom in
- * Returns {ol.loadingstrategy} to be used in layer definition
- */
-ol.loadingstrategy.bboxDependant = function(extent, resolution) {
-	if (this.resolution != resolution)
-		this.clear(); // Force loading when zoom in
-	this.resolution = resolution; // Mem resolution for further requests
-	return [extent];
-};
-
-/**
  * GeoJson POI layer
  * Requires 'myol:onadd' layer event
  * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
@@ -417,19 +415,8 @@ ol.layer.LayerVectorURL = function(o) {
 			);
 		};
 
-	// HACK to clear the layer when the xhr response is received
-	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
-	const format = new ol.format.GeoJSON();
-	format.readFeatures = function(s, o) {
-		if (source.featuresRtree_)
-			source.featuresRtree_.clear();
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
-	};
-
 	// Manage source & vector objects
 	const source = new ol.source.Vector(ol.assign({
-		strategy: ol.loadingstrategy.bboxDependant,
-		format: format,
 		url: function(extent, resolution, projection) {
 			const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 				// Retreive checked parameters
@@ -437,12 +424,20 @@ ol.layer.LayerVectorURL = function(o) {
 					return evt !== 'on'; // Remove the "all" input (default value = "on")
 				});
 			return options.baseUrlFunction(bbox, list, resolution);
-		}
+		},
+		strategy: function(extent, resolution) {
+			if (this.resolution > resolution)
+				this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+			this.resolution = resolution; // Mem resolution for further requests
+			return [extent];
+		},
+		format: new ol.format.GeoJSON()
 	}, options));
 
 	// Create the layer
 	ol.layer.Vector.call(this, ol.assign({
 		source: source,
+		renderBuffer: 16, // buffered area around curent view (px)
 		zIndex: 1 // Above the baselayer even if included to the map before
 	}, options));
 
@@ -459,6 +454,7 @@ ol.layer.LayerVectorURL = function(o) {
 		const map = this.map_;
 
 		// Create the label popup
+		//TODO BUG don't zoom when the cursor is over a label
 		if (!map.popElement_) { //HACK Only once for all layers
 			map.popElement_ = document.createElement('a');
 			map.popElement_.style.display = 'block';
@@ -616,6 +612,7 @@ ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
 //TODO-IE BUG pas d'overpass sur IE
 //TODO-BEST BUG quand déplace ou zoom après avoir changé un sélecteur : affiche des ?
 //TODO-BEST afficher erreur 429 (Too Many Requests)
+//TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 layerOverpass = function(o) {
 	const options = ol.assign({ // Default options
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -970,7 +967,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Requires 'myol:onadd' layer event
  * Requires permanentCheckboxList
  */
-//TODO accepter couche null et ne pas la montrer / pendant dans les couches avec clés.
+//TODO accepter couche null et ne pas la montrer / idem couches avec clés.
 function controlLayersSwitcher(options) {
 	options = options || {};
 
@@ -1126,6 +1123,7 @@ function controlPermalink(o) {
  * GPS control
  * Requires ol.control.Button
  */
+//TODO tap on map = distance from GPS calculation
 function controlGPS(options) {
 	options = options || {};
 
@@ -1277,6 +1275,7 @@ function controlGPS(options) {
 			]));
 
 			// Map orientation (Radians and reverse clockwize)
+			//TODO keep orientation when stop gps tracking
 			if (compas.absolute)
 				view.setRotation(compas.heading, 0); // Use magnetic compas value
 			/*//TODO Firefox use delta if speed > ??? km/h

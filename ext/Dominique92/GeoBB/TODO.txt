@@ -40,15 +40,6 @@ ARCHI
 //TODO-END http://jsbeautifier.org/ & http://jshint.com
 //TODO-END replace var by const / let
 
-//TODO BEST MYOL
-================
- OpenLS-Géoportail - Administratif
-Administratif
- OpenLS-Géoportail - Adresses
-StreetAddress
- OpenLS-Géoportail - Parcelles cadastrales
-CadastralParcel
-
 //TODO BEST CHEMINEUR
 =====================
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
