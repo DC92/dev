@@ -5,7 +5,8 @@
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
  * You only have to include openlayers/dist .js & .css files & my 2 & that's it !
- * Some few classes, no jquery, no es6 modules, no nodejs build nor minification, no npm repository, ... only one file of JS functions & CSS
+ * You can use any of these functions independantly
+ * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 
@@ -51,7 +52,7 @@ function layerOSM(url, attribution) {
 }
 
 /**
- * Kompas (austria)
+ * Kompas (Austria)
  * Requires layerOSM
  * Not available via https
  */
@@ -891,6 +892,7 @@ ol.control.Button = function(o) {
 
 	this.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
+		//HACK get control on Map init to modify it
 
 		if (!map.getTargetElement().map_) { //Only once
 			// Add ol.map object reference to the html #map element
@@ -906,17 +908,6 @@ ol.control.Button = function(o) {
 				target.map_ = map;
 				target.dispatchEvent('myol:onadd');
 			}
-
-			// Set preload of 4 upper level tiles if we are on full screen mode
-			// This prepare the browser to become offline on the same session
-			map.on('change:size', function() {
-				const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-
-				map.getLayers().forEach(function(layer) {
-					if (layer.type == 'TILE')
-						layer.setPreload(fs ? 4 : 0);
-				});
-			});
 		}
 	};
 
@@ -1285,6 +1276,33 @@ function controlGPS(options) {
 				options.callBack(gps.position);
 		}
 	}
+
+	return this_;
+}
+
+/**
+ * Control to displays set preload of 4 upper level tiles if we are on full screen mode
+ * This prepares the browser to become offline on the same session
+ * Requires 'myol:onadd' layer event
+ */
+function controlPreLoad() {
+	const divElement = document.createElement('div'),
+		this_ = new ol.control.Control({
+			element: divElement
+		});
+
+	this_.once('myol:onadd', function(evt) {
+		const map = evt.target.map_;
+
+			map.on('change:size', function() {
+				const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+
+				map.getLayers().forEach(function(layer) {
+					if (layer.type == 'TILE')
+						layer.setPreload(fs ? 4 : 0);
+				});
+			});
+	});
 
 	return this_;
 }
@@ -1912,6 +1930,7 @@ function controlsCollection(options) {
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
+		controlPreLoad(),
 		geocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
