@@ -416,23 +416,25 @@ ol.layer.LayerVectorURL = function(o) {
 		};
 
 	// Manage source & vector objects
-	const source = new ol.source.Vector(ol.assign({
-		url: function(extent, resolution, projection) {
-			const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
-				// Retreive checked parameters
-				list = permanentCheckboxList(options.selectorName).filter(function(evt) { // selectorName optional
-					return evt !== 'on'; // Remove the "all" input (default value = "on")
-				});
-			return options.baseUrlFunction(bbox, list, resolution);
-		},
-		strategy: function(extent, resolution) {
-			if (this.resolution > resolution)
-				this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-			this.resolution = resolution; // Mem resolution for further requests
-			return [extent];
-		},
-		format: new ol.format.GeoJSON()
-	}, options));
+	var loadedExtentsRtree = null, //TODO ARCHI ????? best ?
+		source = new ol.source.Vector(ol.assign({
+			url: function(extent, resolution, projection) {
+				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
+					// Retreive checked parameters
+					list = permanentCheckboxList(options.selectorName).filter(function(evt) { // selectorName optional
+						return evt !== 'on'; // Remove the "all" input (default value = "on")
+					});
+				return options.baseUrlFunction(bbox, list, resolution);
+			},
+			strategy: function(extent, resolution) {
+				loadedExtentsRtree = this.loadedExtentsRtree_;
+				if (this.resolution > resolution)
+					this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+				this.resolution = resolution; // Mem resolution for further requests
+				return [extent];
+			},
+			format: new ol.format.GeoJSON()
+		}, options));
 
 	// Create the layer
 	ol.layer.Vector.call(this, ol.assign({
@@ -442,13 +444,17 @@ ol.layer.LayerVectorURL = function(o) {
 	}, options));
 
 	// Optional : checkboxes to tune layer parameters
-	if (options.selectorName) { // Optional
-		controlPermanentCheckbox(options.selectorName, function(evt, list) {
-			this_.setVisible(list.length);
-			if (list.length)
-				source.clear(); // Redraw the layer
-		});
-	}
+	if (options.selectorName)
+		controlPermanentCheckbox(
+			options.selectorName,
+			function(evt, list) {
+				this_.setVisible(list.length);
+				if (list.length && loadedExtentsRtree) {
+					loadedExtentsRtree.clear(); // Redraw the layer
+					source.clear(); // Redraw the layer //TODO BEST avoid clear the icons now
+				}
+			}
+		);
 
 	this.on('myol:onadd', function() {
 		const map = this.map_;
@@ -567,13 +573,33 @@ ol.layer.LayerVectorURL = function(o) {
 ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
 
 /**
- * Feature format for reading data in the OSMXML format
- * Convert areas into points to display it as an icon
+ * OSM overpass POI layer
+ * From: https://openlayers.org/en/latest/examples/vector-osm.html
+ * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
+ * Requires ol.layer.LayerVectorURL
  */
-ol.format.OSMXMLPOI = function() {
-	ol.format.OSMXML.call(this);
+//TODO BUG : reload layer when clik on feature
+//TODO IE BUG no overpass on IE
+//TODO BEST BUG displays "?" when moves or zooms after changing a selector
+//TODO BEST display error 429 (Too Many Requests)
+//TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
-	this.readFeatures = function(source, options) {
+layerOverpass = function(o) {
+	const options = ol.assign({ // Default options
+			baseUrl: '//overpass-api.de/api/interpreter',
+			maxResolution: 30, // Only call overpass if the map's resolution is lower
+			selectorId: 'overpass', // Element containing all checkboxes
+			selectorName: 'overpass', // Checkboxes
+			labelClass: 'label-overpass',
+			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/'
+		}, o),
+		checkElements = document.getElementsByName(options.selectorName),
+		elSelector = document.getElementById(options.selectorId);
+	elSelector.className = 'overpass'; // At the biginning
+
+	// Convert areas into points to display it as an icon
+	let osmXmlPoi = new ol.format.OSMXML();
+	osmXmlPoi.readFeatures = function(source, options) {
 		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
@@ -600,31 +626,6 @@ ol.format.OSMXMLPOI = function() {
 			}
 		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options);
 	};
-};
-ol.inherits(ol.format.OSMXMLPOI, ol.format.OSMXML);
-
-/**
- * OSM overpass POI layer
- * From: https://openlayers.org/en/latest/examples/vector-osm.html
- * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
- * Requires ol.layer.LayerVectorURL
- */
-//TODO IE BUG no overpass on IE
-//TODO BEST BUG displays "?" when moves or zooms after changing a selector
-//TODO BEST display error 429 (Too Many Requests)
-//TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
-layerOverpass = function(o) {
-	const options = ol.assign({ // Default options
-			baseUrl: '//overpass-api.de/api/interpreter',
-			maxResolution: 30, // Only call overpass if the map's resolution is lower
-			selectorId: 'overpass', // Element containing all checkboxes
-			selectorName: 'overpass', // Checboxes
-			labelClass: 'label-overpass',
-			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/'
-		}, o),
-		checkElements = document.getElementsByName(options.selectorName),
-		elSelector = document.getElementById(options.selectorId);
-	elSelector.className = 'overpass'; // At the biginning
 
 	function overpassType(properties) {
 		for (let e = 0; e < checkElements.length; e++)
@@ -641,7 +642,7 @@ layerOverpass = function(o) {
 	}
 
 	return new ol.layer.LayerVectorURL(ol.assign({
-		format: new ol.format.OSMXMLPOI(),
+		format: osmXmlPoi,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({

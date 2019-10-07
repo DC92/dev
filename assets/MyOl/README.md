@@ -71,7 +71,7 @@ The coding rules are volontary simple & don't follow all openlayers's
 DEPENDENCIES
 ============
 This package includes :
-* openlayers v5.3.0
+* openlayers v6.0.1
 * proj4js 2.5.0
 * ol-geocoder v3.3.0
 

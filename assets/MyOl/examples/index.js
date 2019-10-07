@@ -1,4 +1,5 @@
 console.log(document.cookie);
+//TODO display OL version
 
 /**
  * www.refuges.info POI layer
