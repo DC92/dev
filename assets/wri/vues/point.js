@@ -31,7 +31,7 @@ function layersCollection2() {
 
 
 // Crée la carte
-var map = new ol.MyMap({
+var map = new ol.Map({
 	target: 'carte-point',
 				view: new ol.View({
 					center: ol.proj.fromLonLat([<?=$vue->point->longitude?>,<?=$vue->point->latitude?>]),

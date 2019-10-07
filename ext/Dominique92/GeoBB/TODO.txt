@@ -1,3 +1,7 @@
+Migration MyOl
+==============
+Mymap -> Map
+
 BUGS CHEMINEUR soldes par chem4
 ===============================
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.

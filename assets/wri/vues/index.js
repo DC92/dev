@@ -11,7 +11,7 @@ Supprimer /vues/include/...
 ?>
 
 // Crée la carte
-var map = new ol.MyMap({
+var map = new ol.Map({
 	target: 'carte-accueil',
 	controls: [new ol.control.Attribution({
 		collapsible: false // Attribution always open

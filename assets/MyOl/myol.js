@@ -33,44 +33,6 @@ ol.assign = function() {
 };
 
 /**
- * Add common functions to the Map object
- */
-ol.MyMap = function(options) {
-	ol.Map.call(this, options);
-	const map = this;
-
-	// Add ol.map object reference to the html #map element
-	this.getTargetElement().map_ = map;
-
-	this.on('postrender', function() { // Each time we can
-		map.getLayers().forEach(setMap);
-		map.getControls().forEach(setMap);
-	});
-
-	function setMap(target) {
-		if (!target.fired_) { // Only once
-			target.fired_ = true;
-			// Store the map on it & advise it
-			target.map_ = map;
-			target.dispatchEvent('myol:onadd');
-		}
-	}
-
-	// Set preload of 4 upper level tiles if we are on full screen mode
-	// This prepare the browser to become offline on the same session
-	this.on('change:size', function() {
-		const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-
-		this.getLayers().forEach(function(layer) {
-			if (layer.type == 'TILE')
-				layer.setPreload(fs ? 4 : 0);
-		});
-	});
-};
-ol.inherits(ol.MyMap, ol.Map);
-
-
-/**
  * TILE LAYERS
  */
 /**
@@ -201,7 +163,7 @@ ol.layer.LayerTileIncomplete = function(o) {
 			layer: 'terrain'
 		});
 
-	this.on('myol:onadd', function(evt) {
+	this.once('myol:onadd', function(evt) {
 		evt.target.map_.getView().on('change', change);
 		change(); // At init
 	});
@@ -386,7 +348,7 @@ function permanentCheckboxList(selectorName, evt) {
 /**
  * GeoJson POI layer
  * Requires 'myol:onadd' layer event
- * Requires ol.loadingstrategy.bboxDependant & controlPermanentCheckbox
+ * Requires controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
 //TODO BEST JSON error handling : error + URL
@@ -431,6 +393,7 @@ ol.layer.LayerVectorURL = function(o) {
 				if (this.resolution > resolution)
 					this.loadedExtentsRtree_.clear(); // Force loading when zoom in
 				this.resolution = resolution; // Mem resolution for further requests
+
 				return [extent];
 			},
 			format: new ol.format.GeoJSON()
@@ -456,7 +419,7 @@ ol.layer.LayerVectorURL = function(o) {
 			}
 		);
 
-	this.on('myol:onadd', function() {
+	this.once('myol:onadd', function() {
 		const map = this.map_;
 
 		// Create the label popup
@@ -805,7 +768,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			zIndex: 10
 		});
 
-	this_.on('myol:onadd', function(evt) {
+	this_.once('myol:onadd', function(evt) {
 		if (dragged) {
 			// Drag and drop
 			evt.target.map_.addInteraction(new ol.interaction.Modify({
@@ -926,7 +889,38 @@ ol.control.Button = function(o) {
 	divElement.title = options.title; // {string} displayed when the control is hovered.
 	divElement.control_ = this; // For callback functions
 
-	this.on('myol:onadd', function() {
+	this.setMap = function(map) {
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		if (!map.getTargetElement().map_) { //Only once
+			// Add ol.map object reference to the html #map element
+			map.getTargetElement().map_ = map;
+
+			map.on('postrender', function() { // Each time we can
+				map.getLayers().forEach(setMap);
+				map.getControls().forEach(setMap);
+			});
+
+			function setMap(target) {
+				// Store the map on it & advise it
+				target.map_ = map;
+				target.dispatchEvent('myol:onadd');
+			}
+
+			// Set preload of 4 upper level tiles if we are on full screen mode
+			// This prepare the browser to become offline on the same session
+			map.on('change:size', function() {
+				const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+
+				map.getLayers().forEach(function(layer) {
+					if (layer.type == 'TILE')
+						layer.setPreload(fs ? 4 : 0);
+				});
+			});
+		}
+	};
+
+	this.once('myol:onadd', function() {
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -993,7 +987,7 @@ function controlLayersSwitcher(options) {
 	selectorElement.title = 'Ctrl+click : multicouches';
 	this_.element.appendChild(selectorElement);
 
-	this_.on('myol:onadd', function(evt) {
+	this_.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		// Base layers selector init
@@ -1194,7 +1188,7 @@ function controlGPS(options) {
 		})
 	}));
 
-	this_.on('myol:onadd', function() {
+	this_.once('myol:onadd', function() {
 		map = this_.getMap();
 		view = map.getView();
 
@@ -1305,7 +1299,7 @@ function controlLengthLine() {
 			element: divElement
 		});
 
-	this_.on('myol:onadd', function(evt) {
+	this_.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		divElement.className = 'ol-length-line';
@@ -1524,7 +1518,7 @@ function controlPrint() {
 }
 
 //TODO add scale in printed maps
-//TODO ARCHI incluide in controlPrint
+//TODO ARCHI include in controlPrint
 function printMap(orientation, el, resolution) {
 	// Search control div element in the hierarchy
 	while (el.parentElement && !el.control_)
@@ -1654,7 +1648,7 @@ function controlEdit(o) {
 			style: options.editStyle
 		});
 
-	this_.on('myol:onadd', function(evt) {
+	this_.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		map.addLayer(layer);

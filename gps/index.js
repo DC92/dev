@@ -57,7 +57,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 
 // Load the map when the map DIV is intialised
 window.onload = function() {
-	new ol.MyMap({
+	new ol.Map({
 		target: 'map',
 		controls: [
 			controlLayersSwitcher({

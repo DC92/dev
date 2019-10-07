@@ -19,7 +19,7 @@ If you want to use external providers layers, you must acquire free keys and rep
 
 SUPPORTED FEATURES
 ==================
-[See a DEMO here](https://Dominique92.github.io/MyOl/examples/)
+[See a complete DEMO here](https://Dominique92.github.io/MyOl/examples/)
 * GeoJson ajax layers,
 * Multi vendors maps :
 ```
