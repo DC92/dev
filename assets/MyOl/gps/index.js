@@ -97,7 +97,7 @@ window.onload = function() {
 			geocoder(),
 			controlGPS(),
 			controlLoadGPX(),
-			new ol.control.Button({
+			controlButton({
 				label: '?',
 				title: help,
 				activate: function(active) {

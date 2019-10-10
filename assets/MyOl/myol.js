@@ -13,16 +13,6 @@
 /* jshint esversion: 6 */
 
 /**
- * Inherit the prototype methods from one constructor into another.
- * Horible hack inherited from OL v5, necessary for OL V6
- */
-//TODO ARCHI : use standard class or single functions.
-ol.inherits = function(childCtor, parentCtor) {
-	childCtor.prototype = Object.create(parentCtor.prototype);
-	childCtor.prototype.constructor = childCtor;
-}
-
-/**
  * Appends objects. The last one has the priority
  */
 ol.assign = function() {
@@ -882,19 +872,19 @@ function JSONparse(json) {
  */
 let nextButtonPos = 2.5; // Top position of next button (em)
 
-ol.control.Button = function(o) {
-	const this_ = this, // For callback functions
-		options = this.options_ = ol.assign({
+ function controlButton(o) {
+	const	options = ol.assign({
 			className: '', // {string} className of the button.
 			activeBackgroundColor: 'white',
-			group: this // Main control of a group of controls
 		}, o),
 		buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
 
-	ol.control.Control.call(this, ol.assign({
+	const this_ = new ol.control.Control(ol.assign({
 		element: divElement
 	}, options));
+		this_.options = options;//TODO ARCHI
+		this_.options.group = this_; // Main control of a group of controls //TODO ARCHI
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
@@ -905,10 +895,10 @@ ol.control.Button = function(o) {
 	divElement.appendChild(buttonElement);
 	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
 	divElement.title = options.title; // {string} displayed when the control is hovered.
-	divElement.control_ = this; // For callback functions
+	divElement.control_ = this_; // For callback functions
 
-	this.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
+	this_.setMap = function(map) {
+		ol.control.Control.prototype.setMap.call(this_, map);
 		//HACK get control on Map init to modify it
 
 		if (!map.getTargetElement().map_) { //Only once
@@ -928,7 +918,7 @@ ol.control.Button = function(o) {
 		}
 	};
 
-	this.once('myol:onadd', function() { //TODO archi -> Put on setMap
+	this_.once('myol:onadd', function() { //TODO archi -> Put on setMap
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -940,8 +930,8 @@ ol.control.Button = function(o) {
 
 	// Toggle the button status & aspect
 	// In case of group buttons, set inactive the other one
-	this.active = false;
-	this.toggle = function(newActive) {
+	this_.active = false;
+	this_.toggle = function(newActive) {
 		this_.map_.getControls().forEach(function(control) {
 			if (control.options_ &&
 				control.options_.group == options.group) { // For all controls in the same group
@@ -960,20 +950,20 @@ ol.control.Button = function(o) {
 			}
 		});
 	};
-};
-ol.inherits(ol.control.Button, ol.control.Control);
+	return this_;
+}
 
 /**
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
- * Requires ol.control.Button & controlPermanentCheckbox
+ * Requires controlButton & controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
 //TODO accept null layer and not show it
 function controlLayersSwitcher(options) {
 	options = options || {};
 
-	const this_ = new ol.control.Button({
+	const this_ = controlButton({
 		label: '&hellip;',
 		className: 'switch-layer',
 		title: 'Liste des cartes',
@@ -1122,7 +1112,7 @@ function controlPermalink(o) {
 
 /**
  * GPS control
- * Requires ol.control.Button
+ * Requires controlButton
  */
 //TODO tap on map = distance from GPS calculation
 function controlGPS(options) {
@@ -1159,7 +1149,7 @@ function controlGPS(options) {
 		}),
 
 		// The control button
-		this_ = new ol.control.Button({
+		this_ = controlButton({
 			className: 'gps-button',
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
@@ -1298,7 +1288,7 @@ function controlGPS(options) {
 /**
  * Control to displays set preload of 4 upper level tiles if we are on full screen mode
  * This prepares the browser to become offline on the same session
- * Requires ol.control.Button
+ * Requires controlButton
  */
 function controlPreLoad() {
 	const divElement = document.createElement('div'),
@@ -1324,7 +1314,7 @@ function controlPreLoad() {
 
 /**
  * Control to displays the length of a line overflown
- * Requires ol.control.Button
+ * Requires controlButton
  */
 function controlLengthLine() {
 	const divElement = document.createElement('div'),
@@ -1367,7 +1357,7 @@ function controlLengthLine() {
 
 /**
  * GPX file loader control
- * Requires ol.control.Button
+ * Requires controlButton
  */
 //TODO BUG have a maximum zoom (1 point makes the map invisible)
 function controlLoadGPX(o) {
@@ -1387,7 +1377,7 @@ function controlLoadGPX(o) {
 		inputElement = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
-		this_ = new ol.control.Button(options);
+		this_ = controlButton(options);
 
 	inputElement.type = 'file';
 	inputElement.addEventListener('change', function() {
@@ -1431,7 +1421,7 @@ function controlLoadGPX(o) {
 
 /**
  * GPX file downloader control
- * Requires ol.control.Button
+ * Requires controlButton
  */
 //TODO BUG do not export points
 function controlDownloadGPX(o) {
@@ -1502,7 +1492,7 @@ function controlDownloadGPX(o) {
 			}));
 	};
 
-	return new ol.control.Button(options);
+	return controlButton(options);
 }
 
 /**
@@ -1535,7 +1525,7 @@ function geocoder() {
  * Print control
  */
 function controlPrint() {
-	return new ol.control.Button({
+	return controlButton({
 		className: 'print-button',
 		activate: printMap,
 		question: '<p>Paysage : ' +
@@ -1615,7 +1605,7 @@ function printMap(orientation, el, resolution) {
 
 /**
  * Line & Polygons Editor
- * Requires ol.control.Button
+ * Requires controlButton
  */
 function controlEdit(o) {
 	const options = ol.assign({
@@ -1638,7 +1628,7 @@ function controlEdit(o) {
 			source: source,
 			zIndex: 20
 		}),
-		this_ = new ol.control.Button(ol.assign({
+		this_ = controlButton(ol.assign({
 			label: 'M',
 			title: 'Activer "M" (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
@@ -1705,7 +1695,7 @@ function controlEdit(o) {
 				this_.modified = true; // Optimize the source
 			});
 
-			map.addControl(new ol.control.Button(ol.assign({
+			map.addControl(controlButton(ol.assign({
 				group: this_,
 				label: drawOption.type.charAt(0),
 				title: 'Activer "' + drawOption.type.charAt(0) + '" puis\n' +
