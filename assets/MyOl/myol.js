@@ -368,9 +368,8 @@ function permanentCheckboxList(selectorName, evt) {
  */
 //TODO BEST JSON error handling : error + URL
 //TODO BUG clean when receive request
-ol.layer.LayerVectorURL = function(o) {
-	const this_ = this, // For callback functions
-		options = this.options_ = ol.assign({ // Default options
+layerVectorURL = function(o) {
+	const options =  ol.assign({ // Default options
 			baseUrlFunction: function(bbox, list, resolution) {
 				return options.baseUrl + // baseUrl is mandatory, no default
 					list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
@@ -420,11 +419,12 @@ ol.layer.LayerVectorURL = function(o) {
 		}, options));
 
 	// Create the layer
-	ol.layer.Vector.call(this, ol.assign({
+	const this_ = new	ol.layer.Vector( ol.assign({
 		source: source,
 		renderBuffer: 16, // buffered area around curent view (px)
 		zIndex: 1 // Above the baselayer even if included to the map before
 	}, options));
+	this_.options_ =  options;
 
 	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -439,8 +439,8 @@ ol.layer.LayerVectorURL = function(o) {
 			}
 		);
 
-	this.once('myol:onadd', function() {
-		const map = this.map_;
+	this_.once('myol:onadd', function() {
+		const map = this_.map_;
 
 		// Create the label popup
 		//TODO BUG don't zoom when the cursor is over a label
@@ -552,14 +552,14 @@ ol.layer.LayerVectorURL = function(o) {
 			}
 		);
 	}
-};
-ol.inherits(ol.layer.LayerVectorURL, ol.layer.Vector);
+	return this_;
+}
 
 /**
  * OSM overpass POI layer
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
- * Requires ol.layer.LayerVectorURL
+ * Requires LayerVectorURL
  */
 //TODO BUG : reload layer when clik on feature
 //TODO IE BUG no overpass on IE
@@ -624,7 +624,7 @@ layerOverpass = function(o) {
 		return 'inconnu';
 	}
 
-	return new ol.layer.LayerVectorURL(ol.assign({
+	return layerVectorURL(ol.assign({
 		format: osmXmlPoi,
 		styleOptions: function(properties) {
 			return {

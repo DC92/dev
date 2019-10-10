@@ -6,7 +6,7 @@ console.log(document.cookie);
  * Requires ol.layer.LayerVectorURL
  */
 function layerPointsWri(options) {
-	return new ol.layer.LayerVectorURL(ol.assign({
+	return layerVectorURL(ol.assign({
 		baseUrl: '//www.refuges.info/api/bbox?type_points=',
 		styleOptions: function(properties) {
 			return {
@@ -29,7 +29,7 @@ function layerPointsWri(options) {
  * Requires ol.layer.LayerVectorURL
  */
 function layerMassifsWri() {
-	return new ol.layer.LayerVectorURL({
+	return layerVectorURL({
 		baseUrl: '//www.refuges.info/api/polygones?type_polygon=1',
 		selectorName: 'wri-massifs',
 		styleOptions: function(properties) {
@@ -68,7 +68,7 @@ function layerMassifsWri() {
  * Requires ol.layer.LayerVectorURL
  */
 function chemineurLayer() {
-	return new ol.layer.LayerVectorURL({
+	return layerVectorURL({
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		selectorName: 'chemineur',
 		styleOptions: function(properties) {

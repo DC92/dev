@@ -23,7 +23,7 @@ var map = new ol.Map({
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 		),
 		// La couche "massifs"
-		new ol.layer.LayerVectorURL({
+		layerVectorURL({
 			baseUrl: '/api/polygones?type_polygon=1',
 			styleOptions: function(properties) {
 				// Translates the color in RGBA to be transparent

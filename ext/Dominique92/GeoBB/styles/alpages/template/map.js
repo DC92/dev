@@ -110,7 +110,7 @@ function geoOverlays(o) {
 		hoverTransparency: [0, 1]
 	}, o);
 
-	return [new ol.layer.LayerVectorURL({
+	return [layerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=500&exclude=' + options.topidIdExclude + '&forums=',
 		selectorName: 'couches-alpages',
 		styleOptions: function(properties) {
