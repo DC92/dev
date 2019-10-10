@@ -143,8 +143,8 @@ function layerSpain(serveur, layer) {
  * Requires 'myol:onadd' event
  */
 layerTileIncomplete = function(o) {
-	const this_ = new ol.layer.Tile(), // For callback functions
-		options = this_.options_ = ol.assign({ // Default options
+	const layer = new ol.layer.Tile(), // For callback functions
+		options = layer.options_ = ol.assign({ // Default options
 			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
 			sources: {}
 		}, o),
@@ -152,30 +152,31 @@ layerTileIncomplete = function(o) {
 			layer: 'terrain'
 		});
 
-	this_.once('myol:onadd', function(evt) {
+	layer.once('myol:onadd', function(evt) {
 		evt.target.map_.getView().on('change', change);
 		change(); // At init
 	});
 
 	// Zoom has changed
 	function change() {
-		const view = this_.map_.getView(),
+		const view = layer.map_.getView(),
 			center = view.getCenter();
 		let currentResolution = 999999; // Init loop at max resolution
 		options.sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
-			ol.extent.intersects(options.extent, view.calculateExtent(this_.map_.getSize())))
+			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
 			currentResolution = Object.keys(options.sources).filter(function(evt) { // HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
 
 		// Update layer if necessary
-		if (this_.getSource() != options.sources[currentResolution])
-			this_.setSource(options.sources[currentResolution]);
+		if (layer.getSource() != options.sources[currentResolution])
+			layer.setSource(options.sources[currentResolution]);
 	}
-	return this_;
+
+	return layer;
 };
 
 /**
@@ -404,19 +405,19 @@ layerVectorURL = function(o) {
 		}, options));
 
 	// Create the layer
-	const this_ = new ol.layer.Vector(ol.assign({
+	const layer = new ol.layer.Vector(ol.assign({
 		source: source,
 		renderBuffer: 16, // buffered area around curent view (px)
 		zIndex: 1 // Above the baselayer even if included to the map before
 	}, options));
-	this_.options_ = options;
+	layer.options_ = options;
 
 	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName)
 		controlPermanentCheckbox(
 			options.selectorName,
 			function(evt, list) {
-				this_.setVisible(list.length);
+				layer.setVisible(list.length);
 				if (list.length && loadedExtentsRtree) {
 					loadedExtentsRtree.clear(); // Redraw the layer
 					source.clear(); // Redraw the layer
@@ -424,8 +425,8 @@ layerVectorURL = function(o) {
 			}
 		);
 
-	this_.once('myol:onadd', function() {
-		const map = this_.map_;
+	layer.once('myol:onadd', function() {
+		const map = layer.map_;
 
 		// Create the label popup
 		//TODO BUG don't zoom when the cursor is over a label
@@ -456,10 +457,10 @@ layerVectorURL = function(o) {
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6,
-			filter: function(feature, layer) {
-				return layer == this_;
+			filter: function(feature, l) {
+				return l == layer;
 			},
-			style: this_.options_.hoverStyle || this_.options_.style
+			style: layer.options_.hoverStyle || layer.options_.style
 		}));
 
 		// Hide popup when the cursor is out of the map
@@ -487,12 +488,12 @@ layerVectorURL = function(o) {
 
 		map.forEachFeatureAtPixel(
 			pixel,
-			function(feature, layer) {
+			function(feature, l) {
 				let geometry = feature.getGeometry();
 				if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
 					geometry = geometry.getGeometries()[0];
 
-				if (layer && layer.options_) {
+				if (l && l.options_) {
 					const properties = feature.getProperties(),
 						coordinates = geometry.flatCoordinates, // If it's a point, just over it
 						ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
@@ -537,7 +538,8 @@ layerVectorURL = function(o) {
 			}
 		);
 	}
-	return this_;
+
+	return layer;
 }
 
 /**
@@ -767,13 +769,13 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		source = new ol.source.Vector({
 			features: [feature]
 		}),
-		this_ = new ol.layer.Vector({
+		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
 			zIndex: 10
 		});
 
-	this_.once('myol:onadd', function(evt) {
+	layer.once('myol:onadd', function(evt) {
 		if (dragged) {
 			// Drag and drop
 			evt.target.map_.addInteraction(new ol.interaction.Modify({
@@ -829,18 +831,18 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	displayLL(ol.proj.fromLonLat(llInit));
 
 	// <input> coords edition
-	this_.edit = function(evt, nol, projection) {
+	layer.edit = function(evt, nol, projection) {
 		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
 		coord[nol] = parseFloat(evt.value); // On change la valeur qui a été modifiée
 		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
-		this_.map_.getView().setCenter(point.getCoordinates());
+		layer.map_.getView().setCenter(point.getCoordinates());
 	};
 
-	this_.getPoint = function() {
+	layer.getPoint = function() {
 		return point;
 	};
 
-	return this_;
+	return layer;
 }
 
 /**
@@ -877,25 +879,25 @@ function controlButton(o) {
 		buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
 
-	const this_ = new ol.control.Control(ol.assign({
+	const control = new ol.control.Control(ol.assign({
 		element: divElement
 	}, options));
-	this_.options = options; //TODO ARCHI
-	this_.options.group = this_; // Main control of a group of controls //TODO ARCHI
+	control.options = options; //TODO ARCHI
+	control.options.group = control; // Main control of a group of controls //TODO ARCHI
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
 		evt.preventDefault();
-		this_.toggle();
+		control.toggle();
 	});
 
 	divElement.appendChild(buttonElement);
 	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
 	divElement.title = options.title; // {string} displayed when the control is hovered.
-	divElement.control_ = this_; // For callback functions
+	divElement.control_ = control; // For callback functions
 
-	this_.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this_, map);
+	control.setMap = function(map) {
+		ol.control.Control.prototype.setMap.call(control, map);
 		//HACK get control on Map init to modify it
 
 		if (!map.getTargetElement().map_) { //Only once
@@ -915,7 +917,7 @@ function controlButton(o) {
 		}
 	};
 
-	this_.once('myol:onadd', function() { //TODO archi -> Put on setMap
+	control.once('myol:onadd', function() { //TODO archi -> Put on setMap
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -927,27 +929,29 @@ function controlButton(o) {
 
 	// Toggle the button status & aspect
 	// In case of group buttons, set inactive the other one
-	this_.active = false;
-	this_.toggle = function(newActive) {
-		this_.map_.getControls().forEach(function(control) {
-			if (control.options_ &&
-				control.options_.group == options.group) { // For all controls in the same group
+	control.active = false;
+	control.toggle = function(newActive) {
+		control.map_.getControls().forEach(function(c) {
+			if (c.options_ &&
+				c.options_.group == options.group) { // For all controls in the same group
+				//TODO BUG plus de passage en active dans le même groupe
 				const setActive =
-					control != this_ ? false :
+					c != control ? false :
 					typeof newActive != 'undefined' ? newActive :
-					!control.active;
+					!c.active;
 
-				if (setActive != control.active) {
-					control.active = setActive;
-					control.element.firstChild.style.backgroundColor = control.active ? control.options_.activeBackgroundColor : 'white';
+				if (setActive != c.active) {
+					c.active = setActive;
+					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeBackgroundColor : 'white';
 
-					if (typeof control.options_.activate == 'function')
-						control.options_.activate(control.active, buttonElement);
+					if (typeof c.options_.activate == 'function')
+						c.options_.activate(c.active, buttonElement);
 				}
 			}
 		});
 	};
-	return this_;
+
+	return control;
 }
 
 /**
@@ -960,7 +964,7 @@ function controlButton(o) {
 function controlLayersSwitcher(options) {
 	options = options || {};
 
-	const this_ = controlButton({
+	const this_ = controlButton({ //TODO ARCHI replace this_
 		label: '&hellip;',
 		className: 'switch-layer',
 		title: 'Liste des cartes',
