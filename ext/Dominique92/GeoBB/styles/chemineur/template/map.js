@@ -107,7 +107,7 @@ function geoOverlays(o) {
 
 	return [
 		// chemineur.fr
-		new ol.layer.LayerVectorURL({
+		layerVectorURL({
 			baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300&forums=',
 			selectorName: 'chem-cat',
 			styleOptions: function(properties) {
@@ -126,7 +126,7 @@ function geoOverlays(o) {
 
 		// refuges.info
 		//TODO label avec create point
-		new ol.layer.LayerVectorURL({
+		layerVectorURL({
 			baseUrl: '//www.refuges.info/api/bbox?type_points=',
 			selectorName: 'wri-poi',
 			styleOptions: function(properties) {
@@ -145,7 +145,7 @@ function geoOverlays(o) {
 		}),
 		/*
 				// camptocamp.org
-				new ol.layer.LayerVectorURL({
+				layerVectorURL({
 					baseUrl: 'assets/proxy/?url=https://api.camptocamp.org/waypoints?pl=fr',
 					selectorName: 'c2c-poi',
 					styleOptions: function(properties) {
@@ -164,7 +164,7 @@ function geoOverlays(o) {
 				}),
 
 				// pyrenees-refuges.com
-				new ol.layer.LayerVectorURL({
+				layerVectorURL({
 					baseUrl: 'assets/miniProxy/miniProxy.php?http://www.pyrenees-refuges.com/lib/refuges.js',
 					selectorName: 'prc-poi',
 					styleOptions: function(properties) {
@@ -184,7 +184,7 @@ function geoOverlays(o) {
 		*/
 		// alpages.info
 		//TODO filtrer cabanes accessibles + points d'eau ? potables ?
-		new ol.layer.LayerVectorURL({
+		layerVectorURL({
 			baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=200',
 			selectorName: 'alpi',
 			styleOptions: function(properties) {

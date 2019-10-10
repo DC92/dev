@@ -152,11 +152,9 @@ function layerSpain(serveur, layer) {
  * Displays blank outside of validity area
  * Requires 'myol:onadd' event
  */
-ol.layer.LayerTileIncomplete = function(o) {
-	ol.layer.Tile.call(this);
-
-	const this_ = this, // For callback functions
-		options = this.options_ = ol.assign({ // Default options
+layerTileIncomplete = function(o) {
+	const this_ = new ol.layer.Tile(), // For callback functions
+		options = this_.options_ = ol.assign({ // Default options
 			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
 			sources: {}
 		}, o),
@@ -164,7 +162,7 @@ ol.layer.LayerTileIncomplete = function(o) {
 			layer: 'terrain'
 		});
 
-	this.once('myol:onadd', function(evt) {
+	this_.once('myol:onadd', function(evt) {
 		evt.target.map_.getView().on('change', change);
 		change(); // At init
 	});
@@ -187,13 +185,13 @@ ol.layer.LayerTileIncomplete = function(o) {
 		if (this_.getSource() != options.sources[currentResolution])
 			this_.setSource(options.sources[currentResolution]);
 	}
+	return this_;
 };
-ol.inherits(ol.layer.LayerTileIncomplete, ol.layer.Tile);
 
 /**
  * Swisstopo https://api.geo.admin.ch/
  * Register your domain: https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
- * Requires ol.layer.LayerTileIncomplete
+ * Requires layerTileIncomplete
  */
 function layerSwissTopo(layer) {
 	let projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
@@ -209,7 +207,7 @@ function layerSwissTopo(layer) {
 		matrixIds: matrixIds
 	});
 
-	return new ol.layer.LayerTileIncomplete({
+	return layerTileIncomplete({
 		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781
 		sources: {
 			500: new ol.source.WMTS(({
@@ -225,7 +223,7 @@ function layerSwissTopo(layer) {
 
 /**
  * Italy IGM
- * Requires ol.layer.LayerTileIncomplete
+ * Requires layerTileIncomplete
  */
 function layerIGM() {
 	function igmSource(url, layer) {
@@ -238,7 +236,7 @@ function layerIGM() {
 		});
 	}
 
-	return new ol.layer.LayerTileIncomplete({
+	return layerTileIncomplete({
 		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
 		sources: {
 			100: igmSource('IGM_250000', 'CB.IGM250000'),
@@ -250,11 +248,11 @@ function layerIGM() {
 
 /**
  * Ordnance Survey : Great Britain
- * Requires ol.layer.LayerTileIncomplete
+ * Requires layerTileIncomplete
  * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerOS(key) {
-	const layer = new ol.layer.LayerTileIncomplete({
+	const layer = layerTileIncomplete({
 		extent: [-841575, 6439351, 198148, 8589177] // EPSG:27700 (G.B.)
 	});
 
@@ -559,7 +557,7 @@ layerVectorURL = function(o) {
  * OSM overpass POI layer
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
- * Requires LayerVectorURL
+ * Requires layerVectorURL
  */
 //TODO BUG : reload layer when clik on feature
 //TODO IE BUG no overpass on IE
@@ -930,7 +928,7 @@ ol.control.Button = function(o) {
 		}
 	};
 
-	this.once('myol:onadd', function() {
+	this.once('myol:onadd', function() { //TODO archi -> Put on setMap
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -969,7 +967,6 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires ol.control.Button & controlPermanentCheckbox
- * Requires 'myol:onadd' event
  * Requires permanentCheckboxList
  */
 //TODO accept null layer and not show it
@@ -1067,7 +1064,6 @@ function controlLayersSwitcher(options) {
 /**
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
- * Requires 'myol:onadd' event
  */
 function controlPermalink(o) {
 	const options = this.options_ = ol.assign({
@@ -1302,7 +1298,7 @@ function controlGPS(options) {
 /**
  * Control to displays set preload of 4 upper level tiles if we are on full screen mode
  * This prepares the browser to become offline on the same session
- * Requires 'myol:onadd' event
+ * Requires ol.control.Button
  */
 function controlPreLoad() {
 	const divElement = document.createElement('div'),
@@ -1328,7 +1324,7 @@ function controlPreLoad() {
 
 /**
  * Control to displays the length of a line overflown
- * Requires 'myol:onadd' event
+ * Requires ol.control.Button
  */
 function controlLengthLine() {
 	const divElement = document.createElement('div'),
@@ -1436,7 +1432,6 @@ function controlLoadGPX(o) {
 /**
  * GPX file downloader control
  * Requires ol.control.Button
- * Requires 'myol:onadd' event
  */
 //TODO BUG do not export points
 function controlDownloadGPX(o) {
@@ -1621,7 +1616,6 @@ function printMap(orientation, el, resolution) {
 /**
  * Line & Polygons Editor
  * Requires ol.control.Button
- * Requires 'myol:onadd' event
  */
 function controlEdit(o) {
 	const options = ol.assign({

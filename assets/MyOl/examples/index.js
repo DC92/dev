@@ -3,7 +3,7 @@ console.log(document.cookie);
 
 /**
  * www.refuges.info POI layer
- * Requires ol.layer.LayerVectorURL
+ * Requires layerVectorURL
  */
 function layerPointsWri(options) {
 	return layerVectorURL(ol.assign({
@@ -26,7 +26,7 @@ function layerPointsWri(options) {
 
 /**
  * www.refuges.info areas layer
- * Requires ol.layer.LayerVectorURL
+ * Requires layerVectorURL
  */
 function layerMassifsWri() {
 	return layerVectorURL({
@@ -65,7 +65,7 @@ function layerMassifsWri() {
 
 /**
  * chemineur.fr POI layer
- * Requires ol.layer.LayerVectorURL
+ * Requires layerVectorURL
  */
 function chemineurLayer() {
 	return layerVectorURL({

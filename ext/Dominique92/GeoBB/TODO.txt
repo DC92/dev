@@ -1,6 +1,7 @@
-Migration MyOl
+Migration MyOl (alpages.info)
 ==============
 Mymap -> Map
+ol.layer.LayerVectorURL -> layerVectorURL
 
 BUGS CHEMINEUR soldes par chem4
 ===============================
