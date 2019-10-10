@@ -150,7 +150,7 @@ function layerSpain(serveur, layer) {
  * Virtual class
  * Displays OSM outside the zoom area, 
  * Displays blank outside of validity area
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 ol.layer.LayerTileIncomplete = function(o) {
 	ol.layer.Tile.call(this);
@@ -347,12 +347,27 @@ function permanentCheckboxList(selectorName, evt) {
 }
 
 /**
+ * BBOX dependant strategy
+ * Same that bbox but reloads if we zoom in because we are delivering more points
+ * Returns {ol.loadingstrategy} to be used in layer definition
+ */
+ function loadingStrategyBboxDependant(extent, resolution) {
+				loadedExtentsRtree = this.loadedExtentsRtree_;
+				if (this.resolution > resolution)
+					this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+				this.resolution = resolution; // Mem resolution for further requests
+
+				return [extent];
+			}
+
+/**
  * GeoJson POI layer
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  * Requires controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
 //TODO BEST JSON error handling : error + URL
+//TODO BUG clean when receive request
 ol.layer.LayerVectorURL = function(o) {
 	const this_ = this, // For callback functions
 		options = this.options_ = ol.assign({ // Default options
@@ -378,6 +393,17 @@ ol.layer.LayerVectorURL = function(o) {
 			);
 		};
 
+	// HACK to clear the layer when the xhr response is received
+	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
+	const format = new ol.format.GeoJSON();
+/*//TODO DELETE -> format in the function ?????
+	format.readFeatures = function(s, o) {
+		if (source.featuresRtree_)
+			source.featuresRtree_.clear();
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
+	};
+*/
+
 	// Manage source & vector objects
 	var loadedExtentsRtree = null, //TODO ARCHI ????? best ?
 		source = new ol.source.Vector(ol.assign({
@@ -389,15 +415,8 @@ ol.layer.LayerVectorURL = function(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			strategy: function(extent, resolution) {
-				loadedExtentsRtree = this.loadedExtentsRtree_;
-				if (this.resolution > resolution)
-					this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-				this.resolution = resolution; // Mem resolution for further requests
-
-				return [extent];
-			},
-			format: new ol.format.GeoJSON()
+			strategy: loadingStrategyBboxDependant ,
+			format: format
 		}, options));
 
 	// Create the layer
@@ -413,10 +432,10 @@ ol.layer.LayerVectorURL = function(o) {
 			options.selectorName,
 			function(evt, list) {
 				this_.setVisible(list.length);
-				if (list.length && loadedExtentsRtree) {
-					loadedExtentsRtree.clear(); // Redraw the layer
-					source.clear(); // Redraw the layer //TODO BEST avoid clear the icons now
-				}
+											if (list.length && loadedExtentsRtree) {
+												loadedExtentsRtree.clear(); // Redraw the layer
+												source.clear(); // Redraw the layer //TODO BEST avoid clear the icons now
+											}
 			}
 		);
 
@@ -729,7 +748,7 @@ layerOverpass = function(o) {
 /**
  * Marker
  * Requires proj4.js for swiss coordinates
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 //TODO BEST finger cursor when hover the target (select ?)
 // map.getViewport().style.cursor = 'pointer'; / default
@@ -950,7 +969,7 @@ ol.inherits(ol.control.Button, ol.control.Control);
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires ol.control.Button & controlPermanentCheckbox
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  * Requires permanentCheckboxList
  */
 //TODO accept null layer and not show it
@@ -1048,7 +1067,7 @@ function controlLayersSwitcher(options) {
 /**
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 function controlPermalink(o) {
 	const options = this.options_ = ol.assign({
@@ -1283,7 +1302,7 @@ function controlGPS(options) {
 /**
  * Control to displays set preload of 4 upper level tiles if we are on full screen mode
  * This prepares the browser to become offline on the same session
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 function controlPreLoad() {
 	const divElement = document.createElement('div'),
@@ -1309,7 +1328,7 @@ function controlPreLoad() {
 
 /**
  * Control to displays the length of a line overflown
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 function controlLengthLine() {
 	const divElement = document.createElement('div'),
@@ -1417,7 +1436,7 @@ function controlLoadGPX(o) {
 /**
  * GPX file downloader control
  * Requires ol.control.Button
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 //TODO BUG do not export points
 function controlDownloadGPX(o) {
@@ -1602,7 +1621,7 @@ function printMap(orientation, el, resolution) {
 /**
  * Line & Polygons Editor
  * Requires ol.control.Button
- * Requires 'myol:onadd' layer event
+ * Requires 'myol:onadd' event
  */
 function controlEdit(o) {
 	const options = ol.assign({
