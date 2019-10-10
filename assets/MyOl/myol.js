@@ -339,14 +339,14 @@ function permanentCheckboxList(selectorName, evt) {
  * Same that bbox but reloads if we zoom in because we are delivering more points
  * Returns {ol.loadingstrategy} to be used in layer definition
  */
- function loadingStrategyBboxDependant(extent, resolution) {
-				loadedExtentsRtree = this.loadedExtentsRtree_;
-				if (this.resolution > resolution)
-					this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-				this.resolution = resolution; // Mem resolution for further requests
+function loadingStrategyBboxDependant(extent, resolution) {
+	loadedExtentsRtree = this.loadedExtentsRtree_;
+	if (this.bboxDependantResolution > resolution)
+		this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+	this.bboxDependantResolution = resolution; // Mem resolution for further requests
 
-				return [extent];
-			}
+	return [extent];
+}
 
 /**
  * GeoJson POI layer
@@ -355,16 +355,15 @@ function permanentCheckboxList(selectorName, evt) {
  * Requires permanentCheckboxList
  */
 //TODO BEST JSON error handling : error + URL
-//TODO BUG clean when receive request
 layerVectorURL = function(o) {
-	const options =  ol.assign({ // Default options
-			baseUrlFunction: function(bbox, list, resolution) {
-				return options.baseUrl + // baseUrl is mandatory, no default
-					list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-			}
-		}, o);
+	const options = ol.assign({ // Default options
+		baseUrlFunction: function(bbox, list, resolution) {
+			return options.baseUrl + // baseUrl is mandatory, no default
+				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
+		}
+	}, o);
 	if (options.styleOptions) // Optional
-		options.style = function(feature) { // Optional
+		options.style = function(feature) {
 			return new ol.style.Style(
 				typeof options.styleOptions == 'function' ?
 				options.styleOptions(feature.getProperties()) :
@@ -372,7 +371,7 @@ layerVectorURL = function(o) {
 			);
 		};
 	if (options.hoverStyleOptions) // Optional
-		options.hoverStyle = function(feature) { // Optional
+		options.hoverStyle = function(feature) {
 			return new ol.style.Style(
 				typeof options.hoverStyleOptions == 'function' ?
 				options.hoverStyleOptions(feature.getProperties()) :
@@ -383,13 +382,11 @@ layerVectorURL = function(o) {
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
 	const format = new ol.format.GeoJSON();
-/*//TODO DELETE -> format in the function ?????
 	format.readFeatures = function(s, o) {
-		if (source.featuresRtree_)
-			source.featuresRtree_.clear();
+		if (source.bboxDependantResolution) // If bbbox optimised
+			source.clear(); // Clean all features when receive request
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
 	};
-*/
 
 	// Manage source & vector objects
 	var loadedExtentsRtree = null, //TODO ARCHI ????? best ?
@@ -402,17 +399,17 @@ layerVectorURL = function(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			strategy: loadingStrategyBboxDependant ,
+			strategy: loadingStrategyBboxDependant, //TODO do not use for overpass
 			format: format
 		}, options));
 
 	// Create the layer
-	const this_ = new	ol.layer.Vector( ol.assign({
+	const this_ = new ol.layer.Vector(ol.assign({
 		source: source,
 		renderBuffer: 16, // buffered area around curent view (px)
 		zIndex: 1 // Above the baselayer even if included to the map before
 	}, options));
-	this_.options_ =  options;
+	this_.options_ = options;
 
 	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -420,10 +417,10 @@ layerVectorURL = function(o) {
 			options.selectorName,
 			function(evt, list) {
 				this_.setVisible(list.length);
-											if (list.length && loadedExtentsRtree) {
-												loadedExtentsRtree.clear(); // Redraw the layer
-												source.clear(); // Redraw the layer //TODO BEST avoid clear the icons now
-											}
+				if (list.length && loadedExtentsRtree) {
+					loadedExtentsRtree.clear(); // Redraw the layer
+					source.clear(); // Redraw the layer
+				}
 			}
 		);
 
@@ -872,8 +869,8 @@ function JSONparse(json) {
  */
 let nextButtonPos = 2.5; // Top position of next button (em)
 
- function controlButton(o) {
-	const	options = ol.assign({
+function controlButton(o) {
+	const options = ol.assign({
 			className: '', // {string} className of the button.
 			activeBackgroundColor: 'white',
 		}, o),
@@ -883,8 +880,8 @@ let nextButtonPos = 2.5; // Top position of next button (em)
 	const this_ = new ol.control.Control(ol.assign({
 		element: divElement
 	}, options));
-		this_.options = options;//TODO ARCHI
-		this_.options.group = this_; // Main control of a group of controls //TODO ARCHI
+	this_.options = options; //TODO ARCHI
+	this_.options.group = this_; // Main control of a group of controls //TODO ARCHI
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
@@ -913,7 +910,7 @@ let nextButtonPos = 2.5; // Top position of next button (em)
 			function setMap(target) {
 				// Store the map on it & advise it
 				target.map_ = map;
-				target.dispatchEvent('myol:onadd');
+				target.dispatchEvent('myol:onadd'); //TODO ARCHI replace by setMap
 			}
 		}
 	};
@@ -1299,14 +1296,14 @@ function controlPreLoad() {
 	this_.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
-			map.on('change:size', function() {
-				const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+		map.on('change:size', function() {
+			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
 
-				map.getLayers().forEach(function(layer) {
-					if (layer.type == 'TILE')
-						layer.setPreload(fs ? 4 : 0);
-				});
+			map.getLayers().forEach(function(layer) {
+				if (layer.type == 'TILE')
+					layer.setPreload(fs ? 4 : 0);
 			});
+		});
 	});
 
 	return this_;
