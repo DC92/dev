@@ -340,11 +340,11 @@ function permanentCheckboxList(selectorName, evt) {
  * Same that bbox but reloads if we zoom in because we are delivering more points
  * Returns {ol.loadingstrategy} to be used in layer definition
  */
-function loadingStrategyBboxDependant(extent, resolution) {
+function loadingStrategyBboxLimit(extent, resolution) {
 	loadedExtentsRtree = this.loadedExtentsRtree_;
-	if (this.bboxDependantResolution > resolution)
+	if (this.bboxLimitResolution > resolution)
 		this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-	this.bboxDependantResolution = resolution; // Mem resolution for further requests
+	this.bboxLimitResolution = resolution; // Mem resolution for further requests
 
 	return [extent];
 }
@@ -355,8 +355,7 @@ function loadingStrategyBboxDependant(extent, resolution) {
  * Requires controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
-//TODO BEST JSON error handling : error + URL
-layerVectorURL = function(o) {
+function layerVectorURL(o) {
 	const options = ol.assign({ // Default options
 		baseUrlFunction: function(bbox, list, resolution) {
 			return options.baseUrl + // baseUrl is mandatory, no default
@@ -382,15 +381,16 @@ layerVectorURL = function(o) {
 
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
+	//TODO BEST JSON error handling : error + URL
 	const format = new ol.format.GeoJSON();
 	format.readFeatures = function(s, o) {
-		if (source.bboxDependantResolution) // If bbbox optimised
+		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receive request
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
 	};
 
 	// Manage source & vector objects
-	var loadedExtentsRtree = null, //TODO ARCHI ????? best ?
+	var loadedExtentsRtree = null, //TODO ARCHI best ??????
 		source = new ol.source.Vector(ol.assign({
 			url: function(extent, resolution, projection) {
 				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
@@ -400,7 +400,7 @@ layerVectorURL = function(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			strategy: loadingStrategyBboxDependant, //TODO do not use for overpass
+			strategy: loadingStrategyBboxLimit, //TODO do not use for overpass
 			format: format
 		}, options));
 
@@ -453,7 +453,7 @@ layerVectorURL = function(o) {
 		}
 
 		// Style when hovering a feature
-		//TODO BUG BEST interagit avec l'éditeur
+		//TODO BUG BEST interacts with the editor
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6,
@@ -548,7 +548,7 @@ layerVectorURL = function(o) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO BUG : reload layer when clik on feature
+//TODO BEST reload layer when clik on feature
 //TODO IE BUG no overpass on IE
 //TODO BEST BUG displays "?" when moves or zooms after changing a selector
 //TODO BEST display error 429 (Too Many Requests)
@@ -673,7 +673,7 @@ layerOverpass = function(o) {
 						'title="Voir la fiche d\'origine sur openstreetmap">',
 						p.name ? (
 							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
-							//TODO BUG ne reconnais pas les lettres accentuées (hôtel)
+							//TODO BUG do not recognize accented letters (hôtel)
 						) : (
 							language[p.tourism] || p.tourism
 						),
@@ -882,9 +882,9 @@ function controlButton(o) {
 	const control = new ol.control.Control(ol.assign({
 		element: divElement
 	}, options));
-	control.options = options;
-	if (!control.options.group)
-		control.options.group = control; // Main control of a group of controls
+	control.options_ = options;
+	if (!control.options_.group)
+		control.options_.group = control; // Main control of a group of controls
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
@@ -898,7 +898,7 @@ function controlButton(o) {
 	divElement.control_ = control; // For callback functions
 
 	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(control, map);
+		ol.control.Control.prototype.setMap.call(this, map);
 		//HACK get control on Map init to modify it
 
 		if (!map.getTargetElement().map_) { //Only once
@@ -910,6 +910,7 @@ function controlButton(o) {
 				map.getControls().forEach(setMap);
 			});
 
+			//TODO ARCHI Function declarations should not be placed in blocks.
 			function setMap(target) {
 				// Store the map on it & advise it
 				target.map_ = map;
@@ -933,8 +934,8 @@ function controlButton(o) {
 	control.active = false;
 	control.toggle = function(newActive) {
 		control.map_.getControls().forEach(function(c) {
-			if (c.options &&
-				c.options.group == options.group) { // For all controls in the same group
+			if (c.options_ &&
+				c.options_.group == options.group) { // For all controls in the same group
 				const setActive =
 					c != control ? false :
 					typeof newActive != 'undefined' ? newActive :
@@ -942,10 +943,10 @@ function controlButton(o) {
 
 				if (setActive != c.active) {
 					c.active = setActive;
-					c.element.firstChild.style.backgroundColor = c.active ? c.options.activeBackgroundColor : 'white';
+					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeBackgroundColor : 'white';
 
-					if (typeof c.options.activate == 'function')
-						c.options.activate(c.active, buttonElement);
+					if (typeof c.options_.activate == 'function')
+						c.options_.activate(c.active, buttonElement);
 				}
 			}
 		});
@@ -964,7 +965,7 @@ function controlButton(o) {
 function controlLayersSwitcher(options) {
 	options = options || {};
 
-	const this_ = controlButton({ //TODO ARCHI replace this_
+	const button = controlButton({
 		label: '&hellip;',
 		className: 'switch-layer',
 		title: 'Liste des cartes',
@@ -977,15 +978,15 @@ function controlLayersSwitcher(options) {
 	rangeElement.className = 'range-layer';
 	rangeElement.oninput = displayLayerSelector;
 	rangeElement.title = 'Glisser pour faire varier la tranparence';
-	this_.element.appendChild(rangeElement);
+	button.element.appendChild(rangeElement);
 
 	// Layer selector
 	const selectorElement = document.createElement('div');
 	selectorElement.style.overflow = 'auto';
 	selectorElement.title = 'Ctrl+click : multicouches';
-	this_.element.appendChild(selectorElement);
+	button.element.appendChild(selectorElement);
 
-	this_.once('myol:onadd', function(evt) {
+	button.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		// Base layers selector init
@@ -1002,7 +1003,7 @@ function controlLayersSwitcher(options) {
 		controlPermanentCheckbox('baselayer', displayLayerSelector);
 
 		// Hover the button open the selector
-		this_.element.firstElementChild.onmouseover = displayLayerSelector;
+		button.element.firstElementChild.onmouseover = displayLayerSelector;
 
 		// Click or change map size close the selector
 		map.on(['click', 'change:size'], function() {
@@ -1043,13 +1044,13 @@ function controlLayersSwitcher(options) {
 			options.baseLayers[list[1]].setOpacity(rangeElement.value / 100);
 
 		// Refresh control button, range & selector
-		this_.element.firstElementChild.style.display = evt ? 'none' : '';
+		button.element.firstElementChild.style.display = evt ? 'none' : '';
 		rangeElement.style.display = evt && list.length > 1 ? '' : 'none';
 		selectorElement.style.display = evt ? '' : 'none';
-		selectorElement.style.maxHeight = (this_.map_.getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
+		selectorElement.style.maxHeight = (button.map_.getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}
 
-	return this_;
+	return button;
 }
 
 /**
@@ -1057,17 +1058,19 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
 function controlPermalink(o) {
-	const options = this.options_ = ol.assign({
+	const options = ol.assign({
 			hash: '?', // {?, #} the permalink delimiter
 			visible: true, // {true | false} add a controlPermalink button to the map.
 			init: true // {true | false} use url hash or "controlPermalink" cookie to position the map.
 		}, o),
 		divElement = document.createElement('div'),
-		aElement = document.createElement('a');
-	const this_ = new ol.control.Control({
-		element: divElement,
-		render: render
-	});
+		aElement = document.createElement('a'),
+		control = new ol.control.Control({
+			element: divElement,
+			render: render
+		});
+	this.options_ = options;
+
 	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
 		(options.initialFit || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
@@ -1108,7 +1111,7 @@ function controlPermalink(o) {
 		}
 	}
 
-	return this_;
+	return control;
 }
 
 /**
@@ -1150,7 +1153,7 @@ function controlGPS(options) {
 		}),
 
 		// The control button
-		this_ = controlButton({
+		button = controlButton({
 			className: 'gps-button',
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
@@ -1185,8 +1188,8 @@ function controlGPS(options) {
 		})
 	}));
 
-	this_.once('myol:onadd', function() {
-		map = this_.getMap();
+	button.once('myol:onadd', function() {
+		map = button.getMap();
 		view = map.getView();
 
 		map.on('moveend', renderReticule);
@@ -1228,7 +1231,7 @@ function controlGPS(options) {
 	);
 
 	function renderReticule() {
-		if (this_.active && gps) {
+		if (button.active && gps) {
 			if (!graticule.getGeometry()) // Only once the first time the feature is enabled
 				view.setZoom(17); // Zoom on the area
 
@@ -1283,7 +1286,7 @@ function controlGPS(options) {
 		}
 	}
 
-	return this_;
+	return button;
 }
 
 /**
@@ -1293,11 +1296,11 @@ function controlGPS(options) {
  */
 function controlPreLoad() {
 	const divElement = document.createElement('div'),
-		this_ = new ol.control.Control({
+		button = new ol.control.Control({
 			element: divElement
 		});
 
-	this_.once('myol:onadd', function(evt) {
+	button.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		map.on('change:size', function() {
@@ -1310,7 +1313,7 @@ function controlPreLoad() {
 		});
 	});
 
-	return this_;
+	return button;
 }
 
 /**
@@ -1319,11 +1322,11 @@ function controlPreLoad() {
  */
 function controlLengthLine() {
 	const divElement = document.createElement('div'),
-		this_ = new ol.control.Control({
+		button = new ol.control.Control({
 			element: divElement
 		});
 
-	this_.once('myol:onadd', function(evt) {
+	button.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		divElement.className = 'ol-length-line';
@@ -1353,7 +1356,7 @@ function controlLengthLine() {
 		return false; // Continue detection (for editor that has temporary layers)
 	}
 
-	return this_;
+	return button;
 }
 
 /**
@@ -1378,7 +1381,7 @@ function controlLoadGPX(o) {
 		inputElement = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
-		this_ = controlButton(options);
+		button = controlButton(options);
 
 	inputElement.type = 'file';
 	inputElement.addEventListener('change', function() {
@@ -1386,7 +1389,7 @@ function controlLoadGPX(o) {
 	});
 
 	reader.onload = function() {
-		const map = this_.getMap(),
+		const map = button.getMap(),
 			features = format.readFeatures(reader.result, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857'
@@ -1406,18 +1409,18 @@ function controlLoadGPX(o) {
 					source: source,
 					style: options.style
 				});
-			this_.getMap().addLayer(vector);
-			this_.getMap().getView().fit(source.getExtent());
+			button.getMap().addLayer(vector);
+			button.getMap().getView().fit(source.getExtent());
 		}
 
 		// Zoom the map on the added features
 		const extent = ol.extent.createEmpty();
 		for (let f in features)
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
-		this_.getMap().getView().fit(extent);
+		button.getMap().getView().fit(extent);
 	};
 
-	return this_;
+	return button;
 }
 
 /**
@@ -1629,7 +1632,7 @@ function controlEdit(o) {
 			source: source,
 			zIndex: 20
 		}),
-		this_ = controlButton(ol.assign({
+		button = controlButton(ol.assign({
 			label: 'M',
 			title: 'Activer "M" (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
@@ -1670,11 +1673,11 @@ function controlEdit(o) {
 			style: options.editStyle
 		});
 
-	this_.once('myol:onadd', function(evt) {
+	button.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
 
 		map.addLayer(layer);
-		this_.toggle(options.enableAtInit);
+		button.toggle(options.enableAtInit);
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
@@ -1692,12 +1695,12 @@ function controlEdit(o) {
 			map.addInteraction(draw);
 			draw.setActive(false);
 			draw.on(['drawend'], function(evt) {
-				this_.toggle(true);
-				this_.modified = true; // Optimize the source
+				button.toggle(true);
+				button.modified = true; // Optimize the source
 			});
 
 			map.addControl(controlButton(ol.assign({
-				group: this_,
+				group: button,
 				label: drawOption.type.charAt(0),
 				title: 'Activer "' + drawOption.type.charAt(0) + '" puis\n' +
 					'Cliquer sur la carte et sur chaque point désiré pour dessiner ' +
@@ -1765,8 +1768,8 @@ function controlEdit(o) {
 	});
 
 	source.on(['change'], function() {
-		if (this_.modified) { // Only when required to avoid recursive loops
-			this_.modified = false;
+		if (button.modified) { // Only when required to avoid recursive loops
+			button.modified = false;
 			cleanFeatures(); // Do it now as a feature has been added or changed
 		}
 	});
@@ -1850,8 +1853,8 @@ function controlEdit(o) {
 		});
 	}
 
-	this_.source_ = source; // HACK for getting info from the edited features
-	return this_;
+	button.source_ = source; // HACK for getting info from the edited features
+	return button;
 }
 
 /* Common functions */
