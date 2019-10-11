@@ -1,5 +1,4 @@
 console.log(document.cookie);
-//TODO display OL version
 
 /**
  * www.refuges.info POI layer
@@ -117,7 +116,37 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 		layerMassifsWri(),
 		layerOverpass(),
 		marqueur,
-		viseur
+		viseur,
+		layerEdit({
+			geoJsonId: 'geojson',
+			controls: [
+				controlModify,
+				controlDrawLine,
+				controlDrawPolygon,
+			],
+/*
+			styleOptions: {
+				fill: new ol.style.Fill({
+					color: 'rgba(0,0,0,0.3)'
+				}),
+				stroke: new ol.style.Stroke({
+					color: '#46f'
+				})
+			},
+			editStyleOptions: {
+				image: new ol.style.Circle({
+					radius: 4,
+					fill: new ol.style.Fill({
+						color: '#46f'
+					})
+				}),
+				stroke: new ol.style.Stroke({
+					color: '#46f',
+					width: 2
+				})
+			},
+*/
+		}),
 	],
 	basicControls = controlsCollection({
 		geoKeys: {
@@ -131,40 +160,10 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 				viseur.getPoint().setCoordinates(position);
 			}
 		}
-	}),
-	edit = controlEdit({
-		inputId: 'geojson',
-		snapLayers: overlays,
-		styleOptions: {
-			fill: new ol.style.Fill({
-				color: 'rgba(0,0,0,0.3)'
-			}),
-			stroke: new ol.style.Stroke({
-				color: '#46f'
-			})
-		},
-		editStyleOptions: {
-			image: new ol.style.Circle({
-				radius: 4,
-				fill: new ol.style.Fill({
-					color: '#46f'
-				})
-			}),
-			stroke: new ol.style.Stroke({
-				color: '#46f',
-				width: 2
-			})
-		},
-		enableAtInit: true,
-		draw: [{
-			type: 'LineString'
-		}, {
-			type: 'Polygon'
-		}]
 	});
 
 var map = new ol.Map({
 	target: 'map',
 	layers: overlays,
-	controls: basicControls.concat([edit])
+	controls: basicControls //.concat([edit])
 });

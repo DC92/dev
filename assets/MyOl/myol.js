@@ -648,7 +648,7 @@ layerOverpass = function(o) {
 			const language = {
 					alpine_hut: 'Refuge gard&egrave;',
 					hotel: 'h&ocirc;tel',
-					guest_house: 'chambre d\'h&ocirc;te',
+					guest_house: 'chambre d‘h&ocirc;te',
 					camp_site: 'camping',
 					convenience: 'alimentation',
 					supermarket: 'supermarch&egrave;',
@@ -670,7 +670,7 @@ layerOverpass = function(o) {
 					'<b>' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</b>', [
 						'<a target="_blank"',
 						'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '"',
-						'title="Voir la fiche d\'origine sur openstreetmap">',
+						'title="Voir la fiche d‘origine sur openstreetmap">',
 						p.name ? (
 							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
 							//TODO BUG do not recognize accented letters (hôtel)
@@ -875,6 +875,7 @@ function controlButton(o) {
 	const options = ol.assign({
 			className: '', // {string} className of the button.
 			activeBackgroundColor: 'white',
+			onAdd: function() {},
 		}, o),
 		buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
@@ -883,7 +884,7 @@ function controlButton(o) {
 		element: divElement
 	}, options));
 	control.options_ = options;
-	if (!control.options_.group)
+	if (!control.options_.group) //TODO DELETE
 		control.options_.group = control; // Main control of a group of controls
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
@@ -898,12 +899,16 @@ function controlButton(o) {
 	divElement.control_ = control; // For callback functions
 
 	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
 		//HACK get control on Map init to modify it
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		control.map_ = map;
+		options.onAdd(map);
 
 		if (!map.getTargetElement().map_) { //Only once
+
 			// Add ol.map object reference to the html #map element
-			map.getTargetElement().map_ = map;
+			map.getTargetElement().map_ = map; //TODO ARCHI why ??? / Optim ?
 
 			map.on('postrender', function() { // Each time we can
 				map.getLayers().forEach(setMap);
@@ -914,7 +919,7 @@ function controlButton(o) {
 			function setMap(target) {
 				// Store the map on it & advise it
 				target.map_ = map;
-				target.dispatchEvent('myol:onadd'); //TODO ARCHI replace by setMap
+				target.dispatchEvent('myol:onadd'); //TODO ARCHI replace by onAdd: function (){}
 			}
 		}
 	};
@@ -933,7 +938,7 @@ function controlButton(o) {
 	// In case of group buttons, set inactive the other one
 	control.active = false;
 	control.toggle = function(newActive) {
-		control.map_.getControls().forEach(function(c) {
+		control.map_.getControls().forEach(function(c) { //TODO DELETE
 			if (c.options_ &&
 				c.options_.group == options.group) { // For all controls in the same group
 				const setActive =
@@ -1436,6 +1441,7 @@ function controlDownloadGPX(o) {
 			extraMetaData: '' // Additional tags to the GPX file header
 		}, o),
 		hiddenElement = document.createElement('a');
+	let button; //TODO ARCHI
 
 	//HACK for Moz
 	hiddenElement.target = '_blank';
@@ -1444,10 +1450,10 @@ function controlDownloadGPX(o) {
 
 	options.activate = function(evt) { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
-			extent = this.group.map_.getView().calculateExtent();
+			extent = button.map_.getView().calculateExtent();
 
 		// Get all visible features
-		this.group.map_.getLayers().forEach(function(layer) {
+		button.map_.getLayers().forEach(function(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					features.push(feature);
@@ -1496,7 +1502,8 @@ function controlDownloadGPX(o) {
 			}));
 	};
 
-	return controlButton(options);
+	button = controlButton(options);
+	return button;
 }
 
 /**
@@ -1508,8 +1515,8 @@ function geocoder() {
 	const ua = navigator.userAgent;
 	if (typeof Geocoder != 'function' ||
 		ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
-		return new ol.control.Control({ //HACK No button
-			element: document.createElement('div'),
+		return new ol.control.Control({
+			element: document.createElement('div'), //HACK No button
 		});
 
 	const gc = new Geocoder('nominatim', {
@@ -1533,11 +1540,11 @@ function controlPrint() {
 		className: 'print-button',
 		activate: printMap,
 		question: '<p>Paysage : ' +
-			'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
-			'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
+			'<span onclick="printMap("landscape",this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
+			'<span onclick="printMap("landscape",this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
 			'</p> <p>Portrait : ' +
-			'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
-			'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
+			'<span onclick="printMap("portrait",this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
+			'<span onclick="printMap("portrait",this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
 			'</p> ',
 		title: 'Imprimer la carte'
 	});
@@ -1611,73 +1618,29 @@ function printMap(orientation, el, resolution) {
  * Line & Polygons Editor
  * Requires controlButton
  */
-function controlEdit(o) {
+function layerEdit(o) {
 	const options = ol.assign({
-			inputId: 'editable-json',
-			draw: [], // array of additional buttons (lines, polygons, ...)
-			enableAtInit: false
+			geoJsonId: 'editable-json',
 		}, o),
-		inputEl = document.getElementById(options.inputId), // Read data in an html element
 		format = new ol.format.GeoJSON(),
+		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		features = format.readFeatures(
-			JSONparse(inputEl.value || '{"type":"FeatureCollection","features":[]}'), {
+			JSONparse(geoJsonEl.value || '{"type":"FeatureCollection","features":[]}'), {
 				featureProjection: 'EPSG:3857' // Read/write data as ESPG:4326 by default
 			}
 		),
 		source = new ol.source.Vector({
 			features: features,
-			wrapX: false
+			wrapX: false,
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 20
-		}),
-		button = controlButton(ol.assign({
-			label: 'M',
-			title: 'Activer "M" (couleur jaune) puis\n' +
-				'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
-				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
-				'Alt+cliquer sur un sommet pour le supprimer\n' +
-				'Alt+cliquer  sur un segment à supprimer dans une ligne pour la couper\n' +
-				'Alt+cliquer  sur un segment à supprimer d\'un polygone pour le transformer en ligne\n' +
-				'Joindre les extrémités deux lignes pour les fusionner\n' +
-				'Joindre les extrémités d\'une ligne pour la transformer en polygone\n' +
-				'Ctrl+Alt+cliquer sur un côté d\'une ligne ou d\'un polygone pour les supprimer',
-			activeBackgroundColor: '#ef3',
-			activate: function(active) {
-				modify.setActive(active);
-			}
-		}, options));
-
-	if (options.styleOptions) { // Optional
-		layer.setStyle(
-			new ol.style.Style(options.styleOptions)
-		);
-		options.editStyle = new ol.style.Style(ol.assign( // Optional
-			options.styleOptions,
-			options.editStyleOptions // Optional
-		));
-	}
-
-	const hover = new ol.interaction.Select({
-			layers: [layer],
-			style: options.editStyle,
-			condition: ol.events.condition.pointerMove,
-			hitTolerance: 6
-		}),
-		snap = new ol.interaction.Snap({
-			source: source
-		}),
-		modify = new ol.interaction.Modify({
-			source: source,
-			style: options.editStyle
+			zIndex: 20,
 		});
+	source.geoJsonEl = geoJsonEl;
 
-	button.once('myol:onadd', function(evt) {
+	layer.once('myol:onadd', function(evt) {
 		const map = evt.target.map_;
-
-		map.addLayer(layer);
-		button.toggle(options.enableAtInit);
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
@@ -1685,41 +1648,28 @@ function controlEdit(o) {
 				map.removeInteraction(i);
 		});
 
-		// Add the draw buttons & interaction
-		options.draw.forEach(function(drawOption) {
-			const draw = new ol.interaction.Draw({
-				type: drawOption.type,
+		options.controls.forEach(function(c) {
+			var control = c(ol.assign({
+				group: layer,
+				layer: layer,
 				source: source,
-				style: options.editStyle
-			});
-			map.addInteraction(draw);
-			draw.setActive(false);
-			draw.on(['drawend'], function(evt) {
-				button.toggle(true);
-				button.modified = true; // Optimize the source
-			});
-
-			map.addControl(controlButton(ol.assign({
-				group: button,
-				label: drawOption.type.charAt(0),
-				title: 'Activer "' + drawOption.type.charAt(0) + '" puis\n' +
-					'Cliquer sur la carte et sur chaque point désiré pour dessiner ' +
-					(drawOption.type == 'Polygon' ? 'un polygone' : 'une ligne') +
-					',\ndouble cliquer pour terminer.\n' +
-					(drawOption.type == 'Polygon' ?
-						'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".' :
-						'Cliquer sur une extrémité d\'une ligne pour l\'étendre'),
 				activeBackgroundColor: '#ef3',
+				//			style: options.editStyle
 				activate: function(active) {
-					draw.setActive(active);
-				}
-			}, drawOption)));
+					control.options_.interaction.setActive(active);
+				},
+			}, options));
+			control.options_.interaction.setActive(false);
+			map.addInteraction(control.options_.interaction);
+			map.addControl(control);
 		});
-
-		map.addInteraction(modify);
-		map.addInteraction(snap);
-		map.on('pointermove', function(evt) {
-			map.addInteraction(hover);
+	});
+/*
+		// Add features loaded from GPX file
+		map.on('myol:onfeatureload', function(evt) {
+			source.addFeatures(evt.features);
+			//			cleanFeatures(source);
+			return false;
 		});
 
 		// Snap on features external to the editor
@@ -1731,134 +1681,174 @@ function controlEdit(o) {
 						snap.addFeature(fs[f]);
 				});
 			});
+*/
+	source.on(['change'], function() {
+		if (layer.modified) { // Only when required to avoid recursive loops
+			layer.modified = false;
+			cleanFeatures(source); // Do it now as a feature has been added or changed
 
-		// Add features loaded from GPX file
-		map.on('myol:onfeatureload', function(evt) {
-			source.addFeatures(evt.features);
-			cleanFeatures();
-			return false;
-		});
-
-		cleanFeatures();
+			// Save lines in <EL> as geoJSON at every change
+			source.geoJsonEl.value = format.writeFeatures(source.getFeatures(), {
+				featureProjection: 'EPSG:3857',
+				decimals: 5
+			});
+		}
 	});
+
+	return layer;
+}
+
+function controlModify(options) {
+	const modify = new ol.interaction.Modify(options);
+
 
 	modify.on('modifyend', function(evt) {
 		const map = evt.target.map_;
 
-		map.removeInteraction(hover);
-		//TODO BUG BEST do not delete the feature if you point to a summit
-		if (evt.mapBrowserEvent.originalEvent.altKey) {
-			// altKey + ctrlKey : delete feature
-			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
-				const features = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
-					hitTolerance: 6,
-					layerFilter: function(l) {
-						return l.ol_uid == layer.ol_uid;
-					}
-				});
-				for (let f in features)
-					source.removeFeature(features[f]); // We delete the selected feature
+		if (0)
+			//		map.removeInteraction(hover);
+			//TODO BUG BEST do not delete the feature if you point to a summit
+			if (evt.mapBrowserEvent.originalEvent.altKey) {
+				// altKey + ctrlKey : delete feature
+				if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
+					const features = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+						hitTolerance: 6,
+						layerFilter: function(l) {
+							return l.ol_uid == options.layer.ol_uid;
+						}
+					});
+					for (let f in features)
+						source.removeFeature(features[f]); // We delete the selected feature
+				}
+				// Other modify actions : altKey : delete segment
+				else if (evt.target.vertexFeature_) // Click on a segment
+					return; //   cleanFeatures(source, evt.target.vertexFeature_.getGeometry().getCoordinates());
 			}
-			// Other modify actions : altKey : delete segment
-			else if (evt.target.vertexFeature_) // Click on a segment
-				return cleanFeatures(evt.target.vertexFeature_.getGeometry().getCoordinates());
-		}
 
-		cleanFeatures();
+		//		options.layer.modified = true; // Optimize the source
+		//		cleanFeatures(options.source);
 	});
 
-	source.on(['change'], function() {
-		if (button.modified) { // Only when required to avoid recursive loops
-			button.modified = false;
-			cleanFeatures(); // Do it now as a feature has been added or changed
-		}
+	return controlButton(ol.assign({
+		interaction: modify,
+		label: 'M',
+		title: 'Activer "M" (couleur jaune) puis\n' +
+			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
+			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+			'Alt+cliquer sur un sommet pour le supprimer\n' +
+			'Alt+cliquer  sur un segment à supprimer dans une ligne pour la couper\n' +
+			'Alt+cliquer  sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
+			'Joindre les extrémités deux lignes pour les fusionner\n' +
+			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
+			'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
+	}, options));
+}
+
+function controlDrawLine(options) {
+	const draw = new ol.interaction.Draw(ol.assign({
+		type: 'LineString',
+	}, options));
+
+	draw.on(['drawend'], function(evt) {
+		options.layer.modified = true; // Optimize the source
 	});
 
-	function cleanFeatures(pointerPosition) {
-		//TODO BEST option not to be able to cut a polygon
-		// Get flattened list of multipoints coords
-		let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
-			polys = [];
+	return controlButton(ol.assign({
+		interaction: draw,
+		label: 'L',
+		title: 'Activer "L" puis\n' +
+			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
+			'double cliquer pour terminer.\n' +
+			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
+	}, options));
+}
 
-		source.clear();
-
-		for (let a = 0; a < lines.length; a++) {
-			// Exclude 1 coord features (points)
-			if (lines[a] && lines[a].length < 2)
-				lines[a] = null;
-
-			// Convert closed lines into polygons
-			if (compareCoords(lines[a])) {
-				polys.push([lines[a]]);
-				lines[a] = null;
-			}
-
-			// Merge lines having a common end
-			for (let b = 0; b < a; b++) { // Once each combination
-				const m = [a, b];
-				for (let i = 4; i; i--) // 4 times
-					if (lines[m[0]] && lines[m[1]]) {
-						// Shake lines end to explore all possibilities
-						m.reverse();
-						lines[m[0]].reverse();
-						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
-
-							// Merge 2 lines matching ends
-							lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
-							lines[m[1]] = 0;
-
-							// Restart all the loops
-							a = -1;
-							break;
-						}
-					}
-			}
-		}
-
-		// Makes holes if a polygon is included in a biggest one
-		for (let p1 in polys)
-			if (polys[p1]) {
-				const fs = new ol.geom.Polygon(polys[p1]);
-				for (let p2 in polys)
-					if (p1 != p2 &&
-						polys[p2]) {
-						let intersects = true;
-						for (let c in polys[p2][0])
-							if (!fs.intersectsCoordinate(polys[p2][0][c]))
-								intersects = false;
-						if (intersects) {
-							polys[p1].push(polys[p2][0]);
-							polys[p2] = null;
-						}
-					}
-			}
-
-		// Recreate modified features
-		for (let l in lines)
-			if (lines[l]) {
-				source.addFeature(new ol.Feature({
-					geometry: new ol.geom.LineString(lines[l])
-				}));
-			}
-		for (let p in polys)
-			if (polys[p])
-				source.addFeature(new ol.Feature({
-					geometry: new ol.geom.Polygon(polys[p])
-				}));
-
-		// Save lines in <EL> as geoJSON at every change
-		inputEl.value = format.writeFeatures(source.getFeatures(), {
-			featureProjection: 'EPSG:3857',
-			decimals: 5
-		});
-	}
-
-	button.source_ = source; // HACK for getting info from the edited features
-	return button;
+function controlDrawPolygon(options) {
+	return controlDrawLine(ol.assign({
+		type: 'Polygon',
+		label: 'P',
+		title: 'Activer "P" puis\n' +
+			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
+			'double cliquer pour terminer.\n' +
+			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
+	}, options));
 }
 
 /* Common functions */
 /* Sort Points / Lines (Polygons are treated as Lines) */
+function cleanFeatures(source, pointerPosition) {
+	//TODO BEST option not to be able to cut a polygon
+	// Get flattened list of multipoints coords
+	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
+		polys = [];
+
+	source.clear();
+
+	for (let a = 0; a < lines.length; a++) {
+		// Exclude 1 coord features (points)
+		if (lines[a] && lines[a].length < 2)
+			lines[a] = null;
+
+		// Convert closed lines into polygons
+		if (compareCoords(lines[a])) {
+			polys.push([lines[a]]);
+			lines[a] = null;
+		}
+
+		// Merge lines having a common end
+		for (let b = 0; b < a; b++) { // Once each combination
+			const m = [a, b];
+			for (let i = 4; i; i--) // 4 times
+				if (lines[m[0]] && lines[m[1]]) {
+					// Shake lines end to explore all possibilities
+					m.reverse();
+					lines[m[0]].reverse();
+					if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+
+						// Merge 2 lines matching ends
+						lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
+						lines[m[1]] = 0;
+
+						// Restart all the loops
+						a = -1;
+						break;
+					}
+				}
+		}
+	}
+
+	// Makes holes if a polygon is included in a biggest one
+	for (let p1 in polys)
+		if (polys[p1]) {
+			const fs = new ol.geom.Polygon(polys[p1]);
+			for (let p2 in polys)
+				if (p1 != p2 &&
+					polys[p2]) {
+					let intersects = true;
+					for (let c in polys[p2][0])
+						if (!fs.intersectsCoordinate(polys[p2][0][c]))
+							intersects = false;
+					if (intersects) {
+						polys[p1].push(polys[p2][0]);
+						polys[p2] = null;
+					}
+				}
+		}
+
+	// Recreate modified features
+	for (let l in lines)
+		if (lines[l]) {
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.LineString(lines[l])
+			}));
+		}
+	for (let p in polys)
+		if (polys[p])
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.Polygon(polys[p])
+			}));
+}
+
 function sortFeatures(features, pointerPosition) {
 	let fs = {
 		lines: [],

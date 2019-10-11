@@ -75,11 +75,11 @@
 		<!-- ELSE --> // LineString / Polygon
 			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for bug in O2switch sql MariaDB / still here ?
 			var edit = controlEdit({
-				inputId: 'editable-json',
+				geoJsonId: 'editable-json',
 				snapLayers: overlays,
 				styleOptions: topicStyleOptions,
 				editStyleOptions: editStyleOptions,
-				enableAtInit: true,
+//TODO				enableAtInit: true,
 				title: titleEdit,
 				draw: [{
 					type: '{GEO_MAP_TYPE}'
