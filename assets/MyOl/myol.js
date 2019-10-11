@@ -869,7 +869,7 @@ function JSONparse(json) {
  * Control buttons
  * Abstract definition to be used by other control buttons definitions
  */
-let nextButtonPos = 2.5; // Top position of next button (em)
+var nextButtonPos = 2.5; // Top position of next button (em)
 
 function controlButton(o) {
 	const options = ol.assign({
@@ -882,8 +882,9 @@ function controlButton(o) {
 	const control = new ol.control.Control(ol.assign({
 		element: divElement
 	}, options));
-	control.options = options; //TODO ARCHI
-	control.options.group = control; // Main control of a group of controls //TODO ARCHI
+	control.options = options;
+	if (!control.options.group)
+		control.options.group = control; // Main control of a group of controls
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
@@ -932,9 +933,8 @@ function controlButton(o) {
 	control.active = false;
 	control.toggle = function(newActive) {
 		control.map_.getControls().forEach(function(c) {
-			if (c.options_ &&
-				c.options_.group == options.group) { // For all controls in the same group
-				//TODO BUG plus de passage en active dans le même groupe
+			if (c.options &&
+				c.options.group == options.group) { // For all controls in the same group
 				const setActive =
 					c != control ? false :
 					typeof newActive != 'undefined' ? newActive :
@@ -942,10 +942,10 @@ function controlButton(o) {
 
 				if (setActive != c.active) {
 					c.active = setActive;
-					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeBackgroundColor : 'white';
+					c.element.firstChild.style.backgroundColor = c.active ? c.options.activeBackgroundColor : 'white';
 
-					if (typeof c.options_.activate == 'function')
-						c.options_.activate(c.active, buttonElement);
+					if (typeof c.options.activate == 'function')
+						c.options.activate(c.active, buttonElement);
 				}
 			}
 		});
