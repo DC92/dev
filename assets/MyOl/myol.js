@@ -1647,13 +1647,23 @@ function layerEdit(o) {
 				map.removeInteraction(i);
 		});
 
+		if (options.styleOptions) { // Optional
+			layer.setStyle(
+				new ol.style.Style(options.styleOptions)
+			);
+			options.editStyle = new ol.style.Style(ol.assign( // Optional
+				options.styleOptions,
+				options.editStyleOptions // Optional
+			));
+		}
+
 		options.controls.forEach(function(c) {
 			var control = c(ol.assign({
 				group: layer,
 				layer: layer,
 				source: source,
 				activeBackgroundColor: '#ef3',
-				//			style: options.editStyle
+				style: options.editStyle,
 				activate: function(active) {
 					control.options_.interaction.setActive(active);
 				},

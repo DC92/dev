@@ -124,28 +124,27 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 				controlDrawLine,
 				controlDrawPolygon,
 			],
-/*
 			styleOptions: {
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,0,0.3)'
 				}),
 				stroke: new ol.style.Stroke({
-					color: '#46f'
+					color: 'blue',
+					width: 2,
 				})
 			},
 			editStyleOptions: {
 				image: new ol.style.Circle({
 					radius: 4,
 					fill: new ol.style.Fill({
-						color: '#46f'
+						color: 'red',
 					})
 				}),
 				stroke: new ol.style.Stroke({
 					color: '#46f',
-					width: 2
+					width: 2,
 				})
 			},
-*/
 		}),
 	],
 	basicControls = controlsCollection({
