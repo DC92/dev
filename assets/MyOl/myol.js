@@ -848,7 +848,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 /**
  * JSON.parse handling error
  */
-//TODO BEST apply to format.readFeatures
+//TODO ARCHI BEST apply to format.readFeatures
 function JSONparse(json) {
 	let js;
 	if (json)
@@ -875,7 +875,6 @@ function controlButton(o) {
 	const options = ol.assign({
 			className: '', // {string} className of the button.
 			activeBackgroundColor: 'white',
-			onAdd: function() {},
 		}, o),
 		buttonElement = document.createElement('button'),
 		divElement = document.createElement('div');
@@ -884,8 +883,6 @@ function controlButton(o) {
 		element: divElement
 	}, options));
 	control.options_ = options;
-	if (!control.options_.group) //TODO DELETE
-		control.options_.group = control; // Main control of a group of controls
 
 	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
 	buttonElement.addEventListener('click', function(evt) {
@@ -902,29 +899,6 @@ function controlButton(o) {
 		//HACK get control on Map init to modify it
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		control.map_ = map;
-		options.onAdd(map);
-
-		if (!map.getTargetElement().map_) { //Only once
-
-			// Add ol.map object reference to the html #map element
-			map.getTargetElement().map_ = map; //TODO ARCHI why ??? / Optim ?
-
-			map.on('postrender', function() { // Each time we can
-				map.getLayers().forEach(setMap);
-				map.getControls().forEach(setMap);
-			});
-
-			//TODO ARCHI Function declarations should not be placed in blocks.
-			function setMap(target) {
-				// Store the map on it & advise it
-				target.map_ = map;
-				target.dispatchEvent('myol:onadd'); //TODO ARCHI replace by onAdd: function (){}
-			}
-		}
-	};
-
-	control.once('myol:onadd', function() { //TODO archi -> Put on setMap
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -932,13 +906,31 @@ function controlButton(o) {
 			divElement.style.top = '.5em';
 			divElement.style.left = (nextButtonPos += 2) + 'em';
 		}
-	});
+
+		if (!map.getTargetElement().map_) { //Only once
+			// Add ol.map object reference to the html #map element
+			map.getTargetElement().map_ = map;
+
+			map.on('postrender', function() { // Each time we can
+				map.getLayers().forEach(setMap);
+				map.getControls().forEach(setMap);
+			});
+		}
+	};
+
+	//TODO ARCHI Function declarations should not be placed in blocks.
+	function setMap(target) {
+		// Store the map on it & advise it
+		target.map_ = map;
+		target.dispatchEvent('myol:onadd');
+	}
 
 	// Toggle the button status & aspect
 	// In case of group buttons, set inactive the other one
+	// (button that have the same .grou^p are group)
 	control.active = false;
 	control.toggle = function(newActive) {
-		control.map_.getControls().forEach(function(c) { //TODO DELETE
+		control.map_.getControls().forEach(function(c) {
 			if (c.options_ &&
 				c.options_.group == options.group) { // For all controls in the same group
 				const setActive =
@@ -1644,12 +1636,7 @@ function layerEdit(o) {
 			featureProjection: 'EPSG:3857',
 			decimals: 5
 		});
-	}
-
-	/*
-		source.on(['change'], function(e) { // A feature has been added or changed
-		});
-	*/
+	};
 
 	layer.once('myol:onadd', function(evt) {
 		const map = layer.map_;
@@ -1683,17 +1670,17 @@ function layerEdit(o) {
 			return false;
 		});
 
-	/*
-		// Snap on features external to the editor
-		if (options.snapLayers) // Optional
-			options.snapLayers.forEach(function(layer) {
-				layer.getSource().on('change', function() {
-					const fs = this.getFeatures();
-					for (let f in fs)
-						snap.addFeature(fs[f]);
+		/*
+			// Snap on features external to the editor
+			if (options.snapLayers) // Optional
+				options.snapLayers.forEach(function(layer) {
+					layer.getSource().on('change', function() {
+						const fs = this.getFeatures();
+						for (let f in fs)
+							snap.addFeature(fs[f]);
+					});
 				});
-			});
-	*/
+		*/
 	});
 
 	return layer;
@@ -1754,14 +1741,14 @@ function controlDrawLine(options) {
 				'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
 				'double cliquer pour terminer.\n' +
 				'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
-		}, options));;
+		}, options));
 
 	draw.on(['drawend'], function(evt) {
 		cleanAndSave(options.source);
 		button.toggle(false);
 	});
 
-	return button
+	return button;
 }
 
 function controlDrawPolygon(options) {
@@ -1847,6 +1834,8 @@ function cleanAndSave(source, pointerPosition) {
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.Polygon(polys[p])
 			}));
+
+	source.save();
 }
 
 function sortFeatures(features, pointerPosition) {
