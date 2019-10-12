@@ -1637,10 +1637,22 @@ function layerEdit(o) {
 			source: source,
 			zIndex: 20,
 		});
-	source.geoJsonEl = geoJsonEl;
 
-	layer.once('myol:onadd', function(evt) {
-		const map = evt.target.map_;
+	source.save = function() {
+		// Save lines in <EL> as geoJSON at every change
+		geoJsonEl.value = format.writeFeatures(features, {
+			featureProjection: 'EPSG:3857',
+			decimals: 5
+		});
+	}
+
+	/*
+		source.on(['change'], function(e) { // A feature has been added or changed
+		});
+	*/
+
+	layer.once('prerender', function(evt) { //TODO ARCHI généraliser
+		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
@@ -1664,11 +1676,12 @@ function layerEdit(o) {
 			map.addControl(control);
 		});
 	});
-/*
+
+	/*
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
 			source.addFeatures(evt.features);
-			//			cleanFeatures(source);
+			//			cleanAndSave(source);
 			return false;
 		});
 
@@ -1681,19 +1694,7 @@ function layerEdit(o) {
 						snap.addFeature(fs[f]);
 				});
 			});
-*/
-	source.on(['change'], function() {
-		if (layer.modified) { // Only when required to avoid recursive loops
-			layer.modified = false;
-			cleanFeatures(source); // Do it now as a feature has been added or changed
-
-			// Save lines in <EL> as geoJSON at every change
-			source.geoJsonEl.value = format.writeFeatures(source.getFeatures(), {
-				featureProjection: 'EPSG:3857',
-				decimals: 5
-			});
-		}
-	});
+	*/
 
 	return layer;
 }
@@ -1701,32 +1702,30 @@ function layerEdit(o) {
 function controlModify(options) {
 	const modify = new ol.interaction.Modify(options);
 
-
 	modify.on('modifyend', function(evt) {
 		const map = evt.target.map_;
 
-		if (0)
-			//		map.removeInteraction(hover);
-			//TODO BUG BEST do not delete the feature if you point to a summit
-			if (evt.mapBrowserEvent.originalEvent.altKey) {
-				// altKey + ctrlKey : delete feature
-				if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
-					const features = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
-						hitTolerance: 6,
-						layerFilter: function(l) {
-							return l.ol_uid == options.layer.ol_uid;
-						}
-					});
-					for (let f in features)
-						source.removeFeature(features[f]); // We delete the selected feature
-				}
-				// Other modify actions : altKey : delete segment
-				else if (evt.target.vertexFeature_) // Click on a segment
-					return; //   cleanFeatures(source, evt.target.vertexFeature_.getGeometry().getCoordinates());
-			}
+		//		map.removeInteraction(hover);
 
-		//		options.layer.modified = true; // Optimize the source
-		//		cleanFeatures(options.source);
+		//TODO BUG BEST do not delete the feature if you point to a summit
+		if (evt.mapBrowserEvent.originalEvent.altKey) {
+			// altKey + ctrlKey : delete feature
+			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
+				const selectedFeatures = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+					hitTolerance: 6,
+					layerFilter: function(l) {
+						return l.ol_uid == options.layer.ol_uid;
+					}
+				});
+				for (let f in selectedFeatures)
+					options.source.removeFeature(selectedFeatures[f]); // We delete the selected feature
+			}
+			// Other modify actions : altKey + click on a segment = delete the segment
+			else if (evt.target.vertexFeature_) // 
+				return cleanAndSave(options.source, evt.target.vertexFeature_.getGeometry().getCoordinates());
+		}
+
+		cleanAndSave(options.source);
 	});
 
 	return controlButton(ol.assign({
@@ -1746,21 +1745,23 @@ function controlModify(options) {
 
 function controlDrawLine(options) {
 	const draw = new ol.interaction.Draw(ol.assign({
-		type: 'LineString',
-	}, options));
+			type: 'LineString',
+		}, options)),
+		button = controlButton(ol.assign({
+			interaction: draw,
+			label: 'L',
+			title: 'Activer "L" puis\n' +
+				'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
+				'double cliquer pour terminer.\n' +
+				'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
+		}, options));;
 
 	draw.on(['drawend'], function(evt) {
-		options.layer.modified = true; // Optimize the source
+		cleanAndSave(options.source);
+		button.toggle(false);
 	});
 
-	return controlButton(ol.assign({
-		interaction: draw,
-		label: 'L',
-		title: 'Activer "L" puis\n' +
-			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
-			'double cliquer pour terminer.\n' +
-			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
-	}, options));
+	return button
 }
 
 function controlDrawPolygon(options) {
@@ -1774,11 +1775,13 @@ function controlDrawPolygon(options) {
 	}, options));
 }
 
-/* Common functions */
-/* Sort Points / Lines (Polygons are treated as Lines) */
-function cleanFeatures(source, pointerPosition) {
-	//TODO BEST option not to be able to cut a polygon
+// Sort Points / Lines (Polygons are treated as Lines)
+function cleanAndSave(source, pointerPosition) {
+
+	return source.save(); //TODO ............
+
 	// Get flattened list of multipoints coords
+	//TODO BEST option not to be able to cut a polygon
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 		polys = [];
 
