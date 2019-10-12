@@ -153,7 +153,8 @@ layerTileIncomplete = function(o) {
 		});
 
 	layer.once('myol:onadd', function(evt) {
-		evt.target.map_.getView().on('change', change);
+		layer.map_ = evt.target.map_;
+		layer.map_.getView().on('change', change);
 		change(); // At init
 	});
 
@@ -425,8 +426,8 @@ function layerVectorURL(o) {
 			}
 		);
 
-	layer.once('myol:onadd', function() {
-		const map = layer.map_;
+	layer.once('myol:onadd', function(evt) {
+		const map = layer.map_ = evt.target.map_;
 
 		// Create the label popup
 		//TODO BUG don't zoom when the cursor is over a label
@@ -776,9 +777,11 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		});
 
 	layer.once('myol:onadd', function(evt) {
+		const map = layer.map_ = evt.target.map_;
+
 		if (dragged) {
 			// Drag and drop
-			evt.target.map_.addInteraction(new ol.interaction.Modify({
+			map.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
 				style: style
 			}));
@@ -921,7 +924,7 @@ function controlButton(o) {
 	//TODO ARCHI Function declarations should not be placed in blocks.
 	function setMap(target) {
 		// Store the map on it & advise it
-		target.map_ = map;
+		target.map_ = map; //TODO ARCHI BEST : put on layers/controls
 		target.dispatchEvent('myol:onadd');
 	}
 
@@ -1988,7 +1991,7 @@ function layersCollection(keys) {
 		//403	'Avalanches':	layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'), //TODO BEST layerincomplete = GG photo
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
