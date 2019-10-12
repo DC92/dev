@@ -1651,7 +1651,7 @@ function layerEdit(o) {
 		});
 	*/
 
-	layer.once('prerender', function(evt) { //TODO ARCHI généraliser
+	layer.once('myol:onadd', function(evt) {
 		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
@@ -1675,16 +1675,15 @@ function layerEdit(o) {
 			map.addInteraction(control.options_.interaction);
 			map.addControl(control);
 		});
-	});
 
-	/*
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
 			source.addFeatures(evt.features);
-			//			cleanAndSave(source);
+			cleanAndSave(source);
 			return false;
 		});
 
+	/*
 		// Snap on features external to the editor
 		if (options.snapLayers) // Optional
 			options.snapLayers.forEach(function(layer) {
@@ -1695,6 +1694,7 @@ function layerEdit(o) {
 				});
 			});
 	*/
+	});
 
 	return layer;
 }
@@ -1777,9 +1777,6 @@ function controlDrawPolygon(options) {
 
 // Sort Points / Lines (Polygons are treated as Lines)
 function cleanAndSave(source, pointerPosition) {
-
-	return source.save(); //TODO ............
-
 	// Get flattened list of multipoints coords
 	//TODO BEST option not to be able to cut a polygon
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
