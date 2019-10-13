@@ -66,42 +66,40 @@ function layerMassifsWri() {
  * chemineur.fr POI layer
  * Requires layerVectorURL
  */
-function chemineurLayer() {
-	return layerVectorURL({
-		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
-		selectorName: 'chemineur',
-		styleOptions: function(properties) {
-			return {
-				// POI
-				image: new ol.style.Icon({
-					src: properties.icone
-				}),
-				// Traces
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 3
-				})
-			};
-		},
-		hoverStyleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: properties.icone
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 3
-				})
-			};
-		},
-		label: function(properties) {
-			return '<a href="' + properties.url + '">' + properties.nom + '<a>';
-		},
-		href: function(properties) {
-			return properties.url;
-		}
-	});
-}
+chemineurLayer = layerVectorURL({
+	baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+	selectorName: 'chemineur',
+	styleOptions: function(properties) {
+		return {
+			// POI
+			image: new ol.style.Icon({
+				src: properties.icone
+			}),
+			// Traces
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 3
+			})
+		};
+	},
+	hoverStyleOptions: function(properties) {
+		return {
+			image: new ol.style.Icon({
+				src: properties.icone
+			}),
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 3
+			})
+		};
+	},
+	label: function(properties) {
+		return '<a href="' + properties.url + '">' + properties.nom + '<a>';
+	},
+	href: function(properties) {
+		return properties.url;
+	}
+});
 
 /**
  * EXAMPLE
@@ -112,7 +110,7 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 		layerPointsWri({
 			selectorName: 'wri-poi'
 		}),
-		chemineurLayer(),
+		chemineurLayer,
 		layerMassifsWri(),
 		layerOverpass(),
 		marqueur,
@@ -124,6 +122,7 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 				controlDrawLine,
 				controlDrawPolygon,
 			],
+			snapLayers: [chemineurLayer],
 			styleOptions: {
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,0,0.3)'

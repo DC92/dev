@@ -41,8 +41,8 @@ ol.Map.prototype.renderFrame_ = function(time) {
 			map.getControls().forEach(setMap);
 		});
 	}
-	
-	ol.PluggableMap.prototype.renderFrame_.call(this,time);
+
+	ol.PluggableMap.prototype.renderFrame_.call(this, time);
 }
 
 /**
@@ -117,7 +117,7 @@ function layerStamen(layer) {
  * Get your own (free) IGN key at http://professionnels.ign.fr/user
  */
 function layerIGN(key, layer, format) {
-	const IGNresolutions = [],
+	let IGNresolutions = [],
 		IGNmatrixIds = [];
 	for (let i = 0; i < 18; i++) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
@@ -591,7 +591,7 @@ layerOverpass = function(o) {
 	elSelector.className = 'overpass'; // At the biginning
 
 	// Convert areas into points to display it as an icon
-	let osmXmlPoi = new ol.format.OSMXML();
+	const osmXmlPoi = new ol.format.OSMXML();
 	osmXmlPoi.readFeatures = function(source, options) {
 		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
@@ -726,7 +726,7 @@ layerOverpass = function(o) {
 				];
 
 			// Other paramaters
-			let done = [ // These that have no added value or already included
+			const done = [ // These that have no added value or already included
 					'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
 					'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
 					'opening_hours,description,beds,bus,note',
@@ -1244,7 +1244,7 @@ function controlGPS(options) {
 			view.setCenter(gps.position);
 
 			// Estimate the viewport size
-			let hg = map.getCoordinateFromPixel([0, 0]),
+			const hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
 				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
 
@@ -1637,6 +1637,9 @@ function layerEdit(o) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20,
+		}),
+		snap = new ol.interaction.Snap({
+			source: source
 		});
 
 	source.save = function() {
@@ -1667,7 +1670,7 @@ function layerEdit(o) {
 		}
 
 		options.controls.forEach(function(c) {
-			var control = c(ol.assign({
+			const control = c(ol.assign({
 				group: layer,
 				layer: layer,
 				source: source,
@@ -1689,17 +1692,18 @@ function layerEdit(o) {
 			return false;
 		});
 
-		/*
-			// Snap on features external to the editor
-			if (options.snapLayers) // Optional
-				options.snapLayers.forEach(function(layer) {
-					layer.getSource().on('change', function() {
-						const fs = this.getFeatures();
-						for (let f in fs)
-							snap.addFeature(fs[f]);
-					});
+		// Snap on features internal to the editor
+		map.addInteraction(snap);
+
+		// Snap on features external to the editor
+		if (options.snapLayers) // Optional
+			options.snapLayers.forEach(function(layer) {
+				layer.getSource().on('change', function() {
+					const fs = this.getFeatures();
+					for (let f in fs)
+						snap.addFeature(fs[f]);
 				});
-		*/
+			});
 	});
 
 	return layer;
