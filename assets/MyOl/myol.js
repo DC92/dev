@@ -11,6 +11,7 @@
  */
 
 /* jshint esversion: 6 */
+//TODO ARCHI check var / const / let
 
 /**
  * Appends objects. The last one has the priority
@@ -22,6 +23,27 @@ ol.assign = function() {
 			r[v] = arguments[a][v];
 	return r;
 };
+
+//HACK get control on Map init to modify it
+ol.Map.prototype.renderFrame_ = function(time) {
+	function setMap(target) {
+		// Store the map on it & advise it
+		target.map_ = map; //TODO ARCHI BEST : put on layers/controls
+		target.dispatchEvent('myol:onadd');
+	}
+
+	if (!map.getTargetElement().map_) { //Only once
+		// Add ol.map object reference to the html #map element
+		map.getTargetElement().map_ = map;
+
+		map.on('postrender', function() { // Each time we can
+			map.getLayers().forEach(setMap);
+			map.getControls().forEach(setMap);
+		});
+	}
+	
+	ol.PluggableMap.prototype.renderFrame_.call(this,time);
+}
 
 /**
  * TILE LAYERS
@@ -901,6 +923,7 @@ function controlButton(o) {
 	control.setMap = function(map) {
 		//HACK get control on Map init to modify it
 		ol.control.Control.prototype.setMap.call(this, map);
+		control.map_ = map;
 
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
@@ -909,28 +932,11 @@ function controlButton(o) {
 			divElement.style.top = '.5em';
 			divElement.style.left = (nextButtonPos += 2) + 'em';
 		}
-
-		if (!map.getTargetElement().map_) { //Only once
-			// Add ol.map object reference to the html #map element
-			map.getTargetElement().map_ = map;
-
-			map.on('postrender', function() { // Each time we can
-				map.getLayers().forEach(setMap);
-				map.getControls().forEach(setMap);
-			});
-		}
 	};
 
-	//TODO ARCHI Function declarations should not be placed in blocks.
-	function setMap(target) {
-		// Store the map on it & advise it
-		target.map_ = map; //TODO ARCHI BEST : put on layers/controls
-		target.dispatchEvent('myol:onadd');
-	}
-
 	// Toggle the button status & aspect
-	// In case of group buttons, set inactive the other one
-	// (button that have the same .grou^p are group)
+	// In case of grouped buttons, set inactive the other one
+	// (button that have the same .group are grouped)
 	control.active = false;
 	control.toggle = function(newActive) {
 		control.map_.getControls().forEach(function(c) {
@@ -1514,17 +1520,17 @@ function geocoder() {
 			element: document.createElement('div'), //HACK No button
 		});
 
-	const gc = new Geocoder('nominatim', {
+	const geocoder = new Geocoder('nominatim', {
 		provider: 'osm',
 		lang: 'FR',
 		keepOpen: true,
 		placeholder: 'Recherche sur la carte' // Initialization of the input field
 	});
-	gc.container.title = 'Recherche sur la carte';
-	gc.container.style.top = '.5em';
-	gc.container.style.left = (nextButtonPos += 2) + 'em';
+	geocoder.container.title = 'Recherche sur la carte';
+	geocoder.container.style.top = '.5em';
+	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
 
-	return gc;
+	return geocoder;
 }
 
 /**
