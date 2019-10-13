@@ -11,7 +11,6 @@
  */
 
 /* jshint esversion: 6 */
-//TODO ARCHI check var / const / let
 
 /**
  * Appends objects. The last one has the priority
@@ -1619,6 +1618,7 @@ function printMap(orientation, el, resolution) {
  * Line & Polygons Editor
  * Requires controlButton
  */
+ //TODO hover style on modify / non modify ??
 function layerEdit(o) {
 	const options = ol.assign({
 			geoJsonId: 'editable-json',
