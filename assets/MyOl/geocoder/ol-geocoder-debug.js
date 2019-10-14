@@ -1,8 +1,8 @@
 /*!
- * ol-geocoder - v3.3.0
+ * ol-geocoder - v4.0.0
  * A geocoder extension for OpenLayers.
  * https://github.com/jonataswalker/ol-geocoder
- * Built: Thu Jul 04 2019 07:15:42 GMT-0300 (Brasilia Standard Time)
+ * Built: Wed Oct 09 2019 11:36:42 GMT-0300 (Brasilia Standard Time)
  */
 
 (function (global, factory) {
@@ -60,6 +60,7 @@
   };
 
   var _VARS_ = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     containerId: containerId,
     buttonControlId: buttonControlId,
     inputQueryId: inputQueryId,
@@ -829,7 +830,9 @@
       var this$1 = this;
 
     var timeout, lastQuery;
-    var openSearch = function () {
+    var openSearch = function (evt) {
+      evt.stopPropagation();
+
       hasClass(this$1.els.control, klasses$1.glass.expanded)
         ? this$1.collapse()
         : this$1.expand();
@@ -848,6 +851,9 @@
         evt.preventDefault();
         this$1.query(value);
       }
+    };
+    var stopBubbling = function (evt) {
+      evt.stopPropagation();
     };
     var reset = function (evt) {
       this$1.els.input.focus();
@@ -874,6 +880,7 @@
       }
     };
     this.els.input.addEventListener('keypress', query, false);
+    this.els.input.addEventListener('click', stopBubbling, false);
     this.els.input.addEventListener('input', handleValue, false);
     this.els.reset.addEventListener('click', reset, false);
     if (this.options.targetType === TARGET_TYPE.GLASS) {

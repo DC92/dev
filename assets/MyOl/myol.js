@@ -11,6 +11,7 @@
  */
 
 /* jshint esversion: 6 */
+//TODO check dependencies
 
 /**
  * Appends objects. The last one has the priority
@@ -34,7 +35,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 
 	if (!map.getTargetElement().map__) { //Only once
 		// Add ol.map object reference to the html #map element
-		map.getTargetElement().map__ = map;//TODO delete
+		map.getTargetElement().map__ = map; //TODO delete
 
 		map.on('postrender', function() { // Each time we can
 			map.getLayers().forEach(setMap);
@@ -913,8 +914,8 @@ function controlButton(o) {
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 		options.onAdd(map);
-		control.map_ = map; //TODO DELETE
-		control.dispatchEvent('myol:onadd'); //TODO DELETE
+		//		control.map_ = map; //TODO DELETE
+		//		control.dispatchEvent('myol:onadd'); //TODO DELETE
 	};
 
 	if (options.label || options.className) {
@@ -1297,25 +1298,19 @@ function controlGPS(options) {
  * This prepares the browser to become offline on the same session
  * Requires controlButton
  */
-//TODO TEST
 function controlPreLoad() {
-	const divElement = document.createElement('div'),
-		button = controlButton({
-			onAdd: function(map) {
-				map.on('change:size', function() {
-					const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+	return controlButton({
+		onAdd: function(map) {
+			map.on('change:size', function() {
+				const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
 
-					map.getLayers().forEach(function(layer) {
-						//TODO more extend please
-						//TODO BUG don't work !!
-						if (layer.type == 'TILE')
-							layer.setPreload(fs ? 4 : 0);
-					});
+				map.getLayers().forEach(function(layer) {
+					if (typeof layer.setPreload == 'function')
+						layer.setPreload(fs ? 4 : 0);
 				});
-			},
-		});
-
-	return button;
+			});
+		},
+	});
 }
 
 /**
@@ -1534,7 +1529,7 @@ function controlGeocoder() {
  */
 //TODO BUG dont work
 function controlPrint() {
-	let map;
+	let map; //TODO ARCHI
 	return controlButton({
 		className: 'print-button',
 		activate: printMap,
@@ -1953,7 +1948,7 @@ function controlsCollection(options) {
  */
 function layersCollection(keys) {
 	return {
-		'OpenTopo': layerOSM(
+		'OpenTopo': layerOSM( //TODO BUG no display on lower scales
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
