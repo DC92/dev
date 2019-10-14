@@ -29,13 +29,13 @@ ol.assign = function() {
 ol.Map.prototype.renderFrame_ = function(time) {
 	function setMap(target) {
 		// Store the map on it & advise it
-		target.map_ = map; //TODO ARCHI BEST : put on layers/controls
+		target.map_x = map; //TODO ARCHI BEST : put on layers/controls
 		target.dispatchEvent('myol:onadd');
 	}
 
-	if (!map.getTargetElement().map__) { //Only once
+	if (!map.getTargetElement().map_T_) { //Only once
 		// Add ol.map object reference to the html #map element
-		map.getTargetElement().map__ = map; //TODO delete
+		map.getTargetElement().map_T_ = map; //TODO delete
 
 		map.on('postrender', function() { // Each time we can
 			map.getLayers().forEach(setMap);
@@ -44,7 +44,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 	}
 
 	ol.PluggableMap.prototype.renderFrame_.call(this, time);
-}
+};
 
 /**
  * TILE LAYERS
@@ -176,21 +176,21 @@ layerTileIncomplete = function(o) {
 		});
 
 	layer.once('myol:onadd', function(evt) {
-		layer.map_ = evt.target.map_;
-		layer.map_.getView().on('change', change);
+		layer.map_x = evt.target.map_x; //TODO ARCHI map_x layerTileIncomplete
+		layer.map_x.getView().on('change', change);
 		change(); // At init
 	});
 
 	// Zoom has changed
 	function change() {
-		const view = layer.map_.getView(),
+		const view = layer.map_x.getView(),
 			center = view.getCenter();
 		let currentResolution = 999999; // Init loop at max resolution
 		options.sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
-			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
+			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_x.getSize())))
 			currentResolution = Object.keys(options.sources).filter(function(evt) { // HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
@@ -450,7 +450,7 @@ function layerVectorURL(o) {
 		);
 
 	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_ = evt.target.map_;
+		const map = layer.map_x = evt.target.map_x; //TODO ARCHI map_x layerVectorURL
 
 		// Create the label popup
 		//TODO BUG don't zoom when the cursor is over a label
@@ -728,17 +728,17 @@ layerOverpass = function(o) {
 
 			// Other paramaters
 			const done = [ // These that have no added value or already included
-					'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
-					'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
-					'opening_hours,description,beds,bus,note',
-					'addr,housenumber,street,postcode,city,bus,public_transport,tactile_paving',
-					'ref,source,wheelchair,leisure,landuse,camp_site,bench,network,brand,bulk_purchase,organic',
-					'compressed_air,fuel,vending,vending_machine',
-					'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
-					'historic,motorcycle,drying,restaurant,hgv',
-					'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
-				].join(',').split(','),
-				nbInternet = 0;
+				'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
+				'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
+				'opening_hours,description,beds,bus,note',
+				'addr,housenumber,street,postcode,city,bus,public_transport,tactile_paving',
+				'ref,source,wheelchair,leisure,landuse,camp_site,bench,network,brand,bulk_purchase,organic',
+				'compressed_air,fuel,vending,vending_machine',
+				'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
+				'historic,motorcycle,drying,restaurant,hgv',
+				'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
+			].join(',').split(',');
+			let nbInternet = 0;
 			for (let k in p) {
 				const k0 = k.split(':')[0];
 				if (!done.includes(k0))
@@ -800,7 +800,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		});
 
 	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_ = evt.target.map_;
+		const map = layer.map_x = evt.target.map_x; //TODO ARCHI map_x marker
 
 		if (dragged) {
 			// Drag and drop
@@ -861,7 +861,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
 		coord[nol] = parseFloat(evt.value); // On change la valeur qui a été modifiée
 		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
-		layer.map_.getView().setCenter(point.getCoordinates());
+		layer.map_x.getView().setCenter(point.getCoordinates());
 	};
 
 	layer.getPoint = function() {
@@ -911,11 +911,11 @@ function controlButton(o) {
 	control.options_ = options;
 
 	//HACK get control on Map init
+	let map_w;
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 		options.onAdd(map);
-		//		control.map_ = map; //TODO DELETE
-		//		control.dispatchEvent('myol:onadd'); //TODO DELETE
+		map_w = map; //TODO ARCHI map_x
 	};
 
 	if (options.label || options.className) {
@@ -943,7 +943,7 @@ function controlButton(o) {
 	// (button that have the same .group are grouped)
 	control.active = false;
 	control.toggle = function(newActive) {
-		control.map_.getControls().forEach(function(c) {
+		map_w.getControls().forEach(function(c) {
 			if (c.options_ &&
 				c.options_.group == options.group) { // For all controls in the same group
 				const setActive =
@@ -1646,7 +1646,7 @@ function layerEdit(o) {
 	};
 
 	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_;
+		const map = layer.map_x; //TODO ARCHI map_x layerEdit
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
@@ -1708,7 +1708,7 @@ function controlModify(options) {
 	const modify = new ol.interaction.Modify(options);
 
 	modify.on('modifyend', function(evt) {
-		const map = evt.target.map_;
+		const map = evt.target.map_x; //TODO ARCHI map_x controlModify
 		//TODO		map.removeInteraction(hover);
 
 		//TODO BUG BEST do not delete the feature if you point to a summit
