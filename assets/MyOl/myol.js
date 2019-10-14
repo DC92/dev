@@ -16,7 +16,7 @@
 /**
  * Appends objects. The last one has the priority
  */
-//TODO ARCHI resorb
+//TODO ARCHI BEST resorb
 ol.assign = function() {
 	let r = {};
 	for (let a in arguments)
@@ -31,7 +31,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 		map.hack_ = map;
 		map.on('postrender', function() { // Each time we can / une as once
 			map.getLayers().forEach(function(target) {
-				target.map_x = map; //TODO ARCHI BEST : put on layers/controls
+				target.map_x = map; //TODO ARCHI BEST put on layers/controls
 				target.dispatchEvent('myol:onadd');
 			});
 		});
@@ -1490,7 +1490,6 @@ function controlDownloadGPX(o) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG dont work
 function controlGeocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
@@ -1518,8 +1517,7 @@ function controlGeocoder() {
  */
 //TODO BUG dont work
 function controlPrint() {
-	let map; //TODO ARCHI
-	return controlButton({
+	const button = controlButton({
 		className: 'print-button',
 		activate: printMap,
 		question: '<p>Paysage : ' +
@@ -1530,13 +1528,12 @@ function controlPrint() {
 			'<span onclick="printMap("portrait",this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
 			'</p> ',
 		title: 'Imprimer la carte',
-		onAdd: function(m) {
-			map = m;
-		},
 	});
 
 	//TODO add scale in printed maps
 	function printMap(orientation, el, resolution) {
+		const map = button.getMap();
+
 		// Search control div element in the hierarchy
 		while (el.parentElement && !el.control_)
 			el = el.parentElement;
@@ -1595,6 +1592,8 @@ function controlPrint() {
 			size: printSize
 		});
 	}
+
+	return button;
 }
 
 
