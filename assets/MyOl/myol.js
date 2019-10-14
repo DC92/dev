@@ -4,7 +4,7 @@
  * https://github.com/Dominique92/MyOl
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
- * You only have to include openlayers/dist .js & .css files & my 2 & that's it !
+ * You only have to include openlayers/dist.js & .css files & myol.js & .css & that's it !
  * You can use any of these functions independantly
  * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
@@ -15,6 +15,7 @@
 /**
  * Appends objects. The last one has the priority
  */
+//TODO ARCHI resorb
 ol.assign = function() {
 	let r = {};
 	for (let a in arguments)
@@ -31,13 +32,13 @@ ol.Map.prototype.renderFrame_ = function(time) {
 		target.dispatchEvent('myol:onadd');
 	}
 
-	if (!map.getTargetElement().map_) { //Only once
+	if (!map.getTargetElement().map__) { //Only once
 		// Add ol.map object reference to the html #map element
-		map.getTargetElement().map_ = map;
+		map.getTargetElement().map__ = map;//TODO delete
 
 		map.on('postrender', function() { // Each time we can
 			map.getLayers().forEach(setMap);
-			map.getControls().forEach(setMap);
+			//			map.getControls().forEach(setMap);
 		});
 	}
 
@@ -896,34 +897,37 @@ function JSONparse(json) {
 var nextButtonPos = 2.5; // Top position of next button (em)
 
 function controlButton(o) {
-	const options = ol.assign({
-			className: '', // {string} className of the button.
+	const buttonElement = document.createElement('button'),
+		divElement = document.createElement('div'),
+		options = ol.assign({
+			element: divElement,
+			label: '', // {string} character to be displayed in the button
+			className: '', // {string} className of the button
 			activeBackgroundColor: 'white',
+			onAdd: function() {},
 		}, o),
-		buttonElement = document.createElement('button'),
-		divElement = document.createElement('div');
-
-	const control = new ol.control.Control(ol.assign({
-		element: divElement
-	}, options));
+		control = new ol.control.Control(options);
 	control.options_ = options;
 
-	buttonElement.innerHTML = options.label || ''; // {string} character to be displayed in the button
-	buttonElement.addEventListener('click', function(evt) {
-		evt.preventDefault();
-		control.toggle();
-	});
-
-	divElement.appendChild(buttonElement);
-	divElement.className = 'ol-button ol-unselectable ol-control ' + (options.className || '');
-	divElement.title = options.title; // {string} displayed when the control is hovered.
-	divElement.control_ = control; // For callback functions
-
+	//HACK get control on Map init
 	control.setMap = function(map) {
-		//HACK get control on Map init to modify it
 		ol.control.Control.prototype.setMap.call(this, map);
-		control.map_ = map;
+		options.onAdd(map);
+		control.map_ = map; //TODO DELETE
+		control.dispatchEvent('myol:onadd'); //TODO DELETE
+	};
 
+	if (options.label || options.className) {
+		buttonElement.innerHTML = options.label;
+		buttonElement.addEventListener('click', function(evt) {
+			evt.preventDefault();
+			control.toggle();
+		});
+
+		divElement.appendChild(buttonElement);
+		divElement.className = 'ol-button ol-unselectable ol-control ' + options.className;
+		divElement.title = options.title; // {string} displayed when the control is hovered.
+		divElement.control_ = control; // For callback functions //TODO DELETE ??
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -931,7 +935,7 @@ function controlButton(o) {
 			divElement.style.top = '.5em';
 			divElement.style.left = (nextButtonPos += 2) + 'em';
 		}
-	};
+	}
 
 	// Toggle the button status & aspect
 	// In case of grouped buttons, set inactive the other one
@@ -966,15 +970,13 @@ function controlButton(o) {
  * Requires controlButton & controlPermanentCheckbox
  * Requires permanentCheckboxList
  */
-//TODO accept null layer and not show it
 function controlLayersSwitcher(options) {
-	options = options || {};
-
 	const button = controlButton({
 		label: '&hellip;',
 		className: 'switch-layer',
 		title: 'Liste des cartes',
-		rightPosition: 0.5
+		rightPosition: 0.5,
+		onAdd: onAddLS,
 	});
 
 	// Transparency slider (first position)
@@ -991,18 +993,17 @@ function controlLayersSwitcher(options) {
 	selectorElement.title = 'Ctrl+click : multicouches';
 	button.element.appendChild(selectorElement);
 
-	button.once('myol:onadd', function(evt) {
-		const map = evt.target.map_;
-
+	function onAddLS(map) {
 		// Base layers selector init
-		for (let name in options.baseLayers) { // array of layers, mandatory, no default
-			const baseElement = document.createElement('div');
-			baseElement.innerHTML =
-				'<input type="checkbox" name="baselayer" value="' + name + '">' +
-				'<span title="">' + name + '</span>';
-			selectorElement.appendChild(baseElement);
-			map.addLayer(options.baseLayers[name]);
-		}
+		for (let name in options.baseLayers)
+			if (options.baseLayers[name]) { // array of layers, mandatory, no default
+				const baseElement = document.createElement('div');
+				baseElement.innerHTML =
+					'<input type="checkbox" name="baselayer" value="' + name + '">' +
+					'<span title="">' + name + '</span>';
+				selectorElement.appendChild(baseElement);
+				map.addLayer(options.baseLayers[name]);
+			}
 
 		// Make the selector memorized by cookies
 		controlPermanentCheckbox('baselayer', displayLayerSelector);
@@ -1022,7 +1023,7 @@ function controlLayersSwitcher(options) {
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
 				displayLayerSelector();
 		});
-	});
+	}
 
 	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
@@ -1040,10 +1041,11 @@ function controlLayersSwitcher(options) {
 		list = permanentCheckboxList('baselayer');
 
 		// Refresh layers visibility & opacity
-		for (let layerName in options.baseLayers) {
-			options.baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
-			options.baseLayers[layerName].setOpacity(0);
-		}
+		for (let layerName in options.baseLayers)
+			if (options.baseLayers[layerName]) {
+				options.baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
+				options.baseLayers[layerName].setOpacity(0);
+			}
 		options.baseLayers[list[0]].setOpacity(1);
 		if (list.length >= 2)
 			options.baseLayers[list[1]].setOpacity(rangeElement.value / 100);
@@ -1052,7 +1054,7 @@ function controlLayersSwitcher(options) {
 		button.element.firstElementChild.style.display = evt ? 'none' : '';
 		rangeElement.style.display = evt && list.length > 1 ? '' : 'none';
 		selectorElement.style.display = evt ? '' : 'none';
-		selectorElement.style.maxHeight = (button.map_.getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
+		selectorElement.style.maxHeight = (button.getMap().getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}
 
 	return button;
@@ -1130,12 +1132,9 @@ function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
 		!window.location.href.match(/https|localhost/i))
-		return new ol.control.Control({ //HACK No button
-			element: document.createElement('div'),
-		});
+		return;
 
-	let map, view,
-		gps = {}, // Mem last sensors values
+	let gps = {}, // Mem last sensors values
 		compas = {},
 
 		// The graticule
@@ -1162,7 +1161,11 @@ function controlGPS(options) {
 			className: 'gps-button',
 			title: 'Centrer sur la position GPS',
 			activeBackgroundColor: '#ef3',
+			onAdd: function(map) {
+				map.on('moveend', renderReticule);
+			},
 			activate: function(active) {
+				const map = button.getMap();
 				//TODO 3 steps activation : position + reticule + orientation / reticule / none
 				//TODO freeze rotation when inactive
 				//TODO block screen standby
@@ -1173,7 +1176,7 @@ function controlGPS(options) {
 					map.addLayer(layer);
 				else {
 					map.removeLayer(layer);
-					view.setRotation(0);
+					map.getView().setRotation(0);
 				}
 			}
 		}),
@@ -1192,13 +1195,6 @@ function controlGPS(options) {
 			width: 1
 		})
 	}));
-
-	button.once('myol:onadd', function() {
-		map = button.getMap();
-		view = map.getView();
-
-		map.on('moveend', renderReticule);
-	});
 
 	geolocation.on('error', function(error) {
 		alert('Geolocation error: ' + error.message);
@@ -1237,15 +1233,17 @@ function controlGPS(options) {
 
 	function renderReticule() {
 		if (button.active && gps) {
+			// Estimate the viewport size
+			const map = button.getMap(),
+				view = map.getView(),
+				hg = map.getCoordinateFromPixel([0, 0]),
+				bd = map.getCoordinateFromPixel(map.getSize()),
+				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
+
 			if (!graticule.getGeometry()) // Only once the first time the feature is enabled
 				view.setZoom(17); // Zoom on the area
 
 			view.setCenter(gps.position);
-
-			// Estimate the viewport size
-			const hg = map.getCoordinateFromPixel([0, 0]),
-				bd = map.getCoordinateFromPixel(map.getSize()),
-				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
 
 			// Redraw the graticule
 			graticule.setGeometry(new ol.geom.GeometryCollection([
@@ -1299,24 +1297,23 @@ function controlGPS(options) {
  * This prepares the browser to become offline on the same session
  * Requires controlButton
  */
+//TODO TEST
 function controlPreLoad() {
 	const divElement = document.createElement('div'),
-		button = new ol.control.Control({
-			element: divElement
+		button = controlButton({
+			onAdd: function(map) {
+				map.on('change:size', function() {
+					const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+
+					map.getLayers().forEach(function(layer) {
+						//TODO more extend please
+						//TODO BUG don't work !!
+						if (layer.type == 'TILE')
+							layer.setPreload(fs ? 4 : 0);
+					});
+				});
+			},
 		});
-
-	button.once('myol:onadd', function(evt) {
-		const map = evt.target.map_;
-
-		map.on('change:size', function() {
-			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-
-			map.getLayers().forEach(function(layer) {
-				if (layer.type == 'TILE')
-					layer.setPreload(fs ? 4 : 0);
-			});
-		});
-	});
 
 	return button;
 }
@@ -1327,23 +1324,20 @@ function controlPreLoad() {
  */
 function controlLengthLine() {
 	const divElement = document.createElement('div'),
-		button = new ol.control.Control({
-			element: divElement
+		button = controlButton({
+			element: divElement,
+			onAdd: function(map) {
+				divElement.className = 'ol-length-line';
+
+				map.on('pointermove', function(evtMove) {
+					divElement.innerHTML = ''; // Clear the measure if hover no feature
+
+					map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
+						hitTolerance: 6
+					});
+				});
+			},
 		});
-
-	button.once('myol:onadd', function(evt) {
-		const map = evt.target.map_;
-
-		divElement.className = 'ol-length-line';
-
-		map.on('pointermove', function(evtMove) {
-			divElement.innerHTML = ''; // Clear the measure if hover no feature
-
-			map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
-				hitTolerance: 6
-			});
-		});
-	});
 
 	function calculateLength(feature) {
 		if (!feature)
@@ -1434,26 +1428,29 @@ function controlLoadGPX(o) {
  */
 //TODO BUG do not export points
 function controlDownloadGPX(o) {
+	let map; //TODO BEST ARCHI
 	const options = ol.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
 			fileName: 'trace', //TODO BEST give a name according to the context
-			extraMetaData: '' // Additional tags to the GPX file header
+			extraMetaData: '', // Additional tags to the GPX file header
+			onAdd: function(m) {
+				map = m;
+			},
 		}, o),
 		hiddenElement = document.createElement('a');
-	let button; //TODO ARCHI
 
 	//HACK for Moz
 	hiddenElement.target = '_blank';
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	options.activate = function(evt) { // Callback at activation / desactivation, mandatory, no default
+	options.activate = function() { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
-			extent = button.map_.getView().calculateExtent();
+			extent = map.getView().calculateExtent();
 
 		// Get all visible features
-		button.map_.getLayers().forEach(function(layer) {
+		map.getLayers().forEach(function(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					features.push(feature);
@@ -1502,15 +1499,15 @@ function controlDownloadGPX(o) {
 			}));
 	};
 
-	button = controlButton(options);
-	return button;
+	return controlButton(options);
 }
 
 /**
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-function geocoder() {
+//TODO BUG dont work
+function controlGeocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
 	if (typeof Geocoder != 'function' ||
@@ -1535,7 +1532,9 @@ function geocoder() {
 /**
  * Print control
  */
+//TODO BUG dont work
 function controlPrint() {
+	let map;
 	return controlButton({
 		className: 'print-button',
 		activate: printMap,
@@ -1546,71 +1545,72 @@ function controlPrint() {
 			'<span onclick="printMap("portrait",this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
 			'<span onclick="printMap("portrait",this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
 			'</p> ',
-		title: 'Imprimer la carte'
-	});
-}
-
-//TODO add scale in printed maps
-//TODO ARCHI include in controlPrint
-function printMap(orientation, el, resolution) {
-	// Search control div element in the hierarchy
-	while (el.parentElement && !el.control_)
-		el = el.parentElement;
-
-	// Get existing context
-	const map = el.control_.map_,
-		mapEl = map.getTargetElement(),
-		mapCookie = document.cookie.match('map=([^;]*)');
-
-	// Hide other elements than the map
-	document.body.style.cursor = "wait";
-	while (document.body.firstChild)
-		document.body.removeChild(document.body.firstChild);
-
-	// Raises the map to the top level
-	document.body.appendChild(mapEl);
-	mapEl.style.width = '100%';
-	mapEl.style.height = '100%';
-
-	// Hide controls
-	const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
-	Array.prototype.filter.call(controls, function(el) {
-		el.style.display = 'none';
+		title: 'Imprimer la carte',
+		onAdd: function(m) {
+			map = m;
+		},
 	});
 
-	// Add page style for printing
-	const style = document.createElement('style');
-	document.head.appendChild(style);
-	style.appendChild(document.createTextNode(
-		"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
-	));
+	//TODO add scale in printed maps
+	function printMap(orientation, el, resolution) {
+		// Search control div element in the hierarchy
+		while (el.parentElement && !el.control_)
+			el = el.parentElement;
 
-	map.once('rendercomplete', function(event) {
-		/*//TODO attendre fin du chargement de toutes les couches !
-		map.getLayers().forEach(function(layer) {
-			if(layer.getSource())
-				;
+		// Get existing context
+		const mapEl = map.getTargetElement(),
+			mapCookie = document.cookie.match('map=([^;]*)');
+
+		// Hide other elements than the map
+		document.body.style.cursor = "wait";
+		while (document.body.firstChild)
+			document.body.removeChild(document.body.firstChild);
+
+		// Raises the map to the top level
+		document.body.appendChild(mapEl);
+		mapEl.style.width = '100%';
+		mapEl.style.height = '100%';
+
+		// Hide controls
+		const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
+		Array.prototype.filter.call(controls, function(el) {
+			el.style.display = 'none';
 		});
-		*/
 
-		//TODO BUG Chrome puts 3 pages in landscape
-		//TODO IE11 very big margin
-		window.print();
-		document.cookie = 'map=' + mapCookie + ';path=/';
-		window.location.href = window.location.href;
-	});
+		// Add page style for printing
+		const style = document.createElement('style');
+		document.head.appendChild(style);
+		style.appendChild(document.createTextNode(
+			"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
+		));
 
-	// Set print size, which will render the new map
-	const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
-		printSize = [
-			Math.round(dim[0] * (resolution || 100) / 25.4),
-			Math.round(dim[1] * (resolution || 100) / 25.4)
-		],
-		extent = map.getView().calculateExtent(map.getSize());
-	map.setSize(printSize);
-	map.getView().fit(extent, {
-		size: printSize
-	});
+		map.once('rendercomplete', function(event) {
+			/*//TODO attendre fin du chargement de toutes les couches !
+			map.getLayers().forEach(function(layer) {
+				if(layer.getSource())
+					;
+			});
+			*/
+
+			//TODO BUG Chrome puts 3 pages in landscape
+			//TODO IE11 very big margin
+			window.print();
+			document.cookie = 'map=' + mapCookie + ';path=/';
+			window.location.href = window.location.href;
+		});
+
+		// Set print size, which will render the new map
+		const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
+			printSize = [
+				Math.round(dim[0] * (resolution || 100) / 25.4),
+				Math.round(dim[1] * (resolution || 100) / 25.4)
+			],
+			extent = map.getView().calculateExtent(map.getSize());
+		map.setSize(printSize);
+		map.getView().fit(extent, {
+			size: printSize
+		});
+	}
 }
 
 
@@ -1618,7 +1618,7 @@ function printMap(orientation, el, resolution) {
  * Line & Polygons Editor
  * Requires controlButton
  */
- //TODO hover style on modify / non modify ??
+//TODO hover style on modify / non modify ??
 function layerEdit(o) {
 	const options = ol.assign({
 			geoJsonId: 'editable-json',
@@ -1714,8 +1714,7 @@ function controlModify(options) {
 
 	modify.on('modifyend', function(evt) {
 		const map = evt.target.map_;
-
-		//		map.removeInteraction(hover);
+		//TODO		map.removeInteraction(hover);
 
 		//TODO BUG BEST do not delete the feature if you point to a summit
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
@@ -1940,7 +1939,7 @@ function controlsCollection(options) {
 			tipLabel: 'Plein écran'
 		}),
 		controlPreLoad(),
-		geocoder(),
+		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),

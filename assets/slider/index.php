@@ -11,7 +11,7 @@
 	<?php include('slider.html');
 
 	// Makes a slider with the jpeg files in this directory
-	foreach (glob('*.j*') AS $f)
+	foreach (glob('*.jp*') AS $f)
 		$diaporama [] = $f;
 	?>
 
