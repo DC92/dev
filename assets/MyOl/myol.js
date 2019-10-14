@@ -25,21 +25,15 @@ ol.assign = function() {
 	return r;
 };
 
-//HACK get control on Map init to modify it
+//HACK add a onadd event & map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
-	function setMap(target) {
-		// Store the map on it & advise it
-		target.map_x = map; //TODO ARCHI BEST : put on layers/controls
-		target.dispatchEvent('myol:onadd');
-	}
-
-	if (!map.getTargetElement().map_T_) { //Only once
-		// Add ol.map object reference to the html #map element
-		map.getTargetElement().map_T_ = map; //TODO delete
-
-		map.on('postrender', function() { // Each time we can
-			map.getLayers().forEach(setMap);
-			//			map.getControls().forEach(setMap);
+	if (!map.hack_) { //Only once
+		map.hack_ = map;
+		map.on('postrender', function() { // Each time we can / une as once
+			map.getLayers().forEach(function(target) {
+				target.map_x = map; //TODO ARCHI BEST : put on layers/controls
+				target.dispatchEvent('myol:onadd');
+			});
 		});
 	}
 
@@ -169,15 +163,14 @@ layerTileIncomplete = function(o) {
 	const layer = new ol.layer.Tile(), // For callback functions
 		options = layer.options_ = ol.assign({ // Default options
 			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
-			sources: {}
+			sources: {},
 		}, o),
 		backgroundSource = new ol.source.Stamen({
 			layer: 'terrain'
 		});
 
-	layer.once('myol:onadd', function(evt) {
-		layer.map_x = evt.target.map_x; //TODO ARCHI map_x layerTileIncomplete
-		layer.map_x.getView().on('change', change);
+	layer.once('myol:onadd', function() {
+		layer.map_x.getView().on('change', change); //TODO ARCHI map_x layerTileIncomplete
 		change(); // At init
 	});
 
@@ -425,14 +418,14 @@ function layerVectorURL(o) {
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
 			strategy: loadingStrategyBboxLimit, //TODO do not use for overpass
-			format: format
+			format: format,
 		}, options));
 
 	// Create the layer
 	const layer = new ol.layer.Vector(ol.assign({
 		source: source,
 		renderBuffer: 16, // buffered area around curent view (px)
-		zIndex: 1 // Above the baselayer even if included to the map before
+		zIndex: 1, // Above the baselayer even if included to the map before
 	}, options));
 	layer.options_ = options;
 
@@ -450,7 +443,7 @@ function layerVectorURL(o) {
 		);
 
 	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_x = evt.target.map_x; //TODO ARCHI map_x layerVectorURL
+		const map = evt.target.map_x; //TODO ARCHI map_x layerVectorURL
 
 		// Create the label popup
 		//TODO BUG don't zoom when the cursor is over a label
@@ -585,7 +578,7 @@ layerOverpass = function(o) {
 			selectorId: 'overpass', // Element containing all checkboxes
 			selectorName: 'overpass', // Checkboxes
 			labelClass: 'label-overpass',
-			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/'
+			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 		}, o),
 		checkElements = document.getElementsByName(options.selectorName),
 		elSelector = document.getElementById(options.selectorId);
@@ -752,7 +745,7 @@ layerOverpass = function(o) {
 					}
 			}
 			return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
-		}
+		},
 	}, options));
 };
 
@@ -800,11 +793,9 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		});
 
 	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_x = evt.target.map_x; //TODO ARCHI map_x marker
-
 		if (dragged) {
 			// Drag and drop
-			map.addInteraction(new ol.interaction.Modify({
+			layer.map_x.addInteraction(new ol.interaction.Modify({ //TODO ARCHI map_x marker
 				features: new ol.Collection([feature]),
 				style: style
 			}));
@@ -911,11 +902,9 @@ function controlButton(o) {
 	control.options_ = options;
 
 	//HACK get control on Map init
-	let map_w;
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 		options.onAdd(map);
-		map_w = map; //TODO ARCHI map_x
 	};
 
 	if (options.label || options.className) {
@@ -943,7 +932,7 @@ function controlButton(o) {
 	// (button that have the same .group are grouped)
 	control.active = false;
 	control.toggle = function(newActive) {
-		map_w.getControls().forEach(function(c) {
+		control.getMap().getControls().forEach(function(c) {
 			if (c.options_ &&
 				c.options_.group == options.group) { // For all controls in the same group
 				const setActive =
@@ -1069,7 +1058,7 @@ function controlPermalink(o) {
 	const options = ol.assign({
 			hash: '?', // {?, #} the permalink delimiter
 			visible: true, // {true | false} add a controlPermalink button to the map.
-			init: true // {true | false} use url hash or "controlPermalink" cookie to position the map.
+			init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
 		}, o),
 		divElement = document.createElement('div'),
 		aElement = document.createElement('a'),
@@ -1370,7 +1359,7 @@ function controlLoadGPX(o) {
 					color: 'blue',
 					width: 3
 				})
-			})
+			}),
 		}, o),
 		inputElement = document.createElement('input'),
 		format = new ol.format.GPX(),
@@ -1708,14 +1697,13 @@ function controlModify(options) {
 	const modify = new ol.interaction.Modify(options);
 
 	modify.on('modifyend', function(evt) {
-		const map = evt.target.map_x; //TODO ARCHI map_x controlModify
 		//TODO		map.removeInteraction(hover);
 
 		//TODO BUG BEST do not delete the feature if you point to a summit
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
-				const selectedFeatures = map.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+				const selectedFeatures = modify.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
 					layerFilter: function(l) {
 						return l.ol_uid == options.layer.ol_uid;
@@ -1938,7 +1926,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
-		controlPrint()
+		controlPrint(),
 	];
 }
 
