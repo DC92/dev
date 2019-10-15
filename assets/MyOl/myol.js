@@ -31,7 +31,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 		map.hack_ = map;
 		map.on('postrender', function() { // Each time we can / une as once
 			map.getLayers().forEach(function(target) {
-				target.map_x = map; //TODO ARCHI BEST put on layers/controls
+				target.map_ = map; //TODO ARCHI BEST put on layers/controls
 				target.dispatchEvent('myol:onadd');
 			});
 		});
@@ -170,20 +170,20 @@ layerTileIncomplete = function(o) {
 		});
 
 	layer.once('myol:onadd', function() {
-		layer.map_x.getView().on('change', change); //TODO ARCHI map_x layerTileIncomplete
+		layer.map_.getView().on('change:resolution', change);
 		change(); // At init
 	});
 
 	// Zoom has changed
 	function change() {
-		const view = layer.map_x.getView(),
-			center = view.getCenter();
-		let currentResolution = 999999; // Init loop at max resolution
+		let view = layer.map_.getView(), //TODO ARCHI map ref layerTileIncomplete
+			center = view.getCenter(),
+			currentResolution = 999999; // Init loop at max resolution
 		options.sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
-			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_x.getSize())))
+			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize()))) //TODO ARCHI map ref layerTileIncomplete
 			currentResolution = Object.keys(options.sources).filter(function(evt) { // HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
@@ -265,7 +265,7 @@ function layerOS(key) {
 	});
 
 	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.on('change:opacity', function(evt) {
+	layer.once('change:opacity', function(evt) {
 		if (evt.target.getVisible() && !evt.target.options_.sources[75])
 			evt.target.options_.sources[75] = new ol.source.BingMaps({
 				imagerySet: 'ordnanceSurvey',
@@ -284,7 +284,7 @@ function layerBing(key, subLayer) {
 	const layer = new ol.layer.Tile();
 
 	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.on('change:opacity', function(evt) {
+	layer.once('change:opacity', function(evt) {
 		if (this.getVisible() && !this.getSource()) {
 			layer.setSource(new ol.source.BingMaps({
 				imagerySet: subLayer,
@@ -443,7 +443,7 @@ function layerVectorURL(o) {
 		);
 
 	layer.once('myol:onadd', function(evt) {
-		const map = evt.target.map_x; //TODO ARCHI map_x layerVectorURL
+		const map = evt.target.map_; //TODO ARCHI map ref layerVectorURL
 
 		// Create the label popup
 		//TODO BUG don't zoom when the cursor is over a label
@@ -795,7 +795,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	layer.once('myol:onadd', function(evt) {
 		if (dragged) {
 			// Drag and drop
-			layer.map_x.addInteraction(new ol.interaction.Modify({ //TODO ARCHI map_x marker
+			layer.map_.addInteraction(new ol.interaction.Modify({ //TODO ARCHI map ref marker
 				features: new ol.Collection([feature]),
 				style: style
 			}));
@@ -852,7 +852,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
 		coord[nol] = parseFloat(evt.value); // On change la valeur qui a été modifiée
 		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
-		layer.map_x.getView().setCenter(point.getCoordinates());
+		layer.map_.getView().setCenter(point.getCoordinates());
 	};
 
 	layer.getPoint = function() {
@@ -1600,6 +1600,7 @@ function controlPrint() {
 /**
  * Line & Polygons Editor
  * Requires controlButton
+ * Requires 'myol:onadd' event
  */
 //TODO hover style on modify / non modify ??
 function layerEdit(o) {
@@ -1634,7 +1635,7 @@ function layerEdit(o) {
 	};
 
 	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_x; //TODO ARCHI map_x layerEdit
+		const map = layer.map_; //TODO ARCHI map ref layerEdit
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
