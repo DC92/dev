@@ -476,7 +476,7 @@ function layerVectorURL(o) {
 			filter: function(feature, l) {
 				return l == layer;
 			},
-			style: layer.options_.hoverStyle || layer.options_.style
+			style: layer.options_.hoverStyle || layer.options_.style,
 		}));
 
 		// Hide popup when the cursor is out of the map
@@ -484,7 +484,7 @@ function layerVectorURL(o) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
 			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-				map.popup_.setPosition();
+				map.popup_.setPosition([-100, -100]);
 		});
 	});
 
@@ -497,19 +497,19 @@ function layerVectorURL(o) {
 			popupRect = map.popElement_.getBoundingClientRect();
 		if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
 			popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
-			map.popup_.setPosition();
+			map.popup_.setPosition([-100, -100]);
 
 		// Reset cursor if there is no feature here
 		map.getViewport().style.cursor = 'default';
 
 		map.forEachFeatureAtPixel(
 			pixel,
-			function(feature, l) {
+			function(feature, layer) {
 				let geometry = feature.getGeometry();
 				if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
 					geometry = geometry.getGeometries()[0];
 
-				if (l && l.options_) {
+				if (layer && layer.options_) {
 					const properties = feature.getProperties(),
 						coordinates = geometry.flatCoordinates, // If it's a point, just over it
 						ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
@@ -897,6 +897,7 @@ function controlButton(o) {
 			className: '', // {string} className of the button
 			activeBackgroundColor: 'white',
 			onAdd: function() {},
+			activate: function() {},
 		}, o),
 		control = new ol.control.Control(options);
 	control.options_ = options;
@@ -943,9 +944,7 @@ function controlButton(o) {
 				if (setActive != c.active) {
 					c.active = setActive;
 					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeBackgroundColor : 'white';
-
-					if (typeof c.options_.activate == 'function')
-						c.options_.activate(c.active, buttonElement);
+					c.options_.activate(c.active, buttonElement);
 				}
 			}
 		});
@@ -1307,10 +1306,8 @@ function controlPreLoad() {
  * option hoverStyle style the hovered feature (don't use with layerEdit)
  * Requires controlButton
  */
-function controlLengthLine(options) {
-	var selectedFeature = null,
-		selectedStyle = null,
-		divElement = document.createElement('div'),
+function controlLengthLine() {
+	var divElement = document.createElement('div'),
 		button = controlButton({
 			element: divElement,
 			onAdd: function(map) {
@@ -1319,21 +1316,10 @@ function controlLengthLine(options) {
 				map.on('pointermove', function(evtMove) {
 					divElement.innerHTML = ''; // Clear the measure if hover no feature
 
-					// Restore former style when hovering is finished
-					if (selectedFeature)
-						selectedFeature.setStyle(selectedStyle);
-					selectedFeature = null;
-
 					// Find new features to hover
 					map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
-						hitTolerance: 6
+						hitTolerance: 6,
 					});
-
-					// Style the hovered one
-					if (selectedFeature && options && options.hoverStyle) {
-						selectedStyle = selectedFeature.getStyle();
-						selectedFeature.setStyle(options.hoverStyle);
-					}
 				});
 			},
 		});
@@ -1352,10 +1338,6 @@ function controlLengthLine(options) {
 			divElement.innerHTML = (Math.round(length / 10) / 100) + ' km';
 		else if (length >= 1)
 			divElement.innerHTML = (Math.round(length)) + ' m';
-
-		// Select one of the hovered feature
-		if (divElement.innerHTML) // Only for features having a measure (except points)
-			selectedFeature = feature;
 
 		return false; // Continue detection (for editor that has temporary layers)
 	}
@@ -1500,7 +1482,7 @@ function controlDownloadGPX(o) {
 			hiddenElement.dispatchEvent(new MouseEvent('click', {
 				view: window,
 				bubbles: true,
-				cancelable: true
+				cancelable: true,
 			}));
 	};
 
@@ -1511,6 +1493,7 @@ function controlDownloadGPX(o) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
+//TODO BUG : le title déborde vers le bas quand le pavé de saisie n'est pas affiché
 function controlGeocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
@@ -1625,7 +1608,7 @@ function controlPrint() {
 //TODO hover style on modify / non modify ??
 function layerEdit(o) {
 	const options = ol.assign({
-			geoJsonId: 'editable-json',
+			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 		}, o),
 		format = new ol.format.GeoJSON(),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
@@ -1653,17 +1636,7 @@ function layerEdit(o) {
 			decimals: 5
 		});
 	};
-	/*
-			// Style when hovering a feature
-			map.addInteraction(new ol.interaction.Select({
-				condition: ol.events.condition.pointerMove,
-				hitTolerance: 6,
-				filter: function(feature, l) {
-					return l == layer;
-				},
-				style: layer.options_.hoverStyle || layer.options_.style
-			}));
-	*/
+
 	layer.once('myol:onadd', function(evt) {
 		const map = layer.map_; //TODO ARCHI map ref layerEdit
 
@@ -1683,7 +1656,7 @@ function layerEdit(o) {
 			));
 		}
 
-		options.controls.forEach(function(c) {
+		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
 			const control = c(ol.assign({
 				group: layer,
 				layer: layer,
@@ -1710,7 +1683,7 @@ function layerEdit(o) {
 		map.addInteraction(snap);
 
 		// Snap on features external to the editor
-		if (options.snapLayers) // Optional
+		if (options.snapLayers) // Optional option snapLayers : [list of layers to snap]
 			options.snapLayers.forEach(function(layer) {
 				layer.getSource().on('change', function() {
 					const fs = this.getFeatures();
@@ -1723,12 +1696,11 @@ function layerEdit(o) {
 	return layer;
 }
 
+//TODO BUG no hover on existing features
 function controlModify(options) {
 	const modify = new ol.interaction.Modify(options);
 
 	modify.on('modifyend', function(evt) {
-		//TODO		map.removeInteraction(hover);
-
 		//TODO BUG BEST do not delete the feature if you point to a summit
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
@@ -1746,7 +1718,6 @@ function controlModify(options) {
 			else if (evt.target.vertexFeature_) // 
 				return cleanAndSave(options.source, evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
-
 		cleanAndSave(options.source);
 	});
 
@@ -1943,17 +1914,7 @@ function controlsCollection(options) {
 			className: 'ol-coordinate',
 			undefinedHTML: String.fromCharCode(0)
 		}),
-		controlLengthLine({
-			hoverStyle: new ol.style.Style({
-				fill: new ol.style.Fill({
-					color: 'rgba(255,255,255,0.7)'
-				}),
-				stroke: new ol.style.Stroke({
-					color: '#3399CC',
-					width: 3
-				})
-			}),
-		}),
+		controlLengthLine(),
 		controlPermalink(options.controlPermalink),
 		new ol.control.Zoom({
 			zoomOutLabel: '-'
