@@ -470,7 +470,6 @@ function layerVectorURL(o) {
 		}
 
 		// Style when hovering a feature
-		//TODO BUG BEST interacts with the editor
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6,
@@ -893,6 +892,7 @@ function controlButton(o) {
 		divElement = document.createElement('div'),
 		options = ol.assign({
 			element: divElement,
+			group: Math.random(),
 			label: '', // {string} character to be displayed in the button
 			className: '', // {string} className of the button
 			activeBackgroundColor: 'white',
@@ -1515,7 +1515,6 @@ function controlGeocoder() {
 /**
  * Print control
  */
-//TODO BUG dont work
 function controlPrint() {
 	const button = controlButton({
 		className: 'print-button',
@@ -1749,6 +1748,7 @@ function controlDrawLine(options) {
 		}, options));
 
 	draw.on(['drawend'], function(evt) {
+		//TODO BUG don't stick new line with other open poly (not yet in the source)
 		cleanAndSave(options.source);
 		button.toggle(false);
 	});
@@ -1768,14 +1768,15 @@ function controlDrawPolygon(options) {
 }
 
 // Sort Points / Lines (Polygons are treated as Lines)
+//TODO BUG ouvre massif ou urllayer quand clique sur partie de l'éditeur
+//TODO BEST option not to be able to cut a polygon
 function cleanAndSave(source, pointerPosition) {
-	// Get flattened list of multipoints coords
-	//TODO BEST option not to be able to cut a polygon
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 		polys = [];
 
 	source.clear();
 
+	// Get flattened list of multipoints coords
 	for (let a = 0; a < lines.length; a++) {
 		// Exclude 1 coord features (points)
 		if (lines[a] && lines[a].length < 2)
@@ -1926,7 +1927,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
-		controlPrint(),
+		//TODO BUG controlPrint(),
 	];
 }
 
