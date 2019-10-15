@@ -1304,10 +1304,13 @@ function controlPreLoad() {
 
 /**
  * Control to displays the length of a line overflown
+ * option hoverStyle style the hovered feature (don't use with layerEdit)
  * Requires controlButton
  */
-function controlLengthLine() {
-	const divElement = document.createElement('div'),
+function controlLengthLine(options) {
+	var selectedFeature = null,
+		selectedStyle = null,
+		divElement = document.createElement('div'),
 		button = controlButton({
 			element: divElement,
 			onAdd: function(map) {
@@ -1316,9 +1319,21 @@ function controlLengthLine() {
 				map.on('pointermove', function(evtMove) {
 					divElement.innerHTML = ''; // Clear the measure if hover no feature
 
+					// Restore former style when hovering is finished
+					if (selectedFeature)
+						selectedFeature.setStyle(selectedStyle);
+					selectedFeature = null;
+
+					// Find new features to hover
 					map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
 						hitTolerance: 6
 					});
+
+					// Style the hovered one
+					if (selectedFeature && options && options.hoverStyle) {
+						selectedStyle = selectedFeature.getStyle();
+						selectedFeature.setStyle(options.hoverStyle);
+					}
 				});
 			},
 		});
@@ -1327,6 +1342,7 @@ function controlLengthLine() {
 		if (!feature)
 			return false;
 
+		// Display the line length
 		const length = ol.sphere.getLength(feature.getGeometry());
 		if (length >= 100000)
 			divElement.innerHTML = (Math.round(length / 1000)) + ' km';
@@ -1336,6 +1352,11 @@ function controlLengthLine() {
 			divElement.innerHTML = (Math.round(length / 10) / 100) + ' km';
 		else if (length >= 1)
 			divElement.innerHTML = (Math.round(length)) + ' m';
+
+		// Select one of the hovered feature
+		if (divElement.innerHTML) // Only for features having a measure (except points)
+			selectedFeature = feature;
+
 		return false; // Continue detection (for editor that has temporary layers)
 	}
 
@@ -1632,7 +1653,17 @@ function layerEdit(o) {
 			decimals: 5
 		});
 	};
-
+	/*
+			// Style when hovering a feature
+			map.addInteraction(new ol.interaction.Select({
+				condition: ol.events.condition.pointerMove,
+				hitTolerance: 6,
+				filter: function(feature, l) {
+					return l == layer;
+				},
+				style: layer.options_.hoverStyle || layer.options_.style
+			}));
+	*/
 	layer.once('myol:onadd', function(evt) {
 		const map = layer.map_; //TODO ARCHI map ref layerEdit
 
@@ -1912,7 +1943,17 @@ function controlsCollection(options) {
 			className: 'ol-coordinate',
 			undefinedHTML: String.fromCharCode(0)
 		}),
-		controlLengthLine(),
+		controlLengthLine({
+			hoverStyle: new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: 'rgba(255,255,255,0.7)'
+				}),
+				stroke: new ol.style.Stroke({
+					color: '#3399CC',
+					width: 3
+				})
+			}),
+		}),
 		controlPermalink(options.controlPermalink),
 		new ol.control.Zoom({
 			zoomOutLabel: '-'
