@@ -34,7 +34,7 @@ function geoControls(options) {
 			className: 'ol-coordinate',
 			undefinedHTML: String.fromCharCode(0)
 		}),
-		controlPermalink(ol.assign({
+		controlPermalink(Object.assign({
 			initialFit: options.geoKeys.initialFit
 		}, options.controlPermalink)),
 		new ol.control.Zoom(),
@@ -104,7 +104,7 @@ function layerStyleOptionsFunction(properties, idSelect, transparency /* [fill, 
 }
 
 function geoOverlays(o) {
-	const options = ol.assign({
+	const options = Object.assign({
 		topidIdExclude: '',
 		transparency: [0.5, 0.5],
 		hoverTransparency: [0, 1]

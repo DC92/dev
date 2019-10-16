@@ -5,7 +5,7 @@ console.log(document.cookie);
  * Requires layerVectorURL
  */
 function layerPointsWri(options) {
-	return layerVectorURL(ol.assign({
+	return layerVectorURL(Object.assign({
 		baseUrl: '//www.refuges.info/api/bbox?type_points=',
 		styleOptions: function(properties) {
 			return {

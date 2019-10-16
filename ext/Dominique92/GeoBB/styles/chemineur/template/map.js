@@ -13,7 +13,7 @@ $('#map').resizable({
 function geoControls(options) {
 	const keys = options.geoKeys;
 
-	return controlsCollection(ol.assign({
+	return controlsCollection(Object.assign({
 		baseLayers: {
 			'OpenTopo': layerOSM(
 				'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
@@ -101,7 +101,7 @@ function layerStyleOptionsFunction(properties, hover) {
 
 //TODO factoriser
 function geoOverlays(o) {
-	const options = ol.assign({
+	const options = Object.assign({
 		topidIdExclude: ''
 	}, o);
 

@@ -5,28 +5,16 @@
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
  * You only have to include openlayers/dist.js & .css files & myol.js & .css & that's it !
- * You can use any of these functions independantly
+ * You can use any of these functions independantly (except documented dependencies)
  * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 
 /* jshint esversion: 6 */
-//TODO check dependencies
-
-/**
- * Appends objects. The last one has the priority
- */
-//TODO ARCHI BEST resorb
-ol.assign = function() {
-	let r = {};
-	for (let a in arguments)
-		for (let v in arguments[a])
-			r[v] = arguments[a][v];
-	return r;
-};
 
 //HACK add a onadd event & map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
+	var map = this;
 	if (!map.hack_) { //Only once
 		map.hack_ = map;
 		map.on('postrender', function() { // Each time we can / une as once
@@ -161,7 +149,7 @@ function layerSpain(serveur, layer) {
  */
 layerTileIncomplete = function(o) {
 	const layer = new ol.layer.Tile(), // For callback functions
-		options = layer.options_ = ol.assign({ // Default options
+		options = layer.options_ = Object.assign({ // Default options
 			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
 			sources: {},
 		}, o),
@@ -353,7 +341,7 @@ function permanentCheckboxList(selectorName, evt) {
 }
 
 /**
- * BBOX dependant strategy
+ * BBOX on layer with feature limit
  * Same that bbox but reloads if we zoom in because we are delivering more points
  * Returns {ol.loadingstrategy} to be used in layer definition
  */
@@ -372,25 +360,24 @@ function loadingStrategyBboxLimit(extent, resolution) {
 function escapedStyle(a, b) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 	return function(feature) {
-		return new ol.style.Style(ol.assign({
+		return new ol.style.Style(Object.assign({
 				fill: defaultStyle.getFill(),
 				stroke: defaultStyle.getStroke(),
 				image: defaultStyle.getImage(),
 			},
 			typeof a == 'function' ? a(feature.getProperties()) : a,
-			typeof b == 'function' ? b(feature.getProperties()) : b,
-		))
+			typeof b == 'function' ? b(feature.getProperties()) : b
+		));
 	};
 }
 
 /**
  * GeoJson POI layer
- * Requires 'myol:onadd' event
- * Requires controlPermanentCheckbox
- * Requires permanentCheckboxList
+ * Requires 'myol:onadd' event, controlButton, controlPermanentCheckbox,
+ * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(o) {
-	const options = ol.assign({ // Default options
+	const options = Object.assign({ // Default options
 		baseUrlFunction: function(bbox, list, resolution) {
 			return options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
@@ -408,8 +395,8 @@ function layerVectorURL(o) {
 	};
 
 	// Manage source & vector objects
-	var loadedExtentsRtree = null, //TODO ARCHI best ??????
-		source = new ol.source.Vector(ol.assign({
+	var loadedExtentsRtree = null, //TODO ARCHI
+		source = new ol.source.Vector(Object.assign({
 			url: function(extent, resolution, projection) {
 				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 					// Retreive checked parameters
@@ -423,7 +410,7 @@ function layerVectorURL(o) {
 		}, options));
 
 	// Create the layer
-	const layer = new ol.layer.Vector(ol.assign({
+	const layer = new ol.layer.Vector(Object.assign({
 		source: source,
 		style: escapedStyle(options.styleOptions),
 		renderBuffer: 16, // buffered area around curent view (px)
@@ -472,7 +459,6 @@ function layerVectorURL(o) {
 		}
 
 		// Style when hovering a feature
-		//TODO BUG TEST interagit avec l'éditeur
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6,
@@ -525,13 +511,15 @@ function layerVectorURL(o) {
 						layer.options_.label || '',
 						postLabel = typeof layer.options_.postLabel == 'function' ?
 						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
-						layer.options_.postLabel || '';
+						layer.options_.postLabel || '',
+						pos = map.popup_.getPosition();
 
-					if (label && map.popup_.getPosition()[0] < 0) { // Only for the first feature on the hovered stack
+					if (label && typeof pos == 'array' && pos[0] < 0) { // Only for the first feature on the hovered stack
 						// Calculate the label's anchor
 						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
 						// Fill label class & text
+						//TODO BUG EDGE only dispach the filrst hovered feature
 						map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
 						map.popElement_.innerHTML = label + postLabel;
 						if (typeof layer.options_.href == 'function') {
@@ -574,7 +562,7 @@ function layerVectorURL(o) {
 //TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 layerOverpass = function(o) {
-	const options = ol.assign({ // Default options
+	const options = Object.assign({ // Default options
 			baseUrl: '//overpass-api.de/api/interpreter',
 			maxResolution: 30, // Only call overpass if the map's resolution is lower
 			selectorId: 'overpass', // Element containing all checkboxes
@@ -630,7 +618,7 @@ layerOverpass = function(o) {
 		return 'inconnu';
 	}
 
-	return layerVectorURL(ol.assign({
+	return layerVectorURL(Object.assign({
 		format: osmXmlPoi,
 		styleOptions: function(properties) {
 			return {
@@ -753,8 +741,7 @@ layerOverpass = function(o) {
 
 /**
  * Marker
- * Requires proj4.js for swiss coordinates
- * Requires 'myol:onadd' event
+ * Requires proj4.js for swiss coordinates & 'myol:onadd' event
  */
 //TODO BEST finger cursor when hover the target (select ?)
 // map.getViewport().style.cursor = 'pointer'; / default
@@ -885,7 +872,7 @@ function JSONparse(json) {
  * CONTROLS
  */
 /**
- * Control buttons
+ * Control button
  * Abstract definition to be used by other control buttons definitions
  */
 var nextButtonPos = 2.5; // Top position of next button (em)
@@ -893,7 +880,7 @@ var nextButtonPos = 2.5; // Top position of next button (em)
 function controlButton(o) {
 	const buttonElement = document.createElement('button'),
 		divElement = document.createElement('div'),
-		options = ol.assign({
+		options = Object.assign({
 			element: divElement,
 			group: Math.random(),
 			label: '', // {string} character to be displayed in the button
@@ -959,8 +946,7 @@ function controlButton(o) {
 /**
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
- * Requires controlButton & controlPermanentCheckbox
- * Requires permanentCheckboxList
+ * Requires controlButton, controlPermanentCheckbox & permanentCheckboxList
  */
 function controlLayersSwitcher(options) {
 	const button = controlButton({
@@ -1034,11 +1020,12 @@ function controlLayersSwitcher(options) {
 
 		// Refresh layers visibility & opacity
 		for (let layerName in options.baseLayers)
-			if (options.baseLayers[layerName]) {
+			if (typeof options.baseLayers[layerName] == 'object') {
 				options.baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
 				options.baseLayers[layerName].setOpacity(0);
 			}
-		options.baseLayers[list[0]].setOpacity(1);
+		if (typeof options.baseLayers[list[0]] == 'object')
+			options.baseLayers[list[0]].setOpacity(1);
 		if (list.length >= 2)
 			options.baseLayers[list[1]].setOpacity(rangeElement.value / 100);
 
@@ -1057,7 +1044,7 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
 function controlPermalink(o) {
-	const options = ol.assign({
+	const options = Object.assign({
 			hash: '?', // {?, #} the permalink delimiter
 			visible: true, // {true | false} add a controlPermalink button to the map.
 			init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
@@ -1354,7 +1341,7 @@ function controlLengthLine() {
  */
 //TODO BUG have a maximum zoom (1 point makes the map invisible)
 function controlLoadGPX(o) {
-	const options = ol.assign({
+	const options = Object.assign({
 			label: '&uArr;',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
@@ -1419,7 +1406,7 @@ function controlLoadGPX(o) {
 //TODO BUG do not export points
 function controlDownloadGPX(o) {
 	let map; //TODO BEST ARCHI
-	const options = ol.assign({
+	const options = Object.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
 			fileName: 'trace', //TODO BEST give a name according to the context
@@ -1521,7 +1508,9 @@ function controlGeocoder() {
 
 /**
  * Print control
+ * requires controlButton
  */
+//TODO BUG don't work
 function controlPrint() {
 	const button = controlButton({
 		className: 'print-button',
@@ -1604,12 +1593,10 @@ function controlPrint() {
 
 /**
  * Line & Polygons Editor
- * Requires controlButton
- * Requires escapedStyle
- * Requires 'myol:onadd' event
+ * Requires controlButton, escapedStyle & 'myol:onadd' event
  */
 function layerEdit(o) {
-	const options = ol.assign({
+	const options = Object.assign({
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 		}, o),
 		format = new ol.format.GeoJSON(),
@@ -1628,6 +1615,7 @@ function layerEdit(o) {
 			zIndex: 20,
 			style: escapedStyle(options.styleOptions),
 		}),
+		//TODO BUG snap don't work
 		snap = new ol.interaction.Snap({
 			source: source,
 		}),
@@ -1671,7 +1659,7 @@ function layerEdit(o) {
 			});
 
 		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
-			const control = c(ol.assign({
+			const control = c(Object.assign({
 				group: layer,
 				layer: layer,
 				activeButtonBackgroundColor: '#ef3',
@@ -1722,7 +1710,7 @@ function controlModify(options) {
 		cleanAndSave(options.source);
 	});
 
-	return controlButton(ol.assign({
+	return controlButton(Object.assign({
 		interaction: modify,
 		label: 'M',
 		title: 'Activer "M" (couleur jaune) puis\n' +
@@ -1738,10 +1726,10 @@ function controlModify(options) {
 }
 
 function controlDrawLine(options) {
-	const draw = new ol.interaction.Draw(ol.assign({
+	const draw = new ol.interaction.Draw(Object.assign({
 			type: 'LineString',
 		}, options)),
-		button = controlButton(ol.assign({
+		button = controlButton(Object.assign({
 			interaction: draw,
 			label: 'L',
 			title: 'Activer "L" puis\n' +
@@ -1760,7 +1748,7 @@ function controlDrawLine(options) {
 }
 
 function controlDrawPolygon(options) {
-	return controlDrawLine(ol.assign({
+	return controlDrawLine(Object.assign({
 		type: 'Polygon',
 		label: 'P',
 		title: 'Activer "P" puis\n' +
@@ -1900,7 +1888,7 @@ function controlsCollection(options) {
 		options.baseLayers = layersCollection(options.geoKeys);
 
 	return [
-		controlLayersSwitcher(ol.assign({
+		controlLayersSwitcher(Object.assign({
 			baseLayers: options.baseLayers,
 			geoKeys: options.geoKeys
 		}, options.controlLayersSwitcher)),
@@ -1935,7 +1923,6 @@ function controlsCollection(options) {
 
 /**
  * Tile layers examples
- * Requires many
  */
 function layersCollection(keys) {
 	return {
