@@ -12,6 +12,8 @@
 
 /* jshint esversion: 6 */
 
+//TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
+
 //HACK add a onadd event & map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
 	var map = this;
@@ -41,7 +43,7 @@ function layerOSM(url, attribution) {
 			attributions: [
 				attribution || '',
 				ol.source.OSM.ATTRIBUTION
-			]
+			],
 		})
 	});
 }
@@ -78,7 +80,7 @@ function layerGoogle(layer) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
 			url: '//mt{0-3}.google.com/vt/lyrs=' + layer + '&hl=fr&x={x}&y={y}&z={z}',
-			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>'
+			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
 		})
 	});
 }
@@ -89,7 +91,7 @@ function layerGoogle(layer) {
 function layerStamen(layer) {
 	return new ol.layer.Tile({
 		source: new ol.source.Stamen({
-			layer: layer
+			layer: layer,
 		})
 	});
 }
@@ -120,7 +122,7 @@ function layerIGN(key, layer, format) {
 			format: 'image/' + (format || 'jpeg'),
 			tileGrid: IGNtileGrid,
 			style: 'normal',
-			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>'
+			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
 		})
 	});
 }
@@ -135,7 +137,7 @@ function layerSpain(serveur, layer) {
 				'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
 				'&style=default&tilematrixset=GoogleMapsCompatible' +
 				'&TileMatrix={z}&TileCol={x}&TileRow={y}',
-			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>'
+			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
 		})
 	});
 }
@@ -154,7 +156,7 @@ layerTileIncomplete = function(o) {
 			sources: {},
 		}, o),
 		backgroundSource = new ol.source.Stamen({
-			layer: 'terrain'
+			layer: 'terrain',
 		});
 
 	layer.once('myol:onadd', function() {
@@ -200,7 +202,7 @@ function layerSwissTopo(layer) {
 	const tileGrid = new ol.tilegrid.WMTS({
 		origin: ol.extent.getTopLeft(projectionExtent),
 		resolutions: resolutions,
-		matrixIds: matrixIds
+		matrixIds: matrixIds,
 	});
 
 	return layerTileIncomplete({
@@ -211,7 +213,7 @@ function layerSwissTopo(layer) {
 				url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
 				tileGrid: tileGrid,
 				requestEncoding: 'REST',
-				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>'
+				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 			}))
 		}
 	});
@@ -226,9 +228,9 @@ function layerIGM() {
 		return new ol.source.TileWMS({
 			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
 			params: {
-				layers: layer
+				layers: layer,
 			},
-			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>'
+			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
 		});
 	}
 
@@ -237,7 +239,7 @@ function layerIGM() {
 		sources: {
 			100: igmSource('IGM_250000', 'CB.IGM250000'),
 			25: igmSource('IGM_100000', 'MB.IGM100000'),
-			5: igmSource('IGM_25000', 'CB.IGM25000')
+			5: igmSource('IGM_25000', 'CB.IGM25000'),
 		}
 	});
 }
@@ -249,7 +251,7 @@ function layerIGM() {
  */
 function layerOS(key) {
 	const layer = layerTileIncomplete({
-		extent: [-841575, 6439351, 198148, 8589177] // EPSG:27700 (G.B.)
+		extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
 	});
 
 	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
@@ -257,7 +259,7 @@ function layerOS(key) {
 		if (evt.target.getVisible() && !evt.target.options_.sources[75])
 			evt.target.options_.sources[75] = new ol.source.BingMaps({
 				imagerySet: 'ordnanceSurvey',
-				key: key
+				key: key,
 			});
 	});
 
@@ -559,8 +561,6 @@ function layerVectorURL(o) {
 //TODO IE BUG no overpass on IE
 //TODO BEST BUG displays "?" when moves or zooms after changing a selector
 //TODO BEST display error 429 (Too Many Requests)
-//TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
-
 layerOverpass = function(o) {
 	const options = Object.assign({ // Default options
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -743,8 +743,6 @@ layerOverpass = function(o) {
  * Marker
  * Requires proj4.js for swiss coordinates & 'myol:onadd' event
  */
-//TODO BEST finger cursor when hover the target (select ?)
-// map.getViewport().style.cursor = 'pointer'; / default
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	const format = new ol.format.GeoJSON();
 	let eljson, json, elxy;
@@ -792,6 +790,15 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 				displayLL(this.getCoordinates());
 			});
 		}
+
+		// Change cursor while hovering the target
+		map.on('pointermove', function(evtMove) {
+			map.getViewport().style.cursor = 'default';
+			map.forEachFeatureAtPixel(evtMove.pixel, function(f) {
+				if (f == feature)
+					map.getViewport().style.cursor = 'move';
+			});
+		});
 	});
 
 	// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
