@@ -300,7 +300,7 @@ function controlPermanentCheckbox(selectorName, callback) {
 	for (let e = 0; e < checkElements.length; e++) {
 		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
 
-		//TODO BUG EDGE check, then retrieve init
+		//TODO BUG EDGE check, then retrieve init / lost layer on switchlayer
 		if (cookie) // Set the checks accordingly with the cookie
 			checkElements[e].checked = cookie[1].split(',').indexOf(checkElements[e].value) !== -1;
 	}
@@ -484,8 +484,9 @@ function layerVectorURL(o) {
 		// Hide label by default if none feature or his popup here
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			popupRect = map.popElement_.getBoundingClientRect();
-		if (popupRect.left - 5 > mapRect.x + evt.pixel[0] || mapRect.x + evt.pixel[0] >= popupRect.right + 5 ||
-			popupRect.top - 5 > mapRect.y + evt.pixel[1] || mapRect.y + evt.pixel[1] >= popupRect.bottom + 5)
+		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
+			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
+			!popupRect)
 			map.popup_.setPosition([-100, -100]);
 
 		// Reset cursor if there is no feature here
@@ -514,12 +515,11 @@ function layerVectorURL(o) {
 						layer.options_.postLabel || '',
 						pos = map.popup_.getPosition();
 
-					if (label && typeof pos == 'array' && pos[0] < 0) { // Only for the first feature on the hovered stack
+					if (label && typeof pos == 'object' && pos[0] < 0) { // Only for the first feature on the hovered stack
 						// Calculate the label's anchor
 						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
 						// Fill label class & text
-						//TODO BUG EDGE only dispach the filrst hovered feature
 						map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
 						map.popElement_.innerHTML = label + postLabel;
 						if (typeof layer.options_.href == 'function') {
