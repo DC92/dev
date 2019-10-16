@@ -366,14 +366,21 @@ function loadingStrategyBboxLimit(extent, resolution) {
 	return [extent];
 }
 
-//TODO apply to layerVectorURL
+/**
+ * General function
+ */
 function escapedStyle(a, b) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
-	return new ol.style.Style(ol.assign({
-		fill: defaultStyle.getFill(),
-		stroke: defaultStyle.getStroke(),
-		image: defaultStyle.getImage(),
-	}, a, b));
+	return function(feature) {
+		return new ol.style.Style(ol.assign({
+				fill: defaultStyle.getFill(),
+				stroke: defaultStyle.getStroke(),
+				image: defaultStyle.getImage(),
+			},
+			typeof a == 'function' ? a(feature.getProperties()) : a,
+			typeof b == 'function' ? b(feature.getProperties()) : b,
+		))
+	};
 }
 
 /**
@@ -389,22 +396,6 @@ function layerVectorURL(o) {
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		}
 	}, o);
-	if (options.styleOptions) // Optional
-		options.style = function(feature) {
-			return new ol.style.Style(
-				typeof options.styleOptions == 'function' ?
-				options.styleOptions(feature.getProperties()) :
-				options.styleOptions
-			);
-		};
-	if (options.hoverStyleOptions) // Optional
-		options.hoverStyle = function(feature) {
-			return new ol.style.Style(
-				typeof options.hoverStyleOptions == 'function' ?
-				options.hoverStyleOptions(feature.getProperties()) :
-				options.hoverStyleOptions
-			);
-		};
 
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
@@ -434,10 +425,11 @@ function layerVectorURL(o) {
 	// Create the layer
 	const layer = new ol.layer.Vector(ol.assign({
 		source: source,
+		style: escapedStyle(options.styleOptions),
 		renderBuffer: 16, // buffered area around curent view (px)
 		zIndex: 1, // Above the baselayer even if included to the map before
 	}, options));
-	layer.options_ = options;
+	layer.options_ = options; //TODO ARCHI
 
 	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -456,7 +448,7 @@ function layerVectorURL(o) {
 		const map = evt.target.map_; //TODO ARCHI map ref layerVectorURL
 
 		// Create the label popup
-		//TODO BUG don't zoom when the cursor is over a label
+		//TODO BUG BEST don't zoom when the cursor is over a label
 		if (!map.popElement_) { //HACK Only once for all layers
 			map.popElement_ = document.createElement('a');
 			map.popElement_.style.display = 'block';
@@ -487,7 +479,7 @@ function layerVectorURL(o) {
 			filter: function(feature, l) {
 				return l == layer;
 			},
-			style: layer.options_.hoverStyle || layer.options_.style,
+			style: escapedStyle(options.styleOptions, options.hoverStyleOptions),
 		}));
 
 		// Hide popup when the cursor is out of the map
@@ -535,7 +527,7 @@ function layerVectorURL(o) {
 						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
 						layer.options_.postLabel || '';
 
-					if (label && !map.popup_.getPosition()) { // Only for the first feature on the hovered stack
+					if (label && map.popup_.getPosition()[0] < 0) { // Only for the first feature on the hovered stack
 						// Calculate the label's anchor
 						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
@@ -1504,7 +1496,7 @@ function controlDownloadGPX(o) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG : le title déborde vers le bas quand le pavé de saisie n'est pas affiché
+//TODO BUG le title déborde vers le bas quand le pavé de saisie n'est pas affiché
 function controlGeocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
@@ -1679,7 +1671,6 @@ function layerEdit(o) {
 			});
 
 		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
-			//map.removeInteraction(hover);// Temporary remove hover to have it on the end of the list
 			const control = c(ol.assign({
 				group: layer,
 				layer: layer,
@@ -1707,7 +1698,7 @@ function layerEdit(o) {
 }
 
 function controlModify(options) {
-	//TODO BUG perturbation avec le hover
+	//TODO BUG perturbation avec le hover (when drag rapidly)
 	const modify = new ol.interaction.Modify(options);
 
 	modify.on('modifyend', function(evt) {
