@@ -124,25 +124,22 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 			],
 			snapLayers: [chemineurLayer],
 			styleOptions: {
-				fill: new ol.style.Fill({
-					color: 'rgba(0,0,0,0.3)'
-				}),
 				stroke: new ol.style.Stroke({
-					color: 'blue',
+					color: 'orange',
 					width: 2,
-				})
+				}),
 			},
-			editStyleOptions: {
+			editStyleOptions: { // Hover / modify / create
 				image: new ol.style.Circle({
 					radius: 4,
 					fill: new ol.style.Fill({
 						color: 'red',
-					})
+					}),
 				}),
 				stroke: new ol.style.Stroke({
-					color: '#46f',
+					color: 'red',
 					width: 2,
-				})
+				}),
 			},
 		}),
 	],

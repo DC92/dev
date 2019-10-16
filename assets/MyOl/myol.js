@@ -366,6 +366,16 @@ function loadingStrategyBboxLimit(extent, resolution) {
 	return [extent];
 }
 
+//TODO apply to layerVectorURL
+function escapedStyle(a, b) {
+	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
+	return new ol.style.Style(ol.assign({
+		fill: defaultStyle.getFill(),
+		stroke: defaultStyle.getStroke(),
+		image: defaultStyle.getImage(),
+	}, a, b));
+}
+
 /**
  * GeoJson POI layer
  * Requires 'myol:onadd' event
@@ -470,6 +480,7 @@ function layerVectorURL(o) {
 		}
 
 		// Style when hovering a feature
+		//TODO BUG TEST interagit avec l'éditeur
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
 			hitTolerance: 6,
@@ -895,7 +906,7 @@ function controlButton(o) {
 			group: Math.random(),
 			label: '', // {string} character to be displayed in the button
 			className: '', // {string} className of the button
-			activeBackgroundColor: 'white',
+			activeButtonBackgroundColor: 'white',
 			onAdd: function() {},
 			activate: function() {},
 		}, o),
@@ -943,7 +954,7 @@ function controlButton(o) {
 
 				if (setActive != c.active) {
 					c.active = setActive;
-					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeBackgroundColor : 'white';
+					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeButtonBackgroundColor : 'white';
 					c.options_.activate(c.active, buttonElement);
 				}
 			}
@@ -1149,7 +1160,7 @@ function controlGPS(options) {
 		button = controlButton({
 			className: 'gps-button',
 			title: 'Centrer sur la position GPS',
-			activeBackgroundColor: '#ef3',
+			activeButtonBackgroundColor: '#ef3',
 			onAdd: function(map) {
 				map.on('moveend', renderReticule);
 			},
@@ -1599,13 +1610,12 @@ function controlPrint() {
 	return button;
 }
 
-
 /**
  * Line & Polygons Editor
  * Requires controlButton
+ * Requires escapedStyle
  * Requires 'myol:onadd' event
  */
-//TODO hover style on modify / non modify ??
 function layerEdit(o) {
 	const options = ol.assign({
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
@@ -1624,16 +1634,25 @@ function layerEdit(o) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20,
+			style: escapedStyle(options.styleOptions),
 		}),
 		snap = new ol.interaction.Snap({
-			source: source
+			source: source,
+		}),
+		hover = new ol.interaction.Select({
+			condition: ol.events.condition.pointerMove,
+			hitTolerance: 6,
+			filter: function(feature, l) {
+				return l == layer;
+			},
+			style: escapedStyle(options.styleOptions, options.editStyleOptions),
 		});
 
 	source.save = function() {
 		// Save lines in <EL> as geoJSON at every change
 		geoJsonEl.value = format.writeFeatures(features, {
 			featureProjection: 'EPSG:3857',
-			decimals: 5
+			decimals: 5,
 		});
 	};
 
@@ -1646,23 +1665,27 @@ function layerEdit(o) {
 				map.removeInteraction(i);
 		});
 
-		if (options.styleOptions) { // Optional
-			layer.setStyle(
-				new ol.style.Style(options.styleOptions)
-			);
-			options.editStyle = new ol.style.Style(ol.assign( // Optional
-				options.styleOptions,
-				options.editStyleOptions // Optional
-			));
-		}
+		map.addInteraction(hover);
+		// Snap on features internal to the editor
+		map.addInteraction(snap);
+		// Snap on features external to the editor
+		if (options.snapLayers) // Optional option snapLayers : [list of layers to snap]
+			options.snapLayers.forEach(function(layer) {
+				layer.getSource().on('change', function() {
+					const fs = this.getFeatures();
+					for (let f in fs)
+						snap.addFeature(fs[f]);
+				});
+			});
 
 		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
+			//map.removeInteraction(hover);// Temporary remove hover to have it on the end of the list
 			const control = c(ol.assign({
 				group: layer,
 				layer: layer,
+				activeButtonBackgroundColor: '#ef3',
 				source: source,
-				activeBackgroundColor: '#ef3',
-				style: options.editStyle,
+				style: escapedStyle(options.styleOptions, options.editStyleOptions),
 				activate: function(active) {
 					control.options_.interaction.setActive(active);
 				},
@@ -1678,26 +1701,13 @@ function layerEdit(o) {
 			cleanAndSave(source);
 			return false;
 		});
-
-		// Snap on features internal to the editor
-		map.addInteraction(snap);
-
-		// Snap on features external to the editor
-		if (options.snapLayers) // Optional option snapLayers : [list of layers to snap]
-			options.snapLayers.forEach(function(layer) {
-				layer.getSource().on('change', function() {
-					const fs = this.getFeatures();
-					for (let f in fs)
-						snap.addFeature(fs[f]);
-				});
-			});
 	});
 
 	return layer;
 }
 
-//TODO BUG no hover on existing features
 function controlModify(options) {
+	//TODO BUG perturbation avec le hover
 	const modify = new ol.interaction.Modify(options);
 
 	modify.on('modifyend', function(evt) {
@@ -1715,7 +1725,7 @@ function controlModify(options) {
 					options.source.removeFeature(selectedFeatures[f]); // We delete the selected feature
 			}
 			// Other modify actions : altKey + click on a segment = delete the segment
-			else if (evt.target.vertexFeature_) // 
+			else if (evt.target.vertexFeature_)
 				return cleanAndSave(options.source, evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
 		cleanAndSave(options.source);
@@ -1770,7 +1780,6 @@ function controlDrawPolygon(options) {
 }
 
 // Sort Points / Lines (Polygons are treated as Lines)
-//TODO BUG ouvre massif ou urllayer quand clique sur partie de l'éditeur
 //TODO BEST option not to be able to cut a polygon
 function cleanAndSave(source, pointerPosition) {
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
