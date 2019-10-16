@@ -378,6 +378,7 @@ function escapedStyle(a, b) {
  * Requires 'myol:onadd' event, controlButton, controlPermanentCheckbox,
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
+ //TODO BUG click far of feature goes to url (sometime)
 function layerVectorURL(o) {
 	const options = Object.assign({ // Default options
 		baseUrlFunction: function(bbox, list, resolution) {
@@ -1490,7 +1491,6 @@ function controlDownloadGPX(o) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG le title déborde vers le bas quand le pavé de saisie n'est pas affiché
 function controlGeocoder() {
 	// Vérify if geocoder is available (not in IE)
 	const ua = navigator.userAgent;
@@ -1506,7 +1506,7 @@ function controlGeocoder() {
 		keepOpen: true,
 		placeholder: 'Recherche sur la carte' // Initialization of the input field
 	});
-	geocoder.container.title = 'Recherche sur la carte';
+	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
 	geocoder.container.style.top = '.5em';
 	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
 
@@ -1766,7 +1766,7 @@ function controlDrawPolygon(options) {
 }
 
 // Sort Points / Lines (Polygons are treated as Lines)
-//TODO BEST option not to be able to cut a polygon
+//TODO BEST option not to be able to cut a polygon (WRI / alpages)
 function cleanAndSave(source, pointerPosition) {
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 		polys = [];
