@@ -454,7 +454,7 @@ function layerVectorURL(o) {
 				evt.target.forEachFeatureAtPixel(
 					evt.pixel,
 					function() {
-						if(map.popup_.getPosition())
+						if (map.popup_.getPosition())
 							map.popElement_.click(); // Simulate a click on the label
 					}
 				);
@@ -1516,7 +1516,7 @@ function controlGeocoder() {
  * Print control
  * requires controlButton
  */
-//TODO BUG don't work
+//TODO BUG PRINT don't work
 function controlPrint() {
 	const button = controlButton({
 		className: 'print-button',
@@ -1531,7 +1531,7 @@ function controlPrint() {
 		title: 'Imprimer la carte',
 	});
 
-	//TODO add scale in printed maps
+	//TODO PRINT add scale in printed maps
 	function printMap(orientation, el, resolution) {
 		const map = button.getMap();
 
@@ -1567,15 +1567,15 @@ function controlPrint() {
 		));
 
 		map.once('rendercomplete', function(event) {
-			/*//TODO attendre fin du chargement de toutes les couches !
+			/*//TODO PRINT attendre fin du chargement de toutes les couches !
 			map.getLayers().forEach(function(layer) {
 				if(layer.getSource())
 					;
 			});
 			*/
 
-			//TODO BUG Chrome puts 3 pages in landscape
-			//TODO IE11 very big margin
+			//TODO PRINT BUG Chrome puts 3 pages in landscape
+			//TODO PRINT IE11 very big margin
 			window.print();
 			document.cookie = 'map=' + mapCookie + ';path=/';
 			window.location.href = window.location.href;
@@ -1621,7 +1621,6 @@ function layerEdit(o) {
 			zIndex: 20,
 			style: escapedStyle(options.styleOptions),
 		}),
-		//TODO BUG snap don't work
 		snap = new ol.interaction.Snap({
 			source: source,
 		}),
@@ -1652,6 +1651,26 @@ function layerEdit(o) {
 		});
 
 		map.addInteraction(hover);
+		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
+			const control = c(Object.assign({
+				group: layer,
+				layer: layer,
+				activeButtonBackgroundColor: '#ef3',
+				source: source,
+				style: escapedStyle(options.styleOptions, options.editStyleOptions),
+				activate: function(active) {
+					control.options_.interaction.setActive(active);
+					if (active) //TODO BEST hover feature when modifing
+						map.removeInteraction(hover);
+					else
+						map.addInteraction(hover);
+				},
+			}, options));
+			control.options_.interaction.setActive(false);
+			map.addInteraction(control.options_.interaction);
+			map.addControl(control);
+		});
+
 		// Snap on features internal to the editor
 		map.addInteraction(snap);
 		// Snap on features external to the editor
@@ -1663,22 +1682,6 @@ function layerEdit(o) {
 						snap.addFeature(fs[f]);
 				});
 			});
-
-		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
-			const control = c(Object.assign({
-				group: layer,
-				layer: layer,
-				activeButtonBackgroundColor: '#ef3',
-				source: source,
-				style: escapedStyle(options.styleOptions, options.editStyleOptions),
-				activate: function(active) {
-					control.options_.interaction.setActive(active);
-				},
-			}, options));
-			control.options_.interaction.setActive(false);
-			map.addInteraction(control.options_.interaction);
-			map.addControl(control);
-		});
 
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
@@ -1692,11 +1695,10 @@ function layerEdit(o) {
 }
 
 function controlModify(options) {
-	//TODO BUG perturbation avec le hover (when drag rapidly)
 	const modify = new ol.interaction.Modify(options);
 
 	modify.on('modifyend', function(evt) {
-		//TODO BUG BEST do not delete the feature if you point to a summit
+		//TODO BUG BEST delete only a summit when Ctrl+Alt click on it
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
@@ -1745,7 +1747,6 @@ function controlDrawLine(options) {
 		}, options));
 
 	draw.on(['drawend'], function(evt) {
-		//TODO BUG don't stick new line with other open poly (not yet in the source)
 		cleanAndSave(options.source);
 		button.toggle(false);
 	});
