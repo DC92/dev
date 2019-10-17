@@ -146,7 +146,7 @@ layerTileIncomplete = function(o) {
 		layer = new ol.layer.Tile({
 			source: backgroundSource,
 		}),
-		options = layer.options_ = Object.assign({ // Default options
+		options = layer.options_ /* used in layerOS */ = Object.assign({ // Default options
 			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
 			sources: {},
 		}, o);
@@ -858,6 +858,7 @@ function controlButton(o) {
 			activate: function() {},
 		}, o),
 		control = new ol.control.Control(options);
+	control.options_ = options; //TODO ARCHI Used in editor
 
 	//HACK get control on Map init
 	control.setMap = function(map) {
@@ -885,23 +886,25 @@ function controlButton(o) {
 	}
 
 	// Toggle the button status & aspect
-	let active = false;
+	// In case of grouped buttons, set inactive the other one
+	// (button that have the same .group are grouped)
+	control.active = false;
 	control.toggle = function(newActive) {
-		if (typeof newActive == 'undefined')
-			newActive = !active;
+		control.getMap().getControls().forEach(function(c) {
+			if (c.options_ &&
+				c.options_.group == options.group) { // For all controls in the same group
+				const setActive =
+					c != control ? false :
+					typeof newActive != 'undefined' ? newActive :
+					!c.active;
 
-		// In case of button having the same .group, set inactive the other one
-		if (newActive)
-			control.getMap().getControls().forEach(function(c) {
-				if (c != control && typeof c.toggle == 'function')
-					c.toggle(false);
-			});
-
-		if (active != newActive) {
-			active = newActive;
-			buttonElement.style.backgroundColor = active ? options.activeButtonBackgroundColor : 'white';
-			options.activate(active);
-		}
+				if (setActive != c.active) {
+					c.active = setActive;
+					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeButtonBackgroundColor : 'white';
+					c.options_.activate(c.active, buttonElement);
+				}
+			}
+		});
 	};
 	return control;
 }
