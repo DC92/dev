@@ -378,7 +378,6 @@ function escapedStyle(a, b) {
  * Requires 'myol:onadd' event, controlButton, controlPermanentCheckbox,
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
- //TODO BUG click far of feature goes to url (sometime)
 function layerVectorURL(o) {
 	const options = Object.assign({ // Default options
 		baseUrlFunction: function(bbox, list, resolution) {
@@ -455,7 +454,8 @@ function layerVectorURL(o) {
 				evt.target.forEachFeatureAtPixel(
 					evt.pixel,
 					function() {
-						map.popElement_.click(); // Simulate a click on the label
+						if(map.popup_.getPosition())
+							map.popElement_.click(); // Simulate a click on the label
 					}
 				);
 			});
@@ -476,7 +476,7 @@ function layerVectorURL(o) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
 			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-				map.popup_.setPosition([-100, -100]);
+				map.popup_.setPosition();
 		});
 	});
 
@@ -490,7 +490,7 @@ function layerVectorURL(o) {
 		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
 			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
 			!popupRect)
-			map.popup_.setPosition([-100, -100]);
+			map.popup_.setPosition();
 
 		// Reset cursor if there is no feature here
 		map.getViewport().style.cursor = 'default';
@@ -515,10 +515,9 @@ function layerVectorURL(o) {
 						layer.options_.label || '',
 						postLabel = typeof layer.options_.postLabel == 'function' ?
 						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
-						layer.options_.postLabel || '',
-						pos = map.popup_.getPosition();
+						layer.options_.postLabel || '';
 
-					if (label && typeof pos == 'object' && pos[0] < 0) { // Only for the first feature on the hovered stack
+					if (label && !map.popup_.getPosition()) { // Only for the first feature on the hovered stack
 						// Calculate the label's anchor
 						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
