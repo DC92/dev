@@ -7,6 +7,7 @@ console.log(document.cookie);
 function layerPointsWri(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//www.refuges.info/api/bbox?type_points=',
+		strategy: ol.loadingstrategy.bboxLimit,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -68,6 +69,7 @@ function layerMassifsWri() {
  */
 chemineurLayer = layerVectorURL({
 	baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+	strategy: ol.loadingstrategy.bboxLimit,
 	selectorName: 'chemineur',
 	styleOptions: function(properties) {
 		return {

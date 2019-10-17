@@ -340,6 +340,16 @@ function escapedStyle(a, b) {
 }
 
 /**
+ * BBOX strategy when the url return a limited number of features depending on the extent
+ */
+ol.loadingstrategy.bboxLimit = function(extent, resolution) {
+			if (this.bboxLimitResolution > resolution)
+				this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+			this.bboxLimitResolution = resolution; // Mem resolution for further requests
+	return [extent];
+};
+
+/**
  * GeoJson POI layer
  * Requires controlButton, controlPermanentCheckbox,
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
@@ -349,14 +359,6 @@ function layerVectorURL(o) {
 		baseUrlFunction: function(bbox, list, resolution) {
 			return options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-		},
-		// BBOX on layer with feature limit
-		// Same that bbox but reloads if we zoom in because we are delivering more points
-		strategy: function(extent, resolution) {
-			if (this.bboxLimitResolution > resolution)
-				this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-			this.bboxLimitResolution = resolution; // Mem resolution for further requests
-			return [extent];
 		},
 	}, o);
 
@@ -517,9 +519,7 @@ function layerVectorURL(o) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO BEST reload layer when clik on feature
 //TODO IE BUG no overpass on IE
-//TODO BEST BUG displays "?" when moves or zooms after changing a selector
 //TODO BEST display error 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = Object.assign({ // Default options
@@ -580,7 +580,7 @@ layerOverpass = function(o) {
 
 	return layerVectorURL(Object.assign({
 		format: osmXmlPoi,
-		strategy: bbox,
+		strategy: ol.loadingstrategy.bbox,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -873,7 +873,6 @@ function controlButton(o) {
 		divElement.appendChild(buttonElement);
 		divElement.className = 'ol-button ol-unselectable ol-control ' + options.className;
 		divElement.title = options.title; // {string} displayed when the control is hovered.
-		divElement.control_ = control; // For callback functions //TODO DELETE ??
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			divElement.style.top = options.rightPosition + 'em';
 			divElement.style.right = '.5em';
@@ -1462,7 +1461,6 @@ function controlGeocoder() {
  * Print control
  * requires controlButton
  */
-//TODO BUG PRINT don't work
 function controlPrint() {
 	const button = controlButton({
 		className: 'print-button',
@@ -1482,8 +1480,9 @@ function controlPrint() {
 		const map = button.getMap();
 
 		// Search control div element in the hierarchy
-		while (el.parentElement && !el.control_)
-			el = el.parentElement;
+		if (0) //TODO no more .control_
+			while (el.parentElement && !el.control_)
+				el = el.parentElement; //TODO PRINT search specific tag ????
 
 		// Get existing context
 		const mapEl = map.getTargetElement(),
@@ -1866,7 +1865,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
-		//TODO BUG controlPrint(),
+		//TODO BUG PRINT don't work		controlPrint(),
 	];
 }
 
