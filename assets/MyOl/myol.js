@@ -16,19 +16,28 @@
 
 //HACK add a onadd event & map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
-	var map = this;
-	if (!map.hack_) { //Only once
-		map.hack_ = map;
-		map.on('postrender', function() { // Each time we can / une as once
-			map.getLayers().forEach(function(target) {
-				target.map_ = map; //TODO ARCHI BEST put on layers/controls
+	if (!this.hack_) { //Only once
+		this.hack_ = this;
+		this.on('precompose', function(evt) { // Each time we can
+			this.getLayers().forEach(function(target) {
+				target.map_ = evt.target; //TODO ARCHI MAP BEST put on layers
 				target.dispatchEvent('myol:onadd');
 			});
 		});
 	}
-
 	ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
+
+//HACK add a onadd event & map_ to each layer
+if (0)
+	ol.Map.prototype.renderFrame_ = function(time) {
+		this.on('precompose', function() { // Each time we can
+			this.getLayers().forEach(function(target) {
+				target.map_ = evt.target; //TODO ARCHI MAP BEST put on layers
+			});
+		});
+		ol.PluggableMap.prototype.renderFrame_.call(this, time);
+	};
 
 /**
  * TILE LAYERS
@@ -147,33 +156,34 @@ function layerSpain(serveur, layer) {
  * Virtual class
  * Displays OSM outside the zoom area, 
  * Displays blank outside of validity area
- * Requires 'myol:onadd' event
  */
 layerTileIncomplete = function(o) {
-	const layer = new ol.layer.Tile(), // For callback functions
+	const backgroundSource = new ol.source.Stamen({
+			layer: 'terrain',
+		}),
+		layer = new ol.layer.Tile({
+			source: backgroundSource,
+		}),
 		options = layer.options_ = Object.assign({ // Default options
 			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
 			sources: {},
-		}, o),
-		backgroundSource = new ol.source.Stamen({
-			layer: 'terrain',
-		});
+		}, o);
 
-	layer.once('myol:onadd', function() {
+	layer.once('prerender', function() {
 		layer.map_.getView().on('change:resolution', change);
 		change(); // At init
 	});
 
 	// Zoom has changed
 	function change() {
-		let view = layer.map_.getView(), //TODO ARCHI map ref layerTileIncomplete
+		let view = layer.map_.getView(),
 			center = view.getCenter(),
 			currentResolution = 999999; // Init loop at max resolution
 		options.sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
-			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize()))) //TODO ARCHI map ref layerTileIncomplete
+			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
 			currentResolution = Object.keys(options.sources).filter(function(evt) { // HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
@@ -375,7 +385,7 @@ function escapedStyle(a, b) {
 
 /**
  * GeoJson POI layer
- * Requires 'myol:onadd' event, controlButton, controlPermanentCheckbox,
+ * Requires controlButton, controlPermanentCheckbox,
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(o) {
@@ -433,8 +443,8 @@ function layerVectorURL(o) {
 			}
 		);
 
-	layer.once('myol:onadd', function(evt) {
-		const map = evt.target.map_; //TODO ARCHI map ref layerVectorURL
+	layer.once('prerender', function(evt) {
+		const map = evt.target.map_;
 
 		// Create the label popup
 		//TODO BUG BEST don't zoom when the cursor is over a label
@@ -741,7 +751,7 @@ layerOverpass = function(o) {
 
 /**
  * Marker
- * Requires proj4.js for swiss coordinates & 'myol:onadd' event
+ * Requires proj4.js for swiss coordinates
  */
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	const format = new ol.format.GeoJSON();
@@ -779,10 +789,10 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			zIndex: 10
 		});
 
-	layer.once('myol:onadd', function(evt) {
+	layer.once('prerender', function(evt) {
 		if (dragged) {
 			// Drag and drop
-			layer.map_.addInteraction(new ol.interaction.Modify({ //TODO ARCHI map ref marker
+			layer.map_.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
 				style: style
 			}));
@@ -1597,7 +1607,7 @@ function controlPrint() {
 
 /**
  * Line & Polygons Editor
- * Requires controlButton, escapedStyle & 'myol:onadd' event
+ * Requires controlButton, escapedStyle
  */
 function layerEdit(o) {
 	const options = Object.assign({
@@ -1639,8 +1649,8 @@ function layerEdit(o) {
 		});
 	};
 
-	layer.once('myol:onadd', function(evt) {
-		const map = layer.map_; //TODO ARCHI map ref layerEdit
+	layer.once('myol:onadd', function(evt) { //TODO ARCHI map ref layerEdit
+		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().getArray().forEach(function(i) {
