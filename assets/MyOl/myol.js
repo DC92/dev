@@ -15,7 +15,6 @@
 //TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 //HACK add map_ to each layer
-//TODO ARCHI BEST get map inside layers code
 ol.Map.prototype.renderFrame_ = function(time) {
 	var map = this;
 	this.getLayers().forEach(function(target) {
@@ -107,7 +106,6 @@ function layerIGN(key, layer, format) {
 		resolutions: IGNresolutions,
 		matrixIds: IGNmatrixIds
 	});
-
 	return new ol.layer.Tile({
 		source: new ol.source.WMTS({
 			url: '//wxs.ign.fr/' + key + '/wmts',
@@ -177,7 +175,6 @@ layerTileIncomplete = function(o) {
 		if (layer.getSource() != options.sources[currentResolution])
 			layer.setSource(options.sources[currentResolution]);
 	}
-
 	return layer;
 };
 
@@ -199,7 +196,6 @@ function layerSwissTopo(layer) {
 		resolutions: resolutions,
 		matrixIds: matrixIds,
 	});
-
 	return layerTileIncomplete({
 		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781
 		sources: {
@@ -228,7 +224,6 @@ function layerIGM() {
 			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
 		});
 	}
-
 	return layerTileIncomplete({
 		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
 		sources: {
@@ -257,7 +252,6 @@ function layerOS(key) {
 				key: key,
 			});
 	});
-
 	return layer;
 }
 
@@ -277,7 +271,6 @@ function layerBing(key, subLayer) {
 			}));
 		}
 	});
-
 	return layer;
 }
 
@@ -302,16 +295,14 @@ function controlPermanentCheckbox(selectorName, callback) {
 			checkElements[e].checked = cookie[1].split(',').indexOf(checkElements[e].value) !== -1;
 	}
 
-	// Call callback once at the init
-	callback(null, permanentCheckboxList(selectorName));
-
 	function permanentCheckboxClick(evt) {
 		if (typeof callback == 'function')
 			callback(evt, permanentCheckboxList(selectorName, evt));
 	}
+	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
 }
 
-// Global function, called by others
+// Global functions
 function permanentCheckboxList(selectorName, evt) {
 	const checkElements = document.getElementsByName(selectorName);
 	let allChecks = [];
@@ -329,31 +320,11 @@ function permanentCheckboxList(selectorName, evt) {
 		if (checkElements[e].checked) // List checked elements
 			allChecks.push(checkElements[e].value);
 	}
-
-	// Mem the related cookie
-	// Keep empty one to keep memory of cancelled subchoices
+	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
 	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/';
-
 	return allChecks; // Returns list of checked values or ids
 }
 
-/**
- * BBOX on layer with feature limit
- * Same that bbox but reloads if we zoom in because we are delivering more points
- * Returns {ol.loadingstrategy} to be used in layer definition
- */
-function loadingStrategyBboxLimit(extent, resolution) {
-	loadedExtentsRtree = this.loadedExtentsRtree_;
-	if (this.bboxLimitResolution > resolution)
-		this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-	this.bboxLimitResolution = resolution; // Mem resolution for further requests
-
-	return [extent];
-}
-
-/**
- * General function
- */
 function escapedStyle(a, b) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 	return function(feature) {
@@ -378,11 +349,25 @@ function layerVectorURL(o) {
 		baseUrlFunction: function(bbox, list, resolution) {
 			return options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-		}
+		},
+		// BBOX on layer with feature limit
+		// Same that bbox but reloads if we zoom in because we are delivering more points
+		strategy: function(extent, resolution) {
+			if (this.bboxLimitResolution > resolution)
+				this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+			this.bboxLimitResolution = resolution; // Mem resolution for further requests
+			return [extent];
+		},
 	}, o);
 
-	// HACK to clear the layer when the xhr response is received
-	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
+	//HACK attach these to windows to define only one
+	//TODO BUG BEST don't zoom when the cursor is over a label
+	const popElement = window.popElement_ = document.createElement('a'),
+		popup = window.popup_ = new ol.Overlay({
+			element: popElement
+		});
+	popElement.style.display = 'block';
+
 	//TODO BEST JSON error handling : error + URL
 	const format = new ol.format.GeoJSON();
 	format.readFeatures = function(s, o) {
@@ -391,9 +376,7 @@ function layerVectorURL(o) {
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
 	};
 
-	// Manage source & vector objects
-	var loadedExtentsRtree = null, //TODO ARCHI
-		source = new ol.source.Vector(Object.assign({
+	const source = new ol.source.Vector(Object.assign({
 			url: function(extent, resolution, projection) {
 				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 					// Retreive checked parameters
@@ -402,17 +385,14 @@ function layerVectorURL(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			strategy: loadingStrategyBboxLimit, //TODO do not use for overpass
 			format: format,
+		}, options)),
+		layer = new ol.layer.Vector(Object.assign({
+			source: source,
+			style: escapedStyle(options.styleOptions),
+			renderBuffer: 16, // buffered area around curent view (px)
+			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
-
-	// Create the layer
-	const layer = new ol.layer.Vector(Object.assign({
-		source: source,
-		style: escapedStyle(options.styleOptions),
-		renderBuffer: 16, // buffered area around curent view (px)
-		zIndex: 1, // Above the baselayer even if included to the map before
-	}, options));
 	layer.options_ = options; //TODO ARCHI
 
 	// Optional : checkboxes to tune layer parameters
@@ -421,8 +401,8 @@ function layerVectorURL(o) {
 			options.selectorName,
 			function(evt, list) {
 				layer.setVisible(list.length);
-				if (list.length && loadedExtentsRtree) {
-					loadedExtentsRtree.clear(); // Redraw the layer
+				if (list.length && source.loadedExtentsRtree_) {
+					source.loadedExtentsRtree_.clear(); // Redraw the layer
 					source.clear(); // Redraw the layer
 				}
 			}
@@ -430,31 +410,17 @@ function layerVectorURL(o) {
 
 	layer.once('prerender', function(evt) {
 		const map = evt.target.map_;
-
-		// Create the label popup
-		//TODO BUG BEST don't zoom when the cursor is over a label
-		if (!map.popElement_) { //HACK Only once for all layers
-			map.popElement_ = document.createElement('a');
-			map.popElement_.style.display = 'block';
-			map.popup_ = new ol.Overlay({
-				element: map.popElement_
-			});
-			map.addOverlay(map.popup_);
-
-			// Label when hovering a feature
-			map.on('pointermove', layerVectorPointerMove);
-
-			// Click on a feature
-			map.on('click', function(evt) {
-				evt.target.forEachFeatureAtPixel(
-					evt.pixel,
-					function() {
-						if (map.popup_.getPosition())
-							map.popElement_.click(); // Simulate a click on the label
-					}
-				);
-			});
-		}
+		map.addOverlay(popup);
+		map.on('pointermove', layerVectorPointerMove);
+		map.on('click', function(evt) { // Click on a feature
+			evt.target.forEachFeatureAtPixel(
+				evt.pixel,
+				function() {
+					if (popup.getPosition())
+						popElement.click(); // Simulate a click on the label
+				}
+			);
+		});
 
 		// Style when hovering a feature
 		map.addInteraction(new ol.interaction.Select({
@@ -471,7 +437,7 @@ function layerVectorURL(o) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
 			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-				map.popup_.setPosition();
+				popup.setPosition();
 		});
 	});
 
@@ -481,11 +447,11 @@ function layerVectorURL(o) {
 
 		// Hide label by default if none feature or his popup here
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = map.popElement_.getBoundingClientRect();
+			popupRect = popElement.getBoundingClientRect();
 		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
 			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
 			!popupRect)
-			map.popup_.setPosition();
+			popup.setPosition();
 
 		// Reset cursor if there is no feature here
 		map.getViewport().style.cursor = 'default';
@@ -512,29 +478,29 @@ function layerVectorURL(o) {
 						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
 						layer.options_.postLabel || '';
 
-					if (label && !map.popup_.getPosition()) { // Only for the first feature on the hovered stack
+					if (label && !popup.getPosition()) { // Only for the first feature on the hovered stack
 						// Calculate the label's anchor
-						map.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
+						popup.setPosition(map.getView().getCenter()); // For popup size calculation
 
 						// Fill label class & text
-						map.popElement_.className = 'myPopup ' + (layer.options_.labelClass || '');
-						map.popElement_.innerHTML = label + postLabel;
+						popElement.className = 'myPopup ' + (layer.options_.labelClass || '');
+						popElement.innerHTML = label + postLabel;
 						if (typeof layer.options_.href == 'function') {
-							map.popElement_.href = layer.options_.href(properties);
+							popElement.href = layer.options_.href(properties);
 							map.getViewport().style.cursor = 'pointer';
 						}
 
 						// Shift of the label to stay into the map regarding the pointer position
-						if (pixel[1] < map.popElement_.clientHeight + 12) { // On the top of the map (not enough space for it)
-							pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -map.popElement_.clientWidth - 10;
+						if (pixel[1] < popElement.clientHeight + 12) { // On the top of the map (not enough space for it)
+							pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -popElement.clientWidth - 10;
 							pixel[1] = 2;
 						} else {
-							pixel[0] -= map.popElement_.clientWidth / 2;
+							pixel[0] -= popElement.clientWidth / 2;
 							pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-							pixel[0] = Math.min(pixel[0], map.getSize()[0] - map.popElement_.clientWidth - 1); // Bord droit
-							pixel[1] -= map.popElement_.clientHeight + 8;
+							pixel[0] = Math.min(pixel[0], map.getSize()[0] - popElement.clientWidth - 1); // Bord droit
+							pixel[1] -= popElement.clientHeight + 8;
 						}
-						map.popup_.setPosition(map.getCoordinateFromPixel(pixel));
+						popup.setPosition(map.getCoordinateFromPixel(pixel));
 					}
 				}
 			}, {
@@ -542,7 +508,6 @@ function layerVectorURL(o) {
 			}
 		);
 	}
-
 	return layer;
 }
 
@@ -615,6 +580,7 @@ layerOverpass = function(o) {
 
 	return layerVectorURL(Object.assign({
 		format: osmXmlPoi,
+		strategy: bbox,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -834,9 +800,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			}
 		}
 	}
-
-	// Display once at init
-	displayLL(ol.proj.fromLonLat(llInit));
+	displayLL(ol.proj.fromLonLat(llInit)); // Display once at init
 
 	// <input> coords edition
 	layer.edit = function(evt, nol, projection) {
@@ -849,14 +813,13 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	layer.getPoint = function() {
 		return point;
 	};
-
 	return layer;
 }
 
 /**
  * JSON.parse handling error
  */
-//TODO ARCHI BEST apply to format.readFeatures
+//TODO ARCHI apply to format.readFeatures
 function JSONparse(json) {
 	let js;
 	if (json)
@@ -941,7 +904,6 @@ function controlButton(o) {
 			}
 		});
 	};
-
 	return control;
 }
 
@@ -1037,7 +999,6 @@ function controlLayersSwitcher(options) {
 		selectorElement.style.display = evt ? '' : 'none';
 		selectorElement.style.maxHeight = (button.getMap().getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}
-
 	return button;
 }
 
@@ -1057,7 +1018,7 @@ function controlPermalink(o) {
 			element: divElement,
 			render: render
 		});
-	this.options_ = options;
+	control.options_ = options;
 
 	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
@@ -1098,7 +1059,6 @@ function controlPermalink(o) {
 			document.cookie = 'map=' + newParams.join('/') + ';path=/';
 		}
 	}
-
 	return control;
 }
 
@@ -1108,8 +1068,6 @@ function controlPermalink(o) {
  */
 //TODO tap on map = distance from GPS calculation
 function controlGPS(options) {
-	options = options || {};
-
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
 		!window.location.href.match(/https|localhost/i))
@@ -1265,11 +1223,10 @@ function controlGPS(options) {
 				); */
 
 			// Optional callback function
-			if (typeof options.callBack == 'function') // Default undefined
+			if (options && typeof options.callBack == 'function') // Default undefined
 				options.callBack(gps.position);
 		}
 	}
-
 	return button;
 }
 
@@ -1333,7 +1290,6 @@ function controlLengthLine() {
 
 		return false; // Continue detection (for editor that has temporary layers)
 	}
-
 	return button;
 }
 
@@ -1397,7 +1353,6 @@ function controlLoadGPX(o) {
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
 		button.getMap().getView().fit(extent);
 	};
-
 	return button;
 }
 
@@ -1475,7 +1430,6 @@ function controlDownloadGPX(o) {
 				cancelable: true,
 			}));
 	};
-
 	return button;
 }
 
@@ -1501,7 +1455,6 @@ function controlGeocoder() {
 	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
 	geocoder.container.style.top = '.5em';
 	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
-
 	return geocoder;
 }
 
@@ -1566,9 +1519,8 @@ function controlPrint() {
 					;
 			});
 			*/
-
-			//TODO PRINT BUG Chrome puts 3 pages in landscape
-			//TODO PRINT IE11 very big margin
+			//TODO BUG PRINT Chrome puts 3 pages in landscape
+			//TODO BEST PRINT IE11 very big margin
 			window.print();
 			document.cookie = 'map=' + mapCookie + ';path=/';
 			window.location.href = window.location.href;
@@ -1586,7 +1538,6 @@ function controlPrint() {
 			size: printSize
 		});
 	}
-
 	return button;
 }
 
@@ -1634,6 +1585,7 @@ function layerEdit(o) {
 		});
 	};
 
+	//TODO BUG only setup controls when a feature is on the map extend
 	layer.once('prerender', function(evt) {
 		const map = layer.map_;
 
@@ -1683,7 +1635,6 @@ function layerEdit(o) {
 			return false;
 		});
 	});
-
 	return layer;
 }
 
@@ -1743,7 +1694,6 @@ function controlDrawLine(options) {
 		cleanAndSave(options.source);
 		button.toggle(false);
 	});
-
 	return button;
 }
 
