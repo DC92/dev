@@ -14,30 +14,15 @@
 
 //TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
-//HACK add a onadd event & map_ to each layer
+//HACK add map_ to each layer
+//TODO ARCHI BEST get map inside layers code
 ol.Map.prototype.renderFrame_ = function(time) {
-	if (!this.hack_) { //Only once
-		this.hack_ = this;
-		this.on('precompose', function(evt) { // Each time we can
-			this.getLayers().forEach(function(target) {
-				target.map_ = evt.target; //TODO ARCHI MAP BEST put on layers
-				target.dispatchEvent('myol:onadd');
-			});
-		});
-	}
+	var map = this;
+	this.getLayers().forEach(function(target) {
+		target.map_ = map;
+	});
 	ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
-
-//HACK add a onadd event & map_ to each layer
-if (0)
-	ol.Map.prototype.renderFrame_ = function(time) {
-		this.on('precompose', function() { // Each time we can
-			this.getLayers().forEach(function(target) {
-				target.map_ = evt.target; //TODO ARCHI MAP BEST put on layers
-			});
-		});
-		ol.PluggableMap.prototype.renderFrame_.call(this, time);
-	};
 
 /**
  * TILE LAYERS
@@ -1649,7 +1634,7 @@ function layerEdit(o) {
 		});
 	};
 
-	layer.once('myol:onadd', function(evt) { //TODO ARCHI map ref layerEdit
+	layer.once('prerender', function(evt) {
 		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
@@ -1778,7 +1763,6 @@ function controlDrawPolygon(options) {
 function cleanAndSave(source, pointerPosition) {
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 		polys = [];
-
 	source.clear();
 
 	// Get flattened list of multipoints coords
