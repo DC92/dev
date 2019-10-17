@@ -44,11 +44,10 @@ function layerOSM(url, attribution) {
 /**
  * Kompas (Austria)
  * Requires layerOSM
- * Not available via https
  */
 function layerKompass(layer) {
 	return layerOSM(
-		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' +
+		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + //  Not available via https
 		'Experience=ecmaps&MapStyle=' + layer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
@@ -244,7 +243,7 @@ function layerOS(key) {
 		extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
 	});
 
-	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
 	layer.once('change:opacity', function(evt) {
 		if (evt.target.getVisible() && !evt.target.options_.sources[75])
 			evt.target.options_.sources[75] = new ol.source.BingMaps({
@@ -262,9 +261,9 @@ function layerOS(key) {
 function layerBing(key, subLayer) {
 	const layer = new ol.layer.Tile();
 
-	// HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
 	layer.once('change:opacity', function(evt) {
-		if (this.getVisible() && !this.getSource()) {
+		if (layer.getVisible() && !layer.getSource()) {
 			layer.setSource(new ol.source.BingMaps({
 				imagerySet: subLayer,
 				key: key,
@@ -343,9 +342,9 @@ function escapedStyle(a, b) {
  * BBOX strategy when the url return a limited number of features depending on the extent
  */
 ol.loadingstrategy.bboxLimit = function(extent, resolution) {
-			if (this.bboxLimitResolution > resolution)
-				this.loadedExtentsRtree_.clear(); // Force loading when zoom in
-			this.bboxLimitResolution = resolution; // Mem resolution for further requests
+	if (this.bboxLimitResolution > resolution)
+		this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+	this.bboxLimitResolution = resolution; // Mem resolution for further requests
 	return [extent];
 };
 
@@ -748,7 +747,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 				style: style
 			}));
 			point.on('change', function() {
-				displayLL(this.getCoordinates());
+				displayLL(point.getCoordinates());
 			});
 		}
 
@@ -1139,13 +1138,13 @@ function controlGPS(options) {
 	});
 
 	geolocation.on('change', function() {
-		gps.position = ol.proj.fromLonLat(this.getPosition());
-		gps.accuracyGeometry = this.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
+		gps.position = ol.proj.fromLonLat(geolocation.getPosition());
+		gps.accuracyGeometry = geolocation.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
 		/*//TODO Firefox Update delta only over some speed
 		if (!navigator.userAgent.match('Firefox'))
 
-		if (this.getHeading()) {
-			gps.heading = -this.getHeading(); // Delivered radians, clockwize
+		if (geolocation.getHeading()) {
+			gps.heading = -geolocation.getHeading(); // Delivered radians, clockwize
 			gps.delta = gps.heading - compas.heading; // Freeze delta at this time bewteen the GPS heading & the compas
 		} */
 
@@ -1428,7 +1427,7 @@ function controlDownloadGPX(o) {
 				bubbles: true,
 				cancelable: true,
 			}));
-	};
+	}
 	return button;
 }
 
@@ -1584,8 +1583,7 @@ function layerEdit(o) {
 		});
 	};
 
-	//TODO BUG only setup controls when a feature is on the map extend
-	layer.once('prerender', function(evt) {
+	layer.createRenderer = function() { //HACK to get control at the layer init
 		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
@@ -1619,9 +1617,9 @@ function layerEdit(o) {
 		map.addInteraction(snap);
 		// Snap on features external to the editor
 		if (options.snapLayers) // Optional option snapLayers : [list of layers to snap]
-			options.snapLayers.forEach(function(layer) {
-				layer.getSource().on('change', function() {
-					const fs = this.getFeatures();
+			options.snapLayers.forEach(function(l) {
+				l.getSource().on('change', function() {
+					const fs = l.getSource().getFeatures();
 					for (let f in fs)
 						snap.addFeature(fs[f]);
 				});
@@ -1633,7 +1631,9 @@ function layerEdit(o) {
 			cleanAndSave(source);
 			return false;
 		});
-	});
+
+		return ol.layer.Vector.prototype.createRenderer.call(this);
+	};
 	return layer;
 }
 
@@ -1935,6 +1935,7 @@ function layersCollection(keys) {
 		'Google hybrid': layerGoogle('s,h'),
 		'Stamen': layerStamen('terrain'),
 		'Watercolor': layerStamen('watercolor'),
+		'Toner': layerStamen('toner'),
 		'Neutre': new ol.layer.Tile()
 	};
 }
