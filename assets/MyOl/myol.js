@@ -362,7 +362,7 @@ function layerVectorURL(o) {
 	}, o);
 
 	//HACK attach these to windows to define only one
-	//TODO BUG BEST don't zoom when the cursor is over a label
+	//TODO BUG DIFFICULT don't zoom when the cursor is over a label
 	const popElement = window.popElement_ = document.createElement('a'),
 		popup = window.popup_ = new ol.Overlay({
 			element: popElement
@@ -394,7 +394,6 @@ function layerVectorURL(o) {
 			renderBuffer: 16, // buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
-	layer.options_ = options; //TODO ARCHI
 
 	// Optional : checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -442,6 +441,53 @@ function layerVectorURL(o) {
 		});
 	});
 
+	layer.displayPopup = function(feature, pixel) {
+		let geometry = feature.getGeometry();
+		if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
+			geometry = geometry.getGeometries()[0];
+
+		if (layer && options) {
+			const properties = feature.getProperties(),
+				coordinates = geometry.flatCoordinates, // If it's a point, just over it
+				ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
+			if (coordinates.length == 2) // Stable if icon
+				pixel = map.getPixelFromCoordinate(coordinates);
+
+			// Hovering label
+			const label = typeof options.label == 'function' ?
+				options.label(properties, feature) :
+				options.label || '',
+				postLabel = typeof options.postLabel == 'function' ?
+				options.postLabel(properties, feature, layer, pixel, ll4326) :
+				options.postLabel || '';
+
+			if (label && !popup.getPosition()) { // Only for the first feature on the hovered stack
+				// Calculate the label's anchor
+				popup.setPosition(map.getView().getCenter()); // For popup size calculation
+
+				// Fill label class & text
+				popElement.className = 'myPopup ' + (options.labelClass || '');
+				popElement.innerHTML = label + postLabel;
+				if (typeof options.href == 'function') {
+					popElement.href = options.href(properties);
+					map.getViewport().style.cursor = 'pointer';
+				}
+
+				// Shift of the label to stay into the map regarding the pointer position
+				if (pixel[1] < popElement.clientHeight + 12) { // On the top of the map (not enough space for it)
+					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -popElement.clientWidth - 10;
+					pixel[1] = 2;
+				} else {
+					pixel[0] -= popElement.clientWidth / 2;
+					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
+					pixel[0] = Math.min(pixel[0], map.getSize()[0] - popElement.clientWidth - 1); // Bord droit
+					pixel[1] -= popElement.clientHeight + 8;
+				}
+				popup.setPosition(map.getCoordinateFromPixel(pixel));
+			}
+		}
+	}
+
 	function layerVectorPointerMove(evt) {
 		const map = evt.target;
 		let pixel = [evt.pixel[0], evt.pixel[1]];
@@ -460,55 +506,14 @@ function layerVectorURL(o) {
 		map.forEachFeatureAtPixel(
 			pixel,
 			function(feature, layer) {
-				let geometry = feature.getGeometry();
-				if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
-					geometry = geometry.getGeometries()[0];
-
-				if (layer && layer.options_) {
-					const properties = feature.getProperties(),
-						coordinates = geometry.flatCoordinates, // If it's a point, just over it
-						ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
-					if (coordinates.length == 2) // Stable if icon
-						pixel = map.getPixelFromCoordinate(coordinates);
-
-					// Hovering label
-					const label = typeof layer.options_.label == 'function' ?
-						layer.options_.label(properties, feature) :
-						layer.options_.label || '',
-						postLabel = typeof layer.options_.postLabel == 'function' ?
-						layer.options_.postLabel(properties, feature, layer, pixel, ll4326) :
-						layer.options_.postLabel || '';
-
-					if (label && !popup.getPosition()) { // Only for the first feature on the hovered stack
-						// Calculate the label's anchor
-						popup.setPosition(map.getView().getCenter()); // For popup size calculation
-
-						// Fill label class & text
-						popElement.className = 'myPopup ' + (layer.options_.labelClass || '');
-						popElement.innerHTML = label + postLabel;
-						if (typeof layer.options_.href == 'function') {
-							popElement.href = layer.options_.href(properties);
-							map.getViewport().style.cursor = 'pointer';
-						}
-
-						// Shift of the label to stay into the map regarding the pointer position
-						if (pixel[1] < popElement.clientHeight + 12) { // On the top of the map (not enough space for it)
-							pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -popElement.clientWidth - 10;
-							pixel[1] = 2;
-						} else {
-							pixel[0] -= popElement.clientWidth / 2;
-							pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-							pixel[0] = Math.min(pixel[0], map.getSize()[0] - popElement.clientWidth - 1); // Bord droit
-							pixel[1] -= popElement.clientHeight + 8;
-						}
-						popup.setPosition(map.getCoordinateFromPixel(pixel));
-					}
-				}
+				if (layer && typeof layer.displayPopup == 'function')
+					layer.displayPopup(feature, pixel)
 			}, {
 				hitTolerance: 6,
 			}
 		);
 	}
+
 	return layer;
 }
 
@@ -1016,7 +1021,6 @@ function controlPermalink(o) {
 			element: divElement,
 			render: render
 		});
-	control.options_ = options;
 
 	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
@@ -1690,8 +1694,9 @@ function controlDrawLine(options) {
 		}, options));
 
 	draw.on(['drawend'], function(evt) {
-		cleanAndSave(options.source);
+		//TODO BUG le feature n'est pas encore acquis dans la source
 		button.toggle(false);
+		cleanAndSave(options.source);
 	});
 	return button;
 }
