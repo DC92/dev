@@ -441,6 +441,32 @@ function layerVectorURL(o) {
 		});
 	});
 
+	function layerVectorPointerMove(evt) {
+		const map = evt.target;
+		let pixel = [evt.pixel[0], evt.pixel[1]];
+
+		// Hide label by default if none feature or his popup here
+		const mapRect = map.getTargetElement().getBoundingClientRect(),
+			popupRect = popElement.getBoundingClientRect();
+		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
+			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
+			!popupRect)
+			popup.setPosition();
+
+		// Reset cursor if there is no feature here
+		map.getViewport().style.cursor = 'default';
+
+		map.forEachFeatureAtPixel(
+			pixel,
+			function(feature, layer) {
+				if (layer && typeof layer.displayPopup == 'function')
+					layer.displayPopup(feature, pixel)
+			}, {
+				hitTolerance: 6,
+			}
+		);
+	}
+
 	layer.displayPopup = function(feature, pixel) {
 		let geometry = feature.getGeometry();
 		if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
@@ -487,33 +513,6 @@ function layerVectorURL(o) {
 			}
 		}
 	}
-
-	function layerVectorPointerMove(evt) {
-		const map = evt.target;
-		let pixel = [evt.pixel[0], evt.pixel[1]];
-
-		// Hide label by default if none feature or his popup here
-		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = popElement.getBoundingClientRect();
-		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
-			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
-			!popupRect)
-			popup.setPosition();
-
-		// Reset cursor if there is no feature here
-		map.getViewport().style.cursor = 'default';
-
-		map.forEachFeatureAtPixel(
-			pixel,
-			function(feature, layer) {
-				if (layer && typeof layer.displayPopup == 'function')
-					layer.displayPopup(feature, pixel)
-			}, {
-				hitTolerance: 6,
-			}
-		);
-	}
-
 	return layer;
 }
 
@@ -859,7 +858,6 @@ function controlButton(o) {
 			activate: function() {},
 		}, o),
 		control = new ol.control.Control(options);
-	control.options_ = options;
 
 	//HACK get control on Map init
 	control.setMap = function(map) {
@@ -887,25 +885,23 @@ function controlButton(o) {
 	}
 
 	// Toggle the button status & aspect
-	// In case of grouped buttons, set inactive the other one
-	// (button that have the same .group are grouped)
-	control.active = false;
+	let active = false;
 	control.toggle = function(newActive) {
-		control.getMap().getControls().forEach(function(c) {
-			if (c.options_ &&
-				c.options_.group == options.group) { // For all controls in the same group
-				const setActive =
-					c != control ? false :
-					typeof newActive != 'undefined' ? newActive :
-					!c.active;
+		if (typeof newActive == 'undefined')
+			newActive = !active;
 
-				if (setActive != c.active) {
-					c.active = setActive;
-					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeButtonBackgroundColor : 'white';
-					c.options_.activate(c.active, buttonElement);
-				}
-			}
-		});
+		// In case of button having the same .group, set inactive the other one
+		if (newActive)
+			control.getMap().getControls().forEach(function(c) {
+				if (c != control && typeof c.toggle == 'function')
+					c.toggle(false);
+			});
+
+		if (active != newActive) {
+			active = newActive;
+			buttonElement.style.backgroundColor = active ? options.activeButtonBackgroundColor : 'white';
+			options.activate(active);
+		}
 	};
 	return control;
 }
