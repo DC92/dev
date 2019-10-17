@@ -1412,29 +1412,27 @@ function controlLoadGPX(o) {
  */
 //TODO BUG do not export points
 function controlDownloadGPX(o) {
-	let map; //TODO BEST ARCHI
 	const options = Object.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
 			fileName: 'trace', //TODO BEST give a name according to the context
 			extraMetaData: '', // Additional tags to the GPX file header
-			onAdd: function(m) {
-				map = m;
-			},
+			activate: activate,
 		}, o),
-		hiddenElement = document.createElement('a');
+		hiddenElement = document.createElement('a'),
+		button = controlButton(options);
 
 	//HACK for Moz
 	hiddenElement.target = '_blank';
 	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
 	(document.body || document.documentElement).appendChild(hiddenElement);
 
-	options.activate = function() { // Callback at activation / desactivation, mandatory, no default
+	function activate() { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
-			extent = map.getView().calculateExtent();
+			extent = button.getMap().getView().calculateExtent();
 
 		// Get all visible features
-		map.getLayers().forEach(function(layer) {
+		button.getMap().getLayers().forEach(function(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					features.push(feature);
@@ -1483,7 +1481,7 @@ function controlDownloadGPX(o) {
 			}));
 	};
 
-	return controlButton(options);
+	return button;
 }
 
 /**
