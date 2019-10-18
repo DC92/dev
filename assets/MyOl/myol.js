@@ -12,7 +12,7 @@
 
 /* jshint esversion: 6 */
 
-//TODO WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
+//TODO WARNING DIFFICULT A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
@@ -139,7 +139,7 @@ function layerSpain(serveur, layer) {
  * Displays Stamen outside the layer zoom range or extend
  */
 layerTileIncomplete = function(options) {
-	const layer = layerStamen('terrain');
+	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
 
 	layer.once('prerender', function() {
@@ -177,7 +177,7 @@ layerTileIncomplete = function(options) {
  * Register your domain: https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
  * Requires layerTileIncomplete
  */
-function layerSwissTopo(layer) {
+function layerSwissTopo(layer, extraLayer) {
 	let projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];
@@ -191,6 +191,7 @@ function layerSwissTopo(layer) {
 		matrixIds: matrixIds,
 	});
 	return layerTileIncomplete({
+		extraLayer: extraLayer,
 		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781
 		sources: {
 			500: new ol.source.WMTS(({
@@ -713,7 +714,11 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	if (eljson)
 		json = eljson.value || eljson.innerHTML;
 	if (json)
-		llInit = JSONparse(json).coordinates;
+		try {
+			llInit = JSON.parse(json).coordinates;
+		} catch (returnCode) {
+			console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+		}
 
 	// The marker layer
 	const style = new ol.style.Style({
@@ -811,22 +816,6 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		return point;
 	};
 	return layer;
-}
-
-/**
- * JSON.parse handling error
- */
-//TODO ARCHI apply to format.readFeatures
-function JSONparse(json) {
-	let js;
-	if (json)
-		try {
-			js = JSON.parse(json);
-		} catch (returnCode) {
-			if (returnCode)
-				console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
-		}
-	return js;
 }
 
 
@@ -1570,6 +1559,15 @@ function layerEdit(o) {
 			style: escapedStyle(options.styleOptions, options.editStyleOptions),
 		});
 
+	function JSONparse(json) { //TODO ARCHI
+		try {
+			return JSON.parse(json);
+		} catch (returnCode) {
+			console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+		}
+		return;
+	}
+
 	source.save = function() {
 		// Save lines in <EL> as geoJSON at every change
 		geoJsonEl.value = format.writeFeatures(features, {
@@ -1915,7 +1913,7 @@ function layersCollection(keys) {
 		//403	'Avalanches':	layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'), //TODO BEST layerincomplete = GG photo
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
