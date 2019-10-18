@@ -138,19 +138,16 @@ function layerSpain(serveur, layer) {
  * Virtual class
  * Displays Stamen outside the layer zoom range or extend
  */
-layerTileIncomplete = function(o) {
-	const backgroundSource = new ol.source.Stamen({
-			layer: 'terrain',
-		}),
-		layer = new ol.layer.Tile({
-			source: backgroundSource,
-		}),
-		options = layer.options_ /* used in layerOS */ = Object.assign({ // Default options
-			extent: [-20026376, -20048966, 20026376, 20048966], // EPSG:3857
-			sources: {},
-		}, o);
+layerTileIncomplete = function(options) {
+	const layer = layerStamen('terrain');
+	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
 
 	layer.once('prerender', function() {
+		if (typeof options.addSources == 'function')
+			options.sources = Object.assign(
+				options.sources,
+				options.addSources()
+			);
 		layer.map_.getView().on('change:resolution', change);
 		change(); // At init
 	});
@@ -160,7 +157,6 @@ layerTileIncomplete = function(o) {
 		let view = layer.map_.getView(),
 			center = view.getCenter(),
 			currentResolution = 999999; // Init loop at max resolution
-		options.sources[currentResolution] = backgroundSource; // Add extrabound source on the top of the list
 
 		// Search for sources according to the map resolution
 		if (center &&
@@ -204,7 +200,7 @@ function layerSwissTopo(layer) {
 				requestEncoding: 'REST',
 				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 			}))
-		}
+		},
 	});
 }
 
@@ -228,7 +224,7 @@ function layerIGM() {
 			100: igmSource('IGM_250000', 'CB.IGM250000'),
 			25: igmSource('IGM_100000', 'MB.IGM100000'),
 			5: igmSource('IGM_25000', 'CB.IGM25000'),
-		}
+		},
 	});
 }
 
@@ -237,21 +233,19 @@ function layerIGM() {
  * Requires layerTileIncomplete
  * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
-//TODO BUG
 function layerOS(key) {
-	const layer = layerTileIncomplete({
+	return layerTileIncomplete({
 		extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
+		sources: {},
+		addSources: function() { //HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+			return {
+				75: new ol.source.BingMaps({
+					imagerySet: 'OrdnanceSurvey',
+					key: key,
+				})
+			};
+		},
 	});
-
-	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.once('change:opacity', function(evt) {
-		if (evt.target.getVisible() && !evt.target.options_.sources[75])
-			evt.target.options_.sources[75] = new ol.source.BingMaps({
-				imagerySet: 'ordnanceSurvey',
-				key: key,
-			});
-	});
-	return layer;
 }
 
 /**
@@ -354,7 +348,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(o) {
-	const options = Object.assign({ // Default options
+	const options = Object.assign({
 		baseUrlFunction: function(bbox, list, resolution) {
 			return options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
@@ -525,7 +519,7 @@ function layerVectorURL(o) {
 //TODO IE BUG no overpass on IE
 //TODO BEST display error 429 (Too Many Requests)
 layerOverpass = function(o) {
-	const options = Object.assign({ // Default options
+	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
 			maxResolution: 30, // Only call overpass if the map's resolution is lower
 			selectorId: 'overpass', // Element containing all checkboxes
@@ -1926,9 +1920,8 @@ function layersCollection(keys) {
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
 		'Angleterre': layerOS(keys.bing),
-		'Bing': layerBing(keys.bing, 'Road'),
-		'Bing photo': layerBing(keys.bing, 'Aerial'),
-		'Bing mixte': layerBing(keys.bing, 'AerialWithLabels'),
+		//BUG		'Bing': layerBing(keys.bing, 'Road'),
+		'Bing photo': layerBing(keys.bing, 'AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google photo': layerGoogle('s'),
