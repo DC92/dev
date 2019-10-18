@@ -136,8 +136,7 @@ function layerSpain(serveur, layer) {
 /**
  * Layers with not all resolutions or area available
  * Virtual class
- * Displays OSM outside the zoom area, 
- * Displays blank outside of validity area
+ * Displays Stamen outside the layer zoom range or extend
  */
 layerTileIncomplete = function(o) {
 	const backgroundSource = new ol.source.Stamen({
@@ -238,6 +237,7 @@ function layerIGM() {
  * Requires layerTileIncomplete
  * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
+//TODO BUG
 function layerOS(key) {
 	const layer = layerTileIncomplete({
 		extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
@@ -460,7 +460,7 @@ function layerVectorURL(o) {
 			pixel,
 			function(feature, layer) {
 				if (layer && typeof layer.displayPopup == 'function')
-					layer.displayPopup(feature, pixel)
+					layer.displayPopup(feature, pixel);
 			}, {
 				hitTolerance: 6,
 			}
@@ -512,7 +512,7 @@ function layerVectorURL(o) {
 				popup.setPosition(map.getCoordinateFromPixel(pixel));
 			}
 		}
-	}
+	};
 	return layer;
 }
 
@@ -850,7 +850,6 @@ function controlButton(o) {
 		divElement = document.createElement('div'),
 		options = Object.assign({
 			element: divElement,
-			group: Math.random(),
 			label: '', // {string} character to be displayed in the button
 			className: '', // {string} className of the button
 			activeButtonBackgroundColor: 'white',
@@ -858,7 +857,6 @@ function controlButton(o) {
 			activate: function() {},
 		}, o),
 		control = new ol.control.Control(options);
-	control.options_ = options; //TODO ARCHI Used in editor
 
 	//HACK get control on Map init
 	control.setMap = function(map) {
@@ -886,25 +884,25 @@ function controlButton(o) {
 	}
 
 	// Toggle the button status & aspect
-	// In case of grouped buttons, set inactive the other one
-	// (button that have the same .group are grouped)
 	control.active = false;
-	control.toggle = function(newActive) {
-		control.getMap().getControls().forEach(function(c) {
-			if (c.options_ &&
-				c.options_.group == options.group) { // For all controls in the same group
-				const setActive =
-					c != control ? false :
-					typeof newActive != 'undefined' ? newActive :
-					!c.active;
+	control.toggle = function(newActive, group) {
+		if (typeof newActive == 'undefined')
+			newActive = !control.active;
+		if (group && group != options.group)
+			return;
 
-				if (setActive != c.active) {
-					c.active = setActive;
-					c.element.firstChild.style.backgroundColor = c.active ? c.options_.activeButtonBackgroundColor : 'white';
-					c.options_.activate(c.active, buttonElement);
-				}
-			}
-		});
+		if (control.active != newActive) {
+			// In case of button having the same .group, set inactive the other one
+			if (newActive && options.group)
+				control.getMap().getControls().forEach(function(c) {
+					if (typeof c.toggle == 'function')
+						c.toggle(false, options.group);
+				});
+
+			control.active = newActive;
+			buttonElement.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
+			options.activate(newActive);
+		}
 	};
 	return control;
 }
@@ -1604,15 +1602,15 @@ function layerEdit(o) {
 				source: source,
 				style: escapedStyle(options.styleOptions, options.editStyleOptions),
 				activate: function(active) {
-					control.options_.interaction.setActive(active);
+					control.interaction.setActive(active);
 					if (active) //TODO BEST hover feature when modifing
 						map.removeInteraction(hover);
 					else
 						map.addInteraction(hover);
 				},
 			}, options));
-			control.options_.interaction.setActive(false);
-			map.addInteraction(control.options_.interaction);
+			control.interaction.setActive(false);
+			map.addInteraction(control.interaction);
 			map.addControl(control);
 		});
 
@@ -1641,12 +1639,24 @@ function layerEdit(o) {
 }
 
 function controlModify(options) {
-	const modify = new ol.interaction.Modify(options);
+	const button = controlButton(Object.assign({
+		label: 'M',
+		title: 'Activer "M" (couleur jaune) puis\n' +
+			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
+			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+			'Alt+cliquer sur un sommet pour le supprimer\n' +
+			'Alt+cliquer  sur un segment à supprimer dans une ligne pour la couper\n' +
+			'Alt+cliquer  sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
+			'Joindre les extrémités deux lignes pour les fusionner\n' +
+			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
+			'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
+	}, options));
 
-	modify.on('modifyend', function(evt) {
-		//TODO BUG BEST delete only a summit when Ctrl+Alt click on it
+	button.interaction = new ol.interaction.Modify(options);
+	button.interaction.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
+			//TODO BUG BEST delete only a summit when Ctrl+Alt click on it
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = modify.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
@@ -1663,36 +1673,22 @@ function controlModify(options) {
 		}
 		cleanAndSave(options.source);
 	});
-
-	return controlButton(Object.assign({
-		interaction: modify,
-		label: 'M',
-		title: 'Activer "M" (couleur jaune) puis\n' +
-			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
-			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
-			'Alt+cliquer sur un sommet pour le supprimer\n' +
-			'Alt+cliquer  sur un segment à supprimer dans une ligne pour la couper\n' +
-			'Alt+cliquer  sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
-			'Joindre les extrémités deux lignes pour les fusionner\n' +
-			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
-			'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
-	}, options));
+	return button;
 }
 
 function controlDrawLine(options) {
-	const draw = new ol.interaction.Draw(Object.assign({
-			type: 'LineString',
-		}, options)),
-		button = controlButton(Object.assign({
-			interaction: draw,
-			label: 'L',
-			title: 'Activer "L" puis\n' +
-				'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
-				'double cliquer pour terminer.\n' +
-				'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
-		}, options));
+	const button = controlButton(Object.assign({
+		label: 'L',
+		title: 'Activer "L" puis\n' +
+			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
+			'double cliquer pour terminer.\n' +
+			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
+	}, options));
 
-	draw.on(['drawend'], function(evt) {
+	button.interaction = new ol.interaction.Draw(Object.assign({
+		type: 'LineString',
+	}, options));
+	button.interaction.on(['drawend'], function(evt) {
 		//TODO BUG le feature n'est pas encore acquis dans la source
 		button.toggle(false);
 		cleanAndSave(options.source);
