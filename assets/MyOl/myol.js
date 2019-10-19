@@ -12,7 +12,7 @@
 
 /* jshint esversion: 6 */
 
-//TODO WARNING DIFFICULT A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
+// TODO WARNING DIFFICULT A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
@@ -365,7 +365,7 @@ function layerVectorURL(o) {
 	}, o);
 
 	//HACK attach these to windows to define only one
-	//TODO BUG DIFFICULT don't zoom when the cursor is over a label
+	// TODO BUG DIFFICULT don't zoom when the cursor is over a label
 	const popElement = window.popElement_ = document.createElement('a'),
 		popup = window.popup_ = new ol.Overlay({
 			element: popElement
@@ -526,8 +526,8 @@ function layerVectorURL(o) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO IE BUG no overpass on IE
-//TODO BEST display error 429 (Too Many Requests)
+// TODO IE BUG no overpass on IE
+// TODO BEST display error 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -873,6 +873,20 @@ function controlButton(o) {
 		}
 	}
 
+	// Add a question below the button (for controlPrint)
+	if (options.question) {
+		const questionElement = document.createElement('div');
+		questionElement.innerHTML = options.question;
+		questionElement.className = 'ol-control-hidden';
+		divElement.appendChild(questionElement);
+		divElement.onmouseover = function() {
+			questionElement.className = 'ol-control-question';
+		};
+		divElement.onmouseout = function() {
+			questionElement.className = 'ol-control-hidden';
+		};
+	}
+
 	// Toggle the button status & aspect
 	control.active = false;
 	control.toggle = function(newActive, group) {
@@ -1055,7 +1069,7 @@ function controlPermalink(o) {
  * GPS control
  * Requires controlButton
  */
-//TODO GPS tap on map = distance from GPS calculation
+// TODO GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1094,7 +1108,7 @@ function controlGPS(options) {
 			},
 			activate: function(active) {
 				const map = button.getMap();
-				//TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
+				// TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
 				//TODO GPS freeze rotation when inactive
 				//TODO GPS block screen standby
 
@@ -1131,7 +1145,7 @@ function controlGPS(options) {
 	geolocation.on('change', function() {
 		gps.position = ol.proj.fromLonLat(geolocation.getPosition());
 		gps.accuracyGeometry = geolocation.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
-		/*//TODO GPS Firefox Update delta only over some speed
+		/* // TODO GPS Firefox Update delta only over some speed
 		if (!navigator.userAgent.match('Firefox'))
 
 		if (geolocation.getHeading()) {
@@ -1204,7 +1218,7 @@ function controlGPS(options) {
 			//TODO GPS keep orientation when stop gps tracking
 			if (compas.absolute)
 				view.setRotation(compas.heading, 0); // Use magnetic compas value
-			/*//TODO GPS Firefox use delta if speed > ??? km/h
+			/* // TODO GPS Firefox use delta if speed > ??? km/h
 					compas.absolute ?
 					compas.heading : // Use magnetic compas value
 					compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
@@ -1349,13 +1363,13 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
-//TODO BUG do not export points
-//TODO BUG EDGE & IE Don't mane with the extension .gpx
+//TODO BUG EDGE & IE Don't save with the extension .gpx
+// TODO BUG do not export points
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			label: '&dArr;',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
-			fileName: 'trace', //TODO BEST give a name according to the context
+			fileName: 'trace', // TODO BEST DIFFICULT give a name according to the context
 			extraMetaData: '', // Additional tags to the GPX file header
 			activate: activate,
 		}, o),
@@ -1407,7 +1421,7 @@ function controlDownloadGPX(o) {
 		else if (typeof navigator.msSaveBlob !== 'undefined')
 			return navigator.msSaveBlob(file, options.fileName);
 
-		hiddenElement.href = URL.createObjectURL(file); //TODO ARCHI what is URL ?
+		hiddenElement.href = URL.createObjectURL(file);
 		hiddenElement.download = options.fileName + '.gpx';
 
 		// Simulate the click & download the .gpx file
@@ -1457,23 +1471,23 @@ function controlPrint() {
 		className: 'print-button',
 		activate: printMap,
 		question: '<p>Paysage : ' +
-			'<span onclick="printMap("landscape",this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
-			'<span onclick="printMap("landscape",this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
+			'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
+			'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
 			'</p> <p>Portrait : ' +
-			'<span onclick="printMap("portrait",this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
-			'<span onclick="printMap("portrait",this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
+			'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
+			'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
 			'</p> ',
 		title: 'Imprimer la carte',
 	});
 
-	//TODO PRINT add scale in printed maps
+	// TODO PRINT add scale in printed maps
 	function printMap(orientation, el, resolution) {
 		const map = button.getMap();
 
 		// Search control div element in the hierarchy
-		if (0) //TODO PRINT no more .control_
+		if (0) // TODO PRINT no more .control_
 			while (el.parentElement && !el.control_)
-				el = el.parentElement; //TODO PRINT search specific tag ????
+				el = el.parentElement; // TODO PRINT search specific tag ????
 
 		// Get existing context
 		const mapEl = map.getTargetElement(),
@@ -1503,14 +1517,14 @@ function controlPrint() {
 		));
 
 		map.once('rendercomplete', function() {
-			/*//TODO PRINT attendre fin du chargement de toutes les couches !
+			/*// TODO PRINT attendre fin du chargement de toutes les couches !
 			map.getLayers().forEach(function(layer) {
 				if(layer.getSource())
 					;
 			});
 			*/
-			//TODO BUG PRINT Chrome puts 3 pages in landscape
-			//TODO BEST PRINT IE11 very big margin
+			// TODO PRINT BUG Chrome puts 3 pages in landscape
+			// TODO PRINT BEST IE11 very big margin
 			window.print();
 			document.cookie = 'map=' + mapCookie + ';path=/';
 			window.location.href = window.location.href;
@@ -1637,7 +1651,7 @@ function layerEdit(o) {
 	return layer;
 }
 
-//TODO BEST hover feature when modifing
+// TODO BEST DIFFICULT hover feature when modifing
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		label: 'M',
@@ -1656,7 +1670,7 @@ function controlModify(options) {
 	button.interaction.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			//TODO BUG BEST delete only a summit when Ctrl+Alt click on it
+			// TODO BUG BEST delete only a summit when Ctrl+Alt click on it
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
@@ -1764,7 +1778,7 @@ function optimiseEdited(source, pointerPosition) {
 					}
 				}
 		}
-	//TODO BEST option not to be able to cut a polygon (WRI / alpages)
+	// TODO BEST DIFFICULT option not to be able to cut a polygon (WRI / alpages)
 
 	// Recreate modified features
 	for (let l in lines)
@@ -1864,7 +1878,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
-		//TODO BUG PRINT don't work		controlPrint(),
+		controlPrint(),
 	];
 }
 
