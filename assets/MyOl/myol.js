@@ -23,6 +23,14 @@ ol.Map.prototype.renderFrame_ = function(time) {
 	ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
+function JSONparse(json) {
+	try {
+		return JSON.parse(json);
+	} catch (returnCode) {
+		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+	}
+}
+
 /**
  * TILE LAYERS
  */
@@ -714,17 +722,13 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 	if (eljson)
 		json = eljson.value || eljson.innerHTML;
 	if (json)
-		try {
-			llInit = JSON.parse(json).coordinates;
-		} catch (returnCode) {
-			console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
-		}
+		llInit = JSONparse(json).coordinates;
 
 	// The marker layer
 	const style = new ol.style.Style({
 			image: new ol.style.Icon(({
 				src: imageUrl,
-				anchor: [0.5, 0.5]
+				anchor: [0.5, 0.5],
 			}))
 		}),
 		point = new ol.geom.Point(
@@ -1463,7 +1467,7 @@ function controlPrint() {
 		const map = button.getMap();
 
 		// Search control div element in the hierarchy
-		if (0) //TODO no more .control_
+		if (0) //TODO PRINT no more .control_
 			while (el.parentElement && !el.control_)
 				el = el.parentElement; //TODO PRINT search specific tag ????
 
@@ -1558,15 +1562,6 @@ function layerEdit(o) {
 			},
 			style: escapedStyle(options.styleOptions, options.editStyleOptions),
 		});
-
-	function JSONparse(json) { //TODO ARCHI
-		try {
-			return JSON.parse(json);
-		} catch (returnCode) {
-			console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
-		}
-		return;
-	}
 
 	source.save = function() {
 		// Save lines in <EL> as geoJSON at every change
