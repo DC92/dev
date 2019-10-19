@@ -377,7 +377,7 @@ function layerVectorURL(o) {
 		JSONparse(source); // handle JSON error
 		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receive request
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options);
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options); // End HACK
 	};
 
 	const source = new ol.source.Vector(Object.assign({
@@ -543,7 +543,7 @@ layerOverpass = function(o) {
 
 	// Convert areas into points to display it as an icon
 	const osmXmlPoi = new ol.format.OSMXML();
-	osmXmlPoi.readFeatures = function(source) {
+	osmXmlPoi.readFeatures = function(source) { //HACK  to modify the format
 		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
@@ -568,7 +568,7 @@ layerOverpass = function(o) {
 							newNode.appendChild(subTagNode.cloneNode());
 					}
 			}
-		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options);
+		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options); // End HACK
 	};
 
 	function overpassType(properties) {
@@ -1318,7 +1318,7 @@ function controlLoadGPX(o) {
 				featureProjection: 'EPSG:3857'
 			}),
 			added = map.dispatchEvent({
-				type: 'myol:onfeatureload',
+				type: 'myol:onfeatureload', // Warn layerEdit that uploaded some features
 				features: features
 			});
 
@@ -1594,7 +1594,7 @@ function layerEdit(o) {
 				style: escapedStyle(options.styleOptions, options.editStyleOptions),
 				activate: function(active) {
 					control.interaction.setActive(active);
-					if (active) //TODO BEST hover feature when modifing
+					if (active)
 						map.removeInteraction(hover);
 					else
 						map.addInteraction(hover);
@@ -1617,18 +1617,27 @@ function layerEdit(o) {
 				});
 			});
 
+		// End of feature creation
+		source.on('change', function() { // Called all sliding long
+			if (source.modified) { // Awaiting adding complete to save it
+				source.modified = false; // To avoid loops
+				optimiseEdited(source);
+			}
+		});
+
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
 			source.addFeatures(evt.features);
-			cleanAndSave(source);
-			return false;
+			optimiseEdited(source);
+			return false; // Warn controlLoadGPX that the editor got the included feature
 		});
 
-		return ol.layer.Vector.prototype.createRenderer.call(this);
+		return ol.layer.Vector.prototype.createRenderer.call(this); // End HACK
 	};
 	return layer;
 }
 
+//TODO BEST hover feature when modifing
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		label: 'M',
@@ -1660,9 +1669,9 @@ function controlModify(options) {
 			}
 			// Other modify actions : altKey + click on a segment = delete the segment
 			else if (evt.target.vertexFeature_)
-				return cleanAndSave(options.source, evt.target.vertexFeature_.getGeometry().getCoordinates());
+				return optimiseEdited(options.source, evt.target.vertexFeature_.getGeometry().getCoordinates());
 		}
-		cleanAndSave(options.source);
+		optimiseEdited(options.source);
 	});
 	return button;
 }
@@ -1680,9 +1689,10 @@ function controlDrawLine(options) {
 		type: 'LineString',
 	}, options));
 	button.interaction.on(['drawend'], function() {
-		//TODO BUG le feature n'est pas encore acquis dans la source
 		button.toggle(false);
-		cleanAndSave(options.source);
+		// Warn source 'on change' to save the feature
+		// Don't do it now as it's not yet added to the source
+		options.source.modified = true;
 	});
 	return button;
 }
@@ -1698,12 +1708,12 @@ function controlDrawPolygon(options) {
 	}, options));
 }
 
-// Sort Points / Lines (Polygons are treated as Lines)
-//TODO BEST option not to be able to cut a polygon (WRI / alpages)
-function cleanAndSave(source, pointerPosition) {
+// Reorganise Points, Lines & Polygons
+function optimiseEdited(source, pointerPosition) {
+	// Get all edited features
 	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
 		polys = [];
-	source.clear();
+	source.clear(); // Remove everything
 
 	// Get flattened list of multipoints coords
 	for (let a = 0; a < lines.length; a++) {
@@ -1716,7 +1726,6 @@ function cleanAndSave(source, pointerPosition) {
 			polys.push([lines[a]]);
 			lines[a] = null;
 		}
-
 		// Merge lines having a common end
 		for (let b = 0; b < a; b++) { // Once each combination
 			const m = [a, b];
@@ -1738,7 +1747,6 @@ function cleanAndSave(source, pointerPosition) {
 				}
 		}
 	}
-
 	// Makes holes if a polygon is included in a biggest one
 	for (let p1 in polys)
 		if (polys[p1]) {
@@ -1756,6 +1764,7 @@ function cleanAndSave(source, pointerPosition) {
 					}
 				}
 		}
+	//TODO BEST option not to be able to cut a polygon (WRI / alpages)
 
 	// Recreate modified features
 	for (let l in lines)
@@ -1769,7 +1778,6 @@ function cleanAndSave(source, pointerPosition) {
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.Polygon(polys[p])
 			}));
-
 	source.save();
 }
 
