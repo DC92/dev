@@ -372,9 +372,9 @@ function layerVectorURL(o) {
 		});
 	popElement.style.display = 'block';
 
-	//TODO BEST JSON error handling : error + URL
 	const format = new ol.format.GeoJSON();
 	format.readFeatures = function(source, options) {
+		JSONparse(source); // handle JSON error
 		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receive request
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options);
