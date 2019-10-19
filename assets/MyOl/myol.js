@@ -1055,7 +1055,7 @@ function controlPermalink(o) {
  * GPS control
  * Requires controlButton
  */
-//TODO tap on map = distance from GPS calculation
+//TODO GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1094,9 +1094,9 @@ function controlGPS(options) {
 			},
 			activate: function(active) {
 				const map = button.getMap();
-				//TODO 3 steps activation : position + reticule + orientation / reticule / none
-				//TODO freeze rotation when inactive
-				//TODO block screen standby
+				//TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
+				//TODO GPS freeze rotation when inactive
+				//TODO GPS block screen standby
 
 				// Toggle reticule, position & rotation
 				geolocation.setTracking(active);
@@ -1131,7 +1131,7 @@ function controlGPS(options) {
 	geolocation.on('change', function() {
 		gps.position = ol.proj.fromLonLat(geolocation.getPosition());
 		gps.accuracyGeometry = geolocation.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
-		/*//TODO Firefox Update delta only over some speed
+		/*//TODO GPS Firefox Update delta only over some speed
 		if (!navigator.userAgent.match('Firefox'))
 
 		if (geolocation.getHeading()) {
@@ -1201,10 +1201,10 @@ function controlGPS(options) {
 			]));
 
 			// Map orientation (Radians and reverse clockwize)
-			//TODO keep orientation when stop gps tracking
+			//TODO GPS keep orientation when stop gps tracking
 			if (compas.absolute)
 				view.setRotation(compas.heading, 0); // Use magnetic compas value
-			/*//TODO Firefox use delta if speed > ??? km/h
+			/*//TODO GPS Firefox use delta if speed > ??? km/h
 					compas.absolute ?
 					compas.heading : // Use magnetic compas value
 					compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves

@@ -68,6 +68,8 @@ The coding rules are volontary simple & don't follow all openlayers's
 * Each adaptation is included in a single JS function that you can include separately (check dependencies if any)
 * Feel free to use, modify & share as you want
 
+Tested on windows 10 Chrome, FireFox, Edge, IE11 (with some limitations), Opera (slow)
+
 FILES
 =====
 * myol.css : Specific CSS presentation distribution
