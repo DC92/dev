@@ -43,9 +43,9 @@ function layerOSM(url, attribution) {
 			url: url,
 			attributions: [
 				attribution || '',
-				ol.source.OSM.ATTRIBUTION
+				ol.source.OSM.ATTRIBUTION,
 			],
-		})
+		}),
 	});
 }
 
@@ -55,7 +55,7 @@ function layerOSM(url, attribution) {
  */
 function layerKompass(layer) {
 	return layerOSM(
-		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + //  Not available via https
+		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + layer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
@@ -146,7 +146,7 @@ function layerSpain(serveur, layer) {
  * Virtual class
  * Displays Stamen outside the layer zoom range or extend
  */
-layerTileIncomplete = function(options) {
+function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
 
@@ -162,9 +162,9 @@ layerTileIncomplete = function(options) {
 
 	// Zoom has changed
 	function change() {
-		let view = layer.map_.getView(),
-			center = view.getCenter(),
-			currentResolution = 999999; // Init loop at max resolution
+		const view = layer.map_.getView(),
+			center = view.getCenter();
+		let currentResolution = 999999; // Init loop at max resolution
 
 		// Search for sources according to the map resolution
 		if (center &&
@@ -178,7 +178,7 @@ layerTileIncomplete = function(options) {
 			layer.setSource(options.sources[currentResolution]);
 	}
 	return layer;
-};
+}
 
 /**
  * Swisstopo https://api.geo.admin.ch/
@@ -186,8 +186,8 @@ layerTileIncomplete = function(options) {
  * Requires layerTileIncomplete
  */
 function layerSwissTopo(layer, extraLayer) {
-	let projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
-		resolutions = [],
+	const projectionExtent = ol.proj.get('EPSG:3857').getExtent();
+	let resolutions = [],
 		matrixIds = [];
 	for (let r = 0; r < 18; ++r) {
 		resolutions[r] = ol.extent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
@@ -265,7 +265,7 @@ function layerBing(key, subLayer) {
 	const layer = new ol.layer.Tile();
 
 	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.once('change:opacity', function(evt) {
+	layer.once('change:opacity', function() {
 		if (layer.getVisible() && !layer.getSource()) {
 			layer.setSource(new ol.source.BingMaps({
 				imagerySet: subLayer,
@@ -358,7 +358,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 function layerVectorURL(o) {
 	const options = Object.assign({
-		baseUrlFunction: function(bbox, list, resolution) {
+		baseUrlFunction: function(bbox, list) {
 			return options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
@@ -374,10 +374,10 @@ function layerVectorURL(o) {
 
 	//TODO BEST JSON error handling : error + URL
 	const format = new ol.format.GeoJSON();
-	format.readFeatures = function(s, o) {
+	format.readFeatures = function(source, options) {
 		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receive request
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options);
 	};
 
 	const source = new ol.source.Vector(Object.assign({
@@ -415,9 +415,9 @@ function layerVectorURL(o) {
 		const map = evt.target.map_;
 		map.addOverlay(popup);
 		map.on('pointermove', layerVectorPointerMove);
-		map.on('click', function(evt) { // Click on a feature
-			evt.target.forEachFeatureAtPixel(
-				evt.pixel,
+		map.on('click', function(evtClk) { // Click on a feature
+			evtClk.target.forEachFeatureAtPixel(
+				evtClk.pixel,
 				function() {
 					if (popup.getPosition())
 						popElement.click(); // Simulate a click on the label
@@ -436,10 +436,10 @@ function layerVectorURL(o) {
 		}));
 
 		// Hide popup when the cursor is out of the map
-		window.addEventListener('mousemove', function(evt) {
+		window.addEventListener('mousemove', function(evtMm) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
-			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+			if (evtMm.clientX < divRect.left || evtMm.clientX > divRect.right ||
+				evtMm.clientY < divRect.top || evtMm.clientY > divRect.bottom)
 				popup.setPosition();
 		});
 	});
@@ -461,9 +461,9 @@ function layerVectorURL(o) {
 
 		map.forEachFeatureAtPixel(
 			pixel,
-			function(feature, layer) {
-				if (layer && typeof layer.displayPopup == 'function')
-					layer.displayPopup(feature, pixel);
+			function(feature_, layer_) {
+				if (layer_ && typeof layer_.displayPopup == 'function')
+					layer_.displayPopup(feature_, pixel);
 			}, {
 				hitTolerance: 6,
 			}
@@ -471,6 +471,7 @@ function layerVectorURL(o) {
 	}
 
 	layer.displayPopup = function(feature, pixel) {
+		const map = layer.map_;
 		let geometry = feature.getGeometry();
 		if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
 			geometry = geometry.getGeometries()[0];
@@ -542,7 +543,7 @@ layerOverpass = function(o) {
 
 	// Convert areas into points to display it as an icon
 	const osmXmlPoi = new ol.format.OSMXML();
-	osmXmlPoi.readFeatures = function(source, options) {
+	osmXmlPoi.readFeatures = function(source) {
 		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
@@ -668,7 +669,7 @@ layerOverpass = function(o) {
 						p.capacity ? p.capacity + ' places' : '',
 						p.ele ? parseInt(p.ele, 10) + 'm' : ''
 					].join(' '),
-					phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9\+]+/ig, '') + '">' + phone + '</a>' : '',
+					phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9+]+/ig, '') + '">' + phone + '</a>' : '',
 					p.email ? '&#9993;<a title="Envoyer un mail" href="mailto:' + p.email + '">' + p.email + '</a>' : '',
 					p['addr:street'] ? address.join(' ') : '',
 					p.website ? '&#8943;<a title="Voir le site web" target="_blank" href="' + p.website + '">' + (p.website.split('/')[2] || p.website) + '</a>' : '',
@@ -746,7 +747,8 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 			zIndex: 10
 		});
 
-	layer.once('prerender', function(evt) {
+	layer.once('prerender', function() {
+		const map = layer.map_;
 		if (dragged) {
 			// Drag and drop
 			layer.map_.addInteraction(new ol.interaction.Modify({
@@ -760,6 +762,7 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 
 		// Change cursor while hovering the target
 		map.on('pointermove', function(evtMove) {
+			const map = evtMove.target;
 			map.getViewport().style.cursor = 'default';
 			map.forEachFeatureAtPixel(evtMove.pixel, function(f) {
 				if (f == feature)
@@ -1006,9 +1009,9 @@ function controlPermalink(o) {
 			render: render
 		});
 
-	let params = (location.hash + location.search).match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Priority to the hash
-		document.cookie.match(/map=([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/) || // Then the cookie
-		(options.initialFit || '6/2/47').match(/([-0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
+	let params = (location.hash + location.search).match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Priority to the hash
+		document.cookie.match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Then the cookie
+		(options.initialFit || '6/2/47').match(/([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
 
 	if (options.visible) {
 		divElement.className = 'ol-permalink';
@@ -1066,7 +1069,7 @@ function controlGPS(options) {
 		graticule = new ol.Feature(),
 		northGraticule = new ol.Feature(),
 		layer = new ol.layer.Vector({
-			source: source = new ol.source.Vector({
+			source: new ol.source.Vector({
 				features: [graticule, northGraticule]
 			}),
 			style: new ol.style.Style({
@@ -1242,7 +1245,7 @@ function controlPreLoad() {
  * Requires controlButton
  */
 function controlLengthLine() {
-	var divElement = document.createElement('div'),
+	const divElement = document.createElement('div'),
 		button = controlButton({
 			element: divElement,
 			onAdd: function(map) {
@@ -1347,6 +1350,7 @@ function controlLoadGPX(o) {
  * Requires controlButton
  */
 //TODO BUG do not export points
+//TODO BUG EDGE & IE Don't mane with the extension .gpx
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			label: '&dArr;',
@@ -1403,7 +1407,7 @@ function controlDownloadGPX(o) {
 		else if (typeof navigator.msSaveBlob !== 'undefined')
 			return navigator.msSaveBlob(file, options.fileName);
 
-		hiddenElement.href = URL.createObjectURL(file);
+		hiddenElement.href = URL.createObjectURL(file); //TODO ARCHI what is URL ?
 		hiddenElement.download = options.fileName + '.gpx';
 
 		// Simulate the click & download the .gpx file
@@ -1487,8 +1491,8 @@ function controlPrint() {
 
 		// Hide controls
 		const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
-		Array.prototype.filter.call(controls, function(el) {
-			el.style.display = 'none';
+		Array.prototype.filter.call(controls, function(elm) {
+			elm.style.display = 'none';
 		});
 
 		// Add page style for printing
@@ -1498,7 +1502,7 @@ function controlPrint() {
 			"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
 		));
 
-		map.once('rendercomplete', function(event) {
+		map.once('rendercomplete', function() {
 			/*//TODO PRINT attendre fin du chargement de toutes les couches !
 			map.getLayers().forEach(function(layer) {
 				if(layer.getSource())
@@ -1632,8 +1636,8 @@ function controlModify(options) {
 			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
 			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 			'Alt+cliquer sur un sommet pour le supprimer\n' +
-			'Alt+cliquer  sur un segment à supprimer dans une ligne pour la couper\n' +
-			'Alt+cliquer  sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
+			'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
+			'Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
 			'Joindre les extrémités deux lignes pour les fusionner\n' +
 			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
 			'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
@@ -1645,7 +1649,7 @@ function controlModify(options) {
 			// altKey + ctrlKey : delete feature
 			//TODO BUG BEST delete only a summit when Ctrl+Alt click on it
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
-				const selectedFeatures = modify.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
 					layerFilter: function(l) {
 						return l.ol_uid == options.layer.ol_uid;
@@ -1675,7 +1679,7 @@ function controlDrawLine(options) {
 	button.interaction = new ol.interaction.Draw(Object.assign({
 		type: 'LineString',
 	}, options));
-	button.interaction.on(['drawend'], function(evt) {
+	button.interaction.on(['drawend'], function() {
 		//TODO BUG le feature n'est pas encore acquis dans la source
 		button.toggle(false);
 		cleanAndSave(options.source);
