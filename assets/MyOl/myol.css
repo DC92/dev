@@ -140,6 +140,15 @@
 .print-button p span {
 	color: blue;
 }
+@media print { /* Disable all controls except attribution & scale */
+	.ol-overlaycontainer-stopevent > * {
+		display: none;
+	}
+	.ol-attribution,
+	.ol-scale-line {
+		display: block;
+	}
+}
 
 /* Switch layer popup */
 .switch-layer {

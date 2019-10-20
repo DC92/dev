@@ -840,7 +840,7 @@ function controlButton(o) {
 		divElement = document.createElement('div'),
 		options = Object.assign({
 			element: divElement,
-			label: '', // {string} character to be displayed in the button
+			label: '', // {string} character to be displayed in the button | [{string}] alternates label
 			className: '', // {string} className of the button
 			activeButtonBackgroundColor: 'white',
 			onAdd: function() {},
@@ -848,14 +848,16 @@ function controlButton(o) {
 		}, o),
 		control = new ol.control.Control(options);
 
-	//HACK get control on Map init
+	//HACK execute actions on Map init
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 		options.onAdd(map);
 	};
 
 	if (options.label || options.className) {
-		buttonElement.innerHTML = options.label;
+		if (typeof options.label != 'object')
+			options.label = [options.label, options.label];
+		buttonElement.innerHTML = options.label[0];
 		buttonElement.addEventListener('click', function(evt) {
 			evt.preventDefault();
 			control.toggle();
@@ -874,6 +876,7 @@ function controlButton(o) {
 	}
 
 	// Add a question below the button (for controlPrint)
+	/* //TODO DELETE ?
 	if (options.question) {
 		const questionElement = document.createElement('div');
 		questionElement.innerHTML = options.question;
@@ -885,13 +888,13 @@ function controlButton(o) {
 		divElement.onmouseout = function() {
 			questionElement.className = 'ol-control-hidden';
 		};
-	}
+	}*/
 
 	// Toggle the button status & aspect
-	control.active = false;
+	control.active = 0;
 	control.toggle = function(newActive, group) {
 		if (typeof newActive == 'undefined')
-			newActive = !control.active;
+			newActive = (control.active + 1) % options.label.length;
 		if (group && group != options.group)
 			return;
 
@@ -900,10 +903,11 @@ function controlButton(o) {
 			if (newActive && options.group)
 				control.getMap().getControls().forEach(function(c) {
 					if (typeof c.toggle == 'function')
-						c.toggle(false, options.group);
+						c.toggle(0, options.group);
 				});
 
 			control.active = newActive;
+			buttonElement.innerHTML = options.label[newActive];
 			buttonElement.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
 			options.activate(newActive);
 		}
@@ -1238,7 +1242,7 @@ function controlGPS(options) {
  * This prepares the browser to become offline on the same session
  * Requires controlButton
  */
-function controlPreLoad() {
+function controlTilesBuffer() {
 	return controlButton({
 		onAdd: function(map) {
 			map.on('change:size', function() {
@@ -1470,80 +1474,142 @@ function controlPrint() {
 	const button = controlButton({
 		className: 'print-button',
 		activate: printMap,
-		question: '<p>Paysage : ' +
-			'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
-			'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
-			'</p> <p>Portrait : ' +
-			'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
-			'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
-			'</p> ',
+		/*		question: '<p>Paysage : ' +
+					'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
+					'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
+					'</p> <p>Portrait : ' +
+					'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
+					'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
+					'</p> ',*/
 		title: 'Imprimer la carte',
 	});
+
+	/*
+		window.addEventListener('load', function(){
+
+var gm=document.getElementById('getmap');
+var rr;
+
+
+			
+//			var para = document.createElement("P");                       // Create a <p> node
+var t = document.createTextNode('XXXXXXXXXXXXXX XXXXXXXXXXXXXX '+rr+' XXXXXXXXXXXXXX XXXXXXXXXXXXXX');      // Create a text node
+document.body.appendChild(t);                                          // Append the text to <p>
+			
+	//		document.write('XXXXXXXXXXXXXX XXXXXXXXXXXXXX XXXXXXXXXXXXXX XXXXXXXXXXXXXX ');
+			
+		});
+*/
 
 	// TODO PRINT add scale in printed maps
 	function printMap(orientation, el, resolution) {
 		const map = button.getMap();
 
 		// Search control div element in the hierarchy
+		/*
 		if (0) // TODO PRINT no more .control_
 			while (el.parentElement && !el.control_)
 				el = el.parentElement; // TODO PRINT search specific tag ????
+*/
 
 		// Get existing context
 		const mapEl = map.getTargetElement(),
-			mapCookie = document.cookie.match('map=([^;]*)');
+			mapCookie = document.cookie.match('map=([^;]*)'); //TODO ????
 
 		// Hide other elements than the map
-		document.body.style.cursor = "wait";
+		//		document.body.style.cursor = 'wait';
 		while (document.body.firstChild)
 			document.body.removeChild(document.body.firstChild);
-
 		// Raises the map to the top level
+		document.body.className = 'print';
+		document.body.style.margin = 0;
 		document.body.appendChild(mapEl);
-		mapEl.style.width = '100%';
-		mapEl.style.height = '100%';
+		//		mapEl.style.width = '100vw';
+		//		mapEl.style.height = '70.7vw';
+		//		mapEl.style.width = '70.7vh';
+		//		mapEl.style.height = '100vh';
 
-		// Hide controls
-		const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
-		Array.prototype.filter.call(controls, function(elm) {
-			elm.style.display = 'none';
+		var cpo = controlPrintOrientation({
+			mapEl: mapEl,
 		});
+		map.addControl(cpo);
+		var dpi = controlPrintDpi();
+		map.addControl(dpi);
+		cpo.toggle(0); // To set the map size
 
-		// Add page style for printing
-		const style = document.createElement('style');
-		document.head.appendChild(style);
-		style.appendChild(document.createTextNode(
-			"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
-		));
 
-		map.once('rendercomplete', function() {
-			/*// TODO PRINT attendre fin du chargement de toutes les couches !
-			map.getLayers().forEach(function(layer) {
-				if(layer.getSource())
-					;
-			});
-			*/
-			// TODO PRINT BUG Chrome puts 3 pages in landscape
-			// TODO PRINT BEST IE11 very big margin
-			window.print();
-			document.cookie = 'map=' + mapCookie + ';path=/';
-			window.location.href = window.location.href;
-		});
+		/*
+				// Hide controls
+				const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
+				Array.prototype.filter.call(controls, function(elm) {
+					elm.style.display = 'none';
+				});
+		*/
 
-		// Set print size, which will render the new map
-		const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
-			printSize = [
-				Math.round(dim[0] * (resolution || 100) / 25.4),
-				Math.round(dim[1] * (resolution || 100) / 25.4)
-			],
-			extent = map.getView().calculateExtent(map.getSize());
-		map.setSize(printSize);
-		map.getView().fit(extent, {
-			size: printSize
-		});
+		/*		// Add page style for printing
+				const style = document.createElement('style');
+				document.head.appendChild(style);
+				style.appendChild(document.createTextNode(
+					"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
+				));
+
+				// Set print size, which will render the new map
+				const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
+					printSize = [
+						Math.round(dim[0] * (resolution || 100) / 25.4),
+						Math.round(dim[1] * (resolution || 100) / 25.4)
+					],
+					extent = map.getView().calculateExtent(map.getSize());
+				map.setSize(printSize);
+				map.getView().fit(extent, {
+					size: printSize
+				});
+
+				map.once('rendercomplete', function() {
+					// TODO PRINT attendre fin du chargement de toutes les couches !
+					map.getLayers().forEach(function(layer) {
+						if(layer.getSource())
+							;
+					});
+					// TODO PRINT BUG Chrome puts 3 pages in landscape
+					// TODO PRINT BEST IE11 very big margin
+					//			window.print();
+					//			document.cookie = 'map=' + mapCookie + ';path=/';
+					//			window.location.href = window.location.href;
+				}); */
 	}
 	return button;
 }
+
+function controlPrintOrientation(options) {
+	const button = controlButton(Object.assign({
+		label: ['&#9607;', '&#9608;'],
+		title: 'Paysage / Portrait',
+		activate: function(active) {
+			options.mapEl.style.width = active ? '70.7vh' : '100vw';
+			options.mapEl.style.height = active ? '100vh' : '70.7vw';
+		},
+	}, options));
+	return button;
+}
+
+function controlPrintDpi(options) {
+	const button = controlButton(Object.assign({
+		label: [
+			'<span style="font-size:0.5em">100<br/>dpi</span>',
+			'<span style="font-size:0.5em">200<br/>dpi</span>',
+			'<span style="font-size:0.5em">400<br/>dpi</span>'
+		],
+		title: 'Résolution',
+		/*		wactivate: function(active) {
+					//const mapEl = button.getMap().getTargetElement();
+					options.mapEl.style.width = active ? '100vw' : '70.7vh';
+					options.mapEl.style.height = active ? '70.7vw' : '100vh';
+				},*/
+	}, options));
+	return button;
+}
+
 
 /**
  * Line & Polygons Editor
@@ -1703,7 +1769,7 @@ function controlDrawLine(options) {
 		type: 'LineString',
 	}, options));
 	button.interaction.on(['drawend'], function() {
-		button.toggle(false);
+		button.toggle(0);
 		// Warn source 'on change' to save the feature
 		// Don't do it now as it's not yet added to the source
 		options.source.modified = true;
@@ -1873,7 +1939,7 @@ function controlsCollection(options) {
 			labelActive: '',
 			tipLabel: 'Plein écran'
 		}),
-		controlPreLoad(),
+		controlTilesBuffer(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
