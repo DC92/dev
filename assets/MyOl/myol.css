@@ -126,21 +126,38 @@
 /* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 
 /* Print */
-.print-button:hover {
+.ol-print:hover {
 	background-color: transparent;
 }
-.print-button button {
+.ol-print button {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;'%3E%3Cpath d='M8 6l9 0 0 2-9 0z'/%3E%3Cpath d='M5 10l15 0 0 5-15 0z'/%3E%3Cpath d='M8 13l9 0 0 6-9 0z' style='fill:white;'/%3E%3C/svg%3E");
 }
-.print-button p {
+.ol-print p {
 	margin: 0;
 	font-size: 14px;
 	font-family: Times New Roman;
 }
-.print-button p span {
+.ol-print p span {
 	color: blue;
 }
-@media print { /* Disable all controls except attribution & scale */
+
+/* On print preparation page, hide all controls except : */
+.print .ol-overlaycontainer-stopevent > * {
+	display: none;
+}
+.print .ol-zoom,
+.print .ol-full-screen,
+.print .ol-geocoder,
+.print .ol-load-gpx,
+.print .ol-print,
+.print .ol-print-orientation,
+.print .ol-coordinate,
+.print .ol-attribution,
+.print .ol-scale-line {
+	display: block;
+}
+/* When printing, hide all controls except :  */
+@media print {
 	.ol-overlaycontainer-stopevent > * {
 		display: none;
 	}
@@ -151,20 +168,20 @@
 }
 
 /* Switch layer popup */
-.switch-layer {
+.ol-switch-layer {
 	font-size: small;
 	background-color: white !important;
 	border-radius: 5px;
 	z-index: 200;
 }
-.switch-layer div {
+.ol-switch-layer div {
 	padding: 2px;
 }
-.switch-layer input {
+.ol-switch-layer input {
 	margin: 0;
 }
 
-.gps-button button {
+.ol-gps button {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M7 7A7.5 7.5 0 0 1 18 18 7.5 7.5 0 1 1 7 7'/%3E%3Cpath d='M2 12.5l21 0M12.5 2l0 21' style='stroke-dasharray:6,9;'/%3E%3C/svg%3E");
 }
 

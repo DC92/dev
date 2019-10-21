@@ -354,7 +354,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires controlButton, controlPermanentCheckbox, JSONparse, HACK map_
+ * Requires controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(o) {
@@ -910,7 +910,7 @@ function controlButton(o) {
 			control.active = newActive;
 			buttonElement.innerHTML = options.label[newActive];
 			buttonElement.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
-			options.activate(newActive, control);
+			options.activate(newActive);
 		}
 	};
 	return control;
@@ -924,7 +924,7 @@ function controlButton(o) {
 function controlLayersSwitcher(options) {
 	const button = controlButton({
 		label: '&hellip;',
-		className: 'switch-layer',
+		className: 'ol-switch-layer',
 		title: 'Liste des cartes',
 		rightPosition: 0.5,
 		onAdd: onAddLS,
@@ -1105,9 +1105,9 @@ function controlGPS(options) {
 
 		// The control button
 		button = controlButton({
-			className: 'gps-button',
-			title: 'Centrer sur la position GPS',
+			className: 'ol-gps',
 			activeButtonBackgroundColor: '#ef3',
+			title: 'Centrer sur la position GPS',
 			onAdd: function(map) {
 				map.on('moveend', renderReticule);
 			},
@@ -1309,6 +1309,7 @@ function controlLengthLine() {
 function controlLoadGPX(o) {
 	const options = Object.assign({
 			label: '&uArr;',
+			className: 'ol-load-gpx',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
 				inputElement.click();
@@ -1373,6 +1374,7 @@ function controlLoadGPX(o) {
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			label: '&dArr;',
+			className: 'ol-download-gpx',
 			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
 			fileName: 'trace', // TODO BEST DIFFICULT give a name according to the context
 			extraMetaData: '', // Additional tags to the GPX file header
@@ -1473,7 +1475,7 @@ function controlGeocoder() {
  */
 function controlPrint() {
 	const button = controlButton({
-		className: 'print-button',
+		className: 'ol-print',
 		title: 'Imprimer la carte',
 		activeButtonBackgroundColor: '#ef3',
 		activate: activate,
@@ -1497,9 +1499,7 @@ document.body.appendChild(t);                                          // Append
 		});
 */
 
-	// TODO PRINT add scale in printed maps
-	//	function activate(orientation, el, resolution) {
-	function activate(active, button) {
+	function activate(active) {
 		if (!active) { // On the second click on the control
 			window.print();
 			window.location.href = window.location.href; // Reload the page to get the initial state
@@ -1510,24 +1510,19 @@ document.body.appendChild(t);                                          // Append
 			mapCookie = document.cookie.match('map=([^;]*)'); //TODO ????
 
 		// Hide other elements than the map
-		//		document.body.style.cursor = 'wait';
 		while (document.body.firstChild)
 			document.body.removeChild(document.body.firstChild);
+
 		// Raises the map to the top level
-		//document.body.className = 'print';//TODO ??
 		document.body.style.margin = 0;
 		document.body.appendChild(mapEl);
+		mapEl.className = 'print';
 		map.addControl(controlPrintOrientation({
 			mapEl: mapEl,
 		}));
 		//TODO map.addControl(controlPrintDpi());
 
 		/*
-				// Hide controls
-				const controls = document.getElementsByClassName('ol-overlaycontainer-stopevent');
-				Array.prototype.filter.call(controls, function(elm) {
-					elm.style.display = 'none';
-				});
 
 				// Add page style for printing
 				const style = document.createElement('style');
@@ -1565,21 +1560,42 @@ document.body.appendChild(t);                                          // Append
 }
 
 function controlPrintOrientation(options) {
-	return controlButton(Object.assign({
+	button = controlButton(Object.assign({
 		label: ['&#9607;', '&#9608;'],
+		className: 'ol-print-orientation',
 		title: 'Paysage / Portrait',
-		onAdd: function(map, button) {
-			activate(0, button);
+		onAdd: function(map) {
+			activate(0); // Adjust the map display at init
+			window.addEventListener('resize', function() { // And each time the window resize
+				activate(button.active);
+			});
 		},
 		activate: activate,
 	}, options));
 
-	function activate(active, button) {
-		const map = button.getMap();
-		options.mapEl.style.width = active ? '70.7vh' : '100vw';
-		options.mapEl.style.height = active ? '100vh' : '70.7vw';
-		map.setSize([options.mapEl.offsetWidth, options.mapEl.offsetHeight]);
+	function activate(active) {
+		// Tune the optimal map size
+		if (active) { // Portrait
+			if (window.innerWidth / window.innerHeight > .707) {
+				options.mapEl.style.width = '70.7vh';
+				options.mapEl.style.height = '100vh';
+			} else { // Window too hignt
+				options.mapEl.style.width = '100vw';
+				options.mapEl.style.height = '141.4vw';
+			}
+		} else { // Landscape
+			if (window.innerWidth / window.innerHeight < 1.414) {
+				options.mapEl.style.width = '100vw';
+				options.mapEl.style.height = '70.7vw';
+			} else { // Window too large
+				options.mapEl.style.width = '141.4vh';
+				options.mapEl.style.height = '100vh';
+			}
+		}
+		// Reset the map display at the new size
+		button.getMap().setSize([options.mapEl.offsetWidth, options.mapEl.offsetHeight]);
 	}
+	return button;
 }
 /*
 function controlPrintDpi(options) {
@@ -1589,6 +1605,7 @@ function controlPrintDpi(options) {
 			'<span style="font-size:0.5em">200<br/>dpi</span>',
 			'<span style="font-size:0.5em">400<br/>dpi</span>'
 		],
+		className: 'ol-print-dpi',
 		title: 'Résolution',
 	}, options));
 }*/
@@ -1704,6 +1721,7 @@ function layerEdit(o) {
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		label: 'M',
+		className: 'ol-edit',
 		title: 'Activer "M" (couleur jaune) puis\n' +
 			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
 			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
@@ -1742,6 +1760,7 @@ function controlModify(options) {
 function controlDrawLine(options) {
 	const button = controlButton(Object.assign({
 		label: 'L',
+		className: 'ol-edit',
 		title: 'Activer "L" puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
 			'double cliquer pour terminer.\n' +
