@@ -145,6 +145,7 @@ function layerSpain(serveur, layer) {
  * Layers with not all resolutions or area available
  * Virtual class
  * Displays Stamen outside the layer zoom range or extend
+ * Requires HACK map_
  */
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
@@ -353,7 +354,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires controlButton, controlPermanentCheckbox,
+ * Requires controlButton, controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(o) {
@@ -709,7 +710,7 @@ layerOverpass = function(o) {
 
 /**
  * Marker
- * Requires proj4.js for swiss coordinates
+ * Requires JSONparse, HACK map_, proj4.js for swiss coordinates
  */
 function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	const format = new ol.format.GeoJSON();
@@ -841,7 +842,7 @@ function controlButton(o) {
 		options = Object.assign({
 			element: divElement,
 			label: '', // {string} character to be displayed in the button | [{string}] alternates label
-			className: '', // {string} className of the button
+			className: '', // {string} button className
 			activeButtonBackgroundColor: 'white',
 			onAdd: function() {},
 			activate: function() {},
@@ -851,7 +852,7 @@ function controlButton(o) {
 	//HACK execute actions on Map init
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
-		options.onAdd(map);
+		options.onAdd(map, this);
 	};
 
 	if (options.label || options.className) {
@@ -909,7 +910,7 @@ function controlButton(o) {
 			control.active = newActive;
 			buttonElement.innerHTML = options.label[newActive];
 			buttonElement.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
-			options.activate(newActive);
+			options.activate(newActive, control);
 		}
 	};
 	return control;
@@ -1473,7 +1474,9 @@ function controlGeocoder() {
 function controlPrint() {
 	const button = controlButton({
 		className: 'print-button',
-		activate: printMap,
+		title: 'Imprimer la carte',
+		activeButtonBackgroundColor: '#ef3',
+		activate: activate,
 		/*		question: '<p>Paysage : ' +
 					'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
 					'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
@@ -1481,37 +1484,27 @@ function controlPrint() {
 					'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
 					'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
 					'</p> ',*/
-		title: 'Imprimer la carte',
 	});
 
 	/*
 		window.addEventListener('load', function(){
-
 var gm=document.getElementById('getmap');
 var rr;
-
-
-			
 //			var para = document.createElement("P");                       // Create a <p> node
 var t = document.createTextNode('XXXXXXXXXXXXXX XXXXXXXXXXXXXX '+rr+' XXXXXXXXXXXXXX XXXXXXXXXXXXXX');      // Create a text node
 document.body.appendChild(t);                                          // Append the text to <p>
-			
 	//		document.write('XXXXXXXXXXXXXX XXXXXXXXXXXXXX XXXXXXXXXXXXXX XXXXXXXXXXXXXX ');
-			
 		});
 */
 
 	// TODO PRINT add scale in printed maps
-	function printMap(orientation, el, resolution) {
+	//	function activate(orientation, el, resolution) {
+	function activate(active, button) {
+		if (!active) { // On the second click on the control
+			window.print();
+			window.location.href = window.location.href; // Reload the page to get the initial state
+		}
 		const map = button.getMap();
-
-		// Search control div element in the hierarchy
-		/*
-		if (0) // TODO PRINT no more .control_
-			while (el.parentElement && !el.control_)
-				el = el.parentElement; // TODO PRINT search specific tag ????
-*/
-
 		// Get existing context
 		const mapEl = map.getTargetElement(),
 			mapCookie = document.cookie.match('map=([^;]*)'); //TODO ????
@@ -1521,22 +1514,13 @@ document.body.appendChild(t);                                          // Append
 		while (document.body.firstChild)
 			document.body.removeChild(document.body.firstChild);
 		// Raises the map to the top level
-		document.body.className = 'print';
+		//document.body.className = 'print';//TODO ??
 		document.body.style.margin = 0;
 		document.body.appendChild(mapEl);
-		//		mapEl.style.width = '100vw';
-		//		mapEl.style.height = '70.7vw';
-		//		mapEl.style.width = '70.7vh';
-		//		mapEl.style.height = '100vh';
-
-		var cpo = controlPrintOrientation({
+		map.addControl(controlPrintOrientation({
 			mapEl: mapEl,
-		});
-		map.addControl(cpo);
-		var dpi = controlPrintDpi();
-		map.addControl(dpi);
-		cpo.toggle(0); // To set the map size
-
+		}));
+		//TODO map.addControl(controlPrintDpi());
 
 		/*
 				// Hide controls
@@ -1544,9 +1528,8 @@ document.body.appendChild(t);                                          // Append
 				Array.prototype.filter.call(controls, function(elm) {
 					elm.style.display = 'none';
 				});
-		*/
 
-		/*		// Add page style for printing
+				// Add page style for printing
 				const style = document.createElement('style');
 				document.head.appendChild(style);
 				style.appendChild(document.createTextNode(
@@ -1582,38 +1565,38 @@ document.body.appendChild(t);                                          // Append
 }
 
 function controlPrintOrientation(options) {
-	const button = controlButton(Object.assign({
+	return controlButton(Object.assign({
 		label: ['&#9607;', '&#9608;'],
 		title: 'Paysage / Portrait',
-		activate: function(active) {
-			options.mapEl.style.width = active ? '70.7vh' : '100vw';
-			options.mapEl.style.height = active ? '100vh' : '70.7vw';
+		onAdd: function(map, button) {
+			activate(0, button);
 		},
+		activate: activate,
 	}, options));
-	return button;
-}
 
+	function activate(active, button) {
+		const map = button.getMap();
+		options.mapEl.style.width = active ? '70.7vh' : '100vw';
+		options.mapEl.style.height = active ? '100vh' : '70.7vw';
+		map.setSize([options.mapEl.offsetWidth, options.mapEl.offsetHeight]);
+	}
+}
+/*
 function controlPrintDpi(options) {
-	const button = controlButton(Object.assign({
+	return   controlButton(Object.assign({
 		label: [
 			'<span style="font-size:0.5em">100<br/>dpi</span>',
 			'<span style="font-size:0.5em">200<br/>dpi</span>',
 			'<span style="font-size:0.5em">400<br/>dpi</span>'
 		],
 		title: 'Résolution',
-		/*		wactivate: function(active) {
-					//const mapEl = button.getMap().getTargetElement();
-					options.mapEl.style.width = active ? '100vw' : '70.7vh';
-					options.mapEl.style.height = active ? '70.7vw' : '100vh';
-				},*/
 	}, options));
-	return button;
-}
+}*/
 
 
 /**
  * Line & Polygons Editor
- * Requires controlButton, escapedStyle
+ * Requires controlButton, escapedStyle, JSONparse, HACK map_
  */
 function layerEdit(o) {
 	const options = Object.assign({
