@@ -819,7 +819,6 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
 		layer.map_.getView().setCenter(point.getCoordinates());
 	};
-
 	layer.getPoint = function() {
 		return point;
 	};
@@ -837,13 +836,9 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 var nextButtonPos = 2.5; // Top position of next button (em)
 
 function controlButton(o) {
-	//TODO BUG opera : 2 labels not visible
 	const buttonEl = document.createElement('button'),
 		options = Object.assign({
 			element: document.createElement('div'),
-			label: '', // {string} character to be displayed in the button | [{string}] alternates label
-			//TODO ARCHI all in class ::after ???
-			className: '', // {string} button className
 			activeButtonBackgroundColor: 'white',
 			onAdd: function() {},
 			activate: function() {},
@@ -856,18 +851,15 @@ function controlButton(o) {
 		options.onAdd(map, this);
 	};
 
-	if (options.label || options.className) {
-		if (typeof options.label != 'object')
-			options.label = [options.label, options.label];
-		buttonEl.innerHTML = options.label[0];
-		buttonEl.addEventListener('click', function(evt) {
-			evt.preventDefault();
-			control.toggle();
-		});
+	buttonEl.addEventListener('click', function(evt) {
+		evt.preventDefault();
+		control.toggle();
+	});
 
-		control.element.appendChild(buttonEl);
-		control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
-		control.element.title = options.title; // {string} displayed when the control is hovered.
+	control.element.appendChild(buttonEl);
+	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className; //TODO ARCHI just add options.className
+	control.element.title = options.title; // {string} displayed when the control is hovered.
+	if (options.className) {
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			control.element.style.top = options.rightPosition + 'em';
 			control.element.style.right = '.5em';
@@ -881,7 +873,7 @@ function controlButton(o) {
 	control.active = 0;
 	control.toggle = function(newActive, group) {
 		if (typeof newActive == 'undefined')
-			newActive = (control.active + 1) % options.label.length;
+			newActive = !control.active;
 		if (group && group != options.group)
 			return;
 
@@ -894,7 +886,6 @@ function controlButton(o) {
 				});
 
 			control.active = newActive;
-			buttonEl.innerHTML = options.label[newActive];
 			buttonEl.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
 			options.activate(newActive);
 		}
@@ -909,7 +900,6 @@ function controlButton(o) {
  */
 function controlLayersSwitcher(options) {
 	const button = controlButton({
-		label: '&hellip;',
 		className: 'ol-switch-layer',
 		title: 'Liste des cartes',
 		rightPosition: 0.5,
@@ -1230,18 +1220,22 @@ function controlGPS(options) {
  * Requires controlButton
  */
 function controlTilesBuffer() {
-	return controlButton({
-		onAdd: function(map) {
-			map.on('change:size', function() {
-				const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-
-				map.getLayers().forEach(function(layer) {
-					if (typeof layer.setPreload == 'function')
-						layer.setPreload(fs ? 4 : 0);
-				});
-			});
-		},
+	const control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
 	});
+	control.setMap = function(map) { //HACK
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.on('change:size', function() {
+			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+
+			map.getLayers().forEach(function(layer) {
+				if (typeof layer.setPreload == 'function')
+					layer.setPreload(fs ? 4 : 0);
+			});
+		});
+	};
+	return control;
 }
 
 /**
@@ -1250,20 +1244,22 @@ function controlTilesBuffer() {
  * Requires controlButton
  */
 function controlLengthLine() {
-	const button = controlButton({
-		onAdd: function(map) {
-			button.element.className = 'ol-length-line';
-
-			map.on('pointermove', function(evtMove) {
-				button.element.innerHTML = ''; // Clear the measure if hover no feature
-
-				// Find new features to hover
-				map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
-					hitTolerance: 6,
-				});
-			});
-		},
+	const control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
 	});
+	control.element.className = 'ol-length-line';
+	control.setMap = function(map) { //HACK
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.on('pointermove', function(evtMove) {
+			control.element.innerHTML = ''; // Clear the measure if hover no feature
+
+			// Find new features to hover
+			map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
+				hitTolerance: 6,
+			});
+		});
+	};
 
 	function calculateLength(feature) {
 		if (!feature)
@@ -1272,17 +1268,17 @@ function controlLengthLine() {
 		// Display the line length
 		const length = ol.sphere.getLength(feature.getGeometry());
 		if (length >= 100000)
-			button.element.innerHTML = (Math.round(length / 1000)) + ' km';
+			control.element.innerHTML = (Math.round(length / 1000)) + ' km';
 		else if (length >= 10000)
-			button.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
+			control.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
 		else if (length >= 1000)
-			button.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
+			control.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
 		else if (length >= 1)
-			button.element.innerHTML = (Math.round(length)) + ' m';
+			control.element.innerHTML = (Math.round(length)) + ' m';
 
 		return false; // Continue detection (for editor that has temporary layers)
 	}
-	return button;
+	return control;
 }
 
 /**
@@ -1292,11 +1288,10 @@ function controlLengthLine() {
 //TODO BUG have a maximum zoom (1 point makes the map invisible)
 function controlLoadGPX(o) {
 	const options = Object.assign({
-			label: '&uArr;',
 			className: 'ol-load-gpx',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
-				inputEl.click(); //TODO BUG no inputEl declaration !!!
+				inputEl.click();
 			},
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
@@ -1357,9 +1352,8 @@ function controlLoadGPX(o) {
 // TODO BUG do not export points
 function controlDownloadGPX(o) {
 	const options = Object.assign({
-			label: '&dArr;',
 			className: 'ol-download-gpx',
-			title: 'Obtenir un fichier GPX contenant les éléments visibles dans la fenêtre.',
+			title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
 			fileName: 'trace', // TODO BEST DIFFICULT give a name according to the context
 			extraMetaData: '', // Additional tags to the GPX file header
 			activate: activate,
@@ -1377,7 +1371,8 @@ function controlDownloadGPX(o) {
 			extent = button.getMap().getView().calculateExtent();
 
 		// Get all visible features
-		button.getMap().getLayers().forEach(function(layer) {
+		var ll = button.getMap().getLayers(); //TODO BUG ON IE
+		ll.forEach(function(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					features.push(feature);
@@ -1463,7 +1458,8 @@ function controlPrint() {
 		title: 'Imprimer la carte',
 		activate: activate,
 		onAdd: function(map) {
-			document.getElementsByName('ori').forEach(function(element) {
+			const ll = document.getElementsByName('ori'); //TODO BUG ON IE
+			ll.forEach(function(element) {
 				element.onchange = resizeDraft;
 			});
 		}
@@ -1624,9 +1620,9 @@ function layerEdit(o) {
 // TODO BEST DIFFICULT hover feature when modifing
 function controlModify(options) {
 	const button = controlButton(Object.assign({
-		label: 'M',
-		className: 'ol-edit',
-		title: 'Activer "M" (couleur jaune) puis\n' +
+		className: 'ol-modify',
+		title: 'Modification d‘une ligne, d‘un polygone:\n' +
+			'Activer "M" (couleur jaune) puis\n' +
 			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
 			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 			'Alt+cliquer sur un sommet pour le supprimer\n' +
@@ -1663,9 +1659,9 @@ function controlModify(options) {
 
 function controlDrawLine(options) {
 	const button = controlButton(Object.assign({
-		label: 'L',
-		className: 'ol-edit',
-		title: 'Activer "L" puis\n' +
+		className: 'ol-draw-line',
+		title: 'Création d‘une ligne:\n' +
+			'Activer "L" puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
 			'double cliquer pour terminer.\n' +
 			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
@@ -1685,9 +1681,10 @@ function controlDrawLine(options) {
 
 function controlDrawPolygon(options) {
 	return controlDrawLine(Object.assign({
+		className: 'ol-draw-polygon',
 		type: 'Polygon',
-		label: 'P',
-		title: 'Activer "P" puis\n' +
+		title: 'Modification d‘un polygone:\n' +
+			'Activer "P" puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
 			'double cliquer pour terminer.\n' +
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
@@ -1841,8 +1838,7 @@ function controlsCollection(options) {
 			zoomOutLabel: '-'
 		}),
 		new ol.control.FullScreen({
-			label: '',
-			labelActive: '',
+			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran'
 		}),
 		controlTilesBuffer(),
