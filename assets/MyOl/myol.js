@@ -997,22 +997,22 @@ function controlPermalink(o) {
 			visible: true, // {true | false} add a controlPermalink button to the map.
 			init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
 		}, o),
-		divEl = document.createElement('div'),
 		aEl = document.createElement('a'),
 		control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 			render: render,
 		});
+	control.element.appendChild(aEl);
 
 	let params = (location.hash + location.search).match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Priority to the hash
 		document.cookie.match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Then the cookie
 		(options.initialFit || '6/2/47').match(/([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
 
 	if (options.visible) {
-		divEl.className = 'ol-permalink';
+		control.element.className = 'ol-permalink';
 		aEl.innerHTML = 'Permalink';
 		aEl.title = 'Generate a link with map zoom & position';
-		divEl.appendChild(aEl);
+		control.element.appendChild(aEl);
 	}
 
 	if (typeof options.initialCenter == 'function') {
@@ -1044,6 +1044,98 @@ function controlPermalink(o) {
 		}
 	}
 	return control;
+}
+
+/**
+ * Control to displays the length of a line overflown
+ * option hoverStyle style the hovered feature (don't use with layerEdit)
+ * Requires controlButton
+ */
+function controlLengthLine() {
+	const control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
+	});
+	control.element.className = 'ol-length-line';
+	control.setMap = function(map) { //HACK
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.on('pointermove', function(evtMove) {
+			control.element.innerHTML = ''; // Clear the measure if hover no feature
+
+			// Find new features to hover
+			map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
+				hitTolerance: 6,
+			});
+		});
+	};
+
+	function calculateLength(feature) {
+		if (!feature)
+			return false;
+
+		// Display the line length
+		const length = ol.sphere.getLength(feature.getGeometry());
+		if (length >= 100000)
+			control.element.innerHTML = (Math.round(length / 1000)) + ' km';
+		else if (length >= 10000)
+			control.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
+		else if (length >= 1000)
+			control.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
+		else if (length >= 1)
+			control.element.innerHTML = (Math.round(length)) + ' m';
+
+		return false; // Continue detection (for editor that has temporary layers)
+	}
+	return control;
+}
+
+/**
+ * Control to displays set preload of 4 upper level tiles if we are on full screen mode
+ * This prepares the browser to become offline on the same session
+ * Requires controlButton
+ */
+function controlTilesBuffer() {
+	const control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
+	});
+	control.setMap = function(map) { //HACK
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.on('change:size', function() {
+			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
+
+			map.getLayers().forEach(function(layer) {
+				if (typeof layer.setPreload == 'function')
+					layer.setPreload(fs ? 4 : 0);
+			});
+		});
+	};
+	return control;
+}
+
+/**
+ * Geocoder
+ * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
+ */
+function controlGeocoder() {
+	// Vérify if geocoder is available (not in IE)
+	const ua = navigator.userAgent;
+	if (typeof Geocoder != 'function' ||
+		ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
+		return new ol.control.Control({
+			element: document.createElement('div'), //HACK No button
+		});
+
+	const geocoder = new Geocoder('nominatim', {
+		provider: 'osm',
+		lang: 'FR',
+		keepOpen: true,
+		placeholder: 'Recherche sur la carte' // Initialization of the input field
+	});
+	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
+	geocoder.container.style.top = '.5em';
+	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
+	return geocoder;
 }
 
 /**
@@ -1215,73 +1307,6 @@ function controlGPS(options) {
 }
 
 /**
- * Control to displays set preload of 4 upper level tiles if we are on full screen mode
- * This prepares the browser to become offline on the same session
- * Requires controlButton
- */
-function controlTilesBuffer() {
-	const control = new ol.control.Control({
-		element: document.createElement('div'), //HACK No button
-	});
-	control.setMap = function(map) { //HACK
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		map.on('change:size', function() {
-			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-
-			map.getLayers().forEach(function(layer) {
-				if (typeof layer.setPreload == 'function')
-					layer.setPreload(fs ? 4 : 0);
-			});
-		});
-	};
-	return control;
-}
-
-/**
- * Control to displays the length of a line overflown
- * option hoverStyle style the hovered feature (don't use with layerEdit)
- * Requires controlButton
- */
-function controlLengthLine() {
-	const control = new ol.control.Control({
-		element: document.createElement('div'), //HACK No button
-	});
-	control.element.className = 'ol-length-line';
-	control.setMap = function(map) { //HACK
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		map.on('pointermove', function(evtMove) {
-			control.element.innerHTML = ''; // Clear the measure if hover no feature
-
-			// Find new features to hover
-			map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
-				hitTolerance: 6,
-			});
-		});
-	};
-
-	function calculateLength(feature) {
-		if (!feature)
-			return false;
-
-		// Display the line length
-		const length = ol.sphere.getLength(feature.getGeometry());
-		if (length >= 100000)
-			control.element.innerHTML = (Math.round(length / 1000)) + ' km';
-		else if (length >= 10000)
-			control.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
-		else if (length >= 1000)
-			control.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
-		else if (length >= 1)
-			control.element.innerHTML = (Math.round(length)) + ' m';
-
-		return false; // Continue detection (for editor that has temporary layers)
-	}
-	return control;
-}
-
-/**
  * GPX file loader control
  * Requires controlButton
  */
@@ -1421,31 +1446,6 @@ function controlDownloadGPX(o) {
 			}));
 	}
 	return button;
-}
-
-/**
- * Geocoder
- * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
- */
-function controlGeocoder() {
-	// Vérify if geocoder is available (not in IE)
-	const ua = navigator.userAgent;
-	if (typeof Geocoder != 'function' ||
-		ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
-		return new ol.control.Control({
-			element: document.createElement('div'), //HACK No button
-		});
-
-	const geocoder = new Geocoder('nominatim', {
-		provider: 'osm',
-		lang: 'FR',
-		keepOpen: true,
-		placeholder: 'Recherche sur la carte' // Initialization of the input field
-	});
-	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
-	geocoder.container.style.top = '.5em';
-	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
-	return geocoder;
 }
 
 /**
@@ -1822,10 +1822,10 @@ function controlsCollection(options) {
 			baseLayers: options.baseLayers,
 			geoKeys: options.geoKeys
 		}, options.controlLayersSwitcher)),
-		new ol.control.ScaleLine(),
 		new ol.control.Attribution({
 			collapsible: false // Attribution always open
 		}),
+		new ol.control.ScaleLine(),
 		new ol.control.MousePosition({
 			coordinateFormat: ol.coordinate.createStringXY(5),
 			projection: 'EPSG:4326',
@@ -1833,7 +1833,6 @@ function controlsCollection(options) {
 			undefinedHTML: String.fromCharCode(0)
 		}),
 		controlLengthLine(),
-		controlPermalink(options.controlPermalink),
 		new ol.control.Zoom({
 			zoomOutLabel: '-'
 		}),
@@ -1841,6 +1840,7 @@ function controlsCollection(options) {
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran'
 		}),
+		controlPermalink(options.controlPermalink),
 		controlTilesBuffer(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),

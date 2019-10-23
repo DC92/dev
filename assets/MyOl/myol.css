@@ -7,6 +7,39 @@
 	font-size: 16px;
 }
 
+/* Features popup */
+.myPopup,
+.myPopup:hover {
+	padding: 1px 4px;
+	background-color: white;
+	border-radius: 5px;
+	box-shadow: 0 3px 8px #888;
+	-moz-box-shadow: 0 3px 8px #888;
+	-webkit-box-shadow: 0 3px 8px #999;
+	font-size: 12px;
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	color: initial;
+}
+.myPopup p {
+	margin: 0;
+}
+
+/* Overpass */
+.overpass-popup{
+	background-color: #def;
+	padding: 5px;
+	border-radius: 5px;
+	border: 1px solid #abc;
+}
+.overpass-popup p{
+	font-size: small;
+	margin: 0;
+}
+.overpass-popup p:first-letter {
+	text-transform: uppercase;
+}
+
 /* All buttons*/
 .ol-control-hidden {
 	display: none;
@@ -42,14 +75,35 @@
 	-moz-box-shadow: -.5px -.5px 8px rgba(0, 0, 0, 0.65);
 	-webkit-box-shadow: -.5px -.5px 8px rgba(0, 0, 0, 0.65);
 }
-.ol-control-question {
-	background-color: white;
-	position: relative;
-	top: .3em;
-	padding: 1px;
+
+/* Switch layer popup */
+.ol-switch-layer button::after {
+  content: "…";
 }
-.ol-control-question span {
-	cursor: pointer;
+.ol-switch-layer {
+	font-size: small;
+	background-color: white !important;
+	border-radius: 5px;
+	z-index: 200;
+}
+.ol-switch-layer div {
+	padding: 2px;
+}
+.ol-switch-layer input {
+	margin: 0;
+}
+
+/* Permalink */
+.ol-permalink {
+	position: absolute;
+	bottom: 24px;
+	right: 0;
+	padding: 3px;
+	background-color: rgba(255, 255, 255, 0.8);
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	font-size: .7rem;
+	line-height: 1.375em;
 }
 
 /* Coordinates */
@@ -66,6 +120,39 @@
 .ol-coordinate:empty {
 	display: none;
 }
+
+/* Mesures */
+.ol-length-line {
+	position: absolute;
+	bottom: 52px;
+	left: 8px;
+	padding: 2px;
+	background-color: rgba(0, 60, 136, 0.3);
+	border-radius: 4px;
+	font-size: small;
+	color: white;
+}
+.ol-length-line:empty {
+	display: none;
+}
+
+/* Full screen */
+.ol-full-screen {
+	top: .5em;
+	left: 2.5em;
+	right: auto;
+}
+:-webkit-full-screen { /* HACK bug in Chrome & Edge */
+	width: 100vw !important;
+	height: 100vh !important;
+}
+.ol-full-screen-false {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
+}
+.ol-full-screen-true {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M10 10l5 0 0 5-5 0z'/%3E%3Cpath d='M4 4l17 0 0 17-17 0z' style='stroke-dasharray:5,7,5,0;'/%3E%3C/svg%3E");
+}
+/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 
 /* Geocoder */
 .gcd-gl-container {
@@ -107,23 +194,18 @@
 	left: 8.5px !important;
 }
 
-/* Full screen */
-.ol-full-screen {
-	top: .5em;
-	left: 2.5em;
-	right: auto;
+/* GPS */
+.ol-gps button {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M7 7A7.5 7.5 0 0 1 18 18 7.5 7.5 0 1 1 7 7'/%3E%3Cpath d='M2 12.5l21 0M12.5 2l0 21' style='stroke-dasharray:6,9;'/%3E%3C/svg%3E");
 }
-:-webkit-full-screen { /* HACK bug in Chrome & Edge */
-	width: 100vw !important;
-	height: 100vh !important;
+
+/* GPX */
+.ol-load-gpx button::after {
+  content: "▲";
 }
-.ol-full-screen-false {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
+.ol-download-gpx button::after {
+  content: "▼";
 }
-.ol-full-screen-true {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M10 10l5 0 0 5-5 0z'/%3E%3Cpath d='M4 4l17 0 0 17-17 0z' style='stroke-dasharray:5,7,5,0;'/%3E%3C/svg%3E");
-}
-/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 
 /* Print */
 .ol-print:hover {
@@ -140,6 +222,15 @@
 .ol-print p span {
 	color: blue;
 }
+.ol-control-question {
+	background-color: white;
+	position: relative;
+	top: .3em;
+	padding: 1px;
+}
+.ol-control-question span {
+	cursor: pointer;
+}
 /* When printing, hide all controls except :  */
 @media print {
 	.ol-overlaycontainer-stopevent > * {
@@ -151,35 +242,6 @@
 	}
 }
 
-/* Switch layer popup */
-.ol-switch-layer button::after {
-  content: "…";
-}
-.ol-switch-layer {
-	font-size: small;
-	background-color: white !important;
-	border-radius: 5px;
-	z-index: 200;
-}
-.ol-switch-layer div {
-	padding: 2px;
-}
-.ol-switch-layer input {
-	margin: 0;
-}
-
-.ol-gps button {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M7 7A7.5 7.5 0 0 1 18 18 7.5 7.5 0 1 1 7 7'/%3E%3Cpath d='M2 12.5l21 0M12.5 2l0 21' style='stroke-dasharray:6,9;'/%3E%3C/svg%3E");
-}
-
-/* Buttons */
-.ol-load-gpx button::after {
-  content: "▲";
-}
-.ol-download-gpx button::after {
-  content: "▼";
-}
-
 /* Editor */
 .ol-modify button::after {
   content: "M";
@@ -189,65 +251,4 @@
 }
 .ol-draw-polygon button::after {
   content: "P";
-}
-
-/* Mesures */
-.ol-length-line {
-	position: absolute;
-	bottom: 52px;
-	left: 8px;
-	padding: 2px;
-	background-color: rgba(0, 60, 136, 0.3);
-	border-radius: 4px;
-	font-size: small;
-	color: white;
-}
-.ol-length-line:empty {
-	display: none;
-}
-
-/* Permalink */
-.ol-permalink {
-	position: absolute;
-	bottom: 24px;
-	right: 0;
-	padding: 3px;
-	background-color: rgba(255, 255, 255, 0.8);
-	border-top-left-radius: 4px;
-	border-bottom-left-radius: 4px;
-	font-size: .7rem;
-	line-height: 1.375em;
-}
-
-/* Features popup */
-.myPopup,
-.myPopup:hover {
-	padding: 1px 4px;
-	background-color: white;
-	border-radius: 5px;
-	box-shadow: 0 3px 8px #888;
-	-moz-box-shadow: 0 3px 8px #888;
-	-webkit-box-shadow: 0 3px 8px #999;
-	font-size: 12px;
-	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-	text-decoration: none;
-	color: initial;
-}
-.myPopup p {
-	margin: 0;
-}
-
-/* Overpass */
-.overpass-popup{
-	background-color: #def;
-	padding: 5px;
-	border-radius: 5px;
-	border: 1px solid #abc;
-}
-.overpass-popup p{
-	font-size: small;
-	margin: 0;
-}
-.overpass-popup p:first-letter {
-	text-transform: uppercase;
 }
