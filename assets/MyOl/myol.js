@@ -285,17 +285,17 @@ function layerBing(key, subLayer) {
  * Mem in cookies the checkbox content with name="selectorName"
  */
 function controlPermanentCheckbox(selectorName, callback) {
-	const checkElements = document.getElementsByName(selectorName),
+	const checkEls = document.getElementsByName(selectorName),
 		cookie =
 		location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
 		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
 
-	for (let e = 0; e < checkElements.length; e++) {
-		checkElements[e].addEventListener('click', permanentCheckboxClick); // Attach the action
+	for (let e = 0; e < checkEls.length; e++) {
+		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
 
 		//TODO BUG EDGE check, then retrieve init / lost layer on switchlayer
 		if (cookie) // Set the checks accordingly with the cookie
-			checkElements[e].checked = cookie[1].split(',').indexOf(checkElements[e].value) !== -1;
+			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
 	}
 
 	function permanentCheckboxClick(evt) {
@@ -307,21 +307,21 @@ function controlPermanentCheckbox(selectorName, callback) {
 
 // Global functions
 function permanentCheckboxList(selectorName, evt) {
-	const checkElements = document.getElementsByName(selectorName);
+	const checkEls = document.getElementsByName(selectorName);
 	let allChecks = [];
 
-	for (let e = 0; e < checkElements.length; e++) {
+	for (let e = 0; e < checkEls.length; e++) {
 		// Select/deselect all (clicking an <input> without value)
 		if (evt) {
 			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
-				checkElements[e].checked = evt.target.checked; // Check all if "all" is clicked
-			else if (checkElements[e].value == 'on')
-				checkElements[e].checked = false; // Reset the "all" checks if another check is clicked
+				checkEls[e].checked = evt.target.checked; // Check all if "all" is clicked
+			else if (checkEls[e].value == 'on')
+				checkEls[e].checked = false; // Reset the "all" checks if another check is clicked
 		}
 
 		// Get status of all checks
-		if (checkElements[e].checked) // List checked elements
-			allChecks.push(checkElements[e].value);
+		if (checkEls[e].checked) // List checked elements
+			allChecks.push(checkEls[e].value);
 	}
 	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
 	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/';
@@ -367,11 +367,11 @@ function layerVectorURL(o) {
 
 	//HACK attach these to windows to define only one
 	// TODO BUG DIFFICULT don't zoom when the cursor is over a label
-	const popElement = window.popElement_ = document.createElement('a'),
+	const popEl = window.popEl_ = document.createElement('a'),
 		popup = window.popup_ = new ol.Overlay({
-			element: popElement
+			element: popEl
 		});
-	popElement.style.display = 'block';
+	popEl.style.display = 'block';
 
 	const format = new ol.format.GeoJSON();
 	format.readFeatures = function(source, options) {
@@ -421,7 +421,7 @@ function layerVectorURL(o) {
 				evtClk.pixel,
 				function() {
 					if (popup.getPosition())
-						popElement.click(); // Simulate a click on the label
+						popEl.click(); // Simulate a click on the label
 				}
 			);
 		});
@@ -451,7 +451,7 @@ function layerVectorURL(o) {
 
 		// Hide label by default if none feature or his popup here
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = popElement.getBoundingClientRect();
+			popupRect = popEl.getBoundingClientRect();
 		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
 			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
 			!popupRect)
@@ -497,22 +497,22 @@ function layerVectorURL(o) {
 				popup.setPosition(map.getView().getCenter()); // For popup size calculation
 
 				// Fill label class & text
-				popElement.className = 'myPopup ' + (options.labelClass || '');
-				popElement.innerHTML = label + postLabel;
+				popEl.className = 'myPopup ' + (options.labelClass || '');
+				popEl.innerHTML = label + postLabel;
 				if (typeof options.href == 'function') {
-					popElement.href = options.href(properties);
+					popEl.href = options.href(properties);
 					map.getViewport().style.cursor = 'pointer';
 				}
 
 				// Shift of the label to stay into the map regarding the pointer position
-				if (pixel[1] < popElement.clientHeight + 12) { // On the top of the map (not enough space for it)
-					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -popElement.clientWidth - 10;
+				if (pixel[1] < popEl.clientHeight + 12) { // On the top of the map (not enough space for it)
+					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -popEl.clientWidth - 10;
 					pixel[1] = 2;
 				} else {
-					pixel[0] -= popElement.clientWidth / 2;
+					pixel[0] -= popEl.clientWidth / 2;
 					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-					pixel[0] = Math.min(pixel[0], map.getSize()[0] - popElement.clientWidth - 1); // Bord droit
-					pixel[1] -= popElement.clientHeight + 8;
+					pixel[0] = Math.min(pixel[0], map.getSize()[0] - popEl.clientWidth - 1); // Bord droit
+					pixel[1] -= popEl.clientHeight + 8;
 				}
 				popup.setPosition(map.getCoordinateFromPixel(pixel));
 			}
@@ -538,7 +538,7 @@ layerOverpass = function(o) {
 			labelClass: 'label-overpass',
 			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 		}, o),
-		checkElements = document.getElementsByName(options.selectorName),
+		checkEls = document.getElementsByName(options.selectorName),
 		elSelector = document.getElementById(options.selectorId);
 	elSelector.className = 'overpass'; // At the biginning
 
@@ -573,14 +573,14 @@ layerOverpass = function(o) {
 	};
 
 	function overpassType(properties) {
-		for (let e = 0; e < checkElements.length; e++)
-			if (checkElements[e].checked) {
-				const tags = checkElements[e].value.split('+');
+		for (let e = 0; e < checkEls.length; e++)
+			if (checkEls[e].checked) {
+				const tags = checkEls[e].value.split('+');
 				for (let t = 0; t < tags.length; t++) {
 					const conditions = tags[t].split('"');
 					if (properties[conditions[1]] &&
 						properties[conditions[1]].match(conditions[3]))
-						return checkElements[e].id;
+						return checkEls[e].id;
 				}
 			}
 		return 'inconnu';
@@ -838,10 +838,9 @@ var nextButtonPos = 2.5; // Top position of next button (em)
 
 function controlButton(o) {
 	//TODO BUG opera : 2 labels not visible
-	const buttonElement = document.createElement('button'),
-		divElement = document.createElement('div'),
+	const buttonEl = document.createElement('button'),
 		options = Object.assign({
-			element: divElement,
+			element: document.createElement('div'),
 			label: '', // {string} character to be displayed in the button | [{string}] alternates label
 			//TODO ARCHI all in class ::after ???
 			className: '', // {string} button className
@@ -860,36 +859,22 @@ function controlButton(o) {
 	if (options.label || options.className) {
 		if (typeof options.label != 'object')
 			options.label = [options.label, options.label];
-		buttonElement.innerHTML = options.label[0];
-		buttonElement.addEventListener('click', function(evt) {
+		buttonEl.innerHTML = options.label[0];
+		buttonEl.addEventListener('click', function(evt) {
 			evt.preventDefault();
 			control.toggle();
 		});
 
-		divElement.appendChild(buttonElement);
-		divElement.className = 'ol-button ol-unselectable ol-control ' + options.className;
-		divElement.title = options.title; // {string} displayed when the control is hovered.
+		control.element.appendChild(buttonEl);
+		control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
+		control.element.title = options.title; // {string} displayed when the control is hovered.
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
-			divElement.style.top = options.rightPosition + 'em';
-			divElement.style.right = '.5em';
+			control.element.style.top = options.rightPosition + 'em';
+			control.element.style.right = '.5em';
 		} else {
-			divElement.style.top = '.5em';
-			divElement.style.left = (nextButtonPos += 2) + 'em';
+			control.element.style.top = '.5em';
+			control.element.style.left = (nextButtonPos += 2) + 'em';
 		}
-	}
-
-	// Add a question below the button (for controlPrint)
-	if (options.question) {
-		const questionElement = document.createElement('div');
-		questionElement.innerHTML = options.question;
-		questionElement.className = 'ol-control-hidden';
-		divElement.appendChild(questionElement);
-		divElement.onmouseover = function() {
-			questionElement.className = 'ol-control-question';
-		};
-		divElement.onmouseout = function() {
-			questionElement.className = 'ol-control-hidden';
-		};
 	}
 
 	// Toggle the button status & aspect
@@ -909,8 +894,8 @@ function controlButton(o) {
 				});
 
 			control.active = newActive;
-			buttonElement.innerHTML = options.label[newActive];
-			buttonElement.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
+			buttonEl.innerHTML = options.label[newActive];
+			buttonEl.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
 			options.activate(newActive);
 		}
 	};
@@ -932,28 +917,28 @@ function controlLayersSwitcher(options) {
 	});
 
 	// Transparency slider (first position)
-	const rangeElement = document.createElement('input');
-	rangeElement.type = 'range';
-	rangeElement.className = 'range-layer';
-	rangeElement.oninput = displayLayerSelector;
-	rangeElement.title = 'Glisser pour faire varier la tranparence';
-	button.element.appendChild(rangeElement);
+	const rangeEl = document.createElement('input');
+	rangeEl.type = 'range';
+	rangeEl.className = 'range-layer';
+	rangeEl.oninput = displayLayerSelector;
+	rangeEl.title = 'Glisser pour faire varier la tranparence';
+	button.element.appendChild(rangeEl);
 
 	// Layer selector
-	const selectorElement = document.createElement('div');
-	selectorElement.style.overflow = 'auto';
-	selectorElement.title = 'Ctrl+click : multicouches';
-	button.element.appendChild(selectorElement);
+	const selectorEl = document.createElement('div');
+	selectorEl.style.overflow = 'auto';
+	selectorEl.title = 'Ctrl+click : multicouches';
+	button.element.appendChild(selectorEl);
 
 	function onAddLS(map) {
 		// Base layers selector init
 		for (let name in options.baseLayers)
 			if (options.baseLayers[name]) { // array of layers, mandatory, no default
-				const baseElement = document.createElement('div');
-				baseElement.innerHTML =
+				const baseEl = document.createElement('div');
+				baseEl.innerHTML =
 					'<input type="checkbox" name="baselayer" value="' + name + '">' +
 					'<span title="">' + name + '</span>';
-				selectorElement.appendChild(baseElement);
+				selectorEl.appendChild(baseEl);
 				map.addLayer(options.baseLayers[name]);
 			}
 
@@ -980,14 +965,14 @@ function controlLayersSwitcher(options) {
 	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
 		if (list && list.length === 0)
-			selectorElement.firstChild.firstChild.checked = true;
+			selectorEl.firstChild.firstChild.checked = true;
 
 		// Leave only one checked except if Ctrl key is on
 		if (evt && evt.type == 'click' && !evt.ctrlKey) {
-			const checkElements = document.getElementsByName('baselayer');
-			for (let e = 0; e < checkElements.length; e++)
-				if (checkElements[e] != evt.target)
-					checkElements[e].checked = false;
+			const checkEls = document.getElementsByName('baselayer');
+			for (let e = 0; e < checkEls.length; e++)
+				if (checkEls[e] != evt.target)
+					checkEls[e].checked = false;
 		}
 
 		list = permanentCheckboxList('baselayer');
@@ -1001,13 +986,13 @@ function controlLayersSwitcher(options) {
 		if (typeof options.baseLayers[list[0]] == 'object')
 			options.baseLayers[list[0]].setOpacity(1);
 		if (list.length >= 2)
-			options.baseLayers[list[1]].setOpacity(rangeElement.value / 100);
+			options.baseLayers[list[1]].setOpacity(rangeEl.value / 100);
 
 		// Refresh control button, range & selector
 		button.element.firstElementChild.style.display = evt ? 'none' : '';
-		rangeElement.style.display = evt && list.length > 1 ? '' : 'none';
-		selectorElement.style.display = evt ? '' : 'none';
-		selectorElement.style.maxHeight = (button.getMap().getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
+		rangeEl.style.display = evt && list.length > 1 ? '' : 'none';
+		selectorEl.style.display = evt ? '' : 'none';
+		selectorEl.style.maxHeight = (button.getMap().getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}
 	return button;
 }
@@ -1022,11 +1007,11 @@ function controlPermalink(o) {
 			visible: true, // {true | false} add a controlPermalink button to the map.
 			init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
 		}, o),
-		divElement = document.createElement('div'),
-		aElement = document.createElement('a'),
+		divEl = document.createElement('div'),
+		aEl = document.createElement('a'),
 		control = new ol.control.Control({
-			element: divElement,
-			render: render
+			element: document.createElement('div'), //HACK No button
+			render: render,
 		});
 
 	let params = (location.hash + location.search).match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Priority to the hash
@@ -1034,10 +1019,10 @@ function controlPermalink(o) {
 		(options.initialFit || '6/2/47').match(/([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
 
 	if (options.visible) {
-		divElement.className = 'ol-permalink';
-		aElement.innerHTML = 'Permalink';
-		aElement.title = 'Generate a link with map zoom & position';
-		divElement.appendChild(aElement);
+		divEl.className = 'ol-permalink';
+		aEl.innerHTML = 'Permalink';
+		aEl.title = 'Generate a link with map zoom & position';
+		divEl.appendChild(aEl);
 	}
 
 	if (typeof options.initialCenter == 'function') {
@@ -1064,7 +1049,7 @@ function controlPermalink(o) {
 					Math.round(ll4326[1] * 100000) / 100000
 				];
 
-			aElement.href = options.hash + 'map=' + newParams.join('/');
+			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/';
 		}
 	}
@@ -1265,22 +1250,20 @@ function controlTilesBuffer() {
  * Requires controlButton
  */
 function controlLengthLine() {
-	const divElement = document.createElement('div'),
-		button = controlButton({
-			element: divElement,
-			onAdd: function(map) {
-				divElement.className = 'ol-length-line';
+	const button = controlButton({
+		onAdd: function(map) {
+			button.element.className = 'ol-length-line';
 
-				map.on('pointermove', function(evtMove) {
-					divElement.innerHTML = ''; // Clear the measure if hover no feature
+			map.on('pointermove', function(evtMove) {
+				button.element.innerHTML = ''; // Clear the measure if hover no feature
 
-					// Find new features to hover
-					map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
-						hitTolerance: 6,
-					});
+				// Find new features to hover
+				map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
+					hitTolerance: 6,
 				});
-			},
-		});
+			});
+		},
+	});
 
 	function calculateLength(feature) {
 		if (!feature)
@@ -1289,13 +1272,13 @@ function controlLengthLine() {
 		// Display the line length
 		const length = ol.sphere.getLength(feature.getGeometry());
 		if (length >= 100000)
-			divElement.innerHTML = (Math.round(length / 1000)) + ' km';
+			button.element.innerHTML = (Math.round(length / 1000)) + ' km';
 		else if (length >= 10000)
-			divElement.innerHTML = (Math.round(length / 100) / 10) + ' km';
+			button.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
 		else if (length >= 1000)
-			divElement.innerHTML = (Math.round(length / 10) / 100) + ' km';
+			button.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
 		else if (length >= 1)
-			divElement.innerHTML = (Math.round(length)) + ' m';
+			button.element.innerHTML = (Math.round(length)) + ' m';
 
 		return false; // Continue detection (for editor that has temporary layers)
 	}
@@ -1313,7 +1296,7 @@ function controlLoadGPX(o) {
 			className: 'ol-load-gpx',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
-				inputElement.click();
+				inputEl.click(); //TODO BUG no inputEl declaration !!!
 			},
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
@@ -1322,14 +1305,14 @@ function controlLoadGPX(o) {
 				})
 			}),
 		}, o),
-		inputElement = document.createElement('input'),
+		inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
 		button = controlButton(options);
 
-	inputElement.type = 'file';
-	inputElement.addEventListener('change', function() {
-		reader.readAsText(inputElement.files[0]);
+	inputEl.type = 'file';
+	inputEl.addEventListener('change', function() {
+		reader.readAsText(inputEl.files[0]);
 	});
 
 	reader.onload = function() {
@@ -1381,13 +1364,13 @@ function controlDownloadGPX(o) {
 			extraMetaData: '', // Additional tags to the GPX file header
 			activate: activate,
 		}, o),
-		hiddenElement = document.createElement('a'),
+		hiddenEl = document.createElement('a'),
 		button = controlButton(options);
 
 	//HACK for Moz
-	hiddenElement.target = '_blank';
-	hiddenElement.style = 'display:none;opacity:0;color:transparent;';
-	(document.body || document.documentElement).appendChild(hiddenElement);
+	hiddenEl.target = '_blank';
+	hiddenEl.style = 'display:none;opacity:0;color:transparent;';
+	(document.body || document.documentElement).appendChild(hiddenEl);
 
 	function activate() { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
@@ -1429,14 +1412,14 @@ function controlDownloadGPX(o) {
 		else if (typeof navigator.msSaveBlob !== 'undefined')
 			return navigator.msSaveBlob(file, options.fileName);
 
-		hiddenElement.href = URL.createObjectURL(file);
-		hiddenElement.download = options.fileName + '.gpx';
+		hiddenEl.href = URL.createObjectURL(file);
+		hiddenEl.download = options.fileName + '.gpx';
 
 		// Simulate the click & download the .gpx file
-		if (typeof hiddenElement.click === 'function')
-			hiddenElement.click();
+		if (typeof hiddenEl.click === 'function')
+			hiddenEl.click();
 		else
-			hiddenElement.dispatchEvent(new MouseEvent('click', {
+			hiddenEl.dispatchEvent(new MouseEvent('click', {
 				view: window,
 				bubbles: true,
 				cancelable: true,
@@ -1479,14 +1462,25 @@ function controlPrint() {
 		className: 'ol-print',
 		title: 'Imprimer la carte',
 		activate: activate,
-		question: '<input type="radio" name="ori" value="0">Portrait A4<br>' +
-			'<input type="radio" name="ori" value="1">Paysage A4',
 		onAdd: function(map) {
 			document.getElementsByName('ori').forEach(function(element) {
 				element.onchange = resizeDraft;
 			});
 		}
 	});
+
+	// Add a question below the button (for controlPrint)
+	const questionEl = document.createElement('div');
+	questionEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
+		'<input type="radio" name="ori" value="1">Paysage A4';
+	questionEl.className = 'ol-control-hidden';
+	button.element.appendChild(questionEl);
+	button.element.onmouseover = function() {
+		questionEl.className = 'ol-control-question';
+	};
+	button.element.onmouseout = function() {
+		questionEl.className = 'ol-control-hidden';
+	};
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
