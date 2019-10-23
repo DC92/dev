@@ -140,22 +140,6 @@
 .ol-print p span {
 	color: blue;
 }
-
-/* On print preparation page, hide all controls except : */
-.print .ol-overlaycontainer-stopevent > * {
-	display: none;
-}
-.print .ol-zoom,
-.print .ol-full-screen,
-.print .ol-geocoder,
-.print .ol-load-gpx,
-.print .ol-print,
-.print .ol-print-orientation,
-.print .ol-coordinate,
-.print .ol-attribution,
-.print .ol-scale-line {
-	display: block;
-}
 /* When printing, hide all controls except :  */
 @media print {
 	.ol-overlaycontainer-stopevent > * {

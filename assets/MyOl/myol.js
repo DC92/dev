@@ -837,11 +837,13 @@ function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display',
 var nextButtonPos = 2.5; // Top position of next button (em)
 
 function controlButton(o) {
+	//TODO BUG opera : 2 labels not visible
 	const buttonElement = document.createElement('button'),
 		divElement = document.createElement('div'),
 		options = Object.assign({
 			element: divElement,
 			label: '', // {string} character to be displayed in the button | [{string}] alternates label
+			//TODO ARCHI all in class ::after ???
 			className: '', // {string} button className
 			activeButtonBackgroundColor: 'white',
 			onAdd: function() {},
@@ -877,7 +879,6 @@ function controlButton(o) {
 	}
 
 	// Add a question below the button (for controlPrint)
-	/* //TODO DELETE ?
 	if (options.question) {
 		const questionElement = document.createElement('div');
 		questionElement.innerHTML = options.question;
@@ -889,7 +890,7 @@ function controlButton(o) {
 		divElement.onmouseout = function() {
 			questionElement.className = 'ol-control-hidden';
 		};
-	}*/
+	}
 
 	// Toggle the button status & aspect
 	control.active = 0;
@@ -1198,25 +1199,25 @@ function controlGPS(options) {
 				new ol.geom.MultiLineString([ // The graticule
 					[
 						[gps.position[0], gps.position[1]],
-						[gps.position[0], gps.position[1] - far]
+						[gps.position[0], gps.position[1] - far],
 					],
 					[
 						[gps.position[0], gps.position[1]],
-						[gps.position[0] - far, gps.position[1]]
+						[gps.position[0] - far, gps.position[1]],
 					],
 					[
 						[gps.position[0], gps.position[1]],
-						[gps.position[0] + far, gps.position[1]]
-					]
-				])
+						[gps.position[0] + far, gps.position[1]],
+					],
+				]),
 			]));
 			northGraticule.setGeometry(new ol.geom.GeometryCollection([
 				new ol.geom.MultiLineString([ // Color north in red
 					[
 						[gps.position[0], gps.position[1]],
-						[gps.position[0], gps.position[1] + far]
-					]
-				])
+						[gps.position[0], gps.position[1] + far],
+					],
+				]),
 			]));
 
 			// Map orientation (Radians and reverse clockwize)
@@ -1471,145 +1472,54 @@ function controlGeocoder() {
 
 /**
  * Print control
- * requires controlButton
+ * Requires controlButton
  */
 function controlPrint() {
 	const button = controlButton({
 		className: 'ol-print',
 		title: 'Imprimer la carte',
-		activeButtonBackgroundColor: '#ef3',
 		activate: activate,
-		/*		question: '<p>Paysage : ' +
-					'<span onclick="printMap(\'landscape\',this)" title="Imprimer en mode paysage">100 dpi</span> / ' +
-					'<span onclick="printMap(\'landscape\',this,200)" title="Imprimer en mode paysage 200 dpi (lent)">200 dpi</span>' +
-					'</p> <p>Portrait : ' +
-					'<span onclick="printMap(\'portrait\',this)" title="Imprimer en mode portrait">100 dpi</span> / ' +
-					'<span onclick="printMap(\'portrait\',this,200)" title="Imprimer en mode portrait 200 dpi (lent)">200 dpi</span>' +
-					'</p> ',*/
+		question: '<input type="radio" name="ori" value="0">Portrait A4<br>' +
+			'<input type="radio" name="ori" value="1">Paysage A4',
+		onAdd: function(map) {
+			document.getElementsByName('ori').forEach(function(element) {
+				element.onchange = resizeDraft;
+			});
+		}
 	});
 
-	/*
-		window.addEventListener('load', function(){
-var gm=document.getElementById('getmap');
-var rr;
-//			var para = document.createElement("P");                       // Create a <p> node
-var t = document.createTextNode('XXXXXXXXXXXXXX XXXXXXXXXXXXXX '+rr+' XXXXXXXXXXXXXX XXXXXXXXXXXXXX');      // Create a text node
-document.body.appendChild(t);                                          // Append the text to <p>
-	//		document.write('XXXXXXXXXXXXXX XXXXXXXXXXXXXX XXXXXXXXXXXXXX XXXXXXXXXXXXXX ');
-		});
-*/
-
-	function activate(active) {
-		if (!active) { // On the second click on the control
-			window.print();
-			window.location.href = window.location.href; // Reload the page to get the initial state
-		}
-		const map = button.getMap();
-		// Get existing context
-		const mapEl = map.getTargetElement(),
-			mapCookie = document.cookie.match('map=([^;]*)'); //TODO ????
+	function resizeDraft() {
+		// Resize map to the A4 dimensions
+		const map = button.getMap(),
+			mapEl = map.getTargetElement(),
+			oris = document.querySelectorAll("input[name=ori]:checked"),
+			ori = oris.length ? oris[0].value : 0;
+		mapEl.style.width = ori == 0 ? '210mm' : '297mm';
+		mapEl.style.height = ori == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
+		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide other elements than the map
 		while (document.body.firstChild)
 			document.body.removeChild(document.body.firstChild);
 
 		// Raises the map to the top level
-		document.body.style.margin = 0;
 		document.body.appendChild(mapEl);
-		mapEl.className = 'print';
-		map.addControl(controlPrintOrientation({
-			mapEl: mapEl,
-		}));
-		//TODO map.addControl(controlPrintDpi());
-
-		/*
-
-				// Add page style for printing
-				const style = document.createElement('style');
-				document.head.appendChild(style);
-				style.appendChild(document.createTextNode(
-					"@page{size:A4;margin:0;size:" + (orientation == 'portrait' ? 'portrait' : 'landscape') + "}"
-				));
-
-				// Set print size, which will render the new map
-				const dim = orientation == 'portrait' ? [210, 297] : [297, 210],
-					printSize = [
-						Math.round(dim[0] * (resolution || 100) / 25.4),
-						Math.round(dim[1] * (resolution || 100) / 25.4)
-					],
-					extent = map.getView().calculateExtent(map.getSize());
-				map.setSize(printSize);
-				map.getView().fit(extent, {
-					size: printSize
-				});
-
-				map.once('rendercomplete', function() {
-					// TODO PRINT attendre fin du chargement de toutes les couches !
-					map.getLayers().forEach(function(layer) {
-						if(layer.getSource())
-							;
-					});
-					// TODO PRINT BUG Chrome puts 3 pages in landscape
-					// TODO PRINT BEST IE11 very big margin
-					//			window.print();
-					//			document.cookie = 'map=' + mapCookie + ';path=/';
-					//			window.location.href = window.location.href;
-				}); */
+		document.body.style.margin = 0;
+		document.body.style.padding = 0;
 	}
-	return button;
-}
-
-function controlPrintOrientation(options) {
-	button = controlButton(Object.assign({
-		label: ['&#9607;', '&#9608;'],
-		className: 'ol-print-orientation',
-		title: 'Paysage / Portrait',
-		onAdd: function(map) {
-			activate(0); // Adjust the map display at init
-			window.addEventListener('resize', function() { // And each time the window resize
-				activate(button.active);
-			});
-		},
-		activate: activate,
-	}, options));
 
 	function activate(active) {
-		// Tune the optimal map size
-		if (active) { // Portrait
-			if (window.innerWidth / window.innerHeight > .707) {
-				options.mapEl.style.width = '70.7vh';
-				options.mapEl.style.height = '100vh';
-			} else { // Window too hignt
-				options.mapEl.style.width = '100vw';
-				options.mapEl.style.height = '141.4vw';
-			}
-		} else { // Landscape
-			if (window.innerWidth / window.innerHeight < 1.414) {
-				options.mapEl.style.width = '100vw';
-				options.mapEl.style.height = '70.7vw';
-			} else { // Window too large
-				options.mapEl.style.width = '141.4vh';
-				options.mapEl.style.height = '100vh';
-			}
-		}
-		// Reset the map display at the new size
-		button.getMap().setSize([options.mapEl.offsetWidth, options.mapEl.offsetHeight]);
+		const map = button.getMap(),
+			mapEl = map.getTargetElement();
+
+		resizeDraft(map);
+		map.once('rendercomplete', function() {
+			window.print();
+			window.location.href = window.location.href;
+		});
 	}
 	return button;
 }
-/*
-function controlPrintDpi(options) {
-	return   controlButton(Object.assign({
-		label: [
-			'<span style="font-size:0.5em">100<br/>dpi</span>',
-			'<span style="font-size:0.5em">200<br/>dpi</span>',
-			'<span style="font-size:0.5em">400<br/>dpi</span>'
-		],
-		className: 'ol-print-dpi',
-		title: 'Résolution',
-	}, options));
-}*/
-
 
 /**
  * Line & Polygons Editor
