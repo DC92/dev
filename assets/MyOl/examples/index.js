@@ -162,5 +162,5 @@ var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
 new ol.Map({
 	target: 'map',
 	layers: overlays,
-	controls: basicControls //.concat([edit])
+	controls: basicControls,
 });

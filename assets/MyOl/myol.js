@@ -12,7 +12,7 @@
 
 /* jshint esversion: 6 */
 
-// TODO WARNING DIFFICULT A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
+//TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
@@ -366,7 +366,7 @@ function layerVectorURL(o) {
 	}, o);
 
 	//HACK attach these to windows to define only one
-	// TODO BUG DIFFICULT don't zoom when the cursor is over a label
+	//TODO BEST don't zoom when the cursor is over a label
 	const popEl = window.popEl_ = document.createElement('a'),
 		popup = window.popup_ = new ol.Overlay({
 			element: popEl
@@ -527,8 +527,8 @@ function layerVectorURL(o) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-// TODO IE BUG no overpass on IE
-// TODO BEST display error 429 (Too Many Requests)
+//TODO OVERPASS IE BUG don't work on IE
+//TODO OVERPASS BEST display error 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -649,7 +649,7 @@ layerOverpass = function(o) {
 						'title="Voir la fiche d‘origine sur openstreetmap">',
 						p.name ? (
 							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
-							//TODO BUG do not recognize accented letters (hôtel)
+							//TODO OVERPASS BUG do not recognize accented letters (hôtel)
 						) : (
 							language[p.tourism] || p.tourism
 						),
@@ -845,19 +845,8 @@ function controlButton(o) {
 		}, o),
 		control = new ol.control.Control(options);
 
-	//HACK execute actions on Map init
-	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
-		options.onAdd(map, this);
-	};
-
-	buttonEl.addEventListener('click', function(evt) {
-		evt.preventDefault();
-		control.toggle();
-	});
-
 	control.element.appendChild(buttonEl);
-	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className; //TODO ARCHI just add options.className
+	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
 	control.element.title = options.title; // {string} displayed when the control is hovered.
 	if (options.className) {
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
@@ -868,6 +857,17 @@ function controlButton(o) {
 			control.element.style.left = (nextButtonPos += 2) + 'em';
 		}
 	}
+
+	//HACK execute actions on Map init
+	control.setMap = function(map) {
+		ol.control.Control.prototype.setMap.call(this, map);
+		options.onAdd(map, this);
+	};
+
+	buttonEl.addEventListener('click', function(evt) {
+		evt.preventDefault();
+		control.toggle();
+	});
 
 	// Toggle the button status & aspect
 	control.active = 0;
@@ -991,7 +991,7 @@ function controlLayersSwitcher(options) {
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
-//TODO BEST don't save layerSelector
+//TODO BEST don't save curent layer
 function controlPermalink(o) {
 	const options = Object.assign({
 			hash: '?', // {?, #} the permalink delimiter
@@ -1142,7 +1142,7 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-// TODO GPS tap on map = distance from GPS calculation
+//TODO GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1181,7 +1181,7 @@ function controlGPS(options) {
 			},
 			activate: function(active) {
 				const map = button.getMap();
-				// TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
+				//TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
 				//TODO GPS freeze rotation when inactive
 				//TODO GPS block screen standby
 
@@ -1218,7 +1218,7 @@ function controlGPS(options) {
 	geolocation.on('change', function() {
 		gps.position = ol.proj.fromLonLat(geolocation.getPosition());
 		gps.accuracyGeometry = geolocation.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
-		/* // TODO GPS Firefox Update delta only over some speed
+		/* //TODO GPS Firefox Update delta only over some speed
 		if (!navigator.userAgent.match('Firefox'))
 
 		if (geolocation.getHeading()) {
@@ -1291,7 +1291,7 @@ function controlGPS(options) {
 			//TODO GPS keep orientation when stop gps tracking
 			if (compas.absolute)
 				view.setRotation(compas.heading, 0); // Use magnetic compas value
-			/* // TODO GPS Firefox use delta if speed > ??? km/h
+			/* //TODO GPS Firefox use delta if speed > ??? km/h
 					compas.absolute ?
 					compas.heading : // Use magnetic compas value
 					compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
@@ -1310,7 +1310,6 @@ function controlGPS(options) {
  * GPX file loader control
  * Requires controlButton
  */
-//TODO BUG have a maximum zoom (1 point makes the map invisible)
 function controlLoadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-load-gpx',
@@ -1352,19 +1351,21 @@ function controlLoadGPX(o) {
 					format: format,
 					features: features
 				}),
-				vector = new ol.layer.Vector({
+				layer = new ol.layer.Vector({
 					source: source,
 					style: options.style
 				});
-			button.getMap().addLayer(vector);
-			button.getMap().getView().fit(source.getExtent());
+			map.addLayer(layer);
+			map.getView().fit(source.getExtent());
 		}
 
 		// Zoom the map on the added features
 		const extent = ol.extent.createEmpty();
 		for (let f in features)
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
-		button.getMap().getView().fit(extent);
+		map.getView().fit(extent, {
+			maxZoom: 17,
+		});
 	};
 	return button;
 }
@@ -1374,12 +1375,12 @@ function controlLoadGPX(o) {
  * Requires controlButton
  */
 //TODO BUG EDGE & IE Don't save with the extension .gpx
-// TODO BUG do not export points
+//TODO BEST do not export points
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
 			title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
-			fileName: 'trace', // TODO BEST DIFFICULT give a name according to the context
+			fileName: 'trace', //TODO BEST give a name according to the context
 			extraMetaData: '', // Additional tags to the GPX file header
 			activate: activate,
 		}, o),
@@ -1615,7 +1616,7 @@ function layerEdit(o) {
 	return layer;
 }
 
-// TODO BEST DIFFICULT hover feature when modifing
+//TODO BEST hover feature when modifing
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		className: 'ol-modify',
@@ -1635,7 +1636,7 @@ function controlModify(options) {
 	button.interaction.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			// TODO BUG BEST delete only a summit when Ctrl+Alt click on it
+			//TODO BEST delete only a summit when Ctrl+Alt click on it
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
@@ -1745,7 +1746,7 @@ function optimiseEdited(source, pointerPosition) {
 					}
 				}
 		}
-	// TODO BEST DIFFICULT option not to be able to cut a polygon (WRI / alpages)
+	//TODO BEST option not to be able to cut a polygon (WRI / alpages)
 
 	// Recreate modified features
 	for (let l in lines)
