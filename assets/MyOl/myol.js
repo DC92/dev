@@ -991,6 +991,7 @@ function controlLayersSwitcher(options) {
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
+//TODO BEST don't save layerSelector
 function controlPermalink(o) {
 	const options = Object.assign({
 			hash: '?', // {?, #} the permalink delimiter
@@ -1103,7 +1104,6 @@ function controlTilesBuffer() {
 
 		map.on('change:size', function() {
 			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-
 			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
 					layer.setPreload(fs ? 4 : 0);
@@ -1396,8 +1396,7 @@ function controlDownloadGPX(o) {
 			extent = button.getMap().getView().calculateExtent();
 
 		// Get all visible features
-		var ll = button.getMap().getLayers(); //TODO BUG ON IE
-		ll.forEach(function(layer) {
+		button.getMap().getLayers().forEach(function(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					features.push(feature);
@@ -1458,10 +1457,9 @@ function controlPrint() {
 		title: 'Imprimer la carte',
 		activate: activate,
 		onAdd: function(map) {
-			const ll = document.getElementsByName('ori'); //TODO BUG ON IE
-			ll.forEach(function(element) {
-				element.onchange = resizeDraft;
-			});
+			const oris = document.getElementsByName('ori');
+			for (let i = 0; i < oris.length; i++) // Use for because of a bug in Edge / IE
+				oris[i].onchange = resizeDraft;
 		}
 	});
 
@@ -1559,7 +1557,7 @@ function layerEdit(o) {
 		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
-		map.getInteractions().getArray().forEach(function(i) {
+		map.getInteractions().forEach(function(i) {
 			if (i instanceof ol.interaction.DoubleClickZoom)
 				map.removeInteraction(i);
 		});
