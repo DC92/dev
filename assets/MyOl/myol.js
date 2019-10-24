@@ -16,7 +16,7 @@
 
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
-	var map = this;
+	let map = this;
 	this.getLayers().forEach(function(target) {
 		target.map_ = map;
 	});
@@ -37,10 +37,11 @@ function JSONparse(json) {
 /**
  * Openstreetmap
  */
-function layerOSM(url, attribution) {
+function layerOSM(url, attribution, maxZoom) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
 			url: url,
+			maxZoom: maxZoom || 21,
 			attributions: [
 				attribution || '',
 				ol.source.OSM.ATTRIBUTION,
@@ -1375,7 +1376,6 @@ function controlLoadGPX(o) {
  * Requires controlButton
  */
 //TODO BUG EDGE & IE Don't save with the extension .gpx
-//TODO BEST do not export points
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
@@ -1406,9 +1406,10 @@ function controlDownloadGPX(o) {
 
 		// Get a MultiLineString geometry with just lines fragments
 		// geometries are output as routes (<rte>) and MultiLineString as tracks (<trk>)
+		//TODO BEST export points
 		const multiLineString = new ol.Feature({
 			geometry: new ol.geom.MultiLineString(
-				sortFeatures(features).lines
+				getLines(features)
 			),
 			name: options.fileName
 		});
@@ -1636,7 +1637,7 @@ function controlModify(options) {
 	button.interaction.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			//TODO BEST delete only a summit when Ctrl+Alt click on it
+			//TODO BEST delete only a summit when Ctrl+Alt click
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
@@ -1693,7 +1694,7 @@ function controlDrawPolygon(options) {
 // Reorganise Points, Lines & Polygons
 function optimiseEdited(source, pointerPosition) {
 	// Get all edited features
-	let lines = sortFeatures(source.getFeatures(), pointerPosition).lines,
+	let lines = getLines(source.getFeatures(), pointerPosition),
 		polys = [];
 	source.clear(); // Remove everything
 
@@ -1763,24 +1764,17 @@ function optimiseEdited(source, pointerPosition) {
 	source.save();
 }
 
-function sortFeatures(features, pointerPosition) {
-	let fs = {
-		lines: [],
-		polys: [],
-		points: []
-	};
-
+function getLines(features, pointerPosition) {
+	let lines = [];
 	for (let f in features)
 		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
 			const geometries = features[f].getGeometry().getGeometries();
 			for (let g in geometries)
-				flatCoord(fs.lines, geometries[g].getCoordinates(), pointerPosition);
-		} else if (features[f].getGeometry().getType().match(/point$/i))
-		fs.points.push(features[f]);
-	else
-		flatCoord(fs.lines, features[f].getGeometry().getCoordinates(), pointerPosition);
+				flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
+		} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
+		flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition); // Lines or polyons
 
-	return fs;
+	return lines;
 }
 
 // Get all lines fragments at the same level & split aif one point = pointerPosition
@@ -1854,9 +1848,11 @@ function controlsCollection(options) {
  */
 function layersCollection(keys) {
 	return {
-		'OpenTopo': layerOSM( //TODO BUG no display on lower scales
+		'OpenTopo': layerOSM(
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
+			'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+			17
 		),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
 		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
