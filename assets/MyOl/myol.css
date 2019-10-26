@@ -188,7 +188,6 @@
 	top: calc(2em + 8px) !important;
 	left: 8px !important;
 }
-/*//TODO BUG : don't see gcd-gl-result */
 .gcd-gl-result {
 	top: 66px !important;
 	left: 8.5px !important;

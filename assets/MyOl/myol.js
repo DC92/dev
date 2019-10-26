@@ -1403,7 +1403,7 @@ function controlDownloadGPX(o) {
 
 		// Get a MultiLineString geometry with just lines fragments
 		// geometries are output as routes (<rte>) and MultiLineString as tracks (<trk>)
-		//TODO BEST/WRI export points
+		//TODO WRI export points
 		const multiLineString = new ol.Feature({
 			geometry: new ol.geom.MultiLineString(
 				getLines(features)
