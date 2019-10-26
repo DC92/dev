@@ -367,7 +367,7 @@ function layerVectorURL(o) {
 	}, o);
 
 	//HACK attach these to windows to define only one
-	//TODO BEST don't zoom when the cursor is over a label
+	//TODO BEST zoom map when the cursor is over a label
 	const popEl = window.popEl_ = document.createElement('a'),
 		popup = window.popup_ = new ol.Overlay({
 			element: popEl
@@ -992,7 +992,7 @@ function controlLayersSwitcher(options) {
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
-//TODO BEST don't save curent layer
+//TODO BEST save curent layer
 function controlPermalink(o) {
 	const options = Object.assign({
 			hash: '?', // {?, #} the permalink delimiter
@@ -1375,22 +1375,19 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
-//TODO BUG EDGE & IE Don't save with the extension .gpx
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
 			title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
-			fileName: 'trace', //TODO BEST give a name according to the context
-			extraMetaData: '', // Additional tags to the GPX file header
+			fileName: document.title || 'openlayers',
 			activate: activate,
 		}, o),
 		hiddenEl = document.createElement('a'),
 		button = controlButton(options);
-
-	//HACK for Moz
-	hiddenEl.target = '_blank';
-	hiddenEl.style = 'display:none;opacity:0;color:transparent;';
-	(document.body || document.documentElement).appendChild(hiddenEl);
+	hiddenEl.target = '_self';
+	hiddenEl.download = options.fileName + '.gpx';
+	hiddenEl.style = 'display:none';
+	document.body.appendChild(hiddenEl);
 
 	function activate() { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
@@ -1406,7 +1403,7 @@ function controlDownloadGPX(o) {
 
 		// Get a MultiLineString geometry with just lines fragments
 		// geometries are output as routes (<rte>) and MultiLineString as tracks (<trk>)
-		//TODO BEST export points
+		//TODO BEST/WRI export points
 		const multiLineString = new ol.Feature({
 			geometry: new ol.geom.MultiLineString(
 				getLines(features)
@@ -1419,32 +1416,19 @@ function controlDownloadGPX(o) {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5
-			}),
-			file = new Blob([gpx
-				.replace(/>/g, ">\n")
-				.replace("<name>\n", "<time>" + new Date().toISOString() + "</time>\n" + options.extraMetaData + "<name>")
-			], {
-				type: 'application/gpx+xml'
-			});
+			})
+			.replace(/>/g, ">\n")
+			.replace("<name>\n", "<time>" + new Date().toISOString() + "</time>\n<name>");
+		file = new Blob([gpx], {
+			type: 'application/gpx+xml'
+		});
 
-		//HACK for IE/Edge
-		if (typeof navigator.msSaveOrOpenBlob !== 'undefined')
-			return navigator.msSaveOrOpenBlob(file, options.fileName);
-		else if (typeof navigator.msSaveBlob !== 'undefined')
-			return navigator.msSaveBlob(file, options.fileName);
-
-		hiddenEl.href = URL.createObjectURL(file);
-		hiddenEl.download = options.fileName + '.gpx';
-
-		// Simulate the click & download the .gpx file
-		if (typeof hiddenEl.click === 'function')
+		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
+			navigator.msSaveBlob(file, options.fileName + '.gpx');
+		else {
+			hiddenEl.href = URL.createObjectURL(file);
 			hiddenEl.click();
-		else
-			hiddenEl.dispatchEvent(new MouseEvent('click', {
-				view: window,
-				bubbles: true,
-				cancelable: true,
-			}));
+		}
 	}
 	return button;
 }
