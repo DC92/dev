@@ -1,5 +1,4 @@
-/*!
- * OPENLAYERS V5 ADAPTATION - https://openlayers.org/
+/* OPENLAYERS V5 ADAPTATION - https://openlayers.org/
  * (C) Dominique Cavailhez 2017
  * https://github.com/Dominique92/MyOl
  *
@@ -9,14 +8,13 @@
  * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
-
 /* jshint esversion: 6 */
 
 //TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
-	let map = this;
+	const map = this;
 	this.getLayers().forEach(function(target) {
 		target.map_ = map;
 	});
@@ -109,18 +107,17 @@ function layerIGN(key, layer, format) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 		IGNmatrixIds[i] = i.toString();
 	}
-	const IGNtileGrid = new ol.tilegrid.WMTS({
-		origin: [-20037508, 20037508],
-		resolutions: IGNresolutions,
-		matrixIds: IGNmatrixIds
-	});
 	return new ol.layer.Tile({
 		source: new ol.source.WMTS({
 			url: '//wxs.ign.fr/' + key + '/wmts',
 			layer: layer,
 			matrixSet: 'PM',
 			format: 'image/' + (format || 'jpeg'),
-			tileGrid: IGNtileGrid,
+			tileGrid: new ol.tilegrid.WMTS({
+				origin: [-20037508, 20037508],
+				resolutions: IGNresolutions,
+				matrixIds: IGNmatrixIds,
+			}),
 			style: 'normal',
 			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
 		})
@@ -164,13 +161,11 @@ function layerTileIncomplete(options) {
 
 	// Zoom has changed
 	function change() {
-		const view = layer.map_.getView(),
-			center = view.getCenter();
+		const view = layer.map_.getView();
 		let currentResolution = 999999; // Init loop at max resolution
 
 		// Search for sources according to the map resolution
-		if (center &&
-			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
+		if (ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
 			currentResolution = Object.keys(options.sources).filter(function(evt) { //HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
@@ -195,11 +190,6 @@ function layerSwissTopo(layer, extraLayer) {
 		resolutions[r] = ol.extent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
 		matrixIds[r] = r;
 	}
-	const tileGrid = new ol.tilegrid.WMTS({
-		origin: ol.extent.getTopLeft(projectionExtent),
-		resolutions: resolutions,
-		matrixIds: matrixIds,
-	});
 	return layerTileIncomplete({
 		extraLayer: extraLayer,
 		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781
@@ -207,7 +197,11 @@ function layerSwissTopo(layer, extraLayer) {
 			500: new ol.source.WMTS(({
 				crossOrigin: 'anonymous',
 				url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-				tileGrid: tileGrid,
+				tileGrid: new ol.tilegrid.WMTS({
+					origin: ol.extent.getTopLeft(projectionExtent),
+					resolutions: resolutions,
+					matrixIds: matrixIds,
+				}),
 				requestEncoding: 'REST',
 				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 			}))
@@ -282,13 +276,10 @@ function layerBing(key, subLayer) {
 /**
  * VECTORS, GEOJSON & AJAX LAYERS
  */
-/**
- * Mem in cookies the checkbox content with name="selectorName"
- */
+// Mem in cookies the checkbox content with name="selectorName"
 function controlPermanentCheckbox(selectorName, callback) {
 	const checkEls = document.getElementsByName(selectorName),
-		cookie =
-		location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
+		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
 		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
 
 	for (let e = 0; e < checkEls.length; e++) {
@@ -1064,20 +1055,18 @@ function controlLengthLine() {
 	};
 
 	function calculateLength(feature) {
-		if (!feature)
-			return false;
-
 		// Display the line length
-		const length = ol.sphere.getLength(feature.getGeometry());
-		if (length >= 100000)
-			control.element.innerHTML = (Math.round(length / 1000)) + ' km';
-		else if (length >= 10000)
-			control.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
-		else if (length >= 1000)
-			control.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
-		else if (length >= 1)
-			control.element.innerHTML = (Math.round(length)) + ' m';
-
+		if (feature) {
+			const length = ol.sphere.getLength(feature.getGeometry());
+			if (length >= 100000)
+				control.element.innerHTML = (Math.round(length / 1000)) + ' km';
+			else if (length >= 10000)
+				control.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
+			else if (length >= 1000)
+				control.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
+			else if (length >= 1)
+				control.element.innerHTML = (Math.round(length)) + ' m';
+		}
 		return false; // Continue detection (for editor that has temporary layers)
 	}
 	return control;
@@ -1128,6 +1117,7 @@ function controlGeocoder() {
 	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
 	geocoder.container.style.top = '.5em';
 	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
+
 	return geocoder;
 }
 
@@ -1424,7 +1414,7 @@ function controlPrint() {
 		className: 'ol-print',
 		title: 'Imprimer la carte',
 		activate: activate,
-		onAdd: function(map) {
+		onAdd: function() {
 			const oris = document.getElementsByName('ori');
 			for (let i = 0; i < oris.length; i++) // Use for because of a bug in Edge / IE
 				oris[i].onchange = resizeDraft;
@@ -1444,14 +1434,22 @@ function controlPrint() {
 		questionEl.className = 'ol-control-hidden';
 	};
 
+	function activate() {
+		resizeDraft(button.getMap());
+		button.getMap().once('rendercomplete', function() {
+			window.print();
+			window.location.href = window.location.href;
+		});
+	}
+
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
 		const map = button.getMap(),
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=ori]:checked"),
 			ori = oris.length ? oris[0].value : 0;
-		mapEl.style.width = ori == 0 ? '210mm' : '297mm';
-		mapEl.style.height = ori == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
+		mapEl.style.width = ori === 0 ? '210mm' : '297mm';
+		mapEl.style.height = ori === 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide other elements than the map
@@ -1462,17 +1460,6 @@ function controlPrint() {
 		document.body.appendChild(mapEl);
 		document.body.style.margin = 0;
 		document.body.style.padding = 0;
-	}
-
-	function activate(active) {
-		const map = button.getMap(),
-			mapEl = map.getTargetElement();
-
-		resizeDraft(map);
-		map.once('rendercomplete', function() {
-			window.print();
-			window.location.href = window.location.href;
-		});
 	}
 	return button;
 }
@@ -1489,7 +1476,7 @@ function layerEdit(o) {
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		features = format.readFeatures(
 			JSONparse(geoJsonEl.value || '{"type":"FeatureCollection","features":[]}'), {
-				featureProjection: 'EPSG:3857' // Read/write data as ESPG:4326 by default
+				featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
 			}
 		),
 		source = new ol.source.Vector({
@@ -1583,7 +1570,7 @@ function layerEdit(o) {
 	return layer;
 }
 
-//TODO BEST hover feature when modifing
+//TODO EDIT hover feature when modifing
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		className: 'ol-modify',
@@ -1603,7 +1590,7 @@ function controlModify(options) {
 	button.interaction.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			//TODO BEST delete only a summit when Ctrl+Alt click
+			//TODO EDIT delete only a summit when Ctrl+Alt click
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
@@ -1713,7 +1700,7 @@ function optimiseEdited(source, pointerPosition) {
 					}
 				}
 		}
-	//TODO BEST option not to be able to cut a polygon (WRI / alpages)
+	//TODO EDIT option not to be able to cut a polygon (WRI / alpages)
 
 	// Recreate modified features
 	for (let l in lines)
