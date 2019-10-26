@@ -10,6 +10,7 @@
  */
 /* jshint esversion: 6 */
 
+//TODO BEST collect all languages in a single place
 //TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
 //HACK add map_ to each layer
@@ -284,8 +285,6 @@ function controlPermanentCheckbox(selectorName, callback) {
 
 	for (let e = 0; e < checkEls.length; e++) {
 		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-
-		//TODO BUG EDGE check, then retrieve init / lost layer on switchlayer
 		if (cookie) // Set the checks accordingly with the cookie
 			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
 	}
