@@ -183,6 +183,9 @@
 .gcd-gl-input {
 	display: none;
 }
+.ol-geocoder .gcd-gl-reset {
+	top: 32px;
+}
 .gcd-gl-expanded .gcd-gl-input {
 	display: initial;
 	top: calc(2em + 8px) !important;

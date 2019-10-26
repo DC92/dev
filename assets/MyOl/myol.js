@@ -171,7 +171,7 @@ function layerTileIncomplete(options) {
 		// Search for sources according to the map resolution
 		if (center &&
 			ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
-			currentResolution = Object.keys(options.sources).filter(function(evt) { // HACK : use of filter to perform an action
+			currentResolution = Object.keys(options.sources).filter(function(evt) { //HACK : use of filter to perform an action
 				return evt > view.getResolution();
 			})[0];
 
@@ -374,14 +374,6 @@ function layerVectorURL(o) {
 		});
 	popEl.style.display = 'block';
 
-	const format = new ol.format.GeoJSON();
-	format.readFeatures = function(source, options) {
-		JSONparse(source); // handle JSON error
-		if (source.bboxLimitResolution) // If bbbox optimised
-			source.clear(); // Clean all features when receive request
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options); // End HACK
-	};
-
 	const source = new ol.source.Vector(Object.assign({
 			url: function(extent, resolution, projection) {
 				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
@@ -391,7 +383,7 @@ function layerVectorURL(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			format: format,
+			format: new ol.format.GeoJSON(),
 		}, options)),
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
@@ -570,7 +562,7 @@ layerOverpass = function(o) {
 							newNode.appendChild(subTagNode.cloneNode());
 					}
 			}
-		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options); // End HACK
+		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options);
 	};
 
 	function overpassType(properties) {
@@ -1401,27 +1393,17 @@ function controlDownloadGPX(o) {
 				});
 		});
 
-		// Get a MultiLineString geometry with just lines fragments
-		// geometries are output as routes (<rte>) and MultiLineString as tracks (<trk>)
-		//TODO WRI export points
-		const multiLineString = new ol.Feature({
-			geometry: new ol.geom.MultiLineString(
-				getLines(features)
-			),
-			name: options.fileName
-		});
-
 		// Write in GPX format
-		const gpx = new ol.format.GPX().writeFeatures([multiLineString], {
+		const gpx = new ol.format.GPX().writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5
 			})
-			.replace(/>/g, ">\n")
-			.replace("<name>\n", "<time>" + new Date().toISOString() + "</time>\n<name>");
-		file = new Blob([gpx], {
-			type: 'application/gpx+xml'
-		});
+			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
+			.replace(/(<trk|<\/trk|<wpt|<\/gpx)/g, '\n$1'),
+			file = new Blob([gpx], {
+				type: 'application/gpx+xml'
+			});
 
 		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
 			navigator.msSaveBlob(file, options.fileName + '.gpx');
@@ -1596,7 +1578,7 @@ function layerEdit(o) {
 			return false; // Warn controlLoadGPX that the editor got the included feature
 		});
 
-		return ol.layer.Vector.prototype.createRenderer.call(this); // End HACK
+		return ol.layer.Vector.prototype.createRenderer.call(this);
 	};
 	return layer;
 }
