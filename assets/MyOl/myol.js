@@ -1037,7 +1037,7 @@ function controlPermalink(o) {
  */
 function controlLengthLine() {
 	const control = new ol.control.Control({
-		element: document.createElement('div'), //HACK No button
+		element: document.createElement('div'), // div to display the measure
 	});
 	control.element.className = 'ol-length-line';
 	control.setMap = function(map) { //HACK
@@ -1099,10 +1099,10 @@ function controlTilesBuffer() {
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
 function controlGeocoder() {
-	// Vérify if geocoder is available (not in IE)
+	// Vérify if geocoder is available (not supported in IE)
 	const ua = navigator.userAgent;
 	if (typeof Geocoder != 'function' ||
-		ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1)
+		ua.indexOf('MSIE ') > -1 || ua.indexOf('Trident/') > -1)
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		});
