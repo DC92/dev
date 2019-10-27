@@ -71,15 +71,15 @@ The coding rules are volontary simple & don't follow all openlayers's
 Tested on :
 * windows : Chrome, FireFox, Edge, IE11 (with some limitations), Opera (slow)
 * Android : Chrome, FireFox, Edge, Opera, Samsung Internet
-* IE 10 & 11 need [https://polyfill.io](https://cdn.polyfill.io/v3/polyfill.min.js)
+* IE 10 & 11 need [https://cdn.polyfill.io/v3/polyfill.min.js](https://polyfill.io)
 
 FILES
 =====
-* myol.css : Specific CSS presentation distribution
-* myol.js : Specific CSS extensions distribution
+* myol.css : CSS distribution
+* myol.js : JS distribution
 * ol/... : Openlayer V6.0.1 (you can use any of openlayers V5.* or V6.*) from [Openlayers](https://openlayers.org/download/)
 * geocoder/... : Geocoder V4.0.0 from [Openlayers geocoder](https://github.com/jonataswalker/ol-geocoder/releases/latest)
 * proj4/... : Coordinate transformation software proj4js V2.5.0 from [Proj4](https://github.com/proj4js/proj4js/releases/latest)
 * index.html : Simple demo
-* examples/... : Demo files or ongoing developments
-* gps/... : Off line demo files
+* examples/... : Demos or ongoing developments
+* gps/... : Off line demo with GPS capabilities

@@ -13,7 +13,7 @@ if ('serviceWorker' in navigator)
 	.then(reg => {
 		reg.addEventListener('updatefound', () => {
 			location.reload();
-		})
+		});
 	});
 
 // Openlayers part
@@ -62,48 +62,45 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		'Bing': layerBing(keys.bing, 'Road'),
 		'Photo Bing': layerBing(keys.bing, 'Aerial'),
 		'Google': layerGoogle('m'),
-		'Photo Google': layerGoogle('s')
+		'Photo Google': layerGoogle('s'),
 	};
 
-// Load the map when the map DIV is intialised
-window.onload = function() {
-	new ol.Map({
-		target: 'map',
-		controls: [
-			controlLayersSwitcher({
-				baseLayers: baseLayers
-			}),
-			controlPermalink({
-				visible: false
-			}),
-			new ol.control.ScaleLine(),
-			new ol.control.Attribution({
-				collapseLabel: '>'
-			}),
-			new ol.control.MousePosition({
-				coordinateFormat: ol.coordinate.createStringXY(5),
-				projection: 'EPSG:4326',
-				className: 'ol-coordinate',
-				undefinedHTML: String.fromCharCode(0)
-			}),
-			new ol.control.Zoom({
-				zoomOutLabel: '-'
-			}),
-			new ol.control.FullScreen({
-				label: '',
-				labelActive: '',
-				tipLabel: 'Plein écran'
-			}),
-			geocoder(),
-			controlGPS(),
-			controlLoadGPX(),
-			controlButton({
-				label: '?',
-				title: help,
-				activate: function(active) {
-					alert(this.title);
-				}
-			})
-		]
-	});
-};
+new ol.Map({
+	target: 'map',
+	controls: [
+		controlLayersSwitcher({
+			baseLayers: baseLayers,
+		}),
+		controlPermalink({
+			visible: false,
+		}),
+		new ol.control.ScaleLine(),
+		new ol.control.Attribution({
+			collapseLabel: '>',
+		}),
+		new ol.control.MousePosition({
+			coordinateFormat: ol.coordinate.createStringXY(5),
+			projection: 'EPSG:4326',
+			className: 'ol-coordinate',
+			undefinedHTML: String.fromCharCode(0),
+		}),
+		new ol.control.Zoom({
+			zoomOutLabel: '-',
+		}),
+		new ol.control.FullScreen({
+			label: '',
+			labelActive: '',
+			tipLabel: 'Plein écran',
+		}),
+		controlGeocoder(),
+		controlGPS(),
+		controlLoadGPX(),
+		controlButton({
+			className: 'ol-help',
+			title: help,
+			activate: function() {
+				alert(this.title);
+			},
+		}),
+	]
+});

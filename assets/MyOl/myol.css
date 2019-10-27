@@ -78,7 +78,7 @@
 
 /* Switch layer popup */
 .ol-switch-layer button::after {
-  content: "…";
+	content: "…";
 }
 .ol-switch-layer {
 	font-size: small;
@@ -203,10 +203,10 @@
 
 /* GPX */
 .ol-load-gpx button::after {
-  content: "▲";
+	content: "▲";
 }
 .ol-download-gpx button::after {
-  content: "▼";
+	content: "▼";
 }
 
 /* Print */
@@ -233,7 +233,7 @@
 .ol-control-question span {
 	cursor: pointer;
 }
-/* When printing, hide all controls except :  */
+/* When printing, hide all controls except : */
 @media print {
 	.ol-overlaycontainer-stopevent > * {
 		display: none;
@@ -246,11 +246,15 @@
 
 /* Editor */
 .ol-modify button::after {
-  content: "M";
+	content: "M";
 }
 .ol-draw-line button::after {
-  content: "L";
+	content: "L";
 }
 .ol-draw-polygon button::after {
-  content: "P";
+	content: "P";
+}
+
+.ol-help button::after {
+	content: "?";
 }
