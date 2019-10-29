@@ -13,15 +13,19 @@
 //TODO BEST collect all languages in a single place
 //TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
-//HACK add map_ to each layer
+//HACK add map_ & send an event to each layer & control
 ol.Map.prototype.renderFrame_ = function(time) {
 	const map = this;
-	this.getLayers().forEach(function(target) {
-		target.map_ = map;
-	});
-	ol.PluggableMap.prototype.renderFrame_.call(this, time);
+	map.getLayers().getArray()
+		.concat(map.getControls().getArray())
+		.forEach(function(target) {
+			target.map_ = map;
+			target.dispatchEvent('myol:render');
+		});
+	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
+//HACK log json parsing errors
 function JSONparse(json) {
 	try {
 		return JSON.parse(json);
@@ -823,7 +827,6 @@ function controlButton(o) {
 		options = Object.assign({
 			element: document.createElement('div'),
 			activeButtonBackgroundColor: 'white',
-			onAdd: function() {},
 			activate: function() {},
 		}, o),
 		control = new ol.control.Control(options);
@@ -840,12 +843,6 @@ function controlButton(o) {
 			control.element.style.left = (nextButtonPos += 2) + 'em';
 		}
 	}
-
-	//HACK execute actions on Map init
-	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
-		options.onAdd(map, this);
-	};
 
 	buttonEl.addEventListener('click', function(evt) {
 		evt.preventDefault();
@@ -886,7 +883,6 @@ function controlLayersSwitcher(options) {
 		className: 'ol-switch-layer',
 		title: 'Liste des cartes',
 		rightPosition: 0.5,
-		onAdd: onAddLS,
 	});
 
 	// Transparency slider (first position)
@@ -903,7 +899,9 @@ function controlLayersSwitcher(options) {
 	selectorEl.title = 'Ctrl+click : multicouches';
 	button.element.appendChild(selectorEl);
 
-	function onAddLS(map) {
+	button.once('myol:render', function() {
+		const map = button.map_;
+
 		// Base layers selector init
 		for (let name in options.baseLayers)
 			if (options.baseLayers[name]) { // array of layers, mandatory, no default
@@ -933,7 +931,7 @@ function controlLayersSwitcher(options) {
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
 				displayLayerSelector();
 		});
-	}
+	});
 
 	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
@@ -1040,18 +1038,16 @@ function controlLengthLine() {
 		element: document.createElement('div'), // div to display the measure
 	});
 	control.element.className = 'ol-length-line';
-	control.setMap = function(map) { //HACK
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		map.on('pointermove', function(evtMove) {
+	control.once('myol:render', function() {
+		control.getMap().on('pointermove', function(evt) {
 			control.element.innerHTML = ''; // Clear the measure if hover no feature
 
 			// Find new features to hover
-			map.forEachFeatureAtPixel(evtMove.pixel, calculateLength, {
+			control.getMap().forEachFeatureAtPixel(evt.pixel, calculateLength, {
 				hitTolerance: 6,
 			});
 		});
-	};
+	});
 
 	function calculateLength(feature) {
 		// Display the line length
@@ -1080,17 +1076,15 @@ function controlTilesBuffer() {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), //HACK No button
 	});
-	control.setMap = function(map) { //HACK
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		map.on('change:size', function() {
+	control.once('myol:render', function() {
+		control.getMap().on('change:size', function() { //TODO BUG never called
 			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-			map.getLayers().forEach(function(layer) {
+			control.getMap().getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
 					layer.setPreload(fs ? 4 : 0);
 			});
 		});
-	};
+	});
 	return control;
 }
 
@@ -1124,12 +1118,15 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
+//TODO BUG sur mobile
 //TODO GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
 		!window.location.href.match(/https|localhost/i))
-		return;
+		return new ol.control.Control({ // No button
+			element: document.createElement('div'),
+		});
 
 	let gps = {}, // Mem last sensors values
 		compas = {},
@@ -1158,9 +1155,6 @@ function controlGPS(options) {
 			className: 'ol-gps',
 			activeButtonBackgroundColor: '#ef3',
 			title: 'Centrer sur la position GPS',
-			onAdd: function(map) {
-				map.on('moveend', renderReticule);
-			},
 			activate: function(active) {
 				const map = button.getMap();
 				//TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
@@ -1209,6 +1203,10 @@ function controlGPS(options) {
 		} */
 
 		renderReticule();
+	});
+
+	button.once('myol:render', function() {
+		button.getMap().on('moveend', renderReticule); // Refresh graticule after map zoom
 	});
 
 	// Browser heading from the inertial sensors
@@ -1410,36 +1408,35 @@ function controlDownloadGPX(o) {
  */
 function controlPrint() {
 	const button = controlButton({
-		className: 'ol-print',
-		title: 'Imprimer la carte',
-		activate: activate,
-		onAdd: function() {
-			const oris = document.getElementsByName('ori');
-			for (let i = 0; i < oris.length; i++) // Use for because of a bug in Edge / IE
-				oris[i].onchange = resizeDraft;
-		}
-	});
+			className: 'ol-print',
+			title: 'Imprimer la carte',
+			activate: function() {
+				resizeDraft(button.getMap());
+				button.getMap().once('rendercomplete', function() {
+					window.print();
+					window.location.href = window.location.href;
+				});
+			},
+		}),
+		orientationEl = document.createElement('div');
 
 	// Add a question below the button (for controlPrint)
-	const questionEl = document.createElement('div');
-	questionEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
+	orientationEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
 		'<input type="radio" name="ori" value="1">Paysage A4';
-	questionEl.className = 'ol-control-hidden';
-	button.element.appendChild(questionEl);
+	orientationEl.className = 'ol-control-hidden';
+
+	button.element.appendChild(orientationEl);
 	button.element.onmouseover = function() {
-		questionEl.className = 'ol-control-question';
+		orientationEl.className = 'ol-control-question';
 	};
 	button.element.onmouseout = function() {
-		questionEl.className = 'ol-control-hidden';
+		orientationEl.className = 'ol-control-hidden';
 	};
-
-	function activate() {
-		resizeDraft(button.getMap());
-		button.getMap().once('rendercomplete', function() {
-			window.print();
-			window.location.href = window.location.href;
-		});
-	}
+	button.once('myol:render', function() {
+		const oris = document.getElementsByName('ori');
+		for (let i = 0; i < oris.length; i++) // Use for because of a bug in Edge / IE
+			oris[i].onchange = resizeDraft;
+	});
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
@@ -1508,6 +1505,7 @@ function layerEdit(o) {
 	};
 
 	layer.createRenderer = function() { //HACK to get control at the layer init
+		//TODO myol:render
 		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
@@ -1767,6 +1765,8 @@ function controlsCollection(options) {
 			baseLayers: options.baseLayers,
 			geoKeys: options.geoKeys
 		}, options.controlLayersSwitcher)),
+		controlTilesBuffer(),
+		controlPermalink(options.controlPermalink),
 		new ol.control.Attribution({
 			collapsible: false // Attribution always open
 		}),
@@ -1785,8 +1785,6 @@ function controlsCollection(options) {
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran'
 		}),
-		controlPermalink(options.controlPermalink),
-		controlTilesBuffer(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),

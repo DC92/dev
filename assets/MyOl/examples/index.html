@@ -7,6 +7,19 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/x-icon" href="favicon.ico" />
 
+	<script>
+		// Mobile debug facilities
+		if (!window.location.hash.indexOf('##'))
+			window.onerror = function(msg, url, line, col, error) {
+				alert(error.stack);
+				return true;
+			}
+		if (window.location.hash == '###')
+			console.log = function(message) {
+				alert(message);
+			};
+	</script>
+
 	<!-- IE related -->
 	<script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
 
