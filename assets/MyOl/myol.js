@@ -13,15 +13,12 @@
 //TODO BEST collect all languages in a single place
 //TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
 
-//HACK add map_ & send an event to each layer & control
+//HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
 	const map = this;
-	map.getLayers().getArray()
-		.concat(map.getControls().getArray())
-		.forEach(function(target) {
-			target.map_ = map;
-			target.dispatchEvent('myol:render');
-		});
+	map.getLayers().forEach(function(target) {
+		target.map_ = map;
+	});
 	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
@@ -899,8 +896,8 @@ function controlLayersSwitcher(options) {
 	selectorEl.title = 'Ctrl+click : multicouches';
 	button.element.appendChild(selectorEl);
 
-	button.once('myol:render', function() {
-		const map = button.map_;
+	button.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Base layers selector init
 		for (let name in options.baseLayers)
@@ -931,7 +928,7 @@ function controlLayersSwitcher(options) {
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
 				displayLayerSelector();
 		});
-	});
+	};
 
 	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
@@ -1038,16 +1035,19 @@ function controlLengthLine() {
 		element: document.createElement('div'), // div to display the measure
 	});
 	control.element.className = 'ol-length-line';
-	control.once('myol:render', function() {
-		control.getMap().on('pointermove', function(evt) {
+
+	control.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.on('pointermove', function(evt) {
 			control.element.innerHTML = ''; // Clear the measure if hover no feature
 
 			// Find new features to hover
-			control.getMap().forEachFeatureAtPixel(evt.pixel, calculateLength, {
+			map.forEachFeatureAtPixel(evt.pixel, calculateLength, {
 				hitTolerance: 6,
 			});
 		});
-	});
+	};
 
 	function calculateLength(feature) {
 		// Display the line length
@@ -1076,15 +1076,18 @@ function controlTilesBuffer() {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), //HACK No button
 	});
-	control.once('myol:render', function() {
-		control.getMap().on('change:size', function() { //TODO BUG never called
+
+	control.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.on('change:size', function() { //TODO BUG never called
 			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-			control.getMap().getLayers().forEach(function(layer) {
+			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
 					layer.setPreload(fs ? 4 : 0);
 			});
 		});
-	});
+	};
 	return control;
 }
 
@@ -1205,9 +1208,10 @@ function controlGPS(options) {
 		renderReticule();
 	});
 
-	button.once('myol:render', function() {
-		button.getMap().on('moveend', renderReticule); // Refresh graticule after map zoom
-	});
+	button.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+		map.on('moveend', renderReticule); // Refresh graticule after map zoom
+	};
 
 	// Browser heading from the inertial sensors
 	window.addEventListener(
@@ -1227,7 +1231,7 @@ function controlGPS(options) {
 	);
 
 	function renderReticule() {
-		if (button.active && gps) {
+		if (button.active && gps && gps.position) {
 			// Estimate the viewport size
 			const map = button.getMap(),
 				view = map.getView(),
@@ -1420,7 +1424,7 @@ function controlPrint() {
 		}),
 		orientationEl = document.createElement('div');
 
-	// Add a question below the button (for controlPrint)
+	// Add orientation selectors below the button
 	orientationEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
 		'<input type="radio" name="ori" value="1">Paysage A4';
 	orientationEl.className = 'ol-control-hidden';
@@ -1432,11 +1436,13 @@ function controlPrint() {
 	button.element.onmouseout = function() {
 		orientationEl.className = 'ol-control-hidden';
 	};
-	button.once('myol:render', function() {
+	button.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+
 		const oris = document.getElementsByName('ori');
-		for (let i = 0; i < oris.length; i++) // Use for because of a bug in Edge / IE
+		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / IE
 			oris[i].onchange = resizeDraft;
-	});
+	};
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
@@ -1444,8 +1450,8 @@ function controlPrint() {
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=ori]:checked"),
 			ori = oris.length ? oris[0].value : 0;
-		mapEl.style.width = ori === 0 ? '210mm' : '297mm';
-		mapEl.style.height = ori === 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
+		mapEl.style.width = ori == 0 ? '210mm' : '297mm';
+		mapEl.style.height = ori == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide other elements than the map
@@ -1505,7 +1511,6 @@ function layerEdit(o) {
 	};
 
 	layer.createRenderer = function() { //HACK to get control at the layer init
-		//TODO myol:render
 		const map = layer.map_;
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
