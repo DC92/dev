@@ -346,6 +346,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
+//TODO BUG n'efface pas les features !!!=> En multiple (ligne optimisées !!!)
 function layerVectorURL(o) {
 	const options = Object.assign({
 		baseUrlFunction: function(bbox, list) {
@@ -630,7 +631,7 @@ layerOverpass = function(o) {
 						'title="Voir la fiche d‘origine sur openstreetmap">',
 						p.name ? (
 							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
-							//TODO OVERPASS BUG do not recognize accented letters (hôtel)
+							//TODO OVERPASS BUG don't recognize accented letters (hôtel)
 						) : (
 							language[p.tourism] || p.tourism
 						),
@@ -1343,7 +1344,6 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
-//TODO BUG <rte><rtept ...
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
@@ -1376,8 +1376,10 @@ function controlDownloadGPX(o) {
 				featureProjection: 'EPSG:3857',
 				decimals: 5
 			})
+			.replace(/<rte/g, '<trk')
 			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
-			.replace(/(<trk|<\/trk|<wpt|<\/gpx)/g, '\n$1'),
+			.replace(/(<trk|<\/trk|<wpt|<\/wpt|<\/gpx)/g, '\n$1')
+			.replace(/(<sym)/g, '\n\t$1'),
 			file = new Blob([gpx], {
 				type: 'application/gpx+xml'
 			});
