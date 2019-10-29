@@ -346,24 +346,20 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
-//TODO BUG n'efface pas les features !!!=> En multiple (ligne optimisées !!!)
 function layerVectorURL(o) {
 	const options = Object.assign({
-		baseUrlFunction: function(bbox, list) {
-			return options.baseUrl + // baseUrl is mandatory, no default
-				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-		},
-	}, o);
-
-	//HACK attach these to windows to define only one
-	//TODO BEST zoom map when the cursor is over a label
-	const popEl = window.popEl_ = document.createElement('a'),
-		popup = window.popup_ = new ol.Overlay({
-			element: popEl
-		});
-	popEl.style.display = 'block';
-
-	const source = new ol.source.Vector(Object.assign({
+			baseUrlFunction: function(bbox, list) {
+				return options.baseUrl + // baseUrl is mandatory, no default
+					list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
+			},
+		}, o),
+		popEl = window.popEl_ = document.createElement('a'),
+		popup = window.popup_ = //HACK attach these to windows to define only one
+		new ol.Overlay({
+			element: popEl,
+		}),
+		format = new ol.format.GeoJSON(),
+		source = new ol.source.Vector(Object.assign({
 			url: function(extent, resolution, projection) {
 				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 					// Retreive checked parameters
@@ -372,7 +368,7 @@ function layerVectorURL(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			format: new ol.format.GeoJSON(),
+			format: format, //new ol.format.GeoJSON(),
 		}, options)),
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
@@ -381,7 +377,15 @@ function layerVectorURL(o) {
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
 
-	// Optional : checkboxes to tune layer parameters
+	// HACK to clear the layer when the xhr response is received
+	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
+	format.readFeatures = function(s, o) {
+		if (source.bboxLimitResolution) // If bbbox optimised
+			source.clear(); // Clean all features when receive request
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
+	};
+
+	// Checkboxes to tune layer parameters
 	if (options.selectorName)
 		controlPermanentCheckbox(
 			options.selectorName,
@@ -397,7 +401,7 @@ function layerVectorURL(o) {
 	layer.once('prerender', function(evt) {
 		const map = evt.target.map_;
 		map.addOverlay(popup);
-		map.on('pointermove', layerVectorPointerMove);
+		map.on('pointermove', pointerMove);
 		map.on('click', function(evtClk) { // Click on a feature
 			evtClk.target.forEachFeatureAtPixel(
 				evtClk.pixel,
@@ -408,6 +412,7 @@ function layerVectorURL(o) {
 			);
 		});
 
+		//TODO BEST zoom map when the cursor is over a label
 		// Style when hovering a feature
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
@@ -427,7 +432,7 @@ function layerVectorURL(o) {
 		});
 	});
 
-	function layerVectorPointerMove(evt) {
+	function pointerMove(evt) {
 		const map = evt.target;
 		let pixel = [evt.pixel[0], evt.pixel[1]];
 
@@ -1270,6 +1275,7 @@ function controlGPS(options) {
 				options.callBack(gps.position);
 		}
 	}
+
 	function add2(a, b) {
 		return [a[0] + b[0], a[1] + b[1]];
 	}

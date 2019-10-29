@@ -10,6 +10,7 @@
 /* Features popup */
 .myPopup,
 .myPopup:hover {
+	display: block;
 	padding: 1px 4px;
 	background-color: white;
 	border-radius: 5px;
