@@ -10,9 +10,6 @@
  */
 /* jshint esversion: 6 */
 
-//TODO BEST collect all languages in a single place
-//TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
-
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
 	const map = this;
@@ -823,8 +820,8 @@ function controlButton(o) {
 	const buttonEl = document.createElement('button'),
 		options = Object.assign({
 			element: document.createElement('div'),
-			activeButtonBackgroundColor: 'white',
-			activate: function() {},
+			buttonBackgroundColors: ['white'],
+			stateNumber: 2,
 		}, o),
 		control = new ol.control.Control(options);
 
@@ -840,7 +837,6 @@ function controlButton(o) {
 			control.element.style.left = (nextButtonPos += 2) + 'em';
 		}
 	}
-
 	buttonEl.addEventListener('click', function(evt) {
 		evt.preventDefault();
 		control.toggle();
@@ -849,21 +845,23 @@ function controlButton(o) {
 	// Toggle the button status & aspect
 	control.active = 0;
 	control.toggle = function(newActive, group) {
+		// Toggle by default
 		if (typeof newActive == 'undefined')
-			newActive = !control.active;
-		if (group && group != options.group)
-			return;
+			newActive = (control.active + 1) % options.stateNumber;
 
-		if (control.active != newActive) {
-			// In case of button having the same .group, set inactive the other one
-			if (newActive && options.group)
-				control.getMap().getControls().forEach(function(c) {
-					if (typeof c.toggle == 'function')
-						c.toggle(0, options.group);
-				});
+		// Unselect all other controlButtons from the same group
+		if (newActive && options.group)
+			control.getMap().getControls().forEach(function(c) {
+				if (c != control &&
+					typeof c.toggle == 'function') // Only for controlButtons
+					c.toggle(0, options.group);
+			});
 
+		// Execute the requested change
+		if (control.active != newActive &&
+			(!group || group == options.group)) { // Only for the concerned controls
 			control.active = newActive;
-			buttonEl.style.backgroundColor = newActive ? options.activeButtonBackgroundColor : 'white';
+			buttonEl.style.backgroundColor = options.buttonBackgroundColors[newActive % options.buttonBackgroundColors.length];
 			options.activate(newActive);
 		}
 	};
@@ -1080,7 +1078,7 @@ function controlTilesBuffer() {
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		map.on('change:size', function() { //TODO BUG never called
+		map.on('change:size', function() { // Enable the function when the window expand to fullscreen
 			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
 			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
@@ -1121,7 +1119,6 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//TODO BUG sur mobile
 //TODO GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
@@ -1133,11 +1130,9 @@ function controlGPS(options) {
 
 	let gps = {}, // Mem last sensors values
 		compas = {},
-
-		// The graticule
 		graticule = new ol.Feature(),
 		northGraticule = new ol.Feature(),
-		layer = new ol.layer.Vector({
+		graticuleLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
 				features: [graticule, northGraticule]
 			}),
@@ -1156,21 +1151,20 @@ function controlGPS(options) {
 		// The control button
 		button = controlButton({
 			className: 'ol-gps',
-			activeButtonBackgroundColor: '#ef3',
+			buttonBackgroundColors: ['white', '#ef3', '#ccc'],
 			title: 'Centrer sur la position GPS',
+			stateNumber: 3,
 			activate: function(active) {
 				const map = button.getMap();
-				//TODO GPS 3 steps activation : position + reticule + orientation / reticule / none
-				//TODO GPS freeze rotation when inactive
-				//TODO GPS block screen standby
-
 				// Toggle reticule, position & rotation
 				geolocation.setTracking(active);
-				if (active)
-					map.addLayer(layer);
-				else {
-					map.removeLayer(layer);
-					map.getView().setRotation(0);
+				switch (active) {
+					case 0: // Nothing
+						map.removeLayer(graticuleLayer);
+						break;
+					case 1: // Track, reticule & center to the position / orientation
+						map.addLayer(graticuleLayer);
+						// case 2: Track & display reticule
 				}
 			}
 		}),
@@ -1242,38 +1236,26 @@ function controlGPS(options) {
 			if (!graticule.getGeometry()) // Only once the first time the feature is enabled
 				view.setZoom(17); // Zoom on the area
 
-			view.setCenter(gps.position);
+			if (button.active == 1)
+				view.setCenter(gps.position);
 
-			// Redraw the graticule
+			// Draw the graticule
 			graticule.setGeometry(new ol.geom.GeometryCollection([
 				gps.accuracyGeometry, // The accurate circle
 				new ol.geom.MultiLineString([ // The graticule
-					[
-						[gps.position[0], gps.position[1]],
-						[gps.position[0], gps.position[1] - far],
-					],
-					[
-						[gps.position[0], gps.position[1]],
-						[gps.position[0] - far, gps.position[1]],
-					],
-					[
-						[gps.position[0], gps.position[1]],
-						[gps.position[0] + far, gps.position[1]],
-					],
+					[add2(gps.position, [-far, 0]), add2(gps.position, [far, 0])],
+					[gps.position, add2(gps.position, [0, -far])],
 				]),
 			]));
 			northGraticule.setGeometry(new ol.geom.GeometryCollection([
-				new ol.geom.MultiLineString([ // Color north in red
-					[
-						[gps.position[0], gps.position[1]],
-						[gps.position[0], gps.position[1] + far],
-					],
-				]),
+				new ol.geom.LineString( // Color north in red
+					[gps.position, add2(gps.position, [0, far])]
+				),
 			]));
 
 			// Map orientation (Radians and reverse clockwize)
 			//TODO GPS keep orientation when stop gps tracking
-			if (compas.absolute)
+			if (compas.absolute && button.active == 1)
 				view.setRotation(compas.heading, 0); // Use magnetic compas value
 			/* //TODO GPS Firefox use delta if speed > ??? km/h
 					compas.absolute ?
@@ -1286,6 +1268,9 @@ function controlGPS(options) {
 			if (options && typeof options.callBack == 'function') // Default undefined
 				options.callBack(gps.position);
 		}
+	}
+	function add2(a, b) {
+		return [a[0] + b[0], a[1] + b[1]];
 	}
 	return button;
 }
@@ -1358,6 +1343,7 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
+//TODO BUG <rte><rtept ...
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
@@ -1524,7 +1510,7 @@ function layerEdit(o) {
 			const control = c(Object.assign({
 				group: layer,
 				layer: layer,
-				activeButtonBackgroundColor: '#ef3',
+				buttonBackgroundColors: ['white', '#ef3'],
 				source: source,
 				style: escapedStyle(options.styleOptions, options.editStyleOptions),
 				activate: function(active) {
@@ -1869,3 +1855,6 @@ function layersCollection(keys) {
 		'Neutre': new ol.layer.Tile()
 	};
 }
+
+//TODO BEST collect all languages in a single place
+//TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.
