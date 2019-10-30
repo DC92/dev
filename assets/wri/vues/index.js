@@ -1,16 +1,4 @@
-<?php
 // Script lié à la page d'acceuil
-// Ce fichier ne doit contenir que du code javascript destiné à être inclus dans la page
-// $vue contient les données passées par le fichier PHP
-
-/*TODO intégration WRI
-Ajouter myol
-Supprimer /leaflet/...
-Supprimer /vues/include/...
-*/
-?>
-
-// Crée la carte
 var map = new ol.Map({
 	target: 'carte-accueil',
 	controls: [new ol.control.Attribution({

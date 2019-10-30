@@ -106,8 +106,8 @@ chemineurLayer = layerVectorURL({
 /**
  * EXAMPLE
  */
-var marqueur = marker('http://www.refuges.info/images/cadre.png', 'marqueur'),
-	viseur = marker('http://www.refuges.info/images/viseur.png', 'viseur', null, true),
+var marqueur = layerMarker('http://www.refuges.info/images/cadre.png', 'marqueur'),
+	viseur = layerMarker('http://www.refuges.info/images/viseur.png', 'viseur', null, true),
 	overlays = [
 		layerPointsWri({
 			selectorName: 'wri-poi'

@@ -46,7 +46,6 @@ else // le point est valide
     $vue->lien_wiki_explication_type=lien_wiki("fiche-".replace_url($point->nom_type));
     $vue->lien_wiki_explication_geo=lien_wiki("geo-uri");
     $vue->titre = "$vue->nom_debut_majuscule $point->altitude m ($point->nom_type)";
-    $vue->description = protege("fiche d'information sur : $vue->nom_debut_majuscule, $point->nom_type, altitude $point->altitude avec commentaires et photos");
     $vue->lien_explication_publicite=lien_wiki("publicite");
     
     if ($point->polygones)
@@ -60,14 +59,8 @@ else // le point est valide
             }
         }
     if ($point->modele!=1)
-    $vue->forum_point = infos_point_forum ($point);
-    $vue->forum_point->post_text_propre = bbcode2html (preg_replace ('/<[^>]*>/i', '', $vue->forum_point->post_text));
-
-    //FIXME : Bon, C pa BO mais ça marche pour l'instant ! On passe temporairement en timezone Paris pour décoder l'heure du forum
-    // Pas sûr que ça marche encore en heure d'hiver !
-    date_default_timezone_set('Europe/Paris');
-    $vue->forum_point->date_humaine=strftime ('%A %e %B %Y à %H:%M',$vue->forum_point->post_time);
-    date_default_timezone_set('UTC');
+      $vue->forum_point = infos_point_forum ($point);
+    $vue->lienforum=$config_wri['forum_refuge'].$point->topic_id;
 
     $conditions_commentaires = new stdClass();
     $conditions_commentaires->ids_points = $id_point;
@@ -100,29 +93,13 @@ else // le point est valide
                 }
             }
             
-        /*********** Inclusion des librairies liées à Openlayers ***/
-        function url_ol ($nom) {
-            global $config_wri;
-            return $config_wri['url_chemin_ol'].$nom.'?'.filemtime($config_wri['chemin_ol'].$nom);
-        }
-        // Distrib Openlayers
-        $vue->css           [] = url_ol('ol/ol.css');
-        $vue->java_lib_foot [] = url_ol('ol/ol.js');
-        /*
-        // Recherche par nom
-        $vue->css           [] = url_ol('geocoder/ol-geocoder.min.css');
-        $vue->java_lib_foot [] = url_ol('geocoder/ol-geocoder.js');
-        */
-
-        // Proj4 projection suisse
-        $vue->java_lib_foot [] = url_ol('proj4/proj4-src.js');
-
-        // Librairie perso GitHub/Dominique92/MyOl
-        $vue->css           [] = url_ol('myol.css');
-        $vue->java_lib_foot [] = url_ol('myol.js');
-
         /*********** Détermination de la carte à afficher ***/
         $vue->mini_carte=TRUE;
+		$vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
+		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
+		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4-src.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4-src.js');
+		$vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
+		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
         $vue->vignette = param_cartes ($point);
     }
 
@@ -138,12 +115,13 @@ else // le point est valide
         $vue->lien_modification=TRUE;
             
     /*********** Préparation des infos complémentaires (c'est à dire les attributs du bas de la fiche) ***/
-    // Construction du tableau qui sera lu, ligne par ligne par le modele pour être affiché
+    // Construction du tableau qui sera lu, ligne par ligne par la vue pour être affiché
+    // On pourrait détailler en html chaque propriété entourée par un if (propriété = valide), mais ça fait beaucoup de redondance, alors ainsi, je factorise au détriment d'un peu de lisibilité
     
-    // Voici tous ceux qui nous intéresse 
-    // FIXME: une méthode de sioux doit exister pour se passer d'une liste en dure, comme par exemple récupérer 
+    // Voici tous ceux qui nous intéressent
+    // FIXME: une méthode de sioux doit exister pour se passer d'une liste en dure, comme par exemple récupérer
     // ça directement de la base, mais bon... usine à gaz non ? un avis ? -- sly
-    $champs=array_merge(array('places_matelas'),$config_wri['champs_binaires_points'],array('site_officiel'));
+    $champs=array_merge($config_wri['champs_entier_ou_sait_pas_points'],$config_wri['champs_trinaires_points'],array('site_officiel'));
    
     foreach ($champs as $champ) 
     {
@@ -158,12 +136,8 @@ else // le point est valide
                         $val=array('valeur'=> '', 'lien' => $vue->point->$champ, 'texte_lien'=> $vue->nom_debut_majuscule);
                     break;
                    
-                case 'places_matelas':
-                    if($point->$champ == -1)
-                        $val=array('valeur'=> 'Sans');
-                    elseif($point->$champ === 0)
-                        $val=array('valeur'=> 'Avec, en nombre inconnu');
-                    elseif($point->$champ === NULL )
+                case 'places_matelas' : case 'places' :
+                    if($point->$champ === NULL )
                         $val=array('valeur'=> '<strong>Inconnu</strong>');
                     else
                         $val=array('valeur'=> $point->$champ);
@@ -202,7 +176,7 @@ else // le point est valide
         {
             // l'internaute, en cliquant ici va nous donner ce qu'il pense de ce commentaire
             $commentaire->lien_commentaire = "/avis_internaute_commentaire/$commentaire->id_commentaire/";
-            $commentaire->texte_lien_commentaire = 'Que pensez vous de ce commentaire ?';
+            $commentaire->texte_lien_commentaire = 'Info périmée ?';
         }
         
         // Si, selon la base une photo existe, on va l'afficher

@@ -6,11 +6,6 @@ Des critères tels que 'refuges', villes, apparaissent au dessus d'un fond de ca
 La page ainsi préparée comporte un script Java permettant la sélection des points chauds ("ex: refuges") de la carte
 et renvoi vers un lien sur clic souris. Le déplacement de la souris sur le fond de carte provoque l'affichage des coordonnées du point.
 
-Contient le code PHP de la page
-Le code html est dans /vues/*.html
-Le code javascript est dans /vues/*.js
-Les variables sont passées dans l'objet $vue->...
-
 Concept de Zone et Massifs :
 Massif (1): classique : un poly qui entoure tous les points, possibilité de jouer avec le panel de gauche
 Zone  (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cliquer pour aller sur un massif. comme l'ancienne page massifs.

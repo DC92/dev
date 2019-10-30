@@ -1,7 +1,6 @@
 // Contient les déclarations communes aux cartes
 
 /* Super zoom pour les photos aériennes */
-/*
 L.BingLayer.prototype.options.maxNativeZoom = 18;
 L.BingLayer.prototype.options.maxZoom = 21;
 
@@ -11,11 +10,9 @@ L.TileLayer.OSM.OTP = L.TileLayer.OSM.extend({
 		subAttribution: '<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 	}
 });
-*/
 
 // Couches de base
 <?if (strstr('nav|point',$vue->type)) {?>
-/*
 if (typeof L.OSOpenSpace.TileLayer != 'undefined')
 	L.OSOpenSpace.TileLayer.prototype.options.crs = L.OSOpenSpace.CRS; // Assign CRS to OS-UK layer options
 
@@ -23,7 +20,6 @@ var baseLayers = {
 	'Refuges.info':new L.TileLayer.OSM.MRI(),
 	'OSM fr':      new L.TileLayer.OSM.FR(),
 	'OpenTopoMap': new L.TileLayer.OSM.OTP(),
-	'Outdoors':    new L.TileLayer.OSM.Outdoors({k: '<?=$config_wri['thunderforest_key']?>'}),
 	'IGN':         new L.TileLayer.IGN({k: '<?=$config_wri['ign_key']?>', l:'GEOGRAPHICALGRIDSYSTEMS.MAPS'}),
 	'IGN Express': new L.TileLayer.IGN({k: '<?=$config_wri['ign_key']?>', l:'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'}),
 	'SwissTopo':   new L.TileLayer.SwissTopo({l:'ch.swisstopo.pixelkarte-farbe'}),
@@ -32,11 +28,9 @@ var baseLayers = {
 	'Photo Bing':  new L.BingLayer('<?=$config_wri['bing_key']?>', {type:'Aerial'}),
 	'Photo IGN':   new L.TileLayer.IGN({k: '<?=$config_wri['ign_key']?>', l:'ORTHOIMAGERY.ORTHOPHOTOS'})
 };
-*/
 <?}?>
 
 // Points d'interêt refuges.info
-/*
 L.GeoJSON.Ajax.wriPoi = L.GeoJSON.Ajax.extend({
 	options: {
 		urlGeoJSON: '<?=$config_wri['sous_dossier_installation']?>api/bbox',
@@ -65,11 +59,9 @@ L.GeoJSON.Ajax.wriPoi = L.GeoJSON.Ajax.extend({
 		}
 	}
 });
-*/
 
 // Points d'interêt via chemineur.fr
 <?if (strstr('nav',$vue->type)) {?>
-/*
 L.GeoJSON.Ajax.chem = L.GeoJSON.Ajax.extend({
 	options: {
 		urlGeoJSON: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php',
@@ -93,12 +85,10 @@ L.GeoJSON.Ajax.chem = L.GeoJSON.Ajax.extend({
 		}
 	}
 });
-*/
 <?}?>
 
 // Points d'interêt OSM overpass
 <?if (strstr('nav|point',$vue->type)) {?>
-/*
 L.GeoJSON.Ajax.OSM.services = L.GeoJSON.Ajax.OSM.extend({
 	options: {
 		urlGeoJSON: '<?=$config_wri['overpass_api']?>',
@@ -172,5 +162,5 @@ L.GeoJSON.Ajax.OSM.services = L.GeoJSON.Ajax.OSM.extend({
 			};
 		}
 	}
-});*/
+});
 <?}?>

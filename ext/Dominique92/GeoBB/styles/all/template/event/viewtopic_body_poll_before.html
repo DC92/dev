@@ -27,7 +27,7 @@
 			});
 
 		<!-- IF GEO_MAP_TYPE == 'Point' -->
-			var marqueur = marker('{EXT_DIR}images/cadre.png', 'marqueur'),
+			var marqueur = layerMarker('{EXT_DIR}images/cadre.png', 'marqueur'),
 				pos = marqueur.getPoint().getCoordinates();
 			map.addLayer(marqueur);
 

@@ -48,8 +48,10 @@ $config_wri['url_api']=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].
 $config_wri['forum_refuges']=4;
 
 // Paramètrage des cartes vignettes des fiches de points
-$config_wri['chemin_ol']=$config_wri['racine_projet'].'myol/';
-$config_wri['url_chemin_ol']=$config_wri['sous_dossier_installation'].'myol/';
+$config_wri['chemin_leaflet']=$config_wri['racine_projet'].'leaflet/';
+$config_wri['url_chemin_leaflet']=$config_wri['sous_dossier_installation'].'leaflet/';
+$config_wri['chemin_ol']=$config_wri['racine_projet'].'ol/';
+$config_wri['url_chemin_ol']=$config_wri['sous_dossier_installation'].'ol/';
 
 // En version opérationnelle, deviendra www.refuges.info, mais permet aux zones de dev sur d'autres domaine d'être plus dynamique
 $config_wri['nom_hote']=$_SERVER['HTTP_HOST'];
@@ -66,6 +68,9 @@ $config_wri['largeur_max_vignette']=140;
 $config_wri['hauteur_max_vignette']=140*3/4;
 $config_wri['qualite_jpeg']=80;
 
+/********** posts dans la page points ************/
+  $config_wri['point_posts_nb_max_post'] = 4;
+  $config_wri['point_posts_lon_max_text'] = 250;
 
 /********** id internes liés à certains éléments remarquables de la base. Merci d'éviter les numéros en dur dans le code, car si ça doit changer, c'est jeu de la fourmis ************/
 // sly  27/04/06 je préfère me baser sur l'id pour le retrouver plutôt que son type ( que je viens d'ailleurs de modifier )
@@ -87,11 +92,11 @@ $config_wri['id_gite_etape']=9;
 $config_wri['point_d_eau']=23;
 $config_wri['id_batiment_en_montagne']=28;
 
-// Champs valables pour les points classés par spécificité (permet de dynamiquement gérer le formulaire de saisie et d'affichage)
+// Champs valables pour les points classés par spécificité (permet de dynamiquement gérer en partie le formulaire de saisie et d'affichage)
 // FIXME sly 13/08/2013 : on pourrait presque aller les chercher dans la base directement, mais on perdrait la possiblité de changer l'ordre facilement. A voir le pour et le contre
-$config_wri['champs_binaires_points']=array('couvertures','manque_un_mur','eau_a_proximite','latrines','poele','cheminee','bois_a_proximite');
-$config_wri['champs_choix_multiples_points']=array_merge(array('conditions_utilisation','places_matelas'),$config_wri['champs_binaires_points']);
-$config_wri['champs_simples_points']=array_merge(array("en_attente","nom","places","remark","proprio","id_point_type","id_createur","modele","id_point_gps",'places_matelas','nom_createur'),$config_wri['champs_choix_multiples_points']);
+$config_wri['champs_trinaires_points']=array('couvertures','manque_un_mur','eau_a_proximite','latrines','poele','cheminee','bois_a_proximite'); // ceux là sont des champs ou ne sait pas/oui/non sont possible (traiter dynamiquement dans une boucle)
+$config_wri['champs_entier_ou_sait_pas_points']=array('places','places_matelas');
+$config_wri['champs_simples_points']=array_merge(array('conditions_utilisation','places','places_matelas',"en_attente","nom","acces","remark","proprio","id_point_type","id_createur","modele","altitude","id_type_precision_gps",'nom_createur'),$config_wri['champs_trinaires_points'],$config_wri['champs_entier_ou_sait_pas_points']);
 
 // c'est l'id pour lequel les coordonnées gps données sont volontairement fausses
 $config_wri['id_coordonees_gps_fausses']=5;

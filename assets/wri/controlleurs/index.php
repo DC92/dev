@@ -1,4 +1,4 @@
-<?php
+<?php 
 /*******************************************************************************
 Ecran d'accueil
 
@@ -12,20 +12,11 @@ require_once ("nouvelle.php");
 require_once ("polygone.php");
 
 $vue->titre = 'Carte et informations sur les refuges, cabanes et abris de montagne';
-$vue->description='Base de donnee de refuges, abris, gites, sommets et divers points en montagne avec cartes satellite, descriptions et coordonnees GPS';
 
-// Inclusion des librairies liées à Openlayers
-function url_ol ($nom) {
-	global $config_wri;
-	return $config_wri['url_chemin_ol'].$nom.'?'.filemtime($config_wri['chemin_ol'].$nom);
-}
-// Distrib Openlayers
-$vue->css           [] = url_ol('ol/ol.css');
-$vue->java_lib_foot [] = url_ol('ol/ol.js');
-
-// Librairie perso GitHub/Dominique92/MyOl
-$vue->css           [] = url_ol('myol.css');
-$vue->java_lib_foot [] = url_ol('myol.js');
+$vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
+$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
+$vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
+$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
 
 $vue->fond_carte_par_defaut= $config_wri['carte_base'];
 

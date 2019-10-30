@@ -52,7 +52,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		'Google': layerGoogle('m'),
 		'Photo Google': layerGoogle('s'),
 		'Photo Bing': layerBing(keys.bing,'Aerial'),
-		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS')
+		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 	};
 
 // Load the map when the map DIV is intialised
@@ -61,39 +61,39 @@ window.onload = function() {
 		target: 'map',
 		controls: [
 			controlLayersSwitcher({
-				baseLayers: baseLayers
+				baseLayers: baseLayers,
 			}),
 			controlPermalink({
-				visible: false
+				visible: false,
 			}),
 			new ol.control.ScaleLine(),
 			new ol.control.Attribution({
-				collapseLabel: '>'
+				collapseLabel: '>',
 			}),
 			new ol.control.MousePosition({
 				coordinateFormat: ol.coordinate.createStringXY(5),
 				projection: 'EPSG:4326',
 				className: 'ol-coordinate',
-				undefinedHTML: String.fromCharCode(0)
+				undefinedHTML: String.fromCharCode(0),
 			}),
 			new ol.control.Zoom({
-				zoomOutLabel: '-'
+				zoomOutLabel: '-',
 			}),
 			new ol.control.FullScreen({
 				label: '',
 				labelActive: '',
-				tipLabel: 'Plein écran'
+				tipLabel: 'Plein écran',
 			}),
 			geocoder(),
 			controlGPS(),
 			controlLoadGPX(),
 			controlButton({
-				label: '?',
+				className: 'ol-help',
 				title: help,
 				activate: function(active) {
 					alert(this.title);
 				}
-			})
-		]
+			}),
+		],
 	});
 };

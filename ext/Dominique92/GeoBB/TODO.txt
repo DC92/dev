@@ -126,9 +126,11 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+gps.php "hors connexion" => "hors réseau"
+Ajouter les 3 fichiers edit.*
+Remettre meteo.js au niveau /vues sinon dans poit.js
 Demander une modification => Demander une modification des informations de la fiche
 Hover logo phpbb => devrait rester fond coloré
-hors connexion => hors réseau
 /gps Mettre le commentaire dans service_worker
 /gps Relever la couche IGN
 Méteo ne marche pas sur mobile (status 0 / vide)

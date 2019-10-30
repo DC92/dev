@@ -67,7 +67,7 @@
 		});
 
 		<!-- IF GEO_MAP_TYPE == 'Point' -->
-			editable = marker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
+			editable = layerMarker('{EXT_DIR}images/viseur.png', 'editable', permaCenter, true);
 			map.addLayer(editable);
 			map.getView().fit(editable.getSource().getExtent());
 			map.getView().setZoom(15);

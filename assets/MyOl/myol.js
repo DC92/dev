@@ -9,6 +9,9 @@
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 /* jshint esversion: 6 */
+//TODO WRI NAV PRC + C2C direct
+//TODO WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
+//TODO WRI EDIT édition massifs sans couper
 
 //HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
@@ -699,7 +702,7 @@ layerOverpass = function(o) {
  * Marker
  * Requires JSONparse, HACK map_, proj4.js for swiss coordinates
  */
-function marker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
+function layerMarker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
 	const format = new ol.format.GeoJSON();
 	let eljson, json, elxy;
 
@@ -1053,6 +1056,7 @@ function controlLengthLine() {
 		});
 	};
 
+	//TODO BEST calculate distance to the ends
 	function calculateLength(feature) {
 		// Display the line length
 		if (feature) {

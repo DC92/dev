@@ -1,6 +1,6 @@
 <?php
 /***********************************************************************************************
-La seule et unique feuille de style CSS du site refuges.info
+La seule est unique feuille de style CSS du site refuges.info
 
 Pourquoi une feuille de style en .php ?
 - le but c'est de faire un style dynamique selon la période de l'année pour changer les couleurs ;-) 
@@ -85,9 +85,7 @@ switch ($periode)
 }
 /* Zones masquées */
 #phpbb .headerbar,
-#phpbb .navbar .avatar {
-	display: none;
-}
+#phpbb .navbar .avatar,
 /* Personnalisation des couleurs */
 #phpbb .navbar,
 #phpbb #basdepage {
@@ -372,13 +370,6 @@ A:visited {
 	border: 2px double red;
 	background-color: yellow;
 	padding: 10px;
-}
-
-/*=========ADRESSES MAILS CODEES==========*/
-.mail {
-  unicode-bidi: bidi-override;
-  direction: rtl;
-  cursor: pointer;
 }
 
 /*=========INFOBULLES===========*/
@@ -666,7 +657,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   .menu UL LI UL {
     padding-left: 10px;
   }
-  #accueil-photos {
+  #accueil-photos { /* DOM : masque les photos qui sont trop grosses sur la page accueil en responsive */
     display: none;
   }
 }
@@ -758,6 +749,18 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     left:-110px;
     top:2px;
   }
+  .point_forum blockquote {
+    margin-block-start: 0;
+  }
+  .point_forum blockquote * {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+  .point_forum em {
+    color: black !important;
+  }
 
 /*==================================================================*/
 /* LA METEO DES PAGES POINTS                                        */
@@ -780,6 +783,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 }
 #meteo IMG {
 	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }
 #meteo P {
 	margin: 0;
@@ -789,9 +794,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 /*==================================================================*/
 /*                              CARTES                              */
 /*==================================================================*/
-/* utilisé par TOUTES les images cartes */
-.carte {
-  background-color: #ccc;
+.carte /* utilisé par TOUTES les images cartes */
+ {
   background-image: url(../images/sablier.png);
   background-position: center center;
   background-repeat: no-repeat;
@@ -807,9 +811,60 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     width: 100vw;
     height: 90vw;
   }
+  #accueil-photos {
+    display: none;
+  }
 }
 
-/* Carte de la page des points */
+/* Carte NAV présentation mobile verticale */
+#carte-nav {
+  width: 75%; /* Support of non CSS3 browsers (Safari on Windows)*/
+  height: 75%;
+  width: 96vw;
+  height: 96vw;
+  max-height: calc(100% - 65px); /* Pour ne pas trop déborder en bas */
+  margin: 0 0.8%;
+}
+#selecteur-carte-nav {
+  padding-left: 1px;
+}
+#selecteur-carte-nav P {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+/* Menu deplié */
+@media screen and (min-width: 641px) and (min-device-height: 361px) {
+  #carte-nav {
+    max-height: calc(100% - 126px);
+  }
+}
+/* Carte NAV présentation mobile horizontale */
+@media screen and (min-aspect-ratio: 1/1) and (min-width: 365px) and (max-device-height: 360px) {
+  #carte-nav {
+    float: right;
+    width: 67%;
+    max-height: calc(100% - 75px);
+  }
+  #selecteur-carte-nav {
+    display: table-cell;
+    width: 33%;
+  }
+}
+/* Carte NAV présentation écrans */
+@media screen and (min-width: 800px) {
+  #carte-nav {
+    float: right;
+    width: 75vw;
+    height: 75vw;
+  }
+  #selecteur-carte-nav {
+    display: table-cell;
+    width: 33%;
+    padding-left: 5px;
+  }
+}
+
+/* Carte de la page des points mobiles */
 #carte-point {
   width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
   height: 380px;
@@ -818,6 +873,14 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   min-width: 300px;
   max-height: 400px;
 }
+/* Limite de largeur de l'attribution pour ne pas masquer l'échèle */
+#carte-point .leaflet-control-attribution {
+  max-width: 340px;
+}
+#carte-edit .leaflet-control-attribution {
+  max-width: 390px;
+}
+/* Carte de la page des points écrans */
 @media screen and (min-width: 641px) {
   #container-carte-point {
     float: right;
@@ -828,3 +891,124 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   }
 }
 
+/* Spécificité carte des zones */
+.nav_zone {
+  width: 100% !important;
+}
+/* Carte formulaire de modification */
+#carte-edit {
+  float: right;
+  width: 95vw;
+  height: 95vw;
+  max-height: 450px; 
+}
+/* Carte formulaire de modification présentation écrans */
+@media screen and (min-width: 800px) {
+  #carte-edit {
+    width: 450px; 
+    height: 450px; 
+  }
+}
+
+/* Cartes présentation full screen */
+.leaflet-fullscreen-on {
+  max-height: 100% !important;
+}
+@media screen and (device-width: 100vw) and (device-height: 100vh) { /* Cas du full screen / nécéssaire pour chrome */
+	#carte-nav, #carte-point, #carte-edit {
+		max-width: 100% !important;
+		max-height: 100% !important;
+	}
+}
+
+/* Etiquette dans les cartes */
+.nav-services,
+.carte-service-etiquette .leaflet-rrose-content-wrapper,
+.carte-service-etiquette .leaflet-rrose-tip {
+	background-color: #def;
+}
+.nav-sites,
+.carte-site-etiquette .leaflet-rrose-content-wrapper,
+.carte-site-etiquette .leaflet-rrose-tip {
+	background-color: #efd;
+}
+
+#check-types {
+	float: right;
+	position: relative;
+	right: -10px;
+}
+#check-types input {
+	position: relative;
+	top: 3px;
+}
+/* Couche OSM OVERPASS */
+#ajax-poi-status *,
+#ajax-osm-status *,
+#ajax-poiCHEM-status *,
+#ajax-poiPRC-status *,
+#ajax-poiC2C-status * {
+	display: none;
+}
+.ajax-none .ajax-nav-none,
+.ajax-wait .ajax-nav-wait,
+.ajax-zoom .ajax-nav-zoom,
+.ajax-some .ajax-nav-some,
+.ajax-zero .ajax-nav-zero,
+.ajax-too .ajax-nav-too,
+.ajax-some .ajax-point-some {
+	display: initial !important;
+}
+.ajax-nav-some {
+	color:green;
+}
+.ajax-nav-wait,
+.ajax-nav-zero {
+	color:blue;
+}
+.ajax-nav-zoom,
+.ajax-nav-too,
+.ajax-nav-error {
+	color:red;
+}
+
+.bouton-supprimer {
+	color: red;
+	background-color: yellow;
+	padding: 4px;
+}
+
+/* Format d'impression des cartes */
+@page {
+	margin: 0; 
+}
+@media print {
+	#entete,
+	#menu-normal,
+	#menu-scroll,
+	#fin-entete,
+	#basdepage,
+	.leaflet-control,
+	.leaflet-control-attribution > a:first-child {
+		display: none;
+	}
+	.noprint {
+		display: none !important;
+	}
+	html, body,
+	#carte-nav {
+		position: absolute;
+		top: 0;
+		left: 0;
+		margin: 0;
+		width: 100%;
+		height: 100%;
+		max-height: 100%;
+	}
+	.leaflet-control-attribution {
+		display: block;
+	}
+	.leaflet-control-attribution::first-letter {
+		color: transparent;
+	}
+}
