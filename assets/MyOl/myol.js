@@ -382,10 +382,11 @@ function layerVectorURL(o) {
 
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
-	format.readFeatures = function(s, o) {
+	format.readFeatures = function(source, options) {
 		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receive request
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, s, o);
+		JSONparse(source); // Report jspn error if any
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options);
 	};
 
 	// Checkboxes to tune layer parameters

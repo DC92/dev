@@ -1,12 +1,47 @@
-<?// Code Javascript de la page des cartes
+// Edition des massifs
+var map = new ol.Map({
+	target: 'carte-nav',
+	view: new ol.View({
+		center: ol.proj.fromLonLat([2,47]),
+		zoom: 13,
+	}),
+	controls: [
+		controlLayersSwitcher({
+			baseLayers: {
+				'Refuges.info': layerOSM(
+					'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
+					'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+				),
+				'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+				'OpenTopoMap': layerOSM(
+					'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+					'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+				),
+				'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+				'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+				'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+				'Autriche': layerKompass('KOMPASS Touristik'),
+				'Espagne': layerSpain('mapa-raster', 'MTN'),
+				'Photo Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
+				'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
+			},
+		}),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '',
+			labelActive: '',
+			tipLabel: 'Plein écran',
+		}),
+		controlDownloadGPX(),
+		controlPrint(),
+		new ol.control.Attribution({
+			collapsible: false, // Attribution always open
+		}),
+	],
+});
 
-// Ce fichier ne doit contenir que du code javascript destiné à être inclus dans la page
-// $vue contient les données passées par le fichier PHP
-// $config_wri les données communes à tout WRI
 
-include ($config_wri['racine_projet'].'vues/includes/cartes.js');
-?>
-
+/*
 var map,
 	wriPoi, wriMassif, poiLayer, massifLayer,
 	poiCHEM, poiOVER, poiPRC, poiC2C;
@@ -223,7 +258,6 @@ for (var c in extLayersCheckbox) {
 		maj_autres_site(ce, extLayersCheckbox[c]);
 }
 
-/*************************************************************************************************************************************/
 function switch_massif (combo) {
     if (combo.checked) {
         document.getElementById ('titrepage') .firstChild.nodeValue = "<?echo addslashes($vue->titre)?>"; 
@@ -238,7 +272,6 @@ function switch_massif (combo) {
     }
 }
 
-/*************************************************************************************************************************************/
 function maj_poi (c) {
 <?php if (!$vue->mode_affichage == 'edit') {?>
     // Calcule l'argument d'extration filtre de points
@@ -270,10 +303,10 @@ function maj_poi (c) {
 <?}?>
 }
 
-/*************************************************************************************************************************************/
 function maj_autres_site(e,l) {
 	if(e.checked)
 		map.addLayer(l);
 	else
 		map.removeLayer(l);
 }
+*/

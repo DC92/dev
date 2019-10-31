@@ -1,8 +1,18 @@
 <?php
+/**
+ * This software is a progressive web application (PWA)
+ * It's composed as a basic web page but includes many services as
+ * data storage that make it as powerfull as an installed mobile application
+ * See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
+
+ * The map is based on https://openlayers.org/
+ * With some personal additions https://github.com/Dominique92/MyOl
+*/
+
 header('Content-Type: application/javascript');
 
-// The app reloads when the service-worker file changes
 // Set no cache for immediate check of updating
+// (The app reloads when the service-worker file changes)
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
 // List file & md5 for automatic updating if any file change
