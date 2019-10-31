@@ -126,6 +126,10 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+reprendre config_privee.php.modele
+voir les ' en format word
+keys dans le /gps !!!
+keys sous forme json dans le config
 FAIT, à vérifier
 	gps.php "hors connexion" => "hors réseau"
 	/gps Mettre le commentaire dans service_worker

@@ -35,7 +35,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles\n' +
 	'- Recommencez avec les couches de cartes que vous voulez mémoriser\n' +
 	'- Allez sur le terrain et cliquez sur l\'icône "MyGPS"\n' +
-	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ⇑\n' +
+	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ▲\n' +
 	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur quelques jours\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
@@ -71,11 +71,9 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		'Photo Bing': layerBing(keys.bing, 'Aerial'),
 		'Google': layerGoogle('m'),
 		'Photo Google': layerGoogle('s'),
-	};
+	},
 
-new ol.Map({
-	target: 'map',
-	controls: [
+	controls = [
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
@@ -110,5 +108,9 @@ new ol.Map({
 				alert(this.title);
 			},
 		}),
-	],
+	];
+
+new ol.Map({
+	target: 'map',
+	controls: controls,
 });

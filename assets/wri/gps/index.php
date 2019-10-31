@@ -20,18 +20,15 @@
 	<script src="../ol/myol.js?<?=filemtime('../ol/myol.js')?>"></script>
 
 	<!-- This app -->
-	<link rel="manifest" href="manifest.json?<?=filemtime('manifest.json')?>">
-	<!-- for service-worker list ref="index.php" for -->
-	<!-- for service-worker list ref="service-worker.js.php" -->
+	<link rel="manifest" href="manifest.json">
+	<script defer="defer" src="index.js?<?=filemtime('index.js')?>"></script>
+	<!-- ref="index.php" (for service-worker list) -->
+	<!-- ref="service-worker.js.php" (for service-worker list) -->
+
 	<script>
-		var dateGen = '<?=date('ymd-Hi')?>',
-			keys = {
-			ign: '<?=$config_wri['ign_key']?>',
-			thunderforest: '<?=$config_wri['thunderforest_key']?>',
-			bing: '<?=$config_wri['bing_key']?>'
-		};
+		var keys = <?=json_encode($config_wri['keys'])?>,
+			dateGen = '<?=date('ymd-Hi')?>';
 	</script>
-	<script src="index.js?<?=filemtime('index.js')?>"></script>
 
 	<style>
 		html, body {
