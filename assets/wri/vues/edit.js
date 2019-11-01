@@ -1,45 +1,59 @@
 // Edition des massifs
-var map = new ol.Map({
-	target: 'carte-nav',
-	view: new ol.View({
-		center: ol.proj.fromLonLat([2,47]),
-		zoom: 13,
+const baseLayers = {
+		'Refuges.info': layerOSM(
+			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
+			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+		),
+		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OpenTopoMap': layerOSM(
+			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			'<a href="https://opentopomap.org">OpenTopoMap</a> '+
+			'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+		),
+		'IGN': layerIGN('<?=$config_wri['ign_key ']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN Express': layerIGN('<?=$config_wri['ign_key ']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Autriche': layerKompass('KOMPASS Touristik'),
+		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Photo Bing': layerBing('<?=$config_wri['bing_key ']?>', 'Aerial'),
+		'Photo IGN': layerIGN('<?=$config_wri['ign_key ']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
+	},
+	editeur = layerEdit({
+		geoJsonId: 'edit-json',
+		wcontrols: [
+			controlModify,
+			controlDrawLine,
+			controlDrawPolygon,
+		],
+//		snapLayers: [chemineurLayer],
+		wstyleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 5,
+			}),
+		},
+		weditStyleOptions: { // Hover / modify / create
+			image: new ol.style.Circle({
+				radius: 5,
+				fill: new ol.style.Fill({
+					color: 'red',
+				}),
+			}),
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 5,
+			}),
+		},
 	}),
-	controls: [
-		controlLayersSwitcher({
-			baseLayers: {
-				'Refuges.info': layerOSM(
-					'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-					'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-				),
-				'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-				'OpenTopoMap': layerOSM(
-					'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-					'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-				),
-				'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-				'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-				'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-				'Autriche': layerKompass('KOMPASS Touristik'),
-				'Espagne': layerSpain('mapa-raster', 'MTN'),
-				'Photo Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
-				'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
-			},
+	map = new ol.Map({
+		target: 'carte-nav',
+		view: new ol.View({center: ol.proj.fromLonLat([2, 47]),zoom: 13,
 		}),
-		new ol.control.Zoom(),
-		new ol.control.FullScreen({
-			label: '',
-			labelActive: '',
-			tipLabel: 'Plein écran',
+		overlays: [editeur
+		],
+		controls: controlsCollection({baseLayers: baseLayers,
 		}),
-		controlDownloadGPX(),
-		controlPrint(),
-		new ol.control.Attribution({
-			collapsible: false, // Attribution always open
-		}),
-	],
-});
-
+	});
 
 /*
 var map,
@@ -49,34 +63,17 @@ var map,
 // Les massifs ou contours de massifs
 massifLayer = new L.GeoJSON.Ajax(
 	'<?=$config_wri['sous_dossier_installation']?>api/polygones', {
-		argsGeoJSON: {
-			type_polygon: 1,
+		argsGeoJSON: {type_polygon: 1,
 <?if ($vue->mode_affichage == 'zone') {?>
-	// Affiche tous les massifs d'une zone (en différentes couleurs)
-			intersection: '<?=$vue->polygone->id_polygone?>',
-<?}else{?>
-			type_geom: 'polylines', // La surface à l'intérieur des massifs reste cliquable
+	// Affiche tous les massifs d'une zone (en différentes couleurs)intersection: '<?=$vue->polygone->id_polygone?>',
+<?}else{?>type_geom: 'polylines', // La surface à l'intérieur des massifs reste cliquable
 <?}
-if (!$vue->mode_affichage) {?>
-			massif: '<?=$vue->polygone->id_polygone?>', // Affiche le contour d'un seul massif 
-<?}?>
-			time: <?=time()?> // Inhibe le cache
+if (!$vue->mode_affichage) {?>massif: '<?=$vue->polygone->id_polygone?>', // Affiche le contour d'un seul massif 
+<?}?>time: <?=time()?> // Inhibe le cache
 		},
-		style: function(feature) {
-			return {
-				color: 'blue',
-				weight: 2,
-				fillOpacity: 0,
-<?if ($vue->mode_affichage == 'zone') {?>
-				popup: feature.properties.nom,
-				url: feature.properties.lien,
-				color: 'black',
-				weight: 1,
-				fillColor: feature.properties.couleur,
-				fillOpacity: 0.3,
-<?}?>
-				opacity: 0.6
-			}
+		style: function(feature) {return {	color: 'blue',	weight: 2,	fillOpacity: 0,
+<?if ($vue->mode_affichage == 'zone') {?>	popup: feature.properties.nom,	url: feature.properties.lien,	color: 'black',	weight: 1,	fillColor: feature.properties.couleur,	fillOpacity: 0.3,
+<?}?>	opacity: 0.6}
 		}
 	}
 );
@@ -120,15 +117,10 @@ poiOVER = new L.GeoJSON.Ajax.OSM.services();
 poiLayer = <?if ( $vue->polygone->id_polygone ) {?>wriMassif<?}else{?>wriPoi<?}?>; // Couche active
 
 map = new L.Map('carte-nav', {
-	layers: [
-			baseLayers[
-<?if ($vue->mode_affichage == 'zone') {?>
-				'Outdoors'
-<?}else{?>
-				'<?=$config_wri["carte_base"]?>'
-<?}?>
-			] || // Sinon le fond de carte par défaut
-			baseLayers[Object.keys(baseLayers)[0]], // Sinon la première couche définie
+	layers: [baseLayers[
+<?if ($vue->mode_affichage == 'zone') {?>	'Outdoors'
+<?}else{?>	'<?=$config_wri["carte_base"]?>'
+<?}?>] || // Sinon le fond de carte par défautbaseLayers[Object.keys(baseLayers)[0]], // Sinon la première couche définie
 		massifLayer
 	]
 });
@@ -140,10 +132,8 @@ var controlLayers = new L.Control.Layers(baseLayers).addTo(map);
 	new L.Control.Permalink.Cookies({
 		position: 'bottomright',
 		text:
-	<?if ($vue->mode_affichage == 'zone') {?>
-			'',
-	<?}else{?>
-			'Permalien',
+	<?if ($vue->mode_affichage == 'zone') {?>'',
+	<?}else{?>'Permalien',
 	<?}?>
 		layers: controlLayers
 	}).addTo(map);
@@ -178,13 +168,8 @@ new L.Control.Coordinates({
 
 	// Récupérations des points sous forme de fichier GPX
 	new L.Control.Click(
-		function () {
-			return wriPoi._getUrl() + '&format=gpx&nb_points=all';
-		}, {
-			title: "Obtenir les points de refuges.info visibles sur la carte\n"+
-					"Pour charger le fichier sur un GARMIN, utilisez Basecamp\n"+
-					"Atention: le fichier peut être gros pour une grande carte",
-			label: '&#8659;'
+		function () {return wriPoi._getUrl() + '&format=gpx&nb_points=all';
+		}, {title: "Obtenir les points de refuges.info visibles sur la carte\n"+		"Pour charger le fichier sur un GARMIN, utilisez Basecamp\n"+		"Atention: le fichier peut être gros pour une grande carte",label: '&#8659;'
 		}
 	).addTo(map);
 
@@ -207,42 +192,26 @@ new L.Control.Coordinates({
 
 		// Collecte les lonlat[] des polygones & polynines présents dans l'éditeur
 		var p = [];
-		for (f in geoJson.features)
-			if (geoJson.features[f].geometry.coordinates[0].length > 2) // Polygon
-				p.push(geoJson.features[f].geometry.coordinates);
-			else // Polyline
-				p.push([geoJson.features[f].geometry.coordinates]);
+		for (f in geoJson.features)if (geoJson.features[f].geometry.coordinates[0].length > 2) // Polygon	p.push(geoJson.features[f].geometry.coordinates);else // Polyline	p.push([geoJson.features[f].geometry.coordinates]);
 
 		// Referme chaque lonlat[] avant d'en faire des polygones
-		for (i in p)
-			for (j in p[i]) {
-				var pij0 = p[i][j][0],
-					pijn = p[i][j][p[i][j].length - 1];
-				if (pij0[0] != pijn[0] && pij0[1] != pijn[1])
-					p[i][j].push(p[i][j][0]);
-			}
+		for (i in p)for (j in p[i]) {	var pij0 = p[i][j][0],		pijn = p[i][j][p[i][j].length - 1];	if (pij0[0] != pijn[0] && pij0[1] != pijn[1])		p[i][j].push(p[i][j][0]);}
 
-		ele.value = JSON.stringify({
-			type: 'MultiPolygon',
-			coordinates: p
+		ele.value = JSON.stringify({type: 'MultiPolygon',coordinates: p
 		});
 	});
 
 	// Charge les traces importées dans l'éditeur
 	fl.loader.on('data:loaded', function(args) {
-		this._map.fire('draw:created', { // Rend la trace éditable
-			layer: args.layer
+		this._map.fire('draw:created', { // Rend la trace éditablelayer: args.layer
 		});
 	}, fl);
 
 	// Editeur et aide de l'éditeur
 	var edit = new L.Control.Draw.Plus({
-		draw: {
-			polygon: true,
-			polyline: true
+		draw: {polygon: true,polyline: true
 		},
-		edit: {
-			remove: true
+		edit: {remove: true
 		}
 	}).addTo(map);
 
@@ -281,12 +250,10 @@ function maj_poi (c) {
 
     type_points = '';
     for (var i=0; i < poitypes.length; i++) {
-		if (c && check_types.length)
-			poitypes[i].checked = check_types[0].checked;
+		if (c && check_types.length)poitypes[i].checked = check_types[0].checked;
         if (poitypes[i].checked)
             type_points += (type_points ? ',' : '') + poitypes[i].value;
-		else
-			allchecked = false;
+		elseallchecked = false;
 	}
 	check_types[0].checked = allchecked;
     // L'écrit dans un cookie pour se les rappeler au prochain affichage de cette page

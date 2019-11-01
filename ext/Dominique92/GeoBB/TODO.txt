@@ -126,13 +126,10 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
-reprendre config_privee.php.modele
-voir les ' en format word
-keys dans le /gps !!!
-keys sous forme json dans le config
-FAIT, à vérifier
-	gps.php "hors connexion" => "hors réseau"
-	/gps Mettre le commentaire dans service_worker
+/gps favicon 144px min
+Voir les ' en format word
+FAIT, à reprendre en GIT
+	Reprendre config_privee.php.modele
 	Ajouter les 3 fichiers edit.*
 	Ajouter tous les fichiers OL
 Voir si var map nécéssaire (point)

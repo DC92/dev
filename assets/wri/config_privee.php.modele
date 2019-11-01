@@ -16,13 +16,9 @@ $config_wri['base_pgsql']="test";
 // Par défaut, le fond de carte est maps.refuges.info, décommenter ça permet de changer le par défaut
 //$config_wri['carte_base'] = 'OpenTopoMap';
 
-// Infos privées qu'on ne veut pas divulger sur github et que vous devez remplir
-$config_wri['keys']=[
-  // IGN: http://professionnels.ign.fr/user
-  'ign' => '???',
-  // BING (MicroSoft): https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
-  'bing' => '???',
-];
+// Les clés des cartes sous contrat gratuit
+$config_wri['ign_key']='???'; // http://professionnels.ign.fr/user
+$config_wri['bing_key']='???'; // https://www.bingmapsportal.com
 
 // Le par défaut géré par sly pour l'association Openstreetmap France. Plus rapide en réponse de ~20%, mais leur serveur déconne trop souvent, et ça plante parfois
 //$config_wri['overpass_api']="http://api.openstreetmap.fr/oapi/interpreter";

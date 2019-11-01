@@ -52,14 +52,14 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 		),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'IGN': layerIGN(ign_key, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN Express': layerIGN(ign_key, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Google': layerGoogle('m'),
 		'Photo Google': layerGoogle('s'),
-		'Photo Bing': layerBing('Aerial', keys.bing),
-		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+		'Photo Bing': layerBing('Aerial', bing_key),
+		'Photo IGN': layerIGN(ign_key, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 	},
 
 	layerWRI = layerVectorURL({

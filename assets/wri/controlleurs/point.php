@@ -118,8 +118,8 @@ else // le point est valide
     // Construction du tableau qui sera lu, ligne par ligne par la vue pour être affiché
     // On pourrait détailler en html chaque propriété entourée par un if (propriété = valide), mais ça fait beaucoup de redondance, alors ainsi, je factorise au détriment d'un peu de lisibilité
     
-    // Voici tous ceux qui nous intéressent
-    // FIXME: une méthode de sioux doit exister pour se passer d'une liste en dure, comme par exemple récupérer
+    // Voici tous ce qui nous intéressent
+    // FIXME: une méthode de sioux doit exister pour se passer d'une liste en dur, comme par exemple récupérer
     // ça directement de la base, mais bon... usine à gaz non ? un avis ? -- sly
     $champs=array_merge($config_wri['champs_entier_ou_sait_pas_points'],$config_wri['champs_trinaires_points'],array('site_officiel'));
    

@@ -338,8 +338,8 @@ function escapedStyle(a, b) {
  * BBOX strategy when the url return a limited number of features depending on the extent
  */
 ol.loadingstrategy.bboxLimit = function(extent, resolution) {
-	if (this.bboxLimitResolution > resolution)
-		this.loadedExtentsRtree_.clear(); // Force loading when zoom in
+	if (this.bboxLimitResolution > resolution) // When zoom in
+		this.loadedExtentsRtree_.clear(); // Force the loading of all areas
 	this.bboxLimitResolution = resolution; // Mem resolution for further requests
 	return [extent];
 };
@@ -382,11 +382,10 @@ function layerVectorURL(o) {
 
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
-	format.readFeatures = function(source, options) {
-		if (source.bboxLimitResolution) // If bbbox optimised
-			source.clear(); // Clean all features when receive request
-		JSONparse(source); // Report jspn error if any
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, source, options);
+	format.readFeatures = function(response, options) {
+		source.clear(); // Clean all features when receiving a request
+		JSONparse(response); // Report json error if any
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, response, options);
 	};
 
 	// Checkboxes to tune layer parameters
@@ -396,7 +395,7 @@ function layerVectorURL(o) {
 			function(evt, list) {
 				layer.setVisible(list.length);
 				if (list.length && source.loadedExtentsRtree_) {
-					source.loadedExtentsRtree_.clear(); // Redraw the layer
+					source.loadedExtentsRtree_.clear(); // Force the loading of all areas
 					source.clear(); // Redraw the layer
 				}
 			}
@@ -1035,7 +1034,7 @@ function controlPermalink(o) {
 
 /**
  * Control to displays the length of a line overflown
- * option hoverStyle style the hovered feature (don't use with layerEdit)
+ * option hoverStyle style the hovered feature
  * Requires controlButton
  */
 function controlLengthLine() {
@@ -1322,7 +1321,7 @@ function controlLoadGPX(o) {
 				featureProjection: 'EPSG:3857'
 			}),
 			added = map.dispatchEvent({
-				type: 'myol:onfeatureload', // Warn layerEdit that uploaded some features
+				type: 'myol:onfeatureload', // Warn layerEdit that we uploaded some features
 				features: features
 			});
 
@@ -1757,47 +1756,6 @@ function compareCoords(a, b) {
 
 
 /**
- * Controls examples
- */
-function controlsCollection(options) {
-	options = options || {};
-	if (!options.baseLayers)
-		options.baseLayers = layersCollection(options.geoKeys);
-
-	return [
-		controlLayersSwitcher(Object.assign({
-			baseLayers: options.baseLayers,
-			geoKeys: options.geoKeys
-		}, options.controlLayersSwitcher)),
-		controlTilesBuffer(),
-		controlPermalink(options.controlPermalink),
-		new ol.control.Attribution({
-			collapsible: false // Attribution always open
-		}),
-		new ol.control.ScaleLine(),
-		new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
-			projection: 'EPSG:4326',
-			className: 'ol-coordinate',
-			undefinedHTML: String.fromCharCode(0)
-		}),
-		controlLengthLine(),
-		new ol.control.Zoom({
-			zoomOutLabel: '-'
-		}),
-		new ol.control.FullScreen({
-			label: '', //HACK Bad presentation on IE & FF
-			tipLabel: 'Plein écran'
-		}),
-		controlGeocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownloadGPX(options.controlDownloadGPX),
-		controlPrint(),
-	];
-}
-
-/**
  * Tile layers examples
  */
 function layersCollection(keys) {
@@ -1867,6 +1825,47 @@ function layersCollection(keys) {
 		'Toner': layerStamen('toner'),
 		'Neutre': new ol.layer.Tile()
 	};
+}
+
+/**
+ * Controls examples
+ */
+function controlsCollection(options) {
+	options = options || {};
+	if (!options.baseLayers)
+		options.baseLayers = layersCollection(options.geoKeys);
+
+	return [
+		controlLayersSwitcher(Object.assign({
+			baseLayers: options.baseLayers,
+			geoKeys: options.geoKeys
+		}, options.controlLayersSwitcher)),
+		controlTilesBuffer(),
+		controlPermalink(options.controlPermalink),
+		new ol.control.Attribution({
+			collapsible: false // Attribution always open
+		}),
+		new ol.control.ScaleLine(),
+		new ol.control.MousePosition({
+			coordinateFormat: ol.coordinate.createStringXY(5),
+			projection: 'EPSG:4326',
+			className: 'ol-coordinate',
+			undefinedHTML: String.fromCharCode(0)
+		}),
+		controlLengthLine(),
+		new ol.control.Zoom({
+			zoomOutLabel: '-'
+		}),
+		new ol.control.FullScreen({
+			label: '', //HACK Bad presentation on IE & FF
+			tipLabel: 'Plein écran'
+		}),
+		controlGeocoder(),
+		controlGPS(options.controlGPS),
+		controlLoadGPX(),
+		controlDownloadGPX(options.controlDownloadGPX),
+		controlPrint(),
+	];
 }
 
 //TODO BEST collect all languages in a single place

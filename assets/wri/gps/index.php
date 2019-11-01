@@ -26,7 +26,8 @@
 	<!-- ref="service-worker.js.php" (for service-worker list) -->
 
 	<script>
-		var keys = <?=json_encode($config_wri['keys'])?>,
+		var ign_key = '<?=$config_wri['ign_key']?>',
+			bing_key = '<?=$config_wri['bing_key']?>',
 			dateGen = '<?=date('ymd-Hi')?>';
 	</script>
 
