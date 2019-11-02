@@ -520,6 +520,7 @@ function layerVectorURL(o) {
  */
 //TODO OVERPASS IE BUG don't work on IE
 //TODO OVERPASS BEST display error 429 (Too Many Requests)
+//TODO BUG don't work on examples/index
 layerOverpass = function(o) {
 	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -703,29 +704,31 @@ layerOverpass = function(o) {
  * Marker
  * Requires JSONparse, HACK map_, proj4.js for swiss coordinates
  */
-function layerMarker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-display', [lon, lat], bool
-	const format = new ol.format.GeoJSON();
-	let eljson, json, elxy;
+//TODO BEST Change cursor while hovering the target but there may be a conflict of forEachFeatureAtPixel with another function
+function layerMarker(o) {
+	const options = Object.assign({
+			llInit: [],
+		}, o),
+		format = new ol.format.GeoJSON(),
+		eljson = document.getElementById(options.idDisplay + '-json'),
+		elxy = document.getElementById(options.idDisplay + '-xy');
 
-	if (typeof display == 'string') {
-		eljson = document.getElementById(display + '-json');
-		elxy = document.getElementById(display + '-xy');
-	}
 	// Use json field values if any
-	if (eljson)
-		json = eljson.value || eljson.innerHTML;
-	if (json)
-		llInit = JSONparse(json).coordinates;
+	if (eljson) {
+		let json = eljson.value || eljson.innerHTML;
+		if (json)
+			options.llInit = JSONparse(json).coordinates;
+	}
 
 	// The marker layer
 	const style = new ol.style.Style({
 			image: new ol.style.Icon(({
-				src: imageUrl,
+				src: options.imageUrl,
 				anchor: [0.5, 0.5],
 			}))
 		}),
 		point = new ol.geom.Point(
-			ol.proj.fromLonLat(llInit)
+			ol.proj.fromLonLat(options.llInit)
 		),
 		feature = new ol.Feature({
 			geometry: point
@@ -740,8 +743,7 @@ function layerMarker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-disp
 		});
 
 	layer.once('prerender', function() {
-		const map = layer.map_;
-		if (dragged) {
+		if (options.dragged) {
 			// Drag and drop
 			layer.map_.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
@@ -751,16 +753,6 @@ function layerMarker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-disp
 				displayLL(point.getCoordinates());
 			});
 		}
-
-		// Change cursor while hovering the target
-		map.on('pointermove', function(evtMove) {
-			const map = evtMove.target;
-			map.getViewport().style.cursor = 'default';
-			map.forEachFeatureAtPixel(evtMove.pixel, function(f) {
-				if (f == feature)
-					map.getViewport().style.cursor = 'move';
-			});
-		});
 	});
 
 	// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
@@ -792,7 +784,7 @@ function layerMarker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-disp
 
 		// We insert the resulting HTML string where it is going
 		for (let v in values) {
-			const el = document.getElementById(display + '-' + v);
+			const el = document.getElementById(options.idDisplay + '-' + v);
 			if (el) {
 				if (el.value !== undefined)
 					el.value = values[v];
@@ -801,7 +793,7 @@ function layerMarker(imageUrl, display, llInit, dragged) { // imageUrl, 'id-disp
 			}
 		}
 	}
-	displayLL(ol.proj.fromLonLat(llInit)); // Display once at init
+	displayLL(ol.proj.fromLonLat(options.llInit)); // Display once at init
 
 	// <input> coords edition
 	layer.edit = function(evt, nol, projection) {
@@ -1822,9 +1814,8 @@ function layersCollection(keys) {
 		'Google photo': layerGoogle('s'),
 		'Google hybrid': layerGoogle('s,h'),
 		'Stamen': layerStamen('terrain'),
-		'Watercolor': layerStamen('watercolor'),
 		'Toner': layerStamen('toner'),
-		'Neutre': new ol.layer.Tile()
+		'Watercolor': layerStamen('watercolor'),
 	};
 }
 

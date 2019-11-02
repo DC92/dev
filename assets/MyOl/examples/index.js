@@ -4,8 +4,8 @@ console.log(document.cookie);
  * www.refuges.info POI layer
  * Requires layerVectorURL
  */
-function layerPointsWri(options) {
-	return layerVectorURL(Object.assign({
+const layerPointsWri = layerVectorURL({
+		selectorName: 'wri-poi',
 		baseUrl: '//www.refuges.info/api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		styleOptions: function(properties) {
@@ -21,15 +21,13 @@ function layerPointsWri(options) {
 		href: function(properties) { // For click on icon
 			return properties.lien;
 		}
-	}, options));
-}
+	}),
 
-/**
- * www.refuges.info areas layer
- * Requires layerVectorURL
- */
-function layerMassifsWri() {
-	return layerVectorURL({
+	/**
+	 * www.refuges.info areas layer
+	 * Requires layerVectorURL
+	 */
+	layerMassifsWri = layerVectorURL({
 		baseUrl: '//www.refuges.info/api/polygones?type_polygon=1',
 		selectorName: 'wri-massifs',
 		styleOptions: function(properties) {
@@ -64,54 +62,64 @@ function layerMassifsWri() {
 		href: function(properties) {
 			return properties.lien;
 		},
-	});
-}
+	}),
 
-/**
- * chemineur.fr POI layer
- * Requires layerVectorURL
- */
-chemineurLayer = layerVectorURL({
-	baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
-	strategy: ol.loadingstrategy.bboxLimit,
-	selectorName: 'chemineur',
-	styleOptions: function(properties) {
-		return {
-			// POI
-			image: new ol.style.Icon({
-				src: properties.icone,
-			}),
-			// Traces
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 3,
-			}),
-		};
-	},
-	hoverStyleOptions: function(properties) {
-		return {
-			image: new ol.style.Icon({
-				src: properties.icone,
-			}),
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 3,
-			}),
-		};
-	},
-	label: function(properties) {
-		return '<a href="' + properties.url + '">' + properties.nom + '<a>';
-	},
-	href: function(properties) {
-		return properties.url;
-	},
-});
+	/**
+	 * chemineur.fr POI layer
+	 * Requires layerVectorURL
+	 */
+	chemineurLayer = layerVectorURL({
+		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+		strategy: ol.loadingstrategy.bboxLimit,
+		selectorName: 'chemineur',
+		styleOptions: function(properties) {
+			return {
+				// POI
+				image: new ol.style.Icon({
+					src: properties.icone,
+				}),
+				// Traces
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 3,
+				}),
+			};
+		},
+		hoverStyleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: properties.icone,
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 3,
+				}),
+			};
+		},
+		label: function(properties) {
+			return '<a href="' + properties.url + '">' + properties.nom + '<a>';
+		},
+		href: function(properties) {
+			return properties.url;
+		},
+	}),
 
-/**
- * EXAMPLE
- */
-var marqueur = layerMarker('http://www.refuges.info/images/cadre.png', 'marqueur'),
-	viseur = layerMarker('http://www.refuges.info/images/viseur.png', 'viseur', null, true),
+	/**
+	 * Examples
+	 */
+	marqueur = layerMarker({
+		imageUrl: 'http://www.refuges.info/images/cadre.png',
+		idDisplay: 'marqueur',
+	}),
+	viseur = layerMarker({
+		imageUrl: 'http://www.refuges.info/images/viseur.png',
+		idDisplay: 'viseur',
+		dragged: true,
+	}),
+
+	/**
+	 * Editor
+	 */
 	editor = layerEdit({
 		geoJsonId: 'geojson',
 		controls: [
@@ -139,13 +147,15 @@ var marqueur = layerMarker('http://www.refuges.info/images/cadre.png', 'marqueur
 			}),
 		},
 	}),
+
+	/**
+	 * Map
+	 */
 	overlays = [
-		layerPointsWri({
-			selectorName: 'wri-poi',
-		}),
+		layerPointsWri,
 		chemineurLayer,
-		layerMassifsWri(),
-		layerOverpass(),
+		layerMassifsWri,
+		//layerOverpass,
 		marqueur,
 		viseur,
 		editor,
@@ -166,10 +176,9 @@ var marqueur = layerMarker('http://www.refuges.info/images/cadre.png', 'marqueur
 				viseur.getPoint().setCoordinates(position);
 			}
 		}
+	}),
+	map = new ol.Map({
+		target: 'map',
+		layers: overlays,
+		controls: basicControls,
 	});
-
-new ol.Map({
-	target: 'map',
-	layers: overlays,
-	controls: basicControls,
-});
