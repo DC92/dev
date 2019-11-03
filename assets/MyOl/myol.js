@@ -13,12 +13,15 @@
 //TODO WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO WRI EDIT édition massifs sans couper
 
-//HACK add map_ to each layer
 ol.Map.prototype.renderFrame_ = function(time) {
+	//HACK add map_ to each layer
 	const map = this;
 	map.getLayers().forEach(function(target) {
 		target.map_ = map;
 	});
+
+//TODO hack to centralize pointermove à forEachFeatureAtPixel
+
 	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
@@ -709,7 +712,6 @@ function layerMarker(o) {
 	const options = Object.assign({
 			llInit: [],
 		}, o),
-		format = new ol.format.GeoJSON(),
 		eljson = document.getElementById(options.idDisplay + '-json'),
 		elxy = document.getElementById(options.idDisplay + '-xy');
 
@@ -740,7 +742,8 @@ function layerMarker(o) {
 			source: source,
 			style: style,
 			zIndex: 10
-		});
+		}),
+		format = new ol.format.GeoJSON();
 
 	layer.once('prerender', function() {
 		if (options.dragged) {

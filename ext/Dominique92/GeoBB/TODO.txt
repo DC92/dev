@@ -126,6 +126,7 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+Bug carte point petites largeurs de fenetre : l'ascenseur mange le layerswitcher
 /gps favicon 144px min
 Voir les ' en format word
 FAIT, à reprendre en GIT
