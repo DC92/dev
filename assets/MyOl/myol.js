@@ -12,7 +12,7 @@
 //TODO WRI NAV PRC + C2C direct
 //TODO WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO WRI EDIT édition massifs sans couper
-
+//TODO BEST collect all languages in a single place
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -20,8 +20,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 		target.map_ = map;
 	});
 
-//TODO hack to centralize pointermove à forEachFeatureAtPixel
-
+	//TODO hack to centralize pointermove à forEachFeatureAtPixel
 	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
@@ -319,7 +318,7 @@ function permanentCheckboxList(selectorName, evt) {
 			allChecks.push(checkEls[e].value);
 	}
 	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
-	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/';
+	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/;SameSite=Strict';
 	return allChecks; // Returns list of checked values or ids
 }
 
@@ -706,20 +705,35 @@ layerOverpass = function(o) {
 /**
  * Marker
  * Requires JSONparse, HACK map_, proj4.js for swiss coordinates
+ * Read / write following fields :
+ * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
+ * marker-lon / marker-lat
+ * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
  */
 //TODO BEST Change cursor while hovering the target but there may be a conflict of forEachFeatureAtPixel with another function
 function layerMarker(o) {
 	const options = Object.assign({
 			llInit: [],
+			idDisplay: 'marker',
+			decimalSeparator: '.',
 		}, o),
-		eljson = document.getElementById(options.idDisplay + '-json'),
-		elxy = document.getElementById(options.idDisplay + '-xy');
+		elJson = document.getElementById(options.idDisplay + '-json'),
+		elLon = document.getElementById(options.idDisplay + '-xy'),
+		elLat = document.getElementById(options.idDisplay + '-xy'),
+		elXY = document.getElementById(options.idDisplay + '-xy');
 
 	// Use json field values if any
-	if (eljson) {
-		let json = eljson.value || eljson.innerHTML;
+	if (elJson) {
+		let json = elJson.value || elJson.innerHTML;
 		if (json)
 			options.llInit = JSONparse(json).coordinates;
+	}
+	// Use lon-lat fields values if any
+	if (elLon && elLat) {
+		const lon = parseFloat(elLon.value || elLon.innerHTML),
+			lat = parseFloat(elLat.value || elLat.innerHTML);
+		if (lon && lat)
+			options.llInit = [lon, lat];
 	}
 
 	// The marker layer
@@ -758,53 +772,68 @@ function layerMarker(o) {
 		}
 	});
 
-	// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-	if (typeof proj4 == 'function') {
-		proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-		ol.proj.proj4.register(proj4);
-	}
+	// <input> coords edition
+	feildEdit = function(evt) {
+		const id = evt.target.id.split('-')[1], // Get second part of the field id
+			pars = {
+				lon: [0, 4326],
+				lat: [1, 4326],
+				x: [0, 21781],
+				y: [1, 21781],
+			},
+			nol = pars[id][0], // Get what coord is concerned (x, y)
+			projection = pars[id][1]; // Get what projection is concerned
+		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // Get initial position
+		coord[nol] = parseFloat(evt.target.value.replace(',', '.')); // We change the value that was edited
+		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // Set new position
+
+		// Center map to the new position
+		layer.map_.getView().setCenter(point.getCoordinates());
+	};
 
 	// Display a coordinate
+	//TODO BEST dispach/edit deg min sec
 	function displayLL(ll) {
 		const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
 			values = {
-				lon: Math.round(ll4326[0] * 100000) / 100000,
-				lat: Math.round(ll4326[1] * 100000) / 100000,
+				lon: (Math.round(ll4326[0] * 100000) / 100000).toString().replace('.', options.decimalSeparator),
+				lat: (Math.round(ll4326[1] * 100000) / 100000).toString().replace('.', options.decimalSeparator),
 				json: JSON.stringify(format.writeGeometryObject(point, {
 					featureProjection: 'EPSG:3857',
 					decimals: 5
 				}))
 			};
+
 		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+		if (typeof proj4 == 'function') {
+			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+			ol.proj.proj4.register(proj4);
+		}
+		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+		//TODO load proj4 from server when required & wait onload
 		if (typeof proj4 == 'function' &&
 			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) { // Si on est dans la zone suisse EPSG:21781
 			const c21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
 			values.x = Math.round(c21781[0]);
 			values.y = Math.round(c21781[1]);
 		}
-		if (elxy)
-			elxy.style.display = values.x ? '' : 'none';
+		if (elXY) // Mask full xy if nothing to write
+			elXY.style.display = values.x && values.y ? '' : 'none';
 
 		// We insert the resulting HTML string where it is going
-		for (let v in values) {
-			const el = document.getElementById(options.idDisplay + '-' + v);
+		for (let postId in values) {
+			const el = document.getElementById(options.idDisplay + '-' + postId);
 			if (el) {
+				el.onchange = feildEdit; // Set the change function
 				if (el.value !== undefined)
-					el.value = values[v];
+					el.value = values[postId];
 				else
-					el.innerHTML = values[v];
+					el.innerHTML = values[postId];
 			}
 		}
 	}
 	displayLL(ol.proj.fromLonLat(options.llInit)); // Display once at init
 
-	// <input> coords edition
-	layer.edit = function(evt, nol, projection) {
-		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // La position actuelle de l'icone
-		coord[nol] = parseFloat(evt.value); // On change la valeur qui a été modifiée
-		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // On repositionne l'icone
-		layer.map_.getView().setCenter(point.getCoordinates());
-	};
 	layer.getPoint = function() {
 		return point;
 	};
@@ -1022,7 +1051,7 @@ function controlPermalink(o) {
 				];
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/;SameSite=Strict';
 		}
 	}
 	return control;
@@ -1125,6 +1154,7 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
+//TODO BEST force north button (gps 4th position)
 //TODO GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
@@ -1350,6 +1380,7 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
+//TODO BEST load WPT
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
@@ -1404,6 +1435,7 @@ function controlDownloadGPX(o) {
  * Print control
  * Requires controlButton
  */
+//TODO BUG : don't mem checks when printing
 function controlPrint() {
 	const button = controlButton({
 			className: 'ol-print',
@@ -1797,6 +1829,7 @@ function layersCollection(keys) {
 		'IGN route': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
 		'IGN noms': layerIGN(keys.ign, 'GEOGRAPHICALNAMES.NAMES', 'png'),
 		'IGN rail': layerIGN(keys.ign, 'TRANSPORTNETWORKS.RAILWAYS', 'png'),
+		'IGN hydro': layerIGN(keys.ign, 'HYDROGRAPHY.HYDROGRAPHY', 'png'),
 		'IGN forêt': layerIGN(keys.ign, 'LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN(keys.ign, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
 		//Le style normal n'est pas geré	'SHADOW': layerIGN(keys.ign, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
@@ -1862,6 +1895,3 @@ function controlsCollection(options) {
 		controlPrint(),
 	];
 }
-
-//TODO BEST collect all languages in a single place
-//TODO BEST WARNING A cookie associated with a cross-site resource at https://openlayers.org/ was set without the `SameSite` attribute. A future release of Chrome will only deliver cookies with cross-site requests if they are set with `SameSite=None` and `Secure`. You can review cookies in developer tools under Application>Storage>Cookies and see more details at https://www.chromestatus.com/feature/5088147346030592 and https://www.chromestatus.com/feature/5633521622188032.

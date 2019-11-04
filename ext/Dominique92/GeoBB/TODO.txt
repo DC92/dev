@@ -47,6 +47,8 @@ ARCHI
 
 //TODO BEST CHEMINEUR
 =====================
+cookie = ;SameSite=Strict
+Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Meteo sur chem
 Stockage images sur plus d'1 répertoire => ? plugin ?
@@ -126,6 +128,12 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+Ajouter altitude + nb lits dans les étiquettes WRI
+Récuperer nom -> name pour export GPX des points dans la carte
+cookie = ;SameSite=Strict
+Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
+Point : Init valeurs champs à afficher
+Display coordonnées suisses
 Bug carte point petites largeurs de fenetre : l'ascenseur mange le layerswitcher
 /gps favicon 144px min
 Voir les ' en format word

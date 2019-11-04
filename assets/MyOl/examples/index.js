@@ -110,10 +110,12 @@ const layerPointsWri = layerVectorURL({
 	marqueur = layerMarker({
 		imageUrl: 'http://www.refuges.info/images/cadre.png',
 		idDisplay: 'marqueur',
+		decimalSeparator: ',',
 	}),
 	viseur = layerMarker({
 		imageUrl: 'http://www.refuges.info/images/viseur.png',
 		idDisplay: 'viseur',
+		decimalSeparator: ',',
 		dragged: true,
 	}),
 

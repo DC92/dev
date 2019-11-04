@@ -95,12 +95,13 @@
 
 	<input type="text" id="viseur-json" size="60" value='{"type":"Point","coordinates":[2.4,47.082]}' />
 	<div>
-		Lon <input type="text" id="viseur-lon" onchange="viseur.edit(this,0,4326)" size="10" maxlength="12" />
-		Lat <input type="text" id="viseur-lat" onchange="viseur.edit(this,1,4326)" size="10" maxlength="12" />
+		Lon <input type="text" id="viseur-lon" size="10" maxlength="12" />
+		Lat <input type="text" id="viseur-lat" size="10" maxlength="12" />
 	</div>
 	<div id="viseur-xy">Suisse
-		X <input type="text" id="viseur-x" onchange="viseur.edit(this,0,21781)" size="7" maxlength="12" />
-		Y <input type="text" id="viseur-y" onchange="viseur.edit(this,1,21781)" size="7" maxlength="12" />
+		X <input type="text" id="viseur-x" size="7" maxlength="12" />
+		Y <input type="text" id="viseur-y" size="7" maxlength="12" />
+		(CH 1903)
 	</div>
 
 	<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>

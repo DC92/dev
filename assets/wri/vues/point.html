@@ -89,24 +89,18 @@
 					<strong><?=$vue->point->nom_precision_gps?></strong>
 				<?}else{?>
 					<span id="coordonnees-value">
-						<span id="position-title-lng">Longitude</span>: <em id="position-proj-lng"><?=$vue->point->longitude?></em>
-						<span id="position-title-lat">Latitude</span>: <em id="position-proj-lat"><?=$vue->point->latitude?></em>
-					</span>
-					<select id="position-select"></select>
-					(
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">gpx</a>
-					,
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">kml</a>
-					,
-						<a href="geo:<?=$vue->point->latitude?>,<?=$vue->point->longitude?>">géoloc</a><a href="<?=$vue->lien_wiki_explication_geo?>"><sup>?</sup></a>
-					)
+						<span id="position-title-lng">Longitude</span>:
+						<em id="position-proj-lng"><?=$vue->point->longitude?></em>
+						<span id="position-title-lat">Latitude</span>:
+						<em id="position-proj-lat"><?=$vue->point->latitude?></em>
+						(WGS84)
+					</span>&rarr;
+						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">gpx</a>,
+						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">kml</a>,
+						<a href="geo:<?=$vue->point->latitude?>,<?=$vue->point->longitude?>">géoloc</a>
+						<a href="<?=$vue->lien_wiki_explication_geo?>"></a>
 				<?}?>
 			</dd>
-			<?if ($vue->mini_carte) {?>
-				<dd class="noprint">
-					<strong>Attention:</strong> Ces coordonnées sont relatives à l'ellipsoïde WGS84. Il se peut qu'elles ne correspondent pas pour d'anciennes cartes. Consultez le cartouche de la carte pour vérifier son ellipsoïde de référence.
-				</dd>
-			<?}?>
 <!--======================================== LOCALISATION =========================================-->
 			<?php if ($vue->localisation_point) foreach ($vue->localisation_point as $categorie_polygone => $polygones) { ?>
 				<dt class="condense">Localisation <?=$categorie_polygone?>:</dt>

@@ -45,12 +45,17 @@ const layerPoints = layerVectorURL({
 			layerPoints,
 			layerMarker({
 				imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/cadre.png',
-				llInit: [ <?=$vue->point->longitude?> , <?=$vue->point->latitude?> ],
+//				llInit: [ <?=$vue->point->longitude?> , <?=$vue->point->latitude?> ],
+				idDisplay: 'position-proj',
 			}),
 		],
 		controls: [
 			controlLayersSwitcher({
 				baseLayers: baseLayers,
+			}),
+			controlPermalink({ // Permet de garder le même réglage de carte d'une page à l'autre
+				visible: false, // Mais on ne visualise pas le lien du permalink
+				init: false, // Ici, on utilisera plutôt la position du point
 			}),
 			new ol.control.Zoom(),
 			new ol.control.FullScreen({
