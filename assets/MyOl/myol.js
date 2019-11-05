@@ -1153,7 +1153,6 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//TODO force north button (gps 4th position)
 //BEST GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
@@ -1186,9 +1185,9 @@ function controlGPS(options) {
 		// The control button
 		button = controlButton({
 			className: 'ol-gps',
-			buttonBackgroundColors: ['white', '#ef3', '#ccc'],
+			buttonBackgroundColors: ['white', '#ef3', '#888', '#ccc'],
 			title: 'Centrer sur la position GPS',
-			stateNumber: 3,
+			stateNumber: 4,
 			activate: function(active) {
 				const map = button.getMap();
 				// Toggle reticule, position & rotation
@@ -1199,7 +1198,10 @@ function controlGPS(options) {
 						break;
 					case 1: // Track, reticule & center to the position / orientation
 						map.addLayer(graticuleLayer);
-						// case 2: Track & display reticule
+					case 2: // Track, display reticule, stay in position
+						break;
+					case 3: // Track & display reticule, north on top
+						map.getView().setRotation(0, 0); // Set north to top
 				}
 			}
 		}),
