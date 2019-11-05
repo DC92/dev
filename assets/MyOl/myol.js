@@ -8,8 +8,8 @@
  * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
+
 /* jshint esversion: 6 */
-//BEST collect all languages in a single place
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -1486,6 +1486,13 @@ function controlPrint() {
 		document.body.appendChild(mapEl);
 		document.body.style.margin = 0;
 		document.body.style.padding = 0;
+
+		document.addEventListener('keydown', function(evt) {
+			if (evt.key == 'Escape')
+				setTimeout(function() {
+					window.location.reload();
+				});
+		});
 	}
 	return button;
 }
@@ -1597,6 +1604,7 @@ function layerEdit(o) {
 }
 
 //BEST hover feature when modifing
+//BEST collect all languages in a single place
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		className: 'ol-modify',
