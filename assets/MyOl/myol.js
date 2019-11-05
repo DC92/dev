@@ -9,10 +9,7 @@
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 /* jshint esversion: 6 */
-//TODO WRI NAV PRC + C2C direct
-//TODO WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
-//TODO WRI EDIT édition massifs sans couper
-//TODO BEST collect all languages in a single place
+//BEST collect all languages in a single place
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -20,7 +17,7 @@ ol.Map.prototype.renderFrame_ = function(time) {
 		target.map_ = map;
 	});
 
-	//TODO hack to centralize pointermove à forEachFeatureAtPixel
+	//BEST hack to centralize pointermove à forEachFeatureAtPixel
 	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
@@ -318,7 +315,7 @@ function permanentCheckboxList(selectorName, evt) {
 			allChecks.push(checkEls[e].value);
 	}
 	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
-	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/;SameSite=Strict';
+	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
 	return allChecks; // Returns list of checked values or ids
 }
 
@@ -351,6 +348,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
+//TODO WRI NAV PRC + C2C direct
 function layerVectorURL(o) {
 	const options = Object.assign({
 			baseUrlFunction: function(bbox, list) {
@@ -418,7 +416,7 @@ function layerVectorURL(o) {
 			);
 		});
 
-		//TODO BEST zoom map when the cursor is over a label
+		//BEST zoom map when the cursor is over a label
 		// Style when hovering a feature
 		map.addInteraction(new ol.interaction.Select({
 			condition: ol.events.condition.pointerMove,
@@ -520,9 +518,10 @@ function layerVectorURL(o) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
+//TODO OVERPASS BUG don't work on examples/index
+//TODO OVERPASS WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO OVERPASS IE BUG don't work on IE
-//TODO OVERPASS BEST display error 429 (Too Many Requests)
-//TODO BUG don't work on examples/index
+//BEST OVERPASS BEST display error 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -710,7 +709,7 @@ layerOverpass = function(o) {
  * marker-lon / marker-lat
  * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
  */
-//TODO BEST Change cursor while hovering the target but there may be a conflict of forEachFeatureAtPixel with another function
+//BEST Change cursor while hovering the target but there may be a conflict of forEachFeatureAtPixel with another function
 function layerMarker(o) {
 	const options = Object.assign({
 			llInit: [],
@@ -773,7 +772,7 @@ function layerMarker(o) {
 	});
 
 	// <input> coords edition
-	feildEdit = function(evt) {
+	fieldEdit = function(evt) {
 		const id = evt.target.id.split('-')[1], // Get second part of the field id
 			pars = {
 				lon: [0, 4326],
@@ -792,7 +791,7 @@ function layerMarker(o) {
 	};
 
 	// Display a coordinate
-	//TODO BEST dispach/edit deg min sec
+	//BEST dispach/edit deg min sec
 	function displayLL(ll) {
 		const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
 			values = {
@@ -810,7 +809,7 @@ function layerMarker(o) {
 			ol.proj.proj4.register(proj4);
 		}
 		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-		//TODO load proj4 from server when required & wait onload
+		//BEST load proj4 from server when required & wait onload
 		if (typeof proj4 == 'function' &&
 			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) { // Si on est dans la zone suisse EPSG:21781
 			const c21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
@@ -824,7 +823,7 @@ function layerMarker(o) {
 		for (let postId in values) {
 			const el = document.getElementById(options.idDisplay + '-' + postId);
 			if (el) {
-				el.onchange = feildEdit; // Set the change function
+				el.onchange = fieldEdit; // Set the change function
 				if (el.value !== undefined)
 					el.value = values[postId];
 				else
@@ -1001,7 +1000,7 @@ function controlLayersSwitcher(options) {
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
-//TODO BEST save curent layer
+//BEST save curent layer
 function controlPermalink(o) {
 	const options = Object.assign({
 			hash: '?', // {?, #} the permalink delimiter
@@ -1051,7 +1050,7 @@ function controlPermalink(o) {
 				];
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/;SameSite=Strict';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
 		}
 	}
 	return control;
@@ -1081,7 +1080,7 @@ function controlLengthLine() {
 		});
 	};
 
-	//TODO BEST calculate distance to the ends
+	//BEST calculate distance to the ends
 	function calculateLength(feature) {
 		// Display the line length
 		if (feature) {
@@ -1154,8 +1153,8 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//TODO BEST force north button (gps 4th position)
-//TODO GPS tap on map = distance from GPS calculation
+//TODO force north button (gps 4th position)
+//BEST GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1227,7 +1226,7 @@ function controlGPS(options) {
 	geolocation.on('change', function() {
 		gps.position = ol.proj.fromLonLat(geolocation.getPosition());
 		gps.accuracyGeometry = geolocation.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
-		/* //TODO GPS Firefox Update delta only over some speed
+		/* //BEST GPS Firefox Update delta only over some speed
 		if (!navigator.userAgent.match('Firefox'))
 
 		if (geolocation.getHeading()) {
@@ -1290,10 +1289,9 @@ function controlGPS(options) {
 			]));
 
 			// Map orientation (Radians and reverse clockwize)
-			//TODO GPS keep orientation when stop gps tracking
 			if (compas.absolute && button.active == 1)
 				view.setRotation(compas.heading, 0); // Use magnetic compas value
-			/* //TODO GPS Firefox use delta if speed > ??? km/h
+			/* //BEST GPS Firefox use delta if speed > ??? km/h
 					compas.absolute ?
 					compas.heading : // Use magnetic compas value
 					compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
@@ -1380,7 +1378,7 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
-//TODO BEST load WPT
+//BEST load WPT
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',
@@ -1435,7 +1433,6 @@ function controlDownloadGPX(o) {
  * Print control
  * Requires controlButton
  */
-//TODO BUG : don't mem checks when printing
 function controlPrint() {
 	const button = controlButton({
 			className: 'ol-print',
@@ -1444,7 +1441,7 @@ function controlPrint() {
 				resizeDraft(button.getMap());
 				button.getMap().once('rendercomplete', function() {
 					window.print();
-					window.location.href = window.location.href;
+					location.reload();
 				});
 			},
 		}),
@@ -1480,9 +1477,10 @@ function controlPrint() {
 		mapEl.style.height = ori == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
-		// Hide other elements than the map
-		while (document.body.firstChild)
-			document.body.removeChild(document.body.firstChild);
+		// Hide all but the map
+		for (var child = document.body.firstChild; child !== null; child = child.nextSibling)
+			if (child.style && child !== mapEl)
+				child.style.display = 'none';
 
 		// Raises the map to the top level
 		document.body.appendChild(mapEl);
@@ -1598,7 +1596,7 @@ function layerEdit(o) {
 	return layer;
 }
 
-//TODO EDIT hover feature when modifing
+//BEST hover feature when modifing
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		className: 'ol-modify',
@@ -1618,7 +1616,7 @@ function controlModify(options) {
 	button.interaction.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// altKey + ctrlKey : delete feature
-			//TODO EDIT delete only a summit when Ctrl+Alt click
+			//BEST delete only a summit when Ctrl+Alt click
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
@@ -1728,7 +1726,7 @@ function optimiseEdited(source, pointerPosition) {
 					}
 				}
 		}
-	//TODO EDIT option not to be able to cut a polygon (WRI / alpages)
+	//BEST EDIT option not to be able to cut a polygon (WRI / alpages)
 
 	// Recreate modified features
 	for (let l in lines)

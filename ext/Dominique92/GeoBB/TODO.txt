@@ -48,6 +48,9 @@ ARCHI
 //TODO BEST CHEMINEUR
 =====================
 cookie = ;SameSite=Strict
+	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
+	Or if your host is already updated to 7.3, you can use:
+	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
 Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
 Meteo sur chem
@@ -131,6 +134,9 @@ TODO WRI
 Ajouter altitude + nb lits dans les étiquettes WRI
 Récuperer nom -> name pour export GPX des points dans la carte
 cookie = ;SameSite=Strict
+	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
+	Or if your host is already updated to 7.3, you can use:
+	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
 Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 Point : Init valeurs champs à afficher
 Display coordonnées suisses

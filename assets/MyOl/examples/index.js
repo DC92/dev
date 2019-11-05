@@ -157,7 +157,7 @@ const layerPointsWri = layerVectorURL({
 		layerPointsWri,
 		chemineurLayer,
 		layerMassifsWri,
-		//layerOverpass,
+		layerOverpass(),
 		marqueur,
 		viseur,
 		editor,
