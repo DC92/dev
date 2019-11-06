@@ -1,6 +1,7 @@
-/* OPENLAYERS V5 ADAPTATION - https://openlayers.org/
- * (C) Dominique Cavailhez 2017
+/** OPENLAYERS ADAPTATION
  * https://github.com/Dominique92/MyOl
+ * (C) Dominique Cavailhez 2017
+ * Based on Openlayers https://openlayers.org
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
  * You only have to include openlayers/dist.js & .css files & myol.js & .css & that's it !
@@ -10,6 +11,7 @@
  */
 
 /* jshint esversion: 6 */
+
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -351,18 +353,38 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 //TODO WRI NAV PRC + C2C direct
 function layerVectorURL(o) {
 	const options = Object.assign({
-			baseUrlFunction: function(bbox, list) {
-				return options.baseUrl + // baseUrl is mandatory, no default
-					list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-			},
-		}, o),
-		popEl = window.popEl_ = document.createElement('a'),
-		popup = window.popup_ = //HACK attach these to windows to define only one
-		new ol.Overlay({
-			element: popEl,
-		}),
-		format = new ol.format.GeoJSON(),
-		source = new ol.source.Vector(Object.assign({
+		baseUrlFunction: function(bbox, list) {
+			return options.baseUrl + // baseUrl is mandatory, no default
+				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
+		},
+		format: new ol.format.GeoJSON(),
+		readFeatures: function readFeatures(response) {
+			return JSONparse(response);
+		},
+	}, o);
+
+	//HACK attach these to windows to define only one
+	if (!window.popEl_)
+		window.popEl_ = document.createElement('a');
+	if (!window.popup_)
+		window.popup_ = new ol.Overlay({
+			element: window.popEl_,
+		});
+
+	// HACK to clear the layer when the xhr response is received
+	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
+	const formatReadFeatures = options.format.readFeatures;
+	options.format.readFeatures = function(response, opts) {
+		if (source.bboxLimitResolution) // If bbbox optimised
+			source.clear(); // Clean all features when receiving a request
+
+		return formatReadFeatures.call( // Call former method
+			this, options.readFeatures(response), // Call specific data treatment
+			opts
+		);
+	};
+
+	const source = new ol.source.Vector(Object.assign({
 			url: function(extent, resolution, projection) {
 				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
 					// Retreive checked parameters
@@ -371,7 +393,6 @@ function layerVectorURL(o) {
 					});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
-			format: format, //new ol.format.GeoJSON(),
 		}, options)),
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
@@ -379,15 +400,6 @@ function layerVectorURL(o) {
 			renderBuffer: 16, // buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
-
-	// HACK to clear the layer when the xhr response is received
-	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
-	format.readFeatures = function(response, options) {
-		if (source.bboxLimitResolution) // If bbbox optimised
-			source.clear(); // Clean all features when receiving a request
-		JSONparse(response); // Report json error if any
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, response, options);
-	};
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -404,14 +416,14 @@ function layerVectorURL(o) {
 
 	layer.once('prerender', function(evt) {
 		const map = evt.target.map_;
-		map.addOverlay(popup);
+		map.addOverlay(window.popup_);
 		map.on('pointermove', pointerMove);
 		map.on('click', function(evtClk) { // Click on a feature
 			evtClk.target.forEachFeatureAtPixel(
 				evtClk.pixel,
 				function() {
-					if (popup.getPosition())
-						popEl.click(); // Simulate a click on the label
+					if (window.popup_.getPosition())
+						window.popEl_.click(); // Simulate a click on the label
 				}
 			);
 		});
@@ -432,7 +444,7 @@ function layerVectorURL(o) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
 			if (evtMm.clientX < divRect.left || evtMm.clientX > divRect.right ||
 				evtMm.clientY < divRect.top || evtMm.clientY > divRect.bottom)
-				popup.setPosition();
+				window.popup_.setPosition();
 		});
 	});
 
@@ -442,11 +454,11 @@ function layerVectorURL(o) {
 
 		// Hide label by default if none feature or his popup here
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = popEl.getBoundingClientRect();
+			popupRect = window.popEl_.getBoundingClientRect();
 		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
 			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
 			!popupRect)
-			popup.setPosition();
+			window.popup_.setPosition();
 
 		// Reset cursor if there is no feature here
 		map.getViewport().style.cursor = 'default';
@@ -483,29 +495,29 @@ function layerVectorURL(o) {
 				options.postLabel(properties, feature, layer, pixel, ll4326) :
 				options.postLabel || '';
 
-			if (label && !popup.getPosition()) { // Only for the first feature on the hovered stack
+			if (label && !window.popup_.getPosition()) { // Only for the first feature on the hovered stack
 				// Calculate the label's anchor
-				popup.setPosition(map.getView().getCenter()); // For popup size calculation
+				window.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
 				// Fill label class & text
-				popEl.className = 'myPopup ' + (options.labelClass || '');
-				popEl.innerHTML = label + postLabel;
+				window.popEl_.className = 'myPopup ' + (options.labelClass || '');
+				window.popEl_.innerHTML = label + postLabel;
 				if (typeof options.href == 'function') {
-					popEl.href = options.href(properties);
+					window.popEl_.href = options.href(properties);
 					map.getViewport().style.cursor = 'pointer';
 				}
 
 				// Shift of the label to stay into the map regarding the pointer position
-				if (pixel[1] < popEl.clientHeight + 12) { // On the top of the map (not enough space for it)
-					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -popEl.clientWidth - 10;
+				if (pixel[1] < window.popEl_.clientHeight + 12) { // On the top of the map (not enough space for it)
+					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -window.popEl_.clientWidth - 10;
 					pixel[1] = 2;
 				} else {
-					pixel[0] -= popEl.clientWidth / 2;
+					pixel[0] -= window.popEl_.clientWidth / 2;
 					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-					pixel[0] = Math.min(pixel[0], map.getSize()[0] - popEl.clientWidth - 1); // Bord droit
-					pixel[1] -= popEl.clientHeight + 8;
+					pixel[0] = Math.min(pixel[0], map.getSize()[0] - window.popEl_.clientWidth - 1); // Bord droit
+					pixel[1] -= window.popEl_.clientHeight + 8;
 				}
-				popup.setPosition(map.getCoordinateFromPixel(pixel));
+				window.popup_.setPosition(map.getCoordinateFromPixel(pixel));
 			}
 		}
 	};
@@ -518,7 +530,6 @@ function layerVectorURL(o) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO OVERPASS BUG don't work on examples/index
 //TODO OVERPASS WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO OVERPASS IE BUG don't work on IE
 //BEST OVERPASS BEST display error 429 (Too Many Requests)
@@ -536,17 +547,16 @@ layerOverpass = function(o) {
 	elSelector.className = 'overpass'; // At the biginning
 
 	// Convert areas into points to display it as an icon
-	const osmXmlPoi = new ol.format.OSMXML();
-	osmXmlPoi.readFeatures = function(source) { //HACK  to modify the format
-		for (let node = source.documentElement.firstChild; node; node = node.nextSibling)
+	function readFeaturesOverpass(response) {
+		for (let node = response.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
-				const newNode = source.createElement('node');
-				source.documentElement.appendChild(newNode);
+				const newNode = response.createElement('node');
+				response.documentElement.appendChild(newNode);
 				newNode.id = node.id;
 
 				// Add a tag to mem what node type it was
-				const newTag = source.createElement('tag');
+				const newTag = response.createElement('tag');
 				newTag.setAttribute('k', 'nodetype');
 				newTag.setAttribute('v', 'way');
 				newNode.appendChild(newTag);
@@ -562,8 +572,8 @@ layerOverpass = function(o) {
 							newNode.appendChild(subTagNode.cloneNode());
 					}
 			}
-		return ol.format.OSMXML.prototype.readFeatures.call(this, source, options);
-	};
+		return response;
+	}
 
 	function overpassType(properties) {
 		for (let e = 0; e < checkEls.length; e++)
@@ -580,8 +590,9 @@ layerOverpass = function(o) {
 	}
 
 	return layerVectorURL(Object.assign({
-		format: osmXmlPoi,
 		strategy: ol.loadingstrategy.bbox,
+		format: new ol.format.OSMXML(),
+		readFeatures: readFeaturesOverpass,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -605,7 +616,7 @@ layerOverpass = function(o) {
 				if (elSelector)
 					elSelector.className = 'overpass';
 			} else if (elSelector)
-				elSelector.className = 'overpass-zoom-out';
+				elSelector.className = 'overpass-zoom-out'; //TODO TEST & document on demo
 
 			return options.baseUrl +
 				'?data=[timeout:5];(' + // Not too much !
@@ -772,7 +783,7 @@ function layerMarker(o) {
 	});
 
 	// <input> coords edition
-	fieldEdit = function(evt) {
+	function fieldEdit(evt) {
 		const id = evt.target.id.split('-')[1], // Get second part of the field id
 			pars = {
 				lon: [0, 4326],
@@ -788,7 +799,7 @@ function layerMarker(o) {
 
 		// Center map to the new position
 		layer.map_.getView().setCenter(point.getCoordinates());
-	};
+	}
 
 	// Display a coordinate
 	//BEST dispach/edit deg min sec
@@ -853,8 +864,7 @@ function controlButton(o) {
 	const buttonEl = document.createElement('button'),
 		options = Object.assign({
 			element: document.createElement('div'),
-			buttonBackgroundColors: ['white'],
-			stateNumber: 2,
+			buttonBackgroundColors: ['white', 'white'],
 		}, o),
 		control = new ol.control.Control(options);
 
@@ -880,7 +890,7 @@ function controlButton(o) {
 	control.toggle = function(newActive, group) {
 		// Toggle by default
 		if (typeof newActive == 'undefined')
-			newActive = (control.active + 1) % options.stateNumber;
+			newActive = (control.active + 1) % options.buttonBackgroundColors.length;
 
 		// Unselect all other controlButtons from the same group
 		if (newActive && options.group)
@@ -1154,6 +1164,7 @@ function controlGeocoder() {
  * Requires controlButton
  */
 //BEST GPS tap on map = distance from GPS calculation
+//TODO WRI don't load => date index.php
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1185,9 +1196,8 @@ function controlGPS(options) {
 		// The control button
 		button = controlButton({
 			className: 'ol-gps',
-			buttonBackgroundColors: ['white', '#ef3', '#888', '#ccc'],
+			buttonBackgroundColors: ['white', '#ef3', '#bbb'],
 			title: 'Centrer sur la position GPS',
-			stateNumber: 4,
 			activate: function(active) {
 				const map = button.getMap();
 				// Toggle reticule, position & rotation
@@ -1196,11 +1206,9 @@ function controlGPS(options) {
 					case 0: // Nothing
 						map.removeLayer(graticuleLayer);
 						break;
-					case 1: // Track, reticule & center to the position / orientation
+					case 1: // Track, reticule & center to the position & orientation
 						map.addLayer(graticuleLayer);
-					case 2: // Track, display reticule, stay in position
-						break;
-					case 3: // Track & display reticule, north on top
+					case 2: // Track, display reticule, stay in position & orientation
 						map.getView().setRotation(0, 0); // Set north to top
 				}
 			}
