@@ -11,7 +11,6 @@
  */
 
 /* jshint esversion: 6 */
-
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -298,7 +297,12 @@ function controlPermanentCheckbox(selectorName, callback) {
 	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
 }
 
-// Global functions
+/**
+ * List selected checkboxes having the same name
+ * selectorName (string)
+ * evt (keyboard event)
+ * return : [checked values or ids]
+ */
 function permanentCheckboxList(selectorName, evt) {
 	const checkEls = document.getElementsByName(selectorName);
 	let allChecks = [];
@@ -321,6 +325,10 @@ function permanentCheckboxList(selectorName, evt) {
 	return allChecks; // Returns list of checked values or ids
 }
 
+/**
+ * Compute a style from 2 different style
+ * return ol.style.Style containing each style component or ol default
+ */
 function escapedStyle(a, b) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 	return function(feature) {
@@ -532,7 +540,7 @@ function layerVectorURL(o) {
  */
 //TODO OVERPASS WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO OVERPASS IE BUG don't work on IE
-//BEST OVERPASS BEST display error 429 (Too Many Requests)
+//TODO OVERPASS BEST display errors, including 429 (Too Many Requests)
 layerOverpass = function(o) {
 	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -1334,7 +1342,7 @@ function controlLoadGPX(o) {
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
-					width: 3
+					width: 3,
 				})
 			}),
 		}, o),
@@ -1352,22 +1360,22 @@ function controlLoadGPX(o) {
 		const map = button.getMap(),
 			features = format.readFeatures(reader.result, {
 				dataProjection: 'EPSG:4326',
-				featureProjection: 'EPSG:3857'
+				featureProjection: 'EPSG:3857',
 			}),
 			added = map.dispatchEvent({
 				type: 'myol:onfeatureload', // Warn layerEdit that we uploaded some features
-				features: features
+				features: features,
 			});
 
 		if (added !== false) { // If one used the feature
 			// Display the track on the map
 			const source = new ol.source.Vector({
 					format: format,
-					features: features
+					features: features,
 				}),
 				layer = new ol.layer.Vector({
 					source: source,
-					style: options.style
+					style: options.style,
 				});
 			map.addLayer(layer);
 			map.getView().fit(source.getExtent());
@@ -1419,14 +1427,14 @@ function controlDownloadGPX(o) {
 		const gpx = new ol.format.GPX().writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
-				decimals: 5
+				decimals: 5,
 			})
 			.replace(/<rte/g, '<trk')
 			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
 			.replace(/(<trk|<\/trk|<wpt|<\/wpt|<\/gpx)/g, '\n$1')
 			.replace(/(<sym)/g, '\n\t$1'),
 			file = new Blob([gpx], {
-				type: 'application/gpx+xml'
+				type: 'application/gpx+xml',
 			});
 
 		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
