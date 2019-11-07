@@ -31,6 +31,10 @@ function JSONparse(json) {
 	}
 }
 
+window.onerror = function(msg, url, line, col, error) {
+    console.log(url + ' line:' + line + ' col:' + col + '\n' + error + '\n' + new Error().stack);
+};
+
 /**
  * TILE LAYERS
  */
@@ -371,17 +375,9 @@ function layerVectorURL(o) {
 		},
 	}, o);
 
-	//HACK attach these to windows to define only one
-	if (!window.popEl_)
-		window.popEl_ = document.createElement('a');
-	if (!window.popup_)
-		window.popup_ = new ol.Overlay({
-			element: window.popEl_,
-		});
-
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
-	const formatReadFeatures = options.format.readFeatures;
+	const formatReadFeatures = options.format.readFeatures; // Mem former code
 	options.format.readFeatures = function(response, opts) {
 		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receiving a request
@@ -424,17 +420,25 @@ function layerVectorURL(o) {
 
 	layer.once('prerender', function(evt) {
 		const map = evt.target.map_;
-		map.addOverlay(window.popup_);
-		map.on('pointermove', pointerMove);
-		map.on('click', function(evtClk) { // Click on a feature
-			evtClk.target.forEachFeatureAtPixel(
-				evtClk.pixel,
-				function() {
-					if (window.popup_.getPosition())
-						window.popEl_.click(); // Simulate a click on the label
-				}
-			);
-		});
+
+		// Define one popup for all the layerVectorURL
+		if (!window.popEl_) {
+			window.popEl_ = document.createElement('a');
+			window.popup_ = new ol.Overlay({
+				element: window.popEl_,
+			});
+			map.addOverlay(window.popup_);
+			map.on('pointermove', pointerMove);
+			map.on('click', function(evtClk) { // Click on a feature
+				evtClk.target.forEachFeatureAtPixel(
+					evtClk.pixel,
+					function() {
+						if (window.popup_.getPosition())
+							window.popEl_.click(); // Simulate a click on the label
+					}
+				);
+			});
+		}
 
 		//BEST zoom map when the cursor is over a label
 		// Style when hovering a feature
@@ -539,8 +543,8 @@ function layerVectorURL(o) {
  * Requires layerVectorURL
  */
 //TODO OVERPASS WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
-//TODO OVERPASS IE BUG don't work on IE
-//TODO OVERPASS BEST display errors, including 429 (Too Many Requests)
+//BEST BUG IE OVERPASS don't work on IE
+//BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 layerOverpass = function(o) {
 	const options = Object.assign({
 			baseUrl: '//overpass-api.de/api/interpreter',
@@ -552,7 +556,6 @@ layerOverpass = function(o) {
 		}, o),
 		checkEls = document.getElementsByName(options.selectorName),
 		elSelector = document.getElementById(options.selectorId);
-	elSelector.className = 'overpass'; // At the biginning
 
 	// Convert areas into points to display it as an icon
 	function readFeaturesOverpass(response) {
@@ -612,19 +615,14 @@ layerOverpass = function(o) {
 			const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 				args = [];
 
-			if (resolution < (options.maxResolution)) { // Only for small areas
-				for (let l = 0; l < list.length; l++) {
-					const lists = list[l].split('+');
-					for (let ls = 0; ls < lists.length; ls++)
-						args.push(
-							'node' + lists[ls] + bb + // Ask for nodes in the bbox
-							'way' + lists[ls] + bb // Also ask for areas
-						);
-				}
-				if (elSelector)
-					elSelector.className = 'overpass';
-			} else if (elSelector)
-				elSelector.className = 'overpass-zoom-out'; //TODO TEST & document on demo
+			for (let l = 0; l < list.length; l++) {
+				const lists = list[l].split('+');
+				for (let ls = 0; ls < lists.length; ls++)
+					args.push(
+						'node' + lists[ls] + bb + // Ask for nodes in the bbox
+						'way' + lists[ls] + bb // Also ask for areas
+					);
+			}
 
 			return options.baseUrl +
 				'?data=[timeout:5];(' + // Not too much !
@@ -661,7 +659,6 @@ layerOverpass = function(o) {
 						'title="Voir la fiche d‘origine sur openstreetmap">',
 						p.name ? (
 							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
-							//TODO OVERPASS BUG don't recognize accented letters (hôtel)
 						) : (
 							language[p.tourism] || p.tourism
 						),
