@@ -32,7 +32,7 @@ function JSONparse(json) {
 }
 
 window.onerror = function(msg, url, line, col, error) {
-    console.log(url + ' line:' + line + ' col:' + col + '\n' + error + '\n' + new Error().stack);
+	console.log(url + ' line:' + line + ' col:' + col + '\n' + error + '\n' + new Error().stack);
 };
 
 /**
@@ -733,9 +733,10 @@ function layerMarker(o) {
 			decimalSeparator: '.',
 		}, o),
 		elJson = document.getElementById(options.idDisplay + '-json'),
-		elLon = document.getElementById(options.idDisplay + '-xy'),
-		elLat = document.getElementById(options.idDisplay + '-xy'),
-		elXY = document.getElementById(options.idDisplay + '-xy');
+		elLon = document.getElementById(options.idDisplay + '-lon'),
+		elLat = document.getElementById(options.idDisplay + '-lat'),
+		elX = document.getElementById(options.idDisplay + '-x'),
+		elY = document.getElementById(options.idDisplay + '-y');
 
 	// Use json field values if any
 	if (elJson) {
@@ -756,21 +757,21 @@ function layerMarker(o) {
 			image: new ol.style.Icon(({
 				src: options.imageUrl,
 				anchor: [0.5, 0.5],
-			}))
+			})),
 		}),
 		point = new ol.geom.Point(
 			ol.proj.fromLonLat(options.llInit)
 		),
 		feature = new ol.Feature({
-			geometry: point
+			geometry: point,
 		}),
 		source = new ol.source.Vector({
-			features: [feature]
+			features: [feature],
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
-			zIndex: 10
+			zIndex: 10,
 		}),
 		format = new ol.format.GeoJSON();
 
@@ -779,7 +780,8 @@ function layerMarker(o) {
 			// Drag and drop
 			layer.map_.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
-				style: style
+				pixelTolerance: 16,
+				style: style,
 			}));
 			point.on('change', function() {
 				displayLL(point.getCoordinates());
@@ -798,9 +800,12 @@ function layerMarker(o) {
 			},
 			nol = pars[id][0], // Get what coord is concerned (x, y)
 			projection = pars[id][1]; // Get what projection is concerned
-		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection); // Get initial position
-		coord[nol] = parseFloat(evt.target.value.replace(',', '.')); // We change the value that was edited
-		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857')); // Set new position
+		// Get initial position
+		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection);
+		// We change the value that was edited
+		coord[nol] = parseFloat(evt.target.value.replace(',', '.'));
+		// Set new position
+		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857'));
 
 		// Center map to the new position
 		layer.map_.getView().setCenter(point.getCoordinates());
@@ -832,8 +837,11 @@ function layerMarker(o) {
 			values.x = Math.round(c21781[0]);
 			values.y = Math.round(c21781[1]);
 		}
-		if (elXY) // Mask full xy if nothing to write
-			elXY.style.display = values.x && values.y ? '' : 'none';
+		// Mask xy swiss if nothing to write
+		if (elX)
+			elX.parentNode.style.display = values.x ? '' : 'none';
+		if (elY)
+			elY.parentNode.style.display = values.y ? '' : 'none';
 
 		// We insert the resulting HTML string where it is going
 		for (let postId in values) {

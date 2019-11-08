@@ -7,6 +7,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/png" href="../images/favicon.png" />
 
+	<!--
+	OPENLAYERS ADAPTATION
+	https://github.com/Dominique92/MyOl
+	Dominique Cavailhez 2017
+	Based on Openlayers https://openlayers.org
+	-->
+
 	<!-- Openlayers -->
 	<link href="../ol/ol/ol.css?<?=filemtime('../ol/ol/ol.css')?>" type="text/css" rel="stylesheet">
 	<script src="../ol/ol/ol.js?<?=filemtime('../ol/ol/ol.js')?>"></script>

@@ -279,7 +279,6 @@ FORM#form_point .booleen LEGEND {
 FORM#form_point .booleen LABEL {
   clear: none;
   float: none;
-  /*width: 400px;*/
   padding-left: 10px;
   }
 FORM#form_point TEXTAREA {
@@ -288,11 +287,6 @@ FORM#form_point TEXTAREA {
   width:650px;
   height:170px;
   }
-FORM#form_point LABEL.textarea  SPAN {
-  clear: both;
-  float:left;
-  }
-
 FORM#form_export LABEL {
   clear: none;
   float: left;
@@ -302,10 +296,6 @@ FORM#form_export LABEL {
   border: thin dotted black;
   }
 
-FORM.wri SPAN , FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
-  clear: left;
-  float: left;
-  }
 FORM LABEL[title]:after, FORM LEGEND[title]:after {  /* combine pour exclure OL , leurs LABEL ne sont pas dans des FORM */
   content: url(../images/tooltip.png);
   }

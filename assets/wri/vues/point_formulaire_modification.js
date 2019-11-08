@@ -4,16 +4,16 @@ const layerPoints = layerVectorURL({
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: '<?=$config_wri['sous_dossier_installation']?>images/icones/' + properties.type.icone + '.png'
+					src: '<?=$config_wri['sous_dossier_installation']?>images/icones/' + properties.type.icone + '.png',
 				}),
 			};
 		},
-		label: function(properties) { // For click on the label
-			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-		},
-		href: function(properties) { // For click on icon
-			return properties.lien;
-		},
+	}),
+
+	viseur = layerMarker({
+		imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/viseur.png',
+		idDisplay: 'viseur',
+		dragged: true,
 	}),
 
 	baseLayers = {
@@ -38,15 +38,12 @@ const layerPoints = layerVectorURL({
 	map = new ol.Map({
 		target: 'carte-edit',
 		view: new ol.View({
-			center: ol.proj.fromLonLat([ <?=$vue->point->longitude?> , <?=$vue->point->latitude?> ]),
+			center: ol.proj.fromLonLat([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 			zoom: 13,
 		}),
 		layers: [
 			layerPoints,
-			layerMarker({
-				imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/viseur.png',
-				llInit: [ <?=$vue->point->longitude?> , <?=$vue->point->latitude?> ],
-			}),
+			viseur,
 		],
 		controls: [
 			controlLayersSwitcher({

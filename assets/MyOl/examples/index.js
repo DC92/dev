@@ -15,7 +15,7 @@ const layerPointsWri = layerVectorURL({
 				})
 			};
 		},
-		label: function(properties) { // For click on the label
+		label: function(properties) { // To click on the label
 			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 		},
 		href: function(properties) { // For click on icon
