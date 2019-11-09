@@ -139,7 +139,7 @@ function geoOverlays(o) {
 			label: function(properties) { // To click on the label
 				return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 			},
-			href: function(properties) { // For click on icon
+			href: function(properties) { // To click on icon
 				return properties.lien;
 			}
 		}),
@@ -158,7 +158,7 @@ function geoOverlays(o) {
 					label: function(properties) { // To click on the label
 						return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 					},
-					href: function(properties) { // For click on icon
+					href: function(properties) { // To click on icon
 						return properties.lien;
 					}
 				}),
@@ -177,7 +177,7 @@ function geoOverlays(o) {
 					label: function(properties) { // To click on the label
 						return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
 					},
-					href: function(properties) { // For click on icon
+					href: function(properties) { // To click on icon
 						return properties.lien;
 					}
 				}),

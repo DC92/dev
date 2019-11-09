@@ -1,22 +1,4 @@
-const layerPoints = layerVectorURL({
-		baseUrl: '<?=$config_wri['sous_dossier_installation']?>api/bbox?type_points=',
-		strategy: ol.loadingstrategy.bboxLimit,
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '<?=$config_wri['sous_dossier_installation']?>images/icones/' + properties.type.icone + '.png'
-				}),
-			};
-		},
-		label: function(properties) { // To click on the label
-			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-		},
-		href: function(properties) { // For click on icon
-			return properties.lien;
-		},
-	}),
-
-	baseLayers = {
+const baseLayers = {
 		'Refuges.info': layerOSM(
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
@@ -35,6 +17,29 @@ const layerPoints = layerVectorURL({
 		'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
 	},
 
+	layerPoints = layerVectorURL({
+		baseUrl: '<?=$config_wri['sous_dossier_installation']?>api/bbox?type_points=',
+		strategy: ol.loadingstrategy.bboxLimit,
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: '<?=$config_wri['sous_dossier_installation']?>images/icones/' + properties.type.icone + '.png'
+				}),
+			};
+		},
+		label: function(properties) { // To click on the label
+			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
+		},
+		href: function(properties) { // To click on icon
+			return properties.lien;
+		},
+	}),
+
+	marqueur = layerMarker({
+		imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/cadre.png',
+		idDisplay: 'marqueur',
+	}),
+
 	map = new ol.Map({
 		target: 'carte-point',
 		view: new ol.View({
@@ -43,11 +48,7 @@ const layerPoints = layerVectorURL({
 		}),
 		layers: [
 			layerPoints,
-			layerMarker({
-				imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/cadre.png',
-//				llInit: [ <?=$vue->point->longitude?> , <?=$vue->point->latitude?> ],
-				idDisplay: 'position-proj',
-			}),
+			marqueur,
 		],
 		controls: [
 			controlLayersSwitcher({
@@ -64,7 +65,6 @@ const layerPoints = layerVectorURL({
 				tipLabel: 'Plein écran',
 			}),
 			controlDownloadGPX(),
-			controlPrint(),
 			new ol.control.Attribution({
 				collapsible: false, // Attribution always open
 			}),

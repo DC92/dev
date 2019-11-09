@@ -1074,6 +1074,7 @@ function controlPermalink(o) {
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
+			document.cookie = 'permalink=zoom='+newParams[0]+'&lat='+newParams[2]+'&lon='+newParams[1]+';path=/; SameSite=Strict'; //TODO DELETE (temp WRI)
 		}
 	}
 	return control;
@@ -1401,7 +1402,8 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
-//BEST load WPT
+//TODO TEST downloader WPT
+//TODO BUG don't close the last </wpt>
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'ol-download-gpx',

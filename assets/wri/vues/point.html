@@ -90,10 +90,13 @@
 				<?}else{?>
 					<span id="coordonnees-value">
 						Longitude:
-						<em id="position-proj-lon"><?=$vue->point->longitude?></em>,
+						<em id="marqueur-lon"><?=$vue->point->longitude?></em>,
 						Latitude:
-						<em id="position-proj-lat"><?=$vue->point->latitude?></em>
-						(WGS84)
+						<em id="marqueur-lat"><?=$vue->point->latitude?></em> (WGS84),
+					</span>
+					<span>
+						X : <em id="marqueur-x"></em>,
+						Y : <em id="marqueur-y"></em> (CH 1903)
 					</span>&rarr;
 						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">gpx</a>,
 						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">kml</a>,

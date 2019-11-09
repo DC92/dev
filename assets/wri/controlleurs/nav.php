@@ -20,6 +20,11 @@ require_once ("bdd.php");
 require_once ("meta_donnee.php");
 require_once ("polygone.php");
 
+//TODO DELETE
+$vue->css           [] = $config_wri['url_chemin_leaflet'].'leaflet.css?'.filemtime($config_wri['chemin_leaflet'].'leaflet.css');
+$vue->java_lib_foot [] = $config_wri['url_chemin_leaflet'].'leaflet.js?' .filemtime($config_wri['chemin_leaflet'].'leaflet.js');
+$vue->java_lib_foot [] = $config_wri['sous_dossier_installation'].'vues/wiki.js';
+
 $vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
 $vue->css          [] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.css?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.css');
@@ -37,7 +42,7 @@ $vue->types_point_affichables=types_point_affichables();
 $id_polygone = (int) $controlleur->url_decoupee[1];
 $vue->mode_affichage = $_GET['mode_affichage']; // "zone", "massif" ou "edit". ca definit l'affichage qui suit
 
-//Récupère les soumissions du formulaire de modification de paramètres de massifs
+// Récupère les soumissions du formulaire de modification de paramètres de massifs
 if ($id_polygone_edit = edit_info_polygone())
     $id_polygone = $id_polygone_edit;
 
