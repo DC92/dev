@@ -1921,6 +1921,7 @@ function controlsCollection(options) {
 		}),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
+		new ol.control.Rotate(), //BEST add it in GPS button
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
 		controlPrint(),
