@@ -1074,7 +1074,7 @@ function controlPermalink(o) {
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
-			document.cookie = 'permalink=zoom='+newParams[0]+'&lat='+newParams[2]+'&lon='+newParams[1]+';path=/; SameSite=Strict'; //TODO DELETE (temp WRI)
+			document.cookie = 'permalink=zoom=' + newParams[0] + '&lat=' + newParams[2] + '&lon=' + newParams[1] + ';path=/; SameSite=Strict'; //TODO DELETE (temp WRI)
 		}
 	}
 	return control;
@@ -1178,7 +1178,6 @@ function controlGeocoder() {
  * Requires controlButton
  */
 //BEST GPS tap on map = distance from GPS calculation
-//TODO WRI don't load => date index.php
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1219,11 +1218,11 @@ function controlGPS(options) {
 				switch (active) {
 					case 0: // Nothing
 						map.removeLayer(graticuleLayer);
+						map.getView().setRotation(0, 0); // Set north to top
 						break;
 					case 1: // Track, reticule & center to the position & orientation
 						map.addLayer(graticuleLayer);
-					case 2: // Track, display reticule, stay in position & orientation
-						map.getView().setRotation(0, 0); // Set north to top
+						// case 2: Track, display reticule, stay in position & orientation
 				}
 			}
 		}),
@@ -1274,6 +1273,7 @@ function controlGPS(options) {
 		function(evt) {
 			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
 			if (heading)
+				//TODO BEST don't do map orientation when no GPS
 				compas = {
 					heading: Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 					absolute: evt.absolute // Gives initial device orientation | magnetic north
@@ -1836,8 +1836,6 @@ function layersCollection(keys) {
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
 			'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
 		), // Not on https
-		'Autriche': layerKompass('KOMPASS Touristik'),
-		'Kompas': layerKompass('KOMPASS'),
 		'OSM cycle': layerThunderforest(keys.thunderforest, 'cycle'),
 		'OSM landscape': layerThunderforest(keys.thunderforest, 'landscape'),
 		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
@@ -1874,6 +1872,8 @@ function layersCollection(keys) {
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
 		'Angleterre': layerOS(keys.bing),
+		'Autriche': layerKompass('KOMPASS Touristik'),
+		'Kompas': layerKompass('KOMPASS'),
 		//BUG		'Bing': layerBing(keys.bing, 'Road'),
 		'Bing photo': layerBing(keys.bing, 'AerialWithLabels'),
 		'Google road': layerGoogle('m'),

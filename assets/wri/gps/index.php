@@ -29,8 +29,8 @@
 	<!-- This app -->
 	<link rel="manifest" href="manifest.json">
 	<script defer="defer" src="index.js?<?=filemtime('index.js')?>"></script>
-	<!-- ref="index.php" (for service-worker list) -->
-	<!-- ref="service-worker.js.php" (for service-worker list) -->
+	<!-- ref="index.php" (for cached file list) -->
+	<!-- ref="service-worker.php" (for cached file list) -->
 
 	<script>
 		var ign_key = '<?=$config_wri['ign_key']?>',

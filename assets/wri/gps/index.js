@@ -16,7 +16,7 @@ if (!window.location.pathname.split('/').pop())
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register('service-worker.js.php')
+	navigator.serviceWorker.register('service-worker.php')
 	// Reload if any app file has been updated
 	.then(reg => {
 		reg.addEventListener('updatefound', () => {
@@ -40,7 +40,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée\n' +
-	'Sw ' + dateGen,
+	'Sw ' + dateGen + ' / ' + window.location,
 
 	baseLayers = {
 		'OpenTopoMap': layerOSM(
@@ -115,10 +115,10 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 				alert(this.title);
 			},
 		}),
-	];
+	],
 
-new ol.Map({
-	target: 'map',
-	layers: [layerWRI],
-	controls: controls,
-});
+	map = new ol.Map({
+		target: 'map',
+		layers: [layerWRI],
+		controls: controls,
+	});
