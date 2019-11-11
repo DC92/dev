@@ -18,21 +18,39 @@ const baseLayers = {
 		'Photo Bing': layerBing('<?=$config_wri['bing_key ']?>', 'Aerial'),
 		'Photo IGN': layerIGN('<?=$config_wri['ign_key ']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
 	},
+
+	/**
+	 * www.refuges.info areas layer
+	 * Requires layerVectorURL
+	 */
+	layerMassifs = layerVectorURL({
+		baseUrl: '//www.refuges.info/api/polygones?type_polygon=1',
+		styleOptions: function(properties) {
+			// Translates the color in RGBA to be transparent
+			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.couleur);
+			return {
+				stroke: new ol.style.Stroke({
+					color: 'black',
+				})
+			};
+		},
+	}),
+	
 	editeur = layerEdit({
 		geoJsonId: 'edit-json',
-		wcontrols: [
+		controls: [
 			controlModify,
 			controlDrawLine,
 			controlDrawPolygon,
 		],
-//		snapLayers: [chemineurLayer],
-		wstyleOptions: {
+//		snapLayers: [layerMassifs],
+		styleOptions: {
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 5,
 			}),
 		},
-		weditStyleOptions: { // Hover / modify / create
+		editStyleOptions: { // Hover / modify / create
 			image: new ol.style.Circle({
 				radius: 5,
 				fill: new ol.style.Fill({
@@ -47,12 +65,17 @@ const baseLayers = {
 	}),
 	map = new ol.Map({
 		target: 'carte-nav',
-		view: new ol.View({center: ol.proj.fromLonLat([2, 47]),zoom: 13,
+		view: new ol.View({
+			center: ol.proj.fromLonLat([2, 47]),// Default
+			zoom: 13,
 		}),
-		overlays: [editeur
+		layers: [
+			layerMassifs,
+			editeur,
 		],
-		controls: controlsCollection({baseLayers: baseLayers,
-		}),
+		controls: controlsCollection({
+			baseLayers: baseLayers,		
+			}),
 	});
 
 /*

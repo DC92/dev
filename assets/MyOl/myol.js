@@ -554,8 +554,7 @@ layerOverpass = function(o) {
 			labelClass: 'label-overpass',
 			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 		}, o),
-		checkEls = document.getElementsByName(options.selectorName),
-		elSelector = document.getElementById(options.selectorId);
+		checkEls = document.getElementsByName(options.selectorName);
 
 	// Convert areas into points to display it as an icon
 	function readFeaturesOverpass(response) {
@@ -611,7 +610,7 @@ layerOverpass = function(o) {
 				})
 			};
 		},
-		baseUrlFunction: function(bbox, list, resolution) {
+		baseUrlFunction: function(bbox, list) {
 			const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 				args = [];
 
@@ -1532,8 +1531,9 @@ function layerEdit(o) {
 		}, o),
 		format = new ol.format.GeoJSON(),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		features = format.readFeatures(
-			JSONparse(geoJsonEl.value || '{"type":"FeatureCollection","features":[]}'), {
+			JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
 				featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
 			}
 		),
@@ -1560,11 +1560,12 @@ function layerEdit(o) {
 
 	source.save = function() {
 		// Save lines in <EL> as geoJSON at every change
-		geoJsonEl.value = format.writeFeatures(features, {
-			featureProjection: 'EPSG:3857',
-			decimals: 5,
-		});
-	};
+		if (geoJsonEl)
+			geoJsonEl.value = format.writeFeatures(features, {
+				featureProjection: 'EPSG:3857',
+				decimals: 5,
+			});
+		};
 
 	layer.createRenderer = function() { //HACK to get control at the layer init
 		const map = layer.map_;
@@ -1819,6 +1820,7 @@ function compareCoords(a, b) {
  */
 function layersCollection(keys) {
 	return {
+		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OpenTopo': layerOSM(
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
@@ -1826,7 +1828,6 @@ function layersCollection(keys) {
 			17
 		),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
-		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOSM(
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
