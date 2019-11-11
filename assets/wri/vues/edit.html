@@ -1,13 +1,3 @@
-<?php
-/*
-Bloc HTML réalisant l'édition du contour des massifs
-
-Concept de Zone et Massifs :
-Massif (1): classique : un poly qui entoure tous les points, possibilité de jouer avec le panel de gauche
-Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cliquer pour aller sur un massif. comme l'ancienne page massifs.
-*/
-?>
-
 <div class="contenu noprint">
 	<h3 id="titrepage">
 		Edition des contours du massif "<?=$vue->polygone->nom_polygone?>"
@@ -64,24 +54,26 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 			<fieldset>
 				<legend>Edition</legend>
 				<label>
-					<p><u>Créer un polygone:</u> Cliquer sur le contrôle "polygone" puis à l'emplacement du premier sommet...</p>
-					<p><u>Ajouter un sommet:</u> Déplacer un marqueur au milieu d'un côté.</p>
-					<p><u>Déplacer un sommet:</u> Le déplacer.
-					Les sommets déplacés "collent" aux sommets des autres massifs et prennent exactement leur position.</p>
-					<p><u>Supprimer un sommet:</u> Cliquer une fois dessus.</p>
-					<p><u>Supprimer un polygone:</u> Cliquer sur le contrôle "poubelle" puis sur un côté.</p>
+					<p><u>Créer un polygone:</u> Cliquer sur le contrôle "P" puis à l'emplacement du premier sommet...</p>
 					<hr/>
-					<p>Pour une édition plus complexe, vous pouvez transformer vos polygones en lignes brisées.</p>
-					<p><u>Couper un polygone:</u> Cliquer une fois sur un marqueur au milieu d'un côté.
-					On obtient une ligne.</p>
-					<p><u>Etendre une ligne:</u> Cliquer sur le contrôle "Tracer une ligne" puis sur l'extrémité à étendre...</p>
-					<p><u>Ajouter une ligne:</u> Cliquer sur le contrôle "Tracer une ligne" puis à l'emplacement de la première exterémité...</p>
-					<p><u>Fusionner deux lignes:</u> Joindre une extrémité de chacune.</p>
-					<p><u>Fermer une ligne:</u> Joindre ses deux extrémités. On obtient un polygone.</p>
+					<p><b>Modifier un polygone:</b> Cliquer sur le contrôle "M" puis :</p>
+					<p><u>Ajouter un sommet:</u> Cliquer sur un point d'un côté puis le déplacer</p>
+					<p><u>Déplacer un sommet:</u> Cliquer dessus puis le déplacer.
+					Les sommets déplacés "collent" aux sommets des autres massifs et prennent exactement leur position</p>
+					<p><u>Supprimer un sommet:</u> Alt+cliquer dessus</p>
+					<p><u>Supprimer un polygone:</u> Ctrl+Alt+cliquer sur un côté</p>
+					<hr/>
+
+					<p>Pour une édition plus complexe, vous pouvez transformer vos polygones en lignes brisées</p>
+					<p><u>Couper un polygone:</u> Alt+cliquer au milieu d'un côté.
+					On obtient une ligne</p>
+					<p><u>Etendre une ligne:</u> Etirer une extrémité</p>
+					<p><u>Fusionner deux lignes:</u> Joindre une extrémité de chacune</p>
+					<p><u>Fermer une ligne:</u> Joindre ses deux extrémités. On obtient un polygone</p>
 					<hr/>
 					<p><u>Sauvegarder les modifications:</u> Cliquer sur le bouton "Enregistrer."</p>
-					<p><u>Note:</u> Lors de la sauvegarde les lignes seront refermées en ploygones.</p>
-					<p><u>Quiter sans enregistrer:</u> Cliquer sur "Quiter sans enregistrer".</p>
+					<p><u>Note:</u> Lors de la sauvegarde les lignes seront refermées en ploygones</p>
+					<p><u>Quiter sans enregistrer:</u> Cliquer sur "Quiter sans enregistrer"</p>
 				</label>
 			</fieldset>
 	</form>
