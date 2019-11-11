@@ -8,7 +8,7 @@
  * With some personal additions https://github.com/Dominique92/MyOl
 */
 
-// The first time a user hits the page, an install event is triggered.
+// The first time a user hits the page, an install event is triggered
 // The next times an update is provided if the remote service-worker source md5 is different
 self.addEventListener('install', function(e) {
 	caches.delete('gpsCache');

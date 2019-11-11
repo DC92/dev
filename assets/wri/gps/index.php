@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<?php include('../config_privee.php')?>
+<?php
+	include ('../config_privee.php');
+?>
 <html>
 <head>
 	<title>GPS refuges.info</title>
@@ -34,8 +36,7 @@
 
 	<script>
 		var ign_key = '<?=$config_wri['ign_key']?>',
-			bing_key = '<?=$config_wri['bing_key']?>',
-			dateGen = '<?=date('ymd-Hi')?>';
+			registrationDate = ' <?=date('md-Hi')?>-';
 	</script>
 
 	<style>

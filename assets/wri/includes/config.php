@@ -43,7 +43,6 @@ $config_wri['base_wiki']=$config_wri['sous_dossier_installation']."wiki/";
 // On centralise ici tous les paramètres PhpBB qui sont figés
 // Des fois qu'on décide de re-bouger le forum, on ne le changera qu'ici
 $config_wri['lien_forum']=$config_wri['sous_dossier_installation']."forum/";
-$config_wri['url_api']=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$config_wri['lien_forum'].'ext/RefugesInfo/couplage/api.php';
 // On paramètre le numéro du forum qui contient les topics de discussion sur les fiches des points
 $config_wri['forum_refuges']=4;
 
