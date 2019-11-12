@@ -870,6 +870,7 @@ function layerMarker(o) {
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
+//TODO big buttons on mobile
 var nextButtonPos = 2.5; // Top position of next button (em)
 
 function controlButton(o) {
@@ -1084,6 +1085,20 @@ function controlPermalink(o) {
  * option hoverStyle style the hovered feature
  * Requires controlButton
  */
+function controlMousePosition() {
+	return new ol.control.MousePosition({
+		coordinateFormat: ol.coordinate.createStringXY(5),
+		projection: 'EPSG:4326',
+		className: 'ol-coordinate',
+		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
+	});
+}
+
+/**
+ * Control to displays the length of a line overflown
+ * option hoverStyle style the hovered feature
+ * Requires controlButton
+ */
 function controlLengthLine() {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), // div to display the measure
@@ -1272,7 +1287,6 @@ function controlGPS(options) {
 		function(evt) {
 			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
 			if (heading)
-				//TODO BEST don't do map orientation when no GPS
 				compas = {
 					heading: Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 					absolute: evt.absolute // Gives initial device orientation | magnetic north
@@ -1560,12 +1574,13 @@ function layerEdit(o) {
 
 	source.save = function() {
 		// Save lines in <EL> as geoJSON at every change
+		//TODO simplify FeatureCollection
 		if (geoJsonEl)
 			geoJsonEl.value = format.writeFeatures(features, {
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
 			});
-		};
+	};
 
 	layer.createRenderer = function() { //HACK to get control at the layer init
 		const map = layer.map_;
@@ -1631,6 +1646,7 @@ function layerEdit(o) {
 
 //BEST hover feature when modifing
 //BEST collect all languages in a single place
+//TODO enable at init
 function controlModify(options) {
 	const button = controlButton(Object.assign({
 		className: 'ol-modify',
@@ -1674,7 +1690,7 @@ function controlDrawLine(options) {
 	const button = controlButton(Object.assign({
 		className: 'ol-draw-line',
 		title: 'Création d‘une ligne:\n' +
-			'Activer "L" puis\n' +
+			'Activer "L" (couleur jaune) puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
 			'double cliquer pour terminer.\n' +
 			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
@@ -1697,7 +1713,7 @@ function controlDrawPolygon(options) {
 		className: 'ol-draw-polygon',
 		type: 'Polygon',
 		title: 'Modification d‘un polygone:\n' +
-			'Activer "P" puis\n' +
+			'Activer "P" (couleur jaune) puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
 			'double cliquer pour terminer.\n' +
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
@@ -1898,27 +1914,20 @@ function controlsCollection(options) {
 	return [
 		controlLayersSwitcher(Object.assign({
 			baseLayers: options.baseLayers,
-			geoKeys: options.geoKeys
+			geoKeys: options.geoKeys,
 		}, options.controlLayersSwitcher)),
 		controlTilesBuffer(),
 		controlPermalink(options.controlPermalink),
 		new ol.control.Attribution({
-			collapsible: false // Attribution always open
+			collapsible: false, // Attribution always open
 		}),
 		new ol.control.ScaleLine(),
-		new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
-			projection: 'EPSG:4326',
-			className: 'ol-coordinate',
-			undefinedHTML: String.fromCharCode(0)
-		}),
+		controlMousePosition(),
 		controlLengthLine(),
-		new ol.control.Zoom({
-			zoomOutLabel: '-'
-		}),
+		new ol.control.Zoom(),
 		new ol.control.FullScreen({
 			label: '', //HACK Bad presentation on IE & FF
-			tipLabel: 'Plein écran'
+			tipLabel: 'Plein écran',
 		}),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),

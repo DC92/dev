@@ -84,18 +84,10 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		new ol.control.Attribution({
 			collapseLabel: '>',
 		}),
-		new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
-			projection: 'EPSG:4326',
-			className: 'ol-coordinate',
-			undefinedHTML: String.fromCharCode(0),
-		}),
-		new ol.control.Zoom({
-			zoomOutLabel: '-',
-		}),
+		controlMousePosition(),
+		new ol.control.Zoom(),
 		new ol.control.FullScreen({
-			label: '',
-			labelActive: '',
+			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',
 		}),
 		controlGeocoder(),

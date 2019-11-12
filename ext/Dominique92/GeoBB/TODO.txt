@@ -178,5 +178,5 @@ Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->
 
 AIDE TEST
 =========
-MultiPolygon multiple => WRI massif 3116
+MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
 MultiPolygon avec trou => WRI massif 3127

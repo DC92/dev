@@ -55,8 +55,7 @@ const layerPoints = layerVectorURL({
 			}),
 			new ol.control.Zoom(),
 			new ol.control.FullScreen({
-				label: '',
-				labelActive: '',
+				label: '', //HACK Bad presentation on IE & FF
 				tipLabel: 'Plein écran',
 			}),
 			controlDownloadGPX(),

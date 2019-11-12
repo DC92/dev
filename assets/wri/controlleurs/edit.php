@@ -13,9 +13,6 @@ if (!$_SESSION['niveau_moderation']) {
 
 $vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
-$vue->css          [] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.css?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.css');
-$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.js?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.js');
-$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4-src.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4-src.js');
 $vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
 $vue->java_lib_foot[] = $config_wri['sous_dossier_installation'].'vues/wiki.js';

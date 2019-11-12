@@ -28,19 +28,13 @@ function geoControls(options) {
 		new ol.control.Attribution({
 			collapsible: false // Attribution always open
 		}),
-		new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
-			projection: 'EPSG:4326',
-			className: 'ol-coordinate',
-			undefinedHTML: String.fromCharCode(0)
-		}),
+		controlMousePosition(),
 		controlPermalink(Object.assign({
 			initialFit: options.geoKeys.initialFit
 		}, options.controlPermalink)),
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
-			label: '',
-			labelActive: '',
+			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran'
 		}),
 		// Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist

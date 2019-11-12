@@ -19,15 +19,27 @@ const baseLayers = {
 		'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
 	},
 
-	/**
-	 * www.refuges.info areas layer
-	 * Requires layerVectorURL
-	 */
+	controls = [
+		controlLayersSwitcher({
+			baseLayers: baseLayers,
+		}),
+		//controlPermalink(options.controlPermalink),
+		new ol.control.Attribution(),
+		new ol.control.ScaleLine(),
+		controlMousePosition(),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '', //HACK Bad presentation on IE & FF
+			tipLabel: 'Plein écran',
+		}),
+		controlGeocoder(),
+		controlLoadGPX(),
+		controlDownloadGPX(),
+	],
+
 	layerMassifs = layerVectorURL({
 		baseUrl: '<?=$config_wri['sous_dossier_installation']?>api/polygones?type_polygon=1',
 		styleOptions: function(properties) {
-			// Translates the color in RGBA to be transparent
-			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.couleur);
 			return {
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,0,0)',
@@ -76,9 +88,7 @@ const baseLayers = {
 			layerMassifs,
 			editeur,
 		],
-		controls: controlsCollection({
-			baseLayers: baseLayers,
-		}),
+		controls: controls,
 	});
 
 map.getView().fit(
