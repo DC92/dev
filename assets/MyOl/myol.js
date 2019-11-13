@@ -373,7 +373,7 @@ function layerVectorURL(o) {
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
 		format: new ol.format.GeoJSON(),
-		readFeatures: function readFeatures(response) {
+		readFeatures: function (response) {
 			return JSONparse(response);
 		},
 	}, o);

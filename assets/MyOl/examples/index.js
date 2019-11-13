@@ -68,8 +68,7 @@ const layerPointsWri = layerVectorURL({
 	 * pyrenees-refuges.com POI layer
 	 * Requires layerVectorURL
 	 */
-	prcLayer =
-	layerVectorURL({
+	prcLayer = layerVectorURL({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		selectorName: 'prc',
 		styleOptions: function(properties) {
