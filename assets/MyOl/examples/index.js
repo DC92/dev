@@ -65,21 +65,43 @@ const layerPointsWri = layerVectorURL({
 	}),
 
 	/**
+	 * pyrenees-refuges.com POI layer
+	 * Requires layerVectorURL
+	 */
+	prcLayer =
+	layerVectorURL({
+		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		selectorName: 'prc',
+		styleOptions: function(properties) {
+			const trad = {
+				'cabane fermee': 'inutilisable',
+				'cabane ouverte mais ocupee par le berger l ete': 'cabane-non-gardee',
+				'cabane ouverte': 'cabane-non-gardee',
+				'orri toue abri en pierre': 'abri',
+				'ruine': 'inutilisable',
+				'': 'abri',
+			};
+			return {
+				image: new ol.style.Icon({
+					src: 'http://www.refuges.info/images/icones/' + trad[properties.type_hebergement] + '.png',
+				}),
+			};
+		},
+		label: function(properties) {
+			return '<a href="' + properties.url + '">' + properties.name + '<a><br/>' +
+				properties.altitude + ' m<br/>' +
+				properties.cap_ete + ' places<br/>';
+		},
+		href: function(properties) {
+			return properties.url;
+		},
+	}),
+
+	/**
 	 * chemineur.fr POI layer
 	 * Requires layerVectorURL
 	 */
-	chemineurLayer =
-	layerVectorURL({
-		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-	}),
-	wchemineurLayer = new ol.layer.Vector({
-		source: new ol.source.Vector({
-			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-			format: new ol.format.GeoJSON(),
-		}),
-	}),
-
-	xchemineurLayer = layerVectorURL({
+	chemineurLayer = layerVectorURL({
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		strategy: ol.loadingstrategy.bboxLimit,
 		selectorName: 'chemineur',
@@ -176,6 +198,7 @@ const layerPointsWri = layerVectorURL({
 		layers: [
 			layerPointsWri,
 			chemineurLayer,
+			prcLayer,
 			layerMassifsWri,
 			layerOverpass(),
 			marqueur,
