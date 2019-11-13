@@ -11,6 +11,9 @@
  */
 
 /* jshint esversion: 6 */
+
+//TODO GPS manifest with date to reload without header time
+//TODO GPS avec couche venant d'un serveur (traces randos)
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -1542,6 +1545,12 @@ function controlPrint() {
 function layerEdit(o) {
 	const options = Object.assign({
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
+			saveFeatures: function() {
+				return format.writeFeatures(source.getFeatures(), {
+					featureProjection: 'EPSG:3857',
+					decimals: 5,
+				});
+			},
 		}, o),
 		format = new ol.format.GeoJSON(),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
@@ -1572,14 +1581,10 @@ function layerEdit(o) {
 			style: escapedStyle(options.styleOptions, options.editStyleOptions),
 		});
 
-	source.save = function() {
+	source.save = function(coordinates) {
 		// Save lines in <EL> as geoJSON at every change
-		//TODO simplify FeatureCollection
 		if (geoJsonEl)
-			geoJsonEl.value = format.writeFeatures(features, {
-				featureProjection: 'EPSG:3857',
-				decimals: 5,
-			});
+			geoJsonEl.value = options.saveFeatures(coordinates, format);
 	};
 
 	layer.createRenderer = function() { //HACK to get control at the layer init
@@ -1594,9 +1599,9 @@ function layerEdit(o) {
 		map.addInteraction(hover);
 		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
 			const control = c(Object.assign({
+				buttonBackgroundColors: ['white', '#ef3'],
 				group: layer,
 				layer: layer,
-				buttonBackgroundColors: ['white', '#ef3'],
 				source: source,
 				style: escapedStyle(options.styleOptions, options.editStyleOptions),
 				activate: function(active) {
@@ -1722,75 +1727,76 @@ function controlDrawPolygon(options) {
 
 // Reorganise Points, Lines & Polygons
 function optimiseEdited(source, pointerPosition) {
-	// Get all edited features
+	// Get all edited features as array of coordinates
 	let lines = getLines(source.getFeatures(), pointerPosition),
 		polys = [];
-	source.clear(); // Remove everything
 
-	// Get flattened list of multipoints coords
-	for (let a = 0; a < lines.length; a++) {
-		// Exclude 1 coord features (points)
-		if (lines[a] && lines[a].length < 2)
-			lines[a] = null;
-
-		// Convert closed lines into polygons
-		if (compareCoords(lines[a])) {
-			polys.push([lines[a]]);
-			lines[a] = null;
-		}
-		// Merge lines having a common end
-		for (let b = 0; b < a; b++) { // Once each combination
-			const m = [a, b];
-			for (let i = 4; i; i--) // 4 times
-				if (lines[m[0]] && lines[m[1]]) {
-					// Shake lines end to explore all possibilities
-					m.reverse();
-					lines[m[0]].reverse();
-					if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
-
-						// Merge 2 lines matching ends
-						lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
-						lines[m[1]] = 0;
-
-						// Restart all the loops
-						a = -1;
-						break;
+	for (let loop = true; loop;) {
+		loop = false;
+		for (let a in lines) {
+			// Exclude 1 coordinates features (points)
+			if (lines[a] && lines[a].length < 2) {
+				lines.splice(a, 1);
+				loop = true;
+				break;
+			}
+			// Convert closed lines into polygons
+			if (compareCoords(lines[a])) {
+				polys.push([lines[a]]);
+				lines.splice(a, 1);
+				loop = true;
+				break;
+			}
+			// Merge lines having a common end
+			for (let b = 0; b < a; b++) { // Once each combination
+				const m = [a, b];
+				for (let i = 4; i; i--) // 4 times
+					if (lines[m[0]] && lines[m[1]]) {
+						// Shake lines end to explore all possibilities
+						m.reverse();
+						lines[m[0]].reverse();
+						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+							// Merge 2 lines matching ends
+							lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
+							lines.splice(m[1], 1);
+							loop = true;
+							break;
+						}
 					}
-				}
+			}
 		}
-	}
-	// Makes holes if a polygon is included in a biggest one
-	for (let p1 in polys)
-		if (polys[p1]) {
+		// Makes holes if a polygon is included in a biggest one
+		for (let p1 in polys) {
 			const fs = new ol.geom.Polygon(polys[p1]);
 			for (let p2 in polys)
-				if (p1 != p2 &&
-					polys[p2]) {
+				if (p1 != p2) {
 					let intersects = true;
 					for (let c in polys[p2][0])
 						if (!fs.intersectsCoordinate(polys[p2][0][c]))
 							intersects = false;
 					if (intersects) {
 						polys[p1].push(polys[p2][0]);
-						polys[p2] = null;
+						polys.splice(p2, 1);
+						loop = true;
+						break;
 					}
 				}
 		}
-	//BEST EDIT option not to be able to cut a polygon (WRI / alpages)
-
-	// Recreate modified features
+	}
+	// Recreate & save modified features
+	source.clear();
 	for (let l in lines)
-		if (lines[l]) {
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.LineString(lines[l])
-			}));
-		}
+		source.addFeature(new ol.Feature({
+			geometry: new ol.geom.LineString(lines[l])
+		}));
 	for (let p in polys)
-		if (polys[p])
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(polys[p])
-			}));
-	source.save();
+		source.addFeature(new ol.Feature({
+			geometry: new ol.geom.Polygon(polys[p])
+		}));
+	source.save({
+		lines: lines,
+		polys: polys,
+	});
 }
 
 function getLines(features, pointerPosition) {

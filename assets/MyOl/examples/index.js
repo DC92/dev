@@ -68,7 +68,18 @@ const layerPointsWri = layerVectorURL({
 	 * chemineur.fr POI layer
 	 * Requires layerVectorURL
 	 */
-	chemineurLayer = layerVectorURL({
+	chemineurLayer =
+	layerVectorURL({
+		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+	}),
+	wchemineurLayer = new ol.layer.Vector({
+		source: new ol.source.Vector({
+			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+			format: new ol.format.GeoJSON(),
+		}),
+	}),
+
+	xchemineurLayer = layerVectorURL({
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		strategy: ol.loadingstrategy.bboxLimit,
 		selectorName: 'chemineur',
@@ -147,6 +158,13 @@ const layerPointsWri = layerVectorURL({
 				color: 'red',
 				width: 5,
 			}),
+		},
+		saveFeatures: function(coordinates, format) {
+			return format.writeGeometry(
+				new ol.geom.MultiPolygon(coordinates.polys), {
+					featureProjection: 'EPSG:3857',
+					decimals: 5,
+				});
 		},
 	}),
 

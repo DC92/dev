@@ -54,6 +54,34 @@
 <body>
 	<div id="map"></div>
 
+	<input type="text" id="geojson" style="width:90%" value='
+		{"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"geometry": {
+						"type":"MultiLineString",	"coordinates":[
+							[[-4.37,47.79],[-4.33,47.86],[-4.47,48],[-4.75,48.05],[-4.3,48.12],[-4.27,48.2],[-4.564,48.2],[-4.64,48.3],[-4.23,48.33],[-4.5,48.38],[-4.86,48.3],[-4.84,48.59],[-4.46,48.63],[-4.0,48.7],[-3.7,48.7],[-3.57,48.68],[-3.58,48.84],[-3.14,48.86],[-2.68,48.52],[-2.8,47.57],[-3.14,47.58],[-3.66,47.79],[-4.15,47.76]],
+							[[-5.7,49],[-5.6,48.7],[-5.1,48.8]]
+						]}
+				},{
+					"type": "Feature",
+					"geometry": {
+						"type":"LineString",
+						"coordinates":[[-5.7,48],[-5.6,47.7],[-5.1,47.8]]}
+				},{
+					"type": "Feature",
+					"geometry": {
+						"type": "Polygon",
+						"coordinates": [
+							[[-2.16293, 50.03509],[-3.11462, 49.57392],[-2.48886, 48.9216],[-1.81755, 48.85824],[-1.8988, 49.44551],[-2.16293, 50.03509]],
+							[[-2.27646, 49.17243],[-1.97617, 49.14249],[-2.01096, 49.24779],[-2.28561, 49.27169],[-2.27646, 49.17243]]
+						]}
+				}
+			]
+		}
+	' />
+
 	<ul id="overpass">
 		<li>OVERPASS<input type="checkbox" name="overpass" /></li>
 		<li><input type="checkbox" name="overpass" id="point_eau" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
@@ -107,29 +135,6 @@
 	<p><a style="cursor:pointer" onclick="map.getView().setCenter(viseur.getPoint().getCoordinates())">Recentrer la carte sur le curseur</a></p>
 	<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
 	<p><a style="cursor:pointer" onclick="controlgps.action()">Utiliser la position du GPS</a></p>
-
-	<input type="text" id="geojson" style="width:90%" value='
-		{"type": "FeatureCollection",
-			"features": [
-				{
-					"type": "Feature",
-					"geometry": {
-						"type":"MultiLineString",	"coordinates":[[[-4.37,47.79],[-4.33,47.86],[-4.47,48],[-4.75,48.05],[-4.3,48.12],[-4.27,48.2],[-4.564,48.2],[-4.64,48.3],[-4.23,48.33],[-4.5,48.38],[-4.86,48.3],[-4.84,48.59],[-4.46,48.63],[-4.0,48.7],[-3.7,48.7],[-3.57,48.68],[-3.58,48.84],[-3.14,48.86],[-2.68,48.52],[-2.8,47.57],[-3.14,47.58],[-3.66,47.79],[-4.15,47.76]]]}
-				},{
-					"type": "Feature",
-					"geometry": {
-						"type":"MultiLineString",
-						"coordinates":[[[-5.7,48],[-5.6,47.7],[-5.1,47.8]]]}
-				},{
-					"type": "Feature",
-					"geometry": {
-						"type": "Polygon",
-						"coordinates": [[[-2.16293, 50.03509],[-3.11462, 49.57392],[-2.48886, 48.9216],[-1.81755, 48.85824],[-1.8988, 49.44551],[-2.16293, 50.03509]],
-							[[-2.27646, 49.17243],[-1.97617, 49.14249],[-2.01096, 49.24779],[-2.28561, 49.27169],[-2.27646, 49.17243]]]}
-				}
-			]
-		}
-	' />
 </body>
 
 </html>
