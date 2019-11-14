@@ -3,26 +3,20 @@
  * (C) Dominique Cavailhez 2017 - https://github.com/Dominique92/MyOl
  */
 
-.ol-viewport {
-	font-size: 16px;
-}
-
 /* Features popup */
-.myPopup,
-.myPopup:hover {
+.myol-popup,
+.myol-popup:hover {
 	display: block;
 	padding: 1px 4px;
 	background-color: white;
 	border-radius: 5px;
 	box-shadow: 0 3px 8px #888;
-	-moz-box-shadow: 0 3px 8px #888;
-	-webkit-box-shadow: 0 3px 8px #999;
 	font-size: 12px;
 	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-decoration: none;
 	color: initial;
 }
-.myPopup p {
+.myol-popup p {
 	margin: 0;
 }
 
@@ -39,59 +33,6 @@
 }
 .overpass-popup p:first-letter {
 	text-transform: uppercase;
-}
-
-/* All buttons*/
-.ol-control-hidden {
-	display: none;
-}
-.ol-control {
-	border-radius: 2px;
-	padding: 0;
-}
-.ol-control button,
-.ol-control button:focus {
-	height: 25px;
-	width: 25px;
-	background-color: white;
-	color: black !important;
-	margin: 0;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	-moz-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	-webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	outline: 0;
-}
-.ol-control button:hover {
-	box-shadow: 1px 1px 10px black;
-	-moz-box-shadow: 1px 1px 10px black;
-	-webkit-box-shadow: 1px 1px 10px black;
-	background-color: #D6FBFF;
-}
-.ol-control button:active {
-	background-color: #66F0FF;
-	position: relative;
-	top: 1px;
-	left: 1px;
-	box-shadow: -.5px -.5px 8px rgba(0, 0, 0, 0.65);
-	-moz-box-shadow: -.5px -.5px 8px rgba(0, 0, 0, 0.65);
-	-webkit-box-shadow: -.5px -.5px 8px rgba(0, 0, 0, 0.65);
-}
-
-/* Switch layer popup */
-.ol-switch-layer button::after {
-	content: "…";
-}
-.ol-switch-layer {
-	font-size: small;
-	background-color: white !important;
-	border-radius: 5px;
-	z-index: 200;
-}
-.ol-switch-layer div {
-	padding: 2px;
-}
-.ol-switch-layer input {
-	margin: 0;
 }
 
 /* Permalink */
@@ -137,15 +78,84 @@
 	display: none;
 }
 
+/* All buttons*/
+.ol-control-hidden {
+	display: none;
+}
+.ol-control {
+	padding: 0; /* No grey line around the button */
+}
+.ol-control button,
+.ol-control button:focus,
+.ol-geocoder button,
+.ol-geocoder button:focus {
+	background-color: white;
+	color: black ;
+	margin: 0;
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
+	outline: unset;
+}
+.ol-control button:hover,
+.ol-geocoder button:hover {
+	box-shadow: 1px 1px 10px black;
+	background-color: #D6FBFF;
+}
+.ol-control button:active,
+.ol-geocoder button:active { /* Shift the button by 1px when clicked */
+	position: relative !important;
+	top: 1px;
+	left: 1px;
+	wbox-shadow: -.5px -.5px 8px rgba(0, 0, 0, 0.65);
+}
+/* Top left aligned buttons */
+.ol-zoom,
+.ol-full-screen,
+.ol-geocoder,
+.ol-gps,
+.myol-button {
+	position: initial !important;
+	top: initial !important;
+	left: initial !important;
+	float: left;
+	border-radius: 2px;
+	margin: 0.25em 0 0 0.25em;
+}
+
+/* Geocoder */
+.ol-geocoder {
+	width: 1.625em;
+}
+.ol-geocoder button {
+	position: initial !important;
+	height: 1.375em !important;
+	width: 1.375em !important;
+}
+.gcd-gl-control {
+	height: 70px !important;
+	width: 1.625em !important;
+	background-color: rgba(0, 0, 0, 0);
+}
+.gcd-gl-control:hover {
+	background-color: rgba(0, 0, 0, 0);
+}
+.gcd-gl-input {
+	display: none;
+	position: initial !important;
+	margin: .2em 0;
+}
+.ol-geocoder .gcd-gl-reset {
+	top: 1.5em;
+}
+.gcd-gl-expanded {
+	width: 15.625em !important;
+}
+.gcd-gl-expanded .gcd-gl-input {
+	display: initial; /* Unhide the input field */
+}
+
 /* Full screen */
 .ol-full-screen {
-	top: .5em;
-	left: 2.5em;
-	right: auto;
-}
-:-webkit-full-screen { /* HACK bug in Chrome & Edge */
-	width: 100vw !important;
-	height: 100vh !important;
+	right: initial; /* Initial right => big margin */
 }
 .ol-full-screen-false {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
@@ -154,48 +164,6 @@
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M10 10l5 0 0 5-5 0z'/%3E%3Cpath d='M4 4l17 0 0 17-17 0z' style='stroke-dasharray:5,7,5,0;'/%3E%3C/svg%3E");
 }
 /* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
-
-/* Geocoder */
-.gcd-gl-container {
-	top: 0 !important;
-	left: calc(4.5em - 8px) !important;
-}
-.gcd-gl-control {
-	height: 70px !important;
-	width: 216px !important;
-	background-color: rgba(0, 0, 0, 0) !important;
-}
-.gcd-gl-btn,
-.gcd-gl-btn:focus {
-	top: 8px !important;
-	left: 8px !important;
-	height: 25px !important;
-	width: 25px !important;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='stroke:black;stroke-width:2;fill-opacity:0;'%3E%3Cpath d='M15 15A5 5 0 0 1 6 6A6 6 0 0 1 15 15L22 22'/%3E%3C/svg%3E") !important;
-}
-.ol-geocoder .gcd-gl-btn:focus {
-	top: 9px !important;
-	left: 9px !important;
-}
-.gcd-gl-btn:hover {
-	box-shadow: 1px 1px 10px black;
-}
-.gcd-gl-input {
-	display: none;
-}
-.ol-geocoder .gcd-gl-reset {
-	top: 32px;
-}
-.gcd-gl-expanded .gcd-gl-input {
-	display: initial;
-	top: calc(2em + 8px) !important;
-	left: 8px !important;
-}
-.gcd-gl-result {
-	top: 66px !important;
-	left: 8.5px !important;
-}
 
 /* GPS */
 .ol-gps button {
@@ -262,4 +230,18 @@
 
 .ol-help button::after {
 	content: "?";
+}
+
+/* Switch layer popup */
+.ol-switch-layer {
+	background-color: white !important; /* Initial translucid */
+}
+.ol-switch-layer button::after {
+	content: "…";
+}
+.ol-switch-layer div {
+	padding: 2px;
+}
+.ol-switch-layer input {
+	margin: 0;
 }

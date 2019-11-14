@@ -373,7 +373,7 @@ function layerVectorURL(o) {
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
 		format: new ol.format.GeoJSON(),
-		readFeatures: function (response) {
+		readFeatures: function readFeatures(response) {
 			return JSONparse(response);
 		},
 	}, o);
@@ -515,7 +515,7 @@ function layerVectorURL(o) {
 				window.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
 				// Fill label class & text
-				window.popEl_.className = 'myPopup ' + (options.labelClass || '');
+				window.popEl_.className = 'myol-popup ' + (options.labelClass || '');
 				window.popEl_.innerHTML = label + postLabel;
 				if (typeof options.href == 'function') {
 					window.popEl_.href = options.href(properties);
@@ -873,9 +873,7 @@ function layerMarker(o) {
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
-//TODO big buttons on mobile
-var nextButtonPos = 2.5; // Top position of next button (em)
-
+//BEST left aligned buttons
 function controlButton(o) {
 	const buttonEl = document.createElement('button'),
 		options = Object.assign({
@@ -891,10 +889,8 @@ function controlButton(o) {
 		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
 			control.element.style.top = options.rightPosition + 'em';
 			control.element.style.right = '.5em';
-		} else {
+		} else
 			control.element.style.top = '.5em';
-			control.element.style.left = (nextButtonPos += 2) + 'em';
-		}
 	}
 	buttonEl.addEventListener('click', function(evt) {
 		evt.preventDefault();
@@ -942,7 +938,6 @@ function controlLayersSwitcher(options) {
 	// Transparency slider (first position)
 	const rangeEl = document.createElement('input');
 	rangeEl.type = 'range';
-	rangeEl.className = 'range-layer';
 	rangeEl.oninput = displayLayerSelector;
 	rangeEl.title = 'Glisser pour faire varier la tranparence';
 	button.element.appendChild(rangeEl);
@@ -1168,6 +1163,8 @@ function controlTilesBuffer() {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
+//TODO symbol on button
+//TODO BUG thin button on mobile
 function controlGeocoder() {
 	// Vérify if geocoder is available (not supported in IE)
 	const ua = navigator.userAgent;
@@ -1185,7 +1182,6 @@ function controlGeocoder() {
 	});
 	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
 	geocoder.container.style.top = '.5em';
-	geocoder.container.style.left = (nextButtonPos += 2) + 'em';
 
 	return geocoder;
 }
@@ -1194,7 +1190,8 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//BEST GPS tap on map = distance from GPS calculation
+ //TODO BUG little symbol on mobile
+ //BEST GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
@@ -1225,7 +1222,7 @@ function controlGPS(options) {
 
 		// The control button
 		button = controlButton({
-			className: 'ol-gps',
+			className: 'myol-button ol-gps',
 			buttonBackgroundColors: ['white', '#ef3', '#bbb'],
 			title: 'Centrer sur la position GPS',
 			activate: function(active) {
@@ -1356,7 +1353,7 @@ function controlGPS(options) {
  */
 function controlLoadGPX(o) {
 	const options = Object.assign({
-			className: 'ol-load-gpx',
+			className: 'myol-button ol-load-gpx',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
 				inputEl.click();
@@ -1422,7 +1419,7 @@ function controlLoadGPX(o) {
 //TODO BUG don't close the last </wpt>
 function controlDownloadGPX(o) {
 	const options = Object.assign({
-			className: 'ol-download-gpx',
+			className: 'myol-button ol-download-gpx',
 			title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
 			fileName: document.title || 'openlayers',
 			activate: activate,
@@ -1476,7 +1473,7 @@ function controlDownloadGPX(o) {
  */
 function controlPrint() {
 	const button = controlButton({
-			className: 'ol-print',
+			className: 'myol-button ol-print',
 			title: 'Imprimer la carte',
 			activate: function() {
 				resizeDraft(button.getMap());
@@ -1489,6 +1486,7 @@ function controlPrint() {
 		orientationEl = document.createElement('div');
 
 	// Add orientation selectors below the button
+	//TODO BUG don't shift next button when display orentation choices
 	orientationEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
 		'<input type="radio" name="ori" value="1">Paysage A4';
 	orientationEl.className = 'ol-control-hidden';
@@ -1654,7 +1652,7 @@ function layerEdit(o) {
 //TODO enable at init
 function controlModify(options) {
 	const button = controlButton(Object.assign({
-		className: 'ol-modify',
+		className: 'myol-button ol-modify',
 		title: 'Modification d‘une ligne, d‘un polygone:\n' +
 			'Activer "M" (couleur jaune) puis\n' +
 			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
@@ -1693,7 +1691,7 @@ function controlModify(options) {
 
 function controlDrawLine(options) {
 	const button = controlButton(Object.assign({
-		className: 'ol-draw-line',
+		className: 'myol-button ol-draw-line',
 		title: 'Création d‘une ligne:\n' +
 			'Activer "L" (couleur jaune) puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
@@ -1715,7 +1713,7 @@ function controlDrawLine(options) {
 
 function controlDrawPolygon(options) {
 	return controlDrawLine(Object.assign({
-		className: 'ol-draw-polygon',
+		className: 'myol-button ol-draw-polygon',
 		type: 'Polygon',
 		title: 'Modification d‘un polygone:\n' +
 			'Activer "P" (couleur jaune) puis\n' +
@@ -1931,13 +1929,13 @@ function controlsCollection(options) {
 		controlMousePosition(),
 		controlLengthLine(),
 		new ol.control.Zoom(),
-		new ol.control.FullScreen({
+		new ol.control.FullScreen({ //TODO BUG little symbol on mobile
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',
 		}),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
-		new ol.control.Rotate(), //BEST add it in GPS button
+		//new ol.control.Rotate(), //BEST add it in GPS button
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
 		controlPrint(),
