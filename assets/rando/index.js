@@ -32,27 +32,11 @@ fetch('service-worker.php')
 	})
 	.then(function(data) {
 		genId = data.match(/[0-9]+/)[0];
-		console.log(registrationDate+genId);
+		console.log(registrationDate + genId);
 	});
 
 // Openlayers part
-const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
-	'- Installez l\'application web : explorateur -> options -> ajouter à l\'écran d\'accueil\n' +
-	'- Choisissez une couche de carte\n' +
-	'- Placez-vous au point de départ de votre randonnée\n' +
-	'- Zoomez au niveau le plus détaillé que vous voulez mémoriser\n' +
-	'- Passez en mode plein écran (mémorise également les échèles supérieures)\n' +
-	'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles\n' +
-	'- Recommencez avec les couches de cartes que vous voulez mémoriser\n' +
-	'- Allez sur le terrain et cliquez sur l\'icône "GPS"\n' +
-	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ▲\n' +
-	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur\n' +
-	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' +
-	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
-	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
-	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée\n',
-
-	baseLayers = {
+const baseLayers = {
 		'Topo': layerOSM(
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
@@ -81,24 +65,33 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',
 		}),
-		controlGPS(),
-		controlLoadGPX(),
 		controlButton({
-			className: 'ol-help myol-button',
-			title: help,
+			className: 'myol-button ol-load-gpx',
+			title: 'Charger une trace',
 			activate: function() {
-				alert(this.title + window.location + registrationDate + genId);
+				document.getElementById('liste').style.display = 'block';
+				window.scrollTo(0, 0);
+				if (document.fullscreenElement)
+					document.exitFullscreen();
 			},
 		}),
+		controlGPS(),
 	],
 
-	prcLayer = layerVectorURL({
-		url: 'gif.gpx',
+	map = new ol.Map({
+		target: 'map',
+		controls: controls,
+	});
+
+function addLayer(gpx) {
+	const layer = layerVectorURL({
+		url: gpx + '.gpx',
 		format: new ol.format.GPX(),
-		readFeatures: function (response) {
-			return (response);
+		readFeatures: function(response) {
+			map.getView().setZoom(1); // Enable gpx rendering anywhere we are
+			return (response); // No jSon syntax verification because it's XML
 		},
-		styleOptions: function(properties) {
+		styleOptions: function() {
 			return {
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -106,19 +99,24 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 				}),
 			};
 		},
-	}),
-
-	map = new ol.Map({
-		target: 'map',
-		layers: [prcLayer],
-		controls: controls,
 	});
-/*	
-			// Zoom the map on the added features
-		const extent = ol.extent.createEmpty();
+
+	// Zoom the map on the added features
+	layer.once('prerender', function() {
+		const features = layer.getSource().getFeatures(),
+			extent = ol.extent.createEmpty();
 		for (let f in features)
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
 		map.getView().fit(extent, {
 			maxZoom: 17,
 		});
-*/
+
+		if (features.length)
+			document.getElementById('liste').style.display = 'none';
+	});
+
+	map.addLayer(layer);
+}
+
+if (trace)
+	addLayer(trace);

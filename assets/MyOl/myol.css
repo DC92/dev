@@ -156,13 +156,10 @@
 .ol-full-screen {
 	right: initial; /* Initial right => big margin */
 }
-.ol-full-screen-false {
+.ol-full-screen-false,
+.ol-full-screen-true {
 	background-size: 1.375em;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
-}
-.ol-full-screen-true {
-	background-size: 1.375em !important;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M10 10l5 0 0 5-5 0z'/%3E%3Cpath d='M4 4l17 0 0 17-17 0z' style='stroke-dasharray:5,7,5,0;'/%3E%3C/svg%3E");
 }
 /* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 

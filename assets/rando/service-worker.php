@@ -13,8 +13,9 @@ $index = $_SERVER['REQUEST_SCHEME'].
 preg_match_all ('/(ref|src)="([^"]+)"/', file_get_contents ($index), $app_files);
 
 $cached_files = '';
-foreach ($app_files[2] AS $f)
-	$cached_files .= "\t'$f', // " .filemtime (explode('?',$f)[0]) .PHP_EOL;
+$files = array_merge ($app_files[2], glob('*.gpx'));
+foreach ($files AS $f)
+	$cached_files .= "\t'$f', // " .filemtime (explode ('?',$f) [0]) .PHP_EOL;
 
 // Generate a mark containing the generation ID
 echo "/* Gen ID ".substr (crc32 ($cached_files), -4)." */\n";
