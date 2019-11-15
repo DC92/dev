@@ -84,7 +84,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		controlGPS(),
 		controlLoadGPX(),
 		controlButton({
-			className: 'ol-help',
+			className: 'ol-help myol-button',
 			title: help,
 			activate: function() {
 				alert(this.title + window.location + registrationDate + genId);

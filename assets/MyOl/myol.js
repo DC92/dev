@@ -365,7 +365,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
-//TODO WRI NAV PRC + C2C direct
+//TODO WRI C2C direct
 function layerVectorURL(o) {
 	const options = Object.assign({
 		baseUrlFunction: function(bbox, list) {
@@ -1163,7 +1163,6 @@ function controlTilesBuffer() {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO symbol on button
 //TODO BUG thin button on mobile
 function controlGeocoder() {
 	// Vérify if geocoder is available (not supported in IE)
@@ -1190,8 +1189,8 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
- //TODO BUG little symbol on mobile
- //BEST GPS tap on map = distance from GPS calculation
+//TODO BUG little symbol on mobile
+//BEST GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
