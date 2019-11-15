@@ -8,9 +8,9 @@
 .myol-popup:hover {
 	display: block;
 	padding: 1px 4px;
-	background-color: white;
 	border-radius: 5px;
 	box-shadow: 0 3px 8px #888;
+	background-color: white;
 	font-size: 12px;
 	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-decoration: none;
@@ -22,14 +22,14 @@
 
 /* Overpass */
 .overpass-popup{
-	background-color: #def;
 	padding: 5px;
-	border-radius: 5px;
 	border: 1px solid #abc;
+	border-radius: 5px;
+	background-color: #def;
 }
 .overpass-popup p{
-	font-size: small;
 	margin: 0;
+	font-size: small;
 }
 .overpass-popup p:first-letter {
 	text-transform: uppercase;
@@ -41,9 +41,9 @@
 	bottom: 24px;
 	right: 0;
 	padding: 3px;
-	background-color: rgba(255, 255, 255, 0.8);
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
+	background-color: rgba(255, 255, 255, 0.8);
 	font-size: 0.7rem;
 	line-height: 1.375em;
 }
@@ -54,8 +54,8 @@
 	bottom: 30px;
 	left: 8px;
 	padding: 2px;
-	background-color: rgba(0, 60, 136, 0.3);
 	border-radius: 4px;
+	background-color: rgba(0, 60, 136, 0.3);
 	font-size: small;
 	color: white;
 }
@@ -69,8 +69,8 @@
 	bottom: 52px;
 	left: 8px;
 	padding: 2px;
-	background-color: rgba(0, 60, 136, 0.3);
 	border-radius: 4px;
+	background-color: rgba(0, 60, 136, 0.3);
 	font-size: small;
 	color: white;
 }
@@ -89,10 +89,10 @@
 .ol-control button:focus,
 .ol-geocoder button,
 .ol-geocoder button:focus {
-	background-color: white;
-	color: black ;
 	margin: 0;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
+	background-color: white;
+	color: black ;
 }
 .ol-control button:hover,
 .ol-geocoder button:hover {
@@ -115,8 +115,8 @@
 	top: initial !important;
 	left: initial !important;
 	float: left;
-	border-radius: 2px;
 	margin: 0.5em 0 0 0.5em;
+	border-radius: 2px;
 }
 
 /* Geocoder */
@@ -192,10 +192,10 @@
 	color: blue;
 }
 .ol-control-question {
-	background-color: white;
 	position: relative;
 	top: 0.3em;
 	padding: 1px;
+	background-color: white;
 }
 .ol-control-question span {
 	cursor: pointer;
