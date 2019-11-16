@@ -1,11 +1,3 @@
-// This software is a progressive web application (PWA)
-// It's composed as a basic web page but includes many services as
-// data storage that make it as powerfull as an installed mobile application
-// See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
-
-// The map is based on https://openlayers.org/
-// With some personal additions https://github.com/Dominique92/MyOl
-
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
 	window.location.href = window.location.href.replace('http:', 'https:');
@@ -52,7 +44,6 @@ const help = [
 		'Notes : cette application ne permet pas d‘enregistrer votre parcours',
 		'Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
 		'Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari',
-		'© Dominique Cavailhez 2019 ',
 	],
 
 	baseLayers = {
@@ -85,6 +76,7 @@ const help = [
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',
 		}),
+		controlTilesBuffer(4),
 		controlButton({
 			className: 'myol-button ol-load-gpx',
 			title: 'Charger une trace',
@@ -100,7 +92,7 @@ const help = [
 			className: 'myol-button ol-help',
 			title: help.join('\n- '),
 			activate: function() {
-				alert(this.title + registrationDate + genId);
+				alert(this.title + '\n© Dominique Cavailhez 2019\n' + registrationDate + genId);
 			},
 		}),
 	],
@@ -110,9 +102,12 @@ const help = [
 		controls: controls,
 	});
 
+if (trace)
+	addLayer(trace);
+
 function addLayer(gpx) {
 	const layer = layerVectorURL({
-		url: gpx + '.gpx',
+		url: 'gpx/' + gpx + '.gpx',
 		format: new ol.format.GPX(),
 		readFeatures: function(response) {
 			map.getView().setZoom(1); // Enable gpx rendering anywhere we are
@@ -144,6 +139,3 @@ function addLayer(gpx) {
 
 	map.addLayer(layer);
 }
-
-if (trace)
-	addLayer(trace);

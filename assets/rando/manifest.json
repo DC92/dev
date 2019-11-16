@@ -1,10 +1,10 @@
 {
-	"name": "GPS",
+	"name": "Rando",
 	"start_url": "index.php",
 	"display": "standalone",
 	"icons": [{
-		"src": "favicon.png",
-		"sizes": "96x96",
+		"src": "epgv.png",
+		"sizes": "512x512",
 		"type": "image/png"
 	}]
 }

@@ -1,17 +1,20 @@
 <!DOCTYPE html>
+<!--
+This software is a progressive web application (PWA)
+It's composed as a basic web page but includes many services as
+data storage that make it as powerfull as an installed mobile application
+See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
+
+The map is based on https://openlayers.org/
+with some personal additions https://github.com/Dominique92/MyOl
+© Dominique Cavailhez 2017
+-->
 <html>
 <head>
 	<title>Rando</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="icon" type="image/png" href="favicon.png" />
-
-	<!--
-	OPENLAYERS ADAPTATION
-	https://github.com/Dominique92/MyOl
-	Dominique Cavailhez 2017
-	Based on Openlayers https://openlayers.org
-	-->
+	<link rel="icon" type="image/png" href="epgv.png" />
 
 	<!-- Openlayers -->
 	<link href="MyOl/ol/ol.css?<?=filemtime('MyOl/ol/ol.css')?>" type="text/css" rel="stylesheet">
@@ -22,9 +25,10 @@
 	<script src="MyOl/myol.js?<?=filemtime('MyOl/myol.js')?>"></script>
 
 	<!-- This app -->
-	<link rel="manifest" href="manifest.json">
-	<script defer="defer" src="index.js?<?=filemtime('index.js')?>"></script>
 	<!-- ref="index.php" (for cached file list) -->
+	<link href="index.css?<?=filemtime('index.css')?>" type="text/css" rel="stylesheet">
+	<script defer="defer" src="index.js?<?=filemtime('index.js')?>"></script>
+	<link rel="manifest" href="manifest.json">
 	<!-- ref="service-worker.php" (for cached file list) -->
 
 	<script>
@@ -60,7 +64,7 @@
 		<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 		<ul>
 			<?php
-				$gpxs = glob ('*.gpx');
+				$gpxs = glob ('gpx/*.gpx');
 				foreach ($gpxs AS $gpx)
 					echo '<li><a onclick="addLayer(this.text)" title="Cliquer pour afficher la trace">'.ucfirst(pathinfo($gpx,PATHINFO_FILENAME))."</a></li>\n\t\t\t";
 			?>

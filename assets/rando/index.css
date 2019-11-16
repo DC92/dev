@@ -1,0 +1,18 @@
+html, body {
+	margin: 0;
+	padding: 0;
+}
+#liste h3 {
+	text-align: center
+}
+#liste * {
+	margin: 0;
+	line-height: 1.5em;
+}
+#liste li a {
+	cursor: pointer;
+}
+#map {
+	width: 100vw;
+	height: 100vh;
+}

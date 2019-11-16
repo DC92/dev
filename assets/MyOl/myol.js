@@ -11,9 +11,6 @@
  */
 
 /* jshint esversion: 6 */
-
-//TODO GPS manifest with date to reload without header time
-//TODO GPS avec couche venant d'un serveur (traces randos)
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -832,7 +829,6 @@ function layerMarker(o) {
 			ol.proj.proj4.register(proj4);
 		}
 		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-		//BEST load proj4 from server when required & wait onload
 		if (typeof proj4 == 'function' &&
 			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) { // Si on est dans la zone suisse EPSG:21781
 			const c21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
@@ -1140,8 +1136,7 @@ function controlLengthLine() {
  * This prepares the browser to become offline on the same session
  * Requires controlButton
  */
-//TODO param load everytime (rando)
-function controlTilesBuffer() {
+function controlTilesBuffer(depth, depthFS) {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), //HACK No button
 	});
@@ -1149,14 +1144,22 @@ function controlTilesBuffer() {
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		map.on('change:size', function() { // Enable the function when the window expand to fullscreen
-			const fs = document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement;
-			map.getLayers().forEach(function(layer) {
-				if (typeof layer.setPreload == 'function')
-					layer.setPreload(fs ? 4 : 0);
-			});
+		setPreload({
+			target: map
 		});
+		// Change preload when the window expand to fullscreen
+		map.on('change:size', setPreload);
 	};
+
+	function setPreload(evt) {
+		if (depthFS && // If specific parameter when full screen
+			document.webkitIsFullScreen || document.msFullscreenElement || document.fullscreenElement)
+			depth = depthFS;
+		evt.target.getLayers().forEach(function(layer) {
+			if (typeof layer.setPreload == 'function')
+				layer.setPreload(depth);
+		});
+	}
 	return control;
 }
 
@@ -1190,7 +1193,6 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//TODO BUG little symbol on mobile
 //BEST GPS tap on map = distance from GPS calculation
 function controlGPS(options) {
 	// Vérify if geolocation is available
@@ -1596,6 +1598,7 @@ function layerEdit(o) {
 
 		map.addInteraction(hover);
 		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
+			//TODO be able to define options (E.G. title)
 			const control = c(Object.assign({
 				buttonBackgroundColors: ['white', '#ef3'],
 				group: layer,
@@ -1920,7 +1923,7 @@ function controlsCollection(options) {
 			baseLayers: options.baseLayers,
 			geoKeys: options.geoKeys,
 		}, options.controlLayersSwitcher)),
-		controlTilesBuffer(),
+		controlTilesBuffer(0, 4),
 		controlPermalink(options.controlPermalink),
 		new ol.control.Attribution({
 			collapsible: false, // Attribution always open
@@ -1929,7 +1932,7 @@ function controlsCollection(options) {
 		controlMousePosition(),
 		controlLengthLine(),
 		new ol.control.Zoom(),
-		new ol.control.FullScreen({ //TODO BUG little symbol on mobile
+		new ol.control.FullScreen({
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',
 		}),
