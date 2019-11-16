@@ -35,27 +35,6 @@ with some personal additions https://github.com/Dominique92/MyOl
 		var registrationDate = ' <?=date('md-Hi')?>-',
 			trace = '<?=array_keys($_GET)[0]?>';
 	</script>
-
-	<style>
-		html, body {
-			margin: 0;
-			padding: 0;
-		}
-		#liste h3 {
-			text-align: center
-		}
-		#liste * {
-			margin: 0;
-			line-height: 1.5em;
-		}
-		#liste li a {
-			cursor: pointer;
-		}
-		#map {
-			width: 100vw;
-			height: 100vh;
-		}
-	</style>
 </head>
 
 <body>
@@ -63,11 +42,18 @@ with some personal additions https://github.com/Dominique92/MyOl
 		<h3>RANDONNÉES DE L'EPGV 92</h3>
 		<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 		<ul>
-			<?php
-				$gpxs = glob ('gpx/*.gpx');
-				foreach ($gpxs AS $gpx)
-					echo '<li><a onclick="addLayer(this.text)" title="Cliquer pour afficher la trace">'.ucfirst(pathinfo($gpx,PATHINFO_FILENAME))."</a></li>\n\t\t\t";
-			?>
+		<?php
+			$gpxs = glob ('gpx/*.gpx');
+			foreach ($gpxs AS $gpx) { ?>
+				<li>
+					<a onclick="addLayer(this.text)" title="Cliquer pour afficher la trace">
+						<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
+					</a>
+					<a href="<?=$gpx?>">
+						<img src="gpx.png" title="Charger le fichier GPX" />
+					</a>
+				</li>
+		<?php } ?>
 		</ul>
 		<p>Puis sur la cible pour afficher votre position.</p>
 		<br/>

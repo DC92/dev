@@ -31,19 +31,22 @@ fetch('service-worker.php')
 const help = [
 		'Mode d‘emploi :',
 		'Cliquer (PC) ou toucher (mobile) et déplacer : se déplacer dans la carte',
-		'« + / − » ou pincer avec 2 doigts : zoomer dans la carte',
+		'« + / − » ou roulette de la souris ou pincer avec 2 doigts : zoomer dans la carte',
 		'« Carré » : passer en mode plein écran',
 		'« Flèche en haut » : afficher la liste des randos',
 		'« Cible » : aller et rester à la position et orientation du GPS (mobile)',
 		'« Cible » (2em appui) : voir le GPS mais ne plus le suivre',
 		'« Cible » (3em appui) : effacer le GPS et remettre la carte nord en haut',
 		'« ... » : Choisir un autre fond de carte',
-		'Fonctionnement hors réseau (mobile) : avant de partir :',
-		'   * paramètres de l‘explorateur (3 points verticaux) -> ajouter à l‘écran d‘accueil',
-		'   * déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger les images des cartes',
-		'Notes : cette application ne permet pas d‘enregistrer votre parcours',
-		'Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
-		'Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari',
+		'Fonctionnement hors réseau (mobile) :' + [
+			' avant de partir :',
+			'Paramètres de l‘explorateur (3 points verticaux) -> ajouter à l‘écran d‘accueil',
+			'Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger les images des cartes',
+		].join('\n   * '), [
+			'Notes :',
+			'Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
+			'Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari',
+		].join('\n   '),
 	],
 
 	baseLayers = {
@@ -51,10 +54,9 @@ const help = [
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
-		'IGN': layerIGN('hcxdz5f1p9emo4i1lch6ennl', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'Rando': layerThunderforest('ee751f43b3af4614b01d1bce72785369', 'outdoors'),
 		'Transport': layerThunderforest('ee751f43b3af4614b01d1bce72785369', 'transport'),
-		'OSM': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'IGN': layerIGN('hcxdz5f1p9emo4i1lch6ennl', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'Google': layerGoogle('m'),
 		'Satellite': layerGoogle('s'),
 	},
