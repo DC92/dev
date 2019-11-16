@@ -133,11 +133,11 @@ class listener implements EventSubscriberInterface
 		// Assign post contents to some templates variables
 		$mode = $this-> request->variable('mode', '');
 		$msgs = [
-			'Conditions d\'utilisation' => 'L_TERMS_OF_USE',
+			'Conditions d‘utilisation' => 'L_TERMS_OF_USE',
 			'Politique de confidentialité' => 'L_PRIVACY_POLICY',
 			'Bienvenue '.$this->user->style['style_name'] => 'GEO_PRESENTATION',
 			'Aide' => 'GEO_URL_AIDE',
-			$mode == 'terms' ? 'Conditions d\'utilisation' : 'Politique de confidentialité' => 'AGREEMENT_TEXT',
+			$mode == 'terms' ? 'Conditions d‘utilisation' : 'Politique de confidentialité' => 'AGREEMENT_TEXT',
 		];
 		foreach ($msgs AS $k=>$v) {
 			$sql = 'SELECT post_text, bbcode_uid, bbcode_bitfield FROM '.POSTS_TABLE.' WHERE post_subject = "'.$k.'" ORDER BY post_id';
@@ -812,7 +812,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 						$block[$k]['COMMENT'] .= $post_data['post_id']
 							? 'choisissez ou créez le <a target="_BLANK" href="viewforum.php?&f='.$row['forum_id'].
 							'">ICI</a> et modifiez le champ "Alpage d’appartenance"'
-							: 'enregistrez d\'abord cet alpage.';
+							: 'enregistrez d‘abord cet alpage.';
 
 						$block[$k]['TYPE'] = 'hidden'; // Hides the input field
 						$sql_type = 'int(10)'; // topic_id

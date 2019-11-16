@@ -62,7 +62,7 @@
 			<?php
 				$gpxs = glob ('*.gpx');
 				foreach ($gpxs AS $gpx)
-					echo '<li><a onclick="addLayer(this.text)" title="Cliquer pour afficher la trace">'.pathinfo($gpx,PATHINFO_FILENAME)."</a></li>\n\t\t\t";
+					echo '<li><a onclick="addLayer(this.text)" title="Cliquer pour afficher la trace">'.ucfirst(pathinfo($gpx,PATHINFO_FILENAME))."</a></li>\n\t\t\t";
 			?>
 		</ul>
 		<p>Puis sur la cible pour afficher votre position.</p>

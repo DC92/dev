@@ -1140,6 +1140,7 @@ function controlLengthLine() {
  * This prepares the browser to become offline on the same session
  * Requires controlButton
  */
+//TODO param load everytime (rando)
 function controlTilesBuffer() {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), //HACK No button

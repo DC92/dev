@@ -27,19 +27,19 @@ if ('serviceWorker' in navigator)
 // Openlayers part
 // Initialise Openlayers vars
 const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
-	'- Installez l\'application web : explorateur -> options -> ajouter à l\'écran d\'accueil\n' +
+	'- Installez l‘application web : explorateur -> options -> ajouter à l‘écran d‘accueil\n' +
 	'- Choisissez une couche de carte\n' +
 	'- Placez-vous au point de départ de votre randonnée\n' +
 	'- Zoomez au niveau le plus détaillé que vous voulez mémoriser\n' +
 	'- Passez en mode plein écran (mémorise également les échèles supérieures)\n' +
 	'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles\n' +
 	'- Recommencez avec les couches de cartes que vous voulez mémoriser\n' +
-	'- Allez sur le terrain et cliquez sur l\'icône "MyGPS"\n' +
+	'- Allez sur le terrain et cliquez sur l‘icône "MyGPS"\n' +
 	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ▲\n' +
-	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l\'explorateur quelques jours\n' +
-	'* Cette application ne permet pas d\'enregistrer le parcours\n' +
+	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur quelques jours\n' +
+	'* Cette application ne permet pas d‘enregistrer le parcours\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
-	'* Aucune donnée ni géolocalisation n\'est remontée ni mémorisée',
+	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
 
 	keys = {
 		ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
@@ -94,7 +94,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		controlGPS(),
 		controlLoadGPX(),
 		controlButton({
-			className: 'ol-help',
+			className: 'myol-button ol-help',
 			title: help,
 			activate: function() {
 				alert(this.title);
