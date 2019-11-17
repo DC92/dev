@@ -11,7 +11,9 @@
  */
 
 /* jshint esversion: 6 */
-//TODO BUG IE fetch est indéfini (rando)
+//TODO rando Charger layers avec des coches rando
+//TODO rando Tri noms rando  date.. 
+
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;

@@ -30,16 +30,16 @@ fetch('service-worker.php')
 // Openlayers part
 const help = [
 		'Mode d‘emploi :',
-		'Cliquer (PC) ou toucher (mobile) et déplacer : se déplacer dans la carte',
+		'Cliquer ou toucher et déplacer : se déplacer dans la carte',
 		'« + / − » ou roulette de la souris ou pincer avec 2 doigts : zoomer dans la carte',
 		'« Carré » : passer en mode plein écran',
 		'« Flèche en haut » : afficher la liste des randos',
-		'« Cible » : aller et rester à la position et orientation du GPS (mobile)',
+		'« Cible » : aller et rester à la position et orientation du GPS',
 		'« Cible » (2em appui) : voir le GPS mais ne plus le suivre',
 		'« Cible » (3em appui) : effacer le GPS et remettre la carte nord en haut',
 		'« ... » : Choisir un autre fond de carte',
-		'Fonctionnement hors réseau (mobile) :' + [
-			' avant de partir :',
+		'Fonctionnement hors réseau (mobile) : ' + [
+			'Avant de partir :',
 			'Paramètres de l‘explorateur (3 points verticaux) -> ajouter à l‘écran d‘accueil',
 			'Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger les images des cartes',
 		].join('\n   * '), [
