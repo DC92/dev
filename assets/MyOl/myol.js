@@ -11,6 +11,7 @@
  */
 
 /* jshint esversion: 6 */
+//TODO BUG IE fetch est indéfini (rando)
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -1152,12 +1153,12 @@ function controlTilesBuffer(depth, depthFS) {
 	};
 
 	function setPreload(evt) {
-		if (depthFS && // If specific parameter when full screen
-			document.webkitIsFullScreen || document.msFullscreenElement || document.fullscreenElement)
-			depth = depthFS;
+		const fs = document.webkitIsFullScreen || // Edge, Opera
+			document.msFullscreenElement ||
+			document.fullscreenElement; // Chrome, FF, Opera
 		evt.target.getLayers().forEach(function(layer) {
 			if (typeof layer.setPreload == 'function')
-				layer.setPreload(depth);
+				layer.setPreload(fs ? depthFS || depth || 1 : depth || 1);
 		});
 	}
 	return control;
@@ -1871,8 +1872,8 @@ function layersCollection(keys) {
 		'IGN TOP 25': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		'IGN classique': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'IGN photos': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-		//403	'IGN Spot': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
-		//Double		'SCAN25TOUR': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
+		//403 'IGN Spot': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
+		//Double 	'SCAN25TOUR': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
 		'IGN 1950': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
 		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
 		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
@@ -1885,10 +1886,10 @@ function layersCollection(keys) {
 		'IGN hydro': layerIGN(keys.ign, 'HYDROGRAPHY.HYDROGRAPHY', 'png'),
 		'IGN forêt': layerIGN(keys.ign, 'LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN(keys.ign, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
-		//Le style normal n'est pas geré	'SHADOW': layerIGN(keys.ign, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
-		//Le style normal n'est pas geré	'PN': layerIGN(keys.ign, 'PROTECTEDAREAS.PN', 'png'),
+		//Le style normal n'est pas geré 'SHADOW': layerIGN(keys.ign, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
+		//Le style normal n'est pas geré 'PN': layerIGN(keys.ign, 'PROTECTEDAREAS.PN', 'png'),
 		'PNR': layerIGN(keys.ign, 'PROTECTEDAREAS.PNR', 'png'),
-		//403	'Avalanches':	layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+		//403 'Avalanches': layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 
 		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')),
@@ -1923,7 +1924,7 @@ function controlsCollection(options) {
 			baseLayers: options.baseLayers,
 			geoKeys: options.geoKeys,
 		}, options.controlLayersSwitcher)),
-		controlTilesBuffer(0, 4),
+		controlTilesBuffer(1, 4),
 		controlPermalink(options.controlPermalink),
 		new ol.control.Attribution({
 			collapsible: false, // Attribution always open

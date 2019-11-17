@@ -49,7 +49,7 @@ with some personal additions https://github.com/Dominique92/MyOl
 					<a onclick="addLayer(this.text)" title="Cliquer pour afficher la trace">
 						<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
 					</a>
-					<a href="<?=$gpx?>">
+					<a href="<?=$gpx?>" target="_blank">
 						<img src="gpx.png" title="Charger le fichier GPX" />
 					</a>
 				</li>
