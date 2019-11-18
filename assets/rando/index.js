@@ -1,3 +1,6 @@
+//TODO Charger layers avec des coches rando
+//TODO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
+
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
 	window.location.href = window.location.href.replace('http:', 'https:');
@@ -109,7 +112,7 @@ if (trace)
 
 function addLayer(gpx) {
 	const layer = layerVectorURL({
-		url: 'gpx/' + gpx + '.gpx',
+		url: 'gpx/' + gpx.toLowerCase() + '.gpx',
 		format: new ol.format.GPX(),
 		readFeatures: function(response) {
 			map.getView().setZoom(1); // Enable gpx rendering anywhere we are

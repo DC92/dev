@@ -11,8 +11,6 @@
  */
 
 /* jshint esversion: 6 */
-//TODO rando Charger layers avec des coches rando
-//TODO rando Tri noms rando  date.. 
 
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
@@ -1196,7 +1194,10 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
+//TODO BUG dri gps : geocoder ne va pas à l'endroit trouvé
 //BEST GPS tap on map = distance from GPS calculation
+//BEST button speed
+//BEST button meteo
 function controlGPS(options) {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||

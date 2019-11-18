@@ -46,7 +46,15 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'- Allez sur le terrain et cliquez sur l‘icône "GPS"\n' +
 	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ▲\n' +
 	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur\n' +
-	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' +
+	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' + [
+		'Boutons :',
+		'« Carré » : Passer en mode plein écran',
+		'« Loupe » : Recherche de lieux par nom',
+		'« Cible » : Aller et rester à la position et orientation du GPS',
+		'« Cible » (2em appui) : Voir le GPS mais ne plus le suivre',
+		'« Cible » (3em appui) : Affacer le réticule GPS et remettre la carte nord en haut',
+		'« ... » : Choisir un autre fond de carte',
+	].join('\n   ') +
 	'* Cette application ne permet pas d‘enregistrer le parcours\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée\n',
@@ -109,7 +117,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		controlGPS(),
 		controlLoadGPX(),
 		controlButton({
-			className: 'ol-help',
+			className: 'myol-button ol-help',
 			title: help,
 			activate: function() {
 				alert(this.title + window.location + registrationDate + genId);
