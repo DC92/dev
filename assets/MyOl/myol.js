@@ -11,7 +11,6 @@
  */
 
 /* jshint esversion: 6 */
-
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -1357,6 +1356,7 @@ function controlGPS(options) {
  * GPX file loader control
  * Requires controlButton
  */
+//BEST upload WPT
 function controlLoadGPX(o) {
 	const options = Object.assign({
 			className: 'myol-button ol-load-gpx',
@@ -1421,8 +1421,6 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
-//TODO TEST downloader WPT
-//TODO BUG don't close the last </wpt>
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			className: 'myol-button ol-download-gpx',
@@ -1445,7 +1443,25 @@ function controlDownloadGPX(o) {
 		button.getMap().getLayers().forEach(function(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					features.push(feature);
+					const properties = feature.getProperties();
+					//BEST <symb> for pyrenees-refuges
+					//BEST put in layers
+					if (properties.id)
+						feature.setId(properties.id);
+					if (properties.nom)
+						feature.setProperties({
+							name: properties.nom,
+						});
+					if (properties.altitude)
+						feature.setProperties({
+							ele: parseInt(properties.altitude),
+						});
+					if (properties.coord && properties.coord.alt) // refuges.info
+						feature.setProperties({
+							ele: properties.coord.alt,
+						});
+					if (feature.getKeys().length > 1) // Not only geom (except markers)
+						features.push(feature);
 				});
 		});
 
@@ -1455,10 +1471,11 @@ function controlDownloadGPX(o) {
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
 			})
-			.replace(/<rte/g, '<trk')
 			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
-			.replace(/(<trk|<\/trk|<wpt|<\/wpt|<\/gpx)/g, '\n$1')
-			.replace(/(<sym)/g, '\n\t$1'),
+			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>)/g, '\n$1')
+			.replace(/(<name|<ele|<sym|<\/?trkseg|<rtept)/g, '\n\t$1')
+			.replace(/(<trkpt)/g, '\n\t\t$1'),
+
 			file = new Blob([gpx], {
 				type: 'application/gpx+xml',
 			});
