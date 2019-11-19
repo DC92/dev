@@ -1750,61 +1750,68 @@ function controlDrawPolygon(options) {
 // Reorganise Points, Lines & Polygons
 function optimiseEdited(source, pointerPosition) {
 	// Get all edited features as array of coordinates
+	// Split lines having a summit at pointerPosition
+	//BEST manage points
 	let lines = getLines(source.getFeatures(), pointerPosition),
 		polys = [];
 
-	for (let loop = true; loop;) {
-		loop = false;
-		for (let a in lines) {
-			// Exclude 1 coordinates features (points)
-			if (lines[a] && lines[a].length < 2) {
-				lines.splice(a, 1);
-				loop = true;
-				break;
-			}
+	for (let a in lines)
+		// Exclude 1 coordinate features (points)
+		if (lines[a].length < 2)
+			lines[a] = null;
+
+		// Merge lines having a common end
+		else
+			for (let b = 0; b < a; b++) // Once each combination 
+				if (lines[b]) {
+					const m = [a, b];
+					for (let i = 4; i; i--) // 4 times
+						if (lines[m[0]] && lines[m[1]]) {
+							// Shake lines end to explore all possibilities
+							m.reverse();
+							lines[m[0]].reverse();
+							if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+								// Merge 2 lines matching ends
+								lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
+								lines[m[1]] = null;
+							}
+						}
+				}
+
+	for (let a in lines)
+		if (lines[a]) {
+			// Close open lines
+			//TODO optimize at loading
+			//if(0)//TODO option
+			if (!compareCoords(lines[a]))
+				lines[a].push(lines[a][0]);
+
 			// Convert closed lines into polygons
 			if (compareCoords(lines[a])) {
 				polys.push([lines[a]]);
-				lines.splice(a, 1);
-				loop = true;
-				break;
-			}
-			// Merge lines having a common end
-			for (let b = 0; b < a; b++) { // Once each combination
-				const m = [a, b];
-				for (let i = 4; i; i--) // 4 times
-					if (lines[m[0]] && lines[m[1]]) {
-						// Shake lines end to explore all possibilities
-						m.reverse();
-						lines[m[0]].reverse();
-						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
-							// Merge 2 lines matching ends
-							lines[m[0]] = lines[m[0]].concat(lines[m[1]]);
-							lines.splice(m[1], 1);
-							loop = true;
-							break;
-						}
-					}
+				lines[a] = null;
 			}
 		}
-		// Makes holes if a polygon is included in a biggest one
-		for (let p1 in polys) {
+	lines = lines.filter(Boolean); // Purge lines array
+
+	// Makes holes if a polygon is included in a biggest one
+	for (let p1 in polys)
+		if (polys[p1]) {
 			const fs = new ol.geom.Polygon(polys[p1]);
 			for (let p2 in polys)
-				if (p1 != p2) {
+				if (polys[p2] && p1 != p2) {
 					let intersects = true;
 					for (let c in polys[p2][0])
 						if (!fs.intersectsCoordinate(polys[p2][0][c]))
 							intersects = false;
 					if (intersects) {
 						polys[p1].push(polys[p2][0]);
-						polys.splice(p2, 1);
-						loop = true;
-						break;
+						polys[p2] = null;
 					}
 				}
 		}
-	}
+	polys = polys.filter(Boolean); // Purge polys array
+
 	// Recreate & save modified features
 	source.clear();
 	for (let l in lines)
@@ -1834,7 +1841,7 @@ function getLines(features, pointerPosition) {
 	return lines;
 }
 
-// Get all lines fragments at the same level & split aif one point = pointerPosition
+// Get all lines fragments at the same level & split if one point = pointerPosition
 function flatCoord(existingCoords, newCoords, pointerPosition) {
 	if (typeof newCoords[0][0] == 'object')
 		for (let c1 in newCoords)
