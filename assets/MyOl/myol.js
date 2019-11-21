@@ -1540,7 +1540,7 @@ function controlPrint() {
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide all but the map
-		for (var child = document.body.firstChild; child !== null; child = child.nextSibling)
+		for (let child = document.body.firstChild; child !== null; child = child.nextSibling)
 			if (child.style && child !== mapEl)
 				child.style.display = 'none';
 
@@ -1563,24 +1563,42 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton, escapedStyle, JSONparse, HACK map_
  */
-function layerEdit(o) {
+function controlEdit(o) {
 	const options = Object.assign({
+			group: 'edit',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
+			className: 'myol-button ol-modify',
+			buttonBackgroundColors: ['white', '#ef3'],
+			title: 'Modification d‘une ligne, d‘un polygone:\n' +
+				'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
+				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+				'Alt+cliquer sur un sommet pour le supprimer\n' +
+				'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
+				'Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
+				'Joindre les extrémités deux lignes pour les fusionner\n' +
+				'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
+				'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
+			activate: function(active) {
+				activate(active, modify);
+			},
+			readFeatures: function() {
+				return format.readFeatures(
+					JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
+						featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
+					});
+			},
 			saveFeatures: function() {
-				return format.writeFeatures(source.getFeatures(), {
+				return format.writeFeatures(source.getFeatures(coordinates, format), {
 					featureProjection: 'EPSG:3857',
 					decimals: 5,
 				});
 			},
 		}, o),
+		button = controlButton(options),
 		format = new ol.format.GeoJSON(),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		features = format.readFeatures(
-			JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
-				featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
-			}
-		),
+		features = options.readFeatures(),
 		source = new ol.source.Vector({
 			features: features,
 			wrapX: false,
@@ -1590,16 +1608,18 @@ function layerEdit(o) {
 			zIndex: 20,
 			style: escapedStyle(options.styleOptions),
 		}),
+		style = escapedStyle(options.styleOptions),
+		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
 		snap = new ol.interaction.Snap({
 			source: source,
 		}),
-		hover = new ol.interaction.Select({
-			condition: ol.events.condition.pointerMove,
-			hitTolerance: 6,
-			filter: function(feature, l) {
-				return l == layer;
-			},
-			style: escapedStyle(options.styleOptions, options.editStyleOptions),
+		modify = new ol.interaction.Modify({
+			source: source,
+			style: editStyle,
+			//TODO WWWdeleteCondition
+			WWWdeleteCondition: function(evt) { // Delete summit while only clicking on it
+				return evt.type == 'singleclick' && evt.originalEvent.ctrlKey;
+			}
 		});
 
 	source.save = function(coordinates) {
@@ -1608,8 +1628,8 @@ function layerEdit(o) {
 			geoJsonEl.value = options.saveFeatures(coordinates, format);
 	};
 
-	layer.createRenderer = function() { //HACK to get control at the layer init
-		const map = layer.map_;
+	button.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().forEach(function(i) {
@@ -1617,47 +1637,22 @@ function layerEdit(o) {
 				map.removeInteraction(i);
 		});
 
-		map.addInteraction(hover);
-		options.controls.forEach(function(c) { // Option controls : [controlModify, controlDrawLine, controlDrawPolygon]
-			//TODO be able to define options (E.G. title)
-			const control = c(Object.assign({
-				buttonBackgroundColors: ['white', '#ef3'],
-				group: layer,
-				layer: layer,
-				source: source,
-				style: escapedStyle(options.styleOptions, options.editStyleOptions),
-				activate: function(active) {
-					control.interaction.setActive(active);
-					if (active)
-						map.removeInteraction(hover);
-					else
-						map.addInteraction(hover);
-				},
-			}, options));
-			control.interaction.setActive(false);
-			map.addInteraction(control.interaction);
-			map.addControl(control);
-		});
+		map.addLayer(layer);
+		button.toggle(true); // Init modify button on
 
-		// Snap on features internal to the editor
-		map.addInteraction(snap);
-		// Snap on features external to the editor
-		if (options.snapLayers) // Optional option snapLayers : [list of layers to snap]
-			options.snapLayers.forEach(function(l) {
-				l.getSource().on('change', function() {
-					const fs = l.getSource().getFeatures();
+		// Optional option snapLayers : [list of layers to snap]
+		if (options.snapLayers)
+			options.snapLayers.forEach(function(layer) {
+				layer.getSource().on('change', function() {
+					const fs = layer.getSource().getFeatures();
 					for (let f in fs)
 						snap.addFeature(fs[f]);
 				});
 			});
 
-		// End of feature creation
-		source.on('change', function() { // Called all sliding long
-			if (source.modified) { // Awaiting adding complete to save it
-				source.modified = false; // To avoid loops
-				optimiseEdited(source);
-			}
-		});
+		map.addControl(controlDrawLine()); //TODO option
+		map.addControl(controlDrawPolygon()); //TODO option
+		map.on('pointermove', hover);
 
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
@@ -1665,204 +1660,244 @@ function layerEdit(o) {
 			optimiseEdited(source);
 			return false; // Warn controlLoadGPX that the editor got the included feature
 		});
-
-		return ol.layer.Vector.prototype.createRenderer.call(this);
 	};
-	return layer;
-}
 
-//BEST hover feature when modifing
-//BEST collect all languages in a single place
-//TODO enable at init
-function controlModify(options) {
-	const button = controlButton(Object.assign({
-		className: 'myol-button ol-modify',
-		title: 'Modification d‘une ligne, d‘un polygone:\n' +
-			'Activer "M" (couleur jaune) puis\n' +
-			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
-			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
-			'Alt+cliquer sur un sommet pour le supprimer\n' +
-			'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
-			'Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
-			'Joindre les extrémités deux lignes pour les fusionner\n' +
-			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
-			'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
-	}, options));
+	// Manage hover to save modify actions integrity
+	var hoveredFeature = null;
 
-	button.interaction = new ol.interaction.Modify(options);
-	button.interaction.on('modifyend', function(evt) {
+	function hover(evt) {
+		let nbFeaturesAtPixel = 0;
+		button.getMap().forEachFeatureAtPixel(evt.pixel, function(feature) {
+			source.getFeatures().forEach(function(f) {
+				if (f.ol_uid == feature.ol_uid) {
+					nbFeaturesAtPixel++;
+					if (!hoveredFeature) { // Hovering only one
+						feature.setStyle(editStyle);
+						hoveredFeature = feature; // Don't change it until there is no more hovered
+					}
+				}
+			});
+		}, {
+			hitTolerance: 6, // Default is 0
+		});
+
+		// If no more hovered, return to the normal style
+		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
+			hoveredFeature.setStyle(style);
+			hoveredFeature = null;
+		}
+	}
+
+	modify.on('WWWmodifystart', function(evt) { //TODO
+		if (evt.mapBrowserEvent.originalEvent.altKey &&
+			evt.target.vertexFeature_) {
+			return optimiseEdited(source, evt.target.vertexFeature_.getGeometry().getCoordinates());
+		}
+	});
+	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
-			// altKey + ctrlKey : delete feature
-			//BEST delete only a summit when Ctrl+Alt click
+			// Ctrl + Alt click on segment : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
 				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
 					layerFilter: function(l) {
-						return l.ol_uid == options.layer.ol_uid;
+						return l.ol_uid == layer.ol_uid;
 					}
 				});
-				for (let f in selectedFeatures)
-					options.source.removeFeature(selectedFeatures[f]); // We delete the selected feature
+				for (let f in selectedFeatures) // We delete the selected feature
+					source.removeFeature(selectedFeatures[f]);
 			}
-			// Other modify actions : altKey + click on a segment = delete the segment
+			// Alt click on segment : delete the segment & split the line
 			else if (evt.target.vertexFeature_)
-				return optimiseEdited(options.source, evt.target.vertexFeature_.getGeometry().getCoordinates());
+				return optimiseEdited(source, evt.target.vertexFeature_.getGeometry().getCoordinates());
+			/* else// Alt click on summit
+				  optimiseEdited(source, evt.mapBrowserEvent.coordinate); */
+			//BEST delete feature when Ctrl+Alt click on a summit
+			//TODO split polynom when Alt click on double summit
 		}
-		optimiseEdited(options.source);
+		optimiseEdited(source);
+		hoveredFeature = null; // Recover hovering
 	});
-	return button;
-}
 
-function controlDrawLine(options) {
-	const button = controlButton(Object.assign({
-		className: 'myol-button ol-draw-line',
-		title: 'Création d‘une ligne:\n' +
-			'Activer "L" (couleur jaune) puis\n' +
-			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
-			'double cliquer pour terminer.\n' +
-			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
-	}, options));
-
-	button.interaction = new ol.interaction.Draw(Object.assign({
-		type: 'LineString',
-	}, options));
-	button.interaction.on(['drawend'], function() {
-		button.toggle(0);
-		// Warn source 'on change' to save the feature
-		// Don't do it now as it's not yet added to the source
-		options.source.modified = true;
+	// End of feature creation
+	source.on('change', function() { // Called all sliding long
+		if (source.modified) { // Awaiting adding complete to save it
+			source.modified = false; // To avoid loops
+			optimiseEdited(source);
+			hoveredFeature = null; // Recover hovering
+		}
 	});
+
 	return button;
-}
 
-function controlDrawPolygon(options) {
-	return controlDrawLine(Object.assign({
-		className: 'myol-button ol-draw-polygon',
-		type: 'Polygon',
-		title: 'Modification d‘un polygone:\n' +
-			'Activer "P" (couleur jaune) puis\n' +
-			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
-			'double cliquer pour terminer.\n' +
-			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
-	}, options));
-}
+	// Internal functions
+	function activate(active, inter) { // Callback at activation / desactivation, mandatory, no default
+		if (active) {
+			button.getMap().addInteraction(inter);
+			button.getMap().addInteraction(snap); // Must be added after
+		} else {
+			button.getMap().removeInteraction(snap);
+			button.getMap().removeInteraction(inter);
+		}
+	}
 
-// Reorganise Points, Lines & Polygons
-function optimiseEdited(source, pointerPosition) {
-	// Get all edited features as array of coordinates
-	// Split lines having a summit at pointerPosition
-	//BEST manage points
-	let lines = getLines(source.getFeatures(), pointerPosition),
-		polys = [];
+	function controlDrawLine(options) {
+		const buttonDraw = controlButton(Object.assign({
+				group: 'edit',
+				className: 'myol-button ol-draw-line',
+				buttonBackgroundColors: ['white', '#ef3'],
+				title: 'Création d‘une ligne:\n' +
+					'Activer "L" (couleur jaune) puis\n' +
+					'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
+					'double cliquer pour terminer.\n' +
+					'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
+				activate: function(active) {
+					activate(active, interaction);
+				},
+			}, options)),
+			interaction = new ol.interaction.Draw(Object.assign({
+				type: 'LineString',
+				style: editStyle,
+				source: source,
+			}, options));
 
-	for (let a in lines)
-		// Exclude 1 coordinate features (points)
-		if (lines[a].length < 2)
-			lines[a] = null;
+		interaction.on(['drawend'], function() {
+			// Switch on the main editor button
+			button.toggle(true);
 
-		// Merge lines having a common end
-		else
-			for (let b = 0; b < a; b++) // Once each combination 
-				if (lines[b]) {
-					const m = [a, b];
-					for (let i = 4; i; i--) // 4 times
-						if (lines[m[0]] && lines[m[1]]) {
-							// Shake lines end to explore all possibilities
-							m.reverse();
-							lines[m[0]].reverse();
-							if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
-								// Merge 2 lines matching ends
-								lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
-								lines[m[1]] = null;
-							}
-						}
-				}
+			// Warn source 'on change' to save the feature
+			// Don't do it now as it's not yet added to the source
+			source.modified = true;
+		});
+		return buttonDraw;
+	}
 
-	for (let a in lines)
-		if (lines[a]) {
-			// Close open lines
-			//TODO optimize at loading
-			//if(0)//TODO option
-			if (!compareCoords(lines[a]))
-				lines[a].push(lines[a][0]);
+	function controlDrawPolygon(options) {
+		return controlDrawLine(Object.assign({
+			className: 'myol-button ol-draw-polygon',
+			type: 'Polygon',
+			title: 'Création d‘un polygone:\n' +
+				'Activer "P" (couleur jaune) puis\n' +
+				'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
+				'double cliquer pour terminer.\n' +
+				'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
+		}, options));
+	}
 
-			// Convert closed lines into polygons
-			if (compareCoords(lines[a])) {
-				polys.push([lines[a]]);
+	// Reorganise Points, Lines & Polygons
+	function optimiseEdited(source, pointerPosition) {
+		// Get all edited features as array of coordinates
+		// Split lines having a summit at pointerPosition
+		//BEST manage points
+		//TODO optimize at loading
+
+		let features = source.getFeatures(),
+			lines = [],
+			polys = [];
+		for (let f in features)
+			if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
+				const geometries = features[f].getGeometry().getGeometries();
+				for (let g in geometries)
+					flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
+			} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
+			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition); // Lines or polyons
+
+		for (let a in lines)
+			// Exclude 1 coordinate features (points)
+			if (lines[a].length < 2)
 				lines[a] = null;
+
+			// Merge lines having a common end
+			else
+				for (let b = 0; b < a; b++) // Once each combination 
+					if (lines[b]) {
+						const m = [a, b];
+						for (let i = 4; i; i--) // 4 times
+							if (lines[m[0]] && lines[m[1]]) {
+								// Shake lines end to explore all possibilities
+								m.reverse();
+								lines[m[0]].reverse();
+								if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+									// Merge 2 lines matching ends
+									lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
+									lines[m[1]] = null;
+								}
+							}
+					}
+
+		for (let a in lines)
+			if (lines[a]) {
+				// Close open lines
+				if (0) //TODO option
+					if (!compareCoords(lines[a]))
+						lines[a].push(lines[a][0]);
+
+				// Convert closed lines into polygons
+				if (compareCoords(lines[a])) {
+					polys.push([lines[a]]);
+					lines[a] = null;
+				}
+			}
+		lines = lines.filter(Boolean); // Purge lines array
+
+		// Makes holes if a polygon is included in a biggest one
+		for (let p1 in polys)
+			if (polys[p1]) {
+				const fs = new ol.geom.Polygon(polys[p1]);
+				for (let p2 in polys)
+					if (polys[p2] && p1 != p2) {
+						let intersects = true;
+						for (let c in polys[p2][0])
+							if (!fs.intersectsCoordinate(polys[p2][0][c]))
+								intersects = false;
+						if (intersects) {
+							polys[p1].push(polys[p2][0]);
+							polys[p2] = null;
+						}
+					}
+			}
+		polys = polys.filter(Boolean); // Purge polys array
+
+		// Recreate & save modified features
+		source.clear();
+		for (let l in lines)
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.LineString(lines[l]),
+			}));
+		for (let p in polys)
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.Polygon(polys[p]),
+			}));
+		source.save({
+			lines: lines,
+			polys: polys,
+		});
+	}
+
+	// Get all lines fragments at the same level & split if one point = pointerPosition
+	function flatCoord(existingCoords, newCoords, pointerPosition) {
+		if (typeof newCoords[0][0] == 'object') // Multi*
+			for (let c1 in newCoords)
+				flatCoord(existingCoords, newCoords[c1], pointerPosition);
+		else {
+			existingCoords.push([]); // Increment existingCoords array
+			for (let c2 in newCoords) {
+				if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
+					existingCoords.push([]); // Forget that one & increment existingCoords array
+				} else
+					// Stack on the last existingCoords array
+					existingCoords[existingCoords.length - 1].push(newCoords[c2]);
 			}
 		}
-	lines = lines.filter(Boolean); // Purge lines array
-
-	// Makes holes if a polygon is included in a biggest one
-	for (let p1 in polys)
-		if (polys[p1]) {
-			const fs = new ol.geom.Polygon(polys[p1]);
-			for (let p2 in polys)
-				if (polys[p2] && p1 != p2) {
-					let intersects = true;
-					for (let c in polys[p2][0])
-						if (!fs.intersectsCoordinate(polys[p2][0][c]))
-							intersects = false;
-					if (intersects) {
-						polys[p1].push(polys[p2][0]);
-						polys[p2] = null;
-					}
-				}
-		}
-	polys = polys.filter(Boolean); // Purge polys array
-
-	// Recreate & save modified features
-	source.clear();
-	for (let l in lines)
-		source.addFeature(new ol.Feature({
-			geometry: new ol.geom.LineString(lines[l])
-		}));
-	for (let p in polys)
-		source.addFeature(new ol.Feature({
-			geometry: new ol.geom.Polygon(polys[p])
-		}));
-	source.save({
-		lines: lines,
-		polys: polys,
-	});
-}
-
-function getLines(features, pointerPosition) {
-	let lines = [];
-	for (let f in features)
-		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
-			const geometries = features[f].getGeometry().getGeometries();
-			for (let g in geometries)
-				flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
-		} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
-		flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition); // Lines or polyons
-
-	return lines;
-}
-
-// Get all lines fragments at the same level & split if one point = pointerPosition
-function flatCoord(existingCoords, newCoords, pointerPosition) {
-	if (typeof newCoords[0][0] == 'object')
-		for (let c1 in newCoords)
-			flatCoord(existingCoords, newCoords[c1], pointerPosition);
-	else {
-		existingCoords.push([]); // Increment existingCoords array
-		for (let c2 in newCoords)
-			if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
-				existingCoords.push([]); // & increment existingCoords array
-			} else
-				// Stack on the last existingCoords array
-				existingCoords[existingCoords.length - 1].push(newCoords[c2]);
 	}
-}
 
-function compareCoords(a, b) {
-	if (!a)
-		return false;
-	if (!b)
-		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
-	return a[0] == b[0] && a[1] == b[1]; // 2 coords
+	function compareCoords(a, b) {
+		if (!a)
+			return false;
+		if (!b)
+			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
+		return a[0] == b[0] && a[1] == b[1]; // 2 coords
+	}
 }
 
 
@@ -1969,6 +2004,6 @@ function controlsCollection(options) {
 		//new ol.control.Rotate(), //BEST add it in GPS button
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
-		controlPrint(),
+		//TODO		controlPrint(),
 	];
 }

@@ -153,47 +153,9 @@ const layerPointsWri = layerVectorURL({
 	}),
 
 	/**
-	 * Editor
-	 */
-	editor = layerEdit({
-		geoJsonId: 'geojson',
-		controls: [
-			controlModify,
-			controlDrawLine,
-			controlDrawPolygon,
-		],
-		snapLayers: [chemineurLayer],
-		styleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 5,
-			}),
-		},
-		editStyleOptions: { // Hover / modify / create
-			image: new ol.style.Circle({
-				radius: 5,
-				fill: new ol.style.Fill({
-					color: 'red',
-				}),
-			}),
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 5,
-			}),
-		},
-		saveFeatures: function(coordinates, format) {
-			return format.writeGeometry(
-				new ol.geom.MultiPolygon(coordinates.polys), {
-					featureProjection: 'EPSG:3857',
-					decimals: 5,
-				});
-		},
-	}),
-
-	/**
 	 * Map
 	 */
-	map = new ol.Map({
+	map_ = new ol.Map({
 		target: 'map',
 		layers: [
 			layerPointsWri,
@@ -203,7 +165,6 @@ const layerPointsWri = layerVectorURL({
 			layerOverpass(),
 			marqueur,
 			viseur,
-			editor,
 		],
 		controls: controlsCollection({
 			geoKeys: {
@@ -223,3 +184,36 @@ const layerPointsWri = layerVectorURL({
 			}
 		}),
 	});
+
+/**
+ * Editor
+ */
+map_.addControl(controlEdit({
+	geoJsonId: 'geojson',
+	snapLayers: [chemineurLayer],
+	styleOptions: {
+		stroke: new ol.style.Stroke({
+			color: 'blue',
+			width: 5,
+		}),
+	},
+	editStyleOptions: { // Hover / modify / create
+		image: new ol.style.Circle({ // Draw symbol
+			radius: 5,
+			fill: new ol.style.Fill({
+				color: 'red',
+			}),
+		}),
+		stroke: new ol.style.Stroke({ // Color line
+			color: 'red',
+			width: 5,
+		}),
+	},
+	saveFeatures: function(coordinates, format) {
+		return format.writeGeometry(
+			new ol.geom.MultiPolygon(coordinates.polys), {
+				featureProjection: 'EPSG:3857',
+				decimals: 5,
+			});
+	},
+}));
