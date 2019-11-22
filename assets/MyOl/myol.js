@@ -1688,12 +1688,6 @@ function controlEdit(o) {
 		}
 	}
 
-	modify.on('WWWmodifystart', function(evt) { //TODO
-		if (evt.mapBrowserEvent.originalEvent.altKey &&
-			evt.target.vertexFeature_) {
-			return optimiseEdited(source, evt.target.vertexFeature_.getGeometry().getCoordinates());
-		}
-	});
 	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// Ctrl + Alt click on segment : delete feature
@@ -1800,7 +1794,7 @@ function controlEdit(o) {
 				for (let g in geometries)
 					flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
 			} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
-			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition); // Lines or polyons
+			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition); // Get lines or polyons as flat array of coords
 
 		for (let a in lines)
 			// Exclude 1 coordinate features (points)
@@ -1833,15 +1827,23 @@ function controlEdit(o) {
 						lines[a].push(lines[a][0]);
 
 				// Convert closed lines into polygons
-				if (compareCoords(lines[a])) {
-					polys.push([lines[a]]);
-					lines[a] = null;
+				if (compareCoords(lines[a])) { // If this line is closed
+					for (let i1 = 0; i1 < lines[a].length - 1; i1++) // Explore all summits combinaison
+						for (let i2 = 0; i2 < i1; i2++)
+							if (lines[a][i1][0] == lines[a][i2][0] &&
+								lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
+								let squized = lines[a].splice(i2, i1 - i2); // Extract the squized part
+								squized.push(squized[0]); // Close the poly
+								polys.push([squized]); // Add the squized poly
+								i1 = i2 = lines[a].length; // End loop
+							}
+					polys.push([lines[a]]); // Add the poly
+					lines[a] = null; // Forget the line
 				}
 			}
-		lines = lines.filter(Boolean); // Purge lines array
 
 		// Makes holes if a polygon is included in a biggest one
-		for (let p1 in polys)
+		for (let p1 in polys) // Explore all polys combinaison
 			if (polys[p1]) {
 				const fs = new ol.geom.Polygon(polys[p1]);
 				for (let p2 in polys)
@@ -1850,13 +1852,15 @@ function controlEdit(o) {
 						for (let c in polys[p2][0])
 							if (!fs.intersectsCoordinate(polys[p2][0][c]))
 								intersects = false;
-						if (intersects) {
-							polys[p1].push(polys[p2][0]);
-							polys[p2] = null;
+						if (intersects) { // If one intersects a bigger
+							polys[p1].push(polys[p2][0]); // Include the smaler in the bigger
+							polys[p2] = null; // Forget the smaller
 						}
 					}
 			}
-		polys = polys.filter(Boolean); // Purge polys array
+		// Purge arrays from null values
+		lines = lines.filter(Boolean);
+		polys = polys.filter(Boolean);
 
 		// Recreate & save modified features
 		source.clear();
