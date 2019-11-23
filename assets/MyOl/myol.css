@@ -30,6 +30,14 @@
 	text-transform: uppercase;
 }
 
+/* Compatibility controls OL V5.* */
+.ol-overlaycontainer-stopevent{
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+}
+
 /* Permalink */
 .ol-permalink {
 	position: absolute;
