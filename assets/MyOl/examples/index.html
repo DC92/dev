@@ -1,24 +1,15 @@
 <!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
 <html>
-
 <head>
 	<title>My Openlayers</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/x-icon" href="favicon.ico" />
-
-	<script>
-		// Mobile debug facilities
-		if (!window.location.hash.indexOf('##'))
-			window.onerror = function(msg, url, line, col, error) {
-				alert(error.stack);
-				return true;
-			}
-		if (window.location.hash == '###')
-			console.log = function(message) {
-				alert(message);
-			};
-	</script>
 
 	<!-- IE related -->
 	<script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
@@ -139,5 +130,4 @@
 	<p><a style="cursor:pointer" onclick="viseur.getPoint().setCoordinates(map.getView().getCenter())">Remettre le curseur au centre actuel de la carte</a></p>
 	<p><a style="cursor:pointer" onclick="controlgps.action()">Utiliser la position du GPS</a></p>
 </body>
-
 </html>

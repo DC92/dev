@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <!--
-This software is a progressive web application (PWA)
-It's composed as a basic web page but includes many services as
-data storage that make it as powerfull as an installed mobile application
-See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
-
-The map is based on https://openlayers.org/
-with some personal additions https://github.com/Dominique92/MyOl
-© Dominique Cavailhez 2017
+Progressive web application (PWA)
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
 -->
+<?php
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+?>
 <html>
 <head>
 	<title>Rando</title>
@@ -25,10 +26,10 @@ with some personal additions https://github.com/Dominique92/MyOl
 	<script src="MyOl/myol.js?<?=filemtime('MyOl/myol.js')?>"></script>
 
 	<!-- This app -->
-	<!-- ref="index.php" (for cached file list) -->
 	<link href="index.css?<?=filemtime('index.css')?>" type="text/css" rel="stylesheet">
 	<script defer="defer" src="index.js?<?=filemtime('index.js')?>"></script>
 	<link rel="manifest" href="manifest.json">
+	<!-- ref="index.php" (for cached file list) -->
 	<!-- ref="service-worker.php" (for cached file list) -->
 
 	<script>

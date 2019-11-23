@@ -9,8 +9,7 @@ $index = $_SERVER['REQUEST_SCHEME'].
 	'://'.$_SERVER['HTTP_HOST'].
 	pathinfo ($_SERVER['PHP_SELF'], PATHINFO_DIRNAME).
 	'/index.php';
-
-// Call the url to have the filemtime resolved 
+// Call the url to have the filemtime of the dependencies resolved by PHP
 preg_match_all ('/(ref|src)="([^"]+)"/', file_get_contents ($index), $app_files);
 $files = array_unique ($app_files[2]);
 

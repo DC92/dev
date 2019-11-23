@@ -1,11 +1,3 @@
-// This software is a progressive web application (PWA)
-// It's composed as a basic web page but includes many services as
-// data storage that make it as powerfull as an installed mobile application
-// See https://developer.mozilla.org/fr/docs/Web/Progressive_web_apps
-
-// The map is based on https://openlayers.org/
-// With some personal additions https://github.com/Dominique92/MyOl
-
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
 	window.location.href = window.location.href.replace('http:', 'https:');
@@ -35,29 +27,23 @@ fetch('service-worker.php')
 	});
 
 // Openlayers part
-const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
-	'- Installez l‘application web : explorateur -> options -> ajouter à l‘écran d‘accueil\n' +
-	'- Choisissez une couche de carte\n' +
-	'- Placez-vous au point de départ de votre randonnée\n' +
-	'- Zoomez au niveau le plus détaillé que vous voulez mémoriser\n' +
-	'- Passez en mode plein écran (mémorise également les échèles supérieures)\n' +
-	'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles\n' +
-	'- Recommencez avec les couches de cartes que vous voulez mémoriser\n' +
-	'- Allez sur le terrain et cliquez sur l‘icône "GPS"\n' +
-	'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ▲\n' +
-	'* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur\n' +
-	'* Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' + [
-		'Boutons :',
-		'« Carré » : Passer en mode plein écran',
-		'« Loupe » : Recherche de lieux par nom',
-		'« Cible » : Aller et rester à la position et orientation du GPS',
-		'« Cible » (2em appui) : Voir le GPS mais ne plus le suivre',
-		'« Cible » (3em appui) : Affacer le réticule GPS et remettre la carte nord en haut',
-		'« ... » : Choisir un autre fond de carte',
-	].join('\n   ') +
+const help =
+	'« Carré » : Passer en mode plein écran\n' +
+	'« Loupe » : Recherche de lieux par nom\n' +
+	'« Cible » : Aller et rester à la position et orientation du GPS\n' +
+	'« Cible » (2em appui) : Voir le GPS mais ne plus le suivre\n' +
+	'« Cible » (3em appui) : Affacer le réticule GPS et remettre la carte nord en haut\n' +
+	'« ▲ » : Afficher un fichier GPX (une trace)\n' +
+	'« ... » : Choisir un autre fond de carte\n' +
+	'Avant de partir :\n' +
+	'- Paramètres de l‘explorateur (3 points verticaux) -> ajouter à l‘écran d‘accueil\n' +
+	'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement au zoom maximum pour charger les images des cartes qui seront conservées dans le cache de l‘explorateur\n' +
+	'Hors réseau :\n' +
+	'- Cliquez sur l‘icône "GPS"\n' +
+	'- Les icônes de refuges.info ne sont disponibles que quand vous avez du réseau\n' +
 	'* Cette application ne permet pas d‘enregistrer le parcours\n' +
-	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
-	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée\n',
+	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée\n' +
+	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n',
 
 	baseLayers = {
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
@@ -100,6 +86,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
+		controlTilesBuffer(4),
 		controlPermalink({
 			visible: false,
 		}),

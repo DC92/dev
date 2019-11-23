@@ -1,5 +1,14 @@
 <!DOCTYPE html>
+<!--
+Progressive web application (PWA)
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
 <?php
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
 	include ('../config_privee.php');
 ?>
 <html>
@@ -8,13 +17,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/png" href="../images/favicon.png" />
-
-	<!--
-	OPENLAYERS ADAPTATION
-	https://github.com/Dominique92/MyOl
-	Dominique Cavailhez 2017
-	Based on Openlayers https://openlayers.org
-	-->
 
 	<!-- Openlayers -->
 	<link href="../ol/ol/ol.css?<?=filemtime('../ol/ol/ol.css')?>" type="text/css" rel="stylesheet">
@@ -35,8 +37,8 @@
 	<!-- ref="service-worker.php" (for cached file list) -->
 
 	<script>
-		var ign_key = '<?=$config_wri['ign_key']?>',
-			registrationDate = ' <?=date('md-Hi')?>-';
+		var registrationDate = ' <?=date("md-Hi")?>-',
+			ign_key = '<?=$config_wri["ign_key"]?>';
 	</script>
 
 	<style>

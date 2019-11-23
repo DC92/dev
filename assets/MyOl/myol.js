@@ -1,7 +1,7 @@
 /** OPENLAYERS ADAPTATION
+ * © Dominique Cavailhez 2017
  * https://github.com/Dominique92/MyOl
- * (C) Dominique Cavailhez 2017
- * Based on Openlayers https://openlayers.org
+ * Based on https://openlayers.org
  *
  * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
  * You only have to include openlayers/dist.js & .css files & myol.js & .css & that's it !
@@ -11,6 +11,29 @@
  */
 
 /* jshint esversion: 6 */
+
+//TODO avoid fetch / PWA error on IE
+//TODO RANDO reprendre modifs geoBB32/rando/gps -> le serveur dc9
+//TODO RANDO Charger layers avec des coches rando
+//TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
+
+/**
+ * Debug facilities on mobile
+ */
+// use hash ## for error alerts
+if (!window.location.hash.indexOf('##'))
+	window.addEventListener('error', function(evt) {
+		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
+	});
+// use hash ### to route all console logs on alerts
+if (window.location.hash == '###')
+	console.log = function(message) {
+		alert(message);
+	};
+
+/**
+ * Global openlayers hacks
+ */
 ol.Map.prototype.renderFrame_ = function(time) {
 	//HACK add map_ to each layer
 	const map = this;
@@ -31,9 +54,6 @@ function JSONparse(json) {
 	}
 }
 
-window.onerror = function(msg, url, line, col, error) {
-	console.log(url + ' line:' + line + ' col:' + col + '\n' + error + '\n' + new Error().stack);
-};
 
 /**
  * TILE LAYERS
@@ -1193,7 +1213,7 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//TODO BUG DRI gps : geocoder ne va pas à l'endroit trouvé
+//TODO BUG gps : mobile geocoder ne va pas à l'endroit trouvé (ne zoom pas plus d'1 seconde)
 //BEST GPS tap on map = distance from GPS calculation
 //BEST button speed
 //BEST button meteo
@@ -1753,7 +1773,6 @@ function controlEdit(o) {
 		// Get all edited features as array of coordinates
 		// Split lines having a summit at pointerPosition
 		//BEST manage points
-		//TODO optimize at loading
 
 		let features = source.getFeatures(),
 			lines = [],
