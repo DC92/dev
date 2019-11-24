@@ -42,22 +42,6 @@ const layerMassifsWri = layerVectorURL({
 	}),
 
 	/**
-	 * Examples
-	 * Requires layerMarker
-	 */
-	marqueur = layerMarker({
-		imageUrl: 'cadre.png',
-		idDisplay: 'marqueur',
-		decimalSeparator: ',',
-	}),
-	viseur = layerMarker({
-		imageUrl: 'viseur.png',
-		idDisplay: 'viseur',
-		decimalSeparator: ',',
-		dragged: true,
-	}),
-
-	/**
 	 * Map
 	 */
 	map_ = new ol.Map({
@@ -74,8 +58,17 @@ const layerMassifsWri = layerVectorURL({
 			}),
 			layerOverpass(),
 			layerMassifsWri,
-			marqueur,
-			viseur,
+			layerMarker({
+				imageUrl: 'cadre.png',
+				idDisplay: 'marqueur',
+				decimalSeparator: ',',
+			}),
+			layerMarker({
+				imageUrl: 'viseur.png',
+				idDisplay: 'viseur',
+				decimalSeparator: ',',
+				dragged: true,
+			}),
 		],
 		controls: controlsCollection({
 			geoKeys: {
@@ -88,11 +81,6 @@ const layerMassifsWri = layerVectorURL({
 				// SwissTopo : You need to register your domain in
 				// https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			},
-			controlGPS: {
-				callBack: function(position) {
-					viseur.getPoint().setCoordinates(position);
-				}
-			}
 		}),
 	});
 

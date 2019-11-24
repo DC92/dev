@@ -593,7 +593,7 @@ function layerVectorURL(o) {
  * www.refuges.info POI layer
  * Requires layerVectorURL
  */
-  function layerRefugesInfo(o) {
+function layerRefugesInfo(o) {
 	const options = Object.assign({
 		serverUrl: '//www.refuges.info',
 		baseUrl: '/api/bbox?type_points=',
@@ -627,7 +627,7 @@ function layerVectorURL(o) {
  * pyrenees-refuges.com POI layer
  * Requires layerVectorURL
  */
-  function layerPyreneesRefuges(options) {
+function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		styleOptions: function(properties) {
@@ -666,7 +666,7 @@ function layerVectorURL(o) {
  * chemineur.fr POI layer
  * Requires layerVectorURL
  */
-  function layerChemineur(options) {
+function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -947,16 +947,40 @@ function layerMarker(o) {
 		format = new ol.format.GeoJSON();
 
 	layer.once('prerender', function() {
+		const map = layer.map_;
 		if (options.dragged) {
 			// Drag and drop
-			layer.map_.addInteraction(new ol.interaction.Modify({
+			map.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
 				pixelTolerance: 16,
 				style: style,
 			}));
+
+			// Change text input values
 			point.on('change', function() {
 				displayLL(point.getCoordinates());
 			});
+
+			// GPS position changed
+			map.on('myol:ongpsposition', function(evt) {
+				point.setCoordinates(evt.position);
+			});
+
+			// Map control buttons
+			map.addControl(controlButton({
+				label: '\u29BB',
+				title: 'Remettre le curseur au centre actuel de la carte',
+				activate: function() {
+					point.setCoordinates(map.getView().getCenter());
+				},
+			}));
+			map.addControl(controlButton({
+				label: '\u26DE',
+				title: 'Recentrer la carte sur le curseur',
+				activate: function() {
+					map.getView().setCenter(point.getCoordinates());
+				},
+			}));
 		}
 	});
 
@@ -1041,14 +1065,15 @@ function layerMarker(o) {
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
-//BEST left aligned buttons
+//BEST left aligned buttons when screen vertical
 function controlButton(o) {
-	const buttonEl = document.createElement('button'),
-		options = Object.assign({
+	const options = Object.assign({
 			element: document.createElement('div'),
 			buttonBackgroundColors: ['white', 'white'],
+			className: 'myol-button',
 		}, o),
-		control = new ol.control.Control(options);
+		control = new ol.control.Control(options),
+		buttonEl = document.createElement('button');
 
 	control.element.appendChild(buttonEl);
 	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
@@ -1060,6 +1085,9 @@ function controlButton(o) {
 		} else
 			control.element.style.top = '.5em';
 	}
+	if (options.label)
+		buttonEl.innerHTML = options.label;
+
 	buttonEl.addEventListener('click', function(evt) {
 		evt.preventDefault();
 		control.toggle();
@@ -1369,7 +1397,7 @@ function controlGeocoder() {
 //BEST GPS tap on map = distance from GPS calculation
 //BEST button speed
 //BEST button meteo
-function controlGPS(options) {
+function controlGPS() {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
 		!window.location.href.match(/https|localhost/i))
@@ -1512,9 +1540,10 @@ function controlGPS(options) {
 					0
 				); */
 
-			// Optional callback function
-			if (options && typeof options.callBack == 'function') // Default undefined
-				options.callBack(gps.position);
+			map.dispatchEvent({
+				type: 'myol:ongpsposition', // Warn layerEdit that we uploaded some features
+				position: gps.position,
+			});
 		}
 	}
 
@@ -1531,7 +1560,7 @@ function controlGPS(options) {
 //BEST upload WPT
 function controlLoadGPX(o) {
 	const options = Object.assign({
-			className: 'myol-button ol-load-gpx',
+			label: '\u25b2',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
 				inputEl.click();
@@ -1595,7 +1624,7 @@ function controlLoadGPX(o) {
  */
 function controlDownloadGPX(o) {
 	const options = Object.assign({
-			className: 'myol-button ol-download-gpx',
+			label: '\u25bc',
 			title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
 			fileName: document.title || 'openlayers',
 			activate: activate,
@@ -1681,7 +1710,7 @@ function controlPrint() {
 		orientationEl = document.createElement('div');
 
 	// Add orientation selectors below the button
-	//TODO BUG don't shift next button when display orentation choices
+	//TODO BUG shift next button when display orentation choices
 	orientationEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
 		'<input type="radio" name="ori" value="1">Paysage A4';
 	orientationEl.className = 'ol-control-hidden';
@@ -1739,7 +1768,7 @@ function controlEdit(o) {
 	const options = Object.assign({
 			group: 'edit',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
-			className: 'myol-button ol-modify',
+			label: '\u2948',
 			buttonBackgroundColors: ['white', '#ef3'],
 			activate: function(active) {
 				activate(active, modify);
@@ -1818,29 +1847,29 @@ function controlEdit(o) {
 		if (options.editLine)
 			map.addControl(controlDraw({
 				type: 'LineString',
-				className: 'myol-button ol-draw-line',
+				label: '\u2b20',
 				title: options.editLine,
 			}));
 		if (options.editPolygon)
 			map.addControl(controlDraw({
 				type: 'Polygon',
-				className: 'myol-button ol-draw-polygon',
+				label: '\u2b1f',
 				title: options.editPolygon,
 			}));
 	};
 
-	function controlDraw(o) {
+	function controlDraw(options) {
 		const buttonDraw = controlButton(Object.assign({
 				group: 'edit',
 				buttonBackgroundColors: ['white', '#ef3'],
 				activate: function(active) {
 					activate(active, interaction);
 				},
-			}, o)),
+			}, options)),
 			interaction = new ol.interaction.Draw(Object.assign({
 				style: editStyle,
 				source: source,
-			}, o));
+			}, options));
 
 		interaction.on(['drawend'], function() {
 			// Switch on the main editor button
@@ -1921,6 +1950,7 @@ function controlEdit(o) {
 	}
 
 	// Reorganise Points, Lines & Polygons
+	//TODO test with big polynoms
 	function optimiseEdited(pointerPosition) {
 		// Get all edited features as array of coordinates
 		// Split lines having a summit at pointerPosition
@@ -2129,9 +2159,6 @@ function layersCollection(keys) {
 /**
  * Controls examples
  */
-//TODO Remettre le viseur au centre actuel de la carte
-//TODO Recentrer la carte sur le viseur
-//TODO Utiliser la position du GPS (couplé viseur)
 function controlsCollection(options) {
 	options = options || {};
 	if (!options.baseLayers)
@@ -2157,7 +2184,6 @@ function controlsCollection(options) {
 		}),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
-		//new ol.control.Rotate(), //BEST add it in GPS button
 		controlLoadGPX(),
 		controlDownloadGPX(options.controlDownloadGPX),
 		controlPrint(),

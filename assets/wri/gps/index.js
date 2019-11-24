@@ -104,7 +104,7 @@ const help =
 		controlGPS(),
 		controlLoadGPX(),
 		controlButton({
-			className: 'myol-button ol-help',
+			label:'?',
 			title: help,
 			activate: function() {
 				alert(this.title + window.location + registrationDate + genId);

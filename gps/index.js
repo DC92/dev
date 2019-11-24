@@ -33,7 +33,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée\n' +
 	'Sw ' + dateGen,
-	//TODO BEST dategen = dernière date des fichiers
+	//BEST dategen = dernière date des fichiers
 
 	baseLayers = {
 		'OpenTopoMap': layerOSM(
@@ -80,7 +80,7 @@ window.onload = function() {
 			controlGPS(),
 			controlLoadGPX(),
 			controlButton({
-				className: 'ol-help',
+				label:'?',
 				title: help,
 				activate: function(active) {
 					alert(this.title);

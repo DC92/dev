@@ -91,7 +91,7 @@ const help = [
 		}),
 		controlGPS(),
 		controlButton({
-			className: 'myol-button ol-help',
+			label:'?',
 			title: help.join('\n- '),
 			activate: function() {
 				alert(this.title + '\n© Dominique Cavailhez 2019\n' + registrationDate + genId);
