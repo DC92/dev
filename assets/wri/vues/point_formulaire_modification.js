@@ -53,15 +53,16 @@ const layerPoints = layerVectorURL({
 				visible: false, // Mais on ne visualise pas le lien du permalink
 				init: false, // Ici, on utilisera plutôt la position du point
 			}),
+			new ol.control.Attribution(),
+			new ol.control.ScaleLine(),
+			controlMousePosition(),
 			new ol.control.Zoom(),
 			new ol.control.FullScreen({
 				label: '', //HACK Bad presentation on IE & FF
 				tipLabel: 'Plein écran',
 			}),
-			controlDownloadGPX(),
-			controlPrint(),
-			new ol.control.Attribution({
-				collapsible: false, // Attribution always open
-			}),
+			controlGeocoder(),
+			controlGPS(),
+			controlLoadGPX(),
 		],
 	});

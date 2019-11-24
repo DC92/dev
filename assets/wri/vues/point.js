@@ -58,6 +58,7 @@ const baseLayers = {
 				visible: false, // Mais on ne visualise pas le lien du permalink
 				init: false, // Ici, on utilisera plutôt la position du point
 			}),
+			new ol.control.ScaleLine(),
 			controlMousePosition(),
 			new ol.control.Zoom(),
 			new ol.control.FullScreen({

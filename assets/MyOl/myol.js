@@ -385,8 +385,9 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 //TODO WRI C2C direct
 function layerVectorURL(o) {
 	const options = Object.assign({
+		serverUrl: '',
 		baseUrlFunction: function(bbox, list) {
-			return options.baseUrl + // baseUrl is mandatory, no default
+			return options.serverUrl + options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
 		format: new ol.format.GeoJSON(),
@@ -520,13 +521,11 @@ function layerVectorURL(o) {
 				pixel = map.getPixelFromCoordinate(coordinates);
 
 			// Hovering label
-			const label = typeof options.label == 'function' ?
-				options.label(properties, feature) :
-				options.label || '',
+			const label = formatLabel(options.label, '', properties, feature),
+				//BEST resorb in overpass
 				postLabel = typeof options.postLabel == 'function' ?
 				options.postLabel(properties, feature, layer, pixel, ll4326) :
 				options.postLabel || '';
-
 			if (label && !window.popup_.getPosition()) { // Only for the first feature on the hovered stack
 				// Calculate the label's anchor
 				window.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
@@ -553,7 +552,160 @@ function layerVectorURL(o) {
 			}
 		}
 	};
+
+	function formatLabel(format, closure, properties, feature) {
+		if (typeof format == 'function')
+			format = formatLabel(
+				format(properties, feature),
+				closure, properties, feature
+			);
+
+		if (typeof format == 'object') {
+			// Links
+			if (closure == 'link')
+				return '<a href="' + format.url + '">' + format.name + '<a>';
+
+			// List of closure: object
+			let items = [];
+			for (let f in format)
+				items.push(formatLabel(
+					format[f], f,
+					properties, feature
+				));
+			return items
+				.filter(function(a) { // Purge empty items
+					return a;
+				})
+				.join(closure);
+		}
+		// Number with unit
+		const n = parseInt(format);
+		if (n)
+			return n + closure.replace('?', n > 1 ? 's' : '');
+
+		// Other string
+		return format ? format.toString() : '';
+	}
 	return layer;
+}
+
+/**
+ * www.refuges.info POI layer
+ * Requires layerVectorURL
+ */
+  function layerRefugesInfo(o) {
+	const options = Object.assign({
+		serverUrl: '//www.refuges.info',
+		baseUrl: '/api/bbox?type_points=',
+		strategy: ol.loadingstrategy.bboxLimit,
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: options.serverUrl + '/images/icones/' + properties.type.icone + '.png'
+				})
+			};
+		},
+		label: function(properties) { // To click on the label
+			return {
+				'<br/>': {
+					link: {
+						name: properties.nom,
+						url: properties.lien,
+					},
+					', ': {
+						m: properties.coord.alt,
+						' place?': properties.places.valeur,
+					}
+				}
+			};
+		},
+	}, o);
+	return layerVectorURL(options);
+}
+
+/**
+ * pyrenees-refuges.com POI layer
+ * Requires layerVectorURL
+ */
+  function layerPyreneesRefuges(options) {
+	return layerVectorURL(Object.assign({
+		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		styleOptions: function(properties) {
+			const trad = {
+				'cabane fermee': 'inutilisable',
+				'cabane ouverte mais ocupee par le berger l ete': 'cabane-non-gardee',
+				'cabane ouverte': 'cabane-non-gardee',
+				'orri toue abri en pierre': 'abri',
+				'ruine': 'inutilisable',
+				'': 'abri',
+			};
+			return {
+				image: new ol.style.Icon({
+					src: '//www.refuges.info/images/icones/' + trad[properties.type_hebergement] + '.png',
+				}),
+			};
+		},
+		label: function(properties) {
+			return {
+				'<br/>': {
+					link: properties,
+					', ': {
+						m: properties.altitude,
+						' place?': properties.cap_ete,
+					}
+				}
+			};
+		},
+		href: function(properties) {
+			return properties.url;
+		},
+	}, options));
+}
+
+/**
+ * chemineur.fr POI layer
+ * Requires layerVectorURL
+ */
+  function layerChemineur(options) {
+	return layerVectorURL(Object.assign({
+		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+		strategy: ol.loadingstrategy.bboxLimit,
+		styleOptions: function(properties) {
+			return {
+				// POI
+				image: new ol.style.Icon({
+					src: properties.icone,
+				}),
+				// Traces
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 3,
+				}),
+			};
+		},
+		hoverStyleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: properties.icone,
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 3,
+				}),
+			};
+		},
+		label: function(properties) {
+			return {
+				link: {
+					name: properties.nom,
+					url: properties.url,
+				},
+			};
+		},
+		href: function(properties) {
+			return properties.url;
+		},
+	}, options));
 }
 
 /**
@@ -1088,7 +1240,7 @@ function controlPermalink(o) {
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
-			document.cookie = 'permalink=zoom=' + newParams[0] + '&lat=' + newParams[2] + '&lon=' + newParams[1] + ';path=/; SameSite=Strict'; //TODO DELETE (temp WRI)
+			document.cookie = 'permalink=zoom=' + newParams[0] + '&lat=' + newParams[2] + '&lon=' + newParams[1] + ';path=/; SameSite=Strict'; //BEST DELETE (temp WRI)
 		}
 	}
 	return control;
@@ -1977,6 +2129,9 @@ function layersCollection(keys) {
 /**
  * Controls examples
  */
+//TODO Remettre le viseur au centre actuel de la carte
+//TODO Recentrer la carte sur le viseur
+//TODO Utiliser la position du GPS (couplé viseur)
 function controlsCollection(options) {
 	options = options || {};
 	if (!options.baseLayers)
