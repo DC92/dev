@@ -41,7 +41,6 @@ ol.Map.prototype.renderFrame_ = function(time) {
 		target.map_ = map;
 	});
 
-	//BEST hack to centralize pointermove à forEachFeatureAtPixel
 	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
 };
 
@@ -382,7 +381,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires controlPermanentCheckbox, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
-//TODO WRI C2C direct
 function layerVectorURL(o) {
 	const options = Object.assign({
 		serverUrl: '',
@@ -443,6 +441,7 @@ function layerVectorURL(o) {
 		const map = evt.target.map_;
 
 		// Define one popup for all the layerVectorURL
+		//BEST centralize this code & the hover
 		if (!window.popEl_) {
 			window.popEl_ = document.createElement('a');
 			window.popup_ = new ol.Overlay({
@@ -453,9 +452,9 @@ function layerVectorURL(o) {
 			map.on('click', function(evtClk) { // Click on a feature
 				evtClk.target.forEachFeatureAtPixel(
 					evtClk.pixel,
-					function() {
-						if (window.popup_.getPosition())
-							window.popEl_.click(); // Simulate a click on the label
+					function(feature) {
+						if (typeof options.href == 'function')
+							window.location = options.href(feature.getProperties());
 					}
 				);
 			});
@@ -526,17 +525,16 @@ function layerVectorURL(o) {
 				postLabel = typeof options.postLabel == 'function' ?
 				options.postLabel(properties, feature, layer, pixel, ll4326) :
 				options.postLabel || '';
+
 			if (label && !window.popup_.getPosition()) { // Only for the first feature on the hovered stack
 				// Calculate the label's anchor
 				window.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
 
-				// Fill label class & text
+				// Fill label class, text & cursor
 				window.popEl_.className = 'myol-popup ' + (options.labelClass || '');
 				window.popEl_.innerHTML = label + postLabel;
-				if (typeof options.href == 'function') {
-					window.popEl_.href = options.href(properties);
+				if (typeof options.href == 'function')
 					map.getViewport().style.cursor = 'pointer';
-				}
 
 				// Shift of the label to stay into the map regarding the pointer position
 				if (pixel[1] < window.popEl_.clientHeight + 12) { // On the top of the map (not enough space for it)
@@ -563,7 +561,7 @@ function layerVectorURL(o) {
 		if (typeof format == 'object') {
 			// Links
 			if (closure == 'link')
-				return '<a href="' + format.url + '">' + format.name + '<a>';
+				return '<a href="' + format.url + '">' + format.name + '</a>';
 
 			// List of closure: object
 			let items = [];
@@ -595,20 +593,23 @@ function layerVectorURL(o) {
  */
 function layerRefugesInfo(o) {
 	const options = Object.assign({
-		serverUrl: '//www.refuges.info',
-		baseUrl: '/api/bbox?type_points=',
+		serverUrl: '//www.refuges.info/',
+		baseUrl: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: options.serverUrl + '/images/icones/' + properties.type.icone + '.png'
+					src: options.serverUrl + 'images/icones/' + properties.type.icone + '.png'
 				})
 			};
 		},
-		label: function(properties) { // To click on the label
+		href: function(properties) { // To click on the icon
+			return properties.lien;
+		},
+		label: function(properties) {
 			return {
 				'<br/>': {
-					link: {
+					link: { // To click on the label
 						name: properties.nom,
 						url: properties.lien,
 					},
@@ -627,6 +628,7 @@ function layerRefugesInfo(o) {
  * pyrenees-refuges.com POI layer
  * Requires layerVectorURL
  */
+//BEST <symb> for pyrenees-refuges
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -645,6 +647,9 @@ function layerPyreneesRefuges(options) {
 				}),
 			};
 		},
+		href: function(properties) {
+			return properties.url;
+		},
 		label: function(properties) {
 			return {
 				'<br/>': {
@@ -656,11 +661,10 @@ function layerPyreneesRefuges(options) {
 				}
 			};
 		},
-		href: function(properties) {
-			return properties.url;
-		},
 	}, options));
 }
+
+//TODO C2C
 
 /**
  * chemineur.fr POI layer
@@ -694,6 +698,9 @@ function layerChemineur(options) {
 				}),
 			};
 		},
+		href: function(properties) {
+			return properties.url;
+		},
 		label: function(properties) {
 			return {
 				link: {
@@ -701,9 +708,6 @@ function layerChemineur(options) {
 					url: properties.url,
 				},
 			};
-		},
-		href: function(properties) {
-			return properties.url;
 		},
 	}, options));
 }
@@ -896,7 +900,7 @@ layerOverpass = function(o) {
  * marker-lon / marker-lat
  * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
  */
-//BEST Change cursor while hovering the target but there may be a conflict of forEachFeatureAtPixel with another function
+//BEST Change cursor while hovering the target
 function layerMarker(o) {
 	const options = Object.assign({
 			llInit: [],
@@ -1622,6 +1626,7 @@ function controlLoadGPX(o) {
  * GPX file downloader control
  * Requires controlButton
  */
+//BEST various formats
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			label: '\u25bc',
@@ -1645,7 +1650,6 @@ function controlDownloadGPX(o) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					const properties = feature.getProperties();
-					//BEST <symb> for pyrenees-refuges
 					//BEST put in layers
 					if (properties.id)
 						feature.setId(properties.id);
@@ -1784,6 +1788,33 @@ function controlEdit(o) {
 					featureProjection: 'EPSG:3857',
 					decimals: 5,
 				});
+			},
+			styleOptions: {
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
+				}),
+				fill: new ol.style.Fill({
+					color: 'rgba(0,0,255,0.2)',
+				}),
+			},
+			editStyleOptions: { // Hover / modify / create
+				// Draw symbol
+				image: new ol.style.Circle({
+					radius: 4,
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 2,
+					}),
+				}),
+				// Lines or border colors
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 2,
+				}),
+				fill: new ol.style.Fill({
+					color: 'rgba(255,0,0,0.3)',
+				}),
 			},
 		}, o),
 		button = controlButton(options),

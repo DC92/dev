@@ -10,8 +10,8 @@ if (!window.location.pathname.split('/').pop())
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js')
 	// Reload if any app file has been updated
-	.then(reg => {
-		reg.addEventListener('updatefound', () => {
+	.then(function(reg) {
+		reg.addEventListener('updatefound', function() {
 			location.reload();
 		});
 	});
