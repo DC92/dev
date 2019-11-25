@@ -664,7 +664,7 @@ function layerPyreneesRefuges(options) {
 	}, options));
 }
 
-//TODO C2C
+//TODO WRI NAV C2C
 
 /**
  * chemineur.fr POI layer
@@ -718,7 +718,7 @@ function layerChemineur(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO OVERPASS WRI NAV OSM Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
+//TODO WRI NAV OVERPASS Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //BEST BUG IE OVERPASS don't work on IE
 //BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 layerOverpass = function(o) {
@@ -1399,7 +1399,6 @@ function controlGeocoder() {
  * GPS control
  * Requires controlButton
  */
-//TODO BUG gps : mobile geocoder ne va pas à l'endroit trouvé (ne zoom pas plus d'1 seconde)
 //BEST GPS tap on map = distance from GPS calculation
 //BEST button speed
 //BEST button meteo
@@ -1770,6 +1769,7 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton, escapedStyle, JSONparse, HACK map_
  */
+//TODO BUG controlDownloadGPX don't save edited features
 function controlEdit(o) {
 	const options = Object.assign({
 			group: 'edit',
@@ -1870,6 +1870,7 @@ function controlEdit(o) {
 
 		// Zoom the map on the loaded features
 		// You must use permalink({init: false})
+		//TODO BUG temporary shift to position is permalink init: true
 		const features = source.getFeatures(),
 			extent = ol.extent.createEmpty();
 		if(features.length) {
@@ -1994,7 +1995,7 @@ function controlEdit(o) {
 		}
 	}
 
-	// Reorganise Points, Lines & Polygons
+	// Refurbish Points, Lines & Polygons
 	//TODO test with big polynoms
 	function optimiseEdited(pointerPosition) {
 		// Get all edited features as array of coordinates
