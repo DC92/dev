@@ -13,7 +13,7 @@
 			<!-- Edition du massif -->
 			<label>
 				<input type="hidden" name="id_polygone" value="<?=$vue->polygone->id_polygone?>" />
-				<input type="hidden" name="json_polygones" id="edit-json" value='<?=$vue->json_polygones?>' />
+				<input size="400" type="hidden" name="json_polygones" id="edit-json" value='<?=$vue->json_polygones?>' />
 
 				<p>Nom du massif
 				<input type="text" name="nom_polygone" size="20" value="<?=$vue->polygone->nom_polygone?>" /></p><br/>
@@ -23,7 +23,7 @@
 
 				<p id="edit-changed" style="display:none"><i style="color:red">Polygone modifié</i></p>
 
-				<input type="submit" name="enregistrer" value="Enregistrer" />
+				<input type="submit" name="enregistrer" value="Enregistrer" /> les modifications
 				<br/>ou<br/>
 				<p><a href="./<?=$vue->polygone->id_polygone?>">Quiter sans enregistrer</a></p>
 			</label>
@@ -36,7 +36,7 @@
 						<p>
 							<a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>?test_supprimer=1">
 								Supprimer le massif
-							</a>
+							</a>(définitif).
 						</p>
 					<?}else{?>
 						<b>
@@ -54,27 +54,18 @@
 			<fieldset>
 				<legend>Edition</legend>
 				<label>
-					<p><u>Créer un polygone:</u> Cliquer sur le contrôle "P" puis à l'emplacement des sommets successifs. Double cliquer pour terminer.</p>
+					<p><u>Contrôle "P" (créer un Polygone):</u></p>
+					<p>Cliquer sur "P" puis à l'emplacement des sommets successifs. Double cliquer pour terminer.</p>
+					<p><u>Polygone à trous:</u> Un polygone entièrement compris dans un autre crée un "trou".</p>
 					<hr/>
-
-					<p>Pour modifier un polygone, cliquer sur le contrôle "M" puis :</p>
+					<p><u>Contrôle "M" (Modifier un polygone):</u> Cliquer sur "M" puis:</p>
+					<p><u>Déplacer un sommet:</u> Cliquer dessus puis le déplacer.</p>
 					<p><u>Ajouter un sommet:</u> Cliquer sur un point d'un côté puis le déplacer.</p>
-					<p><u>Déplacer un sommet:</u> Cliquer dessus puis le déplacer.
-					Les sommets déplacés "collent" aux sommets des autres massifs et prennent exactement leur position.</p>
+					<p>Les sommets déplacés "collent" aux sommets et côtés des autres massifs et prennent exactement leur position.</p>
 					<p><u>Supprimer un sommet:</u> Alt+cliquer dessus.</p>
+					<p><u>Scinder un polygone:</u> Joindre 2 sommets d‘un même polygone puis alt+cliquer dessus.</p>
+					<p><u>Fusionner 2 polygones:</u> Coller un côté identique (entre 2 sommets consécutifs) de chaque polygone puis alt+cliquer dessus.</p>
 					<p><u>Supprimer un polygone:</u> Ctrl+Alt+cliquer sur un côté.</p>
-					<hr/>
-
-					<p>Pour une édition plus complexe, vous pouvez transformer vos polygones en lignes brisées :</p>
-					<p><u>Couper un polygone:</u> Alt+cliquer au milieu d'un côté.
-					On obtient une ligne.</p>
-					<p><u>Etendre une ligne:</u> Etirer une extrémité.</p>
-					<p><u>Fusionner deux lignes:</u> Joindre une extrémité de chacune.</p>
-					<p><u>Fermer une ligne:</u> Joindre ses deux extrémités. On obtient un polygone.</p>
-					<hr/>
-					<p><u>Sauvegarder les modifications:</u> Cliquer sur le bouton "Enregistrer"</p>
-					<p><u>Note:</u> Lors de la sauvegarde, les lignes seront refermées en ploygones.</p>
-					<p><u>Quiter sans enregistrer:</u> Cliquer sur "Quiter sans enregistrer"</p>
 				</label>
 			</fieldset>
 	</form>

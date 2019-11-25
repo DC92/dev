@@ -40,7 +40,7 @@ const baseLayers = {
 		}),
 		controlPermalink({ // Permet de garder le même réglage de carte d'une page à l'autre
 			visible: false, // Mais on ne visualise pas le lien du permalink
-			init: false, // Ici, on utilisera plutôt la position du point
+			init: '<?=$point->id_point?>' == '', // Ici, on utilisera plutôt la position du point si on est en modification
 		}),
 		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),

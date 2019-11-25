@@ -157,6 +157,10 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 			<label>
 				<a href="?mode_affichage=edit"><?= $vue->polygone->id_polygone ? 'Modifier le' : 'Créer un'?> massif</a>
 			</label>
+			<br/>ou
+			<label>
+				<a style="color:red" href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>?mode_affichage=edit"><b>NOUVEL EDITEUR</b></a>
+			</label>
 		</fieldset>
 	<?}?>
 

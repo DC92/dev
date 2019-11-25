@@ -950,6 +950,7 @@ function layerMarker(o) {
 		}),
 		format = new ol.format.GeoJSON();
 
+	//TODO BUG n'est pas enabled si on ne voit pas le feature !
 	layer.once('prerender', function() {
 		const map = layer.map_;
 		if (options.dragged) {
@@ -1773,7 +1774,7 @@ function controlEdit(o) {
 	const options = Object.assign({
 			group: 'edit',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
-			label: '\u2948',
+			label: 'M',
 			buttonBackgroundColors: ['white', '#ef3'],
 			activate: function(active) {
 				activate(active, modify);
@@ -1867,6 +1868,18 @@ function controlEdit(o) {
 		map.addLayer(layer);
 		button.toggle(true); // Init modify button on
 
+		// Zoom the map on the loaded features
+		// You must use permalink({init: false})
+		const features = source.getFeatures(),
+			extent = ol.extent.createEmpty();
+		if(features.length) {
+			for (let f in features)
+				ol.extent.extend(extent, features[f].getGeometry().getExtent());
+			map.getView().fit(extent, {
+				maxZoom: 17,
+			});
+		}
+
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', function(evt) {
 			source.addFeatures(evt.features);
@@ -1879,13 +1892,13 @@ function controlEdit(o) {
 		if (options.editLine)
 			map.addControl(controlDraw({
 				type: 'LineString',
-				label: '\u2b20',
+				label: 'L',
 				title: options.editLine,
 			}));
 		if (options.editPolygon)
 			map.addControl(controlDraw({
 				type: 'Polygon',
-				label: '\u2b1f',
+				label: 'P',
 				title: options.editPolygon,
 			}));
 	};

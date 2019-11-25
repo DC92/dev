@@ -70,20 +70,21 @@ map.getView().fit(
 );
 
 map.addControl(controlEdit({
-	geoJsonId: 'geojson',
+	geoJsonId: 'edit-json',
 	snapLayers: [layerMassifs],
-	title: 'Modification d‘une ligne, d‘un polygone:\n' +
+	title: 'Modification d‘un polygone:\n' +
 		'Activer ce bouton (couleur jaune) puis\n' +
-		'Cliquer et déplacer un sommet pour modifier un polygone\n' +
-		'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
-		'Coller un même côté (entre 2 sommets consécutifs) de 2 polygones puis alt+cliquer sur ce côté pour fusionner les polygones\n' +
-		'Joindre 2 sommets d‘un même polygone puis alt+cliquer dessus pour séparer les 2 moitiés\n' +
-		'Ctrl+Alt+cliquer sur un côté d‘un polygone pour le supprimer',
+		'Déplacer un sommet: Cliquer dessus puis le déplacer\n' +
+		'Ajouter un sommet: Cliquer sur un côté puis le déplacer\n' +
+		'Supprimer un sommet: Alt+cliquer dessus\n' +
+		'Scinder un polygone: Joindre 2 sommets d‘un même polygone puis alt+cliquer dessus\n' +
+		'Fusionner 2 polygones: Coller un côté identique (entre 2 sommets consécutifs) de chaque polygone puis alt+cliquer dessus\n' +
+		'Supprimer un polygone: Ctrl+Alt+cliquer sur un côté',
 	editPolygon: 'Création d‘un polygone:\n' +
 		'Activer ce bouton (couleur jaune) puis\n' +
 		'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
 		'double cliquer pour terminer.\n' +
-		'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
+		'Un polygone entièrement compris dans un autre crée un "trou".',
 	saveFeatures: function(coordinates, format) {
 		return format.writeGeometry(
 			new ol.geom.MultiPolygon(coordinates.polys), {

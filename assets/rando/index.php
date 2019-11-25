@@ -41,7 +41,7 @@ Based on https://openlayers.org
 <body>
 	<div id="liste">
 		<h3>RANDONNÉES DE L'EPGV 92</h3>
-		<p>Cliquez sur le nom de la trace pour l'afficher :</p>
+		<p>Cliquez sur le nom de la rando pour l'afficher :</p>
 		<ul>
 		<?php
 			$gpxs = glob ('gpx/*.gpx');
@@ -56,7 +56,7 @@ Based on https://openlayers.org
 				</li>
 		<?php } ?>
 		</ul>
-		<p>Puis sur la cible pour afficher votre position.</p>
+		<p>Cliquez sur la cible pour afficher votre position.</p>
 		<br/>
 	</div>
 
