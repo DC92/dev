@@ -1372,6 +1372,7 @@ function controlTilesBuffer(depth, depthFS) {
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
 //TODO BUG thin button on mobile
+//BEST report issue with with animate on OL v6 & resorb patch
 function controlGeocoder() {
 	// Vérify if geocoder is available (not supported in IE)
 	const ua = navigator.userAgent;

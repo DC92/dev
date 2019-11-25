@@ -1,2 +1,3 @@
 https://github.com/jonataswalker/ol-geocoder/releases/latest
 V4.0.0
+Bug with animate on OL v6 : patch n||500 => 0

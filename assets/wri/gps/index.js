@@ -64,32 +64,11 @@ const help =
 		'Photo Google': layerGoogle('s'),
 	},
 
-	layerWRI = layerVectorURL({
-		baseUrl: '../api/bbox?type_points=',
-		strategy: ol.loadingstrategy.bboxLimit,
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '../images/icones/' + properties.type.icone + '.png'
-				})
-			};
-		},
-		label: function(properties) { // Click the label
-			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-		},
-		href: function(properties) { // Click the icon
-			return properties.lien;
-		},
-	}),
-
 	controls = [
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
 		controlTilesBuffer(4),
-		controlPermalink({
-			visible: false,
-		}),
 		new ol.control.ScaleLine(),
 		new ol.control.Attribution({
 			collapseLabel: '>',
@@ -104,7 +83,7 @@ const help =
 		controlGPS(),
 		controlLoadGPX(),
 		controlButton({
-			label:'?',
+			label: '?',
 			title: help,
 			activate: function() {
 				alert(this.title + window.location + registrationDate + genId);
@@ -114,6 +93,12 @@ const help =
 
 	map = new ol.Map({
 		target: 'map',
-		layers: [layerWRI],
+		view: new ol.View({
+			center: ol.proj.fromLonLat([2, 47]),
+			zoom: 6,
+		}),
+		layers: [layerRefugesInfo({
+			serverUrl: sous_dossier_installation, // Use this server as root
+		})],
 		controls: controls,
 	});

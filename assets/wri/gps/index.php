@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
-	include ('../config_privee.php');
+	include ('../includes/config.php');
 ?>
 <html>
 <head>
@@ -38,6 +38,7 @@ Based on https://openlayers.org
 
 	<script>
 		var registrationDate = ' <?=date("md-Hi")?>-',
+			sous_dossier_installation = '<?=$config_wri["sous_dossier_installation"]?>',
 			ign_key = '<?=$config_wri["ign_key"]?>';
 	</script>
 
