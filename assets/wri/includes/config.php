@@ -47,8 +47,6 @@ $config_wri['lien_forum']=$config_wri['sous_dossier_installation']."forum/";
 $config_wri['forum_refuges']=4;
 
 // Paramètrage des cartes vignettes des fiches de points
-$config_wri['chemin_leaflet']=$config_wri['racine_projet'].'leaflet/';
-$config_wri['url_chemin_leaflet']=$config_wri['sous_dossier_installation'].'leaflet/';
 $config_wri['chemin_ol']=$config_wri['racine_projet'].'ol/';
 $config_wri['url_chemin_ol']=$config_wri['sous_dossier_installation'].'ol/';
 
@@ -205,10 +203,6 @@ require($config_wri['racine_projet']."config_privee.php");
 
 // *** NON NON : *** N'ajoutez rien après ce require_once("config_privee.php"); sauf si vous savez pourquoi, car ajouter après empêche de "surdéfinir" certaines variables du fichier privé à chaque instance ci avant
 // mettez par contre tout ce que vous voulez avant le require_once("config_privee.php");
-
-// Ceci est après l'inclusion de config_privee.php pour que l'on puisse tenir compte du mode debug que le developpeur peut s'il le souhaite activer
-$config_wri['chemin_leaflet'].=$config_wri['debug']?'src/':'dist/';
-$config_wri['url_chemin_leaflet'].=$config_wri['debug']?'src/':'dist/';
 
 if ($config_wri['debug'])
 {

@@ -39,7 +39,8 @@ Based on https://openlayers.org
 	<script>
 		var registrationDate = ' <?=date("md-Hi")?>-',
 			sous_dossier_installation = '<?=$config_wri["sous_dossier_installation"]?>',
-			ign_key = '<?=$config_wri["ign_key"]?>';
+			ign_key = '<?=$config_wri["ign_key"]?>',
+			thunderforest_key = '<?=$config_wri["thunderforest_key"]?>';
 	</script>
 
 	<style>

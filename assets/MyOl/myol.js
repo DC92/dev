@@ -16,6 +16,7 @@
 //TODO RANDO reprendre modifs geoBB32/rando/gps -> le serveur dc9
 //TODO RANDO Charger layers avec des coches rando
 //TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
+//TODO IE try to assign if none
 
 /**
  * Debug facilities on mobile
@@ -1770,6 +1771,7 @@ function controlPrint() {
  * Requires controlButton, escapedStyle, JSONparse, HACK map_
  */
 //TODO BUG controlDownloadGPX don't save edited features
+//BEST why must it be included by map.addControl after map init ? Not as an overlay
 function controlEdit(o) {
 	const options = Object.assign({
 			group: 'edit',

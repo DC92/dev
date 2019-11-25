@@ -1,25 +1,8 @@
-// Edition des massifs
-const baseLayers = {
-		'Refuges.info': layerOSM(
-			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-		),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopoMap': layerOSM(
-			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-			'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
-			'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-		),
-		'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
-		'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
-	},
+<?php
+	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
+?>
 
-	controls = [
+const controls = [
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
@@ -34,7 +17,6 @@ const baseLayers = {
 		}),
 		controlGeocoder(),
 		controlLoadGPX(),
-		controlDownloadGPX(),
 	],
 
 	layerMassifs = layerVectorURL({
@@ -63,11 +45,6 @@ const baseLayers = {
 		],
 		controls: controls,
 	});
-
-if(0)
-map.getView().fit(
-	editeur.getSource().getExtent()
-);
 
 map.addControl(controlEdit({
 	geoJsonId: 'edit-json',

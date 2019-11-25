@@ -55,6 +55,7 @@ const help =
 			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 		),
+		'Outdoors': layerThunderforest(thunderforest_key, 'outdoors'),
 		'IGN': layerIGN(ign_key, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN(ign_key, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'Photo IGN': layerIGN(ign_key, 'ORTHOIMAGERY.ORTHOPHOTOS'),

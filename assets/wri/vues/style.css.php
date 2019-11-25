@@ -871,13 +871,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   min-width: 300px;
   max-height: 400px;
 }
-/* Limite de largeur de l'attribution pour ne pas masquer l'échèle */
-#carte-point .leaflet-control-attribution {
-  max-width: 340px;
-}
-#carte-edit .leaflet-control-attribution {
-  max-width: 390px;
-}
 /* Carte de la page des points écrans */
 @media screen and (min-width: 641px) {
   #container-carte-point {
@@ -906,29 +899,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     width: 450px; 
     height: 450px; 
   }
-}
-
-/* Cartes présentation full screen */
-.leaflet-fullscreen-on {
-  max-height: 100% !important;
-}
-@media screen and (device-width: 100vw) and (device-height: 100vh) { /* Cas du full screen / nécéssaire pour chrome */
-	#carte-nav, #carte-point, #carte-edit {
-		max-width: 100% !important;
-		max-height: 100% !important;
-	}
-}
-
-/* Etiquette dans les cartes */
-.nav-services,
-.carte-service-etiquette .leaflet-rrose-content-wrapper,
-.carte-service-etiquette .leaflet-rrose-tip {
-	background-color: #def;
-}
-.nav-sites,
-.carte-site-etiquette .leaflet-rrose-content-wrapper,
-.carte-site-etiquette .leaflet-rrose-tip {
-	background-color: #efd;
 }
 
 #check-types {
@@ -985,11 +955,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	#menu-normal,
 	#menu-scroll,
 	#fin-entete,
-	#basdepage,
-	.leaflet-control,
-	.leaflet-control-attribution > a:first-child {
-		display: none;
-	}
+	#basdepage
 	.noprint {
 		display: none !important;
 	}
@@ -1002,11 +968,5 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 		width: 100%;
 		height: 100%;
 		max-height: 100%;
-	}
-	.leaflet-control-attribution {
-		display: block;
-	}
-	.leaflet-control-attribution::first-letter {
-		color: transparent;
 	}
 }

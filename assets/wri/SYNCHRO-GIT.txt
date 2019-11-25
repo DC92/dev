@@ -1,1 +1,8 @@
 OK Commits on Nov 25, 2019
+
+Supprimer
+/leaflet/...
+
+Ajouter
+/ol/...
+/*/edit.*

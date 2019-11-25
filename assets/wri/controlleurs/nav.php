@@ -20,9 +20,6 @@ require_once ("bdd.php");
 require_once ("meta_donnee.php");
 require_once ("polygone.php");
 
-//TODO DELETE
-$vue->css           [] = $config_wri['url_chemin_leaflet'].'leaflet.css?'.filemtime($config_wri['chemin_leaflet'].'leaflet.css');
-$vue->java_lib_foot [] = $config_wri['url_chemin_leaflet'].'leaflet.js?' .filemtime($config_wri['chemin_leaflet'].'leaflet.js');
 $vue->java_lib_foot [] = $config_wri['sous_dossier_installation'].'vues/wiki.js';
 
 $vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
