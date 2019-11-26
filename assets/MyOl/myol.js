@@ -16,7 +16,7 @@
 //TODO RANDO reprendre modifs geoBB32/rando/gps -> le serveur dc9
 //TODO RANDO Charger layers avec des coches rando
 //TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
-//TODO IE try to assign if none
+//TODO BUG IE allignment buttons : CSS myol-button {float: left;} failed
 
 /**
  * Debug facilities on mobile
@@ -54,6 +54,15 @@ function JSONparse(json) {
 	}
 }
 
+//HACK IE Object.assign polyfill
+if (!Object.assign)
+	Object.assign = function() {
+		let r = {};
+		for (let a in arguments)
+			for (let m in arguments[a])
+				r[m] = arguments[a][m];
+		return r;
+	};
 
 /**
  * TILE LAYERS
@@ -900,6 +909,8 @@ layerOverpass = function(o) {
  * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
  * marker-lon / marker-lat
  * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
+ * marker-center-cursor : onclick = center the cursor at the middle of the map
+ * marker-center-map : onclick = center the map on the cursor position
  */
 //BEST Change cursor while hovering the target
 function layerMarker(o) {
@@ -912,7 +923,9 @@ function layerMarker(o) {
 		elLon = document.getElementById(options.idDisplay + '-lon'),
 		elLat = document.getElementById(options.idDisplay + '-lat'),
 		elX = document.getElementById(options.idDisplay + '-x'),
-		elY = document.getElementById(options.idDisplay + '-y');
+		elY = document.getElementById(options.idDisplay + '-y'),
+		elCenterMarker = document.getElementById(options.idDisplay + '-center-marker'),
+		elCenterMap = document.getElementById(options.idDisplay + '-center-map');
 
 	// Use json field values if any
 	if (elJson) {
@@ -973,16 +986,24 @@ function layerMarker(o) {
 			});
 
 			// Map control buttons
-			map.addControl(controlButton({
+			if (elCenterMarker)
+				elCenterMarker.onclick = function() {
+					point.setCoordinates(map.getView().getCenter());
+				};
+			else map.addControl(controlButton({
 				label: '\u29BB',
-				title: 'Remettre le curseur au centre actuel de la carte',
+				title: 'Déplacer le curseur au centre de la carte',
 				activate: function() {
 					point.setCoordinates(map.getView().getCenter());
 				},
 			}));
-			map.addControl(controlButton({
+			if (elCenterMarker)
+				elCenterMap.onclick = function() {
+					map.getView().setCenter(point.getCoordinates());
+				};
+			else map.addControl(controlButton({
 				label: '\u26DE',
-				title: 'Recentrer la carte sur le curseur',
+				title: 'Centrer la carte sur le curseur',
 				activate: function() {
 					map.getView().setCenter(point.getCoordinates());
 				},
@@ -1872,10 +1893,10 @@ function controlEdit(o) {
 
 		// Zoom the map on the loaded features
 		// You must use permalink({init: false})
-		//TODO BUG temporary shift to position is permalink init: true
+		//TODO BUG temporary shift to position if permalink init: true
 		const features = source.getFeatures(),
 			extent = ol.extent.createEmpty();
-		if(features.length) {
+		if (features.length) {
 			for (let f in features)
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
 			map.getView().fit(extent, {
@@ -1998,7 +2019,6 @@ function controlEdit(o) {
 	}
 
 	// Refurbish Points, Lines & Polygons
-	//TODO test with big polynoms
 	function optimiseEdited(pointerPosition) {
 		// Get all edited features as array of coordinates
 		// Split lines having a summit at pointerPosition
