@@ -67,7 +67,7 @@ const layerMassifsWri = layerVectorURL({
 				imageUrl: 'viseur.png',
 				idDisplay: 'viseur',
 				decimalSeparator: ',',
-				dragged: true,
+				draggable: true,
 			}),
 		],
 		controls: controlsCollection({

@@ -14,7 +14,7 @@ const overlays = [
 		layerMarker({
 			imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/viseur.png',
 			idDisplay: 'viseur',
-			dragged: true,
+			draggable: true,
 		}),
 	],
 

@@ -14,6 +14,9 @@
 .myol-popup p {
 	margin: 0;
 }
+.myol-popup-hidden {
+	display: none;
+}
 
 /* Overpass */
 .overpass-popup{

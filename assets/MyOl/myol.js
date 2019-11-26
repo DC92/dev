@@ -16,7 +16,6 @@
 //TODO RANDO reprendre modifs geoBB32/rando/gps -> le serveur dc9
 //TODO RANDO Charger layers avec des coches rando
 //TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
-//TODO BUG IE allignment buttons : CSS myol-button {float: left;} failed
 
 /**
  * Debug facilities on mobile
@@ -311,6 +310,332 @@ function layerBing(key, subLayer) {
 /**
  * VECTORS, GEOJSON & AJAX LAYERS
  */
+/**
+ * Popup label
+ * Manages a feature hovering per map common to all features & layers
+ */
+function popupLabel(map) {
+	if (!map.popupLabel_) { // Only one per map
+		const element = document.createElement('div'),
+			popup = map.popupLabel_ = new ol.Overlay({
+				element: element,
+			}),
+			viewStyle = map.getViewport().style;
+		map.addOverlay(popup);
+
+		map.on('click', function(evt) {
+			evt.target.forEachFeatureAtPixel(
+				evt.pixel,
+				function(feature) {
+					const url = feature.getProperties().url;
+					if (url)
+						window.location = url;
+				}
+			);
+		});
+
+		let hoveredFeature = null;
+		map.on('pointermove', function(evt) {
+			let nbFeaturesAtPixel = 0;
+			map.forEachFeatureAtPixel(
+				evt.pixel,
+				function(feature, layer) {
+					if (feature.getKeys().length > 1 && // Avoid doubled feature (E.G. style changed)
+						!(nbFeaturesAtPixel++) && // Only the first hovered
+						(!hoveredFeature || feature.ol_uid != hoveredFeature.ol_uid)) { // The feature has changed
+						deselectFeature();
+						selectFeature(feature, layer, evt.pixel);
+						hoveredFeature = feature;
+						hoveredFeature.layer_ = layer;
+					}
+				}
+			);
+			if (!nbFeaturesAtPixel && hoveredFeature)
+				deselectFeature();
+		});
+
+		// Hide popup when the cursor is out of the map
+		window.addEventListener('mousemove', function(evtMm) {
+			const divRect = map.getTargetElement().getBoundingClientRect();
+			if (evtMm.clientX < divRect.left || evtMm.clientX > divRect.right ||
+				evtMm.clientY < divRect.top || evtMm.clientY > divRect.bottom)
+				deselectFeature();
+		});
+
+		function selectFeature(feature, layer, pixel) {
+			// Change the cursor
+			const properties = feature.getProperties();
+			//TODO BUG pas de curseur en WRI car property.lien
+			if (properties.url)
+				viewStyle.cursor = 'pointer';
+			if (properties.draggable)
+				viewStyle.cursor = 'move';
+
+			if (layer && layer.options) {
+				element.className = 'myol-popup';
+
+				// Apply layer hover style to the feature
+				feature.setStyle(escapedStyle(
+					layer.options.styleOptions,
+					layer.options.hoverStyleOptions,
+					layer.options.editStyleOptions
+				));
+
+				// Set the text & label position
+				element.innerHTML = formatLabel(layer.options.label, '', properties, feature);
+				let geometry = feature.getGeometry();
+
+				// If it's a GeometryCollection, take the fisrt feature
+				if (typeof geometry.getGeometries == 'function')
+					geometry = geometry.getGeometries()[0];
+
+				// If it's a point, the icon is stable above it
+				if (geometry.flatCoordinates.length == 2)
+					pixel = map.getPixelFromCoordinate(geometry.flatCoordinates);
+
+				// Shift of the label to stay into the map regarding the pointer position
+				if (pixel[1] < element.clientHeight + 12) { // On the top of the map (not enough space for it)
+					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -element.clientWidth - 10;
+					pixel[1] = 2;
+				} else {
+					pixel[0] -= element.clientWidth / 2;
+					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
+					pixel[0] = Math.min(pixel[0], map.getSize()[0] - element.clientWidth - 1); // Bord droit
+					pixel[1] -= element.clientHeight + 8;
+				}
+				popup.setPosition(map.getCoordinateFromPixel(pixel));
+			}
+		}
+
+		function deselectFeature() {
+			if (hoveredFeature) {
+				viewStyle.cursor = 'default';
+				element.className = 'myol-popup-hidden';
+				const layer = hoveredFeature.layer_;
+				if (layer && layer.options)
+					hoveredFeature.setStyle(escapedStyle(layer.options.styleOptions));
+				hoveredFeature = null;
+			}
+		}
+
+		function formatLabel(format, closure, properties, feature) {
+			if (typeof format == 'function')
+				format = formatLabel(
+					format(properties, feature),
+					closure, properties, feature
+				);
+
+			if (typeof format == 'object') {
+				// Links
+				if (closure == 'link')
+					return '<a href="' + format.url + '">' + format.name + '</a>';
+
+				// List of closure: object
+				let items = [];
+				for (let f in format)
+					items.push(formatLabel(
+						format[f], f,
+						properties, feature
+					));
+				return items
+					.filter(function(a) { // Purge empty items
+						return a;
+					})
+					.join(closure);
+			}
+			// Number with unit
+			const n = parseInt(format);
+			if (n)
+				return n + closure.replace('?', n > 1 ? 's' : '');
+
+			// Other string
+			return format ? format.toString() : '';
+		}
+	}
+	return map.popupLabel_;
+}
+
+/**
+ * Marker
+ * Requires JSONparse, popupLabel, HACK map_, proj4.js for swiss coordinates
+ * Read / write following fields :
+ * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
+ * marker-lon / marker-lat
+ * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
+ * marker-center-cursor : onclick = center the cursor at the middle of the map
+ * marker-center-map : onclick = center the map on the cursor position
+ */
+function layerMarker(o) {
+	const options = Object.assign({
+			llInit: [],
+			idDisplay: 'marker',
+			decimalSeparator: '.',
+		}, o),
+		elJson = document.getElementById(options.idDisplay + '-json'),
+		elLon = document.getElementById(options.idDisplay + '-lon'),
+		elLat = document.getElementById(options.idDisplay + '-lat'),
+		elX = document.getElementById(options.idDisplay + '-x'),
+		elY = document.getElementById(options.idDisplay + '-y'),
+		elCenterMarker = document.getElementById(options.idDisplay + '-center-marker'),
+		elCenterMap = document.getElementById(options.idDisplay + '-center-map');
+
+	// Use json field values if any
+	if (elJson) {
+		let json = elJson.value || elJson.innerHTML;
+		if (json)
+			options.llInit = JSONparse(json).coordinates;
+	}
+	// Use lon-lat fields values if any
+	if (elLon && elLat) {
+		const lon = parseFloat(elLon.value || elLon.innerHTML),
+			lat = parseFloat(elLat.value || elLat.innerHTML);
+		if (lon && lat)
+			options.llInit = [lon, lat];
+	}
+
+	// The marker layer
+	const style = new ol.style.Style({
+			image: new ol.style.Icon(({
+				src: options.imageUrl,
+				anchor: [0.5, 0.5],
+			})),
+		}),
+		point = new ol.geom.Point(
+			ol.proj.fromLonLat(options.llInit)
+		),
+		feature = new ol.Feature({
+			geometry: point,
+			draggable: options.draggable,
+		}),
+		source = new ol.source.Vector({
+			features: [feature],
+		}),
+		layer = new ol.layer.Vector({
+			source: source,
+			style: style,
+			zIndex: 10,
+		}),
+		format = new ol.format.GeoJSON();
+
+	//TODO BUG n'est pas enabled si on ne voit pas le feature !
+	layer.once('prerender', function() {
+		const map = layer.map_;
+		popupLabel(map); // Attach tracking for cursor changes
+
+		if (options.draggable) {
+			// Drag the feature
+			map.addInteraction(new ol.interaction.Modify({
+				features: new ol.Collection([feature]),
+				pixelTolerance: 16, // The circle around the center
+				style: style, // Avoid to add interaction default style
+			}));
+
+			// Change text input values
+			point.on('change', function() {
+				displayLL(point.getCoordinates());
+			});
+
+			// GPS position changed
+			map.on('myol:ongpsposition', function(evt) {
+				point.setCoordinates(evt.position);
+			});
+
+			// Map control buttons
+			if (elCenterMarker)
+				elCenterMarker.onclick = function() {
+					point.setCoordinates(map.getView().getCenter());
+				};
+			else map.addControl(controlButton({
+				label: '\u29BB',
+				title: 'Déplacer le curseur au centre de la carte',
+				activate: function() {
+					point.setCoordinates(map.getView().getCenter());
+				},
+			}));
+			if (elCenterMarker)
+				elCenterMap.onclick = function() {
+					map.getView().setCenter(point.getCoordinates());
+				};
+			else map.addControl(controlButton({
+				label: '\u26DE',
+				title: 'Centrer la carte sur le curseur',
+				activate: function() {
+					map.getView().setCenter(point.getCoordinates());
+				},
+			}));
+		}
+	});
+
+	// <input> coords edition
+	function fieldEdit(evt) {
+		const id = evt.target.id.split('-')[1], // Get second part of the field id
+			pars = {
+				lon: [0, 4326],
+				lat: [1, 4326],
+				x: [0, 21781],
+				y: [1, 21781],
+			},
+			nol = pars[id][0], // Get what coord is concerned (x, y)
+			projection = pars[id][1]; // Get what projection is concerned
+		// Get initial position
+		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection);
+		// We change the value that was edited
+		coord[nol] = parseFloat(evt.target.value.replace(',', '.'));
+		// Set new position
+		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857'));
+
+		// Center map to the new position
+		layer.map_.getView().setCenter(point.getCoordinates());
+	}
+
+	// Display a coordinate
+	//BEST dispach/edit deg min sec
+	function displayLL(ll) {
+		const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
+			values = {
+				lon: (Math.round(ll4326[0] * 100000) / 100000).toString().replace('.', options.decimalSeparator),
+				lat: (Math.round(ll4326[1] * 100000) / 100000).toString().replace('.', options.decimalSeparator),
+				json: JSON.stringify(format.writeGeometryObject(point, {
+					featureProjection: 'EPSG:3857',
+					decimals: 5
+				}))
+			};
+
+		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+		if (typeof proj4 == 'function') {
+			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+			ol.proj.proj4.register(proj4);
+		}
+		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+		if (typeof proj4 == 'function' &&
+			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) { // Si on est dans la zone suisse EPSG:21781
+			const c21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
+			values.x = Math.round(c21781[0]);
+			values.y = Math.round(c21781[1]);
+		}
+		// Mask xy swiss if nothing to write
+		if (elX)
+			elX.parentNode.style.display = values.x ? '' : 'none';
+		if (elY)
+			elY.parentNode.style.display = values.y ? '' : 'none';
+
+		// We insert the resulting HTML string where it is going
+		for (let postId in values) {
+			const el = document.getElementById(options.idDisplay + '-' + postId);
+			if (el) {
+				el.onchange = fieldEdit; // Set the change function
+				if (el.value !== undefined)
+					el.value = values[postId];
+				else
+					el.innerHTML = values[postId];
+			}
+		}
+	}
+	displayLL(ol.proj.fromLonLat(options.llInit)); // Display once at init
+
+	return layer;
+}
+
 // Mem in cookies the checkbox content with name="selectorName"
 function controlPermanentCheckbox(selectorName, callback) {
 	const checkEls = document.getElementsByName(selectorName),
@@ -388,7 +713,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires controlPermanentCheckbox, JSONparse, HACK map_
+ * Requires controlPermanentCheckbox, popupLabel, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(o) {
@@ -433,6 +758,7 @@ function layerVectorURL(o) {
 			renderBuffer: 16, // buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
+	layer.options = options;
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -448,152 +774,9 @@ function layerVectorURL(o) {
 		);
 
 	layer.once('prerender', function(evt) {
-		const map = evt.target.map_;
-
-		// Define one popup for all the layerVectorURL
-		//BEST centralize this code & the hover
-		if (!window.popEl_) {
-			window.popEl_ = document.createElement('a');
-			window.popup_ = new ol.Overlay({
-				element: window.popEl_,
-			});
-			map.addOverlay(window.popup_);
-			map.on('pointermove', pointerMove);
-			map.on('click', function(evtClk) { // Click on a feature
-				evtClk.target.forEachFeatureAtPixel(
-					evtClk.pixel,
-					function(feature) {
-						if (typeof options.href == 'function')
-							window.location = options.href(feature.getProperties());
-					}
-				);
-			});
-		}
-
-		//BEST zoom map when the cursor is over a label
-		// Style when hovering a feature
-		map.addInteraction(new ol.interaction.Select({
-			condition: ol.events.condition.pointerMove,
-			hitTolerance: 6,
-			filter: function(feature, l) {
-				return l == layer;
-			},
-			style: escapedStyle(options.styleOptions, options.hoverStyleOptions),
-		}));
-
-		// Hide popup when the cursor is out of the map
-		window.addEventListener('mousemove', function(evtMm) {
-			const divRect = map.getTargetElement().getBoundingClientRect();
-			if (evtMm.clientX < divRect.left || evtMm.clientX > divRect.right ||
-				evtMm.clientY < divRect.top || evtMm.clientY > divRect.bottom)
-				window.popup_.setPosition();
-		});
+		popupLabel(evt.target.map_); // Attach tracking for labeling & cursor changes
 	});
 
-	function pointerMove(evt) {
-		const map = evt.target;
-		let pixel = [evt.pixel[0], evt.pixel[1]];
-
-		// Hide label by default if none feature or his popup here
-		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			popupRect = window.popEl_.getBoundingClientRect();
-		if (popupRect.left - 5 > mapRect.left + evt.pixel[0] || mapRect.left + evt.pixel[0] >= popupRect.right + 5 ||
-			popupRect.top - 5 > mapRect.top + evt.pixel[1] || mapRect.top + evt.pixel[1] >= popupRect.bottom + 5 ||
-			!popupRect)
-			window.popup_.setPosition();
-
-		// Reset cursor if there is no feature here
-		map.getViewport().style.cursor = 'default';
-
-		map.forEachFeatureAtPixel(
-			pixel,
-			function(feature_, layer_) {
-				if (layer_ && typeof layer_.displayPopup == 'function')
-					layer_.displayPopup(feature_, pixel);
-			}, {
-				hitTolerance: 6,
-			}
-		);
-	}
-
-	layer.displayPopup = function(feature, pixel) {
-		const map = layer.map_;
-		let geometry = feature.getGeometry();
-		if (typeof feature.getGeometry().getGeometries == 'function') // GeometryCollection
-			geometry = geometry.getGeometries()[0];
-
-		if (layer && options) {
-			const properties = feature.getProperties(),
-				coordinates = geometry.flatCoordinates, // If it's a point, just over it
-				ll4326 = ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326');
-			if (coordinates.length == 2) // Stable if icon
-				pixel = map.getPixelFromCoordinate(coordinates);
-
-			// Hovering label
-			const label = formatLabel(options.label, '', properties, feature),
-				//BEST resorb in overpass
-				postLabel = typeof options.postLabel == 'function' ?
-				options.postLabel(properties, feature, layer, pixel, ll4326) :
-				options.postLabel || '';
-
-			if (label && !window.popup_.getPosition()) { // Only for the first feature on the hovered stack
-				// Calculate the label's anchor
-				window.popup_.setPosition(map.getView().getCenter()); // For popup size calculation
-
-				// Fill label class, text & cursor
-				window.popEl_.className = 'myol-popup ' + (options.labelClass || '');
-				window.popEl_.innerHTML = label + postLabel;
-				if (typeof options.href == 'function')
-					map.getViewport().style.cursor = 'pointer';
-
-				// Shift of the label to stay into the map regarding the pointer position
-				if (pixel[1] < window.popEl_.clientHeight + 12) { // On the top of the map (not enough space for it)
-					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -window.popEl_.clientWidth - 10;
-					pixel[1] = 2;
-				} else {
-					pixel[0] -= window.popEl_.clientWidth / 2;
-					pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-					pixel[0] = Math.min(pixel[0], map.getSize()[0] - window.popEl_.clientWidth - 1); // Bord droit
-					pixel[1] -= window.popEl_.clientHeight + 8;
-				}
-				window.popup_.setPosition(map.getCoordinateFromPixel(pixel));
-			}
-		}
-	};
-
-	function formatLabel(format, closure, properties, feature) {
-		if (typeof format == 'function')
-			format = formatLabel(
-				format(properties, feature),
-				closure, properties, feature
-			);
-
-		if (typeof format == 'object') {
-			// Links
-			if (closure == 'link')
-				return '<a href="' + format.url + '">' + format.name + '</a>';
-
-			// List of closure: object
-			let items = [];
-			for (let f in format)
-				items.push(formatLabel(
-					format[f], f,
-					properties, feature
-				));
-			return items
-				.filter(function(a) { // Purge empty items
-					return a;
-				})
-				.join(closure);
-		}
-		// Number with unit
-		const n = parseInt(format);
-		if (n)
-			return n + closure.replace('?', n > 1 ? 's' : '');
-
-		// Other string
-		return format ? format.toString() : '';
-	}
 	return layer;
 }
 
@@ -902,188 +1085,6 @@ layerOverpass = function(o) {
 	}, options));
 };
 
-/**
- * Marker
- * Requires JSONparse, HACK map_, proj4.js for swiss coordinates
- * Read / write following fields :
- * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
- * marker-lon / marker-lat
- * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
- * marker-center-cursor : onclick = center the cursor at the middle of the map
- * marker-center-map : onclick = center the map on the cursor position
- */
-//BEST Change cursor while hovering the target
-function layerMarker(o) {
-	const options = Object.assign({
-			llInit: [],
-			idDisplay: 'marker',
-			decimalSeparator: '.',
-		}, o),
-		elJson = document.getElementById(options.idDisplay + '-json'),
-		elLon = document.getElementById(options.idDisplay + '-lon'),
-		elLat = document.getElementById(options.idDisplay + '-lat'),
-		elX = document.getElementById(options.idDisplay + '-x'),
-		elY = document.getElementById(options.idDisplay + '-y'),
-		elCenterMarker = document.getElementById(options.idDisplay + '-center-marker'),
-		elCenterMap = document.getElementById(options.idDisplay + '-center-map');
-
-	// Use json field values if any
-	if (elJson) {
-		let json = elJson.value || elJson.innerHTML;
-		if (json)
-			options.llInit = JSONparse(json).coordinates;
-	}
-	// Use lon-lat fields values if any
-	if (elLon && elLat) {
-		const lon = parseFloat(elLon.value || elLon.innerHTML),
-			lat = parseFloat(elLat.value || elLat.innerHTML);
-		if (lon && lat)
-			options.llInit = [lon, lat];
-	}
-
-	// The marker layer
-	const style = new ol.style.Style({
-			image: new ol.style.Icon(({
-				src: options.imageUrl,
-				anchor: [0.5, 0.5],
-			})),
-		}),
-		point = new ol.geom.Point(
-			ol.proj.fromLonLat(options.llInit)
-		),
-		feature = new ol.Feature({
-			geometry: point,
-		}),
-		source = new ol.source.Vector({
-			features: [feature],
-		}),
-		layer = new ol.layer.Vector({
-			source: source,
-			style: style,
-			zIndex: 10,
-		}),
-		format = new ol.format.GeoJSON();
-
-	//TODO BUG n'est pas enabled si on ne voit pas le feature !
-	layer.once('prerender', function() {
-		const map = layer.map_;
-		if (options.dragged) {
-			// Drag and drop
-			map.addInteraction(new ol.interaction.Modify({
-				features: new ol.Collection([feature]),
-				pixelTolerance: 16,
-				style: style,
-			}));
-
-			// Change text input values
-			point.on('change', function() {
-				displayLL(point.getCoordinates());
-			});
-
-			// GPS position changed
-			map.on('myol:ongpsposition', function(evt) {
-				point.setCoordinates(evt.position);
-			});
-
-			// Map control buttons
-			if (elCenterMarker)
-				elCenterMarker.onclick = function() {
-					point.setCoordinates(map.getView().getCenter());
-				};
-			else map.addControl(controlButton({
-				label: '\u29BB',
-				title: 'Déplacer le curseur au centre de la carte',
-				activate: function() {
-					point.setCoordinates(map.getView().getCenter());
-				},
-			}));
-			if (elCenterMarker)
-				elCenterMap.onclick = function() {
-					map.getView().setCenter(point.getCoordinates());
-				};
-			else map.addControl(controlButton({
-				label: '\u26DE',
-				title: 'Centrer la carte sur le curseur',
-				activate: function() {
-					map.getView().setCenter(point.getCoordinates());
-				},
-			}));
-		}
-	});
-
-	// <input> coords edition
-	function fieldEdit(evt) {
-		const id = evt.target.id.split('-')[1], // Get second part of the field id
-			pars = {
-				lon: [0, 4326],
-				lat: [1, 4326],
-				x: [0, 21781],
-				y: [1, 21781],
-			},
-			nol = pars[id][0], // Get what coord is concerned (x, y)
-			projection = pars[id][1]; // Get what projection is concerned
-		// Get initial position
-		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection);
-		// We change the value that was edited
-		coord[nol] = parseFloat(evt.target.value.replace(',', '.'));
-		// Set new position
-		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857'));
-
-		// Center map to the new position
-		layer.map_.getView().setCenter(point.getCoordinates());
-	}
-
-	// Display a coordinate
-	//BEST dispach/edit deg min sec
-	function displayLL(ll) {
-		const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
-			values = {
-				lon: (Math.round(ll4326[0] * 100000) / 100000).toString().replace('.', options.decimalSeparator),
-				lat: (Math.round(ll4326[1] * 100000) / 100000).toString().replace('.', options.decimalSeparator),
-				json: JSON.stringify(format.writeGeometryObject(point, {
-					featureProjection: 'EPSG:3857',
-					decimals: 5
-				}))
-			};
-
-		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-		if (typeof proj4 == 'function') {
-			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-			ol.proj.proj4.register(proj4);
-		}
-		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-		if (typeof proj4 == 'function' &&
-			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) { // Si on est dans la zone suisse EPSG:21781
-			const c21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
-			values.x = Math.round(c21781[0]);
-			values.y = Math.round(c21781[1]);
-		}
-		// Mask xy swiss if nothing to write
-		if (elX)
-			elX.parentNode.style.display = values.x ? '' : 'none';
-		if (elY)
-			elY.parentNode.style.display = values.y ? '' : 'none';
-
-		// We insert the resulting HTML string where it is going
-		for (let postId in values) {
-			const el = document.getElementById(options.idDisplay + '-' + postId);
-			if (el) {
-				el.onchange = fieldEdit; // Set the change function
-				if (el.value !== undefined)
-					el.value = values[postId];
-				else
-					el.innerHTML = values[postId];
-			}
-		}
-	}
-	displayLL(ol.proj.fromLonLat(options.llInit)); // Display once at init
-
-	layer.getPoint = function() {
-		return point;
-	};
-	return layer;
-}
-
 
 /**
  * CONTROLS
@@ -1093,6 +1094,7 @@ function layerMarker(o) {
  * Abstract definition to be used by other control buttons definitions
  */
 //BEST left aligned buttons when screen vertical
+//TODO BUG IE allignment buttons : CSS myol-button {float: left;} failed
 function controlButton(o) {
 	const options = Object.assign({
 			element: document.createElement('div'),
@@ -1295,7 +1297,6 @@ function controlPermalink(o) {
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
-			document.cookie = 'permalink=zoom=' + newParams[0] + '&lat=' + newParams[2] + '&lon=' + newParams[1] + ';path=/; SameSite=Strict'; //BEST DELETE (temp WRI)
 		}
 	}
 	return control;
@@ -1865,6 +1866,7 @@ function controlEdit(o) {
 			source: source,
 			style: editStyle,
 		});
+	layer.options = options;
 
 	// Treat the geoJson input as any other edit
 	optimiseEdited();
@@ -1954,6 +1956,7 @@ function controlEdit(o) {
 	// Manage hover to save modify actions integrity
 	var hoveredFeature = null;
 
+	//TODO use the centralized hover function
 	function hover(evt) {
 		let nbFeaturesAtPixel = 0;
 		button.getMap().forEachFeatureAtPixel(evt.pixel, function(feature) {
