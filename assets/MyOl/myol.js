@@ -13,9 +13,6 @@
 /* jshint esversion: 6 */
 
 //TODO avoid fetch / PWA error on IE
-//TODO RANDO reprendre modifs geoBB32/rando/gps -> le serveur dc9
-//TODO RANDO Charger layers avec des coches rando
-//TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
 
 /**
  * Debug facilities on mobile
@@ -728,18 +725,22 @@ function layerVectorURL(o) {
 		readFeatures: function readFeatures(response) {
 			return JSONparse(response);
 		},
+		receiveProperty() { // Change properties at reception
+			return {};
+		},
 	}, o);
 
 	// HACK to clear the layer when the xhr response is received
 	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
 	const formatReadFeatures = options.format.readFeatures; // Mem former code
-	options.format.readFeatures = function(response, opts) {
+	options.format.readFeatures = function(response, opt_options) {
 		if (source.bboxLimitResolution) // If bbbox optimised
 			source.clear(); // Clean all features when receiving a request
 
 		return formatReadFeatures.call( // Call former method
-			this, options.readFeatures(response), // Call specific data treatment
-			opts
+			this,
+			options.readFeatures(response), // Call specific data treatment
+			opt_options
 		);
 	};
 
@@ -760,6 +761,12 @@ function layerVectorURL(o) {
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
 	layer.options = options;
+
+	source.on('addfeature', function(evt) {
+		evt.feature.setProperties(
+			options.receiveProperty(
+				evt.feature.getProperties()));
+	});
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -790,6 +797,13 @@ function layerRefugesInfo(o) {
 		serverUrl: '//www.refuges.info/',
 		baseUrl: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
+		receiveProperty: function(property) {
+			return {
+				name: property.nom,
+				ele: property.coord.alt,
+				url: property.lien,
+			};
+		},
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
@@ -798,7 +812,7 @@ function layerRefugesInfo(o) {
 			};
 		},
 		href: function(properties) { // To click on the icon
-			return properties.lien;
+			return properties.lien; //BEST default if .url
 		},
 		label: function(properties) {
 			return {
@@ -826,18 +840,25 @@ function layerRefugesInfo(o) {
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		styleOptions: function(properties) {
-			const trad = {
-				'cabane fermee': 'inutilisable',
-				'cabane ouverte mais ocupee par le berger l ete': 'cabane-non-gardee',
-				'cabane ouverte': 'cabane-non-gardee',
-				'orri toue abri en pierre': 'abri',
-				'ruine': 'inutilisable',
-				'': 'abri',
+		receiveProperty: function(property) {
+			let sym = 'Lodge'; // cabane ouverte...
+			switch (property.type_hebergement) {
+				case 'orri toue abri en pierre':
+					sym = 'Campground';
+					break;
+				case 'cabane fermee':
+				case 'ruine':
+					sym = 'Crossing';
+			}
+			return {
+				sym: sym,
+				ele: parseInt(property.altitude),
 			};
+		},
+		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: '//www.refuges.info/images/icones/' + trad[properties.type_hebergement] + '.png',
+					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
 				}),
 			};
 		},
@@ -868,6 +889,52 @@ function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		strategy: ol.loadingstrategy.bboxLimit,
+		receiveProperty: function(property) {
+			// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
+			//BEST put in chemineur
+			let sym = 'Puzzle Cache';
+			switch (property.icone.match(/\/([a-z_]*)\./)[1]) {
+				case 'refuge':
+				case 'gite':
+				case 'hotel':
+					sym = 'Residence';
+					break;
+				case 'cabane':
+				case 'cabane_cle':
+				case 'buron':
+				case 'alpage':
+					sym = 'Lodge';
+					break;
+				case 'abri':
+					sym = 'Fishing Hot Spot Facility';
+					break;
+				case 'orri':
+				case 'camping':
+				case 'bivouac':
+					sym = 'Campground';
+					break;
+				case 'ferme':
+				case 'ruine':
+					sym = 'Crossing';
+					break;
+				case 'point_eau':
+					sym = 'Drinking Water';
+					break;
+				case 'lac':
+					sym = 'Water Source';
+					break;
+				case 'sommet':
+					sym = 'Summit';
+					break;
+				case 'col':
+					sym = 'Flag, Red';
+			}
+			return {
+				name: property.nom,
+				sym: sym,
+				//BEST in chemineur				ele:??,
+			};
+		},
 		styleOptions: function(properties) {
 			return {
 				// POI
@@ -1674,22 +1741,9 @@ function controlDownloadGPX(o) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					const properties = feature.getProperties();
-					//BEST put in layers
 					if (properties.id)
 						feature.setId(properties.id);
-					if (properties.nom)
-						feature.setProperties({
-							name: properties.nom,
-						});
-					if (properties.altitude)
-						feature.setProperties({
-							ele: parseInt(properties.altitude),
-						});
-					if (properties.coord && properties.coord.alt) // refuges.info
-						feature.setProperties({
-							ele: properties.coord.alt,
-						});
-					if (feature.getKeys().length > 1) // Not only geom (except markers)
+					if (feature.getKeys().length > 1) // Except markers taht have only geom
 						features.push(feature);
 				});
 		});
