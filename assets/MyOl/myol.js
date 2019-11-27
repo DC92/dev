@@ -393,6 +393,7 @@ function popupLabel(map) {
 				if (geometry.flatCoordinates.length == 2)
 					pixel = map.getPixelFromCoordinate(geometry.flatCoordinates);
 
+				//TODO BUG quelquefois, ne mesure pas la bonne étiquette
 				// Shift of the label to stay into the map regarding the pointer position
 				if (pixel[1] < element.clientHeight + 12) { // On the top of the map (not enough space for it)
 					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -element.clientWidth - 10;
@@ -1094,7 +1095,6 @@ layerOverpass = function(o) {
  * Abstract definition to be used by other control buttons definitions
  */
 //BEST left aligned buttons when screen vertical
-//TODO BUG IE allignment buttons : CSS myol-button {float: left;} failed
 function controlButton(o) {
 	const options = Object.assign({
 			element: document.createElement('div'),
@@ -1738,7 +1738,6 @@ function controlPrint() {
 		orientationEl = document.createElement('div');
 
 	// Add orientation selectors below the button
-	//TODO BUG shift next button when display orentation choices
 	orientationEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
 		'<input type="radio" name="ori" value="1">Paysage A4';
 	orientationEl.className = 'ol-control-hidden';

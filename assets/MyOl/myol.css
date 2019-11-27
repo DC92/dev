@@ -118,9 +118,9 @@
 .ol-geocoder,
 .ol-gps,
 .myol-button {
-	position: initial !important;
-	top: initial !important;
-	left: initial !important;
+	position: relative !important;
+	top: 0 !important;
+	left: 0 !important;
 	float: left;
 	margin: 0.5em 0 0 0.5em;
 	border-radius: 2px;
@@ -167,8 +167,8 @@
 .ol-full-screen-true {
 	background-size: 1.375em;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
+	/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 }
-/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 
 /* GPS */
 .ol-gps button {
@@ -176,6 +176,9 @@
 }
 
 /* Print */
+.ol-print {
+	width: 1.62em;
+}
 .ol-print:hover {
 	background-color: transparent;
 }
@@ -193,6 +196,7 @@
 .ol-control-question {
 	position: relative;
 	top: 0.3em;
+	width: 6.5em;
 	padding: 1px;
 	background-color: white;
 }
