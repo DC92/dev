@@ -50,11 +50,14 @@ const layerMassifsWri = layerVectorURL({
 			layerRefugesInfo({
 				selectorName: 'wri-poi',
 			}),
-			layerChemineur({
-				selectorName: 'chemineur',
-			}),
 			layerPyreneesRefuges({
 				selectorName: 'prc',
+			}),
+			layerC2C({
+				selectorName: 'c2c',
+			}),
+			layerChemineur({
+				selectorName: 'chemineur',
 			}),
 			layerOverpass(),
 			layerMassifsWri,

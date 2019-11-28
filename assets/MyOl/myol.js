@@ -223,7 +223,7 @@ function layerSwissTopo(layer, extraLayer) {
 	}
 	return layerTileIncomplete({
 		extraLayer: extraLayer,
-		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781
+		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781 (Swiss CH1903 / LV03)
 		sources: {
 			500: new ol.source.WMTS(({
 				crossOrigin: 'anonymous',
@@ -361,8 +361,8 @@ function popupLabel(map) {
 
 		function selectFeature(feature, layer, pixel) {
 			// Change the cursor
+			//TODO BUG pointer on the label
 			const properties = feature.getProperties();
-			//TODO BUG pas de curseur en WRI car property.lien
 			if (properties.url)
 				viewStyle.cursor = 'pointer';
 			if (properties.draggable)
@@ -444,7 +444,7 @@ function popupLabel(map) {
 			// Number with unit
 			const n = parseInt(format);
 			if (n)
-				return n + closure.replace('?', n > 1 ? 's' : '');
+				return n + closure;
 
 			// Other string
 			return format ? format.toString() : '';
@@ -659,6 +659,7 @@ function controlPermanentCheckbox(selectorName, callback) {
  * evt (keyboard event)
  * return : [checked values or ids]
  */
+//TODO BUG read first before modifying layers
 function permanentCheckboxList(selectorName, evt) {
 	const checkEls = document.getElementsByName(selectorName);
 	let allChecks = [];
@@ -699,6 +700,7 @@ function escapedStyle(a, b) {
 	};
 }
 
+
 /**
  * BBOX strategy when the url return a limited number of features depending on the extent
  */
@@ -722,51 +724,56 @@ function layerVectorURL(o) {
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
 		format: new ol.format.GeoJSON(),
-		readFeatures: function readFeatures(response) {
-			return JSONparse(response);
-		},
-		receiveProperty() { // Change properties at reception
-			return {};
-		},
+		projection: 'EPSG:4326',
 	}, o);
 
-	// HACK to clear the layer when the xhr response is received
-	// This needs to be redone every time a response is received to avoid multiple simultaneous xhr requests
-	const formatReadFeatures = options.format.readFeatures; // Mem former code
-	options.format.readFeatures = function(response, opt_options) {
-		if (source.bboxLimitResolution) // If bbbox optimised
+	//HACK overwrite ol.format.GeoJSON.readFeatures
+	if (options.format.readFeaturesFromObject) // If format = GeoJSON
+		options.format.readFeatures = function(json, opts) {
 			source.clear(); // Clean all features when receiving a request
+			let object = JSONparse(json); // Log Json errors
 
-		return formatReadFeatures.call( // Call former method
-			this,
-			options.readFeatures(response), // Call specific data treatment
-			opt_options
-		);
-	};
+			if (typeof options.receiveJson == 'function')
+				object = options.receiveJson(object);
+
+			return options.format.readFeaturesFromObject(
+				object,
+				options.format.getReadOptions(json, opts)
+			);
+		};
 
 	const source = new ol.source.Vector(Object.assign({
 			url: function(extent, resolution, projection) {
-				const bbox = ol.proj.transformExtent(extent, projection.getCode(), 'EPSG:4326'),
+				const bbox = ol.proj.transformExtent(
+						extent,
+						projection.getCode(),
+						options.projection
+					),
 					// Retreive checked parameters
-					list = permanentCheckboxList(options.selectorName).filter(function(evt) { // selectorName optional
-						return evt !== 'on'; // Remove the "all" input (default value = "on")
-					});
+					list = permanentCheckboxList(options.selectorName).
+				filter(function(evt) { // selectorName optional
+					return evt !== 'on'; // Remove the "all" input (default value = "on")
+				});
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
 		}, options)),
+
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: escapedStyle(options.styleOptions),
 			renderBuffer: 16, // buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
+
 	layer.options = options;
 
-	source.on('addfeature', function(evt) {
-		evt.feature.setProperties(
-			options.receiveProperty(
-				evt.feature.getProperties()));
-	});
+	// Change properties at reception
+	if (typeof options.receiveProperty == 'function')
+		source.on('addfeature', function(evt) {
+			evt.feature.setProperties(
+				options.receiveProperty(
+					evt.feature.getProperties()));
+		});
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -789,12 +796,80 @@ function layerVectorURL(o) {
 }
 
 /**
+ * www.camptocamp.org POI layer
+ * Requires layerVectorURL
+ */
+// https://api.camptocamp.org/waypoints?limit=200&bbox=605829,5592648,615498,5635835
+function layerC2C(o) {
+	const options = Object.assign({
+		baseUrl: 'https://api.camptocamp.org/waypoints?limit=200', // https mandatory for Access-Control-Allow-Origin
+		strategy: ol.loadingstrategy.bboxLimit,
+		projection: 'EPSG:3857',
+		format: new ol.format.GeoJSON({
+			dataProjection: 'EPSG:3857',
+		}),
+
+		receiveJson: function(object) {
+			const features = [];
+			for (let i in object.documents) {
+				const o = object.documents[i],
+					geom = JSONparse(o.geometry.geom);
+				const f = {
+					id: o.document_id,
+					type: 'Feature',
+					geometry: geom,
+
+					properties: {
+						id: o.document_id,
+						lien: 'http://www.refuges.info/point/6457/cabane-non-gardee/Cabana-de-Sotllo/',
+						nom: 'Cabana de Sotllo',
+						sym: 'Fishing Hot Spot Facility',
+					},
+
+
+				};
+				if (geom.type)
+					features.push(f);
+			}
+			const r = {
+				type: 'FeatureCollection',
+				features: features,
+			};
+			return r;
+		},
+		wstyleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					//src: options.serverUrl + 'images/icones/' + properties.type.icone + '.png'
+					http: '//www.refuges.info/images/icones/cabane-non-gardee.png',
+				})
+			};
+		},
+		wwwwhref: function(properties) { // To click on the icon
+			return properties.lien; //BEST default if .url
+		},
+		label: function(properties) {
+			return {
+				'<br/>': {
+					link: { // To click on the label
+						name: properties.nom,
+						url: properties.lien,
+					},
+				},
+			};
+		},
+	}, o);
+	return layerVectorURL(options);
+}
+
+/**
  * www.refuges.info POI layer
  * Requires layerVectorURL
  */
 function layerRefugesInfo(o) {
 	const options = Object.assign({
 		serverUrl: '//www.refuges.info/',
+		//		baseUrl: 'api/bbox?format=gpx&type_points=',//TODO DELETE
 		baseUrl: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperty: function(property) {
@@ -823,8 +898,8 @@ function layerRefugesInfo(o) {
 					},
 					', ': {
 						m: properties.coord.alt,
-						' place?': properties.places.valeur,
-					}
+						' \u255E\u2550\u2555': properties.places.valeur,
+					},
 				}
 			};
 		},
@@ -871,15 +946,13 @@ function layerPyreneesRefuges(options) {
 					link: properties,
 					', ': {
 						m: properties.altitude,
-						' place?': properties.cap_ete,
-					}
-				}
+						' \u255E\u2550\u2555': properties.cap_ete,
+					},
+				},
 			};
 		},
 	}, options));
 }
-
-//TODO WRI NAV C2C
 
 /**
  * chemineur.fr POI layer
