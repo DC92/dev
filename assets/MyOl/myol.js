@@ -13,6 +13,7 @@
 /* jshint esversion: 6 */
 
 //TODO avoid fetch / PWA error on IE
+//TODO ranger les blocs dans l'ordre déclaration puis utilisation & noter les dendancies
 
 /**
  * Debug facilities on mobile
@@ -320,6 +321,8 @@ function popupLabel(map) {
 			viewStyle = map.getViewport().style;
 		map.addOverlay(popup);
 
+		//TODO BUG ne click pas sur celle qui à un label quand il y en a plusieurs
+		//TODO BUG ne click pas sur les massifs
 		map.on('click', function(evt) {
 			evt.target.forEachFeatureAtPixel(
 				evt.pixel,
@@ -351,6 +354,7 @@ function popupLabel(map) {
 				deselectFeature();
 		});
 
+		//TODO Function declarations should not be placed in blocks.
 		// Hide popup when the cursor is out of the map
 		window.addEventListener('mousemove', function(evtMm) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
@@ -686,7 +690,7 @@ function permanentCheckboxList(selectorName, evt) {
  * Compute a style from 2 different style
  * return ol.style.Style containing each style component or ol default
  */
-function escapedStyle(a, b) {
+function escapedStyle(a, b, c) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 	return function(feature) {
 		return new ol.style.Style(Object.assign({
@@ -695,7 +699,8 @@ function escapedStyle(a, b) {
 				image: defaultStyle.getImage(),
 			},
 			typeof a == 'function' ? a(feature.getProperties()) : a,
-			typeof b == 'function' ? b(feature.getProperties()) : b
+			typeof b == 'function' ? b(feature.getProperties()) : b,
+			typeof c == 'function' ? c(feature.getProperties()) : c
 		));
 	};
 }
@@ -716,28 +721,48 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires controlPermanentCheckbox, popupLabel, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
-function layerVectorURL(o) {
-	const options = Object.assign({
-		serverUrl: '',
+function layerVectorURL(options) {
+	options = Object.assign({ //TODO DELETE
+		TOTO: function(arg) {
+			return arg;
+		},
+	}, options);
+	options = Object.assign({
+		serverUrl: '', // Url prefix to be defined separately from the rest (E.G. server domain and/or directory)
+		baseUrl: null, // Url of the service (mandatory)
 		baseUrlFunction: function(bbox, list) {
 			return options.serverUrl + options.baseUrl + // baseUrl is mandatory, no default
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
-		format: new ol.format.GeoJSON(),
-		projection: 'EPSG:4326',
-	}, o);
+		selectorName: '', // Id of a <select> to tune url optional parameters
+		projection: 'EPSG:4326', // Projection of received data
+	}, options);
+	options = Object.assign({
+		format: new ol.format.GeoJSON({ // Format of received data
+			dataProjection: options.projection,
+		}),
+		// Modification of the Json object after reception & before geoJson analysis
+		receiveJson: function(object) {
+			return object;
+		},
+		// Modification of the properties of the features during the geoJson analysis
+		receiveProperty: function( /*property*/ ) {
+			return {}; /*new properties*/ ;
+		},
+		styleOptions: null, // ol.style.Style of function of the displayed features
+		// All ol.source.Vector options
+		// All ol.layer.Vector options
+	}, options);
 
 	//HACK overwrite ol.format.GeoJSON.readFeatures
 	if (options.format.readFeaturesFromObject) // If format = GeoJSON
 		options.format.readFeatures = function(json, opts) {
-			source.clear(); // Clean all features when receiving a request
-			let object = JSONparse(json); // Log Json errors
-
-			if (typeof options.receiveJson == 'function')
-				object = options.receiveJson(object);
-
+			if (options.strategy == ol.loadingstrategy.bboxLimit) // If we can have more features when zomming in
+				source.clear(); // Clean all features when receiving a request
 			return options.format.readFeaturesFromObject(
-				object,
+				options.receiveJson(
+					JSONparse(json) // Log Json errors
+				),
 				options.format.getReadOptions(json, opts)
 			);
 		};
@@ -764,16 +789,7 @@ function layerVectorURL(o) {
 			renderBuffer: 16, // buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
-
 	layer.options = options;
-
-	// Change properties at reception
-	if (typeof options.receiveProperty == 'function')
-		source.on('addfeature', function(evt) {
-			evt.feature.setProperties(
-				options.receiveProperty(
-					evt.feature.getProperties()));
-		});
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -792,6 +808,13 @@ function layerVectorURL(o) {
 		popupLabel(evt.target.map_); // Attach tracking for labeling & cursor changes
 	});
 
+	// Change properties at reception
+	source.on('addfeature', function(evt) {
+		evt.feature.setProperties(
+			options.receiveProperty(
+				evt.feature.getProperties()));
+	});
+
 	return layer;
 }
 
@@ -800,42 +823,34 @@ function layerVectorURL(o) {
  * Requires layerVectorURL
  */
 // https://api.camptocamp.org/waypoints?limit=200&bbox=605829,5592648,615498,5635835
-function layerC2C(o) {
-	const options = Object.assign({
+function layerC2C(options) {
+	options = Object.assign({
 		baseUrl: 'https://api.camptocamp.org/waypoints?limit=200', // https mandatory for Access-Control-Allow-Origin
 		strategy: ol.loadingstrategy.bboxLimit,
 		projection: 'EPSG:3857',
-		format: new ol.format.GeoJSON({
-			dataProjection: 'EPSG:3857',
-		}),
 
-		receiveJson: function(object) {
+		receiveJson: function(objects) {
 			const features = [];
-			for (let i in object.documents) {
-				const o = object.documents[i],
-					geom = JSONparse(o.geometry.geom);
-				const f = {
-					id: o.document_id,
-					type: 'Feature',
-					geometry: geom,
-
-					properties: {
-						id: o.document_id,
-						lien: 'http://www.refuges.info/point/6457/cabane-non-gardee/Cabana-de-Sotllo/',
-						nom: 'Cabana de Sotllo',
-						sym: 'Fishing Hot Spot Facility',
-					},
-
-
-				};
+			for (let o in objects.documents) {
+				const ob = objects.documents[o],
+					geom = JSONparse(ob.geometry.geom);
 				if (geom.type)
-					features.push(f);
+					features.push({
+						id: ob.document_id,
+						type: 'Feature',
+						geometry: geom,
+						properties: { //TODO completely to be developped
+							id: ob.document_id,
+							lien: 'http://www.refuges.info/point/6457/cabane-non-gardee/Cabana-de-Sotllo/',
+							nom: 'Cabana de Sotllo',
+							sym: 'Fishing Hot Spot Facility',
+						},
+					});
 			}
-			const r = {
+			return {
 				type: 'FeatureCollection',
 				features: features,
 			};
-			return r;
 		},
 		wstyleOptions: function(properties) {
 			return {
@@ -858,8 +873,8 @@ function layerC2C(o) {
 				},
 			};
 		},
-	}, o);
-	return layerVectorURL(options);
+	}, options);
+	return layerVectorURL(options); //TODO inline
 }
 
 /**
@@ -886,9 +901,6 @@ function layerRefugesInfo(o) {
 				})
 			};
 		},
-		href: function(properties) { // To click on the icon
-			return properties.lien; //BEST default if .url
-		},
 		label: function(properties) {
 			return {
 				'<br/>': {
@@ -904,7 +916,7 @@ function layerRefugesInfo(o) {
 			};
 		},
 	}, o);
-	return layerVectorURL(options);
+	return layerVectorURL(options); //TODO inline
 }
 
 /**
@@ -937,9 +949,6 @@ function layerPyreneesRefuges(options) {
 				}),
 			};
 		},
-		href: function(properties) {
-			return properties.url;
-		},
 		label: function(properties) {
 			return {
 				'<br/>': {
@@ -965,43 +974,45 @@ function layerChemineur(options) {
 		receiveProperty: function(property) {
 			// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
 			//BEST put in chemineur
-			let sym = 'Puzzle Cache';
-			switch (property.icone.match(/\/([a-z_]*)\./)[1]) {
-				case 'refuge':
-				case 'gite':
-				case 'hotel':
-					sym = 'Residence';
-					break;
-				case 'cabane':
-				case 'cabane_cle':
-				case 'buron':
-				case 'alpage':
-					sym = 'Lodge';
-					break;
-				case 'abri':
-					sym = 'Fishing Hot Spot Facility';
-					break;
-				case 'orri':
-				case 'camping':
-				case 'bivouac':
-					sym = 'Campground';
-					break;
-				case 'ferme':
-				case 'ruine':
-					sym = 'Crossing';
-					break;
-				case 'point_eau':
-					sym = 'Drinking Water';
-					break;
-				case 'lac':
-					sym = 'Water Source';
-					break;
-				case 'sommet':
-					sym = 'Summit';
-					break;
-				case 'col':
-					sym = 'Flag, Red';
-			}
+			let sym = 'Puzzle Cache',
+				match = property.icone.match(/\/([a-z_]*)\./);
+			if (match)
+				switch (match[1]) {
+					case 'refuge':
+					case 'gite':
+					case 'hotel':
+						sym = 'Residence';
+						break;
+					case 'cabane':
+					case 'cabane_cle':
+					case 'buron':
+					case 'alpage':
+						sym = 'Lodge';
+						break;
+					case 'abri':
+						sym = 'Fishing Hot Spot Facility';
+						break;
+					case 'orri':
+					case 'camping':
+					case 'bivouac':
+						sym = 'Campground';
+						break;
+					case 'ferme':
+					case 'ruine':
+						sym = 'Crossing';
+						break;
+					case 'point_eau':
+						sym = 'Drinking Water';
+						break;
+					case 'lac':
+						sym = 'Water Source';
+						break;
+					case 'sommet':
+						sym = 'Summit';
+						break;
+					case 'col':
+						sym = 'Flag, Red';
+				}
 			return {
 				name: property.nom,
 				sym: sym,
@@ -1021,20 +1032,20 @@ function layerChemineur(options) {
 				}),
 			};
 		},
-		hoverStyleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: properties.icone,
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 3,
-				}),
-			};
-		},
-		href: function(properties) {
-			return properties.url;
-		},
+		/*		hoverStyleOptions: function(properties) {
+					return {
+						stroke: new ol.style.Stroke({
+							color: 'red',
+							width: 3,
+						}),
+					};
+				},*/
+		//TODO BUG don't work with object
+		//TODO dont display traces the first time
+		hoverStyleOptions: new ol.style.Stroke({
+			color: 'red',
+			width: 3,
+		}),
 		label: function(properties) {
 			return {
 				link: {
@@ -1055,16 +1066,16 @@ function layerChemineur(options) {
 //TODO WRI NAV OVERPASS Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //BEST BUG IE OVERPASS don't work on IE
 //BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
-layerOverpass = function(o) {
-	const options = Object.assign({
-			baseUrl: '//overpass-api.de/api/interpreter',
-			maxResolution: 30, // Only call overpass if the map's resolution is lower
-			selectorId: 'overpass', // Element containing all checkboxes
-			selectorName: 'overpass', // Checkboxes
-			labelClass: 'label-overpass',
-			iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
-		}, o),
-		checkEls = document.getElementsByName(options.selectorName);
+layerOverpass = function(options) {
+	options = Object.assign({
+		baseUrl: '//overpass-api.de/api/interpreter',
+		maxResolution: 30, // Only call overpass if the map's resolution is lower
+		selectorId: 'overpass', // Element containing all checkboxes
+		selectorName: 'overpass', // Checkboxes
+		labelClass: 'label-overpass',
+		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
+	}, options);
+	const checkEls = document.getElementsByName(options.selectorName);
 
 	// Convert areas into points to display it as an icon
 	function readFeaturesOverpass(response) {
@@ -1920,57 +1931,58 @@ function controlPrint() {
  */
 //TODO BUG controlDownloadGPX don't save edited features
 //BEST why must it be included by map.addControl after map init ? Not as an overlay
-function controlEdit(o) {
-	const options = Object.assign({
-			group: 'edit',
-			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
-			label: 'M',
-			buttonBackgroundColors: ['white', '#ef3'],
-			activate: function(active) {
-				activate(active, modify);
-			},
-			readFeatures: function() {
-				return format.readFeatures(
-					JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
-						featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
-					});
-			},
-			saveFeatures: function() {
-				return format.writeFeatures(source.getFeatures(coordinates, format), {
-					featureProjection: 'EPSG:3857',
-					decimals: 5,
+function controlEdit(options) {
+	const format = new ol.format.GeoJSON();
+	options = Object.assign({
+		group: 'edit',
+		geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
+		label: 'M',
+		buttonBackgroundColors: ['white', '#ef3'],
+		activate: function(active) {
+			activate(active, modify);
+		},
+		readFeatures: function() {
+			return format.readFeatures(
+				JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
+					featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
 				});
-			},
-			styleOptions: {
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 2,
-				}),
-				fill: new ol.style.Fill({
-					color: 'rgba(0,0,255,0.2)',
-				}),
-			},
-			editStyleOptions: { // Hover / modify / create
-				// Draw symbol
-				image: new ol.style.Circle({
-					radius: 4,
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 2,
-					}),
-				}),
-				// Lines or border colors
+		},
+		saveFeatures: function() {
+			return format.writeFeatures(source.getFeatures(coordinates, format), {
+				featureProjection: 'EPSG:3857',
+				decimals: 5,
+			});
+		},
+		styleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 2,
+			}),
+			fill: new ol.style.Fill({
+				color: 'rgba(0,0,255,0.2)',
+			}),
+		},
+		editStyleOptions: { // Hover / modify / create
+			// Draw symbol
+			image: new ol.style.Circle({
+				radius: 4,
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 2,
 				}),
-				fill: new ol.style.Fill({
-					color: 'rgba(255,0,0,0.3)',
-				}),
-			},
-		}, o),
-		button = controlButton(options),
-		format = new ol.format.GeoJSON(),
+			}),
+			// Lines or border colors
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 2,
+			}),
+			fill: new ol.style.Fill({
+				color: 'rgba(255,0,0,0.3)',
+			}),
+		},
+	}, options);
+
+	const button = controlButton(options),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		features = options.readFeatures(),
