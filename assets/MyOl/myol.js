@@ -52,6 +52,7 @@ function JSONparse(json) {
 }
 
 //HACK IE Object.assign polyfill
+// You can also use <script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
@@ -321,15 +322,23 @@ function popupLabel(map) {
 			viewStyle = map.getViewport().style;
 		map.addOverlay(popup);
 
-		//TODO BUG ne click pas sur celle qui à un label quand il y en a plusieurs
-		//TODO BUG ne click pas sur les massifs
+		// Go to feature.property.link when click on the feature (icon or area)
 		map.on('click', function(evt) {
+			let done = false;
 			evt.target.forEachFeatureAtPixel(
 				evt.pixel,
 				function(feature) {
-					const url = feature.getProperties().url;
-					if (url)
-						window.location = url;
+					if (done) return;
+					done = true;
+					const link = feature.getProperties().link;
+					if (link) {
+						if (evt.pointerEvent.ctrlKey) {
+							var win = window.open(link, '_blank');
+							if (evt.pointerEvent.shiftKey)
+								win.focus();
+						} else
+							window.location = link;
+					}
 				}
 			);
 		});
@@ -365,9 +374,9 @@ function popupLabel(map) {
 
 		function selectFeature(feature, layer, pixel) {
 			// Change the cursor
-			//TODO BUG pointer on the label
+			//TODO BUG pointer on the label (but no click)
 			const properties = feature.getProperties();
-			if (properties.url)
+			if (properties.link)
 				viewStyle.cursor = 'pointer';
 			if (properties.draggable)
 				viewStyle.cursor = 'move';
@@ -383,7 +392,12 @@ function popupLabel(map) {
 				));
 
 				// Set the text & label position
-				element.innerHTML = formatLabel(layer.options.label, '', properties, feature);
+				element.innerHTML = formatLabel(
+					layer.options.label,
+					'<br/>',
+					properties,
+					feature
+				);
 				let geometry = feature.getGeometry();
 
 				// If it's a GeometryCollection, take the fisrt feature
@@ -430,7 +444,7 @@ function popupLabel(map) {
 			if (typeof format == 'object') {
 				// Links
 				if (closure == 'link')
-					return '<a href="' + format.url + '">' + format.name + '</a>';
+					return '<a href="' + format.link + '">' + format.name + '</a>';
 
 				// List of closure: object
 				let items = [];
@@ -747,9 +761,18 @@ function layerVectorURL(options) {
 		},
 		// Modification of the properties of the features during the geoJson analysis
 		receiveProperty: function( /*property*/ ) {
-			return {}; /*new properties*/ ;
+			return {}; /*new properties*/ 
 		},
 		styleOptions: null, // ol.style.Style of function of the displayed features
+		// Label to dispach above the feature when hovering
+		// - String
+		// - Array of lines to be separated by <br/>
+		// - Structure {'join': {array to be separated by 'join'},...}
+		label: function(properties) {
+			return {
+				link: properties, // By default : properties.name / click to properties.link
+			};
+		},
 		// All ol.source.Vector options
 		// All ol.layer.Vector options
 	}, options);
@@ -809,6 +832,7 @@ function layerVectorURL(options) {
 	});
 
 	// Change properties at reception
+	//TODO BUG too long with lines & polygons
 	source.on('addfeature', function(evt) {
 		evt.feature.setProperties(
 			options.receiveProperty(
@@ -818,63 +842,29 @@ function layerVectorURL(options) {
 	return layer;
 }
 
-/**
- * www.camptocamp.org POI layer
- * Requires layerVectorURL
- */
-// https://api.camptocamp.org/waypoints?limit=200&bbox=605829,5592648,615498,5635835
-function layerC2C(options) {
-	options = Object.assign({
-		baseUrl: 'https://api.camptocamp.org/waypoints?limit=200', // https mandatory for Access-Control-Allow-Origin
-		strategy: ol.loadingstrategy.bboxLimit,
-		projection: 'EPSG:3857',
+// Convert features type into gpx <sym>
+function getSym(type) {
+	const lex =
+		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
+		'<Residence> refuge hotel gite chambre_hote' +
+		'<Lodge> cabane cabane_cle buron alpage shelter' +
+		' cabane ouverte mais ocupee par le berger l ete' +
+		'<Fishing Hot Spot Facility> abri hut' +
+		'<Campground> camping camp_site bivouac orri toue abri en pierre' +
+		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
+		'<Drinking Water> point_eau waterpoint waterfall' +
+		'<Water Source> lac lake' +
+		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
+		'<Flag, Red> col pass' +
+		'<Parking Area> access' +
+		'<City Hall> locality' +
+		'<Reef> grotte cave glacier' +
+		'<Shopping Center> local_product ravitaillement buffet restaurant' +
+		'<Telephone> telephone wifi reseau',
+		//' canyon slackline_spot paragliding_takeoff paragliding_landing virtual webcam
 
-		receiveJson: function(objects) {
-			const features = [];
-			for (let o in objects.documents) {
-				const ob = objects.documents[o],
-					geom = JSONparse(ob.geometry.geom);
-				if (geom.type)
-					features.push({
-						id: ob.document_id,
-						type: 'Feature',
-						geometry: geom,
-						properties: { //TODO completely to be developped
-							id: ob.document_id,
-							lien: 'http://www.refuges.info/point/6457/cabane-non-gardee/Cabana-de-Sotllo/',
-							nom: 'Cabana de Sotllo',
-							sym: 'Fishing Hot Spot Facility',
-						},
-					});
-			}
-			return {
-				type: 'FeatureCollection',
-				features: features,
-			};
-		},
-		wstyleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					//src: options.serverUrl + 'images/icones/' + properties.type.icone + '.png'
-					http: '//www.refuges.info/images/icones/cabane-non-gardee.png',
-				})
-			};
-		},
-		wwwwhref: function(properties) { // To click on the icon
-			return properties.lien; //BEST default if .url
-		},
-		label: function(properties) {
-			return {
-				'<br/>': {
-					link: { // To click on the label
-						name: properties.nom,
-						url: properties.lien,
-					},
-				},
-			};
-		},
-	}, options);
-	return layerVectorURL(options); //TODO inline
+		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
+	return match ? match[1] : 'Puzzle Cache';
 }
 
 /**
@@ -891,7 +881,7 @@ function layerRefugesInfo(o) {
 			return {
 				name: property.nom,
 				ele: property.coord.alt,
-				url: property.lien,
+				link: property.lien,
 			};
 		},
 		styleOptions: function(properties) {
@@ -903,16 +893,12 @@ function layerRefugesInfo(o) {
 		},
 		label: function(properties) {
 			return {
-				'<br/>': {
-					link: { // To click on the label
-						name: properties.nom,
-						url: properties.lien,
-					},
-					', ': {
-						m: properties.coord.alt,
-						' \u255E\u2550\u2555': properties.places.valeur,
-					},
-				}
+				link: properties,
+				', ': {
+					m: properties.coord.alt,
+					' \u255E\u2550\u2555': properties.places.valeur,
+				},
+				'': '&copy;refuges.info',
 			};
 		},
 	}, o);
@@ -923,23 +909,14 @@ function layerRefugesInfo(o) {
  * pyrenees-refuges.com POI layer
  * Requires layerVectorURL
  */
-//BEST <symb> for pyrenees-refuges
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		receiveProperty: function(property) {
-			let sym = 'Lodge'; // cabane ouverte...
-			switch (property.type_hebergement) {
-				case 'orri toue abri en pierre':
-					sym = 'Campground';
-					break;
-				case 'cabane fermee':
-				case 'ruine':
-					sym = 'Crossing';
-			}
 			return {
-				sym: sym,
 				ele: parseInt(property.altitude),
+				link: property.url,
+				sym: getSym(property.type_hebergement),
 			};
 		},
 		styleOptions: function(properties) {
@@ -951,13 +928,61 @@ function layerPyreneesRefuges(options) {
 		},
 		label: function(properties) {
 			return {
-				'<br/>': {
-					link: properties,
-					', ': {
-						m: properties.altitude,
-						' \u255E\u2550\u2555': properties.cap_ete,
-					},
+				link: properties,
+				', ': {
+					m: properties.ele,
+					' \u255E\u2550\u2555': properties.cap_ete,
 				},
+				type: properties.type_hebergement,
+				copy: ' &copy;pyrenees-refuges.com',
+			};
+		},
+	}, options));
+}
+
+/**
+ * www.camptocamp.org POI layer
+ * Requires layerVectorURL, getSym
+ */
+function layerC2C(options) {
+	return layerVectorURL(Object.assign({
+		baseUrl: 'https://api.camptocamp.org/waypoints?limit=200', // https mandatory for Access-Control-Allow-Origin
+		strategy: ol.loadingstrategy.bboxLimit,
+		projection: 'EPSG:3857',
+
+		receiveJson: function(objects) {
+			const features = [];
+			for (let o in objects.documents) {
+				const object = objects.documents[o];
+				features.push({
+					id: object.document_id,
+					type: 'Feature',
+					geometry: JSONparse(object.geometry.geom),
+					properties: { //TODO completely to be developped
+						ele: object.elevation,
+						name: object.locales[0].title,
+						type: object.waypoint_type,
+						sym: getSym(object.waypoint_type),
+						link: 'https://www.camptocamp.org/waypoints/' + object.document_id,
+					},
+				});
+			}
+			return {
+				type: 'FeatureCollection',
+				features: features,
+			};
+		},
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
+				})
+			};
+		},
+		label: function(properties) {
+			return {
+				link: properties,
+				'': properties.type + ' &copy;c2c',
 			};
 		},
 	}, options));
@@ -972,51 +997,10 @@ function layerChemineur(options) {
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperty: function(property) {
-			// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
-			//BEST put in chemineur
-			let sym = 'Puzzle Cache',
-				match = property.icone.match(/\/([a-z_]*)\./);
-			if (match)
-				switch (match[1]) {
-					case 'refuge':
-					case 'gite':
-					case 'hotel':
-						sym = 'Residence';
-						break;
-					case 'cabane':
-					case 'cabane_cle':
-					case 'buron':
-					case 'alpage':
-						sym = 'Lodge';
-						break;
-					case 'abri':
-						sym = 'Fishing Hot Spot Facility';
-						break;
-					case 'orri':
-					case 'camping':
-					case 'bivouac':
-						sym = 'Campground';
-						break;
-					case 'ferme':
-					case 'ruine':
-						sym = 'Crossing';
-						break;
-					case 'point_eau':
-						sym = 'Drinking Water';
-						break;
-					case 'lac':
-						sym = 'Water Source';
-						break;
-					case 'sommet':
-						sym = 'Summit';
-						break;
-					case 'col':
-						sym = 'Flag, Red';
-				}
 			return {
 				name: property.nom,
-				sym: sym,
-				//BEST in chemineur				ele:??,
+				link: property.url,
+				sym: getSym(property.icone),
 			};
 		},
 		styleOptions: function(properties) {
@@ -1032,26 +1016,24 @@ function layerChemineur(options) {
 				}),
 			};
 		},
-		/*		hoverStyleOptions: function(properties) {
-					return {
-						stroke: new ol.style.Stroke({
-							color: 'red',
-							width: 3,
-						}),
-					};
-				},*/
-		//TODO BUG don't work with object
-		//TODO dont display traces the first time
-		hoverStyleOptions: new ol.style.Stroke({
-			color: 'red',
-			width: 3,
-		}),
 		label: function(properties) {
 			return {
-				link: {
-					name: properties.nom,
-					url: properties.url,
-				},
+				link: properties,
+				'': '&copy;chemineur.fr',
+			};
+		},
+		//TODO BUG don't work with object
+		//TODO dont display traces the first time
+		/*hoverStyleOptions: new ol.style.Stroke({
+			color: 'red',
+			width: 3,
+		}),*/
+		hoverStyleOptions: function() {
+			return {
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 3,
+				})
 			};
 		},
 	}, options));
@@ -1802,6 +1784,7 @@ function controlLoadGPX(o) {
  * Requires controlButton
  */
 //BEST various formats
+//TODO BUG download last file when changing the layer without moving the map ==> Clear the source when changing the selector
 function controlDownloadGPX(o) {
 	const options = Object.assign({
 			label: '\u25bc',
@@ -1840,7 +1823,7 @@ function controlDownloadGPX(o) {
 			})
 			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>)/g, '\n$1')
-			.replace(/(<name|<ele|<sym|<\/?trkseg|<rtept)/g, '\n\t$1')
+			.replace(/(<name|<ele|<sym|<link|<type|<\/?trkseg|<rtept)/g, '\n\t$1')
 			.replace(/(<trkpt)/g, '\n\t\t$1'),
 
 			file = new Blob([gpx], {
@@ -2353,7 +2336,8 @@ function layersCollection(keys) {
 		'Angleterre': layerOS(keys.bing),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
-		//BUG		'Bing': layerBing(keys.bing, 'Road'),
+		//TODO BUG		'Bing': layerBing(keys.bing, 'Road'),
+		//TODO BUG ne charge pas les dalles à l'init
 		'Bing photo': layerBing(keys.bing, 'AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),

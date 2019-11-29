@@ -1,6 +1,7 @@
 //TODO RANDO reprendre modifs geoBB32/rando/gps -> le serveur dc9
 //TODO RANDO Charger layers avec des coches rando
-//TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono..
+//TODO RANDO Tri noms rando retro date à venir, futurs, ancien ordre chrono...
+//TODO init zone chaville (zoom +6)
 
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:')
