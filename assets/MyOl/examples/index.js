@@ -98,6 +98,7 @@ const layerMassifsWri = layerVectorURL({
  */
 map_.addControl(controlEdit({
 	geoJsonId: 'geojson',
+	focus: false,
 	snapLayers: [layerMassifsWri],
 	title: 'Modification d‘une ligne, d‘un polygone:\n' +
 		'Activer ce bouton (couleur jaune) puis\n' +

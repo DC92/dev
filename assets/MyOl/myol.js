@@ -13,7 +13,7 @@
 /* jshint esversion: 6 */
 
 //TODO avoid fetch / PWA error on IE
-//TODO ranger les blocs dans l'ordre déclaration puis utilisation & noter les dendancies
+//TODO ranger les blocs dans l'ordre déclaration puis utilisation & noter les dependancies
 
 /**
  * Debug facilities on mobile
@@ -704,9 +704,11 @@ function permanentCheckboxList(selectorName, evt) {
 }
 
 /**
- * Compute a style from 2 different style
+ * Compute a style from different styles
  * return ol.style.Style containing each style component or ol default
  */
+//TODO BUG work only with functions, not object
+//BEST work with arguments
 function escapedStyle(a, b, c) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 	return function(feature) {
@@ -761,10 +763,6 @@ function layerVectorURL(options) {
 		// Modification of the Json object after reception & before geoJson analysis
 		receiveJson: function(object) {
 			return object;
-		},
-		// Modification of the properties of the features during the geoJson analysis
-		receiveProperty: function( /*property*/ ) {
-			return {}; /*new properties*/
 		},
 		styleOptions: null, // ol.style.Style of function of the displayed features
 		// Label to dispach above the feature when hovering
@@ -834,14 +832,6 @@ function layerVectorURL(options) {
 		popupLabel(evt.target.map_); // Attach tracking for labeling & cursor changes
 	});
 
-	// Change properties at reception
-	//TODO BUG too long with lines & polygons
-	source.on('addfeature', function(evt) {
-		evt.feature.setProperties(
-			options.receiveProperty(
-				evt.feature.getProperties()));
-	});
-
 	return layer;
 }
 
@@ -880,12 +870,14 @@ function layerRefugesInfo(o) {
 		//		baseUrl: 'api/bbox?format=gpx&type_points=',//TODO DELETE
 		baseUrl: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
-		receiveProperty: function(property) {
-			return {
-				name: property.nom,
-				ele: property.coord.alt,
-				link: property.lien,
-			};
+		receiveJson: function(FeatureCollection) {
+			for (let f in FeatureCollection.features) {
+				const p = FeatureCollection.features[f].properties;
+				p.name = p.nom;
+				p.link = p.lien;
+				p.ele = p.coord.alt;
+			}
+			return FeatureCollection;
 		},
 		styleOptions: function(properties) {
 			return {
@@ -905,7 +897,7 @@ function layerRefugesInfo(o) {
 			};
 		},
 	}, o);
-	return layerVectorURL(options); //TODO inline
+	return layerVectorURL(options); //BEST inline
 }
 
 /**
@@ -915,12 +907,14 @@ function layerRefugesInfo(o) {
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		receiveProperty: function(property) {
-			return {
-				ele: parseInt(property.altitude),
-				link: property.url,
-				sym: getSym(property.type_hebergement),
-			};
+		receiveJson: function(FeatureCollection) {
+			for (let f in FeatureCollection.features) {
+				const p = FeatureCollection.features[f].properties;
+				p.sym = getSym(p.type_hebergement);
+				p.link = p.url;
+				p.ele = parseInt(p.altitude);
+			}
+			return FeatureCollection;
 		},
 		styleOptions: function(properties) {
 			return {
@@ -938,6 +932,58 @@ function layerPyreneesRefuges(options) {
 				},
 				type: properties.type_hebergement,
 				copy: ' &copy;pyrenees-refuges.com',
+			};
+		},
+	}, options));
+}
+
+/**
+ * chemineur.fr POI layer
+ * Requires layerVectorURL
+ */
+function layerChemineur(options) {
+	return layerVectorURL(Object.assign({
+		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+		strategy: ol.loadingstrategy.bboxLimit,
+		receiveJson: function(FeatureCollection) {
+			for (let f in FeatureCollection.features) {
+				const p = FeatureCollection.features[f].properties;
+				p.name = p.nom;
+				p.link = p.url;
+				p.sym = getSym(p.icone);
+			}
+			return FeatureCollection;
+		},
+		styleOptions: function(properties) {
+			return {
+				// POI
+				image: new ol.style.Icon({
+					src: properties.icone,
+				}),
+				// Traces
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 3,
+				}),
+			};
+		},
+		label: function(properties) {
+			return {
+				link: properties,
+				'': '&copy;chemineur.fr',
+			};
+		},
+		//TODO BUG don't work with object
+		hoverStyleOptions: new ol.style.Stroke({
+			color: 'red',
+			width: 3,
+		}),
+		hoverStyleOptions: function() {
+			return {
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 3,
+				})
 			};
 		},
 	}, options));
@@ -986,57 +1032,6 @@ function layerC2C(options) {
 			return {
 				link: properties,
 				'': properties.type + ' &copy;c2c',
-			};
-		},
-	}, options));
-}
-
-/**
- * chemineur.fr POI layer
- * Requires layerVectorURL
- */
-function layerChemineur(options) {
-	return layerVectorURL(Object.assign({
-		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
-		strategy: ol.loadingstrategy.bboxLimit,
-		receiveProperty: function(property) {
-			return {
-				name: property.nom,
-				link: property.url,
-				sym: getSym(property.icone),
-			};
-		},
-		styleOptions: function(properties) {
-			return {
-				// POI
-				image: new ol.style.Icon({
-					src: properties.icone,
-				}),
-				// Traces
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 3,
-				}),
-			};
-		},
-		label: function(properties) {
-			return {
-				link: properties,
-				'': '&copy;chemineur.fr',
-			};
-		},
-		//TODO BUG don't work with object
-		//TODO dont display traces the first time
-		/*hoverStyleOptions: new ol.style.Stroke({
-			color: 'red',
-			width: 3,
-		}),*/
-		hoverStyleOptions: function() {
-			return {
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 3,
-				})
 			};
 		},
 	}, options));
@@ -1922,6 +1917,7 @@ function controlEdit(options) {
 	options = Object.assign({
 		group: 'edit',
 		geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
+		focus: true, // Zoom the map on the loaded features
 		label: 'M',
 		buttonBackgroundColors: ['white', '#ef3'],
 		activate: function(active) {
@@ -1971,6 +1967,7 @@ function controlEdit(options) {
 	const button = controlButton(options),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
+		extent = ol.extent.createEmpty(), // For focus on all features calculation
 		features = options.readFeatures(),
 		source = new ol.source.Vector({
 			features: features,
@@ -2018,11 +2015,7 @@ function controlEdit(options) {
 		button.toggle(true); // Init modify button on
 
 		// Zoom the map on the loaded features
-		// You must use permalink({init: false})
-		//TODO BUG temporary shift to position if permalink init: true
-		const features = source.getFeatures(),
-			extent = ol.extent.createEmpty();
-		if (features.length) {
+		if (options.focus && features.length) {
 			for (let f in features)
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
 			map.getView().fit(extent, {
