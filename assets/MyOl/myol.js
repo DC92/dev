@@ -707,7 +707,6 @@ function permanentCheckboxList(selectorName, evt) {
  * Compute a style from different styles
  * return ol.style.Style containing each style component or ol default
  */
-//TODO BUG work only with functions, not object
 //BEST work with arguments
 function escapedStyle(a, b, c) {
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
@@ -867,7 +866,6 @@ function getSym(type) {
 function layerRefugesInfo(o) {
 	const options = Object.assign({
 		serverUrl: '//www.refuges.info/',
-		//		baseUrl: 'api/bbox?format=gpx&type_points=',//TODO DELETE
 		baseUrl: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveJson: function(FeatureCollection) {
@@ -973,18 +971,11 @@ function layerChemineur(options) {
 				'': '&copy;chemineur.fr',
 			};
 		},
-		//TODO BUG don't work with object
-		hoverStyleOptions: new ol.style.Stroke({
-			color: 'red',
-			width: 3,
-		}),
-		hoverStyleOptions: function() {
-			return {
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 3,
-				})
-			};
+		hoverStyleOptions: {
+			stroke: new ol.style.Stroke({ // For traces
+				color: 'red',
+				width: 3,
+			})
 		},
 	}, options));
 }
@@ -1007,7 +998,7 @@ function layerC2C(options) {
 					id: object.document_id,
 					type: 'Feature',
 					geometry: JSONparse(object.geometry.geom),
-					properties: { //TODO completely to be developped
+					properties: {
 						ele: object.elevation,
 						name: object.locales[0].title,
 						type: object.waypoint_type,
