@@ -8,6 +8,7 @@ if (window.location.protocol == 'http:')
 	window.location.href = window.location.href.replace('http:', 'https:');
 
 // Force the script name of short url
+//TODO BUG https://rando.dc9.fr/?paris boucle
 if (!window.location.pathname.split('/').pop())
 	window.location.href = window.location.href + 'index.php';
 
