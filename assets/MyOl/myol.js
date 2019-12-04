@@ -311,43 +311,25 @@ function layerBing(key, subLayer) {
  */
 /**
  * Popup label
- * Manages a feature hovering per map common to all features & layers
+ * Manages a feature hovering common to all features & layers
  */
-function popupLabel(map) {
+function setHoverManager(map) {
 	// Only one per map
-	if (map.popupLabel_)
-		return map.popupLabel_;
+	if (map.hasHoverManager_)
+		return map.hasHoverManager_;
+	map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
 
 	const element = document.createElement('div'),
-		popup = map.popupLabel_ = new ol.Overlay({
+		popup = new ol.Overlay({
 			element: element,
 		}),
 		viewStyle = map.getViewport().style;
+
 	map.addOverlay(popup);
 	element.style.cursor = 'auto'; // Default label cursor
 
-	// Go to feature.property.link when click on the feature (icon or area)
-	map.on('click', function(evt) {
-		let done = false;
-		evt.target.forEachFeatureAtPixel(
-			evt.pixel,
-			function(feature) {
-				if (done) return;
-				done = true;
-				const link = feature.getProperties().link;
-				if (link) {
-					if (evt.pointerEvent.ctrlKey) {
-						var win = window.open(link, '_blank');
-						if (evt.pointerEvent.shiftKey)
-							win.focus();
-					} else
-						window.location = link;
-				}
-			}
-		);
-	});
-
-	let hoveredFeature = null;
+	let hoveredLayer = null,
+		hoveredFeature = null;
 	map.on('pointermove', function(evt) {
 		let nbFeaturesAtPixel = 0;
 		map.forEachFeatureAtPixel(
@@ -359,7 +341,7 @@ function popupLabel(map) {
 					deselectFeature();
 					selectFeature(feature, layer, evt.pixel);
 					hoveredFeature = feature;
-					hoveredFeature.layer_ = layer;
+					hoveredLayer = layer;
 				}
 			}
 		);
@@ -411,7 +393,7 @@ function popupLabel(map) {
 				pixel = map.getPixelFromCoordinate(geometry.flatCoordinates);
 
 			//HACK Set the label position in the middle to measure the label extent
-			map.popupLabel_.setPosition(map.getView().getCenter());
+			popup.setPosition(map.getView().getCenter());
 
 			// Shift of the label to stay into the map regarding the pointer position
 			if (pixel[1] < element.clientHeight + 12) { // On the top of the map (not enough space for it)
@@ -431,12 +413,27 @@ function popupLabel(map) {
 		if (hoveredFeature) {
 			viewStyle.cursor = 'default';
 			element.className = 'myol-popup-hidden';
-			const layer = hoveredFeature.layer_;
-			if (layer && layer.options)
-				hoveredFeature.setStyle(escapedStyle(layer.options.styleOptions));
+			if (hoveredLayer && hoveredLayer.options)
+				hoveredFeature.setStyle(escapedStyle(hoveredLayer.options.styleOptions));
 			hoveredFeature = null;
 		}
 	}
+
+	// Go to feature.property.link when click on the feature (icon or area)
+	map.on('click', function(evt) {
+		if (hoveredFeature) {
+			const link = hoveredFeature.getProperties().link;
+			if (link) {
+				if (evt.pointerEvent.ctrlKey) {
+					var win = window.open(link, '_blank');
+					if (evt.pointerEvent.shiftKey)
+						win.focus();
+				} else
+					window.location = link;
+			}
+
+		}
+	});
 
 	function formatLabel(format, closure, properties, feature) {
 		if (typeof format == 'function')
@@ -471,12 +468,11 @@ function popupLabel(map) {
 		// Other string
 		return format ? format.toString() : '';
 	}
-	return map.popupLabel_;
 }
 
 /**
  * Marker
- * Requires JSONparse, popupLabel, HACK map_, proj4.js for swiss coordinates
+ * Requires JSONparse, setHoverManager, HACK map_, proj4.js for swiss coordinates
  * Read / write following fields :
  * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
  * marker-lon / marker-lat
@@ -536,10 +532,10 @@ function layerMarker(o) {
 		}),
 		format = new ol.format.GeoJSON();
 
-	//TODO BUG n'est pas enabled si on ne voit pas le feature !
+	//TODO 1 BUG n'est pas enabled si on ne voit pas le feature !
 	layer.once('prerender', function() {
 		const map = layer.map_;
-		popupLabel(map); // Attach tracking for cursor changes
+		setHoverManager(map); // Attach hovering for cursor changes
 
 		if (options.draggable) {
 			// Drag the feature
@@ -736,7 +732,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires controlPermanentCheckbox, popupLabel, JSONparse, HACK map_
+ * Requires controlPermanentCheckbox, setHoverManager, JSONparse, HACK map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(options) {
@@ -828,7 +824,7 @@ function layerVectorURL(options) {
 		);
 
 	layer.once('prerender', function(evt) {
-		popupLabel(evt.target.map_); // Attach tracking for labeling & cursor changes
+		setHoverManager(evt.target.map_); // Attach tracking for labeling & cursor changes
 	});
 
 	return layer;
@@ -2064,7 +2060,7 @@ function controlEdit(options) {
 	// Manage hover to save modify actions integrity
 	var hoveredFeature = null;
 
-	//TODO use the centralized hover function
+	//BEST use the centralized hover function
 	function hover(evt) {
 		let nbFeaturesAtPixel = 0;
 		button.getMap().forEachFeatureAtPixel(evt.pixel, function(feature) {
