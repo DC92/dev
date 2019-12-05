@@ -12,8 +12,12 @@
 
 /* jshint esversion: 6 */
 
+//TODO BUG controlDownloadGPX don't save edited features
+
 //TODO avoid fetch / PWA error on IE
 //TODO ranger les blocs dans l'ordre déclaration puis utilisation & noter les dependancies
+//BEST document all options in 	options = Object.assign({
+//TODO wri/chem (phpBB cookies SameSite)
 
 /**
  * Debug facilities on mobile
@@ -298,7 +302,7 @@ function layerBing(key, subLayer) {
 	const layer = new ol.layer.Tile();
 
 	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.once('change:opacity', function() {
+	layer.on('change:opacity', function() {
 		if (layer.getVisible() && !layer.getSource()) {
 			layer.setSource(new ol.source.BingMaps({
 				imagerySet: subLayer,
@@ -484,13 +488,13 @@ function hoverManager(map) {
  * marker-center-cursor : onclick = center the cursor at the middle of the map
  * marker-center-map : onclick = center the map on the cursor position
  */
-function layerMarker(o) {
-	const options = Object.assign({
-			llInit: [],
-			idDisplay: 'marker',
-			decimalSeparator: '.',
-		}, o),
-		elJson = document.getElementById(options.idDisplay + '-json'),
+function layerMarker(options) {
+	options = Object.assign({
+		llInit: [],
+		idDisplay: 'marker',
+		decimalSeparator: '.',
+	}, options);
+	const elJson = document.getElementById(options.idDisplay + '-json'),
 		elLon = document.getElementById(options.idDisplay + '-lon'),
 		elLat = document.getElementById(options.idDisplay + '-lat'),
 		elX = document.getElementById(options.idDisplay + '-x'),
@@ -674,12 +678,11 @@ function controlPermanentCheckbox(selectorName, callback) {
 }
 
 /**
- * List selected checkboxes having the same name
+ * Mem selected checkboxes in cookie
  * selectorName (string)
  * evt (keyboard event)
  * return : [checked values or ids]
  */
-//TODO BUG read first before modifying layers
 function permanentCheckboxList(selectorName, evt) {
 	const checkEls = document.getElementsByName(selectorName);
 	let allChecks = [];
@@ -739,11 +742,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(options) {
-	options = Object.assign({ //TODO DELETE
-		TOTO: function(arg) {
-			return arg;
-		},
-	}, options);
 	options = Object.assign({
 		serverUrl: '', // Url prefix to be defined separately from the rest (E.G. server domain and/or directory)
 		baseUrl: null, // Url of the service (mandatory)
@@ -862,8 +860,8 @@ function getSym(type) {
  * www.refuges.info POI layer
  * Requires layerVectorURL
  */
-function layerRefugesInfo(o) {
-	const options = Object.assign({
+function layerRefugesInfo(options) {
+	options = Object.assign({
 		serverUrl: '//www.refuges.info/',
 		baseUrl: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -893,7 +891,7 @@ function layerRefugesInfo(o) {
 				'': '&copy;refuges.info',
 			};
 		},
-	}, o);
+	}, options);
 	return layerVectorURL(options); //BEST inline
 }
 
@@ -1216,13 +1214,13 @@ layerOverpass = function(options) {
  * Abstract definition to be used by other control buttons definitions
  */
 //BEST left aligned buttons when screen vertical
-function controlButton(o) {
-	const options = Object.assign({
-			element: document.createElement('div'),
-			buttonBackgroundColors: ['white', 'white'],
-			className: 'myol-button',
-		}, o),
-		control = new ol.control.Control(options),
+function controlButton(options) {
+	options = Object.assign({
+		element: document.createElement('div'),
+		buttonBackgroundColors: ['white', 'white'],
+		className: 'myol-button',
+	}, options);
+	const control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
 	control.element.appendChild(buttonEl);
@@ -1368,13 +1366,13 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  */
 //BEST save curent layer
-function controlPermalink(o) {
-	const options = Object.assign({
-			hash: '?', // {?, #} the permalink delimiter
-			visible: true, // {true | false} add a controlPermalink button to the map.
-			init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
-		}, o),
-		aEl = document.createElement('a'),
+function controlPermalink(options) {
+	options = Object.assign({
+		hash: '?', // {?, #} the permalink delimiter
+		visible: true, // {true | false} add a controlPermalink button to the map.
+		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
+	}, options);
+	const aEl = document.createElement('a'),
 		control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 			render: render,
@@ -1707,21 +1705,21 @@ function controlGPS() {
  * Requires controlButton
  */
 //BEST upload WPT
-function controlLoadGPX(o) {
-	const options = Object.assign({
-			label: '\u25b2',
-			title: 'Visualiser un fichier GPX sur la carte',
-			activate: function() {
-				inputEl.click();
-			},
-			style: new ol.style.Style({
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 3,
-				})
-			}),
-		}, o),
-		inputEl = document.createElement('input'),
+function controlLoadGPX(options) {
+	options = Object.assign({
+		label: '\u25b2',
+		title: 'Visualiser un fichier GPX sur la carte',
+		activate: function() {
+			inputEl.click();
+		},
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 3,
+			})
+		}),
+	}, options);
+	const inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
 		button = controlButton(options);
@@ -1772,15 +1770,14 @@ function controlLoadGPX(o) {
  * Requires controlButton
  */
 //BEST various formats
-//TODO BUG download last file when changing the layer without moving the map ==> Clear the source when changing the selector
-function controlDownloadGPX(o) {
-	const options = Object.assign({
-			label: '\u25bc',
-			title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
-			fileName: document.title || 'openlayers',
-			activate: activate,
-		}, o),
-		hiddenEl = document.createElement('a'),
+function controlDownloadGPX(options) {
+	options = Object.assign({
+		label: '\u25bc',
+		title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
+		fileName: document.title || 'openlayers',
+		activate: activate,
+	}, options);
+	const hiddenEl = document.createElement('a'),
 		button = controlButton(options);
 	hiddenEl.target = '_self';
 	hiddenEl.download = options.fileName + '.gpx';
@@ -1900,7 +1897,6 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton, escapedStyle, JSONparse
  */
-//TODO BUG controlDownloadGPX don't save edited features
 //BEST why must it be included by map.addControl after map init ? Not as an overlay
 function controlEdit(options) {
 	const format = new ol.format.GeoJSON();
@@ -2322,8 +2318,7 @@ function layersCollection(keys) {
 		'Angleterre': layerOS(keys.bing),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
-		//TODO BUG		'Bing': layerBing(keys.bing, 'Road'),
-		//TODO BUG ne charge pas les dalles à l'init
+		'Bing': layerBing(keys.bing, 'Road'),
 		'Bing photo': layerBing(keys.bing, 'AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
