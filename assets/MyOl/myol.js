@@ -14,7 +14,6 @@
 //BEST document all options in options = Object.assign({
 
 //TODO avoid fetch / PWA error on IE
-//TODO wri/chem (phpBB cookies SameSite)
 
 /**
  * Debug facilities on mobile
@@ -440,7 +439,7 @@ function hoverManager(map) {
 			return n + closure;
 
 		// Other string
-		return format ? format.toString() : '';
+		return format && format != '0' ? format.toString() : '';
 	}
 
 	function selectFeature(feature, layer, pixel) {
@@ -568,8 +567,8 @@ function layerVectorURL(options) {
 		},
 		selectorName: '', // Id of a <select> to tune url optional parameters
 		projection: 'EPSG:4326', // Projection of received data
-	}, options);
-	options = Object.assign({
+		//TODO	}, options);
+		//	options = Object.assign({
 		format: new ol.format.GeoJSON({ // Format of received data
 			dataProjection: options.projection,
 		}),
@@ -585,6 +584,15 @@ function layerVectorURL(options) {
 		label: function(properties) {
 			return {
 				link: properties, // By default : properties.name / click to properties.link
+				', ': {
+					m: properties.ele,
+					'\u255E\u2550\u2555': properties.bed,
+				},
+				'':{
+					type: properties.type,
+					'*': properties.star,
+				},
+				copy: ' &copy;' + properties.copy,
 			};
 		},
 		// All ol.source.Vector options
@@ -596,6 +604,7 @@ function layerVectorURL(options) {
 		options.format.readFeatures = function(json, opts) {
 			if (options.strategy == ol.loadingstrategy.bboxLimit) // If we can have more features when zomming in
 				source.clear(); // Clean all features when receiving a request
+
 			return options.format.readFeaturesFromObject(
 				options.receiveJson(
 					JSONparse(json) // Log Json errors
@@ -616,6 +625,9 @@ function layerVectorURL(options) {
 				filter(function(evt) { // selectorName optional
 					return evt !== 'on'; // Remove the "all" input (default value = "on")
 				});
+				// Round the coordinates
+				for (let b in bbox)
+					bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
 				return options.baseUrlFunction(bbox, list, resolution);
 			},
 		}, options)),
@@ -689,24 +701,18 @@ function layerRefugesInfo(options) {
 				p.name = p.nom;
 				p.link = p.lien;
 				p.ele = p.coord.alt;
+				p.icone = p.type.icone;
+				p.type = p.type.valeur;
+				p.bed = p.places.valeur;
+				p.copy = 'refuges.info';
 			}
 			return FeatureCollection;
 		},
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: options.serverUrl + 'images/icones/' + properties.type.icone + '.png'
+					src: options.serverUrl + 'images/icones/' + properties.icone + '.png'
 				})
-			};
-		},
-		label: function(properties) {
-			return {
-				link: properties,
-				', ': {
-					m: properties.coord.alt,
-					' \u255E\u2550\u2555': properties.places.valeur,
-				},
-				'': '&copy;refuges.info',
 			};
 		},
 	}, options);
@@ -726,6 +732,9 @@ function layerPyreneesRefuges(options) {
 				p.sym = getSym(p.type_hebergement);
 				p.link = p.url;
 				p.ele = parseInt(p.altitude);
+				p.type = p.type_hebergement;
+				p.bed = p.cap_ete;
+				p.copy = 'pyrenees-refuges.com';
 			}
 			return FeatureCollection;
 		},
@@ -734,17 +743,6 @@ function layerPyreneesRefuges(options) {
 				image: new ol.style.Icon({
 					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
 				}),
-			};
-		},
-		label: function(properties) {
-			return {
-				link: properties,
-				', ': {
-					m: properties.ele,
-					' \u255E\u2550\u2555': properties.cap_ete,
-				},
-				type: properties.type_hebergement,
-				copy: ' &copy;pyrenees-refuges.com',
 			};
 		},
 	}, options));
@@ -764,6 +762,8 @@ function layerChemineur(options) {
 				p.name = p.nom;
 				p.link = p.url;
 				p.sym = getSym(p.icone);
+				p.type = p.icone.match(new RegExp('([a-z\-_]+)\.png'))[1];
+				p.copy = 'chemineur.fr';
 			}
 			return FeatureCollection;
 		},
@@ -778,12 +778,6 @@ function layerChemineur(options) {
 					color: 'blue',
 					width: 3,
 				}),
-			};
-		},
-		label: function(properties) {
-			return {
-				link: properties,
-				'': '&copy;chemineur.fr',
 			};
 		},
 		hoverStyleOptions: {
@@ -819,6 +813,7 @@ function layerC2C(options) {
 						type: object.waypoint_type,
 						sym: getSym(object.waypoint_type),
 						link: 'https://www.camptocamp.org/waypoints/' + object.document_id,
+						copy: 'Camptocamp.org',
 					},
 				});
 			}
@@ -834,12 +829,6 @@ function layerC2C(options) {
 				})
 			};
 		},
-		label: function(properties) {
-			return {
-				link: properties,
-				'': properties.type + ' &copy;c2c',
-			};
-		},
 	}, options));
 }
 
@@ -852,16 +841,78 @@ function layerC2C(options) {
 //TODO WRI NAV OVERPASS Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO BUG IE OVERPASS don't work on IE
 //BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
-layerOverpass = function(options) {
+function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
-		selectorId: 'overpass', // Element containing all checkboxes
 		selectorName: 'overpass', // Checkboxes
-		labelClass: 'label-overpass',
+		//		labelClass: 'label-overpass',
 		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 	}, options);
-	const checkEls = document.getElementsByName(options.selectorName);
+	const checkEls = document.getElementsByName(options.selectorName),
+		format = new ol.format.OSMXML();
+
+	var ff = format.readFeaturesFromDocument;
+	format.readFeaturesFromDocument = function(doc, opt) {
+		const features = [];
+		for (let n = /** @type {Node} */ (doc.firstChild); n; n = n.nextSibling) {
+			if (n.nodeType == Node.ELEMENT_NODE) {
+				const f = this.readFeaturesFromNode(n, opt);
+				//        extend(features, this.readFeaturesFromNode(n, opt_options));
+			}
+		}
+		return features;
+	}
+
+	return layerVectorURL(Object.assign({
+		strategy: ol.loadingstrategy.bbox,
+		format: format,
+		//		readFeatures: readFeaturesOverpass,
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: options.iconUrlPath + overpassType(properties) + '.png'
+				})
+			};
+		},
+		baseUrlFunction: function(bbox, list) {
+			const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
+				args = [];
+
+			for (let l = 0; l < list.length; l++) {
+				const lists = list[l].split('+');
+				for (let ls = 0; ls < lists.length; ls++)
+					args.push(
+						'node' + lists[ls] + bb + // Ask for nodes in the bbox
+						'way' + lists[ls] + bb // Also ask for areas
+					);
+			}
+
+			return options.baseUrl +
+				'?data=[timeout:5];(' + // Not too much !
+				args.join('') +
+				');out center;'; // add center of areas
+		},
+	}, options));
+
+
+	function overpassType(properties) {
+		for (let e = 0; e < checkEls.length; e++)
+			if (checkEls[e].checked) {
+				const tags = checkEls[e].value.split('+');
+				for (let t = 0; t < tags.length; t++) {
+					const conditions = tags[t].split('"');
+					if (properties[conditions[1]] &&
+						properties[conditions[1]].match(conditions[3]))
+						return checkEls[e].id;
+				}
+			}
+		return 'inconnu';
+	}
+
+}
+
+WWWWlayerOverpass = function(options) {
 
 	// Convert areas into points to display it as an icon
 	function readFeaturesOverpass(response) {
@@ -1240,8 +1291,7 @@ function controlPermalink(options) {
 }
 
 /**
- * Control to displays the length of a line overflown
- * option hoverStyle style the hovered feature
+ * Control to displays the mouse position
  */
 function controlMousePosition() {
 	return new ol.control.MousePosition({
@@ -1908,7 +1958,7 @@ function layerEdit(options) {
 		readFeatures: function() {
 			return options.format.readFeatures(
 				JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
-					featureProjection: options.projection, // Read/write data as ESPG:4326 by default
+					featureProjection: options.projection,
 				});
 		},
 		saveFeatures: function(coordinates, format) {
