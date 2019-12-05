@@ -13,11 +13,10 @@
 /* jshint esversion: 6 */
 
 //TODO BUG controlDownloadGPX don't save edited features
-
 //TODO avoid fetch / PWA error on IE
 //TODO ranger les blocs dans l'ordre déclaration puis utilisation & noter les dependancies
-//BEST document all options in 	options = Object.assign({
 //TODO wri/chem (phpBB cookies SameSite)
+//BEST document all options in options = Object.assign({
 
 /**
  * Debug facilities on mobile
@@ -1032,7 +1031,7 @@ function layerC2C(options) {
  * Requires layerVectorURL
  */
 //TODO WRI NAV OVERPASS Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
-//BEST BUG IE OVERPASS don't work on IE
+//TODO BUG IE OVERPASS don't work on IE
 //BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 layerOverpass = function(options) {
 	options = Object.assign({
@@ -1515,7 +1514,7 @@ function controlTilesBuffer(depth, depthFS) {
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
 //BEST BUG thin button on mobile
-//BEST report issue with with animate on OL v6 & resorb patch
+//BEST report issue with with animate on OL v6 & resorb patch on Geocoder
 function controlGeocoder() {
 	// Vérify if geocoder is available (not supported in IE)
 	const ua = navigator.userAgent;
@@ -1786,19 +1785,25 @@ function controlDownloadGPX(options) {
 
 	function activate() { // Callback at activation / desactivation, mandatory, no default
 		let features = [],
-			extent = button.getMap().getView().calculateExtent();
+			map = button.getMap(),
+			extent = map.getView().calculateExtent();
 
 		// Get all visible features
-		button.getMap().getLayers().forEach(function(layer) {
+		if (options.originLayer)
+			getFeatures(options.originLayer);
+		else
+			map.getLayers().forEach(getFeatures);
+
+		function getFeatures(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					const properties = feature.getProperties();
 					if (properties.id)
 						feature.setId(properties.id);
-					if (feature.getKeys().length > 1) // Except markers taht have only geom
+					if (feature.getKeys().length > 1) // Except markers that have no properties
 						features.push(feature);
 				});
-		});
+		}
 
 		// Write in GPX format
 		const gpx = new ol.format.GPX().writeFeatures(features, {
@@ -1806,6 +1811,7 @@ function controlDownloadGPX(options) {
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
 			})
+			// Beautify the output
 			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>)/g, '\n$1')
 			.replace(/(<name|<ele|<sym|<link|<type|<\/?trkseg|<rtept)/g, '\n\t$1')
