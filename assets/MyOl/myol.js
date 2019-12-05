@@ -30,29 +30,9 @@ if (window.location.hash == '###')
 	};
 
 /**
- * Global openlayers hacks
+ * IE polyfill
+ * You can include https://cdn.polyfill.io/v3/polyfill.min.js in place
  */
-ol.Map.prototype.renderFrame_ = function(time) {
-	//HACK add map_ to each layer
-	const map = this;
-	map.getLayers().forEach(function(target) {
-		target.map_ = map;
-	});
-
-	return ol.PluggableMap.prototype.renderFrame_.call(this, time);
-};
-
-//HACK log json parsing errors
-function JSONparse(json) {
-	try {
-		return JSON.parse(json);
-	} catch (returnCode) {
-		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
-	}
-}
-
-//HACK IE Object.assign polyfill
-// You can also use <script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
@@ -61,6 +41,30 @@ if (!Object.assign)
 				r[m] = arguments[a][m];
 		return r;
 	};
+
+/**
+ * Json parsing errors log
+ */
+function JSONparse(json) {
+	try {
+		return JSON.parse(json);
+	} catch (returnCode) {
+		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+	}
+}
+
+/**
+ * Hack to add map_ to each layer
+ */
+ol.Map.prototype.render = function() {
+	ol.PluggableMap.prototype.render.call(this);
+
+	const map = this;
+	map.getLayers().forEach(function(target) {
+		target.map_ = map;
+	});
+};
+
 
 /**
  * TILE LAYERS
@@ -176,7 +180,7 @@ function layerSpain(serveur, layer) {
  * Layers with not all resolutions or area available
  * Virtual class
  * Displays Stamen outside the layer zoom range or extend
- * Requires HACK map_
+ * Requires HACK layer.map_
  */
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
@@ -313,7 +317,7 @@ function layerBing(key, subLayer) {
  * Popup label
  * Manages a feature hovering common to all features & layers
  */
-function setHoverManager(map) {
+function hoverManager(map) {
 	// Only one per map
 	if (map.hasHoverManager_)
 		return map.hasHoverManager_;
@@ -472,7 +476,7 @@ function setHoverManager(map) {
 
 /**
  * Marker
- * Requires JSONparse, setHoverManager, HACK map_, proj4.js for swiss coordinates
+ * Requires JSONparse, hoverManager, HACK layer.map_, proj4.js for swiss coordinates
  * Read / write following fields :
  * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
  * marker-lon / marker-lat
@@ -532,10 +536,9 @@ function layerMarker(o) {
 		}),
 		format = new ol.format.GeoJSON();
 
-	//TODO 1 BUG n'est pas enabled si on ne voit pas le feature !
 	layer.once('prerender', function() {
 		const map = layer.map_;
-		setHoverManager(map); // Attach hovering for cursor changes
+		hoverManager(map, layer); // Attach hovering for cursor changes
 
 		if (options.draggable) {
 			// Drag the feature
@@ -732,7 +735,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires controlPermanentCheckbox, setHoverManager, JSONparse, HACK map_
+ * Requires controlPermanentCheckbox, hoverManager, JSONparse, HACK layer.map_
  * permanentCheckboxList, loadingStrategyBboxLimit & escapedStyle
  */
 function layerVectorURL(options) {
@@ -823,8 +826,8 @@ function layerVectorURL(options) {
 			}
 		);
 
-	layer.once('prerender', function(evt) {
-		setHoverManager(evt.target.map_); // Attach tracking for labeling & cursor changes
+	layer.once('prerender', function() {
+		hoverManager(layer.map_, layer); // Attach tracking for labeling & cursor changes
 	});
 
 	return layer;
@@ -1895,7 +1898,7 @@ function controlPrint() {
 
 /**
  * Line & Polygons Editor
- * Requires controlButton, escapedStyle, JSONparse, HACK map_
+ * Requires controlButton, escapedStyle, JSONparse
  */
 //TODO BUG controlDownloadGPX don't save edited features
 //BEST why must it be included by map.addControl after map init ? Not as an overlay
