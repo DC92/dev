@@ -12,7 +12,6 @@
 
 /* jshint esversion: 6 */
 
-//TODO BUG controlDownloadGPX don't save edited features
 //TODO avoid fetch / PWA error on IE
 //TODO ranger les blocs dans l'ordre déclaration puis utilisation & noter les dependancies
 //TODO wri/chem (phpBB cookies SameSite)
@@ -528,6 +527,7 @@ function layerMarker(options) {
 		feature = new ol.Feature({
 			geometry: point,
 			draggable: options.draggable,
+			dontSave: true, // Used by controlDownloadGPX
 		}),
 		source = new ol.source.Vector({
 			features: [feature],
@@ -1789,8 +1789,8 @@ function controlDownloadGPX(options) {
 			extent = map.getView().calculateExtent();
 
 		// Get all visible features
-		if (options.originLayer)
-			getFeatures(options.originLayer);
+		if (options.savedLayer)
+			getFeatures(options.savedLayer);
 		else
 			map.getLayers().forEach(getFeatures);
 
@@ -1798,9 +1798,7 @@ function controlDownloadGPX(options) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					const properties = feature.getProperties();
-					if (properties.id)
-						feature.setId(properties.id);
-					if (feature.getKeys().length > 1) // Except markers that have no properties
+					if (!properties.dontSave)
 						features.push(feature);
 				});
 		}
@@ -1903,27 +1901,22 @@ function controlPrint() {
  * Line & Polygons Editor
  * Requires controlButton, escapedStyle, JSONparse
  */
-//BEST why must it be included by map.addControl after map init ? Not as an overlay
-function controlEdit(options) {
-	const format = new ol.format.GeoJSON();
+function layerEdit(options) {
 	options = Object.assign({
-		group: 'edit',
+		format: new ol.format.GeoJSON(),
+		projection: 'EPSG:3857',
 		geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 		focus: true, // Zoom the map on the loaded features
-		label: 'M',
-		buttonBackgroundColors: ['white', '#ef3'],
-		activate: function(active) {
-			activate(active, modify);
-		},
+		snapLayers: [], // Vector layers to snap on
 		readFeatures: function() {
-			return format.readFeatures(
+			return options.format.readFeatures(
 				JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
-					featureProjection: 'EPSG:3857', // Read/write data as ESPG:4326 by default
+					featureProjection: options.projection, // Read/write data as ESPG:4326 by default
 				});
 		},
-		saveFeatures: function() {
+		saveFeatures: function(coordinates, format) {
 			return format.writeFeatures(source.getFeatures(coordinates, format), {
-				featureProjection: 'EPSG:3857',
+				featureProjection: options.projection,
 				decimals: 5,
 			});
 		},
@@ -1956,8 +1949,7 @@ function controlEdit(options) {
 		},
 	}, options);
 
-	const button = controlButton(options),
-		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		extent = ol.extent.createEmpty(), // For focus on all features calculation
 		features = options.readFeatures(),
@@ -1978,24 +1970,32 @@ function controlEdit(options) {
 		modify = new ol.interaction.Modify({
 			source: source,
 			style: editStyle,
-		});
-	layer.options = options;
-
-	// Treat the geoJson input as any other edit
-	optimiseEdited();
-
-	// Optional option snapLayers : [list of layers to snap]
-	if (options.snapLayers)
-		options.snapLayers.forEach(function(layer) {
-			layer.getSource().on('change', function() {
-				const fs = layer.getSource().getFeatures();
-				for (let f in fs)
-					snap.addFeature(fs[f]);
-			});
+		}),
+		controlModify = controlButton({
+			group: 'edit',
+			label: 'M',
+			buttonBackgroundColors: ['white', '#ef3'],
+			title: options.titleModify,
+			activate: function(active) {
+				activate(active, modify);
+			},
 		});
 
-	button.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+	// Manage hover to save modify actions integrity
+	let hoveredFeature = null;
+
+	// Snap on vector layers
+	options.snapLayers.forEach(function(layer) {
+		layer.getSource().on('change', function() {
+			const fs = layer.getSource().getFeatures();
+			for (let f in fs)
+				snap.addFeature(fs[f]);
+		});
+	});
+
+	layer.once('prerender', function() {
+		const map = layer.map_;
+		optimiseEdited(); // Treat the geoJson input as any other edit
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
 		map.getInteractions().forEach(function(i) {
@@ -2003,8 +2003,21 @@ function controlEdit(options) {
 				map.removeInteraction(i);
 		});
 
-		map.addLayer(layer);
-		button.toggle(true); // Init modify button on
+		// Add required controls
+		map.addControl(controlModify);
+		controlModify.toggle(true);
+		if (options.titleLine)
+			map.addControl(controlDraw({
+				type: 'LineString',
+				label: 'L',
+				title: options.titleLine,
+			}));
+		if (options.titlePolygon)
+			map.addControl(controlDraw({
+				type: 'Polygon',
+				label: 'P',
+				title: options.titlePolygon,
+			}));
 
 		// Zoom the map on the loaded features
 		if (options.focus && features.length) {
@@ -2023,77 +2036,13 @@ function controlEdit(options) {
 		});
 
 		map.on('pointermove', hover);
-
-		if (options.editLine)
-			map.addControl(controlDraw({
-				type: 'LineString',
-				label: 'L',
-				title: options.editLine,
-			}));
-		if (options.editPolygon)
-			map.addControl(controlDraw({
-				type: 'Polygon',
-				label: 'P',
-				title: options.editPolygon,
-			}));
-	};
-
-	function controlDraw(options) {
-		const buttonDraw = controlButton(Object.assign({
-				group: 'edit',
-				buttonBackgroundColors: ['white', '#ef3'],
-				activate: function(active) {
-					activate(active, interaction);
-				},
-			}, options)),
-			interaction = new ol.interaction.Draw(Object.assign({
-				style: editStyle,
-				source: source,
-			}, options));
-
-		interaction.on(['drawend'], function() {
-			// Switch on the main editor button
-			button.toggle(true);
-
-			// Warn source 'on change' to save the feature
-			// Don't do it now as it's not yet added to the source
-			source.modified = true;
-		});
-		return buttonDraw;
-	}
-
-	// Manage hover to save modify actions integrity
-	var hoveredFeature = null;
-
-	//BEST use the centralized hover function
-	function hover(evt) {
-		let nbFeaturesAtPixel = 0;
-		button.getMap().forEachFeatureAtPixel(evt.pixel, function(feature) {
-			source.getFeatures().forEach(function(f) {
-				if (f.ol_uid == feature.ol_uid) {
-					nbFeaturesAtPixel++;
-					if (!hoveredFeature) { // Hovering only one
-						feature.setStyle(editStyle);
-						hoveredFeature = feature; // Don't change it until there is no more hovered
-					}
-				}
-			});
-		}, {
-			hitTolerance: 6, // Default is 0
-		});
-
-		// If no more hovered, return to the normal style
-		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(style);
-			hoveredFeature = null;
-		}
-	}
+	});
 
 	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// Ctrl + Alt click on segment : delete feature
 			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
-				const selectedFeatures = button.getMap().getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
+				const selectedFeatures = layer.map_.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
 					hitTolerance: 6,
 					layerFilter: function(l) {
 						return l.ol_uid == layer.ol_uid;
@@ -2120,13 +2069,61 @@ function controlEdit(options) {
 		}
 	});
 
+	function controlDraw(options) {
+		const button = controlButton(Object.assign({
+				group: 'edit',
+				buttonBackgroundColors: ['white', '#ef3'],
+				activate: function(active) {
+					activate(active, interaction);
+				},
+			}, options)),
+			interaction = new ol.interaction.Draw(Object.assign({
+				style: editStyle,
+				source: source,
+			}, options));
+
+		interaction.on(['drawend'], function() {
+			// Switch on the main editor button
+			button.toggle(true);
+
+			// Warn source 'on change' to save the feature
+			// Don't do it now as it's not yet added to the source
+			source.modified = true;
+		});
+		return button;
+	}
+
 	function activate(active, inter) { // Callback at activation / desactivation, mandatory, no default
 		if (active) {
-			button.getMap().addInteraction(inter);
-			button.getMap().addInteraction(snap); // Must be added after
+			layer.map_.addInteraction(inter);
+			layer.map_.addInteraction(snap); // Must be added after
 		} else {
-			button.getMap().removeInteraction(snap);
-			button.getMap().removeInteraction(inter);
+			layer.map_.removeInteraction(snap);
+			layer.map_.removeInteraction(inter);
+		}
+	}
+
+	//BEST use the centralized hover function
+	function hover(evt) {
+		let nbFeaturesAtPixel = 0;
+		layer.map_.forEachFeatureAtPixel(evt.pixel, function(feature) {
+			source.getFeatures().forEach(function(f) {
+				if (f.ol_uid == feature.ol_uid) {
+					nbFeaturesAtPixel++;
+					if (!hoveredFeature) { // Hovering only one
+						feature.setStyle(editStyle);
+						hoveredFeature = feature; // Don't change it until there is no more hovered
+					}
+				}
+			});
+		}, {
+			hitTolerance: 6, // Default is 0
+		});
+
+		// If no more hovered, return to the normal style
+		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
+			hoveredFeature.setStyle(style);
+			hoveredFeature = null;
 		}
 	}
 
@@ -2171,10 +2168,10 @@ function controlEdit(options) {
 					}
 
 		for (let a in lines)
-			if (options.editPolygon && // Only if polygons are autorized
+			if (options.titlePolygon && // Only if polygons are autorized
 				lines[a]) {
 				// Close open lines
-				if (!options.editLine) // If only polygons are autorized
+				if (!options.titleLine) // If only polygons are autorized
 					if (!compareCoords(lines[a]))
 						lines[a].push(lines[a][0]);
 
@@ -2232,7 +2229,7 @@ function controlEdit(options) {
 			geoJsonEl.value = options.saveFeatures({
 				lines: lines,
 				polys: polys,
-			}, format);
+			}, options.format);
 	}
 
 	// Get all lines fragments at the same level & split if one point = pointerPosition
@@ -2260,7 +2257,7 @@ function controlEdit(options) {
 		return a[0] == b[0] && a[1] == b[1]; // 2 coords
 	}
 
-	return button;
+	return layer;
 }
 
 
