@@ -14,6 +14,9 @@
 //BEST document all options in options = Object.assign({
 
 //TODO avoid fetch / PWA error on IE
+//TODO formats export
+//TODO bug import points GPX (pb icône)
+//TODO overpass
 
 /**
  * Debug facilities on mobile
@@ -317,8 +320,8 @@ function layerBing(key, subLayer) {
  * Compute a style from different styles
  * return ol.style.Style containing each style component or ol default
  */
-//BEST work with arguments
 function escapedStyle(a, b, c) {
+	//BEST work with arguments
 	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 	return function(feature) {
 		return new ol.style.Style(Object.assign({
@@ -333,6 +336,98 @@ function escapedStyle(a, b, c) {
 	};
 }
 
+/**
+ * Mem selected checkboxes in cookie
+ * selectorName (string)
+ * evt (keyboard event)
+ * return : [checked values or ids]
+ */
+function permanentCheckboxList(selectorName, evt) {
+	const checkEls = document.getElementsByName(selectorName);
+	let allChecks = [];
+
+	for (let e = 0; e < checkEls.length; e++) {
+		// Select/deselect all (clicking an <input> without value)
+		if (evt) {
+			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
+				checkEls[e].checked = evt.target.checked; // Check all if "all" is clicked
+			else if (checkEls[e].value == 'on')
+				checkEls[e].checked = false; // Reset the "all" checks if another check is clicked
+		}
+
+		// Get status of all checks
+		if (checkEls[e].checked) // List checked elements
+			allChecks.push(checkEls[e].value);
+	}
+	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
+	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
+	return allChecks; // Returns list of checked values or ids
+}
+
+function controlPermanentCheckbox(selectorName, callback) {
+	const checkEls = document.getElementsByName(selectorName),
+		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
+		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
+
+	for (let e = 0; e < checkEls.length; e++) {
+		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
+		if (cookie) // Set the checks accordingly with the cookie
+			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
+	}
+
+	function permanentCheckboxClick(evt) {
+		if (typeof callback == 'function')
+			callback(evt, permanentCheckboxList(selectorName, evt));
+	}
+	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
+}
+
+
+/**
+ * Mem selected checkboxes in cookie
+ * selectorName (string)
+ * evt (keyboard event)
+ * return : [checked values or ids]
+ */
+function permanentCheckboxList(selectorName, evt) {
+	const checkEls = document.getElementsByName(selectorName);
+	let allChecks = [];
+
+	for (let e = 0; e < checkEls.length; e++) {
+		// Select/deselect all (clicking an <input> without value)
+		if (evt) {
+			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
+				checkEls[e].checked = evt.target.checked; // Check all if "all" is clicked
+			else if (checkEls[e].value == 'on')
+				checkEls[e].checked = false; // Reset the "all" checks if another check is clicked
+		}
+
+		// Get status of all checks
+		if (checkEls[e].checked) // List checked elements
+			allChecks.push(checkEls[e].value);
+	}
+	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
+	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
+	return allChecks; // Returns list of checked values or ids
+}
+
+function controlPermanentCheckbox(selectorName, callback) {
+	const checkEls = document.getElementsByName(selectorName),
+		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
+		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
+
+	for (let e = 0; e < checkEls.length; e++) {
+		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
+		if (cookie) // Set the checks accordingly with the cookie
+			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
+	}
+
+	function permanentCheckboxClick(evt) {
+		if (typeof callback == 'function')
+			callback(evt, permanentCheckboxList(selectorName, evt));
+	}
+	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
+}
 /**
  * Popup label
  * Manages a feature hovering common to all features & layers
@@ -398,50 +493,6 @@ function hoverManager(map) {
 		}
 	});
 
-	function deselectFeature() {
-		if (hoveredFeature) {
-			viewStyle.cursor = 'default';
-			element.className = 'myol-popup-hidden';
-			if (hoveredLayer && hoveredLayer.options)
-				hoveredFeature.setStyle(escapedStyle(hoveredLayer.options.styleOptions));
-			hoveredFeature = null;
-		}
-	}
-
-	function formatLabel(format, closure, properties, feature) {
-		if (typeof format == 'function')
-			format = formatLabel(
-				format(properties, feature),
-				closure, properties, feature
-			);
-
-		if (typeof format == 'object') {
-			// Links
-			if (closure == 'link')
-				return '<a href="' + format.link + '">' + format.name + '</a>';
-
-			// List of closure: object
-			let items = [];
-			for (let f in format)
-				items.push(formatLabel(
-					format[f], f,
-					properties, feature
-				));
-			return items
-				.filter(function(a) { // Purge empty items
-					return a;
-				})
-				.join(closure);
-		}
-		// Number with unit
-		const n = parseInt(format);
-		if (n)
-			return n + closure;
-
-		// Other string
-		return format && format != '0' ? format.toString() : '';
-	}
-
 	function selectFeature(feature, layer, pixel) {
 		// Change the cursor
 		const properties = feature.getProperties();
@@ -461,18 +512,16 @@ function hoverManager(map) {
 			));
 
 			// Set the text
-			element.innerHTML = formatLabel(
-				layer.options.label,
-				'<br/>',
-				properties,
-				feature
-			);
-			let geometry = feature.getGeometry();
+			if (typeof layer.options.label == 'function')
+				element.innerHTML = layer.options.label(properties, feature, layer);
+			else if (layer.options.label)
+				element.innerHTML = layer.options.label;
 
-			// If it's a GeometryCollection, take the fisrt feature
+			// Compute the label position			
+			let geometry = feature.getGeometry();
+			// If it's a GeometryCollection, take the first feature
 			if (typeof geometry.getGeometries == 'function')
 				geometry = geometry.getGeometries()[0];
-
 			// If it's a point, the icon is stable above it
 			if (geometry.flatCoordinates.length == 2)
 				pixel = map.getPixelFromCoordinate(geometry.flatCoordinates);
@@ -493,52 +542,16 @@ function hoverManager(map) {
 			popup.setPosition(map.getCoordinateFromPixel(pixel));
 		}
 	}
-}
 
-/**
- * Mem selected checkboxes in cookie
- * selectorName (string)
- * evt (keyboard event)
- * return : [checked values or ids]
- */
-function permanentCheckboxList(selectorName, evt) {
-	const checkEls = document.getElementsByName(selectorName);
-	let allChecks = [];
-
-	for (let e = 0; e < checkEls.length; e++) {
-		// Select/deselect all (clicking an <input> without value)
-		if (evt) {
-			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
-				checkEls[e].checked = evt.target.checked; // Check all if "all" is clicked
-			else if (checkEls[e].value == 'on')
-				checkEls[e].checked = false; // Reset the "all" checks if another check is clicked
+	function deselectFeature() {
+		if (hoveredFeature) {
+			viewStyle.cursor = 'default';
+			element.className = 'myol-popup-hidden';
+			if (hoveredLayer && hoveredLayer.options)
+				hoveredFeature.setStyle(escapedStyle(hoveredLayer.options.styleOptions));
+			hoveredFeature = null;
 		}
-
-		// Get status of all checks
-		if (checkEls[e].checked) // List checked elements
-			allChecks.push(checkEls[e].value);
 	}
-	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
-	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
-	return allChecks; // Returns list of checked values or ids
-}
-
-function controlPermanentCheckbox(selectorName, callback) {
-	const checkEls = document.getElementsByName(selectorName),
-		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
-		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
-
-	for (let e = 0; e < checkEls.length; e++) {
-		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-		if (cookie) // Set the checks accordingly with the cookie
-			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
-	}
-
-	function permanentCheckboxClick(evt) {
-		if (typeof callback == 'function')
-			callback(evt, permanentCheckboxList(selectorName, evt));
-	}
-	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
 }
 
 
@@ -582,18 +595,23 @@ function layerVectorURL(options) {
 		// - Array of lines to be separated by <br/>
 		// - Structure {'join': {array to be separated by 'join'},...}
 		label: function(properties) {
-			return {
-				link: properties, // By default : properties.name / click to properties.link
-				', ': {
-					m: properties.ele,
-					'\u255E\u2550\u2555': properties.bed,
-				},
-				'':{
-					type: properties.type,
-					'*': properties.star,
-				},
-				copy: ' &copy;' + properties.copy,
-			};
+			const lines = [],
+				cars = [];
+			if (properties.link && properties.name)
+				lines.push('<a href="' + properties.link + '">' + properties.name + '</a>');
+			else if (properties.name)
+				lines.push(properties.name);
+			if (properties.ele)
+				cars.push(properties.ele + 'm');
+			if (properties.bed)
+				cars.push(properties.bed + '\u255E\u2550\u2555');
+			if (cars.length)
+				lines.push(cars.join(', '));
+			if (properties.type)
+				lines.push(properties.type);
+			if (properties.copy)
+				lines.push('&copy;' + properties.copy);
+			return lines.join('<br/>');
 		},
 		// All ol.source.Vector options
 		// All ol.layer.Vector options
@@ -660,7 +678,9 @@ function layerVectorURL(options) {
 	return layer;
 }
 
-// Convert properties type into gpx <sym>
+/**
+ * Convert properties type into gpx <sym>
+ */
 function getSym(type) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
@@ -705,6 +725,7 @@ function layerRefugesInfo(options) {
 				p.type = p.type.valeur;
 				p.bed = p.places.valeur;
 				p.copy = 'refuges.info';
+				//BEST champ gpx <desc>
 			}
 			return FeatureCollection;
 		},
@@ -733,7 +754,7 @@ function layerPyreneesRefuges(options) {
 				p.link = p.url;
 				p.ele = parseInt(p.altitude);
 				p.type = p.type_hebergement;
-				p.bed = p.cap_ete;
+				p.bed = parseInt(p.cap_ete);
 				p.copy = 'pyrenees-refuges.com';
 			}
 			return FeatureCollection;
@@ -813,7 +834,7 @@ function layerC2C(options) {
 						type: object.waypoint_type,
 						sym: getSym(object.waypoint_type),
 						link: 'https://www.camptocamp.org/waypoints/' + object.document_id,
-						copy: 'Camptocamp.org',
+						copy: 'CampToCamp.org',
 					},
 				});
 			}
