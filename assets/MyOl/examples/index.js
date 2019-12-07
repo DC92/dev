@@ -122,7 +122,7 @@ const massifs = layerVectorURL({
 				// SwissTopo : You need to register your domain in
 				// https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			},
-			controlDownloadGPX: {
+			controlDownload: {
 				//savedLayer: editor,
 			},
 		}),

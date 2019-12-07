@@ -18,7 +18,7 @@ const controls = [
 		controlGeocoder(),
 		controlGPS(),
 		controlLoadGPX(),
-		controlDownloadGPX(),
+		controlDownload(),
 		controlPrint(),
 	],
 

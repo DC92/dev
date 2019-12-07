@@ -360,6 +360,7 @@ function permanentCheckboxList(selectorName, evt) {
 	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
 	return allChecks; // Returns list of checked values or ids
 }
+
 function controlPermanentCheckbox(selectorName, callback) {
 	const checkEls = document.getElementsByName(selectorName),
 		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
@@ -671,7 +672,6 @@ function layerRefugesInfo(options) {
 				p.icone = p.type.icone;
 				p.type = p.type.valeur;
 				p.copy = 'refuges.info';
-				//BEST champ gpx <desc>
 			}
 			return FeatureCollection;
 		},
@@ -724,11 +724,12 @@ function layerChemineur(options) {
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveJson: function(FeatureCollection) {
 			for (let f in FeatureCollection.features) {
-				const p = FeatureCollection.features[f].properties;
+				const p = FeatureCollection.features[f].properties,
+					icone = p.icone.match(new RegExp('([a-z\-_]+)\.png'));
 				p.name = p.nom;
 				p.link = p.url;
 				p.sym = getSym(p.icone);
-				p.type = p.icone.match(new RegExp('([a-z\-_]+)\.png'))[1];
+				p.type = icone ? icone[1] : null;
 				p.copy = 'chemineur.fr';
 			}
 			return FeatureCollection;
@@ -805,7 +806,7 @@ function layerC2C(options) {
  * Requires layerVectorURL
  */
 //BEST BUG IE don't dispaly icons
-//BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
+//BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -942,6 +943,21 @@ function controlButton(options) {
 		evt.preventDefault();
 		control.toggle();
 	});
+
+	// Add selectors below the button
+	if (options.question) {
+		control.questionEl = document.createElement('div');
+		control.questionEl.innerHTML = options.question;
+		control.questionEl.className = 'ol-control-hidden';
+
+		control.element.appendChild(control.questionEl);
+		control.element.onmouseover = function() {
+			control.questionEl.className = 'ol-control-question';
+		};
+		control.element.onmouseout = function() {
+			control.questionEl.className = 'ol-control-hidden';
+		};
+	}
 
 	// Toggle the button status & aspect
 	control.active = 0;
@@ -1403,6 +1419,7 @@ function controlGPS() {
  * Requires controlButton
  */
 //TODO BUG WPT label
+//BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
 		label: '\u25b2',
@@ -1469,21 +1486,24 @@ function controlLoadGPX(options) {
 }
 
 /**
- * GPX file downloader control
+ * File downloader control
  * Requires controlButton
  */
-//TODO various formats
-function controlDownloadGPX(options) {
+function controlDownload(options) {
 	options = Object.assign({
 		label: '\u25bc',
 		title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
+		question: '<input type="radio" name="format-download" id="GPX" value"application/gpx+xml" checked="checked" />GPX<br>' +
+			'<input type="radio" name="format-download" id="KML" value"vnd.google-earth.kml+xml”" />KML<br>' +
+			'<input type="radio" name="format-download" id="WKT" value"text/plain" />WKT<br>' +
+			'<input type="radio" name="format-download" id="GeoJSON" value"application/vnd.geo+json" />GeoJSON<br>' +
+			'<input type="radio" name="format-download" id="EsriJSON" value"application/vnd.geo+json" />EsriJSON',
 		fileName: document.title || 'openlayers',
 		activate: activate,
 	}, options);
 	const hiddenEl = document.createElement('a'),
 		button = controlButton(options);
 	hiddenEl.target = '_self';
-	hiddenEl.download = options.fileName + '.gpx';
 	hiddenEl.style = 'display:none';
 	document.body.appendChild(hiddenEl);
 
@@ -1508,24 +1528,27 @@ function controlDownloadGPX(options) {
 		}
 
 		// Write in GPX format
-		const gpx = new ol.format.GPX().writeFeatures(features, {
+		const formatInfo = document.querySelector('input[name="format-download"]:checked'),
+			data = new ol.format[formatInfo.id]().writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
 			})
 			// Beautify the output
 			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
-			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>)/g, '\n$1')
-			.replace(/(<name|<ele|<sym|<link|<type|<\/?trkseg|<rtept)/g, '\n\t$1')
-			.replace(/(<trkpt)/g, '\n\t\t$1'),
+			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document|<\/?Placemark|POINT|LINESTRING|POLYGON|{|})/g, '\n$1')
+			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData|<Point|"[a-z_]*":)/g, '\n\t$1')
+			.replace(/(<trkpt|<Data|<\/?LineString|<\/?Polygon|<\/?Style)/g, '\n\t\t$1')
+			.replace(/(<\/?innerBoundaryIs)/g, '\n\t\t\t$1'),
 
-			file = new Blob([gpx], {
-				type: 'application/gpx+xml',
+			file = new Blob([data], {
+				type: formatInfo.value,
 			});
 
 		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
-			navigator.msSaveBlob(file, options.fileName + '.gpx');
+			navigator.msSaveBlob(file, options.fileName + '.' + formatInfo.id.toLowerCase());
 		else {
+			hiddenEl.download = options.fileName + '.' + formatInfo.id.toLowerCase();
 			hiddenEl.href = URL.createObjectURL(file);
 			hiddenEl.click();
 		}
@@ -1539,34 +1562,23 @@ function controlDownloadGPX(options) {
  */
 function controlPrint() {
 	const button = controlButton({
-			className: 'myol-button ol-print',
-			title: 'Imprimer la carte',
-			activate: function() {
-				resizeDraft(button.getMap());
-				button.getMap().once('rendercomplete', function() {
-					window.print();
-					location.reload();
-				});
-			},
-		}),
-		orientationEl = document.createElement('div');
+		className: 'myol-button ol-print',
+		title: 'Imprimer la carte',
+		question: '<input type="radio" name="print-orientation" value="0" />Portrait A4<br>' +
+			'<input type="radio" name="print-orientation" value="1" />Paysage A4',
+		activate: function() {
+			resizeDraft(button.getMap());
+			button.getMap().once('rendercomplete', function() {
+				window.print();
+				location.reload();
+			});
+		},
+	});
 
-	// Add orientation selectors below the button
-	orientationEl.innerHTML = '<input type="radio" name="ori" value="0">Portrait A4<br>' +
-		'<input type="radio" name="ori" value="1">Paysage A4';
-	orientationEl.className = 'ol-control-hidden';
-
-	button.element.appendChild(orientationEl);
-	button.element.onmouseover = function() {
-		orientationEl.className = 'ol-control-question';
-	};
-	button.element.onmouseout = function() {
-		orientationEl.className = 'ol-control-hidden';
-	};
 	button.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		const oris = document.getElementsByName('ori');
+		const oris = document.getElementsByName('print-orientation');
 		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / IE
 			oris[i].onchange = resizeDraft;
 	};
@@ -1575,10 +1587,10 @@ function controlPrint() {
 		// Resize map to the A4 dimensions
 		const map = button.getMap(),
 			mapEl = map.getTargetElement(),
-			oris = document.querySelectorAll("input[name=ori]:checked"),
-			ori = oris.length ? oris[0].value : 0;
-		mapEl.style.width = ori == 0 ? '210mm' : '297mm';
-		mapEl.style.height = ori == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
+			oris = document.querySelectorAll("input[name=print-orientation]:checked"),
+			orientation = oris.length ? oris[0].value : 0;
+		mapEl.style.width = orientation == 0 ? '210mm' : '297mm';
+		mapEl.style.height = orientation == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide all but the map
@@ -1652,7 +1664,7 @@ function layerMarker(options) {
 		feature = new ol.Feature({
 			geometry: point,
 			draggable: options.draggable,
-			dontSave: true, // Used by controlDownloadGPX
+			dontSave: true, // Used by controlDownload
 		}),
 		source = new ol.source.Vector({
 			features: [feature],
@@ -2247,7 +2259,7 @@ function controlsCollection(options) {
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
-		controlDownloadGPX(options.controlDownloadGPX),
+		controlDownload(options.controlDownload),
 		controlPrint(),
 	];
 }

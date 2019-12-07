@@ -28,7 +28,7 @@ const overlays = [
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',
 		}),
-		controlDownloadGPX(),
+		controlDownload(),
 		new ol.control.Attribution({
 			collapsible: false, // Attribution always open
 		}),

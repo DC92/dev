@@ -56,7 +56,7 @@ const titleEdit = "Cliquer et déplacer un sommet pour modifier une trace\n" +
 	"Alt + cliquer sur un segment pour le supprimer et couper la ligne en 2\n" +
 	"Ctrl + Alt + cliquer sur un segment d'une ligne pour la supprimer";
 /*,
-			controlDownloadGPX: {
+			controlDownload: {
 				fileName: 'topics' //TODO name option
 			}*/
 /*
