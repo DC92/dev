@@ -15,8 +15,6 @@
 
 //TODO avoid fetch / PWA error on IE
 //TODO formats export
-//TODO bug import points GPX (pb icône)
-//TODO overpass
 
 /**
  * Debug facilities on mobile
@@ -580,8 +578,8 @@ function layerVectorURL(options) {
 		},
 		selectorName: '', // Id of a <select> to tune url optional parameters
 		projection: 'EPSG:4326', // Projection of received data
-		//TODO	}, options);
-		//	options = Object.assign({
+		//TODO DELETE	}, options);
+		//TODO DELETE	options = Object.assign({
 		format: new ol.format.GeoJSON({ // Format of received data
 			dataProjection: options.projection,
 		}),
@@ -591,24 +589,21 @@ function layerVectorURL(options) {
 		},
 		styleOptions: null, // ol.style.Style of function of the displayed features
 		// Label to dispach above the feature when hovering
-		// - String
-		// - Array of lines to be separated by <br/>
-		// - Structure {'join': {array to be separated by 'join'},...}
 		label: function(properties) {
-			const lines = [],
-				cars = [];
-			if (properties.link && properties.name)
-				lines.push('<a href="' + properties.link + '">' + properties.name + '</a>');
-			else if (properties.name)
-				lines.push(properties.name);
-			if (properties.ele)
-				cars.push(properties.ele + 'm');
-			if (properties.bed)
-				cars.push(properties.bed + '\u255E\u2550\u2555');
-			if (cars.length)
-				lines.push(cars.join(', '));
-			if (properties.type)
-				lines.push(properties.type);
+			const lines = [];
+			if (properties.name) {
+				if (properties.link)
+					lines.push('<a href="' + properties.link + '">' + properties.name + '</a>');
+				else
+					lines.push(properties.name);
+				if (properties.type)
+					lines.push(properties.type);
+			} else {
+				if (properties.link)
+					lines.push('<a href="' + properties.link + '">' + (properties.type || 'fiche') + '</a>');
+				else if (properties.type)
+					lines.push(properties.type);
+			}
 			if (properties.copy)
 				lines.push('&copy;' + properties.copy);
 			return lines.join('<br/>');
@@ -686,8 +681,7 @@ function getSym(type) {
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
 		// <sym> propertie propertie
 		'<Residence> refuge hotel gite chambre_hote' +
-		'<Lodge> cabane cabane_cle buron alpage shelter' +
-		' cabane ouverte mais ocupee par le berger l ete' +
+		'<Lodge> cabane cabane_cle buron alpage shelter cabane ouverte mais ocupee par le berger l ete' +
 		'<Fishing Hot Spot Facility> abri hut' +
 		'<Campground> camping camp_site bivouac orri toue abri en pierre' +
 		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
@@ -699,7 +693,10 @@ function getSym(type) {
 		'<City Hall> locality' +
 		'<Reef> grotte cave glacier' +
 		'<Shopping Center> local_product ravitaillement buffet restaurant' +
-		'<Telephone> telephone wifi reseau',
+		'<Telephone> telephone' +
+		'<Oil Field> wifi reseau' +
+		'<Restroom> wc' +
+		'<Ground Transportation> bus car',
 		//' canyon slackline_spot paragliding_takeoff paragliding_landing virtual webcam
 
 		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
@@ -723,7 +720,6 @@ function layerRefugesInfo(options) {
 				p.ele = p.coord.alt;
 				p.icone = p.type.icone;
 				p.type = p.type.valeur;
-				p.bed = p.places.valeur;
 				p.copy = 'refuges.info';
 				//BEST champ gpx <desc>
 			}
@@ -754,7 +750,6 @@ function layerPyreneesRefuges(options) {
 				p.link = p.url;
 				p.ele = parseInt(p.altitude);
 				p.type = p.type_hebergement;
-				p.bed = parseInt(p.cap_ete);
 				p.copy = 'pyrenees-refuges.com';
 			}
 			return FeatureCollection;
@@ -859,7 +854,6 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO WRI NAV OVERPASS Hôtels et locations, camping Campings, ravitaillement Alimentation, parking Parkings, arrêt de bus Bus
 //TODO BUG IE OVERPASS don't work on IE
 //BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 function layerOverpass(options) {
@@ -867,126 +861,78 @@ function layerOverpass(options) {
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 		selectorName: 'overpass', // Checkboxes
-		//		labelClass: 'label-overpass',
+		//TODO DELETE		labelClass: 'label-overpass',
 		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 	}, options);
 	const checkEls = document.getElementsByName(options.selectorName),
 		format = new ol.format.OSMXML();
 
-	var ff = format.readFeaturesFromDocument;
-	format.readFeaturesFromDocument = function(doc, opt) {
-		const features = [];
-		for (let n = /** @type {Node} */ (doc.firstChild); n; n = n.nextSibling) {
-			if (n.nodeType == Node.ELEMENT_NODE) {
-				const f = this.readFeaturesFromNode(n, opt);
-				//        extend(features, this.readFeaturesFromNode(n, opt_options));
-			}
-		}
-		return features;
-	}
-
-	return layerVectorURL(Object.assign({
-		strategy: ol.loadingstrategy.bbox,
-		format: format,
-		//		readFeatures: readFeaturesOverpass,
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: options.iconUrlPath + overpassType(properties) + '.png'
-				})
-			};
-		},
-		baseUrlFunction: function(bbox, list) {
-			const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
-				args = [];
-
-			for (let l = 0; l < list.length; l++) {
-				const lists = list[l].split('+');
-				for (let ls = 0; ls < lists.length; ls++)
-					args.push(
-						'node' + lists[ls] + bb + // Ask for nodes in the bbox
-						'way' + lists[ls] + bb // Also ask for areas
-					);
-			}
-
-			return options.baseUrl +
-				'?data=[timeout:5];(' + // Not too much !
-				args.join('') +
-				');out center;'; // add center of areas
-		},
-	}, options));
-
-
-	function overpassType(properties) {
-		for (let e = 0; e < checkEls.length; e++)
-			if (checkEls[e].checked) {
-				const tags = checkEls[e].value.split('+');
-				for (let t = 0; t < tags.length; t++) {
-					const conditions = tags[t].split('"');
-					if (properties[conditions[1]] &&
-						properties[conditions[1]].match(conditions[3]))
-						return checkEls[e].id;
-				}
-			}
-		return 'inconnu';
-	}
-
-}
-
-WWWWlayerOverpass = function(options) {
-
-	// Convert areas into points to display it as an icon
-	function readFeaturesOverpass(response) {
-		for (let node = response.documentElement.firstChild; node; node = node.nextSibling)
+	format.readFeatures = function(doc, opt) {
+		// Transform an area to a node (picto) at the center of this area
+		for (let node = doc.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
-				const newNode = response.createElement('node');
-				response.documentElement.appendChild(newNode);
+				const newNode = doc.createElement('node');
 				newNode.id = node.id;
+				doc.documentElement.appendChild(newNode);
 
-				// Add a tag to mem what node type it was
-				const newTag = response.createElement('tag');
-				newTag.setAttribute('k', 'nodetype');
-				newTag.setAttribute('v', 'way');
-				newNode.appendChild(newTag);
-
+				// Browse wat attributes to build a new node
 				for (let subTagNode = node.firstChild; subTagNode; subTagNode = subTagNode.nextSibling)
 					switch (subTagNode.nodeName) {
 						case 'center':
+							// Set node attributes
 							newNode.setAttribute('lon', subTagNode.getAttribute('lon'));
 							newNode.setAttribute('lat', subTagNode.getAttribute('lat'));
 							newNode.setAttribute('nodeName', subTagNode.nodeName);
 							break;
+
 						case 'tag':
+							// Get existing properties
 							newNode.appendChild(subTagNode.cloneNode());
+
+							// Add a tag to mem what node type it was (for link build)
+							const newTag = doc.createElement('tag');
+							newTag.setAttribute('k', 'nodetype');
+							newTag.setAttribute('v', node.nodeName);
+							newNode.appendChild(newTag);
 					}
 			}
-		return response;
-	}
 
-	function overpassType(properties) {
-		for (let e = 0; e < checkEls.length; e++)
-			if (checkEls[e].checked) {
-				const tags = checkEls[e].value.split('+');
-				for (let t = 0; t < tags.length; t++) {
-					const conditions = tags[t].split('"');
-					if (properties[conditions[1]] &&
-						properties[conditions[1]].match(conditions[3]))
-						return checkEls[e].id;
+		// Call former method into OL
+		const features = ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
+
+		// Compute missing features
+		for (let f in features)
+			if (features[f]) {
+				const properties = features[f].getProperties(),
+					newProperties = {
+						sym: 'Puzzle Cache', // Default symbol
+						link: 'http://www.openstreetmap.org/' + (properties.nodetype || 'node') + '/' + features[f].id_, //TODO BUG : node | way
+						copy: 'openstreetmap.org',
+					};
+				for (let p in properties)
+					if (typeof properties[p] == 'string') { // Avoid geometry
+					for (let c in checkEls)
+						if (checkEls[c].value &&
+							checkEls[c].value.indexOf(p) != -1 &&
+							checkEls[c].value.indexOf(properties[p] != -1)) {
+							newProperties.sym = checkEls[c].id.toString();
+							newProperties.type = p + ':' + properties[p];
+						}
+					features[f].setProperties(newProperties, false);
 				}
 			}
-		return 'inconnu';
-	}
+		return features;
+	};
 
 	return layerVectorURL(Object.assign({
 		strategy: ol.loadingstrategy.bbox,
-		format: new ol.format.OSMXML(),
-		readFeatures: readFeaturesOverpass,
+		format: format,
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: options.iconUrlPath + overpassType(properties) + '.png'
-				})
+					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
+				}),
 			};
 		},
 		baseUrlFunction: function(bbox, list) {
@@ -1001,99 +947,13 @@ WWWWlayerOverpass = function(options) {
 						'way' + lists[ls] + bb // Also ask for areas
 					);
 			}
-
 			return options.baseUrl +
 				'?data=[timeout:5];(' + // Not too much !
 				args.join('') +
 				');out center;'; // add center of areas
 		},
-		label: function(p, f) { // properties, feature
-			p.name = p.name || p.alt_name || p.short_name || '';
-			const language = {
-					alpine_hut: 'Refuge gard&egrave;',
-					hotel: 'h&ocirc;tel',
-					guest_house: 'chambre d‘h&ocirc;te',
-					camp_site: 'camping',
-					convenience: 'alimentation',
-					supermarket: 'supermarch&egrave;',
-					drinking_water: 'point d&apos;eau',
-					watering_place: 'abreuvoir',
-					fountain: 'fontaine',
-					telephone: 't&egrave;l&egrave;phone',
-					shelter: ''
-				},
-				phone = p.phone || p['contact:phone'],
-				address = [
-					p.address,
-					p['addr:housenumber'], p.housenumber,
-					p['addr:street'], p.street,
-					p['addr:postcode'], p.postcode,
-					p['addr:city'], p.city
-				],
-				popup = [
-					'<b>' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</b>', [
-						'<a target="_blank"',
-						'href="http://www.openstreetmap.org/' + (p.nodetype ? p.nodetype : 'node') + '/' + f.getId() + '"',
-						'title="Voir la fiche d‘origine sur openstreetmap">',
-						p.name ? (
-							p.name.toLowerCase().match(language[p.tourism] || 'azertyuiop') ? '' : p.tourism
-						) : (
-							language[p.tourism] || p.tourism
-						),
-						'*'.repeat(p.stars),
-						p.shelter_type == 'basic_hut' ? 'Abri' : '',
-						p.building == 'cabin' ? 'Cabane non gard&egrave;e' : '',
-						p.highway == 'bus_stop' ? 'Arr&ecirc;t de bus' : '',
-						p.waterway == 'water_point' ? 'Point d&apos;eau' : '',
-						p.natural == 'spring' ? 'Source' : '',
-						p.man_made == 'water_well' ? 'Puits' : '',
-						p.shop ? 'alimentation' : '',
-						typeof language[p.amenity] == 'string' ? language[p.amenity] : p.amenity,
-						'</a>'
-					].join(' '), [
-						p.rooms ? p.rooms + ' chambres' : '',
-						p.beds ? p.beds + ' lits' : '',
-						p.place ? p.place + ' places' : '',
-						p.capacity ? p.capacity + ' places' : '',
-						p.ele ? parseInt(p.ele, 10) + 'm' : ''
-					].join(' '),
-					phone ? '&phone;<a title="Appeler" href="tel:' + phone.replace(/[^0-9+]+/ig, '') + '">' + phone + '</a>' : '',
-					p.email ? '&#9993;<a title="Envoyer un mail" href="mailto:' + p.email + '">' + p.email + '</a>' : '',
-					p['addr:street'] ? address.join(' ') : '',
-					p.website ? '&#8943;<a title="Voir le site web" target="_blank" href="' + p.website + '">' + (p.website.split('/')[2] || p.website) + '</a>' : '',
-					p.opening_hours ? 'ouvert ' + p.opening_hours : '',
-					p.note ? p.note : ''
-				];
-
-			// Other paramaters
-			const done = [ // These that have no added value or already included
-				'geometry,lon,lat,area,amenity,building,highway,shop,shelter_type,access,waterway,natural,man_made',
-				'tourism,stars,rooms,place,capacity,ele,phone,contact,url,nodetype,name,alt_name,email,website',
-				'opening_hours,description,beds,bus,note',
-				'addr,housenumber,street,postcode,city,bus,public_transport,tactile_paving',
-				'ref,source,wheelchair,leisure,landuse,camp_site,bench,network,brand,bulk_purchase,organic',
-				'compressed_air,fuel,vending,vending_machine',
-				'fee,heritage,wikipedia,wikidata,operator,mhs,amenity_1,beverage,takeaway,delivery,cuisine',
-				'historic,motorcycle,drying,restaurant,hgv',
-				'drive_through,parking,park_ride,supervised,surface,created_by,maxstay'
-			].join(',').split(',');
-			let nbInternet = 0;
-			for (let k in p) {
-				const k0 = k.split(':')[0];
-				if (!done.includes(k0))
-					switch (k0) {
-						case 'internet_access':
-							if ((p[k] != 'no') && !(nbInternet++))
-								popup.push('Accès internet');
-							break;
-						default:
-							popup.push(k + ' : ' + p[k]);
-					}
-			}
-			return ('<p>' + popup.join('</p><p>') + '</p>').replace(/<p>\s*<\/p>/ig, '');
-		},
 	}, options));
-};
+}
 
 
 /**
@@ -1590,7 +1450,7 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-//BEST upload WPT
+//TODO BUG WPT label
 function controlLoadGPX(options) {
 	options = Object.assign({
 		label: '\u25b2',
@@ -1598,12 +1458,17 @@ function controlLoadGPX(options) {
 		activate: function() {
 			inputEl.click();
 		},
-		style: new ol.style.Style({
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 3,
-			})
-		}),
+		style: function(feature) {
+			return new ol.style.Style({
+				image: new ol.style.Icon({
+					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + feature.getProperties().sym + '.png',
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 3,
+				})
+			});
+		},
 	}, options);
 	const inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
