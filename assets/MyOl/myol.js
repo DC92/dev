@@ -14,7 +14,6 @@
 //BEST document all options in options = Object.assign({
 
 //TODO avoid fetch / PWA error on IE
-//TODO formats export
 
 /**
  * Debug facilities on mobile
@@ -604,12 +603,13 @@ function layerVectorURL(options) {
 				else if (properties.type)
 					lines.push(properties.type);
 			}
+			//TODO add full properties display in a title
 			if (properties.copy)
 				lines.push('&copy;' + properties.copy);
 			return lines.join('<br/>');
 		},
-		// All ol.source.Vector options
-		// All ol.layer.Vector options
+		/** All ol.source.Vector options */
+		/** All ol.layer.Vector options */
 	}, options);
 
 	//HACK overwrite ol.format.GeoJSON.readFeatures
@@ -854,7 +854,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//TODO BUG IE OVERPASS don't work on IE
+//BEST BUG IE don't dispaly icons
 //BEST OVERPASS display errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 function layerOverpass(options) {
 	options = Object.assign({
@@ -868,6 +868,7 @@ function layerOverpass(options) {
 		format = new ol.format.OSMXML();
 
 	format.readFeatures = function(doc, opt) {
+		console.log('overpass response');
 		// Transform an area to a node (picto) at the center of this area
 		for (let node = doc.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
@@ -902,25 +903,27 @@ function layerOverpass(options) {
 		const features = ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 
 		// Compute missing features
-		for (let f in features)
-			if (features[f]) {
+		for (var f = features.length - 1; f >= 0; f--)
+			if (!features[f].getId()) // Remove unused 'way' features
+				features.splice(f, 1);
+			else {
 				const properties = features[f].getProperties(),
 					newProperties = {
 						sym: 'Puzzle Cache', // Default symbol
-						link: 'http://www.openstreetmap.org/' + (properties.nodetype || 'node') + '/' + features[f].id_, //TODO BUG : node | way
+						link: 'http://www.openstreetmap.org/' + (properties.nodetype || 'node') + '/' + features[f].id_,
 						copy: 'openstreetmap.org',
 					};
 				for (let p in properties)
 					if (typeof properties[p] == 'string') { // Avoid geometry
-					for (let c in checkEls)
-						if (checkEls[c].value &&
-							checkEls[c].value.indexOf(p) != -1 &&
-							checkEls[c].value.indexOf(properties[p] != -1)) {
-							newProperties.sym = checkEls[c].id.toString();
-							newProperties.type = p + ':' + properties[p];
-						}
-					features[f].setProperties(newProperties, false);
-				}
+						for (let c = 0; c < checkEls.length; c++)
+							if (checkEls[c].value &&
+								checkEls[c].value.indexOf(p) != -1 &&
+								checkEls[c].value.indexOf(properties[p] != -1)) {
+								newProperties.sym = checkEls[c].getAttribute('id');
+								newProperties.type = p + ':' + properties[p];
+							}
+						features[f].setProperties(newProperties, false);
+					}
 			}
 		return features;
 	};
@@ -928,13 +931,6 @@ function layerOverpass(options) {
 	return layerVectorURL(Object.assign({
 		strategy: ol.loadingstrategy.bbox,
 		format: format,
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
-				}),
-			};
-		},
 		baseUrlFunction: function(bbox, list) {
 			const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 				args = [];
@@ -951,6 +947,13 @@ function layerOverpass(options) {
 				'?data=[timeout:5];(' + // Not too much !
 				args.join('') +
 				');out center;'; // add center of areas
+		},
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
+				}),
+			};
 		},
 	}, options));
 }
@@ -1520,7 +1523,7 @@ function controlLoadGPX(options) {
  * GPX file downloader control
  * Requires controlButton
  */
-//BEST various formats
+//TODO various formats
 function controlDownloadGPX(options) {
 	options = Object.assign({
 		label: '\u25bc',
