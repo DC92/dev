@@ -19,13 +19,13 @@
 }
 
 /* Overpass */
-.overpass-popup{
+.overpass-popup {
 	padding: 5px;
 	border: 1px solid #abc;
 	border-radius: 5px;
 	background-color: #def;
 }
-.overpass-popup p{
+.overpass-popup p {
 	margin: 0;
 	font-size: small;
 }

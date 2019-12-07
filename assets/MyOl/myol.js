@@ -360,7 +360,6 @@ function permanentCheckboxList(selectorName, evt) {
 	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
 	return allChecks; // Returns list of checked values or ids
 }
-
 function controlPermanentCheckbox(selectorName, callback) {
 	const checkEls = document.getElementsByName(selectorName),
 		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
@@ -379,52 +378,6 @@ function controlPermanentCheckbox(selectorName, callback) {
 	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
 }
 
-
-/**
- * Mem selected checkboxes in cookie
- * selectorName (string)
- * evt (keyboard event)
- * return : [checked values or ids]
- */
-function permanentCheckboxList(selectorName, evt) {
-	const checkEls = document.getElementsByName(selectorName);
-	let allChecks = [];
-
-	for (let e = 0; e < checkEls.length; e++) {
-		// Select/deselect all (clicking an <input> without value)
-		if (evt) {
-			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
-				checkEls[e].checked = evt.target.checked; // Check all if "all" is clicked
-			else if (checkEls[e].value == 'on')
-				checkEls[e].checked = false; // Reset the "all" checks if another check is clicked
-		}
-
-		// Get status of all checks
-		if (checkEls[e].checked) // List checked elements
-			allChecks.push(checkEls[e].value);
-	}
-	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
-	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
-	return allChecks; // Returns list of checked values or ids
-}
-
-function controlPermanentCheckbox(selectorName, callback) {
-	const checkEls = document.getElementsByName(selectorName),
-		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
-		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
-
-	for (let e = 0; e < checkEls.length; e++) {
-		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-		if (cookie) // Set the checks accordingly with the cookie
-			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
-	}
-
-	function permanentCheckboxClick(evt) {
-		if (typeof callback == 'function')
-			callback(evt, permanentCheckboxList(selectorName, evt));
-	}
-	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
-}
 /**
  * Popup label
  * Manages a feature hovering common to all features & layers
@@ -577,8 +530,6 @@ function layerVectorURL(options) {
 		},
 		selectorName: '', // Id of a <select> to tune url optional parameters
 		projection: 'EPSG:4326', // Projection of received data
-		//TODO DELETE	}, options);
-		//TODO DELETE	options = Object.assign({
 		format: new ol.format.GeoJSON({ // Format of received data
 			dataProjection: options.projection,
 		}),
@@ -603,7 +554,6 @@ function layerVectorURL(options) {
 				else if (properties.type)
 					lines.push(properties.type);
 			}
-			//TODO add full properties display in a title
 			if (properties.copy)
 				lines.push('&copy;' + properties.copy);
 			return lines.join('<br/>');
@@ -861,7 +811,6 @@ function layerOverpass(options) {
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 		selectorName: 'overpass', // Checkboxes
-		//TODO DELETE		labelClass: 'label-overpass',
 		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 	}, options);
 	const checkEls = document.getElementsByName(options.selectorName),
@@ -917,8 +866,8 @@ function layerOverpass(options) {
 					if (typeof properties[p] == 'string') { // Avoid geometry
 						for (let c = 0; c < checkEls.length; c++)
 							if (checkEls[c].value &&
-								checkEls[c].value.indexOf(p) != -1 &&
-								checkEls[c].value.indexOf(properties[p] != -1)) {
+								checkEls[c].value.includes(p) &&
+								checkEls[c].value.includes(properties[p])) {
 								newProperties.sym = checkEls[c].getAttribute('id');
 								newProperties.type = p + ':' + properties[p];
 							}
