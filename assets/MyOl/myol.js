@@ -13,8 +13,6 @@
 /* jshint esversion: 6 */
 //BEST document all options in options = Object.assign({
 
-//TODO avoid fetch / PWA error on IE
-
 /**
  * Debug facilities on mobile
  */
@@ -640,6 +638,7 @@ function layerVectorURL(options) {
 
 /**
  * Convert properties type into gpx <sym>
+ * Manages common types for many layer services
  */
 function getSym(type) {
 	const lex =
@@ -677,13 +676,13 @@ function layerRefugesInfo(options) {
 		baseUrl: '//www.refuges.info/',
 		urlSuffix: 'api/bbox?nb_points=500&type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
-		receiveProperties: function(p) {
-			p.name = p.nom;
-			p.link = p.lien;
-			p.ele = p.coord.alt;
-			p.icone = p.type.icone;
-			p.type = p.type.valeur;
-			p.copy = 'refuges.info';
+		receiveProperties: function(properties) {
+			properties.name = properties.nom;
+			properties.link = properties.lien;
+			properties.ele = properties.coord.alt;
+			properties.icone = properties.type.icone; // Mem icon value when overwriting type
+			properties.type = properties.type.valeur;
+			properties.copy = 'refuges.info';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -703,12 +702,12 @@ function layerRefugesInfo(options) {
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		receiveProperties: function(p) {
-			p.sym = getSym(p.type_hebergement);
-			p.link = p.url;
-			p.ele = parseInt(p.altitude);
-			p.type = p.type_hebergement;
-			p.copy = 'pyrenees-refuges.com';
+		receiveProperties: function(properties) {
+			properties.sym = getSym(properties.type_hebergement);
+			properties.link = properties.url;
+			properties.ele = parseInt(properties.altitude);
+			properties.type = properties.type_hebergement;
+			properties.copy = 'pyrenees-refuges.com';
 		},
 	}, options));
 }
@@ -722,13 +721,13 @@ function layerChemineur(options) {
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&limite=500&poi=',
 		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64', //TODO WRI 3,8,16,20,23
 		strategy: ol.loadingstrategy.bboxLimit,
-		receiveProperties: function(p) {
-			const icone = p.icone.match(new RegExp('([a-z\-_]+)\.png'));
-			p.name = p.nom;
-			p.link = p.url;
-			p.sym = getSym(p.icone);
-			p.type = icone ? icone[1] : null;
-			p.copy = 'chemineur.fr';
+		receiveProperties: function(properties) {
+			const icone = properties.icone.match(new RegExp('([a-z\-_]+)\.png')); // Type calculation
+			properties.name = properties.nom;
+			properties.link = properties.url;
+			properties.type = icone ? icone[1] : null;
+			properties.sym = getSym(properties.type);
+			properties.copy = 'chemineur.fr';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -760,18 +759,18 @@ function layerChemineur(options) {
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=500&forums=4,5,6',
-		receiveProperties: function(p) {
-			const icone = p.icon.match(new RegExp('([a-z\-_]+)\.png'));
-			p.sym = getSym(p.icone);
-			p.type = icone ? icone[1] : null;
-			p.link = 'http://alpages.info/viewtopic.php?t=' + p.id;
-			p.copy = 'alpages.info';
+		receiveProperties: function(properties) {
+			const icone = properties.icone.match(new RegExp('([a-z\-_]+)\.png'));
+			properties.sym = getSym(properties.icone);
+			properties.type = icone ? icone[1] : null;
+			properties.link = 'http://alpages.info/viewtopic.php?t=' + properties.id;
+			properties.copy = 'alpages.info';
 		},
 		styleOptions: function(properties) {
 			return {
 				// POI
 				image: new ol.style.Icon({
-					src: properties.icon,
+					src: properties.icone,
 				}),
 			};
 		},
@@ -1682,6 +1681,15 @@ function layerMarker(options) {
 		}),
 		format = new ol.format.GeoJSON();
 
+	layer.center = function() {
+		point.setCoordinates(map.getView().getCenter());
+	};
+
+	layer.centerMap = function() {
+		map.getView().setCenter(point.getCoordinates());
+	};
+
+	//TODO don't see the buttons if the marker is not in the area
 	layer.once('prerender', function() {
 		const map = layer.map_;
 		hoverManager(map, layer); // Attach hovering for cursor changes
@@ -1717,15 +1725,11 @@ function layerMarker(options) {
 				},
 			}));
 			if (elCenterMarker)
-				elCenterMap.onclick = function() {
-					map.getView().setCenter(point.getCoordinates());
-				};
+				elCenterMap.onclick = layer.center;
 			else map.addControl(controlButton({
 				label: '\u26DE',
 				title: 'Centrer la carte sur le curseur',
-				activate: function() {
-					map.getView().setCenter(point.getCoordinates());
-				},
+				activate: layer.centerMap,
 			}));
 		}
 	});

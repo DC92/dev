@@ -18,7 +18,8 @@ if ('serviceWorker' in navigator)
 
 // Extract the generation ID from the first comment of the registered service-worker
 var genId;
-fetch('service-worker.php')
+if (typeof fetch == 'function') // Exclude IE
+	fetch('service-worker.php')
 	.then(function(response) {
 		return response.text();
 	})
@@ -35,7 +36,7 @@ const help =
 	'« Cible » (3em appui) : Affacer le réticule GPS et remettre la carte nord en haut\n' +
 	'« ▲ » : Afficher un fichier GPX (une trace)\n' +
 	'« ... » : Choisir un autre fond de carte\n' +
-	'Avant de partir :\n' +
+	'Avant de partir en randonnée :\n' +
 	'- Paramètres de l‘explorateur (3 points verticaux) -> ajouter à l‘écran d‘accueil\n' +
 	'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement au zoom maximum pour charger les images des cartes qui seront conservées dans le cache de l‘explorateur\n' +
 	'Hors réseau :\n' +

@@ -1,22 +1,21 @@
 <?php
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
-const overlays = [
-		layerRefugesInfo({
-			baseUrl: '<?=$config_wri['sous_dossier_installation']?>',
-			// Couche non cliquable
-			href: null,
-			label: function(properties) {
-				return properties.nom;
-			},
-		}),
 
-		layerMarker({
-			imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/viseur.png',
-			idDisplay: 'viseur',
-			draggable: true,
-		}),
-	],
+const refugesInfo = layerRefugesInfo({
+		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
+		// Couche non cliquable
+		href: null,
+		label: function(properties) {
+			return properties.nom;
+		},
+	}),
+
+	marker = layerMarker({
+		imageUrl: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.png',
+		idDisplay: 'viseur',
+		draggable: true,
+	}),
 
 	controls = [
 		controlLayersSwitcher({
@@ -45,6 +44,6 @@ const overlays = [
 			center: ol.proj.fromLonLat([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 			zoom: 13,
 		}),
-		layers: overlays,
+		layers: [refugesInfo, marker],
 		controls: controls,
 	});

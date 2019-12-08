@@ -7,11 +7,10 @@ console.log(document.cookie);
 const massifs = layerVectorURL({
 		baseUrl: '//www.refuges.info/api/polygones?type_polygon=1',
 		selectorName: 'wri-massifs',
-		receiveProperty: function(property) {
-			return {
-				name: property.nom,
-				link: property.lien,
-			};
+		receiveProperties: function(properties) {
+			properties.name = properties.nom;
+			properties.type = null;
+			properties.link = properties.lien;
 		},
 		styleOptions: function(properties) {
 			// Translates the color in RGBA to be transparent
@@ -38,12 +37,6 @@ const massifs = layerVectorURL({
 					color: 'black',
 				}),
 			};
-		},
-		label: function(properties) {
-			return '<a href="' + properties.lien + '">' + properties.nom + '<a>';
-		},
-		href: function(properties) {
-			return properties.lien;
 		},
 	}),
 

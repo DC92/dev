@@ -5,6 +5,13 @@
 const overlays = [
 		layerRefugesInfo({
 			baseUrl: '<?=$config_wri['sous_dossier_installation']?>',
+		receiveProperties: function(properties) {
+			properties.icone = properties.type.icone;
+			properties.name = properties.nom;
+			properties.link = properties.lien;
+			properties.ele = properties.coord.alt;
+			properties.type = properties.type.valeur;
+		},
 		}),
 
 		layerMarker({
