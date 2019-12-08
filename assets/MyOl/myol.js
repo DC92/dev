@@ -54,12 +54,20 @@ function JSONparse(json) {
 /**
  * Hack to add map_ to each layer
  */
-ol.Map.prototype.render = function() {
-	ol.PluggableMap.prototype.render.call(this);
+ol.Map.prototype.handlePostRender = function() {
+	ol.PluggableMap.prototype.handlePostRender.call(this);
 
 	const map = this;
-	map.getLayers().forEach(function(target) {
-		target.map_ = map;
+	map.getLayers().forEach(function(layer) {
+		//TODO erradiquer map_
+		if (!layer.map_) {
+			layer.map_ = map;
+
+			layer.dispatchEvent({
+				type: 'myol:onadd',
+				map: map,
+			});
+		}
 	});
 };
 
@@ -184,13 +192,13 @@ function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
 
-	layer.once('prerender', function() {
+	layer.once('myol:onadd', function(evt) {
 		if (typeof options.addSources == 'function')
 			options.sources = Object.assign(
 				options.sources,
 				options.addSources()
 			);
-		layer.map_.getView().on('change:resolution', change);
+		evt.map.getView().on('change:resolution', change);
 		change(); // At init
 	});
 
@@ -629,8 +637,8 @@ function layerVectorURL(options) {
 			}
 		);
 
-	layer.once('prerender', function() {
-		hoverManager(layer.map_, layer); // Attach tracking for labeling & cursor changes
+	layer.once('myol:onadd', function(evt) {
+		hoverManager(evt.map, layer); // Attach tracking for labeling & cursor changes
 	});
 
 	return layer;
@@ -1015,6 +1023,7 @@ function controlLayersSwitcher(options) {
 	selectorEl.title = 'Ctrl+click : multicouches';
 	button.element.appendChild(selectorEl);
 
+//TODO utiliser l'option render
 	button.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
@@ -1087,6 +1096,7 @@ function controlLayersSwitcher(options) {
 /**
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
+ * Don't set view when you declare the map
  */
 //BEST save curent layer
 function controlPermalink(options) {
@@ -1121,6 +1131,7 @@ function controlPermalink(options) {
 		const view = evt.map.getView();
 
 		// Set center & zoom at the init
+		//TODO option llInit pour point_formulaire_modification.js
 		if (options.init &&
 			params) { // Only once
 			view.setZoom(params[1]);
@@ -1631,6 +1642,7 @@ function controlPrint() {
 function layerMarker(options) {
 	options = Object.assign({
 		llInit: [],
+		centerOnMap: false,
 		idDisplay: 'marker',
 		decimalSeparator: '.',
 	}, options);
@@ -1681,20 +1693,22 @@ function layerMarker(options) {
 		}),
 		format = new ol.format.GeoJSON();
 
-	layer.center = function() {
-		point.setCoordinates(map.getView().getCenter());
-	};
-
-	layer.centerMap = function() {
-		map.getView().setCenter(point.getCoordinates());
-	};
-
-	//TODO don't see the buttons if the marker is not in the area
-	layer.once('prerender', function() {
-		const map = layer.map_;
+	layer.once('myol:onadd', function(evt) {
+		const map = evt.map;
 		hoverManager(map, layer); // Attach hovering for cursor changes
 
+		layer.center = function() {
+			point.setCoordinates(map.getView().getCenter());
+		};
+		layer.centerMap = function() {
+			map.getView().setCenter(point.getCoordinates());
+		};
+
 		if (options.draggable) {
+			// Position at the init
+			if (options.centerOnMap)
+				layer.center();
+
 			// Drag the feature
 			map.addInteraction(new ol.interaction.Modify({
 				features: new ol.Collection([feature]),
@@ -1714,18 +1728,14 @@ function layerMarker(options) {
 
 			// Map control buttons
 			if (elCenterMarker)
-				elCenterMarker.onclick = function() {
-					point.setCoordinates(map.getView().getCenter());
-				};
+				elCenterMarker.onclick = layer.center;
 			else map.addControl(controlButton({
 				label: '\u29BB',
 				title: 'Déplacer le curseur au centre de la carte',
-				activate: function() {
-					point.setCoordinates(map.getView().getCenter());
-				},
+				activate: layer.center,
 			}));
 			if (elCenterMarker)
-				elCenterMap.onclick = layer.center;
+				elCenterMap.onclick = layer.centerMap;
 			else map.addControl(controlButton({
 				label: '\u26DE',
 				title: 'Centrer la carte sur le curseur',
@@ -1900,8 +1910,8 @@ function layerEdit(options) {
 		});
 	});
 
-	layer.once('prerender', function() {
-		const map = layer.map_;
+	layer.once('myol:onadd', function(evt) {
+		const map = evt.map;
 		optimiseEdited(); // Treat the geoJson input as any other edit
 
 		//HACK Avoid zooming when you leave the mode by doubleclick

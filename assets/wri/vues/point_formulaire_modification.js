@@ -14,6 +14,7 @@ const refugesInfo = layerRefugesInfo({
 	marker = layerMarker({
 		imageUrl: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.png',
 		idDisplay: 'viseur',
+		centerOnMap: true,
 		draggable: true,
 	}),
 
@@ -40,10 +41,11 @@ const refugesInfo = layerRefugesInfo({
 
 	map = new ol.Map({
 		target: 'carte-edit',
-		view: new ol.View({ // Position initiale forcée aux coordonnées de la cabane
+		//TODO ne faire que si modif de point
+		wview: new ol.View({ // Position initiale forcée aux coordonnées de la cabane
 			center: ol.proj.fromLonLat([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 			zoom: 13,
 		}),
-		layers: [refugesInfo, marker],
 		controls: controls,
+		layers: [refugesInfo, marker],
 	});

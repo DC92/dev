@@ -2,25 +2,7 @@
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
 
-const overlays = [
-		layerRefugesInfo({
-			baseUrl: '<?=$config_wri['sous_dossier_installation']?>',
-		receiveProperties: function(properties) {
-			properties.icone = properties.type.icone;
-			properties.name = properties.nom;
-			properties.link = properties.lien;
-			properties.ele = properties.coord.alt;
-			properties.type = properties.type.valeur;
-		},
-		}),
-
-		layerMarker({
-			imageUrl: '<?=$config_wri['sous_dossier_installation']?>images/cadre.png',
-			idDisplay: 'marqueur',
-		}),
-	],
-
-	controls = [
+const controls = [
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
@@ -41,15 +23,33 @@ const overlays = [
 		}),
 	],
 
+	overlays = [
+		layerRefugesInfo({
+			baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
+			receiveProperties: function(properties) {
+				properties.icone = properties.type.icone;
+				properties.name = properties.nom;
+				properties.link = properties.lien;
+				properties.ele = properties.coord.alt;
+				properties.type = properties.type.valeur;
+			},
+		}),
+
+		layerMarker({
+			imageUrl: '<?=$config_wri["sous_dossier_installation"]?>images/cadre.png',
+			idDisplay: 'marqueur',
+		}),
+	],
+
 	map = new ol.Map({
 		target: 'carte-point',
 		view: new ol.View({
 			center: ol.proj.fromLonLat([
-				<?=$vue->point->longitude?> ,
+				<?=$vue->point->longitude?>,
 				<?=$vue->point->latitude?>,
 			]),
 			zoom: 13,
 		}),
-		layers: overlays,
 		controls: controls,
+		layers: overlays,
 	});

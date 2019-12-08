@@ -23,7 +23,7 @@ const controls = [
 	],
 
 	layerMassifs = layerVectorURL({
-		baseUrl: '<?=$config_wri['sous_dossier_installation']?>api/polygones?type_polygon=1',
+		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		styleOptions: function(properties) {
 			return {
 				fill: new ol.style.Fill({
@@ -42,8 +42,8 @@ const controls = [
 			center: ol.proj.fromLonLat([2, 47]), // Default
 			zoom: 13,
 		}),
+		controls: controls,
 		layers: [
 			layerMassifs,
 		],
-		controls: controls,
 	});
