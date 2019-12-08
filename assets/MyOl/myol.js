@@ -523,10 +523,10 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 function layerVectorURL(options) {
 	options = Object.assign({
-		serverUrl: '', // Url prefix to be defined separately from the rest (E.G. server domain and/or directory)
-		baseUrl: null, // Url of the service (mandatory)
+		baseUrl: null, // url of the service (mandatory)
+		urlSuffix: '', // url suffix to be defined separately from the rest (E.G. server domain and/or directory)
 		baseUrlFunction: function(bbox, list) {
-			return options.serverUrl + options.baseUrl + // baseUrl is mandatory, no default
+			return options.baseUrl + options.urlSuffix +
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
 		selectorName: '', // Id of a <select> to tune url optional parameters
@@ -535,10 +535,23 @@ function layerVectorURL(options) {
 			dataProjection: options.projection,
 		}),
 		// Modification of the Json object after reception & before geoJson analysis
-		receiveJson: function(object) {
-			return object;
+		receiveProperties: function(properties, feature, layer) {}, // Add properties based on existing one
+		receiveJson: function(FeatureCollection, layer) {
+			for (let f in FeatureCollection.features)
+				options.receiveProperties(
+					FeatureCollection.features[f].properties,
+					FeatureCollection.features[f],
+					layer
+				);
+			return FeatureCollection;
 		},
-		styleOptions: null, // ol.style.Style of function of the displayed features
+		styleOptions: function(properties) {
+			return {
+				image: new ol.style.Icon({
+					src: '//sym16.dc9.fr/' + properties.sym + '.png',
+				}),
+			};
+		},
 		// Label to dispach above the feature when hovering
 		label: function(properties) {
 			const lines = [];
@@ -571,7 +584,8 @@ function layerVectorURL(options) {
 
 			return options.format.readFeaturesFromObject(
 				options.receiveJson(
-					JSONparse(json) // Log Json errors
+					JSONparse(json), // Log Json errors
+					layer
 				),
 				options.format.getReadOptions(json, opts)
 			);
@@ -660,25 +674,21 @@ function getSym(type) {
  */
 function layerRefugesInfo(options) {
 	options = Object.assign({
-		serverUrl: '//www.refuges.info/',
-		baseUrl: 'api/bbox?type_points=',
+		baseUrl: '//www.refuges.info/',
+		urlSuffix: 'api/bbox?nb_points=500&type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
-		receiveJson: function(FeatureCollection) {
-			for (let f in FeatureCollection.features) {
-				const p = FeatureCollection.features[f].properties;
-				p.name = p.nom;
-				p.link = p.lien;
-				p.ele = p.coord.alt;
-				p.icone = p.type.icone;
-				p.type = p.type.valeur;
-				p.copy = 'refuges.info';
-			}
-			return FeatureCollection;
+		receiveProperties: function(p) {
+			p.name = p.nom;
+			p.link = p.lien;
+			p.ele = p.coord.alt;
+			p.icone = p.type.icone;
+			p.type = p.type.valeur;
+			p.copy = 'refuges.info';
 		},
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: options.serverUrl + 'images/icones/' + properties.icone + '.png'
+					src: options.baseUrl + 'images/icones/' + properties.icone + '.png'
 				})
 			};
 		},
@@ -693,23 +703,12 @@ function layerRefugesInfo(options) {
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		receiveJson: function(FeatureCollection) {
-			for (let f in FeatureCollection.features) {
-				const p = FeatureCollection.features[f].properties;
-				p.sym = getSym(p.type_hebergement);
-				p.link = p.url;
-				p.ele = parseInt(p.altitude);
-				p.type = p.type_hebergement;
-				p.copy = 'pyrenees-refuges.com';
-			}
-			return FeatureCollection;
-		},
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
-				}),
-			};
+		receiveProperties: function(p) {
+			p.sym = getSym(p.type_hebergement);
+			p.link = p.url;
+			p.ele = parseInt(p.altitude);
+			p.type = p.type_hebergement;
+			p.copy = 'pyrenees-refuges.com';
 		},
 	}, options));
 }
@@ -720,19 +719,16 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
-		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,28,30,40,44,64,58,62,65',
+		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&limite=500&poi=',
+		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64', //TODO WRI 3,8,16,20,23
 		strategy: ol.loadingstrategy.bboxLimit,
-		receiveJson: function(FeatureCollection) {
-			for (let f in FeatureCollection.features) {
-				const p = FeatureCollection.features[f].properties,
-					icone = p.icone.match(new RegExp('([a-z\-_]+)\.png'));
-				p.name = p.nom;
-				p.link = p.url;
-				p.sym = getSym(p.icone);
-				p.type = icone ? icone[1] : null;
-				p.copy = 'chemineur.fr';
-			}
-			return FeatureCollection;
+		receiveProperties: function(p) {
+			const icone = p.icone.match(new RegExp('([a-z\-_]+)\.png'));
+			p.name = p.nom;
+			p.link = p.url;
+			p.sym = getSym(p.icone);
+			p.type = icone ? icone[1] : null;
+			p.copy = 'chemineur.fr';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -757,15 +753,40 @@ function layerChemineur(options) {
 }
 
 /**
+ * alpages.info POI layer
+ * Requires ol.loadingstrategy.bboxLimit, layerVectorURL, getSym, layerChemineur
+ */
+//BEST chem4 generic layer
+function layerAlpages(options) {
+	return layerChemineur(Object.assign({
+		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=500&forums=4,5,6',
+		receiveProperties: function(p) {
+			const icone = p.icon.match(new RegExp('([a-z\-_]+)\.png'));
+			p.sym = getSym(p.icone);
+			p.type = icone ? icone[1] : null;
+			p.link = 'http://alpages.info/viewtopic.php?t=' + p.id;
+			p.copy = 'alpages.info';
+		},
+		styleOptions: function(properties) {
+			return {
+				// POI
+				image: new ol.style.Icon({
+					src: properties.icon,
+				}),
+			};
+		},
+	}, options));
+}
+
+/**
  * www.camptocamp.org POI layer
  * Requires JSONparse, ol.loadingstrategy.bboxLimit, layerVectorURL, getSym
  */
 function layerC2C(options) {
 	return layerVectorURL(Object.assign({
-		baseUrl: 'https://api.camptocamp.org/waypoints?limit=200', // https mandatory for Access-Control-Allow-Origin
+		baseUrl: 'https://api.camptocamp.org/waypoints?limit=500', // https mandatory for Access-Control-Allow-Origin
 		strategy: ol.loadingstrategy.bboxLimit,
 		projection: 'EPSG:3857',
-
 		receiveJson: function(objects) {
 			const features = [];
 			for (let o in objects.documents) {
@@ -789,13 +810,6 @@ function layerC2C(options) {
 				features: features,
 			};
 		},
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
-				})
-			};
-		},
 	}, options));
 }
 
@@ -812,7 +826,6 @@ function layerOverpass(options) {
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 		selectorName: 'overpass', // Checkboxes
-		iconUrlPath: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/',
 	}, options);
 	const checkEls = document.getElementsByName(options.selectorName),
 		format = new ol.format.OSMXML();
@@ -897,13 +910,6 @@ function layerOverpass(options) {
 				'?data=[timeout:5];(' + // Not too much !
 				args.join('') +
 				');out center;'; // add center of areas
-		},
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + properties.sym + '.png',
-				}),
-			};
 		},
 	}, options));
 }
@@ -1228,8 +1234,8 @@ function controlTilesBuffer(depth, depthFS) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//BEST BUG thin button on mobile
-//BEST report issue with with animate on OL v6 & resorb patch on Geocoder
+//TODO BUG thin button on mobile
+//BEST report bug that stops animation on OL v6 & resorb patch on Geocoder
 function controlGeocoder() {
 	// Vérify if geocoder is available (not supported in IE)
 	const ua = navigator.userAgent;
@@ -1418,31 +1424,21 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-//TODO BUG WPT label
 //BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
 		label: '\u25b2',
 		title: 'Visualiser un fichier GPX sur la carte',
-		activate: function() {
-			inputEl.click();
-		},
-		style: function(feature) {
-			return new ol.style.Style({
-				image: new ol.style.Icon({
-					src: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/types_points/' + feature.getProperties().sym + '.png',
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 3,
-				})
-			});
-		},
 	}, options);
+
 	const inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
-		button = controlButton(options);
+		button = controlButton(Object.assign({
+			activate: function() {
+				inputEl.click();
+			},
+		}, options));
 
 	inputEl.type = 'file';
 	inputEl.addEventListener('change', function() {
@@ -1468,7 +1464,17 @@ function controlLoadGPX(options) {
 				}),
 				layer = new ol.layer.Vector({
 					source: source,
-					style: options.style,
+					style: function(feature) {
+						return new ol.style.Style({
+							image: new ol.style.Icon({
+								src: '//sym16.dc9.fr/' + feature.getProperties().sym + '.png',
+							}),
+							stroke: new ol.style.Stroke({
+								color: 'blue',
+								width: 3,
+							})
+						});
+					},
 				});
 			map.addLayer(layer);
 			map.getView().fit(source.getExtent());
@@ -1496,8 +1502,7 @@ function controlDownload(options) {
 		question: '<input type="radio" name="format-download" id="GPX" value"application/gpx+xml" checked="checked" />GPX<br>' +
 			'<input type="radio" name="format-download" id="KML" value"vnd.google-earth.kml+xml”" />KML<br>' +
 			'<input type="radio" name="format-download" id="WKT" value"text/plain" />WKT<br>' +
-			'<input type="radio" name="format-download" id="GeoJSON" value"application/vnd.geo+json" />GeoJSON<br>' +
-			'<input type="radio" name="format-download" id="EsriJSON" value"application/vnd.geo+json" />EsriJSON',
+			'<input type="radio" name="format-download" id="GeoJSON" value"application/vnd.geo+json" />GeoJSON',
 		fileName: document.title || 'openlayers',
 		activate: activate,
 	}, options);
@@ -1535,9 +1540,10 @@ function controlDownload(options) {
 				decimals: 5,
 			})
 			// Beautify the output
-			.replace(/<[a-z]*>\[object Object\]<\/[a-z]*>/g, '')
-			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document|<\/?Placemark|POINT|LINESTRING|POLYGON|{|})/g, '\n$1')
-			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData|<Point|"[a-z_]*":)/g, '\n\t$1')
+			.replace(/<[a-z]*>[0|null|[\[object Object\]]<\/[a-z]*>/g, '')
+			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
+			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')
+			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData)/g, '\n\t$1')
 			.replace(/(<trkpt|<Data|<\/?LineString|<\/?Polygon|<\/?Style)/g, '\n\t\t$1')
 			.replace(/(<\/?innerBoundaryIs)/g, '\n\t\t\t$1'),
 
@@ -2069,7 +2075,7 @@ function layerEdit(options) {
 		for (let a in lines)
 			// Exclude 1 coordinate features (points)
 			if (lines[a].length < 2)
-				lines[a] = null;
+				lines[a] = null; //BEST use reverse for & split
 
 			// Merge lines having a common end
 			else

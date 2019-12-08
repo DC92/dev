@@ -89,6 +89,9 @@ const massifs = layerVectorURL({
 		layerChemineur({
 			selectorName: 'chemineur',
 		}),
+		layerAlpages({
+			selectorName: 'alpages',
+		}),
 		layerOverpass(),
 		massifs,
 		layerMarker({

@@ -3,7 +3,7 @@
 ?>
 const overlays = [
 		layerRefugesInfo({
-			serverUrl: '<?=$config_wri['sous_dossier_installation']?>',
+			baseUrl: '<?=$config_wri['sous_dossier_installation']?>',
 			// Couche non cliquable
 			href: null,
 			label: function(properties) {

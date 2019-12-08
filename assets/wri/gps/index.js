@@ -99,7 +99,7 @@ const help =
 			zoom: 6,
 		}),
 		layers: [layerRefugesInfo({
-			serverUrl: sous_dossier_installation, // Use this server as root
+			baseUrl: sous_dossier_installation, // Use this server as root
 		})],
 		controls: controls,
 	});
