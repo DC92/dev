@@ -495,7 +495,9 @@ function hoverManager(map) {
 				pixel[0] = Math.min(pixel[0], map.getSize()[0] - element.clientWidth - 1); // Bord droit
 				pixel[1] -= element.clientHeight + 8;
 			}
-			popup.setPosition(map.getCoordinateFromPixel(pixel));
+			popup.setPosition(map.getCoordinateFromPixel(
+				element.innerHTML ? pixel : [-100, -100], // Avoid tinny label when nothing to show
+			));
 		}
 	}
 
@@ -1506,7 +1508,7 @@ function controlLoadGPX(options) {
 function controlDownload(options) {
 	options = Object.assign({
 		label: '\u25bc',
-		title: 'Choisir un format ce-dessous et\n' +
+		title: 'Choisir un format ci-dessous et\n' +
 			'cliquer sur la flèche pour obtenir\n' +
 			'un fichier contenant\n' +
 			'les éléments visibles dans la fenêtre.',
@@ -1545,11 +1547,13 @@ function controlDownload(options) {
 
 		// Write in GPX format
 		const formatInfo = document.querySelector('input[name="format-download"]:checked'),
-			data = new ol.format[formatInfo.id]().writeFeatures(features, {
+			format = new ol.format[formatInfo.id](),
+			data = format.writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
 			})
+			//TODO BUG don't save polygons !
 			// Beautify the output
 			.replace(/<[a-z]*>[0|null|[\[object Object\]]<\/[a-z]*>/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
@@ -2012,7 +2016,7 @@ function layerEdit(options) {
 
 		interaction.on(['drawend'], function() {
 			// Switch on the main editor button
-			button.toggle(true);
+			controlModify.toggle(true);
 
 			// Warn source 'on change' to save the feature
 			// Don't do it now as it's not yet added to the source

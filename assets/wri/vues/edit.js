@@ -2,27 +2,11 @@
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
 
-const controls = [
-		controlLayersSwitcher({
-			baseLayers: baseLayers,
-		}),
-		//controlPermalink(options.controlPermalink),
-		new ol.control.Attribution(),
-		new ol.control.ScaleLine(),
-		controlMousePosition(),
-		new ol.control.Zoom(),
-		new ol.control.FullScreen({
-			label: '', //HACK Bad presentation on IE & FF
-			tipLabel: 'Plein écran',
-		}),
-		controlGeocoder(),
-		controlLoadGPX(),
-	],
-
-	layerMassifs = layerVectorURL({
+// Affiche en fond la limites de tous les massifs en noir
+const layerMassifs = layerVectorURL({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		receiveProperties: function(properties) {
-			properties.type = null;
+			properties.type = null; // Avoid label
 		},
 		styleOptions: function(properties) {
 			return {
@@ -60,6 +44,29 @@ const controls = [
 				});
 		},
 	}),
+
+	controls = [
+		controlLayersSwitcher({
+			baseLayers: baseLayers,
+		}),
+		new ol.control.Attribution(),
+		new ol.control.ScaleLine(),
+		controlMousePosition(),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '', //HACK Bad presentation on IE & FF
+			tipLabel: 'Plein écran',
+		}),
+		controlGeocoder(),
+		controlLoadGPX(),
+		controlDownload({
+			savedLayer: editeur,
+			title: 'Choisir un format ci-dessous et\n' +
+				'cliquer sur la flèche pour obtenir\n' +
+				'un fichier contenant\n' +
+				'les éléments en édition dans la fenêtre.',
+		}),
+	],
 
 	map = new ol.Map({
 		target: 'carte-nav',
