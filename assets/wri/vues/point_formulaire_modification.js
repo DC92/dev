@@ -14,7 +14,9 @@ const refugesInfo = layerRefugesInfo({
 	marker = layerMarker({
 		imageUrl: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.png',
 		idDisplay: 'viseur',
-		centerOnMap: true,
+<?php if (!$point->id_point) { ?> // Pour une création de point
+		centerOnMap: true, // on utilise la position du permalink et on centre le curseur dessus
+<?php } ?>
 		draggable: true,
 	}),
 
@@ -24,7 +26,9 @@ const refugesInfo = layerRefugesInfo({
 		}),
 		controlPermalink({ // Permet de garder le même réglage de carte d'une page à l'autre
 			visible: false, // Mais on ne visualise pas le lien du permalink
-			init: '<?=$point->id_point?>' == '', // Ici, on utilisera plutôt la position du point si on est en modification
+<?php if ($point->id_point) { ?>
+			init: false, // Ici, on utilisera plutôt la position du point si on est en modification
+<?php } ?>
 		}),
 		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),
@@ -41,11 +45,12 @@ const refugesInfo = layerRefugesInfo({
 
 	map = new ol.Map({
 		target: 'carte-edit',
-		//TODO ne faire que si modif de point
-		wview: new ol.View({ // Position initiale forcée aux coordonnées de la cabane
+<?php if ($point->id_point) { ?>
+		view: new ol.View({ // Position initiale forcée aux coordonnées de la cabane
 			center: ol.proj.fromLonLat([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 			zoom: 13,
 		}),
+<?php } ?>
 		controls: controls,
 		layers: [refugesInfo, marker],
 	});

@@ -227,3 +227,7 @@
 .ol-switch-layer input {
 	margin: 0;
 }
+.ol-switch-layer p {
+	margin: 0;
+	font-size: small;
+}

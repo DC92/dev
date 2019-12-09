@@ -52,14 +52,13 @@ function JSONparse(json) {
 }
 
 /**
- * Hack to add map_ to each layer
+ * Hack warn layers when added to the map
  */
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
 
 	const map = this;
 	map.getLayers().forEach(function(layer) {
-		//TODO erradiquer map_
 		if (!layer.map_) {
 			layer.map_ = map;
 
@@ -186,7 +185,7 @@ function layerSpain(serveur, layer) {
  * Layers with not all resolutions or area available
  * Virtual class
  * Displays Stamen outside the layer zoom range or extend
- * Requires HACK layer.map_
+ * Requires myol:onadd
  */
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
@@ -524,7 +523,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 
 /**
  * GeoJson POI layer
- * Requires JSONparse, HACK layer.map_, escapedStyle, hoverManager,
+ * Requires JSONparse, myol:onadd, escapedStyle, hoverManager,
  * permanentCheckboxList, controlPermanentCheckbox, ol.loadingstrategy.bboxLimit
  */
 function layerVectorURL(options) {
@@ -763,12 +762,11 @@ function layerChemineur(options) {
  * alpages.info POI layer
  * Requires ol.loadingstrategy.bboxLimit, layerVectorURL, getSym, layerChemineur
  */
-//BEST chem4 generic layer
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=500&forums=4,5,6',
 		receiveProperties: function(properties) {
-			const icone = properties.icone.match(new RegExp('([a-z\-_]+)\.png'));
+			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
 			properties.sym = getSym(properties.icone);
 			properties.type = icone ? icone[1] : null;
 			properties.link = 'http://alpages.info/viewtopic.php?t=' + properties.id;
@@ -776,9 +774,8 @@ function layerAlpages(options) {
 		},
 		styleOptions: function(properties) {
 			return {
-				// POI
 				image: new ol.style.Icon({
-					src: properties.icone,
+					src: properties.icon,
 				}),
 			};
 		},
@@ -1020,23 +1017,26 @@ function controlLayersSwitcher(options) {
 	// Layer selector
 	const selectorEl = document.createElement('div');
 	selectorEl.style.overflow = 'auto';
-	selectorEl.title = 'Ctrl+click : multicouches';
+	selectorEl.title = 'Ctrl+click: multicouches';
 	button.element.appendChild(selectorEl);
 
-//TODO utiliser l'option render
+	//BEST utiliser l'option render
 	button.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Base layers selector init
 		for (let name in options.baseLayers)
 			if (options.baseLayers[name]) { // array of layers, mandatory, no default
-				const baseEl = document.createElement('div');
-				baseEl.innerHTML =
+				const choiceEl = document.createElement('div');
+				choiceEl.innerHTML =
 					'<input type="checkbox" name="baselayer" value="' + name + '">' +
 					'<span title="">' + name + '</span>';
-				selectorEl.appendChild(baseEl);
+				selectorEl.appendChild(choiceEl);
 				map.addLayer(options.baseLayers[name]);
 			}
+		const commentEl = document.createElement('p');
+		commentEl.innerHTML = 'Ctrl+click: multicouches';
+		selectorEl.appendChild(commentEl);
 
 		// Make the selector memorized by cookies
 		controlPermanentCheckbox('baselayer', displayLayerSelector);
@@ -1098,7 +1098,6 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
-//BEST save curent layer
 function controlPermalink(options) {
 	options = Object.assign({
 		hash: '?', // {?, #} the permalink delimiter
@@ -1131,7 +1130,6 @@ function controlPermalink(options) {
 		const view = evt.map.getView();
 
 		// Set center & zoom at the init
-		//TODO option llInit pour point_formulaire_modification.js
 		if (options.init &&
 			params) { // Only once
 			view.setZoom(params[1]);
@@ -1508,11 +1506,14 @@ function controlLoadGPX(options) {
 function controlDownload(options) {
 	options = Object.assign({
 		label: '\u25bc',
-		title: 'Obtenir un fichier GPX contenant\nles éléments visibles dans la fenêtre.',
+		title: 'Choisir un format ce-dessous et\n' +
+			'cliquer sur la flèche pour obtenir\n' +
+			'un fichier contenant\n' +
+			'les éléments visibles dans la fenêtre.',
 		question: '<input type="radio" name="format-download" id="GPX" value"application/gpx+xml" checked="checked" />GPX<br>' +
 			'<input type="radio" name="format-download" id="KML" value"vnd.google-earth.kml+xml”" />KML<br>' +
-			'<input type="radio" name="format-download" id="WKT" value"text/plain" />WKT<br>' +
-			'<input type="radio" name="format-download" id="GeoJSON" value"application/vnd.geo+json" />GeoJSON',
+			'<input type="radio" name="format-download" id="GeoJSON" value"application/json" />GeoJSON<br>' +
+			'<input type="radio" name="format-download" id="WKT" value"text/plain" />WKT',
 		fileName: document.title || 'openlayers',
 		activate: activate,
 	}, options);
@@ -1631,7 +1632,7 @@ function controlPrint() {
 
 /**
  * Marker
- * Requires JSONparse, HACK layer.map_, hoverManager, proj4.js for swiss coordinates
+ * Requires JSONparse, myol:onadd, hoverManager, proj4.js for swiss coordinates
  * Read / write following fields :
  * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
  * marker-lon / marker-lat
@@ -1816,7 +1817,7 @@ function layerMarker(options) {
 
 /**
  * Line & Polygons Editor
- * Requires JSONparse, HACK layer.map_, escapedStyle, controlButton
+ * Requires JSONparse, myol:onadd, escapedStyle, controlButton
  */
 function layerEdit(options) {
 	options = Object.assign({
