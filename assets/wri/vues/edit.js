@@ -49,6 +49,12 @@ const layerMassifs = layerVectorURL({
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
+		controlPermalink({ // Permet de garder le même réglage de carte en création
+			visible: false, // Mais on ne visualise pas le lien du permalink
+<?php if ($vue->polygone->id_polygone) { ?>
+			init: false, // Ici, on utilisera plutôt la position du massif si on est en modification
+<?php } ?>
+		}),
 		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
@@ -64,7 +70,7 @@ const layerMassifs = layerVectorURL({
 			title: 'Choisir un format ci-dessous et\n' +
 				'cliquer sur la flèche pour obtenir\n' +
 				'un fichier contenant\n' +
-				'les éléments en édition dans la fenêtre.',
+				'les éléments en édition.',
 		}),
 	],
 

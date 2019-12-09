@@ -24,7 +24,7 @@ const refugesInfo = layerRefugesInfo({
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
-		controlPermalink({ // Permet de garder le même réglage de carte d'une page à l'autre
+		controlPermalink({ // Permet de garder le même réglage de carte en création
 			visible: false, // Mais on ne visualise pas le lien du permalink
 <?php if ($point->id_point) { ?>
 			init: false, // Ici, on utilisera plutôt la position du point si on est en modification

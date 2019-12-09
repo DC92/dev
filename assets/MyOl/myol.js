@@ -344,6 +344,24 @@ function escapedStyle(a, b, c) {
  * evt (keyboard event)
  * return : [checked values or ids]
  */
+function controlPermanentCheckbox(selectorName, callback) {
+	const checkEls = document.getElementsByName(selectorName),
+		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
+		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
+
+	for (let e = 0; e < checkEls.length; e++) {
+		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
+		if (cookie) // Set the checks accordingly with the cookie
+			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
+	}
+
+	function permanentCheckboxClick(evt) {
+		if (typeof callback == 'function')
+			callback(evt, permanentCheckboxList(selectorName, evt));
+	}
+	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
+}
+
 function permanentCheckboxList(selectorName, evt) {
 	const checkEls = document.getElementsByName(selectorName);
 	let allChecks = [];
@@ -364,24 +382,6 @@ function permanentCheckboxList(selectorName, evt) {
 	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
 	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
 	return allChecks; // Returns list of checked values or ids
-}
-
-function controlPermanentCheckbox(selectorName, callback) {
-	const checkEls = document.getElementsByName(selectorName),
-		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
-		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
-
-	for (let e = 0; e < checkEls.length; e++) {
-		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-		if (cookie) // Set the checks accordingly with the cookie
-			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
-	}
-
-	function permanentCheckboxClick(evt) {
-		if (typeof callback == 'function')
-			callback(evt, permanentCheckboxList(selectorName, evt));
-	}
-	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
 }
 
 /**
@@ -445,7 +445,6 @@ function hoverManager(map) {
 				} else
 					window.location = link;
 			}
-
 		}
 	});
 
@@ -496,7 +495,7 @@ function hoverManager(map) {
 				pixel[1] -= element.clientHeight + 8;
 			}
 			popup.setPosition(map.getCoordinateFromPixel(
-				element.innerHTML ? pixel : [-100, -100], // Avoid tinny label when nothing to show
+				element.innerHTML ? pixel : [-100, -100] // Avoid tinny label when nothing to show
 			));
 		}
 	}
@@ -1000,7 +999,7 @@ function controlButton(options) {
 /**
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
- * Requires permanentCheckboxList, controlPermanentCheckbox, controlButton
+ * Requires controlPermanentCheckbox, permanentCheckboxList, controlButton
  */
 function controlLayersSwitcher(options) {
 	const button = controlButton({
@@ -1022,7 +1021,7 @@ function controlLayersSwitcher(options) {
 	selectorEl.title = 'Ctrl+click: multicouches';
 	button.element.appendChild(selectorEl);
 
-	//BEST utiliser l'option render
+	//BEST use option render
 	button.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
@@ -1545,22 +1544,30 @@ function controlDownload(options) {
 				});
 		}
 
-		// Write in GPX format
 		const formatInfo = document.querySelector('input[name="format-download"]:checked'),
-			format = new ol.format[formatInfo.id](),
-			data = format.writeFeatures(features, {
+			format = new ol.format[formatInfo.id]();
+
+		// Transform polygons in lines if format is GPX
+		if (formatInfo.id == 'GPX') {
+			const coords = optimiseFeatures(features, true, true);
+			for (let l in coords.polys)
+				features.push(new ol.Feature({
+					geometry: new ol.geom.LineString(coords.polys[l]),
+				}));
+		}
+
+		const data = format.writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
 			})
-			//TODO BUG don't save polygons !
 			// Beautify the output
-			.replace(/<[a-z]*>[0|null|[\[object Object\]]<\/[a-z]*>/g, '')
+			.replace(/<[a-z]*>(0|null|[\[object Object\]|[NTZa:-]*)<\/[a-z]*>/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
 			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')
 			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData)/g, '\n\t$1')
-			.replace(/(<trkpt|<Data|<\/?LineString|<\/?Polygon|<\/?Style)/g, '\n\t\t$1')
-			.replace(/(<\/?innerBoundaryIs)/g, '\n\t\t\t$1'),
+			.replace(/(<trkpt|<Data|<LineString|<\/?Polygon|<Style)/g, '\n\t\t$1')
+			.replace(/(<[a-z]+BoundaryIs)/g, '\n\t\t\t$1'),
 
 			file = new Blob([data], {
 				type: formatInfo.value,
@@ -1742,7 +1749,7 @@ function layerMarker(options) {
 			if (elCenterMarker)
 				elCenterMap.onclick = layer.centerMap;
 			else map.addControl(controlButton({
-				label: '\u26DE',
+				label: '\u2A00',
 				title: 'Centrer la carte sur le curseur',
 				activate: layer.centerMap,
 			}));
@@ -1960,6 +1967,8 @@ function layerEdit(options) {
 		map.on('pointermove', hover);
 	});
 
+	//BEST delete feature when Ctrl+Alt click on a summit
+	//BEST move only one summit when dragging
 	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// Ctrl + Alt click on segment : delete feature
@@ -1976,7 +1985,6 @@ function layerEdit(options) {
 			// Alt click on segment : delete the segment & split the line
 			else if (evt.target.vertexFeature_)
 				return optimiseEdited(evt.target.vertexFeature_.getGeometry().getCoordinates());
-			//BEST delete feature when Ctrl+Alt click on a summit
 		}
 		optimiseEdited();
 		hoveredFeature = null; // Recover hovering
@@ -2049,137 +2057,154 @@ function layerEdit(options) {
 		}
 	}
 
-	function compareCoords(a, b) {
-		if (!a)
-			return false;
-		if (!b)
-			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
-		return a[0] == b[0] && a[1] == b[1]; // 2 coords
-	}
-
-	// Get all lines fragments at the same level & split if one point = pointerPosition
-	function flatCoord(existingCoords, newCoords, pointerPosition) {
-		if (typeof newCoords[0][0] == 'object') // Multi*
-			for (let c1 in newCoords)
-				flatCoord(existingCoords, newCoords[c1], pointerPosition);
-		else {
-			existingCoords.push([]); // Increment existingCoords array
-			for (let c2 in newCoords) {
-				if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
-					existingCoords.push([]); // Forget that one & increment existingCoords array
-				} else
-					// Stack on the last existingCoords array
-					existingCoords[existingCoords.length - 1].push(newCoords[c2]);
-			}
-		}
-	}
-
-	// Refurbish Points, Lines & Polygons
 	function optimiseEdited(pointerPosition) {
-		// Get all edited features as array of coordinates
-		// Split lines having a summit at pointerPosition
-		//BEST manage points
+		const coords = optimiseFeatures(
+			source.getFeatures(),
+			options.titleLine,
+			options.titlePolygon,
+			true,
+			true,
+			pointerPosition
+		);
 
-		let features = source.getFeatures(),
-			lines = [],
-			polys = [];
-		for (let f in features)
-			if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
-				const geometries = features[f].getGeometry().getGeometries();
-				for (let g in geometries)
-					flatCoord(lines, geometries[g].getCoordinates(), pointerPosition);
-			} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
-			flatCoord(lines, features[f].getGeometry().getCoordinates(), pointerPosition); // Get lines or polyons as flat array of coords
-
-		for (let a in lines)
-			// Exclude 1 coordinate features (points)
-			if (lines[a].length < 2)
-				lines[a] = null; //BEST use reverse for & split
-
-			// Merge lines having a common end
-			else
-				for (let b = 0; b < a; b++) // Once each combination 
-					if (lines[b]) {
-						const m = [a, b];
-						for (let i = 4; i; i--) // 4 times
-							if (lines[m[0]] && lines[m[1]]) {
-								// Shake lines end to explore all possibilities
-								m.reverse();
-								lines[m[0]].reverse();
-								if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
-									// Merge 2 lines having 2 ends in common
-									lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
-									lines[m[1]] = null;
-								}
-							}
-					}
-
-		for (let a in lines)
-			if (options.titlePolygon && // Only if polygons are autorized
-				lines[a]) {
-				// Close open lines
-				if (!options.titleLine) // If only polygons are autorized
-					if (!compareCoords(lines[a]))
-						lines[a].push(lines[a][0]);
-
-				if (compareCoords(lines[a])) { // If this line is closed
-					// Split squeezed polygons
-					for (let i1 = 0; i1 < lines[a].length - 1; i1++) // Explore all summits combinaison
-						for (let i2 = 0; i2 < i1; i2++)
-							if (lines[a][i1][0] == lines[a][i2][0] &&
-								lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
-								let squized = lines[a].splice(i2, i1 - i2); // Extract the squized part
-								squized.push(squized[0]); // Close the poly
-								polys.push([squized]); // Add the squized poly
-								i1 = i2 = lines[a].length; // End loop
-							}
-
-					// Convert closed lines into polygons
-					polys.push([lines[a]]); // Add the poly
-					lines[a] = null; // Forget the line
-				}
-			}
-
-		// Makes holes if a polygon is included in a biggest one
-		for (let p1 in polys) // Explore all polys combinaison
-			if (polys[p1]) {
-				const fs = new ol.geom.Polygon(polys[p1]);
-				for (let p2 in polys)
-					if (polys[p2] && p1 != p2) {
-						let intersects = true;
-						for (let c in polys[p2][0])
-							if (!fs.intersectsCoordinate(polys[p2][0][c]))
-								intersects = false;
-						if (intersects) { // If one intersects a bigger
-							polys[p1].push(polys[p2][0]); // Include the smaler in the bigger
-							polys[p2] = null; // Forget the smaller
-						}
-					}
-			}
-		// Purge arrays from null values
-		lines = lines.filter(Boolean);
-		polys = polys.filter(Boolean);
-
-		// Recreate & save modified features
+		// Recreate features
 		source.clear();
-		for (let l in lines)
+		for (let l in coords.lines)
 			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.LineString(lines[l]),
+				geometry: new ol.geom.LineString(coords.lines[l]),
 			}));
-		for (let p in polys)
+		for (let p in coords.polys)
 			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(polys[p]),
+				geometry: new ol.geom.Polygon(coords.polys[p]),
 			}));
 
 		// Save lines in <EL> as geoJSON at every change
 		if (geoJsonEl)
 			geoJsonEl.value = options.saveFeatures({
-				lines: lines,
-				polys: polys,
+				lines: coords.lines,
+				polys: coords.polys,
 			}, options.format);
 	}
 
 	return layer;
+}
+
+
+/**
+ * Refurbish Points, Lines & Polygons
+ * Split lines having a summit at removePosition
+ */
+function optimiseFeatures(features, withLines, withPolygons, merge, holes, removePosition) {
+	let lines = [],
+		polys = [];
+
+	// Get all edited features as array of coordinates
+	for (let f in features)
+		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
+			const geometries = features[f].getGeometry().getGeometries();
+			for (let g in geometries)
+				flatCoord(lines, geometries[g].getCoordinates(), removePosition);
+		} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
+		flatCoord(lines, features[f].getGeometry().getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
+
+	for (let a in lines)
+		// Exclude 1 coordinate features (points)
+		//BEST manage points
+		if (lines[a].length < 2)
+			lines[a] = null;
+
+		// Merge lines having a common end
+		else if (merge)
+		for (let b = 0; b < a; b++) // Once each combination 
+			if (lines[b]) {
+				const m = [a, b];
+				for (let i = 4; i; i--) // 4 times
+					if (lines[m[0]] && lines[m[1]]) {
+						// Shake lines end to explore all possibilities
+						m.reverse();
+						lines[m[0]].reverse();
+						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
+							// Merge 2 lines having 2 ends in common
+							lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
+							lines[m[1]] = null;
+						}
+					}
+			}
+
+	// Make polygons with in loop lines
+	for (let a in lines)
+		if (withPolygons && // Only if polygons are autorized
+			lines[a]) {
+			// Close open lines
+			if (!withLines) // If only polygons are autorized
+				if (!compareCoords(lines[a]))
+					lines[a].push(lines[a][0]);
+
+			if (compareCoords(lines[a])) { // If this line is closed
+				// Split squeezed polygons
+				for (let i1 = 0; i1 < lines[a].length - 1; i1++) // Explore all summits combinaison
+					for (let i2 = 0; i2 < i1; i2++)
+						if (lines[a][i1][0] == lines[a][i2][0] &&
+							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
+							let squized = lines[a].splice(i2, i1 - i2); // Extract the squized part
+							squized.push(squized[0]); // Close the poly
+							polys.push([squized]); // Add the squized poly
+							i1 = i2 = lines[a].length; // End loop
+						}
+
+				// Convert closed lines into polygons
+				polys.push([lines[a]]); // Add the poly
+				lines[a] = null; // Forget the line
+			}
+		}
+
+	// Makes holes if a polygon is included in a biggest one
+	for (let p1 in polys) // Explore all polys combinaison
+		if (holes &&
+			polys[p1]) {
+			const fs = new ol.geom.Polygon(polys[p1]);
+			for (let p2 in polys)
+				if (polys[p2] && p1 != p2) {
+					let intersects = true;
+					for (let c in polys[p2][0])
+						if (!fs.intersectsCoordinate(polys[p2][0][c]))
+							intersects = false;
+					if (intersects) { // If one intersects a bigger
+						polys[p1].push(polys[p2][0]); // Include the smaler in the bigger
+						polys[p2] = null; // Forget the smaller
+					}
+				}
+		}
+	// Purge arrays from null values
+	//BEST use reverse for & split
+	return {
+		lines: lines.filter(Boolean),
+		polys: polys.filter(Boolean),
+	};
+}
+
+function compareCoords(a, b) {
+	if (!a)
+		return false;
+	if (!b)
+		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
+	return a[0] == b[0] && a[1] == b[1]; // 2 coords
+}
+// Get all lines fragments at the same level & split if one point = pointerPosition
+function flatCoord(existingCoords, newCoords, pointerPosition) {
+	if (typeof newCoords[0][0] == 'object') // Multi*
+		for (let c1 in newCoords)
+			flatCoord(existingCoords, newCoords[c1], pointerPosition);
+	else {
+		existingCoords.push([]); // Increment existingCoords array
+		for (let c2 in newCoords) {
+			if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
+				existingCoords.push([]); // Forget that one & increment existingCoords array
+			} else
+				// Stack on the last existingCoords array
+				existingCoords[existingCoords.length - 1].push(newCoords[c2]);
+		}
+	}
 }
 
 
