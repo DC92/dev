@@ -691,6 +691,10 @@ function layerRefugesInfo(options) {
 			properties.icone = properties.type.icone; // Mem icon value when overwriting type
 			properties.type = properties.type.valeur;
 			properties.copy = 'refuges.info';
+			// Need to have clean KML export
+			properties.nom =
+				properties.lien =
+				properties.date = '';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -1563,6 +1567,8 @@ function controlDownload(options) {
 			})
 			// Beautify the output
 			.replace(/<[a-z]*>(0|null|[\[object Object\]|[NTZa:-]*)<\/[a-z]*>/g, '')
+			.replace(/<Data name="[a-z_]*"\/>|,"[a-z_]*":""/g, '')
+			.replace(/<Data name="copy"><value>[a-z_\.]*<\/value><\/Data>|,"copy":"[a-z_\.]*"/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
 			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')
 			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData)/g, '\n\t$1')
