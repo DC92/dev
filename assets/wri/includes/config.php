@@ -43,6 +43,7 @@ $config_wri['base_wiki']=$config_wri['sous_dossier_installation']."wiki/";
 // On centralise ici tous les paramètres PhpBB qui sont figés
 // Des fois qu'on décide de re-bouger le forum, on ne le changera qu'ici
 $config_wri['lien_forum']=$config_wri['sous_dossier_installation']."forum/";
+
 // On paramètre le numéro du forum qui contient les topics de discussion sur les fiches des points
 $config_wri['forum_refuges']=4;
 
@@ -103,11 +104,11 @@ $config_wri['id_coordonees_gps_approximative']=4;
 
 /********** choix de maximums pour rechercher et cartes ************/
 
-//nombre maximum de point que peut sortir la recherche
+// nombre maximum de points que peut sortir la recherche
 $config_wri['points_maximum_recherche']=40;
 
-// nombre de point renvoyé par défaut, par l'API (/exportations/)
-$config_wri['defaut_max_nombre_point']=121; // NicoM : pourquoi 120 ? sly: pourquoi pas 120 ? NicoM : ben 121 c'est 11^2 sly: alors va pour 121 !
+// nombre de points renvoyés par défaut, par l'API
+$config_wri['defaut_max_nombre_point']=250;
 
 
 /********** Lié au Forum / comptes / utilisateurs / login / users ************/
@@ -146,7 +147,25 @@ $config_wri['carte_base_monde'] = 'OSM fr';
 // Pour avoir swisstopo je suppose ?
 $config_wri['SwissTopo'] = true;
 
+// tableau contenant les formats possibles pour exporter des points par l'API et une descripion courte (sly: j'hésite à y mettre un paté d'explication, mais ça fait un lourd à maintenir)
+// La vue qui doit être choisie est /vues/api/points.vue.$format. L'ordre pourra déterminer l'ordre proposé à l'internaute
 
+$config_wri['api_format_points'] = Array 
+( 
+'gpx' => "gpx (Complet, pour logiciel type osmand, marble)",
+'gpx_basecamp' => "gpx (compatible basecamp/garmin/viking/...)",
+'gpx_simple' => "gpx simplifié (sans remarques et accès)",
+'kmz' => "kmz (googlearth compressé)",
+'kml' => "kml (googlearth)",
+'gml' => "Geography Markup Language",
+'gpi' => "gpi (Garmin Point of Interest)",
+'csv' => "csv (tableurs)",
+'geojson' => "GeoJSON"
+);
+
+    
+  
+  
 /* tableau indiquant quel fond de carte on préfère selon le polygon dans lequel on se trouve
  * utilisé pour les vignettes des pages points et le lien d'accès en dessous + lorsque l'on modifie un point
  * le premier champs est le nom du polygone tel qu'il est dans la base openstreetmap
@@ -203,6 +222,10 @@ require($config_wri['racine_projet']."config_privee.php");
 
 // *** NON NON : *** N'ajoutez rien après ce require_once("config_privee.php"); sauf si vous savez pourquoi, car ajouter après empêche de "surdéfinir" certaines variables du fichier privé à chaque instance ci avant
 // mettez par contre tout ce que vous voulez avant le require_once("config_privee.php");
+
+// Ceci est après l'inclusion de config_privee.php pour que l'on puisse tenir compte du mode debug que le developpeur peut s'il le souhaite activer
+$config_wri['chemin_leaflet'].=$config_wri['debug']?'src/':'dist/';
+$config_wri['url_chemin_leaflet'].=$config_wri['debug']?'src/':'dist/';
 
 if ($config_wri['debug'])
 {

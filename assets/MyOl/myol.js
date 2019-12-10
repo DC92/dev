@@ -681,6 +681,7 @@ function getSym(type) {
  */
 function layerRefugesInfo(options) {
 	options = Object.assign({
+		selectorName: 'wri-features',
 		baseUrl: '//www.refuges.info/',
 		urlSuffix: 'api/bbox?nb_points=500&type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -713,6 +714,7 @@ function layerRefugesInfo(options) {
  */
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
+		selectorName: 'prc-features',
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		receiveProperties: function(properties) {
 			properties.sym = getSym(properties.type_hebergement);
@@ -730,6 +732,7 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
+		selectorName: 'chm-features',
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&limite=500&poi=',
 		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64', //TODO WRI 3,8,16,20,23
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -769,6 +772,7 @@ function layerChemineur(options) {
  */
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
+		selectorName: 'alp-features',
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=500&forums=4,5,6',
 		receiveProperties: function(properties) {
 			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
@@ -793,6 +797,7 @@ function layerAlpages(options) {
  */
 function layerC2C(options) {
 	return layerVectorURL(Object.assign({
+		selectorName: 'c2c-features',
 		baseUrl: 'https://api.camptocamp.org/waypoints?limit=500', // https mandatory for Access-Control-Allow-Origin
 		strategy: ol.loadingstrategy.bboxLimit,
 		projection: 'EPSG:3857',
@@ -832,9 +837,9 @@ function layerC2C(options) {
 //BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 function layerOverpass(options) {
 	options = Object.assign({
+		selectorName: 'osm-features',
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
-		selectorName: 'overpass', // Checkboxes
 	}, options);
 	const checkEls = document.getElementsByName(options.selectorName),
 		format = new ol.format.OSMXML();
@@ -1511,26 +1516,42 @@ function controlLoadGPX(options) {
 function controlDownload(options) {
 	options = Object.assign({
 		label: '\u25bc',
-		title: 'Choisir un format ci-dessous et\n' +
-			'cliquer sur la flèche pour obtenir\n' +
-			'un fichier contenant\n' +
+		buttonBackgroundColors: ['white'],
+		className: 'myol-button ol-download',
+		title: 'Cliquer sur un format ci-dessous\n' +
+			'pour obtenir un fichier contenant\n' +
 			'les éléments visibles dans la fenêtre.',
-		question: '<input type="radio" name="format-download" id="GPX" value"application/gpx+xml" checked="checked" />GPX<br>' +
-			'<input type="radio" name="format-download" id="KML" value"vnd.google-earth.kml+xml”" />KML<br>' +
-			'<input type="radio" name="format-download" id="GeoJSON" value"application/json" />GeoJSON<br>' +
-			'<input type="radio" name="format-download" id="WKT" value"text/plain" />WKT',
+		question: '<span/>', // Invisible but generates a questionEl <div>
 		fileName: document.title || 'openlayers',
-		activate: activate,
 	}, options);
+
 	const hiddenEl = document.createElement('a'),
 		button = controlButton(options);
 	hiddenEl.target = '_self';
 	hiddenEl.style = 'display:none';
 	document.body.appendChild(hiddenEl);
 
-	function activate() { // Callback at activation / desactivation, mandatory, no default
+	const formats = {
+		GPX: 'application/gpx+xml',
+		KML: 'vnd.google-earth.kml+xml',
+		GeoJSON: 'application/json',
+		WKT: 'text/plain',
+	};
+	for (let f in formats) {
+		const el = document.createElement('p');
+		el.onclick = download;
+		el.innerHTML = f;
+		el.id = formats[f];
+		el.title = 'Obtenir un fichier ' + f;
+		button.questionEl.appendChild(el);
+	}
+
+	function download() { //formatName, mime
+		const formatName = this.textContent,
+			mime = this.id,
+			format = new ol.format[formatName](),
+			map = button.getMap();
 		let features = [],
-			map = button.getMap(),
 			extent = map.getView().calculateExtent();
 
 		// Get all visible features
@@ -1548,11 +1569,8 @@ function controlDownload(options) {
 				});
 		}
 
-		const formatInfo = document.querySelector('input[name="format-download"]:checked'),
-			format = new ol.format[formatInfo.id]();
-
 		// Transform polygons in lines if format is GPX
-		if (formatInfo.id == 'GPX') {
+		if (formatName == 'GPX') {
 			const coords = optimiseFeatures(features, true, true);
 			for (let l in coords.polys)
 				features.push(new ol.Feature({
@@ -1567,7 +1585,7 @@ function controlDownload(options) {
 			})
 			// Beautify the output
 			.replace(/<[a-z]*>(0|null|[\[object Object\]|[NTZa:-]*)<\/[a-z]*>/g, '')
-			.replace(/<Data name="[a-z_]*"\/>|,"[a-z_]*":""/g, '')
+			.replace(/<Data name="[a-z_]*"><\/Data>|,"[a-z_]*":""/g, '')
 			.replace(/<Data name="copy"><value>[a-z_\.]*<\/value><\/Data>|,"copy":"[a-z_\.]*"/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
 			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')
@@ -1576,13 +1594,13 @@ function controlDownload(options) {
 			.replace(/(<[a-z]+BoundaryIs)/g, '\n\t\t\t$1'),
 
 			file = new Blob([data], {
-				type: formatInfo.value,
+				type: mime,
 			});
 
 		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
-			navigator.msSaveBlob(file, options.fileName + '.' + formatInfo.id.toLowerCase());
+			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
 		else {
-			hiddenEl.download = options.fileName + '.' + formatInfo.id.toLowerCase();
+			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
 			hiddenEl.href = URL.createObjectURL(file);
 			hiddenEl.click();
 		}
@@ -1597,7 +1615,10 @@ function controlDownload(options) {
 function controlPrint() {
 	const button = controlButton({
 		className: 'myol-button ol-print',
-		title: 'Imprimer la carte',
+		title: 'Pour imprimer la carte:\n' +
+			'choisir l‘orientation,\n' +
+			'zoomer et déplacer,\n' +
+			'cliquer sur l‘icône imprimante.',
 		question: '<input type="radio" name="print-orientation" value="0" />Portrait A4<br>' +
 			'<input type="radio" name="print-orientation" value="1" />Paysage A4',
 		activate: function() {

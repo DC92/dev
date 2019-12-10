@@ -71,21 +71,23 @@ const massifs = layerVectorURL({
 
 	overlays = [
 		layerRefugesInfo({
-			selectorName: 'wri-poi',
+			selectorName: 'wri-features',
 		}),
 		layerPyreneesRefuges({
-			selectorName: 'prc',
+			selectorName: 'prc-features',
 		}),
 		layerC2C({
-			selectorName: 'c2c',
+			selectorName: 'c2c-features',
 		}),
 		layerChemineur({
-			selectorName: 'chemineur',
+			selectorName: 'chm-features',
 		}),
 		layerAlpages({
-			selectorName: 'alpages',
+			selectorName: 'alp-features',
 		}),
-		layerOverpass(),
+		layerOverpass({
+			selectorName: 'osm-features',
+		}),
 		massifs,
 		layerMarker({
 			imageUrl: 'cadre.png',

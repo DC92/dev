@@ -6,7 +6,7 @@ const controls = [
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
 		}),
-		//controlPermalink(options.controlPermalink),
+		controlPermalink(),
 		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
@@ -22,20 +22,6 @@ const controls = [
 		controlPrint(),
 	],
 
-	layerMassifs = layerVectorURL({
-		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
-		styleOptions: function(properties) {
-			return {
-				fill: new ol.style.Fill({
-					color: 'rgba(0,0,0,0)',
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'black',
-				})
-			};
-		},
-	}),
-
 	map = new ol.Map({
 		target: 'carte-nav',
 		view: new ol.View({
@@ -44,6 +30,13 @@ const controls = [
 		}),
 		controls: controls,
 		layers: [
-			layerMassifs,
+			layerRefugesInfo({
+				baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
+			}),
+			layerOverpass(),
+			layerPyreneesRefuges(),
+			layerC2C(),
+			layerChemineur(),
+			layerAlpages(),
 		],
 	});

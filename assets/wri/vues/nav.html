@@ -2,12 +2,6 @@
 /*
 Bloc HTML réalisant l'affichage de la page des cartes
 
-Ce fichier est l'unique endroit ou peuvent se trouver des balises HTML
-Un couple <ouverture de balise> </fermeture de balise> doit se trouver dans le même fichier et avec la même indentation
-Ce fichier ne contient que des balises HTML et des balises de contrôle PHP
-$vue contient les données passées par le fichier PHP
-$config_wri les données communes à tout WRI
-
 Concept de Zone et Massifs :
 Massif (1): classique : un poly qui entoure tous les points, possibilité de jouer avec le panel de gauche
 Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cliquer pour aller sur un massif. comme l'ancienne page massifs.
@@ -41,30 +35,16 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 			</label>
 		</fieldset>
 		<fieldset>
-			<legend>
-				Points
-				<span id="ajax-poi-status">
-					<span class="ajax-nav-wait">(chargement...)</span>
-					<span class="ajax-nav-some">(chargé)</span>
-					<span class="ajax-nav-zero" title="Zoomer sur une plus large échelle, déplacer la carte ou sélectionner d'autres types pour voir plus de points.">(zone vide)</span>
-					<span class="ajax-nav-too" title="Zoomer sur une plus petite échelle, déplacer la carte ou sélectionner d'autres types pour voir plus de points.">(trop de points)</span>
-					<span class="ajax-nav-error" title="Le navigateur a rencontré une erreur de réseau ou de programme.">(erreur)</span>
-				</span>
-			</legend>
+			<legend>Points <input type="checkbox" name="wri-features" checked="checked" /></legend>
 			<ul>
-				<? $ktp = explode (',', $_COOKIE['type_points']); // lecture cookie type_points
-				foreach ($vue->types_point_affichables AS $type_affichable) {?>
+				<? foreach ($vue->types_point_affichables AS $type_affichable) {?>
 					<li>
 						<label>
 							<input
 								type="checkbox"
-								name="point_type[]"
-								onclick="maj_poi()"
+								name="wri-features"
 								value="<?=$type_affichable->id_point_type?>"
-								<?if (!isset ($_COOKIE['type_points']) ||
-									in_array ($type_affichable->id_point_type, $ktp)) {?>
-									checked="checked"
-								<?}?>
+								checked="checked"
 							/>
 							<span>
 								<img
@@ -77,76 +57,34 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 						</label>
 					</li>
 				<?}?>
-				<li>
-					<span id="check-types">
-						Tout
-						<input type="checkbox" name="check-types-input" onclick="maj_poi(true)" />
-					</span>
-				</li>
 				<li><a href="<?=$vue->lien_legende_carte?>">Légende</a></li>
 			</ul>
 		</fieldset>
 		<fieldset class="nav-services">
 			<legend>
-				Services <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">&copy;</a>
-				<span id="ajax-osm-status">
-					<span class="ajax-nav-zoom" title="Zoomer sur une plus petite échelle pour voir les points.">(zone trop large)</span>
-					<span class="ajax-nav-wait">(chargement...)</span>
-					<span class="ajax-nav-some">(chargé)</span>
-					<span class="ajax-nav-zero" title="Zoomer sur une plus large échelle, déplacer la carte ou sélectionner d'autres types pour voir plus de points.">(zone vide)</span>
-					<span class="ajax-nav-too" title="Zoomer sur une plus petite échelle, déplacer la carte ou sélectionner d'autres types pour voir plus de points.">(trop de points)</span>
-					<span class="ajax-nav-error" title="Le navigateur a rencontré une erreur de réseau ou de programme.">(erreur)</span>
-				</span>
+				Services <input type="checkbox" name="osm-features" /> <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">&copy;</a>
 			</legend>
 			<ul>
-				<li><label>
-                                        <input type="checkbox" name="osm-categories[]" id="hotel" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' onclick="poiOVER.reload()" />
-					<img src="<?=$config_wri['url_chemin_icones']?>hotel.png" alt="icone de hotel" />
-					Hôtels et locations
-				</label></li>
-				<li><label>
-					<input type="checkbox" name="osm-categories[]" id="camping" value='["tourism"~"camp_site"]' onclick="poiOVER.reload()" />
-					<img src="<?=$config_wri['url_chemin_icones']?>camping.png" alt="icone de camping" />
-					Campings
-				</label></li>
-				<li><label>
-					<input type="checkbox" name="osm-categories[]" id="ravitaillement" value='["shop"~"supermarket|convenience"]' onclick="poiOVER.reload()" />
-					<img src="<?=$config_wri['url_chemin_icones']?>ravitaillement.png" alt="icone de ravitaillement" />
-					Alimentation
-				</label></li>
-				<li><label>
-					<input type="checkbox" name="osm-categories[]" id="parking" value='["amenity"="parking"]["access"!="private"]' onclick="poiOVER.reload()" />
-					<img src="<?=$config_wri['url_chemin_icones']?>parking.png" alt="icone de parking" />
-					Parkings
-				</label></li>
-				<li><label>
-					<input type="checkbox" name="osm-categories[]" id="bus" value='["highway"="bus_stop"]' onclick="poiOVER.reload()" />
-					<img src="<?=$config_wri['url_chemin_icones']?>bus.png" alt="icone d'arrêt de bus" />
-					Bus
-				</label></li>
+				<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtels et locations</li>
+				<li><input type="checkbox" name="osm-features" id="Campground" value='["tourism"="camp_site"]' />Campings</li>
+				<li><input type="checkbox" name="osm-features" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
+				<li><input type="checkbox" name="osm-features" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />Parkings</li>
+				<li><input type="checkbox" name="osm-features" id="Ground Transportation" value='["highway"="bus_stop"]' />Bus</li>
+				<li><input type="checkbox" name="osm-features" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
+				<hr/>
+				<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
+				<li><input type="checkbox" name="osm-features" id="Lodge" value='["building"="cabin"]' />Cabane non gardée</li>
+				<li><input type="checkbox" name="osm-features" id="Fishing Hot Spot Facility" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
+				<li><input type="checkbox" name="osm-features" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
 			</ul>
 		</fieldset>
 		<fieldset class="nav-sites">
 			<legend>Autres sites</legend>
 			<ul>
-				<? foreach (array (
-					'poiPRC' => 'pyrenees-refuges.com',
-					'poiC2C' => 'camptocamp.org',
-					'poiCHEM' => 'chemineur.fr',
-				) AS $k => $v) {?>
-					<li><label>
-						<input type="checkbox" id="<?=$k?>" title="Cocher pour afficher les points <?=$v?> sur la carte" onclick="maj_autres_site(this, <?=$k?>)" />
-						<?=$v?>
-						<a href="http://www.<?=$v?>/" target="_blank" title="Points de <?=$v?>">&copy;</a>
-						<span id="ajax-<?=$k?>-status">
-							<span class="ajax-nav-wait">&bull;&nbsp;&bull;&nbsp;&bull;</span>
-							<span class="ajax-nav-some">chargé</span>
-							<span class="ajax-nav-zero" title="Zoomer sur une plus large échelle, déplacer la carte ou sélectionner d'autres types pour voir plus de points.">(zone vide)</span>
-							<span class="ajax-nav-too" title="Zoomer sur une plus petite échelle, déplacer la carte ou sélectionner d'autres types pour voir plus de points.">(trop de points)</span>
-							<span class="ajax-nav-error" title="Le navigateur a rencontré une erreur de réseau ou de programme.">(erreur)</span>
-						</span>
-					</label></li>
-				<?}?>
+				<li><label><input type="checkbox" name="prc-features" />pyrenees-refuges.com</label></li>
+				<li><label><input type="checkbox" name="c2c-features" />camptocamp.org</label></li>
+				<li><label><input type="checkbox" name="chm-features" />chemineur.fr</label></li>
+				<li><label><input type="checkbox" name="alp-features" />alpages.info</label></li>
 			</ul>
 		</fieldset>
 	<?}?>
@@ -155,11 +93,7 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 		<fieldset>
 			<legend>Modification</legend>
 			<label>
-				<a href="?mode_affichage=edit"><?= $vue->polygone->id_polygone ? 'Modifier le' : 'Créer un'?> massif</a>
-			</label>
-			<br/>ou
-			<label>
-				<a style="color:red" href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>?mode_affichage=edit"><b>NOUVEL EDITEUR</b></a>
+				<a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>"><?= $vue->polygone->id_polygone ? 'Modifier le' : 'Créer un'?> massif</a>
 			</label>
 		</fieldset>
 	<?}?>
