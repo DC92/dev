@@ -192,4 +192,3 @@ else // le point est valide
         $vue->commentaires[]=$commentaire;
     }
 }
-?>

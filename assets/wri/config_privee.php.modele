@@ -12,6 +12,8 @@ $config_wri['serveur_pgsql']="???";
 // Info pour développeurs de notre équipe, la base de prod s'appelle "refuges" mais il n'est pas recommandé de bosser dessus, donc test, c'est bien !
 // a noter que les photos qui sont des fichiers sur le disque risque fort de ne plus s'afficher, mais c'est en quelque sorte "logique"
 $config_wri['base_pgsql']="test";
+if ($config_wri['base_pgsql'] == "test")
+	$config_wri['id_zone_accueil'] = 352; // Celui par défaut en prod n'existe pas dans la base de tests
 
 // Par défaut, le fond de carte est maps.refuges.info, décommenter ça permet de changer le par défaut
 //$config_wri['carte_base'] = 'OpenTopoMap';
@@ -19,6 +21,7 @@ $config_wri['base_pgsql']="test";
 // Les clés des cartes sous contrat gratuit
 $config_wri['ign_key']='???'; // http://professionnels.ign.fr/user
 $config_wri['bing_key']='???'; // https://www.bingmapsportal.com
+$config_wri['thunderforest_key']='???'; // https://manage.thunderforest.com
 
 // Le par défaut géré par sly pour l'association Openstreetmap France. Plus rapide en réponse de ~20%, mais leur serveur déconne trop souvent, et ça plante parfois
 //$config_wri['overpass_api']="http://api.openstreetmap.fr/oapi/interpreter";
@@ -35,4 +38,4 @@ $config_wri['overpass_api']="//overpass-api.de/api/interpreter";
 // par défaut à false, à mettre à décommenter pour les développeurs qui le veulent
 // $config_wri['debug']=true;
 
-?>
+// NE PAS OUBLIER rename htaccess.modele.txt .htaccess

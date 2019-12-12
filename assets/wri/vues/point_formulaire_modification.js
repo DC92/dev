@@ -39,7 +39,7 @@ const refugesInfo = layerRefugesInfo({
 			tipLabel: 'Plein écran',
 		}),
 		controlGeocoder(),
-		controlLoadGPX(),
+		//controlLoadGPX(),
 		controlGPS(),
 	],
 

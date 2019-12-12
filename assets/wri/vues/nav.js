@@ -32,11 +32,23 @@ const controls = [
 		layers: [
 			layerRefugesInfo({
 				baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
+				selectorName: 'wri-features',
 			}),
-			layerOverpass(),
-			layerPyreneesRefuges(),
-			layerC2C(),
-			layerChemineur(),
-			layerAlpages(),
+			layerOverpass({
+				selectorName: 'osm-features',
+			}),
+			layerPyreneesRefuges({
+				selectorName: 'prc-features',
+			}),
+			layerC2C({
+				selectorName: 'c2c-features',
+			}),
+			layerChemineur({
+				selectorName: 'chm-features',
+				urlSuffix: '3,8,16,20,23', // Refuges, abris, inutilisables, points d'eau, sommets, cols, lacs, ...
+			}),
+			layerAlpages({
+				selectorName: 'alp-features',
+			}),
 		],
 	});

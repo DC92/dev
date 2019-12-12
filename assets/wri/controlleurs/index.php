@@ -70,5 +70,3 @@ foreach ($nouveaux_points as $nouveau_point)
 }
 //d( $vue->nouveaux_points);
 $vue->nouvelles_generales=wiki_page_html("nouvelles_generales");
-
-?>

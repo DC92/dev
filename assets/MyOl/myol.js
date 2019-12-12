@@ -681,7 +681,6 @@ function getSym(type) {
  */
 function layerRefugesInfo(options) {
 	options = Object.assign({
-		selectorName: 'wri-features',
 		baseUrl: '//www.refuges.info/',
 		urlSuffix: 'api/bbox?nb_points=500&type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -714,7 +713,6 @@ function layerRefugesInfo(options) {
  */
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
-		selectorName: 'prc-features',
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		receiveProperties: function(properties) {
 			properties.sym = getSym(properties.type_hebergement);
@@ -732,9 +730,8 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
-		selectorName: 'chm-features',
 		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&limite=500&poi=',
-		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64', //TODO WRI 3,8,16,20,23
+		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			const icone = properties.icone.match(new RegExp('([a-z\-_]+)\.png')); // Type calculation
@@ -772,7 +769,6 @@ function layerChemineur(options) {
  */
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
-		selectorName: 'alp-features',
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=500&forums=4,5,6',
 		receiveProperties: function(properties) {
 			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
@@ -797,7 +793,6 @@ function layerAlpages(options) {
  */
 function layerC2C(options) {
 	return layerVectorURL(Object.assign({
-		selectorName: 'c2c-features',
 		baseUrl: 'https://api.camptocamp.org/waypoints?limit=500', // https mandatory for Access-Control-Allow-Origin
 		strategy: ol.loadingstrategy.bboxLimit,
 		projection: 'EPSG:3857',
@@ -837,7 +832,6 @@ function layerC2C(options) {
 //BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 function layerOverpass(options) {
 	options = Object.assign({
-		selectorName: 'osm-features',
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 	}, options);
@@ -1585,7 +1579,7 @@ function controlDownload(options) {
 			})
 			// Beautify the output
 			.replace(/<[a-z]*>(0|null|[\[object Object\]|[NTZa:-]*)<\/[a-z]*>/g, '')
-			.replace(/<Data name="[a-z_]*"><\/Data>|,"[a-z_]*":""/g, '')
+			.replace(/<Data name="[a-z_]*"\/>|<Data name="[a-z_]*"><\/Data>|,"[a-z_]*":""/g, '')
 			.replace(/<Data name="copy"><value>[a-z_\.]*<\/value><\/Data>|,"copy":"[a-z_\.]*"/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
 			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')

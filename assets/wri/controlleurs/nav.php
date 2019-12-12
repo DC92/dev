@@ -69,4 +69,3 @@ $polygones_bruts=infos_polygones($params);
 $vue->json_polygones = $polygones_bruts[0]->geometrie_geojson;
 
 $vue->lien_legende_carte=lien_wiki('legende_carte');
-?>
