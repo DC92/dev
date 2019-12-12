@@ -69,7 +69,7 @@ const massifs = layerVectorURL({
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
 	}),
 
-	overlays = [
+	vectorLayers = [
 		layerRefugesInfo({
 			selectorName: 'wri-features',
 		}),
@@ -108,7 +108,7 @@ const massifs = layerVectorURL({
 	 */
 	map_ = new ol.Map({
 		target: 'map',
-		layers: overlays,
+		layers: vectorLayers,
 		controls: controlsCollection({
 			geoKeys: {
 				// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats

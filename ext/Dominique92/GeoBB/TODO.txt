@@ -137,6 +137,8 @@ Display coordonnées suisses
 
 TODO WRI
 ========
+nte de zone au points à => nte de zone auX points à
+inclus dans la bbos => X
 Mettre le zip forum
 cookie = ;SameSite=Strict
 	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');

@@ -24,7 +24,7 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 	<?if (!$vue->mode_affichage ){?>
 		<fieldset <?if (!$vue->polygone->nom_polygone ){?>style="display:none"<?}?>>
 			<legend>Limites</legend>
-				<label>
+			<label>
 				<input name="id_massif"
 					type="checkbox"
 					<?if ( $vue->polygone->id_polygone ){?>checked="checked"<?}?>
@@ -33,6 +33,10 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 				/>
 				<?=$vue->polygone->nom_polygone?> uniquement
 			</label>
+			<hr/>Exportation de tous les points <?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?> :<br/>
+				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx">GPX </a><br/>
+				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_basecamp">Garmin</a><br/>
+				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml">KML </a>
 		</fieldset>
 		<fieldset>
 			<legend>Points <input type="checkbox" name="wri-features" checked="checked" /></legend>

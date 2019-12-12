@@ -830,6 +830,7 @@ function layerC2C(options) {
  */
 //BEST BUG IE don't dispaly icons
 //BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
+//TODO avertissement quand pas dans zone zoom
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',

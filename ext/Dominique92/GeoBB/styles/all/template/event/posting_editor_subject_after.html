@@ -39,7 +39,7 @@
 	var map, editable, permaCenter;
 	window.addEventListener('load', function() {
 		var eljson = document.getElementById('editable-json'),
-			overlays = geoOverlays({
+			vectorLayers = geoOverlays({
 				posting: true,
 				<!-- IF TOPIC_ID -->
 					topidIdExclude: {TOPIC_ID},
@@ -52,7 +52,7 @@
 
 		map = new ol.Map({
 			target: 'map',
-			layers: overlays,
+			layers: vectorLayers,
 			controls: geoControls({
 				geoKeys: {GEO_KEYS},
 				controlPermalink: {
@@ -81,7 +81,7 @@
 			eljson.value = eljson.value.replace(':]',':[]'); //TODO hack for bug in O2switch sql MariaDB / still here ?
 			var edit = controlEdit({
 				geoJsonId: 'editable-json',
-				snapLayers: overlays,
+				snapLayers: vectorLayers,
 				styleOptions: topicStyleOptions,
 				editStyleOptions: editStyleOptions,
 //TODO				enableAtInit: true,

@@ -90,15 +90,11 @@
 					<span>
 						X : <em id="marqueur-x"></em>,
 						Y : <em id="marqueur-y"></em> (CH 1903)
-					</span>
-					(
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx_basecamp">gpx basecamp</a>
-                    ,
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">gpx</a>
-					,
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">kml</a>
-					,
-						<a href="geo:<?=$vue->point->latitude?>,<?=$vue->point->longitude?>">géoloc</a><a href="<?=$vue->lien_wiki_explication_geo?>"><sup>?</sup></a>
+					</span> (
+						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">GPX</a>,
+						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx_garmin">Garmin</a>,
+						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">KML</a>,
+						<a href="geo:<?=$vue->point->latitude?>,<?=$vue->point->longitude?>">Géoloc</a><a href="<?=$vue->lien_wiki_explication_geo?>"><sup>?</sup></a>
 					)
 				<?}?>
 			</dd>

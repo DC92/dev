@@ -52,5 +52,8 @@ const refugesInfo = layerRefugesInfo({
 		}),
 <?php } ?>
 		controls: controls,
-		layers: [refugesInfo, marker],
+		layers: [
+			refugesInfo,
+			marker
+		],
 	});

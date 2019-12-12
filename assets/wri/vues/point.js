@@ -23,7 +23,7 @@ const controls = [
 		}),
 	],
 
-	overlays = [
+	vectorLayers = [
 		layerRefugesInfo({
 			baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
 		}),
@@ -43,5 +43,5 @@ const controls = [
 			zoom: 13,
 		}),
 		controls: controls,
-		layers: overlays,
+		layers: vectorLayers,
 	});
