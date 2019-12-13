@@ -54,18 +54,10 @@ const controls = [
 		noMemSelection: true,
 		baseUrlFunction: function(bbox, list) {
 			const el = document.getElementById('tous-massif');
-			const url = '<?=$config_wri["sous_dossier_installation"]?>api/'+
-			(el && el.checked ? 'massif?massif=4&' : 'bbox?')+
-			'nb_points=500&type_points=' +
+			return '<?=$config_wri["sous_dossier_installation"]?>api/'+
+				(el && el.checked ? 'massif?massif=<?=$vue->polygone->id_polygone?>&' : 'bbox?')+
+				'nb_points=500&type_points=' +
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
-				
-				
-				
-/*DCMM*/{var _r=' ',_v=url;if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-				
-/*DCMM*/{var _r=' ',_v=el.checked;if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
-			return url;
 		},
 	}),
 
