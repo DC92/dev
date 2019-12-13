@@ -22,73 +22,73 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 
 <div id="selecteur-carte-nav" class="noprint">
 	<?if (!$vue->mode_affichage ){?>
-		<fieldset <?if (!$vue->polygone->nom_polygone ){?>style="display:none"<?}?>>
-			<legend>Limites</legend>
-			<label>
-				<input name="id_massif"
-					type="checkbox"
-					<?if ( $vue->polygone->id_polygone ){?>checked="checked"<?}?>
-					value="<?=$vue->polygone->id_polygone?>"
-					onclick="switch_massif(this);maj_poi()"
-				/>
-				<?=$vue->polygone->nom_polygone?> uniquement
-			</label>
-			<hr/>Exportation de tous les points <?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?> :<br/>
-				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx">GPX </a><br/>
-				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_basecamp">Garmin</a><br/>
-				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml">KML </a>
-		</fieldset>
 		<fieldset>
-			<legend>Points <input type="checkbox" name="wri-features" checked="checked" /></legend>
+			<legend>Points</legend>
 			<ul>
+				<?if ( $vue->polygone->id_polygone ){?>
+					<li><label>
+						<input id="tous-massif" name="couche-massif"
+							onchange="points.getSource().refresh()"
+							type="checkbox" checked="checked" />
+						<?=$vue->polygone->nom_polygone?> uniquement
+					</label></li><hr/>
+				<?}?>
+				<li>
+					<input type="checkbox" name="wri-features" checked="checked" /> Tout
+				</li>
 				<? foreach ($vue->types_point_affichables AS $type_affichable) {?>
-					<li>
-						<label>
-							<input
-								type="checkbox"
-								name="wri-features"
-								value="<?=$type_affichable->id_point_type?>"
-								checked="checked"
+					<li><label>
+						<input
+							type="checkbox"
+							name="wri-features"
+							value="<?=$type_affichable->id_point_type?>"
+							checked="checked"
+						/>
+						<span>
+							<img
+								id="icone_<?=$type_affichable->id_point_type?>"
+								src="<?=$config_wri['url_chemin_icones'].$type_affichable->icone?>.png"
+								alt="icone de <?=$type_affichable->nom_type?>"
 							/>
-							<span>
-								<img
-									id="icone_<?=$type_affichable->id_point_type?>"
-									src="<?=$config_wri['url_chemin_icones'].$type_affichable->icone?>.png"
-									alt="icone de <?=$type_affichable->nom_type?>"
-								/>
-								<?=$type_affichable->nom_type?>
-							</span>
-						</label>
-					</li>
+							<?=$type_affichable->nom_type?>
+						</span>
+					</label></li>
 				<?}?>
 				<li><a href="<?=$vue->lien_legende_carte?>">Légende</a></li>
 			</ul>
 		</fieldset>
+		<fieldset <?if (!$vue->polygone->nom_polygone ){?>style="display:none"<?}?>>
+			<legend>Exportations</legend>
+			Tous les points refuges.info <?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?><br/>
+				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx">GPX </a><br/>
+				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_garmin">Garmin</a><br/>
+				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml">KML </a>
+		</fieldset>
 		<fieldset class="nav-services">
 			<legend>
-				Services <input type="checkbox" name="osm-features" /> <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">&copy;</a>
+				Services <input type="checkbox" name="couche-osm" /> <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">&copy;</a>
 			</legend>
 			<ul>
-				<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtels et locations</li>
-				<li><input type="checkbox" name="osm-features" id="Campground" value='["tourism"="camp_site"]' />Campings</li>
-				<li><input type="checkbox" name="osm-features" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
-				<li><input type="checkbox" name="osm-features" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />Parkings</li>
-				<li><input type="checkbox" name="osm-features" id="Ground Transportation" value='["highway"="bus_stop"]' />Bus</li>
-				<li><input type="checkbox" name="osm-features" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
+				<li><input type="checkbox" name="couche-osm" id="Residence" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtels et locations</li>
+				<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />Campings</li>
+				<li><input type="checkbox" name="couche-osm" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
+				<li><input type="checkbox" name="couche-osm" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />Parkings</li>
+				<li><input type="checkbox" name="couche-osm" id="Ground Transportation" value='["highway"="bus_stop"]' />Bus</li>
+				<li><input type="checkbox" name="couche-osm" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
 				<hr/>
-				<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
-				<li><input type="checkbox" name="osm-features" id="Lodge" value='["building"="cabin"]' />Cabane non gardée</li>
-				<li><input type="checkbox" name="osm-features" id="Fishing Hot Spot Facility" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
-				<li><input type="checkbox" name="osm-features" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
+				<li><input type="checkbox" name="couche-osm" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
+				<li><input type="checkbox" name="couche-osm" id="Lodge" value='["building"="cabin"]' />Cabane non gardée</li>
+				<li><input type="checkbox" name="couche-osm" id="Fishing Hot Spot Facility" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
+				<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
 			</ul>
 		</fieldset>
 		<fieldset class="nav-sites">
 			<legend>Autres sites</legend>
 			<ul>
-				<li><label><input type="checkbox" name="prc-features" />pyrenees-refuges.com</label></li>
-				<li><label><input type="checkbox" name="c2c-features" />camptocamp.org</label></li>
-				<li><label><input type="checkbox" name="chm-features" />chemineur.fr</label></li>
-				<li><label><input type="checkbox" name="alp-features" />alpages.info</label></li>
+				<li><label><input type="checkbox" name="couche-prc" />pyrenees-refuges.com</label></li>
+				<li><label><input type="checkbox" name="couche-c2c" />camptocamp.org</label></li>
+				<li><label><input type="checkbox" name="couche-chemineur" />chemineur.fr</label></li>
+				<li><label><input type="checkbox" name="couche-alpages" />alpages.info</label></li>
 			</ul>
 		</fieldset>
 	<?}?>

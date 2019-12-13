@@ -344,14 +344,14 @@ function escapedStyle(a, b, c) {
  * evt (keyboard event)
  * return : [checked values or ids]
  */
-function controlPermanentCheckbox(selectorName, callback) {
+function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
 	const checkEls = document.getElementsByName(selectorName),
 		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
 		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
 
 	for (let e = 0; e < checkEls.length; e++) {
 		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-		if (cookie) // Set the checks accordingly with the cookie
+		if (cookie && !noMemSelection) // Set the checks accordingly with the cookie
 			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
 	}
 
@@ -513,7 +513,7 @@ function hoverManager(map) {
 
 
 /**
- * BBOX strategy when the url return a limited number of features depending on the extent
+ * BBOX strategy when the url returns a limited number of features depending on the extent
  */
 ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 	if (this.bboxLimitResolution > resolution) // When zoom in
@@ -634,7 +634,8 @@ function layerVectorURL(options) {
 					source.loadedExtentsRtree_.clear(); // Force the loading of all areas
 					source.clear(); // Redraw the layer
 				}
-			}
+			},
+			options.noMemSelection
 		);
 
 	layer.once('myol:onadd', function(evt) {

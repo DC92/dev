@@ -2,7 +2,7 @@
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
 
-// Affiche en fond la limites de tous les massifs en noir
+// Affiche en noir la limite de tous les massifs
 const layerMassifs = layerVectorURL({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		receiveProperties: function(properties) {

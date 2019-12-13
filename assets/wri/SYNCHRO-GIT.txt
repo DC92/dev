@@ -1,24 +1,23 @@
-Bonjour
-
 J'en ai parlé plusieurs fois mais la livraison tarde un peu.
 Je vous propose une réorganisation du logiciel des cartes de refuges.info
-La raison de départ est une difficulté de maintenance des modules Leaflet qui m'a amené à reconsidérr Openlayers mais j'en ai profité pour faire évoluer les fonctionnalités :
+La raison de départ est une difficulté de maintenance des modules Leaflet qui m'a amené à reconsidérer Openlayers.
+Le but est de conserver des fonctionnalités identiques mais c'est l'occasion d'améliorer et d'ajouter ce que vous voulez.
 
 FONCTIONS NON REPORTEES DE LA VERSION LEAFLET :
-- L'affichage en degrés/minutes/secondes des coordonnées. Pas sûr que qulqu'un utilise le sexagésimal et ça faisait une lourdeur de code que je n'ai pas repris (mais c'est faisable si nécéssaire)
+- L'affichage en degrés/minutes/secondes des coordonnées. Pas sûr que quelqu’un utilise le sexagésimal et ça faisait une lourdeur de code que je n'ai pas repris (mais c'est faisable si nécessaire)
 - Il n'y a plus de suivi du chargement des couches (en cours / chargé / ...), l'interface avec le retour XMLHttpRequest n'est pas accessible dans le core openlayers
 
 FONCTIONS NOUVELLES:
 - Affichage de 2 fonds de cartes par transparence.
 La transparence est réglable par un curseur pour passer progressivement d'une carte à l'autre.
 On obtient 2 fonds en cliquant avec Ctrl sur le deuxième.
-Ce n'est pas une fonction liée à Openlayers, on peut très bien la faire sur leaflet, c'est dû au fait que tous les fonds de cartes sont maintenant livrés en projection mercator (même IGN et SwissTopo) et qu'elles sont donc supperposables.
+Ce n'est pas une fonction liée à Openlayers, on peut très bien la faire sur leaflet, c'est dû au fait que tous les fonds de cartes sont maintenant livrés en projection Mercator (même IGN et SwissTopo) et qu'elles sont donc superposables.
 Seules les cartes anglaises (ordnance survey) ne le sont pas mais on les récupère en Mercator par Bings (Microsoft)
 
 - Dalles SwissTopo limitées aux échèles et coordonnées où elles sont pertinentes afin de réduire l'impact des quotas d'utilisation
 
 - Bouton d'impression de la carte.
-2 formats prédéfinis permettent de recâdrer des impressions A4 en mode portrait ou paysage.
+2 formats prédéfinis permettent de recadrer des impressions A4 en mode portrait ou paysage.
 
 - Bouton d'export des icones, lignes et polygones affiches dans la fenêtre de la carte.
 On n'exporte que ce qu'on voit (cadrage & zoom). Le nombre est limité à 500 : si le cadrage est trop grand, on n'aura pas tout !
@@ -37,7 +36,7 @@ Leaflet :
 - Pas de livraison d'un code généré à utiliser de suite.
 
 Openlayers : 
-- la lib est plus grosse mais contient toutes les fonctions nécéssaires
+- la lib est plus grosse mais contient toutes les fonctions nécessaires
 - 2 modules externes :
 * le geocodeur : jonataswalker en a fait un qui me plait bien
 * proj4j : pour la traduction des coordonnée suisses, en affichage ou saisie sur la page seulement.
@@ -50,14 +49,14 @@ proj4.js quand il faut
 
 Mon code spécifique est entièrement contenu dans 2 fichiers myol.js et .css
 C'est du javascript très simple (ECMA es6), compatible I.E., qui ne contient que des fonctions (pas de classes, jquery, ...)
-Toutes les fonctions sont dans le même fichier myol.js, bien séparées et peuvent être utilisées séparéments moyennant quelques dépendances documentées.
+Toutes les fonctions sont dans le même fichier myol.js, bien séparées et peuvent être utilisées séparément moyennant quelques dépendances documentées.
 La doc est intégrée dans le code (pas de générateur ni de page donc fournie à part ça)
 Toutes les icônes (les boutons) spécifiques sont codées dans le .css en images url svg
 Pas de générateur, minificateur, ...
 Attention : ne pas modifier ces 2 fichiers dont les sources ne sont pas dans WRI. Demander au développeur.
 
 ARCHITECTURE WRI:
-- Création d'une page /edit qui isole les fonctions d'éditions précédement dans /nav. La factorisation n'apportant rien et compexifiant le code de /nav
+- Création d'une page /edit qui isole les fonctions d'éditions précédemment dans /nav. La factorisation n'apportant rien et complexifiant le code de /nav
 
 MAQUETTE :
 Vous pouvez essayer une maquette sur http://dom.refuges.info

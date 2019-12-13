@@ -67,14 +67,12 @@
 <!--========================================= COORDONNÉES =========================================-->
 			<dt>Coordonnées:</dt>
             <dd>
-                <span>
                 Provenance:
                 <?if ($vue->point->id_type_precision_gps == $config_wri['id_coordonees_gps_approximative']) {?>
-						<strong><?=$vue->point->nom_precision_gps?></strong>
+					<strong><?=$vue->point->nom_precision_gps?></strong>
 				<?}else{?>
-						<?=$vue->point->nom_precision_gps?>
-					<?}?>
-                </span>
+					<?=$vue->point->nom_precision_gps?>
+				<?}?>
             </dd>
 			<dd>
 				Altitude: <em><?=$vue->point->altitude?>m,</em>
@@ -90,35 +88,38 @@
 					<span>
 						X : <em id="marqueur-x"></em>,
 						Y : <em id="marqueur-y"></em> (CH 1903)
-					</span> (
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">GPX</a>,
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx_garmin">Garmin</a>,
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">KML</a>,
-						<a href="geo:<?=$vue->point->latitude?>,<?=$vue->point->longitude?>">Géoloc</a><a href="<?=$vue->lien_wiki_explication_geo?>"><sup>?</sup></a>
-					)
+					</span>
+            </dd>
+			<dd>
+				Export:
+					<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx">GPX</a>,
+					<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=gpx_garmin">Garmin</a>,
+					<a href="<?=$config_wri['sous_dossier_installation']?>api/point?id=<?=$vue->point->id_point?>&amp;format=kml">KML</a>,
+					<a href="geo:<?=$vue->point->latitude?>,<?=$vue->point->longitude?>">Géoloc</a><a href="<?=$vue->lien_wiki_explication_geo?>"><sup>?</sup></a>
 				<?}?>
 			</dd>
 <!--======================================== LOCALISATION =========================================-->
-			<?php if ($vue->localisation_point) foreach ($vue->localisation_point as $categorie_polygone => $polygones) { ?>
-				<dt class="condense">Localisation <?=$categorie_polygone?>:</dt>
-					<dd class="condense">
-						<?php foreach ($polygones as $key => $polygone) { ?>
-							<?php end($polygones) ; if ($key !== key($polygones)) $virgule=","; else $virgule=""; //on sent qu'on atteint la limite des templates quand il faut 50 caractères pour choisir ou non d'afficher une simple virgule?>
-							  <?php if ($polygone->site_web) { ?>
-								<a href="<?=$polygone->site_web?>"><?=$polygone->nom_polygone?></a>
-							 <?php } else { ?>
-								<?=$polygone->nom_polygone?>
-							 <?php } ?>
-								<?php if ($polygone->avec_lien_carte) { ?>
-								
-								<sup>
-									<a href="<?=$polygone->lien_polygone?>">carte</a>
-								</sup>
-							   <?php } ?>
-							<?=$virgule?>
-						<?php } ?>
-					<dt />
-				</dd>
+			<?php if ($vue->localisation_point)
+				foreach ($vue->localisation_point as $categorie_polygone => $polygones) { ?>
+					<dt class="condense">Localisation <?=$categorie_polygone?>:</dt>
+						<dd class="condense">
+							<?php foreach ($polygones as $key => $polygone) { ?>
+								<?php end($polygones) ; if ($key !== key($polygones)) $virgule=","; else $virgule=""; //on sent qu'on atteint la limite des templates quand il faut 50 caractères pour choisir ou non d'afficher une simple virgule?>
+								  <?php if ($polygone->site_web) { ?>
+									<a href="<?=$polygone->site_web?>"><?=$polygone->nom_polygone?></a>
+								 <?php } else { ?>
+									<?=$polygone->nom_polygone?>
+								 <?php } ?>
+									<?php if ($polygone->avec_lien_carte) { ?>
+									
+									<sup>
+										<a href="<?=$polygone->lien_polygone?>">carte</a>
+									</sup>
+								   <?php } ?>
+								<?=$virgule?>
+							<?php } ?>
+						<dt />
+					</dd>
 			<?php } ?>
 <!--===================================== SUR LE SITE DEPUIS ======================================-->
 			<dt/>
