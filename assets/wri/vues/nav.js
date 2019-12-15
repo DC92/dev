@@ -28,6 +28,39 @@ const controls = [
 		controlPrint(),
 	],
 
+	// La couche "zone"
+	zone = layerVectorURL({
+		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1&intersection=<?=$vue->polygone->id_polygone?>',
+		noMemSelection: true,
+		receiveProperties: function(properties, feature, layer) {
+			properties.name = properties.nom;
+			properties.type = null;
+			properties.link = properties.lien;
+		},
+		styleOptions: function(properties) {
+			// Translates the color in RGBA to be transparent
+			var cs = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(properties.couleur);
+			return {
+				fill: new ol.style.Fill({
+					color: 'rgba(' +
+						parseInt(cs[1], 16) + ',' +
+						parseInt(cs[2], 16) + ',' +
+						parseInt(cs[3], 16) + ',0.5)',
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'black',
+				}),
+			};
+		},
+		hoverStyleOptions: function(properties) {
+			return {
+				fill: new ol.style.Fill({
+					color: properties.couleur,
+				}),
+			};
+		},
+	}),
+
 	// La couche "massifs"
 	massifs = layerVectorURL({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
@@ -62,7 +95,9 @@ const controls = [
 	}),
 
 	overlays = [
-<?php if ($vue->polygone->id_polygone) { ?>
+<?php if ($vue->mode_affichage == 'zone') { ?>
+			zone,
+<?php } else if ($vue->polygone->id_polygone) { ?>
 			massifs,
 <?php } ?>
 			points,
@@ -86,18 +121,15 @@ const controls = [
 
 	map = new ol.Map({
 		target: 'carte-nav',
-		<?if ($vue->polygone->id_polygone){?>
-			view: new ol.View({
-				center: ol.proj.fromLonLat([2, 47]), // Default
-				zoom: 6,
-			}),
-		<?}?>
 		controls: controls,
 		layers: overlays,
 	});
-
+	
 	<?if ($vue->polygone->id_polygone){?>
-		massifs.once('postrender',function(){
-			map.getView().fit(massifs.getSource().getExtent());
-		});
+		map.getView().fit(ol.proj.transformExtent([
+			<?=$vue->polygone->ouest?>,
+			<?=$vue->polygone->sud?>,
+			<?=$vue->polygone->est?>,
+			<?=$vue->polygone->nord?>,
+		], 'EPSG:4326', 'EPSG:3857'));
 	<?}?>

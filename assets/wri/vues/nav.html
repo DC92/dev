@@ -1,7 +1,5 @@
-<?php
+<?php 
 /*
-Bloc HTML réalisant l'affichage de la page des cartes
-
 Concept de Zone et Massifs :
 Massif (1): classique : un poly qui entoure tous les points, possibilité de jouer avec le panel de gauche
 Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cliquer pour aller sur un massif. comme l'ancienne page massifs.
@@ -10,11 +8,7 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 <div class="contenu noprint">
 	<!-- afficher le titre du massif (en mode massif) -->
 	<h3 id="titrepage">
-        <?if ($vue->mode_affichage == 'edit') {?>
-            Edition des contours du massif "<?=$vue->polygone->nom_polygone?>"
-        <?}else{?>
-            <?=$vue->intro?>
-        <?}?>
+		<?=$vue->intro?>
 	</h3>
 </div>
 
@@ -100,77 +94,5 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 				<a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>"><?= $vue->polygone->id_polygone ? 'Modifier le' : 'Créer un'?> massif</a>
 			</label>
 		</fieldset>
-	<?}?>
-
-	<?php if ( $vue->mode_affichage == 'edit' && $_SESSION['niveau_moderation']>=1 ) {?>
-		<form method="post" action="<?=$config_wri['sous_dossier_installation']?>nav/<?=$vue->polygone->id_polygone?>?mode_affichage=edit" >
-			<fieldset>
-				<legend><?=$vue->polygone->id_polygone ? 'Edition' : 'Création'?></legend>
-				<!-- Edition du massif -->
-				<label>
-					<input type="hidden" name="id_polygone" value="<?=$vue->polygone->id_polygone?>" />
-					<input type="hidden" name="json_polygones" id="edit-json" value='<?=$vue->json_polygones?>' />
-
-					<p>Nom du massif
-					<input type="text" name="nom_polygone" size="20" value="<?=$vue->polygone->nom_polygone?>" /></p><br/>
-
-					<p>Article partitif (max 20 car)
-					<input type="text" name="article_partitif" size="9" value="<?=$vue->polygone->article_partitif?>" /></p><br/>
-
-					<p id="edit-changed" style="display:none"><i style="color:red">Polygone modifié</i></p>
-
-					<input type="submit" name="enregistrer" value="Enregistrer" />
-					<br/>ou<br/>
-					<p><a href="./<?=$vue->polygone->id_polygone?>">Quiter sans enregistrer</a></p>
-				</label>
-			</fieldset>
-			<?if ($vue->polygone->id_polygone) {?>
-				<fieldset>
-					<legend>Suppression</legend>
-					<label>
-						<?if (!$_GET['test_supprimer']) {?>
-							<p>
-								<a href="<?=$config_wri['sous_dossier_installation']?>nav/<?=$vue->polygone->id_polygone?>?mode_affichage=edit&amp;test_supprimer=1">
-									Supprimer le massif
-								</a>
-							</p>
-						<?}else{?>
-							<b>
-								<p style="color:red">ATTENTION: Ceci va supprimer définitivement le massif "<?=$vue->polygone->nom_polygone?>"</p>
-								<p style="color:red">Aucune restauration ne sera possible</p>
-							</b>
-							<input class="bouton-supprimer" type="submit" name="supprimer" value="Supprimer '<?=$vue->polygone->nom_polygone?>'" />
-							<br/>ou<br/>
-							<input type="submit" name="annuler" value="Annuler" />
-							<br />&nbsp;
-						<?}?>
-					</label>
-				</fieldset>
-			<?}?>
-				<fieldset>
-					<legend>Edition</legend>
-					<label>
-						<p><u>Créer un polygone:</u> Cliquer sur le contrôle "polygone" puis à l'emplacement du premier sommet...</p>
-						<p><u>Ajouter un sommet:</u> Déplacer un marqueur au milieu d'un côté.</p>
-						<p><u>Déplacer un sommet:</u> Le déplacer.
-						Les sommets déplacés "collent" aux sommets des autres massifs et prennent exactement leur position.</p>
-						<p><u>Supprimer un sommet:</u> Cliquer une fois dessus.</p>
-						<p><u>Supprimer un polygone:</u> Cliquer sur le contrôle "poubelle" puis sur un côté.</p>
-						<hr/>
-						<p>Pour une édition plus complexe, vous pouvez transformer vos polygones en lignes brisées.</p>
-						<p><u>Couper un polygone:</u> Cliquer une fois sur un marqueur au milieu d'un côté.
-						On obtient une ligne.</p>
-						<p><u>Etendre une ligne:</u> Cliquer sur le contrôle "Tracer une ligne" puis sur l'extrémité à étendre...</p>
-						<p><u>Ajouter une ligne:</u> Cliquer sur le contrôle "Tracer une ligne" puis à l'emplacement de la première exterémité...</p>
-						<p><u>Fusionner deux lignes:</u> Joindre une extrémité de chacune.</p>
-						<p><u>Fermer une ligne:</u> Joindre ses deux extrémités. On obtient un polygone.</p>
-						<hr/>
-						<p><u>Sauvegarder les modifications:</u> Cliquer sur le bouton "Enregistrer."</p>
-						<p><u>Note:</u> Lors de la sauvegarde les lignes seront refermées en ploygones.</p>
-						<p><u>Quiter sans enregistrer:</u> Cliquer sur "Quiter sans enregistrer".</p>
-					</label>
-				</fieldset>
-		</form>
-		<div id="help-edit"></div>
 	<?}?>
 </div>

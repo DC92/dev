@@ -1248,9 +1248,12 @@ function controlTilesBuffer(depth, depthFS) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG thin button on mobile
 //BEST report bug that stops animation on OL v6 & resorb patch on Geocoder
-function controlGeocoder() {
+function controlGeocoder(options) {
+	options = Object.assign({
+		title: 'Recherche sur la carte',
+	}, options);
+
 	// Vérify if geocoder is available (not supported in IE)
 	const ua = navigator.userAgent;
 	if (typeof Geocoder != 'function' ||
@@ -1263,10 +1266,12 @@ function controlGeocoder() {
 		provider: 'osm',
 		lang: 'FR',
 		keepOpen: true,
-		placeholder: 'Recherche sur la carte' // Initialization of the input field
+		placeholder: options.title, // Initialization of the input field
 	});
-	geocoder.container.firstChild.firstChild.title = 'Recherche sur la carte';
-	geocoder.container.style.top = '.5em';
+
+	// Move the button at the same level than the other control's buttons
+	geocoder.container.firstChild.firstChild.title = options.title;
+	geocoder.container.appendChild(geocoder.container.firstChild.firstChild);
 
 	return geocoder;
 }

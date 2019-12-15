@@ -1,110 +1,45 @@
-/* Features popup */
-.myol-popup,
-.myol-popup:hover {
-	display: block;
-	padding: 1px 4px;
-	border-radius: 5px;
-	box-shadow: 0 3px 8px #888;
-	background-color: white;
-	font-size: 12px;
-	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-	text-decoration: none;
-	color: initial;
-}
-.myol-popup p {
-	margin: 0;
-}
-.myol-popup-hidden {
-	display: none;
-}
-
-/* Overpass */
-.overpass-popup {
-	padding: 5px;
-	border: 1px solid #abc;
-	border-radius: 5px;
-	background-color: #def;
-}
-.overpass-popup p {
-	margin: 0;
-	font-size: small;
-}
-.overpass-popup p:first-letter {
-	text-transform: uppercase;
-}
-
-/* Compatibility controls OL V5.* */
-.ol-overlaycontainer-stopevent{
-	position: absolute;
-	top: 0;
-	height: 100%;
-	width: 100%;
-}
-
-/* Permalink */
-.ol-permalink {
-	position: absolute;
-	bottom: 24px;
-	right: 0;
-	padding: 3px;
-	border-top-left-radius: 4px;
-	border-bottom-left-radius: 4px;
-	background-color: rgba(255, 255, 255, 0.8);
-	font-size: 0.7rem;
-	line-height: 1.375em;
-}
-
-/* Coordinates */
-.ol-coordinate {
-	position: absolute;
-	bottom: 30px;
-	left: 8px;
-	padding: 2px;
-	border-radius: 4px;
-	background-color: rgba(0, 60, 136, 0.3);
-	font-size: small;
-	color: white;
-}
-.ol-coordinate:empty {
-	display: none;
-}
-
-/* Mesures */
-.ol-length-line {
-	position: absolute;
-	bottom: 52px;
-	left: 8px;
-	padding: 2px;
-	border-radius: 4px;
-	background-color: rgba(0, 60, 136, 0.3);
-	font-size: small;
-	color: white;
-}
-.ol-length-line:empty {
-	display: none;
-}
-
-/* All buttons*/
+/* Top aligned buttons */
+/* Container */
 .ol-control-hidden {
 	display: none;
 }
-.ol-control {
+.ol-zoom,
+.ol-full-screen,
+.ol-geocoder,
+.ol-gps,
+.myol-button {
+	float: left;
+	position: relative !important;
+	left: 0 !important;
+	top: 0 !important;
+	margin: 0.2em 0 0 0.2em;
 	padding: 0; /* No grey line around the button */
 }
+
+/* Button */
 .ol-control button,
 .ol-control button:focus,
-.ol-geocoder button,
-.ol-geocoder button:focus {
-	margin: 0;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	background-color: white;
+.ol-geocoder button {
+	font-size: 1.14em !important;
 	color: black ;
+	background-color: white;
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	outline: 0;
+}
+.ol-geocoder button {
+	position: initial !important;
+	margin: 1px;
+	border: 0;
+	padding: 0;
+	height: 1.375em !important;
+	width: 1.375em !important;
+	border-radius: 2px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;'%3E%3Cpath d='M15 15A5 5 0 0 1 6 6A6 6 0 0 1 15 15L22 22'/%3E%3C/svg%3E") !important;
 }
 .ol-control button:hover,
 .ol-geocoder button:hover {
 	box-shadow: 1px 1px 10px black;
-	background-color: #D6FBFF;
+	background-color: #d6fbff;
 }
 .ol-control button:active,
 .ol-geocoder button:active { /* Shift the button by 1px when clicked */
@@ -112,60 +47,21 @@
 	top: 1px;
 	left: 1px;
 }
-/* Top left aligned buttons */
-.ol-zoom,
-.ol-full-screen,
-.ol-geocoder,
-.ol-gps,
-.myol-button {
-	position: relative !important;
-	top: 0 !important;
-	left: 0 !important;
-	float: left;
-	margin: 0.5em 0 0 0.5em;
-	border-radius: 2px;
-}
 
-/* Geocoder */
-.ol-geocoder {
-	width: 1.625em;
-}
-.ol-geocoder button {
-	position: initial !important;
-	height: 1.375em !important;
-	width: 1.375em !important;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;'%3E%3Cpath d='M15 15A5 5 0 0 1 6 6A6 6 0 0 1 15 15L22 22'/%3E%3C/svg%3E") !important;
-}
+/* Boxes under buttons */
 .gcd-gl-control {
-	height: 70px !important;
-	width: 1.625em !important;
-	background-color: rgba(0, 0, 0, 0);
+	top: 1.7em;
+	left: -2.1em;
+	background: rgba(0, 0, 0, 0); /* Transparent */
 }
-.gcd-gl-control:hover {
-	background-color: rgba(0, 0, 0, 0);
-}
-.gcd-gl-input {
-	display: none;
-	position: initial !important;
-	margin: 0.2em 0;
-}
-.ol-geocoder .gcd-gl-reset {
-	top: 1.5em;
-}
-.gcd-gl-expanded {
-	width: 15.625em !important;
-}
-.gcd-gl-expanded .gcd-gl-input {
-	display: initial; /* Unhide the input field */
+.gcd-gl-result {
+	top: 3.8em !important;
+	left: 0.1em !important;
 }
 
 /* Full screen */
-.ol-full-screen {
-	right: initial; /* Initial right => big margin */
-}
 .ol-full-screen-false,
 .ol-full-screen-true {
-	background-size: 1.375em;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
 	/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
 }
@@ -181,9 +77,6 @@
 }
 
 /* Print */
-.myol-button {
-	width: 1.62em;
-}
 .ol-print:hover {
 	background-color: transparent;
 }
@@ -199,8 +92,8 @@
 	color: blue;
 }
 .ol-control-question {
-	position: relative;
-	top: 0.3em;
+	position: absolute;
+	top: 1.7em;
 	width: 6.5em;
 	padding: 1px;
 	background-color: white;
@@ -235,4 +128,74 @@
 .ol-switch-layer p {
 	margin: 0;
 	font-size: small;
+}
+
+/* Permalink */
+.ol-permalink {
+	position: absolute;
+	bottom: 24px;
+	right: 0;
+	padding: 3px;
+	border-radius: 8px 0 0 8px;
+	background: rgba(255, 255, 255, 0.8);
+	font-size: 0.7rem;
+	line-height: 1.375em;
+}
+
+/* Coordinates */
+.ol-coordinate {
+	position: absolute;
+	bottom: 30px;
+	left: 8px;
+	padding: 2px;
+	border-radius: 4px;
+	background: rgba(0, 60, 136, 0.3);
+	font-size: small;
+	color: white;
+}
+.ol-coordinate:empty {
+	display: none;
+}
+
+/* Mesures */
+.ol-length-line {
+	position: absolute;
+	bottom: 52px;
+	left: 8px;
+	padding: 2px;
+	border-radius: 4px;
+	background: rgba(0, 60, 136, 0.3);
+	font-size: small;
+	color: white;
+}
+.ol-length-line:empty {
+	display: none;
+}
+
+/* Compatibility controls OL V5 */
+.ol-overlaycontainer-stopevent{
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+}
+
+/* Features popup */
+.myol-popup,
+.myol-popup:hover {
+	display: block;
+	padding: 1px 4px;
+	border-radius: 5px;
+	box-shadow: 0 3px 8px #888;
+	background-color: white;
+	font-size: 12px;
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	color: initial;
+}
+.myol-popup p {
+	margin: 0;
+}
+.myol-popup-hidden {
+	display: none;
 }
