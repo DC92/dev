@@ -657,18 +657,19 @@ function getSym(type) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
 		// <sym> propertie propertie
-		'<Residence> refuge hotel gite chambre_hote' +
+		'<City Hall> hotel locality' +
+		'<Residence> refuge gite chambre_hote' +
 		'<Lodge> cabane cabane_cle buron alpage shelter cabane ouverte mais ocupee par le berger l ete' +
 		'<Fishing Hot Spot Facility> abri hut' +
-		'<Campground> camping camp_site bivouac orri toue abri en pierre' +
+		'<Campground> camping camp_site bivouac' +
+		'<Tunnel> orri toue abri en pierre grotte cave' +
 		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
 		'<Drinking Water> point_eau waterpoint waterfall' +
 		'<Water Source> lac lake' +
 		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
+		'<Reef> glacier' +
 		'<Flag, Red> col pass' +
 		'<Parking Area> access' +
-		'<City Hall> locality' +
-		'<Reef> grotte cave glacier' +
 		'<Shopping Center> local_product ravitaillement buffet restaurant' +
 		'<Telephone> telephone' +
 		'<Oil Field> wifi reseau' +
@@ -835,19 +836,46 @@ function layerC2C(options) {
  */
 //BEST BUG IE don't dispaly icons
 //BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
-//TODO avertissement quand pas dans zone zoom
-//TODO WRI l'icone des Hôtels ne se différencie pas de nos refuges gardés
-//TODO ?? points d'eau : (alti ? type=source naturelle/fontaine/ ?)
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 	}, options);
 	const checkEls = document.getElementsByName(options.selectorName),
-		format = new ol.format.OSMXML();
+		elLoad = document.getElementById(options.selectorName + '-load'),
+		elZoom = document.getElementById(options.selectorName + '-zoom'),
+		format = new ol.format.OSMXML(),
+		layer = layerVectorURL(Object.assign({
+			strategy: ol.loadingstrategy.bbox,
+			format: format,
+			baseUrlFunction: urlFunction,
+		}, options));
+
+	function urlFunction(bbox, list) {
+		if (elLoad)
+			elLoad.className = 'loading';
+
+		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
+			args = [];
+
+		for (let l = 0; l < list.length; l++) {
+			const lists = list[l].split('+');
+			for (let ls = 0; ls < lists.length; ls++)
+				args.push(
+					'node' + lists[ls] + bb + // Ask for nodes in the bbox
+					'way' + lists[ls] + bb // Also ask for areas
+				);
+		}
+		return options.baseUrl +
+			'?data=[timeout:5];(' + // Not too much !
+			args.join('') +
+			');out center;'; // add center of areas
+	}
 
 	format.readFeatures = function(doc, opt) {
-		console.log('overpass response');
+		if (elLoad)
+			elLoad.className = 'loaded';
+
 		// Transform an area to a node (picto) at the center of this area
 		for (let node = doc.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
@@ -856,7 +884,7 @@ function layerOverpass(options) {
 				newNode.id = node.id;
 				doc.documentElement.appendChild(newNode);
 
-				// Browse wat attributes to build a new node
+				// Browse <way> attributes to build a new node
 				for (let subTagNode = node.firstChild; subTagNode; subTagNode = subTagNode.nextSibling)
 					switch (subTagNode.nodeName) {
 						case 'center':
@@ -907,27 +935,17 @@ function layerOverpass(options) {
 		return features;
 	};
 
-	return layerVectorURL(Object.assign({
-		strategy: ol.loadingstrategy.bbox,
-		format: format,
-		baseUrlFunction: function(bbox, list) {
-			const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
-				args = [];
+	// Change class indicator when zoom is OK
+	function displayStatus() {
+		if (elZoom)
+			elZoom.className = this.getResolution() < options.maxResolution ? '' : 'zoom-out';
+	}
+	layer.once('myol:onadd', function(evt) {
+		evt.map.getView().on('change:resolution', displayStatus);
+		displayStatus.call(evt.map.getView());
+	});
 
-			for (let l = 0; l < list.length; l++) {
-				const lists = list[l].split('+');
-				for (let ls = 0; ls < lists.length; ls++)
-					args.push(
-						'node' + lists[ls] + bb + // Ask for nodes in the bbox
-						'way' + lists[ls] + bb // Also ask for areas
-					);
-			}
-			return options.baseUrl +
-				'?data=[timeout:5];(' + // Not too much !
-				args.join('') +
-				');out center;'; // add center of areas
-		},
-	}, options));
+	return layer;
 }
 
 

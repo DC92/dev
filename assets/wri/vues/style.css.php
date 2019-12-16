@@ -910,34 +910,19 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	position: relative;
 	top: 3px;
 }
+
 /* Couche OSM OVERPASS */
-#ajax-poi-status *,
-#ajax-osm-status *,
-#ajax-poiCHEM-status *,
-#ajax-poiPRC-status *,
-#ajax-poiC2C-status * {
+#couche-osm-load span,
+#couche-osm-load.loading span,
+#couche-osm-load.loaded span:first-child,
+#couche-osm-zoom span,
+#couche-osm-zoom.zoom-out ul {
 	display: none;
 }
-.ajax-none .ajax-nav-none,
-.ajax-wait .ajax-nav-wait,
-.ajax-zoom .ajax-nav-zoom,
-.ajax-some .ajax-nav-some,
-.ajax-zero .ajax-nav-zero,
-.ajax-too .ajax-nav-too,
-.ajax-some .ajax-point-some {
-	display: initial !important;
-}
-.ajax-nav-some {
-	color:green;
-}
-.ajax-nav-wait,
-.ajax-nav-zero {
-	color:blue;
-}
-.ajax-nav-zoom,
-.ajax-nav-too,
-.ajax-nav-error {
-	color:red;
+#couche-osm-load.loaded span,
+#couche-osm-load.loading span:first-child,
+#couche-osm-zoom.zoom-out span {
+	display: inline;
 }
 
 .bouton-supprimer {

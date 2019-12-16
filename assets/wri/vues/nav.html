@@ -61,16 +61,22 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 		<?}?>
 		<fieldset class="nav-services">
 			<legend>
-				Services <input type="checkbox" name="couche-osm" /> <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">&copy;</a>
+				Services <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">OSM</a>
+				<span id="couche-osm-load"><span> - En cours</span><span> - Chargé</span></span>
 			</legend>
-			<ul>
-				<li><input type="checkbox" name="couche-osm" id="Residence" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />hôtel ou location</li>
-				<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />camping</li>
-				<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />point d'eau</li>
-				<li><input type="checkbox" name="couche-osm" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />alimentation</li>
-				<li><input type="checkbox" name="couche-osm" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />parkings</li>
-				<li><input type="checkbox" name="couche-osm" id="Ground Transportation" value='["highway"="bus_stop"]' />bus</li>
-			</ul>
+
+			<div id="couche-osm-zoom">
+				<span>Zone trop large.<br/>Zoomez pour voir les points</span>
+				<ul>
+					<li><input type="checkbox" name="couche-osm" /> Tout</li>
+					<li><input type="checkbox" name="couche-osm" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />hôtel ou location</li>
+					<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />camping</li>
+					<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />point d'eau</li>
+					<li><input type="checkbox" name="couche-osm" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />alimentation</li>
+					<li><input type="checkbox" name="couche-osm" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />parkings</li>
+					<li><input type="checkbox" name="couche-osm" id="Ground Transportation" value='["highway"="bus_stop"]' />bus</li>
+				</ul>
+			</div>
 		</fieldset>
 		<fieldset class="nav-sites">
 			<legend>Autres sites</legend>

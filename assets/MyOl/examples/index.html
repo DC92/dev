@@ -39,6 +39,14 @@ Based on https://openlayers.org
 		.label-overpass {
 			background: #cde;
 		}
+		#osm-features-zoom,
+		#osm-features-load {
+			display: none;
+		}
+		#osm-features-zoom.zoom-out,
+		#osm-features-load.loading {
+			display: inline;
+		}
 	</style>
 </head>
 
@@ -94,8 +102,13 @@ Based on https://openlayers.org
 }
 	' />
 	
+	
 	<ul>
-		<li>OVERPASS<input type="checkbox" name="osm-features" /></li>
+		<li>
+			OVERPASS<input type="checkbox" name="osm-features" />
+			<span id="osm-features-zoom">Zone trop large</span>
+			<span id="osm-features-load">Demande en cours</span>
+		</li>
 		<li><input type="checkbox" name="osm-features" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
 		<li><input type="checkbox" name="osm-features" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
 		<li><input type="checkbox" name="osm-features" id="Oil Field" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>

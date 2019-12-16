@@ -126,7 +126,7 @@ const controls = [
 		controls: controls,
 		layers: overlays,
 	});
-	
+
 	<?if ($vue->polygone->id_polygone){?>
 		map.getView().fit(ol.proj.transformExtent([
 			<?=$vue->polygone->ouest?>,
