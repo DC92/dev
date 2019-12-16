@@ -162,7 +162,7 @@
 
   function flyTo(map, coord, duration, resolution) {
     resolution = resolution || 2.388657133911758;
-    duration = duration || 500;
+    duration = 0; //TODO BUG duration || 500;
     map.getView().animate({ duration: duration, resolution: resolution }, { duration: duration, center: coord });
   }
 

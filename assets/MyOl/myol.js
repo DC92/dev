@@ -345,6 +345,7 @@ function escapedStyle(a, b, c) {
  * return : [checked values or ids]
  */
 function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
+	//TODO WRI bandeau cartes : doit utiliser ? pas #
 	const checkEls = document.getElementsByName(selectorName),
 		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
 		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
@@ -389,6 +390,9 @@ function permanentCheckboxList(selectorName, evt) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
+//TODO BUG Survol polygone : l'étiquette ne suit pas
+//BEST BUG Survol polygone transparent : peut cliquer dessus
+//BEST split two close points
 function hoverManager(map) {
 	// Only one per map
 	if (map.hasHoverManager_)
@@ -832,6 +836,8 @@ function layerC2C(options) {
 //BEST BUG IE don't dispaly icons
 //BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
 //TODO avertissement quand pas dans zone zoom
+//TODO WRI l'icone des Hôtels ne se différencie pas de nos refuges gardés
+//TODO ?? points d'eau : (alti ? type=source naturelle/fontaine/ ?)
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -945,13 +951,6 @@ function controlButton(options) {
 	control.element.appendChild(buttonEl);
 	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
 	control.element.title = options.title; // {string} displayed when the control is hovered.
-	if (options.className) {
-		if (options.rightPosition) { // {float} distance to the top when the button is on the right of the map
-			control.element.style.top = options.rightPosition + 'em';
-			control.element.style.right = '.5em';
-		} else
-			control.element.style.top = '.5em';
-	}
 	if (options.label)
 		buttonEl.innerHTML = options.label;
 
@@ -980,7 +979,7 @@ function controlButton(options) {
 	control.toggle = function(newActive, group) {
 		// Toggle by default
 		if (typeof newActive == 'undefined')
-			newActive = (control.active + 1) % options.buttonBackgroundColors.length;
+			newActive = (control.active + 1); //TODO DELETE % options.buttonBackgroundColors.length;
 
 		// Unselect all other controlButtons from the same group
 		if (newActive && options.group)
@@ -1008,7 +1007,8 @@ function controlButton(options) {
  */
 function controlLayersSwitcher(options) {
 	const button = controlButton({
-		className: 'ol-switch-layer',
+		className: 'ol-switch-layer myol-button',
+		label: '\u2026',
 		title: 'Liste des cartes',
 		rightPosition: 0.5,
 	});
@@ -1248,7 +1248,8 @@ function controlTilesBuffer(depth, depthFS) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//BEST report bug that stops animation on OL v6 & resorb patch on Geocoder
+//BEST report bug that stops animation on OL v6 & resorb patch on Geocoder https://github.com/openlayers/openlayers/issues/10313
+//BEST BUG controm 1px down on FireFox
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
@@ -1448,16 +1449,15 @@ function controlLoadGPX(options) {
 	options = Object.assign({
 		label: '\u25b2',
 		title: 'Visualiser un fichier GPX sur la carte',
+		activate: function() {
+			inputEl.click();
+		},
 	}, options);
 
 	const inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
-		button = controlButton(Object.assign({
-			activate: function() {
-				inputEl.click();
-			},
-		}, options));
+		button = controlButton(options);
 
 	inputEl.type = 'file';
 	inputEl.addEventListener('change', function() {
@@ -1521,9 +1521,11 @@ function controlDownload(options) {
 		className: 'myol-button ol-download',
 		title: 'Cliquer sur un format ci-dessous\n' +
 			'pour obtenir un fichier contenant\n' +
-			'les éléments visibles dans la fenêtre.',
+			'les éléments visibles dans la fenêtre.\n' +
+			'(la liste peut être incomplète pour les grandes zones)',
 		question: '<span/>', // Invisible but generates a questionEl <div>
 		fileName: document.title || 'openlayers',
+		activate: download,
 	}, options);
 
 	const hiddenEl = document.createElement('a'),
@@ -1536,7 +1538,6 @@ function controlDownload(options) {
 		GPX: 'application/gpx+xml',
 		KML: 'vnd.google-earth.kml+xml',
 		GeoJSON: 'application/json',
-		WKT: 'text/plain',
 	};
 	for (let f in formats) {
 		const el = document.createElement('p');
@@ -1548,7 +1549,7 @@ function controlDownload(options) {
 	}
 
 	function download() { //formatName, mime
-		const formatName = this.textContent,
+		const formatName = this.textContent || 'GPX', //BEST get fisrt value as default
 			mime = this.id,
 			format = new ol.format[formatName](),
 			map = button.getMap();

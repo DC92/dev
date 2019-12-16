@@ -40,9 +40,15 @@ const layer = layerOSM(
 
 	map = new ol.Map({
 		target: 'carte-accueil',
-		controls: [new ol.control.Attribution({
-			collapsible: false, // Attribution always open
-		})],
+		controls: [
+			new ol.control.Attribution({
+				collapsible: false, // Attribution always open
+			}),
+			controlPermalink({ // Permet de garder le même réglage de carte
+				init: false, // Ici, on initialisera plutôt la zone principale
+				visible: false,
+			}),
+		],
 		layers: [
 			layer,
 			massifs,

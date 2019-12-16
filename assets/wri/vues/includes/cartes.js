@@ -10,8 +10,8 @@ const baseLayers = {
 		'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
 		'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 	),
-	'Outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
-	'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+//TODO	'Outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
+	'OSM-fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 <?php if ($vue->type != 'point_formulaire_modification') { ?>
 	'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 	'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
@@ -19,6 +19,6 @@ const baseLayers = {
 	'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 	'Autriche': layerKompass('KOMPASS Touristik'),
 	'Espagne': layerSpain('mapa-raster', 'MTN'),
-	'Photo Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
-	'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
+	'Photo-Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
+	'Photo-IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
 };

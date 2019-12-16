@@ -24,7 +24,9 @@ const controls = [
 		controlGeocoder(),
 		controlGPS(),
 		controlLoadGPX(),
+<?if (!$vue->polygone->nom_polygone ) { ?>
 		controlDownload(),
+<?php } ?>
 		controlPrint(),
 	],
 

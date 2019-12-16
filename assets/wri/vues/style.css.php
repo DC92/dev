@@ -806,7 +806,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 }
 @media screen and (max-width: 650px) {
   #carte-accueil {
-    width: 100vw;
+    width: calc(100vw - 23px);
     height: 90vw;
   }
   #accueil-photos {

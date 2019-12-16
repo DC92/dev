@@ -17,7 +17,7 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 <div id="selecteur-carte-nav" class="noprint">
 	<?if (!$vue->mode_affichage ){?>
 		<fieldset>
-			<legend>Points</legend>
+			<legend>Points (<a href="<?=$vue->lien_legende_carte?>">Légende</a>)</legend>
 			<ul>
 				<?if ( $vue->polygone->id_polygone ){?>
 					<li><label>
@@ -48,32 +48,28 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 						</span>
 					</label></li>
 				<?}?>
-				<li><a href="<?=$vue->lien_legende_carte?>">Légende</a></li>
 			</ul>
 		</fieldset>
-		<fieldset <?if (!$vue->polygone->nom_polygone ){?>style="display:none"<?}?>>
-			<legend>Exportations</legend>
-			Tous les points refuges.info <?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?><br/>
-				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx">GPX </a><br/>
-				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_garmin">Garmin</a><br/>
-				&nbsp; <a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml">KML </a>
-		</fieldset>
+		<?if ($vue->polygone->nom_polygone ) { ?>
+			<fieldset >
+				<legend>Téléchargements</legend>
+				Tous les points refuges.info <?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?><br/>
+					<a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx" title="Télécharger au format GPX complet">GPX</a> /
+					<a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_garmin" title="Télécharger au format GPX pour Garmin">Garmin</a> /
+					<a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml" title="Télécharger au format KML">KML</a>
+			</fieldset>
+		<?}?>
 		<fieldset class="nav-services">
 			<legend>
 				Services <input type="checkbox" name="couche-osm" /> <a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">&copy;</a>
 			</legend>
 			<ul>
-				<li><input type="checkbox" name="couche-osm" id="Residence" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtels et locations</li>
-				<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />Campings</li>
-				<li><input type="checkbox" name="couche-osm" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
-				<li><input type="checkbox" name="couche-osm" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />Parkings</li>
-				<li><input type="checkbox" name="couche-osm" id="Ground Transportation" value='["highway"="bus_stop"]' />Bus</li>
-				<li><input type="checkbox" name="couche-osm" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
-				<hr/>
-				<li><input type="checkbox" name="couche-osm" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
-				<li><input type="checkbox" name="couche-osm" id="Lodge" value='["building"="cabin"]' />Cabane non gardée</li>
-				<li><input type="checkbox" name="couche-osm" id="Fishing Hot Spot Facility" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
-				<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
+				<li><input type="checkbox" name="couche-osm" id="Residence" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />hôtel ou location</li>
+				<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />camping</li>
+				<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />point d'eau</li>
+				<li><input type="checkbox" name="couche-osm" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />alimentation</li>
+				<li><input type="checkbox" name="couche-osm" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />parkings</li>
+				<li><input type="checkbox" name="couche-osm" id="Ground Transportation" value='["highway"="bus_stop"]' />bus</li>
 			</ul>
 		</fieldset>
 		<fieldset class="nav-sites">

@@ -1,3 +1,11 @@
+/* Compatibility controls OL V5 */
+.ol-overlaycontainer-stopevent{
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+}
+
 /* Top aligned buttons */
 /* Container */
 .ol-control-hidden {
@@ -12,7 +20,7 @@
 	position: relative !important;
 	left: 0 !important;
 	top: 0 !important;
-	margin: 0.2em 0 0 0.2em;
+	margin: .2em 0 0 .2em;
 	padding: 0; /* No grey line around the button */
 }
 
@@ -21,9 +29,9 @@
 .ol-control button:focus,
 .ol-geocoder button {
 	font-size: 1.14em !important;
-	color: black ;
+	color: black;
 	background-color: white;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, .65);
 	outline: 0;
 }
 .ol-geocoder button {
@@ -49,14 +57,27 @@
 }
 
 /* Boxes under buttons */
+.ol-control-question {
+	position: absolute;
+	top: 1.7em;
+	width: 6.5em;
+	padding: 1px;
+	background-color: white;
+}
+.ol-control-question span {
+	cursor: pointer;
+}
 .gcd-gl-control {
 	top: 1.7em;
 	left: -2.1em;
+}
+.gcd-gl-control,
+.gcd-gl-control:hover {
 	background: rgba(0, 0, 0, 0); /* Transparent */
 }
 .gcd-gl-result {
 	top: 3.8em !important;
-	left: 0.1em !important;
+	left: .1em !important;
 }
 
 /* Full screen */
@@ -91,16 +112,6 @@
 .ol-print p span {
 	color: blue;
 }
-.ol-control-question {
-	position: absolute;
-	top: 1.7em;
-	width: 6.5em;
-	padding: 1px;
-	background-color: white;
-}
-.ol-control-question span {
-	cursor: pointer;
-}
 /* When printing, hide all controls except : */
 @media print {
 	.ol-overlaycontainer-stopevent > * {
@@ -112,12 +123,19 @@
 	}
 }
 
-/* Switch layer popup */
-.ol-switch-layer {
-	background-color: white !important; /* Initial translucid */
+/* Other controls */
+.ol-permalink,
+.ol-attribution,
+.ol-coordinate,
+.ol-length-line {
+	font-size: .8em;
 }
-.ol-switch-layer button::after {
-	content: "…";
+.ol-switch-layer {
+	position: absolute !important;
+	left: auto !important;
+	right: .2em;
+	z-index: 1;
+	background-color: white !important; /* Initial translucid */
 }
 .ol-switch-layer div {
 	padding: 2px;
@@ -125,62 +143,41 @@
 .ol-switch-layer input {
 	margin: 0;
 }
-.ol-switch-layer p {
-	margin: 0;
-	font-size: small;
+.ol-switch-layer button {
+	padding-bottom: .5em;
 }
-
-/* Permalink */
 .ol-permalink {
 	position: absolute;
 	bottom: 24px;
 	right: 0;
 	padding: 3px;
 	border-radius: 8px 0 0 8px;
-	background: rgba(255, 255, 255, 0.8);
-	font-size: 0.7rem;
-	line-height: 1.375em;
+	background: rgba(255, 255, 255, .8);
 }
-
-/* Coordinates */
 .ol-coordinate {
 	position: absolute;
 	bottom: 30px;
 	left: 8px;
 	padding: 2px;
 	border-radius: 4px;
-	background: rgba(0, 60, 136, 0.3);
-	font-size: small;
+	background: rgba(0, 60, 136, .3);
 	color: white;
 }
-.ol-coordinate:empty {
-	display: none;
-}
-
-/* Mesures */
 .ol-length-line {
 	position: absolute;
 	bottom: 52px;
 	left: 8px;
 	padding: 2px;
 	border-radius: 4px;
-	background: rgba(0, 60, 136, 0.3);
-	font-size: small;
+	background: rgba(0, 60, 136, .3);
 	color: white;
 }
+.ol-coordinate:empty,
 .ol-length-line:empty {
 	display: none;
 }
 
-/* Compatibility controls OL V5 */
-.ol-overlaycontainer-stopevent{
-	position: absolute;
-	top: 0;
-	height: 100%;
-	width: 100%;
-}
-
-/* Features popup */
+/* Vector layers popup */
 .myol-popup,
 .myol-popup:hover {
 	display: block;
