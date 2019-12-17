@@ -21,7 +21,7 @@ if ($config_wri['base_pgsql'] == "test")
 // Les clés des cartes sous contrat gratuit
 $config_wri['ign_key']='???'; // http://professionnels.ign.fr/user
 $config_wri['bing_key']='???'; // https://www.bingmapsportal.com
-$config_wri['thunderforest_key']='???'; // https://manage.thunderforest.com
+$config_wri['thunderforest_key']='???'; // https://www.bingmapsportal.com
 
 // Le par défaut géré par sly pour l'association Openstreetmap France. Plus rapide en réponse de ~20%, mais leur serveur déconne trop souvent, et ça plante parfois
 //$config_wri['overpass_api']="http://api.openstreetmap.fr/oapi/interpreter";

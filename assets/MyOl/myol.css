@@ -106,7 +106,7 @@
 }
 .ol-print p {
 	margin: 0;
-	font-size: 14px;
+	font-size: .8em;
 	font-family: Times New Roman;
 }
 .ol-print p span {
@@ -145,6 +145,10 @@
 }
 .ol-switch-layer button {
 	padding-bottom: .5em;
+}
+.ol-switch-layer p {
+	margin: 0;
+	font-size: .8em;
 }
 .ol-permalink {
 	position: absolute;
@@ -185,7 +189,7 @@
 	border-radius: 5px;
 	box-shadow: 0 3px 8px #888;
 	background-color: white;
-	font-size: 12px;
+	font-size: .8em;
 	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-decoration: none;
 	color: initial;

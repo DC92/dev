@@ -13,7 +13,6 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {}; //HACK For JS validators
 //BEST document all options in options = Object.assign
-//TODO WRI thunderforest_key / Outdoors
 
 /**
  * Debug facilities on mobile
@@ -394,8 +393,8 @@ function permanentCheckboxList(selectorName, evt) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
-//TODO BUG Survol polygone : l'étiquette ne suit pas
-//BEST BUG Survol polygone transparent : peut cliquer dessus
+//TODO BUG Polygon hover: the label does not follow
+//BEST BUG Polygon hover: can click on transparent fill
 //BEST split two close points
 function hoverManager(map) {
 	// Only one per map
@@ -537,20 +536,22 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 function layerVectorURL(options) {
 	options = Object.assign({
-		baseUrl: null, // url of the service (mandatory)
+		/** All ol.source.Vector options */
+		/** All ol.layer.Vector options */
+		// baseUrl: url of the service (mandatory)
+		// strategy: ol.loadingstrategy... object
 		urlSuffix: '', // url suffix to be defined separately from the rest (E.G. server domain and/or directory)
-		baseUrlFunction: function(bbox, list) {
+		// noMemSelection: don't memorize the selection in cookies
+		selectorName: '', // Id of a <select> to tune url optional parameters
+		baseUrlFunction: function(bbox, list) { // Function returning the layer's url
 			return options.baseUrl + options.urlSuffix +
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
-		selectorName: '', // Id of a <select> to tune url optional parameters
 		projection: 'EPSG:4326', // Projection of received data
 		format: new ol.format.GeoJSON({ // Format of received data
 			dataProjection: options.projection,
 		}),
-		// Modification of the Json object after reception & before geoJson analysis
-		receiveProperties: function(properties, feature, layer) {}, // Add properties based on existing one
-		receiveJson: function(FeatureCollection, layer) {
+		receiveJson: function(FeatureCollection, layer) { // Modification of the received Json
 			for (let f in FeatureCollection.features)
 				options.receiveProperties(
 					FeatureCollection.features[f].properties,
@@ -559,36 +560,36 @@ function layerVectorURL(options) {
 				);
 			return FeatureCollection;
 		},
-		styleOptions: function(properties) {
+		receiveProperties: function(properties, feature, layer) {}, // Add properties based on existing one
+		styleOptions: function(properties) { // Function returning the layer's feature style
 			return {
 				image: new ol.style.Icon({
 					src: '//sym16.dc9.fr/' + properties.sym + '.png',
 				}),
 			};
 		},
-		// Label to dispach above the feature when hovering
-		label: function(properties) {
-			const lines = [];
+		label: function(properties) { // Label to dispach above the feature when hovering
+			const lines = [],
+				type = properties.type.replace(/(:|_)/g, ' '),
+				src = (properties.link || '').match(/\/([^\/]+)/i);
 			if (properties.name) {
 				if (properties.link)
 					lines.push('<a href="' + properties.link + '">' + properties.name + '</a>');
 				else
 					lines.push(properties.name);
-				if (properties.type)
-					lines.push(properties.type);
+				if (type)
+					lines.push(type);
 			} else {
 				if (properties.link)
-					lines.push('<a href="' + properties.link + '">' + (properties.type || 'fiche') + '</a>');
-				else if (properties.type)
-					lines.push(properties.type);
+					lines.push('<a href="' + properties.link + '">' + (type || 'fiche') + '</a>');
+				else if (type)
+					lines.push(type);
 			}
-			//BEST extract this from the link
-			if (properties.copy)
-				lines.push('&copy;' + properties.copy);
+			if (src)
+				lines.push('&copy; ' + src[1]);
+
 			return lines.join('<br/>');
 		},
-		/** All ol.source.Vector options */
-		/** All ol.layer.Vector options */
 	}, options);
 
 	//HACK overwrite ol.format.GeoJSON.readFeatures
@@ -615,7 +616,7 @@ function layerVectorURL(options) {
 					),
 					// Retreive checked parameters
 					list = permanentCheckboxList(options.selectorName).
-				filter(function(evt) { // selectorName optional
+				filter(function(evt) {
 					return evt !== 'on'; // Remove the "all" input (default value = "on")
 				});
 				// Round the coordinates
@@ -631,7 +632,7 @@ function layerVectorURL(options) {
 			renderBuffer: 16, // buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
-	layer.options = options;
+	layer.options = options; // Mem options for further use
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -672,15 +673,15 @@ function getSym(type) {
 		'<Drinking Water> point_eau waterpoint waterfall' +
 		'<Water Source> lac lake' +
 		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
-		'<Reef> glacier' +
+		'<Reef> glacier canyon' +
 		'<Flag, Red> col pass' +
 		'<Parking Area> access' +
+		'<Ground Transportation> bus car' +
 		'<Shopping Center> local_product ravitaillement buffet restaurant' +
 		'<Telephone> telephone' +
 		'<Oil Field> wifi reseau' +
-		'<Restroom> wc' +
-		'<Ground Transportation> bus car',
-		//' canyon slackline_spot paragliding_takeoff paragliding_landing virtual webcam
+		'<Restroom> wc',
+		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
 
 		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
 	return match ? match[1] : 'Puzzle Cache';
@@ -701,7 +702,6 @@ function layerRefugesInfo(options) {
 			properties.ele = properties.coord.alt;
 			properties.icone = properties.type.icone; // Mem icon value when overwriting type
 			properties.type = properties.type.valeur;
-			properties.copy = 'refuges.info';
 			// Need to have clean KML export
 			properties.nom =
 				properties.lien =
@@ -730,7 +730,6 @@ function layerPyreneesRefuges(options) {
 			properties.link = properties.url;
 			properties.ele = parseInt(properties.altitude);
 			properties.type = properties.type_hebergement;
-			properties.copy = 'pyrenees-refuges.com';
 		},
 	}, options));
 }
@@ -750,7 +749,6 @@ function layerChemineur(options) {
 			properties.link = properties.url;
 			properties.type = icone ? icone[1] : null;
 			properties.sym = getSym(properties.type);
-			properties.copy = 'chemineur.fr';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -786,7 +784,6 @@ function layerAlpages(options) {
 			properties.sym = getSym(properties.icone);
 			properties.type = icone ? icone[1] : null;
 			properties.link = 'http://alpages.info/viewtopic.php?t=' + properties.id;
-			properties.copy = 'alpages.info';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -1002,7 +999,7 @@ function controlButton(options) {
 	control.toggle = function(newActive, group) {
 		// Toggle by default
 		if (typeof newActive == 'undefined')
-			newActive = (control.active + 1); //TODO DELETE % options.buttonBackgroundColors.length;
+			newActive = (control.active + 1);
 
 		// Unselect all other controlButtons from the same group
 		if (newActive && options.group)

@@ -10,11 +10,11 @@ const baseLayers = {
 		'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
 		'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 	),
-//TODO	'Outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
+	'Outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
 	'OSM-fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 <?php if ($vue->type != 'point_formulaire_modification') { ?>
 	'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-	'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+	'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 <?php } ?>
 	'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 	'Autriche': layerKompass('KOMPASS Touristik'),
