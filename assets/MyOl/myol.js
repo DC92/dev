@@ -11,7 +11,8 @@
  */
 
 /* jshint esversion: 6 */
-//BEST document all options in options = Object.assign({
+if (!ol) var ol = {}; //HACK For JS validators
+//BEST document all options in options = Object.assign
 
 /**
  * Debug facilities on mobile
@@ -345,10 +346,12 @@ function escapedStyle(a, b, c) {
  * return : [checked values or ids]
  */
 function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
-	//TODO WRI bandeau cartes : doit utiliser ? pas #
 	const checkEls = document.getElementsByName(selectorName),
-		cookie = location.hash.match('map-' + selectorName + '=([^#,&;]*)') || // Priority to the hash
-		document.cookie.match('map-' + selectorName + '=([^;]*)'); // Then the cookie
+		cookie = decodeURI(
+			location.search + '#' + // Priority to the url args
+			location.hash + '#' + // Then the hash
+			document.cookie // Then the cookies
+		).match('map-' + selectorName + '=([^#&;]*)');
 
 	for (let e = 0; e < checkEls.length; e++) {
 		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
@@ -578,6 +581,7 @@ function layerVectorURL(options) {
 				else if (properties.type)
 					lines.push(properties.type);
 			}
+			//BEST extract this from the link
 			if (properties.copy)
 				lines.push('&copy;' + properties.copy);
 			return lines.join('<br/>');

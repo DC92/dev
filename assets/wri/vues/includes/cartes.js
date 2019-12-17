@@ -19,6 +19,6 @@ const baseLayers = {
 	'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 	'Autriche': layerKompass('KOMPASS Touristik'),
 	'Espagne': layerSpain('mapa-raster', 'MTN'),
-	'Photo-Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
-	'Photo-IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
+	'Photo Bing': layerBing('<?=$config_wri['bing_key']?>', 'Aerial'),
+	'Photo IGN': layerIGN('<?=$config_wri['ign_key']?>', 'ORTHOIMAGERY.ORTHOPHOTOS'),
 };
