@@ -13,6 +13,7 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {}; //HACK For JS validators
 //BEST document all options in options = Object.assign
+//TODO WRI thunderforest_key / Outdoors
 
 /**
  * Debug facilities on mobile
@@ -1176,6 +1177,7 @@ function controlPermalink(options) {
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
+			document.cookie = 'permalink=zoom=' + newParams[0] + '&lat=' + newParams[2] + '&lon=' + newParams[1] + ';path=/; SameSite=Strict'; //BEST DELETE (temp WRI)
 		}
 	}
 	return control;
