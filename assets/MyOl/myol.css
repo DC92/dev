@@ -193,6 +193,7 @@
 	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-decoration: none;
 	color: initial;
+	cursor: auto;
 }
 .myol-popup p {
 	margin: 0;
