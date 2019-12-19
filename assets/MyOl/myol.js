@@ -590,15 +590,15 @@ function layerVectorURL(options) {
 			if (properties.ele)
 				desc.push(properties.ele + 'm');
 			if (properties.bed)
-				desc.push(properties.bed + '\u255E\u2550\u2555');
+				desc.push(properties.bed + '<span>\u255E\u2550\u2555</span>');
 			if (desc.length)
 				lines.push(desc.join(', '));
 			if (properties.phone)
 				lines.push('<a href="tel:' + properties.phone.replace(/ /g, '') + '">' + properties.phone + '</a>');
+			if(src&&!properties.copy)
+				properties.copy= src[1];
 			if (properties.copy)
-				lines.push('&copy; ' + properties.copy.replace('www.', ''));
-			else if (src)
-				lines.push('&copy; ' + src[1].replace('www.', ''));
+				lines.push('<p>&copy; ' + properties.copy.replace('www.', '')+'</p>');
 
 			return lines.join('<br/>');
 		},
@@ -671,7 +671,7 @@ function layerVectorURL(options) {
  * Convert properties type into gpx <sym>
  * Manages common types for many layer services
  */
-//TODO define in input chech field
+//BEST define <sym> in an input check field
 function getSym(type) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/

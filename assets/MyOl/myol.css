@@ -197,6 +197,10 @@
 }
 .myol-popup p {
 	margin: 0;
+	font-size: .8em;
+}
+.myol-popup span {
+	font-size: .7em;
 }
 .myol-popup-hidden {
 	display: none;
