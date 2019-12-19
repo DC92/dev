@@ -315,7 +315,7 @@ class listener implements EventSubscriberInterface
 			if (!$v)
 				switch ($k) {
 //TODO ALPAGES Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
-
+//TODO ALPAGES BUG : affiche altitude = 99999 sur http://alpages.info/viewtopic.php?t=3166
 					case 'geo_surface':
 						if ($post_data['area'] && $center[0])
 							$update[$k] =

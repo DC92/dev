@@ -345,6 +345,7 @@ function escapedStyle(a, b, c) {
  * evt (keyboard event)
  * return : [checked values or ids]
  */
+//BEST open/close features check button / default in option
 function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
 	const checkEls = document.getElementsByName(selectorName),
 		cookie = decodeURI(
@@ -570,6 +571,7 @@ function layerVectorURL(options) {
 		},
 		label: function(properties) { // Label to dispach above the feature when hovering
 			const lines = [],
+				desc = [],
 				type = (properties.type || '').replace(/(:|_)/g, ' '),
 				src = (properties.link || '').match(/\/([^\/]+)/i);
 			if (properties.name) {
@@ -585,8 +587,18 @@ function layerVectorURL(options) {
 				else if (type)
 					lines.push(type);
 			}
-			if (src)
-				lines.push('&copy; ' + src[1]);
+			if (properties.ele)
+				desc.push(properties.ele + 'm');
+			if (properties.bed)
+				desc.push(properties.bed + '\u255E\u2550\u2555');
+			if (desc.length)
+				lines.push(desc.join(', '));
+			if (properties.phone)
+				lines.push('<a href="tel:' + properties.phone.replace(/ /g, '') + '">' + properties.phone + '</a>');
+			if (properties.copy)
+				lines.push('&copy; ' + properties.copy.replace('www.', ''));
+			else if (src)
+				lines.push('&copy; ' + src[1].replace('www.', ''));
 
 			return lines.join('<br/>');
 		},
@@ -659,28 +671,33 @@ function layerVectorURL(options) {
  * Convert properties type into gpx <sym>
  * Manages common types for many layer services
  */
+//TODO define in input chech field
 function getSym(type) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
 		// <sym> propertie propertie
-		'<City Hall> hotel locality' +
+		'<City Hall> hotel' +
 		'<Residence> refuge gite chambre_hote' +
 		'<Lodge> cabane cabane_cle buron alpage shelter cabane ouverte mais ocupee par le berger l ete' +
 		'<Fishing Hot Spot Facility> abri hut' +
 		'<Campground> camping camp_site bivouac' +
 		'<Tunnel> orri toue abri en pierre grotte cave' +
 		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
-		'<Drinking Water> point_eau waterpoint waterfall' +
-		'<Water Source> lac lake' +
+
 		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
 		'<Reef> glacier canyon' +
-		'<Flag, Red> col pass' +
-		'<Parking Area> access' +
+		'<Waypoint> locality col pass' +
+
+		'<Drinking Water> point_eau waterpoint waterfall' +
+		'<Water Source> lac lake' +
 		'<Ground Transportation> bus car' +
-		'<Shopping Center> local_product ravitaillement buffet restaurant' +
-		'<Telephone> telephone' +
+		'<Parking Area> access' +
+		'<Restaurant> buffet restaurant' +
+		'<Shopping Center> local_product ravitaillement' +
+
+		'<Restroom> wc' +
 		'<Oil Field> wifi reseau' +
-		'<Restroom> wc',
+		'<Telephone> telephone',
 		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
 
 		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
@@ -702,6 +719,7 @@ function layerRefugesInfo(options) {
 			properties.ele = properties.coord.alt;
 			properties.icone = properties.type.icone; // Mem icon value when overwriting type
 			properties.type = properties.type.valeur;
+			properties.bed = properties.places.valeur;
 			// Need to have clean KML export
 			properties.nom =
 				properties.lien =
@@ -726,10 +744,11 @@ function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		receiveProperties: function(properties) {
-			properties.sym = getSym(properties.type_hebergement);
+			properties.sym = getSym(properties.type_hebergement || 'cabane');
 			properties.link = properties.url;
 			properties.ele = parseInt(properties.altitude);
 			properties.type = properties.type_hebergement;
+			properties.bed = properties.cap_ete || properties.cap_hiver;
 		},
 	}, options));
 }
@@ -749,6 +768,7 @@ function layerChemineur(options) {
 			properties.link = properties.url;
 			properties.type = icone ? icone[1] : null;
 			properties.sym = getSym(properties.type);
+			properties.copy = 'chemineur.fr';
 		},
 		styleOptions: function(properties) {
 			return {
@@ -818,7 +838,6 @@ function layerC2C(options) {
 						type: object.waypoint_type,
 						sym: getSym(object.waypoint_type),
 						link: 'https://www.camptocamp.org/waypoints/' + object.document_id,
-						copy: 'CampToCamp.org',
 					},
 				});
 			}
@@ -837,7 +856,7 @@ function layerC2C(options) {
  * Requires layerVectorURL
  */
 //BEST BUG IE don't dispaly icons
-//BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error
+//BEST BUG ? type=access for parking
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -874,6 +893,8 @@ function layerOverpass(options) {
 			');out center;'; // add center of areas
 	}
 
+	//BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error	
+	//TODO Exploit return file overpass 200 with error
 	format.readFeatures = function(doc, opt) {
 		if (elLoad)
 			elLoad.className = 'loaded';
@@ -929,7 +950,7 @@ function layerOverpass(options) {
 								checkEls[c].value.includes(p) &&
 								checkEls[c].value.includes(properties[p])) {
 								newProperties.sym = checkEls[c].getAttribute('id');
-								newProperties.type = p + ':' + properties[p];
+								newProperties.type = properties[p];
 							}
 						features[f].setProperties(newProperties, false);
 					}
