@@ -1,18 +1,11 @@
-// Contient les déclarations communes aux cartes
-
+<?php // Contient les déclarations communes aux cartes
+?>
 const baseLayers = {
-	'Refuges.info': layerOSM(
-		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-		'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-	),
-	'OpenTopo': layerOSM(
-		'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-		'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
-		'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-	),
+	'Refuges.info': layerOsmMri(),
+	'OpenTopo': layerOsmOpenTopo(),
 	'Outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
-	'OSM-fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-<?php if ($vue->type != 'point_formulaire_modification') { ?>
+	'OSM-fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+<?php if ($vue->type != 'edit') { ?>
 	'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 	'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 <?php } ?>

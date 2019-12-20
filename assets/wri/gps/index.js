@@ -46,26 +46,6 @@ const help =
 	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n',
 
-	baseLayers = {
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopoMap': layerOSM(
-			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-		),
-		'Refuges.info': layerOSM(
-			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-		),
-		'Outdoors': layerThunderforest(thunderforest_key, 'outdoors'),
-		'IGN': layerIGN(ign_key, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN Express': layerIGN(ign_key, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-		'Photo IGN': layerIGN(ign_key, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Google': layerGoogle('m'),
-		'Photo Google': layerGoogle('s'),
-	},
-
 	controls = [
 		controlLayersSwitcher({
 			baseLayers: baseLayers,

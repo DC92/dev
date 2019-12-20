@@ -1,9 +1,9 @@
 // Script lié à la page d'acceuil
 
 // Le fond de carte
-const layer = layerOSM(
+const layer = layerOsm(
 		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-		'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 	),
 
 	// La couche "massifs"
@@ -13,6 +13,7 @@ const layer = layerOSM(
 			properties.name = properties.nom;
 			properties.type = null;
 			properties.link = properties.lien;
+			properties.copy = '';
 		},
 		styleOptions: function(properties) {
 			// Translates the color in RGBA to be transparent

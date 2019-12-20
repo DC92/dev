@@ -15,20 +15,20 @@ function geoControls(options) {
 
 	return controlsCollection(Object.assign({
 		baseLayers: {
-			'OpenTopo': layerOSM(
+			'OpenTopo': layerOsm(
 				'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 				'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 			),
 			'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
-			'MRI': layerOSM(
+			'MRI': layerOsm(
 				'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-				'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+				'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 			),
-			'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+			'OSM-FR': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 			'OSM contraste': layerThunderforest(keys.thunderforest, 'mobile-atlas'),
-			'Hike & Bike': layerOSM( // Not on https
+			'Hike & Bike': layerOsm( // Not on https
 				'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
-				'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
+				'<a href="//www.hikebikemap.org/">hikebikemap.org</a>'
 			),
 			'Autriche': layerKompass('KOMPASS Touristik'),
 			'Kompas': layerKompass('KOMPASS'),

@@ -15,8 +15,8 @@ function geoControls(options) {
 			baseLayers: {
 				'Satellite': layerGoogle('s'),
 				'Google hybrid': layerGoogle('s,h'),
-				'OSM': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-				'OSM topo': layerOSM(
+				'OSM': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+				'OSM topo': layerOsm(
 					'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 					'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 				),

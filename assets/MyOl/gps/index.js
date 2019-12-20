@@ -41,17 +41,10 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	},
 
 	baseLayers = {
-		'OpenTopo': layerOSM(
-			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-		),
+		'OpenTopo': layerOsmOpenTopo(),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
 		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'Refuges.info': layerOSM(
-			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-		),
+		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),

@@ -13,6 +13,8 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {}; //HACK For JS validators
 //BEST document all options in options = Object.assign
+//BEST why not function "refocus the cursor" in /examples/index.html ?
+
 
 /**
  * Debug facilities on mobile
@@ -78,7 +80,7 @@ ol.Map.prototype.handlePostRender = function() {
 /**
  * Openstreetmap
  */
-function layerOSM(url, attribution, maxZoom) {
+function layerOsm(url, attribution, maxZoom) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
 			url: url,
@@ -91,12 +93,28 @@ function layerOSM(url, attribution, maxZoom) {
 	});
 }
 
+function layerOsmOpenTopo() {
+	return layerOsm(
+		'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+		'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
+		'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+		17
+	);
+}
+
+function layerOsmMri() {
+	return layerOsm(
+		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
+		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+	);
+}
+
 /**
  * Kompas (Austria)
- * Requires layerOSM
+ * Requires layerOsm
  */
 function layerKompass(layer) {
-	return layerOSM(
+	return layerOsm(
 		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + layer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
@@ -105,11 +123,11 @@ function layerKompass(layer) {
 
 /**
  * Thunderforest
- * Requires layerOSM
+ * Requires layerOsm
  * Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(key, layer) {
-	return layerOSM(
+	return layerOsm(
 		'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + key,
 		'<a href="http://www.thunderforest.com">Thunderforest</a>'
 	);
@@ -508,7 +526,7 @@ function hoverManager(map) {
 			const link = hoveredFeature.getProperties().link;
 			if (link) {
 				if (evt.pointerEvent.ctrlKey) {
-					var win = window.open(link, '_blank');
+					const win = window.open(link, '_blank');
 					if (evt.pointerEvent.shiftKey)
 						win.focus();
 				} else
@@ -572,8 +590,13 @@ function layerVectorURL(options) {
 		label: function(properties) { // Label to dispach above the feature when hovering
 			const lines = [],
 				desc = [],
-				type = (properties.type || '').replace(/(:|_)/g, ' '),
+				type = (properties.type || '')
+				.replace(/(:|_)/g, ' ') // Remove overpass prefix
+				.replace(/[a-z]/, function(c) { // Fisrs char uppercase
+					return c.toUpperCase();
+				}),
 				src = (properties.link || '').match(/\/([^\/]+)/i);
+
 			if (properties.name) {
 				if (properties.link)
 					lines.push('<a href="' + properties.link + '">' + properties.name + '</a>');
@@ -583,7 +606,7 @@ function layerVectorURL(options) {
 					lines.push(type);
 			} else {
 				if (properties.link)
-					lines.push('<a href="' + properties.link + '">' + (type || 'fiche') + '</a>');
+					lines.push('<a href="' + properties.link + '">' + (type || 'Fiche') + '</a>');
 				else if (type)
 					lines.push(type);
 			}
@@ -595,10 +618,10 @@ function layerVectorURL(options) {
 				lines.push(desc.join(', '));
 			if (properties.phone)
 				lines.push('<a href="tel:' + properties.phone.replace(/ /g, '') + '">' + properties.phone + '</a>');
-			if(src&&!properties.copy)
-				properties.copy= src[1];
+			if (typeof properties.copy != 'string' && src)
+				properties.copy = src[1];
 			if (properties.copy)
-				lines.push('<p>&copy; ' + properties.copy.replace('www.', '')+'</p>');
+				lines.push('<p>&copy; ' + properties.copy.replace('www.', '') + '</p>');
 
 			return lines.join('<br/>');
 		},
@@ -856,7 +879,6 @@ function layerC2C(options) {
  * Requires layerVectorURL
  */
 //BEST BUG IE don't dispaly icons
-//BEST BUG ? type=access for parking
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -933,7 +955,7 @@ function layerOverpass(options) {
 		const features = ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 
 		// Compute missing features
-		for (var f = features.length - 1; f >= 0; f--)
+		for (let f = features.length - 1; f >= 0; f--)
 			if (!features[f].getId()) // Remove unused 'way' features
 				features.splice(f, 1);
 			else {
@@ -2284,22 +2306,14 @@ function flatCoord(existingCoords, newCoords, pointerPosition) {
  */
 function layersCollection(keys) {
 	return {
-		'OSM-FR': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopo': layerOSM(
-			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-			'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
-			'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-			17
-		),
+		'OSM-FR': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OpenTopo': layerOsmOpenTopo(),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
-		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-		'MRI': layerOSM(
-			'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-			'<a href="http://wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-		),
-		'Hike & Bike': layerOSM(
+		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+		'MRI': layerOsmMri(),
+		'Hike & Bike': layerOsm(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
-			'<a href="http://www.hikebikemap.org/">hikebikemap.org</a>'
+			'<a href="//www.hikebikemap.org/">hikebikemap.org</a>'
 		), // Not on https
 		'OSM cycle': layerThunderforest(keys.thunderforest, 'cycle'),
 		'OSM landscape': layerThunderforest(keys.thunderforest, 'landscape'),

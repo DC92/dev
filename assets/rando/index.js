@@ -56,7 +56,7 @@ const help = [
 	],
 
 	baseLayers = {
-		'Topo': layerOSM(
+		'Topo': layerOsm(
 			'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'<a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 		),
