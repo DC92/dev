@@ -15,7 +15,7 @@ const refugesInfo = layerRefugesInfo({
 		imageUrl: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.png',
 		idDisplay: 'viseur',
 <?php if (!$point->id_point) { ?> // Pour une création de point
-		centerOnMap: true, // on utilise la position du permalink et on centre le curseur dessus
+		centerOnMap: true, // On utilise la position du permalink et on centre le curseur dessus
 <?php } ?>
 		draggable: true,
 	}),
@@ -39,7 +39,7 @@ const refugesInfo = layerRefugesInfo({
 			tipLabel: 'Plein écran',
 		}),
 		controlGeocoder(),
-		//controlLoadGPX(),
+		controlLoadGPX(),
 		controlGPS(),
 	],
 

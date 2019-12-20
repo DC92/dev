@@ -12,9 +12,6 @@
 
 /* jshint esversion: 6 */
 if (!ol) var ol = {}; //HACK For JS validators
-//BEST document all options in options = Object.assign
-//BEST why not function "refocus the cursor" in /examples/index.html ?
-
 
 /**
  * Debug facilities on mobile
@@ -206,6 +203,7 @@ function layerSpain(serveur, layer) {
  * Displays Stamen outside the layer zoom range or extend
  * Requires myol:onadd
  */
+//BEST document all options in options = Object.assign
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
@@ -412,6 +410,7 @@ function permanentCheckboxList(selectorName, evt) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
+//TODO BUG Hover sur massif ne libère pas le transparent
 //BEST BUG Polygon hover: do not click on transparent fill
 //BEST split two close points
 function hoverManager(map) {

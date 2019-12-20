@@ -38,6 +38,7 @@ const controls = [
 			properties.name = properties.nom;
 			properties.type = null;
 			properties.link = properties.lien;
+			properties.copy = '';
 		},
 		styleOptions: function(properties) {
 			// Translates the color in RGBA to be transparent
@@ -68,18 +69,20 @@ const controls = [
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
 		selectorName: 'couche-massif',
 		noMemSelection: true,
-		receiveProperties: function(properties, feature, layer) {
-			properties.name = properties.nom;
+		receiveProperties: function(properties, feature) {
+			// Converti les polygones en lignes pour ne pas activer le curseur en passant à l'intérieur du massif
+			feature.geometry = {
+				type: 'MultiLineString',
+				coordinates: feature.geometry.coordinates[0],
+			};
+
+			// Pas d'étiquette sur le bord du massif
 			properties.type = null;
-			properties.link = properties.lien;
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
-			}),
-			fill: new ol.style.Fill({
-				color: 'rgba(0,0,0,0)', // Tranparent
 			}),
 		},
 	}),
