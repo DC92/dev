@@ -44,13 +44,11 @@ Based on https://openlayers.org
 	</script>
 
 	<style>
-		html, body {
+		html, body, #map {
 			margin: 0;
 			padding: 0;
-		}
-		#map {
-			width: 100vw;
-			height: 100vh;
+			width: 100%;
+			height: 100%;
 		}
 	</style>
 </head>

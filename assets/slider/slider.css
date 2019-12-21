@@ -1,7 +1,7 @@
 #slide p {
 	position: absolute;
 	top: 0; left: 0;
-	width: 100vw;
+	width: 100vw; //TODO 100% (& html & body)
 	height: 100vh;
 	margin: 0;
 	background: grey;
