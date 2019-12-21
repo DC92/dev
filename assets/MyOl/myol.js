@@ -568,17 +568,7 @@ function layerVectorURL(options) {
 		format: new ol.format.GeoJSON({ // Format of received data
 			dataProjection: options.projection,
 		}),
-		//TODO BUG cancell responses not related to the last request in time
-		receiveJson: function(FeatureCollection, layer) { // Modification of the received Json
-			for (let f in FeatureCollection.features)
-				options.receiveProperties(
-					FeatureCollection.features[f].properties,
-					FeatureCollection.features[f],
-					layer
-				);
-			return FeatureCollection;
-		},
-		receiveProperties: function(properties, feature, layer) {}, // Add properties based on existing one
+		receiveProperties: function() {}, // (properties, feature, layer) Add properties based on existing one
 		styleOptions: function(properties) { // Function returning the layer's feature style
 			return {
 				image: new ol.style.Icon({
@@ -624,39 +614,49 @@ function layerVectorURL(options) {
 
 			return lines.join('<br/>');
 		},
+		url: function(extent, resolution, projection) {
+			const bbox = ol.proj.transformExtent(
+					extent,
+					projection.getCode(),
+					options.projection
+				),
+				// Retreive checked parameters
+				list = permanentCheckboxList(options.selectorName).
+			filter(function(evt) {
+				return evt !== 'on'; // Remove the "all" input (default value = "on")
+			});
+			// Round the coordinates
+			for (let b in bbox)
+				bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
+			return options.baseUrlFunction(bbox, list, resolution);
+		},
 	}, options);
 
-	//HACK overwrite ol.format.GeoJSON.readFeatures
-	if (options.format.readFeaturesFromObject) // If format = GeoJSON
-		options.format.readFeatures = function(json, opts) {
-			if (options.strategy == ol.loadingstrategy.bboxLimit) // If we can have more features when zomming in
-				source.clear(); // Clean all features when receiving a request
+	const xhr = new XMLHttpRequest(),
+		source = new ol.source.Vector(Object.assign({
+			loader: function(extent, resolution, projection) {
+				const url = typeof options.url === 'function' ?
+					options.url(extent, resolution, projection) :
+					options.url;
+				xhr.abort(); // Abort previous requests if any
+				xhr.open('GET', url, true);
+				xhr.onload = function() {
+					// status will be 0 for file:// urls
+					if (!xhr.status || xhr.status >= 200 && xhr.status < 300) {
+						if (options.strategy == ol.loadingstrategy.bboxLimit) // If we can have more features when zomming in
+							source.clear(); // Clean all features when receiving a request
 
-			return options.format.readFeaturesFromObject(
-				options.receiveJson(
-					JSONparse(json), // Log Json errors
-					layer
-				),
-				options.format.getReadOptions(json, opts)
-			);
-		};
-
-	const source = new ol.source.Vector(Object.assign({
-			url: function(extent, resolution, projection) {
-				const bbox = ol.proj.transformExtent(
-						extent,
-						projection.getCode(),
-						options.projection
-					),
-					// Retreive checked parameters
-					list = permanentCheckboxList(options.selectorName).
-				filter(function(evt) {
-					return evt !== 'on'; // Remove the "all" input (default value = "on")
-				});
-				// Round the coordinates
-				for (let b in bbox)
-					bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
-				return options.baseUrlFunction(bbox, list, resolution);
+						const features = options.format.readFeatures(xhr.responseText, {
+							extent: extent,
+							featureProjection: projection
+						});
+						source.addFeatures(features);
+					} else {
+						//TODO failure();
+					}
+				};
+				xhr.onerror = function() {}; //TODO failure()
+				xhr.send();
 			},
 		}, options)),
 
@@ -667,6 +667,15 @@ function layerVectorURL(options) {
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
 	layer.options = options; // Mem options for further use
+
+	// If format = GeoJSON
+	const frffo = options.format.readFeatureFromObject;
+	if (frffo) {
+		options.format.readFeatureFromObject = function(object, opt_options) {
+			options.receiveProperties(object.properties, object, layer);
+			return frffo.call(this, object, opt_options);
+		};
+	}
 
 	// Checkboxes to tune layer parameters
 	if (options.selectorName)
@@ -841,33 +850,42 @@ function layerAlpages(options) {
  * www.camptocamp.org POI layer
  * Requires JSONparse, ol.loadingstrategy.bboxLimit, layerVectorURL, getSym
  */
+//TODO error : Query timed out in "query" at line 1 after 6 seconds.
 function layerC2C(options) {
+	const format = new ol.format.GeoJSON({ // Format of received data
+		dataProjection: 'EPSG:3857',
+	});
+	format.readFeatures = function(json, opts) {
+		const features = [],
+			objects = JSONparse(json);
+		for (let o in objects.documents) {
+			const object = objects.documents[o];
+			features.push({
+				id: object.document_id,
+				type: 'Feature',
+				geometry: JSONparse(object.geometry.geom),
+				properties: {
+					ele: object.elevation,
+					name: object.locales[0].title,
+					type: object.waypoint_type,
+					sym: getSym(object.waypoint_type),
+					link: 'https://www.camptocamp.org/waypoints/' + object.document_id,
+				},
+			});
+		}
+		return format.readFeaturesFromObject({
+				type: 'FeatureCollection',
+				features: features,
+			},
+			format.getReadOptions(json, opts)
+		);
+	};
+
 	return layerVectorURL(Object.assign({
 		baseUrl: 'https://api.camptocamp.org/waypoints?limit=500', // https mandatory for Access-Control-Allow-Origin
 		strategy: ol.loadingstrategy.bboxLimit,
 		projection: 'EPSG:3857',
-		receiveJson: function(objects) {
-			const features = [];
-			for (let o in objects.documents) {
-				const object = objects.documents[o];
-				features.push({
-					id: object.document_id,
-					type: 'Feature',
-					geometry: JSONparse(object.geometry.geom),
-					properties: {
-						ele: object.elevation,
-						name: object.locales[0].title,
-						type: object.waypoint_type,
-						sym: getSym(object.waypoint_type),
-						link: 'https://www.camptocamp.org/waypoints/' + object.document_id,
-					},
-				});
-			}
-			return {
-				type: 'FeatureCollection',
-				features: features,
-			};
-		},
+		format: format,
 	}, options));
 }
 
@@ -883,6 +901,7 @@ function layerOverpass(options) {
 		baseUrl: '//overpass-api.de/api/interpreter',
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 	}, options);
+
 	const checkEls = document.getElementsByName(options.selectorName),
 		elLoad = document.getElementById(options.selectorName + '-load'),
 		elZoom = document.getElementById(options.selectorName + '-zoom'),
@@ -914,13 +933,26 @@ function layerOverpass(options) {
 			');out center;'; // add center of areas
 	}
 
-	//BEST display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error	
+	// Change class indicator when zoom is OK
+	function displayStatus() {
+		if (elZoom)
+			elZoom.className = this.getResolution() < options.maxResolution ? '' : 'zoom-out';
+	}
+
+	layer.once('myol:onadd', function(evt) {
+		evt.map.getView().on('change:resolution', displayStatus);
+		displayStatus.call(evt.map.getView());
+	});
+
+	//TODO display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error	
 	//TODO Exploit return file overpass 200 with error
-	format.readFeatures = function(doc, opt) {
+	// Extract features from data when received
+	format.readFeatures = function(response, opt) {
 		if (elLoad)
 			elLoad.className = 'loaded';
 
 		// Transform an area to a node (picto) at the center of this area
+		const doc = new DOMParser().parseFromString(response, 'application/xml');
 		for (let node = doc.documentElement.firstChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
@@ -938,7 +970,7 @@ function layerOverpass(options) {
 							newNode.setAttribute('nodeName', subTagNode.nodeName);
 							break;
 
-						case 'tag':
+						case 'tag': {
 							// Get existing properties
 							newNode.appendChild(subTagNode.cloneNode());
 
@@ -947,6 +979,7 @@ function layerOverpass(options) {
 							newTag.setAttribute('k', 'nodetype');
 							newTag.setAttribute('v', node.nodeName);
 							newNode.appendChild(newTag);
+						}
 					}
 			}
 
@@ -978,16 +1011,6 @@ function layerOverpass(options) {
 			}
 		return features;
 	};
-
-	// Change class indicator when zoom is OK
-	function displayStatus() {
-		if (elZoom)
-			elZoom.className = this.getResolution() < options.maxResolution ? '' : 'zoom-out';
-	}
-	layer.once('myol:onadd', function(evt) {
-		evt.map.getView().on('change:resolution', displayStatus);
-		displayStatus.call(evt.map.getView());
-	});
 
 	return layer;
 }
