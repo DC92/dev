@@ -362,27 +362,6 @@ function escapedStyle(a, b, c) {
  * return : [checked values or ids]
  */
 //BEST open/close features check button / default in option
-function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
-	const checkEls = document.getElementsByName(selectorName),
-		cookie = decodeURI(
-			location.search + '#' + // Priority to the url args
-			location.hash + '#' + // Then the hash
-			document.cookie // Then the cookies
-		).match('map-' + selectorName + '=([^#&;]*)');
-
-	for (let e = 0; e < checkEls.length; e++) {
-		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-		if (cookie && !noMemSelection) // Set the checks accordingly with the cookie
-			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
-	}
-
-	function permanentCheckboxClick(evt) {
-		if (typeof callback == 'function')
-			callback(evt, permanentCheckboxList(selectorName, evt));
-	}
-	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
-}
-
 function permanentCheckboxList(selectorName, evt) {
 	const checkEls = document.getElementsByName(selectorName);
 	let allChecks = [];
@@ -405,13 +384,33 @@ function permanentCheckboxList(selectorName, evt) {
 	return allChecks; // Returns list of checked values or ids
 }
 
+function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
+	const checkEls = document.getElementsByName(selectorName),
+		cookie = decodeURI(
+			location.search + '#' + // Priority to the url args
+			location.hash + '#' + // Then the hash
+			document.cookie // Then the cookies
+		).match('map-' + selectorName + '=([^#&;]*)');
+
+	for (let e = 0; e < checkEls.length; e++) {
+		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
+		if (cookie && !noMemSelection) // Set the checks accordingly with the cookie
+			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
+	}
+
+	function permanentCheckboxClick(evt) {
+		if (typeof callback == 'function')
+			callback(evt, permanentCheckboxList(selectorName, evt));
+	}
+	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
+}
+
 /**
  * Popup label
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
 //TODO BUG Hover sur massif ne libère pas le transparent
-//BEST BUG Polygon hover: do not click on transparent fill
 //BEST split two close points
 function hoverManager(map) {
 	// Only one per map
@@ -564,6 +563,22 @@ function layerVectorURL(options) {
 			return options.baseUrl + options.urlSuffix +
 				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
 		},
+		url: function(extent, resolution, projection) {
+			const bbox = ol.proj.transformExtent(
+					extent,
+					projection.getCode(),
+					options.projection
+				),
+				// Retreive checked parameters
+				list = permanentCheckboxList(options.selectorName).
+			filter(function(evt) {
+				return evt !== 'on'; // Except the "all" input (default value = "on")
+			});
+			// Round the coordinates
+			for (let b in bbox)
+				bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
+			return options.baseUrlFunction(bbox, list, resolution);
+		},
 		projection: 'EPSG:4326', // Projection of received data
 		format: new ol.format.GeoJSON({ // Format of received data
 			dataProjection: options.projection,
@@ -614,25 +629,10 @@ function layerVectorURL(options) {
 
 			return lines.join('<br/>');
 		},
-		url: function(extent, resolution, projection) {
-			const bbox = ol.proj.transformExtent(
-					extent,
-					projection.getCode(),
-					options.projection
-				),
-				// Retreive checked parameters
-				list = permanentCheckboxList(options.selectorName).
-			filter(function(evt) {
-				return evt !== 'on'; // Remove the "all" input (default value = "on")
-			});
-			// Round the coordinates
-			for (let b in bbox)
-				bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
-			return options.baseUrlFunction(bbox, list, resolution);
-		},
 	}, options);
 
-	const xhr = new XMLHttpRequest(),
+	const statusEl = document.getElementById(options.selectorName + '-status') || {},
+		xhr = new XMLHttpRequest(), // Only one object created
 		source = new ol.source.Vector(Object.assign({
 			loader: function(extent, resolution, projection) {
 				const url = typeof options.url === 'function' ?
@@ -640,23 +640,47 @@ function layerVectorURL(options) {
 					options.url;
 				xhr.abort(); // Abort previous requests if any
 				xhr.open('GET', url, true);
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState < 4)
+						statusEl.innerHTML = 'transfert en cours';
+				};
 				xhr.onload = function() {
-					// status will be 0 for file:// urls
-					if (!xhr.status || xhr.status >= 200 && xhr.status < 300) {
+					if (xhr.status != 200)
+						statusEl.innerHTML = 'erreur: ' + xhr.status + ' ' + xhr.statusText;
+					else {
 						if (options.strategy == ol.loadingstrategy.bboxLimit) // If we can have more features when zomming in
 							source.clear(); // Clean all features when receiving a request
 
-						const features = options.format.readFeatures(xhr.responseText, {
-							extent: extent,
-							featureProjection: projection
-						});
-						source.addFeatures(features);
-					} else {
-						//TODO failure();
+						const error = xhr.responseText.match(/error: ([^\.]+)/); //BEST same syntax : match
+						if (!xhr.responseText)
+							statusEl.innerHTML = 'erreur: réponse vide';
+						else if (error) // Error log ini the text response
+							statusEl.innerHTML = 'erreur: ' + error[1];
+						else {
+							const features = options.format.readFeatures(
+								xhr.responseText, {
+									extent: extent,
+									featureProjection: projection
+								});
+							if (!features.length)
+								statusEl.innerHTML = 'zone vide';
+							else {
+								source.addFeatures(features);
+								statusEl.innerHTML = features.length + ' objet' + (features.length > 1 ? 's' : '') + ' chargé' + (features.length > 1 ? 's' : '');
+							}
+						}
 					}
 				};
-				xhr.onerror = function() {}; //TODO failure()
-				xhr.send();
+				xhr.ontimeout = function() {
+					statusEl.innerHTML = 'temps dépassé';
+				};
+				xhr.onerror = function() {
+					statusEl.innerHTML = 'erreur réseau';
+				};
+				if (!options.maxResolution || (resolution < options.maxResolution)) {
+					xhr.send();
+					statusEl.innerHTML = 'demandé';
+				}
 			},
 		}, options)),
 
@@ -682,7 +706,9 @@ function layerVectorURL(options) {
 		controlPermanentCheckbox(
 			options.selectorName,
 			function(evt, list) {
-				layer.setVisible(list.length);
+				statusEl.innerHTML = '';
+				layer.setVisible(list.length > 0);
+				displayZoomStatus();
 				if (list.length && source.loadedExtentsRtree_) {
 					source.loadedExtentsRtree_.clear(); // Force the loading of all areas
 					source.clear(); // Redraw the layer
@@ -692,9 +718,24 @@ function layerVectorURL(options) {
 		);
 
 	layer.once('myol:onadd', function(evt) {
-		hoverManager(evt.map, layer); // Attach tracking for labeling & cursor changes
+		// Attach tracking for labeling & cursor changes
+		hoverManager(evt.map, layer);
+
+		// Zoom out of range report
+		evt.map.getView().on('change:resolution', displayZoomStatus);
+		displayZoomStatus();
 	});
 
+	// Change class indicator when zoom is OK
+	function displayZoomStatus() {
+		if (options.maxResolution &&
+			layer.map_ &&
+			layer.map_.getView().getResolution() > options.maxResolution) {
+			xhr.abort(); // Abort previous requests if any
+			if (layer.getVisible())
+				statusEl.innerHTML = 'zone trop large: zoomez';
+		}
+	}
 	return layer;
 }
 
@@ -850,7 +891,6 @@ function layerAlpages(options) {
  * www.camptocamp.org POI layer
  * Requires JSONparse, ol.loadingstrategy.bboxLimit, layerVectorURL, getSym
  */
-//TODO error : Query timed out in "query" at line 1 after 6 seconds.
 function layerC2C(options) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
@@ -903,8 +943,6 @@ function layerOverpass(options) {
 	}, options);
 
 	const checkEls = document.getElementsByName(options.selectorName),
-		elLoad = document.getElementById(options.selectorName + '-load'),
-		elZoom = document.getElementById(options.selectorName + '-zoom'),
 		format = new ol.format.OSMXML(),
 		layer = layerVectorURL(Object.assign({
 			strategy: ol.loadingstrategy.bbox,
@@ -913,9 +951,6 @@ function layerOverpass(options) {
 		}, options));
 
 	function urlFunction(bbox, list) {
-		if (elLoad)
-			elLoad.className = 'loading';
-
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 
@@ -933,24 +968,8 @@ function layerOverpass(options) {
 			');out center;'; // add center of areas
 	}
 
-	// Change class indicator when zoom is OK
-	function displayStatus() {
-		if (elZoom)
-			elZoom.className = this.getResolution() < options.maxResolution ? '' : 'zoom-out';
-	}
-
-	layer.once('myol:onadd', function(evt) {
-		evt.map.getView().on('change:resolution', displayStatus);
-		displayStatus.call(evt.map.getView());
-	});
-
-	//TODO display XMLHttpRequest errors, including 429 (Too Many Requests) - ol/featureloader.js / needs FIXME handle error	
-	//TODO Exploit return file overpass 200 with error
 	// Extract features from data when received
 	format.readFeatures = function(response, opt) {
-		if (elLoad)
-			elLoad.className = 'loaded';
-
 		// Transform an area to a node (picto) at the center of this area
 		const doc = new DOMParser().parseFromString(response, 'application/xml');
 		for (let node = doc.documentElement.firstChild; node; node = node.nextSibling)

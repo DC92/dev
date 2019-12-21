@@ -29,6 +29,7 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 				<?}?>
 				<li>Tout
 					<input type="checkbox" name="wri-features" checked="checked" />
+					<span id="wri-features-status" />
 				</li>
 				<? foreach ($vue->types_point_affichables AS $type_affichable) {?>
 					<li><label>
@@ -62,11 +63,10 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 		<fieldset class="nav-services">
 			<legend>
 				Services (<a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">OSM</a>)
-				<span id="couche-osm-load"><span> - En cours</span><span> - Chargé</span></span>
+				<span id="couche-osm-status" />
 			</legend>
 
-			<div id="couche-osm-zoom">
-				<span>Zone trop large:<br/>Zoomez pour voir les points</span>
+			<div>
 				<ul>
 					<li>Tout <input type="checkbox" name="couche-osm" /></li>
 					<li><input type="checkbox" name="couche-osm" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />hôtel ou location</li>
@@ -81,10 +81,10 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 		<fieldset class="nav-sites">
 			<legend>Autres sites</legend>
 			<ul>
-				<li><label><input type="checkbox" name="couche-prc" />pyrenees-refuges.com</label></li>
-				<li><label><input type="checkbox" name="couche-c2c" />camptocamp.org</label></li>
-				<li><label><input type="checkbox" name="couche-chemineur" />chemineur.fr</label></li>
-				<li><label><input type="checkbox" name="couche-alpages" />alpages.info</label></li>
+				<li><input type="checkbox" name="couche-prc" />pyrenees-refuges.com &nbsp;<span id="couche-prc-status" /></li>
+				<li><input type="checkbox" name="couche-c2c" />camptocamp.org &nbsp;<span id="couche-c2c-status" /></li>
+				<li><input type="checkbox" name="couche-chemineur" />chemineur.fr &nbsp;<span id="couche-chemineur-status" /></li>
+				<li><input type="checkbox" name="couche-alpages" />alpages.info &nbsp;<span id="couche-alpages-status" /></li>
 			</ul>
 		</fieldset>
 	<?}?>

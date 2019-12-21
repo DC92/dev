@@ -165,15 +165,6 @@ z.username-coloured {
 	color: yellow !important;
 }
 
-z.overpass .zoom-out,
-z.overpass-zoom-out li {
-	display: none;
-}
-z.overpass-zoom-out .titre,
-z.overpass-zoom-out .zoom-out {
-	display: list-item;
-}
-
 z.geo_presentation {
 	font-size: 1.2em;
 	margin-bottom: 10px;

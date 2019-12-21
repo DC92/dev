@@ -911,20 +911,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	top: 3px;
 }
 
-/* Couche OSM OVERPASS */
-#couche-osm-load span,
-#couche-osm-load.loading span,
-#couche-osm-load.loaded span:first-child,
-#couche-osm-zoom span,
-#couche-osm-zoom.zoom-out ul {
-	display: none;
-}
-#couche-osm-load.loaded span,
-#couche-osm-load.loading span:first-child,
-#couche-osm-zoom.zoom-out span {
-	display: inline;
-}
-
 .bouton-supprimer {
 	color: red;
 	background-color: yellow;
