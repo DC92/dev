@@ -28,7 +28,7 @@ const layerMassifs = layerVectorURL({
 			'Déplacer un sommet: Cliquer dessus puis le déplacer\n' +
 			'Ajouter un sommet: Cliquer sur un côté puis le déplacer\n' +
 			'Supprimer un sommet: Alt+cliquer dessus\n' +
-			'Scinder un polygone: Joindre 2 sommets d‘un même polygone puis alt+cliquer dessus\n' +
+			'Scinder un polygone: Joindre 2 sommets du polygone\n' +
 			'Fusionner 2 polygones: Coller un côté identique (entre 2 sommets consécutifs) de chaque polygone puis alt+cliquer dessus\n' +
 			'Supprimer un polygone: Ctrl+Alt+cliquer sur un côté',
 		titlePolygon: 'Création d‘un polygone:\n' +

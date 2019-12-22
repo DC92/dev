@@ -20,37 +20,36 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 			<legend>Points (<a href="<?=$vue->lien_legende_carte?>">Légende</a>)</legend>
 			<ul>
 				<?if ( $vue->polygone->id_polygone ){?>
-					<li><label>
+					<li>
 						<input id="tous-massif" name="couche-massif"
 							onchange="points.getSource().refresh()"
 							type="checkbox" checked="checked" />
 						<?=$vue->polygone->nom_polygone?> uniquement
-					</label></li><hr/>
+					</li><hr/>
 				<?}?>
 				<li>Tout
 					<input type="checkbox" name="wri-features" checked="checked" />
 					<span id="wri-features-status" />
 				</li>
 				<? foreach ($vue->types_point_affichables AS $type_affichable) {?>
-					<li><label>
+					<li>
 						<input
 							type="checkbox"
 							name="wri-features"
 							value="<?=$type_affichable->id_point_type?>"
 							checked="checked"
 						/>
-						<span>
-							<img
-								id="icone_<?=$type_affichable->id_point_type?>"
-								src="<?=$config_wri['url_chemin_icones'].$type_affichable->icone?>.png"
-								alt="icone de <?=$type_affichable->nom_type?>"
-							/>
-							<?=$type_affichable->nom_type?>
-						</span>
-					</label></li>
+						<img
+							id="icone_<?=$type_affichable->id_point_type?>"
+							src="<?=$config_wri['url_chemin_icones'].$type_affichable->icone?>.png"
+							alt="icone de <?=$type_affichable->nom_type?>"
+						/>
+						<?=$type_affichable->nom_type?>
+					</li>
 				<?}?>
 			</ul>
 		</fieldset>
+
 		<?if ($vue->polygone->nom_polygone ) { ?>
 			<fieldset >
 				<legend>Téléchargements</legend>
@@ -60,15 +59,17 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 					<a href="http://www.refuges.info/api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml" title="Télécharger au format KML">KML</a>
 			</fieldset>
 		<?}?>
-		<fieldset class="nav-services">
+
+		<fieldset>
 			<legend>
 				Services (<a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">OSM</a>)
-				<span id="couche-osm-status" />
 			</legend>
-
 			<div>
 				<ul>
-					<li>Tout <input type="checkbox" name="couche-osm" /></li>
+					<li>
+						Tout <input type="checkbox" name="couche-osm" />
+						<span id="couche-osm-status" />
+					</li>
 					<li><input type="checkbox" name="couche-osm" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />hôtel ou location</li>
 					<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />camping</li>
 					<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />point d'eau</li>
@@ -78,7 +79,8 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 				</ul>
 			</div>
 		</fieldset>
-		<fieldset class="nav-sites">
+
+		<fieldset>
 			<legend>Autres sites</legend>
 			<ul>
 				<li><input type="checkbox" name="couche-prc" />pyrenees-refuges.com &nbsp;<span id="couche-prc-status" /></li>
@@ -92,9 +94,7 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 	<?php if ( !$vue->mode_affichage && $_SESSION['niveau_moderation']>=1 ) {?>
 		<fieldset>
 			<legend>Modification</legend>
-			<label>
-				<a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>"><?= $vue->polygone->id_polygone ? 'Modifier le' : 'Créer un'?> massif</a>
-			</label>
+			<a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>"><?= $vue->polygone->id_polygone ? 'Modifier le' : 'Créer un'?> massif</a>
 		</fieldset>
 	<?}?>
 </div>

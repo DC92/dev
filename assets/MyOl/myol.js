@@ -642,7 +642,7 @@ function layerVectorURL(options) {
 				xhr.open('GET', url, true);
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState < 4)
-						statusEl.innerHTML = 'transfert en cours';
+						statusEl.innerHTML = 'chargement';
 				};
 				xhr.onload = function() {
 					if (xhr.status != 200)
@@ -2281,6 +2281,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 						if (lines[a][i1][0] == lines[a][i2][0] &&
 							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
 							let squized = lines[a].splice(i2, i1 - i2); // Extract the squized part
+							squized[0][0]+=.0001; //HACK don't stick the 2 !
 							squized.push(squized[0]); // Close the poly
 							polys.push([squized]); // Add the squized poly
 							i1 = i2 = lines[a].length; // End loop
