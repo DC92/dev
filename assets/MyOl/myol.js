@@ -2241,11 +2241,11 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 		} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
 		flatCoord(lines, features[f].getGeometry().getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
 
-	for (let a in lines)
+	for (let a = lines.length - 1; a >= 0; a--) // Loop backward to be able to remove lines into the loop
 		// Exclude 1 coordinate features (points)
 		//BEST manage points
 		if (lines[a].length < 2)
-			lines[a] = null;
+			delete lines[a];
 
 		// Merge lines having a common end
 		else if (merge)
@@ -2260,13 +2260,13 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
 							// Merge 2 lines having 2 ends in common
 							lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
-							lines[m[1]] = null;
+							delete lines[m[1]];
 						}
 					}
 			}
 
 	// Make polygons with in loop lines
-	for (let a in lines)
+	for (let a = lines.length - 1; a >= 0; a--)
 		if (withPolygons && // Only if polygons are autorized
 			lines[a]) {
 			// Close open lines
@@ -2281,7 +2281,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 						if (lines[a][i1][0] == lines[a][i2][0] &&
 							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
 							let squized = lines[a].splice(i2, i1 - i2); // Extract the squized part
-							squized[0][0]+=.0001; //HACK don't stick the 2 !
+							squized[0][0] += 0.00001; //HACK don't stick the 2 !
 							squized.push(squized[0]); // Close the poly
 							polys.push([squized]); // Add the squized poly
 							i1 = i2 = lines[a].length; // End loop
@@ -2289,16 +2289,16 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 
 				// Convert closed lines into polygons
 				polys.push([lines[a]]); // Add the poly
-				lines[a] = null; // Forget the line
+				delete lines[a]; // Forget the line
 			}
 		}
 
 	// Makes holes if a polygon is included in a biggest one
-	for (let p1 in polys) // Explore all polys combinaison
+	for (let p1 = polys.length - 1; p1 >= 0; p1--) // Explore all polys combinaison
 		if (holes &&
 			polys[p1]) {
 			const fs = new ol.geom.Polygon(polys[p1]);
-			for (let p2 in polys)
+			for (let p2 = polys.length - 1; p2 >= 0; p2--)
 				if (polys[p2] && p1 != p2) {
 					let intersects = true;
 					for (let c in polys[p2][0])
@@ -2306,15 +2306,13 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 							intersects = false;
 					if (intersects) { // If one intersects a bigger
 						polys[p1].push(polys[p2][0]); // Include the smaler in the bigger
-						polys[p2] = null; // Forget the smaller
+						delete polys[p2]; // Forget the smaller
 					}
 				}
 		}
-	// Purge arrays from null values
-	//BEST use reverse for & split
 	return {
-		lines: lines.filter(Boolean),
-		polys: polys.filter(Boolean),
+		lines: lines,
+		polys: polys,
 	};
 }
 
