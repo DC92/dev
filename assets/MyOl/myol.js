@@ -2126,10 +2126,21 @@ function layerEdit(options) {
 		map.on('pointermove', hover);
 	});
 
+	function removeFeaturesAtPixel(pixel) {
+		const selectedFeatures = layer.map_.getFeaturesAtPixel(pixel, {
+			hitTolerance: 6,
+			layerFilter: function(l) {
+				return l.ol_uid == layer.ol_uid;
+			}
+		});
+		for (let f in selectedFeatures) // We delete the selected feature
+			source.removeFeature(selectedFeatures[f]);
+	}
+
 	//HACK move only one summit when dragging
 	modify.handleDragEvent = function(evt) {
 		let draggedUid; // The first one will be the only one that will be dragged
-		for (s in this.dragSegments_) {
+		for (let s in this.dragSegments_) {
 			let segmentUid = this.dragSegments_[s][0].feature.ol_uid; // Get the current item uid
 			if (draggedUid && segmentUid != draggedUid) // If it is not the first one
 				delete this.dragSegments_[s]; // Remove it from the dragged list
@@ -2137,22 +2148,20 @@ function layerEdit(options) {
 		}
 		this.dragSegments_ = this.dragSegments_.filter(Boolean); // Reorder array keys
 		ol.interaction.Modify.prototype.handleDragEvent.call(this, evt); // Call the former method
-	}
+	};
 
-	//BEST delete feature when Ctrl+Alt click on a summit
+	//HACK delete feature when Ctrl+Alt click
+	modify.handleDownEvent = function(evt) {
+		if (evt.originalEvent.ctrlKey && evt.originalEvent.altKey)
+			removeFeaturesAtPixel(evt.pixel_);
+		return ol.interaction.Modify.prototype.handleDownEvent.call(this, evt); // Call the former method
+	};
+
 	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// Ctrl + Alt click on segment : delete feature
-			if (evt.mapBrowserEvent.originalEvent.ctrlKey) {
-				const selectedFeatures = layer.map_.getFeaturesAtPixel(evt.mapBrowserEvent.pixel, {
-					hitTolerance: 6,
-					layerFilter: function(l) {
-						return l.ol_uid == layer.ol_uid;
-					}
-				});
-				for (let f in selectedFeatures) // We delete the selected feature
-					source.removeFeature(selectedFeatures[f]);
-			}
+			if (evt.mapBrowserEvent.originalEvent.ctrlKey)
+				removeFeaturesAtPixel(evt.mapBrowserEvent.pixel);
 			// Alt click on segment : delete the segment & split the line
 			else if (evt.target.vertexFeature_)
 				return optimiseEdited(evt.target.vertexFeature_.getGeometry().getCoordinates());

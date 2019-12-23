@@ -56,7 +56,7 @@ const massifs = layerVectorURL({
 			'Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
 			'Joindre les extrémités deux lignes pour les fusionner\n' +
 			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
-			'Ctrl+Alt+cliquer sur un côté d‘une ligne ou d‘un polygone pour les supprimer',
+			'Ctrl+Alt+cliquer sur une ligne ou un polygone pour les supprimer',
 		titleLine: 'Création d‘une ligne:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
