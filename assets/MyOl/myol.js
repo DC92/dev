@@ -14,6 +14,7 @@
 if (!ol) var ol = {}; //HACK For JS validators
 //TODO WRI Edition / creation / suppression polygones autres que massif
 //TODO permaliens compatibles WRI/LL
+//TODO WRI BUG http://dom.refuges.info/edit/9954
 
 /**
  * Debug facilities on mobile
@@ -429,7 +430,7 @@ function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
-//BEST WRI split two close points
+//TODO WRI split two close points
 function hoverManager(map) {
 	// Only one per map
 	if (map.hasHoverManager_)
@@ -671,7 +672,7 @@ function layerVectorURL(options) {
 						if (options.strategy == ol.loadingstrategy.bboxLimit) // If we can have more features when zomming in
 							source.clear(); // Clean all features when receiving a request
 
-						const error = xhr.responseText.match(/error: ([^\.]+)/); //BEST same syntax : match
+						const error = xhr.responseText.match(/error: ([^\.]+)/);
 						if (!xhr.responseText)
 							statusEl.innerHTML = 'erreur: réponse vide';
 						else if (error) // Error log ini the text response
@@ -811,7 +812,7 @@ function layerRefugesInfo(options) {
 			properties.name = properties.nom;
 			properties.link = properties.lien;
 			properties.ele = properties.coord.alt;
-			properties.icone = properties.type.icone; // Mem icon value when overwriting type
+			properties.icone = properties.type.icone;
 			properties.type = properties.type.valeur;
 			properties.bed = properties.places.valeur;
 			// Need to have clean KML export
@@ -957,7 +958,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//BEST BUG IE don't dispaly icons
+//BEST BUG IE don't display icons
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -1679,7 +1680,7 @@ function controlDownload(options) {
 	}
 
 	function download() { //formatName, mime
-		const formatName = this.textContent || 'GPX', //BEST get fisrt value as default
+		const formatName = this.textContent || 'GPX', //BEST get first value as default
 			mime = this.id,
 			format = new ol.format[formatName](),
 			map = button.getMap();

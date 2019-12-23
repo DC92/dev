@@ -24,21 +24,24 @@ const layerMassifs = layerVectorURL({
 		geoJsonId: 'edit-json',
 		snapLayers: [layerMassifs],
 		titleModify: 'Modification d‘un polygone:\n' +
-			'Activer ce bouton (couleur jaune) puis\n' +
-			'Déplacer un sommet: Cliquer dessus puis le déplacer\n' +
-			'Ajouter un sommet: Cliquer sur un côté puis le déplacer\n' +
-			'Supprimer un sommet: Alt + cliquer dessus\n' +
-			'Scinder un polygone: Joindre 2 sommets du polygone\n' +
-			'Fusionner 2 polygones: Coller un côté identique (entre 2 sommets consécutifs) de chaque polygone puis alt+cliquer dessus\n' +
-			'Supprimer un polygone: Ctrl + Alt + cliquer dessus',
+			'Activer ce bouton (couleur jaune) puis:\n' +
+			'Déplacer un sommet: Cliquer dessus puis le déplacer.\n' +
+			'Ajouter un sommet: Cliquer sur un côté puis le déplacer.\n' +
+			'Supprimer un sommet: Alt + cliquer dessus.\n' +
+			'Scinder un polygone: Joindre 2 sommets du polygone,\n' +
+			'Fusionner 2 polygones: Coller un côté identique\n' +
+			'(entre 2 sommets consécutifs) de chaque polygone\n' +
+			'puis alt+cliquer dessus.\n' +
+			'Supprimer un polygone: Ctrl + Alt + cliquer dessus.',
 		titlePolygon: 'Création d‘un polygone:\n' +
-			'Activer ce bouton (couleur jaune) puis\n' +
+			'Activer ce bouton (couleur jaune) puis:\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
 			'double cliquer pour terminer.\n' +
 			'Un polygone entièrement compris dans un autre crée un "trou".',
 		saveFeatures: function(coordinates, format) {
 			return format.writeGeometry(
-				new ol.geom.MultiPolygon(coordinates.polys), {
+				new ol.geom.MultiPolygon(coordinates.polys),
+				{
 					featureProjection: 'EPSG:3857',
 					decimals: 5,
 				});

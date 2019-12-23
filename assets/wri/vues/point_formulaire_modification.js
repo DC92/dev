@@ -4,8 +4,10 @@
 
 const refugesInfo = layerRefugesInfo({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
-		// Couche non cliquable
-		href: null,
+		receiveProperties: function(properties) {
+			properties.icone = properties.type.icone;
+			properties.link = null; // Couche non cliquable
+		},
 		label: function(properties) {
 			return properties.nom;
 		},
