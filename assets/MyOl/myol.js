@@ -429,8 +429,7 @@ function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
-//TODO BUG Hover sur massif ne libère pas le transparent
-//BEST split two close points
+//BEST WRI split two close points
 function hoverManager(map) {
 	// Only one per map
 	if (map.hasHoverManager_)
@@ -444,8 +443,9 @@ function hoverManager(map) {
 		viewStyle = map.getViewport().style;
 	map.addOverlay(popup);
 
-	let hoveredLayer = null,
-		hoveredFeature = null;
+	let hoveredFeature = null,
+		hoveredLayer = null;
+
 	map.on('pointermove', function(evt) {
 		let nbFeaturesAtPixel = 0;
 		map.forEachFeatureAtPixel(
@@ -458,6 +458,7 @@ function hoverManager(map) {
 						hideLabel();
 
 					displayLabel(feature, layer, evt.pixel);
+					hoveredLayer = layer;
 					hoveredFeature = feature;
 				}
 			}
@@ -533,7 +534,7 @@ function hoverManager(map) {
 			element.className = 'myol-popup-hidden';
 			if (hoveredLayer && hoveredLayer.options)
 				hoveredFeature.setStyle(escapedStyle(hoveredLayer.options.styleOptions));
-			hoveredFeature = null;
+			hoveredLayer = hoveredFeature = null;
 		}
 	}
 
