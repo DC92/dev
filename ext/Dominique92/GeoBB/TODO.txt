@@ -134,44 +134,45 @@ FAIT WRI OL6
 Ajouter altitude + nb lits dans les étiquettes WRI
 Récuperer nom -> name pour export GPX des points dans la carte
 Display coordonnées suisses
-
-TODO WRI
-========
-nte de zone au points à => nte de zone auX points à
-inclus dans la bbos => X
-Mettre le zip forum
-cookie = ;SameSite=Strict
-	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
-	Or if your host is already updated to 7.3, you can use:
-	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
-Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 Point : Init valeurs champs à afficher
 Bug carte point petites largeurs de fenetre : l'ascenseur mange le layerswitcher
-/gps favicon 144px min
-Voir les ' en format word
+Voir si var map nécéssaire (point)
+Demander une modification => Demander une modification des informations de la fiche
+Récupérer commentaires de conf_privee.php
+Pas de récup cookies de point-modif vers nav
+Création point : garder les cookies et pas forcer à Salanche (point par défaut dans la base !)
+http://www.refuges.info/forum/viewtopic.php?f=2&t=9127 / BUG: cannot click on camp to camp symbol (c) for 'Crête Pilliozan - Agnelin, point 2611 m ©' (ouest barage Grandmaison / Est Grenoble / S/E St Jean Maurienne
 FAIT, à reprendre en GIT
 	Reprendre config_privee.php.modele
 	Ajouter les 3 fichiers edit.*
 	Ajouter tous les fichiers OL
-Voir si var map nécéssaire (point)
+
+TODO WRI
+========
+vues\api\doc\index.html : nte de zone au points à => nte de zone auX points à
+vues\api\doc\index.html : inclus dans la bbos => X
 Enlever dernier RC des fichiers
+Edition / creation / suppression polygones autres que massif
+
+Mettre le zip forum
+/gps favicon 144px min
+cookie = ;SameSite=Strict
+	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
+	Or if your host is already updated to 7.3, you can use:
+	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
+	Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
+Voir les ' en format word
 Remettre meteo.js au niveau /vues sinon dans point.js
-Demander une modification => Demander une modification des informations de la fiche
 Méteo ne marche pas sur mobile (status 0 / vide)
 Possibilité d'agrandir la météo sur mobiles
 Créer les massifs manquants à chemineur
 Pas de massifs dans l'Atlas ?
 Inclure scan_liens.php dans /ressources/outils/...
 Paramétres inclusion posts dans points -> config.php
-Récupérer commentaires de conf_privee.php
 Mettre le format date sur tous les users
 L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
 	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
-Pas de récup cookies de point-modif vers nav
-Edition / creation / suppression polygones autres que massif
 Déraciner le wiki / le mettre dans le forum
-Création point : garder les cookies et pas forcer à Salanche (point par défaut dans la base !)
-http://www.refuges.info/forum/viewtopic.php?f=2&t=9127 / BUG: cannot click on camp to camp symbol (c) for 'Crête Pilliozan - Agnelin, point 2611 m ©'
 Faire une fiche de tests
 
 WRI API

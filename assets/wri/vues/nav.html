@@ -21,21 +21,21 @@ Zone (11): affiche tous les massifs inclus. pas de points, pas de panel. faut cl
 			<ul>
 				<?if ( $vue->polygone->id_polygone ){?>
 					<li>
-						<input id="tous-massif" name="couche-massif"
+						<input id="selecteur-massif" name="couche-massif"
 							onchange="points.getSource().refresh()"
 							type="checkbox" checked="checked" />
 						<?=$vue->polygone->nom_polygone?> uniquement
 					</li><hr/>
 				<?}?>
 				<li>Tout
-					<input type="checkbox" name="wri-features" checked="checked" />
-					<span id="wri-features-status" />
+					<input type="checkbox" name="couche-wri" checked="checked" />
+					<span id="couche-wri-status" />
 				</li>
 				<? foreach ($vue->types_point_affichables AS $type_affichable) {?>
 					<li>
 						<input
 							type="checkbox"
-							name="wri-features"
+							name="couche-wri"
 							value="<?=$type_affichable->id_point_type?>"
 							checked="checked"
 						/>

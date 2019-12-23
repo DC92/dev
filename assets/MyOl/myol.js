@@ -12,6 +12,8 @@
 
 /* jshint esversion: 6 */
 if (!ol) var ol = {}; //HACK For JS validators
+//TODO WRI Edition / creation / suppression polygones autres que massif
+//TODO permaliens compatibles WRI/LL
 
 /**
  * Debug facilities on mobile
@@ -356,53 +358,70 @@ function escapedStyle(a, b, c) {
 }
 
 /**
- * Mem selected checkboxes in cookie
- * selectorName (string)
- * evt (keyboard event)
- * return : [checked values or ids]
+ * Gives list of checkboxes inputs states having the same name
+ * selectorName {string}
+ * evt {keyboard event} if an input is clicked,
+ *     if an input witout value is clicked, copy the check in all other inputs having the same name (click "all")
+ * return : array of values of all checked <input name="selectorName" type="checkbox" value="xxx" />
  */
-//BEST open/close features check button / default in option
+//BEST open/close features check button
+//BEST WRI bug uncheck massifs, go to a page & come back
 function permanentCheckboxList(selectorName, evt) {
-	const checkEls = document.getElementsByName(selectorName);
-	let allChecks = [];
+	const inputEls = document.getElementsByName(selectorName),
+		list = [];
 
-	for (let e = 0; e < checkEls.length; e++) {
-		// Select/deselect all (clicking an <input> without value)
+	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
 		if (evt) {
-			if (evt.target.value == 'on') // The Select/deselect has a default value = "on"
-				checkEls[e].checked = evt.target.checked; // Check all if "all" is clicked
-			else if (checkEls[e].value == 'on')
-				checkEls[e].checked = false; // Reset the "all" checks if another check is clicked
+			// Select/deselect all inputs when clicking an <input> without value
+			if (evt.target.value == 'on') // "all" input has a default value = "on"
+				inputEls[e].checked = evt.target.checked; // Check all if "all" is clicked
+			else if (inputEls[e].value == 'on') // "all" <input>
+				inputEls[e].checked = false; // Reset if another check is clicked
 		}
 
-		// Get status of all checks
-		if (checkEls[e].checked) // List checked elements
-			allChecks.push(checkEls[e].value);
+		// Get the values of all checked inputs
+		if (inputEls[e].checked) // List checked elements
+			list.push(inputEls[e].value);
 	}
-	// Mem the related cookie / Keep empty one to keep memory of cancelled subchoices
-	document.cookie = 'map-' + selectorName + '=' + allChecks.join(',') + ';path=/; SameSite=Strict';
-	return allChecks; // Returns list of checked values or ids
+
+	return list;
 }
 
+/**
+ * Manages checkboxes inputs having the same name
+ * selectorName {string}
+ * callback {function} action when the button is clicked
+ * noMemSelection {bool} do(default)/don't(if true) mem state in a cookie
+ */
 function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
-	const checkEls = document.getElementsByName(selectorName),
+	const inputEls = document.getElementsByName(selectorName),
 		cookie = decodeURI(
 			location.search + '#' + // Priority to the url args
 			location.hash + '#' + // Then the hash
 			document.cookie // Then the cookies
 		).match('map-' + selectorName + '=([^#&;]*)');
 
-	for (let e = 0; e < checkEls.length; e++) {
-		checkEls[e].addEventListener('click', permanentCheckboxClick); // Attach the action
-		if (cookie && !noMemSelection) // Set the checks accordingly with the cookie
-			checkEls[e].checked = cookie[1].split(',').indexOf(checkEls[e].value) !== -1;
+	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+		// Set the checks accordingly with the cookie
+		if (cookie && !noMemSelection)
+			inputEls[e].checked = cookie[1].split(',').indexOf(inputEls[e].value) !== -1;
+
+		// Attach the action
+		inputEls[e].addEventListener('click', onClick);
 	}
 
-	function permanentCheckboxClick(evt) {
+	function onClick(evt) {
+		const list = permanentCheckboxList(selectorName, evt);
 		if (typeof callback == 'function')
-			callback(evt, permanentCheckboxList(selectorName, evt));
+			callback(evt, list);
+
+		// Mem the related cookie
+		//HACK Keep empty one to keep memory of default cancelled checks
+		document.cookie = 'map-' + selectorName + '=' + list.join(',') + '; path=/; SameSite=Strict;';
 	}
-	callback(null, permanentCheckboxList(selectorName)); // Call callback once at the init
+
+	// Call callback once at the init
+	callback(null, permanentCheckboxList(selectorName));
 }
 
 /**
@@ -692,12 +711,12 @@ function layerVectorURL(options) {
 		}, options));
 	layer.options = options; // Mem options for further use
 
-	// If format = GeoJSON
-	const frffo = options.format.readFeatureFromObject;
-	if (frffo) {
+	const formerFeadFeatureFromObject = options.format.readFeatureFromObject;
+	if (formerFeadFeatureFromObject && // If format = GeoJSON
+		options.receiveProperties) { // If receiveProperties options
 		options.format.readFeatureFromObject = function(object, opt_options) {
 			options.receiveProperties(object.properties, object, layer);
-			return frffo.call(this, object, opt_options);
+			return formerFeadFeatureFromObject.call(this, object, opt_options);
 		};
 	}
 
@@ -706,6 +725,8 @@ function layerVectorURL(options) {
 		controlPermanentCheckbox(
 			options.selectorName,
 			function(evt, list) {
+				if (!list.length)
+					xhr.abort();
 				statusEl.innerHTML = '';
 				layer.setVisible(list.length > 0);
 				displayZoomStatus();
@@ -942,7 +963,7 @@ function layerOverpass(options) {
 		maxResolution: 30, // Only call overpass if the map's resolution is lower
 	}, options);
 
-	const checkEls = document.getElementsByName(options.selectorName),
+	const inputEls = document.getElementsByName(options.selectorName),
 		format = new ol.format.OSMXML(),
 		layer = layerVectorURL(Object.assign({
 			strategy: ol.loadingstrategy.bbox,
@@ -1018,11 +1039,11 @@ function layerOverpass(options) {
 					};
 				for (let p in properties)
 					if (typeof properties[p] == 'string') { // Avoid geometry
-						for (let c = 0; c < checkEls.length; c++)
-							if (checkEls[c].value &&
-								checkEls[c].value.includes(p) &&
-								checkEls[c].value.includes(properties[p])) {
-								newProperties.sym = checkEls[c].getAttribute('id');
+						for (let c = 0; c < inputEls.length; c++)
+							if (inputEls[c].value &&
+								inputEls[c].value.includes(p) &&
+								inputEls[c].value.includes(properties[p])) {
+								newProperties.sym = inputEls[c].getAttribute('id');
 								newProperties.type = properties[p];
 							}
 						features[f].setProperties(newProperties, false);
@@ -1162,9 +1183,12 @@ function controlLayersSwitcher(options) {
 		// Leaving the map close the selector
 		window.addEventListener('mousemove', function(evt) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
-			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-				displayLayerSelector();
+			if (evt.clientX < divRect.left || divRect.right < evt.clientX || // The mouse is outside the map
+				evt.clientY < divRect.top || divRect.bottom < evt.clientY) {
+				button.element.firstElementChild.style.display = '';
+				rangeEl.style.display =
+					selectorEl.style.display = 'none';
+			}
 		});
 	};
 
@@ -1175,10 +1199,10 @@ function controlLayersSwitcher(options) {
 
 		// Leave only one checked except if Ctrl key is on
 		if (evt && evt.type == 'click' && !evt.ctrlKey) {
-			const checkEls = document.getElementsByName('baselayer');
-			for (let e = 0; e < checkEls.length; e++)
-				if (checkEls[e] != evt.target)
-					checkEls[e].checked = false;
+			const inputEls = document.getElementsByName('baselayer');
+			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
+				if (inputEls[e] != evt.target)
+					inputEls[e].checked = false;
 		}
 
 		list = permanentCheckboxList('baselayer');
@@ -2241,7 +2265,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 		} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
 		flatCoord(lines, features[f].getGeometry().getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
 
-	for (let a = lines.length - 1; a >= 0; a--) // Loop backward to be able to remove lines into the loop
+	for (let a in lines)
 		// Exclude 1 coordinate features (points)
 		//BEST manage points
 		if (lines[a].length < 2)
@@ -2253,20 +2277,20 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 			if (lines[b]) {
 				const m = [a, b];
 				for (let i = 4; i; i--) // 4 times
-					if (lines[m[0]] && lines[m[1]]) {
+					if (lines[m[0]] && lines[m[1]]) { // Test if the line has been removed
 						// Shake lines end to explore all possibilities
 						m.reverse();
 						lines[m[0]].reverse();
 						if (compareCoords(lines[m[0]][lines[m[0]].length - 1], lines[m[1]][0])) {
 							// Merge 2 lines having 2 ends in common
 							lines[m[0]] = lines[m[0]].concat(lines[m[1]].slice(1));
-							delete lines[m[1]];
+							delete lines[m[1]]; // Remove the line but don't renumber the array keys
 						}
 					}
 			}
 
 	// Make polygons with in loop lines
-	for (let a = lines.length - 1; a >= 0; a--)
+	for (let a in lines)
 		if (withPolygons && // Only if polygons are autorized
 			lines[a]) {
 			// Close open lines
@@ -2294,11 +2318,11 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 		}
 
 	// Makes holes if a polygon is included in a biggest one
-	for (let p1 = polys.length - 1; p1 >= 0; p1--) // Explore all polys combinaison
-		if (holes &&
+	for (let p1 in polys) // Explore all polys combinaison
+		if (holes && // Make holes option
 			polys[p1]) {
 			const fs = new ol.geom.Polygon(polys[p1]);
-			for (let p2 = polys.length - 1; p2 >= 0; p2--)
+			for (let p2 in polys)
 				if (polys[p2] && p1 != p2) {
 					let intersects = true;
 					for (let c in polys[p2][0])

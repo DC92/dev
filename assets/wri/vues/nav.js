@@ -64,8 +64,8 @@ const controls = [
 		},
 	}),
 
-	// La couche "massifs"
-	massifs = layerVectorURL({
+	// La couche "massif"
+	massif = layerVectorURL({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
 		selectorName: 'couche-massif',
 		noMemSelection: true,
@@ -75,7 +75,6 @@ const controls = [
 				type: 'MultiLineString',
 				coordinates: feature.geometry.coordinates[0],
 			};
-
 			// Pas d'étiquette sur le bord du massif
 			properties.type = null;
 		},
@@ -88,10 +87,10 @@ const controls = [
 	}),
 	
 	points = layerRefugesInfo({
-		selectorName: 'wri-features',
+		selectorName: 'couche-wri',
 		noMemSelection: true,
 		baseUrlFunction: function(bbox, list) {
-			const el = document.getElementById('tous-massif');
+			const el = document.getElementById('selecteur-massif');
 			return '<?=$config_wri["sous_dossier_installation"]?>api/'+
 				(el && el.checked ? 'massif?massif=<?=$vue->polygone->id_polygone?>&' : 'bbox?')+
 				'nb_points=500&type_points=' +
@@ -103,7 +102,7 @@ const controls = [
 <?php if ($vue->mode_affichage == 'zone') { ?>
 			zone,
 <?php } else if ($vue->polygone->id_polygone) { ?>
-			massifs,
+			massif,
 <?php } ?>
 			points,
 			layerOverpass({
