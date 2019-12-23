@@ -2069,9 +2069,6 @@ function layerEdit(options) {
 			},
 		});
 
-	// Manage hover to save modify actions integrity
-	let hoveredFeature = null;
-
 	// Snap on vector layers
 	options.snapLayers.forEach(function(layer) {
 		layer.getSource().on('change', function() {
@@ -2080,6 +2077,9 @@ function layerEdit(options) {
 				snap.addFeature(fs[f]);
 		});
 	});
+
+	// Manage hover to save modify actions integrity
+	let hoveredFeature = null;
 
 	layer.once('myol:onadd', function(evt) {
 		const map = evt.map;
@@ -2126,8 +2126,20 @@ function layerEdit(options) {
 		map.on('pointermove', hover);
 	});
 
+	//HACK move only one summit when dragging
+	modify.handleDragEvent = function(evt) {
+		let draggedUid; // The first one will be the only one that will be dragged
+		for (s in this.dragSegments_) {
+			let segmentUid = this.dragSegments_[s][0].feature.ol_uid; // Get the current item uid
+			if (draggedUid && segmentUid != draggedUid) // If it is not the first one
+				delete this.dragSegments_[s]; // Remove it from the dragged list
+			draggedUid = segmentUid;
+		}
+		this.dragSegments_ = this.dragSegments_.filter(Boolean); // Reorder array keys
+		ol.interaction.Modify.prototype.handleDragEvent.call(this, evt); // Call the former method
+	}
+
 	//BEST delete feature when Ctrl+Alt click on a summit
-	//BEST move only one summit when dragging
 	modify.on('modifyend', function(evt) {
 		if (evt.mapBrowserEvent.originalEvent.altKey) {
 			// Ctrl + Alt click on segment : delete feature
@@ -2248,7 +2260,6 @@ function layerEdit(options) {
 	return layer;
 }
 
-
 /**
  * Refurbish Points, Lines & Polygons
  * Split lines having a summit at removePosition
@@ -2306,7 +2317,6 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 						if (lines[a][i1][0] == lines[a][i2][0] &&
 							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
 							let squized = lines[a].splice(i2, i1 - i2); // Extract the squized part
-							squized[0][0] += 0.00001; //HACK don't stick the 2 !
 							squized.push(squized[0]); // Close the poly
 							polys.push([squized]); // Add the squized poly
 							i1 = i2 = lines[a].length; // End loop
@@ -2335,6 +2345,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 					}
 				}
 		}
+
 	return {
 		lines: lines,
 		polys: polys,
@@ -2348,6 +2359,7 @@ function compareCoords(a, b) {
 		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
 	return a[0] == b[0] && a[1] == b[1]; // 2 coords
 }
+
 // Get all lines fragments at the same level & split if one point = pointerPosition
 function flatCoord(existingCoords, newCoords, pointerPosition) {
 	if (typeof newCoords[0][0] == 'object') // Multi*
