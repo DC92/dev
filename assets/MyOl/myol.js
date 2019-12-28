@@ -426,118 +426,31 @@ function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
 }
 
 /**
- * Popup label
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
-//TODO WRI split two close points
 function hoverManager(map) {
-	// Only one per map
-	if (map.hasHoverManager_)
-		return map.hasHoverManager_;
+	if (map.hasHoverManager_) // Only one per map
+		return;
 	map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
 
-	const element = document.createElement('div'),
+	const labelEl = document.createElement('div'),
 		popup = new ol.Overlay({
-			element: element,
+			element: labelEl,
 		}),
 		viewStyle = map.getViewport().style;
 	map.addOverlay(popup);
 
-	let hoveredFeature = null,
-		hoveredLayer = null;
-
-	map.on('pointermove', function(evt) {
-		let nbFeaturesAtPixel = 0;
-		map.forEachFeatureAtPixel(
-			evt.pixel,
-			function(feature, layer) {
-				if ((feature.getKeys().length > 1) && // Avoid internal features (E.G. cursor or hover style)
-					nbFeaturesAtPixel++ == 0) { // Only the first hovered
-					if (hoveredFeature &&
-						feature.ol_uid != hoveredFeature.ol_uid) // The hovered feature has changed
-						hideLabel();
-
-					displayLabel(feature, layer, evt.pixel);
-					hoveredLayer = layer;
-					hoveredFeature = feature;
-				}
-			}
-		);
-		if (!nbFeaturesAtPixel)
-			hideLabel();
-	});
+	let hoveredFeature = null;
+	map.on('pointermove', pointerMove);
 
 	// Hide popup when the cursor is out of the map
-	window.addEventListener('mousemove', function(evtMm) {
+	window.addEventListener('mousemove', function(evt) {
 		const divRect = map.getTargetElement().getBoundingClientRect();
-		if (evtMm.clientX < divRect.left || evtMm.clientX > divRect.right ||
-			evtMm.clientY < divRect.top || evtMm.clientY > divRect.bottom)
-			hideLabel();
+		if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+			evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+			pointerMove();
 	});
-
-	function displayLabel(feature, layer, pixel) {
-		// Change the cursor
-		const properties = feature.getProperties();
-		if (properties.link)
-			viewStyle.cursor = 'pointer';
-		if (properties.draggable)
-			viewStyle.cursor = 'move';
-
-		if (!hoveredFeature && // A new feature has been raised
-			layer && layer.options) { // If any data is available about a label
-			// Apply layer hover style to the feature
-			feature.setStyle(escapedStyle(
-				layer.options.styleOptions,
-				layer.options.hoverStyleOptions,
-				layer.options.editStyleOptions
-			));
-			// Set the text
-			if (typeof layer.options.label == 'function')
-				element.innerHTML = layer.options.label(properties, feature, layer);
-			else if (layer.options.label)
-				element.innerHTML = layer.options.label;
-			element.className = 'myol-popup';
-		}
-
-		// Compute the label position			
-		let geometry = feature.getGeometry();
-		// If it's a GeometryCollection, take the first feature
-
-		if (typeof geometry.getGeometries == 'function')
-			geometry = geometry.getGeometries()[0];
-
-		// If it's a point, the icon is stable above it
-		if (geometry.flatCoordinates.length == 2)
-			pixel = map.getPixelFromCoordinate(geometry.flatCoordinates);
-
-		//HACK Set the label position in the middle to measure the label extent
-		popup.setPosition(map.getView().getCenter());
-
-		// Shift of the label to stay into the map regarding the pointer position
-		if (pixel[1] < element.clientHeight + 12) { // On the top of the map (not enough space for it)
-			pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -element.clientWidth - 10;
-			pixel[1] = 2;
-		} else {
-			pixel[0] -= element.clientWidth / 2;
-			pixel[0] = Math.max(pixel[0], 0); // Bord gauche
-			pixel[0] = Math.min(pixel[0], map.getSize()[0] - element.clientWidth - 1); // Bord droit
-			pixel[1] -= element.clientHeight + 8;
-		}
-		popup.setPosition(map.getCoordinateFromPixel(
-			element.innerHTML ? pixel : [-100, -100] // Avoid tinny label when nothing to show
-		));
-	}
-
-	function hideLabel() {
-		if (hoveredFeature) {
-			viewStyle.cursor = 'default';
-			element.className = 'myol-popup-hidden';
-			if (hoveredLayer && hoveredLayer.options)
-				hoveredFeature.setStyle(escapedStyle(hoveredLayer.options.styleOptions));
-			hoveredLayer = hoveredFeature = null;
-		}
-	}
 
 	// Go to feature.property.link when click on the feature (icon or area)
 	map.on('click', function(evt) {
@@ -553,6 +466,106 @@ function hoverManager(map) {
 			}
 		}
 	});
+
+	function pointerMove(evt) {
+		let closestFeature = null,
+			distanceMin = 2000;
+
+		// Search hovered features
+		if (evt) // Except when out of the map
+			map.forEachFeatureAtPixel(
+				evt.pixel,
+				function(feature, layer) {
+					if (layer) {
+						let geometry = feature.getGeometry(),
+							featurePixel = map.getPixelFromCoordinate(
+								geometry.getExtent()
+							),
+							distance = Math.hypot( // Distance of a point
+								featurePixel[0] - evt.pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
+								featurePixel[1] - evt.pixel[1]
+							);
+
+						// Higest priority for draggable markers
+						if (feature.getProperties().draggable)
+							distance = 0;
+
+						if (geometry.flatCoordinates.length > 2) { // Line or polygon
+							distance = 1000; // Lower priority
+							featurePixel = evt.pixel; // Label follows the cursor
+							//TODO BUG must only follow next moves, not redisign the label!
+						}
+						if (distanceMin > distance) {
+							distanceMin = distance;
+							closestFeature = feature;
+							closestFeature.pixel_ = featurePixel;
+							closestFeature.layer_ = layer;
+						}
+					}
+				}
+			);
+
+		if (closestFeature != hoveredFeature) {
+			// Recover the basic style for the previous hoveredFeature feature
+			if (hoveredFeature && hoveredFeature.layer_.options)
+				hoveredFeature.setStyle(
+					escapedStyle(hoveredFeature.layer_.options.styleOptions)
+				);
+			hoveredFeature = closestFeature; // Mem for the next cursor move
+
+			// Default cursor & label
+			viewStyle.cursor = 'default';
+			labelEl.className = 'myol-popup-hidden';
+
+			if (closestFeature) {
+				const properties = closestFeature.getProperties(),
+					layerOptions = closestFeature.layer_.options;
+
+				// Change the cursor
+				if (properties.link)
+					viewStyle.cursor = 'pointer';
+				if (properties.draggable)
+					viewStyle.cursor = 'move';
+
+				// Set the hovered style
+				if (layerOptions) {
+					closestFeature.setStyle(escapedStyle(
+						layerOptions.styleOptions,
+						layerOptions.hoverStyleOptions,
+						layerOptions.editStyleOptions
+					));
+
+					// Set the text
+					if (typeof layerOptions.label == 'function')
+						labelEl.innerHTML = layerOptions.label(properties, closestFeature, layerOptions);
+					else if (layerOptions.label)
+						labelEl.innerHTML = layerOptions.label;
+					else
+						labelEl.innerHTML = null;
+					if (labelEl.innerHTML) // To avoid tinny popup when nothing to display
+						labelEl.className = 'myol-popup';
+				}
+			}
+		}
+		// Position & reposition the label
+		if (closestFeature) {
+			//HACK set the label position in the middle to measure the label extent
+			popup.setPosition(map.getView().getCenter());
+
+			const pixel = closestFeature.pixel_;
+			// Shift of the label to stay into the map regarding the pointer position
+			if (pixel[1] < labelEl.clientHeight + 12) { // On the top of the map (not enough space for it)
+				pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -labelEl.clientWidth - 10;
+				pixel[1] = 2;
+			} else {
+				pixel[0] -= labelEl.clientWidth / 2;
+				pixel[0] = Math.max(pixel[0], 0); // Left edge
+				pixel[0] = Math.min(pixel[0], map.getSize()[0] - labelEl.clientWidth - 1); // Right edge
+				pixel[1] -= labelEl.clientHeight + 8;
+			}
+			popup.setPosition(map.getCoordinateFromPixel(pixel));
+		}
+	}
 }
 
 
@@ -806,7 +819,7 @@ function getSym(type) {
 function layerRefugesInfo(options) {
 	options = Object.assign({
 		baseUrl: '//www.refuges.info/',
-		urlSuffix: 'api/bbox?nb_points=500&type_points=',
+		urlSuffix: 'api/bbox?type_points=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.name = properties.nom;
@@ -854,7 +867,7 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
-		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&limite=500&poi=',
+		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=',
 		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
@@ -893,7 +906,7 @@ function layerChemineur(options) {
  */
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
-		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?limit=500&forums=4,5,6',
+		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=4,5,6',
 		receiveProperties: function(properties) {
 			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
 			properties.sym = getSym(properties.icone);
@@ -945,7 +958,7 @@ function layerC2C(options) {
 	};
 
 	return layerVectorURL(Object.assign({
-		baseUrl: 'https://api.camptocamp.org/waypoints?limit=500', // https mandatory for Access-Control-Allow-Origin
+		baseUrl: 'https://api.camptocamp.org/waypoints?limit=100', // https mandatory for Access-Control-Allow-Origin
 		strategy: ol.loadingstrategy.bboxLimit,
 		projection: 'EPSG:3857',
 		format: format,
@@ -1697,7 +1710,7 @@ function controlDownload(options) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
 					const properties = feature.getProperties();
-					if (!properties.dontSave)
+					if (!layer.marker_) //BEST find a bette way to don't save the cursors
 						features.push(feature);
 				});
 		}
@@ -1817,6 +1830,7 @@ function layerMarker(options) {
 		centerOnMap: false,
 		idDisplay: 'marker',
 		decimalSeparator: '.',
+		/** draggable:false, */
 	}, options);
 	const elJson = document.getElementById(options.idDisplay + '-json'),
 		elLon = document.getElementById(options.idDisplay + '-lon'),
@@ -1853,7 +1867,6 @@ function layerMarker(options) {
 		feature = new ol.Feature({
 			geometry: point,
 			draggable: options.draggable,
-			dontSave: true, // Used by controlDownload
 		}),
 		source = new ol.source.Vector({
 			features: [feature],
@@ -1864,6 +1877,7 @@ function layerMarker(options) {
 			zIndex: 10,
 		}),
 		format = new ol.format.GeoJSON();
+	layer.marker_ = true; //HACK Used by hover & controlDownload
 
 	layer.once('myol:onadd', function(evt) {
 		const map = evt.map;
