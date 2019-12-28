@@ -493,7 +493,6 @@ function hoverManager(map) {
 						if (geometry.flatCoordinates.length > 2) { // Line or polygon
 							distance = 1000; // Lower priority
 							featurePixel = evt.pixel; // Label follows the cursor
-							//TODO BUG must only follow next moves, not redisign the label!
 						}
 						if (distanceMin > distance) {
 							distanceMin = distance;
@@ -1709,7 +1708,6 @@ function controlDownload(options) {
 		function getFeatures(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					const properties = feature.getProperties();
 					if (!layer.marker_) //BEST find a bette way to don't save the cursors
 						features.push(feature);
 				});
