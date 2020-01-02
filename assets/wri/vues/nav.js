@@ -1,11 +1,8 @@
 <?php
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
-
 const controls = [
-		controlLayersSwitcher({
-			baseLayers: baseLayers,
-		}),
+		layersSwitcher,
 		controlPermalink({ // Permet de garder le même réglage de carte
 <?php if ($vue->polygone->id_polygone) { ?>
 			init: false, // Ici, on cadrera plutôt sur le massif

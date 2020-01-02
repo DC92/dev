@@ -16,7 +16,6 @@ $vue->champs->textareas = new stdClass;
 $vue->champs->boutons = new stdClass; // Modifier, supprimer...
 $vue->champs->trinaires = new stdClass; // seulement les trinaires TRUE FALSE NULL, et seulement ceux qui ont un champs_equivalent.
 $vue->champs->entier_ou_sait_pas = new stdClass; // seulement les trinaires TRUE FALSE NULL, et seulement ceux qui ont un champs_equivalent.
-$vue->fond_carte_par_defaut= $config_wri['carte_base'];
 
 // 4 cas :
 // 1) On veut faire une modification, on ne s'arrêt que si le point n'est pas trouvé
@@ -41,8 +40,6 @@ if ( isset($_REQUEST["id_point"]) )
     // Soit on est avec un modérateur global ou de cette fiche
     if ( isset($_SESSION['id_utilisateur']) AND ( $_SESSION['niveau_moderation'] >= 1 OR $_SESSION['id_utilisateur'] == $point->id_createur ) ) 
     {
-        $vue->serie = param_cartes ($point);
-                
         // boutton supprimer uniquement pour les modérateurs globaux
         if ( $_SESSION['niveau_moderation'] >= 1 )
         {
@@ -57,8 +54,6 @@ if ( isset($_REQUEST["id_point"]) )
         $icone="&amp;iconecenter=ne_sait_pas";
         $action="Modification";
         $verbe="Modifier";
-
-        $vue->serie = $config_wri['fournisseurs_fond_carte']['Saisie-modification'];    
     }
     else // Ni modérateur global, ni modérateur de fiche on l'informe que ses droits sont insuffisants
     {
@@ -109,9 +104,6 @@ elseif ( isset($_REQUEST["id_point_type"]))
         $vue->etapes->guest->titre = "Non connecté ?";
         $vue->etapes->guest->texte = "Je note que vous n'êtes pas connecté avec un compte du forum, rien de grave à ça, mais vous ne pourrez pas revenir ensuite modifier la fiche";
     }
-    
-    $vue->serie = $config_wri['fournisseurs_fond_carte']['Saisie-création'];    
-
 }
 // 3) On ne devrait pas arriver en direct sur ce formulaire ou il nous manque une information
 else
@@ -122,7 +114,6 @@ else
 }
 
 /******** Formulaire de modification/création/suppression *****************/
-
 if (isset($point->id_point))
 {
     $vue->champs->invisibles->id_point = new stdClass;

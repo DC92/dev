@@ -99,7 +99,6 @@ else // le point est valide
 		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4-src.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4-src.js');
 		$vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
 		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
-        $vue->vignette = param_cartes ($point);
     }
 
     /***********  détermination si le point se situe dans un polygone pour lequel un message est à faire passer *******/

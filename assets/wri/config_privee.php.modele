@@ -15,8 +15,9 @@ $config_wri['base_pgsql']="test";
 if ($config_wri['base_pgsql'] == "test")
 	$config_wri['id_zone_accueil'] = 352; // Celui par défaut en prod n'existe pas dans la base de tests
 
-// Par défaut, le fond de carte est maps.refuges.info, décommenter ça permet de changer le par défaut
-//$config_wri['carte_base'] = 'OpenTopoMap';
+// Par défaut, le fond de carte est le premier déclaré dans le fichier /vues/includes/cartes.js (Refuges.info)
+// Décommenter permet de changer le par défaut. Indiquer le nom de la couche dans le sélecteur.
+//$config_wri['carte_base'] = 'OpenTopo';
 
 // Les clés des cartes sous contrat gratuit
 $config_wri['ign_key']='???'; // http://professionnels.ign.fr/user

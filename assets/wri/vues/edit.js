@@ -49,9 +49,7 @@ const layerMassifs = layerVectorURL({
 	}),
 
 	controls = [
-		controlLayersSwitcher({
-			baseLayers: baseLayers,
-		}),
+		layersSwitcher,
 		controlPermalink({ // Permet de garder le même réglage de carte en création
 			visible: false, // Mais on ne visualise pas le lien du permalink
 <?php if ($vue->polygone->id_polygone) { ?>

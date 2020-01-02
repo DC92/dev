@@ -47,9 +47,7 @@ const help =
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n',
 
 	controls = [
-		controlLayersSwitcher({
-			baseLayers: baseLayers,
-		}),
+		layersSwitcher,
 		controlTilesBuffer(4),
 		new ol.control.ScaleLine(),
 		new ol.control.Attribution({

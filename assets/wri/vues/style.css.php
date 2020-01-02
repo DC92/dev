@@ -804,6 +804,9 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   width: 650px;
   height: 600px;
 }
+#carte-accueil .ol-switch-layer {
+  display: none;
+}
 @media screen and (max-width: 650px) {
   #carte-accueil {
     width: calc(100vw - 23px);

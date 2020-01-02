@@ -385,6 +385,10 @@ function permanentCheckboxList(selectorName, evt) {
 			list.push(inputEls[e].value);
 	}
 
+	// Mem the related cookie
+	//HACK the cookie can be empty to keep memory of default cancelled checks
+	document.cookie = 'map-' + selectorName + '=' + list.join(',') + '; path=/; SameSite=Strict;';
+
 	return list;
 }
 
@@ -394,17 +398,19 @@ function permanentCheckboxList(selectorName, evt) {
  * callback {function} action when the button is clicked
  * noMemSelection {bool} do(default)/don't(if true) mem state in a cookie
  */
-function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
+function controlPermanentCheckbox(selectorName, callback, options) {
+	options = options || {};
 	const inputEls = document.getElementsByName(selectorName),
 		cookie = decodeURI(
 			location.search + '#' + // Priority to the url args
 			location.hash + '#' + // Then the hash
-			document.cookie // Then the cookies
+			document.cookie + '#' + // Then the cookies
+			'map-' + selectorName + '=' + options.init // Then the default
 		).match('map-' + selectorName + '=([^#&;]*)');
 
 	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
 		// Set the checks accordingly with the cookie
-		if (cookie && !noMemSelection)
+		if (cookie && !options.noMemSelection)
 			inputEls[e].checked = cookie[1].split(',').indexOf(inputEls[e].value) !== -1;
 
 		// Attach the action
@@ -415,10 +421,6 @@ function controlPermanentCheckbox(selectorName, callback, noMemSelection) {
 		const list = permanentCheckboxList(selectorName, evt);
 		if (typeof callback == 'function')
 			callback(evt, list);
-
-		// Mem the related cookie
-		//HACK Keep empty one to keep memory of default cancelled checks
-		document.cookie = 'map-' + selectorName + '=' + list.join(',') + '; path=/; SameSite=Strict;';
 	}
 
 	// Call callback once at the init
@@ -749,7 +751,7 @@ function layerVectorURL(options) {
 					source.clear(); // Redraw the layer
 				}
 			},
-			options.noMemSelection
+			options
 		);
 
 	layer.once('myol:onadd', function(evt) {
@@ -1165,8 +1167,9 @@ function controlLayersSwitcher(options) {
 	selectorEl.title = 'Ctrl+click: multicouches';
 	button.element.appendChild(selectorEl);
 
+	//HACK execute actions on Map init
 	//BEST use option render
-	button.setMap = function(map) { //HACK execute actions on Map init
+	button.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Base layers selector init
@@ -1184,7 +1187,7 @@ function controlLayersSwitcher(options) {
 		selectorEl.appendChild(commentEl);
 
 		// Make the selector memorized by cookies
-		controlPermanentCheckbox('baselayer', displayLayerSelector);
+		controlPermanentCheckbox('baselayer', displayLayerSelector, options);
 
 		// Hover the button open the selector
 		button.element.firstElementChild.onmouseover = displayLayerSelector;
@@ -1296,7 +1299,6 @@ function controlPermalink(options) {
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
-			document.cookie = 'permalink=zoom=' + newParams[0] + '&lat=' + newParams[2] + '&lon=' + newParams[1] + ';path=/; SameSite=Strict'; //BEST DELETE (temp WRI)
 		}
 	}
 	return control;

@@ -18,8 +18,6 @@ $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($conf
 $vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
 
-$vue->fond_carte_par_defaut= $config_wri['carte_base'];
-
 $conditions_notre_zone = new stdClass;
 $conditions_notre_zone->ids_polygones=$config_wri['id_zone_accueil'];
 $polygones=infos_polygones($conditions_notre_zone);

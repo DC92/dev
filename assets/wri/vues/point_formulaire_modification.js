@@ -1,7 +1,6 @@
 <?php
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
-
 const refugesInfo = layerRefugesInfo({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>',
 		receiveProperties: function(properties) {
@@ -23,9 +22,7 @@ const refugesInfo = layerRefugesInfo({
 	}),
 
 	controls = [
-		controlLayersSwitcher({
-			baseLayers: baseLayers,
-		}),
+		layersSwitcher,
 		controlPermalink({ // Permet de garder le même réglage de carte en création
 			visible: false, // Mais on ne visualise pas le lien du permalink
 <?php if ($point->id_point) { ?>

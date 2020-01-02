@@ -1,13 +1,8 @@
-// Script lié à la page d'acceuil
-
-// Le fond de carte
-const layer = layerOsm(
-		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
-	),
-
-	// La couche "massifs"
-	massifs = layerVectorURL({
+<?php
+	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
+?>
+// La couche "massifs"
+const massifs = layerVectorURL({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		receiveProperties: function(properties) {
 			properties.name = properties.nom;
@@ -42,6 +37,7 @@ const layer = layerOsm(
 	map = new ol.Map({
 		target: 'carte-accueil',
 		controls: [
+			layersSwitcher,
 			new ol.control.Attribution({
 				collapsible: false, // Attribution always open
 			}),
@@ -51,7 +47,6 @@ const layer = layerOsm(
 			}),
 		],
 		layers: [
-			layer,
 			massifs,
 		]
 	});

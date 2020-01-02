@@ -1,11 +1,8 @@
 <?php
 	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
-
 const controls = [
-		controlLayersSwitcher({
-			baseLayers: baseLayers,
-		}),
+		layersSwitcher,
 		controlPermalink({ // Permet de garder le même réglage de carte d'une page à l'autre
 			visible: false, // Mais on ne visualise pas le lien du permalink
 			init: false, // Ici, on utilisera plutôt la position du point
