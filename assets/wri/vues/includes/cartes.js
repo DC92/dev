@@ -7,7 +7,7 @@ const layersSwitcher = controlLayersSwitcher({
 		'OpenTopo': layerOsmOpenTopo(),
 		'Outdoors': layerThunderforest('<?=$config_wri['thunderforest_key']?>', 'outdoors'),
 		'OSM-fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		<?php if ($vue->type != 'edit') { ?>
+		<?php if ($vue->type != 'point_formulaire_modification' && $vue->type != 'edit') { ?>
 		'IGN': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN('<?=$config_wri['ign_key']?>', 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		<?php } ?>

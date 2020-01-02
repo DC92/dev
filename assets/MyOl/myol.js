@@ -400,28 +400,32 @@ function permanentCheckboxList(selectorName, evt) {
  */
 function controlPermanentCheckbox(selectorName, callback, options) {
 	options = options || {};
+
+	// Search values in cookies
 	const inputEls = document.getElementsByName(selectorName),
-		cookie = decodeURI(
-			location.search + '#' + // Priority to the url args
-			location.hash + '#' + // Then the hash
-			document.cookie + '#' + // Then the cookies
-			'map-' + selectorName + '=' + options.init // Then the default
-		).match('map-' + selectorName + '=([^#&;]*)');
-
-	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
-		// Set the checks accordingly with the cookie
-		if (cookie && !options.noMemSelection)
-			inputEls[e].checked = cookie[1].split(',').indexOf(inputEls[e].value) !== -1;
-
-		// Attach the action
-		inputEls[e].addEventListener('click', onClick);
+		cooks = [
+			location.search, // Priority to the url args
+			location.hash, // Then the hash
+			document.cookie, // Then the cookies
+			'map-' + selectorName + '=' + (options.init || '') // Then the default
+		];
+	for (let c in cooks) {
+		const match = cooks[c].match('map-' + selectorName + '=([^#&;]*)');
+		if (match && match && match.index &&
+		//TODO WRI default layer if cookie's one doesn't exists
+			!options.noMemSelection) {
+			// Set the <input> checks accordingly with the cookie
+			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
+				inputEls[e].checked = match[1].split(',').indexOf(inputEls[e].value) !== -1;
+		}
 	}
 
+	// Attach the action
 	function onClick(evt) {
-		const list = permanentCheckboxList(selectorName, evt);
-		if (typeof callback == 'function')
-			callback(evt, list);
+		callback(evt, permanentCheckboxList(selectorName, evt));
 	}
+	for (let e = 0; e < inputEls.length; e++)
+		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
 	callback(null, permanentCheckboxList(selectorName));
