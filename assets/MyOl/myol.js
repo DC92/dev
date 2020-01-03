@@ -12,9 +12,6 @@
 
 /* jshint esversion: 6 */
 if (!ol) var ol = {}; //HACK For JS validators
-//TODO WRI Edition / creation / suppression polygones autres que massif
-//TODO permaliens compatibles WRI/LL
-//TODO WRI BUG http://dom.refuges.info/edit/9954
 
 /**
  * Debug facilities on mobile
@@ -188,6 +185,7 @@ function layerIGN(key, layer, format) {
 /**
  * Spain
  */
+//BEST layerTileIncomplete
 function layerSpain(serveur, layer) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
@@ -385,9 +383,10 @@ function permanentCheckboxList(selectorName, evt) {
 			list.push(inputEls[e].value);
 	}
 
-	// Mem the related cookie
-	//HACK the cookie can be empty to keep memory of default cancelled checks
-	document.cookie = 'map-' + selectorName + '=' + list.join(',') + '; path=/; SameSite=Strict;';
+	// Mem the data in the cookie
+	document.cookie = 'map-' + selectorName + '=' +
+		(list.join(',') || 'none') +
+		'; path=/; SameSite=Strict;';
 
 	return list;
 }
@@ -396,7 +395,8 @@ function permanentCheckboxList(selectorName, evt) {
  * Manages checkboxes inputs having the same name
  * selectorName {string}
  * callback {function} action when the button is clicked
- * noMemSelection {bool} do(default)/don't(if true) mem state in a cookie
+ * options.init {string} default cookie value
+ * options.noMemSelection {bool} do(default)/don't(if true) mem state in a cookie
  */
 function controlPermanentCheckbox(selectorName, callback, options) {
 	options = options || {};
@@ -407,17 +407,16 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 			location.search, // Priority to the url args
 			location.hash, // Then the hash
 			document.cookie, // Then the cookies
-			'map-' + selectorName + '=' + (options.init || '') // Then the default
+			'map-' + selectorName + '=' + (options.init || ''), // Then the default
 		];
+	let found = false;
 	for (let c in cooks) {
 		const match = cooks[c].match('map-' + selectorName + '=([^#&;]*)');
-		if (match && match && match.index &&
-		//TODO WRI default layer if cookie's one doesn't exists
-			!options.noMemSelection) {
+		if (!found && match && !options.noMemSelection)
 			// Set the <input> checks accordingly with the cookie
 			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
-				inputEls[e].checked = match[1].split(',').indexOf(inputEls[e].value) !== -1;
-		}
+				if (match[1].split(',').indexOf(inputEls[e].value) !== -1)
+					found = inputEls[e].checked = true;
 	}
 
 	// Attach the action
@@ -1266,9 +1265,17 @@ function controlPermalink(options) {
 		});
 	control.element.appendChild(aEl);
 
-	let params = (location.hash + location.search).match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Priority to the hash
-		document.cookie.match(/map=([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/) || // Then the cookie
-		(options.initialFit || '6/2/47').match(/([-.0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // Url arg format : <ZOOM>/<LON>/<LAT>/<LAYER>
+	const zoomMatch = location.href.match(/zoom=([0-9]+)/),
+		latLonMatch = location.href.match(/lat=([-.0-9]+)&lon=([-.0-9]+)/);
+	let params = (
+			location.href + // Priority to ?map=6/2/47 or #map=6/2/47
+			(zoomMatch && latLonMatch ? // Old format ?zoom=6&lat=47&lon=5
+				'map=' + zoomMatch[1] + '/' + latLonMatch[2] + '/' + latLonMatch[1] :
+				'') +
+			document.cookie + // Then the cookie
+			'map=' + options.initialFit + // Optional default
+			'map=6/2/47') // Default
+		.match(/map=([0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // map=<ZOOM>/<LON>/<LAT>
 
 	if (options.visible) {
 		control.element.className = 'ol-permalink';
@@ -1296,9 +1303,9 @@ function controlPermalink(options) {
 		if (view.getCenter()) {
 			const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 				newParams = [
-					parseInt(view.getZoom()),
-					Math.round(ll4326[0] * 100000) / 100000,
-					Math.round(ll4326[1] * 100000) / 100000
+					parseInt(view.getZoom()), // Zoom
+					Math.round(ll4326[0] * 100000) / 100000, // Lon
+					Math.round(ll4326[1] * 100000) / 100000, // Lat
 				];
 
 			aEl.href = options.hash + 'map=' + newParams.join('/');
@@ -2279,10 +2286,7 @@ function layerEdit(options) {
 
 		// Save lines in <EL> as geoJSON at every change
 		if (geoJsonEl)
-			geoJsonEl.value = options.saveFeatures({
-				lines: coords.lines,
-				polys: coords.polys,
-			}, options.format);
+			geoJsonEl.value = options.saveFeatures(coords, options.format);
 	}
 
 	return layer;
@@ -2375,8 +2379,8 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 		}
 
 	return {
-		lines: lines,
-		polys: polys,
+		lines: lines.filter(Boolean), // Remove deleted array members
+		polys: polys.filter(Boolean),
 	};
 }
 

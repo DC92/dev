@@ -149,6 +149,8 @@ FAIT, à reprendre en GIT
 
 TODO WRI
 ========
+Edition / creation / suppression polygones autres que massif
+permaliens compatibles WRI/LL (récup liens prédédents
 vues\api\doc\index.html : nte de zone au points à => nte de zone auX points à
 vues\api\doc\index.html : inclus dans la bbos => X
 Enlever dernier RC des fichiers
@@ -162,7 +164,6 @@ cookie = ;SameSite=Strict
 	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
 	Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 Voir les ' en format word
-Remettre meteo.js au niveau /vues sinon dans point.js
 Méteo ne marche pas sur mobile (status 0 / vide)
 Possibilité d'agrandir la météo sur mobiles
 Créer les massifs manquants à chemineur

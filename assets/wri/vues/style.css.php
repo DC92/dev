@@ -873,9 +873,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 #carte-point {
   width: 50%; /* Support of non CSS3 browsers (Safari on Windows)*/
   height: 380px;
-  width: 100vw;
+  width: calc(100vw - 20px);
   height: 100vw;
-  min-width: 300px;
   max-height: 400px;
 }
 /* Carte de la page des points écrans */
@@ -885,7 +884,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   }
   #carte-point {
     width: 400px;
-    min-width: auto;
   }
 }
 
