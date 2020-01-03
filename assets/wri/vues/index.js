@@ -1,5 +1,11 @@
-<?php
-	include ($config_wri['racine_projet'].'vues/includes/cartes.js');
+<?php 
+// Script lié à la page d'acceuil
+
+// Ce fichier ne doit contenir que du code javascript destiné à être inclus dans la page
+// $vue contient les données passées par le fichier PHP
+// $config_wri les données communes à tout WRI
+
+include ($config_wri['racine_projet'].'vues/includes/cartes.js');
 ?>
 // La couche "massifs"
 const massifs = layerVectorURL({

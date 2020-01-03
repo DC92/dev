@@ -94,11 +94,11 @@ else // le point est valide
             
         /*********** Détermination de la carte à afficher ***/
         $vue->mini_carte=TRUE;
-		$vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
-		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
-		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4-src.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4-src.js');
-		$vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
-		$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
+        $vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
+        $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
+        $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4-src.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4-src.js');
+        $vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
+        $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
     }
 
     /***********  détermination si le point se situe dans un polygone pour lequel un message est à faire passer *******/
@@ -191,3 +191,4 @@ else // le point est valide
         $vue->commentaires[]=$commentaire;
     }
 }
+

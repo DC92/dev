@@ -225,3 +225,4 @@ $point->site_officiel=protege($point->site_officiel);
 $point->nom_createur=protege($point->nom_createur);
 $vue->point=$point;
 $vue->utilisateurs=infos_utilisateurs();
+
