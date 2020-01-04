@@ -1,3 +1,37 @@
+BUGS
+====
+
+FAIT WRI OL6
+============
+Ajouter altitude + nb lits dans les étiquettes WRI
+Récuperer nom -> name pour export GPX des points dans la carte
+Display coordonnées suisses
+Point : Init valeurs champs à afficher
+Bug carte point petites largeurs de fenetre : l'ascenseur mange le layerswitcher
+Voir si var map nécéssaire (point)
+Demander une modification => Demander une modification des informations de la fiche
+Récupérer commentaires de conf_privee.php
+Pas de récup cookies de point-modif vers nav
+Création point : garder les cookies et pas forcer à Salanche (point par défaut dans la base !)
+http://www.refuges.info/forum/viewtopic.php?f=2&t=9127 / BUG: cannot click on camp to camp symbol (c) for 'Crête Pilliozan - Agnelin, point 2611 m ©' (ouest barage Grandmaison / Est Grenoble / S/E St Jean Maurienne
+permaliens compatibles WRI/LL (récup liens prédédents
+FAIT, à reprendre en GIT
+	Reprendre config_privee.php.modele
+	Ajouter les 3 fichiers edit.*
+	Ajouter tous les fichiers OL
+
+TODO
+====
+Supprimer
+/leaflet/...
+
+Ajouter
+/ol/...
+/*/edit.*
+
+
+ARGUMENTAIRE
+============
 J'en ai parlé plusieurs fois mais la livraison tarde un peu.
 Je vous propose une réorganisation du logiciel des cartes de refuges.info
 La raison de départ est une difficulté de maintenance des modules Leaflet qui m'a amené à reconsidérer Openlayers.
@@ -62,15 +96,3 @@ MAQUETTE :
 Vous pouvez essayer une maquette sur http://dom.refuges.info
 Il s'agit d'une proposition, tout est discutable, modifiable, ... 
 Je n'ai pas eu le temps de mener des tests approfondis mais je vous encourage vivement à faire le max de tests (il s'agit d'une base de test) et à me remonter le max de problèmes.
-
-
-
-
-OK Commits on Nov 25, 2019
-
-Supprimer
-/leaflet/...
-
-Ajouter
-/ol/...
-/*/edit.*

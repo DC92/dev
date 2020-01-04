@@ -27,7 +27,9 @@ if ( isset($_REQUEST["id_point"]) )
         $meme_si_en_attente=True;
     else
         $meme_si_en_attente=False;
+
     $point=infos_point($_REQUEST['id_point'],$meme_si_en_attente);
+
     // Stop, le point n'existe pas (ou est en attente et il ne faut pas dire que c'est le cas)
     if ($point->erreur) 
     {
@@ -38,7 +40,8 @@ if ( isset($_REQUEST["id_point"]) )
         return "";
     }
     // Soit on est avec un modérateur global ou de cette fiche
-    if ( isset($_SESSION['id_utilisateur']) AND ( $_SESSION['niveau_moderation'] >= 1 OR $_SESSION['id_utilisateur'] == $point->id_createur ) ) 
+    if ( isset($_SESSION['id_utilisateur']) AND
+        ( $_SESSION['niveau_moderation'] >= 1 OR $_SESSION['id_utilisateur'] == $point->id_createur ) )
     {
         // boutton supprimer uniquement pour les modérateurs globaux
         if ( $_SESSION['niveau_moderation'] >= 1 )
@@ -210,11 +213,12 @@ if ( !empty($point->equivalent_conditions_utilisation) )
 
 $vue->css          [] = $config_wri['url_chemin_ol'].'ol/ol.css?'.filemtime($config_wri['chemin_ol'].'ol/ol.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'ol/ol.js?'.filemtime($config_wri['chemin_ol'].'ol/ol.js');
-$vue->css          [] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.css?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.css');
+$vue->css          [] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.min.css?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.min.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.js?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.js');
-$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4-src.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4-src.js');
+$vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'proj4/proj4.js?'.filemtime($config_wri['chemin_ol'].'proj4/proj4.js');
 $vue->css          [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
 $vue->java_lib_foot[] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
+
 // sly : FIXME je n'ai pas sû ou le mettre dans ce fichier
 $vue->lien_bbcode = lien_wiki("syntaxe_bbcode");
 $vue->lien_aide_points = lien_wiki("autres_points");

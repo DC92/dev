@@ -1086,8 +1086,9 @@ function layerOverpass(options) {
 function controlButton(options) {
 	options = Object.assign({
 		element: document.createElement('div'),
-		buttonBackgroundColors: ['white', 'white'],
+		buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
 		className: 'myol-button',
+		activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
 	}, options);
 	const control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
@@ -1136,9 +1137,9 @@ function controlButton(options) {
 		// Execute the requested change
 		if (control.active != newActive &&
 			(!group || group == options.group)) { // Only for the concerned controls
-			control.active = newActive;
-			buttonEl.style.backgroundColor = options.buttonBackgroundColors[newActive % options.buttonBackgroundColors.length];
-			options.activate(newActive);
+			control.active = newActive % options.buttonBackgroundColors.length;
+			buttonEl.style.backgroundColor = options.buttonBackgroundColors[control.active];
+			options.activate(control.active);
 		}
 	};
 	return control;
@@ -1471,7 +1472,7 @@ function controlGPS() {
 		// The control button
 		button = controlButton({
 			className: 'myol-button ol-gps',
-			buttonBackgroundColors: ['white', '#ef3', '#bbb'],
+			buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
 			title: 'Centrer sur la position GPS',
 			activate: function(active) {
 				const map = button.getMap();
