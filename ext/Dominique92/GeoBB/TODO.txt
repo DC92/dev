@@ -129,10 +129,11 @@ ACCEPTER MODERATEUR //TODO vrai sur ALPAGES ???
 Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
 Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
 
+
 TODO WRI
 ========
+? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 ? historique posts phpbb wri (ext/...)
-Edition / creation / suppression polygones autres que massif
 Mettre le zip forum
 /gps favicon 144px min
 	vues\api\doc\index.html : nte de zone au points à => nte de zone auX points à
@@ -144,11 +145,9 @@ cookie = ;SameSite=Strict
 	Or if your host is already updated to 7.3, you can use:
 	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
 	Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
-Voir les ' en format word
 Méteo ne marche pas sur mobile (status 0 / vide)
 Possibilité d'agrandir la météo sur mobiles
 Créer les massifs manquants à chemineur
-Pas de massifs dans l'Atlas ?
 Inclure scan_liens.php dans /ressources/outils/...
 Mettre le format date sur tous les users
 L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
