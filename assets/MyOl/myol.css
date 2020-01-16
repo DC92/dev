@@ -16,11 +16,9 @@
 .ol-geocoder,
 .ol-gps,
 .myol-button {
+	position: static !important;
 	float: left;
-	position: relative !important;
-	left: 0 !important;
-	top: 0 !important;
-	margin: .2em 0 0 .2em;
+	margin: 0.2em 0 0 0.2em;
 	padding: 0; /* No grey line around the button */
 }
 
@@ -31,7 +29,7 @@
 	font-size: 1.14em !important;
 	color: black;
 	background-color: white;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, .65);
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	outline: 0;
 }
 .ol-geocoder button {
@@ -77,7 +75,7 @@
 }
 .gcd-gl-result {
 	top: 3.8em !important;
-	left: .1em !important;
+	left: 0.1em !important;
 }
 
 /* Full screen */
@@ -85,6 +83,17 @@
 .ol-full-screen-true {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
 	/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
+}
+/* Full window polyfill for non fullscreen browsers */
+.ol-pseudo-fullscreen {
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	width: 100% !important;	
+	max-width: 100% !important;
+	height: 100% !important;
+	max-height: 100% !important;
+	z-index: 1000000 !important;
 }
 
 /* GPS */
@@ -106,7 +115,7 @@
 }
 .ol-print p {
 	margin: 0;
-	font-size: .8em;
+	font-size: 0.8em;
 	font-family: Times New Roman;
 }
 .ol-print p span {
@@ -128,12 +137,12 @@
 .ol-attribution,
 .ol-coordinate,
 .ol-length-line {
-	font-size: .8em;
+	font-size: 0.8em;
 }
 .ol-switch-layer {
-	position: absolute !important;
-	left: auto !important;
-	right: .2em;
+	position: static !important;
+	float: right;
+	margin-right: 0.2em;
 	z-index: 1;
 	background-color: white !important; /* Initial translucid */
 }
@@ -144,11 +153,11 @@
 	margin: 0;
 }
 .ol-switch-layer button {
-	padding-bottom: .5em;
+	padding-bottom: 0.5em;
 }
 .ol-switch-layer p {
 	margin: 0;
-	font-size: .8em;
+	font-size: 0.8em;
 }
 .ol-permalink {
 	position: absolute;
@@ -156,7 +165,7 @@
 	right: 0;
 	padding: 3px;
 	border-radius: 8px 0 0 8px;
-	background: rgba(255, 255, 255, .8);
+	background: rgba(255, 255, 255, 0.8);
 }
 .ol-coordinate {
 	position: absolute;
@@ -164,7 +173,7 @@
 	left: 8px;
 	padding: 2px;
 	border-radius: 4px;
-	background: rgba(0, 60, 136, .3);
+	background: rgba(0, 60, 136, 0.3);
 	color: white;
 }
 .ol-length-line {
@@ -173,7 +182,7 @@
 	left: 8px;
 	padding: 2px;
 	border-radius: 4px;
-	background: rgba(0, 60, 136, .3);
+	background: rgba(0, 60, 136, 0.3);
 	color: white;
 }
 .ol-coordinate:empty,
@@ -189,7 +198,7 @@
 	border-radius: 5px;
 	box-shadow: 0 3px 8px #888;
 	background-color: white;
-	font-size: .8em;
+	font-size: 0.8em;
 	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-decoration: none;
 	color: initial;
@@ -197,10 +206,10 @@
 }
 .myol-popup p {
 	margin: 0;
-	font-size: .8em;
+	font-size: 0.8em;
 }
 .myol-popup span {
-	font-size: .7em;
+	font-size: 0.7em;
 }
 .myol-popup-hidden {
 	display: none;

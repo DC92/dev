@@ -132,6 +132,7 @@ Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membr
 
 TODO WRI
 ========
+conf_privee : "???" => '???'
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 ? historique posts phpbb wri (ext/...)
 Mettre le zip forum
