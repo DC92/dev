@@ -67,6 +67,12 @@ const massifs = layerVectorURL({
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
 			'double cliquer pour terminer.\n' +
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
+		styleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 4,
+			}),
+		},
 	}),
 
 	vectorLayers = [
