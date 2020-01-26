@@ -1,0 +1,154 @@
+<!-- IF TOPIC_TITLE == "Activités" -->
+<br/>Catégorie :
+<select name="gym_categorie">
+	<option>Categorie ?</option>
+	<!-- BEGIN liste_categories -->
+		<option value="{liste_categories.POST_ID}"
+			<!-- IF liste_categories.POST_ID == GYM_CATEGORIE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_categories.POST_SUBJECT}
+		</option>
+	<!-- END liste_categories -->
+</select> &nbsp;
+
+Publication :
+Actualités <input type="checkbox" name="gym_actualites"
+<!-- IF GYM_ACTUALITES -->
+	checked="checked"
+<!-- ENDIF -->
+/> &nbsp;
+Horaires <input type="checkbox" name="gym_horaires"
+<!-- IF GYM_HORAIRES -->
+	checked="checked"
+<!-- ENDIF -->
+/><br/><br/>
+
+<select name="gym_lieu">
+	<option>Lieu ?</option>
+	<!-- BEGIN liste_lieux -->
+		<option value="{liste_lieux.POST_ID}"
+			<!-- IF liste_lieux.POST_ID == GYM_LIEU -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_lieux.POST_SUBJECT}
+		</option>
+	<!-- END liste_lieux -->
+</select>
+
+<select name="gym_animateur">
+	<option>Animateur ?</option>
+	<!-- BEGIN liste_animateurs -->
+		<option value="{liste_animateurs.POST_ID}"
+			<!-- IF liste_animateurs.POST_ID == GYM_ANIMATEUR -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_animateurs.POST_SUBJECT}
+		</option>
+	<!-- END liste_animateurs -->
+</select><br/><br/>
+
+<select name="gym_jour" id="gym_jour" onchange="displayCalendar()">
+	<!-- BEGIN liste_jours -->
+		<option value="{liste_jours.NO}"
+			<!-- IF liste_jours.VALEUR == GYM_JOUR -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_jours.VALEUR}
+		</option>
+	<!-- END liste_jours -->
+</select> &nbsp;
+
+<select name="gym_heure">
+	<!-- BEGIN liste_heures -->
+		<option value="{liste_heures.VALEUR}"
+			<!-- IF liste_heures.VALEUR == GYM_HEURE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_heures.VALEUR}
+		</option>
+	<!-- END liste_heures -->
+</select> h
+<select name="gym_minute">
+	<!-- BEGIN liste_minutes -->
+		<option value="{liste_minutes.VALEUR}"
+			<!-- IF liste_minutes.VALEUR == GYM_MINUTE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_minutes.VALEUR}
+		</option>
+	<!-- END liste_minutes -->
+</select><br/><br/>
+
+Période : scolaire
+<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayCalendar()"
+<!-- IF GYM_SCOLAIRE != 'off'-->
+	checked="checked"
+<!-- ENDIF -->
+/><br/>
+
+<div id="liste_semaines">
+<!-- BEGIN liste_semaines -->
+	<br id="gym_br_{liste_semaines.NO}" />
+	<span id="gym_mois_{liste_semaines.NO}"></span>&nbsp; &nbsp;
+	<span id="gym_date_{liste_semaines.NO}"></span>
+	<input type="checkbox" value="{liste_semaines.VALEUR}"
+		name="gym_semaines[]" id="gym_semaine_{liste_semaines.NO}"
+	<!-- IF liste_semaines.BASE != '' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/>
+<!-- END liste_semaines -->
+</div>
+
+<!-- ENDIF -->
+
+<script>
+displayCalendar();
+function displayCalendar() {
+	const elDay = document.getElementById('gym_jour'),
+		elo = document.getElementById('gym_scolaire'),
+		els = document.getElementById('liste_semaines');
+
+	let lastMonth = 0;
+	for (let week = 0; week < 44; week++) {
+		const elb = document.getElementById('gym_br_' + week),
+			elm = document.getElementById('gym_mois_' + week),
+			eld = document.getElementById('gym_date_' + week),
+			date = new Date(new Date().getFullYear(), -4); // Sept 1st
+		date.setDate(date.getDate() + parseInt(elDay.value, 10) + 1 - date.getDay() + week * 7); // Day of the week
+		eld.innerHTML = date.getDate();
+
+		if (lastMonth != date.getMonth()) { // Début de mois
+			elb.style.display = '';
+			elm.innerHTML = date.toLocaleString('fr-FR', {
+				month: 'long'
+			}) + ': ';
+		} else { // Suite de mois
+			elb.style.display = 'none';
+			elm.innerHTML = '';
+		}
+		// Hide week calendar if "scolaire"
+		els.style.display = elo.checked ? 'none' : '';
+
+		lastMonth = date.getMonth();
+	}
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+

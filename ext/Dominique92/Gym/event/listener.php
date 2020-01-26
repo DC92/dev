@@ -1,20 +1,12 @@
 <?php
 /**
- *
- * @package GeoBB
- * @copyright (c) 2016 Dominique Cavailhez
+ * @package Gym
+ * @copyright (c) 2020 Dominique Cavailhez
  * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
-//TODO ALPAGES BEST recherche par département / commune
-//TODO TEST ALPAGES post modif mail inscription
-//TODO ALPAGES ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
-//TODO BEST upgrade ALPAGES/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
-//TODO AFTER WRI enlever /assets/wri
-//TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
-//TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
 
-namespace Dominique92\GeoBB\event;
+namespace Dominique92\Gym\event;
 
 if (!defined('IN_PHPBB'))
 {
@@ -49,41 +41,262 @@ class listener implements EventSubscriberInterface
 
 		return [
 			// All
+//			'core.page_header' => 'page_header',
 			'core.page_footer' => 'page_footer',
-
+/*
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
+*/
+/*
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
-
+*/
 			// Posting
-			'core.modify_posting_auth' => 'modify_posting_auth',
-			'core.modify_posting_parameters' => 'modify_posting_parameters',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
+			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
+/*
+			'core.modify_posting_auth' => 'modify_posting_auth',
+			'core.modify_posting_parameters' => 'modify_posting_parameters',
 
 			// Resize images
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
 
 			// Registration
 			'core.ucp_register_welcome_email_before' => 'ucp_register_welcome_email_before',
+*/
 		];
 	}
 
+//// List template vars : phpbb/template/context.php line 135
+
+	// Called when display post page
+	function posting_modify_template_vars($vars) {
+		$post_data = $vars['post_data'];
+
+		// To prevent an empty title to invalidate the full page and input.
+		if (!$post_data['post_subject'])
+			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
+
+		// Dictionaries depending on database content
+		$sql = "SELECT topic_title, post_id, post_subject
+			FROM ".POSTS_TABLE."
+			JOIN ".TOPICS_TABLE." USING (topic_id)
+			WHERE post_id != topic_first_post_id";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$values [$row['topic_title']][$row['post_subject']] = $row;
+		$this->db->sql_freeresult($result);
+
+		setlocale(LC_ALL, 'fr_FR');
+		foreach ($values AS $k=>$v) {
+			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
+			ksort ($v);
+			foreach ($v AS $vk=>$vv)
+				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
+		}
+
+		// Set specific variables
+		foreach ($post_data AS $k=>$v)
+			if (!strncmp ($k, 'gym', 3) && $v) {
+				$this->template->assign_var (strtoupper ($k), $v);
+				$data[$k] = explode (',', $v); // Expand grouped values
+			}
+
+		// Static dictionaries
+		$static_values = [
+			'heures' => [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
+			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
+			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
+			'semaines' => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
+				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43],
+		];
+		foreach ($static_values AS $k=>$v)
+			foreach ($v AS $vk=>$vv)
+				$this->template->assign_block_vars (
+					'liste_'.$k, [
+						'NO' => $vk,
+						'VALEUR' => $vv,
+						'BASE' => in_array ($vk, $data["gym_$k"] ?: []),
+					]
+				);
+
+		// Create a log file with the existing data if there is none
+		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
+	}
+
+	// Includes language files for this extension
+	function page_footer() {
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+	}
 
 	/**
-		ALL
+		POSTING.PHP
 	*/
-	function page_footer() {
-//		ob_start();var_dump($this->template);echo'template = '.ob_get_clean(); // VISUALISATION VARIABLES TEMPLATE
+	function posting_modify_submission_errors($vars) {
+		$error = $vars['error'];
+
+		// Allows entering a POST with empty text
+		foreach ($error AS $k=>$v)
+			if ($v == $this->user->lang['TOO_FEW_CHARS'])
+				unset ($error[$k]);
+
+		$vars['error'] = $error;
+	}
+
+/*
+			$this->template->assign_block_vars (
+				'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($row['topic_title']))),
+				array_change_key_case ($row, CASE_UPPER)
+			);
+*/
+/*
+		// Get translation of SQL space data
+		if (isset ($post_data['geom'])) {
+			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
+				' FROM '.POSTS_TABLE.
+				' WHERE post_id = '.$post_data['post_id'];
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+			$page_data['GEOJSON'] = $post_data['geojson'] = $row['geojson'];
+		}
+		// Unhide geojson field
+		$this->request->enable_super_globals();
+		$page_data['GEOJSON_TYPE'] = isset($_GET['geom']) ? 'text' : 'hidden';
+		$this->request->disable_super_globals();
+
+		$page_data['EDIT_REASON'] = 'Modération'; // For display in news
+		$page_data['TOPIC_ID'] = @$post_data['topic_id'];
+		$page_data['POST_ID'] = @$post_data['post_id'];
+		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
+
+		$this->topic_fields('specific_fields', $post_data, $post_data['forum_desc'], true);
+		$this->geobb_activate_map($post_data['forum_desc'], @$post_data['post_id'] == $post_data['topic_first_post_id']);
+
+		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
+		$file_name = "phpbb/db/driver/driver.php";
+		$file_tag = "\n\t\tif (is_null(\$var))";
+		$file_patch = "\n\t\tif (strpos(\$var, 'GeomFrom') !== false)\n\t\t\treturn \$var;";
+		$file_content = file_get_contents ($file_name);
+		if (strpos($file_content, '{'.$file_tag))
+			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
+*/
+//		$vars['page_data'] = $page_data;
+
+	// Call when validating the data to be saved
+	function submit_post_modify_sql_data($vars) {
+		$sql_data = $vars['sql_data'];
+
+		// Get special columns list
+		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "gym_%"';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$special_columns[$row['Field']] = $row['Type'];
+			$sql_data[POSTS_TABLE]['sql'][$row['Field']] = 'off'; // Default field value
+		}
+		$this->db->sql_freeresult($result);
+
+		// Treat specific data
+		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_POST,true).'</pre>';exit; // List POSTS values
+		foreach ($_POST AS $k=>$v)
+			if (!strncmp ($k, 'gym', 3)) {
+				// Create the column if none
+				if(!isset($special_columns[$k])){
+					$sql = 'ALTER TABLE '.POSTS_TABLE." ADD $k varchar(255)";
+					$this->db->sql_query($sql);
+				}
+				if(is_array($v))
+					$v = implode (',', $v);
+
+				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
+				$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
+			}
+		$this->request->disable_super_globals();
+
+		$vars['sql_data'] = $sql_data; // return data
+		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
+//		$this->modifs['geojson'] = str_replace (['ST_GeomFromGeoJSON(\'','\')'], '', $this->modifs['geom']);
+	}
+
+	// Called after the post validation
+	function modify_submit_notification_data($vars) {
+		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
+	}
+	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null = false) {
+		if (isset ($post_data['post_id'])) {
+			$this->request->enable_super_globals();
+			$to_save = [
+				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
+				$_SERVER['REQUEST_URI'],
+				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
+				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
+				'post_subject = '.$geo_data['post_subject'],
+				'post_text = '.$post_data['post_text'].$post_data['message'],
+//				'geojson = '.@$geo_data['geojson'],
+			];
+			foreach ($geo_data AS $k=>$v)
+				if ($v && !strncmp ($k, 'gym_', 4))
+					$to_save [] = "$k = $v";
+
+			// Save attachment_data
+			$attach = [];
+			if ($attachment_data)
+				foreach ($attachment_data AS $att)
+					$attach[] = $att['attach_id'].' : '.$att['real_filename'];
+			if (isset ($attach))
+				$to_save[] = 'attachments = '.implode (', ', $attach);
+
+			//TODO protéger l'accès à ces fichiers
+			//TODO sav avec les balises !
+			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+			if (!$create_if_null || !file_exists($file_name))
+				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
+
+			$this->request->disable_super_globals();
+		}
+	}
+
+///////////////////////////////// FIN /////////////////////////////////
+
+	/**
+		VIEWTOPIC.PHP
+	*/
+						// Appelé avant la requette SQL qui récupère les données des posts
+						function viewtopic_get_post_data($vars) {
+							$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geom"';
+							$result = $this->db->sql_query($sql);
+							if ($this->db->sql_fetchrow($result)) {
+								// Insère la conversion du champ geom en format WKT dans la requette SQL
+								$sql_ary = $vars['sql_ary'];
+								$sql_ary['SELECT'] .=
+									', ST_AsGeoJSON(geom) AS geojson'.
+									', ST_AsText(ST_Centroid(ST_Envelope(geom))) AS centerwkt'.
+									', ST_Area(geom) AS area';
+								$vars['sql_ary'] = $sql_ary;
+							}
+							$this->db->sql_freeresult($result);
+						}
+
+						// Called during first pass on post data that reads phpbb-posts SQL data
+						function viewtopic_post_rowset_data($vars) {
+							// Update the database with the automatic data
+							$post_data = $vars['row'];
+
+							//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
+					//		$this->all_post_data[$vars['row']['post_id']] =  array_merge ($post_data, $update);
+						}
+						
+	function page_footer_OLD() {
 
 		/*//TODO DELETE ?
 		// Force le style
@@ -120,9 +333,6 @@ class listener implements EventSubscriberInterface
 					'ARGS' => implode (',', $v),
 				]);
 
-		// Includes language files for this extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
 
 		// Misc template values
 		$this->template->assign_vars([
@@ -286,24 +496,10 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	// Appelé avant la requette SQL qui récupère les données des posts
-	function viewtopic_get_post_data($vars) {
-		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "geom"';
-		$result = $this->db->sql_query($sql);
-		if ($this->db->sql_fetchrow($result)) {
-			// Insère la conversion du champ geom en format WKT dans la requette SQL
-			$sql_ary = $vars['sql_ary'];
-			$sql_ary['SELECT'] .=
-				', ST_AsGeoJSON(geom) AS geojson'.
-				', ST_AsText(ST_Centroid(ST_Envelope(geom))) AS centerwkt'.
-				', ST_Area(geom) AS area';
-			$vars['sql_ary'] = $sql_ary;
-		}
-		$this->db->sql_freeresult($result);
-	}
+
 
 	// Called during first pass on post data that reads phpbb-posts SQL data
-	function viewtopic_post_rowset_data($vars) {
+	function wwwwviewtopic_post_rowset_data($vars) {
 		// Update the database with the automatic data
 		$post_data = $vars['row'];
 
@@ -314,8 +510,6 @@ class listener implements EventSubscriberInterface
 		foreach ($post_data AS $k=>$v)
 			if (!$v)
 				switch ($k) {
-//TODO ALPAGES Automatiser : Année où la fiche de l'alpage a été renseignée ou actualisée
-//TODO ALPAGES BUG : affiche altitude = 99999 sur http://alpages.info/viewtopic.php?t=3166
 					case 'geo_surface':
 						if ($post_data['area'] && $center[0])
 							$update[$k] =
@@ -406,7 +600,7 @@ class listener implements EventSubscriberInterface
 			foreach ($row AS $k=>$v)
 				if (substr($v, -1) == '~') {
 					$vr = str_replace("'", "\\'", substr($v, 0, -1));
-					$sql = "UPDATE phpbb_posts SET $k = '-$vr' WHERE post_id = ".$row['post_id'];
+					$sql = "UPDATE ".POSTS_TABLE." SET $k = '-$vr' WHERE post_id = ".$row['post_id'];
 					$this->db->sql_query($sql);
 				}
 		$this->db->sql_freeresult($result);
@@ -509,127 +703,6 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		$this->db->sql_freeresult ($result);
 		if ($row) // Force le forum
 			$vars['forum_id'] = $row['forum_id'];
-	}
-
-	// Allows entering a POST with empty text
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
-
-	// Called when display post page
-	function posting_modify_template_vars($vars) {
-		$page_data = $vars['page_data'];
-		$post_data = $vars['post_data'];
-
-		// Get translation of SQL space data
-		if (isset ($post_data['geom'])) {
-			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
-				' FROM '.POSTS_TABLE.
-				' WHERE post_id = '.$post_data['post_id'];
-			$result = $this->db->sql_query($sql);
-			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-			$page_data['GEOJSON'] = $post_data['geojson'] = $row['geojson'];
-		}
-
-		// Unhide geojson field
-		$this->request->enable_super_globals();
-		$page_data['GEOJSON_TYPE'] = isset($_GET['geom']) ? 'text' : 'hidden';
-		$this->request->disable_super_globals();
-
-		// Create a log file with the existing data if there is none
-		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
-
-		// To prevent an empty title to invalidate the full page and input.
-		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
-
-		$page_data['EDIT_REASON'] = 'Modération'; // For display in news
-		$page_data['TOPIC_ID'] = @$post_data['topic_id'];
-		$page_data['POST_ID'] = @$post_data['post_id'];
-		$page_data['TOPIC_FIRST_POST_ID'] = $post_data['topic_first_post_id'] ?: 0;
-
-		$this->topic_fields('specific_fields', $post_data, $post_data['forum_desc'], true);
-		$this->geobb_activate_map($post_data['forum_desc'], @$post_data['post_id'] == $post_data['topic_first_post_id']);
-
-		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
-		$file_name = "phpbb/db/driver/driver.php";
-		$file_tag = "\n\t\tif (is_null(\$var))";
-		$file_patch = "\n\t\tif (strpos(\$var, 'GeomFrom') !== false)\n\t\t\treturn \$var;";
-		$file_content = file_get_contents ($file_name);
-		if (strpos($file_content, '{'.$file_tag))
-			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
-
-		$vars['page_data'] = $page_data;
-	}
-
-	// Call when validating the data to be saved
-	function submit_post_modify_sql_data($vars) {
-		$sql_data = $vars['sql_data'];
-
-		// Treat specific data
-		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
-		foreach ($_POST AS $k=>$v)
-			if (!strncmp ($k, 'geo', 3)) {
-				// Retrieves the values of the geometry, includes them in the phpbb_posts table
-				if ($k == 'geom' && $v)
-					$v = "ST_GeomFromGeoJSON('$v')";
-					//TODO TEST est-ce qu'il optimise les linestring en multilinestring (ne devrait pas)
-
-				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-				$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
-			}
-		$this->request->disable_super_globals();
-
-		$vars['sql_data'] = $sql_data; // return data
-		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
-		$this->modifs['geojson'] = str_replace (['ST_GeomFromGeoJSON(\'','\')'], '', $this->modifs['geom']);
-	}
-
-	// Call after the post validation
-	function modify_submit_notification_data($vars) {
-		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
-	}
-
-	// Save changes
-	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null = false) {
-		if (isset ($post_data['post_id'])) {
-			$this->request->enable_super_globals();
-			$to_save = [
-				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
-				$_SERVER['REQUEST_URI'],
-				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
-				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
-				'post_subject = '.$geo_data['post_subject'],
-				'post_text = '.$post_data['post_text'].$post_data['message'],
-				'geojson = '.@$geo_data['geojson'],
-			];
-			foreach ($geo_data AS $k=>$v)
-				if ($v && !strncmp ($k, 'geo_', 4))
-					$to_save [] = "$k = $v";
-
-			// Save attachment_data
-			$attach = [];
-			if ($attachment_data)
-				foreach ($attachment_data AS $att)
-					$attach[] = $att['attach_id'].' : '.$att['real_filename'];
-			if (isset ($attach))
-				$to_save[] = 'attachments = '.implode (', ', $attach);
-
-			//TODO protéger l'accès à ces fichiers
-			//TODO sav avec les balises !
-			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-			if (!$create_if_null || !file_exists($file_name))
-				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
-
-			$this->request->disable_super_globals();
-		}
 	}
 
 
