@@ -1,7 +1,7 @@
 <!-- IF TOPIC_TITLE == "Activités" -->
-<br/>Catégorie :
+<br/>Catégorie
 <select name="gym_categorie">
-	<option>Categorie ?</option>
+	<option>?</option>
 	<!-- BEGIN liste_categories -->
 		<option value="{liste_categories.POST_ID}"
 			<!-- IF liste_categories.POST_ID == GYM_CATEGORIE -->
@@ -13,14 +13,27 @@
 	<!-- END liste_categories -->
 </select> &nbsp;
 
-Publication :
+Intensité
+<select name="gym_intensite" onchange="displayCalendar()">
+	<!-- BEGIN liste_intensites -->
+		<option value="{liste_intensites.NO}"
+			<!-- IF liste_intensites.NO == GYM_INTENSITE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_intensites.VALEUR}
+		</option>
+	<!-- END liste_intensites -->
+</select> &nbsp;
+
+Publication dans :
 Actualités <input type="checkbox" name="gym_actualites"
-<!-- IF GYM_ACTUALITES -->
+<!-- IF GYM_ACTUALITES == 'on' -->
 	checked="checked"
 <!-- ENDIF -->
 /> &nbsp;
 Horaires <input type="checkbox" name="gym_horaires"
-<!-- IF GYM_HORAIRES -->
+<!-- IF GYM_HORAIRES == 'on' -->
 	checked="checked"
 <!-- ENDIF -->
 /><br/><br/>
@@ -54,7 +67,7 @@ Horaires <input type="checkbox" name="gym_horaires"
 <select name="gym_jour" id="gym_jour" onchange="displayCalendar()">
 	<!-- BEGIN liste_jours -->
 		<option value="{liste_jours.NO}"
-			<!-- IF liste_jours.VALEUR == GYM_JOUR -->
+			<!-- IF liste_jours.NO == GYM_JOUR -->
 				selected="selected"
 			<!-- ENDIF -->
 		>
@@ -84,7 +97,18 @@ Horaires <input type="checkbox" name="gym_horaires"
 			{liste_minutes.VALEUR}
 		</option>
 	<!-- END liste_minutes -->
-</select><br/><br/>
+</select> &nbsp; durée
+<select name="gym_duree">
+	<!-- BEGIN liste_duree -->
+		<option value="{liste_duree.VALEUR}"
+			<!-- IF liste_duree.VALEUR == GYM_DUREE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>
+			{liste_duree.VALEUR}
+		</option>
+	<!-- END liste_duree -->
+</select>h<br/><br/>
 
 Période : scolaire
 <input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayCalendar()"

@@ -1,0 +1,21 @@
+<div id="horaires">
+<!-- BEGIN horaires -->
+	<div id="{horaires.JOUR}">
+		{horaires.JOUR}
+		<table class="horaires horaires_{horaires.JOUR}">
+			<!-- BEGIN activite -->
+			<tr>
+				<td>
+					{activite.ACTIVITE}
+					<a class="edit" href="/posting.php?mode=edit&f=2&p={activite.POST_ID}">
+					&#9997;</a>
+				</td>
+				<td>{activite.GYM_HEURE}:{activite.GYM_MINUTE}</td>
+				<td>{activite.LIEU}</td>
+				<td>{activite.ANIMATEUR}</td>
+			</tr>
+			<!-- END activite -->
+		</table>
+	</div>
+<!-- END horaires -->
+</div>

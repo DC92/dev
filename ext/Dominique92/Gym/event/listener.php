@@ -6,6 +6,19 @@
  *
  */
 
+//TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
+//TODO tous posts dans une page viewtopic (limite > 10)
+//TODO afficher datas spéciales POST dans les pages viewtopic
+//TODO mettre ajax dans listener / index.php
+//TODO utiliser champ durée pour calculer l'heure de fin
+//TODO ajouter champ intensité
+//TODO heure de fin
+//TODO ne pas afficher l'cone edit si pas modérateur
+//TODO ne marche pas sous I.E.
+//TODO purger listener / relecture de code
+//TODO retour aprés modif à la page qui l'a demandé
+//TODO argument pour afficher un pavé au démarrage de la page d'index
+
 namespace Dominique92\Gym\event;
 
 if (!defined('IN_PHPBB'))
@@ -42,14 +55,15 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 //			'core.page_header' => 'page_header',
-			'core.page_footer' => 'page_footer',
+//			'core.page_footer' => 'page_footer',
+			'core.page_footer_after' => 'page_footer_after',
 /*
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
+*/
 
 			// Viewtopic
-*/
 /*
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
@@ -68,54 +82,20 @@ class listener implements EventSubscriberInterface
 
 			// Resize images
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
-
-			// Registration
-			'core.ucp_register_welcome_email_before' => 'ucp_register_welcome_email_before',
 */
 		];
 	}
 
 //// List template vars : phpbb/template/context.php line 135
-
-	// Called when display post page
-	function posting_modify_template_vars($vars) {
-		$post_data = $vars['post_data'];
-
-		// To prevent an empty title to invalidate the full page and input.
-		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
-
-		// Set specific variables
-		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'gym', 3) && $v) {
-				$this->template->assign_var (strtoupper ($k), $v);
-				$data[$k] = explode (',', $v); // Expand grouped values
-			}
-
-		// Static dictionaries
-		$static_values = [
-			'heures' => [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
-			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
-			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
-			'semaines' => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
-				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43],
-		];
-		foreach ($static_values AS $k=>$v)
-			foreach ($v AS $vk=>$vv)
-				$this->template->assign_block_vars (
-					'liste_'.$k, [
-						'NO' => $vk,
-						'VALEUR' => $vv,
-						'BASE' => in_array ($vk, $data["gym_$k"] ?: []),
-					]
-				);
-
-		// Create a log file with the existing data if there is none
-		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
-	}
-
-	// Includes language files for this extension
-	function page_footer() {
+	function page_footer_after() {
+	// Change le template pour les requettes ajax en particulier
+		$template = $this->request->variable('template', '');
+		if ($template)
+			$this->template->set_filenames([
+				'body' => "$template.html",
+			]);
+	
+		// Includes language files for this extension
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
 
@@ -135,6 +115,45 @@ class listener implements EventSubscriberInterface
 			ksort ($v);
 			foreach ($v AS $vk=>$vv)
 				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
+		}
+
+		// Add horaires template data
+		$static_values = $this->listes();
+		$horaires = [];
+
+		$sql = "SELECT post.post_id, post.post_subject AS activite,
+			ca.post_subject AS categorie,
+			li.post_subject AS lieu,
+			an.post_subject AS animateur,
+			post.gym_categorie, post.gym_intensite, post.gym_lieu, post.gym_animateur,
+			post.gym_jour, post.gym_heure, post.gym_minute,
+			post.gym_scolaire, post.gym_semaines,
+			post.gym_actualites, post.gym_horaires
+			FROM ".POSTS_TABLE." AS post
+				LEFT JOIN  ".POSTS_TABLE." AS ca on (post.gym_categorie = ca.post_id)
+				LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
+				LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)
+			WHERE post.topic_id = 1 AND
+				post.gym_horaires = 'on'";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$row['activite'] = str_replace ('§', '<br/>', $row['activite']);
+			if ($row['gym_heure'] < 10)
+				$row['gym_heure'] = '0'.$row['gym_heure'];
+			if ($row['gym_intensite'])
+				$row['activite'] .= ' - intensité '.$static_values['intensites'][$row['gym_intensite']];
+			$horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;
+		}
+		$this->db->sql_freeresult($result);
+
+		ksort ($horaires);
+		foreach ($horaires AS $jour=>$j) {
+			$jour_literal = $static_values['jours'][$jour ?: 0];
+			$this->template->assign_block_vars('horaires', ['JOUR' => $jour_literal]);
+			ksort ($j);
+			foreach ($j AS $heure=>$rows)
+				foreach ($rows AS $row) // S'il y a plusieurs activités à la même heure
+					$this->template->assign_block_vars('horaires.activite', array_change_key_case ($row, CASE_UPPER));
 		}
 	}
 
@@ -192,6 +211,49 @@ class listener implements EventSubscriberInterface
 */
 //		$vars['page_data'] = $page_data;
 
+	// Called when display post page
+	function listes() {
+		return [
+			'intensites' => ['?','douce','modérée','moyenne','soutenue','cardio'],
+			'heures' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
+			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
+			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
+			'semaines' => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
+				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43],
+			'duree' => [1,1.5,2,7.5],
+		];
+	}
+
+	function posting_modify_template_vars($vars) {
+		$post_data = $vars['post_data'];
+
+		// To prevent an empty title to invalidate the full page and input.
+		if (!$post_data['post_subject'])
+			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
+
+		// Set specific variables
+		foreach ($post_data AS $k=>$v)
+			if (!strncmp ($k, 'gym', 3) && $v) {
+				$this->template->assign_var (strtoupper ($k), $v);
+				$data[$k] = explode (',', $v); // Expand grouped values
+			}
+
+		// Static dictionaries
+		$static_values = $this->listes();
+		foreach ($static_values AS $k=>$v)
+			foreach ($v AS $vk=>$vv)
+				$this->template->assign_block_vars (
+					'liste_'.$k, [
+						'NO' => $vk,
+						'VALEUR' => $vv,
+						'BASE' => in_array ($vk, $data["gym_$k"] ?: []),
+					]
+				);
+
+		// Create a log file with the existing data if there is none
+		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
+	}
+
 	// Call when validating the data to be saved
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
@@ -207,7 +269,6 @@ class listener implements EventSubscriberInterface
 
 		// Treat specific data
 		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($_POST,true).'</pre>';exit; // List POSTS values
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3)) {
 				// Create the column if none
@@ -417,87 +478,9 @@ class listener implements EventSubscriberInterface
 
 	}
 
-	// Docs presentation
-	/*//TODO DELETE ??? (utilisé dans doc)
-	function index_forum_tree($parent, $num) {
-		$last_num = 1;
-		$sql = "
-			SELECT forum_id, forum_name, forum_type
-			FROM ".FORUMS_TABLE."
-			WHERE parent_id = $parent
-			ORDER BY left_id ASC";
-		$result_forum = $this->db->sql_query($sql);
-		while ($row_forum = $this->db->sql_fetchrow($result_forum)) {
-			$forum_num = $num.$last_num++.'.';
-			$this->template->assign_block_vars('forum_tree', [
-				'FORUM' => $row_forum['forum_type'],
-				'LEVEL' => count (explode ('.', $forum_num)) - 1,
-				'NUM' => $forum_num,
-				'TITLE' => $row_forum['forum_name'],
-				'FORUM_ID' => $row_forum['forum_id'],
-				'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
-			]);
-			if($row_forum['forum_type']) { // C'est un forum (pas une catégotie)
-				$sql = "
-					SELECT post_id, post_subject, post_text, post_attachment, bbcode_uid, bbcode_bitfield, topic_id
-					FROM ".POSTS_TABLE." AS p
-						JOIN ".TOPICS_TABLE." AS t USING (topic_id)
-					WHERE p.post_id = t.topic_first_post_id AND
-						p.forum_id = {$row_forum['forum_id']}
-					ORDER BY post_subject";
-				$result_post = $this->db->sql_query($sql);
-				$sub_num = 1;
-				while ($row_post = $this->db->sql_fetchrow($result_post)) {
-					preg_match ('/^([0-9\.]+) (.*)$/', $row_post['post_subject'], $titles);
-					$post_text = generate_text_for_display ($row_post['post_text'],
-						$row_post['bbcode_uid'],
-						$row_post['bbcode_bitfield'],
-						OPTION_FLAG_BBCODE, true);
-
-					$sql = "
-						SELECT *
-						FROM ".ATTACHMENTS_TABLE."
-						WHERE post_msg_id = {$row_post['post_id']}
-						ORDER BY filetime DESC";
-					$result_attachement = $this->db->sql_query($sql);
-					$attachments = [];
-					while ($row_attachement = $this->db->sql_fetchrow($result_attachement))
-						$attachments[] = $row_attachement;
-					$this->db->sql_freeresult($result_attachement);
-					$update_count = array();
-					if (count($attachments))
-						parse_attachments(0, $post_text, $attachments, $update_count);
-
-					$sql = "SELECT COUNT(*) AS nb_posts FROM ".POSTS_TABLE." WHERE topic_id = {$row_post['topic_id']}";
-					$result_count = $this->db->sql_query($sql);
-					$row_count = $this->db->sql_fetchrow($result_count);
-					$this->db->sql_freeresult($result_count);
-
-					//$post_num = $forum_num.$sub_num++.'.';
-					$this->template->assign_block_vars('forum_tree', [
-						'LEVEL' => count (explode ('.', $forum_num)),
-						'NUM' => $forum_num.$sub_num++.'.',
-						'TITLE' => count ($titles) ? $titles[2] : $row_post['post_subject'],
-						'TEXT' => $post_text,
-						'FORUM_ID' => $row_forum['forum_id'],
-						'TOPIC_ID' => $row_post['topic_id'],
-						'POST_ID' => $row_post['post_id'],
-						'NB_COMMENTS' => $row_count['nb_posts'] - 1,
-						'AUTH' => $this->auth->acl_get('m_edit', $row_forum['forum_id']),
-					]);
-				}
-				$this->db->sql_freeresult($result_post);
-			}
-			$this->index_forum_tree ($row_forum['forum_id'], $forum_num);
-		}
-		$this->db->sql_freeresult($result_forum);
-	}*/
-
 	/**
 		VIEWTOPIC.PHP
 	*/
-
-
 	// Called during first pass on post data that reads phpbb-posts SQL data
 	function wwwwviewtopic_post_rowset_data($vars) {
 		// Update the database with the automatic data
@@ -507,81 +490,6 @@ class listener implements EventSubscriberInterface
 		preg_match_all ('/([0-9\.]+)/', $post_data['centerwkt'], $center);
 
 		$update = []; // Datas to be updated
-		foreach ($post_data AS $k=>$v)
-			if (!$v)
-				switch ($k) {
-					case 'geo_surface':
-						if ($post_data['area'] && $center[0])
-							$update[$k] =
-								round ($post_data['area']
-									* 1111 // hm par ° delta latitude
-									* 1111 * sin ($center[0][1] * M_PI / 180) // hm par ° delta longitude
-								);
-						break;
-
-					// Calcul de l'altitude avec IGN
-					//TODO CHEM Altitude en dehors de la France
-					case 'geo_altitude':
-						if ($center[0]) {
-							global $geo_keys;
-							$api = "http://wxs.ign.fr/{$geo_keys['IGN']}/alti/rest/elevation.json?lon={$center[0][0]}&lat={$center[0][1]}&zonly=true";
-							preg_match ('/([0-9]+)/', @file_get_contents($api), $altitude);
-							if ($altitude)
-								$update[$k] = $altitude[1];
-						}
-						break;
-
-					case 'geo_commune':
-						//TODO BUG : calcule geo_commune sur un post d'un forum normal
-						//TODO BUG BEST : pas de commune = "~ " (un espace de trop)
-						$nominatim = json_decode (@file_get_contents (
-							"https://nominatim.openstreetmap.org/reverse?format=json&lon={$center[0][0]}&lat={$center[0][1]}",
-							false,
-							stream_context_create (array ('http' => array('header' => "User-Agent: StevesCleverAddressScript 3.7.6\r\n")))
-						));
-						$update[$k] = @$nominatim->address->postcode.' '.@(
-							$nominatim->address->town ?:
-							$nominatim->address->city ?:
-							$nominatim->address->suburb  ?:
-							$nominatim->address->village ?:
-							$nominatim->address->hamlet ?:
-							$nominatim->address->neighbourhood ?:
-							$nominatim->address->quarter
-						);
-						break;
-
-					// Infos refuges.info
-					case 'geo_massif':
-					case 'geo_reserve':
-					case 'geo_ign':
-						if ($center[0]) {
-							$massif = ''; $reserve = ''; $igns = [];
-							$url = "http://www.refuges.info/api/polygones?type_polygon=1,3,12&bbox={$center[0][0]},{$center[0][1]},{$center[0][0]},{$center[0][1]}";
-							$wri_export = @file_get_contents($url);
-							if ($wri_export) {
-								$fs = json_decode($wri_export)->features;
-								foreach($fs AS $f)
-									switch ($f->properties->type->type) {
-										case 'massif':
-											$massif = $f->properties->nom;
-											break;
-										case 'zone réglementée':
-											$reserve = $f->properties->nom;
-											break;
-										case 'carte':
-											$ms = explode(' ', str_replace ('-', ' ', $f->properties->nom));
-											$nom_carte = str_replace ('-', ' ', str_replace (' - ', ' : ', $f->properties->nom));
-											$igns[] = "<a target=\"_BLANK\" href=\"https://ignrando.fr/boutique/catalogsearch/result/?q={$ms[1]}\">$nom_carte</a>";
-									}
-								if (array_key_exists('geo_massif', $post_data))
-									$update['geo_massif'] = $massif;
-								if (array_key_exists('geo_reserve', $post_data))
-									$update['geo_reserve'] = $reserve;
-								if (array_key_exists('geo_ign', $post_data))
-									$update['geo_ign'] = implode ('<br/>', $igns);
-							}
-						}
-				}
 
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] =  array_merge ($post_data, $update);
@@ -1130,12 +1038,4 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 
 		$vars['attachment'] = $attachment;
 	}
-
-	/**
-		MODIFY INSCRIPTION MAIL
-	*/
-	function ucp_register_welcome_email_before($vars) {
-		$vars['message'] = implode ("\n", $this->get_post_data('Mail inscription'));
-	}
-
 }
