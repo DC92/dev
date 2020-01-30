@@ -85,24 +85,6 @@ class listener implements EventSubscriberInterface
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
 
-		// Dictionaries depending on database content
-		$sql = "SELECT topic_title, post_id, post_subject
-			FROM ".POSTS_TABLE."
-			JOIN ".TOPICS_TABLE." USING (topic_id)
-			WHERE post_id != topic_first_post_id";
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$values [$row['topic_title']][$row['post_subject']] = $row;
-		$this->db->sql_freeresult($result);
-
-		setlocale(LC_ALL, 'fr_FR');
-		foreach ($values AS $k=>$v) {
-			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
-			ksort ($v);
-			foreach ($v AS $vk=>$vv)
-				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
-		}
-
 		// Set specific variables
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3) && $v) {
@@ -136,6 +118,24 @@ class listener implements EventSubscriberInterface
 	function page_footer() {
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+
+		// Dictionaries depending on database content
+		$sql = "SELECT topic_title, post_id, post_subject
+			FROM ".POSTS_TABLE."
+			JOIN ".TOPICS_TABLE." USING (topic_id)
+			WHERE post_id != topic_first_post_id";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$values [$row['topic_title']][$row['post_subject']] = $row;
+		$this->db->sql_freeresult($result);
+
+		setlocale(LC_ALL, 'fr_FR');
+		foreach ($values AS $k=>$v) {
+			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
+			ksort ($v);
+			foreach ($v AS $vk=>$vv)
+				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
+		}
 	}
 
 	/**

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="robots" content="noindex">
+
+	<link rel="icon" type="image/jpg" href="./styles/gym/theme/images/logo.jpg" />
+	<title>Chavil'GYM</title>
+	<!--link href="{T_FONT_AWESOME_LINK}" rel="stylesheet"-->
+	<link href="{T_STYLESHEET_LINK}" rel="stylesheet">
+	<!--link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet"-->
+</head>
+
+<body>
+	<div id="avertissement">
+		CECI EST UN SITE DE TEST. Le VRAI site se trouve
+		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
+	</div>
+
+	<div id="bandeau">
+		<a id="logo" href="https://www.sport-sante.fr/">
+			<img alt="EPGV" src="./styles/gym/theme/images/logo.jpg">
+		</a>
+		<a href=".">
+			<div class="baniere">Chavil' Gym Volontaire</div>
+		</a>
+	</div>
+	<br id="libre" />
+
+	<script>
+		const animateurs = {
+			<!-- BEGIN liste_animateurs -->
+				'{liste_animateurs.POST_SUBJECT}': 'ajax.php?n=1&pid={liste_animateurs.POST_ID}',
+			<!-- END liste_animateurs -->
+		},
+		categories = {
+			<!-- BEGIN liste_categories -->
+				'{liste_categories.POST_SUBJECT}': 'ajax.php?n=1&pid={liste_categories.POST_ID}',
+			<!-- END liste_categories -->
+		},
+		lieux = {
+			<!-- BEGIN liste_lieux -->
+				'{liste_lieux.POST_SUBJECT}': 'ajax.php?n=1&pid={liste_lieux.POST_ID}',
+			<!-- END liste_lieux -->
+		};
+	</script>
+
+	<script src="{T_JQUERY_LINK}"></script>
+	<script src="{T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js"></script>
+	<!-- INCLUDEJS index_body.js -->
+{$SCRIPTS}
+</body>
+</html>
