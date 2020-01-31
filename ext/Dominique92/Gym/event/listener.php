@@ -7,17 +7,16 @@
  */
 
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-//TODO tous posts dans une page viewtopic (limite > 10)
+	//TODO tous posts dans une page viewtopic (limite > 10)
 //TODO afficher datas spéciales POST dans les pages viewtopic
 //TODO mettre ajax dans listener / index.php
-//TODO utiliser champ durée pour calculer l'heure de fin
-//TODO ajouter champ intensité
-//TODO heure de fin
-//TODO ne pas afficher l'cone edit si pas modérateur
+//TODO ne pas afficher l'icone edit si pas modérateur
 //TODO ne marche pas sous I.E.
 //TODO purger listener / relecture de code
 //TODO retour aprés modif à la page qui l'a demandé
-//TODO argument pour afficher un pavé au démarrage de la page d'index
+//TODO argument pour afficher un pavé au démarrage de la page d'index / démarrage avec presentation & actualité en //
+//TODO lien de l'horaire vers les fiches
+//TODO fiches simplifiées pour ajax
 
 namespace Dominique92\Gym\event;
 
@@ -126,7 +125,7 @@ class listener implements EventSubscriberInterface
 			li.post_subject AS lieu,
 			an.post_subject AS animateur,
 			post.gym_categorie, post.gym_intensite, post.gym_lieu, post.gym_animateur,
-			post.gym_jour, post.gym_heure, post.gym_minute,
+			post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree,
 			post.gym_scolaire, post.gym_semaines,
 			post.gym_actualites, post.gym_horaires
 			FROM ".POSTS_TABLE." AS post
@@ -138,10 +137,24 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$row['activite'] = str_replace ('§', '<br/>', $row['activite']);
-			if ($row['gym_heure'] < 10)
-				$row['gym_heure'] = '0'.$row['gym_heure'];
 			if ($row['gym_intensite'])
 				$row['activite'] .= ' - intensité '.$static_values['intensites'][$row['gym_intensite']];
+
+			$mm = $row['gym_minute'] + $row['gym_duree'] * 60;
+			$hh = $row['gym_heure'] + floor ($mm / 60);
+			$mm = $mm % 60;
+			if ($row['gym_minute'] < 10)
+				$row['gym_minute'] = '0'.$row['gym_minute'];
+			if ($mm < 10)
+				$mm = '0'.$mm;
+			if ($row['gym_heure'] < 10)
+				$row['gym_heure'] = '0'.$row['gym_heure'];
+			if ($hh < 10)
+				$hh = '0'.$hh;
+			$row['horaires'] = $row['gym_heure'].':'.$row['gym_minute'];
+			if ($hh < 24)
+				$row['horaires'] .= " - $hh:$mm";
+
 			$horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;
 		}
 		$this->db->sql_freeresult($result);

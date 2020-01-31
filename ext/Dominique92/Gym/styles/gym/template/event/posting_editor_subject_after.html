@@ -97,18 +97,12 @@ Horaires <input type="checkbox" name="gym_horaires"
 			{liste_minutes.VALEUR}
 		</option>
 	<!-- END liste_minutes -->
-</select> &nbsp; durée
-<select name="gym_duree">
-	<!-- BEGIN liste_duree -->
-		<option value="{liste_duree.VALEUR}"
-			<!-- IF liste_duree.VALEUR == GYM_DUREE -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_duree.VALEUR}
-		</option>
-	<!-- END liste_duree -->
-</select>h<br/><br/>
+</select> &nbsp;
+
+durée
+<input name="gym_duree" type="number" step="0.25" min ="1" style="width:60px"
+value="<!-- IF GYM_DUREE -->{GYM_DUREE}<!-- ELSE -->1<!-- ENDIF -->">
+h<br/><br/>
 
 Période : scolaire
 <input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayCalendar()"
