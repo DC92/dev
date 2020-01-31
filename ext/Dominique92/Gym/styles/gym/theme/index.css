@@ -7,9 +7,9 @@ body {
 	margin: 0;
 	padding: 0;
 	background-image:
-		url("styles/gym/theme/images/plafond.jpg"),
-		url("styles/gym/theme/images/ballons.jpg"),
-		url("styles/gym/theme/images/danseuse.gif");
+		url("ext/Dominique92/Gym/styles/gym/theme/images/plafond.jpg"),
+		url("ext/Dominique92/Gym/styles/gym/theme/images/ballons.jpg"),
+		url("ext/Dominique92/Gym/styles/gym/theme/images/danseuse.gif");
 	background-repeat: no-repeat, no-repeat, no-repeat;
 	background-position: top, center left, bottom 5% right;
 	background-size: 100%, 20%, 160px;

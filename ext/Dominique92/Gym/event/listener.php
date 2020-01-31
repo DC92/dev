@@ -91,7 +91,7 @@ class listener implements EventSubscriberInterface
 		$template = $this->request->variable('template', '');
 		if ($template)
 			$this->template->set_filenames([
-				'body' => "$template.html",
+				'body' => "@Dominique92_Gym/$template.html",
 			]);
 	
 		// Includes language files for this extension
