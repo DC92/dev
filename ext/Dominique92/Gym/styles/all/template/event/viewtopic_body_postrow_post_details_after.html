@@ -1,15 +1,35 @@
-<p>Catégorie :
-	<b>{postrow.CATEGORIE}</b>,
-	intensité : <b>{postrow.GYM_INTENSITE}</b>
-</p>
-<p>Publication :<b>
-	<!-- IF postrow.GYM_ACTUALITES == 'on' -->
-		actualités
-	<!-- ENDIF -->
-	<!-- IF postrow.GYM_HORAIRES == 'on' -->
-		horaires
-	<!-- ENDIF --></b>
-</p>
-<p>Lieu : <b>{postrow.LIEU}</b></p>
-<p>Animateur: <b>{postrow.ANIMATEUR}</b></p>
-<p>Horaires: <b>{postrow.JOUR}</b> <b>{postrow.HORAIRES}</b></p>
+<!-- IF postrow.ACTIVITE  -->
+	<p>Catégorie :
+		<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={postrow.GYM_CATEGORIE}')">
+			<b>{postrow.CATEGORIE}</b>
+		</a>
+	</p>
+<!-- ENDIF -->
+
+<!-- IF postrow.INTENSITE  -->
+	<p>Intensité :
+		<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={postrow.GYM_INTENSITE}')">
+			<b>{postrow.INTENSITE}</b>
+		</a>
+	</p>
+<!-- ENDIF -->
+
+<!-- IF postrow.LIEU -->
+	<p>Lieu :
+		<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={postrow.GYM_LIEU}')">
+			<b>{postrow.LIEU}{postrow.GYM_LIEU}</b>
+		</a>
+	</p>
+<!-- ENDIF -->
+
+<!-- IF postrow.ANIMATEUR -->
+	<p>Animateur:
+		<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={postrow.GYM_ANIMATEUR}')">
+			<b>{postrow.ANIMATEUR}</b>
+		</a>
+	</p>
+<!-- ENDIF -->
+
+<!-- IF postrow.JOUR or postrow.HORAIRES -->
+	<p>Horaires: <b>{postrow.JOUR}</b> <b>{postrow.HORAIRES}</b></p>
+<!-- ENDIF -->

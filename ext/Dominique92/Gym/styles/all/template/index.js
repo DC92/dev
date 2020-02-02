@@ -15,25 +15,29 @@ function menu(list, titre) {
 		el.append(il);
 
 		il.click(function() {
-			// Remove the ajax tmp blocks
-			$('.ajax-temp').remove();
-
-			// Remove the submenu if we click on one item of the main menu
-			if (!titre)
-				$('#submenu').remove();
-
-			// Add the submenu if any
-			if (typeof value == 'object')
-				$('#bandeau').append(
-					menu(value, index).attr('id', 'submenu')
-				);
-
-			// Display ajax block if available
-			if (typeof value == 'string')
-				ajax(value);
+			displayAjax(value, index, titre);
 		});
 	});
 	return el;
+}
+
+function displayAjax(value, titre, keepTitle) {
+	// Remove the ajax tmp blocks
+	$('.ajax-temp').remove();
+
+	// Remove the submenu if we click on one item of the main menu
+	if (!keepTitle)
+		$('#submenu').remove();
+
+	// Add the submenu if any
+	if (typeof value == 'object')
+		$('#bandeau').append(
+			menu(value, titre).attr('id', 'submenu')
+		);
+
+	// Display ajax block if available
+	if (typeof value == 'string')
+		ajax(value);
 }
 
 // Load url data on an element
@@ -44,16 +48,6 @@ function ajax(url) {
 			.attr('class', 'ajax-temp')
 			.html(data);
 		$('body').append(ela);
-
-		// Measure the DIV
-		const free = $('body').innerHeight() -
-			$('#libre').position().top -
-			ela.outerHeight();
-
-		// Set a bit of CCS on the DIV
-		ela.css({
-			marginTop: Math.max(0, free / 2 - 20),
-		});
 	});
 }
 
@@ -69,17 +63,17 @@ function color() {
 
 const animateurs = {
 	<!-- BEGIN liste_animateurs -->
-		'{liste_animateurs.POST_SUBJECT}': 'ajax.php?n=1&pid={liste_animateurs.POST_ID}',
+		'{liste_animateurs.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_animateurs.POST_ID}',
 	<!-- END liste_animateurs -->
 },
 categories = {
 	<!-- BEGIN liste_categories -->
-		'{liste_categories.POST_SUBJECT}': 'ajax.php?n=1&pid={liste_categories.POST_ID}',
+		'{liste_categories.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_categories.POST_ID}',
 	<!-- END liste_categories -->
 },
 lieux = {
 	<!-- BEGIN liste_lieux -->
-		'{liste_lieux.POST_SUBJECT}': 'ajax.php?n=1&pid={liste_lieux.POST_ID}',
+		'{liste_lieux.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_lieux.POST_ID}',
 	<!-- END liste_lieux -->
 };
 

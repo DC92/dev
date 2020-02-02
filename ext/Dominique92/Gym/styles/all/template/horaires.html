@@ -6,13 +6,23 @@
 			<!-- BEGIN activite -->
 			<tr>
 				<td>
-					{activite.ACTIVITE}
+					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.POST_ID}')">
+						{activite.ACTIVITE}
+					</a>
 					<a class="edit" href="/posting.php?mode=edit&f=2&p={activite.POST_ID}">
 					&#9997;</a>
 				</td>
 				<td>{activite.HORAIRES}</td>
-				<td>{activite.LIEU}</td>
-				<td>{activite.ANIMATEUR}</td>
+				<td>
+					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.GYM_LIEU}')">
+						{activite.LIEU}
+					</a>
+				</td>
+				<td>
+					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.GYM_ANIMATEUR}')">
+						{activite.ANIMATEUR}
+					</a>
+				</td>
 			</tr>
 			<!-- END activite -->
 		</table>

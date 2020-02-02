@@ -7,13 +7,9 @@
  */
 
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-//TODO tous posts dans une page viewtopic (limite > 10)
-//TODO afficher datas spéciales POST dans les pages viewtopic
 //TODO ne pas afficher l'icone edit si pas modérateur
 //TODO retour aprés modif à la page qui l'a demandé
 //TODO argument pour afficher un pavé au démarrage de la page d'index / démarrage avec presentation & actualité en //
-//TODO lien de l'horaire vers les fiches
-//TODO fiches simplifiées pour ajax
 
 //// List template vars : phpbb/template/context.php line 135
 
@@ -60,10 +56,10 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
-			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
-			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
+			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
+			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
+			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 		];
 	}
 
@@ -71,16 +67,22 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer_after() {
+		// Assigne les paramètres de l'URL aux variables template
+		$this->request->enable_super_globals();
+		foreach ($_GET AS $k=>$v)
+			$this->template->assign_var (strtoupper ("get_$k"), $v);
+		$this->request->disable_super_globals();
+
 		// Change le template pour les requettes ajax en particulier
-		$template = $this->request->variable('template', '');
 		//TODO generaliser : lire get_filename_from_handle) | retrieve_var / vérifier fichier
+		$template = $this->request->variable('template', '');
 		if ($template)
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
 		elseif ($this->template->retrieve_var('SCRIPT_NAME') == 'index')
 			$this->template->set_filenames([
-				'body' => "@Dominique92_Gym/index_body.html",
+				'body' => "@Dominique92_Gym/index.html",
 			]);
 
 		// Includes language files for this extension
@@ -139,17 +141,6 @@ class listener implements EventSubscriberInterface
 	/**
 		POSTING.PHP
 	*/
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		// Allows entering a POST with empty text
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
-
 	// Called when display post page
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
@@ -179,6 +170,17 @@ class listener implements EventSubscriberInterface
 
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
+	}
+
+	function posting_modify_submission_errors($vars) {
+		$error = $vars['error'];
+
+		// Allows entering a POST with empty text
+		foreach ($error AS $k=>$v)
+			if ($v == $this->user->lang['TOO_FEW_CHARS'])
+				unset ($error[$k]);
+
+		$vars['error'] = $error;
 	}
 
 	// Call when validating the data to be saved
@@ -289,9 +291,12 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result)) {
 				$row['activite'] = str_replace ('§', '<br/>', $row['activite']);
-				if ($row['gym_intensite'])
-					$row['activite'] .= ' - intensité '.$static_values['intensites'][$row['gym_intensite']];
-
+				if ($row['gym_intensite']) {
+					$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
+					$row['activite'] .= ' - intensité '.$row['intensite'];
+				}
+				$row['gym_heure'] = intval ($row['gym_heure']);
+				$row['gym_minute'] = intval ($row['gym_minute']);
 				$mm = $row['gym_minute'] + $row['gym_duree'] * 60;
 				$hh = $row['gym_heure'] + floor ($mm / 60);
 				$mm = $mm % 60;

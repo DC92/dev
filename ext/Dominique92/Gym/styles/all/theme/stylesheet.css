@@ -5,7 +5,6 @@
 
 /* HORAIRES */
 #horaires {
-	font-size: 1.4em;
 	font-family: Times New Roman;
 	text-align: left;
 }
@@ -31,6 +30,7 @@
 	color: inherit;
 	font-size: 14px;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 #lundi {
@@ -171,7 +171,7 @@ html.gym_index  {
 	color: black;
 }
 
-.menu il {
+.gym_index .menu il {
 	display: inline-block;
 	vertical-align: top;
 	top:0;
@@ -192,8 +192,23 @@ html.gym_index  {
 
 .ajax-temp {
 	display: inline-block !important;
-	wborder: 5px solid;
-	wborder-radius: 2em;
-	wpadding: 1em;
-	wbackground: white;
+	font-size: 1.4em;
+}
+
+.ajax-temp p {
+	margin: 0;
+	background: white;
+}
+
+.ajax-temp a {
+	cursor: pointer;
+}
+
+.ajax-temp img {
+	width: 50%;
+	border-radius: 1em;
+}
+
+.ajax-temp dd {
+	display: none;
 }
