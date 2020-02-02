@@ -6,12 +6,11 @@ function menu(list, titre) {
 	if (titre)
 		el.append($('<h2>').text(titre));
 
-	for (let i in list) {
+	jQuery.each(list, function(index, value) {
 		// Build LABEL & IL for the item
-		const col = color(),
-			label = $('<label>').text(i),
+		const label = $('<label>').text(index),
 			il = $('<il>').append(label).css({
-				background: col,
+				background: color(),
 			});
 		el.append(il);
 
@@ -24,21 +23,21 @@ function menu(list, titre) {
 				$('#submenu').remove();
 
 			// Add the submenu if any
-			if (typeof list[i] == 'object')
+			if (typeof value == 'object')
 				$('#bandeau').append(
-					menu(list[i], i).attr('id', 'submenu')
+					menu(value, index).attr('id', 'submenu')
 				);
 
 			// Display ajax block if available
-			if (typeof list[i] == 'string')
-				ajax(list[i], i, col);
+			if (typeof value == 'string')
+				ajax(value);
 		});
-	}
+	});
 	return el;
 }
 
 // Load url data on an element
-function ajax(url, titre, color) {
+function ajax(url) {
 	$.get(url, function(data) {
 		// Build the DIV to display the ajax result
 		const ela = $('<div>')
@@ -53,7 +52,6 @@ function ajax(url, titre, color) {
 
 		// Set a bit of CCS on the DIV
 		ela.css({
-	//		borderColor: color,
 			marginTop: Math.max(0, free / 2 - 20),
 		});
 	});

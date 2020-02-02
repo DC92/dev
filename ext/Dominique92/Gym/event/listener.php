@@ -7,12 +7,9 @@
  */
 
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-	//TODO tous posts dans une page viewtopic (limite > 10)
+//TODO tous posts dans une page viewtopic (limite > 10)
 //TODO afficher datas spéciales POST dans les pages viewtopic
-//TODO mettre ajax dans listener / index.php
 //TODO ne pas afficher l'icone edit si pas modérateur
-//TODO ne marche pas sous I.E.
-//TODO purger listener / relecture de code
 //TODO retour aprés modif à la page qui l'a demandé
 //TODO argument pour afficher un pavé au démarrage de la page d'index / démarrage avec presentation & actualité en //
 //TODO lien de l'horaire vers les fiches
@@ -55,33 +52,18 @@ class listener implements EventSubscriberInterface
 
 		return [
 			// All
-//			'core.page_header' => 'page_header',
-//			'core.page_footer' => 'page_footer',
 			'core.page_footer_after' => 'page_footer_after',
+
 			// Index
-			'core.display_forums_modify_row' => 'display_forums_modify_row',
-/*
-			'core.index_modify_page_title' => 'index_modify_page_title',
-*/
+
 			// Viewtopic
-/*
-			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
-			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
-			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
-*/
-//			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
+
 			// Posting
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-/*
-			'core.modify_posting_auth' => 'modify_posting_auth',
-			'core.modify_posting_parameters' => 'modify_posting_parameters',
-			// Resize images
-			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
-*/
 		];
 	}
 
@@ -89,13 +71,18 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer_after() {
-	// Change le template pour les requettes ajax en particulier
+		// Change le template pour les requettes ajax en particulier
 		$template = $this->request->variable('template', '');
+		//TODO generaliser : lire get_filename_from_handle) | retrieve_var / vérifier fichier
 		if ($template)
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
-	
+		elseif ($this->template->retrieve_var('SCRIPT_NAME') == 'index')
+			$this->template->set_filenames([
+				'body' => "@Dominique92_Gym/index_body.html",
+			]);
+
 		// Includes language files for this extension
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
@@ -133,19 +120,13 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-		INDEX.PHP
-	*/
-	function index_modify_page_title ($vars) {
-	}
-
-	/**
 		VIEWTOPIC.PHP
 	*/
-	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 		$post_id = $post_row['POST_ID'];
 
+		// Ajoute les informations spéciales calculées par get_horaire() à chaque post
 		$this->get_horaire();
 		if ($this->horaires_row[$post_id]) {
 			$horaires_row = array_change_key_case ($this->horaires_row[$post_id], CASE_UPPER);
