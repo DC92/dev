@@ -6,12 +6,23 @@
  *
  */
 
+//TODO Utilitaira carte
+//TODO horaires avec filtre
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
 //TODO ne pas afficher l'icone edit si pas modérateur
 //TODO retour aprés modif à la page qui l'a demandé
-//TODO argument pour afficher un pavé au démarrage de la page d'index / démarrage avec presentation & actualité en //
 
 //// List template vars : phpbb/template/context.php line 135
+
+/** CONFIG
+PERSONNALISER / extension gym
+MESSAGES / Paramètres des fichiers joints / taille téléchargements
+MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
+MESSAGES / BBCodes / cocher afficher
+	[titre-gris]{TEXT}[/titre-gris] / <div class="post-titre-gris">{TEXT}</div>
+	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="post-bandeau-vert">{TEXT}</div>
+	[texte-vert]{TEXT}[/texte-vert] / <div class="post-texte-vert">{TEXT}</div>
+*/
 
 namespace Dominique92\Gym\event;
 

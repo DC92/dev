@@ -1,7 +1,42 @@
 /* Style de la page d'accueil spéciale */
+
+const animateurs = {
+	<!-- BEGIN liste_animateurs -->
+		'{liste_animateurs.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_animateurs.POST_ID}',
+	<!-- END liste_animateurs -->
+},
+categories = {
+	<!-- BEGIN liste_categories -->
+		'{liste_categories.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_categories.POST_ID}',
+	<!-- END liste_categories -->
+},
+lieux = {
+	<!-- BEGIN liste_lieux -->
+		'{liste_lieux.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_lieux.POST_ID}',
+	<!-- END liste_lieux -->
+},
+menu={
+	'Présentation': 'viewtopic.php?template=viewtopic&p=1',
+	'Actualités': '?template=actualites',
+	'Activités': categories,
+	'Lieux': lieux,
+	'Horaires': '?template=horaires',
+	'Animateur(rice)s': animateurs,
+	'Informations': 'ajax.php?n=5&Informations',
+	'Forum': '@viewforum.php?f=3',
+};
+$('#bandeau').append(displayMenu(menu));
+
 /* jshint esversion: 6 */
 
-function menu(list, titre) {
+// Display hash command at the beginning
+const hash = norm(window.location.hash || 'presentation');
+jQuery.each(menu, function(index, value) {
+	if (norm(index) == hash)
+		displayAjax(value, index);
+});
+
+function displayMenu(list, titre) {
 	const el = $('<ul>').attr('class', 'menu');
 	if (titre)
 		el.append($('<h2>').text(titre));
@@ -15,6 +50,7 @@ function menu(list, titre) {
 		el.append(il);
 
 		il.click(function() {
+			window.location.hash = norm(index);
 			displayAjax(value, index, titre);
 		});
 	});
@@ -32,11 +68,15 @@ function displayAjax(value, titre, keepTitle) {
 	// Add the submenu if any
 	if (typeof value == 'object')
 		$('#bandeau').append(
-			menu(value, titre).attr('id', 'submenu')
+			displayMenu(value, titre).attr('id', 'submenu')
 		);
-
+	// Jump to @url
+	else if (value.charAt(0) == '@') {
+		$('body').html('<div>');
+		window.location.href = value.substr(1);
+	}
 	// Display ajax block if available
-	if (typeof value == 'string')
+	else
 		ajax(value);
 }
 
@@ -52,7 +92,7 @@ function ajax(url) {
 }
 
 function color() {
-	const saturation = 80; // / 255
+	const saturation = 80; // on 255
 	window.colorAngle = window.colorAngle ? window.colorAngle + 2.36 : 1;
 	let color = '#';
 	for (let angle = 0; angle < 6; angle += Math.PI * 0.66)
@@ -61,28 +101,6 @@ function color() {
 	return color;
 }
 
-const animateurs = {
-	<!-- BEGIN liste_animateurs -->
-		'{liste_animateurs.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_animateurs.POST_ID}',
-	<!-- END liste_animateurs -->
-},
-categories = {
-	<!-- BEGIN liste_categories -->
-		'{liste_categories.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_categories.POST_ID}',
-	<!-- END liste_categories -->
-},
-lieux = {
-	<!-- BEGIN liste_lieux -->
-		'{liste_lieux.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_lieux.POST_ID}',
-	<!-- END liste_lieux -->
-};
-
-$('#bandeau').append(menu({
-	'Présentation': 'ajax.php?n=8&Présentation',
-	'Actualités': 'ajax.php?n=9&Actualités',
-	'Activités': categories,
-	'Lieux': lieux,
-	'Horaires': '?template=horaires',
-	'Animateur(rice)s': animateurs,
-	'Informations': 'ajax.php?n=5&Informations',
-}));
+function norm(s) {
+	return s.normalize('NFKD').replace(/[\u0000-\u002F]|[\u003A-\u0040]|[\u005B-\u0060]|[\u007B-\u036F]/g, '').toLowerCase();
+}

@@ -1,6 +1,28 @@
+/* Avertissement au posting */
+.section-posting #attach-panel-multi::after {
+	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
+	background: yellow;
+}
+
 /* VIEWTOPIC */
 .postbody p {
 	margin: 0;
+}
+
+/* BBcodes spéciaux */
+.post-titre-gris {
+	color: #888;
+	font-size: 2em;
+	font-weight: 700;
+}
+.post-bandeau-vert {
+	text-align: center;
+	background-color: #329932;
+	color: white;
+	font-size: 1.5em;
+}
+.post-texte-vert {
+	color: rgb(0, 128, 0);
 }
 
 /* HORAIRES */
@@ -170,7 +192,6 @@ html.gym_index  {
 	font-size: 2.4em;
 	color: black;
 }
-
 .gym_index .menu il {
 	display: inline-block;
 	vertical-align: top;
@@ -194,21 +215,31 @@ html.gym_index  {
 	display: inline-block !important;
 	font-size: 1.4em;
 }
-
 .ajax-temp p {
 	margin: 0;
 	background: white;
 }
-
 .ajax-temp a {
 	cursor: pointer;
 }
-
 .ajax-temp img {
 	width: 50%;
 	border-radius: 1em;
 }
-
 .ajax-temp dd {
+	display: none;
+}
+.ajax-temp .content {
+	margin: 0 8%;
+	padding: 0 1%;
+	background: white;
+	text-align: left;
+}
+.ajax-temp .inline-attachment,
+.ajax-temp .inline-attachment * {
+	display: inline-block;
+	margin: 0;
+}
+.ajax-temp .inline-attachment dd {
 	display: none;
 }
