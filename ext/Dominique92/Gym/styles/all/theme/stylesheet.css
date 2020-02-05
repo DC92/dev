@@ -1,3 +1,9 @@
+/* Carte */
+.carte {
+	width: 40vw;
+	height: 30vw;
+}
+
 /* Avertissement au posting */
 .section-posting #attach-panel-multi::after {
 	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
@@ -154,10 +160,7 @@ html.gym_index  {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	background-image:
-		url("ext/Dominique92/Gym/styles/all/theme/images/plafond.jpg"),
-		url("ext/Dominique92/Gym/styles/all/theme/images/ballons.jpg"),
-		url("ext/Dominique92/Gym/styles/all/theme/images/danseuse.gif");
+	background-image: url("images/plafond.jpg"), url("images/ballons.jpg"), url("images/danseuse.gif");
 	background-repeat: no-repeat, no-repeat, no-repeat;
 	background-position: top, center left, bottom 5% right;
 	background-size: 100%, 20%, 160px;

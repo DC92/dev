@@ -1696,7 +1696,7 @@ function controlLoadGPX(options) {
 							stroke: new ol.style.Stroke({
 								color: 'blue',
 								width: 3,
-							})
+							}),
 						});
 					},
 				});

@@ -6,12 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="robots" content="noindex">
 
-	<link rel="icon" type="image/jpg" href="./ext/Dominique92/Gym/styles/all/theme/images/logo.jpg" />
+	<link rel="icon" type="image/jpg" href="ext/Dominique92/Gym/styles/all/theme/images/logo.jpg" />
 	<title>Chavil'GYM</title>
-
-	<style>
-		<!-- INCLUDE @Dominique92_Gym/stylesheet.css -->
-	</style>
 </head>
 
 <body>
@@ -22,7 +18,7 @@
 
 	<div id="bandeau">
 		<a id="logo" href="https://www.sport-sante.fr/">
-			<img alt="EPGV" src="./ext/Dominique92/Gym/styles/all/theme/images/logo.jpg">
+			<img alt="EPGV" src="ext/Dominique92/Gym/styles/all/theme/images/logo.jpg">
 		</a>
 		<a href=".">
 			<div class="baniere">Chavil' Gym Volontaire</div>
@@ -31,9 +27,48 @@
 	<br id="libre" />
 
 	<script src="{T_JQUERY_LINK}"></script>
-	<script src="{T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js"></script>
+	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
+	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
+	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
+	<!-- INCLUDEJS @Dominique92_Gym/ajax.js -->
+	{$STYLESHEETS}
+	{$SCRIPTS}
 	<script>
-		<!-- INCLUDE @Dominique92_Gym/index.js -->
+		const animateurs = {
+			<!-- BEGIN liste_animateurs -->
+				'{liste_animateurs.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_animateurs.POST_ID}',
+			<!-- END liste_animateurs -->
+		},
+		categories = {
+			<!-- BEGIN liste_categories -->
+				'{liste_categories.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_categories.POST_ID}',
+			<!-- END liste_categories -->
+		},
+		lieux = {
+			<!-- BEGIN liste_lieux -->
+				'{liste_lieux.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_lieux.POST_ID}',
+			<!-- END liste_lieux -->
+		},
+		menu = {
+			'Présentation': 'viewtopic.php?template=viewtopic&p=1',
+			'Actualités': '?template=actualites',
+			'Activités': categories,
+			'Lieux': lieux,
+			'Horaires': '?template=horaires',
+			'Animateur(rice)s': animateurs,
+			'Informations': 'ajax.php?n=5&Informations',
+			'Forum': '@viewforum.php?f=3',
+		};
+
+		// Display menu
+		$('#bandeau').append(displayMenu(menu));
+
+		// Display hash command at the beginning
+		const hash = norm(window.location.hash || 'presentation');
+		$.each(menu, function(index, value) {
+			if (norm(index) == hash)
+				displayAjax(value, index);
+		});
 	</script>
 </body>
 </html>

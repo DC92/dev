@@ -6,11 +6,14 @@
  *
  */
 
-//TODO Utilitaira carte
-//TODO horaires avec filtre
-//TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-//TODO ne pas afficher l'icone edit si pas modérateur
-//TODO retour aprés modif à la page qui l'a demandé
+//TODO
+// développer sous-activités et informations
+// actualités (next de chaque)
+// petit include de dates prochaines actualités
+// horaires avec filtre (dans les 3 mois)
+// CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
+// ne pas afficher l'icone edit si pas modérateur
+// retour aprés modif à la page qui l'a demandé
 
 //// List template vars : phpbb/template/context.php line 135
 
@@ -22,6 +25,7 @@ MESSAGES / BBCodes / cocher afficher
 	[titre-gris]{TEXT}[/titre-gris] / <div class="post-titre-gris">{TEXT}</div>
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="post-bandeau-vert">{TEXT}</div>
 	[texte-vert]{TEXT}[/texte-vert] / <div class="post-texte-vert">{TEXT}</div>
+	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div>
 */
 
 namespace Dominique92\Gym\event;

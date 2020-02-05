@@ -1,47 +1,49 @@
-/* Style de la page d'accueil spéciale */
-
-const animateurs = {
-	<!-- BEGIN liste_animateurs -->
-		'{liste_animateurs.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_animateurs.POST_ID}',
-	<!-- END liste_animateurs -->
-},
-categories = {
-	<!-- BEGIN liste_categories -->
-		'{liste_categories.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_categories.POST_ID}',
-	<!-- END liste_categories -->
-},
-lieux = {
-	<!-- BEGIN liste_lieux -->
-		'{liste_lieux.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_lieux.POST_ID}',
-	<!-- END liste_lieux -->
-},
-menu={
-	'Présentation': 'viewtopic.php?template=viewtopic&p=1',
-	'Actualités': '?template=actualites',
-	'Activités': categories,
-	'Lieux': lieux,
-	'Horaires': '?template=horaires',
-	'Animateur(rice)s': animateurs,
-	'Informations': 'ajax.php?n=5&Informations',
-	'Forum': '@viewforum.php?f=3',
-};
-$('#bandeau').append(displayMenu(menu));
-
 /* jshint esversion: 6 */
 
-// Display hash command at the beginning
-const hash = norm(window.location.hash || 'presentation');
-jQuery.each(menu, function(index, value) {
-	if (norm(index) == hash)
-		displayAjax(value, index);
-});
+/* Fonctions liées à la carte */
+function scanCarte() {
+	$('.carte').each(function(index, el) {
+		const ll = ol.proj.transform(eval('[' + el.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
+		el.innerHTML = null; // Erase the DIV
 
+		new ol.Map({
+			layers: [
+				new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+				new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [
+							new ol.Feature({
+								geometry: new ol.geom.Point(ll),
+							}),
+						]
+					}),
+					style: new ol.style.Style({
+						image: new ol.style.Icon(({
+							src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
+						})),
+					}),
+				}),
+			],
+			target: el,
+			controls: [], // No zoom
+			view: new ol.View({
+				center: ll,
+				zoom: 17
+			})
+		});
+	});
+}
+scanCarte();
+
+/* Fonctions liées à la page d'accueil */
 function displayMenu(list, titre) {
 	const el = $('<ul>').attr('class', 'menu');
 	if (titre)
 		el.append($('<h2>').text(titre));
 
-	jQuery.each(list, function(index, value) {
+	$.each(list, function(index, value) {
 		// Build LABEL & IL for the item
 		const label = $('<label>').text(index),
 			il = $('<il>').append(label).css({
@@ -88,6 +90,7 @@ function ajax(url) {
 			.attr('class', 'ajax-temp')
 			.html(data);
 		$('body').append(ela);
+		scanCarte();
 	});
 }
 
