@@ -22,6 +22,7 @@ function scanCarte() {
 					style: new ol.style.Style({
 						image: new ol.style.Icon(({
 							src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
+							anchor: [0.5, 0.8],
 						})),
 					}),
 				}),
