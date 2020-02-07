@@ -39,6 +39,22 @@ function scanCarte() {
 scanCarte();
 
 /* Fonctions liées à la page d'accueil */
+function initMenu(menu, defaut) {
+	// Display hash command at the beginning
+	const hash = decodeURI(window.location.hash.substr(1) || defaut);
+	$.each(menu, function(index, value) {
+		if (index == hash)
+			displayAjax(value, index);
+		if (typeof value == 'object')
+			$.each(value, function(subIndex, subValue) {
+				if (subIndex == hash) {
+					displayAjax(value, index);
+					ajax('viewtopic.php?template=viewtopic&p=' + subValue);
+				}
+			});
+	});
+}
+
 function displayMenu(list, titre) {
 	const el = $('<ul>').attr('class', 'menu');
 	if (titre)
@@ -53,7 +69,7 @@ function displayMenu(list, titre) {
 		el.append(il);
 
 		il.click(function() {
-			window.location.hash = norm(index);
+			window.location.hash = encodeURI(index);
 			displayAjax(value, index, titre);
 		});
 	});
@@ -69,18 +85,14 @@ function displayAjax(value, titre, keepTitle) {
 		$('#submenu').remove();
 
 	// Add the submenu if any
-	if (typeof value == 'object')
+	if (typeof value == 'object') {
 		$('#bandeau').append(
 			displayMenu(value, titre).attr('id', 'submenu')
 		);
-	// Jump to @url
-	else if (value.charAt(0) == '@') {
-		$('body').html('<div>');
-		window.location.href = value.substr(1);
-	}
+		ajax('viewtopic.php?template=viewtopic&p=' + menuItem[titre]);
 	// Display ajax block if available
-	else
-		ajax(value);
+	} else
+		ajax('viewtopic.php?template=viewtopic&p=' + value);
 }
 
 // Load url data on an element
@@ -107,4 +119,10 @@ function color() {
 
 function norm(s) {
 	return s.normalize('NFKD').replace(/[\u0000-\u002F]|[\u003A-\u0040]|[\u005B-\u0060]|[\u007B-\u036F]/g, '').toLowerCase();
+}
+
+function loadUrl(url) {
+	const match = window.location.href.match(/([a-z]+)\.php/);
+	if (match.length == 2 && match[1] == 'index')
+		window.location.href=url;
 }

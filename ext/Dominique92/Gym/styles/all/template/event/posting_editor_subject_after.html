@@ -1,4 +1,4 @@
-<!-- IF TOPIC_TITLE == "Activités" -->
+<!-- IF FORUM_ID == 2 -->
 <br/>Catégorie
 <select name="gym_categorie">
 	<option>?</option>
@@ -24,19 +24,26 @@ Intensité
 			{liste_intensites.VALEUR}
 		</option>
 	<!-- END liste_intensites -->
-</select> &nbsp;
+</select><br/><br/>
 
 Publication dans :
+Horaires <input type="checkbox" name="gym_horaires"
+<!-- IF GYM_HORAIRES == 'on' -->
+	checked="checked"
+<!-- ENDIF -->
+/> &nbsp;
 Actualités <input type="checkbox" name="gym_actualites"
 <!-- IF GYM_ACTUALITES == 'on' -->
 	checked="checked"
 <!-- ENDIF -->
 /> &nbsp;
-Horaires <input type="checkbox" name="gym_horaires"
-<!-- IF GYM_HORAIRES == 'on' -->
+Menu <input type="checkbox" name="gym_menu"
+<!-- IF GYM_MENU == 'on' -->
 	checked="checked"
 <!-- ENDIF -->
-/><br/><br/>
+/> &nbsp;
+ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}">
+<br/><br/>
 
 <select name="gym_lieu">
 	<option>Lieu ?</option>
@@ -100,9 +107,10 @@ Horaires <input type="checkbox" name="gym_horaires"
 </select> &nbsp;
 
 durée
-<input name="gym_duree" type="number" step="0.25" min ="1" style="width:60px"
-value="<!-- IF GYM_DUREE -->{GYM_DUREE}<!-- ELSE -->1<!-- ENDIF -->">
-h<br/><br/>
+<input name="gym_duree_heures" type="number" step="0.25" min ="1" style="width:60px"
+value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
+<input name="gym_duree_jours" type="number" style="width:30px" value="{GYM_DUREE_JOURS}">jour(s)
+<br/><br/>
 
 Période : scolaire
 <input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayCalendar()"

@@ -34,41 +34,26 @@
 	{$STYLESHEETS}
 	{$SCRIPTS}
 	<script>
-		const animateurs = {
-			<!-- BEGIN liste_animateurs -->
-				'{liste_animateurs.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_animateurs.POST_ID}',
-			<!-- END liste_animateurs -->
-		},
-		categories = {
-			<!-- BEGIN liste_categories -->
-				'{liste_categories.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_categories.POST_ID}',
-			<!-- END liste_categories -->
-		},
-		lieux = {
-			<!-- BEGIN liste_lieux -->
-				'{liste_lieux.POST_SUBJECT}': 'viewtopic.php?template=viewtopic&p={liste_lieux.POST_ID}',
-			<!-- END liste_lieux -->
+		const menuItem = {
+			<!-- BEGIN menu -->
+				'{menu.TOPIC_TITLE}': {menu.TOPIC_FIRST_POST_ID},
+			<!-- END menu -->
 		},
 		menu = {
-			'Présentation': 'viewtopic.php?template=viewtopic&p=1',
-			'Actualités': '?template=actualites',
-			'Activités': categories,
-			'Lieux': lieux,
-			'Horaires': '?template=horaires',
-			'Animateur(rice)s': animateurs,
-			'Informations': 'ajax.php?n=5&Informations',
-			'Forum': '@viewforum.php?f=3',
+			<!-- BEGIN menu -->
+				'{menu.TOPIC_TITLE}': <!-- IF menu.COUNT == 1 -->{menu.POST_ID},
+				<!-- ELSE --> {
+					<!-- BEGIN sous_menu -->
+						'{sous_menu.POST_SUBJECT}': {sous_menu.POST_ID},
+					<!-- END sous_menu -->
+				},
+				<!-- ENDIF -->
+			<!-- END menu -->
 		};
 
 		// Display menu
 		$('#bandeau').append(displayMenu(menu));
-
-		// Display hash command at the beginning
-		const hash = norm(window.location.hash || 'presentation');
-		$.each(menu, function(index, value) {
-			if (norm(index) == hash)
-				displayAjax(value, index);
-		});
+		initMenu(menu, 'Accueil');
 	</script>
 </body>
 </html>

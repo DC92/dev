@@ -1,15 +1,14 @@
+<!-- Vue réduite d'un topic pour affichage AJAX -->
 <div class="viewtopic-gym">
 	<!-- BEGIN postrow -->
 		<!-- IF postrow.POST_ID == GET_P -->
-			<h3>
-				{postrow.POST_SUBJECT}
+			<!-- EVENT viewtopic_body_postrow_post_details_after -->
+			<div class="content">
 				<!-- IF postrow.U_EDIT -->
 					<a href="{postrow.U_EDIT}" title="{L_EDIT_POST}" class="button button-icon-only">&#9997;</a>
 				<!-- ENDIF -->
-			</h3>
-
-			<!-- EVENT viewtopic_body_postrow_post_details_after -->
-			<div class="content">{postrow.MESSAGE}</div>
+				{postrow.MESSAGE}
+			</div>
 
 			<!-- BEGIN attachment -->
 				{postrow.attachment.DISPLAY_ATTACHMENT}

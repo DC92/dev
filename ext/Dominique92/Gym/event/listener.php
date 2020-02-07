@@ -7,15 +7,21 @@
  */
 
 //TODO
+// fonction déconnexion admin / marquage user connecté
+// hash accueil avec un n° topic
+// changer le crayon modif pour celui de phpBB
+	// ne pas afficher l'icone edit si pas modérateur
 // développer sous-activités et informations
 // actualités (next de chaque)
 // petit include de dates prochaines actualités
 // horaires avec filtre (dans les 3 mois)
 // CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-// ne pas afficher l'icone edit si pas modérateur
 // retour aprés modif à la page qui l'a demandé
+//BUG edit calendar qaund décoche scolaire : la première coche est cochée
+//BUG ne crée pas automatiquement les colonnes (perturbé par la requette avant)
 
-//// List template vars : phpbb/template/context.php line 135
+// List template vars : phpbb/template/context.php line 135
+//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
 
 /** CONFIG
 PERSONNALISER / extension gym
@@ -26,6 +32,7 @@ MESSAGES / BBCodes / cocher afficher
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="post-bandeau-vert">{TEXT}</div>
 	[texte-vert]{TEXT}[/texte-vert] / <div class="post-texte-vert">{TEXT}</div>
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div>
+	[reload]{TEXT}[/reload] / <script>loadUrl('{TEXT}')</script>
 */
 
 namespace Dominique92\Gym\event;
@@ -66,6 +73,7 @@ class listener implements EventSubscriberInterface
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
+			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
@@ -82,27 +90,29 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer_after() {
+		// Includes language files for this extension
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
 		foreach ($_GET AS $k=>$v)
 			$this->template->assign_var (strtoupper ("get_$k"), $v);
 		$this->request->disable_super_globals();
 
-		// Change le template pour les requettes ajax en particulier
-		//TODO generaliser : lire get_filename_from_handle) | retrieve_var / vérifier fichier
 		$template = $this->request->variable('template', '');
+		// Change le template sur demande
 		if ($template)
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
+		// Change le template pour la page d'accueil
 		elseif ($this->template->retrieve_var('SCRIPT_NAME') == 'index')
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/index.html",
 			]);
 
-		// Includes language files for this extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
+///// A REFAIRE
 
 		// Dictionaries depending on database content
 		$sql = "SELECT topic_title, post_id, post_subject
@@ -134,6 +144,42 @@ class listener implements EventSubscriberInterface
 				foreach ($rows AS $row) // S'il y a plusieurs activités à la même heure
 					$this->template->assign_block_vars('horaires.activite', array_change_key_case ($row, CASE_UPPER));
 		}
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	// Popule le menu et sous-menu
+	function index_modify_page_title() {
+		$sql = "
+			SELECT p.post_id, p.post_subject, t.topic_id, t.topic_title, t.topic_first_post_id,
+				p.gym_ordre_menu, first.gym_ordre_menu AS first_ordre_gym_menu
+			FROM ".POSTS_TABLE." AS p
+			JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
+			LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
+			WHERE p.gym_menu = 'on'
+				AND p.forum_id = 2";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$menu [$row['topic_id']] [] = array_change_key_case ($row, CASE_UPPER);
+		$this->db->sql_freeresult($result);
+
+		usort ($menu, function($a, $b){
+			return $this->tri_menu ($a[0], $b[0]);
+		});
+		foreach ($menu AS $titre=>$v) {
+			$v[0] ['COUNT'] = count($v);
+			$this->template->assign_block_vars('menu', $v[0]);
+			usort ($v, function($a, $b){
+				return $this->tri_menu ($a, $b);
+			});
+			foreach ($v AS $vv)
+				$this->template->assign_block_vars('menu.sous_menu', $vv);
+		}
+	}
+	function tri_menu($a, $b) {
+		return (intval ($a['FIRST_ORDRE_GYM_MENU']) - intval ($b['FIRST_ORDRE_GYM_MENU']))
+			?: strcmp ($a['POST_SUBJECT'], $b['POST_SUBJECT']);
 	}
 
 	/**
@@ -286,7 +332,14 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-	function get_horaire() {
+	function get_horaire($cond = []) {
+
+$cond = [
+	'post.topic_id = 1',
+	'post.gym_horaires = "on"',
+];
+
+		$cond[] = true;
 		if (!$this->horaires) {
 			$static_values = $this->listes();
 			$sql = "SELECT post.post_id, post.post_subject AS activite,
@@ -294,15 +347,14 @@ class listener implements EventSubscriberInterface
 				li.post_subject AS lieu,
 				an.post_subject AS animateur,
 				post.gym_categorie, post.gym_intensite, post.gym_lieu, post.gym_animateur,
-				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree,
+				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
-				post.gym_actualites, post.gym_horaires
+				post.gym_actualites, post.gym_horaires, post.gym_menu
 				FROM ".POSTS_TABLE." AS post
 					LEFT JOIN  ".POSTS_TABLE." AS ca on (post.gym_categorie = ca.post_id)
 					LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
-					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)
-				WHERE post.topic_id = 1 AND
-					post.gym_horaires = 'on'";
+					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)".
+				" WHERE ".implode(' AND ',$cond );
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result)) {
 				$row['activite'] = str_replace ('§', '<br/>', $row['activite']);
@@ -312,7 +364,7 @@ class listener implements EventSubscriberInterface
 				}
 				$row['gym_heure'] = intval ($row['gym_heure']);
 				$row['gym_minute'] = intval ($row['gym_minute']);
-				$mm = $row['gym_minute'] + $row['gym_duree'] * 60;
+				$mm = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
 				$hh = $row['gym_heure'] + floor ($mm / 60);
 				$mm = $mm % 60;
 				if ($row['gym_minute'] < 10)
