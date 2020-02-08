@@ -43,11 +43,11 @@ function initMenu(menu, defaut) {
 	// Display hash command at the beginning
 	const hash = decodeURI(window.location.hash.substr(1) || defaut);
 	$.each(menu, function(index, value) {
-		if (index == hash)
+		if (value == hash)
 			displayAjax(value, index);
 		if (typeof value == 'object')
 			$.each(value, function(subIndex, subValue) {
-				if (subIndex == hash) {
+				if (subValue == hash) {
 					displayAjax(value, index);
 					ajax('viewtopic.php?template=viewtopic&p=' + subValue);
 				}
@@ -55,12 +55,12 @@ function initMenu(menu, defaut) {
 	});
 }
 
-function displayMenu(list, titre) {
+function displayMenu(options) {
 	const el = $('<ul>').attr('class', 'menu');
-	if (titre)
-		el.append($('<h2>').text(titre));
+	if (options.titre)
+		el.append($('<h2>').text(options.titre));
 
-	$.each(list, function(index, value) {
+	$.each(options.menu, function(index, value) {
 		// Build LABEL & IL for the item
 		const label = $('<label>').text(index),
 			il = $('<il>').append(label).css({
@@ -69,8 +69,10 @@ function displayMenu(list, titre) {
 		el.append(il);
 
 		il.click(function() {
-			window.location.hash = encodeURI(index);
-			displayAjax(value, index, titre);
+			window.location.hash = typeof value == 'number' ?
+				value :
+				options.menuItem[index];
+			displayAjax(value, index, options.titre);
 		});
 	});
 	return el;
@@ -87,10 +89,13 @@ function displayAjax(value, titre, keepTitle) {
 	// Add the submenu if any
 	if (typeof value == 'object') {
 		$('#bandeau').append(
-			displayMenu(value, titre).attr('id', 'submenu')
+			displayMenu({
+				menu: value,
+				titre: titre,
+			}).attr('id', 'submenu')
 		);
 		ajax('viewtopic.php?template=viewtopic&p=' + menuItem[titre]);
-	// Display ajax block if available
+		// Display ajax block if available
 	} else
 		ajax('viewtopic.php?template=viewtopic&p=' + value);
 }
@@ -121,8 +126,9 @@ function norm(s) {
 	return s.normalize('NFKD').replace(/[\u0000-\u002F]|[\u003A-\u0040]|[\u005B-\u0060]|[\u007B-\u036F]/g, '').toLowerCase();
 }
 
+/* Fonctions d'exécution des bbCODES */
 function loadUrl(url) {
 	const match = window.location.href.match(/([a-z]+)\.php/);
 	if (match.length == 2 && match[1] == 'index')
-		window.location.href=url;
+		window.location.href = url;
 }

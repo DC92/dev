@@ -52,7 +52,10 @@
 		};
 
 		// Display menu
-		$('#bandeau').append(displayMenu(menu));
+		$('#bandeau').append(displayMenu({
+			menu: menu,
+			menuItem: menuItem,
+		}));
 		initMenu(menu, 'Accueil');
 	</script>
 </body>
