@@ -12,9 +12,8 @@
 // horaires avec filtre (dans les 3 mois)
 // actualités (next de chaque)
 // petit include de dates prochaines actualités
-//BUG edit calendar qaund décoche scolaire : la première coche est cochée
+//BUG edit calendar quand décoche scolaire : la première coche est cochée
 //BUG ne crée pas automatiquement les colonnes de la base (perturbé par la requette avant)
-// retour aprés modif à la page qui l'a demandé
 // fonction déconnexion admin / marquage user connecté
 // CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
 
@@ -83,6 +82,7 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
+			'core.posting_modify_submit_post_after' => 'posting_modify_submit_post_after',
 		];
 	}
 
@@ -315,6 +315,12 @@ class listener implements EventSubscriberInterface
 
 			$this->request->disable_super_globals();
 		}
+	}
+
+	// Return to index if end of config
+	function posting_modify_submit_post_after($vars) {
+		if ($vars['post_data']['forum_name'] == 'Configuration')
+			$vars['redirect_url'] = './index.php#'.$vars['post_id'];
 	}
 
 	/**
