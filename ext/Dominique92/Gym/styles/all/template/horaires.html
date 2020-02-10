@@ -9,8 +9,11 @@
 					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.POST_ID}')">
 						{activite.ACTIVITE}
 					</a>
-					<a class="edit" href="/posting.php?mode=edit&f=2&p={activite.POST_ID}">
-					&#9997;</a>
+					<!-- IF postrow.U_EDIT -->
+						<a href="/posting.php?mode=edit&f=2&p={activite.POST_ID}" title="{L_EDIT_POST}" class="button button-icon-only">
+							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+						</a>
+					<!-- ENDIF -->
 				</td>
 				<td>{activite.HORAIRES}</td>
 				<td>

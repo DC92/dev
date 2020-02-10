@@ -7,18 +7,16 @@
  */
 
 //TODO
-// fonction déconnexion admin / marquage user connecté
-// hash accueil avec un n° topic
-// changer le crayon modif pour celui de phpBB
-	// ne pas afficher l'icone edit si pas modérateur
-// développer sous-activités et informations
+//BUG la carte ne charge pas tout le temps à l'init (antériorité réception script)
+//BUG /adm/index.php route ves accueil quand on n'est pas connecté
+// horaires avec filtre (dans les 3 mois)
 // actualités (next de chaque)
 // petit include de dates prochaines actualités
-// horaires avec filtre (dans les 3 mois)
-// CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-// retour aprés modif à la page qui l'a demandé
 //BUG edit calendar qaund décoche scolaire : la première coche est cochée
-//BUG ne crée pas automatiquement les colonnes (perturbé par la requette avant)
+//BUG ne crée pas automatiquement les colonnes de la base (perturbé par la requette avant)
+// retour aprés modif à la page qui l'a demandé
+// fonction déconnexion admin / marquage user connecté
+// CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -32,7 +30,9 @@ MESSAGES / BBCodes / cocher afficher
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="post-bandeau-vert">{TEXT}</div>
 	[texte-vert]{TEXT}[/texte-vert] / <div class="post-texte-vert">{TEXT}</div>
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div>
-	[reload]{TEXT}[/reload] / <script>loadUrl('{TEXT}')</script>
+	[reload]{TEXT}[/reload] / <script>loadUrl("{TEXT}")</script>
+	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
+	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 */
 
 namespace Dominique92\Gym\event;

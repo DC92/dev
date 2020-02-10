@@ -39,9 +39,9 @@ function scanCarte() {
 scanCarte();
 
 /* Fonctions liées à la page d'accueil */
-function initMenu(menu, defaut) {
+function initMenu(menu) {
 	// Display hash command at the beginning
-	const hash = decodeURI(window.location.hash.substr(1) || defaut);
+	const hash = decodeURI(window.location.hash.substr(1) || menu[Object.keys(menu)[0]]);
 	$.each(menu, function(index, value) {
 		if (value == hash)
 			displayAjax(value, index);

@@ -1,18 +1,15 @@
-/* Carte */
-.carte {
-	width: 40vw;
-	height: 30vw;
+/* VIEWTOPIC */
+.postbody p {
+	margin: 0;
+}
+.viewtopic-gym i {
+	float: left;
 }
 
 /* Avertissement au posting */
 .section-posting #attach-panel-multi::after {
 	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
 	background: yellow;
-}
-
-/* VIEWTOPIC */
-.postbody p {
-	margin: 0;
 }
 
 /* BBcodes spéciaux */
@@ -29,6 +26,11 @@
 }
 .post-texte-vert {
 	color: rgb(0, 128, 0);
+}
+.carte {
+	margin: 1em 20%;
+	width: 60%;
+	height: 35vw;
 }
 
 /* HORAIRES */
@@ -51,9 +53,9 @@
 	border:1px dashed black;
 	padding: 0.2em;
 }
-#horaires .edit {
-	float: right;
-}
+													#horaires .edit {
+														float: right;
+													}
 #horaires a {
 	color: inherit;
 	font-size: 14px;
@@ -160,10 +162,10 @@ html.gym_index  {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	background-image: url("images/plafond.jpg"), url("images/ballons.jpg"), url("images/danseuse.gif");
-	background-repeat: no-repeat, no-repeat, no-repeat;
-	background-position: top, center left, bottom 5% right;
-	background-size: 100%, 20%, 160px;
+	background-image: url("images/plafond.jpg"), url("images/ballons.jpg");
+	background-repeat: no-repeat, no-repeat;
+	background-position: top, center left;
+	background-size: 100%, 20%;
 	background-color: white;
 	font-size: 10px;
 	text-align: center;
@@ -214,9 +216,15 @@ html.gym_index  {
 	cursor: pointer;
 }
 
+/* Style des pages include dans l'acceuil */
 .ajax-temp {
-	display: inline-block !important;
+	margin: 0 8%;
+	padding: 0 1%;
+	background: white;
+}
+.ajax-temp .content {
 	font-size: 1.4em;
+	text-align: justify;
 }
 .ajax-temp p {
 	margin: 0;
@@ -225,24 +233,43 @@ html.gym_index  {
 .ajax-temp a {
 	cursor: pointer;
 }
-.ajax-temp img {
-	width: 50%;
-	border-radius: 1em;
+
+/* Images dans les posts */
+.ajax-temp .inline-attachment,
+.ajax-temp .viewtopic-gym {
+	text-align: center;
+}
+.ajax-temp dl {
+	display: inline-block;
+	width: 60%;
+	margin: 0;
 }
 .ajax-temp dd {
 	display: none;
 }
-.ajax-temp .content {
-	margin: 0 8%;
-	padding: 0 1%;
-	background: white;
-	text-align: left;
+.ajax-temp img {
+	width: 100%;
+	border-radius: 1em;
 }
-.ajax-temp .inline-attachment,
-.ajax-temp .inline-attachment * {
-	display: inline-block;
-	margin: 0;
+
+/* Images décalées */
+.image-gauche dl,
+.image-droite dl {
+	width: 100%;
 }
-.ajax-temp .inline-attachment dd {
-	display: none;
+.image-gauche img,
+.image-droite img {
+	max-width: 30vw;
+	max-height: 30vw;
+	width: auto;
+	height: auto;
+}
+.image-gauche .inline-attachment,
+.image-droite .inline-attachment {
+	float: left;
+	margin-right: 1em;
+}
+.image-droite .inline-attachment {
+	float: right;
+	margin-left: 1em;
 }

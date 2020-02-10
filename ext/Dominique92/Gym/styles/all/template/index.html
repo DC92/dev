@@ -21,15 +21,17 @@
 			<img alt="EPGV" src="ext/Dominique92/Gym/styles/all/theme/images/logo.jpg">
 		</a>
 		<a href=".">
-			<div class="baniere">Chavil' Gym Volontaire</div>
+			<div class="baniere">{SITENAME}</div>
 		</a>
 	</div>
 	<br id="libre" />
 
-	<script src="{T_JQUERY_LINK}"></script>
+	<!-- INCLUDECSS {T_ASSETS_PATH}/css/font-awesome.min.css -->
+	<!-- INCLUDECSS icons.css -->
 	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
 	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
 	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
+	<!-- INCLUDEJS {T_JQUERY_LINK} -->
 	<!-- INCLUDEJS @Dominique92_Gym/ajax.js -->
 	{$STYLESHEETS}
 	{$SCRIPTS}
@@ -56,7 +58,7 @@
 			menu: menu,
 			menuItem: menuItem,
 		}));
-		initMenu(menu, 'Accueil');
+		initMenu(menu);
 	</script>
 </body>
 </html>
