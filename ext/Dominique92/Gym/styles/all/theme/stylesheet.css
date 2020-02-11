@@ -37,6 +37,7 @@
 #horaires {
 	font-family: Times New Roman;
 	text-align: left;
+	clear: both;
 }
 #horaires > div:first-line {
 	text-indent: 3em;

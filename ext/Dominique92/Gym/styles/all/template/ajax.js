@@ -1,42 +1,51 @@
 /* jshint esversion: 6 */
 
-/* Fonctions liées à la carte */
-function scanCarte() {
-	$('.carte').each(function(index, el) {
-		const ll = ol.proj.transform(eval('[' + el.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
-		el.innerHTML = null; // Erase the DIV
+/* Expantion des bbcodes complexes */
+function scanBalises() {
+	$('.horaires').each(function(index, el) {
+		if (el.innerText.match(/=/)) {
+			ajax('?template=horaires&' + encodeURI(el.innerText), el);
+			el.innerHTML = ''; // Erase the DIV to don't loop
+		}
+	});
 
-		new ol.Map({
-			layers: [
-				new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-				new ol.layer.Vector({
-					source: new ol.source.Vector({
-						features: [
-							new ol.Feature({
-								geometry: new ol.geom.Point(ll),
-							}),
-						]
+	$('.carte').each(function(index, el) {
+		if (el.innerText) {
+			const ll = ol.proj.transform(eval('[' + el.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
+			el.innerHTML = null; // Erase the DIV to init the map only once
+
+			new ol.Map({
+				layers: [
+					new ol.layer.Tile({
+						source: new ol.source.OSM(),
 					}),
-					style: new ol.style.Style({
-						image: new ol.style.Icon(({
-							src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
-							anchor: [0.5, 0.8],
-						})),
+					new ol.layer.Vector({
+						source: new ol.source.Vector({
+							features: [
+								new ol.Feature({
+									geometry: new ol.geom.Point(ll),
+								}),
+							]
+						}),
+						style: new ol.style.Style({
+							image: new ol.style.Icon(({
+								src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
+								anchor: [0.5, 0.8],
+							})),
+						}),
 					}),
-				}),
-			],
-			target: el,
-			controls: [], // No zoom
-			view: new ol.View({
-				center: ll,
-				zoom: 17
-			})
-		});
+				],
+				target: el,
+				controls: [], // No zoom
+				view: new ol.View({
+					center: ll,
+					zoom: 17
+				})
+			});
+		}
 	});
 }
-scanCarte();
+scanBalises();
 
 /* Fonctions liées à la page d'accueil */
 function initMenu(menu) {
@@ -101,14 +110,14 @@ function displayAjax(value, titre, keepTitle) {
 }
 
 // Load url data on an element
-function ajax(url) {
+function ajax(url, el) {
 	$.get(url, function(data) {
 		// Build the DIV to display the ajax result
 		const ela = $('<div>')
 			.attr('class', 'ajax-temp')
 			.html(data);
-		$('body').append(ela);
-		scanCarte();
+		$(el || 'body').append(ela);
+		scanBalises();
 	});
 }
 
@@ -120,10 +129,6 @@ function color() {
 		color += (0x1ff - saturation + saturation * Math.sin(window.colorAngle + angle))
 		.toString(16).substring(1, 3);
 	return color;
-}
-
-function norm(s) {
-	return s.normalize('NFKD').replace(/[\u0000-\u002F]|[\u003A-\u0040]|[\u005B-\u0060]|[\u007B-\u036F]/g, '').toLowerCase();
 }
 
 /* Fonctions d'exécution des bbCODES */
