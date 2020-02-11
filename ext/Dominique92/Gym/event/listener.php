@@ -6,6 +6,7 @@
  *
  */
 
+//TODO ne pas afficher page générique quand menu niveau 2
 //TODO @media supprimer les images < 600px large
 //TODO actualités (next de chaque, dans les 3 mois)
 //TODO petit include de dates prochaines actualités

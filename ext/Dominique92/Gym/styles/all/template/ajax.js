@@ -1,10 +1,11 @@
 /* jshint esversion: 6 */
 
-/* Expantion des bbcodes complexes */
+/* Expansion des bbcodes complexes */
 function scanBalises() {
 	$('.horaires').each(function(index, el) {
 		if (el.innerText.match(/=/)) {
-			ajax('?template=horaires&' + encodeURI(el.innerText), el);
+			const args = el.innerText.replace('TITRE', postSubject);
+			ajax('?template=horaires&' + encodeURI(args), el);
 			el.innerHTML = ''; // Erase the DIV to don't loop
 		}
 	});
