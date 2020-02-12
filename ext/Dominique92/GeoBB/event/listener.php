@@ -1,11 +1,11 @@
 <?php
 /**
+ * Geographic functions for the phpBB Forum
  *
- * @package GeoBB
  * @copyright (c) 2016 Dominique Cavailhez
- * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
- *
+ * @license GNU General Public License, version 2 (GPL-2.0)
  */
+
 //TODO ALPAGES BEST recherche par département / commune
 //TODO TEST ALPAGES post modif mail inscription
 //TODO ALPAGES ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05

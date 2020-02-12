@@ -4,31 +4,31 @@
 	<div id="{horaires.JOUR}">
 		{horaires.JOUR}
 		<table class="horaires horaires_{horaires.JOUR}">
-			<!-- BEGIN activite -->
+			<!-- BEGIN seance -->
 			<tr>
 				<td>
-					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.POST_ID}')">
-						{activite.ACTIVITE}
+					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.POST_ID}')">
+						{seance.NOM}
 					</a>
 					<!-- IF postrow.U_EDIT -->
-						<a href="/posting.php?mode=edit&f=2&p={activite.POST_ID}" title="{L_EDIT_POST}" class="button button-icon-only">
+						<a href="/posting.php?mode=edit&f=2&p={seance.POST_ID}" title="{L_EDIT_POST}" class="button button-icon-only">
 							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 						</a>
 					<!-- ENDIF -->
 				</td>
-				<td>{activite.HORAIRES}</td>
+				<td>{seance.HORAIRE}</td>
 				<td>
-					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.GYM_LIEU}')">
-						{activite.LIEU}
+					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.GYM_LIEU}')">
+						{seance.LIEU}
 					</a>
 				</td>
 				<td>
-					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={activite.GYM_ANIMATEUR}')">
-						{activite.ANIMATEUR}
+					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.GYM_ANIMATEUR}')">
+						{seance.ANIMATEUR}
 					</a>
 				</td>
 			</tr>
-			<!-- END activite -->
+			<!-- END seance -->
 		</table>
 	</div>
 <!-- END horaires -->

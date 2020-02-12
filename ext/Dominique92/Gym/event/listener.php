@@ -1,11 +1,12 @@
 <?php
 /**
- * @package Gym
- * @copyright (c) 2020 Dominique Cavailhez
- * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+ * EPGV specific functions & style for the phpBB Forum
  *
+ * @copyright (c) 2020 Dominique Cavailhez
+ * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO BUG les liens vers des fichiers pdf ne sont pas inline
 //TODO ne pas afficher page générique quand menu niveau 2
 //TODO @media supprimer les images < 600px large
 //TODO actualités (next de chaque, dans les 3 mois)
@@ -142,10 +143,36 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars('horaires', ['JOUR' => $jour_literal]);
 				ksort ($j);
 				foreach ($j AS $heure=>$rows)
-					foreach ($rows AS $row) // S'il y a plusieurs activités à la même heure
-						$this->template->assign_block_vars('horaires.activite', array_change_key_case ($row, CASE_UPPER));
+					foreach ($rows AS $row) // S'il y a plusieurs séances à la même heure
+						$this->template->assign_block_vars('horaires.seance', array_change_key_case ($row, CASE_UPPER));
 			}
 		}
+
+
+
+
+
+/*
+		// Add actualites template data
+		$static_values = $this->listes();
+		$horaires = $this->get_horaire($get);
+		if ($horaires) {
+			ksort ($horaires);
+			foreach ($horaires AS $jour=>$j) {
+				$jour_literal = $static_values['jours'][$jour ?: 0];
+				$this->template->assign_block_vars('horaires', ['JOUR' => $jour_literal]);
+				ksort ($j);
+				foreach ($j AS $heure=>$rows)
+					foreach ($rows AS $row) // S'il y a plusieurs séances à la même heure
+						$this->template->assign_block_vars('horaires.seance', array_change_key_case ($row, CASE_UPPER));
+			}
+		}
+*/
+
+
+
+
+
 	}
 	function get_horaire($arg = []) {
 		$this->horaires_row = [];
@@ -157,33 +184,33 @@ class listener implements EventSubscriberInterface
 			switch ($k) {
 				case 'template';
 					break;
-				case 'categorie';
+				case 'activite';
 				case 'lieu';
 				case 'animateur';
 					$cond[] = substr($k,0,2).'.post_subject="'.urldecode($v).'"';
 			}
-	
+
 		if (!$this->horaires) {
 			$static_values = $this->listes();
-			$sql = "SELECT post.post_id, post.post_subject AS activite,
-				ca.post_subject AS categorie,
+			$sql = "SELECT post.post_id, post.post_subject AS nom,
+				ac.post_subject AS activite,
 				li.post_subject AS lieu,
 				an.post_subject AS animateur,
-				post.gym_categorie, post.gym_intensite, post.gym_lieu, post.gym_animateur,
+				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
 				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
 				post.gym_actualites, post.gym_horaires, post.gym_menu
 				FROM ".POSTS_TABLE." AS post
-					LEFT JOIN  ".POSTS_TABLE." AS ca on (post.gym_categorie = ca.post_id)
+					LEFT JOIN  ".POSTS_TABLE." AS ac on (post.gym_activite = ac.post_id)
 					LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
 					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)".
 				" WHERE ".implode(' AND ',$cond );
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result)) {
-				$row['activite'] = str_replace ('§', '<br/>', $row['activite']);
+				$row['seance'] = str_replace ('§', '<br/>', $row['seance']);
 				if ($row['gym_intensite']) {
 					$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
-					$row['activite'] .= ' - intensité '.$row['intensite'];
+					$row['seance'] .= ' - intensité '.$row['intensite'];
 				}
 				$row['gym_heure'] = intval ($row['gym_heure']);
 				$row['gym_minute'] = intval ($row['gym_minute']);
@@ -198,9 +225,9 @@ class listener implements EventSubscriberInterface
 					$row['gym_heure'] = '0'.$row['gym_heure'];
 				if ($hh < 10)
 					$hh = '0'.$hh;
-				$row['horaires'] = $row['gym_heure'].':'.$row['gym_minute'];
+				$row['horaire'] = $row['gym_heure'].':'.$row['gym_minute'];
 				if ($hh < 24)
-					$row['horaires'] .= " - $hh:$mm";
+					$row['horaire'] .= " - $hh:$mm";
 				$row['jour'] = $static_values['jours'][$row['gym_jour']];
 
 				$this->horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;

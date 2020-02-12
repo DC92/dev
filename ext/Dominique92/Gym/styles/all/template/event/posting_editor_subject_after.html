@@ -1,16 +1,16 @@
 <!-- IF FORUM_ID == 2 -->
-<br/>Catégorie
-<select name="gym_categorie">
+<br/>Activité
+<select name="gym_activite">
 	<option>?</option>
-	<!-- BEGIN liste_categories -->
-		<option value="{liste_categories.POST_ID}"
-			<!-- IF liste_categories.POST_ID == GYM_CATEGORIE -->
+	<!-- BEGIN liste_activites -->
+		<option value="{liste_activites.POST_ID}"
+			<!-- IF liste_activites.POST_ID == GYM_ACTIVITE -->
 				selected="selected"
 			<!-- ENDIF -->
 		>
-			{liste_categories.POST_SUBJECT}
+			{liste_activites.POST_SUBJECT}
 		</option>
-	<!-- END liste_categories -->
+	<!-- END liste_activites -->
 </select> &nbsp;
 
 Intensité
