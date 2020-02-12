@@ -6,17 +6,17 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO BUG les liens vers des fichiers pdf ne sont pas inline
 //TODO ne pas afficher page générique quand menu niveau 2
-//TODO @media supprimer les images < 600px large
-//TODO actualités (next de chaque, dans les 3 mois)
-//TODO petit include de dates prochaines actualités
+//TODO BUG les liens vers des fichiers pdf ne sont pas inline
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée
 //TODO horaires avec critère : supprimer la colonne du critère
-//TODO BUG ne crée pas automatiquement les colonnes de la base (perturbé par la requette avant)
 //TODO fonction déconnexion admin / marquage user connecté
 //TODO BUG /adm/index.php route ves accueil quand on n'est pas connecté
+
+//TODO @media supprimer les images < 600px large
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
+//TODO BUG retour en arrière ne recharge pas le hash
+//TODO BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -133,9 +133,13 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
 		}
 
-		// Add horaires template data
+		// Add horaires to template data
 		$static_values = $this->listes();
-		$horaires = $this->get_horaire($get);
+		$get['horaires'] = 'on';
+		$seances = $this->get_seances($get);
+		$horaires = [];
+		foreach ($seances AS $row)
+			$horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;
 		if ($horaires) {
 			ksort ($horaires);
 			foreach ($horaires AS $jour=>$j) {
@@ -148,41 +152,29 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-
-
-
-
-/*
-		// Add actualites template data
-		$static_values = $this->listes();
-		$horaires = $this->get_horaire($get);
-		if ($horaires) {
-			ksort ($horaires);
-			foreach ($horaires AS $jour=>$j) {
-				$jour_literal = $static_values['jours'][$jour ?: 0];
-				$this->template->assign_block_vars('horaires', ['JOUR' => $jour_literal]);
-				ksort ($j);
-				foreach ($j AS $heure=>$rows)
-					foreach ($rows AS $row) // S'il y a plusieurs séances à la même heure
-						$this->template->assign_block_vars('horaires.seance', array_change_key_case ($row, CASE_UPPER));
-			}
+//TODO actualités (next de chaque, dans les 3 mois)
+//TODO petit include de dates prochaines actualités
+		// Add actualites to template data
+		$seances = $this->get_seances([
+			'actualites' => 'on',
+		]);
+		foreach ($seances AS $s) {
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($s['gym_semaines'],true).'</pre>';
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($s ,true).'</pre>';
 		}
-*/
-
-
-
-
-
 	}
-	function get_horaire($arg = []) {
-		$this->horaires_row = [];
-		$cond = [
-			'post.topic_id = 1',
-			'post.gym_horaires = "on"',
-		];
+	function get_seances($arg = []) {
+		$static_values = $this->listes();
+		$seances = [];
+
 		foreach ($arg AS $k=>$v)
 			switch ($k) {
 				case 'template';
+					break;
+				case 'menu';
+				case 'horaires';
+				case 'actualites';
+					$cond[] = "post.gym_$k = '$v'";
 					break;
 				case 'activite';
 				case 'lieu';
@@ -190,54 +182,55 @@ class listener implements EventSubscriberInterface
 					$cond[] = substr($k,0,2).'.post_subject="'.urldecode($v).'"';
 			}
 
-		if (!$this->horaires) {
-			$static_values = $this->listes();
-			$sql = "SELECT post.post_id, post.post_subject AS nom,
-				ac.post_subject AS activite,
-				li.post_subject AS lieu,
-				an.post_subject AS animateur,
-				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
-				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
-				post.gym_scolaire, post.gym_semaines,
-				post.gym_actualites, post.gym_horaires, post.gym_menu
-				FROM ".POSTS_TABLE." AS post
-					LEFT JOIN  ".POSTS_TABLE." AS ac on (post.gym_activite = ac.post_id)
-					LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
-					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)".
-				" WHERE ".implode(' AND ',$cond );
-			$result = $this->db->sql_query($sql);
-			while ($row = $this->db->sql_fetchrow($result)) {
-				$row['seance'] = str_replace ('§', '<br/>', $row['seance']);
-				if ($row['gym_intensite']) {
-					$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
-					$row['seance'] .= ' - intensité '.$row['intensite'];
-				}
-				$row['gym_heure'] = intval ($row['gym_heure']);
-				$row['gym_minute'] = intval ($row['gym_minute']);
-				$mm = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
-				$hh = $row['gym_heure'] + floor ($mm / 60);
-				$mm = $mm % 60;
-				if ($row['gym_minute'] < 10)
-					$row['gym_minute'] = '0'.$row['gym_minute'];
-				if ($mm < 10)
-					$mm = '0'.$mm;
-				if ($row['gym_heure'] < 10)
-					$row['gym_heure'] = '0'.$row['gym_heure'];
-				if ($hh < 10)
-					$hh = '0'.$hh;
-				$row['horaire'] = $row['gym_heure'].':'.$row['gym_minute'];
-				if ($hh < 24)
-					$row['horaire'] .= " - $hh:$mm";
-				$row['jour'] = $static_values['jours'][$row['gym_jour']];
-
-				$this->horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;
-
-				// Mem it for any listener usage
-				$this->horaires_row[$row['post_id']] = $row;
+		$sql = "SELECT post.post_id, post.post_subject AS nom,
+			ac.post_subject AS activite,
+			li.post_subject AS lieu,
+			an.post_subject AS animateur,
+			post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
+			post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
+			post.gym_scolaire, post.gym_semaines,
+			post.gym_actualites, post.gym_horaires, post.gym_menu
+			FROM ".POSTS_TABLE." AS post
+				LEFT JOIN  ".POSTS_TABLE." AS ac on (post.gym_activite = ac.post_id)
+				LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
+				LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)";
+		if ($cond)
+			$sql .= " WHERE ".implode(' AND ',$cond );
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$row['seance'] = str_replace ('§', '<br/>', $row['seance']);
+			if ($row['gym_intensite']) {
+				$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
+				$row['seance'] .= ' - intensité '.$row['intensite'];
 			}
-			$this->db->sql_freeresult($result);
+			// Jour dans la semaine
+			$row['jour'] = $static_values['jours'][$row['gym_jour']];
+			// Temps début
+			$row['gym_heure'] = intval ($row['gym_heure']);
+			$row['gym_minute'] = intval ($row['gym_minute']);
+			// Temps fin
+			$row['gym_duree_heures'] = intval ($row['gym_duree_heures']);
+			$row['gym_duree_jours'] = intval ($row['gym_duree_jours']);
+			$mm = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
+			$hh = $row['gym_heure'] + floor ($mm / 60);
+			$mm = $mm % 60;
+			if ($row['gym_minute'] < 10)
+				$row['gym_minute'] = '0'.$row['gym_minute'];
+			if ($mm < 10)
+				$mm = '0'.$mm;
+			if ($row['gym_heure'] < 10)
+				$row['gym_heure'] = '0'.$row['gym_heure'];
+			if ($hh < 10)
+				$hh = '0'.$hh;
+			$row['horaire'] = $row['gym_heure'].':'.$row['gym_minute'];
+			if ($hh < 24)
+				$row['horaire'] .= " - $hh:$mm";
+
+			$seances[$row['post_id']] = $row;
 		}
-		return $this->horaires;
+		$this->db->sql_freeresult($result);
+
+		return $seances;
 	}
 	function listes() {
 		return [
@@ -262,8 +255,7 @@ class listener implements EventSubscriberInterface
 			FROM ".POSTS_TABLE." AS p
 			JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
 			LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
-			WHERE p.gym_menu = 'on'
-				AND p.forum_id = 2";
+			WHERE p.gym_menu = 'on'";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 			$menu [$row['topic_id']] [] = array_change_key_case ($row, CASE_UPPER);
@@ -294,12 +286,12 @@ class listener implements EventSubscriberInterface
 		$post_row = $vars['post_row'];
 		$post_id = $post_row['POST_ID'];
 
-		// Ajoute les informations spéciales calculées par get_horaire() à chaque post
-		$this->get_horaire();
-		if ($this->horaires_row[$post_id]) {
-			$horaires_row = array_change_key_case ($this->horaires_row[$post_id], CASE_UPPER);
-			$post_row = array_merge($post_row, $horaires_row);
-		}
+		// Ajoute les informations spéciales calculées par get_seances() à chaque post
+		if (!isset ($this->vwt_seances))
+			$this->vwt_seances = $this->get_seances();
+
+		if ($this->vwt_seances[$post_id])
+			$post_row = array_merge($post_row, array_change_key_case ($this->vwt_seances[$post_id], CASE_UPPER));
 
 		$vars['post_row'] = $post_row;
 	}
