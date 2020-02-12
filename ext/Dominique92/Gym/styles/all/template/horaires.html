@@ -1,4 +1,3 @@
-<h3>Horaires</h3>
 <div id="horaires">
 <!-- BEGIN horaires -->
 	<div id="{horaires.JOUR}">
@@ -16,7 +15,7 @@
 						</a>
 					<!-- ENDIF -->
 				</td>
-				<td>{seance.HORAIRE}</td>
+				<td>{seance.HORAIRE_DEBUT} - {seance.HORAIRE_FIN}</td>
 				<td>
 					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.GYM_LIEU}')">
 						{seance.LIEU}

@@ -4,7 +4,7 @@
 function scanBalises() {
 	$('.horaires').each(function(index, el) {
 		if (el.innerText.match(/=/)) {
-			const args = el.innerText.replace('TITRE', postSubject);
+			const args = el.innerText.replace('TITRE', postSubject); //TODO postSubject : calculer suivant toutes variables template
 			ajax('?template=horaires&' + encodeURI(args), el);
 			el.innerHTML = ''; // Erase the DIV to don't loop
 		}
@@ -137,4 +137,39 @@ function loadUrl(url) {
 	const match = window.location.href.match(/([a-z]+)\.php/);
 	if (match.length == 2 && match[1] == 'index')
 		window.location.href = url;
+}
+
+/* Posting.php */
+displayCalendar();
+
+function displayCalendar() {
+	const elDay = document.getElementById('gym_jour'),
+		elo = document.getElementById('gym_scolaire'),
+		els = document.getElementById('liste_semaines');
+
+	if (elDay && elo && els) {
+		let lastMonth = 0;
+		for (let week = 0; week < 44; week++) {
+			const elb = document.getElementById('gym_br_' + week),
+				elm = document.getElementById('gym_mois_' + week),
+				eld = document.getElementById('gym_date_' + week),
+				date = new Date(new Date().getFullYear(), -4); // Sept 1st
+			date.setDate(date.getDate() + parseInt(elDay.value, 10) + 1 - date.getDay() + week * 7); // Day of the week
+			eld.innerHTML = date.getDate();
+
+			if (lastMonth != date.getMonth()) { // Début de mois
+				elb.style.display = '';
+				elm.innerHTML = date.toLocaleString('fr-FR', {
+					month: 'long'
+				}) + ': ';
+			} else { // Suite de mois
+				elb.style.display = 'none';
+				elm.innerHTML = '';
+			}
+			// Hide week calendar if "scolaire"
+			els.style.display = elo.checked ? 'none' : '';
+
+			lastMonth = date.getMonth();
+		}
+	}
 }

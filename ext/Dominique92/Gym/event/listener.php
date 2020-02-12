@@ -6,12 +6,13 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO BUG /adm/index.php route ves accueil quand on n'est pas connecté
+//TODO menu -> forum ne marche pas
 //TODO ne pas afficher page générique quand menu niveau 2
 //TODO BUG les liens vers des fichiers pdf ne sont pas inline
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée
 //TODO horaires avec critère : supprimer la colonne du critère
 //TODO fonction déconnexion admin / marquage user connecté
-//TODO BUG /adm/index.php route ves accueil quand on n'est pas connecté
 
 //TODO @media supprimer les images < 600px large
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
@@ -152,17 +153,17 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-//TODO actualités (next de chaque, dans les 3 mois)
-//TODO petit include de dates prochaines actualités
 		// Add actualites to template data
 		$seances = $this->get_seances([
 			'actualites' => 'on',
 		]);
-		foreach ($seances AS $s) {
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($s['gym_semaines'],true).'</pre>';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($s ,true).'</pre>';
-		}
+		//TODO tri suivant time_fin
+		//TODO template + bbcode actualites
+		foreach ($seances AS $row) 
+			if($row['date'])
+				$this->template->assign_block_vars('actualites', array_change_key_case ($row, CASE_UPPER));
 	}
+
 	function get_seances($arg = []) {
 		$static_values = $this->listes();
 		$seances = [];
@@ -196,6 +197,7 @@ class listener implements EventSubscriberInterface
 				LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)";
 		if ($cond)
 			$sql .= " WHERE ".implode(' AND ',$cond );
+
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
 			$row['seance'] = str_replace ('§', '<br/>', $row['seance']);
@@ -211,20 +213,31 @@ class listener implements EventSubscriberInterface
 			// Temps fin
 			$row['gym_duree_heures'] = intval ($row['gym_duree_heures']);
 			$row['gym_duree_jours'] = intval ($row['gym_duree_jours']);
-			$mm = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
-			$hh = $row['gym_heure'] + floor ($mm / 60);
-			$mm = $mm % 60;
+			$gym_minute_fin = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
+			$gym_heure_fin = $row['gym_heure'] + floor ($gym_minute_fin / 60);
+			$gym_minute_fin = $gym_minute_fin % 60;
+
+			// Date
+			if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
+				setlocale(LC_ALL, 'fr_FR');
+				foreach (explode (',', $row['gym_semaines']) AS $semaine) {
+					$row['next_time'] = mktime($gym_heure_fin, $gym_minute_fin, 0, -3, 2 + $row['gym_jour'] + $semaine * 7, date('Y'));
+					if ($row['next_time'] > time() && !$row['date'])
+						$row['date'] = str_replace ('  ', ' ', strftime ('%A %e %B', $row['next_time']));
+				}
+			}
+
+			// Horaires
 			if ($row['gym_minute'] < 10)
 				$row['gym_minute'] = '0'.$row['gym_minute'];
-			if ($mm < 10)
-				$mm = '0'.$mm;
+			if ($gym_minute_fin < 10)
+				$gym_minute_fin = '0'.$gym_minute_fin;
 			if ($row['gym_heure'] < 10)
 				$row['gym_heure'] = '0'.$row['gym_heure'];
-			if ($hh < 10)
-				$hh = '0'.$hh;
-			$row['horaire'] = $row['gym_heure'].':'.$row['gym_minute'];
-			if ($hh < 24)
-				$row['horaire'] .= " - $hh:$mm";
+			if ($gym_heure_fin < 10)
+				$gym_heure_fin = '0'.$gym_heure_fin;
+			$row['horaire_debut'] = $row['gym_heure'].':'.$row['gym_minute'];
+			$row['horaire_fin'] = $gym_heure_fin.':'.$gym_minute_fin;
 
 			$seances[$row['post_id']] = $row;
 		}
