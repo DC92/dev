@@ -7,7 +7,11 @@ pre {
 	margin: 0;
 }
 .viewtopic-gym i {
-	float: left;
+										wfloat: left;
+}
+
+#actualites li {
+	text-transform: capitalize;
 }
 
 /* Avertissement au posting */
@@ -59,7 +63,7 @@ pre {
 	padding: 0.2em;
 }
 													#horaires .edit {
-														float: right;
+														wfloat: right;
 													}
 #horaires a {
 	color: inherit;

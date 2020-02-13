@@ -1,125 +1,52 @@
 /* jshint esversion: 6 */
 
-/* Expansion des bbcodes complexes */
-function scanBalises() {
-	$('.horaires').each(function(index, el) {
-		if (el.innerText.match(/=/)) {
-			const args = el.innerText.replace('TITRE', postSubject); //TODO postSubject : calculer suivant toutes variables template
-			ajax('?template=horaires&' + encodeURI(args), el);
-			el.innerHTML = ''; // Erase the DIV to don't loop
-		}
-	});
+function initMenu() {
+	const hashPostId = window.location.hash.substr(1) || Object.keys(menu[0])[0];
 
-	$('.carte').each(function(index, el) {
-		if (el.innerText) {
-			const ll = ol.proj.transform(eval('[' + el.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
-			el.innerHTML = null; // Erase the DIV to init the map only once
+	// Affiche un éventuel sous-menu
+	$('#bandeau').append(displayMenu(
+		menu[hashPostId], // sous-menu
+		menu[0][hashPostId], // Titre
+		'submenu' // Id
+	));
 
-			new ol.Map({
-				layers: [
-					new ol.layer.Tile({
-						source: new ol.source.OSM(),
-					}),
-					new ol.layer.Vector({
-						source: new ol.source.Vector({
-							features: [
-								new ol.Feature({
-									geometry: new ol.geom.Point(ll),
-								}),
-							]
-						}),
-						style: new ol.style.Style({
-							image: new ol.style.Icon(({
-								src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
-								anchor: [0.5, 0.8],
-							})),
-						}),
-					}),
-				],
-				target: el,
-				controls: [], // No zoom
-				view: new ol.View({
-					center: ll,
-					zoom: 17
-				})
-			});
-		}
-	});
-}
-scanBalises();
-
-/* Fonctions liées à la page d'accueil */
-function initMenu(menu) {
-	// Display hash command at the beginning
-	const hash = decodeURI(window.location.hash.substr(1) || menu[Object.keys(menu)[0]]);
-	$.each(menu, function(index, value) {
-		if (value == hash)
-			displayAjax(value, index);
-		if (typeof value == 'object')
-			$.each(value, function(subIndex, subValue) {
-				if (subValue == hash) {
-					displayAjax(value, index);
-					ajax('viewtopic.php?template=viewtopic&p=' + subValue);
-				}
-			});
-	});
-}
-
-function displayMenu(options) {
-	const el = $('<ul>').attr('class', 'menu');
-	if (options.titre)
-		el.append($('<h2>').text(options.titre));
-
-	$.each(options.menu, function(index, value) {
-		// Build LABEL & IL for the item
-		const label = $('<label>').text(index),
-			il = $('<il>').append(label).css({
-				background: color(),
-			});
-		el.append(il);
-
-		il.click(function() {
-			window.location.hash = typeof value == 'number' ?
-				value :
-				options.menuItem[index];
-			displayAjax(value, index, options.titre);
-		});
-	});
-	return el;
-}
-
-function displayAjax(value, titre, keepTitle) {
-	// Remove the ajax tmp blocks
+	// Affiche une éventuelle page
 	$('.ajax-temp').remove();
+	ajax('viewtopic.php?template=viewtopic&p=' + hashPostId);
 
-	// Remove the submenu if we click on one item of the main menu
-	if (!keepTitle)
-		$('#submenu').remove();
-
-	// Add the submenu if any
-	if (typeof value == 'object') {
-		$('#bandeau').append(
-			displayMenu({
-				menu: value,
-				titre: titre,
-			}).attr('id', 'submenu')
-		);
-		ajax('viewtopic.php?template=viewtopic&p=' + menuItem[titre]);
-		// Display ajax block if available
-	} else
-		ajax('viewtopic.php?template=viewtopic&p=' + value);
+	// Si c'est le sous-menu
+	$.each(menu, function(index, value) {
+		if (parseInt(index) && value[hashPostId]) {
+			$('#bandeau').append(displayMenu(
+				menu[index], // sous-menu
+				menu[index][hashPostId], // Titre
+				'submenu' // Id
+			));
+		}
+	});
 }
 
-// Load url data on an element
-function ajax(url, el) {
-	$.get(url, function(data) {
-		// Build the DIV to display the ajax result
-		const ela = $('<div>')
-			.attr('class', 'ajax-temp')
-			.html(data);
-		$(el || 'body').append(ela);
-		scanBalises();
+function displayMenu(list, titre, id) {
+	$('#submenu').remove();
+
+	const el = $('<ul>').attr('class', 'menu');
+	if (titre)
+		el.append($('<h2>').text(titre));
+	if (id)
+		el.attr('id', id);
+
+	$.each(list, function(index, value) {
+		el.append($('<il>')
+			.append($('<label>').text(value))
+			.css({
+				background: color(),
+			})
+			.click(function() {
+				window.location.hash = index;
+			}));
 	});
+
+	return el;
 }
 
 function color() {
@@ -132,6 +59,62 @@ function color() {
 	return color;
 }
 
+// Load url data on an element
+function ajax(url, el) {
+	$.get(url, function(data) {
+		// Build the DIV to display the ajax result
+		const ela = $('<div>')
+			.attr('class', 'ajax-temp')
+			.html(data);
+		$(el || 'body').append(ela);
+
+		// Expansion des bbcodes complexes
+		$('.include').each(function(index, el) {
+			if (el.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
+				const url = el.innerText;
+				el.innerHTML = ''; // Erase the DIV to don't loop
+				ajax(url, el);
+			}
+		});
+
+		$('.carte').each(function(index, el) {
+			if (el.innerText) {
+				const ll = ol.proj.transform(eval('[' + el.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
+				el.innerHTML = null; // Erase the DIV to init the map only once
+
+				new ol.Map({
+					layers: [
+						new ol.layer.Tile({
+							source: new ol.source.OSM(),
+						}),
+						new ol.layer.Vector({
+							source: new ol.source.Vector({
+								features: [
+									new ol.Feature({
+										geometry: new ol.geom.Point(ll),
+									}),
+								]
+							}),
+							style: new ol.style.Style({
+								image: new ol.style.Icon(({
+									src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
+									anchor: [0.5, 0.8],
+								})),
+							}),
+						}),
+					],
+					target: el,
+					controls: [], // No zoom
+					view: new ol.View({
+						center: ll,
+						zoom: 17
+					})
+				});
+			}
+		});
+	});
+}
+
 /* Fonctions d'exécution des bbCODES */
 function loadUrl(url) {
 	const match = window.location.href.match(/([a-z]+)\.php/);
@@ -140,8 +123,6 @@ function loadUrl(url) {
 }
 
 /* Posting.php */
-displayCalendar();
-
 function displayCalendar() {
 	const elDay = document.getElementById('gym_jour'),
 		elo = document.getElementById('gym_scolaire'),

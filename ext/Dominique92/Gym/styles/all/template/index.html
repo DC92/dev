@@ -35,30 +35,25 @@
 	<!-- INCLUDEJS @Dominique92_Gym/ajax.js -->
 	{$STYLESHEETS}
 	{$SCRIPTS}
+
 	<script>
-		const menuItem = {
-			<!-- BEGIN menu -->
-				'{menu.TOPIC_TITLE}': {menu.TOPIC_FIRST_POST_ID},
-			<!-- END menu -->
-		},
-		menu = {
-			<!-- BEGIN menu -->
-				'{menu.TOPIC_TITLE}': <!-- IF menu.COUNT == 1 -->{menu.POST_ID},
-				<!-- ELSE --> {
-					<!-- BEGIN sous_menu -->
-						'{sous_menu.POST_SUBJECT}': {sous_menu.POST_ID},
-					<!-- END sous_menu -->
-				},
-				<!-- ENDIF -->
-			<!-- END menu -->
+		const menu = {
+			0: { // Main menu
+<!-- BEGIN menu -->
+				{menu.TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
+<!-- END menu -->
+			},
+<!-- BEGIN menu --><!-- IF menu.COUNT > 1 -->
+			{menu.TOPIC_FIRST_POST_ID}: { // {menu.TOPIC_TITLE} menu
+<!-- BEGIN sous_menu -->
+				{sous_menu.POST_ID}: '{sous_menu.POST_SUBJECT}',
+<!-- END sous_menu -->
+			},
+<!-- ENDIF --><!-- END menu -->
 		};
 
-		// Display menu
-		$('#bandeau').append(displayMenu({
-			menu: menu,
-			menuItem: menuItem,
-		}));
-		initMenu(menu);
+		$('#bandeau').append(displayMenu(menu[0]));
+		$(window).on('load hashchange', initMenu);
 	</script>
 </body>
 </html>

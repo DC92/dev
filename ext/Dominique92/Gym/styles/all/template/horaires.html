@@ -6,7 +6,7 @@
 			<!-- BEGIN seance -->
 			<tr>
 				<td>
-					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.POST_ID}')">
+					<a onclick="window.location.hash={seance.POST_ID}">
 						{seance.NOM}
 					</a>
 					<!-- IF postrow.U_EDIT -->
@@ -17,12 +17,12 @@
 				</td>
 				<td>{seance.HORAIRE_DEBUT} - {seance.HORAIRE_FIN}</td>
 				<td>
-					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.GYM_LIEU}')">
+					<a onclick="window.location.hash={seance.GYM_LIEU}">
 						{seance.LIEU}
 					</a>
 				</td>
 				<td>
-					<a onclick="displayAjax('viewtopic.php?template=viewtopic&p={seance.GYM_ANIMATEUR}')">
+					<a onclick="window.location.hash={seance.GYM_ANIMATEUR}">
 						{seance.ANIMATEUR}
 					</a>
 				</td>

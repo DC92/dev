@@ -6,17 +6,22 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO BUG /adm/index.php route ves accueil quand on n'est pas connecté
-//TODO menu -> forum ne marche pas
-//TODO ne pas afficher page générique quand menu niveau 2
+//TODO reprendre les crayons EDIT
+//TODO submenu : le titre du sous-menu devrait être le sujet du haut
+//TODO actualités plus complètes / actualités simples
+//TODO menu informations / divers
+//TODO dans une séance : afficher la ligne horaire
 //TODO BUG les liens vers des fichiers pdf ne sont pas inline
-//TODO BUG edit calendar quand décoche scolaire : la première coche est cochée
+//TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
 //TODO horaires avec critère : supprimer la colonne du critère
 //TODO fonction déconnexion admin / marquage user connecté
+//TODO menus plus triés !
+//TODO le submenu change de couleur tout le temps !
+//TODO forum dans submenu "Divers"
 
+//TODO mobiles : horaire dépasse en largeur
 //TODO @media supprimer les images < 600px large
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-//TODO BUG retour en arrière ne recharge pas le hash
 //TODO BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
 // List template vars : phpbb/template/context.php line 135
@@ -34,7 +39,9 @@ MESSAGES / BBCodes / cocher afficher
 	[reload]{TEXT}[/reload] / <script>loadUrl("{TEXT}")</script> //TODO voir si utilisé ?
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
-	[horaires]{TEXT}[/horaires] / <div class="horaires">{TEXT}</div> / Affiche des horaires
+	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
+	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
+	[actualites]{TEXT}[/actualites] / <div class="actualites">{TEXT}</div> / Affiche des actualites
 */
 
 namespace Dominique92\Gym\event;
@@ -100,9 +107,10 @@ class listener implements EventSubscriberInterface
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
 		$get = $_GET;
+		$server = $_SERVER;
+		$this->request->disable_super_globals();
 		foreach ($get AS $k=>$v)
 			$this->template->assign_var (strtoupper ("get_$k"), $v);
-		$this->request->disable_super_globals();
 
 		$template = $this->request->variable('template', '');
 		// Change le template sur demande
@@ -111,7 +119,7 @@ class listener implements EventSubscriberInterface
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
 		// Change le template pour la page d'accueil
-		elseif ($this->template->retrieve_var('SCRIPT_NAME') == 'index')
+		elseif ($server['SCRIPT_FILENAME'] == $server['DOCUMENT_ROOT'].'/index.php')
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/index.html",
 			]);
@@ -298,6 +306,19 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 		$post_id = $post_row['POST_ID'];
+
+
+		// Remplace dans le texte du message {VARIABLE_POST_TEMPLATE} par sa valeur
+		//TODO traiter /g pour plusieurs remplacements
+		$this->post_row = $post_row;
+		$post_row['MESSAGE'] = preg_replace_callback(
+			'/([A-Z_]+)/',
+			function ($matches) {
+				$r = $this->post_row[$matches[1]];
+				return $r ? $r : $matches[1];
+			},
+			$post_row['MESSAGE']
+		);
 
 		// Ajoute les informations spéciales calculées par get_seances() à chaque post
 		if (!isset ($this->vwt_seances))
