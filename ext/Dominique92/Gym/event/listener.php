@@ -6,22 +6,21 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO tri des champs des menus dans l'ordre du champ dans la base
+//TODO actualités tri suivant time_fin
 //TODO reprendre les crayons EDIT
-//TODO submenu : le titre du sous-menu devrait être le sujet du haut
 //TODO actualités plus complètes / actualités simples
 //TODO menu informations / divers
 //TODO dans une séance : afficher la ligne horaire
 //TODO BUG les liens vers des fichiers pdf ne sont pas inline
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
-//TODO horaires avec critère : supprimer la colonne du critère
 //TODO fonction déconnexion admin / marquage user connecté
-//TODO menus plus triés !
-//TODO le submenu change de couleur tout le temps !
 //TODO forum dans submenu "Divers"
 
+//TODO viewtopic ajax : ne pas afficher le titre quand c'est la page générique du sous-menu
 //TODO mobiles : horaire dépasse en largeur
-//TODO @media supprimer les images < 600px large
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
+//TODO @media supprimer les images < 600px large
 //TODO BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
 // List template vars : phpbb/template/context.php line 135
@@ -36,7 +35,7 @@ MESSAGES / BBCodes / cocher afficher
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="post-bandeau-vert">{TEXT}</div>
 	[texte-vert]{TEXT}[/texte-vert] / <div class="post-texte-vert">{TEXT}</div>
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div>
-	[reload]{TEXT}[/reload] / <script>loadUrl("{TEXT}")</script> //TODO voir si utilisé ?
+	[reload]{TEXT}[/reload] / <script>window.location.href ="{TEXT}"</script>
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
@@ -143,13 +142,16 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Add horaires to template data
-		$static_values = $this->listes();
 		$get['horaires'] = 'on';
 		$seances = $this->get_seances($get);
-		$horaires = [];
+
+//TODO tri suivant time_fin
+//TODO template + bbcode actualites
 		foreach ($seances AS $row)
 			$horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;
+
 		if ($horaires) {
+			$static_values = $this->listes();
 			ksort ($horaires);
 			foreach ($horaires AS $jour=>$j) {
 				$jour_literal = $static_values['jours'][$jour ?: 0];
@@ -165,8 +167,6 @@ class listener implements EventSubscriberInterface
 		$seances = $this->get_seances([
 			'actualites' => 'on',
 		]);
-		//TODO tri suivant time_fin
-		//TODO template + bbcode actualites
 		foreach ($seances AS $row) 
 			if($row['date'])
 				$this->template->assign_block_vars('actualites', array_change_key_case ($row, CASE_UPPER));

@@ -24,7 +24,6 @@
 			<div class="baniere">{SITENAME}</div>
 		</a>
 	</div>
-	<br id="libre" />
 
 	<!-- INCLUDECSS {T_ASSETS_PATH}/css/font-awesome.min.css -->
 	<!-- INCLUDECSS icons.css -->
@@ -53,7 +52,7 @@
 		};
 
 		$('#bandeau').append(displayMenu(menu[0]));
-		$(window).on('load hashchange', initMenu);
+		$(window).on('load hashchange', refreshMenu);
 	</script>
 </body>
 </html>

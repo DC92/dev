@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-function initMenu() {
+function refreshMenu() {
 	const hashPostId = window.location.hash.substr(1) || Object.keys(menu[0])[0];
 
 	// Affiche un éventuel sous-menu
@@ -19,7 +19,7 @@ function initMenu() {
 		if (parseInt(index) && value[hashPostId]) {
 			$('#bandeau').append(displayMenu(
 				menu[index], // sous-menu
-				menu[index][hashPostId], // Titre
+				menu[0][index], // Titre
 				'submenu' // Id
 			));
 		}
@@ -30,11 +30,12 @@ function displayMenu(list, titre, id) {
 	$('#submenu').remove();
 
 	const el = $('<ul>').attr('class', 'menu');
-	if (titre)
+	if (titre && list)
 		el.append($('<h2>').text(titre));
 	if (id)
 		el.attr('id', id);
 
+	window.colorAngle = titre ? titre.length : 0; // Use same colors for each submenu
 	$.each(list, function(index, value) {
 		el.append($('<il>')
 			.append($('<label>').text(value))
@@ -113,13 +114,6 @@ function ajax(url, el) {
 			}
 		});
 	});
-}
-
-/* Fonctions d'exécution des bbCODES */
-function loadUrl(url) {
-	const match = window.location.href.match(/([a-z]+)\.php/);
-	if (match.length == 2 && match[1] == 'index')
-		window.location.href = url;
 }
 
 /* Posting.php */

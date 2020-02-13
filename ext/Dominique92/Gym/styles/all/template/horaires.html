@@ -15,17 +15,24 @@
 						</a>
 					<!-- ENDIF -->
 				</td>
+
 				<td>{seance.HORAIRE_DEBUT} - {seance.HORAIRE_FIN}</td>
-				<td>
-					<a onclick="window.location.hash={seance.GYM_LIEU}">
-						{seance.LIEU}
-					</a>
-				</td>
-				<td>
-					<a onclick="window.location.hash={seance.GYM_ANIMATEUR}">
-						{seance.ANIMATEUR}
-					</a>
-				</td>
+
+				<!-- IF not GET_LIEU -->
+					<td>
+						<a onclick="window.location.hash={seance.GYM_LIEU}">
+							{seance.LIEU}
+						</a>
+					</td>
+				<!-- ENDIF -->
+
+				<!-- IF not GET_ANIMATEUR -->
+					<td>
+						<a onclick="window.location.hash={seance.GYM_ANIMATEUR}">
+							{seance.ANIMATEUR}
+						</a>
+					</td>
+				<!-- ENDIF -->
 			</tr>
 			<!-- END seance -->
 		</table>
