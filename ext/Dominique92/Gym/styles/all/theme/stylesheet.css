@@ -1,15 +1,20 @@
+/* DEBUG */
 pre {
 	text-align: left;
+}
+
+/* Ménage phpBB */
+.site_logo {
+	background-image: url("./images/logo.jpg");
+}
+#poll-panel-tab {
+	display: none !important;
 }
 
 /* VIEWTOPIC */
 .postbody p {
 	margin: 0;
 }
-.viewtopic-gym i {
-										wfloat: left;
-}
-
 #actualites li {
 	text-transform: capitalize;
 }
@@ -179,12 +184,11 @@ html.gym_index  {
 	font-size: 10px;
 	text-align: center;
 }
-.gym_index #logo {
-	float: left;
-	margin: 0.3em;
-}
 .gym_index #logo img {
-	width: 8em;
+	background: white;
+	float: left;
+	margin: 0.5em;
+	height: 8em;
 	border-radius: 1em;
 }
 .gym_index @media screen and (max-width: 480px) {

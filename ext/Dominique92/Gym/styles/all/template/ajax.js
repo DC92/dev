@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 function refreshMenu() {
 	const hashPostId = parseInt(window.location.hash.substr(1)) ||
-		Object.keys(menu[0])[0]; // Premier menu par défaut
+		Object.keys(menu[0])[0].slice(-3); // Premier menu par défaut
 
 	// Affiche un éventuel sous-menu
 	$('#bandeau').append(displayMenu(

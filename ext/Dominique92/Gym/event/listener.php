@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO actualités tri suivant time_fin
+//TODO template + bbcode actualites
 //TODO actualités plus complètes / actualités simples
 //TODO dans une séance : afficher la ligne horaire
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
@@ -28,14 +28,14 @@ GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utili
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
-	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div>
-	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div>
+	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div> / Applique un style
+	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
-	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div>
-	[titre-gris]{TEXT}[/titre-gris] / <div class="titre-gris">{TEXT}</div>
+	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div> / Applique un style
+	[titre-gris]{TEXT}[/titre-gris] / <div class="titre-gris">{TEXT}</div> / Applique un style
 */
 
 namespace Dominique92\Gym\event;
@@ -140,8 +140,6 @@ class listener implements EventSubscriberInterface
 		$get['horaires'] = 'on';
 		$seances = $this->get_seances($get);
 
-//TODO tri suivant time_fin
-//TODO template + bbcode actualites
 		foreach ($seances AS $row)
 			$horaires[$row ['gym_jour']][$row ['gym_heure']*24+$row ['gym_minute']][] = $row;
 
@@ -162,9 +160,16 @@ class listener implements EventSubscriberInterface
 		$seances = $this->get_seances([
 			'actualites' => 'on',
 		]);
+		usort ($seances, function($a, $b){
+			return $this->tri_next_beg_time ($a, $b);
+		});
 		foreach ($seances AS $row) 
 			if($row['date'])
 				$this->template->assign_block_vars('actualites', array_change_key_case ($row, CASE_UPPER));
+	}
+
+	function tri_next_beg_time($a, $b) {
+		return $a['next_beg_time'] - $b['next_beg_time'];
 	}
 
 	function get_seances($arg = []) {
@@ -224,9 +229,21 @@ class listener implements EventSubscriberInterface
 			if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
 				setlocale(LC_ALL, 'fr_FR');
 				foreach (explode (',', $row['gym_semaines']) AS $semaine) {
-					$row['next_time'] = mktime($gym_heure_fin, $gym_minute_fin, 0, -3, 2 + $row['gym_jour'] + $semaine * 7, date('Y'));
-					if ($row['next_time'] > time() && !$row['date'])
-						$row['date'] = str_replace ('  ', ' ', strftime ('%A %e %B', $row['next_time']));
+					$row['next_beg_time'] = mktime(
+						$gym_heure, $gym_minute,
+						0, -3, // 1er Septembre
+						2 + $row['gym_jour'] + $semaine * 7,
+						date('Y')
+					);
+					$row['next_end_time'] = mktime(
+						$gym_heure_fin, $gym_minute_fin,
+						0, -3,
+						2 + $row['gym_jour'] + $semaine * 7,
+						date('Y')
+					);
+					// Garde le premier évènement qui finit après la date courante
+					if ($row['next_end_time'] > time() && !$row['date'])
+						$row['date'] = str_replace ('  ', ' ', utf8_encode (strftime ('%A %e %B', $row['next_end_time'])));
 				}
 			}
 
