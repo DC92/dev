@@ -61,13 +61,13 @@
 		const menu = {
 			0: { // Main menu
 <!-- BEGIN menu -->
-				{menu.TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
+				1{menu.NORM_FIRST_ORDRE_GYM_MENU}{menu.NORM_TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
 <!-- END menu -->
 			},
 <!-- BEGIN menu --><!-- IF menu.COUNT > 1 -->
 			{menu.TOPIC_FIRST_POST_ID}: { // {menu.TOPIC_TITLE} menu
 <!-- BEGIN sous_menu -->
-				{sous_menu.POST_ID}: '{sous_menu.POST_SUBJECT}',
+				1{sous_menu.NORM_GYM_ORDRE_MENU}{sous_menu.NORM_POST_ID}: '{sous_menu.POST_SUBJECT}',
 <!-- END sous_menu -->
 			},
 <!-- ENDIF --><!-- END menu -->

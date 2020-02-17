@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 function refreshMenu() {
-	const hashPostId = window.location.hash.substr(1) ||
+	const hashPostId = parseInt(window.location.hash.substr(1)) ||
 		Object.keys(menu[0])[0]; // Premier menu par défaut
 
 	// Affiche un éventuel sous-menu
@@ -43,7 +43,7 @@ function displayMenu(list, titre, id) {
 				background: color(),
 			})
 			.click(function() {
-				window.location.hash = index;
+				window.location.hash = parseInt(index) ? index % 1000 : '';
 			}));
 	});
 

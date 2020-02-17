@@ -6,13 +6,11 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO tri des champs des sous-menus dans l'ordre du champ dans la base
 //TODO actualités tri suivant time_fin
 //TODO actualités plus complètes / actualités simples
 //TODO dans une séance : afficher la ligne horaire
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
 
-//http://gym.c92.fr/#0 affiche 2 fois le menu
 //TODO viewtopic ajax : ne pas afficher le titre quand c'est la page générique du sous-menu
 //TODO mobiles : horaire dépasse en largeur
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
@@ -275,26 +273,19 @@ class listener implements EventSubscriberInterface
 			LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
 			WHERE p.gym_menu = 'on'";
 		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result)) {
+			foreach ($row AS $k=>$v)
+				$row["norm_$k"] = substr("000$v", -3);
 			$menu [$row['topic_id']] [] = array_change_key_case ($row, CASE_UPPER);
+		}
 		$this->db->sql_freeresult($result);
 
-		usort ($menu, function($a, $b){
-			return $this->tri_menu ($a[0], $b[0]);
-		});
 		foreach ($menu AS $titre=>$v) {
 			$v[0] ['COUNT'] = count($v);
 			$this->template->assign_block_vars('menu', $v[0]);
-			usort ($v, function($a, $b){
-				return $this->tri_menu ($a, $b);
-			});
 			foreach ($v AS $vv)
 				$this->template->assign_block_vars('menu.sous_menu', $vv);
 		}
-	}
-	function tri_menu($a, $b) {
-		return (intval ($a['FIRST_ORDRE_GYM_MENU']) - intval ($b['FIRST_ORDRE_GYM_MENU']))
-			?: strcmp ($a['POST_SUBJECT'], $b['POST_SUBJECT']);
 	}
 
 	/**
