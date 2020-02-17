@@ -6,22 +6,19 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG Visitez notre https://www.facebook.com/ChavilGym/.
-//TODO tri des champs des menus dans l'ordre du champ dans la base
+//TODO tri des champs des sous-menus dans l'ordre du champ dans la base
 //TODO actualités tri suivant time_fin
 //TODO actualités plus complètes / actualités simples
 //TODO dans une séance : afficher la ligne horaire
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
 
-//TODO menu informations / divers
-//TODO forum dans submenu "Divers"
-
+//http://gym.c92.fr/#0 affiche 2 fois le menu
 //TODO viewtopic ajax : ne pas afficher le titre quand c'est la page générique du sous-menu
 //TODO mobiles : horaire dépasse en largeur
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
-//TODO styles spécifiques à nos pages
-//TODO @media supprimer les images < 600px large
-//TODO BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
+//TODO autres styles spécifiques à nos pages
+//TODO?? @media supprimer les images < 600px large
+//TODO?? BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -33,16 +30,14 @@ GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utili
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
-	[titre-gris]{TEXT}[/titre-gris] / <div class="post-titre-gris">{TEXT}</div>
-	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="post-bandeau-vert">{TEXT}</div>
-	[texte-vert]{TEXT}[/texte-vert] / <div class="post-texte-vert">{TEXT}</div>
+	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div>
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div>
-	[reload]{TEXT}[/reload] / <script>window.location.href ="{TEXT}"</script>
-	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
-	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
+	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
-	[actualites]{TEXT}[/actualites] / <div class="actualites">{TEXT}</div> / Affiche des actualites
+	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
+	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div>
+	[titre-gris]{TEXT}[/titre-gris] / <div class="titre-gris">{TEXT}</div>
 */
 
 namespace Dominique92\Gym\event;

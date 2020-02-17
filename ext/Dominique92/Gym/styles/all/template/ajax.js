@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
-
 function refreshMenu() {
-	const hashPostId = window.location.hash.substr(1) || Object.keys(menu[0])[0];
+	const hashPostId = window.location.hash.substr(1) ||
+		Object.keys(menu[0])[0]; // Premier menu par défaut
 
 	// Affiche un éventuel sous-menu
 	$('#bandeau').append(displayMenu(
@@ -74,7 +74,10 @@ function ajax(url, el) {
 			if (el.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
 				const url = el.innerText;
 				el.innerHTML = ''; // Erase the DIV to don't loop
-				ajax(url, el);
+				if (url.charAt(0) == '@')
+					window.location.href = url.substr(1);
+				else
+					ajax(url, el);
 			}
 		});
 
