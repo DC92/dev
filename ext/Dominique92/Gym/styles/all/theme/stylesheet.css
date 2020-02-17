@@ -243,6 +243,40 @@ html.gym_index  {
 	cursor: pointer;
 }
 
+/* Attachements (notamment liens) */
+.viewtopic-gym .inline-attachment,
+.viewtopic-gym .inline-attachment dl {
+	display: inline-block;
+	width: initial;
+}
+
+/* Crayons d'édition */
+#edit-page {
+	float: right;
+}
+#edit-user,
+#edit-page {
+	float: right;
+	text-align: right;
+	font-size: 1.3em;
+}
+#edit-user .dropdown-contents {
+	display: none;
+	position: relative;
+	right: 0;
+	margin: 0;
+	background: white;
+	padding: 0.3em;
+	text-align: left;
+	list-style-type: none;
+}
+#edit-user:hover .dropdown-contents {
+	display: block;
+}
+#edit-user li {
+	margin: 0.3em;
+}
+
 /* Images dans les posts */
 .ajax-temp .inline-attachment,
 .ajax-temp .viewtopic-gym {

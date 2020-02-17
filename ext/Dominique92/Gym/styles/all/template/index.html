@@ -16,6 +16,28 @@
 		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
 	</div>
 
+	<!-- IF S_USER_LOGGED_IN -->
+		<div id="edit-user">
+			{S_USERNAME}&nbsp;
+			<ul class="dropdown-contents" role="menu">
+				<li>
+					<a href="ucp.php?i=ucp_profile&mode=reg_details">
+						<i class="icon fa-sliders fa-fw" aria-hidden="true"></i><span>{L_PROFILE}</span>
+					</a>
+				</li>
+				<li>
+					<a href="{U_LOGIN_LOGOUT}">
+						<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+	<!-- ELSE -->
+		<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
+			<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+		</a>
+	<!-- ENDIF -->
+
 	<div id="bandeau">
 		<a id="logo" href="https://www.sport-sante.fr/">
 			<img alt="EPGV" src="ext/Dominique92/Gym/styles/all/theme/images/logo.jpg">

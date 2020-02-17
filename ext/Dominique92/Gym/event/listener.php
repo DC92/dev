@@ -6,20 +6,20 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//BUG Visitez notre https://www.facebook.com/ChavilGym/.
 //TODO tri des champs des menus dans l'ordre du champ dans la base
 //TODO actualités tri suivant time_fin
-//TODO reprendre les crayons EDIT
 //TODO actualités plus complètes / actualités simples
-//TODO menu informations / divers
 //TODO dans une séance : afficher la ligne horaire
-//TODO BUG les liens vers des fichiers pdf ne sont pas inline
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
-//TODO fonction déconnexion admin / marquage user connecté
+
+//TODO menu informations / divers
 //TODO forum dans submenu "Divers"
 
 //TODO viewtopic ajax : ne pas afficher le titre quand c'est la page générique du sous-menu
 //TODO mobiles : horaire dépasse en largeur
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
+//TODO styles spécifiques à nos pages
 //TODO @media supprimer les images < 600px large
 //TODO BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
@@ -28,6 +28,8 @@
 
 /** CONFIG
 PERSONNALISER / extension gym
+MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
+GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
