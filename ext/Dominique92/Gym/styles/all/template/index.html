@@ -38,7 +38,7 @@
 		</a>
 	<!-- ENDIF -->
 
-	<div id="bandeau">
+	<div>
 		<a id="logo" href="https://www.sport-sante.fr/">
 			<img alt="EPGV" src="ext/Dominique92/Gym/styles/all/theme/images/logo.png">
 		</a>
@@ -46,6 +46,10 @@
 			<div class="baniere">{SITENAME}</div>
 		</a>
 	</div>
+	<div id="menu"></div>
+	<div id="titre"></div>
+	<div id="sous-menu"></div>
+	<div id="page"></div>
 
 	<!-- INCLUDECSS {T_ASSETS_PATH}/css/font-awesome.min.css -->
 	<!-- INCLUDECSS icons.css -->
@@ -58,7 +62,7 @@
 	{$SCRIPTS}
 
 	<script>
-		const menu = {
+		var menu = {
 			0: { // Main menu
 <!-- BEGIN menu -->
 				1{menu.NORM_FIRST_ORDRE_GYM_MENU}{menu.NORM_TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
@@ -73,8 +77,7 @@
 <!-- ENDIF --><!-- END menu -->
 		};
 
-		$('#bandeau').append(displayMenu(menu[0]));
-		$(window).on('load hashchange', refreshMenu);
+		$(window).on('load hashchange', null, menu, refreshMenu);
 	</script>
 </body>
 </html>

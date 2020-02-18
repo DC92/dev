@@ -67,9 +67,6 @@ pre {
 	border:1px dashed black;
 	padding: 0.2em;
 }
-													#horaires .edit {
-														wfloat: right;
-													}
 #horaires a {
 	color: inherit;
 	font-size: 14px;
@@ -230,20 +227,20 @@ html.gym_index  {
 }
 
 /* Style des pages include dans l'acceuil */
-.ajax-temp {
+#page {
 	margin: 0 8%;
 	padding: 0 1%;
 	background: white;
 }
-.ajax-temp .content {
+#page .content {
 	font-size: 1.4em;
 	text-align: justify;
 }
-.ajax-temp p {
+#page p {
 	margin: 0;
 	background: white;
 }
-.ajax-temp a {
+#page a {
 	cursor: pointer;
 	text-decoration: none;
 }
@@ -283,19 +280,19 @@ html.gym_index  {
 }
 
 /* Images dans les posts */
-.ajax-temp .inline-attachment,
-.ajax-temp .viewtopic-gym {
+#page .inline-attachment,
+#page .viewtopic-gym {
 	text-align: center;
 }
-.ajax-temp dl {
+#page dl {
 	display: inline-block;
 	width: 60%;
 	margin: 0;
 }
-.ajax-temp dd {
+#page dd {
 	display: none;
 }
-.ajax-temp img {
+#page img {
 	width: 100%;
 	border-radius: 1em;
 }

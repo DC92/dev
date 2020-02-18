@@ -1,90 +1,93 @@
 /* jshint esversion: 6 */
-function refreshMenu() {
-	const hashPostId = parseInt(window.location.hash.substr(1)) ||
-		Object.keys(menu[0])[0].slice(-3); // Premier menu par défaut
+function refreshMenu(evt) {
+	const menu = evt.data,
+		titres = {},
+		pagePostId = window.location.hash.substr(1) ||
+		parseInt(Object.keys(menu[0])[0].slice(-3)); // Premier menu par défaut
 
-	// Affiche un éventuel sous-menu
-	$('#bandeau').append(displayMenu(
-		menu[hashPostId], // sous-menu
-		menu[0][hashPostId], // Titre
-		'submenu' // Id
-	));
-
-	// Affiche une éventuelle page
-	$('.ajax-temp').remove();
-	ajax('viewtopic.php?template=viewtopic&p=' + hashPostId);
-
-	// Si c'est le sous-menu
-	$.each(menu, function(index, value) {
-		if (parseInt(index) && value[hashPostId]) {
-			$('#bandeau').append(displayMenu(
-				menu[index], // sous-menu
-				menu[0][index], // Titre
-				'submenu' // Id
-			));
-		}
+	// Find menu item
+	$.each(menu, function(menuPostId, items) {
+		$.each(items, function(index, value) {
+			titres[parseInt(index.slice(-3))] = {
+				menuPostId: parseInt(menuPostId),
+				titre: value,
+			};
+		});
 	});
+
+	// Menu principal (permanent)
+	if (evt.type == 'load')
+		displayMenu($('#menu'), menu[0]);
+
+	// Clean variable areas	
+	$('#titre').html('');
+	$('#sous-menu').html('');
+	$('#page').html('');
+
+	// Choix dans un sous-menu
+	const subMenuPostId = titres[pagePostId].menuPostId;
+	if (subMenuPostId) {
+		$('#titre').html('<h2>' + titres[subMenuPostId].titre + '</h2>');
+		displayMenu($('#sous-menu'), menu[subMenuPostId]);
+		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
+	}
+	// Choix d'un sous-menu
+	else if (menu[pagePostId]) {
+		ajax('#titre', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
+		displayMenu($('#sous-menu'), menu[pagePostId]);
+	}
+	// Choix d'une page
+	else
+		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
 }
 
-function displayMenu(list, titre, id) {
-	$('#submenu').remove();
+function displayMenu(elMenu, items) {
+	const elUL = $('<ul>').attr('class', 'menu');
+	elMenu.append(elUL);
 
-	const el = $('<ul>').attr('class', 'menu');
-	if (titre && list)
-		el.append($('<h2>').text(titre));
-	if (id)
-		el.attr('id', id);
+	window.colorAngle = items.length; // Always same colors for each submenu
+	const saturation = 80; // on 255
 
-	window.colorAngle = titre ? titre.length : 0; // Use same colors for each submenu
-	$.each(list, function(index, value) {
-		el.append($('<il>')
+	$.each(items, function(index, value) {
+		elUL.append($('<il>')
 			.append($('<label>').text(value))
 			.css({
-				background: color(),
+				background: function() { // Random color
+					window.colorAngle = window.colorAngle ? window.colorAngle + 2.36 : 1;
+					let color = '#';
+					for (let angle = 0; angle < 6; angle += Math.PI * 0.66)
+						color += (0x1ff - saturation + saturation * Math.sin(window.colorAngle + angle))
+						.toString(16).substring(1, 3);
+					return color;
+				},
 			})
 			.click(function() {
 				window.location.hash = parseInt(index) ? index % 1000 : '';
 			}));
 	});
-
-	return el;
-}
-
-function color() {
-	const saturation = 80; // on 255
-	window.colorAngle = window.colorAngle ? window.colorAngle + 2.36 : 1;
-	let color = '#';
-	for (let angle = 0; angle < 6; angle += Math.PI * 0.66)
-		color += (0x1ff - saturation + saturation * Math.sin(window.colorAngle + angle))
-		.toString(16).substring(1, 3);
-	return color;
 }
 
 // Load url data on an element
-function ajax(url, el) {
+function ajax(el, url) {
 	$.get(url, function(data) {
-		// Build the DIV to display the ajax result
-		const ela = $('<div>')
-			.attr('class', 'ajax-temp')
-			.html(data);
-		$(el || 'body').append(ela);
+		$(el).html(data);
 
 		// Expansion des bbcodes complexes
-		$('.include').each(function(index, el) {
-			if (el.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
-				const url = el.innerText;
-				el.innerHTML = ''; // Erase the DIV to don't loop
+		$('.include').each(function(index, elBBcode) {
+			if (elBBcode.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
+				const url = elBBcode.innerText;
+				elBBcode.innerHTML = ''; // Erase the BBcode DIV to don't loop
 				if (url.charAt(0) == '@')
 					window.location.href = url.substr(1);
 				else
-					ajax(url, el);
+					ajax(elBBcode, url);
 			}
 		});
 
-		$('.carte').each(function(index, el) {
-			if (el.innerText) {
-				const ll = ol.proj.transform(eval('[' + el.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
-				el.innerHTML = null; // Erase the DIV to init the map only once
+		$('.carte').each(function(index, elCarte) {
+			if (elCarte.innerText) {
+				const ll = ol.proj.transform(eval('[' + elCarte.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
+				elCarte.innerHTML = null; // Erase the DIV to init the map only once
 
 				new ol.Map({
 					layers: [
@@ -107,7 +110,7 @@ function ajax(url, el) {
 							}),
 						}),
 					],
-					target: el,
+					target: elCarte,
 					controls: [], // No zoom
 					view: new ol.View({
 						center: ll,

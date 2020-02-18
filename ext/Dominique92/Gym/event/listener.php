@@ -11,7 +11,6 @@
 //TODO dans une séance : afficher la ligne horaire
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
 
-//TODO viewtopic ajax : ne pas afficher le titre quand c'est la page générique du sous-menu
 //TODO mobiles : horaire dépasse en largeur
 //TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
 //TODO autres styles spécifiques à nos pages
