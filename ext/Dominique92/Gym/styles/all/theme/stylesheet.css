@@ -7,7 +7,22 @@ pre {
 .site_logo {
 	background-image: url("./images/logo.jpg");
 }
-#poll-panel-tab {
+#nav-main li:nth-of-type(1),
+#nav-main li:nth-of-type(2),
+#nav-main li:nth-of-type(3),
+#nav-main li:nth-of-type(5),
+.section-posting .fields1 dl:nth-of-type(1),
+.section-posting #poll-panel-tab,
+.section-posting #options-panel .fields1 > div,
+.section-posting #options-panel dl:nth-of-type(1),
+.section-posting #options-panel dl:nth-of-type(2),
+.section-posting #options-panel dl:nth-of-type(3) dd:nth-of-type(1),
+.section-posting #options-panel dl:nth-of-type(4),
+.section-posting input[name=preview],
+.section-posting input[name=save],
+.section-posting #smiley-box strong,
+.section-posting #review,
+.section-posting #topicreview {
 	display: none !important;
 }
 
@@ -284,15 +299,15 @@ html.gym_index  {
 #page .viewtopic-gym {
 	text-align: center;
 }
-#page dl {
+#page .file dl {
 	display: inline-block;
 	width: 60%;
 	margin: 0;
 }
-#page dd {
+#page .file dd {
 	display: none;
 }
-#page img {
+#page .file img {
 	width: 100%;
 	border-radius: 1em;
 }

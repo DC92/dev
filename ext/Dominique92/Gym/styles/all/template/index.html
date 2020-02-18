@@ -65,19 +65,23 @@
 		var menu = {
 			0: { // Main menu
 <!-- BEGIN menu -->
-				1{menu.NORM_FIRST_ORDRE_GYM_MENU}{menu.NORM_TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
+				1{menu.NORM_FIRST_ORDRE_GYM_MENU}{menu.NORM_TOPIC_ID}{menu.NORM_TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
 <!-- END menu -->
 			},
 <!-- BEGIN menu --><!-- IF menu.COUNT > 1 -->
 			{menu.TOPIC_FIRST_POST_ID}: { // {menu.TOPIC_TITLE} menu
 <!-- BEGIN sous_menu -->
-				1{sous_menu.NORM_GYM_ORDRE_MENU}{sous_menu.NORM_POST_ID}: '{sous_menu.POST_SUBJECT}',
+				1{sous_menu.NORM_GYM_ORDRE_MENU}{menu.NORM_TOPIC_ID}{sous_menu.NORM_POST_ID}: '{sous_menu.POST_SUBJECT}',
 <!-- END sous_menu -->
 			},
 <!-- ENDIF --><!-- END menu -->
 		};
 
 		$(window).on('load hashchange', null, menu, refreshMenu);
+
+<!-- IF S_USER_LOGGED_IN -->
+		const userLogged = true;
+<!-- ENDIF -->
 	</script>
 </body>
 </html>

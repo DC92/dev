@@ -11,6 +11,7 @@ function refreshMenu(evt) {
 			titres[parseInt(index.slice(-3))] = {
 				menuPostId: parseInt(menuPostId),
 				titre: value,
+				topic: parseInt(index.substr(-6, 3)),
 			};
 		});
 	});
@@ -28,20 +29,20 @@ function refreshMenu(evt) {
 	const subMenuPostId = titres[pagePostId].menuPostId;
 	if (subMenuPostId) {
 		$('#titre').html('<h2>' + titres[subMenuPostId].titre + '</h2>');
-		displayMenu($('#sous-menu'), menu[subMenuPostId]);
+		displayMenu($('#sous-menu'), menu[subMenuPostId], titres[subMenuPostId].topic);
 		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
 	}
 	// Choix d'un sous-menu
 	else if (menu[pagePostId]) {
 		ajax('#titre', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
-		displayMenu($('#sous-menu'), menu[pagePostId]);
+		displayMenu($('#sous-menu'), menu[pagePostId], titres[pagePostId].topic);
 	}
 	// Choix d'une page
 	else
 		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
 }
 
-function displayMenu(elMenu, items) {
+function displayMenu(elMenu, items, topic) {
 	const elUL = $('<ul>').attr('class', 'menu');
 	elMenu.append(elUL);
 
@@ -65,6 +66,11 @@ function displayMenu(elMenu, items) {
 				window.location.hash = parseInt(index) ? index % 1000 : '';
 			}));
 	});
+	// Commande ajout
+	if (topic && userLogged)
+		elUL.append($('<il>').html(
+			'<a title="Ajouter un élément" href="posting.php?mode=reply&f=2&t=' + topic +
+			'"><i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i></a>'));
 }
 
 // Load url data on an element
@@ -77,7 +83,7 @@ function ajax(el, url) {
 			if (elBBcode.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
 				const url = elBBcode.innerText;
 				elBBcode.innerHTML = ''; // Erase the BBcode DIV to don't loop
-				if (url.charAt(0) == '@')
+				if (url.charAt(0) == ':')
 					window.location.href = url.substr(1);
 				else
 					ajax(elBBcode, url);

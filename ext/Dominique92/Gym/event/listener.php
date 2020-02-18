@@ -6,13 +6,11 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO dans une séance : afficher la ligne horaire
 //TODO template + bbcode actualites
 //TODO actualités plus complètes / actualités simples
-//TODO dans une séance : afficher la ligne horaire
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
-
 //TODO mobiles : horaire dépasse en largeur
-//TODO CSS renommer boutons / enlever ce qui ne sert pas (sondages, ...)
 //TODO autres styles spécifiques à nos pages
 //TODO?? @media supprimer les images < 600px large
 //TODO?? BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
