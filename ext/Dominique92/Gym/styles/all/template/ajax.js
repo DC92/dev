@@ -38,19 +38,23 @@ function refreshMenu(evt) {
 	$('#sous-menu').html('');
 	$('#page').html('');
 
-	// Choix dans un sous-menu
-	const subMenuPostId = titres[pagePostId].menuPostId;
-	if (subMenuPostId) {
-		$('#titre').html('<h2>' + titres[subMenuPostId].titre + '</h2>');
-		displayMenu($('#sous-menu'), menu[subMenuPostId], titres[subMenuPostId].topic);
-		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
-	}
-	// Choix d'un sous-menu
-	else if (menu[pagePostId]) {
+	// Sous menu du menu
+	if (menu[pagePostId]) {
 		ajax('#titre', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
 		displayMenu($('#sous-menu'), menu[pagePostId], titres[pagePostId].topic);
 	}
-	// Choix d'une page
+	// Page d'un menu
+	else if (titres[pagePostId]) {
+		const menuPostId = titres[pagePostId].menuPostId;
+
+		// Page du sous menu
+		if (titres[menuPostId]) {
+			$('#titre').html('<h2>' + titres[menuPostId].titre + '</h2>');
+			displayMenu($('#sous-menu'), menu[menuPostId], titres[pagePostId].topic);
+		}
+		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
+	}
+	// Page sans menu
 	else
 		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
 }

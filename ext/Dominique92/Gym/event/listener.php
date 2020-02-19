@@ -6,15 +6,11 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//Images danseuse non proportionelle / revoir toutes images & cartes
-// Séances ne s'affichent pas (pas plus que les sous-menus)
-//TODO dans une séance : afficher la ligne horaire
 //TODO template + bbcode actualites
 //TODO actualités plus complètes / actualités simples
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
-//TODO mobiles : horaire dépasse en largeur
+// Remplacer les boutons répondre, .. par ajouter un choix...
 //TODO autres styles spécifiques à nos pages
-//TODO?? @media supprimer les images < 600px large
 //TODO?? BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
 // List template vars : phpbb/template/context.php line 135
@@ -31,6 +27,7 @@ MESSAGES / BBCodes / cocher afficher
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
+	[horaire][/horaire] / <div class="include">?template=horaires&id=POST_ID</div> / Affiche un horaire
 	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
 	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div> / Applique un style
@@ -188,6 +185,9 @@ class listener implements EventSubscriberInterface
 				case 'lieu';
 				case 'animateur';
 					$cond[] = substr($k,0,2).'.post_subject="'.urldecode($v).'"';
+					break;
+				case 'id';
+					$cond[] = 'post.post_id="'.urldecode($v).'"';
 			}
 
 		$sql = "SELECT post.post_id, post.post_subject AS nom,
