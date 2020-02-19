@@ -7,6 +7,11 @@ pre {
 .site_logo {
 	background-image: url("./images/logo.jpg");
 }
+@media (max-width: 600px) {
+	#logo {
+		display: none !important;
+	}
+}
 #nav-main li:nth-of-type(1),
 #nav-main li:nth-of-type(2),
 #nav-main li:nth-of-type(3),
@@ -26,18 +31,141 @@ pre {
 	display: none !important;
 }
 
-/* VIEWTOPIC */
-.postbody p {
-	margin: 0;
+/* Style de la page d'accueil spéciale */
+html.gym_index  {
+	height: 100%;
 }
-#actualites li {
-	text-transform: capitalize;
+.gym_index body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-image: url("images/plafond.jpg"), url("images/ballons.jpg");
+	background-repeat: no-repeat, no-repeat;
+	background-position: top, center left;
+	background-size: 100%, 20%;
+	background-color: white;
+	font-size: 10px;
+	text-align: center;
+}
+.gym_index #logo img {
+	background: white;
+	float: left;
+	margin: 0.5em;
+	height: 8em;
+	border-radius: 1em;
+}
+@media (max-width: 600px) {
+	.gym_index body {
+		background-image: none;
+	}
+	.gym_index #logo {
+		display: none;
+	}
+}
+.gym_index .baniere {
+	display: inline-block;
+	margin: 0.2em;
+	padding: 0.4em;
+	border-radius: 1em;
+	background: #ffc;
+	font-family: Times New Roman;
+	font-weight: bold;
+	font-size: 2.4em;
+	color: black;
+}
+.gym_index .menu il {
+	display: inline-block;
+	vertical-align: top;
+	top:0;
+	margin: .3em;
+	padding: .5em;
+	overflow: hidden;
+	border-radius: 2em;
+	cursor: pointer;
+	transition: 0.5s ease-out;
+}
+.gym_index .menu label {
+	color: black;
+	font-family: Times New Roman;
+	font-size: 1.5em;
+	font-weight: bold;
+	cursor: pointer;
 }
 
-/* Avertissement au posting */
-.section-posting #attach-panel-multi::after {
-	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
-	background: yellow;
+/* Style des pages include dans l'acceuil */
+#page {
+	margin: 0 8%;
+	padding: 0 1%;
+	background: white;
+}
+#page .content {
+	font-size: 1.4em;
+	text-align: justify;
+}
+#page p {
+	margin: 0;
+	background: white;
+}
+#page a {
+	cursor: pointer;
+	text-decoration: none;
+}
+@media (max-width: 600px) {
+	#page {
+		margin: 0;
+	}
+}
+
+/* Attachements (notamment liens) */
+.viewtopic-gym .inline-attachment,
+.viewtopic-gym .inline-attachment dl {
+	display: inline-block;
+	width: initial;
+}
+
+/* Images dans les posts */
+#page .inline-attachment,
+#page .viewtopic-gym {
+	text-align: center;
+}
+#page .file dl {
+	display: inline-block;
+	width: 60%;
+	margin: 0;
+}
+#page .file dd {
+	display: none;
+}
+#page .file img {
+	width: 100%;
+	border-radius: 1em;
+}
+@media (max-width: 600px) {
+	.attach-image {
+		display: none;
+	}
+}
+
+/* Images décalées */
+.image-gauche dl,
+.image-droite dl {
+	width: 100%;
+}
+.image-gauche img,
+.image-droite img {
+	max-width: 30vw;
+	max-height: 30vw;
+	width: auto;
+	height: auto;
+}
+.image-gauche .inline-attachment,
+.image-droite .inline-attachment {
+	float: left;
+	margin-right: 1em;
+}
+.image-droite .inline-attachment {
+	float: right;
+	margin-left: 1em;
 }
 
 /* BBcodes spéciaux */
@@ -164,7 +292,7 @@ pre {
 	border-bottom-color: #284f3d;
 	background-color:#b7f2d6;
 }
-@media screen and (max-width: 600px) {
+@media (max-width: 600px) {
 	#lundi,
 	#mardi,
 	#mercredi,
@@ -178,93 +306,6 @@ pre {
 	#horaires table {
 		width: 100%;
 	}
-}
-
-/* Style de la page d'accueil spéciale */
-html.gym_index  {
-	height: 100%;
-}
-.gym_index body {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	background-image: url("images/plafond.jpg"), url("images/ballons.jpg");
-	background-repeat: no-repeat, no-repeat;
-	background-position: top, center left;
-	background-size: 100%, 20%;
-	background-color: white;
-	font-size: 10px;
-	text-align: center;
-}
-.gym_index #logo img {
-	background: white;
-	float: left;
-	margin: 0.5em;
-	height: 8em;
-	border-radius: 1em;
-}
-.gym_index @media screen and (max-width: 480px) {
-	.gym_index body {
-		background-image: none;
-	}
-	.gym_index #logo {
-		display: none;
-	}
-}
-.gym_index .baniere {
-	display: inline-block;
-	margin: 0.2em;
-	padding: 0.4em;
-	border-radius: 1em;
-	background: #ffc;
-	font-family: Times New Roman;
-	font-weight: bold;
-	font-size: 2.4em;
-	color: black;
-}
-.gym_index .menu il {
-	display: inline-block;
-	vertical-align: top;
-	top:0;
-	margin: .3em;
-	padding: .5em;
-	overflow: hidden;
-	border-radius: 2em;
-	cursor: pointer;
-	transition: 0.5s ease-out;
-}
-.gym_index .menu label {
-	color: black;
-	font-family: Times New Roman;
-	font-size: 1.5em;
-	font-weight: bold;
-	cursor: pointer;
-}
-
-/* Style des pages include dans l'acceuil */
-#page {
-	margin: 0 8%;
-	padding: 0 1%;
-	background: white;
-}
-#page .content {
-	font-size: 1.4em;
-	text-align: justify;
-}
-#page p {
-	margin: 0;
-	background: white;
-}
-#page a {
-	cursor: pointer;
-	text-decoration: none;
-}
-
-/* Attachements (notamment liens) */
-.viewtopic-gym .inline-attachment,
-.viewtopic-gym .inline-attachment dl {
-	display: inline-block;
-	width: initial;
 }
 
 /* Crayons d'édition */
@@ -294,42 +335,16 @@ html.gym_index  {
 	margin: 0.3em;
 }
 
-/* Images dans les posts */
-#page .inline-attachment,
-#page .viewtopic-gym {
-	text-align: center;
-}
-#page .file dl {
-	display: inline-block;
-	width: 60%;
+/* VIEWTOPIC */
+.postbody p {
 	margin: 0;
 }
-#page .file dd {
-	display: none;
-}
-#page .file img {
-	width: 100%;
-	border-radius: 1em;
+#actualites li {
+	text-transform: capitalize;
 }
 
-/* Images décalées */
-.image-gauche dl,
-.image-droite dl {
-	width: 100%;
-}
-.image-gauche img,
-.image-droite img {
-	max-width: 30vw;
-	max-height: 30vw;
-	width: auto;
-	height: auto;
-}
-.image-gauche .inline-attachment,
-.image-droite .inline-attachment {
-	float: left;
-	margin-right: 1em;
-}
-.image-droite .inline-attachment {
-	float: right;
-	margin-left: 1em;
+/* Avertissement au posting */
+.section-posting #attach-panel-multi::after {
+	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
+	background: yellow;
 }

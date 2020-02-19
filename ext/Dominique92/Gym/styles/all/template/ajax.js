@@ -1,9 +1,22 @@
 /* jshint esversion: 6 */
+
+// DEBUG
+if (window.location.hash.substr(1, 1) == '0') {
+	window.addEventListener('error', function(evt) {
+		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
+	});
+	console.log = function(message) {
+		alert(message);
+	};
+}
+
 function refreshMenu(evt) {
 	const menu = evt.data,
 		titres = {},
-		pagePostId = window.location.hash.substr(1) ||
-		parseInt(Object.keys(menu[0])[0].slice(-3)); // Premier menu par défaut
+		pagePostId = parseInt(
+			window.location.hash.substr(1) ||
+			Object.keys(menu[0])[0].slice(-3) // Premier menu par défaut
+		);
 
 	// Find menu item
 	$.each(menu, function(menuPostId, items) {

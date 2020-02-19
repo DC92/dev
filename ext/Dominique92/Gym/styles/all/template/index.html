@@ -8,6 +8,15 @@
 
 	<link rel="icon" type="image/jpg" href="ext/Dominique92/Gym/styles/all/theme/images/icon.jpg" />
 	<title>Chavil'GYM</title>
+
+	<!-- INCLUDECSS {T_ASSETS_PATH}/css/font-awesome.min.css -->
+	<!-- INCLUDECSS icons.css -->
+	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
+	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
+	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
+	<!-- INCLUDEJS {T_JQUERY_LINK} -->
+	<!-- INCLUDEJS @Dominique92_Gym/ajax.js -->
+	{$STYLESHEETS}
 </head>
 
 <body>
@@ -51,16 +60,7 @@
 	<div id="sous-menu"></div>
 	<div id="page"></div>
 
-	<!-- INCLUDECSS {T_ASSETS_PATH}/css/font-awesome.min.css -->
-	<!-- INCLUDECSS icons.css -->
-	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
-	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
-	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
-	<!-- INCLUDEJS {T_JQUERY_LINK} -->
-	<!-- INCLUDEJS @Dominique92_Gym/ajax.js -->
-	{$STYLESHEETS}
 	{$SCRIPTS}
-
 	<script>
 		var menu = {
 			0: { // Main menu
@@ -78,10 +78,7 @@
 		};
 
 		$(window).on('load hashchange', null, menu, refreshMenu);
-
-<!-- IF S_USER_LOGGED_IN -->
-		const userLogged = true;
-<!-- ENDIF -->
+		const userLogged = <!-- IF S_USER_LOGGED_IN -->true<!-- ELSE -->false<!-- ENDIF -->;
 	</script>
 </body>
 </html>

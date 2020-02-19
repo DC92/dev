@@ -2,14 +2,16 @@
 <div class="viewtopic-gym">
 	<!-- BEGIN postrow -->
 		<!-- IF postrow.POST_ID == GET_P -->
-			<h2>{postrow.POST_SUBJECT}</h2>
-			<div class="content">
+			<h2>
+				{postrow.POST_SUBJECT}
 				<!-- IF postrow.U_EDIT -->
 					<a href="{postrow.U_EDIT}" title="Modifier le contenu de cette page"
-						class="button button-icon-only" style="float:right">
+						class="button button-icon-only">
 						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 					</a>
 				<!-- ENDIF -->
+			</h2>
+			<div class="content">
 				{postrow.MESSAGE}
 			</div>
 			<!-- BEGIN attachment -->

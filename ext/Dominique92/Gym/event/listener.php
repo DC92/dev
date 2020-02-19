@@ -6,6 +6,8 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//Images danseuse non proportionelle / revoir toutes images & cartes
+// Séances ne s'affichent pas (pas plus que les sous-menus)
 //TODO dans une séance : afficher la ligne horaire
 //TODO template + bbcode actualites
 //TODO actualités plus complètes / actualités simples
