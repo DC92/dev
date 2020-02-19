@@ -6,11 +6,10 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO n'afficher les crayons que pour un modérateur
 //TODO template + bbcode actualites
 //TODO actualités plus complètes / actualités simples
 //TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
-// Remplacer les boutons répondre, .. par ajouter un choix...
-//TODO autres styles spécifiques à nos pages
 //TODO?? BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
 
 // List template vars : phpbb/template/context.php line 135
@@ -51,13 +50,14 @@ class listener implements EventSubscriberInterface
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
 		\phpbb\user $user,
-		\phpbb\auth\auth $auth
+		\phpbb\auth\auth $auth,
+		\phpbb\language\language $language
 	) {
 		$this->db = $db;
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
-		$this->auth = $auth;
+		$this->language = $language;
 	}
 
 	// List of hooks and related functions
@@ -69,6 +69,7 @@ class listener implements EventSubscriberInterface
 
 		return [
 			// All
+			'core.user_setup_after' => 'user_setup_after',
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
@@ -89,11 +90,12 @@ class listener implements EventSubscriberInterface
 	/**
 		ALL
 	*/
-	function page_footer_after() {
-		// Includes language files for this extension
+	function user_setup_after() {
+		// Inclue les fichiers langages de cette extension
 		$ns = explode ('\\', __NAMESPACE__);
-		$this->user->add_lang_ext($ns[0].'/'.$ns[1], 'common');
-
+		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+	}
+	function page_footer_after() {
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
 		$get = $_GET;

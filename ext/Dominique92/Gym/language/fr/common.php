@@ -38,6 +38,17 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
+	// Login
+	'USERNAME' => 'Prénom',
+	
+	// Posting.php
+	'SUBJECT' => 'Nom',
+	'SUBMIT' => 'Enregistrer',
+	'EDIT_POST' => 'Modifier une fiche',
+	'POST_REPLY' => 'Créer une nouvelle fiche',
+	'DELETE_POST'=> 'Suppression',
+	'DELETE_POST_WARN'=> 'Supprimer cette fiche',
+
 	// Footer
 	'FINAL_INTEGRATION_BY' =>
 		'&copy; Dominique Cavailhez 2020 : <a href="https://github.com/Dominique92">Github</a> &amp; '.
