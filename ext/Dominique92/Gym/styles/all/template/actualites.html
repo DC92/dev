@@ -1,5 +1,12 @@
 <ul id="actualites">
-<!-- BEGIN actualites -->
-	<li><a onclick="window.location.hash={actualites.POST_ID}">{actualites.DATE}: {actualites.NOM}</a></li>
-<!-- END actualites -->
+	<!-- BEGIN actualites -->
+		<li><a onclick="window.location.hash={actualites.POST_ID}">{actualites.DATE}: {actualites.NOM}</a></li>
+	<!-- END actualites -->
 </ul>
+
+<!-- IF U_MCP -->
+	<a href="posting.php?mode=reply&f=2&t=7" title="Ajouter une actualité"
+		class="button button-icon-only">
+		<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+	</a>
+<!-- ENDIF -->

@@ -12,23 +12,23 @@ pre {
 		display: none !important;
 	}
 }
-#nav-main li:nth-of-type(1),
-#nav-main li:nth-of-type(2),
-#nav-main li:nth-of-type(3),
-#nav-main li:nth-of-type(5),
-.section-posting #poll-panel-tab,
-.section-posting #options-panel .fields1 > div,
-.section-posting #postingbox .fields1 > dl:nth-of-type(1),
-.section-posting #options-panel dl:nth-of-type(1) dd:nth-of-type(2),
-.section-posting #options-panel dl:nth-of-type(2),
-.section-posting #options-panel dl:nth-of-type(3),
-.section-posting #options-panel dl:nth-of-type(4),
+#nav-main > li:nth-of-type(1), /* Accès rapide */
+#nav-main > li:nth-of-type(2), /* FAQ */
+.section-posting #postingbox .fields1 > dl:nth-of-type(1), /* Icône de sujet */
+.section-posting #poll-panel-tab, /* Options */
+.section-posting #options-panel .fields1 > div, /* Options */
+.section-posting #options-panel dl label,
+.section-posting #options-panel #edit_reason,
+.section-posting #confirm .fields1, /* Détails confirmation destruction */
 .section-posting input[name=preview],
 .section-posting input[name=save],
 .section-posting #smiley-box strong,
 .section-posting #review,
 .section-posting #topicreview {
 	display: none !important;
+}
+.section-posting #options-panel dl dd label[for=delete_permanent] {
+	display: initial !important;
 }
 
 /* Style de la page d'accueil spéciale */
@@ -147,7 +147,7 @@ html.gym_index  {
 	}
 }
 
-/* BBcodes spéciaux */
+/* BBCodes spéciaux */
 .titre-gris {
 	color: #888;
 	font-size: 2em;

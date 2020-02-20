@@ -20,7 +20,7 @@
 </head>
 
 <body>
-	<div id="avertissement" style="background: yellow;font-weight:bold;color:red;font-size:20px">
+	<div id="avertissement" style="background:yellow;font-weight:bold;color:red;font-size:3vw">
 		CECI EST UN SITE DE TEST. Le VRAI site se trouve
 		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
 	</div>
@@ -78,7 +78,7 @@
 		};
 
 		$(window).on('load hashchange', null, menu, refreshMenu);
-		const userLogged = <!-- IF S_USER_LOGGED_IN -->true<!-- ELSE -->false<!-- ENDIF -->;
+		const moderateurLogged = <!-- IF U_MCP -->true<!-- ELSE -->false<!-- ENDIF -->;
 	</script>
 </body>
 </html>

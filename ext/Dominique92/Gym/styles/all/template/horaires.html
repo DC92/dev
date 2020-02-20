@@ -1,4 +1,11 @@
 <div id="horaires">
+<!-- IF U_MCP -->
+	<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
+		class="button button-icon-only" style="float:left">
+		<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+	</a>
+<!-- ENDIF -->
+
 <!-- BEGIN horaires -->
 	<div id="{horaires.JOUR}">
 		{horaires.JOUR}
@@ -9,7 +16,7 @@
 					<a onclick="window.location.hash={seance.POST_ID}">
 						{seance.NOM}
 					</a>
-					<!-- IF S_USER_LOGGED_IN -->
+					<!-- IF U_MCP -->
 						<a href="/posting.php?mode=edit&f=2&p={seance.POST_ID}"
 							title="Mofifier cette séance" class="button button-icon-only">
 							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>

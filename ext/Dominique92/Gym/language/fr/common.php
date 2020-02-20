@@ -46,8 +46,13 @@ $lang = array_merge($lang, array(
 	'SUBMIT' => 'Enregistrer',
 	'EDIT_POST' => 'Modifier une fiche',
 	'POST_REPLY' => 'Créer une nouvelle fiche',
-	'DELETE_POST'=> 'Suppression',
-	'DELETE_POST_WARN'=> 'Supprimer cette fiche',
+	'DELETE_POST_PERMANENTLY' => array(
+		1	=> 'Supprimer cette fiche',
+		2	=> 'Supprimer ces fiches',
+	),
+	'DELETE_MESSAGE_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
+	'DELETE_POST_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
+	'STICK_TOPIC_FOR_EXPLAIN' => '',
 
 	// Footer
 	'FINAL_INTEGRATION_BY' =>

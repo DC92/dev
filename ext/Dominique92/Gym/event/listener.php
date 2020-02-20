@@ -6,11 +6,12 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO n'afficher les crayons que pour un modérateur
-//TODO template + bbcode actualites
-//TODO actualités plus complètes / actualités simples
-//TODO BUG edit calendar quand décoche scolaire : la première coche est cochée : ne pas afficher semaine 0
-//TODO?? BUG ne crée pas automatiquement les colonnes de la base (code supprimé)
+//TODO template + BBCode ? premières occurences actualites ?
+//TODO liste occurences d'une actualité
+//TODO BBCode calendrier
+//TODO Routage viewtopic vers accueil si non moderateur
+//TODO Champ recherche en page d accueil
+//TODO enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -232,13 +233,13 @@ class listener implements EventSubscriberInterface
 				foreach (explode (',', $row['gym_semaines']) AS $semaine) {
 					$row['next_beg_time'] = mktime(
 						$gym_heure, $gym_minute,
-						0, -3, // 1er Septembre
+						0, -4, // 1er aout
 						2 + $row['gym_jour'] + $semaine * 7,
 						date('Y')
 					);
 					$row['next_end_time'] = mktime(
 						$gym_heure_fin, $gym_minute_fin,
-						0, -3,
+						0, -4, // 1er aout
 						2 + $row['gym_jour'] + $semaine * 7,
 						date('Y')
 					);
@@ -272,8 +273,8 @@ class listener implements EventSubscriberInterface
 			'heures' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
 			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
 			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
-			'semaines' => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
-				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43],
+			'semaines' => [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22, // A partir de 1er aout
+				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],
 			'duree' => [1,1.5,2,7.5],
 		];
 	}
@@ -362,7 +363,7 @@ class listener implements EventSubscriberInterface
 					'liste_'.$k, [
 						'NO' => $vk,
 						'VALEUR' => $vv,
-						'BASE' => in_array ($vk, $data["gym_$k"] ?: []),
+						'BASE' => in_array ($vk, $data["gym_$k"] ?: [], true),
 					]
 				);
 
@@ -444,8 +445,6 @@ class listener implements EventSubscriberInterface
 			if (isset ($attach))
 				$to_save[] = 'attachments = '.implode (', ', $attach);
 
-			//TODO protéger l'accès à ces fichiers
-			//TODO sav avec les balises !
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!$create_if_null || !file_exists($file_name))
 				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);

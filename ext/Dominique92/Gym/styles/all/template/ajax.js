@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 
 // DEBUG
-if (window.location.hash.substr(1, 1) == '0') {
+if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2) {
 	window.addEventListener('error', function(evt) {
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
@@ -13,10 +13,9 @@ if (window.location.hash.substr(1, 1) == '0') {
 function refreshMenu(evt) {
 	const menu = evt.data,
 		titres = {},
-		pagePostId = parseInt(
-			window.location.hash.substr(1) ||
-			Object.keys(menu[0])[0].slice(-3) // Premier menu par défaut
-		);
+		pagePostId =
+		parseInt(window.location.hash.substr(1)) ||
+		parseInt(Object.keys(menu[0])[0].slice(-3)); // Premier menu par défaut
 
 	// Find menu item
 	$.each(menu, function(menuPostId, items) {
@@ -31,7 +30,7 @@ function refreshMenu(evt) {
 
 	// Menu principal (permanent)
 	if (evt.type == 'load')
-		displayMenu($('#menu'), menu[0]);
+		displayMenu($('#menu'), menu[0], 'posting.php?mode=post&f=2');
 
 	// Clean variable areas	
 	$('#titre').html('');
@@ -41,7 +40,7 @@ function refreshMenu(evt) {
 	// Sous menu du menu
 	if (menu[pagePostId]) {
 		ajax('#titre', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
-		displayMenu($('#sous-menu'), menu[pagePostId], titres[pagePostId].topic);
+		displayMenu($('#sous-menu'), menu[pagePostId], 'posting.php?mode=reply&f=2&t=' + titres[pagePostId].topic);
 	}
 	// Page d'un menu
 	else if (titres[pagePostId]) {
@@ -59,7 +58,7 @@ function refreshMenu(evt) {
 		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
 }
 
-function displayMenu(elMenu, items, topic) {
+function displayMenu(elMenu, items, addUrl) {
 	const elUL = $('<ul>').attr('class', 'menu');
 	elMenu.append(elUL);
 
@@ -84,10 +83,10 @@ function displayMenu(elMenu, items, topic) {
 			}));
 	});
 	// Commande ajout
-	if (topic && userLogged)
+	if (moderateurLogged)
 		elUL.append($('<il>').html(
-			'<a title="Ajouter un élément" href="posting.php?mode=reply&f=2&t=' + topic +
-			'"><i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i></a>'));
+			'<a title="Ajouter un item au menu" href="' + addUrl + '">' +
+			'<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i></a>'));
 }
 
 // Load url data on an element
@@ -95,15 +94,15 @@ function ajax(el, url) {
 	$.get(url, function(data) {
 		$(el).html(data);
 
-		// Expansion des bbcodes complexes
-		$('.include').each(function(index, elBBcode) {
-			if (elBBcode.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
-				const url = elBBcode.innerText;
-				elBBcode.innerHTML = ''; // Erase the BBcode DIV to don't loop
+		// Expansion des BBCodes complexes
+		$('.include').each(function(index, elBBCode) {
+			if (elBBCode.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
+				const url = elBBCode.innerText;
+				elBBCode.innerHTML = ''; // Erase the BBCode DIV to don't loop
 				if (url.charAt(0) == ':')
 					window.location.href = url.substr(1);
 				else
-					ajax(elBBcode, url);
+					ajax(elBBCode, url);
 			}
 		});
 
@@ -145,7 +144,7 @@ function ajax(el, url) {
 	});
 }
 
-/* Posting.php */
+// Posting.php
 function displayCalendar() {
 	const elDay = document.getElementById('gym_jour'),
 		elo = document.getElementById('gym_scolaire'),
@@ -153,26 +152,27 @@ function displayCalendar() {
 
 	if (elDay && elo && els) {
 		let lastMonth = 0;
-		for (let week = 0; week < 44; week++) {
+		for (let week = 0; week < 52; week++) { // Numéro depuis le 1er aout
 			const elb = document.getElementById('gym_br_' + week),
 				elm = document.getElementById('gym_mois_' + week),
 				eld = document.getElementById('gym_date_' + week),
-				date = new Date(new Date().getFullYear(), -4); // Sept 1st
-			date.setDate(date.getDate() + parseInt(elDay.value, 10) + 1 - date.getDay() + week * 7); // Day of the week
-			eld.innerHTML = date.getDate();
+				date = new Date(new Date().getFullYear(), -4); // 1er aout
+			if (elb && elm && eld) {
+				date.setDate(date.getDate() + parseInt(elDay.value, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
+				eld.innerHTML = date.getDate();
 
-			if (lastMonth != date.getMonth()) { // Début de mois
-				elb.style.display = '';
-				elm.innerHTML = date.toLocaleString('fr-FR', {
-					month: 'long'
-				}) + ': ';
-			} else { // Suite de mois
-				elb.style.display = 'none';
-				elm.innerHTML = '';
+				if (lastMonth != date.getMonth()) { // Début de mois
+					elb.style.display = '';
+					elm.innerHTML = date.toLocaleString('fr-FR', {
+						month: 'long'
+					}) + ': ';
+				} else { // Suite de mois
+					elb.style.display = 'none';
+					elm.innerHTML = '';
+				}
 			}
 			// Hide week calendar if "scolaire"
 			els.style.display = elo.checked ? 'none' : '';
-
 			lastMonth = date.getMonth();
 		}
 	}
