@@ -94,7 +94,7 @@ function ajax(el, url) {
 	$.get(url, function(data) {
 		$(el).html(data);
 
-		// Expansion des BBCodes complexes
+		// BBCodes d'inclusion d'un bloc ajax ou de saut vers une url
 		$('.include').each(function(index, elBBCode) {
 			if (elBBCode.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
 				const url = elBBCode.innerText;
@@ -106,6 +106,7 @@ function ajax(el, url) {
 			}
 		});
 
+		// BBCodes ajout d'une carte
 		$('.carte').each(function(index, elCarte) {
 			if (elCarte.innerText) {
 				const ll = ol.proj.transform(eval('[' + elCarte.textContent + ']'), 'EPSG:4326', 'EPSG:3857');

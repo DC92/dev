@@ -9,7 +9,10 @@
 //TODO template + BBCode ? premières occurences actualites ?
 //TODO liste occurences d'une actualité
 //TODO BBCode calendrier
+//TODO Mode d'emploi / FAQ pour moderateurs
 //TODO Routage viewtopic vers accueil si non moderateur
+//TODO style pas blanc de fond pour les horaires ??
+//TODO libellé de nom dans page "contactez nous"
 //TODO Champ recherche en page d accueil
 //TODO enlever le .robot et faire un SEO
 
@@ -27,7 +30,6 @@ MESSAGES / BBCodes / cocher afficher
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
-	[horaire][/horaire] / <div class="include">?template=horaires&id=POST_ID</div> / Affiche un horaire
 	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
 	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div> / Applique un style
@@ -77,6 +79,7 @@ class listener implements EventSubscriberInterface
 			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
+			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
@@ -189,8 +192,8 @@ class listener implements EventSubscriberInterface
 				case 'animateur';
 					$cond[] = substr($k,0,2).'.post_subject="'.urldecode($v).'"';
 					break;
-				case 'id';
-					$cond[] = 'post.post_id="'.urldecode($v).'"';
+				case 'sujet';
+					$cond[] = 'post.post_subject="'.urldecode($v).'"';
 			}
 
 		$sql = "SELECT post.post_id, post.post_subject AS nom,
@@ -310,10 +313,28 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
+	// Ajoute les BBCodes du premier post à tous les autres
+	function viewtopic_modify_post_data($vars) {
+		$rowset = $vars['rowset'];
+		$first_post_id = $vars['topic_data']['topic_first_post_id'];
+
+		// Need to take the first from the base if there are more tnan 10 posts in the topic
+		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_id = '.$first_post_id;
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+		preg_match_all ('/<HORAIRES.+\/HORAIRES>/', $row['post_text'], $bbcodes);
+
+		foreach ($rowset AS $k=>$v)
+			if ($bbcodes && $first_post_id != $v['post_id'])
+				$rowset[$k]['post_text'] = '<r>'.str_replace(['<r>','</r>'],'',$v['post_text']).implode ('', $bbcodes[0]).'</r>';
+
+		$vars['rowset'] = $rowset;
+	}
+
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 		$post_id = $post_row['POST_ID'];
-
 
 		// Remplace dans le texte du message {VARIABLE_POST_TEMPLATE} par sa valeur
 		//TODO traiter /g pour plusieurs remplacements

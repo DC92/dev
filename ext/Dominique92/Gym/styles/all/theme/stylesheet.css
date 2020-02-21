@@ -170,8 +170,9 @@ html.gym_index  {
 
 /* HORAIRES */
 #horaires {
-	font-family: Times New Roman;
+	margin: 1em 0;
 	text-align: left;
+	font-family: Times New Roman;
 	clear: both;
 }
 #horaires > div:first-line {
