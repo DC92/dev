@@ -6,9 +6,8 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//ordonner les actualités
 //TODO BUG saisie semaines
-//TODO template + BBCode ? premières occurences actualites ?
-//TODO liste occurences d'une actualité
 //TODO BBCode calendrier
 //TODO Mode d'emploi / FAQ pour moderateurs
 //TODO Routage viewtopic vers accueil si non moderateur
@@ -36,6 +35,7 @@ MESSAGES / BBCodes / cocher afficher
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
+	[resume]{TEXT}[/resume] / {TEXT} / Résumé pour la page d'actualité
 	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div> / Applique un style
 	[titre-gris]{TEXT}[/titre-gris] / <div class="titre-gris">{TEXT}</div> / Applique un style
 */
@@ -200,7 +200,7 @@ class listener implements EventSubscriberInterface
 					$cond[] = 'post.post_subject="'.urldecode($v).'"';
 			}
 
-		$sql = "SELECT post.post_id, post.post_subject AS nom,
+		$sql = "SELECT post.post_id, post.post_subject AS nom, post.post_text,
 			ac.post_subject AS activite,
 			li.post_subject AS lieu,
 			an.post_subject AS animateur,
@@ -252,7 +252,7 @@ class listener implements EventSubscriberInterface
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($row['next_end_time'] > time() && !$row['date'])
-						$row['date'] = str_replace ('  ', ' ', utf8_encode (strftime ('%A %e %B', $row['next_end_time'])));
+						$row['date'] = ucfirst (str_replace ('  ', ' ', utf8_encode (strftime ('%A %e %B', $row['next_end_time']))));
 				}
 			}
 
@@ -317,21 +317,28 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	// Ajoute les BBCodes du premier post à tous les autres
 	function viewtopic_modify_post_data($vars) {
 		$rowset = $vars['rowset'];
 		$first_post_id = $vars['topic_data']['topic_first_post_id'];
 
-		// Need to take the first from the base if there are more tnan 10 posts in the topic
+		// Need to take the first post from the base if there are more tnan 10 posts in the topic
 		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_id = '.$first_post_id;
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 		preg_match_all ('/<HORAIRES.+\/HORAIRES>/', $row['post_text'], $bbcodes);
 
-		foreach ($rowset AS $k=>$v)
+		foreach ($rowset AS $k=>$v) {
+			// Ajoute les BBCodes du premier post à tous les autres
 			if ($bbcodes && $first_post_id != $v['post_id'])
 				$rowset[$k]['post_text'] = '<r>'.str_replace(['<r>','</r>'],'',$v['post_text']).implode ('', $bbcodes[0]).'</r>';
+
+			// Prépare un résumé pour les actualités
+			preg_match ('/\[resume\]<\/s>(.+)<e>\[\/resume\]/', $v['post_text'], $bbcode_resume);
+			$rowset[$k]['resume'] = count ($bbcode_resume)
+				? $bbcode_resume[1]
+				: $v['post_text'];
+		}
 
 		$vars['rowset'] = $rowset;
 	}
@@ -343,6 +350,7 @@ class listener implements EventSubscriberInterface
 		// Remplace dans le texte du message {VARIABLE_POST_TEMPLATE} par sa valeur
 		//TODO traiter /g pour plusieurs remplacements
 		$this->post_row = $post_row;
+		$post_row['RESUME'] = $vars['row']['resume'];
 		$post_row['MESSAGE'] = preg_replace_callback(
 			'/([A-Z_]+)/',
 			function ($matches) {

@@ -96,21 +96,21 @@ function ajax(el, url) {
 
 		// BBCodes d'inclusion d'un bloc ajax ou de saut vers une url
 		$('.include').each(function(index, elBBCode) {
-			if (elBBCode.innerHTML.indexOf('<') == -1) { // Don't loop when receiving the request !
-				const url = elBBCode.innerText;
-				elBBCode.innerHTML = ''; // Erase the BBCode DIV to don't loop
-				if (url.charAt(0) == ':')
-					window.location.href = url.substr(1);
-				else
-					ajax(elBBCode, url);
-			}
+			$(elBBCode).removeClass('include'); // Don't loop
+
+			const url = elBBCode.innerText;
+			elBBCode.innerHTML = '';
+			if (url.charAt(0) == ':')
+				window.location.href = url.substr(1);
+			else
+				ajax(elBBCode, url);
 		});
 
 		// BBCodes ajout d'une carte
 		$('.carte').each(function(index, elCarte) {
 			if (elCarte.innerText) {
 				const ll = ol.proj.transform(eval('[' + elCarte.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
-				elCarte.innerHTML = null; // Erase the DIV to init the map only once
+				elCarte.innerHTML = null; // Don't loop
 
 				new ol.Map({
 					layers: [

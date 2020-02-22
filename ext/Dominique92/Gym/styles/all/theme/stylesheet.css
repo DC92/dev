@@ -44,7 +44,6 @@ html.gym_index  {
 	background-position: top, center left;
 	background-size: 100%, 20%;
 	background-color: white;
-	font-size: 10px;
 	text-align: center;
 }
 .gym_index #logo img {
@@ -70,7 +69,7 @@ html.gym_index  {
 	background: #ffc;
 	font-family: Times New Roman;
 	font-weight: bold;
-	font-size: 2.4em;
+	font-size: 1.5em;
 	color: black;
 }
 .gym_index .menu il {
@@ -87,25 +86,17 @@ html.gym_index  {
 .gym_index .menu label {
 	color: black;
 	font-family: Times New Roman;
-	font-size: 1.5em;
 	font-weight: bold;
 	cursor: pointer;
 }
 
 /* Style des pages include dans l'acceuil */
-#titre {
-	font-size: 1.4em;
-}
-#titre h2 {
-	font-size: 1.1em;
-}
 #page {
 	margin: 0 8%;
 	padding: 0 1%;
 	background: white;
 }
 #page .content {
-	font-size: 1.4em;
 	text-align: justify;
 }
 #page p {
@@ -127,6 +118,7 @@ html.gym_index  {
 #page .inline-attachment dl {
 	display: inline-block;
 	width: initial;
+	max-width: 30vh;
 }
 
 /* Images incluses dans le texte */
@@ -137,6 +129,7 @@ html.gym_index  {
 	display: none;
 }
 #page .file img {
+	max-width: 30vh;
 	border-radius: 1em;
 }
 .image-gauche .inline-attachment {
@@ -156,8 +149,9 @@ html.gym_index  {
 /* BBCodes spéciaux */
 .titre-gris {
 	color: #888;
-	font-size: 2em;
+	font-size: 1.5em;
 	font-weight: 700;
+	margin-bottom:0.3em;
 }
 .bandeau-vert {
 	text-align: center;
@@ -183,7 +177,6 @@ html.gym_index  {
 }
 #horaires > div:first-line {
 	text-indent: 3em;
-	font-size: 1.2em;
 	text-transform: capitalize;
 }
 #horaires table {
@@ -198,7 +191,6 @@ html.gym_index  {
 }
 #horaires a {
 	color: inherit;
-	font-size: 14px;
 	font-weight: bold;
 	cursor: pointer;
 }
@@ -302,7 +294,6 @@ html.gym_index  {
 #edit-page {
 	float: right;
 	text-align: right;
-	font-size: 1.3em;
 }
 #edit-user .dropdown-contents {
 	display: none;
@@ -325,8 +316,16 @@ html.gym_index  {
 .postbody p {
 	margin: 0;
 }
-#actualites li {
-	text-transform: capitalize;
+#actualites h2 {
+	margin: 0;
+	padding: 0 0.5em;
+	background-color: #329932;
+	font-size: 1.2em;
+	color: white;
+}
+#actualites .viewtopic-gym h2,
+#actualites .viewtopic-gym div {
+	margin-bottom: 0.5em;
 }
 
 /* Avertissement au posting */
