@@ -6,18 +6,18 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//ordonner les actualités
-//TODO BUG saisie semaines
 //TODO BBCode calendrier
+//TODO BUG BBCode ne parche pas dans actualités / résumé
 //TODO Mode d'emploi / FAQ pour moderateurs
 //TODO Routage viewtopic vers accueil si non moderateur
 //TODO style pas blanc de fond pour les horaires ??
 //TODO "contactez nous" en page d'accueil (pied de page ?)
 //TODO Champ recherche en page d accueil
 //TODO Inclusion page d'accueil dans le html chargé (pour référencement)
-//TODO enlever le .robot et faire un SEO
-//TODO faire un module spécifique pour toutes les fonctions phpBB
+//TODO clarifier supprimer définitivement (style)
 //TODO posting valeurs semaines masquer en PHP, démasquer en JS
+//TODO faire un module spécifique pour toutes les fonctions phpBB
+//TODO enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -162,7 +162,7 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-		// Add actualites to template data
+		//TODO Add actualites to template data
 		$seances = $this->get_seances([
 			'actualites' => 'on',
 		]);
@@ -237,22 +237,26 @@ class listener implements EventSubscriberInterface
 			// Date
 			if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
 				setlocale(LC_ALL, 'fr_FR');
+				$row['next_end_time'] = INF;
 				foreach (explode (',', $row['gym_semaines']) AS $semaine) {
-					$row['next_beg_time'] = mktime(
+					$beg_time = mktime(
 						$gym_heure, $gym_minute,
 						0, -4, // 1er aout
 						2 + $row['gym_jour'] + $semaine * 7,
 						date('Y')
 					);
-					$row['next_end_time'] = mktime(
+					$end_time = mktime(
 						$gym_heure_fin, $gym_minute_fin,
 						0, -4, // 1er aout
 						2 + $row['gym_jour'] + $semaine * 7,
 						date('Y')
 					);
 					// Garde le premier évènement qui finit après la date courante
-					if ($row['next_end_time'] > time() && !$row['date'])
+					if ($end_time > time() && $end_time < $row['next_end_time']) {
+						$row['next_beg_time'] = $beg_time;
+						$row['next_end_time'] = $end_time;
 						$row['date'] = ucfirst (str_replace ('  ', ' ', utf8_encode (strftime ('%A %e %B', $row['next_end_time']))));
+					}
 				}
 			}
 
