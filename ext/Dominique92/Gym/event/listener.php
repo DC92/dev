@@ -70,13 +70,8 @@ class listener implements EventSubscriberInterface
 	// List of hooks and related functions
 	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
-		// For debug, Varnish will not be caching pages where you are setting a cookie
-		if (defined('TRACES_DOM'))
-			setcookie('disable-varnish', microtime(true), time()+600, '/');
-
 		return [
 			// All
-			'core.user_setup_after' => 'user_setup_after',
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
@@ -88,7 +83,6 @@ class listener implements EventSubscriberInterface
 
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 			'core.posting_modify_submit_post_after' => 'posting_modify_submit_post_after',
@@ -98,11 +92,6 @@ class listener implements EventSubscriberInterface
 	/**
 		ALL
 	*/
-	function user_setup_after() {
-		// Inclue les fichiers langages de cette extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
-	}
 	function page_footer_after() {
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
@@ -162,7 +151,6 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-		//TODO Add actualites to template data
 		$seances = $this->get_seances([
 			'actualites' => 'on',
 		]);
@@ -381,10 +369,6 @@ class listener implements EventSubscriberInterface
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 
-		// To prevent an empty title to invalidate the full page and input.
-		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
-
 		// Set specific variables
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3) && $v) {
@@ -403,20 +387,6 @@ class listener implements EventSubscriberInterface
 						'BASE' => in_array (strval ($v[$vk]), $data["gym_$k"] ?: [], true),
 					]
 				);
-
-		// Create a log file with the existing data if there is none
-		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
-	}
-
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		// Allows entering a POST with empty text
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
-
-		$vars['error'] = $error;
 	}
 
 	// Call when validating the data to be saved

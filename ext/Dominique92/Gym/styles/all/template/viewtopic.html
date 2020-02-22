@@ -2,17 +2,23 @@
 <div class="viewtopic-gym">
 	<!-- BEGIN postrow -->
 		<!-- IF postrow.POST_ID == GET_P -->
-			<h2>
-				{postrow.POST_SUBJECT}
-				<!-- IF postrow.U_EDIT -->
-					<a href="{postrow.U_EDIT}" title="Modifier le contenu de cette page"
-						class="button button-icon-only">
-						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-					</a>
-				<!-- ENDIF -->
-			</h2>
+			<!-- IF GET_TITRE != 'off' -->
+				<h2>
+					{postrow.POST_SUBJECT}
+					<!-- IF postrow.U_EDIT -->
+						<a href="{postrow.U_EDIT}" title="Modifier le contenu de cette page"
+							class="button button-icon-only">
+							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+						</a>
+					<!-- ENDIF -->
+				</h2>
+			<!-- ENDIF -->
 			<div class="content">
-				{postrow.MESSAGE}
+				<!-- IF GET_RESUME == 'on' -->
+					{postrow.RESUME}
+				<!-- ELSE -->
+					{postrow.MESSAGE}
+				<!-- ENDIF -->
 			</div>
 			<!-- BEGIN attachment -->
 				{postrow.attachment.DISPLAY_ATTACHMENT}

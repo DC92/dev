@@ -327,9 +327,3 @@ html.gym_index  {
 #actualites .viewtopic-gym div {
 	margin-bottom: 0.5em;
 }
-
-/* Avertissement au posting */
-.section-posting #attach-panel-multi::after {
-	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
-	background: yellow;
-}
