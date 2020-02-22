@@ -6,15 +6,19 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO BUG saisie semaines
 //TODO template + BBCode ? premières occurences actualites ?
 //TODO liste occurences d'une actualité
 //TODO BBCode calendrier
 //TODO Mode d'emploi / FAQ pour moderateurs
 //TODO Routage viewtopic vers accueil si non moderateur
 //TODO style pas blanc de fond pour les horaires ??
-//TODO libellé de nom dans page "contactez nous"
+//TODO "contactez nous" en page d'accueil (pied de page ?)
 //TODO Champ recherche en page d accueil
+//TODO Inclusion page d'accueil dans le html chargé (pour référencement)
 //TODO enlever le .robot et faire un SEO
+//TODO faire un module spécifique pour toutes les fonctions phpBB
+//TODO posting valeurs semaines masquer en PHP, démasquer en JS
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -384,7 +388,7 @@ class listener implements EventSubscriberInterface
 					'liste_'.$k, [
 						'NO' => $vk,
 						'VALEUR' => $vv,
-						'BASE' => in_array ($vk, $data["gym_$k"] ?: [], true),
+						'BASE' => in_array (strval ($v[$vk]), $data["gym_$k"] ?: [], true),
 					]
 				);
 

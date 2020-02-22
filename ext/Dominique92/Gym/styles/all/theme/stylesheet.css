@@ -93,6 +93,12 @@ html.gym_index  {
 }
 
 /* Style des pages include dans l'acceuil */
+#titre {
+	font-size: 1.4em;
+}
+#titre h2 {
+	font-size: 1.1em;
+}
 #page {
 	margin: 0 8%;
 	padding: 0 1%;
