@@ -47,6 +47,7 @@ class listener implements EventSubscriberInterface
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
+			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 		];
 	}
 
@@ -83,5 +84,41 @@ class listener implements EventSubscriberInterface
 				unset ($error[$k]);
 
 		$vars['error'] = $error;
+	}
+
+	// Called after the post validation
+	function modify_submit_notification_data($vars) {
+		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
+	}
+	function save_post_data($post_data, $attachment_data, $gym_data, $create_if_null = false) {
+		if (isset ($post_data['post_id'])) {
+			$this->request->enable_super_globals();
+			$to_save = [
+				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
+				$_SERVER['REQUEST_URI'],
+				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
+				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
+				'post_subject = '.$gym_data['post_subject'],
+				'post_text = '.$post_data['post_text'].$post_data['message'],
+//				'geojson = '.@$geo_data['geojson'],
+			];
+			foreach ($gym_data AS $k=>$v)
+				if ($v && !strncmp ($k, 'gym_', 4))
+					$to_save [] = "$k = $v";
+
+			// Save attachment_data
+			$attach = [];
+			if ($attachment_data)
+				foreach ($attachment_data AS $att)
+					$attach[] = $att['attach_id'].' : '.$att['real_filename'];
+			if (isset ($attach))
+				$to_save[] = 'attachments = '.implode (', ', $attach);
+
+			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+			if (!$create_if_null || !file_exists($file_name))
+				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
+
+			$this->request->disable_super_globals();
+		}
 	}
 }

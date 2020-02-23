@@ -286,6 +286,37 @@ html.gym_index  {
 	}
 }
 
+/* Calendrier */
+#calendrier {
+	width: calc(100%-2px);
+	border: 2px solid grey;
+}
+#calendrier table {
+	width: 100%;
+	border-collapse: collapse;
+}
+#calendrier * {
+	border-spacing: 0;
+}
+#calendrier td {
+	color: #999;
+}
+#calendrier td.selected {
+	background: #cfc;
+	color: black;
+	font-weight: bold;
+}
+#calendrier td {
+	border: 1px solid grey;
+	text-align: center;
+	width: 8%;
+	margin: 0;
+	padding: 0;
+}
+#calendrier td:first-child {
+	color: black;
+}
+
 /* Crayons d'édition */
 #edit-page {
 	float: right;

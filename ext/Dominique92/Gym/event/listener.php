@@ -6,8 +6,8 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO BBCode calendrier
-//TODO BUG BBCode ne parche pas dans actualités / résumé
+//BUG calendrier si plusieurs noms identique prend le permier
+//TODO BUG BBCode ne marche pas dans actualités / résumé
 //TODO Mode d'emploi / FAQ pour moderateurs
 //TODO Routage viewtopic vers accueil si non moderateur
 //TODO style pas blanc de fond pour les horaires ??
@@ -16,6 +16,7 @@
 //TODO Inclusion page d'accueil dans le html chargé (pour référencement)
 //TODO clarifier supprimer définitivement (style)
 //TODO APRES enlever le .robot et faire un SEO
+//TODO calendrier ne marche pas sous IE11
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -83,7 +84,6 @@ class listener implements EventSubscriberInterface
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
-			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 			'core.posting_modify_submit_post_after' => 'posting_modify_submit_post_after',
 		];
 	}
@@ -151,9 +151,8 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Add calendrier to template data
-if(0)/////////////////////
 		foreach ($seances AS $row)
-			if ($row['nom'] == $row['nom'])
+			if ($row['nom'] == $get['sujet'])
 				$this->set_specific_vars ($row);
 
 		// Add actualites to template data
@@ -217,7 +216,7 @@ if(0)/////////////////////
 				$row['seance'] .= ' - intensité '.$row['intensite'];
 			}
 			// Jour dans la semaine
-			$row['jour'] = $static_values['jours'][$row['gym_jour']];
+			$row['gym_jour_literal'] = $row['jour'] = $static_values['jours'][$row['gym_jour']];
 			// Temps début
 			$row['gym_heure'] = intval ($row['gym_heure']);
 			$row['gym_minute'] = intval ($row['gym_minute']);
@@ -429,42 +428,6 @@ if(0)/////////////////////
 		$vars['sql_data'] = $sql_data; // return data
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
 //		$this->modifs['geojson'] = str_replace (['ST_GeomFromGeoJSON(\'','\')'], '', $this->modifs['geom']);
-	}
-
-	// Called after the post validation
-	function modify_submit_notification_data($vars) {
-		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
-	}
-	function save_post_data($post_data, $attachment_data, $gym_data, $create_if_null = false) {
-		if (isset ($post_data['post_id'])) {
-			$this->request->enable_super_globals();
-			$to_save = [
-				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
-				$_SERVER['REQUEST_URI'],
-				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
-				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
-				'post_subject = '.$gym_data['post_subject'],
-				'post_text = '.$post_data['post_text'].$post_data['message'],
-//				'geojson = '.@$geo_data['geojson'],
-			];
-			foreach ($gym_data AS $k=>$v)
-				if ($v && !strncmp ($k, 'gym_', 4))
-					$to_save [] = "$k = $v";
-
-			// Save attachment_data
-			$attach = [];
-			if ($attachment_data)
-				foreach ($attachment_data AS $att)
-					$attach[] = $att['attach_id'].' : '.$att['real_filename'];
-			if (isset ($attach))
-				$to_save[] = 'attachments = '.implode (', ', $attach);
-
-			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-			if (!$create_if_null || !file_exists($file_name))
-				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
-
-			$this->request->disable_super_globals();
-		}
 	}
 
 	// Return to index if end of config
