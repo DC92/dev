@@ -146,35 +146,18 @@ function ajax(el, url) {
 }
 
 // Posting.php
-function displayCalendar() {
-	const elDay = document.getElementById('gym_jour'),
-		elo = document.getElementById('gym_scolaire'),
-		els = document.getElementById('liste_semaines');
-
-	if (elDay && elo && els) {
-		let lastMonth = 0;
-		for (let week = 0; week < 52; week++) { // Numéro depuis le 1er aout
-			const elb = document.getElementById('gym_br_' + week),
-				elm = document.getElementById('gym_mois_' + week),
-				eld = document.getElementById('gym_date_' + week),
-				date = new Date(new Date().getFullYear(), -4); // 1er aout
-			if (elb && elm && eld) {
-				date.setDate(date.getDate() + parseInt(elDay.value, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
-				eld.innerHTML = date.getDate();
-
-				if (lastMonth != date.getMonth()) { // Début de mois
-					elb.style.display = '';
-					elm.innerHTML = date.toLocaleString('fr-FR', {
-						month: 'long'
-					}) + ': ';
-				} else { // Suite de mois
-					elb.style.display = 'none';
-					elm.innerHTML = '';
-				}
-			}
-			// Hide week calendar if "scolaire"
-			els.style.display = elo.checked ? 'none' : '';
-			lastMonth = date.getMonth();
-		}
+function displayCalendar(elDayValue) {
+	let lastMonth = 0;
+	for (let week = 0; week < 52; week++) { // Numéro depuis le 1er aout
+		const date = new Date(new Date().getFullYear(), -4); // 1er aout
+		date.setDate(date.getDate() + parseInt(elDayValue, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
+		$('#calendrier_semaine_' + week).text(date.getDate());
+		$('#calendrier_semaine_td_' + week).appendTo('#calendrier_mois_' + date.getMonth());
 	}
+}
+
+function displayInputCalendar() {
+	if ($('#gym_scolaire').attr('checked') != 'checked')
+		$('#liste_semaines')[0].style.display = 'block';;
+	displayCalendar($('#gym_jour').val());
 }

@@ -14,7 +14,7 @@
 </select> &nbsp;
 
 Intensité
-<select name="gym_intensite" onchange="displayCalendar()">
+<select name="gym_intensite"">
 	<!-- BEGIN liste_intensites -->
 		<option value="{liste_intensites.NO}"
 			<!-- IF liste_intensites.NO == GYM_INTENSITE -->
@@ -71,7 +71,7 @@ ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_
 	<!-- END liste_animateurs -->
 </select><br/><br/>
 
-<select name="gym_jour" id="gym_jour" onchange="displayCalendar()">
+<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar()">
 	<!-- BEGIN liste_jours -->
 		<option value="{liste_jours.NO}"
 			<!-- IF liste_jours.NO == GYM_JOUR -->
@@ -113,30 +113,42 @@ value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF --
 <br/><br/>
 
 Période : scolaire
-<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayCalendar()"
+<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayInputCalendar()"
 <!-- IF GYM_SCOLAIRE != 'off'-->
 	checked="checked"
 <!-- ENDIF -->
 /><br/>
 
-<div id="liste_semaines">
-<!-- BEGIN liste_semaines -->
-	<br id="gym_br_{liste_semaines.NO}" />
-	<span id="gym_mois_{liste_semaines.NO}"></span>&nbsp; &nbsp;
-	<span id="gym_date_{liste_semaines.NO}"></span>
-	<input type="checkbox" value="{liste_semaines.VALEUR}"
-		name="gym_semaines[]" id="gym_semaine_{liste_semaines.NO}"
-	<!-- IF liste_semaines.BASE != '' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/>
-<!-- END liste_semaines -->
-</div>
+<table id="liste_semaines" style="display:none">
+	<tr id="calendrier_mois_8"><td>Septembre</td></tr>
+	<tr id="calendrier_mois_9"><td>Octobre</td></tr>
+	<tr id="calendrier_mois_10"><td>Novembre</td></tr>
+	<tr id="calendrier_mois_11"><td>Décembre</td></tr>
+	<tr id="calendrier_mois_0"><td>Janvier</td></tr>
+	<tr id="calendrier_mois_1"><td>Février</td></tr>
+	<tr id="calendrier_mois_2"><td>Mars</td></tr>
+	<tr id="calendrier_mois_3"><td>Avril</td></tr>
+	<tr id="calendrier_mois_4"><td>Mai</td></tr>
+	<tr id="calendrier_mois_5"><td>Juin</td></tr>
+	<tr style="display:none">
+		<!-- BEGIN liste_semaines -->
+			<td id="calendrier_semaine_td_{liste_semaines.NO}">
+				<span id="calendrier_semaine_{liste_semaines.NO}"></span>
+				<input type="checkbox" value="{liste_semaines.VALEUR}"
+					name="gym_semaines[]"
+				<!-- IF liste_semaines.BASE != '' -->
+					checked="checked"
+				<!-- ENDIF -->
+				/>
+			<td>
+		<!-- END liste_semaines -->
+	</tr>
+</table>
 
-<!-- ENDIF -->
+<!-- ENDIF --><!-- !FORUM_ID = 2 -->
 
 <script>
 	window.addEventListener('load', function(){
-		displayCalendar();
+		displayInputCalendar();
 	}, false);
 </script>

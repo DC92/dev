@@ -327,3 +327,14 @@ html.gym_index  {
 #actualites .viewtopic-gym div {
 	margin-bottom: 0.5em;
 }
+
+/* POSTING */
+#liste_semaines td {
+	min-width: 4em;
+	wborder: 0.2px solid grey;
+	text-align: right;
+}
+#liste_semaines td:first-child {
+	wpadding-right: 0.3em;
+	text-align: left;
+}

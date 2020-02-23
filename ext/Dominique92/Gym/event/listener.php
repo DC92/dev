@@ -15,9 +15,7 @@
 //TODO Champ recherche en page d accueil
 //TODO Inclusion page d'accueil dans le html chargé (pour référencement)
 //TODO clarifier supprimer définitivement (style)
-//TODO posting valeurs semaines masquer en PHP, démasquer en JS
-//TODO faire un module spécifique pour toutes les fonctions phpBB
-//TODO enlever le .robot et faire un SEO
+//TODO APRES enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -30,6 +28,7 @@ MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div> / Applique un style
+	[calendrier]{TEXT}[/calendrier] / <div class="include">?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
@@ -132,7 +131,7 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Add horaires to template data
-		$get['horaires'] = 'on';
+		$get['horaires'] = 'on'; // Use arguments _GET &sujet=XXX
 		$seances = $this->get_seances($get);
 
 		foreach ($seances AS $row)
@@ -151,6 +150,13 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
+		// Add calendrier to template data
+if(0)/////////////////////
+		foreach ($seances AS $row)
+			if ($row['nom'] == $row['nom'])
+				$this->set_specific_vars ($row);
+
+		// Add actualites to template data
 		$seances = $this->get_seances([
 			'actualites' => 'on',
 		]);
@@ -367,8 +373,9 @@ class listener implements EventSubscriberInterface
 	*/
 	// Called when display post page
 	function posting_modify_template_vars($vars) {
-		$post_data = $vars['post_data'];
-
+		$this->set_specific_vars ($vars['post_data']);
+	}
+	function set_specific_vars($post_data) {
 		// Set specific variables
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3) && $v) {

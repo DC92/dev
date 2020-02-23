@@ -1,0 +1,57 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+AAA{liste_semaines.NO}===
+{liste_semaines.BASE}ZZZ
+<br/>
+
+<style>
+#table {
+	display: table;
+}
+.break {
+	display: none;
+}
+.jour {
+	display: table-cell;
+	border: 1px solid black;
+}
+.break_6,
+.break_12 {
+	display: table-row;
+}
+/*
+.break,
+.mois {
+}
+.sem_6 span:before {
+  content: "xxxy";
+}
+*/
+</style>
+
+
+<div id="table">
+
+<!-- BEGIN liste_semaines -->
+
+
+<div class="break break_{liste_semaines.NO}"></div>
+<div class="mois mois_{liste_semaines.NO}">mois</div>
+<div class="jour jour_{liste_semaines.NO}">{liste_semaines.NO}</div>
+
+
+
+<!-- END liste_semaines -->
+
+</div>
