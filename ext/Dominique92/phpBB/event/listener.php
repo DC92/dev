@@ -41,23 +41,11 @@ class listener implements EventSubscriberInterface
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
 		return [
-			// All
-			'core.user_setup_after' => 'user_setup_after',
-
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 		];
-	}
-
-	/**
-		ALL
-	*/
-	function user_setup_after() {
-		// Inclue les fichiers langages de cette extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 	}
 
 	/**

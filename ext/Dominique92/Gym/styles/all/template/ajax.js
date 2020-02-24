@@ -147,9 +147,8 @@ function ajax(el, url) {
 
 // Posting.php
 function displayCalendar(elDayValue) {
-	let lastMonth = 0;
-	for (let week = 0; week < 52; week++) { // Numéro depuis le 1er aout
-		const date = new Date(new Date().getFullYear(), -4); // 1er aout
+	for (let week = 0; week < 52; week++) { // Numéro depuis le 1er septembre
+		const date = new Date(new Date().getFullYear(), -4); // 1er septembre
 		date.setDate(date.getDate() + parseInt(elDayValue, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
 		$('#calendrier_semaine_' + week).text(date.getDate());
 		$('#calendrier_semaine_td_' + week).appendTo('#calendrier_mois_' + date.getMonth());
@@ -157,7 +156,7 @@ function displayCalendar(elDayValue) {
 }
 
 function displayInputCalendar() {
-	if ($('#gym_scolaire').attr('checked') != 'checked')
+	if (!$('#gym_scolaire')[0].checked)
 		$('#liste_semaines')[0].style.display = 'block';;
 	displayCalendar($('#gym_jour').val());
 }

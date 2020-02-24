@@ -6,17 +6,22 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG calendrier si plusieurs noms identique prend le permier
+//TODO RECUPERER Dominique92/phpBB : pb $this->modifs
+//TODO générer automatiquement le répertoire /LOG
+//TODO clarifier supprimer définitivement (style)
+//BUG calendrier si plusieurs noms identique prend le permier => utiliser ID
+//TODO calendrier ne marche pas sous IE11
+//TODO Inclusion actualités en page d'accueil chargée (pour référencement)
+//TODO lieu actualité depuis l'info lieu de la base / autre champ ?
+//TODO tableau activités / cours
+//TODO retrouver les posts non publiés
 //TODO BUG BBCode ne marche pas dans actualités / résumé
 //TODO Mode d'emploi / FAQ pour moderateurs
 //TODO Routage viewtopic vers accueil si non moderateur
 //TODO style pas blanc de fond pour les horaires ??
 //TODO "contactez nous" en page d'accueil (pied de page ?)
 //TODO Champ recherche en page d accueil
-//TODO Inclusion page d'accueil dans le html chargé (pour référencement)
-//TODO clarifier supprimer définitivement (style)
 //TODO APRES enlever le .robot et faire un SEO
-//TODO calendrier ne marche pas sous IE11
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -65,6 +70,14 @@ class listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->user = $user;
 		$this->language = $language;
+
+		// Includes language and style files of this extension
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+		$template->set_style([
+			'ext/'.$ns[0].'/'.$ns[1].'/styles',
+			'styles', // core styles
+		]);
 	}
 
 	// List of hooks and related functions
@@ -100,16 +113,11 @@ class listener implements EventSubscriberInterface
 		foreach ($get AS $k=>$v)
 			$this->template->assign_var (strtoupper ("get_$k"), $v);
 
-		$template = $this->request->variable('template', '');
 		// Change le template sur demande
+		$template = $this->request->variable('template', '');
 		if ($template)
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/$template.html",
-			]);
-		// Change le template pour la page d'accueil
-		elseif ($server['SCRIPT_FILENAME'] == $server['DOCUMENT_ROOT'].'/index.php')
-			$this->template->set_filenames([
-				'body' => "@Dominique92_Gym/index.html",
 			]);
 
 		// Dictionaries depending on database content
@@ -234,14 +242,14 @@ class listener implements EventSubscriberInterface
 				foreach (explode (',', $row['gym_semaines']) AS $semaine) {
 					$beg_time = mktime(
 						$gym_heure, $gym_minute,
-						0, -4, // 1er aout
-						2 + $row['gym_jour'] + $semaine * 7,
+						0, -4, // 1er septembre
+						$row['gym_jour'] + $semaine * 7 + 5,
 						date('Y')
 					);
 					$end_time = mktime(
 						$gym_heure_fin, $gym_minute_fin,
-						0, -4, // 1er aout
-						2 + $row['gym_jour'] + $semaine * 7,
+						0, -4, // 1er septembre
+						$row['gym_jour'] + $semaine * 7 + 5,
 						date('Y')
 					);
 					// Garde le premier évènement qui finit après la date courante
