@@ -39,7 +39,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	// Footer
-	'FINAL_INTEGRATION_BY' =>
+	'wwwFINAL_INTEGRATION_BY' =>
 		'&copy; Dominique Cavailhez 2020 : <a href="https://github.com/Dominique92">Github</a> &amp; '.
 		'based on <a href="https://www.phpbb.com/">phpBB</a>',
 ));

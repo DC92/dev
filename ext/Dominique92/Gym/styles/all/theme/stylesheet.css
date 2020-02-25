@@ -3,6 +3,12 @@ pre {
 	text-align: left;
 }
 
+/* Avertissement au posting */
+.section-posting #attach-panel-multi::after {
+	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
+	background: yellow;
+}
+
 /* Ménage phpBB */
 .site_logo {
 	background-image: url("./images/logo.jpg");
@@ -14,10 +20,11 @@ pre {
 }
 #nav-main > li:nth-of-type(1), /* Accès rapide */
 #nav-main > li:nth-of-type(2), /* FAQ */
+.section-viewtopic .post-buttons li:not(:first-child),
 .section-posting #postingbox .fields1 > dl:nth-of-type(1), /* Icône de sujet */
 .section-posting #poll-panel-tab, /* Options */
 .section-posting #options-panel .fields1 > div, /* Options */
-.section-posting #options-panel dl label,
+.section-posting #options-panel dl label:not([for=delete_permanent]),
 .section-posting #options-panel #edit_reason,
 .section-posting #confirm .fields1, /* Détails confirmation destruction */
 .section-posting input[name=preview],
@@ -26,9 +33,6 @@ pre {
 .section-posting #review,
 .section-posting #topicreview {
 	display: none !important;
-}
-.section-posting #options-panel dl dd label[for=delete_permanent] {
-	display: initial !important;
 }
 
 /* Style de la page d'accueil spéciale */
