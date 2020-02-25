@@ -7,7 +7,6 @@
  */
 
 //BUG calendrier si plusieurs noms identique prend le permier => utiliser ID
-//TODO calendrier ne marche pas sous IE11
 //TODO Inclusion actualités en page d'accueil chargée (pour référencement)
 //TODO lieu actualité depuis l'info lieu de la base / autre champ ?
 //TODO tableau activités / cours
@@ -386,7 +385,7 @@ class listener implements EventSubscriberInterface
 			'/([A-Z_]+)/',
 			function ($matches) {
 				$r = $this->post_row[$matches[1]];
-				return $r ? $r : $matches[1];
+				return urlencode ($r ? $r : $matches[1]);
 			},
 			$post_row['MESSAGE']
 		);

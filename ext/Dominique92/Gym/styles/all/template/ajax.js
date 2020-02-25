@@ -149,7 +149,7 @@ function ajax(el, url) {
 function displayCalendar(elDayValue) {
 	for (let week = 0; week < 52; week++) { // Numéro depuis le 1er septembre
 		const date = new Date(new Date().getFullYear(), -4); // 1er septembre
-		date.setDate(date.getDate() + parseInt(elDayValue, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
+		date.setDate(date.getDate() + parseInt(elDayValue || 0, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
 		$('#calendrier_semaine_' + week).text(date.getDate());
 		$('#calendrier_semaine_td_' + week).appendTo('#calendrier_mois_' + date.getMonth());
 	}
