@@ -9,7 +9,6 @@
 //BUG calendrier si plusieurs noms identique prend le premier => utiliser ID
 //TODO BUG BBCode ne marche pas dans actualités / résumé
 //TODO Inclusion actualités en page d'accueil chargée (pour référencement)
-//TODO?? tableau activités / cours
 //TODO retrouver les posts non publiés
 //TODO Mode d'emploi / FAQ pour moderateurs
 //TODO style pas blanc de fond pour les horaires ??
@@ -26,6 +25,7 @@ GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utili
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
+	[activites][/activites] / <div class="include">?template=activites</div> / Affiche la liste des seances par activité
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div> / Applique un style
 	[calendrier]{TEXT}[/calendrier] / <div class="include">?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
 	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
@@ -119,7 +119,7 @@ class listener implements EventSubscriberInterface
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
 
-		// Dictionaries depending on database content
+		// Dictionaries depending on the database content
 		$sql = "SELECT topic_title, post_id, post_subject
 			FROM ".POSTS_TABLE."
 			JOIN ".TOPICS_TABLE." USING (topic_id)
@@ -154,6 +154,38 @@ class listener implements EventSubscriberInterface
 				foreach ($j AS $heure=>$rows)
 					foreach ($rows AS $row) // S'il y a plusieurs séances à la même heure
 						$this->template->assign_block_vars('horaires.seance', array_change_key_case ($row, CASE_UPPER));
+			}
+		}
+
+		// Add seances par activités
+		$nb_lignes = 0;
+		foreach ($seances AS $row)
+			if ($row['activite']) {
+				$colonne = substr('000'.$row['activite_ordre'],-3).substr('000'.$row['gym_activite'],-3);
+				$activites[$colonne][] = $row;
+				$nb_lignes = max ($nb_lignes, count ($activites[$colonne]));
+			}
+		if ($activites) {
+			ksort ($activites);
+
+			// Titres
+			$this->template->assign_block_vars('activites', []);
+			foreach ($activites AS $ordre => $lignes)
+				$this->template->assign_block_vars('activites.seance', [
+					'NOM' => $lignes[0]['activite'],
+					'POST_ID' => $lignes[0]['gym_activite'],
+				]);
+
+			// Autant de lignes qu'il faut pour les seances de chaque activité
+			for ($ligne = 0; $ligne < $nb_lignes; $ligne++) {
+				$this->template->assign_block_vars('activites', []);
+				foreach ($activites AS $ordre => $lignes) {
+					$case = [];
+					foreach ($lignes AS $l => $row)
+						if ($l == $ligne)
+							$case = $row;
+					$this->template->assign_block_vars('activites.seance', array_change_key_case ($case, CASE_UPPER));
+				}
 			}
 		}
 
@@ -223,6 +255,7 @@ class listener implements EventSubscriberInterface
 
 		$sql = "SELECT post.post_id, post.post_subject AS nom, post.post_text,
 			ac.post_subject AS activite,
+			ac.gym_ordre_menu AS activite_ordre,
 			li.post_subject AS lieu,
 			an.post_subject AS animateur,
 			post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
