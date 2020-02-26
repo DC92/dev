@@ -6,14 +6,11 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG calendrier si plusieurs noms identique prend le premier => utiliser ID
 //TODO BUG BBCode ne marche pas dans actualités / résumé
 //TODO Inclusion actualités en page d'accueil chargée (pour référencement)
 //TODO retrouver les posts non publiés
-//TODO Mode d'emploi / FAQ pour moderateurs
 //TODO style pas blanc de fond pour les horaires ??
 //APRES enlever le .robot et faire un SEO
-//APRES déactiver Dominique92/phpBB
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -27,7 +24,7 @@ MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -A
 MESSAGES / BBCodes / cocher afficher
 	[activites][/activites] / <div class="include">?template=activites</div> / Affiche la liste des seances par activité
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div> / Applique un style
-	[calendrier]{TEXT}[/calendrier] / <div class="include">?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
+	[calendrier][/calendrier] / <div class="include">?template=calendrier&id=POST_ID</div> / Affiche un calendrier
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
@@ -191,7 +188,8 @@ class listener implements EventSubscriberInterface
 
 		// Add calendrier to template data
 		foreach ($seances AS $row)
-			if ($row['nom'] == $get['sujet'])
+			if ($row['post_id'] == $get['id'] ||
+				$row['nom'] == $get['sujet'])
 				$this->set_specific_vars ($row);
 
 		// Add actualites to template data
@@ -248,6 +246,9 @@ class listener implements EventSubscriberInterface
 				case 'lieu';
 				case 'animateur';
 					$cond[] = substr($k,0,2).'.post_subject="'.urldecode($v).'"';
+					break;
+				case 'id';
+					$cond[] = 'post.post_id='.$v;
 					break;
 				case 'sujet';
 					$cond[] = 'post.post_subject="'.urldecode($v).'"';
