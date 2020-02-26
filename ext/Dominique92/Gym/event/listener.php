@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG calendrier si plusieurs noms identique prend le permier => utiliser ID
+//BUG calendrier si plusieurs noms identique prend le premier => utiliser ID
 //TODO BUG BBCode ne marche pas dans actualités / résumé
 //TODO Inclusion actualités en page d'accueil chargée (pour référencement)
 //TODO?? tableau activités / cours

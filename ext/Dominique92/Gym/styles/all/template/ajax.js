@@ -39,7 +39,7 @@ function refreshMenu(evt) {
 
 	// Sous menu du menu
 	if (menu[pagePostId]) {
-		ajax('#titre', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
+		ajax('#titre', 'viewtopic.php?template=viewpost&p=' + pagePostId);
 		displayMenu($('#sous-menu'), menu[pagePostId], 'posting.php?mode=reply&f=2&t=' + titres[pagePostId].topic);
 	}
 	// Page d'un menu
@@ -51,11 +51,11 @@ function refreshMenu(evt) {
 			$('#titre').html('<h2>' + titres[menuPostId].titre + '</h2>');
 			displayMenu($('#sous-menu'), menu[menuPostId], titres[pagePostId].topic);
 		}
-		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
+		ajax('#page', 'viewtopic.php?template=viewpost&p=' + pagePostId);
 	}
 	// Page sans menu
 	else
-		ajax('#page', 'viewtopic.php?template=viewtopic&p=' + pagePostId);
+		ajax('#page', 'viewtopic.php?template=viewpost&p=' + pagePostId);
 }
 
 function displayMenu(elMenu, items, addUrl) {
@@ -149,7 +149,7 @@ function ajax(el, url) {
 function displayCalendar(elDayValue) {
 	for (let week = 0; week < 52; week++) { // Numéro depuis le 1er septembre
 		const date = new Date(new Date().getFullYear(), -4); // 1er septembre
-		date.setDate(date.getDate() + parseInt(elDayValue || 0, 10) + 1 - date.getDay() + week * 7); // Jour de la semaine
+		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(elDayValue || 0, 10) + week * 7); // Jour de la semaine
 		$('#calendrier_semaine_' + week).text(date.getDate());
 		$('#calendrier_semaine_td_' + week).appendTo('#calendrier_mois_' + date.getMonth());
 	}
@@ -157,6 +157,6 @@ function displayCalendar(elDayValue) {
 
 function displayInputCalendar() {
 	if (!$('#gym_scolaire')[0].checked)
-		$('#liste_semaines')[0].style.display = 'block';;
+		$('#liste_semaines')[0].style.display = 'block';
 	displayCalendar($('#gym_jour').val());
 }
