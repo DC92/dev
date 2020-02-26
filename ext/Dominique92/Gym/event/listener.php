@@ -28,7 +28,7 @@ MESSAGES / BBCodes / cocher afficher
 	[activites][/activites] / <div class="include">?template=activites</div> / Affiche la liste des seances par activité
 	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div> / Applique un style
 	[calendrier]{TEXT}[/calendrier] / <div class="include">?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
-	[carte]{TEXT}[/carte] / <div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
+	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires

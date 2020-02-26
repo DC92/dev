@@ -1,18 +1,10 @@
-<div id="horaires">
-
-<!-- IF U_MCP and .horaires -->
-	<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
-		class="button button-icon-only" style="float:left">
-		<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-	</a>
-<!-- ENDIF -->
-
-<table>
+<table id="activites">
 	<!-- BEGIN activites -->
 	<tr>
 		<!-- BEGIN seance -->
 			<td>
-				<a onclick="window.location.hash={seance.POST_ID}">
+				<a onclick="window.location.hash={seance.POST_ID}"
+					title="Voir la séance">
 					{seance.NOM}
 				</a>
 			</td>
@@ -20,5 +12,3 @@
 	</tr>
 	<!-- END activites -->
 </table>
-
-<div>

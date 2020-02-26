@@ -1,154 +1,155 @@
 <!-- IF FORUM_ID == 2 -->
-<br/>Activité
-<select name="gym_activite">
-	<option>?</option>
-	<!-- BEGIN liste_activites -->
-		<option value="{liste_activites.POST_ID}"
-			<!-- IF liste_activites.POST_ID == GYM_ACTIVITE -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_activites.POST_SUBJECT}
-		</option>
-	<!-- END liste_activites -->
-</select> &nbsp;
-
-Intensité
-<select name="gym_intensite"">
-	<!-- BEGIN liste_intensites -->
-		<option value="{liste_intensites.NO}"
-			<!-- IF liste_intensites.NO == GYM_INTENSITE -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_intensites.VALEUR}
-		</option>
-	<!-- END liste_intensites -->
-</select><br/><br/>
-
-Publication dans :
-Horaires <input type="checkbox" name="gym_horaires"
-<!-- IF GYM_HORAIRES == 'on' -->
-	checked="checked"
+	Publication dans :
+	Menu <input type="checkbox" name="gym_menu"
+	<!-- IF GYM_MENU == 'on' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/> &nbsp;
+	ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
+	Horaires <input type="checkbox" name="gym_horaires"
+	<!-- IF GYM_HORAIRES == 'on' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/> &nbsp;
+	Actualités <input type="checkbox" name="gym_actualites"
+	<!-- IF GYM_ACTUALITES == 'on' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/> &nbsp;
+	<br/><br/>
 <!-- ENDIF -->
-/> &nbsp;
-Actualités <input type="checkbox" name="gym_actualites"
-<!-- IF GYM_ACTUALITES == 'on' -->
-	checked="checked"
-<!-- ENDIF -->
-/> &nbsp;
-Menu <input type="checkbox" name="gym_menu"
-<!-- IF GYM_MENU == 'on' -->
-	checked="checked"
-<!-- ENDIF -->
-/> &nbsp;
-ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}">
-<br/><br/>
 
-<select name="gym_lieu">
-	<option>Lieu ?</option>
-	<!-- BEGIN liste_lieux -->
-		<option value="{liste_lieux.POST_ID}"
-			<!-- IF liste_lieux.POST_ID == GYM_LIEU -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_lieux.POST_SUBJECT}
-		</option>
-	<!-- END liste_lieux -->
-</select>
-
-<select name="gym_animateur">
-	<option>Animateur ?</option>
-	<!-- BEGIN liste_animateurs -->
-		<option value="{liste_animateurs.POST_ID}"
-			<!-- IF liste_animateurs.POST_ID == GYM_ANIMATEUR -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_animateurs.POST_SUBJECT}
-		</option>
-	<!-- END liste_animateurs -->
-</select><br/><br/>
-
-<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar()">
-	<!-- BEGIN liste_jours -->
-		<option value="{liste_jours.NO}"
-			<!-- IF liste_jours.NO == GYM_JOUR -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_jours.VALEUR}
-		</option>
-	<!-- END liste_jours -->
-</select> &nbsp;
-
-<select name="gym_heure">
-	<!-- BEGIN liste_heures -->
-		<option value="{liste_heures.VALEUR}"
-			<!-- IF liste_heures.VALEUR == GYM_HEURE -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_heures.VALEUR}
-		</option>
-	<!-- END liste_heures -->
-</select> h
-<select name="gym_minute">
-	<!-- BEGIN liste_minutes -->
-		<option value="{liste_minutes.VALEUR}"
-			<!-- IF liste_minutes.VALEUR == GYM_MINUTE -->
-				selected="selected"
-			<!-- ENDIF -->
-		>
-			{liste_minutes.VALEUR}
-		</option>
-	<!-- END liste_minutes -->
-</select> &nbsp;
-
-durée
-<input name="gym_duree_heures" type="number" step="0.25" min ="1" style="width:60px"
-value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
-<input name="gym_duree_jours" type="number" style="width:30px" value="{GYM_DUREE_JOURS}">jour(s)
-<br/><br/>
-
-Période : scolaire
-<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayInputCalendar()"
-<!-- IF GYM_SCOLAIRE != 'off'-->
-	checked="checked"
-<!-- ENDIF -->
-/><br/>
-
-<table id="liste_semaines" style="display:none">
-	<tr id="calendrier_mois_8"><td>Septembre</td></tr>
-	<tr id="calendrier_mois_9"><td>Octobre</td></tr>
-	<tr id="calendrier_mois_10"><td>Novembre</td></tr>
-	<tr id="calendrier_mois_11"><td>Décembre</td></tr>
-	<tr id="calendrier_mois_0"><td>Janvier</td></tr>
-	<tr id="calendrier_mois_1"><td>Février</td></tr>
-	<tr id="calendrier_mois_2"><td>Mars</td></tr>
-	<tr id="calendrier_mois_3"><td>Avril</td></tr>
-	<tr id="calendrier_mois_4"><td>Mai</td></tr>
-	<tr id="calendrier_mois_5"><td>Juin</td></tr>
-	<tr style="display:none">
-		<!-- BEGIN liste_semaines -->
-			<td id="calendrier_semaine_td_{liste_semaines.NO}">
-				<span id="calendrier_semaine_{liste_semaines.NO}"></span>
-				<input type="checkbox" value="{liste_semaines.VALEUR}"
-					name="gym_semaines[]"
-				<!-- IF liste_semaines.BASE != '' -->
-					checked="checked"
+<!-- IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Evenements' -->
+	Activité
+	<select name="gym_activite">
+		<option>?</option>
+		<!-- BEGIN liste_activites -->
+			<option value="{liste_activites.POST_ID}"
+				<!-- IF liste_activites.POST_ID == GYM_ACTIVITE -->
+					selected="selected"
 				<!-- ENDIF -->
-				/>
-			<td>
-		<!-- END liste_semaines -->
-	</tr>
-</table>
+			>
+				{liste_activites.POST_SUBJECT}
+			</option>
+		<!-- END liste_activites -->
+	</select>
 
-<script>
-	window.addEventListener('load', function(){
-		displayInputCalendar();
-	}, false);
-</script>
+	Intensité
+	<select name="gym_intensite"">
+		<!-- BEGIN liste_intensites -->
+			<option value="{liste_intensites.NO}"
+				<!-- IF liste_intensites.NO == GYM_INTENSITE -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_intensites.VALEUR}
+			</option>
+		<!-- END liste_intensites -->
+	</select><br/><br/>
 
-<!-- ENDIF --><!-- !FORUM_ID = 2 -->
+	<select name="gym_lieu">
+		<option>Lieu ?</option>
+		<!-- BEGIN liste_lieux -->
+			<option value="{liste_lieux.POST_ID}"
+				<!-- IF liste_lieux.POST_ID == GYM_LIEU -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_lieux.POST_SUBJECT}
+			</option>
+		<!-- END liste_lieux -->
+	</select>
+
+	<select name="gym_animateur">
+		<option>Animateur ?</option>
+		<!-- BEGIN liste_animateurs -->
+			<option value="{liste_animateurs.POST_ID}"
+				<!-- IF liste_animateurs.POST_ID == GYM_ANIMATEUR -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_animateurs.POST_SUBJECT}
+			</option>
+		<!-- END liste_animateurs -->
+	</select><br/><br/>
+
+	<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar()">
+		<!-- BEGIN liste_jours -->
+			<option value="{liste_jours.NO}"
+				<!-- IF liste_jours.NO == GYM_JOUR -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_jours.VALEUR}
+			</option>
+		<!-- END liste_jours -->
+	</select> &nbsp;
+
+	<select name="gym_heure">
+		<!-- BEGIN liste_heures -->
+			<option value="{liste_heures.VALEUR}"
+				<!-- IF liste_heures.VALEUR == GYM_HEURE -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_heures.VALEUR}
+			</option>
+		<!-- END liste_heures -->
+	</select> h
+	<select name="gym_minute">
+		<!-- BEGIN liste_minutes -->
+			<option value="{liste_minutes.VALEUR}"
+				<!-- IF liste_minutes.VALEUR == GYM_MINUTE -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_minutes.VALEUR}
+			</option>
+		<!-- END liste_minutes -->
+	</select> &nbsp;
+
+	durée
+	<input name="gym_duree_heures" type="number" step="0.25" min ="1" style="width:60px"
+	value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
+	<input name="gym_duree_jours" type="number" style="width:30px" value="{GYM_DUREE_JOURS}">jour(s)
+	<br/><br/>
+
+	Période : scolaire
+	<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayInputCalendar()"
+	<!-- IF GYM_SCOLAIRE != 'off'-->
+		checked="checked"
+	<!-- ENDIF -->
+	/><br/>
+
+	<table id="liste_semaines" style="display:none">
+		<tr id="calendrier_mois_8"><td>Septembre</td></tr>
+		<tr id="calendrier_mois_9"><td>Octobre</td></tr>
+		<tr id="calendrier_mois_10"><td>Novembre</td></tr>
+		<tr id="calendrier_mois_11"><td>Décembre</td></tr>
+		<tr id="calendrier_mois_0"><td>Janvier</td></tr>
+		<tr id="calendrier_mois_1"><td>Février</td></tr>
+		<tr id="calendrier_mois_2"><td>Mars</td></tr>
+		<tr id="calendrier_mois_3"><td>Avril</td></tr>
+		<tr id="calendrier_mois_4"><td>Mai</td></tr>
+		<tr id="calendrier_mois_5"><td>Juin</td></tr>
+		<tr style="display:none">
+			<!-- BEGIN liste_semaines -->
+				<td id="calendrier_semaine_td_{liste_semaines.NO}">
+					<span id="calendrier_semaine_{liste_semaines.NO}"></span>
+					<input type="checkbox" value="{liste_semaines.VALEUR}"
+						name="gym_semaines[]"
+					<!-- IF liste_semaines.BASE != '' -->
+						checked="checked"
+					<!-- ENDIF -->
+					/>
+				<td>
+			<!-- END liste_semaines -->
+		</tr>
+	</table>
+
+	<script>
+		window.addEventListener('load', function(){
+			displayInputCalendar();
+		}, false);
+	</script>
+<!-- ENDIF -->
