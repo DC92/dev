@@ -27,8 +27,27 @@
 		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
 	</div>
 
-	<!-- IF S_USER_LOGGED_IN -->
-		<div id="edit-user">
+	<form action="{U_SEARCH}" method="get" id="search">
+	<fieldset>
+		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
+		<button class="button button-search" type="submit" title="{L_SEARCH}">
+			<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
+		</button>
+		{S_SEARCH_HIDDEN_FIELDS}
+	</fieldset>
+	</form>
+
+	<div>
+		<a id="logo" href="https://www.sport-sante.fr/">
+			<img alt="EPGV" src="ext/Dominique92/Gym/styles/all/theme/images/logo.png">
+		</a>
+		<a href=".">
+			<div class="baniere">{SITENAME}</div>
+		</a>
+	</div>
+
+	<div id="edit-user">
+		<!-- IF S_USER_LOGGED_IN -->
 			{S_USERNAME}&nbsp;
 			<ul class="dropdown-contents" role="menu">
 				<li>
@@ -42,21 +61,13 @@
 					</a>
 				</li>
 			</ul>
-		</div>
-	<!-- ELSE -->
-		<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
-			<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-		</a>
-	<!-- ENDIF -->
-
-	<div>
-		<a id="logo" href="https://www.sport-sante.fr/">
-			<img alt="EPGV" src="ext/Dominique92/Gym/styles/all/theme/images/logo.png">
-		</a>
-		<a href=".">
-			<div class="baniere">{SITENAME}</div>
-		</a>
+		<!-- ELSE -->
+			<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
+				<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+			</a>
+		<!-- ENDIF -->
 	</div>
+
 	<div id="menu"></div>
 	<div id="titre"></div>
 	<div id="sous-menu"></div>

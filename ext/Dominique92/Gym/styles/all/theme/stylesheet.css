@@ -21,6 +21,8 @@ pre {
 #nav-main > li:nth-of-type(1), /* Accès rapide */
 #nav-main > li:nth-of-type(2), /* FAQ */
 .section-viewtopic .post-buttons li:not(:first-child),
+.section-search .advanced-search-link,
+.section-search .actions-jump,
 .section-posting #postingbox .fields1 > dl:nth-of-type(1), /* Icône de sujet */
 .section-posting #poll-panel-tab, /* Options */
 .section-posting #options-panel .fields1 > div, /* Options */
@@ -76,6 +78,16 @@ html.gym_index  {
 	font-size: 1.5em;
 	color: black;
 }
+
+.gym_index form#search {
+	float: right;
+}
+
+.gym_index #search fieldset {
+	margin: 0;
+	padding: 0;
+}
+
 .gym_index .menu il {
 	display: inline-block;
 	vertical-align: top;

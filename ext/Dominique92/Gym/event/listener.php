@@ -7,18 +7,14 @@
  */
 
 //BUG calendrier si plusieurs noms identique prend le permier => utiliser ID
-//TODO Inclusion actualités en page d'accueil chargée (pour référencement)
-//TODO lieu actualité depuis l'info lieu de la base / autre champ ?
-//TODO tableau activités / cours
-//TODO retrouver les posts non publiés
 //TODO BUG BBCode ne marche pas dans actualités / résumé
+//TODO Inclusion actualités en page d'accueil chargée (pour référencement)
+//TODO?? tableau activités / cours
+//TODO retrouver les posts non publiés
 //TODO Mode d'emploi / FAQ pour moderateurs
-//TODO Routage viewtopic vers accueil si non moderateur
 //TODO style pas blanc de fond pour les horaires ??
-//TODO "contactez nous" en page d'accueil (pied de page ?)
-//TODO Champ recherche en page d accueil
-//TODO APRES enlever le .robot et faire un SEO
-//TODO déactiver Dominique92/phpBB
+//APRES enlever le .robot et faire un SEO
+//APRES déactiver Dominique92/phpBB
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
