@@ -10,6 +10,7 @@
 //TODO Inclusion actualités en page d'accueil chargée (pour référencement)
 //TODO retrouver les posts non publiés
 //TODO style pas blanc de fond pour les horaires ??
+//TODO style print !
 //APRES enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
@@ -296,13 +297,13 @@ class listener implements EventSubscriberInterface
 				foreach (explode (',', $row['gym_semaines']) AS $semaine) {
 					$beg_time = mktime(
 						$gym_heure, $gym_minute,
-						0, -4, // 1er septembre
+						0, -4, // 1er aout
 						$row['gym_jour'] + $semaine * 7 + 5,
 						date('Y')
 					);
 					$end_time = mktime(
 						$gym_heure_fin, $gym_minute_fin,
-						0, -4, // 1er septembre
+						0, -4, // 1er aout
 						$row['gym_jour'] + $semaine * 7 + 5,
 						date('Y')
 					);
@@ -340,7 +341,8 @@ class listener implements EventSubscriberInterface
 			'heures' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
 			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
 			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
-			'semaines' => [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22, // A partir de 1er aout
+			// Numéros depuis le dimanche suivant le 1et aout (commence à 0)
+			'semaines' => [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
 				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],
 			'duree' => [1,1.5,2,7.5],
 		];
