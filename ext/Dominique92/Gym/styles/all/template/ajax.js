@@ -56,6 +56,9 @@ function refreshMenu(evt) {
 	// Page sans menu
 	else
 		ajax('#page', 'viewtopic.php?template=viewpost&p=' + pagePostId);
+	
+	// Actualité seulement sur la page d'acceuil
+	$('#actualite').css('display',window.location.hash?'none':'');
 }
 
 function displayMenu(elMenu, items, addUrl) {
@@ -146,18 +149,13 @@ function ajax(el, url) {
 }
 
 // Posting.php
-function displayCalendar(elDayValue) {
-	// Numéros depuis le dimanche suivant le 1et aout (commence à 0)
+function displayCalendar(post_id, jour) {
+	// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
 	for (let week = 0; week < 52; week++) {
-		const date = new Date(new Date().getFullYear(), -4); // 1er aout
-		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(elDayValue || 0, 10) + week * 7); // Jour de la semaine
-		$('#calendrier_semaine_' + week).text(date.getDate());
-		$('#calendrier_semaine_td_' + week).appendTo('#calendrier_mois_' + date.getMonth());
+		const date = new Date(new Date().getFullYear(), -5); // 1er aout
+		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7); // Jour de la semaine
+		$('#s_' + post_id+'_' + week).text(date.getDate());
+		$('#tds_' + post_id+'_' + week).appendTo('#mois_' + post_id+'_' + date.getMonth());
 	}
 }
 
-function displayInputCalendar() {
-	if (!$('#gym_scolaire')[0].checked)
-		$('#liste_semaines')[0].style.display = 'block';
-	displayCalendar($('#gym_jour').val());
-}

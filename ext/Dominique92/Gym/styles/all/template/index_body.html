@@ -78,6 +78,17 @@
 	<div id="sous-menu"></div>
 	<div id="page"></div>
 
+	<div id="actualite">
+		<div class="bandeau-vert">Actualité</div>
+		<!-- BEGIN liste -->
+			<h3>{liste.DATE}: <a href="?#{liste.POST_ID}">{liste.NOM}</a></h3>
+			<div>{liste.LIEU} à {liste.HORAIRE_DEBUT}<!-- IF liste.ANIMATEUR --> avec {liste.ANIMATEUR}<!-- ENDIF --></div>
+			{liste.RESUME}
+		<!-- END liste -->
+	</div>
+
+
+
 	{$SCRIPTS}
 	<script>
 		var menu = {

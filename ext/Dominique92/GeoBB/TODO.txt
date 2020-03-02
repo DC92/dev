@@ -1,3 +1,4 @@
+//TODO créer /LOG automatiquement + index.html
 //TODO voir pourquoi les champs de saisie du curseur de l'exemple ont une , au lieu d'un point
 
 Migration MyOl (alpages.info)

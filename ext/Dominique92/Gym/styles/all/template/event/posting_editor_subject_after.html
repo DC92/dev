@@ -121,35 +121,53 @@
 	<!-- ENDIF -->
 	/><br/>
 
+<!-- BEGIN liste -->
 	<table id="liste_semaines" style="display:none">
-		<tr id="calendrier_mois_8"><td>Septembre</td></tr>
-		<tr id="calendrier_mois_9"><td>Octobre</td></tr>
-		<tr id="calendrier_mois_10"><td>Novembre</td></tr>
-		<tr id="calendrier_mois_11"><td>Décembre</td></tr>
-		<tr id="calendrier_mois_0"><td>Janvier</td></tr>
-		<tr id="calendrier_mois_1"><td>Février</td></tr>
-		<tr id="calendrier_mois_2"><td>Mars</td></tr>
-		<tr id="calendrier_mois_3"><td>Avril</td></tr>
-		<tr id="calendrier_mois_4"><td>Mai</td></tr>
-		<tr id="calendrier_mois_5"><td>Juin</td></tr>
-		<tr style="display:none">
-			<!-- BEGIN liste_semaines -->
-				<td id="calendrier_semaine_td_{liste_semaines.NO}">
-					<span id="calendrier_semaine_{liste_semaines.NO}"></span>
-					<input type="checkbox" value="{liste_semaines.VALEUR}"
+		<tr>
+			<!-- BEGIN item -->
+				<td id="tds_{liste.POST_ID}_{item.NO}">
+					<span id="s_{liste.POST_ID}_{item.NO}"></span>
+					<input type="checkbox" value="{item.VALEUR}"
 						name="gym_semaines[]"
-					<!-- IF liste_semaines.BASE != '' -->
+					<!-- IF item.BASE != '' -->
 						checked="checked"
 					<!-- ENDIF -->
 					/>
 				<td>
-			<!-- END liste_semaines -->
+			<!-- END item -->
 		</tr>
+		<tr id="mois_{liste.POST_ID}_8"><td>Septembre</td></tr>
+		<tr id="mois_{liste.POST_ID}_9"><td>Octobre</td></tr>
+		<tr id="mois_{liste.POST_ID}_10"><td>Novembre</td></tr>
+		<tr id="mois_{liste.POST_ID}_11"><td>Décembre</td></tr>
+		<tr id="mois_{liste.POST_ID}_0"><td>Janvier</td></tr>
+		<tr id="mois_{liste.POST_ID}_1"><td>Février</td></tr>
+		<tr id="mois_{liste.POST_ID}_2"><td>Mars</td></tr>
+		<tr id="mois_{liste.POST_ID}_3"><td>Avril</td></tr>
+		<tr id="mois_{liste.POST_ID}_4"><td>Mai</td></tr>
+		<tr id="mois_{liste.POST_ID}_5"><td>Juin</td></tr>
 	</table>
+<!-- END liste -->
 
 	<script>
+	
+	//*DCMM*/{var _r='gym_jour ',_v=$('#gym_jour').value;if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+
+	
+function displayInputCalendar() {
+	if (!$('#gym_scolaire')[0].checked)
+		$('#liste_semaines')[0].style.display = 'block';
+	//displayCalendar('',0);
+		<!-- BEGIN liste -->
+				displayCalendar({liste.POST_ID},{liste.GYM_JOUR});
+		<!-- END liste -->
+}
+
 		window.addEventListener('load', function(){
 			displayInputCalendar();
 		}, false);
+		
+	window.addEventListener('load', function(){
+	}, false);
 	</script>
 <!-- ENDIF -->

@@ -1,51 +1,54 @@
 <div id="horaires">
 
-<!-- IF U_MCP and .horaires -->
+<!-- IF U_MCP and .liste -->
 	<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
 		class="button button-icon-only" style="float:left">
 		<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 	</a>
 <!-- ENDIF -->
 
-<!-- BEGIN horaires -->
-	<div id="{horaires.JOUR}">
-		{horaires.JOUR}
-		<table class="horaires horaires_{horaires.JOUR}">
-			<!-- BEGIN seance -->
+<!-- BEGIN liste -->
+	<div class="horaires j{liste.GYM_JOUR}">
+		<div>{liste.GYM_JOUR_LITERAL}</div>
+		<table>
+			<!-- BEGIN item -->
 			<tr>
 				<td>
-					<a onclick="window.location.hash={seance.POST_ID}">
-						{seance.NOM}
+					<a onclick="window.location.hash={item.POST_ID}">
+						{item.NOM}
 					</a>
 					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f=2&p={seance.POST_ID}"
+						<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
 							title="Mofifier cette séance" class="button button-icon-only">
 							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 						</a>
 					<!-- ENDIF -->
 				</td>
 
-				<td>{seance.HORAIRE_DEBUT} - {seance.HORAIRE_FIN}</td>
+				<td>{item.HORAIRE_DEBUT} {item.HORAIRE_FIN}</td>
 
 				<!-- IF not GET_LIEU -->
 					<td>
-						<a onclick="window.location.hash={seance.GYM_LIEU}">
-							{seance.LIEU}
+						<a onclick="window.location.hash={item.GYM_LIEU}">
+							{item.LIEU}
 						</a>
 					</td>
 				<!-- ENDIF -->
 
 				<!-- IF not GET_ANIMATEUR -->
 					<td>
-						<a onclick="window.location.hash={seance.GYM_ANIMATEUR}">
-							{seance.ANIMATEUR}
+						<a onclick="window.location.hash={item.GYM_ANIMATEUR}">
+							{item.ANIMATEUR}
 						</a>
 					</td>
 				<!-- ENDIF -->
 			</tr>
-			<!-- END seance -->
+			<!-- END item -->
 		</table>
 	</div>
-<!-- END horaires -->
-
+<!-- END liste -->
 </div>
+<script>
+//TODO seulement dans page horaire
+	$('#page').css('background','rgba(0,0,0,0)');
+</script>
