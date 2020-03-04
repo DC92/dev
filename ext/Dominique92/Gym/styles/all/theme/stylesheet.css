@@ -301,7 +301,8 @@ html.gym_index  {
 	}
 }
 
-/* Actualite */
+/* Page d'accueil */
+#presentation,
 #actualite {
 	margin: 0 8%;
 	padding: 0 1%;
@@ -316,6 +317,7 @@ html.gym_index  {
 	text-indent: 1em;
 }
 @media (max-width: 600px) {
+	#presentation,
 	#actualite {
 		margin: 0;
 	}

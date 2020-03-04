@@ -9,8 +9,6 @@
 	<link rel="icon" type="image/jpg" href="ext/Dominique92/Gym/styles/all/theme/images/icon.jpg" />
 	<title>Chavil'GYM</title>
 
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
 	<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
 	<!-- INCLUDECSS icons.css -->
 	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
@@ -78,21 +76,45 @@
 	<div id="sous-menu"></div>
 	<div id="page"></div>
 
+	<div id="presentation">
+		<!-- BEGIN presentation -->
+			<!-- BEGIN item -->
+				<h3>
+					{item.NOM}
+					<!-- IF U_MCP -->
+						<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
+							title="Mofifier cet article" class="button button-icon-only">
+							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+						</a>
+					<!-- ENDIF -->
+				</h3>
+				<div>{item.RESUME}</div>
+			<!-- END item -->
+		<!-- END presentation -->
+	</div>
+
 	<div id="actualite">
 		<div class="bandeau-vert">Actualité</div>
 		<!-- BEGIN liste -->
-			<h3>{liste.DATE}: <a href="?#{liste.POST_ID}">{liste.NOM}</a></h3>
+			<h3>
+				{liste.DATE}: <a href="?#{liste.POST_ID}">{liste.NOM}</a>
+				<!-- IF U_MCP -->
+					<a href="posting.php?mode=edit&f=2&p={liste.POST_ID}"
+						title="Mofifier cette actualité" class="button button-icon-only">
+						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+					</a>
+			</h3>
+			<!-- ENDIF -->
 			<div>{liste.LIEU} à {liste.HORAIRE_DEBUT}<!-- IF liste.ANIMATEUR --> avec {liste.ANIMATEUR}<!-- ENDIF --></div>
 			{liste.RESUME}
 		<!-- END liste -->
 	</div>
 
-
-
 	{$SCRIPTS}
 	<script>
 		var menu = {
 			0: { // Main menu
+				1000000000: 'Accueil',
 <!-- BEGIN menu -->
 				1{menu.NORM_FIRST_ORDRE_GYM_MENU}{menu.NORM_TOPIC_ID}{menu.NORM_TOPIC_FIRST_POST_ID}: '{menu.TOPIC_TITLE}',
 <!-- END menu -->

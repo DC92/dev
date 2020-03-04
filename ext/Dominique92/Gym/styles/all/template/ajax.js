@@ -39,7 +39,8 @@ function refreshMenu(evt) {
 
 	// Sous menu du menu
 	if (menu[pagePostId]) {
-		ajax('#titre', 'viewtopic.php?template=viewpost&p=' + pagePostId);
+		if (pagePostId)
+			ajax('#titre', 'viewtopic.php?template=viewpost&p=' + pagePostId);
 		displayMenu($('#sous-menu'), menu[pagePostId], 'posting.php?mode=reply&f=2&t=' + titres[pagePostId].topic);
 	}
 	// Page d'un menu
@@ -56,9 +57,6 @@ function refreshMenu(evt) {
 	// Page sans menu
 	else
 		ajax('#page', 'viewtopic.php?template=viewpost&p=' + pagePostId);
-	
-	// Actualité seulement sur la page d'acceuil
-	$('#actualite').css('display',window.location.hash?'none':'');
 }
 
 function displayMenu(elMenu, items, addUrl) {
@@ -154,8 +152,7 @@ function displayCalendar(post_id, jour) {
 	for (let week = 0; week < 52; week++) {
 		const date = new Date(new Date().getFullYear(), -5); // 1er aout
 		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7); // Jour de la semaine
-		$('#s_' + post_id+'_' + week).text(date.getDate());
-		$('#tds_' + post_id+'_' + week).appendTo('#mois_' + post_id+'_' + date.getMonth());
+		$('#s_' + post_id + '_' + week).text(date.getDate());
+		$('#tds_' + post_id + '_' + week).appendTo('#mois_' + post_id + '_' + date.getMonth());
 	}
 }
-

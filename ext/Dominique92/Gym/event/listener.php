@@ -6,11 +6,18 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO créer /LOG/index.html
+//TODO BBCode inclure la liste des activités
+//BUG ajouter un item au menu ne marche pas
+//BUG horaires d'un cours listent tout
+//BUG Paul bert l'image chevauche le texte
+//BUG actualité texte en gras si pas dominique
+//TODO ne pas afficher présentation et actualité dans les pages index#123
+//TODO double sous menu accueil
+//TODO insérer sous menu "choix activité"
+//TODO insérer images dans les résumés
 //TODO retrouver les posts non publiés
 //TODO style print !
 //APRES enlever le .robot et faire un SEO
-//TODO Voir si on ne peut pas développer un BBCODE include en PHP (sous-template ?)
 
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
@@ -167,6 +174,7 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars('menu.sous_menu', $vv);
 		}
 
+		$this->listes_temporelles ('presentation', 'presentation');
 		$this->listes_temporelles ($this->request->variable ('template', 'actualites'));
 	}
 
@@ -315,6 +323,7 @@ class listener implements EventSubscriberInterface
 
 			if (!is_dir('LOG'))
 				mkdir('LOG');
+			file_put_contents ('LOG/index.html', '');
 
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!$create_if_null || !file_exists($file_name))
@@ -358,13 +367,15 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Popule les templates horaires, calendrier, actualité
-	function listes_temporelles($template) {
+	function listes_temporelles($template, $assign = 'liste') {
 		$static_values = $this->listes();
 
 		if ($template == 'horaires')
 			$cond = ['post.gym_horaires="on"'];
 		if ($template == 'calendrier')
 			$cond = ['post.gym_horaires="on"'];
+		if ($template == 'presentation')
+			$cond = ['post.gym_presentation="on"'];
 		if ($template == 'actualites')
 			$cond = ['post.gym_actualites="on"'];
 		if ($template == 'new')
@@ -412,7 +423,8 @@ class listener implements EventSubscriberInterface
 
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result)) {
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($row,true).'</pre>';
+//*DCMM*/$row['post_text'] = '';
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>ROW $assign = ".var_export($row,true).'</pre>';
 				if ($row['gym_intensite']) {
 					$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
 					$row['seance'] .= ' - intensité '.$row['intensite'];
@@ -489,10 +501,12 @@ class listener implements EventSubscriberInterface
 					: '<p>'.$display_text.'</p>';
 
 				// Range les résultats dans l'ordre et le groupage espéré
-				if ($template == 'horaires')
-					$liste[$row['gym_jour']][$row['horaire_debut']][] = array_change_key_case ($row, CASE_UPPER);
 				if ($template == 'actualites')
 					$liste[$row['next_end_time']][$row['next_beg_time']][] = array_change_key_case ($row, CASE_UPPER);
+				if ($template == 'presentation')
+					$liste['presentation'][$row['gym_ordre_menu']][] = array_change_key_case ($row, CASE_UPPER);
+				if ($template == 'horaires')
+					$liste[$row['gym_jour']][$row['horaire_debut']][] = array_change_key_case ($row, CASE_UPPER);
 				if ($template == 'calendrier') {
 					$semaines = explode (',', $row['gym_semaines']);
 					foreach ($static_values['semaines'] AS $s) {
@@ -514,16 +528,17 @@ class listener implements EventSubscriberInterface
 					];
 
 			$this->db->sql_freeresult($result);
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>LISTE = ".var_export($liste,true).'</pre>'; 
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>LISTE $assign = ".var_export($liste,true).'</pre>'; 
 
 			if ($liste) {
 				ksort ($liste);
 				foreach ($liste AS $v) { // Tri du 1er niveau
 					ksort ($v);
-					$this->template->assign_block_vars('liste', array_values ($v)[0][0]); // La première pour avoir les valeurs générales
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export(array_values ($v)[0][0],true).'</pre>';
+					$this->template->assign_block_vars($assign, array_values ($v)[0][0]); // La première pour avoir les valeurs générales
 					foreach ($v AS $vv) // Tri du 2" niveau
 						foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
-							$this->template->assign_block_vars('liste.item', $vvv);
+							$this->template->assign_block_vars("$assign.item", $vvv);
 				}
 			}
 		}
