@@ -6,17 +6,18 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO BBCode inclure la liste des activités
 //BUG ajouter un item au menu ne marche pas
-//BUG horaires d'un cours listent tout
+//BUG horaires d'un cours liste tout
 //BUG Paul bert l'image chevauche le texte
 //BUG actualité texte en gras si pas dominique
+//BUG double sous menu accueil
 //TODO ne pas afficher présentation et actualité dans les pages index#123
-//TODO double sous menu accueil
-//TODO insérer sous menu "choix activité"
+
+//TODO ?? insérer sous menu "choix activité"
 //TODO insérer images dans les résumés
+//TODO BBCode inclure la liste des activités
 //TODO retrouver les posts non publiés
-//TODO style print !
+//TODO style print
 //APRES enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
@@ -26,6 +27,7 @@
 PERSONNALISER / extension gym
 MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
 GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
+GENERAL / Paramètres des messages / Messages par page : 99
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher

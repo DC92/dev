@@ -38,9 +38,8 @@ function refreshMenu(evt) {
 	$('#page').html('');
 
 	// Sous menu du menu
-	if (menu[pagePostId]) {
-		if (pagePostId)
-			ajax('#titre', 'viewtopic.php?template=viewpost&p=' + pagePostId);
+	if (pagePostId && menu[pagePostId]) {
+		ajax('#titre', 'viewtopic.php?template=viewpost&p=' + pagePostId);
 		displayMenu($('#sous-menu'), menu[pagePostId], 'posting.php?mode=reply&f=2&t=' + titres[pagePostId].topic);
 	}
 	// Page d'un menu
