@@ -6,6 +6,9 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//horaires < 600 px large !! responsive
+// retour modif d'un horaire revient à l'accueil
+// pas de lien dans le tableau horaire => #pid !!
 //BUG horaires d'un cours liste tout
 //BUG Paul bert l'image chevauche le texte
 //BUG actualité texte en gras si pas dominique
@@ -13,7 +16,6 @@
 //TODO ne pas afficher présentation et actualité dans les pages index#123
 
 //TODO ?? insérer sous menu "choix activité"
-//TODO insérer images dans les résumés
 //TODO BBCode inclure la liste des activités
 //TODO retrouver les posts non publiés
 //TODO style print
@@ -43,7 +45,7 @@ MESSAGES / BBCodes / cocher afficher
 //TODO DELETE remplacer par include
 	[activites][/activites] / <div class="include">?template=activites</div> / Affiche la liste des seances par activité
 	[calendrier][/calendrier] / <div class="include">?template=calendrier&id=POST_ID</div> / Affiche un calendrier
-	[horaires]{TEXT}[/horaires] / <div class="include">?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
+	[horaires]{TEXT}[/horaires] / <div class="include">.?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
 */
 
 namespace Dominique92\Gym\event;
@@ -91,11 +93,10 @@ class listener implements EventSubscriberInterface
 
 		return [
 			// All
-			'core.page_footer_after' => 'all',
+			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
 			'core.index_modify_page_title' => 'index_modify_page_title',
-			'core.page_footer_after' => 'page_footer_after',
 
 			// Viewtopic
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
@@ -125,19 +126,14 @@ class listener implements EventSubscriberInterface
 		foreach ($get AS $k=>$v)
 			$this->template->assign_var (strtoupper ("get_$k"), $v);
 
-		if ($this->my_template)
-			$this->template->set_filenames([
-				'body' => $this->my_template,
-			]);
-	}
-
-	function all() {
-return;
 		// Change le template sur demande
 		$template = $this->request->variable('template', '');
 		if ($template)
+			$this->my_template = "@Dominique92_Gym/$template.html";
+
+		if ($this->my_template)
 			$this->template->set_filenames([
-				'body' => "@Dominique92_Gym/$template.html",
+				'body' => $this->my_template,
 			]);
 	}
 
@@ -165,6 +161,13 @@ return;
 				'post.gym_actualites="on"',
 			],
 			'next_end_time','next_beg_time'
+		);
+
+		$this->liste_fiches (
+			$assign = 'horaires', [
+				'post.gym_horaires="on"',
+			],
+			'gym_jour','horaire_debut'
 		);
 
 return;
@@ -234,12 +237,11 @@ return;
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 
+		// Couleur du sous-menu
 		$post_row['COULEUR'] = $this->couleur();
 
-		$vars['post_row'] = $post_row;
-
-return;
-		$post_id = $post_row['POST_ID'];
+//return;
+//		$post_id = $post_row['POST_ID'];
 
 		// Remplace dans le texte du message {VARIABLE_POST_TEMPLATE} par sa valeur
 		//TODO traiter /g pour plusieurs remplacements
@@ -254,6 +256,7 @@ return;
 			$post_row['MESSAGE']
 		);
 
+		$vars['post_row'] = $post_row;
 	}
 
 	/**
@@ -419,13 +422,15 @@ return;
 	/**
 		FUNCTIONS
 	*/
-	function couleur() {
-		$luminance = 170; // on 255
-		$saturation = 80; // on 128
-		$increment_angle_couleur = 8;
+	function couleur(
+		$luminance = 170, // on 255
+		$saturation = 80, // on 128
+		$increment = 1.8
+	) {
+		$this->angle_couleur += $increment;
 		$couleur = '#';
 		for ($angle = 0; $angle < 6; $angle += M_PI * 0.66)
-			$couleur .= dechex($luminance + $saturation * sin ($this->angle_couleur += $increment_angle_couleur));
+			$couleur .= dechex($luminance + $saturation * sin ($this->angle_couleur + $angle));
 		return $couleur;
 	}
 
@@ -479,7 +484,15 @@ return;
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($cond,true).'</pre>';
 
 		if ($cond) {
-			$sql = "SELECT post.post_id, t.topic_id,
+			// Récupère la table de tous les attachements
+			$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
+			$result = $this->db->sql_query($sql);
+			$attachments = $update_count_ary = [];
+			while ($row = $this->db->sql_fetchrow($result))
+				$attachments[$row['post_msg_id']][] = $row;
+			$this->db->sql_freeresult($result);
+
+			$sql = "SELECT post.post_id, t.topic_id, t.forum_id,
 				post.post_subject AS nom,
 				post.post_text, post.bbcode_uid, post.bbcode_bitfield,
 				li.post_subject AS lieu,
@@ -501,6 +514,30 @@ return;
 			while ($row = $this->db->sql_fetchrow($result)) {
 //*DCMM*/$row['post_text'] = '';
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>ROW $assign = ".var_export($row,true).'</pre>';
+
+				// BBCodes et attachements
+				$display_text = generate_text_for_display(
+					$row['post_text'],
+					$row['bbcode_uid'], $row['bbcode_bitfield'],
+					OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+				);
+				if (!empty($attachments[$row['post_id']]))
+					parse_attachments($row['forum_id'], $display_text, $attachments[$row['post_id']], $update_count_ary);
+
+				// Extrait les résumés
+				$expl = explode ('<!-- resume -->', $display_text);
+				$resume = [];
+				foreach ($expl AS $k=>$fragment)
+					if ($k) { // Sauf le premier
+						$frag_exp = explode ('<!-- emuser -->', $fragment);
+						if (count ($frag_exp) > 1)
+							$resume[] = $frag_exp[0];
+					}
+				$row['resume'] = count ($resume)
+					? '<p>'.implode('</p><p>',$resume).'</p>'
+					: '<p>'.$display_text.'</p>';
+
+				// Paramètres spécifiques
 				if ($row['gym_intensite']) {
 					$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
 					$row['seance'] .= ' - intensité '.$row['intensite'];
@@ -557,25 +594,8 @@ return;
 				$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
 				$row['horaire_debut'] = $row['gym_heure'].':'.$row['gym_minute'];
 				$row['horaire_fin'] = $row['gym_heure_fin'].':'.$row['gym_minute_fin'];
-				$row['couleur'] = $this->couleur();
-
-				// Extrait les résumés
-				$display_text = generate_text_for_display(
-					$row['post_text'],
-					$row['bbcode_uid'], $row['bbcode_bitfield'],
-					OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-				);
-				$expl = explode ('<!-- resume -->', $display_text);
-				$resume = [];
-				foreach ($expl AS $k=>$fragment)
-					if ($k) { // Sauf le premier
-						$frag_exp = explode ('<!-- emuser -->', $fragment);
-						if (count ($frag_exp) > 1)
-							$resume[] = $frag_exp[0];
-					}
-				$row['resume'] = count ($resume)
-					? '<p>'.implode('</p><p>',$resume).'</p>'
-					: '<p>'.$display_text.'</p>';
+				$row['couleur'] = $this->couleur(208, 47);
+				$row['couleur_bord'] = $this->couleur(128, 24, 0);
 
 				/*
 				if ($template == 'actualites')

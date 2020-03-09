@@ -1,16 +1,20 @@
 <div id="horaires">
 
-<!-- IF U_MCP and .liste -->
+<!-- IF U_MCP and .horaires -->
 	<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
 		class="button button-icon-only" style="float:left">
 		<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 	</a>
 <!-- ENDIF -->
 
-<!-- BEGIN liste -->
-	<div class="horaires j{liste.GYM_JOUR}">
-		<div>{liste.GYM_JOUR_LITERAL}</div>
-		<table>
+<!-- BEGIN horaires -->
+	<div class="horaires j{horaires.GYM_JOUR}">
+		<div>{horaires.GYM_JOUR_LITERAL}</div>
+		<table style="
+			margin-left:calc(5%*{horaires.GYM_JOUR});
+			background:{horaires.COULEUR};
+			border-color:{horaires.COULEUR_BORD};
+		">
 			<!-- BEGIN item -->
 			<tr>
 				<td>
@@ -46,7 +50,7 @@
 			<!-- END item -->
 		</table>
 	</div>
-<!-- END liste -->
+<!-- END horaires -->
 </div>
 <script>
 //TODO seulement dans page horaire

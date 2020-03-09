@@ -93,63 +93,56 @@ function displayMenu(elMenu, items, addUrl) {
 }
 */
 
-// Load url data on an element
-/*
-function ajax(el, url) {
-	$.get(url, function(data) {
-		$(el).html(data);
+// BBCode d'inclusion d'un bloc ajax ou de saut vers une url
+$('.include').each(function(index, elBBCode) {
+	$(elBBCode).removeClass('include'); // Don't loop
 
-		// BBCodes d'inclusion d'un bloc ajax ou de saut vers une url
-		$('.include').each(function(index, elBBCode) {
-			$(elBBCode).removeClass('include'); // Don't loop
-
-			const url = elBBCode.innerText;
-			elBBCode.innerHTML = '';
-			if (url.charAt(0) == ':')
-				window.location.href = url.substr(1);
-			else
-				ajax(elBBCode, url);
+	const url = elBBCode.innerText;
+	elBBCode.innerHTML = '';
+	if (url.charAt(0) == ':')
+		window.location.href = url.substr(1);
+	else
+		$.get(url, function(data) {
+			$(elBBCode).html(data);
 		});
+});
 
-		// BBCodes ajout d'une carte
-		$('.carte').each(function(index, elCarte) {
-			if (elCarte.innerText) {
-				const ll = ol.proj.transform(eval('[' + elCarte.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
-				elCarte.innerHTML = null; // Don't loop
+// BBCode ajout d'une carte
+$('.carte').each(function(index, elCarte) {
+	if (elCarte.innerText) {
+		const ll = ol.proj.transform(eval('[' + elCarte.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
+		elCarte.innerHTML = null; // Don't loop
 
-				new ol.Map({
-					layers: [
-						new ol.layer.Tile({
-							source: new ol.source.OSM(),
-						}),
-						new ol.layer.Vector({
-							source: new ol.source.Vector({
-								features: [
-									new ol.Feature({
-										geometry: new ol.geom.Point(ll),
-									}),
-								]
+		new ol.Map({
+			layers: [
+				new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+				new ol.layer.Vector({
+					source: new ol.source.Vector({
+						features: [
+							new ol.Feature({
+								geometry: new ol.geom.Point(ll),
 							}),
-							style: new ol.style.Style({
-								image: new ol.style.Icon(({
-									src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
-									anchor: [0.5, 0.8],
-								})),
-							}),
-						}),
-					],
-					target: elCarte,
-					controls: [], // No zoom
-					view: new ol.View({
-						center: ll,
-						zoom: 17
-					})
-				});
-			}
+						]
+					}),
+					style: new ol.style.Style({
+						image: new ol.style.Icon(({
+							src: 'ext/Dominique92/Gym/styles/all/theme/images/ballon-rose.png',
+							anchor: [0.5, 0.8],
+						})),
+					}),
+				}),
+			],
+			target: elCarte,
+			controls: [], // No zoom
+			view: new ol.View({
+				center: ll,
+				zoom: 17
+			})
 		});
-	});
-}
-*/
+	}
+});
 
 // Posting.php
 /*
