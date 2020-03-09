@@ -6,7 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG ajouter un item au menu ne marche pas
 //BUG horaires d'un cours liste tout
 //BUG Paul bert l'image chevauche le texte
 //BUG actualité texte en gras si pas dominique
@@ -76,8 +75,9 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+		$this->ext_path = 'ext/'.$ns[0].'/'.$ns[1].'/';
 		$template->set_style([
-			'ext/'.$ns[0].'/'.$ns[1].'/styles',
+			$this->ext_path.'styles',
 			'styles', // core styles
 		]);
 	}
@@ -95,8 +95,10 @@ class listener implements EventSubscriberInterface
 
 			// Index
 			'core.index_modify_page_title' => 'index_modify_page_title',
+			'core.page_footer_after' => 'page_footer_after',
 
 			// Viewtopic
+			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
@@ -112,7 +114,9 @@ class listener implements EventSubscriberInterface
 	/**
 		ALL
 	*/
-	function all() {
+	function page_footer_after() {
+		$this->template->assign_var ('EXT_PATH', $this->ext_path);
+
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
 		$get = $_GET;
@@ -121,38 +125,49 @@ class listener implements EventSubscriberInterface
 		foreach ($get AS $k=>$v)
 			$this->template->assign_var (strtoupper ("get_$k"), $v);
 
+		if ($this->my_template)
+			$this->template->set_filenames([
+				'body' => $this->my_template,
+			]);
+	}
+
+	function all() {
+return;
 		// Change le template sur demande
 		$template = $this->request->variable('template', '');
 		if ($template)
 			$this->template->set_filenames([
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
-
-
-		// Dictionnaires en fonction du contenu de la base de données
-		//TODO importer seulement activités, lieux, animateurs
-		$sql = "SELECT topic_title, post_id, post_subject
-			FROM ".POSTS_TABLE."
-			JOIN ".TOPICS_TABLE." USING (topic_id)
-			WHERE post_id != topic_first_post_id";
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$values [$row['topic_title']][$row['post_subject']] = $row;
-		$this->db->sql_freeresult($result);
-
-		setlocale(LC_ALL, 'fr_FR');
-		foreach ($values AS $k=>$v) {
-			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
-			ksort ($v);
-			foreach ($v AS $vk=>$vv)
-				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
-		}
 	}
 
 	/**
 		INDEX.PHP
 	*/
 	function index_modify_page_title() {
+		$this->liste_fiches (
+			$assign = 'menu', [
+				'post.post_id=t.topic_first_post_id',
+				'post.gym_menu="on"',
+			],
+			'gym_menu','gym_ordre_menu'
+		);
+
+		$this->liste_fiches (
+			$assign = 'presentation', [
+				'post.gym_presentation="on"',
+			],
+			'gym_presentation','gym_ordre_menu'
+		);
+
+		$this->liste_fiches (
+			$assign = 'actualites', [
+				'post.gym_actualites="on"',
+			],
+			'next_end_time','next_beg_time'
+		);
+
+return;
 		// Popule le menu et sous-menu
 		$sql = "
 			SELECT p.post_id, p.post_subject, t.topic_id, t.topic_title, t.topic_first_post_id,
@@ -176,14 +191,28 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars('menu.sous_menu', $vv);
 		}
 
-		$this->listes_temporelles ('presentation', 'presentation');
-		$this->listes_temporelles ($this->request->variable ('template', 'actualites'));
+		$this->liste_fiches ('presentation', 'presentation');
+		$this->liste_fiches ($this->request->variable ('template', 'actualites'));
 	}
 
 	/**
 		VIEWTOPIC.PHP
 	*/
+	function viewtopic_modify_page_title($vars) {
+		if ($vars['forum_id'] == 2)
+			$this->my_template = 'index_body.html';
+
+		$this->liste_fiches (
+			$assign = 'menu', [
+				'post.post_id=t.topic_first_post_id',
+				'post.gym_menu="on"',
+			],
+			'gym_menu','gym_ordre_menu'
+		);
+	}
+
 	function viewtopic_modify_post_data($vars) {
+return;
 		$rowset = $vars['rowset'];
 		$first_post_id = $vars['topic_data']['topic_first_post_id'];
 
@@ -204,6 +233,12 @@ class listener implements EventSubscriberInterface
 
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
+
+		$post_row['COULEUR'] = $this->couleur();
+
+		$vars['post_row'] = $post_row;
+
+return;
 		$post_id = $post_row['POST_ID'];
 
 		// Remplace dans le texte du message {VARIABLE_POST_TEMPLATE} par sa valeur
@@ -219,7 +254,6 @@ class listener implements EventSubscriberInterface
 			$post_row['MESSAGE']
 		);
 
-		$vars['post_row'] = $post_row;
 	}
 
 	/**
@@ -252,7 +286,33 @@ class listener implements EventSubscriberInterface
 					]
 				);
 
-		$this->listes_temporelles ($vars['mode'] == 'edit' ? 'calendrier' : 'new');
+		// Dictionnaires en fonction du contenu de la base de données
+		//TODO importer seulement activités, lieux, animateurs
+		$sql = "SELECT topic_title, post_id, post_subject
+			FROM ".POSTS_TABLE."
+			JOIN ".TOPICS_TABLE." USING (topic_id)
+			WHERE post_id != topic_first_post_id";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$values [$row['topic_title']][$row['post_subject']] = $row;
+		$this->db->sql_freeresult($result);
+
+		setlocale(LC_ALL, 'fr_FR');
+		foreach ($values AS $k=>$v) {
+			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
+			ksort ($v);
+			foreach ($v AS $vk=>$vv)
+				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
+		}
+
+		$this->liste_fiches (
+			$assign = $vars['mode'] == 'edit' ? 'calendrier' : 'new', [
+				'post.gym_horaires="on"',
+			],
+			'',''
+		);
+
+//		$this->liste_fiches ();
 
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
@@ -260,6 +320,7 @@ class listener implements EventSubscriberInterface
 
 	// Called during validation of the data to be saved
 	function submit_post_modify_sql_data($vars) {
+return;
 		$sql_data = $vars['sql_data'];
 
 		// Get special columns list
@@ -295,6 +356,7 @@ class listener implements EventSubscriberInterface
 
 	// Called after the post validation
 	function modify_submit_notification_data($vars) {
+return;
 		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
 	}
 	// Keep trace of values prior to modifications
@@ -336,6 +398,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	function posting_modify_submission_errors($vars) {
+return;
 		$error = $vars['error'];
 
 		// Allows entering a POST with empty text
@@ -348,6 +411,7 @@ class listener implements EventSubscriberInterface
 
 	// Return to index if end of config
 	function posting_modify_submit_post_after($vars) {
+return;
 		if ($vars['post_data']['forum_name'] == 'Configuration')
 			$vars['redirect_url'] = './index.php#'.$vars['post_id'];
 	}
@@ -355,6 +419,16 @@ class listener implements EventSubscriberInterface
 	/**
 		FUNCTIONS
 	*/
+	function couleur() {
+		$luminance = 170; // on 255
+		$saturation = 80; // on 128
+		$increment_angle_couleur = 8;
+		$couleur = '#';
+		for ($angle = 0; $angle < 6; $angle += M_PI * 0.66)
+			$couleur .= dechex($luminance + $saturation * sin ($this->angle_couleur += $increment_angle_couleur));
+		return $couleur;
+	}
+
 	function listes() {
 		return [
 			'intensites' => ['?','douce','modérée','moyenne','soutenue','cardio'],
@@ -369,9 +443,9 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Popule les templates horaires, calendrier, actualité
-	function listes_temporelles($template, $assign = 'liste') {
+	function liste_fiches($assign, $cond, $tri1, $tri2) {
 		$static_values = $this->listes();
-
+/*
 		if ($template == 'horaires')
 			$cond = ['post.gym_horaires="on"'];
 		if ($template == 'calendrier')
@@ -382,7 +456,6 @@ class listener implements EventSubscriberInterface
 			$cond = ['post.gym_actualites="on"'];
 		if ($template == 'new')
 			$cond = ['FALSE'];
-
 		$post_id = $this->request->variable('p', '', true);
 		if ($post_id)
 			$cond[] = 'post.post_id='.$post_id;
@@ -402,24 +475,25 @@ class listener implements EventSubscriberInterface
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
+*/
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($cond,true).'</pre>';
 
 		if ($cond) {
-			$sql = "SELECT post.post_id,
+			$sql = "SELECT post.post_id, t.topic_id,
 				post.post_subject AS nom,
 				post.post_text, post.bbcode_uid, post.bbcode_bitfield,
 				li.post_subject AS lieu,
 				an.post_subject AS animateur,
 				ac.post_subject AS activite,
-				ac.gym_ordre_menu,
 				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
 				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
-				post.gym_actualites, post.gym_horaires, post.gym_menu
+				post.gym_actualites, post.gym_horaires, post.gym_menu, post.gym_ordre_menu
 				FROM ".POSTS_TABLE." AS post
 					LEFT JOIN  ".POSTS_TABLE." AS ac on (post.gym_activite = ac.post_id)
 					LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
 					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)
+					JOIN ".TOPICS_TABLE." AS t ON (post.topic_id = t.topic_id)
 				WHERE ".implode(' AND ',$cond );
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
 
@@ -483,6 +557,7 @@ class listener implements EventSubscriberInterface
 				$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
 				$row['horaire_debut'] = $row['gym_heure'].':'.$row['gym_minute'];
 				$row['horaire_fin'] = $row['gym_heure_fin'].':'.$row['gym_minute_fin'];
+				$row['couleur'] = $this->couleur();
 
 				// Extrait les résumés
 				$display_text = generate_text_for_display(
@@ -502,13 +577,15 @@ class listener implements EventSubscriberInterface
 					? '<p>'.implode('</p><p>',$resume).'</p>'
 					: '<p>'.$display_text.'</p>';
 
-				// Range les résultats dans l'ordre et le groupage espéré
+				/*
 				if ($template == 'actualites')
 					$liste[$row['next_end_time']][$row['next_beg_time']][] = array_change_key_case ($row, CASE_UPPER);
 				if ($template == 'presentation')
 					$liste['presentation'][$row['gym_ordre_menu']][] = array_change_key_case ($row, CASE_UPPER);
 				if ($template == 'horaires')
 					$liste[$row['gym_jour']][$row['horaire_debut']][] = array_change_key_case ($row, CASE_UPPER);
+				*/
+				// Range les résultats dans l'ordre et le groupage espéré
 				if ($template == 'calendrier') {
 					$semaines = explode (',', $row['gym_semaines']);
 					foreach ($static_values['semaines'] AS $s) {
@@ -517,10 +594,12 @@ class listener implements EventSubscriberInterface
 						$liste[$row['gym_jour'].$row['horaire_debut']][$s][] = array_change_key_case ($row, CASE_UPPER);
 					}
 				}
+				else
+					$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 			}
 
 			// Template vide pour posting/création
-			if ($template == 'new')
+			if ($assign == 'new')
 				foreach ($static_values['semaines'] AS $s)
 					$liste['new'][][] = [
 						'NO' => $s,

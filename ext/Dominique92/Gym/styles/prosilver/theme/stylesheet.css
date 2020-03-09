@@ -1,0 +1,438 @@
+/* DEBUG */
+pre {
+	text-align: left;
+}
+
+/* Avertissement au posting */
+.section-posting #attach-panel-multi::after {
+	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
+	background: yellow;
+}
+
+/* Ménage phpBB */
+/*
+.site_logo {
+	background-image: url("./images/logo.jpg");
+}
+@media (max-width: 600px) {
+	#logo {
+		display: none !important;
+	}
+}
+#nav-main > li:first-child, / * Accès rapide * /
+#nav-main > li:nth-of-type(2), / * FAQ * /
+.section-viewtopic .post-buttons li:not(:first-child),
+.section-search .advanced-search-link,
+.section-search .actions-jump,
+.section-posting #postingbox .fields1 > dl:first-child, / * Icône de sujet * /
+.section-posting #poll-panel-tab, / * Options * /
+.section-posting #options-panel .fields1 > div, / * Options * /
+.section-posting #options-panel dl label:not([for=delete_permanent]),
+.section-posting #options-panel #edit_reason,
+.section-posting #confirm .fields1, / * Détails confirmation destruction * /
+.section-posting input[name=preview],
+.section-posting input[name=save],
+.section-posting #smiley-box strong,
+.section-posting #review,
+.section-posting #topicreview {
+	display: none !important;
+}
+.viewtopic-gym .content ul {
+	margin: 0;
+}
+*/
+
+/* Style de la page d'accueil */
+html.gym_index  {
+	height: 100%;
+}
+.gym_index body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-image: url("images/plafond.jpg"), url("images/ballons.jpg");
+	background-repeat: no-repeat, no-repeat;
+	background-position: top, center left;
+	background-size: 100%, 20%;
+	background-color: white;
+	text-align: center;
+}
+.gym_index #logo img {
+	background: white;
+	float: left;
+	margin: 0.5em;
+	height: 8em;
+	border-radius: 1em;
+}
+@media (max-width: 600px) {
+	.gym_index body {
+		background-image: none;
+	}
+	.gym_index #logo {
+		display: none;
+	}
+}
+.gym_index .baniere {
+	display: inline-block;
+	margin: 0.2em;
+	padding: 0.4em;
+	border-radius: 1em;
+	background: #ffc;
+	font-family: Times New Roman;
+	font-weight: bold;
+	font-size: 1.5em;
+	color: black;
+}
+
+.gym_index form#search {
+	float: right;
+}
+.gym_index #search fieldset {
+	margin: 0;
+	padding: 0;
+}
+
+.gym_index #menu li,
+.gym_index #sous-menu li {
+	display: inline-block;
+	margin: .3em;
+	padding: .5em;
+	border-radius: 2em;
+	cursor: pointer;
+	font-family: Times New Roman;
+	font-weight: bold;
+}
+.gym_index #sous-menu li a,
+.gym_index #menu li a {
+	color: black;
+	text-decoration: none;
+}
+
+/* Crayons d'édition */
+#edit-page {
+	float: right;
+}
+#edit-user,
+#edit-page {
+	float: right;
+	text-align: right;
+}
+#edit-user .dropdown-contents {
+	display: none;
+	position: relative;
+	right: 0;
+	margin: 0;
+	background: white;
+	padding: 0.3em;
+	text-align: left;
+	list-style-type: none;
+}
+#edit-user:hover .dropdown-contents {
+	display: block;
+}
+#edit-user li {
+	margin: 0.3em;
+}
+
+#presentation,
+#actualites {
+	margin: 0 8%;
+	padding: 0 1%;
+	background: white;
+	text-align: justify;
+}
+#actualites h1 {
+ 	text-align: center;
+	font-size: 2.2em;
+	font-family: "Noto Serif", serif;
+	color: grey;	
+}
+#presentation .bandeau-vert,
+#actualites .bandeau-vert {
+	padding-left: 0.5em;
+	text-align: left;
+}
+#actualites p {
+	margin: 0.3em 0;
+	text-indent: 1em;
+}
+@media (max-width: 600px) {
+	#presentation,
+	#actualites {
+		margin: 0;
+	}
+}
+
+/* Style des pages include dans l'acceuil */
+/*
+#page {
+	margin: 0 8%;
+	padding: 0 1%;
+	background: white;
+}
+#page .content {
+	text-align: justify;
+	text-indent: 1em;
+}
+#page p {
+	margin: 0;
+	background: white;
+}
+#page a {
+	cursor: pointer;
+	text-decoration: none;
+}
+@media (max-width: 600px) {
+	#page {
+		margin: 0;
+	}
+}
+*/
+
+/* Attachements (notamment liens) */
+/*
+#page .inline-attachment,
+#page .inline-attachment dl {
+	display: inline-block;
+	width: initial;
+	max-width: 30vh;
+}
+*/
+
+/* Images incluses dans le texte */
+/*
+#page .file {
+	margin: 0;
+}
+#page .file dd { /* Supprime le compte de vues, ... * /
+	display: none;
+}
+#page .file img {
+	max-width: 30vh;
+	border-radius: 1em;
+}
+.image-gauche .inline-attachment {
+	float: left;
+	margin-right: 1em;
+}
+.image-droite .inline-attachment {
+	float: right;
+	margin-left: 1em;
+}
+@media (max-width: 600px) {
+	.attach-image {
+		display: none;
+	}
+}
+*/
+
+/* BBCodes spéciaux */
+.titre-gris {
+	color: #888;
+	font-size: 1.5em;
+	font-weight: 700;
+	margin-bottom: 0.3em;
+	text-indent: 0;
+}
+.bandeau-vert {
+	text-align: center;
+	background-color: #329932;
+	color: white;
+	font-size: 1.5em;
+}
+.bandeau-vert a {
+	color: white;
+	text-decoration: underline solid white;
+}
+.texte-vert {
+	color: rgb(0, 128, 0);
+}
+.carte {
+	clear: both;
+	margin: 1em 20%;
+	width: 60%;
+	height: 35vw;
+}
+
+/* ACTIVITES */
+/*
+#activites {
+	border-style: solid;
+	border-collapse: collapse;
+}
+#activites tr:first-child td {
+	font-weight: bold;
+}
+#activites td {
+	border: 1px dashed black;
+	padding: 0.2em;
+}
+*/
+
+/* HORAIRES */
+/*
+.horaires {
+	clear: both;
+	margin: 1em 0;
+}
+.horaires div {
+	text-indent: 3em;
+	text-transform: capitalize;
+}
+.horaires table {
+	wwidth: inherit;
+	border: 4px solid;
+	border-collapse: collapse;
+}
+.horaires td {
+	border: 1px dashed;
+	padding: 0.2em;
+}
+.j0 {
+	color: #697c46;
+}
+.j0 table {
+	border-color: #99a682;
+	border-right-color: #3f4c28;
+	border-bottom-color: #3f4c28;
+	background-color: #daedb7;
+}
+.j1 {
+	margin-left: 5%;
+	color: #803d70;
+}
+.j1 table {
+	border-color: #a87c9e;
+	border-right-color: #4e2244;
+	border-bottom-color: #4e2244;
+	background-color: #f1aee1;
+}
+.j2 {
+	margin-left: 10%;
+	color: #525d7c;
+}
+.j2 table {
+	border-color: #8a92a6;
+	border-right-color: #30384c;
+	border-bottom-color: #30384c;
+	background-color: #c3ceed;
+}
+.j3 {
+	margin-left: 15%;
+	color: #508e4d;
+}
+.j3 table {
+	border-color: #89b287;
+	border-right-color: #2f582d;
+	border-bottom-color: #2f582d;
+	background-color: #c1ffbe;
+}
+.j4 {
+	margin-left: 20%;
+	color: #7e5856;
+}
+.j4 table {
+	border-color: #a88e8d;
+	border-right-color: #4e3433;
+	border-bottom-color: #4e3433;
+	background-color: #efc9c7;
+}
+.j5 {
+	margin-left: 25%;
+	color: #6c3f81;
+}
+.j5 table {
+	border-color: #9b7ea9;
+	border-right-color: #41244f;
+	border-bottom-color: #41244f;
+	background-color: #ddb0f2;
+}
+.j6 {
+	margin-left: 30%;
+	color: #468165;
+}
+.j6 table {
+	border-color: #82a997;
+	border-right-color: #284f3d;
+	border-bottom-color: #284f3d;
+	background-color: #b7f2d6;
+}
+@media (max-width: 600px) {
+	.horaires {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.horaires table {
+		width: 100%;
+	}
+}
+*/
+
+/* Calendrier */
+/*
+.calendrier {
+	width: calc(100%-2px);
+	border: 2px solid grey;
+}
+.calendrier table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.calendrier * {
+	border-spacing: 0;
+}
+.calendrier tr:first-child {
+	display: none;
+}
+.calendrier td {
+	color: #999;
+}
+.calendrier td:first-child {
+	color: black;
+}
+.calendrier td.selected {
+	background: #cfc;
+	color: black;
+	font-weight: bold;
+}
+.calendrier td {
+	border: 1px solid grey;
+	text-align: center;
+	width: 8%;
+	margin: 0;
+	padding: 0;
+}
+*/
+
+/* VIEWTOPIC
+.postbody p {
+	margin: 0;
+}
+#actualites h2 {
+	margin: 0;
+	padding: 0 0.5em;
+	background-color: #329932;
+	font-size: 1.2em;
+	color: white;
+}
+#actualites .viewpost-gym h2,
+#actualites .viewpost-gym div {
+	margin-bottom: 0.5em;
+} */
+
+/* POSTING */
+/*
+#liste_semaines {
+	font-size: 1em;
+}
+#liste_semaines tr:first-child {
+	display: none;
+}
+#liste_semaines td {
+	min-width: 4em;
+	text-align: right;
+}
+#liste_semaines td:first-child {
+	text-align: left;
+}
+*/
