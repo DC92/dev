@@ -6,7 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-// index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
 // retour modif d'un horaire revient à l'accueil
 //BUG horaires d'un cours liste tout
 //BUG Paul bert l'image chevauche le texte
@@ -14,6 +13,7 @@
 //BUG double sous menu accueil
 //TODO ne pas afficher présentation et actualité dans les pages index#123
 
+//TODO index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
 //TODO ?? insérer sous menu "choix activité"
 //TODO BBCode inclure la liste des activités
 //TODO retrouver les posts non publiés
@@ -144,7 +144,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function index_modify_page_title() {
 		$this->liste_fiches (
-			$assign = 'menu', [
+			'menu', [
 				'post.post_id=t.topic_first_post_id',
 				'post.gym_menu="on"',
 			],
@@ -152,21 +152,21 @@ class listener implements EventSubscriberInterface
 		);
 
 		$this->liste_fiches (
-			$assign = 'presentation', [
+			'presentation', [
 				'post.gym_presentation="on"',
 			],
 			'gym_presentation','gym_ordre_menu'
 		);
 
 		$this->liste_fiches (
-			$assign = 'actualites', [
+			'actualites', [
 				'post.gym_actualites="on"',
 			],
 			'next_end_time','next_beg_time'
 		);
 
 		$this->liste_fiches (
-			$assign = 'horaires', [
+			'horaires', [
 				'post.gym_horaires="on"',
 			],
 			'gym_jour','horaire_debut'
@@ -208,7 +208,7 @@ return;
 			$this->my_template = 'index_body.html';
 
 		$this->liste_fiches (
-			$assign = 'menu', [
+			'menu', [
 				'post.post_id=t.topic_first_post_id',
 				'post.gym_menu="on"',
 			],
@@ -309,13 +309,28 @@ return;
 				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
 		}
 
-		$this->liste_fiches (
-			$assign = $vars['mode'] == 'edit' ? 'calendrier' : 'new', [
-				'post.gym_horaires="on"',
-				'post.post_id='.$post_data['post_id'],
-			],
-			'',''
-		);
+		//
+		if ($vars['mode'] == 'reply') { // Template vide pour posting/création
+			$liste = [];
+			foreach ($static_values['semaines'] AS $s)
+				$liste['new'][][] = [
+					'NO' => $s,
+					'POST_ID' => 0,
+					'GYM_JOUR' => 0,
+					'GYM_IN_CALENDRIER' => 0,
+				];
+			$this->liste_fiches (
+				'calendrier', [],
+				'','', $liste
+			);
+		} else // Modification
+			$this->liste_fiches (
+				'calendrier', [
+					'post.gym_horaires="on"',
+					'post.post_id='.$post_data['post_id'],
+				],
+				'',''
+			);
 
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
@@ -446,8 +461,7 @@ return;
 	}
 
 	// Popule les templates horaires, calendrier, actualité
-	function liste_fiches($assign, $cond, $tri1, $tri2) {
-		$static_values = $this->listes();
+	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
 /*
 		if ($template == 'horaires')
 			$cond = ['post.gym_horaires="on"'];
@@ -482,7 +496,9 @@ return;
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($cond,true).'</pre>';
 
 		if ($cond) {
-			// Récupère la table de tous les attachements
+			$static_values = $this->listes();
+
+			// Récupère la table de tous les attachements pour les inclusions BBCode
 			$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
 			$result = $this->db->sql_query($sql);
 			$attachments = $update_count_ary = [];
@@ -610,29 +626,20 @@ return;
 				$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 			}
 			$this->db->sql_freeresult($result);
-
-			// Template vide pour posting/création
-/*			if ($assign == 'new')
-				foreach ($static_values['semaines'] AS $s)
-					$liste['new'][][] = [
-						'NO' => $s,
-						'POST_ID' => 0,
-						'GYM_JOUR' => 0,
-						'GYM_IN_CALENDRIER' => 0,
-					];*/
+		}
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($liste,true).'</pre>';
 
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>LISTE $assign = ".var_export($liste,true).'</pre>'; 
 
-			if ($liste) {
-				ksort ($liste);
-				foreach ($liste AS $v) { // Tri du 1er niveau
-					ksort ($v);
+		if ($liste) {
+			ksort ($liste);
+			foreach ($liste AS $v) { // Tri du 1er niveau
+				ksort ($v);
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export(array_values ($v)[0][0],true).'</pre>';
-					$this->template->assign_block_vars($assign, array_values ($v)[0][0]); // La première pour avoir les valeurs générales
-					foreach ($v AS $vv) // Tri du 2" niveau
-						foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
-							$this->template->assign_block_vars("$assign.item", $vvv);
-				}
+				$this->template->assign_block_vars($assign, array_values ($v)[0][0]); // La première pour avoir les valeurs générales
+				foreach ($v AS $vv) // Tri du 2" niveau
+					foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
+						$this->template->assign_block_vars("$assign.item", $vvv);
 			}
 		}
 	}

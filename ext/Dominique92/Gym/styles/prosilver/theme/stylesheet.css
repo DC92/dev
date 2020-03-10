@@ -10,16 +10,16 @@ pre {
 }
 
 /* Ménage phpBB */
-.Wsite_logo {
+.site_logo {
 	background-image: url("./images/logo.jpg");
 }
 @media (max-width: 600px) {
-	#Wlogo {
+	#logo {
 		display: none !important;
 	}
 }
-#Wnav-main > li:first-child, /* Accès rapide */
-#Wnav-main > li:nth-of-type(2), /* FAQ */
+#nav-main > li:first-child, /* Accès rapide */
+#nav-main > li:nth-of-type(2), /* FAQ */
 .Wsection-viewtopic .post-buttons li:not(:first-child),
 .Wsection-search .advanced-search-link,
 .Wsection-search .actions-jump,
