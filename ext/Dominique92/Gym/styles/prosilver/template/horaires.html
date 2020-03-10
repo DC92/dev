@@ -11,14 +11,14 @@
 	<div class="horaires j{horaires.GYM_JOUR}">
 		<div>{horaires.GYM_JOUR_LITERAL}</div>
 		<table style="
-			margin-left:calc(5%*{horaires.GYM_JOUR});
+			margin-left:calc(5% * {horaires.GYM_JOUR} + 1em);
 			background:{horaires.COULEUR};
 			border-color:{horaires.COULEUR_BORD};
 		">
 			<!-- BEGIN item -->
 			<tr>
 				<td>
-					<a onclick="window.location.hash={item.POST_ID}">
+					<a href="viewtopic.php?p={item.POST_ID}">
 						{item.NOM}
 					</a>
 					<!-- IF U_MCP -->
@@ -33,7 +33,7 @@
 
 				<!-- IF not GET_LIEU -->
 					<td>
-						<a onclick="window.location.hash={item.GYM_LIEU}">
+						<a href="viewtopic.php?p={item.GYM_LIEU}">
 							{item.LIEU}
 						</a>
 					</td>
@@ -41,7 +41,7 @@
 
 				<!-- IF not GET_ANIMATEUR -->
 					<td>
-						<a onclick="window.location.hash={item.GYM_ANIMATEUR}">
+						<a href="viewtopic.php?p={item.GYM_ANIMATEUR}">
 							{item.ANIMATEUR}
 						</a>
 					</td>

@@ -6,9 +6,8 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//horaires < 600 px large !! responsive
+// index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
 // retour modif d'un horaire revient à l'accueil
-// pas de lien dans le tableau horaire => #pid !!
 //BUG horaires d'un cours liste tout
 //BUG Paul bert l'image chevauche le texte
 //BUG actualité texte en gras si pas dominique
@@ -116,7 +115,10 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer_after() {
-		$this->template->assign_var ('EXT_PATH', $this->ext_path);
+		$this->template->assign_vars ([
+			'EXT_PATH' => $this->ext_path,
+			'COULEUR_ACCUEIL' => $this->couleur()
+		]);
 
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
@@ -321,14 +323,13 @@ return;
 
 	// Called during validation of the data to be saved
 	function submit_post_modify_sql_data($vars) {
-return;
 		$sql_data = $vars['sql_data'];
 
 		// Get special columns list
 		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "gym_%"';
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
-//			$special_columns[$row['Field']] = $row['Type'];
+//TODO			$special_columns[$row['Field']] = $row['Type'];
 			$sql_data[POSTS_TABLE]['sql'][$row['Field']] = 'off'; // Default field value
 		}
 		$this->db->sql_freeresult($result);
@@ -337,7 +338,7 @@ return;
 		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3)) {
-				// Create the column if none
+				//TODO Create the column if none
 /*				if(!isset($special_columns[$k])){
 					$sql = 'ALTER TABLE '.POSTS_TABLE." ADD $k varchar(255)";
 					$this->db->sql_query($sql);
@@ -420,14 +421,14 @@ return;
 		FUNCTIONS
 	*/
 	function couleur(
-		$luminance = 170, // on 255
-		$saturation = 80, // on 128
+		$saturation = 80, // on 127
+		$luminance = 255,
 		$increment = 1.8
 	) {
 		$this->angle_couleur += $increment;
 		$couleur = '#';
 		for ($angle = 0; $angle < 6; $angle += M_PI * 0.66)
-			$couleur .= dechex($luminance + $saturation * sin ($this->angle_couleur + $angle));
+			$couleur .= dechex ($luminance - $saturation + $saturation * sin ($this->angle_couleur + $angle));
 		return $couleur;
 	}
 
@@ -591,33 +592,35 @@ return;
 				$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
 				$row['horaire_debut'] = $row['gym_heure'].':'.$row['gym_minute'];
 				$row['horaire_fin'] = $row['gym_heure_fin'].':'.$row['gym_minute_fin'];
-				$row['couleur'] = $this->couleur(208, 47);
-				$row['couleur_bord'] = $this->couleur(128, 24, 0);
 
-				// Range les résultats dans l'ordre et le groupage espéré
-				$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
+				$row['couleur'] = $this->couleur(45);
+				$row['couleur_bord'] = $this->couleur(60, 160, 0);
 
 				// Tableau des semaines d'un calendrier
-				$semaines = explode (',', $row['gym_semaines']);
-				if (is_numeric($semaines[0]))
+				if ($assign == 'calendrier') {
+					$semaines = explode (',', $row['gym_semaines']);
 					foreach ($static_values['semaines'] AS $s) {
 						$row['no'] = $s;
 						$row['gym_in_calendrier'] = in_array ($s, $semaines) ? 1 : 0;
 						$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 					}
+				}
+
+				// Range les résultats dans l'ordre et le groupage espéré
+				$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 			}
+			$this->db->sql_freeresult($result);
 
 			// Template vide pour posting/création
-			if ($assign == 'new')
+/*			if ($assign == 'new')
 				foreach ($static_values['semaines'] AS $s)
 					$liste['new'][][] = [
 						'NO' => $s,
 						'POST_ID' => 0,
 						'GYM_JOUR' => 0,
 						'GYM_IN_CALENDRIER' => 0,
-					];
+					];*/
 
-			$this->db->sql_freeresult($result);
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>LISTE $assign = ".var_export($liste,true).'</pre>'; 
 
 			if ($liste) {
