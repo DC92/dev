@@ -104,11 +104,11 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
+			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.posting_modify_submit_post_after' => 'posting_modify_submit_post_after',
-			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 		];
 	}
 
@@ -299,7 +299,6 @@ return;
 		while ($row = $this->db->sql_fetchrow($result))
 			$values [$row['topic_title']][$row['post_subject']] = $row;
 		$this->db->sql_freeresult($result);
-
 		setlocale(LC_ALL, 'fr_FR');
 		foreach ($values AS $k=>$v) {
 			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
@@ -311,11 +310,10 @@ return;
 		$this->liste_fiches (
 			$assign = $vars['mode'] == 'edit' ? 'calendrier' : 'new', [
 				'post.gym_horaires="on"',
+				'post.post_id='.$post_data['post_id'],
 			],
 			'',''
 		);
-
-//		$this->liste_fiches ();
 
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
@@ -401,7 +399,6 @@ return;
 	}
 
 	function posting_modify_submission_errors($vars) {
-return;
 		$error = $vars['error'];
 
 		// Allows entering a POST with empty text
@@ -597,25 +594,17 @@ return;
 				$row['couleur'] = $this->couleur(208, 47);
 				$row['couleur_bord'] = $this->couleur(128, 24, 0);
 
-				/*
-				if ($template == 'actualites')
-					$liste[$row['next_end_time']][$row['next_beg_time']][] = array_change_key_case ($row, CASE_UPPER);
-				if ($template == 'presentation')
-					$liste['presentation'][$row['gym_ordre_menu']][] = array_change_key_case ($row, CASE_UPPER);
-				if ($template == 'horaires')
-					$liste[$row['gym_jour']][$row['horaire_debut']][] = array_change_key_case ($row, CASE_UPPER);
-				*/
 				// Range les résultats dans l'ordre et le groupage espéré
-				if ($template == 'calendrier') {
-					$semaines = explode (',', $row['gym_semaines']);
+				$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
+
+				// Tableau des semaines d'un calendrier
+				$semaines = explode (',', $row['gym_semaines']);
+				if (is_numeric($semaines[0]))
 					foreach ($static_values['semaines'] AS $s) {
 						$row['no'] = $s;
 						$row['gym_in_calendrier'] = in_array ($s, $semaines) ? 1 : 0;
-						$liste[$row['gym_jour'].$row['horaire_debut']][$s][] = array_change_key_case ($row, CASE_UPPER);
+						$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 					}
-				}
-				else
-					$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 			}
 
 			// Template vide pour posting/création

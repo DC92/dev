@@ -10,26 +10,25 @@ pre {
 }
 
 /* Ménage phpBB */
-/*
-.site_logo {
+.Wsite_logo {
 	background-image: url("./images/logo.jpg");
 }
 @media (max-width: 600px) {
-	#logo {
+	#Wlogo {
 		display: none !important;
 	}
 }
-#nav-main > li:first-child, / * Accès rapide * /
-#nav-main > li:nth-of-type(2), / * FAQ * /
-.section-viewtopic .post-buttons li:not(:first-child),
-.section-search .advanced-search-link,
-.section-search .actions-jump,
-.section-posting #postingbox .fields1 > dl:first-child, / * Icône de sujet * /
-.section-posting #poll-panel-tab, / * Options * /
-.section-posting #options-panel .fields1 > div, / * Options * /
+#Wnav-main > li:first-child, /* Accès rapide */
+#Wnav-main > li:nth-of-type(2), /* FAQ */
+.Wsection-viewtopic .post-buttons li:not(:first-child),
+.Wsection-search .advanced-search-link,
+.Wsection-search .actions-jump,
+.section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
+.section-posting #poll-panel-tab, /* Options */
+.section-posting #options-panel .fields1 > div, /* Options */
 .section-posting #options-panel dl label:not([for=delete_permanent]),
 .section-posting #options-panel #edit_reason,
-.section-posting #confirm .fields1, / * Détails confirmation destruction * /
+.section-posting #confirm .fields1, /* Détails confirmation destruction */
 .section-posting input[name=preview],
 .section-posting input[name=save],
 .section-posting #smiley-box strong,
@@ -37,10 +36,9 @@ pre {
 .section-posting #topicreview {
 	display: none !important;
 }
-.viewtopic-gym .content ul {
+.Wviewtopic-gym .content ul {
 	margin: 0;
 }
-*/
 
 /* Style de la page d'accueil */
 html.gym_index  {
@@ -350,7 +348,6 @@ html.gym_index  {
 } */
 
 /* POSTING */
-/*
 #liste_semaines {
 	font-size: 1em;
 }
@@ -364,4 +361,3 @@ html.gym_index  {
 #liste_semaines td:first-child {
 	text-align: left;
 }
-*/

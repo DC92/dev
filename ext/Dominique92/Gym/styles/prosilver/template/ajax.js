@@ -145,7 +145,6 @@ $('.carte').each(function(index, elCarte) {
 });
 
 // Posting.php
-/*
 function displayCalendar(post_id, jour) {
 	// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
 	for (let week = 0; week < 52; week++) {
@@ -155,4 +154,3 @@ function displayCalendar(post_id, jour) {
 		$('#tds_' + post_id + '_' + week).appendTo('#mois_' + post_id + '_' + date.getMonth());
 	}
 }
-*/
