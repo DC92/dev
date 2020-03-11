@@ -115,11 +115,6 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer_after() {
-		$this->template->assign_vars ([
-			'EXT_PATH' => $this->ext_path,
-			'COULEUR_ACCUEIL' => $this->couleur()
-		]);
-
 		// Assigne les paramètres de l'URL aux variables template
 		$this->request->enable_super_globals();
 		$get = $_GET;
@@ -143,6 +138,11 @@ class listener implements EventSubscriberInterface
 		INDEX.PHP
 	*/
 	function index_modify_page_title() {
+		$this->template->assign_vars ([
+			'EXT_PATH' => $this->ext_path,
+			'COULEUR_ACCUEIL' => $this->couleur()
+		]);
+
 		$this->liste_fiches (
 			'menu', [
 				'post.post_id=t.topic_first_post_id',
@@ -207,6 +207,8 @@ return;
 		if ($vars['forum_id'] == 2)
 			$this->my_template = 'index_body.html';
 
+		$this->template->assign_var ('COULEUR_ACCUEIL', $this->couleur());
+
 		$this->liste_fiches (
 			'menu', [
 				'post.post_id=t.topic_first_post_id',
@@ -240,7 +242,7 @@ return;
 		$post_row = $vars['post_row'];
 
 		// Couleur du sous-menu
-		$post_row['COULEUR'] = $this->couleur();
+//		$post_row['COULEUR'] = $this->couleur();
 
 //return;
 //		$post_id = $post_row['POST_ID'];
@@ -436,14 +438,15 @@ return;
 		FUNCTIONS
 	*/
 	function couleur(
-		$saturation = 80, // on 127
+		$saturation = 60, // on 127
 		$luminance = 255,
-		$increment = 1.8
+		$increment = M_PI / 1.75
 	) {
 		$this->angle_couleur += $increment;
 		$couleur = '#';
-		for ($angle = 0; $angle < 6; $angle += M_PI * 0.66)
-			$couleur .= dechex ($luminance - $saturation + $saturation * sin ($this->angle_couleur + $angle));
+		for ($angle = 0; $angle < 6; $angle += M_PI / 1.5)
+			$couleur .= substr ('00'.dechex ($luminance - $saturation + $saturation * sin ($this->angle_couleur + $angle)), -2);
+//*DCMM*/echo"<pre style='background-color:$couleur;color:black;font-size:14px'>$couleur = ".var_export($this->angle_couleur,true).'</pre>';
 		return $couleur;
 	}
 
@@ -602,6 +605,7 @@ return;
 				}
 
 				// Horaires
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>$assign = ".var_export($row['nom'],true).'</pre>';
 				$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);
 				$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
 				$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
@@ -609,8 +613,9 @@ return;
 				$row['horaire_debut'] = $row['gym_heure'].':'.$row['gym_minute'];
 				$row['horaire_fin'] = $row['gym_heure_fin'].':'.$row['gym_minute_fin'];
 
-				$row['couleur'] = $this->couleur(45);
-				$row['couleur_bord'] = $this->couleur(60, 160, 0);
+				$row['couleur'] = $this->couleur();
+				$row['couleur_fond'] = $this->couleur(35, 255, 0);
+				$row['couleur_bord'] = $this->couleur(40, 196, 0);
 
 				// Tableau des semaines d'un calendrier
 				if ($assign == 'calendrier') {
