@@ -11,6 +11,8 @@
 	<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
 	<!-- INCLUDECSS icons.css -->
 	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
+	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
+	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
 	<!-- INCLUDEJS {T_JQUERY_LINK} -->
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 	{$STYLESHEETS}
@@ -87,7 +89,7 @@
 		<div id="presentation">
 			<!-- BEGIN presentation -->
 				<!-- BEGIN item -->
-					<h3>
+					<h3 class="titre-gris">
 						{item.NOM}
 						<!-- IF U_MCP -->
 							<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
@@ -133,7 +135,7 @@
 						</a>
 					<!-- ENDIF -->
 				</h2>
-				<!-- IF GET_T -->
+				<!-- IF not GET_P -->
 					{postrow.MESSAGE}
 				<!-- ENDIF -->
 			<!-- ENDIF -->
@@ -153,6 +155,21 @@
 				</a>
 			</li>
 		</ul>
+
+		<!-- BEGIN postrow -->
+			<!-- IF postrow.POST_ID == GET_P and not GET_T -->
+				<h2>
+					{postrow.POST_SUBJECT}
+					<!-- IF U_MCP -->
+						<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
+							title="Mofifier cette fiche" class="button button-icon-only">
+							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+						</a>
+					<!-- ENDIF -->
+				</h2>
+				{postrow.MESSAGE}
+			<!-- ENDIF -->
+		<!-- END postrow -->
 	<!-- ENDIF -->
 
 	{$SCRIPTS}

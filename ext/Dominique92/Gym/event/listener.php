@@ -6,18 +6,18 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG pas de index.js dans posting
+//sous menu en bbcode
+// Mise en page page evenements
 // retour modif d'un horaire revient à l'accueil
-//BUG horaires d'un cours liste tout
-//BUG Paul bert l'image chevauche le texte
-
-//TODO sous-menu évènements en dessous de la page actualités
-//TODO dans présentation et evenements => Plus d'infos si résumé.
+// Horaire -> nom du cours : plein de bulles !!! (toutes les séances
+//TODO sous-menu évènements en dessous de la page Evenements
+//TODO dans présentation et evenements => lien plus d'infos si résumé.
 //TODO index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
 //TODO ?? insérer sous menu "choix activité"
 //TODO BBCode inclure la liste des activités
 //TODO retrouver les posts non publiés
 //TODO style print
+//BEST include du sous-template evenements
 //BEST erradiquer f=2
 //APRES enlever le .robot et faire un SEO
 
@@ -148,23 +148,6 @@ class listener implements EventSubscriberInterface
 			'gym_menu','gym_ordre_menu'
 		);
 
-		// Inclusions d'extraits de la base
-		if ($this->inclusions['presentation'])
-			$this->liste_fiches (
-				'presentation', [
-					'post.gym_presentation="on"',
-				],
-				'gym_presentation','gym_ordre_menu'
-			);
-
-		if ($this->inclusions['evenements'])
-			$this->liste_fiches (
-				'evenements', [
-					'post.gym_evenements="on"',
-				],
-				'next_end_time','next_beg_time'
-			);
-
 		// Pour le BBCode [horaire]
 		$this->liste_fiches (
 			'horaires', [
@@ -178,8 +161,20 @@ class listener implements EventSubscriberInterface
 		INDEX.PHP
 	*/
 	function index_modify_page_title() {
-		$this->inclusions['presentation'] = true;
-		$this->inclusions['evenements'] = true;
+		// Inclusions des données de la page d'acceuil
+		$this->liste_fiches (
+			'presentation', [
+				'post.gym_presentation="on"',
+			],
+			'gym_presentation','gym_ordre_menu'
+		);
+
+		$this->liste_fiches (
+			'evenements', [
+				'post.gym_evenements="on"',
+			],
+			'next_end_time','next_beg_time'
+		);
 
 return;
 		// Popule le menu et sous-menu
@@ -213,8 +208,8 @@ return;
 		VIEWTOPIC.PHP
 	*/
 	function viewtopic_modify_page_title($vars) {
-		$view = $this->request->variable('view', true);
-		if ($vars['forum_id'] == 2 && $view)
+		$mode = $this->request->variable('mode', '');
+		if ($vars['forum_id'] == 2 && !$mode)
 			$this->my_template = 'index_body.html';
 	}
 
@@ -241,13 +236,13 @@ return;
 
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
-////		$this->post_row = $post_row;
 
 		// Couleur du sous-menu
 		$post_row['COULEUR'] = $this->couleur();
 
 		// Inclue des extraits de la base
-		if ($this->request->variable('view', true))
+		/*
+		if (!$this->request->variable('mode', ''))
 			$post_row['MESSAGE'] = preg_replace_callback(
 				'/\[inclue\]([a-z]+)\[\/inclue\]/',
 				function ($matches) {
@@ -255,15 +250,14 @@ return;
 					return '';
 				},
 				$post_row['MESSAGE']
-			);
+			);*/
 
 		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
 		$post_row['MESSAGE'] = preg_replace_callback(
 			'/([A-Z_]+)/',
-			function ($matches) {
-////				$r = $this->post_row[$matches[1]];
+			function ($matches) use ($post_row) {
 				$r = $post_row[$matches[1]];
-				return urlencode ($r ? $r : $matches[1]);
+				return $r ? $r : urlencode ($matches[1]);
 			},
 			$post_row['MESSAGE']
 		);
@@ -277,7 +271,7 @@ return;
 	function viewforum_modify_topicrow($vars) {
 		// Permet la visualisation en mode forum pour l'édition du site
 		$topic_row = $vars['topic_row'];
-		$topic_row['U_VIEW_TOPIC'] .= '&view';
+		$topic_row['U_VIEW_TOPIC'] .= '&mode=view';
 		$vars['topic_row'] = $topic_row;
 	}
 
@@ -288,7 +282,7 @@ return;
 	function posting_modify_template_vars($vars) {
 		// Permet la visualisation en mode forum pour l'édition du site
 		$page_data = $vars['page_data'];
-		$page_data['U_VIEW_TOPIC'] .= '&view';
+		$page_data['U_VIEW_TOPIC'] .= '&mode=view';
 		$vars['page_data'] = $page_data;
 
 		$post_data = $vars['post_data'];
@@ -489,16 +483,6 @@ return;
 	// Popule les templates horaires, calendrier, actualité
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
 /*
-		if ($template == 'horaires')
-			$cond = ['post.gym_horaires="on"'];
-		if ($template == 'calendrier')
-			$cond = ['post.gym_horaires="on"'];
-		if ($template == 'presentation')
-			$cond = ['post.gym_presentation="on"'];
-		if ($template == 'evenements')
-			$cond = ['post.gym_evenements="on"'];
-		if ($template == 'new')
-			$cond = ['FALSE'];
 		$post_id = $this->request->variable('p', '', true);
 		if ($post_id)
 			$cond[] = 'post.post_id='.$post_id;
@@ -506,11 +490,10 @@ return;
 		$nom = $this->request->variable('nom', '', true);
 		if ($nom)
 			$cond[] = 'post.post_subject="'.urldecode($nom).'"';
-
+*/
 		$lieu = $this->request->variable('lieu', '', true);
 		if ($lieu)
 			$cond[] = 'li.post_subject="'.urldecode($lieu).'"';
-
 		$animateur = $this->request->variable('animateur', '', true);
 		if ($animateur)
 			$cond[] = 'an.post_subject="'.urldecode($animateur).'"';
@@ -518,7 +501,6 @@ return;
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
-*/
 //*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($cond,true).'</pre>';
 
 		if ($cond) {
