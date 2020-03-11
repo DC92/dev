@@ -69,9 +69,6 @@
 	</div>
 
 	<ul id="menu">
-		<li style="background:{COULEUR_ACCUEIL}">
-			<a href=".">Accueil</a>
-		</li>
 		<!-- BEGIN menu -->
 			<!-- BEGIN item -->
 				<li style="background:{item.COULEUR}">
@@ -94,7 +91,7 @@
 						{item.NOM}
 						<!-- IF U_MCP -->
 							<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
-								title="Mofifier cet article" class="button button-icon-only">
+								title="Mofifier cette fiche" class="button button-icon-only">
 								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 							</a>
 						<!-- ENDIF -->
@@ -105,22 +102,22 @@
 		</div>
 	<!-- ENDIF -->
 
-	<!-- IF .actualites -->
-		<div id="actualites">
-			<h1>Actualité</h1>
-			<!-- BEGIN actualites -->
+	<!-- IF .evenements -->
+		<div id="evenements">
+			<h1>Evenements</h1>
+			<!-- BEGIN evenements -->
 				<div class="bandeau-vert">
-					{actualites.DATE}: <a href="viewtopic.php?p={actualites.POST_ID}">{actualites.NOM}</a>
+					{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
 					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f={actualites.FORUM_ID}&p={actualites.POST_ID}"
+						<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
 							title="Mofifier cette actualité" class="button button-icon-only">
 							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 						</a>
 					<!-- ENDIF -->
 				</div>
-				<div>{actualites.LIEU} à {actualites.HORAIRE_DEBUT}<!-- IF actualites.ANIMATEUR --> avec {actualites.ANIMATEUR}<!-- ENDIF --></div>
-				{actualites.RESUME}
-			<!-- END actualites -->
+				<div>{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF --></div>
+				{evenements.RESUME}
+			<!-- END evenements -->
 		</div>
 	<!-- ENDIF -->
 
@@ -151,7 +148,7 @@
 				<!-- ENDIF -->
 			<!-- END postrow -->
 			<li>
-				<a title="Ajouter un item au sous-menu" href="posting.php?mode=reply&amp;f={actualites.FORUM_ID}&t={GET_T}">
+				<a title="Ajouter un item au sous-menu" href="posting.php?mode=reply&amp;f={evenements.FORUM_ID}&t={GET_T}">
 					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 				</a>
 			</li>

@@ -6,19 +6,19 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//BUG pas de index.js dans posting
 // retour modif d'un horaire revient à l'accueil
 //BUG horaires d'un cours liste tout
 //BUG Paul bert l'image chevauche le texte
-//BUG actualité texte en gras si pas dominique
-//BUG double sous menu accueil
-//TODO ne pas afficher présentation et actualité dans les pages index#123
 
-//BEST erradiquer f=2
+//TODO sous-menu évènements en dessous de la page actualités
+//TODO dans présentation et evenements => Plus d'infos si résumé.
 //TODO index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
 //TODO ?? insérer sous menu "choix activité"
 //TODO BBCode inclure la liste des activités
 //TODO retrouver les posts non publiés
 //TODO style print
+//BEST erradiquer f=2
 //APRES enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
@@ -39,7 +39,7 @@ MESSAGES / BBCodes / cocher afficher
 	[image-gauche]{TEXT}[/image-gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
-	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les actualités
+	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
 
 //TODO DELETE remplacer par include
@@ -100,7 +100,7 @@ class listener implements EventSubscriberInterface
 
 			// Viewtopic
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
-			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
+//			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Viewforum
@@ -119,14 +119,6 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer_after() {
-		// Assigne les paramètres de l'URL aux variables template
-		$this->request->enable_super_globals();
-		$get = $_GET;
-		$server = $_SERVER;
-		$this->request->disable_super_globals();
-		foreach ($get AS $k=>$v)
-			$this->template->assign_var (strtoupper ("get_$k"), $v);
-
 		// Change le template sur demande
 		$template = $this->request->variable('template', '');
 		if ($template)
@@ -136,17 +128,18 @@ class listener implements EventSubscriberInterface
 			$this->template->set_filenames([
 				'body' => $this->my_template,
 			]);
-	}
 
-	/**
-		INDEX.PHP
-	*/
-	function index_modify_page_title() {
-		$this->template->assign_vars ([
-			'EXT_PATH' => $this->ext_path,
-			'COULEUR_ACCUEIL' => $this->couleur()
-		]);
+		$this->template->assign_var ('EXT_PATH',$this->ext_path);
 
+		// Assigne les paramètres de l'URL aux variables template
+		$this->request->enable_super_globals();
+		$get = $_GET;
+		$server = $_SERVER;
+		$this->request->disable_super_globals();
+		foreach ($get AS $k=>$v)
+			$this->template->assign_var (strtoupper ("get_$k"), $v);
+
+		// Menu principal
 		$this->liste_fiches (
 			'menu', [
 				'post.post_id=t.topic_first_post_id',
@@ -155,26 +148,38 @@ class listener implements EventSubscriberInterface
 			'gym_menu','gym_ordre_menu'
 		);
 
-		$this->liste_fiches (
-			'presentation', [
-				'post.gym_presentation="on"',
-			],
-			'gym_presentation','gym_ordre_menu'
-		);
+		// Inclusions d'extraits de la base
+		if ($this->inclusions['presentation'])
+			$this->liste_fiches (
+				'presentation', [
+					'post.gym_presentation="on"',
+				],
+				'gym_presentation','gym_ordre_menu'
+			);
 
-		$this->liste_fiches (
-			'actualites', [
-				'post.gym_actualites="on"',
-			],
-			'next_end_time','next_beg_time'
-		);
+		if ($this->inclusions['evenements'])
+			$this->liste_fiches (
+				'evenements', [
+					'post.gym_evenements="on"',
+				],
+				'next_end_time','next_beg_time'
+			);
 
+		// Pour le BBCode [horaire]
 		$this->liste_fiches (
 			'horaires', [
 				'post.gym_horaires="on"',
 			],
 			'gym_jour','horaire_debut'
 		);
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	function index_modify_page_title() {
+		$this->inclusions['presentation'] = true;
+		$this->inclusions['evenements'] = true;
 
 return;
 		// Popule le menu et sous-menu
@@ -201,7 +206,7 @@ return;
 		}
 
 		$this->liste_fiches ('presentation', 'presentation');
-		$this->liste_fiches ($this->request->variable ('template', 'actualites'));
+		$this->liste_fiches ($this->request->variable ('template', 'evenements'));
 	}
 
 	/**
@@ -211,24 +216,12 @@ return;
 		$view = $this->request->variable('view', true);
 		if ($vars['forum_id'] == 2 && $view)
 			$this->my_template = 'index_body.html';
-
-		$this->template->assign_vars ([
-			'EXT_PATH' => $this->ext_path,
-			'COULEUR_ACCUEIL' => $this->couleur()
-		]);
-
-		$this->liste_fiches (
-			'menu', [
-				'post.post_id=t.topic_first_post_id',
-				'post.gym_menu="on"',
-			],
-			'gym_menu','gym_ordre_menu'
-		);
 	}
 
 	function viewtopic_modify_post_data($vars) {
-return;
 		$rowset = $vars['rowset'];
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($rowset,true).'</pre>';
+return;
 		$first_post_id = $vars['topic_data']['topic_first_post_id'];
 
 		// Ajoute les BBCodes du premier post à tous les autres
@@ -248,21 +241,28 @@ return;
 
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
+////		$this->post_row = $post_row;
 
 		// Couleur du sous-menu
-//		$post_row['COULEUR'] = $this->couleur();
+		$post_row['COULEUR'] = $this->couleur();
 
-//return;
-//		$post_id = $post_row['POST_ID'];
+		// Inclue des extraits de la base
+		if ($this->request->variable('view', true))
+			$post_row['MESSAGE'] = preg_replace_callback(
+				'/\[inclue\]([a-z]+)\[\/inclue\]/',
+				function ($matches) {
+					$this->inclusions[$matches[1]] = true;
+					return '';
+				},
+				$post_row['MESSAGE']
+			);
 
-		// Remplace dans le texte du message {VARIABLE_POST_TEMPLATE} par sa valeur
-		//TODO traiter /g pour plusieurs remplacements
-		$this->post_row = $post_row;
-//TODO ???		$post_row['RESUME'] = $vars['row']['resume'];
+		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
 		$post_row['MESSAGE'] = preg_replace_callback(
 			'/([A-Z_]+)/',
 			function ($matches) {
-				$r = $this->post_row[$matches[1]];
+////				$r = $this->post_row[$matches[1]];
+				$r = $post_row[$matches[1]];
 				return urlencode ($r ? $r : $matches[1]);
 			},
 			$post_row['MESSAGE']
@@ -272,9 +272,10 @@ return;
 	}
 
 	/**
-		VIEWTOPIC.PHP
+		VIEWFORUM.PHP
 	*/
 	function viewforum_modify_topicrow($vars) {
+		// Permet la visualisation en mode forum pour l'édition du site
 		$topic_row = $vars['topic_row'];
 		$topic_row['U_VIEW_TOPIC'] .= '&view';
 		$vars['topic_row'] = $topic_row;
@@ -285,6 +286,7 @@ return;
 	*/
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
+		// Permet la visualisation en mode forum pour l'édition du site
 		$page_data = $vars['page_data'];
 		$page_data['U_VIEW_TOPIC'] .= '&view';
 		$vars['page_data'] = $page_data;
@@ -493,8 +495,8 @@ return;
 			$cond = ['post.gym_horaires="on"'];
 		if ($template == 'presentation')
 			$cond = ['post.gym_presentation="on"'];
-		if ($template == 'actualites')
-			$cond = ['post.gym_actualites="on"'];
+		if ($template == 'evenements')
+			$cond = ['post.gym_evenements="on"'];
 		if ($template == 'new')
 			$cond = ['FALSE'];
 		$post_id = $this->request->variable('p', '', true);
@@ -539,7 +541,7 @@ return;
 				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
 				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
-				post.gym_actualites, post.gym_horaires, post.gym_menu, post.gym_ordre_menu
+				post.gym_evenements, post.gym_horaires, post.gym_menu, post.gym_ordre_menu
 				FROM ".POSTS_TABLE." AS post
 					LEFT JOIN  ".POSTS_TABLE." AS ac on (post.gym_activite = ac.post_id)
 					LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)

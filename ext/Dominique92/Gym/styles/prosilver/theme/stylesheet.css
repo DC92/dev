@@ -133,30 +133,30 @@ html.gym_index  {
 }
 
 #presentation,
-#actualites {
+#evenements {
 	margin: 0 8%;
 	padding: 0 1%;
 	background: white;
 	text-align: left;
 }
-#actualites h1 {
+#evenements h1 {
  	text-align: center;
 	font-size: 2.2em;
 	font-family: "Noto Serif", serif;
 	color: grey;	
 }
 #presentation .bandeau-vert,
-#actualites .bandeau-vert {
+#evenements .bandeau-vert {
 	padding-left: 0.5em;
 	text-align: left;
 }
-#actualites p {
+#evenements p {
 	margin: 0.3em 0;
 	text-indent: 1em;
 }
 @media (max-width: 600px) {
 	#presentation,
-	#actualites {
+	#evenements {
 		margin: 0;
 	}
 }
@@ -213,11 +213,11 @@ html.gym_index  {
 	margin-left: 1em;
 }
 .image-droite .inline-attachment {
-	float: right;
+	float: right !important;
 	margin-left: 1em;
 }
 .image-gauche .inline-attachment {
-	float: left;
+	float: left !important;
 	margin-right: 1em;
 }
 @media (max-width: 600px) {
@@ -228,13 +228,14 @@ html.gym_index  {
 
 /* BBCodes spéciaux */
 .titre-gris {
+	margin-bottom: 0.3em;
+	text-indent: 0;
 	color: #888;
 	font-size: 1.5em;
 	font-weight: 700;
-	margin-bottom: 0.3em;
-	text-indent: 0;
 }
 .bandeau-vert {
+	clear: both;
 	text-align: center;
 	background-color: #329932;
 	color: white;
@@ -343,15 +344,15 @@ html.gym_index  {
 .postbody p {
 	margin: 0;
 }
-#actualites h2 {
+#evenements h2 {
 	margin: 0;
 	padding: 0 0.5em;
 	background-color: #329932;
 	font-size: 1.2em;
 	color: white;
 }
-#actualites .viewpost-gym h2,
-#actualites .viewpost-gym div {
+#evenements .viewpost-gym h2,
+#evenements .viewpost-gym div {
 	margin-bottom: 0.5em;
 } */
 

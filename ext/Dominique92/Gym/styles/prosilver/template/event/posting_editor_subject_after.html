@@ -11,8 +11,8 @@
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
-	Actualités <input type="checkbox" name="gym_actualites"
-	<!-- IF GYM_ACTUALITES == 'on' -->
+	Actualités <input type="checkbox" name="gym_evenements"
+	<!-- IF GYM_EVENEMENTS == 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
@@ -154,25 +154,16 @@
 	</table>
 <!-- END calendrier -->
 
-	<script>
-	
-	//*DCMM*/{var _r='gym_jour ',_v=$('#gym_jour').value;if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+<!-- INCLUDEJS @Dominique92_Gym/index.js -->
+<script>
+	function displayInputCalendar() {
+		if (!$('#gym_scolaire')[0].checked)
+			$('#liste_semaines')[0].style.display = 'block';
 
-	
-function displayInputCalendar() {
-	if (!$('#gym_scolaire')[0].checked)
-		$('#liste_semaines')[0].style.display = 'block';
-	//displayCalendar('',0);
 		<!-- BEGIN calendrier -->
 				displayCalendar({calendrier.POST_ID},{calendrier.GYM_JOUR});
 		<!-- END calendrier -->
-}
-
-		window.addEventListener('load', function(){
-			displayInputCalendar();
-		}, false);
-		
-	window.addEventListener('load', function(){
-	}, false);
-	</script>
+	}
+	window.addEventListener('load', displayInputCalendar, false);
+</script>
 <!-- ENDIF -->
