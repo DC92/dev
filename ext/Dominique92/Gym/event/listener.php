@@ -13,6 +13,7 @@
 //BUG double sous menu accueil
 //TODO ne pas afficher présentation et actualité dans les pages index#123
 
+//BEST erradiquer f=2
 //TODO index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
 //TODO ?? insérer sous menu "choix activité"
 //TODO BBCode inclure la liste des activités
@@ -101,6 +102,9 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
+
+			// Viewforum
+			'core.viewforum_modify_topicrow' => 'viewforum_modify_topicrow',
 
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
@@ -204,10 +208,14 @@ return;
 		VIEWTOPIC.PHP
 	*/
 	function viewtopic_modify_page_title($vars) {
-		if ($vars['forum_id'] == 2)
+		$view = $this->request->variable('view', true);
+		if ($vars['forum_id'] == 2 && $view)
 			$this->my_template = 'index_body.html';
 
-		$this->template->assign_var ('COULEUR_ACCUEIL', $this->couleur());
+		$this->template->assign_vars ([
+			'EXT_PATH' => $this->ext_path,
+			'COULEUR_ACCUEIL' => $this->couleur()
+		]);
 
 		$this->liste_fiches (
 			'menu', [
@@ -264,10 +272,23 @@ return;
 	}
 
 	/**
+		VIEWTOPIC.PHP
+	*/
+	function viewforum_modify_topicrow($vars) {
+		$topic_row = $vars['topic_row'];
+		$topic_row['U_VIEW_TOPIC'] .= '&view';
+		$vars['topic_row'] = $topic_row;
+	}
+
+	/**
 		POSTING.PHP
 	*/
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
+		$page_data = $vars['page_data'];
+		$page_data['U_VIEW_TOPIC'] .= '&view';
+		$vars['page_data'] = $page_data;
+
 		$post_data = $vars['post_data'];
 
 		// To prevent an empty title to invalidate the full page and input.
@@ -375,7 +396,7 @@ return;
 
 	// Called after the post validation
 	function modify_submit_notification_data($vars) {
-return;
+return;//TODO save_post_data
 		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
 	}
 	// Keep trace of values prior to modifications
@@ -440,11 +461,11 @@ return;
 	function couleur(
 		$saturation = 60, // on 127
 		$luminance = 255,
-		$increment = M_PI / 1.75
+		$increment = 1.8
 	) {
 		$this->angle_couleur += $increment;
 		$couleur = '#';
-		for ($angle = 0; $angle < 6; $angle += M_PI / 1.5)
+		for ($angle = 0; $angle < 6; $angle += 2)
 			$couleur .= substr ('00'.dechex ($luminance - $saturation + $saturation * sin ($this->angle_couleur + $angle)), -2);
 //*DCMM*/echo"<pre style='background-color:$couleur;color:black;font-size:14px'>$couleur = ".var_export($this->angle_couleur,true).'</pre>';
 		return $couleur;

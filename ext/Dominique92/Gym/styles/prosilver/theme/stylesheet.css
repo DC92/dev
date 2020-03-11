@@ -59,7 +59,7 @@ html.gym_index  {
 	background: white;
 	float: left;
 	margin: 0.5em;
-	height: 8em;
+	height: 5em;
 	border-radius: 1em;
 }
 @media (max-width: 600px) {
