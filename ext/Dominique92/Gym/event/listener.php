@@ -6,17 +6,12 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//sous menu en bbcode
-// Mise en page page evenements
-// retour modif d'un horaire revient à l'accueil
-// Horaire -> nom du cours : plein de bulles !!! (toutes les séances
-//TODO sous-menu évènements en dessous de la page Evenements
-//TODO dans présentation et evenements => lien plus d'infos si résumé.
-//TODO index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
-//TODO ?? insérer sous menu "choix activité"
-//TODO BBCode inclure la liste des activités
-//TODO retrouver les posts non publiés
 //TODO style print
+//TODO ?? insérer sous menu "choix activité"
+//TODO ?? BBCode inclure la liste des activités
+//BEST favicon en posting et autres pages non index
+//BEST index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
+//BEST retrouver les posts non publiés
 //BEST include du sous-template evenements
 //BEST erradiquer f=2
 //APRES enlever le .robot et faire un SEO
@@ -37,15 +32,11 @@ MESSAGES / BBCodes / cocher afficher
 	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div> / Applique un style
 	[image-droite]{TEXT}[/image-droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[image-gauche]{TEXT}[/image-gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
-
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
-	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
-	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
-
-//TODO DELETE remplacer par include
-	[activites][/activites] / <div class="include">?template=activites</div> / Affiche la liste des seances par activité
-	[calendrier][/calendrier] / <div class="include">?template=calendrier&id=POST_ID</div> / Affiche un calendrier
 	[horaires]{TEXT}[/horaires] / <div class="include">.?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
+	[calendrier]{TEXT}[/calendrier] / <div class="include">.?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
+	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
+	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
 */
 
 namespace Dominique92\Gym\event;
@@ -100,7 +91,7 @@ class listener implements EventSubscriberInterface
 
 			// Viewtopic
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
-//			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Viewforum
@@ -155,6 +146,14 @@ class listener implements EventSubscriberInterface
 			],
 			'gym_jour','horaire_debut'
 		);
+
+		// Pour le BBCode [calendrier]
+		$this->liste_fiches (
+			'calendrier', [
+//				'post.gym_calendrier="on"',
+			],
+			'gym_jour','post_id'
+		);
 	}
 
 	/**
@@ -208,19 +207,26 @@ return;
 		VIEWTOPIC.PHP
 	*/
 	function viewtopic_modify_page_title($vars) {
-		$mode = $this->request->variable('mode', '');
-		if ($vars['forum_id'] == 2 && !$mode)
+		$view = $this->request->variable('view', '');
+		if (!$view)
 			$this->my_template = 'index_body.html';
 	}
 
-	function viewtopic_modify_post_data($vars) {
+	// Called during first pass on post data that reads phpbb-posts SQL data
+	function viewtopic_post_rowset_data($vars) {
+		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
+		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
+	}
+
+	function WWWWWWWWWWviewtopic_modify_post_data($vars) {
+return;
 		$rowset = $vars['rowset'];
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($rowset,true).'</pre>';
-return;
 		$first_post_id = $vars['topic_data']['topic_first_post_id'];
 
 		// Ajoute les BBCodes du premier post à tous les autres
 		// Need to take the first post from the base if there are more tnan 10 posts in the topic
+		/*
 		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_id = '.$first_post_id;
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
@@ -229,20 +235,31 @@ return;
 		foreach ($rowset AS $k=>$v) {
 			if ($bbcodes && $first_post_id != $v['post_id'])
 				$rowset[$k]['post_text'] = '<r>'.str_replace(['<r>','</r>'],'',$v['post_text']).implode ('', $bbcodes[0]).'</r>';
-		}
+		}*/
+
+		// Set specific variables
+		foreach ($vars['post_data'] AS $k=>$v)
+			if (!strncmp ($k, 'gym', 3) && $v) {
+				$this->template->assign_var (strtoupper ($k), $v);
+				$data[$k] = explode (',', $v); // Expand grouped values
+			}
 
 		$vars['rowset'] = $rowset;
 	}
 
+	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($post_row['POST_ID'],true).'</pre>';
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($this->all_post_data[$post_row['POST_ID']]['gym_menu'],true).'</pre>';
+		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
 
 		// Couleur du sous-menu
 		$post_row['COULEUR'] = $this->couleur();
 
 		// Inclue des extraits de la base
 		/*
-		if (!$this->request->variable('mode', ''))
+		if (!$this->request->variable('view', ''))
 			$post_row['MESSAGE'] = preg_replace_callback(
 				'/\[inclue\]([a-z]+)\[\/inclue\]/',
 				function ($matches) {
@@ -269,9 +286,9 @@ return;
 		VIEWFORUM.PHP
 	*/
 	function viewforum_modify_topicrow($vars) {
-		// Permet la visualisation en mode forum pour l'édition du site
+		// Permet la visualisation en vue forum pour l'édition du site
 		$topic_row = $vars['topic_row'];
-		$topic_row['U_VIEW_TOPIC'] .= '&mode=view';
+		$topic_row['U_VIEW_TOPIC'] .= '&view=forum';
 		$vars['topic_row'] = $topic_row;
 	}
 
@@ -280,9 +297,9 @@ return;
 	*/
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
-		// Permet la visualisation en mode forum pour l'édition du site
+		// Permet la visualisation en vue forum pour l'édition du site
 		$page_data = $vars['page_data'];
-		$page_data['U_VIEW_TOPIC'] .= '&mode=view';
+		$page_data['U_VIEW_TOPIC'] .= '&view=forum';
 		$vars['page_data'] = $page_data;
 
 		$post_data = $vars['post_data'];
@@ -482,15 +499,12 @@ return;
 
 	// Popule les templates horaires, calendrier, actualité
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
-/*
-		$post_id = $this->request->variable('p', '', true);
+/*		$post_id = $this->request->variable('id', '', true);
 		if ($post_id)
-			$cond[] = 'post.post_id='.$post_id;
-
+			$cond[] = 'post.post_id='.$post_id;*/
 		$nom = $this->request->variable('nom', '', true);
 		if ($nom)
 			$cond[] = 'post.post_subject="'.urldecode($nom).'"';
-*/
 		$lieu = $this->request->variable('lieu', '', true);
 		if ($lieu)
 			$cond[] = 'li.post_subject="'.urldecode($lieu).'"';
@@ -501,7 +515,7 @@ return;
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($cond,true).'</pre>';
+//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>$assign = ".var_export($cond,true).'</pre>';
 
 		if ($cond) {
 			$static_values = $this->listes();
@@ -583,7 +597,6 @@ return;
 					$row['next_end_time'] = INF;
 					$semaines = explode (',', $row['gym_semaines']);
 					foreach ($semaines AS $s) {
-//						$row["gym_semaine_$s"] = true;
 						$beg_time = mktime(
 							$gym_heure, $gym_minute,
 							0, -4, // 1er aout

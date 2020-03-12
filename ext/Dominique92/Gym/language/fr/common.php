@@ -42,6 +42,7 @@ $lang = array_merge($lang, array(
 	'USERNAME' => 'Prénom',
 	
 	// Posting.php
+	'SUBJECT' => 'Titre',
 	'SUBMIT' => 'Enregistrer',
 	'EDIT_POST' => 'Modifier une fiche',
 	'POST_REPLY' => 'Créer une nouvelle fiche',

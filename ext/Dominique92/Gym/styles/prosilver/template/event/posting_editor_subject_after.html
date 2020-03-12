@@ -5,13 +5,13 @@
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
-	ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
+	Ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
 	Présentation <input type="checkbox" name="gym_presentation"
 	<!-- IF GYM_PRESENTATION == 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
-	Actualités <input type="checkbox" name="gym_evenements"
+	Événements <input type="checkbox" name="gym_evenements"
 	<!-- IF GYM_EVENEMENTS == 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
@@ -132,7 +132,7 @@
 			<!-- BEGIN item -->
 				<td id="tds_{calendrier.POST_ID}_{item.NO}">
 					<span id="s_{calendrier.POST_ID}_{item.NO}"></span>
-					<input type="checkbox" value="{item.VALEUR}"
+					<input type="checkbox" value="{item.NO}"
 						name="gym_semaines[]"
 					<!-- IF item.GYM_IN_CALENDRIER -->
 						checked="checked"
@@ -154,10 +154,10 @@
 	</table>
 <!-- END calendrier -->
 
+<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 <script>
 	function displayInputCalendar() {
-		if (!$('#gym_scolaire')[0].checked)
-			$('#liste_semaines')[0].style.display = 'block';
+		$('#liste_semaines')[0].style.display = $('#gym_scolaire')[0].checked ? 'none' : 'block';
 
 		<!-- BEGIN calendrier -->
 				displayCalendar({calendrier.POST_ID},{calendrier.GYM_JOUR});

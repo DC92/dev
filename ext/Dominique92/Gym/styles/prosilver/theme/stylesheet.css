@@ -131,12 +131,16 @@ html.gym_index  {
 	margin: 0.3em;
 }
 
+.gym_index #page,
 #presentation,
 #evenements {
 	margin: 0 8%;
 	padding: 0 1%;
-	background: white;
+	background: white !important;
 	text-align: left;
+}
+.gym_index #page h2 {
+ 	text-align: center;
 }
 #evenements h1 {
  	text-align: center;
@@ -213,11 +217,11 @@ html.gym_index  {
 }
 .image-droite .inline-attachment {
 	float: right !important;
-	margin-left: 1em;
+	margin-left: 1em !important;
 }
 .image-gauche .inline-attachment {
 	float: left !important;
-	margin-right: 1em;
+	margin-right: 1em !important;
 }
 @media (max-width: 600px) {
 	.attach-image {
@@ -254,21 +258,6 @@ html.gym_index  {
 	height: 35vw;
 }
 
-/* ACTIVITES */
-/*
-#activites {
-	border-style: solid;
-	border-collapse: collapse;
-}
-#activites tr:first-child td {
-	font-weight: bold;
-}
-#activites td {
-	border: 1px dashed black;
-	padding: 0.2em;
-}
-*/
-
 /* HORAIRES */
 .horaires {
 	clear: both;
@@ -304,7 +293,6 @@ html.gym_index  {
 }
 
 /* Calendrier */
-/*
 .calendrier {
 	width: calc(100%-2px);
 	border: 2px solid grey;
@@ -337,7 +325,10 @@ html.gym_index  {
 	margin: 0;
 	padding: 0;
 }
-*/
+.calendrier a {
+	text-decoration: none;
+	color: black;
+}
 
 /* VIEWTOPIC
 .postbody p {

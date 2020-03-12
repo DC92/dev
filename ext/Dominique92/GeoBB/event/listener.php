@@ -390,7 +390,7 @@ class listener implements EventSubscriberInterface
 				}
 
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
-		$this->all_post_data[$vars['row']['post_id']] =  array_merge ($post_data, $update);
+		$this->all_post_data[$vars['row']['post_id']] = array_merge ($post_data, $update);
 
 		// Clean ~ automatic feilds / replace by -field
 		//TODO AFTER CHEM remove when no more ~

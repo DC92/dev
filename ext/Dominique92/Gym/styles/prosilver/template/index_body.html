@@ -53,8 +53,13 @@
 					</a>
 				</li>
 				<li>
-					<a href="viewtopic.php?p=93">
+					<a href="viewtopic.php?p=93&view=forum">
 						Mode d'emploi
+					</a>
+				</li>
+				<li>
+					<a href="viewforum.php?f=2">
+						Rubriques
 					</a>
 				</li>
 				<li>
@@ -79,7 +84,7 @@
 			<!-- END item -->
 		<!-- END menu -->
 		<li>
-			<a title="Ajouter un item au menu" href="posting.php?mode=post&amp;f=2">
+			<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&amp;f=2">
 				<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 			</a>
 		</li>
@@ -99,6 +104,7 @@
 						<!-- ENDIF -->
 					</h3>
 					<div>{item.RESUME}</div>
+					<div>. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a></div>
 				<!-- END item -->
 			<!-- END presentation -->
 		</div>
@@ -119,18 +125,20 @@
 				</div>
 				<div>{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF --></div>
 				{evenements.RESUME}
+				<div>. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a></div>
+				<br/>
 			<!-- END evenements -->
 		</div>
 	<!-- ENDIF -->
 
 	<!-- IF .postrow -->
 		<!-- BEGIN postrow -->
-			<!-- IF postrow.S_FIRST_ROW -->
+			<!-- IF postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' -->
 				<h2>
 					{postrow.POST_SUBJECT}
 					<!-- IF U_MCP -->
 						<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-							title="Mofifier cette fiche" class="button button-icon-only">
+							title="Mofifier cette rubrique" class="button button-icon-only">
 							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 						</a>
 					<!-- ENDIF -->
@@ -143,33 +151,37 @@
 
 		<ul id="sous-menu">
 			<!-- BEGIN postrow -->
-				<!-- IF not postrow.S_FIRST_ROW -->
+				<!-- IF postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' -->
+					<li>
+						<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={evenements.FORUM_ID}&t={GET_T}">
+							<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+						</a>
+					</li>
+				<!-- ENDIF -->
+				<!-- IF not postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' -->
 					<li style="background:{postrow.COULEUR}">
 						<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
 					</li>
 				<!-- ENDIF -->
 			<!-- END postrow -->
-			<li>
-				<a title="Ajouter un item au sous-menu" href="posting.php?mode=reply&amp;f={evenements.FORUM_ID}&t={GET_T}">
-					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-				</a>
-			</li>
 		</ul>
 
-		<!-- BEGIN postrow -->
-			<!-- IF postrow.POST_ID == GET_P and not GET_T -->
-				<h2>
-					{postrow.POST_SUBJECT}
-					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-							title="Mofifier cette fiche" class="button button-icon-only">
-							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-						</a>
-					<!-- ENDIF -->
-				</h2>
-				{postrow.MESSAGE}
-			<!-- ENDIF -->
-		<!-- END postrow -->
+		<div id="page">
+			<!-- BEGIN postrow -->
+				<!-- IF postrow.POST_ID == GET_P -->
+					<h2>
+						{postrow.POST_SUBJECT}
+						<!-- IF U_MCP -->
+							<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
+								title="Mofifier cette fiche" class="button button-icon-only">
+								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+							</a>
+						<!-- ENDIF -->
+					</h2>
+					{postrow.MESSAGE}
+				<!-- ENDIF -->
+			<!-- END postrow -->
+		</div>
 	<!-- ENDIF -->
 
 	{$SCRIPTS}
