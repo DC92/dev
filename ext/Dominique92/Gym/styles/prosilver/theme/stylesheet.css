@@ -20,9 +20,6 @@ pre {
 }
 #nav-main > li:first-child, /* Accès rapide */
 #nav-main > li:nth-of-type(2), /* FAQ */
-.Wsection-viewtopic .post-buttons li:not(:first-child),
-.Wsection-search .advanced-search-link,
-.Wsection-search .actions-jump,
 .section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
 .section-posting #poll-panel-tab, /* Options */
 .section-posting #options-panel .fields1 > div, /* Options */
@@ -35,9 +32,6 @@ pre {
 .section-posting #review,
 .section-posting #topicreview {
 	display: none !important;
-}
-.Wviewtopic-gym .content ul {
-	margin: 0;
 }
 
 /* Style de la page d'accueil */
@@ -163,32 +157,6 @@ html.gym_index  {
 		margin: 0;
 	}
 }
-
-/* Style des pages include dans l'acceuil */
-/*
-#page {
-	margin: 0 8%;
-	padding: 0 1%;
-	background: white;
-}
-#page .content {
-	text-align: justify;
-	text-indent: 1em;
-}
-#page p {
-	margin: 0;
-	background: white;
-}
-#page a {
-	cursor: pointer;
-	text-decoration: none;
-}
-@media (max-width: 600px) {
-	#page {
-		margin: 0;
-	}
-}
-*/
 
 /* Attachements (notamment liens) */
 .inline-attachment,
@@ -329,22 +297,6 @@ html.gym_index  {
 	text-decoration: none;
 	color: black;
 }
-
-/* VIEWTOPIC
-.postbody p {
-	margin: 0;
-}
-#evenements h2 {
-	margin: 0;
-	padding: 0 0.5em;
-	background-color: #329932;
-	font-size: 1.2em;
-	color: white;
-}
-#evenements .viewpost-gym h2,
-#evenements .viewpost-gym div {
-	margin-bottom: 0.5em;
-} */
 
 /* POSTING */
 #liste_semaines {

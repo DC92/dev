@@ -6,7 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO save_post_data
 //TODO style print
 //TODO ?? insérer sous menu "choix activité"
 //TODO ?? BBCode inclure la liste des activités
@@ -332,11 +331,9 @@ class listener implements EventSubscriberInterface
 
 	// Called after the post validation
 	function modify_submit_notification_data($vars) {
-return;//TODO save_post_data
 		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
 	}
 	// Keep trace of values prior to modifications
-	//TODO test
 	function save_post_data($post_data, $attachment_data, $gym_data, $create_if_null = false) {
 		if (isset ($post_data['post_id'])) {
 			$this->request->enable_super_globals();
