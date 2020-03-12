@@ -6,6 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO save_post_data
 //TODO style print
 //TODO ?? insérer sous menu "choix activité"
 //TODO ?? BBCode inclure la liste des activités
@@ -102,7 +103,6 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
-			'core.posting_modify_submit_post_after' => 'posting_modify_submit_post_after',
 		];
 	}
 
@@ -148,12 +148,7 @@ class listener implements EventSubscriberInterface
 		);
 
 		// Pour le BBCode [calendrier]
-		$this->liste_fiches (
-			'calendrier', [
-//				'post.gym_calendrier="on"',
-			],
-			'gym_jour','post_id'
-		);
+		$this->liste_fiches ('calendrier', [], 'gym_jour','post_id');
 	}
 
 	/**
@@ -174,33 +169,6 @@ class listener implements EventSubscriberInterface
 			],
 			'next_end_time','next_beg_time'
 		);
-
-return;
-		// Popule le menu et sous-menu
-		$sql = "
-			SELECT p.post_id, p.post_subject, t.topic_id, t.topic_title, t.topic_first_post_id,
-				p.gym_ordre_menu, first.gym_ordre_menu AS first_ordre_gym_menu
-			FROM ".POSTS_TABLE." AS p
-			JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
-			LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
-			WHERE p.gym_menu = 'on'";
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result)) {
-			foreach ($row AS $k=>$v)
-				$row["norm_$k"] = substr("000$v", -3);
-			$menu [$row['topic_id']] [] = array_change_key_case ($row, CASE_UPPER);
-		}
-		$this->db->sql_freeresult($result);
-
-		foreach ($menu AS $titre=>$v) {
-			$v[0] ['COUNT'] = count($v);
-			$this->template->assign_block_vars('menu', $v[0]);
-			foreach ($v AS $vv)
-				$this->template->assign_block_vars('menu.sous_menu', $vv);
-		}
-
-		$this->liste_fiches ('presentation', 'presentation');
-		$this->liste_fiches ($this->request->variable ('template', 'evenements'));
 	}
 
 	/**
@@ -218,56 +186,12 @@ return;
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
 	}
 
-	function WWWWWWWWWWviewtopic_modify_post_data($vars) {
-return;
-		$rowset = $vars['rowset'];
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($rowset,true).'</pre>';
-		$first_post_id = $vars['topic_data']['topic_first_post_id'];
-
-		// Ajoute les BBCodes du premier post à tous les autres
-		// Need to take the first post from the base if there are more tnan 10 posts in the topic
-		/*
-		$sql = 'SELECT post_text FROM '.POSTS_TABLE.' WHERE post_id = '.$first_post_id;
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-		preg_match_all ('/<HORAIRES.+\/HORAIRES>/', $row['post_text'], $bbcodes);
-		foreach ($rowset AS $k=>$v) {
-			if ($bbcodes && $first_post_id != $v['post_id'])
-				$rowset[$k]['post_text'] = '<r>'.str_replace(['<r>','</r>'],'',$v['post_text']).implode ('', $bbcodes[0]).'</r>';
-		}*/
-
-		// Set specific variables
-		foreach ($vars['post_data'] AS $k=>$v)
-			if (!strncmp ($k, 'gym', 3) && $v) {
-				$this->template->assign_var (strtoupper ($k), $v);
-				$data[$k] = explode (',', $v); // Expand grouped values
-			}
-
-		$vars['rowset'] = $rowset;
-	}
-
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($post_row['POST_ID'],true).'</pre>';
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($this->all_post_data[$post_row['POST_ID']]['gym_menu'],true).'</pre>';
+
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
-
-		// Couleur du sous-menu
-		$post_row['COULEUR'] = $this->couleur();
-
-		// Inclue des extraits de la base
-		/*
-		if (!$this->request->variable('view', ''))
-			$post_row['MESSAGE'] = preg_replace_callback(
-				'/\[inclue\]([a-z]+)\[\/inclue\]/',
-				function ($matches) {
-					$this->inclusions[$matches[1]] = true;
-					return '';
-				},
-				$post_row['MESSAGE']
-			);*/
+		$post_row['COULEUR'] = $this->couleur(); // Couleur du sous-menu
 
 		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
 		$post_row['MESSAGE'] = preg_replace_callback(
@@ -404,7 +328,6 @@ return;
 
 		$vars['sql_data'] = $sql_data; // return data
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
-//		$this->modifs['geojson'] = str_replace (['ST_GeomFromGeoJSON(\'','\')'], '', $this->modifs['geom']);
 	}
 
 	// Called after the post validation
@@ -424,7 +347,6 @@ return;//TODO save_post_data
 				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
 				'post_subject = '.$gym_data['post_subject'],
 				'post_text = '.$post_data['post_text'].$post_data['message'],
-//				'geojson = '.@$geo_data['geojson'],
 			];
 			foreach ($gym_data AS $k=>$v)
 				if ($v && !strncmp ($k, 'gym_', 4))
@@ -461,13 +383,6 @@ return;//TODO save_post_data
 		$vars['error'] = $error;
 	}
 
-	// Return to index if end of config
-	function posting_modify_submit_post_after($vars) {
-return;
-		if ($vars['post_data']['forum_name'] == 'Configuration')
-			$vars['redirect_url'] = './index.php#'.$vars['post_id'];
-	}
-
 	/**
 		FUNCTIONS
 	*/
@@ -480,7 +395,6 @@ return;
 		$couleur = '#';
 		for ($angle = 0; $angle < 6; $angle += 2)
 			$couleur .= substr ('00'.dechex ($luminance - $saturation + $saturation * sin ($this->angle_couleur + $angle)), -2);
-//*DCMM*/echo"<pre style='background-color:$couleur;color:black;font-size:14px'>$couleur = ".var_export($this->angle_couleur,true).'</pre>';
 		return $couleur;
 	}
 
@@ -499,9 +413,6 @@ return;
 
 	// Popule les templates horaires, calendrier, actualité
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
-/*		$post_id = $this->request->variable('id', '', true);
-		if ($post_id)
-			$cond[] = 'post.post_id='.$post_id;*/
 		$nom = $this->request->variable('nom', '', true);
 		if ($nom)
 			$cond[] = 'post.post_subject="'.urldecode($nom).'"';
@@ -515,7 +426,6 @@ return;
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>$assign = ".var_export($cond,true).'</pre>';
 
 		if ($cond) {
 			$static_values = $this->listes();
@@ -544,13 +454,9 @@ return;
 					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)
 					JOIN ".TOPICS_TABLE." AS t ON (post.topic_id = t.topic_id)
 				WHERE ".implode(' AND ',$cond );
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($sql,true).'</pre>';
 
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result)) {
-//*DCMM*/$row['post_text'] = '';
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>ROW $assign = ".var_export($row,true).'</pre>';
-
 				// BBCodes et attachements
 				$display_text = generate_text_for_display(
 					$row['post_text'],
@@ -623,7 +529,6 @@ return;
 				}
 
 				// Horaires
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>$assign = ".var_export($row['nom'],true).'</pre>';
 				$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);
 				$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
 				$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
@@ -650,15 +555,11 @@ return;
 			}
 			$this->db->sql_freeresult($result);
 		}
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($liste,true).'</pre>';
-
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'>LISTE $assign = ".var_export($liste,true).'</pre>'; 
 
 		if ($liste) {
 			ksort ($liste);
 			foreach ($liste AS $v) { // Tri du 1er niveau
 				ksort ($v);
-//*DCMM*/echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export(array_values ($v)[0][0],true).'</pre>';
 				$this->template->assign_block_vars($assign, array_values ($v)[0][0]); // La première pour avoir les valeurs générales
 				foreach ($v AS $vv) // Tri du 2" niveau
 					foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
