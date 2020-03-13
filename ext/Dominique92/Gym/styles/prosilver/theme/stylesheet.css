@@ -18,7 +18,7 @@ pre {
 		display: none !important;
 	}
 }
-#nav-main > li:first-child, /* Accès rapide */
+.section-viewtopic .post-buttons li:not(:first-child),
 #nav-main > li:nth-of-type(2), /* FAQ */
 .section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
 .section-posting #poll-panel-tab, /* Options */
@@ -32,6 +32,16 @@ pre {
 .section-posting #review,
 .section-posting #topicreview {
 	display: none !important;
+}
+@media print and (color) { /* //TODO */
+	#search-box,
+	.navbar	{
+		display: none !important;
+	}
+	body,
+	.post {
+		background: white !important;
+	}
 }
 
 /* Style de la page d'accueil */
@@ -60,7 +70,8 @@ html.gym_index  {
 	.gym_index body {
 		background-image: none;
 	}
-	.gym_index #logo {
+	.gym_index #logo,
+	.gym_index #search {
 		display: none;
 	}
 }
@@ -83,7 +94,20 @@ html.gym_index  {
 	margin: 0;
 	padding: 0;
 }
+.gym_index #search input {
+	display: none;
+}
+.gym_index #search:hover input {
+	display: inline-block;
+}
+.gym_index #search .button-search {
+	padding: 0;
+}
 
+.gym_index #menu,
+.gym_index #sous-menu {
+	padding: 0;
+}
 .gym_index #menu li,
 .gym_index #sous-menu li {
 	display: inline-block;
@@ -107,10 +131,11 @@ html.gym_index  {
 #edit-page {
 	float: right;
 	text-align: right;
+	line-height: 1.5em;
 }
 #edit-user .dropdown-contents {
 	display: none;
-	position: relative;
+	position: absolute;
 	right: 0;
 	margin: 0;
 	background: white;
@@ -126,8 +151,8 @@ html.gym_index  {
 }
 
 .gym_index #page,
-#presentation,
-#evenements {
+.gym_index #presentation,
+.gym_index #evenements {
 	margin: 0 8%;
 	padding: 0 1%;
 	background: white !important;
@@ -136,24 +161,25 @@ html.gym_index  {
 .gym_index #page h2 {
  	text-align: center;
 }
-#evenements h1 {
+.gym_index #evenements h1 {
  	text-align: center;
 	font-size: 2.2em;
 	font-family: "Noto Serif", serif;
 	color: grey;	
 }
-#presentation .bandeau-vert,
-#evenements .bandeau-vert {
+.gym_index #presentation .bandeau-vert,
+.gym_index #evenements .bandeau-vert {
 	padding-left: 0.5em;
 	text-align: left;
 }
-#evenements p {
+.gym_index #evenements p {
 	margin: 0.3em 0;
 	text-indent: 1em;
 }
 @media (max-width: 600px) {
-	#presentation,
-	#evenements {
+	.gym_index #page,
+	.gym_index #presentation,
+	.gym_index #evenements {
 		margin: 0;
 	}
 }
@@ -221,9 +247,16 @@ html.gym_index  {
 }
 .carte {
 	clear: both;
-	margin: 1em 20%;
-	width: 60%;
-	height: 35vw;
+	margin: 1em calc(50% - 250px);
+	width: 500px;
+	height: 375px;
+}
+@media (max-width: 600px) {
+	.carte {
+		margin: 0;
+		width: 100%;
+		height: 70vw;
+	}
 }
 
 /* HORAIRES */

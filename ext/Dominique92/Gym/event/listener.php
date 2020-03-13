@@ -282,7 +282,7 @@ class listener implements EventSubscriberInterface
 				'calendrier', [],
 				'','', $liste
 			);
-		} else // Modification
+		} elseif ($post_data['post_id']) // Modification
 			$this->liste_fiches (
 				'calendrier', [
 					'post.gym_horaires="on"',

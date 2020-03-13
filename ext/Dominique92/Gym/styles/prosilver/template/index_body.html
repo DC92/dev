@@ -24,25 +24,6 @@
 		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
 	</div>
 
-	<form action="{U_SEARCH}" method="get" id="search">
-	<fieldset>
-		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
-		<button class="button button-search" type="submit" title="{L_SEARCH}">
-			<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
-		</button>
-		{S_SEARCH_HIDDEN_FIELDS}
-	</fieldset>
-	</form>
-
-	<div>
-		<a id="logo" href="https://www.sport-sante.fr/">
-			<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
-		</a>
-		<a href=".">
-			<div class="baniere">{SITENAME}</div>
-		</a>
-	</div>
-
 	<div id="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
 			{S_USERNAME}&nbsp;
@@ -75,6 +56,25 @@
 		<!-- ENDIF -->
 	</div>
 
+	<form action="{U_SEARCH}" method="get" id="search">
+	<fieldset>
+		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
+		<button class="button button-search" type="submit" title="{L_SEARCH}">
+			<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
+		</button>
+		{S_SEARCH_HIDDEN_FIELDS}
+	</fieldset>
+	</form>
+
+	<div>
+		<a id="logo" href="https://www.sport-sante.fr/">
+			<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
+		</a>
+		<a href=".">
+			<div class="baniere">{SITENAME}</div>
+		</a>
+	</div>
+
 	<ul id="menu">
 		<!-- BEGIN menu -->
 			<!-- BEGIN item -->
@@ -83,11 +83,13 @@
 				</li>
 			<!-- END item -->
 		<!-- END menu -->
-		<li>
-			<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&amp;f=2">
-				<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-			</a>
-		</li>
+		<!-- IF U_MCP -->
+			<li>
+				<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&amp;f=2">
+					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
 	</ul>
 
 	<!-- IF .presentation -->
@@ -151,7 +153,7 @@
 
 		<ul id="sous-menu">
 			<!-- BEGIN postrow -->
-				<!-- IF postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' -->
+				<!-- IF postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' and U_MCP -->
 					<li>
 						<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={evenements.FORUM_ID}&t={GET_T}">
 							<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>

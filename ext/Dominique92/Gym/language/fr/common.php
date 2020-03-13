@@ -53,7 +53,8 @@ $lang = array_merge($lang, array(
 	'DELETE_MESSAGE_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
 	'DELETE_POST_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
 	'STICK_TOPIC_FOR_EXPLAIN' => '',
-
+	'CONTACT_ADMIN' => 'Nous contacter',
+	
 	// Footer
 	'FINAL_INTEGRATION_BY' =>
 		'&copy; Dominique Cavailhez 2020 : <a href="https://github.com/Dominique92">Github</a> &amp; '.
