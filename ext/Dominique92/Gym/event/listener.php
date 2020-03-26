@@ -6,7 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG Tri des sous menus suivant ordre
 //TODO mettre une couleur de plus en plus soutenue selon le niveau de la gym 
 //TODO style print
 //BEST favicon en posting et autres pages non index
@@ -91,6 +90,7 @@ class listener implements EventSubscriberInterface
 			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
+			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
@@ -174,10 +174,16 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	function viewtopic_modify_page_title($vars) {
+	// Called before reading reads phpbb-posts SQL data
+	function viewtopic_gen_sort_selects_before($vars) {
+		// Tri des sous-menus dansle bon ordre
+		$sort_by_sql = $vars['sort_by_sql'];
+
 		$view = $this->request->variable('view', '');
 		if (!$view)
-			$this->my_template = 'index_body.html';
+			$sort_by_sql['t'] = array_merge (['p.gym_ordre_menu'],$sort_by_sql['t']);
+
+		$vars['sort_by_sql'] = $sort_by_sql;
 	}
 
 	// Called during first pass on post data that reads phpbb-posts SQL data
@@ -190,6 +196,7 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 
+		$post_row['TOPIC_FIRST_POST_ID'] = $vars['topic_data']['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
 		$post_row['COULEUR'] = $this->couleur(); // Couleur du sous-menu
 
@@ -204,6 +211,13 @@ class listener implements EventSubscriberInterface
 		);
 
 		$vars['post_row'] = $post_row;
+	}
+
+	// Appelé juste avant d'afficher
+	function viewtopic_modify_page_title($vars) {
+		$view = $this->request->variable('view', '');
+		if (!$view)
+			$this->my_template = 'index_body.html';
 	}
 
 	/**

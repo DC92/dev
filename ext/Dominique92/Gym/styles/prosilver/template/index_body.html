@@ -141,7 +141,7 @@
 
 	<!-- IF .postrow -->
 		<!-- BEGIN postrow -->
-			<!-- IF postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' -->
+			<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
 				<h2>
 					{postrow.POST_SUBJECT}
 					<!-- IF U_MCP -->
@@ -159,14 +159,14 @@
 
 		<ul id="sous-menu">
 			<!-- BEGIN postrow -->
-				<!-- IF postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' and U_MCP -->
+				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' and U_MCP -->
 					<li>
-						<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={evenements.FORUM_ID}&t={GET_T}">
+						<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={postrow.FORUM_ID}&t={GET_T}">
 							<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 						</a>
 					</li>
 				<!-- ENDIF -->
-				<!-- IF not postrow.S_FIRST_ROW and postrow.GYM_MENU == 'on' -->
+				<!-- IF postrow.POST_ID != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
 					<li style="background:{postrow.COULEUR}">
 						<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
 					</li>
