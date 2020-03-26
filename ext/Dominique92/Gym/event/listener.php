@@ -6,19 +6,12 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//BUG http://gym.c92.fr/posting.php?mode=reply&f=&t=2
-//BUG n'affiche plus la date dans les actualités
 //BUG Tri des sous menus suivant ordre
-//TODO enlever plus d'info si pas résumé
 //TODO mettre une couleur de plus en plus soutenue selon le niveau de la gym 
 //TODO style print
-//TODO ?? insérer sous menu "choix activité"
-//TODO ?? BBCode inclure la liste des activités
 //BEST favicon en posting et autres pages non index
-//BEST index: survol nom connecté ne devrait pas decaler ce qu'il y a en dessous
-//BEST retrouver les posts non publiés
-//BEST include du sous-template evenements
 //BEST erradiquer f=2
+//BEST template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 //APRES enlever le .robot et faire un SEO
 
 // List template vars : phpbb/template/context.php line 135
@@ -260,7 +253,7 @@ class listener implements EventSubscriberInterface
 
 		// Dictionnaires en fonction du contenu de la base de données
 		//TODO importer seulement activités, lieux, animateurs
-		$sql = "SELECT topic_title, post_id, post_subject
+		$sql = "SELECT post_id, post_subject, topic_title
 			FROM ".POSTS_TABLE."
 			JOIN ".TOPICS_TABLE." USING (topic_id)
 			WHERE post_id != topic_first_post_id";
@@ -293,12 +286,10 @@ class listener implements EventSubscriberInterface
 		} elseif ($post_data['post_id']) // Modification
 			$this->liste_fiches (
 				'calendrier', [
-					'post.gym_horaires="on"',
 					'post.post_id='.$post_data['post_id'],
 				],
 				'',''
 			);
-
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
 	}

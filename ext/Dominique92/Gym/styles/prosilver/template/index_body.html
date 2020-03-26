@@ -120,19 +120,21 @@
 		<div id="evenements">
 			<h1>Évenements</h1>
 			<!-- BEGIN evenements -->
-				<div class="bandeau-vert">
-					{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
-					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
-							title="Mofifier cette actualité" class="button button-icon-only">
-							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-						</a>
-					<!-- ENDIF -->
-				</div>
-				<div>{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF --></div>
-				{evenements.RESUME}
-				<div>. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a></div>
-				<br/>
+				<!-- IF evenements.DATE -->
+					<div class="bandeau-vert">
+						{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
+						<!-- IF U_MCP -->
+							<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
+								title="Mofifier cette actualité" class="button button-icon-only">
+								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+							</a>
+						<!-- ENDIF -->
+					</div>
+					<div>{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF --></div>
+					{evenements.RESUME}
+					<div>. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a></div>
+					<br/>
+				<!-- ENDIF -->
 			<!-- END evenements -->
 		</div>
 	<!-- ENDIF -->
