@@ -105,8 +105,12 @@
 							</a>
 						<!-- ENDIF -->
 					</h3>
-					<div>{item.RESUME}</div>
-					<div>. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a></div>
+					<!-- IF item.RESUME -->
+						<div>{item.RESUME}</div>
+						<div>. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a></div>
+					<!-- ELSE -->
+						<div>{item.DISPLAY_TEXT}</div>
+					<!-- ENDIF -->
 				<!-- END item -->
 			<!-- END presentation -->
 		</div>
@@ -114,7 +118,7 @@
 
 	<!-- IF .evenements -->
 		<div id="evenements">
-			<h1>Evenements</h1>
+			<h1>Évenements</h1>
 			<!-- BEGIN evenements -->
 				<div class="bandeau-vert">
 					{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>

@@ -158,6 +158,12 @@ html.gym_index  {
 	background: white !important;
 	text-align: left;
 }
+.gym_index #presentation h3 {
+	margin-top: 0.5em;
+}
+.gym_index #presentation p {
+	margin: 0;
+}
 .gym_index #page h2 {
  	text-align: center;
 }
@@ -228,7 +234,7 @@ html.gym_index  {
 	margin-bottom: 0.3em;
 	text-indent: 0;
 	color: #888;
-	font-size: 1.5em;
+	font-size: 1.2em;
 	font-weight: 700;
 }
 .bandeau-vert {

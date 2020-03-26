@@ -6,6 +6,11 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//BUG http://gym.c92.fr/posting.php?mode=reply&f=&t=2
+//BUG n'affiche plus la date dans les actualités
+//BUG Tri des sous menus suivant ordre
+//TODO enlever plus d'info si pas résumé
+//TODO mettre une couleur de plus en plus soutenue selon le niveau de la gym 
 //TODO style print
 //TODO ?? insérer sous menu "choix activité"
 //TODO ?? BBCode inclure la liste des activités
@@ -37,6 +42,9 @@ MESSAGES / BBCodes / cocher afficher
 	[calendrier]{TEXT}[/calendrier] / <div class="include">.?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
 	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
+	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
+	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
+	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une runrique
 */
 
 namespace Dominique92\Gym\event;
@@ -472,9 +480,9 @@ class listener implements EventSubscriberInterface
 						if (count ($frag_exp) > 1)
 							$resume[] = $frag_exp[0];
 					}
-				$row['resume'] = count ($resume)
-					? '<p>'.implode('</p><p>',$resume).'</p>'
-					: '<p>'.$display_text.'</p>';
+				if (count ($resume))
+					$row['resume'] = '<p>'.implode('</p><p>',$resume).'</p>';
+				$row['display_text'] = $display_text;
 
 				// Paramètres spécifiques
 				if ($row['gym_intensite']) {
