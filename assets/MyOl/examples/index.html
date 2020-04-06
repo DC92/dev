@@ -54,30 +54,23 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<!-- Fixed marker -->
-	<p>
-		<input type="hidden" id="marqueur-json" value='{"type":"Point","coordinates":[7.45,46.95]}' />
-		Lon <span id="marqueur-lon"></span>,
-		Lat <span id="marqueur-lat"></span>
-		<span id="marqueur-xy"> /
-			X=<span id="marqueur-x"></span>,
-			Y=<span id="marqueur-y"></span>
-			(CH1903)
-		</span>
-	</p>
+	<p><b>Cadre: </b><span id="marqueur"></span></p>
+	<input type="hidden" id="marqueur-json" value='{"type":"Point","coordinates":[7.45,46.95]}' />
 
 	<!-- Draggable marker -->
+	<p><b>Colimateur: </b><span id="viseur"></span></p>
 	<p>
-		<input type="text" id="viseur-json" size="60" value='{"type":"Point","coordinates":[2.4,47]}' /><br/>
 		Lon <input type="text" id="viseur-lon" size="10" maxlength="12" />
 		Lat <input type="text" id="viseur-lat" size="10" maxlength="12" />
 		<span>Suisse
 			X:<input type="text" id="viseur-x" size="7" maxlength="12" />
 			Y:<input type="text" id="viseur-y" size="7" maxlength="12" />
 			(CH 1903)
-		</span><br/>
+		</span>
 		<button id="viseur-center-marker">Déplacer le viseur au centre de la carte</button>
 		<button id="viseur-center-map">Centrer la carte sur le viseur</button>
 	</p>
+	<input type="text" id="viseur-json" size="60" value='{"type":"Point","coordinates":[2.4,47]}' /><br/>
 
 	<!-- Features editor -->
 	<input type="text" id="geojson" style="width:90%" value='
