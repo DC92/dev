@@ -1,142 +1,117 @@
-//TODO commentaires sur diapos
+/** OPENLAYERS ADAPTATION
+ * © Dominique Cavailhez 2020
+ * https://github.com/Dominique92
+ *
+ * Provide a minimal nice slideshow
+ * from a JS array defining the images & text
+ */
+/* jshint esversion: 6 */
+var scrollDelay = 5000, // Milliseconds
+	buttonsDelay = 1500,
+	images = [],
+	thumb = [],
+	current = -1,
+	timer,
+	timerButtons;
 
-var srcs,
-	slide = [],
-	thumb = [];
+// Start slide show
+sliderLoadimg(0);
+sliderShowButtons();
+sliderDisplay();
 
-function loadimg(i) {
+function sliderLoadimg(i) {
 	// Preload images
-	let img = document.createElement('img');
-	img.src = srcs[i];
-
-	// Loop until the end of the image list
-	img.onload = function() {
-		if (i + 1 < srcs.length)
-			loadimg(i + 1);
-	}
+	$('<img>').attr({
+			src: slides[i][0]
+		})
+		.on('load', function() { // Loop until the end of the image list
+			if (i + 1 < slides.length)
+				sliderLoadimg(i + 1);
+		});
 
 	// Create the display element
-	slide[i] = document.createElement('p');
-	slide[i].style.backgroundImage = 'url("' + srcs[i] + '")';
+	images[i] = $('<div>').css('backgroundImage', 'url("' + slides[i][0] + '")');
 
 	// Add the thumbnail to the thumbs
-	thumb[i] = document.createElement('a');
-	thumb[i].style.backgroundImage = 'url("' + srcs[i] + '")';
-	thumb[i].title = 'Voir ' + srcs[i];
-	thumb[i].onclick = function() {
-		display(i);
-	};
-	el('thumbs').appendChild(thumb[i]);
+	thumb[i] = $('<a>')
+		.css('backgroundImage', 'url("' + slides[i][0] + '")')
+		.attr({
+			title: 'Voir ' + slides[i][1]
+		})
+		.on('click', function() {
+			sliderDisplay(i);
+		});
+	$('#slider-thumbs').append(thumb[i]);
 }
 
-var current = -1,
-	timer = 0;
-
-function display(i) {
-	// If called by timer
+function sliderDisplay(i) {
 	if (i === undefined)
-		i = current + 1 >= srcs.length ? 0 : current + 1;
-
-	// Display if exists
+		i = current + 1 >= slides.length ? 0 : current + 1;
 	current = i;
 
-	// Insert the new slide
-	el('slide').appendChild(slide[i]);
-
-	// Reset scroll if any
+	// Reset slider-scroll if any
 	if (timer) {
 		clearInterval(timer);
-		timer = setInterval(display, 5000);
+		timer = setInterval(sliderDisplay, scrollDelay);
 	}
 
-	// Highligh the last displayed thumbnail
+	// Insert the new images
+	$('#slider-show').append(images[i]);
+	$('#slider-title').html(slides[i][1] || '');
+
+	// Highlight the displayed thumbnail
 	for (let j = 0; j < thumb.length; j++)
-		thumb[j].className = i == j ? 'highlighted' : '';
+		thumb[j][i == j ? 'addClass' : 'removeClass']('highlighted');
 
-	// Download refs
-	el('download').download = srcs[i];
-	el('download').href = srcs[i];
-
-	// Display or not the prev / next buttons
-	el('prev').style.display = i > 0 ? 'block' : 'none';
-	el('next').style.display = i < srcs.length - 1 ? 'block' : 'none';
+	// Display buttons
+	$('#slider-download').attr('href', slides[i][0]).attr('slider-download', slides[i][0]);
+	$('#slider-previous').css('display', i > 0 ? 'block' : 'none'); //style. = ;
+	$('#slider-next').css('display', i < slides.length - 1 ? 'block' : 'none'); //style. = ;
 }
 
-function switchScroll() {
+function sliderSwitchScroll() {
 	if (!timer) {
-		timer = setInterval(display, 5000); // Scroll at time interval
-		el('buttons').className = 'scroll';
+		timer = setInterval(sliderDisplay, scrollDelay);
+		$('#slider-buttons').addClass('slider-scroll');
 	} else {
 		clearInterval(timer);
 		timer = 0;
-		el('buttons').className = '';
+		$('#slider-buttons').removeClass('slider-scroll');
 	}
 }
 
-function showButtons(init) {
-	if (init)
-		el('slide').className = 'show-buttons';
+function sliderShowButtons() {
+	$('#slider-show').addClass('show-buttons');
 
-	var timerButtons = 0,
-		nbMoves = 0; // Avoid show buttons on window change 
-	
 	window.onmousemove = function() {
-		if (nbMoves++ > 5) {
-			nbMoves = 0;
-			el('slide').className = 'show-buttons';
+		$('#slider-show').removeClass('show-buttons').addClass('show-buttons');
 
-			if (timerButtons)
-				clearTimeout(timerButtons);
-
-			timerButtons = setTimeout(function() {
-				el('slide').className = '';
-			}, 1500);
-		}
+		if (timerButtons)
+			clearTimeout(timerButtons);
+		timerButtons = setTimeout(function() {
+			$('#slider-show').removeClass('show-buttons');
+		}, buttonsDelay);
 	};
-};
+}
 
-function fullscreen() {
-	if (document.body.requestFullscreen)
+function sliderFullScreen() {
+	if (document.body.requestFullscreen) {
 		document.body.requestFullscreen();
-	else if (document.body.webkitRequestFullscreen)
-		document.body.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-	else if (document.body.mozRequestFullScreenWithKeys)
-		document.body.mozRequestFullScreenWithKeys();
-	else if (document.body.mozRequestFullScreen)
-		document.body.mozRequestFullScreen();
-	else if (document.body.msRequestFullscreen)
+	} else if (document.body.msRequestFullscreen) {
 		document.body.msRequestFullscreen();
+	} else if (document.body.webkitRequestFullscreen) {
+		document.body.webkitRequestFullscreen();
+	}
+	sliderShowButtons();
 }
 
-function exitFullscreen() {
-	if (document.body.exitFullscreen)
-		document.body.exitFullscreen();
-	else if (document.body.webkitExitFullscreen)
-		document.body.webkitExitFullscreen();
-	else if (document.body.mozCancelFullScreen)
-		document.body.mozCancelFullScreen();
-	else if (document.body.msExitFullscreen)
-		document.body.msExitFullscreen();
-}
-
-function el(id) {
-	return document.getElementById(id);
-}
-
-// Preload all images on the beginning
-function init(s) {
-	srcs = s;
-	loadimg(0);
-	display();
-	showButtons(true);
-}
-
-// Run full screen
-function runFS(s) {
-	srcs = s;
-	loadimg(0);
-	display();
-	showButtons();
-	switchScroll();
-	fullscreen();
+function sliderExitFullScreen() {
+	if (document.exitFullscreen) {
+		document.exitFullscreen();
+	} else if (document.msExitFullscreen) {
+		document.msExitFullscreen();
+	} else if (document.webkitExitFullscreen) {
+		document.webkitExitFullscreen();
+	}
+	sliderShowButtons();
 }
