@@ -1,9 +1,9 @@
 /* Slides */
-#slider-show div {
+#slider div {
 	z-index: -1;
 	position: absolute;
 	top: 0; left: 0;
-	width: 100vw; /*//TODO 100% (& html & body) */
+	width: 100vw;
 	height: 100vh;
 	margin: 0;
 	background: grey;
@@ -34,41 +34,26 @@
 	to {opacity: 1;}
 }
 
-/* Show buttons */
-#slider-thumbs,
-#slider-buttons > a {
-	opacity: 0;
-}
-.show-buttons #slider-thumbs,
-.show-buttons #slider-buttons > a ,
-#slider-thumbs:hover,
-#slider-buttons > a:hover {
-	opacity: 1;
-}
-
-#slider-title {
-	margin: 0 3vw 0 5vw;
-	min-height: 100vh;
-	text-align: justify;
-	font-size: 2.2vw;
-	color: yellow;
-	transition: opacity 1s;
-}
-
+/* Thumbs */
 #slider-thumbs {
 	overflow: auto;
 	position: absolute;
 	top: 0; left: 0;
+	margin: 0;
 	height: 100vh;
 	border-right: 3vw solid rgba(0,0,0,0);
+	opacity: 0;
 	transition: opacity 1s;
+}
+.show-buttons #slider-thumbs,
+#slider-thumbs:hover {
+	opacity: 1;
 }
 #slider-thumbs > a {
 	display: block;
 	height: 5vh;
 	width: 5vw;
-	margin: 0;
-	border: .5px solid black;
+	border: 0.5px solid black;
 	background: grey;
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -79,106 +64,104 @@
 	border: 1px solid yellow;
 }
 
-#slider-buttons > a {
-	position: absolute;
-	top: calc(50% - 2.5vh);
-	text-align: center;
-	line-height: 3vw;
-	font-size: 5vw;
+/* Comments*/
+#slider-comment {
+	margin: 0 5vw;
+	min-height: 100vh;
+	text-align: justify;
+	font-size: 2.2vw;
 	color: yellow;
-	text-decoration: none;
-	cursor: pointer;
 	transition: opacity 1s;
 }
+
+/* Buttons */
+#slider > a {
+	position: absolute;
+	top: calc(50vh - 0.5em);
+	font-size: calc(2.5vw + 2.5vh);
+	text-align: center;
+	line-height: 1em;
+	color: yellow;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 1s;
+}
+#slider.show-buttons > a,
+#slider > a:hover {
+	opacity: 1;
+}
+
 #slider-previous {
-	left: 6vw;
+	left: 10vw;
+}
+#slider-previous:after {
+	font-weight: bold;
+	content: '<';
 }
 #slider-next {
-	right: 6vw;
+	right: 10vw;
+}
+#slider-next:after {
+	font-weight: bold;
+	content: '>';
+}
+
+/* Stop/play buttons */
+#slider-play {
+	left: calc(50vw - 0.5em);
+	line-height: 0.8 !important;
+}
+#slider-play:after {
+	content: '»';
 }
 #slider-stop {
-	left: 48vw;
+	left: calc(50vw - 0.43em);
+	margin-top: 0.2em;
+	height: 0.6em;
+	width: 0.2em;
 	border-style: solid;
-	border-width: 0 5px;
+	border-width: 0 3px;
 	border-color: yellow;
+	display: none;
 }
-#slider-scroll {
-	left: 47vw;
+.show-play #slider-play {
+	display: none;
 }
-#slider-scroll-fullscreen {
-	left: 53vw;
+.show-play #slider-stop {
+	display: block;
 }
-#slider-download {
-	top: 0 !important;
-	right: 6vw;
-}
-#slider-fullscreen,
-#slider-window {
-	top: 0 !important;
-	right: 0;
-}
-#slider-scroll-fullscreen,
-#slider-fullscreen,
-#slider-window {
-	border: .3vw solid yellow;
-	border-radius: 1vw;
-	background: rgba(128,128,0,.5);
-}
+
+/* Fullscreen */
 #slider-fullscreen {
-	color: rgba(0,0,0,0) !important;
+	top: 0.2em !important;
+	right: 0.25em;
+	width: 0.5em;
+	height: 0.5em;
+	border: 0.05em solid yellow;
+}
+:fullscreen #slider-fullscreen {
+	width: 0.3em;
+	height: 0.3em;
+	border: 0.15em double yellow;
+}
+ :-ms-fullscreen #slider-fullscreen {
+	width: 0.3em;
+	height: 0.3em;
+	border: 0.15em double yellow;
 }
 
-/* Display when stop/scroll */
-#slider-stop,
-.slider-scroll #slider-scroll,
-.slider-scroll #slider-scroll-fullscreen {
-	display: none !important;
+/* Download */
+#slider-download {
+	top: 1em !important;
+	right: 0.25em;
+	height: 0.3em !important;
+	width: 0.5em !important;
+	border: 0.05em solid yellow;
+	border-top-width: 0.25em;
+	line-height: 0.18em !important;
+	text-decoration: none;
 }
-.slider-scroll #slider-stop {
-	display: block !important;
-}
-
-/* Fullscreen button */
-:fullscreen .slider-window { /* FF */
-	display: none !important;
-}
-:-webkit-fullscreen .slider-window { /* Edge */
-	display: none !important;
-}
-:-ms-fullscreen .slider-window { /* IE */
-	display: none !important;
-}
-.slider-fullscreen {
-	display: none !important;
-}
-:fullscreen .slider-fullscreen { /* FF */
-	display: block !important;
-}
-:-webkit-fullscreen .slider-fullscreen { /* Edge */
-	display: block !important;
-}
-:-ms-fullscreen .slider-fullscreen { /* IE */
-	display: block !important;
-}
-
-/* Sliders list */
-.list {
-	margin: auto;
-	width: 70vw;
-}
-.list p {
-	display: inline-block;
-	width: 30vw;
-	height: 30vw;
-	margin: 0;
-	background: grey;
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
-	text-align: center;
-	line-height: 30vw;
-	color: yellow;
-	font-size: 5vw;
-	line-height: 30vw;
-	cursor: pointer;
+#slider-download:after {
+	font-size: 0.8em !important;
+	content: '=';
 }
