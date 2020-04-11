@@ -13,12 +13,9 @@
 	<div id="slider"></div>
 	<script>
 		var slides = [
-		['20200221_141320.jpg'],
-//			['https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg'],
-			['https://cdn.pixabay.com/photo/2015/02/24/15/41/dog-647528__340.jpg','Sky, dark, night, moon'],
-			['https://i.ytimg.com/vi/gmU9PBDS-0k/maxresdefault.jpg','10 hours of relaxing sleep music that hopefully will help you fall asleep. This relaxing music can be used as deep sleeping music, meditation music or for stress relief. The music is composed by Peder ...'],
-			['https://s1.1zoom.me/big0/42/Sky_Moon_Clouds_479952.jpg'],
-			['https://i1.sndcdn.com/avatars-000184465205-9j1yv9-t500x500.jpg','Mega\'s stream on SoundCloud - Hear the world\'s sounds'],
+			['https://www.refuges.info/photos_points/8741-originale.jpeg', 'Refuge du Goûter'],
+			['https://www.refuges.info/photos_points/8059-originale.jpeg', "Tète Chevalière est situé dans Réserve Naturelle des Hauts Plateaux du Vercors. Sont interdits : Les chiens (même en laisse), les feux, le camping (mais le bivouac, c'est à dire montage de la tente après 17h et démontage avant 9h est autorisé), la cueillette des plantes, le ramassage des fossiles et le dépôt des déchets.Le décollage en parapente y est interdit mais le survol par tout type d'aéronef à plus de 300m est autorisé, le VTT ne sont autorisés que sur la variante GTV. L'escalade n'y est pas réglementée."],
+			['https://www.refuges.info/photos_points/7984-originale.jpeg', 'Refuge des Grands-mulets,'],
 		];
 	</script>
 </body>

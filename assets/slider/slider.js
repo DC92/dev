@@ -3,28 +3,18 @@
  * https://github.com/Dominique92
  *
  * Provide a minimal nice slideshow
- * from a JS array defining the images & text
+ * from a JS array defining the sliderDivSlides & text
+ *
+ * jshint esversion: 6
  */
-/* jshint esversion: 6 */
 
-/* //TODO
-position du fullscreen pas claire
-démarrage du show au bout d'une tempo au début
-Download ne marche pas si https://stackoverflow.com/questions/23872902/chrome-download-attribute-not-working/35290284
-*/
-
-/*
-console.log = function(message) {
-	alert(message);
-};
-*/
-var scrollDelay = 5000, // Milliseconds
-	buttonsDelay = 1500,
-	images = [],
-	thumb = [],
-	current = -1,
-	timer,
-	timerButtons;
+var sliderScrollDelay = 5000, // Milliseconds
+	sliderShowButtonsDelay = 1500,
+	sliderDivSlides = [],
+	sliderThumbs = [],
+	sliderCurrentImage = -1,
+	sliderScrollTimer,
+	sliderShowButtonsTimer;
 
 // Buttons previous / next / play / stop
 $('#slider')
@@ -34,13 +24,13 @@ $('#slider')
 		$('<a id="slider-next">')
 		.attr('title', 'Suivant')
 		.click(function() {
-			sliderDisplay(current + 1);
+			sliderDisplay(sliderCurrentImage + 1);
 		}))
 	.append(
 		$('<a id="slider-previous">')
 		.attr('title', 'Précédent')
 		.click(function() {
-			sliderDisplay(current - 1);
+			sliderDisplay(sliderCurrentImage - 1);
 		}))
 	.append(
 		$('<a id="slider-play">')
@@ -83,35 +73,10 @@ if (sliderFullScreen)
 // Start slide show
 showButtons();
 sliderLoadimg(0);
-sliderDisplay();
-
-function sliderSwitchScroll() {
-	if (!timer) {
-		// On était en stop
-		sliderDisplay();
-		timer = setInterval(sliderDisplay, scrollDelay);
-		$('#slider').addClass('show-play');
-	} else {
-		// On était en play
-		clearInterval(timer);
-		timer = 0;
-		$('#slider').removeClass('show-play');
-	}
-}
-
-function showButtons() {
-	$('#slider').addClass('show-buttons');
-
-	if (timerButtons)
-		clearTimeout(timerButtons);
-
-	timerButtons = setTimeout(function() {
-		$('#slider').removeClass('show-buttons');
-	}, buttonsDelay);
-}
+sliderSwitchScroll();
 
 function sliderLoadimg(i) {
-	// Preload images
+	// Preload sliderDivSlides
 	$('<img>').attr({
 			src: slides[i][0]
 		})
@@ -121,10 +86,10 @@ function sliderLoadimg(i) {
 		});
 
 	// Create the display element
-	images[i] = $('<div>').css('backgroundImage', 'url("' + slides[i][0] + '")');
+	sliderDivSlides[i] = $('<div>').css('backgroundImage', 'url("' + slides[i][0] + '")');
 
 	// Add the thumbnail to the thumbs
-	thumb[i] = $('<a>')
+	sliderThumbs[i] = $('<a>')
 		.css('backgroundImage', 'url("' + slides[i][0] + '")')
 		.attr({
 			title: 'Voir ' + slides[i][1]
@@ -132,31 +97,57 @@ function sliderLoadimg(i) {
 		.on('click', function() {
 			sliderDisplay(i);
 		});
-	$('#slider-thumbs').append(thumb[i]);
+	$('#slider-thumbs').append(sliderThumbs[i]);
 }
+
 
 function sliderDisplay(i) {
 	if (i === undefined)
-		i = current + 1;
-	current = i = i % slides.length;
+		i = sliderCurrentImage + 1;
+	sliderCurrentImage = i = i % slides.length;
 
 	// Reset show-play if any
-	if (timer) {
-		clearInterval(timer);
-		timer = setInterval(sliderDisplay, scrollDelay);
+	if (sliderScrollTimer) {
+		clearInterval(sliderScrollTimer);
+		sliderScrollTimer = setInterval(sliderDisplay, sliderScrollDelay);
 	}
 
-	// Insert the new images
-	$('#slider').append(images[i]);
+	// Insert the new sliderDivSlides
+	$('#slider').append(sliderDivSlides[i]);
 	$('#slider-comment').html(slides[i].length > 1 ? slides[i][1] : '');
 
 	// Highlight the displayed thumbnail
-	for (let j = 0; j < thumb.length; j++)
-		thumb[j][i == j ? 'addClass' : 'removeClass']('highlighted');
+	for (let j = 0; j < sliderThumbs.length; j++)
+		sliderThumbs[j][i == j ? 'addClass' : 'removeClass']('highlighted');
 
-	$('#slider-download').attr('href', slides[i][0]).attr('download', 'diapo_' + i);
+	$('#slider-download').attr('href', slides[i][0]).attr('download', 'diapo_' + i + '.jpg').attr('target', '_blank');
 
 	// Hide frist previous & last next buttons
 	$('#slider-previous').css('display', i > 0 ? 'block' : 'none'); //style. = ;
 	$('#slider-next').css('display', i < slides.length - 1 ? 'block' : 'none'); //style. = ;
+}
+
+function sliderSwitchScroll() {
+	if (!sliderScrollTimer) {
+		// On était en stop
+		sliderDisplay();
+		sliderScrollTimer = setInterval(sliderDisplay, sliderScrollDelay);
+		$('#slider').addClass('show-play');
+	} else {
+		// On était en play
+		clearInterval(sliderScrollTimer);
+		sliderScrollTimer = 0;
+		$('#slider').removeClass('show-play');
+	}
+}
+
+function showButtons() {
+	$('#slider').addClass('show-buttons');
+
+	if (sliderShowButtonsTimer)
+		clearTimeout(sliderShowButtonsTimer);
+
+	sliderShowButtonsTimer = setTimeout(function() {
+		$('#slider').removeClass('show-buttons');
+	}, sliderShowButtonsDelay);
 }
