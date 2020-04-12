@@ -9,8 +9,6 @@
 
 /*//TODO
 Template miniatures pour réorganisation
-Bouton pour revenir au forum (escape ?)
-download size depends on windows width
 */
 
 namespace Dominique92\Images\event;

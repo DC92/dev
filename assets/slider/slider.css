@@ -1,4 +1,9 @@
 /* Slides */
+body {
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
 #slider div {
 	z-index: -1;
 	position: absolute;

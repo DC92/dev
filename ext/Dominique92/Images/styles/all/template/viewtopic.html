@@ -12,14 +12,30 @@
 	<script src="assets/slider/slider.js?<?=filemtime('assets/slider/slider.js')?>" defer></script>
 
 	<script>
-		var slides = [
-		<!-- BEGIN slides -->
-			[
-				'download/file.php?id={slides.ATTACH_ID}',
-				"<b>{slides.POST_SUBJECT}</b> {slides.MESSAGE} {slides.ATTACH_COMMENT}"
-			],
-		<!-- END slides -->
+		var size = Math.max (window.screen.height, window.screen.width),
+			sliderReturn = window.location.href + '&template=',
+			slides = [
+			<!-- BEGIN slides -->
+				[
+					'download/file.php?id={slides.ATTACH_ID}&size=' + size,
+					"<b>{slides.POST_SUBJECT}</b> {slides.MESSAGE} {slides.ATTACH_COMMENT}"
+				],
+			<!-- END slides -->
 		];
+	//	if(0)
+		document.addEventListener('keydown', function (evt) {
+			switch (evt.keyCode) {
+				case 13: // Entrée
+				case 27: // Escape
+					break;
+				case 106: // *
+					window.location.href = window.location.href + '&template=@Dominique92_Images/film.html';
+					break;
+				default:
+					if (evt.keyCode < 65 || 90 < evt.keyCode)
+						window.location.href = window.location.href + '&template=';
+			}
+		});
 	</script>
 </head>
 

@@ -7,12 +7,11 @@
  *
  * jshint esversion: 6
  */
-
 var sliderScrollDelay = 5000, // Milliseconds
 	sliderShowButtonsDelay = 1500,
 	sliderDivSlides = [],
 	sliderThumbs = [],
-	sliderCurrentImage = -1,
+	sliderCurrentSlideNb = -1,
 	sliderScrollTimer,
 	sliderShowButtonsTimer;
 
@@ -24,13 +23,13 @@ $('#slider')
 		$('<a id="slider-next">')
 		.attr('title', 'Suivant')
 		.click(function() {
-			sliderDisplay(sliderCurrentImage + 1);
+			sliderDisplay(sliderCurrentSlideNb + 1);
 		}))
 	.append(
 		$('<a id="slider-previous">')
 		.attr('title', 'Précédent')
 		.click(function() {
-			sliderDisplay(sliderCurrentImage - 1);
+			sliderDisplay(sliderCurrentSlideNb - 1);
 		}))
 	.append(
 		$('<a id="slider-play">')
@@ -70,6 +69,31 @@ if (sliderFullScreen)
 		})
 	);
 
+document.addEventListener('keydown', function(evt) {
+	switch (evt.keyCode) {
+		case 33:
+		case 37:
+		case 38:
+		case 107:
+			sliderDisplay(sliderCurrentSlideNb - 1);
+			break;
+		case 34:
+		case 39:
+		case 34:
+		case 109:
+			sliderDisplay(sliderCurrentSlideNb + 1);
+			break;
+		case 35:
+			sliderDisplay(slides.length - 1);
+			break;
+		case 36:
+			sliderDisplay(0);
+			break;
+		case 13:
+			sliderSwitchScroll();
+	}
+});
+
 // Start slide show
 showButtons();
 sliderLoadimg(0);
@@ -103,8 +127,10 @@ function sliderLoadimg(i) {
 
 function sliderDisplay(i) {
 	if (i === undefined)
-		i = sliderCurrentImage + 1;
-	sliderCurrentImage = i = i % slides.length;
+		i = sliderCurrentSlideNb + 1;
+	if (0 > i || i >= slides.length)
+		i = 0;
+	sliderCurrentSlideNb = i;
 
 	// Reset show-play if any
 	if (sliderScrollTimer) {
