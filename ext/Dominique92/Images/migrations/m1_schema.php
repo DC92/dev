@@ -36,8 +36,12 @@ class m1_schema extends \phpbb\db\migration\migration
 	{
 		return array(
 			'add_columns'	=> array(
+				$this->table_prefix . 'posts'	=> array(
+					'sort' => array('INT:8', 0),
+				),
 				$this->table_prefix . 'attachments'	=> array(
 					'exif'	=> array('TEXT', null),
+					'sort' => array('INT:8', 0),
 				),
 			),
 		);

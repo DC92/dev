@@ -75,30 +75,42 @@ class listener implements EventSubscriberInterface
 	}
 
 	function viewtopic_modify_post_data($vars) {
-		// Slideshow template variables
-		foreach ($vars['attachments'] AS $post_id => $post_attachments)
-			foreach ($post_attachments AS $attachment) {
-				$row = $vars['rowset'][$post_id];
+		$previous_post = 0;
+		foreach ($vars['attachments'] AS $post_id => $post_attachments) {
+			$row = $vars['rowset'][$post_id];
+			$row['previous_post'] = $previous_post;
+			$previous_post = $post_id;
 
-				// BBCodes
-				$row['message'] = generate_text_for_display(
-					$row['post_text'],
-					$row['bbcode_uid'], $row['bbcode_bitfield'],
-					OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-				);
+			// BBCodes
+			$row['message'] = generate_text_for_display(
+				$row['post_text'],
+				$row['bbcode_uid'], $row['bbcode_bitfield'],
+				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+			);
+
+			$this->template->assign_block_vars (
+				'post',
+				array_change_key_case ($row, CASE_UPPER)
+			);
+
+			$previous_attach = 0;
+			foreach ($post_attachments AS $attachment) {
+				$row['previous_attach'] = $previous_attach;
+				$previous_attach = $attachment['attach_id'];
 
 				// Caractères indésirables
 				foreach ($row AS $k=>$v)
 					$row[$k] = preg_replace( ['/"/', '/[^[:print:]]/'], ['&quot;', ''], $v);
 
 				$this->template->assign_block_vars (
-					'slides',
+					'post.slide',
 					array_change_key_case (
 						array_merge ($attachment, $row),
 						CASE_UPPER
 					)
 				);
 			}
+		}
 
 //		$this->attachments = $vars['attachments'];
 	}

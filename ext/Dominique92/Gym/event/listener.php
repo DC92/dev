@@ -6,6 +6,9 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+
+//cacher page mode d'emploi
+//Extension pbpBB : Tableaux, Log edit posts
 //TODO mettre une couleur de plus en plus soutenue selon le niveau de la gym 
 //TODO style print
 //BEST favicon en posting et autres pages non index
@@ -13,8 +16,6 @@
 //BEST template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 //APRES enlever le .robot et faire un SEO
 
-// List template vars : phpbb/template/context.php line 135
-//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
 
 /** CONFIG
 PERSONNALISER / extension gym
@@ -105,6 +106,9 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 		];
 	}
+
+// List template vars : phpbb/template/context.php line 135
+//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
 
 	/**
 		ALL
@@ -315,21 +319,14 @@ class listener implements EventSubscriberInterface
 		// Get special columns list
 		$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "gym_%"';
 		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result)) {
-//TODO			$special_columns[$row['Field']] = $row['Type'];
+		while ($row = $this->db->sql_fetchrow($result))
 			$sql_data[POSTS_TABLE]['sql'][$row['Field']] = 'off'; // Default field value
-		}
 		$this->db->sql_freeresult($result);
 
 		// Treat specific data
 		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3)) {
-				//TODO Create the column if none
-/*				if(!isset($special_columns[$k])){
-					$sql = 'ALTER TABLE '.POSTS_TABLE." ADD $k varchar(255)";
-					$this->db->sql_query($sql);
-				}*/
 				if(is_array($v))
 					$v = implode (',', $v);
 
@@ -416,13 +413,45 @@ class listener implements EventSubscriberInterface
 			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
 			// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
 			'semaines' => [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
-				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47],
+				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49],
 			'duree' => [1,1.5,2,7.5],
 		];
 	}
 
+	function verify_column($table, $columns) {
+		foreach ($columns AS $column) {
+			$sql = "SHOW columns FROM $table LIKE '$column'";
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+			if (!$row) {
+				$sql = "ALTER TABLE $table ADD $column TEXT";
+				$this->db->sql_query($sql);
+			}
+		}
+	}
+
 	// Popule les templates horaires, calendrier, actualité
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
+		$this->verify_column(POSTS_TABLE, [
+			'gym_activite',
+			'gym_intensite',
+			'gym_lieu',
+			'gym_animateur',
+			'gym_jour',
+			'gym_heure',
+			'gym_minute',
+			'gym_duree_heures',
+			'gym_duree_jours',
+			'gym_scolaire',
+			'gym_semaines',
+			'gym_evenements',
+			'gym_horaires',
+			'gym_menu',
+			'gym_ordre_menu',
+			'gym_presentation',
+		]);
+
 		$nom = $this->request->variable('nom', '', true);
 		if ($nom)
 			$cond[] = 'post.post_subject="'.urldecode($nom).'"';
@@ -559,6 +588,7 @@ class listener implements EventSubscriberInterface
 						$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
 					}
 				}
+				//TODO BUG il y a quelque chose qui rajoute 2 fois la dernière semaine !!!
 
 				// Range les résultats dans l'ordre et le groupage espéré
 				$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
