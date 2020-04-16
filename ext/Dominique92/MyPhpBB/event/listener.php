@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace Dominique92\phpBB\event;
+namespace Dominique92\MyPhpBB\event;
 
 if (!defined('IN_PHPBB'))
 {
@@ -58,8 +58,8 @@ class listener implements EventSubscriberInterface
 		
 		$text = preg_replace_callback ('/<table>.*<\/table>/', function($match) {
 			return str_replace (
-				['<table></td></tr>', '|', '<tr><td></table>'],
-				['<table>', '</td><td>', '</table>'],
+				['<table></td></tr>', '|', ';', '<tr><td></table>'],
+				['<table>', '</td><td>', '<br/>', '</table>'],
 				$match[0]
 			);
 		} , str_replace("\n", '</td></tr><tr><td>',$text));
@@ -109,6 +109,9 @@ class listener implements EventSubscriberInterface
 				mkdir('LOG');
 			// Add a blank file if none
 			file_put_contents ('LOG/index.html', '');
+
+			// Assign post_id to template for link in posting
+			$this->template->assign_var ('POST_ID', $post_data['post_id']);
 
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!$create_if_null || !file_exists($file_name)) {

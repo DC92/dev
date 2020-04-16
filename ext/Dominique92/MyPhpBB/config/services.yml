@@ -1,6 +1,6 @@
 services:
-    Dominique92.phpBB.listener:
-        class: Dominique92\phpBB\event\listener
+    Dominique92.MyPhpBB.listener:
+        class: Dominique92\MyPhpBB\event\listener
         arguments:
             - '@dbal.conn'
             - '@request'

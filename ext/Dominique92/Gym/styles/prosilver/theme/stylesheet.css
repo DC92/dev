@@ -265,7 +265,7 @@ html.gym_index  {
 	}
 }
 
-/* HORAIRES */
+/* Horaires */
 .horaires {
 	clear: both;
 	margin: 1em 0;
@@ -284,10 +284,6 @@ html.gym_index  {
 	padding: 0.2em;
 	text-align: left;
 }
-.horaires a {
-	text-decoration: none;
-	color: black;
-}
 @media (max-width: 600px) {
 	.horaires {
 		margin-left: 0;
@@ -297,6 +293,16 @@ html.gym_index  {
 		width: 100%;
 		margin-left: 0 !important;
 	}
+}
+
+/* Tableaux */
+#page table {
+	border: 2px solid grey;
+	border-collapse: collapse;
+}
+#page td {
+	border: 1px solid black;
+	padding: 2px;
 }
 
 /* Calendrier */

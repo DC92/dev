@@ -6,16 +6,17 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-
-//cacher page mode d'emploi
-//Extension pbpBB : Tableaux, Log edit posts
-//TODO mettre une couleur de plus en plus soutenue selon le niveau de la gym 
-//TODO style print
-//BEST favicon en posting et autres pages non index
-//BEST erradiquer f=2
-//BEST template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
+/*//TODO
+résumé en cinquième colonne horaires
+//BEST
+Cacher page mode d'emploi
+mettre une couleur de plus en plus soutenue selon le niveau de la gym 
+style print
+favicon en posting et autres pages non index
+erradiquer f=2
+template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 //APRES enlever le .robot et faire un SEO
-
+*/
 
 /** CONFIG
 PERSONNALISER / extension gym
@@ -31,13 +32,14 @@ MESSAGES / BBCodes / cocher afficher
 	[image-droite]{TEXT}[/image-droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[image-gauche]{TEXT}[/image-gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
-	[horaires]{TEXT}[/horaires] / <div class="include">.?template=horaires&{TEXT}=POST_SUBJECT</div> / Affiche des horaires
+	[horaire]{TEXT}[/horaire] / <div class="include">.?template=horaires&{TEXT}=POST_ID</div> / Affiche des horaires
 	[calendrier]{TEXT}[/calendrier] / <div class="include">.?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
 	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
 	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
 	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
 	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une runrique
+	[tableau]{TEXT}[/tableau] / <table>{TEXT}</table> / Tableau à 2 dimensions
 */
 
 namespace Dominique92\Gym\event;
@@ -122,14 +124,6 @@ class listener implements EventSubscriberInterface
 			]);
 
 		$this->template->assign_var ('EXT_PATH',$this->ext_path);
-
-		// Assigne les paramètres de l'URL aux variables template
-		$this->request->enable_super_globals();
-		$get = $_GET;
-		$server = $_SERVER;
-		$this->request->disable_super_globals();
-		foreach ($get AS $k=>$v)
-			$this->template->assign_var (strtoupper ("get_$k"), $v);
 
 		// Menu principal
 		$this->liste_fiches (
@@ -403,6 +397,9 @@ class listener implements EventSubscriberInterface
 			'gym_presentation',
 		]);
 
+		$post_id = $this->request->variable('id', '', true);
+		if ($post_id)
+			$cond[] = 'post.post_id='.$post_id;
 		$nom = $this->request->variable('nom', '', true);
 		if ($nom)
 			$cond[] = 'post.post_subject="'.urldecode($nom).'"';
