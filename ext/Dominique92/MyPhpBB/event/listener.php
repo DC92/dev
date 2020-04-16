@@ -56,10 +56,10 @@ class listener implements EventSubscriberInterface
 	function modify_text_for_display_after($vars) {
 		$text = $vars['text'];
 		
-		$text = preg_replace_callback ('/<table>.*<\/table>/', function($match) {
+		$text = preg_replace_callback ('/<tableau>.*<\/tableau>/', function($match) {
 			return str_replace (
-				['<table></td></tr>', '|', ';', '<tr><td></table>'],
-				['<table>', '</td><td>', '<br/>', '</table>'],
+				['<tableau></td></tr>', '|', ';', '<tr><td></tableau>'],
+				['<table class="tableau">', '</td><td>', '<br/>', '</table>'],
 				$match[0]
 			);
 		} , str_replace("\n", '</td></tr><tr><td>',$text));

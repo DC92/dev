@@ -296,11 +296,11 @@ html.gym_index  {
 }
 
 /* Tableaux */
-#page table {
+table.tableau {
 	border: 2px solid grey;
 	border-collapse: collapse;
 }
-#page td {
+table.tableau td {
 	border: 1px solid black;
 	padding: 2px;
 }

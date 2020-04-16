@@ -8,6 +8,8 @@
 
 /*//TODO
 résumé en cinquième colonne horaires
+click pour remonter d'un niveau quand on est sur la fiche d'un cours 
+BBCodes dans les tableaux
 //BEST
 Cacher page mode d'emploi
 mettre une couleur de plus en plus soutenue selon le niveau de la gym 
@@ -39,7 +41,7 @@ MESSAGES / BBCodes / cocher afficher
 	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
 	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
 	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une runrique
-	[tableau]{TEXT}[/tableau] / <table>{TEXT}</table> / Tableau à 2 dimensions
+	[tableau]{TEXT}[/tableau] / <tableau>{TEXT}</tableau> / Tableau à 2 dimensions
 */
 
 namespace Dominique92\Gym\event;
@@ -190,6 +192,9 @@ class listener implements EventSubscriberInterface
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
+
+		// Assign post_id to template
+		$this->template->assign_var ('POST_ID', $this->request->variable('p', 0));
 
 		$post_row['TOPIC_FIRST_POST_ID'] = $vars['topic_data']['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
