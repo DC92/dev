@@ -107,9 +107,6 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-// List template vars : phpbb/template/context.php line 135
-//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
-
 	/**
 		ALL
 	*/
@@ -246,10 +243,6 @@ class listener implements EventSubscriberInterface
 
 		$post_data = $vars['post_data'];
 
-		// To prevent an empty title to invalidate the full page and input.
-		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
-
 		// Set specific variables
 		foreach ($vars['post_data'] AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3) && $v) {
@@ -308,8 +301,6 @@ class listener implements EventSubscriberInterface
 				],
 				'',''
 			);
-		// Create a log file with the existing data if there is none
-		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
 	}
 
 	// Called during validation of the data to be saved
@@ -337,46 +328,6 @@ class listener implements EventSubscriberInterface
 
 		$vars['sql_data'] = $sql_data; // return data
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
-	}
-
-	// Called after the post validation
-	function modify_submit_notification_data($vars) {
-		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
-	}
-	// Keep trace of values prior to modifications
-	function save_post_data($post_data, $attachment_data, $gym_data, $create_if_null = false) {
-		if (isset ($post_data['post_id'])) {
-			$this->request->enable_super_globals();
-			$to_save = [
-				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],
-				$_SERVER['REQUEST_URI'],
-				'forum '.$post_data['forum_id'].' = '.$post_data['forum_name'],
-				'topic '.$post_data['topic_id'].' = '.$post_data['topic_title'],
-				'post_subject = '.$gym_data['post_subject'],
-				'post_text = '.$post_data['post_text'].$post_data['message'],
-			];
-			foreach ($gym_data AS $k=>$v)
-				if ($v && !strncmp ($k, 'gym_', 4))
-					$to_save [] = "$k = $v";
-
-			// Save attachment_data
-			$attach = [];
-			if ($attachment_data)
-				foreach ($attachment_data AS $att)
-					$attach[] = $att['attach_id'].' : '.$att['real_filename'];
-			if (isset ($attach))
-				$to_save[] = 'attachments = '.implode (', ', $attach);
-
-			if (!is_dir('LOG'))
-				mkdir('LOG');
-			file_put_contents ('LOG/index.html', '');
-
-			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-			if (!$create_if_null || !file_exists($file_name))
-				file_put_contents ($file_name, implode ("\n", $to_save)."\n\n", FILE_APPEND);
-
-			$this->request->disable_super_globals();
-		}
 	}
 
 	function posting_modify_submission_errors($vars) {

@@ -65,7 +65,6 @@ class listener implements EventSubscriberInterface
 			// Posting
 			'core.modify_posting_auth' => 'modify_posting_auth',
 			'core.modify_posting_parameters' => 'modify_posting_parameters',
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
@@ -511,17 +510,6 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 			$vars['forum_id'] = $row['forum_id'];
 	}
 
-	// Allows entering a POST with empty text
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
-
 	// Called when display post page
 	function posting_modify_template_vars($vars) {
 		$page_data = $vars['page_data'];
@@ -545,10 +533,6 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 
 		// Create a log file with the existing data if there is none
 		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, $post_data, true);
-
-		// To prevent an empty title to invalidate the full page and input.
-		if (!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'Nom';
 
 		$page_data['EDIT_REASON'] = 'Modération'; // For display in news
 		$page_data['TOPIC_ID'] = @$post_data['topic_id'];
