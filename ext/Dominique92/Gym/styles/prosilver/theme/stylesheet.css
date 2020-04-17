@@ -78,12 +78,12 @@ html.gym_index  {
 .gym_index .baniere {
 	display: inline-block;
 	margin: 0.2em;
-	padding: 0.4em;
+	padding: 0.2em;
 	border-radius: 1em;
 	background: #ffc;
 	font-family: Times New Roman;
 	font-weight: bold;
-	font-size: 1.5em;
+	font-size: 1.2em;
 	color: black;
 }
 
@@ -111,8 +111,8 @@ html.gym_index  {
 .gym_index #menu li,
 .gym_index #sous-menu li {
 	display: inline-block;
-	margin: .3em;
-	padding: .5em;
+	margin: 0.2em;
+	padding: 0.3em;
 	border-radius: 2em;
 	font-family: Times New Roman;
 	font-weight: bold;
@@ -166,6 +166,7 @@ html.gym_index  {
 }
 .gym_index #page h2 {
  	text-align: center;
+	font-size: 1.1em;
 }
 .gym_index #evenements h1 {
  	text-align: center;
@@ -234,7 +235,7 @@ html.gym_index  {
 	margin-bottom: 0.3em;
 	text-indent: 0;
 	color: #888;
-	font-size: 1.2em;
+	font-size: 1.1em;
 	font-weight: 700;
 }
 .bandeau-vert {
@@ -271,7 +272,7 @@ html.gym_index  {
 	margin: 1em 0;
 }
 .horaires div {
-	text-indent: 3em;
+	text-align: initial;
 	text-transform: capitalize;
 }
 .horaires table {

@@ -9,9 +9,11 @@
 
 <!-- BEGIN horaires -->
 	<div class="horaires j{horaires.GYM_JOUR}">
-		<div>{horaires.GYM_JOUR_LITERAL}</div>
+		<div style="text-indent:calc(2% * {horaires.GYM_JOUR} + 2em)">
+			{horaires.GYM_JOUR_LITERAL}
+		</div>
 		<table style="
-			margin-left:calc(5% * {horaires.GYM_JOUR} + 1em);
+			margin-left:calc(2% * {horaires.GYM_JOUR} + 1em);
 			background:{horaires.COULEUR_FOND};
 			border-color:{horaires.COULEUR_BORD};
 		">
@@ -19,16 +21,20 @@
 			<tr>
 				<!-- IF not REQUEST_ID -->
 					<td>
-						<a href="viewtopic.php?p={item.POST_ID}">
+						<!-- IF item.POST_TEXT -->
+							<a href="viewtopic.php?p={item.POST_ID}">
+								{item.NOM}
+							</a>
+						<!-- ELSE -->
 							{item.NOM}
-						</a>
+						<!-- ENDIF -->
 						<!-- IF U_MCP -->
 							<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
 								title="Mofifier cette séance" class="button button-icon-only">
 								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 							</a>
 						<!-- ENDIF -->
-						<!-- IF item.GYM_NOTA -->
+						<!-- IF REQUEST_ACTIVITE and item.GYM_NOTA -->
 							<br>{item.GYM_NOTA}
 						<!-- ENDIF -->
 					</td>
