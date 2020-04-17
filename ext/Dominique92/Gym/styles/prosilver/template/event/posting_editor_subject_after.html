@@ -5,17 +5,20 @@
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
+
 	Ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
 	Présentation <input type="checkbox" name="gym_presentation"
 	<!-- IF GYM_PRESENTATION == 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
+
 	Événements <input type="checkbox" name="gym_evenements"
 	<!-- IF GYM_EVENEMENTS == 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
+
 	Horaires <input type="checkbox" name="gym_horaires"
 	<!-- IF GYM_HORAIRES == 'on' -->
 		checked="checked"
@@ -23,6 +26,7 @@
 	/> &nbsp;
 	<br/><br/>
 <!-- ENDIF -->
+
 <!-- IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements' -->
 	Activité
 	<select name="gym_activite">
@@ -76,6 +80,9 @@
 			</option>
 		<!-- END liste_animateurs -->
 	</select><br/><br/>
+
+	Note pour horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}">
+	<br/><br/>
 
 	<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar()">
 		<!-- BEGIN liste_jours -->

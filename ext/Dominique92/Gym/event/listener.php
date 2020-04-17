@@ -21,6 +21,9 @@ template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' 
 */
 
 /** CONFIG
+https://github.com/phpbbmodders/phpBB-3.1-ext-adduser
+https://www.phpbb.com/customise/db/extension/googleanalytics
+
 PERSONNALISER / extension gym
 MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
 GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
@@ -400,6 +403,7 @@ class listener implements EventSubscriberInterface
 			'gym_menu',
 			'gym_ordre_menu',
 			'gym_presentation',
+			'gym_nota',
 		]);
 
 		$post_id = $this->request->variable('id', '', true);
@@ -414,10 +418,16 @@ class listener implements EventSubscriberInterface
 		$animateur = $this->request->variable('animateur', '', true);
 		if ($animateur)
 			$cond[] = 'an.post_subject="'.urldecode($animateur).'"';
-
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
+		$this->template->assign_vars([
+			'REQUEST_ID' => $post_id,
+			'REQUEST_NOM' => $nom,
+			'REQUEST_LIEU' => $lieu,
+			'REQUEST_ANIMATEUR' => $animateur,
+			'REQUEST_ACTIVITE' => $activite,
+		]);
 
 		if ($cond) {
 			$static_values = $this->listes();
@@ -436,7 +446,7 @@ class listener implements EventSubscriberInterface
 				li.post_subject AS lieu,
 				an.post_subject AS animateur,
 				ac.post_subject AS activite,
-				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur,
+				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur, post.gym_nota,
 				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
 				post.gym_evenements, post.gym_horaires, post.gym_menu, post.gym_ordre_menu
@@ -525,8 +535,8 @@ class listener implements EventSubscriberInterface
 				$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
 				$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
 				$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
-				$row['horaire_debut'] = $row['gym_heure'].':'.$row['gym_minute'];
-				$row['horaire_fin'] = $row['gym_heure_fin'].':'.$row['gym_minute_fin'];
+				$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
+				$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
 
 				$row['couleur'] = $this->couleur();
 				$row['couleur_fond'] = $this->couleur(35, 255, 0);

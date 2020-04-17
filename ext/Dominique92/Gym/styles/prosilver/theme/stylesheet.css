@@ -297,6 +297,7 @@ html.gym_index  {
 
 /* Tableaux */
 table.tableau {
+	margin: 0 auto;
 	border: 2px solid grey;
 	border-collapse: collapse;
 }
