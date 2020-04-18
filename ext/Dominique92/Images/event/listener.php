@@ -39,10 +39,10 @@ class listener implements EventSubscriberInterface
 			// Change template
 			'core.viewtopic_assign_template_vars_before' => 'viewtopic_assign_template_vars_before',
 			'core.page_footer' => 'page_footer',
-			
+
 			//Slideshow
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
-			
+
 			// Image resize
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
 
@@ -59,7 +59,7 @@ class listener implements EventSubscriberInterface
 	function viewtopic_assign_template_vars_before($vars) {
 		// Change template if '*slideshow' is in the forum descriptor
 		$this->my_template = $this->request->variable (
-			'template', 
+			'template',
 			strpos ($vars['topic_data']['forum_desc'], '*slideshow')
 				? "@{$this->ns[0]}_{$this->ns[1]}/viewtopic.html"
 				: ''
@@ -158,7 +158,7 @@ class listener implements EventSubscriberInterface
 		// Reduction de la taille de l'image
 		if ($max_size = request_var('size', 0)) {
 			$img_size = @getimagesize ('../files/'.$attachment['physical_filename']);
-			$isx = $img_size [0]; $isy = $img_size [1]; 
+			$isx = $img_size [0]; $isy = $img_size [1];
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
@@ -188,15 +188,15 @@ class listener implements EventSubscriberInterface
 					}
 
 					// Build destination image
-					$image_dest = imagecreatetruecolor ($isx / $reduction, $isy / $reduction); 
+					$image_dest = imagecreatetruecolor ($isx / $reduction, $isy / $reduction);
 					imagecopyresampled ($image_dest, $image_src, 0,0, 0,0, $isx / $reduction, $isy / $reduction, $isx, $isy);
 
 					// Convert image
 					$imgconv = 'image'.$mimetype[1]; // imagejpeg / imagepng / imagegif
-					$imgconv ($image_dest, $temporaire); 
+					$imgconv ($image_dest, $temporaire);
 
 					// Cleanup
-					imagedestroy ($image_dest); 
+					imagedestroy ($image_dest);
 					imagedestroy ($image_src);
 				}
 				$attachment['physical_filename'] = $temporaire;
@@ -245,7 +245,7 @@ class listener implements EventSubscriberInterface
 				$result = $this->db->sql_query_limit($sql_rch, 1);
 				$r = $this->db->sql_fetchrow($result);
 			}
-			
+
 			$post_row['MESSAGE'] = str_replace (
 				$href.'">'.$imgs[3][$k].'<',
 				$href.'"><img title="'.$href.'" alt="'.$href.'" style="border:5px solid #F3E358" src="download/file.php?id='.$r['attach_id'].'&size=200&'.time().'"><',

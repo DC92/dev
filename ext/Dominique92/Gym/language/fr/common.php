@@ -40,7 +40,7 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, array(
 	// Login
 	'USERNAME' => 'Prénom',
-	
+
 	// Posting.php
 	'SUBJECT' => 'Titre',
 	'SUBMIT' => 'Enregistrer',
@@ -54,7 +54,7 @@ $lang = array_merge($lang, array(
 	'DELETE_POST_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
 	'STICK_TOPIC_FOR_EXPLAIN' => '',
 	'CONTACT_ADMIN' => 'Nous contacter',
-	
+
 	// Footer
 	'FINAL_INTEGRATION_BY' =>
 		'&copy; Dominique Cavailhez 2020 : <a href="https://github.com/Dominique92">Github</a> &amp; '.

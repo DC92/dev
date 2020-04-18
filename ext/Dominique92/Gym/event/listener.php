@@ -213,6 +213,24 @@ class listener implements EventSubscriberInterface
 			$post_row['MESSAGE']
 		);
 
+		$activite_id = $this->all_post_data[$post_row['POST_ID']]['gym_activite'];
+		if ($post_row['POST_ID'] == $this->request->variable ('p','') &&
+			is_numeric ($activite_id)) {
+			$sql = 'SELECT * FROM '.POSTS_TABLE.' WHERE post_id='.$activite_id;
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+
+			$row['message'] = generate_text_for_display(
+				$row['post_text'],
+				$row['bbcode_uid'], $row['bbcode_bitfield'],
+				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+			);
+			$this->template->assign_block_vars (
+				'activite_concernee',
+				array_change_key_case ($row, CASE_UPPER)
+			);
+		}
 		$vars['post_row'] = $post_row;
 	}
 

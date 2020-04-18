@@ -869,7 +869,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 
-		return $row 
+		return $row
 			? explode ("\n", $add_first_line.generate_text_for_display(
 				$row['post_text'],
 				$row['bbcode_uid'],

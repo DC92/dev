@@ -86,7 +86,7 @@ class listener implements EventSubscriberInterface
 				$result = $this->db->sql_query_limit($sql_rch, 1);
 				$r = $this->db->sql_fetchrow($result);
 			}
-			
+
 			$post_row['MESSAGE'] = str_replace (
 				$href.'">'.$imgs[3][$k].'<',
 				$href.'"><img title="'.$href.'" alt="'.$href.'" style="border:5px solid #F3E358" src="download/file.php?id='.$r['attach_id'].'&s=200&'.time().'"><',
@@ -145,9 +145,9 @@ class listener implements EventSubscriberInterface
 					$im = imagecreate  ($nbcligne * 7 + 10, 12 * count ($cs) + 8);
 					ImageColorAllocate ($im, 0, 0, 200);
 					foreach ($cs AS $k => $v)
-						ImageString ($im, 3, 5, 3 + 12 * $k, $v, ImageColorAllocate ($im, 255, 255, 255)); 
+						ImageString ($im, 3, 5, 3 + 12 * $k, $v, ImageColorAllocate ($im, 255, 255, 255));
 					imagejpeg ($im, $local);
-					ImageDestroy ($im); 
+					ImageDestroy ($im);
 				}
 			}
 			$attachment ['physical_filename'] = $local;
@@ -189,7 +189,7 @@ class listener implements EventSubscriberInterface
 		// Reduction de la taille de l'image
 		if ($max_size = request_var('s', 0)) {
 			$img_size = @getimagesize ('../files/'.$attachment['physical_filename']);
-			$isx = $img_size [0]; $isy = $img_size [1]; 
+			$isx = $img_size [0]; $isy = $img_size [1];
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
@@ -219,15 +219,15 @@ class listener implements EventSubscriberInterface
 					}
 
 					// Build destination image
-					$image_dest = imagecreatetruecolor ($isx / $reduction, $isy / $reduction); 
+					$image_dest = imagecreatetruecolor ($isx / $reduction, $isy / $reduction);
 					imagecopyresampled ($image_dest, $image_src, 0,0, 0,0, $isx / $reduction, $isy / $reduction, $isx, $isy);
 
 					// Convert image
 					$imgconv = 'image'.$mimetype[1]; // imagejpeg / imagepng / imagegif
-					$imgconv ($image_dest, $temporaire); 
+					$imgconv ($image_dest, $temporaire);
 
 					// Cleanup
-					imagedestroy ($image_dest); 
+					imagedestroy ($image_dest);
 					imagedestroy ($image_src);
 				}
 				$attachment['physical_filename'] = $temporaire;

@@ -103,7 +103,7 @@ body,
 
 /* INDEX.PHP */
 .section-index > div {
-	background: url('images/coin_ciel.jpg'); 
+	background: url('images/coin_ciel.jpg');
 	background-repeat: no-repeat ;
 	background-color: #5072BF !important;
 }
@@ -181,7 +181,7 @@ z.geo_presentation {
 
 /* Points */
 .section-viewtopic.point #wrap {
-	background: url('images/pierre.jpg'); 
+	background: url('images/pierre.jpg');
 }
 .section-viewtopic.point .topic-title {
 	display: none;

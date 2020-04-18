@@ -139,21 +139,45 @@
 		</div>
 	<!-- ENDIF -->
 
+	<!-- Rappel de l'activité concernée -->
+	<!-- BEGIN activite_concernee -->
+		<div id="activite_concernee">
+			<ul>
+				<li style="background:#9afbbc">
+					<a href="viewtopic.php?p={activite_concernee.POST_ID}">
+						{activite_concernee.POST_SUBJECT}
+					</a>
+				</li>
+			</ul>
+			<!-- IF U_MCP -->
+				<a href="posting.php?mode=edit&f=2&p={activite_concernee.POST_ID}"
+					title="Mofifier cette rubrique" class="button button-icon-only">
+					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+				</a>
+			<!-- ENDIF -->
+			<div>{activite_concernee.MESSAGE}</div>
+		</div>
+
+	<!-- END activite_concernee -->
+
+	<!-- Page concernée -->
 	<!-- IF .postrow -->
 		<!-- BEGIN postrow -->
 			<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
-				<h2>
-					{postrow.POST_SUBJECT}
-					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-							title="Mofifier cette rubrique" class="button button-icon-only">
-							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-						</a>
+				<div id="page_concernee">
+					<h2>
+						{postrow.POST_SUBJECT}
+						<!-- IF U_MCP -->
+							<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
+								title="Mofifier cette rubrique" class="button button-icon-only">
+								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+							</a>
+						<!-- ENDIF -->
+					</h2>
+					<!-- IF not REQUEST_P -->
+						<div>{postrow.MESSAGE}</div>
 					<!-- ENDIF -->
-				</h2>
-				<!-- IF not REQUEST_P -->
-					{postrow.MESSAGE}
-				<!-- ENDIF -->
+				</div>
 			<!-- ENDIF -->
 		<!-- END postrow -->
 

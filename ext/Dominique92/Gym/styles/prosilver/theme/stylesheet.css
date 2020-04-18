@@ -102,6 +102,7 @@ html.gym_index  {
 .gym_index #sous-menu {
 	padding: 0;
 }
+.gym_index #activite_concernee li,
 .gym_index #menu li,
 .gym_index #sous-menu li {
 	display: inline-block;
@@ -111,6 +112,7 @@ html.gym_index  {
 	font-family: Times New Roman;
 	font-weight: bold;
 }
+.gym_index #activite_concernee li a,
 .gym_index #sous-menu li a,
 .gym_index #menu li a {
 	color: black;
@@ -118,6 +120,11 @@ html.gym_index  {
 }
 
 /* Crayons d'édition */
+#activite_concernee ul,
+#activite_concernee i {
+	display: inline-block;
+	margin: 0;
+}
 #edit-page {
 	float: right;
 }
@@ -144,13 +151,15 @@ html.gym_index  {
 	margin: 0.3em;
 }
 
+.gym_index #page_concernee div,
+.gym_index #activite_concernee div,
 .gym_index #page,
 .gym_index #presentation,
 .gym_index #evenements {
 	margin: 0 8%;
 	padding: 0 1%;
 	background: white !important;
-	text-align: left;
+	text-align: justify;
 }
 .gym_index #presentation h3 {
 	margin-top: 0.5em;
@@ -166,7 +175,7 @@ html.gym_index  {
  	text-align: center;
 	font-size: 1.5em;
 	font-family: "Noto Serif", serif;
-	color: grey;	
+	color: grey;
 }
 .gym_index #presentation .bandeau-vert,
 .gym_index #evenements .bandeau-vert {
