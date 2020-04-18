@@ -7,12 +7,10 @@
  */
 
 /*//TODO
-résumé en cinquième colonne horaires
-click pour remonter d'un niveau quand on est sur la fiche d'un cours 
+click pour remonter d'un niveau quand on est sur la fiche d'un cours
 BBCodes dans les tableaux
 //BEST
 Cacher page mode d'emploi
-mettre une couleur de plus en plus soutenue selon le niveau de la gym 
 style print
 favicon en posting et autres pages non index
 erradiquer f=2
@@ -74,17 +72,19 @@ class listener implements EventSubscriberInterface
 		$this->language = $language;
 
 		// Includes language and style files of this extension
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+		$this->ns = explode ('\\', __NAMESPACE__);
+		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
+		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+		$template->set_style ([
+			$this->ext_path.'styles',
+			'styles', // core styles
+		]);
 	}
 
 	static public function getSubscribedEvents() {
-		// For debug, Varnish will not be caching pages where you are setting a cookie
-		if (defined('TRACES_DOM'))
-			setcookie('disable-varnish', microtime(true), time()+600, '/');
-
 		return [
 			// All
+			'core.page_header' => 'page_header',
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
@@ -96,32 +96,23 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
-			// Viewforum
-			'core.viewforum_modify_topicrow' => 'viewforum_modify_topicrow',
-
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 		];
 	}
 
 	/**
 		ALL
 	*/
-	function page_footer_after() {
-		// Change le template sur demande
-		$template = $this->request->variable('template', '');
-		if ($template)
-			$this->my_template = "@Dominique92_Gym/$template.html";
-
-		if ($this->my_template)
-			$this->template->set_filenames([
-				'body' => $this->my_template,
-			]);
-
-		$this->template->assign_var ('EXT_PATH',$this->ext_path);
+	function page_header() {
+		// Assign misc values to the template
+		$this->template->assign_var ('EXT_PATH', $this->ext_path);
+		$this->request->enable_super_globals();
+		foreach ($_REQUEST AS $k=>$v)
+			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
+		$this->request->disable_super_globals();
 
 		// Menu principal
 		$this->liste_fiches (
@@ -165,17 +156,35 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+		Change le template sur demande
+	*/
+	// Appelé juste avant d'afficher
+	function viewtopic_modify_page_title($vars) {
+		$view = $this->request->variable('view', '');
+		if (!$view && $vars['forum_id'] == 2)
+			$this->my_template = 'index_body';
+	}
+
+	// Appelé après viewtopic_modify_page_title & template->set_filenames
+	function page_footer_after() {
+		$template = $this->request->variable (
+			'template',
+			$this->my_template ?: ''
+		);
+		if ($template)
+			$this->template->set_filenames ([
+				'body' => "@Dominique92_Gym/$template.html",
+			]);
+	}
+
+	/**
 		VIEWTOPIC.PHP
 	*/
 	// Called before reading reads phpbb-posts SQL data
 	function viewtopic_gen_sort_selects_before($vars) {
-		// Tri des sous-menus dansle bon ordre
+		// Tri des sous-menus dans le bon ordre
 		$sort_by_sql = $vars['sort_by_sql'];
-
-		$view = $this->request->variable('view', '');
-		if (!$view)
-			$sort_by_sql['t'] = array_merge (['p.gym_ordre_menu'],$sort_by_sql['t']);
-
+		$sort_by_sql['t'] = array_merge (['p.gym_ordre_menu'],$sort_by_sql['t']);
 		$vars['sort_by_sql'] = $sort_by_sql;
 	}
 
@@ -189,9 +198,7 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 
-		// Assign post_id to template
-		$this->template->assign_var ('POST_ID', $this->request->variable('p', 0));
-
+		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $vars['topic_data']['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
 		$post_row['COULEUR'] = $this->couleur(); // Couleur du sous-menu
@@ -201,7 +208,7 @@ class listener implements EventSubscriberInterface
 			'/([A-Z_]+)/',
 			function ($matches) use ($post_row) {
 				$r = $post_row[$matches[1]];
-				return $r ? $r : urlencode ($matches[1]);
+				return $r ?: urlencode ($matches[1]);
 			},
 			$post_row['MESSAGE']
 		);
@@ -209,33 +216,11 @@ class listener implements EventSubscriberInterface
 		$vars['post_row'] = $post_row;
 	}
 
-	// Appelé juste avant d'afficher
-	function viewtopic_modify_page_title($vars) {
-		$view = $this->request->variable('view', '');
-		if (!$view)
-			$this->my_template = 'index_body.html';
-	}
-
-	/**
-		VIEWFORUM.PHP
-	*/
-	function viewforum_modify_topicrow($vars) {
-		// Permet la visualisation en vue forum pour l'édition du site
-		$topic_row = $vars['topic_row'];
-		$topic_row['U_VIEW_TOPIC'] .= '&view=forum';
-		$vars['topic_row'] = $topic_row;
-	}
-
 	/**
 		POSTING.PHP
 	*/
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
-		// Permet la visualisation en vue forum pour l'édition du site
-		$page_data = $vars['page_data'];
-		$page_data['U_VIEW_TOPIC'] .= '&view=forum';
-		$vars['page_data'] = $page_data;
-
 		$post_data = $vars['post_data'];
 
 		// Set specific variables
@@ -276,7 +261,8 @@ class listener implements EventSubscriberInterface
 		}
 
 		//
-		if ($vars['mode'] == 'reply') { // Template vide pour posting/création
+		if ($vars['mode'] == 'reply') {
+			// Template vide pour posting/création
 			$liste = [];
 			foreach ($static_values['semaines'] AS $s)
 				$liste['new'][][] = [
@@ -289,7 +275,8 @@ class listener implements EventSubscriberInterface
 				'calendrier', [],
 				'','', $liste
 			);
-		} elseif ($post_data['post_id']) // Modification
+		} elseif ($post_data['post_id'])
+			// Variables template pour modification
 			$this->liste_fiches (
 				'calendrier', [
 					'post.post_id='.$post_data['post_id'],
@@ -325,17 +312,6 @@ class listener implements EventSubscriberInterface
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
 	}
 
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		// Allows entering a POST with empty text
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
-
 	/**
 		FUNCTIONS
 	*/
@@ -353,7 +329,6 @@ class listener implements EventSubscriberInterface
 
 	function listes() {
 		return [
-			'intensites' => ['?','douce','modérée','moyenne','soutenue','cardio'],
 			'heures' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
 			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
 			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
@@ -364,6 +339,7 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
+	// Add specific columns to the database
 	function verify_column($table, $columns) {
 		foreach ($columns AS $column) {
 			$sql = "SHOW columns FROM $table LIKE '$column'";
@@ -381,7 +357,6 @@ class listener implements EventSubscriberInterface
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
 		$this->verify_column(POSTS_TABLE, [
 			'gym_activite',
-			'gym_intensite',
 			'gym_lieu',
 			'gym_animateur',
 			'gym_jour',
@@ -414,13 +389,6 @@ class listener implements EventSubscriberInterface
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
-		$this->template->assign_vars([
-			'REQUEST_ID' => $post_id,
-			'REQUEST_NOM' => $nom,
-			'REQUEST_LIEU' => $lieu,
-			'REQUEST_ANIMATEUR' => $animateur,
-			'REQUEST_ACTIVITE' => $activite,
-		]);
 
 		if ($cond) {
 			$static_values = $this->listes();
@@ -439,7 +407,7 @@ class listener implements EventSubscriberInterface
 				li.post_subject AS lieu,
 				an.post_subject AS animateur,
 				ac.post_subject AS activite,
-				post.gym_activite, post.gym_intensite, post.gym_lieu, post.gym_animateur, post.gym_nota,
+				post.gym_activite, post.gym_lieu, post.gym_animateur, post.gym_nota,
 				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
 				post.gym_evenements, post.gym_horaires, post.gym_menu, post.gym_ordre_menu
@@ -474,11 +442,6 @@ class listener implements EventSubscriberInterface
 					$row['resume'] = '<p>'.implode('</p><p>',$resume).'</p>';
 				$row['display_text'] = $display_text;
 
-				// Paramètres spécifiques
-				if ($row['gym_intensite']) {
-					$row['intensite'] = $static_values['intensites'][$row['gym_intensite']];
-					$row['seance'] .= ' - intensité '.$row['intensite'];
-				}
 				// Jour dans la semaine
 				$row['gym_jour'] = intval ($row['gym_jour']);
 				$row['gym_jour_literal'] = $static_values['jours'][$row['gym_jour']];

@@ -151,7 +151,7 @@
 						</a>
 					<!-- ENDIF -->
 				</h2>
-				<!-- IF not POST_ID -->
+				<!-- IF not REQUEST_P -->
 					{postrow.MESSAGE}
 				<!-- ENDIF -->
 			<!-- ENDIF -->
@@ -176,7 +176,7 @@
 
 		<div id="page">
 			<!-- BEGIN postrow -->
-				<!-- IF postrow.POST_ID == POST_ID -->
+				<!-- IF postrow.POST_ID == REQUEST_P -->
 					<h2>
 						{postrow.POST_SUBJECT}
 						<!-- IF U_MCP -->

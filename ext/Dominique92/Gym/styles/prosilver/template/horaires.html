@@ -21,19 +21,16 @@
 			<tr>
 				<!-- IF not REQUEST_ID -->
 					<td>
-						<!-- IF item.POST_TEXT -->
-							<a href="viewtopic.php?p={item.POST_ID}">
-								{item.NOM}
-							</a>
-						<!-- ELSE -->
+						<a href="viewtopic.php?p={item.POST_ID}">
 							{item.NOM}
-						<!-- ENDIF -->
+						</a>
 						<!-- IF U_MCP -->
 							<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
 								title="Mofifier cette séance" class="button button-icon-only">
 								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 							</a>
 						<!-- ENDIF -->
+
 						<!-- IF REQUEST_ACTIVITE and item.GYM_NOTA -->
 							<br>{item.GYM_NOTA}
 						<!-- ENDIF -->
