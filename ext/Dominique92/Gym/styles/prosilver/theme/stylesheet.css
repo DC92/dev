@@ -3,12 +3,6 @@ pre {
 	text-align: left;
 }
 
-/* Avertissement au posting */
-.section-posting #attach-panel-multi::after {
-	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
-	background: yellow;
-}
-
 /* Ménage phpBB */
 .site_logo {
 	background-image: url("./images/logo.jpg");

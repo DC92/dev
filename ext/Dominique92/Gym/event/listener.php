@@ -76,15 +76,8 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
-		$this->ext_path = 'ext/'.$ns[0].'/'.$ns[1].'/';
-		$template->set_style([
-			$this->ext_path.'styles',
-			'styles', // core styles
-		]);
 	}
 
-	// List of hooks and related functions
-	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 		// For debug, Varnish will not be caching pages where you are setting a cookie
 		if (defined('TRACES_DOM'))

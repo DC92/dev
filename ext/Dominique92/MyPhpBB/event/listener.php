@@ -1,6 +1,16 @@
 <?php
 /**
  * Add usefull tricks to for phpBB
+ * Includes language and style files of this extension
+ * Clickable banner
+ * <table> BBcode
+ * Prevent an empty post title or text
+ * Log posts edit
+ * Warning to wait until end loading of attached files
+ *
+ * DEBUG :
+ * Disable Varnish
+ * List template vars
  *
  * @copyright (c) 2020 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
@@ -31,11 +41,20 @@ class listener implements EventSubscriberInterface
 		$this->template = $template;
 		$this->user = $user;
 		$this->language = $language;
+
+		// Include language files of this extension
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 	}
 
 	// List of hooks and related functions
 	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
+
+		// For debug, Varnish will not be caching pages where you are setting a cookie
+		if (defined('DEBUG_CONTAINER'))
+			setcookie('disable-varnish', microtime(true), time()+600, '/');
+
 		return [
 			// Viewtopic
 			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
@@ -56,6 +75,7 @@ class listener implements EventSubscriberInterface
 	function modify_text_for_display_after($vars) {
 		$text = $vars['text'];
 
+		// BBCode [tableau]{TEXT}[/tableau] / <tableau>{TEXT}</tableau> / LF split table lines / | split columns
 		$text = preg_replace_callback ('/<tableau>.*<\/tableau>/', function($match) {
 			return str_replace (
 				['<tableau><br>', '<br></tableau>', '<br>', '|', ';'],

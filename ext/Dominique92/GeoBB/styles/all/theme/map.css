@@ -48,10 +48,3 @@
 .topic-edit-button {
 	margin: 5px 0 20px 0;
 }
-
-/* posting.php */
-/* //TODO BEST implémenter un blocage de l'envoi par javascript */
-.section-posting #attach-panel-multi::after {
-	content: "Attendre la fin du chargement des fichiers pour enregistrer le sujet.";
-	background: yellow;
-}
