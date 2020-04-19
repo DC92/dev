@@ -24,6 +24,7 @@
 		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
 	</div>
 
+	<!-- Connexion (float right) -->
 	<div id="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
 			{S_USERNAME}&nbsp;
@@ -56,6 +57,7 @@
 		<!-- ENDIF -->
 	</div>
 
+	<!-- Recherche -->
 	<form action="{U_SEARCH}" method="get" id="search">
 	<fieldset>
 		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
@@ -66,6 +68,7 @@
 	</fieldset>
 	</form>
 
+	<!-- Banière (pavé jaune) -->
 	<div>
 		<a id="logo" href="https://www.sport-sante.fr/">
 			<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
@@ -75,6 +78,7 @@
 		</a>
 	</div>
 
+	<!-- Menu principal -->
 	<ul id="menu">
 		<!-- BEGIN menu -->
 			<!-- BEGIN item -->
@@ -92,32 +96,29 @@
 		<!-- ENDIF -->
 	</ul>
 
-	<!-- IF .presentation -->
-		<div id="presentation">
-			<!-- BEGIN presentation -->
-				<!-- BEGIN item -->
-					<h3 class="titre-gris">
-						{item.NOM}
-						<!-- IF U_MCP -->
-							<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
-								title="Mofifier cette fiche" class="button button-icon-only">
-								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-							</a>
-						<!-- ENDIF -->
-					</h3>
-					<!-- IF item.RESUME -->
-						<div>{item.RESUME}</div>
-						<div>. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a></div>
-					<!-- ELSE -->
-						<div>{item.DISPLAY_TEXT}</div>
+	<div id="page">
+		<!-- Accueil -->
+		<!-- BEGIN presentation -->
+			<!-- BEGIN item -->
+				<h3 class="titre-gris">
+					{item.NOM}
+					<!-- IF U_MCP -->
+						<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
+							title="Mofifier cette fiche" class="button button-icon-only">
+							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+						</a>
 					<!-- ENDIF -->
-				<!-- END item -->
-			<!-- END presentation -->
-		</div>
-	<!-- ENDIF -->
+				</h3>
+				<!-- IF item.RESUME -->
+					{item.RESUME}
+					. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
+				<!-- ELSE -->
+					{item.DISPLAY_TEXT}
+				<!-- ENDIF -->
+			<!-- END item -->
+		<!-- END presentation -->
 
-	<!-- IF .evenements -->
-		<div id="evenements">
+		<!-- IF .evenements -->
 			<h1>Évenements</h1>
 			<!-- BEGIN evenements -->
 				<!-- IF evenements.DATE -->
@@ -130,18 +131,16 @@
 							</a>
 						<!-- ENDIF -->
 					</div>
-					<div>{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF --></div>
+					{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF -->
 					{evenements.RESUME}
-					<div>. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a></div>
+					. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a>
 					<br/>
 				<!-- ENDIF -->
 			<!-- END evenements -->
-		</div>
-	<!-- ENDIF -->
+		<!-- ENDIF -->
 
-	<!-- Rappel de l'activité concernée -->
-	<!-- BEGIN activite_concernee -->
-		<div id="activite_concernee">
+		<!-- Fiche cours : rappel de l'activité -->
+		<!-- BEGIN activite_concernee -->
 			<ul>
 				<li style="background:#9afbbc">
 					<a href="viewtopic.php?p={activite_concernee.POST_ID}">
@@ -155,16 +154,13 @@
 					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 				</a>
 			<!-- ENDIF -->
-			<div>{activite_concernee.MESSAGE}</div>
-		</div>
+			{activite_concernee.MESSAGE}
+		<!-- END activite_concernee -->
 
-	<!-- END activite_concernee -->
-
-	<!-- Page concernée -->
-	<!-- IF .postrow -->
-		<!-- BEGIN postrow -->
-			<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
-				<div id="page_concernee">
+		<!-- Post présenté en page -->
+		<!-- IF .postrow -->
+			<!-- BEGIN postrow -->
+				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
 					<h2>
 						{postrow.POST_SUBJECT}
 						<!-- IF U_MCP -->
@@ -175,30 +171,28 @@
 						<!-- ENDIF -->
 					</h2>
 					<!-- IF not REQUEST_P -->
-						<div>{postrow.MESSAGE}</div>
+						{postrow.MESSAGE}
 					<!-- ENDIF -->
-				</div>
-			<!-- ENDIF -->
-		<!-- END postrow -->
-
-		<ul id="sous-menu">
-			<!-- BEGIN postrow -->
-				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' and U_MCP -->
-					<li>
-						<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={FORUM_ID}&t={TOPIC_ID}">
-							<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-						</a>
-					</li>
-				<!-- ENDIF -->
-				<!-- IF postrow.POST_ID != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
-					<li style="background:{postrow.COULEUR}">
-						<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
-					</li>
 				<!-- ENDIF -->
 			<!-- END postrow -->
-		</ul>
 
-		<div id="page">
+			<ul id="sous-menu">
+				<!-- BEGIN postrow -->
+					<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' and U_MCP -->
+						<li>
+							<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={FORUM_ID}&t={TOPIC_ID}">
+								<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+							</a>
+						</li>
+					<!-- ENDIF -->
+					<!-- IF postrow.POST_ID != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
+						<li style="background:{postrow.COULEUR}">
+							<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
+						</li>
+					<!-- ENDIF -->
+				<!-- END postrow -->
+			</ul>
+
 			<!-- BEGIN postrow -->
 				<!-- IF postrow.POST_ID == REQUEST_P -->
 					<h2>
@@ -213,8 +207,8 @@
 					{postrow.MESSAGE}
 				<!-- ENDIF -->
 			<!-- END postrow -->
-		</div>
-	<!-- ENDIF -->
+		<!-- ENDIF -->
+	</div>
 
 	{$SCRIPTS}
 </body>

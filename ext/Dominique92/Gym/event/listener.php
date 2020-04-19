@@ -6,16 +6,23 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-/*//TODO
-click pour remonter d'un niveau quand on est sur la fiche d'un cours
-BBCodes dans les tableaux
+/*
+//TODO
+Calendrier par ID en marche Nordique
+Bouton imprimer calendier
+GYM bbcode photo/n° attachment
+BBCodes du texte dans les tableaux
+
 //BEST
 Cacher page mode d'emploi
 style print
 favicon en posting et autres pages non index
 erradiquer f=2
 template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
-//APRES enlever le .robot et faire un SEO
+
+//APRES
+Sitemap
+enlever le .robot et faire un SEO
 */
 
 /** CONFIG

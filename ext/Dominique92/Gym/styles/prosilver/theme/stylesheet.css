@@ -3,6 +3,11 @@ pre {
 	text-align: left;
 }
 
+/* Général */
+body {
+	font-family: arial, sans-serif;
+}
+
 /* Ménage phpBB */
 .site_logo {
 	background-image: url("./images/logo.jpg");
@@ -75,9 +80,8 @@ html.gym_index  {
 	padding: 0.2em;
 	border-radius: 1em;
 	background: #ffc;
-	font-family: Times New Roman;
 	font-weight: bold;
-	font-size: 1.2em;
+	font-size: 120%;
 	color: black;
 }
 
@@ -101,40 +105,34 @@ html.gym_index  {
 .gym_index #menu,
 .gym_index #sous-menu {
 	padding: 0;
+	text-align: center;
 }
-.gym_index #activite_concernee li,
 .gym_index #menu li,
-.gym_index #sous-menu li {
+.gym_index #sous-menu li,
+.gym_index #page li {
 	display: inline-block;
 	margin: 0.2em;
 	padding: 0.3em;
 	border-radius: 2em;
-	font-family: Times New Roman;
 	font-weight: bold;
 }
-.gym_index #activite_concernee li a,
+.gym_index #menu li a,
 .gym_index #sous-menu li a,
-.gym_index #menu li a {
+.gym_index #page li a {
 	color: black;
 	text-decoration: none;
 }
 
-/* Crayons d'édition */
-#activite_concernee ul,
-#activite_concernee i {
-	display: inline-block;
-	margin: 0;
-}
-#edit-page {
+.gym_index #edit-page {
 	float: right;
 }
-#edit-user,
-#edit-page {
+.gym_index #edit-user,
+.gym_index #edit-page {
 	float: right;
 	text-align: right;
 	line-height: 1.5em;
 }
-#edit-user .dropdown-contents {
+.gym_index #edit-user .dropdown-contents {
 	display: none;
 	position: absolute;
 	right: 0;
@@ -144,59 +142,42 @@ html.gym_index  {
 	text-align: left;
 	list-style-type: none;
 }
-#edit-user:hover .dropdown-contents {
+.gym_index #edit-user:hover .dropdown-contents {
 	display: block;
 }
-#edit-user li {
+.gym_index #edit-user li {
 	margin: 0.3em;
 }
 
-.gym_index #page_concernee div,
-.gym_index #activite_concernee div,
-.gym_index #page,
-.gym_index #presentation,
-.gym_index #evenements {
-	margin: 0 8%;
-	padding: 0 1%;
+.gym_index #page {
+	margin: 0 calc(10% - 60px);
 	background: white !important;
 	text-align: justify;
 }
-.gym_index #presentation h3 {
-	margin-top: 0.5em;
-}
-.gym_index #presentation p {
-	margin: 0;
+.gym_index #page h1,
+.gym_index #page h3 {
+	margin-bottom: 0;
 }
 .gym_index #page h2 {
  	text-align: center;
-	font-size: 1.1em;
+	font-size: 110%;
 }
-.gym_index #evenements h1 {
- 	text-align: center;
-	font-size: 1.5em;
-	font-family: "Noto Serif", serif;
-	color: grey;
+.gym_index #page p {
+	margin: 0;
 }
-.gym_index #presentation .bandeau-vert,
-.gym_index #evenements .bandeau-vert {
-	padding-left: 0.5em;
+.gym_index #page .bandeau-vert {
+	margin-top: 1em;
 	text-align: left;
 }
-.gym_index #evenements p {
-	margin: 0.3em 0;
-	text-indent: 1em;
-}
 @media (max-width: 600px) {
-	.gym_index #page,
-	.gym_index #presentation,
-	.gym_index #evenements {
+	.gym_index #page {
 		margin: 0;
 	}
 }
 
 /* Attachements (notamment liens) */
-.inline-attachment,
-.inline-attachment dl {
+.gym_index .inline-attachment,
+.gym_index .inline-attachment dl {
 	display: inline-block;
 	float: none !important;
 	margin: 0 !important;
@@ -205,64 +186,64 @@ html.gym_index  {
 }
 
 /* Images incluses dans le texte */
-.file {
+.gym_index .file {
 	margin: 0;
 }
-.file dd { /* Supprime le compte de vues, ... */
+.gym_index .file dd { /* Supprime le compte de vues, ... */
 	display: none;
 }
-.file img {
+.gym_index .file img {
 	max-width: 30vh;
 	border-radius: 1em;
 }
-.inline-attachment {
+.gym_index .inline-attachment {
 	float: right;
 	margin-left: 1em;
 }
-.image-droite .inline-attachment {
+.gym_index .image-droite .inline-attachment {
 	float: right !important;
 	margin-left: 1em !important;
 }
-.image-gauche .inline-attachment {
+.gym_index .image-gauche .inline-attachment {
 	float: left !important;
 	margin-right: 1em !important;
 }
 @media (max-width: 600px) {
-	.attach-image {
+	.gym_index .attach-image {
 		display: none;
 	}
 }
 
 /* BBCodes spéciaux */
-.titre-gris {
+.gym_index .titre-gris {
 	margin-bottom: 0.3em;
 	text-indent: 0;
 	color: #888;
-	font-size: 1.1em;
+	font-size: 110%;
 	font-weight: 700;
 }
-.bandeau-vert {
+.gym_index .bandeau-vert {
 	clear: both;
 	text-align: center;
 	background-color: #329932;
 	color: white;
-	font-size: 1.2em;
+	font-size: 120%;
 }
-.bandeau-vert a {
+.gym_index .bandeau-vert a {
 	color: white;
 	text-decoration: underline solid white;
 }
-.texte-vert {
+.gym_index .texte-vert {
 	color: rgb(0, 128, 0);
 }
-.carte {
+.gym_index .carte {
 	clear: both;
 	margin: 1em calc(50% - 250px);
 	width: 500px;
 	height: 375px;
 }
 @media (max-width: 600px) {
-	.carte {
+	.gym_index .carte {
 		margin: 0;
 		width: 100%;
 		height: 70vw;
@@ -270,88 +251,85 @@ html.gym_index  {
 }
 
 /* Horaires */
-.horaires {
+.gym_index .horaires {
 	clear: both;
 	margin: 1em 0;
 }
-.horaires div {
+.gym_index .horaires > div {
 	text-align: initial;
+	font-size: 120%;
 	text-transform: capitalize;
 }
-.horaires table {
-	margin: 0 1em;
+.gym_index .horaires table {
 	border: 4px solid;
 	border-collapse: collapse;
 }
-.horaires td {
+.gym_index .horaires td {
 	border: 1px dashed;
 	padding: 0.2em;
 	text-align: left;
 }
 @media (max-width: 600px) {
-	.horaires {
+	.gym_index .horaires {
 		margin-left: 0;
 		margin-right: 0;
 	}
-	.horaires table {
+	.gym_index .horaires table {
 		width: 100%;
 		margin-left: 0 !important;
 	}
 }
 
 /* Tableaux */
-table.tableau {
+.gym_index table.tableau {
 	margin: 0 auto;
 	border: 2px solid grey;
 	border-collapse: collapse;
 }
-table.tableau td {
+.gym_index table.tableau td {
 	border: 1px solid black;
 	padding: 2px;
 }
 
 /* Calendrier */
-.calendrier {
+.gym_index .calendrier {
 	width: calc(100%-2px);
 	border: 2px solid grey;
 }
-.calendrier table {
+.gym_index .calendrier table {
 	width: 100%;
 	border-collapse: collapse;
 }
-.calendrier * {
+.gym_index .calendrier * {
 	border-spacing: 0;
 }
-.calendrier tr:first-child {
+.gym_index .calendrier tr:first-child {
 	display: none;
 }
-.calendrier td {
+.gym_index .calendrier td {
 	color: #999;
 }
-.calendrier td:first-child {
+.gym_index .calendrier td:first-child {
 	color: black;
 }
-.calendrier td.selected {
+.gym_index .calendrier td.selected {
 	background: #cfc;
 	color: black;
 	font-weight: bold;
 }
-.calendrier td {
+.gym_index .calendrier td {
 	border: 1px solid grey;
 	text-align: center;
 	width: 8%;
 	margin: 0;
 	padding: 0;
 }
-.calendrier a {
+.gym_index .calendrier a {
 	text-decoration: none;
 	color: black;
 }
 
 /* POSTING */
-#liste_semaines {
-	font-size: 1em;
-}
 #liste_semaines tr:first-child {
 	display: none;
 }
