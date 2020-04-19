@@ -1,65 +1,64 @@
 <div id="horaires">
-
-<!-- IF U_MCP and .horaires -->
-	<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
-		class="button button-icon-only" style="float:right">
-		<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-	</a>
-<!-- ENDIF -->
-
-<!-- BEGIN horaires -->
-	<div class="horaires j{horaires.GYM_JOUR}">
-		<div style="text-indent:calc((10% - 60px) * {horaires.GYM_JOUR})">
-			{horaires.GYM_JOUR_LITERAL}
-		</div>
-		<table style="
-			margin-left:calc((10% - 60px) * {horaires.GYM_JOUR});
-			background:{horaires.COULEUR_FOND};
-			border-color:{horaires.COULEUR_BORD};
-		">
-			<!-- BEGIN item -->
-			<tr>
-				<!-- IF not REQUEST_ID -->
-					<td>
-						<a href="viewtopic.php?p={item.POST_ID}">
-							{item.NOM}
-						</a>
-						<!-- IF U_MCP -->
-							<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
-								title="Mofifier cette séance" class="button button-icon-only">
-								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+	<!-- BEGIN horaires -->
+		<div class="horaires j{horaires.GYM_JOUR}">
+			<div style="text-indent:calc((10% - 60px) * {horaires.GYM_JOUR})">
+				{horaires.GYM_JOUR_LITERAL}
+				<!-- IF U_MCP and .horaires and not horaires.GYM_JOUR -->
+					<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
+						class="button button-icon-only" style="float:right">
+						<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+					</a>
+				<!-- ENDIF -->
+			</div>
+			<table style="
+				margin-left:calc((10% - 60px) * {horaires.GYM_JOUR});
+				background:{horaires.COULEUR_FOND};
+				border-color:{horaires.COULEUR_BORD};
+			">
+				<!-- BEGIN item -->
+				<tr>
+					<!-- IF not REQUEST_ID -->
+						<td>
+							<a href="viewtopic.php?p={item.POST_ID}">
+								{item.NOM}
 							</a>
-						<!-- ENDIF -->
+							<!-- IF U_MCP -->
+								<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
+									title="Mofifier cette séance" class="button button-icon-only">
+									<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+								</a>
+							<!-- ENDIF -->
 
-						<!-- IF REQUEST_ACTIVITE and item.GYM_NOTA -->
-							<br>{item.GYM_NOTA}
-						<!-- ENDIF -->
-					</td>
-				<!-- ENDIF -->
+							<!-- IF REQUEST_ACTIVITE and item.GYM_NOTA -->
+								<br>{item.GYM_NOTA}
+							<!-- ENDIF -->
+						</td>
+					<!-- ENDIF -->
 
-				<td>{item.HORAIRE_DEBUT} {item.HORAIRE_FIN}</td>
+					<td>{item.HORAIRE_DEBUT} {item.HORAIRE_FIN}</td>
 
-				<!-- IF not REQUEST_LIEU -->
-					<td>
-						<a href="viewtopic.php?p={item.GYM_LIEU}">
-							{item.LIEU}
-						</a>
-					</td>
-				<!-- ENDIF -->
+					<!-- IF not REQUEST_LIEU -->
+						<td>
+							<a href="viewtopic.php?p={item.GYM_LIEU}">
+								{item.LIEU}
+							</a>
+						</td>
+					<!-- ENDIF -->
 
-				<!-- IF not REQUEST_ANIMATEUR -->
-					<td>
-						<a href="viewtopic.php?p={item.GYM_ANIMATEUR}">
-							{item.ANIMATEUR}
-						</a>
-					</td>
-				<!-- ENDIF -->
-			</tr>
-			<!-- END item -->
-		</table>
-	</div>
-<!-- END horaires -->
+					<!-- IF not REQUEST_ANIMATEUR -->
+						<td>
+							<a href="viewtopic.php?p={item.GYM_ANIMATEUR}">
+								{item.ANIMATEUR}
+							</a>
+						</td>
+					<!-- ENDIF -->
+				</tr>
+				<!-- END item -->
+			</table>
+		</div>
+	<!-- END horaires -->
 </div>
+
 <script>
 //TODO seulement dans page horaire
 	$('#page').css('background','rgba(0,0,0,0)');

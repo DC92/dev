@@ -162,6 +162,7 @@ html.gym_index  {
  	text-align: center;
 	font-size: 110%;
 }
+.gym_index #page ul,
 .gym_index #page p {
 	margin: 0;
 }
@@ -253,7 +254,7 @@ html.gym_index  {
 /* Horaires */
 .gym_index .horaires {
 	clear: both;
-	margin: 1em 0;
+	margin: 0 0 .3em 0;
 }
 .gym_index .horaires > div {
 	text-align: initial;

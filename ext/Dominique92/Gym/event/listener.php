@@ -8,7 +8,7 @@
 
 /*
 //TODO
-Calendrier par ID en marche Nordique
+Style luminance / saturation
 Bouton imprimer calendier
 GYM bbcode photo/n° attachment
 BBCodes du texte dans les tableaux
@@ -43,7 +43,7 @@ MESSAGES / BBCodes / cocher afficher
 	[image-gauche]{TEXT}[/image-gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[horaire]{TEXT}[/horaire] / <div class="include">.?template=horaires&{TEXT}=POST_ID</div> / Affiche des horaires
-	[calendrier]{TEXT}[/calendrier] / <div class="include">.?template=calendrier&{TEXT}=POST_SUBJECT</div> / Affiche un calendrier
+	[calendrier]{TEXT}[/calendrier] / <div class="include">.?template=calendrier&{TEXT}=POST_ID</div> / Affiche un calendrier
 	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
 	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
 	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
