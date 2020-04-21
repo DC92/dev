@@ -38,7 +38,7 @@ pre {
 	}
 }
 
-/* Style des pages */
+/* Pages style GV */
 html.gym_index  {
 	height: 100%;
 }
@@ -46,10 +46,6 @@ html.gym_index  {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	background-image: url("images/plafond.jpg"), url("images/ballons.jpg");
-	background-repeat: no-repeat, no-repeat;
-	background-position: 0 4vw;
-	background-size: 100%, 20%;
 	font-family: arial, sans-serif;
 }
 .gym_index .logo img {
@@ -100,7 +96,7 @@ html.gym_index  {
 /* User connexion box */
 .gym_index #edit-user {
 	position: absolute;
-	top: 4vw; /* //TODO replace by calc(2vw - 0.5em)*/
+	top: calc(2vw - 0.5em);
 	left: calc(2vw - 0.5em);
 	color: white;
 }
@@ -166,6 +162,9 @@ html.gym_index  {
 	background: #D3F261;
 	font-size: 1.15em;
 	border-radius: 0.2em
+}
+.gym_index #page h1 i {
+	color: white;
 }
 .gym_index #page ul,
 .gym_index #page p {
@@ -254,6 +253,9 @@ html.gym_index  {
 	color: black;
 }
 @media (max-width: 600px) {
+	.gym_index .horaires > div {
+		margin-left: 1em !important;
+	}
 	.gym_index .horaires {
 		margin-left: 0;
 		margin-right: 0;
@@ -276,37 +278,34 @@ html.gym_index  {
 }
 
 /* Calendrier */
-.gym_index .calendrier {
-	width: calc(100%-2px);
+.gym_index table.calendrier {
+	margin: 0 auto;
 	border: 2px solid grey;
-}
-.gym_index .calendrier table {
-	width: 100%;
 	border-collapse: collapse;
-}
-.gym_index .calendrier * {
 	border-spacing: 0;
 }
 .gym_index .calendrier tr:first-child {
 	display: none;
 }
 .gym_index .calendrier td {
+	margin: 0;
+	border: 1px solid grey;
+	padding: 0.25em;
+	width: 1.5em;
+	text-align: center;
 	color: #999;
 }
 .gym_index .calendrier td:first-child {
+	text-align: left;
 	color: black;
+}
+.gym_index .calendrier tr:nth-child(2) td {
+	text-align: center;
 }
 .gym_index .calendrier td.selected {
 	background: #cfc;
 	color: black;
 	font-weight: bold;
-}
-.gym_index .calendrier td {
-	border: 1px solid grey;
-	text-align: center;
-	width: 8%;
-	margin: 0;
-	padding: 0;
 }
 .gym_index .calendrier a {
 	text-decoration: none;

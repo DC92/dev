@@ -1,6 +1,5 @@
 <!-- BEGIN calendrier -->
-	<div class="calendrier">
-	<table>
+	<table class="calendrier">
 		<tr>
 			<!-- BEGIN item -->
 				<!-- IF item.GYM_IN_CALENDRIER == '' -->
@@ -19,6 +18,7 @@
 				<td>
 			<!-- END item -->
 		</tr>
+		<tr><td colspan="6">Les {calendrier.GYM_JOUR_LITERAL}s</td></tr>
 		<tr id="mois_{calendrier.POST_ID}_8"><td>Septembre</td></tr>
 		<tr id="mois_{calendrier.POST_ID}_9"><td>Octobre</td></tr>
 		<tr id="mois_{calendrier.POST_ID}_10"><td>Novembre</td></tr>
@@ -30,7 +30,6 @@
 		<tr id="mois_{calendrier.POST_ID}_4"><td>Mai</td></tr>
 		<tr id="mois_{calendrier.POST_ID}_5"><td>Juin</td></tr>
 	</table>
-	</div>
 <!-- END calendrier -->
 
 <script>

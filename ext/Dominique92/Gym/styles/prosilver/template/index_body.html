@@ -19,11 +19,6 @@
 </head>
 
 <body>
-	<div style="background:yellow;font-weight:bold;color:red;font-size:3vw">
-		CECI EST UN SITE DE TEST. Le VRAI site se trouve
-		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
-	</div>
-
 	<!-- Connexion (float right) -->
 	<div id="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
@@ -119,7 +114,12 @@
 		<!-- END presentation -->
 
 		<!-- IF .evenements -->
-			<h1>Évenements</h1>
+			<h1>
+				Évenements
+				<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
+					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+				</a>
+			</h1>
 			<!-- BEGIN evenements -->
 				<!-- IF evenements.DATE -->
 					<h2>

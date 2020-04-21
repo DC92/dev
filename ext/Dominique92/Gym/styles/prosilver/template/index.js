@@ -70,4 +70,10 @@ function displayCalendar(post_id, jour) {
 		$('#s_' + post_id + '_' + week).text(date.getDate());
 		$('#tds_' + post_id + '_' + week).appendTo('#mois_' + post_id + '_' + date.getMonth());
 	}
+	// Ajoute une case aux mois n'ayant que 4 jours de ce type
+	$('.calendrier tr').each(function(index) {
+		if (index > 1 && // Not the title column
+			$(this).children().length < 6)
+			$('<td>').appendTo($(this));
+	});
 }
