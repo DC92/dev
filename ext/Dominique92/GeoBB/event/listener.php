@@ -527,6 +527,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		}
 
 		// Unhide geojson field
+//TODO enable_super_globals -> $this->request->get_super_global(\phpbb\request\request_interface::SERVER)
 		$this->request->enable_super_globals();
 		$page_data['GEOJSON_TYPE'] = isset($_GET['geom']) ? 'text' : 'hidden';
 		$this->request->disable_super_globals();
@@ -558,6 +559,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		$sql_data = $vars['sql_data'];
 
 		// Treat specific data
+//TODO enable_super_globals -> $this->request->get_super_global(\phpbb\request\request_interface::SERVER)
 		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
 		foreach ($_POST AS $k=>$v)
 			if (!strncmp ($k, 'geo', 3)) {
@@ -584,6 +586,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 	// Save changes
 	function save_post_data($post_data, $attachment_data, $geo_data, $create_if_null = false) {
 		if (isset ($post_data['post_id'])) {
+//TODO enable_super_globals -> $this->request->get_super_global(\phpbb\request\request_interface::SERVER)
 			$this->request->enable_super_globals();
 			$to_save = [
 				$this->user->data['username'].' '.date('r').' '.$_SERVER['REMOTE_ADDR'],

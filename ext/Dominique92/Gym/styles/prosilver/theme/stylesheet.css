@@ -74,6 +74,11 @@ html.gym_index  {
 		display: none;
 	}
 }
+.copyright-dc {
+	text-align: center;
+	margin-top: 2em;
+	font-size: 0.7em;
+}
 
 /* Search box */
 .gym_index form#search {
@@ -154,14 +159,11 @@ html.gym_index  {
 	background: #006AB3;
 	color: white;
 	font-size: 1.3em;
-	border-radius: 0.2em
 }
 .gym_index #page h2 {
-	padding: 0.1em;
 	margin-bottom: 0.2em;
-	background: #D3F261;
-	font-size: 1.15em;
-	border-radius: 0.2em
+	color: #006AB3;
+	font-size: 1.3em;
 }
 .gym_index #page h1 i {
 	color: white;
@@ -233,7 +235,7 @@ html.gym_index  {
 /* Horaires */
 .gym_index .horaires {
 	clear: both;
-	margin: 0 0 .3em 0;
+	margin: 0 0 0.3em 0;
 }
 .gym_index .horaires > div {
 	text-align: initial;

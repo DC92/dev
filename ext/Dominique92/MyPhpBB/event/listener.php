@@ -11,6 +11,7 @@
  * DEBUG :
  * Disable Varnish
  * List template vars
+ * Replace <!-- GETCONTENTS url --> by the url content
  *
  * @copyright (c) 2020 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
@@ -59,6 +60,8 @@ class listener implements EventSubscriberInterface
 			// Viewtopic
 			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
 
+			'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',
+
 			// Posting
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
@@ -69,22 +72,33 @@ class listener implements EventSubscriberInterface
 // List template vars : phpbb/template/context.php line 135
 //echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
 
+	// Replace <!-- GETCONTENTS url --> by the url content
+	function twig_environment_render_template_after($vars) {
+		$vars['output'] = preg_replace_callback ('/\<!--? GETCONTENTS? (.*)? -->/', function ($match) {
+			if (strpos ($match[1], '://') === false) {
+				$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+				$match[1] = implode ('/', [
+					pathinfo ($server['SCRIPT_URI'], PATHINFO_DIRNAME),
+					pathinfo ($server['SCRIPT_URI'], PATHINFO_BASENAME),
+					$match[1]
+				]);
+			}
+			return @file_get_contents ($match[1]);
+		}, $vars['output']);
+	}
+
 	/**
 		VIEWTOPIC.PHP
 	*/
+	// BBCode [tableau]{TEXT}[/tableau] / <tableau>{TEXT}</tableau> / LF split table lines / | split columns
 	function modify_text_for_display_after($vars) {
-		$text = $vars['text'];
-
-		// BBCode [tableau]{TEXT}[/tableau] / <tableau>{TEXT}</tableau> / LF split table lines / | split columns
-		$text = preg_replace_callback ('/<tableau>.*<\/tableau>/', function($match) {
+		$vars['text'] = preg_replace_callback ('/<tableau>.*<\/tableau>/', function($match) {
 			return str_replace (
 				['<tableau><br>', '<br></tableau>', '<br>', '|', ';'],
 				['<table class="tableau"><tr><td>', '</td></tr></table>', '</td></tr><tr><td>', '</td><td>', '<br/>'],
 				$match[0]
 			);
-		} , str_replace ("\n", '',$text));
-
-		$vars['text'] = $text;
+		} , str_replace ("\n", '',$vars['text']));
 	}
 
 	/**

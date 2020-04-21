@@ -10,8 +10,8 @@
 //TODO
 BUG : saisie/affichage jour semaine faux !
 BUG : Forum -> Rubrique -> tombe sur le template index !
-Arranger listes mode d'emploi
-Style titre3
+Arranger [listes] mode d'emploi
+Revoir style titre3
 Remplacer AJAX par PHP filegetcontents
 Bug photo inclusion activité en haut séance
 Bouton imprimer calendier
