@@ -19,7 +19,7 @@
 </head>
 
 <body>
-	<div id="avertissement" style="background:yellow;font-weight:bold;color:red;font-size:3vw">
+	<div style="background:yellow;font-weight:bold;color:red;font-size:3vw">
 		CECI EST UN SITE DE TEST. Le VRAI site se trouve
 		<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
 	</div>
@@ -27,8 +27,8 @@
 	<!-- Connexion (float right) -->
 	<div id="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
-			{S_USERNAME}&nbsp;
-			<ul class="dropdown-contents" role="menu">
+			{S_USERNAME}
+			<ul>
 				<li>
 					<a href="ucp.php?i=ucp_profile&mode=reg_details">
 						<i class="icon fa-sliders fa-fw" aria-hidden="true"></i><span>{L_PROFILE}</span>
@@ -68,13 +68,13 @@
 	</fieldset>
 	</form>
 
-	<!-- Banière (pavé jaune) -->
+	<!-- Banière -->
 	<div>
-		<a id="logo" href="https://www.sport-sante.fr/">
+		<a class="logo" href="https://www.sport-sante.fr/">
 			<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
 		</a>
-		<a href=".">
-			<div class="baniere">{SITENAME}</div>
+		<a class="baniere" href=".">
+			<div>{SITENAME}</div>
 		</a>
 	</div>
 
@@ -100,7 +100,7 @@
 		<!-- Accueil -->
 		<!-- BEGIN presentation -->
 			<!-- BEGIN item -->
-				<h3 class="titre-gris">
+				<h2>
 					{item.NOM}
 					<!-- IF U_MCP -->
 						<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
@@ -108,7 +108,7 @@
 							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 						</a>
 					<!-- ENDIF -->
-				</h3>
+				</h2>
 				<!-- IF item.RESUME -->
 					{item.RESUME}
 					. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
@@ -122,7 +122,7 @@
 			<h1>Évenements</h1>
 			<!-- BEGIN evenements -->
 				<!-- IF evenements.DATE -->
-					<div class="bandeau-vert">
+					<h2>
 						{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
 						<!-- IF U_MCP -->
 							<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
@@ -130,7 +130,7 @@
 								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 							</a>
 						<!-- ENDIF -->
-					</div>
+					</h2>
 					{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF -->
 					{evenements.RESUME}
 					. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a>

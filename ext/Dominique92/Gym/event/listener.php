@@ -8,10 +8,12 @@
 
 /*
 //TODO
-Style luminance / saturation
+Remplacer AJAX par PHP filegetcontents
+Bug photo inclusion activité en haut séance
 Bouton imprimer calendier
 GYM bbcode photo/n° attachment
 BBCodes du texte dans les tableaux
+Accés une URL seumlement pour référencement google
 
 //BEST
 Cacher page mode d'emploi
@@ -36,9 +38,8 @@ GENERAL / Paramètres des messages / Messages par page : 99
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
-	[titre-gris]{TEXT}[/titre-gris] / <div class="titre-gris">{TEXT}</div> / Applique un style
-	[bandeau-vert]{TEXT}[/bandeau-vert] / <div class="bandeau-vert">{TEXT}</div> / Applique un style
-	[texte-vert]{TEXT}[/texte-vert] / <div class="texte-vert">{TEXT}</div> / Applique un style
+	[titre1]{TEXT}[/titre1] / <h1>{TEXT}</h1> / Caractères blancs sur fond bleu
+	[titre2]{TEXT}[/titre2] / <h2>{TEXT}</h2> / Caractères noirs sur fond vert
 	[image-droite]{TEXT}[/image-droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
 	[image-gauche]{TEXT}[/image-gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
