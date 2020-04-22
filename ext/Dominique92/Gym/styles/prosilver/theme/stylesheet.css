@@ -130,8 +130,7 @@ html.gym_index  {
 	text-align: center;
 }
 .gym_index #menu li,
-.gym_index #sous-menu li,
-.gym_index #page li {
+.gym_index #sous-menu li {
 	display: inline-block;
 	margin: 0.2em;
 	padding: 0.3em;
@@ -139,8 +138,7 @@ html.gym_index  {
 	font-weight: bold;
 }
 .gym_index #menu li a,
-.gym_index #sous-menu li a,
-.gym_index #page li a {
+.gym_index #sous-menu li a {
 	color: black;
 }
 
@@ -164,9 +162,16 @@ html.gym_index  {
 	color: #08BABE;
 	font-size: 1.3em;
 }
-.gym_index #page ul,
+.gym_index #page h3,
+.gym_index #page h4 {
+	margin: 0.5em 0 0 0;
+}
 .gym_index #page p {
 	margin: 0;
+}
+.gym_index #page ul {
+	margin: 0;
+	list-style-type: square;
 }
 @media (max-width: 600px) {
 	.gym_index #page {
