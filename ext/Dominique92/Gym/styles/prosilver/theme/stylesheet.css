@@ -271,7 +271,6 @@ html.gym_index  {
 
 /* Tableaux */
 .gym_index table.tableau {
-	margin: 0 auto;
 	border: 2px solid grey;
 	border-collapse: collapse;
 }
