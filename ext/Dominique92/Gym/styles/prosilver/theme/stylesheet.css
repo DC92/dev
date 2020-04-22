@@ -5,12 +5,8 @@ pre {
 
 /* Ménage phpBB */
 .site_logo { /* phpBB pages */
-	background-size: 73px 48px !important;
-	background-repeat: no-repeat !important;
-	background-position: center !important;
-	background: white;
+	background-size: 33px 48px !important;
 	background-image: url("./images/logo.png");
-	border-radius: 4px
 }
 .section-viewtopic .post-buttons li:not(:first-child),
 #nav-main > li:nth-of-type(2), /* FAQ */
@@ -38,7 +34,7 @@ pre {
 	}
 }
 
-/* Pages style GV */
+/* Haut de la page style GV */
 html.gym_index  {
 	height: 100%;
 }
@@ -49,12 +45,12 @@ html.gym_index  {
 	font-family: arial, sans-serif;
 }
 .gym_index .logo img {
-	width: calc(70px + 5vw);
+	width: calc(45px + 3vw);
 	float: left;
-	margin: 0.5em 0 0 0.5em;
+	margin: 0.5em;
 }
 .gym_index .baniere div {
-	background: #006ab3;
+	background: #5826F4;
 	text-align: center;
 	font-size: 4vw;
 	font-weight: bold;
@@ -102,7 +98,7 @@ html.gym_index  {
 .gym_index #edit-user {
 	position: absolute;
 	top: calc(2vw - 0.5em);
-	left: calc(2vw - 0.5em);
+	left: calc(45px + 3vw + 1em);
 	color: white;
 }
 .gym_index #edit-user i {
@@ -156,17 +152,17 @@ html.gym_index  {
 }
 .gym_index #page h1 {
 	padding: 0.1em;
-	background: #006AB3;
+	background: #5826F4;
 	color: white;
-	font-size: 1.3em;
-}
-.gym_index #page h2 {
-	margin-bottom: 0.2em;
-	color: #006AB3;
 	font-size: 1.3em;
 }
 .gym_index #page h1 i {
 	color: white;
+}
+.gym_index #page h2 {
+	margin-bottom: 0.2em;
+	color: #08BABE;
+	font-size: 1.3em;
 }
 .gym_index #page ul,
 .gym_index #page p {
@@ -305,13 +301,15 @@ html.gym_index  {
 	text-align: center;
 }
 .gym_index .calendrier td.selected {
-	background: #cfc;
-	color: black;
+	background: #08BABE;
 	font-weight: bold;
 }
 .gym_index .calendrier a {
 	text-decoration: none;
 	color: black;
+}
+.gym_index .calendrier td.selected a {
+	color: white;
 }
 
 /* POSTING */
