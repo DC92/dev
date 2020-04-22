@@ -8,6 +8,8 @@
 
 /*
 //TODO
+Bug pas de photo catherine 1 sur /phpBB3
+pourquoi lien cliquable sur cases calendrier ?
 BUG : saisie/affichage jour semaine faux !
 BUG : Forum -> Rubrique -> tombe sur le template index !
 Arranger [listes] mode d'emploi
@@ -174,7 +176,7 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_page_title($vars) {
 		$view = $this->request->variable('view', '');
 		if (!$view && $vars['forum_id'] == 2)
-			$this->my_template = 'index_body';
+			$this->my_template = 'viewtopic_body';
 	}
 
 	// Appelé après viewtopic_modify_page_title & template->set_filenames

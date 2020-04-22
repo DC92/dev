@@ -1,215 +1,49 @@
-<!DOCTYPE html>
-<html dir="ltr" lang="fr" class="gym_index">
-<head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="robots" content="noindex">
+<!-- INCLUDE header.html -->
 
-	<link rel="icon" type="image/jpg" href="{EXT_PATH}{T_THEME_PATH}/images/icon.jpg" />
-	<title>Chavil'GYM</title>
-
-	<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
-	<!-- INCLUDECSS icons.css -->
-	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
-	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
-	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
-	<!-- INCLUDEJS {T_JQUERY_LINK} -->
-	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
-	{$STYLESHEETS}
-</head>
-
-<body>
-	<!-- Connexion (float right) -->
-	<div id="edit-user">
-		<!-- IF S_USER_LOGGED_IN -->
-			{S_USERNAME}
-			<ul>
-				<li>
-					<a href="ucp.php?i=ucp_profile&mode=reg_details">
-						<i class="icon fa-sliders fa-fw" aria-hidden="true"></i><span>{L_PROFILE}</span>
-					</a>
-				</li>
-				<li>
-					<a href="viewtopic.php?p=93">
-						Mode d'emploi
-					</a>
-				</li>
-				<li>
-					<a href="viewforum.php?f=2">
-						Rubriques
-					</a>
-				</li>
-				<li>
-					<a href="{U_LOGIN_LOGOUT}">
-						<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
-					</a>
-				</li>
-			</ul>
+<!-- BEGIN presentation -->
+	<!-- BEGIN item -->
+		<h2>
+			{item.NOM}
+			<!-- IF U_MCP -->
+				<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
+					title="Mofifier cette fiche" class="button button-icon-only">
+					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+				</a>
+			<!-- ENDIF -->
+		</h2>
+		<!-- IF item.RESUME -->
+			{item.RESUME}
+			. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
 		<!-- ELSE -->
-			<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
-				<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-			</a>
+			{item.DISPLAY_TEXT}
 		<!-- ENDIF -->
-	</div>
+	<!-- END item -->
+<!-- END presentation -->
 
-	<!-- Recherche -->
-	<form action="{U_SEARCH}" method="get" id="search">
-	<fieldset>
-		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
-		<button class="button button-search" type="submit" title="{L_SEARCH}">
-			<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
-		</button>
-		{S_SEARCH_HIDDEN_FIELDS}
-	</fieldset>
-	</form>
-
-	<!-- Banière -->
-	<div>
-		<a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/">
-			<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
+<!-- IF .evenements -->
+	<h1>
+		Évenements
+		<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
+			<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 		</a>
-		<a class="baniere" title="Retour à l'accueil" href=".">
-			<div>{SITENAME}</div>
-		</a>
-	</div>
-
-	<!-- Menu principal -->
-	<ul id="menu">
-		<!-- BEGIN menu -->
-			<!-- BEGIN item -->
-				<li style="background:{item.COULEUR}">
-					<a href="viewtopic.php?t={item.TOPIC_ID}">{item.NOM}</a>
-				</li>
-			<!-- END item -->
-		<!-- END menu -->
-		<!-- IF U_MCP -->
-			<li>
-				<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&amp;f=2">
-					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-				</a>
-			</li>
-		<!-- ENDIF -->
-	</ul>
-
-	<div id="page">
-		<!-- Accueil -->
-		<!-- BEGIN presentation -->
-			<!-- BEGIN item -->
-				<h2>
-					{item.NOM}
-					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
-							title="Mofifier cette fiche" class="button button-icon-only">
-							<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-						</a>
-					<!-- ENDIF -->
-				</h2>
-				<!-- IF item.RESUME -->
-					{item.RESUME}
-					. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
-				<!-- ELSE -->
-					{item.DISPLAY_TEXT}
-				<!-- ENDIF -->
-			<!-- END item -->
-		<!-- END presentation -->
-
-		<!-- IF .evenements -->
-			<h1>
-				Évenements
-				<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
-					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-				</a>
-			</h1>
-			<!-- BEGIN evenements -->
-				<!-- IF evenements.DATE -->
-					<h2>
-						{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
-						<!-- IF U_MCP -->
-							<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
-								title="Mofifier cette actualité" class="button button-icon-only">
-								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-							</a>
-						<!-- ENDIF -->
-					</h2>
-					{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF -->
-					{evenements.RESUME}
-					. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a>
-					<br/>
-				<!-- ENDIF -->
-			<!-- END evenements -->
-		<!-- ENDIF -->
-
-		<!-- Fiche cours : rappel de l'activité -->
-		<!-- BEGIN activite_concernee -->
-			<ul>
-				<li style="background:#9afbbc">
-					<a href="viewtopic.php?p={activite_concernee.POST_ID}">
-						{activite_concernee.POST_SUBJECT}
-					</a>
-				</li>
+	</h1>
+	<!-- BEGIN evenements -->
+		<!-- IF evenements.DATE -->
+			<h2>
+				{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
 				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&f=2&p={activite_concernee.POST_ID}"
-						title="Mofifier cette rubrique" class="button button-icon-only">
+					<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
+						title="Mofifier cette actualité" class="button button-icon-only">
 						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 					</a>
 				<!-- ENDIF -->
-			</ul>
-			{activite_concernee.MESSAGE}
-		<!-- END activite_concernee -->
-
-		<!-- Post présenté en page -->
-		<!-- IF .postrow -->
-			<!-- BEGIN postrow -->
-				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
-					<h2>
-						{postrow.POST_SUBJECT}
-						<!-- IF U_MCP -->
-							<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-								title="Mofifier cette rubrique" class="button button-icon-only">
-								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-							</a>
-						<!-- ENDIF -->
-					</h2>
-					<!-- IF not REQUEST_P -->
-						{postrow.MESSAGE}
-					<!-- ENDIF -->
-				<!-- ENDIF -->
-			<!-- END postrow -->
-
-			<ul id="sous-menu">
-				<!-- BEGIN postrow -->
-					<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' and U_MCP -->
-						<li>
-							<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={FORUM_ID}&t={TOPIC_ID}">
-								<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
-							</a>
-						</li>
-					<!-- ENDIF -->
-					<!-- IF postrow.POST_ID != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
-						<li style="background:{postrow.COULEUR}">
-							<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
-						</li>
-					<!-- ENDIF -->
-				<!-- END postrow -->
-			</ul>
-
-			<!-- BEGIN postrow -->
-				<!-- IF postrow.POST_ID == REQUEST_P -->
-					<h2>
-						{postrow.POST_SUBJECT}
-						<!-- IF U_MCP -->
-							<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-								title="Mofifier cette fiche" class="button button-icon-only">
-								<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-							</a>
-						<!-- ENDIF -->
-					</h2>
-					{postrow.MESSAGE}
-				<!-- ENDIF -->
-			<!-- END postrow -->
+			</h2>
+			{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF -->
+			{evenements.RESUME}
+			. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a>
+			<br/>
 		<!-- ENDIF -->
-	</div>
-	<p class="copyright-dc">{L_FINAL_INTEGRATION_BY}</p>
-	{$SCRIPTS}
-</body>
-</html>
+	<!-- END evenements -->
+<!-- ENDIF -->
+
+<!-- INCLUDE footer.html -->

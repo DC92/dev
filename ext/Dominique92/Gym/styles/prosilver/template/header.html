@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="fr" class="gym_index">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="robots" content="noindex">
+
+	<link rel="icon" type="image/jpg" href="{EXT_PATH}{T_THEME_PATH}/images/icon.jpg" />
+	<title>Chavil'GYM</title>
+
+	<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
+	<!-- INCLUDECSS icons.css -->
+	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
+	<!-- INCLUDECSS @Dominique92_Gym/assets/ol.css -->
+	<!-- INCLUDEJS @Dominique92_Gym/assets/ol.js -->
+	<!-- INCLUDEJS {T_JQUERY_LINK} -->
+	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
+	{$STYLESHEETS}
+</head>
+
+<body>
+	<!-- Connexion (float right) -->
+	<div id="edit-user">
+		<!-- IF S_USER_LOGGED_IN -->
+			{S_USERNAME}
+			<ul>
+				<li>
+					<a href="ucp.php?i=ucp_profile&mode=reg_details">
+						<i class="icon fa-sliders fa-fw" aria-hidden="true"></i><span>{L_PROFILE}</span>
+					</a>
+				</li>
+				<li>
+					<a href="viewtopic.php?p=93">
+						Mode d'emploi
+					</a>
+				</li>
+				<li>
+					<a href="viewforum.php?f=2">
+						Rubriques
+					</a>
+				</li>
+				<li>
+					<a href="{U_LOGIN_LOGOUT}">
+						<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
+					</a>
+				</li>
+			</ul>
+		<!-- ELSE -->
+			<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
+				<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+			</a>
+		<!-- ENDIF -->
+	</div>
+
+	<!-- Recherche -->
+	<form action="{U_SEARCH}" method="get" id="search">
+	<fieldset>
+		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
+		<button class="button button-search" type="submit" title="{L_SEARCH}">
+			<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
+		</button>
+		{S_SEARCH_HIDDEN_FIELDS}
+	</fieldset>
+	</form>
+
+	<!-- Banière -->
+	<div>
+		<a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/">
+			<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
+		</a>
+		<a class="baniere" title="Retour à l'accueil" href=".">
+			<div>{SITENAME}</div>
+		</a>
+	</div>
+
+	<!-- Menu principal -->
+	<ul id="menu">
+		<!-- BEGIN menu -->
+			<!-- BEGIN item -->
+				<li style="background:{item.COULEUR}">
+					<a href="viewtopic.php?t={item.TOPIC_ID}">{item.NOM}</a>
+				</li>
+			<!-- END item -->
+		<!-- END menu -->
+		<!-- IF U_MCP -->
+			<li>
+				<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&amp;f=2">
+					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+				</a>
+			</li>
+		<!-- ENDIF -->
+	</ul>
+
+	<div id="page">
