@@ -9,19 +9,14 @@
 /*
 //TODO
 Bug pas de photo catherine 1 sur /phpBB3
-pourquoi lien cliquable sur cases calendrier ?
-BUG : saisie/affichage jour semaine faux !
-BUG : Forum -> Rubrique -> tombe sur le template index !
-Arranger [listes] mode d'emploi
-Revoir style titre3
 Remplacer AJAX par PHP filegetcontents
 Bug photo inclusion activité en haut séance
 Bouton imprimer calendier
 GYM bbcode photo/n° attachment
-BBCodes du texte dans les tableaux
-Accés une URL seumlement pour référencement google
+Accés une URL seulement pour référencement google
 
 //BEST
+Mettre un favicon sur la partie forum
 Cacher page mode d'emploi
 style print
 favicon en posting et autres pages non index
@@ -110,6 +105,9 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
+			// Viewforum
+			'core.viewforum_modify_topicrow' => 'viewforum_modify_topicrow',
+
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
@@ -174,9 +172,9 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé juste avant d'afficher
 	function viewtopic_modify_page_title($vars) {
-		$view = $this->request->variable('view', '');
-		if (!$view && $vars['forum_id'] == 2)
-			$this->my_template = 'viewtopic_body';
+		$template = $this->request->variable('template', '');
+		if (!$template && $vars['forum_id'] == 2)
+			$this->my_template = 'viewtopic';
 	}
 
 	// Appelé après viewtopic_modify_page_title & template->set_filenames
@@ -246,6 +244,16 @@ class listener implements EventSubscriberInterface
 			);
 		}
 		$vars['post_row'] = $post_row;
+	}
+
+	/**
+		VIEWFORUM.PHP
+	*/
+	function viewforum_modify_topicrow($vars) {
+		// Permet la visualisation en vue forum pour l'édition du site
+		$topic_row = $vars['topic_row'];
+		$topic_row['U_VIEW_TOPIC'] .= '&template=';
+		$vars['topic_row'] = $topic_row;
 	}
 
 	/**

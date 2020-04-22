@@ -307,12 +307,6 @@ html.gym_index  {
 .gym_index .calendrier td.selected {
 	background: #08BABE;
 	font-weight: bold;
-}
-.gym_index .calendrier a {
-	text-decoration: none;
-	color: black;
-}
-.gym_index .calendrier td.selected a {
 	color: white;
 }
 
