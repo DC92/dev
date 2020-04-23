@@ -144,7 +144,7 @@ html.gym_index  {
 
 /* Corps de la page */
 .gym_index #page {
-	margin: 0 calc(10% - 60px);
+	margin: 0 calc(10% - 54px);
 	background: white !important;
 	text-align: justify;
 }
@@ -166,16 +166,13 @@ html.gym_index  {
 .gym_index #page h4 {
 	margin: 0.5em 0 0 0;
 }
-.gym_index #page p {
-	margin: 0;
-}
 .gym_index #page ul {
 	margin: 0;
 	list-style-type: square;
 }
 @media (max-width: 600px) {
 	.gym_index #page {
-		margin: 0;
+		margin: 0 1%;
 	}
 }
 
