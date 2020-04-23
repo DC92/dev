@@ -13,7 +13,7 @@ Remplacer AJAX par PHP filegetcontents
 Bug photo inclusion activité en haut séance
 Bouton imprimer calendier
 GYM bbcode photo/n° attachment
-Accés une URL seulement pour référencement google
+Accés une URL seulement pour référencement google => redirect 301
 
 //BEST
 Mettre un favicon sur la partie forum
@@ -300,6 +300,13 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
 		}
 
+		// Liste des modérateurs
+		$sql = 'SELECT user_id, username  FROM '.USERS_TABLE.' WHERE group_id = 4 OR group_id = 5';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$this->template->assign_block_vars ('liste_moderateurs', array_change_key_case ($row, CASE_UPPER));
+		$this->db->sql_freeresult($result);
+
 		//
 		if ($vars['mode'] == 'reply') {
 			// Template vide pour posting/création
@@ -412,6 +419,7 @@ class listener implements EventSubscriberInterface
 			'gym_ordre_menu',
 			'gym_presentation',
 			'gym_nota',
+			'gym_moderateur',
 		]);
 
 		$post_id = $this->request->variable('id', '', true);

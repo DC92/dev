@@ -1,4 +1,18 @@
 <!-- IF FORUM_ID == 2 -->
+	Modérateur
+	<select name="gym_moderateur">
+		<option></option>
+		<!-- BEGIN liste_moderateurs -->
+			<option value="{liste_moderateurs.USER_ID}"
+				<!-- IF liste_moderateurs.USER_ID == GYM_MODERATEUR -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_moderateurs.USERNAME}
+			</option>
+		<!-- END liste_moderateurs -->
+	</select><br/>
+
 	Publication dans :
 	Menu <input type="checkbox" name="gym_menu"
 	<!-- IF GYM_MENU == 'on' -->
@@ -25,10 +39,10 @@
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
-	<br/><br/>
 <!-- ENDIF -->
 
 <!-- IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements' -->
+	<br/><br/>
 	Activité
 	<select name="gym_activite">
 		<option>?</option>
