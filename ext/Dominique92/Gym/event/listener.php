@@ -16,10 +16,7 @@ Redimensionner les images suivant taille fenetre
 //BEST
 Bouton imprimer calendier
 Convertir /LOG/*.log en utf8
-Mettre un favicon sur la partie forum
-Cacher page mode d'emploi
 style print
-favicon en posting et autres pages non index
 erradiquer f=2
 template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 

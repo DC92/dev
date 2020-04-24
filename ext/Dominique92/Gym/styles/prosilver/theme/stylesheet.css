@@ -4,8 +4,8 @@ pre {
 }
 
 /* Ménage phpBB */
-.site_logo { /* phpBB pages */
-	background-size: 33px 48px !important;
+.site_logo { /* Logo phpBB */
+	background-size: 48px !important;
 	background-image: url("./images/logo.png");
 }
 .section-viewtopic .post-buttons li:not(:first-child),
@@ -35,38 +35,39 @@ pre {
 }
 
 /* Haut de la page style GV */
-html.gym_index  {
+html.gym  {
 	height: 100%;
 }
-.gym_index body {
+.gym body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
 	font-family: arial, sans-serif;
 }
-.gym_index .logo img {
+.gym .logo img {
 	width: calc(45px + 3vw);
 	float: left;
-	margin: 0.5em;
+	margin-top: 0.3em;
 }
-.gym_index .baniere div {
+.gym .baniere div {
 	background: #5826F4;
+	padding: 0.2em;
 	text-align: center;
-	font-size: 4vw;
+	font-size: 1.4em;
 	font-weight: bold;
 	color: white;
 	text-decoration: none;
 }
-.gym_index .logo,
-.gym_index .baniere {
+.gym .logo,
+.gym .baniere {
 	text-decoration: none !important;
 }
 @media (max-width: 600px) {
-	.gym_index body {
+	.gym body {
 		background-image: none;
 	}
-	.gym_index .logo,
-	.gym_index #search {
+	.gym .logo,
+	.gym #search {
 		display: none;
 	}
 }
@@ -77,123 +78,131 @@ html.gym_index  {
 }
 
 /* Search box */
-.gym_index form#search {
+.gym form#search {
 	margin-top: calc(2vw - 10px);
 	float: right;
 }
-.gym_index #search fieldset {
+.gym #search fieldset {
 	padding: 0;
 }
-.gym_index #search input {
+.gym #search input {
 	display: none;
 }
-.gym_index #search:hover input {
+.gym #search:hover input {
 	display: inline-block;
 }
-.gym_index #search .button-search {
+.gym #search .button-search {
 	padding: 0;
 }
 
 /* User connexion box */
-.gym_index #edit-user {
+.gym #edit-user {
 	position: absolute;
-	top: calc(2vw - 0.5em);
-	left: calc(45px + 3vw + 1em);
+	top: 0.4em;
+	left: calc(45px + 3vw);
+	color: white;
+	white-space: nowrap;
+}
+.gym #edit-user > a{
+	color: white;
+	text-decoration: none;
+}
+.gym #edit-user i {
 	color: white;
 }
-.gym_index #edit-user i {
-	color: white;
-}
-.gym_index #edit-user ul {
+.gym #edit-user ul {
 	display: none;
 	position: absolute;
 	left: 0;
 	margin: 0;
-	background: white;
 	padding: 0.3em;
+	background: white;
 	list-style-type: none;
 }
-.gym_index #edit-user ul i {
+.gym #edit-user li {
+	padding: 0.1em;
+}
+.gym #edit-user ul i {
 	display: none;
 }
-.gym_index #edit-user:hover ul {
+.gym #edit-user:hover ul {
 	display: block;
 }
-.gym_index #edit-user a:hover {
+.gym #edit-user a:hover {
 	font-weight: bold;
 }
 @media (max-width: 600px) {
-	.gym_index #edit-user {
+	.gym #edit-user {
 		left: 0;
 	}
 }
 
 /* Menus bulles */
-.gym_index #menu,
-.gym_index #sous-menu {
+.gym #menu,
+.gym #sous-menu {
 	padding: 0;
 	text-align: center;
 }
-.gym_index #menu li,
-.gym_index #sous-menu li {
+.gym #menu li,
+.gym #sous-menu li {
 	display: inline-block;
 	margin: 0.2em;
 	padding: 0.3em;
 	border-radius: 2em;
 	font-weight: bold;
 }
-.gym_index #menu li a,
-.gym_index #sous-menu li a {
+.gym #menu li a,
+.gym #sous-menu li a {
 	color: black;
 }
 
 /* Corps de la page */
-.gym_index #page {
+.gym #page {
 	margin: 0 calc(10% - 54px);
 	background: white !important;
 	text-align: justify;
 }
-.gym_index #page h1 {
+.gym #page h1 {
 	padding: 0.1em;
 	background: #5826F4;
 	color: white;
 	font-size: 1.3em;
 }
-.gym_index #page h1 i {
+.gym #page h1 i {
 	color: white;
 }
-.gym_index #page h2 {
+.gym #page h2 {
 	margin-bottom: 0.2em;
 	color: #08BABE;
 	font-size: 1.3em;
 }
-.gym_index #page h2 .no-hilight {
+.gym #page h2 .no-hilight {
 	text-decoration: none;
 	color: #08BABE;
 }
-.gym_index #page h3,
-.gym_index #page h4 {
+.gym #page h3,
+.gym #page h4 {
 	margin: 0.5em 0 0 0;
 }
-.gym_index #page .codebox p {
+.gym #page .codebox p {
 	display: none;
 }
-.gym_index #page .codebox pre {
+.gym #page .codebox pre {
 	margin: 0;
 }
-.gym_index #page ul {
+.gym #page ul {
 	margin: 0;
 	list-style-type: square;
 }
 @media (max-width: 600px) {
-	.gym_index #page {
+	.gym #page {
 		margin: 0 1%;
 	}
 }
 
 /* Attachements (notamment liens) */
-.gym_index .inline-attachment,
-.gym_index .inline-attachment dl {
+.gym .inline-attachment,
+.gym .inline-attachment dl {
 	display: inline-block;
 	float: none !important;
 	margin: 0 !important;
@@ -202,43 +211,43 @@ html.gym_index  {
 }
 
 /* Images incluses dans le texte */
-.gym_index .file {
+.gym .file {
 	margin: 0;
 }
-.gym_index .file dd { /* Supprime le compte de vues, ... */
+.gym .file dd { /* Supprime le compte de vues, ... */
 	display: none;
 }
-.gym_index .file img {
+.gym .file img {
 	max-width: 30vh;
 	border-radius: 1em;
 }
-.gym_index .inline-attachment {
+.gym .inline-attachment {
 	float: right;
 	margin-left: 1em;
 }
-.gym_index .image-droite .inline-attachment {
+.gym .image-droite .inline-attachment {
 	float: right !important;
 	margin-left: 1em !important;
 }
-.gym_index .image-gauche .inline-attachment {
+.gym .image-gauche .inline-attachment {
 	float: left !important;
 	margin-right: 1em !important;
 }
 @media (max-width: 600px) {
-	.gym_index .attach-image {
+	.gym .attach-image {
 		display: none;
 	}
 }
 
 /* BBCodes spéciaux */
-.gym_index .carte {
+.gym .carte {
 	clear: both;
 	margin: 1em calc(50% - 250px);
 	width: 500px;
 	height: 375px;
 }
 @media (max-width: 600px) {
-	.gym_index .carte {
+	.gym .carte {
 		margin: 0;
 		width: 100%;
 		height: 70vw;
@@ -246,62 +255,62 @@ html.gym_index  {
 }
 
 /* Horaires */
-.gym_index .horaires {
+.gym .horaires {
 	clear: both;
 	margin: 0 0 0.3em 0;
 }
-.gym_index .horaires > div {
+.gym .horaires > div {
 	text-align: initial;
 	font-size: 120%;
 	text-transform: capitalize;
 }
-.gym_index .horaires table {
+.gym .horaires table {
 	border: 4px solid;
 	border-collapse: collapse;
 }
-.gym_index .horaires td {
+.gym .horaires td {
 	border: 1px dashed;
 	padding: 0.2em;
 	text-align: left;
 }
-.gym_index .horaires a {
+.gym .horaires a {
 	color: black;
 }
 @media (max-width: 600px) {
-	.gym_index .horaires > div {
+	.gym .horaires > div {
 		margin-left: 1em !important;
 	}
-	.gym_index .horaires {
+	.gym .horaires {
 		margin-left: 0;
 		margin-right: 0;
 	}
-	.gym_index .horaires table {
+	.gym .horaires table {
 		width: 100%;
 		margin-left: 0 !important;
 	}
 }
 
 /* Tableaux */
-.gym_index table.tableau {
+.gym table.tableau {
 	border: 2px solid grey;
 	border-collapse: collapse;
 }
-.gym_index table.tableau td {
+.gym table.tableau td {
 	border: 1px solid black;
 	padding: 2px;
 }
 
 /* Calendrier */
-.gym_index table.calendrier {
+.gym table.calendrier {
 	margin: 0 auto;
 	border: 2px solid grey;
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-.gym_index .calendrier tr:first-child {
+.gym .calendrier tr:first-child {
 	display: none;
 }
-.gym_index .calendrier td {
+.gym .calendrier td {
 	margin: 0;
 	border: 1px solid grey;
 	padding: 0.25em;
@@ -309,14 +318,14 @@ html.gym_index  {
 	text-align: center;
 	color: #999;
 }
-.gym_index .calendrier td:first-child {
+.gym .calendrier td:first-child {
 	text-align: left;
 	color: black;
 }
-.gym_index .calendrier tr:nth-child(2) td {
+.gym .calendrier tr:nth-child(2) td {
 	text-align: center;
 }
-.gym_index .calendrier td.selected {
+.gym .calendrier td.selected {
 	background: #08BABE;
 	font-weight: bold;
 	color: white;
