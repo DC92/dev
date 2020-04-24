@@ -3,17 +3,17 @@
 <!-- BEGIN presentation -->
 	<!-- BEGIN item -->
 		<h2>
-			{item.NOM}
+			<a class="no-hilight" title="... plus d'infos" href="viewtopic.php?p={item.POST_ID}">{item.NOM}</a>
 			<!-- IF U_MCP -->
 				<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
-					title="Mofifier cette fiche" class="button button-icon-only">
+					title="Mofifier la page {item.NOM}" class="button button-icon-only">
 					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 				</a>
 			<!-- ENDIF -->
 		</h2>
 		<!-- IF item.RESUME -->
 			{item.RESUME}
-			. . . <a href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
+			. . . <a title="Afficher la page {item.NOM}" href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
 		<!-- ELSE -->
 			{item.DISPLAY_TEXT}
 		<!-- ENDIF -->
@@ -33,7 +33,7 @@
 				{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
 				<!-- IF U_MCP -->
 					<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
-						title="Mofifier cette actualité" class="button button-icon-only">
+						title="Mofifier l'évènement {evenements.NOM}" class="button button-icon-only">
 						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 					</a>
 				<!-- ENDIF -->

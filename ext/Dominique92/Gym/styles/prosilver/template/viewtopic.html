@@ -10,7 +10,7 @@
 		</li>
 		<!-- IF U_MCP -->
 			<a href="posting.php?mode=edit&f=2&p={activite_concernee.POST_ID}"
-				title="Mofifier cette rubrique" class="button button-icon-only">
+				title="Mofifier la page {activite_concernee.POST_SUBJECT}" class="button button-icon-only">
 				<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 			</a>
 		<!-- ENDIF -->
@@ -25,7 +25,7 @@
 			{postrow.POST_SUBJECT}
 			<!-- IF U_MCP -->
 				<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-					title="Mofifier cette rubrique" class="button button-icon-only">
+					title="Mofifier la page {postrow.POST_SUBJECT}" class="button button-icon-only">
 					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 				</a>
 			<!-- ENDIF -->
@@ -40,7 +40,7 @@
 	<!-- BEGIN postrow -->
 		<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' and U_MCP -->
 			<li>
-				<a title="Ajouter une fiche au sous-menu" href="posting.php?mode=reply&amp;f={FORUM_ID}&t={TOPIC_ID}">
+				<a title="Ajouter un ballon au sous-menu" href="posting.php?mode=reply&amp;f={FORUM_ID}&t={TOPIC_ID}">
 					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
 				</a>
 			</li>
@@ -59,7 +59,7 @@
 			{postrow.POST_SUBJECT}
 			<!-- IF U_MCP -->
 				<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-					title="Mofifier cette fiche" class="button button-icon-only">
+					title="Mofifier la page {postrow.POST_SUBJECT}" class="button button-icon-only">
 					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 				</a>
 			<!-- ENDIF -->

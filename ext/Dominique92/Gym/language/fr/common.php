@@ -57,5 +57,8 @@ $lang = array_merge($lang, array(
 
 	// Footer
 	'FINAL_INTEGRATION_BY' =>
-		'&copy; Chavil\'GYM 2020 - <a href="https://github.com/Dominique92">Dominique</a> &amp; <a href="http://www.phpbb-fr.com/">phpBB</a>',
+		'&copy; Chavil\'GYM 2020'.
+		' <a href="mailto:chaville.gym@c92.fr">chaville.gym@c92.fr</a>'.
+		' - Réalisé par <a href="https://github.com/Dominique92">Dominique</a>'.
+		' &amp; <a href="http://www.phpbb-fr.com/">phpBB</a>',
 ));

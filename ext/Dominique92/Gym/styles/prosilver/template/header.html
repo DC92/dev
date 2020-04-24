@@ -23,28 +23,15 @@
 	<div id="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
 			{S_USERNAME}
-			<ul>
-				<li>
-					<a href="ucp.php?i=ucp_profile&mode=reg_details">
-						<i class="icon fa-sliders fa-fw" aria-hidden="true"></i><span>{L_PROFILE}</span>
-					</a>
-				</li>
-				<li>
-					<a href="viewtopic.php?p=93">
-						Mode d'emploi
-					</a>
-				</li>
-				<li>
-					<a href="viewforum.php?f=2">
-						Rubriques
-					</a>
-				</li>
-				<li>
-					<a href="{U_LOGIN_LOGOUT}">
-						<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
-					</a>
-				</li>
-			</ul>
+			<ul><li>
+					<a href="ucp.php?i=ucp_profile&mode=reg_details">{L_PROFILE}</a>
+				</li><li>
+					<a href="viewtopic.php?p=93">Mode d'emploi</a>
+				</li><li>
+					<a href="viewforum.php?f=2">Rubriques</a>
+				</li><li>
+					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
+			</li></ul>
 		<!-- ELSE -->
 			<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
 				<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>

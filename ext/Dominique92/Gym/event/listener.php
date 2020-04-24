@@ -8,14 +8,14 @@
 
 /*
 //TODO
-Bug pas de photo catherine 1 sur /phpBB3
 Remplacer AJAX par PHP filegetcontents
-Bug photo inclusion activité en haut séance
-Bouton imprimer calendier
-GYM bbcode photo/n° attachment
-Accés une URL seulement pour référencement google => redirect 301
+Redimensionner les images suivant taille fenetre
+	GYM bbcode photo/n° attachment
+	Bug photo inclusion activité en haut séance
 
 //BEST
+Bouton imprimer calendier
+Convertir /LOG/*.log en utf8
 Mettre un favicon sur la partie forum
 Cacher page mode d'emploi
 style print

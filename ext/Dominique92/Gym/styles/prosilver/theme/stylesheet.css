@@ -122,6 +122,11 @@ html.gym_index  {
 .gym_index #edit-user a:hover {
 	font-weight: bold;
 }
+@media (max-width: 600px) {
+	.gym_index #edit-user {
+		left: 0;
+	}
+}
 
 /* Menus bulles */
 .gym_index #menu,
@@ -162,9 +167,19 @@ html.gym_index  {
 	color: #08BABE;
 	font-size: 1.3em;
 }
+.gym_index #page h2 .no-hilight {
+	text-decoration: none;
+	color: #08BABE;
+}
 .gym_index #page h3,
 .gym_index #page h4 {
 	margin: 0.5em 0 0 0;
+}
+.gym_index #page .codebox p {
+	display: none;
+}
+.gym_index #page .codebox pre {
+	margin: 0;
 }
 .gym_index #page ul {
 	margin: 0;
