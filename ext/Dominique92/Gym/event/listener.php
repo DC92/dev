@@ -8,22 +8,26 @@
 
 /*
 //TODO
+Affichage tous posts quastions/réponses
+BUG file_get_contents(http://chaville.gym.c92.fr/?template=horaires&activite=Aisance du mouvement)
+Style titre activités dans les pages points de style titre2
 Remplacer AJAX par PHP filegetcontents
+	Check pourquoi il reste des httpRequests (pages séances)
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 	Bug photo inclusion activité en haut séance
 
 //BEST
-//TODO enable_super_globals -> $this->request->get_super_global(\phpbb\request\request_interface::SERVER)
 Récupérer le texte de BBCodes dans les tableaux
 Bouton imprimer calendier
-Convertir /LOG/*.log en utf8
 style print
 erradiquer f=2
 template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 
 //APRES
 Sitemap
+enlever @define('DEBUG_CONTAINER', true);
+enlever recompile templates
 enlever le .robot et faire un SEO
 */
 
@@ -120,10 +124,9 @@ class listener implements EventSubscriberInterface
 	function page_header() {
 		// Assign requested template
 		$this->template->assign_var ('EXT_PATH', $this->ext_path);
-		$this->request->enable_super_globals();
-		foreach ($_REQUEST AS $k=>$v)
+		$request = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
+		foreach ($request AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
-		$this->request->disable_super_globals();
 
 		// Menu principal
 		$this->liste_fiches (
@@ -219,7 +222,7 @@ class listener implements EventSubscriberInterface
 			'/([A-Z_]+)/',
 			function ($matches) use ($post_row) {
 				$r = $post_row[$matches[1]];
-				return $r ?: urlencode ($matches[1]);
+				return urlencode ($r ?: $matches[1]);
 			},
 			$post_row['MESSAGE']
 		);
@@ -343,8 +346,8 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		// Treat specific data
-		$this->request->enable_super_globals(); // Allow access to $_POST & $_SERVER
-		foreach ($_POST AS $k=>$v)
+		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
+		foreach ($post AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3)) {
 				if(is_array($v))
 					$v = implode (',', $v);
@@ -352,7 +355,6 @@ class listener implements EventSubscriberInterface
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 				$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
 			}
-		$this->request->disable_super_globals();
 
 		$vars['sql_data'] = $sql_data; // return data
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change

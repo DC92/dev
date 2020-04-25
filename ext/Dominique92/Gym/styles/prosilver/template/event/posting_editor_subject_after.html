@@ -134,43 +134,32 @@
 	<!-- ENDIF -->
 	/><br/>
 
-<!-- BEGIN calendrier -->
-	<table id="liste_semaines" style="display:none">
-		<tr>
-			<!-- BEGIN item -->
-				<td id="tds_{calendrier.POST_ID}_{item.NO}">
-					<span id="s_{calendrier.POST_ID}_{item.NO}"></span>
-					<input type="checkbox" value="{item.NO}"
-						name="gym_semaines[]"
-					<!-- IF item.GYM_IN_CALENDRIER -->
-						checked="checked"
-					<!-- ENDIF -->
-					/>
-				<td>
-			<!-- END item -->
-		</tr>
-		<tr id="mois_{calendrier.POST_ID}_8"><td>Septembre</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_9"><td>Octobre</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_10"><td>Novembre</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_11"><td>Décembre</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_0"><td>Janvier</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_1"><td>Février</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_2"><td>Mars</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_3"><td>Avril</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_4"><td>Mai</td></tr>
-		<tr id="mois_{calendrier.POST_ID}_5"><td>Juin</td></tr>
-	</table>
-<!-- END calendrier -->
-
-<!-- INCLUDEJS @Dominique92_Gym/index.js -->
-<script>
-	function displayInputCalendar() {
-		$('#liste_semaines')[0].style.display = $('#gym_scolaire')[0].checked ? 'none' : 'block';
-
-		<!-- BEGIN calendrier -->
-				displayCalendar({calendrier.POST_ID},{calendrier.GYM_JOUR});
-		<!-- END calendrier -->
-	}
-	window.addEventListener('load', displayInputCalendar, false);
-</script>
+	<!-- BEGIN calendrier -->
+		<table id="cal_{calendrier.POST_ID}" class="calendrier" data-jour="{calendrier.GYM_JOUR}">
+			<tr id="cal_{calendrier.POST_ID}_mois_8"><td>Septembre</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_9"><td>Octobre</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_10"><td>Novembre</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_11"><td>Décembre</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_0"><td>Janvier</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_1"><td>Février</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_2"><td>Mars</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_3"><td>Avril</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_4"><td>Mai</td></tr>
+			<tr id="cal_{calendrier.POST_ID}_mois_5"><td>Juin</td></tr>
+			<tr style="display:none">
+				<!-- BEGIN item -->
+					<td id="cal_{calendrier.POST_ID}_{item.NO}">
+						<span>xxx</span>
+						<input type="checkbox" value="{item.NO}"
+							name="gym_semaines[]"
+						<!-- IF item.GYM_IN_CALENDRIER -->
+							checked="checked"
+						<!-- ENDIF -->
+						/>
+					<td>
+				<!-- END item -->
+			</tr>
+		</table>
+	<!-- END calendrier -->
+	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 <!-- ENDIF -->

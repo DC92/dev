@@ -3,15 +3,15 @@
  * Add usefull tricks to for phpBB
  * Includes language and style files of this extension
  * Clickable banner
- * <table> BBcode
  * Prevent an empty post title or text
- * Log posts edit
  * Warning to wait until end loading of attached files
+ * <table> BBcode
+ * Replace (INCLUDE relative_url) by the url content
+ * Log posts edit
  *
  * DEBUG :
  * Disable Varnish
  * List template vars
- * Replace <!-- GETCONTENTS url --> by the url content
  *
  * @copyright (c) 2020 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
@@ -76,7 +76,7 @@ class listener implements EventSubscriberInterface
 	function twig_environment_render_template_after($vars) {
 		if (strpos ($vars['name'], 'viewtopic'))
 			$vars['output'] = preg_replace_callback (
-				'/\(INCLUDE[ ]*(.*)[ ]*\)/',
+				'/\(INCLUDE[ ]*([^\)]*)[ ]*\)/',
 				function ($match) {
 					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
@@ -150,12 +150,11 @@ class listener implements EventSubscriberInterface
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!$create_if_null || !file_exists($file_name)) {
 				// Request data
-				$this->request->enable_super_globals();
+				$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 				$to_save = [
 					'user' => $this->user->data['username'].' '.date('r'),
-					'url' => $_SERVER['REQUEST_URI'],
+					'url' => $server['REQUEST_URI'],
 				];
-				$this->request->disable_super_globals();
 
 				// Post data
 				$sql = 'SELECT * FROM '.POSTS_TABLE.' WHERE post_id = '.$post_data['post_id'];
@@ -164,7 +163,7 @@ class listener implements EventSubscriberInterface
 				$this->db->sql_freeresult($result);
 				foreach ($row AS $k=>$v)
 					if ($v && $v != 1 && $v != 'off' && $k != 'post_checksum')
-						$to_save[$k] = $v;
+						$to_save[$k] = utf8_decode ($v);
 
 				// Save attachment_data
 				$attach = [];

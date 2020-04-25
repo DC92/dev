@@ -61,19 +61,21 @@ $('.carte').each(function(index, elCarte) {
 	}
 });
 
-// Posting.php
-function displayCalendar(post_id, jour) {
-	// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
+// BBCode ajout d'une carte
+$('.calendrier').each(function(index, elCal) {
 	for (let week = 0; week < 52; week++) {
-		const date = new Date(new Date().getFullYear(), -5); // 1er aout
-		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7); // Jour de la semaine
-		$('#s_' + post_id + '_' + week).text(date.getDate());
-		$('#tds_' + post_id + '_' + week).appendTo('#mois_' + post_id + '_' + date.getMonth());
+		const jour = $(elCal).attr('data-jour'),
+			elWeek = $('#' + elCal.id + '_' + week),
+			date = new Date(new Date().getFullYear(), -5); // 1er aout
+		// Jour de la semaine
+		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7);
+		elWeek.children().text(date.getDate());
+		elWeek.appendTo('#' + elCal.id + '_mois_' + date.getMonth());
 	}
+
 	// Ajoute une case aux mois n'ayant que 4 jours de ce type
 	$('.calendrier tr').each(function(index) {
-		if (index > 1 && // Not the title column
-			$(this).children().length < 6)
+		if ($(this).children().length < 6)
 			$('<td>').appendTo($(this));
 	});
-}
+});

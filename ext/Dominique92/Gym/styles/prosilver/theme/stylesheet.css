@@ -23,7 +23,7 @@ pre {
 .section-posting #topicreview {
 	display: none !important;
 }
-@media print and (color) { /* //TODO */
+@media print and (color) {
 	#search-box,
 	.navbar	{
 		display: none !important;
@@ -50,7 +50,7 @@ html.gym  {
 	margin-top: 0.3em;
 }
 .gym .baniere div {
-	background: #5826F4;
+	background: #5826f4;
 	padding: 0.2em;
 	text-align: center;
 	font-size: 1.4em;
@@ -165,7 +165,7 @@ html.gym  {
 .gym #page h1 {
 	margin: 1.5em 0 0 0;
 	padding: 0.2em;
-	background: #5826F4;
+	background: #5826f4;
 	color: white;
 	font-size: 1.3em;
 }
@@ -174,12 +174,12 @@ html.gym  {
 }
 .gym #page h2 {
 	margin: 1.2em 0 0 0;
-	color: #08BABE;
+	color: #08babe;
 	font-size: 1.3em;
 }
 .gym #page h2 .no-hilight {
 	text-decoration: none;
-	color: #08BABE;
+	color: #08babe;
 }
 .gym #page h3,
 .gym #page h4 {
@@ -258,6 +258,16 @@ html.gym  {
 	}
 }
 
+/* Tableaux */
+.gym table.tableau {
+	border: 2px solid grey;
+	border-collapse: collapse;
+}
+.gym table.tableau td {
+	border: 1px solid black;
+	padding: 2px;
+}
+
 /* Horaires */
 .gym .horaires {
 	clear: both;
@@ -294,25 +304,12 @@ html.gym  {
 	}
 }
 
-/* Tableaux */
-.gym table.tableau {
-	border: 2px solid grey;
-	border-collapse: collapse;
-}
-.gym table.tableau td {
-	border: 1px solid black;
-	padding: 2px;
-}
-
 /* Calendrier */
 .gym table.calendrier {
 	margin: 0 auto;
 	border: 2px solid grey;
 	border-collapse: collapse;
 	border-spacing: 0;
-}
-.gym .calendrier tr:first-child {
-	display: none;
 }
 .gym .calendrier td {
 	margin: 0;
@@ -326,23 +323,8 @@ html.gym  {
 	text-align: left;
 	color: black;
 }
-.gym .calendrier tr:nth-child(2) td {
-	text-align: center;
-}
 .gym .calendrier td.selected {
-	background: #08BABE;
+	background: #08babe;
 	font-weight: bold;
 	color: white;
-}
-
-/* POSTING */
-#liste_semaines tr:first-child {
-	display: none;
-}
-#liste_semaines td {
-	min-width: 4em;
-	text-align: right;
-}
-#liste_semaines td:first-child {
-	text-align: left;
 }
