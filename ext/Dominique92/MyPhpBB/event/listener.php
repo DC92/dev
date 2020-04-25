@@ -69,22 +69,22 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-// List template vars : phpbb/template/context.php line 135
-//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
+	// List template vars : phpbb/template/context.php line 135
+	//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
 
-	// Replace <!-- GETCONTENTS url --> by the url content
+	// Replace (INCLUDE relative_url) by the url content
 	function twig_environment_render_template_after($vars) {
-		$vars['output'] = preg_replace_callback ('/\<!--? GETCONTENTS? (.*)? -->/', function ($match) {
-			if (strpos ($match[1], '://') === false) {
-				$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-				$match[1] = implode ('/', [
-					pathinfo ($server['SCRIPT_URI'], PATHINFO_DIRNAME),
-					pathinfo ($server['SCRIPT_URI'], PATHINFO_BASENAME),
-					$match[1]
-				]);
-			}
-			return @file_get_contents ($match[1]);
-		}, $vars['output']);
+		if (strpos ($vars['name'], 'viewtopic'))
+			$vars['output'] = preg_replace_callback (
+				'/\(INCLUDE[ ]*(.*)[ ]*\)/',
+				function ($match) {
+					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
+					$uris [count($uris) - 1] = htmlspecialchars_decode ($match[1]);
+					return file_get_contents ('http://'.implode ('/', $uris));
+				},
+				$vars['output']
+			);
 	}
 
 	/**

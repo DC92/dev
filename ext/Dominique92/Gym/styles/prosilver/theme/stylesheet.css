@@ -163,7 +163,8 @@ html.gym  {
 	text-align: justify;
 }
 .gym #page h1 {
-	padding: 0.1em;
+	margin: 1.5em 0 0 0;
+	padding: 0.2em;
 	background: #5826F4;
 	color: white;
 	font-size: 1.3em;
@@ -172,7 +173,7 @@ html.gym  {
 	color: white;
 }
 .gym #page h2 {
-	margin-bottom: 0.2em;
+	margin: 1.2em 0 0 0;
 	color: #08BABE;
 	font-size: 1.3em;
 }
@@ -183,6 +184,9 @@ html.gym  {
 .gym #page h3,
 .gym #page h4 {
 	margin: 0.5em 0 0 0;
+}
+.gym #page p {
+	margin: 0;
 }
 .gym #page .codebox p {
 	display: none;

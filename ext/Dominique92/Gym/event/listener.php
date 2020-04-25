@@ -14,6 +14,8 @@ Redimensionner les images suivant taille fenetre
 	Bug photo inclusion activité en haut séance
 
 //BEST
+//TODO enable_super_globals -> $this->request->get_super_global(\phpbb\request\request_interface::SERVER)
+Récupérer le texte de BBCodes dans les tableaux
 Bouton imprimer calendier
 Convertir /LOG/*.log en utf8
 style print
@@ -116,7 +118,7 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
-		// Assign misc values to the template
+		// Assign requested template
 		$this->template->assign_var ('EXT_PATH', $this->ext_path);
 		$this->request->enable_super_globals();
 		foreach ($_REQUEST AS $k=>$v)
@@ -145,26 +147,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-		INDEX.PHP
-	*/
-	function index_modify_page_title() {
-		// Inclusions des données de la page d'acceuil
-		$this->liste_fiches (
-			'presentation', [
-				'post.gym_presentation="on"',
-			],
-			'gym_presentation','gym_ordre_menu'
-		);
-
-		$this->liste_fiches (
-			'evenements', [
-				'post.gym_evenements="on"',
-			],
-			'next_end_time','next_beg_time'
-		);
-	}
-
-	/**
 		Change le template sur demande
 	*/
 	// Appelé juste avant d'afficher
@@ -184,6 +166,26 @@ class listener implements EventSubscriberInterface
 			$this->template->set_filenames ([
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	function index_modify_page_title() {
+		// Inclusions des données de la page d'acceuil
+		$this->liste_fiches (
+			'presentation', [
+				'post.gym_presentation="on"',
+			],
+			'gym_presentation','gym_ordre_menu'
+		);
+
+		$this->liste_fiches (
+			'evenements', [
+				'post.gym_evenements="on"',
+			],
+			'next_end_time','next_beg_time'
+		);
 	}
 
 	/**
