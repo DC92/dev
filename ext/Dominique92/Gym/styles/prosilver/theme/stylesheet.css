@@ -79,7 +79,7 @@ html.gym  {
 
 /* Search box */
 .gym form#search {
-	margin-top: calc(2vw - 10px);
+	margin-top: calc(0.9em - 10px);
 	float: right;
 }
 .gym #search fieldset {

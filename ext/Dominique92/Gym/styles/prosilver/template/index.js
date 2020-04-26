@@ -10,20 +10,6 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 	};
 }
 
-// BBCode d'inclusion d'un bloc ajax ou de saut vers une url
-$('.include').each(function(index, elBBCode) {
-	$(elBBCode).removeClass('include'); // Don't loop
-
-	const url = elBBCode.innerText;
-	elBBCode.innerHTML = '';
-	if (url.charAt(0) == ':')
-		window.location.href = url.substr(1);
-	else
-		$.get(url, function(data) {
-			$(elBBCode).html(data);
-		});
-});
-
 // BBCode ajout d'une carte
 $('.carte').each(function(index, elCarte) {
 	if (elCarte.innerText) {
@@ -61,7 +47,7 @@ $('.carte').each(function(index, elCarte) {
 	}
 });
 
-// BBCode ajout d'une carte
+// BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {
 	for (let week = 0; week < 52; week++) {
 		const jour = $(elCal).attr('data-jour'),

@@ -8,11 +8,8 @@
 
 /*
 //TODO
-Affichage tous posts quastions/réponses
-BUG file_get_contents(http://chaville.gym.c92.fr/?template=horaires&activite=Aisance du mouvement)
+Affichage tous posts questions/réponses
 Style titre activités dans les pages points de style titre2
-Remplacer AJAX par PHP filegetcontents
-	Check pourquoi il reste des httpRequests (pages séances)
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 	Bug photo inclusion activité en haut séance
@@ -29,6 +26,7 @@ Sitemap
 enlever @define('DEBUG_CONTAINER', true);
 enlever recompile templates
 enlever le .robot et faire un SEO
+mettre redir 301 free
 */
 
 /** CONFIG

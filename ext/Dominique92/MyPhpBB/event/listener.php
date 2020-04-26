@@ -69,22 +69,31 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-	// List template vars : phpbb/template/context.php line 135
-	//echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
+	/* List template vars : phpbb/template/context.php line 135
+echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
+	*/
 
-	// Replace (INCLUDE relative_url) by the url content
+	// (INCLUDE relative_url) replace this string by the url content
+	// (LOCATION relative_url) replace this page by the url
 	function twig_environment_render_template_after($vars) {
-		if (strpos ($vars['name'], 'viewtopic'))
+		if (strpos ($vars['name'], 'viewtopic')) {
 			$vars['output'] = preg_replace_callback (
-				'/\(INCLUDE[ ]*([^\)]*)[ ]*\)/',
+				'/\((INCLUDE|LOCATION)[ ]*([^\)]*)[ ]*\)/',
 				function ($match) {
 					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
-					$uris [count($uris) - 1] = htmlspecialchars_decode ($match[1]);
-					return file_get_contents ('http://'.implode ('/', $uris));
+					$uris [count($uris) - 1] = htmlspecialchars_decode ($match[2]);
+					$url = 'http://'.implode ('/', $uris);
+
+					if ($match[1] == 'INCLUDE')
+						return file_get_contents ($url);
+
+					header ('Location: '.$url);
+					exit;
 				},
 				$vars['output']
 			);
+		}
 	}
 
 	/**
