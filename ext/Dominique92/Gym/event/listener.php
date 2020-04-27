@@ -9,10 +9,11 @@
 /*
 //TODO
 Affichage tous posts questions/réponses
-Style titre activités dans les pages points de style titre2
+	Bug photo inclusion activité en haut séance
+Reprendre viewtopic.html / entête activité
+	Style titre activités dans les pages points de style titre2
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
-	Bug photo inclusion activité en haut séance
 
 //BEST
 Récupérer le texte de BBCodes dans les tableaux
@@ -196,7 +197,10 @@ class listener implements EventSubscriberInterface
 	function viewtopic_gen_sort_selects_before($vars) {
 		// Tri des sous-menus dans le bon ordre
 		$sort_by_sql = $vars['sort_by_sql'];
-		$sort_by_sql['t'] = array_merge (['p.gym_ordre_menu'],$sort_by_sql['t']);
+		$sort_by_sql['t'] = array_merge (
+			['p.gym_ordre_menu IS NULL, p.gym_ordre_menu'],
+			$sort_by_sql['t']
+		);
 		$vars['sort_by_sql'] = $sort_by_sql;
 	}
 

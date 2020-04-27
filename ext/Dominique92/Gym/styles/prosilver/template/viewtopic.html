@@ -20,7 +20,7 @@
 
 <!-- Rappel de la rubrique -->
 <!-- BEGIN postrow -->
-	<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
+	<!-- IF (TOPIC_ID != 19 and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on') or TOPIC_ID == 19 -->
 		<h2>
 			{postrow.POST_SUBJECT}
 			<!-- IF U_MCP -->
