@@ -8,19 +8,19 @@
 
 /*
 //TODO
-Affichage tous posts questions/réponses
-	Bug photo inclusion activité en haut séance
+Peux-t-on mettre (INCLUDE url) dans un template ?
+transformer les (INCLUDE en [include] ???
+BBCode [accueil] /not [resume]
 Reprendre viewtopic.html / entête activité
 	Style titre activités dans les pages points de style titre2
-Redimensionner les images suivant taille fenetre
-	GYM bbcode photo/n° attachment
 
 //BEST
-Récupérer le texte de BBCodes dans les tableaux
+Redimensionner les images suivant taille fenetre
+	GYM bbcode photo/n° attachment
 Bouton imprimer calendier
-style print
-erradiquer f=2
-template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
+	style print
+Erradiquer f=2
+	Erradiquer template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 
 //APRES
 Sitemap

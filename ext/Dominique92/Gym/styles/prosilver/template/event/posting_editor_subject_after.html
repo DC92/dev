@@ -71,16 +71,16 @@
 	</select>
 
 	<select name="gym_animateur">
-		<option>Animateur ?</option>
-		<!-- BEGIN liste_animateurs -->
-			<option value="{liste_animateurs.POST_ID}"
-				<!-- IF liste_animateurs.POST_ID == GYM_ANIMATEUR -->
+		<option>Animatrice ?</option>
+		<!-- BEGIN liste_animatrices -->
+			<option value="{liste_animatrices.POST_ID}"
+				<!-- IF liste_animatrices.POST_ID == GYM_ANIMATEUR -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_animateurs.POST_SUBJECT}
+				{liste_animatrices.POST_SUBJECT}
 			</option>
-		<!-- END liste_animateurs -->
+		<!-- END liste_animatrices -->
 	</select><br/><br/>
 
 	Note pour horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}">
