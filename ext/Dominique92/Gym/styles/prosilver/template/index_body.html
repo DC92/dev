@@ -1,7 +1,8 @@
 <!-- INCLUDE header.html -->
 
-<!-- BEGIN presentation -->
+<!-- BEGIN acceuil -->
 	<!-- BEGIN item -->
+		<!-- IF item.ACCUEIL -->
 		<h2>
 			<a class="no-hilight" title="... plus d'infos sur {item.NOM}" href="viewtopic.php?p={item.POST_ID}">{item.NOM}</a>
 			<!-- IF U_MCP -->
@@ -11,14 +12,11 @@
 				</a>
 			<!-- ENDIF -->
 		</h2>
-		<!-- IF item.RESUME -->
-			{item.RESUME}
+			{item.ACCUEIL}
 			. . . <a title="Afficher la page {item.NOM}" href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
-		<!-- ELSE -->
-			{item.DISPLAY_TEXT}
 		<!-- ENDIF -->
 	<!-- END item -->
-<!-- END presentation -->
+<!-- END acceuil -->
 
 <!-- IF .evenements -->
 	<h1>

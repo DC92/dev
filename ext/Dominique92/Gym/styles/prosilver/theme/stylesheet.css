@@ -177,7 +177,7 @@ html.gym  {
 	color: #08babe;
 	font-size: 1.3em;
 }
-.gym #page h2 .no-hilight {
+.gym #page h2 a {
 	text-decoration: none;
 	color: #08babe;
 }

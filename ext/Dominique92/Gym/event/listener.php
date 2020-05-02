@@ -7,14 +7,14 @@
  */
 
 /*
+//Corrections base
+(TABLEAU dans Tarifs, inscriptions
+changer les[resume en [accueil / [resume2 en [resume / purge du BBcode
+
 //TODO
-Peux-t-on mettre (INCLUDE url) dans un template ?
-transformer les (INCLUDE en [include] ???
-BBCode [accueil] /not [resume]
-Reprendre viewtopic.html / entête activité
-	Style titre activités dans les pages points de style titre2
 
 //BEST
+Retour de modification de rubrique -> PAS LE MEME TEMPLATE ?
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 Bouton imprimer calendier
@@ -80,6 +80,7 @@ class listener implements EventSubscriberInterface
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
+		$this->auth = $auth;
 		$this->language = $language;
 
 		// Includes language and style files of this extension
@@ -97,6 +98,7 @@ class listener implements EventSubscriberInterface
 			// All
 			'core.page_header' => 'page_header',
 			'core.page_footer_after' => 'page_footer_after',
+			'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',
 
 			// Index
 			'core.index_modify_page_title' => 'index_modify_page_title',
@@ -128,24 +130,10 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
 		// Menu principal
-		$this->liste_fiches (
-			'menu', [
-				'post.post_id=t.topic_first_post_id',
-				'post.gym_menu="on"',
-			],
-			'gym_menu','gym_ordre_menu'
-		);
-
-		// Pour le BBCode [horaire]
-		$this->liste_fiches (
-			'horaires', [
-				'post.gym_horaires="on"',
-			],
-			'gym_jour','horaire_debut'
-		);
-
-		// Pour le BBCode [calendrier]
-		$this->liste_fiches ('calendrier', [], 'gym_jour','post_id');
+		$this->liste_fiches ('menu', [
+			'post.post_id=t.topic_first_post_id',
+			'post.gym_menu="on"',
+		],'gym_menu','gym_ordre_menu');
 	}
 
 	/**
@@ -153,8 +141,10 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé juste avant d'afficher
 	function viewtopic_modify_page_title($vars) {
-		$template = $this->request->variable('template', '');
-		if (!$template && $vars['forum_id'] == 2)
+		$get = $this->request->get_super_global(\phpbb\request\request_interface::GET);
+		if (!$get['f'] && $get['t'])
+			$this->my_template = 'viewtopic';
+		if ($vars['forum_id'] == 2 && $get['p'])
 			$this->my_template = 'viewtopic';
 	}
 
@@ -171,23 +161,63 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+		Expansion des "BBCodes" maisons : (CLE valeur)
+	*/
+	function twig_environment_render_template_after($vars) {
+		if ($vars['name'][0] == '@') // Is it a custom template
+			$vars['output'] = preg_replace_callback (
+				'/\(([A-Z]+) ?([^\)]*)\)/s',
+				function ($match) {
+					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
+					$uris [count($uris) - 1] = html_entity_decode ($match[2]);
+					$url = 'http://'.implode ('/', $uris);//TODO.'&sid='.$this->user->session_id;
+
+					switch ($match[1]) {
+						// (INCLUDE relative_url) replace this string by the url content
+						case 'INCLUDE':
+							return file_get_contents ($url.'&mod='.$this->auth->acl_get('m_'));
+
+						// (LOCATION relative_url) replace this page by the url
+						case 'LOCATION':
+							header ('Location: '.$url);
+							exit;
+
+						// (TABLEAU text) replace by a <table> / LF split table lines / | split columns / ; enable several lines per cell
+						case 'TABLEAU':
+							$m = str_replace ([PHP_EOL, '|', ';'], ['', '</td><td>', '<br/>'], $match[2]);
+							$m = array_filter (explode ('<br>', $m));
+							return '<table class="tableau"><tr><td>'.
+								implode ('</td></tr><tr><td>', $m).
+								'</td></tr></table>';
+					}
+					return $match[0];
+				},
+				$vars['output']
+			);
+	}
+
+	/**
 		INDEX.PHP
 	*/
 	function index_modify_page_title() {
 		// Inclusions des données de la page d'acceuil
-		$this->liste_fiches (
-			'presentation', [
-				'post.gym_presentation="on"',
-			],
-			'gym_presentation','gym_ordre_menu'
-		);
+		$this->liste_fiches ('acceuil', [
+			'true',
+		], 'gym_ordre_menu', 'post_id');
 
-		$this->liste_fiches (
-			'evenements', [
-				'post.gym_evenements="on"',
-			],
-			'next_end_time','next_beg_time'
-		);
+		$this->liste_fiches ('evenements', [
+			'post.gym_evenements="on"',
+		], 'next_end_time','next_beg_time');
+
+		// Pour les horaires
+		$this->liste_fiches ('horaires', [
+			'post.gym_horaires="on"',
+		], 'gym_jour','horaire_debut');
+
+		// Pour le calendrier
+		$this->liste_fiches ('calendrier', [
+		], 'gym_jour', 'post_id');
 	}
 
 	/**
@@ -212,12 +242,25 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
+		$topic_data = $vars['topic_data'];
 		$post_row = $vars['post_row'];
+		$post_id = $vars['row']['post_id'];
+		$post_data = $this->all_post_data[$post_id] ?: [];
 
 		// Assign some values to template
-		$post_row['TOPIC_FIRST_POST_ID'] = $vars['topic_data']['topic_first_post_id'];
+		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
 		$post_row['COULEUR'] = $this->couleur(); // Couleur du sous-menu
+
+		// Assign the gym values to the template
+		foreach ($post_data AS $k=>$v)
+			if (strstr ($k, 'gym') && is_string ($v))
+				$post_row[strtoupper($k)] = $v;
+
+		// Extrait des résumé des parties à afficher
+		$resumes = explode ('<!--resume-->', $post_row['MESSAGE']);
+		if (count ($resumes) > 1)
+			$post_row['RESUME'] = $resumes[1];
 
 		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
 		$post_row['MESSAGE'] = preg_replace_callback(
@@ -229,24 +272,6 @@ class listener implements EventSubscriberInterface
 			$post_row['MESSAGE']
 		);
 
-		$activite_id = $this->all_post_data[$post_row['POST_ID']]['gym_activite'];
-		if ($post_row['POST_ID'] == $this->request->variable ('p','') &&
-			is_numeric ($activite_id)) {
-			$sql = 'SELECT * FROM '.POSTS_TABLE.' WHERE post_id='.$activite_id;
-			$result = $this->db->sql_query($sql);
-			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-
-			$row['message'] = generate_text_for_display(
-				$row['post_text'],
-				$row['bbcode_uid'], $row['bbcode_bitfield'],
-				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-			);
-			$this->template->assign_block_vars (
-				'activite_concernee',
-				array_change_key_case ($row, CASE_UPPER)
-			);
-		}
 		$vars['post_row'] = $post_row;
 	}
 
@@ -311,7 +336,6 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_block_vars ('liste_moderateurs', array_change_key_case ($row, CASE_UPPER));
 		$this->db->sql_freeresult($result);
 
-		//
 		if ($vars['mode'] == 'reply') {
 			// Template vide pour posting/création
 			$liste = [];
@@ -322,18 +346,12 @@ class listener implements EventSubscriberInterface
 					'GYM_JOUR' => 0,
 					'GYM_IN_CALENDRIER' => 0,
 				];
-			$this->liste_fiches (
-				'calendrier', [],
-				'','', $liste
-			);
+			$this->liste_fiches ('calendrier', [], '', '', $liste);
 		} elseif ($post_data['post_id'])
 			// Variables template pour modification
-			$this->liste_fiches (
-				'calendrier', [
-					'post.post_id='.$post_data['post_id'],
-				],
-				'',''
-			);
+			$this->liste_fiches ('calendrier', [
+				'post.post_id='.$post_data['post_id'],
+			], '','');
 	}
 
 	// Called during validation of the data to be saved
@@ -357,7 +375,6 @@ class listener implements EventSubscriberInterface
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 				$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
 			}
-
 		$vars['sql_data'] = $sql_data; // return data
 		$this->modifs = $sql_data[POSTS_TABLE]['sql']; // Save change
 	}
@@ -420,7 +437,6 @@ class listener implements EventSubscriberInterface
 			'gym_horaires',
 			'gym_menu',
 			'gym_ordre_menu',
-			'gym_presentation',
 			'gym_nota',
 			'gym_moderateur',
 		]);
@@ -472,26 +488,19 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 			while ($row = $this->db->sql_fetchrow($result)) {
 				// BBCodes et attachements
-				$display_text = generate_text_for_display(
+				$row['display_text'] = generate_text_for_display(
 					$row['post_text'],
 					$row['bbcode_uid'], $row['bbcode_bitfield'],
 					OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
 				);
-				if (!empty($attachments[$row['post_id']]))
-					parse_attachments($row['forum_id'], $display_text, $attachments[$row['post_id']], $update_count_ary);
 
-				// Extrait les résumés
-				$expl = explode ('<!-- resume -->', $display_text);
-				$resume = [];
-				foreach ($expl AS $k=>$fragment)
-					if ($k) { // Sauf le premier
-						$frag_exp = explode ('<!-- emuser -->', $fragment);
-						if (count ($frag_exp) > 1)
-							$resume[] = $frag_exp[0];
-					}
-				if (count ($resume))
-					$row['resume'] = '<p>'.implode('</p><p>',$resume).'</p>';
-				$row['display_text'] = $display_text;
+				if (!empty($attachments[$row['post_id']]))
+					parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
+
+				// Extrait les parties à afficher à l'acceuil
+				$accueils = explode ('<!--accueil-->', $row['display_text']);
+				if (count ($accueils) > 1)
+					$row['accueil'] = '<p>'.$accueils[1].'</p>';
 
 				// Jour dans la semaine
 				$row['gym_jour'] = intval ($row['gym_jour']);

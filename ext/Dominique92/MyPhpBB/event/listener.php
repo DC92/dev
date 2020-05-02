@@ -1,12 +1,11 @@
 <?php
 /**
  * Add usefull tricks to for phpBB
+ *
  * Includes language and style files of this extension
  * Clickable banner
  * Prevent an empty post title or text
  * Warning to wait until end loading of attached files
- * <table> BBcode
- * Replace (INCLUDE relative_url) by the url content
  * Log posts edit
  *
  * DEBUG :
@@ -57,10 +56,9 @@ class listener implements EventSubscriberInterface
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
 		return [
-			// Viewtopic
-			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
-
-			'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',
+			// All
+			'core.page_header' => 'page_header',
+			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
 
 			// Posting
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
@@ -69,54 +67,29 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-	/* List template vars : phpbb/template/context.php line 135
-echo"<pre style='background-color:white;color:black;font-size:14px;'> = ".var_export($ref,true).'</pre>';
-	*/
-
-	// (INCLUDE relative_url) replace this string by the url content
-	// (LOCATION relative_url) replace this page by the url
-	function twig_environment_render_template_after($vars) {
-		if (strpos ($vars['name'], 'viewtopic')) {
-			$vars['output'] = preg_replace_callback (
-				'/\((INCLUDE|LOCATION)[ ]*([^\)]*)[ ]*\)/',
-				function ($match) {
-					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
-					$uris [count($uris) - 1] = htmlspecialchars_decode ($match[2]);
-					$url = 'http://'.implode ('/', $uris);
-
-					if ($match[1] == 'INCLUDE')
-						return file_get_contents ($url);
-
-					header ('Location: '.$url);
-					exit;
-				},
-				$vars['output']
-			);
-		}
+	function page_header() {
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>REQUEST_URI = ".var_export($this->request->get_super_global(\phpbb\request\request_interface::SERVER)['REQUEST_URI'],true).'</pre>';
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>COOKIE = ".var_export($this->request->get_super_global(\phpbb\request\request_interface::COOKIE),true).'</pre>';
 	}
 
-	/**
-		VIEWTOPIC.PHP
-	*/
-	// BBCode [tableau]{TEXT}[/tableau] / <tableau>{TEXT}</tableau> / LF split table lines / | split columns
-	function modify_text_for_display_after($vars) {
-		$vars['text'] = preg_replace_callback ('/<tableau>.*<\/tableau>/', function($match) {
-			return str_replace (
-				['<tableau><br>', '<br></tableau>', '<br>', '|', ';'],
-				['<table class="tableau"><tr><td>', '</td></tr></table>', '</td></tr><tr><td>', '</td><td>', '<br/>'],
-				$match[0]
-			);
-		} , str_replace ("\n", '',$vars['text']));
+	function twig_environment_render_template_before($vars) {
+		// Display the template variables
+/*DCMM*/return;
+		if($vars['name'] != 'attachment.html') {
+			echo '<p><b>TEMPLATE '.$vars['name'].' : '.count($vars['context']).' variables</b></p>';
+			foreach($vars['context'] AS $k=>$v)
+				if (gettype ($v) != 'object')
+					echo"<pre>$k (".gettype ($v).") = ".var_export($v,true).'</pre>';
+		}
 	}
 
 	/**
 		POSTING.PHP
 	*/
-	// Allows entering a POST with empty text
 	function posting_modify_submission_errors($vars) {
 		$error = $vars['error'];
 
+		// Allows entering a POST with empty text
 		foreach ($error AS $k=>$v)
 			if ($v == $this->user->lang['TOO_FEW_CHARS'])
 				unset ($error[$k]);
