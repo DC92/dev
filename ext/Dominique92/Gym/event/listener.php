@@ -7,12 +7,6 @@
  */
 
 /*
-//Corrections base
-(TABLEAU dans Tarifs, inscriptions
-changer les[resume en [accueil / [resume2 en [resume / purge du BBcode
-
-//TODO
-
 //BEST
 Retour de modification de rubrique -> PAS LE MEME TEMPLATE ?
 Redimensionner les images suivant taille fenetre
@@ -41,19 +35,23 @@ GENERAL / Paramètres des messages / Messages par page : 99
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
+	[accueil]{TEXT}[/accueil] / <!--accueil-->{TEXT}<!--accueil--> / Partie de texte à afficher sur la page d'accueil du site
+	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
+	[centre]{TEXT}[/centre] / <div style="text-align:center">{TEXT}</div> / Image centrée
+	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
+	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
+	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
+	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
+	[resume]{TEXT}[/resume] / <!--resume-->{TEXT}<!--resume--> / Résumé pour affichage en début de page
+	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une rubrique
+	[saut_ligne][/saut_ligne] / <br style="clear:both" />
+	[separation][/separation] / <hr/> / Ligne horizontale
+	[surligne]{TEXT}[/surligne] / <span style="background:yellow">{TEXT}</span> / Surligné en jaune
+	[tableau]{TEXT}[/tableau] / (TABLEAU{TEXT}) / Tableau à 2 dimensions
 	[titre1]{TEXT}[/titre1] / <h1>{TEXT}</h1> / Caractères blancs sur fond bleu
 	[titre2]{TEXT}[/titre2] / <h2>{TEXT}</h2> / Caractères noirs sur fond vert
-	[image-droite]{TEXT}[/image-droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
-	[image-gauche]{TEXT}[/image-gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
-	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
-	[horaire]{TEXT}[/horaire] / <div class="include">.?template=horaires&{TEXT}=POST_ID</div> / Affiche des horaires
-	[calendrier]{TEXT}[/calendrier] / <div class="include">.?template=calendrier&{TEXT}=POST_ID</div> / Affiche un calendrier
-	[include]{TEXT}[/include] / <div class="include">{TEXT}</div>
-	[resume]{TEXT}[/resume] / <!-- resume -->{TEXT}<!-- emuser --> / Résumé pour les évenements
-	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
-	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
-	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une runrique
-	[tableau]{TEXT}[/tableau] / <tableau>{TEXT}</tableau> / Tableau à 2 dimensions
+	[titre3]{TEXT}[/titre3] / <h3>{TEXT}</h3>
+	[titre4]{TEXT}[/titre4] / <h4>{TEXT}</h4>
 */
 
 namespace Dominique92\Gym\event;
@@ -164,37 +162,37 @@ class listener implements EventSubscriberInterface
 		Expansion des "BBCodes" maisons : (CLE valeur)
 	*/
 	function twig_environment_render_template_after($vars) {
-		if ($vars['name'][0] == '@') // Is it a custom template
-			$vars['output'] = preg_replace_callback (
-				'/\(([A-Z]+) ?([^\)]*)\)/s',
-				function ($match) {
-					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
-					$uris [count($uris) - 1] = html_entity_decode ($match[2]);
-					$url = 'http://'.implode ('/', $uris);//TODO.'&sid='.$this->user->session_id;
+		$vars['output'] = preg_replace_callback (
+			'/\(([A-Z]+) ?([^\)]*)\)/s',
+			function ($match) {
+				$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+				$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
+				$uris [count($uris) - 1] = html_entity_decode ($match[2]);
+				$url = 'http://'.implode ('/', $uris);//TODO.'&sid='.$this->user->session_id;
 
-					switch ($match[1]) {
-						// (INCLUDE relative_url) replace this string by the url content
-						case 'INCLUDE':
-							return file_get_contents ($url.'&mod='.$this->auth->acl_get('m_'));
+				switch ($match[1]) {
+					// (INCLUDE relative_url) replace this string by the url content
+					case 'INCLUDE':
+						return file_get_contents ($url.'&mod='.$this->auth->acl_get('m_'));
 
-						// (LOCATION relative_url) replace this page by the url
-						case 'LOCATION':
-							header ('Location: '.$url);
-							exit;
+					// (LOCATION relative_url) replace this page by the url
+					case 'LOCATION':
+						header ('Location: '.$url);
+						exit;
 
-						// (TABLEAU text) replace by a <table> / LF split table lines / | split columns / ; enable several lines per cell
-						case 'TABLEAU':
-							$m = str_replace ([PHP_EOL, '|', ';'], ['', '</td><td>', '<br/>'], $match[2]);
-							$m = array_filter (explode ('<br>', $m));
-							return '<table class="tableau"><tr><td>'.
-								implode ('</td></tr><tr><td>', $m).
-								'</td></tr></table>';
-					}
-					return $match[0];
-				},
-				$vars['output']
-			);
+					// (TABLEAU text) replace by a <table> / LF split table lines / | split columns / ; enable several lines per cell
+					case 'TABLEAU':
+						$m = str_replace ([PHP_EOL, '|', ';'], ['', '</td><td>', '<br/>'], $match[2]);
+						$m = array_filter (explode ('<br>', $m));
+						return '<table class="tableau"><tr><td>'.
+							implode ('</td></tr><tr><td>', $m).
+							'</td></tr></table>';
+				}
+				// Sinon, on ne fait rien
+				return $match[0];
+			},
+			$vars['output']
+		);
 	}
 
 	/**
