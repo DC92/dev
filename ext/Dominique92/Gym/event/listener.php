@@ -162,37 +162,39 @@ class listener implements EventSubscriberInterface
 		Expansion des "BBCodes" maisons : (CLE valeur)
 	*/
 	function twig_environment_render_template_after($vars) {
-		$vars['output'] = preg_replace_callback (
-			'/\(([A-Z]+) ?([^\)]*)\)/s',
-			function ($match) {
-				$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-				$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
-				$uris [count($uris) - 1] = html_entity_decode ($match[2]);
-				$url = 'http://'.implode ('/', $uris);//TODO.'&sid='.$this->user->session_id;
+		if ($vars['name'] == 'index_body.html' ||
+			$vars['name'][0] == '@')
+			$vars['output'] = preg_replace_callback (
+				'/\(([A-Z]+) ?([^\)]*)\)/s',
+				function ($match) {
+					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
+					$uris [count($uris) - 1] = html_entity_decode ($match[2]);
+					$url = 'http://'.implode ('/', $uris);
 
-				switch ($match[1]) {
-					// (INCLUDE relative_url) replace this string by the url content
-					case 'INCLUDE':
-						return file_get_contents ($url.'&mod='.$this->auth->acl_get('m_'));
+					switch ($match[1]) {
+						// (INCLUDE relative_url) replace this string by the url content
+						case 'INCLUDE':
+							return file_get_contents ($url.'&mod='.$this->auth->acl_get('m_'));
 
-					// (LOCATION relative_url) replace this page by the url
-					case 'LOCATION':
-						header ('Location: '.$url);
-						exit;
+						// (LOCATION relative_url) replace this page by the url
+						case 'LOCATION':
+							header ('Location: '.$url);
+							exit;
 
-					// (TABLEAU text) replace by a <table> / LF split table lines / | split columns / ; enable several lines per cell
-					case 'TABLEAU':
-						$m = str_replace ([PHP_EOL, '|', ';'], ['', '</td><td>', '<br/>'], $match[2]);
-						$m = array_filter (explode ('<br>', $m));
-						return '<table class="tableau"><tr><td>'.
-							implode ('</td></tr><tr><td>', $m).
-							'</td></tr></table>';
-				}
-				// Sinon, on ne fait rien
-				return $match[0];
-			},
-			$vars['output']
-		);
+						// (TABLEAU text) replace by a <table> / LF split table lines / | split columns / ; enable several lines per cell
+						case 'TABLEAU':
+							$m = str_replace ([PHP_EOL, '|', ';'], ['', '</td><td>', '<br/>'], $match[2]);
+							$m = array_filter (explode ('<br>', $m));
+							return '<table class="tableau"><tr><td>'.
+								implode ('</td></tr><tr><td>', $m).
+								'</td></tr></table>';
+					}
+					// Sinon, on ne fait rien
+					return $match[0];
+				},
+				$vars['output']
+			);
 	}
 
 	/**
@@ -291,7 +293,7 @@ class listener implements EventSubscriberInterface
 		$post_data = $vars['post_data'];
 
 		// Set specific variables
-		foreach ($vars['post_data'] AS $k=>$v)
+		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3) && $v) {
 				$this->template->assign_var (strtoupper ($k), $v);
 				$data[$k] = explode (',', $v); // Expand grouped values
