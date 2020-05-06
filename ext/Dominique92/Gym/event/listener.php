@@ -8,7 +8,6 @@
 
 /*
 //BEST
-Retour de modification de rubrique -> PAS LE MEME TEMPLATE ?
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 Bouton imprimer calendier

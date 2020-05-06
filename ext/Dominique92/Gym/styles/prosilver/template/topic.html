@@ -1,13 +1,7 @@
 <!-- BEGIN postrow -->
-	<!-- IF (TOPIC_ID != 19 and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on') or TOPIC_ID == 19 -->
+	<!-- IF (TOPIC_ID != 19 and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and REQUEST_P != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on') or TOPIC_ID == 19 -->
 		<h2>
-			<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
-			<!-- IF (U_MCP or REQUEST_MOD) -->
-				<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
-					title="Modifier la page {postrow.POST_SUBJECT}" class="button button-icon-only">
-					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-				</a>
-			<!-- ENDIF -->
+			{postrow.POST_SUBJECT}
 		</h2>
 		<!-- IF not REQUEST_P -->
 			{postrow.MESSAGE}
