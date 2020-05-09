@@ -487,6 +487,11 @@ class listener implements EventSubscriberInterface
 				if (!empty($attachments[$row['post_id']]))
 					parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
+				// Extrait des résumé des parties à afficher
+				$resumes = explode ('<!--resume-->', $row['display_text']);
+				if (count ($resumes) > 1)
+					$row['RESUME'] = $resumes[1];
+
 				// Extrait les parties à afficher à l'acceuil
 				$accueils = explode ('<!--accueil-->', $row['display_text']);
 				if (count ($accueils) > 1)
