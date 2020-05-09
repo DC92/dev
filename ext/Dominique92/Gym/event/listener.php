@@ -46,7 +46,6 @@ MESSAGES / BBCodes / cocher afficher
 	[saut_ligne][/saut_ligne] / <br style="clear:both" />
 	[separation][/separation] / <hr/> / Ligne horizontale
 	[surligne]{TEXT}[/surligne] / <span style="background:yellow">{TEXT}</span> / Surligné en jaune
-	[tableau]{TEXT}[/tableau] / (TABLEAU{TEXT}) / Tableau à 2 dimensions
 	[titre1]{TEXT}[/titre1] / <h1>{TEXT}</h1> / Caractères blancs sur fond bleu
 	[titre2]{TEXT}[/titre2] / <h2>{TEXT}</h2> / Caractères noirs sur fond vert
 	[titre3]{TEXT}[/titre3] / <h3>{TEXT}</h3>
@@ -180,14 +179,6 @@ class listener implements EventSubscriberInterface
 						case 'LOCATION':
 							header ('Location: '.$url);
 							exit;
-
-						// (TABLEAU text) replace by a <table> / LF split table lines / | split columns / ; enable several lines per cell
-						case 'TABLEAU':
-							$m = str_replace ([PHP_EOL, '|', ';'], ['', '</td><td>', '<br/>'], $match[2]);
-							$m = array_filter (explode ('<br>', $m));
-							return '<table class="tableau"><tr><td>'.
-								implode ('</td></tr><tr><td>', $m).
-								'</td></tr></table>';
 					}
 					// Sinon, on ne fait rien
 					return $match[0];

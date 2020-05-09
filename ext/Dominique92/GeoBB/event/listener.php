@@ -44,7 +44,7 @@ class listener implements EventSubscriberInterface
 	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 		// For debug, Varnish will not be caching pages where you are setting a cookie
-		if (defined('TRACES_DOM'))
+		if (defined('DEBUG_CONTAINER'))
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
 		return [
@@ -422,7 +422,7 @@ class listener implements EventSubscriberInterface
 				' WHERE post_id = '.$post_data['post_id']
 			);
 
-			if(defined('TRACES_DOM') && count($update))
+			if(defined('DEBUG_CONTAINER') && count($update))
 				echo"<pre style='background-color:white;color:black;font-size:14px;'>AUTOMATIC DATA = ".var_export($update,true).'</pre>';
 		}
 	}
