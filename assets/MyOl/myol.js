@@ -2511,9 +2511,9 @@ function flatCoord(existingCoords, newCoords, pointerPosition) {
  */
 function layersCollection(keys) {
 	return {
-		'OSM-FR': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OpenTopo': layerOsmOpenTopo(),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
+		'OSM-FR': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOsmMri(),
 		'Hike & Bike': layerOsm(

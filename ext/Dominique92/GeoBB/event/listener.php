@@ -301,7 +301,7 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 	}
 
-	// Called during first pass on post data that reads phpbb-posts SQL data
+	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
 		// Update the database with the automatic data
 		$post_data = $vars['row'];

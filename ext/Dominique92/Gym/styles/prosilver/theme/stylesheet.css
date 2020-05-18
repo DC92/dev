@@ -166,26 +166,34 @@ html.gym  {
 	clear: both;
 	margin: 1.5em 0 0 0;
 	padding: 0.2em;
-	background: #5826f4;
+	border-radius: 0.2em;
+	background: #2727F2;
 	color: white;
 	font-size: 1.3em;
 }
+.gym #page h1 a,
 .gym #page h1 i {
 	color: white;
 }
 .gym #page h2 {
-	margin: 1.2em 0 0 0;
-	color: #08babe;
-	font-size: 1.3em;
+	margin: 1.2em 0 0.2em 0;
+	padding: 0.2em;
+	border-radius: 0.2em;
+	background: #00B3B3;
+	color: white;
+	Wcolor: white !important;
+	font-size: 1.1em;
 }
 .gym #page h2 a {
-	text-decoration: none;
-	color: #08babe;
+	color: white;
 }
-.gym #page h3,
+.gym #page h3 {
+	margin: 0.5em 0 0 0;
+	color: #2727F2;
+}
 .gym #page h4 {
 	margin: 0.5em 0 0 0;
-	color: #3B2784;
+	color: #296666;
 }
 .gym #page p {
 	margin: 0;
