@@ -7,7 +7,11 @@
  */
 
 /*
+enlever [accueil]
+class html fonction de script/t&p
+
 //BEST
+Revoir les crayons / enlever ajouter un ballon au sous-menu
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 Bouton imprimer calendier
@@ -18,6 +22,7 @@ Erradiquer f=2
 //APRES
 Sitemap
 enlever @define('DEBUG_CONTAINER', true);
+Enlever la banière jaune et le décallage de la connexion admin
 enlever recompile templates
 enlever le .robot et faire un SEO
 mettre redir 301 free
@@ -111,7 +116,6 @@ class listener implements EventSubscriberInterface
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
-			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 		];
 	}
 
@@ -125,11 +129,16 @@ class listener implements EventSubscriberInterface
 		foreach ($request AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>AA = ".var_export(microtime(),true).'</pre>';
+$this->popule_posts();
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>DD = ".var_export(microtime(),true).'</pre>';
+
 		// Menu principal
 		$this->liste_fiches ('menu', [
-			'post.post_id=t.topic_first_post_id',
+	//TODO DCMM DELETE		'post.post_id=t.topic_first_post_id',
 			'post.gym_menu="on"',
-		],'gym_menu','gym_ordre_menu');
+		],'gym_first_ordre_menu','gym_ordre_menu');
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>ZZ = ".var_export(microtime(),true).'</pre>';
 	}
 
 	/**
@@ -192,13 +201,14 @@ class listener implements EventSubscriberInterface
 	*/
 	function index_modify_page_title() {
 		// Inclusions des données de la page d'acceuil
+		/*
 		$this->liste_fiches ('acceuil', [
 			'true',
 		], 'gym_ordre_menu', 'post_id');
-
 		$this->liste_fiches ('evenements', [
 			'post.gym_evenements="on"',
 		], 'next_end_time','next_beg_time');
+*/
 
 		// Pour les horaires
 		$this->liste_fiches ('horaires', [
@@ -211,9 +221,19 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+		VIEWFORUM.PHP
+	*/
+	function viewforum_modify_topicrow($vars) {
+		// Permet la visualisation en vue forum pour l'édition du site
+		$topic_row = $vars['topic_row'];
+		$topic_row['U_VIEW_TOPIC'] .= '&template=';
+		$vars['topic_row'] = $topic_row;
+	}
+
+	/**
 		VIEWTOPIC.PHP
 	*/
-	// Called before reading reads phpbb-posts SQL data
+	// Called before reading phpbb-posts SQL data
 	function viewtopic_gen_sort_selects_before($vars) {
 		// Tri des sous-menus dans le bon ordre
 		$sort_by_sql = $vars['sort_by_sql'];
@@ -224,7 +244,7 @@ class listener implements EventSubscriberInterface
 		$vars['sort_by_sql'] = $sort_by_sql;
 	}
 
-	// Called during first pass on post data that reads phpbb-posts SQL data
+	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
@@ -236,6 +256,7 @@ class listener implements EventSubscriberInterface
 		$post_row = $vars['post_row'];
 		$post_id = $vars['row']['post_id'];
 		$post_data = $this->all_post_data[$post_id] ?: [];
+		$post_activite = $vars['row']['post_activite'];
 
 		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
@@ -263,16 +284,6 @@ class listener implements EventSubscriberInterface
 		);
 
 		$vars['post_row'] = $post_row;
-	}
-
-	/**
-		VIEWFORUM.PHP
-	*/
-	function viewforum_modify_topicrow($vars) {
-		// Permet la visualisation en vue forum pour l'édition du site
-		$topic_row = $vars['topic_row'];
-		$topic_row['U_VIEW_TOPIC'] .= '&template=';
-		$vars['topic_row'] = $topic_row;
 	}
 
 	/**
@@ -410,7 +421,8 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	// Popule les templates horaires, calendrier, actualité
+	// Popule les templates horaires, calendrier
+	//TODO DELETE
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
 		$this->verify_column(POSTS_TABLE, [
 			'gym_activite',
@@ -459,6 +471,7 @@ class listener implements EventSubscriberInterface
 			$this->db->sql_freeresult($result);
 
 			$sql = "SELECT post.post_id, t.topic_id, t.forum_id,
+				t.topic_title, t.topic_first_post_id,
 				post.post_subject AS nom,
 				post.post_text, post.bbcode_uid, post.bbcode_bitfield,
 				li.post_subject AS lieu,
@@ -467,12 +480,14 @@ class listener implements EventSubscriberInterface
 				post.gym_activite, post.gym_lieu, post.gym_animateur, post.gym_nota,
 				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
 				post.gym_scolaire, post.gym_semaines,
-				post.gym_evenements, post.gym_horaires, post.gym_menu, post.gym_ordre_menu
+				post.gym_evenements, post.gym_horaires, post.gym_menu, post.gym_ordre_menu,
+				first.gym_ordre_menu AS gym_first_ordre_menu
 				FROM ".POSTS_TABLE." AS post
-					LEFT JOIN  ".POSTS_TABLE." AS ac on (post.gym_activite = ac.post_id)
-					LEFT JOIN  ".POSTS_TABLE." AS li on (post.gym_lieu = li.post_id)
-					LEFT JOIN  ".POSTS_TABLE." AS an on (post.gym_animateur = an.post_id)
-					JOIN ".TOPICS_TABLE." AS t ON (post.topic_id = t.topic_id)
+					LEFT JOIN  ".POSTS_TABLE." AS ac ON (ac.post_id = post.gym_activite)
+					LEFT JOIN  ".POSTS_TABLE." AS li ON (li.post_id = post.gym_lieu)
+					LEFT JOIN  ".POSTS_TABLE." AS an ON (an.post_id = post.gym_animateur)
+					JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = post.topic_id)
+					JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
 				WHERE ".implode(' AND ',$cond );
 
 			$result = $this->db->sql_query($sql);
@@ -549,10 +564,6 @@ class listener implements EventSubscriberInterface
 				$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
 				$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
 
-				$row['couleur'] = $this->couleur();
-				$row['couleur_fond'] = $this->couleur(35, 255, 0);
-				$row['couleur_bord'] = $this->couleur(40, 196, 0);
-
 				// Tableau des semaines d'un calendrier
 				if ($assign == 'calendrier') {
 					$semaines = explode (',', $row['gym_semaines']);
@@ -574,10 +585,232 @@ class listener implements EventSubscriberInterface
 			ksort ($liste);
 			foreach ($liste AS $v) { // Tri du 1er niveau
 				ksort ($v);
-				$this->template->assign_block_vars($assign, array_values ($v)[0][0]); // La première pour avoir les valeurs générales
-				foreach ($v AS $vv) // Tri du 2" niveau
+
+				// La première ligne pour avoir les valeurs générales
+				$first = array_values ($v)[0][0];
+				$first['COULEUR'] = $this->couleur();
+				$first['COULEUR_FOND'] = $this->couleur(35, 255, 0);
+				$first['COULEUR_BORD'] = $this->couleur(40, 196, 0);
+				$first['COUNT'] = count($v);
+				$this->template->assign_block_vars($assign, $first);
+
+				foreach ($v AS $vv) {// Tri du 2" niveau
+					ksort ($vv);
 					foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
 						$this->template->assign_block_vars("$assign.item", $vvv);
+				}
+			}
+		}
+	}
+
+	// Popule les templates horaires, calendrier
+	function popule_posts() {
+		$this->verify_column(POSTS_TABLE, [
+			'gym_activite',
+			'gym_lieu',
+			'gym_animateur',
+			'gym_jour',
+			'gym_heure',
+			'gym_minute',
+			'gym_duree_heures',
+			'gym_duree_jours',
+			'gym_scolaire',
+			'gym_semaines',
+			'gym_evenements',
+			'gym_horaires',
+			'gym_menu',
+			'gym_ordre_menu',
+			'gym_nota',
+			'gym_moderateur',
+		]);
+
+		$static_values = $this->listes();
+
+		// Récupère la table de tous les attachements pour les inclusions BBCode
+		$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
+		$result = $this->db->sql_query($sql);
+		$attachments = $update_count_ary = [];
+		while ($row = $this->db->sql_fetchrow($result))
+			$attachments[$row['post_msg_id']][] = $row;
+		$this->db->sql_freeresult($result);
+
+		$sql = "SELECT t.*, post.*,
+			first.gym_menu AS first_gym_menu,
+			first.gym_ordre_menu AS first_gym_ordre_menu,
+			first.post_subject AS first_post_subject,
+			li.post_subject AS lieu,
+			an.post_subject AS animateur,
+			ac.post_subject AS activite
+			FROM ".POSTS_TABLE." AS post
+				LEFT JOIN ".POSTS_TABLE." AS ac ON (ac.post_id = post.gym_activite)
+				LEFT JOIN ".POSTS_TABLE." AS li ON (li.post_id = post.gym_lieu)
+				LEFT JOIN ".POSTS_TABLE." AS an ON (an.post_id = post.gym_animateur)
+				LEFT JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = post.topic_id)
+				LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
+			";
+
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result)) {
+			// BBCodes et attachements
+			$row['display_text'] = generate_text_for_display(
+				$row['post_text'],
+				$row['bbcode_uid'], $row['bbcode_bitfield'],
+				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+			);
+
+			if (!empty($attachments[$row['post_id']]))
+				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
+
+			// Extrait des résumé des parties à afficher
+			$resumes = explode ('<!--resume-->', $row['display_text']);
+			if (count ($resumes) > 1)
+				$row['RESUME'] = $resumes[1];
+
+			// Extrait les parties à afficher à l'acceuil
+			$accueils = explode ('<!--accueil-->', $row['display_text']);
+			if (count ($accueils) > 1)
+				$row['accueil'] = '<p>'.$accueils[1].'</p>';
+
+			// Jour dans la semaine
+			$row['gym_jour'] = intval ($row['gym_jour']);
+			$row['gym_jour_literal'] = $static_values['jours'][$row['gym_jour']];
+			// Temps début
+			$row['gym_heure'] = intval ($row['gym_heure']);
+			$row['gym_minute'] = intval ($row['gym_minute']);
+			// Temps fin
+			$row['gym_duree_heures'] = intval ($row['gym_duree_heures']);
+			$row['gym_duree_jours'] = intval ($row['gym_duree_jours']);
+			$row['gym_minute_fin'] = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
+			$row['gym_heure_fin'] = $row['gym_heure'] + floor ($row['gym_minute_fin'] / 60);
+			$row['gym_minute_fin'] = $row['gym_minute_fin'] % 60;
+
+			// Date
+			if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
+				setlocale(LC_ALL, 'fr_FR');
+				$row['next_end_time'] = INF;
+				$semaines = explode (',', $row['gym_semaines']);
+				foreach ($semaines AS $s) {
+					$beg_time = mktime(
+						$row['gym_heure'], $row['gym_minute'],
+						0, -4, // 1er aout
+						$row['gym_jour'] + $s * 7 + 5,
+						date('Y')
+					);
+					$end_time = mktime(
+						$row['gym_heure_fin'], $row['gym_minute_fin'],
+						0, -4, // 1er aout
+						$row['gym_jour'] + $s * 7 + 5,
+						date('Y')
+					);
+					// Garde le premier évènement qui finit après la date courante
+					if ($end_time > time() && $end_time < $row['next_end_time']) {
+						$row['next_beg_time'] = $beg_time;
+						$row['next_end_time'] = $end_time;
+						$row['date'] = ucfirst (
+							str_replace ('  ', ' ',
+							utf8_encode (
+							strftime ('%A %e %B', $row['next_end_time'])
+						)));
+					}
+				}
+			}
+
+			// Horaires
+			$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);
+			$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
+			$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
+			$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
+			$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
+			$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
+
+			// Range les résultats dans l'ordre et le groupage espéré
+			$liste
+				[
+					$row['next_end_time'].$row['horaire_debut']. // Calendrier
+					$row['first_gym_ordre_menu'].$row['topic_id']. // Menu
+					$row['gym_jour'] // Horaires
+				][
+					$row['gym_ordre_menu'].$row['post_id']
+				]
+				= array_change_key_case ($row, CASE_UPPER);
+
+			// Tableau des semaines d'un calendrier
+			
+			
+
+			
+$row['display_text']='';			
+$row['post_text']='';			
+//if($row['date'])/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row['first_gym_ordre_menu'].$row['topic_id'].$row['gym_jour'].'==='.$row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id'],true).'</pre>';
+//if($row['date'])/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row,true).'</pre>';
+			if ($assign == 'calendrier') {
+				$semaines = explode (',', $row['gym_semaines']);
+				foreach ($static_values['semaines'] AS $s) {
+//					$r = $row;
+					$row['no'] = $s;
+					$row['gym_in_calendrier'] = in_array ($s, $semaines) ? 1 : 0;
+//TODO NE PAS AFFECTER A LISTE / chenger critrees de tri
+					$liste
+						[$row['first_gym_ordre_menu'].$row['topic_id'].$row['gym_jour']]
+						[$row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id'].$s]
+						= array_change_key_case ($row, CASE_UPPER);
+		//			$liste [$row['topic_id']] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
+				}
+			//TODO BUG il y a quelque chose qui rajoute 2 fois la dernière semaine !!!
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>{$row['gym_first_ordre_menu']}{$row['gym_jour']}---".$row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id']." = ".var_export($row['post_subject'],true).'</pre>';
+			}
+
+if(0)
+if($row['date'])
+/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export([
+'tri 1' => $row['first_gym_ordre_menu'].$row['topic_id'].$row['gym_jour'],
+'tri 2' => $row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id'],
+	'topic_title' => $row['topic_title'],
+	'post_subject' => $row['post_subject'],
+	'gym_menu' => $row['gym_menu'],
+	'gym_first_ordre_menu' => $row['gym_first_ordre_menu'],
+	'date' => $row['date'],
+	'gym_evenements' => $row['gym_evenements'],
+	'next_end_time' => $row['next_end_time'],
+	'' => $row[''],
+],true).'</pre>';
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row,true).'</pre>';
+
+
+
+
+
+		}
+		$this->db->sql_freeresult($result);
+
+		$topic = $this->request->variable('t', '');
+		if ($liste) {
+			ksort ($liste);
+			foreach ($liste AS $v) { // Tri du 1er niveau
+				ksort ($v);
+
+				// La première ligne pour avoir les valeurs générales
+				$first = array_values ($v)[0];
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($first['TOPIC_ID'],true).'</pre>';
+				$first['COULEUR'] = $this->couleur ();
+				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
+				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
+/*
+*/
+				$first['COUNT'] = count ($v);
+
+				$this->template->assign_block_vars ('posts', $first);
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export(array_keys ($v),true).'</pre>';
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($first,true).'</pre>';
+
+				foreach ($v AS $vv) { // Tri du 2" niveau
+					if ($topic){
+								$vv['COULEUR'] = $this->couleur ();
+								$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);
+								$vv['COULEUR_BORD'] = $this->couleur (40, 196, 0);
+					}
+					$this->template->assign_block_vars ('posts.item', $vv);
+				}
 			}
 		}
 	}

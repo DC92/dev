@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="fr" class="gym">
+<html dir="ltr" lang="fr">
 <head>
 	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="robots" content="noindex">
 
@@ -18,37 +19,102 @@
 	{$STYLESHEETS}
 </head>
 
-<body>
-	<!-- Connexion (float right) -->
-	<div id="edit-user">
-		<!-- IF S_USER_LOGGED_IN -->
-			<a href="ucp.php?i=ucp_profile&mode=reg_details">{S_USERNAME}</a>
-			<ul><li>
-					<a href="ucp.php?i=ucp_profile&mode=reg_details">{L_PROFILE}</a>
-				</li><li>
-					<a href="viewtopic.php?p=93">Mode d'emploi</a>
-				</li><li>
-					<a href="viewforum.php?f=2">Rubriques</a>
-				</li><li>
-					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
-			</li></ul>
-		<!-- ELSE -->
-			<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
-				<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-			</a>
-		<!-- ENDIF -->
-	</div>
+<body class="gym gym-{SCRIPT_NAME}">
+	<a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/">
+		<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
+	</a>
 
-	<!-- Recherche -->
+<!-- IF 0 -->
+//TODO DELETE
+	<ul class="menu">
+		<!-- IF SCRIPT_NAME == 'viewtopic' -->
+			<li style="background:#2727F2">
+				<a href=".">Chavil'GYM</a>
+				<ul style="background:#2727F2" class="submenu">
+					<li>
+						<a title="Retour à l'accueil" href=".">Chavil'GYM</a>
+					</li>
+					<!-- BEGIN menu -->
+					<li>
+						<a href="viewtopic.php?p={menu.POST_ID}">{menu.TOPIC_TITLE}</a>
+					</li>
+					<!-- END menu -->
+				</ul>
+			</li>
+		<!-- ENDIF -->
+
+		<!-- BEGIN menu -->
+		<!-- IF SCRIPT_NAME == 'index' or menu.POST_ID == REQUEST_P -->
+			<!-- IF SCRIPT_NAME == 'viewtopic' -->
+				<i class="icon fa-arrow-right"></i>
+			<!-- ENDIF -->
+			<li style="background:{menu.COULEUR}">
+				<a href="viewtopic.php?t={menu.TOPIC_ID}">{menu.TOPIC_TITLE}</a>
+				<!-- IF menu.COUNT > 1 -->
+					<ul style="background:{menu.COULEUR}" class="submenu">
+						<!-- BEGIN item -->
+						<li>
+							<a href="viewtopic.php?p={item.POST_ID}">{item.NOM}</a>
+						</li>
+						<!-- END item -->
+					</ul>
+				<!-- ENDIF -->
+			</li>
+		<!-- ENDIF -->
+		<!-- END menu -->
+	</ul>
+
+<div id="top">
+	<ul id="newmenu">
+		<li>
+			<label>
+				<a href=".">Chavil'Gym Volontaire</a>
+			</label>
+		</li>
+		<!-- BEGIN menu -->
+			<li>
+				<label style="background:{menu.COULEUR}">
+					<a href="viewtopic.php?t={menu.TOPIC_ID}">{menu.TOPIC_TITLE}</a>
+				</label>
+				<ul style="background:{menu.COULEUR}">
+					<!-- BEGIN item -->
+					<!-- IF item.POST_ID != item.TOPIC_FIRST_POST_ID -->
+						<li>
+						<a href="viewtopic.php?p={menu.POST_ID}">
+							{item.NOM}
+						</a>
+						</li>
+					<!-- ENDIF -->
+					<!-- END item -->
+				</ul>
+			</li>
+		<!-- END menu -->
+
+		<li>
+			<!-- Recherche -->
+			<form action="{U_SEARCH}" method="get" id="search">
+			<fieldset>
+				<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
+				<button class="button button-search" type="submit" title="{L_SEARCH}">
+					<i class="icon fa-search"></i><span class="sr-only">{L_SEARCH}</span>
+				</button>
+				{S_SEARCH_HIDDEN_FIELDS}
+			</fieldset>
+			</form>
+		</li>
+	</ul>
+</div>
+
+	<!-- Recherche
 	<form action="{U_SEARCH}" method="get" id="search">
 	<fieldset>
 		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}" class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
 		<button class="button button-search" type="submit" title="{L_SEARCH}">
-			<i class="icon fa-search fa-fw" aria-hidden="true"></i><span class="sr-only">{L_SEARCH}</span>
+			<i class="icon fa-search"></i><span class="sr-only">{L_SEARCH}</span>
 		</button>
 		{S_SEARCH_HIDDEN_FIELDS}
 	</fieldset>
-	</form>
+	</form> -->
 
 	<!-- Banière -->
 	<div>
@@ -72,10 +138,14 @@
 		<!-- IF U_MCP -->
 			<li>
 				<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&amp;f=2">
-					<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+					<i class="icon fa-commenting-o"></i>
 				</a>
 			</li>
 		<!-- ENDIF -->
 	</ul>
 
 	<div id="page">
+
+
+
+<!-- ENDIF -->

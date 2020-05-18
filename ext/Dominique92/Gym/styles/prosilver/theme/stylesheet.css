@@ -34,22 +34,255 @@ pre {
 	}
 }
 
-/* Haut de la page style GV */
-html.gym  {
+/* Y compris phpBB */
+html{
 	height: 100%;
 }
-.gym body {
+body {
+	overflow-x: hidden;
 	height: 100%;
 	margin: 0;
 	padding: 0;
+	background-image: url("./images/fond.jpg");
+	background-size: cover;
+	background-position: center center;
 	font-family: arial, sans-serif;
 }
+
+/* Pages GV */
 .gym .logo img {
 	width: calc(45px + 3vw);
 	float: left;
-	margin-top: 0.3em;
 }
-.gym .baniere div {
+.gym-index .titre {
+	padding: 1em;
+	text-align: center;
+}
+.gym-viewtopic .titre {
+	display: inline-block;
+	padding: 1em;
+}
+.gym .titre h1 {
+	display: inline;
+	padding: 0.3em 1em;
+	border-radius: 2em;
+	background: #2727F2;
+	font-size: 1.4em;
+}
+.gym-viewtopic .titre h1 {
+	font-size: 1em;
+}
+.gym-index .titre h1 a {
+	color: white;
+}
+
+/* Page d'accueil */
+.gym-index .intro {
+	margin: 0 calc(10% - 54px);
+	margin-bottom: 2em;
+	padding: 0.3em;
+	border-radius: 0.5em;
+	background: white;
+}
+.gym-index .intro p {
+	margin: 0.3em;
+	text-indent: 1.5em;
+	text-align: justify;
+}
+.gym-index .intro:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+@media (max-width: 600px) {
+	.gym .logo,
+	.gym-index h1 span {
+		display: none;
+	}
+	.gym-index body {
+		background-image: none;
+	}
+}
+
+/* Evenements */
+.gym-index h1 {
+	margin: 1em calc(10% - 54px) !important;
+}
+.gym-index .evenement {
+	margin: 1em calc(10% - 54px);
+	border: 0.2em solid #077;
+	border-radius: 0.5em;
+	background: #CEF;
+	font-size: 1em;
+}
+.gym-index .evenement:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+.gym-index .evenement h2 {
+	margin: 0 !important;
+	padding: 0.1em;
+	background: #077;
+	color: white;
+	font-size: 1.2em;
+}
+.gym-index .evenement a {
+	color: white;
+}
+.gym-index .evenement > div {
+	padding: 0.2em;
+}
+.gym-index .evenement p {
+	margin: 0;
+}
+@media (max-width: 600px) {
+	.gym-index .evenement {
+		border: 0;
+		border-radius: 0;
+	}
+	.gym-index .evenement h2 {
+		margin: 0;
+	}
+}
+
+/* Slideshow */
+.slideshow {
+	float: right;
+	margin-left: 0.5em;
+	width: 400px;
+	height: 300px;
+	overflow: hidden;
+}
+.slideshow ul {
+	width: 600%;
+	height: 300px;
+	padding: 0; 
+	margin: 0;
+	list-style: none;
+}
+.slideshow li {
+	float: left;
+}
+@media (max-width: 600px) {
+	.slideshow {
+		display: none;
+	}
+}
+
+/* Menu principal */
+.gym ul.menu {
+	width: 100%;
+	margin: 0;
+	padding: 0.3em;
+}
+.gym-index ul.menu,
+.gym-viewtopic .page ul.menu {
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+}
+.gym-viewtopic ul.menu {
+	margin: 0.5em;
+}
+.gym-viewtopic .menu > li {
+	display: inline;
+	margin-right: 0.5em;
+}
+.gym-viewtopic > .menu > li:first-child {
+	font-size: 1.4em;
+	border-radius: 1em;
+	padding: 0.3em;
+}
+.gym-viewtopic .menu > li:first-child ul {
+	font-size: initial;
+}
+.gym-viewtopic .menu > li ul li:first-child {
+	font-size: 1.4em;
+}
+.gym .menu li {
+	margin-bottom: 0.4em;
+	padding: 0.4em;
+	border-radius: 1em;
+	list-style-type: none;
+}
+.gym .menu li a {
+	color: black;
+}
+.gym-viewtopic > .menu > li:first-child a {
+	color: white;
+}
+.gym .menu > li > span,
+.gym .menu > li > a,
+.gym .menu li ul li:first-child span,
+.gym .menu > li > a,
+.gym .menu li ul li:first-child a {
+	font-weight: bold;
+}
+.gym .menu li ul {
+	position: absolute;
+	border-radius: 1em;
+	padding: 0.3em;
+	display: none;
+}
+.gym .menu li:hover ul {
+	display: block;
+}
+.gym .menu li ul li {
+	padding: 0;
+}
+
+
+
+/***********************************************/
+													#WWWedit-user{display:none}
+
+
+
+
+
+
+#WWWtop {
+	position: sticky;
+	position: -webkit-sticky;
+	top: 0;
+	width: 100%;
+}
+/*
+#wnewmenu > li:first-child label {
+	background: #2727F2;
+	padding: 0.3em 1em;
+}
+#wnewmenu > li:first-child a {
+	wfont-size: 1.3em;
+	color: white;
+}
+.gym-index .menu > li,
+.gym-index .menu ul li:first-child {
+}
+.gym-index .menu ul {
+	border-radius: 1em;
+	wmargin: 0;
+	padding: 0.3em;
+}
+.gym-index .menu ul li:not(:first-child) {
+	wdisplay: none;
+}
+*/
+
+/*
+	z-index: 2;
+	border-radius: 1em;
+	wposition: absolute;
+	left: 0;
+.gym-index .menu li:hover ul {
+	display: initial;
+}
+.gym-index .menu ul li {
+	padding: 0 1em;
+	list-style-type: none;
+}
+.gymWWW .baniere div {
 	background: #5826f4;
 	padding: 0.2em;
 	text-align: center;
@@ -58,16 +291,19 @@ html.gym  {
 	color: white;
 	text-decoration: none;
 }
-.gym .logo,
-.gym .baniere {
+.gymWWW .logo,
+.gymWWW .baniere {
 	text-decoration: none !important;
 }
+*/
+/***********************************************/
+
 @media (max-width: 600px) {
-	.gym body {
+	.gymWWW body {
 		background-image: none;
 	}
-	.gym .logo,
-	.gym #search {
+	.gymWWW .logo,
+	.gym .recherche {
 		display: none;
 	}
 }
@@ -78,39 +314,42 @@ html.gym  {
 }
 
 /* Search box */
-.gym form#search {
-	margin-top: calc(0.9em - 10px);
-	float: right;
+.gym form.recherche {
+	position: absolute;
+	top: 1em;
+	right: 1em;
+	wmargin-top: calc(0.9em - 10px);
+	xfloat: right;
 }
-.gym #search fieldset {
+.gym .recherche fieldset {
 	padding: 0;
 }
-.gym #search input {
+.gym .recherche input {
 	display: none;
 }
-.gym #search:hover input {
+.gym .recherche:hover input {
 	display: inline-block;
 }
-.gym #search .button-search {
+.gym .recherche .button-search {
 	padding: 0;
 }
 
 /* User connexion box */
-.gym #edit-user {
+.gym .edit-user {
 	position: absolute;
 	top: 0.4em;
 	left: calc(45px + 3vw);
 	color: white;
 	white-space: nowrap;
 }
-.gym #edit-user > a{
+.gym .edit-user > a {
 	color: white;
 	text-decoration: none;
 }
-.gym #edit-user i {
+.gym .edit-user i {
 	color: white;
 }
-.gym #edit-user ul {
+.gym .edit-user ul {
 	display: none;
 	position: absolute;
 	left: 0;
@@ -119,51 +358,56 @@ html.gym  {
 	background: white;
 	list-style-type: none;
 }
-.gym #edit-user li {
+.gym .edit-user li {
 	padding: 0.1em;
 }
-.gym #edit-user ul i {
+.gym .edit-user ul i {
 	display: none;
 }
-.gym #edit-user:hover ul {
+.gym .edit-user:hover ul {
 	display: block;
 }
-.gym #edit-user a:hover {
+.gym .edit-user a:hover {
 	font-weight: bold;
 }
 @media (max-width: 600px) {
-	.gym #edit-user {
+	.gym .edit-user {
 		left: 0;
 	}
 }
 
 /* Menus bulles */
-.gym #menu,
-.gym #sous-menu {
+.gymWWW #menu,
+.gym-viewtopic .sous-menu {
 	padding: 0;
 	text-align: center;
 }
-.gym #menu li,
-.gym #sous-menu li {
+.gymWWW #menu li,
+.gym-viewtopic .sous-menu li {
 	display: inline-block;
 	margin: 0.2em;
 	padding: 0.3em;
 	border-radius: 2em;
 	font-weight: bold;
 }
-.gym #menu li a,
-.gym #sous-menu li a {
+.gymWWW #menu li a,
+.gym-viewtopic .sous-menu li a {
 	color: black;
 }
 
 /* Corps de la page */
-.gym #page {
+.gym .page {
 	margin: 0 calc(10% - 54px);
-	background: white !important;
+	border-radius: 0.2em;
+	background: white;
+}
+.gym .page > div {
+	margin: 0.3em;
+	padding: 0 0.2em 0.2em 0.2em;
+	text-indent: 1.5em;
 	text-align: justify;
 }
-.gym #page h1 {
-	clear: both;
+.gym h1 {
 	margin: 1.5em 0 0 0;
 	padding: 0.2em;
 	border-radius: 0.2em;
@@ -171,45 +415,49 @@ html.gym  {
 	color: white;
 	font-size: 1.3em;
 }
-.gym #page h1 a,
-.gym #page h1 i {
+.gym .page h1 a,
+.gym .page h1 i {
 	color: white;
 }
-.gym #page h2 {
+.gym .page h2 {
 	margin: 1.2em 0 0.2em 0;
 	padding: 0.2em;
 	border-radius: 0.2em;
 	background: #00B3B3;
 	color: white;
-	Wcolor: white !important;
 	font-size: 1.1em;
 }
-.gym #page h2 a {
+.gym .page h2 a {
 	color: white;
 }
-.gym #page h3 {
+.gym .page h3 {
 	margin: 0.5em 0 0 0;
 	color: #2727F2;
 }
-.gym #page h4 {
+.gym .page h4 {
 	margin: 0.5em 0 0 0;
 	color: #296666;
 }
-.gym #page p {
+.gymWWW .page p {
 	margin: 0;
 }
-.gym #page .codebox p {
+.gymWWW .page .codebox p {
 	display: none;
 }
-.gym #page .codebox pre {
+.gymWWW .page .codebox pre {
 	margin: 0;
 }
-.gym #page ul {
+.gymWWW .page ul {
 	margin: 0;
 	list-style-type: square;
 }
 @media (max-width: 600px) {
-	.gym #page {
+	.gym .page {
+		margin: 0;
+	}
+}
+@media (max-width: 600px) {
+	.gymWWW .page {
 		margin: 0 1%;
 	}
 }
@@ -223,8 +471,6 @@ html.gym  {
 	width: initial;
 	max-width: 30vh;
 }
-
-/* Images incluses dans le texte */
 .gym .file {
 	margin: 0;
 }
@@ -239,15 +485,13 @@ html.gym  {
 	float: right;
 	margin-left: 1em;
 }
-.gym .image-droite,
-.gym .image-droite .inline-attachment {
-	float: right !important;
-	margin-left: 1em !important;
+.gym .image-droite {
+	float: right;
+	margin-left: 0.5em;
 }
-.gym .image-gauche,
-.gym .image-gauche .inline-attachment {
-	float: left !important;
-	margin-right: 1em !important;
+.gym .image-gauche {
+	float: left;
+	margin-left: 0.5em;
 }
 @media (max-width: 600px) {
 	.gym .attach-image {
@@ -256,14 +500,14 @@ html.gym  {
 }
 
 /* BBCodes spéciaux */
-.gym .carte {
+.gymWWW .carte {
 	clear: both;
 	margin: 1em calc(50% - 250px);
 	width: 500px;
 	height: 375px;
 }
 @media (max-width: 600px) {
-	.gym .carte {
+	.gymWWW .carte {
 		margin: 0;
 		width: 100%;
 		height: 70vw;

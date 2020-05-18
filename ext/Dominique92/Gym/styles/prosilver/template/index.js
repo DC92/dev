@@ -10,6 +10,41 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 	};
 }
 
+// Scrool to the top at load (for sticky menu)
+/*//TODO DELETE
+window.onbeforeunload = function() {
+	window.scrollTo(0, 0);
+};*/
+
+// Sous-menus déroulants flotants
+function submenuPos() {
+	$('.submenu').each(function(index, el) {
+		const ww = $(window).width(),
+			elw = $(el).width(),
+			pp = $(el).parent().position();
+		$(el).css({
+			top: pp.top,
+			left: Math.min(pp.left, ww - elw)
+		});
+	});
+}
+submenuPos();
+$(window).on('resize', submenuPos);
+
+// Slideshow
+setInterval(function() {
+	$('.slideshow ul').animate({
+			marginLeft: -400,
+		},
+		800,
+		function() {
+			$(this).css({
+				marginLeft: 0,
+			}).find('li:last').after($(this).find('li:first'));
+		}
+	);
+}, 5000);
+
 // BBCode ajout d'une carte
 $('.carte').each(function(index, elCarte) {
 	if (elCarte.innerText) {
@@ -60,7 +95,7 @@ $('.calendrier').each(function(index, elCal) {
 	}
 
 	// Ajoute une case aux mois n'ayant que 4 jours de ce type
-	$('.calendrier tr').each(function(index) {
+	$('.calendrier tr').each(function() {
 		if ($(this).children().length < 6)
 			$('<td>').appendTo($(this));
 	});

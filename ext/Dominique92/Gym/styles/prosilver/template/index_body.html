@@ -1,47 +1,132 @@
 <!-- INCLUDE header.html -->
 
-<!-- BEGIN acceuil -->
-	<!-- BEGIN item -->
-		<!-- IF item.ACCUEIL -->
-		<h2>
-			<a class="no-hilight" title="... plus d'infos sur {item.NOM}" href="viewtopic.php?p={item.POST_ID}">{item.NOM}</a>
-			<!-- IF U_MCP -->
-				<a href="posting.php?mode=edit&f={item.FORUM_ID}&p={item.POST_ID}"
-					title="Modifier la page {item.NOM}" class="button button-icon-only">
-					<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
-				</a>
-			<!-- ENDIF -->
-		</h2>
-			{item.ACCUEIL}
-			. . . <a title="Afficher la page {item.NOM}" href="viewtopic.php?p={item.POST_ID}">plus d'infos</a>
-		<!-- ENDIF -->
-	<!-- END item -->
-<!-- END acceuil -->
-
-<!-- IF .evenements -->
-	<h1>
-		Évenements
-		<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
-			<i class="icon fa-commenting-o fa-fw" aria-hidden="true"></i>
+<!-- Connexion -->
+<div class="edit-user">
+	<!-- IF S_USER_LOGGED_IN -->
+		<a href="ucp.php?i=ucp_profile&mode=reg_details">{S_USERNAME}</a>
+		<ul><li>
+				<a href="ucp.php?i=ucp_profile&mode=reg_details">{L_PROFILE}</a>
+			</li><li>
+				<a href="viewtopic.php?p=93">Mode d'emploi</a>
+			</li><li>
+				<a href="viewforum.php?f=2">Rubriques</a>
+			</li><li>
+				<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
+		</li></ul>
+	<!-- ELSE -->
+		<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
+			<i class="icon fa-pencil"></i>
 		</a>
-	</h1>
-	<!-- BEGIN evenements -->
-		<!-- IF evenements.DATE -->
-			<h2 style="clear:both">
-				{evenements.DATE}: <a href="viewtopic.php?p={evenements.POST_ID}">{evenements.NOM}</a>
+	<!-- ENDIF -->
+</div>
+
+<div class="titre">
+	<h1>Chavil'GYM<span> volontaire<span></h1>
+</div>
+
+<!-- Recherche -->
+<form action="{U_SEARCH}" method="get" class="recherche">
+	<fieldset>
+		<input name="keywords" id="keywords" type="search" maxlength="128" title="{L_SEARCH_KEYWORDS}"
+			class="inputbox search tiny" size="20" value="{SEARCH_WORDS}" placeholder="{L_SEARCH_MINI}" />
+		<button class="button button-search" type="submit" title="{L_SEARCH}">
+			<i class="icon fa-search"></i><span class="sr-only">{L_SEARCH}</span>
+		</button>
+		{S_SEARCH_HIDDEN_FIELDS}
+	</fieldset>
+</form>
+
+<ul class="menu">
+	<!-- BEGIN posts -->
+	<!-- IF posts.FIRST_GYM_MENU == 'on' -->
+	<li style="background:{posts.COULEUR}">
+		<a href="viewtopic.php?t={posts.TOPIC_ID}"
+			 title = "Voir la fiche {posts.TOPIC_TITLE}"
+		>
+			{posts.TOPIC_TITLE}
+		</a>
+
+		<!-- IF posts.COUNT > 1 -->
+		<ul style="background:{posts.COULEUR}" class="submenu">
+			<!-- BEGIN item -->
+			<!-- IF item.GYM_MENU == 'on' -->
+				<li>
+					<a title = "Voir la fiche {item.POST_SUBJECT}" href=
+						<!-- IF item.TOPIC_FIRST_POST_ID == item.POST_ID -->
+						"viewtopic.php?t={posts.TOPIC_ID}"
+						<!-- ELSE -->
+							"viewtopic.php?p={item.POST_ID}"
+						<!-- ENDIF -->
+					>
+						{item.POST_SUBJECT}
+					</a>
+				</li>
+			<!-- ENDIF -->
+			<!-- END item -->
+		</ul>
+		<!-- ENDIF -->
+	</li>
+	<!-- ENDIF -->
+	<!-- END posts -->
+</ul>
+
+<div style="background:yellow;color:red;font-size:1.5vw;text-align:center">
+	CECI EST UN SITE DE TEST. Le VRAI site se trouve
+	<a href="http://chaville.gym.free.fr/"><b>ICI</b></a>
+</div><br/>
+
+<div class="intro">
+	<div class="slideshow">  
+		<ul>
+			<li><img src="slides/1.jpg" width="400" height="300" /></li>
+			<li><img src="slides/2.jpg" width="400" height="300" /></li>
+			<li><img src="slides/3.jpg" width="400" height="300" /></li>
+			<li><img src="slides/4.jpg" width="400" height="300" /></li>
+			<li><img src="slides/5.jpg" width="400" height="300" /></li>
+			<li><img src="slides/6.jpg" width="400" height="300" /></li>
+			<li><img src="slides/7.jpg" width="400" height="300" /></li>
+		</ul>  
+	</div>
+
+	<!-- BEGIN posts -->
+		<!-- BEGIN item -->
+		<!-- IF item.ACCUEIL -->
+			<p>
 				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&f={evenements.FORUM_ID}&p={evenements.POST_ID}"
-						title="Modifier l'évènement {evenements.NOM}" class="button button-icon-only">
-						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
+					<a style="float:right"
+						href="posting.php?mode=edit&f=2&p={item.POST_ID}"
+						title="Modifier la page {item.POST_SUBJECT}">
+						<i class="icon fa-pencil"></i>
 					</a>
 				<!-- ENDIF -->
-			</h2>
-			{evenements.LIEU} à {evenements.HORAIRE_DEBUT}<!-- IF evenements.ANIMATEUR --> avec {evenements.ANIMATEUR}<!-- ENDIF -->
-			{evenements.RESUME}
-			. . . <a href="viewtopic.php?p={evenements.POST_ID}">plus d'infos</a>
-			<br/>
+				{item.ACCUEIL}
+			</p>
 		<!-- ENDIF -->
-	<!-- END evenements -->
+		<!-- END item -->
+	<!-- END posts -->
+</div>
+
+<h1>Actualité</h1>
+<!-- BEGIN posts -->
+<!-- IF posts.NEXT_BEG_TIME and posts.GYM_EVENEMENTS == 'on' -->
+<div class="evenement">
+	<h2>
+		{posts.DATE}: <a href="viewtopic.php?p={posts.POST_ID}">{posts.NOM}</a>
+		<!-- IF U_MCP -->
+			<a href="posting.php?mode=edit&f={posts.FORUM_ID}&p={posts.POST_ID}"
+				title="Modifier l'évènement {posts.NOM}" class="button button-icon-only">
+				<i class="icon fa-pencil"></i>
+			</a>
+		<!-- ENDIF -->
+	</h2>
+
+	<div>
+		{posts.LIEU} à {posts.HORAIRE_DEBUT}
+		<!-- IF posts.ANIMATEUR --> avec {posts.ANIMATEUR}<!-- ENDIF -->
+		<p>{posts.RESUME}</p>
+	</div>
+</div>
 <!-- ENDIF -->
+<!-- END posts -->
 
 <!-- INCLUDE footer.html -->
