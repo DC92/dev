@@ -55,6 +55,7 @@ MESSAGES / BBCodes / cocher afficher
 	[titre2]{TEXT}[/titre2] / <h2>{TEXT}</h2> / Caractères noirs sur fond vert
 	[titre3]{TEXT}[/titre3] / <h3>{TEXT}</h3>
 	[titre4]{TEXT}[/titre4] / <h4>{TEXT}</h4>
+	[urlb={TEXT1}]{TEXT2}[/urlb] / <a target="_BLANK" href="{TEXT1}">{TEXT2}</a> / Lien à afficher sur un nouvel onglet
 */
 
 namespace Dominique92\Gym\event;

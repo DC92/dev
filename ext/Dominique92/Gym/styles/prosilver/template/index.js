@@ -10,27 +10,6 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 	};
 }
 
-// Scrool to the top at load (for sticky menu)
-/*//TODO DELETE
-window.onbeforeunload = function() {
-	window.scrollTo(0, 0);
-};*/
-
-// Sous-menus déroulants flotants
-function submenuPos() {
-	$('.submenu').each(function(index, el) {
-		const ww = $(window).width(),
-			elw = $(el).width(),
-			pp = $(el).parent().position();
-		$(el).css({
-			top: pp.top,
-			left: Math.min(pp.left, ww - elw)
-		});
-	});
-}
-submenuPos();
-$(window).on('resize', submenuPos);
-
 // Slideshow
 setInterval(function() {
 	$('.slideshow ul').animate({

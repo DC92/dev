@@ -3,6 +3,12 @@ pre {
 	text-align: left;
 }
 
+/*
+Charte
+Bleu 5826F4
+Cyan 08BABE
+*/
+
 /* Ménage phpBB */
 .site_logo { /* Logo phpBB */
 	background-size: 48px !important;
@@ -49,6 +55,89 @@ body {
 	font-family: arial, sans-serif;
 }
 
+/* Banniere */
+.gym .banniere {
+	padding: 0.5em;
+	text-align: center;
+	background: #5826F4;
+	font-size: 1.3em;
+	color: white;
+}
+.gym .breadcrumb div {
+	display: inline-block;
+	margin: 0;
+	font-weight: bold;
+}
+.gym .breadcrumb div:first-child > a {
+	font-size: 1.5em;
+}
+.gym .breadcrumb a {
+	color: white;
+	text-decoration: none;
+}
+.gym .breadcrumb ul {
+	display: none;
+	position: absolute;
+	top: 2.2em;
+	margin: 0 -0.2em;
+	padding: 0 0.2em 0.2em 0.2em;
+	background: #5826F4;
+	text-align: left;
+}
+.gym .breadcrumb div:hover ul {
+	display: block;
+}
+.gym .breadcrumb li {
+	list-style-type: none;
+	font-weight: initial;
+}
+
+/* User connexion */
+.gym .edit-user {
+	float: left;
+}
+.gym .edit-user > a {
+	color: white;
+	text-decoration: none;
+}
+.gym .edit-user ul {
+	display: none;
+	position: absolute;
+	left: calc(45px + 3vw);
+	margin: 0;
+	padding: 0.3em;
+	background: white;
+	list-style-type: none;
+}
+.gym .edit-user:hover ul {
+	display: block;
+}
+@media (max-width: 600px) {
+	.gym .banniere .site-name span,
+	.gym .edit-user {
+		display: none;
+	}
+}
+
+/* Search box */
+.gym form.recherche {
+	float: right;
+}
+.gym .recherche fieldset {
+	padding: 0;
+}
+.gym .recherche input {
+	display: none;
+}
+.gym .recherche:hover input {
+	display: inline-block;
+}
+.gym .recherche .button-search {
+	padding: 0;
+}
+
+/******************** VALIDE ********************/
+
 /* Pages GV */
 .gym .logo img {
 	width: calc(45px + 3vw);
@@ -66,7 +155,7 @@ body {
 	display: inline;
 	padding: 0.3em 1em;
 	border-radius: 2em;
-	background: #2727F2;
+	background: #5826F4;
 	font-size: 1.4em;
 }
 .gym-viewtopic .titre h1 {
@@ -215,14 +304,14 @@ body {
 .gym .menu > li > span,
 .gym .menu > li > a,
 .gym .menu li ul li:first-child span,
-.gym .menu > li > a,
-.gym .menu li ul li:first-child a {
+.gym .menu > li > a {
 	font-weight: bold;
 }
 .gym .menu li ul {
 	position: absolute;
 	border-radius: 1em;
 	padding: 0.3em;
+	margin-left: -0.4em;
 	display: none;
 }
 .gym .menu li:hover ul {
@@ -250,7 +339,7 @@ body {
 }
 /*
 #wnewmenu > li:first-child label {
-	background: #2727F2;
+	background: #5826F4;
 	padding: 0.3em 1em;
 }
 #wnewmenu > li:first-child a {
@@ -313,69 +402,6 @@ body {
 	font-size: 0.7em;
 }
 
-/* Search box */
-.gym form.recherche {
-	position: absolute;
-	top: 1em;
-	right: 1em;
-	wmargin-top: calc(0.9em - 10px);
-	xfloat: right;
-}
-.gym .recherche fieldset {
-	padding: 0;
-}
-.gym .recherche input {
-	display: none;
-}
-.gym .recherche:hover input {
-	display: inline-block;
-}
-.gym .recherche .button-search {
-	padding: 0;
-}
-
-/* User connexion box */
-.gym .edit-user {
-	position: absolute;
-	top: 0.4em;
-	left: calc(45px + 3vw);
-	color: white;
-	white-space: nowrap;
-}
-.gym .edit-user > a {
-	color: white;
-	text-decoration: none;
-}
-.gym .edit-user i {
-	color: white;
-}
-.gym .edit-user ul {
-	display: none;
-	position: absolute;
-	left: 0;
-	margin: 0;
-	padding: 0.3em;
-	background: white;
-	list-style-type: none;
-}
-.gym .edit-user li {
-	padding: 0.1em;
-}
-.gym .edit-user ul i {
-	display: none;
-}
-.gym .edit-user:hover ul {
-	display: block;
-}
-.gym .edit-user a:hover {
-	font-weight: bold;
-}
-@media (max-width: 600px) {
-	.gym .edit-user {
-		left: 0;
-	}
-}
-
 /* Menus bulles */
 .gymWWW #menu,
 .gym-viewtopic .sous-menu {
@@ -411,7 +437,7 @@ body {
 	margin: 1.5em 0 0 0;
 	padding: 0.2em;
 	border-radius: 0.2em;
-	background: #2727F2;
+	background: #5826F4;
 	color: white;
 	font-size: 1.3em;
 }
@@ -432,7 +458,7 @@ body {
 }
 .gym .page h3 {
 	margin: 0.5em 0 0 0;
-	color: #2727F2;
+	color: #5826F4;
 }
 .gym .page h4 {
 	margin: 0.5em 0 0 0;
