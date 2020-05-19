@@ -39,7 +39,7 @@
 					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
 			</li></ul>
 		<!-- ELSE -->
-			<a id="edit-page" href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
+			<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
 				<i class="icon fa-pencil"></i>
 			</a>
 		<!-- ENDIF -->
@@ -56,18 +56,22 @@
 		</fieldset>
 	</form>
 
-	<div class="breadcrumb">
+	<h1>
+		<a title="Retour à l'accueil" href=".">
+			{SITENAME}<span> {SITE_DESCRIPTION}</span>
+		</a>
+	</h1>
+</div>
+
+<!-- IF SCRIPT_NAME == 'viewtopic' -->
+	<ul class="breadcrumb">
 		<!--** TITRE **-->
-		<div>
+		<li>
 			<a title="Retour à l'accueil" href=".">
-				{SITENAME}
-				<!-- IF SCRIPT_NAME == 'index' -->
-					<span>{SITE_DESCRIPTION}</span>
-				<!-- ENDIF -->
+				Accueil
 			</a>
 
 			<!-- SOUS MENU DU TITRE -->
-			<!-- IF SCRIPT_NAME == 'viewtopic' -->
 			<ul>
 				<!-- BEGIN posts -->
 				<!-- IF posts.FIRST_GYM_MENU == 'on' -->
@@ -79,15 +83,14 @@
 				<!-- ENDIF -->
 				<!-- END posts -->
 			</ul>
-			<!-- ENDIF -->
-		</div>
+		</li>
 
 		<!-- BEGIN posts -->
 		<!-- IF posts.FIRST_GYM_MENU == 'on' and posts.TOPIC_ID == REQUEST_T -->
 			<!-- Séparateur -->
 			<i class="icon fa-arrow-right"></i>
 
-			<div>
+			<li>
 				<!--** RUBRIQUE **-->
 				{posts.TOPIC_TITLE}
 
@@ -105,11 +108,11 @@
 					<!-- END item -->
 				</ul>
 				<!-- ENDIF -->
-			</div>
+			</li>
 		<!-- ENDIF -->
 		<!-- END posts -->
-	</div>
-</div>
+	</ul>
+<!-- ENDIF -->
 
 <div style="background:yellow;color:red;font-size:1.5vw;text-align:center;margin-top:1em">
 	CECI EST UN SITE DE TEST. Le VRAI site se trouve

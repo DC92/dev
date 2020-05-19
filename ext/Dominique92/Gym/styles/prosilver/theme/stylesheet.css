@@ -56,45 +56,10 @@ body {
 }
 
 /* Banniere */
-.gym .banniere {
-	padding: 0.5em;
-	text-align: center;
-	background: #5826F4;
-	font-size: 1.3em;
-	color: white;
-}
-.gym .breadcrumb div {
-	display: inline-block;
-	margin: 0;
-	font-weight: bold;
-}
-.gym .breadcrumb div:first-child > a {
-	font-size: 1.5em;
-}
-.gym .breadcrumb a {
-	color: white;
-	text-decoration: none;
-}
-.gym .breadcrumb ul {
-	display: none;
-	position: absolute;
-	top: 2.2em;
-	margin: 0 -0.2em;
-	padding: 0 0.2em 0.2em 0.2em;
-	background: #5826F4;
-	text-align: left;
-}
-.gym .breadcrumb div:hover ul {
-	display: block;
-}
-.gym .breadcrumb li {
-	list-style-type: none;
-	font-weight: initial;
-}
-
 /* User connexion */
 .gym .edit-user {
 	float: left;
+	padding-top: 1em;
 }
 .gym .edit-user > a {
 	color: white;
@@ -113,15 +78,34 @@ body {
 	display: block;
 }
 @media (max-width: 600px) {
-	.gym .banniere .site-name span,
 	.gym .edit-user {
 		display: none;
 	}
 }
-
+@media (max-width: 400px) {
+	.gym .banniere h1 span {
+		display: none;
+	}
+}
+/* Titre */
+.gym .banniere {
+	text-align: center;
+	background: #5826F4;
+}
+.gym div.banniere h1 {
+	margin: 0;
+	padding: 0.6em;
+	display: inline-block;
+}
+.gym .banniere h1 a {
+	font-size: 1.5em;
+	color: white;
+	text-decoration: none;
+}
 /* Search box */
 .gym form.recherche {
 	float: right;
+	padding-top: 1em;
 }
 .gym .recherche fieldset {
 	padding: 0;
@@ -134,6 +118,34 @@ body {
 }
 .gym .recherche .button-search {
 	padding: 0;
+}
+/* Breadcrumb */
+.gym ul.breadcrumb {
+    position: relative;
+    top: -0.9em;
+	margin: 0;
+	padding: 0;
+}
+.gym ul.breadcrumb > li {
+	display: inline-block;
+	padding: 0.3em;
+	border-radius: 1em;
+	background: #2EE2E5;
+}
+.gym ul.breadcrumb li ul {
+	display: none;
+	position: absolute;
+	margin: 0 -0.2em;
+	padding: 0.2em;
+	border-radius: 1em;
+	background: #2EE2E5;
+	list-style-type: none;
+}
+.gym .breadcrumb a {
+	color: black;
+}
+.gym .breadcrumb li:hover ul {
+	display: block;
 }
 
 /******************** VALIDE ********************/
@@ -194,7 +206,7 @@ body {
 }
 
 /* Evenements */
-.gym-index h1 {
+.gym-index .evenement h1 {
 	margin: 1em calc(10% - 54px) !important;
 }
 .gym-index .evenement {
@@ -392,7 +404,7 @@ body {
 		background-image: none;
 	}
 	.gymWWW .logo,
-	.gym .recherche {
+	.wwwgym .recherche {
 		display: none;
 	}
 }
