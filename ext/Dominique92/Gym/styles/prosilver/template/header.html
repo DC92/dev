@@ -20,7 +20,7 @@
 </head>
 
 <body class="gym gym-{SCRIPT_NAME}">
-	<!--** LOGO FÉDÉ **-->
+	<!-- LOGO FÉDÉ -->
 	<a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/" target="_BLANK">
 		<img alt="EPGV" src="{EXT_PATH}{T_THEME_PATH}/images/logo.png">
 	</a>
@@ -63,56 +63,86 @@
 	</h1>
 </div>
 
-<!-- IF SCRIPT_NAME == 'viewtopic' -->
-	<ul class="breadcrumb">
-		<!--** TITRE **-->
-		<li>
-			<a title="Retour à l'accueil" href=".">
-				Accueil
-			</a>
+<ul class="breadcrumb">
+	<!-- ACCUEIL -->
+	<li>
+		<a title="Retour à l'accueil" href=".">
+			Accueil
+		</a>
 
-			<!-- SOUS MENU DU TITRE -->
-			<ul>
-				<!-- BEGIN posts -->
-				<!-- IF posts.FIRST_GYM_MENU == 'on' -->
-				<li>
+		<!-- SOUS MENU DU TITRE -->
+		<ul>
+			<!-- BEGIN posts -->
+			<!-- IF posts.FIRST_GYM_MENU == 'on' -->
+			<li>
+			<a title="Voir la fiche {posts.TOPIC_TITLE}" href="viewtopic.php?t={posts.TOPIC_ID}">
+				{posts.TOPIC_TITLE}
+			</a>
+			</li>
+			<!-- ENDIF -->
+			<!-- END posts -->
+		</ul>
+	</li>
+
+	<!-- ACTIVITE -->
+	<!-- BEGIN posts -->
+	<!-- BEGIN item -->
+	<!-- IF item.POST_ID == GYM_ACTIVITE -->
+		<i class="icon fa-arrow-right"></i>
+		<li>
+			<a title="Voir la fiche {posts.TOPIC_TITLE}" href="viewtopic.php?t={posts.TOPIC_ID}">
+				{posts.TOPIC_TITLE}
+			</a>
+		</li>
+		<i class="icon fa-arrow-right"></i>
+		<li>
+			<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
+				{item.POST_SUBJECT}
+			</a>
+		</li>
+	<!-- ENDIF -->
+	<!-- END item -->
+	<!-- END posts -->
+
+	<!-- RUBRIQUE -->
+	<!-- BEGIN posts -->
+	<!-- IF posts.FIRST_GYM_MENU == 'on' and posts.TOPIC_ID == REQUEST_T -->
+		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
+		<li>
+			<!-- RUBRIQUE -->
+			<!-- IF not REQUEST_P -->
+				{posts.TOPIC_TITLE}
+			<!-- ELSE -->
 				<a title="Voir la fiche {posts.TOPIC_TITLE}" href="viewtopic.php?t={posts.TOPIC_ID}">
 					{posts.TOPIC_TITLE}
 				</a>
+			<!-- ENDIF -->
+
+			<!-- SOUS MENU DE LA RUBRIQUE -->
+			<!-- IF posts.COUNT > 1 -->
+			<ul>
+				<!-- BEGIN item -->
+				<!-- IF item.GYM_MENU == 'on' and item.TOPIC_FIRST_POST_ID != item.POST_ID -->
+				<li>
+				<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
+					{item.POST_SUBJECT}
+				</a>
 				</li>
 				<!-- ENDIF -->
-				<!-- END posts -->
+				<!-- END item -->
 			</ul>
+			<!-- ENDIF -->
 		</li>
+	<!-- ENDIF -->
+	<!-- END posts -->
 
-		<!-- BEGIN posts -->
-		<!-- IF posts.FIRST_GYM_MENU == 'on' and posts.TOPIC_ID == REQUEST_T -->
-			<!-- Séparateur -->
-			<i class="icon fa-arrow-right"></i>
-
-			<li>
-				<!--** RUBRIQUE **-->
-				{posts.TOPIC_TITLE}
-
-				<!--** SOUS MENU DE LA RUBRIQUE **-->
-				<!-- IF posts.COUNT > 1 -->
-				<ul>
-					<!-- BEGIN item -->
-					<!-- IF item.GYM_MENU == 'on' and item.TOPIC_FIRST_POST_ID != item.POST_ID -->
-					<li>
-					<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
-						{item.POST_SUBJECT}
-					</a>
-					</li>
-					<!-- ENDIF -->
-					<!-- END item -->
-				</ul>
-				<!-- ENDIF -->
-			</li>
-		<!-- ENDIF -->
-		<!-- END posts -->
-	</ul>
-<!-- ENDIF -->
+	<!-- BEGIN postrow -->
+	<!-- IF postrow.POST_ID == REQUEST_P -->
+		<i class="icon fa-arrow-right"></i>
+		<li>{postrow.POST_SUBJECT}</li>
+	<!-- ENDIF -->
+	<!-- END postrow -->
+</ul>
 
 <div style="background:yellow;color:red;font-size:1.5vw;text-align:center;margin-top:1em">
 	CECI EST UN SITE DE TEST. Le VRAI site se trouve

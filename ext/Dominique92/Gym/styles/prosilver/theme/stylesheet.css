@@ -73,6 +73,7 @@ body {
 	padding: 0.3em;
 	background: white;
 	list-style-type: none;
+	z-index: 10;
 }
 .gym .edit-user:hover ul {
 	display: block;
@@ -125,12 +126,13 @@ body {
     top: -0.9em;
 	margin: 0;
 	padding: 0;
+	color: white;
 }
 .gym ul.breadcrumb > li {
 	display: inline-block;
 	padding: 0.3em;
 	border-radius: 1em;
-	background: #2EE2E5;
+	background: #08BABE;
 }
 .gym ul.breadcrumb li ul {
 	display: none;
@@ -138,11 +140,11 @@ body {
 	margin: 0 -0.2em;
 	padding: 0.2em;
 	border-radius: 1em;
-	background: #2EE2E5;
+	background: #08BABE;
 	list-style-type: none;
 }
 .gym .breadcrumb a {
-	color: black;
+	color: white;
 }
 .gym .breadcrumb li:hover ul {
 	display: block;

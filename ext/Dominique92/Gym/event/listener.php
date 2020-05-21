@@ -135,10 +135,12 @@ $this->popule_posts();
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>DD = ".var_export(microtime(),true).'</pre>';
 
 		// Menu principal
+		/*
 		$this->liste_fiches ('menu', [
 	//TODO DCMM DELETE		'post.post_id=t.topic_first_post_id',
 			'post.gym_menu="on"',
 		],'gym_first_ordre_menu','gym_ordre_menu');
+		*/
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>ZZ = ".var_export(microtime(),true).'</pre>';
 	}
 
@@ -253,11 +255,13 @@ $this->popule_posts();
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
 	function viewtopic_modify_post_row($vars) {
-		$topic_data = $vars['topic_data'];
 		$post_row = $vars['post_row'];
-		$post_id = $vars['row']['post_id'];
+		$post_id = $post_row['POST_ID'];
 		$post_data = $this->all_post_data[$post_id] ?: [];
-		$post_activite = $vars['row']['post_activite'];
+		$topic_data = $vars['topic_data'];
+
+		if ($post_id == $this->request->variable('p', 0))
+			$this->template->assign_var ('GYM_ACTIVITE', $post_data['gym_activite']);
 
 		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
@@ -784,7 +788,7 @@ if($row['date'])
 		}
 		$this->db->sql_freeresult($result);
 
-		$topic = $this->request->variable('t', '');
+		$topic = $this->request->variable('t', 0);
 		if ($liste) {
 			ksort ($liste);
 			foreach ($liste AS $v) { // Tri du 1er niveau
