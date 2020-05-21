@@ -7,6 +7,10 @@
  */
 
 /*
+TODO revoir les couleurs
+TODO résulé d'un cours -> dans l'activité
+TODO détal des activites dans le sous-menu breadcum
+BUG Texte recouvre imame dans Paul Bert
 enlever [accueil]
 class html fonction de script/t&p
 
@@ -428,6 +432,7 @@ $this->popule_posts();
 
 	// Popule les templates horaires, calendrier
 	//TODO DELETE
+	//TODO reprendre le corps de popule_posts
 	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
 		$this->verify_column(POSTS_TABLE, [
 			'gym_activite',
@@ -804,6 +809,7 @@ if($row['date'])
 */
 				$first['COUNT'] = count ($v);
 
+//TODO posts -> topic / items -> post
 				$this->template->assign_block_vars ('posts', $first);
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export(array_keys ($v),true).'</pre>';
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($first,true).'</pre>';
