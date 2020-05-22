@@ -72,69 +72,93 @@
 
 		<!-- SOUS MENU DU TITRE -->
 		<ul>
-			<!-- BEGIN posts -->
-			<!-- IF posts.FIRST_GYM_MENU == 'on' -->
+			<!-- BEGIN topic -->
+			<!-- IF topic.FIRST_GYM_MENU == 'on' -->
 			<li>
-			<a title="Voir la fiche {posts.TOPIC_TITLE}" href="viewtopic.php?t={posts.TOPIC_ID}">
-				{posts.TOPIC_TITLE}
-			</a>
+				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
+					{topic.TOPIC_TITLE}
+				</a>
 			</li>
 			<!-- ENDIF -->
-			<!-- END posts -->
+			<!-- END topic -->
 		</ul>
 	</li>
 
-	<!-- ACTIVITE -->
-	<!-- BEGIN posts -->
-	<!-- BEGIN item -->
-	<!-- IF item.POST_ID == GYM_ACTIVITE -->
-		<i class="icon fa-arrow-right"></i>
-		<li>
-			<a title="Voir la fiche {posts.TOPIC_TITLE}" href="viewtopic.php?t={posts.TOPIC_ID}">
-				{posts.TOPIC_TITLE}
-			</a>
-		</li>
-		<i class="icon fa-arrow-right"></i>
-		<li>
-			<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
-				{item.POST_SUBJECT}
-			</a>
-		</li>
-	<!-- ENDIF -->
-	<!-- END item -->
-	<!-- END posts -->
-
-	<!-- RUBRIQUE -->
-	<!-- BEGIN posts -->
-	<!-- IF posts.FIRST_GYM_MENU == 'on' and posts.TOPIC_ID == REQUEST_T -->
+	<!-- ACTIVITES -->
+	<!-- BEGIN topic -->
+	<!-- IF GYM_ACTIVITE != 'off' and topic.TOPIC_ID == 2 -->
 		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
 		<li>
 			<!-- RUBRIQUE -->
 			<!-- IF not REQUEST_P -->
-				{posts.TOPIC_TITLE}
+				{topic.TOPIC_TITLE}
 			<!-- ELSE -->
-				<a title="Voir la fiche {posts.TOPIC_TITLE}" href="viewtopic.php?t={posts.TOPIC_ID}">
-					{posts.TOPIC_TITLE}
+				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
+					{topic.TOPIC_TITLE}
 				</a>
 			<!-- ENDIF -->
 
 			<!-- SOUS MENU DE LA RUBRIQUE -->
-			<!-- IF posts.COUNT > 1 -->
 			<ul>
-				<!-- BEGIN item -->
-				<!-- IF item.GYM_MENU == 'on' and item.TOPIC_FIRST_POST_ID != item.POST_ID -->
+				<!-- BEGIN post -->
+				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
 				<li>
-				<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
-					{item.POST_SUBJECT}
-				</a>
+					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+						{post.POST_SUBJECT}
+					</a>
 				</li>
 				<!-- ENDIF -->
-				<!-- END item -->
+				<!-- END post -->
+			</ul>
+		</li>
+	<!-- ENDIF -->
+	<!-- END topic -->
+
+	<!-- ACTIVITE -->
+	<!-- BEGIN topic -->
+	<!-- BEGIN post -->
+	<!-- IF GYM_ACTIVITE != 'off' and post.POST_ID == GYM_ACTIVITE -->
+		<i class="icon fa-arrow-right"></i>
+		<li>
+			<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+			{post.POST_SUBJECT}
+			</a>
+		</li>
+	<!-- ENDIF -->
+	<!-- END post -->
+	<!-- END topic -->
+
+	<!-- RUBRIQUE -->
+	<!-- BEGIN topic -->
+	<!-- IF topic.FIRST_GYM_MENU == 'on' and topic.TOPIC_ID == REQUEST_T -->
+		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
+		<li>
+			<!-- RUBRIQUE -->
+			<!-- IF not REQUEST_P -->
+				{topic.TOPIC_TITLE}
+			<!-- ELSE -->
+				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
+					{topic.TOPIC_TITLE}
+				</a>
+			<!-- ENDIF -->
+
+			<!-- SOUS MENU DE LA RUBRIQUE -->
+			<!-- IF topic.COUNT > 1 -->
+			<ul>
+				<!-- BEGIN post -->
+				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<li>
+					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+						{post.POST_SUBJECT}
+					</a>
+				</li>
+				<!-- ENDIF -->
+				<!-- END post -->
 			</ul>
 			<!-- ENDIF -->
 		</li>
 	<!-- ENDIF -->
-	<!-- END posts -->
+	<!-- END topic -->
 
 	<!-- BEGIN postrow -->
 	<!-- IF postrow.POST_ID == REQUEST_P -->

@@ -1,29 +1,35 @@
 <!-- INCLUDE header.html -->
 
 <ul class="menu">
-	<!-- BEGIN posts -->
-	<!-- IF posts.FIRST_GYM_MENU == 'on' -->
-	<li style="background:{posts.COULEUR}">
-		<a href="viewtopic.php?t={posts.TOPIC_ID}" title = "Voir la fiche {posts.TOPIC_TITLE}">
-			{posts.TOPIC_TITLE}
+	<!-- BEGIN topic -->
+	<!-- IF topic.FIRST_GYM_MENU == 'on' -->
+	<li style="background:{topic.COULEUR}">
+		<a href="viewtopic.php?t={topic.TOPIC_ID}" title = "Voir la fiche {topic.TOPIC_TITLE}">
+			{topic.TOPIC_TITLE}
 		</a>
 
-		<!-- IF posts.COUNT > 1 -->
-		<ul style="background:{posts.COULEUR}" class="submenu">
-			<!-- BEGIN item -->
-			<!-- IF item.GYM_MENU == 'on' and item.TOPIC_FIRST_POST_ID != item.POST_ID -->
+		<!-- IF topic.COUNT > 1 -->
+		<ul style="background:{topic.COULEUR}" class="submenu">
+			<!-- BEGIN post -->
+			<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
 				<li>
-				<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
-					{item.POST_SUBJECT}
+				<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+					{post.POST_SUBJECT}
 				</a>
 				</li>
 			<!-- ENDIF -->
-			<!-- END item -->
+			<!-- END post -->
 		</ul>
 		<!-- ENDIF -->
 	</li>
 	<!-- ENDIF -->
-	<!-- END posts -->
+	<!-- END topic -->
+
+	<li>
+		<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&f=2">
+			<i class="icon fa-commenting-o" aria-hidden="true"></i>
+		</a>
+	</li>
 </ul>
 
 <div class="intro">
@@ -40,47 +46,52 @@
 		</ul>  
 	</div>
 
-	<!-- BEGIN posts -->
-		<!-- BEGIN item -->
-		<!-- IF item.ACCUEIL -->
+	<!-- BEGIN topic -->
+		<!-- BEGIN post -->
+		<!-- IF post.ACCUEIL -->
 			<p>
 				<!-- IF U_MCP -->
 				<a style="float:right"
-					href="posting.php?mode=edit&f=2&p={item.POST_ID}"
-					title="Modifier la page {item.POST_SUBJECT}">
+					href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+					title="Modifier la page {post.POST_SUBJECT}">
 					<i class="icon fa-pencil"></i>
 				</a>
 				<!-- ENDIF -->
-				{item.ACCUEIL}
+				{post.ACCUEIL}
 			</p>
 		<!-- ENDIF -->
-		<!-- END item -->
-	<!-- END posts -->
+		<!-- END post -->
+	<!-- END topic -->
 </div>
 
-<h1>Actualité</h1>
-<!-- BEGIN posts -->
-<!-- IF posts.NEXT_BEG_TIME and posts.GYM_EVENEMENTS == 'on' -->
+<h1>
+	Actualité
+	<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
+		<i class="icon fa-commenting-o"></i>
+	</a>
+</h1>
+<!-- BEGIN topic -->
+<!-- IF topic.NEXT_BEG_TIME and topic.GYM_EVENEMENTS == 'on' -->
 <div class="evenement">
 	<h2>
-		{posts.DATE}: <a href="viewtopic.php?p={posts.POST_ID}">{posts.NOM}</a>
+		{topic.DATE}: <a href="viewtopic.php?p={topic.POST_ID}">{topic.NOM}</a>
 		<!-- IF U_MCP -->
-		<a href="posting.php?mode=edit&f={posts.FORUM_ID}&p={posts.POST_ID}"
-			title="Modifier l'évènement {posts.NOM}" class="button button-icon-only">
+		<a href="posting.php?mode=edit&f={topic.FORUM_ID}&p={topic.POST_ID}"
+			title="Modifier l'évènement {topic.NOM}" class="button button-icon-only">
 			<i class="icon fa-pencil"></i>
 		</a>
 		<!-- ENDIF -->
 	</h2>
 
 	<div>
-		{posts.LIEU} à {posts.HORAIRE_DEBUT}
-		<!-- IF posts.ANIMATEUR -->
-			avec {posts.ANIMATEUR}
+		{topic.LIEU} à {topic.HORAIRE_DEBUT}
+		<!-- IF topic.ANIMATEUR -->
+			avec {topic.ANIMATEUR}
 		<!-- ENDIF -->
-		<p>{posts.RESUME}</p>
+		<p>{topic.RESUME}</p>
 	</div>
 </div>
 <!-- ENDIF -->
-<!-- END posts -->
+<!-- END topic -->
 
 <!-- INCLUDE footer.html -->

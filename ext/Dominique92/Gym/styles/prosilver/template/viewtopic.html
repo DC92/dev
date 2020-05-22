@@ -18,22 +18,22 @@
 	<!-- END postrow -->
 
 	<!-- ACTIVITE -->
-	<!-- BEGIN posts -->
-	<!-- BEGIN item -->
-	<!-- IF item.POST_ID == GYM_ACTIVITE and  item.RESUME -->
+	<!-- BEGIN topic -->
+	<!-- BEGIN post -->
+	<!-- IF post.POST_ID == GYM_ACTIVITE and post.RESUME -->
 		<h2>
-			<a href="viewtopic.php?p={item.POST_ID}">{item.POST_SUBJECT}</a>
+			<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
 			<!-- IF (U_MCP or REQUEST_MOD) -->
-				<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
-					title="Modifier la page {item.POST_SUBJECT}" class="button button-icon-only">
+				<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+					title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
 					<i class="icon fa-pencil"></i>
 				</a>
 			<!-- ENDIF -->
 		</h2>
-		{item.RESUME}
+		{post.RESUME}
 	<!-- ENDIF -->
-	<!-- END item -->
-	<!-- END posts -->
+	<!-- END post -->
+	<!-- END topic -->
 
 	<!-- SUJET -->
 	<!-- BEGIN postrow -->
@@ -47,32 +47,46 @@
 					</a>
 				<!-- ENDIF -->
 			</h2>
-
-			<!-- IF not REQUEST_TEMPLATE -->
-				<div>{postrow.MESSAGE}</div>
-			<!-- ELSE IF postrow.RESUME -->
-				{postrow.RESUME}
-				. . . <a href="viewtopic.php?p={postrow.POST_ID}">plus d'infos</a>
-			<!-- ENDIF -->
+			<div>{postrow.MESSAGE}</div>
 		<!-- ENDIF -->
 	<!-- END postrow -->
+
+	<!-- BEGIN topic -->
+	<!-- BEGIN post -->
+	<!-- IF REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
+		<!-- IF (U_MCP or REQUEST_MOD) -->
+			<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+				title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
+				<i class="icon fa-pencil"></i>
+			</a>
+		<!-- ENDIF -->
+		{post.RESUME}
+	<!-- ENDIF -->
+	<!-- END post -->
+	<!-- END topic -->
 
 	<!-- SOUS-MENU DES RUBRIQUES -->
 	<!-- IF not REQUEST_P -->
 	<ul class="menu">
-		<!-- BEGIN posts -->
-		<!-- IF posts.FIRST_GYM_MENU == 'on' and posts.TOPIC_ID == REQUEST_T and posts.COUNT > 1 -->
-			<!-- BEGIN item -->
-			<!-- IF item.GYM_MENU == 'on' and item.TOPIC_FIRST_POST_ID != item.POST_ID -->
-				<li style="background:{item.COULEUR}">
-					<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
-						{item.POST_SUBJECT}
+		<!-- BEGIN topic -->
+		<!-- IF topic.FIRST_GYM_MENU == 'on' and topic.TOPIC_ID == REQUEST_T and topic.COUNT > 1 -->
+			<!-- BEGIN post -->
+				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<li style="background:{post.COULEUR}">
+					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+						{post.POST_SUBJECT}
 					</a>
 				</li>
 			<!-- ENDIF -->
-			<!-- END item -->
+			<!-- END post -->
+
+			<li>
+				<a title="Ajouter un ballon au sous-menu {topic.TOPIC_TITLE}" href="posting.php?mode=reply&f=2&t={topic.TOPIC_ID}">
+					<i class="icon fa-commenting-o" aria-hidden="true"></i>
+				</a>
+			</li>
 		<!-- ENDIF -->
-		<!-- END posts -->
+		<!-- END topic -->
 	</ul>
 	<!-- ENDIF -->
 </div>

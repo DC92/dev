@@ -15,50 +15,50 @@
 				background:{horaires.COULEUR_FOND};
 				border-color:{horaires.COULEUR_BORD};
 			">
-				<!-- BEGIN item -->
+				<!-- BEGIN post -->
 				<tr>
 					<!-- IF not REQUEST_ID -->
 					<td>
-						<a href="viewtopic.php?p={item.POST_ID}">
-							{item.NOM}
+						<a href="viewtopic.php?p={post.POST_ID}">
+							{post.NOM}
 						</a>
 
-						<!-- IF REQUEST_ACTIVITE and item.GYM_NOTA -->
-							<br>{item.GYM_NOTA}
+						<!-- IF REQUEST_ACTIVITE and post.GYM_NOTA -->
+							<br>{post.GYM_NOTA}
 						<!-- ENDIF -->
 					</td>
 					<!-- ENDIF -->
 
 					<td>
-						{item.HORAIRE_DEBUT} {item.HORAIRE_FIN}
+						{post.HORAIRE_DEBUT} {post.HORAIRE_FIN}
 					</td>
 
 					<!-- IF not REQUEST_LIEU -->
 					<td>
-						<a href="viewtopic.php?p={item.GYM_LIEU}">
-							{item.LIEU}
+						<a href="viewtopic.php?p={post.GYM_LIEU}">
+							{post.LIEU}
 						</a>
 					</td>
 					<!-- ENDIF -->
 
 					<!-- IF not REQUEST_ANIMATEUR -->
 					<td>
-						<a href="viewtopic.php?p={item.GYM_ANIMATEUR}">
-							{item.ANIMATEUR}
+						<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
+							{post.ANIMATEUR}
 						</a>
 					</td>
 					<!-- ENDIF -->
 
 					<!-- IF U_MCP or REQUEST_MOD -->
 					<td>
-						<a href="posting.php?mode=edit&f=2&p={item.POST_ID}"
+						<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 							title="Modifier cette séance" class="button button-icon-only">
 							<i class="icon fa-pencil"></i>
 						</a>
 					</td>
 					<!-- ENDIF -->
 				</tr>
-				<!-- END item -->
+				<!-- END post -->
 			</table>
 		</div>
 	<!-- END horaires -->

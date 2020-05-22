@@ -7,21 +7,21 @@
  */
 
 /*
-TODO revoir les couleurs
-TODO résulé d'un cours -> dans l'activité
-TODO détal des activites dans le sous-menu breadcum
-BUG Texte recouvre imame dans Paul Bert
-enlever [accueil]
-class html fonction de script/t&p
+TODO revoir templates horaire & calendrier
+TODO purger listener
+
+//APRES new template
+TODO résumé d'un cours -> dans l'activité => Update de la base
 
 //BEST
-Revoir les crayons / enlever ajouter un ballon au sous-menu
+BUG dans le template.html quand espace dans POST_SUBJECT
+	(INCLUDE ?template=horaires&activite={postrow.POST_SUBJECT})
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 Bouton imprimer calendier
 	style print
 Erradiquer f=2
-	Erradiquer template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
+Erradiquer template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 
 //APRES
 Sitemap
@@ -607,7 +607,7 @@ $this->popule_posts();
 				foreach ($v AS $vv) {// Tri du 2" niveau
 					ksort ($vv);
 					foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
-						$this->template->assign_block_vars("$assign.item", $vvv);
+						$this->template->assign_block_vars("$assign.post", $vvv);
 				}
 			}
 		}
@@ -801,18 +801,12 @@ if($row['date'])
 
 				// La première ligne pour avoir les valeurs générales
 				$first = array_values ($v)[0];
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($first['TOPIC_ID'],true).'</pre>';
 				$first['COULEUR'] = $this->couleur ();
 				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
-/*
-*/
 				$first['COUNT'] = count ($v);
 
-//TODO posts -> topic / items -> post
-				$this->template->assign_block_vars ('posts', $first);
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export(array_keys ($v),true).'</pre>';
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($first,true).'</pre>';
+				$this->template->assign_block_vars ('topic', $first);
 
 				foreach ($v AS $vv) { // Tri du 2" niveau
 					if ($topic){
@@ -820,7 +814,7 @@ if($row['date'])
 								$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 								$vv['COULEUR_BORD'] = $this->couleur (40, 196, 0);
 					}
-					$this->template->assign_block_vars ('posts.item', $vv);
+					$this->template->assign_block_vars ('topic.post', $vv);
 				}
 			}
 		}
