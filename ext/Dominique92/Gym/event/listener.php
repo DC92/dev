@@ -7,7 +7,7 @@
  */
 
 /*
-TODO revoir templates horaire & calendrier
+TODO revoir templates horaire
 TODO purger listener
 
 //APRES new template
@@ -223,8 +223,8 @@ $this->popule_posts();
 		], 'gym_jour','horaire_debut');
 
 		// Pour le calendrier
-		$this->liste_fiches ('calendrier', [
-		], 'gym_jour', 'post_id');
+//		$this->liste_fiches ('calendrier', [
+//		], 'gym_jour', 'post_id');
 	}
 
 	/**
@@ -743,53 +743,6 @@ $this->popule_posts();
 					$row['gym_ordre_menu'].$row['post_id']
 				]
 				= array_change_key_case ($row, CASE_UPPER);
-
-			// Tableau des semaines d'un calendrier
-			
-			
-
-			
-$row['display_text']='';			
-$row['post_text']='';			
-//if($row['date'])/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row['first_gym_ordre_menu'].$row['topic_id'].$row['gym_jour'].'==='.$row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id'],true).'</pre>';
-//if($row['date'])/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row,true).'</pre>';
-			if ($assign == 'calendrier') {
-				$semaines = explode (',', $row['gym_semaines']);
-				foreach ($static_values['semaines'] AS $s) {
-//					$r = $row;
-					$row['no'] = $s;
-					$row['gym_in_calendrier'] = in_array ($s, $semaines) ? 1 : 0;
-//TODO NE PAS AFFECTER A LISTE / chenger critrees de tri
-					$liste
-						[$row['first_gym_ordre_menu'].$row['topic_id'].$row['gym_jour']]
-						[$row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id'].$s]
-						= array_change_key_case ($row, CASE_UPPER);
-		//			$liste [$row['topic_id']] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
-				}
-			//TODO BUG il y a quelque chose qui rajoute 2 fois la dernière semaine !!!
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>{$row['gym_first_ordre_menu']}{$row['gym_jour']}---".$row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id']." = ".var_export($row['post_subject'],true).'</pre>';
-			}
-
-if(0)
-if($row['date'])
-/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export([
-'tri 1' => $row['first_gym_ordre_menu'].$row['topic_id'].$row['gym_jour'],
-'tri 2' => $row['gym_ordre_menu'].$row['next_end_time'].$row['horaire_debut'].$row['post_id'],
-	'topic_title' => $row['topic_title'],
-	'post_subject' => $row['post_subject'],
-	'gym_menu' => $row['gym_menu'],
-	'gym_first_ordre_menu' => $row['gym_first_ordre_menu'],
-	'date' => $row['date'],
-	'gym_evenements' => $row['gym_evenements'],
-	'next_end_time' => $row['next_end_time'],
-	'' => $row[''],
-],true).'</pre>';
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row,true).'</pre>';
-
-
-
-
-
 		}
 		$this->db->sql_freeresult($result);
 
@@ -810,11 +763,19 @@ if($row['date'])
 
 				foreach ($v AS $vv) { // Tri du 2" niveau
 					if ($topic){
-								$vv['COULEUR'] = $this->couleur ();
-								$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);
-								$vv['COULEUR_BORD'] = $this->couleur (40, 196, 0);
+						$vv['COULEUR'] = $this->couleur ();
+						$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);
+						$vv['COULEUR_BORD'] = $this->couleur (40, 196, 0);
 					}
 					$this->template->assign_block_vars ('topic.post', $vv);
+
+					// Tableau des semaines d'un calendrier
+					if ($vv['GYM_SEMAINES'] != 'off')
+						foreach ($static_values['semaines'] AS $s)
+							$this->template->assign_block_vars ('topic.post.week', [
+								'NO' => $s,
+								'SELECT' => strpos (",,{$vv['GYM_SEMAINES']},,", ",$s,"),
+							]);
 				}
 			}
 		}
