@@ -8,8 +8,6 @@
 
 /*
 //TODO revoir création users
-//TODO refaire saisie calendrier
-	Remplacer s=siste statique semaines par 0 - 51
 
 //APRES new template
 TODO résumé d'un cours -> dans l'activité => Update de la base
@@ -308,23 +306,6 @@ class listener implements EventSubscriberInterface
 		while ($row = $this->db->sql_fetchrow($result))
 			$this->template->assign_block_vars ('liste_moderateurs', array_change_key_case ($row, CASE_UPPER));
 		$this->db->sql_freeresult($result);
-
-		if ($vars['mode'] == 'reply') {
-			// Template vide pour posting/création
-			$liste = [];
-			foreach ($static_values['semaines'] AS $s)
-				$liste['new'][][] = [
-					'NO' => $s,
-					'POST_ID' => 0,
-					'GYM_JOUR' => 0,
-					'GYM_IN_CALENDRIER' => 0,
-				];
-//TODO			$this->liste_fiches ('calendrier', [], '', '', $liste);
-		}/* elseif ($post_data['post_id'])
-			// Variables template pour modification
-			$this->liste_fiches ('calendrier', [
-				'post.post_id='.$post_data['post_id'],
-			], '','');*/
 	}
 
 	// Called during validation of the data to be saved
@@ -372,9 +353,6 @@ class listener implements EventSubscriberInterface
 			'heures' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
 			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
 			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
-			// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
-			'semaines' => [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
-				23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49],
 			'duree' => [1,1.5,2,7.5],
 		];
 	}
@@ -393,7 +371,7 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	// Popule les templates horaires, calendrier
+	// Popule les templates
 	function popule_posts() {
 		$this->verify_column(POSTS_TABLE, [
 			'gym_activite',
@@ -493,8 +471,8 @@ class listener implements EventSubscriberInterface
 			if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
 				setlocale(LC_ALL, 'fr_FR');
 				$row['next_end_time'] = INF;
-				$semaines = explode (',', $row['gym_semaines']);
-				foreach ($semaines AS $s) {
+				// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
+				for ($s = 1; $s < 52; $s++) {
 					$beg_time = mktime(
 						$row['gym_heure'], $row['gym_minute'],
 						0, -4, // 1er aout
@@ -569,14 +547,6 @@ class listener implements EventSubscriberInterface
 						$vv['COULEUR_BORD'] = $this->couleur (40, 196, 0);
 					}
 					$this->template->assign_block_vars ('topic.post', $vv);
-
-					// Tableau des semaines d'un calendrier
-					if ($vv['GYM_SEMAINES'] != 'off')
-						foreach ($static_values['semaines'] AS $s)
-							$this->template->assign_block_vars ('topic.post.week', [
-								'NO' => $s,
-								'SELECT' => strpos (",,{$vv['GYM_SEMAINES']},,", ",$s,"),
-							]);
 				}
 			}
 		}

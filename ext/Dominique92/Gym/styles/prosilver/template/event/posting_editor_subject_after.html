@@ -132,32 +132,22 @@
 	<!-- ENDIF -->
 	/><br/>
 
-	<!-- BEGIN calendrier -->
-		<table id="cal_{calendrier.POST_ID}" class="calendrier" data-jour="{calendrier.GYM_JOUR}">
-			<tr id="cal_{calendrier.POST_ID}_mois_8"><td>Septembre</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_9"><td>Octobre</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_10"><td>Novembre</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_11"><td>Décembre</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_0"><td>Janvier</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_1"><td>Février</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_2"><td>Mars</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_3"><td>Avril</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_4"><td>Mai</td></tr>
-			<tr id="cal_{calendrier.POST_ID}_mois_5"><td>Juin</td></tr>
-			<tr style="display:none">
-				<!-- BEGIN post -->
-					<td id="cal_{calendrier.POST_ID}_{post.NO}">
-						<span>xxx</span>
-						<input type="checkbox" value="{post.NO}"
-							name="gym_semaines[]"
-						<!-- IF post.GYM_IN_CALENDRIER -->
-							checked="checked"
-						<!-- ENDIF -->
-						/>
-					<td>
-				<!-- END post -->
-			</tr>
-		</table>
-	<!-- END calendrier -->
+	<table id="edit_semaines"
+		class="calendrier"
+		data-jour="{GYM_JOUR}"
+		data-semaines="{GYM_SEMAINES}"
+	>
+		<tr id="edit_semaines_mois_8"><td>Septembre</td></tr>
+		<tr id="edit_semaines_mois_9"><td>Octobre</td></tr>
+		<tr id="edit_semaines_mois_10"><td>Novembre</td></tr>
+		<tr id="edit_semaines_mois_11"><td>Décembre</td></tr>
+		<tr id="edit_semaines_mois_0"><td>Janvier</td></tr>
+		<tr id="edit_semaines_mois_1"><td>Février</td></tr>
+		<tr id="edit_semaines_mois_2"><td>Mars</td></tr>
+		<tr id="edit_semaines_mois_3"><td>Avril</td></tr>
+		<tr id="edit_semaines_mois_4"><td>Mai</td></tr>
+		<tr id="edit_semaines_mois_5"><td>Juin</td></tr>
+	</table>
+
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 <!-- ENDIF -->

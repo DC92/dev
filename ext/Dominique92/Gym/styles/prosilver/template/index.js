@@ -10,19 +10,41 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 	};
 }
 
-// Slideshow
-setInterval(function() {
-	$('.slideshow ul').animate({
-			marginLeft: -400,
-		},
-		800,
-		function() {
-			$(this).css({
-				marginLeft: 0,
-			}).find('li:last').after($(this).find('li:first'));
+// BBCode ajout d'un calendrier
+$('.calendrier').each(function(index, elCal) {
+	for (let week = 0; week < 52; week++) {
+		const semaines = $(elCal).attr('data-semaines').split(','),
+			jour = $(elCal).attr('data-jour'),
+			date = new Date(new Date().getFullYear(), -5); // 1er aout
+		// Jour de la semaine
+		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7);
+
+		const td = $('<td><span>' + date.getDate() + '</span></td>');
+		td.appendTo('#' + elCal.id + '_mois_' + date.getMonth());
+		if ($('body#phpbb').length) { // posting
+			const input = $('<input type="checkbox" value="' + week + '" name="gym_semaines[]" />');
+			input.appendTo(td);
+			if (semaines.includes(week.toString()))
+				input.attr('checked', 'checked');
+		} else { // viewtopic
+			if (semaines.includes(week.toString()))
+				td.addClass('selected');
 		}
-	);
-}, 5000);
+	}
+
+	// Ajoute une case aux mois n'ayant que 4 jours de ce type
+	$('.calendrier tr').each(function() {
+		if ($(this).children().length == 5)
+			$('<td>').appendTo($(this));
+	});
+
+	displayInputCalendar();
+});
+
+function displayInputCalendar() {
+	$('#edit_semaines')[0].style.display =
+		$('#gym_scolaire')[0].checked ? 'none' : 'block';
+}
 
 // BBCode ajout d'une carte
 $('.carte').each(function(index, elCarte) {
@@ -61,21 +83,16 @@ $('.carte').each(function(index, elCarte) {
 	}
 });
 
-// BBCode ajout d'un calendrier
-$('.calendrier').each(function(index, elCal) {
-	for (let week = 0; week < 52; week++) {
-		const jour = $(elCal).attr('data-jour'),
-			elWeek = $('#' + elCal.id + '_' + week),
-			date = new Date(new Date().getFullYear(), -5); // 1er aout
-		// Jour de la semaine
-		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7);
-		elWeek.children().text(date.getDate());
-		elWeek.appendTo('#' + elCal.id + '_mois_' + date.getMonth());
-	}
-
-	// Ajoute une case aux mois n'ayant que 4 jours de ce type
-	$('.calendrier tr').each(function() {
-		if ($(this).children().length < 6)
-			$('<td>').appendTo($(this));
-	});
-});
+// Slideshow
+setInterval(function() {
+	$('.slideshow ul').animate({
+			marginLeft: -400,
+		},
+		800,
+		function() {
+			$(this).css({
+				marginLeft: 0,
+			}).find('li:last').after($(this).find('li:first'));
+		}
+	);
+}, 5000);

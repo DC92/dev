@@ -71,6 +71,7 @@ body {
 	left: calc(45px + 3vw);
 	margin: 0;
 	padding: 0.3em;
+	text-align: left;
 	background: white;
 	list-style-type: none;
 	z-index: 10;
@@ -152,8 +153,6 @@ body {
 .gym .breadcrumb li:hover ul {
 	display: block;
 }
-
-/******************** VALIDE ********************/
 
 /* Pages GV */
 .gym .logo img {
@@ -493,6 +492,10 @@ body {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+.gym .calendrier tr:first-child td {
+	text-align: center;
+	font-weight: bold;
+}
 .gym .calendrier td {
 	margin: 0;
 	border: 1px solid grey;
@@ -510,4 +513,8 @@ body {
 	background: #08BABE;
 	color: white;
 	font-weight: bold;
+}
+.section-posting .calendrier td {
+	padding: 0.2em;
+	text-align: right;
 }

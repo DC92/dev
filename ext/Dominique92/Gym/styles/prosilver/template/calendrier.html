@@ -1,7 +1,12 @@
 <!-- BEGIN topic -->
 	<!-- BEGIN post -->
 	<!-- IF post.POST_ID == REQUEST_ID -->
-		<table id="cal_{post.POST_ID}" class="calendrier" data-jour="{post.GYM_JOUR}">
+		<table id="cal_{post.POST_ID}"
+			class="calendrier"
+			data-jour="{post.GYM_JOUR}"
+			data-semaines="{post.GYM_SEMAINES}"
+		>
+			<tr><td colspan="6">Les {post.GYM_JOUR_LITERAL}s</td></tr>
 			<tr id="cal_{post.POST_ID}_mois_8"><td>Septembre</td></tr>
 			<tr id="cal_{post.POST_ID}_mois_9"><td>Octobre</td></tr>
 			<tr id="cal_{post.POST_ID}_mois_10"><td>Novembre</td></tr>
@@ -12,14 +17,6 @@
 			<tr id="cal_{post.POST_ID}_mois_3"><td>Avril</td></tr>
 			<tr id="cal_{post.POST_ID}_mois_4"><td>Mai</td></tr>
 			<tr id="cal_{post.POST_ID}_mois_5"><td>Juin</td></tr>
-			<tr style="display:none">
-				<!-- BEGIN week -->
-					<td id="cal_{post.POST_ID}_{week.NO}"
-						<!-- IF week.SELECT -->class="selected"<!-- ENDIF -->>
-						<span></span>
-					</td>
-				<!-- END week -->
-			</tr>
 		</table>
 	<!-- ENDIF -->
 	<!-- END post -->
