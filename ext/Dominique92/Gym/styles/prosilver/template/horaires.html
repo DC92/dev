@@ -1,14 +1,15 @@
 <div id="horaires">
+	<!-- IF REQUEST_MOD -->
+		<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
+			class="button button-icon-only" style="float:right">
+			<i class="icon fa-commenting-o"></i>
+		</a>
+	<!-- ENDIF -->
+
 	<!-- BEGIN topic -->
 	<div class="horaires j{topic.GYM_JOUR}">
 		<div style="margin-left:calc((10% - 60px) * {topic.GYM_JOUR} + 1em)">
 			{topic.GYM_JOUR_LITERAL}
-			<!-- IF REQUEST_MOD -->
-				<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
-					class="button button-icon-only" style="float:right">
-					<i class="icon fa-commenting-o"></i>
-				</a>
-			<!-- ENDIF -->
 		</div>
 
 		<table style="

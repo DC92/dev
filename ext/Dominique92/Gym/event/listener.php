@@ -34,6 +34,7 @@ mettre redir 301 free
 /** CONFIG
 https://github.com/phpbbmodders/phpBB-3.1-ext-adduser
 https://www.phpbb.com/customise/db/extension/googleanalytics
+copier /slides /files config.php
 
 PERSONNALISER / extension gym
 MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
