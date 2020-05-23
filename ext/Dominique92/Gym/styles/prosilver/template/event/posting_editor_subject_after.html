@@ -83,15 +83,17 @@
 	<br/><br/>
 
 	<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar()">
-		<!-- BEGIN liste_jours -->
-			<option value="{liste_jours.NO}"
-				<!-- IF liste_jours.NO == GYM_JOUR -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_jours.VALEUR}
-			</option>
-		<!-- END liste_jours -->
+		<!-- BEGIN topic -->
+		<!-- BEGIN post -->
+		<!-- IF post.POST_ID == REQUEST_P -->
+			<!-- BEGIN week -->
+				<option value="{week.NO}" <!-- IF week.NO == GYM_JOUR -->selected="selected"<!-- ENDIF -->>
+					{week.VALEUR}
+				</option>
+			<!-- END week -->
+		<!-- ENDIF -->
+		<!-- END post -->
+		<!-- END topic -->
 	</select> &nbsp;
 
 	<select name="gym_heure">

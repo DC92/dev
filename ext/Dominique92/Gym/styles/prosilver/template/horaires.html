@@ -1,65 +1,68 @@
 <div id="horaires">
-	<!-- BEGIN horaires -->
-		<div class="horaires j{horaires.GYM_JOUR}">
-			<div style="margin-left:calc((10% - 60px) * {horaires.GYM_JOUR} + 1em)">
-				{horaires.GYM_JOUR_LITERAL}
-				<!-- IF (U_MCP or REQUEST_MOD) and .horaires and not horaires.GYM_JOUR -->
-					<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
-						class="button button-icon-only" style="float:right">
-						<i class="icon fa-commenting-o"></i>
-					</a>
-				<!-- ENDIF -->
-			</div>
-			<table style="
-				margin-left:calc((10% - 60px) * {horaires.GYM_JOUR});
-				background:{horaires.COULEUR_FOND};
-				border-color:{horaires.COULEUR_BORD};
-			">
-				<!-- BEGIN post -->
-				<tr>
-					<!-- IF not REQUEST_ID -->
-					<td>
-						<a href="viewtopic.php?p={post.POST_ID}">
-							{post.NOM}
-						</a>
-
-						<!-- IF REQUEST_ACTIVITE and post.GYM_NOTA -->
-							<br>{post.GYM_NOTA}
-						<!-- ENDIF -->
-					</td>
-					<!-- ENDIF -->
-
-					<td>
-						{post.HORAIRE_DEBUT} {post.HORAIRE_FIN}
-					</td>
-
-					<!-- IF not REQUEST_LIEU -->
-					<td>
-						<a href="viewtopic.php?p={post.GYM_LIEU}">
-							{post.LIEU}
-						</a>
-					</td>
-					<!-- ENDIF -->
-
-					<!-- IF not REQUEST_ANIMATEUR -->
-					<td>
-						<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
-							{post.ANIMATEUR}
-						</a>
-					</td>
-					<!-- ENDIF -->
-
-					<!-- IF U_MCP or REQUEST_MOD -->
-					<td>
-						<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
-							title="Modifier cette séance" class="button button-icon-only">
-							<i class="icon fa-pencil"></i>
-						</a>
-					</td>
-					<!-- ENDIF -->
-				</tr>
-				<!-- END post -->
-			</table>
+	<!-- BEGIN topic -->
+	<div class="horaires j{topic.GYM_JOUR}">
+		<div style="margin-left:calc((10% - 60px) * {topic.GYM_JOUR} + 1em)">
+			{topic.GYM_JOUR_LITERAL}
+			<!-- IF (U_MCP or REQUEST_MOD) and .horaires and not topic.GYM_JOUR -->
+				<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
+					class="button button-icon-only" style="float:right">
+					<i class="icon fa-commenting-o"></i>
+				</a>
+			<!-- ENDIF -->
 		</div>
-	<!-- END horaires -->
+
+		<table style="
+			margin-left:calc((10% - 60px) * {topic.GYM_JOUR});
+			background:{topic.COULEUR_FOND};
+			border-color:{topic.COULEUR_BORD};
+		">
+			<!-- BEGIN post -->
+			<!-- IF post.GYM_HORAIRES == 'on' -->
+			<tr>
+				<!-- IF not REQUEST_ID -->
+				<td>
+					<a href="viewtopic.php?p={post.POST_ID}">
+						{post.POST_SUBJECT}
+					</a>
+
+					<!-- IF REQUEST_ACTIVITE and post.GYM_NOTA -->
+						<br>{post.GYM_NOTA}
+					<!-- ENDIF -->
+				</td>
+				<!-- ENDIF -->
+
+				<td>
+					{post.HORAIRE_DEBUT} {post.HORAIRE_FIN}
+				</td>
+
+				<!-- IF not REQUEST_LIEU -->
+				<td>
+					<a href="viewtopic.php?p={post.GYM_LIEU}">
+						{post.LIEU}
+					</a>
+				</td>
+				<!-- ENDIF -->
+
+				<!-- IF not REQUEST_ANIMATEUR -->
+				<td>
+					<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
+						{post.ANIMATEUR}
+					</a>
+				</td>
+				<!-- ENDIF -->
+
+				<!-- IF U_MCP or REQUEST_MOD -->
+				<td>
+					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+						title="Modifier cette séance" class="button button-icon-only">
+						<i class="icon fa-pencil"></i>
+					</a>
+				</td>
+				<!-- ENDIF -->
+			</tr>
+			<!-- ENDIF -->
+			<!-- END post -->
+		</table>
+	</div>
+	<!-- END topic -->
 </div>

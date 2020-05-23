@@ -7,8 +7,9 @@
  */
 
 /*
-TODO revoir templates horaire
-TODO purger listener
+//TODO revoir création users
+//TODO refaire saisie calendrier
+	Remplacer s=siste statique semaines par 0 - 51
 
 //APRES new template
 TODO résumé d'un cours -> dans l'activité => Update de la base
@@ -106,9 +107,6 @@ class listener implements EventSubscriberInterface
 			'core.page_footer_after' => 'page_footer_after',
 			'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',
 
-			// Index
-			'core.index_modify_page_title' => 'index_modify_page_title',
-
 			// Viewtopic
 			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
@@ -134,18 +132,7 @@ class listener implements EventSubscriberInterface
 		foreach ($request AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>AA = ".var_export(microtime(),true).'</pre>';
-$this->popule_posts();
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>DD = ".var_export(microtime(),true).'</pre>';
-
-		// Menu principal
-		/*
-		$this->liste_fiches ('menu', [
-	//TODO DCMM DELETE		'post.post_id=t.topic_first_post_id',
-			'post.gym_menu="on"',
-		],'gym_first_ordre_menu','gym_ordre_menu');
-		*/
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>ZZ = ".var_export(microtime(),true).'</pre>';
+		$this->popule_posts();
 	}
 
 	/**
@@ -201,30 +188,6 @@ $this->popule_posts();
 				},
 				$vars['output']
 			);
-	}
-
-	/**
-		INDEX.PHP
-	*/
-	function index_modify_page_title() {
-		// Inclusions des données de la page d'acceuil
-		/*
-		$this->liste_fiches ('acceuil', [
-			'true',
-		], 'gym_ordre_menu', 'post_id');
-		$this->liste_fiches ('evenements', [
-			'post.gym_evenements="on"',
-		], 'next_end_time','next_beg_time');
-*/
-
-		// Pour les horaires
-		$this->liste_fiches ('horaires', [
-			'post.gym_horaires="on"',
-		], 'gym_jour','horaire_debut');
-
-		// Pour le calendrier
-//		$this->liste_fiches ('calendrier', [
-//		], 'gym_jour', 'post_id');
 	}
 
 	/**
@@ -356,12 +319,12 @@ $this->popule_posts();
 					'GYM_JOUR' => 0,
 					'GYM_IN_CALENDRIER' => 0,
 				];
-			$this->liste_fiches ('calendrier', [], '', '', $liste);
-		} elseif ($post_data['post_id'])
+//TODO			$this->liste_fiches ('calendrier', [], '', '', $liste);
+		}/* elseif ($post_data['post_id'])
 			// Variables template pour modification
 			$this->liste_fiches ('calendrier', [
 				'post.post_id='.$post_data['post_id'],
-			], '','');
+			], '','');*/
 	}
 
 	// Called during validation of the data to be saved
@@ -431,189 +394,6 @@ $this->popule_posts();
 	}
 
 	// Popule les templates horaires, calendrier
-	//TODO DELETE
-	//TODO reprendre le corps de popule_posts
-	function liste_fiches($assign, $cond, $tri1, $tri2, $liste = []) {
-		$this->verify_column(POSTS_TABLE, [
-			'gym_activite',
-			'gym_lieu',
-			'gym_animateur',
-			'gym_jour',
-			'gym_heure',
-			'gym_minute',
-			'gym_duree_heures',
-			'gym_duree_jours',
-			'gym_scolaire',
-			'gym_semaines',
-			'gym_evenements',
-			'gym_horaires',
-			'gym_menu',
-			'gym_ordre_menu',
-			'gym_nota',
-			'gym_moderateur',
-		]);
-
-		$post_id = $this->request->variable('id', '', true);
-		if ($post_id)
-			$cond[] = 'post.post_id='.$post_id;
-		$nom = $this->request->variable('nom', '', true);
-		if ($nom)
-			$cond[] = 'post.post_subject="'.urldecode($nom).'"';
-		$lieu = $this->request->variable('lieu', '', true);
-		if ($lieu)
-			$cond[] = 'li.post_subject="'.urldecode($lieu).'"';
-		$animateur = $this->request->variable('animateur', '', true);
-		if ($animateur)
-			$cond[] = 'an.post_subject="'.urldecode($animateur).'"';
-		$activite = $this->request->variable('activite', '', true);
-		if ($activite)
-			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
-
-		if ($cond) {
-			$static_values = $this->listes();
-
-			// Récupère la table de tous les attachements pour les inclusions BBCode
-			$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
-			$result = $this->db->sql_query($sql);
-			$attachments = $update_count_ary = [];
-			while ($row = $this->db->sql_fetchrow($result))
-				$attachments[$row['post_msg_id']][] = $row;
-			$this->db->sql_freeresult($result);
-
-			$sql = "SELECT post.post_id, t.topic_id, t.forum_id,
-				t.topic_title, t.topic_first_post_id,
-				post.post_subject AS nom,
-				post.post_text, post.bbcode_uid, post.bbcode_bitfield,
-				li.post_subject AS lieu,
-				an.post_subject AS animateur,
-				ac.post_subject AS activite,
-				post.gym_activite, post.gym_lieu, post.gym_animateur, post.gym_nota,
-				post.gym_jour, post.gym_heure, post.gym_minute, post.gym_duree_heures, post.gym_duree_jours,
-				post.gym_scolaire, post.gym_semaines,
-				post.gym_evenements, post.gym_horaires, post.gym_menu, post.gym_ordre_menu,
-				first.gym_ordre_menu AS gym_first_ordre_menu
-				FROM ".POSTS_TABLE." AS post
-					LEFT JOIN  ".POSTS_TABLE." AS ac ON (ac.post_id = post.gym_activite)
-					LEFT JOIN  ".POSTS_TABLE." AS li ON (li.post_id = post.gym_lieu)
-					LEFT JOIN  ".POSTS_TABLE." AS an ON (an.post_id = post.gym_animateur)
-					JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = post.topic_id)
-					JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
-				WHERE ".implode(' AND ',$cond );
-
-			$result = $this->db->sql_query($sql);
-			while ($row = $this->db->sql_fetchrow($result)) {
-				// BBCodes et attachements
-				$row['display_text'] = generate_text_for_display(
-					$row['post_text'],
-					$row['bbcode_uid'], $row['bbcode_bitfield'],
-					OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-				);
-
-				if (!empty($attachments[$row['post_id']]))
-					parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
-
-				// Extrait des résumé des parties à afficher
-				$resumes = explode ('<!--resume-->', $row['display_text']);
-				if (count ($resumes) > 1)
-					$row['RESUME'] = $resumes[1];
-
-				// Extrait les parties à afficher à l'acceuil
-				$accueils = explode ('<!--accueil-->', $row['display_text']);
-				if (count ($accueils) > 1)
-					$row['accueil'] = '<p>'.$accueils[1].'</p>';
-
-				// Jour dans la semaine
-				$row['gym_jour'] = intval ($row['gym_jour']);
-				$row['gym_jour_literal'] = $static_values['jours'][$row['gym_jour']];
-				// Temps début
-				$row['gym_heure'] = intval ($row['gym_heure']);
-				$row['gym_minute'] = intval ($row['gym_minute']);
-				// Temps fin
-				$row['gym_duree_heures'] = intval ($row['gym_duree_heures']);
-				$row['gym_duree_jours'] = intval ($row['gym_duree_jours']);
-				$row['gym_minute_fin'] = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
-				$row['gym_heure_fin'] = $row['gym_heure'] + floor ($row['gym_minute_fin'] / 60);
-				$row['gym_minute_fin'] = $row['gym_minute_fin'] % 60;
-
-				// Date
-				if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
-					setlocale(LC_ALL, 'fr_FR');
-					$row['next_end_time'] = INF;
-					$semaines = explode (',', $row['gym_semaines']);
-					foreach ($semaines AS $s) {
-						$beg_time = mktime(
-							$gym_heure, $gym_minute,
-							0, -4, // 1er aout
-							$row['gym_jour'] + $s * 7 + 5,
-							date('Y')
-						);
-						$end_time = mktime(
-							$row['gym_heure_fin'], $row['gym_minute_fin'],
-							0, -4, // 1er aout
-							$row['gym_jour'] + $s * 7 + 5,
-							date('Y')
-						);
-						// Garde le premier évènement qui finit après la date courante
-						if ($end_time > time() && $end_time < $row['next_end_time']) {
-							$row['next_beg_time'] = $beg_time;
-							$row['next_end_time'] = $end_time;
-							$row['date'] = ucfirst (
-								str_replace ('  ', ' ',
-								utf8_encode (
-								strftime ('%A %e %B', $row['next_end_time'])
-							)));
-						}
-					}
-				}
-
-				// Horaires
-				$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);
-				$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
-				$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
-				$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
-				$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
-				$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
-
-				// Tableau des semaines d'un calendrier
-				if ($assign == 'calendrier') {
-					$semaines = explode (',', $row['gym_semaines']);
-					foreach ($static_values['semaines'] AS $s) {
-						$row['no'] = $s;
-						$row['gym_in_calendrier'] = in_array ($s, $semaines) ? 1 : 0;
-						$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
-					}
-				}
-				//TODO BUG il y a quelque chose qui rajoute 2 fois la dernière semaine !!!
-
-				// Range les résultats dans l'ordre et le groupage espéré
-				$liste [$row[$tri1]] [$row[$tri2]] [] = array_change_key_case ($row, CASE_UPPER);
-			}
-			$this->db->sql_freeresult($result);
-		}
-
-		if ($liste) {
-			ksort ($liste);
-			foreach ($liste AS $v) { // Tri du 1er niveau
-				ksort ($v);
-
-				// La première ligne pour avoir les valeurs générales
-				$first = array_values ($v)[0][0];
-				$first['COULEUR'] = $this->couleur();
-				$first['COULEUR_FOND'] = $this->couleur(35, 255, 0);
-				$first['COULEUR_BORD'] = $this->couleur(40, 196, 0);
-				$first['COUNT'] = count($v);
-				$this->template->assign_block_vars($assign, $first);
-
-				foreach ($v AS $vv) {// Tri du 2" niveau
-					ksort ($vv);
-					foreach ($vv AS $vvv) // S'il y a plusieurs séances à la même heure
-						$this->template->assign_block_vars("$assign.post", $vvv);
-				}
-			}
-		}
-	}
-
-	// Popule les templates horaires, calendrier
 	function popule_posts() {
 		$this->verify_column(POSTS_TABLE, [
 			'gym_activite',
@@ -634,7 +414,20 @@ $this->popule_posts();
 			'gym_moderateur',
 		]);
 
-		$static_values = $this->listes();
+		// Filtre pour horaires
+		$cond = ['TRUE'];
+		$post_id = $this->request->variable('id', '', true);
+		if ($post_id)
+			$cond[] = 'post.post_id='.$post_id;
+		$activite = $this->request->variable('activite', '', true);
+		if ($activite)
+			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
+		$lieu = $this->request->variable('lieu', '', true);
+		if ($lieu)
+			$cond[] = 'li.post_subject="'.urldecode($lieu).'"';
+		$animateur = $this->request->variable('animateur', '', true);
+		if ($animateur)
+			$cond[] = 'an.post_subject="'.urldecode($animateur).'"';
 
 		// Récupère la table de tous les attachements pour les inclusions BBCode
 		$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
@@ -657,7 +450,8 @@ $this->popule_posts();
 				LEFT JOIN ".POSTS_TABLE." AS an ON (an.post_id = post.gym_animateur)
 				LEFT JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = post.topic_id)
 				LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
-			";
+				WHERE ".implode(' AND ',$cond )."
+				ORDER BY post.topic_id, post.post_id";
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
@@ -682,6 +476,7 @@ $this->popule_posts();
 				$row['accueil'] = '<p>'.$accueils[1].'</p>';
 
 			// Jour dans la semaine
+			$static_values = $this->listes();
 			$row['gym_jour'] = intval ($row['gym_jour']);
 			$row['gym_jour_literal'] = $static_values['jours'][$row['gym_jour']];
 			// Temps début
@@ -732,36 +527,42 @@ $this->popule_posts();
 			$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
 			$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
 			$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
+			$template = $this->request->variable('template', '');
 
 			// Range les résultats dans l'ordre et le groupage espéré
-			$liste
-				[
-					$row['next_end_time'].$row['horaire_debut']. // Calendrier
-					$row['first_gym_ordre_menu'].$row['topic_id']. // Menu
+			$liste [
+				$template == 'horaires' ?
 					$row['gym_jour'] // Horaires
-				][
-					$row['gym_ordre_menu'].$row['post_id']
-				]
-				= array_change_key_case ($row, CASE_UPPER);
+				:
+					$row['first_gym_ordre_menu']. // Menu
+					$row['next_beg_time']. // Evenements
+					$row['topic_id'] // Pour séparer les topics dans les menus
+			][
+				$row['gym_ordre_menu']. // Horaires
+				$row['horaire_debut'].
+				$row['post_id'] // Pour séparer les exeaco
+			] = array_change_key_case ($row, CASE_UPPER);
 		}
 		$this->db->sql_freeresult($result);
 
 		$topic = $this->request->variable('t', 0);
 		if ($liste) {
-			ksort ($liste);
-			foreach ($liste AS $v) { // Tri du 1er niveau
-				ksort ($v);
-
+			// Tri du 1er niveau
+			ksort ($liste, SORT_STRING);
+			foreach ($liste AS $k=>$v) {
 				// La première ligne pour avoir les valeurs générales
 				$first = array_values ($v)[0];
 				$first['COULEUR'] = $this->couleur ();
 				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
 				$first['COUNT'] = count ($v);
-
+//				$first['K'] = $k;
 				$this->template->assign_block_vars ('topic', $first);
 
-				foreach ($v AS $vv) { // Tri du 2" niveau
+				// Tri du 2" niveau
+				ksort ($v, SORT_STRING);
+				foreach ($v AS $kv=>$vv) {
+//					$vv['KV'] = $kv;
 					if ($topic){
 						$vv['COULEUR'] = $this->couleur ();
 						$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);

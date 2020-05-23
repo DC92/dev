@@ -70,11 +70,12 @@
 		<i class="icon fa-commenting-o"></i>
 	</a>
 </h1>
+
 <!-- BEGIN topic -->
 <!-- IF topic.NEXT_BEG_TIME and topic.GYM_EVENEMENTS == 'on' -->
 <div class="evenement">
 	<h2>
-		{topic.DATE}: <a href="viewtopic.php?p={topic.POST_ID}">{topic.NOM}</a>
+		{topic.DATE}: <a href="viewtopic.php?p={topic.POST_ID}">{topic.POST_SUBJECT}</a>
 		<!-- IF U_MCP -->
 		<a href="posting.php?mode=edit&f={topic.FORUM_ID}&p={topic.POST_ID}"
 			title="Modifier l'évènement {topic.NOM}" class="button button-icon-only">
