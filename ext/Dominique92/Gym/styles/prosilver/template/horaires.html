@@ -3,7 +3,7 @@
 	<div class="horaires j{topic.GYM_JOUR}">
 		<div style="margin-left:calc((10% - 60px) * {topic.GYM_JOUR} + 1em)">
 			{topic.GYM_JOUR_LITERAL}
-			<!-- IF (U_MCP or REQUEST_MOD) and .horaires and not topic.GYM_JOUR -->
+			<!-- IF REQUEST_MOD -->
 				<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
 					class="button button-icon-only" style="float:right">
 					<i class="icon fa-commenting-o"></i>
@@ -51,7 +51,7 @@
 				</td>
 				<!-- ENDIF -->
 
-				<!-- IF U_MCP or REQUEST_MOD -->
+				<!-- IF REQUEST_MOD -->
 				<td>
 					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 						title="Modifier cette séance" class="button button-icon-only">
