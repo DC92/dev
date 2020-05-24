@@ -449,3 +449,7 @@ body {
 	padding: 0.2em;
 	text-align: right;
 }
+#cal_mois_6,
+#cal_mois_7 {
+	display: none;
+}

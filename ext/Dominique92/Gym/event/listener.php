@@ -7,10 +7,11 @@
  */
 
 /*
-//TODO revoir création users
+revoir affichage actualité
 bug changement n° jour template saisie / calendrier
 
 //BEST
+//TODO revoir création users
 BUG dans le template.html quand espace dans POST_SUBJECT
 	(INCLUDE ?template=horaires&activite={postrow.POST_SUBJECT})
 Redimensionner les images suivant taille fenetre

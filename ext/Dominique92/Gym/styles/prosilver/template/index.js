@@ -12,15 +12,12 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 
 // BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {
-	for (let week = 0; week < 52; week++) {
-		const semaines = $(elCal).attr('data-semaines').split(','),
-			jour = $(elCal).attr('data-jour'),
-			date = new Date(new Date().getFullYear(), -5); // 1er aout
-		// Jour de la semaine
-		date.setDate(date.getDate() - date.getDay() + 1 + parseInt(jour || 0, 10) + week * 7);
+	const semaines = $(elCal).attr('data-semaines').split(','),
+		nowhere = $('#cal_mois_7');
 
-		const td = $('<td><span>' + date.getDate() + '</span></td>');
-		td.appendTo('#' + elCal.id + '_mois_' + date.getMonth());
+	for (let week = 0; week < 52; week++) {
+		const td = $('<td id="cal_s' + week + '"><span/></td>');
+		td.appendTo(nowhere); // Attach it to be able to get it
 		if ($('body#phpbb').length) { // posting
 			const input = $('<input type="checkbox" value="' + week + '" name="gym_semaines[]" />');
 			input.appendTo(td);
@@ -31,17 +28,33 @@ $('.calendrier').each(function(index, elCal) {
 				td.addClass('selected');
 		}
 	}
+	displayCalendar(elCal);
 
 	// Ajoute une case aux mois n'ayant que 4 jours de ce type
-	$('.calendrier tr').each(function() {
-		if ($(this).children().length == 5)
-			$('<td>').appendTo($(this));
-	});
-
-	displayInputCalendar();
+	if (!$('body#phpbb').length) // viewtopic
+		$('.calendrier tr').each(function() {
+			if ($(this).children().length == 5)
+				$('<td>').appendTo($(this));
+		});
 });
 
-function displayInputCalendar() {
+function displayCalendar(elCal) {
+	// Marque le jour et attribue au mois
+	//TODO BUG n'initialise pas les chiffres quand scolaire est coché
+	const jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
+	for (let week = 0; week < 52; week++) {
+		const wEl = $('#cal_s' + week),
+			date = new Date(new Date().getFullYear(), -5); // 1er aout
+		date.setDate(date.getDate() - date.getDay() + jour + 1 + week * 7); // Jour de la semaine
+		wEl.appendTo('#cal_mois_' + date.getMonth());
+		wEl.children().html(date.getDate());
+	}
+}
+
+function displayInputCalendar(elCal) {
+	displayCalendar(elCal);
+
+	// Bascule scolaire / calendrier
 	$('#edit_semaines')[0].style.display =
 		$('#gym_scolaire')[0].checked ? 'none' : 'block';
 }
@@ -96,3 +109,18 @@ setInterval(function() {
 		}
 	);
 }, 5000);
+
+// Sous-menus déroulants ne dépassent pas à droite
+function submenuPos() {
+	$('.submenu').each(function(index, el) {
+		const ww = $(window).width(),
+			elw = $(el).width(),
+			pp = $(el).parent().position();
+		$(el).css({
+			top: pp.top,
+			left: Math.min(pp.left, ww - elw)
+		});
+	});
+}
+submenuPos();
+$(window).on('resize', submenuPos);
