@@ -1,5 +1,110 @@
 <!-- INCLUDE header.html -->
 
+<ul class="menu breadcrumb">
+	<!-- ACCUEIL -->
+	<li style="background:#a69efd">
+		<a title="Retour à l'accueil" href=".">
+			Accueil
+		</a>
+
+		<!-- SOUS MENU DU TITRE -->
+		<ul style="background:#a69efd">
+			<!-- BEGIN topic -->
+			<!-- IF topic.FIRST_GYM_MENU == 'on' -->
+			<li>
+				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
+					{topic.TOPIC_TITLE}
+				</a>
+			</li>
+			<!-- ENDIF -->
+			<!-- END topic -->
+		</ul>
+	</li>
+
+	<!-- ACTIVITES -->
+	<!-- BEGIN topic -->
+	<!-- IF topic.TOPIC_ID == 2 and GYM_ACTIVITE and GYM_ACTIVITE != 'off' -->
+		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
+		<li style="background:#f3ce88">
+			<!-- RUBRIQUE -->
+			<!-- IF not REQUEST_P -->
+				{topic.TOPIC_TITLE}
+			<!-- ELSE -->
+				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
+					{topic.TOPIC_TITLE}
+				</a>
+			<!-- ENDIF -->
+
+			<!-- SOUS MENU DE LA RUBRIQUE -->
+			<ul style="background:#f3ce88">
+				<!-- BEGIN post -->
+				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<li>
+					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+						{post.POST_SUBJECT}
+					</a>
+				</li>
+				<!-- ENDIF -->
+				<!-- END post -->
+			</ul>
+		</li>
+	<!-- ENDIF -->
+	<!-- END topic -->
+
+	<!-- ACTIVITE -->
+	<!-- BEGIN topic -->
+	<!-- BEGIN post -->
+	<!-- IF GYM_ACTIVITE != 'off' and post.POST_ID == GYM_ACTIVITE -->
+		<i class="icon fa-arrow-right"></i>
+		<li style="background:#d987de">
+			<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+			{post.POST_SUBJECT}
+			</a>
+		</li>
+	<!-- ENDIF -->
+	<!-- END post -->
+	<!-- END topic -->
+
+	<!-- RUBRIQUE -->
+	<!-- BEGIN topic -->
+	<!-- IF topic.FIRST_GYM_MENU == 'on' and topic.TOPIC_ID == REQUEST_T -->
+		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
+		<li style="background:#c7f793">
+			<!-- RUBRIQUE -->
+			<!-- IF not REQUEST_P -->
+				{topic.TOPIC_TITLE}
+			<!-- ELSE -->
+				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
+					{topic.TOPIC_TITLE}
+				</a>
+			<!-- ENDIF -->
+
+			<!-- SOUS MENU DE LA RUBRIQUE -->
+			<!-- IF topic.COUNT > 1 -->
+			<ul style="background:#c7f793">
+				<!-- BEGIN post -->
+				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<li>
+					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+						{post.POST_SUBJECT}
+					</a>
+				</li>
+				<!-- ENDIF -->
+				<!-- END post -->
+			</ul>
+			<!-- ENDIF -->
+		</li>
+	<!-- ENDIF -->
+	<!-- END topic -->
+
+	<!-- BEGIN postrow -->
+	<!-- IF postrow.POST_ID == REQUEST_P -->
+		<i class="icon fa-arrow-right"></i>
+		<li style="background:#fc9baa">{postrow.POST_SUBJECT}</li>
+	<!-- ENDIF -->
+	<!-- END postrow -->
+</ul>
+
 <div class="page">
 	<!-- SUJET -->
 	<!-- BEGIN postrow -->
@@ -13,7 +118,10 @@
 					</a>
 				<!-- ENDIF -->
 			</h2>
-				<div>{postrow.MESSAGE}</div>
+
+			<!-- IF postrow.MESSAGE -->
+				<p>{postrow.MESSAGE}</p>
+			<!-- ENDIF -->
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
@@ -23,14 +131,16 @@
 	<!-- IF post.POST_ID == GYM_ACTIVITE and post.RESUME -->
 		<h2>
 			<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
-			<!-- IF (U_MCP) -->
+			<!-- IF U_MCP -->
 				<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 					title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
 					<i class="icon fa-pencil"></i>
 				</a>
 			<!-- ENDIF -->
 		</h2>
-		{post.RESUME}
+		<!-- IF post.RESUME -->
+			<p>{post.RESUME}</p>
+		<!-- ENDIF -->
 	<!-- ENDIF -->
 	<!-- END post -->
 	<!-- END topic -->
@@ -40,27 +150,29 @@
 		<!-- IF postrow.POST_ID == REQUEST_P -->
 			<h2>
 				<a href="viewtopic.php?p={postrow.POST_ID}">{postrow.POST_SUBJECT}</a>
-				<!-- IF (U_MCP) -->
+				<!-- IF U_MCP -->
 					<a href="posting.php?mode=edit&f=2&p={postrow.POST_ID}"
 						title="Modifier la page {postrow.POST_SUBJECT}" class="button button-icon-only">
 						<i class="icon fa-pencil"></i>
 					</a>
 				<!-- ENDIF -->
 			</h2>
-			<div>{postrow.MESSAGE}</div>
+			<!-- IF postrow.MESSAGE -->
+				<p>{postrow.MESSAGE}</p>
+			<!-- ENDIF -->
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
 	<!-- IF REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
-		<!-- IF (U_MCP) -->
+		<!-- IF U_MCP -->
 			<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 				title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
 				<i class="icon fa-pencil"></i>
 			</a>
+			<p>{postrow.MESSAGE}</p>
 		<!-- ENDIF -->
-		{post.RESUME}
 	<!-- ENDIF -->
 	<!-- END post -->
 	<!-- END topic -->

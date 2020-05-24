@@ -90,7 +90,7 @@ body {
 }
 .gym div.banniere h1 {
 	margin: 0;
-	padding: 0.6em;
+	padding: 0.5em;
 	display: inline-block;
 }
 .gym .banniere h1 a {
@@ -115,36 +115,35 @@ body {
 .gym .recherche .button-search {
 	padding: 0;
 }
-/* Breadcrumb */
-.gym ul.breadcrumb {
-    position: relative;
-    top: -0.9em;
-	margin: 0;
+
+/* Menu principal */
+.gym-index ul.menu,
+.gym-viewtopic .page ul.menu {
+	display: flex;
 	padding: 0;
-	color: white;
+	justify-content: space-around;
+	flex-wrap: wrap;
 }
-.gym ul.breadcrumb > li {
+.gym .menu > li {
 	display: inline-block;
 	padding: 0.4em;
 	border-radius: 1em;
-	background: #08BABE;
+	font-weight: bold;
 }
-.gym ul.breadcrumb li ul {
-	display: none;
-	position: absolute;
-	margin: 0 -0.4em;
-	padding: 0.2em;
-	border-radius: 1em;
-	background: #08BABE;
+.gym .menu li,
+.gym .menu a {
+	color: black;
 	list-style-type: none;
 }
-.gym ul.breadcrumb li ul li {
-	margin: 0.3em;
+.gym .menu ul {
+	display: none;
+	position: absolute;
+	margin-left: -0.4em;
+	padding: 0.3em;
+	border-radius: 1em;
+	font-weight: initial;
 }
-.gym .breadcrumb a {
-	color: white;
-}
-.gym .breadcrumb li:hover ul {
+.gym .menu li:hover ul {
 	display: block;
 }
 
@@ -204,7 +203,7 @@ body {
 }
 
 /* Evenements */
-.gym-index .evenement {
+.gym-index .actualite {
 	margin: 1em calc(10% - 54px);
 	border: 0.2em solid #077;
 	border-radius: 0.5em;
@@ -212,15 +211,15 @@ body {
 	color: black;
 	font-size: 1em;
 }
-.gym-index .evenement:after {
+.gym-index .actualite:after {
     content: '';
     display: block;
     clear: both;
 }
-.gym-index .evenement h1 {
+.gym-index .actualite h1 {
 	margin: 1em calc(10% - 54px) !important;
 }
-.gym-index .evenement h2 {
+.gym-index .actualite h2 {
 	margin: 0 !important;
 	padding: 0.1em;
 	border-radius: 0.2em;
@@ -228,13 +227,13 @@ body {
 	color: white;
 	font-size: 1.2em;
 }
-.gym-index .evenement a {
+.gym-index .actualite a {
 	color: white;
 }
-.gym-index .evenement > div {
+.gym-index .actualite > div {
 	padding: 0.2em;
 }
-.gym-index .evenement p {
+.gym-index .actualite p {
 	margin: 0;
 }
 
@@ -262,68 +261,6 @@ body {
 	}
 }
 
-/* Menu principal */
-.gym ul.menu {
-	width: 100%;
-	margin: 0;
-	padding: 0.3em;
-}
-.gym-index ul.menu,
-.gym-viewtopic .page ul.menu {
-	display: flex;
-	justify-content: space-around;
-	flex-wrap: wrap;
-}
-.gym-viewtopic ul.menu {
-	margin: 0.5em;
-}
-.gym-viewtopic .menu > li {
-	display: inline;
-	margin-right: 0.5em;
-}
-.gym-viewtopic > .menu > li:first-child {
-	font-size: 1.4em;
-	border-radius: 1em;
-	padding: 0.3em;
-}
-.gym-viewtopic .menu > li:first-child ul {
-	font-size: initial;
-}
-.gym-viewtopic .menu > li ul li:first-child {
-	font-size: 1.4em;
-}
-.gym .menu li {
-	margin-bottom: 0.4em;
-	padding: 0.4em;
-	border-radius: 1em;
-	list-style-type: none;
-}
-.gym .menu li a {
-	color: black;
-}
-.gym-viewtopic > .menu > li:first-child a {
-	color: white;
-}
-.gym .menu > li > span,
-.gym .menu > li > a,
-.gym .menu li ul li:first-child span,
-.gym .menu > li > a {
-	font-weight: bold;
-}
-.gym .menu li ul {
-	position: absolute;
-	border-radius: 1em;
-	padding: 0.3em;
-	margin-left: -0.4em;
-	display: none;
-}
-.gym .menu li:hover ul {
-	display: block;
-}
-.gym .menu li ul li {
-	padding: 0;
-}
-
 .copyright-dc {
 	text-align: center;
 	margin-top: 2em;
@@ -336,7 +273,8 @@ body {
 	border-radius: 0.2em;
 	background: white;
 }
-.gym .page > div {
+.gym .page > div,
+.gym .page > p {
 	margin: 0.3em;
 	padding: 0 0.2em 0.2em 0.2em;
 	text-indent: 1.5em;
@@ -355,7 +293,7 @@ body {
 	color: white;
 }
 .gym .page h2 {
-	margin: 1.2em 0 0.2em 0;
+	margin-top: 1em;
 	padding: 0.2em;
 	border-radius: 0.2em;
 	background: #08BABE;
@@ -375,9 +313,9 @@ body {
 }
 @media (max-width: 600px) {
 	.gym-index .intro,
-	.gym-index .evenement,
-	.gym-index .evenement h1,
-	.gym-index .evenement h2,
+	.gym-index .actualite,
+	.gym-index .actualite h1,
+	.gym-index .actualite h2,
 	.gym h1,
 	.gym .page,
 	.gym .page > div {

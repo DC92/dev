@@ -20,24 +20,19 @@
 	<!-- ENDIF -->
 	/> &nbsp;
 
-	Ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
-
 	Horaires <input type="checkbox" name="gym_horaires"
 	<!-- IF GYM_HORAIRES == 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
 
-	Événements <input type="checkbox" name="gym_evenements"
-	<!-- IF GYM_EVENEMENTS == 'on' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/> &nbsp;
+	Ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
 
-	<br/>Pour être publié dans la page d'accueil, le texte doit comporter une balise [accueil]
+	<br/>Pour être publié en haut de la page d'accueil, le texte doit comporter une balise [accueil]
+	<br/>Pour être publié dans la partie Actualité de la page d'accueil, le texte doit comporter une balise [actualite]
 <!-- ENDIF -->
 
-<!-- IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements' -->
+<!-- IF FORUM_ID == 2 -->
 	<br/><br/>
 	Activité
 	<select name="gym_activite">
@@ -79,21 +74,18 @@
 		<!-- END liste_animatrices -->
 	</select><br/><br/>
 
-	Note pour horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}">
-	<br/><br/>
+	Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"><br/><br/>
 
 	<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar()">
-		<!-- BEGIN topic -->
-		<!-- BEGIN post -->
-		<!-- IF post.POST_ID == REQUEST_P -->
-			<!-- BEGIN week -->
-				<option value="{week.NO}" <!-- IF week.NO == GYM_JOUR -->selected="selected"<!-- ENDIF -->>
-					{week.VALEUR}
-				</option>
-			<!-- END week -->
-		<!-- ENDIF -->
-		<!-- END post -->
-		<!-- END topic -->
+		<!-- BEGIN liste_jours -->
+			<option value="{liste_jours.NO}"
+				<!-- IF liste_jours.NO == GYM_JOUR -->
+					selected="selected"
+				<!-- ENDIF -->
+			>
+				{liste_jours.VALEUR}
+			</option>
+		<!-- END liste_jours -->
 	</select> &nbsp;
 
 	<select name="gym_heure">

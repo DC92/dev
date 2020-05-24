@@ -8,9 +8,7 @@
 
 /*
 //TODO revoir création users
-
-//APRES new template
-TODO résumé d'un cours -> dans l'activité => Update de la base
+bug changement n° jour template saisie / calendrier
 
 //BEST
 BUG dans le template.html quand espace dans POST_SUBJECT
@@ -20,7 +18,6 @@ Redimensionner les images suivant taille fenetre
 Bouton imprimer calendier
 	style print
 Erradiquer f=2
-Erradiquer template/event/posting_editor_subject_after.html : IF TOPIC_TITLE == 'Séances' or TOPIC_TITLE == 'Événements'
 
 //APRES
 Sitemap
@@ -43,7 +40,8 @@ GENERAL / Paramètres des messages / Messages par page : 99
 MESSAGES / Paramètres des fichiers joints / taille téléchargements
 MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
 MESSAGES / BBCodes / cocher afficher
-	[accueil]{TEXT}[/accueil] / <!--accueil-->{TEXT}<!--accueil--> / Partie de texte à afficher sur la page d'accueil du site
+	[accueil]{TEXT}[/accueil] / <!--accueil-->{TEXT}<!--accueil--> / Partie de texte à afficher sur le haut de la page d'accueil du site
+	[actualite]{TEXT}[/actualite] / <!--actualite-->{TEXT}<!--actualite--> / Partie de texte à afficher sur le bas de la page d'accueil du site
 	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
 	[centre]{TEXT}[/centre] / <div style="text-align:center">{TEXT}</div> / Image centrée
 	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
@@ -385,7 +383,6 @@ class listener implements EventSubscriberInterface
 			'gym_duree_jours',
 			'gym_scolaire',
 			'gym_semaines',
-			'gym_evenements',
 			'gym_horaires',
 			'gym_menu',
 			'gym_ordre_menu',
@@ -449,10 +446,13 @@ class listener implements EventSubscriberInterface
 			if (count ($resumes) > 1)
 				$row['RESUME'] = $resumes[1];
 
-			// Extrait les parties à afficher à l'acceuil
+			// Extrait les parties à afficher sur la page d'acceuil
 			$accueils = explode ('<!--accueil-->', $row['display_text']);
 			if (count ($accueils) > 1)
 				$row['accueil'] = '<p>'.$accueils[1].'</p>';
+			$s = explode ('<!--actualite-->', $row['display_text']);
+			if (count ($s) > 1)
+				$row['actualite'] = '<p>'.$s[1].'</p>';
 
 			// Jour dans la semaine
 			$static_values = $this->listes();
@@ -514,7 +514,7 @@ class listener implements EventSubscriberInterface
 					$row['gym_jour'] // Horaires
 				:
 					$row['first_gym_ordre_menu']. // Menu
-					$row['next_beg_time']. // Evenements
+					$row['next_beg_time']. // Actualité
 					$row['topic_id'] // Pour séparer les topics dans les menus
 			][
 				$row['gym_ordre_menu']. // Horaires
