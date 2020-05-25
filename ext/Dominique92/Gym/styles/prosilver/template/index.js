@@ -28,20 +28,13 @@ $('.calendrier').each(function(index, elCal) {
 				td.addClass('selected');
 		}
 	}
-	displayCalendar(elCal);
-
-	// Ajoute une case aux mois n'ayant que 4 jours de ce type
-	if (!$('body#phpbb').length) // viewtopic
-		$('.calendrier tr').each(function() {
-			if ($(this).children().length == 5)
-				$('<td>').appendTo($(this));
-		});
+	displayInputCalendar(elCal);
 });
 
-function displayCalendar(elCal) {
+function displayInputCalendar(elCal) {
 	// Marque le jour et attribue au mois
-	//TODO BUG n'initialise pas les chiffres quand scolaire est coché
-	const jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
+	let jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
+	if (isNaN(jour)) jour = 0;
 	for (let week = 0; week < 52; week++) {
 		const wEl = $('#cal_s' + week),
 			date = new Date(new Date().getFullYear(), -5); // 1er aout
@@ -49,10 +42,13 @@ function displayCalendar(elCal) {
 		wEl.appendTo('#cal_mois_' + date.getMonth());
 		wEl.children().html(date.getDate());
 	}
-}
 
-function displayInputCalendar(elCal) {
-	displayCalendar(elCal);
+	// Ajoute une case aux mois n'ayant que 4 jours de ce type
+	if (!$('body#phpbb').length) // viewtopic
+		$('.calendrier tr').each(function() {
+			if ($(this).children().length == 5)
+				$('<td>').appendTo($(this));
+		});
 
 	// Bascule scolaire / calendrier
 	$('#edit_semaines')[0].style.display =

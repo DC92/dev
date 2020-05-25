@@ -7,11 +7,14 @@
  */
 
 /*
-revoir affichage actualité
-bug changement n° jour template saisie / calendrier
+//BUGS
+lien ne passe pas dans l'actualité
 
 //BEST
 //TODO revoir création users
+Bug d'affichage avec &hilit=body
+	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
+	" dans le title !
 BUG dans le template.html quand espace dans POST_SUBJECT
 	(INCLUDE ?template=horaires&activite={postrow.POST_SUBJECT})
 Redimensionner les images suivant taille fenetre

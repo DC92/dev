@@ -230,6 +230,9 @@ body {
 .gym-index .actualite a {
 	color: white;
 }
+.gym-index .actualite div a {
+	color: blue;
+}
 .gym-index .actualite > div {
 	padding: 0.2em;
 }
