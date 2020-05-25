@@ -67,7 +67,7 @@
 </div>
 
 <h1>
-	Actualité
+	La vie du club
 	<!-- IF U_MCP -->
 	<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
 		<i class="icon fa-commenting-o"></i>
@@ -90,7 +90,10 @@
 	</h2>
 
 	<div>
-		{post.LIEU} à {post.HORAIRE_DEBUT}
+		{post.LIEU}
+		<!-- IF post.GYM_HEURE > 0 -->
+			à {post.HORAIRE_DEBUT}
+		<!-- ENDIF -->
 		<!-- IF post.ANIMATEUR -->
 			avec {post.ANIMATEUR}
 		<!-- ENDIF -->

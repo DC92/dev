@@ -8,10 +8,18 @@
 
 /*
 //BUGS
-lien ne passe pas dans l'actualité
+Tout le texte n'est pas en <p> de sorte qu'on n'a plus ma marge
+	http://c92.fr/gymtest/viewtopic.php?p=115
+Lien ne passe pas dans l'actualité
+Mettre un monsieur dans diaporama
+L'actualité ne disparait pas aprés la date
+Drole de date le 28 mai / reprise
+Masquer horaire actualité 00h00
 
 //BEST
-//TODO revoir création users
+Limiter le nombre d'infos sorties en SQL tables topic.post
+Revoir création users
+Diaporama pas vu depuis un moment boucle rapidement
 Bug d'affichage avec &hilit=body
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
 	" dans le title !

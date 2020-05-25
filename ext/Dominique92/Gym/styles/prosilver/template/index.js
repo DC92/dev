@@ -113,7 +113,7 @@ function submenuPos() {
 			elw = $(el).width(),
 			pp = $(el).parent().position();
 		$(el).css({
-			top: pp.top,
+			top: pp.bottom,
 			left: Math.min(pp.left, ww - elw)
 		});
 	});

@@ -138,13 +138,15 @@ body {
 .gym .menu ul {
 	display: none;
 	position: absolute;
-	margin-left: -0.4em;
 	padding: 0.3em;
 	border-radius: 1em;
 	font-weight: initial;
 }
 .gym .menu li:hover ul {
-	display: block;
+	display: block !important;
+}
+.gym .menu ul li {
+	margin: 0.2em;
 }
 
 /* Pages GV */
@@ -330,15 +332,12 @@ body {
 
 /* Attachements (notamment liens) */
 .gym .inline-attachment,
-.gym .inline-attachment dl {
+.gym .inline-attachment dl,
+.gym .file {
 	display: inline-block;
 	float: none !important;
 	margin: 0 !important;
-	width: initial;
-	max-width: 30vh;
-}
-.gym .file {
-	margin: 0;
+	text-indent: 0 !important;
 }
 .gym .file dd { /* Supprime le compte de vues, ... */
 	display: none;
@@ -346,10 +345,6 @@ body {
 .gym .file img {
 	max-width: 30vh;
 	border-radius: 1em;
-}
-.gym .inline-attachment {
-	float: right;
-	margin-left: 1em;
 }
 .gym .image-droite {
 	float: right;
