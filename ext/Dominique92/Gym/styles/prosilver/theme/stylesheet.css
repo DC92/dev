@@ -349,12 +349,12 @@ body {
 .gym .image-droite {
 	float: right;
 	margin-left: 0.5em;
-	text-indent: 0;
+	text-indent: 0 !important;
 }
 .gym .image-gauche {
 	float: left;
 	margin-right: 0.5em;
-	text-indent: 0;
+	text-indent: 0 !important;
 }
 @media (max-width: 600px) {
 	.gym .attach-image {

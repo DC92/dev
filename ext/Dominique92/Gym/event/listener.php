@@ -11,10 +11,9 @@
 Tout le texte n'est pas en <p> de sorte qu'on n'a plus ma marge
 	http://c92.fr/gymtest/viewtopic.php?p=115
 Lien ne passe pas dans l'actualité
-Mettre un monsieur dans diaporama
+Séparer 2 lignes de menus repliés
 L'actualité ne disparait pas aprés la date
 Drole de date le 28 mai / reprise
-Masquer horaire actualité 00h00
 
 //BEST
 Limiter le nombre d'infos sorties en SQL tables topic.post
@@ -310,13 +309,6 @@ class listener implements EventSubscriberInterface
 			foreach ($v AS $vk=>$vv)
 				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
 		}
-
-		// Liste des modérateurs
-		$sql = 'SELECT user_id, username  FROM '.USERS_TABLE.' WHERE group_id = 4 OR group_id = 5';
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$this->template->assign_block_vars ('liste_moderateurs', array_change_key_case ($row, CASE_UPPER));
-		$this->db->sql_freeresult($result);
 	}
 
 	// Called during validation of the data to be saved
@@ -399,7 +391,6 @@ class listener implements EventSubscriberInterface
 			'gym_menu',
 			'gym_ordre_menu',
 			'gym_nota',
-			'gym_moderateur',
 		]);
 
 		// Filtre pour horaires
