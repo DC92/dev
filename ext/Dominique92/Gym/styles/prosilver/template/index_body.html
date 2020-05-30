@@ -52,16 +52,14 @@
 	<!-- BEGIN topic -->
 		<!-- BEGIN post -->
 		<!-- IF post.ACCUEIL -->
-			<p>
-				<!-- IF U_MCP -->
-				<a style="float:right"
-					href="posting.php?mode=edit&f=2&p={post.POST_ID}"
-					title="Modifier la page {post.POST_SUBJECT}">
-					<i class="icon fa-pencil"></i>
-				</a>
-				<!-- ENDIF -->
-				{post.ACCUEIL}
-			</p>
+			<!-- IF U_MCP -->
+			<a style="float:right"
+				href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+				title="Modifier la page {post.POST_SUBJECT}">
+				<i class="icon fa-pencil"></i>
+			</a>
+			<!-- ENDIF -->
+			{post.ACCUEIL}
 		<!-- ENDIF -->
 		<!-- END post -->
 	<!-- END topic -->
@@ -89,7 +87,6 @@
 		</a>
 		<!-- ENDIF -->
 	</h2>
-
 	<div>
 		{post.LIEU}
 		<!-- IF post.GYM_HEURE > 0 -->
@@ -98,7 +95,7 @@
 		<!-- IF post.ANIMATEUR -->
 			avec {post.ANIMATEUR}
 		<!-- ENDIF -->
-		<p>{post.ACTUALITE}</p>
+		{post.ACTUALITE}
 	</div>
 </div>
 <!-- ENDIF -->

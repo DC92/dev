@@ -1,7 +1,7 @@
 <!-- INCLUDE header.html -->
 
-<ul class="menu breadcrumb">
-	<!-- ACCUEIL -->
+<ul class="menu">
+	<!-- MENU ACCUEIL -->
 	<li style="background:#a69efd">
 		<a title="Retour à l'accueil" href=".">
 			Accueil
@@ -21,7 +21,7 @@
 		</ul>
 	</li>
 
-	<!-- ACTIVITES -->
+	<!-- MENU ACTIVITES -->
 	<!-- BEGIN topic -->
 	<!-- IF topic.TOPIC_ID == 2 and GYM_ACTIVITE and GYM_ACTIVITE != 'off' -->
 		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
@@ -51,7 +51,7 @@
 	<!-- ENDIF -->
 	<!-- END topic -->
 
-	<!-- ACTIVITE -->
+	<!-- MENU ACTIVITE -->
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
 	<!-- IF GYM_ACTIVITE != 'off' and post.POST_ID == GYM_ACTIVITE -->
@@ -65,7 +65,7 @@
 	<!-- END post -->
 	<!-- END topic -->
 
-	<!-- RUBRIQUE -->
+	<!-- MENU RUBRIQUE -->
 	<!-- BEGIN topic -->
 	<!-- IF topic.FIRST_GYM_MENU == 'on' and topic.TOPIC_ID == REQUEST_T -->
 		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
@@ -97,6 +97,7 @@
 	<!-- ENDIF -->
 	<!-- END topic -->
 
+	<!-- MENU PAGE COURANTE -->
 	<!-- BEGIN postrow -->
 	<!-- IF postrow.POST_ID == REQUEST_P -->
 		<i class="icon fa-arrow-right"></i>
@@ -120,7 +121,7 @@
 			</h2>
 
 			<!-- IF postrow.MESSAGE -->
-				<p>{postrow.MESSAGE}</p>
+				<div>{postrow.MESSAGE}</div>
 			<!-- ENDIF -->
 		<!-- ENDIF -->
 	<!-- END postrow -->
@@ -139,7 +140,7 @@
 			<!-- ENDIF -->
 		</h2>
 		<!-- IF post.RESUME -->
-			<p>{post.RESUME}</p>
+			<div>{post.RESUME}</div>
 		<!-- ENDIF -->
 	<!-- ENDIF -->
 	<!-- END post -->
@@ -158,7 +159,7 @@
 				<!-- ENDIF -->
 			</h2>
 			<!-- IF postrow.MESSAGE -->
-				<p>{postrow.MESSAGE}</p>
+				<div>{postrow.MESSAGE}</div>
 			<!-- ENDIF -->
 		<!-- ENDIF -->
 	<!-- END postrow -->
@@ -166,13 +167,15 @@
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
 	<!-- IF REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
-		<!-- IF U_MCP -->
-			<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
-				title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
-				<i class="icon fa-pencil"></i>
-			</a>
-			<p>{post.RESUME}</p>
-		<!-- ENDIF -->
+		<div>
+			<!-- IF U_MCP -->
+				<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+					title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
+					<i class="icon fa-pencil"></i>
+				</a>
+			<!-- ENDIF -->
+			{post.RESUME}
+		</div>
 	<!-- ENDIF -->
 	<!-- END post -->
 	<!-- END topic -->

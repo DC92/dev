@@ -8,16 +8,11 @@
 
 /*
 //BUGS
-Tout le texte n'est pas en <p> de sorte qu'on n'a plus ma marge
-	http://c92.fr/gymtest/viewtopic.php?p=115
-Lien ne passe pas dans l'actualité
-Séparer 2 lignes de menus repliés
-L'actualité ne disparait pas aprés la date
+breadcum trop marge en dessous
+enlever paddings sur mobiles
 Drole de date le 28 mai / reprise
 
 //BEST
-Limiter le nombre d'infos sorties en SQL tables topic.post
-Revoir création users
 Diaporama pas vu depuis un moment boucle rapidement
 Bug d'affichage avec &hilit=body
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
@@ -397,7 +392,7 @@ class listener implements EventSubscriberInterface
 		$cond = ['TRUE'];
 		$post_id = $this->request->variable('id', '', true);
 		if ($post_id)
-			$cond[] = 'post.post_id='.$post_id;
+			$cond[] = 'p.post_id='.$post_id;
 		$activite = $this->request->variable('activite', '', true);
 		if ($activite)
 			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
@@ -416,21 +411,21 @@ class listener implements EventSubscriberInterface
 			$attachments[$row['post_msg_id']][] = $row;
 		$this->db->sql_freeresult($result);
 
-		$sql = "SELECT t.*, post.*,
+		$sql = "SELECT p.*, t.topic_title, t.topic_first_post_id,
 			first.gym_menu AS first_gym_menu,
 			first.gym_ordre_menu AS first_gym_ordre_menu,
 			first.post_subject AS first_post_subject,
 			li.post_subject AS lieu,
 			an.post_subject AS animateur,
 			ac.post_subject AS activite
-			FROM ".POSTS_TABLE." AS post
-				LEFT JOIN ".POSTS_TABLE." AS ac ON (ac.post_id = post.gym_activite)
-				LEFT JOIN ".POSTS_TABLE." AS li ON (li.post_id = post.gym_lieu)
-				LEFT JOIN ".POSTS_TABLE." AS an ON (an.post_id = post.gym_animateur)
-				LEFT JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = post.topic_id)
+			FROM ".POSTS_TABLE." AS p
+				LEFT JOIN ".POSTS_TABLE." AS ac ON (ac.post_id = p.gym_activite)
+				LEFT JOIN ".POSTS_TABLE." AS li ON (li.post_id = p.gym_lieu)
+				LEFT JOIN ".POSTS_TABLE." AS an ON (an.post_id = p.gym_animateur)
+				LEFT JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
 				LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
 				WHERE ".implode(' AND ',$cond )."
-				ORDER BY post.topic_id, post.post_id";
+				ORDER BY p.topic_id, p.post_id";
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
@@ -452,10 +447,10 @@ class listener implements EventSubscriberInterface
 			// Extrait les parties à afficher sur la page d'acceuil
 			$accueils = explode ('<!--accueil-->', $row['display_text']);
 			if (count ($accueils) > 1)
-				$row['accueil'] = '<p>'.$accueils[1].'</p>';
+				$row['accueil'] = $accueils[1];
 			$s = explode ('<!--actualite-->', $row['display_text']);
 			if (count ($s) > 1)
-				$row['actualite'] = '<p>'.$s[1].'</p>';
+				$row['actualite'] = $s[1];
 
 			// Jour dans la semaine
 			$static_values = $this->listes();
