@@ -7,11 +7,11 @@
  */
 
 /*
+//BUG martine : titre mardi et pas de cours !
 //TODO
 traduire TOPIC_ID => le n° du topic dans (INCLUDE
 breadcrum trop marge en dessous
 enlever paddings sur mobiles
-Next icon    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
 
 //BEST
 SAVE LOG : même syntaxe que dans l'éditeur

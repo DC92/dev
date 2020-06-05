@@ -364,7 +364,6 @@ body {
 	text-transform: capitalize;
 }
 .gym table.horaires {
-	display: inline-block;
 	margin-top: 0.5em;
 	border: 1px dashed;
 	border-collapse: collapse;
@@ -394,6 +393,21 @@ body {
 		width: 100%;
 		margin-left: 0 !important;
 	}
+}
+.gym .tooltip {
+	display: inline-block;
+}
+.gym .tooltip > i {
+	font-size: 2em;
+}
+.gym .tooltip table {
+	display: none;
+	position: absolute;
+	right: 0;
+	background: white;
+}
+.gym .tooltip:hover table {
+	display: block;
 }
 
 /* Calendrier */
