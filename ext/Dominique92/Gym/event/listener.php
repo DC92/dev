@@ -7,18 +7,18 @@
  */
 
 /*
-//BUGS
-breadcum trop marge en dessous
+//TODO
+traduire TOPIC_ID => le n° du topic dans (INCLUDE
+breadcrum trop marge en dessous
 enlever paddings sur mobiles
-Drole de date le 28 mai / reprise
+Next icon    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
 
 //BEST
+SAVE LOG : même syntaxe que dans l'éditeur
 Diaporama pas vu depuis un moment boucle rapidement
-Bug d'affichage avec &hilit=body
+Bug d'affichage avec &hilit=body (résultat recherche)
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
 	" dans le title !
-BUG dans le template.html quand espace dans POST_SUBJECT
-	(INCLUDE ?template=horaires&activite={postrow.POST_SUBJECT})
 Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 Bouton imprimer calendier
@@ -55,6 +55,7 @@ MESSAGES / BBCodes / cocher afficher
 	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
 	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
 	[resume]{TEXT}[/resume] / <!--resume-->{TEXT}<!--resume--> / Résumé pour affichage en début de page
+	[presentation]{TEXT}[/presentation] / <!--presentation-->{TEXT}<!--presentation--> / Presentation pour affichage dans la rubrique
 	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une rubrique
 	[saut_ligne][/saut_ligne] / <br style="clear:both" />
 	[separation][/separation] / <hr/> / Ligne horizontale
@@ -173,7 +174,8 @@ class listener implements EventSubscriberInterface
 				function ($match) {
 					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
-					$uris [count($uris) - 1] = html_entity_decode ($match[2]);
+					$m2 = urlencode (urldecode ($match[2]));
+					$uris [count($uris) - 1] = str_replace (['%26','amp%3B','%3F','%3D'], ['&','','?','='], $m2);
 					$url = 'http://'.implode ('/', $uris);
 
 					switch ($match[1]) {
@@ -242,11 +244,6 @@ class listener implements EventSubscriberInterface
 		foreach ($post_data AS $k=>$v)
 			if (strstr ($k, 'gym') && is_string ($v))
 				$post_row[strtoupper($k)] = $v;
-
-		// Extrait des résumé des parties à afficher
-		$resumes = explode ('<!--resume-->', $post_row['MESSAGE']);
-		if (count ($resumes) > 1)
-			$post_row['RESUME'] = $resumes[1];
 
 		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
 		$post_row['MESSAGE'] = preg_replace_callback(
@@ -440,17 +437,11 @@ class listener implements EventSubscriberInterface
 				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
 			// Extrait des résumé des parties à afficher
-			$resumes = explode ('<!--resume-->', $row['display_text']);
-			if (count ($resumes) > 1)
-				$row['RESUME'] = $resumes[1];
-
-			// Extrait les parties à afficher sur la page d'acceuil
-			$accueils = explode ('<!--accueil-->', $row['display_text']);
-			if (count ($accueils) > 1)
-				$row['accueil'] = $accueils[1];
-			$s = explode ('<!--actualite-->', $row['display_text']);
-			if (count ($s) > 1)
-				$row['actualite'] = $s[1];
+			foreach (['accueil','actualite','resume','presentation'] AS $k) {
+				$vs = explode ("<!--$k-->", $row['display_text']);
+				if (count ($vs) > 1)
+					$row[strtoupper($k)] = $vs[1];
+			}
 
 			// Jour dans la semaine
 			$static_values = $this->listes();
@@ -506,6 +497,7 @@ class listener implements EventSubscriberInterface
 			$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
 			$template = $this->request->variable('template', '');
 
+
 			// Range les résultats dans l'ordre et le groupage espéré
 			$liste [
 				$template == 'horaires' ?
@@ -533,13 +525,11 @@ class listener implements EventSubscriberInterface
 				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
 				$first['COUNT'] = count ($v);
-//				$first['K'] = $k;
 				$this->template->assign_block_vars ('topic', $first);
 
 				// Tri du 2" niveau
 				ksort ($v, SORT_STRING);
 				foreach ($v AS $kv=>$vv) {
-//					$vv['KV'] = $kv;
 					if ($topic){
 						$vv['COULEUR'] = $this->couleur ();
 						$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);

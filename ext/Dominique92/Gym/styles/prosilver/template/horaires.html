@@ -8,9 +8,11 @@
 
 	<!-- BEGIN topic -->
 	<div class="horaires j{topic.GYM_JOUR}">
-		<div style="margin-left:calc((10% - 60px) * {topic.GYM_JOUR} + 1em)">
-			{topic.GYM_JOUR_LITERAL}
-		</div>
+		<!-- IF topic.GYM_HEURE != '00' -->
+			<div style="margin-left:calc((10% - 60px) * {topic.GYM_JOUR} + 1em)">
+				{topic.GYM_JOUR_LITERAL}
+			</div>
+		<!-- ENDIF -->
 
 		<table style="
 			margin-left:calc((10% - 60px) * {topic.GYM_JOUR});

@@ -1,5 +1,6 @@
 <!-- INCLUDE header.html -->
 
+<!-- BREADCRUMB -->
 <ul class="menu">
 	<!-- MENU ACCUEIL -->
 	<li style="background:#a69efd">
@@ -8,7 +9,7 @@
 		</a>
 
 		<!-- SOUS MENU DU TITRE -->
-		<ul style="background:#a69efd">
+		<ul style="background:#a69efd" class="submenu">
 			<!-- BEGIN topic -->
 			<!-- IF topic.FIRST_GYM_MENU == 'on' -->
 			<li>
@@ -23,7 +24,7 @@
 
 	<!-- MENU ACTIVITES -->
 	<!-- BEGIN topic -->
-	<!-- IF topic.TOPIC_ID == 2 and GYM_ACTIVITE and GYM_ACTIVITE != 'off' -->
+	<!-- IF topic.TOPIC_ID == 2 and GYM_ACTIVITE and GYM_ACTIVITE != 'off' and GYM_ACTIVITE != '?' -->
 		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
 		<li style="background:#f3ce88">
 			<!-- RUBRIQUE -->
@@ -81,7 +82,7 @@
 
 			<!-- SOUS MENU DE LA RUBRIQUE -->
 			<!-- IF topic.COUNT > 1 -->
-			<ul style="background:#c7f793">
+			<ul style="background:#c7f793" class="submenu">
 				<!-- BEGIN post -->
 				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
 				<li>
@@ -119,10 +120,7 @@
 					</a>
 				<!-- ENDIF -->
 			</h2>
-
-			<!-- IF postrow.MESSAGE -->
-				<div>{postrow.MESSAGE}</div>
-			<!-- ENDIF -->
+			<div>{postrow.MESSAGE}</div>
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
@@ -139,9 +137,7 @@
 				</a>
 			<!-- ENDIF -->
 		</h2>
-		<!-- IF post.RESUME -->
-			<div>{post.RESUME}</div>
-		<!-- ENDIF -->
+		<div>{post.RESUME}</div>
 	<!-- ENDIF -->
 	<!-- END post -->
 	<!-- END topic -->
@@ -158,54 +154,40 @@
 					</a>
 				<!-- ENDIF -->
 			</h2>
-			<!-- IF postrow.MESSAGE -->
-				<div>{postrow.MESSAGE}</div>
-			<!-- ENDIF -->
+			<div>{postrow.MESSAGE}</div>
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
-	<!-- IF REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
-		<div>
-			<!-- IF U_MCP -->
-				<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
-					title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
-					<i class="icon fa-pencil"></i>
-				</a>
-			<!-- ENDIF -->
-			{post.RESUME}
-		</div>
-	<!-- ENDIF -->
+		<!-- IF REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
+			<div>
+				<!-- IF U_MCP -->
+					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+						title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
+						<i class="icon fa-pencil"></i>
+					</a>
+				<!-- ENDIF -->
+				{post.RESUME}
+			</div>
+		<!-- ELSEIF REQUEST_T == post.TOPIC_ID and post.PRESENTATION -->
+			<div>
+				<h2>
+					<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
+					<!-- IF U_MCP -->
+						<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+							title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
+							<i class="icon fa-pencil"></i>
+						</a>
+					<!-- ENDIF -->
+				</h2>
+				{post.PRESENTATION}
+				(INCLUDE ?template=horaires-pack&animateur={post.POST_SUBJECT})
+				<div style="clear:both" />
+			</div>
+		<!-- ENDIF -->
 	<!-- END post -->
 	<!-- END topic -->
-
-	<!-- SOUS-MENU DES RUBRIQUES -->
-	<!-- IF not REQUEST_P -->
-	<ul class="menu">
-		<!-- BEGIN topic -->
-		<!-- IF topic.FIRST_GYM_MENU == 'on' and topic.TOPIC_ID == REQUEST_T and topic.COUNT > 1 -->
-			<!-- BEGIN post -->
-				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
-				<li style="background:{post.COULEUR}">
-					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
-						{post.POST_SUBJECT}
-					</a>
-				</li>
-			<!-- ENDIF -->
-			<!-- END post -->
-
-			<!-- IF U_MCP -->
-			<li>
-				<a title="Ajouter un ballon au sous-menu {topic.TOPIC_TITLE}" href="posting.php?mode=reply&f=2&t={topic.TOPIC_ID}">
-					<i class="icon fa-commenting-o" aria-hidden="true"></i>
-				</a>
-			</li>
-			<!-- ENDIF -->
-		<!-- ENDIF -->
-		<!-- END topic -->
-	</ul>
-	<!-- ENDIF -->
 </div>
 
 <!-- INCLUDE footer.html -->

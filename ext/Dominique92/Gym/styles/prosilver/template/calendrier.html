@@ -1,7 +1,7 @@
 <!-- BEGIN topic -->
 	<!-- BEGIN post -->
-	<!-- IF post.POST_ID == REQUEST_ID -->
-		<table id="cal_{post.POST_ID}"
+	<!-- IF post.POST_ID == REQUEST_ID and post.GYM_SEMAINES != 'off' -->
+		<table
 			class="calendrier"
 			data-jour="{post.GYM_JOUR}"
 			data-semaines="{post.GYM_SEMAINES}"
