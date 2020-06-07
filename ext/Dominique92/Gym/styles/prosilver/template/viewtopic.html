@@ -11,7 +11,7 @@
 		<!-- SOUS MENU DU TITRE -->
 		<ul style="background:#a69efd" class="submenu">
 			<!-- BEGIN topic -->
-			<!-- IF topic.FIRST_GYM_MENU == 'on' -->
+			<!-- IF topic.FIRST_GYM_MENU -->
 			<li>
 				<a title="Voir la fiche {topic.TOPIC_TITLE}" href="viewtopic.php?t={topic.TOPIC_ID}">
 					{topic.TOPIC_TITLE}
@@ -24,7 +24,7 @@
 
 	<!-- MENU ACTIVITES -->
 	<!-- BEGIN topic -->
-	<!-- IF topic.TOPIC_ID == 2 and GYM_ACTIVITE and GYM_ACTIVITE != 'off' and GYM_ACTIVITE != '?' -->
+	<!-- IF topic.TOPIC_ID == 2 and GYM_ACTIVITE and GYM_ACTIVITE -->
 		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
 		<li style="background:#f3ce88">
 			<!-- RUBRIQUE -->
@@ -39,7 +39,7 @@
 			<!-- SOUS MENU DE LA RUBRIQUE -->
 			<ul style="background:#f3ce88" class="submenu">
 				<!-- BEGIN post -->
-				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<!-- IF post.GYM_MENU and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
 				<li>
 					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
 						{post.POST_SUBJECT}
@@ -55,7 +55,7 @@
 	<!-- MENU ACTIVITE -->
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
-	<!-- IF GYM_ACTIVITE != 'off' and post.POST_ID == GYM_ACTIVITE -->
+	<!-- IF GYM_ACTIVITE and post.POST_ID == GYM_ACTIVITE -->
 		<i class="icon fa-arrow-right"></i>
 		<li style="background:#d987de">
 			<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
@@ -68,7 +68,7 @@
 
 	<!-- MENU RUBRIQUE -->
 	<!-- BEGIN topic -->
-	<!-- IF topic.FIRST_GYM_MENU == 'on' and topic.TOPIC_ID == REQUEST_T -->
+	<!-- IF topic.FIRST_GYM_MENU and topic.TOPIC_ID == REQUEST_T -->
 		<i class="icon fa-arrow-right"></i> <!-- Séparateur -->
 		<li style="background:#c7f793">
 			<!-- RUBRIQUE -->
@@ -84,7 +84,7 @@
 			<!-- IF topic.COUNT > 1 -->
 			<ul style="background:#c7f793" class="submenu">
 				<!-- BEGIN post -->
-				<!-- IF post.GYM_MENU == 'on' and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<!-- IF post.GYM_MENU and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
 				<li>
 					<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
 						{post.POST_SUBJECT}
@@ -110,7 +110,7 @@
 <div class="page">
 	<!-- RUBRIQUE -->
 	<!-- BEGIN postrow -->
-		<!-- IF not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and REQUEST_P != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU == 'on' -->
+		<!-- IF not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID and REQUEST_P != postrow.TOPIC_FIRST_POST_ID and postrow.GYM_MENU -->
 			<h2>
 				{postrow.POST_SUBJECT}
 				<!-- IF U_MCP -->
@@ -158,9 +158,11 @@
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
+	<!-- ANIMATRICES -->
+	<!-- BEGIN animatrices -->
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
-		<!-- IF REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
+		<!-- IF REQUEST_P and REQUEST_P == post.GYM_ACTIVITE and post.RESUME -->
 			<div>
 				<!-- IF U_MCP -->
 					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
@@ -171,7 +173,7 @@
 				{post.RESUME}
 			</div>
 		<!-- ELSEIF REQUEST_T == post.TOPIC_ID and post.PRESENTATION and not REQUEST_P -->
-			<div>
+			<div class="animatrice">
 				<h2>
 					<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
 					<!-- IF U_MCP -->

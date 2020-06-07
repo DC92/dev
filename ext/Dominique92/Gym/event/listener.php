@@ -7,13 +7,10 @@
  */
 
 /*
-//BUG martine : titre mardi et pas de cours !
-//TODO
-traduire TOPIC_ID => le n° du topic dans (INCLUDE
-breadcrum trop marge en dessous
-enlever paddings sur mobiles
-
 //BEST
+traduire TOPIC_ID => le n° du topic dans (INCLUDE
+Glissement latéral pages
+Lien gmaps 
 SAVE LOG : même syntaxe que dans l'éditeur
 Diaporama pas vu depuis un moment boucle rapidement
 Bug d'affichage avec &hilit=body (résultat recherche)
@@ -426,6 +423,11 @@ class listener implements EventSubscriberInterface
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
+			// Clean non selected values
+			foreach ($row AS $k=>$v)
+				if ($v == 'off' || $v == '?')
+					unset($row[$k]); 
+
 			// BBCodes et attachements
 			$row['display_text'] = generate_text_for_display(
 				$row['post_text'],
@@ -458,7 +460,7 @@ class listener implements EventSubscriberInterface
 			$row['gym_minute_fin'] = $row['gym_minute_fin'] % 60;
 
 			// Date
-			if($row['gym_semaines'] && $row['gym_semaines'] != 'off') {
+			if($row['gym_semaines'] && $row['gym_semaines']) {
 				setlocale(LC_ALL, 'fr_FR');
 				$row['next_end_time'] = INF;
 				// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
@@ -495,12 +497,10 @@ class listener implements EventSubscriberInterface
 			$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
 			$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
 			$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
-			$template = $this->request->variable('template', '');
-
 
 			// Range les résultats dans l'ordre et le groupage espéré
 			$liste [
-				$template == 'horaires' ?
+				$this->request->variable('template', '') == 'horaires' ?
 					$row['gym_jour'] // Horaires
 				:
 					$row['first_gym_ordre_menu']. // Menu
@@ -520,7 +520,9 @@ class listener implements EventSubscriberInterface
 			ksort ($liste, SORT_STRING);
 			foreach ($liste AS $k=>$v) {
 				// La première ligne pour avoir les valeurs générales
-				$first = array_values ($v)[0];
+				$first = [];
+				foreach ($v AS $vv)
+					$first = array_merge ($vv, $first);
 				$first['COULEUR'] = $this->couleur ();
 				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
