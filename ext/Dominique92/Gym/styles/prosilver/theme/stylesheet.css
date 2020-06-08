@@ -53,8 +53,13 @@ body {
 	margin-top: 2em;
 	font-size: 0.7em;
 }
+@media (max-width: 600px) {
+	body.gym  {
+		background-image: none;
+	}
+}
 
-/* Banniere */
+/* Header */
 .gym .banniere {
 	text-align: center;
 	background: #5826F4;
@@ -72,12 +77,10 @@ body {
 .gym .banniere h1 a:hover {
 	color: black;
 }
-/* Logo */
 .gym .logo img {
 	width: calc(45px + 3vw);
 	float: left;
 }
-/* User connexion */
 .gym .edit-user {
 	float: left;
 	padding-top: 1em;
@@ -97,17 +100,6 @@ body {
 .gym .edit-user:hover ul {
 	display: block;
 }
-@media (max-width: 600px) {
-	.gym .edit-user {
-		display: none;
-	}
-}
-@media (max-width: 400px) {
-	.gym .banniere h1 span {
-		display: none;
-	}
-}
-/* Search box */
 .gym form.recherche {
 	float: right;
 	padding-top: 1em;
@@ -121,6 +113,130 @@ body {
 }
 .gym .recherche:hover input {
 	display: inline-block;
+}
+@media (max-width: 600px) {
+	.gym .logo,
+	.gym .edit-user {
+		display: none;
+	}
+}
+
+/* Corps de la page */
+.gym .page {
+	margin: 0 calc(10% - 50px);
+	border-radius: 0.2em;
+	background: white;
+}
+.gym .page > div {
+	margin: 0.3em;
+	padding: 0.2em;
+	text-align: justify;
+}
+.gym h1 {
+	margin: calc(10% - 54px);
+	margin-top: 1em;
+	padding: 0.2em;
+	border-radius: 0.2em;
+	background: #5826F4;
+	color: white;
+	font-size: 1.3em;
+}
+.gym h1 a {
+	color: white;
+}
+.gym h2:first-child {
+	margin-top: 0;
+}
+.gym h2 {
+	padding: 0.2em;
+	border-radius: 0.2em;
+	background: #08BABE;
+	color: white;
+	font-size: 1.1em;
+}
+.gym h2 a {
+	color: white;
+}
+.gym h3 {
+	margin: 0.5em 0 0 0;
+	color: #5826F4;
+}
+.gym h4 {
+	margin: 0.5em 0 0 0;
+	color: #08BABE;
+}
+.gym a {
+	color: blue;
+}
+.gym a:hover {
+	background: blue;
+	color: white;
+}
+@media (max-width: 600px) {
+	.gym .page {
+		margin: 0;
+		border-radius: 0;
+	}
+	.gym .page > div {
+		margin: 1vw;
+		padding: 0;
+		border-radius: 0;
+	}
+	.gym h1 {
+		margin: 0;
+		margin-top: 1em;
+		padding: 1vw;
+		border-radius: 0;
+	}
+	.gym h2 {
+		margin: 0;
+		padding: 1vw;
+		border-radius: 0;
+	}
+}
+
+/* Attachements (liens et images) */
+.gym .inline-attachment,
+.gym .inline-attachment dl,
+.gym .file {
+	display: inline-block;
+	float: none !important;
+	margin: 0 !important;
+	text-indent: 0 !important;
+}
+.gym .file dd { /* Supprime le compte de vues, ... */
+	display: none;
+}
+.gym .file img {
+	max-width: 30vh;
+	border-radius: 1em;
+}
+.gym .image-droite {
+	float: right;
+	margin-left: 0.5em;
+}
+.gym .image-gauche {
+	float: left;
+	margin-right: 0.5em;
+}
+.gym .animatrice .attach-image img {
+	width: 20vw !important;
+}
+@media (max-width: 600px) {
+	.gym .image-droite,
+	.gym .image-gauche,
+	.gym .inline-attachment,
+	.gym .attach-image {
+		display: none;
+	}
+	.gym .animatrice .image-droite,
+	.gym .animatrice .image-gauche,
+	.gym .animatrice .inline-attachment,
+	.gym .animatrice .attach-image {
+		display: block;
+		margin: 0;
+		padding: 0 0.2em 0 0;
+	}
 }
 
 /* Menu accueil et sous-menu pages */
@@ -166,79 +282,14 @@ body {
 	margin: 0.2em;
 }
 
-/* Page d'accueil */
-.gym .intro,
-.gym .actualite {
-	margin: 0.5em calc(10% - 54px);
-	border-radius: 0.5em;
-	background: white;
-	text-align: justify;
-}
-.gym .intro {
-	margin-bottom: 1.5em !important;
-	padding: 0.5em;
-	text-indent: 1em;
-}
-.gym .intro a {
-	margin-left: 0.4em;
-	text-indent: 0;
-}
-.gym .intro a:hover {
-	background: blue;
-	color: white;
-}
-.gym .intro > ul,
-.gym .intro > ul > li {
-	margin: 0.2em;
-	padding: 0;
-	text-indent: 0.3em;
-	font-family: calibri, sans-serif;
-	list-style: none;
-}
-
-/* Evenements */
-.gym .actualite {
-	border: 0.2em solid #077;
-}
-.gym .actualite h1 {
-	margin: 1em calc(10% - 54px) !important;
-}
-.gym .actualite h2 {
-	margin: 0 !important;
-	padding: 0.1em;
-	border-radius: 0.2em;
-	background: #08BABE;
-	color: white;
-	font-size: 1.2em;
-}
-.gym .actualite a {
-	color: blue;
-}
-.gym .actualite h2 a {
-	color: white;
-}
-.gym .actualite a:hover {
-	background: blue;
-	color: white;
-}
-.gym .actualite div {
-	padding: 0.5em;
-	text-indent: 1em;
-}
-.gym .intro:after,
-.gym .actualite:after {
-    content: '';
-    display: block;
-    clear: both;
-}
-
 /* Slideshow */
 .slideshow {
 	float: right;
-	text-indent: 0;
-	margin-left: 0.7em;
 	width: 400px;
 	height: 300px;
+	margin-left: 0.7em;
+	padding: 0 !important;
+	text-indent: 0;
 	overflow: hidden;
 }
 .slideshow ul {
@@ -251,138 +302,9 @@ body {
 .slideshow li {
 	float: left;
 }
-
 @media (max-width: 600px) {
-	body.gym  {
-		background-image: none;
-	}
-	.gym .logo,
-	.gym-index h1 span {
-		display: none;
-	}
 	.slideshow {
 		display: none;
-	}
-}
-
-/* Corps de la page */
-.gym .page {
-	margin: 0 calc(10% - 54px);
-	border-radius: 0.2em;
-	background: white;
-}
-.gym .page div {
-	margin: 0.3em;
-	padding: 0 0.2em 0.2em 0.2em;
-	text-align: justify;
-}
-.gym h1 {
-	margin: calc(10% - 54px);
-	padding: 0.2em;
-	border-radius: 0.2em;
-	background: #5826F4;
-	color: white;
-	font-size: 1.3em;
-}
-.gym h1 a {
-	color: white;
-}
-.gym .page h2:first-child {
-	margin-top: 0;
-}
-.gym .page h2 {
-	padding: 0.2em;
-	border-radius: 0.2em;
-	background: #08BABE;
-	color: white;
-	font-size: 1.1em;
-}
-.gym .page h2 a {
-	color: white;
-}
-.gym .page h3 {
-	margin: 0.5em 0 0 0;
-	color: #5826F4;
-}
-.gym .page h4 {
-	margin: 0.5em 0 0 0;
-	color: #08BABE;
-}
-.gym .page a {
-	color: blue;
-}
-.gym .page a:hover {
-	background: blue;
-	color: white;
-}
-@media (max-width: 600px) {
-	.gym-index .intro,
-	.gym-index .actualite,
-	.gym-index .actualite h1,
-	.gym-index .actualite h2,
-	.gym h1,
-	.gym .page,
-	.gym .page > div {
-		border: 0 !important;
-		margin: 0;
-		padding: 0 !important;
-		border-radius: 0;
-	}
-}
-
-/* Attachements (notamment liens) */
-.gym .inline-attachment,
-.gym .inline-attachment dl,
-.gym .file {
-	display: inline-block;
-	float: none !important;
-	margin: 0 !important;
-	text-indent: 0 !important;
-}
-.gym .file dd { /* Supprime le compte de vues, ... */
-	display: none;
-}
-.gym .file img {
-	max-width: 30vh;
-	border-radius: 1em;
-}
-.gym .image-droite {
-	float: right;
-	margin-left: 0.5em;
-	text-indent: 0 !important;
-}
-.gym .image-gauche {
-	float: left;
-	margin-right: 0.5em;
-	text-indent: 0 !important;
-}
-.gym .animatrice .attach-image img {
-	width: 20vw !important;
-}
-@media (max-width: 600px) {
-	.gym .attach-image {
-		display: none;
-	}
-	.gym .animatrice .attach-image {
-		display: block;
-	}
-}
-
-/* BBCodes spéciaux */
-.gym .carte {
-	clear: both;
-	width: 500px;
-	height: 375px;
-	margin: 1em calc(50% - 250px);
-}
-@media (max-width: 600px) {
-	.gym .carte,
-	.gym .carte div {
-		width: 100%;
-		height: 70vw;
-		margin: 0 !important;
-		padding: 0 !important;
-		text-indent: 0 !important;
 	}
 }
 
@@ -408,7 +330,6 @@ body {
 .gym .horaires td {
 	border: 1px dashed;
 	padding: 0.2em;
-	text-indent: 0;
 	text-align: left;
 }
 .gym .horaires a {
@@ -460,7 +381,6 @@ body {
 	border: 1px solid grey;
 	padding: 0.25em;
 	width: 1.5em;
-	text-indent: 0;
 	text-align: center;
 	color: #999;
 }
@@ -480,4 +400,21 @@ body {
 #cal_mois_6,
 #cal_mois_7 {
 	display: none;
+}
+
+/* Cartes */
+.gym .carte {
+	clear: both;
+	width: 500px;
+	height: 375px;
+	margin: 1em calc(50% - 250px);
+}
+@media (max-width: 600px) {
+	.gym .carte,
+	.gym .carte div {
+		width: 100%;
+		height: 70vw;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
 }

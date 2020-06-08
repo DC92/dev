@@ -171,8 +171,11 @@ class listener implements EventSubscriberInterface
 				function ($match) {
 					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
-					$m2 = urlencode (urldecode ($match[2]));
-					$uris [count($uris) - 1] = str_replace (['%26','amp%3B','%3F','%3D'], ['&','','?','='], $m2);
+					$uris [count($uris) - 1] = str_replace (
+						['%23','%26','amp%3B','%3F','%3D'],
+						['#','&','','?','='],
+						urlencode (urldecode ($match[2]))
+					);
 					$url = 'http://'.implode ('/', $uris);
 
 					switch ($match[1]) {

@@ -34,7 +34,7 @@
 	<!-- ENDIF -->
 </ul>
 
-<div class="intro">
+<div class="page">
 	<div class="slideshow">  
 		<ul>
 			<!-- //TODO automatiser à partir du répertoire -->
@@ -49,23 +49,23 @@
 		</ul>  
 	</div>
 
+	<div>
 	<!-- BEGIN topic -->
 		<!-- BEGIN post -->
 		<!-- IF post.ACCUEIL -->
 			<!-- IF U_MCP -->
-			<a style="float:right"
-				href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+			<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 				title="Modifier la page {post.POST_SUBJECT}">
-				<i class="icon fa-pencil"></i>
-			</a>
+				<i class="icon fa-pencil"></i></a>
 			<!-- ENDIF -->
 			{post.ACCUEIL}
 		<!-- ENDIF -->
 		<!-- END post -->
 	<!-- END topic -->
+	</div>
 </div>
 
-<h1>
+<h1 id="evenements">
 	La vie du club
 	<!-- IF U_MCP -->
 	<a title="Créer un nouvel évènement" href="posting.php?mode=reply&amp;f=2&t=7">
@@ -77,7 +77,7 @@
 <!-- BEGIN topic -->
 <!-- BEGIN post -->
 <!-- IF post.ACTUALITE -->
-<div class="actualite">
+<div class="page">
 	<h2>
 		{post.DATE}: <a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
 		<!-- IF U_MCP -->
