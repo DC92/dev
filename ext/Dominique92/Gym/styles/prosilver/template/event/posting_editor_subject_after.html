@@ -23,41 +23,41 @@
 	Activité
 	<select name="gym_activite">
 		<option>?</option>
-		<!-- BEGIN liste_activites -->
-			<option value="{liste_activites.POST_ID}"
-				<!-- IF liste_activites.POST_ID == GYM_ACTIVITE -->
+		<!-- BEGIN liste_2 -->
+			<option value="{liste_2.POST_ID}"
+				<!-- IF liste_2.POST_ID == GYM_ACTIVITE -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_activites.POST_SUBJECT}
+				{liste_2.POST_SUBJECT}
 			</option>
-		<!-- END liste_activites -->
+		<!-- END liste_2 -->
 	</select>
 
 	<select name="gym_lieu">
 		<option>Lieu ?</option>
-		<!-- BEGIN liste_lieux -->
-			<option value="{liste_lieux.POST_ID}"
-				<!-- IF liste_lieux.POST_ID == GYM_LIEU -->
+		<!-- BEGIN liste_3 -->
+			<option value="{liste_3.POST_ID}"
+				<!-- IF liste_3.POST_ID == GYM_LIEU -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_lieux.POST_SUBJECT}
+				{liste_3.POST_SUBJECT}
 			</option>
-		<!-- END liste_lieux -->
+		<!-- END liste_3 -->
 	</select>
 
 	<select name="gym_animateur">
-		<option>Animatrice ?</option>
-		<!-- BEGIN liste_animatrices -->
-			<option value="{liste_animatrices.POST_ID}"
-				<!-- IF liste_animatrices.POST_ID == GYM_ANIMATEUR -->
+		<option>Animat.eur.rice ?</option>
+		<!-- BEGIN liste_4 -->
+			<option value="{liste_4.POST_ID}"
+				<!-- IF liste_4.POST_ID == GYM_ANIMATEUR -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_animatrices.POST_SUBJECT}
+				{liste_4.POST_SUBJECT}
 			</option>
-		<!-- END liste_animatrices -->
+		<!-- END liste_4 -->
 	</select><br/><br/>
 
 	Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"><br/><br/>

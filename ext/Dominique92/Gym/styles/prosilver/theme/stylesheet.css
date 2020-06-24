@@ -120,6 +120,11 @@ body {
 		display: none;
 	}
 }
+@media (max-width: 400px) {
+	.gym .banniere h1 span {
+		display: none;
+	}
+}
 
 /* Corps de la page */
 .gym .page {

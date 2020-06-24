@@ -285,21 +285,20 @@ class listener implements EventSubscriberInterface
 				);
 
 		// Dictionnaires en fonction du contenu de la base de données
-		//TODO importer seulement activités, lieux, animateurs
-		$sql = "SELECT post_id, post_subject, topic_title
+		$sql = "SELECT post_id, post_subject, topic_id
 			FROM ".POSTS_TABLE."
 			JOIN ".TOPICS_TABLE." USING (topic_id)
-			WHERE post_id != topic_first_post_id";
+			WHERE post_id != topic_first_post_id
+				AND topic_id IN(2,3,4)";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
-			$values [$row['topic_title']][$row['post_subject']] = $row;
+			$values [$row['topic_id']][$row['post_subject']] = $row;
 		$this->db->sql_freeresult($result);
-		setlocale(LC_ALL, 'fr_FR');
+
 		foreach ($values AS $k=>$v) {
-			$kk = 'liste_'.strtolower (iconv ('UTF-8','ASCII//TRANSLIT', ($k)));
 			ksort ($v);
-			foreach ($v AS $vk=>$vv)
-				$this->template->assign_block_vars ($kk, array_change_key_case ($vv, CASE_UPPER));
+			foreach ($v AS $vv)
+				$this->template->assign_block_vars ('liste_'.$k, array_change_key_case ($vv, CASE_UPPER));
 		}
 	}
 
