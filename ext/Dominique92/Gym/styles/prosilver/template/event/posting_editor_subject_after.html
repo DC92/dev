@@ -100,7 +100,7 @@
 	durée
 	<input name="gym_duree_heures" type="number" step="0.25" min ="1" style="width:60px"
 	value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
-	<input name="gym_duree_jours" type="number" style="width:30px" value="{GYM_DUREE_JOURS}">jour(s)
+	<input name="gym_duree_jours" type="number" style="width:60px" value="{GYM_DUREE_JOURS}">jour(s)
 	<br/><br/>
 
 	Période : scolaire
@@ -109,6 +109,10 @@
 		checked="checked"
 	<!-- ENDIF -->
 	/><br/>
+
+	<script>
+		var annee_debut = {ANNEE_DEBUT};
+	</script>
 
 	<table id="edit_semaines"
 		class="calendrier"

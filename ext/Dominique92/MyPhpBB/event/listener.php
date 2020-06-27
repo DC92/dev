@@ -102,61 +102,44 @@ class listener implements EventSubscriberInterface
 		$post_data = $vars['post_data'];
 		$page_data = $vars['page_data'];
 
-		// To prevent an empty title to invalidate the full page and input.
+		// Prevent an empty title to invalidate the full page and input.
 		if (!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'New';
 
 		// Keep trace of values prior to modifications
-		// Create a log file with the existing data if there is none
-		$this->save_post_data($post_data, $vars['message_parser']->attachment_data, true);
+		// Create a log file with the post existing data if there is none
+
+		// Create the LOG directory if none
+		if (!is_dir('LOG'))
+			mkdir('LOG');
+		// Add a blank file if none
+		file_put_contents ('LOG/index.html', '');
+
+		// Create the file with the existing post data
+		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+		if (!file_exists ($file_name))
+			file_put_contents ($file_name,
+				'_______________________________'.PHP_EOL.
+				date('r').PHP_EOL.
+				$post_data['post_subject'].PHP_EOL.
+				$post_data['post_text'].PHP_EOL.PHP_EOL
+			);
 
 		$vars['page_data'] = $page_data;
 	}
 
 	// Called after the post validation
 	function modify_submit_notification_data($vars) {
-		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data']);
-	}
+		$post_data = $vars['data_ary'];
+		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 
-	function save_post_data($post_data, $attachment_data, $create_if_null = false) {
-		if (isset ($post_data['post_id'])) {
-			// Create the LOG directory if none
-			if (!is_dir('LOG'))
-				mkdir('LOG');
-			// Add a blank file if none
-			file_put_contents ('LOG/index.html', '');
-
-			// Assign post_id to template for link in posting
-			$this->template->assign_var ('POST_ID', $post_data['post_id']);
-
-			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-			if (!$create_if_null || !file_exists($file_name)) {
-				// Request data
-				$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-				$to_save = [
-					'user' => $this->user->data['username'].' '.date('r'),
-					'url' => $server['REQUEST_URI'],
-				];
-
-				// Post data
-				$sql = 'SELECT * FROM '.POSTS_TABLE.' WHERE post_id = '.$post_data['post_id'];
-				$result = $this->db->sql_query($sql);
-				$row = $this->db->sql_fetchrow($result);
-				$this->db->sql_freeresult($result);
-				foreach ($row AS $k=>$v)
-					if ($v && $v != 1 && $v != 'off' && $k != 'post_checksum')
-						$to_save[$k] = utf8_decode ($v);
-
-				// Save attachment_data
-				$attach = [];
-				if ($attachment_data)
-					foreach ($attachment_data AS $att)
-						$attach[] = $att['attach_id'].' : '.$att['real_filename'];
-				if (isset ($attach))
-					$to_save[] = 'attachments = '.implode (', ', $attach);
-
-				file_put_contents ($file_name, var_export($to_save,true)."\n\n", FILE_APPEND);
-			}
-		}
+		// Log new post data
+		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+		file_put_contents ($file_name,
+			'_______________________________'.PHP_EOL.
+			date('r').' '.$this->user->data['username'].PHP_EOL.
+			$post['subject'].PHP_EOL.
+			$post['message'].PHP_EOL.PHP_EOL,
+		FILE_APPEND);
 	}
 }

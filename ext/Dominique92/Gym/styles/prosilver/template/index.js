@@ -37,8 +37,7 @@ function displayInputCalendar(elCal) {
 	if (isNaN(jour)) jour = 0;
 	for (let week = 0; week < 52; week++) {
 		const wEl = $('#cal_s' + week),
-			date = new Date(new Date().getFullYear(), -5); // 1er aout
-		date.setDate(date.getDate() - date.getDay() + jour + 1 + week * 7); // Jour de la semaine
+			date = new Date(annee_debut, 8 - 1, 3 + week * 7 + jour); // Jour suivant le lundi suivant le 1er aout annee_debut
 		wEl.appendTo('#cal_mois_' + date.getMonth());
 		wEl.children().html(date.getDate());
 	}
@@ -50,9 +49,9 @@ function displayInputCalendar(elCal) {
 				$('<td>').appendTo($(this));
 		});
 
-	// Bascule scolaire / calendrier
-	$('#edit_semaines')[0].style.display =
-		$('#gym_scolaire')[0].checked ? 'none' : 'block';
+	// Affiche le calendrier si la coche scolaire n'est pas cochée
+	const scolaireChecked = $('#gym_scolaire:checked').length;
+	$('#edit_semaines').css('display', scolaireChecked ? 'none' : 'block');
 }
 
 // BBCode ajout d'une carte

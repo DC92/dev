@@ -447,37 +447,24 @@ class listener implements EventSubscriberInterface
 					$row[strtoupper($k)] = $vs[1];
 			}
 
-			// Jour dans la semaine
-			$static_values = $this->listes();
-			$row['gym_jour'] = intval ($row['gym_jour']);
-			$row['gym_jour_literal'] = $static_values['jours'][$row['gym_jour']];
-			// Temps début
-			$row['gym_heure'] = intval ($row['gym_heure']);
-			$row['gym_minute'] = intval ($row['gym_minute']);
-			// Temps fin
-			$row['gym_duree_heures'] = intval ($row['gym_duree_heures']);
-			$row['gym_duree_jours'] = intval ($row['gym_duree_jours']);
-			$row['gym_minute_fin'] = $row['gym_minute'] + $row['gym_duree_heures'] * 60 + $row['gym_duree_jours'] * 60 * 24;
-			$row['gym_heure_fin'] = $row['gym_heure'] + floor ($row['gym_minute_fin'] / 60);
-			$row['gym_minute_fin'] = $row['gym_minute_fin'] % 60;
-
 			// Date
-			if($row['gym_semaines'] && $row['gym_semaines']) {
+			$annee_debut = 2020;
+			$this->template->assign_var ('ANNEE_DEBUT', $annee_debut);
+			$row['gym_jour_literal'] = $this->listes()['jours'][intval ($row['gym_jour'])];
+
+			if($row['gym_semaines']) {
 				setlocale(LC_ALL, 'fr_FR');
 				$row['next_end_time'] = INF;
-				// Numéros depuis le dimanche suivant le 1er aout (commence à 0)
-				for ($s = 1; $s < 52; $s++) {
-					$beg_time = mktime(
-						$row['gym_heure'], $row['gym_minute'],
-						0, -4, // 1er aout
-						$row['gym_jour'] + $s * 7 + 5,
-						date('Y')
+				foreach (explode (',', $row['gym_semaines']) AS $s) {
+					$beg_time = mktime (
+						$row['gym_heure'], $row['gym_minute'], 0,
+						8, 3 + $s * 7 + $row['gym_jour'], $annee_debut // A partir du lundi suivant le 1er aout $annee_debut
 					);
-					$end_time = mktime(
-						$row['gym_heure_fin'], $row['gym_minute_fin'],
-						0, -4, // 1er aout
-						$row['gym_jour'] + $s * 7 + 5,
-						date('Y')
+					$end_time = mktime (
+						$row['gym_heure'] + $row['gym_duree_heures'] + 24 * $row['gym_duree_jours'],
+						$row['gym_minute'],
+						0, // Secondes
+						8, 3 + $s * 7 + $row['gym_jour'], $annee_debut // Lundi suivant le 1er aout $annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {
@@ -486,7 +473,7 @@ class listener implements EventSubscriberInterface
 						$row['date'] = ucfirst (
 							str_replace ('  ', ' ',
 							utf8_encode (
-							strftime ('%A %e %B', $row['next_end_time'])
+							strftime ('%A %e %B', $beg_time)
 						)));
 					}
 				}
