@@ -119,10 +119,11 @@ class listener implements EventSubscriberInterface
 		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 		if (!file_exists ($file_name))
 			file_put_contents ($file_name,
-				'_______________________________'.PHP_EOL.
+				pack('CCC',0xef,0xbb,0xbf). // UTF-8 encoding
 				date('r').PHP_EOL.
-				$post_data['post_subject'].PHP_EOL.
-				$post_data['post_text'].PHP_EOL.PHP_EOL
+				'Titre: '.$post_data['post_subject'].PHP_EOL.
+				$post_data['post_text'].PHP_EOL.
+				$this->specific_data($post_data).PHP_EOL
 			);
 
 		$vars['page_data'] = $page_data;
@@ -138,8 +139,21 @@ class listener implements EventSubscriberInterface
 		file_put_contents ($file_name,
 			'_______________________________'.PHP_EOL.
 			date('r').' '.$this->user->data['username'].PHP_EOL.
-			$post['subject'].PHP_EOL.
-			$post['message'].PHP_EOL.PHP_EOL,
+			'Titre: '.$post['subject'].PHP_EOL.
+			$post['message'].PHP_EOL.
+			$this->specific_data($post).PHP_EOL,
 		FILE_APPEND);
+	}
+
+	function specific_data($post_data) {
+		$r = '';
+		foreach ($post_data AS $k=>$v)
+			if ($k[3] == '_' &&
+				$v &&
+				$v != '00' &&
+				$v != '0' &&
+				$v != 'off')
+				$r .= $k.': '.(is_array($v) ? implode(',',$v) : $v).PHP_EOL;
+		return $r;
 	}
 }

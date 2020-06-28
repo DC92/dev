@@ -11,7 +11,6 @@
 traduire TOPIC_ID => le n° du topic dans (INCLUDE
 Glissement latéral pages
 Lien gmaps 
-SAVE LOG : même syntaxe que dans l'éditeur
 Diaporama pas vu depuis un moment boucle rapidement
 Bug d'affichage avec &hilit=body (résultat recherche)
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
@@ -90,6 +89,9 @@ class listener implements EventSubscriberInterface
 		$this->user = $user;
 		$this->auth = $auth;
 		$this->language = $language;
+
+		$this->annee_debut = 2020;
+		$this->semaines = '5,6,7,8,9,10,13,14,15,16,17,18,19,22,23,24,25,26,27,30,31,32,33,34,35,36,39,40,41,42,43,44,45,46,47';
 
 		// Includes language and style files of this extension
 		$this->ns = explode ('\\', __NAMESPACE__);
@@ -448,9 +450,11 @@ class listener implements EventSubscriberInterface
 			}
 
 			// Date
-			$annee_debut = 2020;
-			$this->template->assign_var ('ANNEE_DEBUT', $annee_debut);
+			$this->template->assign_var ('ANNEE_DEBUT', $this->annee_debut);
 			$row['gym_jour_literal'] = $this->listes()['jours'][intval ($row['gym_jour'])];
+
+			if($row['gym_scolaire'] == 'on')
+				$row['gym_semaines'] = $this->semaines;
 
 			if($row['gym_semaines']) {
 				setlocale(LC_ALL, 'fr_FR');
@@ -458,13 +462,13 @@ class listener implements EventSubscriberInterface
 				foreach (explode (',', $row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
 						$row['gym_heure'], $row['gym_minute'], 0,
-						8, 3 + $s * 7 + $row['gym_jour'], $annee_debut // A partir du lundi suivant le 1er aout $annee_debut
+						8, 3 + $s * 7 + $row['gym_jour'], $this->annee_debut // A partir du lundi suivant le 1er aout $annee_debut
 					);
 					$end_time = mktime (
 						$row['gym_heure'] + $row['gym_duree_heures'] + 24 * $row['gym_duree_jours'],
 						$row['gym_minute'],
 						0, // Secondes
-						8, 3 + $s * 7 + $row['gym_jour'], $annee_debut // Lundi suivant le 1er aout $annee_debut
+						8, 3 + $s * 7 + $row['gym_jour'], $this->annee_debut // Lundi suivant le 1er aout $annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {
