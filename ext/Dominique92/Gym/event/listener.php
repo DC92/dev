@@ -486,6 +486,11 @@ class listener implements EventSubscriberInterface
 			// Horaires
 			$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);
 			$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
+
+			$row['gym_minute_fin'] = $row['gym_minute'] + $row['gym_duree_heures'] * 60;
+			$row['gym_heure_fin'] = $row['gym_heure'] + floor ($row['gym_minute_fin'] / 60);
+			$row['gym_minute_fin'] = $row['gym_minute_fin'] % 60;
+
 			$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
 			$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
 			$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];

@@ -152,6 +152,7 @@ class listener implements EventSubscriberInterface
 				$v &&
 				$v != '00' &&
 				$v != '0' &&
+				$v != '?' &&
 				$v != 'off')
 				$r .= $k.': '.(is_array($v) ? implode(',',$v) : $v).PHP_EOL;
 		return $r;

@@ -133,9 +133,18 @@ body {
 	background: white;
 }
 .gym .page > div {
-	margin: 0.3em;
+	margin: 0 0.3em 0.7em 0.3em;
 	padding: 0.2em;
 	text-align: justify;
+}
+.gym ul {
+	margin: 0;
+	padding-left: 1em;
+}
+@media (max-width: 400px) {
+	.gym .page  {
+		font-size: 4.2vw;
+	}
 }
 .gym h1 {
 	margin: 1em calc(10% - 54px);
@@ -229,11 +238,11 @@ body {
 	width: 20vw !important;
 }
 @media (max-width: 600px) {
-	.gym .image-droite,
-	.gym .image-gauche,
+	w.gym .image-droite,
+	w.gym .image-gauche,
 	.gym .inline-attachment,
 	.gym .attach-image {
-		display: none;
+		display: none !important;
 	}
 	.gym .animatrice .image-droite,
 	.gym .animatrice .image-gauche,

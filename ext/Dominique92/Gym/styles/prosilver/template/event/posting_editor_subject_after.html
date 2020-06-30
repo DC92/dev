@@ -20,7 +20,7 @@
 
 <!-- IF FORUM_ID == 2 -->
 	<br/><br/>
-	Activité
+	Activité:
 	<select name="gym_activite">
 		<option>?</option>
 		<!-- BEGIN liste_2 -->
@@ -32,10 +32,11 @@
 				{liste_2.POST_SUBJECT}
 			</option>
 		<!-- END liste_2 -->
-	</select>
+	</select> &nbsp;
 
+	Lieu:
 	<select name="gym_lieu">
-		<option>Lieu ?</option>
+		<option>?</option>
 		<!-- BEGIN liste_3 -->
 			<option value="{liste_3.POST_ID}"
 				<!-- IF liste_3.POST_ID == GYM_LIEU -->
@@ -45,10 +46,11 @@
 				{liste_3.POST_SUBJECT}
 			</option>
 		<!-- END liste_3 -->
-	</select>
+	</select> &nbsp;
 
+	Animation:
 	<select name="gym_animateur">
-		<option>Animat.eur.rice ?</option>
+		<option>?</option>
 		<!-- BEGIN liste_4 -->
 			<option value="{liste_4.POST_ID}"
 				<!-- IF liste_4.POST_ID == GYM_ANIMATEUR -->
