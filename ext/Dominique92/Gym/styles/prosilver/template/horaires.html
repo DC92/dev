@@ -1,13 +1,13 @@
 <!-- BEGIN topic -->
 <div class="horaires j{topic.GYM_JOUR}">
 	<!-- IF topic.GYM_HORAIRES -->
-	<div style="margin-left:calc((10% - 60px) * {topic.GYM_JOUR} + 1em)">
+	<div style="margin-left:calc((10% - 60px) * 0{topic.GYM_JOUR} + 1em)">
 		{topic.GYM_JOUR_LITERAL}
 	</div>
 	<!-- ENDIF -->
 
 	<table style="
-		margin-left:calc((10% - 60px) * {topic.GYM_JOUR});
+		margin-left:calc((10% - 60px) * 0{topic.GYM_JOUR});
 		background:{topic.COULEUR_FOND};
 		border-color:{topic.COULEUR_BORD};
 	">

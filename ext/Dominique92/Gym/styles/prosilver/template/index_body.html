@@ -38,14 +38,14 @@
 	<div class="slideshow">  
 		<ul>
 			<!-- //TODO automatiser à partir du répertoire -->
-			<li><img src="slides/1.jpg" width="400" height="300" /></li>
-			<li><img src="slides/2.jpg" width="400" height="300" /></li>
-			<li><img src="slides/3.jpg" width="400" height="300" /></li>
-			<li><img src="slides/4.jpg" width="400" height="300" /></li>
-			<li><img src="slides/5.jpg" width="400" height="300" /></li>
-			<li><img src="slides/6.jpg" width="400" height="300" /></li>
-			<li><img src="slides/7.jpg" width="400" height="300" /></li>
-			<li><img src="slides/8.jpg" width="400" height="300" /></li>
+			<li><img src="slides/1.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/2.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/3.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/4.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/5.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/6.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/7.jpg" width="400" height="300" alt="Slide " /></li>
+			<li><img src="slides/8.jpg" width="400" height="300" alt="Slide " /></li>
 		</ul>  
 	</div>
 
@@ -79,7 +79,10 @@
 <!-- IF post.ACTUALITE -->
 <div class="page">
 	<h2>
-		{post.DATE}: <a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
+		<!-- IF post.DATE -->
+			{post.DATE}:
+		<!-- ENDIF -->
+		<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
 		<!-- IF U_MCP -->
 		<a href="posting.php?mode=edit&f={post.FORUM_ID}&p={post.POST_ID}"
 			title="Modifier l'évènement {post.NOM}" class="button button-icon-only">
