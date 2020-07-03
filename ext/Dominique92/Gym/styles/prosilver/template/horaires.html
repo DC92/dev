@@ -16,9 +16,10 @@
 		<tr>
 			<!-- IF not REQUEST_ID -->
 			<td>
-				<a href="viewtopic.php?p={post.POST_ID}">
-					{post.POST_SUBJECT}
-				</a>
+				<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
+				<!-- IF post.GYM_CERT -->
+					<span title="Cours certifié Prescri’forme">CERT</span>
+				<!-- ENDIF -->
 
 				<!-- IF REQUEST_ACTIVITE and post.GYM_NOTA -->
 					<br>{post.GYM_NOTA}

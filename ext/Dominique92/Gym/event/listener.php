@@ -373,6 +373,7 @@ class listener implements EventSubscriberInterface
 			'gym_activite',
 			'gym_lieu',
 			'gym_animateur',
+			'gym_cert',
 			'gym_jour',
 			'gym_heure',
 			'gym_minute',
