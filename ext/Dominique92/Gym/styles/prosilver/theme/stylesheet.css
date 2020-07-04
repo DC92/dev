@@ -350,7 +350,8 @@ body {
 .gym .horaires a {
 	color: black;
 }
-.gym .horaires span {
+.gym .horaires .cert,
+.gym .horaires .cert:hover {
 	padding: 0 0.2em;
 	border-radius: 1em;
 	background: #8f8;
