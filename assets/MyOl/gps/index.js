@@ -4,11 +4,11 @@ if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 
 // Force the script name of short url
 if (!window.location.pathname.split('/').pop())
-	window.location.href = window.location.href + 'index.html';
+	window.location.href = window.location.href + basename;
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register('service-worker.js')
+	navigator.serviceWorker.register(service_worker)
 	// Reload if any app file has been updated
 	.then(function(reg) {
 		reg.addEventListener('updatefound', function() {

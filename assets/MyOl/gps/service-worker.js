@@ -9,12 +9,13 @@ self.addEventListener('install', function(e) {
 				'index.html',
 				'index.js',
 				'manifest.json',
-				'service-worker.js',
 				'../ol/ol.css',
 				'../ol/ol.js',
 				'../myol.css',
-				'../myol.js'
+				'../myol.js',
 			]);
+//				'index.php',////
+//				'service-worker.js',
 		})
 	);
 });
