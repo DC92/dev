@@ -483,7 +483,7 @@ class listener implements EventSubscriberInterface
 					}
 				}
 			} else
-				$row['next_beg_time'] = 1234567890;
+				$row['next_beg_time'] = 1234567890 + $row['gym_jour'];
 
 			// Horaires
 			$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);

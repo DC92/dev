@@ -3,8 +3,8 @@ if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 	window.location.href = window.location.href.replace('http:', 'https:');
 
 // Force the script name of short url
-if (!window.location.pathname.split('/').pop())
-	window.location.href = window.location.href + basename;
+//if (!window.location.pathname.split('/').pop())
+//	window.location.href = window.location.href + basename;
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
@@ -87,7 +87,42 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		}),
 	];
 
-new ol.Map({
+var map = new ol.Map({
 	target: 'map',
 	controls: controls,
 });
+
+function addLayer(gpx) {
+	const layer = layerVectorURL({
+		url: gpx.toLowerCase() + '.gpx',
+		format: new ol.format.GPX(),
+		readFeatures: function(response) {
+			map.getView().setZoom(1); // Enable gpx rendering anywhere we are
+			return (response); // No jSon syntax verification because it's XML
+		},
+		styleOptions: function() {
+			return {
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 3,
+				}),
+			};
+		},
+	});
+
+	// Zoom the map on the added features
+	layer.once('prerender', function() {
+		const features = layer.getSource().getFeatures(),
+			extent = ol.extent.createEmpty();
+		for (let f in features)
+			ol.extent.extend(extent, features[f].getGeometry().getExtent());
+		map.getView().fit(extent, {
+			maxZoom: 17,
+		});
+
+		if (features.length)
+			document.getElementById('liste').style.display = 'none';
+	});
+
+	map.addLayer(layer);
+}

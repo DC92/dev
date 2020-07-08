@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<!--
-© Dominique Cavailhez 2019
-https://github.com/Dominique92/MyOl
-Based on https://openlayers.org
--->
 <html>
 <head>
+	<!--
+	© Dominique Cavailhez 2019
+	https://github.com/Dominique92/MyOl
+	Based on https://openlayers.org
+	-->
+
 	<title>MyGPS</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,22 +25,14 @@ Based on https://openlayers.org
 	<script src="../myol.js"></script>
 
 	<!-- This app -->
-	<link rel="manifest" href="manifest.json">
-	<script src="index.js" defer="defer"></script>
-
-	<style>
-		html, body, #map {
-			margin: 0;
-			padding: 0;
-			width: 100%;
-			height: 100%;
-		}
-	</style>
-
 	<script>
-		var basename = "index.html",
+		var //basename = "index.html",
 			service_worker = "service-worker.js";
 	</script>
+
+	<link rel="manifest" href="manifest.json">
+	<link href="index.css" type="text/css" rel="stylesheet">
+	<script src="index.js" defer="defer"></script>
 </head>
 
 <body>

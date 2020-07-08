@@ -5,17 +5,17 @@ self.addEventListener('install', function(e) {
 	e.waitUntil(
 		caches.open('myolCache').then(function(cache) {
 			return cache.addAll([
-				'favicon.png',
-				'index.html',
+				'index.css',
 				'index.js',
+				'favicon.png',
 				'manifest.json',
 				'../ol/ol.css',
 				'../ol/ol.js',
+				'../geocoder/ol-geocoder.min.css',
+				'../geocoder/ol-geocoder.js',
 				'../myol.css',
 				'../myol.js',
 			]);
-//				'index.php',////
-//				'service-worker.js',
 		})
 	);
 });

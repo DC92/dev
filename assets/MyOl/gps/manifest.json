@@ -2,6 +2,7 @@
 	"name": "MyGPS",
 	"start_url": "index.html",
 	"display": "standalone",
+	"version_name": "1.0",
 	"icons": [{
 		"src": "favicon.png",
 		"sizes": "225x225",

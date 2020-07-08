@@ -1,22 +1,50 @@
-<?php
-//TODO faut-il le .php urlname ? dans le service-worker ?
-// favicon
+<!DOCTYPE html>
+<html>
+<head>
+	<!--
+	© Dominique Cavailhez 2019
+	https://github.com/Dominique92/MyOl
+	Based on https://openlayers.org
+	-->
+	<?php
+		// Get the script to be referenced in the manifest
+		$basename = basename ($_SERVER['SCRIPT_NAME']);
 
-$manifest = file_get_contents ($gps_path.'index.html');
-$basename = basename ($_SERVER['SCRIPT_NAME']);
+		// Generate a tag depending on the files changes
+		$tag = 0;
+		foreach (glob ('*') as $f)
+			$tag += filesize ($f);
+	?>
 
-if (isset ($title))
-	$manifest = str_replace ('MyGPS', $title, $manifest); // Index.html title
-$manifest = str_replace ('</title>', "</title>\n\t<base href=\"$gps_path\">", $manifest);
-$manifest = str_replace ('manifest.json', 'manifest.json.php?src='.$basename, $manifest);
+	<title>MyGPS</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/png" href="favicon.png" />
 
-// For index.js
-$manifest = str_replace ('index.html', $basename, $manifest);
-$manifest = str_replace (
-	'service-worker.js',
-	'service-worker.js.php'.
-		(isset ($gpx_path) ? '?gpx='.urlencode($gpx_path) : ''),
-	$manifest
-);
+	<!-- Openlayers -->
+	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
 
-echo $manifest;
+	<!-- Recherche par nom -->
+	<link href="../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
+	<script src="../geocoder/ol-geocoder.js"></script>
+
+	<!-- My Openlayers -->
+	<link href="../myol.css" type="text/css" rel="stylesheet">
+	<script src="../myol.js"></script>
+
+	<!-- This app -->
+	<script>
+		var //basename = "<?=$basename?>",
+			service_worker = "service-worker.js.php?<?=$tag?>";
+	</script>
+
+	<link rel="manifest" href="manifest.json.php?url=<?=$basename?>">
+	<link href="index.css" type="text/css" rel="stylesheet">
+	<script src="index.js" defer="defer"></script>
+</head>
+
+<body>
+	<div id="map"></div>
+</body>
+</html>
