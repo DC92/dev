@@ -35,8 +35,7 @@
 
 	<!-- This app -->
 	<script>
-		var //basename = "<?=$basename?>",
-			service_worker = "service-worker.js.php?<?=$tag?>";
+		var service_worker = "service-worker.js.php?url=<?=$basename?>&tag=<?=$tag?>";
 	</script>
 
 	<link rel="manifest" href="manifest.json.php?url=<?=$basename?>">
