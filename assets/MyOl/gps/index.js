@@ -68,7 +68,7 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		controlGPS(),
 		controlLoadGPX(),
 		controlButton({
-			label:'?',
+			label: '?',
 			title: help,
 			activate: function() {
 				alert(this.title);
@@ -81,9 +81,9 @@ var map = new ol.Map({
 	controls: controls,
 });
 
-function addLayer(gpx) {
+function addLayer(url) {
 	const layer = layerVectorURL({
-		url: gpx.toLowerCase() + '.gpx',
+		url: url,
 		format: new ol.format.GPX(),
 		readFeatures: function(response) {
 			map.getView().setZoom(1); // Enable gpx rendering anywhere we are

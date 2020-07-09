@@ -6,10 +6,8 @@
 	https://github.com/Dominique92/MyOl
 	Based on https://openlayers.org
 	-->
-	<?php
-		// Get the script to be referenced in the manifest
-		$basename = basename ($_SERVER['SCRIPT_NAME']);
-	?>
+
+	<link rel="manifest" href="manifest.json.php?url=<?=$_SERVER['SCRIPT_NAME']?>">
 
 	<title>MyGPS</title>
 	<meta charset="utf-8">
@@ -30,7 +28,7 @@
 
 	<!-- This app -->
 	<script>
-		var service_worker = "service-worker.js.php?url=<?=$basename?>",
+		var service_worker = "service-worker.js.php?url=<?=$_SERVER['SCRIPT_NAME']?>",
 			keys = {
 				ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 				thunderforest: 'ee751f43b3af4614b01d1bce72785369', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
@@ -38,8 +36,6 @@
 				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			};
 	</script>
-
-	<link rel="manifest" href="manifest.json.php?url=<?=$basename?>">
 	<link href="index.css" type="text/css" rel="stylesheet">
 	<script src="index.js" defer="defer"></script>
 </head>
