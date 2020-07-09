@@ -9,11 +9,6 @@
 	<?php
 		// Get the script to be referenced in the manifest
 		$basename = basename ($_SERVER['SCRIPT_NAME']);
-
-		// Generate a tag depending on the files changes
-		$tag = 0;
-		foreach (glob ('*') as $f)
-			$tag += filesize ($f);
 	?>
 
 	<title>MyGPS</title>
@@ -35,7 +30,13 @@
 
 	<!-- This app -->
 	<script>
-		var service_worker = "service-worker.js.php?url=<?=$basename?>&tag=<?=$tag?>";
+		var service_worker = "service-worker.js.php?url=<?=$basename?>",
+			keys = {
+				ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
+				thunderforest: 'ee751f43b3af4614b01d1bce72785369', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
+				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
+			};
 	</script>
 
 	<link rel="manifest" href="manifest.json.php?url=<?=$basename?>">

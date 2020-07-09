@@ -2,10 +2,6 @@
 if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 	window.location.href = window.location.href.replace('http:', 'https:');
 
-// Force the script name of short url
-//if (!window.location.pathname.split('/').pop())
-//	window.location.href = window.location.href + basename;
-
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(service_worker)
@@ -32,13 +28,6 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'* Cette application ne permet pas d‘enregistrer le parcours\n' +
 	'* Fonctionne bien sur Android avec Chrome, Edge & Samsung Internet, un peu moins bien avec Firefox & Safari\n' +
 	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
-
-	keys = {
-		ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
-		thunderforest: 'ee751f43b3af4614b01d1bce72785369', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
-		bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
-		// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
-	},
 
 	baseLayers = {
 		'OpenTopo': layerOsmOpenTopo(),
