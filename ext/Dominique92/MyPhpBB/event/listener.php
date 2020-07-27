@@ -2,6 +2,7 @@
 /**
  * Add usefull tricks to for phpBB
  *
+ * viewforum & viewtopic short link /?f=0&t=0&p=0
  * Includes language and style files of this extension
  * Clickable banner
  * Prevent an empty post title or text
@@ -60,6 +61,9 @@ class listener implements EventSubscriberInterface
 			'core.page_header' => 'page_header',
 			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
 
+			// Index
+			'core.index_modify_page_title' => 'index_modify_page_title',
+
 			// Posting
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
@@ -80,6 +84,27 @@ class listener implements EventSubscriberInterface
 			foreach($vars['context'] AS $k=>$v)
 				if (gettype ($v) != 'object')
 					echo"<pre>$k (".gettype ($v).") = ".var_export($v,true).'</pre>';
+		}
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	// viewforum & viewtopic short link /?f=0&t=0&p=0
+	function index_modify_page_title() {
+		$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+		$get = $this->request->get_super_global(\phpbb\request\request_interface::GET);
+
+		if (isset ($get['f']))
+			$script = 'viewforum';
+		if (isset ($get['t']))
+			$script = 'viewtopic';
+		if (isset ($get['p']))
+			$script = 'viewtopic';
+		if ($script) {
+			$uri = $server['REQUEST_SCHEME'].'://'.$server['SERVER_NAME'].str_replace ('/?', "/$script.php?", $server['REQUEST_URI']);
+			echo file_get_contents ($uri);
+			exit;
 		}
 	}
 
