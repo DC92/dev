@@ -1146,6 +1146,17 @@ function controlButton(options) {
 }
 
 /**
+ * No control
+ * Can be added to controls:[] but don't display it
+ * Requires controlButton
+ */
+function noControl() {
+	return new ol.control.Control({
+		element: document.createElement('div'),
+	});
+}
+
+/**
  * Layer switcher control
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires controlPermanentCheckbox, permanentCheckboxList, controlButton
@@ -1493,9 +1504,7 @@ function controlGPS() {
 	// Vérify if geolocation is available
 	if (!navigator.geolocation ||
 		!window.location.href.match(/https|localhost/i))
-		return new ol.control.Control({ // No button
-			element: document.createElement('div'),
-		});
+		return noControl();
 
 	let gps = {}, // Mem last sensors values
 		compas = {},

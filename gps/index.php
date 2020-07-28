@@ -44,6 +44,7 @@
 
 <body>
 	<div id="liste">
+		<b><a style="float:right" onclick="document.getElementById('liste').style.display='none'" title="Fermer">&#10005; &nbsp;</a></b>
 		<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 		<ul>
 		<?php
@@ -57,7 +58,6 @@
 		<?php } ?>
 		</ul>
 		<p>Puis sur la cible pour afficher votre position.</p>
-		<p><a onclick="document.getElementById('liste').style.display='none'">FERMER</a></p>
 		<br/>
 	</div>
 

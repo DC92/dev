@@ -34,31 +34,34 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
 		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'Photo Google': layerGoogle('s'),
+		'Photo Bing': layerBing(keys.bing, 'Aerial'),
+		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Angleterre': layerOS(keys.bing),
-		'Bing': layerBing(keys.bing, 'Road'),
-		'Photo Bing': layerBing(keys.bing, 'Aerial'),
-		'Google': layerGoogle('m'),
-		'Photo Google': layerGoogle('s'),
+		'Espagne': layerSpain('mapa-raster', 'MTN'),
 	},
 
 	controls = [
+		controlTilesBuffer(4),
 		controlLayersSwitcher({
 			baseLayers: baseLayers,
+		}),
+
+		new ol.control.Attribution({
+			collapseLabel: '>',
 		}),
 		controlPermalink({
 			visible: false,
 		}),
+
 		new ol.control.ScaleLine(),
-		new ol.control.Attribution({
-			collapseLabel: '>',
-		}),
 		controlMousePosition(),
+		controlLengthLine(),
+
 		new ol.control.Zoom(),
 		new ol.control.FullScreen({
 			label: '', //HACK Bad presentation on IE & FF
@@ -66,7 +69,20 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		}),
 		controlGeocoder(),
 		controlGPS(),
+
+		typeof localGpx == 'undefined' ? noControl() :
+		controlButton({
+			label: '\u03DE',
+			title: 'Choisir une trace dans la liste',
+			activate: function() {
+				document.getElementById('liste').style.display = 'block';
+				window.scrollTo(0, 0);
+				if (document.fullscreenElement)
+					document.exitFullscreen();
+			},
+		}),
 		controlLoadGPX(),
+		controlDownload(),
 		controlButton({
 			label: '?',
 			title: help,
