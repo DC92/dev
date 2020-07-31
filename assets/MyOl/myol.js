@@ -1382,7 +1382,7 @@ function controlLengthLine() {
 }
 
 /**
- * Control to displays set preload of 4 upper level tiles if we are on full screen mode
+ * Control to display set preload of depth upper level tiles or depthFS if we are on full screen mode
  * This prepares the browser to become offline on the same session
  */
 function controlTilesBuffer(depth, depthFS) {
@@ -1394,8 +1394,9 @@ function controlTilesBuffer(depth, depthFS) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		setPreload({
-			target: map
+			target: map,
 		});
+
 		// Change preload when the window expand to fullscreen
 		map.on('change:size', setPreload);
 	};
@@ -1404,6 +1405,7 @@ function controlTilesBuffer(depth, depthFS) {
 		const fs = document.webkitIsFullScreen || // Edge, Opera
 			document.msFullscreenElement ||
 			document.fullscreenElement; // Chrome, FF, Opera
+
 		evt.target.getLayers().forEach(function(layer) {
 			if (typeof layer.setPreload == 'function')
 				layer.setPreload(fs ? depthFS || depth || 1 : depth || 1);

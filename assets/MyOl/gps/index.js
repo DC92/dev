@@ -14,7 +14,10 @@ if ('serviceWorker' in navigator)
 
 // Openlayers part
 // Initialise Openlayers vars
-const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
+const nbli = document.getElementsByTagName('li').length,
+	liste = document.getElementById('liste').style,
+
+	help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'- Installez l‘application web : explorateur -> options -> ajouter à l‘écran d‘accueil\n' +
 	'- Choisissez une couche de carte\n' +
 	'- Placez-vous au point de départ de votre randonnée\n' +
@@ -70,12 +73,12 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		controlGeocoder(),
 		controlGPS(),
 
-		typeof localGpx == 'undefined' ? noControl() :
+		!nbli ? noControl() :
 		controlButton({
-			label: '\u03DE',
+			label: '\u25B3',
 			title: 'Choisir une trace dans la liste',
 			activate: function() {
-				document.getElementById('liste').style.display = 'block';
+				liste.display = 'block';
 				window.scrollTo(0, 0);
 				if (document.fullscreenElement)
 					document.exitFullscreen();
@@ -90,12 +93,14 @@ const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 				alert(this.title);
 			},
 		}),
-	];
+	],
 
-var map = new ol.Map({
-	target: 'map',
-	controls: controls,
-});
+	map = new ol.Map({
+		target: 'map',
+		controls: controls,
+	});
+
+liste.display = nbli ? 'block' : 'none';
 
 function addLayer(url) {
 	const layer = layerVectorURL({
@@ -124,10 +129,9 @@ function addLayer(url) {
 		map.getView().fit(extent, {
 			maxZoom: 17,
 		});
-
-		if (features.length)
-			document.getElementById('liste').style.display = 'none';
 	});
 
 	map.addLayer(layer);
+
+	liste.display = 'none';
 }
