@@ -622,6 +622,9 @@ function layerVectorURL(options) {
 			dataProjection: options.projection,
 		}),
 		receiveProperties: function() {}, // (properties, feature, layer) Add properties based on existing one
+		receiveFeatures: function(features) { // features pre-treatment
+			return features;
+		},
 		styleOptions: function(properties) { // Function returning the layer's feature style
 			return {
 				image: new ol.style.Icon({
@@ -703,7 +706,7 @@ function layerVectorURL(options) {
 							if (!features.length)
 								statusEl.innerHTML = 'zone vide';
 							else {
-								source.addFeatures(features);
+								source.addFeatures(options.receiveFeatures(features));
 								statusEl.innerHTML = features.length + ' objet' + (features.length > 1 ? 's' : '') + ' chargé' + (features.length > 1 ? 's' : '');
 							}
 						}

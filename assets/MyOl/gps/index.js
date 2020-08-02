@@ -106,9 +106,9 @@ function addLayer(url) {
 	const layer = layerVectorURL({
 		url: url,
 		format: new ol.format.GPX(),
-		readFeatures: function(response) {
+		receiveFeatures: function(features) {
 			map.getView().setZoom(1); // Enable gpx rendering anywhere we are
-			return (response); // No jSon syntax verification because it's XML
+			return features;
 		},
 		styleOptions: function() {
 			return {
