@@ -7,7 +7,3 @@ html, body, #map {
 #liste a {
 	cursor: pointer;
 }
-#liste p,
-#liste ul {
-	margin: 0;
-}

@@ -27,6 +27,8 @@
 	$favicons = glob('favicon.*');
 	if (count ($favicons))
 		$favicon = pathinfo ($_SERVER['SCRIPT_NAME'], PATHINFO_DIRNAME).'/'.$favicons[0];
+
+	$gpx_files = glob ('*.gpx');
 ?>
 	<link rel="manifest" href="manifest.json.php?url=<?=$_SERVER['SCRIPT_NAME']?>">
 
@@ -62,22 +64,29 @@
 </head>
 
 <body>
-	<div id="liste">
-		<p>Cliquez sur le nom de la trace pour l'afficher :</p>
-		<ul>
-		<?php foreach (glob ('*.gpx') AS $gpx) { ?>
-				<li>
-					<a title="Cliquer pour afficher la trace"
-						onclick="addLayer('<?=dirname($_SERVER['SCRIPT_NAME']).'/'.$gpx?>')">
-						<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
-					</a>
-				</li>
-		<?php } ?>
-		</ul>
-		<p>Ou fermer : <a onclick="document.getElementById('liste').style.display='none'" title="Replier">&#9651;</a></p>
-		<br/>
-		<p>Puis sur la cible pour afficher votre position.</p>
-	</div>
+	<?php if (isset ($_GET['gpx'])) { ?>
+		<script>
+			window.onload = function() {
+				addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
+			};
+		</script>
+	<?php } else if (count ($gpx_files)) { ?>
+		<div id="liste">
+			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
+			<ul>
+			<?php foreach ($gpx_files AS $gpx) { ?>
+					<li>
+						<a title="Cliquer pour afficher la trace"
+							onclick="addLayer('<?=dirname($_SERVER['SCRIPT_NAME']).'/'.$gpx?>')">
+							<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
+						</a>
+					</li>
+			<?php } ?>
+			</ul>
+			<p>Puis sur la cible pour afficher votre position.</p>
+			<p>Fermer : <a onclick="document.getElementById('liste').style.display='none'" title="Replier">&#9651;</a></p>
+		</div>
+	<?php } ?>
 
 	<div id="map"></div>
 </body>

@@ -15,7 +15,7 @@ if ('serviceWorker' in navigator)
 // Openlayers part
 // Initialise Openlayers vars
 const nbli = document.getElementsByTagName('li').length,
-	liste = document.getElementById('liste').style,
+	elListe = document.getElementById('liste'),
 
 	help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 	'- Installez l‘application web : explorateur -> options -> ajouter à l‘écran d‘accueil\n' +
@@ -76,9 +76,10 @@ const nbli = document.getElementsByTagName('li').length,
 		!nbli ? noControl() :
 		controlButton({
 			label: '\u25B3',
-			title: 'Choisir une trace dans la liste',
+			title: 'Choisir une trace dans la liste / fermer',
 			activate: function() {
-				liste.display = 'block';
+				if (elListe)
+					elListe.style.display = elListe.style.display == 'none' ? 'block' : 'none';
 				window.scrollTo(0, 0);
 				if (document.fullscreenElement)
 					document.exitFullscreen();
@@ -99,8 +100,6 @@ const nbli = document.getElementsByTagName('li').length,
 		target: 'map',
 		controls: controls,
 	});
-
-liste.display = nbli ? 'block' : 'none';
 
 function addLayer(url) {
 	const layer = layerVectorURL({
@@ -133,5 +132,6 @@ function addLayer(url) {
 
 	map.addLayer(layer);
 
-	liste.display = 'none';
+	if (elListe)
+		elListe.style.display = 'none';
 }
