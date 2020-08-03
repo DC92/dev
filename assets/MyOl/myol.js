@@ -1503,17 +1503,10 @@ function controlGeocoder(options) {
  * Requires controlButton
  */
 //BEST GPS tap on map = distance from GPS calculation
-//BEST button speed
-//BEST button meteo
 function controlGPS() {
-	// Vérify if geolocation is available
-	if (!navigator.geolocation ||
-		!window.location.href.match(/https|localhost/i))
-		return noControl();
+	let view, gps;
 
-	let gps = {}, // Mem last sensors values
-		compas = {},
-		graticule = new ol.Feature(),
+	const graticule = new ol.Feature(),
 		northGraticule = new ol.Feature(),
 		graticuleLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
@@ -1537,27 +1530,20 @@ function controlGPS() {
 			buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
 			title: 'Centrer sur la position GPS',
 			activate: function(active) {
-				const map = button.getMap();
-				// Toggle reticule, position & rotation
-				geolocation.setTracking(active);
-				switch (active) {
-					case 0: // Nothing
-						map.removeLayer(graticuleLayer);
-						map.getView().setRotation(0, 0); // Set north to top
-						break;
-					case 1: // Track, reticule & center to the position & orientation
-						map.addLayer(graticuleLayer);
-						// case 2: Track, display reticule, stay in position & orientation
-				}
+				if (button.active == 1)
+					view.setZoom(17); // Zoom on the area
+
+				if (!active)
+					view.setRotation(0, 0); // Set north to top
+
+				gps.setTracking(active);
+				graticuleLayer.setVisible(active);
+				affichage.className = button.active ? 'ol-control-question' : 'ol-control-hidden';
 			}
 		}),
+		affichage = document.createElement('div');
 
-		// Interface with the GPS system
-		geolocation = new ol.Geolocation({
-			trackingOptions: {
-				enableHighAccuracy: true
-			}
-		});
+	button.element.appendChild(affichage);
 
 	northGraticule.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
@@ -1567,95 +1553,79 @@ function controlGPS() {
 		})
 	}));
 
-	geolocation.on('error', function(error) {
-		alert('Geolocation error: ' + error.message);
-	});
-
-	geolocation.on('change', function() {
-		gps.position = ol.proj.fromLonLat(geolocation.getPosition());
-		gps.accuracyGeometry = geolocation.getAccuracyGeometry().transform('EPSG:4326', 'EPSG:3857');
-		/* //BEST GPS Firefox Update delta only over some speed
-		if (!navigator.userAgent.match('Firefox'))
-
-		if (geolocation.getHeading()) {
-			gps.heading = -geolocation.getHeading(); // Delivered radians, clockwize
-			gps.delta = gps.heading - compas.heading; // Freeze delta at this time bewteen the GPS heading & the compas
-		} */
-
-		renderReticule();
-	});
-
 	button.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
+
+		view = map.getView();
+		map.addLayer(graticuleLayer);
+
+		// Browser heading from the inertial & magnetic sensors
+		window.addEventListener(
+			'ondeviceorientationabsolute' in window ?
+			'deviceorientationabsolute' : // Gives always the magnetic north
+			'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
+			function(evt) {
+				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+
+				if (heading && button.active == 1)
+					view.setRotation(
+						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
+						0
+					);
+			}
+		);
+
+		gps = new ol.Geolocation({
+			projection: map.getView().getProjection(),
+		});
+
+		gps.on('change', renderReticule);
 		map.on('moveend', renderReticule); // Refresh graticule after map zoom
 	};
 
-	// Browser heading from the inertial sensors
-	window.addEventListener(
-		'ondeviceorientationabsolute' in window ?
-		'deviceorientationabsolute' : // Gives always the magnetic north
-		'deviceorientation', // Gives sometime the magnetic north, sometimes initial device orientation
-		function(evt) {
-			const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			if (heading)
-				compas = {
-					heading: Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
-					absolute: evt.absolute // Gives initial device orientation | magnetic north
-				};
-
-			renderReticule();
-		}
-	);
-
 	function renderReticule() {
-		if (button.active && gps && gps.position) {
+		if (button.active) {
 			// Estimate the viewport size
-			const map = button.getMap(),
-				view = map.getView(),
+			const map = button.map_,
+				pos = gps.getPosition(),
+				altitude = Math.round(gps.getAltitude()),
+				speed = Math.round(gps.getSpeed() * 36) / 10,
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
 				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
 
-			if (!graticule.getGeometry()) // Only once the first time the feature is enabled
-				view.setZoom(17); // Zoom on the area
+			if (pos) {
+				graticule.setGeometry(new ol.geom.GeometryCollection([
+					gps.getAccuracyGeometry(), // The accurate circle
+					new ol.geom.MultiLineString([ // The graticule
+						[
+							[pos[0] - far, pos[1]],
+							[pos[0] + far, pos[1]]
+						],
+						[
+							[pos[0], pos[1]],
+							[pos[0], pos[1] - far]
+						],
+					]),
+				]));
+				northGraticule.setGeometry(new ol.geom.GeometryCollection([
+					new ol.geom.LineString( // Color north in red
+						[
+							[pos[0], pos[1]],
+							[pos[0], pos[1] + far]
+						]
+					),
+				]));
 
-			if (button.active == 1)
-				view.setCenter(gps.position);
+				if (altitude)
+					affichage.innerHTML = altitude + ' m, ' + speed + ' km/h';
 
-			// Draw the graticule
-			graticule.setGeometry(new ol.geom.GeometryCollection([
-				gps.accuracyGeometry, // The accurate circle
-				new ol.geom.MultiLineString([ // The graticule
-					[add2(gps.position, [-far, 0]), add2(gps.position, [far, 0])],
-					[gps.position, add2(gps.position, [0, -far])],
-				]),
-			]));
-			northGraticule.setGeometry(new ol.geom.GeometryCollection([
-				new ol.geom.LineString( // Color north in red
-					[gps.position, add2(gps.position, [0, far])]
-				),
-			]));
-
-			// Map orientation (Radians and reverse clockwize)
-			if (compas.absolute && button.active == 1)
-				view.setRotation(compas.heading, 0); // Use magnetic compas value
-			/* //BEST GPS Firefox use delta if speed > ??? km/h
-					compas.absolute ?
-					compas.heading : // Use magnetic compas value
-					compas.heading && gps.delta ? compas.heading + gps.delta : // Correct last GPS heading with handset moves
-					0
-				); */
-
-			map.dispatchEvent({
-				type: 'myol:ongpsposition', // Warn layerEdit that we uploaded some features
-				position: gps.position,
-			});
+				if (button.active == 1)
+					view.setCenter(pos);
+			}
 		}
 	}
 
-	function add2(a, b) {
-		return [a[0] + b[0], a[1] + b[1]];
-	}
 	return button;
 }
 
