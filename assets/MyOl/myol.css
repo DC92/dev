@@ -55,6 +55,12 @@
 }
 
 /* Boxes under buttons */
+.ol-control-gps {
+	position: absolute;
+	top: 2em;
+	padding: 1px;
+	background-color: white;
+}
 .ol-control-question {
 	position: absolute;
 	top: 1.7em;

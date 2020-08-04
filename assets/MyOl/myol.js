@@ -1538,7 +1538,7 @@ function controlGPS() {
 
 				gps.setTracking(active);
 				graticuleLayer.setVisible(active);
-				affichage.className = button.active ? 'ol-control-question' : 'ol-control-hidden';
+				affichage.className = button.active ? 'ol-control-gps' : 'ol-control-hidden';
 			}
 		}),
 		affichage = document.createElement('div');
@@ -1618,7 +1618,8 @@ function controlGPS() {
 				]));
 
 				if (altitude)
-					affichage.innerHTML = altitude + ' m, ' + speed + ' km/h';
+					affichage.innerHTML = altitude + ' m' +
+					(isNaN(speed) ? '' : ', ' + speed + ' km/h');
 
 				if (button.active == 1)
 					view.setCenter(pos);
@@ -1834,8 +1835,8 @@ function controlPrint() {
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=print-orientation]:checked"),
 			orientation = oris.length ? oris[0].value : 0;
-		mapEl.style.width = orientation == 0 ? '210mm' : '297mm';
-		mapEl.style.height = orientation == 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
+		mapEl.style.width = orientation === 0 ? '210mm' : '297mm';
+		mapEl.style.height = orientation === 0 ? '290mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide all but the map
