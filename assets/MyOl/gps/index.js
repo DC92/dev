@@ -106,7 +106,7 @@ function addLayer(url) {
 		url: url,
 		format: new ol.format.GPX(),
 		receiveFeatures: function(features) {
-			map.getView().setZoom(1); // Enable gpx rendering anywhere we are
+			map.getView().setZoom(1); //HACK enable gpx rendering anywhere we are
 			return features;
 		},
 		styleOptions: function() {

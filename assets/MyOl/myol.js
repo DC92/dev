@@ -10,27 +10,26 @@
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 
+//HACKS For JS validators
 /* jshint esversion: 6 */
-if (!ol) var ol = {}; //HACK For JS validators
+if (!ol) var ol = {};
 
 /**
  * Debug facilities on mobile
  */
-// use hash ## for error alerts
+//HACK use hash ## for error alerts
 if (!window.location.hash.indexOf('##'))
 	window.addEventListener('error', function(evt) {
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
-// use hash ### to route all console logs on alerts
+//HACK use hash ### to route all console logs on alerts
 if (window.location.hash == '###')
 	console.log = function(message) {
 		alert(message);
 	};
 
-/**
- * IE polyfill
- * You can include https://cdn.polyfill.io/v3/polyfill.min.js in place
- */
+//HACK IE polyfill
+// You can include https://cdn.polyfill.io/v3/polyfill.min.js in place
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
@@ -40,9 +39,7 @@ if (!Object.assign)
 		return r;
 	};
 
-/**
- * Json parsing errors log
- */
+//HACK Json parsing errors log
 function JSONparse(json) {
 	try {
 		return JSON.parse(json);
@@ -51,9 +48,7 @@ function JSONparse(json) {
 	}
 }
 
-/**
- * Hack warn layers when added to the map
- */
+//HACK warn layers when added to the map
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
 
@@ -978,7 +973,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
-//BEST BUG IE don't display icons
+//BUG IE don't display icons
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -1469,8 +1464,7 @@ function controlFullScreen(options) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//BEST report bug that stops animation on OL v6 & resorb patch on Geocoder https://github.com/openlayers/openlayers/issues/10313
-//BEST BUG controm 1px down on FireFox
+//BUG controm 1px down on FireFox
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
@@ -1755,7 +1749,7 @@ function controlDownload(options) {
 		function getFeatures(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!layer.marker_) //BEST find a bette way to don't save the cursors
+					if (!layer.marker_) //BEST find a better way to don't save the cursors
 						features.push(feature);
 				});
 		}
