@@ -11,13 +11,6 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/x-icon" href="favicon.ico" />
 
-	<!-- IE related -->
-	<script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
-
-	<!-- Apple related -->
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
 	<!-- Openlayers -->
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../ol/ol.js"></script>
@@ -98,7 +91,7 @@ Based on https://openlayers.org
 	<ul class="selectors">
 		<li>
 			OVERPASS<input type="checkbox" name="osm-features" />
-			<span id="osm-features-status" />
+			<span id="osm-features-status"></span>
 		</li>
 		<li><input type="checkbox" name="osm-features" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
 		<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
@@ -119,7 +112,7 @@ Based on https://openlayers.org
 	<ul class="selectors">
 		<li>
 			WRI<input type="checkbox" name="wri-features" />
-			<span id="wri-features-status" />
+			<span id="wri-features-status"></span>
 		</li>
 		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
 		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
@@ -130,19 +123,19 @@ Based on https://openlayers.org
 		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
 	</ul>
 	<ul class="selectors">
-		<li>pyrenees-refuges.com<input type="checkbox" name="prc-features" /><span id="prc-features-status" /></li>
+		<li>pyrenees-refuges.com<input type="checkbox" name="prc-features" /><span id="prc-features-status"></span></li>
 	</ul>
 	<ul class="selectors">
-		<li>camptocamp.org<input type="checkbox" name="c2c-features" /><span id="c2c-features-status" /></li>
+		<li>camptocamp.org<input type="checkbox" name="c2c-features" /><span id="c2c-features-status"></span></li>
 	</ul>
 	<ul class="selectors">
-		<li>Chemineur.fr<input type="checkbox" name="chm-features" /><span id="chm-features-status" /></li>
+		<li>Chemineur.fr<input type="checkbox" name="chm-features" /><span id="chm-features-status"></span></li>
 	</ul>
 	<ul class="selectors">
-		<li>Alpages.info<input type="checkbox" name="alp-features" /><span id="alp-features-status" /></li>
+		<li>Alpages.info<input type="checkbox" name="alp-features" /><span id="alp-features-status"></span></li>
 	</ul>
 	<ul class="selectors">
-		<li>Massifs<input type="checkbox" name="wri-massifs" /><span id="wri-massifs-status" /></li>
+		<li>Massifs<input type="checkbox" name="wri-massifs" /><span id="wri-massifs-status"></span></li>
 	</ul>
 </body>
 </html>

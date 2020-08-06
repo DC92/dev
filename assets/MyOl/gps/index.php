@@ -64,13 +64,17 @@
 </head>
 
 <body>
-	<?php if (isset ($_GET['gpx'])) { ?>
-		<script>
-			window.onload = function() {
+	<script>
+		window.onload = function() {
+			<?php if (isset ($_GET['gpx'])) { ?>
 				addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
-			};
-		</script>
-	<?php } else if (count ($gpx_files)) { ?>
+			<?php }
+			if (isset ($overlay)) { ?>
+				map.addLayer (<?=$overlay?>);
+			<?php } ?>
+		};
+	</script>
+	<?php if (count ($gpx_files) && !isset ($_GET['gpx'])) { ?>
 		<div id="liste">
 			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 			<ul>
