@@ -24,10 +24,6 @@
 	if (count ($dir))
 		echo "\t<base href=\"$gps_path/\" />\n";
 
-	$favicons = glob('favicon.*');
-	if (count ($favicons))
-		$favicon = pathinfo ($_SERVER['SCRIPT_NAME'], PATHINFO_DIRNAME).'/'.$favicons[0];
-
 	$gpx_files = glob ('*.gpx');
 ?>
 	<link rel="manifest" href="manifest.json.php?url=<?=$_SERVER['SCRIPT_NAME']?>">
@@ -53,9 +49,9 @@
 	<script>
 		var service_worker = "service-worker.js.php?url=<?=$_SERVER['SCRIPT_NAME']?>",
 			keys = {
-				ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
-				thunderforest: 'ee751f43b3af4614b01d1bce72785369', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
-				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+				ign: "<?=isset($config_wri['ign_key'])?$config_wri['ign_key']:'hcxdz5f1p9emo4i1lch6ennl'?>", // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
+				thunderforest: "<?=isset($config_wri['thunderforest_key'])?$config_wri['thunderforest_key']:'ee751f43b3af4614b01d1bce72785369'?>", // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
+				bing: "<?=isset($config_wri['bing_key'])?$config_wri['bing_key']:'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'?>" // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
 				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			};
 	</script>

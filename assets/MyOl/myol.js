@@ -183,22 +183,6 @@ function layerIGN(key, layer, format) {
 }
 
 /**
- * Spain
- */
-//BEST layerTileIncomplete
-function layerSpain(serveur, layer) {
-	return new ol.layer.Tile({
-		source: new ol.source.XYZ({
-			url: '//www.ign.es/wmts/' + serveur + '?layer=' + layer +
-				'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
-				'&style=default&tilematrixset=GoogleMapsCompatible' +
-				'&TileMatrix={z}&TileCol={x}&TileRow={y}',
-			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
-		})
-	});
-}
-
-/**
  * Layers with not all resolutions or area available
  * Virtual class
  * Displays Stamen outside the layer zoom range or extend
@@ -209,31 +193,39 @@ function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
 
+	//HACK : Avoid to call the layer initiator if this layer is not required
+	if (typeof options.addSources == 'function')
+		layer.on('change:opacity', function() {
+			if (layer.getOpacity())
+				options.sources = Object.assign(
+					options.sources,
+					options.addSources()
+				);
+		});
+
 	layer.once('myol:onadd', function(evt) {
-		if (typeof options.addSources == 'function')
-			options.sources = Object.assign(
-				options.sources,
-				options.addSources()
-			);
+		evt.map.on('moveend', change);
 		evt.map.getView().on('change:resolution', change);
 		change(); // At init
 	});
 
-	// Zoom has changed
 	function change() {
-		const view = layer.map_.getView();
-		let currentResolution = 999999; // Init loop at max resolution
+		if (layer.getOpacity()) {
+			const view = layer.map_.getView();
+			let currentResolution = 999999; // Init loop at max resolution
 
-		// Search for sources according to the map resolution
-		if (ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
-			currentResolution = Object.keys(options.sources).filter(function(evt) { //HACK : use of filter to perform an action
-				return evt > view.getResolution();
-			})[0];
+			// Search for sources according to the map resolution
+			if (ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
+				currentResolution = Object.keys(options.sources).filter(function(evt) { //HACK : use of filter to perform an action
+					return evt > view.getResolution();
+				})[0];
 
-		// Update layer if necessary
-		if (layer.getSource() != options.sources[currentResolution])
-			layer.setSource(options.sources[currentResolution]);
+			// Update layer if necessary
+			if (layer.getSource() != options.sources[currentResolution])
+				layer.setSource(options.sources[currentResolution]);
+		}
 	}
+
 	return layer;
 }
 
@@ -265,6 +257,25 @@ function layerSwissTopo(layer, extraLayer) {
 				requestEncoding: 'REST',
 				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 			}))
+		},
+	});
+}
+
+/**
+ * Spain
+ */
+function layerSpain(serveur, layer) {
+	return layerTileIncomplete({
+		//extraLayer: extraLayer,
+		extent: [-1036000, 4300000, 482000, 5434000],
+		sources: {
+			1000: new ol.source.XYZ({
+				url: '//www.ign.es/wmts/' + serveur + '?layer=' + layer +
+					'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
+					'&style=default&tilematrixset=GoogleMapsCompatible' +
+					'&TileMatrix={z}&TileCol={x}&TileRow={y}',
+				attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
+			})
 		},
 	});
 }
@@ -302,9 +313,10 @@ function layerOS(key) {
 	return layerTileIncomplete({
 		extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
 		sources: {},
-		addSources: function() { //HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+
+		addSources: function() {
 			return {
-				75: new ol.source.BingMaps({
+				50: new ol.source.BingMaps({
 					imagerySet: 'OrdnanceSurvey',
 					key: key,
 				})
