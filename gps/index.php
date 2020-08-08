@@ -1,3 +1,3 @@
 <?php
-$favicon = '../../../gps/favicon.png'; // Relative to the next include file dir
+$favicon = 'favicon.ico';
 include ('../assets/MyOl/gps/index.php');

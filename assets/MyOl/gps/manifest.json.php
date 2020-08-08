@@ -9,4 +9,13 @@ if (isset ($_GET['url']))
 if (isset ($_GET['title']))
 	$manifest = str_replace ('MyGPS', $_GET['title'], $manifest);
 
+if (isset ($_GET['favicon'])) {
+	$size = getimagesize ($_GET['favicon']);
+	$manifest = str_replace (
+		['favicon.png', '225x225', 'image/png'],
+		[$_GET['favicon'], $size[0].'x'.$size[1], mime_content_type ($_GET['favicon'])],
+		$manifest
+	);
+}
+
 echo $manifest;

@@ -9,7 +9,6 @@ self.addEventListener('install', function(e) {
 				'index.css',
 				'index.js',
 				'favicon.png',
-				'manifest.json',
 				'../ol/ol.css',
 				'../ol/ol.js',
 				'../geocoder/ol-geocoder.min.css',

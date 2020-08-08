@@ -35,10 +35,4 @@ $service_worker = str_replace (
 	$service_worker
 );
 
-$service_worker = str_replace (
-	'manifest.json',
-	'manifest.json.php?url='.$_GET['url'],
-	$service_worker
-);
-
 echo $service_worker;
