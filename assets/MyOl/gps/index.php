@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<!--
-	© Dominique Cavailhez 2019
-	https://github.com/Dominique92/
-	Based on https://openlayers.org
-	-->
-
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
 <?php
 	// Recherche d'un eventuel path relatif entre le script et le package
 	$script_filename = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME);
@@ -25,8 +22,16 @@
 		echo "\t<base href=\"$gps_path/\" />\n";
 
 	$gpx_files = glob ('*.gpx');
+
+	$manifest = 'manifest.json.php?url='.$_SERVER['SCRIPT_NAME'];
+	if (isset ($title))
+		$manifest .= '&title='.$title;
+	if (isset ($favicon))
+		$manifest .= '&favicon='.$favicon;
 ?>
-	<link rel="manifest" href="manifest.json.php?url=<?=$_SERVER['SCRIPT_NAME']?>">
+<html>
+<head>
+	<link rel="manifest" href="<?=$manifest?>">
 
 	<title><?=isset($title)?$title:'MyGPS'?></title>
 	<meta charset="utf-8">
@@ -49,9 +54,9 @@
 	<script>
 		var service_worker = "service-worker.js.php?url=<?=$_SERVER['SCRIPT_NAME']?>",
 			keys = {
-				ign: "<?=isset($config_wri['ign_key'])?$config_wri['ign_key']:'hcxdz5f1p9emo4i1lch6ennl'?>", // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
-				thunderforest: "<?=isset($config_wri['thunderforest_key'])?$config_wri['thunderforest_key']:'ee751f43b3af4614b01d1bce72785369'?>", // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
-				bing: "<?=isset($config_wri['bing_key'])?$config_wri['bing_key']:'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'?>" // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+				ign: "<?=isset($ign_key)?$ign_key:'hcxdz5f1p9emo4i1lch6ennl'?>", // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
+				thunderforest: "<?=isset($thunderforest_key)?$thunderforest_key:'ee751f43b3af4614b01d1bce72785369'?>", // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
+				bing: "<?=isset($bing_key)?$bing_key:'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'?>" // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
 				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			};
 	</script>
