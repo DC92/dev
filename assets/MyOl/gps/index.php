@@ -8,7 +8,7 @@ Based on https://openlayers.org
 	// Calculate relative paths between script & package
 	$dirs = explode ('/', str_replace ('\\', '/', __DIR__));
 	$scripts = explode ('/', pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
-	// Remove identical root directories
+	// Remove common part of the path
 	foreach ($dirs AS $k=>$v)
 		if (@$scripts[$k] == $v) {
 			unset ($dirs[$k]);
@@ -18,16 +18,13 @@ Based on https://openlayers.org
 	$gps_path = str_repeat ('../', count ($scripts) - 1) .implode ('/', $dirs);
 	$script_path = str_repeat ('../', count ($dirs) - 1) .implode ('/', $scripts);
 
-	if (count ($dirs))
-		echo "\t<base href='$gps_path' />\n";
-
-	$manifest = 'manifest.json.php?url='.$_SERVER['SCRIPT_NAME'];
+	$manifest = $gps_path.'manifest.json.php?url='.$_SERVER['SCRIPT_NAME'];
 	if (isset ($title))
 		$manifest .= '&title='.$title;
 	if (isset ($favicon))
-		$manifest .= '&favicon='.$favicon;
+		$manifest .= '&favicon='.$script_path.$favicon;
 	else
-		$favicon = 'favicon.png';
+		$favicon = $gps_path.'favicon.png';
 
 	$gpx_files = glob ('*.gpx');
 ?>
@@ -38,23 +35,23 @@ Based on https://openlayers.org
 	<title><?=isset($title)?$title:'MyGPS'?></title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="icon" type="<?=mime_content_type ($favicon)?>" href="<?=$script_path.$favicon?>" />
+	<link rel="icon" type="<?=mime_content_type($favicon)?>" href="<?=$favicon?>" />
 
 	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
+	<link href="<?=$gps_path?>../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="<?=$gps_path?>../ol/ol.js"></script>
 
 	<!-- Recherche par nom -->
-	<link href="../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
-	<script src="../geocoder/ol-geocoder.js"></script>
+	<link href="<?=$gps_path?>../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
+	<script src="<?=$gps_path?>../geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
-	<link href="../myol.css" type="text/css" rel="stylesheet">
-	<script src="../myol.js"></script>
+	<link href="<?=$gps_path?>../myol.css" type="text/css" rel="stylesheet">
+	<script src="<?=$gps_path?>../myol.js"></script>
 
 	<!-- This app -->
 	<script>
-		var service_worker = "service-worker.js.php?url=<?=$_SERVER['SCRIPT_NAME']?>",
+		var service_worker = "<?=$gps_path?>service-worker.js.php?url=<?=$_SERVER['SCRIPT_NAME']?>",
 			keys = {
 				ign: "<?=isset($ign_key)?$ign_key:'hcxdz5f1p9emo4i1lch6ennl'?>", // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 				thunderforest: "<?=isset($thunderforest_key)?$thunderforest_key:'ee751f43b3af4614b01d1bce72785369'?>", // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
@@ -62,8 +59,8 @@ Based on https://openlayers.org
 				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			};
 	</script>
-	<link href="index.css" type="text/css" rel="stylesheet">
-	<script src="index.js" defer="defer"></script>
+	<link href="<?=$gps_path?>index.css" type="text/css" rel="stylesheet">
+	<script src="<?=$gps_path?>index.js" defer="defer"></script>
 </head>
 
 <body>

@@ -18,8 +18,9 @@ if (isset ($_GET['gpx'])) {
 foreach (glob ('*') as $f)
 	$tag += filesize ($f);
 
-// Generate a tag depending on the total concerned files size
-$service_worker = '// Version '.$tag.PHP_EOL
+// Service Worker
+$service_worker =
+	'// Version '.$tag.PHP_EOL // Generate a tag depending on the total concerned files size
 	.file_get_contents ('service-worker.js');
 
 // Add gpx files to the list of files to cache
