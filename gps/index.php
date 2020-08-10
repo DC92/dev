@@ -1,3 +1,1 @@
-<?php
-$favicon = 'favicon.ico';
-include ('../assets/MyOl/gps/index.php');
+<?php include ('../assets/MyOl/gps/index.php');

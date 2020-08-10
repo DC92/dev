@@ -50,7 +50,7 @@ OFF LINE MAPS
 * Switch to full screen mode (also memorize the higher scales)
 * Move along the path of your hike slowly enough to load all tiles
 * Repeat with the layers of cards you want to memorize
-* Go to the field and click on the "MyGPS" icon
+* Go to the field and click on the "My GPS" icon
 * If you have a .gpx file in your mobile, view it by clicking on ⇑
 * All tiles viewed once will be kept in the explorer's cache for a few days
 * This application does not record your track

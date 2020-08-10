@@ -6,22 +6,20 @@ header('Expires: '.date('r'));
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
 
-$tag = 0;
+$version_tag = 0; // Total byte size of files
 $gpx_files = '';
 if (isset ($_GET['gpx'])) {
 	foreach (glob ($_GET['gpx'].'*.gpx') as $f) {
-		$tag += filesize ($f);
+		$version_tag += filesize ($f);
 		$gpx_files .= "\n\t\t\t\t'". dirname($_GET['url']) .'/'. basename($f) ."',";
 	}
 }
 // Package files
 foreach (glob ('*') as $f)
-	$tag += filesize ($f);
+	$version_tag += filesize ($f);
 
 // Service Worker
-$service_worker =
-	'// Version '.$tag.PHP_EOL // Generate a tag depending on the total concerned files size
-	.file_get_contents ('service-worker.js');
+$service_worker = file_get_contents ('service-worker.js');
 
 // Add gpx files to the list of files to cache
 $service_worker = str_replace (
@@ -36,4 +34,4 @@ $service_worker = str_replace (
 	$service_worker
 );
 
-echo $service_worker;
+echo "// Version $version_tag\n$service_worker";

@@ -1,6 +1,6 @@
 {
 	"name": "My GPS",
-	"start_url": "index.php",
+	"start_url": "index.html",
 	"display": "standalone",
 	"icons": [{
 		"src": "favicon.png",
