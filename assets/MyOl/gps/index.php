@@ -5,6 +5,9 @@ https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
 <?php
+//	This is the entry for the apache servers running PHP
+//	This installs the service and upgrades the files each time the page is reloaded
+
 	// Calculate relative paths between script & package
 	$dirs = explode ('/', str_replace ('\\', '/', __DIR__));
 	$scripts = explode ('/', pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
@@ -64,17 +67,19 @@ Based on https://openlayers.org
 </head>
 
 <body>
-	<script>
-		window.onload = function() {
-			<?php if (isset ($_GET['gpx'])) { ?>
-				addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
-			<?php }
-			if (isset ($overlay)) { ?>
-				map.addLayer (<?=$overlay?>);
-			<?php } ?>
-		};
-	</script>
-	<?php if (count ($gpx_files) && !isset ($_GET['gpx'])) { ?>
+	<?php if (isset ($_GET['gpx']) || isset ($overlay)) { ?>
+		<script>
+			window.onload = function() {
+				<?php if (isset ($_GET['gpx'])) { ?>
+					addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
+				<?php }
+				if () { ?>
+					map.addLayer (<?=$overlay?>);
+				<?php } ?>
+			};
+		</script>
+	<?php }
+	if (count ($gpx_files) && !isset ($_GET['gpx'])) { ?>
 		<div id="liste">
 			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 			<ul>
