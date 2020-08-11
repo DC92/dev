@@ -93,6 +93,7 @@ Based on https://openlayers.org
 		</div>
 	<?php } ?>
 
+assets/MyOl/gps/index.php
 	<div id="map"></div>
 </body>
 </html>

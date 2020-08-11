@@ -1,7 +1,7 @@
 {
 	"name": "My GPS",
 	"start_url": "index.php",
-	"display": "standalone",
+	"display": "fullscreen",
 	"icons": [{
 		"src": "favicon.png",
 		"sizes": "225x225",

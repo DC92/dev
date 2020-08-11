@@ -1,3 +1,4 @@
+/** PWA area */
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 	window.location.href = window.location.href.replace('http:', 'https:');
@@ -5,15 +6,14 @@ if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(service_worker)
-	// Reload if any app file has been updated
+	// Reload if the service worker md5 has changed
 	.then(function(reg) {
 		reg.addEventListener('updatefound', function() {
 			location.reload();
 		});
 	});
 
-// Openlayers part
-// Initialise Openlayers vars
+/** Openlayers map area */
 const nbli = document.getElementsByTagName('li').length,
 	elListe = document.getElementById('liste'),
 
