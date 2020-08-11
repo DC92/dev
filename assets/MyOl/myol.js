@@ -2409,7 +2409,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 
 		// Merge lines having a common end
 		else if (merge)
-		for (let b = 0; b < a; b++) // Once each combination 
+		for (let b = 0; b < a; b++) // Once each combination
 			if (lines[b]) {
 				const m = [a, b];
 				for (let i = 4; i; i--) // 4 times

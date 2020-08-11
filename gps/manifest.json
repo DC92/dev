@@ -1,10 +1,10 @@
 {
-	"name": "GPS",
-	"start_url": "../gps/index.php",
+	"name": "My GPS",
+	"start_url": "../assets/MyOl/gps/test.php",
 	"display": "standalone",
 	"icons": [{
-		"src": "../assets/MyOl/examples/favicon.ico",
-		"sizes": "32x32",
-		"type": "image/x-icon"
+		"src": "../assets/MyOl/gps/favicon.png",
+		"sizes": "225x225",
+		"type": "image/png"
 	}]
 }
