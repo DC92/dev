@@ -6,7 +6,6 @@ self.addEventListener('install', function(evt) {
 	evt.waitUntil(
 		caches.open('myGpsCache').then(function(cache) {
 			return cache.addAll([
-				'index.html',
 				'index.css',
 				'index.js',
 				'favicon.png',
