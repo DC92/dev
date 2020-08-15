@@ -5,6 +5,7 @@ header('Content-Type: application/javascript');
 header('Expires: '.date('r'));
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
+header('Service-Worker-Allowed: /');
 
 $version_tag = 0; // Total byte size of files
 $gpx_files = '';
@@ -27,11 +28,11 @@ $service_worker = str_replace (
 	'addAll(['.$gpx_files,
 	$service_worker
 );
-
+/*
 $service_worker = str_replace (
 	'index.html',
 	$_GET['url'],
 	$service_worker
 );
-
+*/
 echo "// Version $version_tag\n$service_worker";

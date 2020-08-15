@@ -5,7 +5,9 @@ if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register(service_worker)
+	navigator.serviceWorker.register(service_worker, {
+		scope: '/', // Allow service worker to be in a different directory
+	})
 	// Reload if the service worker md5 has changed
 	.then(function(reg) {
 		reg.addEventListener('updatefound', function() {

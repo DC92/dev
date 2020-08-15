@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
@@ -9,28 +10,28 @@ This installs the service but upgrades the files only after the caches delay
 -->
 <html>
 <head>
-	<link rel="manifest" href="manifest-simple.json">
+	<link rel="manifest" href="manifest.json">
 
 	<title>My GPS</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="icon" type="image/png" href="favicon.png" />
+	<link rel="icon" type="image/png" href="gps/favicon.png" />
 
 	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
+	<link href="gps/../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="gps/../ol/ol.js"></script>
 
 	<!-- Recherche par nom -->
-	<link href="../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
-	<script src="../geocoder/ol-geocoder.js"></script>
+	<link href="gps/../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
+	<script src="gps/../geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
-	<link href="../myol.css" type="text/css" rel="stylesheet">
-	<script src="../myol.js"></script>
+	<link href="gps/../myol.css" type="text/css" rel="stylesheet">
+	<script src="gps/../myol.js"></script>
 
 	<!-- This app -->
 	<script>
-		var service_worker = 'service-worker.js',
+		var service_worker = 'gps/service-worker.js.php',
 			// You will have to replace these keys by some that you ask for your own domain
 			keys = {
 				ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
@@ -39,8 +40,8 @@ This installs the service but upgrades the files only after the caches delay
 				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 			};
 	</script>
-	<link href="index.css" type="text/css" rel="stylesheet">
-	<script src="index.js" defer="defer"></script>
+	<link href="gps/index.css" type="text/css" rel="stylesheet">
+	<script src="gps/index.js" defer="defer"></script>
 </head>
 
 <body>
