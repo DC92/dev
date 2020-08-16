@@ -6,15 +6,10 @@ self.addEventListener('install', function(evt) {
 	evt.waitUntil(
 		caches.open('myGpsCache').then(function(cache) {
 			return cache.addAll([
-				'../gps.php',
-				'../manifest.json',
 				'index.html',
-				'index.php',
 				'index.css',
 				'index.js',
-				'manifest-simple.json',
 				'manifest.json',
-				'manifest.json.php',
 				'favicon.png',
 				'../ol/ol.css',
 				'../ol/ol.js',

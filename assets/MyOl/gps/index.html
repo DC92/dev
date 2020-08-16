@@ -4,12 +4,12 @@
 https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 
-This is the entry for servers that don't run PHP
+This is the entry for the servers that don't run PHP
 This installs the service but upgrades the files only after the caches delay
 -->
 <html>
 <head>
-	<link rel="manifest" href="manifest-simple.json">
+	<link rel="manifest" href="manifest.json">
 
 	<title>My GPS</title>
 	<meta charset="utf-8">
@@ -30,9 +30,7 @@ This installs the service but upgrades the files only after the caches delay
 
 	<!-- This app -->
 	<script>
-		var service_worker = 'service-worker.js',
-			// You will have to replace these keys by some that you ask for your own domain
-			keys = {
+		var keys = { // You have to replace these keys by some that you ask for your own domain
 				ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 				thunderforest: 'ee751f43b3af4614b01d1bce72785369', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
 				bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key

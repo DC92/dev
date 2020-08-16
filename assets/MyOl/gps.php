@@ -1,11 +1,17 @@
+<?php
 
+include ('gps/index.php');
+
+
+
+/*
 <!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
 https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 
-This is the entry for servers that don't run PHP
+This is the entry point for servers that don't run PHP
 This installs the service but upgrades the files only after the caches delay
 -->
 <html>
@@ -49,3 +55,4 @@ assets/MyOl/gps/index.html
 	<div id="map"></div>
 </body>
 </html>
+*/
