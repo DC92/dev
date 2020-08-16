@@ -1,0 +1,11 @@
+{
+	"name": "GPS",
+	"display": "fullscreen",
+	"scope": "/",
+	"start_url": "gps.php",
+	"icons": [{
+		"src": "examples/logo.png",
+		"sizes": "230x230",
+		"type": "image/png"
+	}]
+}

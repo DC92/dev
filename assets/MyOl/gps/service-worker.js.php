@@ -7,7 +7,33 @@ header('Cache-Control: no-cache');
 header('Pragma: no-cache');
 header('Service-Worker-Allowed: /');
 
-$version_tag = 0; // Total byte size of files
+// Read service Worker
+$service_worker = file_get_contents ('service-worker.js');
+
+// Calculate a key depending on the delivery (Total byte size of cached files)
+$version_tag = 0;
+
+// Package files
+foreach (glob ('*') as $f)
+	$version_tag += filesize ($f);
+
+// Specific files
+if (isset ($_GET['files'])) {
+	$specific_files = explode (',', $_GET['files']);
+
+	// Update cached file list
+	$service_worker = str_replace (
+		['index.html', 'manifest.json', 'favicon.png'],
+		$specific_files,
+		$service_worker
+	);
+
+	// Update version tag
+	foreach ($specific_files as $f)
+		$version_tag += filesize ($f);
+}
+	
+// Traces in the same directory
 $gpx_files = '';
 if (isset ($_GET['gpx'])) {
 	foreach (glob ($_GET['gpx'].'*.gpx') as $f) {
@@ -15,12 +41,6 @@ if (isset ($_GET['gpx'])) {
 		$gpx_files .= "\n\t\t\t\t'". dirname($_GET['url']) .'/'. basename($f) ."',";
 	}
 }
-// Package files
-foreach (glob ('*') as $f)
-	$version_tag += filesize ($f);
-
-// Service Worker
-$service_worker = file_get_contents ('service-worker.js');
 
 // Add gpx files to the list of files to cache
 $service_worker = str_replace (
@@ -28,11 +48,5 @@ $service_worker = str_replace (
 	'addAll(['.$gpx_files,
 	$service_worker
 );
-/*
-$service_worker = str_replace (
-	'index.html',
-	$_GET['url'],
-	$service_worker
-);
-*/
+
 echo "// Version $version_tag\n$service_worker";

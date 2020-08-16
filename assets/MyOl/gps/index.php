@@ -6,12 +6,13 @@ Based on https://openlayers.org
 -->
 <?php
 	// This is the entry point for the apache servers running PHP
-	// Install the service and upgrades the files each time the page is reloaded
-	// This file can be included from another php in another dorectory
+	// You can include it from another directory
+	// It needs a manifest.json file in the same directory
 
-	// Calculate relative paths between script & package
+	// Calculate relative paths between script & the GPS package
 	$dirs = explode ('/', str_replace ('\\', '/', __DIR__));
 	$scripts = explode ('/', pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
+	$script_basename = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_BASENAME);
 	// Remove common part of the path
 	foreach ($dirs AS $k=>$v)
 		if (@$scripts[$k] == $v) {
@@ -19,25 +20,27 @@ Based on https://openlayers.org
 			unset ($scripts[$k]);
 		}
 	$dirs[] = $scripts[] = '';
-	$scope_path = str_repeat ('../', count ($dirs) - 1);
-	$script_path = $scope_path .implode ('/', $scripts);
 	$gps_path = str_repeat ('../', count ($scripts) - 1) .implode ('/', $dirs);
-	$start_url = $gps_path .pathinfo ($_SERVER['SCRIPT_NAME'], PATHINFO_BASENAME );
+	$scope_path = str_repeat ('../', count ($dirs) - 1);
+	$script_path = $scope_path .implode ('/', $scripts); //TODO revoir tout ca!
 
-	if (!isset ($icon))
-		$icon = 'favicon.png';
-	if (!isset ($title))
-		$title = 'My GPS';
-
+	// Read info in the manifest.json & list *.gpx files
+	$manifest = json_decode (file_get_contents ('manifest.json'), true);
+	$icon = $manifest['icons'][0];
 	$gpx_files = glob ('*.gpx');
+	$specific_files = [
+		$script_path.$script_basename,
+		$script_path.'manifest.json',
+		$script_path.$icon['src'],
+	];
 ?>
 <html>
 <head>
-	<link rel="manifest" href="<?=$gps_path?>manifest.json.php?start_url=<?=$start_url?>&scope=/&icons=<?=$script_path.$icon?>">
-	<title><?=$title?></title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="icon" type="<?=mime_content_type($icon)?>" href="<?=$icon?>" />
+	<title><?=$manifest['name']?></title>
+	<link rel="icon" type="<?=$icon['type']?>" href="<?=$icon['src']?>" />
+	<link rel="manifest" href="manifest.json">
 
 	<!-- Openlayers -->
 	<link href="<?=$gps_path?>../ol/ol.css" type="text/css" rel="stylesheet">
@@ -55,7 +58,7 @@ Based on https://openlayers.org
 	<link href="<?=$gps_path?>index.css" type="text/css" rel="stylesheet">
 	<script src="<?=$gps_path?>index.js" defer="defer"></script>
 	<script>
-		var service_worker = '<?=$gps_path?>service-worker.js.php',
+		var service_worker = '<?=$gps_path?>service-worker.js.php?files=<?=implode(',',$specific_files)?>',
 <?php if ($scope_path) { ?>
 			scope = '/',
 <?php } ?>
