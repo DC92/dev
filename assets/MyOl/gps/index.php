@@ -19,6 +19,8 @@ Based on https://openlayers.org
 			unset ($scripts[$k]);
 		}
 	$dirs[] = $scripts[] = '';
+	$scope_path = str_repeat ('../', count ($dirs) - 1);
+	$script_path = $scope_path .implode ('/', $scripts);
 	$gps_path = str_repeat ('../', count ($scripts) - 1) .implode ('/', $dirs);
 	$start_url = $gps_path .pathinfo ($_SERVER['SCRIPT_NAME'], PATHINFO_BASENAME );
 
@@ -31,7 +33,7 @@ Based on https://openlayers.org
 ?>
 <html>
 <head>
-	<link rel="manifest" href="manifest.json.php?start_url=<?=$start_url?>&icons=<?=$icon?>">
+	<link rel="manifest" href="<?=$gps_path?>manifest.json.php?start_url=<?=$start_url?>&scope=/&icons=<?=$script_path.$icon?>">
 	<title><?=$title?></title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -50,22 +52,20 @@ Based on https://openlayers.org
 	<script src="<?=$gps_path?>../myol.js"></script>
 
 	<!-- This app -->
-	<script>
-		var service_worker = "<?=$gps_path?>service-worker.js.php",
-			keys = {
-				ign: "<?=isset($ign_key)?$ign_key:'hcxdz5f1p9emo4i1lch6ennl'?>", // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
-				thunderforest: "<?=isset($thunderforest_key)?$thunderforest_key:'ee751f43b3af4614b01d1bce72785369'?>", // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
-				bing: "<?=isset($bing_key)?$bing_key:'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt'?>" // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
-				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
-			};
-	</script>
 	<link href="<?=$gps_path?>index.css" type="text/css" rel="stylesheet">
 	<script src="<?=$gps_path?>index.js" defer="defer"></script>
-</head>
-
-<body>
-	<?php if (isset ($_GET['gpx']) || isset ($overlay)) { ?>
-		<script>
+	<script>
+		var service_worker = '<?=$gps_path?>service-worker.js.php',
+<?php if ($scope_path) { ?>
+			scope = '/',
+<?php } ?>
+			keys = {
+				ign: '<?=isset($ign_key)?$ign_key:"hcxdz5f1p9emo4i1lch6ennl"?>', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
+				thunderforest: '<?=isset($thunderforest_key)?$thunderforest_key:"ee751f43b3af4614b01d1bce72785369"?>', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
+				bing: '<?=isset($bing_key)?$bing_key:"ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt"?>', // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
+			};
+<?php if (isset ($_GET['gpx']) || isset ($overlay)) { ?>
 			window.onload = function() {
 				<?php if (isset ($_GET['gpx'])) { ?>
 					addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
@@ -74,27 +74,29 @@ Based on https://openlayers.org
 					map.addLayer (<?=$overlay?>);
 				<?php } ?>
 			};
-		</script>
-	<?php }
-	if (count ($gpx_files) && !isset ($_GET['gpx'])) { ?>
+<?php } ?>
+	</script>
+</head>
+
+<body>
+	<?php if (count ($gpx_files) && !isset ($_GET['gpx'])) { ?>
 		<div id="liste">
 			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 			<ul>
 			<?php foreach ($gpx_files AS $gpx) { ?>
-					<li>
-						<a title="Cliquer pour afficher la trace"
-							onclick="addLayer('<?=dirname($_SERVER['SCRIPT_NAME']).'/'.$gpx?>')">
-							<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
-						</a>
-					</li>
-			<?php } ?>
+				<li>
+					<a title="Cliquer pour afficher la trace"
+						onclick="addLayer('<?=dirname($_SERVER['SCRIPT_NAME']).'/'.$gpx?>')">
+						<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
+					</a>
+				</li>
+		<?php } ?>
 			</ul>
 			<p>Puis sur la cible pour afficher votre position.</p>
 			<p>Fermer : <a onclick="document.getElementById('liste').style.display='none'" title="Replier">&#9651;</a></p>
 		</div>
 	<?php } ?>
 
-assets/MyOl/gps/index.php
 	<div id="map"></div>
 </body>
 </html>
