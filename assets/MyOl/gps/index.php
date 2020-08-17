@@ -13,10 +13,14 @@ Based on https://openlayers.org
 	$manifest = json_decode (file_get_contents ('manifest.json'), true);
 	$icon = $manifest['icons'][0];
 
+	// Find the last subdir server internal files
+	preg_match ('/[^\/]*$/', $_SERVER['DOCUMENT_ROOT'], $tag_root);
+
 	// Calculate relative paths between the requested url & the GPS package directory
-	$url_script = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_BASENAME);
-	$url_dir = explode ('/', pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
-	$gps_dir = explode ('/', str_replace ('\\', '/', __DIR__));
+	$urls = explode ($tag_root[0], pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
+	$dirs = explode ($tag_root[0], str_replace ('\\', '/', __DIR__));
+	$url_dir = explode ('/', $urls[1]);
+	$gps_dir = explode ('/', $dirs[1]);
 
 	// Remove common part of the paths
 	foreach ($url_dir AS $k=>$v)
@@ -24,6 +28,7 @@ Based on https://openlayers.org
 			unset ($url_dir[$k]);
 			unset ($gps_dir[$k]);
 		}
+
 	if (count ($gps_dir)) { // If the URL is not in the GPS package directory
 		$url_path = str_repeat ('../', count ($gps_dir)) .implode ('/', $url_dir) .'/'; // Path of the URL from the GPS dir
 		$gps_path = str_repeat ('../', count ($url_dir)) .implode ('/', $gps_dir) .'/'; // Path of the GPS dir from the URL
@@ -39,7 +44,7 @@ Based on https://openlayers.org
 		'service-worker.js.php?files='.
 		str_replace (['gps/../', '../'], ['', ':'], // Optimise link, avoid error 406 ModSecurity
 			implode (',', [
-				$url_path.$url_script,
+				$url_path.pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_BASENAME),
 				$url_path.'manifest.json',
 				$url_path.$icon['src'],
 			])
