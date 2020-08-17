@@ -31,7 +31,7 @@ Based on https://openlayers.org
 		$specific_files = [
 			$url_path.$url_script,
 			$url_path.'manifest.json',
-			$url_path.$icon['src'],
+			str_replace ('../gps/', '', $url_path.$icon['src']),
 		];
 	} else {
 		$gps_path = '';

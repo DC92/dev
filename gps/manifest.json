@@ -1,8 +1,8 @@
 {
-	"name": "My GPS",
+	"name": "GPS",
 	"display": "fullscreen",
 	"scope": "../",
-	"start_url": "../assets/MyOl/gps/test.php",
+	"start_url": "../assets/MyOl/gps/index.php",
 	"icons": [{
 		"src": "../assets/MyOl/examples/logo.png",
 		"sizes": "230x230",

@@ -1,4 +1,6 @@
 <?php
+// This utility modify the service-worker.js when the package is used from another directory & with .GPX files
+
 header('Content-Type: application/javascript');
 
 // Check new version each time the url is called
