@@ -37,7 +37,7 @@ Based on https://openlayers.org
 	$service_worker =
 		$gps_path.
 		'service-worker.js.php?files='.
-		str_replace (['../gps/', '../'], ['', ':'], // Optimise link, avoid error 406 ModSecurity
+		str_replace (['gps/../', '../'], ['', ':'], // Optimise link, avoid error 406 ModSecurity
 			implode (',', [
 				$url_path.$url_script,
 				$url_path.'manifest.json',
