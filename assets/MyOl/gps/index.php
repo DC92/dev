@@ -28,32 +28,34 @@ Based on https://openlayers.org
 		$url_path = str_repeat ('../', count ($gps_dir)) .implode ('/', $url_dir) .'/'; // Path of the URL from the GPS dir
 		$gps_path = str_repeat ('../', count ($url_dir)) .implode ('/', $gps_dir) .'/'; // Path of the GPS dir from the URL
 		$myol_path = preg_replace ('/gps\/$/', '', $gps_path);
-		$service_worker =
-			$gps_path.
-			'service-worker.js.php?files='.
-			str_replace ('..', ':', // Avoid error 406 ModSecurity
-				implode (',', [
-					$url_path.$url_script,
-					$url_path.'manifest.json',
-					str_replace ('../gps/', '', $url_path.$icon['src']),
-				])
-			);
 	} else {
-		$gps_path = '';
+		$url_path = $gps_path = '';
 		$myol_path = '../';
-		$service_worker = '';
 	}
+
+	// List the files to cache
+	$service_worker =
+		$gps_path.
+		'service-worker.js.php?files='.
+		str_replace (['../gps/', '../'], ['', ':'], // Optimise link, avoid error 406 ModSecurity
+			implode (',', [
+				$url_path.$url_script,
+				$url_path.'manifest.json',
+				$url_path.$icon['src'],
+			])
+		);
 
 	// Get gpx files on the url directory
 	$gpx_files = glob ('*.gpx');
 ?>
 <html>
 <head>
+	<link rel="manifest" href="manifest.json">
+
+	<title><?=$manifest['name']?></title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title><?=$manifest['name']?></title>
 	<link rel="icon" type="<?=$icon['type']?>" href="<?=$icon['src']?>" />
-	<link rel="manifest" href="manifest.json">
 
 	<!-- Openlayers -->
 	<link href="<?=$myol_path?>ol/ol.css" type="text/css" rel="stylesheet">

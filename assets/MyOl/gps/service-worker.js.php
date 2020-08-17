@@ -21,7 +21,11 @@ foreach (glob ('*') as $f)
 
 // Specific files
 if (isset ($_GET['files'])) {
-	$specific_files = explode (',', str_replace (':', '..', $_GET['files']));
+	$specific_files = explode (',', str_replace (':', '../', $_GET['files']));
+
+	// Update version tag
+	foreach ($specific_files as $f)
+		$version_tag += filesize ($f);
 
 	// Update cached file list
 	$service_worker = str_replace (
@@ -29,11 +33,14 @@ if (isset ($_GET['files'])) {
 		$specific_files,
 		$service_worker
 	);
-
-	// Update version tag
-	foreach ($specific_files as $f)
-		$version_tag += filesize ($f);
 }
+
+// Change cache name
+$service_worker = str_replace (
+	'myGpsCache',
+	'myGpsCache_'.md5(@$_GET['files']),
+	$service_worker
+);
 
 // Traces in the same directory
 $gpx_files = '';
