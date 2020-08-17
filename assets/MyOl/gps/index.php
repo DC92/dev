@@ -28,14 +28,20 @@ Based on https://openlayers.org
 		$url_path = str_repeat ('../', count ($gps_dir)) .implode ('/', $url_dir) .'/'; // Path of the URL from the GPS dir
 		$gps_path = str_repeat ('../', count ($url_dir)) .implode ('/', $gps_dir) .'/'; // Path of the GPS dir from the URL
 		$myol_path = preg_replace ('/gps\/$/', '', $gps_path);
-		$specific_files = [
-			$url_path.$url_script,
-			$url_path.'manifest.json',
-			str_replace ('../gps/', '', $url_path.$icon['src']),
-		];
+		$service_worker =
+			$gps_path.
+			'service-worker.js.php?files='.
+			str_replace ('..', ':', // Avoid error 406 ModSecurity
+				implode (',', [
+					$url_path.$url_script,
+					$url_path.'manifest.json',
+					str_replace ('../gps/', '', $url_path.$icon['src']),
+				])
+			);
 	} else {
 		$gps_path = '';
 		$myol_path = '../';
+		$service_worker = '';
 	}
 
 	// Get gpx files on the url directory
@@ -65,7 +71,7 @@ Based on https://openlayers.org
 	<link href="<?=$gps_path?>index.css" type="text/css" rel="stylesheet">
 	<script src="<?=$gps_path?>index.js" defer="defer"></script>
 	<script>
-		var service_worker = '<?=$gps_path?>service-worker.js.php<?=$gps_path?"?files=".implode(',',$specific_files):''?>',
+		var service_worker = '<?=$service_worker?>',
 <?php if (isset ($manifest['scope'])) { ?>
 			scope = '<?=$manifest['scope']?>',
 <?php } ?>

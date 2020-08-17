@@ -21,7 +21,7 @@ foreach (glob ('*') as $f)
 
 // Specific files
 if (isset ($_GET['files'])) {
-	$specific_files = explode (',', $_GET['files']);
+	$specific_files = explode (',', str_replace (':', '..', $_GET['files']));
 
 	// Update cached file list
 	$service_worker = str_replace (
