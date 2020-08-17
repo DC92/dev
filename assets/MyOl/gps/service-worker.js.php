@@ -32,7 +32,7 @@ if (isset ($_GET['files'])) {
 	foreach ($specific_files as $f)
 		$version_tag += filesize ($f);
 }
-	
+
 // Traces in the same directory
 $gpx_files = '';
 if (isset ($_GET['gpx'])) {
@@ -49,4 +49,5 @@ $service_worker = str_replace (
 	$service_worker
 );
 
+// Output the version tag & the revised code
 echo "// Version $version_tag\n$service_worker";

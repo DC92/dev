@@ -9,30 +9,37 @@ Based on https://openlayers.org
 	// You can include it from another directory
 	// It needs a manifest.json file in the same directory
 
-	// Calculate relative paths between script & the GPS package
-	$dirs = explode ('/', str_replace ('\\', '/', __DIR__));
-	$scripts = explode ('/', pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
-	$script_basename = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_BASENAME);
-	// Remove common part of the path
-	foreach ($dirs AS $k=>$v)
-		if (@$scripts[$k] == $v) {
-			unset ($dirs[$k]);
-			unset ($scripts[$k]);
-		}
-	$dirs[] = $scripts[] = '';
-	$gps_path = str_repeat ('../', count ($scripts) - 1) .implode ('/', $dirs);
-	$scope_path = str_repeat ('../', count ($dirs) - 1);
-	$script_path = $scope_path .implode ('/', $scripts); //TODO revoir tout ca!
-
 	// Read info in the manifest.json & list *.gpx files
 	$manifest = json_decode (file_get_contents ('manifest.json'), true);
 	$icon = $manifest['icons'][0];
+
+	// Calculate relative paths between the requested url & the GPS package directory
+	$url_script = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_BASENAME);
+	$url_dir = explode ('/', pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
+	$gps_dir = explode ('/', str_replace ('\\', '/', __DIR__));
+
+	// Remove common part of the paths
+	foreach ($url_dir AS $k=>$v)
+		if (@$gps_dir[$k] == $v) {
+			unset ($url_dir[$k]);
+			unset ($gps_dir[$k]);
+		}
+	if (count ($gps_dir)) { // If the URL is not in the GPS package directory
+		$url_path = str_repeat ('../', count ($gps_dir)) .implode ('/', $url_dir) .'/'; // Path of the URL from the GPS dir
+		$gps_path = str_repeat ('../', count ($url_dir)) .implode ('/', $gps_dir) .'/'; // Path of the GPS dir from the URL
+		$myol_path = preg_replace ('/gps\/$/', '', $gps_path);
+		$specific_files = [
+			$url_path.$url_script,
+			$url_path.'manifest.json',
+			$url_path.$icon['src'],
+		];
+	} else {
+		$gps_path = '';
+		$myol_path = '../';
+	}
+
+	// Get gpx files on the url directory
 	$gpx_files = glob ('*.gpx');
-	$specific_files = [
-		$script_path.$script_basename,
-		$script_path.'manifest.json',
-		$script_path.$icon['src'],
-	];
 ?>
 <html>
 <head>
@@ -43,24 +50,24 @@ Based on https://openlayers.org
 	<link rel="manifest" href="manifest.json">
 
 	<!-- Openlayers -->
-	<link href="<?=$gps_path?>../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="<?=$gps_path?>../ol/ol.js"></script>
+	<link href="<?=$myol_path?>ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="<?=$myol_path?>ol/ol.js"></script>
 
 	<!-- Recherche par nom -->
-	<link href="<?=$gps_path?>../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
-	<script src="<?=$gps_path?>../geocoder/ol-geocoder.js"></script>
+	<link href="<?=$myol_path?>geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
+	<script src="<?=$myol_path?>geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
-	<link href="<?=$gps_path?>../myol.css" type="text/css" rel="stylesheet">
-	<script src="<?=$gps_path?>../myol.js"></script>
+	<link href="<?=$myol_path?>myol.css" type="text/css" rel="stylesheet">
+	<script src="<?=$myol_path?>myol.js"></script>
 
 	<!-- This app -->
 	<link href="<?=$gps_path?>index.css" type="text/css" rel="stylesheet">
 	<script src="<?=$gps_path?>index.js" defer="defer"></script>
 	<script>
-		var service_worker = '<?=$gps_path?>service-worker.js.php?files=<?=implode(',',$specific_files)?>',
-<?php if ($scope_path) { ?>
-			scope = '/',
+		var service_worker = '<?=$gps_path?>service-worker.js.php<?=$gps_path?"?files=".implode(',',$specific_files):''?>',
+<?php if (isset ($manifest['scope'])) { ?>
+			scope = '<?=$manifest['scope']?>',
 <?php } ?>
 			keys = {
 				ign: '<?=isset($ign_key)?$ign_key:"hcxdz5f1p9emo4i1lch6ennl"?>', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats

@@ -1,11 +1,11 @@
 {
 	"name": "My GPS",
 	"display": "fullscreen",
-	"scope": "/",
+	"scope": "../",
 	"start_url": "../assets/MyOl/gps/test.php",
 	"icons": [{
-		"src": "../assets/MyOl/gps/favicon.png",
-		"sizes": "225x225",
+		"src": "../assets/MyOl/examples/logo.png",
+		"sizes": "230x230",
 		"type": "image/png"
 	}]
 }
