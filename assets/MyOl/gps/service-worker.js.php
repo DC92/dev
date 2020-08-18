@@ -59,6 +59,4 @@ $service_worker = str_replace (
 );
 
 // Output the version tag & the revised code
-echo "var version_tag = '$version_tag';
-
-$service_worker";
+echo "// Version $version_tag\n\n$service_worker";
