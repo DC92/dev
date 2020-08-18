@@ -6,7 +6,6 @@ if (window.location.protocol == 'http:' && window.location.host != 'localhost')
 // Force the script name of short url
 if (!window.location.pathname.split('/').pop())
 	window.location.href = window.location.href + 'index.php';
-//TODO argument &gpx=toto.gpx
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
