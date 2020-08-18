@@ -38,7 +38,7 @@ if (isset ($_GET['files'])) {
 // Change cache name
 $service_worker = str_replace (
 	'myGpsCache',
-	'myGpsCache_'.md5(@$_GET['files']),
+	'myGpsCache_'.md5(@$_GET['files']), // Unique name for one implementation
 	$service_worker
 );
 
@@ -59,4 +59,6 @@ $service_worker = str_replace (
 );
 
 // Output the version tag & the revised code
-echo "// Version $version_tag\n$service_worker";
+echo "var version_tag = '$version_tag';
+
+$service_worker";

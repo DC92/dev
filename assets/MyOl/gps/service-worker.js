@@ -1,6 +1,7 @@
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the remote service-worker source md5 is different
 self.addEventListener('install', function(evt) {
+	console.log('Install ' + version_tag);
 	caches.delete('myGpsCache');
 	evt.waitUntil(
 		caches.open('myGpsCache').then(function(cache) {
