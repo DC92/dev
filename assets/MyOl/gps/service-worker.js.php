@@ -33,28 +33,23 @@ if (isset ($_GET['files'])) {
 		$specific_files,
 		$service_worker
 	);
+
+	// Add GPX files in the url directory to the list of files to cache
+	$gpx_files = glob (pathinfo ($specific_files[0], PATHINFO_DIRNAME) .'/*.gpx');
+	foreach ($gpx_files as $gf) {
+		$version_tag += filesize ($gf);
+		$service_worker = str_replace (
+			"addAll([",
+			"addAll([\n\t\t\t\t'$gf',",
+			$service_worker
+		);
+	}
 }
 
 // Change cache name
 $service_worker = str_replace (
 	'myGpsCache',
 	'myGpsCache_'.md5(@$_GET['files']), // Unique name for one implementation
-	$service_worker
-);
-
-// Traces in the same directory
-$gpx_files = '';
-if (isset ($_GET['gpx'])) {
-	foreach (glob ($_GET['gpx'].'*.gpx') as $f) {
-		$version_tag += filesize ($f);
-		$gpx_files .= "\n\t\t\t\t'". dirname($_GET['url']) .'/'. basename($f) ."',";
-	}
-}
-
-// Add gpx files to the list of files to cache
-$service_worker = str_replace (
-	'addAll([',
-	'addAll(['.$gpx_files,
 	$service_worker
 );
 
