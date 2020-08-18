@@ -16,7 +16,7 @@ $service_worker = file_get_contents ('service-worker.js');
 $version_tag = 0;
 
 // Package files
-foreach (glob ('*') as $f)
+foreach (array_merge (glob ('../*'), glob ('../*/*')) as $f)
 	$version_tag += filesize ($f);
 
 // Specific files
@@ -49,7 +49,7 @@ if (isset ($_GET['files'])) {
 // Change cache name
 $service_worker = str_replace (
 	'myGpsCache',
-	'myGpsCache_'.md5(@$_GET['files']), // Unique name for one implementation
+	'myGpsCache_'.strlen(@$_GET['files']), // Unique name for one implementation
 	$service_worker
 );
 
