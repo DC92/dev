@@ -2509,7 +2509,21 @@ function layersCollection(keys) {
 	return {
 		'OpenTopo': layerOsmOpenTopo(),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
-		'OSM-FR': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
+		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'Photo Google': layerGoogle('s'),
+		'Photo Bing': layerBing(keys.bing, 'Aerial'),
+		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
+		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Angleterre': layerOS(keys.bing),
+		'Espagne': layerSpain('mapa-raster', 'MTN'),
+	};
+}
+
+function layersDemo(keys) {
+	return Object.assign(layersCollection(keys), {
 		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOsmMri(),
 		'Hike & Bike': layerOsm(
@@ -2518,22 +2532,16 @@ function layersCollection(keys) {
 		), // Not on https
 		'OSM cycle': layerThunderforest(keys.thunderforest, 'cycle'),
 		'OSM landscape': layerThunderforest(keys.thunderforest, 'landscape'),
-		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
 		'OSM trains': layerThunderforest(keys.thunderforest, 'pioneer'),
 		'OSM villes': layerThunderforest(keys.thunderforest, 'neighbourhood'),
 		'OSM contraste': layerThunderforest(keys.thunderforest, 'mobile-atlas'),
-
-		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+	
 		'IGN TOP 25': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-		'IGN classique': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-		'IGN photos': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
 		//403 'IGN Spot': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
 		//Double 	'SCAN25TOUR': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
 		'IGN 1950': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
-		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
 		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
-		'Etat major': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
-		'ETATMAJOR10': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
+		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
 		'IGN plan': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
 		'IGN route': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
 		'IGN noms': layerIGN(keys.ign, 'GEOGRAPHICALNAMES.NAMES', 'png'),
@@ -2545,25 +2553,24 @@ function layersCollection(keys) {
 		//Le style normal n'est pas geré 'PN': layerIGN(keys.ign, 'PROTECTEDAREAS.PN', 'png'),
 		'PNR': layerIGN(keys.ign, 'PROTECTEDAREAS.PNR', 'png'),
 		//403 'Avalanches': layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
-
-		'Swiss': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Etat major': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
+		'ETATMAJOR10': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
+	
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')), //TODO ?????? layerGoogle
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
-		'Angleterre': layerOS(keys.bing),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
+
 		'Bing': layerBing(keys.bing, 'Road'),
 		'Bing photo': layerBing(keys.bing, 'AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
-		'Google photo': layerGoogle('s'),
 		'Google hybrid': layerGoogle('s,h'),
 		'Stamen': layerStamen('terrain'),
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
-	};
+	});
 }
 
 /**
@@ -2572,7 +2579,7 @@ function layersCollection(keys) {
 function controlsCollection(options) {
 	options = options || {};
 	if (!options.baseLayers)
-		options.baseLayers = layersCollection(options.geoKeys);
+		options.baseLayers = layersDemo(options.geoKeys);
 
 	return [
 		controlLayersSwitcher(Object.assign({

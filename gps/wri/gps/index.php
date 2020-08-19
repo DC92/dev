@@ -1,5 +1,6 @@
 <?php
-$overlay = "layerRefugesInfo({baseUrl:'//{$_SERVER['SERVER_NAME']}/'})";
+$baselayers = '{MRI:layerOsmMri()}';
+$overlays = '[layerRefugesInfo({baseUrl:"//'.$_SERVER['SERVER_NAME'].'/"})]';
 
 include ('../config_privee.php');
 $ign_key = $config_wri['ign_key'];

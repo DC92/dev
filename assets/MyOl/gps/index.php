@@ -9,6 +9,9 @@ Based on https://openlayers.org
 	// You can include it from another directory
 	// It needs a manifest.json file in the same directory
 
+	//TODO BEST afficher version tag
+	//TODO BUG battements entre index.html & index.php
+
 	// Read info in the manifest.json & list *.gpx files
 	$manifest = json_decode (file_get_contents ('manifest.json'), true);
 	$icon = $manifest['icons'][0];
@@ -87,15 +90,18 @@ Based on https://openlayers.org
 				thunderforest: '<?=isset($thunderforest_key)?$thunderforest_key:"ee751f43b3af4614b01d1bce72785369"?>', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
 				bing: '<?=isset($bing_key)?$bing_key:"ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt"?>', // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
 				// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
-			};
-<?php if (isset ($_GET['gpx']) || isset ($overlay)) { ?>
+			},
+			baselayers = <?=isset ($baselayers)?$baselayers:'{}'?>;
+
+<?php if (isset ($_GET['gpx']) || isset ($overlays)) { ?>
 			window.onload = function() {
-				<?php if (isset ($_GET['gpx'])) { ?>
-					addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
-				<?php }
-				if (isset ($overlay)) { ?>
-					map.addLayer (<?=$overlay?>);
-				<?php } ?>
+<?php if (isset ($_GET['gpx'])) { ?>
+				addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
+<?php }
+if (isset ($overlays)) { ?>
+				for (let o in <?=$overlays?>)
+					map.addLayer (<?=$overlays?>[o]);
+<?php } ?>
 			};
 <?php } ?>
 	</script>

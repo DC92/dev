@@ -1,7 +1,4 @@
 <?php
-$overlay = 'layerRefugesInfo()';
+$baselayers = '{MRI:layerOsmMri()}';
+$overlays = '[layerRefugesInfo()]';
 include ('../assets/MyOl/gps/index.php');
-
-//test 3 smartphones + explo
-//best afficher version tag
-//battements entre index.html & index.php

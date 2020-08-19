@@ -42,26 +42,12 @@ const nbli = document.getElementsByTagName('li').length,
 	'* Cette application ne permet pas d‘enregistrer le parcours\n' +
 	'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
 
-	baseLayers = {
-		'OpenTopo': layerOsmOpenTopo(),
-		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
-		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
-		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'Photo Google': layerGoogle('s'),
-		'Photo Bing': layerBing(keys.bing, 'Aerial'),
-		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
-		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
-		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Angleterre': layerOS(keys.bing),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-	},
-
 	controls = [
 		controlTilesBuffer(4),
 		controlLayersSwitcher({
-			baseLayers: baseLayers,
+			baseLayers: Object.assign(
+				baselayers,
+				layersCollection(keys)),
 		}),
 
 		new ol.control.Attribution({
