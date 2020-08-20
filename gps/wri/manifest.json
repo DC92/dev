@@ -1,11 +1,11 @@
 {
 	"name": "GPS refuges.info",
 	"display": "fullscreen",
-	"scope": "../",
+	"scope": "./",
 	"start_url": "index.php",
 	"icons": [{
 		"src": "../images/favicon.png",
-		"sizes": "192x192",
+		"sizes": "256x256",
 		"type": "image/png"
 	}]
 }
