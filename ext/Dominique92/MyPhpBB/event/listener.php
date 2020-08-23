@@ -45,11 +45,16 @@ class listener implements EventSubscriberInterface
 /**
  * Includes style files of this extension
  */
-		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
+//TODO explore all active extensions
+//TODO bug acp_main.html
+/*
+		$this->ext_path = 'ext/'.$ns[0].'/'.$ns[1].'/';
 		$template->set_style ([
 			$this->ext_path.'styles',
 			'styles', // core styles
+			'adm', // core styles
 		]);
+*/
 	}
 
 	// List of hooks and related functions
