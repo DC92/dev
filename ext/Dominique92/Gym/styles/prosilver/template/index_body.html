@@ -1,41 +1,7 @@
 <!-- INCLUDE header.html -->
 
-<ul class="menu">
-	<!-- BEGIN topic -->
-	<!-- IF topic.FIRST_GYM_MENU -->
-	<li style="background:{topic.COULEUR}">
-		<a href="viewtopic.php?t={topic.TOPIC_ID}" title = "Voir la fiche {topic.TOPIC_TITLE}">
-			{topic.TOPIC_TITLE}
-		</a>
-
-		<!-- IF topic.COUNT > 1 -->
-		<ul style="background:{topic.COULEUR}" class="submenu">
-			<!-- BEGIN post -->
-			<!-- IF post.GYM_MENU and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
-				<li>
-				<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
-					{post.POST_SUBJECT}
-				</a>
-				</li>
-			<!-- ENDIF -->
-			<!-- END post -->
-		</ul>
-		<!-- ENDIF -->
-	</li>
-	<!-- ENDIF -->
-	<!-- END topic -->
-
-	<!-- IF U_MCP -->
-	<li>
-		<a title="Ajouter une rubrique au menu principal" href="posting.php?mode=post&f=2">
-			<i class="icon fa-commenting-o" aria-hidden="true"></i>
-		</a>
-	</li>
-	<!-- ENDIF -->
-</ul>
-
 <div class="page">
-	<div class="slideshow">  
+	<div class="slideshow">
 		<ul>
 			<!-- //TODO automatiser à partir du répertoire -->
 			<li><img src="slides/1.jpg" width="400" height="300" alt="Slide " /></li>
@@ -46,7 +12,7 @@
 			<li><img src="slides/6.jpg" width="400" height="300" alt="Slide " /></li>
 			<li><img src="slides/7.jpg" width="400" height="300" alt="Slide " /></li>
 			<li><img src="slides/8.jpg" width="400" height="300" alt="Slide " /></li>
-		</ul>  
+		</ul>
 	</div>
 
 	<div>

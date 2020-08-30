@@ -1,23 +1,17 @@
-<ul class="menu">
+<ul class="menu submenu">
 	<!-- BEGIN topic -->
-	<!-- IF topic.FIRST_GYM_MENU and topic.TOPIC_ID == REQUEST_T and topic.COUNT > 1 -->
+	<!-- IF topic.FIRST_GYM_MENU and topic.TOPIC_ID == REQUEST_IT and topic.COUNT > 1 -->
 		<!-- BEGIN post -->
 			<!-- IF post.GYM_MENU and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
-			<li style="background:{post.COULEUR}">
+			<li>
+			<div style="background:{post.COULEUR}">
 				<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
 					{post.POST_SUBJECT}
 				</a>
+			</div>
 			</li>
 		<!-- ENDIF -->
 		<!-- END post -->
-
-		<!-- IF REQUEST_MOD -->
-		<li>
-			<a title="Ajouter un ballon au sous-menu {topic.TOPIC_TITLE}" href="posting.php?mode=reply&f=2&t={topic.TOPIC_ID}">
-				<i class="icon fa-commenting-o" aria-hidden="true"></i>
-			</a>
-		</li>
-		<!-- ENDIF -->
 	<!-- ENDIF -->
 	<!-- END topic -->
 </ul>

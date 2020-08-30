@@ -16,15 +16,27 @@
 		<tr>
 			<!-- IF not REQUEST_ID -->
 			<td>
-				<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
+				<!-- IF post.GYM_ACTIVITE != REQUEST_IP -->
+					<a href="viewtopic.php?p={post.GYM_ACTIVITE}">{post.POST_SUBJECT}</a>
+				<!-- ELSE -->
+					{post.POST_SUBJECT}
+				<!-- ENDIF -->
+
 				<!-- IF post.GYM_CERT -->
 					<a href="https://www.oncorif.fr/prescriforme-lactivite-physique-sur-ordonnance-en-ile-de-france/"
 						target="_blank" class="cert" title="Cours certifié Prescri’forme"
 					>CERT</a>
 				<!-- ENDIF -->
 
-				<!-- IF REQUEST_ACTIVITE and post.GYM_NOTA -->
+				<!-- IF post.GYM_NOTA -->
 					<br>{post.GYM_NOTA}
+				<!-- ENDIF -->
+
+				<!-- IF REQUEST_MOD -->
+					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+						title="Modifier cette séance" class="button button-icon-only">
+						<i class="icon fa-pencil"></i>
+					</a>
 				<!-- ENDIF -->
 			</td>
 			<!-- ENDIF -->
@@ -33,28 +45,27 @@
 				{post.HORAIRE_DEBUT} à {post.HORAIRE_FIN}
 			</td>
 
-			<!-- IF not REQUEST_LIEU -->
+			<!-- IF REQUEST_T != 3 -->
 			<td>
+				<!-- IF post.GYM_LIEU != REQUEST_IP -->
 				<a href="viewtopic.php?p={post.GYM_LIEU}">
 					{post.LIEU}
 				</a>
+				<!-- ELSE -->
+					{post.LIEU}
+				<!-- ENDIF -->
 			</td>
 			<!-- ENDIF -->
 
-			<!-- IF not REQUEST_ANIMATEUR -->
+			<!-- IF REQUEST_T != 4 -->
 			<td>
+				<!-- IF post.GYM_ANIMATEUR != REQUEST_IP -->
 				<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
 					{post.ANIMATEUR}
 				</a>
-			</td>
-			<!-- ENDIF -->
-
-			<!-- IF REQUEST_MOD -->
-			<td>
-				<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
-					title="Modifier cette séance" class="button button-icon-only">
-					<i class="icon fa-pencil"></i>
-				</a>
+				<!-- ELSE -->
+					{post.ANIMATEUR}
+				<!-- ENDIF -->
 			</td>
 			<!-- ENDIF -->
 		</tr>

@@ -6,63 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-/*
-//BEST
-traduire TOPIC_ID => le n° du topic dans (INCLUDE
-Glissement latéral pages
-Lien gmaps 
-Diaporama pas vu depuis un moment boucle rapidement
-Bug d'affichage avec &hilit=body (résultat recherche)
-	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
-	" dans le title !
-Redimensionner les images suivant taille fenetre
-	GYM bbcode photo/n° attachment
-Bouton imprimer calendier
-	style print
-Erradiquer f=2
-
-//APRES
-Sitemap
-enlever @define('DEBUG_CONTAINER', true);
-Enlever la banière jaune et le décallage de la connexion admin
-enlever recompile templates
-enlever le .robot et faire un SEO
-mettre redir 301 free
-*/
-
-/** CONFIG
-https://github.com/phpbbmodders/phpBB-3.1-ext-adduser
-https://www.phpbb.com/customise/db/extension/googleanalytics
-copier /slides /files config.php
-
-PERSONNALISER / extension gym
-MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
-GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
-GENERAL / Paramètres des messages / Messages par page : 99
-MESSAGES / Paramètres des fichiers joints / taille téléchargements
-MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
-MESSAGES / BBCodes / cocher afficher
-	[accueil]{TEXT}[/accueil] / <!--accueil-->{TEXT}<!--accueil--> / Partie de texte à afficher sur le haut de la page d'accueil du site
-	[actualite]{TEXT}[/actualite] / <!--actualite-->{TEXT}<!--actualite--> / Partie de texte à afficher sur le bas de la page d'accueil du site
-	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
-	[centre]{TEXT}[/centre] / <div style="text-align:center">{TEXT}</div> / Image centrée
-	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
-	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
-	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
-	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
-	[resume]{TEXT}[/resume] / <!--resume-->{TEXT}<!--resume--> / Résumé pour affichage en début de page
-	[presentation]{TEXT}[/presentation] / <!--presentation-->{TEXT}<!--presentation--> / Presentation pour affichage dans la rubrique
-	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une rubrique
-	[saut_ligne][/saut_ligne] / <br style="clear:both" />
-	[separation][/separation] / <hr/> / Ligne horizontale
-	[surligne]{TEXT}[/surligne] / <span style="background:yellow">{TEXT}</span> / Surligné en jaune
-	[titre1]{TEXT}[/titre1] / <h1>{TEXT}</h1> / Caractères blancs sur fond bleu
-	[titre2]{TEXT}[/titre2] / <h2>{TEXT}</h2> / Caractères noirs sur fond vert
-	[titre3]{TEXT}[/titre3] / <h3>{TEXT}</h3>
-	[titre4]{TEXT}[/titre4] / <h4>{TEXT}</h4>
-	[urlb={TEXT1}]{TEXT2}[/urlb] / <a target="_BLANK" href="{TEXT1}">{TEXT2}</a> / Lien à afficher sur un nouvel onglet
-*/
-
 namespace Dominique92\Gym\event;
 
 if (!defined('IN_PHPBB'))
@@ -163,7 +106,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-		Expansion des "BBCodes" maisons : (CLE valeur)
+		Expansion des "BBCodes" maisons : (INCLUDE|LOCATION valeur)
 	*/
 	function twig_environment_render_template_after($vars) {
 		if ($vars['name'] == 'index_body.html' ||
@@ -180,14 +123,24 @@ class listener implements EventSubscriberInterface
 					);
 					$url = 'http://'.implode ('/', $uris);
 
+					// Cas où le paramètre est une url bbcodisée
+					$match_url = explode ('"', $match[2]);
+					if ($match_url[0] == '<a href=')
+						$url = $match_url[1];
+
 					switch ($match[1]) {
 						// (INCLUDE relative_url) replace this string by the url content
 						case 'INCLUDE':
-							return file_get_contents ($url.'&mod='.$this->auth->acl_get('m_'));
+							return file_get_contents (
+								$url.
+								'&it='.$this->request->variable('t',0).
+								'&ip='.$this->request->variable('p',0).
+								'&mod='.$this->auth->acl_get('m_')
+							);
 
 						// (LOCATION relative_url) replace this page by the url
 						case 'LOCATION':
-							header ('Location: '.$url);
+							header ('Location: '.urldecode($url));
 							exit;
 					}
 					// Sinon, on ne fait rien
@@ -234,8 +187,11 @@ class listener implements EventSubscriberInterface
 		$post_data = $this->all_post_data[$post_id] ?: [];
 		$topic_data = $vars['topic_data'];
 
-		if ($post_id == $this->request->variable('p', 0))
-			$this->template->assign_var ('GYM_ACTIVITE', $post_data['gym_activite']);
+/*//TODO DELETE ???
+		if ($post_id == $this->request->variable('p', 0) &&
+			is_numeric($post_data['gym_activite']))
+			$this->template->assign_var ('GYM_ACTIVITE', $post_data['gym_activite']); //TODO INDISPENSABLE ?????
+*/
 
 		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
@@ -269,8 +225,8 @@ class listener implements EventSubscriberInterface
 
 		// Set specific variables
 		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'gym', 3) && $v) {
-				$this->template->assign_var (strtoupper ($k), $v);
+			if (!strncmp ($k, 'gym', 3)) {
+				$this->template->assign_var (strtoupper ($k), $v ?: 0);
 				$data[$k] = explode (',', $v); // Expand grouped values
 			}
 
@@ -392,15 +348,15 @@ class listener implements EventSubscriberInterface
 		$post_id = $this->request->variable('id', '', true);
 		if ($post_id)
 			$cond[] = 'p.post_id='.$post_id;
-		$activite = $this->request->variable('activite', '', true);
-		if ($activite)
-			$cond[] = 'ac.post_subject="'.urldecode($activite).'"';
-		$lieu = $this->request->variable('lieu', '', true);
-		if ($lieu)
-			$cond[] = 'li.post_subject="'.urldecode($lieu).'"';
-		$animateur = $this->request->variable('animateur', '', true);
-		if ($animateur)
-			$cond[] = 'an.post_subject="'.urldecode($animateur).'"';
+
+		$request_it = $this->request->variable('it', 0);
+		$request_ip = $this->request->variable('ip', 0);
+		if ($request_it == 2 && $request_ip)
+			$cond[] = 'ac.post_id='.$request_ip;
+		elseif ($request_it == 3 && $request_ip)
+			$cond[] = 'li.post_id='.$request_ip;
+		elseif ($request_it == 4 && $request_ip)
+			$cond[] = 'an.post_id='.$request_ip;
 
 		// Récupère la table de tous les attachements pour les inclusions BBCode
 		$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
@@ -431,7 +387,7 @@ class listener implements EventSubscriberInterface
 			// Clean non selected values
 			foreach ($row AS $k=>$v)
 				if ($v == 'off' || $v == '?')
-					unset($row[$k]); 
+					unset($row[$k]);
 
 			// BBCodes et attachements
 			$row['display_text'] = generate_text_for_display(
@@ -444,7 +400,7 @@ class listener implements EventSubscriberInterface
 				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
 			// Extrait des résumé des parties à afficher
-			foreach (['accueil','actualite','resume','presentation'] AS $k) {
+			foreach (['accueil','actualite','presentation'] AS $k) {
 				$vs = explode ("<!--$k-->", $row['display_text']);
 				if (count ($vs) > 1)
 					$row[strtoupper($k)] = $vs[1];
@@ -457,7 +413,7 @@ class listener implements EventSubscriberInterface
 			if($row['gym_scolaire'] == 'on')
 				$row['gym_semaines'] = $this->semaines;
 
-			if($row['gym_semaines']) {
+			if($row['gym_semaines'] && !$row['gym_menu']) {
 				setlocale(LC_ALL, 'fr_FR');
 				$row['next_end_time'] = INF;
 				foreach (explode (',', $row['gym_semaines']) AS $s) {
@@ -503,12 +459,12 @@ class listener implements EventSubscriberInterface
 				$this->request->variable('template', '') == 'horaires' ?
 					$row['gym_jour'] // Horaires
 				:
-					$row['first_gym_ordre_menu']. // Menu
-					$row['next_beg_time']. // Actualité
+					$row['first_gym_ordre_menu'].'*'. // Menu
+					$row['next_beg_time'].'*'. // Actualité
 					$row['topic_id'] // Pour séparer les topics dans les menus
 			][
-				$row['gym_ordre_menu']. // Horaires
-				$row['horaire_debut'].
+				$row['gym_ordre_menu'].'*'. // Horaires
+				$row['horaire_debut'].'*'.
 				$row['post_id'] // Pour séparer les exeaco
 			] = array_change_key_case ($row, CASE_UPPER);
 		}
@@ -526,17 +482,15 @@ class listener implements EventSubscriberInterface
 				$first['COULEUR'] = $this->couleur ();
 				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
+				$first['COULEUR_TITRE'] = $this->couleur (80, 162, 0);
 				$first['COUNT'] = count ($v);
 				$this->template->assign_block_vars ('topic', $first);
 
 				// Tri du 2" niveau
 				ksort ($v, SORT_STRING);
 				foreach ($v AS $kv=>$vv) {
-					if ($topic){
-						$vv['COULEUR'] = $this->couleur ();
-						$vv['COULEUR_FOND'] = $this->couleur (35, 255, 0);
-						$vv['COULEUR_BORD'] = $this->couleur (40, 196, 0);
-					}
+					if ($this->request->variable('template', '') == 'submenu')
+						$vv['COULEUR'] = $this->couleur (); // Pour submenu
 					$this->template->assign_block_vars ('topic.post', $vv);
 				}
 			}

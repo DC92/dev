@@ -8,7 +8,6 @@ pre {
 	background-size: 48px !important;
 	background-image: url("./images/logo.png");
 }
-.section-viewtopic .post-buttons li:not(:first-child),
 #nav-main > li:nth-of-type(2), /* FAQ */
 .section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
 .section-posting #poll-panel-tab, /* Options */
@@ -43,20 +42,13 @@ body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	background-image: url("./images/fond.jpg");
-	background-size: cover;
-	background-position: center center;
+	background: white;
 	font-family: arial, sans-serif;
 }
 .copyright-dc {
 	text-align: center;
 	margin-top: 2em;
 	font-size: 0.7em;
-}
-@media (max-width: 600px) {
-	body.gym  {
-		background-image: none;
-	}
 }
 
 /* Header */
@@ -77,12 +69,17 @@ body {
 .gym .banniere h1 a:hover {
 	color: black;
 }
+.gym .logo {
+	position: absolute;
+	top: 0;
+}
 .gym .logo img {
-	width: calc(45px + 3vw);
+	height: 3.5em;
 	float: left;
 }
 .gym .edit-user {
 	float: left;
+	margin-left: calc(50px + 3vw);
 	padding-top: 1em;
 	color: white;
 }
@@ -147,7 +144,6 @@ body {
 	}
 }
 .gym h1 {
-	margin: 1em calc(10% - 54px);
 	margin-top: 1em;
 	padding: 0.2em;
 	border-radius: 0.2em;
@@ -255,46 +251,79 @@ body {
 }
 
 /* Menu accueil et sous-menu pages */
-.gym-index ul.menu,
-.gym-viewtopic .page ul.menu {
+.gym .menu {
 	display: flex;
-	padding: 0;
-	justify-content: space-around;
 	flex-wrap: wrap;
-	margin-top: 1em;
+	justify-content: space-around;
+	margin-bottom: 2em;
+	padding: 0;
 }
-.gym-viewtopic > ul.menu {
-	margin-top: 1em;
-}
-.gym .menu > li {
-	display: inline-block;
-	padding: 0.8em;
-	border-radius: 1.8em;
-	font-weight: bold;
-	margin-bottom: 1em;
-}
-.gym .menu li,
-.gym .menu a {
-	color: black;
-	list-style: none;
-}
-.gym .menu a:hover {
-	background : blue;
-	color: white;
+.gym .menu li div {
+	margin: 0;
+	border-radius: 0.5em;
+	padding: 0.3em;
 }
 .gym .menu ul {
-	display: none;
-	position: absolute;
+	border-radius: 0.5em;
 	padding: 0.3em;
-	border-radius: 1em;
-	font-weight: initial;
-	z-index: 5;
 }
-.gym .menu li:hover ul {
+.gym .menu li {
+	margin: 0;
+	padding: 0.1em;
+	list-style: none;
+}
+
+.gym .menu > li a {
+	color: black;
+}
+.gym .menu > li a:hover,
+.gym .menu > li div a {
+	color: white;
+}
+
+.gym .submenu a {
+	color: black !important;
+}
+.gym .submenu a:hover {
+	color: white !important;
+}
+
+.gym .replie ul {
+	z-index: 1;
+	position: absolute;
+	padding: 0;
+}
+.gym .replie li:hover ul {
+	padding: 0.3em;
+}
+.gym .replie li ul {
+	margin: 0.3em;
+}
+.gym .replie li:hover ul {
+	margin: 0;
+}
+.gym .replie li ul li {
+	display: none;
+	white-space: nowrap ;
+}
+.gym .replie i {
+	display: none;
+}
+.gym .replie li:hover ul li,
+.gym .menu-select {
 	display: block !important;
 }
-.gym .menu ul li {
-	margin: 0.2em;
+.gym li ul li.menu-select {
+	margin: -0.3em;
+	padding: 0.3em;
+	border-radius: 0.5em;
+	background: yellow;
+	color: black;
+	font-weight: bold;
+}
+.gym li:hover ul li.menu-select {
+	margin: 0;
+	padding: 0.1em;
 }
 
 /* Slideshow */
@@ -310,7 +339,7 @@ body {
 .slideshow ul {
 	width: 600%;
 	height: 300px;
-	padding: 0; 
+	padding: 0;
 	margin: 0;
 	list-style: none;
 }
@@ -420,8 +449,20 @@ body {
 	padding: 0.2em;
 	text-align: right;
 }
-#cal_mois_6,
-#cal_mois_7 {
+#cal_0_mois_7,
+#cal_1_mois_7,
+#cal_2_mois_7,
+#cal_3_mois_7,
+#cal_4_mois_7,
+#cal_5_mois_7,
+#cal_6_mois_7,
+#cal_0_mois_8,
+#cal_1_mois_8,
+#cal_2_mois_8,
+#cal_3_mois_8,
+#cal_4_mois_8,
+#cal_5_mois_8,
+#cal_6_mois_8 {
 	display: none;
 }
 

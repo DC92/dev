@@ -16,6 +16,10 @@
 	<!-- INCLUDEJS {T_JQUERY_LINK} -->
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 	{$STYLESHEETS}
+
+	<script>
+		var annee_debut = {ANNEE_DEBUT};
+	</script>
 </head>
 
 <body class="gym gym-{SCRIPT_NAME}">
@@ -61,3 +65,54 @@
 		</a>
 	</h1>
 </div>
+
+<ul class="menu <!-- IF REQUEST_T or REQUEST_P -->replie<!-- ENDIF -->">
+	<!-- BEGIN topic -->
+	<!-- IF topic.FIRST_GYM_MENU -->
+	<li>
+		<div style="background:{topic.COULEUR_TITRE}">
+			<a href="viewtopic.php?t={topic.TOPIC_ID}">{topic.TOPIC_TITLE}</a>
+
+			<!-- IF U_MCP -->
+				<a href="posting.php?mode=edit&f=2&p={topic.TOPIC_FIRST_POST_ID}"
+					title="Modifier le titre" class="button button-icon-only">
+					<i class="icon fa-pencil"></i>
+				</a>
+				<a href="posting.php?mode=reply&f=2&t={topic.TOPIC_ID}"
+					title="Ajouter une ligne"
+					class="button button-icon-only">
+					<i class="icon fa-commenting-o"></i>
+				</a>
+			<!-- ENDIF -->
+		</div>
+
+		<!-- IF topic.COUNT > 1 -->
+		<ul style="background:{topic.COULEUR}">
+			<!-- BEGIN post -->
+			<!-- IF post.GYM_MENU and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+				<!-- IF REQUEST_P == post.POST_ID -->
+					<li class="menu-select">
+						{post.POST_SUBJECT}
+					</li>
+				<!-- ELSE -->
+					<li>
+						<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
+							{post.POST_SUBJECT}
+						</a>
+
+						<!-- IF U_MCP -->
+							<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+								title="Modifier le menu" class="button button-icon-only">
+								<i class="icon fa-pencil"></i>
+							</a>
+						<!-- ENDIF -->
+					</li>
+				<!-- ENDIF -->
+			<!-- ENDIF -->
+			<!-- END post -->
+		</ul>
+		<!-- ENDIF -->
+	</li>
+	<!-- ENDIF -->
+	<!-- END topic -->
+</ul>

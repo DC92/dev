@@ -12,18 +12,20 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 
 // BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {
+	let jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
+	if (isNaN(jour)) jour = 0;
 	const semaines = $(elCal).attr('data-semaines').split(','),
-		nowhere = $('#cal_mois_7');
+		nowhere = $('#cal_' + jour + '_mois_8');
 
 	for (let week = 0; week < 52; week++) {
-		const td = $('<td id="cal_s' + week + '"><span/></td>');
+		const td = $('<td id="cal_' + jour + '_s' + week + '"><span/></td>');
 		td.appendTo(nowhere); // Attach it to be able to get it
-		if ($('body#phpbb').length) { // posting
+		if ($('body#phpbb').length) { // Is it a posting page ?
 			const input = $('<input type="checkbox" value="' + week + '" name="gym_semaines[]" />');
 			input.appendTo(td);
 			if (semaines.includes(week.toString()))
 				input.attr('checked', 'checked');
-		} else { // viewtopic
+		} else { // It is a viewtopic page
 			if (semaines.includes(week.toString()))
 				td.addClass('selected');
 		}
@@ -36,9 +38,9 @@ function displayInputCalendar(elCal) {
 	let jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
 	if (isNaN(jour)) jour = 0;
 	for (let week = 0; week < 52; week++) {
-		const wEl = $('#cal_s' + week),
+		const wEl = $('#cal_' + jour + '_s' + week),
 			date = new Date(annee_debut, 8 - 1, 3 + week * 7 + jour); // Jour suivant le lundi suivant le 1er aout annee_debut
-		wEl.appendTo('#cal_mois_' + date.getMonth());
+		wEl.appendTo('#cal_' + jour + '_mois_' + (1 + date.getMonth()));
 		wEl.children().html(date.getDate());
 	}
 
