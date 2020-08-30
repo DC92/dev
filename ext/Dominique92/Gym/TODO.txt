@@ -1,0 +1,62 @@
+//APRES refaire git Dominique92 / test en DC02
+//TODO Sitemap / SEO
+//BEST actualités non datées
+//BEST Bouton imprimer calendier / style print
+//BEST BUG null au dessus d'une carte sur IE
+//BEST ouverture lente sous-menus
+//BEST lien document => download au lieu d'afficher (plaquette & inscriptions => page attachment)
+//BEST n'inclure OL que quand il y a une carte
+//BEST Lien gmaps
+//BEST BUG Diaporama pas vu depuis un moment boucle rapidement
+//BEST BUG d'affichage avec &hilit=body (résultat recherche)
+	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
+	" dans le title !
+//BEST traduire TOPIC_ID => le n° du topic dans (INCLUDE
+//BEST réduire les it= & ip= (INCLUDE
+//BEST Redimensionner les images suivant taille fenetre
+	GYM bbcode photo/n° attachment
+//BEST Glissement latéral pages
+//BEST ?? url réduit viewtopic / ... (htaccess)
+
+/** CONFIG
+https://github.com/phpbbmodders/phpBB-3.1-ext-adduser
+https://www.phpbb.com/customise/db/extension/googleanalytics
+copier /slides /files config.php
+
+/** UPGRADE GYM
+créer BDD / + user / importer la sauvegarde BDD
+download phpBB -docs -install -ext -file -config.php
+download ext/Gym, ext/MyPhpBB, ext/phpbb/googleanalytics
+copier de version précédente
+	config.php
+	docs/...
+	files/...
+	slides/...
+exécuter /install
+
+
+/** PERSONNALISER / extension gym
+MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
+GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
+GENERAL / Paramètres des messages / Messages par page : 99
+MESSAGES / Paramètres des fichiers joints / taille téléchargements
+MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
+MESSAGES / BBCodes / cocher afficher
+	[accueil]{TEXT}[/accueil] / <!--accueil-->{TEXT}<!--accueil--> / Partie de texte à afficher sur le haut de la page d'accueil du site
+	[actualite]{TEXT}[/actualite] / <!--actualite-->{TEXT}<!--actualite--> / Partie de texte à afficher sur le bas de la page d'accueil du site
+	[carte]{TEXT}[/carte] / <br style="clear:both" /><div class="carte">{TEXT}</div> / Insére une carte [carte]longitude, latitude[/carte]
+	[centre]{TEXT}[/centre] / <div style="text-align:center">{TEXT}</div> / Image centrée
+	[doc={TEXT1}]{TEXT2}[/doc] / <a href="download/file.php?id={TEXT1}">{TEXT2}</a> / Lien vers un document
+	[droite]{TEXT}[/droite] / <div class="image-droite">{TEXT}</div> / Affiche une image à droite
+	[gauche]{TEXT}[/gauche] / <div class="image-gauche">{TEXT}</div> / Affiche une image à gauche
+	[page={TEXT1}]{TEXT2}[/page] / <a href="viewtopic.php?p={TEXT1}">{TEXT2}</a> / Lien vers une page
+	[presentation]{TEXT}[/presentation] / <!--presentation-->{TEXT}<!--presentation--> / Presentation pour affichage dans la rubrique
+	[rubrique={TEXT1}]{TEXT2}[/rubrique] / <a href="viewtopic.php?t={TEXT1}">{TEXT2}</a> / Lien vers une rubrique
+	[saut_ligne][/saut_ligne] / <br style="clear:both" />
+	[separation][/separation] / <hr/> / Ligne horizontale
+	[surligne]{TEXT}[/surligne] / <span style="background:yellow">{TEXT}</span> / Surligné en jaune
+	[titre1]{TEXT}[/titre1] / <h1>{TEXT}</h1> / Caractères blancs sur fond bleu
+	[titre2]{TEXT}[/titre2] / <h2>{TEXT}</h2> / Caractères noirs sur fond vert
+	[titre3]{TEXT}[/titre3] / <h3>{TEXT}</h3>
+	[titre4]{TEXT}[/titre4] / <h4>{TEXT}</h4>
+	[urlb={TEXT1}]{TEXT2}[/urlb] / <a target="_BLANK" href="{TEXT1}">{TEXT2}</a> / Lien à afficher sur un nouvel onglet
