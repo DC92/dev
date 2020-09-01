@@ -52,7 +52,7 @@ class listener implements EventSubscriberInterface
 		$template->set_style ([
 			$this->ext_path.'styles',
 			'styles', // core styles
-			'adm', // core styles
+			'adm', // core styles //TODO needed for template/adm/...
 		]);
 */
 	}

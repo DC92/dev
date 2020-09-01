@@ -95,7 +95,7 @@ class listener implements EventSubscriberInterface
 					],['', ' ', 'download/file.php?$1'],
 					$v
 				).'<br>';
-			
+
 			// Commentaires
 			$txt .= " <div class='comment'>";
 			$comment = trim (strip_tags (generate_text_for_display(

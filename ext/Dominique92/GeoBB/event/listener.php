@@ -19,6 +19,7 @@ class listener implements EventSubscriberInterface
 {
 	// List of externals
 	public function __construct(
+		//TODO purge
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
@@ -40,10 +41,13 @@ class listener implements EventSubscriberInterface
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
 		return [
-/*
 			// All
 			'core.page_footer' => 'page_footer',
 
+			// Adm
+			'core.adm_page_header' => 'adm_page_header',
+
+/*
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
@@ -76,5 +80,20 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer() {
+	}
+
+	/**
+		ADM
+	*/
+	function adm_page_header() {
+		// Create required SQL columns when needed
+		$result = $this->db->sql_query(
+			'SHOW columns FROM '.POSTS_TABLE.' LIKE "geom"'
+		);
+		if (!$this->db->sql_fetchrow($result))
+			$this->db->sql_query(
+				'ALTER TABLE '.POSTS_TABLE.' ADD geom geometrycollection'
+			);
+		$this->db->sql_freeresult($result);
 	}
 }

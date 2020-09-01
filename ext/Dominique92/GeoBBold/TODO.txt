@@ -104,7 +104,7 @@ todo avant upgrade chem
 		C koi chem3/files/attach ?
 	chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
 	Fiche type Point : carte IGN, commune, ...²
-	//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70 
+	//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70
 	Retester ALPAGES avec cette version
 Fermer le site
 Vider cache
