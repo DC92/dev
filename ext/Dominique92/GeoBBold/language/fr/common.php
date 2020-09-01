@@ -38,6 +38,23 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
+//TODO ARCHI reprendre tous les textes dans GeoBB
+	// Fil d'ariane
+	'ACP_SHORT' => 'Administration',
+	'MCP_SHORT' => 'Modération',
+
+	// News
+	'CREATION' => 'Création de',
+	'MODIFICATION' => 'Modification de',
+	'COMMENT' => 'Commentaire sur',
+
+	// Posting
+	'SUBJECT' => 'Nom',
+
+	// Help
+	'FAQ' => 'Aide',
+	'FAQ_EXPLAIN' => 'Documentation des fonctions du site',
+
 	// Footer
 	'FINAL_INTEGRATION_BY' =>
 		'&copy; Dominique Cavailhez 2016 : <a href="https://github.com/Dominique92/GeoBB">GeoBB</a> &amp; '.

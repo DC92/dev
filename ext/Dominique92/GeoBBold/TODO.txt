@@ -1,11 +1,3 @@
-//TODO ALPAGES BEST recherche par département / commune
-//TODO TEST ALPAGES post modif mail inscription
-//TODO ALPAGES ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
-//TODO BEST upgrade ALPAGES/CHEM : remplacer forumdesc par [hide]... (et bbcode !)
-//TODO AFTER WRI enlever /assets/wri
-//TODO CHEM BEST permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
-//TODO CHEM ne pas afficher les points en doublon (flux wri, prc, c2c)
-
 //TODO créer /LOG automatiquement + index.html
 //TODO voir pourquoi les champs de saisie du curseur de l'exemple ont une , au lieu d'un point
 
