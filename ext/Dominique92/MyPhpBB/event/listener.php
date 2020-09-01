@@ -75,6 +75,9 @@ class listener implements EventSubscriberInterface
 
 			// All
 			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
+
+			// Ucp&mode=register
+			'core.ucp_register_requests_after' => 'ucp_register_requests_after',
 		];
 	}
 
@@ -156,6 +159,17 @@ class listener implements EventSubscriberInterface
 				$v != 'off')
 				$r .= $k.': '.(is_array($v) ? implode(',',$v) : $v).PHP_EOL;
 		return $r;
+	}
+
+	// Inhibe l'enregistrement des pays non autorisés dans $config['country_codes']
+	function ucp_register_requests_after () {
+		global $config;
+		if (isset ($config['country_codes']) {
+			$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+			$iplocation = unserialize (file_get_contents ('http://www.geoplugin.net/php.gp?ip='.$server['REMOTE_ADDR']));
+			if (!strpos ($config['country_codes'], $iplocation['geoplugin_countryCode']))
+				header ('Location: ucp.php');
+		}
 	}
 
 /**
