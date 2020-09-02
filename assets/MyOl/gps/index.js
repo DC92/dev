@@ -46,7 +46,7 @@ const nbli = document.getElementsByTagName('li').length,
 		controlTilesBuffer(4),
 		controlLayersSwitcher({
 			baseLayers: Object.assign(
-				baselayers,
+				typeof baselayers != 'undefined' ? baselayers : [],
 				layersCollection(keys)),
 		}),
 

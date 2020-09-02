@@ -507,7 +507,7 @@ function hoverManager(map) {
 						if (feature.getProperties().draggable)
 							distance = 0;
 
-						if (typeof geometry.flatCoordinates != 'undefined' && 
+						if (typeof geometry.flatCoordinates != 'undefined' &&
 							geometry.flatCoordinates.length > 2) { // Line or polygon
 							distance = 1000; // Lower priority
 							featurePixel = evt.pixel; // Label follows the cursor
@@ -1409,25 +1409,19 @@ function controlTilesBuffer(depth, depthFS) {
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		setPreload({
-			target: map,
-		});
-
 		// Change preload when the window expand to fullscreen
-		map.on('change:size', setPreload);
+		map.on('precompose', function() {
+			map.getLayers().forEach(function(layer) {
+				const fs = document.webkitIsFullScreen || // Edge, Opera
+					document.msFullscreenElement ||
+					document.fullscreenElement; // Chrome, FF, Opera
+
+				if (typeof layer.setPreload == 'function')
+					layer.setPreload(fs ? depthFS || depth || 1 : depth || 1);
+			});
+		});
 	};
 
-	function setPreload(evt) {
-		const fs = document.webkitIsFullScreen || // Edge, Opera
-			document.msFullscreenElement ||
-			document.fullscreenElement; // Chrome, FF, Opera
-
-		//TODO BUG les couches ne sont pas encore dans la map !
-		evt.target.getLayers().forEach(function(layer) {
-			if (typeof layer.setPreload == 'function')
-				layer.setPreload(fs ? depthFS || depth || 1 : depth || 1);
-		});
-	}
 	return control;
 }
 

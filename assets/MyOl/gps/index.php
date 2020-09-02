@@ -31,11 +31,13 @@ Based on https://openlayers.org
 			unset ($url_dir[$k]);
 			unset ($gps_dir[$k]);
 		}
-	$url_dir[] = $gps_dir[] = ''; // Add a / at the end if necessary
 
 	if (count ($gps_dir)) { // If the URL is not in the GPS package directory
+		$url_dir[] = $gps_dir[] = ''; // Add a / at the end if necessary
+
 		$url_path = str_repeat ('../', count ($gps_dir) - 1) .implode ('/', $url_dir); // Path of the URL from the GPS dir
 		$gps_path = str_repeat ('../', count ($url_dir) - 1) .implode ('/', $gps_dir); // Path of the GPS dir from the URL
+
 		$myol_path = preg_replace ('/gps\/$/', '', $gps_path);
 	} else {
 		$url_path = $gps_path = '';
