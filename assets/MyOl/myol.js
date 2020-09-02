@@ -1583,7 +1583,7 @@ function controlGPS() {
 		);
 
 		map.on('moveend', renderReticule); // Refresh graticule after map zoom
-		geolocation.on(['change:position', 'change:accuracyGeometry', 'change:tracking'], renderReticule);
+		geolocation.on('change:position', renderReticule);
 		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		geolocation.on('error', function(error) {
 			alert('Geolocation error: ' + error.message);
