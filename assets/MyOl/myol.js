@@ -1421,6 +1421,7 @@ function controlTilesBuffer(depth, depthFS) {
 			document.msFullscreenElement ||
 			document.fullscreenElement; // Chrome, FF, Opera
 
+		//TODO BUG les couches ne sont pas encore dans la map !
 		evt.target.getLayers().forEach(function(layer) {
 			if (typeof layer.setPreload == 'function')
 				layer.setPreload(fs ? depthFS || depth || 1 : depth || 1);
@@ -1586,8 +1587,16 @@ function controlGPS() {
 
 		gps = new ol.Geolocation({
 			projection: map.getView().getProjection(),
+			trackingOptions: {
+				enableHighAccuracy: true,
+			},
 		});
 
+		geolocation.on('error', function(error) {
+			alert('Geolocation error: ' + error.message);
+		});
+
+		//TODO utiliser les autres events et mémoriser les valeurs !
 		gps.on('change', renderReticule);
 		map.on('moveend', renderReticule); // Refresh graticule after map zoom
 	};
@@ -2535,7 +2544,7 @@ function layersDemo(keys) {
 		'OSM trains': layerThunderforest(keys.thunderforest, 'pioneer'),
 		'OSM villes': layerThunderforest(keys.thunderforest, 'neighbourhood'),
 		'OSM contraste': layerThunderforest(keys.thunderforest, 'mobile-atlas'),
-	
+
 		'IGN TOP 25': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		//403 'IGN Spot': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
 		//Double 	'SCAN25TOUR': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
@@ -2555,7 +2564,7 @@ function layersDemo(keys) {
 		//403 'Avalanches': layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 		'Etat major': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 		'ETATMAJOR10': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
-	
+
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')), //TODO ?????? layerGoogle
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
