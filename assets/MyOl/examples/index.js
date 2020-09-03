@@ -47,6 +47,7 @@ const massifs = layerVectorURL({
 		geoJsonId: 'geojson',
 		focus: false,
 		snapLayers: [massifs],
+		titlePoint: 'Modification d‘un point',
 		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
 			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
@@ -67,12 +68,6 @@ const massifs = layerVectorURL({
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
 			'double cliquer pour terminer.\n' +
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
-		styleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 4,
-			}),
-		},
 	}),
 
 	vectorLayers = [

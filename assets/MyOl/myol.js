@@ -856,8 +856,8 @@ function layerRefugesInfo(options) {
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
-					src: options.baseUrl + 'images/icones/' + properties.icone + '.png'
-				})
+					src: options.baseUrl + 'images/icones/' + properties.icone + '.png',
+				}),
 			};
 		},
 	}, options);
@@ -1109,11 +1109,12 @@ function controlButton(options) {
 	const control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
-	control.element.appendChild(buttonEl);
 	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
 	control.element.title = options.title; // {string} displayed when the control is hovered.
 	if (options.label)
 		buttonEl.innerHTML = options.label;
+	if (options.label !== null)
+		control.element.appendChild(buttonEl);
 
 	buttonEl.addEventListener('click', function(evt) {
 		evt.preventDefault();
@@ -2127,6 +2128,17 @@ function layerMarker(options) {
  * Requires JSONparse, myol:onadd, escapedStyle, controlButton
  */
 function layerEdit(options) {
+	// Viewfinder canvas image
+	const canvasViewfinder = document.createElement('canvas'),
+		context = canvasViewfinder.getContext('2d');
+	canvasViewfinder.width = canvasViewfinder.height = 30;
+	context.fillStyle = 'rgba(0,0,0,0)';
+	context.fillRect(0, 0, 30, 30);
+	context.fillStyle = 'yellow';
+	context.fillRect(16, 0, 1, 30);
+	context.fillRect(0, 16, 30, 1);
+	//TODO survol curseur change
+
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
@@ -2146,6 +2158,25 @@ function layerEdit(options) {
 			});
 		},
 		styleOptions: {
+			// Draw symbol
+			image: options.titlePoint ?
+				new ol.style.Circle({
+					radius: 14,
+					fill: new ol.style.Fill({
+						color: context.createPattern(canvasViewfinder, 'no-repeat')
+					}),
+					stroke: new ol.style.Stroke({
+						color: 'yellow',
+						width: 2,
+					}),
+				}) :
+				new ol.style.Circle({
+					radius: 4,
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 2,
+					}),
+				}),
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
@@ -2155,14 +2186,6 @@ function layerEdit(options) {
 			}),
 		},
 		editStyleOptions: { // Hover / modify / create
-			// Draw symbol
-			image: new ol.style.Circle({
-				radius: 4,
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 2,
-				}),
-			}),
 			// Lines or border colors
 			stroke: new ol.style.Stroke({
 				color: 'red',
@@ -2198,7 +2221,7 @@ function layerEdit(options) {
 		}),
 		controlModify = controlButton({
 			group: 'edit',
-			label: 'M',
+			label: options.titleModify ? 'M' : null,
 			buttonBackgroundColors: ['white', '#ef3'],
 			title: options.titleModify,
 			activate: function(active) {
@@ -2229,8 +2252,10 @@ function layerEdit(options) {
 		});
 
 		// Add required controls
-		map.addControl(controlModify);
-		controlModify.toggle(true);
+		if (options.titleModify || options.titlePoint) {
+			map.addControl(controlModify);
+			controlModify.toggle(true);
+		}
 		if (options.titleLine)
 			map.addControl(controlDraw({
 				type: 'LineString',
@@ -2386,6 +2411,11 @@ function layerEdit(options) {
 
 		// Recreate features
 		source.clear();
+		for (let p in coords.points)
+			source.addFeature(new ol.Feature({
+				name: 'point',
+				geometry: new ol.geom.Point(coords.points[p]),
+			}));
 		for (let l in coords.lines)
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.LineString(coords.lines[l]),
@@ -2408,17 +2438,27 @@ function layerEdit(options) {
  * Split lines having a summit at removePosition
  */
 function optimiseFeatures(features, withLines, withPolygons, merge, holes, removePosition) {
-	let lines = [],
+	let points = [],
+		lines = [],
 		polys = [];
 
 	// Get all edited features as array of coordinates
-	for (let f in features)
-		if (typeof features[f].getGeometry().getGeometries == 'function') { // GeometryCollection
-			const geometries = features[f].getGeometry().getGeometries();
+	for (let f in features) {
+		const geom = features[f].getGeometry();
+		if (typeof geom.getGeometries == 'function') {
+			// Expand geometryCollection
+			const geometries = geom.getGeometries();
 			for (let g in geometries)
 				flatCoord(lines, geometries[g].getCoordinates(), removePosition);
-		} else if (!features[f].getGeometry().getType().match(/point$/i)) // Not a point
-		flatCoord(lines, features[f].getGeometry().getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
+		}
+		// Point
+		else if (geom.getType().match(/point$/i))
+			points.push(geom.getCoordinates());
+
+		// lines & poly
+		else
+			flatCoord(lines, geom.getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
+	}
 
 	for (let a in lines)
 		// Exclude 1 coordinate features (points)
@@ -2490,6 +2530,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 		}
 
 	return {
+		points: points,
 		lines: lines.filter(Boolean), // Remove deleted array members
 		polys: polys.filter(Boolean),
 	};
