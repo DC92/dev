@@ -2158,8 +2158,8 @@ function layerEdit(options) {
 			});
 		},
 		styleOptions: {
-			// Draw symbol
 			image: options.titlePoint ?
+				// Dragable point
 				new ol.style.Circle({
 					radius: 14,
 					fill: new ol.style.Fill({
@@ -2170,6 +2170,7 @@ function layerEdit(options) {
 						width: 2,
 					}),
 				}) :
+				// Drag lines or Polygons
 				new ol.style.Circle({
 					radius: 4,
 					stroke: new ol.style.Stroke({
@@ -2191,6 +2192,7 @@ function layerEdit(options) {
 				color: 'red',
 				width: 2,
 			}),
+			// Polygons
 			fill: new ol.style.Fill({
 				color: 'rgba(255,0,0,0.3)',
 			}),
@@ -2506,13 +2508,13 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 						}
 
 				// Convert closed lines into polygons
-				polys.push([lines[a]]); // Add the poly
+				polys.push([lines[a]]); // Add the polygon
 				delete lines[a]; // Forget the line
 			}
 		}
 
 	// Makes holes if a polygon is included in a biggest one
-	for (let p1 in polys) // Explore all polys combinaison
+	for (let p1 in polys) // Explore all Polygons combinaison
 		if (holes && // Make holes option
 			polys[p1]) {
 			const fs = new ol.geom.Polygon(polys[p1]);
