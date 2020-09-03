@@ -164,10 +164,10 @@ class listener implements EventSubscriberInterface
 	// Inhibe l'enregistrement des pays non autorisés dans $config['country_codes']
 	function ucp_register_requests_after () {
 		global $config;
-		if (isset ($config['country_codes']) {
+		if (defined('COUNTRY_CODES')) {
 			$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 			$iplocation = unserialize (file_get_contents ('http://www.geoplugin.net/php.gp?ip='.$server['REMOTE_ADDR']));
-			if (!strpos ($config['country_codes'], $iplocation['geoplugin_countryCode']))
+			if (!strpos (COUNTRY_CODES, $iplocation['geoplugin_countryCode']))
 				header ('Location: ucp.php');
 		}
 	}
@@ -175,13 +175,17 @@ class listener implements EventSubscriberInterface
 /**
  * DEBUG
  * Dump global & templates variables
- * Uncomment these lines
  */
 	function twig_environment_render_template_before($vars) {
-//		var_dump ('COOKIES', $this->request->get_super_global(\phpbb\request\request_interface::COOKIE));
+		if(defined('DUMP_GLOBALS')) {
+			$this->request->enable_super_globals();
+			var_dump ([DUMP_GLOBALS => $GLOBALS[DUMP_GLOBALS]]);
+			$this->request->disable_super_globals();
+		}
 
-//		if($vars['name'] != 'attachment.html')
-//			var_dump('TEMPLATE '.$vars['name'], $vars['context']);
+		if(defined('DUMP_TEMPLATE') &&
+			$vars['name'] != 'attachment.html')
+			var_dump('TEMPLATE '.$vars['name'], $vars['context']);
 	}
 
 /**

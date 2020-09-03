@@ -44,6 +44,9 @@ class listener implements EventSubscriberInterface
 			// All
 			'core.page_footer' => 'page_footer',
 
+			// Posting
+			'core.posting_modify_row_data' => 'posting_modify_row_data',
+
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
 
@@ -80,6 +83,15 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer() {
+	}
+
+	/**
+		POSTING
+	*/
+	function posting_modify_row_data($vars) {
+		preg_match ('/([^\/]+)\.[a-z]+$/' , $vars['post_data']['forum_image'], $image);
+		if (isset ($image[1]))
+			$this->template->assign_var ('IMAGE_FORUM', $image[1]);
 	}
 
 	/**
