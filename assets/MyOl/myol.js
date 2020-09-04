@@ -446,6 +446,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
+//TODO survol étiquette ne reste pas affichée
 function hoverManager(map) {
 	if (map.hasHoverManager_) // Only one per map
 		return;
@@ -474,9 +475,9 @@ function hoverManager(map) {
 		if (hoveredFeature) {
 			const link = hoveredFeature.getProperties().link;
 			if (link) {
-				if (evt.pointerEvent.ctrlKey) {
+				if (evt.originalEvent.ctrlKey) {
 					const win = window.open(link, '_blank');
-					if (evt.pointerEvent.shiftKey)
+					if (evt.originalEvent.shiftKey)
 						win.focus();
 				} else
 					window.location = link;
@@ -2124,21 +2125,112 @@ function layerMarker(options) {
 }
 
 /**
- * Line & Polygons Editor
- * Requires JSONparse, myol:onadd, escapedStyle, controlButton
+ * Display & edit one point coordinates
  */
-function layerEdit(options) {
-	// Viewfinder canvas image
-	const canvasViewfinder = document.createElement('canvas'),
-		context = canvasViewfinder.getContext('2d');
-	canvasViewfinder.width = canvasViewfinder.height = 30;
+function displayPoint(displayPointEl, ll, displayFormat) {
+	if (typeof displayFormat == 'undefined')
+		displayFormat = displayPoint.displayFormat;
+	else
+		displayPoint.displayFormat = displayFormat;
+	const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
+		formats = {
+			decimal: ['Degrés décimaux', 'EPSG:4326', 'format',
+				'Longitude: {x}, Latitude: {y} (WGS84)',
+				5
+			],
+			degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
+		};
+
+	if (typeof proj4 == 'function') {
+		ol.proj.proj4.register(proj4);
+
+		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+		if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
+			// Définition de la projection
+			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+			formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
+
+			// Champs de saisie en coordonnées suisses
+			//				ol.proj.proj4.register(proj4);
+			const ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
+			/*				for (let i in elXY)
+								if (elXY[i]) {
+									elXY[i].value = Math.round(ll21781[i]);
+									elXY[i].onchange = fieldEdit; // Set the change function
+									elXY[i].parentNode.style.display = '';
+								}*/
+		}
+
+		// Fuseau UTM
+		const u = Math.floor(ll4326[0] / 6 + 90) % 60 + 1;
+		formats.utm = ['UTM', 'EPSG:326' + u, 'format', 'UTM ' + u + ' lon: {x}, lat: {y}'];
+		proj4.defs('EPSG:326' + u, '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
+		ol.proj.proj4.register(proj4);
+	}
+
+	// Reset if out of scope
+	if (!formats[displayFormat])
+		displayFormat = 'decimal';
+
+	let f = formats[displayFormat],
+		html = ol.coordinate[f[2]](
+			ol.proj.transform(ll, 'EPSG:3857', f[1]),
+			f[3], f[4], f[5]
+		) + ' <select>';
+
+	for (let f in formats)
+		html += '<option value="' + f + '"' +
+		(f == displayFormat ? ' selected="selected"' : '') + '>' +
+		formats[f][0] + '</option>';
+
+	if (displayPointEl) {
+		displayPointEl.innerHTML = html.replace(
+			/( [-0-9]+)([0-9][0-9][0-9],? )/g,
+			function(whole, part1, part2) {
+				return part1 + ' ' + part2;
+			}
+		) + '</select>';
+		if (displayPointEl.firstChild.nextElementSibling) {
+			displayPointEl.firstChild.nextElementSibling.onchange = function(evt) {
+				displayFormat = evt.target.value;
+				displayPoint(displayPointEl, ll, displayFormat);
+			};
+		}
+	}
+}
+
+/**
+ * Viewfinder canvas image
+ */
+//TODO survol curseur change
+function viewfinder() {
+	const canvas = document.createElement('canvas'),
+		context = canvas.getContext('2d');
+
+	canvas.width = canvas.height = 30;
 	context.fillStyle = 'rgba(0,0,0,0)';
 	context.fillRect(0, 0, 30, 30);
 	context.fillStyle = 'yellow';
 	context.fillRect(16, 0, 1, 30);
 	context.fillRect(0, 16, 30, 1);
-	//TODO survol curseur change
 
+	return new ol.style.Circle({
+		radius: 14,
+		fill: new ol.style.Fill({
+			color: context.createPattern(canvas, 'no-repeat'),
+		}),
+		stroke: new ol.style.Stroke({
+			color: 'yellow',
+			width: 2,
+		}),
+	})
+}
+
+/**
+ * Points, Lines & Polygons Editor
+ * Requires JSONparse, myol:onadd, escapedStyle, controlButton, viewfinder
+ */
+function layerEdit(options) {
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
@@ -2160,16 +2252,7 @@ function layerEdit(options) {
 		styleOptions: {
 			image: options.titlePoint ?
 				// Dragable point
-				new ol.style.Circle({
-					radius: 14,
-					fill: new ol.style.Fill({
-						color: context.createPattern(canvasViewfinder, 'no-repeat')
-					}),
-					stroke: new ol.style.Stroke({
-						color: 'yellow',
-						width: 2,
-					}),
-				}) :
+				viewfinder() :
 				// Drag lines or Polygons
 				new ol.style.Circle({
 					radius: 4,
@@ -2199,7 +2282,8 @@ function layerEdit(options) {
 		},
 	}, options);
 
-	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+	const displayPointEl = document.getElementById(options.displayPointId),
+		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		extent = ol.extent.createEmpty(), // For focus on all features calculation
 		features = options.readFeatures(),
@@ -2410,6 +2494,10 @@ function layerEdit(options) {
 			true,
 			pointerPosition
 		);
+
+		// Display & edit 1st point coordinates
+		if (coords.points.length && displayPointEl)
+			displayPoint(displayPointEl, coords.points[0], options.displayFormat);
 
 		// Recreate features
 		source.clear();

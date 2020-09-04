@@ -45,6 +45,7 @@ const massifs = layerVectorURL({
 	 */
 	editor = layerEdit({
 		geoJsonId: 'geojson',
+		displayPointId: 'displaypoint',
 		focus: false,
 		snapLayers: [massifs],
 		titlePoint: 'Modification d‘un point',
