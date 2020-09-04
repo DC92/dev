@@ -2141,24 +2141,16 @@ function displayPoint(displayPointEl, ll, displayFormat) {
 			degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
 		};
 
+	let ll21781 = null;
 	if (typeof proj4 == 'function') {
 		ol.proj.proj4.register(proj4);
 
 		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
 		if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
-			// Définition de la projection
 			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-			formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
+			ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
 
-			// Champs de saisie en coordonnées suisses
-			//				ol.proj.proj4.register(proj4);
-			const ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
-			/*				for (let i in elXY)
-								if (elXY[i]) {
-									elXY[i].value = Math.round(ll21781[i]);
-									elXY[i].onchange = fieldEdit; // Set the change function
-									elXY[i].parentNode.style.display = '';
-								}*/
+			formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
 		}
 
 		// Fuseau UTM
@@ -2168,28 +2160,55 @@ function displayPoint(displayPointEl, ll, displayFormat) {
 		ol.proj.proj4.register(proj4);
 	}
 
-	// Reset if out of scope
-	if (!formats[displayFormat])
-		displayFormat = 'decimal';
+	const inputEls = displayPointEl.getElementsByTagName('input');
+	if (inputEls.length) {
+		// Set the input html
+		displayPointEl.className = ll21781 ? 'input-21781' : '';
 
-	let f = formats[displayFormat],
-		html = ol.coordinate[f[2]](
-			ol.proj.transform(ll, 'EPSG:3857', f[1]),
-			f[3], f[4], f[5]
-		) + ' <select>';
+		for (let i = 0; i < inputEls.length; i++) {
+			inputEls[i].onchange = displayPoint;
 
-	for (let f in formats)
-		html += '<option value="' + f + '"' +
-		(f == displayFormat ? ' selected="selected"' : '') + '>' +
-		formats[f][0] + '</option>';
-
-	if (displayPointEl) {
-		displayPointEl.innerHTML = html.replace(
-			/( [-0-9]+)([0-9][0-9][0-9],? )/g,
-			function(whole, part1, part2) {
-				return part1 + ' ' + part2;
+			switch (inputEls[i].name) {
+				case 'lon':
+					inputEls[i].value = Math.round(ll4326[0] * 100000) / 100000;
+					break;
+				case 'lat':
+					inputEls[i].value = Math.round(ll4326[1] * 100000) / 100000;
+					break;
+				case 'x':
+					if (ll21781)
+						inputEls[i].value = Math.round(ll21781[0]);
+					break;
+				case 'y':
+					if (ll21781)
+						inputEls[i].value = Math.round(ll21781[1]);
+					break;
 			}
-		) + '</select>';
+		}
+	} else {
+		// Set the display html
+		if (!formats[displayFormat])
+			displayFormat = 'decimal';
+
+		let f = formats[displayFormat],
+			html = ol.coordinate[f[2]](
+				ol.proj.transform(ll, 'EPSG:3857', f[1]),
+				f[3], f[4], f[5]
+			) + ' <select>';
+
+		for (let f in formats)
+			html += '<option value="' + f + '"' +
+			(f == displayFormat ? ' selected="selected"' : '') + '>' +
+			formats[f][0] + '</option>';
+
+		if (displayPointEl) {
+			displayPointEl.innerHTML = html.replace(
+				/( [-0-9]+)([0-9][0-9][0-9],? )/g,
+				function(whole, part1, part2) {
+					return part1 + ' ' + part2;
+				}
+			) + '</select>';
+		}
 		if (displayPointEl.firstChild.nextElementSibling) {
 			displayPointEl.firstChild.nextElementSibling.onchange = function(evt) {
 				displayFormat = evt.target.value;
