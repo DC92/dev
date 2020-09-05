@@ -47,7 +47,18 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<!-- Display LL -->
-	<p id="displaypoint"></p>
+	<p id="displaypoint">
+            <label>
+                Longitude :
+                <input type="text" name="lon" size="12" maxlength="12">(WGS84)&nbsp;
+				 <span style=""> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
+            </label>
+            <label>
+                Latitude :
+                <input type="text" name="lat" size="12" maxlength="12">(WGS84)&nbsp;
+				<span style=""> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
+            </label>
+	</p>
 
 	<!-- Fixed marker -->
 	<p><b>Cadre: </b><span id="marqueur"></span></p>

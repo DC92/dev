@@ -43,7 +43,7 @@ const massifs = layerVectorURL({
 	/**
 	 * Editor
 	 */
-	editor = layerEdit({
+	editor = layerGeoJson({
 		geoJsonId: 'geojson',
 		displayPointId: 'displaypoint',
 		focus: false,

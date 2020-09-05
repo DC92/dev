@@ -1691,7 +1691,7 @@ function controlLoadGPX(options) {
 				featureProjection: 'EPSG:3857',
 			}),
 			added = map.dispatchEvent({
-				type: 'myol:onfeatureload', // Warn layerEdit that we uploaded some features
+				type: 'myol:onfeatureload', // Warn layerGeoJson that we uploaded some features
 				features: features,
 			});
 
@@ -2125,100 +2125,6 @@ function layerMarker(options) {
 }
 
 /**
- * Display & edit one point coordinates
- */
-function displayPoint(displayPointEl, ll, displayFormat) {
-	if (typeof displayFormat == 'undefined')
-		displayFormat = displayPoint.displayFormat;
-	else
-		displayPoint.displayFormat = displayFormat;
-	const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
-		formats = {
-			decimal: ['Degrés décimaux', 'EPSG:4326', 'format',
-				'Longitude: {x}, Latitude: {y} (WGS84)',
-				5
-			],
-			degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
-		};
-
-	let ll21781 = null;
-	if (typeof proj4 == 'function') {
-		ol.proj.proj4.register(proj4);
-
-		// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-		if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
-			proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-			ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
-
-			formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
-		}
-
-		// Fuseau UTM
-		const u = Math.floor(ll4326[0] / 6 + 90) % 60 + 1;
-		formats.utm = ['UTM', 'EPSG:326' + u, 'format', 'UTM ' + u + ' lon: {x}, lat: {y}'];
-		proj4.defs('EPSG:326' + u, '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
-		ol.proj.proj4.register(proj4);
-	}
-
-	const inputEls = displayPointEl.getElementsByTagName('input');
-	if (inputEls.length) {
-		// Set the input html
-		displayPointEl.className = ll21781 ? 'input-21781' : '';
-
-		for (let i = 0; i < inputEls.length; i++) {
-			inputEls[i].onchange = displayPoint;
-
-			switch (inputEls[i].name) {
-				case 'lon':
-					inputEls[i].value = Math.round(ll4326[0] * 100000) / 100000;
-					break;
-				case 'lat':
-					inputEls[i].value = Math.round(ll4326[1] * 100000) / 100000;
-					break;
-				case 'x':
-					if (ll21781)
-						inputEls[i].value = Math.round(ll21781[0]);
-					break;
-				case 'y':
-					if (ll21781)
-						inputEls[i].value = Math.round(ll21781[1]);
-					break;
-			}
-		}
-	} else {
-		// Set the display html
-		if (!formats[displayFormat])
-			displayFormat = 'decimal';
-
-		let f = formats[displayFormat],
-			html = ol.coordinate[f[2]](
-				ol.proj.transform(ll, 'EPSG:3857', f[1]),
-				f[3], f[4], f[5]
-			) + ' <select>';
-
-		for (let f in formats)
-			html += '<option value="' + f + '"' +
-			(f == displayFormat ? ' selected="selected"' : '') + '>' +
-			formats[f][0] + '</option>';
-
-		if (displayPointEl) {
-			displayPointEl.innerHTML = html.replace(
-				/( [-0-9]+)([0-9][0-9][0-9],? )/g,
-				function(whole, part1, part2) {
-					return part1 + ' ' + part2;
-				}
-			) + '</select>';
-		}
-		if (displayPointEl.firstChild.nextElementSibling) {
-			displayPointEl.firstChild.nextElementSibling.onchange = function(evt) {
-				displayFormat = evt.target.value;
-				displayPoint(displayPointEl, ll, displayFormat);
-			};
-		}
-	}
-}
-
-/**
  * Viewfinder canvas image
  */
 //TODO survol curseur change
@@ -2242,14 +2148,16 @@ function viewfinder() {
 			color: 'yellow',
 			width: 2,
 		}),
-	})
+	});
 }
 
 /**
- * Points, Lines & Polygons Editor
+ * geoJson points, lines & polygons display & edit
+ * Marker position display & edit
+ * Lines & polygons edit
  * Requires JSONparse, myol:onadd, escapedStyle, controlButton, viewfinder
  */
-function layerEdit(options) {
+function layerGeoJson(options) {
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
@@ -2301,8 +2209,7 @@ function layerEdit(options) {
 		},
 	}, options);
 
-	const displayPointEl = document.getElementById(options.displayPointId),
-		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		extent = ol.extent.createEmpty(), // For focus on all features calculation
 		features = options.readFeatures(),
@@ -2332,7 +2239,16 @@ function layerEdit(options) {
 			activate: function(active) {
 				activate(active, modify);
 			},
-		});
+		}),
+
+		// Pointer edit <input>
+		displayPointEl = document.getElementById(options.displayPointId),
+		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {};
+
+	for (let i = 0; i < inputEls.length; i++)
+		inputEls[i].onchange = editPoint;
+
+	let EditedPointsGeometry; // Store points geometry for edition
 
 	// Snap on vector layers
 	options.snapLayers.forEach(function(layer) {
@@ -2504,6 +2420,99 @@ function layerEdit(options) {
 		}
 	}
 
+	function editPoint(evt) {
+		const ll = evt.target.name.length == 3 ?
+			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
+			ol.proj.transform([parseInt(inputEls.x.value), parseInt(inputEls.y.value)], 'EPSG:21781', 'EPSG:3857'); // Modify x | y
+
+		displayPoint(ll);
+
+		if (EditedPointsGeometry.length > 0)
+			EditedPointsGeometry[0].setCoordinates(ll);
+	}
+
+	function displayPoint(ll) {
+		if (displayPointEl) {
+			const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
+				formats = {
+					decimal: ['Degrés décimaux', 'EPSG:4326', 'format',
+						'Longitude: {x}, Latitude: {y} (WGS84)',
+						5
+					],
+					degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
+				};
+
+			let ll21781 = null;
+			if (typeof proj4 == 'function') {
+				ol.proj.proj4.register(proj4);
+
+				// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
+				if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
+					proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+					ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
+
+					formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
+				}
+
+				// Fuseau UTM
+				const u = Math.floor(ll4326[0] / 6 + 90) % 60 + 1;
+				formats.utm = ['UTM', 'EPSG:326' + u, 'format', 'UTM ' + u + ' lon: {x}, lat: {y}'];
+				proj4.defs('EPSG:326' + u, '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
+				ol.proj.proj4.register(proj4);
+			}
+			// Display or not the EPSG:21781 coordinates
+			displayPointEl.className = ll21781 ? 'input-21781' : '';
+
+			if (inputEls.length)
+				// Set the html input
+				for (let i = 0; i < inputEls.length; i++)
+					switch (inputEls[i].name) {
+						case 'lon':
+							inputEls[i].value = Math.round(ll4326[0] * 100000) / 100000;
+							break;
+						case 'lat':
+							inputEls[i].value = Math.round(ll4326[1] * 100000) / 100000;
+							break;
+						case 'x':
+							inputEls[i].value = ll21781 ? Math.round(ll21781[0]) : '-';
+							break;
+						case 'y':
+							inputEls[i].value = ll21781 ? Math.round(ll21781[1]) : '-';
+							break;
+					}
+			else {
+				// Set the html display
+				if (!formats[options.displayFormat])
+					options.displayFormat = 'decimal';
+
+				let f = formats[options.displayFormat],
+					html = ol.coordinate[f[2]](
+						ol.proj.transform(ll, 'EPSG:3857', f[1]),
+						f[3], f[4], f[5]
+					) + ' <select>';
+
+				for (let f in formats)
+					html += '<option value="' + f + '"' +
+					(f == options.displayFormat ? ' selected="selected"' : '') + '>' +
+					formats[f][0] + '</option>';
+
+				displayPointEl.innerHTML = html.replace(
+					/( [-0-9]+)([0-9][0-9][0-9],? )/g,
+					function(whole, part1, part2) {
+						return part1 + ' ' + part2;
+					}
+				) + '</select>';
+			}
+			// Select action
+			if (displayPointEl.firstChild.nextElementSibling) {
+				displayPointEl.firstChild.nextElementSibling.onchange = function(evt) {
+					options.displayFormat = evt.target.value;
+					displayPoint(ll);
+				};
+			}
+		}
+	}
+
 	function optimiseEdited(pointerPosition) {
 		const coords = optimiseFeatures(
 			source.getFeatures(),
@@ -2516,15 +2525,19 @@ function layerEdit(options) {
 
 		// Display & edit 1st point coordinates
 		if (coords.points.length && displayPointEl)
-			displayPoint(displayPointEl, coords.points[0], options.displayFormat);
+			displayPoint(coords.points[0]);
 
 		// Recreate features
 		source.clear();
-		for (let p in coords.points)
+		EditedPointsGeometry = [];
+		for (let p in coords.points) {
+			const geometry = new ol.geom.Point(coords.points[p]);
 			source.addFeature(new ol.Feature({
 				name: 'point',
-				geometry: new ol.geom.Point(coords.points[p]),
+				geometry: geometry,
 			}));
+			EditedPointsGeometry.push(geometry);
+		}
 		for (let l in coords.lines)
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.LineString(coords.lines[l]),
