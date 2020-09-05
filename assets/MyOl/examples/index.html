@@ -43,60 +43,21 @@ Based on https://openlayers.org
 		.out-epsg-21781 span {
 			display: none;
 		}
+		ul {
+			margin-top: 0;
+		}
 	</style>
 </head>
 
 <body>
 	<div id="map"></div>
 
-	<!-- Fixed marker -->
-	<p><b>Cadre :</b> <span id="fix-marker"></span></p>
+	<p><a href="markers.html">DEMO MARKERS</a></p>
+	<p><a href="editor.html">DEMO EDITOR</a></p>
 
-	<!-- Draggable marker -->
-	<b>Viseur :</b>
-	<input type="text" id="reticule" style="width:50%" value='{
-		"type": "Point",
-		"coordinates": [7,47]
-	}' />
-	<div id="drag-marker">
-		<p>
-			Longitude :
-			<input type="text" name="lon" size="12" maxlength="12">(WGS84)&nbsp;
-			 <span style=""> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
-		</p>
-		<p>
-			Latitude :
-			<input type="text" name="lat" size="12" maxlength="12">(WGS84)&nbsp;
-			<span style=""> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
-		</p>
-	</div>
-
-	<!-- Features editor -->
-	<input type="text" id="geojson" style="width:90%" value='{
-		"type": "FeatureCollection",
-		"features": [{
-			"type": "Feature",
-			"geometry": {
-				"type": "LineString",
-				"coordinates": [[-4.5,47.2],[-2,44.5]]
-			}
-		}, {
-			"type": "Feature",
-			"geometry": {
-				"type": "Polygon",
-				"coordinates": [
-					[[-5.5,47.2],[-3,44.5],[-8,44.5],[-5.5,47.2]],
-					[[-5.5,44.7],[-6.5,45.8],[-4.5,45.8],[-5.5,44.7]]
-				]
-			}
-		}]
-	}' />
-
+	<br/>OVERPASS<input type="checkbox" name="osm-features" />
+	<span id="osm-features-status"></span>
 	<ul class="selectors">
-		<li>
-			OVERPASS<input type="checkbox" name="osm-features" />
-			<span id="osm-features-status"></span>
-		</li>
 		<li><input type="checkbox" name="osm-features" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
 		<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
 		<li><input type="checkbox" name="osm-features" id="Lodge" value='["building"="cabin"]' />Cabane non gardée</li>
@@ -113,11 +74,10 @@ Based on https://openlayers.org
 		<li><input type="checkbox" name="osm-features" id="Oil Field" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
 		<li><input type="checkbox" name="osm-features" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
 	</ul>
+
+	<br/>WRI<input type="checkbox" name="wri-features" />
+	<span id="wri-features-status"></span>
 	<ul class="selectors">
-		<li>
-			WRI<input type="checkbox" name="wri-features" />
-			<span id="wri-features-status"></span>
-		</li>
 		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
 		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
 		<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
@@ -126,6 +86,7 @@ Based on https://openlayers.org
 		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
 		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
 	</ul>
+
 	<ul class="selectors">
 		<li>pyrenees-refuges.com<input type="checkbox" name="prc-features" /><span id="prc-features-status"></span></li>
 	</ul>

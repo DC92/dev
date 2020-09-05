@@ -99,7 +99,7 @@ Consulter l'historique des éditions
 UPGRADE CHEMINEUR
 =================
 todo avant upgrade chem
-	CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]	
+	CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]
 	TODO récupérer les fichiers chem2
 		C koi chem3/files/attach ?
 	chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)

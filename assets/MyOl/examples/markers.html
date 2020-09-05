@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/png" href="logo.png" />
+
+	<!-- Openlayers -->
+	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- Recherche par nom -->
+	<link  href="../geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
+	<script src="../geocoder/ol-geocoder-debug.js"></script>
+
+	<!-- Proj4 projections Swiss & UK -->
+	<script src="../proj4/proj4-src.js"></script>
+
+	<!-- My Openleyers -->
+	<link  href="../myol.css" type="text/css" rel="stylesheet">
+	<script src="../myol.js"></script>
+
+	<!-- This exemple -->
+	<script src="markers.js" defer="defer"></script>
+	<style>
+		#map {
+			width: 90vw;
+			height: 60vw;
+		}
+		.out-epsg-21781 span {
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="map"></div>
+
+	<!-- Fixed marker -->
+	<p><b>Cadre :</b> <span id="fix-marker-json"></span></p>
+
+	<!-- Draggable marker -->
+	<b>Viseur :</b>
+	<input type="text" id="fix-marker" style="width:50%" value='{
+		"type": "Point",
+		"coordinates": [7,47]
+	}' />
+	<div id="drag-marker">
+		<p>
+			Longitude :
+			<input type="text" name="lon" size="12" maxlength="12">(WGS84)&nbsp;
+			 <span style=""> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
+		</p>
+		<p>
+			Latitude :
+			<input type="text" name="lat" size="12" maxlength="12">(WGS84)&nbsp;
+			<span style=""> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
+		</p>
+	</div>
+</body>
+</html>
