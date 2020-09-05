@@ -1982,10 +1982,12 @@ function layerGeoJson(options) {
 		displayPointEl = document.getElementById(options.displayPointId),
 		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {};
 
-	for (let i = 0; i < inputEls.length; i++)
-		inputEls[i].onchange = editPoint;
+	let editedPointsGeometry = []; // Store points geometry for edition
 
-	let EditedPointsGeometry; // Store points geometry for edition
+	for (let i = 0; i < inputEls.length; i++) {
+		inputEls[i].onchange = editPoint;
+		inputEls[i].source = source;
+	}
 
 	// Snap on vector layers
 	options.snapLayers.forEach(function(layer) {
@@ -2157,16 +2159,16 @@ function layerGeoJson(options) {
 		}
 	}
 
-	//TODO BUG manque contexte
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
 			ol.proj.transform([parseInt(inputEls.x.value), parseInt(inputEls.y.value)], 'EPSG:21781', 'EPSG:3857'); // Modify x | y
 
-		displayPoint(ll);
+		evt.target.source.getFeatures().forEach(function(f) {
+			f.getGeometry().setCoordinates(ll)
+		});
 
-		if (EditedPointsGeometry.length > 0)
-			EditedPointsGeometry[0].setCoordinates(ll);
+		optimiseEdited();
 	}
 
 	function displayPoint(ll) {
@@ -2266,15 +2268,10 @@ function layerGeoJson(options) {
 
 		// Recreate features
 		source.clear();
-		EditedPointsGeometry = [];
-		for (let p in coords.points) {
-			const geometry = new ol.geom.Point(coords.points[p]);
+		for (let p in coords.points)
 			source.addFeature(new ol.Feature({
-				name: 'point',
-				geometry: geometry,
+				geometry: new ol.geom.Point(coords.points[p]),
 			}));
-			EditedPointsGeometry.push(geometry);
-		}
 		for (let l in coords.lines)
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.LineString(coords.lines[l]),

@@ -44,34 +44,38 @@ const massifs = layerVectorURL({
 	 * Editor
 	 */
 	marker = layerGeoJson({
-		geoJson: {
-			"type": "Feature",
-			"geometry": {
-				"type": "Point",
-				"coordinates": [2, 48]
-			}
-		},
 		displayPointId: 'fix-marker',
+		geoJson: {
+			'type': 'Point',
+			'coordinates': [2, 48]
+		},
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: 'cadre.png',
 			}),
 		},
 	}),
-//TODO simplifier sortie : pas de géometrie
 	reticule = layerGeoJson({
-		dragPoint: true,
-		geoJsonId: 'reticule',
 		displayPointId: 'drag-marker',
+		geoJsonId: 'reticule',
+		dragPoint: true,
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: 'viseur.png',
 			}),
 		},
+		saveFeatures: function(coordinates, format) {
+			return format.writeGeometry(
+				new ol.geom.Point(coordinates.points[0]), {
+					featureProjection: 'EPSG:3857',
+					decimals: 5,
+				}
+			).replace(' ', '');
+		},
 	}),
+
 	editor = layerGeoJson({
 		geoJsonId: 'geojson',
-		displayPointId: 'drag-marker',
 		snapLayers: [massifs],
 		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
@@ -120,9 +124,9 @@ const massifs = layerVectorURL({
 			selectorName: 'osm-features',
 		}),
 		massifs,
-//		marker,
+		//		editor,
+		marker,
 		reticule,
-//		editor,
 	],
 
 	/**
