@@ -84,7 +84,7 @@ function layerStyleOptionsFunction(properties, hover) {
 	if (properties.icon)
 		return {
 			image: new ol.style.Icon({
-				src: properties.icon
+				src: properties.icon,
 			})
 		};
 
@@ -102,7 +102,7 @@ function layerStyleOptionsFunction(properties, hover) {
 //TODO factoriser
 function geoOverlays(o) {
 	const options = Object.assign({
-		topidIdExclude: ''
+		topidIdExclude: '',
 	}, o);
 
 	return [

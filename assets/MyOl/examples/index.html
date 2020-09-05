@@ -40,73 +40,60 @@ Based on https://openlayers.org
 			font-size: .8em;
 			color: blue;
 		}
+		.out-epsg-21781 span {
+			display: none;
+		}
 	</style>
 </head>
 
 <body>
 	<div id="map"></div>
 
-	<!-- Display LL -->
-	<p id="displaypoint">
-            <label>
-                Longitude :
-                <input type="text" name="lon" size="12" maxlength="12">(WGS84)&nbsp;
-				 <span style=""> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
-            </label>
-            <label>
-                Latitude :
-                <input type="text" name="lat" size="12" maxlength="12">(WGS84)&nbsp;
-				<span style=""> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
-            </label>
-	</p>
-
 	<!-- Fixed marker -->
-	<p><b>Cadre: </b><span id="marqueur"></span></p>
-	<input type="hidden" id="marqueur-json" value='{"type":"Point","coordinates":[7.45,46.95]}' />
+	<p><b>Cadre :</b> <span id="fix-marker"></span></p>
 
 	<!-- Draggable marker -->
-	<p><b>Colimateur: </b><span id="viseur"></span></p>
-	<p>
-		Lon <input type="text" id="viseur-lon" size="10" maxlength="12" />
-		Lat <input type="text" id="viseur-lat" size="10" maxlength="12" />
-		<span>Suisse
-			X:<input type="text" id="viseur-x" size="7" maxlength="12" />
-			Y:<input type="text" id="viseur-y" size="7" maxlength="12" />
-			(CH 1903)
-		</span>
-		<button id="viseur-center-marker">Déplacer le viseur au centre de la carte</button>
-		<button id="viseur-center-map">Centrer la carte sur le viseur</button>
-	</p>
-	<input type="text" id="viseur-json" size="60" value='{"type":"Point","coordinates":[2.4,47]}' /><br/>
-
-	<!-- Features editor -->
-	<input type="text" id="geojson" style="width:90%" value='
-{
-	"type": "FeatureCollection",
-	"features": [{
+	<div id="drag-marker">
+		<p>
+			<b>Viseur :</b>
+			Longitude :
+			<input type="text" name="lon" size="12" maxlength="12">(WGS84)&nbsp;
+			 <span style=""> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
+		</p>
+		<p>
+			Latitude :
+			<input type="text" name="lat" size="12" maxlength="12">(WGS84)&nbsp;
+			<span style=""> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
+		</p>
+	</div>
+	<input type="text" id="reticule" style="width:90%" value='{
 		"type": "Feature",
 		"geometry": {
 			"type": "Point",
 			"coordinates": [7,47]
 		}
-	}, {
-		"type": "Feature",
-		"geometry": {
-			"type": "LineString",
-			"coordinates": [[-4.5,47.2],[-2,44.5]]
-		}
-	}, {
-		"type": "Feature",
-		"geometry": {
-			"type": "Polygon",
-			"coordinates": [
-				[[-5.5,47.2],[-3,44.5],[-8,44.5],[-5.5,47.2]],
-				[[-5.5,44.7],[-6.5,45.8],[-4.5,45.8],[-5.5,44.7]]
-			]
-		}
-	}]
-}
-	' />
+	}' />
+
+	<!-- Features editor -->
+	<input type="text" id="geojson" style="width:90%" value='{
+		"type": "FeatureCollection",
+		"features": [{
+			"type": "Feature",
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [[-4.5,47.2],[-2,44.5]]
+			}
+		}, {
+			"type": "Feature",
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[-5.5,47.2],[-3,44.5],[-8,44.5],[-5.5,47.2]],
+					[[-5.5,44.7],[-6.5,45.8],[-4.5,45.8],[-5.5,44.7]]
+				]
+			}
+		}]
+	}' />
 
 	<ul class="selectors">
 		<li>

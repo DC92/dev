@@ -1890,282 +1890,21 @@ function controlPrint() {
 }
 
 /**
- * Marker
- * Requires JSONparse, myol:onadd, hoverManager, proj4.js for swiss coordinates
- * Read / write following fields :
- * marker-json : {"type":"Point","coordinates":[2.4,47.082]}
- * marker-lon / marker-lat
- * marker-x / marker-y : CH 1903 (wrapped with marker-xy)
- * marker-center-cursor : onclick = center the cursor at the middle of the map
- * marker-center-map : onclick = center the map on the cursor position
- */
-function layerMarker(options) {
-	options = Object.assign({
-		llInit: [],
-		centerOnMap: false,
-		idDisplay: 'marker',
-		displayFormat: '',
-		draggable: false,
-	}, options);
-	const elJson = document.getElementById(options.idDisplay + '-json'),
-		elDisplay = document.getElementById(options.idDisplay),
-		elLon = document.getElementById(options.idDisplay + '-lon'),
-		elLat = document.getElementById(options.idDisplay + '-lat'),
-		elLonLat = [elLon, elLat],
-		elX = document.getElementById(options.idDisplay + '-x'),
-		elY = document.getElementById(options.idDisplay + '-y'),
-		elXY = [elX, elY],
-		elCenterMarker = document.getElementById(options.idDisplay + '-center-marker'),
-		elCenterMap = document.getElementById(options.idDisplay + '-center-map');
-
-	// Use json field values if any
-	if (elJson) {
-		let json = elJson.value || elJson.innerHTML;
-		if (json)
-			options.llInit = JSONparse(json).coordinates;
-	}
-	// Use lon-lat fields values if any
-	if (elLon && elLat) {
-		const lon = parseFloat(elLon.value || elLon.innerHTML),
-			lat = parseFloat(elLat.value || elLat.innerHTML);
-		if (lon && lat)
-			options.llInit = [lon, lat];
-	}
-
-	// The marker layer
-	const style = new ol.style.Style({
-			image: new ol.style.Icon(({
-				src: options.imageUrl,
-				anchor: [0.5, 0.5],
-			})),
-		}),
-		point = new ol.geom.Point(
-			ol.proj.fromLonLat(options.llInit)
-		),
-		feature = new ol.Feature({
-			geometry: point,
-			draggable: options.draggable,
-		}),
-		source = new ol.source.Vector({
-			features: [feature],
-		}),
-		layer = new ol.layer.Vector({
-			source: source,
-			style: style,
-			zIndex: 10,
-		}),
-		format = new ol.format.GeoJSON();
-
-	layer.marker_ = true; //HACK Used by hover & controlDownload
-
-	layer.once('myol:onadd', function(evt) {
-		const map = evt.map;
-		hoverManager(map, layer); // Attach hovering for cursor changes
-
-		layer.center = function() {
-			point.setCoordinates(map.getView().getCenter());
-		};
-		layer.centerMap = function() {
-			map.getView().setCenter(point.getCoordinates());
-		};
-
-		if (options.draggable) {
-			// Position at the init
-			if (options.centerOnMap)
-				layer.center();
-
-			// Drag the feature
-			map.addInteraction(new ol.interaction.Modify({
-				features: new ol.Collection([feature]),
-				pixelTolerance: 16, // The circle around the center
-				style: style, // Avoid to add interaction default style
-			}));
-
-			// Change text input values
-			point.on('change', function() {
-				displayLL(point.getCoordinates());
-			});
-
-			// GPS position changed
-			map.on('myol:ongpsposition', function(evt) {
-				point.setCoordinates(evt.position);
-			});
-
-			// Map control buttons
-			if (elCenterMarker)
-				elCenterMarker.onclick = layer.center;
-			else map.addControl(controlButton({
-				label: '\u29BB',
-				title: 'Déplacer le curseur au centre de la carte',
-				activate: layer.center,
-			}));
-			if (elCenterMarker)
-				elCenterMap.onclick = layer.centerMap;
-			else map.addControl(controlButton({
-				label: '\u2A00',
-				title: 'Centrer la carte sur le curseur',
-				activate: layer.centerMap,
-			}));
-		}
-	});
-
-	// <input> coords edition
-	function fieldEdit(evt) {
-		const id = evt.target.id.split('-')[1], // Get second part of the field id
-			pars = {
-				lon: [0, 4326],
-				lat: [1, 4326],
-				x: [0, 21781],
-				y: [1, 21781],
-			},
-			nol = pars[id][0], // Get what coord is concerned (x, y)
-			projection = pars[id][1]; // Get what projection is concerned
-		// Get initial position
-		let coord = ol.proj.transform(point.getCoordinates(), 'EPSG:3857', 'EPSG:' + projection);
-		// We change the value that was edited
-		coord[nol] = parseFloat(evt.target.value.replace(',', '.'));
-		// Set new position
-		point.setCoordinates(ol.proj.transform(coord, 'EPSG:' + projection, 'EPSG:3857'));
-
-		// Center map to the new position
-		layer.map_.getView().setCenter(point.getCoordinates());
-	}
-
-	// Display a coordinate
-	function displayLL(ll) {
-		const formats = {
-				decimal: ['Degrés décimaux', 'EPSG:4326', 'format',
-					'Longitude: {x}, Latitude: {y} (WGS84)',
-					5
-				],
-				degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
-			},
-			ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326');
-
-		// Champs de saisie en décimal
-		for (let i in elLonLat)
-			if (elLonLat[i]) {
-				elLonLat[i].value = Math.round(ll4326[i] * 100000) / 100000;
-				elLonLat[i].onchange = fieldEdit; // Set the change function
-			}
-
-		// Initialisation des champs de saisie en coordonnées suisses
-		for (let i in elXY)
-			if (elXY[i])
-				elXY[i].parentNode.style.display = 'none';
-
-		if (typeof proj4 == 'function') {
-			ol.proj.proj4.register(proj4);
-
-			// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-			if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
-				// Définition de la projection
-				proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-				formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
-				ol.proj.proj4.register(proj4);
-
-				// Champs de saisie en coordonnées suisses
-				const ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
-				for (let i in elXY)
-					if (elXY[i]) {
-						elXY[i].value = Math.round(ll21781[i]);
-						elXY[i].onchange = fieldEdit; // Set the change function
-						elXY[i].parentNode.style.display = '';
-					}
-			}
-
-			// Fuseau UTM
-			const u = Math.floor(ll4326[0] / 6 + 90) % 60 + 1;
-			proj4.defs('EPSG:326' + u, '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
-			formats.utm = ['UTM', 'EPSG:326' + u, 'format', 'UTM ' + u + ' lon: {x}, lat: {y}'];
-			ol.proj.proj4.register(proj4);
-		}
-
-		// Reset if out of scope
-		if (!formats[options.displayFormat])
-			options.displayFormat = 'decimal';
-
-		let f = formats[options.displayFormat],
-			html = ol.coordinate[f[2]](
-				ol.proj.transform(ll, 'EPSG:3857', f[1]),
-				f[3], f[4], f[5]
-			) + ' <select>';
-
-		for (let f in formats)
-			html += '<option value="' + f + '"' +
-			(f == options.displayFormat ? ' selected="selected"' : '') + '>' +
-			formats[f][0] + '</option>';
-
-		if (elDisplay) {
-			elDisplay.innerHTML = html.replace(
-				/( [-0-9]+)([0-9][0-9][0-9],? )/g,
-				function(whole, part1, part2) {
-					return part1 + ' ' + part2;
-				}
-			) + '</select>';
-			if (elDisplay.firstChild.nextElementSibling) {
-				elDisplay.firstChild.nextElementSibling.onchange = function(evt) {
-					options.displayFormat = evt.target.value;
-					displayLL(point.getCoordinates());
-				};
-			}
-		}
-
-		// Remontée des infos saisies
-		if (elJson)
-			elJson[elJson.value !== undefined ? 'value' : 'innerHTML'] =
-			JSON.stringify(format.writeGeometryObject(point, {
-				featureProjection: 'EPSG:3857',
-				decimals: 5
-			}));
-	}
-	displayLL(ol.proj.fromLonLat(options.llInit)); // Display once at init
-
-	return layer;
-}
-
-/**
- * Viewfinder canvas image
- */
-//TODO survol curseur change
-function viewfinder() {
-	const canvas = document.createElement('canvas'),
-		context = canvas.getContext('2d');
-
-	canvas.width = canvas.height = 30;
-	context.fillStyle = 'rgba(0,0,0,0)';
-	context.fillRect(0, 0, 30, 30);
-	context.fillStyle = 'yellow';
-	context.fillRect(16, 0, 1, 30);
-	context.fillRect(0, 16, 30, 1);
-
-	return new ol.style.Circle({
-		radius: 14,
-		fill: new ol.style.Fill({
-			color: context.createPattern(canvas, 'no-repeat'),
-		}),
-		stroke: new ol.style.Stroke({
-			color: 'yellow',
-			width: 2,
-		}),
-	});
-}
-
-/**
  * geoJson points, lines & polygons display & edit
  * Marker position display & edit
  * Lines & polygons edit
- * Requires JSONparse, myol:onadd, escapedStyle, controlButton, viewfinder
+ * Requires JSONparse, myol:onadd, escapedStyle, controlButton
  */
 function layerGeoJson(options) {
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
 		geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
-		focus: true, // Zoom the map on the loaded features
+		focus: false, // Zoom the map on the loaded features
 		snapLayers: [], // Vector layers to snap on
 		readFeatures: function() {
 			return options.format.readFeatures(
+				options.geoJson ||
 				JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
 					featureProjection: options.projection,
 				});
@@ -2177,17 +1916,15 @@ function layerGeoJson(options) {
 			});
 		},
 		styleOptions: {
-			image: options.titlePoint ?
-				// Dragable point
-				viewfinder() :
-				// Drag lines or Polygons
-				new ol.style.Circle({
-					radius: 4,
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 2,
-					}),
+			//TODO survol curseur change
+			// Drag lines or Polygons
+			image: new ol.style.Circle({
+				radius: 4,
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 2,
 				}),
+			}),
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
@@ -2273,7 +2010,7 @@ function layerGeoJson(options) {
 		});
 
 		// Add required controls
-		if (options.titleModify || options.titlePoint) {
+		if (options.titleModify || options.dragPoint) {
 			map.addControl(controlModify);
 			controlModify.toggle(true);
 		}
@@ -2420,6 +2157,7 @@ function layerGeoJson(options) {
 		}
 	}
 
+	//TODO BUG manque contexte
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
@@ -2444,11 +2182,10 @@ function layerGeoJson(options) {
 
 			let ll21781 = null;
 			if (typeof proj4 == 'function') {
-				ol.proj.proj4.register(proj4);
-
 				// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
 				if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
 					proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+					ol.proj.proj4.register(proj4);
 					ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
 
 					formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
@@ -2461,7 +2198,7 @@ function layerGeoJson(options) {
 				ol.proj.proj4.register(proj4);
 			}
 			// Display or not the EPSG:21781 coordinates
-			displayPointEl.className = ll21781 ? 'input-21781' : '';
+			displayPointEl.className = ll21781 ? 'epsg-21781' : 'out-epsg-21781';
 
 			if (inputEls.length)
 				// Set the html input
