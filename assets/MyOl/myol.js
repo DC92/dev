@@ -448,140 +448,141 @@ function controlPermanentCheckbox(selectorName, callback, options) {
  */
 //TODO survol étiquette ne reste pas affichée
 function hoverManager(map) {
-	if (map.hasHoverManager_) // Only one per map
-		return;
-	map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
+	if (!map.hasHoverManager_) { // Only one per map
+		map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
 
-	const labelEl = document.createElement('div'),
-		popup = new ol.Overlay({
-			element: labelEl,
-		}),
-		viewStyle = map.getViewport().style;
-	map.addOverlay(popup);
+		const labelEl = document.createElement('div'),
+			popup = new ol.Overlay({
+				element: labelEl,
+			}),
+			viewStyle = map.getViewport().style;
+		map.addOverlay(popup);
 
-	let hoveredFeature = null;
-	map.on('pointermove', pointerMove);
+		let hoveredFeature = null;
 
-	// Hide popup when the cursor is out of the map
-	window.addEventListener('mousemove', function(evt) {
-		const divRect = map.getTargetElement().getBoundingClientRect();
-		if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-			evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-			pointerMove();
-	});
-
-	// Go to feature.property.link when click on the feature (icon or area)
-	map.on('click', function(evt) {
-		if (hoveredFeature) {
-			const link = hoveredFeature.getProperties().link;
-			if (link) {
-				if (evt.originalEvent.ctrlKey) {
-					const win = window.open(link, '_blank');
-					if (evt.originalEvent.shiftKey)
-						win.focus();
-				} else
-					window.location = link;
+		// Go to feature.property.link when click on the feature (icon or area)
+		map.on('click', function(evt) {
+			if (hoveredFeature) {
+				const link = hoveredFeature.getProperties().link;
+				if (link) {
+					if (evt.originalEvent.ctrlKey) {
+						const win = window.open(link, '_blank');
+						if (evt.originalEvent.shiftKey)
+							win.focus();
+					} else
+						window.location = link;
+				}
 			}
-		}
-	});
+		});
 
-	function pointerMove(evt) {
-		let closestFeature = null,
-			distanceMin = 2000;
+		map.on('pointermove', pointerMove);
 
-		// Search hovered features
-		if (evt) // Except when out of the map
-			map.forEachFeatureAtPixel(
-				evt.pixel,
-				function(feature, layer) {
-					if (layer) {
-						let geometry = feature.getGeometry(),
-							featurePixel = map.getPixelFromCoordinate(
-								geometry.getExtent()
-							),
-							distance = Math.hypot( // Distance of a point
-								featurePixel[0] - evt.pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
-								featurePixel[1] - evt.pixel[1]
-							);
+		// Hide popup when the cursor is out of the map
+		window.addEventListener('mousemove', function(evt) {
+			const divRect = map.getTargetElement().getBoundingClientRect();
+			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+				pointerMove();
+		});
 
-						// Higest priority for draggable markers
-						if (feature.getProperties().draggable)
-							distance = 0;
+		function pointerMove(evt) {
+			let closestFeature = null,
+				distanceMin = 2000;
 
-						if (typeof geometry.flatCoordinates != 'undefined' &&
-							geometry.flatCoordinates.length > 2) { // Line or polygon
-							distance = 1000; // Lower priority
-							featurePixel = evt.pixel; // Label follows the cursor
-						}
-						if (distanceMin > distance) {
-							distanceMin = distance;
-							closestFeature = feature;
-							closestFeature.pixel_ = featurePixel;
-							closestFeature.layer_ = layer;
+			// Search hovered features
+			if (evt) // Except when out of the map
+				map.forEachFeatureAtPixel(
+					evt.pixel,
+					function(feature, layer) {
+						if (layer) {
+							let geometry = feature.getGeometry(),
+								featurePixel = map.getPixelFromCoordinate(
+									geometry.getExtent()
+								),
+								distance = Math.hypot( // Distance of a point
+									featurePixel[0] - evt.pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
+									featurePixel[1] - evt.pixel[1]
+								);
+
+							// Higest priority for draggable markers
+							if (feature.getProperties().draggable)
+								distance = 0;
+
+							if (typeof geometry.flatCoordinates != 'undefined' &&
+								geometry.flatCoordinates.length > 2) { // Line or polygon
+								distance = 1000; // Lower priority
+								featurePixel = evt.pixel; // Label follows the cursor
+							}
+							if (distanceMin > distance) {
+								distanceMin = distance;
+								closestFeature = feature;
+								closestFeature.pixel_ = featurePixel;
+								closestFeature.layer_ = layer;
+							}
 						}
 					}
-				}
-			);
-
-		if (closestFeature != hoveredFeature) {
-			// Recover the basic style for the previous hoveredFeature feature
-			if (hoveredFeature && hoveredFeature.layer_.options)
-				hoveredFeature.setStyle(
-					escapedStyle(hoveredFeature.layer_.options.styleOptions)
 				);
-			hoveredFeature = closestFeature; // Mem for the next cursor move
 
-			// Default cursor & label
-			viewStyle.cursor = 'default';
-			labelEl.className = 'myol-popup-hidden';
+			if (closestFeature != hoveredFeature) {
+				// Recover the basic style for the previous hoveredFeature feature
+				if (hoveredFeature && hoveredFeature.layer_.options)
+					hoveredFeature.setStyle(
+						escapedStyle(hoveredFeature.layer_.options.styleOptions)
+					);
+				hoveredFeature = closestFeature; // Mem for the next cursor move
 
-			if (closestFeature) {
-				const properties = closestFeature.getProperties(),
-					layerOptions = closestFeature.layer_.options;
+				// Default cursor & label
+				viewStyle.cursor = 'default';
+				labelEl.className = 'myol-popup-hidden';
 
-				// Change the cursor
-				if (properties.link)
-					viewStyle.cursor = 'pointer';
-				if (properties.draggable)
-					viewStyle.cursor = 'move';
+				if (closestFeature) {
+					const properties = closestFeature.getProperties(),
+						layerOptions = closestFeature.layer_.options;
 
-				// Set the hovered style
-				if (layerOptions) {
-					closestFeature.setStyle(escapedStyle(
-						layerOptions.styleOptions,
-						layerOptions.hoverStyleOptions,
-						layerOptions.editStyleOptions
-					));
+					// Change the cursor
+					if (properties.link)
+						viewStyle.cursor = 'pointer';
+					if (properties.draggable)
+						viewStyle.cursor = 'move';
 
-					// Set the text
-					if (typeof layerOptions.label == 'function')
-						labelEl.innerHTML = layerOptions.label(properties, closestFeature, layerOptions);
-					else if (layerOptions.label)
-						labelEl.innerHTML = layerOptions.label;
-					else
-						labelEl.innerHTML = null;
-					if (labelEl.innerHTML) // To avoid tinny popup when nothing to display
-						labelEl.className = 'myol-popup';
+					// Set the hovered style
+					if (layerOptions) {
+						closestFeature.setStyle(escapedStyle(
+							layerOptions.styleOptions,
+							layerOptions.hoverStyleOptions,
+							layerOptions.editStyleOptions
+						));
+
+						// Set the text
+						if (typeof layerOptions.label == 'function')
+							labelEl.innerHTML = layerOptions.label(properties, closestFeature, layerOptions);
+						else if (layerOptions.label)
+							labelEl.innerHTML = layerOptions.label;
+						else
+							labelEl.innerHTML = null;
+						if (labelEl.innerHTML) // To avoid tinny popup when nothing to display
+							labelEl.className = 'myol-popup';
+					}
 				}
 			}
-		}
-		// Position & reposition the label
-		if (closestFeature) {
-			//HACK set the label position in the middle to measure the label extent
-			popup.setPosition(map.getView().getCenter());
+			// Position & reposition the label
+			if (closestFeature) {
+				//HACK set the label position in the middle to measure the label extent
+				popup.setPosition(map.getView().getCenter());
 
-			const pixel = closestFeature.pixel_;
-			// Shift of the label to stay into the map regarding the pointer position
-			if (pixel[1] < labelEl.clientHeight + 12) { // On the top of the map (not enough space for it)
-				pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -labelEl.clientWidth - 10;
-				pixel[1] = 2;
-			} else {
-				pixel[0] -= labelEl.clientWidth / 2;
-				pixel[0] = Math.max(pixel[0], 0); // Left edge
-				pixel[0] = Math.min(pixel[0], map.getSize()[0] - labelEl.clientWidth - 1); // Right edge
-				pixel[1] -= labelEl.clientHeight + 8;
+				const pixel = closestFeature.pixel_;
+				// Shift of the label to stay into the map regarding the pointer position
+				if (pixel[1] < labelEl.clientHeight + 12) { // On the top of the map (not enough space for it)
+					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -labelEl.clientWidth - 10;
+					pixel[1] = 2;
+				} else {
+					pixel[0] -= labelEl.clientWidth / 2;
+					pixel[0] = Math.max(pixel[0], 0); // Left edge
+					pixel[0] = Math.min(pixel[0], map.getSize()[0] - labelEl.clientWidth - 1); // Right edge
+					pixel[1] -= labelEl.clientHeight + 8;
+				}
+				popup.setPosition(map.getCoordinateFromPixel(pixel));
 			}
-			popup.setPosition(map.getCoordinateFromPixel(pixel));
 		}
 	}
 }
@@ -776,7 +777,7 @@ function layerVectorURL(options) {
 
 	layer.once('myol:onadd', function(evt) {
 		// Attach tracking for labeling & cursor changes
-		hoverManager(evt.map, layer);
+		hoverManager(evt.map);
 
 		// Zoom out of range report
 		evt.map.getView().on('change:resolution', displayZoomStatus);
@@ -1945,7 +1946,6 @@ function layerGeoJson(options) {
 			});
 		},
 		styleOptions: {
-			//TODO survol curseur change
 			// Drag lines or Polygons
 			image: new ol.style.Circle({
 				radius: 4,
@@ -2032,6 +2032,7 @@ function layerGeoJson(options) {
 
 	layer.once('myol:onadd', function(evt) {
 		const map = evt.map;
+		hoverManager(map);
 		optimiseEdited(); // Treat the geoJson input as any other edit
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
@@ -2300,6 +2301,7 @@ function layerGeoJson(options) {
 		for (let p in coords.points)
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.Point(coords.points[p]),
+				draggable: options.dragPoint,
 			}));
 		for (let l in coords.lines)
 			source.addFeature(new ol.Feature({
