@@ -187,12 +187,6 @@ class listener implements EventSubscriberInterface
 		$post_data = $this->all_post_data[$post_id] ?: [];
 		$topic_data = $vars['topic_data'];
 
-/*//TODO DELETE ???
-		if ($post_id == $this->request->variable('p', 0) &&
-			is_numeric($post_data['gym_activite']))
-			$this->template->assign_var ('GYM_ACTIVITE', $post_data['gym_activite']); //TODO INDISPENSABLE ?????
-*/
-
 		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
@@ -310,6 +304,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Add specific columns to the database
+	//TODO utiliser adm_page_header de GeoBB
 	function verify_column($table, $columns) {
 		foreach ($columns AS $column) {
 			$sql = "SHOW columns FROM $table LIKE '$column'";
@@ -470,7 +465,6 @@ class listener implements EventSubscriberInterface
 		}
 		$this->db->sql_freeresult($result);
 
-		$topic = $this->request->variable('t', 0);
 		if ($liste) {
 			// Tri du 1er niveau
 			ksort ($liste, SORT_STRING);
