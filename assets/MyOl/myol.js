@@ -486,7 +486,10 @@ function hoverManager(map) {
 
 		function pointerMove(evt) {
 			let closestFeature = null,
-				distanceMin = 2000;
+				distanceMin = 2000,
+				hoveredEl = evt ?
+				document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8) :
+				'BODY'; // Out of the map
 
 			// Search hovered features
 			if (evt) // Except when out of the map
@@ -514,6 +517,8 @@ function hoverManager(map) {
 							}
 							if (distanceMin > distance) {
 								distanceMin = distance;
+
+								// Look at hovered feature
 								closestFeature = feature;
 								closestFeature.pixel_ = featurePixel;
 								closestFeature.layer_ = layer;
@@ -521,9 +526,11 @@ function hoverManager(map) {
 						}
 					}
 				);
+			else // Out of the map
+				labelEl.className = 'myol-popup-hidden';
 
 			if (closestFeature != hoveredFeature && // Not hovering a feature
-				document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8).tagName == 'CANVAS') { // Not hovering a label
+				hoveredEl.tagName == 'CANVAS') { // Not hovering a label
 				// Recover the basic style for the previous hoveredFeature feature
 				if (hoveredFeature && hoveredFeature.layer_.options)
 					hoveredFeature.setStyle(
