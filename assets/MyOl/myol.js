@@ -446,7 +446,6 @@ function controlPermanentCheckbox(selectorName, callback, options) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
-//TODO survol étiquette ne reste pas affichée
 function hoverManager(map) {
 	if (!map.hasHoverManager_) { // Only one per map
 		map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
@@ -523,7 +522,8 @@ function hoverManager(map) {
 					}
 				);
 
-			if (closestFeature != hoveredFeature) {
+			if (closestFeature != hoveredFeature && // Not hovering a feature
+				document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8).tagName == 'CANVAS') { // Not hovering a label
 				// Recover the basic style for the previous hoveredFeature feature
 				if (hoveredFeature && hoveredFeature.layer_.options)
 					hoveredFeature.setStyle(
@@ -2011,8 +2011,6 @@ function layerGeoJson(options) {
 		displayPointEl = document.getElementById(options.displayPointId),
 		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {};
 
-	let editedPointsGeometry = []; // Store points geometry for edition
-
 	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;
@@ -2195,7 +2193,7 @@ function layerGeoJson(options) {
 			ol.proj.transform([parseInt(inputEls.x.value), parseInt(inputEls.y.value)], 'EPSG:21781', 'EPSG:3857'); // Modify x | y
 
 		evt.target.source.getFeatures().forEach(function(f) {
-			f.getGeometry().setCoordinates(ll)
+			f.getGeometry().setCoordinates(ll);
 		});
 
 		optimiseEdited();
