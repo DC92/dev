@@ -483,16 +483,20 @@ function hoverManager(map) {
 				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
 				pointerMove();
 		});
+	}
 
-		function pointerMove(evt) {
-			let closestFeature = null,
-				distanceMin = 2000,
-				hoveredEl = evt ?
-				document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8) :
-				'BODY'; // Out of the map
+	function pointerMove(evt) {
+		// Search hovered features
+		if (!evt) // Out of the map
+			labelEl.className = 'myol-popup-hidden';
+		else {
+			// Search hovered label
+			hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
+			if (hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
+				// Search hovered features
+				let closestFeature = null,
+					distanceMin = 2000;
 
-			// Search hovered features
-			if (evt) // Except when out of the map
 				map.forEachFeatureAtPixel(
 					evt.pixel,
 					function(feature, layer) {
@@ -526,69 +530,66 @@ function hoverManager(map) {
 						}
 					}
 				);
-			else // Out of the map
-				labelEl.className = 'myol-popup-hidden';
 
-			if (closestFeature != hoveredFeature && // Not hovering a feature
-				hoveredEl.tagName == 'CANVAS') { // Not hovering a label
-				// Recover the basic style for the previous hoveredFeature feature
-				if (hoveredFeature && hoveredFeature.layer_.options)
-					hoveredFeature.setStyle(
-						escapedStyle(hoveredFeature.layer_.options.styleOptions)
-					);
-				hoveredFeature = closestFeature; // Mem for the next cursor move
+				if (closestFeature != hoveredFeature) { // If we hover a new feature
+					// Recover the basic style for the previous hoveredFeature feature
+					if (hoveredFeature && hoveredFeature.layer_.options)
+						hoveredFeature.setStyle(
+							escapedStyle(hoveredFeature.layer_.options.styleOptions)
+						);
+					hoveredFeature = closestFeature; // Mem for the next cursor move
 
-				// Default cursor & label
-				viewStyle.cursor = 'default';
-				labelEl.className = 'myol-popup-hidden';
+					if (!closestFeature) {
+						// Default cursor & label
+						viewStyle.cursor = 'default';
+						labelEl.className = 'myol-popup-hidden';
+					} else {
+						const properties = closestFeature.getProperties(),
+							layerOptions = closestFeature.layer_.options;
 
-				if (closestFeature) {
-					const properties = closestFeature.getProperties(),
-						layerOptions = closestFeature.layer_.options;
+						if (layerOptions) {
+							// Set the hovered style
+							closestFeature.setStyle(escapedStyle(
+								layerOptions.styleOptions,
+								layerOptions.hoverStyleOptions,
+								layerOptions.editStyleOptions
+							));
 
-					// Change the cursor
-					if (properties.link)
-						viewStyle.cursor = 'pointer';
-					if (properties.draggable)
-						viewStyle.cursor = 'move';
-
-					// Set the hovered style
-					if (layerOptions) {
-						closestFeature.setStyle(escapedStyle(
-							layerOptions.styleOptions,
-							layerOptions.hoverStyleOptions,
-							layerOptions.editStyleOptions
-						));
-
-						// Set the text
-						if (typeof layerOptions.label == 'function')
-							labelEl.innerHTML = layerOptions.label(properties, closestFeature, layerOptions);
-						else if (layerOptions.label)
-							labelEl.innerHTML = layerOptions.label;
-						else
-							labelEl.innerHTML = null;
-						if (labelEl.innerHTML) // To avoid tinny popup when nothing to display
-							labelEl.className = 'myol-popup';
+							// Set the text
+							if (typeof layerOptions.label == 'function')
+								labelEl.innerHTML = layerOptions.label(properties, closestFeature, layerOptions);
+							else if (layerOptions.label)
+								labelEl.innerHTML = layerOptions.label;
+							else
+								labelEl.innerHTML = null;
+							if (labelEl.innerHTML) // To avoid tinny popup when nothing to display
+								labelEl.className = 'myol-popup';
+						}
+						// Change the cursor
+						if (properties.link)
+							viewStyle.cursor = 'pointer';
+						if (properties.draggable)
+							viewStyle.cursor = 'move';
 					}
 				}
-			}
-			// Position & reposition the label
-			if (closestFeature) {
-				//HACK set the label position in the middle to measure the label extent
-				popup.setPosition(map.getView().getCenter());
+				// Position & reposition the label
+				if (closestFeature) {
+					//HACK set the label position in the middle to measure the label extent
+					popup.setPosition(map.getView().getCenter());
 
-				const pixel = closestFeature.pixel_;
-				// Shift of the label to stay into the map regarding the pointer position
-				if (pixel[1] < labelEl.clientHeight + 12) { // On the top of the map (not enough space for it)
-					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -labelEl.clientWidth - 10;
-					pixel[1] = 2;
-				} else {
-					pixel[0] -= labelEl.clientWidth / 2;
-					pixel[0] = Math.max(pixel[0], 0); // Left edge
-					pixel[0] = Math.min(pixel[0], map.getSize()[0] - labelEl.clientWidth - 1); // Right edge
-					pixel[1] -= labelEl.clientHeight + 8;
+					const pixel = closestFeature.pixel_;
+					// Shift of the label to stay into the map regarding the pointer position
+					if (pixel[1] < labelEl.clientHeight + 12) { // On the top of the map (not enough space for it)
+						pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -labelEl.clientWidth - 10;
+						pixel[1] = 2;
+					} else {
+						pixel[0] -= labelEl.clientWidth / 2;
+						pixel[0] = Math.max(pixel[0], 0); // Left edge
+						pixel[0] = Math.min(pixel[0], map.getSize()[0] - labelEl.clientWidth - 1); // Right edge
+						pixel[1] -= labelEl.clientHeight + 8;
+					}
+					popup.setPosition(map.getCoordinateFromPixel(pixel));
 				}
-				popup.setPosition(map.getCoordinateFromPixel(pixel));
 			}
 		}
 	}
@@ -1560,8 +1561,8 @@ function controlGPS() {
 			if (!active)
 				view.setRotation(0, 0); // Set north to top
 
-			geolocation.setTracking(active != 0);
-			graticuleLayer.setVisible(active != 0);
+			geolocation.setTracking(active !== 0);
+			graticuleLayer.setVisible(active !== 0);
 		}
 	});
 
