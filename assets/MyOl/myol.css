@@ -1,3 +1,8 @@
+/* Nomalize em sizes */
+.ol-viewport {
+	font-size: 16px;
+}
+
 /* Top aligned buttons */
 /* Container */
 .ol-control-hidden {
@@ -10,7 +15,7 @@
 .myol-button {
 	position: static !important;
 	float: left;
-	margin: 3px 0 0 3px;
+	margin: 2px;
 	padding: 0; /* No grey line around the button */
 }
 
@@ -18,7 +23,7 @@
 .ol-control button,
 .ol-control button:focus,
 .ol-geocoder {
-	font-size: 19px !important;
+	font-size: 18px !important;
 	color: black;
 	background-color: white;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
@@ -197,7 +202,7 @@
 	box-shadow: 0 3px 8px #888;
 	background-color: white;
 	font-size: 12px;
-	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;
 	text-decoration: none;
 	color: initial;
 	cursor: auto;
