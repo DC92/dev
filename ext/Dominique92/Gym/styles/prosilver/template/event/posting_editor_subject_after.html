@@ -70,7 +70,7 @@
 
 	Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"><br/><br/>
 
-	<select name="gym_jour" id="gym_jour" onchange="displayInputCalendar(this)">
+	<select name="gym_jour" id="gym_jour" onchange="changeDayCalendar()">
 		<!-- BEGIN liste_jours -->
 			<option value="{liste_jours.NO}"
 				<!-- IF liste_jours.NO == GYM_JOUR -->
@@ -112,7 +112,7 @@
 	<br/><br/>
 
 	Période : scolaire
-	<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="displayInputCalendar(this)"
+	<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="changeDayCalendar()"
 	<!-- IF GYM_SCOLAIRE != 'off' -->
 		checked="checked"
 	<!-- ENDIF -->
@@ -124,21 +124,22 @@
 
 	<table id="edit_semaines"
 		class="calendrier"
-		data-jour="{GYM_JOUR}"
+		data-id="{REQUEST_P}"
 		data-semaines="{GYM_SEMAINES}"
+		data-jour="{GYM_JOUR}"
 	>
-		<tr id="cal_{GYM_JOUR}_mois_8"><td>Aout</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_9"><td>Septembre</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_10"><td>Octobre</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_11"><td>Novembre</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_12"><td>Décembre</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_1"><td>Janvier</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_2"><td>Février</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_3"><td>Mars</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_4"><td>Avril</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_5"><td>Mai</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_6"><td>Juin</td></tr>
-		<tr id="cal_{GYM_JOUR}_mois_7"><td>Juillet</td></tr>
+		<tr id="cal{REQUEST_P}_m8" style="display:none"></tr>
+		<tr id="cal{REQUEST_P}_m9"><td>Septembre</td></tr>
+		<tr id="cal{REQUEST_P}_m10"><td>Octobre</td></tr>
+		<tr id="cal{REQUEST_P}_m11"><td>Novembre</td></tr>
+		<tr id="cal{REQUEST_P}_m12"><td>Décembre</td></tr>
+		<tr id="cal{REQUEST_P}_m1"><td>Janvier</td></tr>
+		<tr id="cal{REQUEST_P}_m2"><td>Février</td></tr>
+		<tr id="cal{REQUEST_P}_m3"><td>Mars</td></tr>
+		<tr id="cal{REQUEST_P}_m4"><td>Avril</td></tr>
+		<tr id="cal{REQUEST_P}_m5"><td>Mai</td></tr>
+		<tr id="cal{REQUEST_P}_m6"><td>Juin</td></tr>
+		<tr id="cal{REQUEST_P}_m7" style="display:none"></tr>
 	</table>
 
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->

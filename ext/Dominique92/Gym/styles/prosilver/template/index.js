@@ -12,17 +12,17 @@ if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2)
 
 // BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {
-	let jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
-	if (isNaN(jour)) jour = 0;
-	const semaines = $(elCal).attr('data-semaines').split(','),
-		nowhere = $('#cal_' + jour + '_mois_8');
+	const id = $(elCal).attr('data-id'),
+		semaines = $(elCal).attr('data-semaines').split(','),
+		nowhere = $('#cal' + id + '_m8');
 
 	for (let week = 0; week < 52; week++) {
-		const td = $('<td id="cal_' + jour + '_s' + week + '"><span/></td>');
+		const td = $('<td id="cal' + id + '_s' + week + '"><span/></td>');
 		td.appendTo(nowhere); // Attach it to be able to get it
 		if ($('body#phpbb').length) { // Is it a posting page ?
 			const input = $('<input type="checkbox" value="' + week + '" name="gym_semaines[]" />');
 			input.appendTo(td);
+
 			if (semaines.includes(week.toString()))
 				input.attr('checked', 'checked');
 		} else { // It is a viewtopic page
@@ -30,18 +30,31 @@ $('.calendrier').each(function(index, elCal) {
 				td.addClass('selected');
 		}
 	}
-	displayInputCalendar(elCal);
+	displayInputCalendar(
+		elCal,
+		parseInt($(elCal).attr('data-jour'), 10)
+	);
 });
 
-function displayInputCalendar(elCal) {
-	// Marque le jour et attribue au mois
-	let jour = parseInt(elCal.value || $(elCal).attr('data-jour') || 0, 10);
-	if (isNaN(jour)) jour = 0;
+// Change parameters
+function changeDayCalendar() {
+	displayInputCalendar(
+		$('.calendrier')[0],
+		parseInt($('#gym_jour option:selected')[0].value)
+	);
+}
+
+// Display the posting calendar
+function displayInputCalendar(elCal, jour) {
+	let id = $(elCal).attr('data-id');
+
 	for (let week = 0; week < 52; week++) {
-		const wEl = $('#cal_' + jour + '_s' + week),
-			date = new Date(annee_debut, 8 - 1, 3 + week * 7 + jour); // Jour suivant le lundi suivant le 1er aout annee_debut
-		wEl.appendTo('#cal_' + jour + '_mois_' + (1 + date.getMonth()));
-		wEl.children().html(date.getDate());
+		const date = new Date(annee_debut, 8 - 1, 3 + week * 7 + jour), // Jour suivant le lundi suivant le 1er aout annee_debut
+			weekEl = $('#cal' + id + '_s' + week),
+			monthEl = $('#cal' + id + '_m' + (1 + date.getMonth()));
+
+		weekEl.appendTo(monthEl);
+		weekEl.find('span').html(date.getDate());
 	}
 
 	// Ajoute une case aux mois n'ayant que 4 jours de ce type

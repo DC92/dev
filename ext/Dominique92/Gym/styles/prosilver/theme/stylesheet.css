@@ -449,22 +449,6 @@ body {
 	padding: 0.2em;
 	text-align: right;
 }
-#cal_0_mois_7,
-#cal_1_mois_7,
-#cal_2_mois_7,
-#cal_3_mois_7,
-#cal_4_mois_7,
-#cal_5_mois_7,
-#cal_6_mois_7,
-#cal_0_mois_8,
-#cal_1_mois_8,
-#cal_2_mois_8,
-#cal_3_mois_8,
-#cal_4_mois_8,
-#cal_5_mois_8,
-#cal_6_mois_8 {
-	display: none;
-}
 
 /* Cartes */
 .gym .carte {
