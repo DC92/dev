@@ -18,6 +18,9 @@
 	margin: 2px;
 	padding: 0; /* No grey line around the button */
 }
+.ol-geocoder {
+	line-height: 15px; /* HACK FF */
+}
 
 /* Button */
 .ol-control button,
@@ -29,6 +32,8 @@
 	outline: 0;
 }
 .ol-geocoder .gcd-gl-btn {
+	border-image-width: 0 !important;
+	top: 0 !important;
 	position: static;
 	height: 24.75px;
 	width: 24.75px;
