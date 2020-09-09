@@ -447,43 +447,45 @@ function controlPermanentCheckbox(selectorName, callback, options) {
  * Requires escapedStyle
  */
 function hoverManager(map) {
-	if (!map.hasHoverManager_) { // Only one per map
+	if (map.hasHoverManager_)
+		return; // Only one per map
+	else
 		map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
 
-		const labelEl = document.createElement('div'),
-			popup = new ol.Overlay({
-				element: labelEl,
-			}),
-			viewStyle = map.getViewport().style;
-		map.addOverlay(popup);
+	let hoveredFeature = null;
+	const labelEl = document.createElement('div'),
+		viewStyle = map.getViewport().style,
+		popup = new ol.Overlay({
+			element: labelEl,
+		});
+	map.addOverlay(popup);
 
-		let hoveredFeature = null;
-
-		// Go to feature.property.link when click on the feature (icon or area)
-		map.on('click', function(evt) {
-			if (hoveredFeature) {
-				const link = hoveredFeature.getProperties().link;
-				if (link) {
-					if (evt.originalEvent.ctrlKey) {
-						const win = window.open(link, '_blank');
-						if (evt.originalEvent.shiftKey)
-							win.focus();
-					} else
-						window.location = link;
-				}
+	// Go to feature.property.link when click on the feature (icon or area)
+	map.on('click', function(evt) {
+		if (hoveredFeature) {
+			const link = hoveredFeature.getProperties().link;
+			if (link) {
+				if (evt.originalEvent.ctrlKey) {
+					const win = window.open(link, '_blank');
+					if (evt.originalEvent.shiftKey)
+						win.focus();
+				} else
+					window.location = link;
 			}
-		});
+		}
+	});
 
-		map.on('pointermove', pointerMove);
+	map.on('pointermove', function(e) {
+		pointerMove(e);
+	});
 
-		// Hide popup when the cursor is out of the map
-		window.addEventListener('mousemove', function(evt) {
-			const divRect = map.getTargetElement().getBoundingClientRect();
-			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-				pointerMove();
-		});
-	}
+	// Hide popup when the cursor is out of the map
+	window.addEventListener('mousemove', function(evt) {
+		const divRect = map.getTargetElement().getBoundingClientRect();
+		if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+			evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+			pointerMove();
+	});
 
 	function pointerMove(evt) {
 		// Search hovered features
@@ -491,7 +493,7 @@ function hoverManager(map) {
 			labelEl.className = 'myol-popup-hidden';
 		else {
 			// Search hovered label
-			hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
+			const hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
 			if (hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
 				// Search hovered features
 				let closestFeature = null,
