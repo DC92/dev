@@ -1910,6 +1910,7 @@ function controlPrint() {
  */
 function layerMarker(options) {
 	options = Object.assign({
+		singlePoint: true,
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: options.icon,
@@ -2202,6 +2203,22 @@ function layerGeoJson(options) {
 		}
 	}
 
+	layer.centerMarker = function() {
+		source.getFeatures().forEach(function(f) {
+			f.getGeometry().setCoordinates(
+				layer.map_.getView().getCenter()
+			);
+		});
+	};
+
+	layer.centerMap = function() {
+		source.getFeatures().forEach(function(f) {
+			layer.map_.getView().setCenter(
+				f.getGeometry().getCoordinates()
+			);
+		});
+	};
+
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
@@ -2311,21 +2328,32 @@ function layerGeoJson(options) {
 
 		// Recreate features
 		source.clear();
-		for (let p in coords.points)
+		if (options.singlePoint) {
+			// Initialise the marker at the center on the map if no coords are available
+			coords.points.push(layer.map_.getView().getCenter());
+
+			// Keep only the first point
 			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Point(coords.points[p]),
+				geometry: new ol.geom.Point(coords.points[0]),
 				draggable: options.dragPoint,
 			}));
-		for (let l in coords.lines)
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.LineString(coords.lines[l]),
-			}));
-		for (let p in coords.polys)
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(coords.polys[p]),
-			}));
+		} else {
+			for (let p in coords.points)
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.Point(coords.points[p]),
+					draggable: options.dragPoint,
+				}));
+			for (let l in coords.lines)
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.LineString(coords.lines[l]),
+				}));
+			for (let p in coords.polys)
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.Polygon(coords.polys[p]),
+				}));
+		}
 
-		// Save lines in <EL> as geoJSON at every change
+		// Save geometries in <EL> as geoJSON at every change
 		if (geoJsonEl)
 			geoJsonEl.value = options.saveFeatures(coords, options.format);
 	}

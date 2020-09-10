@@ -1,18 +1,18 @@
+const cadre = layerMarker({
+		displayPointId: 'fix-marker-json',
+		coordinates: [2, 48],
+		icon: 'cadre.png',
+	}),
+	viseur = layerMarker({
+		displayPointId: 'drag-marker',
+		geoJsonId: 'fix-marker',
+		icon: 'viseur.png',
+		dragPoint: true,
+	});
+
 new ol.Map({
 	target: 'map',
-	layers: [
-		layerMarker({
-			displayPointId: 'fix-marker-json',
-			coordinates: [2, 48],
-			icon: 'cadre.png',
-		}),
-		layerMarker({
-			displayPointId: 'drag-marker',
-			geoJsonId: 'fix-marker',
-			icon: 'viseur.png',
-			dragPoint: true,
-		}),
-	],
+	layers: [cadre, viseur],
 	controls: controlsCollection({
 		geoKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
