@@ -1,6 +1,13 @@
+const viseur = layerMarker({
+	displayPointId: 'marker',
+	geoJsonId: 'marker-json',
+	icon: 'assets/MyOl/examples/viseur.png',
+	dragPoint: true,
+});
+
 new ol.Map({
 	target: 'map',
-//	layers: vectorLayers,
+	layers: [viseur],
 	controls: controlsCollection({
 		geoKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats

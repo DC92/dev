@@ -2330,6 +2330,7 @@ function layerGeoJson(options) {
 		source.clear();
 		if (options.singlePoint) {
 			// Initialise the marker at the center on the map if no coords are available
+			//TODO BUG si json entrée vide, n'affiche pas les champs numériques
 			coords.points.push(layer.map_.getView().getCenter());
 
 			// Keep only the first point

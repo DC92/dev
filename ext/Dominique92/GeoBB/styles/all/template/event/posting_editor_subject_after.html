@@ -19,6 +19,26 @@
 
 <div id="map"></div>
 
+<input type="text" id="marker-json" style="width:50%" wvalue='{
+	"type": "Point",
+	"coordinates": [7,47]
+}' />
+
+<div id="marker">
+	Lon <input type="text" name="lon" size="12" maxlength="12">(&nbsp;
+	Lat <input type="text" name="lat" size="12" maxlength="12">
+</div>
+
+<p><a onclick="viseur.centerMap()" style="color:blue;cursor:pointer">
+	Centrer la carte sur le curseur
+</u></a></p>
+
+<p><a onclick="viseur.centerMarker()" style="color:blue;cursor:pointer">
+	Déplacez le curseur au centre de la carte
+</u></a></p>
+
+
+
 
 +++{IMAGE_FORUM}---
 

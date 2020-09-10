@@ -5,7 +5,7 @@ const cadre = layerMarker({
 	}),
 	viseur = layerMarker({
 		displayPointId: 'drag-marker',
-		geoJsonId: 'fix-marker',
+		geoJsonId: 'drag-marker-json',
 		icon: 'viseur.png',
 		dragPoint: true,
 	});
