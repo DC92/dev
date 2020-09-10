@@ -1586,8 +1586,9 @@ function controlGPS() {
 			'deviceorientationabsolute',
 			function(evt) {
 				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-
-				if (heading && button.active == 1)
+				if (button.active == 1 &&
+					geolocation.getAltitude() &&
+					heading)
 					view.setRotation(
 						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 						0
@@ -1605,7 +1606,9 @@ function controlGPS() {
 
 	function renderReticule() {
 		const pos = geolocation.getPosition();
-		if (pos && geolocation.getTracking()) {
+		if (geolocation.getTracking() &&
+			geolocation.getAltitude() &&
+			pos) {
 			const map = button.map_,
 				// Estimate the viewport size
 				hg = map.getCoordinateFromPixel([0, 0]),
