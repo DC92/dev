@@ -1522,7 +1522,44 @@ function controlGeocoder(options) {
  */
 //BEST GPS tap on map = distance from GPS calculation
 function controlGPS() {
-	let view, geolocation;
+	let view, geolocation, nbLoc, position, altitude;
+
+	//Button
+	const button = controlButton({
+		className: 'myol-button ol-gps',
+		buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
+		title: 'Centrer sur la position GPS',
+		activate: function(active) {
+			geolocation.setTracking(active !== 0);
+			graticuleLayer.setVisible(active !== 0);
+			nbLoc = 0;
+			if (!active) {
+				view.setRotation(0, 0); // Set north to top
+				displayEl.innerHTML = '';
+			}
+		}
+	});
+
+	// Display status, altitude & speed
+	const displayEl = document.createElement('div');
+	displayEl.className = 'ol-control-gps';
+	button.element.appendChild(displayEl);
+
+	function displayValues() {
+		const displays = [],
+			speed = Math.round(geolocation.getSpeed() * 36) / 10 + ' km/h';
+
+		if (button.active) {
+			altitude = geolocation.getAltitude();
+			if (altitude) {
+				displays.push(Math.round(altitude) + ' m');
+				if (!isNaN(speed))
+					displays.push(speed);
+			} else
+				displays.push('GPS sync...');
+		}
+		displayEl.innerHTML = displays.join(', ');
+	}
 
 	// Graticule
 	const graticule = new ol.Feature(),
@@ -1551,28 +1588,62 @@ function controlGPS() {
 		})
 	}));
 
-	//Button
-	const button = controlButton({
-		className: 'myol-button ol-gps',
-		buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
-		title: 'Centrer sur la position GPS',
-		activate: function(active) {
-			if (button.active == 1)
-				view.setZoom(17); // Zoom on the area
+	function renderReticule() {
+		position = geolocation.getPosition();
+		if (button.active && altitude && position) {
+			const map = button.map_,
+				// Estimate the viewport size
+				hg = map.getCoordinateFromPixel([0, 0]),
+				bd = map.getCoordinateFromPixel(map.getSize()),
+				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
 
-			if (!active)
-				view.setRotation(0, 0); // Set north to top
+				// The graticule
+				geometry = [
+					new ol.geom.MultiLineString([
+						[
+							[position[0] - far, position[1]],
+							[position[0] + far, position[1]]
+						],
+						[
+							[position[0], position[1]],
+							[position[0], position[1] - far]
+						],
+					]),
+				],
 
-			geolocation.setTracking(active !== 0);
-			graticuleLayer.setVisible(active !== 0);
+				// Color north in red
+				northGeometry = [
+					new ol.geom.LineString([
+						[position[0], position[1]],
+						[position[0], position[1] + far]
+					]),
+				];
+
+			graticule.setGeometry(new ol.geom.GeometryCollection(geometry));
+			northGraticule.setGeometry(new ol.geom.GeometryCollection(northGeometry));
+
+			// The accurate circle
+			const accuracy = geolocation.getAccuracyGeometry();
+			if (accuracy)
+				geometry.push(accuracy);
+
+			// Center the map
+			if (button.active == 1) {
+				view.setCenter(position);
+
+				if (!nbLoc) // Only the first time after activation
+					view.setZoom(17); // Zoom on the area
+				nbLoc++;
+			}
 		}
-	});
+		displayValues();
+	}
 
 	button.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		map.addLayer(graticuleLayer);
 		view = map.getView();
+		map.addLayer(graticuleLayer);
 
 		geolocation = new ol.Geolocation({
 			projection: view.getProjection(),
@@ -1586,9 +1657,7 @@ function controlGPS() {
 			'deviceorientationabsolute',
 			function(evt) {
 				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-				if (button.active == 1 &&
-					geolocation.getAltitude() &&
-					heading)
+				if (button.active == 1 && altitude && heading)
 					view.setRotation(
 						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 						0
@@ -1596,80 +1665,13 @@ function controlGPS() {
 			}
 		);
 
+		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		map.on('moveend', renderReticule); // Refresh graticule after map zoom
 		geolocation.on('change:position', renderReticule);
-		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		geolocation.on('error', function(error) {
 			alert('Geolocation error: ' + error.message);
 		});
 	};
-
-	function renderReticule() {
-		const pos = geolocation.getPosition();
-		if (geolocation.getTracking() &&
-			geolocation.getAltitude() &&
-			pos) {
-			const map = button.map_,
-				// Estimate the viewport size
-				hg = map.getCoordinateFromPixel([0, 0]),
-				bd = map.getCoordinateFromPixel(map.getSize()),
-				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
-
-				// The graticule
-				geometry = [
-					new ol.geom.MultiLineString([
-						[
-							[pos[0] - far, pos[1]],
-							[pos[0] + far, pos[1]]
-						],
-						[
-							[pos[0], pos[1]],
-							[pos[0], pos[1] - far]
-						],
-					]),
-				],
-
-				// Color north in red
-				northGeometry = [
-					new ol.geom.LineString(
-						[
-							[pos[0], pos[1]],
-							[pos[0], pos[1] + far]
-						]
-					),
-				];
-
-			graticule.setGeometry(new ol.geom.GeometryCollection(geometry));
-			northGraticule.setGeometry(new ol.geom.GeometryCollection(northGeometry));
-
-			// The accurate circle
-			const accuracy = geolocation.getAccuracyGeometry();
-			if (accuracy)
-				geometry.push(accuracy);
-
-			// Center the map
-			if (button.active == 1)
-				view.setCenter(pos);
-		}
-	}
-
-	// Display altitude & speed
-	const displayEl = document.createElement('div');
-	displayEl.className = 'ol-control-gps';
-	button.element.appendChild(displayEl);
-
-	function displayValues() {
-		displays = [];
-		if (geolocation.getTracking()) {
-			const altitude = geolocation.getAltitude(),
-				speed = Math.round(geolocation.getSpeed() * 36) / 10 + ' km/h';
-			if (altitude)
-				displays.push(Math.round(altitude) + ' m');
-			if (!isNaN(speed))
-				displays.push(speed);
-		}
-		displayEl.innerHTML = displays.join(', ');
-	}
 
 	return button;
 }
