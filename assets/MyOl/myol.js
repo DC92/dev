@@ -12,7 +12,17 @@
 
 //HACKS For JS validators
 /* jshint esversion: 6 */
-if (!ol) var ol = {};
+
+/**
+ * Display version
+ */
+try {
+	new ol.Map({
+		layers: 1,
+	});
+} catch (err) {
+	console.log('ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+}
 
 /**
  * Debug facilities on mobile
