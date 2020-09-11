@@ -1,5 +1,5 @@
 const cadre = layerMarker({
-		displayPointId: 'fix-marker-json',
+		displayPointId: 'fix-marker',
 		coordinates: [2, 48],
 		icon: 'cadre.png',
 	}),
