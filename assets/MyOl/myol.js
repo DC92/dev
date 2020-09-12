@@ -1914,7 +1914,7 @@ function controlPrint() {
 }
 
 /**
- * Display & editable markers
+ * Display & editable marker
  */
 function layerMarker(options) {
 	options = Object.assign({
@@ -1930,7 +1930,7 @@ function layerMarker(options) {
 					featureProjection: 'EPSG:3857',
 					decimals: 5,
 				}
-			).replace(' ', '');
+			);
 		},
 	}, options);
 
@@ -2330,10 +2330,6 @@ function layerGeoJson(options) {
 			pointerPosition
 		);
 
-		// Display & edit 1st point coordinates
-		if (coords.points.length && displayPointEl)
-			displayPoint(coords.points[0]);
-
 		// Recreate features
 		source.clear();
 		if (options.singlePoint) {
@@ -2361,6 +2357,10 @@ function layerGeoJson(options) {
 					geometry: new ol.geom.Polygon(coords.polys[p]),
 				}));
 		}
+
+		// Display & edit 1st point coordinates
+		if (coords.points.length && displayPointEl)
+			displayPoint(coords.points[0]);
 
 		// Save geometries in <EL> as geoJSON at every change
 		if (geoJsonEl)
