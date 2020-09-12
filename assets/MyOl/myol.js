@@ -14,7 +14,7 @@
 /* jshint esversion: 6 */
 
 /**
- * Display version
+ * Display OL version
  */
 try {
 	new ol.style.Icon();
@@ -37,7 +37,7 @@ if (window.location.hash == '###')
 	};
 
 //HACK IE polyfills
-// You can include https://cdn.polyfill.io/v3/polyfill.min.js in place
+// You can include https://cdn.polyfill.io/v3/polyfill.min.js instead
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
