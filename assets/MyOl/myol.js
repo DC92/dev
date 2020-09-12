@@ -17,9 +17,7 @@
  * Display version
  */
 try {
-	new ol.Map({
-		layers: 1,
-	});
+	new ol.style.Icon();
 } catch (err) {
 	console.log('ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
