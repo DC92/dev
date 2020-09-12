@@ -45,7 +45,7 @@ class listener implements EventSubscriberInterface
 			'core.page_footer' => 'page_footer',
 
 			// Posting
-			'core.posting_modify_row_data' => 'posting_modify_row_data',
+//			'core.posting_modify_row_data' => 'posting_modify_row_data',
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
@@ -61,13 +61,13 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
+*/
 
 			// Posting
-			'core.modify_posting_auth' => 'modify_posting_auth',
-			'core.modify_posting_parameters' => 'modify_posting_parameters',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
+/*			'core.modify_posting_auth' => 'modify_posting_auth',
+			'core.modify_posting_parameters' => 'modify_posting_parameters',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 
 			// Resize images
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
@@ -89,9 +89,21 @@ class listener implements EventSubscriberInterface
 		POSTING
 	*/
 	function posting_modify_row_data($vars) {
+		//TODO garder ???? (demo/test posting point)
 		preg_match ('/([^\/]+)\.[a-z]+$/' , $vars['post_data']['forum_image'], $image);
 		if (isset ($image[1]))
 			$this->template->assign_var ('IMAGE_FORUM', $image[1]);
+	}
+
+	// Called when validating the data to be saved
+	function submit_post_modify_sql_data($vars) {
+		$sql_data = $vars['sql_data'];
+		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
+
+		// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
+		$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('{$post['geom']}')";
+		
+		$vars['sql_data'] = $sql_data; // return data
 	}
 
 	/**
@@ -107,5 +119,13 @@ class listener implements EventSubscriberInterface
 				'ALTER TABLE '.POSTS_TABLE.' ADD geom geometrycollection'
 			);
 		$this->db->sql_freeresult($result);
+
+		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
+		$file_name = "phpbb/db/driver/driver.php";
+		$file_tag = "\n\t\tif (is_null(\$var))";
+		$file_patch = "\n\t\tif (strpos(\$var, 'GeomFrom') !== false)\n\t\t\treturn \$var;";
+		$file_content = file_get_contents ($file_name);
+		if (strpos($file_content, '{'.$file_tag))
+			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
 	}
 }

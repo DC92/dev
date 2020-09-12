@@ -1,8 +1,13 @@
-const viseur = layerMarker({
+const viseur = layerGeoJson({
 	displayPointId: 'marker',
 	geoJsonId: 'marker-json',
-	icon: 'assets/MyOl/examples/viseur.png',
 	dragPoint: true,
+	singlePoint: true,
+	styleOptions: {
+		image: new ol.style.Icon({
+			src: 'assets/MyOl/examples/viseur.png',
+		}),
+	},
 });
 
 new ol.Map({

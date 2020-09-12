@@ -554,7 +554,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		$vars['page_data'] = $page_data;
 	}
 
-	// Call when validating the data to be saved
+	// Called when validating the data to be saved
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 
@@ -578,7 +578,7 @@ return;		//TODO CHEM OBSOLETE ????? Voir dans chem !
 		$this->modifs['geojson'] = str_replace (['ST_GeomFromGeoJSON(\'','\')'], '', $this->modifs['geom']);
 	}
 
-	// Call after the post validation
+	// Called after the post validation
 	function modify_submit_notification_data($vars) {
 		$this->save_post_data($vars['data_ary'], $vars['data_ary']['attachment_data'], $this->modifs);
 	}
