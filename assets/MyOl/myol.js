@@ -1301,6 +1301,7 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
+//TODO BUG don't add existing URL params
 function controlPermalink(options) {
 	options = Object.assign({
 		hash: '?', // {?, #} the permalink delimiter
@@ -1934,10 +1935,13 @@ function layerGeoJson(options) {
 				});
 		},
 		saveFeatures: function(coordinates, format) {
-			return format.writeFeatures(source.getFeatures(coordinates, format), {
-				featureProjection: options.projection,
-				decimals: 5,
-			});
+			return format.writeFeatures(
+					source.getFeatures(
+						coordinates, format), {
+						featureProjection: options.projection,
+						decimals: 5,
+					})
+				.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 		},
 		styleOptions: {
 			// Drag lines or Polygons
@@ -2345,27 +2349,13 @@ function layerGeoJson(options) {
  * Split lines having a summit at removePosition
  */
 function optimiseFeatures(features, withLines, withPolygons, merge, holes, removePosition) {
-	let points = [],
+	const points = [],
 		lines = [],
 		polys = [];
 
 	// Get all edited features as array of coordinates
-	for (let f in features) {
-		const geom = features[f].getGeometry();
-		if (typeof geom.getGeometries == 'function') {
-			// Expand geometryCollection
-			const geometries = geom.getGeometries();
-			for (let g in geometries)
-				flatCoord(lines, geometries[g].getCoordinates(), removePosition);
-		}
-		// Point
-		else if (geom.getType().match(/point$/i))
-			points.push(geom.getCoordinates());
-
-		// lines & poly
-		else
-			flatCoord(lines, geom.getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
-	}
+	for (let f in features)
+		flatFeatures(features[f].getGeometry(), points, lines, polys, removePosition);
 
 	for (let a in lines)
 		// Exclude 1 coordinate features (points)
@@ -2443,15 +2433,23 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 	};
 }
 
-function compareCoords(a, b) {
-	if (!a)
-		return false;
-	if (!b)
-		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
-	return a[0] == b[0] && a[1] == b[1]; // 2 coords
+function flatFeatures(geom, points, lines, polys, removePosition) {
+	// Expand geometryCollection
+	if (geom.getType() == 'GeometryCollection') {
+		const geometries = geom.getGeometries();
+		for (let g in geometries)
+			flatFeatures(geometries[g], points, lines, polys, removePosition);
+	}
+	// Point
+	else if (geom.getType().match(/point$/i))
+		points.push(geom.getCoordinates());
+
+	// line & poly
+	else
+		flatCoord(lines, geom.getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
 }
 
-// Get all lines fragments at the same level & split if one point = pointerPosition
+// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...) at the same level & split if one point = pointerPosition
 function flatCoord(existingCoords, newCoords, pointerPosition) {
 	if (typeof newCoords[0][0] == 'object') // Multi*
 		for (let c1 in newCoords)
@@ -2466,6 +2464,14 @@ function flatCoord(existingCoords, newCoords, pointerPosition) {
 				existingCoords[existingCoords.length - 1].push(newCoords[c2]);
 		}
 	}
+}
+
+function compareCoords(a, b) {
+	if (!a)
+		return false;
+	if (!b)
+		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
+	return a[0] == b[0] && a[1] == b[1]; // 2 coords
 }
 
 
@@ -2555,9 +2561,7 @@ function controlsCollection(options) {
 		}, options.controlLayersSwitcher)),
 		controlTilesBuffer(1, 4),
 		controlPermalink(options.controlPermalink),
-		new ol.control.Attribution({
-			collapsible: false, // Attribution always open
-		}),
+		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
 		controlLengthLine(),

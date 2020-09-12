@@ -54,14 +54,15 @@ class listener implements EventSubscriberInterface
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
-
+*/
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
+/*
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
-			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 */
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+//			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
@@ -83,6 +84,28 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_footer() {
+	}
+
+	/**
+		VIEWTOPIC.PHP
+	*/
+	// Appelé avant la requette SQL qui récupère les données des posts
+	function viewtopic_get_post_data($vars) {
+		$sql_ary = $vars['sql_ary'];
+
+		// Insère la conversion du champ geom en format geojson dans la requette SQL
+		$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geojson';
+
+		$vars['sql_ary'] = $sql_ary;
+	}
+
+	// Called during first pass on post data that read phpbb-posts SQL data
+	function viewtopic_post_rowset_data($vars) {
+		$this->template->assign_var ('GEOJSON', $vars['row']['geojson']);
+	}
+
+	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
+	function viewtopic_modify_post_row($vars) {
 	}
 
 	/**
