@@ -1914,36 +1914,6 @@ function controlPrint() {
 }
 
 /**
- * Display & editable marker
- */
-function layerMarker(options) {
-	options = Object.assign({
-		singlePoint: true,
-		styleOptions: {
-			image: new ol.style.Icon({
-				src: options.icon,
-			}),
-		},
-		saveFeatures: function(coordinates, format) {
-			return format.writeGeometry(
-				new ol.geom.Point(coordinates.points[0]), {
-					featureProjection: 'EPSG:3857',
-					decimals: 5,
-				}
-			);
-		},
-	}, options);
-
-	if (options.coordinates)
-		options.geoJson = {
-			type: 'Point',
-			coordinates: options.coordinates,
-		};
-
-	return layerGeoJson(options);
-}
-
-/**
  * geoJson points, lines & polygons display & edit
  * Marker position display & edit
  * Lines & polygons edit

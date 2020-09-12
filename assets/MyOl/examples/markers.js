@@ -1,13 +1,35 @@
-const cadre = layerMarker({
+const cadre = layerGeoJson({
 		displayPointId: 'fix-marker',
-		coordinates: [2, 48],
-		icon: 'cadre.png',
+		singlePoint: true,
+		geoJson: {
+			type: 'Point',
+			coordinates: [2, 48],
+		},
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'cadre.png',
+			}),
+		},
 	}),
-	viseur = layerMarker({
+	viseur = layerGeoJson({
 		displayPointId: 'drag-marker',
 		geoJsonId: 'drag-marker-json',
-		icon: 'viseur.png',
 		dragPoint: true,
+		singlePoint: true,
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'viseur.png',
+			}),
+		},
+		// Remove FeatureCollection packing of the point
+		saveFeatures: function(coordinates, format) {
+			return format.writeGeometry(
+				new ol.geom.Point(coordinates.points[0]), {
+					featureProjection: 'EPSG:3857',
+					decimals: 5,
+				}
+			);
+		},
 	});
 
 new ol.Map({
