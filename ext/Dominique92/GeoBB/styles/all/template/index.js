@@ -1,6 +1,6 @@
 const viseur = layerGeoJson({
 	displayPointId: 'marker',
-	geoJsonId: 'marker-json',
+	geoJsonId: 'geojson',
 	dragPoint: true,
 	singlePoint: true,
 	styleOptions: {

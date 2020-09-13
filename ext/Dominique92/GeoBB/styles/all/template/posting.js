@@ -15,38 +15,46 @@ var map = new ol.Map({
 	}),
 });
 
-if (image_forum == 'line')
+if (imageForum == 'line')
 	map.addLayer(layerGeoJson({
-		displayPointId: 'marker',
-		geoJsonId: 'marker-json',
-		focus: 16,
-		dragPoint: true,
-		singlePoint: true,
-		styleOptions: {
-			image: new ol.style.Icon({
-				src: 'assets/MyOl/examples/viseur.png',
-			}),
-		},
+		geoJsonId: 'geojson',
+		//TODO snapLayers: [wri],
+		titleModify: 'Modification d‘une ligne:\n' +
+			'Activer ce bouton (couleur jaune) puis\n' +
+			'Cliquer et déplacer un sommet pour modifier une ligne\n' +
+			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+			'Alt+cliquer sur un sommet pour le supprimer\n' +
+			'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
+			'Joindre les extrémités deux lignes pour les fusionner\.n',
+		titleLine: 'Création d‘une ligne:\n' +
+			'Activer ce bouton (couleur jaune) puis\n' +
+			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
+			'double cliquer pour terminer.\n' +
+			'Cliquer sur une extrémité d‘une ligne pour l‘étendre.',
 	}));
 
-else if (image_forum == 'poly')
+else if (imageForum == 'poly')
 	map.addLayer(layerGeoJson({
-		displayPointId: 'marker',
-		geoJsonId: 'marker-json',
-		focus: 16,
-		dragPoint: true,
-		singlePoint: true,
-		styleOptions: {
-			image: new ol.style.Icon({
-				src: 'assets/MyOl/examples/viseur.png',
-			}),
-		},
+		geoJsonId: 'geojson',
+		//TODO snapLayers: [wri],
+		titleModify: 'Modification d‘un polygone:\n' +
+			'Activer ce bouton (couleur jaune) puis\n' +
+			'Cliquer et déplacer un sommet pour modifier un polygone\n' +
+			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
+			'Alt+cliquer sur un sommet pour le supprimer\n' +
+			'Joindre un sommet de chaque polygone et Alt+cliquer pour les fusionner' +
+			'Ctrl+Alt+cliquer sur un polygone pour le supprimer.',
+		titlePolygon: 'Création d‘un polygone:\n' +
+			'Activer ce bouton (couleur jaune) puis\n' +
+			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
+			'double cliquer pour terminer.\n' +
+			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
 	}));
 
-else if (image_forum)
+else if (imageForum) // Point
 	map.addLayer(layerGeoJson({
 		displayPointId: 'marker',
-		geoJsonId: 'marker-json',
+		geoJsonId: 'geojson',
 		focus: 16,
 		dragPoint: true,
 		singlePoint: true,

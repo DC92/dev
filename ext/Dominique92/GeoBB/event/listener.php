@@ -92,6 +92,7 @@ class listener implements EventSubscriberInterface
 		INDEX.PHP
 	*/
 	// Add a button to create a topic in front of the list of forums
+	//TODO move in MyPhpBB (+ tune parameters)
 	function display_forums_modify_row ($vars) {
 		$row = $vars['row'];
 

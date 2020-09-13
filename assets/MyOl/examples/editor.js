@@ -1,6 +1,4 @@
-const wri = layerRefugesInfo(),
-
-	editor = layerGeoJson({
+const editor = layerGeoJson({
 		geoJsonId: 'geojson',
 		snapLayers: [wri],
 		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
@@ -28,7 +26,7 @@ const wri = layerRefugesInfo(),
 new ol.Map({
 	target: 'map',
 	layers: [
-		wri,
+		layerRefugesInfo(),
 		editor,
 	],
 	controls: controlsCollection({

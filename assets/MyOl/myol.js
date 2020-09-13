@@ -1759,6 +1759,7 @@ function controlLoadGPX(options) {
  * File downloader control
  * Requires controlButton
  */
+//TODO BUG lettre trop grosses dans GeoBB
 function controlDownload(options) {
 	options = Object.assign({
 		label: '\u25bc',
