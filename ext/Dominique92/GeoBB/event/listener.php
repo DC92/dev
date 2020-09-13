@@ -45,7 +45,7 @@ class listener implements EventSubscriberInterface
 			'core.page_footer' => 'page_footer',
 
 			// Posting
-//			'core.posting_modify_row_data' => 'posting_modify_row_data',
+			'core.posting_modify_row_data' => 'posting_modify_row_data',
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
@@ -112,10 +112,25 @@ class listener implements EventSubscriberInterface
 		POSTING
 	*/
 	function posting_modify_row_data($vars) {
+		$post_data = $vars['post_data'];
+
 		//TODO garder ???? (demo/test posting point)
-		preg_match ('/([^\/]+)\.[a-z]+$/' , $vars['post_data']['forum_image'], $image);
+		/*
+		preg_match ('/([^\/]+)\.[a-z]+$/' , $post_data['forum_image'], $image);
 		if (isset ($image[1]))
 			$this->template->assign_var ('IMAGE_FORUM', $image[1]);
+		*/
+
+		// Get translation of SQL space data
+//		if (isset ($post_data['geom'])) {
+			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
+				' FROM '.POSTS_TABLE.
+				' WHERE post_id = '.$post_data['post_id'];
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->template->assign_var ('GEOJSON', $row['geojson']);
+			$this->db->sql_freeresult($result);
+//		}
 	}
 
 	// Called when validating the data to be saved

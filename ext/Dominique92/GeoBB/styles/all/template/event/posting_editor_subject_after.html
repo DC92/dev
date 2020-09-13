@@ -19,12 +19,11 @@
 
 <div id="map"></div>
 
-<input type="text" id="marker-json" style="width:50%" name="geom" value='' />
-
-<div id="marker">
+<input type="hidden" id="marker-json" name="geom" value='{GEOJSON}' />
+<p id="marker">
 	Lon <input type="text" name="lon" size="12" maxlength="12">(&nbsp;
 	Lat <input type="text" name="lat" size="12" maxlength="12">
-</div>
+</p>
 
 <p><a onclick="viseur.centerMap()" style="color:blue;cursor:pointer">
 	Centrer la carte sur le curseur
