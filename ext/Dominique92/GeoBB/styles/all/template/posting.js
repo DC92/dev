@@ -1,19 +1,6 @@
-const viseur = layerGeoJson({
-	displayPointId: 'marker',
-	geoJsonId: 'marker-json',
-	focus: 16,
-	dragPoint: true,
-	singlePoint: true,
-	styleOptions: {
-		image: new ol.style.Icon({
-			src: 'assets/MyOl/examples/viseur.png',
-		}),
-	},
-});
-
-new ol.Map({
+var map = new ol.Map({
 	target: 'map',
-	layers: [viseur],
+	//	layers: [viseur],
 	controls: controlsCollection({
 		geoKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
@@ -27,3 +14,45 @@ new ol.Map({
 		},
 	}),
 });
+
+if (image_forum == 'line')
+	map.addLayer(layerGeoJson({
+		displayPointId: 'marker',
+		geoJsonId: 'marker-json',
+		focus: 16,
+		dragPoint: true,
+		singlePoint: true,
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'assets/MyOl/examples/viseur.png',
+			}),
+		},
+	}));
+
+else if (image_forum == 'poly')
+	map.addLayer(layerGeoJson({
+		displayPointId: 'marker',
+		geoJsonId: 'marker-json',
+		focus: 16,
+		dragPoint: true,
+		singlePoint: true,
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'assets/MyOl/examples/viseur.png',
+			}),
+		},
+	}));
+
+else if (image_forum)
+	map.addLayer(layerGeoJson({
+		displayPointId: 'marker',
+		geoJsonId: 'marker-json',
+		focus: 16,
+		dragPoint: true,
+		singlePoint: true,
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'assets/MyOl/examples/viseur.png',
+			}),
+		},
+	}));

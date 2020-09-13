@@ -24,13 +24,15 @@ class listener implements EventSubscriberInterface
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
 		\phpbb\user $user,
-		\phpbb\auth\auth $auth
+		\phpbb\auth\auth $auth,
+		$phpbb_root_path
 	) {
 		$this->db = $db;
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
 		$this->auth = $auth;
+		$this->phpbb_root_path = $phpbb_root_path;
 	}
 
 	// List of hooks and related functions
@@ -50,9 +52,9 @@ class listener implements EventSubscriberInterface
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
 
-/*
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
+/*
 			'core.index_modify_page_title' => 'index_modify_page_title',
 */
 			// Viewtopic
@@ -87,6 +89,21 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+		INDEX.PHP
+	*/
+	// Add a button to create a topic in front of the list of forums
+	function display_forums_modify_row ($vars) {
+		$row = $vars['row'];
+
+		if ($this->auth->acl_get('f_post', $row['forum_id']) &&
+			$row['forum_type'] == FORUM_POST)
+			$row['forum_name'] .= ' &nbsp; '.
+				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer</a>';
+
+		$vars['row'] = $row;
+	}
+
+	/**
 		VIEWTOPIC.PHP
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
@@ -114,12 +131,10 @@ class listener implements EventSubscriberInterface
 	function posting_modify_row_data($vars) {
 		$post_data = $vars['post_data'];
 
-		//TODO garder ???? (demo/test posting point)
-		/*
+		// For editing facilities choice
 		preg_match ('/([^\/]+)\.[a-z]+$/' , $post_data['forum_image'], $image);
 		if (isset ($image[1]))
 			$this->template->assign_var ('IMAGE_FORUM', $image[1]);
-		*/
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {
@@ -158,8 +173,8 @@ class listener implements EventSubscriberInterface
 			);
 		$this->db->sql_freeresult($result);
 
-		// HORRIBLE phpbb hack to accept geom values //TODO-ARCHI : check if done by PhpBB (supposed 3.2)
-		$file_name = "phpbb/db/driver/driver.php";
+		//HACK (horrible !) to accept geom spatial feild
+		$file_name = $this->phpbb_root_path."phpbb/db/driver/driver.php";
 		$file_tag = "\n\t\tif (is_null(\$var))";
 		$file_patch = "\n\t\tif (strpos(\$var, 'GeomFrom') !== false)\n\t\t\treturn \$var;";
 		$file_content = file_get_contents ($file_name);

@@ -13,34 +13,39 @@
 <link  href="assets/MyOl/myol.css" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/myol.js"></script>
 
+<script>
+	var image_forum = '{IMAGE_FORUM}';
+</script>
+
 <!-- This map -->
-<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
-<!-- INCLUDEJS @Dominique92_GeoBB/posting.js -->
+<!-- IF IMAGE_FORUM -->
+	<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
+	<!-- INCLUDEJS @Dominique92_GeoBB/posting.js -->
 
-<div id="map"></div>
+	<div id="map"></div>
 
-<input type="hidden" id="marker-json" name="geom" value='{GEOJSON}' />
-<p id="marker">
-	Lon <input type="text" name="lon" size="12" maxlength="12">(&nbsp;
-	Lat <input type="text" name="lat" size="12" maxlength="12">
-</p>
+	<input type="hidden" id="marker-json" name="geom" value='{GEOJSON}' />
+	<p id="marker">
+		Lon <input type="text" name="lon" size="12" maxlength="12">(&nbsp;
+		Lat <input type="text" name="lat" size="12" maxlength="12">
+	</p>
 
-<p><a onclick="viseur.centerMap()" style="color:blue;cursor:pointer">
-	Centrer la carte sur le curseur
-</u></a></p>
+	<p><a onclick="viseur.centerMap()" style="color:blue;cursor:pointer">
+		Centrer la carte sur le curseur
+	</u></a></p>
 
-<p><a onclick="viseur.centerMarker()" style="color:blue;cursor:pointer">
-	Déplacez le curseur au centre de la carte
-</u></a></p>
-
-
-
-
-+++{IMAGE_FORUM}---
+	<p><a onclick="viseur.centerMarker()" style="color:blue;cursor:pointer">
+		Déplacez le curseur au centre de la carte
+	</u></a></p>
+<!-- ENDIF -->
 
 
 
-AAA
+
+
+
+
+AAAAAAAAAAAAAAAAAAAAA
 <!-- IF GEO_MAP_TYPE and POST_ID == TOPIC_FIRST_POST_ID -->
 <!-- INCLUDE map.html -->
 
