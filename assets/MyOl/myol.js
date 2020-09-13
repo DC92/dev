@@ -474,9 +474,9 @@ function hoverManager(map) {
 			const link = hoveredFeature.getProperties().link;
 			if (link) {
 				if (evt.originalEvent.ctrlKey) {
-					const win = window.open(link, '_blank');
+					const tab = window.open(link, '_blank');
 					if (evt.originalEvent.shiftKey)
-						win.focus();
+						tab.focus();
 				} else
 					window.location = link;
 			}
@@ -2060,7 +2060,7 @@ function layerGeoJson(options) {
 			for (let f in features)
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
 			map.getView().fit(extent, {
-				maxZoom: 17,
+				maxZoom: options.focus,
 			});
 		}
 

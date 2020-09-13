@@ -122,7 +122,7 @@ class listener implements EventSubscriberInterface
 		*/
 
 		// Get translation of SQL space data
-//		if (isset ($post_data['geom'])) {
+		if (isset ($post_data['geom'])) {
 			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
 				' FROM '.POSTS_TABLE.
 				' WHERE post_id = '.$post_data['post_id'];
@@ -130,7 +130,7 @@ class listener implements EventSubscriberInterface
 			$row = $this->db->sql_fetchrow($result);
 			$this->template->assign_var ('GEOJSON', $row['geojson']);
 			$this->db->sql_freeresult($result);
-//		}
+		}
 	}
 
 	// Called when validating the data to be saved
