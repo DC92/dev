@@ -146,5 +146,6 @@ header("Cache-Control: max-age=$secondes_de_cache");
 echo json_encode ([
 	'type' => 'FeatureCollection',
 	'timestamp' => date('c'),
-	'features' => $features
+	'features' => $features,
+	//TODO ajouter link (pour click sur le feature)
 ]);

@@ -501,7 +501,8 @@ function hoverManager(map) {
 			labelEl.className = 'myol-popup-hidden';
 		else {
 			// Search hovered label
-			const hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
+			const mapRect = map.getTargetElement().getBoundingClientRect(),
+				hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect['x'], evt.pixel[1] + mapRect['y']);
 			if (hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
 				// Search hovered features
 				let closestFeature = null,
@@ -621,6 +622,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires JSONparse, myol:onadd, escapedStyle, hoverManager,
  * permanentCheckboxList, controlPermanentCheckbox, ol.loadingstrategy.bboxLimit
  */
+//TODO BUG jointure survol entre l'icône et le label dépend du dessin dans l'icône
 function layerVectorURL(options) {
 	options = Object.assign({
 		/** All ol.source.Vector options */
