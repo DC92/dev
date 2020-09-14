@@ -9,9 +9,62 @@ const cadre = layerGeoJson({
 	},
 });
 
+function layerStyleOptionsFunction(properties, hover) {
+	if (properties.icon)
+		return {
+			image: new ol.style.Icon({
+				src: properties.icon,
+			})
+		};
+
+	return {
+		fill: new ol.style.Fill({
+			color: 'rgba(0,0,255,' + (hover ? 0.2 : 0.1) + ')'
+		}),
+		stroke: new ol.style.Stroke({
+			color: 'blue',
+			width: hover ? 3 : 1.5
+		})
+	};
+}
+
+const gis = layerVectorURL({
+	baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300',
+	urlSuffix: '',
+	strategy: ol.loadingstrategy.bboxLimit,
+	receiveProperties: function(properties) {
+		properties.name = 'properties.nom';
+		properties.link = 'properties.url';
+		properties.copy = 'chemineur.fr';
+	},
+	styleOptions: function(properties) {
+		return {
+			// POI
+			image: new ol.style.Icon({
+				src: properties.icon,
+			}),
+			// Traces
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 3,
+			}),
+		};
+	},
+	hoverStyleOptions: {
+		stroke: new ol.style.Stroke({ // For traces
+			color: 'red',
+			width: 3,
+		})
+	},
+});
+
 new ol.Map({
 	target: 'map',
-	layers: [cadre],
+	layers: [
+		layerChemineur(),
+		gis,
+		cadre,
+	],
 	controls: controlsCollection({
 		geoKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats

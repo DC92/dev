@@ -1666,7 +1666,8 @@ function controlGPS() {
 			'deviceorientationabsolute',
 			function(evt) {
 				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-				if (button.active == 1 && altitude && heading)
+				if (button.active == 1 &&
+					event.absolute) // Breaks support for non-absolute browsers, like firefox mobile
 					view.setRotation(
 						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 						0
