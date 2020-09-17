@@ -94,16 +94,20 @@ class listener implements EventSubscriberInterface
 	// Appelé avant la requette SQL qui récupère les données des posts
 	function viewtopic_get_post_data($vars) {
 		$sql_ary = $vars['sql_ary'];
+		$topic_data = $vars['topic_data'];
 
 		// Insère la conversion du champ geom en format geojson dans la requette SQL
-		$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geojson';
+		$sql_ary['SELECT'] .= ', "'.$topic_data['topic_first_post_id'].'" AS topic_first_post_id, ST_AsGeoJSON(geom) AS geojson';
 
 		$vars['sql_ary'] = $sql_ary;
 	}
 
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
-		$this->template->assign_var ('GEOJSON', $vars['row']['geojson']);
+		$row = $vars['row'];
+
+		if ($row['post_id'] == $row['topic_first_post_id'])
+			$this->template->assign_var ('GEOJSON', $row['geojson']);
 	}
 
 	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template

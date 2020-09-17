@@ -57,6 +57,7 @@ $sql_array = [
 		'geom IS NOT NULL',
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",
 		'post_visibility = '.ITEM_APPROVED,
+		't.topic_first_post_id = p.post_id',
 	],
 	'ORDER_BY' => "CASE WHEN f.forum_id = $priority THEN 0 ELSE left_id END",
 ];
