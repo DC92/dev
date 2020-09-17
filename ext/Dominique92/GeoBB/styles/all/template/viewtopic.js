@@ -22,17 +22,19 @@ new ol.Map({
 				properties.copy = 'chemineur.fr';
 			},
 			styleOptions: function(properties) {
-				return {
-					// POI
-					image: new ol.style.Icon({
-						src: properties.icon,
-					}),
+				const style = {
 					// Traces
 					stroke: new ol.style.Stroke({
 						color: 'blue',
 						width: 3,
 					}),
-				};
+				}
+				if (properties.icon)
+					// POI
+					style.image = new ol.style.Icon({
+						src: properties.icon,
+					});
+				return style;
 			},
 			hoverStyleOptions: {
 				stroke: new ol.style.Stroke({ // For traces
