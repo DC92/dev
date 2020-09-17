@@ -94,10 +94,10 @@ class listener implements EventSubscriberInterface
 	// Appelé avant la requette SQL qui récupère les données des posts
 	function viewtopic_get_post_data($vars) {
 		$sql_ary = $vars['sql_ary'];
-		$topic_data = $vars['topic_data'];
+		$this->topic_data = $vars['topic_data'];
 
 		// Insère la conversion du champ geom en format geojson dans la requette SQL
-		$sql_ary['SELECT'] .= ', "'.$topic_data['topic_first_post_id'].'" AS topic_first_post_id, ST_AsGeoJSON(geom) AS geojson';
+		$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geojson';
 
 		$vars['sql_ary'] = $sql_ary;
 	}
@@ -106,7 +106,8 @@ class listener implements EventSubscriberInterface
 	function viewtopic_post_rowset_data($vars) {
 		$row = $vars['row'];
 
-		if ($row['post_id'] == $row['topic_first_post_id'])
+		if ($row['post_id'] == $this->topic_data['topic_first_post_id'] || // Only map on the first topic
+			strstr ($this->topic_data['forum_image'], '_.')) // Image name ends by _ = map on all post of same topic
 			$this->template->assign_var ('GEOJSON', $row['geojson']);
 	}
 
@@ -123,12 +124,11 @@ class listener implements EventSubscriberInterface
 		// For editing facilities choice
 		preg_match ('/([^\/]+)\.[a-z]+$/' , $post_data['forum_image'], $image);
 		if (isset ($image[1]))
-			$this->template->assign_var ('IMAGE_FORUM', $image[1]);
+			$this->template->assign_var ('FORUM_IMAGE', $image[1]);
 
-		$this->template->assign_vars ([
-			'POST_ID' => $post_data['post_id'],
-			'TOPIC_FIRST_POST_ID' => $post_data['topic_first_post_id'],
-		]);
+		if ($post_data['post_id'] == $post_data['topic_first_post_id'] || // Only map on the first topic
+			strstr ($post_data['forum_image'], '_.')) // Image name ends by _ = map on all post of same topic
+			$this->template->assign_var ('HAS_MAP', true);
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {

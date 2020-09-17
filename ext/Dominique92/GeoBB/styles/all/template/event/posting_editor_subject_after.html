@@ -14,18 +14,18 @@
 <script src="assets/MyOl/myol.js"></script>
 
 <script>
-	var imageForum = '{IMAGE_FORUM}';
+	var imageForum = '{FORUM_IMAGE}';
 </script>
 
 <!-- The map -->
-<!-- IF IMAGE_FORUM and TOPIC_FIRST_POST_ID == POST_ID -->
+<!-- IF FORUM_IMAGE and HAS_MAP -->
 	<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
 	<!-- INCLUDEJS @Dominique92_GeoBB/posting.js -->
 
 		<div id="map"></div>
 		<input type="hidden" id="geojson" name="geom" value='{GEOJSON}' />
 
-	<!-- IF IMAGE_FORUM != 'line' and IMAGE_FORUM != 'poly' -->
+	<!-- IF FORUM_IMAGE != 'line' and FORUM_IMAGE != 'poly' -->
 		<p id="marker">
 			Lon <input type="text" name="lon" size="12" maxlength="12">(&nbsp;
 			Lat <input type="text" name="lat" size="12" maxlength="12">
