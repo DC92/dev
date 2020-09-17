@@ -155,9 +155,10 @@ class listener implements EventSubscriberInterface
 		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 
 		// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-		$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('{$post['geom']}')";
+		if ($post['geom'])
+			$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('{$post['geom']}')";
 		
-		$vars['sql_data'] = $sql_data; // return data
+		$vars['sql_data'] = $sql_data; // Return data
 	}
 
 	/**

@@ -57,10 +57,6 @@ $sql_array = [
 		'geom IS NOT NULL',
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",
 		'post_visibility = '.ITEM_APPROVED,
-		'OR' => [
-			't.topic_first_post_id = p.post_id',
-			'forum_desc LIKE "%[all=%"', //TODO DELETE ?
-		],
 	],
 	'ORDER_BY' => "CASE WHEN f.forum_id = $priority THEN 0 ELSE left_id END",
 ];
@@ -72,7 +68,7 @@ if (is_array ($sql_array ['SELECT']))
 if (is_array ($sql_array ['WHERE'])) {
 	foreach ($sql_array ['WHERE'] AS $k=>&$w)
 		if (is_array ($w))
-			$w = '('.implode (" $k ", $w).')';
+			$w = '('.implode (" $k ", $w).')'; //TODO ??? w ne modifie pas $sql_array
 	$sql_array ['WHERE'] = implode (' AND ', $sql_array ['WHERE']);
 }
 $sql = $db->sql_build_query('SELECT', $sql_array);
