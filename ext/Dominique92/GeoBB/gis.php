@@ -93,6 +93,7 @@ while ($row = $db->sql_fetchrow($result)) {
 
 	$properties = [
 		'name' => $row['post_subject'],
+		'link' => $bu.'viewtopic.php?t='.$row['topic_id'],
 		'id' => $row['topic_id'],
 		'type_id' => $row['forum_id'],
 		'post_id' => $row['post_id'],
@@ -126,7 +127,6 @@ function signature ($coord) {
 	return round ($coord[0], 5).'_'.round ($coord[1], 5);
 }
 
-
 // Formatage du header
 $secondes_de_cache = 10;
 $ts = gmdate("D, d M Y H:i:s", time() + $secondes_de_cache) . " GMT";
@@ -143,5 +143,4 @@ echo json_encode ([
 	'type' => 'FeatureCollection',
 	'timestamp' => date('c'),
 	'features' => $features,
-	//TODO ajouter link (pour click sur le feature)
 ]);

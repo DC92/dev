@@ -34,6 +34,7 @@ class listener implements EventSubscriberInterface
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
+		$this->auth = $auth;
 		$this->language = $language;
 
 /**
@@ -68,17 +69,36 @@ class listener implements EventSubscriberInterface
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
 		return [
-			// Posting
-			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
-			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
-
 			// All
 			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
 
 			// Ucp&mode=register
 			'core.ucp_register_requests_after' => 'ucp_register_requests_after',
+
+			// Index
+			'core.display_forums_modify_row' => 'display_forums_modify_row',
+
+			// Posting
+			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
+			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
+			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 		];
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	// Add a button to create a topic in front of the list of forums
+	function display_forums_modify_row ($vars) {
+		$row = $vars['row'];
+
+		if (defined('CREATE_POST_BUTTON') &&
+			$this->auth->acl_get('f_post', $row['forum_id']) &&
+			$row['forum_type'] == FORUM_POST)
+			$row['forum_name'] .= ' &nbsp; '.
+				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer</a>';
+
+		$vars['row'] = $row;
 	}
 
 /**
@@ -87,9 +107,10 @@ class listener implements EventSubscriberInterface
 	function posting_modify_submission_errors($vars) {
 		$error = $vars['error'];
 
-		foreach ($error AS $k=>$v)
-			if ($v == $this->user->lang['TOO_FEW_CHARS'])
-				unset ($error[$k]);
+		if (defined('POST_EMPTY_TEXT'))
+			foreach ($error AS $k=>$v)
+				if ($v == $this->user->lang['TOO_FEW_CHARS'])
+					unset ($error[$k]);
 
 		$vars['error'] = $error;
 	}
@@ -103,7 +124,8 @@ class listener implements EventSubscriberInterface
  */
 		$page_data = $vars['page_data'];
 
-		if (!$post_data['post_subject'])
+		if (defined('POST_EMPTY_SUBJECT') &&
+			!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'New';
 
 		$vars['page_data'] = $page_data;
@@ -112,23 +134,24 @@ class listener implements EventSubscriberInterface
  * Keep trace of values prior to modifications
  * Create a log file with the post existing data if there is none
  */
-		// Create the LOG directory if none
-		if (!is_dir('LOG'))
-			mkdir('LOG');
-		// Add a blank file if none
-		file_put_contents ('LOG/index.html', '');
+		if (defined('LOG_EDIT')) {
+			// Create the LOG directory if none
+			if (!is_dir('LOG'))
+				mkdir('LOG');
+			// Add a blank file if none
+			file_put_contents ('LOG/index.html', '');
 
-		// Create the file with the existing post data
-		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-		if (!file_exists ($file_name))
-			file_put_contents ($file_name,
-				pack('CCC',0xef,0xbb,0xbf). // UTF-8 encoding
-				date('r').PHP_EOL.
-				'Titre: '.$post_data['post_subject'].PHP_EOL.
-				$post_data['post_text'].PHP_EOL.
-				$this->specific_data($post_data).PHP_EOL
-			);
-
+			// Create the file with the existing post data
+			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+			if (!file_exists ($file_name))
+				file_put_contents ($file_name,
+					pack('CCC',0xef,0xbb,0xbf). // UTF-8 encoding
+					date('r').PHP_EOL.
+					'Titre: '.$post_data['post_subject'].PHP_EOL.
+					$post_data['post_text'].PHP_EOL.
+					$this->specific_data($post_data).PHP_EOL
+				);
+		}
 	}
 
 /**
@@ -139,13 +162,14 @@ class listener implements EventSubscriberInterface
 		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 
 		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-		file_put_contents ($file_name,
-			'_______________________________'.PHP_EOL.
-			date('r').' '.$this->user->data['username'].PHP_EOL.
-			'Titre: '.$post['subject'].PHP_EOL.
-			$post['message'].PHP_EOL.
-			$this->specific_data($post).PHP_EOL,
-		FILE_APPEND);
+		if (defined('LOG_EDIT'))
+			file_put_contents ($file_name,
+				'_______________________________'.PHP_EOL.
+				date('r').' '.$this->user->data['username'].PHP_EOL.
+				'Titre: '.$post['subject'].PHP_EOL.
+				$post['message'].PHP_EOL.
+				$this->specific_data($post).PHP_EOL,
+			FILE_APPEND);
 	}
 
 	function specific_data($post_data) {
@@ -178,14 +202,19 @@ class listener implements EventSubscriberInterface
  */
 	function twig_environment_render_template_before($vars) {
 		if(defined('DUMP_GLOBALS')) {
+			ini_set('xdebug.var_display_max_depth', '2');
+			ini_set('xdebug.var_display_max_children', '1024');
 			$this->request->enable_super_globals();
 			var_dump ([DUMP_GLOBALS => $GLOBALS[DUMP_GLOBALS]]);
 			$this->request->disable_super_globals();
 		}
 
 		if(defined('DUMP_TEMPLATE') &&
-			$vars['name'] != 'attachment.html')
+			$vars['name'] != 'attachment.html') {
+			ini_set('xdebug.var_display_max_depth', '1');
+			ini_set('xdebug.var_display_max_children', '1024');
 			var_dump('TEMPLATE '.$vars['name'], $vars['context']);
+		}
 	}
 
 /**

@@ -53,7 +53,7 @@ class listener implements EventSubscriberInterface
 			'core.adm_page_header' => 'adm_page_header',
 
 			// Index
-			'core.display_forums_modify_row' => 'display_forums_modify_row',
+//			'core.display_forums_modify_row' => 'display_forums_modify_row',
 /*
 			'core.index_modify_page_title' => 'index_modify_page_title',
 */
@@ -89,22 +89,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-		INDEX.PHP
-	*/
-	// Add a button to create a topic in front of the list of forums
-	//TODO move in MyPhpBB (+ tune parameters)
-	function display_forums_modify_row ($vars) {
-		$row = $vars['row'];
-
-		if ($this->auth->acl_get('f_post', $row['forum_id']) &&
-			$row['forum_type'] == FORUM_POST)
-			$row['forum_name'] .= ' &nbsp; '.
-				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer</a>';
-
-		$vars['row'] = $row;
-	}
-
-	/**
 		VIEWTOPIC.PHP
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
@@ -136,6 +120,11 @@ class listener implements EventSubscriberInterface
 		preg_match ('/([^\/]+)\.[a-z]+$/' , $post_data['forum_image'], $image);
 		if (isset ($image[1]))
 			$this->template->assign_var ('IMAGE_FORUM', $image[1]);
+
+		$this->template->assign_vars ([
+			'POST_ID' => $post_data['post_id'],
+			'TOPIC_FIRST_POST_ID' => $post_data['topic_first_post_id'],
+		]);
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {
