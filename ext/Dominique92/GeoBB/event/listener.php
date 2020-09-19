@@ -19,73 +19,32 @@ class listener implements EventSubscriberInterface
 {
 	// List of externals
 	public function __construct(
-		//TODO purge
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
-		\phpbb\user $user,
-		\phpbb\auth\auth $auth,
 		$phpbb_root_path
 	) {
 		$this->db = $db;
 		$this->request = $request;
 		$this->template = $template;
-		$this->user = $user;
-		$this->auth = $auth;
 		$this->phpbb_root_path = $phpbb_root_path;
 	}
 
 	// List of hooks and related functions
 	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
-		// For debug, Varnish will not be caching pages where you are setting a cookie
-		if (defined('DEBUG_CONTAINER'))
-			setcookie('disable-varnish', microtime(true), time()+600, '/');
-
 		return [
-			// All
-			'core.page_footer' => 'page_footer',
+			// Viewtopic
+			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 
 			// Posting
 			'core.posting_modify_row_data' => 'posting_modify_row_data',
+			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
-
-			// Index
-//			'core.display_forums_modify_row' => 'display_forums_modify_row',
-/*
-			'core.index_modify_page_title' => 'index_modify_page_title',
-*/
-			// Viewtopic
-			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
-/*
-			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
-			'core.viewtopic_post_row_after' => 'viewtopic_post_row_after',
-*/
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
-//			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
-
-			// Posting
-			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
-/*			'core.modify_posting_auth' => 'modify_posting_auth',
-			'core.modify_posting_parameters' => 'modify_posting_parameters',
-			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
-
-			// Resize images
-			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
-
-			// Registration
-			'core.ucp_register_welcome_email_before' => 'ucp_register_welcome_email_before',
-*/
 		];
-	}
-
-
-	/**
-		ALL
-	*/
-	function page_footer() {
 	}
 
 	/**
@@ -106,13 +65,10 @@ class listener implements EventSubscriberInterface
 	function viewtopic_post_rowset_data($vars) {
 		$row = $vars['row'];
 
-		if ($row['post_id'] == $this->topic_data['topic_first_post_id'] || // Only map on the first topic
-			strstr ($this->topic_data['forum_image'], '_.')) // Image name ends by _ = map on all post of same topic
+		if ($this->topic_data['forum_image'] && // Only for the forums that have a forum icon
+			($row['post_id'] == $this->topic_data['topic_first_post_id'] || // Only map on the first topic
+			strstr ($this->topic_data['forum_image'], '_.'))) // Image name ends by _ = map on all post of same topic
 			$this->template->assign_var ('GEOJSON', $row['geojson']);
-	}
-
-	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
-	function viewtopic_modify_post_row($vars) {
 	}
 
 	/**

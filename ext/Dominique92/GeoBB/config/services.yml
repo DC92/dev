@@ -5,8 +5,6 @@ services:
             - '@dbal.conn'
             - '@request'
             - '@template'
-            - '@user'
-            - '@auth'
             - '%core.root_path%'
         tags:
             - { name: event.listener }
