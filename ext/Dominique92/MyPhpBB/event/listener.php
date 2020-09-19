@@ -37,35 +37,37 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 		$this->language = $language;
 
-/**
- * Includes language files of this extension
- */
+//TODO BUG ADM Ne pas initialiser forum image avec le user/password
+
+		/**
+		 * Includes language files of this extension
+		 */
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 
-/**
- * Includes style files of this extension
- */
-//TODO explore all active extensions
-//TODO bug acp_main.html
-/*
+		/**
+		 * Includes style files of this extension
+		 */
+		//TODO explore all active extensions
+		//TODO bug acp_main.html
+		/*
 		$this->ext_path = 'ext/'.$ns[0].'/'.$ns[1].'/';
 		$template->set_style ([
 			$this->ext_path.'styles',
 			'styles', // core styles
 			'adm', // core styles //TODO needed for template/adm/...
 		]);
-*/
+		*/
 	}
 
 	// List of hooks and related functions
 	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 
-/**
- * For debug, Varnish will not be caching pages where you are setting a cookie
- */
-		if (defined('DEBUG_CONTAINER'))
+	/**
+	 * For debug, Varnish will not be caching pages where you are setting a cookie
+	 */
+		if (defined('MYPHPBB_DISABLE_VARNISH'))
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
 		return [
@@ -88,11 +90,11 @@ class listener implements EventSubscriberInterface
 	/**
 		INDEX.PHP
 	*/
-	// Add a button to create a topic in front of the list of forums
+	// Add a post create button on index & viewforom forum description lines
 	function display_forums_modify_row ($vars) {
 		$row = $vars['row'];
 
-		if (defined('CREATE_POST_BUTTON') &&
+		if (defined('MYPHPBB_CREATE_POST_BUTTON') &&
 			$this->auth->acl_get('f_post', $row['forum_id']) &&
 			$row['forum_type'] == FORUM_POST)
 			$row['forum_name'] .= ' &nbsp; '.
@@ -101,45 +103,33 @@ class listener implements EventSubscriberInterface
 		$vars['row'] = $row;
 	}
 
-/**
- * Allows entering a POST with empty text
- */
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		if (defined('POST_EMPTY_TEXT'))
-			foreach ($error AS $k=>$v)
-				if ($v == $this->user->lang['TOO_FEW_CHARS'])
-					unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
-
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 
-/**
- * Prevent an empty title to invalidate the full page and input.
- */
+		/**
+		 * Prevent an empty title to invalidate the full page and input.
+		 */
 		$page_data = $vars['page_data'];
 
-		if (defined('POST_EMPTY_SUBJECT') &&
+		if (defined('MYPHPBB_POST_EMPTY_SUBJECT') &&
 			!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'New';
 
 		$vars['page_data'] = $page_data;
 
-/**
- * Keep trace of values prior to modifications
- * Create a log file with the post existing data if there is none
- */
-		if (defined('LOG_EDIT')) {
+		/**
+		 * Keep trace of values prior to modifications
+		 * Create a log file with the post existing data if there is none
+		 */
+		if (defined('MYPHPBB_LOG_EDIT')) {
 			// Create the LOG directory if none
 			if (!is_dir('LOG'))
 				mkdir('LOG');
 			// Add a blank file if none
 			file_put_contents ('LOG/index.html', '');
+
+			$this->template->assign_var('MYPHPBB_LOG_EDIT', true);
 
 			// Create the file with the existing post data
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
@@ -154,15 +144,15 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-/**
- * Log new post data
- */
+	/**
+	 * Log new post data
+	 */
 	function modify_submit_notification_data($vars) {
 		$post_data = $vars['data_ary'];
 		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 
 		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
-		if (defined('LOG_EDIT'))
+		if (defined('MYPHPBB_LOG_EDIT'))
 			file_put_contents ($file_name,
 				'_______________________________'.PHP_EOL.
 				date('r').' '.$this->user->data['username'].PHP_EOL.
@@ -185,37 +175,53 @@ class listener implements EventSubscriberInterface
 		return $r;
 	}
 
-	// Inhibe l'enregistrement des pays non autorisés dans $config['country_codes']
-	function ucp_register_requests_after () {
+	// Inhibits the registration of unauthorized countries list in MYPHPBB_COUNTRY_CODES ['FR, ...'] ISO-3166 Country Codes
+	function ucp_register_requests_after() {
 		global $config;
-		if (defined('COUNTRY_CODES')) {
+		if (defined('MYPHPBB_COUNTRY_CODES')) {
 			$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 			$iplocation = unserialize (file_get_contents ('http://www.geoplugin.net/php.gp?ip='.$server['REMOTE_ADDR']));
-			if (!strpos (COUNTRY_CODES, $iplocation['geoplugin_countryCode']))
+			if (!strpos (MYPHPBB_COUNTRY_CODES, $iplocation['geoplugin_countryCode']))
 				header ('Location: ucp.php');
 		}
 	}
 
-/**
- * DEBUG
- * Dump global & templates variables
- */
+	/**
+	 * Allows entering a POST with empty text
+	 */
+	// Called when validating the data to be saved
+	function posting_modify_submission_errors($vars) {
+		$error = $vars['error'];
+
+		if (defined('MYPHPBB_POST_EMPTY_TEXT'))
+			foreach ($error AS $k=>$v)
+				if ($v == $this->user->lang['TOO_FEW_CHARS'])
+					unset ($error[$k]);
+
+		$vars['error'] = $error;
+	}
+
+	/**
+	 * DEBUG
+	 * Dump global & templates variables
+	 */
 	function twig_environment_render_template_before($vars) {
-		if(defined('DUMP_GLOBALS')) {
+		if(defined('MYPHPBB_DUMP_GLOBALS')) {
 			ini_set('xdebug.var_display_max_depth', '2');
 			ini_set('xdebug.var_display_max_children', '1024');
 			$this->request->enable_super_globals();
-			var_dump ([DUMP_GLOBALS => $GLOBALS[DUMP_GLOBALS]]);
+			var_dump ([MYPHPBB_DUMP_GLOBALS => $GLOBALS[MYPHPBB_DUMP_GLOBALS]]);
 			$this->request->disable_super_globals();
 		}
 
-		if(defined('DUMP_TEMPLATE') &&
+		if(defined('MYPHPBB_DUMP_TEMPLATE') &&
 			$vars['name'] != 'attachment.html') {
 			ini_set('xdebug.var_display_max_depth', '1');
 			ini_set('xdebug.var_display_max_children', '1024');
 			var_dump('TEMPLATE '.$vars['name'], $vars['context']);
 		}
 	}
+}
 
 /**
  * Short link /?f=0&t=0&p=0 to viewforum & viewtopic
@@ -229,4 +235,3 @@ RewriteCond %{REQUEST_FILENAME} index.php
 RewriteCond %{QUERY_STRING} (^|&)(t|p)=[0-9]+(&|$)
 RewriteRule ^(.*)$ viewtopic.php [QSA,L]
  */
-}

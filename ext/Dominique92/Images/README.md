@@ -1,19 +1,14 @@
 # PhpBB 3.3 Resize images & slideshow
 
-PhpBB3.3 extension
+PhpBB 3.3 extension
 
 FUNCTIONS
 =========
 * Resize the images downloaded
 ```
-download/file.php?id=4&s=1234
+download/file.php?id=4&size=1234
 ```
 * Extract EXIF in phpbb-attachments.exif SQL table.field
 
 * Display viewtopic as slideshow
-
-INSTALL
-=======
-Download the zip file
-Unzip & upload this package to ext/Dominique92/Images
-Go to phpbb administration -> personnaliser -> Gérer les extensions -> Images -> Activer
+To display & topic as slideshow, add "*slideshow" in the forum descriptor
