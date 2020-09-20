@@ -454,6 +454,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
+//TODO center label on lines & polys
 function hoverManager(map) {
 	if (map.hasHoverManager_)
 		return; // Only one per map

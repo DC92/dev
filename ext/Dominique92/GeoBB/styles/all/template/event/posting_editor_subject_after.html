@@ -1,31 +1,30 @@
 <!-- Openlayers -->
-<link  href="assets/MyOl/ol/ol.css" type="text/css" rel="stylesheet">
+<link href="assets/MyOl/ol/ol.css" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/ol/ol.js"></script>
 
 <!-- Recherche par nom -->
-<link  href="assets/MyOl/geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
+<link href="assets/MyOl/geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/geocoder/ol-geocoder-debug.js"></script>
 
 <!-- Proj4 projections Swiss & UK -->
 <script src="assets/MyOl/proj4/proj4-src.js"></script>
 
 <!-- My Openleyers -->
-<link  href="assets/MyOl/myol.css" type="text/css" rel="stylesheet">
+<link href="assets/MyOl/myol.css" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/myol.js"></script>
 
 <script>
-	var imageForum = '{FORUM_IMAGE}';
+	var map_type = '{MAP_TYPE}';
 </script>
 
-<!-- The map -->
-<!-- IF FORUM_IMAGE and HAS_MAP -->
+<!-- IF MAP_TYPE -->
 	<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
 	<!-- INCLUDEJS @Dominique92_GeoBB/posting.js -->
 
-		<div id="map"></div>
-		<input type="hidden" id="geojson" name="geom" value='{GEOJSON}' />
+	<div id="map"></div>
+	<input type="hidden" id="geojson" name="geom" value='{GEOJSON}' />
 
-	<!-- IF FORUM_IMAGE != 'line' and FORUM_IMAGE != 'poly' -->
+	<!-- IF FORUM_IMAGE -->
 		<p id="marker">
 			Lon <input type="text" name="lon" size="12" maxlength="12">(&nbsp;
 			Lat <input type="text" name="lat" size="12" maxlength="12">

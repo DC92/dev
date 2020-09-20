@@ -64,10 +64,13 @@ class listener implements EventSubscriberInterface
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
 		$row = $vars['row'];
+		$has_maps = preg_match ('/([\.:])(point|line|poly)/', $this->topic_data['forum_desc'], $params);
 
-		if ($this->topic_data['forum_image'] && // Only for the forums that have a forum icon
-			($row['post_id'] == $this->topic_data['topic_first_post_id'] || // Only map on the first topic
-			strstr ($this->topic_data['forum_image'], '_.'))) // Image name ends by _ = map on all post of same topic
+		if ($has_maps && (
+				$params[1] == ':' || // Map on all posts
+				$row['post_id'] == $this->topic_data['topic_first_post_id'] // Only map on the first post
+			))
+			//TODO BUG devrait zoomer sur la totalité des features, au lieu seulement du dernier
 			$this->template->assign_var ('GEOJSON', $row['geojson']);
 	}
 
@@ -76,15 +79,18 @@ class listener implements EventSubscriberInterface
 	*/
 	function posting_modify_row_data($vars) {
 		$post_data = $vars['post_data'];
+		$has_maps = preg_match ('/([\.:])(point|line|poly)/', $post_data['forum_desc'], $params);
 
-		// For editing facilities choice
+		// For editing facilities choice //TODO ???????????????
 		preg_match ('/([^\/]+)\.[a-z]+$/' , $post_data['forum_image'], $image);
 		if (isset ($image[1]))
 			$this->template->assign_var ('FORUM_IMAGE', $image[1]);
 
-		if ($post_data['post_id'] == $post_data['topic_first_post_id'] || // Only map on the first topic
-			strstr ($post_data['forum_image'], '_.')) // Image name ends by _ = map on all post of same topic
-			$this->template->assign_var ('HAS_MAP', true);
+		if ($has_maps && (
+				$params[1] == ':' || // Map on all posts
+				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
+			))
+			$this->template->assign_var ('MAP_TYPE', $params[2]);
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {

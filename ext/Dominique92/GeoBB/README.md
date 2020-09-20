@@ -15,10 +15,10 @@ DEPENDENCIES
 
 FUNCTIONS
 =========
-Posts of each forum include a geographic features depending on the forum image
-* line.png : define lines on the first post only
-* line_.png : define lines on all posts (only one map on the top of the page)
-* poly.png : define lines on the first post only
-* poly_.png : define lines on all posts (only one map on the top of the page)
-* *.png : define points on the first post only (the point's icon is the forum image)
-* *_.png : define points on all posts (only one map on the top of the page)
+Posts of each forum include a geographic features depending on the forum descriptor
+* .line defines lines on the first post only
+* :line defines lines on all posts (only one map on the top of the page)
+* .poly defines lines on the first post only
+* :poly defines lines on all posts (only one map on the top of the page)
+* .point defines points on the first post only (the point's icon is the forum image)
+* .point define spoints on all posts (only one map on the top of the page)

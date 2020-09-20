@@ -58,8 +58,8 @@ $sql_array = [
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",
 		'post_visibility = '.ITEM_APPROVED,
 		'OR' => [
-			't.topic_first_post_id = p.post_id', // Only map on the first topic
-			'forum_image LIKE "%\_.%"', // Image name ends by _ = map on all post of same topic
+			'forum_desc REGEXP ":point|:line|:poly"', // Has map
+			'(forum_desc REGEXP ".point|.line|.poly" AND t.topic_first_post_id = p.post_id)', // Only map on the first topic
 		],
 	],
 	'ORDER_BY' => "CASE WHEN f.forum_id = $priority THEN 0 ELSE left_id END",
@@ -72,9 +72,10 @@ if (is_array ($sql_array ['SELECT']))
 if (is_array ($sql_array ['WHERE'])) {
 	foreach ($sql_array ['WHERE'] AS $k=>&$w)
 		if (is_array ($w))
-			$w = '('.implode (" $k ", $w).')'; //TODO ??? w ne modifie pas $sql_array
+			$sql_array ['WHERE'][$k] = '('.implode (" $k ", $w).')';
 	$sql_array ['WHERE'] = implode (' AND ', $sql_array ['WHERE']);
 }
+
 $sql = $db->sql_build_query('SELECT', $sql_array);
 $result = $db->sql_query_limit($sql, $limit);
 

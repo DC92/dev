@@ -15,7 +15,7 @@ var map = new ol.Map({
 	}),
 });
 
-if (imageForum == 'line')
+if (map_type == 'line')
 	map.addLayer(layerGeoJson({
 		geoJsonId: 'geojson',
 		//TODO snapLayers: [wri],
@@ -33,7 +33,7 @@ if (imageForum == 'line')
 			'Cliquer sur une extrémité d‘une ligne pour l‘étendre.',
 	}));
 
-else if (imageForum == 'poly')
+else if (map_type == 'poly')
 	map.addLayer(layerGeoJson({
 		geoJsonId: 'geojson',
 		//TODO snapLayers: [wri],
@@ -51,7 +51,7 @@ else if (imageForum == 'poly')
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
 	}));
 
-else if (imageForum) // Point
+else if (map_type) // Point
 	map.addLayer(layerGeoJson({
 		displayPointId: 'marker',
 		geoJsonId: 'geojson',
