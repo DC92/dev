@@ -10,6 +10,8 @@
  * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
  */
 
+//TODO lien vers GGstreet
+
 //HACKS For JS validators
 /* jshint esversion: 6 */
 

@@ -13,13 +13,13 @@
 <link href="assets/MyOl/myol.css?assets_version={T_ASSETS_VERSION}" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/myol.js?assets_version={T_ASSETS_VERSION}"></script>
 
-<script>
-	var map_type = '{MAP_TYPE}';
-</script>
-
 <!-- IF MAP_TYPE -->
-	<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
-	<!-- INCLUDEJS @Dominique92_GeoBB/posting.js -->
+	<script>
+		var map_type = '{MAP_TYPE}';
+	</script>
+
+	<!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
+	<!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
 
 	<div id="map"></div>
 	<input type="hidden" id="geojson" name="geom" value='{GEOJSON}' />

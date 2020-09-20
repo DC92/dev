@@ -6,24 +6,16 @@
 <link  href="assets/MyOl/geocoder/ol-geocoder.css?assets_version={T_ASSETS_VERSION}" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/geocoder/ol-geocoder-debug.js?assets_version={T_ASSETS_VERSION}"></script>
 
-<!-- Proj4 projections Swiss & UK -->
-<script src="assets/MyOl/proj4/proj4-src.js?assets_version={T_ASSETS_VERSION}"></script>
-
 <!-- My Openleyers -->
 <link  href="assets/MyOl/myol.css?assets_version={T_ASSETS_VERSION}" type="text/css" rel="stylesheet">
 <script src="assets/MyOl/myol.js?assets_version={T_ASSETS_VERSION}"></script>
 
 <!-- This map -->
 <script>
-	var map_type = 'view';
+	var map_type = 'index';
 </script>
 
 <!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
 <!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
 
-<!-- IF GEOJSON -->
-	<div id="map"></div>
-<!-- ENDIF -->
-
-<input type="hidden" id="cadre-json" value='{GEOJSON}' />
-<p id="cadre-coords"></p>
+<div id="map"></div>
