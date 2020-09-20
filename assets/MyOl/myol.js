@@ -456,7 +456,6 @@ function controlPermanentCheckbox(selectorName, callback, options) {
  * Manages a feature hovering common to all features & layers
  * Requires escapedStyle
  */
-//TODO center label on lines & polys
 function hoverManager(map) {
 	if (map.hasHoverManager_)
 		return; // Only one per map
@@ -505,7 +504,7 @@ function hoverManager(map) {
 		else {
 			// Search hovered label
 			const mapRect = map.getTargetElement().getBoundingClientRect(),
-				hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect['x'], evt.pixel[1] + mapRect['y']);
+				hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
 			if (hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
 				// Search hovered features
 				let closestFeature = null,
@@ -522,14 +521,14 @@ function hoverManager(map) {
 								distance = Math.hypot( // Distance of a point
 									featurePixel[0] - evt.pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
 									featurePixel[1] - evt.pixel[1]
-								);
+								),
+								geomEextent = geometry.getExtent();
 
 							// Higest priority for draggable markers
 							if (feature.getProperties().draggable)
 								distance = 0;
 
-							if (typeof geometry.flatCoordinates != 'undefined' &&
-								geometry.flatCoordinates.length > 2) { // Line or polygon
+							if (geomEextent[0] != geomEextent[2]) { // Line or polygon
 								distance = 1000; // Lower priority
 								featurePixel = evt.pixel; // Label follows the cursor
 							}
