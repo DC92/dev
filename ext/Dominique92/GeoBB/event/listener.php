@@ -34,6 +34,9 @@ class listener implements EventSubscriberInterface
 	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 		return [
+			// Common
+			'core.common' => 'common',
+
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
@@ -45,6 +48,14 @@ class listener implements EventSubscriberInterface
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
 		];
+	}
+
+	/**
+		COMMON
+	*/
+	function common($vars) {
+		global $mapKeys;
+		$this->template->assign_var ('MAP_KEYS', json_encode ($mapKeys));
 	}
 
 	/**

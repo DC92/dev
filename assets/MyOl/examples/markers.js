@@ -36,7 +36,7 @@ new ol.Map({
 	target: 'map',
 	layers: [cadre, viseur],
 	controls: controlsCollection({
-		geoKeys: {
+		mapKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 			ign: 'hcxdz5f1p9emo4i1lch6ennl',
 			// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com

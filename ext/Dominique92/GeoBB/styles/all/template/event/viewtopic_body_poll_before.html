@@ -14,16 +14,17 @@
 <script src="assets/MyOl/myol.js?assets_version={T_ASSETS_VERSION}"></script>
 
 <!-- This map -->
-<script>
-	var map_type = 'view';
-</script>
-
-<!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
-<!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
-
 <!-- IF GEOJSON -->
-	<div id="map"></div>
-<!-- ENDIF -->
+	<script>
+		var mapType = 'view',
+			mapKeys = {MAP_KEYS};
+	</script>
 
-<input type="hidden" id="cadre-json" value='{GEOJSON}' />
-<p id="cadre-coords"></p>
+	<!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
+	<!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
+
+	<div id="map"></div>
+
+	<input type="hidden" id="cadre-json" value='{GEOJSON}' />
+	<p id="cadre-coords"></p>
+<!-- ENDIF -->

@@ -1,4 +1,5 @@
-const editor = layerGeoJson({
+const wri = layerRefugesInfo(), //TODO BUG : need layer without click
+	editor = layerGeoJson({
 		geoJsonId: 'geojson',
 		snapLayers: [wri],
 		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
@@ -26,11 +27,11 @@ const editor = layerGeoJson({
 new ol.Map({
 	target: 'map',
 	layers: [
-		layerRefugesInfo(),
+		wri,
 		editor,
 	],
 	controls: controlsCollection({
-		geoKeys: {
+		mapKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 			ign: 'hcxdz5f1p9emo4i1lch6ennl',
 			// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com

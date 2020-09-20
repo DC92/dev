@@ -2559,12 +2559,12 @@ function layersDemo(keys) {
 function controlsCollection(options) {
 	options = options || {};
 	if (!options.baseLayers)
-		options.baseLayers = layersDemo(options.geoKeys);
+		options.baseLayers = layersDemo(options.mapKeys);
 
 	return [
 		controlLayersSwitcher(Object.assign({
 			baseLayers: options.baseLayers,
-			geoKeys: options.geoKeys,
+			mapKeys: options.mapKeys,
 		}, options.controlLayersSwitcher)),
 		controlTilesBuffer(1, 4),
 		controlPermalink(options.controlPermalink),
