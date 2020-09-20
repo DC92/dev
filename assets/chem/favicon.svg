@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="256" width="256">
+<style>
+	line {
+		stroke: lime;
+		stroke-width: 8;
+		stroke-linecap: round;
+	}
+</style>
+<line x1="16" y1="60" x2="32" y2="19" style="stroke:brown" />
+<line x1="30" y1="32" x2="40" y2="60" style="stroke:brown" />
+<line x1="15" y1="61" x2="22" y2="61" style="stroke:black;stroke-width:6" />
+<line x1="46" y1="59" x2="39" y2="61" style="stroke:black;stroke-width:6" />
+<line x1="32" y1="19" x2="34" y2="30" />
+<line x1="27" y1="31" x2="32" y2="19" />
+<line x1="26" y1="32" x2="44" y2="34" style="stroke-width:6" />
+<rect x="18" y="6" width="12" height="20" style="fill:red" transform="rotate(21)" />
+<ellipse cx="34" cy="7" rx="7" ry="7" style="fill:salmon;stroke-width:0" />
+</svg>
