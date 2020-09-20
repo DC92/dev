@@ -48,7 +48,8 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-//TODO BUG n'affiche pas la première image au début du chargement
+//TODO BUG n'affiche pas la première image au début du chargement (wait !)
+//TODO commande pour revenir au mode forum
 
 	function viewtopic_assign_template_vars_before($vars) {
 		// Change template if '*slideshow' is in the forum descriptor
@@ -109,8 +110,8 @@ class listener implements EventSubscriberInterface
 
 	function download_file_send_to_browser_before($vars) {
 		$attachment = $vars['attachment'];
-		if (!is_dir ('../cache/geo/'))
-			mkdir ('../cache/geo/');
+		if (!is_dir ('../cache/images/'))
+			mkdir ('../cache/images/');
 
 		if (is_file('../'.$attachment['real_filename'])) // Fichier relatif à la racine du site
 			$attachment ['physical_filename'] = '../'.$attachment ['real_filename']; // script = download/file.php
@@ -154,7 +155,7 @@ class listener implements EventSubscriberInterface
 			$reduction = max ($isx / $max_size, $isy / $max_size);
 			if ($reduction > 1) { // Il faut reduire l'image
 				$pn = pathinfo ($attachment['physical_filename']);
-				$temporaire = '../cache/geo/'.$pn['basename'].'.'.$max_size.@$pn['extension'];
+				$temporaire = '../cache/images/'.$pn['basename'].'.'.$max_size.@$pn['extension'];
 
 				// Si le fichier temporaire n'existe pas, il faut le creer
 				if (!is_file ($temporaire)) {
