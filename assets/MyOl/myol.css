@@ -1,6 +1,10 @@
 /* Nomalize em sizes */
 .ol-viewport {
 	font-size: 16px;
+	font-family: initial;
+}
+.ol-viewport * {
+	font-size: 1em;
 }
 
 /* Top aligned buttons */
