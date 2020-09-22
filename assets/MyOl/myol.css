@@ -150,7 +150,6 @@
 }
 
 /* Other controls */
-.ol-permalink,
 .ol-attribution,
 .ol-coordinate,
 .ol-length-line {
@@ -175,14 +174,6 @@
 .ol-switch-layer p {
 	margin: 0;
 	font-size: 12px;
-}
-.ol-permalink {
-	position: absolute;
-	bottom: 34px;
-	right: 0;
-	padding: 3px;
-	border-radius: 8px 0 0 8px;
-	background: rgba(255, 255, 255, 0.8);
 }
 .ol-coordinate {
 	position: absolute;

@@ -67,6 +67,9 @@ new ol.Map({
 		massifs,
 	],
 	controls: controlsCollection({
+		controlPermalink: {
+			display: true,
+		},
 		mapKeys: {
 			// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
 			ign: 'hcxdz5f1p9emo4i1lch6ennl',

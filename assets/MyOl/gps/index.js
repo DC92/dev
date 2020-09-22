@@ -49,14 +49,11 @@ const nbli = document.getElementsByTagName('li').length,
 				typeof baselayers != 'undefined' ? baselayers : [],
 				layersCollection(keys)),
 		}),
+		controlPermalink(),
 
 		new ol.control.Attribution({
 			collapseLabel: '>',
 		}),
-		controlPermalink({
-			visible: false,
-		}),
-
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
 		controlLengthLine(),

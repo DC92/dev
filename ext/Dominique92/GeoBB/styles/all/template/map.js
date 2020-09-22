@@ -34,6 +34,9 @@ const layerGeoBB = layerVectorURL({
 		layers: [layerGeoBB],
 		controls: controlsCollection({
 			mapKeys: mapKeys,
+			controlPermalink: {
+				display: mapType == 'index',
+			},
 		}),
 	});
 

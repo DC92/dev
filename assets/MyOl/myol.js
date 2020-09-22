@@ -14,6 +14,7 @@
 
 //HACKS For JS validators
 /* jshint esversion: 6 */
+if (!ol) var ol = {};
 
 /**
  * Display OL version
@@ -1305,21 +1306,16 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
-//TODO BUG don't add existing URL params
 function controlPermalink(options) {
 	options = Object.assign({
-		hash: '?', // {?, #} the permalink delimiter
-		visible: true, // {true | false} add a controlPermalink button to the map.
 		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
+		display: false, // Change url hash to position the map.
 	}, options);
-	const aEl = document.createElement('a'),
-		control = new ol.control.Control({
+	const control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 			render: render,
-		});
-	control.element.appendChild(aEl);
-
-	const zoomMatch = location.href.match(/zoom=([0-9]+)/),
+		}),
+		zoomMatch = location.href.match(/zoom=([0-9]+)/),
 		latLonMatch = location.href.match(/lat=([-.0-9]+)&lon=([-.0-9]+)/);
 	let params = (
 			location.href + // Priority to ?map=6/2/47 or #map=6/2/47
@@ -1330,13 +1326,6 @@ function controlPermalink(options) {
 			'map=' + options.initialFit + // Optional default
 			'map=6/2/47') // Default
 		.match(/map=([0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // map=<ZOOM>/<LON>/<LAT>
-
-	if (options.visible) {
-		control.element.className = 'ol-permalink';
-		aEl.innerHTML = 'Permalink';
-		aEl.title = 'Generate a link with map zoom & position';
-		control.element.appendChild(aEl);
-	}
 
 	if (typeof options.initialCenter == 'function') {
 		options.initialCenter([parseFloat(params[2]), parseFloat(params[3])]);
@@ -1362,7 +1351,8 @@ function controlPermalink(options) {
 					Math.round(ll4326[1] * 100000) / 100000, // Lat
 				];
 
-			aEl.href = options.hash + 'map=' + newParams.join('/');
+			if (options.display)
+				location.href = '#map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
 		}
 	}
@@ -2560,16 +2550,22 @@ function controlsCollection(options) {
 		options.baseLayers = layersDemo(options.mapKeys);
 
 	return [
+		// Top right
 		controlLayersSwitcher(Object.assign({
 			baseLayers: options.baseLayers,
 			mapKeys: options.mapKeys,
 		}, options.controlLayersSwitcher)),
-		controlTilesBuffer(1, 4),
 		controlPermalink(options.controlPermalink),
+
+		// Bottom right
 		new ol.control.Attribution(),
+
+		// Bottom left
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
 		controlLengthLine(),
+
+		// Top left
 		new ol.control.Zoom(),
 		controlFullScreen(),
 		controlGeocoder(),
