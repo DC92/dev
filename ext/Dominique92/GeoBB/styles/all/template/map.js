@@ -70,6 +70,7 @@ switch (mapType) {
 		}));
 		break;
 
+//TODO BUG une ligne surimposée en viewtopic ??? le marqueur avec un json ?
 	case 'line':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',

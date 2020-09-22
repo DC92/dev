@@ -10,7 +10,7 @@ Based on https://openlayers.org
 	// It needs a manifest.json file in the same directory
 
 	//TODO BEST afficher version tag
-	//TODO BUG battements entre deux instances de GPS
+	//BEST BUG battements entre deux instances de GPS
 
 	// Read info in the manifest.json & list *.gpx files
 	$manifest = json_decode (file_get_contents ('manifest.json'), true);
