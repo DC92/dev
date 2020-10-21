@@ -133,10 +133,12 @@ function layerKompass(layer) {
  * Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(key, layer) {
-	return layerOsm(
-		'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + key,
-		'<a href="http://www.thunderforest.com">Thunderforest</a>'
-	);
+	return typeof key === 'undefined' ?
+		null :
+		layerOsm(
+			'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + key,
+			'<a href="http://www.thunderforest.com">Thunderforest</a>'
+		);
 }
 
 /**
@@ -175,21 +177,23 @@ function layerIGN(key, layer, format) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 		IGNmatrixIds[i] = i.toString();
 	}
-	return new ol.layer.Tile({
-		source: new ol.source.WMTS({
-			url: '//wxs.ign.fr/' + key + '/wmts',
-			layer: layer,
-			matrixSet: 'PM',
-			format: 'image/' + (format || 'jpeg'),
-			tileGrid: new ol.tilegrid.WMTS({
-				origin: [-20037508, 20037508],
-				resolutions: IGNresolutions,
-				matrixIds: IGNmatrixIds,
-			}),
-			style: 'normal',
-			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-		})
-	});
+	return typeof key === 'undefined' ?
+		null :
+		new ol.layer.Tile({
+			source: new ol.source.WMTS({
+				url: '//wxs.ign.fr/' + key + '/wmts',
+				layer: layer,
+				matrixSet: 'PM',
+				format: 'image/' + (format || 'jpeg'),
+				tileGrid: new ol.tilegrid.WMTS({
+					origin: [-20037508, 20037508],
+					resolutions: IGNresolutions,
+					matrixIds: IGNmatrixIds,
+				}),
+				style: 'normal',
+				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
+			})
+		});
 }
 
 /**
@@ -320,19 +324,21 @@ function layerIGM() {
  * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerOS(key) {
-	return layerTileIncomplete({
-		extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
-		sources: {},
+	return typeof key === 'undefined' ?
+		null :
+		layerTileIncomplete({
+			extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
+			sources: {},
 
-		addSources: function() {
-			return {
-				50: new ol.source.BingMaps({
-					imagerySet: 'OrdnanceSurvey',
-					key: key,
-				})
-			};
-		},
-	});
+			addSources: function() {
+				return {
+					50: new ol.source.BingMaps({
+						imagerySet: 'OrdnanceSurvey',
+						key: key,
+					})
+				};
+			},
+		});
 }
 
 /**
@@ -351,7 +357,7 @@ function layerBing(key, subLayer) {
 			}));
 		}
 	});
-	return layer;
+	return typeof key === 'undefined' ? null : layer;
 }
 
 
@@ -1221,8 +1227,8 @@ function controlLayersSwitcher(options) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Base layers selector init
-		for (let name in options.baseLayers)
-			if (options.baseLayers[name]) { // array of layers, mandatory, no default
+		for (let name in options.baseLayers) // array of layers, mandatory, no default
+			if (options.baseLayers[name]) { // null is ignored
 				const choiceEl = document.createElement('div');
 				choiceEl.innerHTML =
 					'<input type="checkbox" name="baselayer" value="' + name + '">' +
@@ -1274,7 +1280,7 @@ function controlLayersSwitcher(options) {
 
 		// Refresh layers visibility & opacity
 		for (let layerName in options.baseLayers)
-			if (typeof options.baseLayers[layerName] == 'object') {
+			if (options.baseLayers[layerName]) {
 				options.baseLayers[layerName].setVisible(list.indexOf(layerName) !== -1);
 				options.baseLayers[layerName].setOpacity(0);
 			}
@@ -2465,6 +2471,7 @@ function compareCoords(a, b) {
  * Tile layers examples
  */
 function layersCollection(keys) {
+	keys = keys || {};
 	return {
 		'OpenTopo': layerOsmOpenTopo(),
 		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
@@ -2482,6 +2489,7 @@ function layersCollection(keys) {
 }
 
 function layersDemo(keys) {
+	keys = keys || {};
 	return Object.assign(layersCollection(keys), {
 		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOsmMri(),
