@@ -69,43 +69,6 @@ function displayInputCalendar(elCal, jour) {
 	$('#edit_semaines').css('display', scolaireChecked ? 'none' : 'block');
 }
 
-// BBCode ajout d'une carte
-$('.carte').each(function(index, elCarte) {
-	if (elCarte.innerText) {
-		const ll = ol.proj.transform(eval('[' + elCarte.textContent + ']'), 'EPSG:4326', 'EPSG:3857');
-		elCarte.innerHTML = null; // Don't loop
-
-		new ol.Map({
-			layers: [
-				new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-				new ol.layer.Vector({
-					source: new ol.source.Vector({
-						features: [
-							new ol.Feature({
-								geometry: new ol.geom.Point(ll),
-							}),
-						]
-					}),
-					style: new ol.style.Style({
-						image: new ol.style.Icon(({
-							src: 'ext/Dominique92/Gym/styles/prosilver/theme/images/ballon-rose.png',
-							anchor: [0.5, 0.8],
-						})),
-					}),
-				}),
-			],
-			target: elCarte,
-			controls: [], // No zoom
-			view: new ol.View({
-				center: ll,
-				zoom: 17
-			})
-		});
-	}
-});
-
 // Slideshow
 setInterval(function() {
 	$('.slideshow ul').animate({

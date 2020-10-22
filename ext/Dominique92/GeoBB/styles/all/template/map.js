@@ -33,7 +33,7 @@ const layerGeoBBgis = layerVectorURL({
 		target: 'map',
 		layers: [layerGeoBBgis],
 		controls: controlsCollection({
-			mapKeys: mapKeys,
+			baseLayers: layersCollection(),
 			controlPermalink: {
 				display: mapType == 'index',
 			},

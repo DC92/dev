@@ -130,13 +130,13 @@ function layerKompass(layer) {
 /**
  * Thunderforest
  * Requires layerOsm
- * Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
+ * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
-function layerThunderforest(key, layer) {
-	return typeof key === 'undefined' ?
+function layerThunderforest(layer) {
+	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.thunderforest ?
 		null :
 		layerOsm(
-			'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + key,
+			'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
 		);
 }
@@ -168,20 +168,20 @@ function layerStamen(layer) {
 /**
  * IGN France
  * Doc on http://api.ign.fr
- * Get your own (free) IGN key at http://professionnels.ign.fr/user
+ * var mapKeys.ign = Get your own (free)IGN key at http://professionnels.ign.fr/user
  */
-function layerIGN(key, layer, format) {
+function layerIGN(layer, format) {
 	let IGNresolutions = [],
 		IGNmatrixIds = [];
 	for (let i = 0; i < 18; i++) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 		IGNmatrixIds[i] = i.toString();
 	}
-	return typeof key === 'undefined' ?
+	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.ign ?
 		null :
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
-				url: '//wxs.ign.fr/' + key + '/wmts',
+				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
 				layer: layer,
 				matrixSet: 'PM',
 				format: 'image/' + (format || 'jpeg'),
@@ -321,10 +321,10 @@ function layerIGM() {
 /**
  * Ordnance Survey : Great Britain
  * Requires layerTileIncomplete
- * Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
+ * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
-function layerOS(key) {
-	return typeof key === 'undefined' ?
+function layerOS() {
+	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.bing ?
 		null :
 		layerTileIncomplete({
 			extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
@@ -334,7 +334,7 @@ function layerOS(key) {
 				return {
 					50: new ol.source.BingMaps({
 						imagerySet: 'OrdnanceSurvey',
-						key: key,
+						key: mapKeys.bing,
 					})
 				};
 			},
@@ -343,9 +343,9 @@ function layerOS(key) {
 
 /**
  * Bing (Microsoft)
- * Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+ * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
-function layerBing(key, subLayer) {
+function layerBing(subLayer) {
 	const layer = new ol.layer.Tile();
 
 	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
@@ -353,11 +353,11 @@ function layerBing(key, subLayer) {
 		if (layer.getVisible() && !layer.getSource()) {
 			layer.setSource(new ol.source.BingMaps({
 				imagerySet: subLayer,
-				key: key,
+				key: mapKeys.bing,
 			}));
 		}
 	});
-	return typeof key === 'undefined' ? null : layer;
+	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.bing ? null : layer;
 }
 
 
@@ -2470,58 +2470,56 @@ function compareCoords(a, b) {
 /**
  * Tile layers examples
  */
-function layersCollection(keys) {
-	keys = keys || {};
+function layersCollection() {
 	return {
 		'OpenTopo': layerOsmOpenTopo(),
-		'OSM outdoors': layerThunderforest(keys.thunderforest, 'outdoors'),
-		'OSM transport': layerThunderforest(keys.thunderforest, 'transport'),
+		'OSM outdoors': layerThunderforest('outdoors'),
+		'OSM transport': layerThunderforest('transport'),
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
-		'Photo Bing': layerBing(keys.bing, 'Aerial'),
-		'Photo IGN': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS'),
-		'IGN': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN Express': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'Photo Bing': layerBing('Aerial'),
+		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS'),
+		'IGN': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN Express': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Angleterre': layerOS(keys.bing),
+		'Angleterre': layerOS(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 	};
 }
 
-function layersDemo(keys) {
-	keys = keys || {};
-	return Object.assign(layersCollection(keys), {
+function layersDemo() {
+	return Object.assign(layersCollection(), {
 		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'MRI': layerOsmMri(),
 		'Hike & Bike': layerOsm(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
 			'<a href="//www.hikebikemap.org/">hikebikemap.org</a>'
 		), // Not on https
-		'OSM cycle': layerThunderforest(keys.thunderforest, 'cycle'),
-		'OSM landscape': layerThunderforest(keys.thunderforest, 'landscape'),
-		'OSM trains': layerThunderforest(keys.thunderforest, 'pioneer'),
-		'OSM villes': layerThunderforest(keys.thunderforest, 'neighbourhood'),
-		'OSM contraste': layerThunderforest(keys.thunderforest, 'mobile-atlas'),
+		'OSM cycle': layerThunderforest('cycle'),
+		'OSM landscape': layerThunderforest('landscape'),
+		'OSM trains': layerThunderforest('pioneer'),
+		'OSM villes': layerThunderforest('neighbourhood'),
+		'OSM contraste': layerThunderforest('mobile-atlas'),
 
-		'IGN TOP 25': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-		//403 'IGN Spot': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
-		//Double 	'SCAN25TOUR': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
-		'IGN 1950': layerIGN(keys.ign, 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
-		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
-		'Cadastre': layerIGN(keys.ign, 'CADASTRALPARCELS.PARCELS', 'png'),
-		'IGN plan': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
-		'IGN route': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
-		'IGN noms': layerIGN(keys.ign, 'GEOGRAPHICALNAMES.NAMES', 'png'),
-		'IGN rail': layerIGN(keys.ign, 'TRANSPORTNETWORKS.RAILWAYS', 'png'),
-		'IGN hydro': layerIGN(keys.ign, 'HYDROGRAPHY.HYDROGRAPHY', 'png'),
-		'IGN forêt': layerIGN(keys.ign, 'LANDCOVER.FORESTAREAS', 'png'),
-		'IGN limites': layerIGN(keys.ign, 'ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
-		//Le style normal n'est pas geré 'SHADOW': layerIGN(keys.ign, 'ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
-		//Le style normal n'est pas geré 'PN': layerIGN(keys.ign, 'PROTECTEDAREAS.PN', 'png'),
-		'PNR': layerIGN(keys.ign, 'PROTECTEDAREAS.PNR', 'png'),
-		//403 'Avalanches': layerIGN('IGN avalanches', keys.ign,'GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
-		'Etat major': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
-		'ETATMAJOR10': layerIGN(keys.ign, 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
+		'IGN TOP 25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+		//403 'IGN Spot': layerIGN('ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
+		//Double 	'SCAN25TOUR': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
+		'IGN 1950': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
+		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN('CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
+		'Cadastre': layerIGN('CADASTRALPARCELS.PARCELS', 'png'),
+		'IGN plan': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
+		'IGN route': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
+		'IGN noms': layerIGN('GEOGRAPHICALNAMES.NAMES', 'png'),
+		'IGN rail': layerIGN('TRANSPORTNETWORKS.RAILWAYS', 'png'),
+		'IGN hydro': layerIGN('HYDROGRAPHY.HYDROGRAPHY', 'png'),
+		'IGN forêt': layerIGN('LANDCOVER.FORESTAREAS', 'png'),
+		'IGN limites': layerIGN('ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
+		//Le style normal n'est pas geré 'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
+		//Le style normal n'est pas geré 'PN': layerIGN('PROTECTEDAREAS.PN', 'png'),
+		'PNR': layerIGN('PROTECTEDAREAS.PNR', 'png'),
+		//403 'Avalanches': layerIGN('IGN avalanches', GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
+		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
+		'ETATMAJOR10': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
 
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')), //TODO ?????? layerGoogle
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
@@ -2529,8 +2527,8 @@ function layersDemo(keys) {
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
 
-		'Bing': layerBing(keys.bing, 'Road'),
-		'Bing photo': layerBing(keys.bing, 'AerialWithLabels'),
+		'Bing': layerBing('Road'),
+		'Bing photo': layerBing('AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google hybrid': layerGoogle('s,h'),
@@ -2545,14 +2543,11 @@ function layersDemo(keys) {
  */
 function controlsCollection(options) {
 	options = options || {};
-	if (!options.baseLayers)
-		options.baseLayers = layersDemo(options.mapKeys);
 
 	return [
 		// Top right
 		controlLayersSwitcher(Object.assign({
 			baseLayers: options.baseLayers,
-			mapKeys: options.mapKeys,
 		}, options.controlLayersSwitcher)),
 		controlPermalink(options.controlPermalink),
 

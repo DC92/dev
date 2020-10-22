@@ -45,9 +45,7 @@ const nbli = document.getElementsByTagName('li').length,
 	controls = [
 		controlTilesBuffer(4),
 		controlLayersSwitcher({
-			baseLayers: Object.assign(
-				typeof baselayers != 'undefined' ? baselayers : [],
-				layersCollection(keys)),
+			baseLayers: layersCollection(),
 		}),
 		controlPermalink(),
 

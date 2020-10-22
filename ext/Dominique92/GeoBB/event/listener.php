@@ -55,7 +55,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function common($vars) {
 		global $mapKeys;
-		$this->template->assign_var ('MAP_KEYS', json_encode ($mapKeys));
+		$this->template->assign_var ('MAP_KEYS', json_encode (@$mapKeys));
 	}
 
 	/**

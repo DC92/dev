@@ -26,10 +26,11 @@ Based on https://openlayers.org
 		html, body {
 			margin: 0;
 			padding: 0;
+			overflow: hidden;
 		}
 		#map {
 			width: 100vw;
-			height: 100vh;
+			height: calc(100vh - 10em);
 		}
 	</style>
 </head>
@@ -43,16 +44,11 @@ Based on https://openlayers.org
 	<p><a href="gps">OFF LINE GPS</a></p>
 
 	<script>
-		// Must be after the <div> tag
+		// Must be after the <div id="map"> tag
 		new ol.Map({
 			target: 'map',
 			controls: controlsCollection({
-				mapKeys: {
-					ign: 'hcxdz5f1p9emo4i1lch6ennl', // Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
-					thunderforest: 'ee751f43b3af4614b01d1bce72785369', // Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
-					bing: 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt' // Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
-					// SwissTopo : You need to register your domain in https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
-				}
+				baseLayers: layersCollection(),
 			})
 		});
 	</script>
