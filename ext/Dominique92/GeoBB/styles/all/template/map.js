@@ -1,5 +1,5 @@
 // Features de la couche
-const layerGeoBB = layerVectorURL({
+const layerGeoBBgis = layerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300',
 		urlSuffix: '',
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -31,7 +31,7 @@ const layerGeoBB = layerVectorURL({
 	}),
 	map = new ol.Map({
 		target: 'map',
-		layers: [layerGeoBB],
+		layers: [layerGeoBBgis],
 		controls: controlsCollection({
 			mapKeys: mapKeys,
 			controlPermalink: {
@@ -74,7 +74,7 @@ switch (mapType) {
 	case 'line':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',
-			snapLayers: [layerGeoBB],
+			snapLayers: [layerGeoBBgis],
 			titleModify: 'Modification d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne\n' +
@@ -93,7 +93,7 @@ switch (mapType) {
 	case 'poly':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',
-			snapLayers: [layerGeoBB],
+			snapLayers: [layerGeoBBgis],
 			titleModify: 'Modification d‘un polygone:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier un polygone\n' +

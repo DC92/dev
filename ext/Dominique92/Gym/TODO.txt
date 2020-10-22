@@ -1,3 +1,15 @@
+Migration
+Ajouter assets/MyOl
+Créer forum lieux :point ext/Dominique92/Gym/styles/prosilver/theme/images/ballon-rose.png
+
+Masque saisie cartes et calendriers suivant sujet
+Dépendance des calendrier scolaires / vision dans actualité
+ordre des actualités = n° ordre (fiche)
+liens en clair pour ajouter une seance, lieu, ... (menu haut ?)
+Carte avec seulement 1 couche ?
+//Bouton enregistrer en haut
+// map GeoBB
+//Lien séance => activité
 //APRES refaire git Dominique92 / test en DC02
 //TODO Sitemap / SEO
 //BEST actualités non datées

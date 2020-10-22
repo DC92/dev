@@ -40,10 +40,14 @@ class listener implements EventSubscriberInterface
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
-		$template->set_style ([
-			$this->ext_path.'styles',
-			'styles', // core styles
-		]);
+		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
+		
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$template->set_style ([
+				$this->ext_path.'styles',
+				'styles', // core styles
+			]);
 	}
 
 	static public function getSubscribedEvents() {
@@ -74,8 +78,7 @@ class listener implements EventSubscriberInterface
 	function page_header() {
 		// Assign requested template
 		$this->template->assign_var ('EXT_PATH', $this->ext_path);
-		$request = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
-		foreach ($request AS $k=>$v)
+		foreach ($this->args AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
 		$this->popule_posts();
@@ -86,10 +89,9 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé juste avant d'afficher
 	function viewtopic_modify_page_title($vars) {
-		$get = $this->request->get_super_global(\phpbb\request\request_interface::GET);
-		if (!$get['f'] && $get['t'])
+		if (!$this->args['f'] && $this->args['t'])
 			$this->my_template = 'viewtopic';
-		if ($vars['forum_id'] == 2 && $get['p'])
+		if ($vars['forum_id'] == 2 && $this->args['p'])
 			$this->my_template = 'viewtopic';
 	}
 
@@ -114,8 +116,7 @@ class listener implements EventSubscriberInterface
 			$vars['output'] = preg_replace_callback (
 				'/\(([A-Z]+) ?([^\)]*)\)/s',
 				function ($match) {
-					$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-					$uris = explode ('/', $server['SERVER_NAME'].$server['REQUEST_URI']);
+					$uris = explode ('/', $this->server['SERVER_NAME'].$this->server['REQUEST_URI']);
 					$uris [count($uris) - 1] = str_replace (
 						['%23','%26','amp%3B','%3F','%3D'],
 						['#','&','','?','='],
@@ -266,8 +267,7 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		// Treat specific data
-		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
-		foreach ($post AS $k=>$v)
+		foreach ($this->args AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3)) {
 				if(is_array($v))
 					$v = implode (',', $v);
