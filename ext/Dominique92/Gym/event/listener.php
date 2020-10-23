@@ -218,6 +218,13 @@ class listener implements EventSubscriberInterface
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 
+		// Quelles saisies spéciales
+		preg_match_all ('/([\.:])(activ|calen|publi)/', $post_data['forum_desc'], $params);
+		foreach ($params[2] AS $k=>$v)
+			if ($params[1][$k] == ':' || // Map on all posts
+				$post_data['post_id'] == $post_data['topic_first_post_id']) // Only map on the first post
+				$this->template->assign_var ('PARAM_'.strtoupper($v), true);
+
 		// Set specific variables
 		foreach ($post_data AS $k=>$v)
 			if (!strncmp ($k, 'gym', 3)) {
@@ -335,7 +342,6 @@ class listener implements EventSubscriberInterface
 			'gym_horaires',
 			'gym_menu',
 			'gym_ordre_menu',
-			'gym_nota',
 		]);
 
 		// Filtre pour horaires

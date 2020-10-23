@@ -1,7 +1,9 @@
 Migration
 Ajouter assets/MyOl
 Créer forum lieux :point ext/Dominique92/Gym/styles/prosilver/theme/images/ballon-rose.png
+Créer lieux personne / transférer les sujets
 
+Initialiser position carte sur Chaville
 Masque saisie cartes et calendriers suivant sujet
 Dépendance des calendrier scolaires / vision dans actualité
 ordre des actualités = n° ordre (fiche)

@@ -1,5 +1,9 @@
-<!-- IF FORUM_ID == 2 -->
-	Publication dans :
+<!-- INCLUDEJS @Dominique92_Gym/index.js -->
+
+<!-- IF PARAM_PUBLI -->
+<div>
+	<b>Publication dans :</b><br/>
+
 	Menu <input type="checkbox" name="gym_menu"
 	<!-- IF GYM_MENU == 'on' -->
 		checked="checked"
@@ -16,10 +20,13 @@
 
 	<br/>Pour être publié en haut de la page d'accueil, le texte doit comporter une balise [accueil]
 	<br/>Pour être publié dans la partie Actualité de la page d'accueil, le texte doit comporter une balise [actualite]
+</div><br/>
 <!-- ENDIF -->
 
-<!-- IF FORUM_ID == 2 -->
-	<br/><br/>
+<!-- IF PARAM_ACTIV -->
+<div>
+	<b>Type :</b><br/>
+
 	Activité:
 	<select name="gym_activite">
 		<option>?</option>
@@ -66,9 +73,13 @@
 	<select name="gym_cert">
 		<option value="0"></option>
 		<option value="1">CERT</option>
-	</select><br/><br/>
+	</select>
+</div><br/>
+<!-- ENDIF -->
 
-	Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"><br/><br/>
+<!-- IF PARAM_CALEN -->
+<div>
+	<b>Calendrier :</b><br/>
 
 	<select name="gym_jour" id="gym_jour" onchange="changeDayCalendar()">
 		<!-- BEGIN liste_jours -->
@@ -141,6 +152,5 @@
 		<tr id="cal{REQUEST_P}_m6"><td>Juin</td></tr>
 		<tr id="cal{REQUEST_P}_m7" style="display:none"></tr>
 	</table>
-
-	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
+</div>
 <!-- ENDIF -->
