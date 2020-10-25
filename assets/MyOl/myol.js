@@ -504,7 +504,7 @@ function hoverManager(map) {
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
-		if (hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
+		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
 			// Search hovered features
 			let closestFeature = null,
 				distanceMin = 2000;
@@ -1521,6 +1521,7 @@ function controlGeocoder(options) {
  * Requires controlButton
  */
 //BEST GPS tap on map = distance from GPS calculation
+//BEST BUG reste un petit point blanc quand pas d'affichage
 function controlGPS() {
 	let view, geolocation, nbLoc, position, altitude;
 
@@ -1547,14 +1548,14 @@ function controlGPS() {
 
 	function displayValues() {
 		const displays = [],
-			speed = Math.round(geolocation.getSpeed() * 36) / 10 + ' km/h';
+			speed = Math.round(geolocation.getSpeed() * 36) / 10;
 
 		if (button.active) {
 			altitude = geolocation.getAltitude();
 			if (altitude) {
 				displays.push(Math.round(altitude) + ' m');
 				if (!isNaN(speed))
-					displays.push(speed);
+					displays.push(speed + ' km/h');
 			} else
 				displays.push('GPS sync...');
 		}
