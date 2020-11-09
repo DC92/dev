@@ -37,6 +37,9 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 		$this->language = $language;
 
+		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
+
 //TODO BUG ADM Ne pas initialiser forum image avec le user/password
 
 		/**
@@ -79,11 +82,19 @@ class listener implements EventSubscriberInterface
 
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
+			'core.index_modify_page_title' => 'index_modify_page_title',
+
+			// Viewtopic
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
+
+			// App (error 400)
+			'core.session_ip_after' => 'session_ip_after',
 		];
 	}
 
@@ -103,7 +114,24 @@ class listener implements EventSubscriberInterface
 		$vars['row'] = $row;
 	}
 
-	// Called when viewing the post page
+	// Route to viewtopic or wiewforum if there is an argument p, t or f
+	function index_modify_page_title ($vars) {
+		$uris = explode ('/?', $this->uri);
+
+		if (defined('MYPHPBB_REDIRECT') &&
+			count ($uris) > 1) {
+				if ($this->request->variable ('p', 0) ||
+					$this->request->variable ('t', 0))
+					exit (file_get_contents ($uris[0].'/viewtopic.php?'.$uris[1]));
+				if ($this->request->variable ('f', 0))
+					exit (file_get_contents ($uris[0].'/viewforum.php?'.$uris[1]));
+		}
+	}
+
+	/**
+		POSTING.PHP
+	*/
+	// Called when viewing the posting page
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 
@@ -122,6 +150,7 @@ class listener implements EventSubscriberInterface
 		 * Keep trace of values prior to modifications
 		 * Create a log file with the post existing data if there is none
 		 */
+		 //TODO BUG Gym Utf9 chars !!!
 		if (defined('MYPHPBB_LOG_EDIT')) {
 			// Create the LOG directory if none
 			if (!is_dir('LOG'))
@@ -187,6 +216,36 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Specific BBcodes
+	 * [location]ABSOLUTE_PATH[/location] Go to ABSOLUTE_PATH
+	 */
+	// Called after reading SQL post data
+	function viewtopic_post_rowset_data($vars) {
+		preg_match ('/\[location\]<.*>(.*)<.*>\[\/location\]/', $vars['row']['post_text'], $match);
+		if (defined('MYPHPBB_BBCODE_LOCATION') &&
+			$match)
+			exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
+	}
+
+	/**
+	 * Specific BBcodes
+	 * Replace [include]RELATIVE_PATH[/include] by the content of the RELATIVE_PATH
+	 */
+	// Called before post assigned to template
+	function viewtopic_modify_post_row($vars) {
+		if (defined('MYPHPBB_BBCODE_INCLUDE'))
+			$vars['post_row'] = preg_replace_callback (
+				'/\[include\](.*)\[\/include\]/',
+				function ($match) {
+					return file_get_contents (
+						pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
+					);
+				},
+				$vars['post_row']
+			);
+	}
+
+	/**
 	 * Allows entering a POST with empty text
 	 */
 	// Called when validating the data to be saved
@@ -219,6 +278,27 @@ class listener implements EventSubscriberInterface
 			ini_set('xdebug.var_display_max_depth', '1');
 			ini_set('xdebug.var_display_max_children', '1024');
 			var_dump('TEMPLATE '.$vars['name'], $vars['context']);
+		}
+	}
+
+	/**
+		APP
+	*/
+	// Called when a page is not found
+	// Redirect url/shortcut to a page containing [shortcut]shortcut[/shortcut]
+	// You can add an empty shortcut BBcode
+	function session_ip_after() {
+		//TODO BUG ne montre pas loggé quand redirigé
+		if (defined('MYPHPBB_SHORTCUT')) {
+			$shortcut = pathinfo ($this->server['REQUEST_URI'], PATHINFO_FILENAME);
+
+			$sql = 'SELECT post_id FROM '.POSTS_TABLE.' WHERE post_text LIKE "%[shortcut]%'.$shortcut.'%[%'.'"';
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+
+			if ($row)
+				echo '<meta http-equiv="refresh" content="0;URL=viewtopic.php?p='.$row['post_id'].'">';
 		}
 	}
 }

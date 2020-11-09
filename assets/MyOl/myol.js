@@ -121,6 +121,7 @@ function layerOsmMri() {
  */
 function layerKompass(layer) {
 	return layerOsm(
+		//TODO BUG sur https://wri -> demande le lien https !
 		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + layer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
@@ -1303,6 +1304,7 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
+//TODO remettre le lien dans la carte et pas dans la ligne de commande
 function controlPermalink(options) {
 	options = Object.assign({
 		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
@@ -1520,6 +1522,7 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
+//TODO ne lancer l'orientation que quand le GPS est synchronisé
 //BEST GPS tap on map = distance from GPS calculation
 //BEST BUG reste un petit point blanc quand pas d'affichage
 function controlGPS() {

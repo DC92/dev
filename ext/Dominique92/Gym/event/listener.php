@@ -71,6 +71,7 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 		];
 	}
+	//TODO enlever GYM_NOTA
 
 	/**
 		ALL
@@ -110,6 +111,7 @@ class listener implements EventSubscriberInterface
 	/**
 		Expansion des "BBCodes" maisons : (INCLUDE|LOCATION valeur)
 	*/
+	//TODO DELETE
 	function twig_environment_render_template_after($vars) {
 		if ($vars['name'] == 'index_body.html' ||
 			$vars['name'][0] == '@')
