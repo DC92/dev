@@ -1533,9 +1533,7 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
-//TODO ne lancer l'orientation que quand le GPS est synchronisé
 //BEST GPS tap on map = distance from GPS calculation
-//BEST BUG reste un petit point blanc quand pas d'affichage
 function controlGPS() {
 	let view, geolocation, nbLoc, position, altitude;
 
@@ -1551,13 +1549,13 @@ function controlGPS() {
 			if (!active) {
 				view.setRotation(0, 0); // Set north to top
 				displayEl.innerHTML = '';
+				displayEl.classList.remove('ol-control-gps');
 			}
 		}
 	});
 
 	// Display status, altitude & speed
 	const displayEl = document.createElement('div');
-	displayEl.className = 'ol-control-gps';
 	button.element.appendChild(displayEl);
 
 	function displayValues() {
@@ -1574,6 +1572,10 @@ function controlGPS() {
 				displays.push('GPS sync...');
 		}
 		displayEl.innerHTML = displays.join(', ');
+		if (displays.length)
+			displayEl.classList.add('ol-control-gps');
+		else
+			displayEl.classList.remove('ol-control-gps');
 	}
 
 	// Graticule
@@ -1673,6 +1675,7 @@ function controlGPS() {
 			function(evt) {
 				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
 				if (button.active == 1 &&
+					altitude && // Only if true GPS position
 					event.absolute) // Breaks support for non-absolute browsers, like firefox mobile
 					view.setRotation(
 						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
