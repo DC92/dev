@@ -331,6 +331,7 @@ class listener implements EventSubscriberInterface
 		$this->verify_column(POSTS_TABLE, [
 			'gym_activite',
 			'gym_lieu',
+			'gym_ouverture',
 			'gym_animateur',
 			'gym_cert',
 			'gym_jour',

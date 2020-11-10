@@ -12,7 +12,7 @@
 		border-color:{topic.COULEUR_BORD};
 	">
 		<!-- BEGIN post -->
-		<!-- IF post.GYM_HORAIRES -->
+		<!-- IF post.GYM_HORAIRES and (post.GYM_LIEU == 154 or REQUEST_SELECT != "Visio") -->
 		<tr>
 			<!-- IF not REQUEST_ID -->
 			<td>
@@ -43,14 +43,27 @@
 
 			<!-- IF REQUEST_T != 3 -->
 			<td>
-				<!-- IF post.GYM_LIEU != REQUEST_IP -->
-				<a href="viewtopic.php?p={post.GYM_LIEU}">
-					{post.LIEU}
-				</a>
-				<!-- ELSE -->
-					{post.LIEU}
-				<!-- ENDIF -->
-			</td>
+ 				<!-- IF post.GYM_LIEU != REQUEST_IP -->
+<!-- IF post.POST_SUBJECT == "TEST" -->
+					<a title="Se connecter à la visioconférence"
+						href="visio.php?a={post.GYM_ANIMATEUR}"
+<!-- ELSE -->
+					<a href="viewtopic.php?p={post.GYM_LIEU}"
+<!-- ENDIF -->
+					<a href="viewtopic.php?p={post.GYM_LIEU}"
+					<!-- IF post.GYM_OUVERTURE == 2 -->
+						class="cert"
+					<!-- ENDIF -->
+					>
+						{post.LIEU}
+					</a>
+ 				<!-- ELSE -->
+ 					{post.LIEU}
+ 				<!-- ENDIF -->
+<!-- IF not post.GYM_OUVERTURE -->
+<span style="color:red">(fermé)</span>
+<!-- ENDIF -->
+ 			</td>
 			<!-- ENDIF -->
 
 			<!-- IF REQUEST_T != 4 -->

@@ -55,6 +55,20 @@
 		<!-- END liste_3 -->
 	</select> &nbsp;
 
+	<select name="gym_ouverture">
+		<option value="0">fermé</option>
+		<option value="1"
+			<!-- IF 1 == GYM_OUVERTURE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>ouvert</option>
+		<option value="2"
+			<!-- IF 2 == GYM_OUVERTURE -->
+				selected="selected"
+			<!-- ENDIF -->
+		>virtuel</option>
+	</select> &nbsp;
+
 	Animation:
 	<select name="gym_animateur">
 		<option>?</option>
