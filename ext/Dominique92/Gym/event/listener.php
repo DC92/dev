@@ -42,7 +42,7 @@ class listener implements EventSubscriberInterface
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
-		
+
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$template->set_style ([
 				$this->ext_path.'styles',
@@ -71,7 +71,6 @@ class listener implements EventSubscriberInterface
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 		];
 	}
-	//TODO enlever GYM_NOTA
 
 	/**
 		ALL

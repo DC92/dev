@@ -123,7 +123,7 @@ class listener implements EventSubscriberInterface
 		// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 		if ($post['geom'])
 			$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('{$post['geom']}')";
-		
+
 		$vars['sql_data'] = $sql_data; // Return data
 	}
 

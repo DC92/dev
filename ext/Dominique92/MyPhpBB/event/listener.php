@@ -1,10 +1,8 @@
 <?php
 /**
  * Usefull tricks to for phpBB
- *
- * Clickable banner (overall_header_searchbox_before.html)
- * Warning to wait until end loading of attached files (posting_attach_body_file_list_before.html)
- * See other docs lines bellow
+ * See comments inline for list of features
+ * Enable features in config.php with define('MYPHPBB_***', true);
  *
  * @copyright (c) 2020 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
@@ -37,20 +35,15 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 		$this->language = $language;
 
+		$this->post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
 
-//TODO BUG ADM Ne pas initialiser forum image avec le user/password
-
-		/**
-		 * Includes language files of this extension
-		 */
+		/* Includes language files of this extension */
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 
-		/**
-		 * Includes style files of this extension
-		 */
+		// Includes style files of this extension
 		//TODO explore all active extensions
 		//TODO bug acp_main.html
 		/*
@@ -63,23 +56,15 @@ class listener implements EventSubscriberInterface
 		*/
 	}
 
-	// List of hooks and related functions
-	// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 	static public function getSubscribedEvents() {
 
-	/**
-	 * For debug, Varnish will not be caching pages where you are setting a cookie
-	 */
+		/* DEBUG : Varnish will not be caching pages where you are setting a cookie */
 		if (defined('MYPHPBB_DISABLE_VARNISH'))
 			setcookie('disable-varnish', microtime(true), time()+600, '/');
 
+		// List of hooks and related functions
+		// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 		return [
-			// All
-			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
-
-			// Ucp&mode=register
-			'core.ucp_register_requests_after' => 'ucp_register_requests_after',
-
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
@@ -93,18 +78,24 @@ class listener implements EventSubscriberInterface
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
 
+			// Ucp&mode=register
+			'core.ucp_register_requests_after' => 'ucp_register_requests_after',
+
 			// App (error 400)
 			'core.session_ip_after' => 'session_ip_after',
+
+			// All (debug)
+			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
 		];
 	}
 
 	/**
 		INDEX.PHP
 	*/
-	// Add a post create button on index & viewforom forum description lines
 	function display_forums_modify_row ($vars) {
 		$row = $vars['row'];
 
+		/* Add a post create button on index & viewforum forum lines */
 		if (defined('MYPHPBB_CREATE_POST_BUTTON') &&
 			$this->auth->acl_get('f_post', $row['forum_id']) &&
 			$row['forum_type'] == FORUM_POST)
@@ -114,10 +105,10 @@ class listener implements EventSubscriberInterface
 		$vars['row'] = $row;
 	}
 
-	// Route to viewtopic or wiewforum if there is an argument p, t or f
 	function index_modify_page_title ($vars) {
 		$uris = explode ('/?', $this->uri);
 
+		/* Route to viewtopic or wiewforum if there is an argument p, t or f */
 		if (defined('MYPHPBB_REDIRECT') &&
 			count ($uris) > 1) {
 				if ($this->request->variable ('p', 0) ||
@@ -129,28 +120,74 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+		VIEWTOPIC.PHP
+	*/
+	// Called after reading SQL post data
+	function viewtopic_post_rowset_data($vars) {
+
+		/* Specific BBcode [location]ABSOLUTE_PATH[/location] */
+		/* go to ABSOLUTE_PATH */
+		if (defined('MYPHPBB_BBCODE_LOCATION')) {
+			$text = preg_replace_callback (
+				'/<[^>]*>/',
+				function () {
+					return '';
+				},
+				$vars['row']['post_text']
+			);
+			preg_match ('/\[location\](.*)\[\/location\]/', $text, $match);
+			if ($match)
+				exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
+		}
+	}
+
+	// Called before post assigned to template
+	function viewtopic_modify_post_row($vars) {
+
+		/* Specific BBcode [include]RELATIVE_PATH[/include] */
+		/* replaced by the content of the RELATIVE_PATH */
+		if (defined('MYPHPBB_BBCODE_INCLUDE'))
+			$vars['post_row'] = preg_replace_callback (
+				'/\[include\](.*)\[\/include\]/',
+				function ($match) {
+					return file_get_contents (
+						pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
+					);
+				},
+				$vars['post_row']
+			);
+	}
+
+	/**
 		POSTING.PHP
 	*/
+	// Called when validating the data to be saved
+	function posting_modify_submission_errors($vars) {
+		$error = $vars['error'];
+
+		/* Allows entering a POST with empty text */
+		if (defined('MYPHPBB_POST_EMPTY_TEXT'))
+			foreach ($error AS $k=>$v)
+				if ($v == $this->user->lang['TOO_FEW_CHARS'])
+					unset ($error[$k]);
+
+		$vars['error'] = $error;
+	}
+
 	// Called when viewing the posting page
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
-
-		/**
-		 * Prevent an empty title to invalidate the full page and input.
-		 */
 		$page_data = $vars['page_data'];
 
+		/* Prevent an empty title to invalidate the full page and input */
 		if (defined('MYPHPBB_POST_EMPTY_SUBJECT') &&
 			!$post_data['post_subject'])
 			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'New';
 
 		$vars['page_data'] = $page_data;
 
-		/**
-		 * Keep trace of values prior to modifications
-		 * Create a log file with the post existing data if there is none
-		 */
-		 //TODO BUG Gym Utf9 chars !!!
+		/* Keep trace of values prior to modifications */
+		/* Create a log file with the post existing data if there is none */
 		if (defined('MYPHPBB_LOG_EDIT')) {
 			// Create the LOG directory if none
 			if (!is_dir('LOG'))
@@ -161,6 +198,7 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_var('MYPHPBB_LOG_EDIT', true);
 
 			// Create the file with the existing post data
+			 //TODO BUG Gym Utf9 chars !!!
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!file_exists ($file_name))
 				file_put_contents ($file_name,
@@ -173,21 +211,16 @@ class listener implements EventSubscriberInterface
 		}
 	}
 
-	/**
-	 * Log new post data
-	 */
 	function modify_submit_notification_data($vars) {
-		$post_data = $vars['data_ary'];
-		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 
-		$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+		/* Log new post data */
 		if (defined('MYPHPBB_LOG_EDIT'))
-			file_put_contents ($file_name,
+			file_put_contents ('LOG/'.$vars['data_ary']['post_id'].'.txt',
 				'_______________________________'.PHP_EOL.
 				date('r').' '.$this->user->data['username'].PHP_EOL.
-				'Titre: '.$post['subject'].PHP_EOL.
-				$post['message'].PHP_EOL.
-				$this->specific_data($post).PHP_EOL,
+				'Titre: '.$$this->post['subject'].PHP_EOL.
+				$$this->post['message'].PHP_EOL.
+				$this->specific_data($$this->post).PHP_EOL,
 			FILE_APPEND);
 	}
 
@@ -204,9 +237,13 @@ class listener implements EventSubscriberInterface
 		return $r;
 	}
 
-	// Inhibits the registration of unauthorized countries list in MYPHPBB_COUNTRY_CODES ['FR, ...'] ISO-3166 Country Codes
+	/**
+	 * UCP
+	 */
 	function ucp_register_requests_after() {
-		global $config;
+
+		/* Inhibits the registration of unauthorized countries */
+		/* listed in MYPHPBB_COUNTRY_CODES ['FR, ...'] (ISO-3166 Country Codes) */
 		if (defined('MYPHPBB_COUNTRY_CODES')) {
 			$server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 			$iplocation = unserialize (file_get_contents ('http://www.geoplugin.net/php.gp?ip='.$server['REMOTE_ADDR']));
@@ -216,55 +253,11 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Specific BBcodes
-	 * [location]ABSOLUTE_PATH[/location] Go to ABSOLUTE_PATH
-	 */
-	// Called after reading SQL post data
-	function viewtopic_post_rowset_data($vars) {
-		preg_match ('/\[location\]<.*>(.*)<.*>\[\/location\]/', $vars['row']['post_text'], $match);
-		if (defined('MYPHPBB_BBCODE_LOCATION') &&
-			$match)
-			exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
-	}
-
-	/**
-	 * Specific BBcodes
-	 * Replace [include]RELATIVE_PATH[/include] by the content of the RELATIVE_PATH
-	 */
-	// Called before post assigned to template
-	function viewtopic_modify_post_row($vars) {
-		if (defined('MYPHPBB_BBCODE_INCLUDE'))
-			$vars['post_row'] = preg_replace_callback (
-				'/\[include\](.*)\[\/include\]/',
-				function ($match) {
-					return file_get_contents (
-						pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
-					);
-				},
-				$vars['post_row']
-			);
-	}
-
-	/**
-	 * Allows entering a POST with empty text
-	 */
-	// Called when validating the data to be saved
-	function posting_modify_submission_errors($vars) {
-		$error = $vars['error'];
-
-		if (defined('MYPHPBB_POST_EMPTY_TEXT'))
-			foreach ($error AS $k=>$v)
-				if ($v == $this->user->lang['TOO_FEW_CHARS'])
-					unset ($error[$k]);
-
-		$vars['error'] = $error;
-	}
-
-	/**
-	 * DEBUG
-	 * Dump global & templates variables
+	 * ALL
 	 */
 	function twig_environment_render_template_before($vars) {
+
+		/* DEBUG : Dump global variables */
 		if(defined('MYPHPBB_DUMP_GLOBALS')) {
 			ini_set('xdebug.var_display_max_depth', '2');
 			ini_set('xdebug.var_display_max_children', '1024');
@@ -273,6 +266,7 @@ class listener implements EventSubscriberInterface
 			$this->request->disable_super_globals();
 		}
 
+		/* DEBUG : Dump templates variables */
 		if(defined('MYPHPBB_DUMP_TEMPLATE') &&
 			$vars['name'] != 'attachment.html') {
 			ini_set('xdebug.var_display_max_depth', '1');
@@ -285,33 +279,21 @@ class listener implements EventSubscriberInterface
 		APP
 	*/
 	// Called when a page is not found
-	// Redirect url/shortcut to a page containing [shortcut]shortcut[/shortcut]
-	// You can add an empty shortcut BBcode
 	function session_ip_after() {
-		//TODO BUG ne montre pas loggé quand redirigé
+
+		/* Redirect url/shortcut to a page containing [shortcut]shortcut[/shortcut] */
+		/* You can add an empty shortcut BBcode */
 		if (defined('MYPHPBB_SHORTCUT')) {
 			$shortcut = pathinfo ($this->server['REQUEST_URI'], PATHINFO_FILENAME);
 
-			$sql = 'SELECT post_id FROM '.POSTS_TABLE.' WHERE post_text LIKE "%[shortcut]%'.$shortcut.'%[%'.'"';
+			$sql = 'SELECT post_id FROM '.POSTS_TABLE.' WHERE post_text LIKE "%shortcut%>'.$shortcut.'<%shortcut%"';
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
 
 			if ($row)
-				echo '<meta http-equiv="refresh" content="0;URL=viewtopic.php?p='.$row['post_id'].'">';
+				echo '<meta http-equiv="refresh" content="0;URL=viewtopic.php?p='.
+					$row['post_id'].'">';
 		}
 	}
 }
-
-/**
- * Short link /?f=0&t=0&p=0 to viewforum & viewtopic
- * Add these lines at the end of /.htaccess
- *
-RewriteCond %{REQUEST_FILENAME} index.php
-RewriteCond %{QUERY_STRING} (^|&)f=[0-9]+(&|$)
-RewriteRule ^(.*)$ viewforum.php [QSA,L]
-
-RewriteCond %{REQUEST_FILENAME} index.php
-RewriteCond %{QUERY_STRING} (^|&)(t|p)=[0-9]+(&|$)
-RewriteRule ^(.*)$ viewtopic.php [QSA,L]
- */
