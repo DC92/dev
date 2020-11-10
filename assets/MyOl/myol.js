@@ -1304,13 +1304,15 @@ function controlLayersSwitcher(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
-//TODO remettre le lien dans la carte et pas dans la ligne de commande
 function controlPermalink(options) {
 	options = Object.assign({
 		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
-		display: false, // Change url hash to position the map.
+		setUrl: false, // Change url hash to position the map.
+		display: false, // Display link the map.
+		hash: '?', // {?, #} the permalink delimiter
 	}, options);
-	const control = new ol.control.Control({
+	const aEl = document.createElement('a'),
+		control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 			render: render,
 		}),
@@ -1325,6 +1327,13 @@ function controlPermalink(options) {
 			'map=' + options.initialFit + // Optional default
 			'map=6/2/47') // Default
 		.match(/map=([0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // map=<ZOOM>/<LON>/<LAT>
+
+	if (options.display) {
+		control.element.className = 'ol-permalink';
+		aEl.innerHTML = 'Permalink';
+		aEl.title = 'Generate a link with map zoom & position';
+		control.element.appendChild(aEl);
+	}
 
 	if (typeof options.initialCenter == 'function') {
 		options.initialCenter([parseFloat(params[2]), parseFloat(params[3])]);
@@ -1351,6 +1360,8 @@ function controlPermalink(options) {
 				];
 
 			if (options.display)
+				aEl.href = options.hash + 'map=' + newParams.join('/');
+			if (options.setUrl)
 				location.href = '#map=' + newParams.join('/');
 			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
 		}
