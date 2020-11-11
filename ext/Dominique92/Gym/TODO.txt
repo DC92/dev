@@ -1,10 +1,20 @@
+Avant
+Créer les geom des salles
+Mettre en file le .mp3 et les slides
+
 Migration
 Créer nouveau répertoire
 Uploader phpBB 3.3.2 sauf doc
 Uploader assets/MyOl
-Uploader ext/Dominique92/MyPhpBB GeoBB Analytics CleanTalk Gym
+Uploader ext/Dominique92/MyPhpBB GeoBB Gym
+Uploader phpbb/GGAnalytics cleantalk/antispam
+Récupérer /files
 Run /install upload
 Supprimer Install
+
+//TODO pouvoir lire files/*.mp3
+	You don't have permission to access this resource.
+	Additionally, a 403 Forbidden error was encountered while trying to use an ErrorDocument to handle the request.
 
 Initialiser position carte sur Chaville
 Masque saisie cartes et calendriers suivant sujet
