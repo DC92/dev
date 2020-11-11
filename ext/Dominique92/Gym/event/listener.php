@@ -89,11 +89,8 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé juste avant d'afficher
 	function viewtopic_modify_page_title($vars) {
-		if (!$this->args['f'] && $this->args['t'])
-			$this->my_template = 'viewtopic';
-		if ($vars['forum_id'] == 2 && $this->args['p'])
-			$this->my_template = 'viewtopic';
-		if ($vars['forum_id'] == 4 && $get['p'])
+		if (!$this->args['f'] && $this->args['t'] ||
+			$this->args['p'])
 			$this->my_template = 'viewtopic';
 	}
 

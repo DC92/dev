@@ -451,6 +451,11 @@ body {
 }
 
 /* Cartes */
+.section-posting #map {
+    width: 400px !important;
+    height: 400px !important;
+}
+/* //TODO DELETE */
 .gym .carte {
 	clear: both;
 	width: 500px;

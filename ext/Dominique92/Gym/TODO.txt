@@ -1,6 +1,8 @@
 Avant
 Créer les geom des salles
 Mettre en file le .mp3 et les slides
+Supprimer Forum et ce qu'il contient
+Purger les posts inutiles
 
 Migration
 Créer nouveau répertoire
