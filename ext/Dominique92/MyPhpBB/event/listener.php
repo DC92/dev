@@ -218,9 +218,9 @@ class listener implements EventSubscriberInterface
 			file_put_contents ('LOG/'.$vars['data_ary']['post_id'].'.txt',
 				'_______________________________'.PHP_EOL.
 				date('r').' '.$this->user->data['username'].PHP_EOL.
-				'Titre: '.$$this->post['subject'].PHP_EOL.
-				$$this->post['message'].PHP_EOL.
-				$this->specific_data($$this->post).PHP_EOL,
+				'Titre: '.$this->post['subject'].PHP_EOL.
+				$this->post['message'].PHP_EOL.
+				$this->specific_data($this->post).PHP_EOL,
 			FILE_APPEND);
 	}
 
