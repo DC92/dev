@@ -93,6 +93,8 @@ class listener implements EventSubscriberInterface
 			$this->my_template = 'viewtopic';
 		if ($vars['forum_id'] == 2 && $this->args['p'])
 			$this->my_template = 'viewtopic';
+		if ($vars['forum_id'] == 4 && $get['p'])
+			$this->my_template = 'viewtopic';
 	}
 
 	// Appelé après viewtopic_modify_page_title & template->set_filenames

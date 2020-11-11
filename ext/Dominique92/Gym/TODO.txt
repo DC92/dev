@@ -1,7 +1,10 @@
 Migration
-Ajouter assets/MyOl
-Créer forum lieux :point ext/Dominique92/Gym/styles/prosilver/theme/images/ballon-rose.png
-Créer lieux personne / transférer les sujets
+Créer nouveau répertoire
+Uploader phpBB 3.3.2 sauf doc
+Uploader assets/MyOl
+Uploader ext/Dominique92/MyPhpBB GeoBB Analytics CleanTalk Gym
+Run /install upload
+Supprimer Install
 
 Initialiser position carte sur Chaville
 Masque saisie cartes et calendriers suivant sujet
