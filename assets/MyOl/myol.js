@@ -2295,12 +2295,12 @@ function layerGeoJson(options) {
 				) + '</select>';
 			}
 			// Select action
-			if (displayPointEl.firstChild.nextElementSibling) {
-				displayPointEl.firstChild.nextElementSibling.onchange = function(evt) {
+			const selects = displayPointEl.getElementsByTagName('select');
+			if (selects.length)
+				selects[0].onchange = function(evt) {
 					options.displayFormat = evt.target.value;
 					displayPoint(ll);
 				};
-			}
 		}
 	}
 
