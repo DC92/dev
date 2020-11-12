@@ -25,6 +25,17 @@
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
+	<!-- Carte -->
+	<!-- IF GEOJSON -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
+		<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
+		<div id="map"></div>
+		<input type="hidden" id="cadre-json" value='{GEOJSON}' />
+	<!-- ENDIF -->
+
 	<!-- ANIMATRICES //TODO DEPLACER (pour page equipe) -->
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->

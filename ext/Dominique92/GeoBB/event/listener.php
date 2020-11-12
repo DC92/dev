@@ -77,7 +77,8 @@ class listener implements EventSubscriberInterface
 		$row = $vars['row'];
 		$has_maps = preg_match ('/([\.:])(point|line|poly)/', $this->topic_data['forum_desc'], $params);
 
-		if ($has_maps && (
+		if ($has_maps &&
+			$row['geojson'] && (
 				$params[1] == ':' || // Map on all posts
 				$row['post_id'] == $this->topic_data['topic_first_post_id'] // Only map on the first post
 			))
