@@ -5,21 +5,30 @@
 	<b>Publication dans :</b><br/>
 
 	Menu <input type="checkbox" name="gym_menu"
-	<!-- IF GYM_MENU == 'on' -->
+	<!-- IF GYM_MENU === 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
 
 	Horaires <input type="checkbox" name="gym_horaires"
-	<!-- IF GYM_HORAIRES == 'on' -->
+	<!-- IF GYM_HORAIRES === 'on' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/> &nbsp;
+
+	Accueil <input type="checkbox" name="gym_accueil"
+	<!-- IF GYM_ACCUEIL === 'on' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/> &nbsp;
+
+	Actualités <input type="checkbox" name="gym_actualite"
+	<!-- IF GYM_ACTUALITE === 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
 
 	Ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
-
-	<br/>Pour être publié en haut de la page d'accueil, le texte doit comporter une balise [accueil].
-	<br/>Pour être publié dans la partie Actualité de la page d'accueil, le texte doit comporter une balise [actualite].
 </div><br/>
 <!-- ENDIF -->
 

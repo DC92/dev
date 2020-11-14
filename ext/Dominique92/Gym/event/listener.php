@@ -69,6 +69,9 @@ class listener implements EventSubscriberInterface
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
+
+			// Adm
+			'core.adm_page_header' => 'adm_page_header',
 		];
 	}
 
@@ -310,24 +313,12 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-	// Add specific columns to the database
-	//TODO utiliser adm_page_header de GeoBB
-	function verify_column($table, $columns) {
-		foreach ($columns AS $column) {
-			$sql = "SHOW columns FROM $table LIKE '$column'";
-			$result = $this->db->sql_query($sql);
-			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-			if (!$row) {
-				$sql = "ALTER TABLE $table ADD $column TEXT";
-				$this->db->sql_query($sql);
-			}
-		}
-	}
-
-	// Popule les templates
-	function popule_posts() {
-		$this->verify_column(POSTS_TABLE, [
+	/**
+		ADM
+	*/
+	function adm_page_header() {
+		// Create required SQL columns when needed
+		$columns = [
 			'gym_activite',
 			'gym_lieu',
 			'gym_ouverture',
@@ -338,13 +329,29 @@ class listener implements EventSubscriberInterface
 			'gym_minute',
 			'gym_duree_heures',
 			'gym_duree_jours',
-			'gym_scolaire',
-			'gym_semaines',
-			'gym_horaires',
-			'gym_menu',
-			'gym_ordre_menu',
-		]);
+ 			'gym_scolaire',
+ 			'gym_semaines',
+			'gym_accueil',
+			'gym_actualite',
+ 			'gym_horaires',
+ 			'gym_menu',
+ 			'gym_ordre_menu',
+		];
+ 
+		foreach ($columns AS $column) {
+			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "'.$column.'"';
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+			if (!$row) {
+				$sql = 'ALTER TABLE '.POSTS_TABLE.' ADD '.$column.' TEXT';
+				$this->db->sql_query($sql);
+			}
+		}
+	}
 
+	// Popule les templates
+	function popule_posts() {
 		// Filtre pour horaires
 		$cond = ['TRUE'];
 		$post_id = $this->request->variable('id', '', true);

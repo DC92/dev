@@ -198,7 +198,6 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_var('MYPHPBB_LOG_EDIT', true);
 
 			// Create the file with the existing post data
-			 //TODO BUG Gym Utf9 chars !!!
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
 			if (!file_exists ($file_name))
 				file_put_contents ($file_name,
