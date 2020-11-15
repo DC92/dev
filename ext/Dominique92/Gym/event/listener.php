@@ -36,19 +36,10 @@ class listener implements EventSubscriberInterface
 		$this->annee_debut = 2020;
 		$this->semaines = '5,6,7,8,9,10,13,14,15,16,17,18,19,22,23,24,25,26,27,30,31,32,33,34,35,36,39,40,41,42,43,44,45,46,47';
 
-		// Includes language and style files of this extension
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
-		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
-
-		// Includes style files of this extension
-		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-			$template->set_style ([
-				$this->ext_path.'styles',
-				'styles', // core styles
-			]);
 	}
 
 	static public function getSubscribedEvents() {
@@ -80,6 +71,16 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
+		// Includes language and style files of this extension
+		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+
+		// Includes style files of this extension
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$this->template->set_style ([
+				$this->ext_path.'styles',
+				'styles', // core styles
+			]);
+
 		// Assign requested template
 		$this->template->assign_var ('EXT_PATH', $this->ext_path);
 		foreach ($this->args AS $k=>$v)

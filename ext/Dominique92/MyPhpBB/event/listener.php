@@ -38,22 +38,6 @@ class listener implements EventSubscriberInterface
 		$this->post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
-
-		/* Includes language files of this extension */
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
-
-		// Includes style files of this extension
-		//TODO explore all active extensions
-		/*
-		$this->ext_path = 'ext/'.$ns[0].'/'.$ns[1].'/';
-		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-			$template->set_style ([
-				$this->ext_path.'styles',
-				'styles', // core styles
-				'adm', // core styles //TODO needed for template/adm/...
-			]);
-		*/
 	}
 
 	static public function getSubscribedEvents() {
@@ -65,6 +49,9 @@ class listener implements EventSubscriberInterface
 		// List of hooks and related functions
 		// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 		return [
+			// All
+			'core.page_header' => 'page_header',
+
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
@@ -87,6 +74,27 @@ class listener implements EventSubscriberInterface
 			// All (debug)
 			'core.twig_environment_render_template_before' => 'twig_environment_render_template_before',
 		];
+	}
+
+	/**
+		ALL
+	*/
+	function page_header() {
+		$ns = explode ('\\', __NAMESPACE__);
+
+		/* Includes language files of this extension */
+		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+
+		// Includes style files of this extension
+		//TODO explore all active extensions
+		/*
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$template->set_style ([
+				'ext/'.$ns[0].'/'.$ns[1].'/styles',
+				'styles', // core styles
+				'adm', // core styles //TODO needed for template/adm/...
+			]);
+		*/
 	}
 
 	/**
