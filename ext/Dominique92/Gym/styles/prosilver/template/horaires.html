@@ -44,13 +44,16 @@
 			<!-- IF REQUEST_T != 3 -->
 			<td>
  				<!-- IF post.GYM_LIEU != REQUEST_IP -->
+
+<!-- Lien visio -->
+<!-- //TODO DELETE -->
 <!-- IF post.POST_SUBJECT == "TEST" -->
 					<a title="Se connecter à la visioconférence"
 						href="visio.php?a={post.GYM_ANIMATEUR}"
 <!-- ELSE -->
 					<a href="viewtopic.php?p={post.GYM_LIEU}"
 <!-- ENDIF -->
-					<a href="viewtopic.php?p={post.GYM_LIEU}"
+
 					<!-- IF post.GYM_OUVERTURE == 2 -->
 						class="cert"
 					<!-- ENDIF -->
@@ -58,7 +61,7 @@
 						{post.LIEU}
 					</a>
  				<!-- ELSE -->
- 					{post.LIEU}
+ 					{post.LIEU}zzzz
  				<!-- ENDIF -->
 <!-- IF not post.GYM_OUVERTURE -->
 <span style="color:red">(fermé)</span>

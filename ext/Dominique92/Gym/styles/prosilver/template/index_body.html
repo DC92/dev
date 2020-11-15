@@ -16,14 +16,17 @@
 	</div>
 
 	<div>
+	<!-- Pavés accueil -->
 	<!-- BEGIN topic -->
 		<!-- BEGIN post -->
+		<!-- //TODO remplacer par coche "accueil" -->
 		<!-- IF post.ACCUEIL -->
 			<!-- IF U_MCP -->
 			<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 				title="Modifier la page {post.POST_SUBJECT}">
 				<i class="icon fa-pencil"></i></a>
 			<!-- ENDIF -->
+		<!-- //TODO afficher résumé -->
 			{post.ACCUEIL}
 		<!-- ENDIF -->
 		<!-- END post -->
@@ -40,8 +43,10 @@
 	<!-- ENDIF -->
 </h1>
 
+<!-- //TODO actualités sans date / sans heure -->
 <!-- BEGIN topic -->
 <!-- BEGIN post -->
+<!-- //TODO remplacer par coche "actualite" -->
 <!-- IF post.ACTUALITE and post.NEXT_BEG_TIME -->
 <div class="page">
 	<h2>
@@ -64,6 +69,7 @@
 		<!-- IF post.ANIMATEUR -->
 			avec {post.ANIMATEUR}
 		<!-- ENDIF -->
+		<!-- //TODO afficher résumé -->
 		<div>{post.ACTUALITE}</div>
 	</div>
 </div>

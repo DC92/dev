@@ -1,15 +1,5 @@
 /* jshint esversion: 6 */
 
-// DEBUG
-if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2) {
-	window.addEventListener('error', function(evt) {
-		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
-	});
-	console.log = function(message) {
-		alert(message);
-	};
-}
-
 // BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {
 	const id = $(elCal).attr('data-id'),
@@ -35,15 +25,6 @@ $('.calendrier').each(function(index, elCal) {
 		parseInt($(elCal).attr('data-jour'), 10)
 	);
 });
-
-// Change parameters
-function changeDayCalendar() {
-	displayInputCalendar(
-		$('.calendrier')[0],
-		parseInt($('#gym_jour option:selected')[0].value)
-	);
-}
-
 // Display the posting calendar
 function displayInputCalendar(elCal, jour) {
 	let id = $(elCal).attr('data-id');
@@ -67,6 +48,14 @@ function displayInputCalendar(elCal, jour) {
 	// Affiche le calendrier si la coche scolaire n'est pas cochée
 	const scolaireChecked = $('#gym_scolaire:checked').length;
 	$('#edit_semaines').css('display', scolaireChecked ? 'none' : 'block');
+}
+
+// Edit calendar inputs
+function changeDayCalendar() {
+	displayInputCalendar(
+		$('.calendrier')[0],
+		parseInt($('#gym_jour option:selected')[0].value)
+	);
 }
 
 // Slideshow

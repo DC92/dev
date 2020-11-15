@@ -18,7 +18,7 @@ Carte avec seulement 1 couche ?
 //Lien séance => activité
 //APRES refaire git Dominique92 / test en DC02
 //TODO Sitemap / SEO
-//BEST actualités non datées
+//TODO actualités non datées
 //BEST Bouton imprimer calendier / style print
 //BEST BUG null au dessus d'une carte sur IE
 //BEST ouverture lente sous-menus

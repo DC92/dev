@@ -14,14 +14,18 @@
 				<!-- ENDIF -->
 			</h1>
 			<div>{postrow.MESSAGE}</div>
-			<!-- IF postrow.GYM_CERT -->
-				<div>
-					Cours certifié
-					<a target="_blank" href="https://www.oncorif.fr/prescriforme-lactivite-physique-sur-ordonnance-en-ile-de-france/">
-						Prescri’forme (CERT)
-					</a>
-				</div>
-			<!-- ENDIF -->
+
+<!-- //TODO DELETE FILE -->
+<!-- IF postrow.GYM_CERT -->
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	<div>
+		Cours certifié
+		<a target="_blank" href="https://www.oncorif.fr/prescriforme-lactivite-physique-sur-ordonnance-en-ile-de-france/">
+			Prescri’forme (CERT)
+		</a>
+	</div>
+<!-- ENDIF -->
+
 		<!-- ENDIF -->
 	<!-- END postrow -->
 
@@ -36,7 +40,7 @@
 		<input type="hidden" id="cadre-json" value='{GEOJSON}' />
 	<!-- ENDIF -->
 
-	<!-- ANIMATRICES //TODO DEPLACER (pour page equipe) -->
+	<!-- ANIMATRICES //TODO DEPLACER (pour page equipe) OU DELETE ??? -->
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
 		<!-- IF REQUEST_T == post.TOPIC_ID and post.PRESENTATION and not REQUEST_P -->

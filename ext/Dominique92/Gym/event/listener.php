@@ -100,6 +100,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Appelé après viewtopic_modify_page_title & template->set_filenames
+	// Pour les templates inclus [include]template[/include]
 	function page_footer_after() {
 		$template = $this->request->variable (
 			'template',
@@ -160,6 +161,8 @@ class listener implements EventSubscriberInterface
 		VIEWFORUM.PHP
 	*/
 	function viewforum_modify_topicrow($vars) {
+	//TODO DELETE ??????????????
+/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>OBSOLETE = ".var_export('?????????????????????????????',true).'</pre>';
 		// Permet la visualisation en vue forum pour l'édition du site
 		$topic_row = $vars['topic_row'];
 		$topic_row['U_VIEW_TOPIC'] .= '&template=';
@@ -204,6 +207,7 @@ class listener implements EventSubscriberInterface
 				$post_row[strtoupper($k)] = $v;
 
 		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
+		//TODO DELETE ??????????????
 		$post_row['MESSAGE'] = preg_replace_callback(
 			'/([A-Z_]+)/',
 			function ($matches) use ($post_row) {
@@ -223,7 +227,7 @@ class listener implements EventSubscriberInterface
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 
-		// Quelles saisies spéciales
+		// Conditions d'affichage dépendant du forum
 		preg_match_all ('/([\.:])(activ|calen|publi)/', $post_data['forum_desc'], $params);
 		foreach ($params[2] AS $k=>$v)
 			if ($params[1][$k] == ':' || // Map on all posts
@@ -318,6 +322,7 @@ class listener implements EventSubscriberInterface
 	/**
 		ADM
 	*/
+	// Appelé par n'importe quelle page de l'administration
 	function adm_page_header() {
 		// Create required SQL columns when needed
 		$columns = [
@@ -354,6 +359,7 @@ class listener implements EventSubscriberInterface
 
 	// Popule les templates
 	function popule_posts() {
+		//TODO à revoir
 		// Filtre pour horaires
 		$cond = ['TRUE'];
 		$post_id = $this->request->variable('id', '', true);
