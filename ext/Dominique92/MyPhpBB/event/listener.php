@@ -45,14 +45,14 @@ class listener implements EventSubscriberInterface
 
 		// Includes style files of this extension
 		//TODO explore all active extensions
-		//TODO bug acp_main.html
 		/*
 		$this->ext_path = 'ext/'.$ns[0].'/'.$ns[1].'/';
-		$template->set_style ([
-			$this->ext_path.'styles',
-			'styles', // core styles
-			'adm', // core styles //TODO needed for template/adm/...
-		]);
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$template->set_style ([
+				$this->ext_path.'styles',
+				'styles', // core styles
+				'adm', // core styles //TODO needed for template/adm/...
+			]);
 		*/
 	}
 

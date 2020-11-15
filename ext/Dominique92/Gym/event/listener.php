@@ -43,6 +43,7 @@ class listener implements EventSubscriberInterface
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
 
+		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$template->set_style ([
 				$this->ext_path.'styles',

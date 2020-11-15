@@ -1,12 +1,10 @@
 Migration
-Créer nouveau répertoire
-Uploader phpBB 3.3.2 sauf doc
-Uploader assets/MyOl
-Uploader ext/Dominique92/MyPhpBB GeoBB Gym
-Uploader phpbb/GGAnalytics cleantalk/antispam
-Récupérer /files /audio / slides youtube.php
-Run /install upload
-Supprimer Install
+Uploader phpBB 3.3.2 sauf doc & install
+assets/MyOl
+ext/Dominique92/MyPhpBB GeoBB Gym
+ext/phpbb/GGAnalytics cleantalk/antispam
+/files /audio /slides config.php youtube.php
+config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
 Créer les geom des salles
 
 Initialiser position carte sur Chaville
