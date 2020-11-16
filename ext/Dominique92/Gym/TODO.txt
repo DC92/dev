@@ -7,8 +7,8 @@ ext/phpbb/GGAnalytics cleantalk/antispam
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
 Créer les geom des salles
 
+//TODO
 Initialiser position carte sur Chaville
-Masque saisie cartes et calendriers suivant sujet
 Dépendance des calendrier scolaires / vision dans actualité
 ordre des actualités = n° ordre (fiche)
 liens en clair pour ajouter une seance, lieu, ... (menu haut ?)

@@ -58,7 +58,7 @@ $lang = array_merge($lang, array(
 	'CONTACT_ADMIN' => 'Nous contacter',
 
 	// Footer
-	'FINAL_INTEGRATION_BY' =>
+	'POWERED_BY' =>
 		'&copy; Chavil\'GYM 2020'.
 		' : <a href="memberlist.php?mode=contactadmin">Contact</a>'.
 		' - Réalisé par <a href="https://github.com/Dominique92">Dominique</a>'.

@@ -38,7 +38,7 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
-	'FINAL_INTEGRATION_BY' =>
+	'POWERED_BY' =>
 		'&copy; <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> '.
 		'<a href="https://github.com/Dominique92">Dominique Cavailhez</a>, '.strftime('%B %Y').
 		'. Powered by <a href="http://www.phpbb-fr.com/">phpBB</a>',

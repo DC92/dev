@@ -7,7 +7,7 @@ new ol.Map({
 			focus: 16,
 			styleOptions: {
 				image: new ol.style.Icon({
-					src: 'ext/Dominique92/Gym/styles/prosilver/theme/images/ballon.png',
+					src: 'ext/Dominique92/Gym/styles/prosilver/theme/images/ballon-rose.png',
 				}),
 			},
 		}),
