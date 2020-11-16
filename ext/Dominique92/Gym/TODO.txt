@@ -6,6 +6,7 @@ ext/phpbb/GGAnalytics cleantalk/antispam
 /files /audio /slides config.php youtube.php
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
 Créer les geom des salles
+Modifier BBcodes accueil & actualite -> resume (ou rien)
 
 //TODO
 Initialiser position carte sur Chaville

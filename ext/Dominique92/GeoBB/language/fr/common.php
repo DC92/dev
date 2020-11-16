@@ -39,7 +39,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	// Footer
-	'POWERED_BY' =>
+	'FINAL_INTEGRATION_BY' =>
 		'&copy; Dominique Cavailhez 2016 : <a href="https://github.com/Dominique92/GeoBB">GeoBB</a> &amp; '.
 		'<a href="https://github.com/Dominique92/MyOl">MyOl</a> '.
 		'based on <a href="https://www.phpbb.com/">phpBB</a>',

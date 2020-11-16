@@ -19,15 +19,13 @@
 	<!-- Pavés accueil -->
 	<!-- BEGIN topic -->
 		<!-- BEGIN post -->
-		<!-- //TODO remplacer par coche "accueil" -->
-		<!-- IF post.ACCUEIL -->
+		<!-- IF post.GYM_ACCUEIL -->
 			<!-- IF U_MCP -->
 			<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 				title="Modifier la page {post.POST_SUBJECT}">
 				<i class="icon fa-pencil"></i></a>
 			<!-- ENDIF -->
-		<!-- //TODO afficher résumé -->
-			{post.ACCUEIL}
+			{post.RESUME}
 		<!-- ENDIF -->
 		<!-- END post -->
 	<!-- END topic -->
@@ -46,8 +44,7 @@
 <!-- //TODO actualités sans date / sans heure -->
 <!-- BEGIN topic -->
 <!-- BEGIN post -->
-<!-- //TODO remplacer par coche "actualite" -->
-<!-- IF post.ACTUALITE and post.NEXT_BEG_TIME -->
+<!-- IF post.GYM_ACTUALITE and post.NEXT_BEG_TIME -->
 <div class="page">
 	<h2>
 		<!-- IF post.DATE -->
@@ -63,14 +60,16 @@
 	</h2>
 	<div>
 		{post.LIEU}
+
 		<!-- IF post.GYM_HEURE > 0 -->
 			à {post.HORAIRE_DEBUT}
 		<!-- ENDIF -->
+
 		<!-- IF post.ANIMATEUR -->
 			avec {post.ANIMATEUR}
 		<!-- ENDIF -->
-		<!-- //TODO afficher résumé -->
-		<div>{post.ACTUALITE}</div>
+
+		<div>{post.RESUME}</div>
 	</div>
 </div>
 <!-- ENDIF -->

@@ -138,9 +138,7 @@ class listener implements EventSubscriberInterface
 		if (defined('MYPHPBB_BBCODE_LOCATION')) {
 			$text = preg_replace_callback (
 				'/<[^>]*>/',
-				function () {
-					return '';
-				},
+				function () {return '';},
 				$vars['row']['post_text']
 			);
 			preg_match ('/\[location\](.*)\[\/location\]/', $text, $match);

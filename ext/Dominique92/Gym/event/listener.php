@@ -412,11 +412,15 @@ class listener implements EventSubscriberInterface
 				$row['bbcode_uid'], $row['bbcode_bitfield'],
 				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
 			);
-
 			if (!empty($attachments[$row['post_id']]))
 				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
-			// Extrait des résumé des parties à afficher
+			// Extrait du résumé
+			$vs = explode ('<!--resume-->', $row['display_text']);
+			$row['resume'] = count ($vs) > 1 ? $vs[1]
+				: $row['display_text']; // Par défaut : tout
+
+			//TODO DELETE
 			foreach (['accueil','actualite','presentation'] AS $k) {
 				$vs = explode ("<!--$k-->", $row['display_text']);
 				if (count ($vs) > 1)
