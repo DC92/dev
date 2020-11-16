@@ -342,6 +342,65 @@ class listener implements EventSubscriberInterface
 				$this->db->sql_query($sql);
 			}
 		}
+
+		// Add / correct the specific BBcodes
+		$bbcodes = [
+			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
+			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],
+			['[doc={TEXT1}]{TEXT2}[/doc]','<a href="docs/{TEXT1}.pdf">{TEXT2}</a>','Lien vers un document'],
+			['[page={TEXT1}]{TEXT2}[/page]','<a href="viewtopic.php?p={TEXT1}">{TEXT2}</a>','Lien vers une page'],
+			['[rubrique={TEXT1}]{TEXT2}[/rubrique]','<a href="viewtopic.php?t={TEXT1}">{TEXT2}</a>','Lien vers une rubrique'],
+			['[centre]{TEXT}[/centre]','<div style="text-align:center">{TEXT}</div>','Texte centré'],
+			['[saut_ligne][/saut_ligne]','<br style="clear:both" />'],
+			['[separation][/separation]','<hr/>','Ligne horizontale'],
+			['[urlb={TEXT1}]{TEXT2}[/urlb]','<a target="_BLANK" href="{TEXT1}">{TEXT2}</a>','Lien à afficher sur un nouvel onglet'],
+			['[resume]{TEXT}[/resume]','<!--resume-->{TEXT}<!--resume-->','Partie de texte à afficher (accueil, actualité, ...)'],
+			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO DELETE
+			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
+			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
+			['[youtube]{TEXT}[/youtube]','[youtube]{TEXT}[/youtube]'],
+			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
+			['[titre1]{TEXT}[/titre1]','<h1>{TEXT}</h1>','Caractères blancs sur fond bleu'],
+			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
+			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
+			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
+//TODO AFTER3 DELETE			['[carte]'],
+		];
+
+		foreach ($bbcodes AS $k=>$bbcode) {
+			preg_match ('/[a-z_0-9]+/', $bbcode[0], $match);
+			$bbcodes[$k][3] = @$match[0];
+
+			$sql = 'DELETE FROM '.BBCODES_TABLE.' WHERE bbcode_tag = "'.$match[0].'"';
+			$this->db->sql_query($sql);
+		}
+
+		$sql = 'SELECT MAX(bbcode_id) as max_bbcode_id FROM '. BBCODES_TABLE;
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+		$next = $row['max_bbcode_id'] + 1;
+
+		foreach ($bbcodes AS $k=>$bbcode)
+			if ($bbcode[1] && $bbcode[3]) {
+				$line = [
+					'bbcode_id' => $next++,
+					'bbcode_match' => $bbcode[0],
+					'bbcode_tpl' => addslashes ($bbcode[1]),
+					'bbcode_helpline' => @$bbcode[2],
+					'bbcode_tag' => $bbcode[3],
+					'display_on_posting' => 1,
+					'first_pass_match' => '/(?!)/',
+					'first_pass_replace' => '',
+					'second_pass_match' => '/(?!)/',
+					'second_pass_replace' => '',
+				];
+
+				$sql = 'INSERT INTO '.BBCODES_TABLE.
+					' ('.implode (',', array_keys ($line)).')'.
+					' VALUES("'.implode ('","', $line).'")';
+				$this->db->sql_query($sql);
+			}
 	}
 
 	// Popule les templates
@@ -409,11 +468,13 @@ class listener implements EventSubscriberInterface
 				: $row['display_text']; // Par défaut : tout
 
 			//TODO AFTER3 DELETE
+			/*
 			foreach (['accueil','actualite','presentation'] AS $k) {
 				$vs = explode ("<!--$k-->", $row['display_text']);
 				if (count ($vs) > 1)
 					$row[strtoupper($k)] = $vs[1];
 			}
+			*/
 
 			// Date
 			$this->template->assign_var ('ANNEE_DEBUT', $this->annee_debut);
