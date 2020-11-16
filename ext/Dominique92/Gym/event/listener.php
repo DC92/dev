@@ -55,9 +55,6 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
-			// Viewforum
-			'core.viewforum_modify_topicrow' => 'viewforum_modify_topicrow',
-
 			// Posting
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
@@ -115,7 +112,7 @@ class listener implements EventSubscriberInterface
 	/**
 		Expansion des "BBCodes" maisons : (INCLUDE|LOCATION valeur)
 	*/
-	//TODO DELETE
+	//TODO AFTER3 DELETE
 	function twig_environment_render_template_after($vars) {
 		if ($vars['name'] == 'index_body.html' ||
 			$vars['name'][0] == '@')
@@ -158,18 +155,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-		VIEWFORUM.PHP
-	*/
-	function viewforum_modify_topicrow($vars) {
-	//TODO DELETE ??????????????
-/*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'>OBSOLETE = ".var_export('?????????????????????????????',true).'</pre>';
-		// Permet la visualisation en vue forum pour l'édition du site
-		$topic_row = $vars['topic_row'];
-		$topic_row['U_VIEW_TOPIC'] .= '&template=';
-		$vars['topic_row'] = $topic_row;
-	}
-
-	/**
 		VIEWTOPIC.PHP
 	*/
 	// Called before reading phpbb-posts SQL data
@@ -208,6 +193,7 @@ class listener implements EventSubscriberInterface
 
 		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
 		//TODO DELETE ??????????????
+		/*
 		$post_row['MESSAGE'] = preg_replace_callback(
 			'/([A-Z_]+)/',
 			function ($matches) use ($post_row) {
@@ -216,6 +202,7 @@ class listener implements EventSubscriberInterface
 			},
 			$post_row['MESSAGE']
 		);
+		*/
 
 		$vars['post_row'] = $post_row;
 	}
@@ -366,6 +353,7 @@ class listener implements EventSubscriberInterface
 		if ($post_id)
 			$cond[] = 'p.post_id='.$post_id;
 
+//TODO réduire les it= & ip= (INCLUDE
 		$request_it = $this->request->variable('it', 0);
 		$request_ip = $this->request->variable('ip', 0);
 		if ($request_it == 2 && $request_ip)
@@ -420,7 +408,7 @@ class listener implements EventSubscriberInterface
 			$row['resume'] = count ($vs) > 1 ? $vs[1]
 				: $row['display_text']; // Par défaut : tout
 
-			//TODO DELETE
+			//TODO AFTER3 DELETE
 			foreach (['accueil','actualite','presentation'] AS $k) {
 				$vs = explode ("<!--$k-->", $row['display_text']);
 				if (count ($vs) > 1)

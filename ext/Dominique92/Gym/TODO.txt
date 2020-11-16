@@ -7,17 +7,16 @@ ext/phpbb/GGAnalytics cleantalk/antispam
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
 Créer les geom des salles
 Modifier BBcodes accueil & actualite -> resume (ou rien)
+remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
+Refaire git Dominique92 / test en DC02
 
-//TODO
-Initialiser position carte sur Chaville
-Dépendance des calendrier scolaires / vision dans actualité
-ordre des actualités = n° ordre (fiche)
-liens en clair pour ajouter une seance, lieu, ... (menu haut ?)
-Carte avec seulement 1 couche ?
-//Bouton enregistrer en haut
-// map GeoBB
-//Lien séance => activité
-//APRES refaire git Dominique92 / test en DC02
+//BEST Initialiser posting lieu position carte sur Chaville
+//BEST carte tous poins dans chaville
+//TODO Dépendance des calendrier scolaires / vision dans actualité
+//TODO ordre des actualités = n° ordre (fiche)
+//TODO liens en clair pour ajouter une seance, lieu, ... (menu haut ?)
+//TODO Bouton enregistrer en haut
+//TODO Lien séance => activité
 //TODO Sitemap / SEO
 //TODO actualités non datées
 //BEST Bouton imprimer calendier / style print
@@ -26,12 +25,11 @@ Carte avec seulement 1 couche ?
 //BEST lien document => download au lieu d'afficher (plaquette & inscriptions => page attachment)
 //BEST n'inclure OL que quand il y a une carte
 //BEST Lien gmaps
-//BEST BUG Diaporama pas vu depuis un moment boucle rapidement
+//BEST BUG Diaporama pas vu depuis un moment => boucle rapidement
 //BEST BUG d'affichage avec &hilit=body (résultat recherche)
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
 	" dans le title !
 //BEST traduire TOPIC_ID => le n° du topic dans (INCLUDE
-//BEST réduire les it= & ip= (INCLUDE
 //BEST Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
 //BEST Glissement latéral pages
