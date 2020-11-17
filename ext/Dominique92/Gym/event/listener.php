@@ -358,7 +358,7 @@ class listener implements EventSubscriberInterface
 			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO DELETE
 			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
 			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
-			['[youtube]{TEXT}[/youtube]','[youtube]{TEXT}[/youtube]'],
+			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
 			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
 			['[titre1]{TEXT}[/titre1]','<h1>{TEXT}</h1>','Caractères blancs sur fond bleu'],
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
