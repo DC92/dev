@@ -3,13 +3,18 @@ Uploader phpBB 3.3.2 sauf doc & install
 assets/MyOl
 ext/Dominique92/MyPhpBB GeoBB Gym
 ext/phpbb/GGAnalytics cleantalk/antispam
-/files /audio /slides config.php youtube.php
+/files /fichiers config.php
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
 Créer les geom des salles
 Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
+//TODO carte dans la page générale des salles
+//TODO convertir tous les non saisis "null" en off
+//TODO BUG revoir les n° de topic des (...) de création de nouveaux
+//TODO BUG pas de pavé supprimer dans posting
+//TODO BUG [location] sur 1 post route tout les posts
 //BEST Initialiser posting lieu position carte sur Chaville
 //BEST carte tous poins dans chaville
 //TODO Dépendance des calendrier scolaires / vision dans actualité
@@ -52,7 +57,7 @@ copier de version précédente
 exécuter /install
 
 
-/** PERSONNALISER / extension gym
+/** PERSONNALISER / extensions MyPhpBB, GeoBB, Gym
 MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
 GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
 GENERAL / Paramètres des messages / Messages par page : 99

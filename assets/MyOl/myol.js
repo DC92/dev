@@ -1503,7 +1503,8 @@ function controlFullScreen(options) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//BUG controm 1px down on FireFox
+//TODO BUG controm 1px down on FireFox
+//TODO BUG pas de loupe (return sera pris par phpBB)
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',

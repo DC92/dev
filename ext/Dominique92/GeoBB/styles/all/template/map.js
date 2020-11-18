@@ -1,5 +1,5 @@
 // Features de la couche
-const layerGeoBBgis = layerVectorURL({
+var layerGeoBBgis = layerVectorURL({
 		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300',
 		urlSuffix: '',
 		strategy: ol.loadingstrategy.bboxLimit,
@@ -29,6 +29,18 @@ const layerGeoBBgis = layerVectorURL({
 			})
 		},
 	}),
+	marker = layerGeoJson({
+		displayPointId: 'marker',
+		geoJsonId: 'geojson',
+		focus: 16,
+		dragPoint: true,
+		singlePoint: true,
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'assets/MyOl/examples/viseur.png',
+			}),
+		},
+	}),
 	map = new ol.Map({
 		target: 'map',
 		layers: [layerGeoBBgis],
@@ -56,21 +68,10 @@ switch (mapType) {
 		break;
 
 	case 'point':
-		map.addLayer(layerGeoJson({
-			displayPointId: 'marker',
-			geoJsonId: 'geojson',
-			focus: 16,
-			dragPoint: true,
-			singlePoint: true,
-			styleOptions: {
-				image: new ol.style.Icon({
-					src: 'assets/MyOl/examples/viseur.png',
-				}),
-			},
-		}));
+		map.addLayer(marker);
 		break;
 
-//TODO BUG une ligne surimposée en viewtopic ??? le marqueur avec un json ?
+		//TODO BUG une ligne surimposée en viewtopic ??? le marqueur avec un json ?
 	case 'line':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',

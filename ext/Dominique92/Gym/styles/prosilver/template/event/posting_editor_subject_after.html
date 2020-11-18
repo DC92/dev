@@ -10,12 +10,6 @@
 	<!-- ENDIF -->
 	/> &nbsp;
 
-	Horaires <input type="checkbox" name="gym_horaires"
-	<!-- IF GYM_HORAIRES === 'on' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/> &nbsp;
-
 	Accueil <input type="checkbox" name="gym_accueil"
 	<!-- IF GYM_ACCUEIL === 'on' -->
 		checked="checked"
@@ -24,6 +18,12 @@
 
 	Actualités <input type="checkbox" name="gym_actualite"
 	<!-- IF GYM_ACTUALITE === 'on' -->
+		checked="checked"
+	<!-- ENDIF -->
+	/> &nbsp;
+
+	Horaires <input type="checkbox" name="gym_horaires"
+	<!-- IF GYM_HORAIRES === 'on' -->
 		checked="checked"
 	<!-- ENDIF -->
 	/> &nbsp;
@@ -39,29 +39,29 @@
 	Activité:
 	<select name="gym_activite">
 		<option>?</option>
-		<!-- BEGIN liste_2 -->
-			<option value="{liste_2.POST_ID}"
-				<!-- IF liste_2.POST_ID == GYM_ACTIVITE -->
+		<!-- BEGIN liste_activites -->
+			<option value="{liste_activites.POST_ID}"
+				<!-- IF liste_activites.POST_ID == GYM_ACTIVITE -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_2.POST_SUBJECT}
+				{liste_activites.POST_SUBJECT}
 			</option>
-		<!-- END liste_2 -->
+		<!-- END liste_activites -->
 	</select> &nbsp;
 
 	Lieu:
 	<select name="gym_lieu">
 		<option>?</option>
-		<!-- BEGIN liste_3 -->
-			<option value="{liste_3.POST_ID}"
-				<!-- IF liste_3.POST_ID == GYM_LIEU -->
+		<!-- BEGIN liste_lieux -->
+			<option value="{liste_lieux.POST_ID}"
+				<!-- IF liste_lieux.POST_ID == GYM_LIEU -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_3.POST_SUBJECT}
+				{liste_lieux.POST_SUBJECT}
 			</option>
-		<!-- END liste_3 -->
+		<!-- END liste_lieux -->
 	</select> &nbsp;
 
 	<select name="gym_ouverture">
@@ -81,15 +81,15 @@
 	Animation:
 	<select name="gym_animateur">
 		<option>?</option>
-		<!-- BEGIN liste_4 -->
-			<option value="{liste_4.POST_ID}"
-				<!-- IF liste_4.POST_ID == GYM_ANIMATEUR -->
+		<!-- BEGIN liste_equipe -->
+			<option value="{liste_equipe.POST_ID}"
+				<!-- IF liste_equipe.POST_ID == GYM_ANIMATEUR -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_4.POST_SUBJECT}
+				{liste_equipe.POST_SUBJECT}
 			</option>
-		<!-- END liste_4 -->
+		<!-- END liste_equipe -->
 	</select> &nbsp;
 
 	Cert:

@@ -241,21 +241,24 @@ class listener implements EventSubscriberInterface
 				);
 
 		// Dictionnaires en fonction du contenu de la base de données
+		global $myphpbb_topics;
+		$topics_keys = implode (',', array_keys ($myphpbb_topics));
 		$sql = "SELECT post_id, post_subject, topic_id
 			FROM ".POSTS_TABLE."
 			JOIN ".TOPICS_TABLE." USING (topic_id)
 			WHERE post_id != topic_first_post_id
-				AND topic_id IN(2,3,4)";
+				AND topic_id IN($topics_keys)";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))
 			$values [$row['topic_id']][$row['post_subject']] = $row;
 		$this->db->sql_freeresult($result);
 
-		foreach ($values AS $k=>$v) {
-			ksort ($v);
-			foreach ($v AS $vv)
-				$this->template->assign_block_vars ('liste_'.$k, array_change_key_case ($vv, CASE_UPPER));
-		}
+		if ($values)
+			foreach ($values AS $k=>$v) {
+				ksort ($v);
+				foreach ($v AS $vv)
+					$this->template->assign_block_vars ('liste_'.$myphpbb_topics[$k], array_change_key_case ($vv, CASE_UPPER));
+			}
 	}
 
 	// Called during validation of the data to be saved
@@ -347,7 +350,7 @@ class listener implements EventSubscriberInterface
 		$bbcodes = [
 			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
 			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],
-			['[doc={TEXT1}]{TEXT2}[/doc]','<a href="docs/{TEXT1}.pdf">{TEXT2}</a>','Lien vers un document'],
+			['[doc={TEXT1}]{TEXT2}[/doc]','<a href="fichiers/{TEXT1}.pdf">{TEXT2}</a>','Lien vers un document'],
 			['[page={TEXT1}]{TEXT2}[/page]','<a href="viewtopic.php?p={TEXT1}">{TEXT2}</a>','Lien vers une page'],
 			['[rubrique={TEXT1}]{TEXT2}[/rubrique]','<a href="viewtopic.php?t={TEXT1}">{TEXT2}</a>','Lien vers une rubrique'],
 			['[centre]{TEXT}[/centre]','<div style="text-align:center">{TEXT}</div>','Texte centré'],
@@ -355,7 +358,7 @@ class listener implements EventSubscriberInterface
 			['[separation][/separation]','<hr/>','Ligne horizontale'],
 			['[urlb={TEXT1}]{TEXT2}[/urlb]','<a target="_BLANK" href="{TEXT1}">{TEXT2}</a>','Lien à afficher sur un nouvel onglet'],
 			['[resume]{TEXT}[/resume]','<!--resume-->{TEXT}<!--resume-->','Partie de texte à afficher (accueil, actualité, ...)'],
-			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO DELETE
+			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
 			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
 			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
 			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
@@ -364,6 +367,9 @@ class listener implements EventSubscriberInterface
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
 			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
+			['[include]{URL}[/include]','{URL}'],
+			['[location]{URL}[/location]','{URL}'], //TODO BUG location ne devrait pas s'exprimer quand on est dans viewtopic format forum
+			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
 //TODO AFTER3 DELETE			['[carte]'],
 		];
 

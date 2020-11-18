@@ -15,16 +15,14 @@
 			</h1>
 			<div>{postrow.MESSAGE}</div>
 
-<!-- //TODO DELETE FILE -->
-<!-- IF postrow.GYM_CERT -->
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-	<div>
-		Cours certifié
-		<a target="_blank" href="https://www.oncorif.fr/prescriforme-lactivite-physique-sur-ordonnance-en-ile-de-france/">
-			Prescri’forme (CERT)
-		</a>
-	</div>
-<!-- ENDIF -->
+			<!-- IF postrow.GYM_CERT === 'on' -->
+				<div>
+					Cours certifié
+					<a target="_blank" href="https://www.oncorif.fr/prescriforme-lactivite-physique-sur-ordonnance-en-ile-de-france/">
+						Prescri’forme (CERT)
+					</a>
+				</div>
+			<!-- ENDIF -->
 
 		<!-- ENDIF -->
 	<!-- END postrow -->
@@ -43,7 +41,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 	<!-- ANIMATRICES //TODO DEPLACER (pour page equipe) OU DELETE ??? -->
 	<!-- BEGIN topic -->
 	<!-- BEGIN post -->
-		<!-- IF REQUEST_T == post.TOPIC_ID and post.PRESENTATION and not REQUEST_P -->
+		<!-- IF REQUEST_T == post.TOPIC_ID and not REQUEST_P -->
 			<div class="animatrice">
 				<h2>
 					<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
@@ -55,7 +53,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 					<!-- ENDIF -->
 				</h2>
 
-				{post.PRESENTATION}<!-- //TODO OBSOLETE ????? ... resume ??? -->
+				{post.RESUME}
 
 				<br/><a href="viewtopic.php?p={post.POST_ID}">Plus d'infos . . .</a>
 				<br style="clear:both;height:0" />
