@@ -67,7 +67,10 @@ body {
 	text-decoration: none;
 }
 .gym .banniere h1 a:hover {
-	color: black;
+	background: blue;
+}
+.gym .edit-user > a {
+	color: white;
 }
 .gym .logo {
 	position: absolute;
