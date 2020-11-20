@@ -16,7 +16,7 @@
 		<tr>
 			<!-- IF not REQUEST_ID -->
 			<td>
-				<!-- IF post.GYM_ACTIVITE != REQUEST_IP -->
+				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->
 					<a href="viewtopic.php?p={post.GYM_ACTIVITE}">{post.POST_SUBJECT}</a>
 				<!-- ELSE -->
 					{post.POST_SUBJECT}
@@ -43,7 +43,7 @@
 
 			<!-- IF REQUEST_T != 3 -->
 			<td>
- 				<!-- IF post.GYM_LIEU != REQUEST_IP -->
+ 				<!-- IF post.GYM_LIEU != REQUEST_P -->
 
 <!-- Lien visio -->
 <!-- //BEST DELETE -->
@@ -61,7 +61,7 @@
 						{post.LIEU}
 					</a>
  				<!-- ELSE -->
- 					{post.LIEU}zzzz
+ 					{post.LIEU}
  				<!-- ENDIF -->
 <!-- IF not post.GYM_OUVERTURE -->
 <span style="color:red">(fermé)</span>
@@ -71,7 +71,7 @@
 
 			<!-- IF REQUEST_T != 4 -->
 			<td>
-				<!-- IF post.GYM_ANIMATEUR != REQUEST_IP -->
+				<!-- IF post.GYM_ANIMATEUR != REQUEST_P -->
 				<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
 					{post.ANIMATEUR}
 				</a>

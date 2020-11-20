@@ -133,9 +133,9 @@ class listener implements EventSubscriberInterface
 	// Called after reading SQL post data
 	function viewtopic_post_rowset_data($vars) {
 
-		/* Specific BBcode [location]ABSOLUTE_PATH[/location] */
-		/* go to ABSOLUTE_PATH */
-		if (defined('MYPHPBB_BBCODE_LOCATION')) {
+		/* Specific BBcode [location]ABSOLUTE_PATH[/location] go to ABSOLUTE_PATH */
+		if (defined('MYPHPBB_BBCODE_LOCATION') &&
+			$this->request->variable ('p', 0)) { // Only if a specific post is required
 			$text = preg_replace_callback (
 				'/<[^>]*>/',
 				function () {return '';},

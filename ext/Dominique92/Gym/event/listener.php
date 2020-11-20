@@ -137,8 +137,8 @@ class listener implements EventSubscriberInterface
 						case 'INCLUDE':
 							return file_get_contents (
 								$url.
-								'&it='.$this->request->variable('t',0).
-								'&ip='.$this->request->variable('p',0).
+								'&t='.$this->request->variable('t',0).
+								'&p='.$this->request->variable('p',0).
 								'&mod='.$this->auth->acl_get('m_')
 							);
 
@@ -242,23 +242,26 @@ class listener implements EventSubscriberInterface
 
 		// Dictionnaires en fonction du contenu de la base de données
 		global $myphpbb_topics;
-		$topics_keys = implode (',', array_keys ($myphpbb_topics));
-		$sql = "SELECT post_id, post_subject, topic_id
-			FROM ".POSTS_TABLE."
-			JOIN ".TOPICS_TABLE." USING (topic_id)
-			WHERE post_id != topic_first_post_id
-				AND topic_id IN($topics_keys)";
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result))
-			$values [$row['topic_id']][$row['post_subject']] = $row;
-		$this->db->sql_freeresult($result);
+		//TODO remplacer IN($topics_keys) par forum_desc :liste
+		if ($myphpbb_topics) {
+			$topics_keys = implode (',', array_keys ($myphpbb_topics));
+			$sql = "SELECT post_id, post_subject, topic_id
+				FROM ".POSTS_TABLE."
+				JOIN ".TOPICS_TABLE." USING (topic_id)
+				WHERE post_id != topic_first_post_id
+					AND topic_id IN($topics_keys)";
+			$result = $this->db->sql_query($sql);
+			while ($row = $this->db->sql_fetchrow($result))
+				$values [$row['topic_id']][$row['post_subject']] = $row;
+			$this->db->sql_freeresult($result);
 
-		if ($values)
-			foreach ($values AS $k=>$v) {
-				ksort ($v);
-				foreach ($v AS $vv)
-					$this->template->assign_block_vars ('liste_'.$myphpbb_topics[$k], array_change_key_case ($vv, CASE_UPPER));
-			}
+			if ($values)
+				foreach ($values AS $k=>$v) {
+					ksort ($v);
+					foreach ($v AS $vv)
+						$this->template->assign_block_vars ('liste_'.$myphpbb_topics[$k], array_change_key_case ($vv, CASE_UPPER));
+				}
+		}
 	}
 
 	// Called during validation of the data to be saved
@@ -368,7 +371,7 @@ class listener implements EventSubscriberInterface
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
 			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
 			['[include]{URL}[/include]','{URL}'],
-			['[location]{URL}[/location]','{URL}'], //TODO BUG location ne devrait pas s'exprimer quand on est dans viewtopic format forum
+			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
 //TODO AFTER3 DELETE			['[carte]'],
 		];
