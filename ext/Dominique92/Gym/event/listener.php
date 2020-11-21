@@ -372,6 +372,7 @@ class listener implements EventSubscriberInterface
 			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
 			['[include]{URL}[/include]','[include]{URL}[/include]','Inclut dans la page le contenu d\'une url'],
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
+			['[video]{URL}[/video]', '<video width="100%" controls><source src="fichiers/{URL}.mp4" type="video/mp4">Your browser does not support HTML video.</video>', 'Insérer une vidéo MP4'],
 			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
 //TODO AFTER3 DELETE			['[carte]'],
 		];
