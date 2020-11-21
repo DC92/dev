@@ -337,7 +337,6 @@ class listener implements EventSubscriberInterface
  			'gym_menu',
  			'gym_ordre_menu',
 		];
- 
 		foreach ($columns AS $column) {
 			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "'.$column.'"';
 			$result = $this->db->sql_query($sql);
@@ -366,6 +365,7 @@ class listener implements EventSubscriberInterface
 			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
 			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
 			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
+			['[carte][/carte]','<div id="map"></div>','Insère la carte'],
 			['[titre1]{TEXT}[/titre1]','<h1>{TEXT}</h1>','Caractères blancs sur fond bleu'],
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
@@ -375,7 +375,6 @@ class listener implements EventSubscriberInterface
 			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
 //TODO AFTER3 DELETE			['[carte]'],
 		];
-
 		foreach ($bbcodes AS $k=>$bbcode) {
 			preg_match ('/[a-z_0-9]+/', $bbcode[0], $match);
 			$bbcodes[$k][3] = @$match[0];
