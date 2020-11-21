@@ -116,9 +116,10 @@ class listener implements EventSubscriberInterface
 	function index_modify_page_title ($vars) {
 		$uris = explode ('/?', $this->uri);
 
-		/* Route to viewtopic or wiewforum if there is an argument p, t or f */
+		/* Route to viewtopic or viewforum if there is an argument p, t or f */
 		if (defined('MYPHPBB_REDIRECT') &&
-			count ($uris) > 1) {
+			count ($uris) > 1 &&
+				!$this->request->variable ('template', '')) {
 				if ($this->request->variable ('p', 0) ||
 					$this->request->variable ('t', 0))
 					exit (file_get_contents ($uris[0].'/viewtopic.php?'.$uris[1]));
@@ -151,14 +152,16 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_post_row($vars) {
 
 		/* Specific BBcode [include]RELATIVE_PATH[/include] */
-		/* replaced by the content of the RELATIVE_PATH */
+		/* Replace by the content of the RELATIVE_PATH */
 		if (defined('MYPHPBB_BBCODE_INCLUDE'))
 			$vars['post_row'] = preg_replace_callback (
 				'/\[include\](.*)\[\/include\]/',
 				function ($match) {
-					return file_get_contents (
+					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
+						parse_url ($this->uri, PHP_URL_QUERY),
 						pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
 					);
+					return file_get_contents (str_replace ('amp;', '', $url));
 				},
 				$vars['post_row']
 			);

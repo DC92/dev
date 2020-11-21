@@ -370,7 +370,7 @@ class listener implements EventSubscriberInterface
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
 			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
-			['[include]{URL}[/include]','{URL}'],
+			['[include]{URL}[/include]','[include]{URL}[/include]','Inclut dans la page le contenu d\'une url'],
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
 //TODO AFTER3 DELETE			['[carte]'],
@@ -413,22 +413,17 @@ class listener implements EventSubscriberInterface
 
 	// Popule les templates
 	function popule_posts() {
-		//TODO à revoir
-		// Filtre pour horaires
+		// Filtres pour horaires
 		$cond = ['TRUE'];
+
+/*//TODO DELETE ????
 		$post_id = $this->request->variable('id', '', true);
 		if ($post_id)
 			$cond[] = 'p.post_id='.$post_id;
-
-//TODO réduire les it= & ip= (INCLUDE
-		$request_it = $this->request->variable('it', 0);
-		$request_ip = $this->request->variable('ip', 0);
-		if ($request_it == 2 && $request_ip)
-			$cond[] = 'ac.post_id='.$request_ip;
-		elseif ($request_it == 3 && $request_ip)
-			$cond[] = 'li.post_id='.$request_ip;
-		elseif ($request_it == 4 && $request_ip)
-			$cond[] = 'an.post_id='.$request_ip;
+*/
+		$p = $this->request->variable('p', 0);
+		if ($this->request->variable('filtre', 0))
+			$cond[] = "(ac.post_id=$p OR li.post_id=$p OR an.post_id=$p)";
 
 		// Récupère la table de tous les attachements pour les inclusions BBCode
 		$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
