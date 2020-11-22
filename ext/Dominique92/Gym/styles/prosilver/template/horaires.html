@@ -12,9 +12,8 @@
 		border-color:{topic.COULEUR_BORD};
 	">
 		<!-- BEGIN post -->
-		<!-- IF post.GYM_HORAIRES and (post.GYM_LIEU == 154 or REQUEST_SELECT != "Visio") -->
+		<!-- IF post.GYM_HORAIRES -->
 		<tr>
-			<!-- IF not REQUEST_ID -->
 			<td>
 				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->
 					<a href="viewtopic.php?p={post.GYM_ACTIVITE}">{post.POST_SUBJECT}</a>
@@ -28,20 +27,19 @@
 					>CERT</a>
 				<!-- ENDIF -->
 
-				<!-- IF REQUEST_MOD -->
+				<!-- IF U_MCP -->
 					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
 						title="Modifier cette séance" class="button button-icon-only">
 						<i class="icon fa-pencil"></i>
 					</a>
 				<!-- ENDIF -->
 			</td>
-			<!-- ENDIF -->
 
 			<td>
 				{post.HORAIRE_DEBUT} à {post.HORAIRE_FIN}
 			</td>
 
-			<!-- IF REQUEST_T != FORUM_LIEUX -->
+			<!-- IF post.GYM_LIEU != REQUEST_P -->
 			<td>
 				<!-- IF post.GYM_OUVERTURE == 'visio' -->
 					<a title="Se connecter à la visioconférence"
@@ -51,21 +49,18 @@
 				<!-- ELSE -->
 					<a href="viewtopic.php?p={post.GYM_LIEU}">{post.LIEU}</a>
 				<!-- ENDIF -->
+
 				<!-- IF post.GYM_OUVERTURE == 'ferme' or (not post.GYM_OUVERTURE and FERME) -->
 					<span style="color:red">(fermé)</span>
 				<!-- ENDIF -->
  			</td>
 			<!-- ENDIF -->
 
-			<!-- IF REQUEST_T != 4 -->
+			<!-- IF post.GYM_ANIMATEUR != REQUEST_P -->
 			<td>
-				<!-- IF post.GYM_ANIMATEUR != REQUEST_P -->
 				<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
 					{post.ANIMATEUR}
 				</a>
-				<!-- ELSE -->
-					{post.ANIMATEUR}
-				<!-- ENDIF -->
 			</td>
 			<!-- ENDIF -->
 		</tr>
@@ -74,10 +69,3 @@
 	</table>
 </div>
 <!-- END topic -->
-
-<!-- IF REQUEST_MOD -->
-	<a href="posting.php?mode=reply&f=2&t=1" title="Ajouter une séance"
-		class="button button-icon-only" style="float:right">
-		<i class="icon fa-commenting-o"></i>
-	</a>
-<!-- ENDIF -->

@@ -36,6 +36,7 @@ class listener implements EventSubscriberInterface
 		$this->language = $language;
 
 		$this->post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
+		$this->get = $this->request->get_super_global(\phpbb\request\request_interface::GET);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
 	}
@@ -88,6 +89,8 @@ class listener implements EventSubscriberInterface
 		global $myphp_template, $myphp_js;
 		$this->template->assign_vars (array_change_key_case ($myphp_template, CASE_UPPER));
 		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js));
+		if (isset ($this->get['mcp']))
+			$this->template->assign_var ('U_MCP', true);
 
 		/* Includes language files of this extension */
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
@@ -160,14 +163,19 @@ class listener implements EventSubscriberInterface
 
 		/* Specific BBcode [include]RELATIVE_PATH[/include] */
 		/* Replace by the content of the RELATIVE_PATH */
+
 		if (defined('MYPHPBB_BBCODE_INCLUDE'))
 			$vars['post_row'] = preg_replace_callback (
 				'/\[include\](.*)\[\/include\]/',
 				function ($match) {
+					$query = parse_url ($this->uri, PHP_URL_QUERY);
 					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
-						parse_url ($this->uri, PHP_URL_QUERY),
+						$query,
 						pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
 					);
+					if ($this->auth->acl_get('m_')) // Add moderator right
+						$url .= $query ? '&mcp=1' : '?mcp=1';
+
 					return file_get_contents (str_replace ('amp;', '', $url));
 				},
 				$vars['post_row']

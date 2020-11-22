@@ -481,7 +481,7 @@ class listener implements EventSubscriberInterface
 			*/
 
 			// Date
-			global $myphp_template;
+			global $myphp_js;
 			$row['gym_jour_literal'] = $this->listes()['jours'][intval ($row['gym_jour'])];
 
 			if($row['gym_scolaire'] == 'on')
@@ -493,13 +493,13 @@ class listener implements EventSubscriberInterface
 				foreach (explode (',', $row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
 						$row['gym_heure'], $row['gym_minute'], 0,
-						8, 3 + $s * 7 + $row['gym_jour'], $myphp_template['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
+						8, 3 + $s * 7 + $row['gym_jour'], $myphp_js['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
 					);
 					$end_time = mktime (
 						$row['gym_heure'] + $row['gym_duree_heures'] + 24 * $row['gym_duree_jours'],
 						$row['gym_minute'],
 						0, // Secondes
-						8, 3 + $s * 7 + $row['gym_jour'], $myphp_template['annee_debut'] // Lundi suivant le 1er aout annee_debut
+						8, 3 + $s * 7 + $row['gym_jour'], $myphp_js['annee_debut'] // Lundi suivant le 1er aout annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {
