@@ -82,6 +82,13 @@ class listener implements EventSubscriberInterface
 	function page_header() {
 		$ns = explode ('\\', __NAMESPACE__);
 
+		/* Includes template & js values defined in config.php */
+		// $myphp_js = ['key' => 'value'];
+		// $myphp_template = ['key' => 'value'];
+		global $myphp_template, $myphp_js;
+		$this->template->assign_vars (array_change_key_case ($myphp_template, CASE_UPPER));
+		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js));
+
 		/* Includes language files of this extension */
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 
@@ -204,7 +211,7 @@ class listener implements EventSubscriberInterface
 			// Add a blank file if none
 			file_put_contents ('LOG/index.html', '');
 
-			$this->template->assign_var('MYPHPBB_LOG_EDIT', true);
+			$this->template->assign_var ('MYPHPBB_LOG_EDIT', true);
 
 			// Create the file with the existing post data
 			$file_name = 'LOG/'.$post_data['post_id'].'.txt';

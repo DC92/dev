@@ -10,6 +10,7 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
+//TODO le titre dépend du topic, pas du post (== nom du lieu, ...)
 //TODO carte dans la page générale des salles
 //TODO convertir tous les non saisis "null" en off
 //TODO BUG revoir les n° de topic des (...) de création de nouveaux

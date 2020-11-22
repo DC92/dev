@@ -33,7 +33,6 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 		$this->language = $language;
 
-		$this->annee_debut = 2020;
 		$this->semaines = '5,6,7,8,9,10,13,14,15,16,17,18,19,22,23,24,25,26,27,30,31,32,33,34,35,36,39,40,41,42,43,44,45,46,47';
 
 		$this->ns = explode ('\\', __NAMESPACE__);
@@ -241,26 +240,27 @@ class listener implements EventSubscriberInterface
 				);
 
 		// Dictionnaires en fonction du contenu de la base de données
-		global $myphpbb_topics;
-		//TODO remplacer IN($topics_keys) par forum_desc :liste
-		if ($myphpbb_topics) {
-			$topics_keys = implode (',', array_keys ($myphpbb_topics));
-			$sql = "SELECT post_id, post_subject, topic_id
-				FROM ".POSTS_TABLE."
-				JOIN ".TOPICS_TABLE." USING (topic_id)
-				WHERE post_id != topic_first_post_id
-					AND topic_id IN($topics_keys)";
-			$result = $this->db->sql_query($sql);
-			while ($row = $this->db->sql_fetchrow($result))
-				$values [$row['topic_id']][$row['post_subject']] = $row;
-			$this->db->sql_freeresult($result);
+		global $myphp_template;
+		$topics_keys = $myphp_template['topic_activites'].','.$myphp_template['topic_lieux'].','.$myphp_template['topic_equipe'];
+		$sql = "SELECT post_id, post_subject, topic_id
+			FROM ".POSTS_TABLE."
+			JOIN ".TOPICS_TABLE." USING (topic_id)
+			WHERE post_id != topic_first_post_id
+				AND topic_id IN($topics_keys)";
+		$result = $this->db->sql_query($sql);
 
-			if ($values)
-				foreach ($values AS $k=>$v) {
-					ksort ($v);
-					foreach ($v AS $vv)
-						$this->template->assign_block_vars ('liste_'.$myphpbb_topics[$k], array_change_key_case ($vv, CASE_UPPER));
-				}
+		$myphpbb_topics = @array_flip($myphp_template);
+		$values = [];
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$nom_liste = str_replace ('topic', 'liste', $myphpbb_topics[$row['topic_id']]);
+			$values [$nom_liste][$row['post_subject']] = $row;
+		}
+		$this->db->sql_freeresult($result);
+
+		foreach ($values AS $k=>$v) {
+			ksort ($v);
+			foreach ($v AS $vv)
+				$this->template->assign_block_vars ($k, array_change_key_case ($vv, CASE_UPPER));
 		}
 	}
 
@@ -481,7 +481,7 @@ class listener implements EventSubscriberInterface
 			*/
 
 			// Date
-			$this->template->assign_var ('ANNEE_DEBUT', $this->annee_debut);
+			global $myphp_template;
 			$row['gym_jour_literal'] = $this->listes()['jours'][intval ($row['gym_jour'])];
 
 			if($row['gym_scolaire'] == 'on')
@@ -493,13 +493,13 @@ class listener implements EventSubscriberInterface
 				foreach (explode (',', $row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
 						$row['gym_heure'], $row['gym_minute'], 0,
-						8, 3 + $s * 7 + $row['gym_jour'], $this->annee_debut // A partir du lundi suivant le 1er aout $annee_debut
+						8, 3 + $s * 7 + $row['gym_jour'], $myphp_template['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
 					);
 					$end_time = mktime (
 						$row['gym_heure'] + $row['gym_duree_heures'] + 24 * $row['gym_duree_jours'],
 						$row['gym_minute'],
 						0, // Secondes
-						8, 3 + $s * 7 + $row['gym_jour'], $this->annee_debut // Lundi suivant le 1er aout $annee_debut
+						8, 3 + $s * 7 + $row['gym_jour'], $myphp_template['annee_debut'] // Lundi suivant le 1er aout annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {

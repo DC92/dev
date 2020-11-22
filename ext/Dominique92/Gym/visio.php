@@ -15,8 +15,8 @@ if (@$_POST['code']) {
 
 // Vérification et routage
 include ('../../../config.php');
-if (strpos (@$_COOKIE['code'], CODE_VISIO) !== false && isset($_GET['anim']))
-	exit ('<meta http-equiv="refresh" content="0;URL=https://meet.jit.si/'.CODE_VISIO.'-'.$_GET['anim'].'">');
+if (strpos (@$_COOKIE['code'], $myphp_template['code_visio']) !== false && isset($_GET['anim']))
+	exit ('<meta http-equiv="refresh" content="0;URL=https://meet.jit.si/'.$myphp_template['code_visio'].'-'.$_GET['anim'].'">');
 ?>
 
 <html dir="ltr" lang="fr">

@@ -16,10 +16,7 @@
 	<!-- INCLUDECSS @Dominique92_Gym/stylesheet.css -->
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 	{$STYLESHEETS}
-
-	<script>
-		var annee_debut = {ANNEE_DEBUT};
-	</script>
+	<!-- EVENT overall_header_stylesheets_after -->
 </head>
 
 <body class="gym gym-{SCRIPT_NAME}">
@@ -31,12 +28,8 @@
 <div class="banniere">
 	<div class="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
-			{S_USERNAME}
+			<a href="ucp.php?i=ucp_profile&mode=reg_details" title="{L_PROFILE}">{S_USERNAME}</a>
 			<ul><li>
-					<a href="ucp.php?i=ucp_profile&mode=reg_details">{L_PROFILE}</a>
-				</li><li>
-					<a href="viewtopic.php?p=93">Mode d'emploi</a>
-				</li><li>
 					<a href="viewforum.php?f=1">Rubriques</a>
 				</li><li>
 					<a href="{{ U_ACP }}">{L_ACP}</a>

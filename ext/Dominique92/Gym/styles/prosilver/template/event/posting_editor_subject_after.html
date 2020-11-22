@@ -64,18 +64,24 @@
 		<!-- END liste_lieux -->
 	</select> &nbsp;
 
+	Accès:
 	<select name="gym_ouverture">
-		<option value="0">fermé</option>
-		<option value="1"
-			<!-- IF 1 == GYM_OUVERTURE -->
+		<option>?</option>
+		<option value="ouvert"
+			<!-- IF GYM_OUVERTURE == 'ouvert' -->
 				selected="selected"
 			<!-- ENDIF -->
 		>ouvert</option>
-		<option value="2"
-			<!-- IF 2 == GYM_OUVERTURE -->
+		<option value="visio"
+			<!-- IF GYM_OUVERTURE == 'visio' -->
 				selected="selected"
 			<!-- ENDIF -->
 		>visio</option>
+		<option value="ferme"
+			<!-- IF GYM_OUVERTURE == 'ferme' -->
+				selected="selected"
+			<!-- ENDIF -->
+		>fermé</option>
 	</select> &nbsp;
 
 	Animation:
@@ -151,10 +157,6 @@
 		checked="checked"
 	<!-- ENDIF -->
 	/><br/>
-
-	<script>
-		var annee_debut = {ANNEE_DEBUT};
-	</script>
 
 	<table id="edit_semaines"
 		class="calendrier"

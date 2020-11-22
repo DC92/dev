@@ -41,31 +41,19 @@
 				{post.HORAIRE_DEBUT} à {post.HORAIRE_FIN}
 			</td>
 
-			<!-- IF REQUEST_T != 3 -->
+			<!-- IF REQUEST_T != FORUM_LIEUX -->
 			<td>
- 				<!-- IF post.GYM_LIEU != REQUEST_P -->
-
-<!-- Lien visio -->
-<!-- //BEST DELETE -->
-<!-- IF post.POST_SUBJECT == "TEST" -->
+				<!-- IF post.GYM_OUVERTURE == 'visio' -->
 					<a title="Se connecter à la visioconférence"
-						href="visio.php?a={post.GYM_ANIMATEUR}"
-<!-- ELSE -->
-					<a href="viewtopic.php?p={post.GYM_LIEU}"
-<!-- ENDIF -->
-
-					<!-- IF post.GYM_OUVERTURE == 2 -->
-						class="cert"
-					<!-- ENDIF -->
-					>
-						{post.LIEU}
-					</a>
- 				<!-- ELSE -->
- 					{post.LIEU}
- 				<!-- ENDIF -->
-<!-- IF not post.GYM_OUVERTURE -->
-<span style="color:red">(fermé)</span>
-<!-- ENDIF -->
+					href="ext/Dominique92/Gym/visio.php?anim={post.ANIMATEUR}"
+					class="visio">
+					Visioconférence</a>
+				<!-- ELSE -->
+					<a href="viewtopic.php?p={post.GYM_LIEU}">{post.LIEU}</a>
+				<!-- ENDIF -->
+				<!-- IF post.GYM_OUVERTURE == 'ferme' or (not post.GYM_OUVERTURE and FERME) -->
+					<span style="color:red">(fermé)</span>
+				<!-- ENDIF -->
  			</td>
 			<!-- ENDIF -->
 

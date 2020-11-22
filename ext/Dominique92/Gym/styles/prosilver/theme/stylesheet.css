@@ -452,6 +452,12 @@ body {
 	padding: 0.2em;
 	text-align: right;
 }
+.gym .visio {
+	color: blue !important;
+}
+.gym .visio:hover {
+	color: white !important;
+}
 
 /* Cartes */
 #map {
