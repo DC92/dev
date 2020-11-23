@@ -168,17 +168,18 @@ class listener implements EventSubscriberInterface
 		/* Specific BBcode [include]RELATIVE_PATH[/include] */
 		/* Replace by the content of the RELATIVE_PATH */
 
-		if (defined('MYPHPBB_BBCODE_INCLUDE'))
+		if (defined('MYPHPBB_BBCODE_INCLUDE') &&
+			!isset ($this->get['mcp'])) // Avoid loop
 			$vars['post_row'] = preg_replace_callback (
 				'/\[include\](.*)\[\/include\]/',
 				function ($match) {
 					$query = parse_url ($this->uri, PHP_URL_QUERY);
 					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
-						$query,
-						pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
-					);
-					if ($this->auth->acl_get('m_')) // Add moderator right
-						$url .= $query ? '&mcp=1' : '?mcp=1';
+							parse_url ($this->uri, PHP_URL_QUERY),
+							pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
+						).
+						(parse_url ($url, PHP_URL_QUERY) ? '&' : '?').
+						'mcp='.$this->auth->acl_get('m_');
 
 					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
 						echo $url;

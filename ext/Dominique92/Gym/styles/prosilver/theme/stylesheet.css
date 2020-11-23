@@ -10,27 +10,12 @@ pre {
 }
 #nav-main > li:nth-of-type(2), /* FAQ */
 .section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
-.section-posting #poll-panel-tab, /* Options */
 .section-posting #options-panel .fields1 > div, /* Options */
-.section-posting #options-panel dl label:not([for=delete_permanent]),
+.section-posting #options-panel label[for=edit_reason],
 .section-posting #options-panel #edit_reason,
-.section-posting #confirm .fields1, /* Détails confirmation destruction */
 .section-posting input[name=preview],
-.section-posting input[name=save],
-.section-posting #smiley-box strong,
-.section-posting #review,
-.section-posting #topicreview {
+.section-posting #smiley-box strong {
 	display: none !important;
-}
-@media print and (color) {
-	#search-box,
-	.navbar	{
-		display: none !important;
-	}
-	body,
-	.post {
-		background: white !important;
-	}
 }
 
 /* Y compris phpBB */
@@ -45,7 +30,7 @@ body {
 	background: white;
 	font-family: arial, sans-serif;
 }
-.copyright-dc {
+.copyright-dc { /* //TODO DELETE ?? */
 	text-align: center;
 	margin-top: 2em;
 	font-size: 0.7em;
@@ -464,4 +449,3 @@ body {
     width: 350px !important;
     height: 300px !important;
 }
-/* //TODO AFTER3 DELETE */ .carte{display:none}
