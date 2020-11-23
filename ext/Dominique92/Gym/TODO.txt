@@ -15,7 +15,6 @@ Refaire git Dominique92 / test en DC02
 //TODO ordre des actualités = n° ordre (fiche)
 //TODO Dépendance des calendrier scolaires / vision dans actualité
 //TODO Lien séance => activité
-//TODO retrouver le topic des liens en clair pour ajouter une seance, lieu, ... (menu haut ?)
 //TODO convertir tous les non saisis "null" en off
 //TODO Sitemap / SEO
 //BEST carte tous points dans chaville

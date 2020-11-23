@@ -41,14 +41,15 @@
 
 			<!-- IF post.GYM_LIEU != REQUEST_P -->
 			<td>
-				<!-- //TODO ne pas expanser quand il n'y a pas de code visio -->
-				<!-- IF post.GYM_OUVERTURE == 'visio' -->
+				<!-- IF post.GYM_OUVERTURE != 'visio' -->
+					<a href="viewtopic.php?p={post.GYM_LIEU}">{post.LIEU}</a>
+				<!-- ELSEIF not CODE_VISIO -->
+					Visioconférence
+				<!-- ELSE -->
 					<a title="Se connecter à la visioconférence"
 					href="ext/Dominique92/Gym/visio.php?anim={post.ANIMATEUR}"
 					class="visio">
 					Visioconférence</a>
-				<!-- ELSE -->
-					<a href="viewtopic.php?p={post.GYM_LIEU}">{post.LIEU}</a>
 				<!-- ENDIF -->
 
 				<!-- IF post.GYM_OUVERTURE == 'ferme' or (not post.GYM_OUVERTURE and FERME) -->

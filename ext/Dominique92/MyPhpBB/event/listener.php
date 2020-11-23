@@ -62,6 +62,7 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
+			'core.modify_posting_parameters' => 'modify_posting_parameters',
 			'core.posting_modify_submission_errors' => 'posting_modify_submission_errors',
 			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.modify_submit_notification_data' => 'modify_submit_notification_data',
@@ -130,7 +131,7 @@ class listener implements EventSubscriberInterface
 		$uris = explode ('/?', $this->uri);
 
 		/* Route to viewtopic or viewforum if there is an argument p, t or f */
-		if (defined('MYPHPBB_REDIRECT') &&
+		if (defined('MYPHPBB_REDIRECT_INDEX') &&
 			count ($uris) > 1 &&
 				!$this->request->variable ('template', '')) {
 				if ($this->request->variable ('p', 0) ||
@@ -191,6 +192,20 @@ class listener implements EventSubscriberInterface
 	/**
 		POSTING.PHP
 	*/
+	function modify_posting_parameters($vars) {
+
+		/* Allows call posting.php without &f=forum_id */
+		if (defined('MYPHPBB_POSTING_WITHOUT_FID') &&
+			!$vars['forum_id']) {
+			$sql = 'SELECT forum_id FROM '.TOPICS_TABLE.' WHERE topic_id LIKE '.$vars['topic_id'];
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+			if ($row)
+				$vars['forum_id'] = $row['forum_id'];
+		}
+	}
+
 	// Called when validating the data to be saved
 	function posting_modify_submission_errors($vars) {
 		$error = $vars['error'];
