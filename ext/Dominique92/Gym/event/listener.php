@@ -46,7 +46,6 @@ class listener implements EventSubscriberInterface
 			// All
 			'core.page_header' => 'page_header',
 			'core.page_footer_after' => 'page_footer_after',
-			'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',
 
 			// Viewtopic
 			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
@@ -106,51 +105,6 @@ class listener implements EventSubscriberInterface
 			$this->template->set_filenames ([
 				'body' => "@Dominique92_Gym/$template.html",
 			]);
-	}
-
-	/**
-		Expansion des "BBCodes" maisons : (INCLUDE|LOCATION valeur)
-	*/
-	//TODO AFTER3 DELETE
-	function twig_environment_render_template_after($vars) {
-		if ($vars['name'] == 'index_body.html' ||
-			$vars['name'][0] == '@')
-			$vars['output'] = preg_replace_callback (
-				'/\(([A-Z]+) ?([^\)]*)\)/s',
-				function ($match) {
-					$uris = explode ('/', $this->server['SERVER_NAME'].$this->server['REQUEST_URI']);
-					$uris [count($uris) - 1] = str_replace (
-						['%23','%26','amp%3B','%3F','%3D'],
-						['#','&','','?','='],
-						urlencode (urldecode ($match[2]))
-					);
-					$url = 'http://'.implode ('/', $uris);
-
-					// Cas où le paramètre est une url bbcodisée
-					$match_url = explode ('"', $match[2]);
-					if ($match_url[0] == '<a href=')
-						$url = $match_url[1];
-
-					switch ($match[1]) {
-						// (INCLUDE relative_url) replace this string by the url content
-						case 'INCLUDE':
-							return file_get_contents (
-								$url.
-								'&t='.$this->request->variable('t',0).
-								'&p='.$this->request->variable('p',0).
-								'&mod='.$this->auth->acl_get('m_')
-							);
-
-						// (LOCATION relative_url) replace this page by the url
-						case 'LOCATION':
-							header ('Location: '.urldecode($url));
-							exit;
-					}
-					// Sinon, on ne fait rien
-					return $match[0];
-				},
-				$vars['output']
-			);
 	}
 
 	/**
@@ -417,11 +371,6 @@ class listener implements EventSubscriberInterface
 		// Filtres pour horaires
 		$cond = ['TRUE'];
 
-/*//TODO DELETE ????
-		$post_id = $this->request->variable('id', '', true);
-		if ($post_id)
-			$cond[] = 'p.post_id='.$post_id;
-*/
 		$p = $this->request->variable('p', 0);
 		if ($this->request->variable('filtre', 0))
 			$cond[] = "(ac.post_id=$p OR li.post_id=$p OR an.post_id=$p)";
@@ -452,6 +401,10 @@ class listener implements EventSubscriberInterface
 
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result)) {
+			// Assigne le titre
+			if ($row['post_id'] == $p)
+				$this->template->assign_var ('POST_SUBJECT', $row['post_subject']);
+
 			// Clean non selected values
 			foreach ($row AS $k=>$v)
 				if ($v == 'off' || $v == '?')

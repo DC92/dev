@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 	<link rel="icon" type="image/jpg" href="{EXT_PATH}{T_THEME_PATH}/images/icon.jpg" />
-	<title><!-- IF TOPIC_TITLE -->{TOPIC_TITLE}<!-- ELSE -->Chavil'GYM<!-- ENDIF --></title>
+	<title><!-- IF POST_SUBJECT -->{POST_SUBJECT}<!-- ELSEIF TOPIC_TITLE -->{TOPIC_TITLE}<!-- ELSE -->{SITENAME} {SITE_DESCRIPTION}<!-- ENDIF --></title>
 
 	<link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
 	<!-- INCLUDECSS icons.css -->
@@ -31,6 +31,16 @@
 			<a href="ucp.php?i=ucp_profile&mode=reg_details" title="{L_PROFILE}">{S_USERNAME}</a>
 			<ul><li>
 					<a href="viewforum.php?f=1">Rubriques</a>
+				</li><li>
+					<a href="posting.php?mode=reply&f=2&t={TOPIC_ACTIVITES}">Ajouter une activité</a>
+				</li><li>
+					<a href="posting.php?mode=reply&f=2&t={TOPIC_EQUIPE}">Ajouter une animatrice</a>
+				</li><li>
+					<a href="posting.php?mode=reply&f=4&t={TOPIC_LIEUX}">Ajouter un lieu</a>
+				</li><li>
+					<a href="posting.php?mode=reply&f=3&t={TOPIC_SEANCES}">Ajouter une séance</a>
+				</li><li>
+					<a href="posting.php?mode=reply&f=3&t={TOPIC_EVENEMENT}">Ajouter un évènement</a>
 				</li><li>
 					<a href="{{ U_ACP }}">{L_ACP}</a>
 				</li><li>

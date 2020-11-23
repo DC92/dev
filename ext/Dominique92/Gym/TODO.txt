@@ -5,46 +5,34 @@ ext/Dominique92/MyPhpBB GeoBB Gym
 ext/phpbb/GGAnalytics cleantalk/antispam
 /files /fichiers config.php
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
-Créer les geom des salles
+Remettre les accès des séances à visio
 Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
-//TODO le titre dépend du topic, pas du post (== nom du lieu, ...)
-//TODO carte dans la page générale des salles
-//TODO convertir tous les non saisis "null" en off
-//TODO BUG revoir les n° de topic des (...) de création de nouveaux
 //TODO BUG pas de pavé supprimer dans posting
-//TODO BUG [location] sur 1 post route tout les posts
-//BEST Initialiser posting lieu position carte sur Chaville
-//BEST carte tous poins dans chaville
-//TODO Dépendance des calendrier scolaires / vision dans actualité
-//TODO ordre des actualités = n° ordre (fiche)
-//TODO liens en clair pour ajouter une seance, lieu, ... (menu haut ?)
-//TODO Bouton enregistrer en haut
-//TODO Lien séance => activité
-//TODO Sitemap / SEO
 //TODO actualités non datées
+//TODO ordre des actualités = n° ordre (fiche)
+//TODO Dépendance des calendrier scolaires / vision dans actualité
+//TODO Lien séance => activité
+//TODO retrouver le topic des liens en clair pour ajouter une seance, lieu, ... (menu haut ?)
+//TODO convertir tous les non saisis "null" en off
+//TODO Sitemap / SEO
+//BEST carte tous points dans chaville
 //BEST Bouton imprimer calendier / style print
-//BEST BUG null au dessus d'une carte sur IE
-//BEST ouverture lente sous-menus
-//BEST lien document => download au lieu d'afficher (plaquette & inscriptions => page attachment)
-//BEST n'inclure OL que quand il y a une carte
 //BEST Lien gmaps
 //BEST BUG Diaporama pas vu depuis un moment => boucle rapidement
 //BEST BUG d'affichage avec &hilit=body (résultat recherche)
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18
 	" dans le title !
-//BEST traduire TOPIC_ID => le n° du topic dans (INCLUDE
 //BEST Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
+//BEST ouverture lente sous-menus
 //BEST Glissement latéral pages
-//BEST ?? url réduit viewtopic / ... (htaccess)
+//BEST Initialiser posting lieu position carte sur Chaville
 
 /** CONFIG
-https://github.com/phpbbmodders/phpBB-3.1-ext-adduser
-https://www.phpbb.com/customise/db/extension/googleanalytics
-copier /slides /files config.php
+https://github.com/phpbbmodders/phpBB-3.1-ext-adduser ????
 
 /** UPGRADE GYM
 créer BDD / + user / importer la sauvegarde BDD
@@ -56,7 +44,6 @@ copier de version précédente
 	files/...
 	slides/...
 exécuter /install
-
 
 /** PERSONNALISER / extensions MyPhpBB, GeoBB, Gym
 MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur

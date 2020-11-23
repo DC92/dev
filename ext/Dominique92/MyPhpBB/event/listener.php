@@ -87,7 +87,10 @@ class listener implements EventSubscriberInterface
 		// $myphp_js = ['key' => 'value'];
 		// $myphp_template = ['key' => 'value'];
 		global $myphp_template, $myphp_js;
-		$this->template->assign_vars (array_change_key_case ($myphp_template, CASE_UPPER));
+		if ($myphp_template)
+			$this->template->assign_vars (
+				array_change_key_case ($myphp_template, CASE_UPPER)
+			);
 		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js));
 		if (isset ($this->get['mcp']))
 			$this->template->assign_var ('U_MCP', true);
@@ -175,6 +178,9 @@ class listener implements EventSubscriberInterface
 					);
 					if ($this->auth->acl_get('m_')) // Add moderator right
 						$url .= $query ? '&mcp=1' : '?mcp=1';
+
+					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
+						echo $url;
 
 					return file_get_contents (str_replace ('amp;', '', $url));
 				},
