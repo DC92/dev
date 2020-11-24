@@ -312,7 +312,6 @@ class listener implements EventSubscriberInterface
 			['[centre]{TEXT}[/centre]','<div style="text-align:center">{TEXT}</div>','Texte centré'],
 			['[saut_ligne][/saut_ligne]','<br style="clear:both" />'],
 			['[separation][/separation]','<hr/>','Ligne horizontale'],
-			['[urlb={TEXT1}]{TEXT2}[/urlb]','<a target="_BLANK" href="{TEXT1}">{TEXT2}</a>','Lien à afficher sur un nouvel onglet'],
 			['[resume]{TEXT}[/resume]','<!--resume-->{TEXT}<!--resume-->','Partie de texte à afficher (accueil, actualité, ...)'],
 			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
 			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
@@ -328,7 +327,7 @@ class listener implements EventSubscriberInterface
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 			['[video]{URL}[/video]', '<video width="100%" controls><source src="fichiers/{URL}.mp4" type="video/mp4">Your browser does not support HTML video.</video>', 'Insérer une vidéo MP4'],
 			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
-//TODO AFTER3 DELETE			['[carte]'],
+			['[urlb]'], ['[carte]'],//TODO AFTER3 DELETE
 		];
 		foreach ($bbcodes AS $k=>$bbcode) {
 			preg_match ('/[a-z_0-9]+/', $bbcode[0], $match);

@@ -93,8 +93,6 @@ class listener implements EventSubscriberInterface
 				array_change_key_case ($myphp_template, CASE_UPPER)
 			);
 		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js));
-		if (isset ($this->get['mcp']))
-			$this->template->assign_var ('U_MCP', true);
 
 		/* Includes language files of this extension */
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
@@ -164,30 +162,34 @@ class listener implements EventSubscriberInterface
 
 	// Called before post assigned to template
 	function viewtopic_modify_post_row($vars) {
+		$post_row = $vars['post_row'];
 
 		/* Specific BBcode [include]RELATIVE_PATH[/include] */
 		/* Replace by the content of the RELATIVE_PATH */
 
 		if (defined('MYPHPBB_BBCODE_INCLUDE') &&
-			!isset ($this->get['mcp'])) // Avoid loop
-			$vars['post_row'] = preg_replace_callback (
+			!isset ($this->get['mcp']) && // Avoid loop
+			$post_row['POST_ID'] == $this->get['p']) // Only on the required one
+			$post_row['MESSAGE'] = preg_replace_callback (
 				'/\[include\](.*)\[\/include\]/',
 				function ($match) {
 					$query = parse_url ($this->uri, PHP_URL_QUERY);
 					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
 							parse_url ($this->uri, PHP_URL_QUERY),
 							pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
-						).
-						(parse_url ($url, PHP_URL_QUERY) ? '&' : '?').
+						);
+					$url .= (parse_url ($url, PHP_URL_QUERY) ? '&' : '?').
 						'mcp='.$this->auth->acl_get('m_');
 
 					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
 						echo $url;
 
-					return file_get_contents (str_replace ('amp;', '', $url));
+					return file_get_contents ($url);
 				},
-				$vars['post_row']
+				str_replace ('amp;', '', $post_row['MESSAGE'])
 			);
+
+		$vars['post_row'] = $post_row;
 	}
 
 	/**

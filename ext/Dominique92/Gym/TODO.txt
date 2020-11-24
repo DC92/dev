@@ -10,7 +10,7 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
-//TODO DELETE BBcode urlb ?
+//TODO includes calendrier
 //TODO BUG pas de pavé supprimer dans posting
 //TODO actualités non datées
 //TODO ordre des actualités = n° ordre (fiche)
