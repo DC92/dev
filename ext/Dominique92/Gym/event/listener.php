@@ -144,19 +144,6 @@ class listener implements EventSubscriberInterface
 			if (strstr ($k, 'gym') && is_string ($v))
 				$post_row[strtoupper($k)] = $v;
 
-		// Remplace dans le texte du message VARIABLE_TEMPLATE par sa valeur
-		//TODO DELETE ??????????????
-		/*
-		$post_row['MESSAGE'] = preg_replace_callback(
-			'/([A-Z_]+)/',
-			function ($matches) use ($post_row) {
-				$r = $post_row[$matches[1]];
-				return urlencode ($r ?: $matches[1]);
-			},
-			$post_row['MESSAGE']
-		);
-		*/
-
 		$vars['post_row'] = $post_row;
 	}
 
@@ -313,9 +300,6 @@ class listener implements EventSubscriberInterface
 			['[saut_ligne][/saut_ligne]','<br style="clear:both" />'],
 			['[separation][/separation]','<hr/>','Ligne horizontale'],
 			['[resume]{TEXT}[/resume]','<!--resume-->{TEXT}<!--resume-->','Partie de texte à afficher (accueil, actualité, ...)'],
-			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
-			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
-			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
 			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
 			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
 			['[carte][/carte]','<div id="map"></div>','Insère la carte'],
@@ -326,7 +310,10 @@ class listener implements EventSubscriberInterface
 			['[include]{URL}[/include]','[include]{URL}[/include]','Inclut dans la page le contenu d\'une url'],
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 			['[video]{URL}[/video]', '<video width="100%" controls><source src="fichiers/{URL}.mp4" type="video/mp4">Your browser does not support HTML video.</video>', 'Insérer une vidéo MP4'],
-			//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
+
+			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
+			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
+			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
 			['[urlb]'], ['[carte]'],//TODO AFTER3 DELETE
 		];
 		foreach ($bbcodes AS $k=>$bbcode) {
