@@ -59,8 +59,20 @@ class listener implements EventSubscriberInterface
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
+'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',//TODO AFTER3 DELETE
 		];
 	}
+
+//TODO AFTER3 DELETE
+function twig_environment_render_template_after($vars) {
+	$vars['output'] = preg_replace_callback (
+		'/\(([A-Z]+) ?([^\)]*)\)/s',
+		function ($match) {
+			return '';
+		},
+		$vars['output']
+	);
+}
 
 	/**
 		ALL

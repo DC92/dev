@@ -182,7 +182,7 @@ class listener implements EventSubscriberInterface
 						'mcp='.$this->auth->acl_get('m_');
 
 					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
-						echo $url;
+						echo $url.'<br/>';
 
 					return file_get_contents ($url);
 				},

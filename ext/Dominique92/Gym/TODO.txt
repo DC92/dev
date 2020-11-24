@@ -10,7 +10,6 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
-//TODO includes calendrier
 //TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
 //TODO actualités non datées / ordre des actualités = n° ordre (fiche)
 //TODO Dépendance des calendrier scolaires / vision dans actualité
