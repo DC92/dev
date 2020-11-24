@@ -62,5 +62,5 @@ $lang = array_merge($lang, array(
 		'&copy; Chavil\'GYM 2020'.
 		' : <a href="memberlist.php?mode=contactadmin">Contact</a>'.
 		' - Réalisé par <a href="https://github.com/Dominique92">Dominique</a>'.
-		' &amp; <a href="http://www.phpbb-fr.com/">phpBB</a>',
+		' avec <a href="http://www.phpbb-fr.com/">phpBB</a>',
 ));

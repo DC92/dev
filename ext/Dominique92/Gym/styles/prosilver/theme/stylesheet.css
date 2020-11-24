@@ -30,9 +30,8 @@ body {
 	background: white;
 	font-family: arial, sans-serif;
 }
-.copyright-dc { /* //TODO DELETE ?? */
+.copyright {
 	text-align: center;
-	margin-top: 2em;
 	font-size: 0.7em;
 }
 
