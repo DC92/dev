@@ -217,6 +217,9 @@ body {
 	float: left;
 	margin-right: 0.5em;
 }
+.gym .animatrice {
+	margin-bottom: 1em;
+}
 .gym .animatrice .attach-image img {
 	width: 20vw !important;
 }

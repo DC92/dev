@@ -174,7 +174,8 @@ function twig_environment_render_template_after($vars) {
 		// Replace (include)RELATIVE_PATH(/include)
 		// by the content of the RELATIVE_PATH
 		// Only on the required post
-		if ($post_row['POST_ID'] == $this->request->variable ('p', 0))
+		$p = $this->request->variable ('p', 0);
+		if ($post_row['POST_ID'] == $p || !$p)
 			$post_row['MESSAGE'] = preg_replace_callback (
 				'/\(include\)(.*)\(\/include\)/',
 				function ($match) {
@@ -461,7 +462,6 @@ function twig_environment_render_template_after($vars) {
 			$vs = explode ('<!--resume-->', $row['display_text']);
 			$row['resume'] = count ($vs) > 1 ? $vs[1]
 				: $row['display_text']; // Par défaut : tout
-			$row['resume'] .= 'ZZ';
 
 			//TODO AFTER3 DELETE
 			/*
