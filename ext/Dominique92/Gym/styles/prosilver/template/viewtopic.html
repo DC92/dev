@@ -26,40 +26,16 @@
 
 		<!-- ENDIF -->
 	<!-- END postrow -->
-
-	<!-- Carte -->
-	<!-- IF GEOJSON -->
-		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
-		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
-		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
-		<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
-		<input type="hidden" id="cadre-json" value='{GEOJSON}' />
-	<!-- ENDIF -->
-
-	<!-- ANIMATRICES //TODO DEPLACER (pour page equipe) OU DELETE ??? -->
-	<!-- BEGIN topic -->
-	<!-- BEGIN post -->
-		<!-- IF REQUEST_T == post.TOPIC_ID and not REQUEST_P -->
-			<div class="animatrice">
-				<h2>
-					<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
-					<!-- IF U_MCP -->
-						<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
-							title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
-							<i class="icon fa-pencil"></i>
-						</a>
-					<!-- ENDIF -->
-				</h2>
-
-				{post.RESUME}
-
-				<br/><a href="viewtopic.php?p={post.POST_ID}">Plus d'infos . . .</a>
-				<br style="clear:both;height:0" />
-			</div>
-		<!-- ENDIF -->
-	<!-- END post -->
-	<!-- END topic -->
 </div>
+
+<!-- Carte -->
+<!-- IF GEOJSON -->
+	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
+	<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
+	<input type="hidden" id="cadre-json" value='{GEOJSON}' />
+<!-- ENDIF -->
 
 <!-- INCLUDE footer.html -->

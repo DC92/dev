@@ -37,8 +37,9 @@ class listener implements EventSubscriberInterface
 
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
-		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
+		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
+		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
 	}
 
 	static public function getSubscribedEvents() {
@@ -137,9 +138,23 @@ function twig_environment_render_template_after($vars) {
 	function viewtopic_post_rowset_data($vars) {
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
+
+		// [location]ABSOLUTE_PATH[/location] go to ABSOLUTE_PATH */
+		if ($vars['row']['post_id'] == $this->request->variable ('p', 0)) { // Only if a specific post is required
+			// Purge unused <...>
+			$text = preg_replace_callback (
+				'/<[^>]*>/',
+				function () {return '';},
+				$vars['row']['post_text']
+			);
+
+			preg_match ('/\[location\](.*)\[\/location\]/', $text, $match);
+			if ($match)
+				exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
+		}
 	}
 
-	// Appelé lors de la deuxième passe sur les données des posts qui prépare dans $post_row les données à afficher sur le post du template
+	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 		$post_id = $post_row['POST_ID'];
@@ -155,6 +170,28 @@ function twig_environment_render_template_after($vars) {
 		foreach ($post_data AS $k=>$v)
 			if (strstr ($k, 'gym') && is_string ($v))
 				$post_row[strtoupper($k)] = $v;
+
+		// Replace (include)RELATIVE_PATH(/include)
+		// by the content of the RELATIVE_PATH
+		// Only on the required post
+		if ($post_row['POST_ID'] == $this->request->variable ('p', 0))
+			$post_row['MESSAGE'] = preg_replace_callback (
+				'/\(include\)(.*)\(\/include\)/',
+				function ($match) {
+					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
+							parse_url ($this->uri, PHP_URL_QUERY),
+							pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.htmlspecialchars_decode($match[1])
+						);
+					$url .= (parse_url ($url, PHP_URL_QUERY) ? '&' : '?').
+						'mcp='.$this->auth->acl_get('m_');
+
+					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
+						echo $url.'<br/>';
+
+					return file_get_contents ($url);
+				},
+				$post_row['MESSAGE']
+			);
 
 		$vars['post_row'] = $post_row;
 	}
@@ -302,7 +339,7 @@ function twig_environment_render_template_after($vars) {
 		}
 
 		// Add / correct the specific BBcodes
-		$bbcodes = [
+		$this->add_bbcode([
 			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
 			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],
 			['[doc={TEXT1}]{TEXT2}[/doc]','<a href="fichiers/{TEXT1}.pdf">{TEXT2}</a>','Lien vers un document'],
@@ -319,49 +356,50 @@ function twig_environment_render_template_after($vars) {
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
 			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
-			['[include]{URL}[/include]','[include]{URL}[/include]','Inclut dans la page le contenu d\'une url'],
-			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 			['[video]{URL}[/video]', '<video width="100%" controls><source src="fichiers/{URL}.mp4" type="video/mp4">Your browser does not support HTML video.</video>', 'Insérer une vidéo MP4'],
+
+			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut dans la page le contenu d\'une url'],
+			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 
 			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
 			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
-			['[presentation]{TEXT}[/presentation]','<!--presentation-->{TEXT}<!--presentation-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
-			['[urlb]'], ['[carte]'],//TODO AFTER3 DELETE
-		];
-		foreach ($bbcodes AS $k=>$bbcode) {
-			preg_match ('/[a-z_0-9]+/', $bbcode[0], $match);
-			$bbcodes[$k][3] = @$match[0];
-
-			$sql = 'DELETE FROM '.BBCODES_TABLE.' WHERE bbcode_tag = "'.$match[0].'"';
-			$this->db->sql_query($sql);
-		}
-
+			['[presentation]{TEXT}[/presentation]','<!--resume-->{TEXT}<!--resume-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
+			['[urlb]'],['[carte]'],//TODO AFTER3 DELETE
+		]);
+	}
+	function add_bbcode($bb) {
+		// Récupère le prochain bbcode_id libre
 		$sql = 'SELECT MAX(bbcode_id) as max_bbcode_id FROM '. BBCODES_TABLE;
 		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 		$next = $row['max_bbcode_id'] + 1;
 
-		foreach ($bbcodes AS $k=>$bbcode)
-			if ($bbcode[1] && $bbcode[3]) {
-				$line = [
-					'bbcode_id' => $next++,
-					'bbcode_match' => $bbcode[0],
-					'bbcode_tpl' => addslashes ($bbcode[1]),
-					'bbcode_helpline' => @$bbcode[2],
-					'bbcode_tag' => $bbcode[3],
-					'display_on_posting' => 1,
-					'first_pass_match' => '/(?!)/',
-					'first_pass_replace' => '',
-					'second_pass_match' => '/(?!)/',
-					'second_pass_replace' => '',
-				];
+		$sql = 'SELECT bbcode_tag FROM '. BBCODES_TABLE;
+		$result = $this->db->sql_query($sql);
+		$attachments = $update_count_ary = [];
+		while ($row = $this->db->sql_fetchrow($result))
+			$tags[$row['bbcode_tag']] = true;
+		$this->db->sql_freeresult($result);
 
-				$sql = 'INSERT INTO '.BBCODES_TABLE.
-					' ('.implode (',', array_keys ($line)).')'.
-					' VALUES("'.implode ('","', $line).'")';
+		foreach ($bb AS $k=>$v) {
+			// Extract the tag
+			preg_match ('/[a-z_0-9]+/', $v[0], $match);
+
+			if (!isset ($tags[@$match[0]])) { // If it doesn't exist
+				// Créate the tag line
+				$sql = 'INSERT INTO '.BBCODES_TABLE.' VALUES ('.$next++.', "'.$match[0].
+					'", "", 1, "", "", "/(?!)/", "", "/(?!)/", "")';
 				$this->db->sql_query($sql);
 			}
+			// Update all
+			$sql = 'UPDATE '.BBCODES_TABLE.' SET '.
+				'bbcode_match = "'.$v[0].'", '.
+				'bbcode_tpl = "'.addslashes($v[1]).'", '.
+				'bbcode_helpline = "'.@$v[2].'" '.
+				'WHERE bbcode_tag = "'.$match[0].'"';
+			$this->db->sql_query($sql);
+		}
 	}
 
 	// Popule les templates
@@ -418,9 +456,12 @@ function twig_environment_render_template_after($vars) {
 				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
 			// Extrait du résumé
+			//TODO laisser [resume][/resume]
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row['display_text'],true).'</pre>';
 			$vs = explode ('<!--resume-->', $row['display_text']);
 			$row['resume'] = count ($vs) > 1 ? $vs[1]
 				: $row['display_text']; // Par défaut : tout
+			$row['resume'] .= 'ZZ';
 
 			//TODO AFTER3 DELETE
 			/*

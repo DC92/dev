@@ -36,7 +36,6 @@ class listener implements EventSubscriberInterface
 		$this->language = $language;
 
 		$this->post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
-		$this->get = $this->request->get_super_global(\phpbb\request\request_interface::GET);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
 	}
@@ -56,10 +55,6 @@ class listener implements EventSubscriberInterface
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
-
-			// Viewtopic
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
-			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
 			'core.modify_posting_parameters' => 'modify_posting_parameters',
@@ -138,58 +133,6 @@ class listener implements EventSubscriberInterface
 				if ($this->request->variable ('f', 0))
 					exit (file_get_contents ($uris[0].'/viewforum.php?'.$uris[1]));
 		}
-	}
-
-	/**
-		VIEWTOPIC.PHP
-	*/
-	// Called after reading SQL post data
-	function viewtopic_post_rowset_data($vars) {
-
-		/* Specific BBcode [location]ABSOLUTE_PATH[/location] go to ABSOLUTE_PATH */
-		if (defined('MYPHPBB_BBCODE_LOCATION') &&
-			$this->request->variable ('p', 0) == $vars['row']['post_id']) { // Only if a specific post is required
-			$text = preg_replace_callback (
-				'/<[^>]*>/',
-				function () {return '';},
-				$vars['row']['post_text']
-			);
-			preg_match ('/\[location\](.*)\[\/location\]/', $text, $match);
-			if ($match)
-				exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
-		}
-	}
-
-	// Called before post assigned to template
-	function viewtopic_modify_post_row($vars) {
-		$post_row = $vars['post_row'];
-
-		/* Specific BBcode [include]RELATIVE_PATH[/include] */
-		/* Replace by the content of the RELATIVE_PATH */
-
-		if (defined('MYPHPBB_BBCODE_INCLUDE') &&
-			!isset ($this->get['mcp']) && // Avoid loop
-			$post_row['POST_ID'] == $this->get['p']) // Only on the required one
-			$post_row['MESSAGE'] = preg_replace_callback (
-				'/\[include\](.*)\[\/include\]/',
-				function ($match) {
-					$query = parse_url ($this->uri, PHP_URL_QUERY);
-					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
-							parse_url ($this->uri, PHP_URL_QUERY),
-							pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.$match[1]
-						);
-					$url .= (parse_url ($url, PHP_URL_QUERY) ? '&' : '?').
-						'mcp='.$this->auth->acl_get('m_');
-
-					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
-						echo $url.'<br/>';
-
-					return file_get_contents ($url);
-				},
-				str_replace ('amp;', '', $post_row['MESSAGE'])
-			);
-
-		$vars['post_row'] = $post_row;
 	}
 
 	/**

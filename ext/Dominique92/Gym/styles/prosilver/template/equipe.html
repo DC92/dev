@@ -1,0 +1,22 @@
+<!-- BEGIN topic -->
+<!-- BEGIN post -->
+	<!-- IF REQUEST_T == post.TOPIC_ID -->
+		<div class="animatrice">
+			<h2>
+				<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
+				<!-- IF U_MCP or REQUEST_MCP -->
+					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+						title="Modifier la page {post.POST_SUBJECT}" class="button button-icon-only">
+						<i class="icon fa-pencil"></i>
+					</a>
+				<!-- ENDIF -->
+			</h2>
+
+			{post.RESUME}
+
+			<br/><a href="viewtopic.php?p={post.POST_ID}">Plus d'infos . . .</a>
+			<br style="clear:both;height:0" />
+		</div>
+	<!-- ENDIF -->
+<!-- END post -->
+<!-- END topic -->
