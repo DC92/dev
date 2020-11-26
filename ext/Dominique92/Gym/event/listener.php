@@ -37,6 +37,7 @@ class listener implements EventSubscriberInterface
 
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
+		$this->cookies = $this->request->get_super_global(\phpbb\request\request_interface::COOKIE);
 		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
@@ -197,6 +198,43 @@ function twig_environment_render_template_after($vars) {
 				},
 				$post_row['MESSAGE']
 			);
+		// Replace by a code & redirection manager
+		if ($post_row['POST_ID'] == $p)
+			$post_row['MESSAGE'] = preg_replace_callback (
+				'/\[visio\](.*)\[\/visio\]/',
+				function ($match) {
+					// Mem the code
+					if (@$this->args['code']) {
+						setcookie ('code', $this->args['code'], time() + 31*24*3600);
+						$this->cookies['code'] = $this->args['code'];
+					}
+
+					// Trace
+					file_put_contents ('LOG/visio.LOG', var_export([
+						'date' => date(DATE_RFC2822),
+						'query' => $this->server['QUERY_STRING'],
+						'ip' => $this->server['REMOTE_ADDR'],
+						'referer' => @$this->server['HTTP_REFERER'],
+						'agent' => @$this->server['HTTP_USER_AGENT'],
+					], true), FILE_APPEND);
+
+					// Vérification et routage
+					global $myphp_template;
+					if (strpos ($this->cookies['code'], $myphp_template['code_visio']) !== false && isset($this->args['anim']))
+						exit ('<meta http-equiv="refresh" content="0;URL=https://meet.jit.si/'.
+							$myphp_template['code_visio'].'-'.
+							$this->args['anim'].'">'
+						);
+
+					return // Add a code formulaire
+						'<form action="'.$this->server['REQUEST_URI'].'" method="post">'.
+							'<input name="code" type="text" style="width:200px">'.
+							'<button type="submit">Envoyer</button>'.
+						'</form>'.
+						($this->cookies['code'] ? '<p style="color:red;font-weight:bold">Le code fourni n\'est pas (ou plus) valable</p>' : '');
+				},
+				$post_row['MESSAGE']
+			);
 
 		$vars['post_row'] = $post_row;
 	}
@@ -316,7 +354,6 @@ function twig_environment_render_template_after($vars) {
 		$columns = [
 			'gym_activite',
 			'gym_lieu',
-			'gym_ouverture',
 			'gym_animateur',
 			'gym_cert',
 			'gym_jour',

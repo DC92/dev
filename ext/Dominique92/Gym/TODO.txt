@@ -11,6 +11,7 @@ remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
 //TODO Horaires cours visio
+
 //TODO listener passer de <!--resume--> à (resume)(/resume)
 //TODO audiences synthétiques ?? > logs / youtube / visio
 //TODO router systèmatiquement séance => activité ???

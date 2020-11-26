@@ -41,20 +41,7 @@
 
 			<!-- IF post.GYM_LIEU != REQUEST_P -->
 			<td>
-				<!-- IF post.GYM_OUVERTURE != 'visio' -->
-					<a href="viewtopic.php?p={post.GYM_LIEU}">{post.LIEU}</a>
-				<!-- ELSEIF not CODE_VISIO -->
-					Visioconférence
-				<!-- ELSE -->
-					<a title="Se connecter à la visioconférence"
-					href="ext/Dominique92/Gym/visio.php?anim={post.ANIMATEUR}"
-					class="visio">
-					Visioconférence</a>
-				<!-- ENDIF -->
-
-				<!-- IF post.GYM_OUVERTURE == 'ferme' or (not post.GYM_OUVERTURE and FERME) -->
-					<span style="color:red">(fermé)</span>
-				<!-- ENDIF -->
+				<a href="viewtopic.php?p={post.GYM_LIEU}&anim={post.ANIMATEUR}">{post.LIEU}</a>
  			</td>
 			<!-- ENDIF -->
 
