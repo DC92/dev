@@ -60,11 +60,11 @@ class listener implements EventSubscriberInterface
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
-'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',//TODO AFTER3 DELETE
+'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',//AFTER3 DELETE
 		];
 	}
 
-//TODO AFTER3 DELETE
+//AFTER3 DELETE
 function twig_environment_render_template_after($vars) {
 	$vars['output'] = preg_replace_callback (
 		'/\(([A-Z]+) ?([^\)]*)\)/s',
@@ -141,9 +141,10 @@ function twig_environment_render_template_after($vars) {
 	function viewtopic_post_rowset_data($vars) {
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
+		$p = $this->request->variable ('p', 0);
 
 		// [location]ABSOLUTE_PATH[/location] go to ABSOLUTE_PATH */
-		if ($vars['row']['post_id'] == $this->request->variable ('p', 0)) { // Only if a specific post is required
+		if ($vars['row']['post_id'] == $p || !$p) { // Only if a specific post is required
 			// Purge unused <...>
 			$text = preg_replace_callback (
 				'/<[^>]*>/',
@@ -365,10 +366,10 @@ function twig_environment_render_template_after($vars) {
 			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut dans la page le contenu d\'une url'],
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 
-			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
-			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //TODO AFTER3 DELETE
-			['[presentation]{TEXT}[/presentation]','<!--resume-->{TEXT}<!--resume-->','Presentation pour affichage dans la rubrique'], //TODO OBSOLETE ???????
-			['[urlb]'],['[carte]'],//TODO AFTER3 DELETE
+			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //AFTER3 DELETE
+			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //AFTER3 DELETE
+			['[presentation]{TEXT}[/presentation]','<!--resume-->{TEXT}<!--resume-->','Presentation pour affichage dans la rubrique'], //AFTER3 DELETE
+			['[urlb]'],['[carte]'],//AFTER3 DELETE
 		]);
 	}
 	function add_bbcode($bb) {
@@ -400,7 +401,8 @@ function twig_environment_render_template_after($vars) {
 			$sql = 'UPDATE '.BBCODES_TABLE.' SET '.
 				'bbcode_match = "'.$v[0].'", '.
 				'bbcode_tpl = "'.addslashes($v[1]).'", '.
-				'bbcode_helpline = "'.@$v[2].'" '.
+				'bbcode_helpline = "'.@$v[2].'", '.
+				'display_on_posting = 1 '.
 				'WHERE bbcode_tag = "'.$match[0].'"';
 			$this->db->sql_query($sql);
 		}
@@ -460,13 +462,13 @@ function twig_environment_render_template_after($vars) {
 				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
 			// Extrait du résumé
-			//TODO laisser [resume][/resume]
+			//TODO passer à (resume)(/resume)
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row['display_text'],true).'</pre>';
 			$vs = explode ('<!--resume-->', $row['display_text']);
 			$row['resume'] = count ($vs) > 1 ? $vs[1]
 				: $row['display_text']; // Par défaut : tout
 
-			//TODO AFTER3 DELETE
+			//AFTER3 DELETE
 			/*
 			foreach (['accueil','actualite','presentation'] AS $k) {
 				$vs = explode ("<!--$k-->", $row['display_text']);
