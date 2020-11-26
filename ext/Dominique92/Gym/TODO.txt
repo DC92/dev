@@ -10,15 +10,18 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
-//TODO mettre viewtopic en format gym quand on a :gym dans le forum_desc
+//TODO Accueil ne va pas au début du site
+//TODO Horaires cours visio
 //TODO actualités non datées / ordre des actualités = n° ordre (fiche)
 //TODO Dépendance des calendrier scolaires / vision dans actualité
 //TODO Lien séance => activité
-//BEST Bouton imprimer calendier / style print
-//BEST convertir tous les non saisis "null" en off
-//BEST Sitemap / SEO
+//TODO audiences > logs / youtuve / visio
+
 //BEST carte tous points dans chaville
 //BEST Lien gmaps
+//BEST convertir tous les non saisis "null" en off
+//BEST Sitemap / SEO
+//BEST Bouton imprimer calendier / style print
 //BEST BUG Diaporama pas vu depuis un moment => boucle rapidement
 //BEST BUG d'affichage avec &hilit=body (résultat recherche)
 	http://c92.fr/gymtest/viewtopic.php?f=2&t=1&p=18&hilit=body#p18

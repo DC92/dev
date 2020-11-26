@@ -102,8 +102,11 @@ function twig_environment_render_template_after($vars) {
 	*/
 	// Appelé juste avant d'afficher
 	function viewtopic_modify_page_title($vars) {
-		if (!$this->args['f'] && $this->args['t'] ||
-			$this->args['p'])
+		if (strpos($vars['topic_data']['forum_desc'],':gym') !== false &&
+				((!$this->args['f'] && $this->args['t']) ||
+					$this->args['p']
+				)
+			)
 			$this->my_template = 'viewtopic';
 	}
 
