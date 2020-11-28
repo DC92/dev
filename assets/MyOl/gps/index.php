@@ -9,7 +9,6 @@ Based on https://openlayers.org
 	// You can include it from another directory
 	// It needs a manifest.json file in the same directory
 
-	//TODO BEST afficher version tag
 	//BEST BUG battements entre deux instances de GPS
 
 	// Read info in the manifest.json & list *.gpx files

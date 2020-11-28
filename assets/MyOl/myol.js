@@ -38,22 +38,6 @@ if (window.location.hash == '###')
 		alert(message);
 	};
 
-//HACK IE polyfills
-// You can include https://cdn.polyfill.io/v3/polyfill.min.js instead
-if (!Object.assign)
-	Object.assign = function() {
-		let r = {};
-		for (let a in arguments)
-			for (let m in arguments[a])
-				r[m] = arguments[a][m];
-		return r;
-	};
-
-if (!Math.hypot)
-	Math.hypot = function(a, b) {
-		return Math.sqrt(a * a + b * b);
-	};
-
 //HACK Json parsing errors log
 function JSONparse(json) {
 	try {
