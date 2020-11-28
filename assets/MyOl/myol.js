@@ -20,7 +20,7 @@ if (!ol) var ol = {};
 try {
 	new ol.style.Icon(); // Try incorrect action
 } catch (err) { // to get Assert url
-	ol.version = 'ol ' + err.message.match('/v([0-9\.]+)/')[1] + '/201127';
+	ol.version = 'ol ' + err.message.match('/v([0-9\.]+)/')[1] + '/201128';
 	console.log(ol.version);
 }
 
@@ -1527,6 +1527,7 @@ function controlGeocoder(options) {
  * Requires controlButton
  */
 //BEST GPS tap on map = distance from GPS calculation
+//TODO average inertial counter to get better speed
 function controlGPS() {
 	let view, geolocation, nbLoc, position, altitude;
 
