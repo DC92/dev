@@ -67,6 +67,10 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="<?=$icon['type']?>" href="<?=$icon['src']?>" />
 
+	<!-- Polyfills -->
+	<script nomodule src="https://cdn.polyfill.io/v3/polyfill.min.js"></script><!-- IE -->
+	<script src="https://unpkg.com/elm-pep"></script><!-- FF -->
+
 	<!-- Openlayers -->
 	<link href="<?=$myol_path?>ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="<?=$myol_path?>ol/ol.js"></script>

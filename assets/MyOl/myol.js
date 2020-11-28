@@ -464,10 +464,52 @@ function hoverManager(map) {
 		});
 	map.addOverlay(popup);
 
+	function findClosestFeature(pixel) {
+		let closestFeature = null,
+			distanceMin = 2000;
+
+		map.forEachFeatureAtPixel( //TODO BUG tolérance 0 OK pour point et surface mais pas pour ligne
+			pixel,
+			function(feature, layer) {
+				if (layer) {
+					let geometry = feature.getGeometry(),
+						featurePixel = map.getPixelFromCoordinate(
+							geometry.getExtent()
+						),
+						distance = Math.hypot( // Distance of a point
+							featurePixel[0] - pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
+							featurePixel[1] - pixel[1]
+						),
+						geomEextent = geometry.getExtent();
+
+					// Higest priority for draggable markers
+					if (feature.getProperties().draggable)
+						distance = 0;
+
+					if (geomEextent[0] != geomEextent[2]) { // Line or polygon
+						distance = 1000; // Lower priority
+						featurePixel = pixel; // Label follows the cursor
+					}
+					if (distanceMin > distance) {
+						distanceMin = distance;
+
+						// Look at hovered feature
+						closestFeature = feature;
+						closestFeature.pixel_ = featurePixel;
+						closestFeature.layer_ = layer;
+					}
+				}
+			}
+		);
+
+		return closestFeature;
+	}
+
 	// Go to feature.property.link when click on the feature (icon or area)
 	map.on('click', function(evt) {
-		if (hoveredFeature) {
-			const link = hoveredFeature.getProperties().link;
+		let clickedFeature = findClosestFeature(evt.pixel);
+		if (clickedFeature) {
+			const link = clickedFeature.getProperties().link;
 			if (link) {
 				if (evt.originalEvent.ctrlKey) {
 					const tab = window.open(link, '_blank');
@@ -479,55 +521,12 @@ function hoverManager(map) {
 		}
 	});
 
-	// Hide popup when the cursor is out of the map
-	window.addEventListener('mousemove', function(evt) {
-		const divRect = map.getTargetElement().getBoundingClientRect();
-		if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-			evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-			labelEl.className = 'myol-popup-hidden';
-	});
-
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
 		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
 			// Search hovered features
-			let closestFeature = null,
-				distanceMin = 2000;
-
-			map.forEachFeatureAtPixel( //TODO BUG tolérance 0 OK pour point et surface mais pas pour ligne
-				evt.pixel,
-				function(feature, layer) {
-					if (layer) {
-						let geometry = feature.getGeometry(),
-							featurePixel = map.getPixelFromCoordinate(
-								geometry.getExtent()
-							),
-							distance = Math.hypot( // Distance of a point
-								featurePixel[0] - evt.pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
-								featurePixel[1] - evt.pixel[1]
-							),
-							geomEextent = geometry.getExtent();
-
-						// Higest priority for draggable markers
-						if (feature.getProperties().draggable)
-							distance = 0;
-
-						if (geomEextent[0] != geomEextent[2]) { // Line or polygon
-							distance = 1000; // Lower priority
-							featurePixel = evt.pixel; // Label follows the cursor
-						}
-						if (distanceMin > distance) {
-							distanceMin = distance;
-
-							// Look at hovered feature
-							closestFeature = feature;
-							closestFeature.pixel_ = featurePixel;
-							closestFeature.layer_ = layer;
-						}
-					}
-				}
-			);
+			let closestFeature = findClosestFeature(evt.pixel);
 
 			if (closestFeature != hoveredFeature) { // If we hover a new feature
 				// Recover the basic style for the previous hoveredFeature feature
@@ -589,6 +588,14 @@ function hoverManager(map) {
 				popup.setPosition(map.getCoordinateFromPixel(pixel));
 			}
 		}
+	});
+
+	// Hide popup when the cursor is out of the map
+	window.addEventListener('mousemove', function(evt) {
+		const divRect = map.getTargetElement().getBoundingClientRect();
+		if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+			evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+			labelEl.className = 'myol-popup-hidden';
 	});
 }
 
