@@ -33,9 +33,6 @@ Based on https://openlayers.org
 			width: 90vw;
 			height: 60vw;
 		}
-		.out-epsg-21781 span {
-			display: none;
-		}
 	</style>
 </head>
 
@@ -59,13 +56,13 @@ Based on https://openlayers.org
 	<div id="drag-marker">
 		<p>
 			Longitude :
-			<input type="text" name="lon" size="12" maxlength="12">(WGS84)&nbsp;
-			 <span style=""> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
+			<input type="text" name="lon" size="12" maxlength="12"> (WGS84)&nbsp;
+			 <span style="display:none" class="epsg-21781"> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
 		</p>
 		<p>
 			Latitude :
-			<input type="text" name="lat" size="12" maxlength="12">(WGS84)&nbsp;
-			<span style=""> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
+			<input type="text" name="lat" size="12" maxlength="12"> (WGS84)&nbsp;
+			<span style="display:none" class="epsg-21781"> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
 		</p>
 	</div>
 

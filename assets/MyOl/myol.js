@@ -2246,7 +2246,9 @@ function layerGeoJson(options) {
 				ol.proj.proj4.register(proj4);
 			}
 			// Display or not the EPSG:21781 coordinates
-			displayPointEl.className = ll21781 ? 'epsg-21781' : 'out-epsg-21781';
+			var epsg21781 = document.getElementsByClassName('epsg-21781');
+			for (var e = 0; e < epsg21781.length; e++)
+				epsg21781[e].style.display = ll21781 ? '' : 'none';
 
 			if (inputEls.length)
 				// Set the html input
