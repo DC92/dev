@@ -20,7 +20,7 @@ if (!ol) var ol = {};
 try {
 	new ol.style.Icon(); // Try incorrect action
 } catch (err) { // to get Assert url
-	ol.version = 'ol ' + err.message.match('/v([0-9\.]+)/')[1] + '/201128';
+	ol.version = 'Ol ' + err.message.match('/v([0-9\.]+)/')[1] + ' 201129';
 	console.log(ol.version);
 }
 
@@ -524,7 +524,11 @@ function hoverManager(map) {
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
-		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
+		if (hoveredEl &&
+			(hoveredEl.tagName == 'CANVAS' || // All browsers
+				hoveredEl.tagName == 'IMG' // For IE
+			)
+		) { // Not hovering an html element (label, button, ...)
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
