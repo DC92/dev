@@ -523,6 +523,7 @@ function hoverManager(map) {
 		}
 	});
 
+	//TODO appeler sur l'event "hover" (pour les mobiles)
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
@@ -877,6 +878,7 @@ function layerRefugesInfo(options) {
 		styleOptions: function(properties) {
 			return {
 				image: new ol.style.Icon({
+					//TODO BUG don't use the same baseUrl than baseUrlFunction
 					src: options.baseUrl + 'images/icones/' + properties.icone + '.png',
 				}),
 			};
