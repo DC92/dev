@@ -1,9 +1,3 @@
-FAIT
-====
-	conf_privee : "???" => '???'
-	vues\api\doc\index.html : nte de zone au points à => nte de zone auX points à
-	vues\api\doc\index.html : inclus dans la bbos => X
-
 TODO WRI
 ========
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */

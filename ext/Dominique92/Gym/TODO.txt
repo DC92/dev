@@ -11,15 +11,13 @@ remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
 //TODO Horaires cours visio
-
 //TODO listener passer de <!--resume--> à (resume)(/resume)
-//TODO audiences synthétiques ?? > logs / youtube / visio
 //TODO router systèmatiquement séance => activité ???
 
-//TODO actualités non datées / ordre des actualités = n° ordre (fiche)
-//TODO actualités sans date / sans heure
+//TODO actualités non datéese / sans heure / ordre des actualités = n° ordre (fiche)
 //TODO Dépendance des calendrier scolaires / vision dans actualité
 
+//BEST audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville
 //BEST Lien gmaps
 //BEST convertir tous les non saisis "null" en off
