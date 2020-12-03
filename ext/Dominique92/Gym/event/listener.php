@@ -357,6 +357,7 @@ function twig_environment_render_template_after($vars) {
 			'gym_acces',
 			'gym_animateur',
 			'gym_cert',
+			'gym_nota',
 			'gym_jour',
 			'gym_heure',
 			'gym_minute',

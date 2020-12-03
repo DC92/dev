@@ -1,4 +1,6 @@
 Migration :
+Dupliquer base
+Si chaville.test -> changer dans le SQL
 Uploader phpBB 3.3.2 sauf /doc /install /ext /files /config.php
 Uploader Dominique92 /assets/MyOl /ext/Dominique92/MyPhpBB GeoBB Gym
 Uploader /ext/phpbb/GGAnalytics /ext/cleantalk/antispam
