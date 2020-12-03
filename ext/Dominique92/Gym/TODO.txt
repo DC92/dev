@@ -1,23 +1,21 @@
-Migration
-Uploader phpBB 3.3.2 sauf doc & install
-assets/MyOl
-ext/Dominique92/MyPhpBB GeoBB Gym
-ext/phpbb/GGAnalytics cleantalk/antispam
-/files /fichiers config.php
+Migration :
+Uploader phpBB 3.3.2 sauf /doc /install /ext /files /config.php
+Uploader Dominique92 /assets/MyOl /ext/Dominique92/MyPhpBB GeoBB Gym
+Uploader /ext/phpbb/GGAnalytics /ext/cleantalk/antispam
+Copier de précédent /files /fichiers config.php
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
-Remettre les accès des séances à visio
+Après :
+Refaire pages horaires ouvert / tous
 Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
-//TODO salles ordre alphabetique
-//TODO Voir GYM_OUVERTURE -> GYM_CERT
-//TODO Horaires cours visio
-//TODO listener passer de <!--resume--> à (resume)(/resume)
+//TODO mesureur audience
 //TODO router systèmatiquement séance => activité ???
 
 //TODO actualités non datées / sans heure / ordre des actualités = n° ordre (fiche)
 //TODO Dépendance des calendrier scolaires / vision dans actualité
+//TODO salles ordre alphabetique
 
 //BEST audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville
@@ -38,17 +36,7 @@ Refaire git Dominique92 / test en DC02
 /** CONFIG
 https://github.com/phpbbmodders/phpBB-3.1-ext-adduser ????
 
-/** UPGRADE GYM
-créer BDD / + user / importer la sauvegarde BDD
-download phpBB -docs -install -ext -file -config.php
-download ext/Gym, ext/MyPhpBB, ext/phpbb/googleanalytics
-copier de version précédente
-	config.php
-	docs/...
-	files/...
-	slides/...
-exécuter /install
-
+Install :
 /** PERSONNALISER / extensions MyPhpBB, GeoBB, Gym
 MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
 GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur

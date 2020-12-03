@@ -12,7 +12,7 @@
 		border-color:{topic.COULEUR_BORD};
 	">
 		<!-- BEGIN post -->
-		<!-- IF post.GYM_HORAIRES -->
+		<!-- IF post.GYM_HORAIRES and (post.GYM_ACCES !== 'ferme' or REQUEST_ACCES !== 'ouvert')-->
 		<tr>
 			<td>
 				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->
@@ -42,6 +42,9 @@
 			<!-- IF post.GYM_LIEU != REQUEST_P -->
 			<td>
 				<a href="viewtopic.php?p={post.GYM_LIEU}&anim={post.ANIMATEUR}">{post.LIEU}</a>
+				<!-- IF post.GYM_ACCES === 'ferme' -->
+					<span style="color:red">(fermé)</span>
+				<!-- ENDIF -->
  			</td>
 			<!-- ENDIF -->
 

@@ -354,6 +354,7 @@ function twig_environment_render_template_after($vars) {
 		$columns = [
 			'gym_activite',
 			'gym_lieu',
+			'gym_acces',
 			'gym_animateur',
 			'gym_cert',
 			'gym_jour',

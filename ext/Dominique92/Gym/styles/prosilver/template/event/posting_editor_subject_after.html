@@ -64,6 +64,16 @@
 		<!-- END liste_lieux -->
 	</select> &nbsp;
 
+	Accès:
+	<select name="gym_acces">
+		<option value="">ouvert</option>
+		<option value="ferme"
+			<!-- IF GYM_ACCES === 'ferme' -->
+				selected="selected"
+			<!-- ENDIF -->
+		>fermé</option>
+	</select> &nbsp;
+
 	Animation:
 	<select name="gym_animateur">
 		<option>?</option>
