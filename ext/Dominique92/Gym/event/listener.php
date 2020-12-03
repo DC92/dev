@@ -390,7 +390,7 @@ function twig_environment_render_template_after($vars) {
 			['[centre]{TEXT}[/centre]','<div style="text-align:center">{TEXT}</div>','Texte centré'],
 			['[saut_ligne][/saut_ligne]','<br style="clear:both" />'],
 			['[separation][/separation]','<hr/>','Ligne horizontale'],
-			['[resume]{TEXT}[/resume]','<!--resume-->{TEXT}<!--resume-->','Partie de texte à afficher (accueil, actualité, ...)'],
+			['[resume]{TEXT}[/resume]','(resume){TEXT}(/resume)','Partie de texte à afficher (accueil, actualité, ...)'],
 			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
 			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
 			['[carte][/carte]','<div id="map"></div>','Insère la carte'],
@@ -403,9 +403,9 @@ function twig_environment_render_template_after($vars) {
 			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut dans la page le contenu d\'une url'],
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 
-			['[accueil]{TEXT}[/accueil]','<!--resume-->{TEXT}<!--resume-->'], //AFTER3 DELETE
-			['[actualite]{TEXT}[/actualite]','<!--resume-->{TEXT}<!--resume-->'], //AFTER3 DELETE
-			['[presentation]{TEXT}[/presentation]','<!--resume-->{TEXT}<!--resume-->','Presentation pour affichage dans la rubrique'], //AFTER3 DELETE
+			['[accueil]{TEXT}[/accueil]','(resume){TEXT}(/resume)'], //AFTER3 DELETE
+			['[actualite]{TEXT}[/actualite]','(resume){TEXT}(/resume)'], //AFTER3 DELETE
+			['[presentation]{TEXT}[/presentation]','(resume){TEXT}(/resume)','Presentation pour affichage dans la rubrique'], //AFTER3 DELETE
 			['[urlb]'],['[carte]'],//AFTER3 DELETE
 		]);
 	}
@@ -498,21 +498,11 @@ function twig_environment_render_template_after($vars) {
 			if (!empty($attachments[$row['post_id']]))
 				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
 
-			// Extrait du résumé
-			//TODO passer à (resume)(/resume)
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:14px'> = ".var_export($row['display_text'],true).'</pre>';
-			$vs = explode ('<!--resume-->', $row['display_text']);
-			$row['resume'] = count ($vs) > 1 ? $vs[1]
-				: $row['display_text']; // Par défaut : tout
-
-			//AFTER3 DELETE
-			/*
-			foreach (['accueil','actualite','presentation'] AS $k) {
-				$vs = explode ("<!--$k-->", $row['display_text']);
-				if (count ($vs) > 1)
-					$row[strtoupper($k)] = $vs[1];
-			}
-			*/
+			// Extrait le résumé
+			preg_match ('/\(resume\)(.*)\(\/resume\)/s', $row['display_text'], $match);
+			$row['resume'] = count($match)
+				? $match[1]
+				: $row['display_text'];
 
 			// Date
 			global $myphp_js;

@@ -10,11 +10,13 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
+//TODO salles ordre alphabetique
+//TODO Voir GYM_OUVERTURE -> GYM_CERT
 //TODO Horaires cours visio
 //TODO listener passer de <!--resume--> à (resume)(/resume)
 //TODO router systèmatiquement séance => activité ???
 
-//TODO actualités non datéese / sans heure / ordre des actualités = n° ordre (fiche)
+//TODO actualités non datées / sans heure / ordre des actualités = n° ordre (fiche)
 //TODO Dépendance des calendrier scolaires / vision dans actualité
 
 //BEST audiences synthétiques ?? > logs / youtube / visio

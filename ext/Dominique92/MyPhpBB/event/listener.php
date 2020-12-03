@@ -99,7 +99,7 @@ class listener implements EventSubscriberInterface
 			$template->set_style ([
 				'ext/'.$ns[0].'/'.$ns[1].'/styles',
 				'styles', // core styles
-				'adm', // core styles //TODO needed for template/adm/...
+				'adm', // core styles (needed for template/adm/...)
 			]);
 		*/
 	}
