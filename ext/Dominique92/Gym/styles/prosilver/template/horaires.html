@@ -1,3 +1,14 @@
+<!-- IF ACCES_FERME -->
+	<p class="single-button">
+		Cliquez pour 
+		<!-- IF REQUEST_FERME -->
+			<a href="?p={REQUEST_P}"><button>masquer les cours suspendus</button></a>
+		<!-- ELSE -->
+			<a href="?p={REQUEST_P}&ferme=oui"><button>voir aussi les cours suspendus</button></a>
+		<!-- ENDIF -->
+	</p>
+<!-- ENDIF -->
+
 <!-- BEGIN topic -->
 <div class="horaires j{topic.GYM_JOUR}">
 	<!-- IF topic.GYM_HORAIRES -->
@@ -12,7 +23,7 @@
 		border-color:{topic.COULEUR_BORD};
 	">
 		<!-- BEGIN post -->
-		<!-- IF post.GYM_HORAIRES and (post.GYM_ACCES !== 'ferme' or REQUEST_ACCES !== 'ouvert')-->
+		<!-- IF post.GYM_HORAIRES and (post.GYM_ACCES !== 'ferme' or REQUEST_FERME) -->
 		<tr>
 			<td>
 				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->

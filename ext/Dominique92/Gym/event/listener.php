@@ -554,6 +554,9 @@ function twig_environment_render_template_after($vars) {
 			$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
 			$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
 
+			if($row['gym_horaires'] == 'on' && $row['gym_acces'] == 'ferme')
+				$this->template->assign_var ('ACCES_FERME', true);
+
 			// Range les résultats dans l'ordre et le groupage espéré
 			$liste [
 				$this->request->variable('template', '') == 'horaires' ?

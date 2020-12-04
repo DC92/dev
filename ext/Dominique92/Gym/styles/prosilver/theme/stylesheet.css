@@ -343,6 +343,9 @@ body {
 }
 
 /* Horaires */
+.single-button button {
+	cursor: pointer;
+}
 .gym .horaires {
 	clear: both;
 	margin: 0 0 0.3em 0;
