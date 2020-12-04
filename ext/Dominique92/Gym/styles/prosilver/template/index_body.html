@@ -42,7 +42,11 @@
 <div class="page">
 	<h2>
 		<!-- IF post.DATE -->
-			{post.DATE}:
+			{post.DATE}
+			<!-- IF post.GYM_HEURE > 0 -->
+				à {post.HORAIRE_DEBUT}
+			<!-- ENDIF -->
+			:
 		<!-- ENDIF -->
 		<a href="viewtopic.php?p={post.POST_ID}">{post.POST_SUBJECT}</a>
 		<!-- IF U_MCP -->
@@ -54,11 +58,6 @@
 	</h2>
 	<div>
 		{post.LIEU}
-
-		<!-- IF post.GYM_HEURE > 0 -->
-			à {post.HORAIRE_DEBUT}
-		<!-- ENDIF -->
-
 		<!-- IF post.ANIMATEUR -->
 			avec {post.ANIMATEUR}
 		<!-- ENDIF -->

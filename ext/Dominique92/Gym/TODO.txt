@@ -14,9 +14,7 @@ Refaire git Dominique92 / test en DC02
 
 //TODO mesureur audience
 //TODO router systèmatiquement séance => activité ???
-
-//TODO actualités non datées / sans heure / ordre des actualités = n° ordre (fiche)
-//TODO Dépendance des calendrier scolaires / vision dans actualité
+//TODO actualités : priorité ordre sur date
 //TODO salles ordre alphabetique
 
 //BEST audiences synthétiques ?? > logs / youtube / visio
