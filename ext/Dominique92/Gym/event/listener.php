@@ -170,6 +170,7 @@ function twig_environment_render_template_after($vars) {
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
 		$post_row['COULEUR'] = $this->couleur(); // Couleur du sous-menu
+		$post_row['GEOJSON'] = $post_data['geojson']; // Position sur la carte
 
 		// Assign the gym values to the template
 		foreach ($post_data AS $k=>$v)
