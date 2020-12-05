@@ -12,12 +12,8 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
-//TODO mesureur audience
-//TODO router systèmatiquement séance => activité ???
-//TODO actualités : priorité ordre sur date
-//TODO salles ordre alphabetique
-
-//BEST audiences synthétiques ?? > logs / youtube / visio
+//BEST mesureur audience
+	audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville
 //BEST Lien gmaps
 //BEST convertir tous les non saisis "null" en off

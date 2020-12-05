@@ -4,6 +4,11 @@
 	<!-- SUJET -->
 	<!-- BEGIN postrow -->
 		<!-- IF postrow.POST_ID == REQUEST_P or (not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID) -->
+
+			<!-- IF postrow.GYM_ACTIVITE > 0 -->
+				<meta http-equiv="refresh" content="0; URL=?p={postrow.GYM_ACTIVITE}" />
+			<!-- ENDIF -->
+
 			<h1>
 				{postrow.POST_SUBJECT}
 				<!-- IF U_MCP -->

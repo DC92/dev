@@ -395,7 +395,7 @@ function twig_environment_render_template_after($vars) {
 			['[resume]{TEXT}[/resume]','(resume){TEXT}(/resume)','Partie de texte à afficher (accueil, actualité, ...)'],
 			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
 			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
-			['[carte][/carte]','<div id="map"></div>','Insère la carte'],
+			['[carte]{TEXT}[/carte]','<div id="map"></div>','Insère la carte'],
 			['[titre1]{TEXT}[/titre1]','<h1>{TEXT}</h1>','Caractères blancs sur fond bleu'],
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
@@ -405,10 +405,10 @@ function twig_environment_render_template_after($vars) {
 			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut dans la page le contenu d\'une url'],
 			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
 
-			['[accueil]{TEXT}[/accueil]','(resume){TEXT}(/resume)'], //AFTER3 DELETE
-			['[actualite]{TEXT}[/actualite]','(resume){TEXT}(/resume)'], //AFTER3 DELETE
-			['[presentation]{TEXT}[/presentation]','(resume){TEXT}(/resume)','Presentation pour affichage dans la rubrique'], //AFTER3 DELETE
-			['[urlb]'],['[carte]'],//AFTER3 DELETE
+			//AFTER3 DELETE
+			['[accueil]{TEXT}[/accueil]','(resume){TEXT}(/resume)'],
+			['[actualite]{TEXT}[/actualite]','(resume){TEXT}(/resume)'],
+			['[presentation]{TEXT}[/presentation]','(resume){TEXT}(/resume)','Presentation pour affichage dans la rubrique'],
 		]);
 	}
 	function add_bbcode($bb) {
@@ -559,16 +559,13 @@ function twig_environment_render_template_after($vars) {
 
 			// Range les résultats dans l'ordre et le groupage espéré
 			$liste [
-				$this->request->variable('template', '') == 'horaires' ?
-					$row['gym_jour'] // Horaires
-				:
-					$row['first_gym_ordre_menu'].'*'. // Menu
-					$row['next_beg_time'].'*'. // Actualité
-					$row['topic_id'] // Pour séparer les topics dans les menus
+				$this->request->variable('template', '') == 'horaires'
+					? $row['gym_jour'] // Horaires
+					: $row['first_gym_ordre_menu'] // Menu
 			][
 				$row['gym_ordre_menu'].'*'. // Horaires
 				$row['horaire_debut'].'*'.
-				$row['post_id'] // Pour séparer les exeaco
+				$row['post_subject'] // Pour trier par nom et séparer les exeaco
 			] = array_change_key_case ($row, CASE_UPPER);
 		}
 		$this->db->sql_freeresult($result);
