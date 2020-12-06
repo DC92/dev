@@ -20,6 +20,7 @@ $user->setup();
 $forums = request_var ('forums', ''); // List of forum to include "1,2,3"
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $exclude = request_var ('exclude', 0); // topic_id to exclude
+$select = request_var ('select', ''); // Post to display
 $limit = request_var ('limit', 250); // Nombre de points maximum
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
@@ -64,6 +65,9 @@ $sql_array = [
 	],
 	'ORDER_BY' => "CASE WHEN f.forum_id = $priority THEN 0 ELSE left_id END",
 ];
+
+if ($select)
+	$sql_array['WHERE'] = array_merge ($sql_array['WHERE'], explode (',', $select));
 
 // Build query
 if (is_array ($sql_array ['SELECT']))

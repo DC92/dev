@@ -634,22 +634,27 @@ function layerVectorURL(options) {
 		selectorName: '', // Id of a <select> to tune url optional parameters
 		baseUrlFunction: function(bbox, list) { // Function returning the layer's url
 			return options.baseUrl + options.urlSuffix +
-				list.join(',') + '&bbox=' + bbox.join(','); // Default most common url format
+				list.join(',') +
+				(bbox ? '&bbox=' + bbox.join(',') : ''); // Default most common url format
 		},
 		url: function(extent, resolution, projection) {
-			const bbox = ol.proj.transformExtent(
+			// Retreive checked parameters
+			let list = permanentCheckboxList(options.selectorName).filter(
+					function(evt) {
+						return evt !== 'on'; // Except the "all" input (default value = "on")
+					}),
+				bbox = null;
+
+			if (ol.extent.getWidth(extent) != Infinity) {
+				bbox = ol.proj.transformExtent(
 					extent,
 					projection.getCode(),
 					options.projection
-				),
-				// Retreive checked parameters
-				list = permanentCheckboxList(options.selectorName).
-			filter(function(evt) {
-				return evt !== 'on'; // Except the "all" input (default value = "on")
-			});
-			// Round the coordinates
-			for (let b in bbox)
-				bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
+				);
+				// Round the coordinates
+				for (let b in bbox)
+					bbox[b] = (Math.ceil(bbox[b] * 10000) + (b < 2 ? 0 : 1)) / 10000;
+			}
 			return options.baseUrlFunction(bbox, list, resolution);
 		},
 		projection: 'EPSG:4326', // Projection of received data
@@ -698,7 +703,7 @@ function layerVectorURL(options) {
 				lines.push(desc.join(', '));
 			if (properties.phone)
 				lines.push('<a href="tel:' + properties.phone.replace(/ /g, '') + '">' + properties.phone + '</a>');
-			if (typeof properties.copy != 'string' && src)
+			if (options.copyDomain && typeof properties.copy != 'string' && src)
 				properties.copy = src[1];
 			if (properties.copy)
 				lines.push('<p>&copy; ' + properties.copy.replace('www.', '') + '</p>');
@@ -743,6 +748,19 @@ function layerVectorURL(options) {
 							else {
 								source.addFeatures(options.receiveFeatures(features));
 								statusEl.innerHTML = features.length + ' objet' + (features.length > 1 ? 's' : '') + ' chargé' + (features.length > 1 ? 's' : '');
+
+								// Zoom the map on the added features
+								if (options.centerOnfeatures) {
+									const extent = ol.extent.createEmpty(),
+										mapSize = layer.map_.getSize();
+									for (let f in features)
+										ol.extent.extend(extent, features[f].getGeometry().getExtent());
+									layer.map_.getView().fit(
+										extent, {
+											maxZoom: 17,
+											size: [mapSize[0] * 0.8, mapSize[1] * 0.8],
+										});
+								}
 							}
 						}
 					}
@@ -1215,6 +1233,10 @@ function controlLayersSwitcher(options) {
 	rangeEl.oninput = displayLayerSelector;
 	rangeEl.title = 'Glisser pour faire varier la tranparence';
 	button.element.appendChild(rangeEl);
+
+	// Don't display the selector if there is only one layer
+	if (options.baseLayers.length < 2)
+		button.element.style.display = 'none';
 
 	// Layer selector
 	const selectorEl = document.createElement('div');

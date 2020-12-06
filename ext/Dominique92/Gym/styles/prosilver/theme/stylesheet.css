@@ -458,7 +458,7 @@ body {
 /* Cartes */
 #carte {
     clear: both;
-    width: 500px;
-    height: 375px;
+    width: 450px;
+    height: 350px;
     margin: 1em calc(50% - 250px);
 }

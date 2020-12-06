@@ -1,7 +1,6 @@
 <!-- INCLUDE header.html -->
 
 <div class="page">
-	<!-- SUJET -->
 	<!-- BEGIN postrow -->
 		<!-- IF postrow.POST_ID == REQUEST_P or (not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID) -->
 
@@ -29,18 +28,25 @@
 				</div>
 			<!-- ENDIF -->
 
-			<!-- Carte -->
-			<!-- IF postrow.GEOJSON -->
-				<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-				<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
-				<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
-				<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
-				<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
-				<input type="hidden" id="cadre-json" value='{postrow.GEOJSON}' />
-			<!-- ENDIF -->
+			<script>
+				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
+					var select = 'gym_menu=%27on%27';
+				<!-- ELSE -->
+					var select = 'post_id={postrow.POST_ID}';
+				<!-- ENDIF -->
+			</script>
 
 		<!-- ENDIF -->
 	<!-- END postrow -->
+
+	<!-- Carte -->
+	<!-- IF GEOJSON -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
+		<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
+	<!-- ENDIF -->
 </div>
 
 <!-- INCLUDE footer.html -->
