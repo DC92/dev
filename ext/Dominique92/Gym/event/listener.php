@@ -396,7 +396,7 @@ function twig_environment_render_template_after($vars) {
 			['[resume]{TEXT}[/resume]','(resume){TEXT}(/resume)','Partie de texte à afficher (accueil, actualité, ...)'],
 			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
 			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
-			['[carte]{TEXT}[/carte]','<div id="map"></div>','Insère la carte'],
+			['[carte]{TEXT}[/carte]','<div id="carte"></div>','Insère la carte'],
 			['[titre1]{TEXT}[/titre1]','<h1>{TEXT}</h1>','Caractères blancs sur fond bleu'],
 			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
 			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],

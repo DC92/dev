@@ -8,6 +8,7 @@ Copier de précédent /files /fichiers config.php
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
 faire un tour par l'admin pour mettre à jour les BBcodes
 Après :
+Supprimer BBcode include
 Refaire pages horaires ouvert / tous
 Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB

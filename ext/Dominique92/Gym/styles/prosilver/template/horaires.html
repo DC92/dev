@@ -1,4 +1,4 @@
-<!-- IF ACCES_FERME -->
+<!-- IF ACCES_FERME and not REQUEST_SELECT -->
 	<p class="single-button">
 		Cliquez pour 
 		<!-- IF REQUEST_FERME -->
@@ -23,7 +23,7 @@
 		border-color:{topic.COULEUR_BORD};
 	">
 		<!-- BEGIN post -->
-		<!-- IF post.GYM_HORAIRES and (post.GYM_ACCES !== 'ferme' or REQUEST_FERME) -->
+		<!-- IF post.GYM_HORAIRES and (post.GYM_ACCES !== 'ferme' or REQUEST_FERME) and (!REQUEST_SELECT or post.GYM_LIEU == REQUEST_SELECT) -->
 		<tr>
 			<td>
 				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->

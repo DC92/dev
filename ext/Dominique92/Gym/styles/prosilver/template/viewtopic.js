@@ -1,5 +1,5 @@
 new ol.Map({
-	target: 'map',
+	target: 'carte',
 	layers: [
 		layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		layerGeoJson({

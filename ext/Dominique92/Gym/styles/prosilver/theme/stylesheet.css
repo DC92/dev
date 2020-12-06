@@ -31,6 +31,7 @@ body {
 	font-family: arial, sans-serif;
 }
 .copyright {
+    clear: both;
 	text-align: center;
 	font-size: 0.7em;
 }
@@ -206,6 +207,7 @@ body {
 	display: none;
 }
 .gym .file img {
+	margin: 1em;
 	max-width: 30vh;
 	border-radius: 1em;
 }
@@ -343,6 +345,10 @@ body {
 }
 
 /* Horaires */
+.single-button {
+	clear: both;
+	margin-bottom: 0;
+}
 .single-button button {
 	cursor: pointer;
 }
@@ -450,7 +456,9 @@ body {
 }
 
 /* Cartes */
-#map {
-    width: 350px !important;
-    height: 300px !important;
+#carte {
+    clear: both;
+    width: 500px;
+    height: 375px;
+    margin: 1em calc(50% - 250px);
 }
