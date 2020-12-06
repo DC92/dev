@@ -144,7 +144,7 @@ function twig_environment_render_template_after($vars) {
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
 		$p = $this->request->variable ('p', 0);
 
-		// [location]ABSOLUTE_PATH[/location] go to ABSOLUTE_PATH */
+		// [redirect]ABSOLUTE_PATH[/redirect] go to ABSOLUTE_PATH */
 		if ($vars['row']['post_id'] == $p || !$p) { // Only if a specific post is required
 			// Purge unused <...>
 			$text = preg_replace_callback (
@@ -153,7 +153,7 @@ function twig_environment_render_template_after($vars) {
 				$vars['row']['post_text']
 			);
 
-			preg_match ('/\[location\](.*)\[\/location\]/', $text, $match);
+			preg_match ('/\[redirect\](.*)\[\/redirect\]/', $text, $match);
 			if ($match)
 				exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
 		}
@@ -403,8 +403,8 @@ function twig_environment_render_template_after($vars) {
 			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
 			['[video]{URL}[/video]', '<video width="100%" controls><source src="fichiers/{URL}.mp4" type="video/mp4">Your browser does not support HTML video.</video>', 'Insérer une vidéo MP4'],
 
-			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut dans la page le contenu d\'une url'],
-			['[location]{URL}[/location]','{URL}','Redirige la page vers l\'url'],
+			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut le contenu d\'une url dans la page'],
+			['[redirect]{URL}[/redirect]','{URL}','Redirige la page vers l\'url'],
 
 			//AFTER3 DELETE
 			['[accueil]{TEXT}[/accueil]','(resume){TEXT}(/resume)'],

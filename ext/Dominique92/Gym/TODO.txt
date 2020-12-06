@@ -6,6 +6,7 @@ Uploader Dominique92 /assets/MyOl /ext/Dominique92/MyPhpBB GeoBB Gym
 Uploader /ext/phpbb/GGAnalytics /ext/cleantalk/antispam
 Copier de précédent /files /fichiers config.php
 config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
+faire un tour par l'admin pour mettre à jour les BBcodes
 Après :
 Refaire pages horaires ouvert / tous
 Modifier BBcodes accueil & actualite -> resume (ou rien)
