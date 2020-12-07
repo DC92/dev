@@ -14,6 +14,7 @@ Modifier BBcodes accueil & actualite -> resume (ou rien)
 remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
 Refaire git Dominique92 / test en DC02
 
+//BEST reprendre en CSS les écarts enre ligne et avant et aprés les resumes
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville

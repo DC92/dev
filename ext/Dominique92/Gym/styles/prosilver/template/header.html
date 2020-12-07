@@ -41,8 +41,10 @@
 					<a href="posting.php?mode=reply&t={TOPIC_SEANCES}">Ajouter une séance</a>
 				</li><li>
 					<a href="posting.php?mode=reply&t={TOPIC_EVENEMENT}">Ajouter un évènement</a>
-				</li><li>
-					<a href="{{ U_ACP }}">{L_ACP}</a>
+				<!-- IF U_ACP -->
+					</li><li>
+						<a href="{{ U_ACP }}">{L_ACP}</a>
+				<!-- ENDIF -->
 				</li><li>
 					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
 			</li></ul>
