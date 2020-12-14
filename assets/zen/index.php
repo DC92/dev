@@ -68,14 +68,21 @@
 			width : 100vw;
 			background: #432;
 			text-align: center;
-			font-size: 9vw;
+			font-size: 5vw;
 			text-decoration: none;
 			color: white;
 			cursor: pointer;
 		}
 		#boot p:first-child {
-			padding-top: calc(50vh - 2em);
+			padding-top: calc(50vh - 7em);
 			margin: 0;
+		}
+		img {
+			width: 10%;
+			height: 10%;
+			position: absolute;
+			top: 45%;
+			left: 45%;
 		}
 	</style>
 
@@ -90,16 +97,19 @@
 		for (let i in liaisons)
 			liaisons[i] = Array.from(new Set(liaisons[i]));
 	</script>
-	<script defer src="<?=$base_path.$script_filename?>.js"></script>
+	<script defer src="<?=$base_path.$script_filename?>.js?<?=time()?>"></script>
 </head>
 
 <body>
-	<a id="boot" onclick="boot()">
-		<p>Mettez un casque et</p>
-		<p>cliquez ou touchez</p>
+	<a id="boot" onclick="init(this)">
+		<p>Allongez-vous dans un endroit calme</p>
+		<p>Mettez un casque</p>
+		<p>Cliquez ou touchez l'écran</p>
+		<p>Posez le mobile sur votre ventre</p>
 	</a>
 
-	<div id="trace" onclick="trace.requestFullscreen()"></div>
-	<div id="capteurs"></div>
+	<img id="icone" src="<?=$base_path?>zen.svg" onclick="location.reload()" />
+
+	<div id="trace">trace</div>
 </body>
 </html>

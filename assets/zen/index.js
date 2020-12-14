@@ -1,114 +1,122 @@
 // DEBUG
-if (window.location.hash.substr(1, 1) == '0' && window.location.hash.length > 2) {
+/* jshint esversion: 6 */
+if (window.screen.width == window.outerWidth) { // Si mobile
 	window.addEventListener('error', function(evt) {
-		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
+		alert('ERROR ' + evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
 	console.log = function(message) {
-		alert(message);
+		alert('CONSOLE ' + message);
 	};
 }
 
-//**************************************************************************
-// Accueil
-function boot () {
-	if(window. screen.width ==window.outerWidth) // Si mobile
-document.body.webkitRequestFullScreen ();
+//****************************************************************
+// Ecran d'accueil, activations nécéssitant une action utilisateur
+function init(el) {
+	el.style.display = 'none';
 
- document.getElementById('boot').style.display = 'none';
- 
-randomSound();
-setInterval(randomSound, delai * 1000);
+	const fs = document.body.requestFullscreen || document.body.webkitRequestFullScreen;
+	if (fs &&
+		window.screen.width == window.outerWidth) // Si mobile
+		fs();
+
+	randomSound();
+	setInterval(randomSound, 1000);
 }
 
-//**************************************************************************
-// Mesure de l'accélération
-//IOS [Homescreen] => [Settings] => [Safari] => enable the motion/orientation access setting
-var demiVie = 1, // Secondes
-	max = 0.5, // Au delà, c'est un choc
-	date = 0,
-	hypotLisse = 0,
-	hypotIntgrate = 0,
-	filtreBas = 0.3, // Secondes
-	passeBas = 0,
-	passeBasIntegre = 0,
-	mouvements = 0,
-	bruit = 0,
-	capteurs = document.getElementById('capteurs');
+//**********************
+// Mesure de la rotation
+var deviceOrientation = {},
+	lastOrientation = {};
 
-window.addEventListener('devicemotion', function(evt) {
-	const acceletation = Math.hypot(Math.hypot(evt.acceleration.x, evt.acceleration.y), evt.acceleration.z),
-		dt = (evt.timeStamp - date) / 1000,
-		ratio = dt / demiVie;
-	date = evt.timeStamp; // Pour la prochaine fois
+// Actualise la position quand elle change
+window.addEventListener('deviceorientation', function(evt) {
+	deviceOrientation = evt;
+});
 
-		capteurs.innerHTML = '.'.repeat(acceletation * 30);
+function derive(k) {
+	let dor = deviceOrientation[k] - lastOrientation[k];
+	if (dor < 180) dor += 360;
+	if (dor > 180) dor -= 360;
+	return isNaN(dor) ? 0 :
+		Math.abs(dor);
+}
 
-	hypotIntgrate += (acceletation - bruit) * dt;
-
-	passeBas = lissage(passeBas, acceletation, filtreBas, max);
-	passeBasIntegre += (passeBas) * dt;
-	bruit = lissage(bruit, passeBas, ratio / 3, passeBas * 3);
-
-	hypotLisse = lissage(hypotLisse, acceletation, ratio, max + bruit);
-	mouvements = Math.max((hypotLisse - bruit) / max, 0);
-
-	//	log.innerHTML = hypotLisse+'</br>'+bruit+'</br>'+ Math.round(mouvements*100)/10;
-//	if (log)
-//		log.innerHTML = passeBasIntegre;
-}, true);
-
-function lissage(valeur, update, ratio, max) {
-	valeur = valeur ?
-		valeur * (1 - ratio) + update * ratio :
-		update;
-
-	if (max && valeur > max)
-		valeur = max;
-
-	return valeur;
+// Récupère la rotation depuis la dernière fois (en °)
+function deltaRotation() {
+	const r = Math.hypot(Math.hypot(derive('alpha'), derive('beta')), derive('gamma'));
+	lastOrientation = deviceOrientation;
+	return r;
 }
 
 //*******************
 // Diffusion des sons
-var audioContext = new(window.AudioContext || window.webkitAudioContext)(),
-	sortie = audioContext.destination,
-	main = 'champs',
-	second = 'foret',
-	balance = 1, // < 0.5 : bascule et revient à > 0.5 / > 1 change le second
-	delai = 8,
-	trace = document.getElementById('trace');
+const delai = 8,
+	ems_r = 0.1 / delai, // Probabilité d'échanger main/second au repos (secondes)
+	es_c = 0.2 / delai, // Probabilité d'échanger second au repos et calme
+	ps_ms = 0.2, // Probabilité de diffuser le second
+	r_bc = 0.1, // Limite basse rotation au calme
+	r_hc = 3, // Limite haute rotation au calme
+	r_ha = 15; // Limite haute rotation agitée
 
-//**********
-// Functions
+var main = 'champs',
+	second = 'foret',
+	son = randomArray(sons[main]),
+	compteur = delai;
+
 function randomSound() {
-	balance += Math.random() - mouvements;
-	if (balance < 0.5) {
+	const rotation = deltaRotation(),
+		// Probabilité d'échanger main/second
+		p_ms = Math.max(ems_r * (1 - rotation / r_bc), (rotation - r_hc) / (r_ha - r_hc)),
+		// Probabilité d'échanger second
+		p_es = Math.max(es_c, (rotation - r_hc) / (r_ha - r_hc));
+
+	// Echange main/second
+	if (Math.random() < p_ms) {
 		const tmp = main;
 		main = second;
 		second = tmp;
-		balance = 1 - balance;
+		compteur = delai; // On change le son tout de suite
 	}
-	if (balance > 1) {
+
+	// Randomisation du second
+	if (Math.random() < p_es) {
 		second = randomArray(liaisons[main]);
-		balance = 1;
 	}
 
-	const nom = Math.random() < balance ? main : second,
-		file = randomArray(sons[nom]);
+	// Choix du son diffusé (main/second)
+	if (compteur++ >= delai) {
+		const nom = Math.random() > ps_ms ? main : second;
+		son = randomArray(sons[nom]);
+		mp3(son);
+		compteur = 0;
+	}
 
-	mp3(file);
-//	if (trace)
-//		trace.innerHTML = main + ' ' + second + ' ' + file + ' ' + balance;
+	const trace = document.getElementById('trace');
+	if (trace)
+		//	trace.innerHTML = deltaRotation (); 
+		trace.innerHTML = [
+			'=== ',
+			main,
+			second,
+			son,
+			'rotation ' + rotation,
+			'p_ms ' + p_ms,
+			'p_es ' + p_es,
+		].join('<br/>');
 }
 
 function randomArray(a) {
 	return a[Math.floor(Math.random() * a.length)];
 }
 
-function mp3(file, out) {
+// Joue un fichier MP3
+//TODO entrée et sortie progressive
+const audioContext = new(window.AudioContext || window.webkitAudioContext)();
+
+function mp3(file) {
 	const source = audioContext.createBufferSource(),
 		panner = audioContext.createPanner();
-	panner.connect(out || sortie);
+	panner.connect(audioContext.destination);
 	source.connect(panner);
 
 	const angle = Math.random() * 2 * Math.PI;
@@ -116,42 +124,15 @@ function mp3(file, out) {
 	//	panner.setPosition(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
 
 	window.fetch(file)
-		.then(response => response.arrayBuffer())
-		.then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-		.then(audioBuffer => {
+		.then(function(response) {
+			return response.arrayBuffer();
+		})
+		.then(function(arrayBuffer) {
+			return audioContext.decodeAudioData(arrayBuffer);
+		})
+		.then(function(audioBuffer) {
 			source.buffer = audioBuffer;
 			source.start();
 		});
 	return source;
 }
-
-// Mesure du spectre
-/*
-var log = document.getElementById('log'),
-	inertie = 2, // Secondes
-	progression = .9, // Progression logarithmique des fréquences
-	nbMesures = 40,
-	dateDernierEchantillon,
-	fourier,
-	barres,
-	fourierTmp= {};
-		for (let o = 1; o <= nbMesures; o++)
-			fourierTmp[o]=[0,0];
-
-window.addEventListener('devicemotion', function(evt) {
-	const acceletation = Math.hypot(Math.hypot(evt.acceleration.x, evt.acceleration.y), evt.acceleration.z),
-		 dti = Math.min(100,evt.timeStamp-dateDernierEchantillon)/1000/inertie;
-	
-		fourier = {};
-		barres = {};
-		for (let o = 1; o <= nbMesures; o++){
-			const ot = 2*Math.PI*Math.pow(progression,o)*evt.timeStamp;
-			fourierTmp[o][0]=(fourierTmp[o][0]||0)*(1-dti)+acceletation*Math.sin(ot)*dti;
-			fourierTmp[o][1]=(fourierTmp[o][1]||0)*(1-dti)+acceletation*Math.cos(ot)*dti;
-			fourier[o]=Math.hypot(fourierTmp[o][0],fourierTmp[o][1]);
-			barres[o]=Math.round(1/Math.pow(progression,o)*10)/10+'.'.repeat(fourier[o]*1000);
-		}
-{var _r='',_v=barres;if(typeof _v=='array'||typeof _v=='object'){for(_i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;log.innerHTML =_r}
-		dateDernierEchantillon=evt.timeStamp;
-}, true);
-*/
