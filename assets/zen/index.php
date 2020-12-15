@@ -9,9 +9,9 @@
 	header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 1)); // 1 second
 
 	// Calculate relative paths between the requested url & the ZEN package directory
-	$script_filename = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_FILENAME);
 	$dir = pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME);
 	$base_path = str_replace ($dir.'/', '', __DIR__.'/');
+	$script = $base_path .pathinfo ($_SERVER['SCRIPT_FILENAME'], PATHINFO_FILENAME);
 
 	$js = [];
 	foreach (glob ($base_path.'*', GLOB_ONLYDIR ) AS $filename) {
@@ -51,53 +51,14 @@
 	<title>ZEN</title>
 	<link href="<?=$base_path?>zen.svg" rel="shortcut icon" />
 
-	<style>
-		html, body {
-			height : 100%;
-			margin: 0;
-			background: black;
-			color: white;
-		}
-		#boot {
-			position: absolute;
-			z-index: 10;
-			top: 0;
-			left: 0;
-			margin: 0;
-			height : 100vh;
-			width : 100vw;
-			background: #432;
-			text-align: center;
-			font-size: 5vw;
-			text-decoration: none;
-			color: white;
-			cursor: pointer;
-		}
-		#boot p:first-child {
-			padding-top: calc(50vh - 7em);
-			margin: 0;
-		}
-		img {
-			width: 10%;
-			height: 10%;
-			position: absolute;
-			top: 45%;
-			left: 45%;
-		}
-	</style>
-
+	<link href="<?=$script?>.css?<?=filesize($script.'.css')?>" rel="stylesheet">
+	<script src="<?=$script?>.js?<?=filesize($script.'.js')?>" defer></script>
 	<script>
-		//********************
 		// Définition des sons
 		var sons = [],
 			liaisons = [];
-		<?php echo implode ("\n\t\t", $js)?>
-
-		// Enlève les doublons
-		for (let i in liaisons)
-			liaisons[i] = Array.from(new Set(liaisons[i]));
+		<?php echo implode ("\n\t\t", $js).PHP_EOL?>
 	</script>
-	<script defer src="<?=$base_path.$script_filename?>.js?<?=time()?>"></script>
 </head>
 
 <body>
@@ -108,8 +69,10 @@
 		<p>Posez le mobile sur votre ventre</p>
 	</a>
 
-	<img id="icone" src="<?=$base_path?>zen.svg" onclick="location.reload()" />
+	<div id="icone" onclick="location.reload()">
+		<img src="<?=$base_path?>zen.svg" />
+	<div>
 
-	<div id="trace">trace</div>
+	<div id="trace"></div>
 </body>
 </html>

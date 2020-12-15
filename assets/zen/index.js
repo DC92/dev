@@ -1,4 +1,5 @@
 // DEBUG
+var trace = 0;
 /* jshint esversion: 6 */
 if (window.screen.width == window.outerWidth) { // Si mobile
 	window.addEventListener('error', function(evt) {
@@ -11,14 +12,22 @@ if (window.screen.width == window.outerWidth) { // Si mobile
 
 //****************************************************************
 // Ecran d'accueil, activations nécéssitant une action utilisateur
+var date, // Lancement du programme
+	body = document.getElementsByTagName('body')[0];
+
 function init(el) {
 	el.style.display = 'none';
 
-	const fs = document.body.requestFullscreen || document.body.webkitRequestFullScreen;
-	if (fs &&
-		window.screen.width == window.outerWidth) // Si mobile
-		fs();
+	if (window.screen.width == window.outerWidth) { // Si mobile
+		if (body.requestFullscreen)
+			body.requestFullscreen();
+		if (body.msRequestFullscreen)
+			body.msRequestFullscreen();
+		if (body.webkitRequestFullscreen)
+			body.webkitRequestFullscreen();
+	}
 
+	date = Date.now(); // Lancement du programme
 	randomSound();
 	setInterval(randomSound, 1000);
 }
@@ -50,11 +59,11 @@ function deltaRotation() {
 
 //*******************
 // Diffusion des sons
-const delai = 8,
+const delai = 8, // (secondes) entre chaque changement de son
 	ems_r = 0.1 / delai, // Probabilité d'échanger main/second au repos (secondes)
 	es_c = 0.2 / delai, // Probabilité d'échanger second au repos et calme
 	ps_ms = 0.2, // Probabilité de diffuser le second
-	r_bc = 0.1, // Limite basse rotation au calme
+	r_bc = 0.05, // Limite basse rotation au calme
 	r_hc = 3, // Limite haute rotation au calme
 	r_ha = 15; // Limite haute rotation agitée
 
@@ -62,6 +71,10 @@ var main = 'champs',
 	second = 'foret',
 	son = randomArray(sons[main]),
 	compteur = delai;
+
+// Enlève les doublons
+for (let i in liaisons)
+	liaisons[i] = Array.from(new Set(liaisons[i]));
 
 function randomSound() {
 	const rotation = deltaRotation(),
@@ -71,7 +84,7 @@ function randomSound() {
 		p_es = Math.max(es_c, (rotation - r_hc) / (r_ha - r_hc));
 
 	// Echange main/second
-	if (Math.random() < p_ms) {
+	if (Math.random() < p_ms && Date.now() - date > 15000) {
 		const tmp = main;
 		main = second;
 		second = tmp;
@@ -79,9 +92,8 @@ function randomSound() {
 	}
 
 	// Randomisation du second
-	if (Math.random() < p_es) {
+	if (Math.random() < p_es && Date.now() - date > 30000)
 		second = randomArray(liaisons[main]);
-	}
 
 	// Choix du son diffusé (main/second)
 	if (compteur++ >= delai) {
@@ -90,12 +102,10 @@ function randomSound() {
 		mp3(son);
 		compteur = 0;
 	}
-
-	const trace = document.getElementById('trace');
-	if (trace)
+	const traceTag = document.getElementById('trace');
+	if (trace && traceTag)
 		//	trace.innerHTML = deltaRotation (); 
-		trace.innerHTML = [
-			'=== ',
+		traceTag.innerHTML = [
 			main,
 			second,
 			son,
