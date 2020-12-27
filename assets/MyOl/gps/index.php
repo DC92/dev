@@ -67,8 +67,7 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="<?=$icon['type']?>" href="<?=$icon['src']?>" />
 
-	<!-- Polyfills -->
-	<!-- iOS -->
+	<!-- Polyfill iOS -->
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 

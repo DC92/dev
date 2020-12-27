@@ -1578,6 +1578,7 @@ function controlGeocoder(options) {
  * Requires controlButton
  */
 //BEST GPS tap on map = distance from GPS calculation
+//TODO position initiale quand PC fixe ?
 //TODO average inertial counter to get better speed
 function controlGPS() {
 	let view, geolocation, nbLoc, position, altitude;
