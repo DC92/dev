@@ -68,18 +68,9 @@ Based on https://openlayers.org
 	<link rel="icon" type="<?=$icon['type']?>" href="<?=$icon['src']?>" />
 
 	<!-- Polyfills -->
-	<!-- IE -->
-	<script nomodule src="https://polyfill.io/v3/polyfill.min.js?features=Math.hypot%2CObject.assign"></script>
 	<!-- iOS -->
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-	<!-- FF -->
-	<?php
-		if ((stripos ($_SERVER['HTTP_USER_AGENT'], 'android') && stripos ($_SERVER['HTTP_USER_AGENT'], 'firefox')) ||
-			(stripos ($_SERVER['HTTP_USER_AGENT'], 'iphone') && stripos ($_SERVER['HTTP_USER_AGENT'], 'safari'))) {
-	?>
-			<script src="https://unpkg.com/elm-pep"></script>
-	<?php } ?>
 
 	<!-- Openlayers -->
 	<link href="<?=$myol_path?>ol/ol.css" type="text/css" rel="stylesheet">

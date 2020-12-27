@@ -14,6 +14,27 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
+//HACK IE polyfills
+if (!Object.assign)
+	Object.assign = function() {
+		let r = {};
+		for (let a in arguments)
+			for (let m in arguments[a])
+				r[m] = arguments[a][m];
+		return r;
+	};
+if (!Math.hypot)
+	Math.hypot = function(a, b) {
+		return Math.sqrt(a * a + b * b);
+	};
+
+//HACK for some mobiles touch functions
+if (navigator.userAgent.match(/android.+firefox|iphone.+safari/i)) {
+	const script = document.createElement('script');
+	script.src = 'https://unpkg.com/elm-pep';
+	document.head.appendChild(script);
+}
+
 /**
  * Display OL version
  */

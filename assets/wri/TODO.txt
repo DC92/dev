@@ -1,5 +1,8 @@
 TODO WRI
 ========
+Retirer :
+	<script src="https://unpkg.com/elm-pep"></script><!-- FF -->
+	<script nomodule src="https://polyfill.io/v3/polyfill.min.js?features=Math.hypot%2CObject.assign"></script>
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 ? historique posts phpbb wri (ext/...)
 	Paramétres inclusion posts dans points -> config.php
