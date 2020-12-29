@@ -15,6 +15,7 @@
 if (!ol) var ol = {};
 
 //HACK IE polyfills
+// Need to transpile ol.js with: https://babeljs.io/repl  BROWSERS = default
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
@@ -41,7 +42,7 @@ if (navigator.userAgent.match(/android.+firefox|iphone.+safari/i)) {
 try {
 	new ol.style.Icon(); // Try incorrect action
 } catch (err) { // to get Assert url
-	ol.version = 'Ol ' + err.message.match('/v([0-9\.]+)/')[1] + ' DEV';
+	ol.version = 'Ol ' + err.message.match('/v([0-9\.]+)/')[1];
 	console.log(ol.version);
 }
 
@@ -483,6 +484,7 @@ function hoverManager(map) {
 		popup = new ol.Overlay({
 			element: labelEl,
 		});
+	labelEl.id = 'label';
 	map.addOverlay(popup);
 
 	function findClosestFeature(pixel) {
@@ -547,12 +549,11 @@ function hoverManager(map) {
 	//TODO appeler sur l'event "hover" (pour les mobiles)
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
-		if (hoveredEl &&
-			(hoveredEl.tagName == 'CANVAS' || // All browsers
-				hoveredEl.tagName == 'IMG' // For IE
-			)
-		) { // Not hovering an html element (label, button, ...)
+			hoveredEl = document.elementFromPoint(
+				evt.pixel[0] + (mapRect.x || mapRect.left), //HACK left/top for IE
+				evt.pixel[1] + (mapRect.y || mapRect.top)
+			);
+		if (hoveredEl.id != 'label') { // Not hovering an html element (label, button, ...)
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
