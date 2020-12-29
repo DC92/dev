@@ -14,6 +14,20 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
+//HACK IE polyfills
+if (!Object.assign)
+	Object.assign = function() {
+		let r = {};
+		for (let a in arguments)
+			for (let m in arguments[a])
+				r[m] = arguments[a][m];
+		return r;
+	};
+if (!Math.hypot)
+	Math.hypot = function(a, b) {
+		return Math.sqrt(a * a + b * b);
+	};
+
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/android.+firefox|iphone.+safari/i)) {
 	const script = document.createElement('script');
@@ -390,19 +404,19 @@ function permanentCheckboxList(selectorName, evt) {
 	const inputEls = document.getElementsByName(selectorName),
 		list = [];
 
-	inputEls.forEach(el => {
+	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
 		if (evt) {
 			// Select/deselect all inputs when clicking an <input> without value
 			if (evt.target.value == 'on') // "all" input has a default value = "on"
-				el.checked = evt.target.checked; // Check all if "all" is clicked
-			else if (el.value == 'on') // "all" <input>
-				el.checked = false; // Reset if another check is clicked
+				inputEls[e].checked = evt.target.checked; // Check all if "all" is clicked
+			else if (inputEls[e].value == 'on') // "all" <input>
+				inputEls[e].checked = false; // Reset if another check is clicked
 		}
 
 		// Get the values of all checked inputs
-		if (el.checked) // List checked elements
-			list.push(el.value);
-	});
+		if (inputEls[e].checked) // List checked elements
+			list.push(inputEls[e].value);
+	}
 
 	// Mem the data in the cookie
 	document.cookie = 'map-' + selectorName + '=' +
@@ -435,19 +449,17 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		const match = cooks[c].match('map-' + selectorName + '=([^#&;]*)');
 		if (!found && match && !options.noMemSelection)
 			// Set the <input> checks accordingly with the cookie
-			inputEls.forEach(el => {
-				if (match[1].split(',').indexOf(el.value) !== -1)
-					found = el.checked = true;
-			});
+			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
+				if (match[1].split(',').indexOf(inputEls[e].value) !== -1)
+					found = inputEls[e].checked = true;
 	}
 
 	// Attach the action
 	function onClick(evt) {
 		callback(evt, permanentCheckboxList(selectorName, evt));
 	}
-	inputEls.forEach(el =>
-		el.addEventListener('click', onClick)
-	);
+	for (let e = 0; e < inputEls.length; e++)
+		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
 	callback(null, permanentCheckboxList(selectorName));
@@ -536,7 +548,11 @@ function hoverManager(map) {
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			hoveredEl = document.elementFromPoint(evt.pixel[0] + mapRect.x, evt.pixel[1] + mapRect.y);
-		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Not hovering an html element (label, button, ...)
+		if (hoveredEl &&
+			(hoveredEl.tagName == 'CANVAS' || // All browsers
+				hoveredEl.tagName == 'IMG' // For IE
+			)
+		) { // Not hovering an html element (label, button, ...)
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
@@ -1037,6 +1053,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  * Requires layerVectorURL
  */
+//BUG IE don't display icons
 function layerOverpass(options) {
 	options = Object.assign({
 		baseUrl: '//overpass-api.de/api/interpreter',
@@ -1119,14 +1136,13 @@ function layerOverpass(options) {
 					};
 				for (let p in properties)
 					if (typeof properties[p] == 'string') { // Avoid geometry
-						inputEls.forEach(elSel => {
-							if (elSel.value &&
-								elSel.value.includes(p) &&
-								elSel.value.includes(properties[p])) {
-								newProperties.sym = elSel.getAttribute('id');
+						for (let c = 0; c < inputEls.length; c++)
+							if (inputEls[c].value &&
+								inputEls[c].value.includes(p) &&
+								inputEls[c].value.includes(properties[p])) {
+								newProperties.sym = inputEls[c].getAttribute('id');
 								newProperties.type = properties[p];
 							}
-						});
 						features[f].setProperties(newProperties, false);
 					}
 			}
@@ -1299,10 +1315,9 @@ function controlLayersSwitcher(options) {
 		// Leave only one checked except if Ctrl key is on
 		if (evt && evt.type == 'click' && !evt.ctrlKey) {
 			const inputEls = document.getElementsByName('baselayer');
-			inputEls.forEach(el => {
-				if (el != evt.target)
-					el.checked = false;
-			});
+			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
+				if (inputEls[e] != evt.target)
+					inputEls[e].checked = false;
 		}
 
 		list = permanentCheckboxList('baselayer');
@@ -1497,7 +1512,7 @@ function controlFullScreen(options) {
 
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '', //HACK Bad presentation on FF
+		label: '', //HACK Bad presentation on IE & FF
 		tipLabel: 'Plein écran',
 	}, options));
 
@@ -1509,8 +1524,10 @@ function controlFullScreen(options) {
 		if (pseudoFullScreen) {
 			el.requestFullscreen = toggle; // What is called first by ol.control.FullScreen
 			document.exitFullscreen = toggle;
-		} else
+		} else {
 			document.addEventListener('webkitfullscreenchange', toggle, false); // Edge, Safari
+			document.addEventListener('MSFullscreenChange', toggle, false); // IE
+		}
 
 		function toggle() {
 			if (pseudoFullScreen) // Toggle the simulated isFullScreen & the control button
@@ -1536,7 +1553,7 @@ function controlGeocoder(options) {
 		title: 'Recherche sur la carte',
 	}, options);
 
-	// Vérify if geocoder is available
+	// Vérify if geocoder is available (not supported in IE)
 	if (typeof Geocoder != 'function')
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
@@ -1882,7 +1899,7 @@ function controlDownload(options) {
 				type: mime,
 			});
 
-		if (typeof navigator.msSaveBlob == 'function') // Edge
+		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
 			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
 		else {
 			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
@@ -1919,9 +1936,8 @@ function controlPrint() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const oris = document.getElementsByName('print-orientation');
-		oris.forEach(el =>
-			el.onchange = resizeDraft
-		);
+		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / IE
+			oris[i].onchange = resizeDraft;
 	};
 
 	function resizeDraft() {
@@ -2049,13 +2065,13 @@ function layerGeoJson(options) {
 		displayPointEl = document.getElementById(options.displayPointId),
 		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {};
 
-	for (let i = 0; i < inputEls.length; i++) { //BEST forEach
+	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;
 	}
 
 	// Snap on vector layers
-	options.snapLayers.forEach(function(layer) { //BEST forEach
+	options.snapLayers.forEach(function(layer) {
 		layer.getSource().on('change', function() {
 			const fs = layer.getSource().getFeatures();
 			for (let f in fs)
@@ -2225,7 +2241,7 @@ function layerGeoJson(options) {
 		}
 	}
 
-	//TODO BUG don't check CH1903 displays
+	//TODO BUG don't check CH1903 hiding
 	layer.centerMarker = function() {
 		source.getFeatures().forEach(function(f) {
 			f.getGeometry().setCoordinates(
@@ -2289,7 +2305,7 @@ function layerGeoJson(options) {
 
 			if (inputEls.length)
 				// Set the html input
-				for (let i = 0; i < inputEls.length; i++) //BEST forEach
+				for (let i = 0; i < inputEls.length; i++)
 					switch (inputEls[i].name) {
 						case 'lon':
 							inputEls[i].value = Math.round(ll4326[0] * 100000) / 100000;
