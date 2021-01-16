@@ -1,4 +1,5 @@
 /* Size & draw the book */
+.cover,
 .book {
 	position: relative; /* To position the child relative to it */
 }
@@ -8,21 +9,38 @@
 .open:after {
 	content: url('book-open.svg');
 }
+.cover:after { /* Add background & define height */
+	content: url('book.svg');
+}
 
 /* The data DIV */
+.cover > div,
 .book > div {
 	position: absolute; /* To the parent */
 	top: 4%;
 	right: 3.5%;
-	height: 87.5%;
 	width: 45%;
+	height: 87.5%;
 	font-size: 2vw;
 }
 .book .left {
 	left: 3%;
 }
+.cover > div {
+	top: 4.4%;
+	right: 7%;
+	width: 86%;
+	height: calc(87.5% - 3em);
+}
+.cover h1 {
+	margin: 0 0 0.4em 0;
+	text-align: center;
+	font-size: 3vw;
+	color: white;
+}
 
 /* Img in the DIV */
+.cover img,
 .book img {
 	/* Fill the available space */
 	max-width: 100%;
