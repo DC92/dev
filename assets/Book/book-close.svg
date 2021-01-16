@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 51">
+	<style>
+		line {
+			stroke-width: 2;
+			stroke-linecap: round;
+		}
+		path {
+			fill: #330408;
+			stroke: #803E26;
+			stroke-width: 0.2;
+		}
+	</style>
+
+	<defs>
+		<linearGradient id="right" x1="98" y1="25" x2="100" y2="25" gradientUnits="userSpaceOnUse">
+			<stop stop-color="black" offset="0" />
+			<stop stop-color="white" offset="1" />
+		</linearGradient>
+		<linearGradient id="top" x1="50" y1="2.5" x2="50" y2="0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="grey" offset="0" />
+			<stop stop-color="white" offset="1" />
+		</linearGradient>
+		<linearGradient id="bottom" x1="50" y1="48.5" x2="50" y2="50.5" gradientUnits="userSpaceOnUse">
+			<stop stop-color="black" offset="0" />
+			<stop stop-color="white" offset="1" />
+		</linearGradient>
+	</defs>
+
+	<!-- shadows -->
+	<line x1="99" y1="2" x2="99" y2="49" stroke="url(#right)" />
+	<line x1="50" y1="1" x2="98.5" y2="1" stroke="url(#top)" />
+	<line x1="50" y1="49.5" x2="98.3" y2="49.5" stroke="url(#bottom)" />
+
+	<!-- slice bottom -->
+	<rect x="50" y="2.1" width="49" height="47.3" fill="#330408" stroke="#803E26" stroke-width="0.2" />
+	<!-- slice left -->
+	<rect x="48.6" y="1.6" width="12" height="47" fill="#330408" stroke="#803E26" stroke-width="0.2" />
+
+	<!-- corner left top -->
+	<path d="m50.3,0.9 a1.2,0.5 0 1,0 0,1.4" />
+	<rect x="48.7" y="1.7" width="48.5" height="1" fill="#330408" />
+	<!-- corner left bottom -->
+	<path d="m50.3,48 a1.2,0.5 0 1,0 0,1.4" fill="#330408"/>
+
+	<!-- slice -->
+	<rect x="50.7" y="2.4" width="47.85" height="46.5" fill="#dddddd"/>
+	<polygon points="97.5,1.4 98.5,2.4 97.5,2.5" fill="#dddddd" />
+	<polygon points="49.8,48.15 51,48 50.7,48.9" fill="#dddddd" />
+
+	<!-- cover -->
+	<rect x="50.4" y="0.9" width="47.3" height="47.1" fill="#51060D" stroke="#B35635" stroke-width="0.2" />
+</svg>
