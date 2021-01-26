@@ -1,0 +1,26 @@
+Migration :
+Dupliquer base
+Si chaville.test -> changer dans le SQL
+Uploader phpBB 3.3.2 sauf /doc /install /ext /files /config.php
+Uploader /assets/MyOl /ext/Dominique92/MyPhpBB GeoBB Gym
+Uploader /ext/phpbb/GGAnalytics /ext/cleantalk/antispam
+Copier de précédent /files /fichiers config.php
+Config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
+Faire un tour par l'admin pour mettre à jour les BBcodes
+Après :
+Supprimer BBcode include
+Refaire pages horaires ouvert / tous
+Modifier BBcodes accueil & actualite -> resume (ou rien)
+remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
+Refaire git Dominique92 / test en DC02
+
+/** CONFIG
+https://github.com/phpbbmodders/phpBB-3.1-ext-adduser ????
+
+Install :
+/** PERSONNALISER / extensions MyPhpBB, GeoBB, Gym
+MEMBRES ET GROUPES / Permissions des groupes / Utilisateurs enregistrés / Permissions avancées / Panneau de l'utilisateur / Peut modifier son nom d’utilisateur
+GENERAL / Fonctionnalités du forum / Autoriser les changements de nom d’utilisateur
+GENERAL / Paramètres des messages / Messages par page : 99
+MESSAGES / Paramètres des fichiers joints / taille téléchargements
+MESSAGES / Gérer les groupes d’extensions des fichiers joints / +Documents -Archives
