@@ -566,7 +566,8 @@ function twig_environment_render_template_after($vars) {
 			][
 				$row['gym_ordre_menu'].'*'. // Horaires
 				$row['horaire_debut'].'*'.
-				$row['post_subject'] // Pour trier par nom et séparer les exeaco
+				$row['post_subject']. // Pour trier par nom
+				$row['post_id'] // Pour séparer les exeaco
 			] = array_change_key_case ($row, CASE_UPPER);
 		}
 		$this->db->sql_freeresult($result);
