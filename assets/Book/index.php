@@ -33,7 +33,13 @@ foreach (glob('*/*') AS $f) {
 
 $album_courant = @array_keys($_GET)[0];
 $page_courante = @$_GET[$album_courant];
+if (!isset ($books[$album_courant][$page_courante]) || $page_courante == '00')
+	$page_courante = '';
 $file = @$books[$album_courant][$page_courante ?: '00'];
+$pages_numbers = array_keys($books[$album_courant]);
+$indice_page = array_search ($page_courante, $pages_numbers) ?: 0;
+$previous_page = @$pages_numbers[$indice_page-1];
+$next_page = @$pages_numbers[$indice_page+1];
 
 function carre ($file, $side = '-') {
 	$r = '';
@@ -76,6 +82,7 @@ elseif (!$page_courante) { ?>
 		<div>
 			<?=carre($file,'-')?>
 		</div>
+		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Page suivante">&#9754;</a>
 	</div>
 <?php } else { ?>
 	<div class="book open">
@@ -85,6 +92,11 @@ elseif (!$page_courante) { ?>
 		<div>
 			<?=carre($file,'-')?>
 		</div>
+<?php if ($previous_page) { ?>
+		<a id="previous-page" href="?<?=$album_courant?>=<?=$previous_page?>" title="Page précédente">&#9755;</a>
+<?php } if ($next_page) { ?>
+		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Page suivante">&#9754;</a>
+<?php } ?>
 	</div>
 <?php } ?>
 

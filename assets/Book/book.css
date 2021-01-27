@@ -61,3 +61,21 @@
 	top: 50%;
 	transform: translateY(-50%);
 }
+#previous-page,
+#next-page {
+	position: absolute;
+	top: 44%;
+	height: 8vw;
+	width: 8vw;
+	font-size: 4vw;
+	text-decoration: none;
+	color: green;
+}
+#previous-page {
+	left: 0.2%;
+}
+#next-page {
+	display: block;
+	right: 0.7%;
+	text-align: right;
+}
