@@ -14,7 +14,7 @@
 }
 
 /* The data DIV */
-.cover > div,
+.cover a,
 .book > div {
 	position: absolute; /* To the parent */
 	top: 4%;
@@ -26,16 +26,22 @@
 .book .left {
 	left: 3%;
 }
-.cover > div {
+.cover a {
+	display: block;
 	top: 4.4%;
 	right: 7%;
 	width: 86%;
-	height: calc(87.5% - 3em);
+	text-decoration: none;
 }
 .cover h1 {
 	margin: 0 0 0.4em 0;
+	width: 100%;
 	text-align: center;
 	font-size: 3vw;
+	color: white;
+}
+.cover p {
+	margin: 0;
 	color: white;
 }
 
