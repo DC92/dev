@@ -15,7 +15,8 @@
 
 /* The data DIV */
 .cover a,
-.book > div {
+.book > a {
+	display: block;
 	position: absolute; /* To the parent */
 	top: 4%;
 	right: 3.5%;
@@ -33,12 +34,18 @@
 	width: 86%;
 	text-decoration: none;
 }
-.cover h1 {
+.cover h1,
+.book h1 {
 	margin: 0 0 0.4em 0;
 	width: 100%;
 	text-align: center;
 	font-size: 3vw;
+}
+.cover h1 {
 	color: white;
+}
+.book p {
+	margin: 0;
 }
 .cover p {
 	margin: 0;
@@ -61,6 +68,7 @@
 	top: 50%;
 	transform: translateY(-50%);
 }
+#home,
 #previous-page,
 #next-page {
 	position: absolute;
@@ -70,6 +78,10 @@
 	font-size: 4vw;
 	text-decoration: none;
 	color: green;
+}
+#home {
+	top: 0;
+	left: 50%;
 }
 #previous-page {
 	left: 0.2%;

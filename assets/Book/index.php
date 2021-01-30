@@ -7,8 +7,6 @@
 
 	<style>
 		/* Spécifique à cette page */
-		body: {
-		}
 		.rayon {
 			text-align: center;
 		}
@@ -22,41 +20,46 @@
 <body>
 
 <?php
-foreach (glob('*/*') AS $f) {
-	preg_match ('/(.*)\/([0-9][0-9])([+-]).*\.(.)/', $f, $m);
-	if ($m) {
-		if ($m[4] == 'J')
-			$m[4] = 'j';
-		$books [$m[1]] [$m[2]] [$m[3]] [$m[4]] = $f;
-	}
+foreach (glob('*/*.[jJ]*') AS $f) {
+	preg_match ('/(.*)\/([0-9][0-9])([+-]).*/', $f, $m);
+	if (count ($m))
+		$galleries [$m[1]] [$m[2]] [$m[3]] = $f;
 }
 
 $album_courant = @array_keys($_GET)[0];
+$pages_numbers = @array_keys($galleries[$album_courant]);
 $page_courante = @$_GET[$album_courant];
-if (!isset ($books[$album_courant][$page_courante]) || $page_courante == '00')
-	$page_courante = '';
-$file = @$books[$album_courant][$page_courante ?: '00'];
-$pages_numbers = array_keys($books[$album_courant]);
-$indice_page = array_search ($page_courante, $pages_numbers) ?: 0;
+if (!$page_courante || $page_courante == '00')
+	$page_courante = $pages_numbers[1];
+$indice_page = @array_search ($page_courante, $pages_numbers) ?: 0;
 $previous_page = @$pages_numbers[$indice_page-1];
 $next_page = @$pages_numbers[$indice_page+1];
 
-function carre ($file, $side = '-') {
-	$r = '';
+function carre ($album, $page, $side = '-') {
+	global $galleries;
 	$h = 0; // Nb em de h1 & p
-	if (isset ($file[$side])) {
-		if (isset ($file[$side]['T'])) {
-			$r .= '<h1>'. @file_get_contents($file[$side]['T']) .'</h1>'.PHP_EOL;
-			$h += 2.3;
-		}
-		if (isset ($file[$side]['t'])) {
-			$r .= @file_get_contents($file[$side]['t']).PHP_EOL;
-			$h += 1.1;
-		}
-		if (isset ($file[$side]['j']))
-			$r .= "<div style='border:1px solid red;height:calc(100% - {$h}em)'>\n".
-				  "<img src='{$file[$side]['j']}' />\n</div>\n";
+	$r = '';
+
+	preg_match ("/§$page$side([^§]*)/s", @file_get_contents("$album/index.txt"), $m);
+	if (count ($m)) {
+		$ts = explode ("\n", $m[1]);
+		foreach ($ts AS $kv=>$vv)
+			if (!trim ($vv))
+				;
+			elseif ($kv) {
+				$r .= '<p>'.trim ($vv).'</p>'.PHP_EOL;
+				$h += 1.1;
+			}
+			else {
+				$r .= '<h1>'.trim ($vv).'</h1>'.PHP_EOL;
+				$h += 3.4;
+			}
 	}
+
+	if (isset ($galleries[$album][$page][stripslashes($side)]))
+		$r .= "<div style='height:calc(100% - {$h}em)'>\n".
+			  "<img src='{$galleries[$album][$page][stripslashes($side)]}' />\n</div>\n";
+
 	return $r;
 }
 
@@ -64,40 +67,45 @@ function carre ($file, $side = '-') {
 if (!$album_courant) { ?>
 	<div class="rayon">
 <?php 
-	foreach ($books AS $album => $book) {
-		$titre = @file_get_contents ($book['00']['-t']);
-		?>
+	foreach ($galleries AS $album => $images) { ?>
 		<div class="cover">
 			<a href='?<?=$album?>' title='Ouvrir le livre'>
-				<?=carre($book['00'],'-')?>
+				<?=carre ($album, '00')?>
 			</a>
 		</div>
 <?php } ?>
 	</div>
-<?php 
-}
-// Un livre
-elseif (!$page_courante) { ?>
+<?php }
+
+// Un livre fermé
+elseif (!$page_courante || $page_courante == '00') { ?>
 	<div class="book">
-		<div>
-			<?=carre($file,'-')?>
-		</div>
+		<a>
+			<?=carre ($album_courant, '00')?>
+		</a>
 		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Page suivante">&#9754;</a>
 	</div>
-<?php } else { ?>
+<?php }
+
+// Un livre ouvert
+else { ?>
 	<div class="book open">
-		<div class="left">
-			<?=carre($file,'+')?>
-		</div>
-		<div>
-			<?=carre($file,'-')?>
-		</div>
-<?php if ($previous_page) { ?>
-		<a id="previous-page" href="?<?=$album_courant?>=<?=$previous_page?>" title="Page précédente">&#9755;</a>
+		<a class="left">
+			<?=carre ($album_courant, $page_courante, '\\+')?>
+		</a>
+		<a>
+			<?=carre ($album_courant, $page_courante)?>
+		</a>
+<?php if ($previous_page == '00') { ?>
+		<a id="previous-page" href="." title="Refermer le livre">&#9755;</a>
+<?php } elseif ($previous_page) { ?>
+		<a id="previous-page" href="?<?=$album_courant?>=<?=$previous_page?>" title="Retourner à la page précédente">&#9755;</a>
 <?php } if ($next_page) { ?>
-		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Page suivante">&#9754;</a>
+		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Tourner la page">&#9754;</a>
 <?php } ?>
 	</div>
+	<a id="home" href="." title="Revenir à la bibliothèque">&#128418;</a>
+	<?=$page_courante?>
 <?php } ?>
 
 </body>
