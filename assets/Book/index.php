@@ -9,27 +9,25 @@
 
 <?php
 foreach (glob('*/*.[jJ]*') AS $f) {
-	preg_match ('/(.*)\/([0-9][0-9])([+-]).*/', $f, $m);
+	preg_match ('/(.*)\/([0-9][0-9]).*/', $f, $m);
 	if (count ($m))
-		$galleries [$m[1]] [$m[2]] [$m[3]] = $f;
+		$galleries [$m[1]] [$m[2]] = $f;
 }
 
-$album_courant = @array_keys($_GET)[0];
-$pages_numbers = @array_keys($galleries[$album_courant]);
-$page_courante = @$_GET[$album_courant];
-if (!$page_courante || $page_courante == '00')
-	$page_courante = $pages_numbers[1];
-$indice_page = @array_search ($page_courante, $pages_numbers) ?: 0;
-$numero_page = $indice_page*2-2;
-$previous_page = @$pages_numbers[$indice_page-1];
-$next_page = @$pages_numbers[$indice_page+1];
+$album_courant = @array_keys ($_GET)[0];
+$page_current = intval (@$_GET[$album_courant]);
+$page_prev = substr (intval ($page_current / 2) * 2 + 99, -2);
+$page_left = substr (intval ($page_current / 2) * 2 + 100, -2);
+$page_right = substr (intval ($page_current / 2) * 2 + 101, -2);
+$page_next = substr (intval ($page_current / 2) * 2 + 102, -2);
+$page_max = max (array_keys ($galleries[$album_courant]));
 
-function carre ($album, $page, $side = '-', $attr = 'onclick="full(this)"') {
+function carre ($album, $page, $attr = 'xonclick="full(this)"') {
 	global $galleries;
 	$h = 0; // Nb em de h1 & p
 	$r = '';
 
-	preg_match ("/§$page$side([^§]*)/s", @file_get_contents("$album/index.txt"), $m);
+	preg_match ("/§$page([^§]*)/s", @file_get_contents("$album/index.txt"), $m);
 	if (count ($m)) {
 		$ts = explode ("\n", $m[1]);
 		foreach ($ts AS $kv=>$vv)
@@ -45,9 +43,9 @@ function carre ($album, $page, $side = '-', $attr = 'onclick="full(this)"') {
 			}
 	}
 
-	if (isset ($galleries[$album][$page][stripslashes($side)]))
+	if (isset ($galleries[$album][$page]))
 		$r .= "<div style='height:calc(100% - {$h}em)'>\n".
-			  "<img src='{$galleries[$album][$page][stripslashes($side)]}' />\n</div>\n";
+			  "<img src='{$galleries[$album][$page]}' />\n</div>\n";
 
 	return "<a $attr>$r</a>";
 }
@@ -61,37 +59,30 @@ if (!$album_courant) { ?>
 
 <?php foreach ($galleries AS $album => $images) { ?>
 		<div class="cover">
-			<?=carre ($album, '00', '-', 'href="?'.$album.'" title="Ouvrir le livre"')?>
+			<?=carre ($album, '00', 'href="?'.$album.'" title="Ouvrir le livre"')?>
 		</div>
 <?php } ?>
-	</div>
-<?php }
-
-// Un livre fermé
-elseif (!$page_courante || $page_courante == '00') { ?>
-	<div class="book">
-		<?=carre ($album_courant, '00')?>
-		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Page suivante">&#9754;</a>
 	</div>
 <?php }
 
 // Un livre ouvert
 else { ?>
 	<div class="book open">
-		<p><?=($indice_page*2-2)?:''?></p>
-		<p><?=$indice_page*2-1?></p>
-		<?=carre ($album_courant, $page_courante, '\\+', 'class="left" onclick="full(this)"')?>
-		<?=carre ($album_courant, $page_courante)?>
-<?php if ($previous_page == '00') { ?>
+		<p><?=intval($page_left)?:''?></p>
+		<p><?=intval($page_right)?></p>
+<?php if ($page_current > 1) { ?>
+		<?=carre ($album_courant, $page_left, 'class="left" onclick="wfull(this)"')?>
+<?php } ?>
+		<?=carre ($album_courant, $page_right)?>
+<?php if ($page_current <= 1) { ?>
 		<a id="previous-page" href="." title="Refermer le livre">&#8627;</a>
-<?php } elseif ($previous_page) { ?>
-		<a id="previous-page" href="?<?=$album_courant?>=<?=$previous_page?>" title="Retourner à la page précédente">&#8627;</a>
-<?php } if ($next_page) { ?>
-		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Tourner la page">&#8626;</a>
+<?php } elseif ($page_prev) { ?>
+		<a id="previous-page" href="?<?=$album_courant?>=<?=$page_prev?>" title="Retourner à la page précédente">&#8627;</a>
+<?php } if ($page_next && ($page_current + 1) < $page_max) { ?>
+		<a id="next-page" href="?<?=$album_courant?>=<?=$page_next?>" title="Tourner la page">&#8626;</a>
 <?php } ?>
 	</div>
 	<a id="home" href="." title="Revenir à la bibliothèque">&#8593;</a>
-	<?=$page_courante?>
 <?php } ?>
 
 </body>
