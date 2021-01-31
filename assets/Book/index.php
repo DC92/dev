@@ -3,27 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<title>Photos Dominique Cavailhez</title>
-	<link rel="stylesheet" href="book.css">
-
-	<style>
-		/* Spécifique à cette page */
-		.rayon {
-			text-align: center;
-		}
-		.cover {
-			display: inline-block;
-			min-width: 32%;
-		}
-	</style>
-
-	<script>
-		function full (el) {
-			el.requestFullscreen();
-		}
-	</script>
+	<link href="index.css?<?=filemtime('index.css')?>" rel="stylesheet">
+	<script src="index.js?<?=filemtime('index.js')?>"></script>
 </head>
-
-<body>
 
 <?php
 foreach (glob('*/*.[jJ]*') AS $f) {
@@ -38,6 +20,7 @@ $page_courante = @$_GET[$album_courant];
 if (!$page_courante || $page_courante == '00')
 	$page_courante = $pages_numbers[1];
 $indice_page = @array_search ($page_courante, $pages_numbers) ?: 0;
+$numero_page = $indice_page*2-2;
 $previous_page = @$pages_numbers[$indice_page-1];
 $next_page = @$pages_numbers[$indice_page+1];
 
@@ -68,12 +51,15 @@ function carre ($album, $page, $side = '-', $attr = 'onclick="full(this)"') {
 
 	return "<a $attr>$r</a>";
 }
+?>
 
-// Entrée dans le site
+<body>
+
+<?php // Entrée dans le site
 if (!$album_courant) { ?>
 	<div class="rayon">
-<?php 
-	foreach ($galleries AS $album => $images) { ?>
+
+<?php foreach ($galleries AS $album => $images) { ?>
 		<div class="cover">
 			<?=carre ($album, '00', '-', 'href="?'.$album.'" title="Ouvrir le livre"')?>
 		</div>
@@ -92,6 +78,8 @@ elseif (!$page_courante || $page_courante == '00') { ?>
 // Un livre ouvert
 else { ?>
 	<div class="book open">
+		<p><?=($indice_page*2-2)?:''?></p>
+		<p><?=$indice_page*2-1?></p>
 		<?=carre ($album_courant, $page_courante, '\\+', 'class="left" onclick="full(this)"')?>
 		<?=carre ($album_courant, $page_courante)?>
 <?php if ($previous_page == '00') { ?>

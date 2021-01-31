@@ -1,3 +1,12 @@
+/* Spécifique à cette page */
+.rayon {
+	text-align: center;
+}
+.cover {
+	display: inline-block;
+	min-width: 32%;
+}
+
 /* Size & draw the book */
 .cover,
 .book {
@@ -14,6 +23,15 @@
 }
 
 /* The data DIV */
+.book > p {
+	position: absolute; /* To the parent */
+	bottom: 7%;
+	right: 25%;
+	font-size: 1vw;
+}
+.book > p:first-child {
+	left: 25%;
+}
 .cover a,
 .book > a {
 	display: block;
