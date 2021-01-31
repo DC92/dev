@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 51">
 	<defs>
 		<linearGradient id="top" x1="50" y1="2.5" x2="50" y2="0" gradientUnits="userSpaceOnUse">
-			<stop stop-color="grey" offset="0" />
-			<stop stop-color="white" offset="1" />
+			<stop offset="0" style="stop-color: black; stop-opacity: 1.0" />
+			<stop offset="1" style="stop-color: black; stop-opacity: 0.0" />
 		</linearGradient>
 		<linearGradient id="bottom" x1="50" y1="49" x2="50" y2="51" gradientUnits="userSpaceOnUse">
-			<stop stop-color="black" offset="0" />
-			<stop stop-color="white" offset="1" />
+			<stop offset="0%" style="stop-color: black; stop-opacity: 1.0" />
+			<stop offset="100%" style="stop-color: black; stop-opacity: 0.0" />
 		</linearGradient>
 		<linearGradient id="right" x1="98" y1="25" x2="100" y2="25" gradientUnits="userSpaceOnUse">
-			<stop stop-color="black" offset="0" />
-			<stop stop-color="white" offset="1" />
+			<stop offset="0" style="stop-color: black; stop-opacity: 1.0" />
+			<stop offset="1" style="stop-color: black; stop-opacity: 0.0" />
 		</linearGradient>
 		<linearGradient id="center" x1="48.7" y1="25" x2="50.7" y2="25" x3="51.7" y3="25" gradientUnits="userSpaceOnUse">
-			<stop stop-color="white" offset="0%" />
-			<stop stop-color="#cccccc" offset="49%" />
-			<stop stop-color="#aaaaaa" offset="50%" />
-			<stop stop-color="white" offset="100%" />
+			<stop offset="0%" stop-color="white" />
+			<stop offset="49%" stop-color="#cccccc" />
+			<stop offset="50%" stop-color="#aaaaaa" />
+			<stop offset="100%" stop-color="white" />
 		</linearGradient>
 	</defs>
 

@@ -5,6 +5,7 @@
 	<title>Photos Dominique Cavailhez</title>
 	<link href="index.css?<?=filemtime('index.css')?>" rel="stylesheet">
 	<script src="index.js?<?=filemtime('index.js')?>"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Sacramento&display=swap" rel="stylesheet">
 </head>
 
 <?php
@@ -21,6 +22,7 @@ $page_left = substr (intval ($page_current / 2) * 2 + 100, -2);
 $page_right = substr (intval ($page_current / 2) * 2 + 101, -2);
 $page_next = substr (intval ($page_current / 2) * 2 + 102, -2);
 $page_max = max (array_keys ($galleries[$album_courant]));
+preg_match ("/§00(.*)/", @file_get_contents("$album_courant/index.txt"), $titre_album);
 
 function carre ($album, $page, $attr = 'xonclick="full(this)"') {
 	global $galleries;
@@ -47,7 +49,7 @@ function carre ($album, $page, $attr = 'xonclick="full(this)"') {
 		$r .= "<div style='height:calc(100% - {$h}em)'>\n".
 			  "<img src='{$galleries[$album][$page]}' />\n</div>\n";
 
-	return "<a $attr>$r</a>";
+	return "<div $attr>$r</div>";
 }
 ?>
 
@@ -67,11 +69,12 @@ if (!$album_courant) { ?>
 
 // Un livre ouvert
 else { ?>
+	<h1 id="titre"><?=$titre_album[1]?><h1>
 	<div class="book open">
 		<p><?=intval($page_left)?:''?></p>
 		<p><?=intval($page_right)?></p>
 <?php if ($page_current > 1) { ?>
-		<?=carre ($album_courant, $page_left, 'class="left" onclick="wfull(this)"')?>
+		<?=carre ($album_courant, $page_left, 'class="left"')?>
 <?php } ?>
 		<?=carre ($album_courant, $page_right)?>
 <?php if ($page_current <= 1) { ?>
