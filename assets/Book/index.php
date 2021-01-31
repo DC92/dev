@@ -15,6 +15,12 @@
 			min-width: 32%;
 		}
 	</style>
+
+	<script>
+		function full (el) {
+			el.requestFullscreen();
+		}
+	</script>
 </head>
 
 <body>
@@ -35,7 +41,7 @@ $indice_page = @array_search ($page_courante, $pages_numbers) ?: 0;
 $previous_page = @$pages_numbers[$indice_page-1];
 $next_page = @$pages_numbers[$indice_page+1];
 
-function carre ($album, $page, $side = '-') {
+function carre ($album, $page, $side = '-', $attr = 'onclick="full(this)"') {
 	global $galleries;
 	$h = 0; // Nb em de h1 & p
 	$r = '';
@@ -60,7 +66,7 @@ function carre ($album, $page, $side = '-') {
 		$r .= "<div style='height:calc(100% - {$h}em)'>\n".
 			  "<img src='{$galleries[$album][$page][stripslashes($side)]}' />\n</div>\n";
 
-	return $r;
+	return "<a $attr>$r</a>";
 }
 
 // Entrée dans le site
@@ -69,9 +75,7 @@ if (!$album_courant) { ?>
 <?php 
 	foreach ($galleries AS $album => $images) { ?>
 		<div class="cover">
-			<a href='?<?=$album?>' title='Ouvrir le livre'>
-				<?=carre ($album, '00')?>
-			</a>
+			<?=carre ($album, '00', '-', 'href="?'.$album.'" title="Ouvrir le livre"')?>
 		</div>
 <?php } ?>
 	</div>
@@ -80,9 +84,7 @@ if (!$album_courant) { ?>
 // Un livre fermé
 elseif (!$page_courante || $page_courante == '00') { ?>
 	<div class="book">
-		<a>
-			<?=carre ($album_courant, '00')?>
-		</a>
+		<?=carre ($album_courant, '00')?>
 		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Page suivante">&#9754;</a>
 	</div>
 <?php }
@@ -90,21 +92,17 @@ elseif (!$page_courante || $page_courante == '00') { ?>
 // Un livre ouvert
 else { ?>
 	<div class="book open">
-		<a class="left">
-			<?=carre ($album_courant, $page_courante, '\\+')?>
-		</a>
-		<a>
-			<?=carre ($album_courant, $page_courante)?>
-		</a>
+		<?=carre ($album_courant, $page_courante, '\\+', 'class="left" onclick="full(this)"')?>
+		<?=carre ($album_courant, $page_courante)?>
 <?php if ($previous_page == '00') { ?>
-		<a id="previous-page" href="." title="Refermer le livre">&#9755;</a>
+		<a id="previous-page" href="." title="Refermer le livre">&#8627;</a>
 <?php } elseif ($previous_page) { ?>
-		<a id="previous-page" href="?<?=$album_courant?>=<?=$previous_page?>" title="Retourner à la page précédente">&#9755;</a>
+		<a id="previous-page" href="?<?=$album_courant?>=<?=$previous_page?>" title="Retourner à la page précédente">&#8627;</a>
 <?php } if ($next_page) { ?>
-		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Tourner la page">&#9754;</a>
+		<a id="next-page" href="?<?=$album_courant?>=<?=$next_page?>" title="Tourner la page">&#8626;</a>
 <?php } ?>
 	</div>
-	<a id="home" href="." title="Revenir à la bibliothèque">&#128418;</a>
+	<a id="home" href="." title="Revenir à la bibliothèque">&#8593;</a>
 	<?=$page_courante?>
 <?php } ?>
 

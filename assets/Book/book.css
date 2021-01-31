@@ -77,17 +77,17 @@
 	width: 8vw;
 	font-size: 4vw;
 	text-decoration: none;
-	color: green;
+	color: blue;
 }
 #home {
 	top: 0;
-	left: 50%;
+	left: 48.7%;
 }
 #previous-page {
-	left: 0.2%;
+	left: 0.9%;
 }
 #next-page {
 	display: block;
-	right: 0.7%;
+	right: 1.4%;
 	text-align: right;
 }
