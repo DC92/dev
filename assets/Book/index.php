@@ -9,6 +9,9 @@
 </head>
 
 <?php
+//TODO centrage image / titre dépend de la taille de la fenetre - idem n° pages
+//BEST Centrer verticalement les textes dans la page
+
 foreach (glob('*/*.[jJ]*') AS $f) {
 	preg_match ('/(.*)\/([0-9][0-9]).*/', $f, $m);
 	if (count ($m))
@@ -21,7 +24,7 @@ $page_prev = substr (intval ($page_current / 2) * 2 + 99, -2);
 $page_left = substr (intval ($page_current / 2) * 2 + 100, -2);
 $page_right = substr (intval ($page_current / 2) * 2 + 101, -2);
 $page_next = substr (intval ($page_current / 2) * 2 + 102, -2);
-$page_max = max (array_keys ($galleries[$album_courant]));
+$page_max = @max (array_keys ($galleries[$album_courant]));
 preg_match ("/§00(.*)/", @file_get_contents("$album_courant/index.txt"), $titre_album);
 
 function carre ($album, $page, $attr = 'xonclick="full(this)"') {
@@ -58,12 +61,15 @@ function carre ($album, $page, $attr = 'xonclick="full(this)"') {
 <?php // Entrée dans le site
 if (!$album_courant) { ?>
 	<div class="rayon">
+		<h1>Exposition de mes meilleures photos</h1>
 
 <?php foreach ($galleries AS $album => $images) { ?>
-		<div class="cover">
-			<?=carre ($album, '00', 'href="?'.$album.'" title="Ouvrir le livre"')?>
-		</div>
+		<a class="cover" href="?<?=$album?>" title="Ouvrir ce livre">
+			<?=carre ($album, '00')?>
+		</a>
 <?php } ?>
+
+		<p>&copy; Dominique Cavailhez 2021</p>
 	</div>
 <?php }
 

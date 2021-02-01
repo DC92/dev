@@ -2,6 +2,14 @@
 body {
 	background-image: url("background.jpg");
 	background-size: cover;
+	font-family: 'Dancing Script';
+}
+a {
+	color: blue;
+	font-family: 'Comic Sans MS';
+}
+.xdebug-error {
+	font-size: 14px;
 	font-family: 'Comic Sans MS';
 }
 #titre {
@@ -11,12 +19,18 @@ body {
 .rayon {
 	text-align: center;
 }
+.rayon > h1 {
+	font-family: 'Comic Sans MS';
+}
 .cover {
 	display: inline-block;
 	min-width: 32%;
 }
 
 /* Size & draw the book */
+.cover {
+	font-family: 'Comic Sans MS';
+}
 .cover,
 .book {
 	position: relative; /* To position the child relative to it */
@@ -43,7 +57,7 @@ body {
 }
 
 /* The data DIV */
-.cover div,
+.cover > div,
 .book > div {
 	position: absolute; /* To the parent */
 	top: 4%;
@@ -54,12 +68,11 @@ body {
 .book > div p {
 	text-align: center;
 	font-size: 3vw;
-	font-family: 'Dancing Script';
 }
 .book .left {
 	left: 3%;
 }
-.cover div {
+.cover > div {
 	top: 4.4%;
 	right: 7%;
 	width: 86%;
@@ -70,10 +83,11 @@ body {
 	margin: 0 0 0.4em 0;
 	width: 100%;
 	text-align: center;
-	font-size: 3vw;
+	font-size: 5vw;
 }
 .cover h1 {
 	color: white;
+	font-size: 3vw;
 }
 .book p {
 	margin: 0;
