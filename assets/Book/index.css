@@ -101,7 +101,9 @@ body {
 }
 #home,
 #previous-page,
-#next-page {
+#next-page,
+#full-screen,
+#download {
 	position: absolute;
 	top: 82%;
 	height: 8vw;
@@ -112,10 +114,13 @@ body {
 }
 #home {
 	top: 0;
-	left: 48.7%;
+	left: 2%;
 }
 #previous-page {
 	left: 2%;
+}
+#full-screen {
+	left: 20%;
 }
 #next-page {
 	display: block;

@@ -85,7 +85,9 @@ else { ?>
 		<a id="next-page" href="?<?=$album_courant?>=<?=$page_next?>" title="Tourner la page">&#8626;</a>
 <?php } ?>
 	</div>
-	<a id="home" href="." title="Revenir à la bibliothèque">&#8593;</a>
+	<a id="full-screen" href="." title="Plein écran">&#9974;</a>
+	<a id="download" href="." title="Télécharger l'image">&#128427;</a>
+	<a id="home" href="." title="Revenir à l'accueil">&#8962;</a>
 <?php } ?>
 
 </body>
