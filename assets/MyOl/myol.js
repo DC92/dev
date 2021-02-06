@@ -30,7 +30,7 @@ if (!Math.hypot)
 	};
 
 //HACK for some mobiles touch functions
-if (navigator.userAgent.match(/android.+firefox|iphone.+safari/i)) {
+if (navigator.userAgent.match(/iphone.+safari/i)) {
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
