@@ -10,7 +10,9 @@
 
 <?php
 //TODO centrage image / titre dépend de la taille de la fenetre - idem n° pages
+//TODO full screen / next - prev / download
 //BEST Centrer verticalement les textes dans la page
+//BEST table des matières
 
 foreach (glob('*/*.[jJ]*') AS $f) {
 	preg_match ('/(.*)\/([0-9][0-9]).*/', $f, $m);
@@ -50,7 +52,8 @@ function carre ($album, $page, $attr = 'xonclick="full(this)"') {
 
 	if (isset ($galleries[$album][$page]))
 		$r .= "<div style='height:calc(100% - {$h}em)'>\n".
-			  "<img src='{$galleries[$album][$page]}' />\n</div>\n";
+			  "<img src='{$galleries[$album][$page]}' style='cursor:zoom-in' title='Voir en plein écran' onclick=\"full(this, '$album', $page)\" />\n".
+			  "</div>\n";
 
 	return "<div $attr>$r</div>";
 }
@@ -61,21 +64,21 @@ function carre ($album, $page, $attr = 'xonclick="full(this)"') {
 <?php // Entrée dans le site
 if (!$album_courant) { ?>
 	<div class="rayon">
-		<h1>Exposition de mes meilleures photos</h1>
+		<h1>Mes meilleures photos</h1>
 
 <?php foreach ($galleries AS $album => $images) { ?>
-		<a class="cover" href="?<?=$album?>" title="Ouvrir ce livre">
+		<a class="cover" href="?<?=$album?>" title="Ouvrir cet album">
 			<?=carre ($album, '00')?>
 		</a>
 <?php } ?>
 
-		<p>&copy; Dominique Cavailhez 2021</p>
+		<p>Cliquez sur un album pour le feuilleter</p>
 	</div>
 <?php }
 
-// Un livre ouvert
+// Un album ouvert
 else { ?>
-	<h1 id="titre"><?=$titre_album[1]?><h1>
+	<h1 id="titre"><?=$titre_album[1]?></h1>
 	<div class="book open">
 		<p><?=intval($page_left)?:''?></p>
 		<p><?=intval($page_right)?></p>
@@ -84,17 +87,22 @@ else { ?>
 <?php } ?>
 		<?=carre ($album_courant, $page_right)?>
 <?php if ($page_current <= 1) { ?>
-		<a id="previous-page" href="." title="Refermer le livre">&#8627;</a>
+		<a id="previous-page" href="." title="Refermer l'album">&#8627;</a>
 <?php } elseif ($page_prev) { ?>
+		<a id="home" href="." title="Fermer l'album">&#8598;</a>
 		<a id="previous-page" href="?<?=$album_courant?>=<?=$page_prev?>" title="Retourner à la page précédente">&#8627;</a>
 <?php } if ($page_next && ($page_current + 1) < $page_max) { ?>
 		<a id="next-page" href="?<?=$album_courant?>=<?=$page_next?>" title="Tourner la page">&#8626;</a>
 <?php } ?>
+
 	</div>
+
+	<p>Cliquez sur une photo pour la voir en plein écran</p>
+
 	<a id="full-screen" href="." title="Plein écran">&#9974;</a>
 	<a id="download" href="." title="Télécharger l'image">&#128427;</a>
-	<a id="home" href="." title="Revenir à l'accueil">&#8962;</a>
 <?php } ?>
 
+	<p class="copy">&copy; Dominique Cavailhez 2021</p>
 </body>
 </html>

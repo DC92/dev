@@ -25,6 +25,6 @@ function exitFullScreen() {
 	}
 }
 
-function full(el) {
-	requestFullScreen(el);
+function full(el, album, page) {
+	requestFullScreen (el.parentElement);
 }

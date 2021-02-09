@@ -2,7 +2,11 @@
 body {
 	background-image: url("background.jpg");
 	background-size: cover;
+	text-align: center;
+}
+.copy {
 	font-family: 'Dancing Script';
+	font-size: '2vw';
 }
 a {
 	color: blue;
@@ -17,7 +21,6 @@ a {
 	text-align: center;
 }
 .rayon {
-	text-align: center;
 }
 .rayon > h1 {
 	font-family: 'Comic Sans MS';
@@ -119,19 +122,19 @@ a {
 #full-screen,
 #download {
 	position: absolute;
-	top: 82%;
+	top: 86%;
 	height: 8vw;
 	width: 4vw;
-	font-size: 4vw;
+	font-size: 3vw;
 	text-decoration: none;
 	color: blue;
 }
 #home {
 	top: 0;
-	left: 2%;
+	left: 1%;
 }
 #previous-page {
-	left: 2%;
+	left: 1%;
 }
 #full-screen {
 	left: 20%;
