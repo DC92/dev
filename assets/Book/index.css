@@ -4,21 +4,22 @@ body {
 	background-size: cover;
 	text-align: center;
 }
-.copy {
+#copyright {
 	font-family: 'Dancing Script';
-	font-size: '2vw';
-}
-a {
-	color: blue;
-	font-family: 'Comic Sans MS';
+	font-size: 2vw;
 }
 .xdebug-error {
 	font-size: 14px;
 	font-family: 'Comic Sans MS';
 }
+/*
 #titre {
 	width: 100%;
 	text-align: center;
+}
+a {
+	color: blue;
+	font-family: 'Comic Sans MS';
 }
 .rayon {
 }
@@ -29,19 +30,17 @@ a {
 	display: inline-block;
 	min-width: 32%;
 }
+*/
 
 /* Size & draw the book */
 .cover {
 	font-family: 'Comic Sans MS';
 }
 .cover,
-.book {
+#book {
 	position: relative; /* To position the child relative to it */
 }
-.book:after { /* Add background & define height */
-	content: url('book-close.svg');
-}
-.open:after {
+#book:after { /* Add background & define height */
 	content: url('book-open.svg');
 }
 .cover:after { /* Add background & define height */
@@ -49,32 +48,43 @@ a {
 }
 
 /* Page numbers */
-.book > p {
+#left-number,
+#right-number {
 	position: absolute; /* To the parent */
 	width: 50%;
 	bottom: 7.5%;
 	right: 0;
 	font-size: 1vw;
 }
-.book > p:first-child {
+#left-number {
 	right: 50%;
 }
 
 /* The data DIV */
 .cover > div,
-.book > div {
+#book > div {
 	position: absolute; /* To the parent */
 	top: 4%;
 	right: 3.5%;
 	width: 45%;
 	height: 87.5%;
 }
-.book > div p {
+
+.cover h1,
+#book h1 {
+	margin: 0 0 0.4em 0;
+	width: 100%;
 	text-align: center;
+	font-size: 5vw;
+}
+/*
+.cover h1 {
+	color: white;
 	font-size: 3vw;
 }
-.book .left {
-	left: 3%;
+.cover p {
+	margin: 0;
+	color: white;
 }
 .cover > div {
 	top: 4.4%;
@@ -82,28 +92,27 @@ a {
 	width: 86%;
 	text-decoration: none;
 }
-.cover h1,
-.book h1 {
-	margin: 0 0 0.4em 0;
-	width: 100%;
+*/
+#left p {
 	text-align: center;
-	font-size: 5vw;
-}
-.cover h1 {
-	color: white;
 	font-size: 3vw;
-}
-.book p {
 	margin: 0;
 }
-.cover p {
-	margin: 0;
-	color: white;
+#book a {
+	cursor: pointer;
+}
+
+#left {
+	left: 3%;
+	font-family: 'Dancing Script';
+}
+#right > div {
+	height: 100%;
 }
 
 /* Img in the DIV */
 .cover img,
-.book img {
+#right img {
 	/* Fill the available space */
 	max-width: 100%;
 	max-height: 100%;
@@ -117,33 +126,66 @@ a {
 	top: 50%;
 	transform: translateY(-50%);
 }
+#right:not(:fullscreen) img {
+	cursor: zoom-in;
+}
+#next-img {
+	display: none;
+}
+
+/* Full screen */
+#right:not(:fullscreen) #full {
+	display: none;
+}
+#full {
+	position: absolute;
+	top: 0;
+	height: initial !important;
+	background: rgba(255, 255, 255, 0.5);
+}
+#full * {
+	margin: 0;
+}
+#prev-page-full,
+#next-page-full {
+	display: block;
+	position: fixed;
+	top: 50%;
+	left: 0;
+	font-size: 3vw;
+	color: yellow;
+}
+#next-page-full {
+	left: initial;
+	right: 0;
+}
 
 /* Navigation */
 #home,
-#previous-page,
+#prev-page,
 #next-page,
-#full-screen,
-#download {
+#full-screen {
 	position: absolute;
-	top: 86%;
-	height: 8vw;
+	top: 85%;
 	width: 4vw;
 	font-size: 3vw;
 	text-decoration: none;
 	color: blue;
 }
 #home {
-	top: 0;
+	top: 0.4vw;
 	left: 1%;
 }
-#previous-page {
-	left: 1%;
-}
-#full-screen {
-	left: 20%;
+#prev-page {
+	left: 0.75%;
 }
 #next-page {
 	display: block;
 	right: 2.5%;
 	text-align: right;
+}
+#full-screen {
+	top: 0;
+	right: 1.7%;
+	cursor: zoom-in !important;
 }

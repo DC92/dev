@@ -3,106 +3,77 @@
 <head>
 	<meta charset="utf-8">
 	<title>Photos Dominique Cavailhez</title>
-	<link href="index.css?<?=filemtime('index.css')?>" rel="stylesheet">
-	<script src="index.js?<?=filemtime('index.js')?>"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Sacramento&display=swap" rel="stylesheet">
-</head>
+	<script src="jquery-3.5.1.min.js"></script>
+	<script src="index.js?<?=filemtime('index.js')?>"></script>
+	<link href="index.css?<?=filemtime('index.css')?>" rel="stylesheet">
 
 <?php
-//TODO centrage image / titre dépend de la taille de la fenetre - idem n° pages
-//TODO full screen / next - prev / download
-//BEST Centrer verticalement les textes dans la page
-//BEST table des matières
+$album = @array_keys ($_GET)[0];
 
-foreach (glob('*/*.[jJ]*') AS $f) {
-	preg_match ('/(.*)\/([0-9][0-9]).*/', $f, $m);
+// Get image list from ./album/*.j*
+foreach (glob ("$album/*.[jJ]*") AS $f) {
+	preg_match ('/([0-9][0-9]).*/', $f, $m);
 	if (count ($m))
-		$galleries [$m[1]] [$m[2]] = $f;
+		$gallerie [intval($m[1])]['img'] = $f;
 }
 
-$album_courant = @array_keys ($_GET)[0];
-$page_current = intval (@$_GET[$album_courant]);
-$page_prev = substr (intval ($page_current / 2) * 2 + 99, -2);
-$page_left = substr (intval ($page_current / 2) * 2 + 100, -2);
-$page_right = substr (intval ($page_current / 2) * 2 + 101, -2);
-$page_next = substr (intval ($page_current / 2) * 2 + 102, -2);
-$page_max = @max (array_keys ($galleries[$album_courant]));
-preg_match ("/§00(.*)/", @file_get_contents("$album_courant/index.txt"), $titre_album);
+// Get text list from ./album/index.txt
+$ts = explode ('§', @file_get_contents ("$album/index.txt"));
+foreach ($ts AS $tss) {
+	$tsss = explode ("\n", $tss);
+	preg_match ('/([0-9][0-9])(.*)/', array_shift ($tsss), $m);
 
-function carre ($album, $page, $attr = 'xonclick="full(this)"') {
-	global $galleries;
-	$h = 0; // Nb em de h1 & p
-	$r = '';
+	if (@$m[2])
+		$gallerie [intval($m[1])]['lines'][] = '<h1>'.$m[2].'</h1>';
 
-	preg_match ("/§$page([^§]*)/s", @file_get_contents("$album/index.txt"), $m);
-	if (count ($m)) {
-		$ts = explode ("\n", $m[1]);
-		foreach ($ts AS $kv=>$vv)
-			if (!trim ($vv))
-				;
-			elseif ($kv) {
-				$r .= '<p>'.trim ($vv).'</p>'.PHP_EOL;
-				$h += 1.1;
-			}
-			else {
-				$r .= '<h1>'.trim ($vv).'</h1>'.PHP_EOL;
-				$h += 3.4;
-			}
-	}
+	foreach ($tsss AS $tssss)
+		if ($tssss)
+			$gallerie [intval($m[1])]['lines'][] = '<p>'.$tssss.'</p>';
+}
 
-	if (isset ($galleries[$album][$page]))
-		$r .= "<div style='height:calc(100% - {$h}em)'>\n".
-			  "<img src='{$galleries[$album][$page]}' style='cursor:zoom-in' title='Voir en plein écran' onclick=\"full(this, '$album', $page)\" />\n".
-			  "</div>\n";
-
-	return "<div $attr>$r</div>";
+for ($p = 0; $p <= max(array_keys($gallerie)); $p++) {
+	$gallerie[$p]['text'] = @implode ('', $gallerie[$p]['lines']);
+	unset ($gallerie[$p]['lines']);
 }
 ?>
+	<script>
+		var gallerie = <?=json_encode($gallerie)?>;
+	</script>
+</head>
 
 <body>
+	<h1 id="titre">Nos oiseaux</h1>
 
-<?php // Entrée dans le site
-if (!$album_courant) { ?>
-	<div class="rayon">
-		<h1>Mes meilleures photos</h1>
+	<div id="book">
+		<div id="left">
+			<div></div>
+		</div>
+		<div id="right">
+			<div>
+				<img title="Voir en plein écran" onclick="full()" />
+			</div>
 
-<?php foreach ($galleries AS $album => $images) { ?>
-		<a class="cover" href="?<?=$album?>" title="Ouvrir cet album">
-			<?=carre ($album, '00')?>
-		</a>
-<?php } ?>
+			<!-- Full screen -->
+			<div id="full">
+				<div></div>
+				<a id="prev-page-full" onclick="page(-1)" title="Page précédente">&lArr;</a>
+				<a id="next-page-full" onclick="page(1)" title="Tourner la page">&rArr;</a>
+			</div>
+		</div>
 
-		<p>Cliquez sur un album pour le feuilleter</p>
-	</div>
-<?php }
+		<p id="left-number"></p>
+		<p id="right-number"></p>
 
-// Un album ouvert
-else { ?>
-	<h1 id="titre"><?=$titre_album[1]?></h1>
-	<div class="book open">
-		<p><?=intval($page_left)?:''?></p>
-		<p><?=intval($page_right)?></p>
-<?php if ($page_current > 1) { ?>
-		<?=carre ($album_courant, $page_left, 'class="left"')?>
-<?php } ?>
-		<?=carre ($album_courant, $page_right)?>
-<?php if ($page_current <= 1) { ?>
-		<a id="previous-page" href="." title="Refermer l'album">&#8627;</a>
-<?php } elseif ($page_prev) { ?>
 		<a id="home" href="." title="Fermer l'album">&#8598;</a>
-		<a id="previous-page" href="?<?=$album_courant?>=<?=$page_prev?>" title="Retourner à la page précédente">&#8627;</a>
-<?php } if ($page_next && ($page_current + 1) < $page_max) { ?>
-		<a id="next-page" href="?<?=$album_courant?>=<?=$page_next?>" title="Tourner la page">&#8626;</a>
-<?php } ?>
-
+		<a id="prev-page" onclick="page(-1)" title="Page précédente">&#8627;</a>
+		<a id="next-page" onclick="page(1)" title="Tourner la page">&#8626;</a>
+		<a id="full-screen" onclick="full()" title="Plein écran">&#9974;</a>
 	</div>
 
-	<p>Cliquez sur une photo pour la voir en plein écran</p>
+	<p id="copyright">&copy; Dominique Cavailhez 2021</p>
+	<img id="next-img" />
 
-	<a id="full-screen" href="." title="Plein écran">&#9974;</a>
-	<a id="download" href="." title="Télécharger l'image">&#128427;</a>
-<?php } ?>
-
-	<p class="copy">&copy; Dominique Cavailhez 2021</p>
+	<script>page(parseInt(window.location.hash.substring(1)/2))</script>
 </body>
 </html>
