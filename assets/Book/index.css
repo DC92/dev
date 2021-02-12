@@ -23,6 +23,7 @@ a {
 }
 .rayon {
 }
+*/
 .rayon > h1 {
 	font-family: 'Comic Sans MS';
 }
@@ -30,7 +31,6 @@ a {
 	display: inline-block;
 	min-width: 32%;
 }
-*/
 
 /* Size & draw the book */
 .cover {
@@ -77,7 +77,7 @@ a {
 	text-align: center;
 	font-size: 5vw;
 }
-/*
+
 .cover h1 {
 	color: white;
 	font-size: 3vw;
@@ -92,7 +92,7 @@ a {
 	width: 86%;
 	text-decoration: none;
 }
-*/
+
 #left p {
 	text-align: center;
 	font-size: 3vw;
