@@ -129,6 +129,13 @@ a {
 #right:not(:fullscreen) img {
 	cursor: zoom-in;
 }
+#right:fullscreen {
+	font-size: 2vw;
+}
+#right:fullscreen h1 {
+	margin: 0;
+	font-size: 3vw;
+}
 #next-img {
 	display: none;
 }

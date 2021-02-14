@@ -12,8 +12,13 @@
 <body>
 	<div class="rayon">
 		<h1>Mes meilleures photos</h1>
+		<p>Cliquez sur un album pour le feuilleter</p>
 
 <?php
+//TODO centrage image / titre d?pend de la taille de la fenetre - idem n? pages
+//BEST full screen : Centrer verticalement les textes dans la page
+//BEST table des mati?res
+
 foreach (glob ("*/00*.[jJ]*") AS $f) {
 	preg_match ('/([^\/]*)\/(.*)/', $f, $img);
 	if (is_file ($img[1].'/index.txt')) {
@@ -30,7 +35,7 @@ foreach (glob ("*/00*.[jJ]*") AS $f) {
 <?php }
 } ?>
 
-		<p>Cliquez sur un album pour le feuilleter</p>
+		<p id="copyright">&copy; Dominique Cavailhez 2021</p>
 	</div>
 </body>
 </html>
