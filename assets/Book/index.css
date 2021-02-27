@@ -12,6 +12,9 @@ body {
 	font-size: 14px;
 	font-family: 'Comic Sans MS';
 }
+h1 {
+	text-transform: capitalize;
+}
 /*
 #titre {
 	width: 100%;
@@ -173,7 +176,7 @@ a {
 #next-page,
 #full-screen {
 	position: absolute;
-	top: 85%;
+	top: 42%;
 	width: 4vw;
 	font-size: 3vw;
 	text-decoration: none;
@@ -184,11 +187,11 @@ a {
 	left: 1%;
 }
 #prev-page {
-	left: 0.75%;
+	left: 0;
 }
 #next-page {
 	display: block;
-	right: 2.5%;
+	right: 1%;
 	text-align: right;
 }
 #full-screen {

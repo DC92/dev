@@ -3,6 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>Photos Dominique Cavailhez</title>
+	<link href="favicon.svg" rel="shortcut icon" type="image/svg+xml" />
+
 	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Sacramento&display=swap" rel="stylesheet">
 	<script src="jquery-3.5.1.min.js"></script>
 	<script src="index.js?<?=filemtime('index.js')?>"></script>
@@ -40,7 +42,8 @@ for ($p = 0; $p <= max(array_keys($gallerie)); $p++) {
 ?>
 
 <body>
-	<h1 id="titre">Nos oiseaux</h1>
+	<h1 id="titre"><?=$album?></h1>
+	<a id="home" href="." title="Revenir à la liste des albums">&#127968;</a>
 
 	<div id="book">
 		<div id="left">
@@ -54,18 +57,17 @@ for ($p = 0; $p <= max(array_keys($gallerie)); $p++) {
 			<!-- Full screen -->
 			<div id="full">
 				<div></div>
-				<a id="prev-page-full" onclick="page(-1)" title="Page précédente">&lArr;</a>
-				<a id="next-page-full" onclick="page(1)" title="Tourner la page">&rArr;</a>
+				<a id="prev-page-full" onclick="page(-1)" title="Page précédente">&#9754;</a>
+				<a id="next-page-full" onclick="page(1)" title="Tourner la page">&#9755;</a>
 			</div>
 		</div>
 
 		<p id="left-number"></p>
 		<p id="right-number"></p>
 
-		<a id="home" href="." title="Fermer l'album">&#8598;</a>
-		<a id="prev-page" onclick="page(-1)" title="Page précédente">&#8627;</a>
-		<a id="next-page" onclick="page(1)" title="Tourner la page">&#8626;</a>
-		<a id="full-screen" onclick="full()" title="Plein écran">&#9974;</a>
+		<a id="prev-page" onclick="page(-1)" title="Page précédente">&#9754;</a>
+		<a id="next-page" onclick="page(1)" title="Tourner la page">&#9755;</a>
+		<a id="full-screen" onclick="full()" title="Voir plein écran">&#9974;</a>
 	</div>
 
 	<p id="copyright">&copy; Dominique Cavailhez 2021</p>
