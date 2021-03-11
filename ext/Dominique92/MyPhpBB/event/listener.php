@@ -77,19 +77,19 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
-		$ns = explode ('\\', __NAMESPACE__);
+		global $myphp_template, $myphp_js;
 
 		/* Includes template & js values defined in config.php */
 		// $myphp_js = ['key' => 'value'];
 		// $myphp_template = ['key' => 'value'];
-		global $myphp_template, $myphp_js;
 		if ($myphp_template)
 			$this->template->assign_vars (
 				array_change_key_case ($myphp_template, CASE_UPPER)
 			);
-		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js));
+		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js ?: []));
 
 		/* Includes language files of this extension */
+		$ns = explode ('\\', __NAMESPACE__);
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 
 		// Includes style files of this extension
