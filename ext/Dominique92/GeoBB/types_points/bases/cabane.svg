@@ -1,0 +1,2 @@
+	<path d="M3 10.7 l0 13,18 0,0 -13" stroke-width="0.5" stroke="<?=$couleur_mur?>" fill="<?=$couleur?>" />
+	<path d="M1.5 12.3 l10.5 -10.5,10.5 10.5" stroke-width="3" stroke-linecap="round" stroke="<?=$couleur_toit?>" fill="<?=$couleur?>" />

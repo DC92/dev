@@ -84,9 +84,9 @@ $sql = $db->sql_build_query('SELECT', $sql_array);
 $result = $db->sql_query_limit($sql, $limit);
 
 // Ajoute l'adresse complète aux images d'icones
-$sp = explode ('/', getenv('REQUEST_SCHEME'));
-$ri = explode ('/ext/', getenv('REQUEST_URI'));
-$bu = $sp[0].'://'.getenv('SERVER_NAME').$ri[0].'/';
+$request_scheme = explode ('/', getenv('REQUEST_SCHEME'));
+$request_uri = explode ('/ext/', getenv('REQUEST_URI'));
+$url_base = $request_scheme[0].'://'.getenv('SERVER_NAME').$request_uri[0].'/';
 
 $features = $signatures = [];
 $ampl = 0x100; // Max color delta
@@ -102,11 +102,11 @@ while ($row = $db->sql_fetchrow($result)) {
 
 	$properties = [
 		'name' => $row['post_subject'],
-		'link' => $bu.'viewtopic.php?t='.$row['topic_id'],
+		'link' => $url_base.'viewtopic.php?t='.$row['topic_id'],
 		'id' => $row['topic_id'],
 		'type_id' => $row['forum_id'],
 		'post_id' => $row['post_id'],
-		'icon' => $row['forum_image'] ? $bu.$row['forum_image'] : null,
+		'icon' => $row['forum_image'] ? $url_base .str_replace ('.png', '.svg', $row['forum_image']) : null,
 		'color' => $color,
 	];
 
