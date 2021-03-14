@@ -18,7 +18,7 @@
 		"composer/installers": "~1.0"
 	},
 	"extra": {
-		"display-name": "Styles & Views",
+		"display-name": "OBSOLETE Styles & Views",
 		"soft-require": {
 			"phpbb/phpbb": ">=3.1.0,<3.2.*@dev"
 		}

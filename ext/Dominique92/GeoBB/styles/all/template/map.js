@@ -18,6 +18,7 @@ var layerGeoBBgis = layerVectorURL({
 				// Points
 				style.image = new ol.style.Icon({
 					src: properties.icon,
+					imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher sur I.E.
 				});
 			return style;
 		},

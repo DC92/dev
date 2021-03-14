@@ -5,9 +5,9 @@ if (isset ($alias[$_GET['nom']]))
 	$_GET['nom'] = $alias[$_GET['nom']];
 
 // Recherche les arguments dans le nom du fichier
-preg_match_all ('/([a-z]+)([0-9]*)\.?([0-9]*)_/', $_GET['nom'].'_', $codes);
+preg_match_all ('/([a-z]+)([0-9]*)\.?([0-9]*)\.?([0-9]*)_/', $_GET['nom'].'_', $codes);
 
-// Le dernier argument peut être t123 : la taille de l'icône 123x123 pixels
+// Le dernier argument peut être t123.4.5 : la taille de l'icône 123x123 pixels
 $taille = 24;
 if (end ($codes[1]) == 't') { // Teste le dernier code
 	$taille = intval (array_pop ($codes[2])) ?: $taille;
@@ -26,9 +26,10 @@ $couleur_toit = 'red';
 $couleur_mur = '#e08020';
 
 foreach ($codes[1] AS $k=>$code) {
-	// Ascii a123.9 = &#123; à la position x=9px
+	// Ascii a123.4.5 = caractère &#123; à la position x = 4, y = 5
 	$ascii = intval ($codes[2][$k+1]) ?: 32; // Extrait le code décimal
-	$position_ascii = $codes[3][$k+1] ? $codes[3][$k+1] : 7.6;
+	$x_ascii = $codes[3][$k+1] ? $codes[3][$k+1] : 7.6;
+	$y_ascii = $codes[4][$k+1] ? $codes[4][$k+1] : 21.5;
 
 	if (in_array ($code, ['a','eau','manqueunmur']))
 		$porte = false;
