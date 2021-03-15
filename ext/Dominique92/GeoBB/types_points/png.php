@@ -21,6 +21,6 @@ $image->setBackgroundColor(new ImagickPixel('transparent'));
 $image->readImageBlob($svg);
 $image->setImageFormat('png32');
 echo $image;
-//file_put_contents($_GET['nom'].'.png', $image);
+//file_put_contents($_GET['nom'].'.png', $image); // Crée le fichier .png
 $image->clear();
 $image->destroy();

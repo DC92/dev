@@ -1,1 +1,1 @@
-	<path d="M1.75 23 l12.8 -22.5,-2.5 4.5,-2.5 -4.5,12.7 22.5" stroke-width="2" stroke="red" fill="<?=$couleur?>" />
+	<path d="M1.75 23 l12.8 -22.5,-2.5 4.5,-2.5 -4.5,12.7 22.5" stroke-width="2" stroke="<?=$couleur2?:'red'?>" fill="<?=$couleur1?:'yellow'?>" />

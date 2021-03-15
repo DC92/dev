@@ -19,12 +19,12 @@ $base = array_shift ($codes[1]);
 if (!file_exists("bases/$base.svg"))
 	$base = '_404';
 
-// Pour les autres codes d'attributs
+// Attributs par defaut
 $porte = $base;
-$couleur = '#ffeedd';
-$couleur_toit = 'red';
-$couleur_mur = '#e08020';
+$couleur1 = null;
+$couleur2 = null;
 
+// Pour les autres codes d'attributs
 foreach ($codes[1] AS $k=>$code) {
 	// Ascii a123.4.5 = caractère &#123; à la position x = 4, y = 5
 	$ascii = intval ($codes[2][$k+1]) ?: 32; // Extrait le code décimal
@@ -35,15 +35,10 @@ foreach ($codes[1] AS $k=>$code) {
 		$porte = false;
 
 	if (!file_exists("attributs/$code.svg")) {
-		if (!$k) { // Le premier code peut être la couleur de face
-			$couleur = $couleur_toit = $couleur_mur = $code;
-
-			// Bâtiment à contour et toits noirs, face blanche
-			if ($code == 'black')
-				$couleur = 'white';
-			$porte = false;
-		} else // Le deuxième code peut être la couleur des toits et murs
-			$couleur_toit = $couleur_mur = $code;
+		$porte = false;
+		if (!$k) // Le premier code peut être la couleur de face
+			$couleur1 = $code;
+		$couleur2 = $code; // Le premier ou deuxième code peut être la couleur des toits et murs
 	}
 }
 
@@ -65,7 +60,7 @@ include ("bases/$base.svg");
 if ($base != '_404')
 	foreach ($codes[1] AS $code)
 		if (file_exists("attributs/$code.svg")) {
-			echo PHP_EOL;
+			echo PHP_EOL; // Jolie mise en page du fichier .svg
 			include ("attributs/$code.svg");
 		}
 
