@@ -35,7 +35,7 @@ INSTALLATION
 	- Forum Name: The name of the type of points that will be in this forum.
 	- Forum image: The icon URL that will represent the points of this forum (optional).
 	These icons (.png 16x16 files) are to be transferred to any directory of the server.
-		- Example: ```ext/Dominique92/GeoBB/types_points/site.png```
+		- Example: ```ext/Dominique92/GeoBB/icones/site.png```
 	- Description: Insert one of the following strings:
 		- ```[first=point]``` if you want to associate a position to each topic of the forum (in fact to the first comment of each subject).
 		- ```[first=line]``` if you want to associate lines with the first comment of each topic.
