@@ -5,63 +5,68 @@ if (isset ($alias[$_GET['nom']]))
 	$_GET['nom'] = $alias[$_GET['nom']];
 
 // Recherche les arguments dans le nom du fichier
-preg_match_all ('/([a-z]+)([0-9]*)\.?([0-9]*)\.?([0-9]*)_/', $_GET['nom'].'_', $codes);
+preg_match_all ('/([a-z]+)([0-9]*)\.?([0-9]*)\.?([0-9]*)_/', $_GET['nom'].'_', $attributs);
 
-// Le dernier argument peut être t123.4.5 : la taille de l'icône 123x123 pixels
-$taille = 24;
-if (end ($codes[1]) == 't') { // Teste le dernier code
-	$taille = intval (array_pop ($codes[2])) ?: $taille;
-	array_pop ($codes[1]); // Enlève ce code
-}
-
-// Traitement du premier code
-$base = array_shift ($codes[1]);
-if (!file_exists("bases/$base.svg"))
-	$base = '_404';
+// Traitement du premier attribut (nom de l'icône)
+$icone = $attributs[1][0];
+if (!file_exists("icones/$icone.svg"))
+	$icone = '_404';
 
 // Attributs par defaut
-$porte = $base;
+$taille = 24;
+$porte = $icone;
 $couleur1 = null;
 $couleur2 = null;
 
-// Pour les autres codes d'attributs
-foreach ($codes[1] AS $k=>$code) {
-	// Ascii a123.4.5 = caractère &#123; à la position x = 4, y = 5
-	$ascii = intval ($codes[2][$k+1]) ?: 32; // Extrait le code décimal
-	$x_ascii = $codes[3][$k+1] ? $codes[3][$k+1] : 7.6;
-	$y_ascii = $codes[4][$k+1] ? $codes[4][$k+1] : 21.5;
+// Pour les autres attributs
+foreach ($attributs[1] AS $k=>$attribut)
+	if ($k) { // le 0 est l'icône !
+		// Ascii a123.4.5 = caractère &#123; à la position x = 4, y = 5
+		if ($attribut == 'a') {
+			$ascii = intval ($attributs[2][$k]) ?: 32; // Extrait le code décimal
+			$x_ascii = $attributs[3][$k] ? $attributs[3][$k] : 7.6;
+			$y_ascii = $attributs[4][$k] ? $attributs[4][$k] : 21.5;
+		}
 
-	if (in_array ($code, ['a','eau','manqueunmur']))
-		$porte = false;
+		if (in_array ($attribut, ['a','eau','manqueunmur']))
+			$porte = false;
 
-	if (!file_exists("attributs/$code.svg")) {
-		$porte = false;
-		if (!$k) // Le premier code peut être la couleur de face
-			$couleur1 = $code;
-		$couleur2 = $code; // Le premier ou deuxième code peut être la couleur des toits et murs
+		if ($attribut == 't')
+			$taille = $attributs[2][$k];
+		else
+		if (!file_exists("attributs/$attribut.svg")) {
+			// Ça doit être une couleur
+			if ($k < 2) // Le premier attribut peut être la couleur de face
+				$couleur1 = $attribut;
+			$couleur2 = $attribut; // Le premier ou deuxième attribut peut être la couleur des toits et murs
+
+			$porte = false;
+		}
 	}
-}
+
+// Enlève le premier code qui est l'attribut
+array_shift ($attributs[1]);
 
 // Ajoute un attribut porte avant les autres
 if ($porte == 'cabane')
-	array_unshift ($codes[1], 'porte');
+	array_unshift ($attributs[1], 'porte');
 
 // Génération du fichier SVG
 header ('Content-type: image/svg+xml');
 //header ('Content-type: text/plain'); // Debug
 header ('Cache-Control: max-age=86000');
 header ('Access-Control-Allow-Origin: *');
-if ($base == '_404')
+if ($icone == '_404')
 	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
 
 include ('_head.svg');
-include ("bases/$base.svg");
+include ("icones/$icone.svg");
 
-if ($base != '_404')
-	foreach ($codes[1] AS $code)
-		if (file_exists("attributs/$code.svg")) {
+if ($icone != '_404')
+	foreach ($attributs[1] AS $attribut)
+		if (file_exists("attributs/$attribut.svg")) {
 			echo PHP_EOL; // Jolie mise en page du fichier .svg
-			include ("attributs/$code.svg");
+			include ("attributs/$attribut.svg");
 		}
 
 include ('_tail.svg');

@@ -1,8 +1,8 @@
 Cet utilitaire produit toutes les icônes SVG utilisées par les cartes
-/images/icones/debut-du-nom-<code>_<code>_<code>.svg ou .png
+/images/icones/debut-du-nom-<icone>_<code>_<code>.svg ou .png
 Chaque <code> désigne une forme élémentaire :
 
-Le premier est obligatoirement le nom complet de l'icône
+<icone> est obligatoirement le nom complet de l'icône
 	bus
 	cabane
 	camping
@@ -19,13 +19,14 @@ Un premier champ du nom d'une couleur CSS génère une icône en forme de bâtim
 	green (gîte)
 	red (refuge gardé)
 
-les suivants définissent les surcharges
+Les suivants définissent les surcharges
+	- Une première couleur CSS (facultative) qui est la couleur de l'icône. Défaut cabane
+	- Une deuxième couleur CSS (facultative) qui est la couleur du toit et des murs
+	- t123 (taille de l'icône 123*123 - défaut 24)
+	- a123.4.5 (caractère Ascii décimal &#123; à la position x = 4, y = 5)
+	- Le nom d'un attribut qui vient en surexposition de l'icône
 	cle
 	eau (petite goutte d'eau)
 	feu (cheminée et fumée)
 	manqueunmur
 	x (une grande croix noire)
-	a123 le caractère ascii 123 (en décimal)
-
-le dernier (facultatif)
-	t123 (taille de l'icône 123*123 - défaut 24)
