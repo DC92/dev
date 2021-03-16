@@ -23,6 +23,7 @@ function mySlider(id, slides, options) {
 		playTitle = options.playTitle || "Défilement",
 		stopTitle = options.stopTitle || "Pause",
 		downloadTitle = options.downloadTitle || "Télécharger l'image courante",
+		homeTitle = options.homeTitle || "Sortie du diaporama",
 		fullscreenTitle = options.fullscreenTitle || "Plein écran",
 		goToTitle = options.goToTitle || "Voir";
 	let currentSlideNb = -1,
@@ -84,6 +85,15 @@ function mySlider(id, slides, options) {
 					sliderExitFullScreen.call(document);
 			})
 		);
+
+	sliderJq.append(
+		$('<a class="myslider-home">')
+		.attr('title', homeTitle)
+		.click(function() {
+			if (typeof mysliderHome === "function")
+			mysliderHome();
+		})
+	);
 
 	document.addEventListener('keydown', function(evt) {
 		switch (evt.keyCode) {

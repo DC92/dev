@@ -49,16 +49,17 @@ class listener implements EventSubscriberInterface
 	}
 
 //TODO BUG n'affiche pas la première image au début du chargement (wait !)
-//TODO commande pour revenir au mode forum
-
 	function viewtopic_assign_template_vars_before($vars) {
+		$view = $this->request->variable ('view', 'diapo');
+
 		// Change template if '*slideshow' is in the forum descriptor
-		$this->my_template = $this->request->variable (
-			'template',
-			strpos ($vars['topic_data']['forum_desc'], '*slideshow')
-				? "@{$this->ns[0]}_{$this->ns[1]}/viewtopic.html"
-				: ''
-		);
+		if ($view == 'diapo')
+			$this->my_template = $this->request->variable (
+				'template',
+				strpos ($vars['topic_data']['forum_desc'], '*slideshow')
+					? "@{$this->ns[0]}_{$this->ns[1]}/viewtopic.html"
+					: ''
+			);
 	}
 
 	function page_footer($vars) {
