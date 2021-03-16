@@ -37,6 +37,9 @@ class listener implements EventSubscriberInterface
 			// Common
 			'core.common' => 'common',
 
+//TODO A SUPPRIMER
+			'core.viewforum_modify_page_title' => 'viewforum_modify_page_title',
+
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
@@ -48,6 +51,22 @@ class listener implements EventSubscriberInterface
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
 		];
+	}
+
+//TODO A SUPPRIMER
+	function viewforum_modify_page_title($vars) {
+		$forum_desc = $vars['forum_data']['forum_desc'];
+		$forum_desc = str_replace ('[first=point]</s><e>', '[first=point]</s>.point<e>', $forum_desc);
+		$forum_desc = str_replace ('[first=line]</s><e>', '[first=line]</s>.poly<e>', $forum_desc);
+		$forum_desc = str_replace ('[view=diapo]</s><e>', '[view=diapo]</s>*slideshow<e>', $forum_desc);
+		$forum_desc = addslashes ($forum_desc);
+
+		$forum_image = str_replace ('types_points', 'icones', $vars['forum_data']['forum_image']);
+		$forum_image = addslashes ($forum_image);
+
+		$sql = "UPDATE ".FORUMS_TABLE." SET forum_desc = \"$forum_desc\", forum_image = \"$forum_image\" WHERE forum_id = ".$vars['forum_data']['forum_id'];
+		$this->db->sql_query($sql);
+///*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($sql,true).'</pre>'.PHP_EOL;
 	}
 
 	/**
