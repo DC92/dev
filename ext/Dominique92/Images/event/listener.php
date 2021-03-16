@@ -114,6 +114,10 @@ class listener implements EventSubscriberInterface
 		if (!is_dir ('../cache/images/'))
 			mkdir ('../cache/images/');
 
+		// Cas des fichiers hérités de chem2
+		//TODO DELETE
+		$attachment ['real_filename'] = str_replace ('http://v2.chemineur.fr', 'chem2', $attachment ['real_filename']);
+
 		if (is_file('../'.$attachment['real_filename'])) // Fichier relatif à la racine du site
 			$attachment ['physical_filename'] = '../'.$attachment ['real_filename']; // script = download/file.php
 
