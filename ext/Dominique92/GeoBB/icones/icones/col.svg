@@ -1,2 +1,0 @@
-	<path d="M2 4 l6 6,8 0,6 -6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="<?=$couleur1?:'black'?>" fill="none" />
-	<path d="M2 20 l6 -6,8 0,6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="<?=$couleur1?:'black'?>" fill="none" />
