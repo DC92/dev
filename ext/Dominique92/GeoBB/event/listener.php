@@ -151,6 +151,8 @@ class listener implements EventSubscriberInterface
 		ADM
 	*/
 	function adm_page_header() {
+		//TODO ajouter geo_massif
+
 		// Create required SQL columns when needed
 		$result = $this->db->sql_query(
 			'SHOW columns FROM '.POSTS_TABLE.' LIKE "geom"'
