@@ -151,17 +151,9 @@ class listener implements EventSubscriberInterface
 		ADM
 	*/
 	function adm_page_header() {
-		//TODO ajouter geo_massif
-
-		// Create required SQL columns when needed
-		$result = $this->db->sql_query(
-			'SHOW columns FROM '.POSTS_TABLE.' LIKE "geom"'
-		);
-		if (!$this->db->sql_fetchrow($result))
-			$this->db->sql_query(
-				'ALTER TABLE '.POSTS_TABLE.' ADD geom geometrycollection'
-			);
-		$this->db->sql_freeresult($result);
+		$this->add_sql_column (POSTS_TABLE, 'geom', 'geometrycollection');
+		$this->add_sql_column (POSTS_TABLE, 'geo_massif', 'varchar(50)');
+		$this->add_sql_column (POSTS_TABLE, 'geo_altitude', 'varchar(12)');
 
 		//HACK (horrible !) to accept geom spatial feild
 		$file_name = $this->phpbb_root_path."phpbb/db/driver/driver.php";
@@ -170,5 +162,16 @@ class listener implements EventSubscriberInterface
 		$file_content = file_get_contents ($file_name);
 		if (strpos($file_content, '{'.$file_tag))
 			file_put_contents ($file_name, str_replace ('{'.$file_tag, '{'.$file_patch.$file_tag, $file_content));
+	}
+
+	function add_sql_column ($table, $column, $type) {
+		$result = $this->db->sql_query(
+			"SHOW columns FROM $table LIKE '$column'"
+		);
+		if (!$this->db->sql_fetchrow($result))
+			$this->db->sql_query(
+				"ALTER TABLE $table ADD $column $type"
+			);
+		$this->db->sql_freeresult($result);
 	}
 }

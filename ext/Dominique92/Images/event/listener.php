@@ -45,6 +45,9 @@ class listener implements EventSubscriberInterface
 
 			// Image resize
 			'core.download_file_send_to_browser_before' => 'download_file_send_to_browser_before',
+
+			// Adm
+			'core.adm_page_header' => 'adm_page_header',
 		];
 	}
 
@@ -202,5 +205,25 @@ class listener implements EventSubscriberInterface
 		}
 
 		$vars['attachment'] = $attachment;
+	}
+
+	/**
+		ADM
+	*/
+	function adm_page_header() {
+		$this->add_sql_column (POSTS_TABLE, 'sort', 'varchar(8)');
+		$this->add_sql_column (ATTACHMENTS_TABLE, 'sort', 'varchar(8)');
+		$this->add_sql_column (ATTACHMENTS_TABLE, 'exif', 'text');
+	}
+
+	function add_sql_column ($table, $column, $type) {
+		$result = $this->db->sql_query(
+			"SHOW columns FROM $table LIKE '$column'"
+		);
+		if (!$this->db->sql_fetchrow($result))
+			$this->db->sql_query(
+				"ALTER TABLE $table ADD $column $type"
+			);
+		$this->db->sql_freeresult($result);
 	}
 }
