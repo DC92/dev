@@ -1,8 +1,8 @@
 {
-	"name": "Dominique92/StylesViews",
+	"name": "Dominique92/Chemineur",
 	"type": "phpbb-extension",
-	"description": "This extension StylesViews",
-	"homepage": "https://github.com/Dominique92/GeoBB",
+	"description": "Style de chemineur.fr",
+	"homepage": "https://github.com/Dominique92/",
 	"version": "1.0.1",
 	"time": "2016-03-27",
 	"license": "GPL-2.0",
@@ -18,7 +18,7 @@
 		"composer/installers": "~1.0"
 	},
 	"extra": {
-		"display-name": "OBSOLETE Styles & Views",
+		"display-name": "Style Chemineur",
 		"soft-require": {
 			"phpbb/phpbb": ">=3.1.0,<3.2.*@dev"
 		}
