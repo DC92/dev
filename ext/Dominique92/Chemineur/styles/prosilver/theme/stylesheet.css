@@ -16,10 +16,11 @@
 			.file-inline-bbcode,
 }/***************************************************************************/
 			.action-bar,
-			.rightside,
 			.time,
 			.stat-block,
 			.footer-row,
+			.breadcrumbs .icon,
+			.nav-main,
 			#page-footer .navbar {
 				display: none !important;
 			}
