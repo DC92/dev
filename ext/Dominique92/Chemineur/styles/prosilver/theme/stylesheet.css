@@ -15,7 +15,12 @@
 			.submit-buttons input[name="preview"],
 			.file-inline-bbcode,
 }/***************************************************************************/
-			.action-bar {
+			.action-bar,
+			.rightside,
+			.time,
+			.stat-block,
+			.footer-row,
+			#page-footer .navbar {
 				display: none !important;
 			}
 @media print{/***************************************************************/
@@ -162,7 +167,7 @@ body, html,
 
 /* Carte */
 #map {
-	margin: 6px 10px 0 5px !important;
+	margin: 10px !important;
 	height: 380px;
 	width: 50vw !important;
 	height: 50vw !important;
