@@ -64,8 +64,5 @@ if(0)//TODO
 				$this->ext_path.'styles',
 				'styles', // core styles
 			]);
-
-		// Assign requested template
-		$this->template->assign_var ('EXT_PATH', $this->ext_path);
 	}
 }

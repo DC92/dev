@@ -53,8 +53,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	function page_header() {
-		$this->template->assign_var ('EXT_PATH', $this->ext_path);
-
 		$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
 		$result = $this->db->sql_query($sql);
 		$attachments = $update_count_ary = [];

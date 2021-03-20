@@ -91,7 +91,6 @@ function twig_environment_render_template_after($vars) {
 			]);
 
 		// Assign requested template
-		$this->template->assign_var ('EXT_PATH', $this->ext_path);
 		foreach ($this->args AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
