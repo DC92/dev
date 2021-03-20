@@ -47,6 +47,9 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 			'core.page_header' => 'page_header',
+
+			// Index
+			'core.index_modify_page_title' => 'index_modify_page_title',
 		];
 	}
 
@@ -64,5 +67,43 @@ if(0)//TODO
 				$this->ext_path.'styles',
 				'styles', // core styles
 			]);
+	}
+
+	// Affiche les post les plus récents sur la page d'accueil
+	function index_modify_page_title ($vars) {
+		global $auth; // DCMM intégrer aux variables du listener ($this->auth)
+
+		$nouvelles = request_var ('nouvelles', 20);
+		$this->template->assign_var ('PLUS_NOUVELLES', $nouvelles * 2);
+
+		$sql = "
+			SELECT t.topic_id, topic_title,
+				t.forum_id, forum_name, forum_image,
+				topic_first_post_id, post_id, post_attachment, topic_posts_approved,
+				username, poster_id, post_time, post_attachment, geo_massif
+			FROM	 ".TOPICS_TABLE." AS t
+				JOIN ".FORUMS_TABLE." AS f USING (forum_id)
+				JOIN ".POSTS_TABLE ." AS p ON (p.post_id = t.topic_last_post_id)
+				JOIN ".USERS_TABLE."  AS u ON (p.poster_id = u.user_id)
+			WHERE post_visibility = ".ITEM_APPROVED."
+			ORDER BY post_time DESC
+			LIMIT ".$nouvelles;
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			if ($auth->acl_get('f_read', $row['forum_id'])) {
+				$row ['topic_comments'] = $row['topic_posts_approved'] - 1;
+				$row ['post_time'] = $this->user->format_date ($row['post_time']);
+				$row ['geo_massif'] = str_replace ('~', '', $row ['geo_massif']);
+				$this->template->assign_block_vars('nouvelles', array_change_key_case ($row, CASE_UPPER));
+			}
+		$this->db->sql_freeresult($result);
+
+		// Affiche un message de bienvenu dépendant du style pour ceux qui ne sont pas connectés
+		// Le texte de ces messages sont dans les posts dont le titre est !style
+		$sql = "SELECT post_text,bbcode_uid,bbcode_bitfield FROM ".POSTS_TABLE." WHERE post_subject LIKE '!{$this->user->style['style_name']}'";
+		$result = $this->db->sql_query($sql);
+		$row = $this->db->sql_fetchrow($result);
+		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
+		$this->db->sql_freeresult($result);
 	}
 }
