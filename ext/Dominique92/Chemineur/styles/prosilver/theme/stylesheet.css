@@ -15,13 +15,12 @@
 			.submit-buttons input[name="preview"],
 			.file-inline-bbcode,
 }/***************************************************************************/
-.logo,
-.action-bar,
 .time,
 .stat-block,
 .footer-row,
 .breadcrumbs .icon,
 .nav-main,
+.headerspace,
 #page-footer .navbar {
 	display: none !important;
 }
@@ -42,11 +41,11 @@
 }/***************************************************************************/
 /* Ecrase le style de base */
 body, html,
-#page-footer {
+.page-footer {
 	padding: 0;
 	background-color: white;
 }
-#wrap {
+.wrap {
 	border: 0;
 	max-width: 100%;
 	padding: 0 !important;
@@ -112,8 +111,12 @@ body, html,
 .navbar {
 	position: absolute;
 	top: 43px;
+	right: 0;
 	width: 100%;
 	background-color: transparent;
+}
+.navbar .nav-breadcrumbs {
+	margin-left: 10px;
 }
 .navbar .nav-breadcrumbs li {
 	background-color: #fe0;
@@ -221,12 +224,12 @@ body, html,
 	color: yellow !important;
 }
 
-@media print{/***************************************************************/
+/* Points */
+.section-viewtopic .wrap {
+	background: url('images/pierre.jpg'); 
+}
 
-			/* Points */
-			.section-viewtopic.view-point #wrap {
-				background: url('images/pierre.jpg'); 
-			}
+@media print{/***************************************************************/
 
 			/* Cadres d'affichage */
 			#etiquette {
