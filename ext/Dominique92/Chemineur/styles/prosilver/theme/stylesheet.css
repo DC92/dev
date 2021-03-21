@@ -67,6 +67,9 @@ body, html,
 }
 
 /* Bandeau */
+#page-header {
+	margin-bottom: 20px;
+}
 .headerbar {
 	background-image: url("images/banniere.jpg");
 	height: 60px;
@@ -107,12 +110,10 @@ body, html,
 
 /* Menu */
 .navbar {
-	position: relative;
-	top: -20px;
+	position: absolute;
+	top: 43px;
+	width: 100%;
 	background-color: transparent;
-}
-.navbar .nav-breadcrumbs {
-	border: none;
 }
 .navbar .nav-breadcrumbs li {
 	background-color: #fe0;
@@ -126,7 +127,12 @@ body, html,
 	font-weight: normal;
 	color: black !important;
 }
+.dropdown-contents {
+	max-height: initial !important;
+}
+.navbar .nav-breadcrumbs,
 .dropdown ul {
+	border: 0 !important;
 	padding: 0 !important;
 }
 
