@@ -1,10 +1,24 @@
-<!-- IF S_REGISTERED_USER -->
-	<li id="username_logged_in" class="rightside <!-- IF CURRENT_USER_AVATAR --> no-bulletin<!-- ENDIF -->" data-skip-responsive="true">
-		<div class="header-profile dropdown-container">
-			<a href="{U_PROFILE}" class="header-avatar dropdown-trigger"><!-- IF CURRENT_USER_AVATAR -->{CURRENT_USER_AVATAR} <!-- ENDIF --> {CURRENT_USERNAME_SIMPLE}</a>
+<!-- IF not S_REGISTERED_USER -->
+	<li class="rightside"  data-skip-responsive="true">
+		<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x" role="menuitem">
+			<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
+		</a>
+	</li>
+	<!-- IF S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) -->
+		<li class="rightside" data-skip-responsive="true">
+			<a href="{U_REGISTER}" role="menuitem">
+				<i class="icon fa-pencil-square-o  fa-fw" aria-hidden="true"></i><span>{L_REGISTER}</span>
+			</a>
+		</li>
+	<!-- ENDIF -->
+
+<!-- ELSE IF not S_IS_BOT -->
+	<!-- Menu déroulant connexion et fonctions users -->
+	<li id="username_logged_in" class="rightside" data-skip-responsive="true">
+		<div class="dropdown-container">
+			<a class="header-avatar">{CURRENT_USERNAME_SIMPLE}</a>
 			<div class="dropdown">
-				<div class="pointer"><div class="pointer-inner"></div></div>
-				<ul class="dropdown-contents" role="menu">
+				<ul class="dropdown-contents">
 					<!-- IF U_RESTORE_PERMISSIONS -->
 						<li>
 							<a href="{U_RESTORE_PERMISSIONS}">
@@ -18,6 +32,7 @@
 							<i class="icon fa-sliders fa-fw" aria-hidden="true"></i><span>{L_PROFILE}</span>
 						</a>
 					</li>
+
 					<!-- IF U_USER_PROFILE -->
 						<li>
 							<a href="{U_USER_PROFILE}" title="{L_READ_PROFILE}" role="menuitem">
@@ -36,13 +51,28 @@
 
 					<!-- IF S_NOTIFICATIONS_DISPLAY -->
 						<li class="dropdown-container dropdown-{S_CONTENT_FLOW_END} rightside" data-skip-responsive="true">
-							<a href="{U_VIEW_ALL_NOTIFICATIONS}" id="notification_list_button" class="dropdown-trigger">
+							<a href="{U_VIEW_ALL_NOTIFICATIONS}" id="notification_list_button">
 								<i class="icon fa-bell fa-fw" aria-hidden="true"></i><span>{L_NOTIFICATIONS} </span><strong class="badge<!-- IF not NOTIFICATIONS_COUNT --> hidden<!-- ENDIF -->">{NOTIFICATIONS_COUNT}</strong>
 							</a>
 						</li>
 					<!-- ENDIF -->
 
-					<li class="separator"></li>
+					<!-- IF U_MCP -->
+						<li data-last-responsive="true">
+							<a href="{U_MCP}" title="{L_MCP}" role="menuitem">
+								<i class="icon fa-gavel fa-fw" aria-hidden="true"></i><span>Modération</span>
+							</a>
+						</li>
+					<!-- ENDIF -->
+
+					<!-- IF U_ACP -->
+						<li data-last-responsive="true">
+							<a href="{U_ACP}" title="{L_ACP}" role="menuitem">
+								<i class="icon fa-cogs fa-fw" aria-hidden="true"></i><span>Administration</span>
+							</a>
+						</li>
+					<!-- ENDIF -->
+
 					<li>
 						<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x" role="menuitem">
 							<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
@@ -52,25 +82,28 @@
 			</div>
 		</div>
 	</li>
-<!-- ELSE IF not S_IS_BOT -->
-	<li class="rightside"  data-skip-responsive="true">
-		<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x" role="menuitem">
-			<i class="icon fa-power-off fa-fw" aria-hidden="true"></i><span>{L_LOGIN_LOGOUT}</span>
-		</a>
-	</li>
-	<!-- IF S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) -->
-		<li class="rightside" data-skip-responsive="true">
-			<a href="{U_REGISTER}" role="menuitem">
-				<i class="icon fa-pencil-square-o  fa-fw" aria-hidden="true"></i><span>{L_REGISTER}</span>
-			</a>
-		</li>
-	<!-- ENDIF -->
-<!-- ENDIF -->
 
-<!-- IF U_ACP -->
-	<li data-last-responsive="true" style="float:right">
-		<a href="{U_ACP}" title="{L_ACP}" role="menuitem">
-			<i class="icon fa-cogs fa-fw" aria-hidden="true"></i><span>{L_ACP_SHORT}</span>
-		</a>
+	<!-- Menu déroulant "Ajouter..." -->
+	<!-- IF .geo_categories -->
+	<li class="rightside" data-skip-responsive="true">
+		<div class="dropdown-container">
+			<a class="header-avatar">
+				<span>Ajouter</span>
+			</a>
+			<div class="dropdown">
+				<ul class="dropdown-contents">
+					<!-- BEGIN geo_categories -->
+						<!-- IF geo_categories.FIRST_FORUM_ID -->
+							<li>
+								<a href="posting.php?mode=post&amp;f={geo_categories.FIRST_FORUM_ID}">
+									{geo_categories.CATEGORY_NAME}
+								</a>
+							</li>
+						<!-- ENDIF -->
+					<!-- END geo_categories -->
+				</ul>
+			</div>
+		</div>
 	</li>
+	<!-- ENDIF -->
 <!-- ENDIF -->

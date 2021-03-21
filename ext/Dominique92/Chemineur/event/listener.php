@@ -57,16 +57,41 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
-		// Includes language and style files of this extension
-//TODO		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+		// Liste des catégories de points à ajouter
+		$sql = "
+			SELECT p.forum_id AS category_id,
+				p.forum_name AS category_name,
+				f.forum_id AS first_forum_id,
+				f.forum_desc
+			FROM ".FORUMS_TABLE." AS f
+			JOIN ".FORUMS_TABLE." AS p ON p.forum_id = f.parent_id
+			WHERE f.forum_type = ".FORUM_POST."
+				AND p.forum_type = ".FORUM_CAT."
+				AND p.parent_id = 0
+			ORDER BY f.left_id
+		";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			if (!@$cat[$row['category_id']]++) // Seulement une fois par catégorie
+				$this->template->assign_block_vars (
+					'geo_categories',
+					array_change_key_case (
+						preg_replace ('/s( |$)/i', '$1', $row), // Enlève les s en fin de mot
+						CASE_UPPER
+					)
+				);
+		$this->db->sql_freeresult($result);
 
-		// Includes style files of this extension
-if(0)//TODO
-		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-			$this->template->set_style ([
-				$this->ext_path.'styles',
-				'styles', // core styles
-			]);
+										// Includes language and style files of this extension
+								//TODO		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+
+										// Includes style files of this extension
+								if(0)//TODO
+										if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+											$this->template->set_style ([
+												$this->ext_path.'styles',
+												'styles', // core styles
+											]);
 	}
 
 	// Affiche les post les plus récents sur la page d'accueil

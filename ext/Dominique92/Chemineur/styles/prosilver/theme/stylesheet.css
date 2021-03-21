@@ -15,15 +15,16 @@
 			.submit-buttons input[name="preview"],
 			.file-inline-bbcode,
 }/***************************************************************************/
-			.action-bar,
-			.time,
-			.stat-block,
-			.footer-row,
-			.breadcrumbs .icon,
-			.nav-main,
-			#page-footer .navbar {
-				display: none !important;
-			}
+.logo,
+.action-bar,
+.time,
+.stat-block,
+.footer-row,
+.breadcrumbs .icon,
+.nav-main,
+#page-footer .navbar {
+	display: none !important;
+}
 @media print{/***************************************************************/
 			/* Affichage état de l'émetteur d'un post */
 			.postbody {
@@ -64,29 +65,22 @@ body, html,
 	position: relative;
 	top: 8px;
 }
-@media print{/***************************************************************/
-
-			.dropdown {
-				z-index: 1000 !important;
-			}
-
-}/***************************************************************************/
 
 /* Bandeau */
 .headerbar {
 	background-image: url("images/banniere.jpg");
 	height: 60px;
-	margin: 0 !important;
+	margin: 0;
 	padding: 0;
 	border-radius: 0;
 }
 .site-description h1 {
-	margin: 0;
+	wmargin: 0;
 }
 .site-description a {
-	display: inline;
-	color: white;
-	text-decoration: none;
+	wwdisplay: inline;
+	qcolor: white;
+	stext-decoration: none;
 }
 .logo,
 #search-box {
@@ -111,34 +105,32 @@ body, html,
 	font-size: 1.5em;
 }
 
+/* Menu */
+.navbar {
+	position: relative;
+	top: -20px;
+	background-color: transparent;
+}
+.navbar .nav-breadcrumbs {
+	border: none;
+}
+.navbar .nav-breadcrumbs li {
+	background-color: #fe0;
+	border: 3px outset #dc0;
+	padding: 1px 5px;
+	cursor: pointer;
+}
+.navbar span,
+.navbar a {
+	font-size: 12px;
+	font-weight: normal;
+	color: black !important;
+}
+.dropdown ul {
+	padding: 0 !important;
+}
+
 @media print{/***************************************************************/
-			/* Menu */
-			/* Specifique chemineur (La base est dans ext/D./Barmenu) */
-			#menu.horizontal {
-				background-color: transparent !important;
-				font-weight: normal !important;
-			}
-			#menu.horizontal > li {
-				margin-top: -16px !important;
-				color: #000 !important;
-				background-color: #fe0 !important;
-				border: 3px outset #dc0 !important;
-			}
-			#menu.horizontal > li:hover {
-				height: 19px;
-			}
-			#menu.horizontal li:hover ul {
-				background-color: #fe0 !important;
-				border: 3px outset #dc0 !important;
-				margin: 8px -3px -3px -4px !important;
-			}
-			#menu.horizontal a {
-				color: #0000ff !important;
-				text-decoration: none;
-			}
-			#menu.horizontal a:hover {
-				background-color: orange;
-			}
 
 			.bouton-new-comment {
 				background-color: #fe0;
@@ -185,10 +177,6 @@ body, html,
 	}
 }
 
-@media print{/***************************************************************/
-
-}/***************************************************************************/
-
 /* Accueil index.php */
 #nouvelles .bg1 {
 	clear: none;
@@ -226,6 +214,7 @@ body, html,
 #more-news a {
 	color: yellow !important;
 }
+
 @media print{/***************************************************************/
 
 			/* Points */
