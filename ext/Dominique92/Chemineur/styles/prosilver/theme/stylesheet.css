@@ -15,6 +15,8 @@
 			.submit-buttons input[name="preview"],
 			.file-inline-bbcode,
 }/***************************************************************************/
+
+.section-index .action-bar,
 .time,
 .stat-block,
 .footer-row,
@@ -167,25 +169,6 @@ body, html,
 	text-transform: capitalize;
 }
 
-/* Carte */
-#map {
-	margin: 10px !important;
-	height: 380px;
-	width: 50vw !important;
-	height: 50vw !important;
-	max-width: 80vw;
-	max-height: 90vh;
-	float: right;
-	background-color: #CDD9B5 !important;
-	background-image: url(images/alt_carte.jpg);
-	background-repeat: repeat-x;
-}
-@media screen and (max-width: 700px) {
-	#map {
-		margin: 0;
-	}
-}
-
 /* Accueil index.php */
 #nouvelles .bg1 {
 	clear: none;
@@ -224,77 +207,93 @@ body, html,
 	color: yellow !important;
 }
 
+/* Carte */
+#map {
+	margin: 10px;
+}
+@media screen and (max-width: 600px) {
+	#map {
+		margin: 0 !important;
+		width: 100% !important;
+	}
+}
+
 /* Points */
 .section-viewtopic .wrap {
 	background: url('images/pierre.jpg'); 
 }
+.section-viewtopic .post {
+	clear: both;
+}
+.section-viewtopic .bar-top {
+	display: none;
+}
 
+/* Cadres d'affichage */
+.section-viewtopic .topic-title,
+.section-viewtopic .map-coords {
+	display: none;
+}
+#etiquette {
+	margin: 20px 10px;
+}
+@media screen and (max-width: 600px) {
+	#etiquette {
+		margin: 0 !important;
+		width: 100% !important;
+	}
+}
+
+#etiquette td {
+	padding: 0;
+}
+#etiquette .hg, #etiquette .hd, #etiquette .bg, #etiquette .bd {
+	height: 36px;
+	min-width: 36px;
+	background: url('cadres/etiquette_bg.png');
+}
+#etiquette .hm, #etiquette .bm {
+	background: url('cadres/etiquette_v.png');
+	text-align: right;
+}
+#etiquette .md {
+	vertical-align: bottom;
+}
+#etiquette .md img {
+	position: relative; right: -27px; bottom: -5px;
+}
+#etiquette .mg, #etiquette .md {
+	background: url('cadres/etiquette_h.png');
+}
+#etiquette .hd {
+	background-position: right top;
+}
+#etiquette .bg {
+	height: 0;
+	background-position: left bottom;
+}
+#etiquette .bd, #etiquette .md, #etiquette .bm {
+	background-position: right bottom;
+}
+#etiquette .mm {
+	background-color: white;
+}
+#etiquette h1 {
+	color: #105289;
+	margin-right: 0;
+	margin-top: 0;
+}
+#etiquette h1 span {
+	color: #105289;
+	font-size: 0.8em;
+}
+#etiquette h3,
+#etiquette .action-bar {
+	text-transform: none;
+	font-size: 1em;
+	padding: 0 2px;
+}
 @media print{/***************************************************************/
-
-			/* Cadres d'affichage */
-			#etiquette {
-				position: relative; top: 30px;
-				margin-left: auto;
-				margin-right: auto;
-				margin-bottom: 20px;
-				border-spacing: 0;
-			}
-			@media screen and (max-width: 600px) {
-				#etiquette {
-					width: 100%;
-			top: 0;
-				}
-			}
-
-			#etiquette td {
-				padding: 0;
-			}
-			#etiquette .hg, #etiquette .hd, #etiquette .bg, #etiquette .bd {
-				height: 36px;
-				min-width: 36px;
-				background: url('cadres/etiquette_bg.png');
-			}
-			#etiquette .hm, #etiquette .bm {
-				background: url('cadres/etiquette_v.png');
-				text-align: right;
-			}
-			#etiquette .md {
-				vertical-align: bottom;
-			}
-			#etiquette .md img {
-				position: relative; right: -27px; bottom: -5px;
-			}
-			#etiquette .mg, #etiquette .md {
-				background: url('cadres/etiquette_h.png');
-			}
-			#etiquette .hd {
-				background-position: right top;
-			}
-			#etiquette .bg {
-				height: 0;
-				background-position: left bottom;
-			}
-			#etiquette .bd, #etiquette .md, #etiquette .bm {
-				background-position: right bottom;
-			}
-			#etiquette .mm {
-				background-color: white;
-			}
-			#etiquette h1 {
-				color: #105289;
-				margin-right: 0;
-				margin-top: 0;
-			}
-			#etiquette h1 span {
-				color: #105289;
-				font-size: 0.8em;
-			}
-			#etiquette h3,
-			#etiquette .action-bar {
-				text-transform: none;
-				font-size: 1em;
-				padding: 0 2px;
-			}
 
 			/* Liens externes */
 			.geo_ref {
