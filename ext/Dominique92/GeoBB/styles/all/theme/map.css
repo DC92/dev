@@ -1,5 +1,8 @@
 #map {
-	width: 100%;
-	height: 60vw;
-	background: grey;
+	float: right;
+	width: 50%;
+	background: linear-gradient (#9ab4cb, #cdd9b5);
+}
+.ol-viewport {
+	padding-bottom: 100%;
 }

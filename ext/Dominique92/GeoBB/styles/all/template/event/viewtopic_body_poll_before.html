@@ -1,34 +1,3 @@
 <!-- IF GEOJSON -->
-	<!-- Polyfill iOS -->
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-	<!-- Openlayers -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
-
-	<!-- Recherche par nom -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.js -->
-
-	<!-- Proj4 projections Swiss & UK -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
-
-	<!-- My Openlayers -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
-
-	<!-- This map -->
-	<!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
-	<!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
-
-	<script>
-		var mapType = 'view',
-			mapKeys = {MAP_KEYS};
-	</script>
-
-	<div id="map"></div>
-
-	<input type="hidden" id="cadre-json" value='{GEOJSON}' />
 	<p id="cadre-coords"></p>
 <!-- ENDIF -->
