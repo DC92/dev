@@ -318,8 +318,13 @@ body, html,
 				position: relative;
 				top: 6px;
 			}
+}/***************************************************************/
 
-			/* Postits */
+/* Posts des points */
+.section-viewtopic.geobb_point .post {
+	display: none;
+}
+/*
 			.point-post {
 				width: 100%;
 			}
@@ -330,132 +335,136 @@ body, html,
 			.point-post table {
 				margin-left: auto; margin-right: auto;
 			}
+*/
 
-			.postit {
-				border-spacing: 0;
-			}
-			.postit td {
-				padding: 0 !important;
-			}
-			.postit .hg, .postit .hd, .postit .bg, .postit .bd {
-				height: 2px; min-width: 2px;
-				background: url('cadres/postit_bg.png');
-			}
-			.postit .bd {
-				height: 32px; min-width: 32px;
-			}
-			.postit .md {
-				vertical-align: bottom;
-			}
-			.postit .md img {
-				position: relative; right: -20px; bottom: -5px;
-			}
-			.postit .hm, .postit .bm {
-				background: url('cadres/postit_v.png');
-				text-align: right;
-				font-family: Arial;
-				font-size: 0.8em;
-			}
-			.postit .mg, .postit .md {
-				background: url('cadres/postit_h.png');
-			}
-			.postit .hd {
-				background-position: right top;
-			}
-			.postit .bg {
-				background-position: left bottom;
-			}
-			.postit .bd, .postit .md, .postit .bm {
-				background-position: right bottom;
-			}
-			.postit .mm {
-				background-color: #F3E358;
-			}
-			.postit .mm p {
-				position: relative; left: 12px; top: 5px;
-				font-family: Arial;
-				font-size: 1em;
-				color: #210;
-				text-indent: 10px;
-				margin-bottom: 0;
-			}
-			.postit .mm .titre {
-				font-size: 1.3em;
-				font-weight: bold;
-			}
-			.postit .bm p {
-				font-size: 0.8em;
-				float:right;
-				position: relative; left: 10px;
-			}
+/* Postits */
+.postit {
+	clear: both;
+	border-spacing: 0;
+}
+.postit td {
+	padding: 0 !important;
+}
+.postit .hg, .postit .hd, .postit .bg, .postit .bd {
+	height: 2px; min-width: 2px;
+	background: url('cadres/postit_bg.png');
+}
+.postit .bd {
+	height: 32px; min-width: 32px;
+}
+.postit .md {
+	vertical-align: bottom;
+}
+.postit .md img {
+	position: relative; right: -20px; bottom: -5px;
+}
+.postit .hm, .postit .bm {
+	background: url('cadres/postit_v.png');
+	text-align: right;
+	font-family: Arial;
+	font-size: 0.8em;
+}
+.postit .mg, .postit .md {
+	background: url('cadres/postit_h.png');
+}
+.postit .hd {
+	background-position: right top;
+}
+.postit .bg {
+	background-position: left bottom;
+}
+.postit .bd, .postit .md, .postit .bm {
+	background-position: right bottom;
+}
+.postit .mm {
+	background-color: #F3E358;
+}
+.postit .mm p {
+	position: relative; left: 12px; top: 5px;
+	font-family: Arial;
+	font-size: 1em;
+	color: #210;
+	text-indent: 10px;
+	margin-bottom: 0;
+}
+.postit .mm .titre {
+	font-size: 1.3em;
+	font-weight: bold;
+}
+.postit .bm p {
+	font-size: 0.8em;
+	float:right;
+	position: relative; left: 10px;
+}
 
-			/* Photos */
-			.photo {
-				border-spacing: 0;
-				margin: 5px 0;
-			}
-			.photo td {
-				padding: 0 !important;
-			}
-			.photo .hg, .photo .hd, .photo .bg, .photo .bd {
-				height: 10px; min-width: 10px;
-				background: url('cadres/photo_bg.png');
-			}
-			.photo .bd {
-				height: 14px; min-width: 14px;
-			}
-			.photo .hm, .photo .bm {
-				background: url('cadres/photo_v.png');
-			}
-			.photo .bd p {
-				height: 12px;
-				position: relative;
-				top: -12px;
-				left: -10px;
-			}
-			.photo .md {
-				vertical-align: bottom;
-			}
-			.photo .md img {
-				position: relative; top: -3px; right: -5px;
-			}
-			.photo .mm {
-				line-height: 0; /* Sinon, le bord inférieur de la photo à un gap de 2px */
-			}
-			.photo .mg, .photo .md {
-				background: url('cadres/photo_h.png');
-			}
-			.photo .hd {
-				background-position: right top;
-			}
-			.photo .bg {
-				background-position: left bottom;
-			}
-			.photo .bd, .photo .md, .photo .bm {
-				background-position: right bottom;
-			}
-			.photo .hm p, .photo .bm p  {
-				font-family: Verdana;
-				color: #a00;
-				font-size: 0.8em;
-			}
-			.photo .hm p {
-				font-weight: bold;
-				position: relative; left: -5px;
-				margin: 0;
-			}
-			.photo .bm p {
-				text-align: right;
-				position: relative; top: -2px; right: 10px;
-				margin: 2px;
-			}
-			.photo-comment {
-				margin: 10px;
-			}
-			.photo-comment span {
-				background-color: #fff;
-				padding: 3px;
-			}
+/* Photos */
+.photo {
+	border-spacing: 0;
+	margin: 5px 0;
+}
+.photo td {
+	padding: 0 !important;
+}
+.photo .hg, .photo .hd, .photo .bg, .photo .bd {
+	height: 10px; min-width: 10px;
+	background: url('cadres/photo_bg.png');
+}
+.photo .bd {
+	height: 14px; min-width: 14px;
+}
+.photo .hm, .photo .bm {
+	background: url('cadres/photo_v.png');
+}
+.photo .bd p {
+	height: 12px;
+	position: relative;
+	top: -12px;
+	left: -10px;
+}
+.photo .md {
+	vertical-align: bottom;
+}
+.photo .md img {
+	position: relative; top: -3px; right: -5px;
+}
+.photo .mm {
+	line-height: 0; /* Sinon, le bord inférieur de la photo à un gap de 2px */
+}
+.photo .mg, .photo .md {
+	background: url('cadres/photo_h.png');
+}
+.photo .hd {
+	background-position: right top;
+}
+.photo .bg {
+	background-position: left bottom;
+}
+.photo .bd, .photo .md, .photo .bm {
+	background-position: right bottom;
+}
+.photo .hm p, .photo .bm p  {
+	font-family: Verdana;
+	color: #a00;
+	font-size: 0.8em;
+}
+.photo .hm p {
+	font-weight: bold;
+	position: relative; left: -5px;
+	margin: 0;
+}
+.photo .bm p {
+	text-align: right;
+	position: relative; top: -2px; right: 10px;
+	margin: 2px;
+}
+.photo-comment {
+	margin: 10px;
+}
+.photo-comment span {
+	background-color: #fff;
+	padding: 3px;
+}
+@media print{/***************************************************************/
 
 			.headerspace {
 				background-color: #ECF3F7;

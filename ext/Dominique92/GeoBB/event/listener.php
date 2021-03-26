@@ -104,6 +104,7 @@ class listener implements EventSubscriberInterface
 				'GEOJSON' => $row['geojson'],
 				'MAP_TYPE' => $params[2],
 				'BODY_CLASS' => 'geobb geobb_'.$params[2],
+				'TOPIC_FIRST_POST_ID' => $this->topic_data['topic_first_post_id'],
 			]);
 	}
 
@@ -123,7 +124,7 @@ class listener implements EventSubscriberInterface
 				$params[1] == ':' || // Map on all posts
 				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
 			))
-			$this->template->assign_var ([
+			$this->template->assign_vars ([
 				'MAP_TYPE', $params[2],
 				'BODY_CLASS' => 'geobb geobb_'.$params[2],
 			]);
