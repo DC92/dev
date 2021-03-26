@@ -50,6 +50,10 @@ class listener implements EventSubscriberInterface
 
 			// Index
 			'core.index_modify_page_title' => 'index_modify_page_title',
+
+			// Viewtopic
+			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
+			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 		];
 	}
 
@@ -94,9 +98,12 @@ class listener implements EventSubscriberInterface
 											]);
 	}
 
+	/**
+		INDEX.PHP
+	*/
 	// Affiche les post les plus récents sur la page d'accueil
 	function index_modify_page_title ($vars) {
-		global $auth; // DCMM intégrer aux variables du listener ($this->auth)
+		global $auth; //BEST intégrer aux variables du listener ($this->auth)
 
 		$nouvelles = request_var ('nouvelles', 20);
 		$this->template->assign_var ('PLUS_NOUVELLES', $nouvelles * 2);
@@ -130,5 +137,22 @@ class listener implements EventSubscriberInterface
 		$row = $this->db->sql_fetchrow($result);
 		$this->template->assign_var ('GEO_PRESENTATION', generate_text_for_display($row['post_text'], $row['bbcode_uid'], $row['bbcode_bitfield'], OPTION_FLAG_BBCODE, true));
 		$this->db->sql_freeresult($result);
+	}
+
+	/**
+		VIEWTOPIC.PHP
+	*/
+	// Appelé avant la requette SQL qui récupère les données des posts
+	function viewtopic_get_post_data($vars) {
+		$this->topic_data = $vars['topic_data'];
+	}
+
+	// Called during first pass on post data that read phpbb-posts SQL data
+	function viewtopic_post_rowset_data($vars) {
+		// Assign the phpbb-posts.geo* SQL data of the first post to the template
+		foreach ($vars['row'] AS $k=>$v)
+			if (strpos ($k,'geo_') === 0 &&
+				$this->topic_data['topic_first_post_id'] == $vars['row']['post_id'])
+				$this->template->assign_var (strtoupper ($k), $v);
 	}
 }
