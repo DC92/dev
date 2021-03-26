@@ -2279,7 +2279,7 @@ function layerGeoJson(options) {
 			const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
 				formats = {
 					decimal: ['Degrés décimaux', 'EPSG:4326', 'format',
-						'Longitude: {x}, Latitude: {y} (WGS84)',
+						'Longitude: {x}, Latitude: {y}',
 						5
 					],
 					degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],

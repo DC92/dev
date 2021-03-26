@@ -100,7 +100,11 @@ class listener implements EventSubscriberInterface
 				$row['post_id'] == $this->topic_data['topic_first_post_id'] // Only map on the first post
 			))
 			//TODO BUG devrait zoomer sur la totalité des features, au lieu seulement du dernier
-			$this->template->assign_var ('GEOJSON', $row['geojson']);
+			$this->template->assign_vars ([
+				'GEOJSON' => $row['geojson'],
+				'MAP_TYPE' => $params[2],
+				'BODY_CLASS' => 'geobb geobb_'.$params[2],
+			]);
 	}
 
 	/**
@@ -119,7 +123,10 @@ class listener implements EventSubscriberInterface
 				$params[1] == ':' || // Map on all posts
 				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
 			))
-			$this->template->assign_var ('MAP_TYPE', $params[2]);
+			$this->template->assign_var ([
+				'MAP_TYPE', $params[2],
+				'BODY_CLASS' => 'geobb geobb_'.$params[2],
+			]);
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {

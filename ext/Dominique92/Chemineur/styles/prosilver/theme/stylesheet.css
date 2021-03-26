@@ -219,21 +219,19 @@ body, html,
 }
 
 /* Points */
-.section-viewtopic .wrap {
+.section-viewtopic.geobb .wrap {
 	background: url('images/pierre.jpg'); 
 }
-.section-viewtopic .post {
+.section-viewtopic.geobb .post {
 	clear: both;
 }
-.section-viewtopic .bar-top {
+.section-viewtopic.geobb .bar-top,
+.section-viewtopic.geobb .topic-title,
+.section-viewtopic.geobb .map-coords {
 	display: none;
 }
 
 /* Cadres d'affichage */
-.section-viewtopic .topic-title,
-.section-viewtopic .map-coords {
-	display: none;
-}
 #etiquette {
 	margin: 20px 10px;
 }
