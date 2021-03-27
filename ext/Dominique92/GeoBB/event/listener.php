@@ -94,6 +94,10 @@ class listener implements EventSubscriberInterface
 		$row = $vars['row'];
 		$has_maps = preg_match ('/([\.:])(point|line|poly)/', $this->topic_data['forum_desc'], $params);
 
+		$view = $this->request->variable ('view', 'geo');
+		if ($view == 'geo')
+			$this->template->assign_var ('BODY_CLASS', 'geobb geobb_'.$params[2]);
+
 		if ($has_maps &&
 			$row['geojson'] && (
 				$params[1] == ':' || // Map on all posts
@@ -103,7 +107,6 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_vars ([
 				'GEOJSON' => $row['geojson'],
 				'MAP_TYPE' => $params[2],
-				'BODY_CLASS' => 'geobb geobb_'.$params[2],
 				'TOPIC_FIRST_POST_ID' => $this->topic_data['topic_first_post_id'],
 			]);
 	}
@@ -126,7 +129,7 @@ class listener implements EventSubscriberInterface
 			))
 			$this->template->assign_vars ([
 				'MAP_TYPE', $params[2],
-				'BODY_CLASS' => 'geobb geobb_'.$params[2],
+//TODO				'BODY_CLASS' => 'geobb geobb_'.$params[2],
 			]);
 
 		// Get translation of SQL space data

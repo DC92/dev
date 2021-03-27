@@ -232,6 +232,12 @@ body, html,
 }
 
 /* Cadres d'affichage */
+.section-viewtopic:not(.geobb) #etiquette,
+.section-viewtopic:not(.geobb) .postit ,
+.section-viewtopic:not(.geobb) .photo {
+	display: none;
+}
+
 #etiquette {
 	margin: 20px 10px;
 }
