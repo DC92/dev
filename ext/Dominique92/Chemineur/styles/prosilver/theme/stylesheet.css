@@ -233,9 +233,17 @@ body, html,
 
 /* Cadres d'affichage */
 .section-viewtopic:not(.geobb) #etiquette,
-.section-viewtopic:not(.geobb) .postit ,
-.section-viewtopic:not(.geobb) .photo {
+.section-viewtopic:not(.geobb) .point-container {
 	display: none;
+}
+.point-container {
+	clear: both;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-around;
+}
+.point-container.reverse {
+	flex-direction: row-reverse;
 }
 
 #etiquette {
@@ -345,7 +353,6 @@ body, html,
 
 /* Postits */
 .postit {
-	clear: both;
 	border-spacing: 0;
 }
 .postit td {
