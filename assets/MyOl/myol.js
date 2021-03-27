@@ -534,8 +534,10 @@ function hoverManager(map) {
 	map.on('click', function(evt) {
 		let clickedFeature = findClosestFeature(evt.pixel);
 		if (clickedFeature) {
-			const link = clickedFeature.getProperties().link;
-			if (link) {
+			const link = clickedFeature.getProperties().link,
+				layerOptions = clickedFeature.layer_.options;
+
+			if (link && !layerOptions.noClick) {
 				if (evt.originalEvent.ctrlKey) {
 					const tab = window.open(link, '_blank');
 					if (evt.originalEvent.shiftKey)
@@ -592,7 +594,7 @@ function hoverManager(map) {
 							labelEl.className = 'myol-popup';
 					}
 					// Change the cursor
-					if (properties.link)
+					if (properties.link && !layerOptions.noClick)
 						viewStyle.cursor = 'pointer';
 					if (properties.draggable)
 						viewStyle.cursor = 'move';

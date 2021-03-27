@@ -6,6 +6,7 @@ var layerGeoBBgis = layerVectorURL({
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
 		},
+		noClick: mapType != 'view',
 		styleOptions: function(properties) {
 			const style = {
 				// Lines & polygons
