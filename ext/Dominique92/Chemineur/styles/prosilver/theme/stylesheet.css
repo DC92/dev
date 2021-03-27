@@ -298,6 +298,7 @@ body, html,
 .section-viewtopic.geobb_point .postbody > div > .post-buttons,
 .section-viewtopic.geobb_point .postbody .content,
 .section-viewtopic.geobb_point .attachbox dt,
+.section-viewtopic.geobb_point .signature,
 .section-viewtopic.geobb_point .first,
 .section-viewtopic.geobb_point .postprofile,
 .section-viewtopic.geobb_point .author {
@@ -308,6 +309,9 @@ body, html,
 .section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg1,
 .section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg2 {
 	background: none;
+}
+.section-viewtopic.geobb_point .postbody {
+	width: 100%;
 }
 .section-viewtopic.geobb_point .postit .post-buttons {
 	position: initial;
@@ -365,7 +369,7 @@ body, html,
 	background-position: right bottom;
 }
 .postit .mm {
-	background-color: #F3E358;
+	background: #F3E358;
 }
 .postit .mm p {
 	position: relative; left: 12px; top: 5px;
@@ -416,6 +420,8 @@ body, html,
 	position: relative; top: -3px; right: -5px;
 }
 .photo .mm {
+	background: #FEFEF7;
+	text-align: center;
 	line-height: 0; /* Sinon, le bord inférieur de la photo à un gap de 2px */
 }
 .photo .mg, .photo .md {

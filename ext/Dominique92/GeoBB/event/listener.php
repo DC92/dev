@@ -127,10 +127,7 @@ class listener implements EventSubscriberInterface
 				$params[1] == ':' || // Map on all posts
 				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
 			))
-			$this->template->assign_vars ([
-				'MAP_TYPE', $params[2],
-//TODO				'BODY_CLASS' => 'geobb geobb_'.$params[2],
-			]);
+			$this->template->assign_var ('MAP_TYPE', $params[2]);
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {
