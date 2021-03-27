@@ -35,7 +35,7 @@ class listener implements EventSubscriberInterface
 
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
-/*
+/*//TODO
 		$this->cookies = $this->request->get_super_global(\phpbb\request\request_interface::COOKIE);
 		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
@@ -54,6 +54,8 @@ class listener implements EventSubscriberInterface
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
+			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
 		];
 	}
 
@@ -154,5 +156,32 @@ class listener implements EventSubscriberInterface
 			if (strpos ($k,'geo_') === 0 &&
 				$this->topic_data['topic_first_post_id'] == $vars['row']['post_id'])
 				$this->template->assign_var (strtoupper ($k), $v);
+	}
+
+	function viewtopic_modify_post_data($vars) {
+		$this->attachments = $vars['attachments'];
+	}
+
+	function parse_attachments_modify_template_data($vars) {
+		if (@$this->attachments) {
+			$post_id = $vars['attachment']['post_msg_id'];
+
+			// Assigne les valeurs au template
+			$this->block_array = $vars['block_array'];
+			$this->block_array['TEXT_SIZE'] = strlen (@$this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
+			$this->block_array['DATE'] = str_replace (' 00:00', '', $this->user->format_date($vars['attachment']['filetime']));
+			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; //TODO Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
+			$this->block_array['EXIF'] = $vars['attachment']['exif'];
+			foreach ($vars['attachment'] AS $k=>$v)
+				$this->block_array[strtoupper($k)] = $v;
+			$vars['block_array'] = $this->block_array;
+
+			// Ceci va assigner un template à {postrow.attachment.DISPLAY_ATTACHMENT}
+			$view = $this->request->variable ('view', 'geo');
+			if ($view == 'geo')
+				$this->template->set_filenames ([
+					'attachment_tpl' => '@Dominique92_Chemineur/viewtopic_point_photo.html'
+				]);
+		}
 	}
 }

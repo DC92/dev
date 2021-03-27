@@ -113,12 +113,12 @@ body, html,
 .navbar {
 	position: absolute;
 	top: 43px;
-	right: 0;
+	padding: 0;
 	width: 100%;
 	background-color: transparent;
 }
 .navbar .nav-breadcrumbs {
-	margin-left: 10px;
+	margin: 0 10px;
 }
 .navbar .nav-breadcrumbs li {
 	background-color: #fe0;
@@ -227,23 +227,11 @@ body, html,
 }
 .section-viewtopic.geobb .bar-top,
 .section-viewtopic.geobb .topic-title,
-.section-viewtopic.geobb .map-coords {
-	display: none;
-}
-
-/* Cadres d'affichage */
+.section-viewtopic.geobb .map-coords ,
 .section-viewtopic:not(.geobb) #etiquette,
-.section-viewtopic:not(.geobb) .point-container {
+.section-viewtopic:not(.geobb) .postit,
+.section-viewtopic:not(.geobb) .photo {
 	display: none;
-}
-.point-container {
-	clear: both;
-	margin-bottom: 20px;
-	display: flex;
-	justify-content: space-around;
-}
-.point-container.reverse {
-	flex-direction: row-reverse;
 }
 
 #etiquette {
@@ -255,7 +243,6 @@ body, html,
 		width: 100% !important;
 	}
 }
-
 #etiquette td {
 	padding: 0;
 }
@@ -305,51 +292,39 @@ body, html,
 	font-size: 1em;
 	padding: 0 2px;
 }
-@media print{/***************************************************************/
-
-			/* Liens externes */
-			.geo_ref {
-				margin: 10px auto;
-				background-color: #def;
-				border-radius: 10px;
-				border: 2px solid #468;
-				padding-bottom: 5px;
-			}
-
-			.geo_ref dl {
-				text-align: center;
-				text-decoration: underline;
-				padding-bottom: 5px;
-			}
-
-			.geo_ref li {
-				list-style-type: circle;
-				margin-left: 20px;
-				height: 28px;
-			}
-
-			.geo_ref .button {
-				position: relative;
-				top: 6px;
-			}
-}/***************************************************************/
 
 /* Posts des points */
-.section-viewtopic.geobb_point .post {
+.section-viewtopic.geobb_point .postbody h3,
+.section-viewtopic.geobb_point .postbody > div > .post-buttons,
+.section-viewtopic.geobb_point .postbody .content,
+.section-viewtopic.geobb_point .attachbox dt,
+.section-viewtopic.geobb_point .first,
+.section-viewtopic.geobb_point .postprofile,
+.section-viewtopic.geobb_point .author {
 	display: none;
 }
-/*
-			.point-post {
-				width: 100%;
-			}
-			.point-post td {
-				vertical-align: middle;
-				padding: 5px;
-			}
-			.point-post table {
-				margin-left: auto; margin-right: auto;
-			}
-*/
+.section-viewtopic.geobb_point .post,
+.section-viewtopic.geobb_point .attachbox,
+.section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg1,
+.section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg2 {
+	background: none;
+}
+.section-viewtopic.geobb_point .postit .post-buttons {
+	position: initial;
+}
+.section-viewtopic.geobb_point .postbody > div {
+	clear: both;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+.section-viewtopic.geobb_point .bg1 .postbody > div {
+	flex-direction: row-reverse;
+}
+.section-viewtopic.geobb_point .attachbox table {
+	margin: 0 auto;
+}
 
 /* Postits */
 .postit {
