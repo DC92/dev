@@ -26,26 +26,13 @@
 #page-footer .navbar {
 	display: none !important;
 }
-@media print{/***************************************************************/
-			/* Affichage état de l'émetteur d'un post */
-			.postbody {
-				width: 100%;
-			}
-			.online {
-				background-image: none;
-			}
-
-			#attach-panel {
-				display: inline-block !important;
-			}
-
 
 }/***************************************************************************/
 /* Ecrase le style de base */
 body, html,
 .page-footer {
 	padding: 0;
-	background-color: white;
+	background: white;
 }
 .wrap {
 	border: 0;
@@ -115,13 +102,13 @@ body, html,
 	top: 43px;
 	padding: 0;
 	width: 100%;
-	background-color: transparent;
+	background: transparent;
 }
 .navbar .nav-breadcrumbs {
 	margin: 0 10px;
 }
 .navbar .nav-breadcrumbs li {
-	background-color: #fe0;
+	background: #fe0;
 	border: 3px outset #dc0;
 	padding: 1px 5px;
 	cursor: pointer;
@@ -141,70 +128,38 @@ body, html,
 	padding: 0 !important;
 }
 
-@media print{/***************************************************************/
-
-			.bouton-new-comment {
-				background-color: #fe0;
-				border: 3px outset #dc0;
-				padding: 5px;
-				margin: 5px;
-			}
-			.topic-tools,
-			#quickmod {
-				float: right !important;
-			}
-			#jumpbox {
-				margin: 0;
-			}
-
-}/***************************************************************************/
-
 /* Accueil */ 
 .section-index > div {
 	background: url('images/coin_ciel.jpg'); 
 	background-repeat: no-repeat ;
-	background-color: #5072BF !important;
+	background: #5072BF !important;
 }
 .username-coloured {
 	text-transform: capitalize;
 }
 
 /* Accueil index.php */
-#nouvelles .bg1 {
-	clear: none;
-	background-color: transparent;
-	background-image: none;
-	overflow: hidden;
-}
-#nouvelles li.row {
-	border: none;
-}
-#nouvelles li.header dt {
-	text-transform: capitalize;
-	color: yellow;
-	text-indent: 5px;
-	font-size: 2em;
-	font-weight: bold;
-	text-decoration: underline;
-	margin-bottom: 5px;
-}
-#nouvelles dt {
-	font-size: 1.6em;
+.nouvelles li {
+	margin: 5px;
+	text-align: justify;
 	font-family: Times New Roman;
-	margin: 0 5px;
+	font-size: 1.6em;
 	color: white;
 }
-#nouvelles li {
-	color: white;
-	text-indent: 5px;
+.nouvelles li:first-child {
+	font-weight: bold;
+	color: yellow;
+	font-size: 2em;
+	text-decoration: underline;
 }
-#nouvelles a {
-	font-family: Arial;
-	font-size: 1em;
+.nouvelles a {
+	font-weight: bold;
 	color: yellow;
 }
-#more-news a {
-	color: yellow !important;
+.nouvelles li:last-child a {
+	color: white;
+	font-size: 12px;
+	font-weight: initial;
 }
 
 /* Carte */
@@ -246,48 +201,48 @@ body, html,
 #etiquette td {
 	padding: 0;
 }
-#etiquette .hg, #etiquette .hd, #etiquette .bg, #etiquette .bd {
+.ehg, .ehd, .ebg, .ebd {
 	height: 36px;
-	min-width: 36px;
+	width: 36px;
 	background: url('cadres/etiquette_bg.png');
 }
-#etiquette .hm, #etiquette .bm {
+.ehm, .ebm {
 	background: url('cadres/etiquette_v.png');
 	text-align: right;
 }
-#etiquette .md {
+.emd {
 	vertical-align: bottom;
 }
-#etiquette .md img {
+.emd img {
 	position: relative; right: -27px; bottom: -5px;
 }
-#etiquette .mg, #etiquette .md {
+.emg, .emd {
 	background: url('cadres/etiquette_h.png');
 }
-#etiquette .hd {
+.ehd {
 	background-position: right top;
 }
-#etiquette .bg {
+.ebg {
 	height: 0;
 	background-position: left bottom;
 }
-#etiquette .bd, #etiquette .md, #etiquette .bm {
+.ebd, .emd, .ebm {
 	background-position: right bottom;
 }
-#etiquette .mm {
-	background-color: white;
+.emm {
+	background: white;
 }
-#etiquette h1 {
+.emm h1 {
 	color: #105289;
 	margin-right: 0;
 	margin-top: 0;
 }
-#etiquette h1 span {
+.emm h1 span {
 	color: #105289;
 	font-size: 0.8em;
 }
-#etiquette h3,
-#etiquette .action-bar {
+.emm h3,
+.emm .action-bar {
 	text-transform: none;
 	font-size: 1em;
 	padding: 0 2px;
@@ -337,41 +292,41 @@ body, html,
 .postit td {
 	padding: 0 !important;
 }
-.postit .hg, .postit .hd, .postit .bg, .postit .bd {
+.thg, .thd, .tbg, .tbd {
 	height: 2px; min-width: 2px;
 	background: url('cadres/postit_bg.png');
 }
-.postit .bd {
+.tbd {
 	height: 32px; min-width: 32px;
 }
-.postit .md {
+.tmd {
 	vertical-align: bottom;
 }
-.postit .md img {
+.tmd img {
 	position: relative; right: -20px; bottom: -5px;
 }
-.postit .hm, .postit .bm {
+.thm, .tbm {
 	background: url('cadres/postit_v.png');
 	text-align: right;
 	font-family: Arial;
 	font-size: 0.8em;
 }
-.postit .mg, .postit .md {
+.tmg, .tmd {
 	background: url('cadres/postit_h.png');
 }
-.postit .hd {
+.thd {
 	background-position: right top;
 }
-.postit .bg {
+.tbg {
 	background-position: left bottom;
 }
-.postit .bd, .postit .md, .postit .bm {
+.tbd, .tmd, .tbm {
 	background-position: right bottom;
 }
-.postit .mm {
+.tmm {
 	background: #F3E358;
 }
-.postit .mm p {
+.tmm p {
 	position: relative; left: 12px; top: 5px;
 	font-family: Arial;
 	font-size: 1em;
@@ -379,11 +334,11 @@ body, html,
 	text-indent: 10px;
 	margin-bottom: 0;
 }
-.postit .mm .titre {
+.tmm .titre {
 	font-size: 1.3em;
 	font-weight: bold;
 }
-.postit .bm p {
+.tbm p {
 	font-size: 0.8em;
 	float:right;
 	position: relative; left: 10px;
@@ -397,56 +352,56 @@ body, html,
 .photo td {
 	padding: 0 !important;
 }
-.photo .hg, .photo .hd, .photo .bg, .photo .bd {
+.phg, .phd, .pbg, .pbd {
 	height: 10px; min-width: 10px;
 	background: url('cadres/photo_bg.png');
 }
-.photo .bd {
+.pbd {
 	height: 14px; min-width: 14px;
 }
-.photo .hm, .photo .bm {
+.phm, .pbm {
 	background: url('cadres/photo_v.png');
 }
-.photo .bd p {
+.pbd p {
 	height: 12px;
 	position: relative;
 	top: -12px;
 	left: -10px;
 }
-.photo .md {
+.pmd {
 	vertical-align: bottom;
 }
-.photo .md img {
+.pmd img {
 	position: relative; top: -3px; right: -5px;
 }
-.photo .mm {
+.pmm {
 	background: #FEFEF7;
 	text-align: center;
 	line-height: 0; /* Sinon, le bord inférieur de la photo à un gap de 2px */
 }
-.photo .mg, .photo .md {
+.pmg, .pmd {
 	background: url('cadres/photo_h.png');
 }
-.photo .hd {
+.phd {
 	background-position: right top;
 }
-.photo .bg {
+.pbg {
 	background-position: left bottom;
 }
-.photo .bd, .photo .md, .photo .bm {
+.pbd, .pmd, .pbm {
 	background-position: right bottom;
 }
-.photo .hm p, .photo .bm p  {
+.phm p, .pbm p  {
 	font-family: Verdana;
 	color: #a00;
 	font-size: 0.8em;
 }
-.photo .hm p {
+.phm p {
 	font-weight: bold;
 	position: relative; left: -5px;
 	margin: 0;
 }
-.photo .bm p {
+.pbm p {
 	text-align: right;
 	position: relative; top: -2px; right: 10px;
 	margin: 2px;
@@ -455,13 +410,13 @@ body, html,
 	margin: 10px;
 }
 .photo-comment span {
-	background-color: #fff;
+	background: #fff;
 	padding: 3px;
 }
 @media print{/***************************************************************/
 
 			.headerspace {
-				background-color: #ECF3F7;
+				background: #ECF3F7;
 				margin: 5px;
 				padding: 5px;
 			}
@@ -471,7 +426,7 @@ body, html,
 
 			/* Lignes*/
 			.hovered {
-				background-color: pink !important;
+				background: pink !important;
 			}
 
 			/* Posting */

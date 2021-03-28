@@ -1,6 +1,6 @@
 <!-- BEGIN _file -->
 	<table class= "photo" title="{_file.COMMENT}">
-		<tr><td class="hg"></td><td class="hm">
+		<tr><td class="phg"></td><td class="phm">
 			<p>
 				<!-- IF not (_file.DATE matches '/1970/') -->
 					{_file.DATE}
@@ -9,8 +9,8 @@
 					&copy; {_file.AUTEUR}
 				<!-- ENDIF -->
 			</p>
-		</td><td class="hd"></td></tr>
-		<tr><td class="mg"></td><td class="mm">
+		</td><td class="phd"></td></tr>
+		<tr><td class="pmg"></td><td class="pmm">
 			<!-- IF _file.ATTACH_ID < 1000000 -->
 				<a href="download/file.php?id={_file.ATTACH_ID}" title="{_file.COMMENT}">
 					<script>document.write('<img src="download/file.php?id={_file.ATTACH_ID}&size='+Math.round(Math.max(window.innerWidth/2.5,(window.innerWidth-100)*375/(500+{_file.TEXT_SIZE})))+'" />')</script>
@@ -18,10 +18,10 @@
 			<!-- ELSE -->
 				<img src="{_file.REAL_FILENAME}" />
 			<!-- ENDIF -->
-		</td><td class="md"></td></tr>
-		<tr><td class="bg"></td><td class="bm">
+		</td><td class="pmd"></td></tr>
+		<tr><td class="pbg"></td><td class="pbm">
 			<p>{_file.EXIF}</p>
-		</td><td class="bd">
+		</td><td class="pbd">
 		</td></tr>
 	</table>
 <!-- END _file -->

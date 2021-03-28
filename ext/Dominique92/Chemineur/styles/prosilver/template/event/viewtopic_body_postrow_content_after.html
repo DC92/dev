@@ -1,19 +1,19 @@
 <table class="postit">
 	<!-- IF postrow.MESSAGE or postrow.POST_SUBJECT -->
-		<tr><td class="hg"></td><td class="hm"></td><td class="hd"></td></tr>
+		<tr><td class="thg"></td><td class="thm"></td><td class="thd"></td></tr>
 
-		<tr><td class="mg"></td><td class="mm">
+		<tr><td class="tmg"></td><td class="tmm">
 			<!-- IF not postrow.RE and not postrow.S_FIRST_ROW -->
 				<p class="titre">{postrow.POST_SUBJECT}</p>
 			<!-- ENDIF -->
 			<p>{postrow.MESSAGE}</p>
-		</td><td class="md"></td></tr>
+		</td><td class="tmd"></td></tr>
 
-		<tr><td class="bg"></td><td class="bm">
+		<tr><td class="tbg"></td><td class="tbm">
 			<span>
 				&copy; {postrow.POST_AUTHOR} / {postrow.POST_DATE}
 			</span>
-		</td><td class="bd"></td></tr>
+		</td><td class="tbd"></td></tr>
 	<!-- ENDIF -->
 
 	<!-- IF not S_IS_BOT -->
