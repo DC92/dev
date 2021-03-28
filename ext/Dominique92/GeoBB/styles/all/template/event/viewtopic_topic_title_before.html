@@ -22,10 +22,14 @@
 	<!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
 	<!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
 
-	<div id="map"></div>
-	<input type="hidden" id="cadre-json" value='{GEOJSON}' />
 	<script>
 		var mapType = 'view',
 			mapKeys = {MAP_KEYS};
 	</script>
+
+	<div id="container-map">
+		<div id="map"></div>
+		<!-- INCLUDE @Dominique92_GeoBB/selector.html -->
+	</div>
+	<input type="hidden" id="cadre-json" value='{GEOJSON}' />
 <!-- ENDIF -->

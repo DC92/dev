@@ -45,7 +45,24 @@ var layerGeoBBgis = layerVectorURL({
 	}),
 	map = new ol.Map({
 		target: 'map',
-		layers: [layerGeoBBgis],
+		layers: [
+			layerGeoBBgis,
+			layerRefugesInfo({
+				selectorName: 'wri-features',
+			}),
+			layerPyreneesRefuges({
+				selectorName: 'prc-features',
+			}),
+			layerC2C({
+				selectorName: 'c2c-features',
+			}),
+			layerAlpages({
+				selectorName: 'alp-features',
+			}),
+			layerOverpass({
+				selectorName: 'osm-features',
+			}),
+		],
 		controls: controlsCollection({
 			baseLayers: layersCollection(),
 			controlPermalink: {

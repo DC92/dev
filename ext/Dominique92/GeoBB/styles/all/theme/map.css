@@ -1,8 +1,34 @@
-#map {
+#container-map {
 	float: right;
 	width: 50%;
-	background: #C0D0C8;
+	background: #eef5f9;
 }
+#map {
+	width: 100%;
+}
+/* Make the height equal to the width */
 .ol-viewport {
 	padding-bottom: 100%;
+}
+
+/* CSS pure open/close menu */
+.css-expand input.switch:first-child,
+.css-expand input.switch:not(:checked) ~ li {
+	display: none;
+}
+.css-expand,
+.container-map p {
+	margin: 3px !important;
+	color: black;
+}
+.css-expand li {
+	margin-left: 15px;
+}
+.css-expand span {
+	font-size: 10px;
+}
+.css-expand label {
+	color: black;
+	font-size: 11px;
+	cursor: pointer;
 }

@@ -867,6 +867,7 @@ function layerVectorURL(options) {
 function getSym(type) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
+		// https://www.gerritspeek.nl/navigatie/gps-navigatie_waypoint-symbolen.html
 		// <sym> propertie propertie
 		'<City Hall> hotel' +
 		'<Residence> refuge gite chambre_hote' +
