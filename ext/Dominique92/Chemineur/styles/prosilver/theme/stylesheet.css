@@ -16,6 +16,8 @@
 			.file-inline-bbcode,
 }/***************************************************************************/
 
+/* Ecrase le style de base */
+
 .section-index .action-bar,
 .time,
 .stat-block,
@@ -26,19 +28,20 @@
 #page-footer .navbar {
 	display: none !important;
 }
-
-}/***************************************************************************/
-/* Ecrase le style de base */
-body, html,
-.page-footer {
-	padding: 0;
-	background: white;
-}
+body,
 .wrap {
-	border: 0;
-	max-width: 100%;
-	padding: 0 !important;
 	margin: 0;
+	border: 0;
+	border-radius: 0;
+	padding: 0;
+}
+.forabg {
+	margin: 5px;
+}
+@media screen and (max-width: 600px) {
+	.forabg {
+		margin: 0;
+	}
 }
 
 /* Inhibe l'affichage du descripteur de forum */
@@ -64,14 +67,6 @@ body, html,
 	margin: 0;
 	padding: 0;
 	border-radius: 0;
-}
-.site-description h1 {
-	wmargin: 0;
-}
-.site-description a {
-	wwdisplay: inline;
-	qcolor: white;
-	stext-decoration: none;
 }
 .logo,
 #search-box {
@@ -129,16 +124,19 @@ body, html,
 }
 
 /* Accueil */ 
-.section-index > div {
+.section-index .wrap {
+	background-color: #5072BF !important;
 	background: url('images/coin_ciel.jpg'); 
 	background-repeat: no-repeat ;
-	background: #5072BF !important;
 }
 .username-coloured {
 	text-transform: capitalize;
 }
+.section-index .copyright,
+.section-index .copyright a {
+	color: white;
+}
 
-/* Accueil index.php */
 .nouvelles li {
 	margin: 5px;
 	text-align: justify;
@@ -256,6 +254,7 @@ body, html,
 .section-viewtopic.geobb_point .signature,
 .section-viewtopic.geobb_point .first,
 .section-viewtopic.geobb_point .postprofile,
+.section-viewtopic.geobb_point .actions-jump,
 .section-viewtopic.geobb_point .author {
 	display: none;
 }
@@ -264,6 +263,13 @@ body, html,
 .section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg1,
 .section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg2 {
 	background: none;
+}
+.pagination {
+	background: white;
+}
+.section-viewtopic .copyright,
+.section-viewtopic .copyright a {
+	color: black;
 }
 .section-viewtopic.geobb_point .postbody {
 	width: 100%;
