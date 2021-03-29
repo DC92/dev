@@ -32,3 +32,10 @@
 	font-size: 11px;
 	cursor: pointer;
 }
+
+.edit-comment p {
+	margin: 0;
+}
+.edit-comment hr {
+	clear: none;
+}

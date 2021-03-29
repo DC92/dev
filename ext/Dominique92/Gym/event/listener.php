@@ -220,7 +220,8 @@ function twig_environment_render_template_after($vars) {
 
 					// Vérification et routage
 					global $myphp_template;
-					if (strpos ($this->cookies['code'], $myphp_template['code_visio']) !== false && isset($this->args['anim']))
+					if (strpos ($this->cookies['code'], $myphp_template['code_visio']) !== false &&
+						isset($this->args['anim']))
 						exit ('<meta http-equiv="refresh" content="0;URL=https://meet.jit.si/'.
 							$myphp_template['code_visio'].'-'.
 							$this->args['anim'].'">'
