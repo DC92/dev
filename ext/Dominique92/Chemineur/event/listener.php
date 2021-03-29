@@ -56,6 +56,9 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
+
+			// posting
+			'core.modify_posting_auth' => 'modify_posting_auth',
 		];
 	}
 
@@ -183,5 +186,36 @@ class listener implements EventSubscriberInterface
 					'attachment_tpl' => '@Dominique92_Chemineur/viewtopic_point_photo.html'
 				]);
 		}
+	}
+
+	/**
+		POSTING.PHP
+	*/
+	function modify_posting_auth($vars) {
+		require_once($this->root_path . 'includes/functions_admin.php');
+
+		// Popule le sélecteur de forum
+		$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
+			FROM ".FORUMS_TABLE."
+			WHERE forum_type = 1
+			ORDER BY left_id ASC";
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$forum_list [] = '<option value="' . $row['forum_id'] . '"' .($row['forum_id'] == $vars['forum_id'] ? ' selected="selected"' : ''). '>' . $row['forum_name'] . '</option>';
+		$this->db->sql_freeresult($result);
+
+		if (isset ($forum_list))
+			$this->template->assign_var (
+				'S_FORUM_SELECT',
+				implode ('', $forum_list)
+			);
+
+		// Assigne le nouveau forum pour la création
+		$vars['forum_id'] = request_var('to_forum_id', $vars['forum_id']);
+
+		// Le bouge
+		if ($vars['mode'] == 'edit' && // S'il existe déjà !
+			$vars['forum_id'] != $vars['forum_id'])
+			move_topics([$vars['post_id']], $vars['forum_id']);
 	}
 }

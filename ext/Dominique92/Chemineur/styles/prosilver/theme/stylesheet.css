@@ -1,23 +1,5 @@
-/* Modification de l'affichage standard */
-@media print{/***************************************************************/
-			.section-index #page-body > p, /* Enlève les commentaires prosilver */
-			.section-index #page-body .compact, /* Enlève "Marquer tous les forums comme lus" */
-			.section-index .statistics,
-
-			.view-point .jumpbox-return,
-			.view-point .pagination,
-			.postprofile,
-			form#viewtopic,
-			.report-icon, .info-icon, .warn-icon, /* Viewtopic / post */
-
-			#options-panel, #options-panel-tab,
-			/*label[for=delete_permanent],*/
-			.submit-buttons input[name="preview"],
-			.file-inline-bbcode,
-}/***************************************************************************/
-
 /* Ecrase le style de base */
-#poll-panel-tab, /* Somdages */
+#poll-panel-tab, /* Sondages */
 .fields1 dl:first-child, /* Icone de sujet */
 .section-index .action-bar,
 .time,
@@ -429,24 +411,11 @@ body,
 	background: #fff;
 	padding: 3px;
 }
-@media print{/***************************************************************/
 
-			.headerspace {
-				background: #ECF3F7;
-				margin: 5px;
-				padding: 5px;
-			}
-			.headerspace h3 {
-				margin: 5px;
-			}
-
-			/* Lignes*/
-			.hovered {
-				background: pink !important;
-			}
-
-			/* Posting */
-			.avertissement {
-				color: red;
-			}
+/* Posting */
+fieldset.fields1 dt {
+	width: initial;
+}
+fieldset.fields1 dd {
+	margin-left: initial;
 }
