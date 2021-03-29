@@ -6,7 +6,7 @@ var layerGeoBBgis = layerVectorURL({
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
 		},
-		noClick: mapType != 'view',
+		noClick: script == 'posting',
 		styleOptions: function(properties) {
 			const style = {
 				// Lines & polygons
@@ -66,13 +66,14 @@ var layerGeoBBgis = layerVectorURL({
 		controls: controlsCollection({
 			baseLayers: layersCollection(),
 			controlPermalink: {
-				display: mapType == 'index',
+				display: script == 'index',
+				init: script != 'viewtopic',
 			},
 		}),
 	});
 
-switch (mapType) {
-	case 'view':
+switch (script + '-' + mapType) {
+	case 'viewtopic-point':
 		map.addLayer( // Cadre définissant la position
 			layerGeoJson({
 				displayPointId: 'cadre-coords',
@@ -86,12 +87,24 @@ switch (mapType) {
 			}));
 		break;
 
-	case 'point':
+	case 'viewtopic-line':
+		const layer = layerGeoJson({
+			geoJsonId: 'cadre-json',
+		});
+		map.getView().fit(
+			layer.getSource().getExtent(), {
+				size: map.getSize(),
+				padding: [5, 5, 5, 5],
+			}
+		);
+		break;
+
+	case 'posting-point':
 		map.addLayer(marker);
 		break;
 
 		//TODO BUG une ligne surimposée en viewtopic ??? le marqueur avec un json ?
-	case 'line':
+	case 'posting-line':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',
 			snapLayers: [layerGeoBBgis],
@@ -110,7 +123,7 @@ switch (mapType) {
 		}));
 		break;
 
-	case 'poly':
+	case 'posting-poly':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',
 			snapLayers: [layerGeoBBgis],
