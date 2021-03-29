@@ -17,7 +17,8 @@
 }/***************************************************************************/
 
 /* Ecrase le style de base */
-
+#poll-panel-tab, /* Somdages */
+.fields1 dl:first-child, /* Icone de sujet */
 .section-index .action-bar,
 .time,
 .stat-block,
@@ -44,7 +45,7 @@ body,
 	}
 }
 
-/* Inhibe l'affichage du descripteur de forum */
+/* Simplifie l'affichage du descripteur de forum */
 .forums .list-inner {
 	color: transparent;
 }
@@ -52,9 +53,18 @@ body,
 	position: relative;
 	top: 10px;
 }
-.forums .list-inner img {
-	position: relative;
-	top: 8px;
+.topic_read_mine,
+.forum_read {
+	background-image: none;
+}
+.forabg .lastpost {
+	display: none;
+}
+.list-inner {
+	padding: 0 10px !important;
+}
+.forum_read {
+	margin: 0 !important;
 }
 
 /* Bandeau */
@@ -172,18 +182,18 @@ body,
 }
 
 /* Points */
-.section-viewtopic.geobb .wrap {
+.section-viewtopic.geobb_point .wrap {
 	background: url('images/pierre.jpg'); 
 }
 .section-viewtopic.geobb .post {
 	clear: both;
 }
-.section-viewtopic.geobb .bar-top,
-.section-viewtopic.geobb .topic-title,
-.section-viewtopic.geobb .map-coords ,
-.section-viewtopic:not(.geobb) #etiquette,
-.section-viewtopic:not(.geobb) .postit,
-.section-viewtopic:not(.geobb) .photo {
+.section-viewtopic.geobb_point .bar-top,
+.section-viewtopic.geobb_point .topic-title,
+.section-viewtopic.geobb_point .map-coords ,
+.section-viewtopic:not(.geobb_point) #etiquette,
+.section-viewtopic:not(.geobb_point) .postit,
+.section-viewtopic:not(.geobb_point) .photo {
 	display: none;
 }
 
