@@ -96,17 +96,19 @@ class listener implements EventSubscriberInterface
 			foreach ($post_attachments AS $attachment) {
 				$row['previous_attach'] = $previous_attach;
 				$previous_attach = $attachment['attach_id'];
+				$data = array_merge ($attachment, $row);
 
 				// Caractères indésirables
-				foreach ($row AS $k=>$v)
-					$row[$k] = preg_replace( ['/"/', '/[^[:print:]]/'], ['&quot;', ''], $v);
+				foreach ($data AS $k=>$v)
+					$data[$k] = preg_replace (
+						['/[\x00-\x1f]/s', '/"/'],
+						[' ', '&quot;'],
+						$v
+					);
 
 				$this->template->assign_block_vars (
 					'post.slide',
-					array_change_key_case (
-						array_merge ($attachment, $row),
-						CASE_UPPER
-					)
+					array_change_key_case ($data, CASE_UPPER)
 				);
 			}
 		}

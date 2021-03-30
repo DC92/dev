@@ -92,27 +92,30 @@ class listener implements EventSubscriberInterface
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
 		$row = $vars['row'];
-		$geom = json_decode ($row['geojson']);
-		$ll = $geom->geometries[0]->coordinates;
-		$has_maps = preg_match ('/([\.:])(point|line|poly)/', $this->topic_data['forum_desc'], $params);
+		
+		if ($row['geojson']) {
+			$geom = json_decode ($row['geojson']);
+			$ll = $geom->geometries[0]->coordinates;
+			$has_maps = preg_match ('/([\.:])(point|line|poly)/', $this->topic_data['forum_desc'], $params);
 
-		$view = $this->request->variable ('view', 'geo');
-		if ($view == 'geo')
-			$this->template->assign_var ('BODY_CLASS', 'geobb geobb_'.$params[2]);
+			$view = $this->request->variable ('view', 'geo');
+			if ($view == 'geo')
+				$this->template->assign_var ('BODY_CLASS', 'geobb geobb_'.$params[2]);
 
-		if ($has_maps &&
-			$row['geojson'] && (
-				$params[1] == ':' || // Map on all posts
-				$row['post_id'] == $this->topic_data['topic_first_post_id'] // Only map on the first post
-			))
-			//TODO BUG devrait zoomer sur la totalité des features, au lieu seulement du dernier
-			$this->template->assign_vars ([
-				'GEOJSON' => $row['geojson'],
-				'GEO_LON' => $ll[0],
-				'GEO_LAT' => $ll[1],
-				'MAP_TYPE' => $params[2],
-				'TOPIC_FIRST_POST_ID' => $this->topic_data['topic_first_post_id'],
-			]);
+			if ($has_maps &&
+				$row['geojson'] && (
+					$params[1] == ':' || // Map on all posts
+					$row['post_id'] == $this->topic_data['topic_first_post_id'] // Only map on the first post
+				))
+				//TODO BUG devrait zoomer sur la totalité des features, au lieu seulement du dernier
+				$this->template->assign_vars ([
+					'GEOJSON' => $row['geojson'],
+					'GEO_LON' => $ll[0],
+					'GEO_LAT' => $ll[1],
+					'MAP_TYPE' => $params[2],
+					'TOPIC_FIRST_POST_ID' => $this->topic_data['topic_first_post_id'],
+				]);
+		}
 	}
 
 	/**
