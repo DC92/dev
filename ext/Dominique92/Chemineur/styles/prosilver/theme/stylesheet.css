@@ -18,40 +18,8 @@ body,
 	border-radius: 0;
 	padding: 0;
 }
-.forabg {
-	margin: 5px;
-}
-@media screen and (max-width: 600px) {
-	.forabg {
-		margin: 0;
-	}
-}
-
-/* Simplifie l'affichage du descripteur de forum */
-.forums .list-inner {
-	color: transparent;
-}
-.forums .list-inner a {
-	position: relative;
-	top: 10px;
-}
-.topic_read_mine,
-.forum_link,
-.forum_unread,
-.forum_read {
-	background-image: none;
-}
-.forabg .lastpost {
-	display: none;
-}
-.list-inner {
-	padding: 0 10px !important;
-}
 
 /* Bandeau */
-#page-header {
-	margin-bottom: 20px;
-}
 .headerbar {
 	background-image: url("images/banniere.jpg");
 	height: 60px;
@@ -84,14 +52,9 @@ body,
 
 /* Menu */
 .navbar {
-	position: absolute;
-	top: 43px;
 	padding: 0;
 	width: 100%;
 	background: transparent;
-}
-.navbar .nav-breadcrumbs {
-	margin: 0 10px;
 }
 .navbar .nav-breadcrumbs li {
 	background: #fe0;
@@ -119,6 +82,7 @@ body,
 	background-color: #5072BF !important;
 	background: url('images/coin_ciel.jpg');
 	background-repeat: no-repeat;
+	background-position-y: 60px;
 }
 .username-coloured {
 	text-transform: capitalize;
@@ -160,6 +124,35 @@ body,
 		margin: 0 !important;
 		width: 100% !important;
 	}
+}
+
+/* Simplifie l'affichage du descripteur de forum */
+.forabg {
+	margin: 10px;
+}
+@media screen and (max-width: 600px) {
+	.forabg {
+		margin: 0;
+	}
+}
+.forums .list-inner {
+	color: transparent;
+}
+.forums .list-inner a {
+	position: relative;
+	top: 10px;
+}
+.topic_read_mine,
+.forum_link,
+.forum_unread,
+.forum_read {
+	background-image: none;
+}
+.forabg .lastpost {
+	display: none;
+}
+.list-inner {
+	padding: 0 10px !important;
 }
 
 /* Points */
@@ -388,7 +381,7 @@ body,
 .pbd, .pmd, .pbm {
 	background-position: right bottom;
 }
-.phm p, .pbm p  {
+.phm p, .pbm p {
 	font-family: Verdana;
 	color: #a00;
 	font-size: 0.8em;

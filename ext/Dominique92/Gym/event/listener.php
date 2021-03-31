@@ -384,6 +384,7 @@ function twig_environment_render_template_after($vars) {
 		}
 
 		// Add / correct the specific BBcodes
+/* Activer uniquement pour créer un nouveau site ou updater les BBCODES
 		$this->add_bbcode([
 			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
 			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],
@@ -447,6 +448,7 @@ function twig_environment_render_template_after($vars) {
 			$this->db->sql_query($sql);
 		}
 	}
+*/
 
 	// Popule les templates
 	function popule_posts() {

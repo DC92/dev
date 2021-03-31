@@ -112,6 +112,7 @@ class listener implements EventSubscriberInterface
 					'GEO_LON' => $ll[0],
 					'GEO_LAT' => $ll[1],
 					'GEOJSON' => $row['geojson'],
+					'TOPIC_FIRST_POST_ID' => $this->topic_data['topic_first_post_id'], //TODO déplacer dans ../chemineur
 				]);
 		}
 	}
