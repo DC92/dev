@@ -67,7 +67,7 @@ class listener implements EventSubscriberInterface
 
 	function page_footer($vars) {
 		// Assign a template
-		if ($this->my_template)
+		if (@$this->my_template)
 			$this->template->set_filenames([
 				'body' => $this->my_template,
 			]);
