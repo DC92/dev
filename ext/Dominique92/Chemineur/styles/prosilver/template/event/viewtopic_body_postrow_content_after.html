@@ -1,10 +1,10 @@
 <table class="postit">
-	<!-- IF postrow.MESSAGE or postrow.POST_SUBJECT -->
+	<!-- IF postrow.MESSAGE or postrow.POST_SUBJECT_OPTIM -->
 		<tr><td class="thg"></td><td class="thm"></td><td class="thd"></td></tr>
 
 		<tr><td class="tmg"></td><td class="tmm">
-			<!-- IF not postrow.RE and not postrow.S_FIRST_ROW -->
-				<p class="titre">{postrow.POST_SUBJECT}</p>
+			<!-- IF postrow.POST_SUBJECT_OPTIM -->
+				<p class="titre">{postrow.POST_SUBJECT_OPTIM}</p>
 			<!-- ENDIF -->
 			<p>{postrow.MESSAGE}</p>
 		</td><td class="tmd"></td></tr>

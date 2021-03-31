@@ -35,12 +35,6 @@ class listener implements EventSubscriberInterface
 
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
-/*//TODO
-		$this->cookies = $this->request->get_super_global(\phpbb\request\request_interface::COOKIE);
-		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
-		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
-*/
 	}
 
 	static public function getSubscribedEvents() {
@@ -156,6 +150,8 @@ class listener implements EventSubscriberInterface
 	}
 	// Modify the posts template block
 	function viewtopic_modify_post_row($vars) {
+		$topic_data = $vars['topic_data'];
+		$topic_first_post_id = $topic_data['topic_first_post_id'];
 		$row = $vars['row'];
 		$post_id = $row['post_id'];
 		$sql_row = $this->sql_row[$post_id];
@@ -163,6 +159,11 @@ class listener implements EventSubscriberInterface
 
 		$geom = json_decode ($sql_row['geojson']);
 		$ll = $geom->geometries[0]->coordinates;
+
+		// Détermine si le titre du post est une réponse
+		if ($post_id != $topic_first_post_id &&
+			strncasecmp ($row['post_subject'], 'Re: ', 4))
+			$post_row['post_subject_optim'] = str_replace ('Re: ', '', $row['post_subject']);
 
 		// Calcul de l'altitude avec mapquest
 		if (@count($ll) == 2 && !@$sql_row['geo_altitude']) {

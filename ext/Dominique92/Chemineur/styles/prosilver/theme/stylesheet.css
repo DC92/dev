@@ -261,23 +261,35 @@ body,
 .section-viewtopic.geobb_point .postit .post-buttons {
 	position: initial;
 }
-.section-viewtopic.geobb_point .postbody > div {
-	clear: both;
-	margin-bottom: 20px;
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
+@media screen and (min-width: 600px) {
+	.section-viewtopic.geobb_point .postbody > div {
+		clear: both;
+		margin-bottom: 20px;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+	}
+	.section-viewtopic.geobb_point .bg1 .postbody > div {
+		flex-direction: row-reverse;
+	}
+	.section-viewtopic.geobb_point .attachbox table {
+		margin: 0 auto;
+	}
 }
-.section-viewtopic.geobb_point .bg1 .postbody > div {
-	flex-direction: row-reverse;
-}
-.section-viewtopic.geobb_point .attachbox table {
-	margin: 0 auto;
+@media screen and (max-width: 600px) {
+	.section-viewtopic.geobb_point .attachbox {
+		width: 100%;
+	}
 }
 
 /* Postits */
 .postit {
 	border-spacing: 0;
+}
+@media screen and (max-width: 600px) {
+	.postit {
+		margin: 0 auto;
+	}
 }
 .postit td {
 	padding: 0 !important;
@@ -337,7 +349,7 @@ body,
 /* Photos */
 .photo {
 	border-spacing: 0;
-	margin: 5px 0;
+	margin: 5px auto;
 }
 .photo td {
 	padding: 0 !important;
