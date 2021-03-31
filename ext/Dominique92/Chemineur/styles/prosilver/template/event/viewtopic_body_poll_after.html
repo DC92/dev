@@ -10,15 +10,19 @@
 			<!-- ENDIF -->
 			<span>(<a href="viewforum.php?f={FORUM_ID}" title="Voir les autres {FORUM_NAME}s">{FORUM_NAME}</a>)</span>
 		</h1>
-		<!-- IF GEO_LAT and GEO_LNG -->
-		<!-- ENDIF -->
 		<h3 id="cadre-coords"></h3>
-		<!-- IF GEO_ALTITUDE -->
-			<h3>Altitude: {GEO_ALTITUDE} m</h3>
-		<!-- ENDIF -->
-		<!-- IF GEO_MASSIF -->
-			<h3>Massif: {GEO_MASSIF}</h3>
-		<!-- ENDIF -->
+
+		<!-- BEGIN postrow -->
+			<!-- IF postrow.S_FIRST_ROW -->
+				<!-- IF postrow.GEO_ALTITUDE -->
+					<h3>Altitude: {postrow.GEO_ALTITUDE} m</h3>
+				<!-- ENDIF -->
+				<!-- IF postrow.GEO_MASSIF -->
+					<h3>Massif: {postrow.GEO_MASSIF}</h3>
+				<!-- ENDIF -->
+			<!-- ENDIF -->
+		<!-- END postrow -->
+
 	</td><td class="emd"></td></tr>
 
 	<tr><td class="ebg"></td><td class="ebm"></td><td class="ebd"></td></tr>

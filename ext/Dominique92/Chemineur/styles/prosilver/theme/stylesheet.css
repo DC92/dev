@@ -114,11 +114,11 @@ body,
 	padding: 0 !important;
 }
 
-/* Accueil */ 
+/* Accueil */
 .section-index .wrap {
 	background-color: #5072BF !important;
-	background: url('images/coin_ciel.jpg'); 
-	background-repeat: no-repeat ;
+	background: url('images/coin_ciel.jpg');
+	background-repeat: no-repeat;
 }
 .username-coloured {
 	text-transform: capitalize;
@@ -164,7 +164,7 @@ body,
 
 /* Points */
 .section-viewtopic.geobb_point .wrap {
-	background: url('images/pierre.jpg'); 
+	background: url('images/pierre.jpg');
 }
 .section-viewtopic.geobb .post {
 	clear: both;
