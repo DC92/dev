@@ -1,3 +1,69 @@
+TEST ?? Images dépassent sur petits écrans
+BEST Bordure blanche images trop larges quand plusieurs dans le même post
+Nom utilisateur masqué sur petit écran
+Fenetre large = limite de largeur du fond
+
+TODO c92 point champs modifié par / Raison
+TODO : posting pas de sélecteur de forum si ce n’est pas le premier post
+TODO Champ de saisie altitude / massif
+
+TODO BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
+TODO DIAPO ordre des diapos
+
+BEST BUG quand trace, la carte est 3 fois plus haute
+BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
+BEST cabane cheminée grise et oeuil de bœuf vert
+BEST Parking avec un P ascii avec couleurs
+BEST cadre et viseur SVG
+BEST Ne pas démarrer les ext quand on installe
+BEST façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
+
+MYOL
+BUG myol editeur ligne zone sensible edit ligne plus grande
+Myol zoom à 2 doigts sur icônes
+
+WRI
+BUG WRI pictos clignotent
+
+************************************************************************************
+MIGRATION
+Copier chem3/files
+Copier chem2/chem-fich dans chem2/chem-fich
+Copier chem3/images/avatars
+Copier gobBB/images/smileys
+
+Save SQL chem3
+	supprimer les 2 lignes create database
+	'http://v2.chemineur.fr', 'chem2'
+	'[first=point]</s><e>', '[first=point]</s>.point<e>'
+	[first=line]</s><e>', '[first=line]</s>.poly<e>'
+'[view=diapo]</s><e>', '[view=diapo]</s>*slideshow<e>'
+'Dominique92/GeoBB/types_points', 'Dominique92/GeoBB/icones'
+
+Créer SQL chem4 / importer
+phpBB3 -> chem4
+phpBBexts -> chem4
+gym/ config.php -> chem4/ config.php
+
+=> Chem4/install
+Français
+Mise à jour
+Uniquement la BDD
+Supprimer chel4/install
+
+=> chem4/
+=> chem4/adm : activer MyPhpBB & Images & slideshow
+=> chem4/adm : désactiver les extensions obsolètes / supprimer de GITHUB et du serveur
+=> chem4/adm : désactiver l’extensions VigLink / supprimer du serveur
+=> chem4/adm : installer l’extensions CleanTalk
+
+Cliquer sur chaque massif / changer .point .line dans viewforum.php
+Manque smiley :sleep :
+
+Installer cleantalk
+
+
+************************************************************************************
 BUGS CHEMINEUR soldes par chem4
 ===============================
 Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.

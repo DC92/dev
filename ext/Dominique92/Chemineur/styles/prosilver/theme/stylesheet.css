@@ -3,6 +3,7 @@
 .fields1 dl:first-child, /* Icone de sujet */
 .section-index .action-bar,
 .time,
+.logo,
 .stat-block,
 .footer-row,
 .breadcrumbs .icon,
@@ -27,10 +28,13 @@ body,
 	padding: 0;
 	border-radius: 0;
 }
-.logo,
+.inner {
+	/* Définit le parent de la position absolute ci-dessous */
+	position: relative;
+}
 #search-box {
 	position: absolute;
-	top: -20px;
+	top: -12px;
 	right: 10px;
 }
 .site-description {
@@ -156,18 +160,18 @@ body,
 }
 
 /* Points */
-.section-viewtopic.geobb_point .wrap {
+.section-viewtopic.geo_point .wrap {
 	background: url('images/pierre.jpg');
 }
-.section-viewtopic.geobb .post {
+.section-viewtopic.geo .post {
 	clear: both;
 }
-.section-viewtopic.geobb_point .bar-top,
-.section-viewtopic.geobb_point .topic-title,
-.section-viewtopic.geobb_point .map-coords ,
-.section-viewtopic:not(.geobb_point) #etiquette,
-.section-viewtopic:not(.geobb_point) .postit,
-.section-viewtopic:not(.geobb_point) .photo {
+.section-viewtopic.geo_point .bar-top,
+.section-viewtopic.geo_point .topic-title,
+.section-viewtopic.geo_point .map-coords ,
+.section-viewtopic:not(.geo_point) #etiquette,
+.section-viewtopic:not(.geo_point) .postit,
+.section-viewtopic:not(.geo_point) .photo {
 	display: none;
 }
 
@@ -231,21 +235,22 @@ body,
 }
 
 /* Posts des points */
-.section-viewtopic.geobb_point .postbody h3,
-.section-viewtopic.geobb_point .postbody > div > .post-buttons,
-.section-viewtopic.geobb_point .postbody .content,
-.section-viewtopic.geobb_point .attachbox dt,
-.section-viewtopic.geobb_point .signature,
-.section-viewtopic.geobb_point .first,
-.section-viewtopic.geobb_point .postprofile,
-.section-viewtopic.geobb_point .actions-jump,
-.section-viewtopic.geobb_point .author {
+.section-viewtopic.geo_point .postbody h3,
+.section-viewtopic.geo_point .postbody > div > .post-buttons,
+.section-viewtopic.geo_point .postbody .content,
+.section-viewtopic.geo_point .attachbox dt,
+.section-viewtopic.geo_point .signature,
+.section-viewtopic.geo_point .notice,
+.section-viewtopic.geo_point .first,
+.section-viewtopic.geo_point .postprofile,
+.section-viewtopic.geo_point .actions-jump,
+.section-viewtopic.geo_point .author {
 	display: none;
 }
-.section-viewtopic.geobb_point .post,
-.section-viewtopic.geobb_point .attachbox,
-.section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg1,
-.section-viewtopic.geobb_point .section-viewtopic.geobb_point .bg2 {
+.section-viewtopic.geo_point .post,
+.section-viewtopic.geo_point .attachbox,
+.section-viewtopic.geo_point .bg1,
+.section-viewtopic.geo_point .bg2 {
 	background: none;
 }
 .pagination {
@@ -255,29 +260,29 @@ body,
 .section-viewtopic .copyright a {
 	color: black;
 }
-.section-viewtopic.geobb_point .postbody {
+.section-viewtopic.geo_point .postbody {
 	width: 100%;
 }
-.section-viewtopic.geobb_point .postit .post-buttons {
+.section-viewtopic.geo_point .postit .post-buttons {
 	position: initial;
 }
 @media screen and (min-width: 600px) {
-	.section-viewtopic.geobb_point .postbody > div {
+	.section-viewtopic.geo_point .postbody > div {
 		clear: both;
 		margin-bottom: 20px;
 		display: flex;
 		justify-content: space-around;
 		align-items: center;
 	}
-	.section-viewtopic.geobb_point .bg1 .postbody > div {
+	.section-viewtopic.geo_point .bg1 .postbody > div {
 		flex-direction: row-reverse;
 	}
-	.section-viewtopic.geobb_point .attachbox table {
+	.section-viewtopic.geo_point .attachbox table {
 		margin: 0 auto;
 	}
 }
 @media screen and (max-width: 600px) {
-	.section-viewtopic.geobb_point .attachbox {
+	.section-viewtopic.geo_point .attachbox {
 		width: 100%;
 	}
 }

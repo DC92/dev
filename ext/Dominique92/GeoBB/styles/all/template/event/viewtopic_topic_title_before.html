@@ -1,4 +1,4 @@
-<!-- IF GEOJSON -->
+<!-- IF GEO_JSON -->
 	<!-- Polyfill iOS -->
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -29,8 +29,8 @@
 	</script>
 
 	<div id="container-map">
+		<input type="hidden" id="cadre-json" value='{GEO_JSON}' />
 		<div id="map"></div>
 		<!-- INCLUDE @Dominique92_GeoBB/selector.html -->
 	</div>
-	<input type="hidden" id="cadre-json" value='{GEOJSON}' />
 <!-- ENDIF -->

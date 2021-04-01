@@ -40,6 +40,7 @@ class listener implements EventSubscriberInterface
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
 			'core.posting_modify_row_data' => 'posting_modify_row_data',
@@ -80,41 +81,92 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé avant la requette SQL qui récupère les données des posts
 	function viewtopic_get_post_data($vars) {
-		$sql_ary = $vars['sql_ary'];
-		$this->topic_data = $vars['topic_data'];
-
 		// Insère la conversion du champ geom en format geojson dans la requette SQL
-		$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geojson';
-
+		$sql_ary = $vars['sql_ary'];
+		$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geo_json';
 		$vars['sql_ary'] = $sql_ary;
 	}
 
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
+		// Conserve les valeurs spécifiques à chaque post du template
+		$post_id = $vars['row']['post_id'];
+		foreach ($vars['row'] AS $k=>$v)
+			if (strpos ($k,'geo_') === 0)
+				$this->geo_data[$post_id][$k] = str_replace ('~', '', $v);
+	}
+
+	// Modify the posts template block
+	function viewtopic_modify_post_row($vars) {
+		// Valeurs du post lues dans la table phpbb_posts
 		$row = $vars['row'];
+		$post_id = $row['post_id'];
 
-		if ($row['geojson']) {
-			$geom = json_decode ($row['geojson']);
-			$ll = $geom->geometries[0]->coordinates;
-			$has_maps = preg_match ('/([\.:])(point|line|poly)/', $this->topic_data['forum_desc'], $params);
+		// Valeurs du topic
+		$topic_data = $vars['topic_data'];
+		$topic_first_post_id = $topic_data['topic_first_post_id'];
 
+		// Valeurs à assigner à tout le template (topic)
+		$topic_row = $this->geo_data[$post_id]; // The geo_ values
+		$topic_row['topic_first_post_id'] = $topic_first_post_id;
+
+		// How to display the topic
+		//TODO map on all posts (":xxxxx")
+		preg_match ('/([\.:])(point|line|poly)/', $topic_data['forum_desc'], $desc);
+		if ($desc) {
 			$view = $this->request->variable ('view', 'geo');
-			if ($view == 'geo')
-				$this->template->assign_var ('BODY_CLASS', 'geobb geobb_'.$params[2]);
+			$topic_row['body_class'] = $view.' '.$view.'_'.$desc[2];
 
-			if ($has_maps &&
-				$row['geojson'] && (
-					$params[1] == ':' || // Map on all posts
-					$row['post_id'] == $this->topic_data['topic_first_post_id'] // Only map on the first post
-				))
-				$this->template->assign_vars ([
-					'MAP_TYPE' => $params[2],
-					'GEO_LON' => $ll[0],
-					'GEO_LAT' => $ll[1],
-					'GEOJSON' => $row['geojson'],
-					'TOPIC_FIRST_POST_ID' => $this->topic_data['topic_first_post_id'], //TODO déplacer dans ../chemineur
-				]);
+			// Position
+			preg_match ('/\[([0-9\.]*)[, ]*([0-9\.]*)\]/', $topic_row['geo_json'], $ll);
+			if ($ll) {
+				$topic_row['map_type'] = $desc[2];
+				$topic_row['geo_lon'] = $ll[1];
+				$topic_row['geo_lat'] = $ll[2];
+
+				// Calcul de l'altitude avec mapquest
+				global $mapKeys;
+				if (array_key_exists ('geo_altitude', $topic_row) && !$topic_row['geo_altitude'] &&
+					@$mapKeys['keys-mapquest']) {
+					$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
+						$mapKeys['keys-mapquest'].
+						'&callback=handleHelloWorldResponse&shapeFormat=raw&latLngCollection='.
+						$ll[2].','.$ll[1];
+					preg_match('/"height":([0-9]+)/', @file_get_contents ($mapquest), $match);
+
+					// Update the template data
+					$topic_row['geo_altitude'] = $match ? $match[1] : '~';
+
+					// Update the database for next time
+					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";
+					$this->db->sql_query($sql);
+				}
+
+				// Détermination du massif par refuges.info
+				if (array_key_exists ('geo_massif', $topic_row) && !$topic_row['geo_massif']) {
+					$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.
+						$ll[1].','.$ll[2].','.$ll[1].','.$ll[2];
+					$wri_export = json_decode (@file_get_contents ($f_wri_export));
+					// récupère tous les polygones englobantz
+					if($wri_export->features)
+						foreach ($wri_export->features AS $f)
+							$ms [$f->properties->type->id] = $f->properties->nom;
+					// Trie le type de polygone le plus petit
+					if (isset ($ms))
+						ksort ($ms);
+
+					// Update the template data
+					$topic_row['geo_massif'] = @$ms[array_keys($ms)[0]] ?: '~';
+
+					// Update the database for next time
+					$sql = "UPDATE phpbb_posts SET geo_massif = '{$topic_row['geo_massif']}' WHERE post_id = $post_id";
+					$this->db->sql_query($sql);
+				}
+			}
 		}
+
+		if ($post_id == $topic_first_post_id)
+			$this->template->assign_vars (array_change_key_case ($topic_row, CASE_UPPER));
 	}
 
 	/**
@@ -137,12 +189,12 @@ class listener implements EventSubscriberInterface
 
 		// Get translation of SQL space data
 		if (isset ($post_data['geom'])) {
-			$sql = 'SELECT ST_AsGeoJSON(geom) AS geojson'.
+			$sql = 'SELECT ST_AsGeoJSON(geom) AS geo_json'.
 				' FROM '.POSTS_TABLE.
 				' WHERE post_id = '.$post_data['post_id'];
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
-			$this->template->assign_var ('GEOJSON', $row['geojson']);
+			$this->template->assign_var ('GEO_JSON', $row['geo_json']);
 			$this->db->sql_freeresult($result);
 		}
 	}

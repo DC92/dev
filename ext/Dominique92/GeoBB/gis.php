@@ -42,7 +42,7 @@ $sql_array = [
 		'f.forum_id',
 		'forum_image',
 		'forum_desc',
-		'ST_AsGeoJSON(geom) AS geojson',
+		'ST_AsGeoJSON(geom) AS geo_json',
 	],
 	'FROM' => [POSTS_TABLE => 'p'],
 	'LEFT_JOIN' => [[
@@ -92,7 +92,7 @@ $features = $signatures = [];
 $ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
 	// Color calculation
-	preg_match_all('/[0-9\.]+/',$row['geojson'],$coords);
+	preg_match_all('/[0-9\.]+/',$row['geo_json'],$coords);
 	$x[0] = $coords[0][0] * 30000 % $ampl; // From lon
 	$x[1] = $coords[0][1] * 30000 % $ampl; // From lat
 	$x[2] = $ampl - ($x[0] + $x[1]) / 2;
@@ -117,7 +117,7 @@ while ($row = $db->sql_fetchrow($result)) {
 		$properties['color'] = $colors[1];
 
 	// Disjoin points having the same coordinate
-	$geophp = json_decode ($row['geojson']);
+	$geophp = json_decode ($row['geo_json']);
 	if ($geophp->type == 'Point') {
 		while (in_array (signature ($geophp->coordinates), $signatures))
 			$geophp->coordinates[0] += 0.00001;

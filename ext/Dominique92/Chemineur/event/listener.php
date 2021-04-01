@@ -46,8 +46,6 @@ class listener implements EventSubscriberInterface
 			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
-			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
 
@@ -141,79 +139,11 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	// Called during first pass on post data that read phpbb-posts SQL data
-	function viewtopic_post_rowset_data($vars) {//1400
-		// Garde les données SQL de chaque post en mémoire
-		$row = $vars['row'];
-		$post_id = $row['post_id'];
-		$this->sql_row[$post_id] = $row;
-	}
-	// Modify the posts template block
-	function viewtopic_modify_post_row($vars) {
-		$topic_data = $vars['topic_data'];
-		$topic_first_post_id = $topic_data['topic_first_post_id'];
-		$row = $vars['row'];
-		$post_id = $row['post_id'];
-		$sql_row = $this->sql_row[$post_id];
-		$post_row = $vars['post_row'];
-
-		$geom = json_decode ($sql_row['geojson']);
-		$ll = $geom->geometries[0]->coordinates;
-
-		// Détermine si le titre du post est une réponse
-		if ($post_id != $topic_first_post_id &&
-			strncasecmp ($row['post_subject'], 'Re: ', 4))
-			$post_row['post_subject_optim'] = str_replace ('Re: ', '', $row['post_subject']);
-
-		// Calcul de l'altitude avec mapquest
-		if (@count($ll) == 2 && !@$sql_row['geo_altitude']) {
-			global $mapKeys;
-			$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
-				$mapKeys['keys-mapquest'].
-				'&callback=handleHelloWorldResponse&shapeFormat=raw&latLngCollection='.
-				$ll[1].','.$ll[0];
-			preg_match('/"height":([0-9]+)/', @file_get_contents ($mapquest), $match);
-
-			// Update the template data
-			$sql_row['geo_altitude'] = $match ? $match[1] : '~';
-
-			// Update the database for next time
-			$sql = "UPDATE phpbb_posts SET geo_altitude = '{$sql_row['geo_altitude']}' WHERE post_id = $post_id";
-			$this->db->sql_query($sql);
-		}
-
-		// Détermination du massif par refuges.info
-		if (@count($ll) == 2 && !@$sql_row['geo_massif']) {
-			$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.$ll[0].','.$ll[1].','.$ll[0].','.$ll[1];
-			$wri_export = json_decode (@file_get_contents ($f_wri_export));
-			// récupère tous les polygones englobantz
-			if($wri_export->features)
-				foreach ($wri_export->features AS $f)
-					$ms [$f->properties->type->id] = $f->properties->nom;
-			// Trie le type de polygone le plus petit
-			if (isset ($ms))
-				ksort ($ms);
-
-			// Update the template data
-			$sql_row['geo_massif'] = @$ms[array_keys($ms)[0]] ?: '~';
-
-			// Update the database for next time
-			$sql = "UPDATE phpbb_posts SET geo_massif = '{$sql_row['geo_massif']}' WHERE post_id = $post_id";
-			$this->db->sql_query($sql);
-		}
-
-		// Assigne les valeurs spécifiques à chaque post du template
-		foreach ($sql_row AS $k=>$v)
-			if (strpos ($k,'geo_') === 0)
-				$post_row[strtoupper($k)] = str_replace ('~', '', $v);
-
-		$vars['post_row'] = $post_row;
-	}
-
 	function viewtopic_modify_post_data($vars) {
 		// Mem for parse_attachments_modify_template_data
 		$this->attachments = $vars['attachments'];
 	}
+
 	function parse_attachments_modify_template_data($vars) {
 		if (@$this->attachments) {
 			$post_id = $vars['attachment']['post_msg_id'];
@@ -236,6 +166,13 @@ class listener implements EventSubscriberInterface
 				]);
 		}
 	}
+
+		// Détermine si le titre du post est une réponse
+		/* //TODO dans chemineur
+		if ($post_id != $topic_first_post_id &&
+			strncasecmp ($row['post_subject'], 'Re: ', 4))
+			$post_row['post_subject_optim'] = str_replace ('Re: ', '', $row['post_subject']);
+			*/
 
 	/**
 		POSTING.PHP
