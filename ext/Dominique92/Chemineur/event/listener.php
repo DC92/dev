@@ -47,6 +47,7 @@ class listener implements EventSubscriberInterface
 
 			// Viewtopic
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
 
 			// posting
@@ -82,17 +83,6 @@ class listener implements EventSubscriberInterface
 					)
 				);
 		$this->db->sql_freeresult($result);
-
-										// Includes language and style files of this extension
-								//TODO		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
-
-										// Includes style files of this extension
-								if(0)//TODO
-										if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-											$this->template->set_style ([
-												$this->ext_path.'styles',
-												'styles', // core styles
-											]);
 	}
 
 	/**
@@ -139,6 +129,20 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
+	// Modify the posts template block
+	function viewtopic_modify_post_row($vars) {
+		$post_row = $vars['post_row'];
+		$topic_data = $vars['topic_data'];
+		$row = $vars['row'];
+
+		// Détermine si le titre du post est une réponse
+		if ($vars['row'] != $topic_data['topic_first_post_id'] &&
+			strncasecmp ($row['post_subject'], 'Re: ', 4))
+			$post_row['POST_SUBJECT_OPTIM'] = str_replace ('Re: ', '', $row['post_subject']);
+
+		$vars['post_row'] = $post_row;
+	}
+
 	function viewtopic_modify_post_data($vars) {
 		// Mem for parse_attachments_modify_template_data
 		$this->attachments = $vars['attachments'];
@@ -166,13 +170,6 @@ class listener implements EventSubscriberInterface
 				]);
 		}
 	}
-
-		// Détermine si le titre du post est une réponse
-		/* //TODO dans chemineur
-		if ($post_id != $topic_first_post_id &&
-			strncasecmp ($row['post_subject'], 'Re: ', 4))
-			$post_row['post_subject_optim'] = str_replace ('Re: ', '', $row['post_subject']);
-			*/
 
 	/**
 		POSTING.PHP

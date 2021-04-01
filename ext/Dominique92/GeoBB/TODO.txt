@@ -1,6 +1,11 @@
 TODO BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
 TODO DIAPO ordre des diapos
 
+Connexion = erreur
+Petit écran menu jaune marge droite
+Modif -> erreur 
+Petit écran.  Loupe recherche trop basse
+
 TEST ?? Images dépassent sur petits écrans
 	Nom utilisateur masqué sur petit écran
 	TODO posting lignes ???
