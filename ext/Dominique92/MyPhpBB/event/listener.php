@@ -189,7 +189,7 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_var ('MYPHPBB_LOG_EDIT', true);
 
 			// Create the file with the existing post data
-			$file_name = 'LOG/'.$post_data['post_id'].'.txt';
+			$file_name = 'LOG/'.@$post_data['post_id'].'.txt';
 			if (!file_exists ($file_name))
 				file_put_contents ($file_name,
 					pack('CCC',0xef,0xbb,0xbf). // UTF-8 encoding

@@ -1,15 +1,9 @@
-c92
-	http://c92.fr/test/chem4/viewtopic.php?f=4&t=4957&p=12660
-		Pas de fichiers joints
-		Ca d'asti viewtopic.php?f=4&t=4957 : n'affiche pas la carte et pas en format point
-
 INSTALL Manque smiley :sleep :
-
-BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
 
 TODO BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
 TODO DIAPO ordre des diapos
 
+BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
 BEST création champs SQL altitude et massif si non existants
 BEST Images responsives de toute la lergeur sur petits écrans
 BEST Bordure blanche images trop larges quand plusieurs dans le même post

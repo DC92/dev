@@ -19,6 +19,7 @@ class listener implements EventSubscriberInterface
 {
 	// List of externals
 	public function __construct(
+		\phpbb\config\config $config,
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\request\request_interface $request,
 		\phpbb\template\template $template,
@@ -26,15 +27,13 @@ class listener implements EventSubscriberInterface
 		\phpbb\auth\auth $auth,
 		\phpbb\language\language $language
 	) {
+		$this->config = $config;
 		$this->db = $db;
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
 		$this->auth = $auth;
 		$this->language = $language;
-
-		$this->ns = explode ('\\', __NAMESPACE__);
-		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
 	}
 
 	static public function getSubscribedEvents() {
@@ -46,6 +45,7 @@ class listener implements EventSubscriberInterface
 			'core.index_modify_page_title' => 'index_modify_page_title',
 
 			// Viewtopic
+			'core.viewtopic_before_f_read_check' => 'viewtopic_before_f_read_check',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 			'core.parse_attachments_modify_template_data' => 'parse_attachments_modify_template_data',
@@ -129,6 +129,11 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
+	public function viewtopic_before_f_read_check($vars) { // ligne 370
+		// Supprime la pagination
+		$this->config['posts_per_page'] = 1000;
+	}
+
 	// Modify the posts template block
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
@@ -136,7 +141,7 @@ class listener implements EventSubscriberInterface
 		$row = $vars['row'];
 
 		// Détermine si le titre du post est une réponse
-		if ($vars['row'] != $topic_data['topic_first_post_id'] &&
+		if ($row['post_id'] != $topic_data['topic_first_post_id'] &&
 			strncasecmp ($row['post_subject'], 'Re: ', 4))
 			$post_row['POST_SUBJECT_OPTIM'] = str_replace ('Re: ', '', $row['post_subject']);
 
