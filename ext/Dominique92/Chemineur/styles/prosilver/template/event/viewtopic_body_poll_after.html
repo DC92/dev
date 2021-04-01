@@ -12,16 +12,13 @@
 		</h1>
 		<h3 id="cadre-coords"></h3>
 
-		<!-- BEGIN postrow -->
-			<!-- IF postrow.S_FIRST_ROW -->
-				<!-- IF postrow.GEO_ALTITUDE -->
-					<h3>Altitude: {postrow.GEO_ALTITUDE} m</h3>
-				<!-- ENDIF -->
-				<!-- IF postrow.GEO_MASSIF -->
-					<h3>Massif: {postrow.GEO_MASSIF}</h3>
-				<!-- ENDIF -->
-			<!-- ENDIF -->
-		<!-- END postrow -->
+		<!-- IF GEO_ALTITUDE -->
+			<h3>Altitude: {GEO_ALTITUDE} m</h3>
+		<!-- ENDIF -->
+
+		<!-- IF GEO_MASSIF -->
+			<h3>Massif: {GEO_MASSIF}</h3>
+		<!-- ENDIF -->
 
 	</td><td class="emd"></td></tr>
 
