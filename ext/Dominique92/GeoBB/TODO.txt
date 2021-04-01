@@ -6,9 +6,13 @@ Petit écran menu jaune marge droite
 Modif -> erreur 
 Petit écran.  Loupe recherche trop basse
 
+TODO création champs SQL altitude et massif si non existants
+
 TEST ?? Images dépassent sur petits écrans
 	Nom utilisateur masqué sur petit écran
 	TODO posting lignes ???
+	//TODO BUG une ligne surimposée en viewtopic ??? le marqueur avec un json ? (case 'posting-line':)
+
 TODO c92 point champs modifié par / Raison
 
 BEST Bordure blanche images trop larges quand plusieurs dans le même post

@@ -174,14 +174,9 @@ class listener implements EventSubscriberInterface
 	*/
 	function posting_modify_row_data($vars) {
 		$post_data = $vars['post_data'];
-		$has_maps = preg_match ('/([\.:])(point|line|poly)/', $post_data['forum_desc'], $params);
+		preg_match ('/([\.:])(point|line|poly)/', $post_data['forum_desc'], $params);
 
-		// For editing facilities choice //TODO ???????????????
-		preg_match ('/([^\/]+)\.[a-z]+$/' , $post_data['forum_image'], $image);
-		if (isset ($image[1]))
-			$this->template->assign_var ('FORUM_IMAGE', $image[1]);
-
-		if ($has_maps && (
+		if ($params && (
 				$params[1] == ':' || // Map on all posts
 				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
 			)) {

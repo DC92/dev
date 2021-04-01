@@ -7,9 +7,7 @@
  * download/file.php?id=<ID>&size=<MAX_PIXELS> resize to fit into a MAX_PIXELS square
  */
 
-/*//TODO
-Template miniatures pour réorganisation
-*/
+//TODO Template miniatures pour réorganisation
 
 namespace Dominique92\Images\event;
 
@@ -120,7 +118,6 @@ class listener implements EventSubscriberInterface
 			mkdir ('../cache/images/');
 
 		// Cas des fichiers hérités de chem2
-		//TODO DELETE
 		$attachment ['real_filename'] = str_replace ('http://v2.chemineur.fr', 'chem2', $attachment ['real_filename']);
 
 		if (is_file('../'.$attachment['real_filename'])) // Fichier relatif à la racine du site

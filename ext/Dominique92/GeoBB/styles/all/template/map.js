@@ -103,7 +103,6 @@ switch (script + '-' + mapType) {
 		map.addLayer(marker);
 		break;
 
-		//TODO BUG une ligne surimposée en viewtopic ??? le marqueur avec un json ?
 	case 'posting-line':
 		map.addLayer(layerGeoJson({
 			geoJsonId: 'geojson',

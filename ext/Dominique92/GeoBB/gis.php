@@ -110,12 +110,6 @@ while ($row = $db->sql_fetchrow($result)) {
 		'color' => $color,
 	];
 
-	// Spécific color defined in forum desc
-	//TODO DELETE / REVOIR ???
-	preg_match('/\[color=([a-z]+)\]/i', html_entity_decode ($row['forum_desc']), $colors);
-	if (count ($colors))
-		$properties['color'] = $colors[1];
-
 	// Disjoin points having the same coordinate
 	$geophp = json_decode ($row['geo_json']);
 	if ($geophp->type == 'Point') {
