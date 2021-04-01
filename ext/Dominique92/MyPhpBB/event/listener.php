@@ -173,7 +173,7 @@ class listener implements EventSubscriberInterface
 		/* Prevent an empty title to invalidate the full page and input */
 		if (defined('MYPHPBB_POST_EMPTY_SUBJECT') &&
 			!$post_data['post_subject'])
-			$page_data['DRAFT_SUBJECT'] = $this->post_name ?: 'New';
+			$page_data['DRAFT_SUBJECT'] = @$this->post_name ?: 'New';
 
 		$vars['page_data'] = $page_data;
 

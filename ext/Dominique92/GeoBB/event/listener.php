@@ -178,19 +178,21 @@ class listener implements EventSubscriberInterface
 
 		if ($params && (
 				$params[1] == ':' || // Map on all posts
-				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
+				@$post_data['post_id'] == @$post_data['topic_first_post_id'] // Only map on the first post
 			)) {
 			$this->template->assign_var ('MAP_TYPE', $params[2]);
 
 			// Get translation of SQL space data
-			$sql = 'SELECT ST_AsGeoJSON(geom) AS geo_json, geo_altitude, geo_massif'.
-				' FROM '.POSTS_TABLE.
-				' WHERE post_id = '.$post_data['post_id'];
-			$result = $this->db->sql_query($sql);
-			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-			if ($row)
-				$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
+			if (@$post_data['post_id']) { // Only modification
+				$sql = 'SELECT ST_AsGeoJSON(geom) AS geo_json, geo_altitude, geo_massif'.
+					' FROM '.POSTS_TABLE.
+					' WHERE post_id = '.$post_data['post_id'];
+				$result = $this->db->sql_query($sql);
+				$row = $this->db->sql_fetchrow($result);
+				$this->db->sql_freeresult($result);
+				if ($row)
+					$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
+			}
 		}
 	}
 

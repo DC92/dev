@@ -175,7 +175,8 @@ class listener implements EventSubscriberInterface
 		POSTING.PHP
 	*/
 	function modify_posting_auth($vars) {
-		require_once($this->root_path . 'includes/functions_admin.php');
+		global $root_path;
+		require_once($root_path.'includes/functions_admin.php');
 
 		// Popule le sélecteur de forum
 		$sql = "SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id, forum_desc
