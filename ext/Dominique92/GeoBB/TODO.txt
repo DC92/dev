@@ -1,15 +1,15 @@
-TEST ?? Images dépassent sur petits écrans
-BEST Bordure blanche images trop larges quand plusieurs dans le même post
-Nom utilisateur masqué sur petit écran
 Fenetre large = limite de largeur du fond
 
 TODO c92 point champs modifié par / Raison
-TODO : posting pas de sélecteur de forum si ce n’est pas le premier post
 TODO Champ de saisie altitude / massif
 
 TODO BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
 TODO DIAPO ordre des diapos
 
+TEST ?? Images dépassent sur petits écrans
+	Nom utilisateur masqué sur petit écran
+
+BEST Bordure blanche images trop larges quand plusieurs dans le même post
 BEST BUG quand trace, la carte est 3 fois plus haute
 BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
 BEST cabane cheminée grise et oeuil de bœuf vert

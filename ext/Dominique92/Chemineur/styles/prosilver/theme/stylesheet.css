@@ -15,6 +15,7 @@
 body,
 .wrap {
 	margin: 0;
+	max-width: none;
 	border: 0;
 	border-radius: 0;
 	padding: 0;
@@ -22,11 +23,11 @@ body,
 
 /* Bandeau */
 .headerbar {
+	margin: 0;
+	border-radius: 0;
 	background-image: url("images/banniere.jpg");
 	height: 60px;
-	margin: 0;
 	padding: 0;
-	border-radius: 0;
 }
 .inner {
 	/* Définit le parent de la position absolute ci-dessous */
@@ -45,8 +46,8 @@ body,
 	color: yellow;
 }
 .site-description h1 {
-	font-size: 3em;
 	display: inline;
+	font-size: 3em;
 	color: yellow;
 }
 .site-description p {
@@ -56,9 +57,9 @@ body,
 
 /* Menu */
 .navbar {
-	padding: 0;
-	width: 100%;
 	background: transparent;
+	width: 100%;
+	padding: 0;
 }
 .navbar .nav-breadcrumbs li {
 	background: #fe0;
@@ -104,9 +105,9 @@ body,
 	color: white;
 }
 .nouvelles li:first-child {
-	font-weight: bold;
 	color: yellow;
 	font-size: 2em;
+	font-weight: bold;
 	text-decoration: underline;
 }
 .nouvelles a {
@@ -114,9 +115,9 @@ body,
 	color: yellow;
 }
 .nouvelles li:last-child a {
-	color: white;
 	font-size: 12px;
 	font-weight: initial;
+	color: white;
 }
 
 /* Carte */
@@ -200,7 +201,9 @@ body,
 	vertical-align: bottom;
 }
 .emd img {
-	position: relative; right: -27px; bottom: -5px;
+	position: relative;
+	right: -27px;
+	bottom: -5px;
 }
 .emg, .emd {
 	background: url('cadres/etiquette_h.png');
@@ -219,19 +222,19 @@ body,
 	background: white;
 }
 .emm h1 {
-	color: #105289;
-	margin-right: 0;
 	margin-top: 0;
+	margin-right: 0;
+	color: #105289;
 }
 .emm h1 span {
-	color: #105289;
 	font-size: 0.8em;
+	color: #105289;
 }
 .emm h3,
 .emm .action-bar {
-	text-transform: none;
-	font-size: 1em;
 	padding: 0 2px;
+	font-size: 1em;
+	text-transform: none;
 }
 
 /* Posts des points */
@@ -269,10 +272,10 @@ body,
 @media screen and (min-width: 600px) {
 	.section-viewtopic.geo_point .postbody > div {
 		clear: both;
-		margin-bottom: 20px;
 		display: flex;
-		justify-content: space-around;
+		margin-bottom: 20px;
 		align-items: center;
+		justify-content: space-around;
 	}
 	.section-viewtopic.geo_point .bg1 .postbody > div {
 		flex-direction: row-reverse;
@@ -310,13 +313,15 @@ body,
 	vertical-align: bottom;
 }
 .tmd img {
-	position: relative; right: -20px; bottom: -5px;
+	position: relative;
+	right: -20px;
+	bottom: -5px;
 }
 .thm, .tbm {
 	background: url('cadres/postit_v.png');
 	text-align: right;
-	font-family: Arial;
 	font-size: 0.8em;
+	font-family: Arial;
 }
 .tmg, .tmd {
 	background: url('cadres/postit_h.png');
@@ -334,12 +339,14 @@ body,
 	background: #F3E358;
 }
 .tmm p {
-	position: relative; left: 12px; top: 5px;
-	font-family: Arial;
-	font-size: 1em;
-	color: #210;
-	text-indent: 10px;
+	position: relative;
+	left: 12px;
+	top: 5px;
 	margin-bottom: 0;
+	text-indent: 10px;
+	font-size: 1em;
+	font-family: Arial;
+	color: #210;
 }
 .tmm .titre {
 	font-size: 1.3em;
@@ -347,8 +354,9 @@ body,
 }
 .tbm p {
 	font-size: 0.8em;
-	float:right;
-	position: relative; left: 10px;
+	float: right;
+	position: relative; 
+	left: 10px;
 }
 
 /* Photos */
@@ -370,10 +378,10 @@ body,
 	background: url('cadres/photo_v.png');
 }
 .pbd p {
-	height: 12px;
 	position: relative;
 	top: -12px;
 	left: -10px;
+	height: 12px;
 }
 .pmd {
 	vertical-align: bottom;
@@ -399,19 +407,22 @@ body,
 	background-position: right bottom;
 }
 .phm p, .pbm p {
+	font-size: 0.8em;
 	font-family: Verdana;
 	color: #a00;
-	font-size: 0.8em;
 }
 .phm p {
-	font-weight: bold;
-	position: relative; left: -5px;
+	position: relative;
+	left: -5px;
 	margin: 0;
+	font-weight: bold;
 }
 .pbm p {
-	text-align: right;
-	position: relative; top: -2px; right: 10px;
+	position: relative;
+	top: -2px;
+	right: 10px;
 	margin: 2px;
+	text-align: right;
 }
 .photo-comment {
 	margin: 10px;
