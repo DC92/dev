@@ -184,18 +184,18 @@ class listener implements EventSubscriberInterface
 		if ($has_maps && (
 				$params[1] == ':' || // Map on all posts
 				$post_data['post_id'] == $post_data['topic_first_post_id'] // Only map on the first post
-			))
+			)) {
 			$this->template->assign_var ('MAP_TYPE', $params[2]);
 
-		// Get translation of SQL space data
-		if (isset ($post_data['geom'])) {
-			$sql = 'SELECT ST_AsGeoJSON(geom) AS geo_json'.
+			// Get translation of SQL space data
+			$sql = 'SELECT ST_AsGeoJSON(geom) AS geo_json, geo_altitude, geo_massif'.
 				' FROM '.POSTS_TABLE.
 				' WHERE post_id = '.$post_data['post_id'];
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
-			$this->template->assign_var ('GEO_JSON', $row['geo_json']);
 			$this->db->sql_freeresult($result);
+			if ($row)
+				$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
 		}
 	}
 
@@ -207,6 +207,9 @@ class listener implements EventSubscriberInterface
 		// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 		if ($post['geom'])
 			$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('{$post['geom']}')";
+
+		$sql_data[POSTS_TABLE]['sql']['geo_altitude'] = $post['geo_altitude'];
+		$sql_data[POSTS_TABLE]['sql']['geo_massif'] = $post['geo_massif'];
 
 		$vars['sql_data'] = $sql_data; // Return data
 	}

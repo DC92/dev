@@ -1,11 +1,10 @@
-TODO c92 point champs modifié par / Raison
-TODO Champ de saisie altitude / massif
-
 TODO BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
 TODO DIAPO ordre des diapos
 
 TEST ?? Images dépassent sur petits écrans
 	Nom utilisateur masqué sur petit écran
+	TODO posting lignes ???
+TODO c92 point champs modifié par / Raison
 
 BEST Bordure blanche images trop larges quand plusieurs dans le même post
 BEST BUG quand trace, la carte est 3 fois plus haute
