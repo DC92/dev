@@ -1,18 +1,32 @@
-INSTALL Manque smiley :sleep :
+TODO ???? BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
+TODO ???? DIAPO ordre des diapos
 
-TODO BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
-TODO DIAPO ordre des diapos
+Selecteur de couches :
+	Chemineur
+	Posting
 
-BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
-BEST création champs SQL altitude et massif si non existants
-BEST Images responsives de toute la lergeur sur petits écrans
-BEST Bordure blanche images trop larges quand plusieurs dans le même post
-BEST BUG quand trace, la carte est 3 fois plus haute
+Bug charge fichier GPX fait un zoom 0
+
+TRACES
+	Différentier la trace du point visionné 
+	Différentier la trace éditée
+	Ne pas survoler les autres traces en posting 
+
+BEST Fonction GPS / selecteur de traces
 BEST cabane cheminée grise et oeuil de bœuf vert
+BEST Jquery extend map
+BEST carte pour 1 forum (aéroport, … ?)
+BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
+BEST Images responsives de toute la largeur sur petits écrans
+	Bordure blanche images trop larges quand plusieurs dans le même post
+BEST Diapo démarre sur une petite page puis défilement en full screen
 BEST Parking avec un P ascii avec couleurs
+BEST façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
+BEST Reprendre tous les @ (erreurs masquées)
+BEST création champs SQL altitude et massif si non existants
+BEST BUG quand trace, la carte est 3 fois plus haute
 BEST cadre et viseur SVG
 BEST Ne pas démarrer les ext quand on installe
-BEST façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
 
 MYOL
 BUG myol editeur ligne zone sensible edit ligne plus grande
@@ -24,9 +38,10 @@ BUG WRI pictos clignotent
 ************************************************************************************
 MIGRATION
 Copier chem3/files
+Copier chem3/files/attach
 Copier chem2/chem-fich dans chem2/chem-fich
 Copier chem3/images/avatars
-Copier gobBB/images/smileys
+Copier gobBB/images/smileys (vérifier :sleep:)
 
 Save SQL chem3
 	supprimer les 2 lignes create database

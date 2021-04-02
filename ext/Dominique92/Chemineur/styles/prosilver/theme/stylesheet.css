@@ -9,6 +9,8 @@
 .breadcrumbs .icon,
 .nav-main,
 .headerspace,
+.section-posting input[name="preview"],
+.section-posting input[name="save"],
 #page-footer .navbar {
 	display: none !important;
 }
@@ -99,7 +101,6 @@ body,
 	background-color: #5072BF !important;
 	background: url('images/coin_ciel.jpg');
 	background-repeat: no-repeat;
-	background-position-y: 60px;
 }
 .username-coloured {
 	text-transform: capitalize;

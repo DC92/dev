@@ -186,7 +186,10 @@ class listener implements EventSubscriberInterface
 			// Add a blank file if none
 			file_put_contents ('LOG/index.html', '');
 
-			$this->template->assign_var ('MYPHPBB_LOG_EDIT', true);
+			$this->template->assign_vars ([
+				'MYPHPBB_LOG_EDIT' => true,
+				'POST_ID' => $post_data['post_id'],
+			]);
 
 			// Create the file with the existing post data
 			$file_name = 'LOG/'.@$post_data['post_id'].'.txt';
@@ -202,7 +205,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	function modify_submit_notification_data($vars) {
-
 		/* Log new post data */
 		if (defined('MYPHPBB_LOG_EDIT'))
 			file_put_contents ('LOG/'.$vars['data_ary']['post_id'].'.txt',

@@ -8,7 +8,6 @@
  * Validated on Chrome, FF, Edge & Opera on Win10 & Android;
  * Safari on IOS; Brave & IE11 on Win10
  */
-
 function mySlider(id, slides, options) {
 	options = options || {};
 
@@ -91,12 +90,18 @@ function mySlider(id, slides, options) {
 		.attr('title', homeTitle)
 		.click(function() {
 			if (typeof mysliderHome === "function")
-			mysliderHome();
+				mysliderHome();
 		})
 	);
 
 	document.addEventListener('keydown', function(evt) {
+		evt.preventDefault();
 		switch (evt.keyCode) {
+			case 27: // Escape
+				if (typeof mysliderHome === "function")
+					if (typeof mysliderHome === "function")
+						mysliderHome();
+				break;
 			case 33: // Page up
 			case 37: // >
 			case 38: // Up
