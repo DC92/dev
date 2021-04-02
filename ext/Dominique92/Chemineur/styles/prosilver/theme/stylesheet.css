@@ -78,11 +78,14 @@ body,
 	font-weight: normal;
 	color: blue !important;
 }
+.menu-container {
+	position: relative;
+}
 .sub-menu {
-	padding: 10px 1px;
+	padding-top: 10px;
 	position: absolute;
-	top: 23px;
-	right: 0;
+	top: 20px;
+	right: -7px;
 	z-index: 1;
 	white-space: nowrap;
 	display: none;
