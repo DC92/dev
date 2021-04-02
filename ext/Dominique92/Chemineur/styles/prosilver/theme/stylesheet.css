@@ -62,6 +62,10 @@ body,
 	margin: 0;
 	padding: 0;
 }
+.navbar .nav-breadcrumbs {
+	border: 0 !important;
+	padding: 0 !important;
+}
 .navbar .nav-breadcrumbs li {
 	background: #fe0;
 	border: 3px outset #dc0;
@@ -74,13 +78,17 @@ body,
 	font-weight: normal;
 	color: blue !important;
 }
-.dropdown-contents {
-	max-height: initial !important;
+.sub-menu {
+	padding: 10px 1px;
+	position: absolute;
+	top: 23px;
+	right: 0;
+	z-index: 1;
+	white-space: nowrap;
+	display: none;
 }
-.navbar .nav-breadcrumbs,
-.dropdown ul {
-	border: 0 !important;
-	padding: 0 !important;
+.menu-container:hover .sub-menu {
+	display: block;
 }
 
 /* Accueil */
