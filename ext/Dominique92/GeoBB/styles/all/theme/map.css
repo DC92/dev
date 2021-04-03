@@ -5,6 +5,7 @@
 }
 #map {
 	width: 100%;
+	min-height: 40vw;
 }
 /* Make the height equal to the width */
 .ol-viewport {

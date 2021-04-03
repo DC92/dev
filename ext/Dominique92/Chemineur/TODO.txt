@@ -2,7 +2,7 @@ TODO ???? BUG DIAPO n'affiche pas la première image au début du chargement (wa
 TODO ???? DIAPO ordre des diapos
 
 BUGS
-Pas de cartes en IE
+Pas de cartes en IE / Ne pas charger Geocoder
 Pas d'images http://c92.fr/test/chem4/viewtopic.php?t=13237#p35360 => Images externes ! Attachment 32937
 
 Selecteur de couches : Posting
@@ -17,12 +17,11 @@ BUG pictos clignotent (idem WRI)
 BEST MYOL
 	selection layer en cliquent sur le nom
 	myol editeur ligne zone sensible edit ligne plus grande
-	zoom à 2 doigts sur icônes
-	selecteur peut être initialisé "checked"
-	et garder ses cookies quand modifié
+	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
+	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
 BEST Sélecteur sur c2c, PRC
-BEST pas de fond ciel sur connexion
 BEST Fonction GPS / selecteur de traces
+BEST pas de fond ciel sur connexion à l'admin
 BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Jquery extend map
 BEST carte pour 1 forum (aéroport, … ?)
