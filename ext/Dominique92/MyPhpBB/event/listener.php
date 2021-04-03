@@ -179,54 +179,65 @@ class listener implements EventSubscriberInterface
 
 		/* Keep trace of values prior to modifications */
 		/* Create a log file with the post existing data if there is none */
-		if (defined('MYPHPBB_LOG_EDIT')) {
-			// Create the LOG directory if none
-			if (!is_dir('LOG'))
-				mkdir('LOG');
-			// Add a blank file if none
-			file_put_contents ('LOG/index.html', '');
-
+		if (defined('MYPHPBB_LOG_EDIT') &&
+			isset ($post_data['post_id'])) {
 			$this->template->assign_vars ([
 				'MYPHPBB_LOG_EDIT' => true,
 				'POST_ID' => $post_data['post_id'],
 			]);
 
 			// Create the file with the existing post data
-			$file_name = 'LOG/'.@$post_data['post_id'].'.txt';
-			if (!file_exists ($file_name))
-				file_put_contents ($file_name,
-					pack('CCC',0xef,0xbb,0xbf). // UTF-8 encoding
-					date('r').PHP_EOL.
-					'Titre: '.$post_data['post_subject'].PHP_EOL.
-					$post_data['post_text'].PHP_EOL.
-					$this->specific_data($post_data).PHP_EOL
-				);
+			$this->log_data (
+				$post_data['post_id'],
+				$post_data
+			);
 		}
 	}
 
 	function modify_submit_notification_data($vars) {
-		/* Log new post data */
 		if (defined('MYPHPBB_LOG_EDIT'))
-			file_put_contents ('LOG/'.$vars['data_ary']['post_id'].'.txt',
-				'_______________________________'.PHP_EOL.
-				date('r').' '.$this->user->data['username'].PHP_EOL.
-				'Titre: '.$this->post['subject'].PHP_EOL.
-				$this->post['message'].PHP_EOL.
-				$this->specific_data($this->post).PHP_EOL,
-			FILE_APPEND);
+			// Log new post data
+			$this->log_data (
+				$vars['data_ary']['post_id'],
+				$this->post,
+				$this->user->data['username']
+			);
 	}
 
-	function specific_data($post_data) {
-		$r = '';
-		foreach ($post_data AS $k=>$v)
-			if ($k[3] == '_' &&
-				$v &&
-				$v != '00' &&
-				$v != '0' &&
-				$v != '?' &&
-				$v != 'off')
-				$r .= $k.': '.(is_array($v) ? implode(',',$v) : $v).PHP_EOL;
-		return $r;
+	function log_data($post_id, $data, $user = '') {
+		// Create the LOG directory & a blank file if none
+		if (!is_dir('LOG')) {
+			mkdir('LOG');
+			file_put_contents ('LOG/index.html', '');
+		}
+
+		$file_name = "LOG/$post_id.txt";
+		if (!file_exists ($file_name)) { // Create the file with the existing post data
+			$r = [
+				pack('CCC',0xef,0xbb,0xbf).date('r'), // UTF-8 encoding
+			];
+		} elseif ($user) { // Log new post data
+			$r = [
+				//'', // End previous line
+				'_______________________________',
+				date('r').' par '.$user,
+			];
+		} else
+			return;
+
+		foreach ($data AS $k=>$v)
+			if ($k == 'post_subject' || $k == 'subject' ||
+				$k == 'post_text' || $k == 'message' ||
+				$k == 'geom' ||
+				($k[3] == '_' && $v && $v != '00' && $v != '0' && $v != '?' && $v != 'off')) {
+			$r[] = "$k: $v";
+		}
+
+		file_put_contents (
+			$file_name,
+			implode (PHP_EOL, $r) .PHP_EOL,
+			FILE_APPEND
+		);
 	}
 
 	/**
