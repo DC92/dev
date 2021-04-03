@@ -779,11 +779,10 @@ function layerVectorURL(options) {
 										mapSize = layer.map_.getSize();
 									for (let f in features)
 										ol.extent.extend(extent, features[f].getGeometry().getExtent());
-									layer.map_.getView().fit(
-										extent, {
-											maxZoom: 17,
-											size: [mapSize[0] * 0.8, mapSize[1] * 0.8],
-										});
+									layer.map_.getView().fit(extent, {
+										maxZoom: 17,
+										size: [mapSize[0] * 0.8, mapSize[1] * 0.8],
+									});
 								}
 							}
 						}
@@ -1097,7 +1096,7 @@ function layerOverpass(options) {
 	format.readFeatures = function(response, opt) {
 		// Transform an area to a node (picto) at the center of this area
 		const doc = new DOMParser().parseFromString(response, 'application/xml');
-		for (let node = doc.documentElement.firstChild; node; node = node.nextSibling)
+		for (let node = doc.documentElement.firstElementChild; node; node = node.nextSibling)
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
 				const newNode = doc.createElement('node');
@@ -1105,7 +1104,7 @@ function layerOverpass(options) {
 				doc.documentElement.appendChild(newNode);
 
 				// Browse <way> attributes to build a new node
-				for (let subTagNode = node.firstChild; subTagNode; subTagNode = subTagNode.nextSibling)
+				for (let subTagNode = node.firstElementChild; subTagNode; subTagNode = subTagNode.nextSibling)
 					switch (subTagNode.nodeName) {
 						case 'center':
 							// Set node attributes
@@ -1317,7 +1316,7 @@ function controlLayersSwitcher(options) {
 	function displayLayerSelector(evt, list) {
 		// Check the first if none checked
 		if (list && list.length === 0)
-			selectorEl.firstChild.firstChild.checked = true;
+			selectorEl.firstElementChild.firstElementChild.checked = true;
 
 		// Leave only one checked except if Ctrl key is on
 		if (evt && evt.type == 'click' && !evt.ctrlKey) {
@@ -1574,8 +1573,8 @@ function controlGeocoder(options) {
 	});
 
 	// Move the button at the same level than the other control's buttons
-	geocoder.container.firstChild.firstChild.title = options.title;
-	geocoder.container.appendChild(geocoder.container.firstChild.firstChild);
+	geocoder.container.firstElementChild.firstElementChild.title = options.title;
+	geocoder.container.appendChild(geocoder.container.firstElementChild.firstElementChild);
 
 	return geocoder;
 }
@@ -1812,6 +1811,8 @@ function controlLoadGPX(options) {
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
 		map.getView().fit(extent, {
 			maxZoom: 17,
+			size: map.getSize(),
+			padding: [5, 5, 5, 5],
 		});
 	};
 	return button;
@@ -1957,7 +1958,7 @@ function controlPrint() {
 		map.setSize([mapEl.offsetWidth, mapEl.offsetHeight]);
 
 		// Hide all but the map
-		for (let child = document.body.firstChild; child !== null; child = child.nextSibling)
+		for (let child = document.body.firstElementChild; child !== null; child = child.nextSibling)
 			if (child.style && child !== mapEl)
 				child.style.display = 'none';
 
@@ -2123,6 +2124,8 @@ function layerGeoJson(options) {
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
 			map.getView().fit(extent, {
 				maxZoom: options.focus,
+				size: map.getSize(),
+				padding: [5, 5, 5, 5],
 			});
 		}
 
