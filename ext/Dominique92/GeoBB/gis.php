@@ -17,7 +17,8 @@ $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
 
-$forums = request_var ('forums', ''); // List of forum to include "1,2,3"
+$forums = request_var ('type', ''); // List of forums to include "1,2,3"
+$categories = request_var ('cat', ''); // List of categories of forums to include "1,2,3"
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $exclude = request_var ('exclude', 0); // topic_id to exclude
 $select = request_var ('select', ''); // Post to display
@@ -54,6 +55,7 @@ $sql_array = [
 	]],
 	'WHERE' => [
 		$forums ? "f.forum_id IN ($forums)" : 'TRUE',
+		$categories ? "f.parent_id IN ($categories)" : 'TRUE',
 		't.topic_id != '.$exclude,
 		'geom IS NOT NULL',
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",

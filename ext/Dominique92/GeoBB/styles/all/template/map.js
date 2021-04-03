@@ -1,7 +1,8 @@
 // Features de la couche
 var layerGeoBBgis = layerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=300',
-		urlSuffix: '',
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250',
+		selectorName: 'chm-features',
+		urlSuffix: '&cat=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';

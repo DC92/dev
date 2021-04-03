@@ -1,4 +1,17 @@
 <ul class="css-expand">
+	<input type="checkbox" id="chm" class="switch">
+	<input type="checkbox" name="chm-features" checked="checked" />
+	<label for="chm">Chemineur &#9660;</label>
+	<span id="chm-features-status"></span>
+	<!-- BEGIN geo_categories -->
+		<li>
+			<input type="checkbox" name="chm-features" value="{geo_categories.CATEGORY}" />
+			{geo_categories.CATEGORY_NAME}
+		</li>
+	<!-- END geo_categories -->
+</ul>
+
+<ul class="css-expand">
 	<input type="checkbox" id="wri" class="switch">
 	<input type="checkbox" name="wri-features" />
 	<label for="wri">Refuges.info &#9660;</label>
@@ -9,6 +22,7 @@
 	<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
 	<li><input type="checkbox" name="wri-features" value="6" />sommet</li>
 	<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
+	<li><input type="checkbox" name="wri-features" value="16" />lac</li>
 	<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
 </ul>
 

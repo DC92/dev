@@ -64,12 +64,14 @@ class listener implements EventSubscriberInterface
 			SELECT p.forum_id AS category_id,
 				p.forum_name AS category_name,
 				f.forum_id AS first_forum_id,
+				f.parent_id AS category,
 				f.forum_desc
 			FROM ".FORUMS_TABLE." AS f
 			JOIN ".FORUMS_TABLE." AS p ON p.forum_id = f.parent_id
 			WHERE f.forum_type = ".FORUM_POST."
 				AND p.forum_type = ".FORUM_CAT."
 				AND p.parent_id = 0
+				AND f.forum_desc REGEXP '.point|.line'
 			ORDER BY f.left_id
 		";
 		$result = $this->db->sql_query($sql);
