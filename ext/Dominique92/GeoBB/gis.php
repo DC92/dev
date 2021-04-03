@@ -22,7 +22,7 @@ $categories = request_var ('cat', ''); // List of categories of forums to includ
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $exclude = request_var ('exclude', 0); // topic_id to exclude
 $select = request_var ('select', ''); // Post to display
-$limit = request_var ('limit', 250); // Nombre de points maximum
+$limit = request_var ('limit', 100); // Nombre de points maximum
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
 $bbox_sql =

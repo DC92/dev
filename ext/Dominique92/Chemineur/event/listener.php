@@ -61,18 +61,18 @@ class listener implements EventSubscriberInterface
 	function page_header() {
 		// Liste des catégories de points à ajouter
 		$sql = "
-			SELECT p.forum_id AS category_id,
-				p.forum_name AS category_name,
-				f.forum_id AS first_forum_id,
-				f.parent_id AS category,
-				f.forum_desc
-			FROM ".FORUMS_TABLE." AS f
-			JOIN ".FORUMS_TABLE." AS p ON p.forum_id = f.parent_id
-			WHERE f.forum_type = ".FORUM_POST."
-				AND p.forum_type = ".FORUM_CAT."
-				AND p.parent_id = 0
-				AND f.forum_desc REGEXP '.point|.line'
-			ORDER BY f.left_id
+			SELECT type.forum_id AS category_id,
+				type.forum_name AS category_name,
+				cat.forum_id AS first_forum_id,
+				cat.parent_id AS category,
+				cat.forum_desc,
+				cat.forum_desc REGEXP '.point|.line' AS geo
+			FROM ".FORUMS_TABLE." AS cat
+			JOIN ".FORUMS_TABLE." AS type ON type.forum_id = cat.parent_id
+			WHERE cat.forum_type = ".FORUM_POST."
+				AND type.forum_type = ".FORUM_CAT."
+				AND type.parent_id = 0
+			ORDER BY cat.left_id
 		";
 		$result = $this->db->sql_query($sql);
 		while ($row = $this->db->sql_fetchrow($result))

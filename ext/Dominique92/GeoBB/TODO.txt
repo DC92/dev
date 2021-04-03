@@ -1,8 +1,11 @@
 TODO ???? BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
 TODO ???? DIAPO ordre des diapos
 
-Selecteur de couches :
-	Posting
+BUGS
+Pas de cartes en IE
+Pas d'images http://c92.fr/test/chem4/viewtopic.php?t=13237#p35360 => Images externes ! Attachment 32937
+
+Selecteur de couches : Posting
 
 TRACES
 	Boutons modifier / supprimer, ...
@@ -11,10 +14,13 @@ TRACES
 	Ne pas survoler les autres traces en posting 
 
 BUG pictos clignotent (idem WRI)
-BEST selecteur peut être initialisé "checked" et garder ses cookies quand modifié
 BEST MYOL
+	selection layer en cliquent sur le nom
 	myol editeur ligne zone sensible edit ligne plus grande
 	zoom à 2 doigts sur icônes
+	selecteur peut être initialisé "checked"
+	et garder ses cookies quand modifié
+BEST Sélecteur sur c2c, PRC
 BEST pas de fond ciel sur connexion
 BEST Fonction GPS / selecteur de traces
 BEST cabane cheminée grise et oeuil de bœuf vert

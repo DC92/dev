@@ -4,10 +4,12 @@
 	<label for="chm">Chemineur &#9660;</label>
 	<span id="chm-features-status"></span>
 	<!-- BEGIN geo_categories -->
+		<!-- IF geo_categories.GEO -->
 		<li>
 			<input type="checkbox" name="chm-features" value="{geo_categories.CATEGORY}" />
 			{geo_categories.CATEGORY_NAME}
 		</li>
+		<!-- ENDIF -->
 	<!-- END geo_categories -->
 </ul>
 
