@@ -160,11 +160,7 @@ body,
 	position: relative;
 	top: 10px;
 }
-.topic_read_mine,
-.topic_unread,
-.forum_link,
-.forum_unread,
-.forum_read {
+.row-item {
 	background-image: none;
 }
 .forabg .lastpost {

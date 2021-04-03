@@ -8,6 +8,7 @@ Selecteur de couches :
 Bug charge fichier GPX fait un zoom 0
 
 TRACES
+	Boutons modifier / supprimer, ...
 	Différentier la trace du point visionné 
 	Différentier la trace éditée
 	Ne pas survoler les autres traces en posting 
