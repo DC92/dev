@@ -1804,7 +1804,6 @@ function controlLoadGPX(options) {
 					},
 				});
 			map.addLayer(layer);
-			map.getView().fit(source.getExtent());
 		}
 
 		// Zoom the map on the added features
