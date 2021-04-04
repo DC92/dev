@@ -2,10 +2,8 @@ TODO ???? BUG DIAPO n'affiche pas la première image au début du chargement (wa
 TODO ???? DIAPO ordre des diapos
 
 BUGS
-Pas de cartes en IE / Ne pas charger Geocoder
 Pas d'images http://c92.fr/test/chem4/viewtopic.php?t=13237#p35360 => Images externes ! Attachment 32937
 
-Selecteur de couches : Posting
 Viewtopic répondre -> ajouter un commentaire
 
 TRACES

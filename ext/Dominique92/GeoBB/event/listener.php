@@ -28,6 +28,7 @@ class listener implements EventSubscriberInterface
 		$this->request = $request;
 		$this->template = $template;
 		$this->phpbb_root_path = $phpbb_root_path;
+		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 	}
 
 	// List of hooks and related functions
@@ -73,7 +74,11 @@ class listener implements EventSubscriberInterface
 	*/
 	function common($vars) {
 		global $mapKeys;
-		$this->template->assign_var ('MAP_KEYS', json_encode (@$mapKeys));
+		preg_match ('/Trident/', $this->server['HTTP_USER_AGENT'], $match);
+		$this->template->assign_vars ([
+			'MAP_KEYS' => json_encode (@$mapKeys),
+			'IS_IE' => $match ? 'IE' : '',
+		]);
 	}
 
 	/**
