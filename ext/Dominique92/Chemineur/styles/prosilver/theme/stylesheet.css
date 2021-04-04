@@ -10,6 +10,8 @@
 .breadcrumbs .icon,
 .nav-main,
 .headerspace,
+.forum-image,
+.section-viewforum .action-bar,
 .section-posting input[name="preview"],
 .section-posting input[name="save"],
 #page-footer .navbar {
@@ -93,6 +95,11 @@ body,
 	white-space: nowrap;
 	display: none;
 }
+.breadcrumbs .sub-menu {
+	left: 0;
+	right: initial;
+}
+.breadcrumbs:hover .sub-menu,
 .menu-container:hover .sub-menu {
 	display: block;
 }

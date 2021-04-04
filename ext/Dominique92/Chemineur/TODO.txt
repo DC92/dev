@@ -4,7 +4,7 @@ TODO ???? DIAPO ordre des diapos
 BUGS
 Pas d'images http://c92.fr/test/chem4/viewtopic.php?t=13237#p35360 => Images externes ! Attachment 32937
 
-Viewtopic répondre -> ajouter un commentaire
+Viewtopic "Répondre" -> "Ajouter un commentaire"
 
 TRACES
 	Différentier la trace du point visionné 
@@ -22,7 +22,6 @@ BEST pas de fond ciel sur connexion à l'admin
 BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Jquery extend map
 BEST carte pour 1 forum (aéroport, … ?)
-BEST menu déroulant jaune sur hover : selecteur catégories dans le menu ???
 BEST Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
 BEST Diapo démarre sur une petite page puis défilement en full screen
@@ -30,7 +29,7 @@ BEST Parking avec un P ascii avec couleurs
 BEST façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
 BEST Reprendre tous les @ (erreurs masquées)
 BEST création champs SQL altitude et massif si non existants
-BEST BUG quand trace, la carte est 3 fois plus haute
+BEST BUG quand erreur debug, la carte est 3 fois plus haute
 BEST cadre et viseur SVG
 BEST Ne pas démarrer les ext quand on installe
 BEST mesureur d'audience
