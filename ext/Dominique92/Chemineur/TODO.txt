@@ -15,7 +15,6 @@ TRACES
 
 BUG pictos clignotent (idem WRI)
 BEST MYOL
-	selection layer en cliquent sur le nom
 	myol editeur ligne zone sensible edit ligne plus grande
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
 	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié

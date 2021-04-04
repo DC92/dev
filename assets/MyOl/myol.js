@@ -1250,7 +1250,6 @@ function controlLayersSwitcher(options) {
 	const button = controlButton({
 		className: 'ol-switch-layer myol-button',
 		label: '\u2026',
-		title: 'Liste des cartes',
 		rightPosition: 0.5,
 	});
 
@@ -1268,7 +1267,6 @@ function controlLayersSwitcher(options) {
 	// Layer selector
 	const selectorEl = document.createElement('div');
 	selectorEl.style.overflow = 'auto';
-	selectorEl.title = 'Ctrl+click: multicouches';
 	button.element.appendChild(selectorEl);
 
 	//HACK execute actions on Map init
@@ -1281,8 +1279,8 @@ function controlLayersSwitcher(options) {
 			if (options.baseLayers[name]) { // null is ignored
 				const choiceEl = document.createElement('div');
 				choiceEl.innerHTML =
-					'<input type="checkbox" name="baselayer" value="' + name + '">' +
-					'<span title="">' + name + '</span>';
+					'<input type="checkbox" name="baselayer" id="bl' + options.baseLayers[name].ol_uid + '" value="' + name + '" /> ' +
+					'<label for="bl' + options.baseLayers[name].ol_uid + '">' + name + '</label>';
 				selectorEl.appendChild(choiceEl);
 				map.addLayer(options.baseLayers[name]);
 			}
