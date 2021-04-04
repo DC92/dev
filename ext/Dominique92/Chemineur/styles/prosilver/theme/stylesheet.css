@@ -2,6 +2,7 @@
 #poll-panel-tab, /* Sondages */
 /* .fields1 dl:first-child,  Icone de sujet */
 .section-index .action-bar,
+.section-viewtopic.geo_line .bar-top,
 .time,
 .logo,
 .stat-block,
@@ -180,7 +181,6 @@ body,
 .section-viewtopic.geo_point .bar-top,
 .section-viewtopic.geo_point .topic-title,
 .section-viewtopic.geo_point .map-coords ,
-.section-viewtopic:not(.geo_point) #etiquette,
 .section-viewtopic:not(.geo_point) .postit,
 .section-viewtopic:not(.geo_point) .photo {
 	display: none;

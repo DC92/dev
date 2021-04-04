@@ -6,9 +6,9 @@ Pas de cartes en IE / Ne pas charger Geocoder
 Pas d'images http://c92.fr/test/chem4/viewtopic.php?t=13237#p35360 => Images externes ! Attachment 32937
 
 Selecteur de couches : Posting
+Viewtopic répondre -> ajouter un commentaire
 
 TRACES
-	Boutons modifier / supprimer, ...
 	Différentier la trace du point visionné 
 	Différentier la trace éditée
 	Ne pas survoler les autres traces en posting 
@@ -19,7 +19,7 @@ BEST MYOL
 	myol editeur ligne zone sensible edit ligne plus grande
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
 	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
-BEST Sélecteur sur c2c, PRC
+BEST Sélecteur de features sur c2c, PRC
 BEST Fonction GPS / selecteur de traces
 BEST pas de fond ciel sur connexion à l'admin
 BEST cabane cheminée grise et oeuil de bœuf vert
@@ -36,6 +36,7 @@ BEST création champs SQL altitude et massif si non existants
 BEST BUG quand trace, la carte est 3 fois plus haute
 BEST cadre et viseur SVG
 BEST Ne pas démarrer les ext quand on installe
+BEST mesureur d'audience
 
 ************************************************************************************
 MIGRATION

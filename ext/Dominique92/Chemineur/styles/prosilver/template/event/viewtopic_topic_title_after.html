@@ -1,28 +1,30 @@
 <!-- IF GEO_JSON -->
 <table id="etiquette">
-	<tr><td class="ehg"></td><td class="ehm"></td><td class="ehd"></td></tr>
+	<!-- IF MAP_TYPE == 'point' -->
+		<tr><td class="ehg"></td><td class="ehm"></td><td class="ehd"></td></tr>
 
-	<tr><td class="emg"></td><td class="emm">
-		<h1>
-			{TOPIC_TITLE}
-			<!-- IF FORUM_IMAGE -->
-				<img src="{FORUM_IMAGE}" title="{FORUM_NAME}"/>
+		<tr><td class="emg"></td><td class="emm">
+			<h1>
+				{TOPIC_TITLE}
+				<!-- IF FORUM_IMAGE -->
+					<img src="{FORUM_IMAGE}" title="{FORUM_NAME}"/>
+				<!-- ENDIF -->
+				<span>(<a href="viewforum.php?f={FORUM_ID}" title="Voir les autres {FORUM_NAME}s">{FORUM_NAME}</a>)</span>
+			</h1>
+			<h3 id="cadre-coords"></h3>
+
+			<!-- IF GEO_ALTITUDE -->
+				<h3>Altitude: {GEO_ALTITUDE} m</h3>
 			<!-- ENDIF -->
-			<span>(<a href="viewforum.php?f={FORUM_ID}" title="Voir les autres {FORUM_NAME}s">{FORUM_NAME}</a>)</span>
-		</h1>
-		<h3 id="cadre-coords"></h3>
 
-		<!-- IF GEO_ALTITUDE -->
-			<h3>Altitude: {GEO_ALTITUDE} m</h3>
-		<!-- ENDIF -->
+			<!-- IF GEO_MASSIF -->
+				<h3>Massif: {GEO_MASSIF}</h3>
+			<!-- ENDIF -->
 
-		<!-- IF GEO_MASSIF -->
-			<h3>Massif: {GEO_MASSIF}</h3>
-		<!-- ENDIF -->
+		</td><td class="emd"></td></tr>
 
-	</td><td class="emd"></td></tr>
-
-	<tr><td class="ebg"></td><td class="ebm"></td><td class="ebd"></td></tr>
+		<tr><td class="ebg"></td><td class="ebm"></td><td class="ebd"></td></tr>
+	<!-- ENDIF -->
 
 	<!-- IF .quickmod --><!-- Teste si moderateur -->
 		<tr><td colspan="2">

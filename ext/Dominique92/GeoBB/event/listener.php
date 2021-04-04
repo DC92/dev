@@ -111,7 +111,7 @@ class listener implements EventSubscriberInterface
 		$topic_row['topic_first_post_id'] = $topic_first_post_id;
 
 		// How to display the topic
-		//TODO map on all posts (":xxxxx")
+		//BEST map on all posts (":xxxxx")
 		preg_match ('/([\.:])(point|line|poly)/', $topic_data['forum_desc'], $desc);
 		if ($desc) {
 			$view = $this->request->variable ('view', 'geo');

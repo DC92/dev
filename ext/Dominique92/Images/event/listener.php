@@ -49,7 +49,7 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-//TODO BUG n'affiche pas la première image au début du chargement (wait !)
+//TODO BUG ??? n'affiche pas la première image au début du chargement (wait !)
 	function viewtopic_assign_template_vars_before($vars) {
 		$view = $this->request->variable ('view', 'diapo');
 
