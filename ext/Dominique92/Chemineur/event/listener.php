@@ -59,6 +59,10 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
+		/* Includes language files of this extension */
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+
 		// Liste des catégories de points à ajouter
 		$sql = "
 			SELECT cat.forum_id AS category_id,
