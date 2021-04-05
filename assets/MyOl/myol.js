@@ -84,6 +84,9 @@ ol.Map.prototype.handlePostRender = function() {
 			});
 		}
 	});
+
+	// Save the js object into the DOM
+	map.getTargetElement()._map = map;
 };
 
 

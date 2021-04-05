@@ -1,9 +1,11 @@
 BUG manque les photos http://chemineur.fr/viewtopic.php?t=3813#p35390
 	https://c92.fr/test/chem4/viewtopic.php?t=3813#p35390
 BUG OL étiquettes quand lien, perd focus ???
+VVTRACK interface
+	RewriteRule "(.+)"  "http://v2.chemineur.fr/feed/$1"
+	http://v2.chemineur.fr/feed/poi.gml.php?site=all&poi=hebergement|ravitaillement|inutilisable&limite=200&bbox=-3.1118782019123,38.849957317458,14.312438201912,52.624379633326
 BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Fonction GPS / selecteur de traces
-BEST Jquery extend map
 BEST mesureur d'audience
 TRACES
 	Différentier la trace du point visionné 
