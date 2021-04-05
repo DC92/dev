@@ -164,6 +164,7 @@ class listener implements EventSubscriberInterface
 		if (@$this->attachments) {
 			$post_id = $vars['attachment']['post_msg_id'];
 
+			//TODO déplacer dans ext/Dominique92/Images
 			// Assigne les valeurs au template
 			$this->block_array = $vars['block_array'];
 			$this->block_array['TEXT_SIZE'] = strlen (@$this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
@@ -173,6 +174,12 @@ class listener implements EventSubscriberInterface
 			foreach ($vars['attachment'] AS $k=>$v)
 				$this->block_array[strtoupper($k)] = $v;
 			$vars['block_array'] = $this->block_array;
+
+			//TODO purger la base des liens photos externes
+			$this->block_array['LOCAL'] = strncasecmp (
+				$vars['attachment']['physical_filename'],
+				'http', 4
+			);
 
 			// Ceci va assigner un template à {postrow.attachment.DISPLAY_ATTACHMENT}
 			$view = $this->request->variable ('view', 'geo');

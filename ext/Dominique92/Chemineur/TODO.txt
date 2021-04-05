@@ -1,10 +1,6 @@
-PHASE 1
-Pas d'images http://c92.fr/test/chem4/viewtopic.php?t=13237#p35360 => Images externes ! Attachment 32937
-Viewtopic "Répondre" -> "Ajouter un commentaire"
+post_id > 100000
+chem2/chem-fich -> files/chem-fich (réinit base)
 
-DOM
-TODO ???? BUG DIAPO n'affiche pas la première image au début du chargement (wait !)
-TODO ???? DIAPO ordre des diapos
 BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Fonction GPS / selecteur de traces
 BEST Jquery extend map
@@ -13,9 +9,13 @@ TRACES
 	Différentier la trace du point visionné 
 	Différentier la trace éditée
 	Ne pas survoler les autres traces en posting 
+TODO DIAPO ordre des diapos
+BEST Images responsives de toute la largeur sur petits écrans
+	Bordure blanche images trop larges quand plusieurs dans le même post
 
 INVESTIGATION
 BUG pictos clignotent (idem WRI)
+DIAPO n'affiche pas la première image au début du chargement (wait !)
 
 BEST
 BEST Sélecteur de features sur c2c, PRC
@@ -24,9 +24,8 @@ BEST MYOL
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
 	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
 BEST pas de fond ciel sur connexion à l'admin
+BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
 BEST carte pour 1 forum (aéroport, … ?)
-BEST Images responsives de toute la largeur sur petits écrans
-	Bordure blanche images trop larges quand plusieurs dans le même post
 BEST Diapo démarre sur une petite page puis défilement en full screen
 BEST Parking avec un P ascii avec couleurs
 BEST façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
@@ -38,24 +37,30 @@ BEST Ne pas démarrer les ext quand on installe
 
 ************************************************************************************
 MIGRATION
-Copier chem3/files
-Copier chem3/files/attach
-Copier chem2/chem-fich dans chem2/chem-fich
-Copier chem3/images/avatars
-Copier gobBB/images/smileys (vérifier :sleep:)
-
 Save SQL chem3
 	supprimer les 2 lignes create database
-	'http://v2.chemineur.fr', 'chem2'
+	'http://v2.chemineur.fr', 'files/chem-fich'
 	'[first=point]</s><e>', '[first=point]</s>.point<e>'
-	[first=line]</s><e>', '[first=line]</s>.poly<e>'
-'[view=diapo]</s><e>', '[view=diapo]</s>*slideshow<e>'
-'Dominique92/GeoBB/types_points', 'Dominique92/GeoBB/icones'
-
+	'[first=line]</s>.line<e>', '[first=line]</s>.line<e>'
+	'[view=diapo]</s>*slideshow<e>', '[view=diapo]</s>*slideshow<e>'
+	'Dominique92/GeoBB/icones', 'Dominique92/GeoBB/icones'
 Créer SQL chem4 / importer
-phpBB3 -> chem4
-phpBBexts -> chem4
-gym/ config.php -> chem4/ config.php
+
+Rafraichissement
+Sav chem3/files (à partir de date)
+
+Copier phpBB3 sauf docs / files / config.php
+Copier chem3/files
+Copier chem3/files/attach
+Copier chem2/chem-fich dans files/chem-fich
+Copier chem3/images/avatars
+Copier gobBB/images/smileys (vérifier :sleep:)
+Copier phpBBexts/assets/MyOl -> chem4
+Copier phpBBexts/assets/MySlider -> chem4
+Copier phpBBexts/ext/phpbb -> chem4
+Copier phpBBexts/ext/Dominique92/ -> chem4 sauf Blog / Gym
+
+???/config.php -> chem4/config.php
 
 => Chem4/install
 Français
