@@ -12,13 +12,9 @@
 				</p>
 			</td><td class="phd"></td></tr>
 			<tr><td class="pmg"></td><td class="pmm">
-				<!-- IF _file.ATTACH_ID < 1000000 -->
-					<a href="download/file.php?id={_file.ATTACH_ID}" title="{_file.COMMENT}">
-						<script>document.write('<img src="download/file.php?id={_file.ATTACH_ID}&size='+Math.round(Math.max(window.innerWidth/2.5,(window.innerWidth-100)*375/(500+{_file.TEXT_SIZE})))+'" />')</script>
-					</a>
-				<!-- ELSE -->
-					<img src="{_file.REAL_FILENAME}" />
-				<!-- ENDIF -->
+				<a href="download/file.php?id={_file.ATTACH_ID}" title="{_file.COMMENT}">
+					<script>document.write('<img src="download/file.php?id={_file.ATTACH_ID}&size='+Math.round(Math.max(window.innerWidth/2.5,(window.innerWidth-100)*375/(500+{_file.TEXT_SIZE})))+'" />')</script>
+				</a>
 			</td><td class="pmd"></td></tr>
 			<tr><td class="pbg"></td><td class="pbm">
 				<p>{_file.EXIF}</p>

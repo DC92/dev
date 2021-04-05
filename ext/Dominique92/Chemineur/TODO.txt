@@ -1,6 +1,4 @@
-post_id > 100000
-chem2/chem-fich -> files/chem-fich (réinit base)
-
+BUG OL étiquettes quand lien, perd focus ???
 BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Fonction GPS / selecteur de traces
 BEST Jquery extend map
@@ -14,11 +12,13 @@ BEST Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
 
 INVESTIGATION
+BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
 BUG pictos clignotent (idem WRI)
 DIAPO n'affiche pas la première image au début du chargement (wait !)
 
 BEST
-BEST Sélecteur de features sur c2c, PRC
+BEST Sélecteur de features sur c2c, PRC, Alpages
+	Nouvelles icônes
 BEST MYOL
 	myol editeur ligne zone sensible edit ligne plus grande
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
@@ -39,11 +39,8 @@ BEST Ne pas démarrer les ext quand on installe
 MIGRATION
 Save SQL chem3
 	supprimer les 2 lignes create database
-	'http://v2.chemineur.fr', 'files/chem-fich'
-	'[first=point]</s><e>', '[first=point]</s>.point<e>'
-	'[first=line]</s>.line<e>', '[first=line]</s>.line<e>'
-	'[view=diapo]</s>*slideshow<e>', '[view=diapo]</s>*slideshow<e>'
-	'Dominique92/GeoBB/icones', 'Dominique92/GeoBB/icones'
+	http://v2.chemineur.fr/chem-fich  =>  files/chem-fich
+	Dominique92/GeoBB/types_points/ =>  Dominique92/GeoBB/icones/
 Créer SQL chem4 / importer
 
 Rafraichissement
@@ -52,31 +49,27 @@ Sav chem3/files (à partir de date)
 Copier phpBB3 sauf docs / files / config.php
 Copier chem3/files
 Copier chem3/files/attach
+Copier chem3/files/attach
 Copier chem2/chem-fich dans files/chem-fich
 Copier chem3/images/avatars
-Copier gobBB/images/smileys (vérifier :sleep:)
-Copier phpBBexts/assets/MyOl -> chem4
-Copier phpBBexts/assets/MySlider -> chem4
+Copier chem3/styles/chemineur
+Copier phpBBexts/images/smileys (vérifier :sleep:)
+Copier phpBBexts/assets/MyOl & MySlider -> chem4
 Copier phpBBexts/ext/phpbb -> chem4
 Copier phpBBexts/ext/Dominique92/ -> chem4 sauf Blog / Gym
-
-???/config.php -> chem4/config.php
+Copier ???/config.php -> chem4/config.php
 
 => Chem4/install
-Français
-Mise à jour
-Uniquement la BDD
+Français / Change
+Mise à jour / Mise à jour
+Uniquement la BDD / Envoyer
 Supprimer chem4/install
 
-=> chem4/
 => chem4/adm : activer MyPhpBB & Images & slideshow
 => chem4/adm : désactiver les extensions obsolètes / supprimer de GITHUB et du serveur
 => chem4/adm : désactiver l’extensions VigLink / supprimer du serveur
-=> chem4/adm : installer l’extensions CleanTalk
-=> chem4/adm : mettre .line au lieu de .poly dans les forums traces GPS
-
-Cliquer sur chaque massif / changer .point .line dans viewforum.php
-
+=> chem4/adm : Gérer les styles / prosilver / Détail / Définir comme style par défaut
+=> chem4/adm : Gérer les styles / chemineur / Détail / Définir comme style par défaut / supprimer du serveur
 Installer cleantalk
 
 
