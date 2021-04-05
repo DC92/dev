@@ -1,3 +1,5 @@
+BUG manque les photos http://chemineur.fr/viewtopic.php?t=3813#p35390
+	https://c92.fr/test/chem4/viewtopic.php?t=3813#p35390
 BUG OL étiquettes quand lien, perd focus ???
 BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Fonction GPS / selecteur de traces
@@ -6,7 +8,7 @@ BEST mesureur d'audience
 TRACES
 	Différentier la trace du point visionné 
 	Différentier la trace éditée
-	Ne pas survoler les autres traces en posting 
+	Ne pas survoler les autres traces en posting
 TODO DIAPO ordre des diapos
 BEST Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post

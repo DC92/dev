@@ -173,13 +173,12 @@ class listener implements EventSubscriberInterface
 			$this->block_array['EXIF'] = $vars['attachment']['exif'];
 			foreach ($vars['attachment'] AS $k=>$v)
 				$this->block_array[strtoupper($k)] = $v;
-			$vars['block_array'] = $this->block_array;
-
 			//TODO purger la base des liens photos externes
-			$this->block_array['LOCAL'] = strncasecmp (
-				$vars['attachment']['physical_filename'],
-				'http', 4
-			);
+			$this->block_array['LOCATION'] =
+				strncasecmp ($vars['attachment']['physical_filename'], 'http', 4)
+				? 'local'
+				: 'extern';
+			$vars['block_array'] = $this->block_array;
 
 			// Ceci va assigner un template à {postrow.attachment.DISPLAY_ATTACHMENT}
 			$view = $this->request->variable ('view', 'geo');
