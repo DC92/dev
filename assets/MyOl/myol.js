@@ -181,7 +181,7 @@ function layerStamen(layer) {
  * Doc on http://api.ign.fr
  * var mapKeys.ign = Get your own (free)IGN key at http://professionnels.ign.fr/user
  */
-function layerIGN(layer, format) {
+function layerIGN(layer, format, key) {
 	let IGNresolutions = [],
 		IGNmatrixIds = [];
 	for (let i = 0; i < 18; i++) {
@@ -192,7 +192,7 @@ function layerIGN(layer, format) {
 		null :
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
-				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
+				url: '//wxs.ign.fr/' + (key || mapKeys.ign) + '/wmts',
 				layer: layer,
 				matrixSet: 'PM',
 				format: 'image/' + (format || 'jpeg'),
@@ -2555,9 +2555,8 @@ function layersCollection() {
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
 		'Photo Bing': layerBing('Aerial'),
-		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS'),
-		'IGN': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN Express': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
+		'IGN': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Angleterre': layerOS(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
@@ -2578,7 +2577,9 @@ function layersDemo() {
 		'OSM villes': layerThunderforest('neighbourhood'),
 		'OSM contraste': layerThunderforest('mobile-atlas'),
 
-		'IGN TOP 25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
+		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
+		'IGN Classique': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
+		'IGN Standard': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		//403 'IGN Spot': layerIGN('ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
 		//Double 	'SCAN25TOUR': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
 		'IGN 1950': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
