@@ -23,6 +23,7 @@ $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $exclude = request_var ('exclude', 0); // topic_id to exclude
 $select = request_var ('select', ''); // Post to display
 $limit = request_var ('limit', 100); // Nombre de points maximum
+$format = request_var ('format', 'geojson'); // Format de sortie. Par défaut geojson
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
 $bbox_sql =
@@ -41,8 +42,10 @@ $sql_array = [
 		'post_id',
 		't.topic_id',
 		'f.forum_id',
+		'f.forum_name',
 		'forum_image',
 		'forum_desc',
+		'geo_altitude',
 		'ST_AsGeoJSON(geom) AS geo_json',
 	],
 	'FROM' => [POSTS_TABLE => 'p'],
@@ -90,7 +93,7 @@ $request_scheme = explode ('/', getenv('REQUEST_SCHEME'));
 $request_uri = explode ('/ext/', getenv('REQUEST_URI'));
 $url_base = $request_scheme[0].'://'.getenv('SERVER_NAME').$request_uri[0].'/';
 
-$features = $signatures = [];
+$data = $features = $signatures = [];
 $ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
 	// Color calculation
@@ -120,11 +123,15 @@ while ($row = $db->sql_fetchrow($result)) {
 		$signatures[] = signature ($geophp->coordinates);
 	}
 
+	// geoJson
 	$features[] = [
 		'type' => 'Feature',
 		'geometry' => $geophp, // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 		'properties' => $properties,
 	];
+
+	// GML
+	$data [] = array_merge ($row, $properties);
 }
 $db->sql_freeresult($result);
 
@@ -135,17 +142,57 @@ function signature ($coord) {
 // Formatage du header
 $secondes_de_cache = 10;
 $ts = gmdate("D, d M Y H:i:s", time() + $secondes_de_cache) . " GMT";
-header("Content-disposition: filename=geobb.json");
-header("Content-Type: application/json; UTF-8");
 header("Content-Transfer-Encoding: binary");
 header("Pragma: cache");
 header("Expires: $ts");
 header("Access-Control-Allow-Origin: *");
 header("Cache-Control: max-age=$secondes_de_cache");
 
-// On transforme l'objet PHP en code geoJson
-echo json_encode ([
-	'type' => 'FeatureCollection',
-	'timestamp' => date('c'),
-	'features' => $features,
-]);
+switch ($format) {
+	case 'gml':
+		header("Content-Type: application/gml+xml; UTF-8");
+		header("Content-disposition: filename=chemineur.gml");
+
+		echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
+<wfs:FeatureCollection
+	xmlns:wfs=\"http://www.opengis.net/wfs\"
+	xmlns:gml=\"http://www.opengis.net/gml\"
+	xmlns:topp=\"http://www.openplans.org/topp\"
+>
+	<name>chemineur.gml</name>
+	<description>Points provenants du site chemineur.fr</description>
+";
+
+		foreach ($data AS $d) {
+			preg_match ('/\[([0-9\.]+,[0-9\.]+)\]/', str_replace (' ', '', json_encode ($d['geo_json'])), $ll);
+			echo "
+	<gml:featureMember>
+		<point>
+			<nom>{$d['post_subject']}</nom>
+			<type>{$d['forum_name']}</type>
+			<site>chemineur.fr</site>
+			<gml:Point>
+				<gml:coordinates decimal=\".\" cs=\",\" ts=\" \">{$ll[1]}</gml:coordinates>
+			</gml:Point>
+			<altitude>{$d['geo_altitude']}</altitude>
+			<url>{$d['link']}</url>
+		</point>
+	</gml:featureMember>
+";
+		}
+
+		echo "
+</wfs:FeatureCollection>";
+		break;
+
+	default:
+		header("Content-Type: application/json; UTF-8");
+		header("Content-disposition: filename=geobb.json");
+
+		// On transforme l'objet PHP en code geoJson
+		echo json_encode ([
+			'type' => 'FeatureCollection',
+			'timestamp' => date('c'),
+			'features' => $features,
+		]);
+}

@@ -1,10 +1,10 @@
-BUG manque les photos http://chemineur.fr/viewtopic.php?t=3813#p35390
-	https://c92.fr/test/chem4/viewtopic.php?t=3813#p35390
-BUG OL étiquettes quand lien, perd focus ???
+BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
+BUG OL étiquettes en survol de point quand lien, perd focus ???
 VVTRACK interface
 	RewriteRule "(.+)"  "http://v2.chemineur.fr/feed/$1"
 	http://v2.chemineur.fr/feed/poi.gml.php?site=all&poi=hebergement|ravitaillement|inutilisable&limite=200&bbox=-3.1118782019123,38.849957317458,14.312438201912,52.624379633326
 BEST cabane cheminée grise et oeuil de bœuf vert
+BEST casquette ou chapeau favicon chemineur
 BEST Fonction GPS / selecteur de traces
 BEST mesureur d'audience
 TRACES
@@ -58,7 +58,7 @@ Copier chem2/chem-fich dans files/chem-fich
 Copier chem3/images/avatars
 Copier chem3/styles/chemineur
 Copier phpBBexts/images/smileys (vérifier :sleep:)
-Copier phpBBexts/assets/MyOl & MySlider -> chem4
+Copier phpBBexts/assets/MyOl, jquery-ui & MySlider -> chem4
 Copier phpBBexts/ext/phpbb -> chem4
 Copier phpBBexts/ext/Dominique92/ -> chem4 sauf Blog / Gym
 Copier ???/config.php -> chem4/config.php
