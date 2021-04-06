@@ -188,7 +188,8 @@ function layerIGN(layer, format, key) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 		IGNmatrixIds[i] = i.toString();
 	}
-	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.ign ?
+	return (typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.ign) &&
+		(typeof key === 'undefined' || !key) ?
 		null :
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
@@ -2556,6 +2557,7 @@ function layersCollection() {
 		'Photo Google': layerGoogle('s'),
 		'Photo Bing': layerBing('Aerial'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
+		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Angleterre': layerOS(),
@@ -2577,7 +2579,6 @@ function layersDemo() {
 		'OSM villes': layerThunderforest('neighbourhood'),
 		'OSM contraste': layerThunderforest('mobile-atlas'),
 
-		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN Classique': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'IGN Standard': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		//403 'IGN Spot': layerIGN('ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
