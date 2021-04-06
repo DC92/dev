@@ -17,12 +17,12 @@ $user->session_begin();
 $auth->acl($user->data);
 $user->setup();
 
-$forums = request_var ('type', ''); // List of forums to include "1,2,3"
-$categories = request_var ('cat', ''); // List of categories of forums to include "1,2,3"
+$type = request_var ('type', ''); // List of forums to include "1,2,3"
+$cat = request_var ('cat', ''); // List of categories of forums to include "1,2,3"
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $exclude = request_var ('exclude', 0); // topic_id to exclude
 $select = request_var ('select', ''); // Post to display
-$limit = request_var ('limit', 100); // Nombre de points maximum
+$limit = request_var ('limit', 250); // Nombre de points maximum
 $format = request_var ('format', 'geojson'); // Format de sortie. Par défaut geojson
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
@@ -57,8 +57,8 @@ $sql_array = [
 		'ON' => 'f.forum_id = p.forum_id',
 	]],
 	'WHERE' => [
-		$forums ? "f.forum_id IN ($forums)" : 'TRUE',
-		$categories ? "f.parent_id IN ($categories)" : 'TRUE',
+		$type ? "f.forum_id IN ($type)" : 'TRUE',
+		$cat ? "f.parent_id IN ($cat)" : 'TRUE',
 		't.topic_id != '.$exclude,
 		'geom IS NOT NULL',
 		"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)",
