@@ -2553,22 +2553,24 @@ function layersCollection() {
 		'OpenTopo': layerOsmOpenTopo(),
 		'OSM outdoors': layerThunderforest('outdoors'),
 		'OSM transport': layerThunderforest('transport'),
+		'MRI': layerOsmMri(),
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
-		'Photo Bing': layerBing('Aerial'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')), //TODO ?????? layerGoogle
+		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 	};
 }
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
 		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-		'MRI': layerOsmMri(),
 		'Hike & Bike': layerOsm(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
 			'<a href="//www.hikebikemap.org/">hikebikemap.org</a>'
@@ -2600,14 +2602,12 @@ function layersDemo() {
 		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 		'ETATMAJOR10': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
 
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')), //TODO ?????? layerGoogle
-		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 		'Italie': layerIGM(),
-		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Kompas': layerKompass('KOMPASS'),
 
 		'Bing': layerBing('Road'),
-		'Bing photo': layerBing('AerialWithLabels'),
+		'Bing photo': layerBing('Aerial'),
+		'Bing hybrid': layerBing('AerialWithLabels'),
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google hybrid': layerGoogle('s,h'),
