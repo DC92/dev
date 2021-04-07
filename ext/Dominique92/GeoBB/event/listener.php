@@ -74,7 +74,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function common($vars) {
 		global $mapKeys;
-		preg_match ('/Trident/', $this->server['HTTP_USER_AGENT'], $match);
+		preg_match ('/Trident/', @$this->server['HTTP_USER_AGENT'], $match);
 		$this->template->assign_vars ([
 			'MAP_KEYS' => json_encode (@$mapKeys),
 			'IS_IE' => $match ? 'IE' : '',

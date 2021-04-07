@@ -1,3 +1,7 @@
+WRI
+	GPS : reprendre le baselayers de WRI (pas de google)
+	service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
+
 BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
 BUG OL étiquettes en survol de point quand lien, perd focus ???
 VVTRACK interface
