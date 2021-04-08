@@ -1,4 +1,7 @@
 <?php
+$colors = ['black','green','blue','red','grey','yellow','white',
+	'maroon','orange','blanchedalmond','lightgrey','violet','purple'];
+
 $alias = [
 	// Tableau de correspondance des icônes
 	'abri' => 'cabane_manqueunmur',
@@ -13,7 +16,7 @@ $alias = [
 //	'col' => 'col',
 	'edifice_religieux' => 'cabane_white_blue_croix',
 	'ferme' => 'cabane_white_black_x',
-	'gare' => 'cabane_white_black_gare',
+	'gare' => 'cabane_white_black_loco',
 	'gite' => 'cabane_green',
 	'gite-d-etape' => 'blue',
 	'grotte' => 'arc_lightgrey_black_manqueunmur',
@@ -42,13 +45,10 @@ $alias = [
 	'site' => 'lac_yellow_a9728.4.18',
 	'site_industriel' => 'cabane_white_black_a9874.6',
 //	'sommet' => 'sommet',
-	'tunnel' => 'arc_lightgray_black_loco',
+	'tunnel' => 'arc_lightgrey_black_loco',
 	'vignoble' => 'cabane_violet_purple_a9753.6',
 	'village' => 'cabane_grey_black_a118',
 	'ville' => 'cabane_white_black_a86',
-
-	// Favicon
-	'favicon' => 'cabane',
 
 	// Icônes Overpass, C2C & PRC (remplacer ' ' par %20 dans l'URL)
 	// Il s'agit en fait d'une équivalence des symboles geocaching utilisés par les GPS
