@@ -1,16 +1,7 @@
-WRI
-	GPS : reprendre le baselayers de WRI (pas de google)
-	service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
-
+Sélecteur de couches plus gros sur mobile
 BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
 BUG OL étiquettes en survol de point quand lien, perd focus ???
-VVTRACK interface
-	RewriteRule "(.+)"  "http://v2.chemineur.fr/feed/$1"
-	http://v2.chemineur.fr/feed/poi.gml.php?site=all&poi=hebergement|ravitaillement|inutilisable&limite=200&bbox=-3.1118782019123,38.849957317458,14.312438201912,52.624379633326
-BEST cabane cheminée grise et oeuil de bœuf vert
-BEST casquette ou chapeau favicon chemineur
-BEST Fonction GPS / selecteur de traces
-BEST mesureur d'audience
+
 TRACES
 	Différentier la trace du point visionné 
 	Différentier la trace éditée
@@ -18,13 +9,21 @@ TRACES
 TODO DIAPO ordre des diapos
 BEST Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
+BEST cabane cheminée grise et oeuil de bœuf vert
+BEST Fonction GPS / selecteur de traces
+BEST mesureur d'audience
+
+BUG chemineur geocodeur met le zoom à 1
+
+??? voir qui a importé https://c92.fr/test/chem4/viewtopic.php?t=99
+
+Bug ne pas afficher ~ sur massif & altitude
 
 INVESTIGATION
 BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
-BUG pictos clignotent (idem WRI)
+BUG ??? pictos clignotent (idem WRI)
 DIAPO n'affiche pas la première image au début du chargement (wait !)
 
-BEST
 BEST Sélecteur de features sur c2c, PRC, Alpages
 	Nouvelles icônes
 BEST MYOL
@@ -36,12 +35,78 @@ BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une f
 BEST carte pour 1 forum (aéroport, … ?)
 BEST Diapo démarre sur une petite page puis défilement en full screen
 BEST Parking avec un P ascii avec couleurs
-BEST façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
 BEST Reprendre tous les @ (erreurs masquées)
 BEST création champs SQL altitude et massif si non existants
 BEST BUG quand erreur debug, la carte est 3 fois plus haute
-BEST cadre et viseur SVG
-BEST Ne pas démarrer les ext quand on installe
+
+PhpBB
+	Façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
+	Ne pas démarrer les ext quand on installe
+
+VTTRACK
+	GIS couches point d'eau plus représentative => Import WRI / OMS ?
+	Fusion points WRI non présents dans Chemineur
+	Bug GML url
+	Pictos dans chem4/prod/chemtype
+	Routage gml.php
+	Priorité pas aux orris !!
+
+//TODO BUGS CHEMINEUR
+=====================
+Voir forum Evolutions & bugs sur chemineur.fr
+Suppression fichier attach ne supprime pas l'attachment.
+WRI : Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
+Posting line: pour édit : mettre marqueurs lignes au dessus des icones
+Clear Ajax carte quand ajoute/supprime un lien (les 2 icones restent sur la carte)
+Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
+Comment retourner un mail de création d'user à l'admin ?
+Pourquoi post_attachment = 0 si on a une image ?
+Click sur une icone chem2 plante
+
+//TODO BEST CHEMINEUR
+=====================
+/Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
+Ne pas afficher les points en doublon (flux wri, prc, c2c)
+Créer /LOG automatiquement + index.html
+Voir pourquoi les champs de saisie du curseur de l'exemple ont une , au lieu d'un point
+cookie = ;SameSite=Strict
+	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
+	Or if your host is already updated to 7.3, you can use:
+	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
+Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
+Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
+Meteo sur chem
+Stockage images sur plus d'1 répertoire => ? plugin ?
+Mettre les media print dans print.css
+CSS bug chem cadre liens sur largeur fenêtre petite
+Choix type trace GPS
+Editeur Optim geom dès le chargement
+Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29
+Erreur type de caractères randos Lozerre
+Récup trace diaporamas + chemins chem2
+Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
+Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
+EDIT.log => Trace supprimer le sujet
+Eviter d'afficher les jpg non autorisés insérés dans le texte.
+	Rechercher les liens vers une image dans le texte (Google image)
+	Interface WRI V2->V3 	http://v2.chemineur.fr/prod/chem/json.php?site=c2c&bbox=-6.921386718749999%2C38.75408327579141%2C20.32470703125%2C51.69979984974196Doublons ou icones fantômes
+Améliorer référencement (-> Prat communal !)
+ext/GeoBB : ajouter les coordonnées au template print
+Posting: Purger les points des [*=line] à la saisie (include fichier dans leaflet) ?
+Import references: osm overpass, LDP
+	Import LDP: view-source:http://www.lacsdespyrenees.com/kml-Bielsa.kml
+Revenir à la page où on était quand on se connecte
+	Login redirection () GeoBB316
+		//GEO login		trigger_error('INSECURE_REDIRECT', E_USER_ERROR);
+				$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login&amp;redirect='.$request->server('REQUEST_URI', '')); //GEO Redirige sur la page initiale apres le login
+		//GEO login		$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
+		+++ logout
+Ajouter bouton permutation sur page point chem
+	View film + permutation
+coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
+BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
+CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
+
 
 ************************************************************************************
 MIGRATION
@@ -80,94 +145,11 @@ Supprimer chem4/install
 => chem4/adm : Gérer les styles / chemineur / Détail / Définir comme style par défaut / supprimer du serveur
 Installer cleantalk
 
-
-************************************************************************************
-BUGS CHEMINEUR soldes par chem4
-===============================
-Import WRIC : bbcode ne marche pas, en particulier les liens ce qui est génant.
-Diapo : ne s'arrête pas sur touche escape
-Pouvoir trier les posts WRIC
-Import WRI: importer texte fiche ?
-Barmenu: Enveloppe message trop basse dans Chrome
-Ajouter l'origine des pages importées chemineur
-Diaporama pleine page ? En particulier sur mobile
-	Echap par une touche sur mobile pas pratique
-EDIT.log => Segmenter par jour
-Import complet points WRI
-	Rechercher dans les points externes / dedoublons autres sites
-Pouvoir citer un WRIC
-	Tri des WRIC (actuellement en bas de page) => date par défaut + déplaçable
-Récupérer les smileys tout ronds de WRI
-https://www.phpbb.com/support/docs/en/3.2/ug/upgradeguide/general_conversion/
-
-//TODO BUGS CHEMINEUR
-=====================
-Voir forum Evolutions & bugs sur chemineur.fr
-Suppression fichier attach ne supprime pas l'attachment.
-WRI : Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
-Pas de choix de forum sur rando pedestre
-Posting line: pour édit : mettre marqueurs lignes au dessus des icones
-Clear Ajax carte quand ajoute/supprime un lien (les 2 icones restent sur la carte)
-Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
-Pourquoi ne retourne t'il pas un mail de création d'user à l'admin ?
-Pourquoi post_attachment = 0 si on a une image ?
-Click sur une icone chem2 plante
-Image interdite dans texte
-	http://chemineur.fr/viewtopic.php?t=10411#p29247
-Interface VTTRACK
-	Icônes KO
-	Priorité pas aux orris !!
-	Reprendre interface sur chem3
-
 ARCHI
 =====
 //TODO-END http://jsbeautifier.org/ & http://jshint.com
 //TODO-END replace var by const / let
 
-//TODO BEST CHEMINEUR
-=====================
-/Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
-Ne pas afficher les points en doublon (flux wri, prc, c2c)
-Créer /LOG automatiquement + index.html
-Voir pourquoi les champs de saisie du curseur de l'exemple ont une , au lieu d'un point
-cookie = ;SameSite=Strict
-	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
-	Or if your host is already updated to 7.3, you can use:
-	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
-Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
-Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
-Meteo sur chem
-Stockage images sur plus d'1 répertoire => ? plugin ?
-Mettre les media print dans print.css
-CSS bug chem cadre liens sur largeur fenêtre petite
-Choix type trace GPS
-Editeur Optim geom dès le chargement
-Appli méteo suisse
-Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29
-Erreur type de caractères randos Lozerre
-Récup trace diaporamas + chemins chem2
-Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
-Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
-EDIT.log => Trace supprimer le sujet
-Eviter d'afficher les jpg non autorisés insérés dans le texte.
-	Rechercher les liens vers une image dans le texte (Google image)
-	Interface WRI V2->V3 	http://v2.chemineur.fr/prod/chem/json.php?site=c2c&bbox=-6.921386718749999%2C38.75408327579141%2C20.32470703125%2C51.69979984974196Doublons ou icones fantômes
-Améliorer référencement (-> Prat communal !)
-ext/GeoBB : ajouter les coordonnées au template print
-Posting: Purger les points des [*=line] à la saisie (include fichier dans leaflet) ?
-Import references: osm overpass, LDP
-	Import LDP: view-source:http://www.lacsdespyrenees.com/kml-Bielsa.kml
-Revenir à la page où on était quand on se connecte
-	Login redirection () GeoBB316
-		//GEO login		trigger_error('INSECURE_REDIRECT', E_USER_ERROR);
-				$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login&amp;redirect='.$request->server('REQUEST_URI', '')); //GEO Redirige sur la page initiale apres le login
-		//GEO login		$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
-		+++ logout
-Ajouter bouton permutation sur page point chem
-	View film + permutation
-coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
-BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
-CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
 
 AIDE CHEM
 =========
@@ -181,7 +163,6 @@ UPGRADE CHEMINEUR
 Avant upgrade chem
 	CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]
 	TODO récupérer les fichiers chem2
-		C koi chem3/files/attach ?
 	chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
 	Fiche type Point : carte IGN, commune, ...²
 	//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70
@@ -206,6 +187,39 @@ Purger contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
 Modifier forum_desc diaporamas : [all=point][view=diapo][exclude=tortillards] => [view=diapo][/view]
 Rediriger dc9.fr/chemineur dans WRI
 Remplacer forumdesc par [hide]... (et bbcode !)
+
+
+TODO WRI
+========
+GPS : reprendre le baselayers de WRI (pas de google)
+service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
+? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+? historique posts phpbb wri (ext/...)
+	Paramétres inclusion posts dans points -> config.php
+L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
+	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
+Déraciner le wiki / le mettre dans le forum
+
+HORS CODE
+=========
+Créer les massifs manquants à chemineur
+Inclure scan_liens.php dans /ressources/outils/...
+Mettre le format date sur tous les users
+Faire une fiche de tests
+
+WRI API
+=======
+Langage ACP / ADM, ... (menu haut page)
+Bug remontée MultiPolygon / default : null
+Erreur: sur geom vide dans un polynome
+Durée cache réglable
+Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->geometrie !!
+
+AIDE TEST
+=========
+MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
+MultiPolygon avec trou => WRI massif 3127
+
 
 ALPAGES
 =======
