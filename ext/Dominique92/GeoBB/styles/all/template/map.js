@@ -79,7 +79,7 @@ switch (script + '-' + mapType) {
 			layerGeoJson({
 				displayPointId: 'cadre-coords',
 				geoJsonId: 'cadre-json',
-				focus: 16,
+				focus: 15,
 				styleOptions: {
 					image: new ol.style.Icon({
 						src: 'assets/MyOl/examples/cadre.png',
