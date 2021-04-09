@@ -123,7 +123,7 @@ class listener implements EventSubscriberInterface
 			$topic_row['body_class'] = $view.' '.$view.'_'.$desc[2];
 
 			// Position
-			preg_match ('/\[([0-9\.]*)[, ]*([0-9\.]*)\]/', $topic_row['geo_json'], $ll);
+			preg_match ('/\[([-0-9\.]*)[, ]*([-0-9\.]*)\]/', $topic_row['geo_json'], $ll);
 			if ($ll) {
 				$topic_row['map_type'] = $desc[2];
 				$topic_row['geo_lon'] = $ll[1];
