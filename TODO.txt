@@ -1,43 +1,45 @@
-Sélecteur de couches plus gros sur mobile
 BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
-BUG OL étiquettes en survol de point quand lien, perd focus ???
+
+BUG chemineur geocodeur met le zoom à 1
+
+Sélecteur de couches
+	plus gros sur mobile
+	BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
+	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
+	BEST Sélecteur de features sur c2c, PRC, Alpages
+
+MyOl
+	étiquettes en survol de point quand lien, perd focus ???
+	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 
 WRI
 	layerGeoJson -> layerEditGeoJson
-	nouvelles images
-	nouvelle icone fumée derrière
+	nouvelles icones
+	nouvelle favicone fumée derrière
+	nav.js / contour = layerVectorURL({ / enlever styleOptions: 
 
 BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
 BUG existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
 	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
 
-TRACES
-	Différentier la trace du point visionné 
-	Différentier la trace éditée
-	Ne pas survoler les autres traces en posting
-TODO DIAPO ordre des diapos
+DIAPO
+	ordre des diapos
+
 BEST Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
-BEST cabane cheminée grise et oeuil de bœuf vert
 BEST Fonction GPS / selecteur de traces
 BEST mesureur d'audience
-
-BUG chemineur geocodeur met le zoom à 1
 
 Bug ne pas afficher ~ sur massif & altitude
 ??? voir qui a importé https://c92.fr/test/chem4d/viewtopic.php?t=99
 
 INVESTIGATION
-BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
-BUG ??? pictos clignotent (idem WRI)
-DIAPO n'affiche pas la première image au début du chargement (wait !)
+	BUG ??? pictos clignotent (idem WRI)
+	DIAPO n'affiche pas la première image au début du chargement (wait !)
 
-BEST Sélecteur de features sur c2c, PRC, Alpages
-	Nouvelles icônes
 BEST MYOL
 	myol editeur ligne zone sensible edit ligne plus grande
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
-	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
 BEST pas de fond ciel sur connexion à l'admin
 BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
 BEST carte pour 1 forum (aéroport, … ?)

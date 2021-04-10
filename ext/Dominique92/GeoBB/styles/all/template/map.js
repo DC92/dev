@@ -4,16 +4,9 @@ var layerGeoBBgis = layerVectorURL({
 		selectorName: 'chm-features',
 		urlSuffix: '&cat=',
 		strategy: ol.loadingstrategy.bboxLimit,
+		noClick: script == 'posting',
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
-		},
-		noClick: script == 'posting',
-		hoverStyleOptions: {
-			// Lines & polygons
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 3,
-			})
 		},
 	}),
 	marker = layerEditGeoJson({
@@ -76,6 +69,7 @@ switch (script + '-' + mapType) {
 		const layer = layerEditGeoJson({
 			geoJsonId: 'cadre-json',
 		});
+		map.addLayer(layer);
 		map.getView().fit(
 			layer.getSource().getExtent(), {
 				size: map.getSize(),

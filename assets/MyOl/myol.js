@@ -709,6 +709,12 @@ function layerVectorURL(options) {
 				}),
 			};
 		},
+		hoverStyleOptions: {
+			stroke: new ol.style.Stroke({ // For lines & polygons
+				color: '#4444ff',
+				width: 4,
+			})
+		},
 		label: function(properties) { // Label to dispach above the feature when hovering
 			const lines = [],
 				desc = [],
@@ -969,12 +975,6 @@ function layerChemineur(options) {
 			properties.type = icon ? icon[1] : null;
 			properties.sym = getSym(properties.type);
 			properties.copy = 'chemineur.fr';
-		},
-		hoverStyleOptions: {
-			stroke: new ol.style.Stroke({ // For lines & polygons
-				color: '#00ffff',
-				width: 5,
-			})
 		},
 	}, options));
 }
@@ -1779,7 +1779,7 @@ function controlLoadGPX(options) {
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',
-								width: 3,
+								width: 2,
 							}),
 						});
 					},
@@ -1988,8 +1988,9 @@ function layerEditGeoJson(options) {
 					})
 				.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 		},
+		// Drag lines or Polygons
 		styleOptions: {
-			// Drag lines or Polygons
+			// Marker circle
 			image: new ol.style.Circle({
 				radius: 4,
 				stroke: new ol.style.Stroke({
@@ -1997,21 +1998,23 @@ function layerEditGeoJson(options) {
 					width: 2,
 				}),
 			}),
+			// Editable lines or polygons border
 			stroke: new ol.style.Stroke({
-				color: 'blue',
+				color: 'red',
 				width: 2,
 			}),
+			// Editable polygons
 			fill: new ol.style.Fill({
 				color: 'rgba(0,0,255,0.2)',
 			}),
 		},
 		editStyleOptions: { // Hover / modify / create
-			// Lines or border colors
+			// Editable lines or polygons border
 			stroke: new ol.style.Stroke({
 				color: 'red',
-				width: 6,
+				width: 4,
 			}),
-			// Polygons
+			// Editable polygons fill
 			fill: new ol.style.Fill({
 				color: 'rgba(255,0,0,0.3)',
 			}),
