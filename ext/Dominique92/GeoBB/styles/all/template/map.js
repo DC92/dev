@@ -86,7 +86,7 @@ switch (script + '-' + mapType) {
 		map.addLayer(layerEditGeoJson({
 			geoJsonId: 'geojson',
 			snapLayers: [layerGeoBBgis],
-			//TODO centraliser les textes dans MyOl / Traduction anglais ?
+			//BEST centraliser les textes dans MyOl / Traduction anglais ?
 			titleModify: 'Modification d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne\n' +

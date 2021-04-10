@@ -3,7 +3,7 @@ const back = layerChemineur({
 		receiveProperties: function(properties) {
 			properties.link = null; // Couche non cliquable
 		},
-	}), //TODO BUG : need layer without click
+	}),
 	editor = layerEditGeoJson({
 		geoJsonId: 'geojson',
 		snapLayers: [back],

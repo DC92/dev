@@ -31,7 +31,7 @@ const cadre = layerEditGeoJson({
 			);
 		},
 	});
-//TODO BEST cadre et viseur SVG / inline ?
+//BEST cadre et viseur SVG / inline
 
 new ol.Map({
 	target: 'map',

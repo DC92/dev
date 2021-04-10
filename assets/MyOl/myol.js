@@ -404,7 +404,7 @@ function escapedStyle(a, b, c) {
  * return : array of values of all checked <input name="selectorName" type="checkbox" value="xxx" />
  */
 //BEST open/close features check button
-//BEST WRI bug uncheck massifs, go to a page & come back
+//TODO WRI bug uncheck massifs, go to a page & come back
 function permanentCheckboxList(selectorName, evt) {
 	const inputEls = document.getElementsByName(selectorName),
 		list = [];
@@ -552,7 +552,7 @@ function hoverManager(map) {
 		}
 	});
 
-	//TODO appeler sur l'event "hover" (pour les mobiles)
+	//BEST appeler sur l'event "hover" (pour les mobiles)
 	map.on('pointermove', function(evt) {
 		const mapRect = map.getTargetElement().getBoundingClientRect(),
 			hoveredEl = document.elementFromPoint(
