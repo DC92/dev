@@ -2,6 +2,10 @@ Sélecteur de couches plus gros sur mobile
 BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
 BUG OL étiquettes en survol de point quand lien, perd focus ???
 
+BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
+BUG existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
+	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
+
 TRACES
 	Différentier la trace du point visionné 
 	Différentier la trace éditée
@@ -15,9 +19,8 @@ BEST mesureur d'audience
 
 BUG chemineur geocodeur met le zoom à 1
 
-??? voir qui a importé https://c92.fr/test/chem4/viewtopic.php?t=99
-
 Bug ne pas afficher ~ sur massif & altitude
+??? voir qui a importé https://c92.fr/test/chem4d/viewtopic.php?t=99
 
 INVESTIGATION
 BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
