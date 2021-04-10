@@ -693,17 +693,26 @@ function layerVectorURL(options) {
 		receiveFeatures: function(features) { // features pre-treatment
 			return features;
 		},
-		styleOptions: function(properties) { // Function returning the layer's feature style
+		styleOptions: function(properties) { // Default function returning the layer's feature style
+			if (!properties.icon)
+				properties.icon = '//sym16.dc9.fr/' + (properties.sym || 'Puzzle Cache') + '.png';
+			//TODO sym16.dc9.fr -> chemineur.fr quand on aura migré ???
 			return {
 				image: new ol.style.Icon({
-					src: '//sym16.dc9.fr/' + properties.sym + '.png', //TODO C coi //sym16.dc9.fr/ ??????????
+					src: properties.icon,
+					imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher sur I.E.
+					//TODO détecter la taille automatiquement
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
 				}),
 			};
 		},
 		label: function(properties) { // Label to dispach above the feature when hovering
 			const lines = [],
 				desc = [],
-				type = (properties.type || '')
+				type = (typeof properties.type == 'string' ? properties.type : '')
 				.replace(/(:|_)/g, ' ') // Remove overpass prefix
 				.replace(/[a-z]/, function(c) { // First char uppercase
 					return c.toUpperCase();
@@ -808,7 +817,7 @@ function layerVectorURL(options) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: escapedStyle(options.styleOptions),
-			renderBuffer: 16, // buffered area around curent view (px)
+			renderBuffer: 16, // Buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
 	layer.options = options; // Mem options for further use
@@ -914,7 +923,7 @@ function layerRefugesInfo(options) {
 			properties.name = properties.nom;
 			properties.link = properties.lien;
 			properties.ele = properties.coord.alt;
-			properties.icone = properties.type.icone;
+			properties.icon = options.baseUrl + 'images/icones/' + properties.type.icone + '.svg';
 			properties.type = properties.type.valeur;
 			properties.bed = properties.places.valeur;
 			// Need to have clean KML export
@@ -922,18 +931,8 @@ function layerRefugesInfo(options) {
 				properties.lien =
 				properties.date = '';
 		},
-
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					//TODO BUG it don't use the same baseUrl than baseUrlFunction
-					src: options.baseUrl + 'images/icones/' + properties.icone + '.svg',
-					imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher sur I.E.
-				}),
-			};
-		},
 	}, options);
-	return layerVectorURL(options); //BEST inline
+	return layerVectorURL(options);
 }
 
 /**
@@ -959,34 +958,22 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
-		baseUrl: '//dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=',
+		//TODO reassigner à chemineur quand on aura migré / Vois aussy sym.dc9.fr
+		baseUrl: 'https://dc9.fr/chem3/ext/Dominique92/GeoBB/gis.php?site=this&poi=',
 		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
-			const icone = properties.icone.match(new RegExp('([a-z\-_]+)\.png')); // Type calculation
+			const icon = properties.icon.match(new RegExp('([a-z\-_]+)\.png')); // Type calculation
 			properties.name = properties.nom;
 			properties.link = properties.url;
-			properties.type = icone ? icone[1] : null;
+			properties.type = icon ? icon[1] : null;
 			properties.sym = getSym(properties.type);
 			properties.copy = 'chemineur.fr';
 		},
-		styleOptions: function(properties) {
-			return {
-				// POI
-				image: new ol.style.Icon({
-					src: properties.icone,
-				}),
-				// Traces
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 3,
-				}),
-			};
-		},
 		hoverStyleOptions: {
-			stroke: new ol.style.Stroke({ // For traces
-				color: 'red',
-				width: 3,
+			stroke: new ol.style.Stroke({ // For lines & polygons
+				color: '#00ffff',
+				width: 5,
 			})
 		},
 	}, options));
@@ -1004,13 +991,6 @@ function layerAlpages(options) {
 			properties.sym = getSym(properties.icone);
 			properties.type = icone ? icone[1] : null;
 			properties.link = 'http://alpages.info/viewtopic.php?t=' + properties.id;
-		},
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: properties.icon,
-				}),
-			};
 		},
 	}, options));
 }
@@ -1780,7 +1760,7 @@ function controlLoadGPX(options) {
 				featureProjection: 'EPSG:3857',
 			}),
 			added = map.dispatchEvent({
-				type: 'myol:onfeatureload', // Warn layerGeoJson that we uploaded some features
+				type: 'myol:onfeatureload', // Warn layerEditGeoJson that we uploaded some features
 				features: features,
 			});
 
@@ -1795,7 +1775,7 @@ function controlLoadGPX(options) {
 					style: function(feature) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
-								src: '//sym16.dc9.fr/' + feature.getProperties().sym + '.png',
+								src: '//sym16.dc9.fr/' + feature.getProperties().sym + '.png', //TODO sym16.dc9.fr -> chemineur.fr quand on aura migré ???
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',
@@ -1985,7 +1965,7 @@ function controlPrint() {
  * Lines & polygons edit
  * Requires JSONparse, myol:onadd, escapedStyle, controlButton
  */
-function layerGeoJson(options) {
+function layerEditGeoJson(options) {
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
@@ -2029,7 +2009,7 @@ function layerGeoJson(options) {
 			// Lines or border colors
 			stroke: new ol.style.Stroke({
 				color: 'red',
-				width: 2,
+				width: 6,
 			}),
 			// Polygons
 			fill: new ol.style.Fill({

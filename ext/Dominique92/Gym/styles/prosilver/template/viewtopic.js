@@ -4,13 +4,6 @@ var layerGeoBBgis = layerVectorURL({
 		receiveProperties: function(properties) {
 			properties.link = '?p=' + properties.post_id;
 		},
-		styleOptions: function(properties) {
-			return {
-				image: new ol.style.Icon({
-					src: properties.icon,
-				}),
-			};
-		},
 	}),
 	map = new ol.Map({
 		target: 'carte',

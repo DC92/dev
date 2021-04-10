@@ -2,6 +2,11 @@ Sélecteur de couches plus gros sur mobile
 BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
 BUG OL étiquettes en survol de point quand lien, perd focus ???
 
+WRI
+	layerGeoJson -> layerEditGeoJson
+	nouvelles images
+	nouvelle icone fumée derrière
+
 BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
 BUG existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
 	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)

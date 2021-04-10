@@ -8,22 +8,6 @@ var layerGeoBBgis = layerVectorURL({
 			properties.copy = 'chemineur.fr';
 		},
 		noClick: script == 'posting',
-		styleOptions: function(properties) {
-			const style = {
-				// Lines & polygons
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 3,
-				}),
-			};
-			if (properties.icon)
-				// Points
-				style.image = new ol.style.Icon({
-					src: properties.icon,
-					imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher sur I.E.
-				});
-			return style;
-		},
 		hoverStyleOptions: {
 			// Lines & polygons
 			stroke: new ol.style.Stroke({
@@ -32,7 +16,7 @@ var layerGeoBBgis = layerVectorURL({
 			})
 		},
 	}),
-	marker = layerGeoJson({
+	marker = layerEditGeoJson({
 		displayPointId: 'marker',
 		geoJsonId: 'geojson',
 		focus: 16,
@@ -76,7 +60,7 @@ var layerGeoBBgis = layerVectorURL({
 switch (script + '-' + mapType) {
 	case 'viewtopic-point':
 		map.addLayer( // Cadre définissant la position
-			layerGeoJson({
+			layerEditGeoJson({
 				displayPointId: 'cadre-coords',
 				geoJsonId: 'cadre-json',
 				focus: 15,
@@ -89,7 +73,7 @@ switch (script + '-' + mapType) {
 		break;
 
 	case 'viewtopic-line':
-		const layer = layerGeoJson({
+		const layer = layerEditGeoJson({
 			geoJsonId: 'cadre-json',
 		});
 		map.getView().fit(
@@ -105,9 +89,10 @@ switch (script + '-' + mapType) {
 		break;
 
 	case 'posting-line':
-		map.addLayer(layerGeoJson({
+		map.addLayer(layerEditGeoJson({
 			geoJsonId: 'geojson',
 			snapLayers: [layerGeoBBgis],
+			//TODO centraliser les textes dans MyOl / Traduction anglais ?
 			titleModify: 'Modification d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne\n' +
@@ -124,7 +109,7 @@ switch (script + '-' + mapType) {
 		break;
 
 	case 'posting-poly':
-		map.addLayer(layerGeoJson({
+		map.addLayer(layerEditGeoJson({
 			geoJsonId: 'geojson',
 			snapLayers: [layerGeoBBgis],
 			titleModify: 'Modification d‘un polygone:\n' +
