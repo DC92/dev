@@ -1,5 +1,6 @@
 BUG bloquants
 	chemineur geocodeur met le zoom à 1
+	bbox: result.boundingbox,
 
 Sélecteur de couches
 	plus gros sur mobile
@@ -125,17 +126,13 @@ Save SQL chem3
 	http://v2.chemineur.fr/chem-fich  =>  files/chem-fich
 	Dominique92/GeoBB/types_points/ =>  Dominique92/GeoBB/icones/
 Créer SQL chem4 / importer
-
-Rafraichissement
 Sav chem3/files (à partir de date)
 
 Copier phpBB3 sauf docs / files / config.php
-Copier chem3/files
-Copier chem3/files/attach
-Copier chem3/files/attach
+Copier chem3/files & chem3/files/attach
 Copier chem2/chem-fich dans files/chem-fich
 Copier chem3/images/avatars
-Copier chem3/styles/chemineur
+Copier chem3/styles/chemineur  -> Supprimer aprés
 Copier phpBBexts/images/smileys (vérifier :sleep:)
 Copier phpBBexts/assets/MyOl, jquery-ui & MySlider -> chem4
 Copier phpBBexts/ext/phpbb -> chem4
