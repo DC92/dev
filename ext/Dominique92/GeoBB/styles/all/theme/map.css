@@ -8,8 +8,11 @@
 	min-height: 40vw; /* For I.E. */
 }
 /* Make the height equal to the width */
-.ol-viewport {
+#map .ol-viewport {
 	padding-bottom: 100%;
+}
+#map:fullscreen .ol-viewport {
+	padding-bottom: 0;
 }
 
 /* CSS pure open/close menu */

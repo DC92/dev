@@ -1,6 +1,5 @@
-BUG chem3 http://dc9.fr/chemineur/ext/Dominique92/GeoBB/gis.php?site=this&poi=3,8,16,20,23,30,40,44,58,62,64&bbox=2.0629,48.7392,2.3373,48.8609
-
-BUG chemineur geocodeur met le zoom à 1
+BUG bloquants
+	chemineur geocodeur met le zoom à 1
 
 Sélecteur de couches
 	plus gros sur mobile
@@ -19,27 +18,28 @@ WRI
 	nav.js / contour = layerVectorURL({ / enlever styleOptions: 
 
 BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
-BUG existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
+
+BUG ne pas afficher ~ sur massif & altitude
+	existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
 	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
 
 DIAPO
 	ordre des diapos
+	DIAPO n'affiche pas la première image au début du chargement (wait !)
 
-BEST Images responsives de toute la largeur sur petits écrans
+BEST
+	Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
-BEST Fonction GPS / selecteur de traces
-BEST mesureur d'audience
 
-Bug ne pas afficher ~ sur massif & altitude
-??? voir qui a importé https://c92.fr/test/chem4d/viewtopic.php?t=99
+BEST Fonction GPS / selecteur de traces
+
+BEST mesureur d'audience
 
 INVESTIGATION
 	BUG ??? pictos clignotent (idem WRI)
-	DIAPO n'affiche pas la première image au début du chargement (wait !)
 
-BEST MYOL
-	myol editeur ligne zone sensible edit ligne plus grande
-	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
+BEST myol editeur ligne zone sensible edit ligne plus grande
+BEST myol zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
 BEST pas de fond ciel sur connexion à l'admin
 BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
 BEST carte pour 1 forum (aéroport, … ?)
