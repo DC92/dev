@@ -559,7 +559,7 @@ function hoverManager(map) {
 				evt.pixel[0] + (mapRect.x || mapRect.left), //HACK left/top for IE
 				evt.pixel[1] + (mapRect.y || mapRect.top)
 			);
-		if (hoveredEl.id != 'label') { // Not hovering an html element (label, button, ...)
+		if (hoveredEl && hoveredEl.id != 'label') { // Not hovering an html element (label, button, ...)
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
