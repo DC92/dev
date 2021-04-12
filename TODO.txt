@@ -1,5 +1,5 @@
 BUG bloquants
-	chemineur geocodeur met le zoom à 1
+	Les pictos ont disparu sur V 3.....! 8(
 	bbox: result.boundingbox,
 
 Sélecteur de couches
@@ -12,6 +12,8 @@ MyOl
 	étiquettes en survol de point quand lien, perd focus ???
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 
+chemineur geocodeur met le zoom à 1 : suivre patch https://github.com/jonataswalker/ol-geocoder/issues/228
+
 WRI
 	layerGeoJson -> layerEditGeoJson
 	nouvelles icones
@@ -19,6 +21,8 @@ WRI
 	nav.js / contour = layerVectorURL({ / enlever styleOptions: 
 
 BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
+
+BUG la date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
 
 BUG ne pas afficher ~ sur massif & altitude
 	existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
@@ -131,7 +135,7 @@ Sav chem3/files (à partir de date)
 Copier phpBB3 sauf docs / files / config.php
 Copier chem3/files & chem3/files/attach
 Copier chem2/chem-fich dans files/chem-fich
-Copier chem3/images/avatars
+Copier chem3/images/avatars/upload/*.jpg dans images/avatars/upload
 Copier chem3/styles/chemineur  -> Supprimer aprés
 Copier phpBBexts/images/smileys (vérifier :sleep:)
 Copier phpBBexts/assets/MyOl, jquery-ui & MySlider -> chem4
