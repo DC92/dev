@@ -1,29 +1,33 @@
 BUG bloquants
 	Les pictos ont disparu sur V 3.....! 8(
-	bbox: result.boundingbox,
-	VTTRACK   'icon' => 'http://chemineur.fr/feed/poi.gml.php?site=all&poi=hebergement|ravitaillement|inutilisable&limite=200&bbox=5.5264656079203,44.561446158151,5.7753746044677,44.804818020569/ext/Dominique92/GeoBB/icones/cabane.svg',
-
-VTTRACK : source de points d'eau ?
+	Chemineur dans MyOl => Traduction symbole (export GPS ?)
 
 Sélecteur de couches
+	Compacter au départ
+	Persistant quand on se déconnecte
 	plus gros sur mobile
 	BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
 	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
 	BEST Sélecteur de features sur c2c, PRC, Alpages
 
+C quoi color=string #70f74c  dans le flux GIS ?
+
 MyOl
 	étiquettes en survol de point quand lien, perd focus ???
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 
-Trace modif geom:        여mÀ-`·@
+Trace modif MyPhpBB : geom:        여mÀ-`·@
 
+GEOCODEUR -> vérifier que le bug est corrigé : bbox: result.boundingbox,
 chemineur geocodeur met le zoom à 1 : suivre patch https://github.com/jonataswalker/ol-geocoder/issues/228
 
 WRI
+	Chemineur dans WRI
 	layerGeoJson -> layerEditGeoJson
 	nouvelles icones
 	nouvelle favicone fumée derrière
 	nav.js / contour = layerVectorURL({ / enlever styleOptions: 
+	Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
 
 BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
 
@@ -37,9 +41,11 @@ DIAPO
 	ordre des diapos
 	DIAPO n'affiche pas la première image au début du chargement (wait !)
 
-BEST
+BEST photos
 	Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
+	Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
+	Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
 
 BEST Fonction GPS / selecteur de traces
 
@@ -48,8 +54,10 @@ BEST mesureur d'audience
 INVESTIGATION
 	BUG ??? pictos clignotent (idem WRI)
 
-BEST myol editeur ligne zone sensible edit ligne plus grande
-BEST myol zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
+MYOL
+	editeur ligne zone sensible edit ligne plus grande
+	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
+
 BEST pas de fond ciel sur connexion à l'admin
 BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
 BEST carte pour 1 forum (aéroport, … ?)
@@ -62,24 +70,17 @@ BEST BUG quand erreur debug, la carte est 3 fois plus haute
 PhpBB
 	Façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
 	Ne pas démarrer les ext quand on installe
+	Comment retourner un mail de création d'user à l'admin ?
 
 VTTRACK
 	GIS couches point d'eau plus représentative => Import WRI / OMS ?
 	Fusion points WRI non présents dans Chemineur
-	Bug GML url
-	Pictos dans chem4/prod/chemtype
-	Routage gml.php
-	Priorité pas aux orris !!
 
 //TODO BUGS CHEMINEUR
 =====================
 Voir forum Evolutions & bugs sur chemineur.fr
 Suppression fichier attach ne supprime pas l'attachment.
-WRI : Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
-Posting line: pour édit : mettre marqueurs lignes au dessus des icones
-Clear Ajax carte quand ajoute/supprime un lien (les 2 icones restent sur la carte)
 Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
-Comment retourner un mail de création d'user à l'admin ?
 Pourquoi post_attachment = 0 si on a une image ?
 Click sur une icone chem2 plante
 
@@ -87,25 +88,15 @@ Click sur une icone chem2 plante
 =====================
 /Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 Ne pas afficher les points en doublon (flux wri, prc, c2c)
-Créer /LOG automatiquement + index.html
-Voir pourquoi les champs de saisie du curseur de l'exemple ont une , au lieu d'un point
 cookie = ;SameSite=Strict
 	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
 	Or if your host is already updated to 7.3, you can use:
 	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
-Cross-Origin Read Blocking (CORB) blocked cross-origin response http://dc9.fr/chemineur/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
-Le sélecteur de couche chem/wri/c2C/... pourrait ne pas sélectionner les sites externes par défaut.
-Meteo sur chem
 Stockage images sur plus d'1 répertoire => ? plugin ?
 Mettre les media print dans print.css
-CSS bug chem cadre liens sur largeur fenêtre petite
-Choix type trace GPS
-Editeur Optim geom dès le chargement
 Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29
 Erreur type de caractères randos Lozerre
 Récup trace diaporamas + chemins chem2
-Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
-Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
 EDIT.log => Trace supprimer le sujet
 Eviter d'afficher les jpg non autorisés insérés dans le texte.
 	Rechercher les liens vers une image dans le texte (Google image)
@@ -128,82 +119,12 @@ BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090
 CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
 
 
-************************************************************************************
-MIGRATION
-Save SQL chem3
-	supprimer les 2 lignes create database
-	http://v2.chemineur.fr/chem-fich  =>  files/chem-fich
-	Dominique92/GeoBB/types_points/ =>  Dominique92/GeoBB/icones/
-Créer SQL chem4 / importer
-Sav chem3/files (à partir de date)
-
-Copier phpBB3 sauf docs / files / config.php
-Copier chem3/files & chem3/files/attach
-Copier chem2/chem-fich dans files/chem-fich
-Copier chem3/images/avatars/upload/*.jpg dans images/avatars/upload
-Copier chem3/styles/chemineur  -> Supprimer aprés
-Copier phpBBexts/images/smileys (vérifier :sleep:)
-Copier phpBBexts/assets/MyOl, jquery-ui & MySlider -> chem4
-Copier phpBBexts/ext/phpbb -> chem4
-Copier phpBBexts/ext/Dominique92/ -> chem4 sauf Blog / Gym
-Copier ???/config.php -> chem4/config.php
-
-=> Chem4/install
-Français / Change
-Mise à jour / Mise à jour
-Uniquement la BDD / Envoyer
-Supprimer chem4/install
-
-=> chem4/adm : activer MyPhpBB & Images & slideshow
-=> chem4/adm : désactiver les extensions obsolètes / supprimer de GITHUB et du serveur
-=> chem4/adm : désactiver l’extensions VigLink / supprimer du serveur
-=> chem4/adm : Gérer les styles / prosilver / Détail / Définir comme style par défaut
-=> chem4/adm : Gérer les styles / chemineur / Détail / Définir comme style par défaut / supprimer du serveur
-Installer cleantalk
-
-ARCHI
-=====
-//TODO-END http://jsbeautifier.org/ & http://jshint.com
-//TODO-END replace var by const / let
-
-
 AIDE CHEM
 =========
 Un sujet est actif quand il y a eu des contributions récentes.
 Création / Edition de traces
 Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
 Consulter l'historique des éditions
-
-UPGRADE CHEMINEUR
-=================
-Avant upgrade chem
-	CHEM2 : [first=point][/point][form=point][/form] => [first=Point][/first][form=Point][/form][view=Point][/view]
-	TODO récupérer les fichiers chem2
-	chem3 : les liens photos dans le post ont donné lieu à des attachement ???? (géré dans le posting.php)
-	Fiche type Point : carte IGN, commune, ...²
-	//TODO reprendre Fonctionnalités et bugs http://chemineur.fr/viewforum.php?f=70
-Fermer le site
-Vider cache
-phpadmin export database
-Cpanel -> Bases de données MySQL
-Créer BDD
-Ajouter un nouvel utilisateur à la base de données
-phpadmin import database
-Copier PhpBB3 sauf doc
-Copier repertoires de GeoBB
-Copier cmem3/files
-Mise à jour config.php
-Lancer admin -> Upgrade
-Supprimer répertoire install
-Désactiver styles et extensions /supprimer les données (y compris collapsible cactégories)
-	Lancer /adm -> Personnaliser -> Gérer les extensions
-	Désactiver et supprimer les données sauf GeoBB
-	Supprimer les ext/* sauf GeoBB
-Purger contenu de /assets /ext/phpbb /ext/Dominique92 /styles /install* /README
-Modifier forum_desc diaporamas : [all=point][view=diapo][exclude=tortillards] => [view=diapo][/view]
-Rediriger dc9.fr/chemineur dans WRI
-Remplacer forumdesc par [hide]... (et bbcode !)
-
 
 TODO WRI
 ========
