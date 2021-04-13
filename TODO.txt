@@ -1,6 +1,9 @@
 BUG bloquants
 	Les pictos ont disparu sur V 3.....! 8(
 	bbox: result.boundingbox,
+	VTTRACK   'icon' => 'http://chemineur.fr/feed/poi.gml.php?site=all&poi=hebergement|ravitaillement|inutilisable&limite=200&bbox=5.5264656079203,44.561446158151,5.7753746044677,44.804818020569/ext/Dominique92/GeoBB/icones/cabane.svg',
+
+VTTRACK : source de points d'eau ?
 
 Sélecteur de couches
 	plus gros sur mobile
@@ -11,6 +14,8 @@ Sélecteur de couches
 MyOl
 	étiquettes en survol de point quand lien, perd focus ???
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
+
+Trace modif geom:        여mÀ-`·@
 
 chemineur geocodeur met le zoom à 1 : suivre patch https://github.com/jonataswalker/ol-geocoder/issues/228
 

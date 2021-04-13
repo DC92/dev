@@ -33,8 +33,6 @@ $bbox_sql =
 	$bboxs[0].' '.$bboxs[3].','.
 	$bboxs[0].' '.$bboxs[1];
 
-$diagBbox = hypot ($bboxs[2] - $bboxs[0], $bboxs[3] - $bboxs[1]); // Hypothènuse de la bbox
-
 // Recherche des points dans la bbox
 $sql_array = [
 	'SELECT' => [
@@ -140,59 +138,19 @@ function signature ($coord) {
 }
 
 // Formatage du header
-$secondes_de_cache = 10;
+$secondes_de_cache = 3600;
 $ts = gmdate("D, d M Y H:i:s", time() + $secondes_de_cache) . " GMT";
 header("Content-Transfer-Encoding: binary");
 header("Pragma: cache");
 header("Expires: $ts");
 header("Access-Control-Allow-Origin: *");
 header("Cache-Control: max-age=$secondes_de_cache");
+header("Content-Type: application/json; UTF-8");
+header("Content-disposition: filename=geobb.json");
 
-switch ($format) {
-	case 'gml':
-		header("Content-Type: application/gml+xml; UTF-8");
-		header("Content-disposition: filename=chemineur.gml");
-
-		echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>
-<wfs:FeatureCollection
-	xmlns:wfs=\"http://www.opengis.net/wfs\"
-	xmlns:gml=\"http://www.opengis.net/gml\"
-	xmlns:topp=\"http://www.openplans.org/topp\"
->
-	<name>chemineur.gml</name>
-	<description>Points provenants du site chemineur.fr</description>
-";
-
-		foreach ($data AS $d) {
-			preg_match ('/\[([0-9\.]+,[0-9\.]+)\]/', str_replace (' ', '', json_encode ($d['geo_json'])), $ll);
-			echo "
-	<gml:featureMember>
-		<point>
-			<nom>{$d['post_subject']}</nom>
-			<type>{$d['forum_name']}</type>
-			<site>chemineur.fr</site>
-			<gml:Point>
-				<gml:coordinates decimal=\".\" cs=\",\" ts=\" \">{$ll[1]}</gml:coordinates>
-			</gml:Point>
-			<altitude>{$d['geo_altitude']}</altitude>
-			<url>{$d['link']}</url>
-		</point>
-	</gml:featureMember>
-";
-		}
-
-		echo "
-</wfs:FeatureCollection>";
-		break;
-
-	default:
-		header("Content-Type: application/json; UTF-8");
-		header("Content-disposition: filename=geobb.json");
-
-		// On transforme l'objet PHP en code geoJson
-		echo json_encode ([
-			'type' => 'FeatureCollection',
-			'timestamp' => date('c'),
-			'features' => $features,
-		]);
-}
+// On transforme l'objet PHP en code geoJson
+echo json_encode ([
+	'type' => 'FeatureCollection',
+	'timestamp' => date('c'),
+	'features' => $features,
+]);
