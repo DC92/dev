@@ -695,8 +695,7 @@ function layerVectorURL(options) {
 		},
 		styleOptions: function(properties) { // Default function returning the layer's feature style
 			if (!properties.icon)
-				properties.icon = '//sym16.dc9.fr/' + (properties.sym || 'Puzzle Cache') + '.png';
-			//TODO sym16.dc9.fr -> chemineur.fr quand on aura migré ???
+				properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + (properties.sym || 'Puzzle Cache') + '.png';
 			return {
 				image: new ol.style.Icon({
 					src: properties.icon,
@@ -964,16 +963,10 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
-		//TODO reassigner à chemineur quand on aura migré / Vois aussy sym.dc9.fr
-		baseUrl: 'https://dc9.fr/chem3/ext/Dominique92/GeoBB/gis.php?site=this&poi=',
-		urlSuffix: '3,8,16,20,23,30,40,44,58,62,64',
+		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?site=this&poi=', //TODO site=this&poi=  ?????
+		urlSuffix: '3,8,16,20,23,30,40,44,58,64',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
-			const icon = properties.icon.match(new RegExp('([a-z\-_]+)\.png')); // Type calculation
-			properties.name = properties.nom;
-			properties.link = properties.url;
-			properties.type = icon ? icon[1] : null;
-			properties.sym = getSym(properties.type);
 			properties.copy = 'chemineur.fr';
 		},
 	}, options));
@@ -1775,7 +1768,7 @@ function controlLoadGPX(options) {
 					style: function(feature) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
-								src: '//sym16.dc9.fr/' + feature.getProperties().sym + '.png', //TODO sym16.dc9.fr -> chemineur.fr quand on aura migré ???
+								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',

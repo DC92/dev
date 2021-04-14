@@ -92,26 +92,34 @@ $request_uri = explode ('/ext/', getenv('REQUEST_URI'));
 $url_base = $request_scheme[0].'://'.getenv('SERVER_NAME').$request_uri[0].'/';
 
 $data = $features = $signatures = [];
-$ampl = 0x100; // Max color delta
 while ($row = $db->sql_fetchrow($result)) {
-	// Color calculation
-	preg_match_all('/[0-9\.]+/',$row['geo_json'],$coords);
-	$x[0] = $coords[0][0] * 30000 % $ampl; // From lon
-	$x[1] = $coords[0][1] * 30000 % $ampl; // From lat
-	$x[2] = $ampl - ($x[0] + $x[1]) / 2;
-	$color = '#';
-	for ($c = 0; $c < 3; $c++) // Chacune des 3 couleurs primaires
-		$color .= substr (dechex (0x100 + $x[$c]), -2); // 0x100 for left hex 0 / the 2 last hex int chars
-
 	$properties = [
 		'name' => $row['post_subject'],
 		'link' => $url_base.'viewtopic.php?t='.$row['topic_id'],
 		'id' => $row['topic_id'],
 		'type_id' => $row['forum_id'],
 		'post_id' => $row['post_id'],
-		'icon' => $row['forum_image'] ? $url_base .str_replace ('.png', '.svg', $row['forum_image']) : null,
-		'color' => $color,
 	];
+
+	if ($row['forum_image']) {
+		preg_match_all ('/([^\/]+).png/', $row['forum_image'], $icon);
+		$properties['type'] = $icon[1];
+		$properties['icon'] = $url_base .str_replace ('.png', '.svg', $row['forum_image']);
+	}
+/*//TODO à quoi ça sert ?
+	else {
+		// Color of lines & polygons
+		preg_match_all ('/[0-9\.]+/', $row['geo_json'], $coords);
+		$ampl = 0x100; // Max color delta
+		$x[0] = $coords[0][0] * 30000 % $ampl; // From lon
+		$x[1] = $coords[0][1] * 30000 % $ampl; // From lat
+		$x[2] = $ampl - ($x[0] + $x[1]) / 2;
+		$color = '#';
+		for ($c = 0; $c < 3; $c++) // Chacune des 3 couleurs primaires
+			$color .= substr (dechex (0x100 + $x[$c]), -2); // 0x100 for left hex 0 / the 2 last hex int chars
+		$properties['color'] = $color;
+	}
+*/
 
 	// Disjoin points having the same coordinate
 	$geophp = json_decode ($row['geo_json']);
