@@ -1,15 +1,21 @@
 BUG bloquants
-	Les pictos ont disparu sur V 3.....! 8(
+	Les pictos ont disparu sur V3
 	Chemineur dans MyOl => Traduction symbole (export GPS ?)
 	Chemineur dans MyOl => Export KML des points KO
 	Trace modif MyPhpBB : geom:        여mÀ-`·@
 
+BUG ne pas afficher ~ sur massif & altitude
+	existe en ext/GeoBB et en ext/Chemineur
+		<p id="cadre-coords"></p>
+		$row ['geo_massif'] = str_replace ('~', '',
+	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
+
 INVESTIGATION
 	BUG ??? pictos clignotent (idem WRI)
-
-WRI
-	Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
-	Tester export KML
+	Pourquoi post_attachment = 0 si on a une image ?
+	Suppression fichier attach ne supprime pas l'attachment.
+	Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
+	Click sur une icone chem2 plante
 
 Sélecteur de couches
 	Compacter au départ
@@ -24,12 +30,6 @@ MyOl
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 	editeur ligne zone sensible edit ligne plus grande
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
-
-BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
-
-BUG ne pas afficher ~ sur massif & altitude
-	existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
-	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
 
 BEST photos
 	La date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
@@ -60,17 +60,13 @@ PhpBB
 	Ne pas démarrer les ext quand on installe
 	Comment retourner un mail de création d'user à l'admin ?
 
-VTTRACK
+VTTRACK TODO
 	GIS couches point d'eau plus représentative => Import WRI / OMS ?
 	Fusion points WRI non présents dans Chemineur
 
 //TODO BUGS CHEMINEUR
 =====================
 Voir forum Evolutions & bugs sur chemineur.fr
-Suppression fichier attach ne supprime pas l'attachment.
-Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
-Pourquoi post_attachment = 0 si on a une image ?
-Click sur une icone chem2 plante
 
 //TODO BEST CHEMINEUR
 =====================
@@ -91,7 +87,6 @@ Eviter d'afficher les jpg non autorisés insérés dans le texte.
 	Interface WRI V2->V3 	http://v2.chemineur.fr/prod/chem/json.php?site=c2c&bbox=-6.921386718749999%2C38.75408327579141%2C20.32470703125%2C51.69979984974196Doublons ou icones fantômes
 Améliorer référencement (-> Prat communal !)
 ext/GeoBB : ajouter les coordonnées au template print
-Posting: Purger les points des [*=line] à la saisie (include fichier dans leaflet) ?
 Import references: osm overpass, LDP
 	Import LDP: view-source:http://www.lacsdespyrenees.com/kml-Bielsa.kml
 Revenir à la page où on était quand on se connecte
@@ -105,7 +100,6 @@ Ajouter bouton permutation sur page point chem
 coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
 BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
 CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
-
 
 AIDE CHEM
 =========
