@@ -71,7 +71,7 @@ class listener implements EventSubscriberInterface
 			$result = $this->db->sql_query($sql);
 
 			echo '<?xml version="1.0" encoding="ISO-8859-1"?>'.PHP_EOL.
-				'<wfs:FeatureCollection xmlns:gml="http://www.opengis.net/gml">';
+				'<FeatureCollection xmlns:gml="http://www.opengis.net/gml">';
 
 			while ($row = $this->db->sql_fetchrow($result)) {
 				preg_match ('/\[([0-9\.]+,[0-9\.]+)\]/', str_replace (' ', '', json_encode ($row['geo_json'])), $ll);
@@ -90,7 +90,7 @@ class listener implements EventSubscriberInterface
 	</gml:featureMember>
 ";
 			}
-			echo '</wfs:FeatureCollection>';
+			echo '</FeatureCollection>';
 			exit; // Don't display phpBB feeds
 		}
 	}
