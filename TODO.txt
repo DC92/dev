@@ -1,6 +1,14 @@
 BUG bloquants
 	Les pictos ont disparu sur V 3.....! 8(
 	Chemineur dans MyOl => Traduction symbole (export GPS ?)
+	Chemineur dans MyOl => Export KML des points KO
+	Trace modif MyPhpBB : geom:        여mÀ-`·@
+	Accueil/News Titre de post insécable
+
+WRI
+	Chemineur dans WRI : GIS ne tient pas compte de POI
+	Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
+	Tester export KML
 
 Sélecteur de couches
 	Compacter au départ
@@ -10,28 +18,13 @@ Sélecteur de couches
 	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
 	BEST Sélecteur de features sur c2c, PRC, Alpages
 
-C quoi color=string #70f74c  dans le flux GIS ?
-
 MyOl
 	étiquettes en survol de point quand lien, perd focus ???
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
-
-Trace modif MyPhpBB : geom:        여mÀ-`·@
-
-GEOCODEUR -> vérifier que le bug est corrigé : bbox: result.boundingbox,
-chemineur geocodeur met le zoom à 1 : suivre patch https://github.com/jonataswalker/ol-geocoder/issues/228
-
-WRI
-	Chemineur dans WRI
-	layerGeoJson -> layerEditGeoJson
-	nouvelles icones
-	nouvelle favicone fumée derrière
-	nav.js / contour = layerVectorURL({ / enlever styleOptions: 
-	Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
+	editeur ligne zone sensible edit ligne plus grande
+	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
 
 BUG existe en ext/GeoBB et en ext/Chemineur <p id="cadre-coords"></p>
-
-BUG la date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
 
 BUG ne pas afficher ~ sur massif & altitude
 	existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
@@ -42,10 +35,12 @@ DIAPO
 	DIAPO n'affiche pas la première image au début du chargement (wait !)
 
 BEST photos
+	La date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
 	Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
 	Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
 	Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
+	BEST Diapo démarre sur une petite page puis défilement en full screen
 
 BEST Fonction GPS / selecteur de traces
 
@@ -54,14 +49,9 @@ BEST mesureur d'audience
 INVESTIGATION
 	BUG ??? pictos clignotent (idem WRI)
 
-MYOL
-	editeur ligne zone sensible edit ligne plus grande
-	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
-
 BEST pas de fond ciel sur connexion à l'admin
 BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
 BEST carte pour 1 forum (aéroport, … ?)
-BEST Diapo démarre sur une petite page puis défilement en full screen
 BEST Parking avec un P ascii avec couleurs
 BEST Reprendre tous les @ (erreurs masquées)
 BEST création champs SQL altitude et massif si non existants
@@ -156,7 +146,6 @@ AIDE TEST
 =========
 MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
 MultiPolygon avec trou => WRI massif 3127
-
 
 ALPAGES
 =======
