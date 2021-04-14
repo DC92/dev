@@ -3,10 +3,11 @@ BUG bloquants
 	Chemineur dans MyOl => Traduction symbole (export GPS ?)
 	Chemineur dans MyOl => Export KML des points KO
 	Trace modif MyPhpBB : geom:        여mÀ-`·@
-	Accueil/News Titre de post insécable
+
+INVESTIGATION
+	BUG ??? pictos clignotent (idem WRI)
 
 WRI
-	Chemineur dans WRI : GIS ne tient pas compte de POI
 	Le numéro de point demandé "5156" est introuvable dans notre base (chalet des ministres)
 	Tester export KML
 
@@ -30,27 +31,24 @@ BUG ne pas afficher ~ sur massif & altitude
 	existe en ext/GeoBB et en ext/Chemineur $row ['geo_massif'] = str_replace ('~', '',
 	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
 
-DIAPO
-	ordre des diapos
-	DIAPO n'affiche pas la première image au début du chargement (wait !)
-
 BEST photos
 	La date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
 	Images responsives de toute la largeur sur petits écrans
 	Bordure blanche images trop larges quand plusieurs dans le même post
 	Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
 	Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
-	BEST Diapo démarre sur une petite page puis défilement en full screen
+	déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
+
+DIAPO
+	ordre des diapos
+	DIAPO n'affiche pas la première image au début du chargement (wait !)
+	Diapo démarre sur une petite page puis défilement en full screen
 
 BEST Fonction GPS / selecteur de traces
 
 BEST mesureur d'audience
 
-INVESTIGATION
-	BUG ??? pictos clignotent (idem WRI)
-
 BEST pas de fond ciel sur connexion à l'admin
-BEST déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
 BEST carte pour 1 forum (aéroport, … ?)
 BEST Parking avec un P ascii avec couleurs
 BEST Reprendre tous les @ (erreurs masquées)

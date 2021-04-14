@@ -133,6 +133,8 @@ body,
 .nouvelles a {
 	font-weight: bold;
 	color: yellow;
+	text-overflow: ellipsis;
+	max-width: 45%;
 }
 .nouvelles li:last-child a {
 	font-size: 12px;
