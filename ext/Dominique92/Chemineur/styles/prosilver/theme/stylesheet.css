@@ -118,7 +118,6 @@ body,
 
 .nouvelles li {
 	margin: 5px;
-	text-align: justify;
 	font-family: Times New Roman;
 	font-size: 1.6em;
 	color: white;
@@ -129,16 +128,20 @@ body,
 	font-weight: bold;
 	text-decoration: underline;
 }
-.nouvelles a {
-	font-weight: bold;
-	color: yellow;
-	text-overflow: ellipsis;
-	max-width: 45%;
-}
 .nouvelles li:last-child a {
 	font-size: 12px;
 	font-weight: initial;
 	color: white;
+}
+.nouvelles a {
+	font-weight: bold;
+	color: yellow;
+}
+@media screen and (min-width: 600px) {
+	.nouvelles a {
+		text-overflow: ellipsis;
+		max-width: 45%;
+	}
 }
 
 /* Carte */
@@ -155,8 +158,6 @@ body,
 /* Simplifie l'affichage du descripteur de forum */
 .forabg {
 	margin: 10px;
-}
-@media screen and (max-width: 600px) {
 	.forabg {
 		margin: 0;
 	}
