@@ -405,6 +405,9 @@ function escapedStyle(a, b, c) {
  */
 //BEST open/close features check button
 //TODO WRI bug uncheck massifs, go to a page & come back
+//TODO BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
+//TODO Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
+
 function permanentCheckboxList(selectorName, evt) {
 	const inputEls = document.getElementsByName(selectorName),
 		list = [];
@@ -836,24 +839,6 @@ function layerVectorURL(options) {
 		};
 	}
 
-	// Checkboxes to tune layer parameters
-	if (options.selectorName)
-		controlPermanentCheckbox(
-			options.selectorName,
-			function(evt, list) {
-				if (!list.length)
-					xhr.abort();
-				statusEl.innerHTML = '';
-				layer.setVisible(list.length > 0);
-				displayZoomStatus();
-				if (list.length && source.loadedExtentsRtree_) {
-					source.loadedExtentsRtree_.clear(); // Force the loading of all areas
-					source.clear(); // Redraw the layer
-				}
-			},
-			options
-		);
-
 	layer.once('myol:onadd', function(evt) {
 		// Attach tracking for labeling & cursor changes
 		hoverManager(evt.map);
@@ -861,6 +846,24 @@ function layerVectorURL(options) {
 		// Zoom out of range report
 		evt.map.getView().on('change:resolution', displayZoomStatus);
 		displayZoomStatus();
+
+		// Checkboxes to tune layer parameters
+		if (options.selectorName)
+			controlPermanentCheckbox(
+				options.selectorName,
+				function(evt, list) {
+					if (!list.length)
+						xhr.abort();
+					statusEl.innerHTML = '';
+					layer.setVisible(list.length > 0);
+					displayZoomStatus();
+					if (list.length && source.loadedExtentsRtree_) {
+						source.loadedExtentsRtree_.clear(); // Force the loading of all areas
+						source.clear(); // Redraw the layer
+					}
+				},
+				options
+			);
 	});
 
 	// Change class indicator when zoom is OK
@@ -1224,18 +1227,16 @@ function noControl() {
  * Requires controlPermanentCheckbox, permanentCheckboxList, controlButton
  */
 function controlLayersSwitcher(options) {
+	options.baseLayers = {
+		OSM: options.baseLayers.OSM,
+		MRI: options.baseLayers.MRI,
+	};
+
 	const button = controlButton({
 		className: 'ol-switch-layer myol-button',
 		label: '\u2026',
 		rightPosition: 0.5,
 	});
-
-	// Transparency slider (first position)
-	const rangeEl = document.createElement('input');
-	rangeEl.type = 'range';
-	rangeEl.oninput = displayLayerSelector;
-	rangeEl.title = 'Glisser pour faire varier la tranparence';
-	button.element.appendChild(rangeEl);
 
 	// Don't display the selector if there is only one layer
 	if (options.baseLayers.length < 2)
@@ -1246,24 +1247,66 @@ function controlLayersSwitcher(options) {
 	selectorEl.style.overflow = 'auto';
 	button.element.appendChild(selectorEl);
 
+	// Transparency slider (first position)
+	const rangeEl = document.createElement('input');
+	rangeEl.type = 'range';
+	rangeEl.oninput = displayLayerSelector;
+	rangeEl.title = 'Glisser pour faire varier la tranparence';
+
+	const commentEl = document.createElement('p');
+	commentEl.innerHTML = 'Ctrl+click: multicouches<br/>';
+
 	//HACK execute actions on Map init
 	//BEST use option render
 	button.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		// Base layers selector init
+		// Build base layers HTML selector
 		for (let name in options.baseLayers) // array of layers, mandatory, no default
 			if (options.baseLayers[name]) { // null is ignored
-				const choiceEl = document.createElement('div');
-				choiceEl.innerHTML =
-					'<input type="checkbox" name="baselayer" id="bl' + options.baseLayers[name].ol_uid + '" value="' + name + '" /> ' +
-					'<label for="bl' + options.baseLayers[name].ol_uid + '">' + name + '</label>';
+				const selectorId = 'bl' + options.baseLayers[name].ol_uid,
+					choiceEl = document.createElement('div');
 				selectorEl.appendChild(choiceEl);
+				choiceEl.innerHTML =
+					'<input type="checkbox" name="baselayer" id="' + selectorId + '" value="' + name + '" /> ' +
+					'<label for="' + selectorId + '">' + name + '</label>';
+
 				map.addLayer(options.baseLayers[name]);
 			}
-		const commentEl = document.createElement('p');
-		commentEl.innerHTML = 'Ctrl+click: multicouches<br/>' + ol.version;
+
+		selectorEl.appendChild(rangeEl);
 		selectorEl.appendChild(commentEl);
+
+		// Build overlay vector layers HTML selector
+		if (options.ovelays) // array of layers, optionnel
+			for (let name in options.ovelays)
+				if (options.ovelays[name]) { // null is ignored
+					const ovelayOptions = options.ovelays[name].options
+					selectorId = ovelayOptions.selectorName;
+					choiceEl = document.createElement('div');
+					selectorEl.appendChild(choiceEl);
+					choiceEl.innerHTML = '<hr/><ul>' +
+						'<label for="' + selectorId + '">' + name + '</label>' +
+						'<input type="checkbox" id="' + selectorId + '" name="' + selectorId + '" checked="checked" />' +
+						//TODO BUG don't work ?? '<br/><span id="' + selectorId + '-status"></span>' +
+						'</ul>';
+
+					if (ovelayOptions.subSelectors)
+						for (let subName in ovelayOptions.subSelectors) {
+							const subChoiceId = 'sc' + selectorId + ovelayOptions.subSelectors[subName],
+								subChoiceEl = document.createElement('li');
+							selectorEl.appendChild(subChoiceEl);
+							subChoiceEl.innerHTML = '<input type="checkbox"' +
+								' id="' + subChoiceId + '" name="' + selectorId + '"' +
+								' value="' + ovelayOptions.subSelectors[subName] + '">' +
+								'<label for="' + subChoiceId + '">' + subName + '</label>';
+						}
+					map.addLayer(options.ovelays[name]);
+				}
+
+		const versionEl = document.createElement('p');
+		versionEl.innerHTML = ol.version;
+		selectorEl.appendChild(versionEl);
 
 		// Make the selector memorized by cookies
 		controlPermanentCheckbox('baselayer', displayLayerSelector, options);
@@ -1282,8 +1325,7 @@ function controlLayersSwitcher(options) {
 			if (evt.clientX < divRect.left || divRect.right < evt.clientX || // The mouse is outside the map
 				evt.clientY < divRect.top || divRect.bottom < evt.clientY) {
 				button.element.firstElementChild.style.display = '';
-				rangeEl.style.display =
-					selectorEl.style.display = 'none';
+				rangeEl.style.display = selectorEl.style.display = 'none';
 			}
 		});
 	};
@@ -1317,6 +1359,7 @@ function controlLayersSwitcher(options) {
 		// Refresh control button, range & selector
 		button.element.firstElementChild.style.display = evt ? 'none' : '';
 		rangeEl.style.display = evt && list.length > 1 ? '' : 'none';
+		commentEl.style.display = evt && list.length > 1 ? 'none' : '';
 		selectorEl.style.display = evt ? '' : 'none';
 		selectorEl.style.maxHeight = (button.getMap().getTargetElement().clientHeight - 58 - (list.length > 1 ? 24 : 0)) + 'px';
 	}

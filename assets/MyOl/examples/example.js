@@ -1,5 +1,7 @@
 console.log(document.cookie);
 
+//TODO I.E. ol-geocoder-debug.js (300,34) L’objet ne gère pas la propriété ou la méthode « append »
+
 /**
  * www.refuges.info areas layer
  * Requires layerVectorURL
@@ -67,9 +69,6 @@ new ol.Map({
 		layerC2C({
 			selectorName: 'c2c-features',
 		}),
-		layerChemineur({
-			selectorName: 'chm-features',
-		}),
 		layerAlpages({
 			selectorName: 'alp-features',
 		}),
@@ -80,6 +79,25 @@ new ol.Map({
 	],
 	controls: controlsCollection({
 		baseLayers: layersDemo(),
+		controlLayersSwitcher: {
+			ovelays: {
+				Chemineur: layerChemineur({
+					selectorName: 'chem-features',
+					urlSuffix: '',
+					subSelectors: {
+						Refuge: 3,
+						Abris: 8,
+						Fermé: 16,
+						Alimentation: 20,
+						Montagne: 23,
+						Transport: 40,
+						Tourisme: 44,
+						Naval: 58,
+						Trace: 64,
+					},
+				}),
+			}
+		},
 		controlPermalink: {
 			display: true,
 		},

@@ -164,8 +164,16 @@
 .ol-switch-layer div {
 	padding: 2px;
 }
-.ol-switch-layer input {
+.ol-switch-layer hr,
+.ol-switch-layer ul {
 	margin: 0;
+	padding: 0;
+}
+.ol-switch-layer li {
+	list-style: none;
+}
+.ol-switch-layer input {
+	margin: 0 5px;
 }
 .ol-switch-layer button {
 	padding-bottom: 8px;

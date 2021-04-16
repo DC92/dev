@@ -1,6 +1,6 @@
 const back = layerChemineur({
-		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?', //TODO GIS sans arguments (&bbox)
 		receiveProperties: function(properties) {
+			properties.name = null; // Pas d'étiquette
 			properties.link = null; // Couche non cliquable
 		},
 	}),
