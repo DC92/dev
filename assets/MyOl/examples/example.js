@@ -84,6 +84,7 @@ new ol.Map({
 				Chemineur: layerChemineur({
 					selectorName: 'chem-features',
 					urlSuffix: '',
+					init: '3,20,58',
 					subSelectors: {
 						Refuge: 3,
 						Abris: 8,

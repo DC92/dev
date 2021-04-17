@@ -403,10 +403,6 @@ function escapedStyle(a, b, c) {
  * if an input witout value is clicked, copy the check in all other inputs having the same name (click "all")
  * return : array of values of all checked <input name="selectorName" type="checkbox" value="xxx" />
  */
-//BEST open/close features check button
-//TODO WRI bug uncheck massifs, go to a page & come back
-//TODO BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
-//TODO Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
 
 function permanentCheckboxList(selectorName, evt) {
 	const inputEls = document.getElementsByName(selectorName),
@@ -426,10 +422,11 @@ function permanentCheckboxList(selectorName, evt) {
 			list.push(inputEls[e].value);
 	}
 
+	//TODO BUG Do that at the end of init only
 	// Mem the data in the cookie
 	document.cookie = 'map-' + selectorName + '=' +
 		(list.join(',') || 'none') +
-		'; path=/; SameSite=Strict;';
+		'; path=/; SameSite=Strict;';//TODO add date to remember on the next session
 
 	return list;
 }
@@ -470,7 +467,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
-	callback(null, permanentCheckboxList(selectorName));
+//TODO	callback(null, permanentCheckboxList(selectorName));
 }
 
 /**
@@ -756,6 +753,8 @@ function layerVectorURL(options) {
 			return lines.join('<br/>');
 		},
 	}, options);
+
+//TODO permanentCheckboxList(options.selectorName); // Init selection from cookies or url
 
 	const statusEl = document.getElementById(options.selectorName + '-status') || {},
 		xhr = new XMLHttpRequest(), // Only one object created
@@ -1226,12 +1225,8 @@ function noControl() {
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires controlPermanentCheckbox, permanentCheckboxList, controlButton
  */
+ //TODO ne devrait pas être transparent à la détection des étiquettes
 function controlLayersSwitcher(options) {
-	options.baseLayers = {
-		OSM: options.baseLayers.OSM,
-		MRI: options.baseLayers.MRI,
-	};
-
 	const button = controlButton({
 		className: 'ol-switch-layer myol-button',
 		label: '\u2026',
@@ -1281,13 +1276,13 @@ function controlLayersSwitcher(options) {
 		if (options.ovelays) // array of layers, optionnel
 			for (let name in options.ovelays)
 				if (options.ovelays[name]) { // null is ignored
-					const ovelayOptions = options.ovelays[name].options
-					selectorId = ovelayOptions.selectorName;
-					choiceEl = document.createElement('div');
+					const ovelayOptions = options.ovelays[name].options,
+						selectorId = ovelayOptions.selectorName,
+						choiceEl = document.createElement('div');
 					selectorEl.appendChild(choiceEl);
 					choiceEl.innerHTML = '<hr/><ul>' +
 						'<label for="' + selectorId + '">' + name + '</label>' +
-						'<input type="checkbox" id="' + selectorId + '" name="' + selectorId + '" checked="checked" />' +
+						'<input type="checkbox" id="' + selectorId + '" name="' + selectorId + '" />' +
 						//TODO BUG don't work ?? '<br/><span id="' + selectorId + '-status"></span>' +
 						'</ul>';
 
@@ -2633,6 +2628,7 @@ function layersDemo() {
 		'Stamen': layerStamen('terrain'),
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
+		//BEST neutral layer
 	});
 }
 

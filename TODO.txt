@@ -11,6 +11,7 @@ BUG ne pas afficher ~ sur massif & altitude
 	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
 
 INVESTIGATION
+	WRI bug uncheck massifs, go to a page & come back
 	BUG ??? pictos clignotent (idem WRI)
 	Pourquoi post_attachment = 0 si on a une image ?
 	Suppression fichier attach ne supprime pas l'attachment.
