@@ -80,6 +80,7 @@ Based on https://openlayers.org
 	<script src="<?=$myol_path?>geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
+	<script src="<?=$myol_path?>layers.js"></script>
 	<link href="<?=$myol_path?>myol.css" type="text/css" rel="stylesheet">
 	<script src="<?=$myol_path?>myol.js"></script>
 

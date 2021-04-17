@@ -1,4 +1,4 @@
-console.log(document.cookie);
+console.log('Cookies: ' + document.cookie);
 
 //TODO I.E. ol-geocoder-debug.js (300,34) L’objet ne gère pas la propriété ou la méthode « append »
 
