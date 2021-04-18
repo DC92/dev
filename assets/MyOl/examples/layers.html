@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/png" href="logo.png" />
+
+	<!-- Openlayers -->
+	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- My Openlayers -->
+	<link  href="../layers.css" type="text/css" rel="stylesheet">
+	<script src="../layers.js"></script>
+</head>
+
+<body>
+	<div id="map" style="width:90vw; height:60vw;"></div>
+
+	<p><a href="..">BASIC DEMO</a></p>
+	<p><a href="markers.html">MARKERS DEMO</a></p>
+	<p><a href="editor.html">EDITOR DEMO</a></p>
+	<p><a href="../gps">OFF LINE GPS</a></p>
+
+	<script>
+	console.log('Cookies: ' + document.cookie);
+
+	new ol.Map({
+		target: 'map',
+		controls: [
+			new ol.control.Zoom(),
+			controlLayerSwitcher({
+				baseLayers: layersDemo(),
+			}),
+		],
+		view: new ol.View({
+			center: [0, 0],
+			zoom: 2,
+		}),
+	});
+	</script>
+</body>
+</html>
