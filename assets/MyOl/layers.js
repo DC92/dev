@@ -12,6 +12,70 @@ if (!ol) var ol = {};
 if (!mapKeys) var mapKeys = {};
 
 /**
+ * Layer switcher
+ */
+function controlLayerSwitcher(options) {
+	const control = new ol.control.Control({
+		element: document.createElement('div'),
+	});
+
+	function selectBaseLayer() {
+		if (!this.value) {// Checkbox selection
+			const match = [
+					location.search, // Priority to the url ?arg=
+					location.hash, // Then the hash #arg=
+					document.cookie, // Then the cookies
+				].join(';')
+				.match(/bl=([A-Za-z0-9_ ]+)/); // Find the value
+
+			this.value = match && typeof options.baseLayers[match[1]] != 'undefined' ?
+				match[1] : // An existing layer
+				Object.keys(options.baseLayers)[0]; // The first selector
+		}
+
+		// Refresh layers visibility & opacity
+		for (let blName in options.baseLayers)
+			if (options.baseLayers[blName]) {
+				options.baseLayers[blName].setVisible(blName == this.value);
+				//				options.baseLayers[blName].setOpacity(0);
+
+				options.baseLayers[blName].inputTag.checked = (blName == this.value);
+			}
+
+		// Mem the data in the cookie
+		document.cookie = 'bl=' + this.value +
+			'; path=/; SameSite=Strict;'; //TODO add date to remember on the next session
+	}
+
+	control.setMap = function(map) {
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		control.element.className = 'ol-control ol-control-switcher';
+		control.element.innerHTML =
+			'<button>\u2026</button>' +
+			'<div><span>Ctrl+click: multicouches</span></div>' +
+			'<div><input type="range" title="Glisser pour faire varier la tranparence"></div>';
+
+		for (let blName in options.baseLayers)
+			if (options.baseLayers[blName]) {
+				const blUid = options.baseLayers[blName].ol_uid,
+					baseEl = document.createElement('div');
+				control.element.appendChild(baseEl);
+				baseEl.innerHTML = '<input type="checkbox" name="bl"' +
+					' id="bl' + blUid + '" value="' + blName + '">' +
+					'<label for="bl' + blUid + '">' + blName + '</label>';
+				baseEl.firstChild.onclick = selectBaseLayer;
+				options.baseLayers[blName].inputTag = baseEl.firstChild; // Mem it for further ops
+
+				map.addLayer(options.baseLayers[blName]);
+			}
+		selectBaseLayer(); // Do that once at the init
+	};
+
+	return control;
+}
+
+/**
  * Openstreetmap
  */
 function layerOsm(url, attribution, maxZoom) {
@@ -361,68 +425,4 @@ function layersDemo() {
 		'Watercolor': layerStamen('watercolor'),
 		//BEST neutral layer
 	});
-}
-
-/**
- * Layer switcher
- */
-function controlLayerSwitcher(options) {
-	const control = new ol.control.Control({
-		element: document.createElement('div'),
-	});
-
-	function selectBaseLayer() {
-		if (!this.value) {
-			const match = [
-					location.search, // Priority to the url args
-					location.hash, // Then the hash
-					document.cookie, // Then the cookies
-				].join(';')
-				.match(/bl=([A-Za-z0-9_ ]+)/); // Find the value
-
-			this.value = match && typeof options.baseLayers[match[1]] != 'undefined' ?
-				match[1] :
-				Object.keys(options.baseLayers)[0]; // The first selector
-		}
-
-		// Refresh layers visibility & opacity
-		for (let blName in options.baseLayers)
-			if (options.baseLayers[blName]) {
-				options.baseLayers[blName].setVisible(blName == this.value);
-				//				options.baseLayers[blName].setOpacity(0);
-
-				options.baseLayers[blName].inputTag.checked = (blName == this.value);
-			}
-
-		// Mem the data in the cookie
-		document.cookie = 'bl=' + this.value +
-			'; path=/; SameSite=Strict;'; //TODO add date to remember on the next session
-	}
-
-	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		control.element.className = 'ol-control ol-control-switcher';
-		control.element.innerHTML =
-			'<button>\u2026</button>' +
-			'<div><span>Ctrl+click: multicouches</span></div>' +
-			'<div><input type="range" title="Glisser pour faire varier la tranparence"></div>';
-
-		for (let blName in options.baseLayers)
-			if (options.baseLayers[blName]) {
-				const blUid = options.baseLayers[blName].ol_uid,
-					baseEl = document.createElement('div');
-				control.element.appendChild(baseEl);
-				baseEl.innerHTML = '<input type="checkbox" name="bl"' +
-					' id="bl' + blUid + '" value="' + blName + '">' +
-					'<label for="bl' + blUid + '">' + blName + '</label>';
-				baseEl.firstChild.onclick = selectBaseLayer;
-				options.baseLayers[blName].inputTag = baseEl.firstChild; // Mem it for further ops
-
-				map.addLayer(options.baseLayers[blName]);
-			}
-		selectBaseLayer(); // Do that once at the init
-	};
-
-	return control;
 }
