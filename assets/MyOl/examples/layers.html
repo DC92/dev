@@ -23,6 +23,12 @@ Based on https://openlayers.org
 <body>
 	<div id="map" style="width:90vw; height:60vw;"></div>
 
+	<div id="addon">
+		<hr />
+		<p>Some additional HTML</p>
+		<p>...</p>
+	</div>
+
 	<p><a href="..">BASIC DEMO</a></p>
 	<p><a href="markers.html">MARKERS DEMO</a></p>
 	<p><a href="editor.html">EDITOR DEMO</a></p>
@@ -36,7 +42,8 @@ Based on https://openlayers.org
 		controls: [
 			new ol.control.Zoom(),
 			controlLayerSwitcher({
-				baseLayers: layersDemo(),
+				baseLayers: layersCollection(),
+				addonEl: document.getElementById('addon'),
 			}),
 		],
 		view: new ol.View({

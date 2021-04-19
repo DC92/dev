@@ -14,6 +14,7 @@ if (!mapKeys) var mapKeys = {};
 /**
  * Layer switcher
  */
+//TODO ne devrait pas être transparent à la détection des étiquettes
 function controlLayerSwitcher(options) {
 	const layerNames = Object.keys(options.baseLayers),
 		control = new ol.control.Control({
@@ -53,11 +54,14 @@ function controlLayerSwitcher(options) {
 				map.addLayer(layer);
 			}
 
+		if (options.addonEl)
+			control.element.appendChild(options.addonEl);
+
 		selectBaseLayer(); // Do that once at the init
 	};
 
 	function selectBaseLayer(evt) {
-		if (!this.value) { // Checkbox selection
+		if (!this.value) { // No checkbox selection = init
 			const match = [
 					location.search, // Priority to the url ?arg=
 					location.hash, // Then the hash #arg=
