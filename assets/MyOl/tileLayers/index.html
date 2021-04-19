@@ -6,7 +6,7 @@ Based on https://openlayers.org
 -->
 <html>
 <head>
-	<title>My Openlayers</title>
+	<title>My tile layers</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/png" href="logo.png" />
@@ -31,31 +31,6 @@ Based on https://openlayers.org
 
 	<p><a href="..">Home demos</a></p>
 	<p><a href="https://github.com/Dominique92/MyOl/tree/master/tileLayers">Github</a></p>
-	<br/>
-	<div>This package defines :</div>
-	<ul>
-		<li>a tile layers collection</li>
-		<li>and a layer switcher control</li>
-	</ul>
-	<br/>
-	<div>Include standard Openlayers distribution ol.css & ol.js</div>
-	<div>Include this package tileLayers.css & tileLayers.js</div>
-	<pre>
-	new ol.Map({
-		target: 'map',
-		controls: [
-			new ol.control.Zoom(),
-			controlLayerSwitcher({
-				baseLayers: layersCollection(),
-				addonEl: document.getElementById('addon'),
-			}),
-		],
-		view: new ol.View({
-			center: [0, 0],
-			zoom: 2,
-		}),
-	});
-	</pre>
 
 	<script>
 	new ol.Map({
