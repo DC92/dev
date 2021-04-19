@@ -143,9 +143,8 @@ function permanentCheckboxList(selectorName, evt) {
 
 	//TODO BUG Do that at the end of init only
 	// Mem the data in the cookie
-	document.cookie = 'map-' + selectorName + '=' +
-		(list.join(',') || 'none') +
-		'; path=/; SameSite=Strict;';//TODO add date to remember on the next session
+	document.cookie = 'map-' + selectorName + '=' + (list.join(',') || 'none') +
+		'; path=/; SameSite=Secure; expires=' + new Date(2100, 0).toUTCString();
 
 	return list;
 }
@@ -186,7 +185,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
-//TODO	callback(null, permanentCheckboxList(selectorName));
+	//TODO	callback(null, permanentCheckboxList(selectorName));
 }
 
 /**
@@ -473,7 +472,7 @@ function layerVectorURL(options) {
 		},
 	}, options);
 
-//TODO permanentCheckboxList(options.selectorName); // Init selection from cookies or url
+	//TODO permanentCheckboxList(options.selectorName); // Init selection from cookies or url
 
 	const statusEl = document.getElementById(options.selectorName + '-status') || {},
 		xhr = new XMLHttpRequest(), // Only one object created
@@ -944,7 +943,7 @@ function noControl() {
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires controlPermanentCheckbox, permanentCheckboxList, controlButton
  */
- //TODO ne devrait pas être transparent à la détection des étiquettes
+//TODO ne devrait pas être transparent à la détection des étiquettes
 function controlLayersSwitcher(options) {
 	const button = controlButton({
 		className: 'ol-switch-layer myol-button',

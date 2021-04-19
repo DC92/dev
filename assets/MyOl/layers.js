@@ -15,25 +15,26 @@ if (!mapKeys) var mapKeys = {};
  * Layer switcher
  */
 function controlLayerSwitcher(options) {
-	const control = new ol.control.Control({
-		element: document.createElement('div'),
-	});
+	const layerNames = Object.keys(options.baseLayers),
+		control = new ol.control.Control({
+			element: document.createElement('div'),
+		});
 
-	// Transparency slider (first position)
+	// Transparency slider
 	const rangeContainerEl = document.createElement('div');
-	rangeContainerEl.innerHTML = '<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">';
+	rangeContainerEl.innerHTML =
+		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
+		'<span>Ctrl+click: multicouches</span>';
 	const rangeEl = rangeContainerEl.firstChild;
-
-	// Hover the button open the selector
-	//rangeContainerEl.onmouseover = tuneOpacity;
+	rangeEl.oninput = function() {
+		options.baseLayers[control.transparentLayerName].setOpacity(rangeEl.value / 100);
+	};
 
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		control.element.className = 'ol-control ol-control-switcher';
-		control.element.innerHTML =
-			'<button>\u2026</button>' +
-			'<div><span>Ctrl+click: multicouches</span></div>';
+		control.element.innerHTML = '<button>\u2026</button>';
 		control.element.appendChild(rangeContainerEl);
 
 		for (let blName in options.baseLayers)
@@ -42,19 +43,18 @@ function controlLayerSwitcher(options) {
 					blUid = layer.ol_uid,
 					baseEl = document.createElement('div');
 				control.element.appendChild(baseEl);
-				baseEl.innerHTML = '<input type="checkbox" name="bl"' +
-					' id="bl' + blUid + '" value="' + blName + '">' +
-					'<label for="bl' + blUid + '">' + blName + '</label>';
+				baseEl.innerHTML = '<input type="checkbox" name="baselayer"' +
+					' id="baselayer' + blUid + '" value="' + blName + '">' +
+					'<label for="baselayer' + blUid + '">' + blName + '</label>';
 				baseEl.firstChild.onclick = selectBaseLayer;
 				layer.inputTag = baseEl.firstChild; // Mem it for further ops
 
 				layer.setVisible(false);
 				map.addLayer(layer);
 			}
+
 		selectBaseLayer(); // Do that once at the init
 	};
-
-	function tuneOpacity(evt) {}
 
 	function selectBaseLayer(evt) {
 		if (!this.value) { // Checkbox selection
@@ -63,11 +63,11 @@ function controlLayerSwitcher(options) {
 					location.hash, // Then the hash #arg=
 					document.cookie, // Then the cookies
 				].join(';')
-				.match(/bl=([A-Za-z0-9_ ]+)/); // Find the value
+				.match(/baselayer=([A-Za-z0-9_ ]+)/); // Find the value
 
 			this.value = match && typeof options.baseLayers[match[1]] != 'undefined' ?
 				match[1] : // An existing layer
-				Object.keys(options.baseLayers)[0]; // The first selector
+				layerNames[0]; // The first selector
 		}
 
 		// Refresh layers visibility & opacity
@@ -81,19 +81,25 @@ function controlLayerSwitcher(options) {
 		options.baseLayers[this.value].inputTag.checked = true;
 		options.baseLayers[this.value].setVisible(true);
 
-		if (evt && evt.ctrlKey && control.lastValue) {
-			options.baseLayers[control.lastValue].inputTag.checked = true;
-			options.baseLayers[control.lastValue].setVisible(true);
-			options.baseLayers[control.lastValue].setOpacity(0.5);
-			options.baseLayers[this.value].setOpacity(0.5);
-		}
-		control.lastValue = this.value;
+		if (evt && evt.ctrlKey && control.lastLayerName) {
+			rangeContainerEl.className = 'double-layer';
+			options.baseLayers[control.lastLayerName].inputTag.checked = true;
+			options.baseLayers[control.lastLayerName].setVisible(true);
 
-		// Mem the data in the cookie
-		document.cookie = 'bl=' + this.value +
-			'; path=/; SameSite=Strict;';
-		//TODO add date to remember on the next session
-		//TODO Indicate whether to send a cookie in a cross-site request by specifying its SameSite attribute
+			if (layerNames.indexOf(control.lastLayerName) >
+				layerNames.indexOf(this.value))
+				control.transparentLayerName = control.lastLayerName;
+			else
+				control.transparentLayerName = this.value;
+			options.baseLayers[control.transparentLayerName].setOpacity(0.5);
+			rangeEl.value = 50;
+		} else
+			rangeContainerEl.className = 'single-layer';
+		control.lastLayerName = this.value;
+
+
+		document.cookie = 'baselayer=' + this.value +
+			'; path=/; SameSite=Secure; expires=' + new Date(2100, 0).toUTCString();
 	}
 
 	return control;

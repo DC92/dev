@@ -2,15 +2,17 @@
 	position: static;
 	float: right;
 }
-.ol-control-switcher span {
+.single-layer span {
 	font-size: 0.7em;
+}
+.single-layer input,
+.double-layer span,
+.ol-control-switcher:hover button ,
+.ol-control-switcher:not(:hover) > div {
+	display: none;
 }
 .ol-control-switcher:hover {
 	height: 100%;
 	overflow: auto;
 	z-index: 100;
-}
-.ol-control-switcher:hover button ,
-.ol-control-switcher:not(:hover) > div {
-	display: none;
 }
