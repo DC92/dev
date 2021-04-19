@@ -16,8 +16,8 @@ Based on https://openlayers.org
 	<script src="../ol/ol.js"></script>
 
 	<!-- My Openlayers -->
-	<link  href="../layers.css" type="text/css" rel="stylesheet">
-	<script src="../layers.js"></script>
+	<link  href="tileLayers.css" type="text/css" rel="stylesheet">
+	<script src="tileLayers.js"></script>
 </head>
 
 <body>
@@ -29,14 +29,35 @@ Based on https://openlayers.org
 		<p>...</p>
 	</div>
 
-	<p><a href="..">BASIC DEMO</a></p>
-	<p><a href="markers.html">MARKERS DEMO</a></p>
-	<p><a href="editor.html">EDITOR DEMO</a></p>
-	<p><a href="../gps">OFF LINE GPS</a></p>
+	<p><a href="..">Home demos</a></p>
+	<p><a href="https://github.com/Dominique92/MyOl/tree/master/tileLayers">Github</a></p>
+	<br/>
+	<div>This package defines :</div>
+	<ul>
+		<li>a tile layers collection</li>
+		<li>and a layer switcher control</li>
+	</ul>
+	<br/>
+	<div>Include standard Openlayers distribution ol.css & ol.js</div>
+	<div>Include this package tileLayers.css & tileLayers.js</div>
+	<pre>
+	new ol.Map({
+		target: 'map',
+		controls: [
+			new ol.control.Zoom(),
+			controlLayerSwitcher({
+				baseLayers: layersCollection(),
+				addonEl: document.getElementById('addon'),
+			}),
+		],
+		view: new ol.View({
+			center: [0, 0],
+			zoom: 2,
+		}),
+	});
+	</pre>
 
 	<script>
-	console.log('Cookies: ' + document.cookie);
-
 	new ol.Map({
 		target: 'map',
 		controls: [
