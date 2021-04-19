@@ -19,6 +19,31 @@ function controlLayerSwitcher(options) {
 		element: document.createElement('div'),
 	});
 
+	control.setMap = function(map) {
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		control.element.className = 'ol-control ol-control-switcher';
+		control.element.innerHTML =
+			'<button>\u2026</button>' +
+			'<div><span>Ctrl+click: multicouches</span></div>' +
+			'<div><input type="range" title="Glisser pour faire varier la tranparence"></div>';
+
+		for (let blName in options.baseLayers)
+			if (options.baseLayers[blName]) {
+				const blUid = options.baseLayers[blName].ol_uid,
+					baseEl = document.createElement('div');
+				control.element.appendChild(baseEl);
+				baseEl.innerHTML = '<input type="checkbox" name="bl"' +
+					' id="bl' + blUid + '" value="' + blName + '">' +
+					'<label for="bl' + blUid + '">' + blName + '</label>';
+				baseEl.firstChild.onclick = selectBaseLayer;
+				options.baseLayers[blName].inputTag = baseEl.firstChild; // Mem it for further ops
+
+				map.addLayer(options.baseLayers[blName]);
+			}
+		selectBaseLayer(); // Do that once at the init
+	};
+
 	function selectBaseLayer() {
 		if (!this.value) {// Checkbox selection
 			const match = [
@@ -46,31 +71,6 @@ function controlLayerSwitcher(options) {
 		document.cookie = 'bl=' + this.value +
 			'; path=/; SameSite=Strict;'; //TODO add date to remember on the next session
 	}
-
-	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		control.element.className = 'ol-control ol-control-switcher';
-		control.element.innerHTML =
-			'<button>\u2026</button>' +
-			'<div><span>Ctrl+click: multicouches</span></div>' +
-			'<div><input type="range" title="Glisser pour faire varier la tranparence"></div>';
-
-		for (let blName in options.baseLayers)
-			if (options.baseLayers[blName]) {
-				const blUid = options.baseLayers[blName].ol_uid,
-					baseEl = document.createElement('div');
-				control.element.appendChild(baseEl);
-				baseEl.innerHTML = '<input type="checkbox" name="bl"' +
-					' id="bl' + blUid + '" value="' + blName + '">' +
-					'<label for="bl' + blUid + '">' + blName + '</label>';
-				baseEl.firstChild.onclick = selectBaseLayer;
-				options.baseLayers[blName].inputTag = baseEl.firstChild; // Mem it for further ops
-
-				map.addLayer(options.baseLayers[blName]);
-			}
-		selectBaseLayer(); // Do that once at the init
-	};
 
 	return control;
 }
