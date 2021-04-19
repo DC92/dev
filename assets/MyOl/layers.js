@@ -19,33 +19,45 @@ function controlLayerSwitcher(options) {
 		element: document.createElement('div'),
 	});
 
+	// Transparency slider (first position)
+	const rangeContainerEl = document.createElement('div');
+	rangeContainerEl.innerHTML = '<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">';
+	const rangeEl = rangeContainerEl.firstChild;
+
+	// Hover the button open the selector
+	//rangeContainerEl.onmouseover = tuneOpacity;
+
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		control.element.className = 'ol-control ol-control-switcher';
 		control.element.innerHTML =
 			'<button>\u2026</button>' +
-			'<div><span>Ctrl+click: multicouches</span></div>' +
-			'<div><input type="range" title="Glisser pour faire varier la tranparence"></div>';
+			'<div><span>Ctrl+click: multicouches</span></div>';
+		control.element.appendChild(rangeContainerEl);
 
 		for (let blName in options.baseLayers)
 			if (options.baseLayers[blName]) {
-				const blUid = options.baseLayers[blName].ol_uid,
+				const layer = options.baseLayers[blName],
+					blUid = layer.ol_uid,
 					baseEl = document.createElement('div');
 				control.element.appendChild(baseEl);
 				baseEl.innerHTML = '<input type="checkbox" name="bl"' +
 					' id="bl' + blUid + '" value="' + blName + '">' +
 					'<label for="bl' + blUid + '">' + blName + '</label>';
 				baseEl.firstChild.onclick = selectBaseLayer;
-				options.baseLayers[blName].inputTag = baseEl.firstChild; // Mem it for further ops
+				layer.inputTag = baseEl.firstChild; // Mem it for further ops
 
-				map.addLayer(options.baseLayers[blName]);
+				layer.setVisible(false);
+				map.addLayer(layer);
 			}
 		selectBaseLayer(); // Do that once at the init
 	};
 
-	function selectBaseLayer() {
-		if (!this.value) {// Checkbox selection
+	function tuneOpacity(evt) {}
+
+	function selectBaseLayer(evt) {
+		if (!this.value) { // Checkbox selection
 			const match = [
 					location.search, // Priority to the url ?arg=
 					location.hash, // Then the hash #arg=
@@ -61,15 +73,27 @@ function controlLayerSwitcher(options) {
 		// Refresh layers visibility & opacity
 		for (let blName in options.baseLayers)
 			if (options.baseLayers[blName]) {
-				options.baseLayers[blName].setVisible(blName == this.value);
-				//				options.baseLayers[blName].setOpacity(0);
-
-				options.baseLayers[blName].inputTag.checked = (blName == this.value);
+				options.baseLayers[blName].inputTag.checked = false;
+				options.baseLayers[blName].setVisible(false);
+				options.baseLayers[blName].setOpacity(1);
 			}
+
+		options.baseLayers[this.value].inputTag.checked = true;
+		options.baseLayers[this.value].setVisible(true);
+
+		if (evt && evt.ctrlKey && control.lastValue) {
+			options.baseLayers[control.lastValue].inputTag.checked = true;
+			options.baseLayers[control.lastValue].setVisible(true);
+			options.baseLayers[control.lastValue].setOpacity(0.5);
+			options.baseLayers[this.value].setOpacity(0.5);
+		}
+		control.lastValue = this.value;
 
 		// Mem the data in the cookie
 		document.cookie = 'bl=' + this.value +
-			'; path=/; SameSite=Strict;'; //TODO add date to remember on the next session
+			'; path=/; SameSite=Strict;';
+		//TODO add date to remember on the next session
+		//TODO Indicate whether to send a cookie in a cross-site request by specifying its SameSite attribute
 	}
 
 	return control;
