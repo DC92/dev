@@ -16,95 +16,130 @@ if (!mapKeys) var mapKeys = {};
  */
 //TODO ne devrait pas être transparent à la détection des étiquettes
 function controlLayerSwitcher(options) {
-	const layerNames = Object.keys(options.baseLayers),
-		control = new ol.control.Control({
+	const control = new ol.control.Control({
 			element: document.createElement('div'),
-		});
+		}),
+		layerNames = Object.keys(options.baseLayers),
+		match = document.cookie.match(/baselayer=([^;]+)/);
 
-	// Transparency slider
+	var selectedBaseLayerName = match ? match[1] : layerNames[0],
+		lastBaseLayerName = '',
+		transparentBaseLayerName = '';
+
+	// Build html transparency slider
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
 		'<span>Ctrl+click: multicouches</span>';
-	const rangeEl = rangeContainerEl.firstChild;
-	rangeEl.oninput = function() {
-		options.baseLayers[control.transparentLayerName].setOpacity(rangeEl.value / 100);
-	};
+	rangeContainerEl.firstChild.oninput = refreshTransparencyRange;
 
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
+		// control.element is defined when attached to the map
 		control.element.className = 'ol-control ol-control-switcher';
 		control.element.innerHTML = '<button>\u2026</button>';
 		control.element.appendChild(rangeContainerEl);
 
-		for (let blName in options.baseLayers)
-			if (options.baseLayers[blName]) {
-				const layer = options.baseLayers[blName],
-					blUid = layer.ol_uid,
-					baseEl = document.createElement('div');
-				control.element.appendChild(baseEl);
-				baseEl.innerHTML = '<input type="checkbox" name="baselayer"' +
-					' id="baselayer' + blUid + '" value="' + blName + '">' +
-					'<label for="baselayer' + blUid + '">' + blName + '</label>';
-				baseEl.firstChild.onclick = selectBaseLayer;
-				layer.inputTag = baseEl.firstChild; // Mem it for further ops
-
-				layer.setVisible(false);
+		// Build html baselayers selector
+		for (let name in options.baseLayers || {})
+			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
+				const layer = options.baseLayers[name];
+				layer.inputEl = // Mem it for further ops
+					addSelection('baseLayer', layer.ol_uid, name, '', selectBaseLayer);
+				layer.setVisible(false); // Don't begin to get the tiles yet
 				map.addLayer(layer);
 			}
 
-		if (options.addonEl)
-			control.element.appendChild(options.addonEl);
+		// Build html overlays selector
+		for (let name in options.overlays || {}) {
+			control.element.appendChild(document.createElement('hr'));
 
-		selectBaseLayer(); // Do that once at the init
-	};
+			const layer = options.overlays[name],
+				subsets = layer.options.subsets;
 
-	function selectBaseLayer(evt) {
-		if (!this.value) { // No checkbox selection = init
-			const match = [
-					location.search, // Priority to the url ?arg=
-					location.hash, // Then the hash #arg=
-					document.cookie, // Then the cookies
-				].join(';')
-				.match(/baselayer=([A-Za-z0-9_ ]+)/); // Find the value
+			addSelection('o' + layer.ol_uid, layer.ol_uid, name, '', selectOverlay, 'left-label');
+			for (let s in subsets || {})
+				addSelection('o' + layer.ol_uid, layer.ol_uid, s, subsets[s], selectSubset);
 
-			this.value = match && typeof options.baseLayers[match[1]] != 'undefined' ?
-				match[1] : // An existing layer
-				layerNames[0]; // The first selector
+			layer.setVisible(false);
+			map.addLayer(layer);
 		}
 
+		refreshBaseLayers();
+	};
+
+	function addSelection(group, uid, name, value, selectAction, className) {
+		const el = document.createElement('div'),
+			inputId = 'l' + uid + (value ? '-' + value : '');
+
+		control.element.appendChild(el);
+		if (className)
+			el.className = className;
+		el.innerHTML =
+			'<input type="checkbox" name="' + group + '" id="' + inputId + '" value="' + name + '" ' + ' />' +
+			'<label for="' + inputId + '">' + name + '</label>';
+		el.firstChild.onclick = selectAction;
+
+		return el.firstChild;
+	}
+
+	function refreshBaseLayers() {
 		// Refresh layers visibility & opacity
-		for (let blName in options.baseLayers)
-			if (options.baseLayers[blName]) {
-				options.baseLayers[blName].inputTag.checked = false;
-				options.baseLayers[blName].setVisible(false);
-				options.baseLayers[blName].setOpacity(1);
+		for (let name in options.baseLayers)
+			if (options.baseLayers[name]) {
+				options.baseLayers[name].inputEl.checked = false;
+				//				checkInput(options.baseLayers[name].inputEl, false);
+				options.baseLayers[name].setVisible(false);
+				options.baseLayers[name].setOpacity(1);
 			}
 
-		options.baseLayers[this.value].inputTag.checked = true;
-		options.baseLayers[this.value].setVisible(true);
+		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
+		options.baseLayers[selectedBaseLayerName].setVisible(true);
+		if (lastBaseLayerName) {
+			options.baseLayers[lastBaseLayerName].inputEl.checked = true;
+			options.baseLayers[lastBaseLayerName].setVisible(true);
+		}
+		refreshTransparencyRange();
+	}
 
-		if (evt && evt.ctrlKey && control.lastLayerName) {
+	function refreshTransparencyRange() {
+		if (transparentBaseLayerName) {
+			options.baseLayers[transparentBaseLayerName].setOpacity(rangeContainerEl.firstChild.value / 100);
 			rangeContainerEl.className = 'double-layer';
-			options.baseLayers[control.lastLayerName].inputTag.checked = true;
-			options.baseLayers[control.lastLayerName].setVisible(true);
-
-			if (layerNames.indexOf(control.lastLayerName) >
-				layerNames.indexOf(this.value))
-				control.transparentLayerName = control.lastLayerName;
-			else
-				control.transparentLayerName = this.value;
-			options.baseLayers[control.transparentLayerName].setOpacity(0.5);
-			rangeEl.value = 50;
 		} else
 			rangeContainerEl.className = 'single-layer';
-		control.lastLayerName = this.value;
-
-
-		document.cookie = 'baselayer=' + this.value +
-			'; path=/; SameSite=Secure; expires=' + new Date(2100, 0).toUTCString();
 	}
+
+	function selectBaseLayer(evt) {
+		// Set the baselayer cookie
+		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Secure; expires=' +
+			new Date(2100, 0).toUTCString();
+
+		// Manage the double selection
+		if (evt && evt.ctrlKey && this.value != selectedBaseLayerName) {
+			lastBaseLayerName = selectedBaseLayerName;
+
+			transparentBaseLayerName =
+				layerNames.indexOf(lastBaseLayerName) > layerNames.indexOf(this.value) ?
+				lastBaseLayerName :
+				this.value;
+
+			options.baseLayers[transparentBaseLayerName].inputEl.checked = true;
+			rangeContainerEl.firstChild.value = 50;
+		} else {
+			lastBaseLayerName =
+				transparentBaseLayerName = '';
+		}
+		selectedBaseLayerName = this.value;
+		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
+
+		refreshBaseLayers();
+	}
+
+	function selectOverlay(evt) {}
+
+	function selectSubset(evt) {}
 
 	return control;
 }

@@ -18,7 +18,7 @@ new ol.Map({
 		new ol.control.Zoom(),
 		controlLayerSwitcher({
 			baseLayers: layersCollection(),
-			addonEl: document.getElementById('addon'),
+			overlays: overlaysCollection(),
 		}),
 	],
 	view: new ol.View({

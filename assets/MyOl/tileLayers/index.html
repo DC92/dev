@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	<title>My tile layers</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="icon" type="image/png" href="logo.png" />
+	<link rel="icon" type="image/png" href="../examples/logo.png" />
 
 	<!-- Openlayers -->
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
@@ -23,28 +23,52 @@ Based on https://openlayers.org
 <body>
 	<div id="map" style="width:90vw; height:60vw;"></div>
 
-	<div id="addon">
-		<hr />
-		<p>Some additional HTML</p>
-		<p>...</p>
-	</div>
-
 	<p><a href="..">Home demos</a></p>
 	<p><a href="https://github.com/Dominique92/MyOl/tree/master/tileLayers">Github</a></p>
 
 	<script>
-	new ol.Map({
+	console.log('Cookies: ' + document.cookie);
+
+	function alpagesLayer(options) {
+		const layer = new ol.layer.Vector({
+			source: new ol.source.Vector({
+				url: 'http://alpages.info/ext/Dominique92/GeoBB/gis.php?forums=4,5',
+				format: new ol.format.GeoJSON(),
+			}),
+			style: function(feature) {
+				return new ol.style.Style({
+					image: new ol.style.Icon({
+						src: feature.get('icon'),
+						//imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher des .SVG sur I.E.
+					}),
+				});
+			},
+		});
+
+		layer.options = options;
+		return layer;
+	}
+
+	var map = new ol.Map({
 		target: 'map',
 		controls: [
 			new ol.control.Zoom(),
 			controlLayerSwitcher({
 				baseLayers: layersCollection(),
-				addonEl: document.getElementById('addon'),
+				overlays: {
+					Alpages: alpagesLayer({
+						subsets: {
+							'Cabane': 4,
+							'Point d\'eau': 5,
+							'Réseau': 6,
+						},
+					}),
+				},
 			}),
 		],
 		view: new ol.View({
-			center: [0, 0],
-			zoom: 2,
+			center: [700000, 5600000],
+			zoom: 7,
 		}),
 	});
 	</script>

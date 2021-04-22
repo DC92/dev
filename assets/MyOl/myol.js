@@ -417,7 +417,7 @@ function layerVectorURL(options) {
 			return {
 				image: new ol.style.Icon({
 					src: properties.icon,
-					imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher sur I.E.
+					imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher des .SVG sur I.E.
 					//TODO détecter la taille automatiquement
 				}),
 				stroke: new ol.style.Stroke({
