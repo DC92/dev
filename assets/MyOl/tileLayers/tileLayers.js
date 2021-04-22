@@ -46,7 +46,7 @@ function controlLayerSwitcher(options) {
 			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
 				const layer = options.baseLayers[name];
 				layer.inputEl = // Mem it for further ops
-					addSelection('baseLayer', layer.ol_uid, name, '', selectBaseLayer);
+					addSelection('baseLayer', layer.ol_uid, name, name, selectBaseLayer);
 				layer.setVisible(false); // Don't begin to get the tiles yet
 				map.addLayer(layer);
 			}
@@ -56,17 +56,25 @@ function controlLayerSwitcher(options) {
 			control.element.appendChild(document.createElement('hr'));
 
 			const layer = options.overlays[name],
-				subsets = layer.options.subsets;
+				subsets = layer.options.subsets,
+				match = document.cookie.match(new RegExp(name + '=([0-9,]*)')),
+				subItems = match ? match[1].split(',') : [],
+				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'left-label');
 
-			addSelection('o' + layer.ol_uid, layer.ol_uid, name, '', selectOverlay, 'left-label');
-			for (let s in subsets || {})
-				addSelection('o' + layer.ol_uid, layer.ol_uid, s, subsets[s], selectSubset);
+			firstCheckboxEl.checked = true;
+			for (let s in subsets || {}) {
+				const cookieSubsetChecked = subItems.indexOf(subsets[s].toString()) != -1;
+				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay)
+					.checked = cookieSubsetChecked;
 
+				if (!cookieSubsetChecked)
+					firstCheckboxEl.checked = false;
+			}
 			layer.setVisible(false);
 			map.addLayer(layer);
 		}
 
-		refreshBaseLayers();
+		refreshBaseLayers(); // Init layers
 	};
 
 	function addSelection(group, uid, name, value, selectAction, className) {
@@ -77,7 +85,8 @@ function controlLayerSwitcher(options) {
 		if (className)
 			el.className = className;
 		el.innerHTML =
-			'<input type="checkbox" name="' + group + '" id="' + inputId + '" value="' + name + '" ' + ' />' +
+			'<input type="checkbox" name="' + group +
+			'" id="' + inputId + '" value="' + value + '" ' + ' />' +
 			'<label for="' + inputId + '">' + name + '</label>';
 		el.firstChild.onclick = selectAction;
 
@@ -89,7 +98,6 @@ function controlLayerSwitcher(options) {
 		for (let name in options.baseLayers)
 			if (options.baseLayers[name]) {
 				options.baseLayers[name].inputEl.checked = false;
-				//				checkInput(options.baseLayers[name].inputEl, false);
 				options.baseLayers[name].setVisible(false);
 				options.baseLayers[name].setOpacity(1);
 			}
@@ -105,7 +113,9 @@ function controlLayerSwitcher(options) {
 
 	function refreshTransparencyRange() {
 		if (transparentBaseLayerName) {
-			options.baseLayers[transparentBaseLayerName].setOpacity(rangeContainerEl.firstChild.value / 100);
+			options.baseLayers[transparentBaseLayerName].setOpacity(
+				rangeContainerEl.firstChild.value / 100
+			);
 			rangeContainerEl.className = 'double-layer';
 		} else
 			rangeContainerEl.className = 'single-layer';
@@ -137,9 +147,27 @@ function controlLayerSwitcher(options) {
 		refreshBaseLayers();
 	}
 
-	function selectOverlay(evt) {}
+	function selectOverlay(evt) {
+		const inputs = document.getElementsByName(this.name),
+			sel = [];
 
-	function selectSubset(evt) {}
+		// Global & sub choice checkboxes correlation
+		if (this.id.includes('-'))
+			inputs[0].checked = true;
+		for (let i = 0; i < inputs.length; i++) {
+			if (!this.id.includes('-'))
+				inputs[i].checked = this.checked;
+			if (i && inputs[i].checked)
+				sel.push(inputs[i].value);
+			if (!inputs[i].checked)
+				inputs[0].checked = false;
+		}
+		//TODO show layer sel.join(',')
+
+		// Set the baselayer cookie
+		document.cookie = this.name + '=' + sel.join(',') + '; path=/; SameSite=Secure; expires=' +
+			new Date(sel ? 2100 : 1970, 0).toUTCString();
+	}
 
 	return control;
 }
