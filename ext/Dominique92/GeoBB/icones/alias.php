@@ -63,6 +63,7 @@ $alias = [
 	'Parking Area' => 'parking', //BEST Parking avec un P ascii avec couleurs
 	'Puzzle Cache' => 'cabane_black_a63',
 	'Restaurant' => 'cabane_white_blue_a9832.5',
+	'Residence' => 'cabane_green',
 	'Shopping Center' => 'ravitaillement', // Ravitaillement
 	'Summit' => 'sommet',
 	'Tunnel' => 'arc_blanchedalmond_red_manqueunmur', // Orri
