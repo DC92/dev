@@ -14,7 +14,6 @@ self.addEventListener('install', function(evt) {
 				'../ol/ol.js',
 				'../geocoder/ol-geocoder.min.css',
 				'../geocoder/ol-geocoder.js',
-				'../layers.js',
 				'../myol.css',
 				'../myol.js',
 			]);

@@ -711,7 +711,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
-	//TODO	callback(null, permanentCheckboxList(selectorName));
+	//TODO callback(null, permanentCheckboxList(selectorName));
 }
 
 /**
