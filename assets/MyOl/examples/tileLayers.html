@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My tile layers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/png" href="favicon.png" />
+
+	<!-- Openlayers -->
+	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- My layer switcher -->
+	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
+	<script src="../src/layerSwitcher.js"></script>
+
+	<!-- My Openlayers -->
+	<script src="../src/tileLayers.js"></script>
+</head>
+
+<body>
+	<div id="map" style="width:90vw; height:60vw;"></div>
+
+	<p><a href="..">Home demos</a></p>
+	<p><a href="https://github.com/Dominique92/MyOl/tree/master/tileLayers">Github</a></p>
+
+	<script>
+	var map = new ol.Map({
+		target: 'map',
+		controls: [
+			new ol.control.Zoom(),
+			controlLayerSwitcher({
+				baseLayers: layersCollection(),
+			}),
+		],
+		view: new ol.View({
+			center: [700000, 5600000],
+			zoom: 7,
+		}),
+	});
+	</script>
+</body>
+</html>

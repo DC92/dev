@@ -208,28 +208,4 @@
 }
 .myol-popup-hidden {
 	display: none;
-}.ol-control-switcher {
-	position: static;
-	float: right;
-}
-.ol-control-switcher .single-layer span {
-	font-size: 0.7em;
-}
-.ol-control-switcher .single-layer input,
-.ol-control-switcher .double-layer span,
-.ol-control-switcher:hover button,
-.ol-control-switcher:not(:hover) > hr,
-.ol-control-switcher:not(:hover) > div {
-	display: none;
-}
-.ol-control-switcher hr {
-	margin: 0;
-}
-.ol-control-switcher:hover {
-	max-height: 100%;
-	overflow: auto;
-	z-index: 100;
-}
-.ol-control-switcher .left-label label {
-	float: left;
 }

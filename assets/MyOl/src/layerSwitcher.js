@@ -1,16 +1,3 @@
-/** OPENLAYERS ADAPTATION
- * © Dominique Cavailhez 2017
- * https://github.com/Dominique92/MyOl
- * Based on https://openlayers.org
- *
- * This module defines a switcher layer control
- */
-
-//HACKS For JS validators
-/* jshint esversion: 6 */
-if (!ol) var ol = {};
-if (!mapKeys) var mapKeys = {};
-
 /**
  * Layer switcher
  */
@@ -24,6 +11,10 @@ function controlLayerSwitcher(options) {
 	var selectedBaseLayerName = match ? match[1] : layerNames[0],
 		lastBaseLayerName = '',
 		transparentBaseLayerName = '';
+
+	// If the cookie doesn't correspond to an existing layer
+	if (typeof options.baseLayers[selectedBaseLayerName] == 'undefined')
+		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
 	const rangeContainerEl = document.createElement('div');
@@ -41,7 +32,7 @@ function controlLayerSwitcher(options) {
 		control.element.appendChild(rangeContainerEl);
 
 		// Build html baselayers selector
-		for (let name in options.baseLayers || {})
+		for (const name in options.baseLayers)
 			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
 				const layer = options.baseLayers[name];
 				layer.inputEl = // Mem it for further ops
@@ -51,7 +42,7 @@ function controlLayerSwitcher(options) {
 			}
 
 		// Build html overlays selector
-		for (let name in options.overlays || {}) {
+		for (const name of Object.keys(options.overlays || {})) {
 			control.element.appendChild(document.createElement('hr'));
 
 			const layer = options.overlays[name],
@@ -61,7 +52,7 @@ function controlLayerSwitcher(options) {
 				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'left-label');
 
 			firstCheckboxEl.checked = true;
-			for (let s in subsets || {}) {
+			for (const s of Object.keys(subsets || {})) {
 				const cookieSubsetChecked = subItems.indexOf(subsets[s].toString()) != -1;
 				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay)
 					.checked = cookieSubsetChecked;
@@ -148,7 +139,16 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers();
 	}
 
-	function selectOverlay(evt) {
+	function displayOverlay(layer) {
+		if (layer.options.urlSuffix) {
+			layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
+			layer.getSource().clear(); // Redraw the layer
+			layer.setVisible(true);
+		} else
+			layer.setVisible(false);
+	}
+
+	function selectOverlay() {
 		const inputs = document.getElementsByName(this.name),
 			layer = options.overlays[this.name],
 			sel = [];
@@ -171,15 +171,6 @@ function controlLayerSwitcher(options) {
 		// Set the baselayer cookie
 		document.cookie = this.name + '=' + sel.join(',') + '; path=/; SameSite=Secure; expires=' +
 			new Date(sel ? 2100 : 1970, 0).toUTCString();
-	}
-
-	function displayOverlay(layer) {
-		if (layer.options.urlSuffix) {
-			layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
-			layer.getSource().clear(); // Redraw the layer
-			layer.setVisible(true);
-		} else
-			layer.setVisible(false);
 	}
 
 	return control;

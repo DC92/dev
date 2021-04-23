@@ -1,8 +1,4 @@
-/** OPENLAYERS ADAPTATION
- * © Dominique Cavailhez 2017
- * https://github.com/Dominique92/MyOl
- * Based on https://openlayers.org
- *
+/**
  * This module defines many WMTS EPSG:3857 tiles layers
  */
 
@@ -10,6 +6,8 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 if (!mapKeys) var mapKeys = {};
+
+/*--*/
 
 /**
  * Openstreetmap

@@ -1,3 +1,5 @@
+//TODO CLEAN all GPS files
+
 /** PWA area */
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:' && window.location.host != 'localhost')
@@ -44,7 +46,7 @@ const nbli = document.getElementsByTagName('li').length,
 
 	controls = [
 		controlTilesBuffer(4),
-		controlLayersSwitcher({
+		controlLayerSwitcher({
 			baseLayers: layersCollection(),
 		}),
 		controlPermalink(),

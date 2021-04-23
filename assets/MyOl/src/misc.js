@@ -1,0 +1,93 @@
+/** OPENLAYERS ADAPTATION
+ * © Dominique Cavailhez 2017
+ * https://github.com/Dominique92/MyOl
+ * Based on https://openlayers.org
+ *
+ * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
+ * You only have to include openlayers/dist.js & .css files, layers.js & myol.js & .css & that's it !
+ * You can use any of these functions independantly (except documented dependencies)
+ * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
+ * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
+ */
+
+//HACKS For JS validators
+/* jshint esversion: 6 */
+if (!ol) var ol = {};
+if (!mapKeys) var mapKeys = {};
+
+//HACK IE polyfills
+// Need to transpile ol.js with: https://babeljs.io/repl  BROWSERS = default
+//TODO try :::   controls: defaultControls().extend([new RotateNorthControl()]),
+if (!Object.assign)
+	Object.assign = function() {
+		let r = {};
+		for (let a in arguments)
+			for (let m in arguments[a])
+				r[m] = arguments[a][m];
+		return r;
+	};
+if (!Math.hypot)
+	Math.hypot = function(a, b) {
+		return Math.sqrt(a * a + b * b);
+	};
+
+//HACK for some mobiles touch functions
+if (navigator.userAgent.match(/iphone.+safari/i)) {
+	const script = document.createElement('script');
+	script.src = 'https://unpkg.com/elm-pep';
+	document.head.appendChild(script);
+}
+
+/**
+ * Display OL version
+ */
+try {
+	new ol.style.Icon(); // Try incorrect action
+} catch (err) { // to get Assert url
+	ol.version = 'Ol ' + err.message.match('/v([0-9\.]+)/')[1];
+	console.log(ol.version);
+}
+
+/**
+ * Debug facilities on mobile
+ */
+//HACK use hash ## for error alerts
+if (!window.location.hash.indexOf('##'))
+	window.addEventListener('error', function(evt) {
+		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
+	});
+//HACK use hash ### to route all console logs on alerts
+if (window.location.hash == '###')
+	console.log = function(message) {
+		alert(message);
+	};
+
+//HACK Json parsing errors log
+function JSONparse(json) {
+	try {
+		return JSON.parse(json);
+	} catch (returnCode) {
+		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+	}
+}
+
+//HACK warn layers when added to the map
+//BEST DELETE
+ol.Map.prototype.handlePostRender = function() {
+	ol.PluggableMap.prototype.handlePostRender.call(this);
+
+	const map = this;
+	map.getLayers().forEach(function(layer) {
+		if (!layer.map_) {
+			layer.map_ = map;
+
+			layer.dispatchEvent({
+				type: 'myol:onadd',
+				map: map,
+			});
+		}
+	});
+
+	// Save the js object into the DOM
+	map.getTargetElement()._map = map;
+};

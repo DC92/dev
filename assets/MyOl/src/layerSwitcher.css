@@ -2,11 +2,11 @@
 	position: static;
 	float: right;
 }
-.single-layer span {
+.ol-control-switcher .single-layer span {
 	font-size: 0.7em;
 }
-.single-layer input,
-.double-layer span,
+.ol-control-switcher .single-layer input,
+.ol-control-switcher .double-layer span,
 .ol-control-switcher:hover button,
 .ol-control-switcher:not(:hover) > hr,
 .ol-control-switcher:not(:hover) > div {
@@ -20,6 +20,6 @@
 	overflow: auto;
 	z-index: 100;
 }
-.left-label label {
+.ol-control-switcher .left-label label {
 	float: left;
 }

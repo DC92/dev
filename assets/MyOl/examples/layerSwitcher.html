@@ -6,36 +6,44 @@ Based on https://openlayers.org
 -->
 <html>
 <head>
-	<title>My tile layers</title>
+	<title>My layer switcher</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="icon" type="image/png" href="../examples/logo.png" />
+	<link href="favicon.png" rel="icon" type="image/png" />
 
 	<!-- Openlayers -->
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../ol/ol.js"></script>
 
 	<!-- My Openlayers -->
-	<link  href="../myol.css" type="text/css" rel="stylesheet">
-	<script src="../myol.js"></script>
-	<link  href="tileLayers.css" type="text/css" rel="stylesheet">
-	<script src="tileLayers.js"></script>
-	<script src="layerSwitcher.js"></script>
+	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
+	<script src="../src/layerSwitcher.js"></script>
 </head>
 
 <body>
 	<div id="map" style="width:90vw; height:60vw;"></div>
 
 	<p><a href="..">Home demos</a></p>
-	<p><a href="https://github.com/Dominique92/MyOl/tree/master/tileLayers">Github</a></p>
+	<p><a href="https://github.com/Dominique92/MyOl/">Github</a></p>
 
 	<script>
 	console.log('Cookies: ' + document.cookie);
 
-	function WWWalpagesLayer(options) {
+	function layerGoogle(options) {
+		return new ol.layer.Tile({
+			source: new ol.source.XYZ({
+				url: '//mt{0-3}.google.com/vt/lyrs=' + options.layer + '&hl=fr&x={x}&y={y}&z={z}',
+				attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
+			})
+		});
+	}
+
+	function alpagesLayer(options) {
 		const layer = new ol.layer.Vector({
 			source: new ol.source.Vector({
-				url: 'http://alpages.info/ext/Dominique92/GeoBB/gis.php?forums=4,5',
+				url: function() {
+					return options.url + options.urlSuffix;
+				},
 				format: new ol.format.GeoJSON(),
 			}),
 			style: function(feature) {
@@ -57,24 +65,27 @@ Based on https://openlayers.org
 		controls: [
 			new ol.control.Zoom(),
 			controlLayerSwitcher({
-				baseLayers: layersCollection(),
+				baseLayers: {
+					'Google road': layerGoogle({
+						layer: 'm'
+					}),
+					'Google terrain': layerGoogle({
+						layer: 'p'
+					}),
+					'Photo Google': layerGoogle({
+						layer: 's'
+					}),
+				},
 				overlays: {
-					Alpages: layerAlpages({
-						subsets: {
-							'Cabane': 4,
-							'Point d\'eau': 5,
-							'Réseau': 6,
-						},
-					}),
-					/*
 					Alpages: alpagesLayer({
+						url: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
+						urlSuffix: '4,5,6',
 						subsets: {
 							'Cabane': 4,
 							'Point d\'eau': 5,
 							'Réseau': 6,
 						},
 					}),
-					*/
 				},
 			}),
 		],
