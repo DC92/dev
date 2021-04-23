@@ -14,7 +14,6 @@ if (!mapKeys) var mapKeys = {};
 /**
  * Layer switcher
  */
-//TODO ne devrait pas être transparent à la détection des étiquettes
 function controlLayerSwitcher(options) {
 	const control = new ol.control.Control({
 			element: document.createElement('div'),

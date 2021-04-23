@@ -272,12 +272,9 @@ function hoverManager(map) {
 
 	//BEST appeler sur l'event "hover" (pour les mobiles)
 	map.on('pointermove', function(evt) {
-		const mapRect = map.getTargetElement().getBoundingClientRect(),
-			hoveredEl = document.elementFromPoint(
-				evt.pixel[0] + (mapRect.x || mapRect.left), //HACK left/top for IE
-				evt.pixel[1] + (mapRect.y || mapRect.top)
-			);
-		if (hoveredEl && hoveredEl.id != 'label') { // Not hovering an html element (label, button, ...)
+		const hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
+
+		if (hoveredEl.tagName == 'CANVAS') { // Don't hover under the buttons & labels
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
@@ -368,7 +365,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * Requires JSONparse, myol:onadd, escapedStyle, hoverManager,
  * permanentCheckboxList, controlPermanentCheckbox, ol.loadingstrategy.bboxLimit
  */
-//TODO BUG jointure survol entre l'icône et le label dépend du dessin dans l'icône
 function layerVectorURL(options) {
 	options = Object.assign({
 		/** All ol.source.Vector options */
@@ -944,7 +940,6 @@ function noControl() {
  * baseLayers {[ol.layer]} layers to be chosen one to fill the map.
  * Requires controlPermanentCheckbox, permanentCheckboxList, controlButton
  */
-//TODO ne devrait pas être transparent à la détection des étiquettes
 function controlLayersSwitcher(options) {
 	const button = controlButton({
 		className: 'ol-switch-layer myol-button',
