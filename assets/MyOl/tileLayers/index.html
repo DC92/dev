@@ -16,8 +16,11 @@ Based on https://openlayers.org
 	<script src="../ol/ol.js"></script>
 
 	<!-- My Openlayers -->
+	<link  href="../myol.css" type="text/css" rel="stylesheet">
+	<script src="../myol.js"></script>
 	<link  href="tileLayers.css" type="text/css" rel="stylesheet">
 	<script src="tileLayers.js"></script>
+	<script src="layerSwitcher.js"></script>
 </head>
 
 <body>
@@ -29,7 +32,7 @@ Based on https://openlayers.org
 	<script>
 	console.log('Cookies: ' + document.cookie);
 
-	function alpagesLayer(options) {
+	function WWWalpagesLayer(options) {
 		const layer = new ol.layer.Vector({
 			source: new ol.source.Vector({
 				url: 'http://alpages.info/ext/Dominique92/GeoBB/gis.php?forums=4,5',
@@ -56,6 +59,14 @@ Based on https://openlayers.org
 			controlLayerSwitcher({
 				baseLayers: layersCollection(),
 				overlays: {
+					Alpages: layerAlpages({
+						subsets: {
+							'Cabane': 4,
+							'Point d\'eau': 5,
+							'Réseau': 6,
+						},
+					}),
+					/*
 					Alpages: alpagesLayer({
 						subsets: {
 							'Cabane': 4,
@@ -63,6 +74,7 @@ Based on https://openlayers.org
 							'Réseau': 6,
 						},
 					}),
+					*/
 				},
 			}),
 		],

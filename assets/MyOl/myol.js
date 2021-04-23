@@ -698,7 +698,8 @@ function layerChemineur(options) {
  */
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
-		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=4,5,6',
+		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
+		urlSuffix: '4,5,6',
 		receiveProperties: function(properties) {
 			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
 			properties.sym = getSym(properties.icone);
