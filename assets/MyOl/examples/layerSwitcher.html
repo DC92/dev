@@ -44,7 +44,7 @@ Based on https://openlayers.org
 				url: function() {
 					return options.url + options.urlSuffix;
 				},
-				format: new ol.format.GeoJSON(),
+				format: new ol.format.GeoJSON(), //TODO BBox with limits
 			}),
 			style: function(feature) {
 				return new ol.style.Style({

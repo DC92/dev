@@ -2,6 +2,10 @@
 	position: static;
 	float: right;
 }
+.ol-control-switcher .main-overlay,
+.ol-control-switcher .sub-overlay {
+	background-color: rgb(162, 226, 255, 0.4);
+}
 .ol-control-switcher .single-layer span {
 	font-size: 0.7em;
 }
@@ -16,10 +20,16 @@
 	margin: 0;
 }
 .ol-control-switcher:hover {
-	max-height: 100%;
+	max-height: calc(100% - 65px);
 	overflow: auto;
-	z-index: 100;
 }
-.ol-control-switcher .left-label label {
+.ol-control-switcher div {
+	padding-left: 5px;
+}
+.ol-control-switcher span,
+.ol-control-switcher label {
+	color: black;
+}
+.ol-control-switcher .main-overlay label {
 	float: left;
 }

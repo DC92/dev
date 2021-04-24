@@ -1,15 +1,3 @@
-/** OPENLAYERS ADAPTATION
- * © Dominique Cavailhez 2017
- * https://github.com/Dominique92/MyOl
- * Based on https://openlayers.org
- *
- * I have designed this openlayers adaptation as simple as possible to make it maintained with basics JS skills
- * You only have to include openlayers/dist.js & .css files, layers.js & myol.js & .css & that's it !
- * You can use any of these functions independantly (except documented dependencies)
- * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ... only one file of JS functions & CSS
- * I know, I know, it's not a modern programming method but it's my choice & you're free to take, modifiy & adapt it as you wish
- */
-
 //HACKS For JS validators
 /* jshint esversion: 6 */
 if (!ol) var ol = {};

@@ -42,6 +42,7 @@ function controlLayerSwitcher(options) {
 			}
 
 		// Build html overlays selector
+		//TODO comment initialiser avant les cookies ?
 		for (const name of Object.keys(options.overlays || {})) {
 			control.element.appendChild(document.createElement('hr'));
 
@@ -49,12 +50,12 @@ function controlLayerSwitcher(options) {
 				subsets = layer.options.subsets,
 				match = document.cookie.match(new RegExp(name + '=([0-9,]*)')),
 				subItems = match ? match[1].split(',') : [],
-				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'left-label');
+				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'main-overlay');
 
 			firstCheckboxEl.checked = true;
 			for (const s of Object.keys(subsets || {})) {
 				const cookieSubsetChecked = subItems.indexOf(subsets[s].toString()) != -1;
-				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay)
+				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay, 'sub-overlay')
 					.checked = cookieSubsetChecked;
 
 				if (!cookieSubsetChecked)

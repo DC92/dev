@@ -1,9 +1,9 @@
 // Features de la couche
 var layerGeoBBgis = layerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250',
-		selectorName: 'chm-features',
-		urlSuffix: '&cat=',
-		strategy: ol.loadingstrategy.bboxLimit,
+		//	baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250&cat=',
+		//selectorName: 'chm-features',
+		//		urlSuffix: '',
+		//		strategy: ol.loadingstrategy.bboxLimit,
 		noClick: script == 'posting',
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
@@ -23,26 +23,36 @@ var layerGeoBBgis = layerVectorURL({
 	}),
 	map = new ol.Map({
 		target: 'map',
-		layers: [
-			layerGeoBBgis,
-			layerRefugesInfo({
-				selectorName: 'wri-features',
-			}),
-			layerPyreneesRefuges({
-				selectorName: 'prc-features',
-			}),
-			layerC2C({
-				selectorName: 'c2c-features',
-			}),
-			layerAlpages({
-				selectorName: 'alp-features',
-			}),
-			layerOverpass({
-				selectorName: 'osm-features',
-			}),
-		],
+
 		controls: controlsCollection({
-			baseLayers: layersCollection(),
+			controlLayerSwitcher: {
+				baseLayers: layersCollection(),
+				overlays: {
+					chemineur: layerGeoBBgis,
+					RefugesInfo: layerRefugesInfo({
+						subsets: {
+							'Cabane': 4,
+							'Point d\'eau': 5,
+							'Réseau': 6,
+						},
+					}),
+					/*			
+					layerPyreneesRefuges({
+					}),
+					layerC2C({
+					}),
+					layerOverpass({
+					}),
+					*/
+					Alpages: layerAlpages({
+						subsets: {
+							'Cabane': 4,
+							'Point d\'eau': 5,
+							'Réseau': 6,
+						},
+					}),
+				},
+			},
 			controlPermalink: {
 				display: script == 'index',
 				init: script != 'viewtopic',
