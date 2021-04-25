@@ -51,13 +51,9 @@ Based on https://openlayers.org
 		new ol.Map({
 			target: 'map',
 			controls: controlsCollection({
-				baseLayers: layersCollection(),
 				controlLayerSwitcher: {
-					overlays: {
-						'refuges.info': layerRefugesInfo(),
-						Chemineur: layerChemineur(),
-						Alpages: layerAlpages(),
-					},
+					baseLayers: layersCollection(),
+					overlays: overlaysCollection(),
 				},
 			}),
 		});

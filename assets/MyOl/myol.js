@@ -1402,6 +1402,17 @@ function layerOverpass(options) {
 	return layer;
 }
 
+function overlaysCollection() {
+	return {
+		chemineur: layerChemineur(),
+		'refuges.info': layerRefugesInfo(),
+		//TODO layerPyreneesRefuges(),
+		//layerC2C(),
+		//layerOverpass(),
+		Alpages: layerAlpages(),
+	};
+}
+
 
 /**
  * CONTROLS
