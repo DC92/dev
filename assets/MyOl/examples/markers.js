@@ -7,7 +7,7 @@ const cadre = layerEditGeoJson({
 		},
 		styleOptions: {
 			image: new ol.style.Icon({
-				src: 'cadre.png',
+				src: 'images/cadre.png',
 			}),
 		},
 	}),
@@ -18,7 +18,7 @@ const cadre = layerEditGeoJson({
 		singlePoint: true,
 		styleOptions: {
 			image: new ol.style.Icon({
-				src: 'viseur.png',
+				src: 'images/viseur.png',
 			}),
 		},
 		// Remove FeatureCollection packing of the point
