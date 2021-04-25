@@ -1,15 +1,5 @@
 // Features de la couche
-var layerGeoBBgis = layerVectorURL({
-		//	baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250&cat=',
-		//selectorName: 'chm-features',
-		//		urlSuffix: '',
-		//		strategy: ol.loadingstrategy.bboxLimit,
-		noClick: script == 'posting',
-		receiveProperties: function(properties) {
-			properties.copy = 'chemineur.fr';
-		},
-	}),
-	marker = layerEditGeoJson({
+var marker = layerEditGeoJson({
 		displayPointId: 'marker',
 		geoJsonId: 'geojson',
 		focus: 16,
@@ -28,29 +18,14 @@ var layerGeoBBgis = layerVectorURL({
 			controlLayerSwitcher: {
 				baseLayers: layersCollection(),
 				overlays: {
-					chemineur: layerGeoBBgis,
-					RefugesInfo: layerRefugesInfo({
-						subsets: {
-							'Cabane': 4,
-							'Point d\'eau': 5,
-							'Réseau': 6,
-						},
+					chemineur: layerChemineur({
+						baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250&cat=',
 					}),
-					/*			
-					layerPyreneesRefuges({
-					}),
-					layerC2C({
-					}),
-					layerOverpass({
-					}),
-					*/
-					Alpages: layerAlpages({
-						subsets: {
-							'Cabane': 4,
-							'Point d\'eau': 5,
-							'Réseau': 6,
-						},
-					}),
+					'refuges.info': layerRefugesInfo(),
+					//TODO layerPyreneesRefuges(),
+					//layerC2C(),
+					//layerOverpass(),
+					Alpages: layerAlpages(),
 				},
 			},
 			controlPermalink: {

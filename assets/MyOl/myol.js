@@ -799,7 +799,7 @@ function hoverManager(map) {
 	map.on('pointermove', function(evt) {
 		const hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
 
-		if (hoveredEl.tagName == 'CANVAS') { // Don't hover under the buttons & labels
+		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Don't hover under the buttons & labels
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
@@ -1162,8 +1162,17 @@ function getSym(type) {
 
 function layerRefugesInfo(options) {
 	options = Object.assign({
-		baseUrl: '//www.refuges.info/',
-		urlSuffix: 'api/bbox?type_points=',
+		baseUrl: '//www.refuges.info/api/bbox?type_points=',
+		subsets: {
+			'cabane': 7,
+			'refuge': 10,
+			'gîte': 9,
+			'point d\'eau': 23,
+			'sommet': 6,
+			'col': 3,
+			'lac': 16,
+			'bâtiment': 28,
+		},
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.name = properties.nom;
@@ -1206,6 +1215,18 @@ function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
 		urlSuffix: '3,8,16,20,23,30,40,44,58,64',
+		subsets: {
+			'Refuges': 3,
+			'Abris': 8,
+			'Inutilisables': 16,
+			'Alimentation': 20,
+			'Montagnes': 23,
+			'Ferroviaire': 30,
+			'Transport': 40,
+			'Tourisme': 44,
+			'Naval': 58,
+			'Trace': 64,
+		},
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
@@ -1220,7 +1241,11 @@ function layerChemineur(options) {
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
-		urlSuffix: '4,5,6',
+		subsets: {
+			'Cabane': 4,
+			'Point d\'eau': 5,
+			'Réseau': 6,
+		},
 		receiveProperties: function(properties) {
 			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
 			properties.sym = getSym(properties.icone);
