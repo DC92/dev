@@ -8,7 +8,6 @@ if (!ol) var ol = {};
 if (!mapKeys) var mapKeys = {};
 
 /*--*/
-
 /**
  * Openstreetmap
  */
