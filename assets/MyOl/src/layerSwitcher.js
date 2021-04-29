@@ -62,6 +62,9 @@ function controlLayerSwitcher(options) {
 					firstCheckboxEl.checked = false;
 			}
 
+			// Assign the selector
+			layer.options.selectorName = name; //TODO DELETE when no more permanentCheckboxList
+
 			// Silently add the layer
 			layer.setVisible(false);
 			map.addLayer(layer);
