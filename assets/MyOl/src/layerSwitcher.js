@@ -61,9 +61,11 @@ function controlLayerSwitcher(options) {
 				if (!cookieSubsetChecked)
 					firstCheckboxEl.checked = false;
 			}
+
+			// Silently add the layer
 			layer.setVisible(false);
 			map.addLayer(layer);
-			layer.options.urlSuffix = subItems.join(',');
+
 			displayOverlay(layer);
 		}
 
@@ -130,23 +132,14 @@ function controlLayerSwitcher(options) {
 
 			options.baseLayers[transparentBaseLayerName].inputEl.checked = true;
 			rangeContainerEl.firstChild.value = 50;
-		} else {
+		} else
 			lastBaseLayerName =
-				transparentBaseLayerName = '';
-		}
+			transparentBaseLayerName = '';
+
 		selectedBaseLayerName = this.value;
 		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
 
 		displayBaseLayers();
-	}
-
-	function displayOverlay(layer) {
-		if (layer.options.urlSuffix) {
-			layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
-			layer.getSource().clear(); // Redraw the layer
-			layer.setVisible(true);
-		} else
-			layer.setVisible(false);
 	}
 
 	function selectOverlay() {
@@ -166,12 +159,20 @@ function controlLayerSwitcher(options) {
 				inputs[0].checked = false;
 		}
 
-		layer.options.urlSuffix = sel.join(',');
 		displayOverlay(layer);
+	}
 
-		// Set the baselayer cookie
-		document.cookie = this.name + '=' + sel.join(',') + '; path=/; SameSite=Secure; expires=' +
-			new Date(sel ? 2100 : 1970, 0).toUTCString();
+	function displayOverlay(layer) {
+		if (layer.options.urlSuffix) {
+			layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
+			layer.getSource().clear(); // Redraw the layer
+			layer.setVisible(true);
+		} else
+			layer.setVisible(false);
+
+		// Set each overlay cookie (set = '' if no selection)
+		document.cookie = this.name + '=' + layer.options.urlSuffix + '; path=/; SameSite=Secure; expires=' +
+			new Date(2100, 0).toUTCString();
 	}
 
 	return control;

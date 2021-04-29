@@ -43,7 +43,7 @@ function permanentCheckboxList(selectorName, evt) {
 		}
 
 		// Get the values of all checked inputs
-		if (inputEls[e].checked) // List checked elements
+		if (inputEls[e].value && inputEls[e].checked) // List checked elements
 			list.push(inputEls[e].value);
 	}
 
@@ -280,11 +280,14 @@ function layerVectorURL(options) {
 		urlSuffix: '', // url suffix to be defined separately from the rest (E.G. server domain and/or directory)
 		// noMemSelection: don't memorize the selection in cookies
 		selectorName: '', // Id of a <select> to tune url optional parameters
+
+		//TODO DELETE (only used in overpass)
 		baseUrlFunction: function(bbox, list) { // Function returning the layer's url
 			return options.baseUrl + options.urlSuffix +
 				list.join(',') +
 				(bbox ? '&bbox=' + bbox.join(',') : ''); // Default most common url format
 		},
+
 		url: function(extent, resolution, projection) {
 			// Retreive checked parameters
 			let list = permanentCheckboxList(options.selectorName).filter(
@@ -310,12 +313,14 @@ function layerVectorURL(options) {
 			dataProjection: options.projection,
 		}),
 		receiveProperties: function() {}, // (properties, feature, layer) Add properties based on existing one
-		receiveFeatures: function(features) { // features pre-treatment
+		receiveFeatures: function(features) { // Features pre-treatment
 			return features;
 		},
 		styleOptions: function(properties) { // Default function returning the layer's feature style
 			if (!properties.icon)
+				//TODO trouver plus standard
 				properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + (properties.sym || 'Puzzle Cache') + '.png';
+
 			return {
 				image: new ol.style.Icon({
 					src: properties.icon,
@@ -447,6 +452,7 @@ function layerVectorURL(options) {
 			renderBuffer: 16, // Buffered area around curent view (px)
 			zIndex: 1, // Above the baselayer even if included to the map before
 		}, options));
+
 	layer.options = options; // Mem options for further use
 
 	const formerFeadFeatureFromObject = options.format.readFeatureFromObject;
@@ -543,7 +549,8 @@ function getSym(type) {
 
 function layerRefugesInfo(options) {
 	options = Object.assign({
-		baseUrl: '//www.refuges.info/api/bbox?type_points=',
+		baseUrl: '//www.refuges.info/',
+		urlSuffix: 'api/bbox?type_points=',
 		subsets: {
 			'cabane': 7,
 			'refuge': 10,
@@ -595,7 +602,7 @@ function layerPyreneesRefuges(options) {
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
-		urlSuffix: '3,8,16,20,23,30,40,44,58,64',
+		selectorName: 'chemineur',
 		subsets: {
 			'Refuges': 3,
 			'Abris': 8,
@@ -622,6 +629,7 @@ function layerChemineur(options) {
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
+		urlSuffix: '4,5,6', //TODO
 		subsets: {
 			'Cabane': 4,
 			'Point d\'eau': 5,
