@@ -41,42 +41,15 @@ function controlLayerSwitcher(options) {
 				map.addLayer(layer);
 			}
 
-		// Build html overlays selector
-		//TODO comment initialiser avant les cookies ?
-		for (const name of Object.keys(options.overlays || {})) {
-			control.element.appendChild(document.createElement('hr'));
-
-			const layer = options.overlays[name],
-				subsets = layer.options.subsets,
-				match = document.cookie.match(new RegExp(name + '=([0-9,]*)')),
-				subItemsOn = match ? match[1].split(',') : layer.options.subsetsDefault,
-				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'main-overlay');
-
-			firstCheckboxEl.checked = true;
-			for (const s of Object.keys(subsets || {})) {
-				// Build & initialise the subItem checkbox
-				const cookieSubsetChecked = subItemsOn.indexOf(subsets[s].toString()) != -1;
-				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay, 'sub-overlay')
-					.checked = cookieSubsetChecked;
-
-				// Tune global layer checkbox
-				if (!cookieSubsetChecked)
-					firstCheckboxEl.checked = false;
-			}
-
-			// Assign the selector
-			layer.options.selectorName = name; //TODO DELETE when no more permanentCheckboxList
-
-			// Silently add the layer
-			layer.setVisible(false);
-			map.addLayer(layer);
-
-			displayOverlay(layer);
-		}
-
 		displayBaseLayers(); // Init layers
+
+		// Attach html overlays selector
+		const overlaySelector = document.getElementById(options.overlaySelectorId);
+		if (overlaySelector)
+			control.element.appendChild(overlaySelector);
 	};
 
+	//TODO inline
 	function addSelection(group, uid, name, value, selectAction, className) {
 		const el = document.createElement('div'),
 			inputId = 'l' + uid + (value ? '-' + value : '');
@@ -145,41 +118,6 @@ function controlLayerSwitcher(options) {
 		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
 
 		displayBaseLayers();
-	}
-
-	function selectOverlay() {
-		const inputs = document.getElementsByName(this.name),
-			layer = options.overlays[this.name];
-
-		layer.options.subsetsOn = [];
-
-		// Global & sub choice checkboxes correlation
-		if (this.id.includes('-'))
-			inputs[0].checked = true;
-		for (let i = 0; i < inputs.length; i++) {
-			if (!this.id.includes('-'))
-				inputs[i].checked = this.checked;
-			if (i && inputs[i].checked)
-				layer.options.subsetsOn.push(inputs[i].value);
-			if (!inputs[i].checked)
-				inputs[0].checked = false;
-		}
-
-		displayOverlay(layer);
-	}
-
-	function displayOverlay(layer) {
-		if (layer.options.urlSuffix)
-			//layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
-			//layer.getSource().clear(); // Redraw the layer
-			//layer.setVisible(true);
-			layer.getSource().refresh(); // Redraw the layer
-		else
-			layer.setVisible(false);
-
-		// Set each overlay cookie (set = '' if no selection)
-		document.cookie = this.name + '=' + layer.options.urlSuffix + '; path=/; SameSite=Secure; expires=' +
-			new Date(2100, 0).toUTCString();
 	}
 
 	return control;

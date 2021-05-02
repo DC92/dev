@@ -40,28 +40,6 @@ Based on https://openlayers.org
 		});
 	}
 
-	function alpagesLayer(options) {
-		const layer = new ol.layer.Vector({
-			source: new ol.source.Vector({
-				url: function() {
-					return options.url + layer.options.subsetsOn.join(',');
-				},
-				format: new ol.format.GeoJSON(), //TODO BBox with limits
-			}),
-			style: function(feature) {
-				return new ol.style.Style({
-					image: new ol.style.Icon({
-						src: feature.get('icon'),
-						//imgSize: [24, 24], // C'est le paramètre miracle qui permet d'afficher des .SVG sur I.E.
-					}),
-				});
-			},
-		});
-
-		layer.options = options;
-		return layer;
-	}
-
 	var map = new ol.Map({
 		target: 'map',
 		controls: [
@@ -71,18 +49,6 @@ Based on https://openlayers.org
 					'Google road': layerGoogle('m'),
 					'Google terrain': layerGoogle('p'),
 					'Photo Google': layerGoogle('s'),
-				},
-				overlays: {
-					Alpages: alpagesLayer({
-						url: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
-						//urlSuffix: [4,5,6],
-						subsetsDefault: [4, 6],
-						subsets: {
-							'Cabane': 4,
-							'Point d\'eau': 5,
-							'Réseau': 6,
-						},
-					}),
 				},
 			}),
 		],
