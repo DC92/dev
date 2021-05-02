@@ -475,12 +475,22 @@ function controlLayerSwitcher(options) {
 		control.element.innerHTML = '<button>\u2026</button>';
 		control.element.appendChild(rangeContainerEl);
 
-		// Build html baselayers selector
+		// Build html baselayers selectors
 		for (const name in options.baseLayers)
 			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
 				const layer = options.baseLayers[name];
-				layer.inputEl = // Mem it for further ops
-					addSelection('baseLayer', layer.ol_uid, name, name, selectBaseLayer);
+
+				const selectionEl = document.createElement('div'),
+					inputId = 'l' + layer.ol_uid + (name ? '-' + name : '');
+
+				control.element.appendChild(selectionEl);
+				selectionEl.innerHTML =
+					'<input type="checkbox" name="baseLayer ' +
+					'"id="' + inputId + '" value="' + name + '" ' + ' />' +
+					'<label for="' + inputId + '">' + name + '</label>';
+				selectionEl.firstChild.onclick = selectBaseLayer;
+				layer.inputEl = selectionEl.firstChild; // Mem it for further ops
+
 				layer.setVisible(false); // Don't begin to get the tiles yet
 				map.addLayer(layer);
 			}
@@ -492,23 +502,6 @@ function controlLayerSwitcher(options) {
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);
 	};
-
-	//TODO inline
-	function addSelection(group, uid, name, value, selectAction, className) {
-		const el = document.createElement('div'),
-			inputId = 'l' + uid + (value ? '-' + value : '');
-
-		control.element.appendChild(el);
-		if (className)
-			el.className = className;
-		el.innerHTML =
-			'<input type="checkbox" name="' + group +
-			'" id="' + inputId + '" value="' + value + '" ' + ' />' +
-			'<label for="' + inputId + '">' + name + '</label>';
-		el.firstChild.onclick = selectAction;
-
-		return el.firstChild;
-	}
 
 	function displayBaseLayers() {
 		// Refresh layers visibility & opacity
@@ -1173,8 +1166,8 @@ function layerPyreneesRefuges(options) {
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
-		subsetsDefault: [3,8,16,20,23,30,40,44,58],
-		subsets: {
+		subsetsDefault: [3,8,16,20,23,30,40,44,58], // TODO DELETE
+		subsets: { // TODO DELETE
 			'Refuges': 3,
 			'Abris': 8,
 			'Inutilisables': 16,

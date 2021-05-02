@@ -604,8 +604,8 @@ function layerPyreneesRefuges(options) {
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
-		subsetsDefault: [3,8,16,20,23,30,40,44,58],
-		subsets: {
+		subsetsDefault: [3,8,16,20,23,30,40,44,58], // TODO DELETE
+		subsets: { // TODO DELETE
 			'Refuges': 3,
 			'Abris': 8,
 			'Inutilisables': 16,
