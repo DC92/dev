@@ -16,8 +16,12 @@ Based on https://openlayers.org
 	<script src="../ol/ol.js"></script>
 
 	<!-- My Openlayers -->
-	<link  href="../myol.css" type="text/css" rel="stylesheet">
-	<script src="../myol.js"></script>
+	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
+	<link  href="../src/myol.css" type="text/css" rel="stylesheet">
+	<script src="../src/header.js"></script>
+	<script src="../src/tileLayers.js"></script>
+	<script src="../src/layerSwitcher.js"></script>
+	<script src="../src/myol.js"></script>
 
 	<!-- This exemple -->
 	<script src="editor.js" defer="defer"></script>
@@ -31,11 +35,6 @@ Based on https://openlayers.org
 
 <body>
 	<div id="map"></div>
-
-	<p><a href="..">BASIC DEMO</a></p>
-	<p><a href=".">LAYERS DEMO</a></p>
-	<p><a href="markers.html">MARKERS DEMO</a></p>
-	<p><a href="../gps">OFF LINE GPS</a></p>
 
 	<!-- Features editor -->
 	<input type="text" id="geojson" style="width:90%" value='{
@@ -57,5 +56,15 @@ Based on https://openlayers.org
 			}
 		}]
 	}' />
+
+	<h1>Demos</h1>
+	<p><a href="../index.html">BASIC</a></p>
+	<p><a href="layerSwitcher.html">LAYER SWITCHER</a></p>
+	<p><a href="tileLayers.html">TILE LAYERS</a></p>
+	<p><a href="vectorLayers.html">VECTOR LAYERS</a></p>
+	<p><a href="markers.html">MARKERS</a></p>
+	<p><a href="../gps">OFF LINE GPS</a></p>
+	<p><a href="../build.php">BUILD</a></p>
+	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 </body>
 </html>

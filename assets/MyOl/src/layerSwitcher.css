@@ -2,10 +2,6 @@
 	position: static;
 	float: right;
 }
-.ol-control-switcher .main-overlay,
-.ol-control-switcher .sub-overlay {
-	background-color: rgb(162, 226, 255, 0.4);
-}
 .ol-control-switcher .single-layer span {
 	font-size: 0.7em;
 }
@@ -29,7 +25,4 @@
 .ol-control-switcher span,
 .ol-control-switcher label {
 	color: black;
-}
-.ol-control-switcher .main-overlay label {
-	float: left;
 }

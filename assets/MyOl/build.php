@@ -28,3 +28,14 @@ function get ($file) {
 
 	return isset ($texts[1]) ? $texts[1] : $text;
 }
+?>
+
+<h1>Demos</h1>
+<p><a href="index.html">BASIC</a></p>
+<p><a href="examples/layerSwitcher.html">LAYER SWITCHER</a></p>
+<p><a href="examples/tileLayers.html">TILE LAYERS</a></p>
+<p><a href="examples/vectorLayers.html">VECTOR LAYERS</a></p>
+<p><a href="examples/markers.html">MARKERS</a></p>
+<p><a href="examples/editor.html">EDITOR</a></p>
+<p><a href="gps">OFF LINE GPS</a></p>
+<p><a href="https://github.com/Dominique92/MyOl/">Github</a></p>

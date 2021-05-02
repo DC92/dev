@@ -43,14 +43,16 @@ function permanentCheckboxList(selectorName, evt) {
 		}
 
 		// Get the values of all checked inputs
-		if (inputEls[e].value && inputEls[e].checked) // List checked elements
+		if (inputEls[e].value && // Only if a value is assigned
+			inputEls[e].checked) // List checked elements
 			list.push(inputEls[e].value);
 	}
 
-	//TODO BUG Do that at the end of init only
 	// Mem the data in the cookie
-	document.cookie = 'map-' + selectorName + '=' + (list.join(',') || 'none') +
-		'; path=/; SameSite=Secure; expires=' + new Date(2100, 0).toUTCString();
+	document.cookie = 'map-' + selectorName + '=' +
+		(list.join(',') || 'none') +
+		'; path=/; SameSite=Secure; ' +
+		'expires=' + new Date(2100, 0).toUTCString(); // Keep on next session
 
 	return list;
 }
@@ -91,7 +93,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
-	//TODO callback(null, permanentCheckboxList(selectorName));
+	callback(null, permanentCheckboxList(selectorName));
 }
 
 /**
@@ -602,7 +604,7 @@ function layerPyreneesRefuges(options) {
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
-		selectorName: 'chemineur',
+		subsetsDefault: [3,8,16,20,23,30,40,44,58],
 		subsets: {
 			'Refuges': 3,
 			'Abris': 8,
@@ -794,11 +796,11 @@ function layerOverpass(options) {
 function overlaysCollection() {
 	return {
 		chemineur: layerChemineur(),
-		'refuges.info': layerRefugesInfo(),
+		//'refuges.info': layerRefugesInfo(),
 		//TODO layerPyreneesRefuges(),
 		//layerC2C(),
 		//layerOverpass(),
-		Alpages: layerAlpages(),
+		//Alpages: layerAlpages(),
 	};
 }
 

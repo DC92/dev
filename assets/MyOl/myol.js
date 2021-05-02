@@ -485,41 +485,15 @@ function controlLayerSwitcher(options) {
 				map.addLayer(layer);
 			}
 
-		// Build html overlays selector
-		//TODO comment initialiser avant les cookies ?
-		for (const name of Object.keys(options.overlays || {})) {
-			control.element.appendChild(document.createElement('hr'));
-
-			const layer = options.overlays[name],
-				subsets = layer.options.subsets,
-				match = document.cookie.match(new RegExp(name + '=([0-9,]*)')),
-				subItems = match ? match[1].split(',') : [],
-				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'main-overlay');
-
-			if (subItems)
-				layer.options.urlSuffix = subItems.join(',');
-/*DCMM*/{var _r=' ',_v=layer.options;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
-			firstCheckboxEl.checked = true;
-			for (const s of Object.keys(subsets ||{})){
-				const cookieSubsetChecked = subItems.indexOf(subsets[s].toString()) != -1;
-				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay, 'sub-overlay')
-					.checked = cookieSubsetChecked;
-
-				if (!cookieSubsetChecked)
-					firstCheckboxEl.checked = false;
-			}
-			
-			// Silently add the layer
-			layer.setVisible(false);
-			map.addLayer(layer);
-			
-			displayOverlay(layer);
-		}
-
 		displayBaseLayers(); // Init layers
+
+		// Attach html overlays selector
+		const overlaySelector = document.getElementById(options.overlaySelectorId);
+		if (overlaySelector)
+			control.element.appendChild(overlaySelector);
 	};
 
+	//TODO inline
 	function addSelection(group, uid, name, value, selectAction, className) {
 		const el = document.createElement('div'),
 			inputId = 'l' + uid + (value ? '-' + value : '');
@@ -582,47 +556,12 @@ function controlLayerSwitcher(options) {
 			rangeContainerEl.firstChild.value = 50;
 		} else
 			lastBaseLayerName =
-				transparentBaseLayerName = '';
-		
+			transparentBaseLayerName = '';
+
 		selectedBaseLayerName = this.value;
 		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
 
 		displayBaseLayers();
-	}
-
-	function selectOverlay() {
-		const inputs = document.getElementsByName(this.name),
-			layer = options.overlays[this.name],
-			sel = [];
-
-		// Global & sub choice checkboxes correlation
-		if (this.id.includes('-'))
-			inputs[0].checked = true;
-		for (let i = 0; i < inputs.length; i++) {
-			if (!this.id.includes('-'))
-				inputs[i].checked = this.checked;
-			if (i && inputs[i].checked)
-				sel.push(inputs[i].value);
-			if (!inputs[i].checked)
-				inputs[0].checked = false;
-		}
-
-		//layer.options.urlSuffix = sel.join(',');
-		layer.changeList (sel);
-		displayOverlay(layer);
-	}
-
-	function displayOverlay(layer) {
-		if (layer.options.urlSuffix) {
-			layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
-			layer.getSource().clear(); // Redraw the layer
-			layer.setVisible(true);
-		} else
-			layer.setVisible(false);
-
-		// Set each overlay cookie (set = '' if no selection)
-		document.cookie = this.name + '=' + layer.options.urlSuffix + '; path=/; SameSite=Secure; expires=' +
-			new Date(2100, 0).toUTCString();
 	}
 
 	return control;
@@ -673,14 +612,16 @@ function permanentCheckboxList(selectorName, evt) {
 		}
 
 		// Get the values of all checked inputs
-		if (inputEls[e].checked) // List checked elements
+		if (inputEls[e].value && // Only if a value is assigned
+			inputEls[e].checked) // List checked elements
 			list.push(inputEls[e].value);
 	}
 
-	//TODO BUG Do that at the end of init only
 	// Mem the data in the cookie
-	document.cookie = 'map-' + selectorName + '=' + (list.join(',') || 'none') +
-		'; path=/; SameSite=Secure; expires=' + new Date(2100, 0).toUTCString();
+	document.cookie = 'map-' + selectorName + '=' +
+		(list.join(',') || 'none') +
+		'; path=/; SameSite=Secure; ' +
+		'expires=' + new Date(2100, 0).toUTCString(); // Keep on next session
 
 	return list;
 }
@@ -721,7 +662,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		inputEls[e].addEventListener('click', onClick);
 
 	// Call callback once at the init
-	//TODO callback(null, permanentCheckboxList(selectorName));
+	callback(null, permanentCheckboxList(selectorName));
 }
 
 /**
@@ -910,11 +851,14 @@ function layerVectorURL(options) {
 		urlSuffix: '', // url suffix to be defined separately from the rest (E.G. server domain and/or directory)
 		// noMemSelection: don't memorize the selection in cookies
 		selectorName: '', // Id of a <select> to tune url optional parameters
+
+		//TODO DELETE (only used in overpass)
 		baseUrlFunction: function(bbox, list) { // Function returning the layer's url
 			return options.baseUrl + options.urlSuffix +
 				list.join(',') +
 				(bbox ? '&bbox=' + bbox.join(',') : ''); // Default most common url format
 		},
+
 		url: function(extent, resolution, projection) {
 			// Retreive checked parameters
 			let list = permanentCheckboxList(options.selectorName).filter(
@@ -945,7 +889,9 @@ function layerVectorURL(options) {
 		},
 		styleOptions: function(properties) { // Default function returning the layer's feature style
 			if (!properties.icon)
+				//TODO trouver plus standard
 				properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + (properties.sym || 'Puzzle Cache') + '.png';
+
 			return {
 				image: new ol.style.Icon({
 					src: properties.icon,
@@ -1102,22 +1048,6 @@ function layerVectorURL(options) {
 			controlPermanentCheckbox(
 				options.selectorName,
 				function(evt, list) {
-					layer.changeList (list);
-/*					if (!list.length)
-						xhr.abort();
-					statusEl.innerHTML = '';
-					layer.setVisible(list.length > 0);
-					displayZoomStatus();
-					if (list.length && source.loadedExtentsRtree_) {
-						source.loadedExtentsRtree_.clear(); // Force the loading of all areas
-						source.clear(); // Redraw the layer
-					}*/
-				},
-				options
-			);
-	});
-
-layer.changeList =function(list){
 					if (!list.length)
 						xhr.abort();
 					statusEl.innerHTML = '';
@@ -1127,7 +1057,10 @@ layer.changeList =function(list){
 						source.loadedExtentsRtree_.clear(); // Force the loading of all areas
 						source.clear(); // Redraw the layer
 					}
-}
+				},
+				options
+			);
+	});
 
 	// Change class indicator when zoom is OK
 	function displayZoomStatus() {
@@ -1187,7 +1120,8 @@ function getSym(type) {
 
 function layerRefugesInfo(options) {
 	options = Object.assign({
-		baseUrl: '//www.refuges.info/api/bbox?type_points=',
+		baseUrl: '//www.refuges.info/',
+		urlSuffix: 'api/bbox?type_points=',
 		subsets: {
 			'cabane': 7,
 			'refuge': 10,
@@ -1239,7 +1173,7 @@ function layerPyreneesRefuges(options) {
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
-		urlSuffix: '3,8,16,20,23,30,40,44,58,64',
+		subsetsDefault: [3,8,16,20,23,30,40,44,58],
 		subsets: {
 			'Refuges': 3,
 			'Abris': 8,
@@ -1266,7 +1200,7 @@ function layerChemineur(options) {
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
-		defaultSubsets: '5,6',
+		urlSuffix: '4,5,6', //TODO
 		subsets: {
 			'Cabane': 4,
 			'Point d\'eau': 5,
@@ -1431,13 +1365,11 @@ function layerOverpass(options) {
 function overlaysCollection() {
 	return {
 		chemineur: layerChemineur(),
-		'refuges.info': layerRefugesInfo({
-			selectorName: 'refuges.info',
-		}),
+		//'refuges.info': layerRefugesInfo(),
 		//TODO layerPyreneesRefuges(),
 		//layerC2C(),
 		//layerOverpass(),
-		Alpages: layerAlpages(),
+		//Alpages: layerAlpages(),
 	};
 }
 
