@@ -31,10 +31,10 @@ Based on https://openlayers.org
 	<script>
 	console.log('Cookies: ' + document.cookie);
 
-	function layerGoogle(options) {
+	function layerGoogle(subLayer) {
 		return new ol.layer.Tile({
 			source: new ol.source.XYZ({
-				url: '//mt{0-3}.google.com/vt/lyrs=' + options.layer + '&hl=fr&x={x}&y={y}&z={z}',
+				url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
 				attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
 			})
 		});
@@ -44,7 +44,7 @@ Based on https://openlayers.org
 		const layer = new ol.layer.Vector({
 			source: new ol.source.Vector({
 				url: function() {
-					return options.url + options.urlSuffix;
+					return options.url + layer.options.subsetsOn.join(',');
 				},
 				format: new ol.format.GeoJSON(), //TODO BBox with limits
 			}),
@@ -68,20 +68,15 @@ Based on https://openlayers.org
 			new ol.control.Zoom(),
 			controlLayerSwitcher({
 				baseLayers: {
-					'Google road': layerGoogle({
-						layer: 'm'
-					}),
-					'Google terrain': layerGoogle({
-						layer: 'p'
-					}),
-					'Photo Google': layerGoogle({
-						layer: 's'
-					}),
+					'Google road': layerGoogle('m'),
+					'Google terrain': layerGoogle('p'),
+					'Photo Google': layerGoogle('s'),
 				},
 				overlays: {
 					Alpages: alpagesLayer({
 						url: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
-						urlSuffix: '4,5,6',
+						//urlSuffix: [4,5,6],
+						subsetsDefault: [4, 6],
 						subsets: {
 							'Cabane': 4,
 							'Point d\'eau': 5,

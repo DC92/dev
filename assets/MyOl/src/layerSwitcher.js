@@ -49,15 +49,17 @@ function controlLayerSwitcher(options) {
 			const layer = options.overlays[name],
 				subsets = layer.options.subsets,
 				match = document.cookie.match(new RegExp(name + '=([0-9,]*)')),
-				subItems = match ? match[1].split(',') : [],
+				subItemsOn = match ? match[1].split(',') : layer.options.subsetsDefault,
 				firstCheckboxEl = addSelection(name, layer.ol_uid, name, '', selectOverlay, 'main-overlay');
 
 			firstCheckboxEl.checked = true;
 			for (const s of Object.keys(subsets || {})) {
-				const cookieSubsetChecked = subItems.indexOf(subsets[s].toString()) != -1;
+				// Build & initialise the subItem checkbox
+				const cookieSubsetChecked = subItemsOn.indexOf(subsets[s].toString()) != -1;
 				addSelection(name, layer.ol_uid, s, subsets[s], selectOverlay, 'sub-overlay')
 					.checked = cookieSubsetChecked;
 
+				// Tune global layer checkbox
 				if (!cookieSubsetChecked)
 					firstCheckboxEl.checked = false;
 			}
@@ -147,8 +149,9 @@ function controlLayerSwitcher(options) {
 
 	function selectOverlay() {
 		const inputs = document.getElementsByName(this.name),
-			layer = options.overlays[this.name],
-			sel = [];
+			layer = options.overlays[this.name];
+
+		layer.options.subsetsOn = [];
 
 		// Global & sub choice checkboxes correlation
 		if (this.id.includes('-'))
@@ -157,7 +160,7 @@ function controlLayerSwitcher(options) {
 			if (!this.id.includes('-'))
 				inputs[i].checked = this.checked;
 			if (i && inputs[i].checked)
-				sel.push(inputs[i].value);
+				layer.options.subsetsOn.push(inputs[i].value);
 			if (!inputs[i].checked)
 				inputs[0].checked = false;
 		}
@@ -166,11 +169,12 @@ function controlLayerSwitcher(options) {
 	}
 
 	function displayOverlay(layer) {
-		if (layer.options.urlSuffix) {
-			layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
-			layer.getSource().clear(); // Redraw the layer
-			layer.setVisible(true);
-		} else
+		if (layer.options.urlSuffix)
+			//layer.getSource().loadedExtentsRtree_.clear(); // Force the loading of all areas
+			//layer.getSource().clear(); // Redraw the layer
+			//layer.setVisible(true);
+			layer.getSource().refresh(); // Redraw the layer
+		else
 			layer.setVisible(false);
 
 		// Set each overlay cookie (set = '' if no selection)
