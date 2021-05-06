@@ -38,6 +38,19 @@ Based on https://openlayers.org
 <body>
 	<div id="map"></div>
 
+	<div id="overlay-selector" class="overlay-selector">
+		<hr />
+		<label for="alp-features">Alpages.info</label><input type="checkbox" id="alp-features" name="alp-features" />
+		<ul class="selectors">
+			<li><input type="checkbox" id="alp-features-4" name="alp-features" value="4" />
+				<label for="alp-features-4">Cabane</label></li>
+			<li><input type="checkbox" id="alp-features-5" name="alp-features" value="5" />
+				<label for="alp-features-5">Point d'eau</label></li>
+			<li><input type="checkbox" id="alp-features-6" name="alp-features" value="6" />
+				<label for="alp-features-6">Réseau</label></li>
+		</ul>
+	</div>
+
 	<br/>OVERPASS<input type="checkbox" name="osm-features" />
 	<span id="osm-features-status"></span>
 	<ul class="selectors">
@@ -80,25 +93,6 @@ Based on https://openlayers.org
 		<li>Chemineur.fr<input type="checkbox" name="chm-features" /><span id="chm-features-status"></span></li>
 	</ul>
 
-	<div id="overlay-selector">
-		<div class="main-overlay">
-			<label for="alp-features">Alpages</label>
-			<input type="checkbox" name="alp-features" id="alp-features" value="">
-		</div>
-		<div class="sub-overlay">
-			<input type="checkbox" name="alp-features" id="alp-features-4" value="4">
-			<label for="alp-features-4">Cabane</label>
-		</div>
-		<div class="sub-overlay">
-			<input type="checkbox" name="alp-features" id="alp-features-5" value="5">
-			<label for="alp-features-5">Point d'eau</label>
-		</div>
-		<div class="sub-overlay">
-			<input type="checkbox" name="alp-features" id="alp-features-6" value="6">
-			<label for="alp-features-6">Réseau</label>
-		</div>
-	</div>
-
 	<h1>Other demos</h1>
 	<p><a href="../index.html">BASIC</a></p>
 	<p><a href="layerSwitcher.html">LAYER SWITCHER</a></p>
@@ -121,7 +115,7 @@ Based on https://openlayers.org
 			layerAlpages({selectorName: 'alp-features'}),
 		],
 		controls: controlsCollection({
-			baseLayers: layersDemo(),
+			baseLayers: layersCollection(),
 			controlLayerSwitcher: {
 				overlaySelectorId: 'overlay-selector',
 			},

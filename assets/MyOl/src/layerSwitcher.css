@@ -26,3 +26,12 @@
 .ol-control-switcher label {
 	color: black;
 }
+
+.overlay-selector {
+	background-color: rgb(162, 226, 255, 0.4);
+}
+.overlay-selector ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
