@@ -7,15 +7,15 @@
 }
 .ol-control-switcher .single-layer input,
 .ol-control-switcher .double-layer span,
-.ol-control-switcher:hover button,
-.ol-control-switcher:not(:hover) > hr,
-.ol-control-switcher:not(:hover) > div {
+.ol-control-switcher-open button,
+.ol-control-switcher:not(.ol-control-switcher-open) > hr,
+.ol-control-switcher:not(.ol-control-switcher-open) > div {
 	display: none;
 }
 .ol-control-switcher hr {
 	margin: 0;
 }
-.ol-control-switcher:hover {
+.ol-control-switcher-open {
 	max-height: calc(100% - 65px);
 	overflow: auto;
 }

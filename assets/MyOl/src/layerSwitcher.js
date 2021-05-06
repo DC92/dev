@@ -27,9 +27,20 @@ function controlLayerSwitcher(options) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// control.element is defined when attached to the map
+		control.element.appendChild(rangeContainerEl);
 		control.element.className = 'ol-control ol-control-switcher';
 		control.element.innerHTML = '<button>\u2026</button>';
-		control.element.appendChild(rangeContainerEl);
+		control.element.onmouseover = function() {
+			control.element.classList.add('ol-control-switcher-open');
+		};
+
+		// Hide popup when the cursor is out of the map
+		window.addEventListener('mousemove', function(evt) {
+			const divRect = map.getTargetElement().getBoundingClientRect();
+			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+				control.element.classList.remove('ol-control-switcher-open');
+		});
 
 		// Build html baselayers selectors
 		for (const name in options.baseLayers)
