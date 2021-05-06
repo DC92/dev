@@ -38,7 +38,7 @@ Based on https://openlayers.org
 <body>
 	<div id="map"></div>
 
-	<div id="overlay-selector" class="overlay-selector">
+	<div id="overlay-selector" >
 		<hr />
 		<label for="alp-features">Alpages.info</label><input type="checkbox" id="alp-features" name="alp-features" />
 		<ul class="selectors">
@@ -116,9 +116,6 @@ Based on https://openlayers.org
 		],
 		controls: controlsCollection({
 			baseLayers: layersCollection(),
-			controlLayerSwitcher: {
-				overlaySelectorId: 'overlay-selector',
-			},
 			controlPermalink: {
 				display: true,
 			},

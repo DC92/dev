@@ -14,19 +14,31 @@ var marker = layerEditGeoJson({
 	map = new ol.Map({
 		target: 'map',
 
+		layers: [
+			layerChemineur({
+				baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250&cat=',
+				selectorName: 'chm-features',
+			}),
+			layerRefugesInfo({
+				selectorName: 'wri-features',
+			}),
+			layerPyreneesRefuges({
+				selectorName: 'prc-features',
+			}),
+			layerC2C({
+				selectorName: 'c2c-features',
+			}),
+			layerAlpages({
+				selectorName: 'alp-features',
+			}),
+			layerOverpass({
+				selectorName: 'osm-features',
+			}),
+		],
+
 		controls: controlsCollection({
 			controlLayerSwitcher: {
 				baseLayers: layersCollection(),
-				overlays: {
-					chemineur: layerChemineur({
-						baseUrl: 'ext/Dominique92/GeoBB/gis.php?limit=250&cat=',
-					}),
-					'refuges.info': layerRefugesInfo(),
-					//TODO layerPyreneesRefuges(),
-					//layerC2C(),
-					//layerOverpass(),
-					Alpages: layerAlpages(),
-				},
 			},
 			controlPermalink: {
 				display: script == 'index',

@@ -65,7 +65,7 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers(); // Init layers
 
 		// Attach html overlays selector
-		const overlaySelector = document.getElementById(options.overlaySelectorId);
+		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);
 	};
