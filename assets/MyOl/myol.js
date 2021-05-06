@@ -471,9 +471,20 @@ function controlLayerSwitcher(options) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// control.element is defined when attached to the map
+		control.element.appendChild(rangeContainerEl);
 		control.element.className = 'ol-control ol-control-switcher';
 		control.element.innerHTML = '<button>\u2026</button>';
-		control.element.appendChild(rangeContainerEl);
+		control.element.onmouseover = function() {
+			control.element.classList.add('ol-control-switcher-open');
+		};
+
+		// Hide popup when the cursor is out of the map
+		window.addEventListener('mousemove', function(evt) {
+			const divRect = map.getTargetElement().getBoundingClientRect();
+			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
+				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+				control.element.classList.remove('ol-control-switcher-open');
+		});
 
 		// Build html baselayers selectors
 		for (const name in options.baseLayers)
@@ -1115,16 +1126,6 @@ function layerRefugesInfo(options) {
 	options = Object.assign({
 		baseUrl: '//www.refuges.info/',
 		urlSuffix: 'api/bbox?type_points=',
-		subsets: {
-			'cabane': 7,
-			'refuge': 10,
-			'gîte': 9,
-			'point d\'eau': 23,
-			'sommet': 6,
-			'col': 3,
-			'lac': 16,
-			'bâtiment': 28,
-		},
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.name = properties.nom;
@@ -1166,19 +1167,6 @@ function layerPyreneesRefuges(options) {
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
 		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
-		subsetsDefault: [3,8,16,20,23,30,40,44,58], // TODO DELETE
-		subsets: { // TODO DELETE
-			'Refuges': 3,
-			'Abris': 8,
-			'Inutilisables': 16,
-			'Alimentation': 20,
-			'Montagnes': 23,
-			'Ferroviaire': 30,
-			'Transport': 40,
-			'Tourisme': 44,
-			'Naval': 58,
-			'Trace': 64,
-		},
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
@@ -1193,12 +1181,6 @@ function layerChemineur(options) {
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
-		urlSuffix: '4,5,6', //TODO
-		subsets: {
-			'Cabane': 4,
-			'Point d\'eau': 5,
-			'Réseau': 6,
-		},
 		receiveProperties: function(properties) {
 			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
 			properties.sym = getSym(properties.icone);

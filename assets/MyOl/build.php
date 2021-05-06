@@ -30,7 +30,7 @@ function get ($file) {
 }
 ?>
 
-<h1>Demos</h1>
+<h1>Other demos</h1>
 <p><a href="index.html">BASIC</a></p>
 <p><a href="examples/layerSwitcher.html">LAYER SWITCHER</a></p>
 <p><a href="examples/tileLayers.html">TILE LAYERS</a></p>
