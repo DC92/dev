@@ -14,6 +14,9 @@
 #map:fullscreen .ol-viewport {
 	padding-bottom: 0;
 }
+#container-map > #overlay-selector {
+	display: none;
+}
 
 .edit-comment p {
 	margin: 0;
