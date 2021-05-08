@@ -15,6 +15,7 @@ file_put_contents ('myol.css', $css);
 echo "TO myol.css</p>\n<p>";
 
 $js .= get ('header.js').PHP_EOL .PHP_EOL;
+$js .= get ('checkboxManager.js').PHP_EOL .PHP_EOL;
 $js .= get ('tileLayers.js').PHP_EOL .PHP_EOL;
 $js .= get ('layerSwitcher.js').PHP_EOL .PHP_EOL;
 $js .= get ('myol.js');
