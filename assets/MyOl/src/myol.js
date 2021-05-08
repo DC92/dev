@@ -609,9 +609,11 @@ function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
 		receiveProperties: function(properties) {
-			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
+			if (properties.icon) {
+				const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png')); //TODO se passer de RegExp
+				properties.type = icone ? icone[1] : null;
+			}
 			properties.sym = getSym(properties.icone);
-			properties.type = icone ? icone[1] : null;
 			properties.link = 'http://alpages.info/viewtopic.php?t=' + properties.id;
 		},
 	}, options));
