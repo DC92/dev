@@ -20,7 +20,7 @@ $js .= get ('tileLayers.js').PHP_EOL .PHP_EOL;
 $js .= get ('layerSwitcher.js').PHP_EOL .PHP_EOL;
 $js .= get ('myol.js');
 file_put_contents ('myol.js', $js);
-echo "TO myol.js</p>";
+echo 'TO myol.js</p>';
 
 function get ($file) {
 	echo "$file, ";

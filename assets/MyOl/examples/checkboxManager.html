@@ -13,23 +13,34 @@ Based on https://openlayers.org
 </head>
 
 <body>
-	<label for="features">Alpages.info</label><input type="checkbox" id="features" name="features">
-	<ul class="selectors">
-		<li><input type="checkbox" id="features-4" name="features" value="4">
-			<label for="features-4">Cabane</label></li>
-		<li><input type="checkbox" id="features-5" name="features" value="5" checked="checked">
-			<label for="features-5">Point d'eau</label></li>
-		<li><input type="checkbox" id="features-6" name="features" value="6">
-			<label for="features-6">Réseau</label></li>
+	<label for="feat-alp">Alpages.info</label><input type="checkbox" id="feat-alp" name="feat-alp">
+	<ul>
+		<li><input type="checkbox" id="feat-alp-4" name="feat-alp" value="4">
+			<label for="feat-alp-4">Cabane</label></li>
+		<li><input type="checkbox" id="feat-alp-5" name="feat-alp" value="5" checked="checked">
+			<label for="feat-alp-5">Point d'eau</label></li>
+		<li><input type="checkbox" id="feat-alp-6" name="feat-alp" value="6">
+			<label for="feat-alp-6">Réseau</label></li>
 	</ul>
 
-	<script src="../src/checkboxManager.js"></script>
+	<div>Chemineur.fr<input type="checkbox" name="feat-chm"></div>
+
+	<br/>
+	<div><input type="checkbox" name="feat-base" id="l21-OpenTopo" value="OpenTopo"><label for="l21-OpenTopo">OpenTopo</label></div>
+	<div><input type="checkbox" name="feat-base" id="l23-MRI" value="MRI"><label for="l23-MRI">MRI</label></div>
+	<div><input type="checkbox" name="feat-base" id="l25-OSM fr" value="OSM fr"><label for="l25-OSM fr">OSM fr</label></div>
+
+<script src="../src/checkboxManager.js"></script>
 	<script>
 		console.log(document.cookie);
 
-		memCheckbox('features', function(list) {
+		memCheckbox('feat-alp', click);
+		memCheckbox('feat-chm', click);
+		memCheckbox('feat-base', click);
+		
+		function click(list) {
 			console.log(list.join(','));
-		});
+		}
 	</script>
 </body>
 </html>
