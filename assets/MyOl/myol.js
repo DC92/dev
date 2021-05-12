@@ -89,6 +89,72 @@ ol.Map.prototype.handlePostRender = function() {
 	map.getTargetElement()._map = map;
 };
 
+/**
+ * Manages checkboxes inputs having the same name
+ * selectorName {string}
+ * callback {function(list)} action when the button is clicked
+ *
+ * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
+ * Manages a global flip-flop of the same named <input> checkboxes
+ */
+function memCheckbox(selectorName, callback) {
+	// Search values in cookies & args
+	const inputEls = document.getElementsByName(selectorName || ''),
+		request = window.location.search + ';' + // Priority to the url args ?selector=1,2,3
+		window.location.hash + ';' + // Then the hash #selector=1,2,3
+		document.cookie, // Then the cookies
+		match = request.match(new RegExp(selectorName + '=([^;]*)'));
+
+	if (inputEls)
+		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+			// Check following cookies & args
+			if (match)
+				inputEls[e].checked =
+				match[1].split(',').includes(inputEls[e].value) || // That one is declared
+				match[1].split(',').includes('on'); // The "all (= "on") is set
+
+			// Attach the action
+			inputEls[e].addEventListener('click', onClick);
+		}
+
+	// Init the cookies if data has been given by the url
+	onClick();
+
+	function onClick(evt) {
+		const list = []; // List of checked values
+		let allIndex = -1, // Index of the "all" <input> if any
+			allCheck = true; // Are all others checked ?
+
+		if (evt)
+			for (let e = 0; e < inputEls.length; e++) {
+				if (evt.target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
+					inputEls[e].checked = evt.target.checked; // Force all the others to the same
+				else if (inputEls[e].value == 'on') // The "all" <input>
+					allIndex = e;
+				else if (!inputEls[e].checked)
+					allCheck = false; // Uncheck the "all" <input> if one other is unchecked	
+			}
+
+		// Check the "all" <input> if all others are
+		if (allIndex != -1)
+			inputEls[allIndex].checked = allCheck;
+
+		// Get the values of all checked inputs
+		for (let e = 0; e < inputEls.length; e++)
+			if (inputEls[e].checked) // List checked elements
+				list.push(inputEls[e].value);
+
+		if (typeof callback == 'function')
+			callback(list);
+
+		// Mem the data in the cookie
+		if (selectorName)
+			document.cookie = selectorName + '=' + list.join(',') +
+			'; path=/; SameSite=Secure; expires=' +
+			new Date(2100, 0).toUTCString(); // Keep over all session
+	}
+}
+
 
 /**
  * Openstreetmap
@@ -602,31 +668,15 @@ function escapedStyle(a, b, c) {
  * if an input witout value is clicked, copy the check in all other inputs having the same name (click "all")
  * return : array of values of all checked <input name="selectorName" type="checkbox" value="xxx" />
  */
-
 function permanentCheckboxList(selectorName, evt) {
 	const inputEls = document.getElementsByName(selectorName),
 		list = [];
 
-	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
-		if (evt) {
-			// Select/deselect all inputs when clicking an <input> without value
-			if (evt.target.value == 'on') // "all" input has a default value = "on"
-				inputEls[e].checked = evt.target.checked; // Check all if "all" is clicked
-			else if (inputEls[e].value == 'on') // "all" <input>
-				inputEls[e].checked = false; // Reset if another check is clicked
-		}
-
+	for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
 		// Get the values of all checked inputs
 		if (inputEls[e].value && // Only if a value is assigned
 			inputEls[e].checked) // List checked elements
 			list.push(inputEls[e].value);
-	}
-
-	// Mem the data in the cookie
-	document.cookie = 'map-' + selectorName + '=' +
-		(list.join(',') || 'none') +
-		'; path=/; SameSite=Secure; ' +
-		'expires=' + new Date(2100, 0).toUTCString(); // Keep on next session
 
 	return list;
 }
@@ -647,11 +697,11 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 			location.search, // Priority to the url args
 			location.hash, // Then the hash
 			document.cookie, // Then the cookies
-			'map-' + selectorName + '=' + (options.init || ''), // Then the default
+			selectorName + '=' + (options.init || ''), // Then the default
 		];
 	let found = false;
 	for (let c in cooks) {
-		const match = cooks[c].match('map-' + selectorName + '=([^#&;]*)');
+		const match = cooks[c].match(selectorName + '=([^#&;]*)');
 		if (!found && match && !options.noMemSelection)
 			// Set the <input> checks accordingly with the cookie
 			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
@@ -660,13 +710,15 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 	}
 
 	// Attach the action
-	function onClick(evt) {
-		callback(evt, permanentCheckboxList(selectorName, evt));
-	}
 	for (let e = 0; e < inputEls.length; e++)
 		inputEls[e].addEventListener('click', onClick);
 
-	// Call callback once at the init
+	function onClick(evt) {
+		const list = permanentCheckboxList(selectorName, evt);
+		callback(evt, list);
+	}
+
+	// Call callback once at the init to draw the layer
 	callback(null, permanentCheckboxList(selectorName));
 }
 
@@ -955,8 +1007,6 @@ function layerVectorURL(options) {
 		},
 	}, options);
 
-	//TODO permanentCheckboxList(options.selectorName); // Init selection from cookies or url
-
 	const statusEl = document.getElementById(options.selectorName + '-status') || {},
 		xhr = new XMLHttpRequest(), // Only one object created
 		source = new ol.source.Vector(Object.assign({
@@ -1050,21 +1100,18 @@ function layerVectorURL(options) {
 
 		// Checkboxes to tune layer parameters
 		if (options.selectorName)
-			controlPermanentCheckbox(
-				options.selectorName,
-				function(evt, list) {
-					if (!list.length)
-						xhr.abort();
-					statusEl.innerHTML = '';
-					layer.setVisible(list.length > 0);
-					displayZoomStatus();
-					if (list.length && source.loadedExtentsRtree_) {
-						source.loadedExtentsRtree_.clear(); // Force the loading of all areas
-						source.clear(); // Redraw the layer
-					}
-				},
-				options
-			);
+			memCheckbox(options.selectorName, function(list) {
+				if (!list.length)
+					xhr.abort();
+				statusEl.innerHTML = '';
+				layer.setVisible(list.length > 0);
+				displayZoomStatus();
+				if (list.length && source.loadedExtentsRtree_) {
+					//TODO reset ?????????????????
+					source.loadedExtentsRtree_.clear(); // Force the loading of all areas
+					source.clear(); // Redraw the layer
+				}
+			});
 	});
 
 	// Change class indicator when zoom is OK
@@ -1183,9 +1230,11 @@ function layerAlpages(options) {
 	return layerChemineur(Object.assign({
 		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
 		receiveProperties: function(properties) {
-			const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png'));
+			if (properties.icon) {
+				const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png')); //TODO se passer de RegExp
+				properties.type = icone ? icone[1] : null;
+			}
 			properties.sym = getSym(properties.icone);
-			properties.type = icone ? icone[1] : null;
 			properties.link = 'http://alpages.info/viewtopic.php?t=' + properties.id;
 		},
 	}, options));

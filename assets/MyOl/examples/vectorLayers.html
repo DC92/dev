@@ -22,6 +22,7 @@ Based on https://openlayers.org
 	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
 	<link  href="../src/myol.css" type="text/css" rel="stylesheet">
 	<script src="../src/header.js"></script>
+	<script src="../src/checkboxManager.js"></script>
 	<script src="../src/tileLayers.js"></script>
 	<script src="../src/layerSwitcher.js"></script>
 	<script src="../src/myol.js"></script>
@@ -104,6 +105,8 @@ Based on https://openlayers.org
 	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 
 	<script>
+	console.log(document.cookie);
+
 	new ol.Map({
 		target: 'map',
 		layers: [

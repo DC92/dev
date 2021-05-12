@@ -28,31 +28,15 @@ function escapedStyle(a, b, c) {
  * if an input witout value is clicked, copy the check in all other inputs having the same name (click "all")
  * return : array of values of all checked <input name="selectorName" type="checkbox" value="xxx" />
  */
-
 function permanentCheckboxList(selectorName, evt) {
 	const inputEls = document.getElementsByName(selectorName),
 		list = [];
 
-	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
-		if (evt) {
-			// Select/deselect all inputs when clicking an <input> without value
-			if (evt.target.value == 'on') // "all" input has a default value = "on"
-				inputEls[e].checked = evt.target.checked; // Check all if "all" is clicked
-			else if (inputEls[e].value == 'on') // "all" <input>
-				inputEls[e].checked = false; // Reset if another check is clicked
-		}
-
+	for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
 		// Get the values of all checked inputs
 		if (inputEls[e].value && // Only if a value is assigned
 			inputEls[e].checked) // List checked elements
 			list.push(inputEls[e].value);
-	}
-
-	// Mem the data in the cookie
-	document.cookie = 'map-' + selectorName + '=' +
-		(list.join(',') || 'none') +
-		'; path=/; SameSite=Secure; ' +
-		'expires=' + new Date(2100, 0).toUTCString(); // Keep on next session
 
 	return list;
 }
@@ -73,11 +57,11 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 			location.search, // Priority to the url args
 			location.hash, // Then the hash
 			document.cookie, // Then the cookies
-			'map-' + selectorName + '=' + (options.init || ''), // Then the default
+			selectorName + '=' + (options.init || ''), // Then the default
 		];
 	let found = false;
 	for (let c in cooks) {
-		const match = cooks[c].match('map-' + selectorName + '=([^#&;]*)');
+		const match = cooks[c].match(selectorName + '=([^#&;]*)');
 		if (!found && match && !options.noMemSelection)
 			// Set the <input> checks accordingly with the cookie
 			for (let e = 0; e < inputEls.length; e++) //HACK el.forEach is not supported by IE/Edge
@@ -86,13 +70,15 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 	}
 
 	// Attach the action
-	function onClick(evt) {
-		callback(evt, permanentCheckboxList(selectorName, evt));
-	}
 	for (let e = 0; e < inputEls.length; e++)
 		inputEls[e].addEventListener('click', onClick);
 
-	// Call callback once at the init
+	function onClick(evt) {
+		const list = permanentCheckboxList(selectorName, evt);
+		callback(evt, list);
+	}
+
+	// Call callback once at the init to draw the layer
 	callback(null, permanentCheckboxList(selectorName));
 }
 
@@ -381,8 +367,6 @@ function layerVectorURL(options) {
 		},
 	}, options);
 
-	//TODO permanentCheckboxList(options.selectorName); // Init selection from cookies or url
-
 	const statusEl = document.getElementById(options.selectorName + '-status') || {},
 		xhr = new XMLHttpRequest(), // Only one object created
 		source = new ol.source.Vector(Object.assign({
@@ -476,21 +460,18 @@ function layerVectorURL(options) {
 
 		// Checkboxes to tune layer parameters
 		if (options.selectorName)
-			controlPermanentCheckbox(
-				options.selectorName,
-				function(evt, list) {
-					if (!list.length)
-						xhr.abort();
-					statusEl.innerHTML = '';
-					layer.setVisible(list.length > 0);
-					displayZoomStatus();
-					if (list.length && source.loadedExtentsRtree_) {
-						source.loadedExtentsRtree_.clear(); // Force the loading of all areas
-						source.clear(); // Redraw the layer
-					}
-				},
-				options
-			);
+			memCheckbox(options.selectorName, function(list) {
+				if (!list.length)
+					xhr.abort();
+				statusEl.innerHTML = '';
+				layer.setVisible(list.length > 0);
+				displayZoomStatus();
+				if (list.length && source.loadedExtentsRtree_) {
+					//TODO reset ?????????????????
+					source.loadedExtentsRtree_.clear(); // Force the loading of all areas
+					source.clear(); // Redraw the layer
+				}
+			});
 	});
 
 	// Change class indicator when zoom is OK

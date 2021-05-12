@@ -1,31 +1,32 @@
 /**
  * Manages checkboxes inputs having the same name
  * selectorName {string}
- * callback {function} action when the button is clicked
+ * callback {function(list)} action when the button is clicked
  *
  * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
 	// Search values in cookies & args
-	const inputEls = document.getElementsByName(selectorName),
+	const inputEls = document.getElementsByName(selectorName || ''),
 		request = window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie, // Then the cookies
 		match = request.match(new RegExp(selectorName + '=([^;]*)'));
 
-	for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
-		// Check following cookies & args
-		if (match)
-			inputEls[e].checked =
-			match[1].split(',').includes(inputEls[e].value) || // That one is declared
-			match[1].split(',').includes('on'); // The "all (= "on") is set
+	if (inputEls)
+		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+			// Check following cookies & args
+			if (match)
+				inputEls[e].checked =
+				match[1].split(',').includes(inputEls[e].value) || // That one is declared
+				match[1].split(',').includes('on'); // The "all (= "on") is set
 
-		// Attach the action
-		inputEls[e].addEventListener('click', onClick);
-	}
+			// Attach the action
+			inputEls[e].addEventListener('click', onClick);
+		}
 
-	// Init the cookies if given by the url
+	// Init the cookies if data has been given by the url
 	onClick();
 
 	function onClick(evt) {
