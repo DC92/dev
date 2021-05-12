@@ -664,11 +664,10 @@ function escapedStyle(a, b, c) {
 /**
  * Gives list of checkboxes inputs states having the same name
  * selectorName {string}
- * evt {keyboard event} if an input is clicked,
  * if an input witout value is clicked, copy the check in all other inputs having the same name (click "all")
  * return : array of values of all checked <input name="selectorName" type="checkbox" value="xxx" />
  */
-function permanentCheckboxList(selectorName, evt) {
+function permanentCheckboxList(selectorName) {
 	const inputEls = document.getElementsByName(selectorName),
 		list = [];
 
@@ -714,7 +713,7 @@ function controlPermanentCheckbox(selectorName, callback, options) {
 		inputEls[e].addEventListener('click', onClick);
 
 	function onClick(evt) {
-		const list = permanentCheckboxList(selectorName, evt);
+		const list = permanentCheckboxList(selectorName);
 		callback(evt, list);
 	}
 
@@ -1085,7 +1084,11 @@ function layerVectorURL(options) {
 	if (formerFeadFeatureFromObject && // If format = GeoJSON
 		options.receiveProperties) { // If receiveProperties options
 		options.format.readFeatureFromObject = function(object, opt_options) {
-			options.receiveProperties(object.properties, object, layer);
+			// Filter features after receiving
+			const valid = options.receiveProperties(object.properties, object, layer);
+			if (!valid)
+				object.geometry.coordinates[1] += 90; //TODO horrible : use filter function
+
 			return formerFeadFeatureFromObject.call(this, object, opt_options);
 		};
 	}
@@ -1198,12 +1201,15 @@ function layerRefugesInfo(options) {
 function layerPyreneesRefuges(options) {
 	return layerVectorURL(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		receiveProperties: function(properties) {
+		receiveProperties: function(properties, object, layer) {
 			properties.sym = getSym(properties.type_hebergement || 'cabane');
 			properties.link = properties.url;
 			properties.ele = parseInt(properties.altitude);
 			properties.type = properties.type_hebergement;
 			properties.bed = properties.cap_ete || properties.cap_hiver;
+
+			const list = permanentCheckboxList(layer.options.selectorName);
+			return list.includes(properties.sym);
 		},
 	}, options));
 }
