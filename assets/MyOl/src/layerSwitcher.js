@@ -34,11 +34,12 @@ function controlLayerSwitcher(options) {
 			control.element.classList.add('ol-control-switcher-open');
 		};
 
-		// Hide popup when the cursor is out of the map
-		window.addEventListener('mousemove', function(evt) {
-			const divRect = map.getTargetElement().getBoundingClientRect();
-			if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-				evt.clientY < divRect.top || evt.clientY > divRect.bottom)
+		// Hide the selector when the cursor is out of the selector
+		map.on('pointermove', function(evt) {
+			const max_x = map.getTargetElement().offsetWidth - control.element.offsetWidth - 20,
+				max_y = control.element.offsetHeight + 20;
+
+			if (evt.pixel[0] < max_x || evt.pixel[1] > max_y)
 				control.element.classList.remove('ol-control-switcher-open');
 		});
 

@@ -1,8 +1,9 @@
 <div id="overlay-selector">
 <hr />
+<label for="chm-features">chemineur</label>
+<input type="checkbox" name="chm-features" id="chm-features" checked="checked" />
+<div id="chm-features-status" class="overlay-status"></div>
 <ul>
-	<label for="chm-features">chemineur</label>
-	<input type="checkbox" name="chm-features" id="chm-features" checked="checked" />
 	<!-- BEGIN geo_categories -->
 		<!-- IF geo_categories.GEO -->
 		<li>
@@ -15,9 +16,10 @@
 </ul>
 
 <hr />
+<label for="wri-features">refuges.info</label>
+<input type="checkbox" name="wri-features" id="wri-features" />
+<div id="wri-features-status" class="overlay-status"></div>
 <ul>
-	<label for="wri-features">refuges.info</label>
-	<input type="checkbox" name="wri-features" id="wri-features" />
 	<li>
 		<input type="checkbox" name="wri-features" id="wri-features-7" value="7" />
 		<label for="wri-features-7">cabane non gardée</label>
@@ -46,9 +48,10 @@
 </ul>
 
 <hr />
+<label for="osm-features">OSM</label>
+<input type="checkbox" name="osm-features"  id="osm-features" />
+<div id="osm-features-status" class="overlay-status"></div>
 <ul>
-	<label for="osm-features">OSM</label>
-	<input type="checkbox" name="osm-features"  id="osm-features" />
 	<li>
 		<input type="checkbox" name="osm-features" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />
 		<label for="City Hall">Hôtel</label>
@@ -92,11 +95,14 @@
 </ul>
 
 <hr />
-<input type="checkbox" name="c2c-features" id="c2c-features" />
 <label for="c2c-features">camptocamp.org</label>
+<input type="checkbox" name="c2c-features" id="c2c-features" />
+<div id="c2c-features-status" class="overlay-status"></div>
 
-<hr/>pyrenees-refuges.com<input type="checkbox" name="prc-features" />
-<span id="prc-features-status"></span>
+<hr/>
+<label for="prc-features">pyrenees-refuges.com</label>
+<input type="checkbox" name="prc-features" />
+<div id="prc-features-status" class="overlay-status"></div>
 <ul>
 	<li><input type="checkbox" name="prc-features" value="Lodge" />cabane ou refuge</li>
 	<li><input type="checkbox" name="prc-features" value="Tunnel" />abri, orri</li>
@@ -104,9 +110,10 @@
 </ul>
 
 <hr />
+<label for="alp-features">alpages.info</label>
+<input type="checkbox" id="alp-features" name="alp-features" />
+<div id="alp-features-status" class="overlay-status"></div>
 <ul>
-	<label for="alp-features">alpages.info</label>
-	<input type="checkbox" id="alp-features" name="alp-features" />
 	<li>
 		<input type="checkbox" id="alp-features-4" name="alp-features" value="4" />
 		<label for="alp-features-4">Cabane</label>
