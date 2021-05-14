@@ -54,7 +54,7 @@ $alias = [
 	// Il s'agit en fait d'une équivalence des symboles geocaching utilisés par les GPS
 	'Campground' => 'camping_yellow_green',
 	'City Hall' => 'cabane_blue', // Hôtel ou location
-	'Crossing' => 'cabane_black_x', // Fermé
+	'Crossing' => 'cabane_white_black_x', // Fermé
 	'Danger Area' => 'triangle_a33',
 	'Drinking Water' => 'pointdeau',
 	'Fishing Hot Spot Facility' => 'cabane_manqueunmur', // Manque un mur

@@ -446,7 +446,8 @@ function layerVectorURL(options) {
 		options.format.readFeatureFromObject = function(object, opt_options) {
 			// Filter features after receiving
 			const valid = options.receiveProperties(object.properties, object, layer);
-			if (!valid && object.geometry && object.geometry.coordinates)
+			if (valid === false &&
+				object.geometry && object.geometry.coordinates)
 				object.geometry.coordinates[1] += 90; //TODO horrible : use filter function
 
 			return formerFeadFeatureFromObject.call(this, object, opt_options);

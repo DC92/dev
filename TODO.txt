@@ -1,3 +1,5 @@
+BEST ext/gis arrondir les lon,lat
+
 BUG bloquants
 	Les pictos ont disparu sur V3
 	Chemineur dans MyOl => Traduction symbole (export GPS ?)
