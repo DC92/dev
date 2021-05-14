@@ -808,7 +808,7 @@ function hoverManager(map) {
 	map.on('pointermove', function(evt) {
 		const hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
 
-		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Don't hover under the buttons & labels
+		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Don't hover above the buttons & labels
 			// Search hovered features
 			let closestFeature = findClosestFeature(evt.pixel);
 
@@ -1174,7 +1174,6 @@ function getSym(type) {
  * www.refuges.info POI layer
  * Requires ol.loadingstrategy.bboxLimit, layerVectorURL
  */
-
 function layerRefugesInfo(options) {
 	options = Object.assign({
 		baseUrl: '//www.refuges.info/',
@@ -1222,7 +1221,8 @@ function layerPyreneesRefuges(options) {
  */
 function layerChemineur(options) {
 	return layerVectorURL(Object.assign({
-		baseUrl: '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?cat=',
+		baseUrl: '//chemineur.fr/',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=',
 		strategy: ol.loadingstrategy.bboxLimit,
 		receiveProperties: function(properties) {
 			properties.copy = 'chemineur.fr';
@@ -1236,7 +1236,8 @@ function layerChemineur(options) {
  */
 function layerAlpages(options) {
 	return layerChemineur(Object.assign({
-		baseUrl: '//alpages.info/ext/Dominique92/GeoBB/gis.php?forums=',
+		baseUrl: '//alpages.info/',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?forums=',
 		receiveProperties: function(properties) {
 			if (properties.icon) {
 				const icone = properties.icon.match(new RegExp('([a-z\-_]+)\.png')); //TODO se passer de RegExp
