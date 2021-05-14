@@ -7,7 +7,7 @@ var marker = layerEditGeoJson({
 		singlePoint: true,
 		styleOptions: {
 			image: new ol.style.Icon({
-				src: 'assets/MyOl/examples/viseur.png',
+				src: 'ext/Dominique92/GeoBB/styles/all/theme/images/viseur.png',
 			}),
 		},
 	}),
@@ -56,7 +56,7 @@ switch (script + '-' + mapType) {
 				focus: 15,
 				styleOptions: {
 					image: new ol.style.Icon({
-						src: 'assets/MyOl/examples/cadre.png',
+						src: 'ext/Dominique92/GeoBB/styles/all/theme/images/cadre.png',
 					}),
 				},
 			}));

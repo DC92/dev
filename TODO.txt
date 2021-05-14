@@ -1,3 +1,6 @@
+BUG
+	viewtopic point KO
+
 BEST ext/gis arrondir les lon,lat
 
 BUG bloquants
