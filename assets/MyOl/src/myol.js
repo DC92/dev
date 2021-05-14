@@ -165,7 +165,11 @@ function hoverManager(map) {
 
 	//BEST appeler sur l'event "hover" (pour les mobiles)
 	map.on('pointermove', function(evt) {
-		const hoveredEl = document.elementFromPoint(evt.pixel[0] + 8, evt.pixel[1] + 8);
+		const maprect = map.getTargetElement().getBoundingClientRect(),
+			hoveredEl = document.elementFromPoint(
+				evt.pixel[0] + maprect.left,
+				evt.pixel[1] + maprect.top
+			);
 
 		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Don't hover above the buttons & labels
 			// Search hovered features
