@@ -16,7 +16,7 @@ var marker = layerEditGeoJson({
 
 		layers: [
 			layerChemineur({
-				baseUrl: '//chemineur.fr/',
+				baseUrl: '',
 				selectorName: 'chm-features',
 			}),
 			layerRefugesInfo({
