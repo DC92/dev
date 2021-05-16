@@ -1,3 +1,6 @@
+TODO TEST GPS
+TODO TEST INCLUSION WRI
+
 BUG
 	viewtopic point KO
 
