@@ -871,16 +871,16 @@ function controlPermalink(options) {
 			render: render,
 		}),
 		zoomMatch = location.href.match(/zoom=([0-9]+)/),
-		latLonMatch = location.href.match(/lat=([-.0-9]+)&lon=([-.0-9]+)/);
+		latLonMatch = location.href.match(/lat=([-0-9\.]+)&lon=([-.0-9]+)/);
 	let params = (
 			location.href + // Priority to ?map=6/2/47 or #map=6/2/47
 			(zoomMatch && latLonMatch ? // Old format ?zoom=6&lat=47&lon=5
-				'map=' + zoomMatch[1] + '/' + latLonMatch[2] + '/' + latLonMatch[1] :
+				';map=' + zoomMatch[1] + '/' + latLonMatch[2] + '/' + latLonMatch[1] :
 				'') +
 			document.cookie + // Then the cookie
-			'map=' + options.initialFit + // Optional default
-			'map=6/2/47') // Default
-		.match(/map=([0-9]+)\/([-.0-9]+)\/([-.0-9]+)/); // map=<ZOOM>/<LON>/<LAT>
+			';map=' + options.initialFit + // Optional default
+			';map=6/2/47') // Default
+		.match(/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // map=<ZOOM>/<LON>/<LAT>
 
 	if (options.display) {
 		control.element.className = 'ol-permalink';
