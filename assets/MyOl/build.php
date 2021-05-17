@@ -35,11 +35,13 @@ if (!$_GET)
 }
 
 /*
+Automatic rebuild option
 RewriteRule "assets/MyOl/myol.([a-z]+)" "assets/MyOl/build.php?$1" [QSA,L]
 */
 
 if ($_GET) {
 	$out = array_keys($_GET)[0];
+	header ('Content-type: text/'.($out == 'css' ? 'css' : 'javascript'));
 	echo $$out;
 } else {
 ?>
