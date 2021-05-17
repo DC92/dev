@@ -49,17 +49,23 @@ var marker = layerEditGeoJson({
 
 switch (script + '-' + mapType) {
 	case 'viewtopic-point':
-		map.addLayer( // Cadre définissant la position
-			layerEditGeoJson({
-				displayPointId: 'cadre-coords',
-				geoJsonId: 'cadre-json',
-				focus: 15,
-				styleOptions: {
-					image: new ol.style.Icon({
-						src: 'ext/Dominique92/GeoBB/styles/all/theme/images/cadre.png',
-					}),
-				},
-			}));
+		const layer2 = layerEditGeoJson({
+			displayPointId: 'cadre-coords',
+			geoJsonId: 'cadre-json',
+			focus: 15,
+			styleOptions: {
+				image: new ol.style.Icon({
+					src: 'ext/Dominique92/GeoBB/styles/all/theme/images/cadre.png',
+				}),
+			},
+		});
+		map.addLayer(layer2);
+		map.getView().fit(
+			layer2.getSource().getExtent(), {
+				size: map.getSize(),
+				padding: [5, 5, 5, 5],
+			}
+		);
 		break;
 
 	case 'viewtopic-line':
@@ -82,7 +88,7 @@ switch (script + '-' + mapType) {
 	case 'posting-line':
 		map.addLayer(layerEditGeoJson({
 			geoJsonId: 'geojson',
-			snapLayers: [layerGeoBBgis],
+//TODO			snapLayers: [layerGeoBBgis],
 			//BEST centraliser les textes dans MyOl / Traduction anglais ?
 			titleModify: 'Modification d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
