@@ -79,7 +79,8 @@ Voir forum Evolutions & bugs sur chemineur.fr
 
 //TODO BEST CHEMINEUR
 =====================
-/Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
+Purger la base des liens photos externes
+Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 Ne pas afficher les points en doublon (flux wri, prc, c2c)
 cookie = ;SameSite=Strict
 	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');

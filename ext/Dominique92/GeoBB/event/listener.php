@@ -50,11 +50,11 @@ class listener implements EventSubscriberInterface
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
 
-			'core.viewforum_modify_page_title' => 'viewforum_modify_page_title', //TODO A SUPPRIMER APRES MIGRATION O2
+//			'core.viewforum_modify_page_title' => 'viewforum_modify_page_title', //TODO A SUPPRIMER APRES MIGRATION O2
 		];
 	}
 
-//TODO A SUPPRIMER APRES MIGRATION O2
+/*/TODO A SUPPRIMER APRES MIGRATION O2
 	function viewforum_modify_page_title($vars) {
 		$forum_desc = $vars['forum_data']['forum_desc'];
 		$forum_desc = str_replace ('[first=point]</s><e>', '[first=point]</s>.point<e>', $forum_desc);
@@ -67,7 +67,7 @@ class listener implements EventSubscriberInterface
 
 		$sql = "UPDATE ".FORUMS_TABLE." SET forum_desc = \"$forum_desc\", forum_image = \"$forum_image\" WHERE forum_id = ".$vars['forum_data']['forum_id'];
 		$this->db->sql_query($sql);
-	}
+	}*/
 
 	/**
 		COMMON

@@ -93,7 +93,7 @@ class listener implements EventSubscriberInterface
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
 
 		// Includes style files of this extension
-		//TODO explore all active extensions
+		//BEST explore all active extensions
 		/*
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$template->set_style ([
