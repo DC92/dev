@@ -762,11 +762,11 @@ function layerOverpass(options) {
 function overlaysCollection() {
 	return {
 		chemineur: layerChemineur(),
-		//'refuges.info': layerRefugesInfo(),
-		//TODO layerPyreneesRefuges(),
-		//layerC2C(),
-		//layerOverpass(),
-		//Alpages: layerAlpages(),
+		'refuges.info': layerRefugesInfo(),
+		'Pyrenees-Refuges.com': layerPyreneesRefuges(),
+		CampToCamp: layerC2C(),
+		OSM: layerOverpass(),
+		Alpages: layerAlpages(),
 	};
 }
 

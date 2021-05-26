@@ -66,7 +66,6 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers(); // Init layers
 
 		// Attach html overlays selector
-		//TODO BUG z-index over other controls
 		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);

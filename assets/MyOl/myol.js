@@ -14,7 +14,7 @@ if (!mapKeys) var mapKeys = {};
 
 //HACK IE polyfills
 // Need to transpile ol.js with: https://babeljs.io/repl  BROWSERS = default
-//TODO try :::   controls: defaultControls().extend([new RotateNorthControl()]),
+//BEST try :::   controls: defaultControls().extend([new RotateNorthControl()]),
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
@@ -576,7 +576,6 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers(); // Init layers
 
 		// Attach html overlays selector
-		//TODO BUG z-index over other controls
 		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);
@@ -1403,11 +1402,11 @@ function layerOverpass(options) {
 function overlaysCollection() {
 	return {
 		chemineur: layerChemineur(),
-		//'refuges.info': layerRefugesInfo(),
-		//TODO layerPyreneesRefuges(),
-		//layerC2C(),
-		//layerOverpass(),
-		//Alpages: layerAlpages(),
+		'refuges.info': layerRefugesInfo(),
+		'Pyrenees-Refuges.com': layerPyreneesRefuges(),
+		CampToCamp: layerC2C(),
+		OSM: layerOverpass(),
+		Alpages: layerAlpages(),
 	};
 }
 

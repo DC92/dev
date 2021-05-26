@@ -5,7 +5,7 @@ if (!mapKeys) var mapKeys = {};
 
 //HACK IE polyfills
 // Need to transpile ol.js with: https://babeljs.io/repl  BROWSERS = default
-//TODO try :::   controls: defaultControls().extend([new RotateNorthControl()]),
+//BEST try :::   controls: defaultControls().extend([new RotateNorthControl()]),
 if (!Object.assign)
 	Object.assign = function() {
 		let r = {};
