@@ -165,6 +165,9 @@ function twig_environment_render_template_after($vars) {
 		$post_data = $this->all_post_data[$post_id] ?: [];
 		$topic_data = $vars['topic_data'];
 
+		// Supprime les balises inutiles pour l'affichage complet
+		$post_row['MESSAGE'] = str_replace (['(resume)','(/resume)'], '', $post_row['MESSAGE']);
+
 		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
@@ -384,6 +387,33 @@ function twig_environment_render_template_after($vars) {
 		}
 
 		// Add / correct the specific BBcodes
+/*
+//BBCODES
+actualite
+ancre
+carte
+centre
+doc
+droite
+gauche
+php include
+location
+page
+presentation
+php redirect
+php resume
+rubrique
+saut_ligne
+separation
+surligne
+titre1
+titre2
+titre3
+titre4
+video
+youtube
+*/
+
 /* Activer uniquement pour créer un nouveau site ou updater les BBCODES
 		$this->add_bbcode([
 			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
@@ -412,7 +442,9 @@ function twig_environment_render_template_after($vars) {
 			['[actualite]{TEXT}[/actualite]','(resume){TEXT}(/resume)'],
 			['[presentation]{TEXT}[/presentation]','(resume){TEXT}(/resume)','Presentation pour affichage dans la rubrique'],
 		]);
+		*/
 	}
+/*
 	function add_bbcode($bb) {
 		// Récupère le prochain bbcode_id libre
 		$sql = 'SELECT MAX(bbcode_id) as max_bbcode_id FROM '. BBCODES_TABLE;

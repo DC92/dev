@@ -1,5 +1,7 @@
-TODO TEST GPS
-TODO TEST INCLUSION WRI
+NEW MYOL
+	Couches vectorielles
+	TEST GPS
+	TEST INCLUSION WRI
 
 BUG
 	viewtopic point KO
@@ -19,7 +21,7 @@ BUG ne pas afficher ~ sur massif & altitude
 	listener viewtopic $topic_row['geo_massif'] = @$ms[array_keys($ms)
 
 INVESTIGATION
-	WRI bug uncheck massifs, go to a page & come back
+	Chemineur : basculement ne recharge pas les js ???
 	BUG ??? pictos clignotent (idem WRI)
 	Pourquoi post_attachment = 0 si on a une image ?
 	Suppression fichier attach ne supprime pas l'attachment.
@@ -120,6 +122,9 @@ Consulter l'historique des éditions
 
 TODO WRI
 ========
+Pas de favicon dans S20 accueil FF
+Lien le forum est vide, => lien ne marche pas
+Auteur demande corrections
 GPS : reprendre le baselayers de WRI (pas de google)
 service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
@@ -129,13 +134,6 @@ L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté 
 	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
 Déraciner le wiki / le mettre dans le forum
 
-HORS CODE
-=========
-Créer les massifs manquants à chemineur
-Inclure scan_liens.php dans /ressources/outils/...
-Mettre le format date sur tous les users
-Faire une fiche de tests
-
 WRI API
 =======
 Langage ACP / ADM, ... (menu haut page)
@@ -143,6 +141,12 @@ Bug remontée MultiPolygon / default : null
 Erreur: sur geom vide dans un polynome
 Durée cache réglable
 Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->geometrie !!
+
+WRI HORS CODE
+=============
+Inclure scan_liens.php dans /ressources/outils/...
+Mettre le format date sur tous les users
+Faire une fiche de tests
 
 AIDE TEST
 =========

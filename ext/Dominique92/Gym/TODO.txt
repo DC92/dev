@@ -1,7 +1,12 @@
 //BUG Ordre actualités / dates
+//BUG (resume) (/resume) -> ne pas afficher quand post complet
+
 //Titre actualité et ecart entre les paragraphes
 	//BEST reprendre en CSS les écarts enre ligne et avant et aprés les resumes
 // Ne pas afficher le premier post dans les cartes
+
+//TODO randos + GPS
+
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville
@@ -18,3 +23,18 @@
 //BEST ouverture lente sous-menus
 //BEST Glissement latéral pages
 //BEST Initialiser posting lieu position carte sur Chaville
+
+//********
+// INSTALL
+Exporter base / créer et importer
+
+Copier phpBB sauf doc & config.php
+Copier assets/MyOl
+Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
+Copier ext/cleantalk
+Copier ext/phpbb/googleanalytics
+Copier gym3/fichiers
+
+/install -> Mettre à jour
+Supprimer /install
+admin -> Paramètres de cookie -> c92.fr
