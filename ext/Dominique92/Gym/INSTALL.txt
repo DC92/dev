@@ -1,3 +1,23 @@
+//********
+// INSTALL du 30/04/2021
+Exporter base / créer et importer
+
+Copier phpBB sauf doc & config.php
+Copier assets/MyOl
+Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
+Copier ext/cleantalk
+Copier ext/phpbb/googleanalytics
+Copier gym3/fichiers
+
+/install -> Mettre à jour
+Supprimer /install
+admin -> Paramètres de cookie -> c92.fr
+
+// Réunion Clamart
+Catégories (dans le tableau horaires)
+Récupérer le nom de domaine / fermer le support
+
+
 Migration :
 Dupliquer base
 Si chaville.test -> changer dans le SQL
