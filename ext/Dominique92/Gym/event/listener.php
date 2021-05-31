@@ -61,20 +61,8 @@ class listener implements EventSubscriberInterface
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
-'core.twig_environment_render_template_after' => 'twig_environment_render_template_after',//AFTER3 DELETE
 		];
 	}
-
-//AFTER3 DELETE
-function twig_environment_render_template_after($vars) {
-	$vars['output'] = preg_replace_callback (
-		'/\(([A-Z]+) ?([^\)]*)\)/s',
-		function ($match) {
-			return '';
-		},
-		$vars['output']
-	);
-}
 
 	/**
 		ALL
@@ -370,7 +358,6 @@ function twig_environment_render_template_after($vars) {
  			'gym_scolaire',
  			'gym_semaines',
 			'gym_accueil',
-			'gym_actualite',
  			'gym_horaires',
  			'gym_menu',
  			'gym_ordre_menu',
@@ -389,7 +376,7 @@ function twig_environment_render_template_after($vars) {
 		// Add / correct the specific BBcodes
 /*
 //BBCODES
-actualite
+DELETE actualite
 ancre
 carte
 centre
@@ -437,7 +424,7 @@ youtube
 			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut le contenu d\'une url dans la page'],
 			['[redirect]{URL}[/redirect]','{URL}','Redirige la page vers l\'url'],
 
-			//AFTER3 DELETE
+			//TODO AFTER3 DELETE
 			['[accueil]{TEXT}[/accueil]','(resume){TEXT}(/resume)'],
 			['[actualite]{TEXT}[/actualite]','(resume){TEXT}(/resume)'],
 			['[presentation]{TEXT}[/presentation]','(resume){TEXT}(/resume)','Presentation pour affichage dans la rubrique'],
@@ -592,6 +579,14 @@ youtube
 			if($row['gym_horaires'] == 'on' && $row['gym_acces'] == 'ferme')
 				$this->template->assign_var ('ACCES_FERME', true);
 
+			// Fil de la page d'acueil
+			if (@$row['gym_accueil'])
+				$accueil [
+					sprintf("%05d", $row['gym_ordre_menu']).
+					$row['horaire_debut'].
+					$row['post_id'] // Pour séparer les exeaco
+				] = array_change_key_case ($row, CASE_UPPER);
+
 			// Range les résultats dans l'ordre et le groupage espéré
 			$liste [
 				$this->request->variable('template', '') == 'horaires'
@@ -605,6 +600,12 @@ youtube
 			] = array_change_key_case ($row, CASE_UPPER);
 		}
 		$this->db->sql_freeresult($result);
+	
+		if ($accueil) {
+			ksort ($accueil, SORT_STRING);
+			foreach ($accueil AS $k=>$v)
+				$this->template->assign_block_vars ('accueil', $v);
+		}
 
 		if ($liste) {
 			// Tri du 1er niveau

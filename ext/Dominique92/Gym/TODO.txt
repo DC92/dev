@@ -1,10 +1,14 @@
 //BUG Ordre actualités / dates
 //BUG (resume) (/resume) -> ne pas afficher quand post complet
+//BUG tri ordre alphabetique
 
 //Titre actualité et ecart entre les paragraphes
 	//BEST reprendre en CSS les écarts enre ligne et avant et aprés les resumes
 // Ne pas afficher le premier post dans les cartes
 
+//TODO accueil -> page banalisée (plus de accueil / news) suite d'accueils
+	Ordonnés par ordre
+	Avec le titre du post
 //TODO randos + GPS
 
 //BEST mesureur audience
@@ -38,3 +42,7 @@ Copier gym3/fichiers
 /install -> Mettre à jour
 Supprimer /install
 admin -> Paramètres de cookie -> c92.fr
+
+// Réunion Clamart
+Catégories (dans le tableau horaires)
+Récupérer le nom de domaine / fermer le support

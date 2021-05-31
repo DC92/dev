@@ -3,6 +3,27 @@ NEW MYOL
 	TEST GPS
 	TEST INCLUSION WRI
 
+
+EVOLUTION WRI
+Accueil carte
+	installable ?
+	haut
+		nom du site
+		recherche
+		menu déplié ou replié
+	carte / groupes de points
+	liste (ou choix des types de points)
+Point
+
+Abandon cartes massifs (sauf carte spécifique ?)
+
+Fusion commentaire / forum : notion de post descriptif
+
+Pictos geocaching
+
+Pictos fusionnés
+
+
 BUG
 	viewtopic point KO
 

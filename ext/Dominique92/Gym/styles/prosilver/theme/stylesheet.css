@@ -323,10 +323,10 @@ body {
 	float: right;
 	width: 400px;
 	height: 300px;
-	margin-left: 0.7em;
-	padding: 0 !important;
+	padding: 0 0 0 0.5em !important;
 	text-indent: 0;
 	overflow: hidden;
+	background: white;
 }
 .slideshow ul {
 	width: 600%;
