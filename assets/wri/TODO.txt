@@ -1,0 +1,117 @@
+EVOLUTION WRI
+Accueil carte
+	installable ?
+	haut
+		nom du site
+		recherche
+		menu déplié ou replié
+	carte / groupes de points
+	liste (ou choix des types de points)
+Point
+
+Abandon cartes massifs (sauf carte spécifique ?)
+
+Fusion commentaire / forum : notion de post descriptif
+
+Pictos geocaching
+
+Pictos fusionnés
+
+
+TODO WRI
+========
+Pas de favicon dans S20 accueil FF
+Lien le forum est vide, => lien ne marche pas
+Auteur demande corrections
+GPS : reprendre le baselayers de WRI (pas de google)
+service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
+? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+? historique posts phpbb wri (ext/...)
+	Paramétres inclusion posts dans points -> config.php
+L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
+	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
+Déraciner le wiki / le mettre dans le forum
+
+WRI API
+=======
+Langage ACP / ADM, ... (menu haut page)
+Bug remontée MultiPolygon / default : null
+Erreur: sur geom vide dans un polynome
+Durée cache réglable
+Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->geometrie !!
+
+WRI HORS CODE
+=============
+Inclure scan_liens.php dans /ressources/outils/...
+Mettre le format date sur tous les users
+Faire une fiche de tests
+
+AIDE TEST
+=========
+MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
+MultiPolygon avec trou => WRI massif 3127
+
+
+[quote=Dominique post_id=35447 time=1622571806 user_id=216]
+[quote=sly post_id=35445 time=1622555829 user_id=3]la donnée (que léo et dominique ont, je l'espère, en copie) ça devrait faire un remplaçant à peu de pertes.[/quote]
+Sans vouloir te vexer, je n'ai toujours pas réussi à exporter la base de ce foutu PG :twisted: 
+[/quote]
+Je suis prêt à livrer mes terribles et complexes secrets !
+
+En ligne de commande :
+pg_dump -u refuges refuges > refuges.sql
+
+et en version encore plus simple, le dossier /home/sql_dumps/  accessible à ton user dom contient un export chaque soir de la base "refuges.sql.gz"
+La complexité se situant plutôt dans l'automatisation de cette récupération (le machin fait 70Mo donc ça va) par un mécanisme qui ne sera pas passé en perte et profit dans 10ans quand il y en aura besoin !
+
+[quote=Dominique post_id=35447 time=1622571806 user_id=216]
+Ni à réinstaller le code sur un autre serveur (Grrr PG :twisted: )
+[/quote]
+
+PG est quand même dispo chez pas mal d'hébergeurs, toutefois, je répète au cas où : je n'ai rien contre un retour à MySQL, toutefois, j'ai rangé ça dans de la perte de temps, car ça va faire un gros boulot, pour un gain trop réduit. Mais si quelqu'un n'a pas peur de s'y frotter, il a mon feu vert (je suis d'ailleurs moi même bien plus à l'aise avec MySQL qu'avec PG)
+
+
+[quote=Dominique post_id=35447 time=1622571806 user_id=216]
+P.S. tu négliges la conf apache et les versions de PG. Pour avoir essayé de faire tourner le code sur un autre serveur, je te garantis qu'il y a de fortes dépendances.
+[/quote]
+
+C'est juste qu'on est pas en face de chrome, wri n'a pas de raison valable d'être installable en 3 clics vu qu'il ne se destine pas a être installé en beaucoup d'instances.
+Et un informaticien ayant un peu d'aisance en linux/php/PG ne devrait pas trop rencontrer de difficultés à le refaire tourner.
+
+[quote=Dominique post_id=35447 time=1622571806 user_id=216]
+Rappelle-toi que nous avons eu cette discussion il y a un certain temps et que tu m'as donné quelque chose de beaucoup plus utile : l'adresse de 2 copains qui connaissent le code (et bien d'autres choses qui seraient nécessaires pour continuer l'œuvre)
+[/quote]
+
+Parfait, mais on pourrait en rajouter un 3ème : toi, n'ayant ainsi plus besoin de personne pour récupérer db, photos et code du domaine. Sachant que tu es in finé, bien plus au courant de comment tout cela s'articule qu'eux.
+Le registrar du domaine (Gandi) a d'ailleurs changé sa procédure il y a ~4ans, permettant maintenant d'être autant d'intervenant que voulu pour piloter un domaine, ce qui n'était pas le cas avant.
+Je peux, si cela te convient, et moyennant la création d'un compte sur : https://account.gandi.net/fr/create_account t'ajouter en full accès sur le domaine. Cela apportera aussi des solutions pour gérer les emails du domaine, le renouvellement si j'ai oublié par accident pendant mes vacances et bien sûr reprendre la gestion total du bidule.
+
+[quote=Dominique post_id=35447 time=1622571806 user_id=216]
+Une bonne idée serait de les donner aussi à Léo (dès fois qu'il me viendrait l'idée de me barrer avec toi aux Kerguelen)
+[/quote]
+ça me convient aussi, si ça convient à léo, en multipliant les personnes de confiance, on reproduit un peu le mécanisme d'une association de fait ou plusieurs intervenant ont du pouvoir pour le projet.
+
+[quote=Dominique post_id=35447 time=1622571806 user_id=216]
+je pense que Léo ou moi reprendrions plutôt un site en préservant l'essentiel des infos et de l'esprit, mais sur des bases nouvelles aussi bien en termes d'hébergement que de présentation.
+[/quote]
+Tant qu'il y a l'esprit de demander aux contributeurs leurs avis, c'est parfait. Ils vous empêcheront (ou pas !) de tout mettre dans un phpBB mal ergonomique ou dans un bidule full js/angular
+(je taquine, mais tu viens de dire qu'il n'est pas nécessaire d'être toujours d'accord !  :lol: )
+
+Bonjour Léo
+
+Merci pour ce retour précis. 
+Premières impressions :
+
+Je suis globalement d'accord avec tes remarques sur la cartographie d'autant qu'elles sont récurentes. Je ferai des propositions un peu plus tard (il y a du boulot)
+
+Évidemment, il y a beaucoup de matière dans ta première intervention. Je reprendrai les points à rythme réfléchi. Comme notre communauté à l'habitude du travail par consensus, ça peut être intéressant. 
+
+Je serais intéressé par quelques exemples d'ergonomie moins  "datées". Kabano est il reparti ? (au moins une version de test)
+
+Je suis d'accord avec toi que l'évolution d'un site de référence n'est pas une chose facile (il ne faut pas déstabiliser l'acquis) et gagne tout à passer par des "pousses" qui ont toute leur autonomie de créativité. 
+C'est pourquoi j'ai créé chemineur avec Claude, labo entre autre de petites évolutions qui ont profité à WRI
+Utiliser Kabano dans ce sens me semble une bonne idée. 
+
+Il est très important que des gens comme toi, qui ont une autre vue et un contact avec des utilisateurs nous nourrissent d'idées (même si on ne promet pas de prendre tout comme dit SLY)
+
+N'hésite pas à être iconoclaste et critique. Même si ce n'est pas toujours agréable de voir son œuvre remise en cause, on ne t'en voudra jamais d'éclairer la route devant nous.

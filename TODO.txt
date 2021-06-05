@@ -4,26 +4,6 @@ NEW MYOL
 	TEST INCLUSION WRI
 
 
-EVOLUTION WRI
-Accueil carte
-	installable ?
-	haut
-		nom du site
-		recherche
-		menu déplié ou replié
-	carte / groupes de points
-	liste (ou choix des types de points)
-Point
-
-Abandon cartes massifs (sauf carte spécifique ?)
-
-Fusion commentaire / forum : notion de post descriptif
-
-Pictos geocaching
-
-Pictos fusionnés
-
-
 BUG
 	viewtopic point KO
 
@@ -58,6 +38,7 @@ Sélecteur de couches
 	BEST Sélecteur de features sur c2c, PRC, Alpages
 
 MyOl
+	TODO pictos fusionnés
 	étiquettes en survol de point quand lien, perd focus ???
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 	editeur ligne zone sensible edit ligne plus grande
@@ -140,39 +121,6 @@ Un sujet est actif quand il y a eu des contributions récentes.
 Création / Edition de traces
 Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
 Consulter l'historique des éditions
-
-TODO WRI
-========
-Pas de favicon dans S20 accueil FF
-Lien le forum est vide, => lien ne marche pas
-Auteur demande corrections
-GPS : reprendre le baselayers de WRI (pas de google)
-service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
-? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
-? historique posts phpbb wri (ext/...)
-	Paramétres inclusion posts dans points -> config.php
-L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
-	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
-Déraciner le wiki / le mettre dans le forum
-
-WRI API
-=======
-Langage ACP / ADM, ... (menu haut page)
-Bug remontée MultiPolygon / default : null
-Erreur: sur geom vide dans un polynome
-Durée cache réglable
-Passage template <?...?> des vues/api // vues/api => repli si pas de $polygone->geometrie !!
-
-WRI HORS CODE
-=============
-Inclure scan_liens.php dans /ressources/outils/...
-Mettre le format date sur tous les users
-Faire une fiche de tests
-
-AIDE TEST
-=========
-MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
-MultiPolygon avec trou => WRI massif 3127
 
 ALPAGES
 =======
