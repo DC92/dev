@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="images/favicon.png" rel="icon" type="image/png" />
+
+	<!-- Openlayers -->
+	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- Proj4 projections Swiss -->
+	<script src="../proj4/proj4-src.js"></script>
+
+	<!-- My Openlayers -->
+	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
+	<link  href="../src/myol.css" type="text/css" rel="stylesheet">
+	<script src="../src/header.js"></script>
+	<script src="../src/checkboxManager.js"></script>
+	<script src="../src/tileLayers.js"></script>
+	<script src="../src/layerSwitcher.js"></script>
+	<script src="../src/myol.js"></script>
+
+	<!-- This exemple -->
+	<script src="newvector.js" defer></script>
+	<style>
+		#map {
+			width: 90vw;
+			height: 60vw;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="map"></div>
+</body>
+</html>

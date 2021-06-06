@@ -6,8 +6,11 @@ NEW MYOL
 
 BUG
 	viewtopic point KO
+	MyOl label points reste sur layerswitcher
+	Mauvais empilement des layers (overlay avant base) : c'est un feature de ol.Map
 
 BEST ext/gis arrondir les lon,lat
+	MyOl feature.get('features')
 
 BUG bloquants
 	Les pictos ont disparu sur V3
