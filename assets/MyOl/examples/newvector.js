@@ -47,7 +47,7 @@ const chemLayer = new ol.layer.Vector({
             }),
             text: new ol.style.Text({
                 text: feature.get('features').length.toString(),
-				font: '16px Calibri,sans-serif',
+                font: '16px Calibri,sans-serif',
                 fill: new ol.style.Fill({
                     color: 'red',
                 }),
@@ -59,7 +59,6 @@ const chemLayer = new ol.layer.Vector({
 
         const typewri = feature.getProperties().type; // WRI
         icon = feature.getProperties().icon; // Chemineur
-
 
         if (typewri)
             icon = 'http://www.refuges.info/images/icones/' + typewri.icone + '.svg';
@@ -88,6 +87,9 @@ const hoverStyle = new ol.style.Style({
     hoverLayer = new ol.layer.Vector({
         source: new ol.source.Vector(),
         style: function(feature) {
+            if (feature.getProperties().features.length == 1)
+                feature = feature.getProperties().features[0];
+
             hoverStyle.getText().setText(feature.get('name') || feature.get('nom'));
             return hoverStyle;
         },
@@ -127,11 +129,15 @@ map.on('pointermove', function(evt) {
 });
 
 map.on('click', function(evt) {
-    const feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+    let feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
         return feature;
     });
+
+    if (feature.getProperties().features.length == 1)
+        feature = feature.getProperties().features[0];
+
     if (feature) {
-        const link = feature.getProperties().link;
+        const link = feature.getProperties().link || feature.getProperties().lien;
         if (link) {
             if (evt.originalEvent.ctrlKey) {
                 const tab = window.open(link, '_blank');
