@@ -49,7 +49,6 @@ const chemLayer = new ol.layer.Vector({
 				}),
 			}),
 			text: new ol.style.Text({
-				text: feature.get('features').length.toString(),
 				font: '14px Calibri,sans-serif',
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -60,13 +59,13 @@ const chemLayer = new ol.layer.Vector({
 			}),
 		});
 
-		if (feature.getProperties().features.length == 1) {
+		if (feature.getProperties().features.length == 1)
 			feature = feature.getProperties().features[0];
-			//style.getText().setText(feature.get('name') || feature.get('nom'));
-		}
+		else
+			style.getText().setText(feature.get('features').length.toString());
 
-		const typewri = feature.getProperties().type; // WRI
-		icon = feature.getProperties().icon; // Chemineur
+		const typewri = feature.get('type'); // WRI
+		icon = feature.get('icon'); // Chemineur
 
 		if (typewri)
 			icon = 'http://www.refuges.info/images/icones/' + typewri.icone + '.svg';
@@ -123,7 +122,8 @@ const map = new ol.Map({
 
 map.on('moveend', function(evt) {
 	const zoom = evt.target.getView().getZoom(),
-		distance = Math.max(8, Math.min(10 * (13 - zoom), 50));
+		distance = Math.max(8, Math.min((14 - zoom) * 20, 60));
+
 	clusterSource.setDistance(distance);
 });
 
@@ -135,13 +135,15 @@ map.on('pointermove', function(evt) {
 		});
 
 	if (feature !== hoveredFeature) {
-		//TODO changer le curseur
 		if (hoveredFeature) {
 			hoverLayer.getSource().removeFeature(hoveredFeature);
-		}
-		if (feature) {
+			map.getViewport().style.cursor = 'default';
+		} else if (feature.getProperties().features.length == 1)
+			map.getViewport().style.cursor = 'pointer';
+
+		if (feature)
 			hoverLayer.getSource().addFeature(feature);
-		}
+
 		hoveredFeature = feature;
 	}
 });
@@ -151,11 +153,11 @@ map.on('click', function(evt) {
 		return feature;
 	});
 
-	if (feature.getProperties().features.length == 1)
+	if (feature && feature.getProperties().features.length == 1)
 		feature = feature.getProperties().features[0];
 
 	if (feature) {
-		const link = feature.getProperties().link || feature.getProperties().lien;
+		const link = feature.get('link') || feature.get('lien');
 		if (link) {
 			if (evt.originalEvent.ctrlKey) {
 				const tab = window.open(link, '_blank');
