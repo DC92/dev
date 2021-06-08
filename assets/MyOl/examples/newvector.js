@@ -3,7 +3,7 @@ const source = new ol.source.Vector({
 	format: new ol.format.GeoJSON(),
 	strategy: ol.loadingstrategy.bbox,
 	url: function(extent, resolution, projection) {
-		// Retreive checked parameters
+		//TODO Retreive checked parameters
 		/*			let list = permanentCheckboxList(options.selectorName).filter(
 							function(evt) {
 								return evt !== 'on'; // Except the "all" input (default value = "on")
@@ -29,10 +29,10 @@ source.on('change', function(evt) {
 const clusterSource = new ol.source.Cluster({
 	distance: 32,
 	source: source,
-	WWWW_geometryFunction: function(feature) {
-		//TODO getInteriorPoint() for polygons
-		return feature.getGeometry();
-	}
+	/*	geometryFunction: function(feature) {
+			//TODO getInteriorPoint() for polygons
+			return feature.getGeometry();
+		}*/
 });
 
 const chemLayer = new ol.layer.Vector({
@@ -79,6 +79,8 @@ const chemLayer = new ol.layer.Vector({
 });
 
 // Hover
+let hoveredFeature;
+
 const hoverStyle = new ol.style.Style({
 		text: new ol.style.Text({
 			font: '16px Calibri,sans-serif',
@@ -94,10 +96,20 @@ const hoverStyle = new ol.style.Style({
 	hoverLayer = new ol.layer.Vector({
 		source: new ol.source.Vector(),
 		style: function(feature) {
-			if (feature.getProperties().features.length == 1)
+			if (feature.getProperties().features.length == 1) {
 				feature = feature.getProperties().features[0];
 
-			hoverStyle.getText().setText(feature.get('name') || feature.get('nom'));
+				hoverStyle.getText().setText(feature.get('name') || feature.get('nom') || 'yyyy');
+			} else {
+				const fs = feature.getProperties().features,
+					txts = []
+				for (let fss in fs)
+					txts.push(fs[fss].getProperties().nom);
+				hoverStyle.getText().setText(txts.length < 8 ?
+					txts.join('\n') :
+					txts.length + ' elements'
+				);
+			}
 			return hoverStyle;
 		},
 	});
@@ -120,6 +132,7 @@ const map = new ol.Map({
 	}),
 });
 
+// Adapt the distance to the zoom
 map.on('moveend', function(evt) {
 	const zoom = evt.target.getView().getZoom(),
 		distance = Math.max(8, Math.min((14 - zoom) * 20, 60));
@@ -127,7 +140,7 @@ map.on('moveend', function(evt) {
 	clusterSource.setDistance(distance);
 });
 
-let hoveredFeature;
+// Hovering a feature
 map.on('pointermove', function(evt) {
 	const pixel = map.getEventPixel(evt.originalEvent),
 		feature = map.forEachFeatureAtPixel(pixel, function(feature) {
@@ -145,6 +158,7 @@ map.on('pointermove', function(evt) {
 			hoverLayer.getSource().addFeature(feature);
 
 		hoveredFeature = feature;
+		//TODO more labelling when hover
 	}
 });
 
