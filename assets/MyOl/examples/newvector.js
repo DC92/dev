@@ -22,14 +22,16 @@ const source = new ol.source.Vector({
 	},
 });
 
+function normalize(f) {
+	f.set('name', f.get('nom'));
+	f.set('link', f.get('lien'));
+	f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
+}
+
 // Normalize properties
 source.on('featuresloadend', function(evt) {
-	for (let k in evt.features) {
-		const f = evt.features[k];
-		f.set('name', f.get('nom'));
-		f.set('link', f.get('lien'));
-		f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
-	}
+	for (let k in evt.features)
+		normalize(evt.features[k]);
 });
 
 const clusterSource = new ol.source.Cluster({
@@ -80,42 +82,107 @@ const chemLayer = new ol.layer.Vector({
 	},
 });
 
-// Hover
-let hoveredFeature;
-
-const hoverStyle = new ol.style.Style({
-		text: new ol.style.Text({
-			font: '16px Calibri,sans-serif',
-			fill: new ol.style.Fill({
-				color: 'blue',
-			}),
-			stroke: new ol.style.Stroke({
-				color: 'white',
-				width: 10,
-			}),
-		}),
-	}),
-	hoverLayer = new ol.layer.Vector({
-		source: new ol.source.Vector(),
-		style: function(feature) {
-			if (feature.getProperties().features.length == 1) {
-				feature = feature.getProperties().features[0];
-
-				hoverStyle.getText().setText(feature.get('name'));
-			} else {
-				const fs = feature.getProperties().features,
-					txts = [];
-				for (let fss in fs)
-					txts.push(fs[fss].get('name'));
-				hoverStyle.getText().setText(txts.length < 8 ?
-					txts.join('\n') :
-					txts.length + ' elements'
-				);
-			}
-			return hoverStyle;
-		},
+/**
+ * Control to display labels on hover a feature & execute click
+ * feature.properties.name : name to label the feature
+ * feature.properties.link : link to call when click on the feature
+ */
+function controlHover() {
+	const control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
 	});
 
+	let hoveredFeature;
+
+	const hoverStyle = new ol.style.Style({
+			text: new ol.style.Text({
+				font: '16px Calibri,sans-serif',
+				fill: new ol.style.Fill({
+					color: 'blue',
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'white',
+					width: 10,
+				}),
+			}),
+		}),
+		hoverLayer = new ol.layer.Vector({
+			source: new ol.source.Vector(),
+			zIndex: 10, // Above the features
+			style: function(feature) {
+				if (feature.getProperties().features.length == 1) {
+					feature = feature.getProperties().features[0];
+
+					hoverStyle.getText().setText(feature.get('name'));
+				} else {
+					const fs = feature.getProperties().features,
+						txts = [];
+					for (let fss in fs)
+						txts.push(fs[fss].get('name'));
+					hoverStyle.getText().setText(txts.length < 8 ?
+						txts.join('\n') :
+						txts.length + ' elements'
+					);
+				}
+				return hoverStyle;
+			},
+		});
+
+	control.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		map.addLayer(hoverLayer);
+
+		// Hovering a feature
+		map.on('pointermove', function(evt) {
+			const pixel = map.getEventPixel(evt.originalEvent),
+				feature = map.forEachFeatureAtPixel(pixel, function(feature) {
+					return feature;
+				});
+
+			if (feature !== hoveredFeature) {
+				if (hoveredFeature) {
+					hoverLayer.getSource().removeFeature(hoveredFeature);
+					map.getViewport().style.cursor = 'default';
+				} else if (feature.getProperties().features.length == 1)
+					map.getViewport().style.cursor = 'pointer';
+
+				if (feature)
+					hoverLayer.getSource().addFeature(feature);
+
+				hoveredFeature = feature;
+				//TODO more labelling when hover
+			}
+		});
+
+		// Click action
+		map.on('click', function(evt) {
+			let feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+				return feature;
+			});
+
+			if (feature && feature.getProperties().features.length == 1)
+				feature = feature.getProperties().features[0];
+
+			if (feature) {
+				const link = feature.get('link');
+				if (link) {
+					if (evt.originalEvent.ctrlKey) {
+						const tab = window.open(link, '_blank');
+						if (evt.originalEvent.shiftKey)
+							tab.focus();
+					} else
+						window.location = link;
+				}
+			}
+		});
+	};
+	return control;
+}
+
+/**
+ * Example
+ */
 // Map
 const map = new ol.Map({
 	target: 'map',
@@ -127,6 +194,7 @@ const map = new ol.Map({
 		controlMousePosition(),
 		new ol.control.Zoom(),
 		controlFullScreen(),
+		controlHover(),
 	],
 	view: new ol.View({
 		center: [700000, 5700000],
@@ -142,48 +210,4 @@ map.on('moveend', function(evt) {
 	clusterSource.setDistance(distance);
 });
 
-// Hovering a feature
-map.on('pointermove', function(evt) {
-	const pixel = map.getEventPixel(evt.originalEvent),
-		feature = map.forEachFeatureAtPixel(pixel, function(feature) {
-			return feature;
-		});
-
-	if (feature !== hoveredFeature) {
-		if (hoveredFeature) {
-			hoverLayer.getSource().removeFeature(hoveredFeature);
-			map.getViewport().style.cursor = 'default';
-		} else if (feature.getProperties().features.length == 1)
-			map.getViewport().style.cursor = 'pointer';
-
-		if (feature)
-			hoverLayer.getSource().addFeature(feature);
-
-		hoveredFeature = feature;
-		//TODO more labelling when hover
-	}
-});
-
-map.on('click', function(evt) {
-	let feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
-		return feature;
-	});
-
-	if (feature && feature.getProperties().features.length == 1)
-		feature = feature.getProperties().features[0];
-
-	if (feature) {
-		const link = feature.get('link');
-		if (link) {
-			if (evt.originalEvent.ctrlKey) {
-				const tab = window.open(link, '_blank');
-				if (evt.originalEvent.shiftKey)
-					tab.focus();
-			} else
-				window.location = link;
-		}
-	}
-});
-
 map.addLayer(chemLayer);
-map.addLayer(hoverLayer);
