@@ -924,7 +924,7 @@ function controlPermalink(options) {
 }
 
 /**
- * Control to displays the mouse position
+ * Control to display the mouse position
  */
 function controlMousePosition() {
 	return new ol.control.MousePosition({
@@ -936,7 +936,7 @@ function controlMousePosition() {
 }
 
 /**
- * Control to displays the length of a line overflown
+ * Control to display the length of a line overflown
  * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {

@@ -1,89 +1,100 @@
 // Vector layer
-function normalize(f) {
-	f.set('name', f.get('nom'));
-	f.set('link', f.get('lien'));
-	f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
+function layerChem() {
+	return layerVector({
+		urlBase: '//chemineur.fr/',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?bbox=',
+	});
 }
 
-var clusterSource;
-
-function layerVector() {
-	const source = new ol.source.Vector({
-		format: new ol.format.GeoJSON(),
-		strategy: ol.loadingstrategy.bbox,
-		url: function(extent, resolution, projection) {
-			//TODO Retreive checked parameters
-			/*			let list = permanentCheckboxList(options.selectorName).filter(
-								function(evt) {
-									return evt !== 'on'; // Except the "all" input (default value = "on")
-								}),*/
-			let bbox = null;
-
-			if (ol.extent.getWidth(extent) != Infinity) {
-				bbox = ol.proj.transformExtent(
-					extent,
-					projection.getCode(),
-					'EPSG:4326' // Received projection
-				);
-			}
-			//return '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?bbox=' + bbox.join(',');
-			return '//www.refuges.info/api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=' + bbox.join(',');
+function layerWRI() {
+	return layerVector({
+		urlBase: '//www.refuges.info/',
+		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
+		normalize: function(f) {
+			f.set('name', f.get('nom'));
+			f.set('link', f.get('lien'));
+			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
 		},
 	});
+}
+
+function layerVector(options) {
+	const source = new ol.source.Vector({
+			format: new ol.format.GeoJSON(),
+			strategy: ol.loadingstrategy.bbox,
+			url: function(extent, resolution, projection) {
+				//TODO Retreive checked parameters
+				/*			let list = permanentCheckboxList(options.selectorName).filter(
+									function(evt) {
+										return evt !== 'on'; // Except the "all" input (default value = "on")
+									}),*/
+				let bbox = null;
+
+				if (ol.extent.getWidth(extent) != Infinity) {
+					bbox = ol.proj.transformExtent(
+						extent,
+						projection.getCode(),
+						'EPSG:4326' // Received projection
+					);
+				}
+				return options.urlBase + // url base that can define different services (E.G. server domain and/or directory)
+					(options.urlSuffix || '') + // url suffix to be defined separately from the urlBase
+					bbox.join(','); //TODO option sans BBox
+			},
+		}),
+		clusterSource = new ol.source.Cluster({
+			distance: 32,
+			source: source,
+			/*	geometryFunction: function(feature) {
+					//TODO getInteriorPoint() for polygons
+					return feature.getGeometry();
+				}*/
+		}),
+		layer = new ol.layer.Vector({
+			source: clusterSource,
+			style: function(feature) {
+				const style = new ol.style.Style({
+					image: new ol.style.Circle({
+						radius: 14,
+						stroke: new ol.style.Stroke({
+							color: 'blue',
+						}),
+						fill: new ol.style.Fill({
+							color: 'white',
+						}),
+					}),
+					text: new ol.style.Text({
+						font: '14px Calibri,sans-serif',
+						stroke: new ol.style.Stroke({
+							color: 'blue',
+						}),
+						fill: new ol.style.Fill({
+							color: 'blue',
+						}),
+					}),
+				});
+
+				if (feature.getProperties().features.length == 1)
+					feature = feature.getProperties().features[0];
+				else
+					style.getText().setText(feature.get('features').length.toString());
+
+				const icon = feature.get('icon');
+				if (icon)
+					style.setImage(new ol.style.Icon({
+						src: icon,
+					}));
+
+				return style;
+			},
+		});
 
 	// Normalize properties
-	source.on('featuresloadend', function(evt) {
-		for (let k in evt.features)
-			normalize(evt.features[k]);
-	});
-
-	clusterSource = new ol.source.Cluster({
-		distance: 32,
-		source: source,
-		/*	geometryFunction: function(feature) {
-				//TODO getInteriorPoint() for polygons
-				return feature.getGeometry();
-			}*/
-	});
-
-	const layer = new ol.layer.Vector({
-		source: clusterSource,
-		style: function(feature) {
-			const style = new ol.style.Style({
-				image: new ol.style.Circle({
-					radius: 14,
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-					}),
-					fill: new ol.style.Fill({
-						color: 'white',
-					}),
-				}),
-				text: new ol.style.Text({
-					font: '14px Calibri,sans-serif',
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-					}),
-					fill: new ol.style.Fill({
-						color: 'blue',
-					}),
-				}),
-			});
-
-			if (feature.getProperties().features.length == 1)
-				feature = feature.getProperties().features[0];
-			else
-				style.getText().setText(feature.get('features').length.toString());
-
-			const icon = feature.get('icon');
-			if (icon)
-				style.setImage(new ol.style.Icon({
-					src: icon,
-				}));
-
-			return style;
-		},
-	});
+	if (typeof options.normalize == 'function')
+		source.on('featuresloadend', function(evt) {
+			for (let k in evt.features)
+				options.normalize(evt.features[k]);
+		});
 
 	// Tune the clustering distance following the zoom leval
 	layer.on('prerender', function(evt) {
@@ -217,4 +228,5 @@ const map = new ol.Map({
 	}),
 });
 
-map.addLayer(layerVector());
+map.addLayer(layerWRI());
+map.addLayer(layerChem());
