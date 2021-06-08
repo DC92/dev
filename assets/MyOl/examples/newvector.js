@@ -22,8 +22,14 @@ const source = new ol.source.Vector({
 	},
 });
 
-source.on('change', function(evt) {
-	//TODO Load status ???
+// Normalize properties
+source.on('featuresloadend', function(evt) {
+	for (let k in evt.features) {
+		const f = evt.features[k];
+		f.set('name', f.get('nom'));
+		f.set('link', f.get('lien'));
+		f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
+	}
 });
 
 const clusterSource = new ol.source.Cluster({
@@ -64,11 +70,7 @@ const chemLayer = new ol.layer.Vector({
 		else
 			style.getText().setText(feature.get('features').length.toString());
 
-		const typewri = feature.get('type'); // WRI
-		icon = feature.get('icon'); // Chemineur
-
-		if (typewri)
-			icon = 'http://www.refuges.info/images/icones/' + typewri.icone + '.svg';
+		const icon = feature.get('icon');
 		if (icon)
 			style.setImage(new ol.style.Icon({
 				src: icon,
@@ -99,12 +101,12 @@ const hoverStyle = new ol.style.Style({
 			if (feature.getProperties().features.length == 1) {
 				feature = feature.getProperties().features[0];
 
-				hoverStyle.getText().setText(feature.get('name') || feature.get('nom') || 'yyyy');
+				hoverStyle.getText().setText(feature.get('name'));
 			} else {
 				const fs = feature.getProperties().features,
-					txts = []
+					txts = [];
 				for (let fss in fs)
-					txts.push(fs[fss].getProperties().nom);
+					txts.push(fs[fss].get('name'));
 				hoverStyle.getText().setText(txts.length < 8 ?
 					txts.join('\n') :
 					txts.length + ' elements'
@@ -171,7 +173,7 @@ map.on('click', function(evt) {
 		feature = feature.getProperties().features[0];
 
 	if (feature) {
-		const link = feature.get('link') || feature.get('lien');
+		const link = feature.get('link');
 		if (link) {
 			if (evt.originalEvent.ctrlKey) {
 				const tab = window.open(link, '_blank');
