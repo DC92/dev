@@ -85,15 +85,14 @@ function layerVector() {
 		},
 	});
 
-	/*//TODO attach to map
-	// Adapt the distance to the zoom
-	map.on('moveend', function(evt) {
-		const zoom = evt.target.getView().getZoom(),
-			distance = Math.max(8, Math.min((14 - zoom) * 20, 60));
-
-		clusterSource.setDistance(distance);
+	// Tune the clustering distance following the zoom leval
+	layer.on('prerender', function(evt) {
+		clusterSource.setDistance(
+			Math.max(8, Math.min(60, // Distance bounds
+				// get the transform ratio from the layer frameState
+				evt.frameState.pixelToCoordinateTransform[0]
+			)));
 	});
-	*/
 
 	return layer;
 }

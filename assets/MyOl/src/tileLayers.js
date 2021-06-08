@@ -126,7 +126,7 @@ function layerIGN(layer, format, key) {
 /**
  * Layers with not all resolutions or area available
  * Virtual class
- * Displays Stamen outside the layer zoom range or extend
+ * Display Stamen outside the layer zoom range or extend
  * Requires myol:onadd
  */
 //BEST document all options in options = Object.assign
