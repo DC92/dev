@@ -1,86 +1,102 @@
 // Vector layer
-const source = new ol.source.Vector({
-	format: new ol.format.GeoJSON(),
-	strategy: ol.loadingstrategy.bbox,
-	url: function(extent, resolution, projection) {
-		//TODO Retreive checked parameters
-		/*			let list = permanentCheckboxList(options.selectorName).filter(
-							function(evt) {
-								return evt !== 'on'; // Except the "all" input (default value = "on")
-							}),*/
-		let bbox = null;
-
-		if (ol.extent.getWidth(extent) != Infinity) {
-			bbox = ol.proj.transformExtent(
-				extent,
-				projection.getCode(),
-				'EPSG:4326' // Received projection
-			);
-		}
-		//return 'https://chemineur.fr/ext/Dominique92/GeoBB/gis.php?bbox=' + bbox.join(',');
-		return 'http://www.refuges.info/api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=' + bbox.join(',');
-	},
-});
-
 function normalize(f) {
 	f.set('name', f.get('nom'));
 	f.set('link', f.get('lien'));
 	f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
 }
 
-// Normalize properties
-source.on('featuresloadend', function(evt) {
-	for (let k in evt.features)
-		normalize(evt.features[k]);
-});
+var clusterSource;
 
-const clusterSource = new ol.source.Cluster({
-	distance: 32,
-	source: source,
-	/*	geometryFunction: function(feature) {
-			//TODO getInteriorPoint() for polygons
-			return feature.getGeometry();
-		}*/
-});
+function layerVector() {
+	const source = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		strategy: ol.loadingstrategy.bbox,
+		url: function(extent, resolution, projection) {
+			//TODO Retreive checked parameters
+			/*			let list = permanentCheckboxList(options.selectorName).filter(
+								function(evt) {
+									return evt !== 'on'; // Except the "all" input (default value = "on")
+								}),*/
+			let bbox = null;
 
-const chemLayer = new ol.layer.Vector({
-	source: clusterSource,
-	style: function(feature) {
-		const style = new ol.style.Style({
-			image: new ol.style.Circle({
-				radius: 14,
-				stroke: new ol.style.Stroke({
-					color: 'blue',
+			if (ol.extent.getWidth(extent) != Infinity) {
+				bbox = ol.proj.transformExtent(
+					extent,
+					projection.getCode(),
+					'EPSG:4326' // Received projection
+				);
+			}
+			//return '//chemineur.fr/ext/Dominique92/GeoBB/gis.php?bbox=' + bbox.join(',');
+			return '//www.refuges.info/api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=' + bbox.join(',');
+		},
+	});
+
+	// Normalize properties
+	source.on('featuresloadend', function(evt) {
+		for (let k in evt.features)
+			normalize(evt.features[k]);
+	});
+
+	clusterSource = new ol.source.Cluster({
+		distance: 32,
+		source: source,
+		/*	geometryFunction: function(feature) {
+				//TODO getInteriorPoint() for polygons
+				return feature.getGeometry();
+			}*/
+	});
+
+	const layer = new ol.layer.Vector({
+		source: clusterSource,
+		style: function(feature) {
+			const style = new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: 14,
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+					fill: new ol.style.Fill({
+						color: 'white',
+					}),
 				}),
-				fill: new ol.style.Fill({
-					color: 'white',
+				text: new ol.style.Text({
+					font: '14px Calibri,sans-serif',
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+					fill: new ol.style.Fill({
+						color: 'blue',
+					}),
 				}),
-			}),
-			text: new ol.style.Text({
-				font: '14px Calibri,sans-serif',
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-				fill: new ol.style.Fill({
-					color: 'blue',
-				}),
-			}),
-		});
+			});
 
-		if (feature.getProperties().features.length == 1)
-			feature = feature.getProperties().features[0];
-		else
-			style.getText().setText(feature.get('features').length.toString());
+			if (feature.getProperties().features.length == 1)
+				feature = feature.getProperties().features[0];
+			else
+				style.getText().setText(feature.get('features').length.toString());
 
-		const icon = feature.get('icon');
-		if (icon)
-			style.setImage(new ol.style.Icon({
-				src: icon,
-			}));
+			const icon = feature.get('icon');
+			if (icon)
+				style.setImage(new ol.style.Icon({
+					src: icon,
+				}));
 
-		return style;
-	},
-});
+			return style;
+		},
+	});
+
+	/*//TODO attach to map
+	// Adapt the distance to the zoom
+	map.on('moveend', function(evt) {
+		const zoom = evt.target.getView().getZoom(),
+			distance = Math.max(8, Math.min((14 - zoom) * 20, 60));
+
+		clusterSource.setDistance(distance);
+	});
+	*/
+
+	return layer;
+}
 
 /**
  * Control to display labels on hover a feature & execute click
@@ -202,12 +218,4 @@ const map = new ol.Map({
 	}),
 });
 
-// Adapt the distance to the zoom
-map.on('moveend', function(evt) {
-	const zoom = evt.target.getView().getZoom(),
-		distance = Math.max(8, Math.min((14 - zoom) * 20, 60));
-
-	clusterSource.setDistance(distance);
-});
-
-map.addLayer(chemLayer);
+map.addLayer(layerVector());
