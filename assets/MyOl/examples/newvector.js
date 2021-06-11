@@ -2,23 +2,36 @@
 function layerChem() {
 	return layerVector({
 		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?bbox=',
+		urlSuffix: function(bbox) {
+			return 'ext/Dominique92/GeoBB/gis.php?bbox=' + bbox.join(',');
+		},
+		//		clusterDistance: 32,
 	});
 }
 
 function layerWRI() {
 	return layerVector({
 		urlBase: '//www.refuges.info/',
-		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
+		urlSuffix: function(bbox) {
+			return 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=' + bbox.join(',');
+		},
 		normalize: function(f) {
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
 			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
 		},
+		clusterDistance: 32,
+		altPixelRatio: 500,
+		altSource: new ol.source.Vector({
+			format: new ol.format.GeoJSON(),
+			url: 'https://www.refuges.info/api/polygones?type_polygon=1',
+		}),
 	});
 }
 
 function layerVector(options) {
+	let pixelRatio = 0;
+
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
@@ -28,28 +41,30 @@ function layerVector(options) {
 									function(evt) {
 										return evt !== 'on'; // Except the "all" input (default value = "on")
 									}),*/
-				let bbox = null;
 
-				if (ol.extent.getWidth(extent) != Infinity) {
-					bbox = ol.proj.transformExtent(
+				const bbox = ol.proj.transformExtent(
 						extent,
 						projection.getCode(),
 						'EPSG:4326' // Received projection
-					);
-				}
-				return options.urlBase + // url base that can define different services (E.G. server domain and/or directory)
-					(options.urlSuffix || '') + // url suffix to be defined separately from the urlBase
-					bbox.join(','); //TODO option sans BBox
+					),
+					// url suffix to be defined separately from the urlBase
+					urlSuffix =
+					typeof options.urlSuffix == 'function' ?
+					options.urlSuffix(bbox) :
+					options.urlSuffix || '';
+
+				return options.urlBase + urlSuffix;
 			},
 		}),
-		clusterSource = new ol.source.Cluster({
-			distance: 32,
+		clusterSource = options.clusterDistance ? new ol.source.Cluster({
+			distance: options.clusterDistance,
 			source: source,
 			/*	geometryFunction: function(feature) {
 					//TODO getInteriorPoint() for polygons
+					return feature.getGeometry().getInteriorPoints().getPoint(0);
 					return feature.getGeometry();
 				}*/
-		}),
+		}) : source,
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: function(feature) {
@@ -63,6 +78,14 @@ function layerVector(options) {
 							color: 'white',
 						}),
 					}),
+					/*//TODO declusteriser les lignes
+										stroke: new ol.style.Stroke({
+											color: 'blue',
+										}),
+										fill: new ol.style.Fill({
+											color: 'red',
+										}),
+										*/
 					text: new ol.style.Text({
 						font: '14px Calibri,sans-serif',
 						stroke: new ol.style.Stroke({
@@ -74,10 +97,12 @@ function layerVector(options) {
 					}),
 				});
 
-				if (feature.getProperties().features.length == 1)
-					feature = feature.getProperties().features[0];
-				else
-					style.getText().setText(feature.get('features').length.toString());
+				if (feature.getProperties().features) {
+					if (feature.getProperties().features.length == 1)
+						feature = feature.getProperties().features[0];
+					else
+						style.getText().setText(feature.get('features').length.toString());
+				}
 
 				const icon = feature.get('icon');
 				if (icon)
@@ -98,11 +123,16 @@ function layerVector(options) {
 
 	// Tune the clustering distance following the zoom leval
 	layer.on('prerender', function(evt) {
-		clusterSource.setDistance(
-			Math.max(8, Math.min(60, // Distance bounds
-				// get the transform ratio from the layer frameState
-				evt.frameState.pixelToCoordinateTransform[0]
-			)));
+		// get the transform ratio from the layer frameState
+		const ratio = evt.frameState.pixelToCoordinateTransform[0];
+
+		if (pixelRatio != ratio) {
+			pixelRatio = ratio;
+
+			// Tune the clustering distance depending on the transform ratio
+			if (typeof clusterSource.setDistance == 'function')
+				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
+		}
 	});
 
 	return layer;
@@ -136,7 +166,9 @@ function controlHover() {
 			source: new ol.source.Vector(),
 			zIndex: 10, // Above the features
 			style: function(feature) {
-				if (feature.getProperties().features.length == 1) {
+				if (!feature.getProperties().features) {
+					hoverStyle.getText().setText(feature.get('name'));
+				} else if (feature.getProperties().features.length == 1) {
 					feature = feature.getProperties().features[0];
 
 					hoverStyle.getText().setText(feature.get('name'));
@@ -170,7 +202,7 @@ function controlHover() {
 				if (hoveredFeature) {
 					hoverLayer.getSource().removeFeature(hoveredFeature);
 					map.getViewport().style.cursor = 'default';
-				} else if (feature.getProperties().features.length == 1)
+				} else if (feature.getProperties().features && feature.getProperties().features.length == 1)
 					map.getViewport().style.cursor = 'pointer';
 
 				if (feature)
@@ -223,10 +255,11 @@ const map = new ol.Map({
 		controlHover(),
 	],
 	view: new ol.View({
-		center: [700000, 5700000],
+		//		center: [700000, 5700000],// Maurienne
+		center: [260000, 6250000], // Paris
 		zoom: 11,
 	}),
 });
 
-map.addLayer(layerWRI());
+//map.addLayer(layerWRI());
 map.addLayer(layerChem());
