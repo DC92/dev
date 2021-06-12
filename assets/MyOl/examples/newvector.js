@@ -1,4 +1,14 @@
 // Vector layer
+const styleLabel = new ol.style.Text({
+	font: '14px Calibri,sans-serif',
+	textBaseline: 'bottom',
+	backgroundFill: new ol.style.Stroke({
+		color: 'yellow',
+	}),
+	offsetY: -13,
+	padding: [1, 3, 0, 3],
+});
+
 function layerJson(options) {
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
@@ -38,18 +48,20 @@ function layerJson(options) {
 		}),
 
 		style = function(feature) {
-			const styleLoca = new ol.style.Style(typeof options.styleOptions == 'function' ?
-				options.styleOptions(feature) :
-				options.styleOptions || {}
-			);
+			const styleLocal = typeof options.style == 'function' ?
+				options.style(feature) :
+				options.style || new ol.style.Style();
 
 			if (feature.getProperties().features) {
-				if (feature.getProperties().features.length == 1)
+				if (feature.getProperties().features.length == 1) {
 					// Only 1 feature in the cluster, display it
 					feature = feature.getProperties().features[0];
-				else {
+
+					styleLocal.setText(styleLabel);
+					styleLocal.getText().setText(feature.get('name'));
+				} else {
 					// This is a cluster, display a circle with the number
-					styleLoca.setImage(new ol.style.Circle({
+					styleLocal.setImage(new ol.style.Circle({
 						radius: 14,
 						stroke: new ol.style.Stroke({
 							color: 'blue',
@@ -59,7 +71,7 @@ function layerJson(options) {
 						}),
 					}));
 
-					styleLoca.setText(new ol.style.Text({
+					styleLocal.setText(new ol.style.Text({
 						font: '14px Calibri,sans-serif',
 						stroke: new ol.style.Stroke({
 							color: 'blue',
@@ -70,15 +82,17 @@ function layerJson(options) {
 						text: feature.get('features').length.toString(),
 					}));
 				}
-			}
+			} else
+				// No clustering
+				styleLocal.getText().setText(feature.get('nom')); //TODO 'name' (nom, c'est pour le massif
 
 			const icon = feature.get('icon'); //TODO mettre en option ???
 			if (icon)
-				styleLoca.setImage(new ol.style.Icon({
+				styleLocal.setImage(new ol.style.Icon({
 					src: icon,
 				}));
 
-			return styleLoca;
+			return styleLocal;
 		},
 
 		layer = new ol.layer.Vector({
@@ -97,12 +111,12 @@ function layerJson(options) {
 	let pixelRatio = 0;
 
 	layer.on('prerender', function(evt) {
-		// get the transform ratio from the layer frameState
+		// Get the transform ratio from the layer frameState
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
 
-			// Tune the clustering distance depending on the transform ratio
-			if (typeof clusterSource.setDistance == 'function')
-				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
+		// Tune the clustering distance depending on the transform ratio
+		if (typeof clusterSource.setDistance == 'function')
+			clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
 
 		if (pixelRatio != ratio) { // Only when changed
 			pixelRatio = ratio;
@@ -130,18 +144,11 @@ function controlHover() {
 	const control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		}),
+
 		hoverStyle = new ol.style.Style({
-			text: new ol.style.Text({
-				font: '16px Calibri,sans-serif',
-				fill: new ol.style.Fill({
-					color: 'blue',
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'white',
-					width: 10,
-				}),
-			}),
+			text: styleLabel, //TODO ??? archi
 		}),
+
 		hoverLayer = new ol.layer.Vector({
 			source: new ol.source.Vector(),
 			zIndex: 10, // Above the features
@@ -208,6 +215,7 @@ function controlHover() {
 
 			if (feature) {
 				const link = feature.get('link');
+
 				if (link) {
 					if (evt.originalEvent.ctrlKey) {
 						const tab = window.open(link, '_blank');
@@ -249,24 +257,23 @@ const map = new ol.Map({
 const layerMassif = layerJson({
 		urlBase: '//www.refuges.info/',
 		urlSuffix: 'api/polygones?type_polygon=1',
+		normalize: function(f) {
+			f.set('link', f.get('lien')); //TODO change cursor
+		},
 
-		styleOptions: function(feature) {
-			return {
+		style: function(feature) {
+			return new ol.style.Style({
 				fill: new ol.style.Fill({
 					color: feature.get('couleur'),
 				}),
 				text: new ol.style.Text({
 					font: '14px Calibri,sans-serif',
-					backgroundStroke: new ol.style.Stroke({
-						color: 'black',
-					}),
 					backgroundFill: new ol.style.Stroke({
 						color: 'yellow',
 					}),
-					text: feature.get('nom'),
-					padding: [0, 3, 0, 3],
+					padding: [1, 3, 0, 3],
 				}),
-			};
+			});
 		},
 	}),
 
@@ -297,4 +304,4 @@ const layerMassif = layerJson({
 
 map.addLayer(layerWRI);
 //map.addLayer(layerMassif);
-map.addLayer(layerChem);
+//map.addLayer(layerChem);
