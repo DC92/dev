@@ -255,7 +255,7 @@ const layerMassif = layerJson({
 		urlSuffix: 'api/polygones?type_polygon=1',
 		normalize: function(f) {
 			f.set('link', f.get('lien'));
-			f.set('name', f.get('nom'));
+			f.set('name', f.get('nom')); //TODO BUG : hover trop haut
 		},
 
 		style: function(feature) {
@@ -283,7 +283,7 @@ const layerMassif = layerJson({
 			const label = [],
 				desc = [];
 			if (f.get('type').valeur)
-				label.push(f.get('type').valeur.replace(/(^\w|\s\w)/g, m => m.toUpperCase()));
+				label.push(f.get('type').valeur.replace(/(^\w|\s\w)/g, m => m.toUpperCase())); //TODO remplacer par function
 			if (f.get('coord').alt)
 				desc.push(f.get('coord').alt + 'm');
 			if (f.get('places').valeur)
