@@ -38,11 +38,20 @@ function layerJson(options) {
 			distance: options.clusterDistance,
 			source: source,
 			geometryFunction: function(feature) {
+
+				/*
+				if (typeof feature.getGeometry().getLastCoordinate == 'function')
+					return new ol.geom.Point({
+						coordinates: feature.getGeometry().getLastCoordinate(),
+					});
+				*/
+
 				if (feature.getGeometry().getGeometries)
 					//TODO getInteriorPoint() for polygons
 					//	return feature.getGeometry().getInteriorPoints().getPoint(0);
 					if (feature.getGeometry().getGeometries)
 						return;
+
 				return feature.getGeometry();
 			}
 		}) :
@@ -83,9 +92,11 @@ function layerJson(options) {
 						text: feature.get('features').length.toString(),
 					}));
 				}
-			} else
+			} else {
 				// No clustering
-				styleLocal.getText().setText(feature.get('name'));
+				if (styleLocal.getText())
+					styleLocal.getText().setText(feature.get('name'));
+			}
 
 			const icon = feature.get('icon'); //TODO mettre en option ???
 			if (icon)
@@ -244,8 +255,8 @@ const map = new ol.Map({
 		controlHover(),
 	],
 	view: new ol.View({
-		center: [700000, 5700000], // Maurienne
 		//center: [260000, 6250000], // Paris
+		center: [700000, 5700000], // Maurienne
 		zoom: 11,
 	}),
 });
@@ -302,9 +313,17 @@ const layerMassif = layerJson({
 
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?bbox=',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
+		},
+
+		style: function(feature) {
+			return new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+			});
 		},
 		clusterDistance: 32,
 	});
