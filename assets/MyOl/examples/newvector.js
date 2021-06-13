@@ -1,11 +1,11 @@
 // Vector layer
 const styleLabel = new ol.style.Text({
-	font: '14px Calibri,sans-serif',
 	textBaseline: 'bottom',
+	offsetY: 9, // Compensate bottom
+	font: '14px Calibri,sans-serif',
 	backgroundFill: new ol.style.Stroke({
 		color: 'yellow',
 	}),
-	offsetY: -13,
 	padding: [1, 3, 0, 3],
 });
 
@@ -22,18 +22,18 @@ function layerJson(options) {
 
 				return options.urlBase + // url base that can varry (server name, ...)
 					options.urlSuffix + // url suffix to be defined separately from the urlBase
-					(!options.urlBbox ?
-						'' :
+					(options.urlBbox ?
 						options.urlBbox(ol.proj.transformExtent(
 							extent,
 							projection.getCode(),
 							'EPSG:4326' // Received projection
-						)));
+						)) :
+						''
+					);
 			},
 		}),
 
-		clusterSource = !options.clusterDistance ?
-		source :
+		clusterSource = options.clusterDistance ?
 		new ol.source.Cluster({
 			distance: options.clusterDistance,
 			source: source,
@@ -45,7 +45,8 @@ function layerJson(options) {
 						return;
 				return feature.getGeometry();
 			}
-		}),
+		}) :
+		source,
 
 		style = function(feature) {
 			const styleLocal = typeof options.style == 'function' ?
@@ -56,9 +57,9 @@ function layerJson(options) {
 				if (feature.getProperties().features.length == 1) {
 					// Only 1 feature in the cluster, display it
 					feature = feature.getProperties().features[0];
-
-					styleLocal.setText(styleLabel);
+					styleLocal.setText(styleLabel.clone());
 					styleLocal.getText().setText(feature.get('name'));
+					styleLocal.getText().setOffsetY(-13);
 				} else {
 					// This is a cluster, display a circle with the number
 					styleLocal.setImage(new ol.style.Circle({
@@ -144,34 +145,33 @@ function controlHover() {
 	const control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		}),
+		hoverTextStyle = styleLabel.clone();
 
-		hoverStyle = new ol.style.Style({
-			text: styleLabel, //TODO ??? archi
-		}),
-
-		hoverLayer = new ol.layer.Vector({
-			source: new ol.source.Vector(),
-			zIndex: 10, // Above the features
-			style: function(feature) {
-				if (!feature.getProperties().features) {
-					hoverStyle.getText().setText(feature.get('name'));
-				} else if (feature.getProperties().features.length == 1) {
-					feature = feature.getProperties().features[0];
-
-					hoverStyle.getText().setText(feature.get('name'));
-				} else {
-					const fs = feature.getProperties().features,
-						txts = [];
-					for (let fss in fs)
-						txts.push(fs[fss].get('name'));
-					hoverStyle.getText().setText(txts.length < 8 ?
-						txts.join('\n') :
-						txts.length + ' elements'
-					);
-				}
-				return hoverStyle;
-			},
-		});
+	hoverLayer = new ol.layer.Vector({
+		source: new ol.source.Vector(),
+		zIndex: 10, // Above the features
+		style: function(feature) {
+			if (!feature.getProperties().features) {
+				hoverTextStyle.setText(feature.get('name'));
+			} else if (feature.getProperties().features.length == 1) {
+				feature = feature.getProperties().features[0];
+				hoverTextStyle.setText(feature.get('label'));
+				hoverTextStyle.setOffsetY(-14);
+			} else {
+				const fs = feature.getProperties().features,
+					txts = [];
+				for (let fss in fs)
+					txts.push(fs[fss].get('name'));
+				hoverTextStyle.setText(txts.length < 8 ?
+					txts.join('\n') :
+					txts.length + ' elements'
+				);
+			}
+			return new ol.style.Style({
+				text: hoverTextStyle,
+			});
+		},
+	});
 
 	let hoveredFeature;
 	control.setMap = function(map) { //HACK execute actions on Map init
@@ -189,6 +189,7 @@ function controlHover() {
 			if (feature !== hoveredFeature) {
 				if (hoveredFeature) {
 					hoverLayer.getSource().removeFeature(hoveredFeature);
+					//TODO ne marche pas sur icone et massif (seulement sur étiquette)
 					map.getViewport().style.cursor = 'default';
 				} else if (feature.getProperties().features && feature.getProperties().features.length == 1)
 					map.getViewport().style.cursor = 'pointer';
@@ -266,13 +267,7 @@ const layerMassif = layerJson({
 				fill: new ol.style.Fill({
 					color: feature.get('couleur'),
 				}),
-				text: new ol.style.Text({
-					font: '14px Calibri,sans-serif',
-					backgroundFill: new ol.style.Stroke({
-						color: 'yellow',
-					}),
-					padding: [1, 3, 0, 3],
-				}),
+				text: styleLabel,
 			});
 		},
 	}),
@@ -283,14 +278,30 @@ const layerMassif = layerJson({
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},
-		normalize: function(f) {
-			f.set('name', f.get('nom'));
-			f.set('link', f.get('lien'));
-			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
-		},
 		clusterDistance: 32,
 		pixelRatioMax: 150,
 		layerAbove: layerMassif,
+
+		normalize: function(f) {
+			// Hover label
+			const label = [],
+				desc = [];
+			if (f.get('type').valeur)
+				label.push(f.get('type').valeur.replace(/(^\w|\s\w)/g, m => m.toUpperCase()));
+			if (f.get('coord').alt)
+				desc.push(f.get('coord').alt + 'm');
+			if (f.get('places').valeur)
+				desc.push(f.get('places').valeur + '\u255E\u2550\u2555');
+			if (desc.length)
+				label.push(desc.join(', '));
+			label.push(f.get('nom'));
+			f.set('label', label.join('\n'));
+
+			// Other displays
+			f.set('name', f.get('nom'));
+			f.set('link', f.get('lien'));
+			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');//TODO reprendre urlBase
+		},
 	}),
 
 	layerChem = layerJson({
