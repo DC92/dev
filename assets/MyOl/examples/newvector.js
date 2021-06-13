@@ -85,7 +85,7 @@ function layerJson(options) {
 				}
 			} else
 				// No clustering
-				styleLocal.getText().setText(feature.get('nom')); //TODO 'name' (nom, c'est pour le massif
+				styleLocal.getText().setText(feature.get('name'));
 
 			const icon = feature.get('icon'); //TODO mettre en option ???
 			if (icon)
@@ -187,18 +187,14 @@ function controlHover() {
 				});
 
 			if (feature !== hoveredFeature) {
-				if (hoveredFeature) {
+				if (hoveredFeature)
 					hoverLayer.getSource().removeFeature(hoveredFeature);
-					//TODO ne marche pas sur icone et massif (seulement sur étiquette)
-					map.getViewport().style.cursor = 'default';
-				} else if (feature.getProperties().features && feature.getProperties().features.length == 1)
-					map.getViewport().style.cursor = 'pointer';
 
 				if (feature)
 					hoverLayer.getSource().addFeature(feature);
 
+				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
 				hoveredFeature = feature;
-				//TODO more labelling when hover
 			}
 		});
 
@@ -226,7 +222,6 @@ function controlHover() {
 						window.location = link;
 				}
 			}
-			//TODO zoom when click a cluster or a polygon (massifs)
 		});
 	};
 	return control;
@@ -259,7 +254,8 @@ const layerMassif = layerJson({
 		urlBase: '//www.refuges.info/',
 		urlSuffix: 'api/polygones?type_polygon=1',
 		normalize: function(f) {
-			f.set('link', f.get('lien')); //TODO change cursor
+			f.set('link', f.get('lien'));
+			f.set('name', f.get('nom'));
 		},
 
 		style: function(feature) {
@@ -279,7 +275,7 @@ const layerMassif = layerJson({
 			return bbox.join(',');
 		},
 		clusterDistance: 32,
-		pixelRatioMax: 150,
+		pixelRatioMax: 100,
 		layerAbove: layerMassif,
 
 		normalize: function(f) {
@@ -300,7 +296,7 @@ const layerMassif = layerJson({
 			// Other displays
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
-			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');//TODO reprendre urlBase
+			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg'); //TODO reprendre urlBase
 		},
 	}),
 
