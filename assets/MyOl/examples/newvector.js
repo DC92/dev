@@ -37,22 +37,13 @@ function layerJson(options) {
 		new ol.source.Cluster({
 			distance: options.clusterDistance,
 			source: source,
+			// Returns an ol.geom.Point as cluster calculation point for the feature. 
 			geometryFunction: function(feature) {
-
-				/*
-				if (typeof feature.getGeometry().getLastCoordinate == 'function')
-					return new ol.geom.Point({
-						coordinates: feature.getGeometry().getLastCoordinate(),
-					});
-				*/
-
-				if (feature.getGeometry().getGeometries)
-					//TODO getInteriorPoint() for polygons
-					//	return feature.getGeometry().getInteriorPoints().getPoint(0);
-					if (feature.getGeometry().getGeometries)
-						return;
-
-				return feature.getGeometry();
+				return new ol.geom.Point(
+					ol.extent.getCenter(
+						feature.getGeometry().getExtent()
+					)
+				);
 			}
 		}) :
 		source,
@@ -241,32 +232,12 @@ function controlHover() {
 /**
  * Example
  */
-// Map
-const map = new ol.Map({
-	target: 'map',
-	controls: [
-		controlLayerSwitcher({
-			baseLayers: layersCollection(),
-		}),
-		new ol.control.Attribution(),
-		controlMousePosition(),
-		new ol.control.Zoom(),
-		controlFullScreen(),
-		controlHover(),
-	],
-	view: new ol.View({
-		//center: [260000, 6250000], // Paris
-		center: [700000, 5700000], // Maurienne
-		zoom: 11,
-	}),
-});
-
 const layerMassif = layerJson({
 		urlBase: '//www.refuges.info/',
 		urlSuffix: 'api/polygones?type_polygon=1',
 		normalize: function(f) {
 			f.set('link', f.get('lien'));
-			f.set('name', f.get('nom')); //TODO BUG : hover trop haut
+			f.set('name', f.get('nom'));
 		},
 
 		style: function(feature) {
@@ -314,20 +285,45 @@ const layerMassif = layerJson({
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
 		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},
 
 		style: function(feature) {
 			return new ol.style.Style({
+				//TODO utile ???
 				stroke: new ol.style.Stroke({
 					color: 'blue',
 				}),
+				fill: new ol.style.Fill({
+					color: 'blue',
+				}),
+				//TODO fin utile ???
 			});
 		},
 		clusterDistance: 32,
 	});
 
-map.addLayer(layerWRI);
+map = new ol.Map({
+	target: 'map',
+	controls: [
+		controlLayerSwitcher({
+			baseLayers: layersCollection(),
+		}),
+		new ol.control.Attribution(),
+		controlMousePosition(),
+		new ol.control.Zoom(),
+		controlFullScreen(),
+		controlHover(),
+	],
+	view: new ol.View({
+		center: [700000, 5700000], // Maurienne
+		//center: [260000, 6250000], // Paris
+		zoom: 11,
+	}),
+});
+
 //map.addLayer(layerMassif);
-//map.addLayer(layerChem);
+//map.addLayer(layerWRI);
+map.addLayer(layerChem);
