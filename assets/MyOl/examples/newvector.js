@@ -115,12 +115,12 @@ function layerJson(options) {
 		// Get the transform ratio from the layer frameState
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
 
-		// Tune the clustering distance depending on the transform ratio
-		if (typeof clusterSource.setDistance == 'function')
-			clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
-
 		if (pixelRatio != ratio) { // Only when changed
 			pixelRatio = ratio;
+
+			// Tune the clustering distance depending on the transform ratio
+			if (typeof clusterSource.setDistance == 'function')
+				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
 
 			// Switch to another layer above a zoom limit
 			if (ratio > options.pixelRatioMax) {
