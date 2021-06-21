@@ -21,19 +21,18 @@ function layerJson(options) {
 									}),*/
 
 				return options.urlBase + // url base that can varry (server name, ...)
-					options.urlSuffix + // url suffix to be defined separately from the urlBase
-					(options.urlBbox ?
+					(options.urlSuffix || '') + // url suffix to be defined separately from the urlBase
+					(!options.urlBbox ? '' :
 						options.urlBbox(ol.proj.transformExtent(
 							extent,
 							projection.getCode(),
 							'EPSG:4326' // Received projection
-						)) :
-						''
+						))
 					);
 			},
 		}),
 
-		clusterSource = options.clusterDistance ?
+		clusterSource = !options.clusterDistance ? source :
 		new ol.source.Cluster({
 			distance: options.clusterDistance,
 			source: source,
@@ -45,8 +44,7 @@ function layerJson(options) {
 					)
 				);
 			}
-		}) :
-		source,
+		}),
 
 		style = function(feature) {
 			const styleLocal = typeof options.style == 'function' ?
@@ -285,12 +283,12 @@ const layerMassif = layerJson({
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
 		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},
 
-		style: function(feature) {
+		wstyle: function(feature) {
 			return new ol.style.Style({
 				//TODO utile ???
 				stroke: new ol.style.Stroke({
@@ -318,8 +316,8 @@ map = new ol.Map({
 		controlHover(),
 	],
 	view: new ol.View({
-		center: [700000, 5700000], // Maurienne
-		//center: [260000, 6250000], // Paris
+		//center: [700000, 5700000], // Maurienne
+		center: [260000, 6250000], // Paris
 		zoom: 11,
 	}),
 });
