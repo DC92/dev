@@ -32,21 +32,27 @@ function layerJson(options) {
 			},
 		}),
 
-		clusterSource = !options.clusterDistance ? source :
+		clusterSource = !options.clusterDistance ?
+		source :
 		new ol.source.Cluster({
 			distance: options.clusterDistance,
 			source: source,
-			// Returns an ol.geom.Point as cluster calculation point for the feature. 
 			geometryFunction: function(feature) {
-				//				if( feature.getGeometry().flatCoordinates&& feature.getGeometry().flatCoordinates.length > 2)
-				//					clusterSource.addFeature(feature);
-				//					? feature.getGeometry().features:
-				return new ol.geom.Point(
-					ol.extent.getCenter(
-						feature.getGeometry().getExtent()
-					)
-				);
-			}
+				// If it's a point
+				if (!ol.extent.getArea(feature.getGeometry().getExtent()))
+					return feature.getGeometry();
+
+				// Test if the feature is already included
+				const featureExists = clusterSource.forEachFeature(function(f) {
+					if (feature.ol_uid == f.ol_uid)
+						return true;
+				});
+
+				if (!featureExists)
+					clusterSource.addFeature(feature); // Add it as a feature
+
+				return null; // Don't cluster it
+			},
 		}),
 
 		style = function(feature) {
@@ -54,24 +60,16 @@ function layerJson(options) {
 				options.style(feature) :
 				options.style || new ol.style.Style();
 
-			if (feature.getProperties().features) {
-				if (feature.getProperties().features.length == 1) {
-					// Only 1 feature in the cluster, display it
-					feature = feature.getProperties().features[0];
+			if (feature.get('features')) {
+				// Only 1 feature in the cluster, display it
+				if (feature.get('features').length == 1) {
+					feature = feature.get('features')[0];
 					styleLocal.setText(styleLabel.clone());
 					styleLocal.getText().setText(feature.get('name'));
 					styleLocal.getText().setOffsetY(-13);
-					/*styleLocal.setImage(new ol.style.Circle({
-						radius: 14,
-						stroke: new ol.style.Stroke({
-							color: 'red',
-						}),
-						fill: new ol.style.Fill({
-							color: 'yellow',
-						}),
-					}));*/
-				} else {
-					// This is a cluster, display a circle with the number
+				}
+				// This is a cluster, display a circle with the number
+				else {
 					styleLocal.setImage(new ol.style.Circle({
 						radius: 14,
 						stroke: new ol.style.Stroke({
@@ -84,29 +82,25 @@ function layerJson(options) {
 
 					styleLocal.setText(new ol.style.Text({
 						font: '14px Calibri,sans-serif',
-						stroke: new ol.style.Stroke({
-							color: 'blue',
-						}),
-						fill: new ol.style.Fill({
-							color: 'blue',
-						}),
 						text: feature.get('features').length.toString(),
 					}));
 				}
-			} else if (styleLocal.getText())
-				// No clustering
+			}
+			// Not clustered
+			else if (styleLocal.getText())
 				styleLocal.getText().setText(feature.get('name'));
 
-			const icon = feature.get('icon'); //TODO mettre en option ???
+			// Add icon on points
+			const icon = feature.get('icon');
 			if (icon)
 				styleLocal.setImage(new ol.style.Icon({
 					src: icon,
 				}));
 
-			// Lines (not cluster)
-			//TODO ????
+			// For lines
 			styleLocal.setStroke(new ol.style.Stroke({
 				color: 'blue',
+				width: 2,
 			}));
 
 			return styleLocal;
@@ -166,23 +160,28 @@ function controlHover() {
 	hoverLayer = new ol.layer.Vector({
 		source: new ol.source.Vector(),
 		zIndex: 10, // Above the features
+
 		style: function(feature) {
-			if (!feature.getProperties().features) {
+			if (!feature.get('features'))
 				hoverTextStyle.setText(feature.get('name'));
-			} else if (feature.getProperties().features.length == 1) {
-				feature = feature.getProperties().features[0];
+
+			else if (feature.get('features').length == 1) {
+				feature = feature.get('features')[0];
 				hoverTextStyle.setText(feature.get('label'));
 				hoverTextStyle.setOffsetY(-14);
 			} else {
-				const fs = feature.getProperties().features,
+				const fs = feature.get('features'),
 					txts = [];
+
 				for (let fss in fs)
 					txts.push(fs[fss].get('name'));
+
 				hoverTextStyle.setText(txts.length < 8 ?
 					txts.join('\n') :
 					txts.length + ' elements'
 				);
 			}
+
 			return new ol.style.Style({
 				text: hoverTextStyle,
 			});
@@ -221,10 +220,10 @@ function controlHover() {
 			});
 
 			if (feature &&
-				feature.getProperties().features &&
-				feature.getProperties().features.length == 1
+				feature.get('features') &&
+				feature.get('features').length == 1
 			)
-				feature = feature.getProperties().features[0];
+				feature = feature.get('features')[0];
 
 			if (feature) {
 				const link = feature.get('link');
@@ -279,7 +278,13 @@ const layerMassif = layerJson({
 			const label = [],
 				desc = [];
 			if (f.get('type').valeur)
-				label.push(f.get('type').valeur.replace(/(^\w|\s\w)/g, m => m.toUpperCase())); //TODO remplacer par function
+				label.push(
+					f.get('type').valeur.replace(
+						/(^\w|\s\w)/g,
+						function(m) {
+							return m.toUpperCase();
+						}
+					));
 			if (f.get('coord').alt)
 				desc.push(f.get('coord').alt + 'm');
 			if (f.get('places').valeur)
@@ -298,23 +303,11 @@ const layerMassif = layerJson({
 
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
 		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
-		},
-
-		wstyle: function(feature) {
-			return new ol.style.Style({
-				//TODO utile ???
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-				fill: new ol.style.Fill({
-					color: 'blue',
-				}),
-				//TODO fin utile ???
-			});
 		},
 		clusterDistance: 32,
 	});
@@ -335,7 +328,7 @@ map = new ol.Map({
 		//center: [700000, 5700000], // Maurienne
 		//center: [260000, 6250000], // Paris
 		center: [257000, 6250000], // Paris
-		zoom: 13, // 11
+		zoom: 11, // 11
 	}),
 });
 
