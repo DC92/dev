@@ -38,6 +38,9 @@ function layerJson(options) {
 			source: source,
 			// Returns an ol.geom.Point as cluster calculation point for the feature. 
 			geometryFunction: function(feature) {
+				//				if( feature.getGeometry().flatCoordinates&& feature.getGeometry().flatCoordinates.length > 2)
+				//					clusterSource.addFeature(feature);
+				//					? feature.getGeometry().features:
 				return new ol.geom.Point(
 					ol.extent.getCenter(
 						feature.getGeometry().getExtent()
@@ -58,6 +61,15 @@ function layerJson(options) {
 					styleLocal.setText(styleLabel.clone());
 					styleLocal.getText().setText(feature.get('name'));
 					styleLocal.getText().setOffsetY(-13);
+					/*styleLocal.setImage(new ol.style.Circle({
+						radius: 14,
+						stroke: new ol.style.Stroke({
+							color: 'red',
+						}),
+						fill: new ol.style.Fill({
+							color: 'yellow',
+						}),
+					}));*/
 				} else {
 					// This is a cluster, display a circle with the number
 					styleLocal.setImage(new ol.style.Circle({
@@ -81,17 +93,21 @@ function layerJson(options) {
 						text: feature.get('features').length.toString(),
 					}));
 				}
-			} else {
+			} else if (styleLocal.getText())
 				// No clustering
-				if (styleLocal.getText())
-					styleLocal.getText().setText(feature.get('name'));
-			}
+				styleLocal.getText().setText(feature.get('name'));
 
 			const icon = feature.get('icon'); //TODO mettre en option ???
 			if (icon)
 				styleLocal.setImage(new ol.style.Icon({
 					src: icon,
 				}));
+
+			// Lines (not cluster)
+			//TODO ????
+			styleLocal.setStroke(new ol.style.Stroke({
+				color: 'blue',
+			}));
 
 			return styleLocal;
 		},
@@ -282,8 +298,8 @@ const layerMassif = layerJson({
 
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},
@@ -317,8 +333,9 @@ map = new ol.Map({
 	],
 	view: new ol.View({
 		//center: [700000, 5700000], // Maurienne
-		center: [260000, 6250000], // Paris
-		zoom: 11,
+		//center: [260000, 6250000], // Paris
+		center: [257000, 6250000], // Paris
+		zoom: 13, // 11
 	}),
 });
 
