@@ -1,4 +1,5 @@
 // Vector layer
+//TODO integrate in functions (make layer option)
 const styleLabel = new ol.style.Text({
 	textBaseline: 'bottom',
 	offsetY: 9, // Compensate bottom
@@ -10,6 +11,7 @@ const styleLabel = new ol.style.Text({
 });
 
 function layerJson(options) {
+	//TODO layers options
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
@@ -49,8 +51,9 @@ function layerJson(options) {
 						return true;
 				});
 
+				// Include the feature in the final source (lines, polygons)
 				if (!featureExists)
-					clusterSource.addFeature(feature); // Add it as a feature
+					clusterSource.addFeature(feature);
 
 				return null; // Don't cluster it
 			},
@@ -309,9 +312,9 @@ const layerMassif = layerJson({
 
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},
