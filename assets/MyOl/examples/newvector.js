@@ -20,7 +20,7 @@ function layerJson(options) {
 										return evt !== 'on'; // Except the "all" input (default value = "on")
 									}),*/
 
-//TODO une seule fonction intégrant bbox et appel baseurl
+				//TODO une seule fonction intégrant bbox et appel baseurl
 				return options.urlBase + // url base that can varry (server name, ...)
 					(options.urlSuffix || '') + // url suffix to be defined separately from the urlBase
 					(!options.urlBbox ? '' :
@@ -111,6 +111,11 @@ function layerJson(options) {
 			source: clusterSource,
 			style: style,
 		});
+
+	// Erase the layer before rebuild when bbox strategy is applied
+	source.on('featuresloadend', function() {
+		source.clear();
+	});
 
 	// Normalize properties
 	if (typeof options.normalize == 'function')
