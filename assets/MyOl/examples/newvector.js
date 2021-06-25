@@ -20,6 +20,7 @@ function layerJson(options) {
 										return evt !== 'on'; // Except the "all" input (default value = "on")
 									}),*/
 
+//TODO une seule fonction intégrant bbox et appel baseurl
 				return options.urlBase + // url base that can varry (server name, ...)
 					(options.urlSuffix || '') + // url suffix to be defined separately from the urlBase
 					(!options.urlBbox ? '' :
@@ -303,9 +304,9 @@ const layerMassif = layerJson({
 
 	layerChem = layerJson({
 		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},
@@ -328,7 +329,7 @@ map = new ol.Map({
 		//center: [700000, 5700000], // Maurienne
 		//center: [260000, 6250000], // Paris
 		center: [257000, 6250000], // Paris
-		zoom: 11, // 11
+		zoom: 9, // 11
 	}),
 });
 
