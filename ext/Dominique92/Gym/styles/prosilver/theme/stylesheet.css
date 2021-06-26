@@ -177,7 +177,7 @@ body {
 		border-radius: 0;
 	}
 	.gym .page > div {
-		margin: 1vw;
+		margin: 0.2em 0.2em 1em 0.2em;
 		padding: 0;
 		border-radius: 0;
 	}
@@ -226,8 +226,6 @@ body {
 	width: 20vw !important;
 }
 @media (max-width: 600px) {
-	w.gym .image-droite,
-	w.gym .image-gauche,
 	.gym .inline-attachment,
 	.gym .attach-image {
 		display: none !important;
