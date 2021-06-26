@@ -1,18 +1,18 @@
 // Vector layer
-//TODO integrate in functions (make layer option)
-const styleLabel = new ol.style.Text({
-	textBaseline: 'bottom',
-	offsetY: 9, // Compensate bottom
-	font: '14px Calibri,sans-serif',
-	backgroundFill: new ol.style.Stroke({
-		color: 'yellow',
-	}),
-	padding: [1, 3, 0, 3],
-});
-
 function layerJson(options) {
 	//TODO layers options
-	const source = new ol.source.Vector({
+	const styleLabelTextOptions = new ol.style.Text({
+			textBaseline: 'bottom',
+			offsetY: 9, // Compensate bottom
+			font: '14px Calibri,sans-serif',
+			backgroundFill: new ol.style.Stroke({
+				color: 'yellow',
+			}),
+			padding: [1, 3, 0, 3],
+			text: 'DEFAULT styleLabelTextOptions',
+		}),
+
+		source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
 			url: function(extent, resolution, projection) {
@@ -35,43 +35,32 @@ function layerJson(options) {
 			},
 		}),
 
-		clusterSource = !options.clusterDistance ?
-		source :
-		new ol.source.Cluster({
-			distance: options.clusterDistance,
-			source: source,
-			geometryFunction: function(feature) {
-				// If it's a point
-				if (!ol.extent.getArea(feature.getGeometry().getExtent()))
-					return feature.getGeometry();
-
-				// Test if the feature is already included
-				const featureExists = clusterSource.forEachFeature(function(f) {
-					if (feature.ol_uid == f.ol_uid)
-						return true;
-				});
-
-				// Include the feature in the final source (lines, polygons)
-				if (!featureExists)
-					clusterSource.addFeature(feature);
-
-				return null; // Don't cluster it
-			},
-		}),
-
 		style = function(feature) {
 			const styleLocal = typeof options.style == 'function' ?
 				options.style(feature) :
 				options.style || new ol.style.Style();
 
 			if (feature.get('features')) {
-				// Only 1 feature in the cluster, display it
+				// Only 1 point in the cluster, display it
 				if (feature.get('features').length == 1) {
 					feature = feature.get('features')[0];
-					styleLocal.setText(styleLabel.clone());
+
+					// Permanent label
+					styleLocal.setText(styleLabelTextOptions.clone());
 					styleLocal.getText().setText(feature.get('name'));
 					styleLocal.getText().setOffsetY(-13);
+
+					const hoverText = styleLabelTextOptions.clone();
+					hoverText.setText(feature.get('name') + '\nMMMMMMMMMMMMM');
+
+					feature.setProperties({
+						'hoverStyleOptions': {
+							text: hoverText,
+						},
+					}, true);
+
 				}
+
 				// This is a cluster, display a circle with the number
 				else {
 					styleLocal.setImage(new ol.style.Circle({
@@ -90,10 +79,10 @@ function layerJson(options) {
 					}));
 				}
 			}
-			// Not clustered
-			else if (styleLocal.getText())
+			// Not clustered (lines & polys)
+			else if (styleLocal.getText()) {
 				styleLocal.getText().setText(feature.get('name'));
-
+			}
 			// Add icon on points
 			const icon = feature.get('icon');
 			if (icon)
@@ -110,15 +99,89 @@ function layerJson(options) {
 			return styleLocal;
 		},
 
+		clusterSource = !options.clusterDistance ?
+		source :
+		new ol.source.Cluster({
+			distance: options.clusterDistance,
+			source: source,
+			geometryFunction: function(feature) {
+
+				// If it's a point
+				if (!ol.extent.getArea(feature.getGeometry().getExtent())) {
+
+					feature.setProperties({
+						'hoverStyleOptions': {
+							text: new ol.style.Text({
+								font: '14px Calibri,sans-serif',
+								text: 'DEFAUT 666666',
+							}),
+
+							textBaseline: 'bottom',
+							offsetY: 9, // Compensate bottom
+							font: '14px Calibri,sans-serif',
+							backgroundFill: new ol.style.Stroke({
+								color: 'yellow',
+							}),
+							padding: [1, 3, 0, 3],
+
+
+							//	text: 'DEFAULT styleLabelTextOptions',
+
+							/*							stroke: new ol.style.Stroke({
+															color: 'blue',
+															width: 5,
+														}),
+														fill: new ol.style.Fill({
+															color: 'red',
+														}),
+														image: new ol.style.Circle({
+															radius: 14,
+															stroke: new ol.style.Stroke({
+																color: 'grey',
+															}),
+															fill: new ol.style.Fill({
+																color: 'white',
+															}),
+														}),*/
+						},
+					}, true);
+
+					return feature.getGeometry();
+				}
+
+				// Then, it's line or poly (not to be clustered)
+
+				// Test if the feature is already included
+				const featureExists = clusterSource.forEachFeature(function(f) {
+					if (feature.ol_uid == f.ol_uid)
+						return true;
+				});
+
+				// Include the feature in the final source (lines, polygons)
+				if (!featureExists) {
+					const hoverStyleOptions = {
+						'hoverStyleOptions': {
+							stroke: new ol.style.Stroke({
+								color: 'red',
+								width: 3,
+							}),
+							//					text: feature.get('name'),
+							text: styleLabelTextOptions,
+						},
+					};
+
+					feature.setProperties(hoverStyleOptions, true);
+
+					clusterSource.addFeature(feature);
+				}
+				return null; // Don't cluster it
+			},
+		}),
+
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
 		});
-
-	// Erase the layer before rebuild when bbox strategy is applied
-	source.on('featuresloadend', function() {
-		source.clear();
-	});
 
 	// Normalize properties
 	if (typeof options.normalize == 'function')
@@ -126,6 +189,11 @@ function layerJson(options) {
 			for (let k in evt.features)
 				options.normalize(evt.features[k]);
 		});
+
+	// Erase the layer before rebuild when bbox strategy is applied
+	source.on('featuresloadend', function() {
+		source.clear();
+	});
 
 	// Tune the clustering distance following the zoom leval
 	let pixelRatio = 0;
@@ -161,39 +229,22 @@ function layerJson(options) {
  * feature.properties.link : link to call when click on the feature
  */
 function controlHover() {
-	const control = new ol.control.Control({
-			element: document.createElement('div'), //HACK No button
-		}),
-		hoverTextStyle = styleLabel.clone();
+	let control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
+	});
 
 	hoverLayer = new ol.layer.Vector({
 		source: new ol.source.Vector(),
-		zIndex: 10, // Above the features
+		zIndex: 1, // Above the features
 
 		style: function(feature) {
-			if (!feature.get('features'))
-				hoverTextStyle.setText(feature.get('name'));
-
-			else if (feature.get('features').length == 1) {
+			// Get the first hover style options of the clustered features
+			if (feature.get('features'))
 				feature = feature.get('features')[0];
-				hoverTextStyle.setText(feature.get('label'));
-				hoverTextStyle.setOffsetY(-14);
-			} else {
-				const fs = feature.get('features'),
-					txts = [];
 
-				for (let fss in fs)
-					txts.push(fs[fss].get('name'));
-
-				hoverTextStyle.setText(txts.length < 8 ?
-					txts.join('\n') :
-					txts.length + ' elements'
-				);
-			}
-
-			return new ol.style.Style({
-				text: hoverTextStyle,
-			});
+			return new ol.style.Style(
+				feature.get('hoverStyleOptions')
+			);
 		},
 	});
 
@@ -205,6 +256,7 @@ function controlHover() {
 
 		// Hovering a feature
 		map.on('pointermove', function(evt) {
+			// Get hovered feature
 			const pixel = map.getEventPixel(evt.originalEvent),
 				feature = map.forEachFeatureAtPixel(pixel, function(feature) {
 					return feature;
@@ -224,20 +276,27 @@ function controlHover() {
 
 		// Click action
 		map.on('click', function(evt) {
+			// Get hovered feature
 			let feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
 				return feature;
 			});
 
-			if (feature &&
-				feature.get('features') &&
-				feature.get('features').length == 1
-			)
-				feature = feature.get('features')[0];
-
 			if (feature) {
+				const center = feature.getGeometry().getCoordinates(),
+					features = feature.get('features');
+				if (features)
+					feature = features[0];
 				const link = feature.get('link');
 
-				if (link) {
+				// Cluster
+				if (features && features.length > 1)
+					map.getView().animate({
+						zoom: map.getView().getZoom() + 1,
+						center: center,
+					});
+
+				// Point, line, poly
+				else if (link) {
 					if (evt.originalEvent.ctrlKey) {
 						const tab = window.open(link, '_blank');
 						if (evt.originalEvent.shiftKey)
@@ -267,7 +326,7 @@ const layerMassif = layerJson({
 				fill: new ol.style.Fill({
 					color: feature.get('couleur'),
 				}),
-				text: styleLabel,
+				text: styleLabelTextOptions,
 			});
 		},
 	}),
