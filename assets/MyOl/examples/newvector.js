@@ -5,11 +5,10 @@ function layerJson(options) {
 			textBaseline: 'bottom',
 			offsetY: 9, // Compensate bottom
 			font: '14px Calibri,sans-serif',
-			backgroundFill: new ol.style.Stroke({
+			backgroundFill: new ol.style.Fill({
 				color: 'yellow',
 			}),
 			padding: [1, 3, 0, 3],
-			text: 'DEFAULT styleLabelTextOptions',
 		}),
 
 		source = new ol.source.Vector({
@@ -50,12 +49,9 @@ function layerJson(options) {
 					styleLocal.getText().setText(feature.get('name'));
 					styleLocal.getText().setOffsetY(-13);
 
-					const hoverText = styleLabelTextOptions.clone();
-					hoverText.setText(feature.get('name') + '\nMMMMMMMMMMMMM');
-
 					feature.setProperties({
 						'hoverStyleOptions': {
-							text: hoverText,
+							text: styleLabelTextOptions,
 						},
 					}, true);
 
@@ -111,16 +107,7 @@ function layerJson(options) {
 
 					feature.setProperties({
 						'hoverStyleOptions': {
-							text: new ol.style.Text({
-								textBaseline: 'bottom',
-								offsetY: -15,
-								font: '14px Calibri,sans-serif',
-								backgroundFill: new ol.style.Stroke({
-									color: 'yellow',
-								}),
-								padding: [1, 3, 0, 3],
-								font: '14px Calibri,sans-serif',
-							}),
+							text: styleLabelTextOptions,
 						},
 					}, true);
 
@@ -134,20 +121,20 @@ function layerJson(options) {
 						return true;
 				});
 
-				// Include the feature in the final source (lines, polygons)
+				// Include the feature in the cluster source (lines, polygons)
 				if (!featureExists) {
-					const hoverStyleOptions = {
+					const textOpt = styleLabelTextOptions.clone();
+					textOpt.setText(feature.get('name'));
+
+					feature.setProperties({
 						'hoverStyleOptions': {
 							stroke: new ol.style.Stroke({
 								color: 'red',
 								width: 3,
 							}),
-							//					text: feature.get('name'),
-							text: styleLabelTextOptions,
+							text: textOpt,
 						},
-					};
-
-					feature.setProperties(hoverStyleOptions, true);
+					}, true);
 
 					clusterSource.addFeature(feature);
 				}
@@ -314,7 +301,10 @@ const layerMassif = layerJson({
 				fill: new ol.style.Fill({
 					color: feature.get('couleur'),
 				}),
-				text: styleLabelTextOptions,
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 10, //TODO ????????????????
+				}),
 			});
 		},
 	}),
@@ -389,5 +379,5 @@ map = new ol.Map({
 });
 
 //map.addLayer(layerMassif);
-//map.addLayer(layerWRI);
+map.addLayer(layerWRI);
 map.addLayer(layerChem);
