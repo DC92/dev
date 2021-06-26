@@ -112,37 +112,15 @@ function layerJson(options) {
 					feature.setProperties({
 						'hoverStyleOptions': {
 							text: new ol.style.Text({
+								textBaseline: 'bottom',
+								offsetY: -15,
 								font: '14px Calibri,sans-serif',
-								text: 'DEFAUT 666666',
+								backgroundFill: new ol.style.Stroke({
+									color: 'yellow',
+								}),
+								padding: [1, 3, 0, 3],
+								font: '14px Calibri,sans-serif',
 							}),
-
-							textBaseline: 'bottom',
-							offsetY: 9, // Compensate bottom
-							font: '14px Calibri,sans-serif',
-							backgroundFill: new ol.style.Stroke({
-								color: 'yellow',
-							}),
-							padding: [1, 3, 0, 3],
-
-
-							//	text: 'DEFAULT styleLabelTextOptions',
-
-							/*							stroke: new ol.style.Stroke({
-															color: 'blue',
-															width: 5,
-														}),
-														fill: new ol.style.Fill({
-															color: 'red',
-														}),
-														image: new ol.style.Circle({
-															radius: 14,
-															stroke: new ol.style.Stroke({
-																color: 'grey',
-															}),
-															fill: new ol.style.Fill({
-																color: 'white',
-															}),
-														}),*/
 						},
 					}, true);
 
@@ -150,7 +128,6 @@ function layerJson(options) {
 				}
 
 				// Then, it's line or poly (not to be clustered)
-
 				// Test if the feature is already included
 				const featureExists = clusterSource.forEachFeature(function(f) {
 					if (feature.ol_uid == f.ol_uid)
@@ -230,25 +207,35 @@ function layerJson(options) {
  */
 function controlHover() {
 	let control = new ol.control.Control({
-		element: document.createElement('div'), //HACK No button
-	});
+			element: document.createElement('div'), //HACK No button
+		}),
+		hoveredFeature;
 
-	hoverLayer = new ol.layer.Vector({
+	const hoverLayer = new ol.layer.Vector({
 		source: new ol.source.Vector(),
 		zIndex: 1, // Above the features
 
 		style: function(feature) {
 			// Get the first hover style options of the clustered features
-			if (feature.get('features'))
-				feature = feature.get('features')[0];
 
-			return new ol.style.Style(
-				feature.get('hoverStyleOptions')
-			);
+			const features = feature.get('features');
+			if (features)
+				feature = features[0];
+
+			const hoverStyleOptions = feature.get('hoverStyleOptions'),
+				names = [];
+
+			if (features) {
+				for (let f in features)
+					names.push(features[f].get('name'));
+
+				hoverStyleOptions.text.setText(names.join('\n'));
+			}
+
+			return new ol.style.Style(hoverStyleOptions);
 		},
 	});
 
-	let hoveredFeature;
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
@@ -307,6 +294,7 @@ function controlHover() {
 			}
 		});
 	};
+
 	return control;
 }
 
