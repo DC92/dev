@@ -1,17 +1,24 @@
 // Vector layer
 function layerJson(options) {
-	//TODO layers options
-	const styleLabelTextOptions = new ol.style.Text({
-			textBaseline: 'bottom',
-			offsetY: 9, // Compensate bottom
-			font: '14px Calibri,sans-serif',
-			backgroundFill: new ol.style.Fill({
-				color: 'yellow',
-			}),
-			padding: [1, 3, 0, 3],
+	options = Object.assign({
+		styleOptions: {},
+		clusterStyleOptions: {},
+		hoverStyleOptions: {
+			toto: 56, //TODO DEBUG
+		},
+	}, options);
+	options.labelStyleOptions = Object.assign({
+		textBaseline: 'bottom',
+		offsetY: 9, // Compensate bottom
+		font: '14px Calibri,sans-serif',
+		backgroundFill: new ol.style.Fill({
+			color: 'yellow',
 		}),
+		padding: [1, 3, 0, 3],
+	}, options.labelStyleOptions);
 
-		source = new ol.source.Vector({
+	//TODO layers options
+	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
 			url: function(extent, resolution, projection) {
@@ -35,6 +42,8 @@ function layerJson(options) {
 		}),
 
 		style = function(feature) {
+			feature.options = options; // Mem for hover
+
 			const styleLocal = typeof options.style == 'function' ?
 				options.style(feature) :
 				options.style || new ol.style.Style();
@@ -45,19 +54,11 @@ function layerJson(options) {
 					feature = feature.get('features')[0];
 
 					// Permanent label
-					styleLocal.setText(styleLabelTextOptions.clone());
+					styleLocal.setText(new ol.style.Text(options.labelStyleOptions));
 					styleLocal.getText().setText(feature.get('name'));
 					styleLocal.getText().setOffsetY(-13);
-
-					feature.setProperties({
-						'hoverStyleOptions': {
-							text: styleLabelTextOptions,
-						},
-					}, true);
-
 				}
-
-				// This is a cluster, display a circle with the number
+					// This is a cluster, display a circle with the number
 				else {
 					styleLocal.setImage(new ol.style.Circle({
 						radius: 14,
@@ -103,16 +104,8 @@ function layerJson(options) {
 			geometryFunction: function(feature) {
 
 				// If it's a point
-				if (!ol.extent.getArea(feature.getGeometry().getExtent())) {
-
-					feature.setProperties({
-						'hoverStyleOptions': {
-							text: styleLabelTextOptions,
-						},
-					}, true);
-
+				if (!ol.extent.getArea(feature.getGeometry().getExtent()))
 					return feature.getGeometry();
-				}
 
 				// Then, it's line or poly (not to be clustered)
 				// Test if the feature is already included
@@ -123,18 +116,8 @@ function layerJson(options) {
 
 				// Include the feature in the cluster source (lines, polygons)
 				if (!featureExists) {
-					const textOpt = styleLabelTextOptions.clone();
+					const textOpt = new ol.style.Text(options.labelStyleOptions);
 					textOpt.setText(feature.get('name'));
-
-					feature.setProperties({
-						'hoverStyleOptions': {
-							stroke: new ol.style.Stroke({
-								color: 'red',
-								width: 3,
-							}),
-							text: textOpt,
-						},
-					}, true);
 
 					clusterSource.addFeature(feature);
 				}
@@ -203,23 +186,20 @@ function controlHover() {
 		zIndex: 1, // Above the features
 
 		style: function(feature) {
-			// Get the first hover style options of the clustered features
-
-			const features = feature.get('features');
-			if (features)
-				feature = features[0];
-
-			const hoverStyleOptions = feature.get('hoverStyleOptions'),
+			const features = feature.get('features') || [feature],
 				names = [];
 
-			if (features) {
+			if (features.length > 1) // Clusters
 				for (let f in features)
 					names.push(features[f].get('name'));
+			else
+				names.push(features[0].get('label') || features[0].get('name'));
 
-				hoverStyleOptions.text.setText(names.join('\n'));
-			}
-
-			return new ol.style.Style(hoverStyleOptions);
+			feature.options.labelStyleOptions.text = names.join('\n');
+			feature.options.hoverStyleOptions.text = new ol.style.Text(
+				feature.options.labelStyleOptions
+			);
+			return new ol.style.Style(feature.options.hoverStyleOptions);
 		},
 	});
 
@@ -344,6 +324,8 @@ const layerMassif = layerJson({
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
 			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg'); //TODO reprendre urlBase
+
+			f.set('label', '11111\n22222\n' + f.get('nom')); //TODO DEBUG
 		},
 	}),
 
@@ -356,6 +338,9 @@ const layerMassif = layerJson({
 			return bbox.join(',');
 		},
 		clusterDistance: 32,
+		labelStyleOptions: {
+			//textBaseline: 'top', //TODO DEBUG
+		},
 	});
 
 map = new ol.Map({
