@@ -44,7 +44,7 @@ function controlLayerSwitcher(options) {
 		});
 
 		// Build html baselayers selectors
-		for (const name in options.baseLayers)
+		for (let name in options.baseLayers)
 			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
 				const layer = options.baseLayers[name];
 

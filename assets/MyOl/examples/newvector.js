@@ -1,10 +1,8 @@
 // Vector layer
 function layerJson(options) {
 	options = Object.assign({
-		styleOptions: {},
-		clusterStyleOptions: {},
-		hoverStyleOptions: {
-			toto: 56, //TODO DEBUG
+		styleOptionsFunction: function(so) {
+			return so;
 		},
 	}, options);
 
@@ -93,7 +91,9 @@ function layerJson(options) {
 					styleOptions.text = new ol.style.Text(labelStyleOptions);
 				}
 
-				return new ol.style.Style(styleOptions);
+				return new ol.style.Style(
+					options.styleOptionsFunction(styleOptions, feature)
+				);
 			}
 
 			//Cluster
@@ -284,19 +284,16 @@ const layerMassif = layerJson({
 			f.set('link', f.get('lien'));
 			f.set('name', f.get('nom'));
 		},
-
-		/*//TODO
-		style: function(feature) {
-			return new ol.style.Style({
+		styleOptionsFunction: function(styleOptions, feature) {
+			return {
 				fill: new ol.style.Fill({
 					color: feature.get('couleur'),
 				}),
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 10, //TODO ????????????????
-				}),
-			});
-		},*/
+			};
+		},
+		hoverStyleOptions: {
+			stroke: new ol.style.Stroke(),
+		},
 	}),
 
 	layerWRI = layerJson({
