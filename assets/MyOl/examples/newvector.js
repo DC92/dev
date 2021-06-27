@@ -13,22 +13,22 @@ function layerJson(options) {
 		}),
 	}, options.styleOptions);
 
-	options.labelStyleOptions = Object.assign({
-		textBaseline: 'bottom',
-		offsetY: 9, // Compensate bottom
-		font: '14px Calibri,sans-serif',
-		backgroundFill: new ol.style.Fill({
-			color: 'yellow',
-		}),
-		padding: [1, 3, 0, 3],
-	}, options.labelStyleOptions);
-
 	options.hoverStyleOptions = Object.assign({
 		stroke: new ol.style.Stroke({
 			color: 'red',
 			width: 3,
 		}),
 	}, options.hoverStyleOptions);
+
+	options.labelStyleOptions = Object.assign({
+		textBaseline: 'bottom',
+		offsetY: -13, // Compensate bottom
+		padding: [1, 3, 0, 3],
+		font: '14px Calibri,sans-serif',
+		backgroundFill: new ol.style.Fill({
+			color: 'yellow',
+		}),
+	}, options.labelStyleOptions);
 
 	options.clusterStyleOptions = Object.assign({
 		image: new ol.style.Circle({
@@ -331,8 +331,6 @@ const layerMassif = layerJson({
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
 			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg'); //TODO reprendre urlBase
-
-			f.set('label', '11111\n22222\n' + f.get('nom')); //TODO DEBUG
 		},
 	}),
 
@@ -371,5 +369,5 @@ map = new ol.Map({
 });
 
 //map.addLayer(layerMassif);
-map.addLayer(layerWRI);
+//map.addLayer(layerWRI);
 map.addLayer(layerChem);
