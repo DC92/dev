@@ -274,7 +274,7 @@ function layerIGN(layer, format, key) {
 /**
  * Layers with not all resolutions or area available
  * Virtual class
- * Displays Stamen outside the layer zoom range or extend
+ * Display Stamen outside the layer zoom range or extend
  * Requires myol:onadd
  */
 //BEST document all options in options = Object.assign
@@ -554,7 +554,7 @@ function controlLayerSwitcher(options) {
 		});
 
 		// Build html baselayers selectors
-		for (const name in options.baseLayers)
+		for (let name in options.baseLayers)
 			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
 				const layer = options.baseLayers[name];
 
@@ -1564,7 +1564,7 @@ function controlPermalink(options) {
 }
 
 /**
- * Control to displays the mouse position
+ * Control to display the mouse position
  */
 function controlMousePosition() {
 	return new ol.control.MousePosition({
@@ -1576,7 +1576,7 @@ function controlMousePosition() {
 }
 
 /**
- * Control to displays the length of a line overflown
+ * Control to display the length of a line overflown
  * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {

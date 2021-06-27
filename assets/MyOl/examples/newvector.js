@@ -1,24 +1,14 @@
 // Vector layer
 function layerJson(options) {
 	options = Object.assign({
+		urlSuffix: '',
 		styleOptionsFunction: function(so) {
 			return so;
 		},
 	}, options);
 
-	options.styleOptions = Object.assign({
-		stroke: new ol.style.Stroke({
-			color: 'blue',
-			width: 2,
-		}),
-	}, options.styleOptions);
-
-	options.hoverStyleOptions = Object.assign({
-		stroke: new ol.style.Stroke({
-			color: 'red',
-			width: 3,
-		}),
-	}, options.hoverStyleOptions);
+	//	options.styleOptions
+	//	options.hoverStyleOptions
 
 	options.labelStyleOptions = Object.assign({
 		textBaseline: 'bottom',
@@ -45,7 +35,7 @@ function layerJson(options) {
 		}),
 	}, options.clusterStyleOptions);
 
-	//TODO layers options
+	//TODO bug sur XMLHttpRequest.Lu.s.onload / n.getCoordinates is not a function
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
@@ -58,7 +48,7 @@ function layerJson(options) {
 
 				//TODO une seule fonction intégrant bbox et appel baseurl
 				return options.urlBase + // url base that can varry (server name, ...)
-					(options.urlSuffix || '') + // url suffix to be defined separately from the urlBase
+					options.urlSuffix + // url suffix to be defined separately from the urlBase
 					(!options.urlBbox ? '' :
 						options.urlBbox(ol.proj.transformExtent(
 							extent,
@@ -77,19 +67,19 @@ function layerJson(options) {
 
 			// Single feature (point, line or poly)
 			if (features.length == 1) {
-				const icon = features[0].get('icon'),
-					styleOptions = Object.assign({}, options.styleOptions),
-					labelStyleOptions = Object.assign({}, options.labelStyleOptions);
+				const styleOptions = Object.assign({}, options.styleOptions),
+					labelStyleOptions = Object.assign({}, options.labelStyleOptions),
+					icon = features[0].get('icon');
 
 				// Add icon on points
-				if (icon) {
+				if (icon)
 					styleOptions.image = new ol.style.Icon({
 						src: icon,
 					});
 
-					labelStyleOptions.text = features[0].get('name');
-					styleOptions.text = new ol.style.Text(labelStyleOptions);
-				}
+				//TODO ne pas afficher label sur ligne
+				labelStyleOptions.text = feature.get('name');
+				styleOptions.text = new ol.style.Text(labelStyleOptions);
 
 				return new ol.style.Style(
 					options.styleOptionsFunction(styleOptions, feature)
@@ -284,15 +274,12 @@ const layerMassif = layerJson({
 			f.set('link', f.get('lien'));
 			f.set('name', f.get('nom'));
 		},
+		//TODO afficher label sans hover
 		styleOptionsFunction: function(styleOptions, feature) {
-			return {
-				fill: new ol.style.Fill({
-					color: feature.get('couleur'),
-				}),
-			};
-		},
-		hoverStyleOptions: {
-			stroke: new ol.style.Stroke(),
+			styleOptions.fill = new ol.style.Fill({
+				color: feature.get('couleur'),
+			});
+			return styleOptions;
 		},
 	}),
 
@@ -330,7 +317,8 @@ const layerMassif = layerJson({
 			// Other displays
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
-			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg'); //TODO reprendre urlBase
+			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
+			//TODO reprendre urlBase
 		},
 	}),
 
@@ -343,8 +331,17 @@ const layerMassif = layerJson({
 			return bbox.join(',');
 		},
 		clusterDistance: 32,
-		labelStyleOptions: {
-			//textBaseline: 'top', //TODO DEBUG
+		styleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 2,
+			}),
+		},
+		hoverStyleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 3,
+			}),
 		},
 	});
 
@@ -368,6 +365,5 @@ map = new ol.Map({
 	}),
 });
 
-//map.addLayer(layerMassif);
-//map.addLayer(layerWRI);
+map.addLayer(layerWRI);
 map.addLayer(layerChem);
