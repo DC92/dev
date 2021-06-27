@@ -7,6 +7,14 @@ function layerJson(options) {
 			toto: 56, //TODO DEBUG
 		},
 	}, options);
+
+	options.styleOptions = Object.assign({
+		stroke: new ol.style.Stroke({
+			color: 'blue',
+			width: 2,
+		}),
+	}, options.styleOptions);
+
 	options.labelStyleOptions = Object.assign({
 		textBaseline: 'bottom',
 		offsetY: 9, // Compensate bottom
@@ -16,6 +24,28 @@ function layerJson(options) {
 		}),
 		padding: [1, 3, 0, 3],
 	}, options.labelStyleOptions);
+
+	options.hoverStyleOptions = Object.assign({
+		stroke: new ol.style.Stroke({
+			color: 'red',
+			width: 3,
+		}),
+	}, options.hoverStyleOptions);
+
+	options.clusterStyleOptions = Object.assign({
+		image: new ol.style.Circle({
+			radius: 14,
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			fill: new ol.style.Fill({
+				color: 'white',
+			}),
+		}),
+		text: new ol.style.Text({
+			font: '14px Calibri,sans-serif',
+		}),
+	}, options.clusterStyleOptions);
 
 	//TODO layers options
 	const source = new ol.source.Vector({
@@ -42,58 +72,37 @@ function layerJson(options) {
 		}),
 
 		style = function(feature) {
-			feature.options = options; // Mem for hover
+			// Memo the options in the feature for hover display
+			feature.options = options;
 
-			const styleLocal = typeof options.style == 'function' ?
-				options.style(feature) :
-				options.style || new ol.style.Style();
+			const features = feature.get('features') || [feature];
 
-			if (feature.get('features')) {
-				// Only 1 point in the cluster, display it
-				if (feature.get('features').length == 1) {
-					feature = feature.get('features')[0];
+			// Single feature (point, line or poly)
+			if (features.length == 1) {
+				const icon = features[0].get('icon'),
+					styleOptions = Object.assign({}, options.styleOptions),
+					labelStyleOptions = Object.assign({}, options.labelStyleOptions);
 
-					// Permanent label
-					styleLocal.setText(new ol.style.Text(options.labelStyleOptions));
-					styleLocal.getText().setText(feature.get('name'));
-					styleLocal.getText().setOffsetY(-13);
+				// Add icon on points
+				if (icon) {
+					styleOptions.image = new ol.style.Icon({
+						src: icon,
+					});
+
+					labelStyleOptions.text = features[0].get('name');
+					styleOptions.text = new ol.style.Text(labelStyleOptions);
 				}
-					// This is a cluster, display a circle with the number
-				else {
-					styleLocal.setImage(new ol.style.Circle({
-						radius: 14,
-						stroke: new ol.style.Stroke({
-							color: 'blue',
-						}),
-						fill: new ol.style.Fill({
-							color: 'white',
-						}),
-					}));
 
-					styleLocal.setText(new ol.style.Text({
-						font: '14px Calibri,sans-serif',
-						text: feature.get('features').length.toString(),
-					}));
-				}
+				return new ol.style.Style(styleOptions);
 			}
-			// Not clustered (lines & polys)
-			else if (styleLocal.getText()) {
-				styleLocal.getText().setText(feature.get('name'));
+
+			//Cluster
+			else {
+				const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
+
+				clusterStyleOptions.text.setText(features.length.toString());
+				return new ol.style.Style(clusterStyleOptions);
 			}
-			// Add icon on points
-			const icon = feature.get('icon');
-			if (icon)
-				styleLocal.setImage(new ol.style.Icon({
-					src: icon,
-				}));
-
-			// For lines
-			styleLocal.setStroke(new ol.style.Stroke({
-				color: 'blue',
-				width: 2,
-			}));
-
-			return styleLocal;
 		},
 
 		clusterSource = !options.clusterDistance ?
@@ -115,12 +124,9 @@ function layerJson(options) {
 				});
 
 				// Include the feature in the cluster source (lines, polygons)
-				if (!featureExists) {
-					const textOpt = new ol.style.Text(options.labelStyleOptions);
-					textOpt.setText(feature.get('name'));
-
+				if (!featureExists)
 					clusterSource.addFeature(feature);
-				}
+
 				return null; // Don't cluster it
 			},
 		}),
@@ -195,11 +201,14 @@ function controlHover() {
 			else
 				names.push(features[0].get('label') || features[0].get('name'));
 
-			feature.options.labelStyleOptions.text = names.join('\n');
-			feature.options.hoverStyleOptions.text = new ol.style.Text(
-				feature.options.labelStyleOptions
+			const hoverStyleOptions = Object.assign({}, feature.options.hoverStyleOptions),
+				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions);
+
+			labelStyleOptions.text = names.join('\n');
+			hoverStyleOptions.text = new ol.style.Text(
+				labelStyleOptions
 			);
-			return new ol.style.Style(feature.options.hoverStyleOptions);
+			return new ol.style.Style(hoverStyleOptions);
 		},
 	});
 
@@ -276,6 +285,7 @@ const layerMassif = layerJson({
 			f.set('name', f.get('nom'));
 		},
 
+		/*//TODO
 		style: function(feature) {
 			return new ol.style.Style({
 				fill: new ol.style.Fill({
@@ -286,7 +296,7 @@ const layerMassif = layerJson({
 					width: 10, //TODO ????????????????
 				}),
 			});
-		},
+		},*/
 	}),
 
 	layerWRI = layerJson({
