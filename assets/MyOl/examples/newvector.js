@@ -78,7 +78,7 @@ function layerJson(options) {
 					});
 
 				//TODO ne pas afficher label sur ligne
-				labelStyleOptions.text = feature.get('name');
+				labelStyleOptions.text = features[0].get('name');
 				styleOptions.text = new ol.style.Text(labelStyleOptions);
 
 				return new ol.style.Style(
@@ -126,11 +126,13 @@ function layerJson(options) {
 			style: style,
 		});
 
+	layer.options = options;
+
 	// Normalize properties
 	if (typeof options.normalize == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let k in evt.features)
-				options.normalize(evt.features[k]);
+				options.normalize(evt.features[k], layer);
 		});
 
 	// Erase the layer before rebuild when bbox strategy is applied
@@ -264,26 +266,48 @@ function controlHover() {
 	return control;
 }
 
-/**
- * Example
- */
-const layerMassif = layerJson({
+function layerChem(options) {
+	return layerJson(Object.assign({
+		urlBase: '//chemineur.fr/',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
+		urlBbox: function(bbox) {
+			return bbox.join(',');
+		},
+		clusterDistance: 32,
+		styleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 2,
+			}),
+		},
+		hoverStyleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 3,
+			}),
+		},
+	}, options));
+}
+
+function layerWRI(options) {
+	const layerMassif = layerJson({
 		urlBase: '//www.refuges.info/',
 		urlSuffix: 'api/polygones?type_polygon=1',
 		normalize: function(f) {
 			f.set('link', f.get('lien'));
 			f.set('name', f.get('nom'));
 		},
-		//TODO afficher label sans hover
 		styleOptionsFunction: function(styleOptions, feature) {
 			styleOptions.fill = new ol.style.Fill({
 				color: feature.get('couleur'),
 			});
 			return styleOptions;
 		},
-	}),
+	});
 
-	layerWRI = layerJson({
+	options = Object.assign({
 		urlBase: '//www.refuges.info/',
 		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
 		urlBbox: function(bbox) {
@@ -293,7 +317,7 @@ const layerMassif = layerJson({
 		pixelRatioMax: 100,
 		layerAbove: layerMassif,
 
-		normalize: function(f) {
+		normalize: function(f, layer) {
 			// Hover label
 			const label = [],
 				desc = [];
@@ -317,35 +341,17 @@ const layerMassif = layerJson({
 			// Other displays
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
-			f.set('icon', '//www.refuges.info/images/icones/' + f.get('type').icone + '.svg');
-			//TODO reprendre urlBase
+			f.set('icon', layer.options.urlBase + 'images/icones/' + f.get('type').icone + '.svg');
 		},
-	}),
+	}, options);
 
-	layerChem = layerJson({
-		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
-		urlBbox: function(bbox) {
-			return bbox.join(',');
-		},
-		clusterDistance: 32,
-		styleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 2,
-			}),
-		},
-		hoverStyleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 3,
-			}),
-		},
-	});
+	return layerJson(options);
+}
 
-map = new ol.Map({
+/**
+ * Example
+ */
+const map = new ol.Map({
 	target: 'map',
 	controls: [
 		controlLayerSwitcher({
@@ -365,5 +371,5 @@ map = new ol.Map({
 	}),
 });
 
-map.addLayer(layerWRI);
-map.addLayer(layerChem);
+map.addLayer(layerWRI());
+map.addLayer(layerChem());
