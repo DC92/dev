@@ -20,15 +20,12 @@ Based on https://openlayers.org
 
 	<!-- My Openlayers -->
 	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<link  href="../src/myol.css" type="text/css" rel="stylesheet">
 	<script src="../src/header.js"></script>
 	<script src="../src/checkboxManager.js"></script>
 	<script src="../src/tileLayers.js"></script>
 	<script src="../src/layerSwitcher.js"></script>
-	<script src="../src/myol.js"></script>
+	<script src="../src/geoJsonLayers.js"></script>
 
-	<!-- This exemple -->
-	<script src="newvector.js" defer></script>
 	<style>
 		#map {
 			width: 97vw;
@@ -39,5 +36,27 @@ Based on https://openlayers.org
 
 <body>
 	<div id="map"></div>
+
+	<script>
+		const map = new ol.Map({
+			target: 'map',
+			controls: [
+				controlLayerSwitcher({
+					baseLayers: layersCollection(),
+				}),
+				new ol.control.Zoom(),
+				controlHover(),
+			],
+			view: new ol.View({
+				//center: [700000, 5700000], // Maurienne
+				//center: [260000, 6250000], // Paris
+				center: [257000, 6250000], // Paris
+				zoom: 9, // 11
+			}),
+		});
+
+		map.addLayer(layerWRI());
+		map.addLayer(layerChem());
+	</script>
 </body>
 </html>

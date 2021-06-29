@@ -1,5 +1,5 @@
 // Vector layer
-function layerJson(options) {
+function geoJsonLayer(options) {
 	options = Object.assign({
 		urlSuffix: '',
 		styleOptionsFunction: function(so) {
@@ -267,7 +267,7 @@ function controlHover() {
 }
 
 function layerChem(options) {
-	return layerJson(Object.assign({
+	return geoJsonLayer(Object.assign({
 		urlBase: '//chemineur.fr/',
 		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
@@ -292,7 +292,7 @@ function layerChem(options) {
 }
 
 function layerWRI(options) {
-	const layerMassif = layerJson({
+	const layerMassif = geoJsonLayer({
 		urlBase: '//www.refuges.info/',
 		urlSuffix: 'api/polygones?type_polygon=1',
 		normalize: function(f) {
@@ -345,31 +345,5 @@ function layerWRI(options) {
 		},
 	}, options);
 
-	return layerJson(options);
+	return geoJsonLayer(options);
 }
-
-/**
- * Example
- */
-const map = new ol.Map({
-	target: 'map',
-	controls: [
-		controlLayerSwitcher({
-			baseLayers: layersCollection(),
-		}),
-		new ol.control.Attribution(),
-		controlMousePosition(),
-		new ol.control.Zoom(),
-		controlFullScreen(),
-		controlHover(),
-	],
-	view: new ol.View({
-		//center: [700000, 5700000], // Maurienne
-		//center: [260000, 6250000], // Paris
-		center: [257000, 6250000], // Paris
-		zoom: 9, // 11
-	}),
-});
-
-map.addLayer(layerWRI());
-map.addLayer(layerChem());

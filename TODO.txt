@@ -1,8 +1,6 @@
 NEW MYOL
-	Couches vectorielles
 	TEST GPS
 	TEST INCLUSION WRI
-
 
 BUG
 	viewtopic point KO
