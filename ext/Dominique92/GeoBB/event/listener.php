@@ -49,25 +49,8 @@ class listener implements EventSubscriberInterface
 
 			// Adm
 			'core.adm_page_header' => 'adm_page_header',
-
-//			'core.viewforum_modify_page_title' => 'viewforum_modify_page_title', //TODO A SUPPRIMER APRES MIGRATION O2
 		];
 	}
-
-/*/TODO A SUPPRIMER APRES MIGRATION O2
-	function viewforum_modify_page_title($vars) {
-		$forum_desc = $vars['forum_data']['forum_desc'];
-		$forum_desc = str_replace ('[first=point]</s><e>', '[first=point]</s>.point<e>', $forum_desc);
-		$forum_desc = str_replace ('[first=line]</s><e>', '[first=line]</s>.poly<e>', $forum_desc);
-		$forum_desc = str_replace ('[view=diapo]</s><e>', '[view=diapo]</s>*slideshow<e>', $forum_desc);
-		$forum_desc = addslashes ($forum_desc);
-
-		$forum_image = str_replace ('types_points', 'icones', $vars['forum_data']['forum_image']);
-		$forum_image = addslashes ($forum_image);
-
-		$sql = "UPDATE ".FORUMS_TABLE." SET forum_desc = \"$forum_desc\", forum_image = \"$forum_image\" WHERE forum_id = ".$vars['forum_data']['forum_id'];
-		$this->db->sql_query($sql);
-	}*/
 
 	/**
 		COMMON
@@ -143,7 +126,7 @@ class listener implements EventSubscriberInterface
 					$topic_row['geo_altitude'] = $match ? $match[1] : '~';
 
 					// Update the database for next time
-					$sql = "UPDATE phpbb_posts SET geo_massif = '".addslashes ($topic_row['geo_massif'])."' WHERE post_id = $post_id";     
+					$sql = "UPDATE phpbb_posts SET geo_altitude = {$topic_row['geo_altitude']} WHERE post_id = $post_id";     
 					$this->db->sql_query($sql);
 				}
 
@@ -164,7 +147,7 @@ class listener implements EventSubscriberInterface
 					$topic_row['geo_massif'] = @$ms[array_keys($ms)[0]] ?: '~';
 
 					// Update the database for next time
-					$sql = "UPDATE phpbb_posts SET geo_massif = '{$topic_row['geo_massif']}' WHERE post_id = $post_id";
+					$sql = "UPDATE phpbb_posts SET geo_massif = '".addslashes ($topic_row['geo_massif'])."' WHERE post_id = $post_id";
 					$this->db->sql_query($sql);
 				}
 			}
