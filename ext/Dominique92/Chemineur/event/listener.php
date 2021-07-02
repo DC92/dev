@@ -164,15 +164,16 @@ class listener implements EventSubscriberInterface
 		if (@$this->attachments) {
 			$post_id = $vars['attachment']['post_msg_id'];
 
-			//BEST déplacer dans ext/Dominique92/Images
+			//TODO déplacer dans ext/Dominique92/Images
 			// Assigne les valeurs au template
 			$this->block_array = $vars['block_array'];
 			$this->block_array['TEXT_SIZE'] = strlen (@$this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
 			$this->block_array['DATE'] = str_replace (' 00:00', '', $this->user->format_date($vars['attachment']['filetime']));
-			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; //BEST Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
+			$this->block_array['AUTEUR'] = $vars['row']['user_sig']; //TODO Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
 			$this->block_array['EXIF'] = $vars['attachment']['exif'];
 			foreach ($vars['attachment'] AS $k=>$v)
 				$this->block_array[strtoupper($k)] = $v;
+			//TODO purger la base des liens photos externes
 			$this->block_array['LOCATION'] =
 				strncasecmp ($vars['attachment']['physical_filename'], 'http', 4)
 				? 'local'

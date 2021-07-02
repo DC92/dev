@@ -118,15 +118,15 @@ class listener implements EventSubscriberInterface
 					@$mapKeys['keys-mapquest']) {
 					$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
 						$mapKeys['keys-mapquest'].
-						'&callback=handleHelloWorldResponse&shapeFormat=raw&latLngCollection='.
+						'&latLngCollection='.
 						$ll[2].','.$ll[1];
-					preg_match('/"height":([0-9]+)/', @file_get_contents ($mapquest), $match);
+					preg_match('/"height":([-0-9]+)/', @file_get_contents ($mapquest), $match);
 
 					// Update the template data
 					$topic_row['geo_altitude'] = $match ? $match[1] : '~';
 
 					// Update the database for next time
-					$sql = "UPDATE phpbb_posts SET geo_altitude = {$topic_row['geo_altitude']} WHERE post_id = $post_id";     
+					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";     
 					$this->db->sql_query($sql);
 				}
 
