@@ -122,50 +122,50 @@ function geoJsonLayer(options) {
 	});
 
 	function style(feature) {
-		// Memorize the options in the feature for hover display
-		feature.options = options;
+		const features = feature.get('features') || [feature],
+			icon = features[0].get('icon'),
+			area = ol.extent.getArea(
+				features[0].getGeometry().getExtent()
+			),
+			styleOptions = Object.assign({}, options.styleOptions),
+			labelStyleOptions = Object.assign({}, options.labelStyleOptions);
 
-		const features = feature.get('features') || [feature];
+		feature.options = options; // Memorize the options in the feature for hover display
+
+		// Clusters
+		if (features.length > 1) {
+			const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
+			clusterStyleOptions.text.setText(features.length.toString());
+
+			return new ol.style.Style(clusterStyleOptions);
+		}
 
 		// Single feature (point, line or poly)
-		if (features.length == 1) {
-			// Include the feature in the cluster source (lines, polygons)
+		// Add a permanent label
+		labelStyleOptions.text = features[0].get('name'); //TODO make 'name' an option
+		styleOptions.text = new ol.style.Text(labelStyleOptions);
+
+		// Include the feature in the cluster source (lines, polygons)
+		if (area) {
 			const featureExists = clusterSource.forEachFeature(function(f) {
 				if (features[0].ol_uid == f.ol_uid)
 					return true;
 			});
+
 			if (!featureExists)
 				clusterSource.addFeature(features[0]);
-
-			// Compute basic style
-			const styleOptions = Object.assign({}, options.styleOptions),
-				labelStyleOptions = Object.assign({}, options.labelStyleOptions),
-				icon = features[0].get('icon');
-
-			// Add icon if one is in the property icon
-			if (icon)
-				styleOptions.image = new ol.style.Icon({
-					src: icon,
-				});
-
-			// Add a permanent label
-			labelStyleOptions.text = features[0].get('name') //TODO make 'name' an option
-				+
-				' cluster ' + features[0].ol_uid; //TODO DELETE
-			styleOptions.text = new ol.style.Text(labelStyleOptions);
-
-			// Define the style of the cluster point & the groupped features
-			return new ol.style.Style(
-				options.styleOptionsFunction(styleOptions, feature)
-			);
 		}
 
-		//Cluster
-		else {
-			const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
-			clusterStyleOptions.text.setText(features.length.toString());
-			return new ol.style.Style(clusterStyleOptions);
-		}
+		// Add icon if one is in the property icon
+		else if (icon)
+			styleOptions.image = new ol.style.Icon({
+				src: icon,
+			});
+
+		// Define the style of the cluster point & the groupped features
+		return new ol.style.Style(
+			options.styleOptionsFunction(styleOptions, feature)
+		);
 	}
 
 	return layer;
