@@ -36,18 +36,20 @@ function geoJsonLayer(options) {
 	}, options.clusterStyleOptions);
 
 	//TODO bug sur XMLHttpRequest.Lu.s.onload / n.getCoordinates is not a function
+	//TODO gérer les msg erreur
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
 			url: function(extent, resolution, projection) {
 				//TODO Retreive checked parameters
-				/*			let list = permanentCheckboxList(options.selectorName).filter(
-									function(evt) {
-										return evt !== 'on'; // Except the "all" input (default value = "on")
-									}),*/
+				/* let list = permanentCheckboxList(options.selectorName).filter(
+					function(evt) {
+						return evt !== 'on'; // Except the "all" input (default value = "on")
+					}
+				),*/
 
 				//TODO une seule fonction intégrant bbox et appel baseurl
-				return options.urlBase + // url base that can varry (server name, ...)
+				return options.urlBase + // url base that can vary (server name, ...)
 					options.urlSuffix + // url suffix to be defined separately from the urlBase
 					(!options.urlBbox ? '' :
 						options.urlBbox(ol.proj.transformExtent(
@@ -59,53 +61,24 @@ function geoJsonLayer(options) {
 			},
 		}),
 
-		style = function(feature) {
-			// Memo the options in the feature for hover display
-			feature.options = options;
-
-			const features = feature.get('features') || [feature];
-
-			// Single feature (point, line or poly)
-			if (features.length == 1) {
-				const styleOptions = Object.assign({}, options.styleOptions),
-					labelStyleOptions = Object.assign({}, options.labelStyleOptions),
-					icon = features[0].get('icon');
-
-				// Add icon on points
-				if (icon)
-					styleOptions.image = new ol.style.Icon({
-						src: icon,
-					});
-
-				//TODO ne pas afficher label sur ligne
-				labelStyleOptions.text = features[0].get('name');
-				styleOptions.text = new ol.style.Text(labelStyleOptions);
-
-				return new ol.style.Style(
-					options.styleOptionsFunction(styleOptions, feature)
-				);
-			}
-
-			//Cluster
-			else {
-				const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
-
-				clusterStyleOptions.text.setText(features.length.toString());
-				return new ol.style.Style(clusterStyleOptions);
-			}
-		},
-
-		clusterSource = !options.clusterDistance ?
-		source :
+		// Optional clusterisation
+		clusterSource = !options.clusterDistance ? source :
 		new ol.source.Cluster({
 			distance: options.clusterDistance,
 			source: source,
 			geometryFunction: function(feature) {
-
 				// If it's a point
-				if (!ol.extent.getArea(feature.getGeometry().getExtent()))
-					return feature.getGeometry();
+				//if (!ol.extent.getArea(feature.getGeometry().getExtent()))
+				//	return feature.getGeometry();
 
+				//const center = ol.extent.getCenter(feature.getGeometry().getExtent());
+				return new ol.geom.Point(
+					ol.extent.getCenter(
+						feature.getGeometry().getExtent()
+					)
+				);
+
+				/*
 				// Then, it's line or poly (not to be clustered)
 				// Test if the feature is already included
 				const featureExists = clusterSource.forEachFeature(function(f) {
@@ -118,14 +91,62 @@ function geoJsonLayer(options) {
 					clusterSource.addFeature(feature);
 
 				return null; // Don't cluster it
+				*/
 			},
 		}),
+
+		style = function(feature) {
+			// Memorize the options in the feature for hover display
+			feature.options = options;
+
+			const features = feature.get('features') || [feature];
+
+			// Single feature (point, line or poly)
+			if (features.length == 1) {
+				// Test if the feature is already included
+				const featureExists = clusterSource.forEachFeature(function(f) {
+					if (features[0].ol_uid == f.ol_uid)
+						return true;
+				});
+
+				// Include the feature in the cluster source (lines, polygons)
+				if (!featureExists)
+					clusterSource.addFeature(features[0]);
+
+				const styleOptions = Object.assign({}, options.styleOptions),
+					labelStyleOptions = Object.assign({}, options.labelStyleOptions),
+					icon = features[0].get('icon');
+
+				// Add icon if one is in the property icon
+				if (icon)
+					styleOptions.image = new ol.style.Icon({
+						src: icon,
+					});
+
+				// Add a permanent label
+				labelStyleOptions.text = features[0].get('name') + ' cluster'; //TODO make 'name' an option
+				styleOptions.text = new ol.style.Text(labelStyleOptions);
+
+				// Define the style of the cluster point & the groupped features
+				return new ol.style.Style(
+					options.styleOptionsFunction(styleOptions, feature)
+				);
+			}
+
+			//Cluster
+			else {
+				const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
+				clusterStyleOptions.text.setText(features.length.toString());
+				return new ol.style.Style(clusterStyleOptions);
+			}
+		},
 
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
 		});
 
+	// Memorize for further use
 	layer.options = options;
 
 	// Normalize properties
@@ -187,9 +208,16 @@ function controlHover() {
 			const features = feature.get('features') || [feature],
 				names = [];
 
-			if (features.length > 1) // Clusters
+			// Big clusters
+			if (features.length > 5)
+				names.push(features.length + ' éléments');
+
+			// Clusters
+			else if (features.length > 1)
 				for (let f in features)
 					names.push(features[f].get('name'));
+
+			// Point
 			else
 				names.push(features[0].get('label') || features[0].get('name'));
 
@@ -212,10 +240,19 @@ function controlHover() {
 		// Hovering a feature
 		map.on('pointermove', function(evt) {
 			// Get hovered feature
-			const pixel = map.getEventPixel(evt.originalEvent),
+			let pixel = map.getEventPixel(evt.originalEvent), //TODO let -> const ?
 				feature = map.forEachFeatureAtPixel(pixel, function(feature) {
 					return feature;
 				});
+
+			if (feature) {
+				const features = feature.get('features') || [feature];
+				if (features.length == 1) {
+					const options = feature.options;
+					feature = features[0];
+					features[0].options = options;
+				}
+			}
 
 			if (feature !== hoveredFeature) {
 				if (hoveredFeature)
