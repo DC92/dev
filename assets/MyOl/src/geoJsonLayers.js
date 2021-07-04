@@ -1,7 +1,7 @@
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?bbox=',
+		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=',
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',

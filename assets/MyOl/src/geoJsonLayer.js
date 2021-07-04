@@ -35,7 +35,6 @@ function geoJsonLayer(options) {
 		}),
 	}, options.clusterStyleOptions);
 
-	//TODO bug sur XMLHttpRequest.Lu.s.onload / n.getCoordinates is not a function
 	//TODO gérer les msg erreur
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
@@ -145,8 +144,10 @@ function geoJsonLayer(options) {
 		// Single feature (point, line or poly)
 
 		// Add a permanent label
-		labelStyleOptions.text = features[0].get('name');
-		styleOptions.text = new ol.style.Text(labelStyleOptions);
+		if (feature.get('features')) { // Exclude cluster marker
+			labelStyleOptions.text = features[0].get('name');
+			styleOptions.text = new ol.style.Text(labelStyleOptions);
+		}
 
 		// Include the feature in the cluster source (lines, polygons)
 		// to make it visible
