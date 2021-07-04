@@ -1,6 +1,8 @@
 NEW MYOL
 	TEST GPS
 	TEST INCLUSION WRI
+	valeur du pas du zoom tous explorateurs
+	Etiquette ligne au survol / une seule par fiche ?
 
 BUG
 	viewtopic point KO
