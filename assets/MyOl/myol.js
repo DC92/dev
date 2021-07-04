@@ -10,7 +10,6 @@
 //HACKS For JS validators
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
-if (!mapKeys) var mapKeys = {};
 
 //HACK IE polyfills
 // Need to transpile ol.js with: https://babeljs.io/repl  BROWSERS = default

@@ -5,7 +5,6 @@
 //HACKS For JS validators
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
-if (!mapKeys) var mapKeys = {};
 
 /*--*/
 /**

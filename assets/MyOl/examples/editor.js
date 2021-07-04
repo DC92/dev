@@ -29,13 +29,19 @@ const back = layerChemineur({
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
 	});
 
-new ol.Map({
-	target: 'map',
-	layers: [
-		back,
-		editor,
-	],
-	controls: controlsCollection({
-		baseLayers: layersCollection(),
-	}),
-});
+const mapKeys = {
+		"ign": "hcxdz5f1p9emo4i1lch6ennl",
+		"thunderforest": "ee751f43b3af4614b01d1bce72785369",
+		"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
+	},
+
+	map = new ol.Map({
+		target: 'map',
+		layers: [
+			back,
+			editor,
+		],
+		controls: controlsCollection({
+			baseLayers: layersCollection(),
+		}),
+	});

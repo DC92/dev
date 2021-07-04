@@ -36,34 +36,34 @@ Based on https://openlayers.org
 	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 
 	<script>
-	console.log('Cookies: ' + document.cookie);
+		console.log('Cookies: ' + document.cookie);
 
-	function layerGoogle(subLayer) {
-		return new ol.layer.Tile({
-			source: new ol.source.XYZ({
-				url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
-				attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
-			})
-		});
-	}
+		function layerGoogle(subLayer) {
+			return new ol.layer.Tile({
+				source: new ol.source.XYZ({
+					url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
+					attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
+				})
+			});
+		}
 
-	var map = new ol.Map({
-		target: 'map',
-		controls: [
-			new ol.control.Zoom(),
-			controlLayerSwitcher({
-				baseLayers: {
-					'Google road': layerGoogle('m'),
-					'Google terrain': layerGoogle('p'),
-					'Photo Google': layerGoogle('s'),
-				},
+		var map = new ol.Map({
+			target: 'map',
+			controls: [
+				new ol.control.Zoom(),
+				controlLayerSwitcher({
+					baseLayers: {
+						'Google road': layerGoogle('m'),
+						'Google terrain': layerGoogle('p'),
+						'Photo Google': layerGoogle('s'),
+					},
+				}),
+			],
+			view: new ol.View({
+				center: [700000, 5600000],
+				zoom: 7,
 			}),
-		],
-		view: new ol.View({
-			center: [700000, 5600000],
-			zoom: 7,
-		}),
-	});
+		});
 	</script>
 </body>
 </html>

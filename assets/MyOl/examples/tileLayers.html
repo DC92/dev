@@ -35,19 +35,25 @@ Based on https://openlayers.org
 	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 
 	<script>
-	var map = new ol.Map({
-		target: 'map',
-		controls: [
-			new ol.control.Zoom(),
-			controlLayerSwitcher({
-				baseLayers: layersDemo(),
+		const mapKeys = {
+			"ign": "hcxdz5f1p9emo4i1lch6ennl",
+			"thunderforest": "ee751f43b3af4614b01d1bce72785369",
+			"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
+		},
+
+		map = new ol.Map({
+			target: 'map',
+			controls: [
+				new ol.control.Zoom(),
+				controlLayerSwitcher({
+					baseLayers: layersDemo(),
+				}),
+			],
+			view: new ol.View({
+				center: [700000, 5600000],
+				zoom: 7,
 			}),
-		],
-		view: new ol.View({
-			center: [700000, 5600000],
-			zoom: 7,
-		}),
-	});
+		});
 	</script>
 </body>
 </html>

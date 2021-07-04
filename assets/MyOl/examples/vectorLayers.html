@@ -110,25 +110,25 @@ Based on https://openlayers.org
 	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 
 	<script>
-	console.log(document.cookie);
+		console.log(document.cookie);
 
-	new ol.Map({
-		target: 'map',
-		layers: [
-			layerOverpass({selectorName: 'osm-features'}),
-			layerRefugesInfo({selectorName: 'wri-features'}),
-			layerPyreneesRefuges({selectorName: 'prc-features'}),
-			layerC2C({selectorName: 'c2c-features'}),
-			layerChemineur({selectorName: 'chm-features'}),
-			layerAlpages({selectorName: 'alp-features'}),
-		],
-		controls: controlsCollection({
-			baseLayers: layersCollection(),
-			controlPermalink: {
-				display: true,
-			},
-		}),
-	});
+		new ol.Map({
+			target: 'map',
+			layers: [
+				layerOverpass({selectorName: 'osm-features'}),
+				layerRefugesInfo({selectorName: 'wri-features'}),
+				layerPyreneesRefuges({selectorName: 'prc-features'}),
+				layerC2C({selectorName: 'c2c-features'}),
+				layerChemineur({selectorName: 'chm-features'}),
+				layerAlpages({selectorName: 'alp-features'}),
+			],
+			controls: controlsCollection({
+				baseLayers: layersCollection(),
+				controlPermalink: {
+					display: true,
+				},
+			}),
+		});
 	</script>
 </body>
 </html>

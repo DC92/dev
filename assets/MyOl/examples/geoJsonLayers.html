@@ -39,22 +39,28 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<script>
-		const map = new ol.Map({
-			target: 'map',
-			controls: [
-				controlLayerSwitcher({
-					baseLayers: layersCollection(),
+		const mapKeys = {
+				"ign": "hcxdz5f1p9emo4i1lch6ennl",
+				"thunderforest": "ee751f43b3af4614b01d1bce72785369",
+				"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
+			},
+
+			map = new ol.Map({
+				target: 'map',
+				controls: [
+					controlLayerSwitcher({
+						baseLayers: layersCollection(),
+					}),
+					new ol.control.Zoom(),
+					controlHover(),
+				],
+				view: new ol.View({
+					//center: [700000, 5700000], // Maurienne
+					center: [260000, 6250000], // Paris
+					//center: [300000, 6170000], // 
+					zoom: 10,
 				}),
-				new ol.control.Zoom(),
-				controlHover(),
-			],
-			view: new ol.View({
-				//center: [700000, 5700000], // Maurienne
-				center: [260000, 6250000], // Paris
-				//center: [300000, 6170000], // 
-				zoom: 10,
-			}),
-		});
+			});
 
 		map.addLayer(layerWRI());
 		map.addLayer(layerChem());
