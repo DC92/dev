@@ -127,7 +127,10 @@ function geoJsonLayer(options) {
 			area = ol.extent.getArea(
 				features[0].getGeometry().getExtent()
 			),
-			styleOptions = Object.assign({}, options.styleOptions),
+			styleOptions = options.styleOptionsFunction(
+				options.styleOptions || {},
+				feature
+			),
 			labelStyleOptions = Object.assign({}, options.labelStyleOptions);
 
 		feature.options = options; // Memorize the options in the feature for hover display
@@ -135,7 +138,6 @@ function geoJsonLayer(options) {
 		// Clusters
 		if (features.length > 1) {
 			const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
-
 			clusterStyleOptions.text.setText(features.length.toString());
 
 			return new ol.style.Style(clusterStyleOptions);
@@ -144,7 +146,13 @@ function geoJsonLayer(options) {
 		// Single feature (point, line or poly)
 
 		// Add a permanent label
-		if (feature.get('features')) { // Exclude cluster marker
+		if (!options.clusterDistance || // If no clusterisation 
+			(feature.get('features') // If not cluster marker 
+			) && (
+				(styleOptions.labelOnPoint && !area) ||
+				(styleOptions.labelOnLine && area) ||
+				(styleOptions.labelOnPoly && area)
+			)) {
 			labelStyleOptions.text = features[0].get('name');
 			styleOptions.text = new ol.style.Text(labelStyleOptions);
 		}
@@ -167,9 +175,7 @@ function geoJsonLayer(options) {
 				src: icon,
 			});
 
-		return new ol.style.Style(
-			options.styleOptionsFunction(styleOptions, feature)
-		);
+		return new ol.style.Style(styleOptions);
 	}
 
 	return layer;
@@ -192,7 +198,9 @@ function controlHover() {
 
 		style: function(feature) {
 			const features = feature.get('features') || [feature],
-				names = [];
+				names = [],
+				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions),
+				hoverStyleOptions = Object.assign({}, feature.options.hoverStyleOptions);
 
 			// Big clusters
 			if (features.length > 5)
@@ -207,9 +215,6 @@ function controlHover() {
 			else
 				names.push(features[0].get('label') || features[0].get('name'));
 
-			const hoverStyleOptions = Object.assign({}, feature.options.hoverStyleOptions),
-				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions);
-
 			labelStyleOptions.text = names.join('\n');
 			hoverStyleOptions.text = new ol.style.Text(
 				labelStyleOptions
@@ -222,6 +227,9 @@ function controlHover() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		map.addLayer(hoverLayer);
+
+		//TODO BUG étiquette décallée sur hover lignes chemineur
+		//TODO options label sur hover ligne / surface / point ||| basic / hover ???
 
 		// Hovering a feature
 		map.on('pointermove', function(evt) {

@@ -10,6 +10,7 @@ function layerChem(options) {
 		},
 		clusterDistance: 32,
 		styleOptions: {
+			labelOnPoint: true,
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
@@ -33,6 +34,7 @@ function layerWRI(options) {
 			f.set('name', f.get('nom'));
 		},
 		styleOptionsFunction: function(styleOptions, feature) {
+			styleOptions.labelOnPoly = true;
 			styleOptions.fill = new ol.style.Fill({
 				color: feature.get('couleur'),
 			});

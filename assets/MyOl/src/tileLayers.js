@@ -301,7 +301,7 @@ function layersCollection() {
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage', layerGoogle('s')), //TODO ?????? layerGoogle
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
