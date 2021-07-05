@@ -167,13 +167,12 @@ function geoJsonLayer(options) {
 
 			if (!featureExists)
 				clusterSource.addFeature(features[0]);
-		}
-
-		// Add icon if one is defined in the properties
-		else if (icon)
-			styleOptions.image = new ol.style.Icon({
-				src: icon,
-			});
+		} else
+			// Add icon if one is defined in the properties
+			if (icon)
+				styleOptions.image = new ol.style.Icon({
+					src: icon,
+				});
 
 		return new ol.style.Style(styleOptions);
 	}
@@ -190,35 +189,36 @@ function controlHover() {
 	let control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		}),
-		hoveredFeature;
+		previousHoveredFeature;
 
 	const hoverLayer = new ol.layer.Vector({
 		source: new ol.source.Vector(),
 		zIndex: 1, // Above the features
 
 		style: function(feature) {
+			//BEST options label on hover ligne / surface / point ???
 			const features = feature.get('features') || [feature],
 				names = [],
 				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions),
 				hoverStyleOptions = Object.assign({}, feature.options.hoverStyleOptions);
 
-			// Big clusters
 			if (features.length > 5)
+				// Big clusters
 				names.push(features.length + ' éléments');
-
-			// Clusters
-			else if (features.length > 1)
-				for (let f in features)
-					names.push(features[f].get('name'));
-
-			// Point
 			else
-				names.push(features[0].get('label') || features[0].get('name'));
+				// Clusters
+				if (features.length > 1)
+					for (let f in features)
+						names.push(features[f].get('name'));
+				else
+					// Point
+					names.push(features[0].get('label') || features[0].get('name'));
 
 			labelStyleOptions.text = names.join('\n');
 			hoverStyleOptions.text = new ol.style.Text(
 				labelStyleOptions
 			);
+
 			return new ol.style.Style(hoverStyleOptions);
 		},
 	});
@@ -228,68 +228,53 @@ function controlHover() {
 
 		map.addLayer(hoverLayer);
 
-		//TODO BUG étiquette décallée sur hover lignes chemineur
-		//TODO options label sur hover ligne / surface / point ||| basic / hover ???
-
-		// Hovering a feature
-		map.on('pointermove', function(evt) {
+		map.on(['pointermove', 'click'], function(evt) {
 			// Get hovered feature
-			let pixel = map.getEventPixel(evt.originalEvent), //TODO let -> const ?
-				feature = map.forEachFeatureAtPixel(pixel, function(feature) {
+			let feature = map.forEachFeatureAtPixel(
+				map.getEventPixel(evt.originalEvent),
+				function(feature) {
 					return feature;
 				});
 
 			if (feature) {
-				const features = feature.get('features') || [feature];
-				if (features.length == 1) {
-					const options = feature.options;
+				const features = feature.get('features'),
+					center = feature.getGeometry().getCoordinates(),
+					options = feature.options; // Mem it locally
+
+				if (features && features.length == 1) {
+					// Single feature
 					feature = features[0];
-					features[0].options = options;
-				}
+					const link = feature.get('link');
+
+					if (evt.type == 'click' && link) {
+						if (evt.originalEvent.ctrlKey) {
+							const tab = window.open(link, '_blank');
+							if (evt.originalEvent.shiftKey)
+								tab.focus();
+						} else
+							window.location = link;
+					}
+				} else
+					// Cluster
+					if (evt.type == 'click')
+						map.getView().animate({
+							zoom: map.getView().getZoom() + 1,
+							center: center,
+						});
+
+				feature.options = options;
 			}
 
-			if (feature !== hoveredFeature) {
-				if (hoveredFeature)
-					hoverLayer.getSource().removeFeature(hoveredFeature);
+			// Make the hovered feature visible in a dedicated layer
+			if (feature !== previousHoveredFeature) {
+				if (previousHoveredFeature)
+					hoverLayer.getSource().removeFeature(previousHoveredFeature);
 
 				if (feature)
 					hoverLayer.getSource().addFeature(feature);
 
 				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
-				hoveredFeature = feature;
-			}
-		});
-
-		// Click action
-		map.on('click', function(evt) {
-			// Get hovered feature
-			let feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
-				return feature;
-			});
-
-			if (feature) {
-				const center = feature.getGeometry().getCoordinates(),
-					features = feature.get('features');
-				if (features)
-					feature = features[0];
-				const link = feature.get('link');
-
-				// Cluster
-				if (features && features.length > 1)
-					map.getView().animate({
-						zoom: map.getView().getZoom() + 1,
-						center: center,
-					});
-
-				// Point, line, poly
-				else if (link) {
-					if (evt.originalEvent.ctrlKey) {
-						const tab = window.open(link, '_blank');
-						if (evt.originalEvent.shiftKey)
-							tab.focus();
-					} else
-						window.location = link;
-				}
+				previousHoveredFeature = feature;
 			}
 		});
 	};
