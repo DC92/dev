@@ -10,7 +10,6 @@ function layerChem(options) {
 		},
 		clusterDistance: 32,
 		styleOptions: {
-			labelOnPoint: true,
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
@@ -74,9 +73,9 @@ function layerWRI(options) {
 			f.set('label', label.join('\n'));
 
 			// Other displays
+			f.set('icon', layer.options.urlBase + 'images/icones/' + f.get('type').icone + '.svg');
 			f.set('name', f.get('nom'));
 			f.set('link', f.get('lien'));
-			f.set('icon', layer.options.urlBase + 'images/icones/' + f.get('type').icone + '.svg');
 		},
 	}, options);
 

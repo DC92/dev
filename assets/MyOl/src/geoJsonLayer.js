@@ -7,7 +7,10 @@ function geoJsonLayer(options) {
 		},
 	}, options);
 
-	//	options.styleOptions
+	options.styleOptions = Object.assign({
+		labelOnPoint: true,
+	}, options.styleOptions);
+
 	//	options.hoverStyleOptions
 
 	options.labelStyleOptions = Object.assign({
@@ -128,7 +131,7 @@ function geoJsonLayer(options) {
 				features[0].getGeometry().getExtent()
 			),
 			styleOptions = options.styleOptionsFunction(
-				options.styleOptions || {},
+				options.styleOptions,
 				feature
 			),
 			labelStyleOptions = Object.assign({}, options.labelStyleOptions);
@@ -183,7 +186,8 @@ function geoJsonLayer(options) {
 /**
  * Control to display labels on hovering a feature & execute click
  * feature.properties.name : name to label the feature
- * feature.properties.link : link to call when click on the feature
+ * feature.properties.label : full label on hover
+ * feature.properties.link : go to a new URL when we click on the feature
  */
 function controlHover() {
 	let control = new ol.control.Control({
@@ -212,7 +216,7 @@ function controlHover() {
 						names.push(features[f].get('name'));
 				else
 					// Point
-					names.push(features[0].get('label') || features[0].get('name'));
+					names.push(features[0].get('label'));
 
 			labelStyleOptions.text = names.join('\n');
 			hoverStyleOptions.text = new ol.style.Text(
@@ -225,7 +229,6 @@ function controlHover() {
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
-
 		map.addLayer(hoverLayer);
 
 		map.on(['pointermove', 'click'], function(evt) {
