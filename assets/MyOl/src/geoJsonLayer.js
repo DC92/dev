@@ -43,16 +43,9 @@ function geoJsonLayer(options) {
 			format: new ol.format.GeoJSON(),
 			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
 			url: function(extent, resolution, projection) {
-				//TODO Retreive checked parameters
-				/* let list = permanentCheckboxList(options.selectorName).filter(
-					function(evt) {
-						return evt !== 'on'; // Except the "all" input (default value = "on")
-					}
-				),*/
-
 				//TODO une seule fonction intégrant bbox et appel baseurl
 				return options.urlBase + // url base that can vary (server name, ...)
-					options.urlSuffix + // url suffix to be defined separately from the urlBase
+					'api/bbox?nb_points=all&type_points=' + options.selectorList + '&bbox=' + // url suffix to be defined separately from the urlBase
 					(!options.urlBbox ? '' :
 						options.urlBbox(ol.proj.transformExtent(
 							extent,
@@ -86,6 +79,12 @@ function geoJsonLayer(options) {
 	// Memorize for further use
 	layer.options = options;
 
+	if (options.selectorName)
+		memCheckbox(options.selectorName, function(list) {
+			options.selectorList = list.join(',');
+			source.refresh();
+		});
+
 	// Normalize properties
 	if (typeof options.normalize == 'function')
 		source.on('featuresloadend', function(evt) {
@@ -113,7 +112,7 @@ function geoJsonLayer(options) {
 				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
 
 			// Switch to another layer above a zoom limit
-			if (ratio > options.pixelRatioMax) {
+			if (options.layerAbove && ratio > options.pixelRatioMax) {
 				layer.setSource(options.layerAbove.getSource());
 				layer.setStyle(options.layerAbove.getStyle());
 			} else {
@@ -184,10 +183,11 @@ function geoJsonLayer(options) {
 }
 
 /**
- * Control to display labels on hovering a feature & execute click
- * feature.properties.name : name to label the feature
- * feature.properties.label : full label on hover
- * feature.properties.link : go to a new URL when we click on the feature
+ * Control to display labels on hovering & click
+ * on features of vector layers having the following properties :
+ * name : name to label the feature
+ * label : full label on hover
+ * link : go to a new URL when we click on the feature
  */
 function controlHover() {
 	let control = new ol.control.Control({

@@ -43,7 +43,9 @@ function layerWRI(options) {
 
 	options = Object.assign({
 		urlBase: '//www.refuges.info/',
-		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
+		//		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
+		//		selectorList: '7,10,9,23,6,3,28',
+		selectorName: 'wri-features',
 		urlBbox: function(bbox) {
 			return bbox.join(',');
 		},

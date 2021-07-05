@@ -31,12 +31,25 @@ Based on https://openlayers.org
 		#map {
 			width: 97vw;
 			height: 97vh;
+			height: 70vh;
 		}
 	</style>
 </head>
 
 <body>
 	<div id="map"></div>
+
+	<br/>WRI<input type="checkbox" name="wri-features" />
+	<span id="wri-features-status"></span>
+	<ul>
+		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
+		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
+		<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
+		<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
+		<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
+		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
+		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
+	</ul>
 
 	<script>
 		const mapKeys = {
@@ -55,15 +68,15 @@ Based on https://openlayers.org
 					controlHover(),
 				],
 				view: new ol.View({
-					//center: [700000, 5700000], // Maurienne
-					center: [260000, 6250000], // Paris
+					center: [700000, 5700000], // Maurienne
+					//center: [260000, 6250000], // Paris
 					//center: [300000, 6170000], // 
 					zoom: 10,
 				}),
 			});
 
 		map.addLayer(layerWRI());
-		map.addLayer(layerChem());
+		//map.addLayer(layerChem());
 	</script>
 </body>
 </html>
