@@ -1,10 +1,10 @@
 // Vector layer
 function geoJsonLayer(options) {
 	options = Object.assign({
-		urlSuffix: '',
 		styleOptionsFunction: function(styleOptions) {
 			return styleOptions;
 		},
+		loadingstrategy: 'bbox', // | 'all'
 	}, options);
 
 	options.styleOptions = Object.assign({
@@ -41,18 +41,17 @@ function geoJsonLayer(options) {
 	//TODO gérer les msg erreur
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
-			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
+			strategy: ol.loadingstrategy[options.loadingstrategy],
 			url: function(extent, resolution, projection) {
-				//TODO une seule fonction intégrant bbox et appel baseurl
-				return options.urlBase + // url base that can vary (server name, ...)
-					'api/bbox?nb_points=all&type_points=' + options.selectorList + '&bbox=' + // url suffix to be defined separately from the urlBase
-					(!options.urlBbox ? '' :
-						options.urlBbox(ol.proj.transformExtent(
-							extent,
-							projection.getCode(),
-							'EPSG:4326' // Received projection
-						))
-					);
+				return options.url(
+					ol.proj.transformExtent( // BBox
+						extent,
+						projection.getCode(),
+						'EPSG:4326' // Received projection
+					),
+					options.selectorList,
+					resolution // === zoom level
+				);
 			},
 		}),
 
@@ -81,7 +80,7 @@ function geoJsonLayer(options) {
 
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
-			options.selectorList = list.join(',');
+			options.selectorList = list;
 			source.refresh();
 		});
 

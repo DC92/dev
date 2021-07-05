@@ -1,13 +1,10 @@
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
-		urlBbox: function(bbox) {
-			return bbox.join(',');
+		url: function() {
+			return options.urlBase + 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=';
 		},
+		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		clusterDistance: 32,
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -26,8 +23,9 @@ function layerChem(options) {
 
 function layerWRI(options) {
 	const layerMassif = geoJsonLayer({
-		urlBase: '//www.refuges.info/',
-		urlSuffix: 'api/polygones?type_polygon=1',
+		url: function() {
+			return options.urlBase + 'api/polygones?type_polygon=1';
+		},
 		normalize: function(f) {
 			f.set('link', f.get('lien'));
 			f.set('name', f.get('nom'));
@@ -43,15 +41,16 @@ function layerWRI(options) {
 
 	options = Object.assign({
 		urlBase: '//www.refuges.info/',
-		//		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
-		//		selectorList: '7,10,9,23,6,3,28',
 		selectorName: 'wri-features',
-		urlBbox: function(bbox) {
-			return bbox.join(',');
-		},
 		clusterDistance: 32,
 		pixelRatioMax: 100,
 		layerAbove: layerMassif,
+
+		url: function(bbox, selectorList, resolution) {
+			return options.urlBase + // url base that can vary (server name, ...)
+				'api/bbox?nb_points=all&type_points=' + selectorList +
+				'&bbox=' + bbox.join(',');
+		},
 
 		normalize: function(f, layer) {
 			// Hover label
