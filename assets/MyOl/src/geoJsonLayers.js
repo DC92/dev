@@ -32,12 +32,14 @@ function layerMassif(options) {
 			f.set('link', f.get('lien'));
 		},
 		styleOptionsFunction: function(styleOptions, feature) {
-			const hex = feature.get('couleur'),
-				r = parseInt(hex.substring(1, 3), 16),
-				g = parseInt(hex.substring(3, 5), 16),
-				b = parseInt(hex.substring(5, 7), 16);
+			const hex = feature.get('couleur');
 			styleOptions.fill = new ol.style.Fill({
-				color: `rgba(${r},${g},${b},0.6)`,
+				color: 'rgba(' + [
+					parseInt(hex.substring(1, 3), 16),
+					parseInt(hex.substring(3, 5), 16),
+					parseInt(hex.substring(5, 7), 16),
+					0.5,
+				].join(',') + ')',
 			});
 			return styleOptions;
 		},
