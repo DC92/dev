@@ -26,33 +26,41 @@ function layerWRI(options) {
 		url: function() {
 			return options.urlBase + 'api/polygones?type_polygon=1';
 		},
-		normalize: function(f) {
+		normalizeProperties: function(f) {
 			f.set('link', f.get('lien'));
 			f.set('name', f.get('nom'));
 		},
 		styleOptionsFunction: function(styleOptions, feature) {
 			styleOptions.labelOnPoly = true;
+
+			const hex = feature.get('couleur'),
+				r = parseInt(hex.substring(1, 3), 16),
+				g = parseInt(hex.substring(3, 5), 16),
+				b = parseInt(hex.substring(5, 7), 16);
 			styleOptions.fill = new ol.style.Fill({
-				color: feature.get('couleur'),
+				color: `rgba(${r},${g},${b},0.6)`,
 			});
+
 			return styleOptions;
 		},
 	});
 
 	options = Object.assign({
 		urlBase: '//www.refuges.info/',
+		url: function(bbox, selectorList, resolution) {
+			return options.urlBase +
+				'api/bbox?nb_points=all&type_points=' + selectorList +
+				'&bbox=' + bbox.join(',');
+		},
 		selectorName: 'wri-features',
 		clusterDistance: 32,
 		pixelRatioMax: 100,
 		layerAbove: layerMassif,
-
-		url: function(bbox, selectorList, resolution) {
-			return options.urlBase + // url base that can vary (server name, ...)
-				'api/bbox?nb_points=all&type_points=' + selectorList +
-				'&bbox=' + bbox.join(',');
+		styleOptions: {
+			labelOnPoint: true,
 		},
 
-		normalize: function(f, layer) {
+		normalizeProperties: function(f, layer) {
 			// Hover label
 			const label = [],
 				desc = [];

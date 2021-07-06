@@ -1,17 +1,14 @@
 // Vector layer
 function geoJsonLayer(options) {
 	options = Object.assign({
+		loadingstrategy: 'bbox', // | 'all'
 		styleOptionsFunction: function(styleOptions) {
 			return styleOptions;
 		},
-		loadingstrategy: 'bbox', // | 'all'
 	}, options);
 
-	options.styleOptions = Object.assign({
-		labelOnPoint: true,
-	}, options.styleOptions);
-
-	//	options.hoverStyleOptions
+	options.styleOptions = options.styleOptions || {};
+	options.hoverStyleOptions = options.hoverStyleOptions || {};
 
 	options.labelStyleOptions = Object.assign({
 		textBaseline: 'bottom',
@@ -38,11 +35,11 @@ function geoJsonLayer(options) {
 		}),
 	}, options.clusterStyleOptions);
 
-	//TODO gérer les msg erreur
 	const source = new ol.source.Vector({
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy[options.loadingstrategy],
 			url: function(extent, resolution, projection) {
+				//BEST gérer les msg erreur
 				return options.url(
 					ol.proj.transformExtent( // BBox
 						extent,
@@ -61,7 +58,7 @@ function geoJsonLayer(options) {
 			distance: options.clusterDistance,
 			source: source,
 			geometryFunction: function(feature) {
-				// Generate a center point at to manage clusterisations
+				// Generate a center point to manage clusterisations
 				return new ol.geom.Point(
 					ol.extent.getCenter(
 						feature.getGeometry().getExtent()
@@ -75,20 +72,22 @@ function geoJsonLayer(options) {
 			style: style,
 		});
 
-	// Memorize for further use
-	layer.options = options;
+	layer.options = options; //HACK Memorize for further use
 
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
 			options.selectorList = list;
-			source.refresh();
+			//TODO set visible should not act on layerAbove
+			layer.setVisible(list.length > 0);
+			if (list.length > 0)
+				source.refresh();
 		});
 
 	// Normalize properties
-	if (typeof options.normalize == 'function')
+	if (typeof options.normalizeProperties == 'function')
 		source.on('featuresloadend', function(evt) {
-			for (let k in evt.features)
-				options.normalize(evt.features[k], layer);
+			for (let p in evt.features)
+				options.normalizeProperties(evt.features[p], layer);
 		});
 
 	// Erase the layer before rebuild when bbox strategy is applied
@@ -98,7 +97,6 @@ function geoJsonLayer(options) {
 
 	// Tune the clustering distance following the zoom leval
 	let pixelRatio = 0;
-
 	layer.on('prerender', function(evt) {
 		// Get the transform ratio from the layer frameState
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
@@ -134,7 +132,7 @@ function geoJsonLayer(options) {
 			),
 			labelStyleOptions = Object.assign({}, options.labelStyleOptions);
 
-		feature.options = options; // Memorize the options in the feature for hover display
+		feature.options = options; //HACK Memorize the options in the feature for hover display
 
 		// Clusters
 		if (features.length > 1) {
@@ -145,7 +143,6 @@ function geoJsonLayer(options) {
 		}
 
 		// Single feature (point, line or poly)
-
 		// Add a permanent label
 		if (!options.clusterDistance || // If no clusterisation 
 			(feature.get('features') // If not cluster marker 
