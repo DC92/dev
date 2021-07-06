@@ -39,7 +39,6 @@ function layerMassif(options) {
 			styleOptions.fill = new ol.style.Fill({
 				color: `rgba(${r},${g},${b},0.6)`,
 			});
-
 			return styleOptions;
 		},
 	}, options));

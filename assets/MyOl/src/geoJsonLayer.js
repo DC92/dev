@@ -236,30 +236,28 @@ function controlHover() {
 			if (feature) {
 				const features = feature.get('features'),
 					center = feature.getGeometry().getCoordinates(),
-					options = feature.options; // Mem it locally
+					options = feature.options, // Mem it locally
+					link = (features ? features[0] : feature).get('link');
 
-				if (features && features.length == 1) {
-					// Single feature
-					feature = features[0];
-					const link = feature.get('link');
-
-					if (link && evt.type == 'click') {
-						if (evt.originalEvent.ctrlKey) {
-							const tab = window.open(link, '_blank');
-							if (evt.originalEvent.shiftKey)
-								tab.focus();
-						} else
-							window.location = link;
-					}
-				} else
+				if (evt.type == 'click') {
 					// Cluster
-					if (evt.type == 'click')
+					if (features && features.length > 1)
 						map.getView().animate({
 							zoom: map.getView().getZoom() + 1,
 							center: center,
 						});
 
-				feature.options = options;
+					// Single feature
+					else if (link) {
+						if (evt.originalEvent.ctrlKey)
+							window.open(link, '_blank').focus();
+						else if (evt.originalEvent.shiftKey)
+							// To specify feature open a new window
+							window.open(link, '_blank', 'resizable=yes').focus();
+						else
+							window.location = link;
+					}
+				}
 			}
 
 			// Make the hovered feature visible in a dedicated layer
