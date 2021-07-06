@@ -40,7 +40,6 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<br/>WRI<input type="checkbox" name="wri-features" />
-	<span id="wri-features-status"></span>
 	<ul>
 		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
 		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
@@ -49,6 +48,19 @@ Based on https://openlayers.org
 		<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
 		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
 		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
+	</ul>
+
+	<br/>Chemineur<input type="checkbox" name="chem-features" />
+	<ul>
+		<li><input type="checkbox" name="chem-features" value="3"/>Refuge</li>
+		<li><input type="checkbox" name="chem-features" value="8"/>Abri</li>
+		<li><input type="checkbox" name="chem-features" value="20"/>Alimentation</li>
+		<li><input type="checkbox" name="chem-features" value="23"/>Montagne</li>
+		<li><input type="checkbox" name="chem-features" value="30"/>Ferroviaire</li>
+		<li><input type="checkbox" name="chem-features" value="40"/>Transport</li>
+		<li><input type="checkbox" name="chem-features" value="44"/>Tourisme</li>
+		<li><input type="checkbox" name="chem-features" value="58"/>Naval</li>
+		<li><input type="checkbox" name="chem-features" value="64"/>Trace</li>
 	</ul>
 
 	<script>
@@ -68,20 +80,20 @@ Based on https://openlayers.org
 					controlHover(),
 				],
 				view: new ol.View({
-					center: [700000, 5700000], // Maurienne
-					//center: [260000, 6250000], // Paris
+					//center: [700000, 5700000], // Maurienne
+					center: [260000, 6250000], // Paris
 					//center: [300000, 6170000], // 
 					zoom: 10,
 				}),
 			});
 
-		//if (0)
+		if (0)
 			map.addLayer(layerWRI({
 				pixelRatioMax: 100,
 				layerAbove: layerMassif(),
 			}));
 		//map.addLayer(layerMassif());
-		//map.addLayer(layerChem());
+		map.addLayer(layerChem());
 	</script>
 </body>
 </html>

@@ -1,11 +1,17 @@
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//chemineur.fr/',
-		urlPath: function() {
-			return 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=';
+		urlPath: function(bbox, selectorList) {
+			return 'ext/Dominique92/GeoBB/gis.php?limit=1000000' +
+				'&cat=' + selectorList +
+				'&bbox=' + bbox.join(',');
 		},
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
+		selectorName: 'chem-features',
 		clusterDistance: 32,
+
+		normalizeProperties: function(f) {
+			f.set('hover', f.get('name'));
+		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
 				color: 'blue',
