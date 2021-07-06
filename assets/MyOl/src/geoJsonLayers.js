@@ -1,8 +1,8 @@
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
-		urlBase: '//chemineur.fr/',
-		url: function() {
-			return options.urlBase + 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=';
+		urlHost: '//chemineur.fr/',
+		urlPath: function() {
+			return 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=';
 		},
 		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
 		clusterDistance: 32,
@@ -21,18 +21,17 @@ function layerChem(options) {
 	}, options));
 }
 
-function layerWRI(options) {
-	const layerMassif = geoJsonLayer({
-		url: function() {
-			return options.urlBase + 'api/polygones?type_polygon=1';
+function layerMassif(options) {
+	return geoJsonLayer(Object.assign({
+		urlHost: '//www.refuges.info/',
+		urlPath: function() {
+			return 'api/polygones?type_polygon=1';
 		},
 		normalizeProperties: function(f) {
+			f.set('label', f.get('nom'));
 			f.set('link', f.get('lien'));
-			f.set('name', f.get('nom'));
 		},
 		styleOptionsFunction: function(styleOptions, feature) {
-			styleOptions.labelOnPoly = true;
-
 			const hex = feature.get('couleur'),
 				r = parseInt(hex.substring(1, 3), 16),
 				g = parseInt(hex.substring(3, 5), 16),
@@ -43,29 +42,25 @@ function layerWRI(options) {
 
 			return styleOptions;
 		},
-	});
+	}, options));
+}
 
-	options = Object.assign({
-		urlBase: '//www.refuges.info/',
-		url: function(bbox, selectorList, resolution) {
-			return options.urlBase +
-				'api/bbox?nb_points=all&type_points=' + selectorList +
+function layerWRI(options) {
+	return geoJsonLayer(Object.assign({
+		urlHost: '//www.refuges.info/',
+		urlPath: function(bbox, selectorList, resolution) {
+			return 'api/bbox?nb_points=all' +
+				'&type_points=' + selectorList +
 				'&bbox=' + bbox.join(',');
 		},
 		selectorName: 'wri-features',
 		clusterDistance: 32,
-		pixelRatioMax: 100,
-		layerAbove: layerMassif,
-		styleOptions: {
-			labelOnPoint: true,
-		},
 
 		normalizeProperties: function(f, layer) {
-			// Hover label
-			const label = [],
+			const hover = [], // Hover label
 				desc = [];
 			if (f.get('type').valeur)
-				label.push(
+				hover.push(
 					f.get('type').valeur.replace(
 						/(^\w|\s\w)/g,
 						function(m) {
@@ -77,16 +72,15 @@ function layerWRI(options) {
 			if (f.get('places').valeur)
 				desc.push(f.get('places').valeur + '\u255E\u2550\u2555');
 			if (desc.length)
-				label.push(desc.join(', '));
-			label.push(f.get('nom'));
-			f.set('label', label.join('\n'));
+				hover.push(desc.join(', '));
+			hover.push(f.get('nom'));
+			f.set('hover', hover.join('\n'));
 
 			// Other displays
-			f.set('icon', layer.options.urlBase + 'images/icones/' + f.get('type').icone + '.svg');
+			f.set('icon', layer.options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
 			f.set('name', f.get('nom'));
+			f.set('label', f.get('nom'));
 			f.set('link', f.get('lien'));
 		},
-	}, options);
-
-	return geoJsonLayer(options);
+	}, options));
 }

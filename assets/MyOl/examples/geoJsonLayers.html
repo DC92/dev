@@ -75,7 +75,12 @@ Based on https://openlayers.org
 				}),
 			});
 
-		map.addLayer(layerWRI());
+		//if (0)
+			map.addLayer(layerWRI({
+				pixelRatioMax: 100,
+				layerAbove: layerMassif(),
+			}));
+		//map.addLayer(layerMassif());
 		//map.addLayer(layerChem());
 	</script>
 </body>

@@ -40,15 +40,16 @@ function geoJsonLayer(options) {
 			strategy: ol.loadingstrategy[options.loadingstrategy],
 			url: function(extent, resolution, projection) {
 				//BEST gérer les msg erreur
-				return options.url(
-					ol.proj.transformExtent( // BBox
-						extent,
-						projection.getCode(),
-						'EPSG:4326' // Received projection
-					),
-					options.selectorList,
-					resolution // === zoom level
-				);
+				return options.urlHost +
+					options.urlPath(
+						ol.proj.transformExtent( // BBox
+							extent,
+							projection.getCode(),
+							'EPSG:4326' // Received projection
+						),
+						options.selectorList,
+						resolution // === zoom level
+					);
 			},
 		}),
 
@@ -123,6 +124,7 @@ function geoJsonLayer(options) {
 	function style(feature) {
 		const features = feature.get('features') || [feature],
 			icon = features[0].get('icon'),
+			label = features[0].get('label'),
 			area = ol.extent.getArea(
 				features[0].getGeometry().getExtent()
 			),
@@ -146,12 +148,8 @@ function geoJsonLayer(options) {
 		// Add a permanent label
 		if (!options.clusterDistance || // If no clusterisation 
 			(feature.get('features') // If not cluster marker 
-			) && (
-				(styleOptions.labelOnPoint && !area) ||
-				(styleOptions.labelOnLine && area) ||
-				(styleOptions.labelOnPoly && area)
-			)) {
-			labelStyleOptions.text = features[0].get('name');
+			) && label) {
+			labelStyleOptions.text = label;
 			styleOptions.text = new ol.style.Text(labelStyleOptions);
 		}
 
@@ -181,8 +179,8 @@ function geoJsonLayer(options) {
 /**
  * Control to display labels on hovering & click
  * on features of vector layers having the following properties :
- * name : name to label the feature
- * label : full label on hover
+ * name : name of the feature
+ * hover : full label on hover
  * link : go to a new URL when we click on the feature
  */
 function controlHover() {
@@ -196,7 +194,7 @@ function controlHover() {
 		zIndex: 1, // Above the features
 
 		style: function(feature) {
-			//BEST options label on hover ligne / surface / point ???
+			//BEST options label on hover point /ligne / surface ???
 			const features = feature.get('features') || [feature],
 				names = [],
 				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions),
@@ -212,7 +210,7 @@ function controlHover() {
 						names.push(features[f].get('name'));
 				else
 					// Point
-					names.push(features[0].get('label'));
+					names.push(features[0].get('hover'));
 
 			labelStyleOptions.text = names.join('\n');
 			hoverStyleOptions.text = new ol.style.Text(
@@ -245,7 +243,7 @@ function controlHover() {
 					feature = features[0];
 					const link = feature.get('link');
 
-					if (evt.type == 'click' && link) {
+					if (link && evt.type == 'click') {
 						if (evt.originalEvent.ctrlKey) {
 							const tab = window.open(link, '_blank');
 							if (evt.originalEvent.shiftKey)
