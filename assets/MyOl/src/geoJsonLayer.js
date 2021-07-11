@@ -85,10 +85,10 @@ function geoJsonLayer(options) {
 		});
 
 	// Normalize properties
-	if (typeof options.normalizeProperties == 'function')
+	if (typeof options.computeProperties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)
-				options.normalizeProperties(evt.features[p], layer);
+				options.computeProperties(evt.features[p], layer);
 		});
 
 	// Erase the layer before rebuild when bbox strategy is applied

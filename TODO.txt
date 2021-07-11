@@ -3,6 +3,7 @@ NEW MYOL
 	TEST INCLUSION WRI
 	valeur du pas du zoom tous explorateurs
 	Etiquette ligne au survol / une seule par fiche ?
+	WRI : pas de baselayer=IGN%20TOP25 (blancs pas acceptés
 
 BUG
 	viewtopic point KO

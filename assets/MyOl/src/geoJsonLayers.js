@@ -2,14 +2,16 @@ function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, selectorList) {
-			return 'ext/Dominique92/GeoBB/gis.php?limit=1000000' +
+			return 'ext/Dominique92/GeoBB/gis2.php?simple=1' +
 				'&cat=' + selectorList +
 				'&bbox=' + bbox.join(',');
 		},
 		selectorName: 'chem-features',
 		clusterDistance: 32,
 
-		normalizeProperties: function(f) {
+		computeProperties: function(f, layer) {
+			f.set('icon', layer.options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
+			f.set('link', layer.options.urlHost + 'viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
 		},
 		styleOptions: {
@@ -33,7 +35,7 @@ function layerMassif(options) {
 		urlPath: function() {
 			return 'api/polygones?type_polygon=1';
 		},
-		normalizeProperties: function(f) {
+		computeProperties: function(f) {
 			f.set('label', f.get('nom'));
 			f.set('link', f.get('lien'));
 		},
@@ -63,7 +65,7 @@ function layerWRI(options) {
 		selectorName: 'wri-features',
 		clusterDistance: 32,
 
-		normalizeProperties: function(f, layer) {
+		computeProperties: function(f, layer) {
 			const hover = [], // Hover label
 				desc = [];
 			if (f.get('type').valeur)
