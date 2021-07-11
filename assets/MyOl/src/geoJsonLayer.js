@@ -96,7 +96,7 @@ function geoJsonLayer(options) {
 		source.clear();
 	});
 
-	// Tune the clustering distance following the zoom leval
+	// Tune the clustering distance following the zoom level
 	let pixelRatio = 0;
 	layer.on('prerender', function(evt) {
 		// Get the transform ratio from the layer frameState
@@ -137,9 +137,15 @@ function geoJsonLayer(options) {
 		feature.options = options; //HACK Memorize the options in the feature for hover display
 
 		// Clusters
-		if (features.length > 1) {
+		if (features.length > 1 ||
+			parseInt(features[0].get('cluster'))) {
+			let clusters = 0;
+			for (let f in features)
+				clusters += parseInt(features[f].get('cluster')) || 1;
+
 			const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
-			clusterStyleOptions.text.setText(features.length.toString());
+			clusterStyleOptions.text.setText(clusters.toString());
+			feature.set('hover', clusters.toString() + ' éléments');
 
 			return new ol.style.Style(clusterStyleOptions);
 		}
@@ -196,23 +202,24 @@ function controlHover() {
 		style: function(feature) {
 			//BEST options label on hover point /ligne / surface ???
 			const features = feature.get('features') || [feature],
-				names = [],
+				titles = [],
+				hover = feature.get('hover'),
 				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions),
 				hoverStyleOptions = Object.assign({}, feature.options.hoverStyleOptions);
 
-			if (features.length > 5)
+			if (hover)
 				// Big clusters
-				names.push(features.length + ' éléments');
+				titles.push(hover);
 			else
 				// Clusters
 				if (features.length > 1)
 					for (let f in features)
-						names.push(features[f].get('name'));
+						titles.push(features[f].get('name'));
 				else
 					// Point
-					names.push(features[0].get('hover'));
+					titles.push(features[0].get('hover'));
 
-			labelStyleOptions.text = names.join('\n');
+			labelStyleOptions.text = titles.join('\n');
 			hoverStyleOptions.text = new ol.style.Text(
 				labelStyleOptions
 			);
@@ -240,15 +247,8 @@ function controlHover() {
 					link = (features ? features[0] : feature).get('link');
 
 				if (evt.type == 'click') {
-					// Cluster
-					if (features && features.length > 1)
-						map.getView().animate({
-							zoom: map.getView().getZoom() + 1,
-							center: center,
-						});
-
 					// Single feature
-					else if (link) {
+					if (link) {
 						if (evt.originalEvent.ctrlKey)
 							window.open(link, '_blank').focus();
 						else if (evt.originalEvent.shiftKey)
@@ -257,6 +257,13 @@ function controlHover() {
 						else
 							window.location = link;
 					}
+
+					// Cluster
+					else
+						map.getView().animate({
+							zoom: map.getView().getZoom() + 1,
+							center: center,
+						});
 				}
 			}
 

@@ -39,17 +39,6 @@ Based on https://openlayers.org
 <body>
 	<div id="map"></div>
 
-	<br/>WRI<input type="checkbox" name="wri-features" />
-	<ul>
-		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
-		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
-		<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
-		<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
-		<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
-		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
-		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
-	</ul>
-
 	<br/>Chemineur<input type="checkbox" name="chem-features" />
 	<ul>
 		<li><input type="checkbox" name="chem-features" value="3"/>Refuge</li>
@@ -61,6 +50,17 @@ Based on https://openlayers.org
 		<li><input type="checkbox" name="chem-features" value="44"/>Tourisme</li>
 		<li><input type="checkbox" name="chem-features" value="58"/>Naval</li>
 		<li><input type="checkbox" name="chem-features" value="64"/>Trace</li>
+	</ul>
+
+	<br/>Refuges.info<input type="checkbox" name="wri-features" />
+	<ul>
+		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
+		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
+		<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
+		<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
+		<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
+		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
+		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
 	</ul>
 
 	<script>
@@ -88,13 +88,21 @@ Based on https://openlayers.org
 				}),
 			});
 
-		if (0)
-			map.addLayer(layerWRI({
+		const massif = layerMassif(),
+			wri = layerWRI({
 				pixelRatioMax: 100,
 				layerAbove: layerMassif(),
-			}));
-		//map.addLayer(layerMassif());
-		map.addLayer(layerChem());
+			}),
+			chemClusters = layerChemClusters(),
+			chem = layerChem({
+				pixelRatioMax: 1000,
+				layerAbove: chemClusters,
+			});
+
+			//map.addLayer(wri);
+			//map.addLayer(massif);
+			map.addLayer(chem);
+			//map.addLayer(chemClusters);
 	</script>
 </body>
 </html>

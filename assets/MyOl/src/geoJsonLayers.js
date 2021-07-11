@@ -1,3 +1,15 @@
+function layerChemClusters(options) {
+	return geoJsonLayer(Object.assign({
+		urlHost: '//chemineur.fr/',
+		urlPath: function(bbox, selectorList) {
+			return 'ext/Dominique92/GeoBB/gis2.php?layer=cluster' +
+				(selectorList ? '&cat=' + selectorList : '');
+		},
+		selectorName: 'chem-features',
+		clusterDistance: 32,
+	}, options));
+}
+
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//chemineur.fr/',
@@ -11,7 +23,8 @@ function layerChem(options) {
 
 		computeProperties: function(f, layer) {
 			f.set('icon', layer.options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
-			f.set('link', layer.options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+			if (f.get('id'))
+				f.set('link', layer.options.urlHost + 'viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
 		},
 		styleOptions: {
@@ -37,7 +50,8 @@ function layerMassif(options) {
 		},
 		computeProperties: function(f) {
 			f.set('label', f.get('nom'));
-			f.set('link', f.get('lien'));
+			if (f.get('lien'))
+				f.set('link', f.get('lien'));
 		},
 		styleOptionsFunction: function(styleOptions, feature) {
 			const hex = feature.get('couleur');
@@ -89,7 +103,8 @@ function layerWRI(options) {
 			f.set('icon', layer.options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
 			f.set('name', f.get('nom'));
 			f.set('label', f.get('nom'));
-			f.set('link', f.get('lien'));
+			if (f.get('lien'))
+				f.set('link', f.get('lien'));
 		},
 	}, options));
 }

@@ -204,6 +204,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function adm_page_header() {
 		$this->add_sql_column (POSTS_TABLE, 'geom', 'geometrycollection');
+		$this->add_sql_column (POSTS_TABLE, 'geom_region', 'int');
 		$this->add_sql_column (POSTS_TABLE, 'geo_massif', 'varchar(50)');
 		$this->add_sql_column (POSTS_TABLE, 'geo_altitude', 'varchar(12)');
 
