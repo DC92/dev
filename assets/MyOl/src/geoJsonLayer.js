@@ -93,7 +93,7 @@ function geoJsonLayer(options) {
 
 	// Erase the layer before rebuild when bbox strategy is applied
 	source.on('featuresloadend', function() {
-		source.clear();
+	//TODO ????	source.clear();
 	});
 
 	// Tune the clustering distance following the zoom level

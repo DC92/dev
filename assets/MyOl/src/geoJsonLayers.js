@@ -14,7 +14,7 @@ function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, selectorList) {
-			return 'ext/Dominique92/GeoBB/gis2.php?simple=1' +
+			return 'ext/Dominique92/GeoBB/gis2.php?layer=simple&limit=1000' +
 				'&cat=' + selectorList +
 				'&bbox=' + bbox.join(',');
 		},
