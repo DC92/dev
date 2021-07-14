@@ -5,6 +5,7 @@ NEW MYOL
 	Etiquette ligne au survol / une seule par fiche ?
 	WRI : pas de baselayer=IGN%20TOP25 (blancs pas acceptés
 
+-
 BUG
 	viewtopic point KO
 	MyOl label points reste sur layerswitcher
