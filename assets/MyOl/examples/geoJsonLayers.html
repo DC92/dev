@@ -77,11 +77,11 @@ Based on https://openlayers.org
 					controlHover(),
 				],
 				view: new ol.View({
-					//center: [700000, 5700000], // Maurienne
+					center: [700000, 5700000], // Maurienne
 					//center: [260000, 6250000], // Paris
-					center: [260000, 5800000], // France
+					//center: [260000, 5800000], // France
 					//center: [300000, 6170000], // 
-					zoom: 6,
+					zoom: 12,
 				}),
 			});
 
@@ -90,16 +90,13 @@ Based on https://openlayers.org
 				pixelRatioMax: 100,
 				layerAbove: layerMassif(),
 			}),
-			chemClusters = layerChemClusters(),
 			chem = layerChem({
-				pixelRatioMax: 1000,
-				layerAbove: chemClusters,
+				pixelRatioMax: 30,
 			});
 
 			//map.addLayer(wri);
 			//map.addLayer(massif);
 			map.addLayer(chem);
-			//map.addLayer(chemClusters);
 	</script>
 </body>
 </html>

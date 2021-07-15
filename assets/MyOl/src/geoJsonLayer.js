@@ -1,7 +1,19 @@
+/**
+ * BBOX strategy when the url returns a limited number of features depending on the extent
+ */
+ol.loadingstrategy.bboxLimit = function(extent, resolution) {
+	if (this.bboxLimitResolution != resolution)
+		this.refresh(); // Force the loading of all areas
+	this.bboxLimitResolution = resolution; // Mem resolution for further requests
+
+	return [extent];
+};
+
 // Vector layer
 function geoJsonLayer(options) {
 	options = Object.assign({
-		loadingstrategy: 'bbox', // | 'all'
+		format: 'GeoJSON',
+		loadingstrategy: 'bboxLimit', // | 'all' | 'bbox'
 		styleOptionsFunction: function(styleOptions) {
 			return styleOptions;
 		},
@@ -36,7 +48,7 @@ function geoJsonLayer(options) {
 	}, options.clusterStyleOptions);
 
 	const source = new ol.source.Vector({
-			format: new ol.format.GeoJSON(),
+			format: new ol.format[options.format](),
 			strategy: ol.loadingstrategy[options.loadingstrategy],
 			url: function(extent, resolution, projection) {
 				//BEST gérer les msg erreur
@@ -91,32 +103,17 @@ function geoJsonLayer(options) {
 				options.computeProperties(evt.features[p], layer);
 		});
 
-	// Erase the layer before rebuild when bbox strategy is applied
-	source.on('featuresloadend', function() {
-	//TODO ????	source.clear();
-	});
-
 	// Tune the clustering distance following the zoom level
 	let pixelRatio = 0;
 	layer.on('prerender', function(evt) {
 		// Get the transform ratio from the layer frameState
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
-
 		if (pixelRatio != ratio) { // Only when changed
 			pixelRatio = ratio;
 
 			// Tune the clustering distance depending on the transform ratio
 			if (typeof clusterSource.setDistance == 'function')
 				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
-
-			// Switch to another layer above a zoom limit
-			if (options.layerAbove && ratio > options.pixelRatioMax) {
-				layer.setSource(options.layerAbove.getSource());
-				layer.setStyle(options.layerAbove.getStyle());
-			} else {
-				layer.setSource(clusterSource);
-				layer.setStyle(style);
-			}
 		}
 	});
 

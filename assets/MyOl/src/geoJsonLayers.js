@@ -1,25 +1,17 @@
-function layerChemClusters(options) {
-	return geoJsonLayer(Object.assign({
-		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, selectorList) {
-			return 'ext/Dominique92/GeoBB/gis2.php?layer=cluster' +
-				(selectorList ? '&cat=' + selectorList : '');
-		},
-		selectorName: 'chem-features',
-		clusterDistance: 32,
-	}, options));
-}
-
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, selectorList) {
-			return 'ext/Dominique92/GeoBB/gis2.php?layer=simple&limit=1000' +
-				'&cat=' + selectorList +
-				'&bbox=' + bbox.join(',');
+		urlPath: function(bbox, selectorList, resolution) {
+			if (resolution > 100)
+				return 'ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
+					(selectorList ? '&cat=' + selectorList : '');
+			else
+				return 'ext/Dominique92/GeoBB/gis2.php?layer=simple&limit=500' +
+					'&cat=' + selectorList +
+					'&bbox=' + bbox.join(',');
 		},
 		selectorName: 'chem-features',
-		clusterDistance: 32,
+		//clusterDistance: 32,
 
 		computeProperties: function(f, layer) {
 			f.set('icon', layer.options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
