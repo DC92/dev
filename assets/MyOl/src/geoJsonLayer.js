@@ -2,7 +2,7 @@
 function geoJsonLayer(options) {
 	options = Object.assign({
 		format: 'GeoJSON',
-		loadingstrategy: 'bbox', // | 'all' | 'bbox'
+		loadingstrategy: 'bbox', // | 'all' | 'bbox' //TODO une option pour couche clusterisée
 		styleOptionsFunction: function(styleOptions) {
 			return styleOptions;
 		},
@@ -40,6 +40,8 @@ function geoJsonLayer(options) {
 			format: new ol.format[options.format](),
 			strategy: ol.loadingstrategy[options.loadingstrategy],
 			url: function(extent, resolution, projection) {
+				source.refresh(); //TODO voir si on peut eviter la duplication des features à la création
+
 				//BEST gérer les msg erreur
 				return options.urlHost +
 					options.urlPath(
@@ -79,7 +81,6 @@ function geoJsonLayer(options) {
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
 			options.selectorList = list;
-			//TODO set visible should not act on layerAbove
 			layer.setVisible(list.length > 0);
 			if (list.length > 0)
 				source.refresh();
@@ -99,8 +100,8 @@ function geoJsonLayer(options) {
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
 
 		// Refresh if we change to clustered url
-		if (pixelRatio > 100 ^ ratio > 100)
-			clusterSource.refresh();
+		if (pixelRatio > 100 ^ ratio > 100) //TODO remplacer 100 par une option
+			source.refresh();
 
 		// Tune the clustering distance depending on the transform ratio
 		if (pixelRatio != ratio && // Only when changed
@@ -149,8 +150,7 @@ function geoJsonLayer(options) {
 			styleOptions.text = new ol.style.Text(labelStyleOptions);
 		}
 
-		// Include the feature in the cluster source (lines, polygons)
-		// to make it visible
+		// Include the feature in the cluster source (lines, polygons) to make it visible
 		if (area) {
 			const featureExists = clusterSource.forEachFeature(function(f) {
 				if (features[0].ol_uid == f.ol_uid)
@@ -180,10 +180,9 @@ function geoJsonLayer(options) {
  * link : go to a new URL when we click on the feature
  */
 function controlHover() {
-	let control = new ol.control.Control({
-			element: document.createElement('div'), //HACK No button
-		}),
-		previousHoveredFeature;
+	const control = new ol.control.Control({
+		element: document.createElement('div'), //HACK No button
+	});
 
 	const hoverLayer = new ol.layer.Vector({
 		source: new ol.source.Vector(),
@@ -222,9 +221,10 @@ function controlHover() {
 		ol.control.Control.prototype.setMap.call(this, map);
 		map.addLayer(hoverLayer);
 
+		let previousHoveredFeature;
 		map.on(['pointermove', 'click'], function(evt) {
 			// Get hovered feature
-			let feature = map.forEachFeatureAtPixel(
+			const feature = map.forEachFeatureAtPixel(
 				map.getEventPixel(evt.originalEvent),
 				function(feature) {
 					return feature;

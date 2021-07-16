@@ -6,7 +6,7 @@ function layerChem(options) {
 				return 'ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
 					(selectorList ? '&cat=' + selectorList : '');
 			else
-				return 'ext/Dominique92/GeoBB/gis2.php?layer=simple&limit=500' +
+				return 'ext/Dominique92/GeoBB/gis2.php?layer=simple&limit=1000000' +
 					'&cat=' + selectorList +
 					'&bbox=' + bbox.join(',');
 		},
