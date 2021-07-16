@@ -50,7 +50,8 @@ function memCheckbox(selectorName, callback) {
 
 		// Get the values of all checked inputs
 		for (let e = 0; e < inputEls.length; e++)
-			if (inputEls[e].checked) // List checked elements
+			if (inputEls[e].checked &&
+				inputEls[e].value != 'on')
 				list.push(inputEls[e].value);
 
 		if (typeof callback == 'function')

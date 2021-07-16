@@ -1,19 +1,8 @@
-/**
- * BBOX strategy when the url returns a limited number of features depending on the extent
- */
-ol.loadingstrategy.bboxLimit = function(extent, resolution) {
-	if (this.bboxLimitResolution != resolution)
-		this.refresh(); // Force the loading of all areas
-	this.bboxLimitResolution = resolution; // Mem resolution for further requests
-
-	return [extent];
-};
-
 // Vector layer
 function geoJsonLayer(options) {
 	options = Object.assign({
 		format: 'GeoJSON',
-		loadingstrategy: 'bboxLimit', // | 'all' | 'bbox'
+		loadingstrategy: 'bbox', // | 'all' | 'bbox'
 		styleOptionsFunction: function(styleOptions) {
 			return styleOptions;
 		},
@@ -108,13 +97,17 @@ function geoJsonLayer(options) {
 	layer.on('prerender', function(evt) {
 		// Get the transform ratio from the layer frameState
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
-		if (pixelRatio != ratio) { // Only when changed
-			pixelRatio = ratio;
 
-			// Tune the clustering distance depending on the transform ratio
-			if (typeof clusterSource.setDistance == 'function')
-				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
-		}
+		// Refresh if we change to clustered url
+		if (pixelRatio > 100 ^ ratio > 100)
+			clusterSource.refresh();
+
+		// Tune the clustering distance depending on the transform ratio
+		if (pixelRatio != ratio && // Only when changed
+			typeof clusterSource.setDistance == 'function')
+			clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
+
+		pixelRatio = ratio;
 	});
 
 	// Define the style of the cluster point & the groupped features

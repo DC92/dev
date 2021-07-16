@@ -11,10 +11,11 @@ function layerChem(options) {
 					'&bbox=' + bbox.join(',');
 		},
 		selectorName: 'chem-features',
-		//clusterDistance: 32,
+		clusterDistance: 32,
 
 		computeProperties: function(f, layer) {
-			f.set('icon', layer.options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
+			if (f.get('type'))
+				f.set('icon', layer.options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
 			if (f.get('id'))
 				f.set('link', layer.options.urlHost + 'viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
