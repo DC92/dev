@@ -35,6 +35,7 @@ $bbox_sql =
 	$bboxs[0].' '.$bboxs[1];
 
 ////////////////////////////////////////////////////////////////
+// Temporary tool to generate all the keys
 if(0){
 $sql="
 SELECT post_id, geom_region,
@@ -43,12 +44,14 @@ ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
 FROM phpbb_posts
 WHERE geom IS NOT NULL
 ";
-$subgroups = 25;
+$subgroups = 10;
 $result = $db->sql_query_limit($sql, 10000000);
 while ($row = $db->sql_fetchrow($result)) {
 //	echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($row,true).'</pre>'.PHP_EOL;
 	$geocenter = json_decode ($row['geocenter'])->coordinates;
-	$geom_region = intval (5000 + $geocenter[0] * $subgroups) * 10000 + intval (5000 + $geocenter[0] * $subgroups);
+	$geom_region =
+		intval ((180 + $geocenter[0]) * $subgroups) * 360 * $subgroups +
+		intval ((180 + $geocenter[1]) * $subgroups);
 	$sqlupd = "UPDATE phpbb_posts SET geom_region = $geom_region WHERE post_id = ".$row['post_id'];
 	$db->sql_query($sqlupd);
 //	echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($sqlupd,true).'</pre>'.PHP_EOL;
@@ -60,7 +63,7 @@ while ($row = $db->sql_fetchrow($result)) {
 // Super clusters
 if ($layer == 'cluster') {
 	$sql="
-	SELECT count(*) AS num,
+	SELECT count(*) AS num, geom_region,
 		ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
 	FROM phpbb_posts AS p
 		LEFT JOIN phpbb_forums f ON (f.forum_id = p.forum_id)
@@ -76,6 +79,7 @@ if ($layer == 'cluster') {
 	while ($row = $db->sql_fetchrow($result)) {
 		$features[] = [
 			'type' => 'Feature',
+			'id' => $row['geom_region'],
 			'geometry' => trunc (json_decode ($row['geocenter'])),
 			'properties' => [
 				'cluster' => $row['num'],
@@ -177,6 +181,7 @@ else {
 		// geoJson
 		$features[] = [
 			'type' => 'Feature',
+			'id' => $row['topic_id'], // Conformité with WFS specification. Avoid multiple display of the same
 			'geometry' => $geophp, // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 			'properties' => $properties,
 		];

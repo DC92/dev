@@ -40,8 +40,6 @@ function geoJsonLayer(options) {
 			format: new ol.format[options.format](),
 			strategy: ol.loadingstrategy[options.loadingstrategy],
 			url: function(extent, resolution, projection) {
-				source.refresh(); //TODO voir si on peut eviter la duplication des features à la création
-
 				//BEST gérer les msg erreur
 				return options.urlHost +
 					options.urlPath(
