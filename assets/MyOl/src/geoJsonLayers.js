@@ -30,8 +30,19 @@ function layerChem(options) {
 				width: 3,
 			}),
 		},
+		/*//TODO options / source alternative
+		alt: {
+			minResolution: 100,
+			urlPath: function(bbox, selectorList) {
+				return 'ext/Dominique92/GeoBB/gis2.php?' +
+					'layer=cluster&limit=1000000' +
+					(selectorList ? '&cat=' + selectorList : '');
+			},
+		}
+		*/
 	}, options));
 }
+//TODO CHEM : génération du code region à la création de fiche
 
 function layerMassif(options) {
 	return geoJsonLayer(Object.assign({

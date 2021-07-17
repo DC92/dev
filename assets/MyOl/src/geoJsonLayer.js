@@ -49,7 +49,8 @@ function geoJsonLayer(options) {
 							'EPSG:4326' // Received projection
 						),
 						options.selectorList,
-						resolution // === zoom level
+						resolution, // === zoom level
+						options
 					);
 			},
 		}),
@@ -92,21 +93,21 @@ function geoJsonLayer(options) {
 		});
 
 	// Tune the clustering distance following the zoom level
-	let pixelRatio = 0;
+	let previousRatio = 0;
 	layer.on('prerender', function(evt) {
 		// Get the transform ratio from the layer frameState
 		const ratio = evt.frameState.pixelToCoordinateTransform[0];
 
 		// Refresh if we change to clustered url
-		if (pixelRatio > 100 ^ ratio > 100) //TODO remplacer 100 par une option
+		if (previousRatio > 100 ^ ratio > 100) //TODO remplacer 100 par une option
 			source.refresh();
 
 		// Tune the clustering distance depending on the transform ratio
-		if (pixelRatio != ratio && // Only when changed
+		if (previousRatio != ratio && // Only when changed
 			typeof clusterSource.setDistance == 'function')
 			clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
 
-		pixelRatio = ratio;
+		previousRatio = ratio;
 	});
 
 	// Define the style of the cluster point & the groupped features
