@@ -7,8 +7,22 @@
  */
 function geoJsonLayer(options) {
 	options = Object.assign({
-		format: 'GeoJSON',
-		loadingstrategy: 'bbox', // | 'all' | 'bbox' //TODO une option pour couche clusterisée
+		format: new ol.format.GeoJSON(),
+		strategy: ol.loadingstrategy.bbox,
+		url: function(extent, resolution, projection) {
+			//BEST gérer les msg erreur
+			return options.urlHost +
+				options.urlPath(
+					ol.proj.transformExtent( // BBox
+						extent,
+						projection.getCode(),
+						'EPSG:4326' // Received projection
+					),
+					options.selectorList,
+					resolution, // === zoom level
+					options
+				);
+		},
 	}, options);
 
 	// options.styleOptions, // Object or function(feature)
@@ -45,24 +59,7 @@ function geoJsonLayer(options) {
 		}),
 	}, options.clusterStyleOptions);
 
-	const source = new ol.source.Vector({
-			format: new ol.format[options.format](),
-			strategy: ol.loadingstrategy[options.loadingstrategy],
-			url: function(extent, resolution, projection) {
-				//BEST gérer les msg erreur
-				return options.urlHost +
-					options.urlPath(
-						ol.proj.transformExtent( // BBox
-							extent,
-							projection.getCode(),
-							'EPSG:4326' // Received projection
-						),
-						options.selectorList,
-						resolution, // === zoom level
-						options
-					);
-			},
-		}),
+	const source = new ol.source.Vector(options),
 
 		// Optional clusterisation
 		clusterSource = !options.clusterDistance ? source :
@@ -203,13 +200,13 @@ function controlHover() {
 				// Big clusters
 				titles.push(feature.get('hover'));
 			else
-				if (features.length > 1)
-					// Clusters
-					for (let f in features)
-						titles.push(features[f].get('name'));
-				else
-					// Point
-					titles.push(features[0].get('hover'));
+			if (features.length > 1)
+				// Clusters
+				for (let f in features)
+					titles.push(features[f].get('name'));
+			else
+				// Point
+				titles.push(features[0].get('hover'));
 
 			feature.hoverStyleOptions.text.setText(titles.join('\n'));
 

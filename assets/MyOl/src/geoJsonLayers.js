@@ -32,7 +32,7 @@ function layerChem(options) {
 		},
 		alt: { //TODO
 			minResolution: 100,
-			loadingstrategy: 'all',
+			strategy: ol.loadingstrategy.all,
 			urlPath: function(bbox, selectorList) {
 				return 'ext/Dominique92/GeoBB/gis2.php?' +
 					'layer=cluster&limit=1000000' +
@@ -73,7 +73,7 @@ function layerMassif(options) {
 function layerWRI(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//www.refuges.info/',
-		urlPath: function(bbox, selectorList, resolution) {
+		urlPath: function(bbox, selectorList) {
 			return 'api/bbox?nb_points=all' +
 				'&type_points=' + selectorList +
 				'&bbox=' + bbox.join(',');
