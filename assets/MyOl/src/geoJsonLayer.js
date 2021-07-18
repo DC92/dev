@@ -6,65 +6,72 @@
  * Specific source for hign resolution zoom
  */
 function geoJsonLayer(options) {
-	options = Object.assign({
-		format: new ol.format.GeoJSON(),
-		strategy: ol.loadingstrategy.bbox,
-		url: function(extent, resolution, projection) {
-			//BEST gérer les msg erreur
-			return options.urlHost +
-				options.urlPath(
-					ol.proj.transformExtent( // BBox
-						extent,
-						projection.getCode(),
-						'EPSG:4326' // Received projection
-					),
-					options.selectorList,
-					resolution, // === zoom level
-					options
-				);
-		},
-	}, options);
+	const baseOptions = Object.assign({
+			format: new ol.format.GeoJSON(),
+			strategy: ol.loadingstrategy.bbox,
+			url: function(extent, resolution, projection) {
+				//BEST gérer les msg erreur
+				return baseOptions.urlHost +
+					baseOptions.urlPath(
+						ol.proj.transformExtent( // BBox
+							extent,
+							projection.getCode(),
+							'EPSG:4326' // Received projection
+						),
+						baseOptions.selectorList,
+						resolution, // === zoom level
+						baseOptions
+					);
+			},
+		}, options),
 
-	// options.styleOptions, // Object or function(feature)
+		//altOptions = Object.assign(options, options.alt);
 
-	options.labelStyleOptions = Object.assign({
-		textBaseline: 'bottom',
-		offsetY: -13, // Compensate the bottom textBaseline
-		padding: [1, 3, 0, 3],
-		font: '14px Calibri,sans-serif',
-		backgroundFill: new ol.style.Fill({
-			color: 'yellow',
-		}),
-	}, options.labelStyleOptions);
+		// Base feature format
+		// options.styleOptions, // Object or function(feature)
 
-	options.hoverStyleOptions = Object.assign({
-		// We assign the same text style to the hover label
-		text: new ol.style.Text(
-			options.labelStyleOptions
-		),
-	}, options.hoverStyleOptions);
-
-	options.clusterStyleOptions = Object.assign({
-		image: new ol.style.Circle({
-			radius: 14,
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
-			fill: new ol.style.Fill({
-				color: 'white',
-			}),
-		}),
-		text: new ol.style.Text({
+		// Common label text format
+		labelStyleOptions = Object.assign({
+			textBaseline: 'bottom',
+			offsetY: -13, // Compensate the bottom textBaseline
+			padding: [1, 3, 0, 3],
 			font: '14px Calibri,sans-serif',
-		}),
-	}, options.clusterStyleOptions);
+			backgroundFill: new ol.style.Fill({
+				color: 'yellow',
+			}),
+		}, options.labelStyleOptions),
 
-	const source = new ol.source.Vector(options),
+		// Style when hovering a feature
+		hoverStyleOptions = Object.assign({
+			// We assign the same text style to the hover label
+			text: new ol.style.Text(
+				labelStyleOptions
+			),
+		}, options.hoverStyleOptions),
+
+		// Specific format of clusters bullets
+		clusterStyleOptions = Object.assign({
+			image: new ol.style.Circle({
+				radius: 14,
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+				fill: new ol.style.Fill({
+					color: 'white',
+				}),
+			}),
+			text: new ol.style.Text({
+				font: '14px Calibri,sans-serif',
+			}),
+		}, options.clusterStyleOptions),
+
+		// Base source
+		source = new ol.source.Vector(baseOptions),
 
 		// Optional clusterisation
-		clusterSource = !options.clusterDistance ? source :
+		clusterSource = !baseOptions.clusterDistance ? source :
 		new ol.source.Cluster({
-			distance: options.clusterDistance,
+			distance: baseOptions.clusterDistance,
 			source: source,
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
@@ -76,26 +83,26 @@ function geoJsonLayer(options) {
 			},
 		}),
 
+		// Layer
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
 		});
 
-	layer.options = options; //HACK Memorize for further use
-
-	if (options.selectorName)
-		memCheckbox(options.selectorName, function(list) {
-			options.selectorList = list;
+	// Add layer options selector
+	if (baseOptions.selectorName)
+		memCheckbox(baseOptions.selectorName, function(list) {
+			baseOptions.selectorList = list;
 			layer.setVisible(list.length > 0);
 			if (list.length > 0)
 				source.refresh();
 		});
 
 	// Normalize properties
-	if (typeof options.computeProperties == 'function')
+	if (typeof baseOptions.computeProperties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)
-				options.computeProperties(evt.features[p], layer);
+				baseOptions.computeProperties(evt.features[p], baseOptions);
 		});
 
 	// Tune the clustering distance following the zoom level
@@ -124,12 +131,12 @@ function geoJsonLayer(options) {
 			area = ol.extent.getArea(
 				features[0].getGeometry().getExtent()
 			),
-			styleOptions = typeof options.styleOptions == 'function' ?
-			options.styleOptions(feature) :
-			options.styleOptions || {};
+			styleOptions = typeof baseOptions.styleOptions == 'function' ?
+			baseOptions.styleOptions(feature) :
+			baseOptions.styleOptions || {};
 
 		//HACK Memorize the options in the feature for hover display
-		feature.hoverStyleOptions = options.hoverStyleOptions;
+		feature.hoverStyleOptions = hoverStyleOptions;
 
 		// Clusters
 		if (features.length > 1 ||
@@ -138,19 +145,19 @@ function geoJsonLayer(options) {
 			for (let f in features)
 				clusters += parseInt(features[f].get('cluster')) || 1;
 
-			options.clusterStyleOptions.text.setText(clusters.toString());
+			clusterStyleOptions.text.setText(clusters.toString());
 			feature.set('hover', clusters.toString() + ' éléments');
 
-			return new ol.style.Style(options.clusterStyleOptions);
+			return new ol.style.Style(clusterStyleOptions);
 		}
 
 		// Single feature (point, line or poly)
 		// Add a permanent label
-		if (!options.clusterDistance || // If no clusterisation 
+		if (!baseOptions.clusterDistance || // If no clusterisation 
 			(feature.get('features') // If not cluster marker 
 			) && label) {
-			options.labelStyleOptions.text = label;
-			styleOptions.text = new ol.style.Text(options.labelStyleOptions);
+			labelStyleOptions.text = label;
+			styleOptions.text = new ol.style.Text(labelStyleOptions);
 		}
 
 		// Include the feature in the cluster source (lines, polygons) to make it visible
@@ -184,35 +191,35 @@ function geoJsonLayer(options) {
  */
 function controlHover() {
 	const control = new ol.control.Control({
-		element: document.createElement('div'), //HACK No button
-	});
+			element: document.createElement('div'), //HACK No button
+		}),
+		// Internal layer to temporary display hovered feature
+		hoverLayer = new ol.layer.Vector({
+			source: new ol.source.Vector(),
+			zIndex: 1, // Above the features
+			style: style,
+		});
 
-	const hoverLayer = new ol.layer.Vector({
-		source: new ol.source.Vector(),
-		zIndex: 1, // Above the features
+	function style(feature) {
+		//BEST options label on hover point /ligne / surface ???
+		const features = feature.get('features') || [feature],
+			titles = [];
 
-		style: function(feature) {
-			//BEST options label on hover point /ligne / surface ???
-			const features = feature.get('features') || [feature],
-				titles = [];
+		if (feature.get('hover'))
+			// Big clusters
+			titles.push(feature.get('hover'));
+		else
+		if (features.length > 1)
+			// Clusters
+			for (let f in features)
+				titles.push(features[f].get('name'));
+		else
+			// Point
+			titles.push(features[0].get('hover'));
 
-			if (feature.get('hover'))
-				// Big clusters
-				titles.push(feature.get('hover'));
-			else
-			if (features.length > 1)
-				// Clusters
-				for (let f in features)
-					titles.push(features[f].get('name'));
-			else
-				// Point
-				titles.push(features[0].get('hover'));
-
-			feature.hoverStyleOptions.text.setText(titles.join('\n'));
-
-			return new ol.style.Style(feature.hoverStyleOptions);
-		},
-	});
+		feature.hoverStyleOptions.text.setText(titles.join('\n'));
+		return new ol.style.Style(feature.hoverStyleOptions);
+	}
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);

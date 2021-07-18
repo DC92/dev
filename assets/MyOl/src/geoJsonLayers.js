@@ -11,11 +11,11 @@ function layerChem(options) {
 		selectorName: 'chem-features',
 		clusterDistance: 32,
 
-		computeProperties: function(f, layer) {
+		computeProperties: function(f, options) {
 			if (f.get('type'))
-				f.set('icon', layer.options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
+				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
 			if (f.get('id'))
-				f.set('link', layer.options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
 		},
 		styleOptions: {
@@ -81,7 +81,7 @@ function layerWRI(options) {
 		selectorName: 'wri-features',
 		clusterDistance: 32,
 
-		computeProperties: function(f, layer) {
+		computeProperties: function(f, options) {
 			const hover = [], // Hover label
 				desc = [];
 			if (f.get('type').valeur)
@@ -102,7 +102,7 @@ function layerWRI(options) {
 			f.set('hover', hover.join('\n'));
 
 			// Other displays
-			f.set('icon', layer.options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
+			f.set('icon', options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
 			f.set('name', f.get('nom'));
 			f.set('label', f.get('nom'));
 			if (f.get('lien'))
