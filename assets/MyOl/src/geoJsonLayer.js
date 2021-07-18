@@ -1,4 +1,10 @@
-// Vector layer
+/**
+ * Layer to display remote geoJson
+ * Styles, icons & labels
+ * Hover & click
+ * Features clusters
+ * Specific source for hign resolution zoom
+ */
 function geoJsonLayer(options) {
 	options = Object.assign({
 		format: 'GeoJSON',
@@ -197,8 +203,8 @@ function controlHover() {
 				// Big clusters
 				titles.push(feature.get('hover'));
 			else
-				// Clusters
 				if (features.length > 1)
+					// Clusters
 					for (let f in features)
 						titles.push(features[f].get('name'));
 				else
