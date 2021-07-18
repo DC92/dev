@@ -30,16 +30,15 @@ function layerChem(options) {
 				width: 3,
 			}),
 		},
-		/*//TODO options / source alternative
-		alt: {
+		alt: { //TODO
 			minResolution: 100,
+			loadingstrategy: 'all',
 			urlPath: function(bbox, selectorList) {
 				return 'ext/Dominique92/GeoBB/gis2.php?' +
 					'layer=cluster&limit=1000000' +
 					(selectorList ? '&cat=' + selectorList : '');
 			},
 		}
-		*/
 	}, options));
 }
 //TODO CHEM : génération du code region à la création de fiche
@@ -55,17 +54,18 @@ function layerMassif(options) {
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
-		styleOptionsFunction: function(styleOptions, feature) {
+		styleOptions: function(feature) {
 			const hex = feature.get('couleur');
-			styleOptions.fill = new ol.style.Fill({
-				color: 'rgba(' + [
-					parseInt(hex.substring(1, 3), 16),
-					parseInt(hex.substring(3, 5), 16),
-					parseInt(hex.substring(5, 7), 16),
-					0.5,
-				].join(',') + ')',
-			});
-			return styleOptions;
+			return {
+				fill: new ol.style.Fill({
+					color: 'rgba(' + [
+						parseInt(hex.substring(1, 3), 16),
+						parseInt(hex.substring(3, 5), 16),
+						parseInt(hex.substring(5, 7), 16),
+						0.5,
+					].join(',') + ')',
+				})
+			};
 		},
 	}, options));
 }

@@ -3,16 +3,13 @@ function geoJsonLayer(options) {
 	options = Object.assign({
 		format: 'GeoJSON',
 		loadingstrategy: 'bbox', // | 'all' | 'bbox' //TODO une option pour couche clusterisée
-		styleOptionsFunction: function(styleOptions) { //TODO ??? traiter séparément comme options.styleOptions
-			return styleOptions;
-		},
 	}, options);
 
-	options.styleOptions = options.styleOptions || {}; //TODO ??? genéraliser ...OptionsFunction
+	// options.styleOptions, // Object or function(feature)
 
 	options.labelStyleOptions = Object.assign({
 		textBaseline: 'bottom',
-		offsetY: -13, // Compensate bottom
+		offsetY: -13, // Compensate the bottom textBaseline
 		padding: [1, 3, 0, 3],
 		font: '14px Calibri,sans-serif',
 		backgroundFill: new ol.style.Fill({
@@ -21,6 +18,7 @@ function geoJsonLayer(options) {
 	}, options.labelStyleOptions);
 
 	options.hoverStyleOptions = Object.assign({
+		// We assign the same text style to the hover label
 		text: new ol.style.Text(
 			options.labelStyleOptions
 		),
@@ -123,10 +121,9 @@ function geoJsonLayer(options) {
 			area = ol.extent.getArea(
 				features[0].getGeometry().getExtent()
 			),
-			styleOptions = options.styleOptionsFunction(
-				options.styleOptions,
-				feature
-			);
+			styleOptions = typeof options.styleOptions == 'function' ?
+			options.styleOptions(feature) :
+			options.styleOptions || {};
 
 		//HACK Memorize the options in the feature for hover display
 		feature.hoverStyleOptions = options.hoverStyleOptions;
