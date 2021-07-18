@@ -25,10 +25,10 @@ function geoJsonLayer(options) {
 			},
 		}, options),
 
-		//altOptions = Object.assign(options, options.alt);
+		// Options of the source if resolution > options.alt.minResolution
+		altOptions = Object.assign({}, baseOptions, baseOptions.alt),
 
-		// Base feature format
-		// options.styleOptions, // Object or function(feature)
+		// options.styleOptions, // Base feature format : Object or function(feature)
 
 		// Common label text format
 		labelStyleOptions = Object.assign({
@@ -106,21 +106,23 @@ function geoJsonLayer(options) {
 		});
 
 	// Tune the clustering distance following the zoom level
-	let previousRatio = 0;
+	let previousResolution = 0;
 	layer.on('prerender', function(evt) {
-		// Get the transform ratio from the layer frameState
-		const ratio = evt.frameState.pixelToCoordinateTransform[0];
+		// Get the transform resolution from the layer frameState
+		const resolution = evt.frameState.viewState.resolution;
 
-		// Refresh if we change to clustered url
-		if (previousRatio > 100 ^ ratio > 100) //TODO remplacer 100 par une option
+		// Refresh if we change the source options
+		if (options.alt &&
+			options.alt.minResolution > resolution ^
+			options.alt.minResolution > previousResolution)
 			source.refresh();
 
-		// Tune the clustering distance depending on the transform ratio
-		if (previousRatio != ratio && // Only when changed
+		// Tune the clustering distance depending on the transform resolution
+		if (previousResolution != resolution && // Only when changed
 			typeof clusterSource.setDistance == 'function')
-			clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
+			clusterSource.setDistance(Math.max(8, Math.min(60, resolution)));
 
-		previousRatio = ratio;
+		previousResolution = resolution;
 	});
 
 	// Define the style of the cluster point & the groupped features
@@ -132,8 +134,8 @@ function geoJsonLayer(options) {
 				features[0].getGeometry().getExtent()
 			),
 			styleOptions = typeof baseOptions.styleOptions == 'function' ?
-			baseOptions.styleOptions(feature) :
-			baseOptions.styleOptions || {};
+			options.styleOptions(feature) :
+			options.styleOptions || {};
 
 		//HACK Memorize the options in the feature for hover display
 		feature.hoverStyleOptions = hoverStyleOptions;
