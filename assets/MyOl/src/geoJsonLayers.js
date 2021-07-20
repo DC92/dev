@@ -6,7 +6,7 @@ function layerChem(options) {
 				'layer=' + (resolution < 100 ? 'simple' : 'cluster') +
 				'&limit=1000000' +
 				(selectorList ? '&cat=' + selectorList : '') +
-				'&bbox=' + bbox.join(',');
+				(resolution < 100 ? '&bbox=' + bbox.join(',') : '');
 		},
 		selectorName: 'chem-features',
 		clusterDistance: 32,
@@ -30,7 +30,7 @@ function layerChem(options) {
 				width: 3,
 			}),
 		},
-		alt: { //TODO
+		alt: {
 			minResolution: 100,
 			strategy: ol.loadingstrategy.all,
 			urlPath: function(bbox, selectorList) {
@@ -49,6 +49,7 @@ function layerMassif(options) {
 		urlPath: function() {
 			return 'api/polygones?type_polygon=1';
 		},
+		clusterDistance: 1000000,
 		computeProperties: function(f) {
 			f.set('label', f.get('nom'));
 			if (f.get('lien'))

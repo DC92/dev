@@ -9,20 +9,8 @@ function geoJsonLayer(options) {
 	const baseOptions = Object.assign({
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			url: function(extent, resolution, projection) {
-				//BEST gérer les msg erreur
-				return baseOptions.urlHost +
-					baseOptions.urlPath(
-						ol.proj.transformExtent( // BBox
-							extent,
-							projection.getCode(),
-							'EPSG:4326' // Received projection
-						),
-						baseOptions.selectorList,
-						resolution, // === zoom level
-						baseOptions
-					);
-			},
+			url: url,
+			clusterDistance: 1000000, // No clusterisation
 		}, options),
 
 		// Options of the source if resolution > options.alt.minResolution
@@ -65,12 +53,13 @@ function geoJsonLayer(options) {
 			}),
 		}, options.clusterStyleOptions),
 
-		// Base source
 		source = new ol.source.Vector(baseOptions),
+		altSource = new ol.source.Vector(Object.assign({}, baseOptions, baseOptions.alt)),
 
-		// Optional clusterisation
-		clusterSource = !baseOptions.clusterDistance ? source :
-		new ol.source.Cluster({
+		// Clusterisation
+		//clusterSource = !baseOptions.clusterDistance ? source :
+		//new ol.source.Cluster({
+		clusterSource = new ol.source.Cluster({
 			distance: baseOptions.clusterDistance,
 			source: source,
 			geometryFunction: function(feature) {
@@ -88,6 +77,30 @@ function geoJsonLayer(options) {
 			source: clusterSource,
 			style: style,
 		});
+
+	function url(extent, resolution, projection) {
+		//clusterSource.setSource(resolution < 100  ?source:	altSource);
+		/*
+					source.strategy_= 
+					clusterSource.strategy_= 
+					 ?
+						baseOptions.strategy:
+						altOptions.strategy;
+		*/
+
+		//BEST gérer les msg erreur
+		return baseOptions.urlHost +
+			baseOptions.urlPath(
+				ol.proj.transformExtent( // BBox
+					extent,
+					projection.getCode(),
+					'EPSG:4326' // Received projection
+				),
+				baseOptions.selectorList,
+				resolution, // === zoom level
+				baseOptions
+			);
+	}
 
 	// Add layer options selector
 	if (baseOptions.selectorName)
@@ -110,6 +123,10 @@ function geoJsonLayer(options) {
 	layer.on('prerender', function(evt) {
 		// Get the transform resolution from the layer frameState
 		const resolution = evt.frameState.viewState.resolution;
+
+		//clusterSource.setSource(resolution < 100 ? source : altSource);
+		//source.refresh();
+		//clusterSource.refresh();
 
 		// Refresh if we change the source options
 		if (options.alt &&

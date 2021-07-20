@@ -85,18 +85,9 @@ Based on https://openlayers.org
 				}),
 			});
 
-		const massif = layerMassif(),
-			wri = layerWRI({
-				pixelRatioMax: 100,
-				layerAbove: layerMassif(),
-			}),
-			chem = layerChem({
-				pixelRatioMax: 30,
-			});
-
-			//map.addLayer(wri);
-			//map.addLayer(massif);
-			map.addLayer(chem);
+			//map.addLayer(layerWRI());
+			//map.addLayer(layerMassif());
+			map.addLayer(layerChem());
 	</script>
 </body>
 </html>
