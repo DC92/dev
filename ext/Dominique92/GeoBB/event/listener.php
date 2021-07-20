@@ -71,7 +71,9 @@ class listener implements EventSubscriberInterface
 	function viewtopic_get_post_data($vars) {
 		// Insère la conversion du champ geom en format geojson dans la requette SQL
 		$sql_ary = $vars['sql_ary'];
-		$sql_ary['SELECT'] .= ', ST_AsGeoJSON(geom) AS geo_json';
+		$sql_ary['SELECT'] .=
+			', ST_AsGeoJSON(geom) AS geo_json'.
+			', ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geo_center';
 		$vars['sql_ary'] = $sql_ary;
 	}
 
@@ -151,6 +153,15 @@ class listener implements EventSubscriberInterface
 					$this->db->sql_query($sql);
 				}
 			}
+
+			// Calcul de la "region" du globe (pour les super-clusters)
+			if (array_key_exists ('geo_region', $topic_row) && !$topic_row['geo_region']) {
+				$subgroups = 10;
+				$geo_center = json_decode ($topic_row['geo_center'])->coordinates;
+				$topic_row['geo_region'] =
+					intval ((180 + $geo_center[0]) * $subgroups) * 360 * $subgroups +
+					intval ((180 + $geo_center[1]) * $subgroups);
+			}
 		}
 
 		if ($post_id == $topic_first_post_id)
@@ -204,7 +215,7 @@ class listener implements EventSubscriberInterface
 	*/
 	function adm_page_header() {
 		$this->add_sql_column (POSTS_TABLE, 'geom', 'geometrycollection');
-		$this->add_sql_column (POSTS_TABLE, 'geom_region', 'int');
+		$this->add_sql_column (POSTS_TABLE, 'geo_region', 'int');
 		$this->add_sql_column (POSTS_TABLE, 'geo_massif', 'varchar(50)');
 		$this->add_sql_column (POSTS_TABLE, 'geo_altitude', 'varchar(12)');
 

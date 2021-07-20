@@ -38,7 +38,7 @@ $bbox_sql =
 // Temporary tool to generate all the keys
 if(0){
 $sql="
-SELECT post_id, geom_region,
+SELECT post_id, geo_region,
 ST_AsGeoJSON(geom) AS geojson,
 ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
 FROM phpbb_posts
@@ -49,10 +49,10 @@ $result = $db->sql_query_limit($sql, 10000000);
 while ($row = $db->sql_fetchrow($result)) {
 //	echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($row,true).'</pre>'.PHP_EOL;
 	$geocenter = json_decode ($row['geocenter'])->coordinates;
-	$geom_region =
+	$geo_region =
 		intval ((180 + $geocenter[0]) * $subgroups) * 360 * $subgroups +
 		intval ((180 + $geocenter[1]) * $subgroups);
-	$sqlupd = "UPDATE phpbb_posts SET geom_region = $geom_region WHERE post_id = ".$row['post_id'];
+	$sqlupd = "UPDATE phpbb_posts SET geo_region = $geo_region WHERE post_id = ".$row['post_id'];
 	$db->sql_query($sqlupd);
 //	echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($sqlupd,true).'</pre>'.PHP_EOL;
 }
@@ -63,15 +63,15 @@ while ($row = $db->sql_fetchrow($result)) {
 // Super clusters
 if ($layer == 'cluster') {
 	$sql="
-	SELECT count(*) AS num, geom_region,
+	SELECT count(*) AS num, geo_region,
 		ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
 	FROM phpbb_posts AS p
 		LEFT JOIN phpbb_forums f ON (f.forum_id = p.forum_id)
-	WHERE geom_region IS NOT NULL AND ".
+	WHERE geo_region IS NOT NULL AND ".
 		($type ? "f.forum_id IN ($type) AND " : '').
 		($cat ? "f.parent_id IN ($cat) AND " : '').
 	"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)
-	GROUP BY geom_region
+	GROUP BY geo_region
 	ORDER BY num DESC
 	";
 	$result = $db->sql_query($sql);
@@ -79,7 +79,7 @@ if ($layer == 'cluster') {
 	while ($row = $db->sql_fetchrow($result)) {
 		$features[] = [
 			'type' => 'Feature',
-			'id' => $row['geom_region'],
+			'id' => $row['geo_region'],
 			'geometry' => trunc (json_decode ($row['geocenter'])),
 			'properties' => [
 				'cluster' => $row['num'],
