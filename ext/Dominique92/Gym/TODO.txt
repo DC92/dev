@@ -1,3 +1,10 @@
+GYM résumé => ... en savoir plus
+GYM : masquer altitude et massif (suivant dispo du champ dans la base ?)
+GYM affiche la fin dune balise dans le titre
+	Quand recherche page => affiche la fin dune balise dans le titre
+GYM : ne peut pas lire une rubrique si un des textes comprend une redirection
+
+
 // Ne pas afficher le premier post dans les cartes
 
 //TODO randos + GPS

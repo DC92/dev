@@ -13,6 +13,10 @@ BUG
 BEST ext/gis arrondir les lon,lat
 	MyOl feature.get('features')
 
+CSS preload
+	link rel="preload" as="style" requests the stylesheet asynchronously. You can learn more about preload in the Preload critical assets guide.
+	https://web.dev/defer-non-critical-css/
+
 BUG bloquants
 	Les pictos ont disparu sur V3
 	Chemineur dans MyOl => Traduction symbole (export GPS ?)
