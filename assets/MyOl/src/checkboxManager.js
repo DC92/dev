@@ -17,7 +17,8 @@ function memCheckbox(selectorName, callback) {
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
 			// Check following cookies & args
-			inputEls[e].checked =
+			if (match)
+				inputEls[e].checked =
 				match[1].split(',').includes(inputEls[e].value) || // That one is declared
 				match[1].split(',').includes('on'); // The "all (= "on") is set
 
