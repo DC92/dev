@@ -201,7 +201,8 @@ function geoJsonLayer(options) {
 
 			if (!featureExists)
 				clusterSource.addFeature(features[0]);
-		} else if (icon)
+		} else
+		if (icon)
 			// Add icon if one is defined in the properties
 			styleOptions.image = new ol.style.Icon({
 				src: icon,
@@ -256,54 +257,57 @@ function controlHover() {
 		ol.control.Control.prototype.setMap.call(this, map);
 		map.addLayer(hoverLayer);
 
-		let previousHoveredFeature;
-		map.on(['pointermove', 'click'], function(evt) {
-			// Get hovered feature
-			const feature = map.forEachFeatureAtPixel(
-				map.getEventPixel(evt.originalEvent),
-				function(feature) {
-					return feature;
-				});
-
-			if (feature) {
-				const features = feature.get('features'),
-					center = feature.getGeometry().getCoordinates(),
-					link = (features ? features[0] : feature).get('link');
-
-				if (evt.type == 'click') {
-					// Single feature
-					if (link) {
-						if (evt.originalEvent.ctrlKey)
-							window.open(link, '_blank').focus();
-						else if (evt.originalEvent.shiftKey)
-							// To specify feature open a new window
-							window.open(link, '_blank', 'resizable=yes').focus();
-						else
-							window.location = link;
-					}
-
-					// Cluster
-					else
-						map.getView().animate({
-							zoom: map.getView().getZoom() + 1,
-							center: center,
-						});
-				}
-			}
-
-			// Make the hovered feature visible in a dedicated layer
-			if (feature !== previousHoveredFeature) {
-				if (previousHoveredFeature)
-					hoverLayer.getSource().removeFeature(previousHoveredFeature);
-
-				if (feature)
-					hoverLayer.getSource().addFeature(feature);
-
-				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
-				previousHoveredFeature = feature;
-			}
-		});
+		map.on(['pointermove', 'click'], action);
 	};
+
+	let previousHoveredFeature;
+
+	function action(evt) {
+		// Get hovered feature
+		const feature = map.forEachFeatureAtPixel(
+			map.getEventPixel(evt.originalEvent),
+			function(feature) {
+				return feature;
+			});
+
+		if (feature) {
+			const features = feature.get('features'),
+				center = feature.getGeometry().getCoordinates(),
+				link = (features ? features[0] : feature).get('link');
+
+			if (evt.type == 'click') {
+				// Single feature
+				if (features.length == 1) {
+					if (evt.originalEvent.ctrlKey)
+						window.open(link, '_blank').focus();
+					else if (evt.originalEvent.shiftKey)
+						// To specify feature open a new window
+						window.open(link, '_blank', 'resizable=yes').focus();
+					else
+						window.location = link;
+				}
+
+				// Cluster
+				else
+					map.getView().animate({
+						zoom: map.getView().getZoom() + 1,
+						center: center,
+					});
+			}
+		}
+
+		// Make the hovered feature visible in a dedicated layer
+		if (feature !== previousHoveredFeature) {
+			if (previousHoveredFeature)
+				hoverLayer.getSource().removeFeature(previousHoveredFeature);
+
+			if (feature)
+				hoverLayer.getSource().addFeature(feature);
+
+			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
+			previousHoveredFeature = feature;
+		}
+	}
 
 	return control;
 }
