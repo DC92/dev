@@ -74,7 +74,7 @@ function geoJsonLayer(options) {
 		altSource = options.alt ? new ol.source.Vector(altOptions) : null,
 
 		// Alternative cluster
-		clusterAltSource = altOptions.clusterDistance ?
+		clusterAltSource = options.alt && altOptions.clusterDistance ?
 		new ol.source.Cluster({
 			distance: altOptions.clusterDistance,
 			source: altSource,
@@ -103,6 +103,16 @@ function geoJsonLayer(options) {
 		);
 	}
 
+	if (options.selectorName)
+		memCheckbox(options.selectorName, function(list) {
+			layer.setVisible(list.length > 0);
+			if (list.length > 0) {
+				source.refresh();
+				if (altSource)
+					altSource.refresh();
+			}
+		});
+
 	function url(extent, resolution, projection, options) {
 		options = options || baseOptions;
 
@@ -114,11 +124,7 @@ function geoJsonLayer(options) {
 					projection.getCode(),
 					'EPSG:4326' // Received projection
 				),
-				memCheckbox(options.selectorName, function(list) {
-					layer.setVisible(list.length > 0);
-					if (list.length > 0)
-						source.refresh();
-				}),
+				readCheckbox(options.selectorName),
 				resolution, // === zoom level
 				options
 			);

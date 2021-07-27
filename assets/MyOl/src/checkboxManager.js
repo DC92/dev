@@ -6,15 +6,31 @@
  * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
  * Manages a global flip-flop of the same named <input> checkboxes
  */
+function readCheckbox(selectorName) {
+	const inputEls = document.getElementsByName(selectorName);
+
+	// Specific case of a single on/off <input>
+	if (inputEls.length == 1)
+		return [inputEls[0].checked];
+
+	// Read each <input> checkbox
+	const list = [];
+	for (let e = 0; e < inputEls.length; e++)
+		if (inputEls[e].checked &&
+			inputEls[e].value != 'on')
+			list.push(inputEls[e].value);
+
+	return list;
+}
+
 function memCheckbox(selectorName, callback) {
-	//TODO BUG ne mémorise que le callback de la dernière déclaration
 	const request = // Search values in cookies & args
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie, // Then the cookies
 
 		match = request.match(new RegExp(selectorName + '=([^;]*)')),
-		inputEls = document.getElementsByName(selectorName || '');
+		inputEls = document.getElementsByName(selectorName);
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
@@ -32,14 +48,17 @@ function memCheckbox(selectorName, callback) {
 			checkEl(inputEls[e]);
 		}
 
-	const list = readList();
+	const list = readCheckbox(selectorName);
+
 	if (typeof callback == 'function')
 		callback(list);
+
+	return list;
 
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
-		const list = readList();
+		const list = readCheckbox(selectorName);
 
 		// Mem the data in the cookie
 		if (selectorName)
@@ -69,21 +88,4 @@ function memCheckbox(selectorName, callback) {
 		if (allIndex != -1)
 			inputEls[allIndex].checked = allCheck;
 	}
-
-	function readList() {
-		// Specific case of a single on/off <input>
-		if (inputEls.length == 1)
-			return [inputEls[0].checked];
-
-		// Read each <input> checkbox
-		const list = [];
-		for (let e = 0; e < inputEls.length; e++)
-			if (inputEls[e].checked &&
-				inputEls[e].value != 'on')
-				list.push(inputEls[e].value);
-
-		return list;
-	}
-
-	return list;
 }
