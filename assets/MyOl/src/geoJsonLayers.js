@@ -1,15 +1,15 @@
 function layerChem(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, selectorList, resolution) {
+		urlPath: function(bbox, list, resolution, options) {
 			return 'ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=' + (resolution < 100 ? 'simple' : 'cluster') +
-				'&limit=1000000' +
-				(selectorList ? '&cat=' + selectorList : '') +
-				(resolution < 100 ? '&bbox=' + bbox.join(',') : '');
+				'layer=simple&limit=1000' +
+				(options.selectorName ? '&cat=' + list.join(',') : '') +
+				'&bbox=' + bbox.join(',');
 		},
+		strategy: ol.loadingstrategy.bbox,
 		selectorName: 'chem-features',
-		clusterDistance: 32,
+		clusterDistance: 50,
 
 		computeProperties: function(f, options) {
 			if (f.get('type'))
@@ -33,15 +33,14 @@ function layerChem(options) {
 		alt: {
 			minResolution: 100,
 			strategy: ol.loadingstrategy.all,
-			urlPath: function(bbox, selectorList) {
+			urlPath: function(bbox, list) {
 				return 'ext/Dominique92/GeoBB/gis2.php?' +
-					'layer=cluster&limit=1000000' +
-					(selectorList ? '&cat=' + selectorList : '');
+					'layer=cluster&limit=1000' +
+					(options.selectorName ? '&cat=' + list.join(',') : '');
 			},
-		}
+		},
 	}, options));
 }
-//TODO CHEM : génération du code region à la création de fiche
 
 function layerMassif(options) {
 	return geoJsonLayer(Object.assign({
@@ -49,38 +48,68 @@ function layerMassif(options) {
 		urlPath: function() {
 			return 'api/polygones?type_polygon=1';
 		},
-		clusterDistance: 1000000,
-		computeProperties: function(f) {
-			f.set('label', f.get('nom'));
-			if (f.get('lien'))
-				f.set('link', f.get('lien'));
-		},
-		styleOptions: function(feature) {
-			const hex = feature.get('couleur');
-			return {
-				fill: new ol.style.Fill({
-					color: 'rgba(' + [
-						parseInt(hex.substring(1, 3), 16),
-						parseInt(hex.substring(3, 5), 16),
-						parseInt(hex.substring(5, 7), 16),
-						0.5,
-					].join(',') + ')',
-				})
-			};
-		},
+		//strategy: ol.loadingstrategy.all,
+		//clusterDistance: 1000000,
+			computeProperties: function(f) {
+				f.set('label', f.get('nom'));
+				if (f.get('lien'))
+					f.set('link', f.get('lien'));
+			},
+			styleOptions: function(feature) {
+				const hex = feature.get('couleur');
+				return {
+					fill: new ol.style.Fill({
+						color: 'rgba(' + [
+							parseInt(hex.substring(1, 3), 16),
+							parseInt(hex.substring(3, 5), 16),
+							parseInt(hex.substring(5, 7), 16),
+							0.5,
+						].join(',') + ')',
+					})
+				};
+			},
 	}, options));
 }
 
 function layerWRI(options) {
 	return geoJsonLayer(Object.assign({
+		alt: {
+			minResolution: 100,
+			strategy: ol.loadingstrategy.all,
+			clusterDistance: null,
+			urlPath: function() {
+				return 'api/polygones?type_polygon=1';
+			},
+/*			computeProperties: function(f) {
+				f.set('label', f.get('nom'));
+				if (f.get('lien'))
+					f.set('link', f.get('lien'));
+			},*/
+			styleOptions: function(feature) {
+				const hex = feature.get('couleur');
+				return {
+					fill: new ol.style.Fill({
+						color: 'rgba(' + [
+							parseInt(hex.substring(1, 3), 16),
+							parseInt(hex.substring(3, 5), 16),
+							parseInt(hex.substring(5, 7), 16),
+							0.5,
+						].join(',') + ')',
+					})
+				};
+			},
+		},
+
+
 		urlHost: '//www.refuges.info/',
-		urlPath: function(bbox, selectorList) {
+		urlPath: function(bbox, list) {
 			return 'api/bbox?nb_points=all' +
-				'&type_points=' + selectorList +
+				'&type_points=' + list.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
+		strategy: ol.loadingstrategy.bbox,
 		selectorName: 'wri-features',
-		clusterDistance: 32,
+		clusterDistance: 50,
 
 		computeProperties: function(f, options) {
 			const hover = [], // Hover label

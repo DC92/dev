@@ -33,11 +33,8 @@ function memCheckbox(selectorName, callback) {
 		}
 
 	const list = readList();
-
 	if (typeof callback == 'function')
 		callback(list);
-
-	return list;
 
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
@@ -80,7 +77,6 @@ function memCheckbox(selectorName, callback) {
 
 		// Read each <input> checkbox
 		const list = [];
-
 		for (let e = 0; e < inputEls.length; e++)
 			if (inputEls[e].checked &&
 				inputEls[e].value != 'on')
@@ -88,4 +84,6 @@ function memCheckbox(selectorName, callback) {
 
 		return list;
 	}
+
+	return list;
 }

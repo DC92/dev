@@ -61,6 +61,8 @@ Based on https://openlayers.org
 	</ul>
 
 	<script>
+		console.log('Cookies: ' + document.cookie);
+
 		const mapKeys = {
 				"ign": "hcxdz5f1p9emo4i1lch6ennl",
 				"thunderforest": "ee751f43b3af4614b01d1bce72785369",
@@ -81,13 +83,17 @@ Based on https://openlayers.org
 					//center: [260000, 6250000], // Paris
 					//center: [260000, 5800000], // France
 					//center: [300000, 6170000], // 
-					zoom: 12,
+					zoom: 8,
 				}),
 			});
 
-			//map.addLayer(layerWRI());
-			//map.addLayer(layerMassif());
-			map.addLayer(layerChem());
+if(0)		map.addLayer(layerWRI({
+				selectorName: 'wri-features',
+			}));
+if(0)			map.addLayer(layerMassif());
+			map.addLayer(layerChem({
+				selectorName: 'chem-features',
+			}));
 	</script>
 </body>
 </html>

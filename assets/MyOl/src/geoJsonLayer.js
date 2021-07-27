@@ -8,13 +8,8 @@
 function geoJsonLayer(options) {
 	const baseOptions = Object.assign({
 			format: new ol.format.GeoJSON(),
-			strategy: ol.loadingstrategy.bbox,
 			url: url,
-			clusterDistance: 1000000, // No clusterisation
 		}, options),
-
-		// Options of the source if resolution > options.alt.minResolution
-		altOptions = Object.assign({}, baseOptions, baseOptions.alt),
 
 		// options.styleOptions, // Base feature format : Object or function(feature)
 
@@ -33,7 +28,7 @@ function geoJsonLayer(options) {
 		hoverStyleOptions = Object.assign({
 			// We assign the same text style to the hover label
 			text: new ol.style.Text(
-				labelStyleOptions
+				labelStyleOptions //BEST specific hoverLabelStyleOptions
 			),
 		}, options.hoverStyleOptions),
 
@@ -53,63 +48,81 @@ function geoJsonLayer(options) {
 			}),
 		}, options.clusterStyleOptions),
 
-		source = new ol.source.Vector(baseOptions),
-		altSource = new ol.source.Vector(Object.assign({}, baseOptions, baseOptions.alt)),
+		// Options of the source if resolution > options.alt.minResolution
+		altOptions = Object.assign({},
+			baseOptions,
+			options.alt, {
+				url: function(extent, resolution, projection) {
+					return url(extent, resolution, projection, altOptions);
+				}
+			}
+		),
 
-		// Clusterisation
-		//clusterSource = !baseOptions.clusterDistance ? source :
-		//new ol.source.Cluster({
-		clusterSource = new ol.source.Cluster({
+		// Basic source
+		source = new ol.source.Vector(baseOptions),
+
+		// Source if clusterized
+		clusterSource = baseOptions.clusterDistance ?
+		new ol.source.Cluster({
 			distance: baseOptions.clusterDistance,
 			source: source,
-			geometryFunction: function(feature) {
-				// Generate a center point to manage clusterisations
-				return new ol.geom.Point(
-					ol.extent.getCenter(
-						feature.getGeometry().getExtent()
-					)
-				);
-			},
-		}),
+			geometryFunction: centerPoint,
+		}) :
+		source,
+
+		// Alternative source
+		altSource = options.alt ? new ol.source.Vector(altOptions) : null,
+
+		// Alternative cluster
+		clusterAltSource = altOptions.clusterDistance ?
+		new ol.source.Cluster({
+			distance: altOptions.clusterDistance,
+			source: altSource,
+			geometryFunction: centerPoint,
+		}) :
+		altSource,
 
 		// Layer
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
+			render: function(frameState, target) {
+				prepareFrame(frameState.pixelToCoordinateTransform[0]);
+
+				//HACK to be informed of render to be run
+				return ol.layer.Vector.prototype.render.call(this, frameState, target);
+			},
 		});
 
-	function url(extent, resolution, projection) {
-		//clusterSource.setSource(resolution < 100  ?source:	altSource);
-		/*
-					source.strategy_= 
-					clusterSource.strategy_= 
-					 ?
-						baseOptions.strategy:
-						altOptions.strategy;
-		*/
+	function centerPoint(feature) {
+		// Generate a center point to manage clusterisations
+		return new ol.geom.Point(
+			ol.extent.getCenter(
+				feature.getGeometry().getExtent()
+			)
+		);
+	}
+
+	function url(extent, resolution, projection, options) {
+		options = options || baseOptions;
 
 		//BEST gérer les msg erreur
-		return baseOptions.urlHost +
-			baseOptions.urlPath(
+		return options.urlHost +
+			options.urlPath(
 				ol.proj.transformExtent( // BBox
 					extent,
 					projection.getCode(),
 					'EPSG:4326' // Received projection
 				),
-				baseOptions.selectorList,
+				memCheckbox(options.selectorName, function(list) {
+					layer.setVisible(list.length > 0);
+					if (list.length > 0)
+						source.refresh();
+				}),
 				resolution, // === zoom level
-				baseOptions
+				options
 			);
 	}
-
-	// Add layer options selector
-	if (baseOptions.selectorName)
-		memCheckbox(baseOptions.selectorName, function(list) {
-			baseOptions.selectorList = list;
-			layer.setVisible(list.length > 0);
-			if (list.length > 0)
-				source.refresh();
-		});
 
 	// Normalize properties
 	if (typeof baseOptions.computeProperties == 'function')
@@ -118,15 +131,15 @@ function geoJsonLayer(options) {
 				baseOptions.computeProperties(evt.features[p], baseOptions);
 		});
 
-	// Tune the clustering distance following the zoom level
 	let previousResolution = 0;
-	layer.on('prerender', function(evt) {
-		// Get the transform resolution from the layer frameState
-		const resolution = evt.frameState.viewState.resolution;
 
-		//clusterSource.setSource(resolution < 100 ? source : altSource);
-		//source.refresh();
-		//clusterSource.refresh();
+	function prepareFrame(resolution) {
+		// Change the source if > alt.minResolution
+		if (options.alt)
+			layer.setSource(options.alt.minResolution > resolution ?
+				clusterSource :
+				clusterAltSource
+			);
 
 		// Refresh if we change the source options
 		if (options.alt &&
@@ -140,7 +153,7 @@ function geoJsonLayer(options) {
 			clusterSource.setDistance(Math.max(8, Math.min(60, resolution)));
 
 		previousResolution = resolution;
-	});
+	}
 
 	// Define the style of the cluster point & the groupped features
 	function style(feature) {
@@ -188,12 +201,11 @@ function geoJsonLayer(options) {
 
 			if (!featureExists)
 				clusterSource.addFeature(features[0]);
-		} else
+		} else if (icon)
 			// Add icon if one is defined in the properties
-			if (icon)
-				styleOptions.image = new ol.style.Icon({
-					src: icon,
-				});
+			styleOptions.image = new ol.style.Icon({
+				src: icon,
+			});
 
 		return new ol.style.Style(styleOptions);
 	}
