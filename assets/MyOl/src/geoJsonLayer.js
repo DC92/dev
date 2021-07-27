@@ -277,7 +277,7 @@ function controlHover() {
 
 			if (evt.type == 'click') {
 				// Single feature
-				if (features.length == 1) {
+				if (features.length == 1 && link) {
 					if (evt.originalEvent.ctrlKey)
 						window.open(link, '_blank').focus();
 					else if (evt.originalEvent.shiftKey)
