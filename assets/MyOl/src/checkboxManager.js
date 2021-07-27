@@ -16,6 +16,7 @@ function memCheckbox(selectorName, callback) {
 		match = request.match(new RegExp(selectorName + '=([^;]*)')),
 		inputEls = document.getElementsByName(selectorName || '');
 
+	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
 			// Set inputs following cookies & args
@@ -31,15 +32,29 @@ function memCheckbox(selectorName, callback) {
 			checkEl(inputEls[e]);
 		}
 
-	return readList(inputEls);
+	const list = readList();
+
+	if (typeof callback == 'function')
+		callback(list);
+
+	return list;
 
 	function onClick(evt) {
-		const list = checkEl(evt.target); // Do the "all" check verification
+		checkEl(evt.target); // Do the "all" check verification
+
+		const list = readList();
+
+		// Mem the data in the cookie
+		if (selectorName)
+			document.cookie = selectorName + '=' + list.join(',') +
+			'; path=/; SameSite=Secure; expires=' +
+			new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (typeof callback == 'function')
 			callback(list);
 	}
 
+	// Check on <input> & set the "All" input accordingly
 	function checkEl(target) {
 		let allIndex = -1, // Index of the "all" <input> if any
 			allCheck = true; // Are all others checked ?
@@ -56,23 +71,14 @@ function memCheckbox(selectorName, callback) {
 		// Check the "all" <input> if all others are
 		if (allIndex != -1)
 			inputEls[allIndex].checked = allCheck;
-
-		// Get the values of all checked inputs
-		const list = readList(inputEls);
-
-		// Mem the data in the cookie
-		if (selectorName)
-			document.cookie = selectorName + '=' + list.join(',') +
-			'; path=/; SameSite=Secure; expires=' +
-			new Date(2100, 0).toUTCString(); // Keep over all session
-
-		return list;
 	}
 
-	function readList(inputEls) {
+	function readList() {
+		// Specific case of a single on/off <input>
 		if (inputEls.length == 1)
 			return [inputEls[0].checked];
 
+		// Read each <input> checkbox
 		const list = [];
 
 		for (let e = 0; e < inputEls.length; e++)
