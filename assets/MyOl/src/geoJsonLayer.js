@@ -7,6 +7,8 @@
  */
 function geoJsonLayer(options) {
 	const baseOptions = Object.assign({
+			urlHost: '',
+			urlPath: '',
 			format: new ol.format.GeoJSON(),
 			url: url,
 		}, options),
@@ -114,10 +116,10 @@ function geoJsonLayer(options) {
 		});
 
 	function url(extent, resolution, projection, options) {
+		//BEST gérer les msg erreur
 		options = options || baseOptions;
 
-		//BEST gérer les msg erreur
-		return options.urlHost +
+		const urlPath = typeof options.urlPath == 'function' ?
 			options.urlPath(
 				ol.proj.transformExtent( // BBox
 					extent,
@@ -127,7 +129,10 @@ function geoJsonLayer(options) {
 				readCheckbox(options.selectorName),
 				resolution, // === zoom level
 				options
-			);
+			) :
+			options.urlPath;
+
+		return options.urlHost + urlPath;
 	}
 
 	// Normalize properties
@@ -277,9 +282,9 @@ function controlHover() {
 			});
 
 		if (feature) {
-			const features = feature.get('features'),
-				center = feature.getGeometry().getCoordinates(),
-				link = (features ? features[0] : feature).get('link');
+			const features = feature.get('features') || [feature],
+				link = features[0].get('link'),
+				center = feature.getGeometry().getCoordinates();
 
 			if (evt.type == 'click') {
 				// Single feature

@@ -45,29 +45,25 @@ function layerChem(options) {
 function layerMassif(options) {
 	return geoJsonLayer(Object.assign({
 		urlHost: '//www.refuges.info/',
-		urlPath: function() {
-			return 'api/polygones?type_polygon=1';
+		urlPath: 'api/polygones?type_polygon=1',
+		computeProperties: function(f) {
+			f.set('label', f.get('nom'));
+			if (f.get('lien'))
+				f.set('link', f.get('lien'));
 		},
-		//strategy: ol.loadingstrategy.all,
-		//clusterDistance: 1000000,
-			computeProperties: function(f) {
-				f.set('label', f.get('nom'));
-				if (f.get('lien'))
-					f.set('link', f.get('lien'));
-			},
-			styleOptions: function(feature) {
-				const hex = feature.get('couleur');
-				return {
-					fill: new ol.style.Fill({
-						color: 'rgba(' + [
-							parseInt(hex.substring(1, 3), 16),
-							parseInt(hex.substring(3, 5), 16),
-							parseInt(hex.substring(5, 7), 16),
-							0.5,
-						].join(',') + ')',
-					})
-				};
-			},
+		styleOptions: function(feature) {
+			const hex = feature.get('couleur');
+			return {
+				fill: new ol.style.Fill({
+					color: 'rgba(' + [
+						parseInt(hex.substring(1, 3), 16),
+						parseInt(hex.substring(3, 5), 16),
+						parseInt(hex.substring(5, 7), 16),
+						0.5,
+					].join(',') + ')',
+				})
+			};
+		},
 	}, options));
 }
 
@@ -80,11 +76,11 @@ function layerWRI(options) {
 			urlPath: function() {
 				return 'api/polygones?type_polygon=1';
 			},
-/*			computeProperties: function(f) {
-				f.set('label', f.get('nom'));
-				if (f.get('lien'))
-					f.set('link', f.get('lien'));
-			},*/
+			/*			computeProperties: function(f) {
+							f.set('label', f.get('nom'));
+							if (f.get('lien'))
+								f.set('link', f.get('lien'));
+						},*/
 			styleOptions: function(feature) {
 				const hex = feature.get('couleur');
 				return {
