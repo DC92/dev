@@ -1,3 +1,6 @@
+/**
+ * Site refuges.info
+ */
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		urlHost: '//www.refuges.info/',
@@ -41,7 +44,7 @@ function layerWriPoi(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO label on hover litle massifs
+	//TODO label on hover little massifs
 	return layerVector(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: 'api/polygones?type_polygon=1',
@@ -71,10 +74,14 @@ function layerWri(options) {
 		layerWriPoi(options),
 		layerWriAreas(options),
 		100
-	)
+	);
 }
 
-const layerChemOptions = {
+/**
+ * Site chemineur.fr
+ */
+function layerChemPoi(options) {
+	return layerVector(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {
 			return 'ext/Dominique92/GeoBB/gis2.php?' +
@@ -82,9 +89,7 @@ const layerChemOptions = {
 				(options.selectorName ? '&cat=' + list.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		//maxResolution: 100,
 		strategy: ol.loadingstrategy.bbox,
-		selectorName: 'chem-features',
 		clusterDistance: 50,
 
 		computeProperties: function(f, options) {
@@ -106,32 +111,25 @@ const layerChemOptions = {
 				width: 3,
 			}),
 		},
-		//TODO DELETE
-		alt: {
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			urlPath: function(bbox, list, resolution, options) {
-				return 'ext/Dominique92/GeoBB/gis2.php?' +
-					'layer=cluster&limit=1000' +
-					(options.selectorName ? '&cat=' + list.join(',') : '');
-			},
-		},
-	},
+	}, options));
+}
 
-	layerChemClusterOptions = Object.assign({}, layerChemOptions, {
-		minResolution: 100,
-		strategy: ol.loadingstrategy.all,
+function layerChemCluster(options) {
+	return layerVector(Object.assign({
+		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {
 			return 'ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=cluster&limit=1000' +
 				(options.selectorName ? '&cat=' + list.join(',') : '');
-		}
-	});
-
-function layerChem(options) {
-	return layerVector(Object.assign(layerChemOptions, options));
+		},
+		clusterDistance: 50,
+	}, options));
 }
 
-function layerChemCluster(options) {
-	return layerVector(Object.assign(layerChemClusterOptions, options));
+function layerChem(options) {
+	return layerFlip(
+		layerChemPoi(options),
+		layerChemCluster(options),
+		100
+	);
 }

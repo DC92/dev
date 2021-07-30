@@ -132,6 +132,7 @@ function layerVector(options) {
 				clusters += parseInt(features[f].get('cluster')) || 1;
 
 			clusterStyleOptions.text.setText(clusters.toString());
+			//TODO BEST mettre la liste des 5 premiers titres
 			feature.set('hover', clusters.toString() + ' éléments');
 
 			return new ol.style.Style(clusterStyleOptions);
