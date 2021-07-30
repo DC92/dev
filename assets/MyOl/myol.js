@@ -88,72 +88,6 @@ ol.Map.prototype.handlePostRender = function() {
 	map.getTargetElement()._map = map;
 };
 
-/**
- * Manages checkboxes inputs having the same name
- * selectorName {string}
- * callback {function(list)} action when the button is clicked
- *
- * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
- * Manages a global flip-flop of the same named <input> checkboxes
- */
-function memCheckbox(selectorName, callback) {
-	// Search values in cookies & args
-	const inputEls = document.getElementsByName(selectorName || ''),
-		request = window.location.search + ';' + // Priority to the url args ?selector=1,2,3
-		window.location.hash + ';' + // Then the hash #selector=1,2,3
-		document.cookie, // Then the cookies
-		match = request.match(new RegExp(selectorName + '=([^;]*)'));
-
-	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
-			// Check following cookies & args
-			if (match)
-				inputEls[e].checked =
-				match[1].split(',').includes(inputEls[e].value) || // That one is declared
-				match[1].split(',').includes('on'); // The "all (= "on") is set
-
-			// Attach the action
-			inputEls[e].addEventListener('click', onClick);
-		}
-
-	// Init the cookies if data has been given by the url
-	onClick();
-
-	function onClick(evt) {
-		const list = []; // List of checked values
-		let allIndex = -1, // Index of the "all" <input> if any
-			allCheck = true; // Are all others checked ?
-
-		if (evt)
-			for (let e = 0; e < inputEls.length; e++) {
-				if (evt.target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
-					inputEls[e].checked = evt.target.checked; // Force all the others to the same
-				else if (inputEls[e].value == 'on') // The "all" <input>
-					allIndex = e;
-				else if (!inputEls[e].checked)
-					allCheck = false; // Uncheck the "all" <input> if one other is unchecked	
-			}
-
-		// Check the "all" <input> if all others are
-		if (allIndex != -1)
-			inputEls[allIndex].checked = allCheck;
-
-		// Get the values of all checked inputs
-		for (let e = 0; e < inputEls.length; e++)
-			if (inputEls[e].checked) // List checked elements
-				list.push(inputEls[e].value);
-
-		if (typeof callback == 'function')
-			callback(list);
-
-		// Mem the data in the cookie
-		if (selectorName)
-			document.cookie = selectorName + '=' + list.join(',') +
-			'; path=/; SameSite=Secure; expires=' +
-			new Date(2100, 0).toUTCString(); // Keep over all session
-	}
-}
-
 
 /**
  * Openstreetmap
@@ -637,169 +571,155 @@ function controlLayerSwitcher(options) {
 	return control;
 }
 
-// Vector layer
-function geoJsonLayer(options) {
-	options = Object.assign({
-		urlSuffix: '',
-		styleOptionsFunction: function(styleOptions) {
-			return styleOptions;
-		},
-	}, options);
-
-	options.styleOptions = Object.assign({
-		labelOnPoint: true,
-	}, options.styleOptions);
-
-	//	options.hoverStyleOptions
-
-	options.labelStyleOptions = Object.assign({
-		textBaseline: 'bottom',
-		offsetY: -13, // Compensate bottom
-		padding: [1, 3, 0, 3],
-		font: '14px Calibri,sans-serif',
-		backgroundFill: new ol.style.Fill({
-			color: 'yellow',
-		}),
-	}, options.labelStyleOptions);
-
-	options.clusterStyleOptions = Object.assign({
-		image: new ol.style.Circle({
-			radius: 14,
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
-			fill: new ol.style.Fill({
-				color: 'white',
-			}),
-		}),
-		text: new ol.style.Text({
-			font: '14px Calibri,sans-serif',
-		}),
-	}, options.clusterStyleOptions);
-
-	//TODO gérer les msg erreur
-	const source = new ol.source.Vector({
+/**
+ * Layer to display remote geoJson
+ * Styles, icons & labels
+ * Cluster features
+ */
+function layerVector(options) {
+	const baseOptions = Object.assign({
+			urlHost: '',
+			urlPath: '',
+			url: url,
 			format: new ol.format.GeoJSON(),
-			strategy: options.urlBbox ? ol.loadingstrategy.bbox : ol.loadingstrategy.all,
-			url: function(extent, resolution, projection) {
-				//TODO une seule fonction intégrant bbox et appel baseurl
-				return options.urlBase + // url base that can vary (server name, ...)
-					'api/bbox?nb_points=all&type_points=' + options.selectorList + '&bbox=' + // url suffix to be defined separately from the urlBase
-					(!options.urlBbox ? '' :
-						options.urlBbox(ol.proj.transformExtent(
-							extent,
-							projection.getCode(),
-							'EPSG:4326' // Received projection
-						))
-					);
-			},
-		}),
+		}, options),
 
-		// Optional clusterisation
-		clusterSource = !options.clusterDistance ? source :
+		// options.styleOptions, // Base feature format : Object or function(feature)
+
+		// Common label text format
+		labelStyleOptions = Object.assign({
+			textBaseline: 'bottom',
+			offsetY: -13, // Compensate the bottom textBaseline
+			padding: [1, 3, 0, 3],
+			font: '14px Calibri,sans-serif',
+			backgroundFill: new ol.style.Fill({
+				color: 'yellow',
+			}),
+		}, options.labelStyleOptions),
+
+		// Style when hovering a feature
+		hoverStyleOptions = Object.assign({
+			// We assign the same text style to the hover label
+			text: new ol.style.Text(
+				labelStyleOptions //BEST specific hoverLabelStyleOptions
+			),
+		}, options.hoverStyleOptions),
+
+		// Specific format of clusters bullets
+		clusterStyleOptions = Object.assign({
+			image: new ol.style.Circle({
+				radius: 14,
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+				fill: new ol.style.Fill({
+					color: 'white',
+				}),
+			}),
+			text: new ol.style.Text({
+				font: '14px Calibri,sans-serif',
+			}),
+		}, options.clusterStyleOptions),
+
+		// Basic source
+		source = new ol.source.Vector(baseOptions),
+
+		// Source if clusterized
+		clusterSource = baseOptions.clusterDistance ?
 		new ol.source.Cluster({
-			distance: options.clusterDistance,
+			distance: baseOptions.clusterDistance,
 			source: source,
-			geometryFunction: function(feature) {
-				// Generate a center point at to manage clusterisations
-				return new ol.geom.Point(
-					ol.extent.getCenter(
-						feature.getGeometry().getExtent()
-					)
-				);
-			},
-		}),
+			geometryFunction: centerPoint,
+		}) :
+		source,
 
+		// Layer
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
 		});
 
-	// Memorize for further use
-	layer.options = options;
+	function centerPoint(feature) {
+		// Generate a center point to manage clusterisations
+		return new ol.geom.Point(
+			ol.extent.getCenter(
+				feature.getGeometry().getExtent()
+			)
+		);
+	}
 
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
-			options.selectorList = list.join(',');
-			source.refresh();
+			layer.setVisible(list.length > 0);
+			if (list.length > 0)
+				source.refresh();
 		});
+
+	function url(extent, resolution, projection, options) {
+		//BEST gérer les msg erreur
+		options = options || baseOptions;
+
+		const urlPath = typeof options.urlPath == 'function' ?
+			options.urlPath(
+				ol.proj.transformExtent( // BBox
+					extent,
+					projection.getCode(),
+					'EPSG:4326' // Received projection
+				),
+				readCheckbox(options.selectorName),
+				resolution, // === zoom level
+				options
+			) :
+			options.urlPath;
+
+		return options.urlHost + urlPath;
+	}
 
 	// Normalize properties
-	if (typeof options.normalize == 'function')
+	if (typeof baseOptions.computeProperties == 'function')
 		source.on('featuresloadend', function(evt) {
-			for (let k in evt.features)
-				options.normalize(evt.features[k], layer);
+			for (let p in evt.features)
+				baseOptions.computeProperties(evt.features[p], baseOptions);
 		});
-
-	// Erase the layer before rebuild when bbox strategy is applied
-	source.on('featuresloadend', function() {
-		source.clear();
-	});
-
-	// Tune the clustering distance following the zoom leval
-	let pixelRatio = 0;
-
-	layer.on('prerender', function(evt) {
-		// Get the transform ratio from the layer frameState
-		const ratio = evt.frameState.pixelToCoordinateTransform[0];
-
-		if (pixelRatio != ratio) { // Only when changed
-			pixelRatio = ratio;
-
-			// Tune the clustering distance depending on the transform ratio
-			if (typeof clusterSource.setDistance == 'function')
-				clusterSource.setDistance(Math.max(8, Math.min(60, ratio)));
-
-			// Switch to another layer above a zoom limit
-			if (options.layerAbove11ratio > options.pixelRatioMax) {
-				layer.setSource(options.layerAbove.getSource());
-				layer.setStyle(options.layerAbove.getStyle());
-			} else {
-				layer.setSource(clusterSource);
-				layer.setStyle(style);
-			}
-		}
-	});
 
 	// Define the style of the cluster point & the groupped features
 	function style(feature) {
 		const features = feature.get('features') || [feature],
 			icon = features[0].get('icon'),
+			label = features[0].get('label'),
 			area = ol.extent.getArea(
 				features[0].getGeometry().getExtent()
 			),
-			styleOptions = options.styleOptionsFunction(
-				options.styleOptions,
-				feature
-			),
-			labelStyleOptions = Object.assign({}, options.labelStyleOptions);
+			styleOptions = typeof baseOptions.styleOptions == 'function' ?
+			options.styleOptions(feature) :
+			options.styleOptions || {};
 
-		feature.options = options; // Memorize the options in the feature for hover display
+		//HACK Memorize the options in the feature for hover display
+		feature.hoverStyleOptions = hoverStyleOptions;
 
 		// Clusters
-		if (features.length > 1) {
-			const clusterStyleOptions = Object.assign({}, options.clusterStyleOptions);
-			clusterStyleOptions.text.setText(features.length.toString());
+		if (features.length > 1 ||
+			parseInt(features[0].get('cluster'))) {
+			let clusters = 0;
+			for (let f in features)
+				clusters += parseInt(features[f].get('cluster')) || 1;
+
+			clusterStyleOptions.text.setText(clusters.toString());
+			feature.set('hover', clusters.toString() + ' éléments');
 
 			return new ol.style.Style(clusterStyleOptions);
 		}
 
 		// Single feature (point, line or poly)
-
 		// Add a permanent label
-		if (!options.clusterDistance || // If no clusterisation 
+		if (!baseOptions.clusterDistance || // If no clusterisation 
 			(feature.get('features') // If not cluster marker 
-			) && (
-				(styleOptions.labelOnPoint && !area) ||
-				(styleOptions.labelOnLine && area) ||
-				(styleOptions.labelOnPoly && area)
-			)) {
-			labelStyleOptions.text = features[0].get('name');
+			) && label) {
+			labelStyleOptions.text = label;
 			styleOptions.text = new ol.style.Text(labelStyleOptions);
 		}
 
-		// Include the feature in the cluster source (lines, polygons)
-		// to make it visible
+		// Include the feature in the cluster source (lines, polygons) to make it visible
 		if (area) {
 			const featureExists = clusterSource.forEachFeature(function(f) {
 				if (features[0].ol_uid == f.ol_uid)
@@ -809,11 +729,11 @@ function geoJsonLayer(options) {
 			if (!featureExists)
 				clusterSource.addFeature(features[0]);
 		} else
+		if (icon)
 			// Add icon if one is defined in the properties
-			if (icon)
-				styleOptions.image = new ol.style.Icon({
-					src: icon,
-				});
+			styleOptions.image = new ol.style.Icon({
+				src: icon,
+			});
 
 		return new ol.style.Style(styleOptions);
 	}
@@ -822,119 +742,319 @@ function geoJsonLayer(options) {
 }
 
 /**
+ * Display different layer depending on the map resolution
+ */
+function layerFlip(lowLayer, highLayer, limitResolution) {
+	let currentLayer;
+
+	const layer = new ol.layer.Vector({
+		render: function(frameState, target) { //HACK to be informed of render to be run
+			const resolution = frameState.pixelToCoordinateTransform[0],
+				newLayer = resolution < limitResolution ? lowLayer : highLayer;
+
+			if (currentLayer != newLayer) {
+				currentLayer = newLayer;
+				layer.setSource(newLayer.getSource());
+				layer.setStyle(newLayer.getStyle());
+			}
+
+			return ol.layer.Vector.prototype.render.call(this, frameState, target);
+		},
+	});
+
+	return layer;
+
+}
+
+/**
  * Control to display labels on hovering & click
  * on features of vector layers having the following properties :
- * name : name to label the feature
- * label : full label on hover
+ * name : name of the feature
+ * hover : full label on hover
  * link : go to a new URL when we click on the feature
  */
 function controlHover() {
-	let control = new ol.control.Control({
+	const control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		}),
-		previousHoveredFeature;
+		// Internal layer to temporary display hovered feature
+		hoverLayer = new ol.layer.Vector({
+			source: new ol.source.Vector(),
+			zIndex: 1, // Above the features
+			style: style,
+		});
 
-	const hoverLayer = new ol.layer.Vector({
-		source: new ol.source.Vector(),
-		zIndex: 1, // Above the features
+	function style(feature) {
+		//BEST options label on hover point /ligne / surface ???
+		const features = feature.get('features') || [feature],
+			titles = [];
 
-		style: function(feature) {
-			//BEST options label on hover ligne / surface / point ???
-			const features = feature.get('features') || [feature],
-				names = [],
-				labelStyleOptions = Object.assign({}, feature.options.labelStyleOptions),
-				hoverStyleOptions = Object.assign({}, feature.options.hoverStyleOptions);
+		if (feature.get('hover'))
+			// Big clusters
+			titles.push(feature.get('hover'));
+		else
+		if (features.length > 1)
+			// Clusters
+			for (let f in features)
+				titles.push(features[f].get('name'));
+		else
+			// Point
+			titles.push(features[0].get('hover'));
 
-			if (features.length > 5)
-				// Big clusters
-				names.push(features.length + ' éléments');
-			else
-				// Clusters
-				if (features.length > 1)
-					for (let f in features)
-						names.push(features[f].get('name'));
-				else
-					// Point
-					names.push(features[0].get('label'));
-
-			labelStyleOptions.text = names.join('\n');
-			hoverStyleOptions.text = new ol.style.Text(
-				labelStyleOptions
-			);
-
-			return new ol.style.Style(hoverStyleOptions);
-		},
-	});
+		feature.hoverStyleOptions.text.setText(titles.join('\n'));
+		return new ol.style.Style(feature.hoverStyleOptions);
+	}
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 		map.addLayer(hoverLayer);
 
-		map.on(['pointermove', 'click'], function(evt) {
-			// Get hovered feature
-			let feature = map.forEachFeatureAtPixel(
-				map.getEventPixel(evt.originalEvent),
-				function(feature) {
-					return feature;
-				});
-
-			if (feature) {
-				const features = feature.get('features'),
-					center = feature.getGeometry().getCoordinates(),
-					options = feature.options; // Mem it locally
-
-				if (features && features.length == 1) {
-					// Single feature
-					feature = features[0];
-					const link = feature.get('link');
-
-					if (evt.type == 'click' && link) {
-						if (evt.originalEvent.ctrlKey) {
-							const tab = window.open(link, '_blank');
-							if (evt.originalEvent.shiftKey)
-								tab.focus();
-						} else
-							window.location = link;
-					}
-				} else
-					// Cluster
-					if (evt.type == 'click')
-						map.getView().animate({
-							zoom: map.getView().getZoom() + 1,
-							center: center,
-						});
-
-				feature.options = options;
-			}
-
-			// Make the hovered feature visible in a dedicated layer
-			if (feature !== previousHoveredFeature) {
-				if (previousHoveredFeature)
-					hoverLayer.getSource().removeFeature(previousHoveredFeature);
-
-				if (feature)
-					hoverLayer.getSource().addFeature(feature);
-
-				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
-				previousHoveredFeature = feature;
-			}
-		});
+		map.on(['pointermove', 'click'], action);
 	};
+
+	let previousHoveredFeature;
+
+	function action(evt) {
+		// Get hovered feature
+		const feature = map.forEachFeatureAtPixel(
+			map.getEventPixel(evt.originalEvent),
+			function(feature) {
+				return feature;
+			});
+
+		if (feature) {
+			const features = feature.get('features') || [feature],
+				link = features[0].get('link'),
+				center = feature.getGeometry().getCoordinates();
+
+			if (evt.type == 'click') {
+				// Single feature
+				if (features.length == 1 && link) {
+					if (evt.originalEvent.ctrlKey)
+						window.open(link, '_blank').focus();
+					else if (evt.originalEvent.shiftKey)
+						// To specify feature open a new window
+						window.open(link, '_blank', 'resizable=yes').focus();
+					else
+						window.location = link;
+				}
+
+				// Cluster
+				else
+					map.getView().animate({
+						zoom: map.getView().getZoom() + 1,
+						center: center,
+					});
+			}
+		}
+
+		// Make the hovered feature visible in a dedicated layer
+		if (feature !== previousHoveredFeature) {
+			if (previousHoveredFeature)
+				hoverLayer.getSource().removeFeature(previousHoveredFeature);
+
+			if (feature)
+				hoverLayer.getSource().addFeature(feature);
+
+			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
+			previousHoveredFeature = feature;
+		}
+	}
 
 	return control;
 }
+/**
+ * Get checkboxes values of inputs having the same name
+ * selectorName {string}
+ */
+function readCheckbox(selectorName) {
+	const inputEls = document.getElementsByName(selectorName);
 
-function layerChem(options) {
-	return geoJsonLayer(Object.assign({
-		urlBase: '//chemineur.fr/',
-		urlSuffix: 'ext/Dominique92/GeoBB/gis.php?limit=1000000&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8,64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=64&bbox=',
-		//urlSuffix: 'ext/Dominique92/GeoBB/gis.php?cat=8&bbox=',
-		urlBbox: function(bbox) {
-			return bbox.join(',');
+	// Specific case of a single on/off <input>
+	if (inputEls.length == 1)
+		return [inputEls[0].checked];
+
+	// Read each <input> checkbox
+	const list = [];
+	for (let e = 0; e < inputEls.length; e++)
+		if (inputEls[e].checked &&
+			inputEls[e].value != 'on')
+			list.push(inputEls[e].value);
+
+	return list;
+}
+
+/**
+ * Manages checkboxes inputs having the same name
+ * selectorName {string}
+ * callback {function(list)} action when the button is clicked
+ *
+ * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
+ * Manages a global flip-flop of the same named <input> checkboxes
+ */
+function memCheckbox(selectorName, callback) {
+	const request = // Search values in cookies & args
+		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
+		window.location.hash + ';' + // Then the hash #selector=1,2,3
+		document.cookie, // Then the cookies
+
+		match = request.match(new RegExp(selectorName + '=([^;]*)')),
+		inputEls = document.getElementsByName(selectorName);
+
+	// Set the <inputs> accordingly with the cookies or url args
+	if (inputEls)
+		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+			// Set inputs following cookies & args
+			if (match)
+				inputEls[e].checked =
+				match[1].split(',').includes(inputEls[e].value) || // That one is declared
+				match[1].split(',').includes('on'); // The "all (= "on") is set
+
+			// Attach the action
+			inputEls[e].onclick = onClick;
+
+			// Compute the all check && init the cookies if data has been given by the url
+			checkEl(inputEls[e]);
+		}
+
+	const list = readCheckbox(selectorName);
+
+	if (typeof callback == 'function')
+		callback(list);
+
+	return list;
+
+	function onClick(evt) {
+		checkEl(evt.target); // Do the "all" check verification
+
+		const list = readCheckbox(selectorName);
+
+		// Mem the data in the cookie
+		if (selectorName)
+			document.cookie = selectorName + '=' + list.join(',') +
+			'; path=/; SameSite=Secure; expires=' +
+			new Date(2100, 0).toUTCString(); // Keep over all session
+
+		if (typeof callback == 'function')
+			callback(list);
+	}
+
+	// Check on <input> & set the "All" input accordingly
+	function checkEl(target) {
+		let allIndex = -1, // Index of the "all" <input> if any
+			allCheck = true; // Are all others checked ?
+
+		for (let e = 0; e < inputEls.length; e++) {
+			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
+				inputEls[e].checked = target.checked; // Force all the others to the same
+			else if (inputEls[e].value == 'on') // The "all" <input>
+				allIndex = e;
+			else if (!inputEls[e].checked)
+				allCheck = false; // Uncheck the "all" <input> if one other is unchecked	
+		}
+
+		// Check the "all" <input> if all others are
+		if (allIndex != -1)
+			inputEls[allIndex].checked = allCheck;
+	}
+}
+
+function layerWriPoi(options) {
+	return layerVector(Object.assign({
+		urlHost: '//www.refuges.info/',
+		urlPath: function(bbox, list) {
+			return 'api/bbox?nb_points=all' +
+				'&type_points=' + list.join(',') +
+				'&bbox=' + bbox.join(',');
 		},
-		clusterDistance: 32,
+		strategy: ol.loadingstrategy.bbox,
+		selectorName: 'wri-features',
+		clusterDistance: 50,
+
+		computeProperties: function(f, options) {
+			const hover = [], // Hover label
+				desc = [];
+			if (f.get('type').valeur)
+				hover.push(
+					f.get('type').valeur.replace(
+						/(^\w|\s\w)/g,
+						function(m) {
+							return m.toUpperCase();
+						}
+					));
+			if (f.get('coord').alt)
+				desc.push(f.get('coord').alt + 'm');
+			if (f.get('places').valeur)
+				desc.push(f.get('places').valeur + '\u255E\u2550\u2555');
+			if (desc.length)
+				hover.push(desc.join(', '));
+			hover.push(f.get('nom'));
+			f.set('hover', hover.join('\n'));
+
+			// Other displays
+			f.set('icon', options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
+			f.set('name', f.get('nom'));
+			f.set('label', f.get('nom'));
+			if (f.get('lien'))
+				f.set('link', f.get('lien'));
+		},
+	}, options));
+}
+
+function layerWriAreas(options) {
+	//TODO label on hover litle massifs
+	return layerVector(Object.assign({
+		urlHost: '//www.refuges.info/',
+		urlPath: 'api/polygones?type_polygon=1',
+		computeProperties: function(f) {
+			f.set('label', f.get('nom'));
+			if (f.get('lien'))
+				f.set('link', f.get('lien'));
+		},
+		styleOptions: function(feature) {
+			const hex = feature.get('couleur');
+			return {
+				fill: new ol.style.Fill({
+					color: 'rgba(' + [
+						parseInt(hex.substring(1, 3), 16),
+						parseInt(hex.substring(3, 5), 16),
+						parseInt(hex.substring(5, 7), 16),
+						0.5,
+					].join(',') + ')',
+				})
+			};
+		},
+	}, options));
+}
+
+function layerWri(options) {
+	return layerFlip(
+		layerWriPoi(options),
+		layerWriAreas(options),
+		100
+	)
+}
+
+const layerChemOptions = {
+		urlHost: '//chemineur.fr/',
+		urlPath: function(bbox, list, resolution, options) {
+			return 'ext/Dominique92/GeoBB/gis2.php?' +
+				'layer=simple&limit=1000' +
+				(options.selectorName ? '&cat=' + list.join(',') : '') +
+				'&bbox=' + bbox.join(',');
+		},
+		//maxResolution: 100,
+		strategy: ol.loadingstrategy.bbox,
+		selectorName: 'chem-features',
+		clusterDistance: 50,
+
+		computeProperties: function(f, options) {
+			if (f.get('type'))
+				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
+			if (f.get('id'))
+				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+			f.set('hover', f.get('name'));
+		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
 				color: 'blue',
@@ -947,67 +1067,34 @@ function layerChem(options) {
 				width: 3,
 			}),
 		},
-	}, options));
-}
+		//TODO DELETE
+		alt: {
+			minResolution: 100,
+			strategy: ol.loadingstrategy.all,
+			urlPath: function(bbox, list, resolution, options) {
+				return 'ext/Dominique92/GeoBB/gis2.php?' +
+					'layer=cluster&limit=1000' +
+					(options.selectorName ? '&cat=' + list.join(',') : '');
+			},
+		},
+	},
 
-function layerWRI(options) {
-	const layerMassif = geoJsonLayer({
-		urlBase: '//www.refuges.info/',
-		urlSuffix: 'api/polygones?type_polygon=1',
-		normalize: function(f) {
-			f.set('link', f.get('lien'));
-			f.set('name', f.get('nom'));
-		},
-		styleOptionsFunction: function(styleOptions, feature) {
-			styleOptions.labelOnPoly = true;
-			styleOptions.fill = new ol.style.Fill({
-				color: feature.get('couleur'),
-			});
-			return styleOptions;
-		},
+	layerChemClusterOptions = Object.assign({}, layerChemOptions, {
+		minResolution: 100,
+		strategy: ol.loadingstrategy.all,
+		urlPath: function(bbox, list, resolution, options) {
+			return 'ext/Dominique92/GeoBB/gis2.php?' +
+				'layer=cluster&limit=1000' +
+				(options.selectorName ? '&cat=' + list.join(',') : '');
+		}
 	});
 
-	options = Object.assign({
-		urlBase: '//www.refuges.info/',
-		//		urlSuffix: 'api/bbox?nb_points=all&type_points=7,10,9,23,6,3,28&bbox=',
-		//		selectorList: '7,10,9,23,6,3,28',
-		selectorName: 'wri-features',
-		urlBbox: function(bbox) {
-			return bbox.join(',');
-		},
-		clusterDistance: 32,
-		pixelRatioMax: 100,
-		//TODO	layerAbove: layerMassif,
+function layerChem(options) {
+	return layerVector(Object.assign(layerChemOptions, options));
+}
 
-		normalize: function(f, layer) {
-			// Hover label
-			const label = [],
-				desc = [];
-			if (f.get('type').valeur)
-				label.push(
-					f.get('type').valeur.replace(
-						/(^\w|\s\w)/g,
-						function(m) {
-							return m.toUpperCase();
-						}
-					));
-			if (f.get('coord').alt)
-				desc.push(f.get('coord').alt + 'm');
-			if (f.get('places').valeur)
-				desc.push(f.get('places').valeur + '\u255E\u2550\u2555');
-			if (desc.length)
-				label.push(desc.join(', '));
-			label.push(f.get('nom'));
-			f.set('label', label.join('\n'));
-
-			// Other displays
-			f.set('icon', layer.options.urlBase + 'images/icones/' + f.get('type').icone + '.svg');
-			f.set('name', f.get('nom'));
-			f.set('link', f.get('lien'));
-		},
-	}, options);
-
-	return geoJsonLayer(options);
+function layerChemCluster(options) {
+	return layerVector(Object.assign(layerChemClusterOptions, options));
 }
 
 /**

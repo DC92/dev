@@ -3,7 +3,7 @@
  * Styles, icons & labels
  * Cluster features
  */
-function layerGeoJson(options) {
+function layerVector(options) {
 	const baseOptions = Object.assign({
 			urlHost: '',
 			urlPath: '',

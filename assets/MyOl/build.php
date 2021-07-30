@@ -17,10 +17,10 @@ if (!$_GET)
 	echo "TO myol.css</p>\n<p>";
 
 $js .= get ('header.js').PHP_EOL .PHP_EOL;
-$js .= get ('tileLayers.js').PHP_EOL .PHP_EOL;
+$js .= get ('layersTile.js').PHP_EOL .PHP_EOL;
 $js .= get ('layerSwitcher.js').PHP_EOL .PHP_EOL;
-$js .= get ('geoJsonLayer.js').PHP_EOL .PHP_EOL;
-$js .= get ('geoJsonLayers.js').PHP_EOL .PHP_EOL;
+$js .= get ('layerVector.js').PHP_EOL .PHP_EOL;
+$js .= get ('layersVector.js').PHP_EOL .PHP_EOL;
 $js .= get ('myol.js');
 file_put_contents ('myol.js', $js);
 if (!$_GET)
@@ -50,8 +50,8 @@ if ($_GET) {
 <h1>Other demos</h1>
 <p><a href="index.html">BASIC</a></p>
 <p><a href="examples/layerSwitcher.html">LAYER SWITCHER</a></p>
-<p><a href="examples/tileLayers.html">TILE LAYERS</a></p>
-<p><a href="examples/vectorLayers.html">VECTOR LAYERS</a></p>
+<p><a href="examples/layersTile.html">TILE LAYERS</a></p>
+<p><a href="examples/layersVector.html">VECTOR LAYERS</a></p>
 <p><a href="examples/markers.html">MARKERS</a></p>
 <p><a href="examples/editor.html">EDITOR</a></p>
 <p><a href="gps">OFF LINE GPS</a></p>

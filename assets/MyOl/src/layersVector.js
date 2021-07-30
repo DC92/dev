@@ -1,5 +1,5 @@
 function layerWriPoi(options) {
-	return layerGeoJson(Object.assign({
+	return layerVector(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: function(bbox, list) {
 			return 'api/bbox?nb_points=all' +
@@ -42,7 +42,7 @@ function layerWriPoi(options) {
 
 function layerWriAreas(options) {
 	//TODO label on hover litle massifs
-	return layerGeoJson(Object.assign({
+	return layerVector(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: 'api/polygones?type_polygon=1',
 		computeProperties: function(f) {
@@ -129,9 +129,9 @@ const layerChemOptions = {
 	});
 
 function layerChem(options) {
-	return layerGeoJson(Object.assign(layerChemOptions, options));
+	return layerVector(Object.assign(layerChemOptions, options));
 }
 
 function layerChemCluster(options) {
-	return layerGeoJson(Object.assign(layerChemClusterOptions, options));
+	return layerVector(Object.assign(layerChemClusterOptions, options));
 }
