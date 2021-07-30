@@ -86,17 +86,13 @@ Based on https://openlayers.org
 				}),
 			});
 
-if(0)		map.addLayer(layerWRI({
+if(0)		map.addLayer(layerWriPoi({
 			selectorName: 'wri-features',
 		}));
-if(0)		map.addLayer(layerMassif());
-		map.addLayer(flipLayer(
-			layerWRI({
-				selectorName: 'wri-features',
-			}),
-			layerMassif(), 
-			100
-		));
+if(0)		map.addLayer(layerWriAreas());
+		map.addLayer(layerWri({
+			selectorName: 'wri-features',
+		}));
 		
 if(0)			map.addLayer(layerChem({
 				selectorName: 'chem-features',

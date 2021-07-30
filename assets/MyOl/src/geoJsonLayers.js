@@ -1,5 +1,5 @@
-function layerWRI(options) {
-	return geoJsonLayer(Object.assign({
+function layerWriPoi(options) {
+	return layerGeoJson(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: function(bbox, list) {
 			return 'api/bbox?nb_points=all' +
@@ -40,8 +40,9 @@ function layerWRI(options) {
 	}, options));
 }
 
-function layerMassif(options) {
-	return geoJsonLayer(Object.assign({
+function layerWriAreas(options) {
+	//TODO label on hover litle massifs
+	return layerGeoJson(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: 'api/polygones?type_polygon=1',
 		computeProperties: function(f) {
@@ -65,7 +66,15 @@ function layerMassif(options) {
 	}, options));
 }
 
-const layerChemOptions={
+function layerWri(options) {
+	return layerFlip(
+		layerWriPoi(options),
+		layerWriAreas(options),
+		100
+	)
+}
+
+const layerChemOptions = {
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {
 			return 'ext/Dominique92/GeoBB/gis2.php?' +
@@ -73,7 +82,7 @@ const layerChemOptions={
 				(options.selectorName ? '&cat=' + list.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-			//maxResolution: 100,
+		//maxResolution: 100,
 		strategy: ol.loadingstrategy.bbox,
 		selectorName: 'chem-features',
 		clusterDistance: 50,
@@ -108,20 +117,21 @@ const layerChemOptions={
 			},
 		},
 	},
-	
- layerChemClusterOptions=Object.assign({},layerChemOptions,{
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			urlPath: function(bbox, list, resolution, options) {
-				return 'ext/Dominique92/GeoBB/gis2.php?' +
-					'layer=cluster&limit=1000' +
-					(options.selectorName ? '&cat=' + list.join(',') : '');
-			} } );
+
+	layerChemClusterOptions = Object.assign({}, layerChemOptions, {
+		minResolution: 100,
+		strategy: ol.loadingstrategy.all,
+		urlPath: function(bbox, list, resolution, options) {
+			return 'ext/Dominique92/GeoBB/gis2.php?' +
+				'layer=cluster&limit=1000' +
+				(options.selectorName ? '&cat=' + list.join(',') : '');
+		}
+	});
 
 function layerChem(options) {
-	return geoJsonLayer(Object.assign(layerChemOptions, options));
+	return layerGeoJson(Object.assign(layerChemOptions, options));
 }
 
 function layerChemCluster(options) {
-	return geoJsonLayer(Object.assign(layerChemClusterOptions, options));
+	return layerGeoJson(Object.assign(layerChemClusterOptions, options));
 }

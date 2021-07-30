@@ -3,12 +3,12 @@
  * Styles, icons & labels
  * Cluster features
  */
-function geoJsonLayer(options) {
+function layerGeoJson(options) {
 	const baseOptions = Object.assign({
 			urlHost: '',
 			urlPath: '',
-			format: new ol.format.GeoJSON(),
 			url: url,
+			format: new ol.format.GeoJSON(),
 		}, options),
 
 		// options.styleOptions, // Base feature format : Object or function(feature)
@@ -64,12 +64,6 @@ function geoJsonLayer(options) {
 		layer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
-			render: function(frameState, target) {
-				prepareFrame(frameState.pixelToCoordinateTransform[0]);
-
-				//HACK to be informed of render to be run
-				return ol.layer.Vector.prototype.render.call(this, frameState, target);
-			},
 		});
 
 	function centerPoint(feature) {
@@ -177,7 +171,7 @@ function geoJsonLayer(options) {
 /**
  * Display different layer depending on the map resolution
  */
-function flipLayer(lowLayer, highLayer, limitResolution) {
+function layerFlip(lowLayer, highLayer, limitResolution) {
 	let currentLayer;
 
 	const layer = new ol.layer.Vector({
