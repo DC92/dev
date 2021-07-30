@@ -18,7 +18,6 @@ Based on https://openlayers.org
 	<!-- My Openlayers -->
 	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
 	<script src="../src/header.js"></script>
-	<script src="../src/checkboxManager.js"></script>
 	<script src="../src/tileLayers.js"></script>
 	<script src="../src/layerSwitcher.js"></script>
 	<script src="../src/geoJsonLayer.js"></script>
@@ -83,17 +82,28 @@ Based on https://openlayers.org
 					//center: [260000, 6250000], // Paris
 					//center: [260000, 5800000], // France
 					//center: [300000, 6170000], // 
-					zoom: 8,
+					zoom: 11,
 				}),
 			});
 
+if(0)		map.addLayer(layerWRI({
+			selectorName: 'wri-features',
+		}));
+if(0)		map.addLayer(layerMassif());
+		map.addLayer(flipLayer(
+			layerWRI({
+				selectorName: 'wri-features',
+			}),
+			layerMassif(), 
+			100
+		));
+		
 if(0)			map.addLayer(layerChem({
 				selectorName: 'chem-features',
 			}));
-if(0)		map.addLayer(layerWRI({
-				selectorName: 'wri-features',
+if(0)			map.addLayer(layerChemCluster({
+				selectorName: 'chem-features',
 			}));
-			map.addLayer(layerMassif());
 	</script>
 </body>
 </html>

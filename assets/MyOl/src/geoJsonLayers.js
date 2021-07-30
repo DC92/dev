@@ -1,102 +1,5 @@
-function layerChem(options) {
-	return geoJsonLayer(Object.assign({
-		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, list, resolution, options) {
-			return 'ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=simple&limit=1000' +
-				(options.selectorName ? '&cat=' + list.join(',') : '') +
-				'&bbox=' + bbox.join(',');
-		},
-		strategy: ol.loadingstrategy.bbox,
-		selectorName: 'chem-features',
-		clusterDistance: 50,
-
-		computeProperties: function(f, options) {
-			if (f.get('type'))
-				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
-			if (f.get('id'))
-				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
-			f.set('hover', f.get('name'));
-		},
-		styleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 2,
-			}),
-		},
-		hoverStyleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 3,
-			}),
-		},
-		alt: {
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			urlPath: function(bbox, list) {
-				return 'ext/Dominique92/GeoBB/gis2.php?' +
-					'layer=cluster&limit=1000' +
-					(options.selectorName ? '&cat=' + list.join(',') : '');
-			},
-		},
-	}, options));
-}
-
-function layerMassif(options) {
-	return geoJsonLayer(Object.assign({
-		urlHost: '//www.refuges.info/',
-		urlPath: 'api/polygones?type_polygon=1',
-		computeProperties: function(f) {
-			f.set('label', f.get('nom'));
-			if (f.get('lien'))
-				f.set('link', f.get('lien'));
-		},
-		styleOptions: function(feature) {
-			const hex = feature.get('couleur');
-			return {
-				fill: new ol.style.Fill({
-					color: 'rgba(' + [
-						parseInt(hex.substring(1, 3), 16),
-						parseInt(hex.substring(3, 5), 16),
-						parseInt(hex.substring(5, 7), 16),
-						0.5,
-					].join(',') + ')',
-				})
-			};
-		},
-	}, options));
-}
-
 function layerWRI(options) {
 	return geoJsonLayer(Object.assign({
-		alt: {
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			clusterDistance: null,
-			urlPath: function() {
-				return 'api/polygones?type_polygon=1';
-			},
-			/*			computeProperties: function(f) {
-							f.set('label', f.get('nom'));
-							if (f.get('lien'))
-								f.set('link', f.get('lien'));
-						},*/
-			styleOptions: function(feature) {
-				const hex = feature.get('couleur');
-				return {
-					fill: new ol.style.Fill({
-						color: 'rgba(' + [
-							parseInt(hex.substring(1, 3), 16),
-							parseInt(hex.substring(3, 5), 16),
-							parseInt(hex.substring(5, 7), 16),
-							0.5,
-						].join(',') + ')',
-					})
-				};
-			},
-		},
-
-
 		urlHost: '//www.refuges.info/',
 		urlPath: function(bbox, list) {
 			return 'api/bbox?nb_points=all' +
@@ -135,4 +38,90 @@ function layerWRI(options) {
 				f.set('link', f.get('lien'));
 		},
 	}, options));
+}
+
+function layerMassif(options) {
+	return geoJsonLayer(Object.assign({
+		urlHost: '//www.refuges.info/',
+		urlPath: 'api/polygones?type_polygon=1',
+		computeProperties: function(f) {
+			f.set('label', f.get('nom'));
+			if (f.get('lien'))
+				f.set('link', f.get('lien'));
+		},
+		styleOptions: function(feature) {
+			const hex = feature.get('couleur');
+			return {
+				fill: new ol.style.Fill({
+					color: 'rgba(' + [
+						parseInt(hex.substring(1, 3), 16),
+						parseInt(hex.substring(3, 5), 16),
+						parseInt(hex.substring(5, 7), 16),
+						0.5,
+					].join(',') + ')',
+				})
+			};
+		},
+	}, options));
+}
+
+const layerChemOptions={
+		urlHost: '//chemineur.fr/',
+		urlPath: function(bbox, list, resolution, options) {
+			return 'ext/Dominique92/GeoBB/gis2.php?' +
+				'layer=simple&limit=1000' +
+				(options.selectorName ? '&cat=' + list.join(',') : '') +
+				'&bbox=' + bbox.join(',');
+		},
+			//maxResolution: 100,
+		strategy: ol.loadingstrategy.bbox,
+		selectorName: 'chem-features',
+		clusterDistance: 50,
+
+		computeProperties: function(f, options) {
+			if (f.get('type'))
+				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
+			if (f.get('id'))
+				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+			f.set('hover', f.get('name'));
+		},
+		styleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 2,
+			}),
+		},
+		hoverStyleOptions: {
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 3,
+			}),
+		},
+		//TODO DELETE
+		alt: {
+			minResolution: 100,
+			strategy: ol.loadingstrategy.all,
+			urlPath: function(bbox, list, resolution, options) {
+				return 'ext/Dominique92/GeoBB/gis2.php?' +
+					'layer=cluster&limit=1000' +
+					(options.selectorName ? '&cat=' + list.join(',') : '');
+			},
+		},
+	},
+	
+ layerChemClusterOptions=Object.assign({},layerChemOptions,{
+			minResolution: 100,
+			strategy: ol.loadingstrategy.all,
+			urlPath: function(bbox, list, resolution, options) {
+				return 'ext/Dominique92/GeoBB/gis2.php?' +
+					'layer=cluster&limit=1000' +
+					(options.selectorName ? '&cat=' + list.join(',') : '');
+			} } );
+
+function layerChem(options) {
+	return geoJsonLayer(Object.assign(layerChemOptions, options));
+}
+
+function layerChemCluster(options) {
+	return geoJsonLayer(Object.assign(layerChemClusterOptions, options));
 }

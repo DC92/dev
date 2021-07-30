@@ -1,9 +1,7 @@
 /**
  * Layer to display remote geoJson
  * Styles, icons & labels
- * Hover & click
- * Features clusters
- * Specific source for hign resolution zoom
+ * Cluster features
  */
 function geoJsonLayer(options) {
 	const baseOptions = Object.assign({
@@ -50,16 +48,6 @@ function geoJsonLayer(options) {
 			}),
 		}, options.clusterStyleOptions),
 
-		// Options of the source if resolution > options.alt.minResolution
-		altOptions = Object.assign({},
-			baseOptions,
-			options.alt, {
-				url: function(extent, resolution, projection) {
-					return url(extent, resolution, projection, altOptions);
-				}
-			}
-		),
-
 		// Basic source
 		source = new ol.source.Vector(baseOptions),
 
@@ -71,18 +59,6 @@ function geoJsonLayer(options) {
 			geometryFunction: centerPoint,
 		}) :
 		source,
-
-		// Alternative source
-		altSource = options.alt ? new ol.source.Vector(altOptions) : null,
-
-		// Alternative cluster
-		clusterAltSource = options.alt && altOptions.clusterDistance ?
-		new ol.source.Cluster({
-			distance: altOptions.clusterDistance,
-			source: altSource,
-			geometryFunction: centerPoint,
-		}) :
-		altSource,
 
 		// Layer
 		layer = new ol.layer.Vector({
@@ -108,11 +84,8 @@ function geoJsonLayer(options) {
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
 			layer.setVisible(list.length > 0);
-			if (list.length > 0) {
+			if (list.length > 0)
 				source.refresh();
-				if (altSource)
-					altSource.refresh();
-			}
 		});
 
 	function url(extent, resolution, projection, options) {
@@ -141,30 +114,6 @@ function geoJsonLayer(options) {
 			for (let p in evt.features)
 				baseOptions.computeProperties(evt.features[p], baseOptions);
 		});
-
-	let previousResolution = 0;
-
-	function prepareFrame(resolution) {
-		// Change the source if > alt.minResolution
-		if (options.alt)
-			layer.setSource(options.alt.minResolution > resolution ?
-				clusterSource :
-				clusterAltSource
-			);
-
-		// Refresh if we change the source options
-		if (options.alt &&
-			options.alt.minResolution > resolution ^
-			options.alt.minResolution > previousResolution)
-			source.refresh();
-
-		// Tune the clustering distance depending on the transform resolution
-		if (previousResolution != resolution && // Only when changed
-			typeof clusterSource.setDistance == 'function')
-			clusterSource.setDistance(Math.max(8, Math.min(60, resolution)));
-
-		previousResolution = resolution;
-	}
 
 	// Define the style of the cluster point & the groupped features
 	function style(feature) {
@@ -223,6 +172,31 @@ function geoJsonLayer(options) {
 	}
 
 	return layer;
+}
+
+/**
+ * Display different layer depending on the map resolution
+ */
+function flipLayer(lowLayer, highLayer, limitResolution) {
+	let currentLayer;
+
+	const layer = new ol.layer.Vector({
+		render: function(frameState, target) { //HACK to be informed of render to be run
+			const resolution = frameState.pixelToCoordinateTransform[0],
+				newLayer = resolution < limitResolution ? lowLayer : highLayer;
+
+			if (currentLayer != newLayer) {
+				currentLayer = newLayer;
+				layer.setSource(newLayer.getSource());
+				layer.setStyle(newLayer.getStyle());
+			}
+
+			return ol.layer.Vector.prototype.render.call(this, frameState, target);
+		},
+	});
+
+	return layer;
+
 }
 
 /**
@@ -321,4 +295,99 @@ function controlHover() {
 	}
 
 	return control;
+}
+/**
+ * Get checkboxes values of inputs having the same name
+ * selectorName {string}
+ */
+function readCheckbox(selectorName) {
+	const inputEls = document.getElementsByName(selectorName);
+
+	// Specific case of a single on/off <input>
+	if (inputEls.length == 1)
+		return [inputEls[0].checked];
+
+	// Read each <input> checkbox
+	const list = [];
+	for (let e = 0; e < inputEls.length; e++)
+		if (inputEls[e].checked &&
+			inputEls[e].value != 'on')
+			list.push(inputEls[e].value);
+
+	return list;
+}
+
+/**
+ * Manages checkboxes inputs having the same name
+ * selectorName {string}
+ * callback {function(list)} action when the button is clicked
+ *
+ * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
+ * Manages a global flip-flop of the same named <input> checkboxes
+ */
+function memCheckbox(selectorName, callback) {
+	const request = // Search values in cookies & args
+		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
+		window.location.hash + ';' + // Then the hash #selector=1,2,3
+		document.cookie, // Then the cookies
+
+		match = request.match(new RegExp(selectorName + '=([^;]*)')),
+		inputEls = document.getElementsByName(selectorName);
+
+	// Set the <inputs> accordingly with the cookies or url args
+	if (inputEls)
+		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+			// Set inputs following cookies & args
+			if (match)
+				inputEls[e].checked =
+				match[1].split(',').includes(inputEls[e].value) || // That one is declared
+				match[1].split(',').includes('on'); // The "all (= "on") is set
+
+			// Attach the action
+			inputEls[e].onclick = onClick;
+
+			// Compute the all check && init the cookies if data has been given by the url
+			checkEl(inputEls[e]);
+		}
+
+	const list = readCheckbox(selectorName);
+
+	if (typeof callback == 'function')
+		callback(list);
+
+	return list;
+
+	function onClick(evt) {
+		checkEl(evt.target); // Do the "all" check verification
+
+		const list = readCheckbox(selectorName);
+
+		// Mem the data in the cookie
+		if (selectorName)
+			document.cookie = selectorName + '=' + list.join(',') +
+			'; path=/; SameSite=Secure; expires=' +
+			new Date(2100, 0).toUTCString(); // Keep over all session
+
+		if (typeof callback == 'function')
+			callback(list);
+	}
+
+	// Check on <input> & set the "All" input accordingly
+	function checkEl(target) {
+		let allIndex = -1, // Index of the "all" <input> if any
+			allCheck = true; // Are all others checked ?
+
+		for (let e = 0; e < inputEls.length; e++) {
+			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
+				inputEls[e].checked = target.checked; // Force all the others to the same
+			else if (inputEls[e].value == 'on') // The "all" <input>
+				allIndex = e;
+			else if (!inputEls[e].checked)
+				allCheck = false; // Uncheck the "all" <input> if one other is unchecked	
+		}
+
+		// Check the "all" <input> if all others are
+		if (allIndex != -1)
+			inputEls[allIndex].checked = allCheck;
+	}
 }
