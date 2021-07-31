@@ -1,7 +1,40 @@
+//TODO protéger les variables qui peuvent être nulles
+
+/**
+ * Misc styles
+ */
+var styleOptions = {
+	// Common label text format
+	label: {
+		textBaseline: 'bottom',
+		offsetY: -13, // Compensate the bottom textBaseline
+		padding: [1, 3, 0, 3],
+		font: '14px Calibri,sans-serif',
+		backgroundFill: new ol.style.Fill({
+			color: 'yellow',
+		}),
+	},
+	// Specific format of clusters bullets
+	cluster: {
+		image: new ol.style.Circle({
+			radius: 14,
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			fill: new ol.style.Fill({
+				color: 'white',
+			}),
+		}),
+		text: new ol.style.Text({
+			font: '14px Calibri,sans-serif',
+		}),
+	},
+};
+
+
 /**
  * Layer to display remote geoJson
  * Styles, icons & labels
- * Cluster features
  */
 function layerVector(options) {
 	const baseOptions = Object.assign({
@@ -12,17 +45,8 @@ function layerVector(options) {
 		}, options),
 
 		// options.styleOptions, // Base feature format : Object or function(feature)
-
-		// Common label text format
-		labelStyleOptions = Object.assign({
-			textBaseline: 'bottom',
-			offsetY: -13, // Compensate the bottom textBaseline
-			padding: [1, 3, 0, 3],
-			font: '14px Calibri,sans-serif',
-			backgroundFill: new ol.style.Fill({
-				color: 'yellow',
-			}),
-		}, options.labelStyleOptions),
+		labelStyleOptions = Object.assign(styleOptions.label, options.labelStyleOptions),
+		clusterStyleOptions = Object.assign({}, styleOptions.cluster, options.clusterStyleOptions),
 
 		// Style when hovering a feature
 		hoverStyleOptions = Object.assign({
@@ -32,48 +56,11 @@ function layerVector(options) {
 			),
 		}, options.hoverStyleOptions),
 
-		// Specific format of clusters bullets
-		clusterStyleOptions = Object.assign({
-			image: new ol.style.Circle({
-				radius: 14,
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-				fill: new ol.style.Fill({
-					color: 'white',
-				}),
-			}),
-			text: new ol.style.Text({
-				font: '14px Calibri,sans-serif',
-			}),
-		}, options.clusterStyleOptions),
-
-		// Basic source
 		source = new ol.source.Vector(baseOptions),
-
-		// Source if clusterized
-		clusterSource = baseOptions.clusterDistance ?
-		new ol.source.Cluster({
-			distance: baseOptions.clusterDistance,
-			source: source,
-			geometryFunction: centerPoint,
-		}) :
-		source,
-
-		// Layer
 		layer = new ol.layer.Vector({
-			source: clusterSource,
+			source: source,
 			style: style,
 		});
-
-	function centerPoint(feature) {
-		// Generate a center point to manage clusterisations
-		return new ol.geom.Point(
-			ol.extent.getCenter(
-				feature.getGeometry().getExtent()
-			)
-		);
-	}
 
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
@@ -82,9 +69,9 @@ function layerVector(options) {
 				source.refresh();
 		});
 
-	function url(extent, resolution, projection, options) {
+	function url(extent, resolution, projection, opt) {
 		//BEST gérer les msg erreur
-		options = options || baseOptions;
+		const options = opt || baseOptions;
 
 		const urlPath = typeof options.urlPath == 'function' ?
 			options.urlPath(
@@ -109,14 +96,10 @@ function layerVector(options) {
 				baseOptions.computeProperties(evt.features[p], baseOptions);
 		});
 
-	// Define the style of the cluster point & the groupped features
 	function style(feature) {
-		const features = feature.get('features') || [feature],
-			icon = features[0].get('icon'),
-			label = features[0].get('label'),
-			area = ol.extent.getArea(
-				features[0].getGeometry().getExtent()
-			),
+		const icon = feature.get('icon'),
+			cluster = feature.get('cluster'),
+			label = feature.get('label'),
 			styleOptions = typeof baseOptions.styleOptions == 'function' ?
 			options.styleOptions(feature) :
 			options.styleOptions || {};
@@ -124,44 +107,24 @@ function layerVector(options) {
 		//HACK Memorize the options in the feature for hover display
 		feature.hoverStyleOptions = hoverStyleOptions;
 
-		// Clusters
-		if (features.length > 1 ||
-			parseInt(features[0].get('cluster'))) {
-			let clusters = 0;
-			for (let f in features)
-				clusters += parseInt(features[f].get('cluster')) || 1;
-
-			clusterStyleOptions.text.setText(clusters.toString());
+		if (cluster) {
+			clusterStyleOptions.text.setText(cluster.toString());
 			//TODO BEST mettre la liste des 5 premiers titres
-			feature.set('hover', clusters.toString() + ' éléments');
+			feature.set('hover', cluster.toString() + ' éléments');
 
 			return new ol.style.Style(clusterStyleOptions);
 		}
 
-		// Single feature (point, line or poly)
-		// Add a permanent label
-		if (!baseOptions.clusterDistance || // If no clusterisation 
-			(feature.get('features') // If not cluster marker 
-			) && label) {
-			labelStyleOptions.text = label;
-			styleOptions.text = new ol.style.Text(labelStyleOptions);
-		}
-
-		// Include the feature in the cluster source (lines, polygons) to make it visible
-		if (area) {
-			const featureExists = clusterSource.forEachFeature(function(f) {
-				if (features[0].ol_uid == f.ol_uid)
-					return true;
-			});
-
-			if (!featureExists)
-				clusterSource.addFeature(features[0]);
-		} else
 		if (icon)
 			// Add icon if one is defined in the properties
 			styleOptions.image = new ol.style.Icon({
 				src: icon,
 			});
+
+		if (label) {
+			labelStyleOptions.text = label;
+			styleOptions.text = new ol.style.Text(labelStyleOptions);
+		}
 
 		return new ol.style.Style(styleOptions);
 	}
@@ -170,7 +133,103 @@ function layerVector(options) {
 }
 
 /**
- * Display different layer depending on the map resolution
+ * Cluster too close features
+ */
+function layerVectorCluster(opt) {
+	const options = Object.assign({
+			clusterDistance: 50,
+		}, opt),
+
+		layer = layerVector(options),
+		source = layer.getSource(),
+		detailStyleFunction = layer.getStyleFunction(),
+
+		// Specific format of clusters bullets
+		//TODO double déclaration
+		clusterStyleOptions = {
+			image: new ol.style.Circle({
+				radius: 14,
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+				fill: new ol.style.Fill({
+					color: 'white',
+				}),
+			}),
+			text: new ol.style.Text({
+				font: '14px Calibri,sans-serif',
+			}),
+		},
+
+		// Source if clusterized
+		//TODO tune the distance depending on the resolution
+		clusterSource = new ol.source.Cluster({
+			distance: options.clusterDistance,
+			source: source,
+			geometryFunction: centerPoint,
+		}),
+
+		// Layer
+		clusterLayer = new ol.layer.Vector({
+			source: clusterSource,
+			style: style,
+		});
+
+	function centerPoint(feature) {
+		// Generate a center point to manage clusterisations
+		return new ol.geom.Point(
+			ol.extent.getCenter(
+				feature.getGeometry().getExtent()
+			)
+		);
+	}
+
+	function style(feature, resolution) {
+		const features = feature.get('features'),
+			label = feature.get('label');
+
+		// Clusters
+		if (features) {
+			// Clustered features
+			let clusters = 0;
+			for (let f in features)
+				clusters += parseInt(features[f].get('cluster')) || 1;
+
+			if (clusters > 1) {
+				clusterStyleOptions.text.setText(clusters.toString());
+				//TODO BEST mettre la liste des 5 premiers titres
+				feature.set('hover', clusters.toString() + ' éléments');
+
+				/*
+						// Add a permanent label
+						if (!baseOptions.clusterDistance || // If no clusterisation 
+							(feature.get('features') // If not cluster marker 
+							) && label) {
+							labelStyleOptions.text = label;
+							styleOptions.text = new ol.style.Text(labelStyleOptions);
+						}
+						*/
+
+				return new ol.style.Style(clusterStyleOptions);
+			}
+
+			// Single feature (point, line or poly)
+			const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
+				if (features[0].ol_uid == f.ol_uid)
+					return true;
+			});
+
+			if (!featureAlreadyExists)
+				clusterSource.addFeature(features[0]);
+		} else // Feature copied from initial source to cluster source
+			return detailStyleFunction(feature, resolution);
+	}
+
+	return clusterLayer;
+}
+
+/**
+ * Display different layers depending on the map resolution
  */
 function layerFlip(lowLayer, highLayer, limitResolution) {
 	let currentLayer;
@@ -191,7 +250,6 @@ function layerFlip(lowLayer, highLayer, limitResolution) {
 	});
 
 	return layer;
-
 }
 
 /**
@@ -229,7 +287,9 @@ function controlHover() {
 			// Point
 			titles.push(features[0].get('hover'));
 
-		feature.hoverStyleOptions.text.setText(titles.join('\n'));
+		if (feature.hoverStyleOptions)
+			feature.hoverStyleOptions.text.setText(titles.join('\n'));
+
 		return new ol.style.Style(feature.hoverStyleOptions);
 	}
 
@@ -291,6 +351,7 @@ function controlHover() {
 
 	return control;
 }
+
 /**
  * Get checkboxes values of inputs having the same name
  * selectorName {string}
@@ -345,13 +406,6 @@ function memCheckbox(selectorName, callback) {
 			checkEl(inputEls[e]);
 		}
 
-	const list = readCheckbox(selectorName);
-
-	if (typeof callback == 'function')
-		callback(list);
-
-	return list;
-
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
@@ -385,4 +439,11 @@ function memCheckbox(selectorName, callback) {
 		if (allIndex != -1)
 			inputEls[allIndex].checked = allCheck;
 	}
+
+	const list = readCheckbox(selectorName);
+
+	if (typeof callback == 'function')
+		callback(list);
+
+	return list;
 }

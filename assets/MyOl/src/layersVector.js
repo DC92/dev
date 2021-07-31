@@ -2,7 +2,7 @@
  * Site refuges.info
  */
 function layerWriPoi(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: function(bbox, list) {
 			return 'api/bbox?nb_points=all' +
@@ -10,7 +10,6 @@ function layerWriPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		selectorName: 'wri-features',
 		clusterDistance: 50,
 
 		computeProperties: function(f, options) {
@@ -81,7 +80,7 @@ function layerWri(options) {
  * Site chemineur.fr
  */
 function layerChemPoi(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {
 			return 'ext/Dominique92/GeoBB/gis2.php?' +
@@ -115,7 +114,7 @@ function layerChemPoi(options) {
 }
 
 function layerChemCluster(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {
 			return 'ext/Dominique92/GeoBB/gis2.php?' +
