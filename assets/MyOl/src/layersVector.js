@@ -10,8 +10,6 @@ function layerWriPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		clusterDistance: 50,
-
 		computeProperties: function(f, options) {
 			const hover = [], // Hover label
 				desc = [];
@@ -89,8 +87,6 @@ function layerChemPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		clusterDistance: 50,
-
 		computeProperties: function(f, options) {
 			if (f.get('type'))
 				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
@@ -121,7 +117,6 @@ function layerChemCluster(options) {
 				'layer=cluster&limit=1000' +
 				(options.selectorName ? '&cat=' + list.join(',') : '');
 		},
-		clusterDistance: 50,
 	}, options));
 }
 
