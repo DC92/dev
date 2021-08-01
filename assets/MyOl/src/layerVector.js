@@ -13,7 +13,7 @@ function layerVector(opt) {
 			style: style,
 		});
 
-	// Base feature format : Object or function(feature)
+	// Base style : Object or function(feature)
 	// options.styleOptions
 
 	// Common label text format
@@ -27,7 +27,7 @@ function layerVector(opt) {
 		}),
 	}, opt.labelStyleOptions);
 
-	// Specific format of clusters bullets
+	// Common clusters bullets format
 	options.clusterStyleOptions = Object.assign({
 		image: new ol.style.Circle({
 			radius: 14,
@@ -45,10 +45,10 @@ function layerVector(opt) {
 
 	// Style when hovering a feature
 	options.hoverStyleOptions = Object.assign({
-		// We assign the same text style to the hover label
 		text: new ol.style.Text(options.labelStyleOptions),
 	}, opt.hoverStyleOptions);
 
+	// Url args selector
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
 			layer.setVisible(list.length > 0);
@@ -56,7 +56,7 @@ function layerVector(opt) {
 				source.refresh();
 		});
 
-	// Normalize properties
+	// Convert specific properties to basic one ("icon", "label, "link", ...
 	if (typeof options.computeProperties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)
@@ -67,26 +67,26 @@ function layerVector(opt) {
 	layer.options = options;
 
 	function url(extent, resolution, projection, opt) {
-		const optionsUrl = opt || options;
+		opt = opt || options;
 
-		const urlPath = typeof optionsUrl.urlPath == 'function' ?
-			optionsUrl.urlPath(
+		const urlPath = typeof opt.urlPath == 'function' ?
+			opt.urlPath(
 				ol.proj.transformExtent( // BBox
 					extent,
 					projection.getCode(),
 					'EPSG:4326' // Received projection
 				),
-				readCheckbox(optionsUrl.selectorName),
+				readCheckbox(opt.selectorName),
 				resolution, // === zoom level
-				optionsUrl
+				opt
 			) :
-			optionsUrl.urlPath || '';
+			opt.urlPath || '';
 
-		return optionsUrl.urlHost + urlPath;
+		return opt.urlHost + urlPath;
 	}
 
 	function style(feature) {
-		//HACK save options in the feature for hover display
+		//HACK save style in the feature for hover display
 		feature.hoverStyleOptions = options.hoverStyleOptions;
 
 		const icon = feature.get('icon'),
@@ -124,12 +124,14 @@ function layerVector(opt) {
  * Cluster close features
  */
 function layerVectorCluster(opt) {
-	// Full features source & layer
+	// Full features layer & source
 	const fullLayer = layerVector(opt),
+
+		// Base options
 		options = Object.assign({},
 			fullLayer.options, { // Get default options from the layerVector
 				clusterDistance: 50,
-			}, opt),
+			}, opt), // Get declaration options
 
 		// Clusterized source & layer
 		clusterSource = new ol.source.Cluster({
@@ -156,7 +158,6 @@ function layerVectorCluster(opt) {
 	function clusterStyle(feature, resolution) {
 		//HACK Save options for further use
 		feature.hoverStyleOptions = options.hoverStyleOptions;
-		//feature.hoverStyleOptions  .text = new ol.style.Text(options.labelStyleOptions);//TODO ??? faire autrement ???
 
 		const features = feature.get('features');
 
@@ -166,7 +167,6 @@ function layerVectorCluster(opt) {
 			let clusters = 0;
 			for (let f in features)
 				clusters += parseInt(features[f].get('cluster')) || 1;
-			//TODO limite à 5 puis n éléménts
 
 			if (clusters > 1) {
 				options.clusterStyleOptions.text.setText(clusters.toString());
@@ -255,8 +255,10 @@ function controlHover() {
 			// Point
 			titles.push(features[0].get('hover'));
 
-		if (feature.hoverStyleOptions)
-			feature.hoverStyleOptions.text.setText(titles.join('\n'));
+		feature.hoverStyleOptions.text.setText(titles.length > 5 ?
+			'Click to zoom' : //TODO BUG ne marche pas pour les couches clusters
+			titles.join('\n')
+		);
 
 		return new ol.style.Style(feature.hoverStyleOptions);
 	}
@@ -399,7 +401,7 @@ function memCheckbox(selectorName, callback) {
 			else if (inputEls[e].value == 'on') // The "all" <input>
 				allIndex = e;
 			else if (!inputEls[e].checked)
-				allCheck = false; // Uncheck the "all" <input> if one other is unchecked	
+				allCheck = false; // Uncheck the "all" <input> if one other is unchecked
 		}
 
 		// Check the "all" <input> if all others are

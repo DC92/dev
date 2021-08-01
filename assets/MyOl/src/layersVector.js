@@ -110,7 +110,7 @@ function layerChemPoi(options) {
 }
 
 function layerChemCluster(options) {
-	//TODO label on clusters
+	//TODO BUG label on clusters
 	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {
