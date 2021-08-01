@@ -41,12 +41,12 @@ function layerWriPoi(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO label on hover little massifs
 	return layerVector(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: 'api/polygones?type_polygon=1',
 		computeProperties: function(f) {
 			f.set('label', f.get('nom'));
+			f.set('hover', f.get('nom')); //TODO ajouté temporairement pour debugger largeur petits massifs
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
@@ -110,7 +110,6 @@ function layerChemPoi(options) {
 }
 
 function layerChemCluster(options) {
-	//TODO BUG label on clusters
 	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
 		urlPath: function(bbox, list, resolution, options) {

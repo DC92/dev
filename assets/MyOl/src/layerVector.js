@@ -257,7 +257,7 @@ function controlHover() {
 
 		feature.hoverStyleOptions.text.setText(titles.length > 5 ?
 			'Click to zoom' : //TODO BUG ne marche pas pour les couches clusters
-			titles.join('\n')
+			titles.join('\n') //TODO BUG pour petits massifs : n'affiche pas si > largeur du massif
 		);
 
 		return new ol.style.Style(feature.hoverStyleOptions);
