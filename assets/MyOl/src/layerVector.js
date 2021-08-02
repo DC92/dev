@@ -246,7 +246,6 @@ function controlHover() {
 		});
 
 	function style(feature) {
-		//BEST options label on hover point /ligne / surface ???
 		const features = feature.get('features') || [feature],
 			titles = [];
 
@@ -254,16 +253,17 @@ function controlHover() {
 			// Big clusters
 			titles.push(feature.get('hover'));
 		else
-		if (features.length > 1)
+		if (features.length > 1) {
 			// Clusters
 			for (let f in features)
-				titles.push(features[f].get('name'));
-		else
+				if (features[f].get('name'))
+					titles.push(features[f].get('name'));
+		} else
 			// Point
 			titles.push(features[0].get('hover'));
 
-		feature.hoverStyleOptions.text.setText(titles.length > 5 ?
-			'Click to zoom' : //TODO BUG ne marche pas pour les couches clusters
+		feature.hoverStyleOptions.text.setText(!titles.length || titles.length > 5 ?
+			'Click to zoom' :
 			titles.join('\n')
 		);
 
