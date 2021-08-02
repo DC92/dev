@@ -45,7 +45,11 @@ function layerVector(opt) {
 
 	// Style when hovering a feature
 	options.hoverStyleOptions = Object.assign({
-		text: new ol.style.Text(options.labelStyleOptions),
+		text: new ol.style.Text(Object.assign({
+				overflow: true,
+			},
+			options.labelStyleOptions
+		)),
 	}, opt.hoverStyleOptions);
 
 	// Url args selector
@@ -257,7 +261,7 @@ function controlHover() {
 
 		feature.hoverStyleOptions.text.setText(titles.length > 5 ?
 			'Click to zoom' : //TODO BUG ne marche pas pour les couches clusters
-			titles.join('\n') //TODO BUG pour petits massifs : n'affiche pas si > largeur du massif
+			titles.join('\n')
 		);
 
 		return new ol.style.Style(feature.hoverStyleOptions);
