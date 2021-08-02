@@ -21,7 +21,6 @@ function layerVector(opt) {
 		textBaseline: 'bottom',
 		offsetY: -13, // Compensate the bottom textBaseline
 		padding: [1, 3, 0, 3],
-		font: '14px Calibri,sans-serif',
 		backgroundFill: new ol.style.Fill({
 			color: 'yellow',
 		}),
@@ -47,6 +46,10 @@ function layerVector(opt) {
 	options.hoverStyleOptions = Object.assign({
 		text: new ol.style.Text(Object.assign({
 				overflow: true,
+				font: '14px Calibri,sans-serif',
+				backgroundStroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
 			},
 			options.labelStyleOptions
 		)),
