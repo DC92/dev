@@ -58,6 +58,7 @@ function layerVector(opt) {
 	// Url args selector
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(list) {
+			//TODO make invisible if no checkbox selected
 			layer.setVisible(list.length > 0);
 			if (list.length > 0)
 				source.refresh();
@@ -150,6 +151,11 @@ function layerVectorCluster(opt) {
 			source: clusterSource,
 			style: clusterStyle,
 		});
+
+	//HACK report setVisile to the cluster
+	fullLayer.on('change:visible', function() {
+		clusterLayer.setVisible(this.getVisible());
+	});
 
 	options.hoverStyleOptions = Object.assign(fullLayer.options.hoverStyleOptions, opt.hoverStyleOptions);
 

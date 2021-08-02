@@ -2,6 +2,7 @@
  * Site refuges.info
  */
 function layerWriPoi(options) {
+	//TODO BUG selecteur KO
 	return layerVectorCluster(Object.assign({
 		urlHost: '//www.refuges.info/',
 		urlPath: function(bbox, list) {
@@ -46,7 +47,7 @@ function layerWriAreas(options) {
 		urlPath: 'api/polygones?type_polygon=1',
 		computeProperties: function(f) {
 			f.set('label', f.get('nom'));
-			f.set('hover', f.get('nom')); //TODO ajouté temporairement pour debugger largeur petits massifs
+			f.set('hover', f.get('nom'));
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
