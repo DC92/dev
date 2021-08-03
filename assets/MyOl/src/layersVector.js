@@ -2,7 +2,6 @@
  * Site refuges.info
  */
 function layerWriPoi(options) {
-	//TODO BUG selecteur KO
 	return layerVectorCluster(Object.assign({
 		urlHost: '//www.refuges.info/',
 		url: function url(options, bbox, selection) {
@@ -67,7 +66,9 @@ function layerWriAreas(options) {
 				})
 			};
 		},
-	}, options));
+	}, options, {
+		selectorName: null, // Forced
+	}));
 }
 
 function layerWri(options) {
@@ -120,7 +121,7 @@ function layerChemGroup(options) {
 		url: function url(options, bbox, selection) {
 			return options.urlHost +
 				'ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=cluster&limit=1000000' +
+				'layer=group&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));

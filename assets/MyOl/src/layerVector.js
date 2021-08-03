@@ -59,7 +59,6 @@ function layerVector(opt) {
 	// Url args selector
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(selection) {
-			//TODO make invisible if no checkbox selected
 			layer.setVisible(selection.length > 0);
 			if (selection.length > 0)
 				source.refresh();
@@ -143,9 +142,10 @@ function layerVectorCluster(opt) {
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: clusterStyle,
+			visible: fullLayer.getVisible(),
 		});
 
-	//HACK report setVisible to the cluster
+	//HACK report setVisible
 	fullLayer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
 	});
@@ -209,7 +209,7 @@ function layerFlip(lowLayer, highLayer, limitResolution) {
 	let currentLayer;
 
 	const layer = new ol.layer.Vector({
-		render: function(frameState, target) { //HACK to be informed of render to be run
+		render: function(frameState, target) {
 			const resolution = frameState.pixelToCoordinateTransform[0],
 				newLayer = resolution < limitResolution ? lowLayer : highLayer;
 
@@ -217,8 +217,15 @@ function layerFlip(lowLayer, highLayer, limitResolution) {
 				currentLayer = newLayer;
 				layer.setSource(newLayer.getSource());
 				layer.setStyle(newLayer.getStyle());
+				layer.setVisible(newLayer.getVisible());
 			}
 
+			//HACK report setVisible to the cluster
+			currentLayer.on('change:visible', function() {
+				layer.setVisible(this.getVisible());
+			});
+
+			//HACK to be informed of render to be run
 			return ol.layer.Vector.prototype.render.call(this, frameState, target);
 		},
 	});
@@ -375,7 +382,7 @@ function memCheckbox(selectorName, callback) {
 				match[1].split(',').includes('on'); // The "all (= "on") is set
 
 			// Attach the action
-			inputEls[e].onclick = onClick;
+			inputEls[e].addEventListener('click', onClick);
 
 			// Compute the all check && init the cookies if data has been given by the url
 			checkEl(inputEls[e]);

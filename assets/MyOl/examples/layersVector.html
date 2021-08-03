@@ -28,29 +28,35 @@ Based on https://openlayers.org
 <body>
 	<div id="map"></div>
 
-	<br/>Chemineur<input type="checkbox" name="chem-features" />
-	<ul>
-		<li><input type="checkbox" name="chem-features" value="3"/>Refuge</li>
-		<li><input type="checkbox" name="chem-features" value="8"/>Abri</li>
-		<li><input type="checkbox" name="chem-features" value="20"/>Alimentation</li>
-		<li><input type="checkbox" name="chem-features" value="23"/>Montagne</li>
-		<li><input type="checkbox" name="chem-features" value="30"/>Ferroviaire</li>
-		<li><input type="checkbox" name="chem-features" value="40"/>Transport</li>
-		<li><input type="checkbox" name="chem-features" value="44"/>Tourisme</li>
-		<li><input type="checkbox" name="chem-features" value="58"/>Naval</li>
-		<li><input type="checkbox" name="chem-features" value="64"/>Trace</li>
-	</ul>
+	<div style="float:right">
+		Chemineur
+		<input type="checkbox" name="chem-features" />
+		<ul>
+			<li><input type="checkbox" name="chem-features" value="3"/>Refuge</li>
+			<li><input type="checkbox" name="chem-features" value="8"/>Abri</li>
+			<li><input type="checkbox" name="chem-features" value="20"/>Alimentation</li>
+			<li><input type="checkbox" name="chem-features" value="23"/>Montagne</li>
+			<li><input type="checkbox" name="chem-features" value="30"/>Ferroviaire</li>
+			<li><input type="checkbox" name="chem-features" value="40"/>Transport</li>
+			<li><input type="checkbox" name="chem-features" value="44"/>Tourisme</li>
+			<li><input type="checkbox" name="chem-features" value="58"/>Naval</li>
+			<li><input type="checkbox" name="chem-features" value="64"/>Trace</li>
+		</ul>
+	</div>
 
-	<br/>Refuges.info<input type="checkbox" name="wri-features" />
-	<ul>
-		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
-		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
-		<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
-		<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
-		<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
-		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
-		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
-	</ul>
+	<div>
+		Refuges.info
+		<input type="checkbox" name="wri-features" />
+		<ul>
+			<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
+			<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
+			<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
+			<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
+			<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
+			<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
+			<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
+		</ul>
+	</div>
 
 	<script>
 		const map = new ol.Map({
@@ -84,7 +90,7 @@ if(01)		map.addLayer(layerWri({
 if(0)		map.addLayer(layerChemPoi({
 			selectorName: 'chem-features',
 		}));
-if(0)		map.addLayer(layerChemCluster({
+if(0)		map.addLayer(layerChemGroup({
 			selectorName: 'chem-features',
 		}));
 if(0)		map.addLayer(layerChem({
