@@ -54,7 +54,7 @@ function layerWriAreas(options) {
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
-		styleOptions: function(feature) {
+		style: function(feature) {
 			const hex = feature.get('couleur');
 			return {
 				fill: new ol.style.Fill({
@@ -99,13 +99,13 @@ function layerChemPoi(options) {
 				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
 		},
-		styleOptions: {
+		style: {
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),
 		},
-		hoverStyleOptions: {
+		hoverStyle: {
 			stroke: new ol.style.Stroke({
 				color: 'red',
 				width: 3,
@@ -114,13 +114,13 @@ function layerChemPoi(options) {
 	}, options));
 }
 
-function layerChemCluster(options) {
+function layerChemGroup(options) {
 	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
 		url: function url(options, bbox, selection) {
 			return options.urlHost +
 				'ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=cluster&limit=1000' +
+				'layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
@@ -129,7 +129,7 @@ function layerChemCluster(options) {
 function layerChem(options) {
 	return layerFlip(
 		layerChemPoi(options),
-		layerChemCluster(options),
+		layerChemGroup(options),
 		100
 	);
 }
