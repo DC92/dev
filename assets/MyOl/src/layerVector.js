@@ -1,34 +1,19 @@
 /**
- * Layer to display remote geoJson
- * Styles, icons & labels
+ * Misc default styles options
  */
-function layerVector(opt) {
-	// Source & layer
-	const options = Object.assign({
-			format: new ol.format.GeoJSON(), // Default
-		}, opt, {
-			url: url, // Forced
-		}),
-		source = new ol.source.Vector(options),
-		layer = new ol.layer.Vector({
-			source: source,
-			style: style,
-		});
+var myStyleOptions = {
+	style: {}, // Base style : Object | function(feature)
 
-	// options.style: Base style : Object or function(feature)
-
-	// Common label text format
-	options.labelStyle = Object.assign({
+	labelStyle: {
 		textBaseline: 'bottom',
 		offsetY: -13, // Compensate the bottom textBaseline
 		padding: [1, 3, 0, 3],
 		backgroundFill: new ol.style.Fill({
 			color: 'yellow',
 		}),
-	}, opt.labelStyle);
+	},
 
-	// Common cluster & group bullets format
-	options.clusterStyle = Object.assign({
+	clusterStyle: {
 		image: new ol.style.Circle({
 			radius: 14,
 			stroke: new ol.style.Stroke({
@@ -41,20 +26,52 @@ function layerVector(opt) {
 		text: new ol.style.Text({
 			font: '14px Calibri,sans-serif',
 		}),
-	}, opt.clusterStyle);
+	},
+
+	hoverTextStyle: { // Specific to hover labels
+		overflow: true,
+		font: '14px Calibri,sans-serif',
+		backgroundStroke: new ol.style.Stroke({
+			color: 'blue',
+		}),
+	},
+};
+//TODO pas de labels sur certains group
+
+/**
+ * Layer to display remote geoJson
+ * Styles, icons & labels
+ */
+function layerVector(opt) {
+	// Source & layer
+	const options = Object.assign({
+			format: new ol.format.GeoJSON(), // Default
+		}, opt, { // Optional
+			url: url, // Forced
+		}),
+		source = new ol.source.Vector(options),
+		layer = new ol.layer.Vector({
+			source: source,
+			style: style,
+		});
+
+	// Compute style options
+	for (let o in myStyleOptions)
+		options[o] = Object.assign({},
+			myStyleOptions[o],
+			opt[o]
+		);
 
 	// Style when hovering a feature
 	options.hoverStyle = Object.assign({
-		text: new ol.style.Text(Object.assign({
-				overflow: true,
-				font: '14px Calibri,sans-serif',
-				backgroundStroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-			},
-			options.labelStyle
+		text: new ol.style.Text(Object.assign({},
+			options.labelStyle,
+			options.hoverTextStyle
 		)),
 	}, opt.hoverStyle);
+
+	//HACK Save options for further use
+	layer.options = options; //BEST avoid
 
 	// Url args selector
 	if (options.selectorName)
@@ -63,9 +80,6 @@ function layerVector(opt) {
 			if (selection.length > 0)
 				source.refresh();
 		});
-
-	//HACK Save options for further use
-	layer.options = options; //BEST avoid
 
 	function url(extent, resolution, projection) {
 		return opt.url(
