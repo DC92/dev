@@ -3,18 +3,19 @@
  * Styles, icons & labels
  */
 function layerVector(opt) {
+	// Source & layer
 	const options = Object.assign({
-			url: url,
-			format: new ol.format.GeoJSON(),
-		}, opt),
+			format: new ol.format.GeoJSON(), // Default
+		}, opt, {
+			url: url, // Forced
+		}),
 		source = new ol.source.Vector(options),
 		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
 		});
 
-	// Base style : Object or function(feature)
-	// options.styleOptions
+	// options.styleOptions: Base style : Object or function(feature)
 
 	// Common label text format
 	options.labelStyleOptions = Object.assign({
@@ -57,41 +58,35 @@ function layerVector(opt) {
 
 	// Url args selector
 	if (options.selectorName)
-		memCheckbox(options.selectorName, function(list) {
+		memCheckbox(options.selectorName, function(selection) {
 			//TODO make invisible if no checkbox selected
-			layer.setVisible(list.length > 0);
-			if (list.length > 0)
+			layer.setVisible(selection.length > 0);
+			if (selection.length > 0)
 				source.refresh();
-		});
-
-	// Convert specific properties to basic one ("icon", "label, "link", ...
-	if (typeof options.computeProperties == 'function')
-		source.on('featuresloadend', function(evt) {
-			for (let p in evt.features)
-				options.computeProperties(evt.features[p], options);
 		});
 
 	//HACK Save options for further use
 	layer.options = options;
 
-	function url(extent, resolution, projection, opt) {
-		opt = opt || options;
-
-		const urlPath = typeof opt.urlPath == 'function' ?
-			opt.urlPath(
-				ol.proj.transformExtent( // BBox
-					extent,
-					projection.getCode(),
-					'EPSG:4326' // Received projection
-				),
-				readCheckbox(opt.selectorName),
-				resolution, // === zoom level
-				opt
-			) :
-			opt.urlPath || '';
-
-		return opt.urlHost + urlPath;
+	function url(extent, resolution, projection) {
+		return opt.url(
+			options,
+			ol.proj.transformExtent( // BBox
+				extent,
+				projection.getCode(),
+				'EPSG:4326' // Received projection
+			),
+			readCheckbox(opt.selectorName),
+			extent, resolution, projection
+		);
 	}
+
+	// Convert specific properties to basic one ("icon", "label, "link", ...
+	if (typeof options.properties == 'function')
+		source.on('featuresloadend', function(evt) {
+			for (let p in evt.features)
+				options.properties(evt.features[p], options);
+		});
 
 	function style(feature) {
 		//HACK save style in the feature for hover display
@@ -347,19 +342,19 @@ function readCheckbox(selectorName) {
 		return [inputEls[0].checked];
 
 	// Read each <input> checkbox
-	const list = [];
+	const selection = [];
 	for (let e = 0; e < inputEls.length; e++)
 		if (inputEls[e].checked &&
 			inputEls[e].value != 'on')
-			list.push(inputEls[e].value);
+			selection.push(inputEls[e].value);
 
-	return list;
+	return selection;
 }
 
 /**
  * Manages checkboxes inputs having the same name
  * selectorName {string}
- * callback {function(list)} action when the button is clicked
+ * callback {function(selection)} action when the button is clicked
  *
  * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
  * Manages a global flip-flop of the same named <input> checkboxes
@@ -391,16 +386,16 @@ function memCheckbox(selectorName, callback) {
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
-		const list = readCheckbox(selectorName);
+		const selection = readCheckbox(selectorName);
 
 		// Mem the data in the cookie
 		if (selectorName)
-			document.cookie = selectorName + '=' + list.join(',') +
+			document.cookie = selectorName + '=' + selection.join(',') +
 			'; path=/; SameSite=Secure; expires=' +
 			new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (typeof callback == 'function')
-			callback(list);
+			callback(selection);
 	}
 
 	// Check on <input> & set the "All" input accordingly
@@ -422,10 +417,10 @@ function memCheckbox(selectorName, callback) {
 			inputEls[allIndex].checked = allCheck;
 	}
 
-	const list = readCheckbox(selectorName);
+	const selection = readCheckbox(selectorName);
 
 	if (typeof callback == 'function')
-		callback(list);
+		callback(selection);
 
-	return list;
+	return selection;
 }

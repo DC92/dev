@@ -5,13 +5,14 @@ function layerWriPoi(options) {
 	//TODO BUG selecteur KO
 	return layerVectorCluster(Object.assign({
 		urlHost: '//www.refuges.info/',
-		urlPath: function(bbox, list) {
-			return 'api/bbox?nb_points=all' +
-				'&type_points=' + list.join(',') +
+		url: function url(options, bbox, selection) {
+			return options.urlHost +
+				'api/bbox?nb_points=all' +
+				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		computeProperties: function(f, options) {
+		properties: function(f, options) {
 			const hover = [], // Hover label
 				desc = [];
 			if (f.get('type').valeur)
@@ -44,8 +45,10 @@ function layerWriPoi(options) {
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		urlHost: '//www.refuges.info/',
-		urlPath: 'api/polygones?type_polygon=1',
-		computeProperties: function(f) {
+		url: function url(options) {
+			return options.urlHost + 'api/polygones?type_polygon=1';
+		},
+		properties: function(f) {
 			f.set('label', f.get('nom'));
 			f.set('hover', f.get('nom'));
 			if (f.get('lien'))
@@ -81,14 +84,15 @@ function layerWri(options) {
 function layerChemPoi(options) {
 	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, list, resolution, options) {
-			return 'ext/Dominique92/GeoBB/gis2.php?' +
+		url: function url(options, bbox, selection) {
+			return options.urlHost +
+				'ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=simple&limit=1000' +
-				(options.selectorName ? '&cat=' + list.join(',') : '') +
+				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		computeProperties: function(f, options) {
+		properties: function(f, options) {
 			if (f.get('type'))
 				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
 			if (f.get('id'))
@@ -113,10 +117,11 @@ function layerChemPoi(options) {
 function layerChemCluster(options) {
 	return layerVectorCluster(Object.assign({
 		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, list, resolution, options) {
-			return 'ext/Dominique92/GeoBB/gis2.php?' +
+		url: function url(options, bbox, selection) {
+			return options.urlHost +
+				'ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=cluster&limit=1000' +
-				(options.selectorName ? '&cat=' + list.join(',') : '');
+				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
 }
