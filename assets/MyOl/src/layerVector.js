@@ -2,7 +2,7 @@
  * Misc default styles options
  */
 var myStyleOptions = {
-	style: {}, // Base style : Object | function(feature)
+	//style: {}, // Base style : Object | function(feature)
 
 	labelStyle: {
 		textBaseline: 'bottom',
@@ -55,24 +55,6 @@ function layerVector(opt) {
 			style: style,
 		});
 
-	// Compute style options
-	for (let o in myStyleOptions)
-		options[o] = Object.assign({},
-			myStyleOptions[o],
-			opt[o]
-		);
-
-	// Style when hovering a feature
-	options.hoverStyle = Object.assign({
-		text: new ol.style.Text(Object.assign({},
-			options.labelStyle,
-			options.hoverTextStyle
-		)),
-	}, opt.hoverStyle);
-
-	//HACK Save options for further use
-	layer.options = options; //BEST avoid
-
 	// Url args selector
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(selection) {
@@ -100,6 +82,21 @@ function layerVector(opt) {
 			for (let p in evt.features)
 				options.properties(evt.features[p], options);
 		});
+
+	// Compute style options
+	for (let o in myStyleOptions)
+		options[o] = Object.assign({},
+			myStyleOptions[o],
+			opt[o]
+		);
+
+	// Style when hovering a feature
+	options.hoverStyle = Object.assign({
+		text: new ol.style.Text(Object.assign({},
+			options.labelStyle,
+			options.hoverTextStyle
+		)),
+	}, opt.hoverStyle);
 
 	function style(feature) {
 		//HACK save style in the feature for hover display
@@ -130,6 +127,9 @@ function layerVector(opt) {
 
 		return new ol.style.Style(style);
 	}
+
+	//HACK Save options for further use
+	layer.options = options; //BEST avoid
 
 	return layer;
 }
