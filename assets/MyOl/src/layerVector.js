@@ -152,7 +152,7 @@ function layerVectorCluster(opt) {
 			style: clusterStyle,
 		});
 
-	//HACK report setVisile to the cluster
+	//HACK report setVisible to the cluster
 	fullLayer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
 	});

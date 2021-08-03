@@ -11,15 +11,8 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 
-	<!-- Openlayers -->
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../ol/ol.js"></script>
-
-	<!-- My Openlayers -->
-	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<script src="../src/header.js"></script>
-	<script src="../src/layersTile.js"></script>
-	<script src="../src/layerSwitcher.js"></script>
 	<script src="../src/layerVector.js"></script>
 	<script src="../src/layersVector.js"></script>
 
@@ -60,31 +53,25 @@ Based on https://openlayers.org
 	</ul>
 
 	<script>
-		console.log('Cookies: ' + document.cookie);
-
-		const mapKeys = {
-				"ign": "hcxdz5f1p9emo4i1lch6ennl",
-				"thunderforest": "ee751f43b3af4614b01d1bce72785369",
-				"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
-			},
-
-			map = new ol.Map({
-				target: 'map',
-				controls: [
-					controlLayerSwitcher({
-						baseLayers: layersCollection(),
-					}),
-					new ol.control.Zoom(),
-					controlHover(),
-				],
-				view: new ol.View({
-					center: [700000, 5700000], // Maurienne
-					//center: [260000, 6250000], // Paris
-					//center: [260000, 5800000], // France
-					//center: [300000, 6170000],
-					zoom: 12,
+		const map = new ol.Map({
+			target: 'map',
+			layers: [
+				new ol.layer.Tile({
+					source: new ol.source.OSM(),
 				}),
-			});
+			],
+			controls: [
+				new ol.control.Zoom(),
+				controlHover(),
+			],
+			view: new ol.View({
+				center: [700000, 5700000], // Maurienne
+				//center: [260000, 6250000], // Paris
+				//center: [260000, 5800000], // France
+				//center: [300000, 6170000],
+				zoom: 12,
+			}),
+		});
 
 if(0)		map.addLayer(layerWriPoi({
 			selectorName: 'wri-features',
