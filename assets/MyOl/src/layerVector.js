@@ -3,13 +3,22 @@
  */
 var myStyleOptions = {
 	//style: {}, // Base style : Object | function(feature)
+	//TODO BUG voir pourquoi on ne peut pas itérer sur 'style'
 
-	labelStyle: {
+	labelTextStyle: {
 		textBaseline: 'bottom',
 		offsetY: -13, // Compensate the bottom textBaseline
 		padding: [1, 3, 0, 3],
 		backgroundFill: new ol.style.Fill({
 			color: 'yellow',
+		}),
+	},
+
+	hoverTextStyle: { // (added to labelTextStyle)
+		overflow: true,
+		font: '14px Calibri,sans-serif',
+		backgroundStroke: new ol.style.Stroke({
+			color: 'blue',
 		}),
 	},
 
@@ -28,13 +37,7 @@ var myStyleOptions = {
 		}),
 	},
 
-	hoverTextStyle: { // Specific to hover labels
-		overflow: true,
-		font: '14px Calibri,sans-serif',
-		backgroundStroke: new ol.style.Stroke({
-			color: 'blue',
-		}),
-	},
+	// hoverStyle: {},
 };
 //TODO pas de labels sur certains group
 
@@ -93,14 +96,14 @@ function layerVector(opt) {
 	// Style when hovering a feature
 	options.hoverStyle = Object.assign({
 		text: new ol.style.Text(Object.assign({},
-			options.labelStyle,
+			options.labelTextStyle,
 			options.hoverTextStyle
 		)),
 	}, opt.hoverStyle);
 
 	function style(feature) {
 		//HACK save style in the feature for hover display
-		feature.hoverStyle = options.hoverStyle;
+		feature.hoverStyle = options.hoverStyle; //TODO BUG hoverStyle ne peut pas être une fonction(feature)
 
 		const properties = feature.getProperties(),
 			style = typeof options.style == 'function' ?
@@ -121,8 +124,8 @@ function layerVector(opt) {
 
 		// Add label if one is defined in the properties
 		if (properties.label) {
-			options.labelStyle.text = properties.label;
-			style.text = new ol.style.Text(options.labelStyle);
+			options.labelTextStyle.text = properties.label;
+			style.text = new ol.style.Text(options.labelTextStyle);
 		}
 
 		return new ol.style.Style(style);
@@ -270,7 +273,7 @@ function controlHover() {
 			titles = [];
 
 		if (feature.get('hover'))
-			// Big clusters
+			// Groups (clusters managed by the server)
 			titles.push(feature.get('hover'));
 		else
 		if (features.length > 1) {
@@ -310,7 +313,7 @@ function controlHover() {
 		if (feature) {
 			const features = feature.get('features') || [feature],
 				link = features[0].get('link'),
-				center = feature.getGeometry().getCoordinates();
+				geom = feature.getGeometry();
 
 			if (evt.type == 'click') {
 				// Single feature
@@ -325,10 +328,10 @@ function controlHover() {
 				}
 
 				// Cluster
-				else
+				else if (geom)
 					map.getView().animate({
 						zoom: map.getView().getZoom() + 2,
-						center: center,
+						center: geom.getCoordinates(),
 					});
 			}
 		}

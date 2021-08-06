@@ -63,7 +63,7 @@ function layerWriAreas(options) {
 						parseInt(hex.substring(5, 7), 16),
 						0.5,
 					].join(',') + ')',
-				})
+				}),
 			};
 		},
 	}, options, {
@@ -133,4 +133,52 @@ function layerChem(options) {
 		layerChemGroup(options),
 		100
 	);
+}
+
+/**
+ * Site alpages.info
+ */
+function layerAlpages(options) {
+	return layerVector(Object.assign({
+		urlHost: '//alpages.info/',
+		url: function url(options, bbox, selection) {
+			return options.urlHost +
+				'ext/Dominique92/GeoBB/gis.php?forums=3,4,5,6&limit=500' +
+				'&bbox=' + bbox.join(',');
+		},
+		strategy: ol.loadingstrategy.bbox,
+		properties: function(f, options) {
+			if (f.get('id'))
+				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+			f.set('label', f.get('name')); //DCMM
+			f.set('hover', f.get('name'));
+		},
+		style: function(feature) {
+			const hex = feature.get('color');
+			if (hex)
+				return {
+					fill: new ol.style.Fill({
+						color: 'rgba(' + [
+							parseInt(hex.substring(1, 3), 16),
+							parseInt(hex.substring(3, 5), 16),
+							parseInt(hex.substring(5, 7), 16),
+							0.5,
+						].join(',') + ')',
+					}),
+				};
+		},
+		hoverStyle: function(feature) {
+			const hex = feature.get('couleur');
+			return {
+				fill: new ol.style.Fill({
+					color: 'rgba(' + [
+						parseInt(hex.substring(1, 3), 16),
+						parseInt(hex.substring(3, 5), 16),
+						parseInt(hex.substring(5, 7), 16),
+						0.7,
+					].join(',') + ')',
+				}),
+			};
+		},
+	}, options));
 }
