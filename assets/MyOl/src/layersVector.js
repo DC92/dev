@@ -38,6 +38,13 @@ function layerWriPoi(options) {
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
+		hoverTextStyle: {
+			overflow: true,
+			font: '14px Calibri,sans-serif',
+			backgroundStroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+		},
 	}, options));
 }
 
@@ -65,6 +72,13 @@ function layerWriAreas(options) {
 					].join(',') + ')',
 				}),
 			};
+		},
+		hoverTextStyle: {
+			overflow: true,
+			font: '14px Calibri,sans-serif',
+			backgroundStroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
 		},
 	}, options, {
 		selectorName: null, // Forced
@@ -112,6 +126,9 @@ function layerChemPoi(options) {
 				width: 3,
 			}),
 		},
+		hoverTextStyle: {
+			font: '14px Calibri,sans-serif',
+		},
 	}, options));
 }
 
@@ -150,7 +167,7 @@ function layerAlpages(options) {
 		properties: function(f, options) {
 			if (f.get('id'))
 				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
-			f.set('label', f.get('name')); //DCMM
+			f.set('label', f.get('name'));
 			f.set('hover', f.get('name'));
 		},
 		style: function(feature) {

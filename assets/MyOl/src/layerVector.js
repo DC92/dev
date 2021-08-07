@@ -1,28 +1,34 @@
 /**
- * Misc default styles options
+ * Layer to display remote geoJson
+ * Styles, icons & labels
  */
-var myStyleOptions = {
-	//style: {}, // Base style : Object | function(feature)
-	//TODO BUG voir pourquoi on ne peut pas itérer sur 'style'
+function layerVector(opt) {
+	const options = Object.assign({
+			format: new ol.format.GeoJSON(), // Default
+		}, opt, { // Optional
+			url: url, // Forced
+		}),
+		// Source & layer
+		source = new ol.source.Vector(options),
+		layer = new ol.layer.Vector({
+			source: source,
+			style: style,
+		});
 
-	labelTextStyle: {
+	//HACK Save options for further use
+	layer.options = options; //BEST avoid
+
+	// Compute style options
+	options.labelTextStyle = Object.assign({
 		textBaseline: 'bottom',
 		offsetY: -13, // Compensate the bottom textBaseline
 		padding: [1, 3, 0, 3],
 		backgroundFill: new ol.style.Fill({
 			color: 'yellow',
 		}),
-	},
+	}, opt.labelTextStyle);
 
-	hoverTextStyle: { // (added to labelTextStyle)
-		overflow: true,
-		font: '14px Calibri,sans-serif',
-		backgroundStroke: new ol.style.Stroke({
-			color: 'blue',
-		}),
-	},
-
-	clusterStyle: {
+	options.clusterStyle = Object.assign({
 		image: new ol.style.Circle({
 			radius: 14,
 			stroke: new ol.style.Stroke({
@@ -35,28 +41,15 @@ var myStyleOptions = {
 		text: new ol.style.Text({
 			font: '14px Calibri,sans-serif',
 		}),
-	},
+	}, opt.clusterStyle);
 
-	// hoverStyle: {},
-};
-//TODO pas de labels sur certains group
-
-/**
- * Layer to display remote geoJson
- * Styles, icons & labels
- */
-function layerVector(opt) {
-	// Source & layer
-	const options = Object.assign({
-			format: new ol.format.GeoJSON(), // Default
-		}, opt, { // Optional
-			url: url, // Forced
-		}),
-		source = new ol.source.Vector(options),
-		layer = new ol.layer.Vector({
-			source: source,
-			style: style,
-		});
+	// Style when hovering a feature
+	options.hoverStyle = Object.assign({
+		text: new ol.style.Text(Object.assign({},
+			options.labelTextStyle,
+			options.hoverTextStyle
+		)),
+	}, opt.hoverStyle);
 
 	// Url args selector
 	if (options.selectorName)
@@ -86,21 +79,6 @@ function layerVector(opt) {
 				options.properties(evt.features[p], options);
 		});
 
-	// Compute style options
-	for (let o in myStyleOptions)
-		options[o] = Object.assign({},
-			myStyleOptions[o],
-			opt[o]
-		);
-
-	// Style when hovering a feature
-	options.hoverStyle = Object.assign({
-		text: new ol.style.Text(Object.assign({},
-			options.labelTextStyle,
-			options.hoverTextStyle
-		)),
-	}, opt.hoverStyle);
-
 	function style(feature) {
 		//HACK save style in the feature for hover display
 		feature.hoverStyle = options.hoverStyle; //TODO BUG hoverStyle ne peut pas être une fonction(feature)
@@ -124,15 +102,12 @@ function layerVector(opt) {
 
 		// Add label if one is defined in the properties
 		if (properties.label) {
-			options.labelTextStyle.text = properties.label;
+			options.labelTextStyle.text = properties.label; //TODO convertir htmlentities
 			style.text = new ol.style.Text(options.labelTextStyle);
 		}
 
 		return new ol.style.Style(style);
 	}
-
-	//HACK Save options for further use
-	layer.options = options; //BEST avoid
 
 	return layer;
 }
@@ -285,9 +260,13 @@ function controlHover() {
 			// Point
 			titles.push(features[0].get('hover'));
 
-		feature.hoverStyle.text.setText(!titles.length || titles.length > 5 ?
-			'Click to zoom' :
-			titles.join('\n')
+		//HACK to render the html entities //TODO généraliser ??
+		const elTitles = document.createElement('span');
+		elTitles.innerHTML = titles.join('\n');
+
+		feature.hoverStyle.text.setText(!titles.length || feature.get('group') || titles.length > 5 ?
+			'Cliquer pour zoomer' :
+			elTitles.innerHTML //BEST ??? insérer des liens ???
 		);
 
 		return new ol.style.Style(feature.hoverStyle);
