@@ -1,6 +1,13 @@
 /**
  * Layer to display remote geoJson
  * Styles, icons & labels
+ *
+ * options:
+ * - All source.Vector options : format, strategy, attributions, ...
+ * - selectorName : <input name="selectorName"> url arguments selector
+ * - Style, labelTextStyle : Style of the features
+ * - hoverStyle, hoverTextStyle : Style when hovering the features
+ * - clusterStyle : Style of the cluster bullets
  */
 function layerVector(opt) {
 	const options = Object.assign({
@@ -14,9 +21,6 @@ function layerVector(opt) {
 			source: source,
 			style: style,
 		});
-
-	//HACK Save options for further use
-	layer.options = options; //BEST avoid
 
 	// Compute style options
 	options.labelTextStyle = Object.assign({
@@ -50,6 +54,9 @@ function layerVector(opt) {
 			options.hoverTextStyle
 		)),
 	}, opt.hoverStyle);
+
+	//HACK Save options for further use
+	layer.options = options; //BEST avoid
 
 	// Url args selector
 	if (options.selectorName)
@@ -137,12 +144,15 @@ function layerVectorCluster(opt) {
 			visible: fullLayer.getVisible(),
 		});
 
-	//HACK report setVisible
+	//HACK propagate setVisible
 	fullLayer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
 	});
 
-	options.hoverStyle = Object.assign(fullLayer.options.hoverStyle, opt.hoverStyle);
+	options.hoverStyle = Object.assign(
+		fullLayer.options.hoverStyle,
+		opt.hoverStyle
+	);
 
 	function centerPoint(feature) {
 		// Generate a center point to manage clusterisations
