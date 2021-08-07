@@ -155,6 +155,7 @@ function layerChem(options) {
 /**
  * Site alpages.info
  */
+//TODO option selection par défaut (pas de sélecteur ou sélecteur binaire)
 function layerAlpages(options) {
 	return layerVector(Object.assign({
 		urlHost: '//alpages.info/',
@@ -179,7 +180,7 @@ function layerAlpages(options) {
 							parseInt(hex.substring(1, 3), 16),
 							parseInt(hex.substring(3, 5), 16),
 							parseInt(hex.substring(5, 7), 16),
-							0.5,
+							0.2,
 						].join(',') + ')',
 					}),
 				};
