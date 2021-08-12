@@ -3,10 +3,10 @@
  */
 function layerWriPoi(options) {
 	return layerVectorCluster(Object.assign({
-		urlHost: '//www.refuges.info/',
+		host: 'www.refuges.info',
 		url: function url(options, bbox, selection) {
-			return options.urlHost +
-				'api/bbox?nb_points=all' +
+			return '//' + options.host +
+				'/api/bbox?nb_points=all' +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
@@ -32,13 +32,13 @@ function layerWriPoi(options) {
 			f.set('hover', hover.join('\n'));
 
 			// Other displays
-			f.set('icon', options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
+			f.set('icon', '//' + options.host + '/images/icones/' + f.get('type').icone + '.svg');
 			f.set('name', f.get('nom'));
 			f.set('label', f.get('nom'));
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
-		hoverTextStyle: {
+		hoverTextStyleOptions: {
 			overflow: true,
 			font: '14px Calibri,sans-serif',
 			backgroundStroke: new ol.style.Stroke({
@@ -50,9 +50,9 @@ function layerWriPoi(options) {
 
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
-		urlHost: '//www.refuges.info/',
+		host: 'www.refuges.info',
 		url: function url(options) {
-			return options.urlHost + 'api/polygones?type_polygon=1';
+			return '//' + options.host + '/api/polygones?type_polygon=1';
 		},
 		properties: function(f) {
 			f.set('label', f.get('nom'));
@@ -60,7 +60,7 @@ function layerWriAreas(options) {
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
-		style: function(feature) {
+		styleOptions: function(feature) {
 			const hex = feature.get('couleur');
 			return {
 				fill: new ol.style.Fill({
@@ -73,7 +73,7 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		hoverTextStyle: {
+		hoverTextStyleOptions: {
 			overflow: true,
 			font: '14px Calibri,sans-serif',
 			backgroundStroke: new ol.style.Stroke({
@@ -98,10 +98,10 @@ function layerWri(options) {
  */
 function layerChemPoi(options) {
 	return layerVectorCluster(Object.assign({
-		urlHost: '//chemineur.fr/',
+		host: 'chemineur.fr',
 		url: function url(options, bbox, selection) {
-			return options.urlHost +
-				'ext/Dominique92/GeoBB/gis2.php?' +
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=simple&limit=1000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
@@ -109,24 +109,24 @@ function layerChemPoi(options) {
 		strategy: ol.loadingstrategy.bbox,
 		properties: function(f, options) {
 			if (f.get('type'))
-				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
+				f.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
 			if (f.get('id'))
-				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+				f.set('link', '//' + options.host + '/viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
 		},
-		style: {
+		styleOptions: {
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),
 		},
-		hoverStyle: {
+		hoverStyleOptions: {
 			stroke: new ol.style.Stroke({
 				color: 'red',
 				width: 3,
 			}),
 		},
-		hoverTextStyle: {
+		hoverTextStyleOptions: {
 			font: '14px Calibri,sans-serif',
 		},
 	}, options));
@@ -134,10 +134,10 @@ function layerChemPoi(options) {
 
 function layerChemGroup(options) {
 	return layerVectorCluster(Object.assign({
-		urlHost: '//chemineur.fr/',
+		host: 'chemineur.fr',
 		url: function url(options, bbox, selection) {
-			return options.urlHost +
-				'ext/Dominique92/GeoBB/gis2.php?' +
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=group&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
@@ -158,20 +158,20 @@ function layerChem(options) {
 //TODO option selection par défaut (pas de sélecteur ou sélecteur binaire)
 function layerAlpages(options) {
 	return layerVector(Object.assign({
-		urlHost: '//alpages.info/',
+		host: 'alpages.info',
 		url: function url(options, bbox, selection) {
-			return options.urlHost +
-				'ext/Dominique92/GeoBB/gis.php?forums=3,4,5,6&limit=500' +
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis.php?forums=3,4,5,6&limit=500' +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
 		properties: function(f, options) {
 			if (f.get('id'))
-				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
+				f.set('link', '//' + options.host + '/viewtopic.php?t=' + f.get('id'));
 			f.set('label', f.get('name'));
 			f.set('hover', f.get('name'));
 		},
-		style: function(feature) {
+		styleOptions: function(feature) {
 			const hex = feature.get('color');
 			if (hex)
 				return {
@@ -185,7 +185,7 @@ function layerAlpages(options) {
 					}),
 				};
 		},
-		hoverStyle: function(feature) {
+		hoverStyleOptions: function(feature) {
 			const hex = feature.get('couleur');
 			return {
 				fill: new ol.style.Fill({

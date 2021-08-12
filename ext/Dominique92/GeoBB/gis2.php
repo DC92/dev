@@ -23,7 +23,7 @@ $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 //$exclude = request_var ('exclude', 0); // topic_id to exclude
 $select = request_var ('select', ''); // Post to display
 $format = request_var ('format', 'geojson'); // Format de sortie. Par défaut geojson
-$layer = request_var ('layer', 'full'); // full | simple | group
+$layer = request_var ('layer', 'full'); // full | simple | cluster
 $limit = request_var ('limit', 250); // Nombre de points maximum
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
@@ -60,8 +60,8 @@ while ($row = $db->sql_fetchrow($result)) {
 }
 ////////////////////////////////////////////////////////////////
 
-// Groups (sort of cluster managed at the server level)
-if ($layer == 'group') {
+// Features cluster managed at the server level
+if ($layer == 'cluster') {
 	$sql="
 	SELECT count(*) AS num, geo_region,
 		ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
@@ -82,7 +82,7 @@ if ($layer == 'group') {
 			'id' => $row['geo_region'],
 			'geometry' => trunc (json_decode ($row['geocenter'])),
 			'properties' => [
-				'group' => $row['num'],
+				'cluster' => $row['num'],
 			],
 		];
 	}
