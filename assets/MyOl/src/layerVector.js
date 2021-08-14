@@ -18,27 +18,29 @@
  * cluster: several features too close to be displayed alone (number)
  */
 function layerVector(options) {
-	const defaultLabelTextOptions = {
+	const defaultOptions = {
+			format: new ol.format.GeoJSON(),
+		},
+		// Yellow label
+		defaultLabelTextOptions = {
 			textBaseline: 'bottom',
 			offsetY: -13, // Compensate the bottom textBaseline
 			padding: [1, 3, 0, 3],
+			font: '14px Calibri,sans-serif',
 			backgroundFill: new ol.style.Fill({
 				color: 'yellow',
 			}),
 		},
-		defaultOptions = {
-			format: new ol.format.GeoJSON(),
-		},
+		// Basic feature format
 		defaultStyleOptions = {
 			textOptions: defaultLabelTextOptions,
 		},
+		// Hover display "hover" properties on another format
 		defaultHoverStyleOptions = {
-			// In addition to defaultStyleOptions
 			hover: true, // Select label | hover as text to be display
-			textOptions: {
-				font: '14px Calibri,sans-serif',
-			},
+			textOptions: defaultLabelTextOptions,
 		},
+		// Cluster bullet
 		defaultClusterStyleOptions = {
 			image: new ol.style.Circle({
 				radius: 14,
@@ -52,11 +54,6 @@ function layerVector(options) {
 			text: new ol.style.Text({
 				font: '14px Calibri,sans-serif',
 			}),
-		},
-		defaultClusterHoverStyleOptions = {
-			// In addition to defaultClusterStyleOptions
-			hover: true, // Select label | hover as text to be display
-			textOptions: defaultLabelTextOptions,
 		},
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 
@@ -72,8 +69,7 @@ function layerVector(options) {
 			style: style,
 		});
 
-	// Url args selector
-	//TODO comment
+	// Modify a geoJson url argument depending on checkboxes
 	if (options.selectorName)
 		memCheckbox(options.selectorName, function(selection) {
 			layer.setVisible(selection.length > 0);
@@ -81,13 +77,16 @@ function layerVector(options) {
 				source.refresh();
 		});
 
-	// Convert specific properties to basic one ("icon", "label, "link", "cluster", ...)
+	// Convert server properties to the one rendered ("icon", "label, "hover", "link", "cluster", ...)
+	//TODO rename display
+	//TODO pas property mais feature.NOM
 	if (typeof options.properties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)
 				options.properties(evt.features[p], options);
 		});
 
+	// Calculate the geoJson url
 	function url(extent, resolution, projection) {
 		return options.url(
 			options,
@@ -102,35 +101,23 @@ function layerVector(options) {
 	}
 
 	function style(feature, resolution) {
-		// Cluster: grouped features
-		if (feature.get('cluster')) {
-			// Precompile hover style
-			feature.hoverStyleFunction = function(feature, resolution) {
-		//		feature.set('hover', 'WW hover');
-		//		feature.set('label', 'WW label');
-		//		feature.set('cluster', 'WW cluster '+feature.get('cluster'));
-				return displayStyle(feature, resolution, [
-					defaultClusterStyleOptions, options.clusterStyleOptions,
-					defaultClusterHoverStyleOptions, options.clusterHoverStyleOptions
-				]);
-			};
-			// Calculate display style
+		// Hover style
+		feature.hoverStyleFunction = function(feature, resolution) {
+			return displayStyle(feature, resolution, [
+				defaultHoverStyleOptions, options.hoverStyleOptions
+			]);
+		};
+
+		if (feature.get('cluster')) // Grouped features
+			// Cluster style
 			return displayStyle(feature, resolution, [
 				defaultClusterStyleOptions, options.clusterStyleOptions
 			]);
-		} else {
-			// Precompile hover style
-			feature.hoverStyleFunction = function(feature, resolution) {
-				return displayStyle(feature, resolution, [
-					defaultStyleOptions, options.styleOptions,
-					defaultHoverStyleOptions, options.hoverStyleOptions
-				]);
-			};
-			// Calculate display style
+		else
+			// Basic display style
 			return displayStyle(feature, resolution, [
 				defaultStyleOptions, options.styleOptions
 			]);
-		}
 	}
 
 	function displayStyle(feature, resolution, styles) {
@@ -138,7 +125,7 @@ function layerVector(options) {
 			styleOptions = {},
 			textOptions = {};
 
-		// Concatenate the list of styles
+		// Compile the list of styles & default
 		for (let s in styles)
 			if (styles[s]) {
 				Object.assign(styleOptions,
@@ -156,15 +143,20 @@ function layerVector(options) {
 				src: properties.icon,
 			});
 
-		// Cluster: grouped features
-		if (properties.cluster) 
-			elLabel.innerHTML = properties.cluster ;
 		// Hover
-		else if(styleOptions.hover)
-			elLabel.innerHTML = properties.hover  ;
+		if (styleOptions.hover)
+			elLabel.innerHTML = properties.hover;
+
+		// Cluster: grouped features
+		else if (properties.cluster)
+			elLabel.innerHTML = properties.cluster;
+
 		// Labels
+		else if (properties.label)
+			elLabel.innerHTML = properties.label;
+
 		else
-			elLabel.innerHTML =   properties.label;
+			elLabel.innerHTML = '';
 
 		// Feature label
 		if (elLabel.innerHTML) {
@@ -173,37 +165,6 @@ function layerVector(options) {
 		}
 
 		return new ol.style.Style(styleOptions);
-	}
-
-	// Callback function run when hovering the feature
-	function WWWWWWWWWWhoverStyleLocal(feature) { //TODO DELETE
-		const features = feature.get('features') || [feature],
-			titles = [];
-
-		if (feature.get('hover'))
-			// Groups (clusters managed by the server)
-			titles.push(feature.get('hover'));
-		else
-		if (features.length > 1) {
-			// Clusters
-			for (let f in features)
-				if (features[f].get('name'))
-					titles.push(features[f].get('name'));
-		} else
-			// Point
-			titles.push(features[0].get('hover'));
-
-		//HACK to render the html entities //TODO généraliser ??
-		const elTitles = document.createElement('span');
-		elTitles.innerHTML = titles.join('\n');
-
-		if (options.hoverStyleOptions.text)
-			options.hoverStyleOptions.text.setText(!titles.length || feature.get('group') || titles.length > 5 ?
-				'Cliquer pour zoomer' :
-				elTitles.innerHTML
-			);
-
-		return new ol.style.Style(options.hoverStyleOptions);
 	}
 
 	//HACK Save options for further use (layerVectorCluster)
@@ -215,20 +176,12 @@ function layerVector(options) {
 /**
  * Cluster close features
  */
-function layerVectorCluster(opt) {
-	//TODO réduction distance clusters quand zoome plus prés
-	const fullLayer = layerVector(opt), // Hidden layer with all the features
-
-		// Base options
-		options = Object.assign({},
-			fullLayer.options, { // Get default options from the layerVector
-				clusterDistance: 50,
-			}, opt), // Get declaration options
-
-		// Clusterized source & layer
-		clusterSource = new ol.source.Cluster({
-			distance: options.clusterDistance,
-			source: fullLayer.getSource(),
+function layerVectorCluster(layer, distance) {
+	// Clusterized source & layer
+	const clusterSource = new ol.source.Cluster({
+			distance: distance || layer.options.distance || 50,
+			//TODO réduction distance clusters quand zoome plus prés
+			source: layer.getSource(),
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
 				return new ol.geom.Point(
@@ -241,23 +194,32 @@ function layerVectorCluster(opt) {
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: clusterStyleOptions,
-			visible: fullLayer.getVisible(),
+			visible: layer.getVisible(),
 		});
 
 	//HACK propagate setVisible
-	fullLayer.on('change:visible', function() {
+	layer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
 	});
 
 	function clusterStyleOptions(feature, resolution) {
 		const features = feature.get('features'),
-			style = fullLayer.getStyleFunction();
+			style = layer.getStyleFunction(),
+			titles = [];
 
 		if (features) {
-			if (features.length > 1)
-				// Cluster
+			if (features.length > 5) {
+				// Big cluster
+				feature.set('cluster', features.length); //TODO som of groups !
+				feature.set('hover', 'Cliquer pour zoomer');
+			} else if (features.length > 1) {
 				feature.set('cluster', features.length);
-			 else {
+				for (let f in features)
+					if (features[f].get('name'))
+						titles.push(features[f].get('name'));
+
+				feature.set('hover', titles.join('\n'));
+			} else {
 				// Single feature (point, line or poly)
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
 					if (features[0].ol_uid == f.ol_uid)
@@ -352,19 +314,19 @@ function controlHover() {
 				if (features.length == 1 && link) {
 					if (evt.originalEvent.ctrlKey)
 						window.open(link, '_blank').focus();
-					else if (evt.originalEvent.shiftKey)
+					else
+					if (evt.originalEvent.shiftKey)
 						// To specify feature open a new window
 						window.open(link, '_blank', 'resizable=yes').focus();
 					else
 						window.location = link;
-				}
-
-				// Cluster
-				else if (geom)
-					map.getView().animate({
-						zoom: map.getView().getZoom() + 2,
-						center: geom.getCoordinates(),
-					});
+				} else
+					// Cluster
+					if (geom)
+						map.getView().animate({
+							zoom: map.getView().getZoom() + 2,
+							center: geom.getCoordinates(),
+						});
 			}
 		}
 

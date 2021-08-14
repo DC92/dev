@@ -2,7 +2,7 @@
  * Site refuges.info
  */
 function layerWriPoi(options) {
-	return layerVectorCluster(Object.assign({
+	return layerVector(Object.assign({
 		host: 'www.refuges.info',
 		url: function url(options, bbox, selection) {
 			return '//' + options.host +
@@ -33,17 +33,19 @@ function layerWriPoi(options) {
 
 			// Other displays
 			f.set('icon', '//' + options.host + '/images/icones/' + f.get('type').icone + '.svg');
-			f.set('name', f.get('nom'));
 			f.set('label', f.get('nom'));
+			f.set('name', f.get('nom')); // For cluster list
 			if (f.get('lien'))
 				f.set('link', f.get('lien'));
 		},
-		hoverTextStyleOptions: {
-			overflow: true,
-			font: '14px Calibri,sans-serif',
-			backgroundStroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
+		hoverStyleOptions: {
+			textOptions: {
+				overflow: true,
+				font: '14px Calibri,sans-serif',
+				backgroundStroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+			},
 		},
 	}, options));
 }
@@ -73,12 +75,13 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		hoverTextStyleOptions: {
-			overflow: true,
-			font: '14px Calibri,sans-serif',
-			backgroundStroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
+		hoverStyleOptions: {
+			textOptions: {
+				overflow: true,
+				backgroundStroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+			},
 		},
 	}, options, {
 		selectorName: null, // Forced
@@ -87,7 +90,7 @@ function layerWriAreas(options) {
 
 function layerWri(options) {
 	return layerFlip(
-		layerWriPoi(options),
+		layerVectorCluster(layerWriPoi(options)),
 		layerWriAreas(options),
 		100
 	);
@@ -97,7 +100,7 @@ function layerWri(options) {
  * Site chemineur.fr
  */
 function layerChemPoi(options) {
-	return layerVectorCluster(Object.assign({
+	return layerVector(Object.assign({
 		host: 'chemineur.fr',
 		url: function url(options, bbox, selection) {
 			return '//' + options.host +
@@ -121,19 +124,19 @@ function layerChemPoi(options) {
 			}),
 		},
 		hoverStyleOptions: {
+			textOptions: {
+				font: '14px Calibri,sans-serif',
+			},
 			stroke: new ol.style.Stroke({
 				color: 'red',
 				width: 3,
 			}),
 		},
-		hoverTextStyleOptions: {
-			font: '14px Calibri,sans-serif',
-		},
 	}, options));
 }
 
 function layerChemGroup(options) {
-	return layerVectorCluster(Object.assign({
+	return layerVector(Object.assign({
 		host: 'chemineur.fr',
 		url: function url(options, bbox, selection) {
 			return '//' + options.host +
@@ -146,8 +149,8 @@ function layerChemGroup(options) {
 
 function layerChem(options) {
 	return layerFlip(
-		layerChemPoi(options),
-		layerChemGroup(options),
+		layerVectorCluster(layerChemPoi(options)),
+		layerVectorCluster(layerChemGroup(options)),
 		100
 	);
 }
@@ -159,7 +162,7 @@ function layerChem(options) {
 function layerAlpages(options) {
 	return layerVector(Object.assign({
 		host: 'alpages.info',
-		url: function url(options, bbox, selection) {
+		url: function url(options, bbox) {
 			return '//' + options.host +
 				'/ext/Dominique92/GeoBB/gis.php?forums=3,4,5,6&limit=500' +
 				'&bbox=' + bbox.join(',');
@@ -168,7 +171,6 @@ function layerAlpages(options) {
 		properties: function(f, options) {
 			if (f.get('id'))
 				f.set('link', '//' + options.host + '/viewtopic.php?t=' + f.get('id'));
-			f.set('label', f.get('name'));
 			f.set('hover', f.get('name'));
 		},
 		styleOptions: function(feature) {
