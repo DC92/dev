@@ -210,13 +210,14 @@ function layerVectorCluster(layer, distance) {
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: clusterStyleOptions,
-			visible: layer.getVisible(),
+			//DCMM			visible: layer.getVisible(),
 		});
 
 	//HACK propagate setVisible
+	/*DCMM
 	layer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
-	});
+	});*/
 
 	function clusterStyleOptions(feature, resolution) {
 		const features = feature.get('features'),
@@ -255,6 +256,7 @@ function layerVectorCluster(layer, distance) {
 /**
  * Display different layers depending on the map resolution
  */
+/*DCMM
 function layerFlip(lowLayer, highLayer, limitResolution) {
 	let currentLayer;
 
@@ -281,7 +283,7 @@ function layerFlip(lowLayer, highLayer, limitResolution) {
 	});
 
 	return layer;
-}
+}*/
 
 /**
  * Control to display labels on hovering & click
@@ -308,6 +310,7 @@ function controlHover() {
 		map.addLayer(hoverLayer);
 
 		map.on(['pointermove', 'click'], mouseEvent);
+		map.getView().on('change:resolution', zoom);
 	};
 
 	let previousHoveredFeature;
@@ -357,6 +360,14 @@ function controlHover() {
 			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
 			previousHoveredFeature = feature;
 		}
+	}
+
+	function zoom() {
+		// Remove hovered feature
+		if (previousHoveredFeature)
+			hoverLayer.getSource().removeFeature(previousHoveredFeature);
+		map.getViewport().style.cursor = 'default';
+		previousHoveredFeature = null;
 	}
 
 	return control;

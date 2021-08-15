@@ -76,6 +76,9 @@ function layerWriAreas(options) {
 			};
 		},
 		hoverStyleOptions: {
+			fill: new ol.style.Fill({
+				color: 'rgba(0,0,0,0.3)',
+			}),
 			textOptions: {
 				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
