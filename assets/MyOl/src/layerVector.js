@@ -4,7 +4,7 @@
  *
  * Options:
  * All source.Vector options : format, strategy, attributions, ...
- * url: function(options, bbox, selection, extent, resolution, projection)
+ * url: function(extent, resolution, projection, options, bbox, selection)
  * selectorName : <input name="selectorName"> url arguments selector
  * styleOptions: Options of the style of the features (object = style options or function returning object)
  * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
@@ -17,10 +17,16 @@
  * link: url to go if feature is clicked
  * cluster: several features too close to be displayed alone (number)
  */
-function layerVector(options) {
-	const defaultOptions = {
-			format: new ol.format.GeoJSON(),
-		},
+function layerVector(opt) {
+	const options = Object.assign({ // Default
+				format: new ol.format.GeoJSON(),
+				lowestResolution: 0,
+				higestResolution: Infinity,
+			},
+			opt, { // Options
+				url: url, // Forced
+			}
+		),
 		// Yellow label
 		defaultLabelTextOptions = {
 			textBaseline: 'bottom',
@@ -60,12 +66,7 @@ function layerVector(options) {
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 
 		// Source & layer
-		source = new ol.source.Vector(Object.assign(
-			defaultOptions,
-			options, {
-				url: url, // Forced
-			}
-		)),
+		source = new ol.source.Vector(options),
 		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
@@ -88,17 +89,32 @@ function layerVector(options) {
 
 	// Calculate the geoJson url
 	function url(extent, resolution, projection) {
-		return options.url(
-			options,
+		return opt.url(
+			extent, resolution, projection,
+			options, // Layer options
 			ol.proj.transformExtent( // BBox
 				extent,
 				projection.getCode(),
 				'EPSG:4326' // Received projection
 			),
-			readCheckbox(options.selectorName),
-			extent, resolution, projection
+			readCheckbox(options.selectorName)
 		);
 	}
+
+	// Tune parameters following the zoom leval
+	let previousVisible;
+	layer.render = function(frameState, target) {
+		const resolution = frameState.pixelToCoordinateTransform[0],
+			visible = options.lowestResolution < resolution && resolution < options.higestResolution;
+
+		if (previousVisible != visible)
+			layer.setStyle(visible ? style : null);
+
+		previousVisible = visible;
+
+		//HACK to be informed of render to be run
+		return ol.layer.Vector.prototype.render.call(this, frameState, target);
+	};
 
 	function style(feature, resolution) {
 		// Hover style

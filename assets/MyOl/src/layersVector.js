@@ -4,7 +4,7 @@
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
-		url: function url(options, bbox, selection) {
+		url: function(extent, resolution, projection, options, bbox, selection) {
 			return '//' + options.host +
 				'/api/bbox?nb_points=all' +
 				'&type_points=' + selection.join(',') +
@@ -52,9 +52,10 @@ function layerWriPoi(options) {
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
-		url: function url(options) {
+		url: function(extent, resolution, projection, options) {
 			return '//' + options.host + '/api/polygones?type_polygon=1';
 		},
+		lowestResolution: 500,
 		properties: function(f) {
 			f.set('label', f.get('nom'));
 			f.set('hover', f.get('nom'));
@@ -100,7 +101,7 @@ function layerWri(options) {
 function layerChemPoi(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
-		url: function url(options, bbox, selection) {
+		url: function(extent, resolution, projection, options, bbox, selection) {
 			return '//' + options.host +
 				'/ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=simple&limit=1000' +
@@ -137,7 +138,7 @@ function layerChemGroup(options) {
 	//TODO ne marche pas
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
-		url: function url(options, bbox, selection) {
+		url: function(extent, resolution, projection, options, bbox, selection) {
 			return '//' + options.host +
 				'/ext/Dominique92/GeoBB/gis2.php?' +
 				'layer=group&limit=1000000' +
@@ -161,7 +162,7 @@ function layerChem(options) {
 function layerAlpages(options) {
 	return layerVector(Object.assign({
 		host: 'alpages.info',
-		url: function url(options, bbox) {
+		url: function(extent, resolution, projection, options, bbox) {
 			return '//' + options.host +
 				'/ext/Dominique92/GeoBB/gis.php?forums=3,4,5,6&limit=500' +
 				'&bbox=' + bbox.join(',');
