@@ -78,8 +78,6 @@ function layerVector(options) {
 		});
 
 	// Convert server properties to the one rendered ("icon", "label, "hover", "link", "cluster", ...)
-	//TODO rename display
-	//TODO pas property mais feature.NOM
 	if (typeof options.properties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)

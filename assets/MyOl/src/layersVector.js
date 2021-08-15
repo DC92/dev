@@ -136,6 +136,7 @@ function layerChemPoi(options) {
 }
 
 function layerChemGroup(options) {
+	//TODO ne marche pas
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
 		url: function url(options, bbox, selection) {
@@ -174,6 +175,7 @@ function layerAlpages(options) {
 			f.set('hover', f.get('name'));
 		},
 		styleOptions: function(feature) {
+			//TODO icone des cabanes
 			const hex = feature.get('color');
 			if (hex)
 				return {
@@ -188,17 +190,18 @@ function layerAlpages(options) {
 				};
 		},
 		hoverStyleOptions: function(feature) {
-			const hex = feature.get('couleur');
-			return {
-				fill: new ol.style.Fill({
-					color: 'rgba(' + [
-						parseInt(hex.substring(1, 3), 16),
-						parseInt(hex.substring(3, 5), 16),
-						parseInt(hex.substring(5, 7), 16),
-						0.7,
-					].join(',') + ')',
-				}),
-			};
+			const hex = feature.get('color');
+			if (hex)
+				return {
+					fill: new ol.style.Fill({
+						color: 'rgba(' + [
+							parseInt(hex.substring(1, 3), 16),
+							parseInt(hex.substring(3, 5), 16),
+							parseInt(hex.substring(5, 7), 16),
+							0.7,
+						].join(',') + ')',
+					}),
+				};
 		},
 	}, options));
 }
