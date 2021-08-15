@@ -38,7 +38,9 @@ function layerVector(options) {
 		// Hover display "hover" properties on another format
 		defaultHoverStyleOptions = {
 			hover: true, // Select label | hover as text to be display
-			textOptions: defaultLabelTextOptions,
+			textOptions: {
+				overflow: true, // Force label display of little polygons
+			},
 		},
 		// Cluster bullet
 		defaultClusterStyleOptions = {
@@ -102,7 +104,7 @@ function layerVector(options) {
 		// Hover style
 		feature.hoverStyleFunction = function(feature, resolution) {
 			return displayStyle(feature, resolution, [
-				defaultHoverStyleOptions, options.hoverStyleOptions
+				defaultStyleOptions, defaultHoverStyleOptions, options.hoverStyleOptions
 			]);
 		};
 

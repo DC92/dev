@@ -40,7 +40,6 @@ function layerWriPoi(options) {
 		},
 		hoverStyleOptions: {
 			textOptions: {
-				overflow: true,
 				font: '14px Calibri,sans-serif',
 				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
@@ -77,7 +76,6 @@ function layerWriAreas(options) {
 		},
 		hoverStyleOptions: {
 			textOptions: {
-				overflow: true,
 				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
 				}),
