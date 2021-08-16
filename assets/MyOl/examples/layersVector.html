@@ -81,14 +81,13 @@ Based on https://openlayers.org
 
 if(0)	map.addLayer(layerWriPoi({
 			selectorName: 'wri-features',
-			maxResolution: 50,
 		}));
 if(01)	map.addLayer(layerVectorCluster(layerWriPoi({
 			selectorName: 'wri-features',
-			maxResolution: 50,
+			maxResolution: 100,
 		})));
 if(01)	map.addLayer(layerWriAreas({
-			minResolution: 50,
+			minResolution: 100,
 		}));
 
 if(0)	map.addLayer(layerChemPoi({

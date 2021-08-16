@@ -98,17 +98,6 @@ function layerVector(options) {
 				options.properties(evt.features[p], options);
 		});
 
-	/*
-	//TODO Tune parameters following the zoom level
-	let previousVisible;
-	layer.render = function(frameState, target) {
-		const resolution = frameState.pixelToCoordinateTransform[0];
-
-		//HACK to be informed of render to be run
-		return ol.layer.Vector.prototype.render.call(this, frameState, target);
-	};
-	*/
-
 	// Callback function for the layer
 	function style(feature, resolution) {
 		// Hover style
@@ -191,7 +180,6 @@ function layerVectorCluster(layer, distance) {
 	// Clusterized source & layer
 	const clusterSource = new ol.source.Cluster({
 			distance: distance || layer.options.distance || 50,
-			//TODO réduction distance clusters quand zoome plus prés
 			source: layer.getSource(),
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
@@ -208,6 +196,17 @@ function layerVectorCluster(layer, distance) {
 			},
 			layer.options));
 
+	// Tune the clustering distance following the zoom level
+	let previousResolution;
+	clusterLayer.on('prerender', function(evt) {
+		const resolution = evt.frameState.viewState.resolution;
+
+		if (previousResolution != resolution) // Only when changed
+			clusterSource.setDistance(Math.max(1, Math.min(clusterSource.getDistance(), resolution)));
+
+		previousResolution = resolution;
+	});
+
 	// Callback function for the layer
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
@@ -220,6 +219,7 @@ function layerVectorCluster(layer, distance) {
 				feature.set('cluster', features.length); //TODO som of groups !
 				feature.set('hover', 'Cliquer pour zoomer');
 			} else if (features.length > 1) {
+				// 2 to 5 features cluster
 				feature.set('cluster', features.length);
 				for (let f in features)
 					if (features[f].get('name'))
@@ -232,9 +232,11 @@ function layerVectorCluster(layer, distance) {
 					if (features[0].ol_uid == f.ol_uid)
 						return true;
 				});
+
 				if (!featureAlreadyExists)
 					clusterSource.addFeature(features[0]);
-				return; // Dont display that one !!!
+
+				return; // Dont display that one, it will display the added one
 			}
 		}
 
