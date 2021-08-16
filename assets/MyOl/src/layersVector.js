@@ -97,17 +97,12 @@ function layerChemPoi(options) {
 		host: 'chemineur.fr',
 		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=simple&limit=1000' +
+				'/ext/Dominique92/GeoBB/gis2.php?cluster=300' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
 		properties: function(f, options) {
-			if (f.get('type'))
-				f.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
-			if (f.get('id'))
-				f.set('link', '//' + options.host + '/viewtopic.php?t=' + f.get('id'));
 			f.set('hover', f.get('name'));
 		},
 		styleOptions: {
@@ -124,19 +119,6 @@ function layerChemPoi(options) {
 				color: 'red',
 				width: 3,
 			}),
-		},
-	}, options));
-}
-
-function layerChemGroup(options) {
-	//TODO ne marche pas
-	return layerVector(Object.assign({
-		host: 'chemineur.fr',
-		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
-			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=group&limit=1000000' +
-				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
 }
