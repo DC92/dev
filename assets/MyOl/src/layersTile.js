@@ -129,6 +129,7 @@ function layerIGN(layer, format, key) {
  * Requires myol:onadd
  */
 //BEST document all options in options = Object.assign
+//TODO use minResolution / maxResolution
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list

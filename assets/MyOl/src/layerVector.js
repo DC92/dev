@@ -4,7 +4,7 @@
  *
  * Options:
  * All source.Vector options : format, strategy, attributions, ...
- * url: function(extent, resolution, projection, options, bbox, selection)
+ * urlFunction: function(extent, resolution, projection, options, bbox, selection)
  * selectorName : <input name="selectorName"> url arguments selector
  * styleOptions: Options of the style of the features (object = style options or function returning object)
  * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
@@ -17,18 +17,9 @@
  * link: url to go if feature is clicked
  * cluster: several features too close to be displayed alone (number)
  */
-function layerVector(opt) {
-	const options = Object.assign({ // Default
-				format: new ol.format.GeoJSON(),
-				lowestResolution: 0,
-				higestResolution: Infinity,
-			},
-			opt, { // Options
-				url: url, // Forced
-			}
-		),
-		// Yellow label
-		defaultLabelTextOptions = {
+function layerVector(options) {
+	// Yellow label
+	const defaultLabelTextOptions = {
 			textBaseline: 'bottom',
 			offsetY: -13, // Compensate the bottom textBaseline
 			padding: [1, 3, 0, 3],
@@ -63,14 +54,20 @@ function layerVector(opt) {
 				font: '14px Calibri,sans-serif',
 			}),
 		},
-		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
+		//HACK to render the html entities in canvas
+		elLabel = document.createElement('span'),
 
 		// Source & layer
-		source = new ol.source.Vector(options),
-		layer = new ol.layer.Vector({
-			source: source,
-			style: style,
-		});
+		source = new ol.source.Vector(Object.assign({
+				url: url,
+				format: new ol.format.GeoJSON(),
+			},
+			options)),
+		layer = new ol.layer.Vector(Object.assign({
+				source: source,
+				style: style,
+			},
+			options));
 
 	// Modify a geoJson url argument depending on checkboxes
 	if (options.selectorName)
@@ -80,16 +77,9 @@ function layerVector(opt) {
 				source.refresh();
 		});
 
-	// Convert server properties to the one rendered ("icon", "label, "hover", "link", "cluster", ...)
-	if (typeof options.properties == 'function')
-		source.on('featuresloadend', function(evt) {
-			for (let p in evt.features)
-				options.properties(evt.features[p], options);
-		});
-
-	// Calculate the geoJson url
+	// Callback function for the layer
 	function url(extent, resolution, projection) {
-		return opt.url(
+		return options.urlFunction(
 			extent, resolution, projection,
 			options, // Layer options
 			ol.proj.transformExtent( // BBox
@@ -101,21 +91,25 @@ function layerVector(opt) {
 		);
 	}
 
-	// Tune parameters following the zoom leval
+	// Convert server properties to the one rendered ("icon", "label, "hover", "link", "cluster", ...)
+	if (typeof options.properties == 'function')
+		source.on('featuresloadend', function(evt) {
+			for (let p in evt.features)
+				options.properties(evt.features[p], options);
+		});
+
+	/*
+	//TODO Tune parameters following the zoom level
 	let previousVisible;
 	layer.render = function(frameState, target) {
-		const resolution = frameState.pixelToCoordinateTransform[0],
-			visible = options.lowestResolution < resolution && resolution < options.higestResolution;
-
-		if (previousVisible != visible)
-			layer.setStyle(visible ? style : null);
-
-		previousVisible = visible;
+		const resolution = frameState.pixelToCoordinateTransform[0];
 
 		//HACK to be informed of render to be run
 		return ol.layer.Vector.prototype.render.call(this, frameState, target);
 	};
+	*/
 
+	// Callback function for the layer
 	function style(feature, resolution) {
 		// Hover style
 		feature.hoverStyleFunction = function(feature, resolution) {
@@ -136,6 +130,7 @@ function layerVector(opt) {
 			]);
 	}
 
+	// Function to display different styles
 	function displayStyle(feature, resolution, styles) {
 		const properties = feature.getProperties(),
 			styleOptions = {},
@@ -207,19 +202,14 @@ function layerVectorCluster(layer, distance) {
 				);
 			},
 		}),
-		clusterLayer = new ol.layer.Vector({
-			source: clusterSource,
-			style: clusterStyleOptions,
-			//DCMM			visible: layer.getVisible(),
-		});
+		clusterLayer = new ol.layer.Vector(Object.assign({
+				source: clusterSource,
+				style: clusterStyle,
+			},
+			layer.options));
 
-	//HACK propagate setVisible
-	/*DCMM
-	layer.on('change:visible', function() {
-		clusterLayer.setVisible(this.getVisible());
-	});*/
-
-	function clusterStyleOptions(feature, resolution) {
+	// Callback function for the layer
+	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction(),
 			titles = [];
@@ -247,43 +237,12 @@ function layerVectorCluster(layer, distance) {
 				return; // Dont display that one !!!
 			}
 		}
+
 		return style(feature, resolution);
 	}
 
 	return clusterLayer;
 }
-
-/**
- * Display different layers depending on the map resolution
- */
-/*DCMM
-function layerFlip(lowLayer, highLayer, limitResolution) {
-	let currentLayer;
-
-	const layer = new ol.layer.Vector({
-		render: function(frameState, target) {
-			const resolution = frameState.pixelToCoordinateTransform[0],
-				newLayer = resolution < limitResolution ? lowLayer : highLayer;
-
-			if (currentLayer != newLayer) {
-				currentLayer = newLayer;
-				layer.setSource(newLayer.getSource());
-				layer.setStyle(newLayer.getStyle());
-				layer.setVisible(newLayer.getVisible());
-			}
-
-			//HACK report setVisible to the cluster
-			currentLayer.on('change:visible', function() {
-				layer.setVisible(this.getVisible());
-			});
-
-			//HACK to be informed of render to be run
-			return ol.layer.Vector.prototype.render.call(this, frameState, target);
-		},
-	});
-
-	return layer;
-}*/
 
 /**
  * Control to display labels on hovering & click

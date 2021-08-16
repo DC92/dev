@@ -75,19 +75,20 @@ Based on https://openlayers.org
 				//center: [260000, 6250000], // Paris
 				//center: [260000, 5800000], // France
 				//center: [300000, 6170000],
-				zoom: 8,
+				zoom: 12,
 			}),
 		});
 
 if(0)	map.addLayer(layerWriPoi({
 			selectorName: 'wri-features',
+			maxResolution: 50,
 		}));
-if(0)	map.addLayer(layerVectorCluster(layerWriPoi({
+if(01)	map.addLayer(layerVectorCluster(layerWriPoi({
 			selectorName: 'wri-features',
+			maxResolution: 50,
 		})));
-if(01)	map.addLayer(layerWriAreas());
-if(0)	map.addLayer(layerWri({
-			selectorName: 'wri-features',
+if(01)	map.addLayer(layerWriAreas({
+			minResolution: 50,
 		}));
 
 if(0)	map.addLayer(layerChemPoi({
@@ -97,9 +98,6 @@ if(0)	map.addLayer(layerVectorCluster(layerChemPoi({
 			selectorName: 'chem-features',
 		})));
 if(0)	map.addLayer(layerChemGroup({
-			selectorName: 'chem-features',
-		}));
-if(0)	map.addLayer(layerChem({
 			selectorName: 'chem-features',
 		}));
 
