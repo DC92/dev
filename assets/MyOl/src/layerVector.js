@@ -178,8 +178,9 @@ function layerVector(options) {
  */
 function layerVectorCluster(layer, distance) {
 	// Clusterized source & layer
-	const clusterSource = new ol.source.Cluster({
-			distance: distance || layer.options.distance || 50,
+	const clusterDistance = distance || layer.options.distance || 50,
+		clusterSource = new ol.source.Cluster({
+			distance: clusterDistance,
 			source: layer.getSource(),
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
@@ -196,13 +197,14 @@ function layerVectorCluster(layer, distance) {
 			},
 			layer.options));
 
-	// Tune the clustering distance following the zoom level
+	// Tune the clustering distance depending on the zoom level
 	let previousResolution;
 	clusterLayer.on('prerender', function(evt) {
-		const resolution = evt.frameState.viewState.resolution;
+		const resolution = evt.frameState.viewState.resolution,
+			distance = resolution < 10 ? 0 : Math.min(clusterDistance, resolution);
 
 		if (previousResolution != resolution) // Only when changed
-			clusterSource.setDistance(Math.max(1, Math.min(clusterSource.getDistance(), resolution)));
+			clusterSource.setDistance(distance);
 
 		previousResolution = resolution;
 	});

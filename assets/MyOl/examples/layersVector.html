@@ -82,19 +82,21 @@ Based on https://openlayers.org
 if(0)	map.addLayer(layerWriPoi({
 			selectorName: 'wri-features',
 		}));
-if(01)	map.addLayer(layerVectorCluster(layerWriPoi({
+if(0)	map.addLayer(layerVectorCluster(layerWriPoi({
 			selectorName: 'wri-features',
 			maxResolution: 100,
+			distance: 100,
 		})));
-if(01)	map.addLayer(layerWriAreas({
+if(0)	map.addLayer(layerWriAreas({
 			minResolution: 100,
 		}));
 
 if(0)	map.addLayer(layerChemPoi({
 			selectorName: 'chem-features',
 		}));
-if(0)	map.addLayer(layerVectorCluster(layerChemPoi({
+if(01)	map.addLayer(layerVectorCluster(layerChemPoi({
 			selectorName: 'chem-features',
+			distance: 100,
 		})));
 if(0)	map.addLayer(layerChemGroup({
 			selectorName: 'chem-features',
