@@ -22,13 +22,18 @@ Based on https://openlayers.org
 			height: 97vh;
 			height: 70vh;
 		}
+		.selector {
+			float: left;
+			border-right: solid;
+			padding: 5px
+		}
 	</style>
 </head>
 
 <body>
 	<div id="map"></div>
 
-	<div style="float:right">
+	<div class="selector">
 		Refuges.info
 		<input type="checkbox" name="wri-features" />
 		<ul>
@@ -42,7 +47,7 @@ Based on https://openlayers.org
 		</ul>
 	</div>
 
-	<div style="float:right">
+	<div class="selector">
 		Chemineur
 		<input type="checkbox" name="chem-features" />
 		<ul>
@@ -58,7 +63,12 @@ Based on https://openlayers.org
 		</ul>
 	</div>
 
-	<div style="float:right">
+	<div class="selector">
+		Pyrenees-refuges.com
+		<input type="checkbox" name="prc-features" />
+	</div>
+
+	<div class="selector">
 		Alpages.info
 		<input type="checkbox" name="alp-features" />
 		<ul>
@@ -82,49 +92,64 @@ Based on https://openlayers.org
 				controlHover(),
 			],
 			view: new ol.View({
-				center: [700000, 5700000], // Maurienne
-				//center: [260000, 6250000], // Paris
-				//center: [260000, 5800000], // France
-				//center: [300000, 6170000],
-				zoom: 12,
+				//center: [700000, 5700000], zoom: 12, // Maurienne / 12
+				//center: [260000, 6250000], zoom: 12, // Paris / 12
+				//center: [260000, 5800000], zoom: 7, // France / 7
+				center: [50000, 5300000], zoom: 12, //  Pyrénées / 8
 			}),
 		});
 
-if (0) map.addLayer(layerWriPoi({
-	selectorName: 'wri-features',
-}));
-if (0) map.addLayer(layerVectorCluster(
-	layerWriPoi({
-		selectorName: 'wri-features',
-		maxResolution: 100,
-		distance: 100,
-	})
-));
-if (0) map.addLayer(layerWriAreas({
-	minResolution: 100,
-}));
+		if (0)
+			map.addLayer(layerWriPoi({
+				selectorName: 'wri-features',
+			}));
 
-if (0) map.addLayer(layerChemPoi({
-	selectorName: 'chem-features',
-}));
-if (0) map.addLayer(layerVectorCluster(
-	layerChemPoi({
-		selectorName: 'chem-features',
-		maxResolution: 100,
-		distance: 100,
-	})
-));
-if (0) map.addLayer(layerVectorCluster(
-	layerChemCluster({
-		selectorName: 'chem-features',
-		minResolution: 100,
-		distance: 100,
-	})
-));
+		if (0) {
+			map.addLayer(layerVectorCluster(
+				layerWriPoi({
+					selectorName: 'wri-features',
+					maxResolution: 100,
+					distance: 100,
+				})
+			));
+			map.addLayer(layerWriAreas({
+				minResolution: 100,
+			}));
+		}
 
-if (01) map.addLayer(layerAlpages({
-	selectorName: 'alp-features',
-}));
+		if (0)
+			map.addLayer(layerChemPoi({
+				selectorName: 'chem-features',
+			}));
+
+		if (0) {
+			map.addLayer(layerVectorCluster(
+				layerChemPoi({
+					selectorName: 'chem-features',
+					maxResolution: 100,
+					distance: 100,
+				})
+			));
+			map.addLayer(layerVectorCluster(
+				layerChemCluster({
+					selectorName: 'chem-features',
+					minResolution: 100,
+					distance: 100,
+				})
+			));
+		}
+
+		if (01)
+			map.addLayer(layerVectorCluster(
+				layerPyreneesRefuges({
+					selectorName: 'prc-features',
+				})
+			));
+
+		if (0)
+			map.addLayer(layerAlpages({
+				selectorName: 'alp-features',
+			}));
 	</script>
 </body>
 </html>

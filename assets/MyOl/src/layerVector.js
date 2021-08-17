@@ -4,7 +4,7 @@
  *
  * Options:
  * All source.Vector options : format, strategy, attributions, ...
- * urlFunction: function(extent, resolution, projection, options, bbox, selection)
+ * urlFunction: function(options, bbox, selection, extent, resolution, projection)
  * selectorName : <input name="selectorName"> url arguments selector
  * styleOptions: Options of the style of the features (object = style options or function returning object)
  * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
@@ -14,25 +14,24 @@
  * icon : url of an icon file
  * label : label on top of the feature
  * hover : label on hovering a feature
- * link: url to go if feature is clicked
- * cluster: several features too close to be displayed alone (number)
+ * url: url to go if feature is clicked
+ * cluster: number of grouped features too close to be displayed alone
  */
 function layerVector(options) {
-	// Yellow label
-	const defaultLabelTextOptions = {
-			textBaseline: 'bottom',
-			offsetY: -13, // Compensate the bottom textBaseline
-			padding: [1, 3, 0, 3],
-			font: '14px Calibri,sans-serif',
-			backgroundFill: new ol.style.Fill({
-				color: 'yellow',
-			}),
+	const defaultStyleOptions = {
+			// Yellow label
+			textOptions: {
+				textBaseline: 'bottom',
+				offsetY: -13, // Compensate the bottom textBaseline
+				padding: [1, 3, 0, 3],
+				font: '14px Calibri,sans-serif',
+				backgroundFill: new ol.style.Fill({
+					color: 'yellow',
+				}),
+			},
 		},
-		// Basic feature format
-		defaultStyleOptions = {
-			textOptions: defaultLabelTextOptions,
-		},
-		// Hover display "hover" properties on another format
+		// Hover a feature can display "hover" properties on another format
+		// In addition to defaultStyleOptions
 		defaultHoverStyleOptions = {
 			hover: true, // Select label | hover as text to be display
 			textOptions: {
@@ -70,17 +69,17 @@ function layerVector(options) {
 			},
 			options));
 
-	// Callback function for the layer
+	// url callback function for the layer
 	function url(extent, resolution, projection) {
 		return options.urlFunction(
-			extent, resolution, projection,
 			options, // Layer options
 			ol.proj.transformExtent( // BBox
 				extent,
 				projection.getCode(),
 				'EPSG:4326' // Received projection
 			),
-			readCheckbox(options.selectorName)
+			readCheckbox(options.selectorName),
+			extent, resolution, projection
 		);
 	}
 
@@ -92,14 +91,14 @@ function layerVector(options) {
 				source.refresh();
 		});
 
-	// Convert server properties to the one rendered ("icon", "label, "hover", "link", "cluster", ...)
+	// Convert server properties to the one rendered ("icon", "label, "hover", "url", "cluster", ...)
 	if (typeof options.properties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)
 				options.properties(evt.features[p], options);
 		});
 
-	// Callback function for the layer
+	// style callback function for the layer
 	function style(feature, resolution) {
 		// Hover style
 		feature.hoverStyleFunction = function(feature, resolution) {
@@ -147,7 +146,7 @@ function layerVector(options) {
 
 		// Hover
 		if (styleOptions.hover)
-			elLabel.innerHTML = properties.hover;
+			elLabel.innerHTML = properties.hover || properties.label;
 
 		// Cluster: grouped features
 		else if (properties.cluster)
@@ -217,12 +216,12 @@ function layerVectorCluster(layer, distance) {
 		previousResolution = resolution;
 	});
 
-	// Callback function for the layer
+	// style callback function for the layer
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
 		let clusters = 0, // Add number of clusters of server cluster groups
-			names = [], // List names of clustered features
+			labels = [], // List of labels of clustered features
 			clustered = false; // The server send clusters
 
 		if (features) {
@@ -234,18 +233,19 @@ function layerVectorCluster(layer, distance) {
 					clustered = true;
 
 				clusters += parseInt(properties.cluster) || 1;
-				if (properties.name)
-					names.push(properties.name);
+
+				if (properties.label || properties.hover)
+					labels.push(properties.label || properties.hover);
 			}
 
-			if (features.length > 1 || !names.length) {
+			if (features.length > 1 || !labels.length) {
 				// Big cluster
 				if (clusters > 5)
-					names = []; // Don't display big list
+					labels = []; // Don't display big list
 
 				// Clusters
 				feature.set('cluster', clusters);
-				feature.set('hover', names.length ? names.join('\n') : 'Cliquer pour zoomer');
+				feature.set('hover', labels.length ? labels.join('\n') : 'Cliquer pour zoomer');
 			} else {
 				// Single feature (point, line or poly)
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
@@ -270,7 +270,7 @@ function layerVectorCluster(layer, distance) {
  * Control to display labels on hovering & click
  * on features of vector layers having the following properties :
  * label : text on top of the picture
- * link : go to a new URL when we click on the feature
+ * url : go to a new URL when we click on the feature
  */
 function controlHover() {
 	const control = new ol.control.Control({
@@ -315,20 +315,20 @@ function controlHover() {
 
 		if (feature) {
 			const features = feature.get('features') || [feature],
-				link = features[0].get('link'),
+				url = features[0].get('url'),
 				geom = feature.getGeometry();
 
 			if (evt.type == 'click') {
 				// Single feature
-				if (features.length == 1 && link) {
+				if (features.length == 1 && url) {
 					if (evt.originalEvent.ctrlKey)
-						window.open(link, '_blank').focus();
+						window.open(url, '_blank').focus();
 					else
 					if (evt.originalEvent.shiftKey)
 						// To specify feature open a new window
-						window.open(link, '_blank', 'resizable=yes').focus();
+						window.open(url, '_blank', 'resizable=yes').focus();
 					else
-						window.location = link;
+						window.location = url;
 				} else
 					// Cluster
 					if (geom)
@@ -385,6 +385,7 @@ function readCheckbox(selectorName) {
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
+	//TODO BUG ne marche pas avec un sélecteur simple (une coche on/off)
 	const request = // Search values in cookies & args
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3

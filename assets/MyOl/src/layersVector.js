@@ -1,3 +1,6 @@
+/**
+ * Common function
+ */
 function hexToRgba(color, transparency) {
 	return 'rgba(' + [
 		parseInt(color.substring(1, 3), 16),
@@ -8,12 +11,49 @@ function hexToRgba(color, transparency) {
 }
 
 /**
+ * Convert properties type into gpx <sym>
+ * Manages common types for many layer services
+ */
+function getSym(type) {
+	const lex =
+		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
+		// https://www.gerritspeek.nl/navigatie/gps-navigatie_waypoint-symbolen.html
+		// <sym> propertie propertie
+		'<City Hall> hotel' +
+		'<Residence> refuge gite chambre_hote' +
+		'<Lodge> cabane cabane_cle buron alpage shelter cabane ouverte mais ocupee par le berger l ete' +
+		'<Fishing Hot Spot Facility> abri hut' +
+		'<Campground> camping camp_site bivouac' +
+		'<Tunnel> orri toue abri en pierre grotte cave' +
+		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
+
+		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
+		'<Reef> glacier canyon' +
+		'<Waypoint> locality col pass' +
+
+		'<Drinking Water> point_eau waterpoint waterfall' +
+		'<Water Source> lac lake' +
+		'<Ground Transportation> bus car' +
+		'<Parking Area> access' +
+		'<Restaurant> buffet restaurant' +
+		'<Shopping Center> local_product ravitaillement' +
+
+		'<Restroom> wc' +
+		'<Oil Field> wifi reseau' +
+		'<Telephone> telephone',
+		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
+
+		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
+	return match ? match[1] : 'Puzzle Cache';
+}
+
+/**
  * Site refuges.info
  */
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
-		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
+		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host +
 				'/api/bbox?nb_points=all' +
 				'&type_points=' + selection.join(',') +
@@ -49,10 +89,9 @@ function layerWriPoi(options) {
 			// Other displays
 			feature.set('icon', '//' + options.host + '/images/icones/' + properties.type.icone + '.svg');
 			feature.set('label', properties.nom);
-			feature.set('name', properties.nom); // For cluster list
 
 			if (properties.lien)
-				feature.set('link', properties.lien);
+				feature.set('url', properties.lien);
 		},
 		hoverStyleOptions: {
 			textOptions: {
@@ -68,17 +107,17 @@ function layerWriPoi(options) {
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
-		urlFunction: function(extent, resolution, projection, options) {
-			return '//' + options.host + '/api/polygones?type_polygon=1';
+		polygon: 1,
+		urlFunction: function(options) {
+			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
 		},
 		properties: function(feature) {
 			const properties = feature.getProperties();
 
 			feature.set('label', properties.nom);
-			feature.set('hover', properties.nom);
 
 			if (properties.lien)
-				feature.set('link', properties.lien);
+				feature.set('url', properties.lien);
 		},
 		styleOptions: function(feature) {
 			return {
@@ -99,9 +138,7 @@ function layerWriAreas(options) {
 				},
 			};
 		},
-	}, options, {
-		selectorName: null, // Forced
-	}));
+	}, options));
 }
 
 /**
@@ -110,15 +147,23 @@ function layerWriAreas(options) {
 function layerChemPoi(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
-		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
+		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?limit=1000000' +
+				'/ext/Dominique92/GeoBB/gis2.php?limit=1000000&layer=simple&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(feature) {
-			feature.set('hover', feature.get('name'));
+		properties: function(feature, options) {
+			const properties = feature.getProperties();
+
+			feature.set('hover', properties.name);
+
+			if (properties.type)
+				feature.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg');
+
+			if (properties.id)
+				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -141,10 +186,9 @@ function layerChemPoi(options) {
 function layerChemCluster(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
-		urlFunction: function url(extent, resolution, projection, options, bbox, selection) {
+		urlFunction: function url(options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=cluster&limit=1000000' +
+				'/ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
@@ -156,7 +200,7 @@ function layerChemCluster(options) {
 function layerAlpages(options) {
 	return layerVector(Object.assign({
 		host: 'alpages.info',
-		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
+		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host +
 				'/ext/Dominique92/GeoBB/gis.php?limit=500' +
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
@@ -166,9 +210,10 @@ function layerAlpages(options) {
 		properties: function(feature, options) {
 			const properties = feature.getProperties();
 
-			if (properties.id)
-				feature.set('link', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 			feature.set('hover', properties.name);
+
+			if (properties.id)
+				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 		},
 		styleOptions: function(feature) {
 			return {
@@ -183,6 +228,26 @@ function layerAlpages(options) {
 					color: hexToRgba(feature.get('color'), 0.7),
 				}),
 			};
+		},
+	}, options));
+}
+
+/**
+ * Site pyrenees-refuges.com
+ */
+function layerPyreneesRefuges(options) {
+	return layerVector(Object.assign({
+		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		properties: function(feature) {
+			const properties = feature.getProperties();
+
+			feature.set(
+				'icon', '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+				getSym(properties.type_hebergement || 'cabane') + '.svg'
+			);
+
+			if (properties.name)
+				feature.set('label', properties.name);
 		},
 	}, options));
 }
