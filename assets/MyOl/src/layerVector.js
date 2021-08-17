@@ -63,19 +63,12 @@ function layerVector(options) {
 				format: new ol.format.GeoJSON(),
 			},
 			options)),
+
 		layer = new ol.layer.Vector(Object.assign({
 				source: source,
 				style: style,
 			},
 			options));
-
-	// Modify a geoJson url argument depending on checkboxes
-	if (options.selectorName)
-		memCheckbox(options.selectorName, function(selection) {
-			layer.setVisible(selection.length > 0);
-			if (selection.length > 0)
-				source.refresh();
-		});
 
 	// Callback function for the layer
 	function url(extent, resolution, projection) {
@@ -90,6 +83,14 @@ function layerVector(options) {
 			readCheckbox(options.selectorName)
 		);
 	}
+
+	// Modify a geoJson url argument depending on checkboxes
+	if (options.selectorName)
+		memCheckbox(options.selectorName, function(selection) {
+			layer.setVisible(selection.length > 0);
+			if (selection.length > 0)
+				source.refresh();
+		});
 
 	// Convert server properties to the one rendered ("icon", "label, "hover", "link", "cluster", ...)
 	if (typeof options.properties == 'function')
@@ -194,8 +195,14 @@ function layerVectorCluster(layer, distance) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 				source: clusterSource,
 				style: clusterStyle,
+				visible: layer.getVisible(), // Get the selector status 
 			},
 			layer.options));
+
+	//HACK propagate setVisible following the selector status
+	layer.on('change:visible', function() {
+		clusterLayer.setVisible(this.getVisible());
+	});
 
 	// Tune the clustering distance depending on the zoom level
 	let previousResolution;
@@ -212,22 +219,32 @@ function layerVectorCluster(layer, distance) {
 	// Callback function for the layer
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
-			style = layer.getStyleFunction(),
-			titles = [];
+			style = layer.getStyleFunction();
+		let clusters = 0, // Add number of clusters of server cluster groups
+			names = [], // List names of clustered features
+			clustered = false; // The server send clusters
 
 		if (features) {
-			if (features.length > 5) {
-				// Big cluster
-				feature.set('cluster', features.length); //TODO som of groups !
-				feature.set('hover', 'Cliquer pour zoomer');
-			} else if (features.length > 1) {
-				// 2 to 5 features cluster
-				feature.set('cluster', features.length);
-				for (let f in features)
-					if (features[f].get('name'))
-						titles.push(features[f].get('name'));
+			for (let f in features) {
+				const properties = features[f].getProperties();
 
-				feature.set('hover', titles.join('\n'));
+				// Check if the server send clusters
+				if (properties.cluster)
+					clustered = true;
+
+				clusters += parseInt(properties.cluster) || 1;
+				if (properties.name)
+					names.push(properties.name);
+			}
+
+			if (features.length > 1 || !names.length) {
+				// Big cluster
+				if (clusters > 5)
+					names = []; // Don't display big list
+
+				// Clusters
+				feature.set('cluster', clusters);
+				feature.set('hover', names.length ? names.join('\n') : 'Cliquer pour zoomer');
 			} else {
 				// Single feature (point, line or poly)
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
@@ -273,7 +290,16 @@ function controlHover() {
 		map.addLayer(hoverLayer);
 
 		map.on(['pointermove', 'click'], mouseEvent);
-		map.getView().on('change:resolution', zoom);
+
+		map.getView().on('change:resolution', function() {
+			// Remove hovered feature
+			if (previousHoveredFeature)
+				hoverLayer.getSource().removeFeature(previousHoveredFeature);
+			previousHoveredFeature = null;
+
+			// Reset cursor
+			map.getViewport().style.cursor = 'default';
+		});
 	};
 
 	let previousHoveredFeature;
@@ -323,14 +349,6 @@ function controlHover() {
 			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
 			previousHoveredFeature = feature;
 		}
-	}
-
-	function zoom() {
-		// Remove hovered feature
-		if (previousHoveredFeature)
-			hoverLayer.getSource().removeFeature(previousHoveredFeature);
-		map.getViewport().style.cursor = 'default';
-		previousHoveredFeature = null;
 	}
 
 	return control;

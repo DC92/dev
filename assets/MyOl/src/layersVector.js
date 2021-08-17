@@ -97,7 +97,7 @@ function layerChemPoi(options) {
 		host: 'chemineur.fr',
 		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?cluster=300' +
+				'/ext/Dominique92/GeoBB/gis2.php?limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
@@ -119,6 +119,18 @@ function layerChemPoi(options) {
 				color: 'red',
 				width: 3,
 			}),
+		},
+	}, options));
+}
+
+function layerChemCluster(options) {
+	return layerVector(Object.assign({
+		host: 'chemineur.fr',
+		urlFunction: function url(extent, resolution, projection, options, bbox, selection) {
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis2.php?' +
+				'layer=cluster&limit=1000000' +
+				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
 }
