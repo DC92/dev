@@ -129,13 +129,14 @@ function layerVector(options) {
 		// Compile the list of styles & default
 		for (let s in styles)
 			if (styles[s]) {
-				Object.assign(styleOptions,
-					typeof styles[s] == 'function' ? styles[s](feature) : styles[s]
-				);
+				const style = typeof styles[s] == 'function' ?
+					styles[s](feature) :
+					styles[s];
+
+				Object.assign(styleOptions, style);
+
 				// Separately concatenate text options
-				Object.assign(textOptions,
-					styles[s].textOptions
-				);
+				Object.assign(textOptions, style.textOptions);
 			}
 
 		// Feature icon

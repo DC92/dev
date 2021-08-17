@@ -1,3 +1,12 @@
+function hexToRgba(color, transparency) {
+	return 'rgba(' + [
+		parseInt(color.substring(1, 3), 16),
+		parseInt(color.substring(3, 5), 16),
+		parseInt(color.substring(5, 7), 16),
+		transparency,
+	].join(',') + ')';
+}
+
 /**
  * Site refuges.info
  */
@@ -11,32 +20,39 @@ function layerWriPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(f, options) {
-			const hover = [], // Hover label
+		properties: function(feature, options) {
+			const properties = feature.getProperties(),
+				hover = [], // Hover label
 				desc = [];
-			if (f.get('type').valeur)
+
+			if (properties.type.valeur)
 				hover.push(
-					f.get('type').valeur.replace(
+					properties.type.valeur.replace(
 						/(^\w|\s\w)/g,
 						function(m) {
 							return m.toUpperCase();
 						}
 					));
-			if (f.get('coord').alt)
-				desc.push(f.get('coord').alt + 'm');
-			if (f.get('places').valeur)
-				desc.push(f.get('places').valeur + '\u255E\u2550\u2555');
+
+			if (properties.coord.alt)
+				desc.push(properties.coord.alt + 'm');
+
+			if (properties.places.valeur)
+				desc.push(properties.places.valeur + '\u255E\u2550\u2555');
+
 			if (desc.length)
 				hover.push(desc.join(', '));
-			hover.push(f.get('nom'));
-			f.set('hover', hover.join('\n'));
+
+			hover.push(properties.nom);
+			feature.set('hover', hover.join('\n'));
 
 			// Other displays
-			f.set('icon', '//' + options.host + '/images/icones/' + f.get('type').icone + '.svg');
-			f.set('label', f.get('nom'));
-			f.set('name', f.get('nom')); // For cluster list
-			if (f.get('lien'))
-				f.set('link', f.get('lien'));
+			feature.set('icon', '//' + options.host + '/images/icones/' + properties.type.icone + '.svg');
+			feature.set('label', properties.nom);
+			feature.set('name', properties.nom); // For cluster list
+
+			if (properties.lien)
+				feature.set('link', properties.lien);
 		},
 		hoverStyleOptions: {
 			textOptions: {
@@ -55,34 +71,33 @@ function layerWriAreas(options) {
 		urlFunction: function(extent, resolution, projection, options) {
 			return '//' + options.host + '/api/polygones?type_polygon=1';
 		},
-		properties: function(f) {
-			f.set('label', f.get('nom'));
-			f.set('hover', f.get('nom'));
-			if (f.get('lien'))
-				f.set('link', f.get('lien'));
+		properties: function(feature) {
+			const properties = feature.getProperties();
+
+			feature.set('label', properties.nom);
+			feature.set('hover', properties.nom);
+
+			if (properties.lien)
+				feature.set('link', properties.lien);
 		},
 		styleOptions: function(feature) {
-			const hex = feature.get('couleur');
 			return {
 				fill: new ol.style.Fill({
-					color: 'rgba(' + [
-						parseInt(hex.substring(1, 3), 16),
-						parseInt(hex.substring(3, 5), 16),
-						parseInt(hex.substring(5, 7), 16),
-						0.5,
-					].join(',') + ')',
+					color: hexToRgba(feature.get('couleur'), 0.5),
 				}),
 			};
 		},
-		hoverStyleOptions: {
-			fill: new ol.style.Fill({
-				color: 'rgba(0,0,0,0.3)',
-			}),
-			textOptions: {
-				backgroundStroke: new ol.style.Stroke({
-					color: 'blue',
+		hoverStyleOptions: function(feature) {
+			return {
+				fill: new ol.style.Fill({
+					color: hexToRgba(feature.get('couleur'), 0.7),
 				}),
-			},
+				textOptions: {
+					backgroundStroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+				},
+			};
 		},
 	}, options, {
 		selectorName: null, // Forced
@@ -102,8 +117,8 @@ function layerChemPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(f, options) {
-			f.set('hover', f.get('name'));
+		properties: function(feature) {
+			feature.set('hover', feature.get('name'));
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -138,49 +153,36 @@ function layerChemCluster(options) {
 /**
  * Site alpages.info
  */
-//TODO option selection par défaut (pas de sélecteur ou sélecteur binaire)
 function layerAlpages(options) {
 	return layerVector(Object.assign({
 		host: 'alpages.info',
-		urlFunction: function(extent, resolution, projection, options, bbox) {
+		urlFunction: function(extent, resolution, projection, options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis.php?forums=3,4,5,6&limit=500' +
+				'/ext/Dominique92/GeoBB/gis.php?limit=500' +
+				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(f, options) {
-			if (f.get('id'))
-				f.set('link', '//' + options.host + '/viewtopic.php?t=' + f.get('id'));
-			f.set('hover', f.get('name'));
+		properties: function(feature, options) {
+			const properties = feature.getProperties();
+
+			if (properties.id)
+				feature.set('link', '//' + options.host + '/viewtopic.php?t=' + properties.id);
+			feature.set('hover', properties.name);
 		},
 		styleOptions: function(feature) {
-			//TODO icone des cabanes
-			const hex = feature.get('color');
-			if (hex)
-				return {
-					fill: new ol.style.Fill({
-						color: 'rgba(' + [
-							parseInt(hex.substring(1, 3), 16),
-							parseInt(hex.substring(3, 5), 16),
-							parseInt(hex.substring(5, 7), 16),
-							0.2,
-						].join(',') + ')',
-					}),
-				};
+			return {
+				fill: new ol.style.Fill({
+					color: hexToRgba(feature.get('color'), 0.3),
+				}),
+			};
 		},
 		hoverStyleOptions: function(feature) {
-			const hex = feature.get('color');
-			if (hex)
-				return {
-					fill: new ol.style.Fill({
-						color: 'rgba(' + [
-							parseInt(hex.substring(1, 3), 16),
-							parseInt(hex.substring(3, 5), 16),
-							parseInt(hex.substring(5, 7), 16),
-							0.7,
-						].join(',') + ')',
-					}),
-				};
+			return {
+				fill: new ol.style.Fill({
+					color: hexToRgba(feature.get('color'), 0.7),
+				}),
+			};
 		},
 	}, options));
 }
