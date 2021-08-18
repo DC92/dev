@@ -12,9 +12,10 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
+	<script src="../ol/ol-ie.js"></script>
+	<script src="../src/header.js"></script>
 	<script src="../src/layerVector.js"></script>
-	<script src="../src/layersVector.js"></script>
+	<script src="../src/layerVectorCollection.js"></script>
 
 	<style>
 		#map {
@@ -104,7 +105,7 @@ Based on https://openlayers.org
 				selectorName: 'wri-features',
 			}));
 
-		if (0) {
+		if (01) {
 			map.addLayer(layerVectorCluster(
 				layerWriPoi({
 					selectorName: 'wri-features',
@@ -139,7 +140,11 @@ Based on https://openlayers.org
 			));
 		}
 
-		if (01)
+		if (0)
+			map.addLayer(layerPyreneesRefuges({
+				selectorName: 'prc-features',
+			}));
+		if (0)
 			map.addLayer(layerVectorCluster(
 				layerPyreneesRefuges({
 					selectorName: 'prc-features',

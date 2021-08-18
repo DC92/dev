@@ -211,6 +211,7 @@ function layerIGN(layer, format, key) {
  * Requires myol:onadd
  */
 //BEST document all options in options = Object.assign
+//TODO use minResolution / maxResolution
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
@@ -574,39 +575,45 @@ function controlLayerSwitcher(options) {
 /**
  * Layer to display remote geoJson
  * Styles, icons & labels
- * Cluster features
+ *
+ * Options:
+ * All source.Vector options : format, strategy, attributions, ...
+ * urlFunction: function(options, bbox, selection, extent, resolution, projection)
+ * selectorName : <input name="selectorName"> url arguments selector
+ * styleOptions: Options of the style of the features (object = style options or function returning object)
+ * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
+ * clusterStyleOptions : Options of the style of the cluster bullets (object = style options)
+ *
+ * GeoJson properties:
+ * icon : url of an icon file
+ * label : label on top of the feature
+ * hover : label on hovering a feature
+ * url: url to go if feature is clicked
+ * cluster: number of grouped features too close to be displayed alone
  */
 function layerVector(options) {
-	const baseOptions = Object.assign({
-			urlHost: '',
-			urlPath: '',
-			url: url,
-			format: new ol.format.GeoJSON(),
-		}, options),
-
-		// options.styleOptions, // Base feature format : Object or function(feature)
-
-		// Common label text format
-		labelStyleOptions = Object.assign({
-			textBaseline: 'bottom',
-			offsetY: -13, // Compensate the bottom textBaseline
-			padding: [1, 3, 0, 3],
-			font: '14px Calibri,sans-serif',
-			backgroundFill: new ol.style.Fill({
-				color: 'yellow',
-			}),
-		}, options.labelStyleOptions),
-
-		// Style when hovering a feature
-		hoverStyleOptions = Object.assign({
-			// We assign the same text style to the hover label
-			text: new ol.style.Text(
-				labelStyleOptions //BEST specific hoverLabelStyleOptions
-			),
-		}, options.hoverStyleOptions),
-
-		// Specific format of clusters bullets
-		clusterStyleOptions = Object.assign({
+	const defaultStyleOptions = {
+			// Yellow label
+			textOptions: {
+				textBaseline: 'bottom',
+				offsetY: -13, // Compensate the bottom textBaseline
+				padding: [1, 3, 0, 3],
+				font: '14px Calibri,sans-serif',
+				backgroundFill: new ol.style.Fill({
+					color: 'yellow',
+				}),
+			},
+		},
+		// Hover a feature can display "hover" properties on another format
+		// In addition to defaultStyleOptions
+		defaultHoverStyleOptions = {
+			hover: true, // Select label | hover as text to be display
+			textOptions: {
+				overflow: true, // Force label display of little polygons
+			},
+		},
+		// Cluster bullet
+		defaultClusterStyleOptions = {
 			image: new ol.style.Circle({
 				radius: 14,
 				stroke: new ol.style.Stroke({
@@ -619,159 +626,225 @@ function layerVector(options) {
 			text: new ol.style.Text({
 				font: '14px Calibri,sans-serif',
 			}),
-		}, options.clusterStyleOptions),
+		},
+		//HACK to render the html entities in canvas
+		elLabel = document.createElement('span'),
 
-		// Basic source
-		source = new ol.source.Vector(baseOptions),
+		// Source & layer
+		source = new ol.source.Vector(Object.assign({
+				url: url,
+				format: new ol.format.GeoJSON(),
+			},
+			options)),
 
-		// Source if clusterized
-		clusterSource = baseOptions.clusterDistance ?
-		new ol.source.Cluster({
-			distance: baseOptions.clusterDistance,
-			source: source,
-			geometryFunction: centerPoint,
-		}) :
-		source,
+		layer = new ol.layer.Vector(Object.assign({
+				source: source,
+				style: style,
+			},
+			options));
 
-		// Layer
-		layer = new ol.layer.Vector({
-			source: clusterSource,
-			style: style,
-		});
-
-	function centerPoint(feature) {
-		// Generate a center point to manage clusterisations
-		return new ol.geom.Point(
-			ol.extent.getCenter(
-				feature.getGeometry().getExtent()
-			)
+	// url callback function for the layer
+	function url(extent, resolution, projection) {
+		return options.urlFunction(
+			options, // Layer options
+			ol.proj.transformExtent( // BBox
+				extent,
+				projection.getCode(),
+				'EPSG:4326' // Received projection
+			),
+			readCheckbox(options.selectorName),
+			extent, resolution, projection
 		);
 	}
 
+	// Modify a geoJson url argument depending on checkboxes
 	if (options.selectorName)
-		memCheckbox(options.selectorName, function(list) {
-			layer.setVisible(list.length > 0);
-			if (list.length > 0)
+		memCheckbox(options.selectorName, function(selection) {
+			layer.setVisible(selection.length > 0);
+			if (selection.length > 0)
 				source.refresh();
 		});
 
-	function url(extent, resolution, projection, options) {
-		//BEST gérer les msg erreur
-		options = options || baseOptions;
-
-		const urlPath = typeof options.urlPath == 'function' ?
-			options.urlPath(
-				ol.proj.transformExtent( // BBox
-					extent,
-					projection.getCode(),
-					'EPSG:4326' // Received projection
-				),
-				readCheckbox(options.selectorName),
-				resolution, // === zoom level
-				options
-			) :
-			options.urlPath;
-
-		return options.urlHost + urlPath;
-	}
-
-	// Normalize properties
-	if (typeof baseOptions.computeProperties == 'function')
+	// Convert server properties to the one rendered ("icon", "label, "hover", "url", "cluster", ...)
+	if (typeof options.properties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let p in evt.features)
-				baseOptions.computeProperties(evt.features[p], baseOptions);
+				options.properties(evt.features[p], options);
 		});
 
-	// Define the style of the cluster point & the groupped features
-	function style(feature) {
-		const features = feature.get('features') || [feature],
-			icon = features[0].get('icon'),
-			label = features[0].get('label'),
-			area = ol.extent.getArea(
-				features[0].getGeometry().getExtent()
-			),
-			styleOptions = typeof baseOptions.styleOptions == 'function' ?
-			options.styleOptions(feature) :
-			options.styleOptions || {};
+	// style callback function for the layer
+	function style(feature, resolution) {
+		// Hover style
+		feature.hoverStyleFunction = function(feature, resolution) {
+			return displayStyle(feature, resolution, [
+				defaultStyleOptions, defaultHoverStyleOptions, options.hoverStyleOptions
+			]);
+		};
 
-		//HACK Memorize the options in the feature for hover display
-		feature.hoverStyleOptions = hoverStyleOptions;
+		if (feature.get('cluster')) // Grouped features
+			// Cluster style
+			return displayStyle(feature, resolution, [
+				defaultClusterStyleOptions, options.clusterStyleOptions
+			]);
+		else
+			// Basic display style
+			return displayStyle(feature, resolution, [
+				defaultStyleOptions, options.styleOptions
+			]);
+	}
 
-		// Clusters
-		if (features.length > 1 ||
-			parseInt(features[0].get('cluster'))) {
-			let clusters = 0;
-			for (let f in features)
-				clusters += parseInt(features[f].get('cluster')) || 1;
+	// Function to display different styles
+	function displayStyle(feature, resolution, styles) {
+		const properties = feature.getProperties(),
+			styleOptions = {},
+			textOptions = {};
 
-			clusterStyleOptions.text.setText(clusters.toString());
-			feature.set('hover', clusters.toString() + ' éléments');
+		// Compile the list of styles & default
+		for (let s in styles)
+			if (styles[s]) {
+				const style = typeof styles[s] == 'function' ?
+					styles[s](feature) :
+					styles[s];
 
-			return new ol.style.Style(clusterStyleOptions);
-		}
+				Object.assign(styleOptions, style);
 
-		// Single feature (point, line or poly)
-		// Add a permanent label
-		if (!baseOptions.clusterDistance || // If no clusterisation 
-			(feature.get('features') // If not cluster marker 
-			) && label) {
-			labelStyleOptions.text = label;
-			styleOptions.text = new ol.style.Text(labelStyleOptions);
-		}
+				// Separately concatenate text options
+				Object.assign(textOptions, style.textOptions);
+			}
 
-		// Include the feature in the cluster source (lines, polygons) to make it visible
-		if (area) {
-			const featureExists = clusterSource.forEachFeature(function(f) {
-				if (features[0].ol_uid == f.ol_uid)
-					return true;
-			});
-
-			if (!featureExists)
-				clusterSource.addFeature(features[0]);
-		} else
-		if (icon)
-			// Add icon if one is defined in the properties
+		// Feature icon
+		if (properties.icon)
 			styleOptions.image = new ol.style.Icon({
-				src: icon,
+				src: properties.icon,
 			});
+
+		// Hover
+		if (styleOptions.hover)
+			elLabel.innerHTML = properties.hover || properties.label;
+
+		// Cluster: grouped features
+		else if (properties.cluster)
+			elLabel.innerHTML = properties.cluster;
+
+		// Labels
+		else if (properties.label)
+			elLabel.innerHTML = properties.label;
+
+		else
+			elLabel.innerHTML = '';
+
+		// Feature label
+		if (elLabel.innerHTML) {
+			textOptions.text = elLabel.textContent;
+			styleOptions.text = new ol.style.Text(textOptions);
+		}
 
 		return new ol.style.Style(styleOptions);
 	}
+
+	//HACK Save options for further use (layerVectorCluster)
+	layer.options = options; //BEST avoid
 
 	return layer;
 }
 
 /**
- * Display different layer depending on the map resolution
+ * Cluster close features
  */
-function layerFlip(lowLayer, highLayer, limitResolution) {
-	let currentLayer;
+function layerVectorCluster(layer, distance) {
+	// Clusterized source & layer
+	const clusterDistance = distance || layer.options.distance || 50,
+		clusterSource = new ol.source.Cluster({
+			distance: clusterDistance,
+			source: layer.getSource(),
+			geometryFunction: function(feature) {
+				// Generate a center point to manage clusterisations
+				return new ol.geom.Point(
+					ol.extent.getCenter(
+						feature.getGeometry().getExtent()
+					)
+				);
+			},
+		}),
+		clusterLayer = new ol.layer.Vector(Object.assign({
+				source: clusterSource,
+				style: clusterStyle,
+				visible: layer.getVisible(), // Get the selector status 
+			},
+			layer.options));
 
-	const layer = new ol.layer.Vector({
-		render: function(frameState, target) { //HACK to be informed of render to be run
-			const resolution = frameState.pixelToCoordinateTransform[0],
-				newLayer = resolution < limitResolution ? lowLayer : highLayer;
-
-			if (currentLayer != newLayer) {
-				currentLayer = newLayer;
-				layer.setSource(newLayer.getSource());
-				layer.setStyle(newLayer.getStyle());
-			}
-
-			return ol.layer.Vector.prototype.render.call(this, frameState, target);
-		},
+	//HACK propagate setVisible following the selector status
+	layer.on('change:visible', function() {
+		clusterLayer.setVisible(this.getVisible());
 	});
 
-	return layer;
+	// Tune the clustering distance depending on the zoom level
+	let previousResolution;
+	clusterLayer.on('prerender', function(evt) {
+		const resolution = evt.frameState.viewState.resolution,
+			distance = resolution < 10 ? 0 : Math.min(clusterDistance, resolution);
 
+		if (previousResolution != resolution) // Only when changed
+			clusterSource.setDistance(distance);
+
+		previousResolution = resolution;
+	});
+
+	// style callback function for the layer
+	function clusterStyle(feature, resolution) {
+		const features = feature.get('features'),
+			style = layer.getStyleFunction();
+		let clusters = 0, // Add number of clusters of server cluster groups
+			labels = [], // List of labels of clustered features
+			clustered = false; // The server send clusters
+
+		if (features) {
+			for (let f in features) {
+				const properties = features[f].getProperties();
+
+				// Check if the server send clusters
+				if (properties.cluster)
+					clustered = true;
+
+				clusters += parseInt(properties.cluster) || 1;
+
+				if (properties.label || properties.hover)
+					labels.push(properties.label || properties.hover);
+			}
+
+			if (features.length > 1 || !labels.length) {
+				// Big cluster
+				if (clusters > 5)
+					labels = []; // Don't display big list
+
+				// Clusters
+				feature.set('cluster', clusters);
+				feature.set('hover', labels.length ? labels.join('\n') : 'Cliquer pour zoomer');
+			} else {
+				// Single feature (point, line or poly)
+				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
+					if (features[0].ol_uid == f.ol_uid)
+						return true;
+				});
+
+				if (!featureAlreadyExists)
+					clusterSource.addFeature(features[0]);
+
+				return; // Dont display that one, it will display the added one
+			}
+		}
+
+		return style(feature, resolution);
+	}
+
+	return clusterLayer;
 }
 
 /**
  * Control to display labels on hovering & click
  * on features of vector layers having the following properties :
- * name : name of the feature
- * hover : full label on hover
- * link : go to a new URL when we click on the feature
+ * label : text on top of the picture
+ * url : go to a new URL when we click on the feature
  */
 function controlHover() {
 	const control = new ol.control.Control({
@@ -781,40 +854,32 @@ function controlHover() {
 		hoverLayer = new ol.layer.Vector({
 			source: new ol.source.Vector(),
 			zIndex: 1, // Above the features
-			style: style,
+			style: function(feature, resolution) {
+				if (typeof feature.hoverStyleFunction == 'function')
+					return feature.hoverStyleFunction(feature, resolution);
+			},
 		});
-
-	function style(feature) {
-		//BEST options label on hover point /ligne / surface ???
-		const features = feature.get('features') || [feature],
-			titles = [];
-
-		if (feature.get('hover'))
-			// Big clusters
-			titles.push(feature.get('hover'));
-		else
-		if (features.length > 1)
-			// Clusters
-			for (let f in features)
-				titles.push(features[f].get('name'));
-		else
-			// Point
-			titles.push(features[0].get('hover'));
-
-		feature.hoverStyleOptions.text.setText(titles.join('\n'));
-		return new ol.style.Style(feature.hoverStyleOptions);
-	}
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 		map.addLayer(hoverLayer);
 
-		map.on(['pointermove', 'click'], action);
+		map.on(['pointermove', 'click'], mouseEvent);
+
+		map.getView().on('change:resolution', function() {
+			// Remove hovered feature
+			if (previousHoveredFeature)
+				hoverLayer.getSource().removeFeature(previousHoveredFeature);
+			previousHoveredFeature = null;
+
+			// Reset cursor
+			map.getViewport().style.cursor = 'default';
+		});
 	};
 
 	let previousHoveredFeature;
 
-	function action(evt) {
+	function mouseEvent(evt) {
 		// Get hovered feature
 		const feature = map.forEachFeatureAtPixel(
 			map.getEventPixel(evt.originalEvent),
@@ -824,27 +889,27 @@ function controlHover() {
 
 		if (feature) {
 			const features = feature.get('features') || [feature],
-				link = features[0].get('link'),
-				center = feature.getGeometry().getCoordinates();
+				url = features[0].get('url'),
+				geom = feature.getGeometry();
 
 			if (evt.type == 'click') {
 				// Single feature
-				if (features.length == 1 && link) {
+				if (features.length == 1 && url) {
 					if (evt.originalEvent.ctrlKey)
-						window.open(link, '_blank').focus();
-					else if (evt.originalEvent.shiftKey)
-						// To specify feature open a new window
-						window.open(link, '_blank', 'resizable=yes').focus();
+						window.open(url, '_blank').focus();
 					else
-						window.location = link;
-				}
-
-				// Cluster
-				else
-					map.getView().animate({
-						zoom: map.getView().getZoom() + 1,
-						center: center,
-					});
+					if (evt.originalEvent.shiftKey)
+						// To specify feature open a new window
+						window.open(url, '_blank', 'resizable=yes').focus();
+					else
+						window.location = url;
+				} else
+					// Cluster
+					if (geom)
+						map.getView().animate({
+							zoom: map.getView().getZoom() + 2,
+							center: geom.getCoordinates(),
+						});
 			}
 		}
 
@@ -863,6 +928,7 @@ function controlHover() {
 
 	return control;
 }
+
 /**
  * Get checkboxes values of inputs having the same name
  * selectorName {string}
@@ -875,29 +941,29 @@ function readCheckbox(selectorName) {
 		return [inputEls[0].checked];
 
 	// Read each <input> checkbox
-	const list = [];
+	const selection = [];
 	for (let e = 0; e < inputEls.length; e++)
 		if (inputEls[e].checked &&
 			inputEls[e].value != 'on')
-			list.push(inputEls[e].value);
+			selection.push(inputEls[e].value);
 
-	return list;
+	return selection;
 }
 
 /**
  * Manages checkboxes inputs having the same name
  * selectorName {string}
- * callback {function(list)} action when the button is clicked
+ * callback {function(selection)} action when the button is clicked
  *
  * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
+	//TODO BUG ne marche pas avec un sélecteur simple (une coche on/off)
 	const request = // Search values in cookies & args
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie, // Then the cookies
-
 		match = request.match(new RegExp(selectorName + '=([^;]*)')),
 		inputEls = document.getElementsByName(selectorName);
 
@@ -911,32 +977,25 @@ function memCheckbox(selectorName, callback) {
 				match[1].split(',').includes('on'); // The "all (= "on") is set
 
 			// Attach the action
-			inputEls[e].onclick = onClick;
+			inputEls[e].addEventListener('click', onClick);
 
 			// Compute the all check && init the cookies if data has been given by the url
 			checkEl(inputEls[e]);
 		}
 
-	const list = readCheckbox(selectorName);
-
-	if (typeof callback == 'function')
-		callback(list);
-
-	return list;
-
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
-		const list = readCheckbox(selectorName);
+		const selection = readCheckbox(selectorName);
 
 		// Mem the data in the cookie
 		if (selectorName)
-			document.cookie = selectorName + '=' + list.join(',') +
+			document.cookie = selectorName + '=' + selection.join(',') +
 			'; path=/; SameSite=Secure; expires=' +
 			new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (typeof callback == 'function')
-			callback(list);
+			callback(selection);
 	}
 
 	// Check on <input> & set the "All" input accordingly
@@ -950,110 +1009,188 @@ function memCheckbox(selectorName, callback) {
 			else if (inputEls[e].value == 'on') // The "all" <input>
 				allIndex = e;
 			else if (!inputEls[e].checked)
-				allCheck = false; // Uncheck the "all" <input> if one other is unchecked	
+				allCheck = false; // Uncheck the "all" <input> if one other is unchecked
 		}
 
 		// Check the "all" <input> if all others are
 		if (allIndex != -1)
 			inputEls[allIndex].checked = allCheck;
 	}
+
+	const selection = readCheckbox(selectorName);
+
+	if (typeof callback == 'function')
+		callback(selection);
+
+	return selection;
 }
 
+/**
+ * Common function
+ */
+function hexToRgba(color, transparency) {
+	return 'rgba(' + [
+		parseInt(color.substring(1, 3), 16),
+		parseInt(color.substring(3, 5), 16),
+		parseInt(color.substring(5, 7), 16),
+		transparency,
+	].join(',') + ')';
+}
+
+/**
+ * Convert properties type into gpx <sym>
+ * Manages common types for many layer services
+ */
+function getSym(type) {
+	const lex =
+		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
+		// https://www.gerritspeek.nl/navigatie/gps-navigatie_waypoint-symbolen.html
+		// <sym> propertie propertie
+		'<City Hall> hotel' +
+		'<Residence> refuge gite chambre_hote' +
+		'<Lodge> cabane cabane_cle buron alpage shelter cabane ouverte mais ocupee par le berger l ete' +
+		'<Fishing Hot Spot Facility> abri hut' +
+		'<Campground> camping camp_site bivouac' +
+		'<Tunnel> orri toue abri en pierre grotte cave' +
+		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
+
+		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
+		'<Reef> glacier canyon' +
+		'<Waypoint> locality col pass' +
+
+		'<Drinking Water> point_eau waterpoint waterfall' +
+		'<Water Source> lac lake' +
+		'<Ground Transportation> bus car' +
+		'<Parking Area> access' +
+		'<Restaurant> buffet restaurant' +
+		'<Shopping Center> local_product ravitaillement' +
+
+		'<Restroom> wc' +
+		'<Oil Field> wifi reseau' +
+		'<Telephone> telephone',
+		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
+
+		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
+	return match ? match[1] : 'Puzzle Cache';
+}
+
+/**
+ * Site refuges.info
+ */
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
-		urlHost: '//www.refuges.info/',
-		urlPath: function(bbox, list) {
-			return 'api/bbox?nb_points=all' +
-				'&type_points=' + list.join(',') +
+		host: 'www.refuges.info',
+		urlFunction: function(options, bbox, selection) {
+			return '//' + options.host +
+				'/api/bbox?nb_points=all' +
+				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		selectorName: 'wri-features',
-		clusterDistance: 50,
-
-		computeProperties: function(f, options) {
-			const hover = [], // Hover label
+		properties: function(feature, options) {
+			const properties = feature.getProperties(),
+				hover = [], // Hover label
 				desc = [];
-			if (f.get('type').valeur)
+
+			if (properties.type.valeur)
 				hover.push(
-					f.get('type').valeur.replace(
+					properties.type.valeur.replace(
 						/(^\w|\s\w)/g,
 						function(m) {
 							return m.toUpperCase();
 						}
 					));
-			if (f.get('coord').alt)
-				desc.push(f.get('coord').alt + 'm');
-			if (f.get('places').valeur)
-				desc.push(f.get('places').valeur + '\u255E\u2550\u2555');
+
+			if (properties.coord.alt)
+				desc.push(properties.coord.alt + 'm');
+
+			if (properties.places.valeur)
+				desc.push(properties.places.valeur + '\u255E\u2550\u2555');
+
 			if (desc.length)
 				hover.push(desc.join(', '));
-			hover.push(f.get('nom'));
-			f.set('hover', hover.join('\n'));
+
+			hover.push(properties.nom);
+			feature.set('hover', hover.join('\n'));
 
 			// Other displays
-			f.set('icon', options.urlHost + 'images/icones/' + f.get('type').icone + '.svg');
-			f.set('name', f.get('nom'));
-			f.set('label', f.get('nom'));
-			if (f.get('lien'))
-				f.set('link', f.get('lien'));
+			feature.set('icon', '//' + options.host + '/images/icones/' + properties.type.icone + '.svg');
+			feature.set('label', properties.nom);
+
+			if (properties.lien)
+				feature.set('url', properties.lien);
+		},
+		hoverStyleOptions: {
+			textOptions: {
+				font: '14px Calibri,sans-serif',
+				backgroundStroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+			},
 		},
 	}, options));
 }
 
 function layerWriAreas(options) {
-	//TODO label on hover litle massifs
 	return layerVector(Object.assign({
-		urlHost: '//www.refuges.info/',
-		urlPath: 'api/polygones?type_polygon=1',
-		computeProperties: function(f) {
-			f.set('label', f.get('nom'));
-			if (f.get('lien'))
-				f.set('link', f.get('lien'));
+		host: 'www.refuges.info',
+		polygon: 1,
+		urlFunction: function(options) {
+			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
+		},
+		properties: function(feature) {
+			const properties = feature.getProperties();
+
+			feature.set('label', properties.nom);
+
+			if (properties.lien)
+				feature.set('url', properties.lien);
 		},
 		styleOptions: function(feature) {
-			const hex = feature.get('couleur');
 			return {
 				fill: new ol.style.Fill({
-					color: 'rgba(' + [
-						parseInt(hex.substring(1, 3), 16),
-						parseInt(hex.substring(3, 5), 16),
-						parseInt(hex.substring(5, 7), 16),
-						0.5,
-					].join(',') + ')',
-				})
+					color: hexToRgba(feature.get('couleur'), 0.5),
+				}),
+			};
+		},
+		hoverStyleOptions: function(feature) {
+			return {
+				fill: new ol.style.Fill({
+					color: hexToRgba(feature.get('couleur'), 0.7),
+				}),
+				textOptions: {
+					backgroundStroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+				},
 			};
 		},
 	}, options));
 }
 
-function layerWri(options) {
-	return layerFlip(
-		layerWriPoi(options),
-		layerWriAreas(options),
-		100
-	)
-}
-
-const layerChemOptions = {
-		urlHost: '//chemineur.fr/',
-		urlPath: function(bbox, list, resolution, options) {
-			return 'ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=simple&limit=1000' +
-				(options.selectorName ? '&cat=' + list.join(',') : '') +
+/**
+ * Site chemineur.fr
+ */
+function layerChemPoi(options) {
+	return layerVector(Object.assign({
+		host: 'chemineur.fr',
+		urlFunction: function(options, bbox, selection) {
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis2.php?limit=1000000&layer=simple&' +
+				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		//maxResolution: 100,
 		strategy: ol.loadingstrategy.bbox,
-		selectorName: 'chem-features',
-		clusterDistance: 50,
+		properties: function(feature, options) {
+			const properties = feature.getProperties();
 
-		computeProperties: function(f, options) {
-			if (f.get('type'))
-				f.set('icon', options.urlHost + 'ext/Dominique92/GeoBB/icones/' + f.get('type') + '.svg');
-			if (f.get('id'))
-				f.set('link', options.urlHost + 'viewtopic.php?t=' + f.get('id'));
-			f.set('hover', f.get('name'));
+			feature.set('hover', properties.name);
+
+			if (properties.type)
+				feature.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg');
+
+			if (properties.id)
+				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -1062,39 +1199,84 @@ const layerChemOptions = {
 			}),
 		},
 		hoverStyleOptions: {
+			textOptions: {
+				font: '14px Calibri,sans-serif',
+			},
 			stroke: new ol.style.Stroke({
 				color: 'red',
 				width: 3,
 			}),
 		},
-		//TODO DELETE
-		alt: {
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			urlPath: function(bbox, list, resolution, options) {
-				return 'ext/Dominique92/GeoBB/gis2.php?' +
-					'layer=cluster&limit=1000' +
-					(options.selectorName ? '&cat=' + list.join(',') : '');
-			},
-		},
-	},
-
-	layerChemClusterOptions = Object.assign({}, layerChemOptions, {
-		minResolution: 100,
-		strategy: ol.loadingstrategy.all,
-		urlPath: function(bbox, list, resolution, options) {
-			return 'ext/Dominique92/GeoBB/gis2.php?' +
-				'layer=cluster&limit=1000' +
-				(options.selectorName ? '&cat=' + list.join(',') : '');
-		}
-	});
-
-function layerChem(options) {
-	return layerVector(Object.assign(layerChemOptions, options));
+	}, options));
 }
 
 function layerChemCluster(options) {
-	return layerVector(Object.assign(layerChemClusterOptions, options));
+	return layerVector(Object.assign({
+		host: 'chemineur.fr',
+		urlFunction: function url(options, bbox, selection) {
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
+				(options.selectorName ? '&cat=' + selection.join(',') : '');
+		},
+	}, options));
+}
+
+/**
+ * Site alpages.info
+ */
+function layerAlpages(options) {
+	return layerVector(Object.assign({
+		host: 'alpages.info',
+		urlFunction: function(options, bbox, selection) {
+			return '//' + options.host +
+				'/ext/Dominique92/GeoBB/gis.php?limit=500' +
+				(options.selectorName ? '&forums=' + selection.join(',') : '') +
+				'&bbox=' + bbox.join(',');
+		},
+		strategy: ol.loadingstrategy.bbox,
+		properties: function(feature, options) {
+			const properties = feature.getProperties();
+
+			feature.set('hover', properties.name);
+
+			if (properties.id)
+				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
+		},
+		styleOptions: function(feature) {
+			return {
+				fill: new ol.style.Fill({
+					color: hexToRgba(feature.get('color'), 0.3),
+				}),
+			};
+		},
+		hoverStyleOptions: function(feature) {
+			return {
+				fill: new ol.style.Fill({
+					color: hexToRgba(feature.get('color'), 0.7),
+				}),
+			};
+		},
+	}, options));
+}
+
+/**
+ * Site pyrenees-refuges.com
+ */
+function layerPyreneesRefuges(options) {
+	return layerVector(Object.assign({
+		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		properties: function(feature) {
+			const properties = feature.getProperties();
+
+			feature.set(
+				'icon', '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+				getSym(properties.type_hebergement || 'cabane') + '.svg'
+			);
+
+			if (properties.name)
+				feature.set('label', properties.name);
+		},
+	}, options));
 }
 
 /**
