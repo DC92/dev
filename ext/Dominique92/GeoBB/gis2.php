@@ -152,8 +152,10 @@ else {
 	$data = $features = $signatures = [];
 	while ($row = $db->sql_fetchrow($result)) {
 		$properties = [
+			'type' => $row['forum_name'],
 			'name' => $row['post_subject'],
 			'id' => $row['topic_id'],
+			'alt' => str_replace('~', '', $row['geo_altitude']),
 		];
 
 		if ($layer == 'full') {

@@ -13,7 +13,7 @@
  * GeoJson properties:
  * icon : url of an icon file
  * name : label on top of the feature
- * category : cabane, ...
+ * type : cabane, ...
  * alt : altitude (meters)
  * bed : number of places to sleep
  * cluster: number of grouped features too close to be displayed alone
@@ -154,8 +154,8 @@ function layerVector(options) {
 		const hover = [],
 			subHover = [];
 		if (styleOptions.hover) { // When the function is called for hover
-			if (properties.category)
-				hover.push(properties.category);
+			if (properties.type)
+				hover.push(properties.type.replace('_', ' '));
 			if (properties.alt)
 				subHover.push(properties.alt + 'm');
 			if (properties.bed)
@@ -165,19 +165,13 @@ function layerVector(options) {
 			hover.push(properties.name);
 		}
 
-		elLabel.innerHTML =
+		elLabel.innerHTML = //HACK to render the html entities in canvas
 			(styleOptions.hover ? properties.hover : properties.cluster) ||
 			hover.join('\n') ||
 			properties.name;
 
 		if (elLabel.innerHTML) {
-			textOptions.text = elLabel.textContent //HACK to render the html entities in canvas
-				.replace( // First character upperCase
-					/(^\w|\s\w)/g,
-					function(m) {
-						return m.toUpperCase();
-					}
-				);
+			textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
 			styleOptions.text = new ol.style.Text(textOptions);
 		}
 

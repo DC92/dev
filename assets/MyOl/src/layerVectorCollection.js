@@ -6,20 +6,24 @@
 /**
  * Common function
  */
-function hexToRgba(color, transparency) {
-	return 'rgba(' + [
-		parseInt(color.substring(1, 3), 16),
-		parseInt(color.substring(3, 5), 16),
-		parseInt(color.substring(5, 7), 16),
-		transparency,
-	].join(',') + ')';
+function fillColorOption(hexColor, transparency) {
+	return {
+		fill: new ol.style.Fill({
+			color: 'rgba(' + [
+				parseInt(hexColor.substring(1, 3), 16),
+				parseInt(hexColor.substring(3, 5), 16),
+				parseInt(hexColor.substring(5, 7), 16),
+				transparency,
+			].join(',') + ')',
+		}),
+	};
 }
 
 /**
- * Convert properties category into gpx <sym>
+ * Convert properties type into gpx <sym>
  * Manages common types for many layer services
  */
-function getSym(category) {
+function getSym(type) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
 		// https://www.gerritspeek.nl/navigatie/gps-navigatie_waypoint-symbolen.html
@@ -48,7 +52,7 @@ function getSym(category) {
 		'<Telephone> telephone',
 		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
 
-		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + category));
+		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
 	return match ? match[1] : 'Puzzle Cache';
 }
 
@@ -72,12 +76,13 @@ function layerWriPoi(options) {
 			feature.set('alt', properties.coord.alt);
 			feature.set('bed', properties.places.valeur);
 			feature.set('url', properties.lien);
-			feature.set('category', properties.type.valeur);
+			feature.set('type', properties.type.valeur);
 		},
 	}, options));
 }
 
 function layerWriAreas(options) {
+	//TODO follow selector on/of
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
 		polygon: 1,
@@ -88,20 +93,13 @@ function layerWriAreas(options) {
 			const properties = feature.getProperties();
 			feature.set('name', feature.get('nom'));
 			feature.set('url', feature.get('lien'));
+			feature.set('type', null);
 		},
 		styleOptions: function(feature) {
-			return {
-				fill: new ol.style.Fill({
-					color: hexToRgba(feature.get('couleur'), 0.5),
-				}),
-			};
+			return fillColorOption(feature.get('couleur'), 0.5);
 		},
 		hoverStyleOptions: function(feature) {
-			return {
-				fill: new ol.style.Fill({
-					color: hexToRgba(feature.get('couleur'), 0.7),
-				}),
-			};
+			return fillColorOption(feature.get('couleur'), 0.7);
 		},
 	}, options));
 }
@@ -122,8 +120,6 @@ function layerChemPoi(options) {
 		myProperties: function(feature, options) {
 			const properties = feature.getProperties();
 			feature.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg');
-			feature.set('category', properties.type); // TODO category -> type (- bug !)
-			//TODO altitude
 			feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 		},
 		styleOptions: {
@@ -177,18 +173,10 @@ function layerAlpages(options) {
 				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 		},
 		styleOptions: function(feature) {
-			return {
-				fill: new ol.style.Fill({
-					color: hexToRgba(feature.get('color'), 0.3),
-				}),
-			};
+			return fillColorOption(feature.get('color'), 0.3);
 		},
 		hoverStyleOptions: function(feature) {
-			return {
-				fill: new ol.style.Fill({
-					color: hexToRgba(feature.get('color'), 0.7),
-				}),
-			};
+			return fillColorOption(feature.get('color'), 0.7);
 		},
 	}, options));
 }
