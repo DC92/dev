@@ -1,4 +1,9 @@
 /**
+ * This file implements various acces to geoJson services
+ * using MyOl/src/layerVector.js
+ */
+
+/**
  * Common function
  */
 function hexToRgba(color, transparency) {

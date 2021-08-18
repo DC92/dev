@@ -17,6 +17,7 @@
  * url: url to go if feature is clicked
  * cluster: number of grouped features too close to be displayed alone
  */
+//TODO BUG IE SCRIPT5022: IndexSizeError
 function layerVector(options) {
 	const defaultStyleOptions = {
 			// Yellow label
@@ -399,8 +400,8 @@ function memCheckbox(selectorName, callback) {
 			// Set inputs following cookies & args
 			if (match)
 				inputEls[e].checked =
-				match[1].split(',').includes(inputEls[e].value) || // That one is declared
-				match[1].split(',').includes('on'); // The "all (= "on") is set
+				match[1].split(',').indexOf(inputEls[e].value) != -1 || // That one is declared
+				match[1].split(',').indexOf('on') != -1; // The "all (= "on") is set
 
 			// Attach the action
 			inputEls[e].addEventListener('click', onClick);
