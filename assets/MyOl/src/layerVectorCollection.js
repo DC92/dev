@@ -16,10 +16,10 @@ function hexToRgba(color, transparency) {
 }
 
 /**
- * Convert properties type into gpx <sym>
+ * Convert properties category into gpx <sym>
  * Manages common types for many layer services
  */
-function getSym(type) {
+function getSym(category) {
 	const lex =
 		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
 		// https://www.gerritspeek.nl/navigatie/gps-navigatie_waypoint-symbolen.html
@@ -48,7 +48,7 @@ function getSym(type) {
 		'<Telephone> telephone',
 		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
 
-		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
+		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + category));
 	return match ? match[1] : 'Puzzle Cache';
 }
 
@@ -59,52 +59,20 @@ function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host +
-				'/api/bbox?nb_points=all' +
+			return '//' + options.host + '/api/bbox' +
+				'?nb_points=all' +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(feature, options) {
-			const properties = feature.getProperties(),
-				hover = [], // Hover label
-				desc = [];
-
-			if (properties.type.valeur)
-				hover.push(
-					properties.type.valeur.replace(
-						/(^\w|\s\w)/g,
-						function(m) {
-							return m.toUpperCase();
-						}
-					));
-
-			if (properties.coord.alt)
-				desc.push(properties.coord.alt + 'm');
-
-			if (properties.places.valeur)
-				desc.push(properties.places.valeur + '\u255E\u2550\u2555');
-
-			if (desc.length)
-				hover.push(desc.join(', '));
-
-			hover.push(properties.nom);
-			feature.set('hover', hover.join('\n'));
-
-			// Other displays
+		myProperties: function(feature, options) {
+			const properties = feature.getProperties();
 			feature.set('icon', '//' + options.host + '/images/icones/' + properties.type.icone + '.svg');
-			feature.set('label', properties.nom);
-
-			if (properties.lien)
-				feature.set('url', properties.lien);
-		},
-		hoverStyleOptions: {
-			textOptions: {
-				font: '14px Calibri,sans-serif',
-				backgroundStroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-			},
+			feature.set('name', properties.nom);
+			feature.set('alt', properties.coord.alt);
+			feature.set('bed', properties.places.valeur);
+			feature.set('url', properties.lien);
+			feature.set('category', properties.type.valeur);
 		},
 	}, options));
 }
@@ -116,13 +84,10 @@ function layerWriAreas(options) {
 		urlFunction: function(options) {
 			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
 		},
-		properties: function(feature) {
+		myProperties: function(feature) {
 			const properties = feature.getProperties();
-
-			feature.set('label', properties.nom);
-
-			if (properties.lien)
-				feature.set('url', properties.lien);
+			feature.set('name', feature.get('nom'));
+			feature.set('url', feature.get('lien'));
 		},
 		styleOptions: function(feature) {
 			return {
@@ -136,11 +101,6 @@ function layerWriAreas(options) {
 				fill: new ol.style.Fill({
 					color: hexToRgba(feature.get('couleur'), 0.7),
 				}),
-				textOptions: {
-					backgroundStroke: new ol.style.Stroke({
-						color: 'blue',
-					}),
-				},
 			};
 		},
 	}, options));
@@ -159,16 +119,12 @@ function layerChemPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(feature, options) {
+		myProperties: function(feature, options) {
 			const properties = feature.getProperties();
-
-			feature.set('hover', properties.name);
-
-			if (properties.type)
-				feature.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg');
-
-			if (properties.id)
-				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
+			feature.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg');
+			feature.set('category', properties.type); // TODO category -> type (- bug !)
+			//TODO altitude
+			feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -212,7 +168,7 @@ function layerAlpages(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		properties: function(feature, options) {
+		myProperties: function(feature, options) {
 			const properties = feature.getProperties();
 
 			feature.set('hover', properties.name);
@@ -243,7 +199,7 @@ function layerAlpages(options) {
 function layerPyreneesRefuges(options) {
 	return layerVector(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		properties: function(feature) {
+		myProperties: function(feature) {
 			const properties = feature.getProperties();
 
 			feature.set(

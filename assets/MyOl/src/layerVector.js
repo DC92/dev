@@ -12,10 +12,13 @@
  *
  * GeoJson properties:
  * icon : url of an icon file
- * label : label on top of the feature
+ * name : label on top of the feature
+ * category : cabane, ...
+ * alt : altitude (meters)
+ * bed : number of places to sleep
+ * cluster: number of grouped features too close to be displayed alone
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
- * cluster: number of grouped features too close to be displayed alone
  */
 //TODO BUG IE SCRIPT5022: IndexSizeError
 function layerVector(options) {
@@ -37,6 +40,9 @@ function layerVector(options) {
 			hover: true, // Select label | hover as text to be display
 			textOptions: {
 				overflow: true, // Force label display of little polygons
+				backgroundStroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
 			},
 		},
 		// Cluster bullet
@@ -92,13 +98,6 @@ function layerVector(options) {
 				source.refresh();
 		});
 
-	// Convert server properties to the one rendered ("icon", "label, "hover", "url", "cluster", ...)
-	if (typeof options.properties == 'function')
-		source.on('featuresloadend', function(evt) {
-			for (let p in evt.features)
-				options.properties(evt.features[p], options);
-		});
-
 	// style callback function for the layer
 	function style(feature, resolution) {
 		// Hover style
@@ -120,13 +119,20 @@ function layerVector(options) {
 			]);
 	}
 
+	// Callback function to convert server properties to the one rendered by displayStyle
+	if (typeof options.myProperties == 'function')
+		source.on('featuresloadend', function(evt) {
+			for (let p in evt.features)
+				options.myProperties(evt.features[p], options);
+		});
+
 	// Function to display different styles
 	function displayStyle(feature, resolution, styles) {
 		const properties = feature.getProperties(),
 			styleOptions = {},
 			textOptions = {};
 
-		// Compile the list of styles & default
+		// Concatenate the list of styles & defaults
 		for (let s in styles)
 			if (styles[s]) {
 				const style = typeof styles[s] == 'function' ?
@@ -139,30 +145,39 @@ function layerVector(options) {
 				Object.assign(textOptions, style.textOptions);
 			}
 
-		// Feature icon
 		if (properties.icon)
 			styleOptions.image = new ol.style.Icon({
 				src: properties.icon,
 			});
 
 		// Hover
-		if (styleOptions.hover)
-			elLabel.innerHTML = properties.hover || properties.label;
+		const hover = [],
+			subHover = [];
+		if (styleOptions.hover) { // When the function is called for hover
+			if (properties.category)
+				hover.push(properties.category);
+			if (properties.alt)
+				subHover.push(properties.alt + 'm');
+			if (properties.bed)
+				subHover.push(properties.bed + '\u255E\u2550\u2555');
+			if (subHover.length)
+				hover.push(subHover.join(', '));
+			hover.push(properties.name);
+		}
 
-		// Cluster: grouped features
-		else if (properties.cluster)
-			elLabel.innerHTML = properties.cluster;
+		elLabel.innerHTML =
+			(styleOptions.hover ? properties.hover : properties.cluster) ||
+			hover.join('\n') ||
+			properties.name;
 
-		// Labels
-		else if (properties.label)
-			elLabel.innerHTML = properties.label;
-
-		else
-			elLabel.innerHTML = '';
-
-		// Feature label
 		if (elLabel.innerHTML) {
-			textOptions.text = elLabel.textContent;
+			textOptions.text = elLabel.textContent //HACK to render the html entities in canvas
+				.replace( // First character upperCase
+					/(^\w|\s\w)/g,
+					function(m) {
+						return m.toUpperCase();
+					}
+				);
 			styleOptions.text = new ol.style.Text(textOptions);
 		}
 
@@ -222,7 +237,7 @@ function layerVectorCluster(layer, distance) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
 		let clusters = 0, // Add number of clusters of server cluster groups
-			labels = [], // List of labels of clustered features
+			names = [], // List of names of clustered features
 			clustered = false; // The server send clusters
 
 		if (features) {
@@ -235,18 +250,18 @@ function layerVectorCluster(layer, distance) {
 
 				clusters += parseInt(properties.cluster) || 1;
 
-				if (properties.label || properties.hover)
-					labels.push(properties.label || properties.hover);
+				if (properties.name)
+					names.push(properties.name);
 			}
 
-			if (features.length > 1 || !labels.length) {
+			if (features.length > 1 || !names.length) {
 				// Big cluster
 				if (clusters > 5)
-					labels = []; // Don't display big list
+					names = []; // Don't display big list
 
 				// Clusters
 				feature.set('cluster', clusters);
-				feature.set('hover', labels.length ? labels.join('\n') : 'Cliquer pour zoomer');
+				feature.set('hover', names.length ? names.join('\n') : 'Cliquer pour zoomer');
 			} else {
 				// Single feature (point, line or poly)
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
@@ -270,14 +285,14 @@ function layerVectorCluster(layer, distance) {
 /**
  * Control to display labels on hovering & click
  * on features of vector layers having the following properties :
- * label : text on top of the picture
+ * hover : text on top of the picture
  * url : go to a new URL when we click on the feature
  */
 function controlHover() {
 	const control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		}),
-		// Internal layer to temporary display hovered feature
+		// Internal layer to temporary display the hovered feature
 		hoverLayer = new ol.layer.Vector({
 			source: new ol.source.Vector(),
 			zIndex: 1, // Above the features
@@ -291,8 +306,6 @@ function controlHover() {
 		ol.control.Control.prototype.setMap.call(this, map);
 		map.addLayer(hoverLayer);
 
-		map.on(['pointermove', 'click'], mouseEvent);
-
 		map.getView().on('change:resolution', function() {
 			// Remove hovered feature
 			if (previousHoveredFeature)
@@ -302,6 +315,8 @@ function controlHover() {
 			// Reset cursor
 			map.getViewport().style.cursor = 'default';
 		});
+
+		map.on(['pointermove', 'click'], mouseEvent);
 	};
 
 	let previousHoveredFeature;
@@ -314,14 +329,27 @@ function controlHover() {
 				return feature;
 			});
 
+		// Make the hovered feature visible in a dedicated layer
+		if (feature !== previousHoveredFeature) {
+			if (previousHoveredFeature)
+				hoverLayer.getSource().removeFeature(previousHoveredFeature);
+
+			if (feature)
+				hoverLayer.getSource().addFeature(feature);
+
+			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
+			previousHoveredFeature = feature;
+		}
+
+		// Click actions
 		if (feature) {
 			const features = feature.get('features') || [feature],
 				url = features[0].get('url'),
 				geom = feature.getGeometry();
 
 			if (evt.type == 'click') {
-				// Single feature
 				if (features.length == 1 && url) {
+					// Single feature
 					if (evt.originalEvent.ctrlKey)
 						window.open(url, '_blank').focus();
 					else
@@ -338,18 +366,6 @@ function controlHover() {
 							center: geom.getCoordinates(),
 						});
 			}
-		}
-
-		// Make the hovered feature visible in a dedicated layer
-		if (feature !== previousHoveredFeature) {
-			if (previousHoveredFeature)
-				hoverLayer.getSource().removeFeature(previousHoveredFeature);
-
-			if (feature)
-				hoverLayer.getSource().addFeature(feature);
-
-			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
-			previousHoveredFeature = feature;
 		}
 	}
 
