@@ -1,4 +1,15 @@
 /**
+ * BBOX strategy when the url returns a limited number of features in the BBox
+ * We do need to reload when the zoom in
+ */
+ol.loadingstrategy.bboxLimit = function(extent, resolution) {
+	if (this.bboxLimitResolution > resolution) // When zoom in
+		this.loadedExtentsRtree_.clear(); // Force the loading of all areas
+	this.bboxLimitResolution = resolution; // Mem resolution for further requests
+	return [extent];
+};
+
+/**
  * Layer to display remote geoJson
  * Styles, icons & labels
  *
@@ -26,7 +37,7 @@ function layerVector(options) {
 			// Yellow label
 			textOptions: {
 				textBaseline: 'bottom',
-				offsetY: -13, // Compensate the bottom textBaseline
+				offsetY: -13, // Balance the bottom textBaseline
 				padding: [1, 3, 0, 3],
 				font: '14px Calibri,sans-serif',
 				backgroundFill: new ol.style.Fill({
@@ -34,7 +45,7 @@ function layerVector(options) {
 				}),
 			},
 		},
-		// Hover a feature can display "hover" properties on another format
+		// Display hover feature can display with another format
 		// In addition to defaultStyleOptions
 		defaultHoverStyleOptions = {
 			hover: true, // Select label | hover as text to be display
@@ -98,6 +109,16 @@ function layerVector(options) {
 				source.refresh();
 		});
 
+	// Callback function to define features displays from the properties received from the server
+	if (typeof options.displayProperties == 'function')
+		source.on('featuresloadend', function(evt) {
+			for (let p in evt.features)
+				evt.features[p].display = options.displayProperties(
+					evt.features[p].getProperties(),
+					options
+				);
+		});
+
 	// style callback function for the layer
 	function style(feature, resolution) {
 		// Hover style
@@ -107,7 +128,7 @@ function layerVector(options) {
 			]);
 		};
 
-		if (feature.get('cluster')) // Grouped features
+		if (feature.display.cluster) // Grouped features
 			// Cluster style
 			return displayStyle(feature, resolution, [
 				defaultClusterStyleOptions, options.clusterStyleOptions
@@ -119,17 +140,9 @@ function layerVector(options) {
 			]);
 	}
 
-	// Callback function to convert server properties to the one rendered by displayStyle
-	if (typeof options.myProperties == 'function')
-		source.on('featuresloadend', function(evt) {
-			for (let p in evt.features)
-				options.myProperties(evt.features[p], options);
-		});
-
 	// Function to display different styles
 	function displayStyle(feature, resolution, styles) {
-		const properties = feature.getProperties(),
-			styleOptions = {},
+		const styleOptions = {},
 			textOptions = {};
 
 		// Concatenate the list of styles & defaults
@@ -145,30 +158,30 @@ function layerVector(options) {
 				Object.assign(textOptions, style.textOptions);
 			}
 
-		if (properties.icon)
+		if (feature.display.icon)
 			styleOptions.image = new ol.style.Icon({
-				src: properties.icon,
+				src: feature.display.icon,
 			});
 
 		// Hover
 		const hover = [],
 			subHover = [];
 		if (styleOptions.hover) { // When the function is called for hover
-			if (properties.type)
-				hover.push(properties.type.replace('_', ' '));
-			if (properties.alt)
-				subHover.push(properties.alt + 'm');
-			if (properties.bed)
-				subHover.push(properties.bed + '\u255E\u2550\u2555');
+			if (feature.display.type)
+				hover.push(feature.display.type.replace('_', ' '));
+			if (feature.display.alt)
+				subHover.push(feature.display.alt + 'm');
+			if (feature.display.bed)
+				subHover.push(feature.display.bed + '\u255E\u2550\u2555');
 			if (subHover.length)
 				hover.push(subHover.join(', '));
-			hover.push(properties.name);
+			hover.push(feature.display.name);
 		}
 
 		elLabel.innerHTML = //HACK to render the html entities in canvas
-			(styleOptions.hover ? properties.hover : properties.cluster) ||
+			(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
 			hover.join('\n') ||
-			properties.name;
+			feature.display.name;
 
 		if (elLabel.innerHTML) {
 			textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
@@ -236,16 +249,14 @@ function layerVectorCluster(layer, distance) {
 
 		if (features) {
 			for (let f in features) {
-				const properties = features[f].getProperties();
-
 				// Check if the server send clusters
-				if (properties.cluster)
+				if (features[f].display.cluster)
 					clustered = true;
 
-				clusters += parseInt(properties.cluster) || 1;
+				clusters += parseInt(features[f].display.cluster) || 1;
 
-				if (properties.name)
-					names.push(properties.name);
+				if (features[f].display.name)
+					names.push(features[f].display.name);
 			}
 
 			if (features.length > 1 || !names.length) {
@@ -254,8 +265,10 @@ function layerVectorCluster(layer, distance) {
 					names = []; // Don't display big list
 
 				// Clusters
-				feature.set('cluster', clusters);
-				feature.set('hover', names.length ? names.join('\n') : 'Cliquer pour zoomer');
+				feature.display = {
+					cluster: clusters,
+					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
+				}
 			} else {
 				// Single feature (point, line or poly)
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
@@ -338,7 +351,7 @@ function controlHover() {
 		// Click actions
 		if (feature) {
 			const features = feature.get('features') || [feature],
-				url = features[0].get('url'),
+				url = features[0].display.url,
 				geom = feature.getGeometry();
 
 			if (evt.type == 'click') {

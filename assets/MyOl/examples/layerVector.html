@@ -102,7 +102,7 @@ Based on https://openlayers.org
 				//center: [700000, 5700000], zoom: 12, // Maurienne
 				//center: [260000, 6250000], zoom: 12, // Paris
 				//center: [260000, 5800000], zoom: 7, // France
-				center: [50000, 5300000], zoom: 12, //  Pyrénées
+				center: [50000, 5300000], zoom: 11, //  Pyrénées
 			}),
 		});
 
@@ -129,7 +129,7 @@ Based on https://openlayers.org
 				selectorName: 'chem-features',
 			}));
 
-		if (01) {
+		if (0) {
 			map.addLayer(layerVectorCluster(
 				layerChemPoi({
 					selectorName: 'chem-features',
@@ -150,17 +150,19 @@ Based on https://openlayers.org
 			map.addLayer(layerPyreneesRefuges({
 				selectorName: 'prc-features',
 			}));
-		if (0)
-			map.addLayer(layerVectorCluster(// Too slow !
+		if (01)
+			map.addLayer(layerVectorCluster(
 				layerPyreneesRefuges({
 					selectorName: 'prc-features',
 				})
 			));
 
-		if (01)
-			map.addLayer(layerAlpages({
-				selectorName: 'alp-features',
-			}));
+		if (0)
+			map.addLayer(layerVectorCluster(
+				layerAlpages({
+					selectorName: 'alp-features',
+				})
+			));
 	</script>
 </body>
 </html>

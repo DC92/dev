@@ -7,16 +7,16 @@
  * Common function
  */
 function fillColorOption(hexColor, transparency) {
-	return {
+	return hexColor ? {
 		fill: new ol.style.Fill({
 			color: 'rgba(' + [
 				parseInt(hexColor.substring(1, 3), 16),
 				parseInt(hexColor.substring(3, 5), 16),
 				parseInt(hexColor.substring(5, 7), 16),
-				transparency,
+				transparency || 1,
 			].join(',') + ')',
 		}),
-	};
+	} : {};
 }
 
 /**
@@ -69,14 +69,15 @@ function layerWriPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		myProperties: function(feature, options) {
-			const properties = feature.getProperties();
-			feature.set('icon', '//' + options.host + '/images/icones/' + properties.type.icone + '.svg');
-			feature.set('name', properties.nom);
-			feature.set('alt', properties.coord.alt);
-			feature.set('bed', properties.places.valeur);
-			feature.set('url', properties.lien);
-			feature.set('type', properties.type.valeur);
+		displayProperties: function(properties, options) {
+			return {
+				name: properties.nom,
+				type: properties.type.valeur,
+				icon: '//' + options.host + '/images/icones/' + properties.type.icone + '.svg',
+				alt: properties.coord.alt,
+				bed: properties.places.valeur,
+				url: properties.lien,
+			};
 		},
 	}, options));
 }
@@ -89,11 +90,11 @@ function layerWriAreas(options) {
 		urlFunction: function(options) {
 			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
 		},
-		myProperties: function(feature) {
-			const properties = feature.getProperties();
-			feature.set('name', feature.get('nom'));
-			feature.set('url', feature.get('lien'));
-			feature.set('type', null);
+		displayProperties: function(properties) {
+			return {
+				name: properties.nom,
+				url: properties.lien,
+			};
 		},
 		styleOptions: function(feature) {
 			return fillColorOption(feature.get('couleur'), 0.5);
@@ -117,10 +118,10 @@ function layerChemPoi(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		myProperties: function(feature, options) {
-			const properties = feature.getProperties();
-			feature.set('icon', '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg');
-			feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
+		displayProperties: function(properties, options) {
+			properties.icon = '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
+			return properties
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -148,6 +149,9 @@ function layerChemCluster(options) {
 				'/ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
+		displayProperties: function(properties) { //TODO faire un défaut !
+			return properties
+		},
 	}, options));
 }
 
@@ -164,13 +168,10 @@ function layerAlpages(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		strategy: ol.loadingstrategy.bbox,
-		myProperties: function(feature, options) {
-			const properties = feature.getProperties();
-
-			feature.set('hover', properties.name);
-
-			if (properties.id)
-				feature.set('url', '//' + options.host + '/viewtopic.php?t=' + properties.id);
+		displayProperties: function(properties, options) {
+			//TODO altitude / lits / type
+			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
+			return properties
 		},
 		styleOptions: function(feature) {
 			return fillColorOption(feature.get('color'), 0.3);
@@ -187,6 +188,13 @@ function layerAlpages(options) {
 function layerPyreneesRefuges(options) {
 	return layerVector(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		displayProperties: function(properties, options) {
+			//TODO altitude / lits / type
+			properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+				getSym(properties.type_hebergement || 'cabane') + '.svg';
+			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
+			return properties
+		},
 		myProperties: function(feature) {
 			const properties = feature.getProperties();
 
