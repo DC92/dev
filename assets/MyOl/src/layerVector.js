@@ -388,7 +388,7 @@ function readCheckbox(selectorName) {
 
 	// Specific case of a single on/off <input>
 	if (inputEls.length == 1)
-		return [inputEls[0].checked];
+		return inputEls[0].checked ? ['on'] : [];
 
 	// Read each <input> checkbox
 	const selection = [];
@@ -409,7 +409,6 @@ function readCheckbox(selectorName) {
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
-	//TODO BUG ne marche pas avec un sélecteur simple (une coche on/off)
 	const request = // Search values in cookies & args
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3

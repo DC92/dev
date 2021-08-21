@@ -83,7 +83,6 @@ function layerWriPoi(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO follow selector on/of
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
 		polygon: 1,
