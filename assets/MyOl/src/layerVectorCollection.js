@@ -112,7 +112,7 @@ function layerChemPoi(options) {
 		host: 'chemineur.fr',
 		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?limit=1000000&layer=simple&' +
+				'/ext/Dominique92/GeoBB/gis2.php?layer=simple&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
@@ -120,7 +120,7 @@ function layerChemPoi(options) {
 		displayProperties: function(properties, options) {
 			properties.icon = '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
-			return properties
+			return properties;
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -148,9 +148,6 @@ function layerChemCluster(options) {
 				'/ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
-		displayProperties: function(properties) { //TODO faire un défaut !
-			return properties
-		},
 	}, options));
 }
 
@@ -170,7 +167,7 @@ function layerAlpages(options) {
 		displayProperties: function(properties, options) {
 			//TODO altitude / lits / type
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
-			return properties
+			return properties;
 		},
 		styleOptions: function(feature) {
 			return fillColorOption(feature.get('color'), 0.3);
@@ -192,7 +189,7 @@ function layerPyreneesRefuges(options) {
 			properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
 				getSym(properties.type_hebergement || 'cabane') + '.svg';
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
-			return properties
+			return properties;
 		},
 		myProperties: function(feature) {
 			const properties = feature.getProperties();

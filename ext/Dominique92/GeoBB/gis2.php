@@ -24,7 +24,7 @@ $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $select = request_var ('select', ''); // Post to display
 $format = request_var ('format', 'geojson'); // Format de sortie. Par défaut geojson
 $layer = request_var ('layer', 'full'); // full | simple | cluster
-$limit = request_var ('limit', 250); // Nombre de points maximum
+$limit = request_var ('limit', 1000); // Nombre de points maximum
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
 $bbox_sql =

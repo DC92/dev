@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 /**
  * BBOX strategy when the url returns a limited number of features in the BBox
  * We do need to reload when the zoom in
@@ -32,9 +34,17 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * url: url to go if feature is clicked
  */
 //TODO BUG IE SCRIPT5022: IndexSizeError
-function layerVector(options) {
-	const defaultStyleOptions = {
-			// Yellow label
+function layerVector(opt) {
+	const options = Object.assign({
+				format: new ol.format.GeoJSON(),
+				displayProperties: function(properties) {
+					return properties;
+				},
+			},
+			opt),
+
+		// Yellow label
+		defaultStyleOptions = {
 			textOptions: {
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
@@ -45,6 +55,7 @@ function layerVector(options) {
 				}),
 			},
 		},
+
 		// Display hover feature can display with another format
 		// In addition to defaultStyleOptions
 		defaultHoverStyleOptions = {
@@ -56,6 +67,7 @@ function layerVector(options) {
 				}),
 			},
 		},
+
 		// Cluster bullet
 		defaultClusterStyleOptions = {
 			image: new ol.style.Circle({
@@ -71,13 +83,13 @@ function layerVector(options) {
 				font: '14px Calibri,sans-serif',
 			}),
 		},
+
 		//HACK to render the html entities in canvas
 		elLabel = document.createElement('span'),
 
 		// Source & layer
 		source = new ol.source.Vector(Object.assign({
 				url: url,
-				format: new ol.format.GeoJSON(),
 			},
 			options)),
 
@@ -268,7 +280,7 @@ function layerVectorCluster(layer, distance) {
 				feature.display = {
 					cluster: clusters,
 					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
-				}
+				};
 			} else {
 				// Single feature (point, line or poly)
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
