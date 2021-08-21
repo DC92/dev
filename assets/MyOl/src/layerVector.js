@@ -6,7 +6,7 @@
  */
 ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 	if (this.bboxLimitResolution > resolution) // When zoom in
-		this.loadedExtentsRtree_.clear(); // Force the loading of all areas
+		this.refresh(); // Force the loading of all areas
 	this.bboxLimitResolution = resolution; // Mem resolution for further requests
 	return [extent];
 };
@@ -25,9 +25,10 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  *
  * GeoJson properties:
  * icon : url of an icon file
+ * iconchem : url of an icon from chemineur.fr
  * name : label on top of the feature
  * type : cabane, ...
- * alt : altitude (meters)
+ * ele : elevation / altitude (meters)
  * bed : number of places to sleep
  * cluster: number of grouped features too close to be displayed alone
  * hover : label on hovering a feature
@@ -37,6 +38,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 function layerVector(opt) {
 	const options = Object.assign({
 			format: new ol.format.GeoJSON(),
+			strategy: ol.loadingstrategy.bbox,
 			displayProperties: function(properties) {
 				return properties;
 			},
@@ -169,7 +171,13 @@ function layerVector(opt) {
 				Object.assign(textOptions, style.textOptions);
 			}
 
+		//TODO faire une fonction plus générale pour les feature.display
+		if (feature.display.iconchem)
+			feature.display.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+			getSym(feature.display.iconchem || 'inconnu') + '.svg';
+
 		if (feature.display.icon)
+			//TODO add <sym> for Garmin upload
 			styleOptions.image = new ol.style.Icon({
 				src: feature.display.icon,
 			});
@@ -180,8 +188,8 @@ function layerVector(opt) {
 		if (styleOptions.hover) { // When the function is called for hover
 			if (feature.display.type)
 				hover.push(feature.display.type.replace('_', ' '));
-			if (feature.display.alt)
-				subHover.push(feature.display.alt + 'm');
+			if (feature.display.ele)
+				subHover.push(feature.display.ele + 'm');
 			if (feature.display.bed)
 				subHover.push(feature.display.bed + '\u255E\u2550\u2555');
 			if (subHover.length)
@@ -213,6 +221,7 @@ function layerVector(opt) {
  */
 function layerVectorCluster(layer, distance) {
 	const options = Object.assign({
+			strategy: ol.loadingstrategy.bbox,
 			distance: 50, // Distance in pixels within which features will be clustered together.
 		}, layer.options),
 

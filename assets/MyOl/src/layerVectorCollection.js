@@ -68,13 +68,12 @@ function layerWriPoi(options) {
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
-		strategy: ol.loadingstrategy.bbox,
 		displayProperties: function(properties, options) {
 			return {
 				name: properties.nom,
 				type: properties.type.valeur,
 				icon: '//' + options.host + '/images/icones/' + properties.type.icone + '.svg',
-				alt: properties.coord.alt,
+				ele: properties.coord.alt,
 				bed: properties.places.valeur,
 				url: properties.lien,
 			};
@@ -116,7 +115,6 @@ function layerChemPoi(options) {
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		strategy: ol.loadingstrategy.bbox,
 		displayProperties: function(properties, options) {
 			properties.icon = '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
@@ -163,7 +161,6 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		strategy: ol.loadingstrategy.bbox,
 		displayProperties: function(properties, options) {
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
 			return properties;
@@ -183,16 +180,58 @@ function layerAlpages(options) {
 function layerPyreneesRefuges(options) {
 	return layerVector(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		displayProperties: function(properties, options) {
+		strategy: ol.loadingstrategy.all,
+		displayProperties: function(properties) {
 			return {
 				name: properties.name,
 				type: properties.type_hebergement,
-				icon: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-					getSym(properties.type_hebergement || 'cabane') + '.svg',
-				url: '//' + options.host + '/viewtopic.php?t=' + properties.id,
-				alt: properties.altitude,
+				iconchem: properties.type_hebergement || 'cabane',
+				url: properties.url,
+				ele: properties.altitude,
 				bed: properties.cap_ete,
 			};
 		},
+	}, options));
+}
+
+/**
+ * Site camptocamp.org
+ */
+function layerC2C(options) {
+	const format = new ol.format.GeoJSON({ // Format of received data
+		dataProjection: 'EPSG:3857',
+	});
+	format.readFeatures = function(json, opts) {
+		const features = [],
+			objects = JSON.parse(json);
+		for (let o in objects.documents) {
+			const properties = objects.documents[o];
+			features.push({
+				id: properties.document_id,
+				type: 'Feature',
+				geometry: JSON.parse(properties.geometry.geom),
+				properties: {
+					ele: properties.elevation,
+					name: properties.locales[0].title,
+					type: properties.waypoint_type,
+					iconchem: properties.waypoint_type || 'Puzzle Cache',
+					url: 'https://www.camptocamp.org/waypoints/' + properties.document_id,
+				},
+			});
+		}
+		return format.readFeaturesFromObject({
+				type: 'FeatureCollection',
+				features: features,
+			},
+			format.getReadOptions(json, opts)
+		);
+	};
+
+	return layerVector(Object.assign({
+		urlFunction: function(options, bbox, selection, extent) {
+			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
+		},
+		format: format,
+		strategy: ol.loadingstrategy.bboxLimit,
 	}, options));
 }
