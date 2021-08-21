@@ -99,10 +99,10 @@ Based on https://openlayers.org
 				controlHover(),
 			],
 			view: new ol.View({
-				//center: [700000, 5700000], zoom: 12, // Maurienne
+				center: [700000, 5700000], zoom: 12, // Maurienne
 				//center: [260000, 6250000], zoom: 12, // Paris
 				//center: [260000, 5800000], zoom: 7, // France
-				center: [50000, 5300000], zoom: 11, //  Pyrénées
+				//center: [50000, 5300000], zoom: 11, //  Pyrénées
 			}),
 		});
 
@@ -116,7 +116,7 @@ Based on https://openlayers.org
 				layerWriPoi({
 					selectorName: 'wri-features',
 					maxResolution: 100,
-					distance: 100,
+					distance: 50,
 				})
 			));
 			map.addLayer(layerWriAreas({
@@ -135,35 +135,34 @@ Based on https://openlayers.org
 				layerChemPoi({
 					selectorName: 'chem-features',
 					maxResolution: 100,
-					distance: 100,
+					distance: 50,
 				})
 			));
 			map.addLayer(layerVectorCluster(
 				layerChemCluster({
 					selectorName: 'chem-features',
 					minResolution: 100,
-					distance: 100,
+					distance: 50,
 				})
 			));
 		}
 
-		if (01)
+		if (0)
 			map.addLayer(layerPyreneesRefuges({
 				selectorName: 'prc-features',
 			}));
-		if (0)
+		if (01)
 			map.addLayer(layerVectorCluster(
 				layerPyreneesRefuges({
 					selectorName: 'prc-features',
+					distance: 50,
 				})
 			));
 
 		if (01)
-			map.addLayer(layerVectorCluster(
-				layerAlpages({
-					selectorName: 'alp-features',
-				})
-			));
+			map.addLayer(layerAlpages({
+				selectorName: 'alp-features',
+			}));
 	</script>
 </body>
 </html>

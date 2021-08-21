@@ -36,12 +36,11 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 //TODO BUG IE SCRIPT5022: IndexSizeError
 function layerVector(opt) {
 	const options = Object.assign({
-				format: new ol.format.GeoJSON(),
-				displayProperties: function(properties) {
-					return properties;
-				},
+			format: new ol.format.GeoJSON(),
+			displayProperties: function(properties) {
+				return properties;
 			},
-			opt),
+		}, opt),
 
 		// Yellow label
 		defaultStyleOptions = {
@@ -213,10 +212,13 @@ function layerVector(opt) {
  * Cluster close features
  */
 function layerVectorCluster(layer, distance) {
-	// Clusterized source & layer
-	const clusterDistance = distance || layer.options.distance || 50,
+	const options = Object.assign({
+			distance: 50, // Distance in pixels within which features will be clustered together.
+		}, layer.options),
+
+		// Clusterized source & layer
 		clusterSource = new ol.source.Cluster({
-			distance: clusterDistance,
+			distance: options.distance,
 			source: layer.getSource(),
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
@@ -232,7 +234,7 @@ function layerVectorCluster(layer, distance) {
 				style: clusterStyle,
 				visible: layer.getVisible(), // Get the selector status 
 			},
-			layer.options));
+			options));
 
 	//HACK propagate setVisible following the selector status
 	layer.on('change:visible', function() {
@@ -243,7 +245,7 @@ function layerVectorCluster(layer, distance) {
 	let previousResolution;
 	clusterLayer.on('prerender', function(evt) {
 		const resolution = evt.frameState.viewState.resolution,
-			distance = resolution < 10 ? 0 : Math.min(clusterDistance, resolution);
+			distance = resolution < 10 ? 0 : Math.min(options.distance, resolution);
 
 		if (previousResolution != resolution) // Only when changed
 			clusterSource.setDistance(distance);
