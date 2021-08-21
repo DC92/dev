@@ -127,9 +127,6 @@ function layerChemPoi(options) {
 			}),
 		},
 		hoverStyleOptions: {
-			textOptions: {
-				font: '14px Calibri,sans-serif',
-			},
 			stroke: new ol.style.Stroke({
 				color: 'red',
 				width: 3,
@@ -162,6 +159,10 @@ function layerAlpages(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, options) {
+			//TODO add 'Oil feild' icon in chemineur.fr
+			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
+			if (match)
+				properties.iconchem = match[1];
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
 			return properties;
 		},
