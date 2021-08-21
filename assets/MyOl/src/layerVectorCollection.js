@@ -165,7 +165,6 @@ function layerAlpages(options) {
 		},
 		strategy: ol.loadingstrategy.bbox,
 		displayProperties: function(properties, options) {
-			//TODO altitude / lits / type
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
 			return properties;
 		},
@@ -185,22 +184,15 @@ function layerPyreneesRefuges(options) {
 	return layerVector(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		displayProperties: function(properties, options) {
-			//TODO altitude / lits / type
-			properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-				getSym(properties.type_hebergement || 'cabane') + '.svg';
-			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
-			return properties;
-		},
-		myProperties: function(feature) {
-			const properties = feature.getProperties();
-
-			feature.set(
-				'icon', '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-				getSym(properties.type_hebergement || 'cabane') + '.svg'
-			);
-
-			if (properties.name)
-				feature.set('label', properties.name);
+			return {
+				name: properties.name,
+				type: properties.type_hebergement,
+				icon: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+					getSym(properties.type_hebergement || 'cabane') + '.svg',
+				url: '//' + options.host + '/viewtopic.php?t=' + properties.id,
+				alt: properties.altitude,
+				bed: properties.cap_ete,
+			};
 		},
 	}, options));
 }
