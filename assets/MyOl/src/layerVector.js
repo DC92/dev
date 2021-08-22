@@ -173,8 +173,8 @@ function layerVector(opt) {
 
 		//TODO faire une fonction plus générale pour les feature.display
 		if (feature.display.iconchem)
-			feature.display.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-			getSym(feature.display.iconchem || 'inconnu') + '.svg';
+			feature.display.icon =
+			'//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.display.iconchem + '.svg';
 
 		if (feature.display.icon)
 			//TODO add <sym> for Garmin upload

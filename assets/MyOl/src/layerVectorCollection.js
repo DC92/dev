@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 /**
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
@@ -17,43 +19,6 @@ function fillColorOption(hexColor, transparency) {
 			].join(',') + ')',
 		}),
 	} : {};
-}
-
-/**
- * Convert properties type into gpx <sym>
- * Manages common types for many layer services
- */
-function getSym(type) {
-	const lex =
-		// https://forums.geocaching.com/GC/index.php?/topic/277519-garmin-roadtrip-waypoint-symbols/
-		// https://www.gerritspeek.nl/navigatie/gps-navigatie_waypoint-symbolen.html
-		// <sym> propertie propertie
-		'<City Hall> hotel' +
-		'<Residence> refuge gite chambre_hote' +
-		'<Lodge> cabane cabane_cle buron alpage shelter cabane ouverte mais ocupee par le berger l ete' +
-		'<Fishing Hot Spot Facility> abri hut' +
-		'<Campground> camping camp_site bivouac' +
-		'<Tunnel> orri toue abri en pierre grotte cave' +
-		'<Crossing> ferme ruine batiment-inutilisable cabane fermee' +
-
-		'<Summit> sommet summit climbing_indoor climbing_outdoor bisse' +
-		'<Reef> glacier canyon' +
-		'<Waypoint> locality col pass' +
-
-		'<Drinking Water> point_eau waterpoint waterfall' +
-		'<Water Source> lac lake' +
-		'<Ground Transportation> bus car' +
-		'<Parking Area> access' +
-		'<Restaurant> buffet restaurant' +
-		'<Shopping Center> local_product ravitaillement' +
-
-		'<Restroom> wc' +
-		'<Oil Field> wifi reseau' +
-		'<Telephone> telephone',
-		// slackline_spot paragliding_takeoff paragliding_landing virtual webcam
-
-		match = lex.match(new RegExp('<([^>]*)>[^>]* ' + type));
-	return match ? match[1] : 'Puzzle Cache';
 }
 
 /**
@@ -163,6 +128,7 @@ function layerAlpages(options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
 				properties.iconchem = match[1];
+
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
 			return properties;
 		},
@@ -176,6 +142,57 @@ function layerAlpages(options) {
 }
 
 /**
+ * OSM XML overpass POI layer
+ * From: https://openlayers.org/en/latest/examples/vector-osm.html
+ * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
+ */
+function layerOSM(options) {
+	const layer = layerVector(Object.assign({
+		host: 'https://overpass-api.de/api/interpreter',
+		urlFunction: urlFunction,
+		format: new ol.format.OSMXML(),
+		displayProperties: displayProperties,
+	}, options));
+
+	function urlFunction(options, bbox, selection) {
+		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
+			args = [];
+
+		// Convert selections on overpass_api language
+		for (let l = 0; l < selection.length; l++) {
+			const selections = selection[l].split('+');
+			for (let ls = 0; ls < selections.length; ls++)
+				args.push(
+					'node' + selections[ls] + bb + // Ask for nodes in the bbox
+					'way' + selections[ls] + bb // Also ask for areas
+				);
+		}
+
+		return options.host +
+			'?data=[timeout:5];(' + // Not too much !
+			args.join('') +
+			');out center;'; // add center of areas
+	}
+
+	function displayProperties(properties) {
+		properties.type =
+			properties.iconchem =
+			properties.tourism ||
+			properties.building ||
+			properties.shelter_type ||
+			properties.amenity ||
+			properties.waterway ||
+			properties.man_made ||
+			properties.highway ||
+			properties.shop;
+
+		return properties;
+	}
+
+	return layer;
+}
+
+/**
  * Site pyrenees-refuges.com
  */
 function layerPyreneesRefuges(options) {
@@ -183,10 +200,11 @@ function layerPyreneesRefuges(options) {
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		displayProperties: function(properties) {
+			const types = properties.type_hebergement.split(' ');
 			return {
 				name: properties.name,
 				type: properties.type_hebergement,
-				iconchem: properties.type_hebergement || 'cabane',
+				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
 				url: properties.url,
 				ele: properties.altitude,
 				bed: properties.cap_ete,
@@ -215,7 +233,7 @@ function layerC2C(options) {
 					ele: properties.elevation,
 					name: properties.locales[0].title,
 					type: properties.waypoint_type,
-					iconchem: properties.waypoint_type || 'Puzzle Cache',
+					iconchem: properties.waypoint_type,
 					url: 'https://www.camptocamp.org/waypoints/' + properties.document_id,
 				},
 			});

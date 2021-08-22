@@ -13,7 +13,8 @@ $alias = [
 	'cafe' => 'cabane_white_green_a9749.5',
 	'camping' => 'camping_yellow_green',
 	'chambre_hote' => 'cabane_green',
-//	'col' => 'col',
+//	'bus' => 'bus',
+//	'cabane' => 'cabane',
 	'edifice_religieux' => 'cabane_white_blue_croix',
 	'ferme' => 'cabane_white_black_x',
 	'gare' => 'cabane_white_black_loco',
@@ -49,6 +50,29 @@ $alias = [
 	'vignoble' => 'cabane_violet_purple_a9753.6',
 	'village' => 'cabane_grey_black_a118',
 	'ville' => 'cabane_white_black_a86',
+
+	// PRC
+	'cabane_fermee' => 'cabane_white_black_x',
+	'cabane_mais' => 'cabane_white_black_x',
+	'cabane_ouverte' => 'cabane',
+	'orri_toue' => 'arc_blanchedalmond_red_manqueunmur',
+
+	// OSM
+	'access' => 'parking',
+	'bivouac' => 'camping_yellow_green',
+	'buffet' => 'cabane_white_blue_a9832.5',
+	'car' => 'bus',
+	'camp_site' => 'camping_yellow_green',
+	'cave' => 'arc_lightgrey_black_manqueunmur',
+	'hut' => 'cabane_manqueunmur',
+	'lake' => 'lac',
+	'local_product' => 'ravitaillement',
+	'pass' => 'triangle_a33',
+	'shelter' => 'cabane',
+	'summit' => 'sommet',
+
+	// Alpages.info
+	'reseau' => 'a63',
 
 	// Icônes Overpass, C2C & PRC (remplacer ' ' par %20 dans l'URL)
 	// Il s'agit en fait d'une équivalence des symboles geocaching utilisés par les GPS
