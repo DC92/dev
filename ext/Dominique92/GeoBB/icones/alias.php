@@ -2,24 +2,25 @@
 $colors = ['black','green','blue','red','grey','yellow','white',
 	'maroon','orange','blanchedalmond','lightgrey','violet','purple'];
 
+// Tableau de correspondance des icônes
 $alias = [
-	// Tableau de correspondance des icônes
+	// Chemineur
 	'abri' => 'cabane_manqueunmur',
 	'abri_pierre' => 'arc_white_maroon_manqueunmur',
 	'aeroport' => 'cabane_white_blue_a9992.6.20',
 	'bivouac' => 'camping_grey_maroon',
-	'buffet' => 'ravitaillement',
 	'buron' => 'cabane_maroon',
 	'cafe' => 'cabane_white_green_a9749.5',
 	'camping' => 'camping_yellow_green',
 	'chambre_hote' => 'cabane_green',
 //	'bus' => 'bus',
 //	'cabane' => 'cabane',
+//	'cabane_cle' => 'cabane_cle',
+//	'col' => 'col',
 	'edifice_religieux' => 'cabane_white_blue_croix',
 	'ferme' => 'cabane_white_black_x',
 	'gare' => 'cabane_white_black_loco',
 	'gite' => 'cabane_green',
-	'gite-d-etape' => 'blue',
 	'grotte' => 'arc_lightgrey_black_manqueunmur',
 	'hotel' => 'cabane_blue',
 	'ile' => 'lac_orange_a45.8.15',
@@ -33,14 +34,13 @@ $alias = [
 	'ouvrage_militaire' => 'cabane_white_black_a9876.6',
 //	'parking' => 'parking',
 	'passage_a_niveau' => 'triangle_loco',
-	'passage-delicat' => 'triangle_a33',
 	'phare' => 'lac_orange_a9820.4.15',
 	'point_eau' => 'pointdeau',
 	'pont' => 'arc_white_black_loco',
 	'port' => 'bateau',
 //	'ravitaillement' => 'ravitaillement',
 	'refuge' => 'cabane_red',
-	'restaurant' => 'cabane_white_blue_a9832.5',
+	//'restaurant' => 'cabane_white_blue_a9832.5',
 	'rond_point' => 'triangle_a8634.5.22',
 	'ruine' => 'triangle_grey_black_manqueunmur',
 	'site' => 'lac_yellow_a9728.4.18',
@@ -50,12 +50,39 @@ $alias = [
 	'vignoble' => 'cabane_violet_purple_a9753.6',
 	'village' => 'cabane_grey_black_a118',
 	'ville' => 'cabane_white_black_a86',
+ 
+	// WRI
+	//'gite-d-etape' => 'blue',
+	//'passage-delicat' => 'triangle_a33',
 
 	// PRC
 	'cabane_fermee' => 'cabane_white_black_x',
 	'cabane_mais' => 'cabane_white_black_x',
 	'cabane_ouverte' => 'cabane',
 	'orri_toue' => 'arc_blanchedalmond_red_manqueunmur',
+
+	// C2C
+	'bus_stop' => 'bus',
+	'canyon' => 'triangle_a33',
+	'climbing_indoor' => 'sommet',
+	'climbing_outdoor' => 'sommet',
+	'convenience' => 'ravitaillement',
+	'locality' => 'cabane_grey_black_a118',
+	'misc' => 'a63',
+	'paragliding_takeoff' => 'sommet',
+	'paragliding_landing' => 'triangle_a33',
+	'retail' => 'ravitaillement',
+	'slackline_spot' => 'a63',
+	'virtual' => 'a63',
+	'waterpoint' => 'pointdeau',
+	'waterfall' => 'pointdeau',
+	'weather_station' => 'a63',
+	'webcam' => 'a63',
+	/*//TODO manque
+	refuges
+	parkings
+	WC -> yes
+	*/
 
 	// OSM
 	'access' => 'parking',
@@ -73,6 +100,14 @@ $alias = [
 
 	// Alpages.info
 	'reseau' => 'a63',
+
+	// OSM
+	'alpine_hut' => 'cabane',
+	'basic_hut' => 'cabane',
+	'guest_house' => 'cabane_blue',
+	'hostel' => 'cabane_blue',
+	'chalet' => 'cabane_blue',
+	'apartment' => 'cabane_blue',
 
 	// Icônes Overpass, C2C & PRC (remplacer ' ' par %20 dans l'URL)
 	// Il s'agit en fait d'une équivalence des symboles geocaching utilisés par les GPS

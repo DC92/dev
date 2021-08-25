@@ -20,12 +20,8 @@ Based on https://openlayers.org
 	<script src="geocoder/ol-geocoder-debug.js"></script>
 
 	<!-- My Openlayers -->
-	<link  href="src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<link  href="src/myol.css" type="text/css" rel="stylesheet">
-	<script src="src/header.js"></script>
-	<script src="src/layerTileCollection.js"></script>
-	<script src="src/layerSwitcher.js"></script>
-	<script src="src/myol.js"></script>
+	<link  href="myol.css" type="text/css" rel="stylesheet">
+	<script src="myol.js"></script>
 
 	<style>
 		html, body {
@@ -57,12 +53,31 @@ Based on https://openlayers.org
 		// Must be after the <div id="map"> tag
 		new ol.Map({
 			target: 'map',
-			controls: controlsCollection({
-				controlLayerSwitcher: {
-					baseLayers: layersCollection(),
-					overlays: overlaysCollection(),
-				},
+			view: new ol.View({
+				center: [260000, 5800000],
+				zoom: 5, // France
 			}),
+			controls: [
+				new ol.control.Zoom(),
+				controlHover(),
+				controlLayerSwitcher({
+					baseLayers: layersCollection(),
+				}),
+			],
+			layers: [
+				layerVectorCluster(
+					layerChemPoi({
+						maxResolution: 100,
+						distance: 50,
+					})
+				),
+				layerVectorCluster(
+					layerChemCluster({
+						minResolution: 100,
+						distance: 50,
+					})
+				),
+			],
 		});
 	</script>
 </body>

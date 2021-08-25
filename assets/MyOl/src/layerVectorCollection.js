@@ -148,6 +148,7 @@ function layerAlpages(options) {
  */
 function layerOSM(options) {
 	const layer = layerVector(Object.assign({
+		maxResolution: 50,
 		host: 'https://overpass-api.de/api/interpreter',
 		urlFunction: urlFunction,
 		format: new ol.format.OSMXML(),

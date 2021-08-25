@@ -37,6 +37,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 //TODO BUG IE SCRIPT5022: IndexSizeError
 function layerVector(opt) {
 	const options = Object.assign({
+			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			displayProperties: function(properties) {
@@ -319,13 +320,14 @@ function layerVectorCluster(layer, distance) {
  * url : go to a new URL when we click on the feature
  */
 function controlHover() {
+	//TODO le lancer automatiquement ???
 	const control = new ol.control.Control({
 			element: document.createElement('div'), //HACK No button
 		}),
 		// Internal layer to temporary display the hovered feature
 		hoverLayer = new ol.layer.Vector({
 			source: new ol.source.Vector(),
-			zIndex: 1, // Above the features
+			zIndex: 2, // Above the features
 			style: function(feature, resolution) {
 				if (typeof feature.hoverStyleFunction == 'function')
 					return feature.hoverStyleFunction(feature, resolution);
@@ -353,11 +355,12 @@ function controlHover() {
 
 	function mouseEvent(evt) {
 		// Get hovered feature
-		const feature = map.forEachFeatureAtPixel(
-			map.getEventPixel(evt.originalEvent),
-			function(feature) {
-				return feature;
-			});
+		const map = evt.target,
+			feature = map.forEachFeatureAtPixel(
+				map.getEventPixel(evt.originalEvent),
+				function(feature) {
+					return feature;
+				});
 
 		// Make the hovered feature visible in a dedicated layer
 		if (feature !== previousHoveredFeature) {

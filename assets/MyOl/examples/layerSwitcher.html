@@ -49,6 +49,10 @@ Based on https://openlayers.org
 
 		var map = new ol.Map({
 			target: 'map',
+			view: new ol.View({
+				center: [700000, 5600000],
+				zoom: 7,
+			}),
 			controls: [
 				new ol.control.Zoom(),
 				controlLayerSwitcher({
@@ -59,10 +63,6 @@ Based on https://openlayers.org
 					},
 				}),
 			],
-			view: new ol.View({
-				center: [700000, 5600000],
-				zoom: 7,
-			}),
 		});
 	</script>
 </body>
