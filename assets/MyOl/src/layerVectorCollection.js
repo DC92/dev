@@ -146,7 +146,7 @@ function layerAlpages(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
-	//TODO traduction des areas (parkings déclarés en area)
+	//TODO strategie bboxLimit
 	const format = new ol.format.OSMXML(),
 		layer = layerVector(Object.assign({
 			maxResolution: 50,
@@ -173,8 +173,44 @@ function layerOSM(options) {
 		return options.host +
 			'?data=[timeout:5];(' + // Not too much !
 			args.join('') +
-			');out center;'; // add center of areas
+			');out center;'; // Add center of areas
 	}
+
+	// Extract features from data when received
+	format.readFeatures = function(doc, opt) {
+		// Transform an area to a node (picto) at the center of this area
+		for (let node = doc.documentElement.firstElementChild; node; node = node.nextSibling)
+			if (node.nodeName == 'way') {
+				// Create a new 'node' element centered on the surface
+				const newNode = doc.createElement('node');
+				newNode.id = node.id;
+				doc.documentElement.appendChild(newNode);
+
+				// Browse <way> attributes to build a new node
+				for (let subTagNode = node.firstElementChild; subTagNode; subTagNode = subTagNode.nextSibling)
+					switch (subTagNode.nodeName) {
+						case 'center':
+							// Set node attributes
+							newNode.setAttribute('lon', subTagNode.getAttribute('lon'));
+							newNode.setAttribute('lat', subTagNode.getAttribute('lat'));
+							newNode.setAttribute('nodeName', subTagNode.nodeName);
+							break;
+
+						case 'tag': {
+							// Get existing properties
+							newNode.appendChild(subTagNode.cloneNode());
+
+							// Add a tag to mem what node type it was (for link build)
+							const newTag = doc.createElement('tag');
+							newTag.setAttribute('k', 'nodetype');
+							newTag.setAttribute('v', node.nodeName);
+							newNode.appendChild(newTag);
+						}
+					}
+			}
+
+		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
+	};
 
 	function displayProperties(properties) {
 		if (options.symbols)

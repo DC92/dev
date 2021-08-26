@@ -115,6 +115,7 @@ function layerVector(opt) {
 			extent, resolution, projection
 		);
 	}
+	//TODO status de chargement
 
 	// Modify a geoJson url argument depending on checkboxes
 	if (options.selectorName)
@@ -197,13 +198,15 @@ function layerVector(opt) {
 				subHover.push(feature.display.bed + '\u255E\u2550\u2555');
 			if (subHover.length)
 				hover.push(subHover.join(', '));
-			hover.push(feature.display.name);
+			if (feature.display.name)
+				hover.push(feature.display.name);
 		}
 
 		elLabel.innerHTML = //HACK to render the html entities in canvas
 			(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
 			hover.join('\n') ||
-			feature.display.name;
+			feature.display.name ||
+			'';
 
 		if (elLabel.innerHTML) {
 			textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
