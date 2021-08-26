@@ -33,7 +33,7 @@ function layerWriPoi(options) {
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, options) {
+		displayProperties: function(properties, feature, options) {
 			return {
 				name: properties.nom,
 				type: properties.type.valeur,
@@ -80,7 +80,7 @@ function layerChemPoi(options) {
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, options) {
+		displayProperties: function(properties, feature, options) {
 			properties.icon = '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
 			return properties;
@@ -123,8 +123,7 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, options) {
-			//TODO add 'Oil feild' icon in chemineur.fr
+		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
 				properties.iconchem = match[1];
@@ -147,13 +146,15 @@ function layerAlpages(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
-	const layer = layerVector(Object.assign({
-		maxResolution: 50,
-		host: 'https://overpass-api.de/api/interpreter',
-		urlFunction: urlFunction,
-		format: new ol.format.OSMXML(),
-		displayProperties: displayProperties,
-	}, options));
+	//TODO traduction des areas (parkings déclarés en area)
+	const format = new ol.format.OSMXML(),
+		layer = layerVector(Object.assign({
+			maxResolution: 50,
+			host: 'https://overpass-api.de/api/interpreter',
+			urlFunction: urlFunction,
+			format: format,
+			displayProperties: displayProperties,
+		}, options));
 
 	function urlFunction(options, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
@@ -176,16 +177,17 @@ function layerOSM(options) {
 	}
 
 	function displayProperties(properties) {
-		properties.type =
+		if (options.symbols)
+			for (let p in properties)
+				if (typeof options.symbols[p] == 'string')
+					properties.type = p;
+				else if (typeof options.symbols[properties[p]] == 'string')
+			properties.type = properties[p];
+
+		if (properties.type)
+			properties.sym =
 			properties.iconchem =
-			properties.tourism ||
-			properties.building ||
-			properties.shelter_type ||
-			properties.amenity ||
-			properties.waterway ||
-			properties.man_made ||
-			properties.highway ||
-			properties.shop;
+			options.symbols[properties.type];
 
 		return properties;
 	}

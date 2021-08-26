@@ -14,7 +14,8 @@ Chaque <element> désigne :
 
 // Traduit le nom si nécéssaire
 include ('alias.php');
-$nom = isset ($alias[$_GET['nom']]) ? $alias[$_GET['nom']] : $_GET['nom'];
+$arg = str_replace (' ', '_', strtolower($_GET['nom']));
+$nom = isset ($alias[$arg]) ? $alias[$arg] : $arg;
 
 // Recherche les éléments à afficher dans le nom du fichier
 preg_match_all ('/([a-z]+)([0-9]*)\.?([0-9]*)\.?([0-9]*)_/', $nom.'_', $elements);

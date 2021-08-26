@@ -106,6 +106,7 @@ function layerVector(opt) {
 		return options.urlFunction(
 			options, // Layer options
 			ol.proj.transformExtent( // BBox
+				//TODO arrondir à 5 décimales
 				extent,
 				projection.getCode(),
 				'EPSG:4326' // Received projection
@@ -129,6 +130,7 @@ function layerVector(opt) {
 			for (let p in evt.features)
 				evt.features[p].display = options.displayProperties(
 					evt.features[p].getProperties(),
+					evt.features[p],
 					options
 				);
 		});

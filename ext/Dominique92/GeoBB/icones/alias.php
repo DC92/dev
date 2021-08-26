@@ -40,7 +40,7 @@ $alias = [
 	'port' => 'bateau',
 //	'ravitaillement' => 'ravitaillement',
 	'refuge' => 'cabane_red',
-	//'restaurant' => 'cabane_white_blue_a9832.5',
+	'restaurant' => 'cabane_white_blue_a9832.5',
 	'rond_point' => 'triangle_a8634.5.22',
 	'ruine' => 'triangle_grey_black_manqueunmur',
 	'site' => 'lac_yellow_a9728.4.18',
@@ -94,6 +94,7 @@ $alias = [
 	'hut' => 'cabane_manqueunmur',
 	'lake' => 'lac',
 	'local_product' => 'ravitaillement',
+	'museum' => 'cabane_white_blue_a9905.7',
 	'pass' => 'triangle_a33',
 	'shelter' => 'cabane',
 	'summit' => 'sommet',
@@ -108,7 +109,9 @@ $alias = [
 	'hostel' => 'cabane_blue',
 	'chalet' => 'cabane_blue',
 	'apartment' => 'cabane_blue',
+];
 
+$geocaching = [
 	// Icônes Overpass, C2C & PRC (remplacer ' ' par %20 dans l'URL)
 	// Il s'agit en fait d'une équivalence des symboles geocaching utilisés par les GPS
 	'Campground' => 'camping_yellow_green',
@@ -119,6 +122,7 @@ $alias = [
 	'Fishing Hot Spot Facility' => 'cabane_manqueunmur', // Manque un mur
 	'Ground Transportation' => 'bus',
 	'Lodge' => 'cabane',
+	'Oil Field' => 'a9910.5',
 	'Parking Area' => 'parking', //BEST Parking avec un P ascii avec couleurs
 	'Puzzle Cache' => 'cabane_black_a63',
 	'Restaurant' => 'cabane_white_blue_a9832.5',
@@ -129,3 +133,6 @@ $alias = [
 	'Water Source' => 'pointdeau',
 	'Waypoint' => 'triangle_a33',
 ];
+
+foreach ($geocaching AS $k=>$v)
+	$alias [str_replace (' ', '_', strtolower($k))] = $v;

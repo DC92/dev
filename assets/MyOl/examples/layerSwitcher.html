@@ -25,9 +25,39 @@ Based on https://openlayers.org
 
 	<p>This is the demo of <a href="../src/layerSwitcher.js">src/layerSwitcher.js</a></p>
 
+	<pre>
+new ol.Map({
+	target: 'map',
+	view: new ol.View({
+		center: [700000, 5600000],
+		zoom: 7,
+	}),
+	controls: [
+		new ol.control.Zoom(),
+		controlLayerSwitcher({
+			baseLayers: {
+				OSM: new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+				Stamen: new ol.layer.Tile({
+					source: new ol.source.Stamen({
+						layer: 'terrain',
+					}),
+				}),
+				Watercolor: new ol.layer.Tile({
+					source: new ol.source.Stamen({
+						layer: 'watercolor',
+					}),
+				}),
+			},
+		}),
+	],
+});
+	</pre>
+
 	<h1>Other demos</h1>
 	<p><a href="../index.html">BASIC</a></p>
-	<p><a href="layersTile.html">TILE LAYERS</a></p>
+	<p><a href="layerTile.html">TILE LAYERS</a></p>
 	<p><a href="layersVector.html">VECTOR LAYERS</a></p>
 	<p><a href="markers.html">MARKERS</a></p>
 	<p><a href="editor.html">EDITOR</a></p>
@@ -36,18 +66,7 @@ Based on https://openlayers.org
 	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 
 	<script>
-		console.log('Cookies: ' + document.cookie);
-
-		function layerGoogle(subLayer) {
-			return new ol.layer.Tile({
-				source: new ol.source.XYZ({
-					url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
-					attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
-				})
-			});
-		}
-
-		var map = new ol.Map({
+		new ol.Map({
 			target: 'map',
 			view: new ol.View({
 				center: [700000, 5600000],
@@ -57,9 +76,19 @@ Based on https://openlayers.org
 				new ol.control.Zoom(),
 				controlLayerSwitcher({
 					baseLayers: {
-						'Google road': layerGoogle('m'),
-						'Google terrain': layerGoogle('p'),
-						'Photo Google': layerGoogle('s'),
+						OSM: new ol.layer.Tile({
+							source: new ol.source.OSM(),
+						}),
+						Stamen: new ol.layer.Tile({
+							source: new ol.source.Stamen({
+								layer: 'terrain',
+							}),
+						}),
+						Watercolor: new ol.layer.Tile({
+							source: new ol.source.Stamen({
+								layer: 'watercolor',
+							}),
+						}),
 					},
 				}),
 			],
