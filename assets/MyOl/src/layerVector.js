@@ -105,7 +105,9 @@ function layerVector(opt) {
 
 	if (statusEl)
 		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
-			statusEl.textContent = '';
+			if (!statusEl.textContent.includes('error'))
+				statusEl.textContent = '';
+
 			switch (evt.type) {
 				case 'featuresloadstart':
 					statusEl.textContent = 'Chargement...';
