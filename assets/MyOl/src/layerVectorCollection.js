@@ -154,7 +154,8 @@ function layerOSM(options) {
 			urlFunction: urlFunction,
 			format: format,
 			displayProperties: displayProperties,
-		}, options));
+		}, options)),
+		statusEl = document.getElementById(options.selectorName);
 
 	function urlFunction(options, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
@@ -208,6 +209,9 @@ function layerOSM(options) {
 						}
 					}
 			}
+		// Status 200 / error message
+		else if (node.nodeName == 'remark' && statusEl)
+			statusEl.textContent = node.textContent;
 
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
@@ -221,10 +225,9 @@ function layerOSM(options) {
 					properties.type = properties[p];
 			}
 
-		if (properties.type) {
-			properties.iconchem = properties.type;
+		if (properties.type)
+			properties.iconchem =
 			properties.sym = options.symbols[properties.type];
-		}
 
 		return properties;
 	}
