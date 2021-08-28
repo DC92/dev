@@ -99,7 +99,21 @@ function layerVector(opt) {
 				source: source,
 				style: style,
 			},
-			options));
+			options)),
+
+		statusEl = document.getElementById(options.selectorName);
+
+	if (statusEl)
+		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
+			statusEl.textContent = '';
+			switch (evt.type) {
+				case 'featuresloadstart':
+					statusEl.textContent = 'Chargement...';
+					break;
+				case 'featuresloaderror':
+					statusEl.textContent = 'Erreur !';
+			}
+		});
 
 	// url callback function for the layer
 	function url(extent, resolution, projection) {
@@ -115,7 +129,6 @@ function layerVector(opt) {
 			extent, resolution, projection
 		);
 	}
-	//TODO status de chargement
 
 	// Modify a geoJson url argument depending on checkboxes
 	if (options.selectorName)
