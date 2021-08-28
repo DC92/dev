@@ -129,6 +129,7 @@ $geocaching = [
 	'Residence' => 'cabane_green',
 	'Shopping Center' => 'ravitaillement', // Ravitaillement
 	'Summit' => 'sommet',
+	'Telephone' => 'a9743',
 	'Tunnel' => 'arc_blanchedalmond_red_manqueunmur', // Orri
 	'Water Source' => 'pointdeau',
 	'Waypoint' => 'triangle_a33',

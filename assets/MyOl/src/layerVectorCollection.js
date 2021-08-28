@@ -214,16 +214,17 @@ function layerOSM(options) {
 
 	function displayProperties(properties) {
 		if (options.symbols)
-			for (let p in properties)
+			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
 					properties.type = p;
 				else if (typeof options.symbols[properties[p]] == 'string')
-			properties.type = properties[p];
+					properties.type = properties[p];
+			}
 
-		if (properties.type)
-			properties.sym =
-			properties.iconchem =
-			options.symbols[properties.type];
+		if (properties.type) {
+			properties.iconchem = properties.type;
+			properties.sym = options.symbols[properties.type];
+		}
 
 		return properties;
 	}
