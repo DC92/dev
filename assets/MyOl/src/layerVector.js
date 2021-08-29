@@ -122,11 +122,12 @@ function layerVector(opt) {
 		return options.urlFunction(
 			options, // Layer options
 			ol.proj.transformExtent( // BBox
-				//TODO arrondir à 5 décimales
 				extent,
 				projection.getCode(),
 				'EPSG:4326' // Received projection
-			),
+			).map(function(c) {
+				return c.toFixed(4); // Round to 4 digits
+			}),
 			readCheckbox(options.selectorName),
 			extent, resolution, projection
 		);
