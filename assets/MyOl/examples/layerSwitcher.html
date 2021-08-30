@@ -23,7 +23,48 @@ Based on https://openlayers.org
 <body>
 	<div id="map" style="width:90vw; height:60vw;"></div>
 
-	<p>This is the demo of <a href="../src/layerSwitcher.js">src/layerSwitcher.js</a></p>
+	<script>
+//TODO overlay control ???
+		const vectorLayer = new ol.layer.Vector({
+  source: new ol.source.Vector({
+    url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+    format: new ol.format.GeoJSON(),
+  }),
+});
+	const map =
+		new ol.Map({
+			target: 'map',
+			view: new ol.View({
+				center: [700000, 5600000],
+				zoom: 7,
+			}),
+			controls: [
+				new ol.control.Zoom(),
+				controlLayerSwitcher({
+					baseLayers: {
+						OSM: new ol.layer.Tile({
+							source: new ol.source.OSM(),
+						}),
+						Stamen: new ol.layer.Tile({
+							source: new ol.source.Stamen({
+								layer: 'terrain',
+							}),
+						}),
+						Watercolor: new ol.layer.Tile({
+							source: new ol.source.Stamen({
+								layer: 'watercolor',
+							}),
+						}),
+					},
+				}),
+			],
+		});
+
+//map.addLayer(vectorLayer);
+		
+	</script>
+
+	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both baselayers & overlays.</p>
 
 	<pre>
 new ol.Map({
@@ -55,46 +96,16 @@ new ol.Map({
 });
 	</pre>
 
-	<h1>Other demos</h1>
-	<p><a href="../index.html">BASIC</a></p>
-	<p><a href="layerSwitcher.html">LAYER SWITCHER</a></p>
-	<p><a href="layerTile.html">LAYER TILE</a></p>
-	<p><a href="../gps">OFF LINE GPS</a></p>
-	<p><a href="layerVector.html">LAYER VECTOR</a></p>
-	<p><a href="controls.html">CONTROLS</a></p>
-	<p><a href="marker.html">MARKER</a></p>
-	<p><a href="editor.html">EDITOR</a></p>
-	<p><a href="../build.php">BUILD</a></p>
+	<h1 style="clear:both">MyOl</h1>
+	<p><a href="../index.html">Overview</a></p>
+	<p><a href="layerSwitcher.html">Layer switcher</a></p>
+	<p><a href="layerTile.html">Layer tile</a></p>
+	<p><a href="layerVector.html">Layer vector</a></p>
+	<p><a href="controls.html">Controls</a></p>
+	<p><a href="marker.html">Marker</a></p>
+	<p><a href="editor.html">Editor</a></p>
+	<p><a href="../gps">Off line GPS</a></p>
+	<p><a href="../build.php">Build</a></p>
 	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
-
-	<script>
-		new ol.Map({
-			target: 'map',
-			view: new ol.View({
-				center: [700000, 5600000],
-				zoom: 7,
-			}),
-			controls: [
-				new ol.control.Zoom(),
-				controlLayerSwitcher({
-					baseLayers: {
-						OSM: new ol.layer.Tile({
-							source: new ol.source.OSM(),
-						}),
-						Stamen: new ol.layer.Tile({
-							source: new ol.source.Stamen({
-								layer: 'terrain',
-							}),
-						}),
-						Watercolor: new ol.layer.Tile({
-							source: new ol.source.Stamen({
-								layer: 'watercolor',
-							}),
-						}),
-					},
-				}),
-			],
-		});
-	</script>
 </body>
 </html>
