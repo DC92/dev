@@ -47,14 +47,17 @@ if ($_GET) {
 } else {
 ?>
 
-<h1>Other demos</h1>
-<p><a href="index.html">BASIC</a></p>
-<p><a href="examples/layerSwitcher.html">LAYER SWITCHER</a></p>
-<p><a href="examples/layerTile.html">TILE LAYERS</a></p>
-<p><a href="examples/layerVector.html">VECTOR LAYERS</a></p>
-<p><a href="examples/markers.html">MARKERS</a></p>
-<p><a href="examples/editor.html">EDITOR</a></p>
-<p><a href="gps">OFF LINE GPS</a></p>
-<p><a href="https://github.com/Dominique92/MyOl/">Github</a></p>
+	<h1 style="clear:both">MyOl</h1>
+	<p>Set of js functions adding some facilities to <a href="https://openlayers.org/">Openlayers</a></p>
+	<p>See doc & details on <a href="https://github.com/DC92/dev/tree/master/assets/MyOl">GITHUB</a></p>
+	<p><a href="examples/layerSwitcher.html">Layer switcher</a></p>
+	<p><a href="examples/layerTile.html">Layer tile</a></p>
+	<p><a href="examples/layerVector.html">Layer vector</a></p>
+	<p><a href="examples/controls.html">Controls</a></p>
+	<p><a href="examples/marker.html">Marker</a></p>
+	<p><a href="examples/editor.html">Editor</a></p>
+	<p><a href="gps">Off line GPS</a></p>
+	<p><a href="build.php">Build</a></p>
+	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
 
 <?php } ?>
