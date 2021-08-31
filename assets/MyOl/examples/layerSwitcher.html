@@ -23,55 +23,28 @@ Based on https://openlayers.org
 <body>
 	<div id="map" style="width:90vw; height:60vw;"></div>
 
+	<div id="overlay-selector" >
+		<hr />
+		Countries <input type="checkbox" onChange="countries.setVisible(!countries.getVisible())" />
+	</div>
+
 	<script>
-//TODO overlay control ???
-		const vectorLayer = new ol.layer.Vector({
-  source: new ol.source.Vector({
-    url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
-    format: new ol.format.GeoJSON(),
-  }),
+const countries = new ol.layer.Vector({
+	zIndex: 1, // Above the base layer
+	source: new ol.source.Vector({
+		url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+		format: new ol.format.GeoJSON(),
+	}),
+	style: new ol.style.Style({
+		stroke: new ol.style.Stroke(),
+	}),
 });
-	const map =
-		new ol.Map({
-			target: 'map',
-			view: new ol.View({
-				center: [700000, 5600000],
-				zoom: 7,
-			}),
-			controls: [
-				new ol.control.Zoom(),
-				controlLayerSwitcher({
-					baseLayers: {
-						OSM: new ol.layer.Tile({
-							source: new ol.source.OSM(),
-						}),
-						Stamen: new ol.layer.Tile({
-							source: new ol.source.Stamen({
-								layer: 'terrain',
-							}),
-						}),
-						Watercolor: new ol.layer.Tile({
-							source: new ol.source.Stamen({
-								layer: 'watercolor',
-							}),
-						}),
-					},
-				}),
-			],
-		});
 
-//map.addLayer(vectorLayer);
-		
-	</script>
-
-	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both baselayers & overlays.</p>
-
-	<pre>
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
 		center: [700000, 5600000],
-		zoom: 7,
+		zoom: 5,
 	}),
 	controls: [
 		new ol.control.Zoom(),
@@ -93,6 +66,40 @@ new ol.Map({
 			},
 		}),
 	],
+	layers: [countries],
+});
+	</script>
+
+	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both baselayers & overlays.</p>
+
+	<pre>
+new ol.Map({
+	target: 'map',
+	view: new ol.View({
+		center: [700000, 5600000],
+		zoom: 5,
+	}),
+	controls: [
+		new ol.control.Zoom(),
+		controlLayerSwitcher({
+			baseLayers: {
+				OSM: new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+				Stamen: new ol.layer.Tile({
+					source: new ol.source.Stamen({
+						layer: 'terrain',
+					}),
+				}),
+				Watercolor: new ol.layer.Tile({
+					source: new ol.source.Stamen({
+						layer: 'watercolor',
+					}),
+				}),
+			},
+		}),
+	],
+	layers: [countries],
 });
 	</pre>
 

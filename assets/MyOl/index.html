@@ -16,7 +16,7 @@ Based on https://openlayers.org
 	<script src="ol/ol.js"></script>
 
 	<!-- Recherche par nom -->
-	<link  href="geocoder/ol-geocoder-min.css" type="text/css" rel="stylesheet">
+	<link  href="geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
 	<script src="geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
@@ -47,37 +47,33 @@ Based on https://openlayers.org
 	</div>
 
 	<script>
-		// Must be after the <div id="map"> tag
-		new ol.Map({
-			target: 'map',
-			view: new ol.View({
-				center: [260000, 5800000],
-				zoom: 5, // France
-			}),
-			controls: [
-				new ol.control.Zoom(),
-				controlHover(),
-				controlLayerSwitcher({
-					baseLayers: layersCollection(),
-				}),
-			],
-			layers: [
-				layerVectorCluster(
-					layerChemPoi({
-						selectorName: 'chem-features',
-						maxResolution: 300,
-						distance: 30,
-					})
-				),
-				layerVectorCluster(
-					layerChemCluster({
-						selectorName: 'chem-features',
-						minResolution: 300,
-						distance: 50,
-					})
-				),
-			],
-		});
+// Must be after the <div id="map"> tag
+new ol.Map({
+	target: 'map',
+	view: new ol.View({
+		center: [260000, 5800000], // France
+		zoom: 5,
+	}),
+	controls: controlsCollection({
+		baseLayers: layersCollection(),
+	}),
+	layers: [
+		layerVectorCluster(
+			layerChemPoi({
+				selectorName: 'chem-features',
+				maxResolution: 300,
+				distance: 30,
+			})
+		),
+		layerVectorCluster(
+			layerChemCluster({
+				selectorName: 'chem-features',
+				minResolution: 300,
+				distance: 50,
+			})
+		),
+	],
+});
 	</script>
 
 	<h1 style="clear:both">MyOl</h1>
