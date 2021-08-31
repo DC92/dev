@@ -77,12 +77,11 @@ If you want to use external providers layers, you must acquire free keys and rep
 * French IGN : Get your own (free) IGN key at [https://professionnels.ign.fr](https://professionnels.ign.fr/ign/contrats)
 * OSM thunderforest : Get your own (free) THUNDERFOREST key at [https://manage.thunderforest.com](https://manage.thunderforest.com)
 * Microsoft BING : Get your own (free) BING key at [https://www.microsoft.com](https://www.microsoft.com/en-us/maps/create-a-bing-maps-key)
-* Swiss Topo : You need to register your domain in [https://shop.swisstopo.admin.ch](https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info)
 
 ARCHITECTURE
 ============
 Just include myol.js & myos.css after ol/dist, proj4js & geocoder's js & css.
-* See [index.html](https://raw.githubusercontent.com/DC92/dev/assets/MyOl/master/index.html) for example
+* See [index.html](https://raw.githubusercontent.com/DC92/dev/master/assets/MyOl/index.html) for example
 * Code & all tiled layers use EPSG:3857 spherical mercator projection
 
 The coding rules are volontary simple & don't follow all openlayers's

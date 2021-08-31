@@ -7,48 +7,6 @@
  * Please dont modify it. Modify src/... & rebuild it !
  */
 
-.ol-control-switcher {
-	position: static;
-	float: right;
-}
-.ol-control-switcher .single-layer span {
-	font-size: 0.7em;
-}
-.ol-control-switcher .single-layer input,
-.ol-control-switcher .double-layer span,
-.ol-control-switcher-open button,
-.ol-control-switcher:not(.ol-control-switcher-open) > hr,
-.ol-control-switcher:not(.ol-control-switcher-open) > div {
-	display: none;
-}
-.ol-control-switcher hr {
-	margin: 0;
-}
-.ol-control-switcher-open {
-	max-height: 100%;
-	overflow: auto;
-}
-.ol-control-switcher div {
-	padding-left: 5px;
-}
-.ol-control-switcher span,
-.ol-control-switcher label {
-	color: black;
-}
-
-#overlay-selector {
-	background-color: rgb(162, 226, 255, 0.4);
-}
-#overlay-selector ul {
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
-}
-.overlay-status {
-	font-size: 0.7em;
-	color: blue;
-}
-
 /* Nomalize em sizes */
 .ol-viewport {
 	font-size: 16px;
@@ -259,4 +217,46 @@
 }
 .myol-popup-hidden {
 	display: none;
+}
+
+.ol-control-switcher {
+	position: static;
+	float: right;
+}
+.ol-control-switcher .single-layer span {
+	font-size: 0.7em;
+}
+.ol-control-switcher .single-layer input,
+.ol-control-switcher .double-layer span,
+.ol-control-switcher-open button,
+.ol-control-switcher:not(.ol-control-switcher-open) > hr,
+.ol-control-switcher:not(.ol-control-switcher-open) > div {
+	display: none;
+}
+.ol-control-switcher hr {
+	margin: 0;
+}
+.ol-control-switcher-open {
+	max-height: 100%;
+	overflow: auto;
+}
+.ol-control-switcher div {
+	padding-left: 5px;
+}
+.ol-control-switcher span,
+.ol-control-switcher label {
+	color: black;
+}
+
+#overlay-selector {
+	background-color: rgb(162, 226, 255, 0.4);
+}
+#overlay-selector ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+.overlay-status {
+	font-size: 0.7em;
+	color: blue;
 }

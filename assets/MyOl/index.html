@@ -16,8 +16,8 @@ Based on https://openlayers.org
 	<script src="ol/ol.js"></script>
 
 	<!-- Recherche par nom -->
-	<link  href="geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
-	<script src="geocoder/ol-geocoder-debug.js"></script>
+	<link  href="geocoder/ol-geocoder-min.css" type="text/css" rel="stylesheet">
+	<script src="geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
 	<link  href="myol.css" type="text/css" rel="stylesheet">
@@ -26,13 +26,25 @@ Based on https://openlayers.org
 	<style>
 		#map {
 			width: 100%;
+			max-width: 600px;
 			height: 80vw;
+			max-height: 400px;
 		}
 	</style>
 </head>
 
 <body>
 	<div id="map"></div>
+
+	<div id="overlay-selector" >
+		<hr />
+		chemineur.fr <input type="checkbox" name="chem-features" />
+		<ul>
+			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
+		</ul>
+	</div>
 
 	<script>
 		// Must be after the <div id="map"> tag
@@ -52,13 +64,15 @@ Based on https://openlayers.org
 			layers: [
 				layerVectorCluster(
 					layerChemPoi({
-						maxResolution: 100,
-						distance: 50,
+						selectorName: 'chem-features',
+						maxResolution: 300,
+						distance: 30,
 					})
 				),
 				layerVectorCluster(
 					layerChemCluster({
-						minResolution: 100,
+						selectorName: 'chem-features',
+						minResolution: 300,
 						distance: 50,
 					})
 				),

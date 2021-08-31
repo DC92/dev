@@ -10,18 +10,18 @@ $css = $js = "/** OPENLAYERS ADAPTATION
 if (!$_GET)
 	echo "<p>";
 
-$css .= get ('layerSwitcher.css').PHP_EOL .PHP_EOL;
-$css .= get ('myol.css');
+$css .= get ('myol.css').PHP_EOL .PHP_EOL;
+$css .= get ('layerSwitcher.css');
 file_put_contents ('myol.css', $css);
 if (!$_GET)
 	echo "TO myol.css</p>\n<p>";
 
 $js .= get ('header.js').PHP_EOL .PHP_EOL;
+$js .= get ('myol.js').PHP_EOL .PHP_EOL;
 $js .= get ('layerTileCollection.js').PHP_EOL .PHP_EOL;
 $js .= get ('layerSwitcher.js').PHP_EOL .PHP_EOL;
 $js .= get ('layerVector.js').PHP_EOL .PHP_EOL;
-$js .= get ('layerVectorCollection.js').PHP_EOL .PHP_EOL;
-$js .= get ('myol.js');
+$js .= get ('layerVectorCollection.js');
 file_put_contents ('myol.js', $js);
 if (!$_GET)
 	echo 'TO myol.js</p>';
@@ -50,6 +50,7 @@ if ($_GET) {
 	<h1 style="clear:both">MyOl</h1>
 	<p>Set of js functions adding some facilities to <a href="https://openlayers.org/">Openlayers</a></p>
 	<p>See doc & details on <a href="https://github.com/DC92/dev/tree/master/assets/MyOl">GITHUB</a></p>
+	<p><a href="index.html">Overview</a></p>
 	<p><a href="examples/layerSwitcher.html">Layer switcher</a></p>
 	<p><a href="examples/layerTile.html">Layer tile</a></p>
 	<p><a href="examples/layerVector.html">Layer vector</a></p>
@@ -58,6 +59,4 @@ if ($_GET) {
 	<p><a href="examples/editor.html">Editor</a></p>
 	<p><a href="gps">Off line GPS</a></p>
 	<p><a href="build.php">Build</a></p>
-	<p><a href="https://github.com/Dominique92/MyOl/">GITHUB</a></p>
-
 <?php } ?>

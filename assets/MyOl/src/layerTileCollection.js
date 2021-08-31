@@ -172,7 +172,6 @@ function layerTileIncomplete(options) {
 
 /**
  * Swisstopo https://api.geo.admin.ch/
- * Register your domain: https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
  * Requires layerTileIncomplete
  */
 function layerSwissTopo(layer, extraLayer) {
