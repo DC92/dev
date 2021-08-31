@@ -18,10 +18,19 @@ Based on https://openlayers.org
 	<!-- My Openlayers -->
 	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
 	<script src="../src/layerSwitcher.js"></script>
+
+	<style>
+		#map {
+			width: 100%;
+			max-width: 600px;
+			height: 80vw;
+			max-height: 400px;
+		}
+	</style>
 </head>
 
 <body>
-	<div id="map" style="width:90vw; height:60vw;"></div>
+	<div id="map"></div>
 
 	<div id="overlay-selector" >
 		<hr />

@@ -1823,6 +1823,7 @@ function controlLayerSwitcher(options) {
 
 		// Attach html overlays selector
 		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
+		//TODO other id don't use the css
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);
 	};

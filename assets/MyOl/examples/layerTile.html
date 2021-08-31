@@ -21,49 +21,58 @@ Based on https://openlayers.org
 
 	<!-- My Openlayers -->
 	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<script src="../src/layerTileCollection.js"></script>
 	<script src="../src/layerSwitcher.js"></script>
+	<script src="../src/layerTileCollection.js"></script>
+
+	<style>
+		#map {
+			width: 100%;
+			max-width: 600px;
+			height: 80vw;
+			max-height: 400px;
+		}
+	</style>
 </head>
 
 <body>
-	<div id="map" style="width:90vw; height:60vw;"></div>
+	<div id="map"></div>
 
 	<script>
-		const mapKeys = {
-			"ign": "hcxdz5f1p9emo4i1lch6ennl",
-			"thunderforest": "ee751f43b3af4614b01d1bce72785369",
-			"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
-		},
+const mapKeys = {
+	"ign": "hcxdz5f1p9emo4i1lch6ennl",
+	"thunderforest": "ee751f43b3af4614b01d1bce72785369",
+	"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
+};
 
-		map = new ol.Map({
-			target: 'map',
-			controls: [
-				new ol.control.Zoom(),
-				controlLayerSwitcher({
-					baseLayers: layersDemo(),
-				}),
-			],
-			view: new ol.View({
-				center: [700000, 5600000],
-				zoom: 7,
-			}),
-		});
+new ol.Map({
+	target: 'map',
+	controls: [
+		new ol.control.Zoom(),
+		controlLayerSwitcher({
+			baseLayers: layersDemo(),
+		}),
+	],
+	view: new ol.View({
+		center: [700000, 5600000],
+		zoom: 7,
+	}),
+});
 	</script>
 
 	<pre>
-		map = new ol.Map({
-			target: 'map',
-			controls: [
-				new ol.control.Zoom(),
-				controlLayerSwitcher({
-					baseLayers: layersDemo(),
-				}),
-			],
-			view: new ol.View({
-				center: [700000, 5600000],
-				zoom: 7,
-			}),
-		});
+new ol.Map({
+	target: 'map',
+	controls: [
+		new ol.control.Zoom(),
+		controlLayerSwitcher({
+			baseLayers: layersDemo(),
+		}),
+	],
+	view: new ol.View({
+		center: [700000, 5600000],
+		zoom: 7,
+	}),
+});
 	</pre>
 
 	<h1 style="clear:both">MyOl</h1>

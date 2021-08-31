@@ -67,6 +67,7 @@ function controlLayerSwitcher(options) {
 
 		// Attach html overlays selector
 		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
+		//TODO other id don't use the css
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);
 	};
@@ -80,6 +81,7 @@ function controlLayerSwitcher(options) {
 				options.baseLayers[name].setOpacity(1);
 			}
 
+		//TODO BUG bugge quand le cookie ne correspond pas à une entrée connue
 		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
 		options.baseLayers[selectedBaseLayerName].setVisible(true);
 		if (lastBaseLayerName) {
