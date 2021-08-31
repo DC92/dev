@@ -37,6 +37,8 @@ Based on https://openlayers.org
 		Countries <input type="checkbox" onChange="countries.setVisible(!countries.getVisible())" />
 	</div>
 
+	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both baselayers & overlays.</p>
+
 	<script>
 const countries = new ol.layer.Vector({
 	zIndex: 1, // Above the base layer
@@ -48,7 +50,8 @@ const countries = new ol.layer.Vector({
 		stroke: new ol.style.Stroke(),
 	}),
 });
-
+	</script>
+	<script>
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
@@ -78,39 +81,7 @@ new ol.Map({
 	layers: [countries],
 });
 	</script>
-
-	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both baselayers & overlays.</p>
-
-	<pre>
-new ol.Map({
-	target: 'map',
-	view: new ol.View({
-		center: [700000, 5600000],
-		zoom: 5,
-	}),
-	controls: [
-		new ol.control.Zoom(),
-		controlLayerSwitcher({
-			baseLayers: {
-				OSM: new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-				Stamen: new ol.layer.Tile({
-					source: new ol.source.Stamen({
-						layer: 'terrain',
-					}),
-				}),
-				Watercolor: new ol.layer.Tile({
-					source: new ol.source.Stamen({
-						layer: 'watercolor',
-					}),
-				}),
-			},
-		}),
-	],
-	layers: [countries],
-});
-	</pre>
+	<script src="print_script.js"></script>
 
 	<h1 style="clear:both">MyOl</h1>
 	<p><a href="../index.html">Overview</a></p>

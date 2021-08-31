@@ -101,28 +101,9 @@ Based on https://openlayers.org
 	</ul>
 
 	<script>
-		console.log(document.cookie);
-
-		new ol.Map({
-			target: 'map',
-			layers: [
-				layerOverpass({selectorName: 'osm-features'}),
-				layerRefugesInfo({selectorName: 'wri-features'}),
-				layerPyreneesRefuges({selectorName: 'prc-features'}),
-				layerC2C({selectorName: 'c2c-features'}),
-				layerChemineur({selectorName: 'chm-features'}),
-				layerAlpages({selectorName: 'alp-features'}),
-			],
-			controls: controlsCollection({
-				baseLayers: layersCollection(),
-				controlPermalink: {
-					display: true,
-				},
-			}),
-		});
+console.log(document.cookie);
 	</script>
-
-	<pre>
+	<script>
 new ol.Map({
 	target: 'map',
 	layers: [
@@ -140,7 +121,8 @@ new ol.Map({
 		},
 	}),
 });
-	</pre>
+	</script>
+	<script src="print_script.js"></script>
 
 	<h1 style="clear:both">MyOl</h1>
 	<p><a href="../index.html">Overview</a></p>

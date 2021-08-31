@@ -71,6 +71,7 @@ function layerWriAreas(options) {
 /**
  * Site chemineur.fr
  */
+//TODO générer cluster n° quand modifie fiche
 function layerChemPoi(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
