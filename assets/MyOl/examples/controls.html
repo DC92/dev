@@ -15,15 +15,12 @@ Based on https://openlayers.org
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../ol/ol.js"></script>
 
-	<!-- Proj4 projections Swiss -->
-	<script src="../proj4/proj4-src.js"></script>
+	<!-- Recherche par nom -->
+	<link  href="../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
+	<script src="../geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
-	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
 	<link  href="../src/myol.css" type="text/css" rel="stylesheet">
-	<script src="../src/header.js"></script>
-	<script src="../src/layerTileCollection.js"></script>
-	<script src="../src/layerSwitcher.js"></script>
 	<script src="../src/myol.js"></script>
 
 	<!-- This exemple -->
@@ -40,82 +37,27 @@ Based on https://openlayers.org
 <body>
 	<div id="map"></div>
 
-	<div id="overlay-selector" >
-		<hr />
-		<label for="alp-features">Alpages.info</label><input type="checkbox" id="alp-features" name="alp-features" />
+	<p>Add some usefull controls:
 		<ul>
-			<li><input type="checkbox" id="alp-features-4" name="alp-features" value="4" />
-				<label for="alp-features-4">Cabane</label></li>
-			<li><input type="checkbox" id="alp-features-5" name="alp-features" value="5" />
-				<label for="alp-features-5">Point d'eau</label></li>
-			<li><input type="checkbox" id="alp-features-6" name="alp-features" value="6" />
-				<label for="alp-features-6">Réseau</label></li>
+			<li>Full screen</li>
+			<li>Geocoder</li>
+			<li>GPS</li>
+			<li>Load GPX file</li>
+			<li>Download GPX file</li>
+			<li>Print</li>
+			<li>Length of a line</li>
 		</ul>
-	</div>
+	</p>
 
-	<br/>OVERPASS<input type="checkbox" name="osm-features" />
-	<span id="osm-features-status"></span>
-	<ul>
-		<li><input type="checkbox" name="osm-features" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
-		<li><input type="checkbox" name="osm-features" id="Residence" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
-		<li><input type="checkbox" name="osm-features" id="Lodge" value='["building"="cabin"]' />Cabane non gardée</li>
-		<li><input type="checkbox" name="osm-features" id="Fishing Hot Spot Facility" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
-		<li><input type="checkbox" name="osm-features" id="Campground" value='["tourism"="camp_site"]' />Camping</li>
-
-		<li><input type="checkbox" name="osm-features" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
-		<li><input type="checkbox" name="osm-features" id="Ground Transportation" value='["highway"="bus_stop"]' />Bus</li>
-		<li><input type="checkbox" name="osm-features" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
-		<li><input type="checkbox" name="osm-features" id="Restaurant" value='["amenity"="restaurant"]' />Restaurants</li>
-		<li><input type="checkbox" name="osm-features" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
-
-		<li><input type="checkbox" name="osm-features" id="Restroom" value='["amenity"="toilets"]' />WC</li>
-		<li><input type="checkbox" name="osm-features" id="Oil Field" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
-		<li><input type="checkbox" name="osm-features" id="Telephone" value='["amenity"="telephone"]' />Cabines téléphoniques</li>
-	</ul>
-
-	<br/>WRI<input type="checkbox" name="wri-features" />
-	<span id="wri-features-status"></span>
-	<ul>
-		<li><input type="checkbox" name="wri-features" value="7" checked="checked" />cabane non gardée</li>
-		<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
-		<li><input type="checkbox" name="wri-features" value="9" checked="checked" />gîte d'étape</li>
-		<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
-		<li><input type="checkbox" name="wri-features" value="6" checked="checked" />sommet</li>
-		<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
-		<li><input type="checkbox" name="wri-features" value="28" />bâtiment en montagne</li>
-	</ul>
-
-	<br/>pyrenees-refuges.com<input type="checkbox" name="prc-features" />
-	<span id="prc-features-status"></span>
-	<ul>
-		<li><input type="checkbox" name="prc-features" value="Lodge" />cabane ou refuge</li>
-		<li><input type="checkbox" name="prc-features" value="Tunnel" />abri, orri</li>
-		<li><input type="checkbox" name="prc-features" value="Crossing" />cabane fermée</li>
-	</ul>
-
-	<ul>
-		<li>camptocamp.org<input type="checkbox" name="c2c-features" /><span id="c2c-features-status"></span></li>
-	</ul>
-	<ul>
-		<li>Chemineur.fr<input type="checkbox" name="chm-features" /><span id="chm-features-status"></span></li>
-	</ul>
-
-	<script>
-console.log(document.cookie);
-	</script>
 	<script>
 new ol.Map({
 	target: 'map',
 	layers: [
-		layerOverpass({selectorName: 'osm-features'}),
-		layerRefugesInfo({selectorName: 'wri-features'}),
-		layerPyreneesRefuges({selectorName: 'prc-features'}),
-		layerC2C({selectorName: 'c2c-features'}),
-		layerChemineur({selectorName: 'chm-features'}),
-		layerAlpages({selectorName: 'alp-features'}),
+		new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
 	],
 	controls: controlsCollection({
-		baseLayers: layersCollection(),
 		controlPermalink: {
 			display: true,
 		},

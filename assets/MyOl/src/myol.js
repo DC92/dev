@@ -1,3 +1,7 @@
+//HACKS For JS validators
+/* jshint esversion: 6 */
+if (!ol) var ol = {};
+
 /**
  * CONTROLS
  */
@@ -94,7 +98,7 @@ function controlPermalink(options) {
 	}, options);
 	const aEl = document.createElement('a'),
 		control = new ol.control.Control({
-			element: document.createElement('div'), //HACK No button
+			element: document.createElement('div'), //HACK no button
 			render: render,
 		}),
 		zoomMatch = location.href.match(/zoom=([0-9]+)/),
@@ -210,7 +214,7 @@ function controlLengthLine() {
  */
 function controlTilesBuffer(depth, depthFS) {
 	const control = new ol.control.Control({
-		element: document.createElement('div'), //HACK No button
+		element: document.createElement('div'), //HACK no button
 	});
 
 	control.setMap = function(map) { //HACK execute actions on Map init
@@ -294,7 +298,7 @@ function controlGeocoder(options) {
 	// Vérify if geocoder is available (not supported in IE)
 	if (typeof Geocoder != 'function')
 		return new ol.control.Control({
-			element: document.createElement('div'), //HACK No button
+			element: document.createElement('div'), //HACK no button
 		});
 
 	const geocoder = new Geocoder('nominatim', {
@@ -1286,13 +1290,17 @@ function controlsCollection(options) {
 
 	return [
 		// Top right
+		typeof controlLayerSwitcher == 'function' ?
 		controlLayerSwitcher(Object.assign({
 			baseLayers: options.baseLayers,
-		}, options.controlLayerSwitcher)),
-		controlPermalink(options.controlPermalink),
+		}, options.controlLayerSwitcher)) :
+		new ol.control.Control({ //HACK no control
+			element: document.createElement('div'),
+		}),
 
 		// Bottom right
 		new ol.control.Attribution(),
+		controlPermalink(options.controlPermalink),
 
 		// Bottom left
 		new ol.control.ScaleLine(),
