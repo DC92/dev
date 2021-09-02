@@ -541,7 +541,7 @@ youtube
 				foreach (explode (',', $row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
 						$row['gym_heure'], $row['gym_minute'], 0,
-						8, 3 + $s * 7 + $row['gym_jour'], $myphp_js['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
+						8, 2 + $s * 7 + $row['gym_jour'], $myphp_js['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
 					);
 					$end_time = mktime (
 						$row['gym_heure'] + $row['gym_duree_heures'] + 24 * $row['gym_duree_jours'],
