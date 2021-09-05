@@ -1,4 +1,6 @@
-/* jshint esversion: 6 */
+/**
+ * This file adds some facilities to ol.layer.Vector
+ */
 
 /**
  * BBOX strategy when the url returns a limited number of features in the BBox

@@ -1,9 +1,5 @@
-//HACKS For JS validators
-/* jshint esversion: 6 */
-if (!ol) var ol = {};
-
 //HACK IE polyfills
-// Need to transpile ol.js with: https://babeljs.io/repl  BROWSERS = default
+// Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
 //BEST try :::   controls: defaultControls().extend([new RotateNorthControl()]),
 if (!Object.assign)
 	Object.assign = function() {

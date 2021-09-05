@@ -2,11 +2,6 @@
  * This module defines many WMTS EPSG:3857 tiles layers
  */
 
-//HACKS For JS validators
-/* jshint esversion: 6 */
-if (!ol) var ol = {};
-
-/*--*/
 /**
  * Openstreetmap
  */
@@ -94,6 +89,7 @@ function layerStamen(layer) {
  * IGN France
  * Doc on http://api.ign.fr
  * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user
+ //TODO adapt to new key polocy
  */
 function layerIGN(layer, format, key) {
 	let IGNresolutions = [],

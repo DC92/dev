@@ -1,5 +1,3 @@
-/* jshint esversion: 6 */
-
 /**
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
