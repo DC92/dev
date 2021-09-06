@@ -1,190 +1,4 @@
 /**
-/**
- * Compute a style from different styles
- * return ol.style.Style containing each style component or ol default
- */
-function escapedStyle(a, b, c) {
-	//BEST work with arguments
-	const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
-	return function(feature) {
-		return new ol.style.Style(Object.assign({
-				fill: defaultStyle.getFill(),
-				stroke: defaultStyle.getStroke(),
-				image: defaultStyle.getImage(),
-			},
-			typeof a == 'function' ? a(feature.getProperties()) : a,
-			typeof b == 'function' ? b(feature.getProperties()) : b,
-			typeof c == 'function' ? c(feature.getProperties()) : c
-		));
-	};
-}
-
-/**
- * Manages a feature hovering common to all features & layers
- * Requires escapedStyle
- */
-//TODO BUG no label when Modify mode
-//TODO no click if one editor mode active
-function hoverManager(map) {
-	if (map.hasHoverManager_)
-		return; // Only one per map
-	else
-		map.hasHoverManager_ = true; //BEST make it reentrant (for several maps)
-
-	let hoveredFeature = null;
-	const labelEl = document.createElement('div'),
-		viewStyle = map.getViewport().style,
-		popup = new ol.Overlay({
-			element: labelEl,
-		});
-	labelEl.id = 'label';
-	map.addOverlay(popup);
-
-	function findClosestFeature(pixel) {
-		let closestFeature = null,
-			distanceMin = 2000;
-
-		map.forEachFeatureAtPixel(
-			pixel,
-			function(feature, layer) {
-				if (layer) {
-					let geometry = feature.getGeometry(),
-						featurePixel = map.getPixelFromCoordinate(
-							geometry.getExtent()
-						),
-						distance = Math.hypot( // Distance of a point
-							featurePixel[0] - pixel[0] + 1 / feature.ol_uid, // Randomize to avoid same location features
-							featurePixel[1] - pixel[1]
-						),
-						geomEextent = geometry.getExtent();
-
-					// Higest priority for draggable markers
-					if (feature.getProperties().draggable)
-						distance = 0;
-
-					if (geomEextent[0] != geomEextent[2]) { // Line or polygon
-						distance = 1000; // Lower priority
-						featurePixel = pixel; // Label follows the cursor
-					}
-					if (distanceMin > distance) {
-						distanceMin = distance;
-
-						// Look at hovered feature
-						closestFeature = feature;
-						closestFeature.pixel_ = featurePixel;
-						closestFeature.layer_ = layer;
-					}
-				}
-			}, {
-				hitTolerance: 6,
-			}
-		);
-
-		return closestFeature;
-	}
-
-	// Go to feature.property.link when click on the feature (icon or area)
-	map.on('click', function(evt) {
-		let clickedFeature = findClosestFeature(evt.pixel);
-		if (clickedFeature) {
-			const link = clickedFeature.getProperties().link,
-				layerOptions = clickedFeature.layer_.options;
-
-			if (link && !layerOptions.noClick) {
-				if (evt.originalEvent.ctrlKey) {
-					const tab = window.open(link, '_blank');
-					if (evt.originalEvent.shiftKey)
-						tab.focus();
-				} else
-					window.location = link;
-			}
-		}
-	});
-
-	//BEST appeler sur l'event "hover" (pour les mobiles)
-	map.on('pointermove', function(evt) {
-		const maprect = map.getTargetElement().getBoundingClientRect(),
-			hoveredEl = document.elementFromPoint(
-				evt.pixel[0] + maprect.left,
-				evt.pixel[1] + maprect.top
-			);
-
-		if (hoveredEl && hoveredEl.tagName == 'CANVAS') { // Don't hover above the buttons & labels
-			// Search hovered features
-			let closestFeature = findClosestFeature(evt.pixel);
-
-			if (closestFeature != hoveredFeature) { // If we hover a new feature
-				// Recover the basic style for the previous hoveredFeature feature
-				if (hoveredFeature && hoveredFeature.layer_.options)
-					hoveredFeature.setStyle(
-						escapedStyle(hoveredFeature.layer_.options.styleOptions)
-					);
-				hoveredFeature = closestFeature; // Mem for the next cursor move
-
-				if (!closestFeature) {
-					// Default cursor & label
-					viewStyle.cursor = 'default';
-					labelEl.className = 'myol-popup-hidden';
-				} else {
-					const properties = closestFeature.getProperties(),
-						layerOptions = closestFeature.layer_.options;
-
-					if (layerOptions) {
-						// Set the hovered style
-						closestFeature.setStyle(escapedStyle(
-							layerOptions.styleOptions,
-							layerOptions.hoverStyleOptions,
-							layerOptions.editStyleOptions
-						));
-
-						// Set the text
-						if (typeof layerOptions.label == 'function')
-							labelEl.innerHTML = layerOptions.label(properties, closestFeature, layerOptions);
-						else if (layerOptions.label)
-							labelEl.innerHTML = layerOptions.label;
-						else
-							labelEl.innerHTML = null;
-						if (labelEl.innerHTML) // To avoid tinny popup when nothing to display
-							labelEl.className = 'myol-popup';
-					}
-					// Change the cursor
-					if (properties.link && !layerOptions.noClick)
-						viewStyle.cursor = 'pointer';
-					if (properties.draggable)
-						viewStyle.cursor = 'move';
-				}
-			}
-			// Position & reposition the label
-			if (closestFeature) {
-				//HACK set the label position in the middle to measure the label extent
-				popup.setPosition(map.getView().getCenter());
-
-				const pixel = closestFeature.pixel_;
-				// Shift of the label to stay into the map regarding the pointer position
-				if (pixel[1] < labelEl.clientHeight + 12) { // On the top of the map (not enough space for it)
-					pixel[0] += pixel[0] < map.getSize()[0] / 2 ? 10 : -labelEl.clientWidth - 10;
-					pixel[1] = 2;
-				} else {
-					pixel[0] -= labelEl.clientWidth / 2;
-					pixel[0] = Math.max(pixel[0], 0); // Left edge
-					pixel[0] = Math.min(pixel[0], map.getSize()[0] - labelEl.clientWidth - 1); // Right edge
-					pixel[1] -= labelEl.clientHeight + 8;
-				}
-				popup.setPosition(map.getCoordinateFromPixel(pixel));
-			}
-		}
-	});
-
-	// Hide popup when the cursor is out of the map
-	window.addEventListener('mousemove', function(evt) {
-		const divRect = map.getTargetElement().getBoundingClientRect();
-		if (evt.clientX < divRect.left || evt.clientX > divRect.right ||
-			evt.clientY < divRect.top || evt.clientY > divRect.bottom)
-			labelEl.className = 'myol-popup-hidden';
-	});
-}
-
-/**
  * CONTROLS
  */
 /**
@@ -366,7 +180,7 @@ function controlLengthLine() {
 
 			// Find new features to hover
 			map.forEachFeatureAtPixel(evt.pixel, calculateLength, {
-				hitTolerance: 6,
+				hitTolerance: 6, // Default is 0
 			});
 		});
 	};
@@ -472,6 +286,7 @@ function controlFullScreen(options) {
  */
 //TODO BUG controm 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
+//TODO BUG IE SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
@@ -896,12 +711,50 @@ function controlPrint() {
 }
 
 /**
+ * Controls examples
+ */
+function controlsCollection(options) {
+	options = options || {};
+
+	return [
+		// Top right
+		typeof controlLayerSwitcher == 'function' ?
+		controlLayerSwitcher(Object.assign({
+			baseLayers: options.baseLayers,
+		}, options.controlLayerSwitcher)) :
+		new ol.control.Control({ //HACK no control
+			element: document.createElement('div'),
+		}),
+
+		// Bottom right
+		new ol.control.Attribution(),
+		controlPermalink(options.controlPermalink),
+
+		// Bottom left
+		new ol.control.ScaleLine(),
+		controlMousePosition(),
+		controlLengthLine(),
+
+		// Top left
+		new ol.control.Zoom(),
+		controlFullScreen(),
+		controlGeocoder(),
+		controlGPS(options.controlGPS),
+		controlLoadGPX(),
+		controlDownload(options.controlDownload),
+		controlPrint(),
+	];
+}
+
+
+/**
  * geoJson points, lines & polygons display & edit
  * Marker position display & edit
  * Lines & polygons edit
- * Requires JSONparse, myol:onadd, escapedStyle, controlButton
+ * Requires JSONparse, myol:onadd, controlButton
  */
 function layerEditGeoJson(options) {
+	//TODO cohabitation test with controlHover
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
@@ -958,6 +811,8 @@ function layerEditGeoJson(options) {
 	}, options);
 
 	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+		displayPointEl = document.getElementById(options.displayPointId), // Pointer edit <input>
+		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {},
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		extent = ol.extent.createEmpty(), // For focus on all features calculation
 		features = options.readFeatures(),
@@ -974,9 +829,11 @@ function layerEditGeoJson(options) {
 		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
 		snap = new ol.interaction.Snap({
 			source: source,
+			pixelTolerance: 7.5, // 6 + line width / 2 : default is 10
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
+			pixelTolerance: 6, // Default is 10
 			style: editStyle,
 		}),
 		controlModify = controlButton({
@@ -987,12 +844,9 @@ function layerEditGeoJson(options) {
 			activate: function(active) {
 				activate(active, modify);
 			},
-		}),
+		});
 
-		// Pointer edit <input>
-		displayPointEl = document.getElementById(options.displayPointId),
-		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {};
-
+	// Set edit fields actions
 	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;
@@ -1012,10 +866,10 @@ function layerEditGeoJson(options) {
 
 	layer.once('myol:onadd', function(evt) {
 		const map = evt.map;
-		hoverManager(map);
 		optimiseEdited(); // Treat the geoJson input as any other edit
 
 		//HACK Avoid zooming when you leave the mode by doubleclick
+		//TODO voir s'il y a un paramètre à une interaction : modify ?
 		map.getInteractions().forEach(function(i) {
 			if (i instanceof ol.interaction.DoubleClickZoom)
 				map.removeInteraction(i);
@@ -1062,7 +916,7 @@ function layerEditGeoJson(options) {
 
 	function removeFeaturesAtPixel(pixel) {
 		const selectedFeatures = layer.map_.getFeaturesAtPixel(pixel, {
-			hitTolerance: 6,
+			hitTolerance: 6, // Default is 0
 			layerFilter: function(l) {
 				return l.ol_uid == layer.ol_uid;
 			}
@@ -1072,38 +926,49 @@ function layerEditGeoJson(options) {
 	}
 
 	//HACK move only one summit when dragging
-	modify.handleDragEvent = function(evt) {
-		let draggedUid; // The first one will be the only one that will be dragged
+	if (0) //TODO DONT WORK !
+		modify.handleDragEvent = function(evt) {
+			let draggedUid; // The first one will be the only one that will be dragged
 
-		for (let s in this.dragSegments_) {
-			let segmentUid = this.dragSegments_[s][0].feature.ol_uid; // Get the current item uid
-			if (draggedUid && segmentUid != draggedUid) // If it is not the first one
-				delete this.dragSegments_[s]; // Remove it from the dragged list
-			draggedUid = segmentUid;
-		}
+			for (let s in this.dragSegments_) {
+				let segmentUid = this.dragSegments_[s][0].feature.ol_uid; // Get the current item uid
+				if (draggedUid && segmentUid != draggedUid) // If it is not the first one
+					delete this.dragSegments_[s]; // Remove it from the dragged list
+				draggedUid = segmentUid;
+			}
 
-		if (this.dragSegments_) //TODO est ce un bug ??? / Ne fonctionne pas
-			this.dragSegments_ = this.dragSegments_.filter(Boolean); // Reorder array keys
+			if (this.dragSegments_) //TODO est ce un bug ??? / Ne fonctionne pas
+				this.dragSegments_ = this.dragSegments_.filter(Boolean); // Reorder array keys
 
-		ol.interaction.Modify.prototype.handleDragEvent.call(this, evt); // Call the former method
-	};
+			ol.interaction.Modify.prototype.handleDragEvent.call(this, evt); // Call the former method
+		};
 
 	//HACK delete feature when Ctrl+Alt click
-	modify.handleDownEvent = function(evt) {
-		if (evt.originalEvent.ctrlKey && evt.originalEvent.altKey)
-			removeFeaturesAtPixel(evt.pixel_);
-		return ol.interaction.Modify.prototype.handleDownEvent.call(this, evt); // Call the former method
-	};
+	if (0) //TODO DONT WORK !
+		modify.handleDownEvent = function(evt) {
+			if (evt.originalEvent.ctrlKey && evt.originalEvent.altKey)
+				removeFeaturesAtPixel(evt.pixel_);
+			return ol.interaction.Modify.prototype.handleDownEvent.call(this, evt); // Call the former method
+		};
 
 	modify.on('modifyend', function(evt) {
-		if (evt.mapBrowserEvent.originalEvent.altKey) {
-			// Ctrl + Alt click on segment : delete feature
-			if (evt.mapBrowserEvent.originalEvent.ctrlKey)
-				removeFeaturesAtPixel(evt.mapBrowserEvent.pixel);
-			// Alt click on segment : delete the segment & split the line
-			else if (evt.target.vertexFeature_)
-				return optimiseEdited(evt.target.vertexFeature_.getGeometry().getCoordinates());
-		}
+		// Ctrl+Alt+click on segment : delete the line or poly
+		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
+			evt.mapBrowserEvent.originalEvent.altKey)
+			removeFeaturesAtPixel(evt.mapBrowserEvent.pixel);
+
+		//TODO 'Ctrl+Alt+cliquer sur une ligne ou un sommet pour les supprimer'
+
+		// Alt+click on segment : delete the segment & split the line
+		const newFeature = snap.snapTo(
+			evt.mapBrowserEvent.pixel,
+			evt.mapBrowserEvent.coordinate,
+			snap.getMap()
+		);
+		if (evt.mapBrowserEvent.originalEvent.altKey)
+			optimiseEdited(newFeature.vertex);
+
+		// Finish
 		optimiseEdited();
 		hoveredFeature = null; // Recover hovering
 	});
@@ -1112,6 +977,8 @@ function layerEditGeoJson(options) {
 	source.on('change', function() { // Called all sliding long
 		if (source.modified) { // Awaiting adding complete to save it
 			source.modified = false; // To avoid loops
+
+			// Finish
 			optimiseEdited();
 			hoveredFeature = null; // Recover hovering
 		}
@@ -1151,7 +1018,6 @@ function layerEditGeoJson(options) {
 		return button;
 	}
 
-	//BEST use the centralized hover function
 	function hover(evt) {
 		let nbFeaturesAtPixel = 0;
 		layer.map_.forEachFeatureAtPixel(evt.pixel, function(feature) {
@@ -1192,6 +1058,7 @@ function layerEditGeoJson(options) {
 		});
 	};
 
+	//TODO make separate position control
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
@@ -1287,14 +1154,30 @@ function layerEditGeoJson(options) {
 		}
 	}
 
-	function optimiseEdited(pointerPosition) {
+	function escapedStyle(a, b, c) {
+		//BEST work with arguments
+		const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
+		return function(feature) {
+			return new ol.style.Style(Object.assign({
+					fill: defaultStyle.getFill(),
+					stroke: defaultStyle.getStroke(),
+					image: defaultStyle.getImage(),
+				},
+				typeof a == 'function' ? a(feature.getProperties()) : a,
+				typeof b == 'function' ? b(feature.getProperties()) : b,
+				typeof c == 'function' ? c(feature.getProperties()) : c
+			));
+		};
+	}
+
+	function optimiseEdited(deleteCoords) {
 		const coords = optimiseFeatures(
 			source.getFeatures(),
 			options.titleLine,
 			options.titlePolygon,
 			true,
 			true,
-			pointerPosition
+			deleteCoords
 		);
 
 		// Recreate features
@@ -1339,16 +1222,16 @@ function layerEditGeoJson(options) {
 
 /**
  * Refurbish Points, Lines & Polygons
- * Split lines having a summit at removePosition
+ * Split lines having a summit at deleteCoords
  */
-function optimiseFeatures(features, withLines, withPolygons, merge, holes, removePosition) {
+function optimiseFeatures(features, withLines, withPolygons, merge, holes, deleteCoords) {
 	const points = [],
 		lines = [],
 		polys = [];
 
 	// Get all edited features as array of coordinates
 	for (let f in features)
-		flatFeatures(features[f].getGeometry(), points, lines, polys, removePosition);
+		flatFeatures(features[f].getGeometry(), points, lines, polys, deleteCoords);
 
 	for (let a in lines)
 		// Exclude 1 coordinate features (points)
@@ -1374,7 +1257,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 					}
 			}
 
-	// Make polygons with in loop lines
+	// Make polygons with looped lines
 	for (let a in lines)
 		if (withPolygons && // Only if polygons are autorized
 			lines[a]) {
@@ -1426,12 +1309,12 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, remov
 	};
 }
 
-function flatFeatures(geom, points, lines, polys, removePosition) {
+function flatFeatures(geom, points, lines, polys, deleteCoords) {
 	// Expand geometryCollection
 	if (geom.getType() == 'GeometryCollection') {
 		const geometries = geom.getGeometries();
 		for (let g in geometries)
-			flatFeatures(geometries[g], points, lines, polys, removePosition);
+			flatFeatures(geometries[g], points, lines, polys, deleteCoords);
 	}
 	// Point
 	else if (geom.getType().match(/point$/i))
@@ -1439,23 +1322,24 @@ function flatFeatures(geom, points, lines, polys, removePosition) {
 
 	// line & poly
 	else
-		flatCoord(lines, geom.getCoordinates(), removePosition); // Get lines or polyons as flat array of coords
+		flatCoord(lines, geom.getCoordinates(), deleteCoords); // Get lines or polyons as flat array of coords
 }
 
-// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...) at the same level & split if one point = pointerPosition
-function flatCoord(existingCoords, newCoords, pointerPosition) {
+// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)
+// at the same level & split if one point = deleteCoords
+function flatCoord(existingCoords, newCoords, deleteCoords) {
 	if (typeof newCoords[0][0] == 'object') // Multi*
 		for (let c1 in newCoords)
-			flatCoord(existingCoords, newCoords[c1], pointerPosition);
+			flatCoord(existingCoords, newCoords[c1], deleteCoords);
 	else {
-		existingCoords.push([]); // Increment existingCoords array
-		for (let c2 in newCoords) {
-			if (pointerPosition && compareCoords(newCoords[c2], pointerPosition)) {
-				existingCoords.push([]); // Forget that one & increment existingCoords array
-			} else
+		existingCoords.push([]); // Add a new segment
+
+		for (let c2 in newCoords)
+			if (deleteCoords && compareCoords(newCoords[c2], deleteCoords))
+				existingCoords.push([]); // Ignore this point and add a new segment
+			else
 				// Stack on the last existingCoords array
 				existingCoords[existingCoords.length - 1].push(newCoords[c2]);
-		}
 	}
 }
 
@@ -1465,41 +1349,4 @@ function compareCoords(a, b) {
 	if (!b)
 		return compareCoords(a[0], a[a.length - 1]); // Compare start with end
 	return a[0] == b[0] && a[1] == b[1]; // 2 coords
-}
-
-
-/**
- * Controls examples
- */
-function controlsCollection(options) {
-	options = options || {};
-
-	return [
-		// Top right
-		typeof controlLayerSwitcher == 'function' ?
-		controlLayerSwitcher(Object.assign({
-			baseLayers: options.baseLayers,
-		}, options.controlLayerSwitcher)) :
-		new ol.control.Control({ //HACK no control
-			element: document.createElement('div'),
-		}),
-
-		// Bottom right
-		new ol.control.Attribution(),
-		controlPermalink(options.controlPermalink),
-
-		// Bottom left
-		new ol.control.ScaleLine(),
-		controlMousePosition(),
-		controlLengthLine(),
-
-		// Top left
-		new ol.control.Zoom(),
-		controlFullScreen(),
-		controlGeocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownload(options.controlDownload),
-		controlPrint(),
-	];
 }
