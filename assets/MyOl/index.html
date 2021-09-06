@@ -49,7 +49,7 @@ Based on https://openlayers.org
 
 	<script>
 // Must be after the <div id="map"> tag
-new ol.Map({
+var map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
 		center: [260000, 5800000], // France
@@ -75,6 +75,8 @@ new ol.Map({
 		),
 	],
 });
+
+map.addControl(controlHover());
 	</script>
 
 	<h1 style="clear:both">MyOl</h1>
