@@ -161,6 +161,10 @@ class listener implements EventSubscriberInterface
 				$topic_row['geo_region'] =
 					intval ((180 + $geo_center[0]) * $subgroups) * 360 * $subgroups +
 					intval ((180 + $geo_center[1]) * $subgroups);
+
+					// Update the database for next time
+					$sql = "UPDATE phpbb_posts SET geo_region = '{$topic_row['geo_region']}' WHERE post_id = $post_id";
+					$this->db->sql_query($sql);
 			}
 		}
 
@@ -201,8 +205,19 @@ class listener implements EventSubscriberInterface
 		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 
 		// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
-		if (@$post['geom'])
-			$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('{$post['geom']}')";
+		if (@$post['geom']) {
+			// Avoid wrap of the world
+			$geom = preg_replace_callback(
+				'/coordinates\"\:\[([0-9-\.]*)/',
+				function ($matches) {
+					$tours = round (($matches[1] + 180) / 360);
+					$matches[1] -= $tours * 360;
+					return 'coordinates":['.$matches[1];
+				},
+				$post['geom']
+			);
+			$sql_data[POSTS_TABLE]['sql']['geom'] = "ST_GeomFromGeoJSON('$geom')";
+		}
 
 		$sql_data[POSTS_TABLE]['sql']['geo_altitude'] = @$post['geo_altitude'];
 		$sql_data[POSTS_TABLE]['sql']['geo_massif'] = @$post['geo_massif'];
