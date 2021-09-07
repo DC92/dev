@@ -208,11 +208,9 @@ class listener implements EventSubscriberInterface
 		if (@$post['geom']) {
 			// Avoid wrap of the world
 			$geom = preg_replace_callback(
-				'/coordinates\"\:\[([0-9-\.]*)/',
+				'/coordinates\"\:\[([0-9-.]*)/',
 				function ($matches) {
-					$tours = round (($matches[1] + 180) / 360);
-					$matches[1] -= $tours * 360;
-					return 'coordinates":['.$matches[1];
+					return 'coordinates":['.($matches[1] - round ($matches[1] / 360) * 360);
 				},
 				$post['geom']
 			);
