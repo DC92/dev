@@ -1878,9 +1878,13 @@ function controlLayerSwitcher(options) {
 				options.baseLayers[name].setOpacity(1);
 			}
 
-		//TODO BUG bugge quand le cookie ne correspond pas à une entrée connue
+		// Baselayer default is the first of the selection
+		if (!options.baseLayers[selectedBaseLayerName])
+			selectedBaseLayerName = Object.keys(options.baseLayers)[0];
+
 		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
 		options.baseLayers[selectedBaseLayerName].setVisible(true);
+
 		if (lastBaseLayerName) {
 			options.baseLayers[lastBaseLayerName].inputEl.checked = true;
 			options.baseLayers[lastBaseLayerName].setVisible(true);
@@ -2083,15 +2087,8 @@ function layerVector(opt) {
 				);
 		});
 
-	// style callback function for the layer
+	// Style callback function for the layer
 	function style(feature, resolution) {
-		// Hover style
-		feature.hoverStyleFunction = function(feature, resolution) {
-			return displayStyle(feature, resolution, [
-				defaultStyleOptions, defaultHoverStyleOptions, options.hoverStyleOptions
-			]);
-		};
-
 		if (feature.display.cluster) // Grouped features
 			// Cluster style
 			return displayStyle(feature, resolution, [
@@ -2170,7 +2167,7 @@ function layerVector(opt) {
 
 	//HACK to attach hover listeners when the map is defined
 	ol.Map.prototype.render = function() {
-		if (!this.hoverLayer)
+		if (!this.hoverLayer && this.getView())
 			initHover(this);
 
 		return ol.PluggableMap.prototype.render.call(this);
@@ -2181,15 +2178,15 @@ function layerVector(opt) {
 	function initHover(map) {
 		// Internal layer to temporary display the hovered feature
 		const view = map.getView(),
-			source = new ol.source.Vector();
+			hoverSource = new ol.source.Vector();
 
 		map.hoverLayer = new ol.layer.Vector({
-			source: source,
+			source: hoverSource,
 			zIndex: 2, // Above the features
-			//TODO use only feature.hoverStyleFunction
 			style: function(feature, resolution) {
-				if (typeof feature.hoverStyleFunction == 'function')
-					return feature.hoverStyleFunction(feature, resolution);
+				return displayStyle(feature, resolution, [
+					defaultStyleOptions, defaultHoverStyleOptions, options.hoverStyleOptions
+				]);
 			},
 		});
 
@@ -2209,10 +2206,10 @@ function layerVector(opt) {
 			// Update the display of hovered feature
 			if (hoveredFeature !== feature) {
 				if (hoveredFeature)
-					source.clear();
+					hoverSource.clear();
 
 				if (feature)
-					source.addFeature(feature);
+					hoverSource.addFeature(feature);
 
 				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
 				hoveredFeature = feature;

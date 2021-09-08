@@ -81,9 +81,13 @@ function controlLayerSwitcher(options) {
 				options.baseLayers[name].setOpacity(1);
 			}
 
-		//TODO BUG bugge quand le cookie ne correspond pas à une entrée connue
+		// Baselayer default is the first of the selection
+		if (!options.baseLayers[selectedBaseLayerName])
+			selectedBaseLayerName = Object.keys(options.baseLayers)[0];
+
 		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
 		options.baseLayers[selectedBaseLayerName].setVisible(true);
+
 		if (lastBaseLayerName) {
 			options.baseLayers[lastBaseLayerName].inputEl.checked = true;
 			options.baseLayers[lastBaseLayerName].setVisible(true);
