@@ -1,18 +1,6 @@
-//HACK IE polyfills
+//HACK I.E. polyfills
 // Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
-//BEST try :::   controls: defaultControls().extend([new RotateNorthControl()]),
-if (!Object.assign)
-	Object.assign = function() {
-		let r = {};
-		for (let a in arguments)
-			for (let m in arguments[a])
-				r[m] = arguments[a][m];
-		return r;
-	};
-if (!Math.hypot)
-	Math.hypot = function(a, b) {
-		return Math.sqrt(a * a + b * b);
-	};
+// Need polyfill-ie.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) {
