@@ -125,10 +125,6 @@ Based on https://openlayers.org
 					source: new ol.source.OSM(),
 				}),
 			],
-			controls: [
-				new ol.control.Zoom(),
-				controlHover(),
-			],
 			view: new ol.View({
 				center: [700000, 5700000], zoom: 12, // Maurienne
 				//center: [260000, 6250000], zoom: 12, // Paris
@@ -149,6 +145,7 @@ Based on https://openlayers.org
 					distance: 50,
 				})
 			));
+			//TODO 2nd layer in the same
 			map.addLayer(layerWriAreas({
 				minResolution: 100,
 				selectorName: 'wri-features',

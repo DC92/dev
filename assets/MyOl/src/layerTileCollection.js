@@ -89,7 +89,7 @@ function layerStamen(layer) {
  * IGN France
  * Doc on http://api.ign.fr
  * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user
- //TODO adapt to new key polocy
+ //TODO adapt to new key policy
  */
 function layerIGN(layer, format, key) {
 	let IGNresolutions = [],

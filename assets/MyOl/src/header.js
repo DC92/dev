@@ -46,7 +46,7 @@ if (window.location.hash == '###')
 	};
 
 //HACK Json parsing errors log
-//TODO implement on layerVector.js
+//TODO implement on layerVector.js & editor
 function JSONparse(json) {
 	try {
 		return JSON.parse(json);
