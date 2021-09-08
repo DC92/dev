@@ -55,20 +55,20 @@ Based on https://openlayers.org
 	}' />
 
 	<script>
-const back = new ol.layer.Vector({
-	zIndex: 1, // Above the base layer
-	source: new ol.source.Vector({
-		url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
-		format: new ol.format.GeoJSON(),
+const snaplayer = new ol.layer.Vector({
+		zIndex: 1, // Above the base layer
+		source: new ol.source.Vector({
+			url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+			format: new ol.format.GeoJSON(),
+		}),
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke(),
+		}),
 	}),
-	style: new ol.style.Style({
-		stroke: new ol.style.Stroke(),
-	}),
-}),
 
 	editor = layerEditGeoJson({
 		geoJsonId: 'geojson',
-		snapLayers: [back],
+		snapLayers: [snaplayer],
 		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
 			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
@@ -92,28 +92,25 @@ const back = new ol.layer.Vector({
 	});
 
 const mapKeys = {
-		"ign": "hcxdz5f1p9emo4i1lch6ennl",
-		"thunderforest": "ee751f43b3af4614b01d1bce72785369",
-		"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
-	};
+	"ign": "hcxdz5f1p9emo4i1lch6ennl",
+	"thunderforest": "ee751f43b3af4614b01d1bce72785369",
+	"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
+};
 
-	  new ol.Map({
-		target: 'map',
-		view: new ol.View({
+new ol.Map({
+	target: 'map',
+	view: new ol.View({
 		center: [-500000, 5800000],
 		zoom: 6,
 	}),
 	layers: [
-		 new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-			back,
-			editor,
-		],
-		controls:  [
-		new ol.control.Zoom(),
+		new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
+		snaplayer,
+		editor,
 	],
-	});
+});
 	</script>
 	<script src="print_script.js"></script>
 

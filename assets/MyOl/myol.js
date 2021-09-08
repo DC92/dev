@@ -841,7 +841,6 @@ function controlsCollection(options) {
  * Requires JSONparse, myol:onadd, controlButton
  */
 function layerEditGeoJson(options) {
-	//TODO cohabitation test with controlHover
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',
@@ -2103,61 +2102,63 @@ function layerVector(opt) {
 
 	// Function to display different styles
 	function displayStyle(feature, resolution, styles) {
-		const styleOptions = {},
-			textOptions = {};
+		if (feature.display) {
+			const styleOptions = {},
+				textOptions = {};
 
-		// Concatenate the list of styles & defaults
-		for (let s in styles)
-			if (styles[s]) {
-				const style = typeof styles[s] == 'function' ?
-					styles[s](feature) :
-					styles[s];
+			// Concatenate the list of styles & defaults
+			for (let s in styles)
+				if (styles[s]) {
+					const style = typeof styles[s] == 'function' ?
+						styles[s](feature) :
+						styles[s];
 
-				Object.assign(styleOptions, style);
+					Object.assign(styleOptions, style);
 
-				// Separately concatenate text options
-				Object.assign(textOptions, style.textOptions);
+					// Separately concatenate text options
+					Object.assign(textOptions, style.textOptions);
+				}
+
+			//TODO faire une fonction plus générale pour les feature.display
+			if (feature.display.iconchem)
+				feature.display.icon =
+				'//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.display.iconchem + '.svg';
+
+			if (feature.display.icon)
+				//TODO add <sym> for Garmin upload
+				styleOptions.image = new ol.style.Icon({
+					src: feature.display.icon,
+				});
+
+			// Hover
+			const hover = [],
+				subHover = [];
+			if (styleOptions.hover) { // When the function is called for hover
+				if (feature.display.type)
+					hover.push(feature.display.type.replace('_', ' '));
+				if (feature.display.ele)
+					subHover.push(feature.display.ele + 'm');
+				if (feature.display.bed)
+					subHover.push(feature.display.bed + '\u255E\u2550\u2555');
+				if (subHover.length)
+					hover.push(subHover.join(', '));
+				if (feature.display.name)
+					hover.push(feature.display.name);
 			}
 
-		//TODO faire une fonction plus générale pour les feature.display
-		if (feature.display.iconchem)
-			feature.display.icon =
-			'//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.display.iconchem + '.svg';
+			elLabel.innerHTML = //HACK to render the html entities in canvas
+				(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
+				hover.join('\n') ||
+				feature.display.name ||
+				'';
 
-		if (feature.display.icon)
-			//TODO add <sym> for Garmin upload
-			styleOptions.image = new ol.style.Icon({
-				src: feature.display.icon,
-			});
+			if (elLabel.innerHTML) {
+				textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
+				styleOptions.text = new ol.style.Text(textOptions);
+			}
 
-		// Hover
-		const hover = [],
-			subHover = [];
-		if (styleOptions.hover) { // When the function is called for hover
-			if (feature.display.type)
-				hover.push(feature.display.type.replace('_', ' '));
-			if (feature.display.ele)
-				subHover.push(feature.display.ele + 'm');
-			if (feature.display.bed)
-				subHover.push(feature.display.bed + '\u255E\u2550\u2555');
-			if (subHover.length)
-				hover.push(subHover.join(', '));
-			if (feature.display.name)
-				hover.push(feature.display.name);
+			return new ol.style.Style(styleOptions);
 		}
-
-		elLabel.innerHTML = //HACK to render the html entities in canvas
-			(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
-			hover.join('\n') ||
-			feature.display.name ||
-			'';
-
-		if (elLabel.innerHTML) {
-			textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
-			styleOptions.text = new ol.style.Text(textOptions);
-		}
-
-		return new ol.style.Style(styleOptions);
 	}
 
 	// Display labels on hovering & click
@@ -2216,22 +2217,22 @@ function layerVector(opt) {
 			}
 
 			// Click actions
-			if (feature) {
+			if (feature && evt.type == 'click') {
 				const features = feature.get('features') || [feature],
-					url = features[0].display.url,
+					display = features[0].display,
 					geom = feature.getGeometry();
 
-				if (evt.type == 'click') {
-					if (features.length == 1 && url) {
+				if (display) {
+					if (features.length == 1 && display.url) {
 						// Single feature
 						if (evt.originalEvent.ctrlKey)
-							window.open(url, '_blank').focus();
+							window.open(display.url, '_blank').focus();
 						else
 						if (evt.originalEvent.shiftKey)
 							// To specify feature open a new window
-							window.open(url, '_blank', 'resizable=yes').focus();
+							window.open(display.url, '_blank', 'resizable=yes').focus();
 						else
-							window.location = url;
+							window.location = display.url;
 					}
 					// Cluster
 					else if (geom)
@@ -2465,6 +2466,7 @@ function fillColorOption(hexColor, transparency) {
 /**
  * Site refuges.info
  */
+//TODO min & max layer in the same function
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
@@ -2512,7 +2514,7 @@ function layerWriAreas(options) {
 /**
  * Site chemineur.fr
  */
-//TODO générer cluster n° quand modifie fiche
+//TODO min & max layer in the same function
 function layerChemPoi(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',

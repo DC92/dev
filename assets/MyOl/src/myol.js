@@ -754,7 +754,6 @@ function controlsCollection(options) {
  * Requires JSONparse, myol:onadd, controlButton
  */
 function layerEditGeoJson(options) {
-	//TODO cohabitation test with controlHover
 	options = Object.assign({
 		format: new ol.format.GeoJSON(),
 		projection: 'EPSG:3857',

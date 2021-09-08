@@ -22,6 +22,7 @@ function fillColorOption(hexColor, transparency) {
 /**
  * Site refuges.info
  */
+//TODO min & max layer in the same function
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
@@ -69,7 +70,7 @@ function layerWriAreas(options) {
 /**
  * Site chemineur.fr
  */
-//TODO générer cluster n° quand modifie fiche
+//TODO min & max layer in the same function
 function layerChemPoi(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
