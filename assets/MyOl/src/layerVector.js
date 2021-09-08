@@ -43,7 +43,7 @@ function layerVector(opt) {
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			displayProperties: function(properties) {
-				return properties;
+				return properties; // Blank default
 			},
 		}, opt),
 
@@ -234,6 +234,90 @@ function layerVector(opt) {
 		return new ol.style.Style(styleOptions);
 	}
 
+	// Display labels on hovering & click
+	// on features of vector layers having the following properties :
+	// hover : text on top of the picture
+	// url : go to a new URL when we click on the feature
+
+	//HACK to attach hover listeners when the map is defined
+	ol.Map.prototype.render = function() {
+		if (!this.hoverLayer)
+			initHover(this);
+
+		return ol.PluggableMap.prototype.render.call(this);
+	};
+
+	let hoveredFeature;
+
+	function initHover(map) {
+		// Internal layer to temporary display the hovered feature
+		const view = map.getView(),
+			source = new ol.source.Vector();
+
+		map.hoverLayer = new ol.layer.Vector({
+			source: source,
+			zIndex: 2, // Above the features
+			//TODO use only feature.hoverStyleFunction
+			style: function(feature, resolution) {
+				if (typeof feature.hoverStyleFunction == 'function')
+					return feature.hoverStyleFunction(feature, resolution);
+			},
+		});
+
+		map.addLayer(map.hoverLayer);
+		map.on(['pointermove', 'click'], hovermouseEvent);
+		view.on('change:resolution', hovermouseEvent);
+
+		function hovermouseEvent(evt) {
+			// Get hovered feature
+			const feature = !evt.originalEvent ? null :
+				map.forEachFeatureAtPixel(
+					map.getEventPixel(evt.originalEvent),
+					function(feature) {
+						return feature;
+					});
+
+			// Update the display of hovered feature
+			if (hoveredFeature !== feature) {
+				if (hoveredFeature)
+					source.clear();
+
+				if (feature)
+					source.addFeature(feature);
+
+				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
+				hoveredFeature = feature;
+			}
+
+			// Click actions
+			if (feature) {
+				const features = feature.get('features') || [feature],
+					url = features[0].display.url,
+					geom = feature.getGeometry();
+
+				if (evt.type == 'click') {
+					if (features.length == 1 && url) {
+						// Single feature
+						if (evt.originalEvent.ctrlKey)
+							window.open(url, '_blank').focus();
+						else
+						if (evt.originalEvent.shiftKey)
+							// To specify feature open a new window
+							window.open(url, '_blank', 'resizable=yes').focus();
+						else
+							window.location = url;
+					}
+					// Cluster
+					else if (geom)
+						view.animate({
+							zoom: view.getZoom() + 2,
+							center: geom.getCoordinates(),
+						});
+				}
+			}
+		}
+	}
+
 	//HACK Save options for further use (layerVectorCluster)
 	layer.options = options; //BEST avoid
 
@@ -243,7 +327,7 @@ function layerVector(opt) {
 /**
  * Cluster close features
  */
-function layerVectorCluster(layer, distance) {
+function layerVectorCluster(layer) {
 	const options = Object.assign({
 			strategy: ol.loadingstrategy.bbox,
 			distance: 50, // Distance in pixels within which features will be clustered together.
@@ -334,98 +418,6 @@ function layerVectorCluster(layer, distance) {
 	}
 
 	return clusterLayer;
-}
-
-/**
- * Control to display labels on hovering & click
- * on features of vector layers having the following properties :
- * hover : text on top of the picture
- * url : go to a new URL when we click on the feature
- */
-function controlHover() {
-	//TODO le lancer automatiquement ???
-	const control = new ol.control.Control({
-			element: document.createElement('div'), //HACK No button
-		}),
-		// Internal layer to temporary display the hovered feature
-		hoverLayer = new ol.layer.Vector({
-			source: new ol.source.Vector(),
-			zIndex: 2, // Above the features
-			style: function(feature, resolution) {
-				if (typeof feature.hoverStyleFunction == 'function')
-					return feature.hoverStyleFunction(feature, resolution);
-			},
-		});
-
-	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
-		map.addLayer(hoverLayer);
-
-		map.getView().on('change:resolution', function() {
-			// Remove hovered feature
-			if (previousHoveredFeature)
-				hoverLayer.getSource().removeFeature(previousHoveredFeature);
-			previousHoveredFeature = null;
-
-			// Reset cursor
-			map.getViewport().style.cursor = 'default';
-		});
-
-		map.on(['pointermove', 'click'], mouseEvent);
-	};
-
-	let previousHoveredFeature;
-
-	function mouseEvent(evt) {
-		// Get hovered feature
-		const map = evt.target,
-			feature = map.forEachFeatureAtPixel(
-				map.getEventPixel(evt.originalEvent),
-				function(feature) {
-					return feature;
-				});
-
-		// Make the hovered feature visible in a dedicated layer
-		if (feature !== previousHoveredFeature) {
-			if (previousHoveredFeature)
-				hoverLayer.getSource().removeFeature(previousHoveredFeature);
-
-			if (feature)
-				hoverLayer.getSource().addFeature(feature);
-
-			map.getViewport().style.cursor = feature ? 'pointer' : 'default';
-			previousHoveredFeature = feature;
-		}
-
-		// Click actions
-		if (feature) {
-			const features = feature.get('features') || [feature],
-				url = features[0].display.url,
-				geom = feature.getGeometry();
-
-			if (evt.type == 'click') {
-				if (features.length == 1 && url) {
-					// Single feature
-					if (evt.originalEvent.ctrlKey)
-						window.open(url, '_blank').focus();
-					else
-					if (evt.originalEvent.shiftKey)
-						// To specify feature open a new window
-						window.open(url, '_blank', 'resizable=yes').focus();
-					else
-						window.location = url;
-				} else
-					// Cluster
-					if (geom)
-						map.getView().animate({
-							zoom: map.getView().getZoom() + 2,
-							center: geom.getCoordinates(),
-						});
-			}
-		}
-	}
-
-	return control;
 }
 
 /**
