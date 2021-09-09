@@ -9,7 +9,7 @@
 
 //HACK I.E. polyfills
 // Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
-// Need polyfill-ie.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
+// Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) {
@@ -604,7 +604,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO BUG IE SCRIPT5022: IndexSizeError
+//TODO BUG I.E. SCRIPT5022: IndexSizeError
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -1022,7 +1022,7 @@ function memCheckbox(selectorName, callback) {
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by I.E./Edge
 			// Set inputs following cookies & args
 			if (match)
 				inputEls[e].checked =
@@ -1345,13 +1345,13 @@ function layerC2C(options) {
 	});
 	format.readFeatures = function(json, opts) {
 		const features = [],
-			objects = JSON.parse(json);
+			objects = JSONparse(json);
 		for (let o in objects.documents) {
 			const properties = objects.documents[o];
 			features.push({
 				id: properties.document_id,
 				type: 'Feature',
-				geometry: JSON.parse(properties.geometry.geom),
+				geometry: JSONparse(properties.geometry.geom),
 				properties: {
 					ele: properties.elevation,
 					name: properties.locales[0].title,
@@ -1630,7 +1630,7 @@ function controlFullScreen(options) {
 
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '', //HACK Bad presentation on IE & FF
+		label: '', //HACK Bad presentation on I.E. & FF
 		tipLabel: 'Plein écran',
 	}, options));
 
@@ -1644,7 +1644,7 @@ function controlFullScreen(options) {
 			document.exitFullscreen = toggle;
 		} else {
 			document.addEventListener('webkitfullscreenchange', toggle, false); // Edge, Safari
-			document.addEventListener('MSFullscreenChange', toggle, false); // IE
+			document.addEventListener('MSFullscreenChange', toggle, false); // I.E.
 		}
 
 		function toggle() {
@@ -1666,13 +1666,13 @@ function controlFullScreen(options) {
  */
 //TODO BUG controm 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
-//TODO BUG IE SCRIPT5022: IndexSizeError
+//TODO BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
 	}, options);
 
-	// Vérify if geocoder is available (not supported in IE)
+	// Vérify if geocoder is available (not supported in I.E.)
 	if (typeof Geocoder != 'function')
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
@@ -2019,7 +2019,7 @@ function controlDownload(options) {
 				type: mime,
 			});
 
-		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
+		if (typeof navigator.msSaveBlob == 'function') // I.E./Edge
 			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
 		else {
 			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
@@ -2056,7 +2056,7 @@ function controlPrint() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const oris = document.getElementsByName('print-orientation');
-		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / IE
+		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / I.E.
 			oris[i].onchange = resizeDraft;
 	};
 
@@ -2565,11 +2565,13 @@ function layerEditGeoJson(options) {
 			//TODO BUG si json entrée vide, n'affiche pas les champs numériques
 			coords.points.push(layer.map_.getView().getCenter());
 
+
 			// Keep only the first point
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Point(coords.points[0]),
-				draggable: options.dragPoint,
-			}));
+			if (coords.points[0])
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.Point(coords.points[0]),
+					draggable: options.dragPoint,
+				}));
 		} else {
 			for (let p in coords.points)
 				source.addFeature(new ol.Feature({

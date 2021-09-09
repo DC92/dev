@@ -437,11 +437,13 @@ function layerEditGeoJson(options) {
 			//TODO BUG si json entrée vide, n'affiche pas les champs numériques
 			coords.points.push(layer.map_.getView().getCenter());
 
+
 			// Keep only the first point
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Point(coords.points[0]),
-				draggable: options.dragPoint,
-			}));
+			if (coords.points[0])
+				source.addFeature(new ol.Feature({
+					geometry: new ol.geom.Point(coords.points[0]),
+					draggable: options.dragPoint,
+				}));
 		} else {
 			for (let p in coords.points)
 				source.addFeature(new ol.Feature({

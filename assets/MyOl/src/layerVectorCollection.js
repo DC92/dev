@@ -265,13 +265,13 @@ function layerC2C(options) {
 	});
 	format.readFeatures = function(json, opts) {
 		const features = [],
-			objects = JSON.parse(json);
+			objects = JSONparse(json);
 		for (let o in objects.documents) {
 			const properties = objects.documents[o];
 			features.push({
 				id: properties.document_id,
 				type: 'Feature',
-				geometry: JSON.parse(properties.geometry.geom),
+				geometry: JSONparse(properties.geometry.geom),
 				properties: {
 					ele: properties.elevation,
 					name: properties.locales[0].title,

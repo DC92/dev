@@ -36,7 +36,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO BUG IE SCRIPT5022: IndexSizeError
+//TODO BUG I.E. SCRIPT5022: IndexSizeError
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -454,7 +454,7 @@ function memCheckbox(selectorName, callback) {
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by IE/Edge
+		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by I.E./Edge
 			// Set inputs following cookies & args
 			if (match)
 				inputEls[e].checked =

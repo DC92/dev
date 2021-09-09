@@ -250,7 +250,7 @@ function controlFullScreen(options) {
 
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '', //HACK Bad presentation on IE & FF
+		label: '', //HACK Bad presentation on I.E. & FF
 		tipLabel: 'Plein écran',
 	}, options));
 
@@ -264,7 +264,7 @@ function controlFullScreen(options) {
 			document.exitFullscreen = toggle;
 		} else {
 			document.addEventListener('webkitfullscreenchange', toggle, false); // Edge, Safari
-			document.addEventListener('MSFullscreenChange', toggle, false); // IE
+			document.addEventListener('MSFullscreenChange', toggle, false); // I.E.
 		}
 
 		function toggle() {
@@ -286,13 +286,13 @@ function controlFullScreen(options) {
  */
 //TODO BUG controm 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
-//TODO BUG IE SCRIPT5022: IndexSizeError
+//TODO BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
 	}, options);
 
-	// Vérify if geocoder is available (not supported in IE)
+	// Vérify if geocoder is available (not supported in I.E.)
 	if (typeof Geocoder != 'function')
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
@@ -639,7 +639,7 @@ function controlDownload(options) {
 				type: mime,
 			});
 
-		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
+		if (typeof navigator.msSaveBlob == 'function') // I.E./Edge
 			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
 		else {
 			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
@@ -676,7 +676,7 @@ function controlPrint() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const oris = document.getElementsByName('print-orientation');
-		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / IE
+		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / I.E.
 			oris[i].onchange = resizeDraft;
 	};
 

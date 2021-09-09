@@ -11,6 +11,9 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 
+	<!-- I.E. compatibility -->
+	<script nomodule src="../src/polyfill.js"></script>
+
 	<!-- Openlayers -->
 	<link  href="../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../ol/ol.js"></script>
@@ -19,15 +22,11 @@ Based on https://openlayers.org
 	<script src="../proj4/proj4-src.js"></script>
 
 	<!-- My Openlayers -->
-	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<link  href="../src/myol.css" type="text/css" rel="stylesheet">
 	<script src="../src/header.js"></script>
-	<script src="../src/layerTileCollection.js"></script>
-	<script src="../src/layerSwitcher.js"></script>
-	<script src="../src/myol.js"></script>
+	<link  href="../src/controls.css" type="text/css" rel="stylesheet">
+	<script src="../src/controls.js"></script>
+	<script src="../src/editor.js"></script>
 
-	<!-- This exemple -->
-	<script src="marker.js" defer="defer"></script>
 	<style>
 		#map {
 			width: 100%;
@@ -40,6 +39,59 @@ Based on https://openlayers.org
 
 <body>
 	<div id="map"></div>
+
+	<script>
+//BEST cadre et viseur SVG / inline
+const cadre = layerEditGeoJson({
+		displayPointId: 'fix-marker',
+		singlePoint: true,
+		geoJson: {
+			type: 'Point',
+			coordinates: [2, 48],
+		},
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'images/cadre.png',
+			}),
+		},
+	}),
+	viseur = layerEditGeoJson({
+		displayPointId: 'drag-marker',
+		geoJsonId: 'drag-marker-json',
+		dragPoint: true,
+		singlePoint: true,
+		styleOptions: {
+			image: new ol.style.Icon({
+				src: 'images/viseur.png',
+			}),
+		},
+		// Remove FeatureCollection packing of the point
+		saveFeatures: function(coordinates, format) {
+			return format.writeGeometry(
+				new ol.geom.Point(coordinates.points[0]), {
+					featureProjection: 'EPSG:3857',
+					decimals: 5,
+				}
+			);
+		},
+	});
+
+new ol.Map({
+	target: 'map',
+	view: new ol.View({
+		center: [200000, 5800000],
+		zoom: 6,
+	}),
+	layers: [
+		new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
+		cadre,
+		viseur,
+	],
+});
+	</script>
+	<script src="print_script.js"></script>
 
 	<!-- Fixed marker -->
 	<p><b>Cadre :</b> <span id="fix-marker"></span></p>

@@ -16,9 +16,10 @@ Based on https://openlayers.org
 	<script src="../ol/ol.js"></script>
 
 	<!-- I.E. compatibility -->
-	<script nomodule src="../src/polyfill-ie.js"></script>
+	<script nomodule src="../src/polyfill.js"></script>
 
 	<!-- My Openlayers -->
+	<script src="../src/header.js"></script>
 	<script src="../src/layerVector.js"></script>
 	<script src="../src/layerVectorCollection.js"></script>
 
@@ -116,7 +117,7 @@ Based on https://openlayers.org
 	</div>
 
 	<script>
-		//TODO BUG IE SCRIPT5022: IndexSizeError
+		//TODO BUG I.E. SCRIPT5022: IndexSizeError
 		const map = new ol.Map({
 			target: 'map',
 			layers: [
