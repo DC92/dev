@@ -7,12 +7,6 @@
  * Please dont modify it. Modify src/... & rebuild it !
  */
 
-/* Nomalize em sizes */
-.ol-viewport {
-	font-size: 16px;
-	font-family: Arial;
-}
-
 /* Top aligned buttons */
 /* Container */
 .ol-control-hidden {
@@ -191,31 +185,6 @@
 }
 .ol-coordinate:empty,
 .ol-length-line:empty {
-	display: none;
-}
-
-/* Vector layers popup */
-.myol-popup,
-.myol-popup:hover {
-	display: block;
-	padding: 1px 4px;
-	border-radius: 5px;
-	box-shadow: 0 3px 8px #888;
-	background-color: white;
-	font-size: 12px;
-	font-family: Arial, Helvetica, sans-serif;
-	text-decoration: none;
-	color: initial;
-	cursor: auto;
-}
-.myol-popup p {
-	margin: 0;
-	font-size: 12px;
-}
-.myol-popup span {
-	font-size: 12px;
-}
-.myol-popup-hidden {
 	display: none;
 }
 

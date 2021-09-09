@@ -9,17 +9,18 @@ $js = $css = ["/** OPENLAYERS ADAPTATION
  */"];
 echo "<p>";
 
-$css[] = get ('myol.css');
+$css[] = get ('controls.css');
 $css[] = get ('layerSwitcher.css');
 file_put_contents ('myol.css', implode (PHP_EOL .PHP_EOL, $css));
 echo "TO myol.css</p>\n<p>";
 
 $js[] = get ('header.js');
-$js[] = get ('myol.js');
 $js[] = get ('layerTileCollection.js');
 $js[] = get ('layerSwitcher.js');
 $js[] = get ('layerVector.js');
 $js[] = get ('layerVectorCollection.js');
+$js[] = get ('controls.js');
+$js[] = get ('editor.js');
 file_put_contents ('myol.js', implode (PHP_EOL .PHP_EOL, $js));
 echo 'TO myol.js</p>';
 
