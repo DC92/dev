@@ -120,17 +120,17 @@ Based on https://openlayers.org
 		//TODO BUG I.E. SCRIPT5022: IndexSizeError
 		const map = new ol.Map({
 			target: 'map',
-			layers: [
-				new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-			],
 			view: new ol.View({
 				center: [700000, 5700000], zoom: 12, // Maurienne
 				//center: [260000, 6250000], zoom: 12, // Paris
 				//center: [260000, 5800000], zoom: 7, // France
 				//center: [50000, 5300000], zoom: 12, //  Pyrénées
 			}),
+			layers: [
+				new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+			],
 		});
 
 		if (0)
