@@ -611,6 +611,7 @@ function controlDownload(options) {
 
 		// Transform polygons in lines if format is GPX
 		if (formatName == 'GPX') {
+			//TODO BUG optimiseFeatures is not defined
 			const coords = optimiseFeatures(features, true, true);
 			for (let l in coords.polys)
 				features.push(new ol.Feature({

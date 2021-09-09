@@ -3,7 +3,7 @@
  * https://github.com/Dominique92/MyOl
  * Based on https://openlayers.org
  *
- * This file has been generated Thu, 09 Sep 2021 17:49:31 +0000
+ * This file has been generated Thu, 09 Sep 2021 17:55:07 +0000
  * by build.php from the src/... sources
  * Please dont modify it : modify src/... & rebuild it !
  */
