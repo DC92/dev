@@ -7,9 +7,10 @@
  * Please dont modify it. Modify src/... & rebuild it !
  */
 
-//HACK I.E. polyfills
-// Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
+// I.E. polyfills
+// NO MORE : Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
+//BEST include src/polyfill.js with a tag
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) {
@@ -163,8 +164,7 @@ function layerStamen(layer) {
 /**
  * IGN France
  * Doc on http://api.ign.fr
- * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user
- //TODO adapt to new key policy
+ * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user fot others than IGN V2 & photo
  */
 function layerIGN(layer, format, key) {
 	let IGNresolutions = [],
@@ -175,7 +175,7 @@ function layerIGN(layer, format, key) {
 	}
 	return (typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.ign) &&
 		(typeof key === 'undefined' || !key) ?
-		null :
+		null : // Don't display that one
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
 				url: '//wxs.ign.fr/' + (key || mapKeys.ign) + '/wmts',
@@ -200,7 +200,7 @@ function layerIGN(layer, format, key) {
  * Requires myol:onadd
  */
 //BEST document all options in options = Object.assign
-//TODO use minResolution / maxResolution
+//BEST ?? use minResolution / maxResolution
 function layerTileIncomplete(options) {
 	const layer = options.extraLayer || layerStamen('terrain');
 	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
@@ -368,9 +368,9 @@ function layersCollection() {
 		'MRI': layerOsmMri(),
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
+		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
+		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the free layer key
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
-		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'),
-		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
@@ -393,6 +393,21 @@ function layersDemo() {
 		'OSM villes': layerThunderforest('neighbourhood'),
 		'OSM contraste': layerThunderforest('mobile-atlas'),
 
+		'Italie': layerIGM(),
+		'Kompas': layerKompass('KOMPASS'),
+
+		'Bing': layerBing('Road'),
+		'Bing photo': layerBing('Aerial'),
+		'Bing hybrid': layerBing('AerialWithLabels'),
+		'Google road': layerGoogle('m'),
+		'Google terrain': layerGoogle('p'),
+		'Google hybrid': layerGoogle('s,h'),
+		'Stamen': layerStamen('terrain'),
+		'Toner': layerStamen('toner'),
+		'Watercolor': layerStamen('watercolor'),
+		//BEST neutral layer
+
+		// Need an IGN key
 		'IGN Classique': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'IGN Standard': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		//403 'IGN Spot': layerIGN('ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
@@ -407,26 +422,13 @@ function layersDemo() {
 		'IGN hydro': layerIGN('HYDROGRAPHY.HYDROGRAPHY', 'png'),
 		'IGN forêt': layerIGN('LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN('ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
+
 		//Le style normal n'est pas geré 'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
 		//Le style normal n'est pas geré 'PN': layerIGN('PROTECTEDAREAS.PN', 'png'),
 		'PNR': layerIGN('PROTECTEDAREAS.PNR', 'png'),
 		//403 'Avalanches': layerIGN('IGN avalanches', GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 		'ETATMAJOR10': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
-
-		'Italie': layerIGM(),
-		'Kompas': layerKompass('KOMPASS'),
-
-		'Bing': layerBing('Road'),
-		'Bing photo': layerBing('Aerial'),
-		'Bing hybrid': layerBing('AerialWithLabels'),
-		'Google road': layerGoogle('m'),
-		'Google terrain': layerGoogle('p'),
-		'Google hybrid': layerGoogle('s,h'),
-		'Stamen': layerStamen('terrain'),
-		'Toner': layerStamen('toner'),
-		'Watercolor': layerStamen('watercolor'),
-		//BEST neutral layer
 	});
 }
 
@@ -755,7 +757,7 @@ function layerVector(opt) {
 					Object.assign(textOptions, style.textOptions);
 				}
 
-			//TODO faire une fonction plus générale pour les feature.display
+			//BEST faire une fonction plus générale pour les feature.display
 			if (feature.display.iconchem)
 				feature.display.icon =
 				'//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.display.iconchem + '.svg';
@@ -2456,6 +2458,7 @@ function layerEditGeoJson(options) {
 					degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
 				};
 
+			//BEST include proj4/proj4-src.js with a tag
 			let ll21781 = null;
 			if (typeof proj4 == 'function') {
 				// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)

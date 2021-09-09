@@ -37,6 +37,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * url: url to go if feature is clicked
  */
 //TODO BUG I.E. SCRIPT5022: IndexSizeError
+//TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -187,7 +188,7 @@ function layerVector(opt) {
 					Object.assign(textOptions, style.textOptions);
 				}
 
-			//TODO faire une fonction plus générale pour les feature.display
+			//BEST faire une fonction plus générale pour les feature.display
 			if (feature.display.iconchem)
 				feature.display.icon =
 				'//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.display.iconchem + '.svg';
@@ -454,7 +455,7 @@ function memCheckbox(selectorName, callback) {
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by I.E./Edge
+		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
 			if (match)
 				inputEls[e].checked =

@@ -304,7 +304,7 @@ function layerEditGeoJson(options) {
 		});
 	};
 
-	//TODO make separate position control
+	//BEST make separate position control
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
@@ -328,6 +328,7 @@ function layerEditGeoJson(options) {
 					degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
 				};
 
+			//BEST include proj4/proj4-src.js with a tag
 			let ll21781 = null;
 			if (typeof proj4 == 'function') {
 				// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)

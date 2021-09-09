@@ -840,7 +840,6 @@ CreateMethodProperty(Object, 'assign', function assign(target, source) { // esli
 			/*
 				This step in our polyfill is not complying with the specification.
 				[[OwnPropertyKeys]] is meant to return ALL keys, including non-enumerable and symbols.
-				TODO: When we have Reflect.ownKeys, use that instead as it is the userland equivalent of [[OwnPropertyKeys]].
 			*/
 			keys = Object.keys(from);
 		}
