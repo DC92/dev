@@ -188,21 +188,12 @@ function layerEditGeoJson(options) {
 			ol.interaction.Modify.prototype.handleDragEvent.call(this, evt); // Call the former method
 		};
 
-	//HACK delete feature when Ctrl+Alt click
-	if (0) //TODO DONT WORK !
-		modify.handleDownEvent = function(evt) {
-			if (evt.originalEvent.ctrlKey && evt.originalEvent.altKey)
-				removeFeaturesAtPixel(evt.pixel_);
-			return ol.interaction.Modify.prototype.handleDownEvent.call(this, evt); // Call the former method
-		};
-
 	modify.on('modifyend', function(evt) {
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
 			evt.mapBrowserEvent.originalEvent.altKey)
 			removeFeaturesAtPixel(evt.mapBrowserEvent.pixel);
-
-		//TODO 'Ctrl+Alt+cliquer sur une ligne ou un sommet pour les supprimer'
+		//TODO Ctrl+Alt+click on summit : delete the line or poly
 
 		// Alt+click on segment : delete the segment & split the line
 		const newFeature = snap.snapTo(
