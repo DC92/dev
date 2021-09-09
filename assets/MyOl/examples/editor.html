@@ -44,6 +44,12 @@ Based on https://openlayers.org
 			"type": "Feature",
 			"geometry": {
 				"type": "LineString",
+				"coordinates": [[-7.5,48],[-5.5,47.2],[-3.5,48]]
+			}
+		},{
+			"type": "Feature",
+			"geometry": {
+				"type": "LineString",
 				"coordinates": [[-4.5,47.2],[-2,44.5]]
 			}
 		}, {
@@ -94,11 +100,6 @@ const snaplayer = new ol.layer.Vector({
 			'double cliquer pour terminer.\n' +
 			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
 	});
-
-const mapKeys = {
-	"thunderforest": "ee751f43b3af4614b01d1bce72785369",
-	"bing": "ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt",
-};
 
 new ol.Map({
 	target: 'map',

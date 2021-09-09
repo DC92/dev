@@ -3,7 +3,7 @@
  * https://github.com/Dominique92/MyOl
  * Based on https://openlayers.org
  *
- * This file has been generated Thu, 09 Sep 2021 18:06:23 +0000
+ * This file has been generated Thu, 09 Sep 2021 19:02:44 +0000
  * by build.php from the src/... sources
  * Please dont modify it : modify src/... & rebuild it !
  */
@@ -2428,41 +2428,25 @@ function layerEditGeoJson(options) {
 		map.on('pointermove', hover);
 	});
 
-	function removeFeaturesAtPixel(pixel) {
-		const selectedFeatures = layer.map_.getFeaturesAtPixel(pixel, {
-			hitTolerance: 6, // Default is 0
-			layerFilter: function(l) {
-				return l.ol_uid == layer.ol_uid;
-			}
-		});
-		for (let f in selectedFeatures) // We delete the selected feature
-			source.removeFeature(selectedFeatures[f]);
-	}
-
-	//HACK move only one summit when dragging
-	if (0) //TODO DONT WORK !
-		modify.handleDragEvent = function(evt) {
-			let draggedUid; // The first one will be the only one that will be dragged
-
-			for (let s in this.dragSegments_) {
-				let segmentUid = this.dragSegments_[s][0].feature.ol_uid; // Get the current item uid
-				if (draggedUid && segmentUid != draggedUid) // If it is not the first one
-					delete this.dragSegments_[s]; // Remove it from the dragged list
-				draggedUid = segmentUid;
-			}
-
-			if (this.dragSegments_) //TODO est ce un bug ??? / Ne fonctionne pas
-				this.dragSegments_ = this.dragSegments_.filter(Boolean); // Reorder array keys
-
-			ol.interaction.Modify.prototype.handleDragEvent.call(this, evt); // Call the former method
-		};
+	//TODO move only one summit when dragging
 
 	modify.on('modifyend', function(evt) {
+		//TODO Ctrl+Alt+click on summit : delete the line or poly
+
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
-			evt.mapBrowserEvent.originalEvent.altKey)
-			removeFeaturesAtPixel(evt.mapBrowserEvent.pixel);
-		//TODO Ctrl+Alt+click on summit : delete the line or poly
+			evt.mapBrowserEvent.originalEvent.altKey) {
+			const selectedFeatures = layer.map_.getFeaturesAtPixel(
+				evt.mapBrowserEvent.pixel, {
+					hitTolerance: 6, // Default is 0
+					layerFilter: function(l) {
+						return l.ol_uid == layer.ol_uid;
+					}
+				});
+
+			for (let f in selectedFeatures) // We delete the selected feature
+				source.removeFeature(selectedFeatures[f]);
+		}
 
 		// Alt+click on segment : delete the segment & split the line
 		const newFeature = snap.snapTo(
