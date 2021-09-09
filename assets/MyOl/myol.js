@@ -7,6 +7,7 @@
  * Please dont modify it. Modify src/... & rebuild it !
  */
 
+/* FILE src/header.js */
 // I.E. polyfills
 // NO MORE : Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
@@ -74,6 +75,7 @@ ol.Map.prototype.handlePostRender = function() {
 	map.getTargetElement()._map = map;
 };
 
+/* FILE src/layerTileCollection.js */
 /**
  * This module defines many WMTS EPSG:3857 tiles layers
  */
@@ -432,6 +434,7 @@ function layersDemo() {
 	});
 }
 
+/* FILE src/layerSwitcher.js */
 /**
  * Layer switcher
  */
@@ -568,6 +571,7 @@ function controlLayerSwitcher(options) {
 	return control;
 }
 
+/* FILE src/layerVector.js */
 /**
  * This file adds some facilities to ol.layer.Vector
  */
@@ -607,6 +611,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * url: url to go if feature is clicked
  */
 //TODO BUG I.E. SCRIPT5022: IndexSizeError
+//TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -1024,7 +1029,7 @@ function memCheckbox(selectorName, callback) {
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //HACK el.forEach is not supported by I.E./Edge
+		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
 			if (match)
 				inputEls[e].checked =
@@ -1080,6 +1085,7 @@ function memCheckbox(selectorName, callback) {
 	return selection;
 }
 
+/* FILE src/layerVectorCollection.js */
 /**
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
@@ -1380,9 +1386,7 @@ function layerC2C(options) {
 	}, options));
 }
 
-/**
- * CONTROLS
- */
+/* FILE src/controls.js */
 /**
  * Control button
  * Abstract definition to be used by other control buttons definitions
@@ -1774,8 +1778,9 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		if (button.active && altitude && position) {
-			const map = button.map_,
+		//TODO detecter aussi si on est sur un mobile
+		if (button.active && position && altitude) {
+			const map = button.getMap(),
 				// Estimate the viewport size
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
@@ -2128,6 +2133,7 @@ function controlsCollection(options) {
 	];
 }
 
+/* FILE src/editor.js */
 /**
  * geoJson points, lines & polygons display & edit
  * Marker position display & edit
@@ -2434,7 +2440,7 @@ function layerEditGeoJson(options) {
 		});
 	};
 
-	//TODO make separate position control
+	//BEST make separate position control
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat

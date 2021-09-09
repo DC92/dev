@@ -1,7 +1,4 @@
 /**
- * CONTROLS
- */
-/**
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
@@ -392,8 +389,9 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		if (button.active && altitude && position) {
-			const map = button.map_,
+		//TODO detecter aussi si on est sur un mobile
+		if (button.active && position && altitude) {
+			const map = button.getMap(),
 				// Estimate the viewport size
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),

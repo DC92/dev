@@ -26,7 +26,7 @@ echo 'TO myol.js</p>';
 
 function get ($file) {
 	echo "$file, ";
-	return file_get_contents ('src/'.$file);
+	return "/* FILE src/$file */\n".file_get_contents ('src/'.$file);
 }
 ?>
 
