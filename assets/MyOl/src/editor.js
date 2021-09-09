@@ -97,6 +97,8 @@ function layerEditGeoJson(options) {
 		});
 
 	// Set edit fields actions
+	//BEST do a specific layer for point position editing
+	//TODO BUG answer should stay in -180 +180 ° wrap
 	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;
@@ -117,13 +119,6 @@ function layerEditGeoJson(options) {
 	layer.once('myol:onadd', function(evt) {
 		const map = evt.map;
 		optimiseEdited(); // Treat the geoJson input as any other edit
-
-		//HACK Avoid zooming when you leave the mode by doubleclick
-		//TODO voir s'il y a un paramètre à une interaction : modify ?
-		map.getInteractions().forEach(function(i) {
-			if (i instanceof ol.interaction.DoubleClickZoom)
-				map.removeInteraction(i);
-		});
 
 		// Add required controls
 		if (options.titleModify || options.dragPoint) {
@@ -255,6 +250,7 @@ function layerEditGeoJson(options) {
 			interaction = new ol.interaction.Draw(Object.assign({
 				style: editStyle,
 				source: source,
+				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
 			}, options));
 
 		interaction.on(['drawend'], function() {
