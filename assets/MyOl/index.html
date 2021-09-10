@@ -61,11 +61,7 @@ new ol.Map({
 		center: [260000, 5800000], // France
 		zoom: 5,
 	}),
-	controls: controlsCollection({
-		extra: controlLayerSwitcher({
-			baseLayers: layersCollection(),
-		}),
-	}),
+	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
 		layerVectorCluster(
 			layerChemPoi({

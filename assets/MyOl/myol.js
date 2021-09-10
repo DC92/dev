@@ -3,7 +3,7 @@
  * https://github.com/Dominique92/MyOl
  * Based on https://openlayers.org
  *
- * This file has been generated Fri, 10 Sep 2021 13:24:24 +0000
+ * This file has been generated Fri, 10 Sep 2021 16:15:55 +0000
  * by build.php from the src/... sources
  * Please dont modify it : modify src/... & rebuild it !
  */
@@ -440,11 +440,14 @@ function layersDemo() {
  * Layer switcher
  * Need to include layerSwitcher.css
  */
-function controlLayerSwitcher(options) {
+function controlLayerSwitcher(baseLayers, options) {
+	baseLayers = baseLayers || layersCollection();
+	options = options || {};
+
 	const control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
-		layerNames = Object.keys(options.baseLayers),
+		layerNames = Object.keys(baseLayers),
 		match = document.cookie.match(/baselayer=([^;]+)/);
 
 	var selectedBaseLayerName = match ? match[1] : layerNames[0],
@@ -452,7 +455,7 @@ function controlLayerSwitcher(options) {
 		transparentBaseLayerName = '';
 
 	// If the cookie doesn't correspond to an existing layer
-	if (typeof options.baseLayers[selectedBaseLayerName] == 'undefined')
+	if (typeof baseLayers[selectedBaseLayerName] == 'undefined')
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
@@ -483,9 +486,9 @@ function controlLayerSwitcher(options) {
 		});
 
 		// Build html baselayers selectors
-		for (let name in options.baseLayers)
-			if (options.baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
-				const layer = options.baseLayers[name];
+		for (let name in baseLayers)
+			if (baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
+				const layer = baseLayers[name];
 
 				const selectionEl = document.createElement('div'),
 					inputId = 'l' + layer.ol_uid + (name ? '-' + name : '');
@@ -513,30 +516,30 @@ function controlLayerSwitcher(options) {
 
 	function displayBaseLayers() {
 		// Refresh layers visibility & opacity
-		for (let name in options.baseLayers)
-			if (options.baseLayers[name]) {
-				options.baseLayers[name].inputEl.checked = false;
-				options.baseLayers[name].setVisible(false);
-				options.baseLayers[name].setOpacity(1);
+		for (let name in baseLayers)
+			if (baseLayers[name]) {
+				baseLayers[name].inputEl.checked = false;
+				baseLayers[name].setVisible(false);
+				baseLayers[name].setOpacity(1);
 			}
 
 		// Baselayer default is the first of the selection
-		if (!options.baseLayers[selectedBaseLayerName])
-			selectedBaseLayerName = Object.keys(options.baseLayers)[0];
+		if (!baseLayers[selectedBaseLayerName])
+			selectedBaseLayerName = Object.keys(baseLayers)[0];
 
-		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
-		options.baseLayers[selectedBaseLayerName].setVisible(true);
+		baseLayers[selectedBaseLayerName].inputEl.checked = true;
+		baseLayers[selectedBaseLayerName].setVisible(true);
 
 		if (lastBaseLayerName) {
-			options.baseLayers[lastBaseLayerName].inputEl.checked = true;
-			options.baseLayers[lastBaseLayerName].setVisible(true);
+			baseLayers[lastBaseLayerName].inputEl.checked = true;
+			baseLayers[lastBaseLayerName].setVisible(true);
 		}
 		displayTransparencyRange();
 	}
 
 	function displayTransparencyRange() {
 		if (transparentBaseLayerName) {
-			options.baseLayers[transparentBaseLayerName].setOpacity(
+			baseLayers[transparentBaseLayerName].setOpacity(
 				rangeContainerEl.firstChild.value / 100
 			);
 			rangeContainerEl.className = 'double-layer';
@@ -558,14 +561,14 @@ function controlLayerSwitcher(options) {
 				lastBaseLayerName :
 				this.value;
 
-			options.baseLayers[transparentBaseLayerName].inputEl.checked = true;
+			baseLayers[transparentBaseLayerName].inputEl.checked = true;
 			rangeContainerEl.firstChild.value = 50;
 		} else
 			lastBaseLayerName =
 			transparentBaseLayerName = '';
 
 		selectedBaseLayerName = this.value;
-		options.baseLayers[selectedBaseLayerName].inputEl.checked = true;
+		baseLayers[selectedBaseLayerName].inputEl.checked = true;
 
 		displayBaseLayers();
 	}
@@ -2102,26 +2105,24 @@ function controlsCollection(options) {
 	options = options || {};
 
 	return [
-			// Top left
-			new ol.control.Zoom(),
-			controlFullScreen(),
-			controlGeocoder(),
-			controlGPS(options.controlGPS),
-			controlLoadGPX(),
-			controlDownload(options.controlDownload),
-			controlPrint(),
+		// Top left
+		new ol.control.Zoom(),
+		controlFullScreen(),
+		controlGeocoder(),
+		controlGPS(options.controlGPS),
+		controlLoadGPX(),
+		controlDownload(options.controlDownload),
+		controlPrint(),
 
-			// Bottom left
-			new ol.control.ScaleLine(),
-			controlMousePosition(),
-			controlLengthLine(),
+		// Bottom left
+		controlLengthLine(),
+		controlMousePosition(),
+		new ol.control.ScaleLine(),
 
-			// Bottom right
-			new ol.control.Attribution(),
-			controlPermalink(options.controlPermalink),
-		]
-		// Additional controls
-		.concat(options.extra || []);
+		// Bottom right
+		controlPermalink(options.controlPermalink),
+		new ol.control.Attribution(),
+	];
 }
 
 /* FILE src/editor.js */

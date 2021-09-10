@@ -46,9 +46,7 @@ const nbli = document.getElementsByTagName('li').length,
 
 	controls = [
 		controlTilesBuffer(4),
-		controlLayerSwitcher({
-			baseLayers: layersCollection(),
-		}),
+		controlLayerSwitcher(),
 		controlPermalink(),
 
 		new ol.control.Attribution({

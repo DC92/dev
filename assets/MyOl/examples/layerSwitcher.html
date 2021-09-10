@@ -65,21 +65,19 @@ new ol.Map({
 	controls: [
 		new ol.control.Zoom(),
 		controlLayerSwitcher({
-			baseLayers: {
-				OSM: new ol.layer.Tile({
-					source: new ol.source.OSM(),
+			OSM: new ol.layer.Tile({
+				source: new ol.source.OSM(),
+			}),
+			Stamen: new ol.layer.Tile({
+				source: new ol.source.Stamen({
+					layer: 'terrain',
 				}),
-				Stamen: new ol.layer.Tile({
-					source: new ol.source.Stamen({
-						layer: 'terrain',
-					}),
+			}),
+			Watercolor: new ol.layer.Tile({
+				source: new ol.source.Stamen({
+					layer: 'watercolor',
 				}),
-				Watercolor: new ol.layer.Tile({
-					source: new ol.source.Stamen({
-						layer: 'watercolor',
-					}),
-				}),
-			},
+			}),
 		}),
 	],
 	layers: [countries],

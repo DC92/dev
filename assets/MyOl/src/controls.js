@@ -711,24 +711,22 @@ function controlsCollection(options) {
 	options = options || {};
 
 	return [
-			// Top left
-			new ol.control.Zoom(),
-			controlFullScreen(),
-			controlGeocoder(),
-			controlGPS(options.controlGPS),
-			controlLoadGPX(),
-			controlDownload(options.controlDownload),
-			controlPrint(),
+		// Top left
+		new ol.control.Zoom(),
+		controlFullScreen(),
+		controlGeocoder(),
+		controlGPS(options.controlGPS),
+		controlLoadGPX(),
+		controlDownload(options.controlDownload),
+		controlPrint(),
 
-			// Bottom left
-			new ol.control.ScaleLine(),
-			controlMousePosition(),
-			controlLengthLine(),
+		// Bottom left
+		controlLengthLine(),
+		controlMousePosition(),
+		new ol.control.ScaleLine(),
 
-			// Bottom right
-			new ol.control.Attribution(),
-			controlPermalink(options.controlPermalink),
-		]
-		// Additional controls
-		.concat(options.extra || []);
+		// Bottom right
+		controlPermalink(options.controlPermalink),
+		new ol.control.Attribution(),
+	];
 }
