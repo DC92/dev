@@ -1,8 +1,8 @@
 // Print the inner code of the previous <script> tag
 
-const title = document.createElement('h4'),
-	pre = document.createElement('pre'),
-	scripts = document.getElementsByTagName('script');
+const scripts = document.getElementsByTagName('script'),
+	title = document.createElement('h4'),
+	pre = document.createElement('pre');
 
 document.body.appendChild(title);
 title.innerHTML = 'Related code:';

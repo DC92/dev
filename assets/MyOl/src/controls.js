@@ -1,4 +1,9 @@
 /**
+ * Add some usefull controls
+ * Need to include controls.css
+ */
+
+/**
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
@@ -706,31 +711,24 @@ function controlsCollection(options) {
 	options = options || {};
 
 	return [
-		// Top right
-		typeof controlLayerSwitcher == 'function' ?
-		controlLayerSwitcher(Object.assign({
-			baseLayers: options.baseLayers,
-		}, options.controlLayerSwitcher)) :
-		new ol.control.Control({ //HACK no control
-			element: document.createElement('div'),
-		}),
+			// Top left
+			new ol.control.Zoom(),
+			controlFullScreen(),
+			controlGeocoder(),
+			controlGPS(options.controlGPS),
+			controlLoadGPX(),
+			controlDownload(options.controlDownload),
+			controlPrint(),
 
-		// Bottom right
-		new ol.control.Attribution(),
-		controlPermalink(options.controlPermalink),
+			// Bottom left
+			new ol.control.ScaleLine(),
+			controlMousePosition(),
+			controlLengthLine(),
 
-		// Bottom left
-		new ol.control.ScaleLine(),
-		controlMousePosition(),
-		controlLengthLine(),
-
-		// Top left
-		new ol.control.Zoom(),
-		controlFullScreen(),
-		controlGeocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownload(options.controlDownload),
-		controlPrint(),
-	];
+			// Bottom right
+			new ol.control.Attribution(),
+			controlPermalink(options.controlPermalink),
+		]
+		// Additional controls
+		.concat(options.extra || []);
 }

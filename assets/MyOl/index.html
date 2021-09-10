@@ -37,6 +37,10 @@ Based on https://openlayers.org
 </head>
 
 <body>
+	<a style="float:right" href="examples/layerSwitcher.html">Layer switcher &#9654;</a>
+	<h1>MyOl</h1>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+
 	<div id="map"></div>
 
 	<div id="overlay-selector" >
@@ -51,7 +55,6 @@ Based on https://openlayers.org
 
 	<script>
 // Must be after the <div id="map"> tag
-//TODO liste fonctions centralisées ici et retour à index pour les exemples
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
@@ -59,7 +62,9 @@ new ol.Map({
 		zoom: 5,
 	}),
 	controls: controlsCollection({
-		baseLayers: layersCollection(),
+		extra: controlLayerSwitcher({
+			baseLayers: layersCollection(),
+		}),
 	}),
 	layers: [
 		layerVectorCluster(

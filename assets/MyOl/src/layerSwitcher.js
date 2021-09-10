@@ -1,5 +1,6 @@
 /**
  * Layer switcher
+ * Need to include layerSwitcher.css
  */
 function controlLayerSwitcher(options) {
 	const control = new ol.control.Control({

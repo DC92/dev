@@ -9,7 +9,6 @@ $js = $css = ["/** OPENLAYERS ADAPTATION
  * Please dont modify it : modify src/... & rebuild it !
  */"];
 echo "<p>";
-echo date('r');
 
 $css[] = get ('controls.css');
 $css[] = get ('layerSwitcher.css');

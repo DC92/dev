@@ -3,7 +3,7 @@
  * https://github.com/Dominique92/MyOl
  * Based on https://openlayers.org
  *
- * This file has been generated Thu, 09 Sep 2021 20:02:02 +0000
+ * This file has been generated Fri, 10 Sep 2021 13:24:24 +0000
  * by build.php from the src/... sources
  * Please dont modify it : modify src/... & rebuild it !
  */
@@ -438,6 +438,7 @@ function layersDemo() {
 /* FILE src/layerSwitcher.js */
 /**
  * Layer switcher
+ * Need to include layerSwitcher.css
  */
 function controlLayerSwitcher(options) {
 	const control = new ol.control.Control({
@@ -1389,6 +1390,11 @@ function layerC2C(options) {
 
 /* FILE src/controls.js */
 /**
+ * Add some usefull controls
+ * Need to include controls.css
+ */
+
+/**
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
@@ -2096,33 +2102,26 @@ function controlsCollection(options) {
 	options = options || {};
 
 	return [
-		// Top right
-		typeof controlLayerSwitcher == 'function' ?
-		controlLayerSwitcher(Object.assign({
-			baseLayers: options.baseLayers,
-		}, options.controlLayerSwitcher)) :
-		new ol.control.Control({ //HACK no control
-			element: document.createElement('div'),
-		}),
+			// Top left
+			new ol.control.Zoom(),
+			controlFullScreen(),
+			controlGeocoder(),
+			controlGPS(options.controlGPS),
+			controlLoadGPX(),
+			controlDownload(options.controlDownload),
+			controlPrint(),
 
-		// Bottom right
-		new ol.control.Attribution(),
-		controlPermalink(options.controlPermalink),
+			// Bottom left
+			new ol.control.ScaleLine(),
+			controlMousePosition(),
+			controlLengthLine(),
 
-		// Bottom left
-		new ol.control.ScaleLine(),
-		controlMousePosition(),
-		controlLengthLine(),
-
-		// Top left
-		new ol.control.Zoom(),
-		controlFullScreen(),
-		controlGeocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownload(options.controlDownload),
-		controlPrint(),
-	];
+			// Bottom right
+			new ol.control.Attribution(),
+			controlPermalink(options.controlPermalink),
+		]
+		// Additional controls
+		.concat(options.extra || []);
 }
 
 /* FILE src/editor.js */
