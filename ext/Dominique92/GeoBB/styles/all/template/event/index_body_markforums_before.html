@@ -2,27 +2,27 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+<!-- Map resize -->
+<!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
+<!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
+
 <!-- Openlayers -->
 <!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
 <!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
 
+<!-- Recherche par nom -->
 <!-- IF not IS_IE -->
-	<!-- Recherche par nom -->
 	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder-debug.js --><? /* //TODO clear the problem in geocoder & remove debug */ ?>
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.js -->
 <!-- ENDIF -->
-
-<!-- Map resize -->
-<!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
-<!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
 
 <!-- My Openlayers -->
 <!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
 <!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
 
 <!-- This map -->
-<!-- INCLUDECSS @Dominique92_GeoBB/map.css -->
-<!-- INCLUDEJS @Dominique92_GeoBB/map.js -->
+<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
+<!-- INCLUDEJS @Dominique92_GeoBB/map_index.js -->
 
 <script>
 	var script = '{SCRIPT_NAME}',
@@ -30,7 +30,4 @@
 		mapKeys = {MAP_KEYS};
 </script>
 
-<div id="container-map">
-	<div id="map"></div>
-	<!-- EVENT map_selector -->
-</div>
+<div id="map"></div>

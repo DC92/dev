@@ -76,11 +76,13 @@ function layerChemPoi(options) {
 		host: 'chemineur.fr',
 		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host +
+				//TODO gis2 -> gis
 				'/ext/Dominique92/GeoBB/gis2.php?layer=simple&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, feature, options) {
+			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
 			properties.icon = '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
 			return properties;
