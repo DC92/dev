@@ -6,12 +6,19 @@
 <!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
 <!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
 
-<!-- Openlayers -->
-<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+<!-- IF IS_IE --><!-- I.E. -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/src/polyfill.js -->
 
-<!-- Recherche par nom -->
-<!-- IF not IS_IE -->
+	<!-- Openlayers -->
+	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol661.js -->
+
+<!-- ELSE --><!-- Other browser -->
+	<!-- Openlayers -->
+	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+
+	<!-- Recherche par nom -->
 	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.css -->
 	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.js -->
 <!-- ENDIF -->
