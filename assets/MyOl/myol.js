@@ -3,7 +3,7 @@
  * https://github.com/Dominique92/MyOl
  * Based on https://openlayers.org
  *
- * This file has been generated Sat, 11 Sep 2021 13:23:17 +0000
+ * This file has been generated Sun, 12 Sep 2021 18:08:30 +0000
  * by build.php from the src/... sources
  * Please dont modify it : modify src/... & rebuild it !
  */
@@ -1115,7 +1115,7 @@ function fillColorOption(hexColor, transparency) {
 /**
  * Site refuges.info
  */
-//TODO min & max layer in the same function
+//BEST min & max layer in the same function
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
 		host: 'www.refuges.info',
@@ -1163,14 +1163,13 @@ function layerWriAreas(options) {
 /**
  * Site chemineur.fr
  */
-//TODO min & max layer in the same function
-function layerChemPoi(options) {
+//BEST min & max layer in the same function
+function layerGeoBBPoi(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
 		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host +
-				//TODO gis2 -> gis
-				'/ext/Dominique92/GeoBB/gis2.php?layer=simple&' +
+				'/ext/Dominique92/GeoBB/gis.php?layer=simple&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
@@ -1195,12 +1194,12 @@ function layerChemPoi(options) {
 	}, options));
 }
 
-function layerChemCluster(options) {
+function layerGeoBBCluster(options) {
 	return layerVector(Object.assign({
 		host: 'chemineur.fr',
 		urlFunction: function url(options, bbox, selection) {
 			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis2.php?layer=cluster&limit=1000000' +
+				'/ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
@@ -1682,7 +1681,7 @@ function controlFullScreen(options) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG controm 1px down on FireFox
+//TODO BUG control 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
 //TODO BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {

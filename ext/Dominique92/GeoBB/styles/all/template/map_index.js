@@ -7,13 +7,15 @@ var map = new ol.Map({
 	}).concat(controlLayerSwitcher()),
 	layers: [
 		layerVectorCluster(
-			layerChemPoi({
+			layerGeoBBPoi({
+				selectorName: 'geobb-features',
 				maxResolution: 100,
 				distance: 50,
 			})
 		),
 		layerVectorCluster(
-			layerChemCluster({
+			layerGeoBBCluster({
+				selectorName: 'geobb-features',
 				minResolution: 100,
 				distance: 50,
 			})

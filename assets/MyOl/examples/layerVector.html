@@ -65,18 +65,18 @@ Based on https://openlayers.org
 
 	<div class="selector">
 		Chemineur
-		<input type="checkbox" name="chem-features" />
-		<p id="chem-features"></p>
+		<input type="checkbox" name="geobb-features" />
+		<p id="geobb-features"></p>
 		<ul>
-			<li><input type="checkbox" name="chem-features" value="3"/>Refuge</li>
-			<li><input type="checkbox" name="chem-features" value="8"/>Abri</li>
-			<li><input type="checkbox" name="chem-features" value="20"/>Alimentation</li>
-			<li><input type="checkbox" name="chem-features" value="23"/>Montagne</li>
-			<li><input type="checkbox" name="chem-features" value="30"/>Ferroviaire</li>
-			<li><input type="checkbox" name="chem-features" value="40"/>Transport</li>
-			<li><input type="checkbox" name="chem-features" value="44"/>Tourisme</li>
-			<li><input type="checkbox" name="chem-features" value="58"/>Naval</li>
-			<li><input type="checkbox" name="chem-features" value="64"/>Trace</li>
+			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="geobb-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="geobb-features" value="20" />Alimentation</li>
+			<li><input type="checkbox" name="geobb-features" value="23" />Montagne</li>
+			<li><input type="checkbox" name="geobb-features" value="30" />Ferroviaire</li>
+			<li><input type="checkbox" name="geobb-features" value="40" />Transport</li>
+			<li><input type="checkbox" name="geobb-features" value="44" />Tourisme</li>
+			<li><input type="checkbox" name="geobb-features" value="58" />Naval</li>
+			<li><input type="checkbox" name="geobb-features" value="64" />Trace</li>
 		</ul>
 	</div>
 
@@ -159,20 +159,20 @@ Based on https://openlayers.org
 		}
 
 		if (0)
-			map.addLayer(layerChemPoi({
-				selectorName: 'chem-features',
+			map.addLayer(layerGeoBBPoi({
+				selectorName: 'geobb-features',
 			}));
 		if (01) {
 			map.addLayer(layerVectorCluster(
-				layerChemPoi({
-					selectorName: 'chem-features',
+				layerGeoBBPoi({
+					selectorName: 'geobb-features',
 					maxResolution: 100,
 					distance: 50,
 				})
 			));
 			map.addLayer(layerVectorCluster(
-				layerChemCluster({
-					selectorName: 'chem-features',
+				layerGeoBBCluster({
+					selectorName: 'geobb-features',
 					minResolution: 100,
 					distance: 50,
 				})

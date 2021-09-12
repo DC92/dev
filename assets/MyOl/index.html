@@ -50,11 +50,11 @@ Based on https://openlayers.org
 
 	<div id="overlay-selector" >
 		<hr />
-		chemineur.fr <input type="checkbox" name="chem-features" />
+		chemineur.fr <input type="checkbox" name="geobb-features" checked="checked" />
 		<ul>
-			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
-			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
-			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
+			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="geobb-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="geobb-features" value="23" />Montagne</li>
 		</ul>
 	</div>
 
@@ -69,15 +69,15 @@ new ol.Map({
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
 		layerVectorCluster(
-			layerChemPoi({
-				selectorName: 'chem-features',
+			layerGeoBBPoi({
+				selectorName: 'geobb-features',
 				maxResolution: 300,
 				distance: 30,
 			})
 		),
 		layerVectorCluster(
-			layerChemCluster({
-				selectorName: 'chem-features',
+			layerGeoBBCluster({
+				selectorName: 'geobb-features',
 				minResolution: 300,
 				distance: 50,
 			})

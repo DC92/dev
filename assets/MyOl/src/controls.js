@@ -286,7 +286,7 @@ function controlFullScreen(options) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG controm 1px down on FireFox
+//TODO BUG control 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
 //TODO BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
