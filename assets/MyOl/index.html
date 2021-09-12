@@ -11,8 +11,13 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="examples/images/favicon.png" rel="icon" type="image/png" />
 
+	<!-- Polyfill iOS : Amélioration du pseudo full screen pour les cartes pour d'anciennes versions d'iOS/Safari -->
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
 	<!-- I.E. compatibility -->
 	<script nomodule src="src/polyfill.js"></script>
+	<script nomodule src="ol/ol661.js"></script>
 
 	<!-- Openlayers -->
 	<link  href="ol/ol.css" type="text/css" rel="stylesheet">
