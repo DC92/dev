@@ -281,7 +281,7 @@ function layerVector(opt) {
 				if (feature)
 					hoverSource.addFeature(feature);
 
-				map.getViewport().style.cursor = feature ? 'pointer' : 'default';
+				map.getViewport().style.cursor = feature ? 'pointer' : '';
 				hoveredFeature = feature;
 			}
 
