@@ -1,10 +1,7 @@
 var map = new ol.Map({
 	target: 'map',
-	controls: controlsCollection({
-		wcontrolPermalink: {
-			display: true,
-		},
-	}).concat(controlLayerSwitcher()),
+	controls: controlsCollection(controlOptions)
+		.concat(controlLayerSwitcher()),
 	layers: [
 		layerVectorCluster(
 			layerGeoBBPoi({

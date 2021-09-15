@@ -3,6 +3,8 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+	<!-- //TODO move in EVENT overall_header_head_append.html -->
+
 	<!-- Map resize -->
 	<!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
 	<!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
@@ -34,12 +36,20 @@
 	<!-- This map -->
 	<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
 	<!-- INCLUDEJS @Dominique92_GeoBB/layerGeoBB.js -->
+	<!-- INCLUDEJS @Dominique92_GeoBB/viewtopic.js -->
 
 	<script>
 		var script = '{SCRIPT_NAME}',
 			mapType = '{MAP_TYPE}',
-			mapKeys = {MAP_KEYS};
+			coordinates = [{GEO_LON}, {GEO_LAT}],
+			mapKeys = {MAP_KEYS},
+			controlOptions = {
+				controlPermalink: {
+					forced: '6/2/47',
+				},
+			};
 	</script>
 
 	<div id="map"></div>
+	<p id="fix-marker"></p>
 <!-- ENDIF -->

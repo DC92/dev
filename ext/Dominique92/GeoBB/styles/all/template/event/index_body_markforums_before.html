@@ -2,6 +2,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+<!-- //TODO move in EVENT overall_header_head_append.html -->
+
 <!-- Map resize -->
 <!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
 <!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
@@ -34,7 +36,12 @@
 <script>
 	var script = '{SCRIPT_NAME}',
 		mapType = '',
-		mapKeys = {MAP_KEYS};
+		mapKeys = {MAP_KEYS},
+		controlOptions = {
+			controlPermalink: {
+				display: true,
+			},
+		};
 </script>
 
 <div id="map"></div>
