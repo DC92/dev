@@ -1,21 +1,21 @@
 var map = new ol.Map({
 	target: 'map',
 	controls: controlsCollection({
-		controlPermalink: {
+		wcontrolPermalink: {
 			display: true,
 		},
 	}).concat(controlLayerSwitcher()),
 	layers: [
 		layerVectorCluster(
 			layerGeoBBPoi({
-				selectorName: 'geobb-features',
+				host: '', // Relative adress
 				maxResolution: 100,
 				distance: 50,
 			})
 		),
 		layerVectorCluster(
 			layerGeoBBCluster({
-				selectorName: 'geobb-features',
+				host: '',
 				minResolution: 100,
 				distance: 50,
 			})

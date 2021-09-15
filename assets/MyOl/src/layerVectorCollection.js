@@ -25,9 +25,9 @@ function fillColorOption(hexColor, transparency) {
 //BEST min & max layer in the same function
 function layerWriPoi(options) {
 	return layerVector(Object.assign({
-		host: 'www.refuges.info',
+		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host + '/api/bbox' +
+			return options.host + 'api/bbox' +
 				'?nb_points=all' +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
@@ -36,7 +36,7 @@ function layerWriPoi(options) {
 			return {
 				name: properties.nom,
 				type: properties.type.valeur,
-				icon: '//' + options.host + '/images/icones/' + properties.type.icone + '.svg',
+				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord.alt,
 				bed: properties.places.valeur,
 				url: properties.lien,
@@ -47,10 +47,10 @@ function layerWriPoi(options) {
 
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
-		host: 'www.refuges.info',
+		host: '//www.refuges.info/',
 		polygon: 1,
 		urlFunction: function(options) {
-			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
+			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
 		displayProperties: function(properties) {
 			return {
@@ -73,17 +73,17 @@ function layerWriAreas(options) {
 //BEST min & max layer in the same function
 function layerGeoBBPoi(options) {
 	return layerVector(Object.assign({
-		host: 'chemineur.fr',
+		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis.php?layer=simple&' +
+			return options.host +
+				'ext/Dominique92/GeoBB/gis.php?layer=simple&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, feature, options) {
 			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
-			properties.icon = '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
-			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
+			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},
 		styleOptions: {
@@ -103,10 +103,10 @@ function layerGeoBBPoi(options) {
 
 function layerGeoBBCluster(options) {
 	return layerVector(Object.assign({
-		host: 'chemineur.fr',
+		host: '//chemineur.fr/',
 		urlFunction: function url(options, bbox, selection) {
-			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=1000000' +
+			return options.host +
+				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 	}, options));
@@ -117,10 +117,10 @@ function layerGeoBBCluster(options) {
  */
 function layerAlpages(options) {
 	return layerVector(Object.assign({
-		host: 'alpages.info',
+		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host +
-				'/ext/Dominique92/GeoBB/gis.php?limit=500' +
+			return options.host +
+				'ext/Dominique92/GeoBB/gis.php?limit=500' +
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
@@ -129,7 +129,7 @@ function layerAlpages(options) {
 			if (match)
 				properties.iconchem = match[1];
 
-			properties.url = '//' + options.host + '/viewtopic.php?t=' + properties.id;
+			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},
 		styleOptions: function(feature) {

@@ -3,30 +3,37 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-	<!-- Openlayers -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
-
-	<!-- IF not IS_IE -->
-		<!-- Recherche par nom -->
-		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.css -->
-		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder-debug.js -->
-	<!-- ENDIF -->
-
 	<!-- Map resize -->
 	<!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
 	<!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
 
-	<!-- Proj4 projections Swiss & UK -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
+	<!-- IF IS_IE --><!-- I.E. -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/src/polyfill.js -->
+
+		<!-- Openlayers -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol661.js -->
+
+	<!-- ELSE --><!-- Other browser -->
+		<!-- Openlayers -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+
+		<!-- Recherche par nom -->
+		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.css -->
+		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.js -->
+	<!-- ENDIF -->
 
 	<!-- My Openlayers -->
 	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
 	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
 
+	<!-- Proj4 projections Swiss & UK -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
+
 	<!-- This map -->
-<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
-<!-- INCLUDEJS @Dominique92_GeoBB/layerGeoBB.js -->
+	<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
+	<!-- INCLUDEJS @Dominique92_GeoBB/layerGeoBB.js -->
 
 	<script>
 		var script = '{SCRIPT_NAME}',
@@ -34,8 +41,5 @@
 			mapKeys = {MAP_KEYS};
 	</script>
 
-	<div id="container-map">
-		<div id="map"></div>
-		<input type="hidden" id="cadre-json" value='{GEO_JSON}' />
-	</div>
+	<div id="map"></div>
 <!-- ENDIF -->
