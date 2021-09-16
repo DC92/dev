@@ -684,6 +684,7 @@ function layerVector(opt) {
 
 		statusEl = document.getElementById(options.selectorName);
 
+	// XHR download tracking
 	if (statusEl)
 		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
 			if (!statusEl.textContent.includes('error'))
@@ -715,7 +716,7 @@ function layerVector(opt) {
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
-	if (options.selectorName)
+	if (statusEl)
 		memCheckbox(options.selectorName, function(selection) {
 			layer.setVisible(selection.length > 0);
 			if (selection.length > 0)
@@ -725,12 +726,15 @@ function layerVector(opt) {
 	// Callback function to define features displays from the properties received from the server
 	if (typeof options.displayProperties == 'function')
 		source.on('featuresloadend', function(evt) {
-			for (let p in evt.features)
-				evt.features[p].display = options.displayProperties(
-					evt.features[p].getProperties(),
-					evt.features[p],
+			for (let f in evt.features) {
+				evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
+
+				evt.features[f].display = options.displayProperties(
+					evt.features[f].getProperties(),
+					evt.features[f],
 					options
 				);
+			}
 		});
 
 	// Style callback function for the layer
@@ -833,7 +837,7 @@ function layerVector(opt) {
 			zIndex: 2, // Above the features
 			style: function(feature, resolution) {
 				return displayStyle(feature, resolution, [
-					defaultStyleOptions, defaultHoverStyleOptions, options.hoverStyleOptions
+					defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions
 				]);
 			},
 		});

@@ -110,7 +110,6 @@ class listener implements EventSubscriberInterface
 		// Valeurs à assigner à tout le template (topic)
 		$topic_row = $this->geo_data[$post_id]; // The geo_ values
 		$topic_row['topic_first_post_id'] = $topic_first_post_id;
-		$topic_row['forum_image'] = $topic_data['forum_image'];
 
 		// How to display the topic
 		//BEST map on all posts (":xxxxx")
@@ -123,8 +122,7 @@ class listener implements EventSubscriberInterface
 			preg_match ('/\[([-0-9\.]*)[, ]*([-0-9\.]*)\]/', $topic_row['geo_json'], $ll);
 			if ($ll) {
 				$topic_row['map_type'] = $desc[2];
-				$topic_row['geo_lon'] = $ll[1];
-				$topic_row['geo_lat'] = $ll[2];
+				$topic_row['forum_image'] = $topic_data['forum_image'];
 
 				// Calcul de l'altitude avec mapquest
 				global $mapKeys;

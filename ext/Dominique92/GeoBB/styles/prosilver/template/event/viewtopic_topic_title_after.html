@@ -1,20 +1,13 @@
 <!-- IF GEO_JSON and MAP_TYPE -->
-	<!-- Proj4 projections Swiss & UK -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
-
-	<!-- Point marker -->
-	<!-- IF FORUM_IMAGE -->
-		<!-- INCLUDEJS @Dominique92_GeoBB/viewtopic.js -->
-	<!-- ENDIF -->
 	<script>
 		var script = '{SCRIPT_NAME}',
 			mapType = '{MAP_TYPE}',
-			coordinates = [{GEO_LON}, {GEO_LAT}],
 			mapKeys = {MAP_KEYS};
 	</script>
 
 	<div id="map"></div>
-	<p id="fix-marker"></p>
+	<input type="hidden" id="geo_json" value='{GEO_JSON}' />
+
 	<!-- IF U_MCP -->
 		<a class="edit-button"
 			href="posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}"
@@ -22,5 +15,13 @@
 			<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 			<span class="sr-only">{L_BUTTON_EDIT}</span>
 		</a>
+	<!-- ENDIF -->
+
+	<!-- Proj4 projections Swiss & UK -->
+	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
+
+	<!-- Point marker -->
+	<!-- IF FORUM_IMAGE -->
+		<!-- INCLUDEJS @Dominique92_GeoBB/viewtopic.js -->
 	<!-- ENDIF -->
 <!-- ENDIF -->
