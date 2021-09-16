@@ -6,6 +6,7 @@ var map = new ol.Map({
 		layerVectorCluster(
 			layerGeoBBPoi({
 				host: '', // Relative adress
+				selectorName: 'geobb-features',
 				maxResolution: 100,
 				distance: 50,
 			})
@@ -13,6 +14,7 @@ var map = new ol.Map({
 		layerVectorCluster(
 			layerGeoBBCluster({
 				host: '',
+				selectorName: 'geobb-features',
 				minResolution: 100,
 				distance: 50,
 			})

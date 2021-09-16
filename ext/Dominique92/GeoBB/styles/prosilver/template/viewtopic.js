@@ -9,5 +9,3 @@ map.addLayer(layerEditGeoJson({
 		}),
 	},
 }));
-
-//TODO centrer fenetre sur une trace

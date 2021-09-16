@@ -38,6 +38,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 //TODO BUG I.E. SCRIPT5022: IndexSizeError
 //TODO BUG battement si trop d'icônes
+//TODO BUG trace n'est pas visible en cluster (distance : sur toute la ligne ?)
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
