@@ -38,6 +38,9 @@ class listener implements EventSubscriberInterface
 			// Common
 			'core.common' => 'common',
 
+			// Index
+			'core.index_modify_page_title' => 'index_modify_page_title',
+
 			// Viewtopic
 			'core.viewtopic_get_post_data' => 'viewtopic_get_post_data',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
@@ -62,6 +65,13 @@ class listener implements EventSubscriberInterface
 			'MAP_KEYS' => json_encode (@$mapKeys),
 			'IS_IE' => $match ? 'IE' : '',
 		]);
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	function index_modify_page_title($vars) {
+		$this->template->assign_var ('MAP_TYPE', 'index');
 	}
 
 	/**

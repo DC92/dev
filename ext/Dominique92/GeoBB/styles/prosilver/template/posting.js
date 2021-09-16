@@ -1,5 +1,4 @@
-//TODO conditional to image forum
-// Add point marker
+//TODO conditional image forum
 map.addLayer(layerEditGeoJson({
 	displayPointId: 'fix-marker',
 	focus: 15,

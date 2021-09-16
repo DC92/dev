@@ -1,38 +1,3 @@
-<!-- Polyfill iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-<!-- //TODO move in EVENT overall_header_head_append.html -->
-
-<!-- Map resize -->
-<!-- INCLUDECSS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.css -->
-<!-- INCLUDEJS {T_ASSETS_PATH}/jquery-ui/jquery-ui.min.js -->
-
-<!-- IF IS_IE --><!-- I.E. -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/src/polyfill.js -->
-
-	<!-- Openlayers -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol661.js -->
-
-<!-- ELSE --><!-- Other browser -->
-	<!-- Openlayers -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
-
-	<!-- Recherche par nom -->
-	<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.css -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/geocoder/ol-geocoder.js -->
-<!-- ENDIF -->
-
-<!-- My Openlayers -->
-<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
-<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
-
-<!-- This map -->
-<!-- INCLUDECSS @Dominique92_GeoBB/stylesheet.css -->
-<!-- INCLUDEJS @Dominique92_GeoBB/layerGeoBB.js -->
-
 <script>
 	var script = '{SCRIPT_NAME}',
 		mapType = '',
