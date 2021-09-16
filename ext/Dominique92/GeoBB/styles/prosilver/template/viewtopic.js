@@ -1,16 +1,14 @@
-//TODO conditional to image forum
-// Add point marker
 map.addLayer(layerEditGeoJson({
-	displayPointId: 'fix-marker',
+	displayPointId: typeof displayPointId == 'string' ? displayPointId : 'point-marker',
 	focus: 15,
 	singlePoint: true,
-	geoJson: {
+	geoJson: { //TODO avec geojson
 		type: 'Point',
 		coordinates: coordinates,
 	},
 	styleOptions: {
 		image: new ol.style.Icon({
-			src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/cadre.png', //TODO simplifier code
+			src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/cadre.png',
 		}),
 	},
 }));

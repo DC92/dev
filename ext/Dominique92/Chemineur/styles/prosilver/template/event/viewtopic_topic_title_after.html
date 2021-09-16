@@ -12,7 +12,10 @@
 				<span>(<a href="viewforum.php?f={FORUM_ID}" title="Voir les autres {FORUM_NAME}s">{FORUM_NAME}</a>)</span>
 			</h1>
 
-			<h3 id="cadre-coords"></h3>
+			<h3 id="point-coordinates"></h3>
+			<script>
+				var displayPointId = 'point-coordinates';
+			</script>
 
 			<!-- IF GEO_ALTITUDE -->
 				<h3>Altitude: {GEO_ALTITUDE} m</h3>
@@ -38,7 +41,7 @@
 				</li>
 				<li>
 					<a href="posting.php?mode=edit&f={FORUM_ID}&p={TOPIC_FIRST_POST_ID}"
-						title="Modifier l'entête" class="button button-icon-only">
+						title="Modifier l'entête de la fiche" class="button button-icon-only">
 						<i class="icon fa-pencil fa-fw" aria-hidden="true"></i>
 						<span class="sr-only">{L_BUTTON_EDIT}</span>
 					</a>

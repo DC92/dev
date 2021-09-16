@@ -61,6 +61,7 @@ class listener implements EventSubscriberInterface
 	function common($vars) {
 		global $mapKeys;
 		preg_match ('/Trident/', @$this->server['HTTP_USER_AGENT'], $match);
+
 		$this->template->assign_vars ([
 			'MAP_KEYS' => json_encode (@$mapKeys),
 			'IS_IE' => $match ? 'IE' : '',
@@ -109,6 +110,7 @@ class listener implements EventSubscriberInterface
 		// Valeurs à assigner à tout le template (topic)
 		$topic_row = $this->geo_data[$post_id]; // The geo_ values
 		$topic_row['topic_first_post_id'] = $topic_first_post_id;
+		$topic_row['forum_image'] = $topic_data['forum_image'];
 
 		// How to display the topic
 		//BEST map on all posts (":xxxxx")
@@ -185,6 +187,7 @@ class listener implements EventSubscriberInterface
 	/**
 		POSTING
 	*/
+	// Called when displaying the page
 	function posting_modify_row_data($vars) {
 		$post_data = $vars['post_data'];
 		preg_match ('/([\.:])(point|line|poly)/', $post_data['forum_desc'], $params);

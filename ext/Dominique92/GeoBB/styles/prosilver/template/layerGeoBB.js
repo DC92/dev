@@ -1,6 +1,6 @@
 var map = new ol.Map({
 	target: 'map',
-	controls: controlsCollection(controlOptions)
+	controls: controlsCollection(typeof controlOptions == 'object' ? controlOptions : {})
 		.concat(controlLayerSwitcher()),
 	layers: [
 		layerVectorCluster(

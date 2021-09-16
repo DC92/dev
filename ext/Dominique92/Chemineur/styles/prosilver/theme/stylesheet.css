@@ -1,4 +1,4 @@
-/* Ecrase le style de base */
+/* PhpBB modifications */
 #poll-panel-tab, /* Sondages */
 /* .fields1 dl:first-child,  Icone de sujet */
 .section-index .action-bar,
@@ -12,7 +12,9 @@
 .headerspace,
 .section-posting input[name="preview"],
 .section-posting input[name="save"],
-#page-footer .navbar {
+#page-footer .navbar,
+/* GeoBB */
+.section-viewtopic .edit-button {
 	display: none !important;
 }
 body,
@@ -23,6 +25,7 @@ body,
 	border-radius: 0;
 	padding: 0;
 }
+/* //TODO chemineur responsive */
 
 /* Bandeau */
 .headerbar {
@@ -201,6 +204,7 @@ body,
 }
 
 #etiquette {
+	float: left;
 	margin: 20px 10px;
 }
 @media screen and (max-width: 600px) {
