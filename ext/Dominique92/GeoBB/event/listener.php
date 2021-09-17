@@ -47,7 +47,7 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
-			'core.posting_modify_row_data' => 'posting_modify_row_data',
+			'core.posting_modify_template_vars' => 'posting_modify_template_vars',
 			'core.submit_post_modify_sql_data' => 'submit_post_modify_sql_data',
 
 			// Adm
@@ -186,7 +186,7 @@ class listener implements EventSubscriberInterface
 		POSTING
 	*/
 	// Called when displaying the page
-	function posting_modify_row_data($vars) {
+	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 		preg_match ('/([\.:])(point|line|poly)/', $post_data['forum_desc'], $params);
 
@@ -204,8 +204,11 @@ class listener implements EventSubscriberInterface
 				$result = $this->db->sql_query($sql);
 				$row = $this->db->sql_fetchrow($result);
 				$this->db->sql_freeresult($result);
-				if ($row)
+				if ($row) {
+					foreach ($row  AS $k=>$v)
+						$row[$k] = str_replace ('~', '', $v);
 					$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
+				}
 			}
 		}
 	}
