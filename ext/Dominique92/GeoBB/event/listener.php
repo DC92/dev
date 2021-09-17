@@ -135,7 +135,7 @@ class listener implements EventSubscriberInterface
 					preg_match('/"height":([-0-9]+)/', @file_get_contents ($mapquest), $match);
 
 					// Update the template data
-					$topic_row['geo_altitude'] = $match ? $match[1] : '~';
+					$topic_row['geo_altitude'] = $match ? $match[1].'~' : '~';
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";     
@@ -156,7 +156,7 @@ class listener implements EventSubscriberInterface
 						ksort ($ms);
 
 					// Update the template data
-					$topic_row['geo_massif'] = @$ms[array_keys($ms)[0]] ?: '~';
+					$topic_row['geo_massif'] = @$ms[array_keys($ms)[0]] ? $ms[array_keys($ms)[0]].'~' : '~';
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_massif = '".addslashes ($topic_row['geo_massif'])."' WHERE post_id = $post_id";
