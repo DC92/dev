@@ -1,29 +1,32 @@
 <!-- IF MAP_TYPE -->
-	<!-- Proj4 projections Swiss & UK -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
-
-	<!-- Marker or editor -->
-	<!-- INCLUDEJS @Dominique92_GeoBB/posting.js -->
-
 	<script>
 		var script = '{SCRIPT_NAME}',
 			mapType = '{MAP_TYPE}',
-			mapKeys = {MAP_KEYS},
-			controlOptions = {
-			};
+			mapKeys = {MAP_KEYS};
 	</script>
 
-	<div id="container-map">
-		<div id="map"></div>
-		<input type="hidden" name="geom" id="geojson" value='{GEO_JSON}' />
-		<input type="hidden" name="geo_center" />
-	</div>
+	<div id="map"></div>
+	<input type="hidden" name="geom" id="geo_json" value='{GEO_JSON}' />
 
 	<!-- IF MAP_TYPE == 'point' -->
-		<p id="marker">
-			Lon <input type="text" name="lon" size="12" maxlength="12">
-			Lat <input type="text" name="lat" size="12" maxlength="12">
-		</p>
+		<div id="point_marker">
+			<p>
+				Longitude :
+				<input type="text" name="lon" size="12" maxlength="12">
+				(WGS84)&nbsp;
+				 <span style="display:none" class="epsg-21781"> / X :
+					<input type="text" name="x" size="7" maxlength="12"> (CH 1903)
+				 </span>
+			</p>
+			<p>
+				Latitude :
+				<input type="text" name="lat" size="12" maxlength="12">
+				(WGS84)&nbsp;
+				<span style="display:none" class="epsg-21781"> / Y :
+					<input type="text" name="y" size="7" maxlength="12">
+				</span>
+			</p>
+		</div>
 
 		<p><a onclick="marker.centerMap()" style="color:blue;cursor:pointer">
 			Centrer la carte sur le curseur

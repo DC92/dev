@@ -10,39 +10,45 @@ if (jQuery.ui)
 	});
 
 var map = new ol.Map({
-	target: 'map',
-	controls: controlsCollection(typeof controlOptions == 'object' ? controlOptions : {})
-		.concat(controlLayerSwitcher()),
-	layers: [
-		layerVectorCluster(
-			layerGeoBBPoi({
-				host: '', // Relative adress
-				selectorName: 'geobb-features',
-				maxResolution: 100,
-				distance: 50,
-			})
-		),
-		layerVectorCluster(
-			layerGeoBBCluster({
-				host: '',
-				selectorName: 'geobb-features',
-				minResolution: 100,
-				distance: 50,
-			})
-		),
-	],
-});
+		target: 'map',
+		controls: controlsCollection(typeof controlOptions == 'object' ? controlOptions : {})
+			.concat(controlLayerSwitcher()),
+		layers: [
+			layerVectorCluster(
+				layerGeoBBPoi({
+					host: '', // Relative adress
+					selectorName: 'geobb-features',
+					maxResolution: 100,
+					distance: 50,
+				})
+			),
+			layerVectorCluster(
+				layerGeoBBCluster({
+					host: '',
+					selectorName: 'geobb-features',
+					minResolution: 100,
+					distance: 50,
+				})
+			),
+		],
+	}),
 
-// viewtopic marker
-if (script == 'viewtopic')
-	map.addLayer(layerEditGeoJson({
+	// Point marker
+	marker = layerEditGeoJson({
 		geoJsonId: 'geo_json',
+		displayPointId: typeof displayPointId == 'string' ? displayPointId : 'point_marker',
 		singlePoint: true,
+		dragPoint: script == 'posting',
 		focus: 15,
-		displayPointId: typeof displayPointId == 'string' ? displayPointId : 'point-marker',
 		styleOptions: {
 			image: new ol.style.Icon({
-				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/cadre.png',
+				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + script + '.png',
 			}),
 		},
-	}));
+	});
+
+if (script == 'viewtopic')
+	map.addLayer(marker);
+
+if (script == 'posting' && mapType == 'point')
+	map.addLayer(marker);

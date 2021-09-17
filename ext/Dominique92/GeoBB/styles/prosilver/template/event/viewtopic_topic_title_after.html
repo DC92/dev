@@ -1,7 +1,4 @@
-<!-- IF GEO_JSON and MAP_TYPE -->
-	<!-- Proj4 projections Swiss -->
-	<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/proj4/proj4-src.js -->
-
+<!-- IF MAP_TYPE and GEO_JSON -->
 	<script>
 		var script = '{SCRIPT_NAME}',
 			mapType = '{MAP_TYPE}',
@@ -10,6 +7,7 @@
 
 	<div id="map"></div>
 	<input type="hidden" id="geo_json" value='{GEO_JSON}' />
+	<p id="point_marker"></p>
 
 	<!-- IF U_MCP -->
 		<a class="edit-button"

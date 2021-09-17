@@ -205,8 +205,9 @@ class listener implements EventSubscriberInterface
 				$row = $this->db->sql_fetchrow($result);
 				$this->db->sql_freeresult($result);
 				if ($row) {
-					foreach ($row  AS $k=>$v)
-						$row[$k] = str_replace ('~', '', $v);
+					foreach ($row AS $k=>$v)
+						if (strpos ($v, '~'))
+							$row[$k] = ''; // Erase the field if generated automatically
 					$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
 				}
 			}
