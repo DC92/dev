@@ -38,42 +38,35 @@ var map = new ol.Map({
 		geoJsonId: 'geo_json',
 		displayPointId: typeof displayPointId == 'string' ? displayPointId : 'point-marker',
 		singlePoint: true,
-		dragPoint: script == 'posting',
+		dragPoint: scriptName == 'posting',
 		focus: 15,
 		styleOptions: {
 			image: new ol.style.Icon({
-				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + script + '.png',
+				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.png',
 			}),
 		},
 	});
 
-if (script == 'viewtopic')
+if (scriptName == 'viewtopic')
 	map.addLayer(marker);
 
-if (script == 'posting' && mapType == 'point')
+if (scriptName == 'posting' && mapType == 'point')
 	map.addLayer(marker);
 
-if (script == 'posting' && mapType == 'line')
+if (scriptName == 'posting' && mapType == 'line')
 	map.addLayer(layerEditGeoJson({
-		geoJsonId: 'geojson',
-		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
+		geoJsonId: 'geo_json',
+		titleModify: 'Modification d‘une ligne:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
-			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
+			'Cliquer et déplacer un sommet pour modifier une ligne\n' +
 			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
 			'Alt+cliquer sur un sommet pour le supprimer\n' +
 			'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
-			'Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
 			'Joindre les extrémités deux lignes pour les fusionner\n' +
-			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
-			'Ctrl+Alt+cliquer sur une ligne ou un polygone pour les supprimer',
+			'Ctrl+Alt+cliquer sur une ligne pour la supprimer',
 		titleLine: 'Création d‘une ligne:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
 			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
 			'double cliquer pour terminer.\n' +
 			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
-		titlePolygon: 'Création d‘un polygone:\n' +
-			'Activer ce bouton (couleur jaune) puis\n' +
-			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
-			'double cliquer pour terminer.\n' +
-			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
 	}));
