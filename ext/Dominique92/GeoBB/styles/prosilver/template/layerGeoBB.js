@@ -56,6 +56,7 @@ if (scriptName == 'posting' && mapType == 'point')
 if (scriptName == 'posting' && mapType == 'line')
 	map.addLayer(layerEditGeoJson({
 		geoJsonId: 'geo_json',
+		focus: 15,
 		titleModify: 'Modification d‘une ligne:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +
 			'Cliquer et déplacer un sommet pour modifier une ligne\n' +
