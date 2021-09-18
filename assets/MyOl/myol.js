@@ -897,23 +897,20 @@ function layerVector(opt) {
 		}
 	}
 
-	//HACK Save options for further use (layerVectorCluster)
-	layer.options = options; //BEST avoid
-
 	return layer;
 }
 
 /**
  * Cluster close features
  */
-function layerVectorCluster(layer) {
-	const options = Object.assign({
-			strategy: ol.loadingstrategy.bbox,
-			distance: 50, // Distance in pixels within which features will be clustered together.
-		}, layer.options),
+function layerVectorCluster(options) {
+	const layer = layerVector(options);
 
-		// Clusterized source
-		clusterSource = new ol.source.Cluster({
+	if (!options.distance)
+		return layer;
+
+	// Clusterized source
+	const clusterSource = new ol.source.Cluster({
 			distance: options.distance,
 			source: layer.getSource(),
 			geometryFunction: function(feature) {
@@ -1124,7 +1121,7 @@ function fillColorOption(hexColor, transparency) {
  */
 //BEST min & max layer in the same function
 function layerWriPoi(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'api/bbox' +
@@ -1172,7 +1169,7 @@ function layerWriAreas(options) {
  */
 //BEST min & max layer in the same function
 function layerGeoBBPoi(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host +
@@ -1202,7 +1199,7 @@ function layerGeoBBPoi(options) {
 }
 
 function layerGeoBBCluster(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		host: '//chemineur.fr/',
 		urlFunction: function url(options, bbox, selection) {
 			return options.host +
@@ -1216,7 +1213,7 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host +
@@ -1249,7 +1246,7 @@ function layerAlpages(options) {
 function layerOSM(options) {
 	//TODO strategie bboxLimit
 	const format = new ol.format.OSMXML(),
-		layer = layerVector(Object.assign({
+		layer = layerVectorCluster(Object.assign({
 			maxResolution: 50,
 			host: 'https://overpass-api.de/api/interpreter',
 			urlFunction: urlFunction,
@@ -1340,7 +1337,7 @@ function layerOSM(options) {
  * Site pyrenees-refuges.com
  */
 function layerPyreneesRefuges(options) {
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		displayProperties: function(properties) {
@@ -1390,7 +1387,7 @@ function layerC2C(options) {
 		);
 	};
 
-	return layerVector(Object.assign({
+	return layerVectorCluster(Object.assign({
 		urlFunction: function(options, bbox, selection, extent) {
 			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
 		},

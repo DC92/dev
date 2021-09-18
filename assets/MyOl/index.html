@@ -68,20 +68,16 @@ new ol.Map({
 	}),
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
-		layerVectorCluster(
-			layerGeoBBPoi({
-				selectorName: 'geobb-features',
-				maxResolution: 300,
-				distance: 30,
-			})
-		),
-		layerVectorCluster(
-			layerGeoBBCluster({
-				selectorName: 'geobb-features',
-				minResolution: 300,
-				distance: 50,
-			})
-		),
+		layerGeoBBPoi({
+			selectorName: 'geobb-features',
+			maxResolution: 300,
+			distance: 30,
+		}),
+		layerGeoBBCluster({
+			selectorName: 'geobb-features',
+			minResolution: 300,
+			distance: 50,
+		}),
 	],
 });
 	</script>

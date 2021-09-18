@@ -319,23 +319,20 @@ function layerVector(opt) {
 		}
 	}
 
-	//HACK Save options for further use (layerVectorCluster)
-	layer.options = options; //BEST avoid
-
 	return layer;
 }
 
 /**
  * Cluster close features
  */
-function layerVectorCluster(layer) {
-	const options = Object.assign({
-			strategy: ol.loadingstrategy.bbox,
-			distance: 50, // Distance in pixels within which features will be clustered together.
-		}, layer.options),
+function layerVectorCluster(options) {
+	const layer = layerVector(options);
 
-		// Clusterized source
-		clusterSource = new ol.source.Cluster({
+	if (!options.distance)
+		return layer;
+
+	// Clusterized source
+	const clusterSource = new ol.source.Cluster({
 			distance: options.distance,
 			source: layer.getSource(),
 			geometryFunction: function(feature) {

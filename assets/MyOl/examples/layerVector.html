@@ -124,112 +124,105 @@ Based on https://openlayers.org
 	</div>
 
 	<script>
-		//TODO BUG I.E. SCRIPT5022: IndexSizeError
-		const map = new ol.Map({
-			target: 'map',
-			view: new ol.View({
-				center: [700000, 5700000], zoom: 12, // Maurienne
-				//center: [260000, 6250000], zoom: 12, // Paris
-				//center: [260000, 5800000], zoom: 7, // France
-				//center: [50000, 5300000], zoom: 12, //  Pyrénées
-			}),
-			layers: [
-				new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-			],
-		});
+//TODO BUG I.E. SCRIPT5022: IndexSizeError
+const map = new ol.Map({
+	target: 'map',
+	view: new ol.View({
+		center: [700000, 5700000],
+		zoom: 12, // Maurienne
+		//center: [260000, 6250000], zoom: 12, // Paris
+		//center: [260000, 5800000], zoom: 7, // France
+		//center: [50000, 5300000], zoom: 12, //  Pyrénées
+	}),
+	layers: [
+		new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
+	],
+});
 
-		if (0)
-			map.addLayer(layerWriPoi({
-				selectorName: 'wri-features',
-			}));
-		if (01) {
-			map.addLayer(layerVectorCluster(
-				layerWriPoi({
-					selectorName: 'wri-features',
-					maxResolution: 100,
-					distance: 50,
-				})
-			));
-			map.addLayer(layerWriAreas({
-				minResolution: 100,
-				selectorName: 'wri-features',
-			}));
-		}
+if (0)
+	map.addLayer(layerWriPoi({
+		selectorName: 'wri-features',
+	}));
+if (01) {
+	map.addLayer(layerWriPoi({
+		selectorName: 'wri-features',
+		maxResolution: 100,
+		distance: 50,
+	}));
+	map.addLayer(layerWriAreas({
+		minResolution: 100,
+		selectorName: 'wri-features',
+	}));
+}
 
-		if (0)
-			map.addLayer(layerGeoBBPoi({
-				selectorName: 'geobb-features',
-			}));
-		if (01) {
-			map.addLayer(layerVectorCluster(
-				layerGeoBBPoi({
-					selectorName: 'geobb-features',
-					maxResolution: 100,
-					distance: 50,
-				})
-			));
-			map.addLayer(layerVectorCluster(
-				layerGeoBBCluster({
-					selectorName: 'geobb-features',
-					minResolution: 100,
-					distance: 50,
-				})
-			));
-		}
+if (0)
+	map.addLayer(layerGeoBBPoi({
+		selectorName: 'geobb-features',
+	}));
+if (01) {
+	map.addLayer(layerGeoBBPoi({
+		selectorName: 'geobb-features',
+		maxResolution: 100,
+		distance: 50,
+	}));
+	map.addLayer(layerGeoBBCluster({
+		selectorName: 'geobb-features',
+		minResolution: 100,
+		distance: 50,
+	}));
+}
 
-		if (0)
-			map.addLayer(layerPyreneesRefuges({
-				selectorName: 'prc-features',
-			}));
-		if (01)
-			map.addLayer(layerVectorCluster(
-				layerPyreneesRefuges({
-					selectorName: 'prc-features',
-					distance: 50,
-				})
-			));
+if (0)
+	map.addLayer(layerPyreneesRefuges({
+		selectorName: 'prc-features',
+	}));
+if (01)
+	map.addLayer(layerPyreneesRefuges({
+		selectorName: 'prc-features',
+		distance: 50,
+	}));
 
-		if (01)
-			map.addLayer(layerAlpages({
-				selectorName: 'alp-features',
-			}));
+if (01)
+	map.addLayer(layerAlpages({
+		selectorName: 'alp-features',
+	}));
 
-		if (01)
-			map.addLayer(layerC2C({
-				selectorName: 'c2c-features',
-			}));
+if (01)
+	map.addLayer(layerC2C({
+		selectorName: 'c2c-features',
+	}));
 
-		if (01)
-			map.addLayer(layerOSM({
-				selectorName: 'osm-features',
-				symbols: {
-					hotel: 'City Hall',
-					guest_house: 'City Hall',
-					chalet: 'City Hall',
-					hostel: 'City Hall',
-					apartment: 'City Hall',
-					alpine_hut: 'Residence',
-					cabin: 'Lodge',
-					shelter: 'Fishing Hot Spot Facility',
-					basic_hut: 'Fishing Hot Spot Facility',
-					camp_site: 'Campground',
-					drinking_water: 'Drinking Water',
-					watering_place: 'Drinking Water',
-					fountain: 'Drinking Water',
-					water_point: 'Drinking Water',
-					spring: 'Drinking Water',
-					water_well: 'Drinking Water',
-					bus_stop: 'Ground Transportation',
-					parking: 'Parking Area',
-					restaurant: 'Restaurant',
-					shop: 'Shopping Center',
-					toilets: 'Restroom',
-					internet_access: 'Oil Field',
-					telephone: 'Telephone',
-				},
-			}));
+if (01)
+	map.addLayer(layerOSM({
+		selectorName: 'osm-features',
+		symbols: {
+			hotel: 'City Hall',
+			guest_house: 'City Hall',
+			chalet: 'City Hall',
+			hostel: 'City Hall',
+			apartment: 'City Hall',
+			alpine_hut: 'Residence',
+			cabin: 'Lodge',
+			shelter: 'Fishing Hot Spot Facility',
+			basic_hut: 'Fishing Hot Spot Facility',
+			camp_site: 'Campground',
+			drinking_water: 'Drinking Water',
+			watering_place: 'Drinking Water',
+			fountain: 'Drinking Water',
+			water_point: 'Drinking Water',
+			spring: 'Drinking Water',
+			water_well: 'Drinking Water',
+			bus_stop: 'Ground Transportation',
+			parking: 'Parking Area',
+			restaurant: 'Restaurant',
+			shop: 'Shopping Center',
+			toilets: 'Restroom',
+			internet_access: 'Oil Field',
+			telephone: 'Telephone',
+		},
+	}));
 	</script>
 </body>
 </html>
