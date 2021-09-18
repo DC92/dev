@@ -162,7 +162,7 @@ function layerVector(opt) {
 
 	// Style callback function for the layer
 	function style(feature, resolution) {
-		if (feature.display.cluster) // Grouped features
+		if (feature.display && feature.display.cluster) // Grouped features
 			// Cluster style
 			return displayStyle(feature, resolution, [
 				defaultClusterStyleOptions, options.clusterStyleOptions
@@ -354,7 +354,7 @@ function layerVectorCluster(layer) {
 			},
 			options));
 
-	//HACK propagate setVisible following the selector status
+	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
 	});
@@ -371,7 +371,7 @@ function layerVectorCluster(layer) {
 		previousResolution = resolution;
 	});
 
-	// style callback function for the layer
+	// Style callback function for the layer
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
@@ -391,6 +391,7 @@ function layerVectorCluster(layer) {
 					names.push(features[f].display.name);
 			}
 
+			// Cluster labels
 			if (features.length > 1 || !names.length) {
 				// Big cluster
 				if (clusters > 5)
@@ -401,8 +402,10 @@ function layerVectorCluster(layer) {
 					cluster: clusters,
 					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
 				};
-			} else {
-				// Single feature (point, line or poly)
+			}
+			// Single feature (point, line or poly)
+			else {
+				// Check if the feature is aleady included in the layer
 				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
 					if (features[0].ol_uid == f.ol_uid)
 						return true;
@@ -411,7 +414,7 @@ function layerVectorCluster(layer) {
 				if (!featureAlreadyExists)
 					clusterSource.addFeature(features[0]);
 
-				return; // Dont display that one, it will display the added one
+				return; // Don't display the center feature, display only the plain one
 			}
 		}
 
