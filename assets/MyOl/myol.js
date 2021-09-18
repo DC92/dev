@@ -740,7 +740,7 @@ function layerVector(opt) {
 
 	// Style callback function for the layer
 	function style(feature, resolution) {
-		if (feature.display.cluster) // Grouped features
+		if (feature.display && feature.display.cluster) // Grouped features
 			// Cluster style
 			return displayStyle(feature, resolution, [
 				defaultClusterStyleOptions, options.clusterStyleOptions
@@ -912,7 +912,7 @@ function layerVectorCluster(layer) {
 			distance: 50, // Distance in pixels within which features will be clustered together.
 		}, layer.options),
 
-		// Clusterized source & layer
+		// Clusterized source
 		clusterSource = new ol.source.Cluster({
 			distance: options.distance,
 			source: layer.getSource(),
@@ -924,7 +924,20 @@ function layerVectorCluster(layer) {
 					)
 				);
 			},
+			createCluster: function(point, features) {
+				// Single feature : display it
+				if (features.length == 1)
+					return features[0];
+
+				// Still clustured
+				return new ol.Feature({
+					geometry: point,
+					features: features
+				});
+			},
 		}),
+
+		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 				source: clusterSource,
 				style: clusterStyle,
@@ -932,7 +945,7 @@ function layerVectorCluster(layer) {
 			},
 			options));
 
-	//HACK propagate setVisible following the selector status
+	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
 		clusterLayer.setVisible(this.getVisible());
 	});
@@ -949,7 +962,7 @@ function layerVectorCluster(layer) {
 		previousResolution = resolution;
 	});
 
-	// style callback function for the layer
+	// Style callback function for the layer
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
@@ -969,6 +982,7 @@ function layerVectorCluster(layer) {
 					names.push(features[f].display.name);
 			}
 
+			// Cluster labels
 			if (features.length > 1 || !names.length) {
 				// Big cluster
 				if (clusters > 5)
@@ -979,17 +993,6 @@ function layerVectorCluster(layer) {
 					cluster: clusters,
 					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
 				};
-			} else {
-				// Single feature (point, line or poly)
-				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
-					if (features[0].ol_uid == f.ol_uid)
-						return true;
-				});
-
-				if (!featureAlreadyExists)
-					clusterSource.addFeature(features[0]);
-
-				return; // Dont display that one, it will display the added one
 			}
 		}
 

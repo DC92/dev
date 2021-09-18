@@ -334,7 +334,7 @@ function layerVectorCluster(layer) {
 			distance: 50, // Distance in pixels within which features will be clustered together.
 		}, layer.options),
 
-		// Clusterized source & layer
+		// Clusterized source
 		clusterSource = new ol.source.Cluster({
 			distance: options.distance,
 			source: layer.getSource(),
@@ -346,7 +346,20 @@ function layerVectorCluster(layer) {
 					)
 				);
 			},
+			createCluster: function(point, features) {
+				// Single feature : display it
+				if (features.length == 1)
+					return features[0];
+
+				// Still clustured
+				return new ol.Feature({
+					geometry: point,
+					features: features
+				});
+			},
 		}),
+
+		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 				source: clusterSource,
 				style: clusterStyle,
@@ -402,19 +415,6 @@ function layerVectorCluster(layer) {
 					cluster: clusters,
 					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
 				};
-			}
-			// Single feature (point, line or poly)
-			else {
-				// Check if the feature is aleady included in the layer
-				const featureAlreadyExists = clusterSource.forEachFeature(function(f) {
-					if (features[0].ol_uid == f.ol_uid)
-						return true;
-				});
-
-				if (!featureAlreadyExists)
-					clusterSource.addFeature(features[0]);
-
-				return; // Don't display the center feature, display only the plain one
 			}
 		}
 
