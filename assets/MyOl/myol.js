@@ -507,10 +507,10 @@ function controlLayerSwitcher(baseLayers, options) {
 		displayBaseLayers(); // Init layers
 
 		// Attach html additional selector
-		const overlaySelector = document.getElementById(options.overlaySelectorId || 'additional-selector');
+		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
 		//TODO other id don't use the css
-		if (overlaySelector)
-			control.element.appendChild(overlaySelector);
+		if (additionalSelector)
+			control.element.appendChild(additionalSelector);
 	};
 
 	function displayBaseLayers() {
