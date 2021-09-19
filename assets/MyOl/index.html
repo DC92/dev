@@ -62,10 +62,6 @@ Based on https://openlayers.org
 // Must be after the <div id="map"> tag
 new ol.Map({
 	target: 'map',
-	view: new ol.View({
-		center: [260000, 5800000], // France
-		zoom: 5,
-	}),
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
 		layerGeoBBPoi({

@@ -335,20 +335,21 @@ function layerVectorCluster(options) {
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			distance: options.distance,
+			// Generate a center point to manage clusterisations
 			geometryFunction: function(feature) {
-				// Generate a center point to manage clusterisations
 				return new ol.geom.Point(
 					ol.extent.getCenter(
 						feature.getGeometry().getExtent()
 					)
 				);
 			},
+			// Generate the features to render the cluster
 			createCluster: function(point, features) {
 				// Single feature : display it
 				if (features.length == 1)
 					return features[0];
 
-				// Still clustered
+				// Stay clustered
 				return new ol.Feature({
 					geometry: point,
 					features: features
