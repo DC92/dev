@@ -730,8 +730,10 @@ function layerVector(opt) {
 	if (typeof options.displayProperties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let f in evt.features) {
+				// These options will be displayed by the hover response
 				evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
+				// Add data to be used to display the feature
 				evt.features[f].display = options.displayProperties(
 					evt.features[f].getProperties(),
 					evt.features[f],
@@ -1147,6 +1149,7 @@ function layerWri(options) {
 }
 
 function layerWriAreas(options) {
+	//TODO BUG hover label under others features labels
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI

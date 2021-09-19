@@ -152,8 +152,10 @@ function layerVector(opt) {
 	if (typeof options.displayProperties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let f in evt.features) {
+				// These options will be displayed by the hover response
 				evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
+				// Add data to be used to display the feature
 				evt.features[f].display = options.displayProperties(
 					evt.features[f].getProperties(),
 					evt.features[f],
