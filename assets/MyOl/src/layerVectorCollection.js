@@ -48,7 +48,7 @@ function layerWriPoi(options) {
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
-		polygon: 1,
+		polygon: 1, // Type de polygone WRI
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},

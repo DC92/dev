@@ -27,15 +27,15 @@
 	color: black;
 }
 
-#overlay-selector {
+#additional-selector {
+	color: black;
 	background-color: rgb(162, 226, 255, 0.4);
 }
-#overlay-selector ul {
+#additional-selector ul {
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
 }
-.overlay-status {
-	font-size: 0.7em;
-	color: blue;
+#additional-selector hr {
+	border-color: black;
 }

@@ -1,3 +1,6 @@
+<a style="float:right;margin-right:15px" href=".">HOME</a>
+<h1>Building distribution files</h1>
+
 <?php
 $js = $css = ["/** OPENLAYERS ADAPTATION
  * © Dominique Cavailhez 2017
@@ -29,16 +32,3 @@ function get ($file) {
 	return "/* FILE src/$file */\n".file_get_contents ('src/'.$file);
 }
 ?>
-
-<h1 style="clear:both">MyOl</h1>
-<p>Set of js functions adding some facilities to <a href="https://openlayers.org/">Openlayers</a></p>
-<p>See doc & details on <a href="https://github.com/DC92/dev/tree/master/assets/MyOl">GITHUB</a></p>
-<p><a href="index.html">Overview</a></p>
-<p><a href="examples/layerSwitcher.html">Layer switcher</a></p>
-<p><a href="examples/layerTile.html">Layer tile</a></p>
-<p><a href="examples/layerVector.html">Layer vector</a></p>
-<p><a href="examples/controls.html">Controls</a></p>
-<p><a href="examples/marker.html">Marker</a></p>
-<p><a href="examples/editor.html">Editor</a></p>
-<p><a href="gps">Off line GPS</a></p>
-<p><a href="build.php">Build</a></p>

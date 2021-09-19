@@ -38,28 +38,25 @@ Based on https://openlayers.org
 	<a style="float:right;margin-right:15px" href="..">HOME</a>
 	<h1 style="margin:0">Layer switcher</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
-	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both baselayers & overlays.</p>
+	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both base & vector layers.</p>
 
 	<div id="map"></div>
 
-	<div id="overlay-selector" >
+	<div id="additional-selector" >
 		<hr />
 		Countries <input type="checkbox" checked="checked" onChange="countries.setVisible(this.checked)" />
 	</div>
 
 	<script>
+// Vectorlayer 
 const countries = new ol.layer.Vector({
-	zIndex: 1, // Above the base layer
 	source: new ol.source.Vector({
 		url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
 		format: new ol.format.GeoJSON(),
 	}),
-	style: new ol.style.Style({
-		stroke: new ol.style.Stroke(),
-	}),
+	zIndex: 1, // Above the base layer
 });
-	</script>
-	<script>
+
 new ol.Map({
 	target: 'map',
 	view: new ol.View({

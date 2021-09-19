@@ -72,7 +72,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 20,
+			//TODO zIndex: 2,
 			style: escapedStyle(options.styleOptions),
 		}),
 		style = escapedStyle(options.styleOptions),

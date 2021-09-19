@@ -151,12 +151,6 @@ body,
 #container-map {
 	margin: 10px;
 }
-#overlay-selector {
-	color: black;
-}
-#overlay-selector hr {
-	border-color: black;
-}
 @media screen and (max-width: 600px) {
 	#container-map {
 		margin: 0 !important;

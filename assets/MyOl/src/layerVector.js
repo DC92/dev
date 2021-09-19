@@ -333,8 +333,8 @@ function layerVectorCluster(options) {
 
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
-			distance: options.distance,
 			source: layer.getSource(),
+			distance: options.distance,
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
 				return new ol.geom.Point(
@@ -348,7 +348,7 @@ function layerVectorCluster(options) {
 				if (features.length == 1)
 					return features[0];
 
-				// Still clustured
+				// Still clustered
 				return new ol.Feature({
 					geometry: point,
 					features: features
@@ -359,6 +359,7 @@ function layerVectorCluster(options) {
 		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 				source: clusterSource,
+				zIndex: 1, // Above the base layer
 				style: clusterStyle,
 				visible: layer.getVisible(), // Get the selector status 
 			},

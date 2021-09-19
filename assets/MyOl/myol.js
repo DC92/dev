@@ -506,8 +506,8 @@ function controlLayerSwitcher(baseLayers, options) {
 
 		displayBaseLayers(); // Init layers
 
-		// Attach html overlays selector
-		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
+		// Attach html additional selector
+		const overlaySelector = document.getElementById(options.overlaySelectorId || 'additional-selector');
 		//TODO other id don't use the css
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);
@@ -911,8 +911,8 @@ function layerVectorCluster(options) {
 
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
-			distance: options.distance,
 			source: layer.getSource(),
+			distance: options.distance,
 			geometryFunction: function(feature) {
 				// Generate a center point to manage clusterisations
 				return new ol.geom.Point(
@@ -926,7 +926,7 @@ function layerVectorCluster(options) {
 				if (features.length == 1)
 					return features[0];
 
-				// Still clustured
+				// Still clustered
 				return new ol.Feature({
 					geometry: point,
 					features: features
@@ -937,6 +937,7 @@ function layerVectorCluster(options) {
 		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 				source: clusterSource,
+				zIndex: 1, // Above the base layer
 				style: clusterStyle,
 				visible: layer.getVisible(), // Get the selector status 
 			},
@@ -1145,7 +1146,7 @@ function layerWriPoi(options) {
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
-		polygon: 1,
+		polygon: 1, // Type de polygone WRI
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
@@ -2206,7 +2207,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 20,
+			//TODO zIndex: 2,
 			style: escapedStyle(options.styleOptions),
 		}),
 		style = escapedStyle(options.styleOptions),

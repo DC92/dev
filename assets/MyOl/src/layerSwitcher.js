@@ -69,8 +69,8 @@ function controlLayerSwitcher(baseLayers, options) {
 
 		displayBaseLayers(); // Init layers
 
-		// Attach html overlays selector
-		const overlaySelector = document.getElementById(options.overlaySelectorId || 'overlay-selector');
+		// Attach html additional selector
+		const overlaySelector = document.getElementById(options.overlaySelectorId || 'additional-selector');
 		//TODO other id don't use the css
 		if (overlaySelector)
 			control.element.appendChild(overlaySelector);

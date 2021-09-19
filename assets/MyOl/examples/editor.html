@@ -74,7 +74,6 @@ Based on https://openlayers.org
 	<script>
 //TODO BUG sur demo editor : GET http://chemineur.fr/ext/Dominique92/GeoBB/icones/undefined.png 404 (Not Found)
 const snaplayer = new ol.layer.Vector({
-		zIndex: 1, // Above the base layer
 		source: new ol.source.Vector({
 			url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
 			format: new ol.format.GeoJSON(),
