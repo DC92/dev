@@ -33,23 +33,23 @@ $bbox_sql =
 	$bboxs[0].' '.$bboxs[3].','.
 	$bboxs[0].' '.$bboxs[1];
 
-// Temporary tool to generate all the regions
+// Temporary tool to generate all the clusters
 if (0) {
 	$sql="
-		SELECT post_id, geo_region,
+		SELECT post_id, geo_cluster,
 		ST_AsGeoJSON(geom) AS geojson,
 		ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
 		FROM phpbb_posts
 		WHERE geom IS NOT NULL
 	";
-	$regions_by_degree = 10; // Regions by ° lon lat
+	$clusters_by_degree = 10; // clusters by ° lon lat
 	$result = $db->sql_query_limit($sql, 10000000);
 	while ($row = $db->sql_fetchrow($result)) {
 		$geocenter = json_decode ($row['geocenter'])->coordinates;
-		$geo_region =
-			intval ((180 + $geocenter[0]) * $regions_by_degree) * 360 * $regions_by_degree +
-			intval ((180 + $geocenter[1]) * $regions_by_degree);
-		$sqlupd = "UPDATE phpbb_posts SET geo_region = $geo_region WHERE post_id = ".$row['post_id'];
+		$geo_cluster =
+			intval ((180 + $geocenter[0]) * $clusters_by_degree) * 360 * $clusters_by_degree +
+			intval ((180 + $geocenter[1]) * $clusters_by_degree);
+		$sqlupd = "UPDATE phpbb_posts SET geo_cluster = $geo_cluster WHERE post_id = ".$row['post_id'];
 		$db->sql_query($sqlupd);
 	}
 }
@@ -57,15 +57,15 @@ if (0) {
 // Features cluster managed at the server level
 if ($layer == 'cluster') {
 	$sql="
-	SELECT count(*) AS num, geo_region,
+	SELECT count(*) AS num, geo_cluster,
 		ST_AsGeoJSON(ST_Centroid(ST_Envelope(geom))) AS geocenter
 	FROM phpbb_posts AS p
 		LEFT JOIN phpbb_forums f ON (f.forum_id = p.forum_id)
-	WHERE geo_region IS NOT NULL AND ".
+	WHERE geo_cluster IS NOT NULL AND ".
 		($type ? "f.forum_id IN ($type) AND " : '').
 		($cat ? "f.parent_id IN ($cat) AND " : '').
 	"Intersects (GeomFromText ('POLYGON (($bbox_sql))',4326),geom)
-	GROUP BY geo_region
+	GROUP BY geo_cluster
 	ORDER BY num DESC
 	";
 	$result = $db->sql_query($sql);
@@ -73,7 +73,7 @@ if ($layer == 'cluster') {
 	while ($row = $db->sql_fetchrow($result)) {
 		$features[] = [
 			'type' => 'Feature',
-			'id' => $row['geo_region'],
+			'id' => $row['geo_cluster'],
 			'geometry' => trunc (json_decode ($row['geocenter'])),
 			'properties' => [
 				'cluster' => $row['num'],

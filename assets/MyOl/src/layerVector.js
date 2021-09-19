@@ -52,6 +52,7 @@ function layerVector(opt) {
 		// Yellow label
 		defaultStyleOptions = {
 			textOptions: {
+				overflow: true, // Force polygons label display when decluttering
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
 				padding: [1, 3, 0, 3],
@@ -67,7 +68,7 @@ function layerVector(opt) {
 		defaultHoverStyleOptions = {
 			hover: true, // Select label | hover as text to be display
 			textOptions: {
-				overflow: true, // Force label display of little polygons
+				overflow: true, // Force label display of little polygons when hovering
 				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
 				}),
@@ -102,6 +103,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 				source: source,
 				style: style,
+				declutter: true, // Force polygons labels to display when don't cover others
 			},
 			options)),
 

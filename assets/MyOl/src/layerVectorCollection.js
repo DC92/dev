@@ -23,7 +23,7 @@ function fillColorOption(hexColor, transparency) {
  * Site refuges.info
  */
 //BEST min & max layer in the same function
-function layerWriPoi(options) {
+function layerWri(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -49,6 +49,7 @@ function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
+		declutter: true,
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},

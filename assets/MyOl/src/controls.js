@@ -166,7 +166,7 @@ function controlMousePosition() {
 }
 
 /**
- * Control to display the length of a line overflown
+ * Control to display the length of an hovered line
  * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {

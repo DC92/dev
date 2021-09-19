@@ -1,5 +1,5 @@
 map.addLayer(layerVectorCluster(
-	layerWriPoi({
+	layerWri({
 		selectorName: 'wri-features',
 		maxResolution: 300,
 	})

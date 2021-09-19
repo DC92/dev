@@ -630,6 +630,7 @@ function layerVector(opt) {
 		// Yellow label
 		defaultStyleOptions = {
 			textOptions: {
+				overflow: true, // Force polygons label display when decluttering
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
 				padding: [1, 3, 0, 3],
@@ -645,7 +646,7 @@ function layerVector(opt) {
 		defaultHoverStyleOptions = {
 			hover: true, // Select label | hover as text to be display
 			textOptions: {
-				overflow: true, // Force label display of little polygons
+				overflow: true, // Force label display of little polygons when hovering
 				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
 				}),
@@ -680,6 +681,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 				source: source,
 				style: style,
+				declutter: true, // Force polygons labels to display when don't cover others
 			},
 			options)),
 
@@ -913,20 +915,21 @@ function layerVectorCluster(options) {
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			distance: options.distance,
+			// Generate a center point to manage clusterisations
 			geometryFunction: function(feature) {
-				// Generate a center point to manage clusterisations
 				return new ol.geom.Point(
 					ol.extent.getCenter(
 						feature.getGeometry().getExtent()
 					)
 				);
 			},
+			// Generate the features to render the cluster
 			createCluster: function(point, features) {
 				// Single feature : display it
 				if (features.length == 1)
 					return features[0];
 
-				// Still clustered
+				// Stay clustered
 				return new ol.Feature({
 					geometry: point,
 					features: features
@@ -1121,7 +1124,7 @@ function fillColorOption(hexColor, transparency) {
  * Site refuges.info
  */
 //BEST min & max layer in the same function
-function layerWriPoi(options) {
+function layerWri(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -1147,6 +1150,7 @@ function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
+		declutter: true,
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
@@ -1566,7 +1570,7 @@ function controlMousePosition() {
 }
 
 /**
- * Control to display the length of a line overflown
+ * Control to display the length of an hovered line
  * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {
