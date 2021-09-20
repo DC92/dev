@@ -15,6 +15,7 @@ function controlButton(options) {
 		className: 'myol-button',
 		activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
 	}, options);
+
 	const control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 

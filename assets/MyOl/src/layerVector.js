@@ -96,16 +96,14 @@ function layerVector(opt) {
 
 		// Source & layer
 		source = new ol.source.Vector(Object.assign({
-				url: url,
-			},
-			options)),
+			url: url,
+		}, options)),
 
 		layer = new ol.layer.Vector(Object.assign({
-				source: source,
-				style: style,
-				declutter: true, // Force polygons labels to display when don't cover others
-			},
-			options)),
+			source: source,
+			style: style,
+			declutter: true, // Force polygons labels to display when don't cover others
+		}, options)),
 
 		statusEl = document.getElementById(options.selectorName);
 
@@ -148,7 +146,7 @@ function layerVector(opt) {
 				source.refresh();
 		});
 
-	// Callback function to define features displays from the properties received from the server
+	// Callback function to define feature display from the properties received from the server
 	if (typeof options.displayProperties == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let f in evt.features) {
@@ -330,10 +328,11 @@ function layerVector(opt) {
  * Cluster close features
  */
 function layerVectorCluster(options) {
-	const layer = layerVector(options);
-
+	// No clustering
 	if (!options.distance)
-		return layer;
+		return layerVector(options);
+
+	const layer = layerVector(options);
 
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
@@ -363,12 +362,11 @@ function layerVectorCluster(options) {
 
 		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
-				source: clusterSource,
-				zIndex: 1, // Above the base layer
-				style: clusterStyle,
-				visible: layer.getVisible(), // Get the selector status 
-			},
-			options));
+			source: clusterSource,
+			zIndex: 1, // Above the base layer
+			style: clusterStyle,
+			visible: layer.getVisible(), // Get the selector status 
+		}, options));
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
