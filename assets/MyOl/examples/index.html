@@ -69,7 +69,7 @@ new ol.Map({
 	target: 'map',
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
-		layerGeoBBPoi({
+		layerGeoBB({
 			selectorName: 'geobb-features', //TODO BUG dont work in layers: [
 			maxResolution: 300,
 			distance: 30,

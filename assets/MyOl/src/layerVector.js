@@ -44,9 +44,6 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			displayProperties: function(properties) {
-				return properties; // Blank default
-			},
 		}, opt),
 
 		// Yellow label
@@ -147,18 +144,44 @@ function layerVector(opt) {
 		});
 
 	// Callback function to define feature display from the properties received from the server
-	if (typeof options.displayProperties == 'function')
+	if (typeof options.receiveFeature == 'function')
 		source.on('featuresloadend', function(evt) {
 			for (let f in evt.features) {
+				// Optional tratment when receiving the feature
+				options.receiveFeature(
+					evt.features[f],
+					evt.features[f].getProperties(),
+					options
+				);
+
 				// These options will be displayed by the hover response
 				evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
+				//DCMM DELETE *********************************
+				//*DCMM*/{var _r=' ',_v=ol.extent.getArea(evt.features[f].getGeometry().getExtent());if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+
+
+				if (0) /*DCMM*/
+					if (ol.extent.getArea(evt.features[f].getGeometry().getExtent()))
+						evt.features[f] = new ol.Feature({
+							geometry: new ol.geom.Point(
+								ol.extent.getCenter(
+									evt.features[f].getGeometry().getExtent()
+								)
+							),
+						}); /*DCMM*/
+
+
+
 				// Add data to be used to display the feature
+				/*
 				evt.features[f].display = options.displayProperties(
 					evt.features[f].getProperties(),
 					evt.features[f],
 					options
 				);
+				*/
+				//DCMM DELETE *********************************
 			}
 		});
 
@@ -352,6 +375,30 @@ function layerVectorCluster(options) {
 				if (features.length == 1)
 					return features[0];
 
+				//if (0) /*DCMM*/
+				for (let f in features) {
+					var st = new ol.Feature({
+						geometry: new ol.geom.Point(
+							ol.extent.getCenter(
+								features[f].getGeometry().getExtent()
+							)
+						),
+					});
+
+					st.setStyle(new ol.style.Style({
+						image: new ol.style.Circle({
+							radius: 4,
+							stroke: new ol.style.Stroke({
+								color: 'red',
+								width: 2,
+							}),
+						}),
+					}));
+
+					clusterSource.addFeature(features[f]);
+					clusterSource.addFeature(st);
+				} /*DCMM*/
+
 				// Stay clustered
 				return new ol.Feature({
 					geometry: point,
@@ -394,16 +441,17 @@ function layerVectorCluster(options) {
 			clustered = false; // The server send clusters
 
 		if (features) {
-			for (let f in features) {
-				// Check if the server send clusters
-				if (features[f].display.cluster)
-					clustered = true;
+			// Check if the server send clusters
+			for (let f in features)
+				if (features[f].display) {
+					if (features[f].display.name)
+						names.push(features[f].display.name);
 
-				clusters += parseInt(features[f].display.cluster) || 1;
+					if (features[f].display.cluster)
+						clustered = true;
 
-				if (features[f].display.name)
-					names.push(features[f].display.name);
-			}
+					clusters += parseInt(features[f].display.cluster) || 1;
+				}
 
 			// Cluster labels
 			if (features.length > 1 || !names.length) {

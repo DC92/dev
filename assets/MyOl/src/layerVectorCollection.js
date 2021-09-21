@@ -32,8 +32,8 @@ function layerWri(options) {
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, feature, options) {
-			return {
+		receiveFeature: function(feature, properties, options) {
+			feature.display = {
 				name: properties.nom,
 				type: properties.type.valeur,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
@@ -54,8 +54,8 @@ function layerWriAreas(options) {
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
-		displayProperties: function(properties) {
-			return {
+		receiveFeature: function(feature, properties) {
+			feature.display = {
 				name: properties.nom,
 				url: properties.lien,
 			};
@@ -73,7 +73,7 @@ function layerWriAreas(options) {
  * Site chemineur.fr
  */
 //BEST min & max layer in the same function
-function layerGeoBBPoi(options) {
+function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
@@ -82,11 +82,11 @@ function layerGeoBBPoi(options) {
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, feature, options) {
+		receiveFeature: function(feature, properties, options) {
 			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
 			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			return properties;
+			feature.display = properties;
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -126,13 +126,13 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, feature, options) {
+		receiveFeature: function(feature, properties, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
 				properties.iconchem = match[1];
 
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			return properties;
+			feature.display = properties;
 		},
 		styleOptions: function(feature) {
 			return fillColorOption(feature.get('color'), 0.3);
@@ -156,7 +156,7 @@ function layerOSM(options) {
 			host: 'https://overpass-api.de/api/interpreter',
 			urlFunction: urlFunction,
 			format: format,
-			displayProperties: displayProperties,
+			receiveFeature: receiveFeature,
 		}, options)),
 		statusEl = document.getElementById(options.selectorName);
 
@@ -219,7 +219,7 @@ function layerOSM(options) {
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
-	function displayProperties(properties) {
+	function receiveFeature(feature, properties) {
 		if (options.symbols)
 			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
@@ -232,7 +232,7 @@ function layerOSM(options) {
 			properties.iconchem =
 			properties.sym = options.symbols[properties.type];
 
-		return properties;
+		feature.display = properties;
 	}
 
 	return layer;
@@ -245,9 +245,9 @@ function layerPyreneesRefuges(options) {
 	return layerVectorCluster(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
-		displayProperties: function(properties) {
+		receiveFeature: function(feature, properties) {
 			const types = properties.type_hebergement.split(' ');
-			return {
+			feature.display = {
 				name: properties.name,
 				type: properties.type_hebergement,
 				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
@@ -263,14 +263,18 @@ function layerPyreneesRefuges(options) {
  * Site camptocamp.org
  */
 function layerC2C(options) {
+	//TODO BUG dont work !!!
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
+
 	format.readFeatures = function(json, opts) {
 		const features = [],
 			objects = JSONparse(json);
+
 		for (let o in objects.documents) {
 			const properties = objects.documents[o];
+
 			features.push({
 				id: properties.document_id,
 				type: 'Feature',
