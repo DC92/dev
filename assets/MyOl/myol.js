@@ -722,46 +722,21 @@ function layerVector(opt) {
 		});
 
 	// Callback function to define feature display from the properties received from the server
-	if (typeof options.receiveFeature == 'function')
-		source.on('featuresloadend', function(evt) {
-			for (let f in evt.features) {
-				// Optional tratment when receiving the feature
-				options.receiveFeature(
-					evt.features[f],
-					evt.features[f].getProperties(),
-					options
-				);
+	source.on('featuresloadend', function(evt) {
+		for (let f in evt.features) {
+			// These options will be displayed by the hover response
+			evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
-				// These options will be displayed by the hover response
-				evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
-
-				//DCMM DELETE *********************************
-				//*DCMM*/{var _r=' ',_v=ol.extent.getArea(evt.features[f].getGeometry().getExtent());if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
-
-				if (0) /*DCMM*/
-					if (ol.extent.getArea(evt.features[f].getGeometry().getExtent()))
-						evt.features[f] = new ol.Feature({
-							geometry: new ol.geom.Point(
-								ol.extent.getCenter(
-									evt.features[f].getGeometry().getExtent()
-								)
-							),
-						}); /*DCMM*/
-
-
-
-				// Add data to be used to display the feature
-				/*
-				evt.features[f].display = options.displayProperties(
+			// Add data to be used to display the feature
+			evt.features[f].display = typeof options.displayProperties == 'function' ?
+				options.displayProperties(
 					evt.features[f].getProperties(),
 					evt.features[f],
 					options
-				);
-				*/
-				//DCMM DELETE *********************************
-			}
-		});
+				) :
+				evt.features[f].getProperties();
+		}
+	});
 
 	// Style callback function for the layer
 	function style(feature, resolution) {
@@ -953,30 +928,6 @@ function layerVectorCluster(options) {
 				if (features.length == 1)
 					return features[0];
 
-				//if (0) /*DCMM*/
-				for (let f in features) {
-					var st = new ol.Feature({
-						geometry: new ol.geom.Point(
-							ol.extent.getCenter(
-								features[f].getGeometry().getExtent()
-							)
-						),
-					});
-
-					st.setStyle(new ol.style.Style({
-						image: new ol.style.Circle({
-							radius: 4,
-							stroke: new ol.style.Stroke({
-								color: 'red',
-								width: 2,
-							}),
-						}),
-					}));
-
-					clusterSource.addFeature(features[f]);
-					clusterSource.addFeature(st);
-				} /*DCMM*/
-
 				// Stay clustered
 				return new ol.Feature({
 					geometry: point,
@@ -1019,8 +970,8 @@ function layerVectorCluster(options) {
 			clustered = false; // The server send clusters
 
 		if (features) {
-			// Check if the server send clusters
 			for (let f in features)
+				// Check if the server send clusters
 				if (features[f].display) {
 					if (features[f].display.name)
 						names.push(features[f].display.name);
@@ -1181,8 +1132,8 @@ function layerWri(options) {
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
-		receiveFeature: function(feature, properties, options) {
-			feature.display = {
+		displayProperties: function(properties, feature, options) {
+			return {
 				name: properties.nom,
 				type: properties.type.valeur,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
@@ -1203,8 +1154,8 @@ function layerWriAreas(options) {
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
-		receiveFeature: function(feature, properties) {
-			feature.display = {
+		displayProperties: function(properties) {
+			return {
 				name: properties.nom,
 				url: properties.lien,
 			};
@@ -1231,11 +1182,11 @@ function layerGeoBB(options) {
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		receiveFeature: function(feature, properties, options) {
+		displayProperties: function(properties, feature, options) {
 			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
 			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			feature.display = properties;
+			return properties;
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -1275,13 +1226,13 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		receiveFeature: function(feature, properties, options) {
+		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
 				properties.iconchem = match[1];
 
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			feature.display = properties;
+			return properties;
 		},
 		styleOptions: function(feature) {
 			return fillColorOption(feature.get('color'), 0.3);
@@ -1305,7 +1256,7 @@ function layerOSM(options) {
 			host: 'https://overpass-api.de/api/interpreter',
 			urlFunction: urlFunction,
 			format: format,
-			receiveFeature: receiveFeature,
+			displayProperties: displayProperties,
 		}, options)),
 		statusEl = document.getElementById(options.selectorName);
 
@@ -1368,7 +1319,7 @@ function layerOSM(options) {
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
-	function receiveFeature(feature, properties) {
+	function displayProperties(properties) {
 		if (options.symbols)
 			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
@@ -1381,7 +1332,7 @@ function layerOSM(options) {
 			properties.iconchem =
 			properties.sym = options.symbols[properties.type];
 
-		feature.display = properties;
+		return properties;
 	}
 
 	return layer;
@@ -1394,9 +1345,9 @@ function layerPyreneesRefuges(options) {
 	return layerVectorCluster(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
-		receiveFeature: function(feature, properties) {
+		displayProperties: function(properties) {
 			const types = properties.type_hebergement.split(' ');
-			feature.display = {
+			return {
 				name: properties.name,
 				type: properties.type_hebergement,
 				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
@@ -1412,7 +1363,6 @@ function layerPyreneesRefuges(options) {
  * Site camptocamp.org
  */
 function layerC2C(options) {
-	//TODO BUG dont work !!!
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});

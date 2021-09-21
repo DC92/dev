@@ -15,7 +15,7 @@ var map = new ol.Map({
 			.concat(controlLayerSwitcher()),
 		layers: [
 			layerVectorCluster(
-				layerGeoBBPoi({
+				layerGeoBB({
 					host: '', // Relative adress
 					selectorName: 'geobb-features',
 					maxResolution: 100,

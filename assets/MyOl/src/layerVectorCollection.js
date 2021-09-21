@@ -32,8 +32,8 @@ function layerWri(options) {
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
-		receiveFeature: function(feature, properties, options) {
-			feature.display = {
+		displayProperties: function(properties, feature, options) {
+			return {
 				name: properties.nom,
 				type: properties.type.valeur,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
@@ -54,8 +54,8 @@ function layerWriAreas(options) {
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
-		receiveFeature: function(feature, properties) {
-			feature.display = {
+		displayProperties: function(properties) {
+			return {
 				name: properties.nom,
 				url: properties.lien,
 			};
@@ -82,11 +82,11 @@ function layerGeoBB(options) {
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		receiveFeature: function(feature, properties, options) {
+		displayProperties: function(properties, feature, options) {
 			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
 			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			feature.display = properties;
+			return properties;
 		},
 		styleOptions: {
 			stroke: new ol.style.Stroke({
@@ -126,13 +126,13 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		receiveFeature: function(feature, properties, options) {
+		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
 				properties.iconchem = match[1];
 
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			feature.display = properties;
+			return properties;
 		},
 		styleOptions: function(feature) {
 			return fillColorOption(feature.get('color'), 0.3);
@@ -156,7 +156,7 @@ function layerOSM(options) {
 			host: 'https://overpass-api.de/api/interpreter',
 			urlFunction: urlFunction,
 			format: format,
-			receiveFeature: receiveFeature,
+			displayProperties: displayProperties,
 		}, options)),
 		statusEl = document.getElementById(options.selectorName);
 
@@ -219,7 +219,7 @@ function layerOSM(options) {
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
-	function receiveFeature(feature, properties) {
+	function displayProperties(properties) {
 		if (options.symbols)
 			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
@@ -232,7 +232,7 @@ function layerOSM(options) {
 			properties.iconchem =
 			properties.sym = options.symbols[properties.type];
 
-		feature.display = properties;
+		return properties;
 	}
 
 	return layer;
@@ -245,9 +245,9 @@ function layerPyreneesRefuges(options) {
 	return layerVectorCluster(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
-		receiveFeature: function(feature, properties) {
+		displayProperties: function(properties) {
 			const types = properties.type_hebergement.split(' ');
-			feature.display = {
+			return {
 				name: properties.name,
 				type: properties.type_hebergement,
 				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
@@ -263,7 +263,6 @@ function layerPyreneesRefuges(options) {
  * Site camptocamp.org
  */
 function layerC2C(options) {
-	//TODO BUG dont work !!!
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
