@@ -1136,9 +1136,10 @@ function fillColorOption(hexColor, transparency) {
 function layerWri(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
+		nb_points: 'all',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'api/bbox' +
-				'?nb_points=all' +
+				'?nb_points=' + options.nb_points +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
@@ -1227,6 +1228,7 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
+	//TODO BUG dédouble les points
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {

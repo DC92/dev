@@ -1,6 +1,5 @@
 map.addLayer(layerWri({
 	selectorName: 'wri-features',
-	maxResolution: 300,
 	distance: 50,
 }));
 map.addLayer(layerPyreneesRefuges({
