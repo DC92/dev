@@ -38,7 +38,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 //TODO BUG I.E. SCRIPT5022: IndexSizeError
 //TODO BUG battement si trop d'icônes
-//TODO BUG trace n'est pas visible en cluster (distance : sur toute la ligne ?)
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -336,26 +335,8 @@ function layerVectorCluster(options) {
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			distance: options.distance,
-			// Generate a center point to manage clusterisations
-			geometryFunction: function(feature) {
-				return new ol.geom.Point(
-					ol.extent.getCenter(
-						feature.getGeometry().getExtent()
-					)
-				);
-			},
-			// Generate the features to render the cluster
-			createCluster: function(point, features) {
-				// Single feature : display it
-				if (features.length == 1)
-					return features[0];
-
-				// Stay clustered
-				return new ol.Feature({
-					geometry: point,
-					features: features
-				});
-			},
+			geometryFunction: geometryFunction,
+			createCluster: createCluster,
 		}),
 
 		// Clusterized layer
@@ -382,6 +363,35 @@ function layerVectorCluster(options) {
 
 		previousResolution = resolution;
 	});
+
+	// Generate a center point to manage clusterisations
+	function geometryFunction(feature) {
+		const extent = feature.getGeometry().getExtent(),
+			pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
+
+		if (pixelSemiPerimeter > 200)
+			// Don't cluster lines or polygons whose the 1/2 perimeter is more than 200 pixels
+			clusterSource.addFeature(feature);
+		else
+			return new ol.geom.Point(
+				ol.extent.getCenter(
+					feature.getGeometry().getExtent()
+				)
+			);
+	}
+
+	// Generate the features to render the cluster
+	function createCluster(point, features) {
+		// Single feature : display it
+		if (features.length == 1)
+			return features[0];
+
+		// Stay clustered
+		return new ol.Feature({
+			geometry: point,
+			features: features
+		});
+	}
 
 	// Style callback function for the layer
 	function clusterStyle(feature, resolution) {
