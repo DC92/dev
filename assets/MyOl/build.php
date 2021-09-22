@@ -1,5 +1,6 @@
+<title>Build distribution files</title>
 <a style="float:right;margin-right:15px" href=".">HOME</a>
-<h1>Building distribution files</h1>
+<h1>Build distribution files</h1>
 
 <?php
 $js = $css = ["/** OPENLAYERS ADAPTATION

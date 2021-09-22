@@ -1,14 +1,12 @@
-map.addLayer(layerVectorCluster(
-	layerWri({
-		selectorName: 'wri-features',
-		maxResolution: 300,
-	})
-));
-map.addLayer(layerVectorCluster(
-	layerPyreneesRefuges({
-		selectorName: 'prc-features',
-	})
-));
+map.addLayer(layerWri({
+	selectorName: 'wri-features',
+	maxResolution: 300,
+	distance: 50,
+}));
+map.addLayer(layerPyreneesRefuges({
+	selectorName: 'prc-features',
+	distance: 50,
+}));
 map.addLayer(layerAlpages({
 	selectorName: 'alp-features',
 }));

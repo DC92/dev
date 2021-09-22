@@ -208,7 +208,9 @@
 	margin: 0;
 }
 .ol-control-switcher-open {
-	max-height: 100%;
+	position: absolute;
+	right: 0;
+	max-height: 98%;
 	overflow: auto;
 }
 .ol-control-switcher div {

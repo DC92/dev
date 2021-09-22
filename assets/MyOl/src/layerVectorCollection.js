@@ -126,6 +126,7 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
+		distance: 50,
 		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)

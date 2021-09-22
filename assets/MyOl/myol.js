@@ -676,7 +676,6 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			declutter: true, // Force polygons labels to display when don't cover others
 		}, options)),
 
 		statusEl = document.getElementById(options.selectorName);
@@ -1236,6 +1235,7 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
+		distance: 50,
 		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)

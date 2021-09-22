@@ -98,7 +98,6 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			declutter: true, // Force polygons labels to display when don't cover others
 		}, options)),
 
 		statusEl = document.getElementById(options.selectorName);

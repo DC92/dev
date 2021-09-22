@@ -14,22 +14,18 @@ var map = new ol.Map({
 		controls: controlsCollection(typeof controlOptions == 'object' ? controlOptions : {})
 			.concat(controlLayerSwitcher()),
 		layers: [
-			layerVectorCluster(
-				layerGeoBB({
-					host: '', // Relative adress
-					selectorName: 'geobb-features',
-					maxResolution: 100,
-					distance: 50,
-				})
-			),
-			layerVectorCluster(
-				layerGeoBBCluster({
-					host: '',
-					selectorName: 'geobb-features',
-					minResolution: 100,
-					distance: 50,
-				})
-			),
+			layerGeoBB({
+				host: '', // Relative adress
+				selectorName: 'geobb-features',
+				maxResolution: 100,
+				distance: 50,
+			}),
+			layerGeoBBCluster({
+				host: '',
+				selectorName: 'geobb-features',
+				minResolution: 100,
+				distance: 50,
+			}),
 		],
 	}),
 
