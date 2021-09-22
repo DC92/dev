@@ -621,6 +621,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
+			declutter: true,
 		}, opt),
 
 		// Yellow label
@@ -642,7 +643,6 @@ function layerVector(opt) {
 		defaultHoverStyleOptions = {
 			hover: true, // Select label | hover as text to be display
 			textOptions: {
-				overflow: true, // Force label display of little polygons when hovering
 				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
 				}),
@@ -920,6 +920,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
+			declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
@@ -1159,7 +1160,6 @@ function layerWriAreas(options) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
-		declutter: true,
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},

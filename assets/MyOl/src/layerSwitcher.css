@@ -38,6 +38,10 @@
 	padding: 0;
 	list-style-type: none;
 }
+#additional-selector p {
+	margin: 0;
+	color: red;
+}
 #additional-selector hr {
 	border-color: black;
 }
