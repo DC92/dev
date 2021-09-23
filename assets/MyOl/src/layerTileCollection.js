@@ -53,12 +53,11 @@ function layerKompass(layer) {
  * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(layer) {
-	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.thunderforest ?
-		null :
+	return typeof mapKeys == 'object' && mapKeys.thunderforest ?
 		layerOsm(
 			'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
-		);
+		) : null;
 }
 
 /**
@@ -90,19 +89,19 @@ function layerStamen(layer) {
  * Doc on http://api.ign.fr
  * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user fot others than IGN V2 & photo
  */
-function layerIGN(layer, format, key) {
+function layerIGN(layer, format) {
 	let IGNresolutions = [],
 		IGNmatrixIds = [];
+
 	for (let i = 0; i < 18; i++) {
 		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 		IGNmatrixIds[i] = i.toString();
 	}
-	return (typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.ign) &&
-		(typeof key === 'undefined' || !key) ?
-		null : // Don't display that one
+
+	return typeof mapKeys == 'object' && mapKeys.ign ?
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
-				url: '//wxs.ign.fr/' + (key || mapKeys.ign) + '/wmts',
+				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
 				layer: layer,
 				matrixSet: 'PM',
 				format: 'image/' + (format || 'jpeg'),
@@ -114,85 +113,34 @@ function layerIGN(layer, format, key) {
 				style: 'normal',
 				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
 			})
-		});
-}
-
-/**
- * Layers with not all resolutions or area available
- * Virtual class
- * Display Stamen outside the layer zoom range or extend
- * Requires myol:onadd
- */
-//BEST document all options in options = Object.assign
-//BEST ?? use minResolution / maxResolution
-function layerTileIncomplete(options) {
-	const layer = options.extraLayer || layerStamen('terrain');
-	options.sources[999999] = layer.getSource(); // Add extrabound source on the top of the list
-
-	//HACK : Avoid to call the layer initiator if this layer is not required
-	if (typeof options.addSources == 'function')
-		layer.on('change:opacity', function() {
-			if (layer.getOpacity())
-				options.sources = Object.assign(
-					options.sources,
-					options.addSources()
-				);
-		});
-
-	layer.once('myol:onadd', function(evt) {
-		evt.map.on('moveend', change);
-		evt.map.getView().on('change:resolution', change);
-		change(); // At init
-	});
-
-	function change() {
-		if (layer.getOpacity()) {
-			const view = layer.map_.getView();
-			let currentResolution = 999999; // Init loop at max resolution
-
-			// Search for sources according to the map resolution
-			if (ol.extent.intersects(options.extent, view.calculateExtent(layer.map_.getSize())))
-				currentResolution = Object.keys(options.sources).filter(function(evt) { //HACK : use of filter to perform an action
-					return evt > view.getResolution();
-				})[0];
-
-			// Update layer if necessary
-			if (layer.getSource() != options.sources[currentResolution])
-				layer.setSource(options.sources[currentResolution]);
-		}
-	}
-
-	return layer;
+		}) : null;
 }
 
 /**
  * Swisstopo https://api.geo.admin.ch/
- * Requires layerTileIncomplete
  */
-function layerSwissTopo(layer, extraLayer) {
-	const projectionExtent = ol.proj.get('EPSG:3857').getExtent();
-	let resolutions = [],
+function layerSwissTopo(layer1) {
+	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
+		resolutions = [],
 		matrixIds = [];
+
 	for (let r = 0; r < 18; ++r) {
 		resolutions[r] = ol.extent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
 		matrixIds[r] = r;
 	}
-	return layerTileIncomplete({
-		extraLayer: extraLayer,
-		extent: [664577, 5753148, 1167741, 6075303], // EPSG:21781 (Swiss CH1903 / LV03)
-		sources: {
-			500: new ol.source.WMTS(({
-				crossOrigin: 'anonymous',
-				url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-				tileGrid: new ol.tilegrid.WMTS({
-					origin: ol.extent.getTopLeft(projectionExtent),
-					resolutions: resolutions,
-					matrixIds: matrixIds,
-				}),
-				requestEncoding: 'REST',
-				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
-			}))
-		},
+
+	return new ol.layer.Tile({
+		source: new ol.source.WMTS(({
+			crossOrigin: 'anonymous',
+			url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer1 + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
+			tileGrid: new ol.tilegrid.WMTS({
+				origin: ol.extent.getTopLeft(projectionExtent),
+				resolutions: resolutions,
+				matrixIds: matrixIds,
+			}),
+			requestEncoding: 'REST',
+			attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
+		})),
 	});
 }
 
@@ -200,66 +148,28 @@ function layerSwissTopo(layer, extraLayer) {
  * Spain
  */
 function layerSpain(serveur, layer) {
-	return layerTileIncomplete({
-		//extraLayer: extraLayer,
-		extent: [-1036000, 4300000, 482000, 5434000],
-		sources: {
-			1000: new ol.source.XYZ({
-				url: '//www.ign.es/wmts/' + serveur + '?layer=' + layer +
-					'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
-					'&style=default&tilematrixset=GoogleMapsCompatible' +
-					'&TileMatrix={z}&TileCol={x}&TileRow={y}',
-				attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
-			})
-		},
-	});
-}
-
-/**
- * Italy IGM
- * Requires layerTileIncomplete
- */
-function layerIGM() {
-	function igmSource(url, layer) {
-		return new ol.source.TileWMS({
-			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
-			params: {
-				layers: layer,
-			},
-			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
-		});
-	}
-	return layerTileIncomplete({
-		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
-		sources: {
-			100: igmSource('IGM_250000', 'CB.IGM250000'),
-			25: igmSource('IGM_100000', 'MB.IGM100000'),
-			5: igmSource('IGM_25000', 'CB.IGM25000'),
-		},
+	return new ol.layer.Tile({
+		source: new ol.source.XYZ({
+			url: '//www.ign.es/wmts/' + serveur + '?layer=' + layer +
+				'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
+				'&style=default&tilematrixset=GoogleMapsCompatible' +
+				'&TileMatrix={z}&TileCol={x}&TileRow={y}',
+			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
+		}),
 	});
 }
 
 /**
  * Ordnance Survey : Great Britain
- * Requires layerTileIncomplete
- * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
+ * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
-function layerOS() {
-	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.bing ?
-		null :
-		layerTileIncomplete({
-			extent: [-841575, 6439351, 198148, 8589177], // EPSG:27700 (G.B.)
-			sources: {},
-
-			addSources: function() {
-				return {
-					50: new ol.source.BingMaps({
-						imagerySet: 'OrdnanceSurvey',
-						key: mapKeys.bing,
-					})
-				};
-			},
-		});
+function layerOS(subLayer) {
+	return typeof mapKeys == 'object' && mapKeys.os ?
+		new ol.layer.Tile({
+			source: new ol.source.XYZ({
+				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer + '/{z}/{x}/{y}.png?key=' + mapKeys.os,
+			})
+		}) : null;
 }
 
 /**
@@ -270,15 +180,16 @@ function layerBing(subLayer) {
 	const layer = new ol.layer.Tile();
 
 	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.on('change:opacity', function() {
-		if (layer.getVisible() && !layer.getSource()) {
+	layer.on('change:visible', function() {
+		if (!layer.getSource()) {
 			layer.setSource(new ol.source.BingMaps({
 				imagerySet: subLayer,
 				key: mapKeys.bing,
 			}));
 		}
 	});
-	return typeof mapKeys === 'undefined' || !mapKeys || !mapKeys.bing ? null : layer;
+
+	return typeof mapKeys == 'object' && mapKeys.bing ? layer : null;
 }
 
 /**
@@ -298,7 +209,7 @@ function layersCollection() {
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
-		'Angleterre': layerOS(),
+		'Angleterre': layerOS('Outdoor_3857'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 	};
@@ -317,12 +228,14 @@ function layersDemo() {
 		'OSM villes': layerThunderforest('neighbourhood'),
 		'OSM contraste': layerThunderforest('mobile-atlas'),
 
-		'Italie': layerIGM(),
+		'os light': layerOS('Light_3857'),
+		'os road': layerOS('Road_3857'),
 		'Kompas': layerKompass('KOMPASS'),
 
 		'Bing': layerBing('Road'),
 		'Bing photo': layerBing('Aerial'),
 		'Bing hybrid': layerBing('AerialWithLabels'),
+
 		'Google road': layerGoogle('m'),
 		'Google terrain': layerGoogle('p'),
 		'Google hybrid': layerGoogle('s,h'),
@@ -334,7 +247,6 @@ function layersDemo() {
 		// Need an IGN key
 		'IGN Classique': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.CLASSIQUE'),
 		'IGN Standard': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
-		//403 'IGN Spot': layerIGN('ORTHOIMAGERY.ORTHO-SAT.SPOT.2017', 'png'),
 		//Double 	'SCAN25TOUR': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
 		'IGN 1950': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
 		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN('CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
@@ -350,7 +262,6 @@ function layersDemo() {
 		//Le style normal n'est pas geré 'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
 		//Le style normal n'est pas geré 'PN': layerIGN('PROTECTEDAREAS.PN', 'png'),
 		'PNR': layerIGN('PROTECTEDAREAS.PNR', 'png'),
-		//403 'Avalanches': layerIGN('IGN avalanches', GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN'),
 		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 		'ETATMAJOR10': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
 	});
