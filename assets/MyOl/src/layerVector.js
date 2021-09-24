@@ -417,7 +417,7 @@ function layerVectorCluster(options) {
 			// Cluster labels
 			if (features.length > 1 || !names.length) {
 				// Big cluster
-				if (clusters > 5)
+				if (clusters > 7)
 					names = []; // Don't display big list
 
 				// Clusters

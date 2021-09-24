@@ -908,7 +908,7 @@ function layerVectorCluster(options) {
 			// Cluster labels
 			if (features.length > 1 || !names.length) {
 				// Big cluster
-				if (clusters > 5)
+				if (clusters > 7)
 					names = []; // Don't display big list
 
 				// Clusters
@@ -1135,6 +1135,11 @@ function layerGeoBBCluster(options) {
 				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=1000000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
+		displayProperties: function(properties, feature, options) {
+			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
+			return properties;
+		},
 	}, options));
 }
 
@@ -1151,7 +1156,6 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		distance: 50,
 		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
