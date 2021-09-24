@@ -72,7 +72,6 @@ Based on https://openlayers.org
 	}' />
 
 	<script>
-//TODO BUG sur demo editor : GET http://chemineur.fr/ext/Dominique92/GeoBB/icones/undefined.png 404 (Not Found)
 const snaplayer = new ol.layer.Vector({
 		source: new ol.source.Vector({
 			url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
@@ -84,7 +83,7 @@ const snaplayer = new ol.layer.Vector({
 	}),
 
 	editor = layerEditGeoJson({
-		//TODO généralilser les aides / traduction
+		//BEST généralilser les aides / traduction
 		geoJsonId: 'geojson',
 		snapLayers: [snaplayer],
 		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +

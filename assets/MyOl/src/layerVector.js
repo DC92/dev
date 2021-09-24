@@ -43,7 +43,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			declutter: true, //TODO BUG empêche aussi l'icone !!!
+			declutter: true, //TODO++ BUG empêche aussi l'icone !!!
 		}, opt),
 
 		// Yellow label
@@ -256,7 +256,7 @@ function layerVector(opt) {
 
 		map.hoverLayer = new ol.layer.Vector({
 			source: hoverSource,
-			zIndex: 2000, // Above the features //TODO BUG don't work
+			zIndex: 2000, // Above the features //TODO+ BUG don't work
 			style: function(feature, resolution) {
 				return displayStyle(feature, resolution, [
 					defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions

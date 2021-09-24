@@ -1,4 +1,8 @@
-//TODO CLEAN all GPS files
+//TODO+ test GPS
+//TODO+ test GPS chemineur
+//TODO+ test GPS WRI
+//TODO+ test GPS gps.c92.fr
+//BEST CLEAN all GPS files
 
 /** PWA area */
 // Force https to allow web apps and geolocation

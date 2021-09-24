@@ -70,7 +70,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		// Attach html additional selector
 		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
 
-		//TODO other id don't use the css
+		//BEST other id don't use the css
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration

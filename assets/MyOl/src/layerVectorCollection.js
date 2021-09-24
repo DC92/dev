@@ -124,7 +124,7 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO BUG dédouble les points
+	//TODO+ BUG dédouble les points
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -133,6 +133,7 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
+		//distance: 30, //TODO+ BUG dédouble les points
 		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)

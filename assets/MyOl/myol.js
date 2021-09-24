@@ -418,7 +418,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		// Attach html additional selector
 		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
 
-		//TODO other id don't use the css
+		//BEST other id don't use the css
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration
@@ -534,7 +534,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			declutter: true, //TODO BUG empêche aussi l'icone !!!
+			declutter: true, //TODO++ BUG empêche aussi l'icone !!!
 		}, opt),
 
 		// Yellow label
@@ -747,7 +747,7 @@ function layerVector(opt) {
 
 		map.hoverLayer = new ol.layer.Vector({
 			source: hoverSource,
-			zIndex: 2000, // Above the features //TODO BUG don't work
+			zIndex: 2000, // Above the features //TODO+ BUG don't work
 			style: function(feature, resolution) {
 				return displayStyle(feature, resolution, [
 					defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions
@@ -1148,7 +1148,7 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO BUG dédouble les points
+	//TODO+ BUG dédouble les points
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -1157,6 +1157,7 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
+		//distance: 30, //TODO+ BUG dédouble les points
 		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
@@ -1626,8 +1627,8 @@ function controlFullScreen(options) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG control 1px down on FireFox
-//TODO BUG pas de loupe (return sera pris par phpBB)
+//BEST BUG control 1px down on FireFox
+//TODO+ BUG pas de loupe (return sera pris par phpBB)
 //TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
