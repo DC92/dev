@@ -289,8 +289,9 @@ function controlFullScreen(options) {
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
 //BEST BUG control 1px down on FireFox
+//BEST BUG I.E. No Internet connexion
+//BEST BUG I.E. L’objet ne gère pas la propriété ou la méthode « remove
 //TODO+ BUG pas de loupe (return sera pris par phpBB)
-//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',

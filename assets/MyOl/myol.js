@@ -131,7 +131,7 @@ function layerKompass(subLayer) {
  * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(subLayer) {
-	return typeof mapKeys == 'object' && mapKeys.thunderforest ?
+	return typeof mapKeys == 'object' && mapKeys && mapKeys.thunderforest ?
 		layerOsm(
 			'//{a-c}.tile.thunderforest.com/' + subLayer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
@@ -176,7 +176,7 @@ function layerIGN(subLayer, format) {
 		IGNmatrixIds[i] = i.toString();
 	}
 
-	return typeof mapKeys == 'object' && mapKeys.ign ?
+	return typeof mapKeys == 'object' && mapKeys && mapKeys.ign ?
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
 				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
@@ -244,7 +244,7 @@ function layerSpain(server, subLayer) {
  */
 function layerOS(subLayer) {
 	//TODO carte stamen hors zoom ou extent
-	return typeof mapKeys == 'object' && mapKeys.os ?
+	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ?
 		new ol.layer.Tile({
 			source: new ol.source.XYZ({
 				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer + '/{z}/{x}/{y}.png?key=' + mapKeys.os,
@@ -527,8 +527,8 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 //TODO BUG battement si trop d'icônes
+//TODO BUG pas d'icônes dans I.E.
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -1628,8 +1628,9 @@ function controlFullScreen(options) {
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
 //BEST BUG control 1px down on FireFox
+//BEST BUG I.E. No Internet connexion
+//BEST BUG I.E. L’objet ne gère pas la propriété ou la méthode « remove
 //TODO+ BUG pas de loupe (return sera pris par phpBB)
-//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
