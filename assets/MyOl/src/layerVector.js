@@ -43,7 +43,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			declutter: true,
+			declutter: true, //TODO BUG empêche aussi l'icone !!!
 		}, opt),
 
 		// Yellow label
@@ -216,9 +216,10 @@ function layerVector(opt) {
 					hover.push(subHover.join(', '));
 				if (feature.display.name)
 					hover.push(feature.display.name);
+				//TODO attribution
 			}
 
-			elLabel.innerHTML = //HACK to render the html entities in canvas
+			elLabel.innerHTML = //HACK to render the html entities in the canvas
 				(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
 				hover.join('\n') ||
 				feature.display.name ||
@@ -255,7 +256,7 @@ function layerVector(opt) {
 
 		map.hoverLayer = new ol.layer.Vector({
 			source: hoverSource,
-			zIndex: 2, // Above the features
+			zIndex: 2000, // Above the features //TODO BUG don't work
 			style: function(feature, resolution) {
 				return displayStyle(feature, resolution, [
 					defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions

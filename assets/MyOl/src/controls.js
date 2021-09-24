@@ -531,6 +531,7 @@ function controlLoadGPX(options) {
 					style: function(feature) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
+								//TODO voir les ref sym
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 							}),
 							stroke: new ol.style.Stroke({

@@ -74,18 +74,17 @@ function layerWriAreas(options) {
  */
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
-	//TODO régler les paramètres pour avoir plus de densité de pictos / clusters
 	return layerVectorCluster(Object.assign({
 		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?layer=simple&' +
+				'ext/Dominique92/GeoBB/gis.php?layer=simple&limit=10000&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, feature, options) {
-			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
-			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			if (properties.type)
+				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},
@@ -109,11 +108,12 @@ function layerGeoBBCluster(options) {
 		host: '//chemineur.fr/',
 		urlFunction: function url(options, bbox, selection) {
 			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=1000000' +
+				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=10000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 		displayProperties: function(properties, feature, options) {
-			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			if (properties.type)
+				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},

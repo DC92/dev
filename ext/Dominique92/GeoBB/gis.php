@@ -43,7 +43,7 @@ if (0) {
 		WHERE geom IS NOT NULL
 	";
 	$clusters_by_degree = 10; // clusters by ° lon lat
-	$result = $db->sql_query_limit($sql, 10000000);
+	$result = $db->sql_query($sql);
 	while ($row = $db->sql_fetchrow($result)) {
 		$geocenter = json_decode ($row['geocenter'])->coordinates;
 		$geo_cluster =
@@ -150,7 +150,6 @@ $url_base = $request_scheme[0].'://'.getenv('SERVER_NAME').$request_uri[0].'/';
 $data = $features = $signatures = [];
 while ($row = $db->sql_fetchrow($result)) {
 	$properties = [
-		'type' => $row['forum_name'],
 		'name' => $row['post_subject'],
 		'id' => $row['topic_id'],
 		'alt' => str_replace('~', '', $row['geo_altitude']),

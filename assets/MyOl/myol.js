@@ -534,7 +534,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			declutter: true,
+			declutter: true, //TODO BUG empêche aussi l'icone !!!
 		}, opt),
 
 		// Yellow label
@@ -707,9 +707,10 @@ function layerVector(opt) {
 					hover.push(subHover.join(', '));
 				if (feature.display.name)
 					hover.push(feature.display.name);
+				//TODO attribution
 			}
 
-			elLabel.innerHTML = //HACK to render the html entities in canvas
+			elLabel.innerHTML = //HACK to render the html entities in the canvas
 				(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
 				hover.join('\n') ||
 				feature.display.name ||
@@ -746,7 +747,7 @@ function layerVector(opt) {
 
 		map.hoverLayer = new ol.layer.Vector({
 			source: hoverSource,
-			zIndex: 2, // Above the features
+			zIndex: 2000, // Above the features //TODO BUG don't work
 			style: function(feature, resolution) {
 				return displayStyle(feature, resolution, [
 					defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions
@@ -1097,18 +1098,17 @@ function layerWriAreas(options) {
  */
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
-	//TODO régler les paramètres pour avoir plus de densité de pictos / clusters
 	return layerVectorCluster(Object.assign({
 		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?layer=simple&' +
+				'ext/Dominique92/GeoBB/gis.php?layer=simple&limit=10000&' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, feature, options) {
-			//TODO https://chemineur.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg 404
-			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			if (properties.type)
+				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},
@@ -1132,11 +1132,12 @@ function layerGeoBBCluster(options) {
 		host: '//chemineur.fr/',
 		urlFunction: function url(options, bbox, selection) {
 			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=1000000' +
+				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=10000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
 		displayProperties: function(properties, feature, options) {
-			properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
+			if (properties.type)
+				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},
@@ -1868,6 +1869,7 @@ function controlLoadGPX(options) {
 					style: function(feature) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
+								//TODO voir les ref sym
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 							}),
 							stroke: new ol.style.Stroke({

@@ -18,13 +18,13 @@ var map = new ol.Map({
 				host: '', // Relative adress
 				selectorName: 'geobb-features',
 				maxResolution: 100,
-				distance: 25,
+				distance: 30,
 			}),
 			layerGeoBBCluster({
 				host: '',
 				selectorName: 'geobb-features',
 				minResolution: 100,
-				distance: 25,
+				distance: 30,
 			}),
 		],
 	}),
