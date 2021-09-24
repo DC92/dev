@@ -145,16 +145,11 @@ body,
 		text-overflow: ellipsis;
 		max-width: 45%;
 	}
-}
-
-/* Carte */
-#container-map {
-	margin: 10px;
-}
-@media screen and (max-width: 600px) {
-	#container-map {
-		margin: 0 !important;
-		width: 100% !important;
+	/* Carte */
+	#map {
+		float: right;
+		height: 50vw !important;
+		width: 50vw !important;
 	}
 }
 

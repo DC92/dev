@@ -38,11 +38,11 @@ function layerOsmMri() {
  * Kompas (Austria)
  * Requires layerOsm
  */
-function layerKompass(layer) {
+function layerKompass(subLayer) {
 	return layerOsm(
 		//TODO BUG sur https://wri -> demande le lien https !
 		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
-		'Experience=ecmaps&MapStyle=' + layer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
+		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
 }
@@ -52,10 +52,10 @@ function layerKompass(layer) {
  * Requires layerOsm
  * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
-function layerThunderforest(layer) {
+function layerThunderforest(subLayer) {
 	return typeof mapKeys == 'object' && mapKeys.thunderforest ?
 		layerOsm(
-			'//{a-c}.tile.thunderforest.com/' + layer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
+			'//{a-c}.tile.thunderforest.com/' + subLayer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
 		) : null;
 }
@@ -63,10 +63,10 @@ function layerThunderforest(layer) {
 /**
  * Google
  */
-function layerGoogle(layer) {
+function layerGoogle(subLayer) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
-			url: '//mt{0-3}.google.com/vt/lyrs=' + layer + '&hl=fr&x={x}&y={y}&z={z}',
+			url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
 			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
 		})
 	});
@@ -76,10 +76,10 @@ function layerGoogle(layer) {
 /**
  * Stamen http://maps.stamen.com
  */
-function layerStamen(layer) {
+function layerStamen(subLayer) {
 	return new ol.layer.Tile({
 		source: new ol.source.Stamen({
-			layer: layer,
+			layer: subLayer,
 		})
 	});
 }
@@ -89,7 +89,7 @@ function layerStamen(layer) {
  * Doc on http://api.ign.fr
  * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user fot others than IGN V2 & photo
  */
-function layerIGN(layer, format) {
+function layerIGN(subLayer, format) {
 	let IGNresolutions = [],
 		IGNmatrixIds = [];
 
@@ -102,7 +102,7 @@ function layerIGN(layer, format) {
 		new ol.layer.Tile({
 			source: new ol.source.WMTS({
 				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
-				layer: layer,
+				layer: subLayer,
 				matrixSet: 'PM',
 				format: 'image/' + (format || 'jpeg'),
 				tileGrid: new ol.tilegrid.WMTS({
@@ -120,6 +120,7 @@ function layerIGN(layer, format) {
  * Swisstopo https://api.geo.admin.ch/
  */
 function layerSwissTopo(layer1) {
+	//TODO carte stamen hors zoom ou extent
 	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];
@@ -147,10 +148,10 @@ function layerSwissTopo(layer1) {
 /**
  * Spain
  */
-function layerSpain(serveur, layer) {
+function layerSpain(server, subLayer) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
-			url: '//www.ign.es/wmts/' + serveur + '?layer=' + layer +
+			url: '//www.ign.es/wmts/' + server + '?layer=' + subLayer +
 				'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
 				'&style=default&tilematrixset=GoogleMapsCompatible' +
 				'&TileMatrix={z}&TileCol={x}&TileRow={y}',
@@ -164,6 +165,7 @@ function layerSpain(serveur, layer) {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
+	//TODO carte stamen hors zoom ou extent
 	return typeof mapKeys == 'object' && mapKeys.os ?
 		new ol.layer.Tile({
 			source: new ol.source.XYZ({
@@ -204,7 +206,8 @@ function layersCollection() {
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
-		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the free layer key
+		// 'pratique' is the key for the free layer
+		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
@@ -249,7 +252,6 @@ function layersDemo() {
 		'IGN Standard': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'),
 		//Double 	'SCAN25TOUR': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR'),
 		'IGN 1950': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS.1950-1965', 'png'),
-		//Le style normal n'est pas geré	'Cadast.Exp': layerIGN('CADASTRALPARCELS.PARCELLAIRE_EXPRESS', 'png'),
 		'Cadastre': layerIGN('CADASTRALPARCELS.PARCELS', 'png'),
 		'IGN plan': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGN'),
 		'IGN route': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.ROUTIER'),
@@ -259,9 +261,7 @@ function layersDemo() {
 		'IGN forêt': layerIGN('LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN('ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
 
-		//Le style normal n'est pas geré 'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
-		//Le style normal n'est pas geré 'PN': layerIGN('PROTECTEDAREAS.PN', 'png'),
-		'PNR': layerIGN('PROTECTEDAREAS.PNR', 'png'),
+		'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
 		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
 		'ETATMAJOR10': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR10'),
 	});

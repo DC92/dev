@@ -74,6 +74,7 @@ function layerWriAreas(options) {
  */
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
+	//TODO régler les paramètres pour avoir plus de densité de pictos / clusters
 	return layerVectorCluster(Object.assign({
 		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
