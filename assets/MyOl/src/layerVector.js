@@ -36,7 +36,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO BUG I.E. SCRIPT5022: IndexSizeError
+//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 //TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({

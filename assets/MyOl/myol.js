@@ -198,7 +198,7 @@ function layerIGN(subLayer, format) {
  * Swisstopo https://api.geo.admin.ch/
  */
 function layerSwissTopo(layer1) {
-	//TODO carte stamen hors zoom ou extent
+	//TODO+ carte stamen hors zoom ou extent
 	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];
@@ -398,10 +398,8 @@ function controlLayerSwitcher(baseLayers, options) {
 		// Build html baselayers selectors
 		for (let name in baseLayers)
 			if (baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
-				const layer = baseLayers[name];
-
 				const selectionEl = document.createElement('div'),
-					inputId = 'l' + layer.ol_uid + (name ? '-' + name : '');
+					inputId = 'l' + baseLayers[name].ol_uid + (name ? '-' + name : '');
 
 				control.element.appendChild(selectionEl);
 				selectionEl.innerHTML =
@@ -409,19 +407,23 @@ function controlLayerSwitcher(baseLayers, options) {
 					'"id="' + inputId + '" value="' + name + '" ' + ' />' +
 					'<label for="' + inputId + '">' + name + '</label>';
 				selectionEl.firstChild.onclick = selectBaseLayer;
-				layer.inputEl = selectionEl.firstChild; // Mem it for further ops
+				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				layer.setVisible(false); // Don't begin to get the tiles yet
-				map.addLayer(layer);
+				baseLayers[name].setVisible(false); // Don't begin to get the tiles yet
+				map.addLayer(baseLayers[name]);
 			}
 
 		displayBaseLayers(); // Init layers
 
 		// Attach html additional selector
 		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
+
 		//TODO other id don't use the css
-		if (additionalSelector)
+		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
+			// Unmask the selector if it has been @ the declaration
+			additionalSelector.style.display = '';
+		}
 	};
 
 	function displayBaseLayers() {
@@ -525,7 +527,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO BUG I.E. SCRIPT5022: IndexSizeError
+//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 //TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
@@ -1068,7 +1070,7 @@ function layerWri(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO BUG hover label under others features labels
+	//TODO+ BUG hover label under others features labels
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
@@ -1621,7 +1623,7 @@ function controlFullScreen(options) {
  */
 //TODO BUG control 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
-//TODO BUG I.E. SCRIPT5022: IndexSizeError
+//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
@@ -1727,7 +1729,7 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		//TODO detecter aussi si on est sur un mobile
+		//TODO+ detecter aussi si on est sur un mobile
 		if (button.active && position && altitude) {
 			const map = button.getMap(),
 				// Estimate the viewport size
@@ -2139,7 +2141,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			//TODO zIndex: 2,
+			//TODO zIndex: 2, //TODO+ BUG cursor above the features !!!
 			style: escapedStyle(options.styleOptions),
 		}),
 		style = escapedStyle(options.styleOptions),
@@ -2165,7 +2167,7 @@ function layerEditGeoJson(options) {
 
 	// Set edit fields actions
 	//BEST do a specific layer for point position editing
-	//TODO BUG answer should stay in -180 +180 ° wrap
+	//BEST BUG answer should stay in -180 +180 ° wrap
 	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;

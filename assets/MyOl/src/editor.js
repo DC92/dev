@@ -72,7 +72,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			//TODO zIndex: 2,
+			//TODO zIndex: 2, //TODO+ BUG cursor above the features !!!
 			style: escapedStyle(options.styleOptions),
 		}),
 		style = escapedStyle(options.styleOptions),
@@ -98,7 +98,7 @@ function layerEditGeoJson(options) {
 
 	// Set edit fields actions
 	//BEST do a specific layer for point position editing
-	//TODO BUG answer should stay in -180 +180 ° wrap
+	//BEST BUG answer should stay in -180 +180 ° wrap
 	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;

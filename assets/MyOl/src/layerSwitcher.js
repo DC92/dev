@@ -50,10 +50,8 @@ function controlLayerSwitcher(baseLayers, options) {
 		// Build html baselayers selectors
 		for (let name in baseLayers)
 			if (baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
-				const layer = baseLayers[name];
-
 				const selectionEl = document.createElement('div'),
-					inputId = 'l' + layer.ol_uid + (name ? '-' + name : '');
+					inputId = 'l' + baseLayers[name].ol_uid + (name ? '-' + name : '');
 
 				control.element.appendChild(selectionEl);
 				selectionEl.innerHTML =
@@ -61,19 +59,23 @@ function controlLayerSwitcher(baseLayers, options) {
 					'"id="' + inputId + '" value="' + name + '" ' + ' />' +
 					'<label for="' + inputId + '">' + name + '</label>';
 				selectionEl.firstChild.onclick = selectBaseLayer;
-				layer.inputEl = selectionEl.firstChild; // Mem it for further ops
+				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				layer.setVisible(false); // Don't begin to get the tiles yet
-				map.addLayer(layer);
+				baseLayers[name].setVisible(false); // Don't begin to get the tiles yet
+				map.addLayer(baseLayers[name]);
 			}
 
 		displayBaseLayers(); // Init layers
 
 		// Attach html additional selector
 		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
+
 		//TODO other id don't use the css
-		if (additionalSelector)
+		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
+			// Unmask the selector if it has been @ the declaration
+			additionalSelector.style.display = '';
+		}
 	};
 
 	function displayBaseLayers() {

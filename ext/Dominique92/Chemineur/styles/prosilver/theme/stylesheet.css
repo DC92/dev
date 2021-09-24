@@ -12,7 +12,7 @@
 .headerspace,
 .section-posting input[name="preview"],
 .section-posting input[name="save"],
-#page-footer .navbar,
+#page-footer .navbar
 /* GeoBB */
 .section-viewtopic .edit-button {
 	display: none !important;
@@ -25,7 +25,6 @@ body,
 	border-radius: 0;
 	padding: 0;
 }
-/* //TODO chemineur responsive */
 
 /* Bandeau */
 .headerbar {

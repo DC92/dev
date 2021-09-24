@@ -55,7 +55,7 @@ if (0) {
 }
 
 // Features cluster managed at the server level
-//TODO BEST Cluster converti en suite de points si 1 ou 2
+//TODO+ BEST Cluster converti en suite de points si 1 ou 2
 
 if ($layer == 'cluster') {
 	$sql="

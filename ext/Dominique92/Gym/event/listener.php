@@ -423,11 +423,6 @@ youtube
 
 			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut le contenu d\'une url dans la page'],
 			['[redirect]{URL}[/redirect]','{URL}','Redirige la page vers l\'url'],
-
-			//TODO AFTER3 DELETE
-			['[accueil]{TEXT}[/accueil]','(resume){TEXT}(/resume)'],
-			['[actualite]{TEXT}[/actualite]','(resume){TEXT}(/resume)'],
-			['[presentation]{TEXT}[/presentation]','(resume){TEXT}(/resume)','Presentation pour affichage dans la rubrique'],
 		]);
 		*/
 	}

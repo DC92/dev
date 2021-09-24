@@ -290,7 +290,7 @@ function controlFullScreen(options) {
  */
 //TODO BUG control 1px down on FireFox
 //TODO BUG pas de loupe (return sera pris par phpBB)
-//TODO BUG I.E. SCRIPT5022: IndexSizeError
+//TODO+ BUG I.E. SCRIPT5022: IndexSizeError
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
@@ -396,7 +396,7 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		//TODO detecter aussi si on est sur un mobile
+		//TODO+ detecter aussi si on est sur un mobile
 		if (button.active && position && altitude) {
 			const map = button.getMap(),
 				// Estimate the viewport size

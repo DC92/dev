@@ -78,7 +78,7 @@ $alias = [
 	'waterfall' => 'pointdeau',
 	'weather_station' => 'a63',
 	'webcam' => 'a63',
-	/*//TODO manque
+	/*//BEST manque
 	refuges
 	parkings
 	WC -> yes

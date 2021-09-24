@@ -47,7 +47,7 @@ function layerWri(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO BUG hover label under others features labels
+	//TODO+ BUG hover label under others features labels
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
