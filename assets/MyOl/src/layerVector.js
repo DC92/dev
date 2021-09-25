@@ -37,7 +37,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * url: url to go if feature is clicked
  */
 //TODO BUG battement si trop d'icônes
-//TODO BUG pas d'icônes dans I.E.
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -200,6 +199,8 @@ function layerVector(opt) {
 				//TODO add <sym> for Garmin upload
 				styleOptions.image = new ol.style.Icon({
 					src: feature.display.icon,
+					imgSize: [24, 24], // I.E. compatibility
+					//TODO automatic detect
 				});
 
 			// Hover

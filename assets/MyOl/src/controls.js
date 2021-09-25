@@ -278,6 +278,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
+			//TODO I.E. L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};
@@ -534,6 +535,8 @@ function controlLoadGPX(options) {
 							image: new ol.style.Icon({
 								//TODO voir les ref sym
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
+								imgSize: [24, 24], // I.E. compatibility
+								//TODO automatic detect
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',

@@ -89,6 +89,7 @@ const cadre = layerEditGeoJson({
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: 'images/cadre.png',
+				imgSize: [31, 43], // I.E. compatibility
 			}),
 		},
 	}),
@@ -100,6 +101,7 @@ const cadre = layerEditGeoJson({
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: 'images/viseur.png',
+				imgSize: [30, 30], // I.E. compatibility
 			}),
 		},
 		// Remove FeatureCollection packing of the point
