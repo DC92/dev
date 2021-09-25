@@ -1,4 +1,4 @@
 https://openlayers.org/download/
-v6.7.0
+v6.8.0
 Add this line to avoid double loading with I.E.
-if(typeof ol=='undefined')//HACK to avoid double definition in I.E.
+if(typeof ol=='undefined')

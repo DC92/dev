@@ -48,6 +48,7 @@ function layerWri(options) {
 
 function layerWriAreas(options) {
 	//TODO+ BUG hover label under others features labels
+	//TODO+ too much labels at large zoom (missing declutter)
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
@@ -124,7 +125,7 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO+ BUG dédouble les points
+	//TODO BUG dédouble les points si cluster
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {

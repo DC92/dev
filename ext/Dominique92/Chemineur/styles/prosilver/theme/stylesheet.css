@@ -144,7 +144,7 @@ body,
 		text-overflow: ellipsis;
 		max-width: 45%;
 	}
-	/* Carte */
+
 	#map {
 		float: right;
 		height: 50vw !important;
@@ -197,6 +197,7 @@ body,
 }
 @media screen and (max-width: 600px) {
 	#etiquette {
+		float: none;
 		margin: 0 !important;
 		width: 100% !important;
 	}

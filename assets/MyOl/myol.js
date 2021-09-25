@@ -534,7 +534,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			declutter: true, //TODO++ BUG empêche aussi l'icone !!!
+			//TODO++ BUG empêche aussi l'icone !!! declutter: true,
 		}, opt),
 
 		// Yellow label
@@ -834,7 +834,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			declutter: true,
+			//6.8.0 BUG declutter declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
@@ -1072,6 +1072,7 @@ function layerWri(options) {
 
 function layerWriAreas(options) {
 	//TODO+ BUG hover label under others features labels
+	//TODO+ too much labels at large zoom (missing declutter)
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Type de polygone WRI
@@ -1148,7 +1149,7 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO+ BUG dédouble les points
+	//TODO BUG dédouble les points si cluster
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -1448,7 +1449,7 @@ function controlPermalink(options) {
 				';map=' + zoomMatch[1] + '/' + latLonMatch[2] + '/' + latLonMatch[1] :
 				'') +
 			document.cookie + // Then the cookie
-			';map=' + options.default + // Optional default
+			';map=' + options.mapDefault + // Optional default
 			';map=6/2/47') // General default
 		.match(/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // map=<ZOOM>/<LON>/<LAT>
 
@@ -2019,6 +2020,7 @@ function controlPrint() {
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
+		//TODO+ BUG : don't print full page
 		const map = button.getMap(),
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=print-orientation]:checked"),

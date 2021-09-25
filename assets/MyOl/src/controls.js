@@ -109,7 +109,7 @@ function controlPermalink(options) {
 				';map=' + zoomMatch[1] + '/' + latLonMatch[2] + '/' + latLonMatch[1] :
 				'') +
 			document.cookie + // Then the cookie
-			';map=' + options.default + // Optional default
+			';map=' + options.mapDefault + // Optional default
 			';map=6/2/47') // General default
 		.match(/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // map=<ZOOM>/<LON>/<LAT>
 
@@ -680,6 +680,7 @@ function controlPrint() {
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
+		//TODO+ BUG : don't print full page
 		const map = button.getMap(),
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=print-orientation]:checked"),

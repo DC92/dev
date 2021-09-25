@@ -43,7 +43,7 @@ function layerVector(opt) {
 			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			declutter: true, //TODO++ BUG empêche aussi l'icone !!!
+			//TODO++ BUG empêche aussi l'icone !!! declutter: true,
 		}, opt),
 
 		// Yellow label
@@ -343,7 +343,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			declutter: true,
+			//6.8.0 BUG declutter declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
