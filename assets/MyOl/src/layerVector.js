@@ -36,10 +36,9 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO BUG battement si trop d'icônes
+//TODO +BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
-			zIndex: 1, // Above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			//TODO++ BUG empêche aussi l'icone !!! declutter: true,
@@ -258,7 +257,6 @@ function layerVector(opt) {
 
 		map.hoverLayer = new ol.layer.Vector({
 			source: hoverSource,
-			zIndex: 2000, // Above the features //TODO+ BUG don't work
 			style: function(feature, resolution) {
 				return displayStyle(feature, resolution, [
 					defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions
@@ -344,7 +342,6 @@ function layerVectorCluster(options) {
 		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
-			zIndex: 1, // Above the base layer
 			//declutter declutter: true, //TODO BUG 6.8.0
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 

@@ -63,8 +63,11 @@ function layerEditGeoJson(options) {
 	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		displayPointEl = document.getElementById(options.displayPointId), // Pointer edit <input>
 		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {},
+
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		extent = ol.extent.createEmpty(), // For focus on all features calculation
+		style = escapedStyle(options.styleOptions),
+		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
+
 		features = options.readFeatures(),
 		source = new ol.source.Vector({
 			features: features,
@@ -72,11 +75,9 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			//zIndex: 2, //TODO+ BUG cursor above the features !!!
-			style: escapedStyle(options.styleOptions),
+			zIndex: 2, // Cursor above the features
+			style: style,
 		}),
-		style = escapedStyle(options.styleOptions),
-		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
 		snap = new ol.interaction.Snap({
 			source: source,
 			pixelTolerance: 7.5, // 6 + line width / 2 : default is 10
@@ -117,7 +118,9 @@ function layerEditGeoJson(options) {
 	let hoveredFeature = null;
 
 	layer.once('myol:onadd', function(evt) {
-		const map = evt.map;
+		const map = evt.map,
+			extent = ol.extent.createEmpty(); // For focus on all features calculation
+
 		optimiseEdited(); // Treat the geoJson input as any other edit
 
 		// Add required controls
