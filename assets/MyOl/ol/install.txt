@@ -1,4 +1,2 @@
 https://openlayers.org/download/
-v6.8.0
-Add this line to avoid double loading with I.E.
-if(typeof ol=='undefined')
+v6.8.1

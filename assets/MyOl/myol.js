@@ -369,6 +369,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
+	//BEST I.E. don't work
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -528,7 +529,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * url: url to go if feature is clicked
  */
 //TODO BUG battement si trop d'icônes
-//TODO BUG pas d'icônes dans I.E.
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -691,6 +691,8 @@ function layerVector(opt) {
 				//TODO add <sym> for Garmin upload
 				styleOptions.image = new ol.style.Icon({
 					src: feature.display.icon,
+					imgSize: [24, 24], // I.E. compatibility
+					//TODO automatic detect
 				});
 
 			// Hover
@@ -740,6 +742,7 @@ function layerVector(opt) {
 
 	let hoveredFeature;
 
+	//TODO+ label attached to the cursor (best for lines & polys)
 	function initHover(map) {
 		// Internal layer to temporary display the hovered feature
 		const view = map.getView(),
@@ -1618,6 +1621,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
+			//TODO I.E. L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};
@@ -1874,6 +1878,8 @@ function controlLoadGPX(options) {
 							image: new ol.style.Icon({
 								//TODO voir les ref sym
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
+								imgSize: [24, 24], // I.E. compatibility
+								//TODO automatic detect
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',

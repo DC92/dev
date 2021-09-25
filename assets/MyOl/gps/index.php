@@ -73,7 +73,6 @@ Based on https://openlayers.org
 
 	<!-- I.E. compatibility -->
 	<script nomodule src="../src/polyfill.js"></script>
-	<script nomodule src="../ol/ol661.js"></script>
 
 	<!-- Openlayers -->
 	<link href="<?=$myol_path?>ol/ol.css" type="text/css" rel="stylesheet">

@@ -250,6 +250,7 @@ function layerVector(opt) {
 
 	let hoveredFeature;
 
+	//TODO+ label attached to the cursor (best for lines & polys)
 	function initHover(map) {
 		// Internal layer to temporary display the hovered feature
 		const view = map.getView(),
