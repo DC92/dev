@@ -47,7 +47,6 @@ function layerWri(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO+ BUG hover label under others features labels
 	//TODO+ too much labels at large zoom (missing declutter)
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
