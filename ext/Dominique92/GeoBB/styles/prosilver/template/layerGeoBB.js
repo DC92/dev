@@ -40,6 +40,7 @@ var map = new ol.Map({
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.png',
+				imgSize: scriptName == 'viewtopic' ? [31, 43] : [30, 30], // I.E. compatibility
 			}),
 		},
 	});

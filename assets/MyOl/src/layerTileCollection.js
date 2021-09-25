@@ -165,7 +165,7 @@ function layerSpain(server, subLayer) {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
-	//TODO carte stamen hors zoom ou extent
+	//TODO+ carte stamen hors zoom ou extent
 	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ?
 		new ol.layer.Tile({
 			source: new ol.source.XYZ({

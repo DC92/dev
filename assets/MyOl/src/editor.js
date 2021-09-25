@@ -72,7 +72,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			//TODO zIndex: 2, //TODO+ BUG cursor above the features !!!
+			//zIndex: 2, //TODO+ BUG cursor above the features !!!
 			style: escapedStyle(options.styleOptions),
 		}),
 		style = escapedStyle(options.styleOptions),

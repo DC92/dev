@@ -536,7 +536,7 @@ function controlLoadGPX(options) {
 								//TODO voir les ref sym
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 								imgSize: [24, 24], // I.E. compatibility
-								//TODO automatic detect
+								//BEST automatic detect
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',

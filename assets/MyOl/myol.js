@@ -243,7 +243,7 @@ function layerSpain(server, subLayer) {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
-	//TODO carte stamen hors zoom ou extent
+	//TODO+ carte stamen hors zoom ou extent
 	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ?
 		new ol.layer.Tile({
 			source: new ol.source.XYZ({
@@ -692,7 +692,7 @@ function layerVector(opt) {
 				styleOptions.image = new ol.style.Icon({
 					src: feature.display.icon,
 					imgSize: [24, 24], // I.E. compatibility
-					//TODO automatic detect
+					//BEST automatic detect
 				});
 
 			// Hover
@@ -837,7 +837,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			//6.8.0 BUG declutter declutter: true,
+			//declutter declutter: true, //TODO BUG 6.8.0
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
@@ -1152,7 +1152,6 @@ function layerGeoBBCluster(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO BUG dédouble les points si cluster
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -1161,7 +1160,7 @@ function layerAlpages(options) {
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		//distance: 30, //TODO+ BUG dédouble les points
+		//distance: 30, //BEST BUG dédouble les points si cluster
 		displayProperties: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
@@ -1879,7 +1878,7 @@ function controlLoadGPX(options) {
 								//TODO voir les ref sym
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 								imgSize: [24, 24], // I.E. compatibility
-								//TODO automatic detect
+								//BEST automatic detect
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',
@@ -2157,7 +2156,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			//TODO zIndex: 2, //TODO+ BUG cursor above the features !!!
+			//zIndex: 2, //TODO+ BUG cursor above the features !!!
 			style: escapedStyle(options.styleOptions),
 		}),
 		style = escapedStyle(options.styleOptions),

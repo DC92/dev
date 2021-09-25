@@ -200,7 +200,7 @@ function layerVector(opt) {
 				styleOptions.image = new ol.style.Icon({
 					src: feature.display.icon,
 					imgSize: [24, 24], // I.E. compatibility
-					//TODO automatic detect
+					//BEST automatic detect
 				});
 
 			// Hover
@@ -345,7 +345,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			//6.8.0 BUG declutter declutter: true,
+			//declutter declutter: true, //TODO BUG 6.8.0
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
