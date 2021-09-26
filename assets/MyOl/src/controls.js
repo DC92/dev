@@ -2,6 +2,7 @@
  * Add some usefull controls
  * Need to include controls.css
  */
+//TODO+ Inhiber rotation carte 
 
 /**
  * Control button

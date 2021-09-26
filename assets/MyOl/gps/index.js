@@ -3,6 +3,7 @@
 //TODO+ test GPS WRI
 //TODO+ test GPS gps.c92.fr
 //BEST CLEAN all GPS files
+//TODO+ Pas de zoom page quand carte
 
 /** PWA area */
 // Force https to allow web apps and geolocation

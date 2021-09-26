@@ -36,7 +36,8 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO +BUG battement si trop d'icônes
+//TODO+ BUG battement si trop d'icônes
+//TODO+ BUG Pas de pictos Cluster dans le Vercors 
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer

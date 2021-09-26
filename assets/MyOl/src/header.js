@@ -1,3 +1,7 @@
+// Validators adapters
+/* jshint esversion: 6 */
+if (!ol) var ol = {};
+
 // I.E. polyfills
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
 
@@ -43,7 +47,7 @@ function JSONparse(json) {
 }
 
 //HACK warn layers when added to the map
-//BEST DELETE
+//BEST DELETE (used by editor)
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
 
@@ -58,7 +62,4 @@ ol.Map.prototype.handlePostRender = function() {
 			});
 		}
 	});
-
-	// Save the js object into the DOM
-	map.getTargetElement()._map = map;
 };

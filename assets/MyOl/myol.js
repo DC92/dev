@@ -8,6 +8,10 @@
  */
 
 /* FILE src/header.js */
+// Validators adapters
+/* jshint esversion: 6 */
+if (!ol) var ol = {};
+
 // I.E. polyfills
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
 
@@ -53,7 +57,7 @@ function JSONparse(json) {
 }
 
 //HACK warn layers when added to the map
-//BEST DELETE
+//BEST DELETE (used by editor)
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
 
@@ -68,9 +72,6 @@ ol.Map.prototype.handlePostRender = function() {
 			});
 		}
 	});
-
-	// Save the js object into the DOM
-	map.getTargetElement()._map = map;
 };
 
 /* FILE src/layerTileCollection.js */
@@ -526,7 +527,8 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
-//TODO +BUG battement si trop d'icônes
+//TODO+ BUG battement si trop d'icônes
+//TODO+ BUG Pas de pictos Cluster dans le Vercors 
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -1341,6 +1343,7 @@ function layerC2C(options) {
  * Add some usefull controls
  * Need to include controls.css
  */
+//TODO+ Inhiber rotation carte 
 
 /**
  * Control button
