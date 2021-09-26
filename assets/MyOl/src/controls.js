@@ -289,15 +289,13 @@ function controlFullScreen(options) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//BEST BUG control 1px down on FireFox
-//TODO+ BUG pas de loupe (return sera pris par phpBB)
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
 	}, options);
 
-	if (typeof Geocoder != 'function' && // Vérify if geocoder is available
-		!document.documentMode) // Not supported in I.E.
+	if (typeof Geocoder != 'function' || // Vérify if geocoder is available
+		document.documentMode) // Not supported in I.E.
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
 		});
@@ -305,6 +303,7 @@ function controlGeocoder(options) {
 	const geocoder = new Geocoder('nominatim', {
 		provider: 'osm',
 		lang: 'FR',
+		autoComplete: true,
 		keepOpen: true,
 		placeholder: options.title, // Initialization of the input field
 	});
