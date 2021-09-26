@@ -68,7 +68,7 @@ function layerGoogle(subLayer) {
 		source: new ol.source.XYZ({
 			url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
 			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
-		})
+		}),
 	});
 }
 //BEST lien vers GGstreet
@@ -80,7 +80,7 @@ function layerStamen(subLayer) {
 	return new ol.layer.Tile({
 		source: new ol.source.Stamen({
 			layer: subLayer,
-		})
+		}),
 	});
 }
 
@@ -112,7 +112,7 @@ function layerIGN(subLayer, format) {
 				}),
 				style: 'normal',
 				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-			})
+			}),
 		}) : null;
 }
 
@@ -166,11 +166,15 @@ function layerSpain(server, subLayer) {
  */
 function layerOS(subLayer) {
 	//TODO+ carte stamen hors zoom ou extent
+
 	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ?
 		new ol.layer.Tile({
+			extent: [-1198263, 6365000, 213000, 8702260],
+			minZoom: 6.5,
+			maxZoom: 16.4,
 			source: new ol.source.XYZ({
 				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer + '/{z}/{x}/{y}.png?key=' + mapKeys.os,
-			})
+			}),
 		}) : null;
 }
 
