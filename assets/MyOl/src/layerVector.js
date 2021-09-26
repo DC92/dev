@@ -132,12 +132,11 @@ function layerVector(opt) {
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
-	if (statusEl)
-		memCheckbox(options.selectorName, function(selection) {
-			layer.setVisible(selection.length > 0);
-			if (selection.length > 0)
-				source.refresh();
-		});
+	memCheckbox(options.selectorName, function(selection) {
+		layer.setVisible(selection.length > 0);
+		if (selection.length > 0)
+			source.refresh();
+	});
 
 	// Callback function to define feature display from the properties received from the server
 	source.on('featuresloadend', function(evt) {
