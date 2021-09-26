@@ -15,7 +15,9 @@ echo "<p>";
 
 $css[] = get ('controls.css');
 $css[] = get ('layerSwitcher.css');
-file_put_contents ('myol.css', implode (PHP_EOL .PHP_EOL, $css));
+file_put_contents ('myol.css', implode ('
+
+', $css));
 echo "TO myol.css</p>\n<p>";
 
 $js[] = get ('header.js');
@@ -25,7 +27,9 @@ $js[] = get ('layerVector.js');
 $js[] = get ('layerVectorCollection.js');
 $js[] = get ('controls.js');
 $js[] = get ('editor.js');
-file_put_contents ('myol.js', implode (PHP_EOL .PHP_EOL, $js));
+file_put_contents ('myol.js', implode ('
+
+', $js));
 echo 'TO myol.js</p>';
 
 function get ($file) {
