@@ -80,12 +80,13 @@ class listener implements EventSubscriberInterface
 		global $myphp_template, $myphp_js;
 
 		/* Includes template & js values defined in config.php */
-		// $myphp_js = ['key' => 'value'];
-		// $myphp_template = ['key' => 'value'];
+		//BEST ??? $myphp_js = ['key' => 'value'];
+		//BEST ??? $myphp_template = ['key' => 'value'];
 		if ($myphp_template)
 			$this->template->assign_vars (
 				array_change_key_case ($myphp_template, CASE_UPPER)
 			);
+		//BEST move in GYM
 		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js ?: []));
 
 		/* Includes language files of this extension */
