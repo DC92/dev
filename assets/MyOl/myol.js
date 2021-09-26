@@ -992,7 +992,7 @@ function memCheckbox(selectorName, callback) {
 			'; path=/; SameSite=Secure; expires=' +
 			new Date(2100, 0).toUTCString(); // Keep over all session
 
-		if (typeof callback == 'function')
+		if (inputEls.length && typeof callback == 'function')
 			callback(selection);
 	}
 
@@ -1017,7 +1017,8 @@ function memCheckbox(selectorName, callback) {
 
 	const selection = readCheckbox(selectorName);
 
-	if (typeof callback == 'function')
+	//BEST common code with function onClick(evt) {
+	if (inputEls.length && typeof callback == 'function')
 		callback(selection);
 
 	return selection;
