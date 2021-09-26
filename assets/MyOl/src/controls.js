@@ -278,7 +278,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
-			//TODO I.E. L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
+			//BEST I.E. : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};
@@ -290,16 +290,14 @@ function controlFullScreen(options) {
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
 //BEST BUG control 1px down on FireFox
-//BEST BUG I.E. No Internet connexion
-//BEST BUG I.E. L’objet ne gère pas la propriété ou la méthode « remove
 //TODO+ BUG pas de loupe (return sera pris par phpBB)
 function controlGeocoder(options) {
 	options = Object.assign({
 		title: 'Recherche sur la carte',
 	}, options);
 
-	// Vérify if geocoder is available (not supported in I.E.)
-	if (typeof Geocoder != 'function')
+	if (typeof Geocoder != 'function' && // Vérify if geocoder is available
+		!document.documentMode) // Not supported in I.E.
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
 		});
