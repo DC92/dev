@@ -683,7 +683,6 @@ function controlPrint() {
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
-		//TODO+ BUG : don't print full page
 		const map = button.getMap(),
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=print-orientation]:checked"),
@@ -726,7 +725,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
-		controlPrint(),
+		//controlPrint(), //TODO BUG : don't print full page
 
 		// Bottom left
 		controlLengthLine(),

@@ -1,7 +1,5 @@
 // I.E. polyfills
-// NO MORE : Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
-//BEST include src/polyfill.js with a tag
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) {

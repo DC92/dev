@@ -344,7 +344,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			//declutter declutter: true, //TODO BUG 6.8.0
+			//declutter declutter: true, //TODO+ BUG 6.8.0
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));

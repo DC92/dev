@@ -156,7 +156,7 @@ function layerAlpages(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
-	//TODO strategie bboxLimit
+	//TODO+ strategie bboxLimit
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			maxResolution: 50,

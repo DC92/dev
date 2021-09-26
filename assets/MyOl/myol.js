@@ -9,9 +9,7 @@
 
 /* FILE src/header.js */
 // I.E. polyfills
-// NO MORE : Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
-//BEST include src/polyfill.js with a tag
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) {
@@ -836,7 +834,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			//declutter declutter: true, //TODO BUG 6.8.0
+			//declutter declutter: true, //TODO+ BUG 6.8.0
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
@@ -1183,7 +1181,7 @@ function layerAlpages(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
-	//TODO strategie bboxLimit
+	//TODO+ strategie bboxLimit
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			maxResolution: 50,
@@ -2024,7 +2022,6 @@ function controlPrint() {
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
-		//TODO+ BUG : don't print full page
 		const map = button.getMap(),
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=print-orientation]:checked"),
@@ -2067,7 +2064,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
-		controlPrint(),
+		//controlPrint(), //TODO BUG : don't print full page
 
 		// Bottom left
 		controlLengthLine(),
@@ -2245,7 +2242,7 @@ function layerEditGeoJson(options) {
 		map.on('pointermove', hover);
 	});
 
-	//TODO move only one summit when dragging
+	//BEST+ move only one summit when dragging
 
 	modify.on('modifyend', function(evt) {
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
@@ -2348,13 +2345,13 @@ function layerEditGeoJson(options) {
 		}
 	}
 
-	//TODO BUG don't check CH1903 hiding
 	layer.centerMarker = function() {
 		source.getFeatures().forEach(function(f) {
 			f.getGeometry().setCoordinates(
 				layer.map_.getView().getCenter()
 			);
 		});
+		optimiseEdited(); // Check CH1903 feilds visibility
 	};
 
 	layer.centerMap = function() {
@@ -2492,7 +2489,6 @@ function layerEditGeoJson(options) {
 		source.clear();
 		if (options.singlePoint) {
 			// Initialise the marker at the center on the map if no coords are available
-			//TODO BUG si json entrée vide, n'affiche pas les champs numériques
 			coords.points.push(layer.map_.getView().getCenter());
 
 

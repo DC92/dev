@@ -209,7 +209,7 @@ class listener implements EventSubscriberInterface
 				$this->db->sql_freeresult($result);
 				if ($row) {
 					foreach ($row AS $k=>$v)
-						if (strpos ($v, '~'))
+						if (strpos ($v, '~') !== false)
 							$row[$k] = ''; // Erase the field if generated automatically
 					$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
 				}

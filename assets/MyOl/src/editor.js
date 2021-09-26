@@ -162,7 +162,7 @@ function layerEditGeoJson(options) {
 		map.on('pointermove', hover);
 	});
 
-	//TODO move only one summit when dragging
+	//BEST+ move only one summit when dragging
 
 	modify.on('modifyend', function(evt) {
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
@@ -265,13 +265,13 @@ function layerEditGeoJson(options) {
 		}
 	}
 
-	//TODO BUG don't check CH1903 hiding
 	layer.centerMarker = function() {
 		source.getFeatures().forEach(function(f) {
 			f.getGeometry().setCoordinates(
 				layer.map_.getView().getCenter()
 			);
 		});
+		optimiseEdited(); // Check CH1903 feilds visibility
 	};
 
 	layer.centerMap = function() {
@@ -409,7 +409,6 @@ function layerEditGeoJson(options) {
 		source.clear();
 		if (options.singlePoint) {
 			// Initialise the marker at the center on the map if no coords are available
-			//TODO BUG si json entrée vide, n'affiche pas les champs numériques
 			coords.points.push(layer.map_.getView().getCenter());
 
 
