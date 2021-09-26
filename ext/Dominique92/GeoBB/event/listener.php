@@ -123,6 +123,8 @@ class listener implements EventSubscriberInterface
 			preg_match ('/\[([-0-9\.]*)[, ]*([-0-9\.]*)\]/', $topic_row['geo_json'], $ll);
 			if ($ll) {
 				$topic_row['map_type'] = $desc[2];
+				$topic_row['geo_lon'] = $ll[1]; // For OSM search link
+				$topic_row['geo_lat'] = $ll[2];
 				$topic_row['forum_image'] = $topic_data['forum_image'];
 
 				// Calcul de l'altitude avec mapquest
