@@ -8,15 +8,26 @@
  */
 function fillColorOption(hexColor, transparency) {
 	return hexColor ? {
-		fill: new ol.style.Fill({
-			color: 'rgba(' + [
-				parseInt(hexColor.substring(1, 3), 16),
-				parseInt(hexColor.substring(3, 5), 16),
-				parseInt(hexColor.substring(5, 7), 16),
-				transparency || 1,
-			].join(',') + ')',
-		}),
+		textOptions: {
+			overflow: true, // Force polygons label display when decluttering
+		},
+		fill: fillColorStyle(hexColor, transparency),
 	} : {};
+}
+
+function fillColorStyle(hexColor, transparency) {
+	return hexColor ? new ol.style.Fill({
+		color: rgbaColor(hexColor, transparency),
+	}) : {};
+}
+
+function rgbaColor(hexColor, transparency) {
+	return 'rgba(' + [
+		parseInt(hexColor.substring(1, 3), 16),
+		parseInt(hexColor.substring(3, 5), 16),
+		parseInt(hexColor.substring(5, 7), 16),
+		transparency || 1,
+	].join(',') + ')';
 }
 
 /**
@@ -47,10 +58,9 @@ function layerWri(options) {
 }
 
 function layerWriAreas(options) {
-	//TODO+ too much labels at large zoom (missing declutter)
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
-		polygon: 1, // Type de polygone WRI
+		polygon: 1, // Massifs
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
@@ -61,10 +71,34 @@ function layerWriAreas(options) {
 			};
 		},
 		styleOptions: function(feature) {
-			return fillColorOption(feature.get('couleur'), 0.5);
+			return {
+				textOptions: {
+					font: 'bold 14px Calibri,sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+				},
+				fill: new ol.style.Fill({
+					color: rgbaColor(feature.get('couleur'), 0.5),
+				}),
+			};
 		},
 		hoverStyleOptions: function(feature) {
-			return fillColorOption(feature.get('couleur'), 0.7);
+			return {
+				textOptions: {
+					overflow: true, // Force polygons label display when decluttering
+					font: 'bold 14px Calibri,sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'white',
+					}),
+				},
+				fill: new ol.style.Fill({
+					color: rgbaColor(feature.get('couleur'), 0.7),
+				}),
+			};
 		},
 	}, options));
 }

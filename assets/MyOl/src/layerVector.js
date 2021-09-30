@@ -45,47 +45,6 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.bbox,
 		}, opt),
 
-		// Yellow label
-		defaultStyleOptions = {
-			textOptions: {
-				overflow: true, // Force polygons label display when decluttering
-				textBaseline: 'bottom',
-				offsetY: -13, // Balance the bottom textBaseline
-				padding: [1, 3, 0, 3],
-				font: '14px Calibri,sans-serif',
-				backgroundFill: new ol.style.Fill({
-					color: 'yellow',
-				}),
-			},
-		},
-
-		// Display hover feature can display with another format
-		// In addition to defaultStyleOptions
-		defaultHoverStyleOptions = {
-			hover: true, // Select label | hover as text to be display
-			textOptions: {
-				backgroundStroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-			},
-		},
-
-		// Cluster bullet
-		defaultClusterStyleOptions = {
-			image: new ol.style.Circle({
-				radius: 14,
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-				fill: new ol.style.Fill({
-					color: 'white',
-				}),
-			}),
-			text: new ol.style.Text({
-				font: '14px Calibri,sans-serif',
-			}),
-		},
-
 		//HACK to render the html entities in canvas
 		elLabel = document.createElement('span'),
 
@@ -161,34 +120,16 @@ function layerVector(opt) {
 	function style(feature, resolution) {
 		if (feature.display && feature.display.cluster) // Grouped features
 			// Cluster style
-			return displayStyle(feature, resolution, [
-				defaultClusterStyleOptions, options.clusterStyleOptions
-			]);
+			return displayStyle(feature, resolution, options.clusterStyleOptions);
 		else
 			// Basic display style
-			return displayStyle(feature, resolution, [
-				defaultStyleOptions, options.styleOptions
-			]);
+			return displayStyle(feature, resolution, options.styleOptions);
 	}
 
 	// Function to display different styles
-	function displayStyle(feature, resolution, styles) {
+	function displayStyle(feature, resolution, styleOptionsFunction) {
 		if (feature.display) {
-			const styleOptions = {},
-				textOptions = {};
-
-			// Concatenate the list of styles & defaults
-			for (let s in styles)
-				if (styles[s]) {
-					const style = typeof styles[s] == 'function' ?
-						styles[s](feature) :
-						styles[s];
-
-					Object.assign(styleOptions, style);
-
-					// Separately concatenate text options
-					Object.assign(textOptions, style.textOptions);
-				}
+			const styleOptions = typeof styleOptionsFunction == 'function' ? styleOptionsFunction(feature) : {}; //TODO optimize
 
 			//BEST faire une fonction plus générale pour les feature.display
 			if (feature.display.iconchem)
@@ -203,32 +144,15 @@ function layerVector(opt) {
 					//BEST automatic detect
 				});
 
-			// Hover
-			const hover = [],
-				subHover = [];
-			if (styleOptions.hover) { // When the function is called for hover
-				if (feature.display.type)
-					hover.push(feature.display.type.replace('_', ' '));
-				if (feature.display.ele)
-					subHover.push(feature.display.ele + 'm');
-				if (feature.display.bed)
-					subHover.push(feature.display.bed + '\u255E\u2550\u2555');
-				if (subHover.length)
-					hover.push(subHover.join(', '));
-				if (feature.display.name)
-					hover.push(feature.display.name);
-				//TODO attribution
-			}
-
 			elLabel.innerHTML = //HACK to render the html entities in the canvas
 				(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
-				hover.join('\n') ||
 				feature.display.name ||
 				'';
 
 			if (elLabel.innerHTML) {
-				textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
-				styleOptions.text = new ol.style.Text(textOptions);
+				if (!styleOptions.textOptions) styleOptions.textOptions = {}; //TODO optimize
+				styleOptions.textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
+				styleOptions.text = new ol.style.Text(styleOptions.textOptions);
 			}
 
 			return new ol.style.Style(styleOptions);
@@ -251,26 +175,14 @@ function layerVector(opt) {
 	};
 
 	function initHover(map) {
-		// Text popup & overlay
-		const hoverEl = document.createElement('div'),
-			hoverOverlay = new ol.Overlay({
-				element: hoverEl,
-				positioning: 'bottom-center',
-			});
-
-		hoverEl.className = 'hoverText';
-		hoverEl.onclick = hovermouseEvent;
-		map.addOverlay(hoverOverlay);
-
 		// Layer to display an hovered features
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
 				zIndex: 2, // Above the features
+				declutter: true, //To avoid dumping the other labels
 				style: function(feature, resolution) {
-					return displayStyle(feature, resolution, [
-						defaultStyleOptions, defaultHoverStyleOptions, feature.hoverStyleOptions
-					]);
+					return displayStyle(feature, resolution, feature.hoverStyleOptions);
 				},
 			});
 
@@ -290,7 +202,8 @@ function layerVector(opt) {
 
 		function hovermouseEvent(evt) {
 			const originalEvent = evt.originalEvent || evt,
-				// Get he hovered feature
+				// Get the hovered feature
+				//TODO+ BUG forEachFeatureAtPixel with no features
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature) {
@@ -299,29 +212,6 @@ function layerVector(opt) {
 						hitTolerance: 6, // Default 0
 					});
 
-			// Positioning & filling popup
-			if (feature) {
-				const extent = feature.getGeometry().getExtent();
-
-				if (ol.extent.getArea(extent)) {
-					// Line or polygon
-					hoverOverlay.setPosition(evt.coordinate);
-					hoverOverlay.setOffset([0, -2]); // Avoid cursor over the popup
-				} else {
-					// Point
-					hoverOverlay.setPosition(ol.extent.getCenter(extent));
-					hoverOverlay.setOffset([0, -14]); // Above the icon
-				}
-
-				hoverEl.innerHTML = feature.display.hover || feature.display.name; //TODO revoir affichage
-				map.getViewport().style.cursor = 'pointer';
-			} else {
-				// Reset hovering
-				hoverOverlay.setPosition();
-				hoverEl.innerHTML = '';
-				map.getViewport().style.cursor = '';
-			}
-
 			// Update the display of hovered feature
 			if (map.hoveredFeature !== feature) {
 				if (map.hoveredFeature)
@@ -329,6 +219,8 @@ function layerVector(opt) {
 
 				if (feature)
 					hoverSource.addFeature(feature);
+
+				map.getViewport().style.cursor = feature ? 'pointer' : '';
 
 				map.hoveredFeature = feature;
 			}
@@ -501,7 +393,7 @@ function readCheckbox(selectorName) {
 }
 
 /**
- * Manages checkboxes inputs having the same name
+ * Manage checkbox inputs having the same name
  * selectorName {string}
  * callback {function(selection)} action when the button is clicked
  *
