@@ -46,12 +46,57 @@ function layerWri(options) {
 		},
 		displayProperties: function(properties, feature, options) {
 			return {
-				name: properties.nom,
-				type: properties.type.valeur,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord.alt,
-				bed: properties.places.valeur,
 				url: properties.lien,
+			};
+		},
+		styleOptions: function(feature, properties, options) {
+			return {
+				image: new ol.style.Icon({
+					src: options.host + 'images/icones/' + properties.type.icone + '.svg',
+					imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+				}),
+				text: new ol.style.Text({
+					text: properties.nom,
+					textBaseline: 'bottom',
+					offsetY: -13, // Balance the bottom textBaseline
+					padding: [0, 1, 0, 1],
+					font: '14px Calibri,sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'yellow',
+					}),
+				}),
+			};
+		},
+		hoverStyleOptions: function(feature, properties) {
+			const hover = [],
+				subHover = [];
+
+			hover.push(properties.type.valeur.replace('_', ' '));
+			if (properties.coord.alt)
+				subHover.push(properties.coord.alt + 'm');
+			if (typeof properties.places.valeur == 'number')
+				subHover.push(properties.places.valeur + '\u255E\u2550\u2555');
+			if (subHover.length)
+				hover.push(subHover.join(', '));
+			hover.push(properties.nom);
+
+			return {
+				text: new ol.style.Text({
+					text: hover.join('\n'),
+					textBaseline: 'bottom',
+					offsetY: -13, // Balance the bottom textBaseline
+					padding: [0, 1, 0, 1],
+					font: '14px Calibri,sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'yellow',
+					}),
+				}),
 			};
 		},
 	}, options));
@@ -70,22 +115,24 @@ function layerWriAreas(options) {
 				url: properties.lien,
 			};
 		},
-		styleOptions: function(feature) {
+		styleOptions: function(feature, properties) {
 			return {
-				textOptions: {
+				text: new ol.style.Text({
+					text: properties.nom,
 					font: 'bold 14px Calibri,sans-serif',
 					fill: new ol.style.Fill({
 						color: 'black',
 					}),
-				},
+				}),
 				fill: new ol.style.Fill({
 					color: rgbaColor(feature.get('couleur'), 0.5),
 				}),
 			};
 		},
-		hoverStyleOptions: function(feature) {
+		hoverStyleOptions: function(feature, properties) {
 			return {
-				textOptions: {
+				text: new ol.style.Text({
+					text: properties.nom,
 					overflow: true, // Force polygons label display when decluttering
 					font: 'bold 14px Calibri,sans-serif',
 					fill: new ol.style.Fill({
@@ -94,7 +141,7 @@ function layerWriAreas(options) {
 					backgroundFill: new ol.style.Fill({
 						color: 'white',
 					}),
-				},
+				}),
 				fill: new ol.style.Fill({
 					color: rgbaColor(feature.get('couleur'), 0.7),
 				}),
@@ -117,22 +164,44 @@ function layerGeoBB(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, feature, options) {
-			if (properties.type)
-				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
 			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
 		},
-		styleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 2,
-			}),
+		styleOptions: function(feature, properties, options) {
+			if (properties.type)
+				// Points
+				return {
+					image: new ol.style.Icon({
+						src: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+					}),
+				};
+			else
+				// Lines
+				return {
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+						width: 2,
+					}),
+				};
 		},
-		hoverStyleOptions: {
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 3,
-			}),
+		hoverStyleOptions: function(feature, properties) {
+			return {
+				text: new ol.style.Text({
+					text: properties.name,
+					textBaseline: 'bottom',
+					offsetY: -13, // Balance the bottom textBaseline
+					padding: [1, 3, 0, 3],
+					font: '14px Calibri,sans-serif',
+					backgroundFill: new ol.style.Fill({
+						color: 'yellow',
+					}),
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 3,
+				}),
+			};
 		},
 	}, options));
 }

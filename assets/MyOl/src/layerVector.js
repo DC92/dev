@@ -129,31 +129,7 @@ function layerVector(opt) {
 	// Function to display different styles
 	function displayStyle(feature, resolution, styleOptionsFunction) {
 		if (feature.display) {
-			const styleOptions = typeof styleOptionsFunction == 'function' ? styleOptionsFunction(feature) : {}; //TODO optimize
-
-			//BEST faire une fonction plus générale pour les feature.display
-			if (feature.display.iconchem)
-				feature.display.icon =
-				'//chemineur.fr/ext/Dominique92/GeoBB/icones/' + feature.display.iconchem + '.svg';
-
-			if (feature.display.icon)
-				//TODO add <sym> for Garmin upload
-				styleOptions.image = new ol.style.Icon({
-					src: feature.display.icon,
-					imgSize: [24, 24], // I.E. compatibility
-					//BEST automatic detect
-				});
-
-			elLabel.innerHTML = //HACK to render the html entities in the canvas
-				(styleOptions.hover ? feature.display.hover : feature.display.cluster) ||
-				feature.display.name ||
-				'';
-
-			if (elLabel.innerHTML) {
-				if (!styleOptions.textOptions) styleOptions.textOptions = {}; //TODO optimize
-				styleOptions.textOptions.text = elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1);
-				styleOptions.text = new ol.style.Text(styleOptions.textOptions);
-			}
+			const styleOptions = typeof styleOptionsFunction == 'function' ? styleOptionsFunction(feature, feature.getProperties(), options) : {}; //TODO optimize
 
 			return new ol.style.Style(styleOptions);
 		}
