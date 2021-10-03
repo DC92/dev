@@ -3,17 +3,6 @@
  */
 
 /**
- * BBOX strategy when the url returns a limited number of features in the BBox
- * We do need to reload when the zoom in
- */
-ol.loadingstrategy.bboxLimit = function(extent, resolution) {
-	if (this.bboxLimitResolution > resolution) // When zoom in
-		this.refresh(); // Force the loading of all areas
-	this.bboxLimitResolution = resolution; // Mem resolution for further requests
-	return [extent];
-};
-
-/**
  * Layer to display remote geoJson
  * Styles, icons & labels
  *
@@ -23,17 +12,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * selectorName : <input name="selectorName"> url arguments selector
  * styleOptions: Options of the style of the features (object = style options or function returning object)
  * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
-					 *
-					 * GeoJson properties:
-					 * icon : url of an icon file
-					 * iconchem : url of an icon from chemineur.fr
-					 * name : label on top of the feature
-					 * type : cabane, ...
-					 * ele : elevation / altitude (meters)
-					 * bed : number of places to sleep
-					 * cluster: number of grouped features too close to be displayed alone
-					 * hover : label on hovering a feature
-					 * url: url to go if feature is clicked
  */
 //TODO+ BUG battement si trop d'icônes
 //TODO+ BUG Pas de pictos Cluster dans le Vercors 
@@ -117,11 +95,6 @@ function layerVector(opt) {
 
 	// Style callback function for the layer
 	function style(feature, resolution) {
-		/*		if (feature.display && feature.display.cluster) // Grouped features
-					// Cluster style
-					return displayStyle(feature, resolution, options.clusterStyleOptions);
-				else*/
-		// Basic display style
 		return displayStyle(feature, resolution, options.styleOptions);
 	}
 
@@ -205,7 +178,7 @@ function layerVector(opt) {
 			// Click actions
 			if (feature && evt.type == 'click') {
 				const features = feature.get('features') || [feature],
-					display = features[0].display,
+					display = features[0].display, // Get first or alone feature
 					geom = feature.getGeometry();
 
 				if (display) {
@@ -331,6 +304,7 @@ function layerVectorCluster(options) {
 				}
 
 			// Cluster labels
+			//TODO add cluster numbers
 			if (features.length > 1 || !names.length) {
 				// Big cluster
 				if (clusters > 7)

@@ -127,7 +127,7 @@ const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
 		center: ol.proj.transform([5.36, 44.935], 'EPSG:4326', 'EPSG:3857'), // Crobache
-		zoom: 15,
+		zoom: 11,
 	}),
 	layers: [
 		new ol.layer.Tile({
@@ -162,8 +162,9 @@ if (01) {
 		maxResolution: 100,
 		distance: 50,
 	}));
-	map.addLayer(layerGeoBBCluster({
+	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
+		subLayer: 'cluster',
 		minResolution: 100,
 		distance: 50,
 	}));

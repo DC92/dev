@@ -32,19 +32,26 @@ function rgbaColor(hexColor, transparency) {
 	].join(',') + ')';
 }
 
-// Virtual function with custom styles
+/* Virtual function with custom styles
+ * GeoJson properties:
+ * icon : url of an icon file
+ * iconchem : url of an icon from chemineur.fr
+ * name : label on top of the feature
+ * type : cabane, ...
+ * ele : elevation / altitude (meters)
+ * bed : number of places to sleep
+ * cluster: number of grouped features too close to be displayed alone
+ * hover : label on hovering a feature
+ * url: url to go if feature is clicked
+ */
 function myLayer(options) {
 	return layerVectorCluster(Object.assign({
 		styleOptions: function(feature, properties, options) {
 			// Points
-			if (properties.type)
-				return {
-					image: new ol.style.Icon({
-						src: options.host + 'images/icones/' + properties.type.icone + '.svg',
-						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-					}),
+			if (properties.type) {
+				styleOptions = {
 					text: new ol.style.Text({
-						text: properties.nom,
+						text: properties.name || properties.nom, //TODO   htmlcars + first upper + _
 						textBaseline: 'bottom',
 						offsetY: -13, // Balance the bottom textBaseline
 						padding: [0, 1, 0, 1],
@@ -57,6 +64,15 @@ function myLayer(options) {
 						}),
 					}),
 				};
+
+				if (feature.display.icon)
+					styleOptions.image = new ol.style.Icon({
+						src: feature.display.icon,
+						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+					});
+
+				return styleOptions;
+			}
 
 			// Clusters
 			else if (properties.features)
@@ -72,7 +88,6 @@ function myLayer(options) {
 					}),
 					text: new ol.style.Text({
 						text: properties.features.length.toString(),
-						//text:properties.features.length||'X',
 						font: '14px Calibri,sans-serif',
 					}),
 				};
@@ -80,24 +95,27 @@ function myLayer(options) {
 
 		hoverStyleOptions: function(feature, properties) {
 			const hover = [],
-				subHover = [];
+				line = [];
 
 			if (properties.type) {
-				hover.push(properties.type.valeur.replace('_', ' '));
-				if (properties.coord.alt)
-					subHover.push(properties.coord.alt + 'm');
-				if (typeof properties.places.valeur == 'number')
-					subHover.push(properties.places.valeur + '\u255E\u2550\u2555');
-				if (subHover.length)
-					hover.push(subHover.join(', '));
-				hover.push(properties.nom);
+				if (properties.type.valeur) // Refuges.info
+					properties.type = properties.type.valeur;
+				hover.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+				if (properties.coord && properties.coord.alt) // Refuges.info
+					properties.alt = properties.coord.alt;
+				if (properties.alt)
+					line.push(properties.alt + 'm');
+				if (properties.places && properties.places.valeur)
+					line.push(properties.places.valeur + '\u255E\u2550\u2555');
+				if (line.length)
+					hover.push(line.join(', '));
+				hover.push(properties.name || properties.nom);
 			}
 
 			// Points
-			//if(properties.type)
 			return {
-				text: new ol.style.Text({
-					text: hover.join('\n') || 'Click pour zoomer',
+				text: new ol.style.Text({ //TODO reuse points def of text label
+					text: hover.join('\n') || 'Cliquer pour zoomer',
 					textBaseline: 'bottom',
 					offsetY: -13, // Balance the bottom textBaseline
 					padding: [0, 1, 0, 1],
@@ -131,6 +149,7 @@ function layerWri(options) {
 		displayProperties: function(properties, feature, options) {
 			return {
 				url: properties.lien,
+				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 			};
 		},
 	}, options));
@@ -189,115 +208,21 @@ function layerWriAreas(options) {
  */
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
-	return layerVectorCluster(Object.assign({
-		//DCMM host: '//chemineur.fr/',
-		host: '//c92.fr/test/chem5/',
+	return myLayer(Object.assign({
+		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?layer=simple&limit=10000&' +
+				'ext/Dominique92/GeoBB/gis.php?limit=10000' +
+				'&layer=' + (options.subLayer || 'simple') +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		displayProperties: function(properties, feature, options) {
-			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			return properties;
-		},
-		styleOptions: function(feature, properties, options) {
-			if (properties.type)
-				// Points
-				return {
-					image: new ol.style.Icon({
-						src: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
-						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-					}),
-				};
-			else
-				// Lines
-				return {
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-						width: 2,
-					}),
-				};
-		},
-		hoverStyleOptions: function(feature, properties) {
 			return {
-				text: new ol.style.Text({
-					text: properties.name,
-					textBaseline: 'bottom',
-					offsetY: -13, // Balance the bottom textBaseline
-					padding: [1, 3, 0, 3],
-					font: '14px Calibri,sans-serif',
-					backgroundFill: new ol.style.Fill({
-						color: 'yellow',
-					}),
-				}),
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 3,
-				}),
+				url: options.host + 'viewtopic.php?t=' + properties.id,
+				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
 			};
-		},
-	}, options));
-}
-
-function layerGeoBBCluster(options) {
-	//DCMM return layerVectorCluster(Object.assign({
-	return layerVector(Object.assign({
-		//DCMM host: '//chemineur.fr/',
-		host: '//c92.fr/test/chem5/',
-		urlFunction: function url(options, bbox, selection) {
-			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=10000' +
-				(options.selectorName ? '&cat=' + selection.join(',') : '');
-		},
-		strategy: ol.loadingstrategy.bboxLimit,
-		wdisplayProperties: function(properties, feature, options) {
-			if (properties.cluster)
-				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/unkn.svg';
-			if (properties.type)
-				properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
-		},
-		styleOptions: function(feature, properties, options) {
-			if (properties.type)
-				// Points
-				return properties.cluster ? {
-					image: new ol.style.Icon({
-						src: options.host + 'ext/Dominique92/GeoBB/icones/cabane.svg',
-						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-					}),
-				} : {
-					image: new ol.style.Icon({
-						src: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
-						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-					}),
-				};
-			else
-				// Lines
-				return {
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-						width: 2,
-					}),
-				};
-		},
-		clusterStyleOptions: function(feature, properties, options) {
-			return {
-				image: new ol.style.Circle({
-					radius: 14,
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-					}),
-					fill: new ol.style.Fill({
-						color: 'white',
-					}),
-				}),
-				text: new ol.style.Text({
-					text: properties.cluster ? properties.cluster.toString() : 'X',
-					font: '14px Calibri,sans-serif',
-				}),
-			};
 		},
 	}, options));
 }
@@ -489,6 +414,6 @@ function layerC2C(options) {
 			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
 		},
 		format: format,
-		strategy: ol.loadingstrategy.bboxLimit,
+		strategy: ol.loadingstrategy.bboxLimit, //TODO ???
 	}, options));
 }
