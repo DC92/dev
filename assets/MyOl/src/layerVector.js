@@ -23,18 +23,17 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * selectorName : <input name="selectorName"> url arguments selector
  * styleOptions: Options of the style of the features (object = style options or function returning object)
  * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
- * clusterStyleOptions : Options of the style of the cluster bullets (object = style options)
- *
- * GeoJson properties:
- * icon : url of an icon file
- * iconchem : url of an icon from chemineur.fr
- * name : label on top of the feature
- * type : cabane, ...
- * ele : elevation / altitude (meters)
- * bed : number of places to sleep
- * cluster: number of grouped features too close to be displayed alone
- * hover : label on hovering a feature
- * url: url to go if feature is clicked
+					 *
+					 * GeoJson properties:
+					 * icon : url of an icon file
+					 * iconchem : url of an icon from chemineur.fr
+					 * name : label on top of the feature
+					 * type : cabane, ...
+					 * ele : elevation / altitude (meters)
+					 * bed : number of places to sleep
+					 * cluster: number of grouped features too close to be displayed alone
+					 * hover : label on hovering a feature
+					 * url: url to go if feature is clicked
  */
 //TODO+ BUG battement si trop d'icônes
 //TODO+ BUG Pas de pictos Cluster dans le Vercors 
@@ -45,9 +44,6 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.bbox,
 		}, opt),
 
-		//HACK to render the html entities in canvas
-		elLabel = document.createElement('span'),
-
 		// Source & layer
 		source = new ol.source.Vector(Object.assign({
 			url: url,
@@ -56,9 +52,10 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			declutter: true,
+			//TODO declutter: true,
 		}, options)),
 
+		//		elLabel = document.createElement('span'),		//HACK to render the html entities in canvas
 		statusEl = document.getElementById(options.selectorName);
 
 	// XHR download tracking
@@ -103,9 +100,11 @@ function layerVector(opt) {
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
+			//HACK attach this function to each feature to access it when hovering without layer context
 			evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
 			// Add data to be used to display the feature
+			//TODO DELETE
 			evt.features[f].display = typeof options.displayProperties == 'function' ?
 				options.displayProperties(
 					evt.features[f].getProperties(),
@@ -118,15 +117,16 @@ function layerVector(opt) {
 
 	// Style callback function for the layer
 	function style(feature, resolution) {
-		if (feature.display && feature.display.cluster) // Grouped features
-			// Cluster style
-			return displayStyle(feature, resolution, options.clusterStyleOptions);
-		else
-			// Basic display style
-			return displayStyle(feature, resolution, options.styleOptions);
+		/*		if (feature.display && feature.display.cluster) // Grouped features
+					// Cluster style
+					return displayStyle(feature, resolution, options.clusterStyleOptions);
+				else*/
+		// Basic display style
+		return displayStyle(feature, resolution, options.styleOptions);
 	}
 
 	// Function to display different styles
+	//TODO merge with style
 	function displayStyle(feature, resolution, styleOptionsFunction) {
 		if (feature.display) {
 			const styleOptions = typeof styleOptionsFunction == 'function' ? styleOptionsFunction(feature, feature.getProperties(), options) : {}; //TODO optimize
@@ -140,7 +140,7 @@ function layerVector(opt) {
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
 
-	//HACK to attach an hover listener once when the map is defined
+	//HACK attach an hover listener once when the map is defined
 	ol.Map.prototype.render = function() {
 		if (!this.hoverListenerInstalled && this.getView()) {
 			initHover(this);
@@ -156,7 +156,7 @@ function layerVector(opt) {
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
 				zIndex: 2, // Above the features
-				declutter: true, //To avoid dumping the other labels
+				//TODO declutter: true, //To avoid dumping the other labels
 				style: function(feature, resolution) {
 					return displayStyle(feature, resolution, feature.hoverStyleOptions);
 				},
@@ -177,9 +177,10 @@ function layerVector(opt) {
 		map.getView().on('change:resolution', hovermouseEvent); // For WRI massifs
 
 		function hovermouseEvent(evt) {
-			const originalEvent = evt.originalEvent || evt,
+			const originalEvent = evt.originalEvent ||
+				evt, //TODO still needed ???
 				// Get the hovered feature
-				//TODO+ BUG forEachFeatureAtPixel with no features
+				//TODO+ BUG forEachFeatureAtPixel with no features when decluter
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature) {
@@ -241,10 +242,11 @@ function layerVectorCluster(options) {
 	if (!options.distance)
 		return layerVector(options);
 
-	const layer = layerVector(options);
+	// Detailed layer
+	const layer = layerVector(options),
 
-	// Clusterized source
-	const clusterSource = new ol.source.Cluster({
+		// Clusterized source
+		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			distance: options.distance,
 			geometryFunction: geometryFunction,
@@ -255,7 +257,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			//declutter: true, //TODO+ ????
+			//TODO declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
@@ -310,6 +312,7 @@ function layerVectorCluster(options) {
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
+
 		let clusters = 0, // Add number of clusters of server cluster groups
 			names = [], // List of names of clustered features
 			clustered = false; // The server send clusters
@@ -338,6 +341,7 @@ function layerVectorCluster(options) {
 					cluster: clusters,
 					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
 				};
+				feature.hoverStyleOptions = options.hoverStyleOptions;
 			}
 		}
 

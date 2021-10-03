@@ -6,6 +6,7 @@
 /**
  * Common function
  */
+//TODO DELETE
 function fillColorOption(hexColor, transparency) {
 	return hexColor ? {
 		textOptions: {
@@ -15,6 +16,7 @@ function fillColorOption(hexColor, transparency) {
 	} : {};
 }
 
+//TODO DELETE
 function fillColorStyle(hexColor, transparency) {
 	return hexColor ? new ol.style.Fill({
 		color: rgbaColor(hexColor, transparency),
@@ -30,12 +32,94 @@ function rgbaColor(hexColor, transparency) {
 	].join(',') + ')';
 }
 
+// Virtual function with custom styles
+function myLayer(options) {
+	return layerVectorCluster(Object.assign({
+		styleOptions: function(feature, properties, options) {
+			// Points
+			if (properties.type)
+				return {
+					image: new ol.style.Icon({
+						src: options.host + 'images/icones/' + properties.type.icone + '.svg',
+						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+					}),
+					text: new ol.style.Text({
+						text: properties.nom,
+						textBaseline: 'bottom',
+						offsetY: -13, // Balance the bottom textBaseline
+						padding: [0, 1, 0, 1],
+						font: '14px Calibri,sans-serif',
+						fill: new ol.style.Fill({
+							color: 'black',
+						}),
+						backgroundFill: new ol.style.Fill({
+							color: 'yellow',
+						}),
+					}),
+				};
+
+			// Clusters
+			else if (properties.features)
+				return {
+					image: new ol.style.Circle({
+						radius: 14,
+						stroke: new ol.style.Stroke({
+							color: 'blue',
+						}),
+						fill: new ol.style.Fill({
+							color: 'white',
+						}),
+					}),
+					text: new ol.style.Text({
+						text: properties.features.length.toString(),
+						//text:properties.features.length||'X',
+						font: '14px Calibri,sans-serif',
+					}),
+				};
+		},
+
+		hoverStyleOptions: function(feature, properties) {
+			const hover = [],
+				subHover = [];
+
+			if (properties.type) {
+				hover.push(properties.type.valeur.replace('_', ' '));
+				if (properties.coord.alt)
+					subHover.push(properties.coord.alt + 'm');
+				if (typeof properties.places.valeur == 'number')
+					subHover.push(properties.places.valeur + '\u255E\u2550\u2555');
+				if (subHover.length)
+					hover.push(subHover.join(', '));
+				hover.push(properties.nom);
+			}
+
+			// Points
+			//if(properties.type)
+			return {
+				text: new ol.style.Text({
+					text: hover.join('\n') || 'Click pour zoomer',
+					textBaseline: 'bottom',
+					offsetY: -13, // Balance the bottom textBaseline
+					padding: [0, 1, 0, 1],
+					font: '14px Calibri,sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'yellow',
+					}),
+				}),
+			};
+		},
+	}, options));
+}
+
 /**
  * Site refuges.info
  */
 //BEST min & max layer in the same function
 function layerWri(options) {
-	return layerVectorCluster(Object.assign({
+	return myLayer(Object.assign({
 		host: '//www.refuges.info/',
 		nb_points: 'all',
 		urlFunction: function(options, bbox, selection) {
@@ -47,56 +131,6 @@ function layerWri(options) {
 		displayProperties: function(properties, feature, options) {
 			return {
 				url: properties.lien,
-			};
-		},
-		styleOptions: function(feature, properties, options) {
-			return {
-				image: new ol.style.Icon({
-					src: options.host + 'images/icones/' + properties.type.icone + '.svg',
-					imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-				}),
-				text: new ol.style.Text({
-					text: properties.nom,
-					textBaseline: 'bottom',
-					offsetY: -13, // Balance the bottom textBaseline
-					padding: [0, 1, 0, 1],
-					font: '14px Calibri,sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'yellow',
-					}),
-				}),
-			};
-		},
-		hoverStyleOptions: function(feature, properties) {
-			const hover = [],
-				subHover = [];
-
-			hover.push(properties.type.valeur.replace('_', ' '));
-			if (properties.coord.alt)
-				subHover.push(properties.coord.alt + 'm');
-			if (typeof properties.places.valeur == 'number')
-				subHover.push(properties.places.valeur + '\u255E\u2550\u2555');
-			if (subHover.length)
-				hover.push(subHover.join(', '));
-			hover.push(properties.nom);
-
-			return {
-				text: new ol.style.Text({
-					text: hover.join('\n'),
-					textBaseline: 'bottom',
-					offsetY: -13, // Balance the bottom textBaseline
-					padding: [0, 1, 0, 1],
-					font: '14px Calibri,sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'yellow',
-					}),
-				}),
 			};
 		},
 	}, options));
@@ -156,7 +190,8 @@ function layerWriAreas(options) {
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/',
+		//DCMM host: '//chemineur.fr/',
+		host: '//c92.fr/test/chem5/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host +
 				'ext/Dominique92/GeoBB/gis.php?layer=simple&limit=10000&' +
@@ -207,18 +242,62 @@ function layerGeoBB(options) {
 }
 
 function layerGeoBBCluster(options) {
-	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/',
+	//DCMM return layerVectorCluster(Object.assign({
+	return layerVector(Object.assign({
+		//DCMM host: '//chemineur.fr/',
+		host: '//c92.fr/test/chem5/',
 		urlFunction: function url(options, bbox, selection) {
 			return options.host +
 				'ext/Dominique92/GeoBB/gis.php?layer=cluster&limit=10000' +
 				(options.selectorName ? '&cat=' + selection.join(',') : '');
 		},
-		displayProperties: function(properties, feature, options) {
+		strategy: ol.loadingstrategy.bboxLimit,
+		wdisplayProperties: function(properties, feature, options) {
+			if (properties.cluster)
+				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/unkn.svg';
 			if (properties.type)
-				properties.icon = options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg';
-			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
+				properties.url = options.host + 'viewtopic.php?t=' + properties.id;
 			return properties;
+		},
+		styleOptions: function(feature, properties, options) {
+			if (properties.type)
+				// Points
+				return properties.cluster ? {
+					image: new ol.style.Icon({
+						src: options.host + 'ext/Dominique92/GeoBB/icones/cabane.svg',
+						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+					}),
+				} : {
+					image: new ol.style.Icon({
+						src: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+					}),
+				};
+			else
+				// Lines
+				return {
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+						width: 2,
+					}),
+				};
+		},
+		clusterStyleOptions: function(feature, properties, options) {
+			return {
+				image: new ol.style.Circle({
+					radius: 14,
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+					fill: new ol.style.Fill({
+						color: 'white',
+					}),
+				}),
+				text: new ol.style.Text({
+					text: properties.cluster ? properties.cluster.toString() : 'X',
+					font: '14px Calibri,sans-serif',
+				}),
+			};
 		},
 	}, options));
 }

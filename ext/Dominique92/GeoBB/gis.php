@@ -54,10 +54,9 @@ if (0) {
 	}
 }
 
-// Features cluster managed at the server level
-$features = [];
-$light_features = [];
+$data = $features = $signatures = $features = $light_features = [];
 
+// Features cluster managed at the server level
 if ($layer == 'cluster') {
 	$sql="
 	SELECT count(*) AS num, geo_cluster,
@@ -146,7 +145,6 @@ $request_scheme = explode ('/', getenv('REQUEST_SCHEME'));
 $request_uri = explode ('/ext/', getenv('REQUEST_URI'));
 $url_base = $request_scheme[0].'://'.getenv('SERVER_NAME').$request_uri[0].'/';
 
-$data = $features = $signatures = [];
 while ($row = $db->sql_fetchrow($result)) {
 	$properties = [
 		'name' => $row['post_subject'],
