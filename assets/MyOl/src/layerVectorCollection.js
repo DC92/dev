@@ -69,28 +69,35 @@ function myLayer(options) {
 			properties.attribution = options.host.replaceAll('/', '').replace('www.', ''); // Default
 			Object.assign(properties, feature.display);
 
-			if (typeof properties.type == 'string')
-				text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
-			if (properties.alt)
-				line.push(properties.alt + 'm');
-			if (properties.bed)
-				line.push(properties.bed + '\u255E\u2550\u2555');
-			if (line.length)
-				text.push(line.join(', '));
-			if (properties.attribution)
-				text.push('&copy;' + properties.attribution);
-			text.push(properties.name);
+			if (properties.features && properties.features.length < 7) {
+				for (let f in properties.features)
+					text.push(properties.features[f].getProperties().name || properties.features[f].display.name);
+			} else if (properties.features)
+				text.push('Cliquer pour zoomer');
+			else {
+				if (typeof properties.type == 'string')
+					text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+				if (properties.alt)
+					line.push(properties.alt + 'm');
+				if (properties.bed)
+					line.push(properties.bed + '\u255E\u2550\u2555');
+				if (line.length)
+					text.push(line.join(', '));
+				if (properties.attribution)
+					text.push('&copy;' + properties.attribution);
+				text.push(properties.name);
+			}
 
 			// Features
 			return {
-				text: yellowLabel(text.join('\n') || 'Cliquer pour zoomer', properties, true),
+				text: yellowLabel(text.join('\n'), properties, true),
 				// Lines
-				/*//TODO TBD
+				/**/ //TODO TBD
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 3,
 				}),
-				*/
+
 				// Polygons
 				fill: new ol.style.Fill({
 					color: rgbaColor(feature.get('color') || feature.get('couleur') || '#333333', 0.5),
@@ -114,7 +121,7 @@ function myLayer(options) {
 		if (hover)
 			st.overflow = true;
 
-		if (properties.icon)
+		if (properties.icon || properties.features)
 			Object.assign(st, {
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
@@ -194,10 +201,9 @@ function layerGeoBB(options) {
 		},
 		displayFunction: function(properties, feature, options) {
 			return {
+				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
 				url: options.host + 'viewtopic.php?t=' + properties.id,
-				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg', //TODO pas de type sur ligne ?
 			};
-			return properties;
 		},
 	}, options));
 }

@@ -261,7 +261,7 @@ function layerVectorCluster(options) {
 			pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
 
 		if (pixelSemiPerimeter > 200)
-			// Don't cluster lines or polygons whose the 1/2 perimeter is more than 200 pixels
+			// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
 			clusterSource.addFeature(feature);
 		else
 			return new ol.geom.Point(
@@ -289,38 +289,9 @@ function layerVectorCluster(options) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
 
-		let clusters = 0, // Add number of clusters of server cluster groups
-			names = [], // List of names of clustered features
-			clustered = false; // The server send clusters
+		if (features)
+			feature.hoverStyleOptions = options.hoverStyleOptions;
 
-		if (features) {
-			for (let f in features)
-				// Check if the server send clusters
-				if (features[f].display) {
-					if (features[f].display.name)
-						names.push(features[f].display.name);
-
-					if (features[f].display.cluster)
-						clustered = true;
-
-					clusters += parseInt(features[f].display.cluster) || 1;
-				}
-
-			// Cluster labels
-			//TODO add cluster numbers
-			if (features.length > 1 || !names.length) {
-				// Big cluster
-				if (clusters > 7)
-					names = []; // Don't display big list
-
-				// Clusters
-				feature.display = {
-					cluster: clusters,
-					hover: names.length ? names.join('\n') : 'Cliquer pour zoomer',
-				};
-				feature.hoverStyleOptions = options.hoverStyleOptions;
-			}
-		}
 
 		return style(feature, resolution);
 	}
