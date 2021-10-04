@@ -47,35 +47,8 @@ function rgbaColor(hexColor, transparency) {
 function myLayer(options) {
 	return layerVectorCluster(Object.assign({
 		styleOptions: function(feature, properties, options) {
-			// Points
-			if (properties.type) {
-				styleOptions = {
-					text: new ol.style.Text({
-						text: properties.name || properties.nom, //TODO   htmlcars + first upper + _
-						textBaseline: 'bottom',
-						offsetY: -13, // Balance the bottom textBaseline
-						padding: [0, 1, 0, 1],
-						font: '14px Calibri,sans-serif',
-						fill: new ol.style.Fill({
-							color: 'black',
-						}),
-						backgroundFill: new ol.style.Fill({
-							color: 'yellow',
-						}),
-					}),
-				};
-
-				if (feature.display.icon)
-					styleOptions.image = new ol.style.Icon({
-						src: feature.display.icon,
-						imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-					});
-
-				return styleOptions;
-			}
-
 			// Clusters
-			else if (properties.features)
+			if (properties.features)
 				return {
 					image: new ol.style.Circle({
 						radius: 14,
@@ -91,6 +64,43 @@ function myLayer(options) {
 						font: '14px Calibri,sans-serif',
 					}),
 				};
+
+			// Features
+			styleOptions = {
+				text: new ol.style.Text({
+					text: properties.name || properties.nom, //TODO   htmlcars + first upper + _
+					textBaseline: 'bottom',
+					offsetY: -13, // Balance the bottom textBaseline
+					padding: [0, 1, 0, 1],
+					font: '14px Calibri,sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'yellow',
+					}),
+				}),
+				// Lines
+				/*//TODO TBD
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
+				}),
+				*/
+				// Polygons
+				fill: new ol.style.Fill({
+					color: rgbaColor(feature.get('color') || feature.get('couleur') || '#333333', 0.5),
+				}),
+			};
+
+			// Points
+			if (feature.display.icon)
+				styleOptions.image = new ol.style.Icon({
+					src: feature.display.icon,
+					imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+				});
+
+			return styleOptions;
 		},
 
 		hoverStyleOptions: function(feature, properties) {
@@ -100,7 +110,8 @@ function myLayer(options) {
 			if (properties.type) {
 				if (properties.type.valeur) // Refuges.info
 					properties.type = properties.type.valeur;
-				hover.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+				if (properties.type.length)
+					hover.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
 				if (properties.coord && properties.coord.alt) // Refuges.info
 					properties.alt = properties.coord.alt;
 				if (properties.alt)
@@ -109,10 +120,10 @@ function myLayer(options) {
 					line.push(properties.places.valeur + '\u255E\u2550\u2555');
 				if (line.length)
 					hover.push(line.join(', '));
-				hover.push(properties.name || properties.nom);
 			}
+			hover.push(properties.name || properties.nom);
 
-			// Points
+			// Features
 			return {
 				text: new ol.style.Text({ //TODO reuse points def of text label
 					text: hover.join('\n') || 'Cliquer pour zoomer',
@@ -126,6 +137,17 @@ function myLayer(options) {
 					backgroundFill: new ol.style.Fill({
 						color: 'yellow',
 					}),
+				}),
+				// Lines
+				/*//TODO TBD
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 3,
+				}),
+				*/
+				// Polygons
+				fill: new ol.style.Fill({
+					color: rgbaColor(feature.get('color') || feature.get('couleur') || '#333333', 0.5),
 				}),
 			};
 		},
@@ -146,7 +168,7 @@ function layerWri(options) {
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, feature, options) {
+		displayFunction: function(properties, feature, options) {
 			return {
 				url: properties.lien,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
@@ -156,48 +178,16 @@ function layerWri(options) {
 }
 
 function layerWriAreas(options) {
-	return layerVector(Object.assign({
+	return myLayer(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
-		displayProperties: function(properties) {
+		displayFunction: function(properties) {
 			return {
 				name: properties.nom,
 				url: properties.lien,
-			};
-		},
-		styleOptions: function(feature, properties) {
-			return {
-				text: new ol.style.Text({
-					text: properties.nom,
-					font: 'bold 14px Calibri,sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-				}),
-				fill: new ol.style.Fill({
-					color: rgbaColor(feature.get('couleur'), 0.5),
-				}),
-			};
-		},
-		hoverStyleOptions: function(feature, properties) {
-			return {
-				text: new ol.style.Text({
-					text: properties.nom,
-					overflow: true, // Force polygons label display when decluttering
-					font: 'bold 14px Calibri,sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'white',
-					}),
-				}),
-				fill: new ol.style.Fill({
-					color: rgbaColor(feature.get('couleur'), 0.7),
-				}),
 			};
 		},
 	}, options));
@@ -217,7 +207,7 @@ function layerGeoBB(options) {
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
-		displayProperties: function(properties, feature, options) {
+		displayFunction: function(properties, feature, options) {
 			return {
 				url: options.host + 'viewtopic.php?t=' + properties.id,
 				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
@@ -231,6 +221,59 @@ function layerGeoBB(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
+	return layerGeoBB(Object.assign({
+		host: '//alpages.info/',
+		displayFunction: function(properties, feature, options) {
+			return {
+				icon: properties.type ? '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
+				url: options.host + 'viewtopic.php?t=' + properties.id,
+			}
+
+
+		},
+
+
+
+		//*DCMM*/{var _r=' ',_v=properties;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+
+		/*		
+			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
+			if (match)
+				properties.icon = match[1];
+			*/
+		//*DCMM*/{var _r=' ',_v=match;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+
+		/*
+
+		return properties;
+		*/
+		/*
+		urlFunction: function(options, bbox, selection) {
+			return options.host +
+				'ext/Dominique92/GeoBB/gis.php?limit=500' +
+				(options.selectorName ? '&forums=' + selection.join(',') : '') +
+				'&bbox=' + bbox.join(',');
+		},
+		//distance: 30, //BEST BUG dédouble les points si cluster
+		displayFunction: function(properties, feature, options) {
+			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
+			if (match)
+				properties.iconchem = match[1];
+
+			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
+			return properties;
+		},
+		styleOptions: function(feature) {
+			return fillColorOption(feature.get('color'), 0.3);
+		},
+		hoverStyleOptions: function(feature) {
+			return fillColorOption(feature.get('color'), 0.7);
+		},
+		*/
+	}, options));
+}
+
+function WWlayerAlpages(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -240,7 +283,7 @@ function layerAlpages(options) {
 				'&bbox=' + bbox.join(',');
 		},
 		//distance: 30, //BEST BUG dédouble les points si cluster
-		displayProperties: function(properties, feature, options) {
+		displayFunction: function(properties, feature, options) {
 			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
 			if (match)
 				properties.iconchem = match[1];
@@ -270,7 +313,7 @@ function layerOSM(options) {
 			host: 'https://overpass-api.de/api/interpreter',
 			urlFunction: urlFunction,
 			format: format,
-			displayProperties: displayProperties,
+			displayFunction: displayFunction,
 		}, options)),
 		statusEl = document.getElementById(options.selectorName);
 
@@ -333,7 +376,7 @@ function layerOSM(options) {
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
-	function displayProperties(properties) {
+	function displayFunction(properties) {
 		if (options.symbols)
 			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
@@ -359,7 +402,7 @@ function layerPyreneesRefuges(options) {
 	return layerVectorCluster(Object.assign({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
-		displayProperties: function(properties) {
+		displayFunction: function(properties) {
 			const types = properties.type_hebergement.split(' ');
 			return {
 				name: properties.name,

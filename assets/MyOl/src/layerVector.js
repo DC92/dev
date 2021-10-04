@@ -7,14 +7,14 @@
  * Styles, icons & labels
  *
  * Options:
- * All source.Vector options : format, strategy, attributions, ...
- * urlFunction: function(options, bbox, selection, extent, resolution, projection)
  * selectorName : <input name="selectorName"> url arguments selector
- * styleOptions: Options of the style of the features (object = style options or function returning object)
- * hoverStyleOptions: Options of the style when hovering the features (object = style options or function returning object)
+ * urlFunction: function(options, bbox, selection, extent, resolution, projection) returning the XHR url
+ * displayFunction: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX 
+ * styleOptions: function(feature, properties, options) returning options of the style of the features
+ * hoverStyleOptions: function(feature, properties, options) returning options of the style when hovering the features
+ * source.Vector options : format, strategy, attributions, ...
  */
 //TODO+ BUG battement si trop d'icônes
-//TODO+ BUG Pas de pictos Cluster dans le Vercors 
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -33,7 +33,7 @@ function layerVector(opt) {
 			//TODO declutter: true,
 		}, options)),
 
-		//		elLabel = document.createElement('span'),		//HACK to render the html entities in canvas
+		//TODO elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		statusEl = document.getElementById(options.selectorName);
 
 	// XHR download tracking
@@ -81,15 +81,13 @@ function layerVector(opt) {
 			//HACK attach this function to each feature to access it when hovering without layer context
 			evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
-			// Add data to be used to display the feature
-			//TODO DELETE
-			evt.features[f].display = typeof options.displayProperties == 'function' ?
-				options.displayProperties(
+			// Compute data to be used to display the feature
+			if (typeof options.displayFunction == 'function')
+				evt.features[f].display = options.displayFunction(
 					evt.features[f].getProperties(),
 					evt.features[f],
 					options
-				) :
-				evt.features[f].getProperties();
+				);
 		}
 	});
 
