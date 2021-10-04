@@ -5,14 +5,12 @@
 
 /* Virtual function with custom styles
  * GeoJson properties:
- * icon : url of an icon file
- * iconchem : url of an icon from chemineur.fr
  * name : label on top of the feature
  * type : cabane, ...
+ * icon : url of an icon file
  * ele : elevation / altitude (meters)
  * bed : number of places to sleep
  * cluster: number of grouped features when too close to be displayed alone
- * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
 function myLayer(options) {
@@ -40,7 +38,7 @@ function myLayer(options) {
 
 			// Features
 			styleOptions = {
-				text: yellowLabel(properties.name || properties.nom),
+				text: yellowLabel(properties.name || properties.nom, properties),
 				// Lines
 				/*//TODO TBD
 				stroke: new ol.style.Stroke({
@@ -65,31 +63,27 @@ function myLayer(options) {
 		},
 
 		hoverStyleOptions: function(feature, properties) {
-			const hover = [],
+			const text = [],
 				line = [];
 
+			properties.attribution = options.host.replaceAll('/', '').replace('www.', ''); // Default
 			Object.assign(properties, feature.display);
 
-			if (properties.type) {
-				if (properties.type.valeur) // Refuges.info
-					properties.type = properties.type.valeur;
-				if (properties.type.length)
-					hover.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
-				if (properties.coord && properties.coord.alt) // Refuges.info
-					properties.alt = properties.coord.alt;
-				if (properties.alt)
-					line.push(properties.alt + 'm');
-				if (properties.places && properties.places.valeur)
-					line.push(properties.places.valeur + '\u255E\u2550\u2555');
-				if (line.length)
-					hover.push(line.join(', '));
-				//TODO attribution
-			}
-			hover.push(properties.name || properties.nom);
+			if (typeof properties.type == 'string')
+				text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+			if (properties.alt)
+				line.push(properties.alt + 'm');
+			if (properties.bed)
+				line.push(properties.bed + '\u255E\u2550\u2555');
+			if (line.length)
+				text.push(line.join(', '));
+			if (properties.attribution)
+				text.push('&copy;' + properties.attribution);
+			text.push(properties.name);
 
 			// Features
 			return {
-				text: yellowLabel(hover.join('\n') || 'Cliquer pour zoomer'),
+				text: yellowLabel(text.join('\n') || 'Cliquer pour zoomer', properties, true),
 				// Lines
 				/*//TODO TBD
 				stroke: new ol.style.Stroke({
@@ -105,12 +99,9 @@ function myLayer(options) {
 		},
 	}, options));
 
-	function yellowLabel(text) {
-		return new ol.style.Text({ //TODO reuse points def of text label
+	function yellowLabel(text, properties, hover) {
+		const st = {
 			text: text,
-			textBaseline: 'bottom',
-			offsetY: -13, // Balance the bottom textBaseline
-			padding: [0, 1, 0, 1],
 			font: '14px Calibri,sans-serif',
 			fill: new ol.style.Fill({
 				color: 'black',
@@ -118,7 +109,19 @@ function myLayer(options) {
 			backgroundFill: new ol.style.Fill({
 				color: 'yellow',
 			}),
-		});
+		};
+
+		if (hover)
+			st.overflow = true;
+
+		if (properties.icon)
+			Object.assign(st, {
+				textBaseline: 'bottom',
+				offsetY: -13, // Balance the bottom textBaseline
+				padding: [0, 1, 0, 1],
+			});
+
+		return new ol.style.Text(st);
 	}
 
 	function rgbaColor(hexColor, transparency) {
@@ -147,8 +150,12 @@ function layerWri(options) {
 		},
 		displayFunction: function(properties, feature, options) {
 			return {
-				url: properties.lien,
+				name: properties.nom,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				type: properties.type.valeur,
+				alt: properties.coord.alt,
+				bed: properties.places.valeur,
+				url: properties.lien,
 			};
 		},
 	}, options));
@@ -165,6 +172,7 @@ function layerWriAreas(options) {
 			return {
 				name: properties.nom,
 				url: properties.lien,
+				attribution: null,
 			};
 		},
 	}, options));
@@ -187,7 +195,7 @@ function layerGeoBB(options) {
 		displayFunction: function(properties, feature, options) {
 			return {
 				url: options.host + 'viewtopic.php?t=' + properties.id,
-				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg', //TODO pas de type sur ligne ?
 			};
 			return properties;
 		},
@@ -205,8 +213,6 @@ function layerAlpages(options) {
 				icon: properties.type ? '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
 				url: options.host + 'viewtopic.php?t=' + properties.id,
 			}
-
-
 		},
 	}, options));
 }
