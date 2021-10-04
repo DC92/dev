@@ -29,11 +29,13 @@ function layerVector(opt) {
 
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
-			style: style,
+			style: function(feature, resolution) {
+				return displayStyle(feature, options.styleOptions);
+			},
 			//TODO declutter: true,
 		}, options)),
 
-		//TODO elLabel = document.createElement('span'), //HACK to render the html entities in canvas
+		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		statusEl = document.getElementById(options.selectorName);
 
 	// XHR download tracking
@@ -91,19 +93,22 @@ function layerVector(opt) {
 		}
 	});
 
-	// Style callback function for the layer
-	function style(feature, resolution) {
-		return displayStyle(feature, resolution, options.styleOptions);
-	}
-
 	// Function to display different styles
-	//TODO merge with style
-	function displayStyle(feature, resolution, styleOptionsFunction) {
-		if (feature.display) {
-			const styleOptions = typeof styleOptionsFunction == 'function' ? styleOptionsFunction(feature, feature.getProperties(), options) : {}; //TODO optimize
+	function displayStyle(feature, styleOptionsFunction) {
+		const styleOptions = styleOptionsFunction(feature, feature.getProperties(), options);
 
-			return new ol.style.Style(styleOptions);
+		//HACK to render the html entities in the canvas
+		if (styleOptions.text) {
+			elLabel.innerHTML = styleOptions.text.getText();
+
+			if (elLabel.innerHTML) {
+				styleOptions.text.setText(
+					elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1)
+				);
+			}
 		}
+
+		return new ol.style.Style(styleOptions);
 	}
 
 	// Display labels on hovering & click
@@ -129,7 +134,7 @@ function layerVector(opt) {
 				zIndex: 2, // Above the features
 				//TODO declutter: true, //To avoid dumping the other labels
 				style: function(feature, resolution) {
-					return displayStyle(feature, resolution, feature.hoverStyleOptions);
+					return displayStyle(feature, feature.hoverStyleOptions);
 				},
 			});
 

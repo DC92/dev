@@ -3,35 +3,6 @@
  * using MyOl/src/layerVector.js
  */
 
-/**
- * Common function
- */
-//TODO DELETE
-function fillColorOption(hexColor, transparency) {
-	return hexColor ? {
-		textOptions: {
-			overflow: true, // Force polygons label display when decluttering
-		},
-		fill: fillColorStyle(hexColor, transparency),
-	} : {};
-}
-
-//TODO DELETE
-function fillColorStyle(hexColor, transparency) {
-	return hexColor ? new ol.style.Fill({
-		color: rgbaColor(hexColor, transparency),
-	}) : {};
-}
-
-function rgbaColor(hexColor, transparency) {
-	return 'rgba(' + [
-		parseInt(hexColor.substring(1, 3), 16),
-		parseInt(hexColor.substring(3, 5), 16),
-		parseInt(hexColor.substring(5, 7), 16),
-		transparency || 1,
-	].join(',') + ')';
-}
-
 /* Virtual function with custom styles
  * GeoJson properties:
  * icon : url of an icon file
@@ -40,13 +11,15 @@ function rgbaColor(hexColor, transparency) {
  * type : cabane, ...
  * ele : elevation / altitude (meters)
  * bed : number of places to sleep
- * cluster: number of grouped features too close to be displayed alone
+ * cluster: number of grouped features when too close to be displayed alone
  * hover : label on hovering a feature
  * url: url to go if feature is clicked
  */
 function myLayer(options) {
 	return layerVectorCluster(Object.assign({
 		styleOptions: function(feature, properties, options) {
+			Object.assign(properties, feature.display);
+
 			// Clusters
 			if (properties.features)
 				return {
@@ -67,19 +40,7 @@ function myLayer(options) {
 
 			// Features
 			styleOptions = {
-				text: new ol.style.Text({
-					text: properties.name || properties.nom, //TODO   htmlcars + first upper + _
-					textBaseline: 'bottom',
-					offsetY: -13, // Balance the bottom textBaseline
-					padding: [0, 1, 0, 1],
-					font: '14px Calibri,sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'yellow',
-					}),
-				}),
+				text: yellowLabel(properties.name || properties.nom),
 				// Lines
 				/*//TODO TBD
 				stroke: new ol.style.Stroke({
@@ -107,6 +68,8 @@ function myLayer(options) {
 			const hover = [],
 				line = [];
 
+			Object.assign(properties, feature.display);
+
 			if (properties.type) {
 				if (properties.type.valeur) // Refuges.info
 					properties.type = properties.type.valeur;
@@ -120,24 +83,13 @@ function myLayer(options) {
 					line.push(properties.places.valeur + '\u255E\u2550\u2555');
 				if (line.length)
 					hover.push(line.join(', '));
+				//TODO attribution
 			}
 			hover.push(properties.name || properties.nom);
 
 			// Features
 			return {
-				text: new ol.style.Text({ //TODO reuse points def of text label
-					text: hover.join('\n') || 'Cliquer pour zoomer',
-					textBaseline: 'bottom',
-					offsetY: -13, // Balance the bottom textBaseline
-					padding: [0, 1, 0, 1],
-					font: '14px Calibri,sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'yellow',
-					}),
-				}),
+				text: yellowLabel(hover.join('\n') || 'Cliquer pour zoomer'),
 				// Lines
 				/*//TODO TBD
 				stroke: new ol.style.Stroke({
@@ -152,6 +104,31 @@ function myLayer(options) {
 			};
 		},
 	}, options));
+
+	function yellowLabel(text) {
+		return new ol.style.Text({ //TODO reuse points def of text label
+			text: text,
+			textBaseline: 'bottom',
+			offsetY: -13, // Balance the bottom textBaseline
+			padding: [0, 1, 0, 1],
+			font: '14px Calibri,sans-serif',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'yellow',
+			}),
+		});
+	}
+
+	function rgbaColor(hexColor, transparency) {
+		return 'rgba(' + [
+			parseInt(hexColor.substring(1, 3), 16),
+			parseInt(hexColor.substring(3, 5), 16),
+			parseInt(hexColor.substring(5, 7), 16),
+			transparency || 1,
+		].join(',') + ')';
+	}
 }
 
 /**
@@ -231,72 +208,72 @@ function layerAlpages(options) {
 
 
 		},
-
-
-
-		//*DCMM*/{var _r=' ',_v=properties;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
-		/*		
-			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
-			if (match)
-				properties.icon = match[1];
-			*/
-		//*DCMM*/{var _r=' ',_v=match;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
-		/*
-
-		return properties;
-		*/
-		/*
-		urlFunction: function(options, bbox, selection) {
-			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?limit=500' +
-				(options.selectorName ? '&forums=' + selection.join(',') : '') +
-				'&bbox=' + bbox.join(',');
-		},
-		//distance: 30, //BEST BUG dédouble les points si cluster
-		displayFunction: function(properties, feature, options) {
-			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
-			if (match)
-				properties.iconchem = match[1];
-
-			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			return properties;
-		},
-		styleOptions: function(feature) {
-			return fillColorOption(feature.get('color'), 0.3);
-		},
-		hoverStyleOptions: function(feature) {
-			return fillColorOption(feature.get('color'), 0.7);
-		},
-		*/
 	}, options));
 }
 
-function WWlayerAlpages(options) {
-	return layerVectorCluster(Object.assign({
-		host: '//alpages.info/',
-		urlFunction: function(options, bbox, selection) {
-			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?limit=500' +
-				(options.selectorName ? '&forums=' + selection.join(',') : '') +
-				'&bbox=' + bbox.join(',');
+/**
+ * Site pyrenees-refuges.com
+ */
+function layerPyreneesRefuges(options) {
+	return myLayer(Object.assign({
+		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		strategy: ol.loadingstrategy.all,
+		displayFunction: function(properties) {
+			const types = properties.type_hebergement.split(' ');
+			return {
+				name: properties.name,
+				type: properties.type_hebergement,
+				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
+				url: properties.url,
+				ele: properties.altitude,
+				bed: properties.cap_ete,
+			};
 		},
-		//distance: 30, //BEST BUG dédouble les points si cluster
-		displayFunction: function(properties, feature, options) {
-			const match = properties.icon.match(new RegExp('/([a-z_0-9]+).png'));
-			if (match)
-				properties.iconchem = match[1];
+	}, options));
+}
 
-			properties.url = options.host + 'viewtopic.php?t=' + properties.id;
-			return properties;
+/**
+ * Site camptocamp.org
+ */
+function layerC2C(options) {
+	const format = new ol.format.GeoJSON({ // Format of received data
+		dataProjection: 'EPSG:3857',
+	});
+
+	format.readFeatures = function(json, opts) {
+		const features = [],
+			objects = JSONparse(json);
+
+		for (let o in objects.documents) {
+			const properties = objects.documents[o];
+
+			features.push({
+				id: properties.document_id,
+				type: 'Feature',
+				geometry: JSONparse(properties.geometry.geom),
+				properties: {
+					ele: properties.elevation,
+					name: properties.locales[0].title,
+					type: properties.waypoint_type,
+					iconchem: properties.waypoint_type,
+					url: 'https://www.camptocamp.org/waypoints/' + properties.document_id,
+				},
+			});
+		}
+		return format.readFeaturesFromObject({
+				type: 'FeatureCollection',
+				features: features,
+			},
+			format.getReadOptions(json, opts)
+		);
+	};
+
+	return layerVectorCluster(Object.assign({
+		urlFunction: function(options, bbox, selection, extent) {
+			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
 		},
-		styleOptions: function(feature) {
-			return fillColorOption(feature.get('color'), 0.3);
-		},
-		hoverStyleOptions: function(feature) {
-			return fillColorOption(feature.get('color'), 0.7);
-		},
+		format: format,
+		strategy: ol.loadingstrategy.bboxLimit, //TODO ???
 	}, options));
 }
 
@@ -393,70 +370,4 @@ function layerOSM(options) {
 	}
 
 	return layer;
-}
-
-/**
- * Site pyrenees-refuges.com
- */
-function layerPyreneesRefuges(options) {
-	return layerVectorCluster(Object.assign({
-		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		strategy: ol.loadingstrategy.all,
-		displayFunction: function(properties) {
-			const types = properties.type_hebergement.split(' ');
-			return {
-				name: properties.name,
-				type: properties.type_hebergement,
-				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
-				url: properties.url,
-				ele: properties.altitude,
-				bed: properties.cap_ete,
-			};
-		},
-	}, options));
-}
-
-/**
- * Site camptocamp.org
- */
-function layerC2C(options) {
-	const format = new ol.format.GeoJSON({ // Format of received data
-		dataProjection: 'EPSG:3857',
-	});
-
-	format.readFeatures = function(json, opts) {
-		const features = [],
-			objects = JSONparse(json);
-
-		for (let o in objects.documents) {
-			const properties = objects.documents[o];
-
-			features.push({
-				id: properties.document_id,
-				type: 'Feature',
-				geometry: JSONparse(properties.geometry.geom),
-				properties: {
-					ele: properties.elevation,
-					name: properties.locales[0].title,
-					type: properties.waypoint_type,
-					iconchem: properties.waypoint_type,
-					url: 'https://www.camptocamp.org/waypoints/' + properties.document_id,
-				},
-			});
-		}
-		return format.readFeaturesFromObject({
-				type: 'FeatureCollection',
-				features: features,
-			},
-			format.getReadOptions(json, opts)
-		);
-	};
-
-	return layerVectorCluster(Object.assign({
-		urlFunction: function(options, bbox, selection, extent) {
-			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
-		},
-		format: format,
-		strategy: ol.loadingstrategy.bboxLimit, //TODO ???
-	}, options));
 }
