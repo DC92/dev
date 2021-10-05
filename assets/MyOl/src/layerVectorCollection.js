@@ -48,9 +48,9 @@ function myLayer(options) {
 			};
 
 			// Points
-			if (feature.display.icon)
+			if (properties.icon)
 				styleOptions.image = new ol.style.Icon({
-					src: feature.display.icon,
+					src: properties.icon,
 					imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
 				});
 
@@ -87,7 +87,7 @@ function myLayer(options) {
 					if (name)
 						text.push(name);
 					if (properties.features[f].getProperties().cluster)
-						includeCluster = true;;
+						includeCluster = true;
 				}
 
 				if (text.length == 0 || text.length > 6 || includeCluster)
@@ -238,7 +238,7 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
-//TODO BUG color se surimpose sans s'effacer
+//TODO+ BUG color se surimpose sans s'effacer : need an feature id
 function layerAlpages(options) {
 	return layerGeoBB(Object.assign({
 		host: '//alpages.info/',
@@ -246,7 +246,7 @@ function layerAlpages(options) {
 			return {
 				icon: properties.type ? '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
 				url: options.host + 'viewtopic.php?t=' + properties.id,
-			}
+			};
 		},
 	}, options));
 }
@@ -275,10 +275,20 @@ function layerPyreneesRefuges(options) {
 }
 
 /**
+ * BBOX strategy when the url returns a limited number of features in the BBox
+ * We do need to reload when the zoom in
+ */
+ol.loadingstrategy.bboxLimit = function(extent, resolution) {
+	if (this.bboxLimitResolution > resolution) // When zoom in
+		this.refresh(); // Force the loading of all areas
+	this.bboxLimitResolution = resolution; // Mem resolution for further requests
+	return [extent];
+};
+
+/**
  * Site camptocamp.org
  */
 function layerC2C(options) {
-	//TODO++
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
@@ -298,8 +308,9 @@ function layerC2C(options) {
 					ele: properties.elevation,
 					name: properties.locales[0].title,
 					type: properties.waypoint_type,
-					iconchem: properties.waypoint_type,
-					url: 'https://www.camptocamp.org/waypoints/' + properties.document_id,
+					icon: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.waypoint_type + '.svg',
+					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
+					attribution: 'CampToCamp',
 				},
 			});
 		}
@@ -316,7 +327,6 @@ function layerC2C(options) {
 			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
 		},
 		format: format,
-		//TODO strategy: ol.loadingstrategy.bboxLimit,
 	}, options));
 }
 
@@ -326,12 +336,13 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
-	//TODO+ strategie bboxLimit
+	//TODO++
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			maxResolution: 50,
 			host: 'https://overpass-api.de/api/interpreter',
 			urlFunction: urlFunction,
+			strategy: ol.loadingstrategy.bboxLimit, //TODO+ strategie bboxLimit
 			format: format,
 			displayFunction: displayFunction,
 		}, options)),

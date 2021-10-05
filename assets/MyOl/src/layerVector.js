@@ -14,7 +14,7 @@
  * hoverStyleOptions: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
-//TODO+ BUG battement si trop d'icônes
+//TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -147,13 +147,13 @@ function layerVector(opt) {
 			// The mouse is outside of the map
 			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				hovermouseEvent({});
+				mouseEvent({});
 		});
 
-		map.on(['pointermove', 'click'], hovermouseEvent);
-		map.getView().on('change:resolution', hovermouseEvent); // For WRI massifs
+		map.on(['pointermove', 'click'], mouseEvent);
+		map.getView().on('change:resolution', mouseEvent); // For WRI massifs
 
-		function hovermouseEvent(evt) {
+		function mouseEvent(evt) {
 			const originalEvent = evt.originalEvent || evt,
 				// Get the hovered feature
 				//TODO BUG forEachFeatureAtPixel with no features when decluter
@@ -181,7 +181,10 @@ function layerVector(opt) {
 			// Click actions
 			if (feature && evt.type == 'click') {
 				const features = feature.get('features') || [feature],
-					display = features[0].display, // Get first or alone feature
+					display = Object.assign({},
+						features[0].getProperties(), // Get first or alone feature
+						features[0].display
+					),
 					geom = feature.getGeometry();
 
 				if (display) {
