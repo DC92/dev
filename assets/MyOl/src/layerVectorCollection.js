@@ -45,17 +45,6 @@ function myLayer(options) {
 			// Features
 			styleOptions = {
 				text: yellowLabel(properties.name || properties.nom, properties),
-				// Lines
-				/*//TODO TBD
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 2,
-				}),
-				*/
-				// Polygons
-				fill: new ol.style.Fill({
-					color: rgbaColor(feature.get('color') || feature.get('couleur') || '#333333', 0.5),
-				}),
 			};
 
 			// Points
@@ -65,15 +54,30 @@ function myLayer(options) {
 					imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
 				});
 
+			// Polygons
+			if (properties.color)
+				styleOptions.fill = new ol.style.Fill({
+					color: rgbaColor(properties.color, 0.5),
+				});
+
+			// Lines
+			else
+				styleOptions.stroke = new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
+				});
+
 			return styleOptions;
 		},
 
 		hoverStyleOptions: function(feature, properties) {
+			Object.assign(properties, feature.display);
+
 			let text = [],
 				line = [];
 
-			properties.attribution = options.host.replaceAll('/', '').replace('www.', ''); // Default
-			Object.assign(properties, feature.display);
+			if (options.host)
+				properties.attribution = options.host.replaceAll('/', '').replace('www.', ''); // Default
 
 			// Cluster
 			if (properties.features || properties.cluster) {
@@ -91,7 +95,7 @@ function myLayer(options) {
 			}
 			// Feature
 			else {
-				if (typeof properties.type == 'string')
+				if (typeof properties.type == 'string' && properties.type)
 					text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
 				if (properties.alt)
 					line.push(properties.alt + 'm');
@@ -104,21 +108,26 @@ function myLayer(options) {
 				text.push(properties.name);
 			}
 
+
 			// Features
-			return {
+			styleOptions = {
 				text: yellowLabel(text.join('\n'), properties, true),
-				// Lines
-				/**/ //TODO TBD
-				stroke: new ol.style.Stroke({
+			};
+
+			// Polygons
+			if (properties.color)
+				styleOptions.fill = new ol.style.Fill({
+					color: rgbaColor(properties.color, 0.5),
+				});
+
+			// Lines
+			else
+				styleOptions.stroke = new ol.style.Stroke({
 					color: 'red',
 					width: 3,
-				}),
+				});
 
-				// Polygons
-				fill: new ol.style.Fill({
-					color: rgbaColor(feature.get('color') || feature.get('couleur') || '#333333', 0.5),
-				}),
-			};
+			return styleOptions;
 		},
 	}, options));
 
@@ -194,6 +203,7 @@ function layerWriAreas(options) {
 		displayFunction: function(properties) {
 			return {
 				name: properties.nom,
+				color: properties.couleur,
 				url: properties.lien,
 				attribution: null,
 			};
@@ -228,6 +238,7 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
+//TODO BUG color se surimpose sans s'effacer
 function layerAlpages(options) {
 	return layerGeoBB(Object.assign({
 		host: '//alpages.info/',
@@ -248,11 +259,13 @@ function layerPyreneesRefuges(options) {
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		displayFunction: function(properties) {
-			const types = properties.type_hebergement.split(' ');
+			const types = properties.type_hebergement.split(' '),
+				iconName = types[0] + (types.length > 1 ? '_' + types[1] : ''); // Limit to 2 type names
+
 			return {
 				name: properties.name,
 				type: properties.type_hebergement,
-				iconchem: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
+				icon: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg',
 				url: properties.url,
 				ele: properties.altitude,
 				bed: properties.cap_ete,
@@ -265,6 +278,7 @@ function layerPyreneesRefuges(options) {
  * Site camptocamp.org
  */
 function layerC2C(options) {
+	//TODO++
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
@@ -297,12 +311,12 @@ function layerC2C(options) {
 		);
 	};
 
-	return layerVectorCluster(Object.assign({
+	return myLayer(Object.assign({
 		urlFunction: function(options, bbox, selection, extent) {
 			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
 		},
 		format: format,
-		strategy: ol.loadingstrategy.bboxLimit, //TODO ???
+		//TODO strategy: ol.loadingstrategy.bboxLimit,
 	}, options));
 }
 

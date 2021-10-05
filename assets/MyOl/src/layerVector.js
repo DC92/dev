@@ -156,7 +156,7 @@ function layerVector(opt) {
 		function hovermouseEvent(evt) {
 			const originalEvent = evt.originalEvent || evt,
 				// Get the hovered feature
-				//TODO+ BUG forEachFeatureAtPixel with no features when decluter
+				//TODO BUG forEachFeatureAtPixel with no features when decluter
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature) {

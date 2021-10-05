@@ -120,7 +120,7 @@ function layerIGN(subLayer, format) {
  * Swisstopo https://api.geo.admin.ch/
  */
 function layerSwissTopo(layer1) {
-	//TODO+ carte stamen hors zoom ou extent
+	//TODO carte stamen hors zoom ou extent
 	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];
@@ -165,7 +165,7 @@ function layerSpain(server, subLayer) {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
-	//TODO+ carte stamen hors zoom ou extent
+	//TODO carte stamen hors zoom ou extent
 
 	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ?
 		new ol.layer.Tile({

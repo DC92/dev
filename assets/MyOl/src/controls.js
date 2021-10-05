@@ -397,7 +397,7 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		//TODO+ detecter aussi si on est sur un mobile
+		//TODO detecter aussi si on est sur un mobile
 		if (button.active && position && altitude) {
 			const map = button.getMap(),
 				// Estimate the viewport size
