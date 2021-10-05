@@ -144,7 +144,8 @@ function layerVector(opt) {
 		window.addEventListener('mousemove', function(evt) {
 			const divRect = map.getTargetElement().getBoundingClientRect();
 
-			if (evt.clientX < divRect.left || divRect.right < evt.clientX || // The mouse is outside the map
+			// The mouse is outside of the map
+			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
 				hovermouseEvent({});
 		});
@@ -153,8 +154,7 @@ function layerVector(opt) {
 		map.getView().on('change:resolution', hovermouseEvent); // For WRI massifs
 
 		function hovermouseEvent(evt) {
-			const originalEvent = evt.originalEvent ||
-				evt, //TODO still needed ???
+			const originalEvent = evt.originalEvent || evt,
 				// Get the hovered feature
 				//TODO+ BUG forEachFeatureAtPixel with no features when decluter
 				feature = map.forEachFeatureAtPixel(
@@ -277,7 +277,7 @@ function layerVectorCluster(options) {
 		if (features.length == 1)
 			return features[0];
 
-		// Stay clustered
+		// Display a cluster point
 		return new ol.Feature({
 			geometry: point,
 			features: features
@@ -291,7 +291,6 @@ function layerVectorCluster(options) {
 
 		if (features)
 			feature.hoverStyleOptions = options.hoverStyleOptions;
-
 
 		return style(feature, resolution);
 	}

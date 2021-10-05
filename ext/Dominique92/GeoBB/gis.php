@@ -22,7 +22,7 @@ $cat = request_var ('cat', ''); // List of categories of forums to include "1,2,
 $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 $select = request_var ('select', ''); // Post to display
 $format = request_var ('format', 'geojson'); // Format de sortie. Par défaut geojson
-$layer = request_var ('layer', 'full'); // full | simple | cluster
+$layer = request_var ('layer', 'verbose'); // verbose (full data) | cluster (grouped points) | 'simple' (simplified)
 $limit = request_var ('limit', 200); // Nombre de points maximum
 
 $bboxs = explode (',', $bbox = request_var ('bbox', '-180,-90,180,90'));
@@ -152,7 +152,7 @@ while ($row = $db->sql_fetchrow($result)) {
 		'alt' => str_replace('~', '', $row['geo_altitude']),
 	];
 
-	if ($layer == 'full') {
+	if ($layer == 'verbose') {
 		$properties['link'] = $url_base.'viewtopic.php?t='.$row['topic_id'];
 		$properties['type_id'] = $row['forum_id'];
 		$properties['post_id'] = $row['post_id'];
@@ -161,7 +161,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	if ($row['forum_image']) {
 		preg_match ('/([^\/]+)\./', $row['forum_image'], $icon);
 		$properties['type'] = $icon[1];
-		if ($layer == 'full')
+		if ($layer == 'verbose')
 			$properties['icon'] = $url_base .str_replace ('.png', '.svg', $row['forum_image']);
 	}
 

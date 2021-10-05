@@ -19,7 +19,12 @@ function myLayer(options) {
 			Object.assign(properties, feature.display);
 
 			// Clusters
-			if (properties.features)
+			if (properties.features) {
+				let nbClusters = 0;
+
+				for (let f in properties.features)
+					nbClusters += parseInt(properties.features[f].getProperties().cluster) || 1;
+
 				return {
 					image: new ol.style.Circle({
 						radius: 14,
@@ -31,10 +36,11 @@ function myLayer(options) {
 						}),
 					}),
 					text: new ol.style.Text({
-						text: properties.features.length.toString(),
+						text: nbClusters.toString(),
 						font: '14px Calibri,sans-serif',
 					}),
 				};
+			}
 
 			// Features
 			styleOptions = {
@@ -63,17 +69,27 @@ function myLayer(options) {
 		},
 
 		hoverStyleOptions: function(feature, properties) {
-			const text = [],
+			let text = [],
 				line = [];
 
 			properties.attribution = options.host.replaceAll('/', '').replace('www.', ''); // Default
 			Object.assign(properties, feature.display);
 
-			if (properties.features && properties.features.length < 7) {
-				for (let f in properties.features)
-					text.push(properties.features[f].getProperties().name || properties.features[f].display.name);
-			} else if (properties.features)
-				text.push('Cliquer pour zoomer');
+			// Cluster
+			if (properties.features) {
+				let includeCluster = false;;
+				for (let f in properties.features) {
+					const name = properties.features[f].getProperties().name || properties.features[f].display.name;
+					if (name)
+						text.push(name);
+					if (properties.features[f].getProperties().cluster)
+						includeCluster = true;;
+				}
+
+				if (text.length == 0 || text.length > 6 || includeCluster)
+					text = ['Cliquer pour zoomer'];
+			}
+			// Feature
 			else {
 				if (typeof properties.type == 'string')
 					text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
@@ -187,6 +203,7 @@ function layerWriAreas(options) {
 
 /**
  * Site chemineur.fr
+ * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
