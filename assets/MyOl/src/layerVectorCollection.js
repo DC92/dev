@@ -48,6 +48,8 @@ function myLayer(options) {
 			};
 
 			// Points
+			if (properties.iconChemineur)
+				properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.iconChemineur + '.svg';
 			if (properties.icon)
 				styleOptions.image = new ol.style.Icon({
 					src: properties.icon,
@@ -76,9 +78,6 @@ function myLayer(options) {
 			let text = [],
 				line = [];
 
-			if (options.host)
-				properties.attribution = options.host.replaceAll('/', '').replace('www.', ''); // Default
-
 			// Cluster
 			if (properties.features || properties.cluster) {
 				let includeCluster = !!properties.cluster;
@@ -96,15 +95,18 @@ function myLayer(options) {
 			// Feature
 			else {
 				if (typeof properties.type == 'string' && properties.type)
-					text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+					line.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+				if (properties.attribution)
+					line.push('&copy;' + properties.attribution);
+				if (line.length)
+					text.push(line.join(' '));
+				line = [];
 				if (properties.alt)
 					line.push(properties.alt + 'm');
 				if (properties.bed)
 					line.push(properties.bed + '\u255E\u2550\u2555');
 				if (line.length)
 					text.push(line.join(', '));
-				if (properties.attribution)
-					text.push('&copy;' + properties.attribution);
 				text.push(properties.name);
 			}
 
@@ -188,6 +190,7 @@ function layerWri(options) {
 				alt: properties.coord.alt,
 				bed: properties.places.valeur,
 				url: properties.lien,
+				attribution: 'Refuges.info',
 			};
 		},
 	}, options));
@@ -230,6 +233,7 @@ function layerGeoBB(options) {
 			return {
 				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
 				url: options.host + 'viewtopic.php?t=' + properties.id,
+				attribution: 'Chemineur',
 			};
 		},
 	}, options));
@@ -244,8 +248,9 @@ function layerAlpages(options) {
 		host: '//alpages.info/',
 		displayFunction: function(properties, feature, options) {
 			return {
-				icon: properties.type ? '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
+				iconChemineur: properties.type,
 				url: options.host + 'viewtopic.php?t=' + properties.id,
+				attribution: 'Alpages',
 			};
 		},
 	}, options));
@@ -259,16 +264,16 @@ function layerPyreneesRefuges(options) {
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		displayFunction: function(properties) {
-			const types = properties.type_hebergement.split(' '),
-				iconName = types[0] + (types.length > 1 ? '_' + types[1] : ''); // Limit to 2 type names
+			const types = properties.type_hebergement.split(' ');
 
 			return {
 				name: properties.name,
 				type: properties.type_hebergement,
-				icon: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg',
+				iconChemineur: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
 				url: properties.url,
 				ele: properties.altitude,
 				bed: properties.cap_ete,
+				attribution: 'Pyrenees-Refuges',
 			};
 		},
 	}, options));
@@ -308,7 +313,7 @@ function layerC2C(options) {
 					ele: properties.elevation,
 					name: properties.locales[0].title,
 					type: properties.waypoint_type,
-					icon: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.waypoint_type + '.svg',
+					iconChemineur: properties.waypoint_type,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
 					attribution: 'CampToCamp',
 				},
@@ -408,6 +413,7 @@ function layerOSM(options) {
 	};
 
 	function displayFunction(properties) {
+		//TODO attribution
 		if (options.symbols)
 			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
@@ -417,7 +423,7 @@ function layerOSM(options) {
 			}
 
 		if (properties.type)
-			properties.iconchem =
+			properties.iconChemineur =
 			properties.sym = options.symbols[properties.type];
 
 		return properties;
