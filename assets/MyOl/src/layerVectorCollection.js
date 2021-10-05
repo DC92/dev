@@ -19,8 +19,8 @@ function myLayer(options) {
 			Object.assign(properties, feature.display);
 
 			// Clusters
-			if (properties.features) {
-				let nbClusters = 0;
+			if (properties.features || properties.cluster) {
+				let nbClusters = properties.cluster || 0;
 
 				for (let f in properties.features)
 					nbClusters += parseInt(properties.features[f].getProperties().cluster) || 1;
@@ -76,8 +76,8 @@ function myLayer(options) {
 			Object.assign(properties, feature.display);
 
 			// Cluster
-			if (properties.features) {
-				let includeCluster = false;;
+			if (properties.features || properties.cluster) {
+				let includeCluster = !!properties.cluster;
 				for (let f in properties.features) {
 					const name = properties.features[f].getProperties().name || properties.features[f].display.name;
 					if (name)
@@ -137,7 +137,7 @@ function myLayer(options) {
 		if (hover)
 			st.overflow = true;
 
-		if (properties.icon || properties.features)
+		if (properties.icon || properties.features || properties.cluster)
 			Object.assign(st, {
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
