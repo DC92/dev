@@ -62,6 +62,7 @@ const nbli = document.getElementsByTagName('li').length,
 		controlLengthLine(),
 
 		new ol.control.Zoom(),
+		//TODO BUG should not zoom when full screen
 		new ol.control.FullScreen({
 			label: '', //HACK Bad presentation on IE & FF
 			tipLabel: 'Plein écran',

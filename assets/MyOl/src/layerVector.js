@@ -120,8 +120,8 @@ function layerVector(opt) {
 	//HACK attach an hover listener once when the map is defined
 	ol.Map.prototype.render = function() {
 		if (!this.hoverListenerInstalled && this.getView()) {
-			initHover(this);
 			this.hoverListenerInstalled = true;
+			initHover(this);
 		}
 
 		return ol.PluggableMap.prototype.render.call(this);

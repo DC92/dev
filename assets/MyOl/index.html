@@ -63,6 +63,9 @@ Based on https://openlayers.org
 // Must be after the <div id="map"> tag
 new ol.Map({
 	target: 'map',
+	view: new ol.View({
+		enableRotation: false,
+	}),
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
 		layerGeoBB({
@@ -70,8 +73,9 @@ new ol.Map({
 			maxResolution: 300,
 			distance: 30,
 		}),
-		layerGeoBBCluster({
+		layerGeoBB({
 			selectorName: 'geobb-features',
+			subLayer: 'cluster',
 			minResolution: 300,
 			distance: 50,
 		}),

@@ -2,7 +2,6 @@
  * Add some usefull controls
  * Need to include controls.css
  */
-//TODO Inhiber rotation carte 
 
 /**
  * Control button
@@ -240,7 +239,6 @@ function controlTilesBuffer(depth, depthFS) {
 /**
  * Full window polyfill for non full screen browsers (iOS)
  */
-//TODO BUG should not zoom when full screen
 function controlFullScreen(options) {
 	let pseudoFullScreen = !(
 		document.body.webkitRequestFullscreen || // What is tested by ol.control.FullScreen
