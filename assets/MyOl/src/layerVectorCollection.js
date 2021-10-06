@@ -174,10 +174,10 @@ function myLayer(options) {
 //BEST min & max layer in the same function
 function layerWri(options) {
 	return myLayer(Object.assign({
-		host: '//www.refuges.info/',
+		host: 'www.refuges.info',
 		nb_points: 'all',
 		urlFunction: function(options, bbox, selection) {
-			return options.host + 'api/bbox' +
+			return '//' + options.host + '/api/bbox' +
 				'?nb_points=' + options.nb_points +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
@@ -185,7 +185,7 @@ function layerWri(options) {
 		displayFunction: function(properties, feature, options) {
 			return {
 				name: properties.nom,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				icon: '//' + options.host + '/images/icones/' + properties.type.icone + '.svg',
 				type: properties.type.valeur,
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
@@ -198,10 +198,10 @@ function layerWri(options) {
 
 function layerWriAreas(options) {
 	return myLayer(Object.assign({
-		host: '//www.refuges.info/',
+		host: 'www.refuges.info',
 		polygon: 1, // Massifs
 		urlFunction: function(options) {
-			return options.host + 'api/polygones?type_polygon=' + options.polygon;
+			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
 		},
 		displayFunction: function(properties) {
 			return {
@@ -221,18 +221,17 @@ function layerWriAreas(options) {
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
 	return myLayer(Object.assign({
-		host: '//chemineur.fr/',
+		host: 'chemineur.fr',
 		urlFunction: function(options, bbox, selection) {
-			return options.host +
-				'ext/Dominique92/GeoBB/gis.php?limit=10000' +
+			return '//' + options.host + '/ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		displayFunction: function(properties, feature, options) {
 			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
-				url: options.host + 'viewtopic.php?t=' + properties.id,
+				icon: properties.type ? '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
+				url: '//' + options.host + '/viewtopic.php?t=' + properties.id,
 				attribution: 'Chemineur',
 			};
 		},
@@ -245,11 +244,11 @@ function layerGeoBB(options) {
 //TODO+ BUG color se surimpose sans s'effacer : need an feature id
 function layerAlpages(options) {
 	return layerGeoBB(Object.assign({
-		host: '//alpages.info/',
+		host: 'alpages.info',
 		displayFunction: function(properties, feature, options) {
 			return {
 				iconChemineur: properties.type,
-				url: options.host + 'viewtopic.php?t=' + properties.id,
+				url: '//' + options.host + '/viewtopic.php?t=' + properties.id,
 				attribution: 'Alpages',
 			};
 		},
@@ -344,11 +343,11 @@ function layerOSM(options) {
 	const format = new ol.format.OSMXML(),
 		layer = myLayer(Object.assign({
 			maxResolution: 50,
-			//host: 'https://overpass-api.de/api/interpreter',
-			//host: 'https://lz4.overpass-api.de/api/interpreter',
-			host: 'http://overpass.openstreetmap.fr/api/interpreter',
-			//https://overpass.kumi.systems/api/interpreter',
-			//https://overpass.nchc.org.tw/api/interpreter',
+			//host: 'overpass-api.de',
+			//host: 'lz4.overpass-api.de',
+			host: 'overpass.openstreetmap.fr',
+			//host: 'overpass.kumi.systems',
+			//host: 'overpass.nchc.org.tw',
 			urlFunction: urlFunction,
 			format: format,
 			displayFunction: displayFunction,
@@ -369,7 +368,7 @@ function layerOSM(options) {
 				);
 		}
 
-		return options.host +
+		return 'https://' + options.host + '/api/interpreter' +
 			'?data=[timeout:5];(' + // Not too much !
 			args.join('') +
 			');out center;'; // Add center of areas
