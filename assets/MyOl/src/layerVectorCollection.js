@@ -9,7 +9,7 @@
  * type : cabane, ...
  * icon : url of an icon file
  * ele : elevation / altitude (meters)
- * bed : number of places to sleep
+ * capacity : number of places to sleep
  * cluster: number of grouped features when too close to be displayed alone
  * url: url to go if feature is clicked
  */
@@ -44,7 +44,7 @@ function myLayer(options) {
 
 			// Features
 			styleOptions = {
-				text: yellowLabel(properties.name || properties.nom, properties),
+				text: yellowLabel(properties.name || properties.nom || '', properties),
 			};
 
 			// Points
@@ -101,15 +101,15 @@ function myLayer(options) {
 				if (line.length)
 					text.push(line.join(' '));
 				line = [];
-				if (properties.alt)
-					line.push(properties.alt + 'm');
-				if (properties.bed)
-					line.push(properties.bed + '\u255E\u2550\u2555');
+				if (properties.ele)
+					line.push(properties.ele + ' m');
+				if (properties.capacity)
+					line.push(properties.capacity + '\u255E\u2550\u2555');
 				if (line.length)
 					text.push(line.join(', '));
-				text.push(properties.name);
+				if (properties.name)
+					text.push(properties.name);
 			}
-
 
 			// Features
 			styleOptions = {
@@ -134,7 +134,7 @@ function myLayer(options) {
 	}, options));
 
 	function yellowLabel(text, properties, hover) {
-		const st = {
+		const styleTextOptions = {
 			text: text,
 			font: '14px Calibri,sans-serif',
 			fill: new ol.style.Fill({
@@ -145,17 +145,17 @@ function myLayer(options) {
 			}),
 		};
 
-		if (hover)
-			st.overflow = true;
-
-		if (properties.icon || properties.features || properties.cluster)
-			Object.assign(st, {
+		if (!properties.area) // Not a line or polygon
+			Object.assign(styleTextOptions, {
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
 				padding: [0, 1, 0, 1],
 			});
 
-		return new ol.style.Text(st);
+		if (hover)
+			styleTextOptions.overflow = true;
+
+		return new ol.style.Text(styleTextOptions);
 	}
 
 	function rgbaColor(hexColor, transparency) {
@@ -187,8 +187,8 @@ function layerWri(options) {
 				name: properties.nom,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 				type: properties.type.valeur,
-				alt: properties.coord.alt,
-				bed: properties.places.valeur,
+				ele: properties.coord.alt,
+				capacity: properties.places.valeur,
 				url: properties.lien,
 				attribution: 'Refuges.info',
 			};
@@ -272,7 +272,7 @@ function layerPyreneesRefuges(options) {
 				iconChemineur: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
 				url: properties.url,
 				ele: properties.altitude,
-				bed: properties.cap_ete,
+				capacity: properties.cap_ete,
 				attribution: 'Pyrenees-Refuges',
 			};
 		},
@@ -341,13 +341,15 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
-	//TODO++
 	const format = new ol.format.OSMXML(),
-		layer = layerVectorCluster(Object.assign({
+		layer = myLayer(Object.assign({
 			maxResolution: 50,
-			host: 'https://overpass-api.de/api/interpreter',
+			//host: 'https://overpass-api.de/api/interpreter',
+			//host: 'https://lz4.overpass-api.de/api/interpreter',
+			host: 'http://overpass.openstreetmap.fr/api/interpreter',
+			//https://overpass.kumi.systems/api/interpreter',
+			//https://overpass.nchc.org.tw/api/interpreter',
 			urlFunction: urlFunction,
-			strategy: ol.loadingstrategy.bboxLimit, //TODO+ strategie bboxLimit
 			format: format,
 			displayFunction: displayFunction,
 		}, options)),
@@ -413,8 +415,7 @@ function layerOSM(options) {
 	};
 
 	function displayFunction(properties) {
-		//TODO attribution
-		if (options.symbols)
+		if (options.symbols) //TODO convertir minuscules et " " -> "_" et 2 symboles
 			for (let p in properties) {
 				if (typeof options.symbols[p] == 'string')
 					properties.type = p;
@@ -425,6 +426,8 @@ function layerOSM(options) {
 		if (properties.type)
 			properties.iconChemineur =
 			properties.sym = options.symbols[properties.type];
+
+		properties.attribution = 'OSM';
 
 		return properties;
 	}

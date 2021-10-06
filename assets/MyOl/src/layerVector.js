@@ -84,12 +84,13 @@ function layerVector(opt) {
 			evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
 
 			// Compute data to be used to display the feature
-			if (typeof options.displayFunction == 'function')
-				evt.features[f].display = options.displayFunction(
+			evt.features[f].display = typeof options.displayFunction == 'function' ?
+				options.displayFunction(
 					evt.features[f].getProperties(),
 					evt.features[f],
 					options
-				);
+				) : {};
+			evt.features[f].display.area = ol.extent.getArea(evt.features[f].getGeometry().getExtent()); // detect lines or polygons
 		}
 	});
 
