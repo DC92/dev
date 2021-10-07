@@ -95,7 +95,6 @@ Based on https://openlayers.org
 			<li><input type="checkbox" name="osm-features" value='["amenity"="restaurant"]' />Restaurant</li>
 			<li><input type="checkbox" name="osm-features" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="toilets"]' />WC</li>
-			<li><input type="checkbox" name="osm-features" value='["internet_access"~"yes|public|wlan|wired|terminal|service|free|fee|type|access"]' />Café internet</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="telephone"]' />Cabine téléphonique</li>
 		</ul>
 	</div>
@@ -130,7 +129,7 @@ const map = new ol.Map({
 		//center: ol.proj.transform([7.331, 46.0185], 'EPSG:4326', 'EPSG:3857'), zoom: 16, // Caractères html dans titre
 		//center: ol.proj.transform([0, 43], 'EPSG:4326', 'EPSG:3857'), zoom: 10, // Pyrénées
 		//center: ol.proj.transform([5.5, 44.8], 'EPSG:4326', 'EPSG:3857'), zoom: 13, // Alpages
-		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'), zoom: 13, // Grenoble OSM
+		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'), zoom: 15, // Grenoble OSM
 	}),
 	layers: [
 		new ol.layer.Tile({
@@ -196,31 +195,6 @@ if (01)
 if (01)
 	map.addLayer(layerOSM({
 		selectorName: 'osm-features',
-		symbols: {
-			hotel: 'City Hall',
-			guest_house: 'City Hall',
-			chalet: 'City Hall',
-			hostel: 'City Hall',
-			apartment: 'City Hall',
-			alpine_hut: 'Residence',
-			cabin: 'Lodge',
-			shelter: 'Fishing Hot Spot Facility',
-			basic_hut: 'Fishing Hot Spot Facility',
-			camp_site: 'Campground',
-			drinking_water: 'Drinking Water',
-			watering_place: 'Drinking Water',
-			fountain: 'Drinking Water',
-			water_point: 'Drinking Water',
-			spring: 'Drinking Water',
-			water_well: 'Drinking Water',
-			bus_stop: 'Ground Transportation',
-			parking: 'Parking Area',
-			restaurant: 'Restaurant',
-			shop: 'Shopping Center',
-			toilets: 'Restroom',
-			internet_access: 'Oil Field',
-			telephone: 'Telephone',
-		},
 	}));
 	</script>
 

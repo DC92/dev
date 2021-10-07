@@ -86,29 +86,31 @@ $alias = [
 
 	// OSM
 	'access' => 'parking',
+	'alpine_hut' => 'cabane',
+	'apartment' => 'cabane_blue',
+	'basic_hut' => 'cabane',
 	'bivouac' => 'camping_yellow_green',
 	'buffet' => 'cabane_white_blue_a9832.5',
+	'cabin' => 'cabane',
 	'car' => 'bus',
 	'camp_site' => 'camping_yellow_green',
 	'cave' => 'arc_lightgrey_black_manqueunmur',
+	'chalet' => 'cabane_blue',
+	'guest_house' => 'cabane_blue',
+	'hostel' => 'cabane_blue',
 	'hut' => 'cabane_manqueunmur',
 	'lake' => 'lac',
 	'local_product' => 'ravitaillement',
 	'museum' => 'cabane_white_blue_a9905.7',
 	'pass' => 'triangle_a33',
 	'shelter' => 'cabane',
+	'spring' => 'pointdeau',
 	'summit' => 'sommet',
+	'supermarket' => 'ravitaillement',
+	'toilets' => 'a87',
 
 	// Alpages.info
 	'reseau' => 'a63',
-
-	// OSM
-	'alpine_hut' => 'cabane',
-	'basic_hut' => 'cabane',
-	'guest_house' => 'cabane_blue',
-	'hostel' => 'cabane_blue',
-	'chalet' => 'cabane_blue',
-	'apartment' => 'cabane_blue',
 ];
 
 $geocaching = [

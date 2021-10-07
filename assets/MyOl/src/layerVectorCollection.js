@@ -48,8 +48,14 @@ function myLayer(options) {
 			};
 
 			// Points
-			if (properties.iconChemineur)
-				properties.icon = '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.iconChemineur + '.svg';
+			if (properties.iconChemineur) {
+				const icons = properties.iconChemineur.split(' '),
+					// Limit to 2 type names & ' ' -> '_'
+					iconChemineur = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); 
+					
+				properties.icon = '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconChemineur + '.svg';
+			}
+
 			if (properties.icon)
 				styleOptions.image = new ol.style.Icon({
 					src: properties.icon,
@@ -221,7 +227,8 @@ function layerWriAreas(options) {
 //BEST min & max layer in the same function
 function layerGeoBB(options) {
 	return myLayer(Object.assign({
-		host: 'chemineur.fr',
+		//TODO+ host: 'chemineur.fr',
+		host: 'c92.fr/test/chem5',
 		urlFunction: function(options, bbox, selection) {
 			return '//' + options.host + '/ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
@@ -263,12 +270,10 @@ function layerPyreneesRefuges(options) {
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		displayFunction: function(properties) {
-			const types = properties.type_hebergement.split(' ');
-
 			return {
 				name: properties.name,
 				type: properties.type_hebergement,
-				iconChemineur: types[0] + (types.length > 1 ? '_' + types[1] : ''), // Limit to 2 type names
+				iconChemineur: properties.type_hebergement,
 				url: properties.url,
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
@@ -352,7 +357,14 @@ function layerOSM(options) {
 			format: format,
 			displayFunction: displayFunction,
 		}, options)),
-		statusEl = document.getElementById(options.selectorName);
+		statusEl = document.getElementById(options.selectorName),
+		selectorEls = document.getElementsByName(options.selectorName);
+
+	// List of acceptable tags in the request return
+	let tags = '';
+	for (let e in selectorEls)
+		tags += selectorEls[e].value;
+	tags = tags.replace('private', '');
 
 	function urlFunction(options, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
@@ -414,21 +426,14 @@ function layerOSM(options) {
 	};
 
 	function displayFunction(properties) {
-		if (options.symbols) //TODO convertir minuscules et " " -> "_" et 2 symboles
-			for (let p in properties) {
-				if (typeof options.symbols[p] == 'string')
-					properties.type = p;
-				else if (typeof options.symbols[properties[p]] == 'string')
-					properties.type = properties[p];
-			}
-
-		if (properties.type)
-			properties.iconChemineur =
-			properties.sym = options.symbols[properties.type];
-
-		properties.attribution = 'OSM';
-
-		return properties;
+		for (let p in properties)
+			if (tags.indexOf(p) !== -1 && tags.indexOf(properties[p]) !== -1)
+				return {
+					name: properties.name,
+					type: properties[p],
+					iconChemineur: properties[p],
+					attribution: 'OSM',
+				};
 	}
 
 	return layer;
