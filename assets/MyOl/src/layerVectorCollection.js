@@ -143,11 +143,16 @@ function myLayer(options) {
 		const styleTextOptions = {
 			text: text,
 			font: '14px Calibri,sans-serif',
+			padding: [1, 1, 0, 3],
 			fill: new ol.style.Fill({
 				color: 'black',
 			}),
 			backgroundFill: new ol.style.Fill({
 				color: 'yellow',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				color: 'black',
+				width: 0.3,
 			}),
 		};
 
@@ -155,7 +160,6 @@ function myLayer(options) {
 			Object.assign(styleTextOptions, {
 				textBaseline: 'bottom',
 				offsetY: -13, // Balance the bottom textBaseline
-				padding: [0, 1, 0, 1],
 			});
 
 		if (hover)
@@ -249,7 +253,7 @@ function layerGeoBB(options) {
  * Site alpages.info
  */
 //BEST (pour alpages) BUG color se surimpose sans s'effacer : need an feature id
-//BEST mettre cluster
+//BEST cluster génère multiple points : need an feature id
 function layerAlpages(options) {
 	return myLayer(Object.assign({
 		host: 'alpages.info',
@@ -442,7 +446,7 @@ function layerOSM(options) {
 					ele: properties.ele,
 					capacity: properties.capacity,
 					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
-					attribution: 'OSM',
+					attribution: 'osm',
 				};
 	}
 

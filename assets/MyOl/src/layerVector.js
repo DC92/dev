@@ -363,7 +363,7 @@ function memCheckbox(selectorName, callback) {
 		// Mem the data in the cookie
 		if (selectorName)
 			document.cookie = selectorName + '=' + selection.join(',') +
-			'; path=/; SameSite=Secure; expires=' +
+			'; path=/; SameSite=Strict; expires=' +
 			new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')
