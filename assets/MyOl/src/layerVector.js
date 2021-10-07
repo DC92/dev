@@ -29,7 +29,7 @@ function layerVector(opt) {
 
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
-			style: function(feature, resolution) {
+			style: function(feature) {
 				return displayStyle(feature, options.styleOptions);
 			},
 			//TODO declutter: true,
@@ -134,7 +134,7 @@ function layerVector(opt) {
 				source: hoverSource,
 				zIndex: 2, // Above the features
 				//TODO declutter: true, //To avoid dumping the other labels
-				style: function(feature, resolution) {
+				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptions);
 				},
 			});

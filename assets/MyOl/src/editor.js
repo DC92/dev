@@ -306,7 +306,6 @@ function layerEditGeoJson(options) {
 					degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
 				};
 
-			//BEST include proj4/proj4-src.js with a tag
 			let ll21781 = null;
 			if (typeof proj4 == 'function') {
 				// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)

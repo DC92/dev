@@ -15,7 +15,7 @@
  */
 function myLayer(options) {
 	return layerVectorCluster(Object.assign({
-		styleOptions: function(feature, properties, options) {
+		styleOptions: function(feature, properties) {
 			Object.assign(properties, feature.display);
 
 			// Clusters
@@ -51,8 +51,8 @@ function myLayer(options) {
 			if (properties.iconChemineur) {
 				const icons = properties.iconChemineur.split(' '),
 					// Limit to 2 type names & ' ' -> '_'
-					iconChemineur = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); 
-					
+					iconChemineur = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
+
 				properties.icon = '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconChemineur + '.svg';
 			}
 
@@ -108,9 +108,9 @@ function myLayer(options) {
 					text.push(line.join(' '));
 				line = [];
 				if (properties.ele)
-					line.push(properties.ele + ' m');
+					line.push(parseInt(properties.ele) + ' m');
 				if (properties.capacity)
-					line.push(properties.capacity + '\u255E\u2550\u2555');
+					line.push(parseInt(properties.capacity) + '\u255E\u2550\u2555');
 				if (line.length)
 					text.push(line.join(', '));
 				if (properties.name)
@@ -248,10 +248,16 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
-//TODO+ BUG color se surimpose sans s'effacer : need an feature id
+//BEST (pour alpages) BUG color se surimpose sans s'effacer : need an feature id
+//BEST mettre cluster
 function layerAlpages(options) {
-	return layerGeoBB(Object.assign({
+	return myLayer(Object.assign({
 		host: 'alpages.info',
+		urlFunction: function(options, bbox, selection) {
+			return '//' + options.host + '/ext/Dominique92/GeoBB/gis.php?limit=1000' +
+				(options.selectorName ? '&forums=' + selection.join(',') : '') +
+				'&bbox=' + bbox.join(',');
+		},
 		displayFunction: function(properties, feature, options) {
 			return {
 				iconChemineur: properties.type,
@@ -314,10 +320,10 @@ function layerC2C(options) {
 				type: 'Feature',
 				geometry: JSONparse(properties.geometry.geom),
 				properties: {
-					ele: properties.elevation,
-					name: properties.locales[0].title,
 					type: properties.waypoint_type,
 					iconChemineur: properties.waypoint_type,
+					name: properties.locales[0].title,
+					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
 					attribution: 'CampToCamp',
 				},
@@ -345,6 +351,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOSM(options) {
+	//BEST I.E. Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = myLayer(Object.assign({
 			maxResolution: 50,
@@ -425,13 +432,16 @@ function layerOSM(options) {
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
-	function displayFunction(properties) {
+	function displayFunction(properties, feature) {
 		for (let p in properties)
 			if (tags.indexOf(p) !== -1 && tags.indexOf(properties[p]) !== -1)
 				return {
-					name: properties.name,
 					type: properties[p],
 					iconChemineur: properties[p],
+					name: properties.name,
+					ele: properties.ele,
+					capacity: properties.capacity,
+					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
 					attribution: 'OSM',
 				};
 	}
