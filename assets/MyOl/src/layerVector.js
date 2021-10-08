@@ -10,8 +10,9 @@
  * selectorName : <input name="selectorName"> url arguments selector
  * urlFunction: function(options, bbox, selection, extent, resolution, projection) returning the XHR url
  * displayFunction: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX 
- * styleOptions: function(feature, properties, options) returning options of the style of the features
- * hoverStyleOptions: function(feature, properties, options) returning options of the style when hovering the features
+ * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
+ * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
+ * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
 //TODO BUG battement si trop d'icônes
@@ -30,7 +31,14 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: function(feature) {
-				return displayStyle(feature, options.styleOptions);
+				const properties = feature.getProperties();
+
+				return displayStyle(
+					feature,
+					properties.features || properties.cluster ?
+					options.styleOptionsClusterFunction :
+					options.styleOptionsFunction
+				);
 			},
 			//TODO declutter: true,
 		}, options)),
@@ -81,7 +89,7 @@ function layerVector(opt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
 			//HACK attach this function to each feature to access it when hovering without layer context
-			evt.features[f].hoverStyleOptions = options.hoverStyleOptions;
+			evt.features[f].hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
 			// Compute data to be used to display the feature
 			evt.features[f].display = typeof options.displayFunction == 'function' ?
@@ -135,7 +143,7 @@ function layerVector(opt) {
 				zIndex: 2, // Above the features
 				//TODO declutter: true, //To avoid dumping the other labels
 				style: function(feature) {
-					return displayStyle(feature, feature.hoverStyleOptions);
+					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
 			});
 
@@ -294,7 +302,7 @@ function layerVectorCluster(options) {
 			style = layer.getStyleFunction();
 
 		if (features)
-			feature.hoverStyleOptions = options.hoverStyleOptions;
+			feature.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
 		return style(feature, resolution);
 	}

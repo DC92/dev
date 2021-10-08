@@ -13,54 +13,90 @@
  * cluster: number of grouped features when too close to be displayed alone
  * url: url to go if feature is clicked
  */
+function styleOptionsIcon(properties) {
+	if (properties.icon)
+		return {
+			image: new ol.style.Icon({
+				src: properties.icon,
+				imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+			}),
+		};
+}
+
+function styleOptionsIconChemineur(properties) {
+	if (properties.iconChemineur) { //TODO iconChemineur -> icon
+		const icons = properties.iconChemineur.split(' ')
+		// Limit to 2 type names & ' ' -> '_'
+		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
+
+		return styleOptionsIcon({
+			icon: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconName + '.svg',
+		});
+	}
+}
+
+function styleOptionsLabel(text, isPoint, overflow) { //TODO styleOptionsLabel(properties)
+	const styleTextOptions = {
+		text: text,
+		font: '14px Calibri,sans-serif',
+		padding: [1, 1, 0, 3],
+		fill: new ol.style.Fill({
+			color: 'black',
+		}),
+		backgroundFill: new ol.style.Fill({
+			color: 'yellow',
+		}),
+		backgroundStroke: new ol.style.Stroke({
+			color: 'black',
+			width: 0.3,
+		}),
+		overflow: overflow,
+	};
+
+	if (isPoint) // Not a line or polygon
+		Object.assign(styleTextOptions, {
+			textBaseline: 'bottom',
+			offsetY: -13, // Balance the bottom textBaseline
+		});
+
+	return {
+		text: new ol.style.Text(styleTextOptions)
+	};
+}
+
+function styleOptionsClusterFunction(feature) {
+	const properties = feature.getProperties();
+	let nbClusters = properties.cluster || 0;
+
+	for (let f in properties.features)
+		nbClusters += parseInt(properties.features[f].getProperties().cluster) || 1;
+
+	return {
+		image: new ol.style.Circle({
+			radius: 14,
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			fill: new ol.style.Fill({
+				color: 'white',
+			}),
+		}),
+		text: new ol.style.Text({
+			text: nbClusters.toString(),
+			font: '14px Calibri,sans-serif',
+		}),
+	};
+}
+
 function myLayer(options) {
+
 	return layerVectorCluster(Object.assign({
-		styleOptions: function(feature, properties) {
-			Object.assign(properties, feature.display);
+		styleOptionsClusterFunction: styleOptionsClusterFunction, //TODO ????? -> intégrer
 
-			// Clusters
-			if (properties.features || properties.cluster) {
-				let nbClusters = properties.cluster || 0;
+		styleOptionsFunction: function(feature, properties) {
+			Object.assign(properties, feature.display); //TODO integres dans l'appel à styleOptionsFunction
 
-				for (let f in properties.features)
-					nbClusters += parseInt(properties.features[f].getProperties().cluster) || 1;
-
-				return {
-					image: new ol.style.Circle({
-						radius: 14,
-						stroke: new ol.style.Stroke({
-							color: 'blue',
-						}),
-						fill: new ol.style.Fill({
-							color: 'white',
-						}),
-					}),
-					text: new ol.style.Text({
-						text: nbClusters.toString(),
-						font: '14px Calibri,sans-serif',
-					}),
-				};
-			}
-
-			// Features
-			styleOptions = {
-				text: yellowLabel(properties.name || properties.nom || '', properties),
-			};
-
-			// Points
-			if (properties.iconChemineur) {
-				const icons = properties.iconChemineur.split(' '),
-					// Limit to 2 type names & ' ' -> '_'
-					iconChemineur = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
-
-				properties.icon = '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconChemineur + '.svg';
-			}
-
-			if (properties.icon)
-				styleOptions.image = new ol.style.Icon({
-					src: properties.icon,
-					imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
-				});
+			const styleOptions = {};
 
 			// Polygons
 			if (properties.color)
@@ -75,10 +111,15 @@ function myLayer(options) {
 					width: 2,
 				});
 
-			return styleOptions;
+			return Object.assign(styleOptions,
+				properties.iconChemineur ?
+				styleOptionsIconChemineur(properties) :
+				styleOptionsIcon(properties),
+				styleOptionsLabel(properties.name, !properties.area)
+			);
 		},
 
-		hoverStyleOptions: function(feature, properties) {
+		hoverStyleOptionsFunction: function(feature, properties) {
 			Object.assign(properties, feature.display);
 
 			let text = [],
@@ -118,9 +159,7 @@ function myLayer(options) {
 			}
 
 			// Features
-			styleOptions = {
-				text: yellowLabel(text.join('\n'), properties, true),
-			};
+			styleOptions = {};
 
 			// Polygons
 			if (properties.color)
@@ -135,38 +174,11 @@ function myLayer(options) {
 					width: 3,
 				});
 
-			return styleOptions;
+			return Object.assign(styleOptions,
+				styleOptionsLabel(text.join('\n'), !properties.area, true)
+			);
 		},
 	}, options));
-
-	function yellowLabel(text, properties, hover) {
-		const styleTextOptions = {
-			text: text,
-			font: '14px Calibri,sans-serif',
-			padding: [1, 1, 0, 3],
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'yellow',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				color: 'black',
-				width: 0.3,
-			}),
-		};
-
-		if (!properties.area) // Not a line or polygon
-			Object.assign(styleTextOptions, {
-				textBaseline: 'bottom',
-				offsetY: -13, // Balance the bottom textBaseline
-			});
-
-		if (hover)
-			styleTextOptions.overflow = true;
-
-		return new ol.style.Text(styleTextOptions);
-	}
 
 	function rgbaColor(hexColor, transparency) {
 		return 'rgba(' + [
