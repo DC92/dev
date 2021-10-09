@@ -287,8 +287,7 @@ function layersCollection() {
 		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
-		// 'pratique' is the key for the free layer
-		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'),
+		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the key for the free layers
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
@@ -527,7 +526,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			//TODO declutter: true,
+			//TODO declutter: true, //TODO BUG enlève les labels mais aussi les icones
 		}, options)),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
@@ -604,20 +603,22 @@ function layerVector(opt) {
 
 	// Function to display different styles
 	function displayStyle(feature, styleOptionsFunction) {
-		const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
+		if (typeof styleOptionsFunction == 'function') {
+			const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
 
-		//HACK to render the html entities in the canvas
-		if (styleOptions.text) {
-			elLabel.innerHTML = styleOptions.text.getText();
+			//HACK to render the html entities in the canvas
+			if (styleOptions.text) {
+				elLabel.innerHTML = styleOptions.text.getText();
 
-			if (elLabel.innerHTML) {
-				styleOptions.text.setText(
-					elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1)
-				);
+				if (elLabel.innerHTML) {
+					styleOptions.text.setText(
+						elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1)
+					);
+				}
 			}
-		}
 
-		return new ol.style.Style(styleOptions);
+			return new ol.style.Style(styleOptions);
+		}
 	}
 
 	// Display labels on hovering & click

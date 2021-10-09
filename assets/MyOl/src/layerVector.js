@@ -32,7 +32,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			//TODO declutter: true,
+			//TODO declutter: true, //TODO BUG enlève les labels mais aussi les icones
 		}, options)),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
@@ -109,20 +109,22 @@ function layerVector(opt) {
 
 	// Function to display different styles
 	function displayStyle(feature, styleOptionsFunction) {
-		const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
+		if (typeof styleOptionsFunction == 'function') {
+			const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
 
-		//HACK to render the html entities in the canvas
-		if (styleOptions.text) {
-			elLabel.innerHTML = styleOptions.text.getText();
+			//HACK to render the html entities in the canvas
+			if (styleOptions.text) {
+				elLabel.innerHTML = styleOptions.text.getText();
 
-			if (elLabel.innerHTML) {
-				styleOptions.text.setText(
-					elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1)
-				);
+				if (elLabel.innerHTML) {
+					styleOptions.text.setText(
+						elLabel.textContent[0].toUpperCase() + elLabel.textContent.substring(1)
+					);
+				}
 			}
-		}
 
-		return new ol.style.Style(styleOptions);
+			return new ol.style.Style(styleOptions);
+		}
 	}
 
 	// Display labels on hovering & click
