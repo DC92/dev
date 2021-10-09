@@ -3,39 +3,33 @@
  * using MyOl/src/layerVector.js
  */
 
-/* Virtual function with custom styles
- * GeoJson properties:
- * name : label on top of the feature
- * type : cabane, ...
- * icon : url of an icon file
- * ele : elevation / altitude (meters)
- * capacity : number of places to sleep
- * cluster: number of grouped features when too close to be displayed alone
- * url: url to go if feature is clicked
+/**
+ * Some usefull style functions
  */
-function styleOptionsIcon(properties) {
-	if (properties.icon)
+
+// Get icon from an URL
+function styleOptionsIcon(iconUrl) {
+	if (iconUrl)
 		return {
 			image: new ol.style.Icon({
-				src: properties.icon,
+				src: iconUrl,
 				imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
 			}),
 		};
 }
 
-function styleOptionsIconChemineur(properties) {
-	if (properties.iconChemineur) { //TODO iconChemineur -> icon
-		const icons = properties.iconChemineur.split(' ')
+// Get icon from chemineur.fr
+function styleOptionsIconChemineur(iconName) {
+	if (iconName) {
+		const icons = iconName.split(' ')
 		// Limit to 2 type names & ' ' -> '_'
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
 
-		return styleOptionsIcon({
-			icon: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconName + '.svg',
-		});
+		return styleOptionsIcon('//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
 }
 
-function styleOptionsLabel(text, isPoint, overflow) { //TODO styleOptionsLabel(properties)
+function styleOptionsLabel(text, properties) {
 	const styleTextOptions = {
 		text: text,
 		font: '14px Calibri,sans-serif',
@@ -50,10 +44,10 @@ function styleOptionsLabel(text, isPoint, overflow) { //TODO styleOptionsLabel(p
 			color: 'black',
 			width: 0.3,
 		}),
-		overflow: overflow,
+		overflow: properties.overflow,
 	};
 
-	if (isPoint) // Not a line or polygon
+	if (!properties.area) // Not a line or polygon
 		Object.assign(styleTextOptions, {
 			textBaseline: 'bottom',
 			offsetY: -13, // Balance the bottom textBaseline
@@ -64,8 +58,22 @@ function styleOptionsLabel(text, isPoint, overflow) { //TODO styleOptionsLabel(p
 	};
 }
 
-function styleOptionsClusterFunction(feature) {
-	const properties = feature.getProperties();
+// Apply a color and transparency to a polygon
+function styleOptionsPolygon(color, transparency) { // color = #rgb, transparency = 0 to 1
+	if (color)
+		return {
+			fill: new ol.style.Fill({
+				color: 'rgba(' + [
+					parseInt(color.substring(1, 3), 16),
+					parseInt(color.substring(3, 5), 16),
+					parseInt(color.substring(5, 7), 16),
+					transparency || 1,
+				].join(',') + ')',
+			})
+		};
+}
+
+function styleOptionsCluster(feature, properties) {
 	let nbClusters = properties.cluster || 0;
 
 	for (let f in properties.features)
@@ -88,40 +96,42 @@ function styleOptionsClusterFunction(feature) {
 	};
 }
 
+/**
+ * Virtual function with custom styles
+ * GeoJson properties:
+ * name : label on top of the feature
+ * type : cabane, ...
+ * icon : url of an icon file
+ * ele : elevation / altitude (meters)
+ * capacity : number of places to sleep
+ * cluster: number of grouped features when too close to be displayed alone
+ * url: url to go if feature is clicked
+ */
 function myLayer(options) {
 
 	return layerVectorCluster(Object.assign({
-		styleOptionsClusterFunction: styleOptionsClusterFunction, //TODO ????? -> intégrer
+		styleOptionsClusterFunction: styleOptionsCluster, //TODO ????? -> intégrer
 
 		styleOptionsFunction: function(feature, properties) {
-			Object.assign(properties, feature.display); //TODO integres dans l'appel à styleOptionsFunction
-
 			const styleOptions = {};
-
-			// Polygons
-			if (properties.color)
-				styleOptions.fill = new ol.style.Fill({
-					color: rgbaColor(properties.color, 0.5),
-				});
-
-			// Lines
-			else
-				styleOptions.stroke = new ol.style.Stroke({
-					color: 'blue',
-					width: 2,
-				});
 
 			return Object.assign(styleOptions,
 				properties.iconChemineur ?
-				styleOptionsIconChemineur(properties) :
-				styleOptionsIcon(properties),
-				styleOptionsLabel(properties.name, !properties.area)
+				styleOptionsIconChemineur(properties.iconChemineur) :
+				styleOptionsIcon(properties.icon),
+				styleOptionsLabel(properties.name, properties),
+				styleOptionsPolygon(properties.color, 0.5),
+				// Lines
+				{
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+						width: 2,
+					})
+				}, {} //TODO DELETE
 			);
 		},
 
 		hoverStyleOptionsFunction: function(feature, properties) {
-			Object.assign(properties, feature.display);
-
 			let text = [],
 				line = [];
 
@@ -158,36 +168,17 @@ function myLayer(options) {
 					text.push(properties.name);
 			}
 
+			properties.overflow = true;
+
 			// Features
 			styleOptions = {};
 
-			// Polygons
-			if (properties.color)
-				styleOptions.fill = new ol.style.Fill({
-					color: rgbaColor(properties.color, 0.5),
-				});
-
-			// Lines
-			else
-				styleOptions.stroke = new ol.style.Stroke({
-					color: 'red',
-					width: 3,
-				});
-
 			return Object.assign(styleOptions,
-				styleOptionsLabel(text.join('\n'), !properties.area, true)
+				styleOptionsLabel(text.join('\n'), properties),
+				styleOptionsPolygon(properties.color, 0.5), {} //TODO DELETE
 			);
 		},
 	}, options));
-
-	function rgbaColor(hexColor, transparency) {
-		return 'rgba(' + [
-			parseInt(hexColor.substring(1, 3), 16),
-			parseInt(hexColor.substring(3, 5), 16),
-			parseInt(hexColor.substring(5, 7), 16),
-			transparency || 1,
-		].join(',') + ')';
-	}
 }
 
 /**

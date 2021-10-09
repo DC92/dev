@@ -30,23 +30,13 @@ function layerVector(opt) {
 
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
-			style: function(feature) {
-				const properties = feature.getProperties();
-
-				return displayStyle(
-					feature,
-					properties.features || properties.cluster ?
-					options.styleOptionsClusterFunction :
-					options.styleOptionsFunction
-				);
-			},
+			style: style,
 			//TODO declutter: true,
 		}, options)),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
-		statusEl = document.getElementById(options.selectorName);
+		statusEl = document.getElementById(options.selectorName); // XHR download tracking
 
-	// XHR download tracking
 	if (statusEl)
 		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
 			if (!statusEl.textContent.includes('error'))
@@ -98,13 +88,28 @@ function layerVector(opt) {
 					evt.features[f],
 					options
 				) : {};
-			evt.features[f].display.area = ol.extent.getArea(evt.features[f].getGeometry().getExtent()); // detect lines or polygons
+
+			// detect lines or polygons
+			evt.features[f].display.area = ol.extent.getArea(evt.features[f].getGeometry().getExtent());
 		}
 	});
 
+	// style callback function for the layer
+	function style(feature) {
+		const properties = feature.getProperties();
+
+		return displayStyle(
+			feature,
+			properties.features || properties.cluster ?
+			options.styleOptionsClusterFunction :
+			options.styleOptionsFunction
+		);
+	}
+	//TODO merge style & displayStyle ???
+
 	// Function to display different styles
 	function displayStyle(feature, styleOptionsFunction) {
-		const styleOptions = styleOptionsFunction(feature, feature.getProperties(), options);
+		const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
 
 		//HACK to render the html entities in the canvas
 		if (styleOptions.text) {
@@ -272,8 +277,8 @@ function layerVectorCluster(options) {
 		const extent = feature.getGeometry().getExtent(),
 			pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
 
+		// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
 		if (pixelSemiPerimeter > 200)
-			// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
 			clusterSource.addFeature(feature);
 		else
 			return new ol.geom.Point(
