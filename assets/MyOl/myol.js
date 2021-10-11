@@ -549,24 +549,28 @@ function layerVector(opt) {
 
 	// url callback function for the layer
 	function url(extent, resolution, projection) {
+		const selection = readCheckbox(options.selectorName);
+
 		return options.urlFunction(
 			options, // Layer options
 			ol.proj.transformExtent( // BBox
 				extent,
-				projection.getCode(),
+				projection.getCode(), // Map projection
 				'EPSG:4326' // Received projection
 			).map(function(c) {
 				return c.toFixed(4); // Round to 4 digits
 			}),
-			readCheckbox(options.selectorName),
+			typeof selection == 'object' ? selection : [],
 			extent, resolution, projection
 		);
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
 	memCheckbox(options.selectorName, function(selection) {
-		layer.setVisible(selection.length > 0);
-		if (selection.length > 0)
+		const visible = typeof selection == 'object' ? selection.length : selection === true;
+
+		layer.setVisible(visible);
+		if (visible)
 			source.refresh();
 	});
 
@@ -815,14 +819,14 @@ function layerVectorCluster(options) {
 /**
  * Get checkboxes values of inputs having the same name
  * selectorName {string}
- * Return false (nothing selected) | true (all selected) | ['arg1', 'arg2', ...] //TODO
+ * Return false (nothing selected) | true (all selected) | ['arg1', 'arg2', ...]
  */
 function readCheckbox(selectorName) {
 	const inputEls = document.getElementsByName(selectorName);
 
 	// Specific case of a single on/off <input>
 	if (inputEls.length == 1)
-		return inputEls[0].checked ? ['on'] : [];
+		return inputEls[0].checked;
 
 	// Read each <input> checkbox
 	const selection = [];
@@ -869,13 +873,13 @@ function memCheckbox(selectorName, callback) {
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
-		const selection = readCheckbox(selectorName);
-
 		// Mem the data in the cookie
+		const selection = readCheckbox(selectorName);
 		if (selectorName)
-			document.cookie = selectorName + '=' + selection.join(',') +
-			'; path=/; SameSite=Strict; expires=' +
-			new Date(2100, 0).toUTCString(); // Keep over all session
+			document.cookie =
+			typeof selection == 'object' ? selection : '' +
+			'path=/; SameSite=Strict; ' +
+			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')
 			callback(selection);
