@@ -12,7 +12,7 @@ map.addLayer(layerAlpages({
 map.addLayer(layerC2C({
 	selectorName: 'c2c-features',
 }));
-map.addLayer(layerOSM({
+map.addLayer(layerOverpass({
 	selectorName: 'osm-features',
 	symbols: {
 		hotel: 'City Hall',

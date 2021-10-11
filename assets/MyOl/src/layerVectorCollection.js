@@ -243,7 +243,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-function layerOSM(options) {
+function layerOverpass(options) {
 	//BEST I.E. Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
@@ -342,7 +342,7 @@ function layerOSM(options) {
 			if (tags.indexOf(p) !== -1 && tags.indexOf(properties[p]) !== -1)
 				return {
 					type: properties[p],
-					name: properties.name,
+					name: properties.name || properties[p],
 					ele: properties.ele,
 					capacity: properties.capacity,
 					url: 'https://www.openstreetmap.org/node/' + feature.getId(),

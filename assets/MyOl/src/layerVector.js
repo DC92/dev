@@ -43,6 +43,7 @@ function layerVector(opt) {
 			if (!statusEl.textContent.includes('error'))
 				statusEl.textContent = '';
 
+			//TODO status hors limites zoom
 			switch (evt.type) {
 				case 'featuresloadstart':
 					statusEl.textContent = 'Chargement...';
@@ -320,6 +321,7 @@ function layerVectorCluster(options) {
 /**
  * Get checkboxes values of inputs having the same name
  * selectorName {string}
+ * Return false (nothing selected) | true (all selected) | ['arg1', 'arg2', ...] //TODO
  */
 function readCheckbox(selectorName) {
 	const inputEls = document.getElementsByName(selectorName);
@@ -332,7 +334,7 @@ function readCheckbox(selectorName) {
 	const selection = [];
 	for (let e = 0; e < inputEls.length; e++)
 		if (inputEls[e].checked &&
-			inputEls[e].value != 'on')
+			inputEls[e].value != 'on') // Avoid the first check in a list
 			selection.push(inputEls[e].value);
 
 	return selection;
@@ -537,10 +539,10 @@ function styleOptionsPolygon(color, transparency) { // color = #rgb, transparenc
 
 // Style of a cluster bullet (both local & server cluster
 function styleOptionsCluster(feature, properties) {
-	let nbClusters = properties.cluster || 0;
+	let nbClusters = parseInt(properties.cluster || 0);
 
 	for (let f in properties.features)
-		nbClusters += parseInt(properties.features[f].getProperties().cluster) || 1;
+		nbClusters += parseInt(properties.features[f].getProperties().cluster || 1);
 
 	return {
 		image: new ol.style.Circle({

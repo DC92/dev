@@ -12,7 +12,7 @@ var layerGeoBBgis = layerVectorURL({
 			zoom: 12,
 		}),
 		layers: [
-			layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+			layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 			layerGeoBBgis,
 		],
 		controls: [

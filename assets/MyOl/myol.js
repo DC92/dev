@@ -82,7 +82,7 @@ ol.Map.prototype.handlePostRender = function() {
 /**
  * Openstreetmap
  */
-function layerOsm(url, attribution, maxZoom) {
+function layerOSM(url, attribution, maxZoom) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
 			url: url,
@@ -96,7 +96,7 @@ function layerOsm(url, attribution, maxZoom) {
 }
 
 function layerOsmOpenTopo() {
-	return layerOsm(
+	return layerOSM(
 		'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 		'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
 		'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
@@ -105,7 +105,7 @@ function layerOsmOpenTopo() {
 }
 
 function layerOsmMri() {
-	return layerOsm(
+	return layerOSM(
 		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
 	);
@@ -113,10 +113,10 @@ function layerOsmMri() {
 
 /**
  * Kompas (Austria)
- * Requires layerOsm
+ * Requires layerOSM
  */
 function layerKompass(subLayer) {
-	return layerOsm(
+	return layerOSM(
 		//TODO BUG sur https://wri -> demande le lien https !
 		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
@@ -126,12 +126,12 @@ function layerKompass(subLayer) {
 
 /**
  * Thunderforest
- * Requires layerOsm
+ * Requires layerOSM
  * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(subLayer) {
 	return typeof mapKeys == 'object' && mapKeys && mapKeys.thunderforest ?
-		layerOsm(
+		layerOSM(
 			'//{a-c}.tile.thunderforest.com/' + subLayer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
 		) : null;
@@ -284,7 +284,7 @@ function layersCollection() {
 		'OSM outdoors': layerThunderforest('outdoors'),
 		'OSM transport': layerThunderforest('transport'),
 		'MRI': layerOsmMri(),
-		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the key for the free layers
@@ -300,8 +300,8 @@ function layersCollection() {
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
-		'OSM': layerOsm('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-		'Hike & Bike': layerOsm(
+		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+		'Hike & Bike': layerOSM(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
 			'<a href="//www.hikebikemap.org/">hikebikemap.org</a>'
 		), // Not on https
@@ -537,6 +537,7 @@ function layerVector(opt) {
 			if (!statusEl.textContent.includes('error'))
 				statusEl.textContent = '';
 
+			//TODO status hors limites zoom
 			switch (evt.type) {
 				case 'featuresloadstart':
 					statusEl.textContent = 'Chargement...';
@@ -814,6 +815,7 @@ function layerVectorCluster(options) {
 /**
  * Get checkboxes values of inputs having the same name
  * selectorName {string}
+ * Return false (nothing selected) | true (all selected) | ['arg1', 'arg2', ...] //TODO
  */
 function readCheckbox(selectorName) {
 	const inputEls = document.getElementsByName(selectorName);
@@ -826,7 +828,7 @@ function readCheckbox(selectorName) {
 	const selection = [];
 	for (let e = 0; e < inputEls.length; e++)
 		if (inputEls[e].checked &&
-			inputEls[e].value != 'on')
+			inputEls[e].value != 'on') // Avoid the first check in a list
 			selection.push(inputEls[e].value);
 
 	return selection;
@@ -1031,10 +1033,10 @@ function styleOptionsPolygon(color, transparency) { // color = #rgb, transparenc
 
 // Style of a cluster bullet (both local & server cluster
 function styleOptionsCluster(feature, properties) {
-	let nbClusters = properties.cluster || 0;
+	let nbClusters = parseInt(properties.cluster || 0);
 
 	for (let f in properties.features)
-		nbClusters += parseInt(properties.features[f].getProperties().cluster) || 1;
+		nbClusters += parseInt(properties.features[f].getProperties().cluster || 1);
 
 	return {
 		image: new ol.style.Circle({
@@ -1299,7 +1301,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-function layerOSM(options) {
+function layerOverpass(options) {
 	//BEST I.E. Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
@@ -1398,7 +1400,7 @@ function layerOSM(options) {
 			if (tags.indexOf(p) !== -1 && tags.indexOf(properties[p]) !== -1)
 				return {
 					type: properties[p],
-					name: properties.name,
+					name: properties.name || properties[p],
 					ele: properties.ele,
 					capacity: properties.capacity,
 					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
