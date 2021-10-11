@@ -95,7 +95,7 @@ function layerOSM(url, attribution, maxZoom) {
 	});
 }
 
-function layerOsmOpenTopo() {
+function layerOpenTopo() {
 	return layerOSM(
 		'//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 		'<a href="https://opentopomap.org">OpenTopoMap</a> ' +
@@ -104,7 +104,7 @@ function layerOsmOpenTopo() {
 	);
 }
 
-function layerOsmMri() {
+function layerMRI() {
 	return layerOSM(
 		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
@@ -280,10 +280,10 @@ function layerBing(subLayer) {
  */
 function layersCollection() {
 	return {
-		'OpenTopo': layerOsmOpenTopo(),
+		'OpenTopo': layerOpenTopo(),
 		'OSM outdoors': layerThunderforest('outdoors'),
 		'OSM transport': layerThunderforest('transport'),
-		'MRI': layerOsmMri(),
+		'MRI': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key

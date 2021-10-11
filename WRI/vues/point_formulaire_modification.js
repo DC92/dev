@@ -9,10 +9,10 @@ function affiche_et_set( el , affiche, valeur ) {
 const coordinates = [<?=$vue->point->longitude?>, <?=$vue->point->latitude?>],
 
 	baseLayers = {
-		'Refuges.info': layerOsmMri(),
-		'OpenTopo': layerOsmOpenTopo(),
+		'Refuges.info': layerMRI(),
+		'OpenTopo': layerOpenTopo(),
 		'Outdoors': layerThunderforest('outdoors'),
-		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),

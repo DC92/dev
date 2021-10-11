@@ -1,8 +1,8 @@
 const baseLayers = {
-		'Refuges.info': layerOsmMri(),
-		'OpenTopo': layerOsmOpenTopo(),
+		'Refuges.info': layerMRI(),
+		'OpenTopo': layerOpenTopo(),
 		'Outdoors': layerThunderforest('outdoors'),
-		'OSM fr': layerOsm('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the key for the free layers
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
@@ -49,7 +49,7 @@ new ol.Map({
 	}),
 	controls: controls,
 	layers: [
-		layerOsmMri(), // Fond de carte WRI
+		layerMRI(), // Fond de carte WRI
 		layerWri({ // La couche des points
 			host: '<?=$config_wri["nom_hote"]?>',
 			distance: 50, // Clusterisation
