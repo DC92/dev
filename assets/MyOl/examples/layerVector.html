@@ -48,21 +48,6 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<div class="selector">
-		Refuges.info
-		<input type="checkbox" name="wri-features" />
-		<p id="wri-features"></p>
-		<ul>
-			<li><input type="checkbox" name="wri-features" value="7" checked="checked" />Cabane non gardée</li>
-			<li><input type="checkbox" name="wri-features" value="10" />Refuge gardé</li>
-			<li><input type="checkbox" name="wri-features" value="9" checked="checked" />Gîte d'étape</li>
-			<li><input type="checkbox" name="wri-features" value="23" />Point d'eau</li>
-			<li><input type="checkbox" name="wri-features" value="6" checked="checked" />Sommet</li>
-			<li><input type="checkbox" name="wri-features" value="3" />Passage délicat</li>
-			<li><input type="checkbox" name="wri-features" value="28" />Bâtiment en montagne</li>
-		</ul>
-	</div>
-
-	<div class="selector">
 		Chemineur
 		<input type="checkbox" name="geobb-features" />
 		<p id="geobb-features"></p>
@@ -79,7 +64,7 @@ Based on https://openlayers.org
 		</ul>
 	</div>
 
-	<div>
+	<div class="selector">
 		Alpages.info
 		<input type="checkbox" name="alp-features" />
 		<p id="alp-features"></p>
@@ -91,19 +76,6 @@ Based on https://openlayers.org
 		</ul>
 	</div>
 
-	<div>
-		Pyrenees-refuges.com
-		<input type="checkbox" name="prc-features" />
-		<p id="prc-features"></p>
-	</div>
-	<br />
-	<div>
-		Camptocamp.org
-		<input type="checkbox" name="c2c-features" />
-		<p><span id="c2c-features"></span> Only 100 features at a time</p>
-	</div>
-
-	<br style="clear:both" />
 	<div class="selector">
 		Overpass (OSM services)
 		<input type="checkbox" name="osm-features" />
@@ -124,7 +96,29 @@ Based on https://openlayers.org
 		</ul>
 	</div>
 
+	<div>
+		Refuges.info
+		<input type="checkbox" name="wri-features" value="7,9,10" />
+		<p id="wri-features"></p>
+	</div>
+
+	<div>
+		Pyrenees-refuges.com
+		<input type="checkbox" name="prc-features" />
+		<p id="prc-features"></p>
+	</div>
+
+	<div>
+		Camptocamp.org
+		<input type="checkbox" name="c2c-features" />
+		<p><span id="c2c-features"></span> Only 100 features at a time</p>
+	</div>
+
+	<br style="clear:both" />
+
 	<script>
+console.log(document.cookie);
+
 const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
@@ -140,23 +134,6 @@ const map = new ol.Map({
 		}),
 	],
 });
-
-// Refuges.info
-if (0)
-	map.addLayer(layerWri({
-		selectorName: 'wri-features',
-	}));
-if (01) {
-	map.addLayer(layerWri({
-		selectorName: 'wri-features',
-		maxResolution: 100,
-		distance: 50,
-	}));
-	map.addLayer(layerWriAreas({
-		minResolution: 100,
-		selectorName: 'wri-features',
-	}));
-}
 
 // Chemineur
 if (0)
@@ -185,6 +162,30 @@ if (01)
 		selectorName: 'alp-features',
 	}));
 
+// Overpass
+if (01)
+	map.addLayer(layerOverpass({
+		selectorName: 'osm-features',
+		distance: 50,
+	}));
+
+// Refuges.info
+if (0)
+	map.addLayer(layerWri({
+		selectorName: 'wri-features',
+	}));
+if (01) {
+	map.addLayer(layerWri({
+		selectorName: 'wri-features',
+		maxResolution: 100,
+		distance: 50,
+	}));
+	map.addLayer(layerWriAreas({
+		minResolution: 100,
+		selectorName: 'wri-features',
+	}));
+}
+
 // Pyrenees-refuges.com
 if (0)
 	map.addLayer(layerPyreneesRefuges({
@@ -203,12 +204,6 @@ if (01)
 		distance: 50,
 	}));
 
-// Overpass
-if (01)
-	map.addLayer(layerOverpass({
-		selectorName: 'osm-features',
-		distance: 50,
-	}));
 	</script>
 
 	<h4 style="clear:both;margin-bottom:0">Tests</h4>

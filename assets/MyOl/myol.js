@@ -826,7 +826,7 @@ function readCheckbox(selectorName) {
 
 	// Specific case of a single on/off <input>
 	if (inputEls.length == 1)
-		return inputEls[0].checked;
+		return inputEls[0].checked ? [inputEls[0].value] : [];
 
 	// Read each <input> checkbox
 	const selection = [];
@@ -860,7 +860,7 @@ function memCheckbox(selectorName, callback) {
 			// Set inputs following cookies & args
 			if (match)
 				inputEls[e].checked =
-				match[1].split(',').indexOf(inputEls[e].value) != -1 || // That one is declared
+				match[1].indexOf(inputEls[e].value) != -1 || // That one is declared
 				match[1].split(',').indexOf('on') != -1; // The "all (= "on") is set
 
 			// Attach the action
@@ -875,9 +875,10 @@ function memCheckbox(selectorName, callback) {
 
 		// Mem the data in the cookie
 		const selection = readCheckbox(selectorName);
+
 		if (selectorName)
 			document.cookie =
-			typeof selection == 'object' ? selection : '' +
+			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
 			'path=/; SameSite=Strict; ' +
 			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
