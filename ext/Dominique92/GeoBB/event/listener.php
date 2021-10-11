@@ -225,7 +225,6 @@ class listener implements EventSubscriberInterface
 		// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 		if (@$post['geom']) {
 			// Avoid wrap of the world
-			//TODO+ incompatible avec les traces
 			$geom = preg_replace_callback(
 				'/coordinates\"\:\[([0-9-.]+)/',
 				function ($matches) {

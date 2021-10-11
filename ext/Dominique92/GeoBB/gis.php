@@ -149,8 +149,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	$properties = [
 		'name' => $row['post_subject'],
 		'id' => $row['topic_id'],
-		'alt' => str_replace('~', '', $row['geo_altitude']), //TODO DELETE
-		'ele' => str_replace('~', '', $row['geo_altitude']),
+		'alt' => str_replace('~', '', $row['geo_altitude']),
 	];
 
 	if ($layer == 'verbose') {
