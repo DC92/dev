@@ -22,6 +22,8 @@ const layer = layerVector({
 		*/
 	}),
 
+	//TODO GYM : pas de strategie.bbox sur cartes
+	//TODO+ Inhiber rotation carte
 	map = new ol.Map({
 		target: 'carte',
 		view: new ol.View({

@@ -7,7 +7,7 @@
  * download/file.php?id=<ID>&size=<MAX_PIXELS> resize to fit into a MAX_PIXELS square
  */
 
-//TODO Template miniatures pour réorganisation
+//BEST Template miniatures pour réorganisation
 
 namespace Dominique92\Images\event;
 

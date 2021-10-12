@@ -4,6 +4,7 @@
 //TODO+ test GPS gps.c92.fr
 //BEST CLEAN all GPS files
 //TODO+ Pas de zoom page quand carte
+//TODO+ Inhiber rotation carte quand pas de GPS
 
 /** PWA area */
 // Force https to allow web apps and geolocation

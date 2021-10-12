@@ -36,7 +36,7 @@ class listener implements EventSubscriberInterface
 		$this->language = $language;
 
 		// Includes language and style files of this extension
-		//TODO mettre dans page_header (risque de passer avant que toutes les langues soient connues)
+		//BEST mettre dans page_header (risque de passer avant que toutes les langues soient connues)
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);

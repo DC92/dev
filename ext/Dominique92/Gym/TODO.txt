@@ -8,7 +8,7 @@ GYM : evenement : mettre le lien vers le lieu et l'animatrice
 
 // Ne pas afficher le premier post dans les cartes
 
-//TODO randos + GPS
+//BEST randos + GPS
 
 BUG les evenements ne sont pas supprimés quand la date est echue (ils ne marquent plus l'heure)
 

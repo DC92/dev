@@ -82,6 +82,7 @@ layers = [
 		controlPrint(),
 	],
 
+//TODO Inhiber rotation carte quand pas de GPS
   map = new ol.Map({
 	target: 'carte-nav',
 	controls: controls,

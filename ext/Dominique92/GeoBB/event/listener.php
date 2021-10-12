@@ -58,7 +58,6 @@ class listener implements EventSubscriberInterface
 	/**
 		COMMON
 	*/
-	//TODO+ test GYM
 	function common($vars) {
 		global $mapKeys;
 		preg_match ('/Trident/', @$this->server['HTTP_USER_AGENT'], $match);

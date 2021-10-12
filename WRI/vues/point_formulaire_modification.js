@@ -68,6 +68,7 @@ const coordinates = [<?=$vue->point->longitude?>, <?=$vue->point->latitude?>],
 		},
 	});
 
+//TODO Inhiber rotation carte quand pas de GPS
 new ol.Map({
 	target: 'carte-edit',
 	view: new ol.View({
