@@ -531,6 +531,7 @@ function controlLoadGPX(options) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
 								//BEST voir les ref sym
+								//TODO chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 								imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
 							}),

@@ -10,6 +10,8 @@ GYM : evenement : mettre le lien vers le lieu et l'animatrice
 
 //TODO randos + GPS
 
+BUG les evenements ne sont pas supprimés quand la date est echue (ils ne marquent plus l'heure)
+
 //BEST ??? masquer le texte dans les séances
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio

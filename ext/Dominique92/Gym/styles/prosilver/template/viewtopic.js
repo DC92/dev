@@ -1,9 +1,11 @@
-var layerGeoBBgis = layerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?select=' + select,
-		centerOnfeatures: true,
-		receiveProperties: function(properties) {
-			properties.link = '?p=' + properties.post_id;
-		},
+var layerGeoBBgis = layerGeoBB({
+	host:'c92.fr/test/gymcha6/',
+	/*
+		selectorName: 'geobb-features',
+		maxResolution: 100,
+		distance: 50,
+		attribution: 'Chemineur',
+	*/
 	}),
 	map = new ol.Map({
 		target: 'carte',
@@ -20,3 +22,12 @@ var layerGeoBBgis = layerVectorURL({
 			new ol.control.Attribution(),
 		],
 	});
+	
+	/*
+	layerVectorURL({
+		baseUrl: 'ext/Dominique92/GeoBB/gis.php?select=' + select,
+		centerOnfeatures: true,
+		receiveProperties: function(properties) {
+			properties.link = '?p=' + properties.post_id;
+		},
+	})*/

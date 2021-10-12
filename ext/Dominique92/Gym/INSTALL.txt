@@ -2,12 +2,12 @@
 // INSTALL du 30/04/2021
 Exporter base / créer et importer
 
-Copier phpBB sauf doc & config.php
+Copier phpBB sauf doc, install ? & config.php
 Copier assets/MyOl
 Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
 Copier ext/cleantalk
 Copier ext/phpbb/googleanalytics
-Copier gym3/fichiers
+Copier gym/fichiers gym/files
 
 /install -> Mettre à jour
 Supprimer /install

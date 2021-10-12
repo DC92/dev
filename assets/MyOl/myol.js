@@ -946,6 +946,7 @@ function styleOptionsIconChemineur(iconName) {
 		// Limit to 2 type names & ' ' -> '_'
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
 
+		//TODO chemineur.fr
 		return styleOptionsIcon('//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
 }
@@ -1071,10 +1072,10 @@ function styleOptionsCluster(feature, properties) {
  */
 function layerWri(options) {
 	return layerVectorCluster(Object.assign({
-		host: 'www.refuges.info',
+		host: '//www.refuges.info/',
 		nb_points: 'all',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host + '/api/bbox' +
+			return options.host + 'api/bbox' +
 				'?nb_points=' + options.nb_points +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
@@ -1083,7 +1084,7 @@ function layerWri(options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
-				icon: '//' + options.host + '/images/icones/' + properties.type.icone + '.svg',
+				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
 				url: properties.lien,
@@ -1106,10 +1107,10 @@ function layerWri(options) {
 
 function layerWriAreas(options) {
 	return layerVector(Object.assign({
-		host: 'www.refuges.info',
+		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
 		urlFunction: function(options) {
-			return '//' + options.host + '/api/polygones?type_polygon=' + options.polygon;
+			return options.host + 'api/polygones?type_polygon=' + options.polygon;
 		},
 		convertProperties: function(properties) {
 			return {
@@ -1140,17 +1141,17 @@ function layerWriAreas(options) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: 'c92.fr/test/chem5', //TODO+ host: 'chemineur.fr',
+		host: '//c92.fr/test/chem5/', //TODO+ host: 'chemineur.fr',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host + '/ext/Dominique92/GeoBB/gis.php?limit=10000' +
+			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
 				(options.selectorName ? '&cat=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				icon: properties.type ? '//' + options.host + '/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
-				url: '//' + options.host + '/viewtopic.php?t=' + properties.id,
+				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
+				url: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: options.attribution,
 			};
 		},
@@ -1188,15 +1189,15 @@ function layerGeoBB(options) {
 function layerAlpages(options) {
 	//TODO ol.loadingstrategy.bboxLimit,
 	return layerVectorCluster(Object.assign({ //TODO BUG cluster don't work
-		host: 'alpages.info',
+		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
-			return '//' + options.host + '/ext/Dominique92/GeoBB/gis.php?limit=1000' +
+			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=1000' +
 				(options.selectorName ? '&forums=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				url: '//' + options.host + '/viewtopic.php?t=' + properties.id,
+				url: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: 'Alpages',
 			};
 		},
@@ -1950,6 +1951,7 @@ function controlLoadGPX(options) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
 								//BEST voir les ref sym
+								//TODO chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 								imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
 							}),
