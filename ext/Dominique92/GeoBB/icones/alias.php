@@ -1,6 +1,6 @@
 <?php
 $colors = ['black','green','blue','red','grey','yellow','white',
-	'maroon','orange','blanchedalmond','lightgrey','violet','purple'];
+	'maroon','orange','blanchedalmond','lightgrey','violet','purple','turquoise'];
 
 // Tableau de correspondance des icônes
 $alias = [
@@ -111,6 +111,9 @@ $alias = [
 
 	// Alpages.info
 	'reseau' => 'a63',
+
+	// EPGV
+	'gym' => 'cabane_turquoise_blue_a71.6.20',
 ];
 
 $geocaching = [

@@ -1,33 +1,39 @@
-var layerGeoBBgis = layerGeoBB({
-	host:'c92.fr/test/gymcha6/',
-	/*
-		selectorName: 'geobb-features',
-		maxResolution: 100,
-		distance: 50,
-		attribution: 'Chemineur',
-	*/
+const layer = layerVector({
+		url: 'ext/Dominique92/GeoBB/gis.php',
+		convertProperties: function(properties, feature, options) {
+			return {
+				icon: 'ext/Dominique92/GeoBB/icones/gym.svg',
+				url: 'viewtopic.php?p=' + properties.post_id,
+			};
+		},
+		styleOptionsFunction: function(feature, properties) {
+			return Object.assign({},
+				styleOptionsIcon(properties.icon),
+				styleOptionsLabel(properties.name, properties),
+			);
+		},
+		/* //TODO pour la carte lieux
+		styleOptionsFunction: function(feature, properties) {
+			return styleOptionsIcon(properties.icon);
+		},
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsLabel(properties.name, properties);
+		},
+		*/
 	}),
+
 	map = new ol.Map({
 		target: 'carte',
 		view: new ol.View({
-			center: [247000, 6243000],
-			zoom: 12,
+			center: ol.proj.transform(coordonnees, 'EPSG:4326', 'EPSG:3857'),
+			zoom: zoom,
 		}),
 		layers: [
 			layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-			layerGeoBBgis,
+			layer,
 		],
 		controls: [
 			new ol.control.Zoom(),
 			new ol.control.Attribution(),
 		],
 	});
-	
-	/*
-	layerVectorURL({
-		baseUrl: 'ext/Dominique92/GeoBB/gis.php?select=' + select,
-		centerOnfeatures: true,
-		receiveProperties: function(properties) {
-			properties.link = '?p=' + properties.post_id;
-		},
-	})*/

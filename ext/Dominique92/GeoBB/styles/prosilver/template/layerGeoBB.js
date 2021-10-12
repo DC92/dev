@@ -20,11 +20,9 @@ var map = new ol.Map({
 				selectorName: 'geobb-features',
 				maxResolution: 100,
 				distance: 30,
-				attribution: 'Chemineur',
 			}),
-			layerGeoBB({
+			layerGeoBBCluster({
 				host: '',
-				subLayer: 'cluster',
 				selectorName: 'geobb-features',
 				minResolution: 100,
 				distance: 30,

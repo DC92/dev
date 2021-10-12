@@ -102,6 +102,7 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_post_row($vars) {
 		// Valeurs du post lues dans la table phpbb_posts
 		$row = $vars['row'];
+		$post_row = $vars['post_row'];
 		$post_id = $row['post_id'];
 
 		// Valeurs du topic
@@ -122,10 +123,11 @@ class listener implements EventSubscriberInterface
 			// Position
 			preg_match ('/\[([-0-9\.]*)[, ]*([-0-9\.]*)\]/', $topic_row['geo_json'], $ll);
 			if ($ll) {
+				$topic_row['forum_image'] = $topic_data['forum_image'];
 				$topic_row['map_type'] = $desc[2];
 				$topic_row['geo_lon'] = $ll[1]; // For OSM search link
 				$topic_row['geo_lat'] = $ll[2];
-				$topic_row['forum_image'] = $topic_data['forum_image'];
+				$post_row['LON_LAT'] = $ll[0];
 
 				// Calcul de l'altitude avec mapquest
 				global $mapKeys;
@@ -183,6 +185,8 @@ class listener implements EventSubscriberInterface
 
 		if ($post_id == $topic_first_post_id)
 			$this->template->assign_vars (array_change_key_case ($topic_row, CASE_UPPER));
+
+		$vars['post_row'] = $post_row;
 	}
 
 	/**

@@ -177,7 +177,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	// GeoJson
 	$features[] = [
 		'type' => 'Feature',
-		'id' => $row['topic_id'], // Conformité with WFS specification. Avoid multiple display of the same
+		'id' => $row['post_id'], // Conformité with WFS specification. Avoid multiple display of the same
 		'geometry' => $geophp, // On ajoute le tout à la liste à afficher sous la forme d'un "Feature" (Sous forme d'objet PHP)
 		'properties' => $properties,
 	];

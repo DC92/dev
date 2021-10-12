@@ -6,7 +6,7 @@ if (!ol) var ol = {};
 // Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
 
 //HACK for some mobiles touch functions
-if (navigator.userAgent.match(/iphone.+safari/i)) {
+if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO  migrate to navigator.userAgentData.
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);

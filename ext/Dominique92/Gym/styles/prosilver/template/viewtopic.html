@@ -30,9 +30,13 @@
 
 			<script>
 				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
-					var select = 'gym_menu=%27on%27';
+					var select = 'gym_menu=%27on%27',
+						coordonnees = [{GEO_LON}, {LON_LAT}], // Topic_data
+						zoom = 14;
 				<!-- ELSE -->
-					var select = 'post_id={postrow.POST_ID}';
+					var select = 'post_id={postrow.POST_ID}',
+						coordonnees = {postrow.LON_LAT}, // Post_data
+						zoom = 18;
 				<!-- ENDIF -->
 			</script>
 
