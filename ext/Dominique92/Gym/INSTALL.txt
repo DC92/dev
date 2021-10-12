@@ -3,7 +3,7 @@
 Exporter base / créer et importer
 
 Copier phpBB sauf doc, install ? & config.php
-Copier assets/MyOl
+Copier assets/MyOl & jquery-ui
 Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
 Copier ext/cleantalk
 Copier ext/phpbb/googleanalytics
