@@ -457,37 +457,7 @@ function styleOptionsIconChemineur(iconName) {
 	}
 }
 
-// Display a yellow label with only the name
-function styleOptionsLabel(text, properties, overflow) {
-	const styleTextOptions = {
-		text: text,
-		font: '14px Calibri,sans-serif',
-		padding: [1, 1, 0, 3],
-		fill: new ol.style.Fill({
-			color: 'black',
-		}),
-		backgroundFill: new ol.style.Fill({
-			color: 'yellow',
-		}),
-		backgroundStroke: new ol.style.Stroke({
-			color: 'black',
-			width: 0.3,
-		}),
-		overflow: overflow,
-	};
-
-	if (!properties.area) // Not a line or polygon
-		Object.assign(styleTextOptions, {
-			textBaseline: 'bottom',
-			offsetY: -13, // Balance the bottom textBaseline
-		});
-
-	return {
-		text: new ol.style.Text(styleTextOptions)
-	};
-}
-
-// Display a yellow label with more data about the feature
+// Display a yellow label with some data about the feature
 function styleOptionsFullLabel(properties, overflow) {
 	let text = [],
 		line = [];
@@ -508,24 +478,54 @@ function styleOptionsFullLabel(properties, overflow) {
 	}
 	// Feature
 	else {
-		if (typeof properties.type == 'string' && properties.type)
-			line.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
-		if (properties.attribution)
-			line.push('&copy;' + properties.attribution);
-		if (line.length)
-			text.push(line.join(' '));
-		line = [];
+		if (properties.name)
+			text.push(properties.name);
+		
 		if (properties.ele)
 			line.push(parseInt(properties.ele) + ' m');
 		if (properties.capacity)
 			line.push(parseInt(properties.capacity) + '\u255E\u2550\u2555');
 		if (line.length)
 			text.push(line.join(', '));
-		if (properties.name)
-			text.push(properties.name);
+		
+		if (typeof properties.type == 'string' && properties.type)
+			text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+		if (properties.attribution)
+			text.push('&copy;' + properties.attribution);
 	}
 
 	return styleOptionsLabel(text.join('\n'), properties, overflow);
+}
+
+// Display a yellow label with only the name
+function styleOptionsLabel(text, properties, overflow) {
+	const styleTextOptions = {
+		text: text,
+		font: '14px Calibri,sans-serif',
+		padding: [1, 1, 0, 3],
+		fill: new ol.style.Fill({
+			color: 'black',
+		}),
+		backgroundFill: new ol.style.Fill({
+			color: 'yellow',
+		}),
+		backgroundStroke: new ol.style.Stroke({
+			color: 'black',
+			width: 0.3,
+		}),
+		overflow: overflow,
+	};
+
+// For points
+	if (!properties.area) 
+		Object.assign(styleTextOptions, {
+			textBaseline: 'top',
+			offsetY: -30, // Above the icon
+		});
+
+	return {
+		text: new ol.style.Text(styleTextOptions)
+	};
 }
 
 // Apply a color and transparency to a polygon
