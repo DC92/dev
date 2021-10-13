@@ -254,7 +254,7 @@ function controlFullScreen(options) {
 
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '', //HACK Bad presentation on I.E. & FF
+		label: '', //HACK Bad presentation on IE & FF
 		tipLabel: 'Plein écran',
 	}, options));
 
@@ -278,7 +278,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
-			//BEST I.E. : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
+			//BEST IE : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};
@@ -533,7 +533,7 @@ function controlLoadGPX(options) {
 								//BEST voir les ref sym
 								//TODO chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
-								imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+								imgSize: [24, 24], // IE compatibility //BEST automatic detect
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',

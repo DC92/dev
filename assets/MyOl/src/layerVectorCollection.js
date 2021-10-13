@@ -24,19 +24,17 @@ function layerWri(options) {
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
 				url: properties.lien,
-				attribution: 'Refuges.info',
+				attribution: 'Refuges.info'
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				styleOptionsLabel(properties.nom, properties),
+				styleOptionsLabel(properties.nom, properties)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties),
-			);
+			return styleOptionsFullLabel(properties);
 		},
 	}, options));
 }
@@ -59,7 +57,7 @@ function layerWriAreas(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5),
+				styleOptionsPolygon(properties.color, 0.5)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
@@ -123,7 +121,6 @@ function layerGeoBB(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO ol.loadingstrategy.bboxLimit,
 	return layerVectorCluster(Object.assign({ //TODO BUG cluster don't work
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -141,7 +138,7 @@ function layerAlpages(options) {
 			return Object.assign({},
 				styleOptionsIconChemineur(properties.type),
 				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5),
+				styleOptionsPolygon(properties.color, 0.5)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
@@ -172,13 +169,11 @@ function layerPyreneesRefuges(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIconChemineur(properties.type_hebergement),
-				styleOptionsLabel(properties.name, properties),
+				styleOptionsLabel(properties.name, properties)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties, true),
-			);
+			return styleOptionsFullLabel(properties, true);
 		},
 	}, options));
 }
@@ -227,13 +222,11 @@ function layerC2C(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIconChemineur(properties.type),
-				styleOptionsLabel(properties.name, properties),
+				styleOptionsLabel(properties.name, properties)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties, true),
-			);
+			return styleOptionsFullLabel(properties, true);
 		},
 	}, options));
 }
@@ -244,7 +237,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOverpass(options) {
-	//BEST I.E. Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
+	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			//host: 'overpass-api.de',
@@ -260,13 +253,11 @@ function layerOverpass(options) {
 			styleOptionsFunction: function(feature, properties) {
 				return Object.assign({},
 					styleOptionsIconChemineur(properties.type),
-					styleOptionsLabel(properties.name, properties),
+					styleOptionsLabel(properties.name, properties)
 				);
 			},
 			hoverStyleOptionsFunction: function(feature, properties) {
-				return Object.assign({},
-					styleOptionsFullLabel(properties, true),
-				);
+				return styleOptionsFullLabel(properties, true);
 			},
 		}, options)),
 		statusEl = document.getElementById(options.selectorName),

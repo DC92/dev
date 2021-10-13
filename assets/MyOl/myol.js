@@ -12,8 +12,11 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-// I.E. polyfills
-// Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
+/** IE polyfills
+ * Need polyfill.js generated with https://polyfill.io/v3/url-builder/
+ * append assign hypot includes promise reflect 
+ */
+//TODO BUG IE don't work with 6.9.0
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO  migrate to navigator.userAgentData.
@@ -371,7 +374,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
-	//BEST I.E. don't work
+	//BEST IE don't work
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -934,7 +937,7 @@ function styleOptionsIcon(iconUrl) {
 		return {
 			image: new ol.style.Icon({
 				src: iconUrl,
-				imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+				imgSize: [24, 24], // IE compatibility //BEST automatic detect
 			}),
 		};
 }
@@ -1088,19 +1091,17 @@ function layerWri(options) {
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
 				url: properties.lien,
-				attribution: 'Refuges.info',
+				attribution: 'Refuges.info'
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				styleOptionsLabel(properties.nom, properties),
+				styleOptionsLabel(properties.nom, properties)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties),
-			);
+			return styleOptionsFullLabel(properties);
 		},
 	}, options));
 }
@@ -1123,7 +1124,7 @@ function layerWriAreas(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5),
+				styleOptionsPolygon(properties.color, 0.5)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
@@ -1187,7 +1188,6 @@ function layerGeoBB(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	//TODO ol.loadingstrategy.bboxLimit,
 	return layerVectorCluster(Object.assign({ //TODO BUG cluster don't work
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
@@ -1205,7 +1205,7 @@ function layerAlpages(options) {
 			return Object.assign({},
 				styleOptionsIconChemineur(properties.type),
 				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5),
+				styleOptionsPolygon(properties.color, 0.5)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
@@ -1236,13 +1236,11 @@ function layerPyreneesRefuges(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIconChemineur(properties.type_hebergement),
-				styleOptionsLabel(properties.name, properties),
+				styleOptionsLabel(properties.name, properties)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties, true),
-			);
+			return styleOptionsFullLabel(properties, true);
 		},
 	}, options));
 }
@@ -1291,13 +1289,11 @@ function layerC2C(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIconChemineur(properties.type),
-				styleOptionsLabel(properties.name, properties),
+				styleOptionsLabel(properties.name, properties)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties, true),
-			);
+			return styleOptionsFullLabel(properties, true);
 		},
 	}, options));
 }
@@ -1308,7 +1304,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOverpass(options) {
-	//BEST I.E. Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
+	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			//host: 'overpass-api.de',
@@ -1324,13 +1320,11 @@ function layerOverpass(options) {
 			styleOptionsFunction: function(feature, properties) {
 				return Object.assign({},
 					styleOptionsIconChemineur(properties.type),
-					styleOptionsLabel(properties.name, properties),
+					styleOptionsLabel(properties.name, properties)
 				);
 			},
 			hoverStyleOptionsFunction: function(feature, properties) {
-				return Object.assign({},
-					styleOptionsFullLabel(properties, true),
-				);
+				return styleOptionsFullLabel(properties, true);
 			},
 		}, options)),
 		statusEl = document.getElementById(options.selectorName),
@@ -1674,7 +1668,7 @@ function controlFullScreen(options) {
 
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '', //HACK Bad presentation on I.E. & FF
+		label: '', //HACK Bad presentation on IE & FF
 		tipLabel: 'Plein écran',
 	}, options));
 
@@ -1698,7 +1692,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
-			//BEST I.E. : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
+			//BEST IE : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};
@@ -1953,7 +1947,7 @@ function controlLoadGPX(options) {
 								//BEST voir les ref sym
 								//TODO chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
-								imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+								imgSize: [24, 24], // IE compatibility //BEST automatic detect
 							}),
 							stroke: new ol.style.Stroke({
 								color: 'blue',

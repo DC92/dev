@@ -2,8 +2,11 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-// I.E. polyfills
-// Need polyfill.js generate with https://polyfill.io/v3/url-builder/ includes append promise assign hypot
+/** IE polyfills
+ * Need polyfill.js generated with https://polyfill.io/v3/url-builder/
+ * append assign hypot includes promise reflect 
+ */
+//TODO BUG IE don't work with 6.9.0
 
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO  migrate to navigator.userAgentData.

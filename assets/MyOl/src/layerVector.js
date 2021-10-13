@@ -440,7 +440,7 @@ function styleOptionsIcon(iconUrl) {
 		return {
 			image: new ol.style.Icon({
 				src: iconUrl,
-				imgSize: [24, 24], // I.E. compatibility //BEST automatic detect
+				imgSize: [24, 24], // IE compatibility //BEST automatic detect
 			}),
 		};
 }

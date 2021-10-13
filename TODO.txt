@@ -1,9 +1,12 @@
+//TODO => toute la liste !
+//TODO Chemineur : CSS geofinder
+//TODO : restreindre / prioriser les résultats de la recherche ... limite 5 ?
+
 NEW MYOL
 	TEST GPS
-	TEST INCLUSION WRI
 	valeur du pas du zoom tous explorateurs
 	Etiquette ligne au survol / une seule par fiche ?
-	WRI : pas de baselayer=IGN%20TOP25 (blancs pas acceptés
+	WRI : pas de baselayer=IGN%20TOP25 (blancs pas acceptés)
 
 BUG
 	viewtopic point KO
