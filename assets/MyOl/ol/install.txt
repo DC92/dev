@@ -1,4 +1,11 @@
 https://openlayers.org/download/
-v6.9.0
+v6.8.1
 
-NO MORE : Need to transpile ol.js to ol-ie.js with: https://babeljs.io/repl (TARGETS = default)
+IE polyfill
+https://polyfill.io/v3/url-builder
+append assign hypot includes promise
+
+NO MORE for IE
+Transpile ol.js to ol-ie.js with:
+https://babeljs.io/repl
+TARGETS = default

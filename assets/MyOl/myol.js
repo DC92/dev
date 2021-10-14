@@ -12,12 +12,6 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-/** IE polyfills
- * Need polyfill.js generated with https://polyfill.io/v3/url-builder/
- * append assign hypot includes promise reflect 
- */
-//TODO BUG IE don't work with 6.9.0
-
 //HACK for some mobiles touch functions
 if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO  migrate to navigator.userAgentData.
 	const script = document.createElement('script');
@@ -1303,6 +1297,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
+//TODO BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 function layerOverpass(options) {
 	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
