@@ -319,9 +319,6 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
-//BEST GPS tap on map = distance from GPS calculation
-//TODO GPS position initiale quand PC fixe ?
-//BEST GPS average inertial counter to get better speed
 function controlGPS() {
 	let view, geolocation, nbLoc, position, altitude;
 
@@ -356,8 +353,10 @@ function controlGPS() {
 				displays.push(Math.round(altitude) + ' m');
 				if (!isNaN(speed))
 					displays.push(speed + ' km/h');
+				//BEST GPS average inertial counter to get better speed
 			} else
 				displays.push('GPS sync...');
+			//TODO GPS position initiale quand PC fixe ?
 		}
 		displayEl.innerHTML = displays.join(', ');
 		if (displays.length)
@@ -395,7 +394,6 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		//TODO detecter aussi si on est sur un mobile
 		if (button.active && position && altitude) {
 			const map = button.getMap(),
 				// Estimate the viewport size
@@ -473,12 +471,13 @@ function controlGPS() {
 			}
 		);
 
-		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		map.on('moveend', renderReticule); // Refresh graticule after map zoom
+		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		geolocation.on('change:position', renderReticule);
 		geolocation.on('error', function(error) {
 			alert('Geolocation error: ' + error.message);
 		});
+		//BEST GPS tap on map = distance from GPS calculation
 	};
 
 	return button;
@@ -531,7 +530,7 @@ function controlLoadGPX(options) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
 								//BEST voir les ref sym
-								//TODO chemineur.fr
+								//TODO+ chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 								imgSize: [24, 24], // IE compatibility //BEST automatic detect
 							}),

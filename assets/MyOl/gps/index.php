@@ -64,7 +64,7 @@ Based on https://openlayers.org
 
 	<title><?=$manifest['name']?></title>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="icon" type="<?=$icon['type']?>" href="<?=$icon['src']?>" />
 
 	<!-- Polyfill iOS : Amélioration du pseudo full screen pour les cartes pour d'anciennes versions d'iOS/Safari -->

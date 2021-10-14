@@ -13,7 +13,7 @@
 if (!ol) var ol = {};
 
 //HACK for some mobiles touch functions
-if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO  migrate to navigator.userAgentData.
+if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
@@ -111,10 +111,10 @@ function layerMRI() {
 /**
  * Kompas (Austria)
  * Requires layerOSM
+ * This will not work on http: pages. No workarond available !
  */
 function layerKompass(subLayer) {
 	return layerOSM(
-		//TODO BUG sur https://wri -> demande le lien https !
 		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
@@ -308,8 +308,8 @@ function layersDemo() {
 		'OSM villes': layerThunderforest('neighbourhood'),
 		'OSM contraste': layerThunderforest('mobile-atlas'),
 
-		'os light': layerOS('Light_3857'),
-		'os road': layerOS('Road_3857'),
+		'OS light': layerOS('Light_3857'),
+		'OS road': layerOS('Road_3857'),
 		'Kompas': layerKompass('KOMPASS'),
 
 		'Bing': layerBing('Road'),
@@ -943,7 +943,7 @@ function styleOptionsIconChemineur(iconName) {
 		// Limit to 2 type names & ' ' -> '_'
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
 
-		//TODO chemineur.fr
+		//TODO+ chemineur.fr
 		return styleOptionsIcon('//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
 }
@@ -1181,8 +1181,9 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
+//TODO BUG cluster don't work
 function layerAlpages(options) {
-	return layerVectorCluster(Object.assign({ //TODO BUG cluster don't work
+	return layerVectorCluster(Object.assign({ 
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=1000' +
@@ -1297,7 +1298,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-//TODO BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
+//TODO+ BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 function layerOverpass(options) {
 	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
@@ -1728,9 +1729,6 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
-//BEST GPS tap on map = distance from GPS calculation
-//TODO GPS position initiale quand PC fixe ?
-//BEST GPS average inertial counter to get better speed
 function controlGPS() {
 	let view, geolocation, nbLoc, position, altitude;
 
@@ -1765,8 +1763,10 @@ function controlGPS() {
 				displays.push(Math.round(altitude) + ' m');
 				if (!isNaN(speed))
 					displays.push(speed + ' km/h');
+				//BEST GPS average inertial counter to get better speed
 			} else
 				displays.push('GPS sync...');
+			//TODO GPS position initiale quand PC fixe ?
 		}
 		displayEl.innerHTML = displays.join(', ');
 		if (displays.length)
@@ -1804,7 +1804,6 @@ function controlGPS() {
 
 	function renderReticule() {
 		position = geolocation.getPosition();
-		//TODO detecter aussi si on est sur un mobile
 		if (button.active && position && altitude) {
 			const map = button.getMap(),
 				// Estimate the viewport size
@@ -1882,12 +1881,13 @@ function controlGPS() {
 			}
 		);
 
-		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		map.on('moveend', renderReticule); // Refresh graticule after map zoom
+		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
 		geolocation.on('change:position', renderReticule);
 		geolocation.on('error', function(error) {
 			alert('Geolocation error: ' + error.message);
 		});
+		//BEST GPS tap on map = distance from GPS calculation
 	};
 
 	return button;
@@ -1940,7 +1940,7 @@ function controlLoadGPX(options) {
 						return new ol.style.Style({
 							image: new ol.style.Icon({
 								//BEST voir les ref sym
-								//TODO chemineur.fr
+								//TODO+ chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
 								imgSize: [24, 24], // IE compatibility //BEST automatic detect
 							}),

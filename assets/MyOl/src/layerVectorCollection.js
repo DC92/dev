@@ -120,8 +120,9 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
+//TODO BUG cluster don't work
 function layerAlpages(options) {
-	return layerVectorCluster(Object.assign({ //TODO BUG cluster don't work
+	return layerVectorCluster(Object.assign({ 
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=1000' +
@@ -236,7 +237,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-//TODO BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
+//TODO+ BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 function layerOverpass(options) {
 	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),

@@ -3,7 +3,7 @@
 if (!ol) var ol = {};
 
 //HACK for some mobiles touch functions
-if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO  migrate to navigator.userAgentData.
+if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);

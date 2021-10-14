@@ -37,10 +37,10 @@ function layerMRI() {
 /**
  * Kompas (Austria)
  * Requires layerOSM
+ * This will not work on http: pages. No workarond available !
  */
 function layerKompass(subLayer) {
 	return layerOSM(
-		//TODO BUG sur https://wri -> demande le lien https !
 		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
@@ -234,8 +234,8 @@ function layersDemo() {
 		'OSM villes': layerThunderforest('neighbourhood'),
 		'OSM contraste': layerThunderforest('mobile-atlas'),
 
-		'os light': layerOS('Light_3857'),
-		'os road': layerOS('Road_3857'),
+		'OS light': layerOS('Light_3857'),
+		'OS road': layerOS('Road_3857'),
 		'Kompas': layerKompass('KOMPASS'),
 
 		'Bing': layerBing('Road'),
