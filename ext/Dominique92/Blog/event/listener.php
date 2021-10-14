@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 24(GPL-240)
  */
 
-/*//TODO text-indent de <p> */
+/*//BEST text-indent de <p> */
 
 namespace Dominique92\Blog\event;
 

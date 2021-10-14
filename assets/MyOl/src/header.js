@@ -3,11 +3,12 @@
 if (!ol) var ol = {};
 
 //HACK for some mobiles touch functions
+/*
 if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
-}
+}*/
 
 /**
  * Display OL version
@@ -15,8 +16,7 @@ if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.
 try {
 	new ol.style.Icon(); // Try incorrect action
 } catch (err) { // to get Assert url
-	ol.version = 'Ol ' + err.message.match('/v([0-9\.]+)/')[1];
-	console.log(ol.version);
+	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
 
 /**
