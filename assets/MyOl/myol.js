@@ -1934,18 +1934,23 @@ function controlLoadGPX(options) {
 				layer = new ol.layer.Vector({
 					source: source,
 					style: function(feature) {
-						return new ol.style.Style({
-							image: new ol.style.Icon({
-								//BEST voir les ref sym
+						const properties = feature.getProperties(),
+							styleOptions = {
+								stroke: new ol.style.Stroke({
+									color: 'blue',
+									width: 2,
+								}),
+							};
+
+						if (properties.sym)
+							styleOptions.image = new ol.style.Icon({
+								//TODO+ voir les ref sym
 								//TODO+ chemineur.fr
-								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + feature.getProperties().sym + '.png',
+								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + properties.sym + '.png',
 								imgSize: [24, 24], // IE compatibility //BEST automatic detect
-							}),
-							stroke: new ol.style.Stroke({
-								color: 'blue',
-								width: 2,
-							}),
-						});
+							});
+
+						return new ol.style.Style(styleOptions);
 					},
 				});
 			map.addLayer(layer);

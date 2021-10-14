@@ -97,7 +97,7 @@ const nbli = document.getElementsByTagName('li').length,
 	});
 
 function addLayer(url) {
-	const layer = layerVectorURL({
+	const layer = layerVector({
 		url: url,
 		format: new ol.format.GPX(),
 		receiveFeatures: function(features) {
