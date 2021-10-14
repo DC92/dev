@@ -61,10 +61,6 @@ const nbli = document.getElementsByTagName('li').length,
 		controlLengthLine(),
 
 		new ol.control.Zoom(),
-		new ol.control.FullScreen({
-			label: '', //HACK Bad presentation on IE & FF
-			tipLabel: 'Plein écran',
-		}),
 		controlGeocoder(),
 		controlGPS(),
 
@@ -103,6 +99,14 @@ function addLayer(url) {
 		receiveFeatures: function(features) {
 			map.getView().setZoom(1); //HACK enable gpx rendering anywhere we are
 			return features;
+		},
+		style: function(feature) {
+			return new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
+				}),
+			});
 		},
 	});
 
