@@ -15,7 +15,6 @@
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
-//TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer

@@ -120,7 +120,6 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
-//TODO BUG cluster don't work
 function layerAlpages(options) {
 	return layerVectorCluster(Object.assign({ 
 		host: '//alpages.info/',
@@ -239,7 +238,6 @@ function layerC2C(options) {
  */
 //TODO+ BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 function layerOverpass(options) {
-	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			//host: 'overpass-api.de',

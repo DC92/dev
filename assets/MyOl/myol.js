@@ -368,7 +368,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
-	//BEST IE don't work
+	//BEST IE don't work on IE
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -506,7 +506,6 @@ function controlLayerSwitcher(baseLayers, options) {
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
-//TODO BUG battement si trop d'icônes
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -1181,7 +1180,6 @@ function layerGeoBB(options) {
 /**
  * Site alpages.info
  */
-//TODO BUG cluster don't work
 function layerAlpages(options) {
 	return layerVectorCluster(Object.assign({ 
 		host: '//alpages.info/',
@@ -1300,7 +1298,6 @@ function layerC2C(options) {
  */
 //TODO+ BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 function layerOverpass(options) {
-	//BEST IE Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			//host: 'overpass-api.de',
