@@ -1,9 +1,3 @@
-//TODO+ test GPS
-//TODO+ test GPS chemineur
-//TODO+ test GPS WRI
-//TODO+ test GPS gps.c92.fr
-//BEST CLEAN all GPS files
-
 /** PWA area */
 // Force https to allow web apps and geolocation
 if (window.location.protocol == 'http:' && window.location.host != 'localhost')
@@ -61,6 +55,10 @@ const nbli = document.getElementsByTagName('li').length,
 		controlLengthLine(),
 
 		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			label: '', //HACK Bad presentation on IE & FF
+			tipLabel: 'Plein écran',
+		}),
 		controlGeocoder(),
 		controlGPS(),
 
