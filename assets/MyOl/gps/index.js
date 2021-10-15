@@ -93,13 +93,11 @@ const nbli = document.getElementsByTagName('li').length,
 	});
 
 function addLayer(url) {
-	const layer = layerVector({
-		url: url,
-		format: new ol.format.GPX(),
-		receiveFeatures: function(features) {
-			map.getView().setZoom(1); //HACK enable gpx rendering anywhere we are
-			return features;
-		},
+	const layer = new ol.layer.Vector({
+		source: new ol.source.Vector({
+			format: new ol.format.GPX(),
+			url: url,
+		}),
 		style: function(feature) {
 			return new ol.style.Style({
 				stroke: new ol.style.Stroke({
@@ -125,6 +123,10 @@ function addLayer(url) {
 
 	map.addLayer(layer);
 
+	//HACK needed because the layer only becomes active when in the map area
+	map.getView().setZoom(1);
+
+	// Mask the local .gpx file list
 	if (elListe)
 		elListe.style.display = 'none';
 }
