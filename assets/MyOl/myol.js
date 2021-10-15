@@ -104,7 +104,7 @@ function layerOpenTopo() {
 function layerMRI() {
 	return layerOSM(
 		'//maps.refuges.info/hiking/{z}/{x}/{y}.png',
-		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">MRI</a>'
+		'<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">Refuges.info</a>'
 	);
 }
 
@@ -280,7 +280,7 @@ function layersCollection() {
 		'OpenTopo': layerOpenTopo(),
 		'OSM outdoors': layerThunderforest('outdoors'),
 		'OSM transport': layerThunderforest('transport'),
-		'MRI': layerMRI(),
+		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'Photo Google': layerGoogle('s'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key

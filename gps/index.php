@@ -10,6 +10,4 @@ $mapKeys = [
 	// https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 ];
 
-$baselayers = '{MRI:layerOsmMri()}';
-$overlays = '[layerRefugesInfo()]';
 include ('../assets/MyOl/gps/index.php');

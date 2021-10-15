@@ -97,16 +97,10 @@ Based on https://openlayers.org
 			mapKeys = <?=json_encode(@$mapKeys)?>,
 			baselayers = <?=isset ($baselayers)?$baselayers:'{}'?>;
 
-<?php if (isset ($_GET['gpx']) || isset ($overlays)) { ?>
-			window.onload = function() {
 <?php if (isset ($_GET['gpx'])) { ?>
-				addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
-<?php }
-if (isset ($overlays)) { ?>
-				for (let o in <?=$overlays?>)
-					map.addLayer (<?=$overlays?>[o]);
-<?php } ?>
-			};
+		window.onload = function() {
+			addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
+		};
 <?php } ?>
 	</script>
 </head>
