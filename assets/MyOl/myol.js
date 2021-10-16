@@ -684,13 +684,10 @@ function layerVector(opt) {
 				if (feature)
 					hoverSource.addFeature(feature);
 
-				map.getViewport().style.cursor = feature ? 'pointer' : '';
-
 				map.hoveredFeature = feature;
 			}
 
-			// Click actions
-			if (feature && evt.type == 'click') {
+			if (feature) {
 				const features = feature.get('features') || [feature],
 					display = Object.assign({},
 						features[0].getProperties(), // Get first or alone feature
@@ -698,7 +695,11 @@ function layerVector(opt) {
 					),
 					geom = feature.getGeometry();
 
-				if (display) {
+				// Set the cursor if hover a clicable feature
+				map.getViewport().style.cursor = display.url ? 'pointer' : '';
+
+				// Click actions
+				if (evt.type == 'click' && display) {
 					if (features.length == 1 && display.url) {
 						// Single feature
 						if (originalEvent.ctrlKey)
@@ -717,7 +718,8 @@ function layerVector(opt) {
 							center: geom.getCoordinates(),
 						});
 				}
-			}
+			} else
+				map.getViewport().style.cursor = '';
 		}
 	}
 

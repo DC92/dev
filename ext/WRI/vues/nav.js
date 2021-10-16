@@ -101,9 +101,11 @@ layers = [
 	<?}?>
 
 // La couche "contour" (du massif, de la zone)
-const contour = layerVector({
-	url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?' +
-		'type_polygon=<?=$vue->contenu->id_polygone_type?>&intersection=<?=$vue->polygone->id_polygone?>',
+const contour = new ol.layer.Vector({
+	source: new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+	}),
 	style: new ol.style.Style({
 		stroke: new ol.style.Stroke({
 			color: 'blue',

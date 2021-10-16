@@ -1,4 +1,3 @@
-//TODO Inhiber rotation carte quand pas de GPS
 new ol.Map({
 	target: 'carte-accueil',
 	view: new ol.View({
