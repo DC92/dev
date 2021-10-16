@@ -15,11 +15,13 @@ const baseLayers = {
 layers = [
 	// Refuges.info
 	layerWri({
+		host: '//<?=$config_wri["nom_hote"].$config_wri["sous_dossier_installation"]?>',
 		selectorName: 'couche-wri',
 		maxResolution: 100,
 		distance: 50,
 	}),
 	layerWriAreas({
+		host: '//<?=$config_wri["nom_hote"].$config_wri["sous_dossier_installation"]?>',
 		minResolution: 100,
 		selectorName: 'couche-wri',
 	}),

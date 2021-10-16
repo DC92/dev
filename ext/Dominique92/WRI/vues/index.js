@@ -4,7 +4,7 @@ new ol.Map({
 	layers: [
 		layerMRI(), // Fond de carte WRI
 		layerWriAreas({ // La couche "massifs"
-			host: '<?=$config_wri["nom_hote"]?>',
+			host: '//<?=$config_wri["nom_hote"].$config_wri["sous_dossier_installation"]?>',
 		}),
 	],
 	controls: [

@@ -52,7 +52,7 @@ new ol.Map({
 	layers: [
 		layerMRI(), // Fond de carte WRI
 		layerWri({ // La couche des points
-			host: '<?=$config_wri["nom_hote"]?>',
+			host: '//<?=$config_wri["nom_hote"].$config_wri["sous_dossier_installation"]?>',
 			distance: 50, // Clusterisation
 			styleOptionsFunction: function(feature, properties) {
 				return styleOptionsIcon(properties.icon); // Display only the icon
