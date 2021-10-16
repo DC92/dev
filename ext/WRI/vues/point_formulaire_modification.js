@@ -62,7 +62,7 @@ const coordinates = [<?=$vue->point->longitude?>, <?=$vue->point->latitude?>],
 
 	layerPoints = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
-		distance: 50, // Clusterisation
+		maxResolution: 100, // La couche n'est pas affichée pour des résolutions > 100 (nb de map unit Mercator)
 		styleOptionsFunction: function(feature, properties) {
 			return styleOptionsIcon(properties.icon); // Display only the icon
 		},

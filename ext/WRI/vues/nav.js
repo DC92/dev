@@ -17,10 +17,10 @@ layers = [
 	layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
 		selectorName: 'couche-wri',
-		maxResolution: 500, // La couche n'est pas affichée pour des résolutions > 100 (nb de map unit Mercator) //TODO 100
-		distance: 50, // Clusterisation
+		maxResolution: 100, // La couche n'est pas affichée pour des résolutions > 100 (nb de map unit Mercator)
+		distance: 30, // Clusterisation
 	}),
-/*	layerWriAreas({
+/*	layerWriAreas({ //TODO
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
 		minResolution: 100,
 		selectorName: 'couche-wri',
@@ -28,31 +28,31 @@ layers = [
 	// Overpass
 	layerOverpass({
 		selectorName: 'couche-osm',
-		distance: 50,
+		distance: 30,
 		maxResolution: 100,
 	}),
 	// Pyrenees-refuges.com
 	layerPyreneesRefuges({
 		selectorName: 'couche-prc',
-		distance: 50,
+		distance: 30,
 	}),
 	// CampToCamp
 	layerC2C({
 		selectorName: 'couche-c2c',
-		distance: 50,
+		distance: 30,
 	}),
 	// Chemineur
 	layerGeoBB({
 		selectorName: 'couche-chemineur',
 		maxResolution: 100,
-		distance: 50,
+		distance: 30,
 		attribution: 'Chemineur',
 	}),
 	layerGeoBB({
 		selectorName: 'couche-chemineur',
 		subLayer: 'cluster',
 		minResolution: 100,
-		distance: 50,
+		distance: 30,
 		attribution: 'Chemineur',
 	}),
 	// Alpages.info
@@ -86,9 +86,6 @@ layers = [
 
 	map = new ol.Map({
 		target: 'carte-nav',
-		view: new ol.View({
-			enableRotation: false,
-		}),
 		controls: controls,
 		layers: layers,
 	});
@@ -103,7 +100,7 @@ layers = [
 		], 'EPSG:4326', 'EPSG:3857'));
 	<?}?>
 
-
+// La couche "contour" (du massif, de la zone)
 const contour = layerVector({
 	url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?' +
 		'type_polygon=<?=$vue->contenu->id_polygone_type?>&intersection=<?=$vue->polygone->id_polygone?>',
@@ -117,8 +114,10 @@ const contour = layerVector({
 
 map.addLayer(contour);
 
+
+
+
 /*
-	// La couche "contour" (du massif, de la zone)
 	contour = layerVectorURL({
 		baseUrl: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
 		selectorName: 'couche-massif',

@@ -2,11 +2,11 @@
 //BEST faire un tableau et mettre dans la création de la map
 map.addLayer(layerWri({
 	selectorName: 'wri-features',
-	distance: 50,
+	distance: 30,
 }));
 map.addLayer(layerPyreneesRefuges({
 	selectorName: 'prc-features',
-	distance: 50,
+	distance: 30,
 }));
 map.addLayer(layerAlpages({
 	selectorName: 'alp-features',
