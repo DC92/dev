@@ -98,9 +98,9 @@ Based on https://openlayers.org
 			baselayers = <?=isset ($baselayers)?$baselayers:'{}'?>;
 
 <?php if (isset ($_GET['gpx'])) { ?>
-		window.onload = function() {
+		window.addEventListener ('load', function() {
 			addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
-		};
+		});
 <?php } ?>
 	</script>
 </head>

@@ -363,16 +363,17 @@ function memCheckbox(selectorName, callback) {
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
-			if (match)
+			if (match) {
 				inputEls[e].checked =
-				match[1].indexOf(inputEls[e].value) != -1 || // That one is declared
-				match[1].split(',').indexOf('on') != -1; // The "all (= "on") is set
+					match[1].indexOf(inputEls[e].value) != -1 || // That one is declared
+					match[1].split(',').indexOf('on') != -1; // The "all (= "on") is set
+
+				// Compute the all check && init the cookies if data has been given by the url
+				checkEl(inputEls[e]);
+			}
 
 			// Attach the action
 			inputEls[e].addEventListener('click', onClick);
-
-			// Compute the all check && init the cookies if data has been given by the url
-			checkEl(inputEls[e]);
 		}
 
 	function onClick(evt) {
@@ -479,14 +480,14 @@ function styleOptionsFullLabel(properties, overflow) {
 	else {
 		if (properties.name)
 			text.push(properties.name);
-		
+
 		if (properties.ele)
 			line.push(parseInt(properties.ele) + ' m');
 		if (properties.capacity)
 			line.push(parseInt(properties.capacity) + '\u255E\u2550\u2555');
 		if (line.length)
 			text.push(line.join(', '));
-		
+
 		if (typeof properties.type == 'string' && properties.type)
 			text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
 		if (properties.attribution)
@@ -515,8 +516,8 @@ function styleOptionsLabel(text, properties, overflow) {
 		overflow: overflow,
 	};
 
-// For points
-	if (!properties.area) 
+	// For points
+	if (!properties.area)
 		Object.assign(styleTextOptions, {
 			textBaseline: 'top',
 			offsetY: -30, // Above the icon
