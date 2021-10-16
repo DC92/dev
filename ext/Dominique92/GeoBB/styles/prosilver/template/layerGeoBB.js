@@ -11,7 +11,9 @@ if (jQuery.ui)
 
 var map = new ol.Map({
 		target: 'map',
-		enableRotation: false,
+		view: new ol.View({
+			enableRotation: false,
+		}),
 		controls: controlsCollection(typeof controlOptions == 'object' ? controlOptions : {})
 			.concat(controlLayerSwitcher()),
 		layers: [

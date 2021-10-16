@@ -96,14 +96,12 @@ function addLayer(url) {
 			format: new ol.format.GPX(),
 			url: url,
 		}),
-		style: function(feature) {
-			return new ol.style.Style({
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-					width: 2,
-				}),
-			});
-		},
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 2,
+			}),
+		}),
 	});
 
 	// Zoom the map on the added features
