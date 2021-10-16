@@ -125,5 +125,8 @@ Based on https://openlayers.org
 	<?php } ?>
 
 	<div id="map"></div>
+
+<?php if (!isset ($no_tail)) { ?>
 </body>
 </html>
+<?php } ?>
