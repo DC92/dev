@@ -26,6 +26,7 @@ const baseLayers = {
 	],
 
 	coordinates = [<?=$vue->point->longitude?>,<?=$vue->point->latitude?>],
+
 	cadre = layerEditGeoJson({
 		displayPointId: 'marqueur',
 		singlePoint: true,

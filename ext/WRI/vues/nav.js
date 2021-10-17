@@ -19,9 +19,7 @@ const baseLayers = {
 			init: false, // Ici, on cadrera plutôt sur le massif
 <?php } ?>
 		}),
-		new ol.control.Attribution({
-			collapsible: false,
-		}),
+		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
 		new ol.control.Zoom(),
@@ -32,7 +30,6 @@ const baseLayers = {
 <?if (!$vue->polygone->nom_polygone ) { ?>
 		controlDownload(),
 <?php } ?>
-		controlPrint(),
 	],
 
 	points = layerWri({
@@ -62,24 +59,23 @@ const baseLayers = {
 	}),
 
 	// La couche "contour" (du massif, de la zone)
-	contour = layerWriAreas({
-		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+	contour = layerVector({
+		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
+			'?massif=<?=$vue->polygone->id_polygone?>',
 		selectorName: 'couche-massif',
-		convertProperties: null,
 		style: new ol.style.Style({
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),
 		}),
-		hoverStyleOptionsFunction: null,
 	}),
 
 	layers = [
 		// Refuges.info
+		contour,
 		points,
 		massifs,
-		contour,
 		// Overpass
 		layerOverpass({
 			selectorName: 'couche-osm',

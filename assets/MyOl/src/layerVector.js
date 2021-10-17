@@ -221,7 +221,7 @@ function layerVector(opt) {
 							window.location = display.url;
 					}
 					// Cluster
-					else if (geom)
+					else if (geom && features.length > 1)
 						map.getView().animate({
 							zoom: map.getView().getZoom() + 2,
 							center: geom.getCoordinates(),

@@ -6,9 +6,7 @@ function affiche_et_set( el , affiche, valeur ) {
 }
 
 // Gestion des cartes
-const coordinates = [<?=$vue->point->longitude?>, <?=$vue->point->latitude?>],
-
-	baseLayers = {
+const baseLayers = {
 		'Refuges.info': layerMRI(),
 		'OpenTopo': layerOpenTopo(),
 		'Outdoors': layerThunderforest('outdoors'),
@@ -37,6 +35,8 @@ const coordinates = [<?=$vue->point->longitude?>, <?=$vue->point->latitude?>],
 		controlLoadGPX(),
 		controlGPS(),
 	],
+
+	coordinates = [<?=$vue->point->longitude?>, <?=$vue->point->latitude?>],
 
 	viseur = layerEditGeoJson({
 		displayPointId: 'viseur',

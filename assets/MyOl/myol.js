@@ -282,16 +282,14 @@ function layersCollection() {
 		'OSM transport': layerThunderforest('transport'),
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'Photo Google': layerGoogle('s'),
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the key for the free layers
-		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS('Outdoor_3857'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
+		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
+		'Photo Google': layerGoogle('s'),
 	};
 }
 
@@ -337,6 +335,9 @@ function layersDemo() {
 		'IGN hydro': layerIGN('HYDROGRAPHY.HYDROGRAPHY', 'png'),
 		'IGN forêt': layerIGN('LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN('ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
+
+		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
+		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 
 		'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
 		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
@@ -712,7 +713,7 @@ function layerVector(opt) {
 							window.location = display.url;
 					}
 					// Cluster
-					else if (geom)
+					else if (geom && features.length > 1)
 						map.getView().animate({
 							zoom: map.getView().getZoom() + 2,
 							center: geom.getCoordinates(),

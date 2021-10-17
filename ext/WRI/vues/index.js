@@ -10,9 +10,7 @@ new ol.Map({
 		}),
 	],
 	controls: [
-		new ol.control.Attribution({
-			collapsible: false, // Attribution always open
-		}),
+		new ol.control.Attribution(),
 	],
 })
 
