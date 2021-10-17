@@ -1053,6 +1053,7 @@ function styleOptionsCluster(feature, properties) {
 				color: 'white',
 			}),
 		}),
+		//TODO BUG le chiffre apparait en surimpression sur les autres étiquettes
 		text: new ol.style.Text({
 			text: nbClusters.toString(),
 			font: '14px Calibri,sans-serif',

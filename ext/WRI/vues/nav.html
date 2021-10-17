@@ -20,7 +20,7 @@
 				<?php if ( $vue->polygone->id_polygone ){?>
 					<li>
 						<input id="selecteur-massif" name="couche-massif"
-							onchange="points.getSource().refresh()"
+							onchange="points.getSource().getSource().refresh()"
 							type="checkbox" checked="checked" />
 						<?=$vue->polygone->nom_polygone?> uniquement
 					</li><hr/>
@@ -61,6 +61,7 @@
 		<fieldset>
 			<legend>
 				Services (<a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">OSM</a>)
+				- disponible seulement pour les zoom forts
 			</legend>
 			<div>
 				<ul>
@@ -82,7 +83,9 @@
 			<legend>Autres sites</legend>
 			<ul>
 				<li><input type="checkbox" name="couche-prc" />pyrenees-refuges.com &nbsp;<span id="couche-prc"></span></li>
-				<li><input type="checkbox" name="couche-c2c" />camptocamp.org &nbsp;<span id="couche-c2c"></span></li>
+				<li><input type="checkbox" name="couche-c2c" />camptocamp.org &nbsp;<span id="couche-c2c"></span>
+					(seuls les 100 premiers points sont affichés)
+				</li>
 				<li><input type="checkbox" name="couche-chemineur" value="3,8,20,23" />chemineur.fr &nbsp;<span id="couche-chemineur"></span></li>
 				<li><input type="checkbox" name="couche-alpages" value="4,5" />alpages.info &nbsp;<span id="couche-alpages"></span></li>
 			</ul>

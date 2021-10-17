@@ -26,7 +26,7 @@ include ('../MyOl/gps/index.php');
 	window.addEventListener('load', function() {
 		map.addLayer(layerWri({
 			selectorName: 'wri-features',
-			maxResolution: 100, // La couche n'est pas affichée pour des résolutions > 100 (nb de map unit Mercator)
+			maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
 			distance: 30, // Clusterisation
 		}));
 	});
