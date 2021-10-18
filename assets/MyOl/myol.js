@@ -12,13 +12,15 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-//HACK for some mobiles touch functions
+//HACK for some mobiles touch functions //TODO vérifier sur vieux mobiles
 /*
 if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
 }*/
+
+//TODO+ voir polyfills & IE / pas de geocoder avec IE
 
 /**
  * Display OL version
@@ -524,7 +526,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			//TODO declutter: true, //TODO BUG enlève les labels mais aussi les icones
+			//BEST declutter: true, //BEST BUG enlève les labels mais aussi les icones
 		}, options)),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
@@ -535,7 +537,7 @@ function layerVector(opt) {
 			if (!statusEl.textContent.includes('error'))
 				statusEl.textContent = '';
 
-			//TODO status hors limites zoom
+			//BEST status hors limites zoom
 			switch (evt.type) {
 				case 'featuresloadstart':
 					statusEl.textContent = 'Chargement...';
@@ -645,7 +647,7 @@ function layerVector(opt) {
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
 				zIndex: 2, // Above the features
-				//TODO declutter: true, //To avoid dumping the other labels
+				//BEST declutter: true, //To avoid dumping the other labels
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
@@ -669,7 +671,7 @@ function layerVector(opt) {
 		function mouseEvent(evt) {
 			const originalEvent = evt.originalEvent || evt,
 				// Get the hovered feature
-				//TODO BUG forEachFeatureAtPixel with no features when decluter
+				//BEST BUG forEachFeatureAtPixel with no features when decluter
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature) {
@@ -751,7 +753,7 @@ function layerVectorCluster(options) {
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
 			zIndex: 1, // Above the base layer
-			//TODO declutter: true,
+			//BEST declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
 		}, options));
@@ -952,7 +954,7 @@ function styleOptionsIconChemineur(iconName) {
 	}
 }
 
-// Display a yellow label with some data about the feature
+// Display a label with some data about the feature
 function styleOptionsFullLabel(properties) {
 	let text = [],
 		line = [];
@@ -992,7 +994,7 @@ function styleOptionsFullLabel(properties) {
 	return styleOptionsLabel(text.join('\n'), properties, true);
 }
 
-// Display a yellow label with only the name
+// Display a label with only the name
 function styleOptionsLabel(text, properties, important) {
 	const styleTextOptions = {
 		text: text,
@@ -1002,10 +1004,10 @@ function styleOptionsLabel(text, properties, important) {
 			color: 'black',
 		}),
 		backgroundFill: new ol.style.Fill({
-			color: 'yellow',
+			color: 'white',
 		}),
 		backgroundStroke: new ol.style.Stroke({
-			color: important ? 'blue' : 'black',
+			color: 'black',
 			width: important ? 1 : 0.3,
 		}),
 		overflow: important,
@@ -1055,7 +1057,7 @@ function styleOptionsCluster(feature, properties) {
 				color: 'white',
 			}),
 		}),
-		//TODO BUG le chiffre apparait en surimpression sur les autres étiquettes
+		//TODO+ BUG le chiffre apparait en surimpression sur les autres étiquettes
 		text: new ol.style.Text({
 			text: nbClusters.toString(),
 			font: '14px Calibri,sans-serif',
@@ -1093,6 +1095,7 @@ function layerGeoBB(options) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
 				styleOptionsLabel(properties.name, properties),
+				//BEST BUG autant d'étiquettes que de tronçons de ligne
 				// Lines
 				{
 					stroke: new ol.style.Stroke({
@@ -1684,9 +1687,9 @@ function controlGeocoder(options) {
 
 	const geocoder = new Geocoder('nominatim', {
 		provider: 'osm',
-		lang: 'FR',
-		autoComplete: true,
-		keepOpen: true,
+		lang: 'fr-FR',
+		autoComplete: false, // Else keep list of many others
+		keepOpen: true, // Else bug "no internet"
 		placeholder: options.title, // Initialization of the input field
 	});
 

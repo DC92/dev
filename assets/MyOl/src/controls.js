@@ -302,9 +302,9 @@ function controlGeocoder(options) {
 
 	const geocoder = new Geocoder('nominatim', {
 		provider: 'osm',
-		lang: 'FR',
-		autoComplete: true,
-		keepOpen: true,
+		lang: 'fr-FR',
+		autoComplete: false, // Else keep list of many others
+		keepOpen: true, // Else bug "no internet"
 		placeholder: options.title, // Initialization of the input field
 	});
 

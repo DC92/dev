@@ -170,11 +170,11 @@ class listener implements EventSubscriberInterface
 
 			// Calcul du cluster (managé par le serveur)
 			if (array_key_exists ('geo_cluster', $topic_row) && !$topic_row['geo_cluster']) {
-				$subgroups = 10;
+				$clusters_by_degree = 10;
 				$geo_center = json_decode ($topic_row['geo_center'])->coordinates;
 				$topic_row['geo_cluster'] =
-					intval ((180 + $geo_center[0]) * $subgroups) * 360 * $subgroups +
-					intval ((180 + $geo_center[1]) * $subgroups);
+					intval ((180 + $geo_center[0]) * $clusters_by_degree) * 360 * $clusters_by_degree +
+					intval ((180 + $geo_center[1]) * $clusters_by_degree);
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_cluster = '{$topic_row['geo_cluster']}' WHERE post_id = $post_id";
@@ -221,6 +221,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Called when validating the data to be saved
+	//TODO wrap longitude on -180, +180
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);

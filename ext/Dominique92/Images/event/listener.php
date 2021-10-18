@@ -124,6 +124,7 @@ class listener implements EventSubscriberInterface
 			$attachment ['physical_filename'] = '../'.$attachment ['real_filename']; // script = download/file.php
 
 //TODO seulement quand l'info n'est pas dans la base / ne pas oublier d'effacer !
+//BEST Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
 		if ($exif = @exif_read_data ('../files/'.$attachment['physical_filename'])) {
 			$fls = explode ('/', @$exif ['FocalLength']);
 			if (count ($fls) == 2)

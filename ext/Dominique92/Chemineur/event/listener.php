@@ -5,6 +5,7 @@
  * @copyright (c) 2020 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
+//BEST carte pour 1 forum (aéroport, … ?)
 
 namespace Dominique92\Chemineur\event;
 

@@ -27,6 +27,7 @@ function layerGeoBB(options) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
 				styleOptionsLabel(properties.name, properties),
+				//BEST BUG autant d'étiquettes que de tronçons de ligne
 				// Lines
 				{
 					stroke: new ol.style.Stroke({

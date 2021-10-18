@@ -107,6 +107,7 @@ body,
 /* Accueil */
 .section-index .wrap {
 	background-color: #5072BF !important;
+	/*//BEST pas de fond ciel sur connexion à l'admin*/
 	background: url('images/coin_ciel.jpg');
 	background-repeat: no-repeat;
 }

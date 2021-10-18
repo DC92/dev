@@ -1,4 +1,3 @@
-//TODO+ Inhiber rotation carte quand pas de GPS
 //BEST faire un tableau et mettre dans la création de la map
 map.addLayer(layerWri({
 	selectorName: 'wri-features',

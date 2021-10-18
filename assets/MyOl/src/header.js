@@ -2,13 +2,15 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-//HACK for some mobiles touch functions
+//HACK for some mobiles touch functions //TODO vérifier sur vieux mobiles
 /*
 if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
 }*/
+
+//TODO+ voir polyfills & IE / pas de geocoder avec IE
 
 /**
  * Display OL version
