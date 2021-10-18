@@ -129,6 +129,7 @@ class listener implements EventSubscriberInterface
 				$post_row['LON_LAT'] = $ll[0];
 
 				// Calcul de l'altitude avec mapquest
+				//TODO ne marche pas
 				global $mapKeys;
 				if (array_key_exists ('geo_altitude', $topic_row) && !$topic_row['geo_altitude'] &&
 					@$mapKeys['keys-mapquest']) {
@@ -147,6 +148,7 @@ class listener implements EventSubscriberInterface
 				}
 
 				// Détermination du massif par refuges.info
+				//TODO ne marche pas
 				if (array_key_exists ('geo_massif', $topic_row) && !$topic_row['geo_massif']) {
 					$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.
 						$ll[1].','.$ll[2].','.$ll[1].','.$ll[2];
@@ -181,6 +183,10 @@ class listener implements EventSubscriberInterface
 					$this->db->sql_query($sql);
 			}
 		}
+
+		// remove the extra ~ before dispplay
+		foreach ($topic_row AS $k=>$v)
+			$topic_row[$k] = str_replace ('~', '', $v);
 
 		if ($post_id == $topic_first_post_id)
 			$this->template->assign_vars (array_change_key_case ($topic_row, CASE_UPPER));
