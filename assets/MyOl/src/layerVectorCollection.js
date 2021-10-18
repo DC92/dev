@@ -4,6 +4,56 @@
  */
 
 /**
+ * Site chemineur.fr, alpages.info
+ * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
+ */
+function layerGeoBB(options) {
+	return layerVectorCluster(Object.assign({
+		host: '//c92.fr/test/chem5/', //TODO+ host: 'chemineur.fr',
+		urlFunction: function(options, bbox, selection) {
+			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
+				'&layer=' + (options.subLayer || 'simple') +
+				(options.selectorName ? '&' + (options.argSelName || 'cat') + '=' + selection.join(',') : '') +
+				'&bbox=' + bbox.join(',');
+		},
+		convertProperties: function(properties, feature, options) {
+			return {
+				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : null,
+				url: options.host + 'viewtopic.php?t=' + properties.id,
+				attribution: options.attribution,
+			};
+		},
+		styleOptionsFunction: function(feature, properties) {
+			return Object.assign({},
+				styleOptionsIcon(properties.icon),
+				styleOptionsLabel(properties.name, properties),
+				// Lines
+				{
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+						width: 2,
+					})
+				},
+				// Polygons with color
+				styleOptionsPolygon(properties.color, 0.5)
+			);
+		},
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return Object.assign({},
+				styleOptionsFullLabel(properties),
+				// Lines
+				{
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 3,
+					})
+				}
+			);
+		},
+	}, options));
+}
+
+/**
  * Site refuges.info
  */
 function layerWri(options) {
@@ -64,56 +114,6 @@ function layerWriAreas(options) {
 			return Object.assign({},
 				styleOptionsLabel(properties.name, properties, true),
 				styleOptionsPolygon(properties.color, 1)
-			);
-		},
-	}, options));
-}
-
-/**
- * Site chemineur.fr
- * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
- */
-function layerGeoBB(options) {
-	return layerVectorCluster(Object.assign({
-		host: '//c92.fr/test/chem5/', //TODO+ host: 'chemineur.fr',
-		urlFunction: function(options, bbox, selection) {
-			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
-				'&layer=' + (options.subLayer || 'simple') +
-				(options.selectorName ? '&' + (options.argSelName || 'cat') + '=' + selection.join(',') : '') +
-				'&bbox=' + bbox.join(',');
-		},
-		convertProperties: function(properties, feature, options) {
-			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : null,
-				url: options.host + 'viewtopic.php?t=' + properties.id,
-				attribution: options.attribution,
-			};
-		},
-		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsIcon(properties.icon),
-				styleOptionsLabel(properties.name, properties),
-				// Lines
-				{
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-						width: 2,
-					})
-				},
-				// Polygons with color
-				styleOptionsPolygon(properties.color, 0.5)
-			);
-		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties),
-				// Lines
-				{
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 3,
-					})
-				}
 			);
 		},
 	}, options));
