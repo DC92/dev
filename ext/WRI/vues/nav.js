@@ -73,7 +73,9 @@ const baseLayers = {
 
 	layers = [
 		// Refuges.info
+<?php if ($vue->polygone->id_polygone) { ?>
 		contour,
+<?php } ?>
 		points,
 		massifs,
 		// Overpass

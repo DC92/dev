@@ -63,7 +63,7 @@ function layerWriAreas(options) {
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsLabel(properties.name, properties, true),
-				styleOptionsPolygon(properties.color, 0.5)
+				styleOptionsPolygon(properties.color, 1)
 			);
 		},
 	}, options));
@@ -104,7 +104,7 @@ function layerGeoBB(options) {
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
-				styleOptionsFullLabel(properties, true),
+				styleOptionsFullLabel(properties),
 				// Lines
 				{
 					stroke: new ol.style.Stroke({
@@ -121,7 +121,7 @@ function layerGeoBB(options) {
  * Site alpages.info
  */
 function layerAlpages(options) {
-	return layerVectorCluster(Object.assign({ 
+	return layerVectorCluster(Object.assign({
 		host: '//alpages.info/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=1000' +
@@ -143,8 +143,8 @@ function layerAlpages(options) {
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
-				styleOptionsFullLabel(properties, true),
-				styleOptionsPolygon(properties.color, 0.5)
+				styleOptionsFullLabel(properties),
+				styleOptionsPolygon(properties.color, 1)
 			);
 		},
 	}, options));
@@ -173,7 +173,7 @@ function layerPyreneesRefuges(options) {
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return styleOptionsFullLabel(properties, true);
+			return styleOptionsFullLabel(properties);
 		},
 	}, options));
 }
@@ -226,7 +226,7 @@ function layerC2C(options) {
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return styleOptionsFullLabel(properties, true);
+			return styleOptionsFullLabel(properties);
 		},
 	}, options));
 }
@@ -257,7 +257,7 @@ function layerOverpass(options) {
 				);
 			},
 			hoverStyleOptionsFunction: function(feature, properties) {
-				return styleOptionsFullLabel(properties, true);
+				return styleOptionsFullLabel(properties);
 			},
 		}, options)),
 		statusEl = document.getElementById(options.selectorName),

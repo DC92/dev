@@ -460,7 +460,7 @@ function styleOptionsIconChemineur(iconName) {
 }
 
 // Display a yellow label with some data about the feature
-function styleOptionsFullLabel(properties, overflow) {
+function styleOptionsFullLabel(properties) {
 	let text = [],
 		line = [];
 
@@ -496,11 +496,11 @@ function styleOptionsFullLabel(properties, overflow) {
 			text.push('&copy;' + properties.attribution);
 	}
 
-	return styleOptionsLabel(text.join('\n'), properties, overflow);
+	return styleOptionsLabel(text.join('\n'), properties, true);
 }
 
 // Display a yellow label with only the name
-function styleOptionsLabel(text, properties, overflow) {
+function styleOptionsLabel(text, properties, important) {
 	const styleTextOptions = {
 		text: text,
 		font: '14px Calibri,sans-serif',
@@ -512,10 +512,10 @@ function styleOptionsLabel(text, properties, overflow) {
 			color: 'yellow',
 		}),
 		backgroundStroke: new ol.style.Stroke({
-			color: 'black',
-			width: 0.3,
+			color: important ? 'blue' : 'black',
+			width: important ? 1 : 0.3,
 		}),
-		overflow: overflow,
+		overflow: important,
 	};
 
 	// For points
