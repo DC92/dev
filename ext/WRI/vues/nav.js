@@ -109,8 +109,12 @@ const baseLayers = {
 			attribution: 'Chemineur',
 		}),
 		// Alpages.info
-		layerAlpages({
+		layerGeoBB({
+			host: '//alpages.info/',
 			selectorName: 'couche-alpages',
+			argSelName: 'forums',
+			distance: 30,
+			attribution: 'Alpages',
 		}),
 	],
 

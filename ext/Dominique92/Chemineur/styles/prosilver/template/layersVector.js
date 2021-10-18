@@ -8,8 +8,12 @@ map.addLayer(layerPyreneesRefuges({
 	selectorName: 'prc-features',
 	distance: 30,
 }));
-map.addLayer(layerAlpages({
+map.addLayer(layerGeoBB({
+	host: '//alpages.info/',
 	selectorName: 'alp-features',
+	argSelName: 'forums',
+	distance: 30,
+	attribution: 'Alpages',
 }));
 map.addLayer(layerC2C({
 	selectorName: 'c2c-features',

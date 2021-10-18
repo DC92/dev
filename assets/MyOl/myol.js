@@ -1145,12 +1145,12 @@ function layerGeoBB(options) {
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
-				(options.selectorName ? '&cat=' + selection.join(',') : '') +
+				(options.selectorName ? '&' + (options.argSelName || 'cat') + '=' + selection.join(',') : '') +
 				'&bbox=' + bbox.join(',');
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : '',
+				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : null,
 				url: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: options.attribution,
 			};
@@ -1165,7 +1165,9 @@ function layerGeoBB(options) {
 						color: 'blue',
 						width: 2,
 					})
-				}
+				},
+				// Polygons with color
+				styleOptionsPolygon(properties.color, 0.5)
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
@@ -1178,39 +1180,6 @@ function layerGeoBB(options) {
 						width: 3,
 					})
 				}
-			);
-		},
-	}, options));
-}
-
-/**
- * Site alpages.info
- */
-function layerAlpages(options) {
-	return layerVectorCluster(Object.assign({
-		host: '//alpages.info/',
-		urlFunction: function(options, bbox, selection) {
-			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=1000' +
-				(options.selectorName ? '&forums=' + selection.join(',') : '') +
-				'&bbox=' + bbox.join(',');
-		},
-		convertProperties: function(properties, feature, options) {
-			return {
-				url: options.host + 'viewtopic.php?t=' + properties.id,
-				attribution: 'Alpages',
-			};
-		},
-		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsIconChemineur(properties.type),
-				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5)
-			);
-		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties),
-				styleOptionsPolygon(properties.color, 1)
 			);
 		},
 	}, options));

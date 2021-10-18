@@ -144,30 +144,33 @@ if (01) {
 	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
 		maxResolution: 100,
-		distance: 50,
+		distance: 30,
 		attribution: 'Chemineur',
 	}));
 	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
 		subLayer: 'cluster',
 		minResolution: 100,
-		distance: 50,
+		distance: 30,
 		attribution: 'Chemineur',
 	}));
 }
 
 // Alpages.info
 if (01)
-	map.addLayer(layerAlpages({
+	map.addLayer(layerGeoBB({
+		host: '//alpages.info/',
 		selectorName: 'alp-features',
-		distance: 50,
+		argSelName: 'forums',
+		distance: 30,
+		attribution: 'Alpages',
 	}));
 
 // Overpass
 if (01)
 	map.addLayer(layerOverpass({
 		selectorName: 'osm-features',
-		distance: 50,
+		distance: 30,
 	}));
 
 // Refuges.info
@@ -179,7 +182,7 @@ if (01) {
 	map.addLayer(layerWri({
 		selectorName: 'wri-features',
 		maxResolution: 100,
-		distance: 50,
+		distance: 30,
 	}));
 	map.addLayer(layerWriAreas({
 		minResolution: 100,
@@ -195,14 +198,14 @@ if (0)
 if (01)
 	map.addLayer(layerPyreneesRefuges({
 		selectorName: 'prc-features',
-		distance: 50,
+		distance: 30,
 	}));
 
 // CampToCamp
 if (01)
 	map.addLayer(layerC2C({
 		selectorName: 'c2c-features',
-		distance: 50,
+		distance: 30,
 	}));
 
 	</script>
