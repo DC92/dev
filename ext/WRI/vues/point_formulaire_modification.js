@@ -26,7 +26,7 @@ const baseLayers = {
 			init: false, // Ici, on utilisera plutôt la position du point si on est en modification
 <?php } ?>
 		}),
-		new ol.control.Attribution(), //TODO BUG devrait être collapsed
+		new ol.control.Attribution(),
 		new ol.control.ScaleLine(),
 		controlMousePosition(),
 		new ol.control.Zoom(),

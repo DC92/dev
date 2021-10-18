@@ -5,6 +5,8 @@
  * @copyright (c) 2021 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
+//BEST GIS couches point d'eau plus représentative => Import WRI / OMS ?
+//BEST Fusion points WRI non présents dans Chemineur
 
 namespace Dominique92\VTTrack\event;
 

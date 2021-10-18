@@ -507,6 +507,7 @@ function controlLayerSwitcher(baseLayers, options) {
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
+//BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 1, // Above the base layer
@@ -2138,7 +2139,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
-		//controlPrint(), //TODO BUG : don't print full page
+		//controlPrint(), //BEST BUG : don't print full page
 
 		// Bottom left
 		controlLengthLine(),

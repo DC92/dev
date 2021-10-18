@@ -3,10 +3,8 @@
 //TODO : restreindre / prioriser les résultats de la recherche ... limite 5 ?
 
 NEW MYOL
-	TEST GPS
 	valeur du pas du zoom tous explorateurs
 	Etiquette ligne au survol / une seule par fiche ?
-	WRI : pas de baselayer=IGN%20TOP25 (blancs pas acceptés)
 
 BUG
 	viewtopic point KO
@@ -16,13 +14,13 @@ BUG
 BEST ext/gis arrondir les lon,lat
 	MyOl feature.get('features')
 
-CSS preload
+//BEST CSS preload
 	link rel="preload" as="style" requests the stylesheet asynchronously. You can learn more about preload in the Preload critical assets guide.
 	https://web.dev/defer-non-critical-css/
 
 BUG bloquants
 	Les pictos ont disparu sur V3
-	Chemineur dans MyOl => Traduction symbole (export GPS ?)
+//TODO+ Chemineur dans MyOl => Traduction symbole (export GPS ?)
 	Chemineur dans MyOl => Export KML des points KO
 	Trace modif MyPhpBB : geom:        여mÀ-`·@
 
@@ -34,19 +32,14 @@ BUG ne pas afficher ~ sur massif & altitude
 
 INVESTIGATION
 	Chemineur : basculement ne recharge pas les js ???
-	BUG ??? pictos clignotent (idem WRI)
 	Pourquoi post_attachment = 0 si on a une image ?
 	Suppression fichier attach ne supprime pas l'attachment.
 	Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
 	Click sur une icone chem2 plante
 
 Sélecteur de couches
-	Compacter au départ
 	Persistant quand on se déconnecte
-	plus gros sur mobile
 	BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
-	Le selecteur de features peut être initialisé "checked" et garder ses cookies quand modifié
-	BEST Sélecteur de features sur c2c, PRC, Alpages
 
 MyOl
 	TODO pictos fusionnés
@@ -56,43 +49,23 @@ MyOl
 	zoom à 2 doigts sur icônes. Ne devrait pas zoomer la page
 
 BEST photos
-	La date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
-	Images responsives de toute la largeur sur petits écrans
-	Bordure blanche images trop larges quand plusieurs dans le même post
-	Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
-	Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
-	déplacer le calcul exif dans ext/Dominique92/Images / ne le faire qu'une fois
+//TODO La date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
+//TODO Images responsives de toute la largeur sur petits écrans
+//TODO Bordure blanche images trop larges quand plusieurs dans le même post
+//BEST Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
+//BEST Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
 
-DIAPO
-	ordre des diapos
-	DIAPO n'affiche pas la première image au début du chargement (wait !)
-	Diapo démarre sur une petite page puis défilement en full screen
-
-BEST Fonction GPS / selecteur de traces
-
-BEST mesureur d'audience
-
-BEST pas de fond ciel sur connexion à l'admin
-BEST carte pour 1 forum (aéroport, … ?)
-BEST Parking avec un P ascii avec couleurs
-BEST Reprendre tous les @ (erreurs masquées)
-BEST création champs SQL altitude et massif si non existants
-BEST BUG quand erreur debug, la carte est 3 fois plus haute
-
-PhpBB
-	Façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
-	Ne pas démarrer les ext quand on installe
-	Comment retourner un mail de création d'user à l'admin ?
-
-VTTRACK TODO
-	GIS couches point d'eau plus représentative => Import WRI / OMS ?
-	Fusion points WRI non présents dans Chemineur
+//BEST pas de fond ciel sur connexion à l'admin
+//BEST carte pour 1 forum (aéroport, … ?)
+//BEST Reprendre tous les @ (erreurs masquées)
+//BEST création champs SQL altitude et massif si non existants
+//BEST BUG quand erreur debug, la carte est 3 fois plus haute
 
 //TODO BUGS CHEMINEUR
 =====================
 Voir forum Evolutions & bugs sur chemineur.fr
 
-//TODO BEST CHEMINEUR
+//BEST CHEMINEUR
 =====================
 Purger la base des liens photos externes
 Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html

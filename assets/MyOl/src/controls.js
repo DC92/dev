@@ -726,7 +726,7 @@ function controlsCollection(options) {
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
-		//controlPrint(), //TODO BUG : don't print full page
+		//controlPrint(), //BEST BUG : don't print full page
 
 		// Bottom left
 		controlLengthLine(),
