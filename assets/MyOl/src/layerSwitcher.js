@@ -114,7 +114,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 	function selectBaseLayer(evt) {
 		// Set the baselayer cookie
-		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Strict; expires=' +
+		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Lax; expires=' +
 			new Date(2100, 0).toUTCString();
 
 		// Manage the double selection

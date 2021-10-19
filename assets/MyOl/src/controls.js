@@ -148,7 +148,7 @@ function controlPermalink(options) {
 				aEl.href = options.hash + 'map=' + newParams.join('/');
 			if (options.setUrl)
 				location.href = '#map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Lax';
 		}
 	}
 	return control;
@@ -487,6 +487,7 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
+//TODO+ Chemineur dans MyOl => Traduction symbole (export GPS ?)
 //BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({

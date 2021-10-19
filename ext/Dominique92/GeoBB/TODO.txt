@@ -1,8 +1,7 @@
 //TODO => toute la liste !
-
-BUG bloquants
-//TODO+ Chemineur dans MyOl => Traduction symbole (export GPS ?)
-	Trace modif MyPhpBB : geom:        여mÀ-`·@
+//TODO Voir forum Evolutions & bugs sur chemineur.fr
+//BEST Reprendre tous les @ (erreurs masquées)
+//TODO Trace modif MyPhpBB : geom:        여mÀ-`·@
 
 INVESTIGATION
 	Les pictos ont disparu sur V3
@@ -15,35 +14,17 @@ INVESTIGATION
 
 Sélecteur de couches
 	Persistant quand on se déconnecte
-	BUG continue à afficher du chemineur alors que le sélecteur est vide (décochage chemineur alors que le sélecteur est replié)
 
 MyOl
 	TODO pictos fusionnés
 	Survol chemineur lignes : Cross-Origin Read Blocking (CORB) blocked cross-origin response http://chemineur.fr/ with MIME type text/html. See https://www.chromestatus.com/feature/5629709824032768 for more details.
 	editeur ligne zone sensible edit ligne plus grande
 
-BEST Chemineur
-//BEST Reprendre tous les @ (erreurs masquées)
-
-BEST photos
-//TODO La date des photos indiquée en haut à gauche de celles-ci qui est n'importe quoi,  
-//TODO Images responsives de toute la largeur sur petits écrans
-//TODO Bordure blanche images trop larges quand plusieurs dans le même post
-//BEST Récup auteur photo // Retrouver le nom du "poster_id" : $vars['attachment']['poster_id']
-
-BUGS CHEMINEUR
-=====================
-//TODO Voir forum Evolutions & bugs sur chemineur.fr
-
 //BEST CHEMINEUR
 =====================
 Purger la base des liens photos externes
 Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 Ne pas afficher les points en doublon (flux wri, prc, c2c)
-cookie = ;SameSite=Strict
-	header('Set-Cookie: cross-site-cookie=name; SameSite=None; Secure');
-	Or if your host is already updated to 7.3, you can use:
-	setcookie('cross-site-cookie', 'name', ['samesite' => 'None', 'secure' => true]);
 Stockage images sur plus d'1 répertoire => ? plugin ?
 Mettre les media print dans print.css
 Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les remplacer respectivement par %28 et %29

@@ -328,7 +328,7 @@ function layerVectorCluster(options) {
 /**
  * Get checkboxes values of inputs having the same name
  * selectorName {string}
- * Return false (nothing selected) | true (all selected) | ['arg1', 'arg2', ...]
+ * Return an array of the selected inputs
  */
 function readCheckbox(selectorName) {
 	const inputEls = document.getElementsByName(selectorName);
@@ -371,7 +371,7 @@ function memCheckbox(selectorName, callback) {
 			if (match) {
 				inputEls[e].checked =
 					match[1].indexOf(inputEls[e].value) != -1 || // That one is declared
-					match[1].split(',').indexOf('on') != -1; // The "all (= "on") is set
+					match[1].split(',').indexOf('on') != -1; // The "all" (= "on") is set
 
 				// Compute the all check && init the cookies if data has been given by the url
 				checkEl(inputEls[e]);
@@ -387,11 +387,10 @@ function memCheckbox(selectorName, callback) {
 		// Mem the data in the cookie
 		const selection = readCheckbox(selectorName);
 
-		//TODO (FF / overpass) Le cookie « osm-features » sera bientôt rejeté car son attribut « SameSite » est défini sur « None » ou une valeur invalide et il n’a pas l’attribut « secure ». Pour en savoir plus sur l’attribut « SameSite », consultez https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 		if (selectorName)
 			document.cookie =
 			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
-			'path=/; SameSite=Strict; ' +
+			'path=/; SameSite=Lax; ' +
 			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')
