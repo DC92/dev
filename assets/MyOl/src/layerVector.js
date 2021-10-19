@@ -81,6 +81,7 @@ function layerVector(opt) {
 	});
 
 	// Callback function to define feature display from the properties received from the server
+	//BEST BUG IE n'appelle pas featuresloadend avec overpass. Impact overpass
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
@@ -363,6 +364,7 @@ function memCheckbox(selectorName, callback) {
 		inputEls = document.getElementsByName(selectorName);
 
 	// Set the <inputs> accordingly with the cookies or url args
+	//TODO+ BUG ne coche pas les autres si la principale seule est checked
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args

@@ -20,8 +20,6 @@ if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.
 	document.head.appendChild(script);
 }*/
 
-//TODO+ voir polyfills & IE / pas de geocoder avec IE
-
 /**
  * Display OL version
  */
@@ -371,7 +369,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
-	//BEST IE don't work on IE
+	//BEST BUG IE don't work on IE. Impact réglage mode transparent
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -575,6 +573,7 @@ function layerVector(opt) {
 	});
 
 	// Callback function to define feature display from the properties received from the server
+	//BEST BUG IE n'appelle pas featuresloadend avec overpass. Impact overpass
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
@@ -857,6 +856,7 @@ function memCheckbox(selectorName, callback) {
 		inputEls = document.getElementsByName(selectorName);
 
 	// Set the <inputs> accordingly with the cookies or url args
+	//TODO+ BUG ne coche pas les autres si la principale seule est checked
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
@@ -1274,7 +1274,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-//TODO+ BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie
+//BEST BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie (lié à n'appelle pas featuresloadend)
 function layerOverpass(options) {
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
@@ -1663,7 +1663,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
-			//BEST IE : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
+			//BEST IE sans impact : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};

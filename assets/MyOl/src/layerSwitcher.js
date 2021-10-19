@@ -21,7 +21,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
-	//BEST IE don't work on IE
+	//BEST BUG IE don't work on IE. Impact réglage mode transparent
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +

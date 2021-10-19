@@ -10,8 +10,6 @@ if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.
 	document.head.appendChild(script);
 }*/
 
-//TODO+ voir polyfills & IE / pas de geocoder avec IE
-
 /**
  * Display OL version
  */

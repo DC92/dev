@@ -278,7 +278,7 @@ function controlFullScreen(options) {
 				document.fullscreenElement ||
 				document.msFullscreenElement;
 			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
-			//BEST IE : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
+			//BEST IE sans impact : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
 			control.handleFullScreenChange_(); // Change the button class & resize the map
 		}
 	};
