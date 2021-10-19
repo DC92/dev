@@ -879,6 +879,7 @@ function memCheckbox(selectorName, callback) {
 		// Mem the data in the cookie
 		const selection = readCheckbox(selectorName);
 
+		//TODO (FF / overpass) Le cookie « osm-features » sera bientôt rejeté car son attribut « SameSite » est défini sur « None » ou une valeur invalide et il n’a pas l’attribut « secure ». Pour en savoir plus sur l’attribut « SameSite », consultez https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 		if (selectorName)
 			document.cookie =
 			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
