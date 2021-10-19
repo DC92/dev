@@ -18,7 +18,7 @@
 //BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
-			zIndex: 1, // Above the base layer
+			zIndex: 2, // Above the base layer & the clusters
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			styleOptionsClusterFunction: styleOptionsCluster,
@@ -152,7 +152,7 @@ function layerVector(opt) {
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
-				zIndex: 2, // Above the features
+				zIndex: 3, // Above the features
 				//BEST declutter: true, //To avoid dumping the other labels
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
@@ -513,7 +513,7 @@ function styleOptionsLabel(text, properties, important) {
 			color: 'white',
 		}),
 		backgroundStroke: new ol.style.Stroke({
-			color: 'black',
+			color: 'blue',
 			width: important ? 1 : 0.3,
 		}),
 		overflow: important,
@@ -527,7 +527,8 @@ function styleOptionsLabel(text, properties, important) {
 		});
 
 	return {
-		text: new ol.style.Text(styleTextOptions)
+		text: new ol.style.Text(styleTextOptions),
+		zIndex: 3, // Above the the clusters
 	};
 }
 
@@ -563,7 +564,6 @@ function styleOptionsCluster(feature, properties) {
 				color: 'white',
 			}),
 		}),
-		//TODO+ BUG le chiffre apparait en surimpression sur les autres étiquettes
 		text: new ol.style.Text({
 			text: nbClusters.toString(),
 			font: '14px Calibri,sans-serif',
