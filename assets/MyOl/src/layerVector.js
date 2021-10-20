@@ -331,7 +331,7 @@ function layerVectorCluster(options) {
  * selectorName {string}
  * Return an array of the selected inputs
  */
-function readCheckbox(selectorName) {
+function readCheckbox(selectorName, withOn) {
 	const inputEls = document.getElementsByName(selectorName);
 
 	// Specific case of a single on/off <input>
@@ -342,7 +342,7 @@ function readCheckbox(selectorName) {
 	const selection = [];
 	for (let e = 0; e < inputEls.length; e++)
 		if (inputEls[e].checked &&
-			inputEls[e].value != 'on') // Avoid the first check in a list
+			(inputEls[e].value != 'on' || withOn)) // Avoid the first check in a list
 			selection.push(inputEls[e].value);
 
 	return selection;
@@ -360,12 +360,12 @@ function memCheckbox(selectorName, callback) {
 	const request = // Search values in cookies & args
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3
-		document.cookie, // Then the cookies
+		document.cookie + ';' + // Then the cookies
+		selectorName + '=' + readCheckbox(selectorName, true).join(','), // Then the existing checks
 		match = request.match(new RegExp(selectorName + '=([^;]*)')),
 		inputEls = document.getElementsByName(selectorName);
 
 	// Set the <inputs> accordingly with the cookies or url args
-	//TODO+ BUG ne coche pas les autres si la principale seule est checked
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
