@@ -499,7 +499,8 @@ function controlLayerSwitcher(baseLayers, options) {
  * Styles, icons & labels
  *
  * Options:
- * selectorName : <input name="selectorName"> url arguments selector
+ * selectorName : <input name="SELECTORNAME"> url arguments selector
+ * selectorName : <TAG id="SELECTORNAME-status"></TAG> display loading status
  * urlFunction: function(options, bbox, selection, extent, resolution, projection) returning the XHR url
  * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX 
  * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
@@ -528,7 +529,7 @@ function layerVector(opt) {
 		}, options)),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
-		statusEl = document.getElementById(options.selectorName); // XHR download tracking
+		statusEl = document.getElementById(options.selectorName + '-status'); // XHR download tracking
 
 	if (statusEl)
 		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
