@@ -108,6 +108,7 @@ $alias = [
 	'summit' => 'sommet',
 	'supermarket' => 'ravitaillement',
 	'toilets' => 'a87',
+	'water_well' => 'pointdeau',
 
 	// Alpages.info
 	'reseau' => 'a63',

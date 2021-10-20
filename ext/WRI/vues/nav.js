@@ -3,6 +3,7 @@ const baseLayers = {
 		'OpenTopo': layerOpenTopo(),
 		'Outdoors': layerThunderforest('outdoors'),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		//TODO+ voir licences IGN V2 / Photos / SwissTopo
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'png', 'pratique'), // 'pratique' is the key for the free layers
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
@@ -15,6 +16,7 @@ const baseLayers = {
   controls = [
 		controlLayerSwitcher(baseLayers),
 		controlPermalink({ // Permet de garder le même réglage de carte
+			display: true,
 <?php if ($vue->polygone->id_polygone) { ?>
 			init: false, // Ici, on cadrera plutôt sur le massif
 <?php } ?>
