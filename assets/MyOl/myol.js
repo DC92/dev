@@ -1143,7 +1143,7 @@ function layerWri(options) {
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
-				url: properties.lien,
+				url: options.noClick ? null : properties.lien,
 				attribution: 'Refuges.info'
 			};
 		},
@@ -2221,7 +2221,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 2, // Cursor above the features
+			zIndex: 4, // Cursor above the features
 			style: style,
 		}),
 		snap = new ol.interaction.Snap({
@@ -2555,7 +2555,6 @@ function layerEditGeoJson(options) {
 		if (options.singlePoint) {
 			// Initialise the marker at the center on the map if no coords are available
 			coords.points.push(layer.map_.getView().getCenter());
-
 
 			// Keep only the first point
 			if (coords.points[0])

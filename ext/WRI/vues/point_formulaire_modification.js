@@ -63,9 +63,11 @@ const baseLayers = {
 	layerPoints = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
 		maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
+		noClick: true, // Pour ne pas perturber l'édition par ces clicks intempestifs
 		styleOptionsFunction: function(feature, properties) {
 			return styleOptionsIcon(properties.icon); // Display only the icon
 		},
+		hoverStyleOptionsFunction: null, // Pour ne pas perturber l'édition par ces étiquettes intempestives
 	});
 
 new ol.Map({

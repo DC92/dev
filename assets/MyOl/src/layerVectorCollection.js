@@ -74,7 +74,7 @@ function layerWri(options) {
 				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
-				url: properties.lien,
+				url: options.noClick ? null : properties.lien,
 				attribution: 'Refuges.info'
 			};
 		},

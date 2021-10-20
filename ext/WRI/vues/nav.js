@@ -78,22 +78,26 @@ const baseLayers = {
 <?php } ?>
 		points,
 		massifs,
+
 		// Overpass
 		layerOverpass({
 			selectorName: 'couche-osm',
 			distance: 30,
 			maxResolution: 100,
 		}),
+
 		// Pyrenees-refuges.com
 		layerPyreneesRefuges({
 			selectorName: 'couche-prc',
 			distance: 30,
 		}),
+
 		// CampToCamp
 		layerC2C({
 			selectorName: 'couche-c2c',
 			distance: 30,
 		}),
+
 		// Chemineur
 		layerGeoBB({
 			selectorName: 'couche-chemineur',
@@ -108,6 +112,7 @@ const baseLayers = {
 			distance: 30,
 			attribution: 'Chemineur',
 		}),
+
 		// Alpages.info
 		layerGeoBB({
 			host: '//alpages.info/',
