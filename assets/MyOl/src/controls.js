@@ -319,58 +319,32 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
+//BEST GPS tap on map = distance from GPS calculation
 function controlGPS() {
-	let view, geolocation, nbLoc, position, altitude;
+	let view, geolocation, nbLoc, position, accuracy, altitude, speed;
 
 	//Button
 	const button = controlButton({
-		className: 'myol-button ol-gps',
-		buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
-		title: 'Centrer sur la position GPS',
-		activate: function(active) {
-			geolocation.setTracking(active !== 0);
-			graticuleLayer.setVisible(active !== 0);
-			nbLoc = 0;
-			if (!active) {
-				view.setRotation(0, 0); // Set north to top
-				displayEl.innerHTML = '';
-				displayEl.classList.remove('ol-control-gps');
+			className: 'myol-button ol-gps',
+			buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
+			title: 'Centrer sur la position GPS',
+			activate: function(active) {
+				geolocation.setTracking(active !== 0);
+				graticuleLayer.setVisible(active !== 0);
+				nbLoc = 0;
+				if (!active) {
+					view.setRotation(0, 0); // Set north to top
+					displayEl.innerHTML = '';
+					displayEl.classList.remove('ol-control-gps');
+				}
 			}
-		}
-	});
-
-	// Display status, altitude & speed
-	const displayEl = document.createElement('div');
-	button.element.appendChild(displayEl);
-
-	function displayValues() {
-		const displays = [],
-			speed = Math.round(geolocation.getSpeed() * 36) / 10;
-
-		if (button.active) {
-			altitude = geolocation.getAltitude();
-			if (altitude) {
-				displays.push(Math.round(altitude) + ' m');
-				if (!isNaN(speed))
-					displays.push(speed + ' km/h');
-				//BEST GPS average inertial counter to get better speed
-			} else
-				displays.push('GPS sync...');
-			//TODO GPS position initiale quand PC fixe ?
-		}
-		displayEl.innerHTML = displays.join(', ');
-		if (displays.length)
-			displayEl.classList.add('ol-control-gps');
-		else
-			displayEl.classList.remove('ol-control-gps');
-	}
-
-	// Graticule
-	const graticule = new ol.Feature(),
-		northGraticule = new ol.Feature(),
+		}),
+		// Graticule
+		graticuleFeature = new ol.Feature(),
+		northGraticuleFeature = new ol.Feature(),
 		graticuleLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
-				features: [graticule, northGraticule]
+				features: [graticuleFeature, northGraticuleFeature]
 			}),
 			style: new ol.style.Style({
 				fill: new ol.style.Fill({
@@ -382,9 +356,13 @@ function controlGPS() {
 					width: 1
 				})
 			})
-		});
+		}),
+		// Display status, altitude & speed
+		displayEl = document.createElement('div');
 
-	northGraticule.setStyle(new ol.style.Style({
+	button.element.appendChild(displayEl);
+
+	northGraticuleFeature.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
 			color: '#c00',
 			lineDash: [16, 14],
@@ -392,11 +370,81 @@ function controlGPS() {
 		})
 	}));
 
-	function renderReticule() {
-		position = geolocation.getPosition();
-		if (button.active && position && altitude) {
+	button.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		view = map.getView();
+		map.addLayer(graticuleLayer);
+
+		geolocation = new ol.Geolocation({
+			projection: view.getProjection(),
+			trackingOptions: {
+				enableHighAccuracy: true,
+			},
+		});
+
+		// Trigger position
+		geolocation.on('change:position', renderPosition);
+		map.on('moveend', renderPosition); // Refresh graticule after map zoom
+		function renderPosition() {
+			position = geolocation.getPosition();
+			accuracy = geolocation.getAccuracyGeometry();
+			renderGPS();
+		}
+
+		// Triggers data display
+		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], function() {
+			speed = Math.round(geolocation.getSpeed() * 36) / 10;
+			altitude = geolocation.getAltitude();
+			renderGPS();
+		});
+
+		// Browser heading from the inertial & magnetic sensors
+		window.addEventListener('deviceorientationabsolute', function(evt) {
+			if (evt.absolute) { // Breaks support for non-absolute browsers, like firefox mobile
+				heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+				renderGPS();
+			}
+		});
+
+		// Enable to render position on terestrial positionning
+		displayEl.onclick = function() {
+			altitude = 0;
+			renderGPS();
+		};
+
+		geolocation.on('error', function(error) {
+			alert('Geolocation error: ' + error.message);
+		});
+	};
+
+	function renderGPS() {
+		// Display data under the button
+		let displays = [];
+
+		if (button.active) {
+			if (altitude)
+				displays.push(Math.round(altitude) + ' m');
+
+			if (!isNaN(speed))
+				displays.push(speed + ' km/h');
+
+			if (altitude === undefined)
+				displays = ['GPS sync...'];
+		}
+
+		displayEl.innerHTML = displays.join(', ');
+
+		if (displays.length)
+			displayEl.classList.add('ol-control-gps');
+		else
+			displayEl.classList.remove('ol-control-gps');
+
+		// Render position & graticule
+		if (button.active && position &&
+			altitude !== undefined) { // Position on GPS signal only
 			const map = button.getMap(),
-				// Estimate the viewport size
+				// Estimate the viewport size to draw visible graticule
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
 				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
@@ -423,62 +471,31 @@ function controlGPS() {
 					]),
 				];
 
-			graticule.setGeometry(new ol.geom.GeometryCollection(geometry));
-			northGraticule.setGeometry(new ol.geom.GeometryCollection(northGeometry));
+			graticuleFeature.setGeometry(new ol.geom.GeometryCollection(geometry));
+			northGraticuleFeature.setGeometry(new ol.geom.GeometryCollection(northGeometry));
 
-			// The accurate circle
+			// The accuracy circle
 			const accuracy = geolocation.getAccuracyGeometry();
 			if (accuracy)
 				geometry.push(accuracy);
 
-			// Center the map
 			if (button.active == 1) {
+				// Center the map
 				view.setCenter(position);
 
 				if (!nbLoc) // Only the first time after activation
 					view.setZoom(17); // Zoom on the area
 				nbLoc++;
-			}
-		}
-		displayValues();
-	}
 
-	button.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		view = map.getView();
-		map.addLayer(graticuleLayer);
-
-		geolocation = new ol.Geolocation({
-			projection: view.getProjection(),
-			trackingOptions: {
-				enableHighAccuracy: true,
-			},
-		});
-
-		// Browser heading from the inertial & magnetic sensors
-		window.addEventListener(
-			'deviceorientationabsolute',
-			function(evt) {
-				const heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-				if (button.active == 1 &&
-					altitude && // Only if true GPS position
-					event.absolute) // Breaks support for non-absolute browsers, like firefox mobile
+				// Orientation
+				if (heading)
 					view.setRotation(
 						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
 						0
 					);
 			}
-		);
-
-		map.on('moveend', renderReticule); // Refresh graticule after map zoom
-		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], displayValues);
-		geolocation.on('change:position', renderReticule);
-		geolocation.on('error', function(error) {
-			alert('Geolocation error: ' + error.message);
-		});
-		//BEST GPS tap on map = distance from GPS calculation
-	};
+		}
+	}
 
 	return button;
 }
