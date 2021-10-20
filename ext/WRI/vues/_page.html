@@ -1,0 +1,62 @@
+<?php
+// Affichage de l'entête des pages de refuges.info
+
+// $vue contient les données passées par le fichier PHP
+// $config_wri les données communes à tout WRI
+// Ce fichier est l'unique endroit ou peuvent se trouver des balises HTML
+// Un couple <ouverture de balise> </fermeture de balise> doit se trouver dans le même fichier et avec la même indentation
+// Ce fichier ne contient que des balises HTML et des balises de contrôle PHP
+
+// Ici on permet de changer le code http qui, par défaut est 200
+if (!empty($vue->http_status_code)) 
+    switch ($vue->http_status_code) 
+    {
+        case 403:
+            header("HTTP/1.0 403 Forbidden");
+            break;
+
+        case 404:
+            header("HTTP/1.0 404 Not Found");
+        
+        default:
+            break;
+    }
+?>
+<!doctype html>
+<html lang="fr">
+	<head>
+		<title><?=$vue->titre ?? ''?></title>
+		<link rel="icon" type="image/svg+xml" href="<?=$config_wri['sous_dossier_installation']?>images/icones/favicon.svg">
+		<meta name="robots" content="all" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+		<meta http-equiv="Content-Type" content="text/html;charset=<?=$config_wri['encodage_des_contenu_web']?>" />
+		<meta http-equiv="Content-Style-Type" content="text/css" />
+
+		<!-- Polyfill iOS : Amélioration du pseudo full screen pour les cartes pour d'anciennes versions d'iOS/Safari -->
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<!-- Polyfill IE - nomodule garanti qu'il n'est chargé que sous IE -->
+		<script  src="<?=$config_wri['sous_dossier_installation']?>MyOl/ol/polyfill.min.js"></script>
+
+		<script>
+			var mapKeys = <?=json_encode($config_wri['mapKeys'])?>;
+		</script>
+
+		<link type="text/css" rel="stylesheet" href="<?=$config_wri['sous_dossier_installation']?>vues/style.css.php?<?=filemtime($config_wri['racine_projet'].'vues/style.css.php')?>" />
+		<?if (isset ($vue->css))
+			foreach ($vue->css as $css) {?>
+				<link type="text/css" rel="stylesheet" href="<?=$css?>" />
+		<?}?>
+		<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	</head>
+
+	<body>
+		<?
+			include ($config_wri['chemin_vues'].'_bandeau.html');
+			include ($config_wri['chemin_vues'].$vue->type.'.html');
+			include ($config_wri['chemin_vues'].'_pied.html');
+		?>
+	</body>
+</html>
