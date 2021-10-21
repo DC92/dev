@@ -129,7 +129,6 @@ class listener implements EventSubscriberInterface
 				$post_row['LON_LAT'] = $ll[0];
 
 				// Calcul de l'altitude avec mapquest
-				//TODO ne marche pas
 				global $mapKeys;
 				if (array_key_exists ('geo_altitude', $topic_row) && !$topic_row['geo_altitude'] &&
 					@$mapKeys['keys-mapquest']) {
@@ -148,7 +147,6 @@ class listener implements EventSubscriberInterface
 				}
 
 				// Détermination du massif par refuges.info
-				//TODO ne marche pas
 				if (array_key_exists ('geo_massif', $topic_row) && !$topic_row['geo_massif']) {
 					$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.
 						$ll[1].','.$ll[2].','.$ll[1].','.$ll[2];
@@ -227,7 +225,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	// Called when validating the data to be saved
-	//TODO wrap longitude on -180, +180
 	function submit_post_modify_sql_data($vars) {
 		$sql_data = $vars['sql_data'];
 		$post = $this->request->get_super_global(\phpbb\request\request_interface::POST);

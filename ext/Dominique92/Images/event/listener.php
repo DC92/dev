@@ -49,7 +49,7 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-//TODO BUG ??? n'affiche pas la première image au début du chargement (wait !)
+//BEST n'affiche pas la première image au début du chargement (wait !)
 	function viewtopic_assign_template_vars_before($vars) {
 		$view = $this->request->variable ('view', 'diapo');
 
@@ -123,7 +123,7 @@ class listener implements EventSubscriberInterface
 		if (is_file('../'.$attachment['real_filename'])) // Fichier relatif à la racine du site
 			$attachment ['physical_filename'] = '../'.$attachment ['real_filename']; // script = download/file.php
 
-//TODO seulement quand l'info n'est pas dans la base / ne pas oublier d'effacer !
+//BEST seulement quand l'info n'est pas dans la base / ne pas oublier d'effacer !
 //BEST Date des clichés < 1970 ??? (pas d'UNIX time) => Utiliser la date EXIF (éditée) pour les clichés ???
 		if ($exif = @exif_read_data ('../files/'.$attachment['physical_filename'])) {
 			$fls = explode ('/', @$exif ['FocalLength']);
