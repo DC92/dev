@@ -184,6 +184,7 @@ class listener implements EventSubscriberInterface
 
 		/* Keep trace of values prior to modifications */
 		/* Create a log file with the post existing data if there is none */
+		//TODO BUG Trace modif MyPhpBB : geom: ...ctrl chars
 		if (defined('MYPHPBB_LOG_EDIT') &&
 			isset ($post_data['post_id'])) {
 			$this->template->assign_vars ([
