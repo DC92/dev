@@ -12,7 +12,7 @@ function controlButton(options) {
 	options = Object.assign({
 		element: document.createElement('div'),
 		buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
-		className: 'myol-button',
+		className: 'ol-button',
 		activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
 	}, options);
 
@@ -326,7 +326,7 @@ function controlGPS() {
 
 	//Button
 	const button = controlButton({
-			className: 'myol-button ol-gps',
+			className: 'ol-button ol-gps',
 			buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
 			title: 'Centrer sur la position GPS',
 			activate: function(active) {
@@ -589,7 +589,7 @@ function controlDownload(options) {
 	options = Object.assign({
 		label: '\u25bc',
 		buttonBackgroundColors: ['white'],
-		className: 'myol-button ol-download',
+		className: 'ol-button ol-download',
 		title: 'Cliquer sur un format ci-dessous\n' +
 			'pour obtenir un fichier contenant\n' +
 			'les éléments visibles dans la fenêtre.\n' +
@@ -677,7 +677,7 @@ function controlDownload(options) {
  */
 function controlPrint() {
 	const button = controlButton({
-		className: 'myol-button ol-print',
+		className: 'ol-button ol-print',
 		title: 'Pour imprimer la carte:\n' +
 			'choisir l‘orientation,\n' +
 			'zoomer et déplacer,\n' +

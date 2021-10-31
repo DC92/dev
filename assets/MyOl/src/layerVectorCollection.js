@@ -19,7 +19,7 @@ function layerGeoBB(options) {
 		convertProperties: function(properties, feature, options) {
 			return {
 				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : null,
-				url: options.host + 'viewtopic.php?t=' + properties.id,
+				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
 				attribution: options.attribution,
 			};
 		},

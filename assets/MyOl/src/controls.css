@@ -7,7 +7,7 @@
 .ol-full-screen,
 .ol-geocoder,
 .ol-gps,
-.myol-button {
+.ol-button {
 	position: static !important;
 	float: left;
 	margin: 2px;

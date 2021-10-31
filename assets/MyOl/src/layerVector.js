@@ -209,7 +209,7 @@ function layerVector(opt) {
 					geom = feature.getGeometry();
 
 				// Set the cursor if hover a clicable feature
-				map.getViewport().style.cursor = display.url ? 'pointer' : '';
+				map.getViewport().style.cursor = display.url || display.cluster ? 'pointer' : '';
 
 				// Click actions
 				if (evt.type == 'click' && display) {
@@ -225,7 +225,7 @@ function layerVector(opt) {
 							window.location = display.url;
 					}
 					// Cluster
-					else if (geom && features.length > 1)
+					else if (geom && (features.length > 1 || display.cluster))
 						map.getView().animate({
 							zoom: map.getView().getZoom() + 2,
 							center: geom.getCoordinates(),
