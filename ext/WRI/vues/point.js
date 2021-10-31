@@ -37,7 +37,7 @@ const baseLayers = {
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: '<?=$config_wri["sous_dossier_installation"]?>images/cadre.png',
-				imgSize: [31, 43], // I.E. compatibility
+				imgSize: [31, 43], // IE compatibility
 			}),
 		},
 	});

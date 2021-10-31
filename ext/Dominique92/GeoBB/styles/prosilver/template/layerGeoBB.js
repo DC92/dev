@@ -49,7 +49,7 @@ var map = new ol.Map({
 		},
 	});
 
-if (scriptName == 'viewtopic')
+if (scriptName == 'viewtopic' && mapType == 'point')
 	map.addLayer(marker);
 
 if (scriptName == 'posting' && mapType == 'point')

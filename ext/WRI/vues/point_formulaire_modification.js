@@ -46,7 +46,7 @@ const baseLayers = {
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.png',
-				imgSize: [30, 30], // I.E. compatibility
+				imgSize: [30, 30], // IE compatibility
 			}),
 		},
 		// Remove FeatureCollection packing of the point

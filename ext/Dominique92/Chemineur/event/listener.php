@@ -6,6 +6,8 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 //BEST carte pour 1 forum (aéroport, … ?)
+//BEST ?? Les pictos ont disparu sur V3
+//BEST ?? Click sur une icone chem2 plante
 
 namespace Dominique92\Chemineur\event;
 

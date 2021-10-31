@@ -138,7 +138,7 @@ function layerVector(opt) {
 	// on features of vector layers having the following properties :
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
-	//TODO label attached to the cursor for lines & poly
+	//BEST label attached to the cursor for lines & poly
 
 	//HACK attach an hover listener once when the map is defined
 	ol.Map.prototype.render = function() {

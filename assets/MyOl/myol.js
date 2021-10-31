@@ -629,7 +629,7 @@ function layerVector(opt) {
 	// on features of vector layers having the following properties :
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
-	//TODO label attached to the cursor for lines & poly
+	//BEST label attached to the cursor for lines & poly
 
 	//HACK attach an hover listener once when the map is defined
 	ol.Map.prototype.render = function() {
@@ -1852,7 +1852,7 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-//TODO+ Chemineur dans MyOl => Traduction symbole (export GPS ?)
+//BEST Chemineur dans MyOl => Traduction symbole (export GPS ?)
 //BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
@@ -1903,7 +1903,7 @@ function controlLoadGPX(options) {
 
 						if (properties.sym)
 							styleOptions.image = new ol.style.Icon({
-								//TODO+ voir les ref sym
+								//BEST voir les ref sym pour inmport dans GARMIN GPX
 								//TODO+ chemineur.fr
 								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + properties.sym + '.png',
 								imgSize: [24, 24], // IE compatibility //BEST automatic detect
@@ -2086,7 +2086,7 @@ function controlsCollection(options) {
 
 	return [
 		// Top left
-		new ol.control.Zoom(),
+		new ol.control.Zoom(), //BEST Valeur du pas du zoom tous explorateurs
 		controlFullScreen(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),

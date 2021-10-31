@@ -11,6 +11,9 @@
 //BEST Façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
 //BEST Ne pas démarrer les ext quand on installe
 //BEST Comment retourner un mail de création d'user à l'admin ?
+//BEST Reprendre tous les @ (erreurs masquées)
+//BEST ?? Pourquoi post_attachment = 0 si on a une image ?
+//BEST ?? Suppression fichier attach ne supprime pas l'attachment.
 
 namespace Dominique92\MyPhpBB\event;
 
@@ -182,9 +185,8 @@ class listener implements EventSubscriberInterface
 
 		$vars['page_data'] = $page_data;
 
-		/* Keep trace of values prior to modifications */
-		/* Create a log file with the post existing data if there is none */
-		//TODO BUG Trace modif MyPhpBB : geom: ...ctrl chars
+		// Keep trace of values prior to modifications
+		// Create a log file with the post existing data if there is none
 		if (defined('MYPHPBB_LOG_EDIT') &&
 			isset ($post_data['post_id'])) {
 			$this->template->assign_vars ([

@@ -1,9 +1,0 @@
-//TODO INVESTIGATION
-	Reprendre tous les @ (erreurs masquées)
-	Les pictos ont disparu sur V3
-	Valeur du pas du zoom tous explorateurs
-	Chemineur : basculement ne recharge pas les js ???
-	Pourquoi post_attachment = 0 si on a une image ?
-	Suppression fichier attach ne supprime pas l'attachment.
-	Supression de fiche => viewforum.php?f=0 => Le forum que vous avez tenté d’atteindre n’existe pas.
-	Click sur une icone chem2 plante
