@@ -1459,17 +1459,6 @@ function controlButton(options) {
 }
 
 /**
- * No control
- * Can be added to controls:[] but don't display it
- * Requires controlButton
- */
-function noControl() {
-	return new ol.control.Control({
-		element: document.createElement('div'),
-	});
-}
-
-/**
  * Permalink control
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
@@ -1623,52 +1612,24 @@ function controlTilesBuffer(depth, depthFS) {
 }
 
 /**
- * Full window polyfill for non full screen browsers (iOS)
+ * Adaptations of ol.control.FullScreen
  */
+//BEST don't work on old IOS/Safari versions
 function controlFullScreen(options) {
-	const pseudoFullScreen = !(
-		document.body.webkitRequestFullscreen || // What is tested by ol.control.FullScreen
-		(document.body.msRequestFullscreen && document.msFullscreenEnabled) ||
-		(document.body.requestFullscreen && document.fullscreenEnabled)
-	);
-
-	// Force the control button display if no full screen is supported
-	//TODO+ BUG don't work on ols IOS
-	if (pseudoFullScreen) {
-		document.body.msRequestFullscreen = true; // What is tested by ol.control.FullScreen
-		document.msFullscreenEnabled = true;
-	}
-
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
 		label: '', //HACK Bad presentation on IE & FF
 		tipLabel: 'Plein écran',
 	}, options));
 
-	// Add some tricks when the map is known !
-	control.setMap = function(map) {
-		ol.control.FullScreen.prototype.setMap.call(this, map);
+	//HACK : polyfill for IE
+	control.on('enterfullscreen', function(evt) {
+		evt.target.getMap().getTargetElement().classList.add('ol-pseudo-fullscreen');
+	});
+	control.on('leavefullscreen', function(evt) {
+		evt.target.getMap().getTargetElement().classList.remove('ol-pseudo-fullscreen');
+	});
 
-		const el = map.getTargetElement();
-		if (pseudoFullScreen) {
-			el.requestFullscreen = toggle; // What is called first by ol.control.FullScreen
-			document.exitFullscreen = toggle;
-		} else {
-			document.addEventListener('webkitfullscreenchange', toggle, false); // Edge, Safari
-			document.addEventListener('MSFullscreenChange', toggle, false); // I.E.
-		}
-
-		function toggle() {
-			if (pseudoFullScreen) // Toggle the simulated isFullScreen & the control button
-				document.webkitIsFullScreen = !document.webkitIsFullScreen;
-			const isFullScreen = document.webkitIsFullScreen ||
-				document.fullscreenElement ||
-				document.msFullscreenElement;
-			el.classList[isFullScreen ? 'add' : 'remove']('ol-pseudo-fullscreen');
-			//BEST IE sans impact : Warning : L’objet ne gère pas la propriété ou la méthode « handleFullScreenChange_ »
-			control.handleFullScreenChange_(); // Change the button class & resize the map
-		}
-	};
 	return control;
 }
 
@@ -1682,7 +1643,7 @@ function controlGeocoder(options) {
 	}, options);
 
 	if (typeof Geocoder != 'function' || // Vérify if geocoder is available
-		document.documentMode) // Not supported in I.E.
+		document.documentMode) // Not supported in IE
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
 		});
@@ -2046,7 +2007,7 @@ function controlDownload(options) {
 				type: mime,
 			});
 
-		if (typeof navigator.msSaveBlob == 'function') // I.E./Edge
+		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
 			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
 		else {
 			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
@@ -2083,7 +2044,7 @@ function controlPrint() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const oris = document.getElementsByName('print-orientation');
-		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / I.E.
+		for (let i = 0; i < oris.length; i++) // Use « for » because of a bug in Edge / IE
 			oris[i].onchange = resizeDraft;
 	};
 

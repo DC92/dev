@@ -23,7 +23,7 @@ if ('serviceWorker' in navigator)
 	});
 
 /** Openlayers map area */
-const nbli = document.getElementsByTagName('li').length,
+const areLiTags = document.getElementsByTagName('li').length,
 	elListe = document.getElementById('liste'),
 
 	help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
@@ -62,7 +62,7 @@ const nbli = document.getElementsByTagName('li').length,
 		controlGeocoder(),
 		controlGPS(),
 
-		!nbli ? noControl() :
+		areLiTags ?
 		controlButton({
 			label: '\u25B3',
 			title: 'Choisir une trace dans la liste / fermer',
@@ -73,7 +73,12 @@ const nbli = document.getElementsByTagName('li').length,
 				if (document.fullscreenElement)
 					document.exitFullscreen();
 			},
+		}) :
+		// No button display
+		new ol.control.Control({
+			element: document.createElement('div'),
 		}),
+
 		controlLoadGPX(),
 		controlDownload(),
 		controlButton({
