@@ -2,13 +2,12 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-//HACK for some mobiles touch functions //TODO vérifier sur vieux mobiles
-/*
-if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
+//HACK for some mobiles touch functions (IOS)
+if (typeof window.PointerEvent == 'undefined') {
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
-}*/
+}
 
 /**
  * Display OL version

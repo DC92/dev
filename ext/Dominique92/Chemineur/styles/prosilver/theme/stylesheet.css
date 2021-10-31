@@ -187,9 +187,8 @@ body,
 }
 .section-viewtopic.geo_point .bar-top,
 .section-viewtopic.geo_point .topic-title,
-.section-viewtopic.geo_point .map-coords ,
-.section-viewtopic:not(.geo_point) .postit,
-.section-viewtopic:not(.geo_point) .photo {
+.section-viewtopic.geo_point .map-coords,
+.section-viewtopic:not(.geo_point) .postit {
 	display: none;
 }
 

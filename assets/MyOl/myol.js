@@ -12,13 +12,12 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-//HACK for some mobiles touch functions //TODO vérifier sur vieux mobiles
-/*
-if (navigator.userAgent.match(/iphone.+safari/i)) { //TODO migrate to navigator.userAgentData.
+//HACK for some mobiles touch functions (IOS)
+if (typeof window.PointerEvent == 'undefined') {
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
-}*/
+}
 
 /**
  * Display OL version
@@ -1627,13 +1626,14 @@ function controlTilesBuffer(depth, depthFS) {
  * Full window polyfill for non full screen browsers (iOS)
  */
 function controlFullScreen(options) {
-	let pseudoFullScreen = !(
+	const pseudoFullScreen = !(
 		document.body.webkitRequestFullscreen || // What is tested by ol.control.FullScreen
 		(document.body.msRequestFullscreen && document.msFullscreenEnabled) ||
 		(document.body.requestFullscreen && document.fullscreenEnabled)
 	);
 
 	// Force the control button display if no full screen is supported
+	//TODO+ BUG don't work on ols IOS
 	if (pseudoFullScreen) {
 		document.body.msRequestFullscreen = true; // What is tested by ol.control.FullScreen
 		document.msFullscreenEnabled = true;
