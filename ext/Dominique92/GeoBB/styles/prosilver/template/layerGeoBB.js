@@ -29,7 +29,7 @@ var map = new ol.Map({
 	marker = layerEditGeoJson({
 		geoJsonId: 'geo_json',
 		displayPointId: typeof displayPointId == 'string' ? displayPointId : 'point-marker',
-		singlePoint: true,
+		singlePoint: mapType == 'point',
 		dragPoint: scriptName == 'posting',
 		focus: 15,
 		styleOptions: {
@@ -37,12 +37,14 @@ var map = new ol.Map({
 				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.png',
 				imgSize: scriptName == 'posting' ? [30, 30] : [31, 43], // I.E. compatibility
 			}),
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 3,
+			}),
 		},
 	});
 
-//TODO+ zoomer & colorier la trace de la fiche
-
-if (scriptName == 'viewtopic' && mapType == 'point')
+if (scriptName == 'viewtopic')
 	map.addLayer(marker);
 
 if (scriptName == 'posting' && mapType == 'point')

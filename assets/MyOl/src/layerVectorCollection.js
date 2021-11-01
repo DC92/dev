@@ -26,14 +26,13 @@ function layerGeoBB(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				styleOptionsLabel(properties.name, properties),
-				//BEST BUG autant d'étiquettes que de tronçons de ligne
-				// Lines
-				{
+				styleOptionsLabel(properties.name, properties), {
+					//BEST BUG autant d'étiquettes que de tronçons de ligne
+					// Lines
 					stroke: new ol.style.Stroke({
 						color: 'blue',
 						width: 2,
-					})
+					}),
 				},
 				// Polygons with color
 				styleOptionsPolygon(properties.color, 0.5)
@@ -41,13 +40,12 @@ function layerGeoBB(options) {
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
-				styleOptionsFullLabel(properties),
-				// Lines
-				{
+				styleOptionsFullLabel(properties), {
+					// Lines
 					stroke: new ol.style.Stroke({
 						color: 'red',
 						width: 3,
-					})
+					}),
 				}
 			);
 		},

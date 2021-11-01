@@ -595,7 +595,7 @@ function controlDownload(options) {
 		function getFeatures(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!layer.marker_) //BEST find a better way to don't save the cursors
+					if (!layer.marker_) //BEST find a better way to don't save the cursor
 						features.push(feature);
 				});
 		}

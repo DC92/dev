@@ -1095,14 +1095,13 @@ function layerGeoBB(options) {
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				styleOptionsLabel(properties.name, properties),
-				//BEST BUG autant d'étiquettes que de tronçons de ligne
-				// Lines
-				{
+				styleOptionsLabel(properties.name, properties), {
+					//BEST BUG autant d'étiquettes que de tronçons de ligne
+					// Lines
 					stroke: new ol.style.Stroke({
 						color: 'blue',
 						width: 2,
-					})
+					}),
 				},
 				// Polygons with color
 				styleOptionsPolygon(properties.color, 0.5)
@@ -1110,13 +1109,12 @@ function layerGeoBB(options) {
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
-				styleOptionsFullLabel(properties),
-				// Lines
-				{
+				styleOptionsFullLabel(properties), {
+					// Lines
 					stroke: new ol.style.Stroke({
 						color: 'red',
 						width: 3,
-					})
+					}),
 				}
 			);
 		},
@@ -1981,7 +1979,7 @@ function controlDownload(options) {
 		function getFeatures(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!layer.marker_) //BEST find a better way to don't save the cursors
+					if (!layer.marker_) //BEST find a better way to don't save the cursor
 						features.push(feature);
 				});
 		}
