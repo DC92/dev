@@ -10,8 +10,8 @@ if (!window.location.pathname.split('/').pop())
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(
-		typeof service_worker === 'undefined' ? 'service-worker.js' : service_worker,
-		typeof scope === 'undefined' ? {} : {
+		service_worker === undefined ? 'service-worker.js' : service_worker,
+		scope === undefined ? {} : {
 			scope: scope, // Max scope. Allow service worker to be in a different directory
 		}
 	)

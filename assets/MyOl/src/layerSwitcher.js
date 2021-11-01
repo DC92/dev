@@ -17,7 +17,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		transparentBaseLayerName = '';
 
 	// If the cookie doesn't correspond to an existing layer
-	if (typeof baseLayers[selectedBaseLayerName] == 'undefined')
+	if (!baseLayers[selectedBaseLayerName])
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider

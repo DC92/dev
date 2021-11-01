@@ -3,7 +3,7 @@
 if (!ol) var ol = {};
 
 //HACK for some mobiles touch functions (IOS)
-if (typeof window.PointerEvent == 'undefined') {
+if (window.PointerEvent === undefined) {
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);

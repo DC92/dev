@@ -37,3 +37,5 @@ function get ($file) {
 	return "/* FILE src/$file */\n".file_get_contents ('src/'.$file);
 }
 ?>
+
+<p><a href="build.php">REBUILD</a></p>

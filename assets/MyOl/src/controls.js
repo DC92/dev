@@ -50,7 +50,7 @@ function controlButton(options) {
 	control.active = 0;
 	control.toggle = function(newActive, group) {
 		// Toggle by default
-		if (typeof newActive == 'undefined')
+		if (newActive === undefined)
 			newActive = (control.active + 1);
 
 		// Unselect all other controlButtons from the same group
@@ -285,22 +285,33 @@ function controlGeocoder(options) {
 function controlGPS() {
 	let view, geolocation, nbLoc, position, accuracy, altitude, speed;
 
-	//Button
-	const button = controlButton({
+	// Display status, altitude & speed
+	const displayEl = document.createElement('div'),
+
+		//Button
+		button = controlButton({
 			className: 'ol-button ol-gps',
-			buttonBackgroundColors: ['white', '#ef3', '#bbb'], // Define 3 states button
+			buttonBackgroundColors: [ // Define 4 states button
+				'white', // 0 : inactive
+				'orange', // 1 : waiting physical GPS sensor position & altitude
+				'lime', // 2 : active, centered & oriented
+				'grey', // 3 : active, do not centered nor oriented
+			],
 			title: 'Centrer sur la position GPS',
 			activate: function(active) {
-				geolocation.setTracking(active !== 0);
-				graticuleLayer.setVisible(active !== 0);
-				nbLoc = 0;
-				if (!active) {
-					view.setRotation(0, 0); // Set north to top
-					displayEl.innerHTML = '';
-					displayEl.classList.remove('ol-control-gps');
+				if (geolocation) {
+					geolocation.setTracking(active !== 0);
+					graticuleLayer.setVisible(active !== 0);
+					nbLoc = 0;
+					if (!active && view) {
+						view.setRotation(0, 0); // Set north to top
+						displayEl.innerHTML = '';
+						displayEl.classList.remove('ol-control-gps');
+					}
 				}
 			}
 		}),
+
 		// Graticule
 		graticuleFeature = new ol.Feature(),
 		northGraticuleFeature = new ol.Feature(),
@@ -318,9 +329,7 @@ function controlGPS() {
 					width: 1
 				})
 			})
-		}),
-		// Display status, altitude & speed
-		displayEl = document.createElement('div');
+		});
 
 	button.element.appendChild(displayEl);
 
@@ -369,12 +378,6 @@ function controlGPS() {
 			}
 		});
 
-		// Enable to render position on terestrial positionning
-		displayEl.onclick = function() {
-			altitude = 0;
-			renderGPS();
-		};
-
 		geolocation.on('error', function(error) {
 			alert('Geolocation error: ' + error.message);
 		});
@@ -393,6 +396,8 @@ function controlGPS() {
 
 			if (altitude === undefined)
 				displays = ['GPS sync...'];
+			else if (button.active == 1)
+				button.toggle(); // Go directly to state 2
 		}
 
 		displayEl.innerHTML = displays.join(', ');
@@ -404,7 +409,7 @@ function controlGPS() {
 
 		// Render position & graticule
 		if (button.active && position &&
-			altitude !== undefined) { // Position on GPS signal only
+			(button.active > 1 || altitude !== undefined)) { // Position on GPS signal only on state 1
 			const map = button.getMap(),
 				// Estimate the viewport size to draw visible graticule
 				hg = map.getCoordinateFromPixel([0, 0]),
@@ -441,12 +446,13 @@ function controlGPS() {
 			if (accuracy)
 				geometry.push(accuracy);
 
-			if (button.active == 1) {
+			if (button.active == 2) {
 				// Center the map
 				view.setCenter(position);
 
 				if (!nbLoc) // Only the first time after activation
 					view.setZoom(17); // Zoom on the area
+
 				nbLoc++;
 
 				// Orientation
