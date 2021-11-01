@@ -1,14 +1,3 @@
-// Resize map
-if (jQuery.ui)
-	$('#map').resizable({
-		handles: 's,w,sw', // 2 côtés et 1 coin
-
-		resize: function(event, ui) {
-			ui.position.left = ui.originalPosition.left; // Reste à droite de la page
-			map.updateSize(); // Reaffiche tout le nouveau <div>
-		},
-	});
-
 var map = new ol.Map({
 		target: 'map',
 		view: new ol.View({
@@ -17,6 +6,7 @@ var map = new ol.Map({
 		controls: controlsCollection(typeof controlOptions == 'object' ? controlOptions : {})
 			.concat(controlLayerSwitcher()),
 		layers: [
+			// Low map resolution : points
 			layerGeoBB({
 				host: '', // Relative adress
 				selectorName: 'geobb-features',
@@ -24,8 +14,9 @@ var map = new ol.Map({
 				distance: 30,
 				attribution: 'Chemineur',
 			}),
+			// High map resolution : clusters
 			layerGeoBB({
-				host: '',
+				host: '', // Relative adress
 				subLayer: 'cluster',
 				selectorName: 'geobb-features',
 				minResolution: 100,
@@ -44,10 +35,12 @@ var map = new ol.Map({
 		styleOptions: {
 			image: new ol.style.Icon({
 				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.png',
-				imgSize: scriptName == 'viewtopic' ? [31, 43] : [30, 30], // I.E. compatibility
+				imgSize: scriptName == 'posting' ? [30, 30] : [31, 43], // I.E. compatibility
 			}),
 		},
 	});
+
+//TODO+ zoomer & colorier la trace de la fiche
 
 if (scriptName == 'viewtopic' && mapType == 'point')
 	map.addLayer(marker);
@@ -73,3 +66,15 @@ if (scriptName == 'posting' && mapType == 'line')
 			'double cliquer pour terminer.\n' +
 			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
 	}));
+
+// Resize map
+//TODO BUG don't work (50vw !important dans .css)
+if (jQuery.ui)
+	$(map.getTargetElement()).resizable({
+		handles: 's,w,sw', // 2 côtés et 1 coin
+
+		resize: function(event, ui) {
+			ui.position.left = ui.originalPosition.left; // Reste à droite de la page
+			map.updateSize(); // Reaffiche tout le nouveau <div>
+		},
+	});

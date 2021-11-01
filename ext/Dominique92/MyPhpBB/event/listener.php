@@ -14,6 +14,13 @@
 //BEST Reprendre tous les @ (erreurs masquées)
 //BEST ?? Pourquoi post_attachment = 0 si on a une image ?
 //BEST ?? Suppression fichier attach ne supprime pas l'attachment.
+//BEST Revenir à la page où on était quand on se connecte
+/*	Login redirection () GeoBB316
+		//GEO login		trigger_error('INSECURE_REDIRECT', E_USER_ERROR);
+				$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login&amp;redirect='.$request->server('REQUEST_URI', '')); //GEO Redirige sur la page initiale apres le login
+		//GEO login		$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
+		+++ logout
+*/
 
 namespace Dominique92\MyPhpBB\event;
 

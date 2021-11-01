@@ -1,7 +1,7 @@
-//TODO Voir forum Evolutions & bugs sur chemineur.fr
+//BEST Voir forum Evolutions & bugs sur chemineur.fr
 
 //BEST CHEMINEUR
-=====================
+================
 Purger la base des liens photos externes
 Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 Ne pas afficher les points en doublon (flux wri, prc, c2c)
@@ -11,28 +11,10 @@ Pouvoir inclure : Les caractères ( ) sont interdits dans les URLs, il faut les 
 Erreur type de caractères randos Lozerre
 Récup trace diaporamas + chemins chem2
 EDIT.log => Trace supprimer le sujet
-Eviter d'afficher les jpg non autorisés insérés dans le texte.
-	Rechercher les liens vers une image dans le texte (Google image)
-	Interface WRI V2->V3 	http://v2.chemineur.fr/prod/chem/json.php?site=c2c&bbox=-6.921386718749999%2C38.75408327579141%2C20.32470703125%2C51.69979984974196Doublons ou icones fantômes
 Améliorer référencement (-> Prat communal !)
 ext/GeoBB : ajouter les coordonnées au template print
-Import references: osm overpass, LDP
-	Import LDP: view-source:http://www.lacsdespyrenees.com/kml-Bielsa.kml
-Revenir à la page où on était quand on se connecte
-	Login redirection () GeoBB316
-		//GEO login		trigger_error('INSECURE_REDIRECT', E_USER_ERROR);
-				$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login&amp;redirect='.$request->server('REQUEST_URI', '')); //GEO Redirige sur la page initiale apres le login
-		//GEO login		$u_login_logout = append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=login');
-		+++ logout
 Ajouter bouton permutation sur page point chem
 	View film + permutation
 coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
 BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
 CHEMINEUR => http://jean.louis.negre.free.fr/indebaug.htm
-
-AIDE CHEM
-=========
-Un sujet est actif quand il y a eu des contributions récentes.
-Création / Edition de traces
-Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
-Consulter l'historique des éditions

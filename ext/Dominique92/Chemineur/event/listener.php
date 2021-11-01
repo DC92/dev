@@ -9,6 +9,14 @@
 //BEST ?? Les pictos ont disparu sur V3
 //BEST ?? Click sur une icone chem2 plante
 
+//BEST AIDE CHEM
+/*=========
+Un sujet est actif quand il y a eu des contributions récentes.
+Création / Edition de traces
+Ici, la COPPA est la "Children's Online Privacy Protection Act", une loi américaine pour protéger la vie privée des mineurs de moins de 13 ans. J'essayerai d'enlever les mentions dans les formulaires.
+Consulter l'historique des éditions
+*/
+
 namespace Dominique92\Chemineur\event;
 
 if (!defined('IN_PHPBB'))

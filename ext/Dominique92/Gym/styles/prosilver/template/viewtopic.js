@@ -23,12 +23,12 @@ const layer = layerVector({
 	}),
 
 	//TODO GYM : pas de strategie.bbox sur cartes
-	//TODO+ Inhiber rotation carte
 	map = new ol.Map({
 		target: 'carte',
 		view: new ol.View({
 			center: ol.proj.transform(coordonnees, 'EPSG:4326', 'EPSG:3857'),
 			zoom: zoom,
+			enableRotation: false,
 		}),
 		layers: [
 			layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),

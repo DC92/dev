@@ -466,7 +466,7 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-//BEST Chemineur dans MyOl => Traduction symbole (export GPS ?)
+//BEST Chemineur dans MyOl => Traduction sym (symbole export GPS ?)
 //BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
@@ -517,9 +517,7 @@ function controlLoadGPX(options) {
 
 						if (properties.sym)
 							styleOptions.image = new ol.style.Icon({
-								//BEST voir les ref sym pour inmport dans GARMIN GPX
-								//TODO+ chemineur.fr
-								src: '//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + properties.sym + '.png',
+								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.png',
 								imgSize: [24, 24], // IE compatibility //BEST automatic detect
 							});
 

@@ -1,4 +1,6 @@
 //BEST faire un tableau et mettre dans la création de la map
+//BEST LDP http://www.lacsdespyrenees.com/kml-Bielsa.kml
+
 if (typeof map !== 'undefined') {
 	map.addLayer(layerWri({
 		selectorName: 'wri-features',
