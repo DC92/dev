@@ -47,11 +47,11 @@ function controlButton(options) {
 	}
 
 	// Toggle the button status & aspect
-	control.active = 0;
+	control.state = 0;
 	control.toggle = function(newActive, group) {
 		// Toggle by default
 		if (newActive === undefined)
-			newActive = (control.active + 1);
+			newActive = control.state + 1;
 
 		// Unselect all other controlButtons from the same group
 		if (newActive && options.group)
@@ -62,11 +62,11 @@ function controlButton(options) {
 			});
 
 		// Execute the requested change
-		if (control.active != newActive &&
+		if (control.state != newActive &&
 			(!group || group == options.group)) { // Only for the concerned controls
-			control.active = newActive % options.buttonBackgroundColors.length;
-			buttonEl.style.backgroundColor = options.buttonBackgroundColors[control.active];
-			options.activate(control.active);
+			control.state = newActive % options.buttonBackgroundColors.length;
+			buttonEl.style.backgroundColor = options.buttonBackgroundColors[control.state];
+			options.activate(control.state);
 		}
 	};
 	return control;
@@ -288,8 +288,7 @@ function controlGPS() {
 	// Display status, altitude & speed
 	const displayEl = document.createElement('div'),
 
-		//Button
-		button = controlButton({
+		control = controlButton({
 			className: 'ol-button ol-gps',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
@@ -298,12 +297,12 @@ function controlGPS() {
 				'grey', // 3 : active, do not centered nor oriented
 			],
 			title: 'Centrer sur la position GPS',
-			activate: function(active) {
+			activate: function(state) {
 				if (geolocation) {
-					geolocation.setTracking(active !== 0);
-					graticuleLayer.setVisible(active !== 0);
+					geolocation.setTracking(state !== 0);
+					graticuleLayer.setVisible(state !== 0);
 					nbLoc = 0;
-					if (!active && view) {
+					if (!state && view) {
 						view.setRotation(0, 0); // Set north to top
 						displayEl.innerHTML = '';
 						displayEl.classList.remove('ol-control-gps');
@@ -331,7 +330,7 @@ function controlGPS() {
 			})
 		});
 
-	button.element.appendChild(displayEl);
+	control.element.appendChild(displayEl);
 
 	northGraticuleFeature.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
@@ -341,7 +340,7 @@ function controlGPS() {
 		})
 	}));
 
-	button.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		view = map.getView();
@@ -387,7 +386,7 @@ function controlGPS() {
 		// Display data under the button
 		let displays = [];
 
-		if (button.active) {
+		if (control.state) {
 			if (altitude)
 				displays.push(Math.round(altitude) + ' m');
 
@@ -396,8 +395,8 @@ function controlGPS() {
 
 			if (altitude === undefined)
 				displays = ['GPS sync...'];
-			else if (button.active == 1)
-				button.toggle(); // Go directly to state 2
+			else if (control.state == 1)
+				control.toggle(); // Go directly to state 2
 		}
 
 		displayEl.innerHTML = displays.join(', ');
@@ -408,9 +407,9 @@ function controlGPS() {
 			displayEl.classList.remove('ol-control-gps');
 
 		// Render position & graticule
-		if (button.active && position &&
-			(button.active > 1 || altitude !== undefined)) { // Position on GPS signal only on state 1
-			const map = button.getMap(),
+		if (control.state && position &&
+			(control.state > 1 || altitude !== undefined)) { // Position on GPS signal only on state 1
+			const map = control.getMap(),
 				// Estimate the viewport size to draw visible graticule
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
@@ -446,7 +445,7 @@ function controlGPS() {
 			if (accuracy)
 				geometry.push(accuracy);
 
-			if (button.active == 2) {
+			if (control.state == 2) {
 				// Center the map
 				view.setCenter(position);
 
@@ -465,7 +464,7 @@ function controlGPS() {
 		}
 	}
 
-	return button;
+	return control;
 }
 
 /**
@@ -486,7 +485,7 @@ function controlLoadGPX(options) {
 	const inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
 		reader = new FileReader(),
-		button = controlButton(options);
+		control = controlButton(options);
 
 	inputEl.type = 'file';
 	inputEl.addEventListener('change', function() {
@@ -494,7 +493,7 @@ function controlLoadGPX(options) {
 	});
 
 	reader.onload = function() {
-		const map = button.getMap(),
+		const map = control.getMap(),
 			features = format.readFeatures(reader.result, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
@@ -543,7 +542,7 @@ function controlLoadGPX(options) {
 			padding: [5, 5, 5, 5],
 		});
 	};
-	return button;
+	return control;
 }
 
 /**
@@ -565,7 +564,7 @@ function controlDownload(options) {
 	}, options);
 
 	const hiddenEl = document.createElement('a'),
-		button = controlButton(options);
+		control = controlButton(options);
 	hiddenEl.target = '_self';
 	hiddenEl.style = 'display:none';
 	document.body.appendChild(hiddenEl);
@@ -581,14 +580,14 @@ function controlDownload(options) {
 		el.innerHTML = f;
 		el.id = formats[f];
 		el.title = 'Obtenir un fichier ' + f;
-		button.questionEl.appendChild(el);
+		control.questionEl.appendChild(el);
 	}
 
 	function download() { //formatName, mime
 		const formatName = this.textContent || 'GPX', //BEST get first value as default
 			mime = this.id,
 			format = new ol.format[formatName](),
-			map = button.getMap();
+			map = control.getMap();
 		let features = [],
 			extent = map.getView().calculateExtent();
 
@@ -633,7 +632,7 @@ function controlDownload(options) {
 			hiddenEl.click();
 		}
 	}
-	return button;
+	return control;
 }
 
 /**
@@ -641,7 +640,7 @@ function controlDownload(options) {
  * Requires controlButton
  */
 function controlPrint() {
-	const button = controlButton({
+	const control = controlButton({
 		className: 'ol-button ol-print',
 		title: 'Pour imprimer la carte:\n' +
 			'choisir l‘orientation,\n' +
@@ -650,15 +649,15 @@ function controlPrint() {
 		question: '<input type="radio" name="print-orientation" value="0" />Portrait A4<br>' +
 			'<input type="radio" name="print-orientation" value="1" />Paysage A4',
 		activate: function() {
-			resizeDraft(button.getMap());
-			button.getMap().once('rendercomplete', function() {
+			resizeDraft(control.getMap());
+			control.getMap().once('rendercomplete', function() {
 				window.print();
 				location.reload();
 			});
 		},
 	});
 
-	button.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const oris = document.getElementsByName('print-orientation');
@@ -668,7 +667,7 @@ function controlPrint() {
 
 	function resizeDraft() {
 		// Resize map to the A4 dimensions
-		const map = button.getMap(),
+		const map = control.getMap(),
 			mapEl = map.getTargetElement(),
 			oris = document.querySelectorAll("input[name=print-orientation]:checked"),
 			orientation = oris.length ? oris[0].value : 0;
@@ -693,7 +692,7 @@ function controlPrint() {
 				});
 		});
 	}
-	return button;
+	return control;
 }
 
 /**

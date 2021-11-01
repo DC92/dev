@@ -92,8 +92,8 @@ function layerEditGeoJson(options) {
 			label: options.titleModify ? 'M' : null,
 			buttonBackgroundColors: ['white', '#ef3'],
 			title: options.titleModify,
-			activate: function(active) {
-				activate(active, modify);
+			activate: function(state) {
+				activate(state, modify);
 			},
 		});
 
@@ -207,8 +207,8 @@ function layerEditGeoJson(options) {
 		}
 	});
 
-	function activate(active, inter) { // Callback at activation / desactivation, mandatory, no default
-		if (active) {
+	function activate(state, inter) { // Callback at activation / desactivation, mandatory, no default
+		if (state) {
 			layer.map_.addInteraction(inter);
 			layer.map_.addInteraction(snap); // Must be added after
 		} else {
@@ -218,11 +218,11 @@ function layerEditGeoJson(options) {
 	}
 
 	function controlDraw(options) {
-		const button = controlButton(Object.assign({
+		const control = controlButton(Object.assign({
 				group: 'edit',
 				buttonBackgroundColors: ['white', '#ef3'],
-				activate: function(active) {
-					activate(active, interaction);
+				activate: function(state) {
+					activate(state, interaction);
 				},
 			}, options)),
 			interaction = new ol.interaction.Draw(Object.assign({
@@ -239,7 +239,7 @@ function layerEditGeoJson(options) {
 			// Don't do it now as it's not yet added to the source
 			source.modified = true;
 		});
-		return button;
+		return control;
 	}
 
 	function hover(evt) {
