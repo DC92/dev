@@ -87,7 +87,8 @@ function layerStamen(subLayer) {
 /**
  * IGN France
  * Doc on http://api.ign.fr
- * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user fot others than IGN V2 & photo
+ * var mapKeys.ign = Get your own (free)IGN key at https://professionnels.ign.fr/user
+ * IGN V2 & photo don't need this key
  */
 function layerIGN(subLayer, format) {
 	let IGNresolutions = [],

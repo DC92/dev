@@ -1,6 +1,6 @@
 <?php
 /**
- * Generate feed fot VVTrack.fr
+ * Generate feed for VTTrack.fr
  *
  * @copyright (c) 2021 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
