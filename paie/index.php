@@ -50,6 +50,9 @@ $mois = [
 	'12' => 'décembre',
 ];
 
+include 'PHPMailer/PHPMailerAutoload.php'; //https://github.com/PHPMailer/PHPMailer
+include 'PdfParser.php'; // https://gist.github.com/smalot/6183152
+
 /**
 * Compute inputs
 */
@@ -70,7 +73,7 @@ if (@$_GET['sid'] == $md5)
 /**
 * Identification
 */
-echo '<p><b>Outil de paye de Chavil\'GYM</b></p>';
+echo '<p><b>Archives des bulletins de salaire de Chavil\'GYM</b></p>';
 
 if ($mail && !$prenom)
 	echo "<p style='color:red'>Mail <b>$mail</b> inconnu.<p>";
@@ -92,7 +95,6 @@ if ($prenom) { ?>
 * Vérif pour membre du bureau
 */
 if ($est_bureau && ($sid != $md5)) {
-	require 'PHPMailer/PHPMailerAutoload.php';
 	$mailer = new PHPMailer;
 	$mailer->CharSet = 'UTF-8';
 	$mailer->SMTPDebug = 3; // Enable verbose debug output
@@ -114,40 +116,55 @@ if ($est_bureau && ($sid != $md5)) {
 /**
 * Upload files
 */
-include ('PdfParser.php'); // https://gist.github.com/smalot/6183152
-
 if ($est_bureau) { ?>
 	<form method="post" enctype="multipart/form-data">
-		Nouveau bulletin
-		<input type="file" id="file" name="file">
+		Archiver des bulletins (Ctrl+click = multiple)<br />
+		<input type="file" id="file" name="file[]" multiple ="true">
 		<button>Envoyer</button>
 	</form>
 
-	<? if (isset ($_FILES['file'])) {
-		$pdf = PdfParser::parseFile ($_FILES['file']['tmp_name']);
-		preg_match('/emploi : du ([0-9]+)\/([0-9]+)\/([0-9]+)/', $pdf, $date);
-		preg_match('/Prénom : ([^ ]+)/', $pdf, $prenom_compose);
+	<? 
+	if (isset ($_FILES['file']))
+		foreach ($_FILES['file']['name'] AS $k=>$f) {
+			$tmp = $_FILES['file']['tmp_name'][$k];
+			$pdf = PdfParser::parseFile ($tmp);
+			preg_match('/emploi : du ([0-9]+)\/([0-9]+)\/([0-9]+)/', $pdf, $date);
+			preg_match('/Prénom : ([^ ]+)/', $pdf, $prenom_compose);
 
-		if (count($date) < 4 || count($prenom_compose) < 2) return;
+			if (count($date) < 4 || count($prenom_compose) < 2) return;
 
-		$prenoms = explode('-',$prenom_compose[1]);
-		foreach ($prenoms AS $k=>$v)
-			$prenoms[$k] = ucfirst (str_replace (['é','è'], 'e', mb_strtolower ($v, 'UTF-8')));
+			$prenoms = explode('-',$prenom_compose[1]);
+			foreach ($prenoms AS $k=>$v)
+				$prenoms[$k] = ucfirst (str_replace (['é','è'], 'e', mb_strtolower ($v, 'UTF-8')));
 
-		$local_file_name = '20'.$date[3].'-'.$date[2].'-'.implode('-', $prenoms).'.pdf';
+			$local_file_name = '20'.$date[3].'-'.$date[2].'-'.implode('-', $prenoms).'.pdf';
 
-		// Copy file
-		$ok = move_uploaded_file($_FILES['file']['tmp_name'], 'pdf/'.$local_file_name);
-		if ($ok)
-			echo '<p style="color:red">Le fichier <b>'.$local_file_name.'</b> à été chargé</p>';
-	}
+			// Copy file
+			$mouvement = file_exists('pdf/'.$local_file_name) ? 'remplacé' : 'archivé';
+			$ok = move_uploaded_file($tmp, 'pdf/'.$local_file_name);
+			if ($ok)
+				echo "<p style='color:red'>Le fichier <b>$local_file_name</b> à été $mouvement.</p>";
+			else
+				echo "<p style='color:red'>Erreur d'archivage du fichier <b>$local_file_name</b>.</p>";
+		}
 }
 
 /**
-* Download files
+* Liste des bulletins
 */
-else {
-	$files = glob('pdf/*'.str_replace(['é','è'], 'e', $prenom).'.pdf');
-/*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($files,true).'</pre>'.PHP_EOL;
+else { ?>
+	<p>Sélectionnez le bulletin de salaire désiré dans la liste ci-dessous puis<br />
+		<input type="submit" style="cursor:pointer"
+			title="Cliquez pour recevoir le document par mail"
+			value="Envoyer par mail à : <?=$_REQUEST['mail']?>" />
+	</p>
+
+	<? $files = glob('pdf/*'.str_replace(['é','è'], 'e', $prenom).'.pdf');
+	foreach (array_reverse($files) AS $f) {
+		$nf = explode ('-', str_replace ('/', '-', $f));
+	?>
+		<input type="radio" name="doc" value="<?=str_replace(['pdf/', '.pdf'], '', $f)?>">
+		<?=ucfirst($mois[$nf[2]]).' '.$nf[1]?><br>
+	<? }
 }
 ?>
