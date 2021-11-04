@@ -150,21 +150,68 @@ if ($est_bureau) { ?>
 }
 
 /**
+* Envoi d'un bulletin
+*/
+if ($_POST['doc'])
+	envoi ($_POST['doc'],
+"Bonjour $prenom
+
+Veuillez trouver ci-joint le document demandé.
+
+Cordialement.
+
+Dominique
+
+NOTE: Vous recevez ce mail parce qu'une demande à été postée sur le site d'archives de Chavil'GYM.
+Si cette demande ne provient pas de vous, supprimez ce mail.
+Si ces envois persistent, signalez-le moi en répondant à ce mail.
+");
+
+/**
 * Liste des bulletins
 */
-else { ?>
-	<p>Sélectionnez le bulletin de salaire désiré dans la liste ci-dessous puis<br />
-		<input type="submit" style="cursor:pointer"
-			title="Cliquez pour recevoir le document par mail"
-			value="Envoyer par mail à : <?=$_REQUEST['mail']?>" />
-	</p>
+if (!$est_bureau) { ?>
+	<form action="index.php" method="POST">
+		<p>Sélectionnez le bulletin de salaire désiré dans la liste ci-dessous puis<br />
+			<input type="submit" style="cursor:pointer"
+				title="Cliquez pour recevoir le document par mail"
+				value="Envoyer par mail à : <?=$_REQUEST['mail']?>" />
+		</p>
 
-	<? $files = glob('pdf/*'.str_replace(['é','è'], 'e', $prenom).'.pdf');
-	foreach (array_reverse($files) AS $f) {
-		$nf = explode ('-', str_replace ('/', '-', $f));
-	?>
-		<input type="radio" name="doc" value="<?=str_replace(['pdf/', '.pdf'], '', $f)?>">
-		<?=ucfirst($mois[$nf[2]]).' '.$nf[1]?><br>
-	<? }
+		<? $files = glob('pdf/*'.str_replace(['é','è'], 'e', $prenom).'.pdf');
+		foreach (array_reverse($files) AS $f) {
+			$nf = explode ('-', str_replace ('/', '-', $f));
+		?>
+			<input type="radio" name="doc" value="<?=str_replace(['pdf/', '.pdf'], '', $f)?>">
+			<?=ucfirst($mois[$nf[2]]).' '.$nf[1]?>
+			<br>
+		<? } ?>
+	</form>
+<? }
+
+/**
+* Envoi d'un fichier
+*/
+function envoi ($nom_fichier, $texte_mail) {
+	global $mois, $prenom;
+
+	$docs = explode ('-', $nom_fichier);
+	$mailer = new PHPMailer;
+	$mailer->CharSet = 'UTF-8';
+	$mailer->SMTPDebug = 3; // Enable verbose debug output
+	$mailer->FromName = 'Chavil\'GYM';
+	$mailer->From = 'chavil.gym@cavailhez.fr';
+	$mailer->addAddress ($_REQUEST['mail']);
+//	$mailer->addBCC('chavil.gym@cavailhez.fr', 'jfbonnin78140@gmail.com');
+	$mailer->Subject = "Bulletin de salaire de $prenom pour {$mois[$docs[1]]} {$docs[0]}";
+	$mailer->Body = $texte_mail;
+	$mailer->AddAttachment (__DIR__.'/'.utf8_decode('pdf/'.$_POST['doc'].'.pdf'), $_POST['doc']);
+
+	if ($mailer->ErrorInfo)
+		echo $mailer->ErrorInfo;
+	else
+		$mailer->Send();
+
+	echo '<p style="color:red">Le document a été envoyé.</p>';
 }
 ?>
