@@ -56,18 +56,18 @@ include 'PdfParser.php'; // https://gist.github.com/smalot/6183152
 /**
 * Compute inputs
 */
-$mail = isset($_GET['logout'])
+$gymmail = isset($_GET['logout'])
 	? null
-	: urldecode(@$_POST['mail'] ?: @$_COOKIE['mail']);
-$prenom = @($bureau + $animateurs)[$mail];
-$est_bureau = @$bureau[$mail];
-$sid = @$_GET['sid'] ?: @$_COOKIE['sid'];
-$md5 = md5($_SERVER['REMOTE_ADDR'].$mail);
+	: urldecode(@$_POST['gymmail'] ?: @$_COOKIE['gymmail']);
+$prenom = @($bureau + $animateurs)[$gymmail];
+$est_bureau = @$bureau[$gymmail];
+$gymsid = @$_GET['gymsid'] ?: @$_COOKIE['gymsid'];
+$md5 = md5($_SERVER['REMOTE_ADDR'].$gymmail);
 
-setcookie('mail', $mail);
-setcookie('sid', $sid);
+setcookie('gymmail', $gymmail);
+setcookie('gymsid', $gymsid);
 
-if (@$_GET['sid'] == $md5)
+if (@$_GET['gymsid'] == $md5 && @$_COOKIE['gymsid'] != $md5)
 	echo '<p style="color:red">Vérification approuvée.</p>';
 
 /**
@@ -75,9 +75,8 @@ if (@$_GET['sid'] == $md5)
 */
 echo '<p><b>Archives des bulletins de salaire de Chavil\'GYM</b></p>';
 
-if ($mail && !$prenom)
-	echo "<p style='color:red'>Mail <b>$mail</b> inconnu.<p>";
-
+if ($gymmail && !$prenom)
+	echo "<p style='color:red'>Mail <b>$gymmail</b> inconnu.<p>";
 
 if ($prenom) { ?>
 	<a href="index.php?logout" style="float:right">Déconnection</a>
@@ -85,7 +84,7 @@ if ($prenom) { ?>
 <? } else { ?>
 	<p>Pour vous identifier, saisissez votre adresse mail :</p>
 	<form action="index.php" method="POST">
-		<p><input type="text" name="mail" size="50" /></p>
+		<p><input type="text" name="gymmail" size="50" /></p>
 		<p><input type="submit" value="Soumettre" /></p>
 	</form>
 <?	exit;
@@ -94,7 +93,7 @@ if ($prenom) { ?>
 /**
 * Vérif pour membre du bureau
 */
-if ($est_bureau && ($sid != $md5)) {
+if ($est_bureau && ($gymsid != $md5)) {
 	$mailer = new PHPMailer;
 	$mailer->CharSet = 'UTF-8';
 	$mailer->SMTPDebug = 3; // Enable verbose debug output
@@ -102,23 +101,24 @@ if ($est_bureau && ($sid != $md5)) {
 	$mailer->From = 'chavil.gym@cavailhez.fr';
 	$mailer->addAddress ('dominique.cavailhez@gmail.com');
 	$mailer->Subject = 'Validation de votre connexion à chavil.gym/paie';
-	$mailer->Body = 'Pour valider votre connexion à chavil.gym/paie, cliquez <a href="https://c92.fr/paie?sid='.$md5.'">ICI</a>';
+	$mailer->Body = 'Pour valider votre connexion à chavil.gym/paie, cliquez <a href="https://c92.fr/paie?gymsid='.$md5.'">ICI</a>';
 
 	if ($mailer->ErrorInfo)
 		echo $mailer->ErrorInfo;
 	else
 		$mailer->Send();
 
-	echo '<p>Un mail de vérification vient de vous être envoyé.</p>';
+	echo '<p>Un mail de vérification de votre connexion vient de vous être envoyé.</p>';
 	exit;
 }
 
 /**
-* Upload files
+* Trésorier : upload files
 */
 if ($est_bureau) { ?>
+	<hr />
 	<form method="post" enctype="multipart/form-data">
-		Archiver des bulletins (Ctrl+click = multiple)<br />
+		Pour archiver des bulletins<br />(Ctrl+click pour multiple)<br />
 		<input type="file" id="file" name="file[]" multiple ="true">
 		<button>Envoyer</button>
 	</form>
@@ -150,9 +150,44 @@ if ($est_bureau) { ?>
 }
 
 /**
+* Trésorier : envoi des fichiers par mail
+*/
+?><hr />
+<p>Envoi des bulletins du mois</p>
+<?
+$grep = 'pdf/'.date('Y-m', time() - 15 * 24 * 3600).'-*.pdf';
+$files = glob ($grep);
+foreach ($files AS $f) { ?>
+	<input type="radio" name="doc" value="<?=str_replace(['pdf/', '.pdf'], '', $f)?>">
+	<?=str_replace('pdf/', '', $f)?>
+	<br>
+<? } ?>
+<p>&lt;PRENOM&gt; sera remplacé par le prénom du destinataire.</p>
+<textarea name="texte-mail" rows="15" cols="80">Bonjour <PRENOM>.
+
+Ci-joint ton bulletin de paie pour <?=$mois[date('m')].date(' Y')?>.
+La somme correspondante à la dernière ligne a été virée sur ton compte.
+
+Cordialement.
+
+Dominique
+
+Rappel : tu retrouveras tes bulletins de paie et attestations sur http://chaville.gym.free.fr/archives
+Ces fichiers peuvent être lus et imprimés avec https://get.adobe.com/fr/reader/ (Télécharger Acrobat Reader)
+</textarea>
+<br />
+
+<p>
+				Puis <input type="submit" title="Cliquez pour recevoir le document sélectionné par mail" value="Envoyer par mail à : jieungenouville@yahoo.fr">
+			</p>
+			
+
+<?
+
+/**
 * Envoi d'un bulletin
 */
-if ($_POST['doc'])
+if (isset ($_POST['doc']))
 	envoi ($_POST['doc'],
 "Bonjour $prenom
 
@@ -168,14 +203,15 @@ Si ces envois persistent, signalez-le moi en répondant à ce mail.
 ");
 
 /**
-* Liste des bulletins
+* Liste des bulletins d'un employé
 */
 if (!$est_bureau) { ?>
+	<hr />
 	<form action="index.php" method="POST">
 		<p>Sélectionnez le bulletin de salaire désiré dans la liste ci-dessous puis<br />
 			<input type="submit" style="cursor:pointer"
 				title="Cliquez pour recevoir le document par mail"
-				value="Envoyer par mail à : <?=$_REQUEST['mail']?>" />
+				value="Envoyer par mail à : <?=$_REQUEST['gymmail']?>" />
 		</p>
 
 		<? $files = glob('pdf/*'.str_replace(['é','è'], 'e', $prenom).'.pdf');
@@ -201,7 +237,7 @@ function envoi ($nom_fichier, $texte_mail) {
 	$mailer->SMTPDebug = 3; // Enable verbose debug output
 	$mailer->FromName = 'Chavil\'GYM';
 	$mailer->From = 'chavil.gym@cavailhez.fr';
-	$mailer->addAddress ($_REQUEST['mail']);
+	$mailer->addAddress ($_REQUEST['gymmail']);
 //	$mailer->addBCC('chavil.gym@cavailhez.fr', 'jfbonnin78140@gmail.com');
 	$mailer->Subject = "Bulletin de salaire de $prenom pour {$mois[$docs[1]]} {$docs[0]}";
 	$mailer->Body = $texte_mail;
