@@ -7,6 +7,12 @@ const controls = [
 		controlFullScreen(),
 		controlGeocoder(),
 		controlLoadGPX(),
+		controlPermalink({ // Permet de garder le même réglage de carte
+			display: true,
+<?php if ($vue->polygone->id_polygone) { ?>
+			init: false, // Ici, on cadrera plutôt sur le massif
+<?php } ?>
+		}),
 	],
 
 	// Affiche en noir la limite de tous les massifs
@@ -25,8 +31,8 @@ const controls = [
 		titleModify: 'Modification d‘un polygone:\n' +
 			'Activer ce bouton (couleur jaune) puis:\n' +
 			'Déplacer un sommet: Cliquer dessus puis le déplacer.\n' +
-			'Ajouter un sommet: Cliquer sur un côté puis le déplacer.\n' +
-			'Supprimer un sommet: Alt + cliquer dessus.\n' +
+			'Ajouter un sommet: Cliquer au milieu d\'un côté puis le déplacer.\n' +
+			'Supprimer un sommet: Alt + cliquer sur le côté commun.\n' +
 			'Scinder un polygone: Joindre 2 sommets du polygone,\n' +
 			'Fusionner 2 polygones: Coller un côté identique\n' +
 			'(entre 2 sommets consécutifs) de chaque polygone\n' +
