@@ -11,7 +11,7 @@
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//c92.fr/test/chem5/', //TODO+ host: 'chemineur.fr',
+		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +

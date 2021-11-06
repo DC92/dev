@@ -951,8 +951,7 @@ function styleOptionsIconChemineur(iconName) {
 		// Limit to 2 type names & ' ' -> '_'
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
 
-		//TODO+ chemineur.fr
-		return styleOptionsIcon('//c92.fr/test/chem5/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
+		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
 }
 
@@ -1081,7 +1080,7 @@ function styleOptionsCluster(feature, properties) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//c92.fr/test/chem5/', //TODO+ host: 'chemineur.fr',
+		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
