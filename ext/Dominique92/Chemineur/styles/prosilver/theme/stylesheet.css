@@ -146,12 +146,6 @@ body,
 		text-overflow: ellipsis;
 		max-width: 45%;
 	}
-	#map {
-		float: right;
-		/* //TODO BUG inhibe jquery-ui resize */
-		height: 50vw !important;
-		width: 50vw !important;
-	}
 }
 
 /* Simplifie l'affichage du descripteur de forum */

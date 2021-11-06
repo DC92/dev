@@ -68,15 +68,3 @@ if (scriptName == 'posting' && mapType == 'line')
 			'double cliquer pour terminer.\n' +
 			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
 	}));
-
-// Resize map
-//TODO BUG don't work (50vw !important dans .css)
-if (jQuery.ui)
-	$(map.getTargetElement()).resizable({
-		handles: 's,w,sw', // 2 côtés et 1 coin
-
-		resize: function(event, ui) {
-			ui.position.left = ui.originalPosition.left; // Reste à droite de la page
-			map.updateSize(); // Reaffiche tout le nouveau <div>
-		},
-	});

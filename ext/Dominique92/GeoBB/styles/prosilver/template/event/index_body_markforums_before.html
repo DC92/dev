@@ -6,4 +6,20 @@
 	};
 </script>
 
+<style>
+/* Need to be there to overlap GeoBB stylesheet.css */
+@media screen and (min-width: 600px) {
+	#map {
+		float: right;
+		width: 50vw;
+	}
+}
+@media screen and (max-width: 600px) {
+	#map {
+		/* Important freeze jQuery.ui.resizable */
+		width: 100vw !important;
+	}
+}
+</style>
+
 <div id="map"></div>

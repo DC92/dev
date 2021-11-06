@@ -1,6 +1,3 @@
-//BEST faire un tableau et mettre dans la création de la map
-//BEST LDP http://www.lacsdespyrenees.com/kml-Bielsa.kml
-
 if (typeof map !== 'undefined') {
 	map.addLayer(layerWri({
 		selectorName: 'wri-features',
@@ -49,3 +46,14 @@ if (typeof map !== 'undefined') {
 		},
 	}));
 }
+
+// Resize map
+if (jQuery.ui)
+	$(map.getTargetElement()).resizable({
+		handles: 's,w,sw', // 2 côtés et 1 coin
+
+		resize: function(event, ui) {
+			ui.position.left = ui.originalPosition.left; // Reste à droite de la page
+			map.updateSize(); // Reaffiche tout le nouveau <div>
+		},
+	});

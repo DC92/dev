@@ -1072,6 +1072,8 @@ function styleOptionsCluster(feature, properties) {
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
+//BEST http://www.lacsdespyrenees.com/kml-Bielsa.kml
+//BEST https://www.lecampingsauvage.fr/legislation-et-reglementation/camping-sauvage-bivouac
 
 /**
  * Site chemineur.fr, alpages.info
