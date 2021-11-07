@@ -5,41 +5,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors','on');
 
-$bureau = [
-	'dominique.cavailhez@gmail.com' => 'Dominique',
-//	'antoine.dael@wanadoo.fr' => '.*',
-];
-
-$animateurs = [
-	'dominique@cavailhez.fr' => 'Marie-Thérèse',
-/*
-		'bullier.chaville@free.fr' => 'Martine',
-		'mtduclos@yahoo.fr' => 'Marie-Thérèse',
-		'nataly3d.prigent@gmail.com' => 'Nathalie',
-		'eberpascale@gmail.com' => 'Pascale',
-		'christine@lemarquand.fr' => 'Christine',
-		'catherine.jegou@googlemail.com' => 'Catherine',
-		'simon.rose@neuf.fr' => 'Rose',
-		'corinne.lemaire@hotmail.fr' => 'Corinne',
-		'florina.morin@free.fr' => 'Florina',
-		'theo.canaple@wanadoo.fr' => 'Théo',
-		'jieungenouville@yahoo.fr' => 'Ina-Jieun',
-		'f.carcelli@gmail.com' => 'Florence',
-	'mireille.simonnet@hotmail.fr' => 'Mireille',
-	'spapin8@gmail.com' => 'Sandrine',
-	'auroregauer@sfr.fr' => 'Aurore',
-	'yogasanum@gmail.com' => 'Armelle',
-	'filtre.kiara@gmail.com' => 'Martine-LT',
-	'cheick-cisse@hotmail.com' => 'Cheick',
-	'alyssa.dijoux@live.fr' => 'Alyssa',
-	'asemain@yahoo.com' => 'Arnaud',
-	'gabrielfauchart@gmail.com' => 'Gabriel',
-	'lydialabadi@hotmail.com' => 'Lydia',
-	'aurelie.alcindor@gmail.com' => 'Aurélie',
-	'viennet.lydie@orange.fr' => 'Lydie',
-	'realromano@live.fr' => 'Romain',
-	*/
-];
+include 'liste.php';
 
 $nomAnimateurs = $mailAnimateurs = [];
 foreach ($animateurs AS $k=>$v) {
