@@ -62,7 +62,7 @@ if ($prenom && $session_id != $md5) {
 		$_POST['send_address'] = $session_mail;
 		$_POST['send_subject'] = 'Validation de votre connexion à chavil.gym';
 		$_POST['send_body'] = "Pour valider votre connexion à chavil.gym,
-cliquez sur {$_SERVER['SCRIPT_URI']}?session_id=$md5";
+cliquez sur {$_SERVER['HTTP_ORIGIN']}{$_SERVER['SCRIPT_NAME']}?session_id=$md5";
 		$_POST['send_confirm'] = 'Un mail de vérification de votre connexion vient de vous être envoyé.';
 	}
 	// Les animateurs n'ont pas besoin de valider
@@ -97,7 +97,7 @@ if (isset ($_POST['send_address'])) {
 		$mailer->FromName = 'Chavil\'GYM';
 		$mailer->From = 'chavil.gym@cavailhez.fr';
 		$mailer->addAddress ($_POST['send_address']);
-		//	$mailer->addBCC('chavil.gym@cavailhez.fr', 'jfbonnin78140@gmail.com');
+		$mailer->addBCC('chavil.gym@cavailhez.fr', 'jfbonnin78140@gmail.com');
 		$mailer->Subject = $_POST['send_subject'] ?: 'Chavil\'GYM';
 		$mailer->Body = $_POST['send_body'];
 		if (isset ($_POST['send_attachment']))
@@ -190,7 +190,7 @@ Cordialement.
 
 Dominique
 
-Rappel : tu retrouveras tes bulletins de paie et attestations sur http://chaville.gym.free.fr/archives
+Rappel : tu retrouveras tes bulletins de paie et attestations sur http://chaville.gym.c92.fr/archives
 Ces fichiers peuvent être lus et imprimés avec https://get.adobe.com/fr/reader/ (Télécharger Acrobat Reader)";
 }
 // Récupération d'un bulletin par un employé
