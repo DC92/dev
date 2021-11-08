@@ -13,8 +13,6 @@ foreach ($animateurs AS $k=>$v) {
 	$mailAnimateurs [str_replace (['é','è'], 'e', $v)] = $k;
 }
 
-/*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($nomAnimateurs,true).'</pre>'.PHP_EOL;
-
 $mois = [
 	'01' => 'janvier',
 	'02' => 'février',
@@ -85,7 +83,7 @@ $debug = [
 	'prenom' => $prenom,
 	'est_bureau' => $est_bureau,
 ];
-/*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($debug,true).'</pre>'.PHP_EOL;
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($debug,true).'</pre>'.PHP_EOL;
 
 /**
  * Envoi d'un mail
@@ -122,45 +120,6 @@ if ($prenom)
 	echo "<p>Bonjour $prenom</p>";
 else
 	exit;
-
-/**
- * Liste des bulletins d'un employé
- */
-if (!$est_bureau) { ?>
-	<hr />
-	<form action="index.php" method="POST">
-		Pour obtenir une copie d'un bulletin de paie,
-		le sélectionnez dans la liste ci-dessous puis
-		<input type="submit" style="cursor:pointer;display:inline-block"
-			title="Cliquez pour recevoir le document par mail"
-			value="envoyer à <?=$session_mail?>" />
-		<br /><br />
-
-		<? $files = glob('pdf/*'.str_replace(['é','è'], 'e', $prenom).'.pdf');
-		foreach (array_reverse($files) AS $f) {
-			$nf = explode ('-', str_replace ('/', '-', $f));
-			?>
-			<input type="radio" name="send_attachment" value="<?=$f?>">
-			<?=ucfirst($mois[$nf[2]]).' '.$nf[1]?>
-			<br>
-		<? } ?>
-
-		<input type="hidden" name="send_address" value="<?=$session_mail?>" />
-		<input type="hidden" name="send_subject" value="Votre document Chavil'GYM" />
-		<input type="hidden" name="send_confirm" value="Votre document a été envoyé." />
-		<input type="hidden" name="send_body" value="Bonjour <?=$prenom?>.
-
-Veuillez trouver ci-joint le document demandé.
-
-Cordialement.
-
-Chavil'GYM
-
-NOTE: Vous recevez ce mail parce qu'une demande à été postée sur le site d'archives de Chavil'GYM.
-Si cette demande ne provient pas de vous, supprimez ce mail.
-Si ces envois persistent, signalez-le moi en répondant à ce mail." />
-	</form>
-<? }
 
 /**
  * Trésorier : upload files
@@ -201,6 +160,89 @@ if ($est_bureau) { ?>
 }
 
 /**
- * Trésorier : envoi des fichiers par mail
+ * Trésorier : liste des employés
  */
 ?><hr />
+Liste des bulletins à envoyer à :<br />
+<?
+if ($est_bureau)
+	foreach ($animateurs AS $mail => $prenom) {
+		$prenom_flat = str_replace(['é','è',' '], ['e','e','-'], $prenom);
+		echo "<a href='./?prenom=$prenom_flat'>$prenom</a><br />";
+	}
+
+/**
+ * Liste des bulletins d'un employé
+ */
+// Envoi des bulletins par le trésorier
+if ($est_bureau) {
+	$prenom_liste = @$_GET['prenom'];
+	$intro_liste = 'Pour envoyer un bulletin de paie à '.$prenom_liste.
+		',<br/>modifiez le texte';
+	$mail_liste = @$mailAnimateurs [$prenom_liste];
+	$titre_liste = "Bulletin de paie de $prenom_liste pour octobre 2021";
+	$texte_edit_liste = "Bonjour $prenom_liste.
+
+Ci-joint ton bulletin de paie pour ".$mois[date('m')].date(' Y').".
+La somme correspondante à la dernière ligne a été virée sur ton compte.
+
+Cordialement.
+
+Dominique
+
+Rappel : tu retrouveras tes bulletins de paie et attestations sur http://chaville.gym.free.fr/archives
+Ces fichiers peuvent être lus et imprimés avec https://get.adobe.com/fr/reader/ (Télécharger Acrobat Reader)";
+}
+// Récupération d'un bulletin par un employé
+else {
+	$intro_liste = 'Pour obtenir une copie d\'un bulletin de paie';
+	$prenom_liste = $prenom;
+	$mail_liste = $session_mail;
+	$titre_liste = 'Votre document Chavil\'GYM';
+	$texte_liste = "Bonjour $prenom_liste.
+
+Veuillez trouver ci-joint le document demandé.
+
+Cordialement.
+
+Chavil'GYM
+
+NOTE: Vous recevez ce mail parce qu'une demande à été postée sur le site d'archives de Chavil'GYM.
+Si cette demande ne provient pas de vous, supprimez ce mail.
+Si ces envois persistent, signalez-le moi en répondant à ce mail.";
+}
+
+if ($prenom_liste) {
+	$prenom_liste_flat = str_replace(['é','è'], 'e', $prenom_liste);
+	$files = glob('pdf/*'.$prenom_liste_flat.'.pdf');
+?>
+	<hr />
+	<form action="index.php" method="POST">
+		<?=$intro_liste?>,<br />
+		sélectionnez le dans la liste ci-dessous puis<br/>
+		<input type="submit" style="cursor:pointer;display:inline-block"
+			title="Cliquez pour recevoir le document par mail"
+			value="envoyer à <?=$mail_liste?>" />
+		<br /><br />
+
+		<input type="hidden" name="send_address" value="<?=$mail_liste?>" />
+		<input type="hidden" name="send_subject" value="<?=$titre_liste?>" />
+		<input type="hidden" name="send_confirm" value="Votre document a été envoyé à <?=$mail_liste?>." />
+		<? if (isset ($texte_liste)) { ?>
+			<input type="hidden" name="send_body" value="<?=$texte_liste?>" />
+		<? } else { ?>
+			<textarea name="send_body" rows="15" cols="80"><?=$texte_edit_liste?></textarea><br/><br/>
+		<? } ?>
+
+		<? if ($files)
+			foreach (array_reverse($files) AS $f) {
+				$nf = explode ('-', str_replace ('/', '-', $f));
+				?>
+				<input type="radio" name="send_attachment" value="<?=$f?>">
+				<?=ucfirst($mois[$nf[2]]).' '.$nf[1]?>
+				<br><?
+			}
+		?>
+	</form>
+<? }
+
