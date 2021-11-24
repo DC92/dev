@@ -140,8 +140,11 @@
 .ol-print p span {
 	color: blue;
 }
-/* When printing, hide all controls except : */
+/* When printing, hide all controls except scale & attribution */
 @media print {
+	@page {
+		margin: 0; /* Hide the header, footer & margins */
+	}
 	.ol-overlaycontainer-stopevent > * {
 		display: none;
 	}
