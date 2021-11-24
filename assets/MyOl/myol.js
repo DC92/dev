@@ -2020,8 +2020,10 @@ function controlPrint() {
 			'choisir l‘orientation,\n' +
 			'zoomer et déplacer,\n' +
 			'cliquer sur l‘icône imprimante.',
-		question: '<input type="radio" name="print-orientation" value="0" />Portrait A4<br>' +
-			'<input type="radio" name="print-orientation" value="1" />Paysage A4',
+		question: '<input type="radio" name="print-orientation" id="ol-po0" value="0" />' +
+			'<label for="ol-po0">Portrait A4</label><br />' +
+			'<input type="radio" name="print-orientation" id="ol-po1" value="1" />' +
+			'<label for="ol-po1">Paysage A4</label>',
 		activate: function() {
 			resizeDraft(control.getMap());
 			control.getMap().once('rendercomplete', function() {
@@ -2047,9 +2049,9 @@ function controlPrint() {
 
 		mapEl.style.maxHeight = mapEl.style.maxWidth = 'none';
 		mapEl.style.width = orientation == 0 ? '210mm' : '297mm';
-		mapEl.style.height = orientation == 0 ? '297mm' : '209.9mm'; // -.1mm for Chrome landscape no marging bug
+		mapEl.style.height = orientation == 0 ? '297mm' : '209.9mm';
+		// -.1mm for Chrome landscape no marging bug
 		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
-		document.body.style.margin = 0;
 
 		// Set portrait / landscape
 		const styleSheet = document.createElement('style');

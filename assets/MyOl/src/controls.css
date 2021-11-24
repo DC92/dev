@@ -135,7 +135,11 @@
 	@page {
 		margin: 0; /* Hide the header, footer & margins */
 	}
-	.ol-overlaycontainer-stopevent > * {
+	body {
+		margin: 0;
+		padding: 0;
+	}
+	.ol-overlaycontainer-stopevent > div {
 		display: none;
 	}
 	.ol-attribution,
