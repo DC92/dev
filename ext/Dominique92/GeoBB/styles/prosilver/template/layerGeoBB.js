@@ -4,7 +4,7 @@ var map = new ol.Map({
 			enableRotation: false,
 		}),
 		controls: controlsCollection({
-				controlPermalink: {
+				permalink: {
 					display: mapType == 'index',
 				},
 			})

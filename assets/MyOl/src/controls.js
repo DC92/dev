@@ -673,7 +673,8 @@ function controlPrint() {
 			poElcs = document.querySelectorAll('input[name=print-orientation]:checked'),
 			orientation = poElcs.length ? parseInt(poElcs[0].value) : 0;
 
-		mapEl.style.maxHeight = mapEl.style.maxWidth = 'none';
+		mapEl.style.float =
+			mapEl.style.maxHeight = mapEl.style.maxWidth = 'none';
 		mapEl.style.width = orientation == 0 ? '210mm' : '297mm';
 		mapEl.style.height = orientation == 0 ? '297mm' : '210mm';
 		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
