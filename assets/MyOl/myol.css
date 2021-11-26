@@ -154,7 +154,7 @@
 	}
 	.ol-attribution,
 	.ol-scale-line {
-		display: block;
+		display: flex !important;
 	}
 }
 

@@ -675,8 +675,7 @@ function controlPrint() {
 
 		mapEl.style.maxHeight = mapEl.style.maxWidth = 'none';
 		mapEl.style.width = orientation == 0 ? '210mm' : '297mm';
-		mapEl.style.height = orientation == 0 ? '297mm' : '209.9mm';
-		// -.1mm for Chrome landscape no marging bug
+		mapEl.style.height = orientation == 0 ? '297mm' : '210mm';
 		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
 
 		// Set portrait / landscape
@@ -725,7 +724,7 @@ function controlsCollection(options) {
 		new ol.control.ScaleLine(),
 
 		// Bottom right
-		controlPermalink(options.controlPermalink),
+		controlPermalink(options.permalink),
 		new ol.control.Attribution(),
 	];
 }
