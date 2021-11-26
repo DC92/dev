@@ -136,7 +136,7 @@
 		margin: 0; /* Hide the header, footer & margins */
 	}
 	body {
-		margin: 0;
+		margin: 1mm 0 0 1mm;
 		padding: 0;
 	}
 	.ol-overlaycontainer-stopevent > div {

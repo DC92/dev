@@ -7,6 +7,13 @@
 }
 
 @media print {
+	html {
+		height: initial;
+	}
+	#map {
+		padding: 0;
+	}
+
 	/* Force attribution open */
 	.ol-attribution {
 	  background: rgba(255,255,255,0.8);

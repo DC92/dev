@@ -2049,8 +2049,8 @@ function controlPrint() {
 
 		mapEl.style.maxHeight = mapEl.style.maxWidth =
 			mapEl.style.float = 'none';
-		mapEl.style.width = orientation == 0 ? '210mm' : '297mm';
-		mapEl.style.height = orientation == 0 ? '297mm' : '210mm';
+		mapEl.style.width = orientation == 0 ? '208mm' : '295mm';
+		mapEl.style.height = orientation == 0 ? '295mm' : '208mm';
 		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
 
 		// Set portrait / landscape
