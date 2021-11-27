@@ -149,9 +149,6 @@
 		margin: 1mm 0 0 1mm;
 		padding: 0;
 	}
-	.ol-attribution,
-	.ol-scale-line {
-	}
 
 	/* Force attribution open */
 	.ol-scale-line,
