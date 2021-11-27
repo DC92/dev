@@ -149,12 +149,21 @@
 		margin: 1mm 0 0 1mm;
 		padding: 0;
 	}
-	.ol-overlaycontainer-stopevent > div {
-		display: none;
-	}
 	.ol-attribution,
 	.ol-scale-line {
+	}
+
+	/* Force attribution open */
+	.ol-scale-line,
+	.ol-attribution {
 		display: flex !important;
+	}
+	.ol-attribution ul {
+		display: block !important;
+	}
+	.ol-attribution button,
+	.ol-overlaycontainer-stopevent > div {
+		display: none;
 	}
 }
 
