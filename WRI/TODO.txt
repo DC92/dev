@@ -16,12 +16,13 @@ Point
 
 TODO WRI
 ========
+Formulaire contact : nom utilisateur
 Fusion commentaire / forum : notion de post descriptif
 Pictos geocaching
 Pas de favicon dans S20 accueil FF
 Lien le forum est vide, => lien ne marche pas
 Auteur demande corrections
-WRI liste users surs / utilitaire scan liens
+Liste users surs / utilitaire scan liens
 GPS : reprendre le baselayers de WRI (pas de google)
 service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
@@ -30,6 +31,7 @@ service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Fail
 L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
 	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
 Déraciner le wiki / le mettre dans le forum
+Install ne vas plus marcher si config.php est là !
 
 WRI API
 =======
