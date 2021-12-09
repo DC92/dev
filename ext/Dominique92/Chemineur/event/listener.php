@@ -180,7 +180,8 @@ class listener implements EventSubscriberInterface
 			$this->block_array = $vars['block_array'];
 			$this->block_array['TEXT_SIZE'] = strlen (@$this->post_data[$post_id]['post_text']) * count($this->attachments[$post_id]);
 			$this->block_array['DATE'] = str_replace (' 00:00', '', $this->user->format_date($vars['attachment']['filetime']));
-			$this->block_array['AUTEUR'] = $vars['row']['user_sig'];
+			if (isset ($vars['row']))
+				$this->block_array['AUTEUR'] = $vars['row']['user_sig'];
 			//BEST Retrouver le nom du "poster_id" : $vars['attachment']['poster_id'] ??
 			$this->block_array['EXIF'] = $vars['attachment']['exif'];
 			foreach ($vars['attachment'] AS $k=>$v)
