@@ -2,39 +2,14 @@
 Exporter base / créer et importer
 
 Copier phpBB sauf doc, install ? & config.php
-Copier assets/MyOl & jquery-ui
+Copier assets/MyOl
 Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
 Copier ext/cleantalk
-Copier ext/phpbb/googleanalytics
 Copier gym/fichiers gym/files
 
 /install -> Mettre à jour
 Supprimer /install
 admin -> Paramètres de cookie -> c92.fr
-
-// Réunion Clamart
-Catégories (dans le tableau horaires)
-Récupérer le nom de domaine / fermer le support
-
-
-Migration :
-Dupliquer base
-Si chaville.test -> changer dans le SQL
-Uploader phpBB 3.3.2 sauf /doc /install /ext /files /config.php
-Uploader /assets/MyOl /ext/Dominique92/MyPhpBB GeoBB Gym
-Uploader /ext/phpbb/GGAnalytics /ext/cleantalk/antispam
-Copier de précédent /files /fichiers config.php
-Config.php CHANGER_NOM_BASE ajouter les define('MYPHPBB_
-Faire un tour par l'admin pour mettre à jour les BBcodes
-Après :
-Supprimer BBcode include
-Refaire pages horaires ouvert / tous
-Modifier BBcodes accueil & actualite -> resume (ou rien)
-remplacer (INCLUDE ? (LOCATION ? par le BBcode MyPhpBB
-Refaire git Dominique92 / test en DC02
-
-/** CONFIG
-https://github.com/phpbbmodders/phpBB-3.1-ext-adduser ????
 
 Install :
 /** PERSONNALISER / extensions MyPhpBB, GeoBB, Gym

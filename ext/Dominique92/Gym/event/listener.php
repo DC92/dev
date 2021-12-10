@@ -91,7 +91,7 @@ class listener implements EventSubscriberInterface
 	// Appelé juste avant d'afficher
 	function viewtopic_modify_page_title($vars) {
 		if (strpos($vars['topic_data']['forum_desc'],':gym') !== false &&
-				((!$this->args['f'] && $this->args['t']) ||
+				((!isset ($this->args['f']) && isset ($this->args['t'])) ||
 					$this->args['p']
 				)
 			)
@@ -103,7 +103,7 @@ class listener implements EventSubscriberInterface
 	function page_footer_after() {
 		$template = $this->request->variable (
 			'template',
-			$this->my_template ?: ''
+			isset ($this->my_template) ? $this->my_template : ''
 		);
 		if ($template)
 			$this->template->set_filenames ([
@@ -159,7 +159,7 @@ class listener implements EventSubscriberInterface
 		// Assign some values to template
 		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
 		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
-		$post_row['COULEUR'] = $this->couleur(); // Couleur du sous-menu
+		$post_row['COULEUR'] = $this->couleur (); // Couleur du sous-menu
 		$post_row['GEO_JSON'] = $post_data['geo_json']; // Position sur la carte
 
 		// Assign the gym values to the template
@@ -321,6 +321,8 @@ class listener implements EventSubscriberInterface
 		$luminance = 255,
 		$increment = 1.8
 	) {
+		if (!isset ($this->angle_couleur))
+			$this->angle_couleur = 0;
 		$this->angle_couleur += $increment;
 		$couleur = '#';
 		for ($angle = 0; $angle < 6; $angle += 2)
@@ -525,24 +527,24 @@ youtube
 
 			// Date
 			global $myphp_js;
-			$row['gym_jour_literal'] = $this->listes()['jours'][intval ($row['gym_jour'])];
+			$row['gym_jour_literal'] = @$this->listes()['jours'][intval ($row['gym_jour'])];
 
-			if($row['gym_scolaire'] == 'on')
+			if(@$row['gym_scolaire'] == 'on')
 				$row['gym_semaines'] = $this->semaines;
 
-			if($row['gym_semaines'] && !$row['gym_menu']) {
+			if(isset ($row['gym_semaines']) && !isset ($row['gym_menu'])) {
 				setlocale(LC_ALL, 'fr_FR');
 				$row['next_end_time'] = INF;
-				foreach (explode (',', $row['gym_semaines']) AS $s) {
+				foreach (explode (',', @$row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
-						$row['gym_heure'], $row['gym_minute'], 0,
-						8, 2 + $s * 7 + $row['gym_jour'], $myphp_js['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
+						@$row['gym_heure'], @$row['gym_minute'], 0,
+						8, 2 + $s * 7 + @$row['gym_jour'], $myphp_js['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
 					);
 					$end_time = mktime (
-						$row['gym_heure'] + $row['gym_duree_heures'] + 24 * $row['gym_duree_jours'],
-						$row['gym_minute'],
+						@$row['gym_heure'] + @$row['gym_duree_heures'] + 24 * @$row['gym_duree_jours'],
+						@$row['gym_minute'],
 						0, // Secondes
-						8, 3 + $s * 7 + $row['gym_jour'], $myphp_js['annee_debut'] // Lundi suivant le 1er aout annee_debut
+						8, 3 + $s * 7 + @$row['gym_jour'], $myphp_js['annee_debut'] // Lundi suivant le 1er aout annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {
@@ -556,28 +558,28 @@ youtube
 					}
 				}
 			} else
-				$row['next_beg_time'] = 1234567890 + $row['gym_jour'];
+				$row['next_beg_time'] = 1234567890 + @$row['gym_jour'];
 
 			// Horaires
-			$row['gym_heure'] = substr('00'.$row['gym_heure'], -2);
-			$row['gym_minute'] = substr('00'.$row['gym_minute'], -2);
+			$row['gym_heure'] = substr('00'.@$row['gym_heure'], -2);
+			$row['gym_minute'] = substr('00'.@$row['gym_minute'], -2);
 
-			$row['gym_minute_fin'] = $row['gym_minute'] + $row['gym_duree_heures'] * 60;
-			$row['gym_heure_fin'] = $row['gym_heure'] + floor ($row['gym_minute_fin'] / 60);
-			$row['gym_minute_fin'] = $row['gym_minute_fin'] % 60;
+			$row['gym_minute_fin'] = @$row['gym_minute'] + @$row['gym_duree_heures'] * 60;
+			$row['gym_heure_fin'] = @$row['gym_heure'] + floor (@$row['gym_minute_fin'] / 60);
+			$row['gym_minute_fin'] = @$row['gym_minute_fin'] % 60;
 
-			$row['gym_heure_fin'] = substr('00'.$row['gym_heure_fin'], -2);
-			$row['gym_minute_fin'] = substr('00'.$row['gym_minute_fin'], -2);
-			$row['horaire_debut'] = $row['gym_heure'].'h'.$row['gym_minute'];
-			$row['horaire_fin'] = $row['gym_heure_fin'].'h'.$row['gym_minute_fin'];
+			$row['gym_heure_fin'] = substr('00'.@$row['gym_heure_fin'], -2);
+			$row['gym_minute_fin'] = substr('00'.@$row['gym_minute_fin'], -2);
+			$row['horaire_debut'] = @$row['gym_heure'].'h'.@$row['gym_minute'];
+			$row['horaire_fin'] = @$row['gym_heure_fin'].'h'.@$row['gym_minute_fin'];
 
-			if($row['gym_horaires'] == 'on' && $row['gym_acces'] == 'ferme')
+			if(@$row['gym_horaires'] == 'on' && @$row['gym_acces'] == 'ferme')
 				$this->template->assign_var ('ACCES_FERME', true);
 
 			// Fil de la page d'acueil
-			if (@$row['gym_accueil'])
+			if (isset ($row['gym_accueil']))
 				$accueil [
-					sprintf("%05d", $row['gym_ordre_menu']).
+					sprintf("%05d", @$row['gym_ordre_menu']).
 					$row['horaire_debut'].
 					$row['post_id'] // Pour séparer les exeaco
 				] = array_change_key_case ($row, CASE_UPPER);
@@ -585,17 +587,17 @@ youtube
 			// Range les résultats dans l'ordre et le groupage espéré
 			$liste [
 				$this->request->variable('template', '') == 'horaires'
-					? $row['gym_jour'] // Horaires
+					? @$row['gym_jour'] // Horaires
 					: $row['first_gym_ordre_menu'] // Menu
 			][
-				$row['gym_ordre_menu'].'*'. // Horaires
+				@$row['gym_ordre_menu'].'*'. // Horaires
 				$row['horaire_debut'].'*'.
 				$row['post_subject']. // Pour trier par nom
 				$row['post_id'] // Pour séparer les exeaco
 			] = array_change_key_case ($row, CASE_UPPER);
 		}
 		$this->db->sql_freeresult($result);
-	
+
 		if ($accueil) {
 			ksort ($accueil, SORT_STRING);
 			foreach ($accueil AS $k=>$v)
