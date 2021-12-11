@@ -1,12 +1,12 @@
 //TODO GYM TOUTE LA LISTE
 
 GYM résumé => ... en savoir plus
-GYM : masquer altitude et massif (suivant dispo du champ dans la base ?)
+GYM masquer altitude et massif (suivant dispo du champ dans la base ?)
 GYM affiche la fin dune balise dans le titre
 	Quand recherche page => affiche la fin dune balise dans le titre
-GYM : ne peut pas lire une rubrique si un des textes comprend une redirection
+GYM ne peut pas lire une rubrique si un des textes comprend une redirection
 GYM curseur carte non centré sur la pointe du marqueur
-GYM : evenement : mettre le lien vers le lieu et l'animatrice
+GYM evenement : mettre le lien vers le lieu et l'animatrice
 
 // Ne pas afficher le premier post dans les cartes
 

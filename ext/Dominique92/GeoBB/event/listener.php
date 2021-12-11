@@ -120,7 +120,7 @@ class listener implements EventSubscriberInterface
 			$topic_row['body_class'] = $view.' '.$view.'_'.$desc[2];
 
 			// Position
-			preg_match ('/\[([-0-9\.]*)[, ]*([-0-9\.]*)\]/', $topic_row['geo_json'], $ll);
+			preg_match ('/\[([-0-9\.]*)[, ]*([-0-9\.]*)\]/', @$topic_row['geo_json'], $ll);
 			if ($ll) {
 				$topic_row['forum_image'] = $topic_data['forum_image'];
 				$topic_row['map_type'] = $desc[2];
@@ -130,8 +130,10 @@ class listener implements EventSubscriberInterface
 
 				// Calcul de l'altitude avec mapquest
 				global $mapKeys;
-				if (array_key_exists ('geo_altitude', $topic_row) && !$topic_row['geo_altitude'] &&
-					@$mapKeys['keys-mapquest']) {
+				if (array_key_exists ('geo_altitude', $topic_row) &&
+					!isset ($topic_row['geo_altitude']) &&
+					@$mapKeys['keys-mapquest'])
+				{
 					$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
 						$mapKeys['keys-mapquest'].
 						'&latLngCollection='.
@@ -151,16 +153,20 @@ class listener implements EventSubscriberInterface
 					$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.
 						$ll[1].','.$ll[2].','.$ll[1].','.$ll[2];
 					$wri_export = json_decode (@file_get_contents ($f_wri_export));
-					// récupère tous les polygones englobantz
+
+					// Récupère tous les polygones englobantz
 					if($wri_export->features)
 						foreach ($wri_export->features AS $f)
 							$ms [$f->properties->type->id] = $f->properties->nom;
+
 					// Trie le type de polygone le plus petit
-					if (isset ($ms))
+					if (isset ($ms)) {
 						ksort ($ms);
 
-					// Update the template data
-					$topic_row['geo_massif'] = @$ms[array_keys($ms)[0]] ? $ms[array_keys($ms)[0]].'~' : '~';
+						// Update the template data
+						$topic_row['geo_massif'] = $ms[array_keys($ms)[0]].'~';
+					} else
+						$topic_row['geo_massif'] = '~';
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_massif = '".addslashes ($topic_row['geo_massif'])."' WHERE post_id = $post_id";
@@ -171,7 +177,7 @@ class listener implements EventSubscriberInterface
 			// Calcul du cluster (managé par le serveur)
 			if (array_key_exists ('geo_cluster', $topic_row) && !$topic_row['geo_cluster']) {
 				$clusters_by_degree = 10;
-				$geo_center = json_decode ($topic_row['geo_center'])->coordinates;
+				$geo_center = json_decode (@$topic_row['geo_center'])->coordinates;
 				$topic_row['geo_cluster'] =
 					intval ((180 + $geo_center[0]) * $clusters_by_degree) * 360 * $clusters_by_degree +
 					intval ((180 + $geo_center[1]) * $clusters_by_degree);
