@@ -19,7 +19,7 @@
 //BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
-			zIndex: 2, // Above the base layer & the clusters
+			zIndex: 10, // Features : above the base layer
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			styleOptionsClusterFunction: styleOptionsCluster,
@@ -155,7 +155,7 @@ function layerVector(opt) {
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
-				zIndex: 3, // Above the features
+				zIndex: 30, // Hover : above the the features
 				//BEST declutter: true, //To avoid dumping the other labels
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
@@ -261,7 +261,6 @@ function layerVectorCluster(options) {
 		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
-			zIndex: 1, // Above the base layer
 			//BEST declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(), // Get the selector status 
@@ -531,7 +530,7 @@ function styleOptionsLabel(text, properties, important) {
 
 	return {
 		text: new ol.style.Text(styleTextOptions),
-		zIndex: 3, // Above the the clusters
+		zIndex: 20, // Label : above the the clusters
 	};
 }
 

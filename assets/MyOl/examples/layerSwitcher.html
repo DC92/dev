@@ -53,7 +53,7 @@ const countries = new ol.layer.Vector({
 		url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
 		format: new ol.format.GeoJSON(),
 	}),
-	zIndex: 1, // Above the base layer
+	zIndex: 50, // Above the layers
 });
 
 new ol.Map({
