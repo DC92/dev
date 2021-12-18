@@ -131,17 +131,18 @@ class listener implements EventSubscriberInterface
 				// Calcul de l'altitude avec mapquest
 				global $mapKeys;
 				if (array_key_exists ('geo_altitude', $topic_row) &&
-					!isset ($topic_row['geo_altitude']) &&
+					!@$topic_row['geo_altitude'] &&
 					@$mapKeys['keys-mapquest'])
 				{
 					$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
 						$mapKeys['keys-mapquest'].
 						'&latLngCollection='.
 						$ll[2].','.$ll[1];
-					preg_match('/"height":([-0-9]+)/', @file_get_contents ($mapquest), $match);
+					$mapquest_result =@file_get_contents ($mapquest) ;
+					preg_match('/"height":([-0-9]+)/', $mapquest_result, $match);
 
 					// Update the template data
-					$topic_row['geo_altitude'] = $match ? $match[1].'~' : '~';
+					$topic_row['geo_altitude'] = $match && $match[1] > 0 ? $match[1].'~' : '~';
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";     
