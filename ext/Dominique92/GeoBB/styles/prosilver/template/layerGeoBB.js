@@ -16,6 +16,7 @@ var map = new ol.Map({
 				selectorName: 'geobb-features',
 				maxResolution: 100,
 				distance: 30,
+				zIndex: 10,
 				attribution: 'Chemineur',
 			}),
 			// High map resolution : clusters
@@ -25,6 +26,7 @@ var map = new ol.Map({
 				selectorName: 'geobb-features',
 				minResolution: 100,
 				distance: 30,
+				zIndex: 10,
 			}),
 		],
 	}),

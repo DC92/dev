@@ -511,7 +511,7 @@ function controlLayerSwitcher(baseLayers, options) {
 //BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
-			zIndex: 10, // Features : above the base layer
+			zIndex: 10, // Features : above the base layer (1)
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			styleOptionsClusterFunction: styleOptionsCluster,
@@ -594,7 +594,7 @@ function layerVector(opt) {
 		}
 	});
 
-	// style callback function for the layer
+	// Style callback function for the layer
 	function style(feature) {
 		const properties = feature.getProperties();
 
@@ -1022,7 +1022,7 @@ function styleOptionsLabel(text, properties, important) {
 
 	return {
 		text: new ol.style.Text(styleTextOptions),
-		zIndex: 20, // Label : above the the clusters
+		zIndex: 40, // Label : above the the features & editor
 	};
 }
 
@@ -2181,7 +2181,7 @@ function layerEditGeoJson(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 40, // Editor cursor : above the features
+			zIndex: 20, // Editor & cursor : above the features
 			style: style,
 		}),
 		snap = new ol.interaction.Snap({
