@@ -19,7 +19,7 @@
 //BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
-			zIndex: 10, // Features : above the base layer (1)
+			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			styleOptionsClusterFunction: styleOptionsCluster,
@@ -243,15 +243,15 @@ function layerVector(opt) {
  * Clustering features
  */
 function layerVectorCluster(options) {
+	// Detailed layer
+	const layer = layerVector(options);
+
 	// No clustering
 	if (!options.distance)
-		return layerVector(options);
+		return layer;
 
-	// Detailed layer
-	const layer = layerVector(options),
-
-		// Clusterized source
-		clusterSource = new ol.source.Cluster({
+	// Clusterized source
+	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			distance: options.distance,
 			geometryFunction: geometryFunction,
@@ -263,7 +263,8 @@ function layerVectorCluster(options) {
 			source: clusterSource,
 			//BEST declutter: true,
 			style: clusterStyle,
-			visible: layer.getVisible(), // Get the selector status 
+			visible: layer.getVisible(),
+			zIndex: layer.getZIndex(),
 		}, options));
 
 	// Propagate setVisible following the selector status
