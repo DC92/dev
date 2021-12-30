@@ -72,12 +72,14 @@ new ol.Map({
 			selectorName: 'geobb-features',
 			maxResolution: 300,
 			distance: 30,
+			zIndex: 10, // Above the base layer
 		}),
 		layerGeoBB({
 			selectorName: 'geobb-features',
 			subLayer: 'cluster',
 			minResolution: 300,
 			distance: 30,
+			zIndex: 10,
 		}),
 	],
 });

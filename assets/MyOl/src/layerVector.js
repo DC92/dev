@@ -97,7 +97,7 @@ function layerVector(opt) {
 					options
 				) : {};
 
-			// detect lines or polygons
+			// Detect lines or polygons
 			evt.features[f].display.area = ol.extent.getArea(evt.features[f].getGeometry().getExtent());
 		}
 	});
@@ -120,7 +120,7 @@ function layerVector(opt) {
 			const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
 
 			//HACK to render the html entities in the canvas
-			if (styleOptions.text) {
+			if (styleOptions && styleOptions.text) {
 				elLabel.innerHTML = styleOptions.text.getText();
 
 				if (elLabel.innerHTML) {

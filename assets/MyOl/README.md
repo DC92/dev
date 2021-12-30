@@ -103,5 +103,5 @@ FILES
 * proj4/... : Coordinate transformation software proj4js V2.5.0 from [Proj4](https://github.com/proj4js/proj4js/releases/latest)
 * index.html : Simple demo
 * examples/... : Demos or ongoing developments
-* examples/polyfill.js : pour IE, generate with https://polyfill.io/v3/url-builder/
+* examples/polyfill.min.js : pour IE, generate with https://polyfill.io/v3/url-builder/
 * gps/... : Off line demo with GPS capabilities
