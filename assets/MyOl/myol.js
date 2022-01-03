@@ -289,6 +289,7 @@ function layersCollection() {
 		'Angleterre': layerOS('Outdoor_3857'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
+		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': layerGoogle('s'),
 	};
 }
@@ -311,7 +312,6 @@ function layersDemo() {
 		'Kompas': layerKompass('KOMPASS'),
 
 		'Bing': layerBing('Road'),
-		'Bing photo': layerBing('Aerial'),
 		'Bing hybrid': layerBing('AerialWithLabels'),
 
 		'Google road': layerGoogle('m'),
@@ -336,8 +336,8 @@ function layersDemo() {
 		'IGN forêt': layerIGN('LANDCOVER.FORESTAREAS', 'png'),
 		'IGN limites': layerIGN('ADMINISTRATIVEUNITS.BOUNDARIES', 'png'),
 
-		'Swiss photo': layerSwissTopo('ch.swisstopo.swissimage'),
-		'Espagne photo': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
+		'Photo Swiss': layerSwissTopo('ch.swisstopo.swissimage'),
+		'Photo Espagne': layerSpain('pnoa-ma', 'OI.OrthoimageCoverage'),
 
 		'SHADOW': layerIGN('ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW', 'png'),
 		'Etat major': layerIGN('GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40'),
