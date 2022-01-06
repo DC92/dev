@@ -1080,7 +1080,7 @@ function styleOptionsCluster(feature, properties) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/',
+		host: '//chemineur.fr/', //TODO investiger pourquoi c'est pris par urlFunction & convertProperties
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
@@ -1128,11 +1128,9 @@ function layerGeoBB(options) {
  */
 function layerWri(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//www.refuges.info/',
-		nb_points: 'all',
+		host: '//www.refuges.info/', //TODO investiger pourquoi c'est pris par urlFunction & convertProperties
 		urlFunction: function(options, bbox, selection) {
-			return options.host + 'api/bbox' +
-				'?nb_points=' + options.nb_points +
+			return options.host + 'api/bbox?nb_points=all' +
 				'&type_points=' + selection.join(',') +
 				'&bbox=' + bbox.join(',');
 		},
