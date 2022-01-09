@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="images/favicon.png" rel="icon" type="image/png" />
+
+	<!-- IE compatibility -->
+	<script nomodule src="../ol-681/polyfill.min.js"></script>
+
+	<!-- Openlayers - last Ol version compatible with IE -->
+	<link  href="../ol-681/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol-681/ol.js"></script>
+
+	<!-- My Openlayers -->
+	<link  href="../myol.css" type="text/css" rel="stylesheet">
+	<script src="../myol.js"></script>
+
+	<style>
+		#map {
+			clear: both;
+			width: 100%;
+			max-width: 600px;
+			height: 80vw;
+			max-height: 400px;
+		}
+		.selector {
+			float: left;
+			border-right: solid;
+			padding: 5px
+		}
+	</style>
+</head>
+
+<body>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+
+	<div id="map"></div>
+
+	<div id="additional-selector" >
+		<hr />
+		chemineur.fr <input type="checkbox" name="geobb-features" checked="checked" />
+		<ul>
+			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="geobb-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="geobb-features" value="23" />Montagne</li>
+		</ul>
+	</div>
+
+	<script>
+// Must be after the "map" tag
+new ol.Map({
+	target: 'map',
+	controls: controlsCollection().concat(controlLayerSwitcher()),
+	layers: [
+		// Low map resolution : points
+		layerGeoBB({
+			selectorName: 'geobb-features',
+			maxResolution: 100,
+			distance: 30,
+			attribution: 'Chemineur',
+		}),
+		// High map resolution : clusters
+		layerGeoBB({
+			subLayer: 'cluster',
+			selectorName: 'geobb-features',
+			minResolution: 100,
+			distance: 30,
+		}),
+	],
+});
+
+//TODO add editor
+	</script>
+	<script src="print_script.js"></script>
+</body>
+</html>

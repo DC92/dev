@@ -82,7 +82,6 @@ function layerVector(opt) {
 	});
 
 	// Callback function to define feature display from the properties received from the server
-	//BEST BUG IE n'appelle pas featuresloadend avec overpass. Impact overpass
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
@@ -392,7 +391,7 @@ function memCheckbox(selectorName, callback) {
 		if (selectorName)
 			document.cookie =
 			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
-			'path=/; SameSite=Lax; ' +
+			'path=/; SameSite=Lax; Secure; ' +
 			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')
@@ -447,7 +446,7 @@ function styleOptionsIcon(iconUrl) {
 		return {
 			image: new ol.style.Icon({
 				src: iconUrl,
-				imgSize: [24, 24], // IE compatibility //BEST automatic detect
+				imgSize: [24, 24], // IE compatibility //BEST automatic detect or polyfill
 			}),
 		};
 }

@@ -195,7 +195,6 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-//BEST BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie (lié à n'appelle pas featuresloadend)
 function layerOverpass(options) {
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({

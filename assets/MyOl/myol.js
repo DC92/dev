@@ -257,6 +257,9 @@ function layerOS(subLayer) {
  * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerBing(subLayer) {
+	if (typeof mapKeys != 'object' || !mapKeys || !mapKeys.bing)
+		return null;
+
 	const layer = new ol.layer.Tile();
 
 	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
@@ -269,7 +272,7 @@ function layerBing(subLayer) {
 		}
 	});
 
-	return typeof mapKeys == 'object' && mapKeys.bing ? layer : null;
+	return layer;
 }
 
 /**
@@ -369,7 +372,6 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
-	//BEST BUG IE don't work on IE. Impact réglage mode transparent
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -462,7 +464,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 	function selectBaseLayer(evt) {
 		// Set the baselayer cookie
-		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Lax; expires=' +
+		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Lax; Secure; expires=' +
 			new Date(2100, 0).toUTCString();
 
 		// Manage the double selection
@@ -574,7 +576,6 @@ function layerVector(opt) {
 	});
 
 	// Callback function to define feature display from the properties received from the server
-	//BEST BUG IE n'appelle pas featuresloadend avec overpass. Impact overpass
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
@@ -884,7 +885,7 @@ function memCheckbox(selectorName, callback) {
 		if (selectorName)
 			document.cookie =
 			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
-			'path=/; SameSite=Lax; ' +
+			'path=/; SameSite=Lax; Secure; ' +
 			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')
@@ -939,7 +940,7 @@ function styleOptionsIcon(iconUrl) {
 		return {
 			image: new ol.style.Icon({
 				src: iconUrl,
-				imgSize: [24, 24], // IE compatibility //BEST automatic detect
+				imgSize: [24, 24], // IE compatibility //BEST automatic detect or polyfill
 			}),
 		};
 }
@@ -1264,7 +1265,6 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-//BEST BUG IE SCRIPT5007: Impossible d’obtenir la propriété  « toString » d’une référence null ou non définie (lié à n'appelle pas featuresloadend)
 function layerOverpass(options) {
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
@@ -1509,7 +1509,7 @@ function controlPermalink(options) {
 				aEl.href = options.hash + 'map=' + newParams.join('/');
 			if (options.setUrl)
 				location.href = '#map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Lax';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Lax; Secure';
 		}
 	}
 	return control;
@@ -1628,8 +1628,7 @@ function controlGeocoder(options) {
 		title: 'Recherche sur la carte',
 	}, options);
 
-	if (typeof Geocoder != 'function' || // Vérify if geocoder is available
-		document.documentMode) // Not supported in IE
+	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
 		});

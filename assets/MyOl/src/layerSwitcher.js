@@ -21,7 +21,6 @@ function controlLayerSwitcher(baseLayers, options) {
 		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
-	//BEST BUG IE don't work on IE. Impact réglage mode transparent
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -114,7 +113,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 	function selectBaseLayer(evt) {
 		// Set the baselayer cookie
-		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Lax; expires=' +
+		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Lax; Secure; expires=' +
 			new Date(2100, 0).toUTCString();
 
 		// Manage the double selection

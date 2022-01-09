@@ -137,7 +137,7 @@ function controlPermalink(options) {
 				aEl.href = options.hash + 'map=' + newParams.join('/');
 			if (options.setUrl)
 				location.href = '#map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Lax';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Lax; Secure';
 		}
 	}
 	return control;
@@ -256,8 +256,7 @@ function controlGeocoder(options) {
 		title: 'Recherche sur la carte',
 	}, options);
 
-	if (typeof Geocoder != 'function' || // Vérify if geocoder is available
-		document.documentMode) // Not supported in IE
+	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
 		});

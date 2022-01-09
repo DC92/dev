@@ -184,6 +184,9 @@ function layerOS(subLayer) {
  * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerBing(subLayer) {
+	if (typeof mapKeys != 'object' || !mapKeys || !mapKeys.bing)
+		return null;
+
 	const layer = new ol.layer.Tile();
 
 	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
@@ -196,7 +199,7 @@ function layerBing(subLayer) {
 		}
 	});
 
-	return typeof mapKeys == 'object' && mapKeys.bing ? layer : null;
+	return layer;
 }
 
 /**
