@@ -1,5 +1,8 @@
 //BEST CHEMINEUR
 ================
+//TODO BUG carte création trop large quand grande fenetre
+//TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
+
 Voir forum Evolutions & bugs sur chemineur.fr
 Purger la base des liens photos externes
 Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html

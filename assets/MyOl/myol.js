@@ -110,11 +110,10 @@ function layerMRI() {
 /**
  * Kompas (Austria)
  * Requires layerOSM
- * This will not work on http: pages. No workarond available !
  */
 function layerKompass(subLayer) {
 	return layerOSM(
-		'http://ec{0-3}.cdn.ecmaps.de/WmsGateway.ashx.jpg?' + // Not available via https
+		'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon&' + // Not available via https
 		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
@@ -233,6 +232,56 @@ function layerSpain(server, subLayer) {
 		}),
 	});
 }
+
+/**
+ * Italy IGM
+ * Requires layerTileIncomplete
+ */
+/*//TODO DEBUG
+function layerIGM() {
+	let url = 'IGM_100000',
+		layer = 'MB.IGM100000';
+	
+	return new ol.layer.Tile({
+		source: new ol.source.TileWMS({
+			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/IGM_250000.map',
+			params: {
+				//layers: layer',
+				service: 'WMS',
+				request: 'GetMap',
+				layers: 'CB.IGM250000',
+				styles: '',
+				format: 'image/jpeg',
+				transparent: false,
+				version: '1.1.1',
+				height: 512,
+				width: 512,
+				srs: 'EPSG:900913',
+			},
+			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
+		}),
+	});
+
+	function igmSource(url, layer) {
+		return new ol.source.TileWMS({
+			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
+			params: {
+				layers: layer,
+			},
+			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
+		});
+	}
+
+	return layerTileIncomplete({
+		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
+		sources: {
+			100: igmSource('IGM_250000', 'CB.IGM250000'),
+			25: igmSource('IGM_100000', 'MB.IGM100000'),
+			5: igmSource('IGM_25000', 'CB.IGM25000'),
+		},
+	});
+}
+*/
 
 /**
  * Ordnance Survey : Great Britain
