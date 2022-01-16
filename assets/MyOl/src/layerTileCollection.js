@@ -162,43 +162,26 @@ function layerSpain(server, subLayer) {
 
 /**
  * Italy IGM
- * Requires layerTileIncomplete
  */
-/*//TODO DEBUG
+//TODO DEBUG
 function layerIGM() {
 	let url = 'IGM_100000',
 		layer = 'MB.IGM100000';
 	
 	return new ol.layer.Tile({
+//			maxResolution: 50,
 		source: new ol.source.TileWMS({
-			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/IGM_250000.map',
-			params: {
-				//layers: layer',
-				service: 'WMS',
-				request: 'GetMap',
-				layers: 'CB.IGM250000',
-				styles: '',
-				format: 'image/jpeg',
-				transparent: false,
-				version: '1.1.1',
-				height: 512,
-				width: 512,
-				srs: 'EPSG:900913',
-			},
-			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
-		}),
-	});
-
-	function igmSource(url, layer) {
-		return new ol.source.TileWMS({
+			// Not available via https
 			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
+/*			url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it&type=x-icon&' +
+				'map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',*/
 			params: {
 				layers: layer,
 			},
-			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer">IGM</a>',
-		});
-	}
-
+			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
+		}),
+	});
+/*
 	return layerTileIncomplete({
 		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
 		sources: {
@@ -207,8 +190,8 @@ function layerIGM() {
 			5: igmSource('IGM_25000', 'CB.IGM25000'),
 		},
 	});
-}
 */
+}
 
 /**
  * Ordnance Survey : Great Britain
@@ -275,6 +258,7 @@ function layersCollection() {
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
+		'Italy': layerIGM(),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'Hike & Bike': layerOSM(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
