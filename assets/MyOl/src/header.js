@@ -9,6 +9,8 @@ if (window.PointerEvent === undefined) {
 	document.head.appendChild(script);
 }
 
+//BEST ALL for (let => for (const
+
 /**
  * Display OL version
  */

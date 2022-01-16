@@ -14,7 +14,7 @@ if ($s)
 $url = @$servers[$s];
 
 if ($url && $type) {
-	$img = file_get_contents ($url.'?'.http_build_query ($_GET));
+	$img = file_get_contents ($url.'?'.http_build_query ($_GET)); //TODO error 500
 	header('Content-Type: image/'.$type);
 	header('Cache-Control: max-age='.(31*24*3600));
 	echo $img;

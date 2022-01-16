@@ -19,6 +19,8 @@ if (window.PointerEvent === undefined) {
 	document.head.appendChild(script);
 }
 
+//BEST ALL for (let => for (const
+
 /**
  * Display OL version
  */
@@ -113,8 +115,8 @@ function layerMRI() {
  */
 function layerKompass(subLayer) {
 	return layerOSM(
-		'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon&' + // Not available via https
-		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
+		'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
+		'&Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
 }
@@ -148,11 +150,12 @@ function layerGoogle(subLayer) {
 /**
  * Stamen http://maps.stamen.com
  */
-function layerStamen(subLayer) {
+function layerStamen(subLayer, min) {
 	return new ol.layer.Tile({
 		source: new ol.source.Stamen({
 			layer: subLayer,
 		}),
+		minResolution: min || 0,
 	});
 }
 
@@ -236,34 +239,28 @@ function layerSpain(server, subLayer) {
 /**
  * Italy IGM
  */
-//TODO DEBUG
 function layerIGM() {
-	let url = 'IGM_100000',
-		layer = 'MB.IGM100000';
-	
-	return new ol.layer.Tile({
-//			maxResolution: 50,
-		source: new ol.source.TileWMS({
-			// Not available via https
-			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
-/*			url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it&type=x-icon&' +
-				'map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',*/
-			params: {
-				layers: layer,
-			},
-			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
-		}),
-	});
-/*
-	return layerTileIncomplete({
-		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
-		sources: {
-			100: igmSource('IGM_250000', 'CB.IGM250000'),
-			25: igmSource('IGM_100000', 'MB.IGM100000'),
-			5: igmSource('IGM_25000', 'CB.IGM25000'),
-		},
-	});
-*/
+	return [
+		subLayerIGM('IGM_25000', 'CB.IGM25000', 5, 10),
+		subLayerIGM('IGM_100000', 'MB.IGM100000', 10, 20),
+		subLayerIGM('IGM_250000', 'CB.IGM250000', 20, 80),
+		layerStamen('terrain', 80),
+	];
+
+	function subLayerIGM(url, layer, min, max) {
+		return new ol.layer.Tile({
+			minResolution: min,
+			maxResolution: max,
+			source: new ol.source.TileWMS({
+				url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it&type=png' + // Not available via https
+					'&map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
+				params: {
+					layers: layer,
+				},
+				attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
+			}),
+		});
+	}
 }
 
 /**
@@ -322,6 +319,7 @@ function layersCollection() {
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS('Outdoor_3857'),
+		'Italie': layerIGM(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
 		'Photo Bing': layerBing('Aerial'),
@@ -331,7 +329,6 @@ function layersCollection() {
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
-		'Italy': layerIGM(),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'Hike & Bike': layerOSM(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
@@ -434,8 +431,12 @@ function controlLayerSwitcher(baseLayers, options) {
 		// Build html baselayers selectors
 		for (let name in baseLayers)
 			if (baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
+				// Make all choices an array of layers
+				if (!baseLayers[name].length)
+					baseLayers[name] = [baseLayers[name]];
+
 				const selectionEl = document.createElement('div'),
-					inputId = 'l' + baseLayers[name].ol_uid + (name ? '-' + name : '');
+					inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
 
 				control.element.appendChild(selectionEl);
 				selectionEl.innerHTML =
@@ -445,8 +446,10 @@ function controlLayerSwitcher(baseLayers, options) {
 				selectionEl.firstChild.onclick = selectBaseLayer;
 				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				baseLayers[name].setVisible(false); // Don't begin to get the tiles yet
-				map.addLayer(baseLayers[name]);
+				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
+					baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
+					map.addLayer(baseLayers[name][l]);
+				}
 			}
 
 		displayBaseLayers(); // Init layers
@@ -467,8 +470,11 @@ function controlLayerSwitcher(baseLayers, options) {
 		for (let name in baseLayers)
 			if (baseLayers[name]) {
 				baseLayers[name].inputEl.checked = false;
-				baseLayers[name].setVisible(false);
-				baseLayers[name].setOpacity(1);
+				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
+					//for (const layer of baseLayers[name]) {
+					baseLayers[name][l].setVisible(false);
+					baseLayers[name][l].setOpacity(1);
+				}
 			}
 
 		// Baselayer default is the first of the selection
@@ -476,20 +482,23 @@ function controlLayerSwitcher(baseLayers, options) {
 			selectedBaseLayerName = Object.keys(baseLayers)[0];
 
 		baseLayers[selectedBaseLayerName].inputEl.checked = true;
-		baseLayers[selectedBaseLayerName].setVisible(true);
+		for (let l = 0; l < baseLayers[selectedBaseLayerName].length; l++) //HACK IE
+			baseLayers[selectedBaseLayerName][l].setVisible(true);
 
 		if (lastBaseLayerName) {
 			baseLayers[lastBaseLayerName].inputEl.checked = true;
-			baseLayers[lastBaseLayerName].setVisible(true);
+			for (let l = 0; l < baseLayers[lastBaseLayerName].length; l++) //HACK IE
+				baseLayers[lastBaseLayerName][l].setVisible(true);
 		}
 		displayTransparencyRange();
 	}
 
 	function displayTransparencyRange() {
 		if (transparentBaseLayerName) {
-			baseLayers[transparentBaseLayerName].setOpacity(
-				rangeContainerEl.firstChild.value / 100
-			);
+			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++) //HACK IE
+				baseLayers[transparentBaseLayerName][l].setOpacity(
+					rangeContainerEl.firstChild.value / 100
+				);
 			rangeContainerEl.className = 'double-layer';
 		} else
 			rangeContainerEl.className = 'single-layer';

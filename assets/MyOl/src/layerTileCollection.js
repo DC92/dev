@@ -40,8 +40,8 @@ function layerMRI() {
  */
 function layerKompass(subLayer) {
 	return layerOSM(
-		'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon&' + // Not available via https
-		'Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
+		'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
+		'&Experience=ecmaps&MapStyle=' + subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
 		'<a href="http://www.kompass.de/livemap/">KOMPASS</a>'
 	);
 }
@@ -75,11 +75,12 @@ function layerGoogle(subLayer) {
 /**
  * Stamen http://maps.stamen.com
  */
-function layerStamen(subLayer) {
+function layerStamen(subLayer, min) {
 	return new ol.layer.Tile({
 		source: new ol.source.Stamen({
 			layer: subLayer,
 		}),
+		minResolution: min || 0,
 	});
 }
 
@@ -163,34 +164,28 @@ function layerSpain(server, subLayer) {
 /**
  * Italy IGM
  */
-//TODO DEBUG
 function layerIGM() {
-	let url = 'IGM_100000',
-		layer = 'MB.IGM100000';
-	
-	return new ol.layer.Tile({
-//			maxResolution: 50,
-		source: new ol.source.TileWMS({
-			// Not available via https
-			url: 'http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
-/*			url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it&type=x-icon&' +
-				'map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',*/
-			params: {
-				layers: layer,
-			},
-			attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
-		}),
-	});
-/*
-	return layerTileIncomplete({
-		extent: [660124, 4131313, 2113957, 5958411], // EPSG:6875 (Italie)
-		sources: {
-			100: igmSource('IGM_250000', 'CB.IGM250000'),
-			25: igmSource('IGM_100000', 'MB.IGM100000'),
-			5: igmSource('IGM_25000', 'CB.IGM25000'),
-		},
-	});
-*/
+	return [
+		subLayerIGM('IGM_25000', 'CB.IGM25000', 5, 10),
+		subLayerIGM('IGM_100000', 'MB.IGM100000', 10, 20),
+		subLayerIGM('IGM_250000', 'CB.IGM250000', 20, 80),
+		layerStamen('terrain', 80),
+	];
+
+	function subLayerIGM(url, layer, min, max) {
+		return new ol.layer.Tile({
+			minResolution: min,
+			maxResolution: max,
+			source: new ol.source.TileWMS({
+				url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it&type=png' + // Not available via https
+					'&map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
+				params: {
+					layers: layer,
+				},
+				attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
+			}),
+		});
+	}
 }
 
 /**
@@ -249,6 +244,7 @@ function layersCollection() {
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS('Outdoor_3857'),
+		'Italie': layerIGM(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', 'jpeg', 'pratique'),
 		'Photo Bing': layerBing('Aerial'),
@@ -258,7 +254,6 @@ function layersCollection() {
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
-		'Italy': layerIGM(),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'Hike & Bike': layerOSM(
 			'http://{a-c}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png',
