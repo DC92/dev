@@ -243,8 +243,8 @@ function layerIGM() {
 	return [
 		subLayerIGM('IGM_25000', 'CB.IGM25000', 5, 10),
 		subLayerIGM('IGM_100000', 'MB.IGM100000', 10, 20),
-		subLayerIGM('IGM_250000', 'CB.IGM250000', 20, 80),
-		layerStamen('terrain', 80),
+		subLayerIGM('IGM_250000', 'CB.IGM250000', 20, 120),
+		layerStamen('terrain', 120),
 	];
 
 	function subLayerIGM(url, layer, min, max) {
