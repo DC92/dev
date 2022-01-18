@@ -90,7 +90,7 @@ function controlLayerSwitcher(baseLayers, options) {
 			if (baseLayers[name]) {
 				baseLayers[name].inputEl.checked = false;
 				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
-					//for (const layer of baseLayers[name]) {
+					//for (let layer of baseLayers[name]) {
 					baseLayers[name][l].setVisible(false);
 					baseLayers[name][l].setOpacity(1);
 				}
