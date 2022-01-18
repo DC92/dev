@@ -131,19 +131,23 @@ function layerSwissTopo(layer1) {
 		matrixIds[r] = r;
 	}
 
-	return new ol.layer.Tile({
-		source: new ol.source.WMTS(({
-			crossOrigin: 'anonymous',
-			url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer1 + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-			tileGrid: new ol.tilegrid.WMTS({
-				origin: ol.extent.getTopLeft(projectionExtent),
-				resolutions: resolutions,
-				matrixIds: matrixIds,
-			}),
-			requestEncoding: 'REST',
-			attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
-		})),
-	});
+	return [
+		layerStamen('terrain', 300),
+		new ol.layer.Tile({
+			maxResolution: 300,
+			source: new ol.source.WMTS(({
+				crossOrigin: 'anonymous',
+				url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer1 + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
+				tileGrid: new ol.tilegrid.WMTS({
+					origin: ol.extent.getTopLeft(projectionExtent),
+					resolutions: resolutions,
+					matrixIds: matrixIds,
+				}),
+				requestEncoding: 'REST',
+				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
+			})),
+		}),
+	];
 }
 
 /**
@@ -203,7 +207,7 @@ function layerOS(subLayer) {
 				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer +
 					'/{z}/{x}/{y}.png?key=' + mapKeys.os,
 			}),
-		})
+		}),
 	] : null;
 }
 
