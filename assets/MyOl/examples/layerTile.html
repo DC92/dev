@@ -52,13 +52,15 @@ const mapKeys = {
 };
 	</script>
 	<script>
-new ol.Map({
+const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
-//		center: [700000, 5600000],
+		center: [-700000, 7000000], // Angleterre
+		zoom: 6,
+//		center: [700000, 5600000], // Sud est
 //		zoom: 7,
-		center: [850000, 5630000], // Turin
-		zoom: 11,
+//		center: [850000, 5630000], // Turin
+//		zoom: 11,
 	}),
 	controls: [
 		new ol.control.Zoom(),
@@ -67,6 +69,12 @@ new ol.Map({
 });
 	</script>
 	<script src="print_script.js"></script>
+	<script>
+const v = map.getView();
+v.on('change:resolution', function() {
+	console.log('resolution = ' + Math.round(v.getResolutionForZoom(v.getZoom())));
+});
+	</script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Check all baselayers</div>

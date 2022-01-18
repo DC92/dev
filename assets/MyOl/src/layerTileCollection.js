@@ -193,17 +193,18 @@ function layerIGM() {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
-	//BEST carte stamen hors zoom ou extent
-
-	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ?
+	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ? [
+		layerStamen('terrain', 1700),
 		new ol.layer.Tile({
 			extent: [-1198263, 6365000, 213000, 8702260],
-			minZoom: 6.5,
-			maxZoom: 16.4,
+			minResolution: 2,
+			maxResolution: 1700,
 			source: new ol.source.XYZ({
-				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer + '/{z}/{x}/{y}.png?key=' + mapKeys.os,
+				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer +
+					'/{z}/{x}/{y}.png?key=' + mapKeys.os,
 			}),
-		}) : null;
+		})
+	] : null;
 }
 
 /**
