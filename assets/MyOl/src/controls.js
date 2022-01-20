@@ -137,7 +137,7 @@ function controlPermalink(options) {
 				aEl.href = options.hash + 'map=' + newParams.join('/');
 			if (options.setUrl)
 				location.href = '#map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Lax; Secure';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=None';
 		}
 	}
 	return control;

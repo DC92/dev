@@ -1,3 +1,5 @@
+//TODO BUG page équipe : Effectivement, la phrase de la page équipe dupliquée par un bug du logiciel qui bégaye.
+
 //TODO GYM TOUTE LA LISTE
 
 GYM résumé => ... en savoir plus
