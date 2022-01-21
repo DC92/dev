@@ -391,7 +391,7 @@ function memCheckbox(selectorName, callback) {
 		if (selectorName)
 			document.cookie =
 			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
-			'path=/; SameSite=None; ' +
+			'path=/; SameSite=Strict; ' +
 			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')

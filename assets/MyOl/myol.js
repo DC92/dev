@@ -509,7 +509,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 	function selectBaseLayer(evt) {
 		// Set the baselayer cookie
-		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=None; expires=' +
+		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Strict; expires=' +
 			new Date(2100, 0).toUTCString();
 
 		// Manage the double selection
@@ -930,7 +930,7 @@ function memCheckbox(selectorName, callback) {
 		if (selectorName)
 			document.cookie =
 			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
-			'path=/; SameSite=None; ' +
+			'path=/; SameSite=Strict; ' +
 			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
 
 		if (inputEls.length && typeof callback == 'function')
@@ -1554,7 +1554,7 @@ function controlPermalink(options) {
 				aEl.href = options.hash + 'map=' + newParams.join('/');
 			if (options.setUrl)
 				location.href = '#map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=None';
+			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
 		}
 	}
 	return control;
