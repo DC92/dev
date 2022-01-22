@@ -174,14 +174,16 @@ class listener implements EventSubscriberInterface
 			// Calcul du cluster (managé par le serveur)
 			if (array_key_exists ('geo_cluster', $topic_row) && !$topic_row['geo_cluster']) {
 				$clusters_by_degree = 10;
-				$geo_center = json_decode (@$topic_row['geo_center'])->coordinates;
-				$topic_row['geo_cluster'] =
-					intval ((180 + $geo_center[0]) * $clusters_by_degree) * 360 * $clusters_by_degree +
-					intval ((180 + $geo_center[1]) * $clusters_by_degree);
+				$geo_center = json_decode (@$topic_row['geo_center']);
+				if ($geo_center) {
+					$topic_row['geo_cluster'] =
+						intval ((180 + $geo_center->coordinates[0]) * $clusters_by_degree) * 360 * $clusters_by_degree +
+						intval ((180 + $geo_center->coordinates[1]) * $clusters_by_degree);
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_cluster = '{$topic_row['geo_cluster']}' WHERE post_id = $post_id";
 					$this->db->sql_query($sql);
+				}
 			}
 		}
 
