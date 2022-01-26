@@ -65,6 +65,7 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 			'core.page_header' => 'page_header',
+			'core.gen_sort_selects_after' => 'gen_sort_selects_after',
 
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
@@ -117,6 +118,14 @@ class listener implements EventSubscriberInterface
 				'adm', // core styles // Needed for template/adm/...
 			]);
 		*/
+	}
+
+	function gen_sort_selects_after ($vars) {
+		/* Force display sort & direction */
+		if (defined('MYPHPBB_SORT_KEY'))
+			$vars['sort_key'] = MYPHPBB_SORT_KEY;
+		if (defined('MYPHPBB_SORT_DIR'))
+			$vars['sort_dir'] = MYPHPBB_SORT_DIR;
 	}
 
 	/**
