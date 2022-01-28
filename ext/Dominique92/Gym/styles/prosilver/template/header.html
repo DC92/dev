@@ -28,6 +28,11 @@
 <div class="banniere">
 	<div class="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
+<!-- //TODO aller à viewforum.php?f=1 après connexion -->
+			<a href="viewforum.php?f=1" title="Modification" class="button button-icon-only">
+				<i class="icon fa-pencil"></i>
+			</a>
+<!-- IF 0 -->
 			<a href="ucp.php?i=ucp_profile&mode=reg_details" title="{L_PROFILE}">{S_USERNAME}</a>
 			<ul><li>
 					<a href="viewforum.php?f=1">Rubriques</a>
@@ -48,6 +53,7 @@
 				</li><li>
 					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
 			</li></ul>
+<!-- ENDIF -->
 		<!-- ELSE -->
 			<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
 				<i class="icon fa-pencil"></i>

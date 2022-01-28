@@ -49,6 +49,9 @@ class listener implements EventSubscriberInterface
 			'core.page_header' => 'page_header',
 			'core.page_footer_after' => 'page_footer_after',
 
+			// Index
+			'core.index_modify_page_title' => 'index_modify_page_title',
+
 			// Viewtopic
 			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
@@ -68,15 +71,17 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
-		// Includes language and style files of this extension
-		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
-
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
 				$this->ext_path.'styles',
-				'styles', // core styles
+				'styles', // Core styles
 			]);
+
+		return; //TODO
+
+		// Includes language and style files of this extension
+		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
 		// Assign requested template
 		foreach ($this->args AS $k=>$v)
@@ -85,22 +90,11 @@ class listener implements EventSubscriberInterface
 		$this->popule_posts();
 	}
 
-	/**
-		Change le template sur demande
-	*/
-	// Appelé juste avant d'afficher
-	function viewtopic_modify_page_title($vars) {
-		if (strpos($vars['topic_data']['forum_desc'],':gym') !== false &&
-				((!isset ($this->args['f']) && isset ($this->args['t'])) ||
-					$this->args['p']
-				)
-			)
-			$this->my_template = 'viewtopic';
-	}
-
 	// Appelé après viewtopic_modify_page_title & template->set_filenames
 	// Pour les templates inclus [include]template[/include]
 	function page_footer_after() {
+		return; //TODO
+
 		$template = $this->request->variable (
 			'template',
 			isset ($this->my_template) ? $this->my_template : ''
@@ -112,10 +106,67 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+		INDEX.PHP
+	*/
+	function index_modify_page_title($vars) {
+		$menus = [
+			'Présentation' => [],
+			'Activités' => [],
+			'Équipe' => [],
+			'Lieux' => [],
+		];
+
+		// Exploration des horaires
+		$sql = "SELECT equi.post_id AS ei, equi.post_subject AS en,
+				acti.post_id AS ai, acti.post_subject AS an,
+				lieu.post_id AS li, lieu.post_subject AS ln
+			FROM ".POSTS_TABLE." AS p
+				JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
+				JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
+				JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
+			WHERE p.topic_id = 1";
+		$result = $this->db->sql_query($sql);
+
+		while ($row = $this->db->sql_fetchrow($result)) {
+			$menus['Activités'] [$row['en']] = $row['ei'];
+			$menus['Équipe'] [$row['an']] = $row['ai'];
+			$menus['Lieux'] [$row['ln']] = $row['li'];
+		}
+		$this->db->sql_freeresult($result);
+
+		// Exploration des éléments d'accueil
+		$sql = "SELECT *
+			FROM ".POSTS_TABLE." AS p
+			WHERE p.forum_id = 9";
+		$result = $this->db->sql_query($sql);
+
+		while ($row = $this->db->sql_fetchrow($result))
+			$menus['Présentation'] [$row['post_subject']] = $row['post_id'];
+		$this->db->sql_freeresult($result);
+
+		foreach ($menus AS $mk=>$mv) {
+			$this->template->assign_block_vars ('menu', [
+				'TITLE' => $mk,
+				'COULEUR' => $this->couleur (),
+				'COULEUR_TITRE' => $this->couleur (80, 162, 0),
+			]);
+
+			ksort ($mv);
+			foreach ($mv AS $mvk=>$mvv)
+				$this->template->assign_block_vars ('menu.choix', [
+					'POST_ID' => $mvv,
+					'NAME' => $mvk,
+				]);
+		}
+	}
+
+	/**
 		VIEWTOPIC.PHP
 	*/
 	// Called before reading phpbb-posts SQL data
 	function viewtopic_gen_sort_selects_before($vars) {
+		return; //TODO
+
 		// Tri des sous-menus dans le bon ordre
 		$sort_by_sql = $vars['sort_by_sql'];
 		$sort_by_sql['t'] = array_merge (
@@ -125,8 +176,23 @@ class listener implements EventSubscriberInterface
 		$vars['sort_by_sql'] = $sort_by_sql;
 	}
 
+	// Change le template sur demande
+	// Appelé juste avant d'afficher
+	function viewtopic_modify_page_title($vars) {
+		return; //TODO
+
+		if (strpos($vars['topic_data']['forum_desc'],':gym') !== false &&
+				((!isset ($this->args['f']) && isset ($this->args['t'])) ||
+					$this->args['p']
+				)
+			)
+			$this->my_template = 'viewtopic';
+	}
+
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
+		return; //TODO
+
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
 		$p = $this->request->variable ('p', 0);
@@ -148,6 +214,8 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
+		return; //TODO
+
 		$post_row = $vars['post_row'];
 		$post_id = $post_row['POST_ID'];
 		$post_data = $this->all_post_data[$post_id] ?: [];
@@ -236,6 +304,8 @@ class listener implements EventSubscriberInterface
 	*/
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
+		return; //TODO
+
 		$post_data = $vars['post_data'];
 
 		// Conditions d'affichage dépendant du forum
@@ -291,6 +361,8 @@ class listener implements EventSubscriberInterface
 
 	// Called during validation of the data to be saved
 	function submit_post_modify_sql_data($vars) {
+		return; //TODO
+
 		$sql_data = $vars['sql_data'];
 
 		// Get special columns list
@@ -344,6 +416,8 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé par n'importe quelle page de l'administration
 	function adm_page_header() {
+		return; //TODO
+
 		// Create required SQL columns when needed
 		$columns = [
 			'gym_activite',
