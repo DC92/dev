@@ -78,10 +78,10 @@ class listener implements EventSubscriberInterface
 				'styles', // Core styles
 			]);
 
-		return; //TODO
-
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+
+		return; //TODO
 
 		// Assign requested template
 		foreach ($this->args AS $k=>$v)
@@ -135,7 +135,7 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		// Exploration des éléments d'accueil
-		$sql = "SELECT *
+		$sql = "SELECT post_id, post_subject
 			FROM ".POSTS_TABLE." AS p
 			WHERE p.forum_id = 9";
 		$result = $this->db->sql_query($sql);
@@ -158,6 +158,25 @@ class listener implements EventSubscriberInterface
 					'TITLE' => $mvk,
 				]);
 		}
+
+		// Rubriques d'acceuil
+		$sql = "SELECT post_id, post_subject, post_text, bbcode_uid, bbcode_bitfield
+			FROM ".POSTS_TABLE." AS p
+			WHERE p.forum_id = 13
+			ORDER BY post_subject"; //TODO reprendre les valeurs de config.php
+		$result = $this->db->sql_query($sql);
+
+		while ($row = $this->db->sql_fetchrow($result)) {
+			// Traduit les BBcodes
+			$row['display_text'] = generate_text_for_display(
+				$row['post_text'],
+				$row['bbcode_uid'], $row['bbcode_bitfield'],
+				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+			);
+
+			 $this->template->assign_block_vars ('accueil', array_change_key_case ($row, CASE_UPPER));
+		}
+		$this->db->sql_freeresult($result);
 	}
 
 	/**

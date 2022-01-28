@@ -17,20 +17,7 @@
 
 <!-- BEGIN accueil -->
 		<h2>
-			<!-- IF accueil.DATE -->
-				{accueil.DATE}
-				<!-- IF accueil.GYM_HEURE > 0 -->
-					à {accueil.HORAIRE_DEBUT}
-				<!-- ENDIF -->
-				:
-			<!-- ENDIF -->
 			<a href="viewtopic.php?p={accueil.POST_ID}">{accueil.POST_SUBJECT}</a>
-			<!-- IF U_MCP -->
-			<a href="posting.php?mode=edit&f={accueil.FORUM_ID}&p={accueil.POST_ID}"
-				title="Modifier l'évènement {accueil.NOM}" class="button button-icon-only">
-				<i class="icon fa-pencil"></i>
-			</a>
-			<!-- ENDIF -->
 		</h2>
 		<div>
 			{accueil.LIEU}
@@ -38,7 +25,7 @@
 				avec {accueil.ANIMATEUR}
 			<!-- ENDIF -->
 
-			<div>{accueil.RESUME}</div>
+			<div>{accueil.DISPLAY_TEXT}</div>
 		</div>
 <!-- END accueil -->
 
