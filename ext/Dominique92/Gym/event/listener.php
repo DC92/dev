@@ -147,15 +147,15 @@ class listener implements EventSubscriberInterface
 		foreach ($menus AS $mk=>$mv) {
 			$this->template->assign_block_vars ('menu', [
 				'TITLE' => $mk,
-				'COULEUR' => $this->couleur (),
-				'COULEUR_TITRE' => $this->couleur (80, 162, 0),
+				'COLOR' => $this->couleur (),
+				'COLOR_TITLE' => $this->couleur (80, 162, 0),
 			]);
 
 			ksort ($mv);
 			foreach ($mv AS $mvk=>$mvv)
-				$this->template->assign_block_vars ('menu.choix', [
+				$this->template->assign_block_vars ('menu.item', [
 					'POST_ID' => $mvv,
-					'NAME' => $mvk,
+					'TITLE' => $mvk,
 				]);
 		}
 	}
