@@ -1,3 +1,5 @@
+//TODO FAIRE LE MENAGE
+
 const layer = layerVector({
 		url: 'ext/Dominique92/GeoBB/gis.php',
 		convertProperties: function(properties, feature, options) {

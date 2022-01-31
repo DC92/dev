@@ -47,7 +47,6 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 			'core.page_header' => 'page_header',
-			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
 			'core.index_modify_page_title' => 'index_modify_page_title',
@@ -81,45 +80,45 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
-		return; //TODO
-
-		// Assign requested template
-		foreach ($this->args AS $k=>$v)
-			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
-
-		$this->popule_posts();
-	}
-
-	// Appelé après viewtopic_modify_page_title & template->set_filenames
-	// Pour les templates inclus [include]template[/include]
-	function page_footer_after() {
-		return; //TODO
-
-		$template = $this->request->variable (
-			'template',
-			isset ($this->my_template) ? $this->my_template : ''
-		);
-		if ($template)
-			$this->template->set_filenames ([
-				'body' => "@Dominique92_Gym/$template.html",
-			]);
-	}
-
-	/**
-		INDEX.PHP
-	*/
-	function index_modify_page_title($vars) {
+		// MENUS
 		$menus = [
 			'Présentation' => [],
 			'Activités' => [],
 			'Équipe' => [],
 			'Lieux' => [],
 		];
+		$horaire = [];
+		$jours_semaine = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
 
 		// Exploration des horaires
 		$sql = "SELECT equi.post_id AS ei, equi.post_subject AS en,
+
+
+		p.gym_activite,
+		p.gym_lieu,
+		p.gym_acces,
+		p.gym_animateur,
+		p.gym_cert,
+		p.gym_nota,
+		p.gym_jour,
+		p.gym_heure,
+		p.gym_minute,
+		p.gym_duree_heures,
+		p.gym_duree_jours,
+ 		p.gym_scolaire,
+ 		p.gym_semaines,
+		p.gym_accueil,
+ 		p.gym_horaires,
+ 		p.gym_menu,
+ 		p.gym_ordre_menu,
+
+
 				acti.post_id AS ai, acti.post_subject AS an,
-				lieu.post_id AS li, lieu.post_subject AS ln
+				lieu.post_id AS li, lieu.post_subject AS ln,
+
+				equi.post_subject AS animateur,
+				acti.post_subject AS activite,
+				lieu.post_subject AS lieu
 			FROM ".POSTS_TABLE." AS p
 				JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
@@ -128,6 +127,9 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
+			if ($row['gym_jour'])
+				$horaire[$row['gym_jour']][$row['gym_heure']*60 + $row['gym_minute']] = $row;
+
 			$menus['Activités'] [$row['en']] = $row['ei'];
 			$menus['Équipe'] [$row['an']] = $row['ai'];
 			$menus['Lieux'] [$row['ln']] = $row['li'];
@@ -144,21 +146,39 @@ class listener implements EventSubscriberInterface
 			$menus['Présentation'] [$row['post_subject']] = $row['post_id'];
 		$this->db->sql_freeresult($result);
 
-		foreach ($menus AS $mk=>$mv) {
+		foreach ($menus AS $k=>$v) {
 			$this->template->assign_block_vars ('menu', [
-				'TITLE' => $mk,
+				'TITLE' => $k,
 				'COLOR' => $this->couleur (),
 				'COLOR_TITLE' => $this->couleur (80, 162, 0),
 			]);
 
-			ksort ($mv);
-			foreach ($mv AS $mvk=>$mvv)
+			ksort ($v);
+			foreach ($v AS $vk=>$vv)
 				$this->template->assign_block_vars ('menu.item', [
-					'POST_ID' => $mvv,
-					'TITLE' => $mvk,
+					'POST_ID' => $vv,
+					'TITLE' => $vk,
 				]);
 		}
 
+		// Extraction des horaires
+		sort ($horaire);
+		foreach ($horaire AS $j=>$v) {
+			$this->template->assign_block_vars ('jour', [
+				'JOUR' => $jours_semaine[intval ($j)],
+			]);
+
+			sort ($v);
+			foreach ($v AS $h)
+//			foreach ($js AS $h)
+				$this->template->assign_block_vars ('jour.heure', array_change_key_case ($h, CASE_UPPER));
+		}
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	function index_modify_page_title($vars) {
 		// Rubriques d'acceuil
 		$sql = "SELECT post_id, post_subject, post_text, bbcode_uid, bbcode_bitfield
 			FROM ".POSTS_TABLE." AS p
@@ -560,6 +580,7 @@ youtube
 */
 
 	// Popule les templates
+	//TODO DELETE
 	function popule_posts() {
 		// Filtres pour horaires
 		$cond = ['TRUE'];

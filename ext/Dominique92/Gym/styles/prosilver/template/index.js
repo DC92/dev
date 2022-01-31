@@ -1,4 +1,4 @@
-/* jshint esversion: 6 */
+//TODO FAIRE LE MENAGE
 
 // BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {

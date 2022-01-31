@@ -1,3 +1,13 @@
+<!-- BEGIN jour -->
+aaaa{jour.JOUR}z
+
+	<!-- BEGIN heure -->
+	-----{heure.ANIMATEUR}={heure.ACTIVITE}={heure.LIEU}z
+	<!-- END heure -->
+
+<!-- END jour -->
+
+<!-- //TODO A REVOIR -->
 <!-- BEGIN topic -->
 <div class="horaires j{topic.GYM_JOUR}">
 	<!-- IF topic.GYM_HORAIRES -->
@@ -18,7 +28,7 @@
 				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->
 					<a href="viewtopic.php?p={post.GYM_ACTIVITE}">{post.POST_SUBJECT}</a>
 				<!-- ELSE -->
-					{post.POST_SUBJECT}
+					
 				<!-- ENDIF -->
 
 				<!-- IF post.GYM_CERT -->
