@@ -98,7 +98,6 @@ class listener implements EventSubscriberInterface
 		p.gym_lieu,
 		p.gym_acces,
 		p.gym_animateur,
-		p.gym_cert,
 		p.gym_nota,
 		p.gym_jour,
 		p.gym_heure,
@@ -127,6 +126,7 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
+			$row['jour_literal'] = $jours_semaine[intval($row['gym_jour'])];
 			if ($row['gym_jour'])
 				$horaire[$row['gym_jour']][$row['gym_heure']*60 + $row['gym_minute']] = $row;
 
@@ -164,13 +164,16 @@ class listener implements EventSubscriberInterface
 		// Extraction des horaires
 		sort ($horaire);
 		foreach ($horaire AS $j=>$v) {
-			$this->template->assign_block_vars ('jour', [
-				'JOUR' => $jours_semaine[intval ($j)],
-			]);
+			$first = $v[array_keys ($v)[0]];
+			$first['COULEUR'] = $this->couleur ();
+			$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
+			$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
+			//$first['COULEUR_TITRE'] = $this->couleur (80, 162, 0);
+			//$first['COUNT'] = count ($v);
+			$this->template->assign_block_vars ('jour', array_change_key_case ($first, CASE_UPPER));
 
 			sort ($v);
 			foreach ($v AS $h)
-//			foreach ($js AS $h)
 				$this->template->assign_block_vars ('jour.heure', array_change_key_case ($h, CASE_UPPER));
 		}
 	}
@@ -463,7 +466,6 @@ class listener implements EventSubscriberInterface
 			'gym_lieu',
 			'gym_acces',
 			'gym_animateur',
-			'gym_cert',
 			'gym_nota',
 			'gym_jour',
 			'gym_heure',
@@ -517,6 +519,7 @@ youtube
 */
 
 /* Activer uniquement pour créer un nouveau site ou updater les BBCODES
+	//TODO DELETE
 		$this->add_bbcode([
 			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
 			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],
@@ -580,8 +583,8 @@ youtube
 */
 
 	// Popule les templates
-	//TODO DELETE
 	function popule_posts() {
+return;	//TODO DELETE
 		// Filtres pour horaires
 		$cond = ['TRUE'];
 

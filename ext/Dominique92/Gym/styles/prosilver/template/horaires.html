@@ -1,77 +1,62 @@
 <!-- BEGIN jour -->
-aaaa{jour.JOUR}z
-
-	<!-- BEGIN heure -->
-	-----{heure.ANIMATEUR}={heure.ACTIVITE}={heure.LIEU}z
-	<!-- END heure -->
-
-<!-- END jour -->
-
-<!-- //TODO A REVOIR -->
-<!-- BEGIN topic -->
-<div class="horaires j{topic.GYM_JOUR}">
-	<!-- IF topic.GYM_HORAIRES -->
-	<div style="margin-left:calc((10% - 60px) * 0{topic.GYM_JOUR} + 1em)">
-		{topic.GYM_JOUR_LITERAL}
+<div class="horaires j{jour.GYM_JOUR}">
+	<!-- IF jour.GYM_HORAIRES -->
+	<div style="margin-left:calc((10% - 60px) * 0{jour.GYM_JOUR} + 1em)">
+		{jour.JOUR_LITERAL}
 	</div>
 	<!-- ENDIF -->
 
 	<table style="
-		margin-left:calc((10% - 60px) * 0{topic.GYM_JOUR});
-		background:{topic.COULEUR_FOND};
-		border-color:{topic.COULEUR_BORD};
+		margin-left:calc((10% - 60px) * 0{jour.GYM_JOUR});
+		background:{jour.COULEUR_FOND};
+		border-color:{jour.COULEUR_BORD};
 	">
-		<!-- BEGIN post -->
-		<!-- IF post.GYM_HORAIRES and (post.GYM_ACCES !== 'ferme' or REQUEST_FERME) and (!REQUEST_SELECT or post.GYM_LIEU == REQUEST_SELECT) -->
+		<!-- BEGIN heure -->
+<!-- //TODO A REVOIR -->
+		<!-- IF heure.GYM_HORAIRES and (heure.GYM_ACCES !== 'ferme' or REQUEST_FERME) and (!REQUEST_SELECT or heure.GYM_LIEU == REQUEST_SELECT) -->
 		<tr>
 			<td>
-				<!-- IF post.GYM_ACTIVITE != REQUEST_P -->
-					<a href="viewtopic.php?p={post.GYM_ACTIVITE}">{post.POST_SUBJECT}</a>
+				<!-- IF heure.GYM_ACTIVITE != REQUEST_P -->
+					<a href="viewtopic.php?p={heure.GYM_ACTIVITE}">{heure.POST_SUBJECT}</a>
 				<!-- ELSE -->
 					
 				<!-- ENDIF -->
 
-				<!-- IF post.GYM_CERT -->
-					<a href="https://www.oncorif.fr/prescriforme-lactivite-physique-sur-ordonnance-en-ile-de-france/"
-						target="_blank" class="cert" title="Cours certifié Prescri’forme"
-					>CERT</a>
-				<!-- ENDIF -->
-
 				<!-- IF U_MCP or REQUEST_MCP -->
-					<a href="posting.php?mode=edit&f=2&p={post.POST_ID}"
+					<a href="posting.php?mode=edit&f=2&p={heure.POST_ID}"
 						title="Modifier cette séance" class="button button-icon-only">
 						<i class="icon fa-pencil"></i>
 					</a>
 				<!-- ENDIF -->
 
-				<!-- IF post.GYM_NOTA -->
-					<br>{post.GYM_NOTA}
+				<!-- IF heure.GYM_NOTA -->
+					<br>{heure.GYM_NOTA}
 				<!-- ENDIF -->
 			</td>
 
 			<td>
-				{post.HORAIRE_DEBUT} à {post.HORAIRE_FIN}
+				{heure.HORAIRE_DEBUT} à {heure.HORAIRE_FIN}
 			</td>
 
-			<!-- IF post.GYM_LIEU != REQUEST_P -->
+			<!-- IF heure.GYM_LIEU != REQUEST_P -->
 			<td>
-				<a href="viewtopic.php?p={post.GYM_LIEU}&anim={post.ANIMATEUR}">{post.LIEU}</a>
-				<!-- IF post.GYM_ACCES === 'ferme' -->
+				<a href="viewtopic.php?p={heure.GYM_LIEU}&anim={heure.ANIMATEUR}">{heure.LIEU}</a>
+				<!-- IF heure.GYM_ACCES === 'ferme' -->
 					<span style="color:red">(fermé)</span>
 				<!-- ENDIF -->
  			</td>
 			<!-- ENDIF -->
 
-			<!-- IF post.GYM_ANIMATEUR != REQUEST_P -->
+			<!-- IF heure.GYM_ANIMATEUR != REQUEST_P -->
 			<td>
-				<a href="viewtopic.php?p={post.GYM_ANIMATEUR}">
-					{post.ANIMATEUR}
+				<a href="viewtopic.php?p={heure.GYM_ANIMATEUR}">
+					{heure.ANIMATEUR}
 				</a>
 			</td>
 			<!-- ENDIF -->
 		</tr>
 		<!-- ENDIF -->
-		<!-- END post -->
+		<!-- END heure -->
 	</table>
 </div>
-<!-- END topic -->
+<!-- END jour -->
