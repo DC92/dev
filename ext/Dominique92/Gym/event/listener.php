@@ -91,30 +91,31 @@ class listener implements EventSubscriberInterface
 		$jours_semaine = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
 
 		// Exploration des horaires
-		$sql = "SELECT equi.post_id AS ei, equi.post_subject AS en,
+/*
+				p.post_subject,
+				p.gym_activite,
+				p.gym_lieu,
+				p.gym_acces,
+				p.gym_animateur,
+				p.gym_nota,
+				p.gym_jour,
+				p.gym_heure,
+				p.gym_minute,
+				p.gym_duree_heures,
+				p.gym_duree_jours,
+				p.gym_scolaire,
+				p.gym_semaines,
 
-
-		p.gym_activite,
-		p.gym_lieu,
-		p.gym_acces,
-		p.gym_animateur,
-		p.gym_nota,
-		p.gym_jour,
-		p.gym_heure,
-		p.gym_minute,
-		p.gym_duree_heures,
-		p.gym_duree_jours,
- 		p.gym_scolaire,
- 		p.gym_semaines,
-		p.gym_accueil,
- 		p.gym_horaires,
- 		p.gym_menu,
- 		p.gym_ordre_menu,
-
-
+//TODO DELETE
+				p.gym_accueil,
+				p.gym_horaires,
+				p.gym_menu,
+				p.gym_ordre_menu,
+*/
+		$sql = "SELECT p.*,
+				equi.post_id AS ei, equi.post_subject AS en,
 				acti.post_id AS ai, acti.post_subject AS an,
 				lieu.post_id AS li, lieu.post_subject AS ln,
-
 				equi.post_subject AS animateur,
 				acti.post_subject AS activite,
 				lieu.post_subject AS lieu
@@ -126,13 +127,10 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
-			$row['jour_literal'] = $jours_semaine[intval($row['gym_jour'])];
-			if ($row['gym_jour'])
-				$horaire[$row['gym_jour']][$row['gym_heure']*60 + $row['gym_minute']] = $row;
-
-			$menus['Activités'] [$row['en']] = $row['ei'];
-			$menus['Équipe'] [$row['an']] = $row['ai'];
-			$menus['Lieux'] [$row['ln']] = $row['li'];
+			$menus ['Activités'] [$row['en']] = $row['ei'];
+			$menus ['Équipe'] [$row['an']] = $row['ai'];
+			$menus ['Lieux'] [$row['ln']] = $row['li'];
+			$horaire [intval($row ['gym_jour'])] [$row['gym_heure']*60 + $row['gym_minute']] = $row;
 		}
 		$this->db->sql_freeresult($result);
 
@@ -162,19 +160,28 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Extraction des horaires
-		sort ($horaire);
+		ksort ($horaire);
 		foreach ($horaire AS $j=>$v) {
 			$first = $v[array_keys ($v)[0]];
+			$first['JOUR_LITERAL'] = $jours_semaine[$j];
 			$first['COULEUR'] = $this->couleur ();
 			$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 			$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
-			//$first['COULEUR_TITRE'] = $this->couleur (80, 162, 0);
-			//$first['COUNT'] = count ($v);
 			$this->template->assign_block_vars ('jour', array_change_key_case ($first, CASE_UPPER));
 
 			sort ($v);
-			foreach ($v AS $h)
+			foreach ($v AS $h) {
+				$h['gym_heure'] = substr('00'.@$h['gym_heure'], -2);
+				$h['gym_minute'] = substr('00'.@$h['gym_minute'], -2);
+				$h['gym_minute_fin'] = @$h['gym_minute'] + @$h['gym_duree_heures'] * 60;
+				$h['gym_heure_fin'] = @$h['gym_heure'] + floor (@$h['gym_minute_fin'] / 60);
+				$h['gym_minute_fin'] = @$h['gym_minute_fin'] % 60;
+				$h['gym_heure_fin'] = substr('00'.@$h['gym_heure_fin'], -2);
+				$h['gym_minute_fin'] = substr('00'.@$h['gym_minute_fin'], -2);
+				$h['horaire_debut'] = @$h['gym_heure'].'h'.@$h['gym_minute'];
+				$h['horaire_fin'] = @$h['gym_heure_fin'].'h'.@$h['gym_minute_fin'];
 				$this->template->assign_block_vars ('jour.heure', array_change_key_case ($h, CASE_UPPER));
+			}
 		}
 	}
 
@@ -461,6 +468,12 @@ class listener implements EventSubscriberInterface
 		return; //TODO
 
 		// Create required SQL columns when needed
+/* //TODO DELETE
+			'gym_accueil',
+ 			'gym_horaires',
+ 			'gym_menu',
+ 			'gym_ordre_menu',
+*/
 		$columns = [
 			'gym_activite',
 			'gym_lieu',
@@ -474,10 +487,6 @@ class listener implements EventSubscriberInterface
 			'gym_duree_jours',
  			'gym_scolaire',
  			'gym_semaines',
-			'gym_accueil',
- 			'gym_horaires',
- 			'gym_menu',
- 			'gym_ordre_menu',
 		];
 		foreach ($columns AS $column) {
 			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "'.$column.'"';
@@ -585,6 +594,7 @@ youtube
 	// Popule les templates
 	function popule_posts() {
 return;	//TODO DELETE
+/*
 		// Filtres pour horaires
 		$cond = ['TRUE'];
 
@@ -744,6 +754,6 @@ return;	//TODO DELETE
 					$this->template->assign_block_vars ('topic.post', $vv);
 				}
 			}
-		}
+		}*/
 	}
 }

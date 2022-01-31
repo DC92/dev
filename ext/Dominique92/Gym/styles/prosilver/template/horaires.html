@@ -1,10 +1,10 @@
 <!-- BEGIN jour -->
 <div class="horaires j{jour.GYM_JOUR}">
-	<!-- IF jour.GYM_HORAIRES -->
+	<!-- IF jour.GYM_HORAIRES -->//TODO DELETE
+	<!-- ENDIF -->
 	<div style="margin-left:calc((10% - 60px) * 0{jour.GYM_JOUR} + 1em)">
 		{jour.JOUR_LITERAL}
 	</div>
-	<!-- ENDIF -->
 
 	<table style="
 		margin-left:calc((10% - 60px) * 0{jour.GYM_JOUR});
@@ -12,14 +12,10 @@
 		border-color:{jour.COULEUR_BORD};
 	">
 		<!-- BEGIN heure -->
-<!-- //TODO A REVOIR -->
-		<!-- IF heure.GYM_HORAIRES and (heure.GYM_ACCES !== 'ferme' or REQUEST_FERME) and (!REQUEST_SELECT or heure.GYM_LIEU == REQUEST_SELECT) -->
 		<tr>
 			<td>
 				<!-- IF heure.GYM_ACTIVITE != REQUEST_P -->
-					<a href="viewtopic.php?p={heure.GYM_ACTIVITE}">{heure.POST_SUBJECT}</a>
-				<!-- ELSE -->
-					
+					<a href="./?p={heure.GYM_ACTIVITE}">{heure.POST_SUBJECT}</a>
 				<!-- ENDIF -->
 
 				<!-- IF U_MCP or REQUEST_MCP -->
@@ -40,22 +36,16 @@
 
 			<!-- IF heure.GYM_LIEU != REQUEST_P -->
 			<td>
-				<a href="viewtopic.php?p={heure.GYM_LIEU}&anim={heure.ANIMATEUR}">{heure.LIEU}</a>
-				<!-- IF heure.GYM_ACCES === 'ferme' -->
-					<span style="color:red">(fermé)</span>
-				<!-- ENDIF -->
+				<a href="./?p={heure.GYM_LIEU}&anim={heure.ANIMATEUR}">{heure.LIEU}</a>
  			</td>
 			<!-- ENDIF -->
 
 			<!-- IF heure.GYM_ANIMATEUR != REQUEST_P -->
 			<td>
-				<a href="viewtopic.php?p={heure.GYM_ANIMATEUR}">
-					{heure.ANIMATEUR}
-				</a>
+				<a href="./?p={heure.GYM_ANIMATEUR}">{heure.ANIMATEUR}</a>
 			</td>
 			<!-- ENDIF -->
 		</tr>
-		<!-- ENDIF -->
 		<!-- END heure -->
 	</table>
 </div>
