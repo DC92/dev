@@ -66,6 +66,7 @@ class listener implements EventSubscriberInterface
 			// All
 			'core.page_header' => 'page_header',
 			'core.gen_sort_selects_after' => 'gen_sort_selects_after',
+			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
 			'core.display_forums_modify_row' => 'display_forums_modify_row',
@@ -128,6 +129,22 @@ class listener implements EventSubscriberInterface
 			$vars['sort_dir'] = MYPHPBB_SORT_DIR;
 	}
 
+	// Appelé après viewtopic_modify_page_title & template->set_filenames
+	// Change the dispached template
+	function page_footer_after() {
+		if (defined('MYPHPBB_TEMPLATE')) {
+			$template = $this->request->variable ('template', '');
+			$template_name = glob ("ext/*/*/styles/prosilver/template/$template.html");
+
+			if ($template && $template_name) {
+				$tns = explode ('/', $template_name[0]);
+				$this->template->set_filenames ([
+					'body' => "@{$tns[1]}_{$tns[2]}/$template.html",
+				]);
+			}
+		}
+	}
+
 	/**
 		INDEX.PHP
 	*/
@@ -150,12 +167,13 @@ class listener implements EventSubscriberInterface
 		/* Route to viewtopic or viewforum if there is an argument p, t or f */
 		if (defined('MYPHPBB_REDIRECT_INDEX') &&
 			count ($uris) > 1 &&
-				!$this->request->variable ('template', '')) {
+			!$this->request->variable ('template', '')) {
 				if ($this->request->variable ('p', 0) ||
 					$this->request->variable ('t', 0))
-					exit (file_get_contents ($uris[0].'/viewtopic.php?'.$uris[1]));
+					exit (file_get_contents ($uris[0].'/viewtopic.php?template=viewtopic&'.$uris[1]));
+					//TODO error reporting
 				if ($this->request->variable ('f', 0))
-					exit (file_get_contents ($uris[0].'/viewforum.php?'.$uris[1]));
+					exit (file_get_contents ($uris[0].'/viewforum.php?template=viewforum&'.$uris[1]));
 		}
 	}
 

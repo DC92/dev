@@ -80,6 +80,11 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
+		// Assign command line
+		/* //TODO garde ?
+		foreach ($this->args AS $k=>$v)
+			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
+
 		// MENUS
 		$menus = [
 			'Présentation' => [],
@@ -113,9 +118,9 @@ class listener implements EventSubscriberInterface
 				p.gym_ordre_menu,
 */
 		$sql = "SELECT p.*,
-				equi.post_id AS ei, equi.post_subject AS en,
-				acti.post_id AS ai, acti.post_subject AS an,
-				lieu.post_id AS li, lieu.post_subject AS ln,
+				equi.topic_id AS eti, equi.post_subject AS en,
+				acti.topic_id AS ati, acti.post_subject AS an,
+				lieu.topic_id AS lti, lieu.post_subject AS ln,
 				equi.post_subject AS animateur,
 				acti.post_subject AS activite,
 				lieu.post_subject AS lieu
@@ -127,21 +132,21 @@ class listener implements EventSubscriberInterface
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
-			$menus ['Activités'] [$row['en']] = $row['ei'];
-			$menus ['Équipe'] [$row['an']] = $row['ai'];
-			$menus ['Lieux'] [$row['ln']] = $row['li'];
+			$menus ['Activités'] [$row['en']] = $row + ['id' => $row['eti']];
+			$menus ['Équipe'] [$row['an']] = $row + ['id' => $row['ati']];
+			$menus ['Lieux'] [$row['ln']] = $row + ['id' => $row['lti']];
 			$horaire [intval($row ['gym_jour'])] [$row['gym_heure']*60 + $row['gym_minute']] = $row;
 		}
 		$this->db->sql_freeresult($result);
 
 		// Exploration des éléments d'accueil
-		$sql = "SELECT post_id, post_subject
+		$sql = "SELECT topic_id, post_id, post_subject
 			FROM ".POSTS_TABLE." AS p
-			WHERE p.forum_id = 9";
+			WHERE p.forum_id = 9"; //TODO récupérer n° forum 9
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result))
-			$menus['Présentation'] [$row['post_subject']] = $row['post_id'];
+			$menus['Présentation'] [$row['post_subject']] = $row + ['id' => $row['topic_id']];
 		$this->db->sql_freeresult($result);
 
 		foreach ($menus AS $k=>$v) {
@@ -152,11 +157,10 @@ class listener implements EventSubscriberInterface
 			]);
 
 			ksort ($v);
-			foreach ($v AS $vk=>$vv)
-				$this->template->assign_block_vars ('menu.item', [
-					'POST_ID' => $vv,
-					'TITLE' => $vk,
-				]);
+			foreach ($v AS $kv=>$vv)
+				$this->template->assign_block_vars ('menu.item',
+					array_change_key_case ($vv + ['title' => $kv], CASE_UPPER)
+				);
 		}
 
 		// Extraction des horaires

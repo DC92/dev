@@ -1,7 +1,5 @@
 <!-- BEGIN jour -->
 <div class="horaires j{jour.GYM_JOUR}">
-	<!-- IF jour.GYM_HORAIRES -->//TODO DELETE
-	<!-- ENDIF -->
 	<div style="margin-left:calc((10% - 60px) * 0{jour.GYM_JOUR} + 1em)">
 		{jour.JOUR_LITERAL}
 	</div>
@@ -34,7 +32,7 @@
 				{heure.HORAIRE_DEBUT} à {heure.HORAIRE_FIN}
 			</td>
 
-			<!-- IF heure.GYM_LIEU != REQUEST_P -->
+			<!-- IF heure.GYM_LIEU != REQUEST_P --><!-- //TODO DELETE REQUEST_P -->
 			<td>
 				<a href="./?p={heure.GYM_LIEU}&anim={heure.ANIMATEUR}">{heure.LIEU}</a>
  			</td>
