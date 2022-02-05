@@ -41,8 +41,6 @@ Based on https://openlayers.org
 
 	<script>
 const mapKeys = {
-	// Get your own (free) IGN key at http://professionnels.ign.fr/ign/contrats
-	'ign': 'hcxdz5f1p9emo4i1lch6ennl',
 	// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
 	'thunderforest': 'ee751f43b3af4614b01d1bce72785369',
 	// Get your own (free) OS key at https://osdatahub.os.uk/
@@ -55,12 +53,7 @@ const mapKeys = {
 const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: [-700000, 7000000], // Angleterre
-		zoom: 6,
-//		center: [700000, 5600000], // Sud est
-//		zoom: 7,
-//		center: [850000, 5630000], // Turin
-//		zoom: 11,
+		center: [700000, 5600000], zoom: 7, // Sud est
 	}),
 	controls: [
 		new ol.control.Zoom(),
