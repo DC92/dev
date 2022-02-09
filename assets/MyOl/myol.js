@@ -323,7 +323,7 @@ function layersCollection() {
 		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
 		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', {
 			format: 'png',
-			key: 'pratique'
+			key: 'pratique',
 		}),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
@@ -331,7 +331,7 @@ function layersCollection() {
 		'Italie': layerIGM(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', {
-			key: 'pratique'
+			key: 'pratique',
 		}),
 		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': layerGoogle('s'),
