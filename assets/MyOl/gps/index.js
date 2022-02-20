@@ -1,11 +1,15 @@
 /** PWA area */
-// Force https to allow web apps and geolocation
-if (window.location.protocol == 'http:' && window.location.host != 'localhost')
-	window.location.href = window.location.href.replace('http:', 'https:');
 
-// Force the script name of short url
-if (!window.location.pathname.split('/').pop())
-	window.location.href = window.location.href + 'index.php';
+// Force https to allow web apps and geolocation
+// Force the script name of short url to allow PWA mode
+if (!window.location.href.match(/https.*index.php/)) {
+	window.location.replace(
+		'https://' + window.location.hostname +
+		window.location.pathname + 'index.php' +
+		window.location.search
+	);
+	throw ''; // Exit
+}
 
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)

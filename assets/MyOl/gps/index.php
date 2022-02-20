@@ -9,8 +9,6 @@ Based on https://openlayers.org
 	// You can include it from another directory
 	// It needs a manifest.json file in the same directory
 
-	//BEST BUG battements entre deux instances de GPS
-
 	// Read info in the manifest.json & list *.gpx files
 	$manifest = json_decode (file_get_contents ('manifest.json'), true);
 	$icon = $manifest['icons'][0];
@@ -94,9 +92,12 @@ Based on https://openlayers.org
 			mapKeys = <?=json_encode(@$mapKeys)?>,
 			baselayers = <?=isset ($baselayers)?$baselayers:'{}'?>;
 
-<?php if (isset ($_GET['gpx'])) { ?>
+<?php
+	// Add a gpx layer if any arguments to the url
+	$gpx = isset ($_GET['gpx']) ? $_GET['gpx'] : @array_keys($_GET)[0];
+	if ($gpx) { ?>
 		window.addEventListener ('load', function() {
-			addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$_GET['gpx']?>.gpx');
+			addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$gpx?>.gpx');
 		});
 <?php } ?>
 	</script>
