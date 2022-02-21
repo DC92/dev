@@ -99,6 +99,13 @@ const areLiTags = document.getElementsByTagName('li').length,
 		controls: controls,
 	});
 
+// Add a gpx layer if any arguments to the url
+const gpxFile = location.search.replace('?', '').replace('gpx=', '');
+if (gpxFile)
+	window.addEventListener('load', function() {
+		addLayer(gpxFile + '.gpx');
+	});
+
 function addLayer(url) {
 	const layer = new ol.layer.Vector({
 		source: new ol.source.Vector({

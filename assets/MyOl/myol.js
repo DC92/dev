@@ -32,12 +32,12 @@ try {
  * Debug facilities on mobile
  */
 //HACK use hash ## for error alerts
-if (!window.location.hash.indexOf('##'))
+if (!window.location.hash.indexOf('##')) //BEST ??? window.location => location
 	window.addEventListener('error', function(evt) {
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
 //HACK use hash ### to route all console logs on alerts
-if (window.location.hash == '###')
+if (window.location.hash == '###') //BEST ??? window.location => location
 	console.log = function(message) {
 		alert(message);
 	};
@@ -381,6 +381,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		}),
 		layerNames = Object.keys(baseLayers),
 		request = // Search values in cookies & args
+		 //BEST ??? window.location => location
 		window.location.search + '&' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + '&' + // Then the hash #selector=1,2,3
 		document.cookie + '&', // Then the cookies
@@ -887,6 +888,7 @@ function readCheckbox(selectorName, withOn) {
  */
 function memCheckbox(selectorName, callback) {
 	const request = // Search values in cookies & args
+		//BEST ??? window.location => location
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie + ';' + // Then the cookies
@@ -2106,7 +2108,7 @@ function controlPrint() {
 		document.addEventListener('keydown', function(evt) {
 			if (evt.key == 'Escape')
 				setTimeout(function() { // Delay reload for FF & Opera
-					window.location.reload();
+					window.location.reload(); //BEST ??? window.location => location
 				});
 		});
 	}

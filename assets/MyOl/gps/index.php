@@ -91,15 +91,6 @@ Based on https://openlayers.org
 <?php } ?>
 			mapKeys = <?=json_encode(@$mapKeys)?>,
 			baselayers = <?=isset ($baselayers)?$baselayers:'{}'?>;
-
-<?php
-	// Add a gpx layer if any arguments to the url
-	$gpx = isset ($_GET['gpx']) ? $_GET['gpx'] : @array_keys($_GET)[0];
-	if ($gpx) { ?>
-		window.addEventListener ('load', function() {
-			addLayer ('<?=dirname($_SERVER['SCRIPT_NAME'])?>/<?=$gpx?>.gpx');
-		});
-<?php } ?>
 	</script>
 </head>
 

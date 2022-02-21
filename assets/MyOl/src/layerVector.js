@@ -358,6 +358,7 @@ function readCheckbox(selectorName, withOn) {
  */
 function memCheckbox(selectorName, callback) {
 	const request = // Search values in cookies & args
+		//BEST ??? window.location => location
 		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
 		window.location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie + ';' + // Then the cookies
