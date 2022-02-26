@@ -76,12 +76,6 @@ ol.Map.prototype.handlePostRender = function() {
  */
 
 /**
- * Clean definition of mapKeys = {mapOrigin1: 'key value 1', ...}
- */
-if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
-
-
-/**
  * Openstreetmap
  */
 function layerOSM(url, attribution, maxZoom) {
@@ -131,6 +125,8 @@ function layerKompass(subLayer) {
  * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(subLayer) {
+	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
+
 	if (mapKeys.thunderforest)
 		layerOSM(
 			'//{a-c}.tile.thunderforest.com/' + subLayer +
@@ -170,6 +166,8 @@ function layerStamen(subLayer, minResolution) {
  * doc : https://geoservices.ign.fr/services-web
  */
 function layerIGN(subLayer, options) {
+	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
+
 	if (mapKeys.ign) {
 		options = options || {};
 
@@ -280,6 +278,8 @@ function layerIGM() {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
+	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
+
 	if (mapKeys.os)
 		return [
 			layerStamen('terrain', 1700),
@@ -300,6 +300,8 @@ function layerOS(subLayer) {
  * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerBing(subLayer) {
+	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
+
 	if (mapKeys.bing) {
 		const layer = new ol.layer.Tile();
 
