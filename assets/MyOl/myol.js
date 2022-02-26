@@ -994,9 +994,9 @@ function styleOptionsIcon(iconUrl) {
 // Get icon from chemineur.fr
 function styleOptionsIconChemineur(iconName) {
 	if (iconName) {
-		const icons = iconName.split(' ')
-		// Limit to 2 type names & ' ' -> '_'
-		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : '');
+		const icons = iconName.split(' ');
+
+		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
 
 		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
