@@ -3,6 +3,12 @@
  */
 
 /**
+ * Clean definition of mapKeys = {mapOrigin1: 'key value 1', ...}
+ */
+if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
+
+
+/**
  * Openstreetmap
  */
 function layerOSM(url, attribution, maxZoom) {
@@ -52,11 +58,12 @@ function layerKompass(subLayer) {
  * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
 function layerThunderforest(subLayer) {
-	return typeof mapKeys == 'object' && mapKeys && mapKeys.thunderforest ?
+	if (mapKeys.thunderforest)
 		layerOSM(
-			'//{a-c}.tile.thunderforest.com/' + subLayer + '/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
+			'//{a-c}.tile.thunderforest.com/' + subLayer +
+			'/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
-		) : null;
+		);
 }
 
 /**
@@ -90,22 +97,21 @@ function layerStamen(subLayer, minResolution) {
  * doc : https://geoservices.ign.fr/services-web
  */
 function layerIGN(subLayer, options) {
-	options = options || {};
+	if (mapKeys.ign) {
+		options = options || {};
 
-	let key = options.key || (typeof mapKeys == 'object' ? mapKeys.ign : null),
-		IGNresolutions = [],
-		IGNmatrixIds = [];
+		let IGNresolutions = [],
+			IGNmatrixIds = [];
 
-	for (let i = 0; i < 18; i++) {
-		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
-		IGNmatrixIds[i] = i.toString();
-	}
+		for (let i = 0; i < 18; i++) {
+			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNmatrixIds[i] = i.toString();
+		}
 
-	if (key)
 		return new ol.layer.Tile({
 			maxResolution: options.maxResolution,
 			source: new ol.source.WMTS({
-				url: '//wxs.ign.fr/' + key + '/wmts',
+				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
 				layer: subLayer,
 				matrixSet: 'PM',
 				format: 'image/' + (options.format || 'jpeg'),
@@ -118,6 +124,7 @@ function layerIGN(subLayer, options) {
 				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
 			}),
 		});
+	}
 }
 
 /**
@@ -200,18 +207,19 @@ function layerIGM() {
  * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(subLayer) {
-	return typeof mapKeys == 'object' && mapKeys && mapKeys.os ? [
-		layerStamen('terrain', 1700),
-		new ol.layer.Tile({
-			extent: [-1198263, 6365000, 213000, 8702260],
-			minResolution: 2,
-			maxResolution: 1700,
-			source: new ol.source.XYZ({
-				url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer +
-					'/{z}/{x}/{y}.png?key=' + mapKeys.os,
+	if (mapKeys.os)
+		return [
+			layerStamen('terrain', 1700),
+			new ol.layer.Tile({
+				extent: [-1198263, 6365000, 213000, 8702260],
+				minResolution: 2,
+				maxResolution: 1700,
+				source: new ol.source.XYZ({
+					url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer +
+						'/{z}/{x}/{y}.png?key=' + mapKeys.os,
+				}),
 			}),
-		}),
-	] : null;
+		];
 }
 
 /**
@@ -219,22 +227,21 @@ function layerOS(subLayer) {
  * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
  */
 function layerBing(subLayer) {
-	if (typeof mapKeys != 'object' || !mapKeys || !mapKeys.bing)
-		return null;
+	if (mapKeys.bing) {
+		const layer = new ol.layer.Tile();
 
-	const layer = new ol.layer.Tile();
+		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
+		layer.on('change:visible', function() {
+			if (!layer.getSource()) {
+				layer.setSource(new ol.source.BingMaps({
+					imagerySet: subLayer,
+					key: mapKeys.bing,
+				}));
+			}
+		});
 
-	//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-	layer.on('change:visible', function() {
-		if (!layer.getSource()) {
-			layer.setSource(new ol.source.BingMaps({
-				imagerySet: subLayer,
-				key: mapKeys.bing,
-			}));
-		}
-	});
-
-	return layer;
+		return layer;
+	}
 }
 
 /**
