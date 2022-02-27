@@ -1,6 +1,4 @@
 <?php
-// This utility modify the service-worker.js when the package is used from another directory & with .GPX files
-
 require_once ('functions.php');
 
 header('Content-Type: application/javascript');

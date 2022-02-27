@@ -38,6 +38,7 @@ require_once ('functions.php');
 	<script src="<?=$script_path?>index.js" defer="defer"></script>
 	<script>
 		var service_worker = '<?=$script_path?>service-worker.js.php',
+			scope = '<?=$scope_path?>',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
 	</script>
 </head>

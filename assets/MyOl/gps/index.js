@@ -14,7 +14,10 @@ if (!window.location.href.match(/https.*index\./)) {
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(
-		typeof service_worker == 'undefined' ? 'service-worker.js' : service_worker
+		typeof service_worker == 'undefined' ? 'service-worker.js' : service_worker, {
+			// Max scope. Allow service worker to be in a different directory
+			scope: typeof scope == 'undefined' ? './' : scope,
+		}
 	)
 	// Reload if the service worker md5 (including the total files key) has changed
 	.then(function(reg) {
