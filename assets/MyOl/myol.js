@@ -381,6 +381,7 @@ function layersDemo() {
  * Layer switcher
  * Need to include layerSwitcher.css
  */
+//BEST alt key to swith layers / transparency
 function controlLayerSwitcher(baseLayers, options) {
 	baseLayers = baseLayers || layersCollection();
 	options = options || {};

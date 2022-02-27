@@ -2,7 +2,7 @@
 
 // Force https to allow web apps and geolocation
 // Force the script name of short url to allow PWA mode
-if (!window.location.href.match(/https.*index.php/)) {
+if (!window.location.href.match(/https.*index\./)) {
 	window.location.replace(
 		'https://' + window.location.hostname +
 		window.location.pathname + 'index.php' +
@@ -14,15 +14,13 @@ if (!window.location.href.match(/https.*index.php/)) {
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(
-		service_worker === undefined ? 'service-worker.js' : service_worker,
-		typeof scope == 'undefined' ? {} : {
-			scope: scope, // Max scope. Allow service worker to be in a different directory
-		}
+		typeof service_worker == 'undefined' ? 'service-worker.js' : service_worker
 	)
 	// Reload if the service worker md5 (including the total files key) has changed
 	.then(function(reg) {
 		reg.addEventListener('updatefound', function() {
 			location.reload();
+			//alert('location.reload');
 		});
 	});
 
@@ -97,6 +95,9 @@ const areLiTags = document.getElementsByTagName('li').length,
 	map = new ol.Map({
 		target: 'map',
 		controls: controls,
+		view: new ol.View({
+			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+		}),
 	});
 
 // Add a gpx layer if any arguments to the url
