@@ -5,7 +5,7 @@ https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
 <?php
-$entry_url = $_SERVER['SCRIPT_URL'];
+$entry_url = $_SERVER['SCRIPT_NAME'];
 require_once ('functions.php');
 ?>
 <html>

@@ -14,24 +14,13 @@ $version_tag = 0;
 foreach (array_merge (glob ('../*'), glob ('../*/*')) as $f)
 	$version_tag += filesize ($f);
 
-$root_dirs = explode ('/', $_SERVER['HTTP_REFERER']);
-$script_dirs = explode ('/', $_SERVER['SCRIPT_URI']);
-array_pop ($root_dirs); // Remove script name
-array_pop ($script_dirs); // Remove script name
-while (count ($root_dirs) && count ($script_dirs) && $root_dirs[0] == $script_dirs[0]) {
-	array_shift ($root_dirs); // Remove common part of the paths
-	array_shift ($script_dirs);
-}
-$root_dirs[] = ''; // Add last / if necessary
-$script_dirs[] = ''; // Add last / if necessary
-$url_path = str_repeat ('../', count ($script_dirs) - 1) .implode ('/', $root_dirs);
-
-// Read service Worker
-$service_worker = file_get_contents ('service-worker.js');
-$service_worker = str_replace (
-	['index.html', 'manifest.json', 'myGpsCache'],
-	[$url_path.'index.php', 'manifest.json.php', 'myGpsCache_'.$version_tag],
-	$service_worker
+// Read service worker & replace some values
+$service_worker = read_replace (
+	'service-worker.js', [
+		'index.html' => $url_path.'index.php',
+		'manifest.json' => 'manifest.json.php',
+		'myGpsCache' => 'myGpsCache_'.$version_tag,
+	]	
 );
 
 // Add GPX files in the url directory to the list of files to cache
@@ -45,5 +34,4 @@ foreach ($gpx_files as $gf) {
 	);
 }
 
-// Output the version tag & the revised code
-echo "// Version $version_tag\n\n$service_worker";
+echo $service_worker;

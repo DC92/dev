@@ -1,5 +1,6 @@
 <?php
 // Calculate relative paths between the requested url & the GPS package directory
+
 if (!isset ($entry_url)) // Initial GPS url
 	$entry_url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
 
@@ -11,8 +12,7 @@ while (count ($url_dirs) && count ($script_dirs) && $url_dirs[0] == $script_dirs
 	array_shift ($script_dirs);
 }
 
-$url_dirs[] = ''; // Add last / if necessary
-$script_dirs[] = ''; // Add last / if necessary
+$url_dirs[] = $script_dirs[] = ''; // Add last / if necessary
 $scope_path = str_repeat ('../', max (count ($script_dirs), count ($url_dirs)) - 1) ?: './';
 $url_path = str_repeat ('../', count ($script_dirs) - 1) .implode ('/', $url_dirs);
 $script_path = str_repeat ('../', count ($url_dirs) - 1) .implode ('/', $script_dirs);
