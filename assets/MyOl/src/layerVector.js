@@ -221,7 +221,7 @@ function layerVector(opt) {
 							// To specify feature open a new window
 							window.open(display.url, '_blank', 'resizable=yes').focus();
 						else
-							window.location = display.url;
+							location = display.url;
 					}
 					// Cluster
 					else if (geom && (features.length > 1 || display.cluster))
@@ -358,9 +358,8 @@ function readCheckbox(selectorName, withOn) {
  */
 function memCheckbox(selectorName, callback) {
 	const request = // Search values in cookies & args
-		//BEST ??? window.location => location
-		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
-		window.location.hash + ';' + // Then the hash #selector=1,2,3
+		location.search + ';' + // Priority to the url args ?selector=1,2,3
+		location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie + ';' + // Then the cookies
 		selectorName + '=' + readCheckbox(selectorName, true).join(','), // Then the existing checks
 		match = request.match(new RegExp(selectorName + '=([^;]*)')),

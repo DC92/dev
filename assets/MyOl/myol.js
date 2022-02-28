@@ -32,12 +32,12 @@ try {
  * Debug facilities on mobile
  */
 //HACK use hash ## for error alerts
-if (!window.location.hash.indexOf('##')) //BEST ??? window.location => location
+if (!location.hash.indexOf('##')) //BEST ??? location => location
 	window.addEventListener('error', function(evt) {
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
 //HACK use hash ### to route all console logs on alerts
-if (window.location.hash == '###') //BEST ??? window.location => location
+if (location.hash == '###') //BEST ??? location => location
 	console.log = function(message) {
 		alert(message);
 	};
@@ -391,9 +391,9 @@ function controlLayerSwitcher(baseLayers, options) {
 		}),
 		layerNames = Object.keys(baseLayers),
 		request = // Search values in cookies & args
-		 //BEST ??? window.location => location
-		window.location.search + '&' + // Priority to the url args ?selector=1,2,3
-		window.location.hash + '&' + // Then the hash #selector=1,2,3
+		 //BEST ??? location => location
+		location.search + '&' + // Priority to the url args ?selector=1,2,3
+		location.hash + '&' + // Then the hash #selector=1,2,3
 		document.cookie + '&', // Then the cookies
 		match = request.match(/baselayer=([^&]+)/);
 
@@ -761,7 +761,7 @@ function layerVector(opt) {
 							// To specify feature open a new window
 							window.open(display.url, '_blank', 'resizable=yes').focus();
 						else
-							window.location = display.url;
+							location = display.url;
 					}
 					// Cluster
 					else if (geom && (features.length > 1 || display.cluster))
@@ -898,9 +898,8 @@ function readCheckbox(selectorName, withOn) {
  */
 function memCheckbox(selectorName, callback) {
 	const request = // Search values in cookies & args
-		//BEST ??? window.location => location
-		window.location.search + ';' + // Priority to the url args ?selector=1,2,3
-		window.location.hash + ';' + // Then the hash #selector=1,2,3
+		location.search + ';' + // Priority to the url args ?selector=1,2,3
+		location.hash + ';' + // Then the hash #selector=1,2,3
 		document.cookie + ';' + // Then the cookies
 		selectorName + '=' + readCheckbox(selectorName, true).join(','), // Then the existing checks
 		match = request.match(new RegExp(selectorName + '=([^;]*)')),
@@ -2119,7 +2118,7 @@ function controlPrint() {
 		document.addEventListener('keydown', function(evt) {
 			if (evt.key == 'Escape')
 				setTimeout(function() { // Delay reload for FF & Opera
-					window.location.reload(); //BEST ??? window.location => location
+					location.reload(); //BEST ??? location => location
 				});
 		});
 	}

@@ -699,7 +699,7 @@ function controlPrint() {
 		document.addEventListener('keydown', function(evt) {
 			if (evt.key == 'Escape')
 				setTimeout(function() { // Delay reload for FF & Opera
-					window.location.reload(); //BEST ??? window.location => location
+					location.reload(); //BEST ??? location => location
 				});
 		});
 	}

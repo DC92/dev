@@ -12,9 +12,9 @@ function controlLayerSwitcher(baseLayers, options) {
 		}),
 		layerNames = Object.keys(baseLayers),
 		request = // Search values in cookies & args
-		 //BEST ??? window.location => location
-		window.location.search + '&' + // Priority to the url args ?selector=1,2,3
-		window.location.hash + '&' + // Then the hash #selector=1,2,3
+		 //BEST ??? location => location
+		location.search + '&' + // Priority to the url args ?selector=1,2,3
+		location.hash + '&' + // Then the hash #selector=1,2,3
 		document.cookie + '&', // Then the cookies
 		match = request.match(/baselayer=([^&]+)/);
 
