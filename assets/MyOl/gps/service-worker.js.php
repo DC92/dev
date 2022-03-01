@@ -10,28 +10,26 @@ header('Pragma: no-cache');
 header('Service-Worker-Allowed: /');
 
 // Calculate a key depending on the delivery (Total byte size of cached files)
-$version_tag = 0;
-foreach (array_merge (glob ('../*'), glob ('../*/*')) as $f)
-	$version_tag += filesize ($f);
+$versionTag = 0;
+foreach (glob ("{../*,../*/*,$url_path*}", GLOB_BRACE) as $f)
+	$versionTag += filemtime ($f);
 
 // Read service worker & replace some values
-$service_worker = read_replace (
+$serviceWorkerCode = read_replace (
 	'service-worker.js', [
 		'index.html' => $url_path.'index.php',
 		'manifest.json' => 'manifest.json.php',
-		'myGpsCache' => 'myGpsCache_'.$version_tag,
+		'myGpsCache' => 'myGpsCache_'.$versionTag,
 	]	
 );
 
 // Add GPX files in the url directory to the list of files to cache
-$gpx_files = glob ($url_path.'*.gpx');
-foreach ($gpx_files as $gf) {
-	$version_tag += filesize ($gf);
-	$service_worker = str_replace (
+foreach (glob ($url_path.'*.gpx') as $gf) {
+	$serviceWorkerCode = str_replace (
 		"addAll([",
 		"addAll([\n\t\t\t\t'$gf',",
-		$service_worker
+		$serviceWorkerCode
 	);
 }
 
-echo $service_worker;
+echo $serviceWorkerCode;

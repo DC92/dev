@@ -17,7 +17,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 // Load service worker for web application install & updates
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(
-		typeof service_worker == 'undefined' ? 'service-worker.js' : service_worker, {
+		typeof serviceWorkerName == 'undefined' ? 'service-worker.js' : serviceWorkerName, {
 			// Max scope. Allow service worker to be in a different directory
 			scope: typeof scope == 'undefined' ? './' : scope,
 		}
@@ -25,8 +25,13 @@ if ('serviceWorker' in navigator)
 	// Reload if the service worker md5 (including the total files key) has changed
 	.then(function(reg) {
 		reg.addEventListener('updatefound', function() {
+			// Erase all caches
+			caches.keys().then(function(names) {
+				for (let name of names)
+					caches.delete(name);
+			});
+
 			location.reload();
-			//alert('location.reload');
 		});
 	});
 

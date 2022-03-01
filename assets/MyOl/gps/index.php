@@ -37,7 +37,7 @@ require_once ('functions.php');
 	<link href="<?=$script_path?>index.css" type="text/css" rel="stylesheet">
 	<script src="<?=$script_path?>index.js" defer="defer"></script>
 	<script>
-		var service_worker = '<?=$script_path?>service-worker.js.php',
+		var serviceWorkerName = '<?=$script_path?>service-worker.js.php',
 			scope = '<?=$scope_path?>',
 			scriptName = 'index.php',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
