@@ -25,6 +25,3 @@ function read_replace ($file_name, $changes) {
 		file_get_contents ($file_name)
 	);
 }
-
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'>scope_path, url_path, script_path = ".var_export([$scope_path,$url_path,$script_path],true).'</pre>'.PHP_EOL;
-?>

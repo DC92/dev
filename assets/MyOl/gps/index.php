@@ -67,5 +67,9 @@ require_once ('functions.php');
 	<?php } ?>
 
 	<div id="map"></div>
+
+	<?php if(file_exists ('footer.php'))
+		include 'footer.php';
+	?>
 </body>
 </html>
