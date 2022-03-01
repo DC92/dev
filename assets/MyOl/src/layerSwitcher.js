@@ -12,7 +12,6 @@ function controlLayerSwitcher(baseLayers, options) {
 		}),
 		layerNames = Object.keys(baseLayers),
 		request = // Search values in cookies & args
-		 //BEST ??? location => location
 		location.search + '&' + // Priority to the url args ?selector=1,2,3
 		location.hash + '&' + // Then the hash #selector=1,2,3
 		document.cookie + '&', // Then the cookies

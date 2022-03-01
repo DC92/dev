@@ -32,12 +32,12 @@ try {
  * Debug facilities on mobile
  */
 //HACK use hash ## for error alerts
-if (!location.hash.indexOf('##')) //BEST ??? location => location
+if (!location.hash.indexOf('##'))
 	window.addEventListener('error', function(evt) {
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
 //HACK use hash ### to route all console logs on alerts
-if (location.hash == '###') //BEST ??? location => location
+if (location.hash == '###')
 	console.log = function(message) {
 		alert(message);
 	};
@@ -391,7 +391,6 @@ function controlLayerSwitcher(baseLayers, options) {
 		}),
 		layerNames = Object.keys(baseLayers),
 		request = // Search values in cookies & args
-		 //BEST ??? location => location
 		location.search + '&' + // Priority to the url args ?selector=1,2,3
 		location.hash + '&' + // Then the hash #selector=1,2,3
 		document.cookie + '&', // Then the cookies
@@ -2118,7 +2117,7 @@ function controlPrint() {
 		document.addEventListener('keydown', function(evt) {
 			if (evt.key == 'Escape')
 				setTimeout(function() { // Delay reload for FF & Opera
-					location.reload(); //BEST ??? location => location
+					location.reload();
 				});
 		});
 	}
