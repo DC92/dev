@@ -1,14 +1,17 @@
-/** PWA area */
+/**
+ * PWA
+ */
 
-// Force https to allow web apps and geolocation
-// Force the script name of short url to allow PWA mode
-if (!window.location.href.match(/https.*index\./)) {
-	window.location.replace(
-		'https://' + window.location.hostname +
-		window.location.pathname + 'index.php' +
-		window.location.search
-	);
-	throw ''; // Exit
+// Force https to allow PWA and geolocation
+// Force full script name of short url to allow PWA
+if (!location.href.match(/(https|localhost).*index/)) {
+	location.replace(
+		(location.hostname == 'localhost' ? 'http://' : 'https://') +
+		location.hostname +
+		location.pathname + (location.pathname.slice(-1) == '/' ? scriptName : '') +
+		location.search);
+
+	throw 'Exit'; //HACK exit page
 }
 
 // Load service worker for web application install & updates
@@ -27,7 +30,9 @@ if ('serviceWorker' in navigator)
 		});
 	});
 
-/** Openlayers map area */
+/**
+ * OPENLAYERS
+ */
 const areLiTags = document.getElementsByTagName('li').length,
 	elListe = document.getElementById('liste'),
 

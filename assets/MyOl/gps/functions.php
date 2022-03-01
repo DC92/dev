@@ -4,7 +4,7 @@
 if (!isset ($entry_url)) // Initial GPS url
 	$entry_url = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
 
-$url_dirs = explode ('/', pathinfo ($entry_url.'xxx', PATHINFO_DIRNAME)); //HACK 'x' avoid / end terminated path error
+$url_dirs = explode ('/', pathinfo ($entry_url.'*', PATHINFO_DIRNAME)); //HACK '*' avoid / end terminated path error
 $script_dirs = explode ('/', str_replace ($_SERVER['DOCUMENT_ROOT'], '', str_replace ('\\', '/', __DIR__)));
 
 while (count ($url_dirs) && count ($script_dirs) && $url_dirs[0] == $script_dirs[0]) {
