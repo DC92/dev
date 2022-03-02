@@ -20,7 +20,7 @@ $serviceWorkerCode = read_replace (
 		'index.html' => $url_path.'index.php',
 		'manifest.json' => 'manifest.json.php',
 		'myGpsCache' => 'myGpsCache_'.$versionTag,
-	]	
+	]
 );
 
 // Add GPX files in the url directory to the list of files to cache

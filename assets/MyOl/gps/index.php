@@ -55,7 +55,7 @@ require_once ('functions.php');
 			<?php foreach ($gpx_files AS $gpx) { ?>
 				<li>
 					<a title="Cliquer pour afficher la trace"
-						onclick="addLayer('<?=dirname($_SERVER['SCRIPT_NAME']).'/'.$gpx?>')">
+						onclick="addLayer('<?=$gpx?>')">
 						<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
 					</a>
 				</li>

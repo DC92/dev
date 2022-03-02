@@ -13,5 +13,5 @@ echo read_replace (
 		'My GPS' => isset ($title) ? $title : 'My GPS',
 		'./' => $scope_path,
 		'index.html' => $index,
-	]	
+	]
 );

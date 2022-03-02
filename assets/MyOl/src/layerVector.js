@@ -10,7 +10,7 @@
  * selectorName : <input name="SELECTORNAME"> url arguments selector
  * selectorName : <TAG id="SELECTORNAME-status"></TAG> display loading status
  * urlFunction: function(options, bbox, selection, extent, resolution, projection) returning the XHR url
- * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX 
+ * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX
  * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
  * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
