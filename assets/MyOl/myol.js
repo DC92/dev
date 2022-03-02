@@ -1117,8 +1117,6 @@ function styleOptionsCluster(feature, properties) {
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
-//BEST http://www.lacsdespyrenees.com/kml-Bielsa.kml
-//BEST https://www.lecampingsauvage.fr/legislation-et-reglementation/camping-sauvage-bivouac
 
 /**
  * Site chemineur.fr, alpages.info
@@ -1126,7 +1124,7 @@ function styleOptionsCluster(feature, properties) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/', //TODO investiger pourquoi c'est pris par urlFunction & convertProperties
+		host: '//chemineur.fr/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
@@ -1174,7 +1172,7 @@ function layerGeoBB(options) {
  */
 function layerWri(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//www.refuges.info/', //TODO investiger pourquoi c'est pris par urlFunction & convertProperties
+		host: '//www.refuges.info/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'api/bbox?nb_points=all' +
 				'&type_points=' + selection.join(',') +

@@ -11,6 +11,8 @@ require_once ('functions.php');
 <html>
 <head>
 	<link rel="manifest" href="<?=$script_path?>manifest.json.php">
+	<!-- /TODO BUG Error while trying to use the following icon from the Manifest: https://c92.fr/test/gps/MyOl/gps/favicon.png (Download error or resource isn't a valid image) -->
+	<!-- /TODO BUG ne retrouve pas glob(*.gpx) quand installé -->
 
 	<title><?=isset($title)?$title:'My GPS'?></title>
 	<meta charset="utf-8">
