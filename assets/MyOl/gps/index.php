@@ -7,6 +7,8 @@ Based on https://openlayers.org
 <?php
 $entry_url = $_SERVER['SCRIPT_NAME'];
 require_once ('functions.php');
+
+$url_path = str_replace ('../../', '.././../', $url_path); //HACK avoid http 406 error
 ?>
 <html>
 <head>
@@ -39,7 +41,7 @@ require_once ('functions.php');
 	<link href="<?=$script_path?>index.css" type="text/css" rel="stylesheet">
 	<script src="<?=$script_path?>index.js" defer="defer"></script>
 	<script>
-		var serviceWorkerName = '<?=$script_path?>service-worker.js.php',
+		var serviceWorkerName = '<?=$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
 			scope = '<?=$scope_path?>',
 			scriptName = 'index.php',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
