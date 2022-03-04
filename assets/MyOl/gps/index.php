@@ -14,7 +14,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 <html>
 <head>
 	<title><?=$manifest['name']?></title>
-	<link rel="manifest" href="<?=@$script_path?>manifest-php.json">
+	<link rel="manifest" href="<?=@$script_path?>manifest-php.json"><?/* //TODO -> manifest.json */?>
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
