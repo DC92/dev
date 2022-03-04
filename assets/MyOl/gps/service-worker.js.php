@@ -1,6 +1,4 @@
 <?php
-require_once ('functions.php');
-
 header('Content-Type: application/javascript');
 
 // Check new version each time the url is called
@@ -15,12 +13,16 @@ foreach (glob ("{../*,../*/*,{$_GET['url_path']}*}", GLOB_BRACE) as $f)
 	$versionTag += filemtime ($f);
 
 // Read service worker & replace some values
-$serviceWorkerCode = read_replace (
-	'service-worker.js', [
-		'index.html' => $_GET['url_path'].'index.php',
-		'manifest.json' => 'manifest.json.php',
-		'myGpsCache' => 'myGpsCache_'.$versionTag,
-	]
+$changes = [
+	'index.html' => $_GET['url_path'].'index.php',
+	'favicon.png' => 'favicon.svg',
+	'manifest.json' => 'manifest-php.json',
+	'myGpsCache' => 'myGpsCache_'.$versionTag,
+];
+
+$serviceWorkerCode = str_replace (
+	array_keys ($changes), $changes,
+	file_get_contents ('service-worker.js')
 );
 
 // Add GPX files in the url directory to the list of files to cache

@@ -5,44 +5,43 @@ https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
 <?php
-$entry_url = $_SERVER['SCRIPT_NAME'];
-require_once ('functions.php');
+$url_path = str_replace ('../../', '.././../', @$url_path); //HACK avoid http 406 error
 
-$url_path = str_replace ('../../', '.././../', $url_path); //HACK avoid http 406 error
+$manifest = json_decode (file_get_contents ('manifest-php.json'), true);
+$icon_file = $manifest['icons'][0]['src'];
+$icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 ?>
 <html>
 <head>
-	<link rel="manifest" href="<?=$script_path?>manifest.json.php">
-	<!-- /TODO BUG Error while trying to use the following icon from the Manifest: https://c92.fr/test/gps/MyOl/gps/favicon.png (Download error or resource isn't a valid image) -->
-	<!-- /TODO BUG ne retrouve pas glob(*.gpx) quand installé -->
+	<title><?=$manifest['name']?></title>
+	<link rel="manifest" href="<?=@$script_path?>manifest-php.json">
 
-	<title><?=isset($title)?$title:'My GPS'?></title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="icon" type="png" href="<?=$script_path?>favicon.png" />
+	<link rel="icon" type="image/<?=$icon_type?>" href="<?=$icon_file?>" />
 
 	<!-- Polyfill iOS : Amélioration du pseudo full screen pour les cartes pour d'anciennes versions d'iOS/Safari -->
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
 	<!-- Openlayers -->
-	<link href="<?=$script_path?>../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="<?=$script_path?>../ol/ol.js"></script>
+	<link href="<?=@$script_path?>../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="<?=@$script_path?>../ol/ol.js"></script>
 
 	<!-- Recherche par nom -->
-	<link href="<?=$script_path?>../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
-	<script src="<?=$script_path?>../geocoder/ol-geocoder.js"></script>
+	<link href="<?=@$script_path?>../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
+	<script src="<?=@$script_path?>../geocoder/ol-geocoder.js"></script>
 
 	<!-- My Openlayers -->
-	<link href="<?=$script_path?>../myol.css" type="text/css" rel="stylesheet">
-	<script src="<?=$script_path?>../myol.js"></script>
+	<link href="<?=@$script_path?>../myol.css" type="text/css" rel="stylesheet">
+	<script src="<?=@$script_path?>../myol.js"></script>
 
 	<!-- This app -->
-	<link href="<?=$script_path?>index.css" type="text/css" rel="stylesheet">
-	<script src="<?=$script_path?>index.js" defer="defer"></script>
+	<link href="<?=@$script_path?>index.css" type="text/css" rel="stylesheet">
+	<script src="<?=@$script_path?>index.js" defer="defer"></script>
 	<script>
-		var serviceWorkerName = '<?=$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
-			scope = '<?=$scope_path?>',
+		var serviceWorkerName = '<?=@$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
+			scope = '<?=@$scope_path?$scope_path:'./'?>',
 			scriptName = 'index.php',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
 	</script>
