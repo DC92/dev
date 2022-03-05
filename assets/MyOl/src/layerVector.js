@@ -446,7 +446,7 @@ function styleOptionsIcon(iconUrl) {
 		return {
 			image: new ol.style.Icon({
 				src: iconUrl,
-				imgSize: [24, 24], // IE compatibility //BEST automatic detect or polyfill
+				imgSize: [24, 24], // IE compatibility
 			}),
 		};
 }

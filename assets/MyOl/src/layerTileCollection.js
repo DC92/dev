@@ -129,7 +129,6 @@ function layerIGN(subLayer, options) {
  * Swisstopo https://api.geo.admin.ch/
  */
 function layerSwissTopo(layer1) {
-	//BEST carte stamen hors zoom ou extent
 	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];

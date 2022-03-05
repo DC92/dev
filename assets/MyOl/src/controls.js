@@ -449,8 +449,13 @@ function controlGPS() {
 				// Center the map
 				view.setCenter(position);
 
-				if (!nbLoc) // Only the first time after activation
+				if (!nbLoc) { // Only the first time after activation
 					view.setZoom(17); // Zoom on the area
+
+					map.dispatchEvent({
+						type: 'myol:ongpsactivate',
+					});
+				}
 
 				nbLoc++;
 
@@ -524,7 +529,7 @@ function controlLoadGPX(options) {
 						if (properties.sym)
 							styleOptions.image = new ol.style.Icon({
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.png',
-								imgSize: [24, 24], // IE compatibility //BEST automatic detect
+								imgSize: [24, 24], // IE compatibility
 							});
 
 						return new ol.style.Style(styleOptions);
@@ -715,7 +720,7 @@ function controlsCollection(options) {
 
 	return [
 		// Top left
-		new ol.control.Zoom(), //BEST Valeur du pas du zoom tous explorateurs
+		new ol.control.Zoom(),
 		controlFullScreen(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),

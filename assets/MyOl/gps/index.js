@@ -115,6 +115,12 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		window.addEventListener('load', function() {
 			addLayer(gpxFile);
 		});
+
+	// Mask if GPS location is active
+	map.on('myol:ongpsactivate', function(evt) {
+		if (elListe)
+			elListe.style.display = 'none';
+	});
 }
 
 function addLayer(url) {
@@ -150,7 +156,6 @@ function addLayer(url) {
 	map.getView().setZoom(1);
 
 	// Mask the local .gpx file list
-	//BEST mask if GPS location is run
 	if (elListe)
 		elListe.style.display = 'none';
 }
