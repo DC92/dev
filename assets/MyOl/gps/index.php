@@ -47,11 +47,31 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	</script>
 </head>
 
+<!--
+	// Add a gpx layer if any arguments to the url
+	const gpxFile = location.search.replace('?', '').replace('gpx=', '');
+-->
 <body>
 	<?php
 	// List gpx files on the url directory
 	$gpx_files = glob ('*.gpx');
-	if (count ($gpx_files) && !isset ($_GET['gpx'])) { ?>
+	$gpx_args = $_GET ?: $gpx_files;
+
+	// Add a gpx layer if any arguments to the url
+	if (count ($gpx_args) == 1) {
+		$gpx_show =
+			@$gpx_args['gpx'] ?: // 1 : ?gpx=trace
+			str_replace ('.gpx', '', array_values($gpx_args)[0]) ?: // 3 : 1 gpx file in the directory
+			array_keys($gpx_args)[0]; // 2 : ?trace
+
+		if (in_array ($gpx_show.'.gpx', $gpx_files)) { ?>
+		<script>
+			var gpxFile = '<?=$gpx_show?>.gpx';
+		</script>
+	<?php }
+	}
+
+	if (count ($gpx_files)) { ?>
 		<div id="liste">
 			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
 			<ul>
@@ -71,8 +91,9 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 
 	<div id="map"></div>
 
-	<?php if(file_exists ('footer.php'))
-		include 'footer.php';
+	<?php // WRI
+		if(file_exists ('footer.php'))
+			include 'footer.php';
 	?>
 </body>
 </html>

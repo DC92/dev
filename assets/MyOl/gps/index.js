@@ -110,11 +110,10 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		}),
 	});
 
-	// Add a gpx layer if any arguments to the url
-	const gpxFile = location.search.replace('?', '').replace('gpx=', '');
-	if (gpxFile)
+	// Add a gpx layer if any to be loaded
+	if (typeof gpxFile == 'string')
 		window.addEventListener('load', function() {
-			addLayer(gpxFile + '.gpx');
+			addLayer(gpxFile);
 		});
 }
 
