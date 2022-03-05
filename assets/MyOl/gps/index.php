@@ -7,14 +7,14 @@ Based on https://openlayers.org
 <?php
 $url_path = str_replace ('../../', '.././../', @$url_path); //HACK avoid http 406 error
 
-$manifest = json_decode (file_get_contents ('manifest-php.json'), true);
+$manifest = json_decode (file_get_contents ('manifest.json.php'), true);
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 ?>
 <html>
 <head>
 	<title><?=$manifest['name']?></title>
-	<link rel="manifest" href="<?=@$script_path?>manifest-php.json"><!-- //TODO -> manifest.json -->
+	<link rel="manifest" href="<?=@$script_path?>manifest.json.php">
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />

@@ -15,7 +15,7 @@ foreach (glob ("{../*,../*/*,{$_GET['url_path']}*}", GLOB_BRACE) as $f)
 // Read service worker & replace some values
 $changes = [
 	'index.html' => $_GET['url_path'].'index.php',
-	'manifest.json' => 'manifest-php.json',
+	'manifest.json' => 'manifest.json.php',
 	'myGpsCache' => 'myGpsCache_'.$versionTag,
 ];
 
