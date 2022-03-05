@@ -5,9 +5,8 @@ https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
 <?php
-$url_path = str_replace ('../../', '.././../', @$url_path); //HACK avoid http 406 error
-
 $manifest = json_decode (file_get_contents ('manifest.json.php'), true);
+$url_path = str_replace ('../../', '.././../', @$url_path); //HACK avoid http 406 error
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 ?>
@@ -47,10 +46,6 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	</script>
 </head>
 
-<!--
-	// Add a gpx layer if any arguments to the url
-	const gpxFile = location.search.replace('?', '').replace('gpx=', '');
--->
 <body>
 	<?php
 	// List gpx files on the url directory
@@ -71,6 +66,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	<?php }
 	}
 
+	// Add a gpx layers list
 	if (count ($gpx_files)) { ?>
 		<div id="liste">
 			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
