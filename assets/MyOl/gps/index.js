@@ -27,11 +27,8 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		// Reload if the service worker md5 (including versionTag) has changed
 		.then(function(reg) {
 			reg.addEventListener('updatefound', function() {
-				// Erase all caches
-				caches.keys().then(function(names) {
-					for (let name of names)
-						caches.delete(name);
-				});
+				caches.delete('myGpsCache');
+
 				location.reload();
 			});
 		});

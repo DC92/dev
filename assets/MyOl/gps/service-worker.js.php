@@ -13,13 +13,8 @@ foreach (glob ("{../*,../*/*,{$_GET['url_path']}*}", GLOB_BRACE) as $f)
 	$versionTag += filemtime ($f);
 
 // Read service worker & replace some values
-$changes = [
-	'index.html' => $_GET['url_path'].'index.php',
-	'myGpsCache' => 'myGpsCache_'.$versionTag,
-];
-
 $serviceWorkerCode = str_replace (
-	array_keys ($changes), $changes,
+	'index.html', $_GET['url_path'].'index.php',
 	file_get_contents ('service-worker.js')
 );
 
@@ -32,4 +27,4 @@ foreach (glob ($_GET['url_path'].'*.gpx') as $gf) {
 	);
 }
 
-echo $serviceWorkerCode;
+echo "// Version tag $versionTag\n$serviceWorkerCode";

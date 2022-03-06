@@ -7,7 +7,7 @@ $mapKeys = [
 $title = 'GPS refuges.info';
 
 $scope_path = '../';
-$url_path = '../wri/';
-$script_path = '../gps/';
+$url_path = '../../wri/';
+$script_path = '../MyOl/gps/';
 
 include ($script_path.'index.php');
