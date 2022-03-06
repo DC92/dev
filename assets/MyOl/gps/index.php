@@ -5,7 +5,7 @@ https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
 <?php
-$manifest = json_decode (file_get_contents ('manifest.json.php'), true);
+$manifest = json_decode (file_get_contents ('manifest.json'), true);
 $url_path = str_replace ('../../', '.././../', @$url_path); //HACK avoid http 406 error
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
@@ -13,15 +13,11 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 <html>
 <head>
 	<title><?=$manifest['name']?></title>
-	<link rel="manifest" href="manifest.json.php">
+	<link href="manifest.json" rel="manifest">
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="icon" type="image/<?=$icon_type?>" href="<?=$icon_file?>" />
-
-	<!-- Polyfill iOS : Amélioration du pseudo full screen pour les cartes pour d'anciennes versions d'iOS/Safari -->
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<link href="<?=$icon_file?>" rel="icon" type="image/<?=$icon_type?>" />
 
 	<!-- Openlayers -->
 	<link href="<?=@$script_path?>../ol/ol.css" type="text/css" rel="stylesheet">
@@ -40,7 +36,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	<script src="<?=@$script_path?>index.js" defer="defer"></script>
 	<script>
 		var serviceWorkerName = '<?=@$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
-			scope = '<?=@$scope_path?$scope_path:'./'?>',
+			scope = '<?=@$scope_path?:'./'?>',
 			scriptName = 'index.php',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
 	</script>
