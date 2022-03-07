@@ -1,5 +1,6 @@
 {
 	"name": "My GPS",
+	"id": "simple_gps",
 	"display": "fullscreen",
 	"scope": "./",
 	"start_url": "index.html",
