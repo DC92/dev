@@ -1,7 +1,7 @@
 /**
  * PWA
  */
-let map;
+var map;
 const liTags = document.getElementsByTagName('li'),
 	elListe = document.getElementById('liste');
 
@@ -27,7 +27,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		// Reload if the service worker md5 (including versionTag) has changed
 		.then(function(reg) {
 			reg.addEventListener('updatefound', function() {
-				caches.delete('myGpsCache');
+				//caches.delete('myGpsCache');
 
 				location.reload();
 			});

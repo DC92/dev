@@ -18,6 +18,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link href="<?=$icon_file?>" rel="icon" type="image/<?=$icon_type?>" />
+	<link href="<?=$icon_file?>" rel="apple-touch-icon" />
 
 	<!-- Openlayers -->
 	<link href="<?=@$script_path?>../ol/ol.css" type="text/css" rel="stylesheet">
