@@ -28,6 +28,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		.then(function(reg) {
 			if (reg.active) // Already installed
 				reg.addEventListener('updatefound', function() {
+					//HACK Do it after upgrades load
 					if (confirm('Charger nouvelles informations ?'))
 						location.reload();
 				});
@@ -114,7 +115,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		});
 
 	// Mask if GPS location is active
-	map.on('myol:ongpsactivate', function(evt) {
+	map.on('myol:ongpsactivate', function() {
 		if (elListe)
 			elListe.style.display = 'none';
 	});
@@ -152,7 +153,7 @@ function addLayer(url) {
 	//HACK needed because the layer only becomes active when in the map area
 	map.getView().setZoom(1);
 
-	// Mask the local .gpx file list
+	// Mask the local .gpx file list when one gpx is displayed
 	if (elListe)
 		elListe.style.display = 'none';
 }

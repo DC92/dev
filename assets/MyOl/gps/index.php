@@ -56,8 +56,8 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 			str_replace ('.gpx', '', array_values($gpx_args)[0]) ?: // 3 : 1 gpx file in the directory
 			array_keys($gpx_args)[0]; // 2 : ?trace
 
-		if (in_array ($gpx_show.'.gpx', $gpx_files)) { ?>
-		<script>
+		if (in_array ($gpx_show.'.gpx', $gpx_files)) {
+	?>	<script>
 			var gpxFile = '<?=$gpx_show?>.gpx';
 		</script>
 	<?php }

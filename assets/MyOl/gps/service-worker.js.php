@@ -7,11 +7,6 @@ header('Cache-Control: no-cache');
 header('Pragma: no-cache');
 header('Service-Worker-Allowed: /');
 
-// Calculate a key depending on the delivery (Total byte size of cached files)
-$versionTag = 0;
-foreach (glob ("{../*,../*/*,{$_GET['url_path']}*}", GLOB_BRACE) as $f)
-	$versionTag += filemtime ($f);
-
 // Read service worker & replace some values
 $serviceWorkerCode = str_replace (
 	'index.html', $_GET['url_path'].'index.php',
@@ -27,4 +22,10 @@ foreach (glob ($_GET['url_path'].'*.gpx') as $gf) {
 	);
 }
 
+// Calculate a key depending on the delivery (Total byte size of cached files)
+$versionTag = 0;
+foreach (glob ("{../*,../*/*,{$_GET['url_path']}*}", GLOB_BRACE) as $f)
+	$versionTag += filemtime ($f);
+
+// Display code
 echo "// Version tag $versionTag\n$serviceWorkerCode";
