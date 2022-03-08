@@ -26,10 +26,11 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		)
 		// Reload if the service worker md5 (including versionTag) has changed
 		.then(function(reg) {
-			reg.addEventListener('updatefound', function() {
-				if (confirm('Charger nouvelles informations ?'))
-					location.reload();
-			});
+			if (reg.active) // Already installed
+				reg.addEventListener('updatefound', function() {
+					if (confirm('Charger nouvelles informations ?'))
+						location.reload();
+				});
 		});
 
 	/**

@@ -128,7 +128,7 @@ function layerThunderforest(subLayer) {
 	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
 
 	if (mapKeys.thunderforest)
-		layerOSM(
+		return layerOSM(
 			'//{a-c}.tile.thunderforest.com/' + subLayer +
 			'/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
