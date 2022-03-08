@@ -24,14 +24,17 @@ if (!location.href.match(/(https|localhost).*index/)) {
 				scope: typeof scope == 'undefined' ? './' : scope,
 			}
 		)
-		// Reload if the service worker md5 (including versionTag) has changed
-		.then(function(reg) {
-			if (reg.active) // Already installed
-				reg.addEventListener('updatefound', function() {
-					//HACK Do it after upgrades load
-					if (confirm('Charger nouvelles informations ?'))
-						location.reload();
-				});
+		.then(function(registration) {
+			if (registration.active) // Avoid reload on first install
+				registration.onupdatefound = function() { // service-worker.js is changed
+					const installingWorker = registration.installing;
+					installingWorker.onstatechange = function() {
+						if (installingWorker.state == 'installed')
+							// The old content have been purged
+							// and the fresh content have been added to the cache.
+							location.reload();
+					};
+				};
 		});
 
 	/**
