@@ -7,7 +7,6 @@
 	"icons": [{
 		"src": "../assets/MyOl/gps/favicon.png",
 		"sizes": "225x225",
-		"type": "image/png",
-		"purpose": "any"
+		"type": "image/png"
 	}]
 }

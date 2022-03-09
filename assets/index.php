@@ -5,8 +5,4 @@ $mapKeys = [
 	'bing' => 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt',
 ];
 
-$scope_path = '../../';
-$url_path = '../../';
-$script_path = 'MyOl/gps/';
-
-include ($script_path.'index.php');
+include ('MyOl/gps/index.php');

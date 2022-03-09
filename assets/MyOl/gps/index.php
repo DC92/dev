@@ -5,8 +5,26 @@ https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
 <?php
+// Scan involved directories
+$url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
+$script_dirs  = explode ('/', str_replace ('\\', '/', __DIR__ .'/'));
+
+// Remove common part of the paths (except the last /)
+while (count ($url_dirs ) > 1 && count ($script_dirs ) > 1 &&
+	$url_dirs [0] == $script_dirs [0]) {
+	array_shift ($url_dirs );
+	array_shift ($script_dirs );
+}
+
+// Url path from service-worker
+$url_path = str_replace ('../../', '.././../', //HACK avoid http 406 error
+	str_repeat ('../', count ($script_dirs ) - 1) .implode ('/', $url_dirs));
+
+// Gps scripts path from url
+$script_path = str_repeat ('../', count ($url_dirs ) - 1) .implode ('/', $script_dirs);
+
+// Get manifest info
 $manifest = json_decode (file_get_contents ('manifest.json'), true);
-$url_path = str_replace ('../../', '.././../', @$url_path); //HACK avoid http 406 error
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 ?>
@@ -37,7 +55,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	<script src="<?=@$script_path?>index.js" defer="defer"></script>
 	<script>
 		var serviceWorkerName = '<?=@$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
-			scope = '<?=@$scope_path?:'./'?>',
+			scope = '<?=$manifest['scope']?>',
 			scriptName = 'index.php',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
 	</script>
