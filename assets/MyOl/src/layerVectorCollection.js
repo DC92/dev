@@ -193,14 +193,13 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-//TODO BUG Access to XMLHttpRequest has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
 function layerOverpass(options) {
 	const format = new ol.format.OSMXML(),
 		layer = layerVectorCluster(Object.assign({
 			//host: 'overpass-api.de',
 			//host: 'lz4.overpass-api.de',
-			host: 'overpass.openstreetmap.fr',
-			//host: 'overpass.kumi.systems',
+			//host: 'overpass.openstreetmap.fr', // Out of order
+			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
 			urlFunction: urlFunction,
