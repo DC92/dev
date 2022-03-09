@@ -17,7 +17,7 @@ while (count ($url_dirs ) > 1 && count ($script_dirs ) > 1 &&
 }
 
 // Url path from service-worker
-$url_path = str_replace ('../../', '.././../', //HACK avoid http 406 error
+$url_path = str_replace ('../', ':', //HACK avoid http 406 error
 	str_repeat ('../', count ($script_dirs ) - 1) .implode ('/', $url_dirs));
 
 // Gps scripts path from url
