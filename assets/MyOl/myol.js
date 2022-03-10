@@ -572,7 +572,6 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector(Object.assign({
 			source: source,
 			style: style,
-			//BEST declutter: true, //BEST BUG enlève les labels mais aussi les icones
 		}, options)),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
@@ -694,7 +693,6 @@ function layerVector(opt) {
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
 				zIndex: 30, // Hover : above the the features
-				//BEST declutter: true, //To avoid dumping the other labels
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
@@ -718,7 +716,6 @@ function layerVector(opt) {
 		function mouseEvent(evt) {
 			const originalEvent = evt.originalEvent || evt,
 				// Get the hovered feature
-				//BEST BUG forEachFeatureAtPixel with no features when decluter
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature) {
@@ -799,7 +796,6 @@ function layerVectorCluster(options) {
 		// Clusterized layer
 		clusterLayer = new ol.layer.Vector(Object.assign({
 			source: clusterSource,
-			//BEST declutter: true,
 			style: clusterStyle,
 			visible: layer.getVisible(),
 			zIndex: layer.getZIndex(),
