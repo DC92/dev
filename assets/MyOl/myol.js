@@ -166,11 +166,11 @@ function layerStamen(subLayer, minResolution) {
  * doc : https://geoservices.ign.fr/services-web
  */
 function layerIGN(subLayer, options) {
-	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
+	options = options || {};
+	if (typeof mapKeys == 'undefined' || !mapKeys)
+		mapKeys = {};
 
-	if (mapKeys.ign) {
-		options = options || {};
-
+	if (options.key || mapKeys.ign) {
 		let IGNresolutions = [],
 			IGNmatrixIds = [];
 
@@ -182,7 +182,7 @@ function layerIGN(subLayer, options) {
 		return new ol.layer.Tile({
 			maxResolution: options.maxResolution,
 			source: new ol.source.WMTS({
-				url: '//wxs.ign.fr/' + mapKeys.ign + '/wmts',
+				url: '//wxs.ign.fr/' + (options.key || mapKeys.ign) + '/wmts',
 				layer: subLayer,
 				matrixSet: 'PM',
 				format: 'image/' + (options.format || 'jpeg'),
