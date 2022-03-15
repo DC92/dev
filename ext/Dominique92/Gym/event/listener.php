@@ -70,8 +70,6 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
-		global $forum_accueil;
-
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
@@ -119,6 +117,8 @@ class listener implements EventSubscriberInterface
 				p.gym_menu,
 				p.gym_ordre_menu,
 */
+		global $my_forum_ids;
+
 		$sql = "SELECT p.*,
 				equi.topic_id AS eti, equi.post_subject AS en,
 				acti.topic_id AS ati, acti.post_subject AS an,
@@ -130,12 +130,12 @@ class listener implements EventSubscriberInterface
 				JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			WHERE p.topic_id = $forum_accueil";
+			WHERE p.topic_id = ".$my_forum_ids['accueil'];
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
-			$menus ['Activités'] [$row['en']] = $row + ['id' => $row['eti']];
-			$menus ['Équipe'] [$row['an']] = $row + ['id' => $row['ati']];
+			$menus ['Activités'] [$row['an']] = $row + ['id' => $row['eti']];
+			$menus ['Équipe'] [$row['en']] = $row + ['id' => $row['ati']];
 			$menus ['Lieux'] [$row['ln']] = $row + ['id' => $row['lti']];
 			$horaire [intval($row ['gym_jour'])] [$row['gym_heure']*60 + $row['gym_minute']] = $row;
 		}
@@ -144,7 +144,7 @@ class listener implements EventSubscriberInterface
 		// Page d'accueil
 		$sql = "SELECT topic_id, post_id, post_subject
 			FROM ".POSTS_TABLE." AS p
-			WHERE p.forum_id = 9"; //TODO récupérer n° forum 9
+			WHERE p.forum_id = ".$my_forum_ids['presentation'];
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result))

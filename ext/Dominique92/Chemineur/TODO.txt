@@ -21,9 +21,6 @@
 //BEST ?? Les pictos ont disparu sur V3
 //BEST ?? Click sur une icone chem2 plante
 
-//BEST http://www.lacsdespyrenees.com/kml-Bielsa.kml
-//BEST https://www.lecampingsauvage.fr/legislation-et-reglementation/camping-sauvage-bivouac
-
 //BEST AIDE CHEM
 Un sujet est actif quand il y a eu des contributions récentes.
 Création / Edition de traces
