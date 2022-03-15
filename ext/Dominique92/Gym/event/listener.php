@@ -70,6 +70,8 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
+		global $forum_accueil;
+
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
@@ -81,7 +83,7 @@ class listener implements EventSubscriberInterface
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
 		// Assign command line
-		/* //TODO garde ?
+		/* //TODO DELETE ?
 		foreach ($this->args AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
 
@@ -95,7 +97,7 @@ class listener implements EventSubscriberInterface
 		$horaire = [];
 		$jours_semaine = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
 
-		// Exploration des horaires
+		// Exploration de la base
 /*
 				p.post_subject,
 				p.gym_activite,
@@ -128,7 +130,7 @@ class listener implements EventSubscriberInterface
 				JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			WHERE p.topic_id = 1";
+			WHERE p.topic_id = $forum_accueil";
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
@@ -139,7 +141,7 @@ class listener implements EventSubscriberInterface
 		}
 		$this->db->sql_freeresult($result);
 
-		// Exploration des éléments d'accueil
+		// Page d'accueil
 		$sql = "SELECT topic_id, post_id, post_subject
 			FROM ".POSTS_TABLE." AS p
 			WHERE p.forum_id = 9"; //TODO récupérer n° forum 9
@@ -163,7 +165,18 @@ class listener implements EventSubscriberInterface
 				);
 		}
 
-		// Extraction des horaires
+		// Horaires
+		foreach ($horaire AS $j)
+			foreach ($j AS $h)
+		foreach ($h AS $k=>$v){
+			if ($v == @$this->args['t'])
+;
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'>aa = ".var_export($h,true).'</pre>'.PHP_EOL;
+		}
+		
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($this->args['t'],true).'</pre>'.PHP_EOL;
+
+
 		ksort ($horaire);
 		foreach ($horaire AS $j=>$v) {
 			$first = $v[array_keys ($v)[0]];
@@ -197,7 +210,7 @@ class listener implements EventSubscriberInterface
 		$sql = "SELECT post_id, post_subject, post_text, bbcode_uid, bbcode_bitfield
 			FROM ".POSTS_TABLE." AS p
 			WHERE p.forum_id = 13
-			ORDER BY post_subject"; //TODO reprendre les valeurs de config.php
+			ORDER BY post_subject"; //TODO reprendre les valeurs de config.php //TODO pourquoi 13 ?
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {

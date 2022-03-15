@@ -49,6 +49,7 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 		$this->language = $language;
 
+		$this->cookie = $this->request->get_super_global(\phpbb\request\request_interface::COOKIE);
 		$this->post = $this->request->get_super_global(\phpbb\request\request_interface::POST);
 		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
 		$this->uri = $this->server['REQUEST_SCHEME'].'://'.$this->server['SERVER_NAME'].$this->server['REQUEST_URI'];
@@ -162,7 +163,23 @@ class listener implements EventSubscriberInterface
 	}
 
 	function index_modify_page_title ($vars) {
+
 		$uris = explode ('/?', $this->uri);
+		$cookies = [];
+
+		// Get cookies context
+		global $config;
+		foreach (['u','k','sid'] AS $v) {
+			$kn = $config['cookie_name'].'_'.$v;
+			$cookies[] .= $kn.'='.$this->cookie[$kn];
+		}
+		$context = stream_context_create([
+			'http' => [
+				'method' => "GET",
+				'header' => "Accept-language: en\r\n".
+							"Cookie: ".implode('; ',$cookies)."\r\n",
+				],
+		]);
 
 		/* Route to viewtopic or viewforum if there is an argument p, t or f */
 		if (defined('MYPHPBB_REDIRECT_INDEX') &&
@@ -170,10 +187,18 @@ class listener implements EventSubscriberInterface
 			!$this->request->variable ('template', '')) {
 				if ($this->request->variable ('p', 0) ||
 					$this->request->variable ('t', 0))
-					exit (file_get_contents ($uris[0].'/viewtopic.php?template=viewtopic&'.$uris[1]));
+					exit (file_get_contents (
+						$uris[0].'/viewtopic.php?template=viewtopic&'.$uris[1],
+						false,
+						$context
+					));
 					//TODO error reporting
 				if ($this->request->variable ('f', 0))
-					exit (file_get_contents ($uris[0].'/viewforum.php?template=viewforum&'.$uris[1]));
+					exit (file_get_contents (
+						$uris[0].'/viewforum.php?template=viewforum&'.$uris[1],
+						false,
+						$context
+					));
 		}
 	}
 
