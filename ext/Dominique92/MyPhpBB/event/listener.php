@@ -210,7 +210,9 @@ class listener implements EventSubscriberInterface
 		/* Allows call posting.php without &f=forum_id */
 		if (defined('MYPHPBB_POSTING_WITHOUT_FID') &&
 			!$vars['forum_id']) {
-			$sql = 'SELECT forum_id FROM '.TOPICS_TABLE.' WHERE topic_id LIKE '.$vars['topic_id'];
+			$sql = 'SELECT forum_id FROM '.POSTS_TABLE.
+				' WHERE topic_id LIKE '.$vars['topic_id'].
+				'    OR post_id  LIKE '.$vars['post_id'];
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
