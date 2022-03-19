@@ -71,8 +71,6 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
-		global $my_forum_ids;
-
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
@@ -157,9 +155,10 @@ class listener implements EventSubscriberInterface
 			// Rubriques du menu
 			ksort ($m); // Par ordre alphabétique des rubriques du menu
 			foreach ($m AS $k=>$v)
-				$this->template->assign_block_vars ('menu.item',
-					array_change_key_case ($v, CASE_UPPER)
-				);
+				if ($v['post_subject'] != $v['forum_name'])
+					$this->template->assign_block_vars ('menu.item',
+						array_change_key_case ($v, CASE_UPPER)
+					);
 		}
 
 		// Horaires
@@ -174,7 +173,7 @@ class listener implements EventSubscriberInterface
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($this->args['t'],true).'</pre>'.PHP_EOL;
 
 		ksort ($horaire);
-if(0)////////////////////////////DCMM
+if(0)//TODO HORAIRES
 		foreach ($horaire AS $j=>$v) {
 			$first = $v[array_keys ($v)[0]];
 			$first['JOUR_LITERAL'] = $this->jours_semaine[$j];
@@ -204,7 +203,7 @@ if(0)////////////////////////////DCMM
 	*/
 	function index_modify_page_title($vars) {
 		// Rubriques d'acceuil
-		$sql = "SELECT post_id, post_subject, post_text, bbcode_uid, bbcode_bitfield
+		$sql = "SELECT forum_id, post_id, post_subject, post_text, bbcode_uid, bbcode_bitfield
 			FROM ".POSTS_TABLE." AS p
 			WHERE p.forum_id = 13
 			ORDER BY post_subject"; //TODO reprendre les valeurs de config.php //TODO pourquoi 13 ?

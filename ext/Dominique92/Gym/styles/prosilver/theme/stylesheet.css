@@ -271,6 +271,9 @@ body {
 .gym .menu > li div a {
 	color: white;
 }
+.gym .button-icon-only {
+	text-decoration: none;
+}
 
 .gym .submenu a {
 	color: black !important;
