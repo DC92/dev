@@ -253,13 +253,12 @@ if(0)//TODO HORAIRES
 
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
-		return; //TODO
-
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
-		$p = $this->request->variable ('p', 0);
 
-		// [redirect]ABSOLUTE_PATH[/redirect] go to ABSOLUTE_PATH */
+		return; //TODO
+
+		$p = $this->request->variable ('p', 0);
 		if ($vars['row']['post_id'] == $p || !$p) { // Only if a specific post is required
 			// Purge unused <...>
 			$text = preg_replace_callback (
@@ -276,11 +275,19 @@ if(0)//TODO HORAIRES
 
 	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
-		return; //TODO
+		$post_row = $vars['post_row']; // Data to be displayed
 
-		$post_row = $vars['post_row'];
+		// [redirect]ABSOLUTE_PATH[/redirect] go to ABSOLUTE_PATH
+		preg_match ('/([^>]*)<\/a>\[\/redirect\]/', $post_row['MESSAGE'], $match);
+		if ($match)
+			$post_row['REDIRECT'] = $match[1];
+
+		$vars['post_row'] = $post_row;
+
+		return; //TODO /////////////////////////////////////
+
 		$post_id = $post_row['POST_ID'];
-		$post_data = $this->all_post_data[$post_id] ?: [];
+		$post_data = $this->all_post_data[$post_id] ?: []; // Initial sql values
 		$topic_data = $vars['topic_data'];
 
 		// Supprime les balises inutiles pour l'affichage complet
@@ -357,8 +364,6 @@ if(0)//TODO HORAIRES
 				},
 				$post_row['MESSAGE']
 			);
-
-		$vars['post_row'] = $post_row;
 	}
 
 	/**

@@ -1,24 +1,29 @@
 <!-- INCLUDE header.html -->
 
-<!-- //TODO A REVOIR -->
 <div class="page">
 	<!-- BEGIN postrow -->
+		<h1>
+			{postrow.POST_SUBJECT}
+			<!-- IF U_MCP -->
+				<a href="posting.php?mode=edit&p={postrow.POST_ID}"
+					title="Modifier la page {postrow.POST_SUBJECT}" class="button button-icon-only">
+					<i class="icon fa-pencil"></i>
+				</a>
+			<!-- ENDIF -->
+		</h1>
+
+		<!-- IF postrow.REDIRECT -->
+			<meta http-equiv="refresh" content="0;URL={postrow.REDIRECT}">
+		<!-- ELSE -->
+			<div>{postrow.MESSAGE}</div>
+		<!-- ENDIF -->
+
+<!-- //TODO A REVOIR -->
 		<!-- IF postrow.POST_ID == REQUEST_P or (not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID) -->
 
-			<!-- IF postrow.GYM_ACTIVITE > 0 -->
+			<!-- I F postrow.GYM_ACTIVITE >
 				<meta http-equiv="refresh" content="0; URL=?p={postrow.GYM_ACTIVITE}" />
-			<!-- ENDIF -->
-
-			<h1>
-				{postrow.POST_SUBJECT}
-				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&p={postrow.POST_ID}"
-						title="Modifier la page {postrow.POST_SUBJECT}" class="button button-icon-only">
-						<i class="icon fa-pencil"></i>
-					</a>
-				<!-- ENDIF -->
-			</h1>
-			<div>{postrow.MESSAGE}</div>
+			 ENDIF -->
 
 			<script>
 				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
