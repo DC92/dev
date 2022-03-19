@@ -107,9 +107,13 @@ class listener implements EventSubscriberInterface
 
 		$menus = $horaire = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
+			preg_match ('/[0-9 ]*(.*)/', $row['post_subject'], $title);
+			$row['post_title'] = $title[1];
+
 			preg_match ('/:menu=([0-9]*)/', $row['forum_desc'], $no_menu);
 			if ($no_menu)
 				$menus [$no_menu[1]] [$row['post_subject']] = $row;
+
 			$horaire
 				[intval ($row ['gym_jour'])]
 				[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
@@ -210,6 +214,9 @@ if(0)//TODO HORAIRES
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result)) {
+			preg_match ('/[0-9 ]*(.*)/', $row['post_subject'], $title);
+			$row['post_title'] = $title[1];
+
 			// Traduit les BBcodes
 			$row['display_text'] = generate_text_for_display(
 				$row['post_text'],
