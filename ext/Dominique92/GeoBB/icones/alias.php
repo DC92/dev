@@ -50,7 +50,7 @@ $alias = [
 	'vignoble' => 'cabane_violet_purple_a9753.6',
 	'village' => 'cabane_grey_black_a118',
 	'ville' => 'cabane_white_black_a86',
- 
+
 	// WRI
 	//'gite-d-etape' => 'blue',
 	//'passage-delicat' => 'triangle_a33',

@@ -34,6 +34,7 @@ class listener implements EventSubscriberInterface
 		$this->language = $language;
 
 		$this->semaines = '5,6,7,8,9,10,13,14,15,16,17,18,19,22,23,24,25,26,27,30,31,32,33,34,35,36,39,40,41,42,43,44,45,46,47';
+		$this->jours_semaine = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
 
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
@@ -70,6 +71,8 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header() {
+		global $my_forum_ids;
+
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
@@ -85,17 +88,37 @@ class listener implements EventSubscriberInterface
 		foreach ($this->args AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
 
-		// MENUS
-		$menus = [
-			'Présentation' => [],
-			'Activités' => [],
-			'Équipe' => [],
-			'Lieux' => [],
-		];
-		$horaire = [];
-		$jours_semaine = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+		// Lecture de la base
+		$sql = "SELECT
+				f.forum_name, f.forum_desc,
+				p.post_subject, p.topic_id, p.post_id, p.forum_id,
+				p.gym_jour, p.gym_heure, p.gym_minute,
+				equi.forum_id AS efi, equi.topic_id AS eti, equi.post_id AS epi, equi.post_subject AS eps,
+				acti.forum_id AS afi, acti.topic_id AS ati, acti.post_id AS api, acti.post_subject AS aps,
+				lieu.forum_id AS lfi, lieu.topic_id AS lti, lieu.post_id AS lpi, lieu.post_subject AS lps,
+				equi.post_subject AS animateur,
+				acti.post_subject AS activite,
+				lieu.post_subject AS lieu
+			FROM ".POSTS_TABLE." AS p
+				JOIN ".FORUMS_TABLE." AS f ON (f.forum_id = p.forum_id)
+				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
+				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
+				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
+			";
+		$result = $this->db->sql_query($sql);
 
-		// Exploration de la base
+		$menus = $horaire = [];
+		while ($row = $this->db->sql_fetchrow($result)) {
+			preg_match ('/:menu=([0-9]*)/', $row['forum_desc'], $no_menu);
+			if ($no_menu)
+				$menus [$no_menu[1]] [$row['post_subject']] = $row;
+			$horaire
+				[intval ($row ['gym_jour'])]
+				[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
+				$row;
+		}
+		$this->db->sql_freeresult($result);
+
 /*
 				p.post_subject,
 				p.gym_activite,
@@ -110,77 +133,51 @@ class listener implements EventSubscriberInterface
 				p.gym_duree_jours,
 				p.gym_scolaire,
 				p.gym_semaines,
-
 //TODO DELETE
 				p.gym_accueil,
 				p.gym_horaires,
 				p.gym_menu,
 				p.gym_ordre_menu,
 */
-		global $my_forum_ids;
 
-		$sql = "SELECT p.*,
-				equi.topic_id AS eti, equi.post_subject AS en,
-				acti.topic_id AS ati, acti.post_subject AS an,
-				lieu.topic_id AS lti, lieu.post_subject AS ln,
-				equi.post_subject AS animateur,
-				acti.post_subject AS activite,
-				lieu.post_subject AS lieu
-			FROM ".POSTS_TABLE." AS p
-				JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
-				JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
-				JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			WHERE p.topic_id = ".$my_forum_ids['accueil'];
-		$result = $this->db->sql_query($sql);
+		ksort ($menus); // Par n° de menu dans forum_desc
+		foreach ($menus AS $m) {
+			// Etiquette du menu
+			$menu_name = array_values($m)[0]['forum_name'];
 
-		while ($row = $this->db->sql_fetchrow($result)) {
-			$menus ['Activités'] [$row['an']] = $row + ['id' => $row['eti']];
-			$menus ['Équipe'] [$row['en']] = $row + ['id' => $row['ati']];
-			$menus ['Lieux'] [$row['ln']] = $row + ['id' => $row['lti']];
-			$horaire [intval($row ['gym_jour'])] [$row['gym_heure']*60 + $row['gym_minute']] = $row;
-		}
-		$this->db->sql_freeresult($result);
-
-		// Page d'accueil
-		$sql = "SELECT topic_id, post_id, post_subject
-			FROM ".POSTS_TABLE." AS p
-			WHERE p.forum_id = ".$my_forum_ids['presentation'];
-		$result = $this->db->sql_query($sql);
-
-		while ($row = $this->db->sql_fetchrow($result))
-			$menus['Présentation'] [$row['post_subject']] = $row + ['id' => $row['topic_id']];
-		$this->db->sql_freeresult($result);
-
-		foreach ($menus AS $k=>$v) {
 			$this->template->assign_block_vars ('menu', [
-				'TITLE' => $k,
+				'TITLE' => $menu_name,
+				'POST_ID' => @$m[$menu_name]['post_id'],
+				'TOPIC_ID' => array_values($m)[0]['topic_id'],
+				'FORUM_ID' => array_values($m)[0]['forum_id'],
 				'COLOR' => $this->couleur (),
 				'COLOR_TITLE' => $this->couleur (80, 162, 0),
 			]);
 
-			ksort ($v);
-			foreach ($v AS $kv=>$vv)
+			// Rubriques du menu
+			ksort ($m); // Par ordre alphabétique des rubriques du menu
+			foreach ($m AS $k=>$v)
 				$this->template->assign_block_vars ('menu.item',
-					array_change_key_case ($vv + ['title' => $kv], CASE_UPPER)
+					array_change_key_case ($v, CASE_UPPER)
 				);
 		}
 
 		// Horaires
 		foreach ($horaire AS $j)
 			foreach ($j AS $h)
-		foreach ($h AS $k=>$v){
-			if ($v == @$this->args['t'])
-;
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'>aa = ".var_export($h,true).'</pre>'.PHP_EOL;
-		}
-		
+				foreach ($h AS $k=>$v) {
+					if ($v == @$this->args['t'])
+		;
+		//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'>aa = ".var_export($h,true).'</pre>'.PHP_EOL;
+				}
+
 //*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($this->args['t'],true).'</pre>'.PHP_EOL;
 
-
 		ksort ($horaire);
+if(0)////////////////////////////DCMM
 		foreach ($horaire AS $j=>$v) {
 			$first = $v[array_keys ($v)[0]];
-			$first['JOUR_LITERAL'] = $jours_semaine[$j];
+			$first['JOUR_LITERAL'] = $this->jours_semaine[$j];
 			$first['COULEUR'] = $this->couleur ();
 			$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
 			$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);

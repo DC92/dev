@@ -14,18 +14,15 @@ define('MYPHPBB_REDIRECT', true);
 define('MYPHPBB_BBCODE_INCLUDE', true);
 define('MYPHPBB_SHORTCUT', true);
 */
-// NO !
-//define('MYPHPBB_CREATE_POST_BUTTON', true);
+/* NO !
+define('MYPHPBB_CREATE_POST_BUTTON', true);
+*/
 
-//define('MYPHPBB_BBCODE_INCLUDE_TRACE', true);
-//define('MYPHPBB_DUMP_TEMPLATE', true);
+/* Debug
+define('MYPHPBB_BBCODE_INCLUDE_TRACE', true);
+define('MYPHPBB_DUMP_TEMPLATE', true);
+*/
 
-$my_forum_ids = [
-	'accueil' => 1,
-	'presentation' => 9,
-	'equipe' => 11,
-	'lieux' => 4,
-];
 $myphp_js = [
 	'annee_debut' => 2021,
 ];

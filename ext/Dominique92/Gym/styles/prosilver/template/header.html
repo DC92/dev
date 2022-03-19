@@ -83,16 +83,33 @@
 	<!-- BEGIN menu -->
 	<li>
 		<div style="background:{menu.COLOR_TITLE}">
-			<a href="./?t=9">{menu.TITLE}</a><!-- //TODO ce lien faux -->
+			<a <!-- IF menu.POST_ID -->href="./?p={menu.POST_ID}"<!-- ENDIF -->>
+				{menu.TITLE}
+			</a>
+			<!-- IF U_MCP -->
+				<!-- IF menu.POST_ID -->
+					<a href="posting.php?mode=edit&p={menu.POST_ID}"
+				<!-- ELSE -->
+					<a href="posting.php?mode=post&t={menu.TOPIC_ID}"
+				<!-- ENDIF -->
+					title="Modifier la fiche" class="button button-icon-only">
+					<i class="icon fa-pencil"></i>
+				</a>
+
+				<a href="viewforum.php?f={menu.FORUM_ID}"
+					title="Modifier la liste" class="button button-icon-only">
+					<i class="icon fa-list"></i>
+				</a>
+			<!-- ENDIF -->
 		</div>
 
 		<ul style="background:{menu.COLOR}">
 		<!-- BEGIN item -->
 			<li>
-				<a title="Voir la fiche Horaires" href="./?t={item.ID}">{item.TITLE}</a>
+				<a title="Voir la fiche Horaires" href="./?p={item.POST_ID}">{item.POST_SUBJECT}</a>
 
 				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&t={item.ID}"
+					<a href="posting.php?mode=edit&p={item.POST_ID}"
 						title="Modifier la fiche" class="button button-icon-only">
 						<i class="icon fa-pencil"></i>
 					</a>
