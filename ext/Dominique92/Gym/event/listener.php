@@ -49,9 +49,6 @@ class listener implements EventSubscriberInterface
 			// All
 			'core.page_header' => 'page_header',
 
-			// Index
-			'core.index_modify_page_title' => 'index_modify_page_title',
-
 			// Viewtopic
 			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
 			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
@@ -90,6 +87,7 @@ class listener implements EventSubscriberInterface
 		$sql = "SELECT
 				f.forum_name, f.forum_desc,
 				p.post_subject, p.topic_id, p.post_id, p.forum_id,
+				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
 				p.gym_jour, p.gym_heure, p.gym_minute,
 				equi.forum_id AS efi, equi.topic_id AS eti, equi.post_id AS epi, equi.post_subject AS eps,
 				acti.forum_id AS afi, acti.topic_id AS ati, acti.post_id AS api, acti.post_subject AS aps,
@@ -105,14 +103,18 @@ class listener implements EventSubscriberInterface
 			";
 		$result = $this->db->sql_query($sql);
 
-		$menus = $horaire = [];
+		$menus = $accueil = $horaire = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
-			preg_match ('/[0-9 ]*(.*)/', $row['post_subject'], $title);
+			preg_match ('/[0-9]* ?(.*)/', $row['post_subject'], $title);
 			$row['post_title'] = $title[1];
 
 			preg_match ('/:menu=([0-9]*)/', $row['forum_desc'], $no_menu);
 			if ($no_menu)
 				$menus [$no_menu[1]] [$row['post_subject']] = $row;
+
+			preg_match ('/:accueil/', $row['forum_desc'], $est_accueil);
+			if ($est_accueil)
+				$accueil [$row['post_title']] = $row;
 
 			$horaire
 				[intval ($row ['gym_jour'])]
@@ -121,27 +123,7 @@ class listener implements EventSubscriberInterface
 		}
 		$this->db->sql_freeresult($result);
 
-/*
-				p.post_subject,
-				p.gym_activite,
-				p.gym_lieu,
-				p.gym_acces,
-				p.gym_animateur,
-				p.gym_nota,
-				p.gym_jour,
-				p.gym_heure,
-				p.gym_minute,
-				p.gym_duree_heures,
-				p.gym_duree_jours,
-				p.gym_scolaire,
-				p.gym_semaines,
-//TODO DELETE
-				p.gym_accueil,
-				p.gym_horaires,
-				p.gym_menu,
-				p.gym_ordre_menu,
-*/
-
+		// Popule les menus
 		ksort ($menus); // Par n° de menu dans forum_desc
 		foreach ($menus AS $m) {
 			// Etiquette du menu
@@ -164,6 +146,23 @@ class listener implements EventSubscriberInterface
 						array_change_key_case ($v, CASE_UPPER)
 					);
 		}
+
+		// Textes de la page d'accueil
+		ksort ($accueil); // Par ordre alphabétique de titre
+		foreach ($accueil AS $a) {
+			// Traduit les BBcodes
+			$a['display_text'] = generate_text_for_display(
+				$a['post_text'],
+				$a['bbcode_uid'], $a['bbcode_bitfield'],
+				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+			);
+
+			$this->template->assign_block_vars (
+				'accueil',
+				array_change_key_case ($a, CASE_UPPER)
+			);
+		}
+
 
 		// Horaires
 		foreach ($horaire AS $j)
@@ -200,33 +199,25 @@ if(0)//TODO HORAIRES
 				$this->template->assign_block_vars ('jour.heure', array_change_key_case ($h, CASE_UPPER));
 			}
 		}
-	}
 
-	/**
-		INDEX.PHP
-	*/
-	function index_modify_page_title($vars) {
-		// Rubriques d'acceuil
-		$sql = "SELECT forum_id, post_id, post_subject, post_text, bbcode_uid, bbcode_bitfield
-			FROM ".POSTS_TABLE." AS p
-			WHERE p.forum_id = 13
-			ORDER BY post_subject"; //TODO reprendre les valeurs de config.php //TODO pourquoi 13 ?
-		$result = $this->db->sql_query($sql);
 
-		while ($row = $this->db->sql_fetchrow($result)) {
-			preg_match ('/[0-9 ]*(.*)/', $row['post_subject'], $title);
-			$row['post_title'] = $title[1];
+/*
+				p.gym_nota,
+				p.gym_jour,
+				p.gym_heure,
+				p.gym_minute,
+				p.gym_duree_heures,
+				p.gym_duree_jours,
+				p.gym_scolaire,
+				p.gym_semaines,
+//TODO DELETE
+				p.gym_accueil,
+				p.gym_horaires,
+				p.gym_menu,
+				p.gym_ordre_menu,
+*/
 
-			// Traduit les BBcodes
-			$row['display_text'] = generate_text_for_display(
-				$row['post_text'],
-				$row['bbcode_uid'], $row['bbcode_bitfield'],
-				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-			);
 
-			 $this->template->assign_block_vars ('accueil', array_change_key_case ($row, CASE_UPPER));
-		}
-		$this->db->sql_freeresult($result);
 	}
 
 	/**
