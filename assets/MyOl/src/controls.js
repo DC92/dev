@@ -48,6 +48,7 @@ function controlButton(options) {
 
 	// Toggle the button status & aspect
 	control.state = 0;
+
 	control.toggle = function(newActive, group) {
 		// Toggle by default
 		if (newActive === undefined)
@@ -69,6 +70,7 @@ function controlButton(options) {
 			options.activate(control.state);
 		}
 	};
+
 	return control;
 }
 
@@ -148,10 +150,21 @@ function controlPermalink(options) {
  */
 function controlMousePosition() {
 	return new ol.control.MousePosition({
-		coordinateFormat: ol.coordinate.createStringXY(4),
 		projection: 'EPSG:4326',
 		className: 'ol-coordinate',
 		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
+
+		coordinateFormat: function(mouse) {
+			if (ol.gpsPosition) {
+				const ll4326 = ol.proj.transform(ol.gpsPosition, 'EPSG:3857', 'EPSG:4326'),
+					distance = ol.sphere.getDistance(mouse, ll4326);
+
+				return distance < 1000 ?
+					(Math.round(distance)) + ' m' :
+					(Math.round(distance / 10) / 100) + ' km';
+			} else
+				return ol.coordinate.createStringXY(4)(mouse);
+		},
 	});
 }
 
@@ -183,14 +196,10 @@ function controlLengthLine() {
 		// Display the line length
 		if (feature) {
 			const length = ol.sphere.getLength(feature.getGeometry());
-			if (length >= 100000)
-				control.element.innerHTML = (Math.round(length / 1000)) + ' km';
-			else if (length >= 10000)
-				control.element.innerHTML = (Math.round(length / 100) / 10) + ' km';
-			else if (length >= 1000)
-				control.element.innerHTML = (Math.round(length / 10) / 100) + ' km';
-			else if (length >= 1)
-				control.element.innerHTML = (Math.round(length)) + ' m';
+
+			control.element.innerHTML = length < 1000 ?
+				(Math.round(length)) + ' m' :
+				(Math.round(length / 10) / 100) + ' km';
 		}
 		return false; // Continue detection (for editor that has temporary layers)
 	}
@@ -308,6 +317,7 @@ function controlGPS() {
 						displayEl.classList.remove('ol-control-gps');
 					}
 				}
+				ol.gpsPosition = null;
 			}
 		}),
 
@@ -466,6 +476,9 @@ function controlGPS() {
 						0
 					);
 			}
+
+			// For other controls usage
+			ol.gpsPosition = position;
 		}
 	}
 
