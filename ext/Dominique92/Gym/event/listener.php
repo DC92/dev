@@ -88,6 +88,7 @@ class listener implements EventSubscriberInterface
 				f.forum_name, f.forum_desc,
 				p.post_subject, p.topic_id, p.post_id, p.forum_id,
 				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
+				p.gym_horaires,
 				p.gym_jour, p.gym_heure, p.gym_minute,
 				equi.forum_id AS efi, equi.topic_id AS eti, equi.post_id AS epi, equi.post_subject AS eps,
 				acti.forum_id AS afi, acti.topic_id AS ati, acti.post_id AS api, acti.post_subject AS aps,
@@ -101,9 +102,10 @@ class listener implements EventSubscriberInterface
 				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
 			";
+		//TODO purger les *fi *ti *pi
 		$result = $this->db->sql_query($sql);
 
-		$menus = $accueil = $horaire = [];
+		$menus = $accueil = $horaire = $en_horaire = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			preg_match ('/[0-9]* ?(.*)/', $row['post_subject'], $title);
 			$row['post_title'] = $title[1];
@@ -116,6 +118,10 @@ class listener implements EventSubscriberInterface
 			if ($est_accueil)
 				$accueil [$row['post_title']] = $row;
 
+			if ($row['gym_horaires'] == 'on') // TODO à résorber
+				$en_horaire [$row ['epi']] =
+				$en_horaire [$row ['api']] =
+				$en_horaire [$row ['lpi']] = true;
 			$horaire
 				[intval ($row ['gym_jour'])]
 				[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
@@ -125,25 +131,26 @@ class listener implements EventSubscriberInterface
 
 		// Popule les menus
 		ksort ($menus); // Par n° de menu dans forum_desc
-		foreach ($menus AS $m) {
+		foreach ($menus AS $k=>$v) {
 			// Etiquette du menu
-			$menu_name = array_values($m)[0]['forum_name'];
+			$menu_name = array_values($v)[0]['forum_name'];
 
 			$this->template->assign_block_vars ('menu', [
 				'TITLE' => $menu_name,
-				'POST_ID' => @$m[$menu_name]['post_id'],
-				'TOPIC_ID' => array_values($m)[0]['topic_id'],
-				'FORUM_ID' => array_values($m)[0]['forum_id'],
+				'POST_ID' => @$v[$menu_name]['post_id'],
+				'TOPIC_ID' => array_values($v)[0]['topic_id'],
+				'FORUM_ID' => array_values($v)[0]['forum_id'],
 				'COLOR' => $this->couleur (),
 				'COLOR_TITLE' => $this->couleur (80, 162, 0),
 			]);
 
 			// Rubriques du menu
-			ksort ($m); // Par ordre alphabétique des rubriques du menu
-			foreach ($m AS $k=>$v)
-				if ($v['post_subject'] != $v['forum_name'])
+			ksort ($v); // Par ordre alphabétique des rubriques du menu
+			foreach ($v AS $vv)
+				if ($vv['post_subject'] != $vv['forum_name'] &&
+					($k == 1 || in_array ($vv['post_id'], array_keys ($en_horaire))))
 					$this->template->assign_block_vars ('menu.item',
-						array_change_key_case ($v, CASE_UPPER)
+						array_change_key_case ($vv, CASE_UPPER)
 					);
 		}
 
