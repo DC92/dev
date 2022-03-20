@@ -141,7 +141,7 @@ class listener implements EventSubscriberInterface
 					$topic_row['geo_altitude'] = $match && $match[1] > 0 ? $match[1].'~' : '~';
 
 					// Update the database for next time
-					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";    
+					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";
 					$this->db->sql_query($sql);
 				}
 

@@ -9,42 +9,42 @@
 		background:{jour.COULEUR_FOND};
 		border-color:{jour.COULEUR_BORD};
 	">
-		<!-- BEGIN heure -->
+		<!-- BEGIN seance -->
 		<tr>
 			<td>
-				<!-- IF heure.GYM_ACTIVITE != REQUEST_P -->
-					<a href="./?p={heure.GYM_ACTIVITE}">{heure.POST_SUBJECT}</a>
+				<!-- IF seance.GYM_ACTIVITE != REQUEST_P -->
 				<!-- ENDIF -->
+					<a href="./?p={seance.GYM_ACTIVITE}">{seance.APS}</a>
 
 				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&p={heure.POST_ID}"
+					<a href="posting.php?mode=edit&p={seance.POST_ID}"
 						title="Modifier cette séance" class="button button-icon-only">
 						<i class="icon fa-pencil"></i>
 					</a>
 				<!-- ENDIF -->
 
-				<!-- IF heure.GYM_NOTA -->
-					<br>{heure.GYM_NOTA}
+				<!-- IF seance.GYM_NOTA -->
+					<br>{seance.GYM_NOTA}
 				<!-- ENDIF -->
 			</td>
 
 			<td>
-				{heure.HORAIRE_DEBUT} à {heure.HORAIRE_FIN}
+				{seance.DEBUT} à {seance.FIN}
 			</td>
 
-			<!-- IF heure.GYM_LIEU != REQUEST_P --><!-- //TODO DELETE REQUEST_P -->
+			<!-- IF seance.GYM_LIEU != REQUEST_P --><!-- //TODO DELETE REQUEST_P -->
+			<!-- ENDIF -->
 			<td>
-				<a href="./?p={heure.GYM_LIEU}&anim={heure.ANIMATEUR}">{heure.LIEU}</a>
+				<a href="./?p={seance.GYM_LIEU}&anim={seance.ANIMATEUR}">{seance.LIEU}</a>
  			</td>
-			<!-- ENDIF -->
 
-			<!-- IF heure.GYM_ANIMATEUR != REQUEST_P -->
-			<td>
-				<a href="./?p={heure.GYM_ANIMATEUR}">{heure.ANIMATEUR}</a>
-			</td>
+			<!-- IF seance.GYM_ANIMATEUR != REQUEST_P -->
 			<!-- ENDIF -->
+			<td>
+				<a href="./?p={seance.GYM_ANIMATEUR}">{seance.ANIMATEUR}</a>
+			</td>
 		</tr>
-		<!-- END heure -->
+		<!-- END seance -->
 	</table>
 </div>
 <!-- END jour -->

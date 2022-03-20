@@ -89,7 +89,7 @@ class listener implements EventSubscriberInterface
 				p.post_subject, p.topic_id, p.post_id, p.forum_id,
 				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
 				p.gym_horaires,
-				p.gym_jour, p.gym_heure, p.gym_minute,
+				p.gym_jour, p.gym_heure, p.gym_minute, p.gym_duree_heures,
 				equi.forum_id AS efi, equi.topic_id AS eti, equi.post_id AS epi, equi.post_subject AS eps,
 				acti.forum_id AS afi, acti.topic_id AS ati, acti.post_id AS api, acti.post_subject AS aps,
 				lieu.forum_id AS lfi, lieu.topic_id AS lti, lieu.post_id AS lpi, lieu.post_subject AS lps,
@@ -118,7 +118,7 @@ class listener implements EventSubscriberInterface
 			if ($est_accueil)
 				$accueil [$row['post_title']] = $row;
 
-			if ($row['gym_horaires'] == 'on') // TODO à résorber
+			if (intval (@$row['gym_heure']))
 				$en_horaire [$row ['epi']] =
 				$en_horaire [$row ['api']] =
 				$en_horaire [$row ['lpi']] = true;
@@ -170,43 +170,33 @@ class listener implements EventSubscriberInterface
 			);
 		}
 
-
 		// Horaires
-		foreach ($horaire AS $j)
-			foreach ($j AS $h)
-				foreach ($h AS $k=>$v) {
-					if ($v == @$this->args['t'])
-		;
-		//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'>aa = ".var_export($h,true).'</pre>'.PHP_EOL;
-				}
-
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($this->args['t'],true).'</pre>'.PHP_EOL;
-
-		ksort ($horaire);
-if(0)//TODO HORAIRES
-		foreach ($horaire AS $j=>$v) {
-			$first = $v[array_keys ($v)[0]];
-			$first['JOUR_LITERAL'] = $this->jours_semaine[$j];
-			$first['COULEUR'] = $this->couleur ();
-			$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
-			$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
+		ksort ($horaire); // Jours de la semaine
+		foreach ($horaire AS $j=>$jour) {
+			$first = array_values($jour)[0];
+			$first['jour_literal'] = $this->jours_semaine[$j];
+			$first['couleur'] = $this->couleur ();
+			$first['couleur_fond'] = $this->couleur (35, 255, 0);
+			$first['couleur_bord'] = $this->couleur (40, 196, 0);
 			$this->template->assign_block_vars ('jour', array_change_key_case ($first, CASE_UPPER));
 
-			sort ($v);
-			foreach ($v AS $h) {
-				$h['gym_heure'] = substr('00'.@$h['gym_heure'], -2);
-				$h['gym_minute'] = substr('00'.@$h['gym_minute'], -2);
-				$h['gym_minute_fin'] = @$h['gym_minute'] + @$h['gym_duree_heures'] * 60;
-				$h['gym_heure_fin'] = @$h['gym_heure'] + floor (@$h['gym_minute_fin'] / 60);
-				$h['gym_minute_fin'] = @$h['gym_minute_fin'] % 60;
-				$h['gym_heure_fin'] = substr('00'.@$h['gym_heure_fin'], -2);
-				$h['gym_minute_fin'] = substr('00'.@$h['gym_minute_fin'], -2);
-				$h['horaire_debut'] = @$h['gym_heure'].'h'.@$h['gym_minute'];
-				$h['horaire_fin'] = @$h['gym_heure_fin'].'h'.@$h['gym_minute_fin'];
-				$this->template->assign_block_vars ('jour.heure', array_change_key_case ($h, CASE_UPPER));
+			ksort ($jour); // Horaires dans la journée
+			foreach ($jour AS $s) { // Séances
+				$m = intval (@$s['gym_minute']);
+				$h = intval (@$s['gym_heure']);
+				if ($h) {
+					$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
+					$h_fin = $h + floor ($m_fin / 60);
+					$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
+					$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
+
+					$this->template->assign_block_vars ('jour.seance',
+						array_change_key_case ($s, CASE_UPPER)
+					);
+				}
 			}
 		}
-
+	}
 
 /*
 				p.gym_nota,
@@ -218,14 +208,11 @@ if(0)//TODO HORAIRES
 				p.gym_scolaire,
 				p.gym_semaines,
 //TODO DELETE
-				p.gym_accueil,
 				p.gym_horaires,
+				p.gym_accueil,
 				p.gym_menu,
 				p.gym_ordre_menu,
 */
-
-
-	}
 
 	/**
 		VIEWTOPIC.PHP
