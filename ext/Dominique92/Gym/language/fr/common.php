@@ -57,9 +57,6 @@ $lang = array_merge($lang, array(
 	'STICK_TOPIC_FOR_EXPLAIN' => '',
 	'CONTACT_ADMIN' => 'Nous contacter',
 
-	// Viewtopic.php message called from index.php
-	'MISSING_INLINE_ATTACHMENT'	=> 'Le fichier joint <strong>%s</strong> n’est plus disponible.', //TODO DELETE
-
 	// Footer
 	'POWERED_BY' =>
 		'&copy; Chavil\'GYM 2020'.

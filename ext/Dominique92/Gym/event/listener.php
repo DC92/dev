@@ -64,6 +64,12 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
+//TODO GYM page présentation / résumé / carte ... des têtes de menu
+//TODO GYM carte point & horaire suivant page choisie (p=)
+//TODO GYM editeur de post (carte, coches, ...)
+//TODO GYM redirection vers url interne / [/redirect] plus général !!
+//TODO GYM calendrier
+
 	/**
 		ALL
 	*/
@@ -79,16 +85,14 @@ class listener implements EventSubscriberInterface
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
 		// Assign command line
-		/* //TODO DELETE ?
 		foreach ($this->args AS $k=>$v)
-			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
+			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
 		// Lecture de la base
 		$sql = "SELECT
 				f.forum_name, f.forum_desc,
 				p.post_subject, p.topic_id, p.post_id, p.forum_id,
 				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
-				p.gym_horaires,
 				p.gym_jour, p.gym_heure, p.gym_minute, p.gym_duree_heures,
 				equi.forum_id AS efi, equi.topic_id AS eti, equi.post_id AS epi, equi.post_subject AS eps,
 				acti.forum_id AS afi, acti.topic_id AS ati, acti.post_id AS api, acti.post_subject AS aps,
@@ -101,7 +105,8 @@ class listener implements EventSubscriberInterface
 				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			";
+			WHERE f.parent_id = 1";
+
 		//TODO purger les *fi *ti *pi
 		$result = $this->db->sql_query($sql);
 
@@ -118,14 +123,17 @@ class listener implements EventSubscriberInterface
 			if ($est_accueil)
 				$accueil [$row['post_title']] = $row;
 
-			if (intval (@$row['gym_heure']))
+			preg_match ('/:horaire/', $row['forum_desc'], $est_horaire);
+			if ($est_horaire) {
 				$en_horaire [$row ['epi']] =
 				$en_horaire [$row ['api']] =
 				$en_horaire [$row ['lpi']] = true;
-			$horaire
-				[intval ($row ['gym_jour'])]
-				[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
-				$row;
+
+				$horaire
+					[intval ($row ['gym_jour'])]
+					[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
+					$row;
+			}
 		}
 		$this->db->sql_freeresult($result);
 
@@ -184,16 +192,14 @@ class listener implements EventSubscriberInterface
 			foreach ($jour AS $s) { // Séances
 				$m = intval (@$s['gym_minute']);
 				$h = intval (@$s['gym_heure']);
-				if ($h) {
-					$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
-					$h_fin = $h + floor ($m_fin / 60);
-					$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
-					$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
+				$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
+				$h_fin = $h + floor ($m_fin / 60);
+				$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
+				$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
 
-					$this->template->assign_block_vars ('jour.seance',
-						array_change_key_case ($s, CASE_UPPER)
-					);
-				}
+				$this->template->assign_block_vars ('jour.seance',
+					array_change_key_case ($s, CASE_UPPER)
+				);
 			}
 		}
 	}

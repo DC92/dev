@@ -25,6 +25,7 @@ $('.calendrier').each(function(index, elCal) {
 		parseInt($(elCal).attr('data-jour'), 10)
 	);
 });
+
 // Display the posting calendar
 function displayInputCalendar(elCal, jour) {
 	let id = $(elCal).attr('data-id');
