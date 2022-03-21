@@ -6,6 +6,12 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO GYM page présentation / résumé / carte ... des têtes de menu
+//TODO GYM carte point & horaire suivant page choisie (p=)
+//TODO GYM editeur de post (carte, coches, ...)
+//TODO GYM redirection vers url interne / [/redirect] plus général !!
+//TODO GYM calendrier
+
 namespace Dominique92\Gym\event;
 
 if (!defined('IN_PHPBB'))
@@ -64,16 +70,10 @@ class listener implements EventSubscriberInterface
 		];
 	}
 
-//TODO GYM page présentation / résumé / carte ... des têtes de menu
-//TODO GYM carte point & horaire suivant page choisie (p=)
-//TODO GYM editeur de post (carte, coches, ...)
-//TODO GYM redirection vers url interne / [/redirect] plus général !!
-//TODO GYM calendrier
-
 	/**
 		ALL
 	*/
-	function page_header() {
+	function page_header($var) {
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
@@ -94,24 +94,21 @@ class listener implements EventSubscriberInterface
 				p.post_subject, p.topic_id, p.post_id, p.forum_id,
 				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
 				p.gym_jour, p.gym_heure, p.gym_minute, p.gym_duree_heures,
-				equi.forum_id AS efi, equi.topic_id AS eti, equi.post_id AS epi, equi.post_subject AS eps,
-				acti.forum_id AS afi, acti.topic_id AS ati, acti.post_id AS api, acti.post_subject AS aps,
-				lieu.forum_id AS lfi, lieu.topic_id AS lti, lieu.post_id AS lpi, lieu.post_subject AS lps,
-				equi.post_subject AS animateur,
+				p.gym_activite, p.gym_animateur, p.gym_lieu,
 				acti.post_subject AS activite,
+				equi.post_subject AS animateur,
 				lieu.post_subject AS lieu
 			FROM ".POSTS_TABLE." AS p
-				JOIN ".FORUMS_TABLE." AS f ON (f.forum_id = p.forum_id)
-				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
+				LEFT JOIN ".FORUMS_TABLE." AS f ON (f.forum_id = p.forum_id)
 				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
+				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
 			WHERE f.parent_id = 1";
-
-		//TODO purger les *fi *ti *pi
 		$result = $this->db->sql_query($sql);
 
 		$menus = $accueil = $horaire = $en_horaire = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
+			// Titre sans ses premiers chiffres
 			preg_match ('/[0-9]* ?(.*)/', $row['post_subject'], $title);
 			$row['post_title'] = $title[1];
 
@@ -119,20 +116,19 @@ class listener implements EventSubscriberInterface
 			if ($no_menu)
 				$menus [$no_menu[1]] [$row['post_subject']] = $row;
 
-			preg_match ('/:accueil/', $row['forum_desc'], $est_accueil);
-			if ($est_accueil)
+			if (stripos ($row['forum_desc'], ':accueil') !== false)
 				$accueil [$row['post_title']] = $row;
 
-			preg_match ('/:horaire/', $row['forum_desc'], $est_horaire);
-			if ($est_horaire) {
-				$en_horaire [$row ['epi']] =
-				$en_horaire [$row ['api']] =
-				$en_horaire [$row ['lpi']] = true;
+			if (stripos ($row['forum_desc'], ':horaire') !== false) {
+				$dans_cet_horaire = [$row ['gym_activite'], $row ['gym_animateur'], $row ['gym_lieu']];
+				$en_horaire = array_merge($en_horaire, $dans_cet_horaire);
 
-				$horaire
-					[intval ($row ['gym_jour'])]
-					[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
-					$row;
+				if (in_array (@$this->args['p'], $dans_cet_horaire) ||
+					stripos ($var['page_title'], 'horaire') !== false)
+					$horaire
+						[intval ($row ['gym_jour'])]
+						[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
+						$row;
 			}
 		}
 		$this->db->sql_freeresult($result);
@@ -156,7 +152,7 @@ class listener implements EventSubscriberInterface
 			ksort ($v); // Par ordre alphabétique des rubriques du menu
 			foreach ($v AS $vv)
 				if ($vv['post_subject'] != $vv['forum_name'] &&
-					($k == 1 || in_array ($vv['post_id'], array_keys ($en_horaire))))
+					($k == 1 || in_array ($vv['post_id'], $en_horaire)))
 					$this->template->assign_block_vars ('menu.item',
 						array_change_key_case ($vv, CASE_UPPER)
 					);

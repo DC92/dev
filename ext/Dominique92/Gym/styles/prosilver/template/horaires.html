@@ -14,7 +14,7 @@
 			<td>
 				<!-- IF seance.GYM_ACTIVITE != REQUEST_P -->
 				<!-- ENDIF -->
-					<a href="./?p={seance.API}">{seance.APS}</a>
+					<a href="./?p={seance.GYM_ACTIVITE}">{seance.ACTIVITE}</a>
 
 				<!-- IF U_MCP -->
 					<a href="posting.php?mode=edit&p={seance.POST_ID}"
@@ -35,7 +35,7 @@
 			<!-- IF seance.GYM_LIEU != REQUEST_P --><!-- //TODO DELETE REQUEST_P -->
 			<!-- ENDIF -->
 			<td>
-				<a href="./?p={seance.GYM_LIEU}&anim={seance.ANIMATEUR}">{seance.LIEU}</a>
+				<a href="./?p={seance.GYM_LIEU}">{seance.LIEU}</a>
  			</td>
 
 			<!-- IF seance.GYM_ANIMATEUR != REQUEST_P -->
