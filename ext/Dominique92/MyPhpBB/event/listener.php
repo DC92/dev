@@ -188,14 +188,14 @@ class listener implements EventSubscriberInterface
 				if ($this->request->variable ('p', 0) ||
 					$this->request->variable ('t', 0))
 					exit (file_get_contents (
-						$uris[0].'/viewtopic.php?template=viewtopic&'.$uris[1],
+						$uris[0].'/viewtopic.php?'.$uris[1],
 						false,
 						$context
 					));
 					//TODO error reporting
 				if ($this->request->variable ('f', 0))
 					exit (file_get_contents (
-						$uris[0].'/viewforum.php?template=viewforum&'.$uris[1],
+						$uris[0].'/viewforum.php?'.$uris[1],
 						false,
 						$context
 					));

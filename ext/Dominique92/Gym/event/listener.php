@@ -8,10 +8,8 @@
 
 //TODO GYM page présentation / résumé
 //TODO GYM pages des têtes de rubriques
-//TODO GYM carte point & horaire suivant page choisie (p=)
 //TODO GYM editeur de post (carte, coches, ...)
 //TODO GYM calendrier
-//TODO GYM revenir à la page visionnée aprés modif
 
 namespace Dominique92\Gym\event;
 
