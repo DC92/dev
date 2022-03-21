@@ -20,40 +20,26 @@
 </head>
 
 <body class="gym gym-{SCRIPT_NAME}">
-	<!-- LOGO FÉDÉ -->
-	<a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/" target="_BLANK">
-		<img alt="EPGV" src="ext/Dominique92/Gym/styles/prosilver/theme/images/logo.png">
-	</a>
+<!-- LOGO FÉDÉ -->
+<a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/" target="_BLANK">
+	<img alt="EPGV" src="ext/Dominique92/Gym/styles/prosilver/theme/images/logo.png">
+</a>
+
 <div class="banniere">
 	<div class="edit-user">
 		<!-- IF S_USER_LOGGED_IN -->
-<!-- //TODO aller à viewforum.php?f=1 après connexion -->
-			<a href="viewforum.php?f=1" title="Modification" class="button button-icon-only">
-				<i class="icon fa-pencil"></i>
-			</a>
-<!-- IF 0 --><!-- //TODO DELETE -->
-//TODO aller à ?f=1 aprés connexion
-			<a href="ucp.php?i=ucp_profile&mode=reg_details" title="{L_PROFILE}">{S_USERNAME}</a>
+			{S_USERNAME}
 			<ul><li>
-					<a href="viewforum.php?f=1">Rubriques</a>
-				</li><li>
-					<a href="posting.php?mode=reply&t={TOPIC_ACTIVITES}">Ajouter une activité</a>
-				</li><li>
-					<a href="posting.php?mode=reply&t={TOPIC_EQUIPE}">Ajouter une animatrice</a>
-				</li><li>
-					<a href="posting.php?mode=reply&t={TOPIC_LIEUX}">Ajouter un lieu</a>
-				</li><li>
-					<a href="posting.php?mode=reply&t={TOPIC_SEANCES}">Ajouter une séance</a>
-				</li><li>
-					<a href="posting.php?mode=reply&t={TOPIC_EVENEMENT}">Ajouter un évènement</a>
+					<a href="viewforum.php?f=1">Données du site</a>
 				<!-- IF U_ACP -->
-					</li><li>
-						<a href="{{ U_ACP }}">{L_ACP}</a>
+				</li><li>
+					<a href="{U_ACP}">{L_ACP}</a>
 				<!-- ENDIF -->
+				</li><li>
+					<a href="ucp.php?i=ucp_profile&mode=reg_details" title="{L_PROFILE}">Profil utilisateur</a>
 				</li><li>
 					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
 			</li></ul>
-<!-- ENDIF -->
 		<!-- ELSE -->
 			<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
 				<i class="icon fa-pencil"></i>
@@ -92,7 +78,7 @@
 				<!-- ELSE -->
 					<a href="posting.php?mode=post&t={menu.TOPIC_ID}"
 				<!-- ENDIF -->
-					title="Modifier la fiche" class="button button-icon-only">
+					title="Modifier la fiche {menu.TITLE}" class="button button-icon-only">
 					<i class="icon fa-pencil"></i>
 				</a>
 
@@ -111,7 +97,7 @@
 
 				<!-- IF U_MCP -->
 					<a href="posting.php?mode=edit&p={item.POST_ID}"
-						title="Modifier la fiche" class="button button-icon-only">
+						title="Modifier la fiche {item.POST_TITLE}" class="button button-icon-only">
 						<i class="icon fa-pencil"></i>
 					</a>
 				<!-- ENDIF -->

@@ -171,7 +171,7 @@ class listener implements EventSubscriberInterface
 		global $config;
 		foreach (['u','k','sid'] AS $v) {
 			$kn = $config['cookie_name'].'_'.$v;
-			$cookies[] .= $kn.'='.$this->cookie[$kn];
+			$cookies[] .= $kn.'='.@$this->cookie[$kn];
 		}
 		$context = stream_context_create([
 			'http' => [

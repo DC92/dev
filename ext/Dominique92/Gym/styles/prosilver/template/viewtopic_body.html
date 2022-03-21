@@ -16,24 +16,23 @@
 
 <!-- //TODO A REVOIR -->
 		<!-- IF postrow.POST_ID == REQUEST_P or (not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID) -->
-
+		<!-- ENDIF -->
 			<!-- I F postrow.GYM_ACTIVITE >
 				<meta http-equiv="refresh" content="0; URL=?p={postrow.GYM_ACTIVITE}" />
 			 ENDIF -->
+<!-- //TODO END A REVOIR -->
 
-			<script>
-				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
-					var select = 'gym_menu=%27on%27',
-						coordonnees = [{GEO_LON}, {LON_LAT}], // Topic_data
-						zoom = 14;
-				<!-- ELSE -->
-					var select = 'post_id={postrow.POST_ID}',
-						coordonnees = {postrow.LON_LAT}, // Post_data
-						zoom = 18;
-				<!-- ENDIF -->
-			</script>
-
-		<!-- ENDIF -->
+		<script>
+			<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
+				var select = 'gym_menu=%27on%27',
+					coordonnees = [{GEO_LON}, {LON_LAT}], // Topic_data
+					zoom = 14;
+			<!-- ELSE -->
+				var select = 'post_id={postrow.POST_ID}',
+					coordonnees = {postrow.LON_LAT}, // Post_data
+					zoom = 18;
+			<!-- ENDIF -->
+		</script>
 	<!-- END postrow -->
 
 	<!-- Carte -->

@@ -83,9 +83,9 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
-		// Assign command line
-		foreach ($this->args AS $k=>$v)
-			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
+		// Assign command line //TODO DELETE
+/*		foreach ($this->args AS $k=>$v)
+			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
 
 		// Lecture de la base
 		$sql = "SELECT
@@ -102,22 +102,26 @@ class listener implements EventSubscriberInterface
 				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			WHERE f.parent_id = 1";
+			WHERE f.parent_id = 1"; //TODO DELETE ce n° 1
 		$result = $this->db->sql_query($sql);
 
 		$menus = $accueil = $horaire = $en_horaire = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			// Titre sans ses premiers chiffres
 			preg_match ('/[0-9]* ?(.*)/', $row['post_subject'], $title);
-			$row['post_title'] = $title[1];
+			if ($title)
+				$row['post_title'] = $title[1];
 
+			// Liste des menus
 			preg_match ('/:menu=([0-9]*)/', $row['forum_desc'], $no_menu);
 			if ($no_menu)
 				$menus [$no_menu[1]] [$row['post_subject']] = $row;
 
+			// Posts à afficher sur la page d'accueil
 			if (stripos ($row['forum_desc'], ':accueil') !== false)
-				$accueil [$row['post_title']] = $row;
+				$accueil [$row['post_subject']] = $row;
 
+			// Séances à afficher dans l'horaire
 			if (stripos ($row['forum_desc'], ':horaire') !== false) {
 				$dans_cet_horaire = [$row ['gym_activite'], $row ['gym_animateur'], $row ['gym_lieu']];
 				$en_horaire = array_merge($en_horaire, $dans_cet_horaire);
@@ -260,11 +264,16 @@ class listener implements EventSubscriberInterface
 
 	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
-
-		return; //TODO /////////////////////////////////////
 		$post_row = $vars['post_row']; // Data to be displayed
 
+		// Titre sans ses premiers chiffres
+		preg_match ('/[0-9]* ?(.*)/', $post_row['POST_SUBJECT'], $title);
+		if ($title)
+			$post_row['POST_SUBJECT'] = $title[1];
+
 		$vars['post_row'] = $post_row;
+
+		return; //TODO /////////////////////////////////////
 
 		$post_id = $post_row['POST_ID'];
 		$post_data = $this->all_post_data[$post_id] ?: []; // Initial sql values
