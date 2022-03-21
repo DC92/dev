@@ -6,11 +6,12 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO GYM page présentation / résumé / carte ... des têtes de menu
+//TODO GYM page présentation / résumé
+//TODO GYM pages des têtes de rubriques
 //TODO GYM carte point & horaire suivant page choisie (p=)
 //TODO GYM editeur de post (carte, coches, ...)
-//TODO GYM redirection vers url interne / [/redirect] plus général !!
 //TODO GYM calendrier
+//TODO GYM revenir à la page visionnée aprés modif
 
 namespace Dominique92\Gym\event;
 
@@ -250,35 +251,22 @@ class listener implements EventSubscriberInterface
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
 
-		return; //TODO
-
-		$p = $this->request->variable ('p', 0);
-		if ($vars['row']['post_id'] == $p || !$p) { // Only if a specific post is required
-			// Purge unused <...>
-			$text = preg_replace_callback (
-				'/<[^>]*>/',
-				function () {return '';},
-				$vars['row']['post_text']
-			);
-
-			preg_match ('/\[redirect\](.*)\[\/redirect\]/', $text, $match);
-			if ($match)
-				exit ('<meta http-equiv="refresh" content="0;URL='.$match[1].'">');
+		// Redirect the page to an URL is text includes redirection(URL)
+		$sans_balises = preg_replace ('/<[^>]+>/', '', $vars['row']['post_text']);
+		preg_match ('/redirection\(([^\)]+)/', $sans_balises, $redirection);
+		if($redirection) {
+			header('location: '.$redirection[1]);
+			exit();
 		}
 	}
 
 	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
-		$post_row = $vars['post_row']; // Data to be displayed
-
-		// [redirect]ABSOLUTE_PATH[/redirect] go to ABSOLUTE_PATH
-		preg_match ('/([^>]*)<\/a>\[\/redirect\]/', $post_row['MESSAGE'], $match);
-		if ($match)
-			$post_row['REDIRECT'] = $match[1];
-
-		$vars['post_row'] = $post_row;
 
 		return; //TODO /////////////////////////////////////
+		$post_row = $vars['post_row']; // Data to be displayed
+
+		$vars['post_row'] = $post_row;
 
 		$post_id = $post_row['POST_ID'];
 		$post_data = $this->all_post_data[$post_id] ?: []; // Initial sql values
@@ -525,7 +513,7 @@ php include
 location
 page
 presentation
-php redirect
+DELETE php redirect
 php resume
 rubrique
 saut_ligne

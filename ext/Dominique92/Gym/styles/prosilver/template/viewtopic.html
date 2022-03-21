@@ -12,11 +12,7 @@
 			<!-- ENDIF -->
 		</h1>
 
-		<!-- IF postrow.REDIRECT -->
-			<meta http-equiv="refresh" content="0;URL={postrow.REDIRECT}">
-		<!-- ELSE -->
-			<div>{postrow.MESSAGE}</div>
-		<!-- ENDIF -->
+		<div>{postrow.MESSAGE}</div>
 
 <!-- //TODO A REVOIR -->
 		<!-- IF postrow.POST_ID == REQUEST_P or (not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID) -->
@@ -42,13 +38,15 @@
 
 	<!-- Carte -->
 	<!-- IF GEO_JSON -->
+		<div id="carte"></div>
 		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
 		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
 		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
 		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
 		<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
 	<!-- ENDIF -->
+
+	<!-- INCLUDE horaires.html -->
 </div>
 
-<!-- INCLUDE horaires.html -->
 <!-- INCLUDE footer.html -->
