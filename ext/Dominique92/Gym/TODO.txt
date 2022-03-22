@@ -37,3 +37,8 @@ BUG les evenements ne sont pas supprimés quand la date est echue (ils ne marque
 // RÉUNION CLAMART
 Catégories (dans le tableau horaires)
 Récupérer le nom de domaine / fermer le support
+
+//TODO GYM paie ident forum
+//TODO GYM paie ne marche pas en IE
+//TODO GYM salaire : diffusion des attestations
+//TODO GYM paie ne pas envoyer CC mail si connexion

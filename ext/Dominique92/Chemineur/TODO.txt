@@ -3,6 +3,10 @@
 //TODO BUG geocoder dont't accept enter on posting.php
 //TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
 
+//TODO ordre des posts
+//TODO recherche nom lieux en page modif
+//TODO hauteur max carte quand glisse jquery
+
 //BEST Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Purger la base des liens photos externes
 //BEST Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
