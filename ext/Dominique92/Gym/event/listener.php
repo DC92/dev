@@ -53,6 +53,7 @@ class listener implements EventSubscriberInterface
 		return [
 			// All
 			'core.page_header' => 'page_header',
+			'core.page_footer_after' => 'page_footer_after',
 
 			// Viewtopic
 			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
@@ -201,6 +202,17 @@ class listener implements EventSubscriberInterface
 				);
 			}
 		}
+	}
+
+	function page_footer_after($var) {
+		// Change le template viewtopic sauf après viewforum
+		$url_viewtopic = strpos (@$this->server['SCRIPT_URI'], 'viewtopic') !== false;
+		$ref_viewforum = strpos (@$this->server['HTTP_REFERER'], 'viewforum') !== false;
+
+		if ($url_viewtopic && !$ref_viewforum)
+			$this->template->set_filenames(array(
+				'body' => 'viewtopic.html',
+			));
 	}
 
 /*

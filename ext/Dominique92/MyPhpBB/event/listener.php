@@ -163,7 +163,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	function index_modify_page_title ($vars) {
-
 		$uris = explode ('/?', $this->uri);
 		$cookies = [];
 
