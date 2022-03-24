@@ -65,7 +65,6 @@ class listener implements EventSubscriberInterface
 		// We find the calling point by searching in the software of PhpBB 3.x: "event core.<XXX>"
 		return [
 			// All
-			'core.page_header' => 'page_header',
 			'core.gen_sort_selects_after' => 'gen_sort_selects_after',
 			'core.page_footer_after' => 'page_footer_after',
 
@@ -93,35 +92,6 @@ class listener implements EventSubscriberInterface
 	/**
 		ALL
 	*/
-	function page_header() {
-		global $myphp_template, $myphp_js;
-
-		/* Includes template & js values defined in config.php */
-		//BEST ??? $myphp_js = ['key' => 'value'];
-		//BEST ??? $myphp_template = ['key' => 'value'];
-		if ($myphp_template)
-			$this->template->assign_vars (
-				array_change_key_case ($myphp_template, CASE_UPPER)
-			);
-		//BEST move in GYM
-		$this->template->assign_var ('MYPHP_JS', json_encode($myphp_js ?: []));
-
-		/* Includes language files of this extension */
-		$ns = explode ('\\', __NAMESPACE__);
-		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
-
-		// Includes style files of this extension
-		//BEST explore all active extensions
-		/*
-		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-			$template->set_style ([
-				'ext/'.$ns[0].'/'.$ns[1].'/styles',
-				'styles', // core styles
-				'adm', // core styles // Needed for template/adm/...
-			]);
-		*/
-	}
-
 	function gen_sort_selects_after ($vars) {
 		/* Force display sort & direction */
 		if (defined('MYPHPBB_SORT_KEY'))
@@ -144,6 +114,21 @@ class listener implements EventSubscriberInterface
 				]);
 			}
 		}
+
+		/* Includes language files of this extension */
+		$ns = explode ('\\', __NAMESPACE__);
+		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);
+
+		// Includes style files of this extension
+		//BEST explore all active extensions
+		/*
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$template->set_style ([
+				'ext/'.$ns[0].'/'.$ns[1].'/styles',
+				'styles', // core styles
+				'adm', // core styles // Needed for template/adm/...
+			]);
+		*/
 	}
 
 	/**
