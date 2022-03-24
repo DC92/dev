@@ -38,9 +38,6 @@ class listener implements EventSubscriberInterface
 		$this->auth = $auth;
 		$this->language = $language;
 
-		$this->semaines = '5,6,7,8,9,10,13,14,15,16,17,18,19,22,23,24,25,26,27,30,31,32,33,34,35,36,39,40,41,42,43,44,45,46,47';
-		$this->jours_semaine = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
-
 		$this->ns = explode ('\\', __NAMESPACE__);
 		$this->ext_path = 'ext/'.$this->ns[0].'/'.$this->ns[1].'/';
 		$this->cookies = $this->request->get_super_global(\phpbb\request\request_interface::COOKIE);
@@ -84,6 +81,9 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
+//		global $gym_dicos;
+//TODO		$this->template->assign_var ('GYM_DICOS', json_encode($gym_dicos ?: []));
+
 		// Assign command line //TODO DELETE
 /*		foreach ($this->args AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
@@ -124,6 +124,8 @@ class listener implements EventSubscriberInterface
 
 			// Séances à afficher dans l'horaire
 			if (stripos ($row['forum_desc'], ':horaire') !== false) {
+				$this->template->assign_var ('CONTIENT_HORAIRE', true); //TODO REVOIR
+
 				$dans_cet_horaire = [$row ['gym_activite'], $row ['gym_animateur'], $row ['gym_lieu']];
 				$en_horaire = array_merge($en_horaire, $dans_cet_horaire);
 
@@ -179,10 +181,11 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Horaires
+		global $gym_dicos;
 		ksort ($horaire); // Jours de la semaine
 		foreach ($horaire AS $j=>$jour) {
 			$first = array_values($jour)[0];
-			$first['jour_literal'] = $this->jours_semaine[$j];
+			$first['jour_literal'] = $gym_dicos['jours_semaine'][$j];
 			$first['couleur'] = $this->couleur ();
 			$first['couleur_fond'] = $this->couleur (35, 255, 0);
 			$first['couleur_bord'] = $this->couleur (40, 196, 0);
@@ -327,6 +330,8 @@ class listener implements EventSubscriberInterface
 				},
 				$post_row['MESSAGE']
 			);
+
+/*
 		// Replace by a code & redirection manager
 		if ($post_row['POST_ID'] == $p)
 			$post_row['MESSAGE'] = preg_replace_callback (
@@ -365,6 +370,7 @@ class listener implements EventSubscriberInterface
 				},
 				$post_row['MESSAGE']
 			);
+*/
 	}
 
 	/**
@@ -372,16 +378,7 @@ class listener implements EventSubscriberInterface
 	*/
 	// Called when viewing the post page
 	function posting_modify_template_vars($vars) {
-		return; //TODO
-
 		$post_data = $vars['post_data'];
-
-		// Conditions d'affichage dépendant du forum
-		preg_match_all ('/([\.:])(activ|calen|publi)/', $post_data['forum_desc'], $params);
-		foreach ($params[2] AS $k=>$v)
-			if ($params[1][$k] == ':' || // Map on all posts
-				$post_data['post_id'] == $post_data['topic_first_post_id']) // Only map on the first post
-				$this->template->assign_var ('PARAM_'.strtoupper($v), true);
 
 		// Set specific variables
 		foreach ($post_data AS $k=>$v)
@@ -391,18 +388,28 @@ class listener implements EventSubscriberInterface
 			}
 
 		// Static dictionaries
-		$static_values = $this->listes();
-		foreach ($static_values AS $k=>$v)
+		global $gym_dicos;
+		foreach ($gym_dicos AS $k=>$v)
 			foreach ($v AS $vk=>$vv)
 				$this->template->assign_block_vars (
 					'liste_'.$k, [
 						'NO' => $vk,
 						'VALEUR' => $vv,
-						'BASE' => in_array (strval ($v[$vk]), $data["gym_$k"] ?: [], true),
+//TODO ??????						'BASE' => in_array (strval ($v[$vk]), $data["gym_$k"] ?: [], true),
 					]
 				);
 
+		// Conditions d'affichage dépendant du forum
+/*		preg_match_all ('/([\.:])(activ|calen|publi)/', $post_data['forum_desc'], $params);
+		foreach ($params[2] AS $k=>$v)
+			if ($params[1][$k] == ':' || // Map on all posts
+				$post_data['post_id'] == $post_data['topic_first_post_id']) // Only map on the first post
+				$this->template->assign_var ('PARAM_'.strtoupper($v), true);
+*/
+//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($post_data,true).'</pre>'.PHP_EOL;
+
 		// Dictionnaires en fonction du contenu de la base de données
+		/* //TODO $gym_dicos = [...
 		global $myphp_template;
 		$topics_keys = $myphp_template['topic_activites'].','.$myphp_template['topic_lieux'].','.$myphp_template['topic_equipe'];
 		$sql = "SELECT post_id, post_subject, topic_id
@@ -425,6 +432,7 @@ class listener implements EventSubscriberInterface
 			foreach ($v AS $vv)
 				$this->template->assign_block_vars ($k, array_change_key_case ($vv, CASE_UPPER));
 		}
+*/
 	}
 
 	// Called during validation of the data to be saved
@@ -468,15 +476,6 @@ class listener implements EventSubscriberInterface
 		for ($angle = 0; $angle < 6; $angle += 2)
 			$couleur .= substr ('00'.dechex ($luminance - $saturation + $saturation * sin ($this->angle_couleur + $angle)), -2);
 		return $couleur;
-	}
-
-	function listes() {
-		return [
-			'heures' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
-			'minutes' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
-			'jours' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
-			'duree' => [1,1.5,2,7.5],
-		];
 	}
 
 	/**
@@ -672,11 +671,11 @@ return;	//TODO DELETE
 				: $row['display_text'];
 
 			// Date
-			global $myphp_js;
+			global $gym_dicos;
 			$row['gym_jour_literal'] = @$this->listes()['jours'][intval ($row['gym_jour'])];
 
 			if(@$row['gym_scolaire'] == 'on')
-				$row['gym_semaines'] = $this->semaines;
+				$row['gym_semaines'] = $this->no_semaines;
 
 			if(isset ($row['gym_semaines']) && !isset ($row['gym_menu'])) {
 				setlocale(LC_ALL, 'fr_FR');
@@ -684,13 +683,13 @@ return;	//TODO DELETE
 				foreach (explode (',', @$row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
 						@$row['gym_heure'], @$row['gym_minute'], 0,
-						8, 2 + $s * 7 + @$row['gym_jour'], $myphp_js['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
+						8, 2 + $s * 7 + @$row['gym_jour'], $gym_dicos['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
 					);
 					$end_time = mktime (
 						@$row['gym_heure'] + @$row['gym_duree_heures'] + 24 * @$row['gym_duree_jours'],
 						@$row['gym_minute'],
 						0, // Secondes
-						8, 3 + $s * 7 + @$row['gym_jour'], $myphp_js['annee_debut'] // Lundi suivant le 1er aout annee_debut
+						8, 3 + $s * 7 + @$row['gym_jour'], $gym_dicos['annee_debut'] // Lundi suivant le 1er aout annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {
