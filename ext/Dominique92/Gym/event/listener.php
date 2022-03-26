@@ -78,17 +78,18 @@ class listener implements EventSubscriberInterface
 		global $gym_const;
 		$this->template->assign_var ('GYM_CONST', json_encode($gym_const ?: []));
 
-		// Assign command line //TODO DELETE
-/*		foreach ($this->args AS $k=>$v)
-			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
+		// Assign command line
+		foreach ($this->args AS $k=>$v)
+			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
 		// Lecture de la base
 		$sql = "SELECT
 				f.forum_name, f.forum_desc,
 				p.post_subject, p.topic_id, p.post_id, p.forum_id,
-				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
-				p.gym_jour, p.gym_heure, p.gym_minute, p.gym_duree_heures,
 				p.gym_activite, p.gym_animateur, p.gym_lieu,
+				p.gym_jour, p.gym_heure, p.gym_minute, p.gym_duree_heures,
+p.gym_semaines,
+				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
 				acti.post_subject AS activite,
 				equi.post_subject AS animateur,
 				lieu.post_subject AS lieu
@@ -127,6 +128,11 @@ class listener implements EventSubscriberInterface
 						[intval ($row ['gym_jour'])]
 						[intval ($row['gym_heure']) * 60 + intval ($row['gym_minute'])] =
 						$row;
+			}
+
+			// Calendriers de toutes les séances de l'activité
+			if ($row['gym_semaines'] && $row['gym_semaines'] != 'off' && $row['gym_activite'] == $this->args['p']) {
+//TODO calendrier ??????
 			}
 		}
 		$this->db->sql_freeresult($result);

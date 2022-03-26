@@ -2,6 +2,7 @@
 
 <div class="page">
 	<!-- BEGIN postrow -->
+		<!-- IF postrow.POST_ID == REQUEST_P -->
 		<h1>
 			{postrow.POST_SUBJECT}
 			<!-- IF U_MCP -->
@@ -14,14 +15,6 @@
 
 		<div>{postrow.MESSAGE}</div>
 
-<!-- //TODO A REVOIR -->
-		<!-- IF postrow.POST_ID == REQUEST_P or (not REQUEST_P and postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID) -->
-		<!-- ENDIF -->
-			<!-- I F postrow.GYM_ACTIVITE >
-				<meta http-equiv="refresh" content="0; URL=?p={postrow.GYM_ACTIVITE}" />
-			 ENDIF -->
-<!-- //TODO END A REVOIR -->
-
 		<script>
 			<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
 				var select = 'gym_menu=%27on%27',
@@ -33,6 +26,7 @@
 					zoom = 18;
 			<!-- ENDIF -->
 		</script>
+	<!-- ENDIF -->
 	<!-- END postrow -->
 
 	<!-- Carte -->
