@@ -6,10 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO GYM résumés
-//TODO GYM pages des têtes de rubriques
-//TODO GYM calendrier
-
 namespace Dominique92\Gym\event;
 
 if (!defined('IN_PHPBB'))
@@ -52,8 +48,6 @@ class listener implements EventSubscriberInterface
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Viewtopic
-			'core.viewtopic_gen_sort_selects_before' => 'viewtopic_gen_sort_selects_before',
-			'core.viewtopic_modify_page_title' => 'viewtopic_modify_page_title',
 			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
@@ -79,6 +73,10 @@ class listener implements EventSubscriberInterface
 
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+
+		// Constants values used in js code
+		global $gym_const;
+		$this->template->assign_var ('GYM_CONST', json_encode($gym_const ?: []));
 
 		// Assign command line //TODO DELETE
 /*		foreach ($this->args AS $k=>$v)
@@ -157,7 +155,7 @@ class listener implements EventSubscriberInterface
 						array_change_key_case ($vv, CASE_UPPER)
 					);
 
-				// Dictionnaires pour posting
+				// Posting selections
 				$this->template->assign_block_vars ('liste_saisie_'.$k,
 					array_change_key_case ($vv, CASE_UPPER)
 				);
@@ -180,11 +178,11 @@ class listener implements EventSubscriberInterface
 		}
 
 		// Horaires
-		global $gym_dicos;
+		global $gym_const;
 		ksort ($horaire);
 		foreach ($horaire AS $j=>$jour) { // Jours de la semaine
 			$first = array_values($jour)[0];
-			$first['jour_literal'] = $gym_dicos['jour'][$j];
+			$first['jour_literal'] = $gym_const['jour'][$j];
 			$first['couleur'] = $this->couleur ();
 			$first['couleur_fond'] = $this->couleur (35, 255, 0);
 			$first['couleur_bord'] = $this->couleur (40, 196, 0);
@@ -222,32 +220,6 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	// Called before reading phpbb-posts SQL data
-	function viewtopic_gen_sort_selects_before($vars) {
-		return; //TODO
-
-		// Tri des sous-menus dans le bon ordre
-		$sort_by_sql = $vars['sort_by_sql'];
-		$sort_by_sql['t'] = array_merge (
-			['p.gym_ordre_menu IS NULL, p.gym_ordre_menu'],
-			$sort_by_sql['t']
-		);
-		$vars['sort_by_sql'] = $sort_by_sql;
-	}
-
-	// Change le template sur demande
-	// Appelé juste avant d'afficher
-	function viewtopic_modify_page_title($vars) {
-		return; //TODO
-
-		if (strpos($vars['topic_data']['forum_desc'],':gym') !== false &&
-				((!isset ($this->args['f']) && isset ($this->args['t'])) ||
-					$this->args['p']
-				)
-			)
-			$this->my_template = 'viewtopic';
-	}
-
 	// Called during first pass on post data that read phpbb-posts SQL data
 	function viewtopic_post_rowset_data($vars) {
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
@@ -334,9 +306,9 @@ class listener implements EventSubscriberInterface
 					$data[$k] = explode (',', $v); // Expand grouped values
 				}
 
-			// Static dictionaries
-			global $gym_dicos;
-			foreach ($gym_dicos AS $k=>$v)
+			// Static selections
+			global $gym_const;
+			foreach ($gym_const AS $k=>$v)
 				if (is_array ($v))
 					foreach ($v AS $vk=>$vv)
 						$this->template->assign_block_vars ('liste_'.$k, [
@@ -579,7 +551,7 @@ youtube
 				: $row['display_text'];
 
 			// Date
-			global $gym_dicos;
+			global $gym_const;
 			$row['gym_jour_literal'] = @$this->listes()['jours'][intval ($row['gym_jour'])];
 
 			if(@$row['gym_scolaire'] == 'on')
@@ -591,13 +563,13 @@ youtube
 				foreach (explode (',', @$row['gym_semaines']) AS $s) {
 					$beg_time = mktime (
 						@$row['gym_heure'], @$row['gym_minute'], 0,
-						8, 2 + $s * 7 + @$row['gym_jour'], $gym_dicos['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
+						8, 2 + $s * 7 + @$row['gym_jour'], $gym_const['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
 					);
 					$end_time = mktime (
 						@$row['gym_heure'] + @$row['gym_duree_heures'] + 24 * @$row['gym_duree_jours'],
 						@$row['gym_minute'],
 						0, // Secondes
-						8, 3 + $s * 7 + @$row['gym_jour'], $gym_dicos['annee_debut'] // Lundi suivant le 1er aout annee_debut
+						8, 3 + $s * 7 + @$row['gym_jour'], $gym_const['annee_debut'] // Lundi suivant le 1er aout annee_debut
 					);
 					// Garde le premier évènement qui finit après la date courante
 					if ($end_time > time() && $end_time < $row['next_end_time']) {

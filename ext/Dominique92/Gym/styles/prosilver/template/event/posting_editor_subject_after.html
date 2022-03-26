@@ -1,121 +1,121 @@
-<!-- INCLUDEJS @Dominique92_Gym/index.js -->
-
 <!-- IF SAISIE_HORAIRE -->
-<div>
-	<b>Type :</b>
-	<br/>
+	<script>
+		var gym_const = {GYM_CONST};
+	</script>
+	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 
-	Activité:
-	<select name="gym_activite">
-		<option>?</option>
-		<!-- BEGIN liste_saisie_2 -->
-			<option value="{liste_saisie_2.POST_ID}"
-				<!-- IF liste_saisie_2.POST_ID == GYM_ACTIVITE -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_saisie_2.POST_SUBJECT}
-			</option>
-		<!-- END liste_saisie_2 -->
-	</select> &nbsp;
+	<div class="saisie_infos_gym">
+		<b>Activité :</b>
+		<select name="gym_activite">
+			<option>?</option>
+			<!-- BEGIN liste_saisie_2 -->
+				<option value="{liste_saisie_2.POST_ID}"
+					<!-- IF liste_saisie_2.POST_ID == GYM_ACTIVITE -->
+						selected="selected"
+					<!-- ENDIF -->
+				>
+					{liste_saisie_2.POST_SUBJECT}
+				</option>
+			<!-- END liste_saisie_2 -->
+		</select> &nbsp;
 
-	Lieu:
-	<select name="gym_lieu">
-		<option>?</option>
-		<!-- BEGIN liste_saisie_4 -->
-			<option value="{liste_saisie_4.POST_ID}"
-				<!-- IF liste_saisie_4.POST_ID == GYM_LIEU -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_saisie_4.POST_SUBJECT}
-			</option>
-		<!-- END liste_saisie_4 -->
-	</select> &nbsp;
+		<b>Lieu :</b>
+		<select name="gym_lieu">
+			<option>?</option>
+			<!-- BEGIN liste_saisie_4 -->
+				<option value="{liste_saisie_4.POST_ID}"
+					<!-- IF liste_saisie_4.POST_ID == GYM_LIEU -->
+						selected="selected"
+					<!-- ENDIF -->
+				>
+					{liste_saisie_4.POST_SUBJECT}
+				</option>
+			<!-- END liste_saisie_4 -->
+		</select> &nbsp;
 
-	Animation:
-	<select name="gym_animateur">
-		<option>?</option>
-		<!-- BEGIN liste_saisie_3 -->
-			<option value="{liste_saisie_3.POST_ID}"
-				<!-- IF liste_saisie_3.POST_ID == GYM_ANIMATEUR -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_saisie_3.POST_SUBJECT}
-			</option>
-		<!-- END liste_saisie_3 -->
-	</select> &nbsp;
+		<b>Animation :</b>
+		<select name="gym_animateur">
+			<option>?</option>
+			<!-- BEGIN liste_saisie_3 -->
+				<option value="{liste_saisie_3.POST_ID}"
+					<!-- IF liste_saisie_3.POST_ID == GYM_ANIMATEUR -->
+						selected="selected"
+					<!-- ENDIF -->
+				>
+					{liste_saisie_3.POST_SUBJECT}
+				</option>
+			<!-- END liste_saisie_3 -->
+		</select> &nbsp;
+	</div>
 
-	<br/>
-	Deuxième ligne de la case horaire
-	<input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"> &nbsp;
-</div>
-<br/>
+	<div class="saisie_infos_gym">
+		<b>Deuxième ligne de la case horaire :</b>
+		<input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"> &nbsp;
+	</div>
 
-<div>
-	<b>Calendrier :</b>
-	<br/>
+	<div class="saisie_infos_gym">
+		<b>Séance :</b>
+		<select name="gym_jour" id="gym_jour" onchange="changeDayCalendar()">
+			<!-- BEGIN liste_jour -->
+				<option value="{liste_jour.NO}"
+					<!-- IF liste_jour.NO == GYM_JOUR -->
+						selected="selected"
+					<!-- ENDIF -->
+				>
+					{liste_jour.VALEUR}
+				</option>
+			<!-- END liste_jour -->
+		</select> &nbsp;
 
-	<select name="gym_jour" id="gym_jour" onchange="changeDayCalendar()">
-		<!-- BEGIN liste_jour -->
-			<option value="{liste_jour.NO}"
-				<!-- IF liste_jour.NO == GYM_JOUR -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_jour.VALEUR}
-			</option>
-		<!-- END liste_jour -->
-	</select> &nbsp;
+		<select name="gym_heure">
+			<!-- BEGIN liste_heure -->
+				<option value="{liste_heure.VALEUR}"
+					<!-- IF liste_heure.VALEUR == GYM_HEURE -->
+						selected="selected"
+					<!-- ENDIF -->
+				>
+					{liste_heure.VALEUR}
+				</option>
+			<!-- END liste_heure -->
+		</select> h
+		<select name="gym_minute">
+			<!-- BEGIN liste_minute -->
+				<option value="{liste_minute.VALEUR}"
+					<!-- IF liste_minute.VALEUR == GYM_MINUTE -->
+						selected="selected"
+					<!-- ENDIF -->
+				>
+					{liste_minute.VALEUR}
+				</option>
+			<!-- END liste_minute -->
+		</select> &nbsp;
 
-	<select name="gym_heure">
-		<!-- BEGIN liste_heure -->
-			<option value="{liste_heure.VALEUR}"
-				<!-- IF liste_heure.VALEUR == GYM_HEURE -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_heure.VALEUR}
-			</option>
-		<!-- END liste_heure -->
-	</select> h
-	<select name="gym_minute">
-		<!-- BEGIN liste_minute -->
-			<option value="{liste_minute.VALEUR}"
-				<!-- IF liste_minute.VALEUR == GYM_MINUTE -->
-					selected="selected"
-				<!-- ENDIF -->
-			>
-				{liste_minute.VALEUR}
-			</option>
-		<!-- END liste_minute -->
-	</select> &nbsp;
+		<b>Durée :</b>
+		<input name="gym_duree_heures" type="number" step="0.25" min ="1" style="width:60px"
+		value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
+		<input name="gym_duree_jours" type="number" style="width:60px" value="{GYM_DUREE_JOURS}">jour(s)
+	</div>
 
-	durée
-	<input name="gym_duree_heures" type="number" step="0.25" min ="1" style="width:60px"
-	value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
-	<input name="gym_duree_jours" type="number" style="width:60px" value="{GYM_DUREE_JOURS}">jour(s)
-	<br/><br/>
-
-	<table id="edit_semaines"
-		class="calendrier"
-		data-id="{REQUEST_P}"
-		data-semaines="{GYM_SEMAINES}"
-		data-jour="{GYM_JOUR}"
-	>
-		<tr id="cal{REQUEST_P}_m8" style="display:none"></tr>
-		<tr id="cal{REQUEST_P}_m9"><td>Septembre</td></tr>
-		<tr id="cal{REQUEST_P}_m10"><td>Octobre</td></tr>
-		<tr id="cal{REQUEST_P}_m11"><td>Novembre</td></tr>
-		<tr id="cal{REQUEST_P}_m12"><td>Décembre</td></tr>
-		<tr id="cal{REQUEST_P}_m1"><td>Janvier</td></tr>
-		<tr id="cal{REQUEST_P}_m2"><td>Février</td></tr>
-		<tr id="cal{REQUEST_P}_m3"><td>Mars</td></tr>
-		<tr id="cal{REQUEST_P}_m4"><td>Avril</td></tr>
-		<tr id="cal{REQUEST_P}_m5"><td>Mai</td></tr>
-		<tr id="cal{REQUEST_P}_m6"><td>Juin</td></tr>
-		<tr id="cal{REQUEST_P}_m7" style="display:none"></tr>
-	</table>
-</div>
+	<div class="saisie_infos_gym">
+		<b>Calendrier :</b>
+		<table id="edit_semaines"
+			class="calendrier"
+			data-id="{REQUEST_P}"
+			data-semaines="{GYM_SEMAINES}"
+			data-jour="{GYM_JOUR}"
+		>
+			<tr id="cal{REQUEST_P}_m8" style="display:none"></tr>
+			<tr id="cal{REQUEST_P}_m9"><td>Septembre</td></tr>
+			<tr id="cal{REQUEST_P}_m10"><td>Octobre</td></tr>
+			<tr id="cal{REQUEST_P}_m11"><td>Novembre</td></tr>
+			<tr id="cal{REQUEST_P}_m12"><td>Décembre</td></tr>
+			<tr id="cal{REQUEST_P}_m1"><td>Janvier</td></tr>
+			<tr id="cal{REQUEST_P}_m2"><td>Février</td></tr>
+			<tr id="cal{REQUEST_P}_m3"><td>Mars</td></tr>
+			<tr id="cal{REQUEST_P}_m4"><td>Avril</td></tr>
+			<tr id="cal{REQUEST_P}_m5"><td>Mai</td></tr>
+			<tr id="cal{REQUEST_P}_m6"><td>Juin</td></tr>
+			<tr id="cal{REQUEST_P}_m7" style="display:none"></tr>
+		</table>
+	</div>
 <!-- ENDIF -->

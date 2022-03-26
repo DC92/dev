@@ -14,12 +14,14 @@ pre {
 .section-posting #options-panel label[for=edit_reason],
 .section-posting #options-panel #edit_reason,
 .section-posting input[name=preview],
-.section-posting #smiley-box strong {
+.section-posting #smiley-box strong,
+.bbcode-quote,
+.bbcode-code,
+.bbcode-lisy-,
+.bbcode-flash {
 	display: none !important;
 }
 
-/* Y compris phpBB */
-/* //TODO simplifier pages d'édition du forum */
 html{
 	height: 100%;
 }
@@ -460,4 +462,16 @@ body {
 }
 .map-altitude, .map-massif, .map-altitude-massif {
 	display: none;
+}
+
+/* Posting */
+.saisie_infos_gym {
+	margin: 1em 0 !important;
+}
+.button-secondary {
+	font-size: 1em;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-weight: normal;
+	color: black;
+	padding: 1px;
 }

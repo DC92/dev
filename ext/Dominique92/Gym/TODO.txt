@@ -1,28 +1,19 @@
 //TODO BUG page équipe : Effectivement, la phrase de la page équipe dupliquée par un bug du logiciel qui bégaye.
 
-//TODO GYM TOUTE LA LISTE
+//TODO GYM résumé => ... en savoir plus
+//TODO GYM pages des têtes de rubriques
+//TODO GYM calendrier (affichage)
 
-GYM résumé => ... en savoir plus
-GYM masquer altitude et massif (suivant dispo du champ dans la base ?)
-GYM affiche la fin dune balise dans le titre
-	Quand recherche page => affiche la fin dune balise dans le titre
-GYM ne peut pas lire une rubrique si un des textes comprend une redirection
-GYM curseur carte non centré sur la pointe du marqueur
-GYM evenement : mettre le lien vers le lieu et l'animatrice
-
-// Ne pas afficher le premier post dans les cartes
-
-//BEST randos + GPS
-
-BUG les evenements ne sont pas supprimés quand la date est echue (ils ne marquent plus l'heure)
+//TODO GYM affiche la fin dune balise dans le titre
+//TODO GYM Quand recherche page => affiche la fin d'une balise dans le titre
+//TODO GYM curseur carte non centré sur la pointe du marqueur
+//TODO Ne pas afficher le premier post dans les cartes
 
 //BEST ??? masquer le texte dans les séances
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville
-//BEST Lien gmaps
-//BEST convertir tous les non saisis "null" en off
-//BEST Sitemap / SEO
+//BEST Lien gmaps / stretview
 //BEST Bouton imprimer calendier / style print
 //BEST BUG Diaporama pas vu depuis un moment => boucle rapidement
 //BEST BUG d'affichage avec &hilit=body (résultat recherche)
@@ -30,14 +21,17 @@ BUG les evenements ne sont pas supprimés quand la date est echue (ils ne marque
 	" dans le title !
 //BEST Redimensionner les images suivant taille fenetre
 	GYM bbcode photo/n° attachment
-//BEST ouverture lente sous-menus
 //BEST Glissement latéral pages
 //BEST Initialiser posting lieu position carte sur Chaville
+//BEST convertir tous les non saisis "null" en off
+//BEST Sitemap / SEO
 
-// RÉUNION CLAMART
+RÉUNION CLAMART
 Catégories (dans le tableau horaires)
 Récupérer le nom de domaine / fermer le support
 
+CHAVIL.GYM
+//TODO BEST randos + GPS
 //TODO GYM paie ident forum
 //TODO GYM paie ne marche pas en IE
 //TODO GYM salaire : diffusion des attestations

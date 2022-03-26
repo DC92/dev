@@ -1,5 +1,3 @@
-//TODO FAIRE LE MENAGE
-
 // BBCode ajout d'un calendrier
 $('.calendrier').each(function(index, elCal) {
 	const id = $(elCal).attr('data-id'),
@@ -31,7 +29,7 @@ function displayInputCalendar(elCal, jour) {
 	let id = $(elCal).attr('data-id');
 
 	for (let week = 0; week < 52; week++) {
-		const date = new Date(gym_dicos.annee_debut, 8 - 1, 2 + week * 7 + jour), // Jour suivant le lundi suivant le 1er aout annee_debut
+		const date = new Date(gym_const.annee_debut, 8 - 1, 2 + week * 7 + jour), // Jour suivant le lundi suivant le 1er aout annee_debut
 			weekEl = $('#cal' + id + '_s' + week),
 			monthEl = $('#cal' + id + '_m' + (1 + date.getMonth()));
 
@@ -72,18 +70,3 @@ setInterval(function() {
 		}
 	);
 }, 5000);
-
-// Sous-menus déroulants ne dépassent pas à droite
-function submenuPos() {
-	$('.submenu').each(function(index, el) {
-		const ww = $(window).width(),
-			elw = $(el).width(),
-			pp = $(el).parent().position();
-		$(el).css({
-			top: pp.bottom,
-			left: Math.min(pp.left, ww - elw)
-		});
-	});
-}
-submenuPos();
-$(window).on('resize', submenuPos);
