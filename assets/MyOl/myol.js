@@ -349,7 +349,7 @@ function layersCollection() {
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
-		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'), //TODO error 403
 		'OSM cycle': layerThunderforest('cycle'),
 		'OSM landscape': layerThunderforest('landscape'),
 		'OSM trains': layerThunderforest('pioneer'),
