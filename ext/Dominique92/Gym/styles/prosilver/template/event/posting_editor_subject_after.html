@@ -1,35 +1,9 @@
 <!-- INCLUDEJS @Dominique92_Gym/index.js -->
 
-<!-- IF PARAM_PUBLI -->
-OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE
-IF PARAM_PUBLI -POSTING_EDITOR_SUBJECT_AFTER.HTML
+<!-- IF SAISIE_HORAIRE -->
 <div>
-	<b>Publication dans :</b><br/>
-
-	Menu <input type="checkbox" name="gym_menu"
-	<!-- IF GYM_MENU === 'on' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/> &nbsp;
-
-	Accueil <input type="checkbox" name="gym_accueil"
-	<!-- IF GYM_ACCUEIL === 'on' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/> &nbsp;
-
-	Horaires <input type="checkbox" name="gym_horaires"
-	<!-- IF GYM_HORAIRES === 'on' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/> &nbsp;
-
-	Ordre <input name="gym_ordre_menu" type="number" style="width:40px" value="{GYM_ORDRE_MENU}"> &nbsp;
-</div><br/>
-<!-- ENDIF -->
-
-<div>
-	<b>Type :</b><br/>
+	<b>Type :</b>
+	<br/>
 
 	Activité:
 	<select name="gym_activite">
@@ -73,13 +47,15 @@ IF PARAM_PUBLI -POSTING_EDITOR_SUBJECT_AFTER.HTML
 		<!-- END liste_saisie_3 -->
 	</select> &nbsp;
 
-	<br/>Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"> &nbsp;
+	<br/>
+	Deuxième ligne de la case horaire
+	<input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"> &nbsp;
+</div>
+<br/>
 
-</div><br/>
-
-<!-- IF CONTIENT_HORAIRE -->
 <div>
-	<b>Calendrier :</b><br/>
+	<b>Calendrier :</b>
+	<br/>
 
 	<select name="gym_jour" id="gym_jour" onchange="changeDayCalendar()">
 		<!-- BEGIN liste_jour -->
@@ -121,13 +97,6 @@ IF PARAM_PUBLI -POSTING_EDITOR_SUBJECT_AFTER.HTML
 	value="<!-- IF GYM_DUREE_HEURES -->{GYM_DUREE_HEURES}<!-- ELSE -->1<!-- ENDIF -->">h
 	<input name="gym_duree_jours" type="number" style="width:60px" value="{GYM_DUREE_JOURS}">jour(s)
 	<br/><br/>
-
-	Période : scolaire
-	<input type="checkbox" name="gym_scolaire" id="gym_scolaire" onchange="changeDayCalendar()"
-	<!-- IF GYM_SCOLAIRE != 'off' -->
-		checked="checked"
-	<!-- ENDIF -->
-	/><br/>
 
 	<table id="edit_semaines"
 		class="calendrier"

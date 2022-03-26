@@ -6,9 +6,8 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-//TODO GYM page présentation / résumé
+//TODO GYM résumés
 //TODO GYM pages des têtes de rubriques
-//TODO GYM editeur de post (carte, coches, ...)
 //TODO GYM calendrier
 
 namespace Dominique92\Gym\event;
@@ -124,8 +123,6 @@ class listener implements EventSubscriberInterface
 
 			// Séances à afficher dans l'horaire
 			if (stripos ($row['forum_desc'], ':horaire') !== false) {
-				$this->template->assign_var ('CONTIENT_HORAIRE', true); //TODO trouver mieux
-
 				$dans_cet_horaire = [$row ['gym_activite'], $row ['gym_animateur'], $row ['gym_lieu']];
 				$en_horaire = array_merge($en_horaire, $dans_cet_horaire);
 
@@ -373,23 +370,27 @@ class listener implements EventSubscriberInterface
 	function posting_modify_template_vars($vars) {
 		$post_data = $vars['post_data'];
 
-		// Set specific variables
-		foreach ($post_data AS $k=>$v)
-			if (!strncmp ($k, 'gym', 3)) {
-				$this->template->assign_var (strtoupper ($k), $v ?: 0);
-				$data[$k] = explode (',', $v); // Expand grouped values
-			}
+		if (stripos ($post_data['forum_desc'], ':horaire') !== false) {
+			$this->template->assign_var ('SAISIE_HORAIRE', true);
 
-		// Static dictionaries
-		global $gym_dicos;
-		foreach ($gym_dicos AS $k=>$v)
-			if (is_array ($v))
-				foreach ($v AS $vk=>$vv)
-					$this->template->assign_block_vars ('liste_'.$k, [
-							'NO' => $vk,
-							'VALEUR' => $vv,
-						]
-					);
+			// Set specific variables
+			foreach ($post_data AS $k=>$v)
+				if (!strncmp ($k, 'gym', 3)) {
+					$this->template->assign_var (strtoupper ($k), $v ?: 0);
+					$data[$k] = explode (',', $v); // Expand grouped values
+				}
+
+			// Static dictionaries
+			global $gym_dicos;
+			foreach ($gym_dicos AS $k=>$v)
+				if (is_array ($v))
+					foreach ($v AS $vk=>$vv)
+						$this->template->assign_block_vars ('liste_'.$k, [
+								'NO' => $vk,
+								'VALEUR' => $vv,
+							]
+						);
+		}
 	}
 
 	// Called during validation of the data to be saved
@@ -454,13 +455,13 @@ class listener implements EventSubscriberInterface
 			'gym_minute',
 			'gym_duree_heures',
 			'gym_duree_jours',
- 			'gym_scolaire',
  			'gym_semaines',
 /* //TODO DELETE
 			'gym_accueil',
  			'gym_horaires',
  			'gym_menu',
  			'gym_ordre_menu',
+ 			'gym_scolaire',
 */
 		];
 		foreach ($columns AS $column) {
