@@ -80,9 +80,6 @@ class listener implements EventSubscriberInterface
 		// Includes language and style files of this extension
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
-//		global $gym_dicos;
-//TODO		$this->template->assign_var ('GYM_DICOS', json_encode($gym_dicos ?: []));
-
 		// Assign command line //TODO DELETE
 /*		foreach ($this->args AS $k=>$v)
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);*/
@@ -184,31 +181,29 @@ class listener implements EventSubscriberInterface
 
 		// Horaires
 		global $gym_dicos;
-		if ($horaire) {
-			ksort ($horaire);
-			foreach ($horaire AS $j=>$jour) { // Jours de la semaine
-				$first = array_values($jour)[0];
-				$first['jour_literal'] = $gym_dicos['jours_semaine'][$j];
-				$first['couleur'] = $this->couleur ();
-				$first['couleur_fond'] = $this->couleur (35, 255, 0);
-				$first['couleur_bord'] = $this->couleur (40, 196, 0);
-				$this->template->assign_block_vars ('jour',
-					array_change_key_case ($first, CASE_UPPER)
+		ksort ($horaire);
+		foreach ($horaire AS $j=>$jour) { // Jours de la semaine
+			$first = array_values($jour)[0];
+			$first['jour_literal'] = $gym_dicos['jour'][$j];
+			$first['couleur'] = $this->couleur ();
+			$first['couleur_fond'] = $this->couleur (35, 255, 0);
+			$first['couleur_bord'] = $this->couleur (40, 196, 0);
+			$this->template->assign_block_vars ('jour',
+				array_change_key_case ($first, CASE_UPPER)
+			);
+
+			ksort ($jour); // Horaires dans la journée
+			foreach ($jour AS $s) { // Séances
+				$m = intval (@$s['gym_minute']);
+				$h = intval (@$s['gym_heure']);
+				$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
+				$h_fin = $h + floor ($m_fin / 60);
+				$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
+				$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
+
+				$this->template->assign_block_vars ('jour.seance',
+					array_change_key_case ($s, CASE_UPPER)
 				);
-
-				ksort ($jour); // Horaires dans la journée
-				foreach ($jour AS $s) { // Séances
-					$m = intval (@$s['gym_minute']);
-					$h = intval (@$s['gym_heure']);
-					$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
-					$h_fin = $h + floor ($m_fin / 60);
-					$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
-					$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
-
-					$this->template->assign_block_vars ('jour.seance',
-						array_change_key_case ($s, CASE_UPPER)
-					);
-				}
 			}
 		}
 	}
@@ -320,47 +315,6 @@ class listener implements EventSubscriberInterface
 				},
 				$post_row['MESSAGE']
 			);
-
-/*
-		// Replace by a code & redirection manager
-		if ($post_row['POST_ID'] == $p)
-			$post_row['MESSAGE'] = preg_replace_callback (
-				'/\[visio\](.*)\[\/visio\]/',
-				function ($match) {
-					// Mem the code
-					if (@$this->args['code']) {
-						setcookie ('code', $this->args['code'], time() + 31*24*3600);
-						$this->cookies['code'] = $this->args['code'];
-					}
-
-					// Trace
-					file_put_contents ('LOG/visio.LOG', var_export([
-						'date' => date(DATE_RFC2822),
-						'query' => $this->server['QUERY_STRING'],
-						'ip' => $this->server['REMOTE_ADDR'],
-						'referer' => @$this->server['HTTP_REFERER'],
-						'agent' => @$this->server['HTTP_USER_AGENT'],
-					], true), FILE_APPEND);
-
-					// Vérification et routage
-					global $myphp_template;
-					if (strpos ($this->cookies['code'], $myphp_template['code_visio']) !== false &&
-						isset($this->args['anim']))
-						exit ('<meta http-equiv="refresh" content="0;URL=https://meet.jit.si/'.
-							$myphp_template['code_visio'].'-'.
-							$this->args['anim'].'">'
-						);
-
-					return // Add a code formulaire
-						'<form action="'.$this->server['REQUEST_URI'].'" method="post">'.
-							'<input name="code" type="text" style="width:200px">'.
-							'<button type="submit">Envoyer</button>'.
-						'</form>'.
-						($this->cookies['code'] ? '<p style="color:red;font-weight:bold">Le code fourni n\'est pas (ou plus) valable</p>' : '');
-				},
-				$post_row['MESSAGE']
-			);
-*/
 	}
 
 	/**
@@ -395,8 +349,6 @@ class listener implements EventSubscriberInterface
 
 	// Called during validation of the data to be saved
 	function submit_post_modify_sql_data($vars) {
-		return; //TODO
-
 		$sql_data = $vars['sql_data'];
 
 		// Get special columns list
@@ -568,9 +520,7 @@ youtube
 */
 
 	// Popule les templates
-	function popule_posts() {
-return;	//TODO DELETE
-/*
+/*	function popule_posts() {
 		// Filtres pour horaires
 		$cond = ['TRUE'];
 
@@ -730,6 +680,6 @@ return;	//TODO DELETE
 					$this->template->assign_block_vars ('topic.post', $vv);
 				}
 			}
-		}*/
-	}
+		}
+	}*/
 }
