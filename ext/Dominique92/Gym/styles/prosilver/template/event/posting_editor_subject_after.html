@@ -28,68 +28,54 @@ IF PARAM_PUBLI -POSTING_EDITOR_SUBJECT_AFTER.HTML
 </div><br/>
 <!-- ENDIF -->
 
-<!-- IF PARAM_ACTIV -->
-OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE
-PARAM_ACTIV POSTING_EDITOR_SUBJECT_AFTER.HTML
 <div>
 	<b>Type :</b><br/>
 
 	Activité:
 	<select name="gym_activite">
 		<option>?</option>
-		<!-- BEGIN liste_activites -->
-			<option value="{liste_activites.POST_ID}"
-				<!-- IF liste_activites.POST_ID == GYM_ACTIVITE -->
+		<!-- BEGIN liste_saisie_2 -->
+			<option value="{liste_saisie_2.POST_ID}"
+				<!-- IF liste_saisie_2.POST_ID == GYM_ACTIVITE -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_activites.POST_SUBJECT}
+				{liste_saisie_2.POST_SUBJECT}
 			</option>
-		<!-- END liste_activites -->
+		<!-- END liste_saisie_2 -->
 	</select> &nbsp;
 
 	Lieu:
 	<select name="gym_lieu">
 		<option>?</option>
-		<!-- BEGIN liste_lieux -->
-			<option value="{liste_lieux.POST_ID}"
-				<!-- IF liste_lieux.POST_ID == GYM_LIEU -->
+		<!-- BEGIN liste_saisie_4 -->
+			<option value="{liste_saisie_4.POST_ID}"
+				<!-- IF liste_saisie_4.POST_ID == GYM_LIEU -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_lieux.POST_SUBJECT}
+				{liste_saisie_4.POST_SUBJECT}
 			</option>
-		<!-- END liste_lieux -->
-	</select> &nbsp;
-
-	Accès:
-	<select name="gym_acces">
-		<option value="">ouvert</option>
-		<option value="ferme"
-			<!-- IF GYM_ACCES === 'ferme' -->
-				selected="selected"
-			<!-- ENDIF -->
-		>fermé</option>
+		<!-- END liste_saisie_4 -->
 	</select> &nbsp;
 
 	Animation:
 	<select name="gym_animateur">
 		<option>?</option>
-		<!-- BEGIN liste_equipe -->
-			<option value="{liste_equipe.POST_ID}"
-				<!-- IF liste_equipe.POST_ID == GYM_ANIMATEUR -->
+		<!-- BEGIN liste_saisie_3 -->
+			<option value="{liste_saisie_3.POST_ID}"
+				<!-- IF liste_saisie_3.POST_ID == GYM_ANIMATEUR -->
 					selected="selected"
 				<!-- ENDIF -->
 			>
-				{liste_equipe.POST_SUBJECT}
+				{liste_saisie_3.POST_SUBJECT}
 			</option>
-		<!-- END liste_equipe -->
+		<!-- END liste_saisie_3 -->
 	</select> &nbsp;
 
-	Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"> &nbsp;
+	<br/>Deuxième ligne de la case horaire <input name="gym_nota" type="text" style="width:400px" value="{GYM_NOTA}"> &nbsp;
 
 </div><br/>
-<!-- ENDIF -->
 
 <!-- IF CONTIENT_HORAIRE -->
 <div>

@@ -124,7 +124,7 @@ class listener implements EventSubscriberInterface
 
 			// Séances à afficher dans l'horaire
 			if (stripos ($row['forum_desc'], ':horaire') !== false) {
-				$this->template->assign_var ('CONTIENT_HORAIRE', true); //TODO REVOIR
+				$this->template->assign_var ('CONTIENT_HORAIRE', true); //TODO trouver mieux
 
 				$dans_cet_horaire = [$row ['gym_activite'], $row ['gym_animateur'], $row ['gym_lieu']];
 				$en_horaire = array_merge($en_horaire, $dans_cet_horaire);
@@ -154,14 +154,20 @@ class listener implements EventSubscriberInterface
 				'COLOR_TITLE' => $this->couleur (80, 162, 0),
 			]);
 
-			// Rubriques du menu
 			ksort ($v); // Par ordre alphabétique des rubriques du menu
-			foreach ($v AS $vv)
+			foreach ($v AS $vv) {
+				// Sous-items des menus
 				if ($vv['post_subject'] != $vv['forum_name'] &&
 					($k == 1 || in_array ($vv['post_id'], $en_horaire)))
 					$this->template->assign_block_vars ('menu.item',
 						array_change_key_case ($vv, CASE_UPPER)
 					);
+
+				// Dictionnaires pour posting
+				$this->template->assign_block_vars ('liste_saisie_'.$k,
+					array_change_key_case ($vv, CASE_UPPER)
+				);
+			}
 		}
 
 		// Textes de la page d'accueil
@@ -174,35 +180,38 @@ class listener implements EventSubscriberInterface
 				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
 			);
 
-			$this->template->assign_block_vars (
-				'accueil',
+			$this->template->assign_block_vars ('accueil',
 				array_change_key_case ($a, CASE_UPPER)
 			);
 		}
 
 		// Horaires
 		global $gym_dicos;
-		ksort ($horaire); // Jours de la semaine
-		foreach ($horaire AS $j=>$jour) {
-			$first = array_values($jour)[0];
-			$first['jour_literal'] = $gym_dicos['jours_semaine'][$j];
-			$first['couleur'] = $this->couleur ();
-			$first['couleur_fond'] = $this->couleur (35, 255, 0);
-			$first['couleur_bord'] = $this->couleur (40, 196, 0);
-			$this->template->assign_block_vars ('jour', array_change_key_case ($first, CASE_UPPER));
-
-			ksort ($jour); // Horaires dans la journée
-			foreach ($jour AS $s) { // Séances
-				$m = intval (@$s['gym_minute']);
-				$h = intval (@$s['gym_heure']);
-				$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
-				$h_fin = $h + floor ($m_fin / 60);
-				$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
-				$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
-
-				$this->template->assign_block_vars ('jour.seance',
-					array_change_key_case ($s, CASE_UPPER)
+		if ($horaire) {
+			ksort ($horaire);
+			foreach ($horaire AS $j=>$jour) { // Jours de la semaine
+				$first = array_values($jour)[0];
+				$first['jour_literal'] = $gym_dicos['jours_semaine'][$j];
+				$first['couleur'] = $this->couleur ();
+				$first['couleur_fond'] = $this->couleur (35, 255, 0);
+				$first['couleur_bord'] = $this->couleur (40, 196, 0);
+				$this->template->assign_block_vars ('jour',
+					array_change_key_case ($first, CASE_UPPER)
 				);
+
+				ksort ($jour); // Horaires dans la journée
+				foreach ($jour AS $s) { // Séances
+					$m = intval (@$s['gym_minute']);
+					$h = intval (@$s['gym_heure']);
+					$m_fin = $m + intval (@$s['gym_duree_heures']) * 60;
+					$h_fin = $h + floor ($m_fin / 60);
+					$s['debut'] = substr ('00' .$h, -2) .'h'. substr ('00' .$m, -2);
+					$s['fin'] = substr('00' .$h_fin, -2) .'h'. substr ('00' .$m_fin % 60, -2);
+
+					$this->template->assign_block_vars ('jour.seance',
+						array_change_key_case ($s, CASE_UPPER)
+					);
+				}
 			}
 		}
 	}
@@ -217,22 +226,6 @@ class listener implements EventSubscriberInterface
 				'body' => 'viewtopic.html',
 			));
 	}
-
-/*
-				p.gym_nota,
-				p.gym_jour,
-				p.gym_heure,
-				p.gym_minute,
-				p.gym_duree_heures,
-				p.gym_duree_jours,
-				p.gym_scolaire,
-				p.gym_semaines,
-//TODO DELETE
-				p.gym_horaires,
-				p.gym_accueil,
-				p.gym_menu,
-				p.gym_ordre_menu,
-*/
 
 	/**
 		VIEWTOPIC.PHP
@@ -390,49 +383,13 @@ class listener implements EventSubscriberInterface
 		// Static dictionaries
 		global $gym_dicos;
 		foreach ($gym_dicos AS $k=>$v)
-			foreach ($v AS $vk=>$vv)
-				$this->template->assign_block_vars (
-					'liste_'.$k, [
-						'NO' => $vk,
-						'VALEUR' => $vv,
-//TODO ??????						'BASE' => in_array (strval ($v[$vk]), $data["gym_$k"] ?: [], true),
-					]
-				);
-
-		// Conditions d'affichage dépendant du forum
-/*		preg_match_all ('/([\.:])(activ|calen|publi)/', $post_data['forum_desc'], $params);
-		foreach ($params[2] AS $k=>$v)
-			if ($params[1][$k] == ':' || // Map on all posts
-				$post_data['post_id'] == $post_data['topic_first_post_id']) // Only map on the first post
-				$this->template->assign_var ('PARAM_'.strtoupper($v), true);
-*/
-//*DCMM*/echo"<pre style='background:white;color:black;font-size:16px'> = ".var_export($post_data,true).'</pre>'.PHP_EOL;
-
-		// Dictionnaires en fonction du contenu de la base de données
-		/* //TODO $gym_dicos = [...
-		global $myphp_template;
-		$topics_keys = $myphp_template['topic_activites'].','.$myphp_template['topic_lieux'].','.$myphp_template['topic_equipe'];
-		$sql = "SELECT post_id, post_subject, topic_id
-			FROM ".POSTS_TABLE."
-			JOIN ".TOPICS_TABLE." USING (topic_id)
-			WHERE post_id != topic_first_post_id
-				AND topic_id IN($topics_keys)";
-		$result = $this->db->sql_query($sql);
-
-		$myphpbb_topics = @array_flip($myphp_template);
-		$values = [];
-		while ($row = $this->db->sql_fetchrow($result)) {
-			$nom_liste = str_replace ('topic', 'liste', $myphpbb_topics[$row['topic_id']]);
-			$values [$nom_liste][$row['post_subject']] = $row;
-		}
-		$this->db->sql_freeresult($result);
-
-		foreach ($values AS $k=>$v) {
-			ksort ($v);
-			foreach ($v AS $vv)
-				$this->template->assign_block_vars ($k, array_change_key_case ($vv, CASE_UPPER));
-		}
-*/
+			if (is_array ($v))
+				foreach ($v AS $vk=>$vv)
+					$this->template->assign_block_vars ('liste_'.$k, [
+							'NO' => $vk,
+							'VALEUR' => $vv,
+						]
+					);
 	}
 
 	// Called during validation of the data to be saved
@@ -486,12 +443,6 @@ class listener implements EventSubscriberInterface
 		return; //TODO
 
 		// Create required SQL columns when needed
-/* //TODO DELETE
-			'gym_accueil',
- 			'gym_horaires',
- 			'gym_menu',
- 			'gym_ordre_menu',
-*/
 		$columns = [
 			'gym_activite',
 			'gym_lieu',
@@ -505,6 +456,12 @@ class listener implements EventSubscriberInterface
 			'gym_duree_jours',
  			'gym_scolaire',
  			'gym_semaines',
+/* //TODO DELETE
+			'gym_accueil',
+ 			'gym_horaires',
+ 			'gym_menu',
+ 			'gym_ordre_menu',
+*/
 		];
 		foreach ($columns AS $column) {
 			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "'.$column.'"';
