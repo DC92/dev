@@ -46,9 +46,9 @@ class listener implements EventSubscriberInterface
 			// All
 			'core.page_header' => 'page_header',
 			'core.page_footer_after' => 'page_footer_after',
+			'core.gen_sort_selects_after' => 'gen_sort_selects_after',
 
 			// Viewtopic
-//			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
@@ -101,7 +101,7 @@ class listener implements EventSubscriberInterface
 		$menus = $accueil = $horaire = $en_horaire = $calendriers = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			// Titre sans ses premiers chiffres
-			preg_match ('/[0-9]* ?(.*)/', $row['post_subject'], $title);
+			preg_match ('/[!0-9]* ?(.*)/', $row['post_subject'], $title);
 			if ($title)
 				$row['post_title'] = $title[1];
 
@@ -234,6 +234,12 @@ class listener implements EventSubscriberInterface
 			));
 	}
 
+	function gen_sort_selects_after($vars) {
+		// Ordre d'affichage
+		$vars['sort_key'] = 's';
+		$vars['sort_dir'] = 'a';
+	}
+
 	/**
 		VIEWTOPIC.PHP
 	*/
@@ -241,7 +247,7 @@ class listener implements EventSubscriberInterface
 		$post_row = $vars['post_row'];
 
 		// Titre sans ses premiers chiffres
-		preg_match ('/[0-9]* ?(.*)/', $post_row['POST_SUBJECT'], $title);
+		preg_match ('/[!0-9]* ?(.*)/', $post_row['POST_SUBJECT'], $title);
 		if ($title)
 			$post_row['POST_SUBJECT'] = $title[1];
 

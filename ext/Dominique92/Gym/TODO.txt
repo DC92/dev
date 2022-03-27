@@ -1,4 +1,6 @@
 //TODO BUG page équipe : Effectivement, la phrase de la page équipe dupliquée par un bug du logiciel qui bégaye.
+//TODO tri viewforum par ordre alphabétique
+//TODO 1er topic du forum = entête dui sous menu si titre sans 00 est égal
 
 //TODO GYM résumé => ... en savoir plus
 //TODO GYM pages des têtes de rubriques
