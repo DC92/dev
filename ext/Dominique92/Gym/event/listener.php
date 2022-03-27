@@ -83,13 +83,8 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
 		// Lecture de la base
-		$sql = "SELECT
+		$sql = "SELECT p.*,
 				f.forum_name, f.forum_desc,
-				p.post_subject, p.topic_id, p.post_id, p.forum_id,
-				p.gym_activite, p.gym_animateur, p.gym_lieu,
-				p.gym_jour, p.gym_heure, p.gym_minute, p.gym_duree_heures,
-p.gym_semaines,
-				p.post_text, p.bbcode_uid, p.bbcode_bitfield,
 				acti.post_subject AS activite,
 				equi.post_subject AS animateur,
 				lieu.post_subject AS lieu
@@ -98,7 +93,7 @@ p.gym_semaines,
 				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			WHERE f.parent_id = 1"; //TODO DELETE ce n° 1
+			WHERE p.post_visibility = 1";
 		$result = $this->db->sql_query($sql);
 
 		$menus = $accueil = $horaire = $en_horaire = [];
@@ -131,7 +126,7 @@ p.gym_semaines,
 			}
 
 			// Calendriers de toutes les séances de l'activité
-			if ($row['gym_semaines'] && $row['gym_semaines'] != 'off' && $row['gym_activite'] == $this->args['p']) {
+			if ($row['gym_semaines'] && $row['gym_semaines'] != 'off' && $row['gym_activite'] == @$this->args['p']) {
 //TODO calendrier ??????
 			}
 		}

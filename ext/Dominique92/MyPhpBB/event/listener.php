@@ -282,7 +282,7 @@ class listener implements EventSubscriberInterface
 			if ($k == 'post_subject' || $k == 'subject' ||
 				$k == 'post_text' || $k == 'message' ||
 				$k == 'geom' ||
-				($k[3] == '_' && $v && $v != '00' && $v != '0' && $v != '?' && $v != 'off')) {
+				(@$k[3] == '_' && $v && $v != '00' && $v != '0' && $v != '?' && $v != 'off')) {
 			$r[] = "$k: $v";
 		}
 

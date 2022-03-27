@@ -32,7 +32,13 @@
 			{S_USERNAME}
 			<ul><li>
 					<a href="viewforum.php?f=1">Données du site</a>
-				<!-- IF U_ACP -->
+				<!-- IF U_MCP -->
+				</li><li>
+					<a href="{U_MCP}&i=mcp_queue&mode=deleted_posts">Restauration des messages supprimés</a>
+				</li><li>
+					<a href="{U_MCP}">{L_MCP}</a>
+				<!-- ENDIF -->
+				<!-- IF U_MCP -->
 				</li><li>
 					<a href="{U_ACP}">{L_ACP}</a>
 				<!-- ENDIF -->

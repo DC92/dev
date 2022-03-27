@@ -1,8 +1,6 @@
 <?php
 define('MYPHPBB_POST_EMPTY_TEXT', true);
 define('MYPHPBB_LOG_EDIT', true);
-define('MYPHPBB_SORT_KEY', 's');
-define('MYPHPBB_SORT_DIR', 'c');
 
 define('MYPHPBB_REDIRECT_INDEX', true);
 define('MYPHPBB_TEMPLATE', true);
@@ -16,6 +14,10 @@ define('MYPHPBB_SHORTCUT', true);
 
 /* NO !
 define('MYPHPBB_CREATE_POST_BUTTON', true);
+
+//BUG https://c92.fr/test/gymcha6/mcp.php?i=148&f=2&t=7
+define('MYPHPBB_SORT_KEY', 's');
+define('MYPHPBB_SORT_DIR', 'c');
 */
 
 /* Debug
