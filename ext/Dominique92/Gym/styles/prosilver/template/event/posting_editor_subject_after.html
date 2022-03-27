@@ -1,7 +1,15 @@
 <!-- IF SAISIE_HORAIRE -->
+	<style>
+		.format-buttons,
+		.format-text,
+		.message-box {
+			display: none !important;
+		}
+	</style>
 	<script>
 		var annee_debut = {ANNEE_DEBUT};
 	</script>
+
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 
 	<div class="saisie_infos_gym">
@@ -98,6 +106,7 @@
 
 	<div class="saisie_infos_gym">
 		<b>Calendrier :</b>
+		(Laisser vide si tous les cours sont assurés)
 		<table id="edit_semaines"
 			class="calendrier"
 			data-id="{REQUEST_P}"

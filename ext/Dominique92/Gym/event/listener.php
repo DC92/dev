@@ -48,7 +48,7 @@ class listener implements EventSubscriberInterface
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Viewtopic
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
+//			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
 			// Posting
@@ -139,7 +139,7 @@ class listener implements EventSubscriberInterface
 		// Popule les menus
 		ksort ($menus); // Par n° de menu dans forum_desc
 		foreach ($menus AS $k=>$v) {
-			// Etiquette du menu
+			// Menus du header
 			$menu_name = array_values($v)[0]['forum_name'];
 
 			$this->template->assign_block_vars ('menu', [
@@ -210,7 +210,7 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-		// Popule les calendriers
+		// Calendriers
 		if ($calendriers) {
 			ksort ($calendriers); // Par n° de jour dans la semaine
 			foreach ($calendriers AS $k=>$v) {
@@ -237,20 +237,6 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	// Called during first pass on post data that read phpbb-posts SQL data
-	function viewtopic_post_rowset_data($vars) {
-		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
-		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
-
-		// Redirect the page to an URL is text includes redirection(URL)
-		$sans_balises = preg_replace ('/<[^>]+>/', '', $vars['row']['post_text']);
-		preg_match ('/redirection\(([^\)]+)/', $sans_balises, $redirection);
-		if($redirection) {
-			header('location: '.$redirection[1]);
-			exit();
-		}
-	}
-
 	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row']; // Data to be displayed
@@ -262,7 +248,16 @@ class listener implements EventSubscriberInterface
 
 		$vars['post_row'] = $post_row;
 
-		return; //TODO /////////////////////////////////////
+		// Redirect the page to an URL is text includes redirection(URL)
+		$sans_balises = preg_replace ('/<[^>]+>/', '', $vars['row']['post_text']);
+		preg_match ('/redirection\(([^\)]+)/', $sans_balises, $redirection);
+		if($redirection) {
+			header('location: '.$redirection[1]);
+			exit();
+		}
+/*
+		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
+		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
 
 		$post_id = $post_row['POST_ID'];
 		$post_data = $this->all_post_data[$post_id] ?: []; // Initial sql values
@@ -270,17 +265,6 @@ class listener implements EventSubscriberInterface
 
 		// Supprime les balises inutiles pour l'affichage complet
 		$post_row['MESSAGE'] = str_replace (['(resume)','(/resume)'], '', $post_row['MESSAGE']);
-
-		// Assign some values to template
-		$post_row['TOPIC_FIRST_POST_ID'] = $topic_data['topic_first_post_id'];
-		$post_row['GYM_MENU'] = $this->all_post_data[$post_row['POST_ID']]['gym_menu'];
-		$post_row['COULEUR'] = $this->couleur (); // Couleur du sous-menu
-		$post_row['GEO_JSON'] = $post_data['geo_json']; // Position sur la carte
-
-		// Assign the gym values to the template
-		foreach ($post_data AS $k=>$v)
-			if (strstr ($k, 'gym') && is_string ($v))
-				$post_row[strtoupper($k)] = $v;
 
 		// Replace (include)RELATIVE_PATH(/include)
 		// by the content of the RELATIVE_PATH
@@ -304,6 +288,7 @@ class listener implements EventSubscriberInterface
 				},
 				$post_row['MESSAGE']
 			);
+*/
 	}
 
 	/**
@@ -508,168 +493,4 @@ youtube
 		}
 	}
 */
-
-	// Popule les templates
-/*	function popule_posts() {
-		// Filtres pour horaires
-		$cond = ['TRUE'];
-
-		$p = $this->request->variable('p', 0);
-		if ($this->request->variable('filtre', 0))
-			$cond[] = "(ac.post_id=$p OR li.post_id=$p OR an.post_id=$p)";
-
-		// Récupère la table de tous les attachements pour les inclusions BBCode
-		$sql = 'SELECT * FROM '. ATTACHMENTS_TABLE .' ORDER BY attach_id DESC, post_msg_id ASC';
-		$result = $this->db->sql_query($sql);
-		$attachments = $update_count_ary = [];
-		while ($row = $this->db->sql_fetchrow($result))
-			$attachments[$row['post_msg_id']][] = $row;
-		$this->db->sql_freeresult($result);
-
-		$sql = "SELECT p.*, t.topic_title, t.topic_first_post_id,
-			first.gym_menu AS first_gym_menu,
-			first.gym_ordre_menu AS first_gym_ordre_menu,
-			first.post_subject AS first_post_subject,
-			li.post_subject AS lieu,
-			an.post_subject AS animateur,
-			ac.post_subject AS activite
-			FROM ".POSTS_TABLE." AS p
-				LEFT JOIN ".POSTS_TABLE." AS ac ON (ac.post_id = p.gym_activite)
-				LEFT JOIN ".POSTS_TABLE." AS li ON (li.post_id = p.gym_lieu)
-				LEFT JOIN ".POSTS_TABLE." AS an ON (an.post_id = p.gym_animateur)
-				LEFT JOIN ".TOPICS_TABLE." AS t ON (t.topic_id = p.topic_id)
-				LEFT JOIN ".POSTS_TABLE." AS first ON (first.post_id = t.topic_first_post_id)
-				WHERE ".implode(' AND ',$cond )."
-				ORDER BY p.topic_id, p.post_id";
-
-		$result = $this->db->sql_query($sql);
-		while ($row = $this->db->sql_fetchrow($result)) {
-			// Assigne le titre
-			if ($row['post_id'] == $p)
-				$this->template->assign_var ('POST_SUBJECT', $row['post_subject']);
-
-			// Clean non selected values
-			foreach ($row AS $k=>$v)
-				if ($v == 'off' || $v == '?')
-					unset($row[$k]);
-
-			// BBCodes et attachements
-			$row['display_text'] = generate_text_for_display(
-				$row['post_text'],
-				$row['bbcode_uid'], $row['bbcode_bitfield'],
-				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-			);
-			if (!empty($attachments[$row['post_id']]))
-				parse_attachments($row['forum_id'], $row['display_text'], $attachments[$row['post_id']], $update_count_ary);
-
-			// Extrait le résumé
-			preg_match ('/\(resume\)(.*)\(\/resume\)/s', $row['display_text'], $match);
-			$row['resume'] = count($match)
-				? $match[1]
-				: $row['display_text'];
-
-			// Date
-			global $gym_const;
-			$row['gym_jour_literal'] = @$this->listes()['jours'][intval ($row['gym_jour'])];
-
-			if(@$row['gym_scolaire'] == 'on')
-				$row['gym_semaines'] = $this->no_semaines;
-
-			if(isset ($row['gym_semaines']) && !isset ($row['gym_menu'])) {
-				setlocale(LC_ALL, 'fr_FR');
-				$row['next_end_time'] = INF;
-				foreach (explode (',', @$row['gym_semaines']) AS $s) {
-					$beg_time = mktime (
-						@$row['gym_heure'], @$row['gym_minute'], 0,
-						8, 2 + $s * 7 + @$row['gym_jour'], $gym_const['annee_debut'] // A partir du lundi suivant le 1er aout annee_debut
-					);
-					$end_time = mktime (
-						@$row['gym_heure'] + @$row['gym_duree_heures'] + 24 * @$row['gym_duree_jours'],
-						@$row['gym_minute'],
-						0, // Secondes
-						8, 3 + $s * 7 + @$row['gym_jour'], $gym_const['annee_debut'] // Lundi suivant le 1er aout annee_debut
-					);
-					// Garde le premier évènement qui finit après la date courante
-					if ($end_time > time() && $end_time < $row['next_end_time']) {
-						$row['next_beg_time'] = $beg_time;
-						$row['next_end_time'] = $end_time;
-						$row['date'] = ucfirst (
-							str_replace ('  ', ' ',
-							utf8_encode (
-							strftime ('%A %e %B', $beg_time)
-						)));
-					}
-				}
-			} else
-				$row['next_beg_time'] = 1234567890 + @$row['gym_jour'];
-
-			// Horaires
-			$row['gym_heure'] = substr('00'.@$row['gym_heure'], -2);
-			$row['gym_minute'] = substr('00'.@$row['gym_minute'], -2);
-
-			$row['gym_minute_fin'] = @$row['gym_minute'] + @$row['gym_duree_heures'] * 60;
-			$row['gym_heure_fin'] = @$row['gym_heure'] + floor (@$row['gym_minute_fin'] / 60);
-			$row['gym_minute_fin'] = @$row['gym_minute_fin'] % 60;
-
-			$row['gym_heure_fin'] = substr('00'.@$row['gym_heure_fin'], -2);
-			$row['gym_minute_fin'] = substr('00'.@$row['gym_minute_fin'], -2);
-			$row['horaire_debut'] = @$row['gym_heure'].'h'.@$row['gym_minute'];
-			$row['horaire_fin'] = @$row['gym_heure_fin'].'h'.@$row['gym_minute_fin'];
-
-			if(@$row['gym_horaires'] == 'on' && @$row['gym_acces'] == 'ferme')
-				$this->template->assign_var ('ACCES_FERME', true);
-
-			// Fil de la page d'acueil
-			if (isset ($row['gym_accueil']))
-				$accueil [
-					sprintf("%05d", @$row['gym_ordre_menu']).
-					$row['horaire_debut'].
-					$row['post_id'] // Pour séparer les exeaco
-				] = array_change_key_case ($row, CASE_UPPER);
-
-			// Range les résultats dans l'ordre et le groupage espéré
-			$liste [
-				$this->request->variable('template', '') == 'horaires'
-					? @$row['gym_jour'] // Horaires
-					: $row['first_gym_ordre_menu'] // Menu
-			][
-				@$row['gym_ordre_menu'].'*'. // Horaires
-				$row['horaire_debut'].'*'.
-				$row['post_subject']. // Pour trier par nom
-				$row['post_id'] // Pour séparer les exeaco
-			] = array_change_key_case ($row, CASE_UPPER);
-		}
-		$this->db->sql_freeresult($result);
-
-		if ($accueil) {
-			ksort ($accueil, SORT_STRING);
-			foreach ($accueil AS $k=>$v)
-				$this->template->assign_block_vars ('accueil', $v);
-		}
-
-		if ($liste) {
-			// Tri du 1er niveau
-			ksort ($liste, SORT_STRING);
-			foreach ($liste AS $k=>$v) {
-				// La première ligne pour avoir les valeurs générales
-				$first = [];
-				foreach ($v AS $vv)
-					$first = array_merge ($vv, $first);
-				$first['COULEUR'] = $this->couleur ();
-				$first['COULEUR_FOND'] = $this->couleur (35, 255, 0);
-				$first['COULEUR_BORD'] = $this->couleur (40, 196, 0);
-				$first['COULEUR_TITRE'] = $this->couleur (80, 162, 0);
-				$first['COUNT'] = count ($v);
-				$this->template->assign_block_vars ('topic', $first);
-
-				// Tri du 2" niveau
-				ksort ($v, SORT_STRING);
-				foreach ($v AS $kv=>$vv) {
-					if ($this->request->variable('template', '') == 'submenu')
-						$vv['COULEUR'] = $this->couleur (); // Pour submenu
-					$this->template->assign_block_vars ('topic.post', $vv);
-				}
-			}
-		}
-	}*/
 }
