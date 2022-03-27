@@ -237,24 +237,23 @@ class listener implements EventSubscriberInterface
 	/**
 		VIEWTOPIC.PHP
 	*/
-	// Appelé lors de la deuxième passe qui prépare dans $post_row les données à afficher
 	function viewtopic_modify_post_row($vars) {
-		$post_row = $vars['post_row']; // Data to be displayed
+		$post_row = $vars['post_row'];
 
 		// Titre sans ses premiers chiffres
 		preg_match ('/[0-9]* ?(.*)/', $post_row['POST_SUBJECT'], $title);
 		if ($title)
 			$post_row['POST_SUBJECT'] = $title[1];
 
-		$vars['post_row'] = $post_row;
-
-		// Redirect the page to an URL is text includes redirection(URL)
+		// Redirect the page to an URL is text includes rediriger(URL)
 		$sans_balises = preg_replace ('/<[^>]+>/', '', $vars['row']['post_text']);
-		preg_match ('/redirection\(([^\)]+)/', $sans_balises, $redirection);
-		if($redirection) {
-			header('location: '.$redirection[1]);
-			exit();
-		}
+		preg_match ('/rediriger\(([^\)]+)/', $sans_balises, $rediriger);
+		if ($rediriger)
+			$this->template->assign_var ('REDIRIGER', $rediriger[1]);
+
+		$vars['post_row'] = $post_row; // Data to be displayed
+	}
+
 /*
 		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
 		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
@@ -289,7 +288,6 @@ class listener implements EventSubscriberInterface
 				$post_row['MESSAGE']
 			);
 */
-	}
 
 	/**
 		POSTING.PHP

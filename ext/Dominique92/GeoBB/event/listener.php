@@ -6,6 +6,9 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
+//TODO BUG geocoder dont't accept enter on posting.php
+//TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
+//TODO BUG fond de carte non persistant quand posting
 //BEST calcul dénivelé / profil
 
 namespace Dominique92\GeoBB\event;

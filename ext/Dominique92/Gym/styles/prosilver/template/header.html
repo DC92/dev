@@ -72,7 +72,7 @@
 	</h1>
 </div>
 
-<ul class="menu">
+<ul class="menu <!-- IF REQUEST_T or REQUEST_P -->replie<!-- ENDIF -->">
 	<!-- BEGIN menu -->
 	<li>
 		<div style="background:{menu.COLOR_TITLE}">
@@ -98,17 +98,23 @@
 
 		<ul style="background:{menu.COLOR}">
 		<!-- BEGIN item -->
-			<li>
-				<a title="Voir la fiche {item.POST_TITLE}" href="./?p={item.POST_ID}">
-				{item.POST_TITLE}</a>
+			<!-- IF item.POST_ID == REQUEST_P -->
+				<li class="menu-select">
+					{item.POST_SUBJECT}
+				</li>
+			<!-- ELSE -->
+				<li>
+					<a title="Voir la fiche {item.POST_TITLE}" href="./?p={item.POST_ID}">
+					{item.POST_TITLE}</a>
 
-				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&p={item.POST_ID}"
-						title="Modifier la fiche {item.POST_TITLE}" class="button button-icon-only">
-						<i class="icon fa-pencil"></i>
-					</a>
-				<!-- ENDIF -->
-			</li>
+					<!-- IF U_MCP -->
+						<a href="posting.php?mode=edit&p={item.POST_ID}"
+							title="Modifier la fiche {item.POST_TITLE}" class="button button-icon-only">
+							<i class="icon fa-pencil"></i>
+						</a>
+					<!-- ENDIF -->
+				</li>
+			<!-- ENDIF -->
 		<!-- END item -->
 		</ul>
 	</li>

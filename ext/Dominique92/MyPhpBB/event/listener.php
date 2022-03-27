@@ -69,8 +69,8 @@ class listener implements EventSubscriberInterface
 			'core.page_footer_after' => 'page_footer_after',
 
 			// Index
-			'core.display_forums_modify_row' => 'display_forums_modify_row',
 			'core.index_modify_page_title' => 'index_modify_page_title',
+			'core.display_forums_modify_row' => 'display_forums_modify_row',
 
 			// Posting
 			'core.modify_posting_parameters' => 'modify_posting_parameters',
@@ -147,42 +147,24 @@ class listener implements EventSubscriberInterface
 		$vars['row'] = $row;
 	}
 
+	// The first hook on index.php
 	function index_modify_page_title ($vars) {
-		$uris = explode ('/?', $this->uri);
-		$cookies = [];
+		// Route index.php to viewtopic or viewforum if there is an argument p or t or f
+		if (defined('MYPHPBB_REDIRECT_INDEX')) {
+			if ($p = $this->request->variable ('p', 0)) {
+				header ('location: viewtopic.php?p='.$p);
+				exit ();
+			}
 
-		// Get cookies context
-		global $config;
-		foreach (['u','k','sid'] AS $v) {
-			$kn = $config['cookie_name'].'_'.$v;
-			$cookies[] .= $kn.'='.@$this->cookie[$kn];
-		}
-		$context = stream_context_create([
-			'http' => [
-				'method' => "GET",
-				'header' => "Accept-language: en\r\n".
-							"Cookie: ".implode('; ',$cookies)."\r\n",
-				],
-		]);
+			if ($t = $this->request->variable ('t', 0)) {
+				header ('location: viewtopic.php?t='.$t);
+				exit ();
+			}
 
-		/* Route to viewtopic or viewforum if there is an argument p, t or f */
-		if (defined('MYPHPBB_REDIRECT_INDEX') &&
-			count ($uris) > 1 &&
-			!$this->request->variable ('template', '')) {
-				if ($this->request->variable ('p', 0) ||
-					$this->request->variable ('t', 0))
-					exit (file_get_contents (
-						$uris[0].'/viewtopic.php?'.$uris[1],
-						false,
-						$context
-					));
-					//TODO error reporting
-				if ($this->request->variable ('f', 0))
-					exit (file_get_contents (
-						$uris[0].'/viewforum.php?'.$uris[1],
-						false,
-						$context
-					));
+			if ($f = $this->request->variable ('f', 0)) {
+				header ('location: viewforum.php?t='.$f);
+				exit ();
+			}
 		}
 	}
 
