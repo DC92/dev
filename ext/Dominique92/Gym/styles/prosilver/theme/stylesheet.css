@@ -416,7 +416,7 @@ body {
 
 /* Calendrier */
 .gym table.calendrier {
-	margin: 0 auto;
+	margin: 1em auto;
 	border: 2px solid grey;
 	border-collapse: collapse;
 	border-spacing: 0;

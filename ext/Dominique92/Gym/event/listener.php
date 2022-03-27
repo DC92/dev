@@ -64,6 +64,8 @@ class listener implements EventSubscriberInterface
 		ALL
 	*/
 	function page_header($var) {
+		global $gym_const;
+
 		// Includes style files of this extension
 		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
 			$this->template->set_style ([
@@ -75,12 +77,12 @@ class listener implements EventSubscriberInterface
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
 		// Constants values used in js code
-		global $gym_const;
-		$this->template->assign_var ('GYM_CONST', json_encode($gym_const ?: []));
+		$this->template->assign_var ('ANNEE_DEBUT', $gym_const['annee_debut']);
 
 		// Assign command line
-		foreach ($this->args AS $k=>$v)
-			$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
+		if ($this->args)
+			foreach ($this->args AS $k=>$v)
+				$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
 
 		// Lecture de la base
 		$sql = "SELECT p.*,
@@ -96,7 +98,7 @@ class listener implements EventSubscriberInterface
 			WHERE p.post_visibility = 1";
 		$result = $this->db->sql_query($sql);
 
-		$menus = $accueil = $horaire = $en_horaire = [];
+		$menus = $accueil = $horaire = $en_horaire = $calendriers = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			// Titre sans ses premiers chiffres
 			preg_match ('/[0-9]* ?(.*)/', $row['post_subject'], $title);
@@ -117,7 +119,7 @@ class listener implements EventSubscriberInterface
 				$dans_cet_horaire = [$row ['gym_activite'], $row ['gym_animateur'], $row ['gym_lieu']];
 				$en_horaire = array_merge($en_horaire, $dans_cet_horaire);
 
-				if (in_array (@$this->args['p'], $dans_cet_horaire) ||
+				if (in_array ($this->request->variable('p', 0), $dans_cet_horaire) ||
 					stripos ($var['page_title'], 'horaire') !== false)
 					$horaire
 						[intval ($row ['gym_jour'])]
@@ -126,9 +128,11 @@ class listener implements EventSubscriberInterface
 			}
 
 			// Calendriers de toutes les séances de l'activité
-			if ($row['gym_semaines'] && $row['gym_semaines'] != 'off' && $row['gym_activite'] == @$this->args['p']) {
-//TODO calendrier ??????
-			}
+			if ($row['gym_semaines'] &&
+				$row['gym_semaines'] != 'off' &&
+				$row['gym_activite'] == $this->request->variable('p', 0)
+				)
+				$calendriers [intval ($row['gym_jour'])] = $row;
 		}
 		$this->db->sql_freeresult($result);
 
@@ -202,6 +206,18 @@ class listener implements EventSubscriberInterface
 
 				$this->template->assign_block_vars ('jour.seance',
 					array_change_key_case ($s, CASE_UPPER)
+				);
+			}
+		}
+
+		// Popule les calendriers
+		if ($calendriers) {
+			ksort ($calendriers); // Par n° de jour dans la semaine
+			foreach ($calendriers AS $k=>$v) {
+				$v['gym_jour_literal'] = $gym_const['jour'][$k];
+
+				$this->template->assign_block_vars ('calendrier',
+					array_change_key_case ($v, CASE_UPPER)
 				);
 			}
 		}
@@ -332,10 +348,11 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		// Treat specific data
-		foreach ($this->args AS $k=>$v)
-			if (!strncmp ($k, 'gym', 3)) {
-				if(is_array($v))
-					$v = implode (',', $v);
+		if ($this->args)
+			foreach ($this->args AS $k=>$v)
+				if (!strncmp ($k, 'gym', 3)) {
+					if(is_array($v))
+						$v = implode (',', $v);
 
 				// Retrieves the values of the questionnaire, includes them in the phpbb_posts table
 				$sql_data[POSTS_TABLE]['sql'][$k] = utf8_normalize_nfc($v) ?: null; // null allows the deletion of the field
@@ -366,7 +383,7 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé par n'importe quelle page de l'administration
 	function adm_page_header() {
-		return; //TODO
+		return; //TODO /////////////////////////////////////
 
 		// Create required SQL columns when needed
 		$columns = [

@@ -1,7 +1,6 @@
-//BEST CHEMINEUR
-================
 //TODO BUG geocoder dont't accept enter on posting.php
 //TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
+//TODO BUG fond de carte non persistant quand posting
 
 //TODO ordre des posts
 //TODO recherche nom lieux en page modif

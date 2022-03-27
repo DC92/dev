@@ -25,9 +25,7 @@ class listener implements EventSubscriberInterface
 		\phpbb\request\request_interface $request
 	) {
 		$this->db = $db;
-		$this->request = $request;
-		$this->server = $this->request->get_super_global(\phpbb\request\request_interface::SERVER);
-		$this->args = $this->request->get_super_global(\phpbb\request\request_interface::REQUEST);
+		$this->server = $request->get_super_global(\phpbb\request\request_interface::SERVER);
 	}
 
 	static public function getSubscribedEvents() {

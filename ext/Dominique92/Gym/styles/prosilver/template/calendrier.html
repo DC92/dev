@@ -1,40 +1,30 @@
-OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE
-CALENDRIER.HTML
-<!-- BEGIN postrow -->5555555555555555
-			data-semaines="{postrow.POST_SUBJECT}"
-<!-- END postrow -->
-
-<!-- BEGIN topic -->
-	<!-- BEGIN post -->
-	<!-- IF post.POST_ID == REQUEST_ID and post.GYM_SEMAINES -->
-		<table
-			class="calendrier"
-			data-id="{REQUEST_ID}"
-			data-semaines="{post.GYM_SEMAINES}"
-			data-jour="{post.GYM_JOUR}"
-		>
-			<tr><td colspan="6">
-				Les {post.GYM_JOUR_LITERAL}s
-				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&p={post.POST_ID}"
-						title="Modifier la page {post.POST_TITLE}" class="button button-icon-only">
-						<i class="icon fa-pencil"></i>
-					</a>
-				<!-- ENDIF -->
-			</td></tr>
-			<tr id="cal{REQUEST_ID}_m8" style="display:none"></tr>
-			<tr id="cal{REQUEST_ID}_m9"><td>Septembre</td></tr>
-			<tr id="cal{REQUEST_ID}_m10"><td>Octobre</td></tr>
-			<tr id="cal{REQUEST_ID}_m11"><td>Novembre</td></tr>
-			<tr id="cal{REQUEST_ID}_m12"><td>Décembre</td></tr>
-			<tr id="cal{REQUEST_ID}_m1"><td>Janvier</td></tr>
-			<tr id="cal{REQUEST_ID}_m2"><td>Février</td></tr>
-			<tr id="cal{REQUEST_ID}_m3"><td>Mars</td></tr>
-			<tr id="cal{REQUEST_ID}_m4"><td>Avril</td></tr>
-			<tr id="cal{REQUEST_ID}_m5"><td>Mai</td></tr>
-			<tr id="cal{REQUEST_ID}_m6"><td>Juin</td></tr>
-			<tr id="cal{REQUEST_ID}_m7" style="display:none"></tr>
-		</table>
-	<!-- ENDIF -->
-	<!-- END post -->
-<!-- END topic -->
+<!-- BEGIN calendrier -->
+	<table
+		class="calendrier"
+		data-id="{calendrier.POST_ID}"
+		data-semaines="{calendrier.GYM_SEMAINES}"
+		data-jour="{calendrier.GYM_JOUR}"
+	>
+		<tr><td colspan="6">
+			Les {calendrier.GYM_JOUR_LITERAL}s
+			<!-- IF U_MCP -->
+				<a href="posting.php?mode=edit&p={calendrier.POST_ID}"
+					title="Modifier la page {calendrier.POST_TITLE}" class="button button-icon-only">
+					<i class="icon fa-pencil"></i>
+				</a>
+			<!-- ENDIF -->
+		</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m8" style="display:none"></tr>
+		<tr id="cal{calendrier.POST_ID}_m9"><td>Septembre</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m10"><td>Octobre</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m11"><td>Novembre</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m12"><td>Décembre</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m1"><td>Janvier</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m2"><td>Février</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m3"><td>Mars</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m4"><td>Avril</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m5"><td>Mai</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m6"><td>Juin</td></tr>
+		<tr id="cal{calendrier.POST_ID}_m7" style="display:none"></tr>
+	</table>
+<!-- END calendrier -->

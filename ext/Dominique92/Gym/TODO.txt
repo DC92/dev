@@ -1,4 +1,5 @@
 //TODO BUG page équipe : Effectivement, la phrase de la page équipe dupliquée par un bug du logiciel qui bégaye.
+//TODO enlever saisie texte sur une séances (enlever titre aussi ?)
 
 //TODO GYM résumé => ... en savoir plus
 //TODO GYM pages des têtes de rubriques
