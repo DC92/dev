@@ -136,22 +136,28 @@ class listener implements EventSubscriberInterface
 		}
 		$this->db->sql_freeresult($result);
 
-		// Popule les menus
+		// Menus du header
 		ksort ($menus); // Par n° de menu dans forum_desc
 		foreach ($menus AS $k=>$v) {
-			// Menus du header
-			$menu_name = array_values($v)[0]['forum_name'];
+			ksort ($v); // Par ordre alphabétique des lignes du menu
 
-			$this->template->assign_block_vars ('menu', [
-				'TITLE' => $menu_name,
-				'POST_ID' => @$v[$menu_name]['post_id'],
-				'TOPIC_ID' => array_values($v)[0]['topic_id'],
-				'FORUM_ID' => array_values($v)[0]['forum_id'],
-				'COLOR' => $this->couleur (),
-				'COLOR_TITLE' => $this->couleur (80, 162, 0),
-			]);
+			// Menu title
+			$menu_head = array_values($v)[0];
 
-			ksort ($v); // Par ordre alphabétique des rubriques du menu
+			if ($menu_head['post_subject'][0] == '!')
+				array_shift ($v);
+			else
+				$menu_head = [
+					'post_title' => $menu_head['forum_name'],
+				];
+
+			$this->template->assign_block_vars ('menu',
+				array_change_key_case ($menu_head, CASE_UPPER) + [
+					'COLOR' => $this->couleur (),
+					'COLOR_TITLE' => $this->couleur (80, 162, 0),
+				]
+			);
+
 			foreach ($v AS $vv) {
 				// Sous-items des menus
 				if ($vv['post_subject'] != $vv['forum_name'] &&
