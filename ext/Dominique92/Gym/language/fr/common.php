@@ -46,14 +46,14 @@ $lang = array_merge($lang, array(
 	// Posting.php
 	'SUBJECT' => 'Titre',
 	'SUBMIT' => 'Enregistrer',
-	'EDIT_POST' => 'Modifier une fiche',
-	'POST_REPLY' => 'Créer une nouvelle fiche',
+	'EDIT_POST' => 'Modifier une page',
+	'POST_REPLY' => 'Créer une nouvelle page',
 	'DELETE_POST_PERMANENTLY' => array(
-		1	=> 'Supprimer cette fiche',
-		2	=> 'Supprimer ces fiches',
+		1	=> 'Supprimer cette page',
+		2	=> 'Supprimer ces pages',
 	),
-	'DELETE_MESSAGE_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
-	'DELETE_POST_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette fiche ?',
+	'DELETE_MESSAGE_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette page ?',
+	'DELETE_POST_CONFIRM' => 'Êtes-vous sûr de vouloir supprimer cette page ?',
 	'STICK_TOPIC_FOR_EXPLAIN' => '',
 	'CONTACT_ADMIN' => 'Nous contacter',
 

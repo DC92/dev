@@ -149,6 +149,7 @@ class listener implements EventSubscriberInterface
 			else
 				$menu_head = [
 					'post_title' => $menu_head['forum_name'],
+					'forum_id' => $menu_head['forum_id'],
 				];
 
 			$this->template->assign_block_vars ('menu',

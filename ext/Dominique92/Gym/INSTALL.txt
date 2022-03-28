@@ -1,11 +1,12 @@
 // INSTALL du 30/04/2021
-Exporter base / créer et importer
+Exporter base / créer, ajouter utilisateur et importer
+Créer sous domaine / générer SSL (pas de changement des paramètres)
 
 Copier phpBB sauf doc, install ? & config.php
 Copier assets/MyOl
 Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
 Copier ext/cleantalk
-Copier gym/fichiers gym/files
+Copier gym/fichiers, gym/files
 
 /install -> Mettre à jour
 Supprimer /install
