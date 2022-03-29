@@ -266,43 +266,13 @@ class listener implements EventSubscriberInterface
 		if ($rediriger)
 			$this->template->assign_var ('REDIRIGER', $rediriger[1]);
 
+		// Include a template file
+		preg_match ('/inclure\(([^\)]+)/', $sans_balises, $inclure);
+		if ($inclure && is_file($this->ext_path.'styles/prosilver/template/'.$inclure[1].'.html'))
+			$this->template->assign_var ('SUB_TEMPLATE', $inclure[1]);
+
 		$vars['post_row'] = $post_row; // Data to be displayed
 	}
-
-/*
-		//Stores post SQL data for further processing (viewtopic proceeds in 2 steps)
-		$this->all_post_data[$vars['row']['post_id']] = $vars['row'];
-
-		$post_id = $post_row['POST_ID'];
-		$post_data = $this->all_post_data[$post_id] ?: []; // Initial sql values
-		$topic_data = $vars['topic_data'];
-
-		// Supprime les balises inutiles pour l'affichage complet
-		$post_row['MESSAGE'] = str_replace (['(resume)','(/resume)'], '', $post_row['MESSAGE']);
-
-		// Replace (include)RELATIVE_PATH(/include)
-		// by the content of the RELATIVE_PATH
-		// Only on the required post
-		$p = $this->request->variable ('p', 0);
-		if ($post_row['POST_ID'] == $p || !$p)
-			$post_row['MESSAGE'] = preg_replace_callback (
-				'/\(include\)(.*)\(\/include\)/',
-				function ($match) {
-					$url = str_replace ('ARGS', // Replace ARGS by the current page arguments
-							parse_url ($this->uri, PHP_URL_QUERY),
-							pathinfo ($this->uri, PATHINFO_DIRNAME).'/'.htmlspecialchars_decode($match[1])
-						);
-					$url .= (parse_url ($url, PHP_URL_QUERY) ? '&' : '?').
-						'mcp='.$this->auth->acl_get('m_');
-
-					if (defined('MYPHPBB_BBCODE_INCLUDE_TRACE'))
-						echo $url.'<br/>';
-
-					return file_get_contents ($url);
-				},
-				$post_row['MESSAGE']
-			);
-*/
 
 	/**
 		POSTING.PHP
