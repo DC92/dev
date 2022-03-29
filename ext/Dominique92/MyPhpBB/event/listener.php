@@ -264,9 +264,8 @@ class listener implements EventSubscriberInterface
 			if ($k == 'post_subject' || $k == 'subject' ||
 				$k == 'post_text' || $k == 'message' ||
 				$k == 'geom' ||
-				(@$k[3] == '_' && $v && $v != '00' && $v != '0' && $v != '?' && $v != 'off')) {
-			$r[] = "$k: $v";
-		}
+				(@$k[3] == '_' && $v && $v != '00' && $v != '0' && $v != '?' && $v != 'off'))
+			$r[] = $k.': '.json_encode($v);
 
 		file_put_contents (
 			$file_name,

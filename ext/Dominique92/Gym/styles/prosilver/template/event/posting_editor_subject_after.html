@@ -6,9 +6,6 @@
 			display: none !important;
 		}
 	</style>
-	<script>
-		var annee_debut = {ANNEE_DEBUT};
-	</script>
 
 	<!-- INCLUDEJS @Dominique92_Gym/index.js -->
 
@@ -104,6 +101,9 @@
 		<input name="gym_duree_jours" type="number" style="width:60px" value="{GYM_DUREE_JOURS}">jour(s)
 	</div>
 
+	<script>
+		var annee_debut = {ANNEE_DEBUT};
+	</script>
 	<div class="saisie_infos_gym">
 		<b>Calendrier :</b>
 		(Laisser vide si tous les cours sont assurés)
@@ -111,7 +111,7 @@
 			class="calendrier"
 			data-id="{REQUEST_P}"
 			data-semaines="{GYM_SEMAINES}"
-			data-jour="{GYM_JOUR}"
+			data-jour="0{GYM_JOUR}"
 		>
 			<tr id="cal{REQUEST_P}_m8" style="display:none"></tr>
 			<tr id="cal{REQUEST_P}_m9"><td>Septembre</td></tr>

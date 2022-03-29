@@ -234,7 +234,7 @@ class listener implements EventSubscriberInterface
 
 	function page_footer_after($var) {
 		// Change le template viewtopic sauf après viewforum
-		$url_viewtopic = strpos (@$this->server['SCRIPT_URI'], 'viewtopic') !== false;
+		$url_viewtopic = strpos (@$this->server['SCRIPT_NAME'], 'viewtopic') !== false;
 		$ref_viewforum = strpos (@$this->server['HTTP_REFERER'], 'viewforum') !== false;
 
 		if ($url_viewtopic && !$ref_viewforum)
