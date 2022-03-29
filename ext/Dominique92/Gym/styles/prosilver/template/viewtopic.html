@@ -1,48 +1,49 @@
 <!-- IF REDIRIGER -->
 	<meta http-equiv="refresh" content="0;URL={REDIRIGER}">';
+<!-- ELSE -->
+	<!-- INCLUDE header.html -->
+	<div class="page">
+		<!-- BEGIN postrow -->
+			<!-- IF postrow.POST_ID == REQUEST_P -->
+			<h1>
+				{postrow.POST_SUBJECT}
+				<!-- IF U_MCP -->
+					<a href="posting.php?mode=edit&p={postrow.POST_ID}"
+						title="Modifier la page {postrow.POST_SUBJECT}"
+						class="button button-icon-only">
+						<i class="icon fa-pencil"></i>
+					</a>
+				<!-- ENDIF -->
+			</h1>
+
+			<div>{postrow.MESSAGE}</div>
+
+			<script>
+				<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
+					var select = 'gym_menu=%27on%27',
+						coordonnees = [{GEO_LON}, {LON_LAT}], // Topic_data
+						zoom = 14;
+				<!-- ELSEIF postrow.LON_LAT -->
+					var select = 'post_id={postrow.POST_ID}',
+						coordonnees = {postrow.LON_LAT}, // Post_data
+						zoom = 18;
+				<!-- ENDIF -->
+			</script>
+		<!-- ENDIF -->
+		<!-- END postrow -->
+
+		<!-- Carte -->
+		<!-- IF GEO_JSON -->
+			<div id="carte"></div>
+			<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
+			<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
+			<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
+			<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
+			<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
+		<!-- ENDIF -->
+
+		<!-- INCLUDE horaires.html -->
+	</div>
+
+	<!-- INCLUDE footer.html -->
 <!-- ENDIF -->
-<!-- INCLUDE header.html -->
-<div class="page">
-	<!-- BEGIN postrow -->
-		<!-- IF postrow.POST_ID == REQUEST_P -->
-		<h1>
-			{postrow.POST_SUBJECT}
-			<!-- IF U_MCP -->
-				<a href="posting.php?mode=edit&p={postrow.POST_ID}"
-					title="Modifier la page {postrow.POST_SUBJECT}"
-					class="button button-icon-only">
-					<i class="icon fa-pencil"></i>
-				</a>
-			<!-- ENDIF -->
-		</h1>
-
-		<div>{postrow.MESSAGE}</div>
-
-		<script>
-			<!-- IF postrow.POST_ID == postrow.TOPIC_FIRST_POST_ID -->
-				var select = 'gym_menu=%27on%27',
-					coordonnees = [{GEO_LON}, {LON_LAT}], // Topic_data
-					zoom = 14;
-			<!-- ELSEIF postrow.LON_LAT -->
-				var select = 'post_id={postrow.POST_ID}',
-					coordonnees = {postrow.LON_LAT}, // Post_data
-					zoom = 18;
-			<!-- ENDIF -->
-		</script>
-	<!-- ENDIF -->
-	<!-- END postrow -->
-
-	<!-- Carte -->
-	<!-- IF GEO_JSON -->
-		<div id="carte"></div>
-		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/ol/ol.css -->
-		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/ol/ol.js -->
-		<!-- INCLUDECSS {T_ASSETS_PATH}/MyOl/myol.css -->
-		<!-- INCLUDEJS {T_ASSETS_PATH}/MyOl/myol.js -->
-		<!-- INCLUDEJS @Dominique92_Gym/viewtopic.js -->
-	<!-- ENDIF -->
-
-	<!-- INCLUDE horaires.html -->
-</div>
-
-<!-- INCLUDE footer.html -->
