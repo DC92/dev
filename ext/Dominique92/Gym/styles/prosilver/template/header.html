@@ -48,7 +48,8 @@
 					<a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a>
 			</li></ul>
 		<!-- ELSE -->
-			<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" class="button button-icon-only">
+			<a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}"
+				class="button button-icon-only">
 				<i class="icon fa-pencil"></i>
 			</a>
 		<!-- ENDIF -->
@@ -77,20 +78,26 @@
 	<li>
 		<div style="background:{menu.COLOR_TITLE}">
 			<a <!-- IF menu.POST_ID -->href="./?p={menu.POST_ID}"<!-- ENDIF -->>
-				{menu.POST_TITLE}
-			</a>
+				{menu.POST_TITLE}</a>
 
 			<!-- IF U_MCP -->
 				<!-- IF menu.POST_ID -->
 					<a href="posting.php?mode=edit&p={menu.POST_ID}"
 						title="Modifier la page {menu.POST_TITLE}"
 						class="button button-icon-only">
-					<i class="icon fa-pencil"></i>
-				</a>
+						<i class="icon fa-pencil"></i>
+					</a>
 				<!-- ENDIF -->
 
+				<a href="posting.php?mode=post&f={menu.FORUM_ID}"
+					title="Ajouter une ligne au menu {menu.POST_TITLE}"
+					class="button button-icon-only">
+					<i class="icon fa-plus"></i>
+				</a>
+
 				<a href="viewforum.php?f={menu.FORUM_ID}"
-					title="Modifier la liste du menu {menu.POST_TITLE}" class="button button-icon-only">
+					title="Modifier la liste du menu {menu.POST_TITLE}"
+					class="button button-icon-only">
 					<i class="icon fa-list"></i>
 				</a>
 			<!-- ENDIF -->
@@ -109,7 +116,8 @@
 
 					<!-- IF U_MCP -->
 						<a href="posting.php?mode=edit&p={item.POST_ID}"
-							title="Modifier la page {item.POST_TITLE}" class="button button-icon-only">
+							title="Modifier la page {item.POST_TITLE}"
+							class="button button-icon-only">
 							<i class="icon fa-pencil"></i>
 						</a>
 					<!-- ENDIF -->

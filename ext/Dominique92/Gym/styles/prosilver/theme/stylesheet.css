@@ -13,12 +13,20 @@ pre {
 .section-posting #options-panel .fields1 > div, /* Options */
 .section-posting #options-panel label[for=edit_reason],
 .section-posting #options-panel #edit_reason,
-.section-posting input[name=preview],
+.section-posting #poll-panel-tab,
+.section-posting .fields1 hr:nth-child(6),
+.section-posting .fields1 dl:nth-child(7),
+.section-posting .fields1 dl:nth-child(8),
+.section-posting .fields1 hr:nth-child(9),
+
 .section-posting #smiley-box,
+.section-posting input[name=preview],
 .bbcode-quote,
 .bbcode-code,
 .bbcode-lisy-,
-.bbcode-flash {
+.bbcode-flash,
+.section-viewforum .stat-block,
+.section-viewforum .pagination a {
 	display: none !important;
 }
 

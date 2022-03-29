@@ -82,7 +82,7 @@ class listener implements EventSubscriberInterface
 		// Assign command line
 		if ($this->args)
 			foreach ($this->args AS $k=>$v)
-				$this->template->assign_var ('REQUEST_'.strtoupper ($k), $v);
+				$this->template->assign_var (strtoupper ("REQUEST_$k"), $v);
 
 		// Lecture de la base
 		$sql = "SELECT p.*,
@@ -107,8 +107,10 @@ class listener implements EventSubscriberInterface
 
 			// Liste des menus
 			preg_match ('/:menu=([0-9]*)/', $row['forum_desc'], $no_menu);
-			if ($no_menu)
+			if ($no_menu) {
 				$menus [$no_menu[1]] [$row['post_subject']] = $row;
+				$this->template->assign_var ('NO_MENU', $no_menu[1]);
+			}
 
 			// Posts à afficher sur la page d'accueil
 			if (stripos ($row['forum_desc'], ':accueil') !== false)
@@ -176,16 +178,16 @@ class listener implements EventSubscriberInterface
 
 		// Textes de la page d'accueil
 		ksort ($accueil); // Par ordre alphabétique de titre
-		foreach ($accueil AS $a) {
+		foreach (array_values ($accueil) AS $k=>$v) {
 			// Traduit les BBcodes
-			$a['display_text'] = generate_text_for_display(
-				$a['post_text'],
-				$a['bbcode_uid'], $a['bbcode_bitfield'],
+			$v['display_text'] = generate_text_for_display (
+				$v['post_text'],
+				$v['bbcode_uid'], $v['bbcode_bitfield'],
 				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
 			);
 
 			$this->template->assign_block_vars ('accueil',
-				array_change_key_case ($a, CASE_UPPER)
+				array_change_key_case ($v, CASE_UPPER) + ['NO' => $k]
 			);
 		}
 
