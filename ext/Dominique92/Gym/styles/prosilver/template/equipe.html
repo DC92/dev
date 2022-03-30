@@ -1,24 +1,24 @@
-OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE
-//TODO ??? EQUIPE.HTML
-<!-- BEGIN topic -->
-<!-- BEGIN post -->
-	<!-- IF REQUEST_T == post.TOPIC_ID and post.GYM_MENU == 'on' -->
-		<div class="animatrice">
-			<h2>
-				<a href="viewtopic.php?p={post.POST_ID}">{post.POST_TITLE}</a>
-				<!-- IF U_MCP -->
-					<a href="posting.php?mode=edit&p={post.POST_ID}"
-						title="Modifier la page {post.POST_TITLE}" class="button button-icon-only">
-						<i class="icon fa-pencil"></i>
-					</a>
-				<!-- ENDIF -->
-			</h2>
+<ul class="menu submenu">
+	<!-- BEGIN menu -->
+	<!-- IF menu.POST_ID == REQUEST_P -->
+		<!-- BEGIN item -->
+			<div class="animatrice">
+				<h2>
+					<a href="viewtopic.php?p={item.POST_ID}">{item.POST_TITLE}</a>
+					<!-- IF U_MCP -->
+						<a href="posting.php?mode=edit&p={item.POST_ID}"
+							title="Modifier la page {item.POST_TITLE}" class="button button-icon-only">
+							<i class="icon fa-pencil"></i>
+						</a>
+					<!-- ENDIF -->
+				</h2>
 
-			{post.RESUME}
+				{item.RESUME}
 
-			<br/><a href="viewtopic.php?p={post.POST_ID}">Plus d'infos . . .</a>
-			<br style="clear:both;height:0" />
-		</div>
+				<br/><a href="viewtopic.php?p={item.POST_ID}">Plus d'infos . . .</a>
+				<br style="clear:both;height:0" />
+			</div>
+		<!-- END item -->
 	<!-- ENDIF -->
-<!-- END post -->
-<!-- END topic -->
+	<!-- END menu -->
+</ul>

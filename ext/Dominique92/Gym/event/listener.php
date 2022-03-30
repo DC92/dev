@@ -162,6 +162,8 @@ class listener implements EventSubscriberInterface
 			);
 
 			foreach ($v AS $vv) {
+				$vv['color'] =  $this->couleur ();
+
 				// Sous-items des menus
 				if ($vv['post_subject'] != $vv['forum_name'] &&
 					($k == 1 || in_array ($vv['post_id'], $en_horaire)))
@@ -268,8 +270,10 @@ class listener implements EventSubscriberInterface
 
 		// Include a template file
 		preg_match ('/inclure\(([^\)]+)/', $sans_balises, $inclure);
-		if ($inclure && is_file($this->ext_path.'styles/prosilver/template/'.$inclure[1].'.html'))
+		if ($inclure && is_file($this->ext_path.'styles/prosilver/template/'.$inclure[1].'.html')) {
 			$this->template->assign_var ('SUB_TEMPLATE', $inclure[1]);
+			$post_row['MESSAGE'] = str_replace ('inclure('.$inclure[1].')', '', $post_row['MESSAGE']);
+		}
 
 		$vars['post_row'] = $post_row; // Data to be displayed
 	}

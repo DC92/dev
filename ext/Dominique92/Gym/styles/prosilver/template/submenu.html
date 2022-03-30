@@ -1,20 +1,15 @@
-OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE
-//TODO ??? SUBMENU.HTML
-<!-- Page Activités et Salles -->
 <ul class="menu submenu">
-	<!-- BEGIN topic -->
-	<!-- IF topic.FIRST_GYM_MENU and topic.TOPIC_ID == REQUEST_T and topic.COUNT > 1 -->
-		<!-- BEGIN post -->
-			<!-- IF post.GYM_MENU and post.TOPIC_FIRST_POST_ID != post.POST_ID -->
+	<!-- BEGIN menu -->
+	<!-- IF menu.POST_ID == REQUEST_P -->
+		<!-- BEGIN item -->
 			<li>
-			<div style="background:{post.COULEUR}">
-				<a title = "Voir la fiche {post.POST_SUBJECT}" href="viewtopic.php?p={post.POST_ID}">
-					{post.POST_SUBJECT}
+			<div style="background:{item.COLOR}">
+				<a title = "Voir la fiche {item.POST_SUBJECT}" href="viewtopic.php?p={item.POST_ID}">
+					{item.POST_SUBJECT}
 				</a>
 			</div>
 			</li>
-		<!-- ENDIF -->
-		<!-- END post -->
+		<!-- END item -->
 	<!-- ENDIF -->
-	<!-- END topic -->
+	<!-- END menu -->
 </ul>

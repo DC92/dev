@@ -309,9 +309,6 @@ body {
 	display: none;
 	white-space: nowrap ;
 }
-.gym .replie i {
-	display: none;
-}
 .gym .replie li:hover ul li,
 .gym .menu-select {
 	display: block !important;
