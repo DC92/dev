@@ -12,13 +12,9 @@ pre {
 .section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
 .section-posting #options-panel .fields1 > div, /* Options */
 .section-posting #options-panel label[for=edit_reason],
+.section-posting #options-panel label[for=delete_permanent],
 .section-posting #options-panel #edit_reason,
 .section-posting #poll-panel-tab,
-.section-posting .fields1 hr,
-/*//TODO
-.section-posting .fields1 dl:nth-child(7),
-.section-posting .fields1 dl:nth-child(8),
-*/
 .section-posting .review,
 .section-posting .topicreview,
 

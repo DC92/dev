@@ -115,6 +115,14 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
+		// Remove status & stick
+		if (defined('MYPHPBB_REMOVE_STATUS_STICKY'))
+			$this->template->assign_vars(array(
+				'S_TYPE_TOGGLE' => false,
+				'S_TOPIC_TYPE_ANNOUNCE' => false,
+				'S_TOPIC_TYPE_STICKY' => false,
+			));
+
 		/* Includes language files of this extension */
 		$ns = explode ('\\', __NAMESPACE__);
 		$this->language->add_lang('common', $ns[0].'/'.$ns[1]);

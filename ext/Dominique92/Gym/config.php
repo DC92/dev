@@ -5,6 +5,7 @@ define('MYPHPBB_LOG_EDIT', true);
 define('MYPHPBB_REDIRECT_INDEX', true);
 define('MYPHPBB_TEMPLATE', true);
 define('MYPHPBB_POSTING_WITHOUT_FID', true);
+define('MYPHPBB_REMOVE_STATUS_STICKY', true);
 
 /* ??
 define('MYPHPBB_REDIRECT', true);
