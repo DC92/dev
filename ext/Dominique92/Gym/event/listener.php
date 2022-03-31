@@ -183,10 +183,17 @@ class listener implements EventSubscriberInterface
 		foreach (array_values ($accueil) AS $k=>$v) {
 			// Traduit les BBcodes
 			$v['display_text'] = generate_text_for_display (
-				$v['post_text'],
-				$v['bbcode_uid'], $v['bbcode_bitfield'],
+				$v['post_text'],			
+				$v['bbcode_uid'],
+				$v['bbcode_bitfield'],
 				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
 			);
+
+			// Insére + d'infos... à l'emplacement du tag :suite
+			$display_texts = explode (':suite', $v['display_text']);
+			if (count ($display_texts) > 1)
+				$v['display_text'] = $display_texts[0].
+					'<a href="viewtopic.php?p='.$v['post_id'].'" title="Voir la suite du texte">Plus d\'infos...</a>';
 
 			$this->template->assign_block_vars ('accueil',
 				array_change_key_case ($v, CASE_UPPER) + ['NO' => $k]
@@ -274,6 +281,8 @@ class listener implements EventSubscriberInterface
 			$this->template->assign_var ('SUB_TEMPLATE', $inclure[1]);
 			$post_row['MESSAGE'] = str_replace ('inclure('.$inclure[1].')', '', $post_row['MESSAGE']);
 		}
+
+		$post_row['MESSAGE'] = str_replace (':suite', '', $post_row['MESSAGE']);
 
 		$vars['post_row'] = $post_row; // Data to be displayed
 	}
