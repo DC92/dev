@@ -1,7 +1,5 @@
-//TODO FAIRE LE MENAGE
-
 const layer = layerVector({
-		url: 'ext/Dominique92/GeoBB/gis.php',
+		url: 'ext/Dominique92/GeoBB/gis.php', //TODO filtrer ceux dans l'horaire
 		convertProperties: function(properties, feature, options) {
 			return {
 				icon: 'ext/Dominique92/GeoBB/icones/gym.svg',
@@ -11,17 +9,12 @@ const layer = layerVector({
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				styleOptionsLabel(properties.name, properties),
+				tousLieux ? null :  styleOptionsLabel(properties.name, properties),
 			);
-		},
-		/* //TODO pour la carte lieux
-		styleOptionsFunction: function(feature, properties) {
-			return styleOptionsIcon(properties.icon);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return styleOptionsLabel(properties.name, properties);
 		},
-		*/
 	}),
 
 	//TODO GYM : pas de strategie.bbox sur cartes

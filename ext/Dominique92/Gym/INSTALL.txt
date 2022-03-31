@@ -2,7 +2,7 @@
 Exporter base / créer, ajouter utilisateur et importer
 Créer sous domaine / générer SSL (pas de changement des paramètres)
 
-Copier phpBB sauf doc, install ? & config.php
+Copier phpBB sauf doc, install, ext/phpbb & config.php
 Copier assets/MyOl
 Copier ext/Dominique92/Gym, GeoBB & MyPhpBB
 Copier ext/cleantalk

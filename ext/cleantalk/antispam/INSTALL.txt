@@ -1,1 +1,2 @@
 https://github.com/CleanTalk/phpbb3.1-3.2-antispam/releases/tag/5.7.4
+CleanTalk Antispam extension for phpbb v3.1.X, v3.2.X & v3.3.X

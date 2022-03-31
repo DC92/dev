@@ -105,6 +105,21 @@ class listener implements EventSubscriberInterface
 			if ($title)
 				$row['post_title'] = $title[1];
 
+			// Traduit les BBcodes
+			$row['message'] = generate_text_for_display (
+				$row['post_text'],			
+				$row['bbcode_uid'],
+				$row['bbcode_bitfield'],
+				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
+			);
+
+			// Insére + d'infos... à l'emplacement du tag :suite
+			$ms = explode (':suite', $row['message']);
+			if (count ($ms) > 1)
+				$row['message'] = $ms[0].
+					'<a href="viewtopic.php?p='.$row['post_id'].
+					'" title="Voir la suite du texte">Plus d\'infos...</a>';
+
 			// Liste des menus
 			preg_match ('/:menu=([0-9]*)/', $row['forum_desc'], $no_menu);
 			if ($no_menu) {
@@ -180,25 +195,10 @@ class listener implements EventSubscriberInterface
 
 		// Textes de la page d'accueil
 		ksort ($accueil); // Par ordre alphabétique de titre
-		foreach (array_values ($accueil) AS $k=>$v) {
-			// Traduit les BBcodes
-			$v['display_text'] = generate_text_for_display (
-				$v['post_text'],			
-				$v['bbcode_uid'],
-				$v['bbcode_bitfield'],
-				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
-			);
-
-			// Insére + d'infos... à l'emplacement du tag :suite
-			$display_texts = explode (':suite', $v['display_text']);
-			if (count ($display_texts) > 1)
-				$v['display_text'] = $display_texts[0].
-					'<a href="viewtopic.php?p='.$v['post_id'].'" title="Voir la suite du texte">Plus d\'infos...</a>';
-
+		foreach (array_values ($accueil) AS $k=>$v)
 			$this->template->assign_block_vars ('accueil',
-				array_change_key_case ($v, CASE_UPPER) + ['NO' => $k]
+				array_change_key_case ($v, CASE_UPPER) + ['MENU_LINE_NUMBER' => $k]
 			);
-		}
 
 		// Horaires
 		global $gym_const;
@@ -310,7 +310,7 @@ class listener implements EventSubscriberInterface
 				if (is_array ($v))
 					foreach ($v AS $vk=>$vv)
 						$this->template->assign_block_vars ('liste_'.$k, [
-								'NO' => $vk,
+								'MENU_LINE_NUMBER' => $vk,
 								'VALEUR' => $vv,
 							]
 						);
