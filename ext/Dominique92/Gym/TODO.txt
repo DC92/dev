@@ -1,6 +1,5 @@
-//TODO BUG page équipe : Effectivement, la phrase de la page équipe dupliquée par un bug du logiciel qui bégaye.
-//TODO GYM Quand recherche page => affiche la fin d'une balise dans le titre
-//TODO GYM curseur carte non centré sur la pointe du marqueur
+//TODO BUG il y a un 30 devant http://chaville.2022.c92.fr/viewtopic.php?p=76
+//TODO BUG n'affiche pas le texte des pages
 
 //BEST ??? masquer le texte dans les séances
 //BEST mesureur audience

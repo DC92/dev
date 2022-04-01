@@ -108,7 +108,7 @@ class listener implements EventSubscriberInterface
 			WHERE p.post_visibility = 1"; // Posts non supprimés
 		$result = $this->db->sql_query($sql);
 
-		$menus = $accueil = $horaire = $en_horaire = $calendriers = $update_count = [];
+		$menus = $une = $horaire = $en_horaire = $calendriers = $update_count = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			// Titre sans ses premiers chiffres
 			preg_match ('/[!0-9]* ?(.*)/', $row['post_subject'], $title);
@@ -139,9 +139,9 @@ class listener implements EventSubscriberInterface
 				$this->template->assign_var ('NO_MENU', $no_menu[1]);
 			}
 
-			// Posts à afficher sur la page d'accueil
-			if (stripos ($row['forum_desc'], ':accueil') !== false)
-				$accueil [$row['post_subject']] = $row;
+			// Posts à afficher sur la première page
+			if (stripos ($row['forum_desc'], ':une') !== false)
+				$une [$row['post_subject']] = $row;
 
 			// Séances à afficher dans l'horaire
 			if (stripos ($row['forum_desc'], ':horaire') !== false) {
@@ -205,10 +205,10 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-		// Textes de la page d'accueil
-		ksort ($accueil); // Par ordre alphabétique de titre
-		foreach (array_values ($accueil) AS $k=>$v)
-			$this->template->assign_block_vars ('accueil',
+		// Textes de la première page 
+		ksort ($une); // Par ordre alphabétique de titre
+		foreach (array_values ($une) AS $k=>$v)
+			$this->template->assign_block_vars ('une',
 				array_change_key_case ($v, CASE_UPPER) + ['MENU_LINE_NUMBER' => $k]
 			);
 
@@ -277,12 +277,15 @@ class listener implements EventSubscriberInterface
 		$post_row = $vars['post_row'];
 
 		// Tête de menu
-		$post_row['FIRST_MENU_LINE'] = $post_row['POST_SUBJECT'][0] == '!' ? 'true' : 'false';
+		$post_row['FIRST_MENU_LINE'] = @$post_row['POST_SUBJECT'][0] == '!' ? 'true' : 'false';
 
 		// Titre sans ses premiers chiffres
 		preg_match ('/[!0-9]* ?(.*)/', $post_row['POST_SUBJECT'], $title);
 		if ($title)
 			$post_row['POST_SUBJECT'] = $title[1];
+
+		// Enlever les balises des titres
+		$post_row['POST_SUBJECT'] = preg_replace ('/<[^>]+>/', '', $post_row['POST_SUBJECT']);
 
 		// Redirect the page to an URL is text includes rediriger(URL)
 		$sans_balises = preg_replace ('/<[^>]+>/', '', $vars['row']['post_text']);
@@ -380,8 +383,6 @@ class listener implements EventSubscriberInterface
 	*/
 	// Appelé par n'importe quelle page de l'administration
 	function adm_page_header() {
-		return; //TODO /////////////////////////////////////
-
 		// Create required SQL columns when needed
 		$columns = [
 			'gym_activite',
@@ -395,13 +396,6 @@ class listener implements EventSubscriberInterface
 			'gym_duree_heures',
 			'gym_duree_jours',
  			'gym_semaines',
-/* DELETE
-			'gym_accueil',
- 			'gym_horaires',
- 			'gym_menu',
- 			'gym_ordre_menu',
- 			'gym_scolaire',
-*/
 		];
 		foreach ($columns AS $column) {
 			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "'.$column.'"';
@@ -413,95 +407,5 @@ class listener implements EventSubscriberInterface
 				$this->db->sql_query($sql);
 			}
 		}
-
-		// Add / correct the specific BBcodes
-/*
-//BBCODES
-DELETE actualite
-ancre
-carte
-centre
-doc
-droite
-gauche
-php include
-location
-page
-presentation
-DELETE php redirect
-php resume
-rubrique
-saut_ligne
-separation
-surligne
-titre1
-titre2
-titre3
-titre4
-video
-youtube
-*/
-
-/* Activer uniquement pour créer un nouveau site ou updater les BBCODES
-		$this->add_bbcode([
-			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
-			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],
-			['[doc={TEXT1}]{TEXT2}[/doc]','<a href="fichiers/{TEXT1}.pdf">{TEXT2}</a>','Lien vers un document'],
-			['[page={TEXT1}]{TEXT2}[/page]','<a href="viewtopic.php?p={TEXT1}">{TEXT2}</a>','Lien vers une page'],
-			['[rubrique={TEXT1}]{TEXT2}[/rubrique]','<a href="viewtopic.php?t={TEXT1}">{TEXT2}</a>','Lien vers une rubrique'],
-			['[centre]{TEXT}[/centre]','<div style="text-align:center">{TEXT}</div>','Texte centré'],
-			['[saut_ligne][/saut_ligne]','<br style="clear:both" />'],
-			['[separation][/separation]','<hr/>','Ligne horizontale'],
-			['[resume]{TEXT}[/resume]','(resume){TEXT}(/resume)','Partie de texte à afficher (accueil, actualité, ...)'],
-			['[youtube]{TEXT}[/youtube]','<a href="ext/Dominique92/Gym/youtube.php?y={TEXT}">https://youtu.be/{TEXT}</a>'],
-			['[surligne]{TEXT}[/surligne]','<span style="background:yellow">{TEXT}</span>','Surligné en jaune'],
-			['[carte]{TEXT}[/carte]','<div id="carte"></div>','Insère la carte'],
-			['[titre1]{TEXT}[/titre1]','<h1>{TEXT}</h1>','Caractères blancs sur fond bleu'],
-			['[titre2]{TEXT}[/titre2]','<h2>{TEXT}</h2>','Caractères noirs sur fond vert'],
-			['[titre3]{TEXT}[/titre3]','<h3>{TEXT}</h3>'],
-			['[titre4]{TEXT}[/titre4]','<h4>{TEXT}</h4>'],
-			['[video]{URL}[/video]', '<video width="100%" controls><source src="fichiers/{URL}.mp4" type="video/mp4">Your browser does not support HTML video.</video>', 'Insérer une vidéo MP4'],
-
-			['[include]{TEXT}[/include]','(include){TEXT}(/include)','Inclut le contenu d\'une url dans la page'],
-			['[redirect]{URL}[/redirect]','{URL}','Redirige la page vers l\'url'],
-		]);
-		*/
 	}
-/*
-	function add_bbcode($bb) {
-		// Récupère le prochain bbcode_id libre
-		$sql = 'SELECT MAX(bbcode_id) as max_bbcode_id FROM '. BBCODES_TABLE;
-		$result = $this->db->sql_query($sql);
-		$row = $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-		$next = $row['max_bbcode_id'] + 1;
-
-		$sql = 'SELECT bbcode_tag FROM '. BBCODES_TABLE;
-		$result = $this->db->sql_query($sql);
-		$attachments = $update_count_ary = [];
-		while ($row = $this->db->sql_fetchrow($result))
-			$tags[$row['bbcode_tag']] = true;
-		$this->db->sql_freeresult($result);
-
-		foreach ($bb AS $k=>$v) {
-			// Extract the tag
-			preg_match ('/[a-z_0-9]+/', $v[0], $match);
-
-			if (!isset ($tags[@$match[0]])) { // If it doesn't exist
-				// Créate the tag line
-				$sql = 'INSERT INTO '.BBCODES_TABLE.' VALUES ('.$next++.', "'.$match[0].
-					'", "", 1, "", "", "/(?!)/", "", "/(?!)/", "")';
-				$this->db->sql_query($sql);
-			}
-			// Update all
-			$sql = 'UPDATE '.BBCODES_TABLE.' SET '.
-				'bbcode_match = "'.$v[0].'", '.
-				'bbcode_tpl = "'.addslashes($v[1]).'", '.
-				'bbcode_helpline = "'.@$v[2].'", '.
-				'display_on_posting = 1 '.
-				'WHERE bbcode_tag = "'.$match[0].'"';
-			$this->db->sql_query($sql);
-		}
-	}
-*/
 }

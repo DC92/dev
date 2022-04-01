@@ -17,24 +17,24 @@
 	</div>
 
 <!-- ACTUALITES -->
-<!-- BEGIN accueil -->
+<!-- BEGIN une -->
 		<h2>
-			<a href="./?p={accueil.POST_ID}">{accueil.POST_TITLE}</a>
+			<a href="./?p={une.POST_ID}">{une.POST_TITLE}</a>
 			<!-- IF U_MCP -->
-				<a href="posting.php?mode=edit&p={accueil.POST_ID}"
-					title="Modifier ou supprimer l'article {accueil.POST_TITLE}"
+				<a href="posting.php?mode=edit&p={une.POST_ID}"
+					title="Modifier ou supprimer l'article {une.POST_TITLE}"
 					class="button button-icon-only">
 					<i class="icon fa-pencil"></i>
 				</a>
 
-				<!-- IF accueil.MENU_LINE_NUMBER == 0 -->
-					<a href="viewforum.php?f={accueil.FORUM_ID}"
+				<!-- IF une.MENU_LINE_NUMBER == 0 -->
+					<a href="viewforum.php?f={une.FORUM_ID}"
 						title="Modifier la liste des articles de la première page"
 						class="button button-icon-only">
 						<i class="icon fa-list"></i>
 					</a>
 
-					<a href="posting.php?mode=post&f={accueil.FORUM_ID}"
+					<a href="posting.php?mode=post&f={une.FORUM_ID}"
 						title="Ajouter un article à la première page"
 						class="button button-icon-only">
 						<i class="icon fa-plus"></i>
@@ -43,13 +43,13 @@
 			<!-- ENDIF -->
 		</h2>
 		<div>
-			{accueil.LIEU}
-			<!-- IF accueil.ANIMATEUR -->
-				avec {accueil.ANIMATEUR}
+			{une.LIEU}
+			<!-- IF une.ANIMATEUR -->
+				avec {une.ANIMATEUR}
 			<!-- ENDIF -->
 
-			<div>{accueil.MESSAGE}</div>
+			<div>{une.MESSAGE}</div>
 		</div>
-<!-- END accueil -->
+<!-- END une -->
 
 <!-- INCLUDE footer.html -->

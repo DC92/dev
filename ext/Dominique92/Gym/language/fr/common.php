@@ -37,6 +37,9 @@ if (empty($lang) || !is_array($lang))
 // ’ « » “ ” …
 //
 
+//TODO BUG pas pris en compte en écrasement
+//TODO remplacer "supprimer" par "corbeille"
+
 $lang = array_merge($lang, array(
 	// Corrections du template prosilver
 
