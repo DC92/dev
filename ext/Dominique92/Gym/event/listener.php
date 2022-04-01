@@ -276,6 +276,9 @@ class listener implements EventSubscriberInterface
 	function viewtopic_modify_post_row($vars) {
 		$post_row = $vars['post_row'];
 
+		// Tête de menu
+		$post_row['FIRST_MENU_LINE'] = $post_row['POST_SUBJECT'][0] == '!' ? 'true' : 'false';
+
 		// Titre sans ses premiers chiffres
 		preg_match ('/[!0-9]* ?(.*)/', $post_row['POST_SUBJECT'], $title);
 		if ($title)
@@ -392,7 +395,7 @@ class listener implements EventSubscriberInterface
 			'gym_duree_heures',
 			'gym_duree_jours',
  			'gym_semaines',
-/* //TODO DELETE
+/* DELETE
 			'gym_accueil',
  			'gym_horaires',
  			'gym_menu',
@@ -440,7 +443,6 @@ youtube
 */
 
 /* Activer uniquement pour créer un nouveau site ou updater les BBCODES
-	//TODO DELETE
 		$this->add_bbcode([
 			['[droite]{TEXT}[/droite]','<div class="image-droite">{TEXT}</div>','Affiche une image à droite'],
 			['[gauche]{TEXT}[/gauche]','<div class="image-gauche">{TEXT}</div>','Affiche une image à gauche'],

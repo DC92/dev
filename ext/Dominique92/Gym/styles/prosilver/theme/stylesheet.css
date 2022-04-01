@@ -12,12 +12,11 @@ pre {
 .section-posting #postingbox .fields1 > dl:first-child, /* Icône de sujet */
 .section-posting #options-panel .fields1 > div, /* Options */
 .section-posting #options-panel label[for=edit_reason],
-.section-posting #options-panel label[for=delete_permanent],
+.section-posting label[for=delete_permanent],
 .section-posting #options-panel #edit_reason,
 .section-posting #poll-panel-tab,
 .section-posting .review,
 .section-posting .topicreview,
-
 .section-posting #smiley-box,
 .section-posting input[name=preview],
 .bbcode-quote,

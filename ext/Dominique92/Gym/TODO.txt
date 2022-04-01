@@ -1,15 +1,6 @@
 //TODO BUG page équipe : Effectivement, la phrase de la page équipe dupliquée par un bug du logiciel qui bégaye.
-//TODO tri viewforum par ordre alphabétique
-//TODO 1er topic du forum = entête dui sous menu si titre sans 00 est égal
-
-//TODO GYM résumé => ... en savoir plus
-//TODO GYM pages des têtes de rubriques
-//TODO GYM calendrier (affichage)
-
-//TODO GYM affiche la fin dune balise dans le titre
 //TODO GYM Quand recherche page => affiche la fin d'une balise dans le titre
 //TODO GYM curseur carte non centré sur la pointe du marqueur
-//TODO Ne pas afficher le premier post dans les cartes
 
 //BEST ??? masquer le texte dans les séances
 //BEST mesureur audience
@@ -33,8 +24,8 @@ Catégories (dans le tableau horaires)
 Récupérer le nom de domaine / fermer le support
 
 CHAVIL.GYM
-//TODO BEST randos + GPS
-//TODO GYM paie ident forum
-//TODO GYM paie ne marche pas en IE
-//TODO GYM salaire : diffusion des attestations
-//TODO GYM paie ne pas envoyer CC mail si connexion
+//BEST randos + GPS
+//BEST paie ident by forum
+//BEST paie ne marche pas en IE
+//BEST salaire : diffusion des attestations
+//BEST paie ne pas envoyer CC mail si connexion

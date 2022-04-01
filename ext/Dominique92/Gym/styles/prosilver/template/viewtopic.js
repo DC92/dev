@@ -9,7 +9,7 @@ const layer = layerVector({
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				tousLieux ? null :  styleOptionsLabel(properties.name, properties),
+				firstMenuLine ? null : styleOptionsLabel(properties.name, properties),
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
@@ -17,12 +17,11 @@ const layer = layerVector({
 		},
 	}),
 
-	//TODO GYM : pas de strategie.bbox sur cartes
 	map = new ol.Map({
 		target: 'carte',
 		view: new ol.View({
 			center: ol.proj.transform(coordonnees, 'EPSG:4326', 'EPSG:3857'),
-			zoom: zoom,
+			zoom: 18,
 			enableRotation: false,
 		}),
 		layers: [
@@ -33,4 +32,13 @@ const layer = layerVector({
 			new ol.control.Zoom(),
 			new ol.control.Attribution(),
 		],
+	});
+
+if (firstMenuLine)
+	layer.getSource().on('featuresloadend', function(evt) {
+		map.getView().fit(
+			layer.getSource().getExtent(), {
+				size: map.getSize(),
+				padding: [35, 16, 16, 16],
+			});
 	});
