@@ -84,6 +84,16 @@ class listener implements EventSubscriberInterface
 			foreach ($this->args AS $k=>$v)
 				$this->template->assign_var (strtoupper ("REQUEST_$k"), $v);
 
+		// List all attacments
+		$sql = 'SELECT *
+			FROM '.ATTACHMENTS_TABLE.'
+			WHERE in_message = 0
+			ORDER BY attach_id DESC, post_msg_id ASC';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+			$attachments[$row['post_msg_id']][] = $row;
+		$this->db->sql_freeresult($result);
+
 		// Lecture de la base
 		$sql = "SELECT p.*,
 				f.forum_name, f.forum_desc,
@@ -95,10 +105,10 @@ class listener implements EventSubscriberInterface
 				LEFT JOIN ".POSTS_TABLE." AS acti ON (acti.post_id = p.gym_activite)
 				LEFT JOIN ".POSTS_TABLE." AS equi ON (equi.post_id = p.gym_animateur)
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
-			WHERE p.post_visibility = 1";
+			WHERE p.post_visibility = 1"; // Posts non supprimés
 		$result = $this->db->sql_query($sql);
 
-		$menus = $accueil = $horaire = $en_horaire = $calendriers = [];
+		$menus = $accueil = $horaire = $en_horaire = $calendriers = $update_count = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			// Titre sans ses premiers chiffres
 			preg_match ('/[!0-9]* ?(.*)/', $row['post_subject'], $title);
@@ -112,6 +122,8 @@ class listener implements EventSubscriberInterface
 				$row['bbcode_bitfield'],
 				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS
 			);
+			if ($row['post_attachment'])
+				parse_attachments ($row['forum_id'], $row['message'], $attachments[$row['post_id']], $update_count);
 
 			// Insére + d'infos... à l'emplacement du tag :suite
 			$ms = explode (':suite', $row['message']);
@@ -282,6 +294,7 @@ class listener implements EventSubscriberInterface
 			$post_row['MESSAGE'] = str_replace ('inclure('.$inclure[1].')', '', $post_row['MESSAGE']);
 		}
 
+		// Supprimer :suite
 		$post_row['MESSAGE'] = str_replace (':suite', '', $post_row['MESSAGE']);
 
 		$vars['post_row'] = $post_row; // Data to be displayed
