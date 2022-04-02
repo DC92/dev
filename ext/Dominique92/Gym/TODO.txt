@@ -1,6 +1,3 @@
-//TODO BUG il y a un 30 devant http://chaville.2022.c92.fr/viewtopic.php?p=76
-//TODO BUG n'affiche pas le texte des pages
-
 //BEST ??? masquer le texte dans les séances
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio

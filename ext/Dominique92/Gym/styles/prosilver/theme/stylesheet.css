@@ -155,7 +155,7 @@ body {
 	margin-top: 0;
 }
 .gym h2 {
-	margin: 0;
+	margin: 1em 0 0 0;
 	padding: 0.2em;
 	border-radius: 0.2em;
 	background: #08BABE;
@@ -256,7 +256,7 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-around;
-	margin-bottom: 2em;
+	margin-bottom: 2.5em;
 	padding: 0;
 }
 .gym .menu li div {
@@ -365,7 +365,7 @@ body {
 }
 .gym .horaires {
 	clear: both;
-	margin: 0 0 0.3em 0;
+	margin: 1em 0 0.5em 0 !important;
 }
 .gym .horaires > div {
 	text-align: initial;
