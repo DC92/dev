@@ -291,7 +291,7 @@ function controlGeocoder(options) {
  */
 //BEST GPS tap on map = distance from GPS calculation
 function controlGPS() {
-	let view, geolocation, nbLoc, position, accuracy, altitude, speed;
+	let view, geolocation, nbLoc, position, heading, accuracy, altitude, speed;
 
 	// Display status, altitude & speed
 	const displayEl = document.createElement('div'),
@@ -326,28 +326,37 @@ function controlGPS() {
 		northGraticuleFeature = new ol.Feature(),
 		graticuleLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
-				features: [graticuleFeature, northGraticuleFeature]
+				features: [graticuleFeature, northGraticuleFeature],
 			}),
+			zIndex: 20, // Above the features
 			style: new ol.style.Style({
 				fill: new ol.style.Fill({
-					color: 'rgba(128,128,255,0.2)'
+					color: 'rgba(128,128,255,0.2)',
 				}),
 				stroke: new ol.style.Stroke({
 					color: '#20b',
 					lineDash: [16, 14],
-					width: 1
-				})
-			})
+					width: 1,
+				}),
+			}),
 		});
 
 	control.element.appendChild(displayEl);
+
+	graticuleFeature.setStyle(new ol.style.Style({
+		stroke: new ol.style.Stroke({
+			color: '#000',
+			lineDash: [16, 14],
+			width: 1,
+		}),
+	}));
 
 	northGraticuleFeature.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
 			color: '#c00',
 			lineDash: [16, 14],
-			width: 1
-		})
+			width: 1,
+		}),
 	}));
 
 	control.setMap = function(map) { //HACK execute actions on Map init
@@ -360,6 +369,8 @@ function controlGPS() {
 			projection: view.getProjection(),
 			trackingOptions: {
 				enableHighAccuracy: true,
+				maximumAge: 1000,
+				timeout: 1000,
 			},
 		});
 

@@ -10,15 +10,6 @@ if (window.PointerEvent === undefined) {
 }
 
 /**
- * Display OL version
- */
-try {
-	new ol.style.Icon(); // Try incorrect action
-} catch (err) { // to get Assert url
-	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
-}
-
-/**
  * Debug facilities on mobile
  */
 //HACK use hash ## for error alerts
@@ -32,7 +23,18 @@ if (location.hash == '###')
 		alert(message);
 	};
 
-//HACK Json parsing errors log
+/**
+ * Display OL version
+ */
+try {
+	new ol.style.Icon(); // Try incorrect action
+} catch (err) { // to get Assert url
+	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+}
+
+/**
+ * Json parsing errors log
+ */
 //BEST implement on layerVector.js & editor
 function JSONparse(json) {
 	try {
@@ -42,7 +44,9 @@ function JSONparse(json) {
 	}
 }
 
-//HACK warn layers when added to the map
+/**
+ * warn layers when added to the map
+ */
 //BEST DELETE (used by editor)
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
