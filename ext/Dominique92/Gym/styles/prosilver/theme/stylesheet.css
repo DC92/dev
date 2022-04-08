@@ -19,6 +19,7 @@ pre {
 .section-posting .topicreview,
 .section-posting #smiley-box,
 .section-posting input[name=preview],
+.section-posting input[name="save"],
 .bbcode-quote,
 .bbcode-code,
 .bbcode-lisy-,
