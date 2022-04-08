@@ -48,6 +48,9 @@ class listener implements EventSubscriberInterface
 			'core.page_footer_after' => 'page_footer_after',
 			'core.gen_sort_selects_after' => 'gen_sort_selects_after',
 
+			// Index
+			'core.index_modify_page_title' => 'index_modify_page_title',
+
 			// Viewtopic
 			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 
@@ -65,16 +68,6 @@ class listener implements EventSubscriberInterface
 	*/
 	function page_header($var) {
 		global $gym_const;
-
-		// Includes style files of this extension
-		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-			$this->template->set_style ([
-				$this->ext_path.'styles',
-				'styles', // Core styles
-			]);
-
-		// Includes language and style files of this extension
-		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
 		// Constants values used in js code
 		$this->template->assign_var ('ANNEE_DEBUT', $gym_const['annee_debut']);
@@ -254,6 +247,16 @@ class listener implements EventSubscriberInterface
 	}
 
 	function page_footer_after($var) {
+		// Includes style files of this extension
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$this->template->set_style ([
+				$this->ext_path.'styles',
+				'styles', // Core styles
+			]);
+
+		// Includes language and style files of this extension
+		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+
 		// Change le template viewtopic sauf après viewforum
 		$url_viewtopic = strpos (@$this->server['SCRIPT_NAME'], 'viewtopic') !== false;
 		$ref_viewforum = strpos (@$this->server['HTTP_REFERER'], 'viewforum') !== false;
@@ -268,6 +271,16 @@ class listener implements EventSubscriberInterface
 		// Ordre d'affichage
 		$vars['sort_key'] = 's';
 		$vars['sort_dir'] = 'a';
+	}
+
+	/**
+		INDEX.PHP
+	*/
+	function index_modify_page_title() {
+		foreach (glob ('fichiers/slider/*') AS $f)
+			$this->template->assign_block_vars ('slider', [
+				'FILE_NAME' => $f,
+			]);
 	}
 
 	/**
