@@ -233,8 +233,12 @@ body {
 .gym .animatrice {
 	margin-bottom: 1em;
 }
+.gym .animatrice h2 {
+	margin-bottom: 0.5em;
+}
 .gym .animatrice .attach-image img {
 	width: 20vw !important;
+	margin: 0;
 }
 @media (max-width: 600px) {
 	.gym .inline-attachment,

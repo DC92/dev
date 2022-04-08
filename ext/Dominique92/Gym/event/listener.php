@@ -125,8 +125,8 @@ class listener implements EventSubscriberInterface
 			if ($row['post_attachment'])
 				parse_attachments ($row['forum_id'], $row['message'], $attachments[$row['post_id']], $update_count);
 
-			// Insére + d'infos... à l'emplacement du tag :suite
-			$ms = explode (':suite', $row['message']);
+			// Insére + d'infos... à l'emplacement du tag [suite]
+			$ms = explode ('<suite>', $row['message']);
 			if (count ($ms) > 1)
 				$row['message'] = $ms[0].
 					'<a href="viewtopic.php?p='.$row['post_id'].
@@ -289,19 +289,14 @@ class listener implements EventSubscriberInterface
 
 		// Redirect the page to an URL is text includes rediriger(URL)
 		$sans_balises = preg_replace ('/<[^>]+>/', '', $vars['row']['post_text']);
-		preg_match ('/rediriger\(([^\)]+)/', $sans_balises, $rediriger);
+		preg_match ('/rediriger\]([^\[]+)/', $sans_balises, $rediriger);
 		if ($rediriger)
 			$this->template->assign_var ('REDIRIGER', $rediriger[1]);
 
 		// Include a template file
-		preg_match ('/inclure\(([^\)]+)/', $sans_balises, $inclure);
-		if ($inclure && is_file($this->ext_path.'styles/prosilver/template/'.$inclure[1].'.html')) {
-			$this->template->assign_var ('SUB_TEMPLATE', $inclure[1]);
-			$post_row['MESSAGE'] = str_replace ('inclure('.$inclure[1].')', '', $post_row['MESSAGE']);
-		}
-
-		// Supprimer :suite
-		$post_row['MESSAGE'] = str_replace (':suite', '', $post_row['MESSAGE']);
+		preg_match ('/inclure\]([^\[]+)/', $sans_balises, $inclure);
+		if ($inclure && is_file($this->ext_path.'styles/prosilver/template/'.$inclure[1].'.html'))
+			$this->template->assign_var ('INCLURE', $inclure[1]);
 
 		$vars['post_row'] = $post_row; // Data to be displayed
 	}
