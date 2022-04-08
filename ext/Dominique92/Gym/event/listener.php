@@ -69,6 +69,16 @@ class listener implements EventSubscriberInterface
 	function page_header($var) {
 		global $gym_const;
 
+		// Includes style files of this extension
+		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
+			$this->template->set_style ([
+				$this->ext_path.'styles',
+				'styles', // Core styles
+			]);
+
+		// Includes language and style files of this extension
+		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
+
 		// Constants values used in js code
 		$this->template->assign_var ('ANNEE_DEBUT', $gym_const['annee_debut']);
 
@@ -247,16 +257,6 @@ class listener implements EventSubscriberInterface
 	}
 
 	function page_footer_after($var) {
-		// Includes style files of this extension
-		if (!strpos ($this->server['SCRIPT_NAME'], 'adm/'))
-			$this->template->set_style ([
-				$this->ext_path.'styles',
-				'styles', // Core styles
-			]);
-
-		// Includes language and style files of this extension
-		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
-
 		// Change le template viewtopic sauf après viewforum
 		$url_viewtopic = strpos (@$this->server['SCRIPT_NAME'], 'viewtopic') !== false;
 		$ref_viewforum = strpos (@$this->server['HTTP_REFERER'], 'viewforum') !== false;
