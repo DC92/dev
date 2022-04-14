@@ -26,10 +26,14 @@
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	outline: 0;
 }
+
+/* Attribution */
 .ol-attribution button,
 .ol-attribution button:focus {
 	font-size: 14px !important;
 }
+
+/* Geocodeur */
 .ol-geocoder .gcd-gl-btn {
 	border-image-width: 0 !important;
 	top: 0 !important;
@@ -41,8 +45,6 @@
 	padding: 0;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	border-radius: 2px;
-	background: white;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;'%3E%3Cpath d='M15 15A5 5 0 0 1 6 6A6 6 0 0 1 15 15L22 22'/%3E%3C/svg%3E") !important;
 }
 .ol-control button:hover,
 .ol-geocoder button:hover {
@@ -87,13 +89,6 @@
 	left: 2px !important;
 }
 
-/* Full screen */
-.ol-full-screen button, /* ol.6.10.0+ */
-.ol-full-screen-false, /* ol.6.8.1- */
-.ol-full-screen-true { /* ol.6.8.1- */
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:5,7,5,0;'%3E%3Cpath d='M4 4l17 0 0 17-17 0z'/%3E%3C/svg%3E");
-	/* https://developer.mozilla.org/fr/docs/Web/SVG/Tutoriel/Paths */
-}
 /* Full window polyfill for non fullscreen browsers */
 .ol-pseudo-fullscreen {
 	position: fixed !important;
@@ -106,11 +101,7 @@
 	z-index: 1000000 !important;
 }
 
-/* GPS */
-.ol-gps button {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;stroke-width:2;fill-opacity:0;stroke-linejoin:round;stroke-linecap:round;'%3E%3Cpath d='M7 7A7.5 7.5 0 0 1 18 18 7.5 7.5 0 1 1 7 7'/%3E%3Cpath d='M2 12.5l21 0M12.5 2l0 21' style='stroke-dasharray:6,9;'/%3E%3C/svg%3E");
-}
-
+/* Download */
 .ol-download p {
 	margin: 0;
 	cursor: pointer;

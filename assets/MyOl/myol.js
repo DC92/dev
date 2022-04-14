@@ -420,7 +420,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 		// control.element is defined when attached to the map
 		control.element.className = 'ol-control ol-control-switcher';
-		control.element.innerHTML = '<button>\u2026</button>';
+		control.element.innerHTML = '<button>&#10063;</button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
 			control.element.classList.add('ol-control-switcher-open');
@@ -1656,7 +1656,7 @@ function controlTilesBuffer(depth, depthFS) {
 function controlFullScreen(options) {
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '', //HACK Bad presentation on IE & FF
+		label: '\u25A2',
 		tipLabel: 'Plein écran',
 	}, options));
 
@@ -1694,8 +1694,10 @@ function controlGeocoder(options) {
 	});
 
 	// Move the button at the same level than the other control's buttons
-	geocoder.container.firstElementChild.firstElementChild.title = options.title;
-	geocoder.container.appendChild(geocoder.container.firstElementChild.firstElementChild);
+	const buttonEl = geocoder.element.firstElementChild.firstElementChild;
+	buttonEl.innerHTML = '&#128269;';
+	buttonEl.title = options.title;
+	geocoder.element.appendChild(buttonEl);
 
 	return geocoder;
 }
@@ -1713,6 +1715,7 @@ function controlGPS() {
 
 		control = controlButton({
 			className: 'ol-button ol-gps',
+			label: '&#128204;',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
 				'orange', // 1 : waiting physical GPS sensor position & altitude
@@ -1919,7 +1922,7 @@ function controlGPS() {
 //BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
-		label: '\u25b2',
+		label: '&#128194;',
 		title: 'Visualiser un fichier GPX sur la carte',
 		activate: function() {
 			inputEl.click();
@@ -1999,7 +2002,7 @@ function controlLoadGPX(options) {
  */
 function controlDownload(options) {
 	options = Object.assign({
-		label: '\u25bc',
+		label: '&#128229;',
 		buttonBackgroundColors: ['white'],
 		className: 'ol-button ol-download',
 		title: 'Cliquer sur un format ci-dessous\n' +
