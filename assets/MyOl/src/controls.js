@@ -241,8 +241,8 @@ function controlTilesBuffer(depth, depthFS) {
 function controlFullScreen(options) {
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-		label: '\u25A2',
-		tipLabel: 'Plein écran',
+	//	label: '\u21F3', //BEST why not html form ?
+		tipLabel: 'Plein écran', //TODO BUG don't display title on mobile
 	}, options));
 
 	//HACK : polyfill for IE
@@ -280,7 +280,7 @@ function controlGeocoder(options) {
 
 	// Move the button at the same level than the other control's buttons
 	const buttonEl = geocoder.element.firstElementChild.firstElementChild;
-	buttonEl.innerHTML = '&#128269;';
+	buttonEl.innerHTML = '&#x1F50D;';
 	buttonEl.title = options.title;
 	geocoder.element.appendChild(buttonEl);
 
@@ -300,7 +300,7 @@ function controlGPS() {
 
 		control = controlButton({
 			className: 'ol-button ol-gps',
-			label: '&#128204;',
+			label: '&#x2295;',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
 				'orange', // 1 : waiting physical GPS sensor position & altitude
@@ -507,7 +507,7 @@ function controlGPS() {
 //BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
-		label: '&#128194;',
+		label: '&#x1F4C2;',
 		title: 'Visualiser un fichier GPX sur la carte',
 		activate: function() {
 			inputEl.click();
@@ -587,7 +587,7 @@ function controlLoadGPX(options) {
  */
 function controlDownload(options) {
 	options = Object.assign({
-		label: '&#128229;',
+		label: '&#x1F4E5;',
 		buttonBackgroundColors: ['white'],
 		className: 'ol-button ol-download',
 		title: 'Cliquer sur un format ci-dessous\n' +

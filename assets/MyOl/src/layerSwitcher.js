@@ -37,7 +37,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 		// control.element is defined when attached to the map
 		control.element.className = 'ol-control ol-control-switcher';
-		control.element.innerHTML = '<button>&#10063;</button>';
+		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
 			control.element.classList.add('ol-control-switcher-open');
