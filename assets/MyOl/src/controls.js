@@ -241,7 +241,7 @@ function controlTilesBuffer(depth, depthFS) {
 function controlFullScreen(options) {
 	// Call the former control constructor
 	const control = new ol.control.FullScreen(Object.assign({
-	//	label: '\u21F3', //BEST why not html form ?
+		label: '', // Use ol-full-screen-false:after 
 		tipLabel: 'Plein écran', //TODO BUG don't display title on mobile
 	}, options));
 
