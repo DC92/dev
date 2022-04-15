@@ -11,7 +11,7 @@
 
 <?php
 	$diapos = [];
-	foreach (glob('*.j*') AS $f)
+	foreach (glob('*.*g') AS $f)
 		$diapos[] = [$f, ''];
 ?>
 
