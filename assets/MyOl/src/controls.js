@@ -210,6 +210,7 @@ function controlLengthLine() {
  * Control to display set preload of depth upper level tiles or depthFS if we are on full screen mode
  * This prepares the browser to become offline on the same session
  */
+//TODO BUG too much load on basic browsing
 function controlTilesBuffer(depth, depthFS) {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), //HACK no button
