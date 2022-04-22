@@ -84,7 +84,7 @@ function layerEditGeoJson(options) {
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
-			pixelTolerance: 6, // Default is 10
+			pixelTolerance: displayPointEl ? 16 : 6, // Default is 10
 			style: editStyle,
 		}),
 		controlModify = controlButton({

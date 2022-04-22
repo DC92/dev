@@ -556,8 +556,7 @@ function controlLoadGPX(options) {
 
 						if (properties.sym)
 							styleOptions.image = new ol.style.Icon({
-								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.png',
-								imgSize: [24, 24], // IE compatibility
+								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.svg',
 							});
 
 						return new ol.style.Style(styleOptions);
