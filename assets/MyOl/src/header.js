@@ -33,6 +33,12 @@ try {
 }
 
 /**
+ * Load url ?name=value&name=value and #name=value&name=value in localstorage.myol_name
+ */
+for (let v of location.href.matchAll(/([a-z]+)=([^?#=]+)/g))
+	localStorage['myol_' + v[1]] = v[2];
+
+/**
  * Json parsing errors log
  */
 //BEST implement on layerVector.js & editor
@@ -45,7 +51,7 @@ function JSONparse(json) {
 }
 
 /**
- * warn layers when added to the map
+ * Warn layers when added to the map
  */
 //BEST DELETE (used by editor)
 ol.Map.prototype.handlePostRender = function() {

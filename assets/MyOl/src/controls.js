@@ -79,6 +79,7 @@ function controlButton(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
+//TODO replace cookies by localStorage
 function controlPermalink(options) {
 	options = Object.assign({
 		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.

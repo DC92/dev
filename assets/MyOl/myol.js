@@ -43,6 +43,12 @@ try {
 }
 
 /**
+ * Load url ?name=value&name=value and #name=value&name=value in localstorage.myol_name
+ */
+for (let v of location.href.matchAll(/([a-z]+)=([^?#=]+)/g))
+	localStorage['myol_' + v[1]] = v[2];
+
+/**
  * Json parsing errors log
  */
 //BEST implement on layerVector.js & editor
@@ -55,7 +61,7 @@ function JSONparse(json) {
 }
 
 /**
- * warn layers when added to the map
+ * Warn layers when added to the map
  */
 //BEST DELETE (used by editor)
 ol.Map.prototype.handlePostRender = function() {
@@ -393,22 +399,10 @@ function controlLayerSwitcher(baseLayers, options) {
 	const control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
-		layerNames = Object.keys(baseLayers),
-		//TODO use window.localStorage
-		request = // Search values in cookies & args
-		location.search + '&' + // Priority to the url args ?selector=1,2,3
-		location.hash + '&' + // Then the hash #selector=1,2,3
-		document.cookie + '&', // Then the cookies
-		match = request.match(/baselayer=([^&]+)/);
+		layerNames = Object.keys(baseLayers);
 
-	//TODO BUG ne mémorise pas le layer
-	var selectedBaseLayerName = match ? decodeURI(match[1]) : layerNames[0],
-		lastBaseLayerName = '',
+	var lastBaseLayerName = '',
 		transparentBaseLayerName = '';
-
-	// If the cookie doesn't correspond to an existing layer
-	if (!baseLayers[selectedBaseLayerName])
-		selectedBaseLayerName = layerNames[0];
 
 	// Build html transparency slider
 	const rangeContainerEl = document.createElement('div');
@@ -487,12 +481,12 @@ function controlLayerSwitcher(baseLayers, options) {
 			}
 
 		// Baselayer default is the first of the selection
-		if (!baseLayers[selectedBaseLayerName])
-			selectedBaseLayerName = Object.keys(baseLayers)[0];
+		if (!baseLayers[localStorage.myol_baselayer])
+			localStorage.myol_baselayer = Object.keys(baseLayers)[0];
 
-		baseLayers[selectedBaseLayerName].inputEl.checked = true;
-		for (let l = 0; l < baseLayers[selectedBaseLayerName].length; l++) //HACK IE
-			baseLayers[selectedBaseLayerName][l].setVisible(true);
+		baseLayers[localStorage.myol_baselayer].inputEl.checked = true;
+		for (let l = 0; l < baseLayers[localStorage.myol_baselayer].length; l++) //HACK IE
+			baseLayers[localStorage.myol_baselayer][l].setVisible(true);
 
 		if (lastBaseLayerName) {
 			baseLayers[lastBaseLayerName].inputEl.checked = true;
@@ -514,13 +508,12 @@ function controlLayerSwitcher(baseLayers, options) {
 	}
 
 	function selectBaseLayer(evt) {
-		// Set the baselayer cookie
-		document.cookie = 'baselayer=' + this.value + '; path=/; SameSite=Strict; expires=' +
-			new Date(2100, 0).toUTCString();
+		// Mem the baseLayer
+		localStorage.myol_baselayer = this.value;
 
 		// Manage the double selection
-		if (evt && evt.ctrlKey && this.value != selectedBaseLayerName) {
-			lastBaseLayerName = selectedBaseLayerName;
+		if (evt && evt.ctrlKey && this.value != localStorage.myol_baselayer) {
+			lastBaseLayerName = localStorage.myol_baselayer;
 
 			transparentBaseLayerName =
 				layerNames.indexOf(lastBaseLayerName) > layerNames.indexOf(this.value) ?
@@ -533,8 +526,8 @@ function controlLayerSwitcher(baseLayers, options) {
 			lastBaseLayerName =
 			transparentBaseLayerName = '';
 
-		selectedBaseLayerName = this.value;
-		baseLayers[selectedBaseLayerName].inputEl.checked = true;
+		localStorage.myol_baselayer = this.value;
+		baseLayers[localStorage.myol_baselayer].inputEl.checked = true;
 
 		displayBaseLayers();
 	}
@@ -907,6 +900,7 @@ function memCheckbox(selectorName, callback) {
 		inputEls = document.getElementsByName(selectorName);
 
 	// Set the <inputs> accordingly with the cookies or url args
+	//TODO replace cookies by localStorage
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
@@ -1496,6 +1490,7 @@ function controlButton(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
+//TODO replace cookies by localStorage
 function controlPermalink(options) {
 	options = Object.assign({
 		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.

@@ -362,6 +362,7 @@ function memCheckbox(selectorName, callback) {
 		inputEls = document.getElementsByName(selectorName);
 
 	// Set the <inputs> accordingly with the cookies or url args
+	//TODO replace cookies by localStorage
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
