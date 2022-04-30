@@ -394,12 +394,14 @@ function controlLayerSwitcher(baseLayers, options) {
 			element: document.createElement('div'),
 		}),
 		layerNames = Object.keys(baseLayers),
+		//TODO use window.localStorage
 		request = // Search values in cookies & args
 		location.search + '&' + // Priority to the url args ?selector=1,2,3
 		location.hash + '&' + // Then the hash #selector=1,2,3
 		document.cookie + '&', // Then the cookies
 		match = request.match(/baselayer=([^&]+)/);
 
+	//TODO BUG ne mémorise pas le layer
 	var selectedBaseLayerName = match ? decodeURI(match[1]) : layerNames[0],
 		lastBaseLayerName = '',
 		transparentBaseLayerName = '';
@@ -2090,6 +2092,7 @@ function controlDownload(options) {
  * Print control
  * Requires controlButton
  */
+//TODO zoom plus fin et ne dépendant pas de la baselayer
 function controlPrint() {
 	const control = controlButton({
 		className: 'ol-button ol-print',

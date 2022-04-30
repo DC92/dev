@@ -1,7 +1,7 @@
-//TODO ordre des posts
-//TODO recherche nom lieux en page modif
+//TODO recherche nom lieux en page modif / enter ne marche pas
 //TODO hauteur max carte quand glisse jquery
 
+//BEST inverser l'ordre des posts
 //BEST Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Purger la base des liens photos externes
 //BEST Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html

@@ -38,6 +38,7 @@ var map = new ol.Map({
 		focus: 15,
 		styleOptions: {
 			image: new ol.style.Icon({
+				//TODO utiliser les cadres et viseurs svg
 				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.png',
 			}),
 			stroke: new ol.style.Stroke({

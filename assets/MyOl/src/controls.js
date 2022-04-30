@@ -675,6 +675,7 @@ function controlDownload(options) {
  * Print control
  * Requires controlButton
  */
+//TODO zoom plus fin et ne dépendant pas de la baselayer
 function controlPrint() {
 	const control = controlButton({
 		className: 'ol-button ol-print',

@@ -4,6 +4,15 @@ Ne nettoie pas les pictos de la carte en cas de modif
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
+Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
+Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
+Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
+https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
+Lien vers … la page de liens (en menu)
+BUG ne voit pas le forum développement
+
+EVOLUTION WRI PAGE ACCUEIL
+==========================
 Accueil carte
 	installable ?
 	haut
@@ -16,6 +25,7 @@ Point
 
 TODO WRI
 ========
+Retour à la page initiale après connexion
 Formulaire contact : nom utilisateur
 Fusion commentaire / forum : notion de post descriptif
 Pictos geocaching
