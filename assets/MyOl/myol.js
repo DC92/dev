@@ -891,27 +891,21 @@ function readCheckbox(selectorName, withOn) {
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
-	const request = // Search values in cookies & args
-		location.search + ';' + // Priority to the url args ?selector=1,2,3
-		location.hash + ';' + // Then the hash #selector=1,2,3
-		document.cookie + ';' + // Then the cookies
-		selectorName + '=' + readCheckbox(selectorName, true).join(','), // Then the existing checks
-		match = request.match(new RegExp(selectorName + '=([^;]*)')),
-		inputEls = document.getElementsByName(selectorName);
+	const inputEls = document.getElementsByName(selectorName),
+		values = typeof localStorage['myol_' + selectorName] != 'undefined' ?
+		localStorage['myol_' + selectorName] :
+		readCheckbox(selectorName, true).join(',');
 
 	// Set the <inputs> accordingly with the cookies or url args
-	//TODO replace cookies by localStorage
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
 			// Set inputs following cookies & args
-			if (match) {
-				inputEls[e].checked =
-					match[1].indexOf(inputEls[e].value) != -1 || // That one is declared
-					match[1].split(',').indexOf('on') != -1; // The "all" (= "on") is set
+			inputEls[e].checked =
+				values.indexOf(inputEls[e].value) != -1 || // That one is declared
+				values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
 
-				// Compute the all check && init the cookies if data has been given by the url
-				checkEl(inputEls[e]);
-			}
+			// Compute the all check && init the cookies if data has been given by the url
+			checkEl(inputEls[e]);
 
 			// Attach the action
 			inputEls[e].addEventListener('click', onClick);
@@ -924,10 +918,7 @@ function memCheckbox(selectorName, callback) {
 		const selection = readCheckbox(selectorName);
 
 		if (selectorName)
-			document.cookie =
-			typeof selection == 'object' ? selectorName + '=' + selection.join(',') : (selection ? 'on' : '') +
-			'path=/; SameSite=Strict; ' +
-			'expires=' + new Date(2100, 0).toUTCString(); // Keep over all session
+			localStorage['myol_' + selectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
 
 		if (inputEls.length && typeof callback == 'function')
 			callback(selection);
