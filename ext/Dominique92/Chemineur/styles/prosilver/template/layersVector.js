@@ -53,6 +53,7 @@ if (typeof map !== 'undefined') {
 }
 
 // Resize map
+//TODO hauteur max carte quand glisse jquery
 if (jQuery.ui)
 	$(map.getTargetElement()).resizable({
 		handles: 's,w,sw', // 2 côtés et 1 coin

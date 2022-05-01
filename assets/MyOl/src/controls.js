@@ -259,7 +259,6 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
-//BEST GPS tap on map = distance from GPS calculation
 function controlGPS() {
 	let view, geolocation, nbLoc, position, heading, accuracy, altitude, speed;
 

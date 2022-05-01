@@ -25,7 +25,6 @@ $mapKeys = [
 	'bing' => 'ArLngay7TxiroomF7HLEXCS7kTWexf1_1s1qiF7nbTYs2IkD3XLcUnvSlKbGRZxt',
 	// Get your mapquest (free) key in : https://developer.mapquest.com/
 	'mapquest' => 'Fmjtd%7Cluur2968n1%2C70%3Do5-90rs04', // Calcul altitude
-	'keys-mapquest' => 'Fmjtd%7Cluur2968n1%2C70%3Do5-90rs04', //TODO DELETE
 	// SwissTopo : You need to register your domain in
 	// https://shop.swisstopo.admin.ch/fr/products/geoservice/swisstopo_geoservices/WMTS_info
 ];

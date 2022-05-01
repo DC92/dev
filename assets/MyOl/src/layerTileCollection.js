@@ -73,7 +73,6 @@ function layerGoogle(subLayer) {
 		}),
 	});
 }
-//BEST lien vers GGstreet
 
 /**
  * Stamen http://maps.stamen.com

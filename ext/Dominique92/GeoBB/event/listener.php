@@ -8,7 +8,6 @@
 
 //TODO BUG geocoder dont't accept enter on posting.php
 //TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
-//TODO BUG fond de carte non persistant quand posting
 //BEST calcul dénivelé / profil
 
 namespace Dominique92\GeoBB\event;
@@ -133,10 +132,10 @@ class listener implements EventSubscriberInterface
 				global $mapKeys;
 				if (array_key_exists ('geo_altitude', $topic_row) &&
 					!@$topic_row['geo_altitude'] &&
-					@$mapKeys['keys-mapquest'])
+					@$mapKeys['mapquest'])
 				{
 					$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
-						$mapKeys['keys-mapquest'].
+						$mapKeys['mapquest'].
 						'&latLngCollection='.
 						$ll[2].','.$ll[1];
 					$mapquest_result =@file_get_contents ($mapquest) ;

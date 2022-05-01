@@ -16,7 +16,6 @@
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
-//BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 10, // Features : above the base layer (zIndex = 1)

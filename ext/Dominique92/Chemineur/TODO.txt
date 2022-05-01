@@ -1,6 +1,3 @@
-//TODO recherche nom lieux en page modif / enter ne marche pas
-//TODO hauteur max carte quand glisse jquery
-
 //BEST inverser l'ordre des posts
 //BEST Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Purger la base des liens photos externes
