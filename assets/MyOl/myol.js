@@ -12,7 +12,6 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-//HACK for some mobiles touch functions (IOS)
 if (window.PointerEvent === undefined) {
 	const script = document.createElement('script');
 	script.src = 'https://unpkg.com/elm-pep';
@@ -22,12 +21,10 @@ if (window.PointerEvent === undefined) {
 /**
  * Debug facilities on mobile
  */
-//HACK use hash ## for error alerts
 if (!location.hash.indexOf('##'))
 	window.addEventListener('error', function(evt) {
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
-//HACK use hash ### to route all console logs on alerts
 if (location.hash == '###')
 	console.log = function(message) {
 		alert(message);
@@ -51,7 +48,6 @@ for (let v of location.href.matchAll(/([a-z]+)=([^?#=]+)/g))
 /**
  * Json parsing errors log
  */
-//BEST implement on layerVector.js & editor
 function JSONparse(json) {
 	try {
 		return JSON.parse(json);
@@ -63,7 +59,6 @@ function JSONparse(json) {
 /**
  * Warn layers when added to the map
  */
-//BEST DELETE (used by editor)
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
 
@@ -156,7 +151,6 @@ function layerGoogle(subLayer) {
 		}),
 	});
 }
-//BEST lien vers GGstreet
 
 /**
  * Stamen http://maps.stamen.com
@@ -211,7 +205,6 @@ function layerIGN(subLayer, options) {
 /**
  * Swisstopo https://api.geo.admin.ch/
  */
-//BEST : fall back out of valid area
 function layerSwissTopo(layer1) {
 	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
@@ -315,7 +308,6 @@ function layerBing(subLayer) {
 	if (mapKeys.bing) {
 		const layer = new ol.layer.Tile();
 
-		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
 		layer.on('change:visible', function() {
 			if (!layer.getSource()) {
 				layer.setSource(new ol.source.BingMaps({
@@ -382,7 +374,6 @@ function layersDemo() {
 		'Stamen': layerStamen('terrain'),
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
-		//BEST neutral layer
 	});
 }
 
@@ -391,7 +382,6 @@ function layersDemo() {
  * Layer switcher
  * Need to include layerSwitcher.css
  */
-//BEST alt key to swith layers / transparency
 function controlLayerSwitcher(baseLayers, options) {
 	baseLayers = baseLayers || layersCollection();
 	options = options || {};
@@ -449,7 +439,7 @@ function controlLayerSwitcher(baseLayers, options) {
 				selectionEl.firstChild.onclick = selectBaseLayer;
 				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
+				for (let l = 0; l < baseLayers[name].length; l++) {
 					baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
 					map.addLayer(baseLayers[name][l]);
 				}
@@ -460,7 +450,6 @@ function controlLayerSwitcher(baseLayers, options) {
 		// Attach html additional selector
 		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
 
-		//BEST other id don't use the css
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration
@@ -473,7 +462,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		for (let name in baseLayers)
 			if (baseLayers[name]) {
 				baseLayers[name].inputEl.checked = false;
-				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
+				for (let l = 0; l < baseLayers[name].length; l++) {
 					//for (let layer of baseLayers[name]) {
 					baseLayers[name][l].setVisible(false);
 					baseLayers[name][l].setOpacity(1);
@@ -485,12 +474,12 @@ function controlLayerSwitcher(baseLayers, options) {
 			localStorage.myol_baselayer = Object.keys(baseLayers)[0];
 
 		baseLayers[localStorage.myol_baselayer].inputEl.checked = true;
-		for (let l = 0; l < baseLayers[localStorage.myol_baselayer].length; l++) //HACK IE
+		for (let l = 0; l < baseLayers[localStorage.myol_baselayer].length; l++)
 			baseLayers[localStorage.myol_baselayer][l].setVisible(true);
 
 		if (lastBaseLayerName) {
 			baseLayers[lastBaseLayerName].inputEl.checked = true;
-			for (let l = 0; l < baseLayers[lastBaseLayerName].length; l++) //HACK IE
+			for (let l = 0; l < baseLayers[lastBaseLayerName].length; l++)
 				baseLayers[lastBaseLayerName][l].setVisible(true);
 		}
 		displayTransparencyRange();
@@ -498,7 +487,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 	function displayTransparencyRange() {
 		if (transparentBaseLayerName) {
-			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++) //HACK IE
+			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++)
 				baseLayers[transparentBaseLayerName][l].setOpacity(
 					rangeContainerEl.firstChild.value / 100
 				);
@@ -554,7 +543,6 @@ function controlLayerSwitcher(baseLayers, options) {
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
-//BEST BUG icons blink when too many
 function layerVector(opt) {
 	const options = Object.assign({
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
@@ -573,7 +561,7 @@ function layerVector(opt) {
 			style: style,
 		}, options)),
 
-		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
+		elLabel = document.createElement('span'),
 		statusEl = document.getElementById(options.selectorName + '-status'); // XHR download tracking
 
 	if (statusEl)
@@ -581,7 +569,6 @@ function layerVector(opt) {
 			if (!statusEl.textContent.includes('error'))
 				statusEl.textContent = '';
 
-			//BEST status hors limites zoom
 			switch (evt.type) {
 				case 'featuresloadstart':
 					statusEl.textContent = 'Chargement...';
@@ -622,7 +609,6 @@ function layerVector(opt) {
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
 			// These options will be displayed by the hover response
-			//HACK attach this function to each feature to access it when hovering without layer context
 			evt.features[f].hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
 			// Compute data to be used to display the feature
@@ -655,7 +641,6 @@ function layerVector(opt) {
 		if (typeof styleOptionsFunction == 'function') {
 			const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
 
-			//HACK to render the html entities in the canvas
 			if (styleOptions && styleOptions.text) {
 				elLabel.innerHTML = styleOptions.text.getText();
 
@@ -674,9 +659,7 @@ function layerVector(opt) {
 	// on features of vector layers having the following properties :
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
-	//BEST label attached to the cursor for lines & poly
 
-	//HACK attach an hover listener once when the map is defined
 	ol.Map.prototype.render = function() {
 		if (!this.hoverListenerInstalled && this.getView()) {
 			this.hoverListenerInstalled = true;
@@ -945,7 +928,6 @@ function memCheckbox(selectorName, callback) {
 
 	const selection = readCheckbox(selectorName);
 
-	//BEST common code with function onClick(evt) {
 	if (inputEls.length && typeof callback == 'function')
 		callback(selection);
 
@@ -1110,7 +1092,7 @@ function styleOptionsCluster(feature, properties) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
+		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
@@ -1158,7 +1140,7 @@ function layerGeoBB(options) {
  */
 function layerWri(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//www.refuges.info/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
+		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'api/bbox?nb_points=all' +
 				'&type_points=' + selection.join(',') +
@@ -1408,7 +1390,6 @@ function layerOverpass(options) {
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
-//BEST left aligned buttons when screen vertical
 function controlButton(options) {
 	options = Object.assign({
 		element: document.createElement('div'),
@@ -1489,7 +1470,7 @@ function controlPermalink(options) {
 	}, options);
 	const aEl = document.createElement('a'),
 		control = new ol.control.Control({
-			element: document.createElement('div'), //HACK no button
+			element: document.createElement('div'),
 			render: render,
 		});
 
@@ -1542,7 +1523,7 @@ function controlMousePosition() {
 	return new ol.control.MousePosition({
 		projection: 'EPSG:4326',
 		className: 'ol-coordinate',
-		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
+		undefinedHTML: String.fromCharCode(0),
 
 		coordinateFormat: function(mouse) {
 			if (ol.gpsPosition) {
@@ -1568,7 +1549,7 @@ function controlLengthLine() {
 	});
 	control.element.className = 'ol-length-line';
 
-	control.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		map.on('pointermove', function(evt) {
@@ -1581,7 +1562,6 @@ function controlLengthLine() {
 		});
 	};
 
-	//BEST calculate distance to the ends
 	function calculateLength(feature) {
 		// Display the line length
 		if (feature) {
@@ -1600,13 +1580,12 @@ function controlLengthLine() {
  * Control to display set preload of depth upper level tiles or depthFS if we are on full screen mode
  * This prepares the browser to become offline on the same session
  */
-//TODO too much load on basic browsing
 function controlTilesBuffer(depth, depthFS) {
 	const control = new ol.control.Control({
-		element: document.createElement('div'), //HACK no button
+		element: document.createElement('div'),
 	});
 
-	control.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Change preload when the window expand to fullscreen
@@ -1636,7 +1615,7 @@ function controlGeocoder(options) {
 
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return new ol.control.Control({
-			element: document.createElement('div'), //HACK no button
+			element: document.createElement('div'),
 		});
 
 	const geocoder = new Geocoder('nominatim', {
@@ -1660,7 +1639,6 @@ function controlGeocoder(options) {
  * GPS control
  * Requires controlButton
  */
-//BEST GPS tap on map = distance from GPS calculation
 function controlGPS() {
 	let view, geolocation, nbLoc, position, heading, accuracy, altitude, speed;
 
@@ -1675,7 +1653,6 @@ function controlGPS() {
 				'orange', // 1 : waiting physical GPS sensor position & altitude
 				'lime', // 2 : active, centered & oriented
 				'grey', // 3 : active, do not centered nor oriented
-				//BEST No orange wait position when no real GPS captor
 			],
 			title: 'Centrer sur la position GPS',
 			activate: function(state) {
@@ -1731,7 +1708,7 @@ function controlGPS() {
 		}),
 	}));
 
-	control.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		view = map.getView();
@@ -1872,8 +1849,6 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-//BEST Chemineur dans MyOl => Traduction sym (symbole export GPS ?)
-//BEST misc formats
 function controlLoadGPX(options) {
 	options = Object.assign({
 		label: '&#x1F4C2;',
@@ -1988,7 +1963,7 @@ function controlDownload(options) {
 	}
 
 	function download() { //formatName, mime
-		const formatName = this.textContent || 'GPX', //BEST get first value as default
+		const formatName = this.textContent || 'GPX',
 			mime = this.id,
 			format = new ol.format[formatName](),
 			map = control.getMap();
@@ -2004,7 +1979,7 @@ function controlDownload(options) {
 		function getFeatures(layer) {
 			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
 				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!layer.marker_) //BEST find a better way to don't save the cursor
+					if (!layer.marker_)
 						features.push(feature);
 				});
 		}
@@ -2043,7 +2018,6 @@ function controlDownload(options) {
  * Print control
  * Requires controlButton
  */
-//TODO zoom plus fin et ne dépendant pas de la baselayer
 function controlPrint() {
 	const control = controlButton({
 		className: 'ol-button ol-print',
@@ -2064,11 +2038,11 @@ function controlPrint() {
 		},
 	});
 
-	control.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const poEls = document.getElementsByName('print-orientation');
-		for (let i = 0; i < poEls.length; i++) // Use « for » because of a bug in Edge //BEST ???
+		for (let i = 0; i < poEls.length; i++) // Use « for » because of a bug in Edge
 			poEls[i].onchange = resizeDraft;
 	};
 
@@ -2236,8 +2210,6 @@ function layerEditGeoJson(options) {
 		});
 
 	// Set edit fields actions
-	//BEST do a specific layer for point position editing
-	//BEST BUG answer should stay in -180 +180 ° wrap
 	for (let i = 0; i < inputEls.length; i++) {
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;
@@ -2300,10 +2272,8 @@ function layerEditGeoJson(options) {
 		map.on('pointermove', hover);
 	});
 
-	//BEST+ move only one summit when dragging
 
 	modify.on('modifyend', function(evt) {
-		//BEST Ctrl+Alt+click on summit : delete the line or poly
 
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
@@ -2420,7 +2390,6 @@ function layerEditGeoJson(options) {
 		});
 	};
 
-	//BEST make separate position control
 	function editPoint(evt) {
 		const ll = evt.target.name.length == 3 ?
 			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
@@ -2517,7 +2486,6 @@ function layerEditGeoJson(options) {
 	}
 
 	function escapedStyle(a, b, c) {
-		//BEST work with arguments
 		const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 		return function(feature) {
 			return new ol.style.Style(Object.assign({
@@ -2598,7 +2566,6 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 
 	for (let a in lines)
 		// Exclude 1 coordinate features (points)
-		//BEST manage points
 		if (lines[a].length < 2)
 			delete lines[a];
 

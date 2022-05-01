@@ -27,14 +27,16 @@ $js[] = get ('layerVector.js');
 $js[] = get ('layerVectorCollection.js');
 $js[] = get ('controls.js');
 $js[] = get ('editor.js');
-file_put_contents ('myol.js', implode ('
-
-', $js));
+file_put_contents ('myol.js', implode ("\n\n", $js));
 echo 'TO myol.js</p>';
 
 function get ($file) {
 	echo "$file, ";
-	return "/* FILE src/$file */\n".file_get_contents ('src/'.$file);
+	return "/* FILE src/$file */\n".
+		preg_replace (
+			'/\n?[ \t]*\/\/(TODO|BEST|HACK)[^\n]*/', '',
+			file_get_contents ('src/'.$file)
+		);
 }
 ?>
 
