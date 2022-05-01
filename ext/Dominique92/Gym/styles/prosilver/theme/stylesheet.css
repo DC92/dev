@@ -490,7 +490,7 @@ body {
 	color: black;
 	padding: 1px;
 }
-#format-buttons:before {
+#format-buttons::before {
 	font-weight: bold;
 	content: "Format :";
 }

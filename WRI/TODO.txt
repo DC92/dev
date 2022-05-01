@@ -2,6 +2,10 @@ BUG
 ===
 Ne nettoie pas les pictos de la carte en cas de modif
 
+EVOLUTIONS MyOL
+===============
+controlFullScreen => new ol.control.FullScreen
+
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
 Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326

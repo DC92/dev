@@ -19,8 +19,8 @@ p {
 	float: left;
 	text-indent: 1em;
 }
-body > div:before,
-p:before {
+body > div::before,
+p::before {
 	content: ".";
 	display: block;
 	clear: both;

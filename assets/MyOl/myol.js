@@ -359,7 +359,7 @@ function layersCollection() {
 
 function layersDemo() {
 	return Object.assign(layersCollection(), {
-		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'), //TODO error 403
+		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 		'OSM cycle': layerThunderforest('cycle'),
 		'OSM landscape': layerThunderforest('landscape'),
 		'OSM trains': layerThunderforest('pioneer'),
@@ -1622,7 +1622,7 @@ function controlLengthLine() {
  * Control to display set preload of depth upper level tiles or depthFS if we are on full screen mode
  * This prepares the browser to become offline on the same session
  */
-//TODO BUG too much load on basic browsing
+//TODO too much load on basic browsing
 function controlTilesBuffer(depth, depthFS) {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), //HACK no button
@@ -1643,28 +1643,6 @@ function controlTilesBuffer(depth, depthFS) {
 			});
 		});
 	};
-
-	return control;
-}
-
-/**
- * Adaptations of ol.control.FullScreen
- */
-//BEST don't work on old IOS/Safari versions
-function controlFullScreen(options) {
-	// Call the former control constructor
-	const control = new ol.control.FullScreen(Object.assign({
-		label: '', // Use ol-full-screen-false:after 
-		tipLabel: 'Plein écran', //TODO BUG don't display title on mobile
-	}, options));
-
-	//HACK : polyfill for IE
-	control.on('enterfullscreen', function(evt) {
-		evt.target.getMap().getTargetElement().classList.add('ol-pseudo-fullscreen');
-	});
-	control.on('leavefullscreen', function(evt) {
-		evt.target.getMap().getTargetElement().classList.remove('ol-pseudo-fullscreen');
-	});
 
 	return control;
 }
@@ -2161,7 +2139,7 @@ function controlsCollection(options) {
 	return [
 		// Top left
 		new ol.control.Zoom(),
-		controlFullScreen(),
+		new ol.control.FullScreen(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
