@@ -981,7 +981,6 @@ function styleOptionsIcon(iconUrl) {
 		return {
 			image: new ol.style.Icon({
 				src: iconUrl,
-				imgSize: [24, 24], // IE compatibility
 			}),
 		};
 }
@@ -1490,7 +1489,6 @@ function controlButton(options) {
  * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
  * Don't set view when you declare the map
  */
-//TODO replace cookies by localStorage
 function controlPermalink(options) {
 	options = Object.assign({
 		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
@@ -1502,19 +1500,7 @@ function controlPermalink(options) {
 		control = new ol.control.Control({
 			element: document.createElement('div'), //HACK no button
 			render: render,
-		}),
-		zoomMatch = location.href.match(/zoom=([0-9]+)/),
-		latLonMatch = location.href.match(/lat=([-0-9\.]+)&lon=([-.0-9]+)/);
-	let params = (
-			';map=' + options.forced + // Forced
-			location.href + // Priority to ?map=6/2/47 or #map=6/2/47
-			(zoomMatch && latLonMatch ? // Old format ?zoom=6&lat=47&lon=5
-				';map=' + zoomMatch[1] + '/' + latLonMatch[2] + '/' + latLonMatch[1] :
-				'') +
-			document.cookie + // Then the cookie
-			';map=' + options.mapDefault + // Optional default
-			';map=6/2/47') // General default
-		.match(/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/); // map=<ZOOM>/<LON>/<LAT>
+		});
 
 	if (options.display) {
 		control.element.className = 'ol-permalink';
@@ -1523,35 +1509,36 @@ function controlPermalink(options) {
 		control.element.appendChild(aEl);
 	}
 
-	if (typeof options.initialCenter == 'function') {
-		options.initialCenter([parseFloat(params[2]), parseFloat(params[3])]);
-	}
-
 	function render(evt) {
 		const view = evt.map.getView();
 
 		// Set center & zoom at the init
-		if (options.init &&
-			params) { // Only once
-			view.setZoom(params[1]);
-			view.setCenter(ol.proj.transform([parseFloat(params[2]), parseFloat(params[3])], 'EPSG:4326', 'EPSG:3857'));
-			params = null;
+		if (options.init) {
+			options.init = false; // Only once
+
+			view.setZoom(parseFloat(localStorage.myol_zoom) || 6);
+			view.setCenter(ol.proj.transform([
+				parseFloat(localStorage.myol_lon) || 2,
+				parseFloat(localStorage.myol_lat) || 47
+			], 'EPSG:4326', 'EPSG:3857'));
 		}
 
 		// Set the permalink with current map zoom & position
 		if (view.getCenter()) {
 			const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
-				newParams = [
-					parseInt(view.getZoom()), // Zoom
-					Math.round(ll4326[0] * 10000) / 10000, // Lon
-					Math.round(ll4326[1] * 10000) / 10000, // Lat
-				];
+				newParams = 'zoom=' + Math.round(view.getZoom() * 10) / 10 +
+				'&lon=' + Math.round(ll4326[0] * 1000) / 1000 +
+				'&lat=' + Math.round(ll4326[1] * 1000) / 1000;
+
+			localStorage.myol_zoom = view.getZoom();
+			localStorage.myol_lon = ll4326[0];
+			localStorage.myol_lat = ll4326[1];
 
 			if (options.display)
-				aEl.href = options.hash + 'map=' + newParams.join('/');
+				aEl.href = options.hash + newParams;
+
 			if (options.setUrl)
-				location.href = '#map=' + newParams.join('/');
-			document.cookie = 'map=' + newParams.join('/') + ';path=/; SameSite=Strict';
+				location.href = '#' + newParams;
 		}
 	}
 	return control;
@@ -2050,7 +2037,7 @@ function controlDownload(options) {
 				type: mime,
 			});
 
-		if (typeof navigator.msSaveBlob == 'function') // IE/Edge
+		if (typeof navigator.msSaveBlob == 'function') // Edge
 			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
 		else {
 			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
@@ -2090,7 +2077,7 @@ function controlPrint() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const poEls = document.getElementsByName('print-orientation');
-		for (let i = 0; i < poEls.length; i++) // Use « for » because of a bug in Edge / IE
+		for (let i = 0; i < poEls.length; i++) // Use « for » because of a bug in Edge //BEST ???
 			poEls[i].onchange = resizeDraft;
 	};
 

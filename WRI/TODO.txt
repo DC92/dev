@@ -5,6 +5,8 @@ Ne nettoie pas les pictos de la carte en cas de modif
 EVOLUTIONS MyOL
 ===============
 controlFullScreen => new ol.control.FullScreen
+delete apple-mobile-web-app-capable & apple-mobile-web-app-capable
+delete ol-681 et autres supports IE
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================

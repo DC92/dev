@@ -70,7 +70,6 @@ if (!location.href.match(/(https|localhost).*index/)) {
 
 			new ol.control.Zoom(),
 			new ol.control.FullScreen({
-				label: '', //HACK Bad presentation on IE & FF
 				tipLabel: 'Plein écran',
 			}),
 			controlGeocoder(),
