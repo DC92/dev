@@ -642,7 +642,6 @@ function controlDownload(options) {
  * Print control
  * Requires controlButton
  */
-//TODO zoom plus fin et ne dépendant pas de la baselayer
 function controlPrint() {
 	const control = controlButton({
 		className: 'ol-button ol-print',
@@ -694,6 +693,12 @@ function controlPrint() {
 		for (let child = document.body.firstElementChild; child !== null; child = child.nextSibling)
 			if (child.style && child !== mapEl)
 				child.style.display = 'none';
+
+		// Finer zoom not dependent on the baselayer's levels
+		map.getView().setConstrainResolution(false);
+		map.addInteraction(new ol.interaction.MouseWheelZoom({
+			maxDelta: 0.1,
+		}));
 
 		// To return without print
 		document.addEventListener('keydown', function(evt) {

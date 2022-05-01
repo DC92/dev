@@ -2070,6 +2070,12 @@ function controlPrint() {
 			if (child.style && child !== mapEl)
 				child.style.display = 'none';
 
+		// Finer zoom not dependent on the baselayer's levels
+		map.getView().setConstrainResolution(false);
+		map.addInteraction(new ol.interaction.MouseWheelZoom({
+			maxDelta: 0.1,
+		}));
+
 		// To return without print
 		document.addEventListener('keydown', function(evt) {
 			if (evt.key == 'Escape')
