@@ -881,7 +881,7 @@ function memCheckbox(selectorName, callback) {
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
+		for (let e = 0; e < inputEls.length; e++) {
 			// Set inputs following cookies & args
 			inputEls[e].checked =
 				values.indexOf(inputEls[e].value) != -1 || // That one is declared
@@ -1577,10 +1577,10 @@ function controlLengthLine() {
 }
 
 /**
- * Control to display set preload of depth upper level tiles or depthFS if we are on full screen mode
- * This prepares the browser to become offline on the same session
+ * Control to display set preload of depth upper level tiles
+ * This prepares the browser to become offline
  */
-function controlTilesBuffer(depth, depthFS) {
+function controlTilesBuffer(depth) {
 	const control = new ol.control.Control({
 		element: document.createElement('div'),
 	});
@@ -1588,15 +1588,11 @@ function controlTilesBuffer(depth, depthFS) {
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		// Change preload when the window expand to fullscreen
+		// Action on each layer
 		map.on('precompose', function() {
 			map.getLayers().forEach(function(layer) {
-				const fs = document.webkitIsFullScreen || // Edge, Opera
-					document.msFullscreenElement ||
-					document.fullscreenElement; // Chrome, FF, Opera
-
 				if (typeof layer.setPreload == 'function')
-					layer.setPreload(fs ? depthFS || depth || 1 : depth || 1);
+					layer.setPreload(depth);
 			});
 		});
 	};
@@ -2003,13 +1999,9 @@ function controlDownload(options) {
 				type: mime,
 			});
 
-		if (typeof navigator.msSaveBlob == 'function') // Edge
-			navigator.msSaveBlob(file, options.fileName + '.' + formatName.toLowerCase());
-		else {
-			hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
-			hiddenEl.href = URL.createObjectURL(file);
-			hiddenEl.click();
-		}
+		hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
+		hiddenEl.href = URL.createObjectURL(file);
+		hiddenEl.click();
 	}
 	return control;
 }
@@ -2042,7 +2034,8 @@ function controlPrint() {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		const poEls = document.getElementsByName('print-orientation');
-		for (let i = 0; i < poEls.length; i++) // Use « for » because of a bug in Edge
+
+		for (let i in poEls)
 			poEls[i].onchange = resizeDraft;
 	};
 
@@ -2604,7 +2597,8 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 
 			if (compareCoords(lines[a])) { // If this line is closed
 				// Split squeezed polygons
-				for (let i1 = 0; i1 < lines[a].length - 1; i1++) // Explore all summits combinaison
+				// Explore all summits combinaison
+				for (let i1 = 0; i1 < lines[a].length - 1; i1++)
 					for (let i2 = 0; i2 < i1; i2++)
 						if (lines[a][i1][0] == lines[a][i2][0] &&
 							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits

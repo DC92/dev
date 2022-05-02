@@ -100,7 +100,7 @@ function layerEditGeoJson(options) {
 	// Set edit fields actions
 	//BEST do a specific layer for point position editing
 	//BEST BUG answer should stay in -180 +180 ° wrap
-	for (let i = 0; i < inputEls.length; i++) {
+	for (let i = 0; i < inputEls.length; i++) { //BEST ??? Use « for » because of a bug in Edge
 		inputEls[i].onchange = editPoint;
 		inputEls[i].source = source;
 	}
@@ -324,8 +324,8 @@ function layerEditGeoJson(options) {
 				ol.proj.proj4.register(proj4);
 			}
 			// Display or not the EPSG:21781 coordinates
-			const epsg21781 = document.getElementsByClassName('epsg-21781');
-			for (let e = 0; e < epsg21781.length; e++)
+			const epsg21781 = document.getElementsByClassName('epsg-21781'); //BEST ??? Use « for » because of a bug in Edge
+			for (let e = 0; e < epsg21781.length; e++) //BEST ??? Use « for » because of a bug in Edge
 				epsg21781[e].style.display = ll21781 ? '' : 'none';
 
 			if (inputEls.length)
@@ -493,7 +493,8 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 
 			if (compareCoords(lines[a])) { // If this line is closed
 				// Split squeezed polygons
-				for (let i1 = 0; i1 < lines[a].length - 1; i1++) // Explore all summits combinaison
+				// Explore all summits combinaison
+				for (let i1 = 0; i1 < lines[a].length - 1; i1++) //BEST ??? Use « for » because of a bug in Edge
 					for (let i2 = 0; i2 < i1; i2++)
 						if (lines[a][i1][0] == lines[a][i2][0] &&
 							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits

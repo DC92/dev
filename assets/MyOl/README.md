@@ -1,21 +1,21 @@
-DC92.MyOl
+Dominique92.MyOl
 ================
 * This package adds many features to [openlayer maps](https://openlayers.org/)
 * It is deployed on [refuges.info](https://www.refuges.info), [chemineur.fr](https://chemineur.fr) & [alpages.info](https://alpages.info)
 
 SIMPLE EXAMPLE
 ==============
-This [EXAMPLE DEMO](https://DC92.github.io/dev/assets/MyOl/) implements a single map with the most current maps layers providers.
-* You can download the [DISTRIBUTION ZIPPED PACKAGE](https://github.com/DC92/dev/archive/refs/heads/master.zip) and unzip it in your website FTP section.
+This [EXAMPLE DEMO](https://Dominique92.github.io/dev/assets/MyOl/) implements a single map with the most current maps layers providers.
+* You can download the [DISTRIBUTION ZIPPED PACKAGE](https://github.com/Dominique92/dev/archive/refs/heads/master.zip) and unzip it in your website FTP section.
 * You can include the css & js sections of this example on your own page (adjust the include files path to your implementation)
 
 LAYER SWITCHER
 ==============
-See a LAYER SWITCHER DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/layerSwitcher.html)
+See a LAYER SWITCHER DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/examples/layerSwitcher.html)
 
 TILE LAYERS
 ===========
-See a TILE LAYERS DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/layerTile.html)
+See a TILE LAYERS DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/examples/layerTile.html)
 * OSM, OSM-FR, OpenTopo, Maps.Refuges.Info
 * ThunderForest Outdoors, OpenTopoMap, Cycles, Landscape, Transport, ...
 * IGN France, cadastre, satellite, ...
@@ -29,13 +29,13 @@ See a TILE LAYERS DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/la
 
 VECTOR LAYERS
 =============
-See a VECTOR LAYER DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/layerVector.html)
+See a VECTOR LAYER DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/examples/layerVector.html)
 * GeoJson ajax layers,
 * OverPass (OSM vector points of interest)
 
 MISC CONTROLS
 =============
-See a CONTROL DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/controls.html)
+See a CONTROL DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/examples/controls.html)
 * Keep position, zoom & zoom on localstorage
 * Geocoder
 * Line length display
@@ -45,18 +45,18 @@ See a CONTROL DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/contro
 
 MARKER DISPLAY & EDIT
 =====================
-See a MARKER DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/marker.html)
+See a MARKER DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/examples/marker.html)
 * Editable position marker with multi-projection position display,
 
 LINES & POLYGONS EDITOR
 =======================
-See an EDITOR DEMO [here](https://DC92.github.io/dev/assets/MyOl/examples/editor.html)
+See an EDITOR DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/examples/editor.html)
 * Polylines & polygons editor.
 
 OFF LINE GPS
 ============
-See an OFF LINE GPS DEMO [here](https://DC92.github.io/dev/assets/MyOl/gps)
-* Open this url : [DC92.github.io/dev/assets/MyOl/gps](https://DC92.github.io/dev/assets/MyOl/gps/)
+See an OFF LINE GPS DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/gps)
+* Open this url : [Dominique92.github.io/dev/assets/MyOl/gps](https://Dominique92.github.io/dev/assets/MyOl/gps/)
 * Browser -> options -> add to the home screen
 * Choose a map layer
 * Place yourself at the starting point of your hike
@@ -81,17 +81,13 @@ If you want to use external providers layers, you must acquire free keys and rep
 ARCHITECTURE
 ============
 Just include myol.js & myos.css after ol/dist, proj4js & geocoder's js & css.
-* See [index.html](https://raw.githubusercontent.com/DC92/dev/master/assets/MyOl/index.html) for example
+* See [index.html](https://raw.githubusercontent.com/Dominique92/dev/master/assets/MyOl/index.html) for example
 * Code & all tiled layers use EPSG:3857 spherical mercator projection
 
 The coding rules are volontary simple & don't follow all openlayers's
 * No JS classes, no jquery, no es6 modules, no nodejs build, no minification, no npm repository, ...
 * Each adaptation is included in a single JS function that you can include separately (check dependencies if any)
 * Feel free to use, modify & share as you want
-
-Tested on :
-* windows : Chrome, FireFox, Edge, IE11 (with some limitations), Opera (slow)
-* Android : Chrome, FireFox, Edge, Opera, Samsung Internet
 
 FILES
 =====
@@ -105,5 +101,8 @@ FILES
 * examples/... : Demos or ongoing developments
 * gps/... : Off line demo with GPS capabilities
 
-NO IE support
-=============
+TESTED ON
+=========
+* windows : Chrome, FireFox, Edge, Opera, Brave
+* Android : Chrome, FireFox, Samsung Internet
+* NO SUPPORT ON Microsoft Internet Explorer

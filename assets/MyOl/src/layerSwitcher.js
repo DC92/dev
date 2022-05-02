@@ -60,7 +60,7 @@ function controlLayerSwitcher(baseLayers, options) {
 				selectionEl.firstChild.onclick = selectBaseLayer;
 				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
+				for (let l = 0; l < baseLayers[name].length; l++) { //BEST HACK IE
 					baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
 					map.addLayer(baseLayers[name][l]);
 				}
@@ -84,7 +84,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		for (let name in baseLayers)
 			if (baseLayers[name]) {
 				baseLayers[name].inputEl.checked = false;
-				for (let l = 0; l < baseLayers[name].length; l++) { //HACK IE
+				for (let l = 0; l < baseLayers[name].length; l++) { //BEST HACK IE
 					//for (let layer of baseLayers[name]) {
 					baseLayers[name][l].setVisible(false);
 					baseLayers[name][l].setOpacity(1);
@@ -96,12 +96,12 @@ function controlLayerSwitcher(baseLayers, options) {
 			localStorage.myol_baselayer = Object.keys(baseLayers)[0];
 
 		baseLayers[localStorage.myol_baselayer].inputEl.checked = true;
-		for (let l = 0; l < baseLayers[localStorage.myol_baselayer].length; l++) //HACK IE
+		for (let l = 0; l < baseLayers[localStorage.myol_baselayer].length; l++) //BEST HACK IE
 			baseLayers[localStorage.myol_baselayer][l].setVisible(true);
 
 		if (lastBaseLayerName) {
 			baseLayers[lastBaseLayerName].inputEl.checked = true;
-			for (let l = 0; l < baseLayers[lastBaseLayerName].length; l++) //HACK IE
+			for (let l = 0; l < baseLayers[lastBaseLayerName].length; l++) //BEST HACK IE
 				baseLayers[lastBaseLayerName][l].setVisible(true);
 		}
 		displayTransparencyRange();
@@ -109,7 +109,7 @@ function controlLayerSwitcher(baseLayers, options) {
 
 	function displayTransparencyRange() {
 		if (transparentBaseLayerName) {
-			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++) //HACK IE
+			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++) //BEST HACK IE
 				baseLayers[transparentBaseLayerName][l].setOpacity(
 					rangeContainerEl.firstChild.value / 100
 				);

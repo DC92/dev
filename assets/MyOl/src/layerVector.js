@@ -359,7 +359,7 @@ function memCheckbox(selectorName, callback) {
 
 	// Set the <inputs> accordingly with the cookies or url args
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { // for doesn't work on element array
+		for (let e = 0; e < inputEls.length; e++) { //BEST ?? HACK for doesn't work on element array
 			// Set inputs following cookies & args
 			inputEls[e].checked =
 				values.indexOf(inputEls[e].value) != -1 || // That one is declared
@@ -390,7 +390,7 @@ function memCheckbox(selectorName, callback) {
 		let allIndex = -1, // Index of the "all" <input> if any
 			allCheck = true; // Are all others checked ?
 
-		for (let e = 0; e < inputEls.length; e++) {
+		for (let e = 0; e < inputEls.length; e++) { //BEST ??
 			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
 				inputEls[e].checked = target.checked; // Force all the others to the same
 			else if (inputEls[e].value == 'on') // The "all" <input>
