@@ -103,6 +103,7 @@ FILES
 
 TESTED ON
 =========
-* windows : Chrome, FireFox, Edge, Opera, Brave
-* Android : Chrome, FireFox, Samsung Internet
+* windows10 : Edge, FireFox, Chrome, Opera, Brave
+* Android : Samsung Internet, FireFox, Chrome, Brave, DuckDuckGo
+* IOS7 : Safari, FireFox, Chrome
 * NO SUPPORT ON Microsoft Internet Explorer

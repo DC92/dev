@@ -870,7 +870,7 @@ function readCheckbox(selectorName, withOn) {
  * selectorName {string}
  * callback {function(selection)} action when the button is clicked
  *
- * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
+ * Mem / recover the checkboxes in localStorage, url args or hash
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
@@ -879,15 +879,15 @@ function memCheckbox(selectorName, callback) {
 		localStorage['myol_' + selectorName] :
 		readCheckbox(selectorName, true).join(',');
 
-	// Set the <inputs> accordingly with the cookies or url args
+	// Set the <inputs> accordingly with the localStorage or url args
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) {
-			// Set inputs following cookies & args
+			// Set inputs following localStorage & args
 			inputEls[e].checked =
 				values.indexOf(inputEls[e].value) != -1 || // That one is declared
 				values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
 
-			// Compute the all check && init the cookies if data has been given by the url
+			// Compute the all check && init the localStorage if data has been given by the url
 			checkEl(inputEls[e]);
 
 			// Attach the action
@@ -897,7 +897,7 @@ function memCheckbox(selectorName, callback) {
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
-		// Mem the data in the cookie
+		// Mem the data in the localStorage
 		const selection = readCheckbox(selectorName);
 
 		if (selectorName)
@@ -1458,15 +1458,15 @@ function controlButton(options) {
 
 /**
  * Permalink control
- * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
+ * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
 function controlPermalink(options) {
 	options = Object.assign({
-		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
-		setUrl: false, // Change url hash to position the map.
-		display: false, // Display link the map.
-		hash: '?', // {?, #} the permalink delimiter
+		init: true, // {true | false} use url hash or localStorage to position the map.
+		setUrl: false, // {true | false} Change url hash when moving the map.
+		display: false, // {true | false} Display permalink link the map.
+		hash: '?', // {?, #} the permalink delimiter after the url
 	}, options);
 	const aEl = document.createElement('a'),
 		control = new ol.control.Control({

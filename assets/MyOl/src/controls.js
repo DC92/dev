@@ -76,15 +76,15 @@ function controlButton(options) {
 
 /**
  * Permalink control
- * "map" url hash or cookie = {map=<ZOOM>/<LON>/<LAT>/<LAYER>}
+ * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
 function controlPermalink(options) {
 	options = Object.assign({
-		init: true, // {true | false} use url hash or "controlPermalink" cookie to position the map.
-		setUrl: false, // Change url hash to position the map.
-		display: false, // Display link the map.
-		hash: '?', // {?, #} the permalink delimiter
+		init: true, // {true | false} use url hash or localStorage to position the map.
+		setUrl: false, // {true | false} Change url hash when moving the map.
+		display: false, // {true | false} Display permalink link the map.
+		hash: '?', // {?, #} the permalink delimiter after the url
 	}, options);
 	const aEl = document.createElement('a'),
 		control = new ol.control.Control({
@@ -263,7 +263,7 @@ function controlGPS() {
 
 		control = controlButton({
 			className: 'ol-button ol-gps',
-			label: '&#x2295;',
+			label: '&#x2295;', //TODO BUG petit picto Android Chrome
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
 				'orange', // 1 : waiting physical GPS sensor position & altitude
@@ -466,6 +466,7 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
+//TODO export / import names and links
 //BEST Chemineur dans MyOl => Traduction sym (symbole export GPS ?)
 //BEST misc formats
 function controlLoadGPX(options) {
@@ -713,7 +714,7 @@ function controlsCollection(options) {
 	return [
 		// Top left
 		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
+		new ol.control.FullScreen(), //TODO BUG Symbole trop petit dans Android Chrome
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),

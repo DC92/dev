@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/javascript');
+//TODO BUG : essaye de loader le service worker quand on revient à l'URL de base MyOl/
 
 // Check new version each time the url is called
 header('Expires: '.date('r'));
@@ -8,7 +9,7 @@ header('Pragma: no-cache');
 header('Service-Worker-Allowed: /');
 
 //HACK avoid http 406 error
-$url_path = str_replace (':', '../', $_GET['url_path']);
+$url_path = str_replace (':', '../', @$_GET['url_path']);
 
 // Read service worker & replace some values
 $serviceWorkerCode = str_replace (

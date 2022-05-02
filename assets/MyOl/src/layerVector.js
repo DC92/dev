@@ -348,7 +348,7 @@ function readCheckbox(selectorName, withOn) {
  * selectorName {string}
  * callback {function(selection)} action when the button is clicked
  *
- * Mem the checkboxes in cookies / recover it from the cookies, url args or hash
+ * Mem / recover the checkboxes in localStorage, url args or hash
  * Manages a global flip-flop of the same named <input> checkboxes
  */
 function memCheckbox(selectorName, callback) {
@@ -357,15 +357,15 @@ function memCheckbox(selectorName, callback) {
 		localStorage['myol_' + selectorName] :
 		readCheckbox(selectorName, true).join(',');
 
-	// Set the <inputs> accordingly with the cookies or url args
+	// Set the <inputs> accordingly with the localStorage or url args
 	if (inputEls)
 		for (let e = 0; e < inputEls.length; e++) { //BEST ?? HACK for doesn't work on element array
-			// Set inputs following cookies & args
+			// Set inputs following localStorage & args
 			inputEls[e].checked =
 				values.indexOf(inputEls[e].value) != -1 || // That one is declared
 				values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
 
-			// Compute the all check && init the cookies if data has been given by the url
+			// Compute the all check && init the localStorage if data has been given by the url
 			checkEl(inputEls[e]);
 
 			// Attach the action
@@ -375,7 +375,7 @@ function memCheckbox(selectorName, callback) {
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
 
-		// Mem the data in the cookie
+		// Mem the data in the localStorage
 		const selection = readCheckbox(selectorName);
 
 		if (selectorName)
