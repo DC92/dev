@@ -263,7 +263,7 @@ function controlGPS() {
 
 		control = controlButton({
 			className: 'ol-button ol-gps',
-			label: '&#x2295;', //TODO BUG petit picto Android Chrome
+			label: '&#x2295;',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
 				'orange', // 1 : waiting physical GPS sensor position & altitude
@@ -466,7 +466,7 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-//TODO export / import names and links
+//BEST export / import names and links
 //BEST Chemineur dans MyOl => Traduction sym (symbole export GPS ?)
 //BEST misc formats
 function controlLoadGPX(options) {
@@ -714,7 +714,7 @@ function controlsCollection(options) {
 	return [
 		// Top left
 		new ol.control.Zoom(),
-		new ol.control.FullScreen(), //TODO BUG Symbole trop petit dans Android Chrome
+		new ol.control.FullScreen(),
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
