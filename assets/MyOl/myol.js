@@ -1888,8 +1888,9 @@ function controlLoadGPX(options) {
 						const properties = feature.getProperties(),
 							styleOptions = {
 								stroke: new ol.style.Stroke({
-									color: 'blue',
-									width: 2,
+									color: [0, 0, 128],
+									lineDash: [0, 20],
+									width: 8,
 								}),
 							};
 
