@@ -140,6 +140,9 @@ body,
 	font-weight: bold;
 	color: yellow;
 }
+.nouvelles a::first-letter {
+    text-transform: uppercase;
+}
 @media screen and (min-width: 600px) {
 	.nouvelles a {
 		text-overflow: ellipsis;

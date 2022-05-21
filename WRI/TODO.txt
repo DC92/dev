@@ -1,6 +1,7 @@
 BUG
 ===
 Ne nettoie pas les pictos de la carte en cas de modif
+Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 
 EVOLUTIONS MyOL
 ===============

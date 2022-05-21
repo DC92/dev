@@ -91,37 +91,32 @@ function layerStamen(subLayer, minResolution) {
  * var mapKeys.ign = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-function layerIGN(subLayer, options) {
-	options = options || {};
-	if (typeof mapKeys == 'undefined' || !mapKeys)
-		mapKeys = {};
+function layerIGN(options) {
+	options = Object.assign({
+		format: 'image/jpeg',
+		style: 'normal',
+	}, options);
 
-	if (options.key || mapKeys.ign) {
-		let IGNresolutions = [],
-			IGNmatrixIds = [];
+	let IGNresolutions = [],
+		IGNmatrixIds = [];
 
-		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
-			IGNmatrixIds[i] = i.toString();
-		}
-
-		return new ol.layer.Tile({
-			maxResolution: options.maxResolution,
-			source: new ol.source.WMTS({
-				url: '//wxs.ign.fr/' + (options.key || mapKeys.ign) + '/wmts',
-				layer: subLayer,
-				matrixSet: 'PM',
-				format: 'image/' + (options.format || 'jpeg'),
-				tileGrid: new ol.tilegrid.WMTS({
-					origin: [-20037508, 20037508],
-					resolutions: IGNresolutions,
-					matrixIds: IGNmatrixIds,
-				}),
-				style: 'normal',
-				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-			}),
-		});
+	for (let i = 0; i < 18; i++) {
+		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+		IGNmatrixIds[i] = i.toString();
 	}
+
+	return new ol.layer.Tile({
+		source: new ol.source.WMTS(Object.assign({
+			url: '//wxs.ign.fr/' + options.key + '/wmts',
+			matrixSet: 'PM',
+			tileGrid: new ol.tilegrid.WMTS({
+				origin: [-20037508, 20037508],
+				resolutions: IGNresolutions,
+				matrixIds: IGNmatrixIds,
+			}),
+			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
+		}, options)),
+	});
 }
 
 /**
@@ -255,18 +250,42 @@ function layersCollection() {
 		'OSM transport': layerThunderforest('transport'),
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'IGN TOP25': layerIGN('GEOGRAPHICALGRIDSYSTEMS.MAPS'), // Need an IGN key
-		'IGN V2': layerIGN('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', {
-			format: 'png',
-			key: 'pratique',
+		'IGN TOP25': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
+			key: mapKeys.ign,
 		}),
+		'IGN V2': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
+			key: 'essentiels',
+			format: 'image/png',
+		}),
+		'IGN cartes 1950': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950',
+			key: 'cartes/geoportail',
+		}),
+		'IGN E.M. 1820-66': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
+			key: 'cartes/geoportail',
+		}),
+		/*'IGN Cassini': layerIGN({
+			layer:'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+			key: 'x7yv499pbcguxhhxh8syehwe/geoportail',
+		}),*/
+		//TODO Cadastre
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS('Outdoor_3857'),
 		'Italie': layerIGM(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo IGN': layerIGN('ORTHOIMAGERY.ORTHOPHOTOS', {
-			key: 'pratique',
+		'Photo IGN': layerIGN({
+			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
+			key: 'essentiels',
+		}),
+		'Photo IGN 1950-65': layerIGN({
+			layer: 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965',
+			key: 'orthohisto/geoportail',
+			style: 'BDORTHOHISTORIQUE',
+			format: 'image/png',
 		}),
 		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': layerGoogle('s'),
