@@ -12,8 +12,7 @@ function controlLayerSwitcher(baseLayers, options) {
 		}),
 		layerNames = Object.keys(baseLayers);
 
-	var lastBaseLayerName = '',
-		transparentBaseLayerName = '';
+	var transparentBaseLayerName = '';
 
 	// Build html transparency slider
 	const rangeContainerEl = document.createElement('div');
@@ -60,7 +59,7 @@ function controlLayerSwitcher(baseLayers, options) {
 				selectionEl.firstChild.onclick = selectBaseLayer;
 				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				for (let l = 0; l < baseLayers[name].length; l++) { //BEST HACK IE
+				for (let l = 0; l < baseLayers[name].length; l++) {
 					baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
 					map.addLayer(baseLayers[name][l]);
 				}
@@ -79,68 +78,53 @@ function controlLayerSwitcher(baseLayers, options) {
 		}
 	};
 
-	function displayBaseLayers() {
-		// Refresh layers visibility & opacity
-		for (let name in baseLayers)
-			if (baseLayers[name]) {
-				baseLayers[name].inputEl.checked = false;
-				for (let l = 0; l < baseLayers[name].length; l++) { //BEST HACK IE
-					//for (let layer of baseLayers[name]) {
-					baseLayers[name][l].setVisible(false);
-					baseLayers[name][l].setOpacity(1);
-				}
-			}
+	function selectBaseLayer(evt) {
+		if (!evt || !evt.ctrlKey || this.value == localStorage.myol_baselayer) {
+			transparentBaseLayerName = '';
+			localStorage.myol_baselayer = this.value;
+		} else if (layerNames.indexOf(localStorage.myol_baselayer) < layerNames.indexOf(this.value)) {
+			transparentBaseLayerName = this.value;
+			// localStorage.myol_baselayer don't change
+		} else {
+			transparentBaseLayerName = localStorage.myol_baselayer;
+			localStorage.myol_baselayer = this.value;
+		}
 
+		rangeContainerEl.firstChild.value = 50;
+		displayBaseLayers();
+	}
+
+	function displayBaseLayers() {
 		// Baselayer default is the first of the selection
 		if (!baseLayers[localStorage.myol_baselayer])
 			localStorage.myol_baselayer = Object.keys(baseLayers)[0];
 
-		baseLayers[localStorage.myol_baselayer].inputEl.checked = true;
-		for (let l = 0; l < baseLayers[localStorage.myol_baselayer].length; l++) //BEST HACK IE
-			baseLayers[localStorage.myol_baselayer][l].setVisible(true);
+		for (let name in baseLayers) {
+			const visible = name == localStorage.myol_baselayer || name == transparentBaseLayerName;
 
-		if (lastBaseLayerName) {
-			baseLayers[lastBaseLayerName].inputEl.checked = true;
-			for (let l = 0; l < baseLayers[lastBaseLayerName].length; l++) //BEST HACK IE
-				baseLayers[lastBaseLayerName][l].setVisible(true);
+			// Write the checks
+			baseLayers[name].inputEl.checked = visible;
+
+			// Make the right layers visible
+			for (let l = 0; l < baseLayers[name].length; l++) {
+				baseLayers[name][l].setVisible(visible);
+				baseLayers[name][l].setOpacity(1);
+			}
 		}
+
 		displayTransparencyRange();
 	}
 
 	function displayTransparencyRange() {
 		if (transparentBaseLayerName) {
-			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++) //BEST HACK IE
+			for (let l = 0; l < baseLayers[transparentBaseLayerName].length; l++)
 				baseLayers[transparentBaseLayerName][l].setOpacity(
 					rangeContainerEl.firstChild.value / 100
 				);
+
 			rangeContainerEl.className = 'double-layer';
 		} else
 			rangeContainerEl.className = 'single-layer';
-	}
-
-	function selectBaseLayer(evt) {
-		// Mem the baseLayer
-		localStorage.myol_baselayer = this.value;
-
-		// Manage the double selection
-		if (evt && evt.ctrlKey && this.value != localStorage.myol_baselayer) {
-			lastBaseLayerName = localStorage.myol_baselayer;
-
-			transparentBaseLayerName =
-				layerNames.indexOf(lastBaseLayerName) > layerNames.indexOf(this.value) ?
-				lastBaseLayerName :
-				this.value;
-
-			baseLayers[transparentBaseLayerName].inputEl.checked = true;
-			rangeContainerEl.firstChild.value = 50;
-		} else
-			lastBaseLayerName =
-			transparentBaseLayerName = '';
-
-		localStorage.myol_baselayer = this.value;
-		baseLayers[localStorage.myol_baselayer].inputEl.checked = true;
-
-		displayBaseLayers();
 	}
 
 	return control;
