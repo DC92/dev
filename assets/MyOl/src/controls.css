@@ -71,12 +71,14 @@
 	border-radius: 2px;
 	background: white;
 }
+.gcd-gl-control:not(.gcd-gl-expanded) {
+	display: none;
+}
 .gcd-gl-control,
 .gcd-gl-control:hover {
 	top: 27px;
-	background: rgba(0, 0, 0, 0); /* Transparent */
 }
-.gcd-gl-input:focus {
+.gcd-gl-input {
 	margin-left: -32px;
 }
 .gcd-gl-result {
