@@ -497,18 +497,19 @@ function controlLayerSwitcher(baseLayers, options) {
 		if (!baseLayers[localStorage.myol_baselayer])
 			localStorage.myol_baselayer = Object.keys(baseLayers)[0];
 
-		for (let name in baseLayers) {
-			const visible = name == localStorage.myol_baselayer || name == transparentBaseLayerName;
+		for (let name in baseLayers)
+			if (baseLayers[name]) {
+				const visible = name == localStorage.myol_baselayer || name == transparentBaseLayerName;
 
-			// Write the checks
-			baseLayers[name].inputEl.checked = visible;
+				// Write the checks
+				baseLayers[name].inputEl.checked = visible;
 
-			// Make the right layers visible
-			for (let l = 0; l < baseLayers[name].length; l++) {
-				baseLayers[name][l].setVisible(visible);
-				baseLayers[name][l].setOpacity(1);
+				// Make the right layers visible
+				for (let l = 0; l < baseLayers[name].length; l++) {
+					baseLayers[name][l].setVisible(visible);
+					baseLayers[name][l].setOpacity(1);
+				}
 			}
-		}
 
 		displayTransparencyRange();
 	}

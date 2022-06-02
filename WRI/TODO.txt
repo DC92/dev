@@ -1,13 +1,8 @@
 BUG
 ===
 Ne nettoie pas les pictos de la carte en cas de modif
+Ne'affiche pas le massif modifié en cas de modif
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-
-EVOLUTIONS MyOL
-===============
-controlFullScreen => new ol.control.FullScreen
-delete apple-mobile-web-app-capable & apple-mobile-web-app-capable
-delete ol-681 et autres supports IE
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -40,7 +35,6 @@ Pas de favicon dans S20 accueil FF
 Lien le forum est vide, => lien ne marche pas
 Auteur demande corrections
 Liste users surs / utilitaire scan liens
-GPS : reprendre le baselayers de WRI (pas de google)
 service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 ? historique posts phpbb wri (ext/...)
