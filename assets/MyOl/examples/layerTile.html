@@ -61,6 +61,9 @@ const map = new ol.Map({
 	}),
 	controls: [
 		new ol.control.Zoom(),
+		new ol.control.Attribution({
+			collapsed: false,
+		}),
 		controlLayerSwitcher(layersDemo()),
 	],
 });

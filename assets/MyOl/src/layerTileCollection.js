@@ -107,7 +107,7 @@ function layerIGN(options) {
 
 	return new ol.layer.Tile({
 		source: new ol.source.WMTS(Object.assign({
-			url: '//wxs.ign.fr/' + options.key + '/wmts',
+			url: 'https://wxs.ign.fr/' + options.key + '/wmts',
 			matrixSet: 'PM',
 			tileGrid: new ol.tilegrid.WMTS({
 				origin: [-20037508, 20037508],
@@ -211,6 +211,7 @@ function layerOS(subLayer) {
 				source: new ol.source.XYZ({
 					url: 'https://api.os.uk/maps/raster/v1/zxy/' + subLayer +
 						'/{z}/{x}/{y}.png?key=' + mapKeys.os,
+					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
 				}),
 			}),
 		];
@@ -218,7 +219,7 @@ function layerOS(subLayer) {
 
 /**
  * Bing (Microsoft)
- * var mapKeys.bing = Get your own (free) key at http://www.ordnancesurvey.co.uk/business-and-government/products/os-openspace/
+ * var mapKeys.bing = Get your own (free) key at https://docs.microsoft.com/en-us/bingmaps/getting-started/
  */
 function layerBing(subLayer) {
 	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
@@ -317,6 +318,6 @@ function layersDemo() {
 		'Stamen': layerStamen('terrain'),
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
-		//BEST neutral layer
+		'Blank': new ol.layer.Tile(),
 	});
 }

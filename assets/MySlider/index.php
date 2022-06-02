@@ -13,6 +13,10 @@
 	$diapos = [];
 	foreach (glob('*.*g') AS $f)
 		$diapos[] = [$f, ''];
+
+//TODO Slider bouton départ / son / full
+//TODO Slider bouton son
+//TODO resize ImageMagick
 ?>
 
 <body>
