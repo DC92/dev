@@ -445,6 +445,7 @@ function styleOptionsIconChemineur(iconName) {
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
 
 		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
+		//TODO BUG detect svg support on canvas & modify extention / do for all svg
 	}
 }
 

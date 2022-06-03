@@ -85,6 +85,7 @@ function layerEditGeoJson(options) {
 		modify = new ol.interaction.Modify({
 			source: source,
 			pixelTolerance: displayPointEl ? 16 : 6, // Default is 10
+			//TODO BUG un point fantome perturbe la sélection et double l'affichage
 			style: editStyle,
 		}),
 		controlModify = controlButton({

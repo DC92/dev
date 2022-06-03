@@ -34,7 +34,7 @@ function get ($file) {
 	echo "$file, ";
 	return "/* FILE src/$file */\n".
 		preg_replace (
-			'/\n?[ \t]*\/\/(TODO|BEST|HACK)[^\n]*/', '',
+			'/\n?[ \t]*\/\/[A-Z][^\n]*/', '',
 			file_get_contents ('src/'.$file)
 		);
 }
