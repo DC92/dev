@@ -18,7 +18,7 @@ function layerGeoBB(options) {
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : null,
+				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
 				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
 				attribution: options.attribution,
 			};
@@ -67,7 +67,7 @@ function layerWri(options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				icon: options.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
 				url: options.noClick ? null : properties.lien,

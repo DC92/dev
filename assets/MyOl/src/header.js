@@ -51,6 +51,14 @@ function JSONparse(json) {
 }
 
 /**
+ * Icon extension depending on the OS
+ */
+function iconCanvasExt() {
+	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
+	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
+}
+
+/**
  * Warn layers when added to the map
  */
 //BEST DELETE (used by editor)

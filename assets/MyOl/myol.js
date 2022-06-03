@@ -57,6 +57,14 @@ function JSONparse(json) {
 }
 
 /**
+ * Icon extension depending on the OS
+ */
+function iconCanvasExt() {
+	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
+	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
+}
+
+/**
  * Warn layers when added to the map
  */
 ol.Map.prototype.handlePostRender = function() {
@@ -970,7 +978,7 @@ function styleOptionsIconChemineur(iconName) {
 
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
 
-		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
+		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
 	}
 }
 
@@ -1106,7 +1114,7 @@ function layerGeoBB(options) {
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.svg' : null,
+				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
 				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
 				attribution: options.attribution,
 			};
@@ -1155,7 +1163,7 @@ function layerWri(options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				icon: options.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
 				ele: properties.coord.alt,
 				capacity: properties.places.valeur,
 				url: options.noClick ? null : properties.lien,
