@@ -69,7 +69,7 @@ See an OFF LINE GPS DEMO [here](https://Dominique92.github.io/dev/assets/MyOl/gp
 * All tiles viewed once will be kept in the explorer's cache for a few days
 * This application does not record your track
 * Works well on Android with Chrome, Edge & Samsung Internet, a little less well with Firefox & Safari
-* Not tested on iOs
+* Tested on iOS7 (iPhone5s) Safari, FireFox, Chrome
 
 LAYERS KEYS
 ===========
@@ -104,6 +104,6 @@ FILES
 TESTED ON
 =========
 * windows10 : Edge, FireFox, Chrome, Opera, Brave
-* Android : Samsung Internet, FireFox, Chrome, Brave, DuckDuckGo
-* IOS7 : Safari, FireFox, Chrome
+* Android (Samsung) : Samsung Internet, FireFox, Chrome, Brave, DuckDuckGo
+* iOS7 (iPhone5s) : Safari, FireFox, Chrome
 * NO SUPPORT ON Microsoft Internet Explorer
