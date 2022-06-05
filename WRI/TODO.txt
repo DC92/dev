@@ -3,6 +3,7 @@ BUG
 Ne nettoie pas les pictos de la carte en cas de modif
 Ne'affiche pas le massif modifié en cas de modif
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
+Carte nav affiche les massifs pour les gros massifs => zoom ?
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -13,8 +14,6 @@ https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
 Lien vers … la page de liens (en menu)
 BUG ne voit pas le forum développement
 
-EVOLUTION WRI PAGE ACCUEIL
-==========================
 Accueil carte
 	installable ?
 	haut

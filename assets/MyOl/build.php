@@ -26,6 +26,7 @@ $js[] = get ('layerSwitcher.js');
 $js[] = get ('layerVector.js');
 $js[] = get ('layerVectorCollection.js');
 $js[] = get ('controls.js');
+$js[] = get ('marker.js');
 $js[] = get ('editor.js');
 file_put_contents ('myol.js', implode ("\n\n", $js));
 echo 'TO myol.js</p>';

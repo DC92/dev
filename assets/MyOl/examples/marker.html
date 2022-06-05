@@ -25,7 +25,7 @@ Based on https://openlayers.org
 	<script src="../src/header.js"></script>
 	<link  href="../src/controls.css" type="text/css" rel="stylesheet">
 	<script src="../src/controls.js"></script>
-	<script src="../src/editor.js"></script>
+	<script src="../src/marker.js"></script>
 
 	<style>
 		#map {
@@ -33,6 +33,9 @@ Based on https://openlayers.org
 			max-width: 600px;
 			height: 80vw;
 			max-height: 400px;
+		}
+		#viseur-coords:not(.epsg21781) .xy {
+			display: none;
 		}
 	</style>
 </head>
@@ -47,24 +50,31 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<!-- Fixed marker -->
-	<p><b>Cadre :</b> <span id="fix-marker"></span></p>
+	<input type="hidden" id="marker-json" value='{"type":"Point","coordinates":[2.34,48.86]}' /></p>
+	<p><b>Cadre :</b> <span id="marker-string"></span></p>
 
 	<!-- Draggable marker -->
-	<b>Viseur :</b>
-	<input type="text" id="drag-marker-json" style="width:50%" value='{
-		"type": "Point",
-		"coordinates": [7,47]
-	}' />
-	<div id="drag-marker">
+	<div id="viseur-coords">
+		<p><b>Colimateur :</b>
+			<span id="viseur-string"></span>
+			<select id="viseur-select">
+				<option value="dec" selected="selected">Degrés décimaux</option>
+				<option value="dms">Deg Min Sec</option>
+				<option class="xy" value="swiss">Suisse</option>
+				<option value="utm">UTM</option>
+			</select>
+		</p>
+
+		<p><input id="viseur-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' /></p>
 		<p>
 			Longitude :
-			<input type="text" name="lon" size="12" maxlength="12"> (WGS84)&nbsp;
-			 <span style="display:none" class="epsg-21781"> / X : <input type="text" name="x" size="7" maxlength="12"> (CH 1903)</span>
+			<input id="viseur-lon" type="text" name="lon" size="12" maxlength="12" value="12" /> (WGS84)&nbsp;
+			 <span class="xy"> / X : <input id="viseur-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
 		</p>
 		<p>
 			Latitude :
-			<input type="text" name="lat" size="12" maxlength="12"> (WGS84)&nbsp;
-			<span style="display:none" class="epsg-21781"> / Y : <input type="text" name="y" size="7" maxlength="12"></span>
+			<input id="viseur-lat" type="text" name="lat" size="12" maxlength="12"> (WGS84)&nbsp;
+			<span class="xy"> / Y : <input id="viseur-y" type="text" value="21" name="y" size="7" maxlength="12"></span>
 		</p>
 	</div>
 
@@ -77,41 +87,6 @@ Based on https://openlayers.org
 	</a></p>
 
 	<script>
-const cadre = layerEditGeoJson({
-		displayPointId: 'fix-marker',
-		singlePoint: true,
-		geoJson: {
-			type: 'Point',
-			coordinates: [2, 48],
-		},
-		styleOptions: {
-			image: new ol.style.Icon({
-				src: 'images/cadre.' + iconCanvasExt(),
-			}),
-		},
-	}),
-
-	viseur = layerEditGeoJson({
-		displayPointId: 'drag-marker',
-		geoJsonId: 'drag-marker-json',
-		dragPoint: true,
-		singlePoint: true,
-		styleOptions: {
-			image: new ol.style.Icon({
-				src: 'images/viseur.' + iconCanvasExt(),
-			}),
-		},
-		// Remove FeatureCollection packing of the point
-		saveFeatures: function(coordinates, format) {
-			return format.writeGeometry(
-				new ol.geom.Point(coordinates.points[0]), {
-					featureProjection: 'EPSG:3857',
-					decimals: 5,
-				}
-			);
-		},
-	});
-
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
@@ -122,8 +97,8 @@ new ol.Map({
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
-		cadre,
-		viseur,
+		layerMarker('images/cadre.png'),
+		layerMarker('images/viseur.png', true, 'viseur'),
 	],
 });
 	</script>

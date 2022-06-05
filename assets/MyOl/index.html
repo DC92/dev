@@ -41,17 +41,7 @@ Based on https://openlayers.org
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
 
 	<div id="map"></div>
-
-	<div id="additional-selector">
-		<hr />
-		Chemineur
-		<input type="checkbox" name="geobb-features" checked="checked" />
-		<ul>
-			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
-			<li><input type="checkbox" name="geobb-features" value="8" />Abri</li>
-			<li><input type="checkbox" name="geobb-features" value="23" />Montagne</li>
-		</ul>
-	</div>
+	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
 	<script>
 // Must be after the <div id="map"> tag
@@ -73,6 +63,7 @@ new ol.Map({
 			minResolution: 300,
 			distance: 30,
 		}),
+		layerMarker('examples/images/viseur.png', true),
 	],
 });
 	</script>

@@ -76,7 +76,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			controlGPS(),
 
 			liTags.length ? controlButton({
-				label: '\u25B3',
+				label: '\u25B3', //BEST un meilleur picto ?
 				title: 'Choisir une trace dans la liste / fermer',
 				activate: function() {
 					if (elListe)
