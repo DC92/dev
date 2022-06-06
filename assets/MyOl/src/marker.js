@@ -1,4 +1,4 @@
-function layerMarker(image, drag, prefix) {
+function layerMarker(image, dragable, prefix) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
 		layer = new ol.layer.Vector({
@@ -56,7 +56,7 @@ function layerMarker(image, drag, prefix) {
 			const ll3857 = ol.proj.transform(ll, proj, 'EPSG:3857'),
 				ll4326 = ol.proj.transform(ll, proj, 'EPSG:4326');
 
-			// Move the viewfinder
+			// Move the marker
 			point.setCoordinates(ll3857);
 
 			// Populate inputs
@@ -99,8 +99,9 @@ function layerMarker(image, drag, prefix) {
 		}
 	}
 
-	// Drag the viewfinder
-	if (drag) {
+	// Edit the marker position
+	//TODO BUG answer should stay in -180 +180 ° wrap
+	if (dragable) {
 		const dragInteraction = new ol.interaction.Pointer({
 			handleDownEvent: function(evt) {
 				return evt.map.getFeaturesAtPixel(evt.pixel, {
@@ -115,7 +116,14 @@ function layerMarker(image, drag, prefix) {
 		});
 
 		layer.once('myol:onadd', function(evt) {
+			// Drag the marker
 			evt.map.addInteraction(dragInteraction);
+
+			// Get the marker at the dblclick position
+			evt.map.on('dblclick', function(evt) {
+				changeLL(evt.coordinate, 'EPSG:3857');
+				return false;
+			});
 		});
 	}
 

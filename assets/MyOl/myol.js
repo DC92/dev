@@ -2123,7 +2123,7 @@ function controlsCollection(options) {
 }
 
 /* FILE src/marker.js */
-function layerMarker(image, drag, prefix) {
+function layerMarker(image, dragable, prefix) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
 		layer = new ol.layer.Vector({
@@ -2181,7 +2181,7 @@ function layerMarker(image, drag, prefix) {
 			const ll3857 = ol.proj.transform(ll, proj, 'EPSG:3857'),
 				ll4326 = ol.proj.transform(ll, proj, 'EPSG:4326');
 
-			// Move the viewfinder
+			// Move the marker
 			point.setCoordinates(ll3857);
 
 			// Populate inputs
@@ -2224,8 +2224,8 @@ function layerMarker(image, drag, prefix) {
 		}
 	}
 
-	// Drag the viewfinder
-	if (drag) {
+	// Edit the marker position
+	if (dragable) {
 		const dragInteraction = new ol.interaction.Pointer({
 			handleDownEvent: function(evt) {
 				return evt.map.getFeaturesAtPixel(evt.pixel, {
@@ -2240,7 +2240,14 @@ function layerMarker(image, drag, prefix) {
 		});
 
 		layer.once('myol:onadd', function(evt) {
+			// Drag the marker
 			evt.map.addInteraction(dragInteraction);
+
+			// Get the marker at the dblclick position
+			evt.map.on('dblclick', function(evt) {
+				changeLL(evt.coordinate, 'EPSG:3857');
+				return false;
+			});
 		});
 	}
 
@@ -2249,8 +2256,7 @@ function layerMarker(image, drag, prefix) {
 
 /* FILE src/editor.js */
 /**
- * geoJson points, lines & polygons display
- * Marker position display & edit
+ * geoJson lines & polygons display
  * Lines & polygons edit
  * Requires JSONparse, myol:onadd, controlButton (from src/controls.js file)
  */
@@ -2311,9 +2317,6 @@ function layerEditGeoJson(options) {
 	}, options);
 
 	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
-		displayPointEl = document.getElementById(options.displayPointId), // Pointer edit <input>
-		inputEls = displayPointEl ? displayPointEl.getElementsByTagName('input') : {},
-
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		style = escapedStyle(options.styleOptions),
 		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
@@ -2334,7 +2337,6 @@ function layerEditGeoJson(options) {
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
-			pixelTolerance: displayPointEl ? 16 : 6, // Default is 10
 			style: editStyle,
 		}),
 		controlModify = controlButton({
@@ -2346,12 +2348,6 @@ function layerEditGeoJson(options) {
 				activate(state, modify);
 			},
 		});
-
-	// Set edit fields actions
-	for (let i = 0; i < inputEls.length; i++) {
-		inputEls[i].onchange = editPoint;
-		inputEls[i].source = source;
-	}
 
 	// Snap on vector layers
 	options.snapLayers.forEach(function(layer) {
@@ -2372,7 +2368,7 @@ function layerEditGeoJson(options) {
 		optimiseEdited(); // Treat the geoJson input as any other edit
 
 		// Add required controls
-		if (options.titleModify || options.dragPoint) {
+		if (options.titleModify) {
 			map.addControl(controlModify);
 			controlModify.toggle(true);
 		}
@@ -2511,118 +2507,6 @@ function layerEditGeoJson(options) {
 		}
 	}
 
-	layer.centerMarker = function() {
-		source.getFeatures().forEach(function(f) {
-			f.getGeometry().setCoordinates(
-				layer.map_.getView().getCenter()
-			);
-		});
-		optimiseEdited(); // Check CH1903 feilds visibility
-	};
-
-	layer.centerMap = function() {
-		source.getFeatures().forEach(function(f) {
-			layer.map_.getView().setCenter(
-				f.getGeometry().getCoordinates()
-			);
-		});
-	};
-
-	function editPoint(evt) {
-		const ll = evt.target.name.length == 3 ?
-			ol.proj.transform([inputEls.lon.value, inputEls.lat.value], 'EPSG:4326', 'EPSG:3857') : // Modify lon | lat
-			ol.proj.transform([parseInt(inputEls.x.value), parseInt(inputEls.y.value)], 'EPSG:21781', 'EPSG:3857'); // Modify x | y
-
-		evt.target.source.getFeatures().forEach(function(f) {
-			f.getGeometry().setCoordinates(ll);
-		});
-
-		optimiseEdited();
-	}
-
-	function displayPoint(ll) {
-		if (displayPointEl) {
-			const ll4326 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:4326'),
-				formats = {
-					decimal: ['Degrés décimaux', 'EPSG:4326', 'format',
-						'Longitude: {x}, Latitude: {y}',
-						5
-					],
-					degminsec: ['Deg Min Sec', 'EPSG:4326', 'toStringHDMS'],
-				};
-
-			let ll21781 = null;
-			if (typeof proj4 == 'function') {
-				// Specific Swiss coordinates EPSG:21781 (CH1903 / LV03)
-				if (ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll)) {
-					proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
-					ol.proj.proj4.register(proj4);
-					ll21781 = ol.proj.transform(ll, 'EPSG:3857', 'EPSG:21781');
-
-					formats.swiss = ['Suisse', 'EPSG:21781', 'format', 'X= {x} Y= {y} (CH1903)'];
-				}
-
-				// Fuseau UTM
-				const u = Math.floor(ll4326[0] / 6 + 90) % 60 + 1;
-				formats.utm = ['UTM', 'EPSG:326' + u, 'format', 'UTM ' + u + ' lon: {x}, lat: {y}'];
-				proj4.defs('EPSG:326' + u, '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
-				ol.proj.proj4.register(proj4);
-			}
-			// Display or not the EPSG:21781 coordinates
-			const epsg21781 = document.getElementsByClassName('epsg-21781');
-			for (let e = 0; e < epsg21781.length; e++)
-				epsg21781[e].style.display = ll21781 ? '' : 'none';
-
-			if (inputEls.length)
-				// Set the html input
-				for (let i = 0; i < inputEls.length; i++)
-					switch (inputEls[i].name) {
-						case 'lon':
-							inputEls[i].value = Math.round(ll4326[0] * 100000) / 100000;
-							break;
-						case 'lat':
-							inputEls[i].value = Math.round(ll4326[1] * 100000) / 100000;
-							break;
-						case 'x':
-							inputEls[i].value = ll21781 ? Math.round(ll21781[0]) : '-';
-							break;
-						case 'y':
-							inputEls[i].value = ll21781 ? Math.round(ll21781[1]) : '-';
-							break;
-					}
-			else {
-				// Set the html display
-				if (!formats[options.displayFormat])
-					options.displayFormat = 'decimal';
-
-				let f = formats[options.displayFormat],
-					html = ol.coordinate[f[2]](
-						ol.proj.transform(ll, 'EPSG:3857', f[1]),
-						f[3], f[4], f[5]
-					) + ' <select>';
-
-				for (let f in formats)
-					html += '<option value="' + f + '"' +
-					(f == options.displayFormat ? ' selected="selected"' : '') + '>' +
-					formats[f][0] + '</option>';
-
-				displayPointEl.innerHTML = html.replace(
-					/( [-0-9]+)([0-9][0-9][0-9],? )/g,
-					function(whole, part1, part2) {
-						return part1 + ' ' + part2;
-					}
-				) + '</select>';
-			}
-			// Select action
-			const selects = displayPointEl.getElementsByTagName('select');
-			if (selects.length)
-				selects[0].onchange = function(evt) {
-					options.displayFormat = evt.target.value;
-					displayPoint(ll);
-				};
-		}
-	}
-
 	function escapedStyle(a, b, c) {
 		const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
 		return function(feature) {
@@ -2650,46 +2534,21 @@ function layerEditGeoJson(options) {
 
 		// Recreate features
 		source.clear();
-		if (options.singlePoint) {
-			// Initialise the marker at the center on the map if no coords are available
-			coords.points.push(layer.map_.getView().getCenter());
-
-			// Keep only the first point
-			if (coords.points[0])
-				source.addFeature(new ol.Feature({
-					geometry: new ol.geom.Point(coords.points[0]),
-					draggable: options.dragPoint,
-				}));
-		} else {
-			for (let p in coords.points)
-				source.addFeature(new ol.Feature({
-					geometry: new ol.geom.Point(coords.points[p]),
-					draggable: options.dragPoint,
-				}));
-			for (let l in coords.lines)
-				source.addFeature(new ol.Feature({
-					geometry: new ol.geom.LineString(coords.lines[l]),
-				}));
-			for (let p in coords.polys)
-				source.addFeature(new ol.Feature({
-					geometry: new ol.geom.Polygon(coords.polys[p]),
-				}));
-		}
-
-		// Display & edit 1st point coordinates
-		if (coords.points.length && displayPointEl)
-			displayPoint(coords.points[0]);
-
-		// Save geometries in <EL> as geoJSON at every change
-		if (geoJsonEl)
-			geoJsonEl.value = options.saveFeatures(coords, options.format);
+		for (let l in coords.lines)
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.LineString(coords.lines[l]),
+			}));
+		for (let p in coords.polys)
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.Polygon(coords.polys[p]),
+			}));
 	}
 
 	return layer;
 }
 
 /**
- * Refurbish Points, Lines & Polygons
+ * Refurbish Lines & Polygons
  * Split lines having a summit at deleteCoords
  * Common to controlDownload & layerEditGeoJson
  */
