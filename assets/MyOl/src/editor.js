@@ -175,7 +175,8 @@ function layerEditGeoJson(options) {
 			evt.mapBrowserEvent.coordinate,
 			snap.getMap()
 		);
-		if (evt.mapBrowserEvent.originalEvent.altKey)
+
+		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)
 			optimiseEdited(newFeature.vertex);
 
 		// Finish

@@ -2123,6 +2123,10 @@ function controlsCollection(options) {
 }
 
 /* FILE src/marker.js */
+/**
+ * Marker position display & edit
+ * Requires myol:onadd
+ */
 function layerMarker(image, dragable, prefix) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
@@ -2430,7 +2434,8 @@ function layerEditGeoJson(options) {
 			evt.mapBrowserEvent.coordinate,
 			snap.getMap()
 		);
-		if (evt.mapBrowserEvent.originalEvent.altKey)
+
+		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)
 			optimiseEdited(newFeature.vertex);
 
 		// Finish

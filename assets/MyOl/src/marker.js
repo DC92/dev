@@ -1,3 +1,7 @@
+/**
+ * Marker position display & edit
+ * Requires myol:onadd
+ */
 function layerMarker(image, dragable, prefix) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
