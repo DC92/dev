@@ -1,6 +1,11 @@
 /**
  * Marker position display & edit
  * Requires myol:onadd
+ * Options:
+ *   image : url of the marker image
+ *   prefix : id prefix of input/output values
+ *   focus : center & zoom on the marker
+ *   dragable : can draw the marker to edit position
  */
 function layerMarker(options) {
 	const els = [],
