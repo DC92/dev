@@ -9,6 +9,7 @@
 //TODO BUG geocoder dont't accept enter on posting.php
 //TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
 //BEST calcul dénivelé / profil
+//BEST inversion de la trace
 
 namespace Dominique92\GeoBB\event;
 
