@@ -2,7 +2,7 @@
  * Marker position display & edit
  * Requires myol:onadd
  */
-function layerMarker(image, dragable, prefix) {
+function layerMarker(options) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
 		layer = new ol.layer.Vector({
@@ -13,7 +13,7 @@ function layerMarker(image, dragable, prefix) {
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
 					anchor: [0.5, 0.5],
-					src: image,
+					src: options.image,
 				}),
 			}),
 		});
@@ -34,7 +34,7 @@ function layerMarker(image, dragable, prefix) {
 
 	// Collect all entries elements
 	['json', 'lon', 'lat', 'x', 'y', 'coords', 'select', 'string'].forEach(i => {
-		els[i] = document.getElementById((prefix || 'marker') + '-' + i) || document.createElement('div');
+		els[i] = document.getElementById((options.prefix || 'marker') + '-' + i) || document.createElement('div');
 		els[i].onchange = onChange;
 	});
 
@@ -45,7 +45,7 @@ function layerMarker(image, dragable, prefix) {
 	// Read new values
 	function onChange() {
 		if (this.id[7] == 'j') { // json
-			const json = (els.json.value).match(/([0-9\.]+),([0-9\.]+)/);
+			const json = (els.json.value).match(/([0-9\.]+)[, ]*([0-9\.]+)/);
 			if (json)
 				changeLL(json.slice(1), 'EPSG:4326');
 		} else if (this.id[7] == 'l') // lon | lat
@@ -55,10 +55,14 @@ function layerMarker(image, dragable, prefix) {
 	}
 
 	// Display values
-	function changeLL(ll, proj) {
+	function changeLL(ll, projection) {
 		if (ll[0] && ll[1]) {
-			const ll3857 = ol.proj.transform(ll, proj, 'EPSG:3857'),
-				ll4326 = ol.proj.transform(ll, proj, 'EPSG:4326');
+			// Wrap +-180°
+			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);
+			ll[0] -= Math.round(ll[0] / bounds[0] / 2) * bounds[0] * 2;
+
+			const ll3857 = ol.proj.transform(ll, projection, 'EPSG:3857'),
+				ll4326 = ol.proj.transform(ll, projection, 'EPSG:4326');
 
 			// Move the marker
 			point.setCoordinates(ll3857);
@@ -78,10 +82,10 @@ function layerMarker(image, dragable, prefix) {
 				// UTM zones
 				const z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
 					u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
-					llutm = ol.proj.transform(ll, proj, 'EPSG:' + u);
+					llutm = ol.proj.transform(ll, projection, 'EPSG:' + u);
 
 				// Swiss
-				const ll21781 = ol.proj.transform(ll, proj, 'EPSG:21781');
+				const ll21781 = ol.proj.transform(ll, projection, 'EPSG:21781');
 				els.x.value = Math.round(ll21781[0]);
 				els.y.value = Math.round(ll21781[1]);
 
@@ -103,33 +107,36 @@ function layerMarker(image, dragable, prefix) {
 		}
 	}
 
-	// Edit the marker position
-	//TODO BUG answer should stay in -180 +180 ° wrap
-	if (dragable) {
-		const dragInteraction = new ol.interaction.Pointer({
-			handleDownEvent: function(evt) {
-				return evt.map.getFeaturesAtPixel(evt.pixel, {
-					layerFilter: function(l) {
-						return l.ol_uid == layer.ol_uid;
-					}
-				}).length;
-			},
-			handleDragEvent: function(evt) {
-				changeLL(evt.coordinate, 'EPSG:3857');
-			},
-		});
+	layer.once('myol:onadd', function(evt) {
+		// Focus map on the marker
+		if (options.focus) {
+			evt.map.getView().setCenter(point.getCoordinates());
+			evt.map.getView().setZoom(options.focus);
+		}
 
-		layer.once('myol:onadd', function(evt) {
+		// Edit the marker position
+		if (options.dragable) {
 			// Drag the marker
-			evt.map.addInteraction(dragInteraction);
+			evt.map.addInteraction(new ol.interaction.Pointer({
+				handleDownEvent: function(evt) {
+					return evt.map.getFeaturesAtPixel(evt.pixel, {
+						layerFilter: function(l) {
+							return l.ol_uid == layer.ol_uid;
+						}
+					}).length;
+				},
+				handleDragEvent: function(evt) {
+					changeLL(evt.coordinate, 'EPSG:3857');
+				},
+			}));
 
 			// Get the marker at the dblclick position
 			evt.map.on('dblclick', function(evt) {
 				changeLL(evt.coordinate, 'EPSG:3857');
 				return false;
 			});
-		});
-	}
+		}
+	});
 
 	return layer;
 }

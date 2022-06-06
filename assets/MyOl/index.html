@@ -63,7 +63,10 @@ new ol.Map({
 			minResolution: 300,
 			distance: 30,
 		}),
-		layerMarker('examples/images/viseur.png', true),
+		layerMarker({
+			image: 'examples/images/viseur.png',
+			dragable: true,
+		}),
 	],
 });
 	</script>

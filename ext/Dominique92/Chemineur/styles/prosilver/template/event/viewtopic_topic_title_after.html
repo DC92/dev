@@ -15,9 +15,13 @@
 				<span>(<a href="viewforum.php?f={FORUM_ID}" title="Voir les autres {FORUM_NAME}s">{FORUM_NAME}</a>)</span>
 			</h1>
 
-			<h3 id="point-coordinates"></h3>
+			<h3 id="marker-position"></h3>
 			<script>
-				var displayPointId = 'point-coordinates';
+				// Place l'affichage de la position dans l'étiquette
+				document.getElementById('marker-position')
+					.appendChild(
+						document.getElementById('marker-string')
+					);
 			</script>
 
 			<!-- IF GEO_ALTITUDE -->

@@ -27,36 +27,17 @@ var map = new ol.Map({
 				distance: 30,
 			}),
 		],
-	}),
-
-	// Point marker
-	marker = layerEditGeoJson({
-		geoJsonId: 'geo_json',
-		displayPointId: typeof displayPointId == 'string' ? displayPointId : 'point-marker',
-		singlePoint: mapType == 'point',
-		dragPoint: scriptName == 'posting',
-		focus: 15,
-		styleOptions: {
-			image: new ol.style.Icon({
-				src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
-			}),
-			stroke: new ol.style.Stroke({
-				color: [0, 0, 128],
-				lineDash: [0, 20],
-				width: 8,
-			}),
-		},
 	});
 
 if (scriptName == 'viewtopic')
-	map.addLayer(marker);
+	map.addLayer(layerMarker('ext/Dominique92/GeoBB/styles/prosilver/theme/images/viewtopic.svg'));
 
 if (scriptName == 'posting' && mapType == 'point')
-	map.addLayer(marker);
+	map.addLayer(layerMarker('ext/Dominique92/GeoBB/styles/prosilver/theme/images/posting.svg'), true);
 
 if (scriptName == 'posting' && mapType == 'line')
 	map.addLayer(layerEditGeoJson({
-		geoJsonId: 'geo_json',
+		geoJsonId: 'marker-json',
 		focus: 15,
 		titleModify: 'Modification d‘une ligne:\n' +
 			'Activer ce bouton (couleur jaune) puis\n' +

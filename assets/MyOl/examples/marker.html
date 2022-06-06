@@ -78,7 +78,7 @@ Based on https://openlayers.org
 		</p>
 	</div>
 
-	<p>Double click sur la carte ou click et déplacer pour déplacer le curseur</p>
+	<p>Double click sur la carte pour y placer le curseur.</p>
 
 	<script>
 new ol.Map({
@@ -91,8 +91,15 @@ new ol.Map({
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
-		layerMarker('images/cadre.png'),
-		layerMarker('images/viseur.png', true, 'viseur'),
+		layerMarker({
+			image: 'images/cadre.png',
+		}),
+		layerMarker({
+			image: 'images/viseur.png',
+			prefix: 'viseur',
+			focus: 15,
+			dragable: true,
+		}),
 	],
 });
 	</script>

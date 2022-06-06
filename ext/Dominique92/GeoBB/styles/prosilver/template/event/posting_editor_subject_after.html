@@ -1,6 +1,6 @@
 <!-- IF MAP_TYPE -->
 	<div id="map"></div>
-	<input type="hidden" name="geom" id="geo_json" value='{GEO_JSON}' />
+	<input type="hidden" name="geom" id="marker-json" value='{GEO_JSON}' />
 
 	<!-- IF MAP_TYPE == 'point' -->
 		<div id="point-marker">
@@ -22,13 +22,7 @@
 			</p>
 		</div>
 
-		<p class="map-center"><a onclick="marker.centerMap()" style="color:blue;cursor:pointer">
-			Centrer la carte sur le curseur
-		</a></p>
-
-		<p class="map-center-cursor"><a onclick="marker.centerMarker()" style="color:blue;cursor:pointer">
-			Déplacez le curseur au centre de la carte
-		</a></p>
+		<p>Double click sur la carte pour y placer le curseur.</p>
 
 		<p class="map-altitude">Altitude
 			<input type="text" name="geo_altitude" size="10"
