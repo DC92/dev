@@ -54,7 +54,7 @@ function JSONparse(json) {
  * Icon extension depending on the OS
  */
 function iconCanvasExt() {
-	//TODO OBSOLETE navigator.userAgent => navigator.userAgentData
+	//BEST OBSOLETE navigator.userAgent => navigator.userAgentData
 	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
 	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
 }

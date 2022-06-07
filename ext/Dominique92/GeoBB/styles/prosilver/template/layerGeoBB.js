@@ -46,13 +46,6 @@ var map = new ol.Map({
 		layerEditGeoJson({
 			geoJsonId: 'marker-json',
 			focus: 15,
-			styleOptions: {
-				stroke: new ol.style.Stroke({
-					color: [0, 0, 128],
-					lineDash: [0, 20],
-					width: 8,
-				}),
-			},
 			titleModify: scriptName != 'posting' ? '' : 'Modification d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne\n' +
