@@ -34,7 +34,7 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
-		#viseur-coords:not(.epsg21781) .xy {
+		#marker-coords:not(.epsg21781) .xy {
 			display: none;
 		}
 	</style>
@@ -50,14 +50,14 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<!-- Fixed marker -->
-	<input type="hidden" id="marker-json" value='{"type":"Point","coordinates":[2.34,48.86]}' /></p>
-	<p><b>Cadre :</b> <span id="marker-string"></span></p>
+	<input type="hidden" id="cadre-json" value='{"type":"Point","coordinates":[2.34,48.86]}' /></p>
+	<p><b>Cadre :</b> <span id="cadre-string">sss</span></p>
 
 	<!-- Draggable marker -->
-	<div id="viseur-coords">
+	<div id="marker-coords">
 		<p><b>Colimateur :</b>
-			<span id="viseur-string"></span>
-			<select id="viseur-select">
+			<span id="marker-string"></span>
+			<select id="marker-select">
 				<option value="dec" selected="selected">Degrés décimaux</option>
 				<option value="dms">Deg Min Sec</option>
 				<option class="xy" value="swiss">Suisse</option>
@@ -65,16 +65,16 @@ Based on https://openlayers.org
 			</select>
 		</p>
 
-		<p><input id="viseur-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' /></p>
-		<p>
+		<p><input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' /></p>
+		<p> 
 			Longitude :
-			<input id="viseur-lon" type="text" name="lon" size="12" maxlength="12" value="12" /> (WGS84)&nbsp;
-			 <span class="xy"> / X : <input id="viseur-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
+			<input id="marker-lon" type="text" name="lon" size="12" maxlength="12" value="12" /> (WGS84)&nbsp;
+			<span class="xy"> / X : <input id="marker-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)</span> 
 		</p>
 		<p>
 			Latitude :
-			<input id="viseur-lat" type="text" name="lat" size="12" maxlength="12"> (WGS84)&nbsp;
-			<span class="xy"> / Y : <input id="viseur-y" type="text" value="21" name="y" size="7" maxlength="12"></span>
+			<input id="marker-lat" type="text" name="lat" size="12" maxlength="12"> (WGS84)&nbsp;
+			<span class="xy"> / Y : <input id="marker-y" type="text" value="21" name="y" size="7" maxlength="12"></span>
 		</p>
 	</div>
 
@@ -93,10 +93,10 @@ new ol.Map({
 		}),
 		layerMarker({
 			image: 'images/cadre.png',
+			prefix: 'cadre',
 		}),
 		layerMarker({
 			image: 'images/viseur.png',
-			prefix: 'viseur',
 			focus: 15,
 			dragable: true,
 		}),

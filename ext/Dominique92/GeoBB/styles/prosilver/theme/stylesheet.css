@@ -6,6 +6,9 @@
 	font-size: 16px;
 	padding-bottom: 5px;
 }
+#marker-coords:not(.epsg21781) .xy {
+	display: none;
+}
 
 @media print {
 	html {

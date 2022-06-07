@@ -720,7 +720,7 @@ function layerVector(opt) {
 					});
 
 			// Update the display of hovered feature
-			if (map.hoveredFeature !== feature) {
+			if (map.hoveredFeature !== feature && !options.noLabel) {
 				if (map.hoveredFeature)
 					hoverSource.clear();
 
@@ -730,7 +730,7 @@ function layerVector(opt) {
 				map.hoveredFeature = feature;
 			}
 
-			if (feature) {
+			if (feature && !options.noClick) {
 				const features = feature.get('features') || [feature],
 					display = Object.assign({},
 						features[0].getProperties(), // Get first or alone feature
@@ -2135,7 +2135,7 @@ function controlsCollection(options) {
 function layerMarker(options) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
-		layer = new ol.layer.Vector({
+		layer = new ol.layer.Vector(Object.assign({
 			source: new ol.source.Vector({
 				features: [new ol.Feature(point)],
 			}),
@@ -2146,7 +2146,7 @@ function layerMarker(options) {
 					src: options.image,
 				}),
 			}),
-		});
+		}, options));
 
 	// Initialise specific projection
 	if (typeof proj4 == 'function') {
@@ -2174,14 +2174,21 @@ function layerMarker(options) {
 
 	// Read new values
 	function onChange() {
-		if (this.id[7] == 'j') { // json
-			const json = (els.json.value).match(/([0-9\.]+)[, ]*([0-9\.]+)/);
-			if (json)
-				changeLL(json.slice(1), 'EPSG:4326');
-		} else if (this.id[7] == 'l') // lon | lat
-			changeLL([els.lon.value, els.lat.value], 'EPSG:4326');
-		else if (typeof proj4 == 'function') // x | y
-			changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781');
+		const fieldName = this.id.match(/-([a-z])/);
+
+		if (fieldName) {
+			if (fieldName[1] == 'j') { // json
+				const json = (els.json.value).match(/([0-9\.]+)[, ]*([0-9\.]+)/);
+
+				if (json)
+					changeLL(json.slice(1), 'EPSG:4326');
+			} else
+			if (fieldName[1] == 'l') // lon | lat
+				changeLL([els.lon.value, els.lat.value], 'EPSG:4326');
+			else
+			if (typeof proj4 == 'function') // x | y
+				changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781');
+		}
 	}
 
 	// Display values
@@ -2189,6 +2196,7 @@ function layerMarker(options) {
 		if (ll[0] && ll[1]) {
 			// Wrap +-180°
 			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);
+
 			ll[0] -= Math.round(ll[0] / bounds[0] / 2) * bounds[0] * 2;
 
 			const ll3857 = ol.proj.transform(ll, projection, 'EPSG:3857'),
@@ -2227,7 +2235,9 @@ function layerMarker(options) {
 
 				// Hide Swiss coordinates when out of extent
 				const epsg21781 = ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
+
 				els.coords.classList[epsg21781 ? 'add' : 'remove']('epsg21781');
+
 				if (!epsg21781 && els.select.value == 'swiss')
 					els.select.value = 'dec';
 			}

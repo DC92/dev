@@ -208,7 +208,7 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-		// Textes de la première page 
+		// Textes de la première page
 		ksort ($une); // Par ordre alphabétique de titre
 		foreach (array_values ($une) AS $k=>$v)
 			$this->template->assign_block_vars ('une',

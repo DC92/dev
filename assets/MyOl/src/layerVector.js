@@ -185,7 +185,7 @@ function layerVector(opt) {
 					});
 
 			// Update the display of hovered feature
-			if (map.hoveredFeature !== feature) {
+			if (map.hoveredFeature !== feature && !options.noLabel) {
 				if (map.hoveredFeature)
 					hoverSource.clear();
 
@@ -195,7 +195,7 @@ function layerVector(opt) {
 				map.hoveredFeature = feature;
 			}
 
-			if (feature) {
+			if (feature && !options.noClick) {
 				const features = feature.get('features') || [feature],
 					display = Object.assign({},
 						features[0].getProperties(), // Get first or alone feature

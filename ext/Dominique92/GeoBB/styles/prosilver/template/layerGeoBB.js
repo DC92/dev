@@ -19,6 +19,8 @@ var map = new ol.Map({
 			maxResolution: 100,
 			distance: 30,
 			attribution: 'Chemineur',
+			noLabel: scriptName == 'posting',
+			noClick: scriptName == 'posting',
 		}),
 
 		// High map resolution : clusters
@@ -28,6 +30,8 @@ var map = new ol.Map({
 			selectorName: 'geobb-features',
 			minResolution: 100,
 			distance: 30,
+			noLabel: scriptName == 'posting',
+			noClick: scriptName == 'posting',
 		}),
 
 		mapType == 'point' ?
@@ -35,6 +39,7 @@ var map = new ol.Map({
 			image: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
 			focus: 15,
 			dragable: scriptName == 'posting',
+			zIndex: 10,
 		}) :
 
 		// Line or polygon

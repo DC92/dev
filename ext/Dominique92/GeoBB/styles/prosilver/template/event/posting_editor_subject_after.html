@@ -4,32 +4,32 @@
 
 	<!-- IF MAP_TYPE == 'point' -->
 		<p>Double click sur la carte pour déplacer le curseur.</p>
-		<div id="point-marker">
+		<div id="marker-coords">
 			<p>
 				Longitude :
-				<input type="text" name="lon" size="12" maxlength="12">
+				<input id="marker-lon" type="text" name="lon" size="12" maxlength="12">
 				(WGS84)&nbsp;
-				 <span style="display:none" class="epsg-21781"> / X :
-					<input type="text" name="x" size="7" maxlength="12"> (CH 1903)
-				 </span>
+				<span class="xy"> / X :
+					<input id="marker-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)
+				</span>
 			</p>
 			<p>
 				Latitude :
-				<input type="text" name="lat" size="12" maxlength="12">
+				<input id="marker-lat" type="text" name="lat" size="12" maxlength="12">
 				(WGS84)&nbsp;
-				<span style="display:none" class="epsg-21781"> / Y :
-					<input type="text" name="y" size="7" maxlength="12">
+				<span class="xy"> / Y :
+					<input id="marker-y" type="text" name="y" size="7" maxlength="12">
 				</span>
 			</p>
 		</div>
 
 		<p class="map-altitude">Altitude
 			<input type="text" name="geo_altitude" size="10"
-				class="inputbox autowidth" value="{GEO_ALTITUDE}" />*
+				class="inputbox autowidth" value="{GEO_ALTITUDE}" /> *
 		</p>
 		<p class="map-massif">Massif
 			<input type="text" name="geo_massif" size="25"
-				class="inputbox autowidth" value="{GEO_MASSIF}" />
+				class="inputbox autowidth" value="{GEO_MASSIF}" /> *
 		</p>
 		<p class="map-altitude-massif">
 			* Laisser le champ vide pour que le serveur le détermine automatiquement.
