@@ -53,7 +53,7 @@ var map = new ol.Map({
 					width: 8,
 				}),
 			},
-			titleModify: scriptName == 'viewtopic' ? '' : 'Modification d‘une ligne:\n' +
+			titleModify: scriptName != 'posting' ? '' : 'Modification d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer et déplacer un sommet pour modifier une ligne\n' +
 				'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
@@ -61,7 +61,7 @@ var map = new ol.Map({
 				'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
 				'Joindre les extrémités deux lignes pour les fusionner\n' +
 				'Ctrl+Alt+cliquer sur une ligne pour la supprimer',
-			titleLine: scriptName == 'viewtopic' ? '' : 'Création d‘une ligne:\n' +
+			titleLine: scriptName != 'posting' ? '' : 'Création d‘une ligne:\n' +
 				'Activer ce bouton (couleur jaune) puis\n' +
 				'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
 				'double cliquer pour terminer.\n' +

@@ -289,6 +289,10 @@ function layerEditGeoJson(options) {
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.Polygon(coords.polys[p]),
 			}));
+
+		// Save geometries in <EL> as geoJSON at every change
+		if (geoJsonEl)
+			geoJsonEl.value = options.saveFeatures(coords, options.format);
 	}
 
 	return layer;

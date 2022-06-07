@@ -2181,18 +2181,18 @@ function layerMarker(options) {
 				const json = (els.json.value).match(/([0-9\.]+)[, ]*([0-9\.]+)/);
 
 				if (json)
-					changeLL(json.slice(1), 'EPSG:4326');
+					changeLL(json.slice(1), 'EPSG:4326', true);
 			} else
 			if (fieldName[1] == 'l') // lon | lat
-				changeLL([els.lon.value, els.lat.value], 'EPSG:4326');
+				changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
 			else
 			if (typeof proj4 == 'function') // x | y
-				changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781');
+				changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
 		}
 	}
 
 	// Display values
-	function changeLL(ll, projection) {
+	function changeLL(ll, projection, focus) {
 		if (ll[0] && ll[1]) {
 			// Wrap +-180°
 			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);
@@ -2204,6 +2204,10 @@ function layerMarker(options) {
 
 			// Move the marker
 			point.setCoordinates(ll3857);
+
+			// Move the map
+			if (focus && layer.map_)
+				layer.map_.getView().setCenter(ll3857);
 
 			// Populate inputs
 			els.lon.value = Math.round(ll4326[0] * 100000) / 100000;
@@ -2570,6 +2574,10 @@ function layerEditGeoJson(options) {
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.Polygon(coords.polys[p]),
 			}));
+
+		// Save geometries in <EL> as geoJSON at every change
+		if (geoJsonEl)
+			geoJsonEl.value = options.saveFeatures(coords, options.format);
 	}
 
 	return layer;

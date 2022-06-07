@@ -9,6 +9,9 @@
 #marker-coords:not(.epsg21781) .xy {
 	display: none;
 }
+.wrap {
+	padding: 0;
+}
 
 @media print {
 	html {

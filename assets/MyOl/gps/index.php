@@ -30,6 +30,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 ?>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
 	<title><?=$manifest['name']?></title>
 	<link href="manifest.json" rel="manifest">
 

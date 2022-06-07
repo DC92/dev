@@ -149,8 +149,8 @@ class listener implements EventSubscriberInterface
 		if (defined('MYPHPBB_CREATE_POST_BUTTON') &&
 			$this->auth->acl_get('f_post', $row['forum_id']) &&
 			$row['forum_type'] == FORUM_POST)
-			$row['forum_name'] .= ' &nbsp; '.
-				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer</a>';
+			$row['forum_name'] .= '</a> &nbsp; '.
+				'<a class="button" href="./posting.php?mode=post&f='.$row['forum_id'].'" title="Créer un nouveau sujet '.strtolower($row['forum_name']).'">Créer';
 
 		$vars['row'] = $row;
 	}
