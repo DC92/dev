@@ -2162,7 +2162,7 @@ function layerMarker(options) {
 	}
 
 	// Collect all entries elements
-	['json', 'lon', 'lat', 'x', 'y', 'coords', 'select', 'string'].forEach(i => {
+	['json', 'lon', 'lat', 'x', 'y', 'coordinates', 'select', 'string'].forEach(i => {
 		els[i] = document.getElementById((options.prefix || 'marker') + '-' + i) || document.createElement('div');
 		els[i].onchange = onChange;
 	});
@@ -2239,7 +2239,7 @@ function layerMarker(options) {
 				// Hide Swiss coordinates when out of extent
 				const epsg21781 = ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
-				els.coords.classList[epsg21781 ? 'add' : 'remove']('epsg21781');
+				els.coordinates.classList[epsg21781 ? 'add' : 'remove']('epsg21781');
 
 				if (!epsg21781 && els.select.value == 'swiss')
 					els.select.value = 'dec';
@@ -2367,6 +2367,7 @@ function layerEditGeoJson(options) {
 		}),
 		modify = new ol.interaction.Modify({
 			source: source,
+			pixelTolerance: 16, // Default is 10
 			style: editStyle,
 		}),
 		controlModify = controlButton({
@@ -2554,7 +2555,7 @@ function layerEditGeoJson(options) {
 	}
 
 	function optimiseEdited(deleteCoords) {
-		const coords = optimiseFeatures(
+		const coordinates = optimiseFeatures(
 			source.getFeatures(),
 			options.titleLine,
 			options.titlePolygon,
@@ -2565,18 +2566,18 @@ function layerEditGeoJson(options) {
 
 		// Recreate features
 		source.clear();
-		for (let l in coords.lines)
+		for (let l in coordinates.lines)
 			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.LineString(coords.lines[l]),
+				geometry: new ol.geom.LineString(coordinates.lines[l]),
 			}));
-		for (let p in coords.polys)
+		for (let p in coordinates.polys)
 			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(coords.polys[p]),
+				geometry: new ol.geom.Polygon(coordinates.polys[p]),
 			}));
 
 		// Save geometries in <EL> as geoJSON at every change
 		if (geoJsonEl)
-			geoJsonEl.value = options.saveFeatures(coords, options.format);
+			geoJsonEl.value = options.saveFeatures(coordinates, options.format);
 	}
 
 	return layer;
@@ -2684,7 +2685,7 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 
 		// line & poly
 		else
-			flatCoord(lines, geom.getCoordinates(), deleteCoords); // Get lines or polyons as flat array of coords
+			flatCoord(lines, geom.getCoordinates(), deleteCoords); // Get lines or polyons as flat array of coordinates
 	}
 
 	// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)
@@ -2710,6 +2711,6 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 			return false;
 		if (!b)
 			return compareCoords(a[0], a[a.length - 1]); // Compare start with end
-		return a[0] == b[0] && a[1] == b[1]; // 2 coords
+		return a[0] == b[0] && a[1] == b[1]; // 2 coordinates
 	}
 }

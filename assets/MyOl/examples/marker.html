@@ -23,6 +23,7 @@ Based on https://openlayers.org
 	<script src="../src/header.js"></script>
 	<link  href="../src/controls.css" type="text/css" rel="stylesheet">
 	<script src="../src/controls.js"></script>
+	<link  href="../src/marker.css" type="text/css" rel="stylesheet">
 	<script src="../src/marker.js"></script>
 
 	<style>
@@ -31,9 +32,6 @@ Based on https://openlayers.org
 			max-width: 600px;
 			height: 80vw;
 			max-height: 400px;
-		}
-		#marker-coords:not(.epsg21781) .xy {
-			display: none;
 		}
 	</style>
 </head>
@@ -52,7 +50,7 @@ Based on https://openlayers.org
 	<p><b>Cadre :</b> <span id="cadre-string">sss</span></p>
 
 	<!-- Draggable marker -->
-	<div id="marker-coords">
+	<div id="marker-coordinates">
 		<p><b>Colimateur :</b>
 			<span id="marker-string"></span>
 			<select id="marker-select">
@@ -76,7 +74,7 @@ Based on https://openlayers.org
 		</p>
 	</div>
 
-	<p>Double clic sur la carte pour déplacer le curseur.</p>
+	<p>Double clic sur la carte là où placer le curseur.</p>
 
 	<script>
 new ol.Map({

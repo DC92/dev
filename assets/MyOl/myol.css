@@ -240,3 +240,8 @@
 #additional-selector hr {
 	border-color: black;
 }
+
+/* FILE src/marker.css */
+#marker-coordinates:not(.epsg21781) .xy {
+	display: none;
+}

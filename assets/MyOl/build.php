@@ -15,6 +15,7 @@ echo "<p>";
 
 $css[] = get ('controls.css');
 $css[] = get ('layerSwitcher.css');
+$css[] = get ('marker.css');
 file_put_contents ('myol.css', implode ('
 
 ', $css));

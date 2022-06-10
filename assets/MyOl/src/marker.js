@@ -38,7 +38,8 @@ function layerMarker(options) {
 	}
 
 	// Collect all entries elements
-	['json', 'lon', 'lat', 'x', 'y', 'coords', 'select', 'string'].forEach(i => {
+	//BEST element #xxx-coordinates not dependent of # prefix
+	['json', 'lon', 'lat', 'x', 'y', 'coordinates', 'select', 'string'].forEach(i => {
 		els[i] = document.getElementById((options.prefix || 'marker') + '-' + i) || document.createElement('div');
 		els[i].onchange = onChange;
 	});
@@ -115,7 +116,7 @@ function layerMarker(options) {
 				// Hide Swiss coordinates when out of extent
 				const epsg21781 = ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
-				els.coords.classList[epsg21781 ? 'add' : 'remove']('epsg21781');
+				els.coordinates.classList[epsg21781 ? 'add' : 'remove']('epsg21781');
 
 				if (!epsg21781 && els.select.value == 'swiss')
 					els.select.value = 'dec';

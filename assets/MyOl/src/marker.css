@@ -1,0 +1,3 @@
+#marker-coordinates:not(.epsg21781) .xy {
+	display: none;
+}
