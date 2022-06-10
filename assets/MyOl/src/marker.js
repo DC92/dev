@@ -53,7 +53,7 @@ function layerMarker(options) {
 
 		if (fieldName) {
 			if (fieldName[1] == 'j') { // json
-				const json = (els.json.value).match(/([0-9\.]+)[, ]*([0-9\.]+)/);
+				const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
 
 				if (json)
 					changeLL(json.slice(1), 'EPSG:4326', true);
