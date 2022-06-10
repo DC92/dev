@@ -6,6 +6,7 @@
 * @license GNU General Public License, version 2 (GPL-2.0)
 *
 */
+//TODO 5 décimales dans les traces
 
 define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../';

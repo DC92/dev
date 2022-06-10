@@ -36,7 +36,7 @@ var map = new ol.Map({
 
 		mapType == 'point' ?
 		layerMarker({
-			image: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
+			src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
 			focus: 15,
 			dragable: scriptName == 'posting',
 			zIndex: 10,
