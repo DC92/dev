@@ -417,9 +417,13 @@ function controlLayerSwitcher(baseLayers, options) {
 	const control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
-		layerNames = Object.keys(baseLayers);
+		layerNames = Object.keys(baseLayers),
+		baselayer = location.search.match(/baselayer=([^\&]+)/);
+	let transparentBaseLayerName = '';
 
-	var transparentBaseLayerName = '';
+	// Get baselayer from url ?
+	if (baselayer)
+		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
 	// Build html transparency slider
 	const rangeContainerEl = document.createElement('div');
@@ -475,7 +479,10 @@ function controlLayerSwitcher(baseLayers, options) {
 		displayBaseLayers(); // Init layers
 
 		// Attach html additional selector
-		const additionalSelector = document.getElementById(options.additionalSelectorId || 'additional-selector');
+		const additionalSelector = document.getElementById(
+			options.additionalSelectorId ||
+			'additional-selector'
+		);
 
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
@@ -485,13 +492,19 @@ function controlLayerSwitcher(baseLayers, options) {
 	};
 
 	function selectBaseLayer(evt) {
+		// 1 seule couche
 		if (!evt || !evt.ctrlKey || this.value == localStorage.myol_baselayer) {
 			transparentBaseLayerName = '';
 			localStorage.myol_baselayer = this.value;
-		} else if (layerNames.indexOf(localStorage.myol_baselayer) < layerNames.indexOf(this.value)) {
+		}
+		// Il y a une deuxième couche aprés celle existante
+		else if (layerNames.indexOf(localStorage.myol_baselayer) <
+			layerNames.indexOf(this.value)) {
 			transparentBaseLayerName = this.value;
 			// localStorage.myol_baselayer don't change
-		} else {
+		}
+		// Il y a une deuxième couche avant celle existante
+		else {
 			transparentBaseLayerName = localStorage.myol_baselayer;
 			localStorage.myol_baselayer = this.value;
 		}
@@ -507,7 +520,9 @@ function controlLayerSwitcher(baseLayers, options) {
 
 		for (let name in baseLayers)
 			if (baseLayers[name]) {
-				const visible = name == localStorage.myol_baselayer || name == transparentBaseLayerName;
+				const visible =
+					name == localStorage.myol_baselayer ||
+					name == transparentBaseLayerName;
 
 				// Write the checks
 				baseLayers[name].inputEl.checked = visible;
