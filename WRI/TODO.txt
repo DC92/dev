@@ -8,6 +8,7 @@ Carte nav affiche les massifs pour les gros massifs => zoom ?
 Lien vers compte utilisateur sur petit écran
 GPS : le triangle en haut reste affiché
 Erreur gps s20 : Position acquisition time out
+Editeur massif : download ne marche pas ! (fichier vide)
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================

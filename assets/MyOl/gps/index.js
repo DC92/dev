@@ -2,7 +2,7 @@
  * PWA
  */
 var map;
-const liTags = document.getElementsByTagName('li'),
+const liTags = document.getElementsByTagName('li'), //TODO BUG trop de séléction (BUG WRI)
 	elListe = document.getElementById('liste');
 
 // Force https to allow PWA and geolocation
@@ -75,8 +75,9 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			controlGeocoder(),
 			controlGPS(),
 
+			//BEST liste des traces dans le layerswitcher
 			liTags.length ? controlButton({
-				label: '\u25B3', //BEST un meilleur picto ?
+				label: '&Xi;',
 				title: 'Choisir une trace dans la liste / fermer',
 				activate: function() {
 					if (elListe)

@@ -95,7 +95,8 @@ function layerVector(opt) {
 				) : {};
 
 			// Detect lines or polygons
-			evt.features[f].display.area = ol.extent.getArea(evt.features[f].getGeometry().getExtent());
+			evt.features[f].display.area =
+				ol.extent.getArea(evt.features[f].getGeometry().getExtent());
 		}
 	});
 
@@ -114,7 +115,11 @@ function layerVector(opt) {
 	// Function to display different styles
 	function displayStyle(feature, styleOptionsFunction) {
 		if (typeof styleOptionsFunction == 'function') {
-			const styleOptions = styleOptionsFunction(feature, Object.assign(feature.getProperties(), feature.display), options);
+			const styleOptions = styleOptionsFunction(
+				feature, Object.assign(feature.getProperties(),
+					feature.display),
+				options
+			);
 
 			//HACK to render the html entities in the canvas
 			if (styleOptions && styleOptions.text) {
@@ -456,6 +461,7 @@ function styleOptionsFullLabel(properties) {
 	// Cluster
 	if (properties.features || properties.cluster) {
 		let includeCluster = !!properties.cluster;
+
 		for (let f in properties.features) {
 			const name = properties.features[f].getProperties().name || properties.features[f].display.name;
 			if (name)
@@ -463,15 +469,16 @@ function styleOptionsFullLabel(properties) {
 			if (properties.features[f].getProperties().cluster)
 				includeCluster = true;
 		}
-
 		if (text.length == 0 || text.length > 6 || includeCluster)
 			text = ['Cliquer pour zoomer'];
 	}
 	// Feature
 	else {
+		// 1st line
 		if (properties.name)
 			text.push(properties.name);
 
+		// 2nd line
 		if (properties.ele)
 			line.push(parseInt(properties.ele) + ' m');
 		if (properties.capacity)
@@ -479,8 +486,14 @@ function styleOptionsFullLabel(properties) {
 		if (line.length)
 			text.push(line.join(', '));
 
+		// 3rd line
 		if (typeof properties.type == 'string' && properties.type)
-			text.push(properties.type[0].toUpperCase() + properties.type.substring(1).replace('_', ' '));
+			text.push(
+				properties.type[0].toUpperCase() +
+				properties.type.substring(1).replace('_', ' ')
+			);
+
+		// 4rd line
 		if (properties.attribution)
 			text.push('&copy;' + properties.attribution);
 	}
@@ -510,8 +523,8 @@ function styleOptionsLabel(text, properties, important) {
 	// For points
 	if (!properties.area)
 		Object.assign(styleTextOptions, {
-			textBaseline: 'top',
-			offsetY: -30, // Above the icon
+			textBaseline: 'bottom',
+			offsetY: -14, // Above the icon
 		});
 
 	return {

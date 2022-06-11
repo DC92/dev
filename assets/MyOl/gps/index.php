@@ -97,7 +97,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 		<?php } ?>
 			</ul>
 			<p>Puis sur la cible pour afficher votre position.</p>
-			<p>Fermer : <a onclick="document.getElementById('liste').style.display='none'" title="Replier">&#9651;</a></p>
+			<p>Fermer : <a onclick="document.getElementById('liste').style.display='none'" title="Replier">&Xi;</a></p>
 		</div>
 	<?php } ?>
 

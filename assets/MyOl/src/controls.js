@@ -387,11 +387,7 @@ function controlGPS() {
 		}
 
 		displayEl.innerHTML = displays.join(', ');
-
-		if (displays.length)
-			displayEl.classList.add('ol-control-gps');
-		else
-			displayEl.classList.remove('ol-control-gps');
+		displayEl.classList[displays.length ? 'add' : 'remove']('ol-control-gps');
 
 		// Render position & graticule
 		if (control.state && position &&
