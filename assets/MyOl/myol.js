@@ -1437,15 +1437,15 @@ function layerOverpass(options) {
  * Abstract definition to be used by other control buttons definitions
  */
 function controlButton(options) {
-	const control = new ol.control.Control(options),
-		buttonEl = document.createElement('button');
-
 	options = Object.assign({
 		element: document.createElement('div'),
 		buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
 		className: 'ol-button',
 		activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
 	}, options);
+
+	const control = new ol.control.Control(options),
+		buttonEl = document.createElement('button');
 
 	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
 	control.element.title = options.title; // {string} displayed when the control is hovered.
