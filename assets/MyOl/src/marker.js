@@ -90,7 +90,7 @@ function layerMarker(options) {
 			els.lat.value = Math.round(ll4326[1] * 100000) / 100000;
 			els.json.value = '{"type":"Point","coordinates":[' + els.lon.value + ',' + els.lat.value + ']}';
 
-			// Display	
+			// Display
 			const strings = {
 				dec: 'Lon: ' + els.lon.value + ', Lat: ' + els.lat.value,
 				dms: ol.coordinate.toStringHDMS(ll4326),
@@ -107,7 +107,7 @@ function layerMarker(options) {
 				els.x.value = Math.round(ll21781[0]);
 				els.y.value = Math.round(ll21781[1]);
 
-				// Display	
+				// Display
 				strings.swiss = 'X=' + els.x.value + ', Y=' + els.y.value + ' (CH1903)';
 				strings.utm = ' UTM ' + z +
 					' E:' + Math.round(llutm[0]) + ' ' +
@@ -128,18 +128,27 @@ function layerMarker(options) {
 	}
 
 	layer.once('myol:onadd', function(evt) {
+		const map = evt.map,
+			view = map.getView(),
+			pc = point.getCoordinates();
+
 		// Focus map on the marker
 		if (options.focus) {
-			evt.map.getView().setCenter(point.getCoordinates());
-			evt.map.getView().setZoom(options.focus);
+			if (pc[0] && pc[1])
+				view.setCenter(pc);
+			else
+				// If no position given, put the marker on the center of the visible map
+				changeLL(view.getCenter(), 'EPSG:3857');
+
+			view.setZoom(options.focus);
 		}
 
 		// Edit the marker position
 		if (options.dragable) {
 			// Drag the marker
-			evt.map.addInteraction(new ol.interaction.Pointer({
+			map.addInteraction(new ol.interaction.Pointer({
 				handleDownEvent: function(evt) {
-					return evt.map.getFeaturesAtPixel(evt.pixel, {
+					return map.getFeaturesAtPixel(evt.pixel, {
 						layerFilter: function(l) {
 							return l.ol_uid == layer.ol_uid;
 						}
@@ -151,7 +160,7 @@ function layerMarker(options) {
 			}));
 
 			// Get the marker at the dblclick position
-			evt.map.on('dblclick', function(evt) {
+			map.on('dblclick', function(evt) {
 				changeLL(evt.coordinate, 'EPSG:3857');
 				return false;
 			});

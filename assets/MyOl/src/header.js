@@ -24,6 +24,17 @@ if (location.hash == '###')
 	};
 
 /**
+ * Display localStorage
+ */
+let localStorageDump = [];
+for (let i = 0; i < localStorage.length; i++) {
+	localStorageDump.push(
+		localStorage.key(i) + ': ' +
+		localStorage.getItem(localStorage.key(i)));
+}
+console.log(localStorageDump.join('\n'));
+
+/**
  * Display OL version
  */
 try {
@@ -35,6 +46,7 @@ try {
 /**
  * Load url ?name=value&name=value and #name=value&name=value in localstorage.myol_name
  */
+//TODO non ! pas tout !
 for (let v of location.href.matchAll(/([a-z]+)=([^?#=]+)/g))
 	localStorage['myol_' + v[1]] = v[2];
 
