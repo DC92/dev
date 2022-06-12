@@ -11,7 +11,7 @@ function controlLayerSwitcher(baseLayers, options) {
 			element: document.createElement('div'),
 		}),
 		layerNames = Object.keys(baseLayers),
-		baselayer = location.search.match(/baselayer=([^\&]+)/);
+		baselayer = location.href.match(/baselayer=([^\&]+)/);
 	let transparentBaseLayerName = '';
 
 	// Get baselayer from url ?

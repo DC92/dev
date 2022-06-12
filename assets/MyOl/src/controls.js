@@ -9,15 +9,15 @@
  */
 //BEST left aligned buttons when screen vertical
 function controlButton(options) {
+	const control = new ol.control.Control(options),
+		buttonEl = document.createElement('button');
+
 	options = Object.assign({
 		element: document.createElement('div'),
 		buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
 		className: 'ol-button',
 		activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
 	}, options);
-
-	const control = new ol.control.Control(options),
-		buttonEl = document.createElement('button');
 
 	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
 	control.element.title = options.title; // {string} displayed when the control is hovered.
@@ -80,17 +80,23 @@ function controlButton(options) {
  * Don't set view when you declare the map
  */
 function controlPermalink(options) {
+	const aEl = document.createElement('a'),
+		control = new ol.control.Control({
+			element: document.createElement('div'), //HACK no button
+			render: render,
+		}),
+		urlArgs = {};
+
+	// Load url ?name=value&name=value and #name=value&name=value in urlArgs
+	for (let v of location.href.matchAll(/([a-z]+)=([^?#&=]+)/g))
+		urlArgs[v[1]] = v[2];
+
 	options = Object.assign({
 		init: true, // {true | false} use url hash or localStorage to position the map.
 		setUrl: false, // {true | false} Change url hash when moving the map.
 		display: false, // {true | false} Display permalink link the map.
 		hash: '?', // {?, #} the permalink delimiter after the url
 	}, options);
-	const aEl = document.createElement('a'),
-		control = new ol.control.Control({
-			element: document.createElement('div'), //HACK no button
-			render: render,
-		});
 
 	if (options.display) {
 		control.element.className = 'ol-permalink';
@@ -99,30 +105,29 @@ function controlPermalink(options) {
 		control.element.appendChild(aEl);
 	}
 
-	function render(evt) {
-		const view = evt.map.getView();
+	function render(evt) { //HACK to get map object
+		const view = evt.map.getView(),
+			mapHash = (urlArgs.map + '//').split('/');
 
 		// Set center & zoom at the init
 		if (options.init) {
 			options.init = false; // Only once
 
-			view.setZoom(parseFloat(localStorage.myol_zoom) || 6);
+			view.setZoom(parseFloat(mapHash[0] || urlArgs.zoom || localStorage.myol_zoom || 6));
+
 			view.setCenter(ol.proj.transform([
-				parseFloat(localStorage.myol_lon) || 2,
-				parseFloat(localStorage.myol_lat) || 47
+				parseFloat(mapHash[1] || urlArgs.lon || localStorage.myol_lon || 2),
+				parseFloat(mapHash[2] || urlArgs.lat || localStorage.myol_lat || 47)
 			], 'EPSG:4326', 'EPSG:3857'));
 		}
 
 		// Set the permalink with current map zoom & position
 		if (view.getCenter()) {
 			const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
-				newParams = 'zoom=' + Math.round(view.getZoom() * 10) / 10 +
-				'&lon=' + Math.round(ll4326[0] * 1000) / 1000 +
-				'&lat=' + Math.round(ll4326[1] * 1000) / 1000;
-
-			localStorage.myol_zoom = view.getZoom();
-			localStorage.myol_lon = ll4326[0];
-			localStorage.myol_lat = ll4326[1];
+				newParams = 'map=' +
+				(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
+				(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
+				(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
 
 			if (options.display)
 				aEl.href = options.hash + newParams;

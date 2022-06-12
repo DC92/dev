@@ -2,13 +2,6 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
-//HACK for some mobiles touch functions (IOS)
-if (window.PointerEvent === undefined) {
-	const script = document.createElement('script');
-	script.src = 'https://unpkg.com/elm-pep';
-	document.head.appendChild(script);
-}
-
 /**
  * Debug facilities on mobile
  */
@@ -44,37 +37,9 @@ try {
 }
 
 /**
- * Load url ?name=value&name=value and #name=value&name=value in localstorage.myol_name
- */
-//TODO non ! pas tout !
-for (let v of location.href.matchAll(/([a-z]+)=([^?#=]+)/g))
-	localStorage['myol_' + v[1]] = v[2];
-
-/**
- * Json parsing errors log
- */
-//BEST implement on layerVector.js & editor
-function JSONparse(json) {
-	try {
-		return JSON.parse(json);
-	} catch (returnCode) {
-		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
-	}
-}
-
-/**
- * Icon extension depending on the OS
- */
-function iconCanvasExt() {
-	//BEST OBSOLETE navigator.userAgent => navigator.userAgentData
-	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
-	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
-}
-
-/**
  * Warn layers when added to the map
  */
-//BEST DELETE (used by editor)
+//BEST DELETE (used by marker.js & editor.js)
 ol.Map.prototype.handlePostRender = function() {
 	ol.PluggableMap.prototype.handlePostRender.call(this);
 
@@ -90,3 +55,31 @@ ol.Map.prototype.handlePostRender = function() {
 		}
 	});
 };
+
+/**
+ * Json parsing errors log
+ */
+//BEST implement on layerVectorCollection.js & editor.js
+function JSONparse(json) {
+	try {
+		return JSON.parse(json);
+	} catch (returnCode) {
+		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+	}
+}
+
+/**
+ * IOS 12 support
+ */
+//HACK for pointer events (IOS < 13)
+if (window.PointerEvent === undefined) {
+	const script = document.createElement('script');
+	script.src = 'https://unpkg.com/elm-pep';
+	document.head.appendChild(script);
+}
+// Icon extension depending on the OS (IOS 12 dosn't support SVG)
+function iconCanvasExt() {
+	//BEST OBSOLETE navigator.userAgent => navigator.userAgentData
+	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
+	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
+}
