@@ -25,8 +25,15 @@ if (location.hash == '###')
 	};
 
 /**
- * Display localStorage
+ * Display misc values
  */
+// OL version
+try {
+	new ol.style.Icon(); // Try incorrect action
+} catch (err) { // to get Assert url
+	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+}
+// localStorage
 let localStorageDump = [];
 for (let i = 0; i < localStorage.length; i++) {
 	localStorageDump.push(
@@ -34,15 +41,6 @@ for (let i = 0; i < localStorage.length; i++) {
 		localStorage.getItem(localStorage.key(i)));
 }
 console.log(localStorageDump.join('\n'));
-
-/**
- * Display OL version
- */
-try {
-	new ol.style.Icon(); // Try incorrect action
-} catch (err) { // to get Assert url
-	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
-}
 
 /**
  * Warn layers when added to the map
@@ -384,11 +382,13 @@ function layersCollection() {
 function layersDemo() {
 	return Object.assign(layersCollection(), {
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-		'OSM cycle': layerThunderforest('cycle'),
-		'OSM landscape': layerThunderforest('landscape'),
-		'OSM trains': layerThunderforest('pioneer'),
-		'OSM villes': layerThunderforest('neighbourhood'),
-		'OSM contraste': layerThunderforest('mobile-atlas'),
+		'OSM cyclo': layerOSM('//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'),
+
+		'ThF cycle': layerThunderforest('cycle'),
+		'ThF landscape': layerThunderforest('landscape'),
+		'ThF trains': layerThunderforest('pioneer'),
+		'ThF villes': layerThunderforest('neighbourhood'),
+		'ThF contraste': layerThunderforest('mobile-atlas'),
 
 		'OS light': layerOS('Light_3857'),
 		'OS road': layerOS('Road_3857'),
@@ -1513,10 +1513,12 @@ function controlPermalink(options) {
 			element: document.createElement('div'),
 			render: render,
 		}),
-		urlArgs = {};
+		urlArgs = {
+			map: '',
+		};
 
 	// Load url ?name=value&name=value and #name=value&name=value in urlArgs
-	for (let v of location.href.matchAll(/([a-z]+)=([^?#&=]+)/g))
+	for (let v of location.href.replaceAll('NaN', '').matchAll(/([a-z]+)=([^?#&=]+)/g))
 		urlArgs[v[1]] = v[2];
 
 	options = Object.assign({
@@ -1541,11 +1543,11 @@ function controlPermalink(options) {
 		if (options.init) {
 			options.init = false; // Only once
 
-			view.setZoom(parseFloat(mapHash[0] || urlArgs.zoom || localStorage.myol_zoom || 6));
+			view.setZoom(parseFloat(mapHash[0] || urlArgs.zoom || localStorage.myol_zoom.replace('NaN', '') || 6));
 
 			view.setCenter(ol.proj.transform([
-				parseFloat(mapHash[1] || urlArgs.lon || localStorage.myol_lon || 2),
-				parseFloat(mapHash[2] || urlArgs.lat || localStorage.myol_lat || 47)
+				parseFloat(mapHash[1] || urlArgs.lon || localStorage.myol_lon.replace('NaN', '') || 2),
+				parseFloat(mapHash[2] || urlArgs.lat || localStorage.myol_lat.replace('NaN', '') || 47)
 			], 'EPSG:4326', 'EPSG:3857'));
 		}
 

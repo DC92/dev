@@ -1,13 +1,12 @@
 BUG
 ===
-Ne nettoie pas les pictos de la carte en cas de modif
-Ne'affiche pas le massif modifié en cas de modif
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 Carte nav affiche les massifs pour les gros massifs => zoom ?
 Lien vers compte utilisateur sur petit écran
-GPS : le triangle en haut reste affiché
-Erreur gps s20 : Position acquisition time out
 Editeur massif : download ne marche pas ! (fichier vide)
+Ne nettoie pas les pictos de la carte en cas de modif
+N'affiche pas le massif modifié en cas de modif
+GPS : le triangle en haut reste affiché
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -28,6 +27,33 @@ Accueil carte
 	liste (ou choix des types de points)
 Point
 
+EVOLUTIONS
+==========
+http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
+https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
+https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
+
+Couleur des pictos cabanes dont on n’a pas d’éléments pour dire qu’elles sont destinées à accueillir des randonneurs
+-	Picto cabane ou abri avec un 0 (comme aujourd’hui) similaire aux pictos de celles faites pour accueillir des randonneurs
+-	Picto cabane ou abri gris, mur noir avec 0 (urgence seulement) ou ? (on ne sait pas) ou X (fermé)
+
+Informations affichées pour les cabanes non destinées à y dormir
+-	Nom, position (carte), propriétaire / accessibilité, forum + bandeau expliquant que cette cabane n’est pas destinée à y dormir
+
+dualité fiche-forum
+
+page GPS (ou similaire) comme un point d'entrée mobile
+
+Sur les massifs, nous avons eu des retours sur des points absents, alors qu'il suffisait juste de décocher la case "Massif uniquement". Ce n'est pas intuitif.
+Sur la visualisation d'un point, il arrive souvent que les contributeurs se perdent entre forum et commentaires, le paragraphe n'étant pas bien lu. Une piste serait d'intégrer le fil du forum à la page point.
+De manière générale, nous avons souvent mit en place des textes explicatifs pour apporter des précisions avec des liens rebondissants vers le wiki. Cette lecture peut décourager. Une option est d'utiliser plus fréquemment des icônes.
+Sur le forum, il arrive souvent que des questions soient posées en double, les recherches n'étant pas correctement effectuées.
+La version mobile, parfois réclamée, est bien cachée
+Les données externes (PRC...) pourraient être mieux intégrées, en imaginant les intégrer directement aux fiches.
+Le formulaire n'est accessible facilement que depuis un ordinateur, et malheureusement l'ergonomie de Facebook ou autres rend la chose beaucoup plus aisés sur des groupes spécialisés dans ces espaces.
+La saisie en BBcode n'est plus fréquente, et nécessite donc de l'apprendre : une piste est d'utiliser du Markdown au gout du jour.
+
+
 TODO WRI
 ========
 Retour à la page initiale après connexion
@@ -35,7 +61,6 @@ Formulaire contact : nom utilisateur
 Fusion commentaire / forum : notion de post descriptif
 Pictos geocaching
 Pas de favicon dans S20 accueil FF
-Lien le forum est vide, => lien ne marche pas
 Auteur demande corrections
 Liste users surs / utilitaire scan liens
 service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
@@ -65,3 +90,9 @@ AIDE TEST
 =========
 MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
 MultiPolygon avec trou => WRI massif 3127
+
+TRANSFERT WRI
+=============
+Download refuges.sql.gz
+Unpack it
+Change OWNER TO refuges -> OWNER TO cado1118_pg

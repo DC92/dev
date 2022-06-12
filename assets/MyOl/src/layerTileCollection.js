@@ -296,11 +296,13 @@ function layersCollection() {
 function layersDemo() {
 	return Object.assign(layersCollection(), {
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-		'OSM cycle': layerThunderforest('cycle'),
-		'OSM landscape': layerThunderforest('landscape'),
-		'OSM trains': layerThunderforest('pioneer'),
-		'OSM villes': layerThunderforest('neighbourhood'),
-		'OSM contraste': layerThunderforest('mobile-atlas'),
+		'OSM cyclo': layerOSM('//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'),
+
+		'ThF cycle': layerThunderforest('cycle'),
+		'ThF landscape': layerThunderforest('landscape'),
+		'ThF trains': layerThunderforest('pioneer'),
+		'ThF villes': layerThunderforest('neighbourhood'),
+		'ThF contraste': layerThunderforest('mobile-atlas'),
 
 		'OS light': layerOS('Light_3857'),
 		'OS road': layerOS('Road_3857'),

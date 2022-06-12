@@ -17,8 +17,15 @@ if (location.hash == '###')
 	};
 
 /**
- * Display localStorage
+ * Display misc values
  */
+// OL version
+try {
+	new ol.style.Icon(); // Try incorrect action
+} catch (err) { // to get Assert url
+	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+}
+// localStorage
 let localStorageDump = [];
 for (let i = 0; i < localStorage.length; i++) {
 	localStorageDump.push(
@@ -26,15 +33,6 @@ for (let i = 0; i < localStorage.length; i++) {
 		localStorage.getItem(localStorage.key(i)));
 }
 console.log(localStorageDump.join('\n'));
-
-/**
- * Display OL version
- */
-try {
-	new ol.style.Icon(); // Try incorrect action
-} catch (err) { // to get Assert url
-	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
-}
 
 /**
  * Warn layers when added to the map

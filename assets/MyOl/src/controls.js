@@ -82,13 +82,15 @@ function controlButton(options) {
 function controlPermalink(options) {
 	const aEl = document.createElement('a'),
 		control = new ol.control.Control({
-			element: document.createElement('div'), //HACK no button
+			element: document.createElement('div'),
 			render: render,
 		}),
-		urlArgs = {};
+		urlArgs = {
+			map: '',
+		};
 
 	// Load url ?name=value&name=value and #name=value&name=value in urlArgs
-	for (let v of location.href.matchAll(/([a-z]+)=([^?#&=]+)/g))
+	for (let v of location.href.replaceAll('NaN', '').matchAll(/([a-z]+)=([^?#&=]+)/g))
 		urlArgs[v[1]] = v[2];
 
 	options = Object.assign({
@@ -113,11 +115,11 @@ function controlPermalink(options) {
 		if (options.init) {
 			options.init = false; // Only once
 
-			view.setZoom(parseFloat(mapHash[0] || urlArgs.zoom || localStorage.myol_zoom || 6));
+			view.setZoom(parseFloat(mapHash[0] || urlArgs.zoom || localStorage.myol_zoom.replace('NaN', '') || 6));
 
 			view.setCenter(ol.proj.transform([
-				parseFloat(mapHash[1] || urlArgs.lon || localStorage.myol_lon || 2),
-				parseFloat(mapHash[2] || urlArgs.lat || localStorage.myol_lat || 47)
+				parseFloat(mapHash[1] || urlArgs.lon || localStorage.myol_lon.replace('NaN', '') || 2),
+				parseFloat(mapHash[2] || urlArgs.lat || localStorage.myol_lat.replace('NaN', '') || 47)
 			], 'EPSG:4326', 'EPSG:3857'));
 		}
 
@@ -330,7 +332,8 @@ function controlGPS() {
 		}),
 	}));
 
-	control.setMap = function(map) { //HACK execute actions on Map init
+	control.setMap = function(map) {
+		//HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		view = map.getView();
@@ -346,6 +349,7 @@ function controlGPS() {
 		});
 
 		// Trigger position
+		//TODO BUG Erreur gps s20 : Position acquisition time out
 		geolocation.on('change:position', renderPosition);
 		map.on('moveend', renderPosition); // Refresh graticule after map zoom
 		function renderPosition() {
