@@ -26,13 +26,13 @@ try {
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
 // localStorage
-let localStorageDump = [];
+let myol_localArgs = [];
 for (let i = 0; i < localStorage.length; i++) {
-	localStorageDump.push(
+	myol_localArgs.push(
 		localStorage.key(i) + ': ' +
 		localStorage.getItem(localStorage.key(i)));
 }
-console.log(localStorageDump.join('\n'));
+console.log(myol_localArgs.join('\n'));
 
 /**
  * Warn layers when added to the map

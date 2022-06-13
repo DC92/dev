@@ -85,13 +85,16 @@ function controlPermalink(options) {
 			element: document.createElement('div'),
 			render: render,
 		}),
+		urlhashs = location.href.replace(/NaN/g, '').match(/[a-z]+=[^?#&=]+/g),
 		urlArgs = {
 			map: '',
 		};
 
 	// Load url ?name=value&name=value and #name=value&name=value in urlArgs
-	for (let v of location.href.replaceAll('NaN', '').matchAll(/([a-z]+)=([^?#&=]+)/g))
-		urlArgs[v[1]] = v[2];
+	for (let u in urlhashs) {
+		const uh = urlhashs[u].match(/([a-z]+)=([^?#&=]+)/);
+		urlArgs[uh[1]] = uh[2];
+	}
 
 	options = Object.assign({
 		init: true, // {true | false} use url hash or localStorage to position the map.
