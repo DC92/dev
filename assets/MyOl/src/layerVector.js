@@ -222,7 +222,7 @@ function layerVector(opt) {
 							// To specify feature open a new window
 							window.open(display.url, '_blank', 'resizable=yes').focus();
 						else
-							location.replace(display.url);
+							window.location.href = display.url;
 					}
 					// Cluster
 					else if (geom && (features.length > 1 || display.cluster))

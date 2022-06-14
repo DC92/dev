@@ -354,7 +354,6 @@ function controlGPS() {
 		});
 
 		// Trigger position
-		//TODO BUG Erreur gps s20 : Position acquisition time out
 		geolocation.on('change:position', renderPosition);
 		map.on('moveend', renderPosition); // Refresh graticule after map zoom
 		function renderPosition() {

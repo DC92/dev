@@ -268,11 +268,16 @@ function layersCollection() {
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
+		//TODO Cassini
 		/*'IGN Cassini': layerIGN({
 			layer:'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
-			key: 'x7yv499pbcguxhhxh8syehwe/geoportail',
+			key: 'cartes/geoportail',
 		}),*/
-		//TODO Cadastre
+		'Cadastre': layerIGN({
+			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
+			key: 'essentiels',
+			format: 'image/png',
+		}),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
 		'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS('Outdoor_3857'),
