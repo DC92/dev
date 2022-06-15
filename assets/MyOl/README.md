@@ -16,13 +16,13 @@ See a LAYER SWITCHER DEMO [here](https://Dominique92.github.io/MyOl/examples/lay
 TILE LAYERS
 ===========
 See a TILE LAYERS DEMO [here](https://Dominique92.github.io/MyOl/examples/layerTile.html)
-* OSM, OSM-FR, OpenTopo, Maps.Refuges.Info
+* OSM, OSM-FR, OpenTopo, CyclOsm, Maps.Refuges.Info
 * ThunderForest Outdoors, OpenTopoMap, Cycles, Landscape, Transport, ...
 * IGN France, cadastre, satellite, ...
 * SwissTopo, satellite
 * IDEE España, satellite
 * IGM Italie
-* Great Britain
+* Ordnance Survey (Great Britain)
 * Kompass Austria
 * Bing Microsoft, satellite
 * Google maps, satellite
