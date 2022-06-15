@@ -21,6 +21,10 @@ var map = new ol.Map({
 			attribution: 'Chemineur',
 			noLabel: scriptName == 'posting',
 			noClick: scriptName == 'posting',
+			hoverStyleOptionsFunction: function(feature, properties) {
+				properties.attribution = null;
+				return styleOptionsFullLabel(properties);
+			},
 		}),
 
 		// High map resolution : clusters
