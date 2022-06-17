@@ -21,7 +21,7 @@
 //TODO retour de fullscreen en cliquant sur l'image
 //TODO mesure d'audience
 //BEST Texte technique en italique
-//TODO centrage image / titre d?pend de la taille de la fenetre - idem n? pages
+//TODO centrage image / titre dépend de la taille de la fenetre - idem n° pages
 //BEST full screen : Centrer verticalement les textes dans la page
 //BEST table des mati?res
 

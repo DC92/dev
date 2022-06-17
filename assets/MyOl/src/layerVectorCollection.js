@@ -13,7 +13,15 @@ function layerGeoBB(options) {
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
-				(options.selectorName ? '&' + (options.argSelName || 'cat') + '=' + selection.join(',') : '') +
+				// Add layer features filters
+				(options.selectorName ?
+					'&' + (options.argSelName || 'cat') + '=' + selection.join(',') :
+					'') +
+				// Refresh layer when data chenged
+				(localStorage.myol_lastChangeTime ?
+					'&v=' + localStorage.myol_lastChangeTime :
+					'') +
+				// Bbox strategy
 				'&bbox=' + bbox.join(',');
 		},
 		convertProperties: function(properties, feature, options) {

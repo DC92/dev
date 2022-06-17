@@ -203,6 +203,7 @@ function controlLengthLine() {
 					length < 1000 ?
 					(Math.round(length)) + ' m' :
 					(Math.round(length / 10) / 100) + ' km';
+
 				return false; // Continue detection (for editor that has temporary layers)
 			}
 		}

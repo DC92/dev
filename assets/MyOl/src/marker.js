@@ -49,8 +49,12 @@ function layerMarker(options) {
 	els.json.onchange();
 
 	// Read new values
-	function onChange() {
+	function onChange(evt) {
 		const fieldName = this.id.match(/-([a-z])/);
+
+		// Mark last change time
+		if (evt) // If a field has changed
+			localStorage.myol_lastChangeTime = new Date().getTime();
 
 		if (fieldName) {
 			if (fieldName[1] == 'j') { // json
@@ -148,6 +152,9 @@ function layerMarker(options) {
 			// Drag the marker
 			map.addInteraction(new ol.interaction.Pointer({
 				handleDownEvent: function(evt) {
+					// Mark last change time
+					localStorage.myol_lastChangeTime = new Date().getTime();
+
 					return map.getFeaturesAtPixel(evt.pixel, {
 						layerFilter: function(l) {
 							return l.ol_uid == layer.ol_uid;

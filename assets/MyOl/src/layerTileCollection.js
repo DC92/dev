@@ -246,8 +246,8 @@ function layerBing(subLayer) {
  */
 function layersCollection() {
 	return {
-		'OpenTopo': layerOpenTopo(),
 		'OSM outdoors': layerThunderforest('outdoors'),
+		'OpenTopo': layerOpenTopo(),
 		'OSM transport': layerThunderforest('transport'),
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),

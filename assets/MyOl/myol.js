@@ -333,8 +333,8 @@ function layerBing(subLayer) {
  */
 function layersCollection() {
 	return {
-		'OpenTopo': layerOpenTopo(),
 		'OSM outdoors': layerThunderforest('outdoors'),
+		'OpenTopo': layerOpenTopo(),
 		'OSM transport': layerThunderforest('transport'),
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
@@ -1147,7 +1147,15 @@ function layerGeoBB(options) {
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
-				(options.selectorName ? '&' + (options.argSelName || 'cat') + '=' + selection.join(',') : '') +
+				// Add layer features filters
+				(options.selectorName ?
+					'&' + (options.argSelName || 'cat') + '=' + selection.join(',') :
+					'') +
+				// Refresh layer when data chenged
+				(localStorage.myol_lastChangeTime ?
+					'&v=' + localStorage.myol_lastChangeTime :
+					'') +
+				// Bbox strategy
 				'&bbox=' + bbox.join(',');
 		},
 		convertProperties: function(properties, feature, options) {
@@ -1635,6 +1643,7 @@ function controlLengthLine() {
 					length < 1000 ?
 					(Math.round(length)) + ' m' :
 					(Math.round(length / 10) / 100) + ' km';
+
 				return false; // Continue detection (for editor that has temporary layers)
 			}
 		}
@@ -2221,8 +2230,12 @@ function layerMarker(options) {
 	els.json.onchange();
 
 	// Read new values
-	function onChange() {
+	function onChange(evt) {
 		const fieldName = this.id.match(/-([a-z])/);
+
+		// Mark last change time
+		if (evt) // If a field has changed
+			localStorage.myol_lastChangeTime = new Date().getTime();
 
 		if (fieldName) {
 			if (fieldName[1] == 'j') { // json
@@ -2320,6 +2333,9 @@ function layerMarker(options) {
 			// Drag the marker
 			map.addInteraction(new ol.interaction.Pointer({
 				handleDownEvent: function(evt) {
+					// Mark last change time
+					localStorage.myol_lastChangeTime = new Date().getTime();
+
 					return map.getFeaturesAtPixel(evt.pixel, {
 						layerFilter: function(l) {
 							return l.ol_uid == layer.ol_uid;
@@ -2497,6 +2513,9 @@ function layerEditGeoJson(options) {
 
 
 	modify.on('modifyend', function(evt) {
+
+		// Mark last change time
+		localStorage.myol_lastChangeTime = new Date().getTime();
 
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
