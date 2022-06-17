@@ -198,11 +198,14 @@ function controlLengthLine() {
 		if (feature) {
 			const length = ol.sphere.getLength(feature.getGeometry());
 
-			control.element.innerHTML = length < 1000 ?
-				(Math.round(length)) + ' m' :
-				(Math.round(length / 10) / 100) + ' km';
+			if (length) {
+				control.element.innerHTML =
+					length < 1000 ?
+					(Math.round(length)) + ' m' :
+					(Math.round(length / 10) / 100) + ' km';
+				return false; // Continue detection (for editor that has temporary layers)
+			}
 		}
-		return false; // Continue detection (for editor that has temporary layers)
 	}
 	return control;
 }
