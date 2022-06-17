@@ -68,7 +68,15 @@ function layerWri(options) {
 		host: '//www.refuges.info/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'api/bbox?nb_points=all' +
-				'&type_points=' + selection.join(',') +
+				// Add layer features filters
+				(selection && selection.length ?
+					'&type_points=' + selection.join(',') +
+					'') +
+				// Refresh layer when data chenged
+				(localStorage.myol_lastChangeTime ?
+					'&v=' + localStorage.myol_lastChangeTime :
+					'') +
+				// Bbox strategy
 				'&bbox=' + bbox.join(',');
 		},
 		convertProperties: function(properties, feature, options) {
@@ -96,7 +104,11 @@ function layerWriAreas(options) {
 		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
 		urlFunction: function(options) {
-			return options.host + 'api/polygones?type_polygon=' + options.polygon;
+			return options.host + 'api/polygones?type_polygon=' + options.polygon +
+				// Refresh layer when data chenged
+				(localStorage.myol_lastChangeTime ?
+					'&v=' + localStorage.myol_lastChangeTime :
+					'');
 		},
 		convertProperties: function(properties) {
 			return {
