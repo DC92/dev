@@ -70,7 +70,7 @@ function layerWri(options) {
 			return options.host + 'api/bbox?nb_points=all' +
 				// Add layer features filters
 				(selection && selection.length ?
-					'&type_points=' + selection.join(',') +
+					'&type_points=' + selection.join(',') :
 					'') +
 				// Refresh layer when data chenged
 				(localStorage.myol_lastChangeTime ?
