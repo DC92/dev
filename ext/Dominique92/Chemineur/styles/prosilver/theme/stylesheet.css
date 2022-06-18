@@ -441,6 +441,18 @@ body,
 	padding: 3px;
 }
 
+/* Videos */
+.attachbox dd {
+	margin: 10px;
+	padding: 0;
+}
+.attachbox video {
+	width: calc(100% - 24px);
+	border-width: 0 12px;
+	border-style: solid;
+	border-image: url(cadres/film.svg) 12 round;
+}
+
 /* Posting */
 fieldset.fields1 dt {
 	width: initial;
