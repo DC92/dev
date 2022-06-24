@@ -1,3 +1,5 @@
+//TODO BUG : afficher quand même le picto de la fiche si la couche chem est désactivée
+
 //BEST inverser l'ordre des posts
 //BEST Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Purger la base des liens photos externes

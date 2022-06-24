@@ -50,24 +50,27 @@ function layerMarker(options) {
 
 	// Read new values
 	function onChange(evt) {
-		const fieldName = this.id.match(/-([a-z])/);
-
-		// Mark last change time
-		if (evt) // If a field has changed
+		if (evt) { // If a field has changed
+			// Mark last change time to be able to reload vector layr if changed
 			localStorage.myol_lastChangeTime = new Date().getTime();
 
-		if (fieldName) {
-			if (fieldName[1] == 'j') { // json
-				const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
-
-				if (json)
-					changeLL(json.slice(1), 'EPSG:4326', true);
-			} else
-			if (fieldName[1] == 'l') // lon | lat
-				changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
-			else
-			if (typeof proj4 == 'function') // x | y
-				changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
+			// Find changed input type from tne input id
+			switch (evt.target.id.match(/-([a-z]+)/)[1]) {
+				case 'json':
+					const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
+					if (json)
+						changeLL(json.slice(1), 'EPSG:4326', true);
+					break;
+				case 'lon':
+				case 'lat':
+					changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
+					break;
+				case 'x':
+				case 'y':
+					if (typeof proj4 == 'function') // x | y
+						changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
+					break;
+			}
 		}
 	}
 

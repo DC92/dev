@@ -91,6 +91,7 @@ function layerStamen(subLayer, minResolution) {
  * var mapKeys.ign = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
+//TODO don't display if no key provided
 function layerIGN(options) {
 	options = Object.assign({
 		format: 'image/jpeg',
