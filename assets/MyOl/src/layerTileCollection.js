@@ -35,6 +35,19 @@ function layerMRI() {
 }
 
 /**
+ * ArcGIS (Esri)
+ */
+function layerArcGIS() {
+	return new ol.layer.Tile({
+		source: new ol.source.XYZ({
+			url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+			maxZoom: 19,
+			attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
+		}),
+	});
+}
+
+/**
  * Kompas (Austria)
  * Requires layerOSM
  */
@@ -294,6 +307,7 @@ function layersCollection() {
 			style: 'BDORTHOHISTORIQUE',
 			format: 'image/png',
 		}),
+		'Photo ArcGIS': layerArcGIS('Aerial'),
 		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': layerGoogle('s'),
 	};
