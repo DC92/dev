@@ -124,19 +124,6 @@ function layerMRI() {
 }
 
 /**
- * ArcGIS (Esri)
- */
-function layerArcGIS() {
-	return new ol.layer.Tile({
-		source: new ol.source.XYZ({
-			url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-			maxZoom: 19,
-			attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
-		}),
-	});
-}
-
-/**
  * Kompas (Austria)
  * Requires layerOSM
  */
@@ -162,30 +149,6 @@ function layerThunderforest(subLayer) {
 			'/{z}/{x}/{y}.png?apikey=' + mapKeys.thunderforest,
 			'<a href="http://www.thunderforest.com">Thunderforest</a>'
 		);
-}
-
-/**
- * Google
- */
-function layerGoogle(subLayer) {
-	return new ol.layer.Tile({
-		source: new ol.source.XYZ({
-			url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
-			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
-		}),
-	});
-}
-
-/**
- * Stamen http://maps.stamen.com
- */
-function layerStamen(subLayer, minResolution) {
-	return new ol.layer.Tile({
-		source: new ol.source.Stamen({
-			layer: subLayer,
-		}),
-		minResolution: minResolution || 0,
-	});
 }
 
 /**
@@ -319,6 +282,44 @@ function layerOS(subLayer) {
 }
 
 /**
+ * ArcGIS (Esri)
+ */
+function layerArcGIS(subLayer) {
+	return new ol.layer.Tile({
+		source: new ol.source.XYZ({
+			url: 'https://server.arcgisonline.com/ArcGIS/rest/services/' + subLayer +
+				'/MapServer/tile/{z}/{y}/{x}',
+			maxZoom: 19,
+			attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
+		}),
+	});
+}
+
+/**
+ * Stamen http://maps.stamen.com
+ */
+function layerStamen(subLayer, minResolution) {
+	return new ol.layer.Tile({
+		source: new ol.source.Stamen({
+			layer: subLayer,
+		}),
+		minResolution: minResolution || 0,
+	});
+}
+
+/**
+ * Google
+ */
+function layerGoogle(subLayer) {
+	return new ol.layer.Tile({
+		source: new ol.source.XYZ({
+			url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
+			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
+		}),
+	});
+}
+
+/**
  * Bing (Microsoft)
  * var mapKeys.bing = Get your own (free) key at https://docs.microsoft.com/en-us/bingmaps/getting-started/
  */
@@ -392,7 +393,7 @@ function layersCollection() {
 			style: 'BDORTHOHISTORIQUE',
 			format: 'image/png',
 		}),
-		'Photo ArcGIS': layerArcGIS('Aerial'),
+		'Photo ArcGIS': layerArcGIS('World_Imagery'),
 		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': layerGoogle('s'),
 	};
