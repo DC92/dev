@@ -435,7 +435,7 @@ function layersDemo() {
  * Layer switcher
  * Need to include layerSwitcher.css
  */
-function controlLayerSwitcher(baseLayers, options) {
+function controlLayerSwitcher(layers, options) {
 	options = options || {};
 
 	const control = new ol.control.Control({
@@ -2264,22 +2264,24 @@ function layerMarker(options) {
 			localStorage.myol_lastChangeTime = new Date().getTime();
 
 		// Find changed input type from tne input id
-		switch (this.id.match(/-([a-z]+)/)[1]) {
-			case 'json':
-				const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
-				if (json)
-					changeLL(json.slice(1), 'EPSG:4326', true);
-				break;
-			case 'lon':
-			case 'lat':
-				changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
-				break;
-			case 'x':
-			case 'y':
-				if (typeof proj4 == 'function') // x | y
-					changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
-				break;
-		}
+		const idMatch = this.id.match(/-([a-z]+)/);
+		if (idMatch)
+			switch (idMatch[1]) {
+				case 'json':
+					const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
+					if (json)
+						changeLL(json.slice(1), 'EPSG:4326', true);
+					break;
+				case 'lon':
+				case 'lat':
+					changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
+					break;
+				case 'x':
+				case 'y':
+					if (typeof proj4 == 'function') // x | y
+						changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
+					break;
+			}
 	}
 
 	// Display values

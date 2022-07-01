@@ -3,7 +3,7 @@
  * Need to include layerSwitcher.css
  */
 //BEST alt key to swith layers / transparency
-function controlLayerSwitcher(baseLayers, options) {
+function controlLayerSwitcher(layers, options) {
 	options = options || {};
 
 	const control = new ol.control.Control({
