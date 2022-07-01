@@ -436,12 +436,15 @@ function layersDemo() {
  * Need to include layerSwitcher.css
  */
 function controlLayerSwitcher(baseLayers, options) {
-	baseLayers = baseLayers || layersCollection();
 	options = options || {};
 
 	const control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
+		baseLayers = Object.fromEntries(
+			Object.entries(layers || layersCollection())
+			.filter(([_, v]) => v != null) // Remove empty layers
+		),
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
 	let transparentBaseLayerName = '';
@@ -478,28 +481,27 @@ function controlLayerSwitcher(baseLayers, options) {
 		});
 
 		// Build html baselayers selectors
-		for (let name in baseLayers)
-			if (baseLayers[name]) { // Don't dispatch null layers (whose declaraton failed)
-				// Make all choices an array of layers
-				if (!baseLayers[name].length)
-					baseLayers[name] = [baseLayers[name]];
+		for (let name in baseLayers) {
+			// Make all choices an array of layers
+			if (!baseLayers[name].length)
+				baseLayers[name] = [baseLayers[name]];
 
-				const selectionEl = document.createElement('div'),
-					inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
+			const selectionEl = document.createElement('div'),
+				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
 
-				control.element.appendChild(selectionEl);
-				selectionEl.innerHTML =
-					'<input type="checkbox" name="baseLayer ' +
-					'"id="' + inputId + '" value="' + name + '" ' + ' />' +
-					'<label for="' + inputId + '">' + name + '</label>';
-				selectionEl.firstChild.onclick = selectBaseLayer;
-				baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
+			control.element.appendChild(selectionEl);
+			selectionEl.innerHTML =
+				'<input type="checkbox" name="baseLayer ' +
+				'"id="' + inputId + '" value="' + name + '" ' + ' />' +
+				'<label for="' + inputId + '">' + name + '</label>';
+			selectionEl.firstChild.onclick = selectBaseLayer;
+			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 
-				for (let l = 0; l < baseLayers[name].length; l++) {
-					baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
-					map.addLayer(baseLayers[name][l]);
-				}
+			for (let l = 0; l < baseLayers[name].length; l++) {
+				baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
+				map.addLayer(baseLayers[name][l]);
 			}
+		}
 
 		displayBaseLayers(); // Init layers
 
@@ -541,23 +543,22 @@ function controlLayerSwitcher(baseLayers, options) {
 	function displayBaseLayers() {
 		// Baselayer default is the first of the selection
 		if (!baseLayers[localStorage.myol_baselayer])
-			localStorage.myol_baselayer = Object.keys(baseLayers)[0];
+			localStorage.myol_baselayer = layerNames[0];
 
-		for (let name in baseLayers)
-			if (baseLayers[name]) {
-				const visible =
-					name == localStorage.myol_baselayer ||
-					name == transparentBaseLayerName;
+		for (let name in baseLayers) {
+			const visible =
+				name == localStorage.myol_baselayer ||
+				name == transparentBaseLayerName;
 
-				// Write the checks
-				baseLayers[name].inputEl.checked = visible;
+			// Write the checks
+			baseLayers[name].inputEl.checked = visible;
 
-				// Make the right layers visible
-				for (let l = 0; l < baseLayers[name].length; l++) {
-					baseLayers[name][l].setVisible(visible);
-					baseLayers[name][l].setOpacity(1);
-				}
+			// Make the right layers visible
+			for (let l = 0; l < baseLayers[name].length; l++) {
+				baseLayers[name][l].setVisible(visible);
+				baseLayers[name][l].setOpacity(1);
 			}
+		}
 
 		displayTransparencyRange();
 	}
@@ -2258,27 +2259,26 @@ function layerMarker(options) {
 
 	// Read new values
 	function onChange(evt) {
-		if (evt) { // If a field has changed
-			// Mark last change time to be able to reload vector layr if changed
+		if (evt) // If a field has changed
+			// Mark last change time to be able to reload vector layer if changed
 			localStorage.myol_lastChangeTime = new Date().getTime();
 
-			// Find changed input type from tne input id
-			switch (evt.target.id.match(/-([a-z]+)/)[1]) {
-				case 'json':
-					const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
-					if (json)
-						changeLL(json.slice(1), 'EPSG:4326', true);
-					break;
-				case 'lon':
-				case 'lat':
-					changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
-					break;
-				case 'x':
-				case 'y':
-					if (typeof proj4 == 'function') // x | y
-						changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
-					break;
-			}
+		// Find changed input type from tne input id
+		switch (this.id.match(/-([a-z]+)/)[1]) {
+			case 'json':
+				const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
+				if (json)
+					changeLL(json.slice(1), 'EPSG:4326', true);
+				break;
+			case 'lon':
+			case 'lat':
+				changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
+				break;
+			case 'x':
+			case 'y':
+				if (typeof proj4 == 'function') // x | y
+					changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
+				break;
 		}
 	}
 

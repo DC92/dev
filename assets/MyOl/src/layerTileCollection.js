@@ -248,6 +248,7 @@ function layerBing(subLayer) {
 				layer.setSource(new ol.source.BingMaps({
 					imagerySet: subLayer,
 					key: mapKeys.bing,
+					//TODO attribution
 				}));
 			}
 		});
