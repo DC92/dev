@@ -80,7 +80,10 @@ class listener implements EventSubscriberInterface
 		$this->language->add_lang ('common', $this->ns[0].'/'.$this->ns[1]);
 
 		// Constants values used in js code
+		//TODO grouper gym_const -> js
 		$this->template->assign_var ('ANNEE_DEBUT', $gym_const['annee_debut']);
+		$this->template->assign_var ('MOIS_DEBUT', $gym_const['mois_debut']);
+		$this->template->assign_var ('JOUR_DEBUT', $gym_const['jour_debut']);
 
 		// Assign command line
 		if ($this->args)

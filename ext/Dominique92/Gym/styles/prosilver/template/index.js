@@ -29,7 +29,7 @@ function displayInputCalendar(elCal, jour) {
 	let id = $(elCal).attr('data-id');
 
 	for (let week = 0; week < 52; week++) {
-		const date = new Date(annee_debut, 8 - 1, 2 + week * 7 + jour), // Jour suivant le lundi suivant le 1er aout annee_debut
+		const date = new Date(annee_debut, mois_debut, jour_debut + week * 7 + jour),
 			weekEl = $('#cal' + id + '_s' + week),
 			monthEl = $('#cal' + id + '_m' + (1 + date.getMonth()));
 

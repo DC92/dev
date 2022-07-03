@@ -27,7 +27,9 @@ define('MYPHPBB_DUMP_TEMPLATE', true);
 */
 
 $gym_const = [
-	'annee_debut' => 2021,
+	'annee_debut' => 2022,
+	'mois_debut' => 7,
+	'jour_debut' => 1,
 	'jour' => ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'],
 	'heure' => [0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
 	'minute' => ['00','05',10,15,20,25,30,35,40,45,45,50,55],
