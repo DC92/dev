@@ -64,36 +64,37 @@ function layerThunderforest(subLayer) {
 
 /**
  * IGN France
- * var mapKeys.ign = Get your own (free)IGN key at https://geoservices.ign.fr/
+ * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-//TODO don't display if no key provided
 function layerIGN(options) {
 	options = Object.assign({
 		format: 'image/jpeg',
 		style: 'normal',
 	}, options);
 
-	let IGNresolutions = [],
-		IGNmatrixIds = [];
+	if (options.key) { // Don't display if no key provided
+		let IGNresolutions = [],
+			IGNmatrixIds = [];
 
-	for (let i = 0; i < 18; i++) {
-		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
-		IGNmatrixIds[i] = i.toString();
+		for (let i = 0; i < 18; i++) {
+			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNmatrixIds[i] = i.toString();
+		}
+
+		return new ol.layer.Tile({
+			source: new ol.source.WMTS(Object.assign({
+				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
+				matrixSet: 'PM',
+				tileGrid: new ol.tilegrid.WMTS({
+					origin: [-20037508, 20037508],
+					resolutions: IGNresolutions,
+					matrixIds: IGNmatrixIds,
+				}),
+				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
+			}, options)),
+		});
 	}
-
-	return new ol.layer.Tile({
-		source: new ol.source.WMTS(Object.assign({
-			url: 'https://wxs.ign.fr/' + options.key + '/wmts',
-			matrixSet: 'PM',
-			tileGrid: new ol.tilegrid.WMTS({
-				origin: [-20037508, 20037508],
-				resolutions: IGNresolutions,
-				matrixIds: IGNmatrixIds,
-			}),
-			attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-		}, options)),
-	});
 }
 
 /**
@@ -239,7 +240,7 @@ function layerGoogle(subLayer) {
 function layerBing(subLayer) {
 	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
 
-	if (mapKeys.bing) {
+	if (mapKeys.bing) { // Don't display if no key provided
 		const layer = new ol.layer.Tile();
 
 		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
@@ -248,7 +249,7 @@ function layerBing(subLayer) {
 				layer.setSource(new ol.source.BingMaps({
 					imagerySet: subLayer,
 					key: mapKeys.bing,
-					//TODO attribution
+					// Attributions: defined by source.BingMaps
 				}));
 			}
 		});
@@ -285,10 +286,10 @@ function layersCollection() {
 			key: 'cartes/geoportail',
 		}),
 		//TODO Cassini
-		/*'IGN Cassini': layerIGN({
-			layer:'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
-			key: 'cartes/geoportail',
-		}),*/
+		'IGN Cassini': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+			key: mapKeys.ign,
+		}),
 		'Cadastre': layerIGN({
 			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
 			key: 'essentiels',

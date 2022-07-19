@@ -2,6 +2,7 @@
  * Layer switcher
  * Need to include layerSwitcher.css
  */
+//TODO open by touch only if touchscreen
 //BEST alt key to swith layers / transparency
 function controlLayerSwitcher(layers, options) {
 	options = options || {};
