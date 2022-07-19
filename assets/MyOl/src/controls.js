@@ -289,6 +289,11 @@ function controlGPS() {
 			],
 			title: 'Centrer sur la position GPS',
 			activate: function(state) {
+				// Force https to enable geolocation except for //localhost
+				if (!location.href.match(/(https|localhost)/))
+					location.replace(document.location.href.replace('http:', 'https:'));
+
+				// Tune geolocation
 				if (geolocation) {
 					geolocation.setTracking(state !== 0);
 					graticuleLayer.setVisible(state !== 0);
