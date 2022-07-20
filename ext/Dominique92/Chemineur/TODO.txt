@@ -1,6 +1,7 @@
 //TODO BUG : afficher quand même le picto de la fiche si la couche chem est désactivée
 
-//BEST inverser l'ordre des posts
+//BEST token psw {S_LOGIN_REDIRECT}
+//BEST inverser l'ordre des posts / SPECIALEMENT DIAPORAMAS !
 //BEST Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Purger la base des liens photos externes
 //BEST Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html

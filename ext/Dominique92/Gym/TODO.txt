@@ -1,3 +1,7 @@
+//TODO redirect page initiale aprés modif
+//TODO BUG saisie 2em ligne horaires avec balises dépassent
+//TODO BUG calcul heure de fin : Marche Nordique modérée / 1h30 tous les 15 jours	11h00 à 12h00
+//BEST diaporama sur demande dans le post
 //BEST ??? masquer le texte dans les séances
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio

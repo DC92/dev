@@ -285,7 +285,7 @@ function layersCollection() {
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
-		//TODO Cassini
+		//TODO what key for Cassini
 		'IGN Cassini': layerIGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
 			key: mapKeys.ign,

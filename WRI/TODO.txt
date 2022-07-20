@@ -1,7 +1,9 @@
 BUG
 ===
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
+Espagne méridionales qui inclue chemineur
 Carte nav affiche les massifs pour les gros massifs => zoom ?
+Manque lien administrateur dans le menu connecté
 Lien vers compte utilisateur sur petit écran
 Editeur massif : download ne marche pas ! (fichier vide)
 Ne nettoie pas les pictos de la carte en cas de modif
