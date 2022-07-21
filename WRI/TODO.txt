@@ -1,5 +1,7 @@
 BUG
 ===
+Click logo ne va pas à l'accueil en dehors de span
+Input recherche déborde des petits ecrans
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 Espagne méridionales qui inclue chemineur
 Carte nav affiche les massifs pour les gros massifs => zoom ?
