@@ -619,23 +619,14 @@ function layerVector(opt) {
 		}, options)),
 
 		elLabel = document.createElement('span'),
-		statusEl = document.getElementById(options.selectorName + '-status'); // XHR download tracking
+		inputEls = document.getElementsByName(options.selectorName),
+		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
+		values =
+		typeof localStorage['myol_' + options.selectorName] != 'undefined' ?
+		localStorage['myol_' + options.selectorName] :
+		readCheckbox(options.selectorName, true).join(',');
 
-	if (statusEl)
-		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
-			if (!statusEl.textContent.includes('error'))
-				statusEl.textContent = '';
-
-			switch (evt.type) {
-				case 'featuresloadstart':
-					statusEl.textContent = 'Chargement...';
-					break;
-				case 'featuresloaderror':
-					statusEl.textContent = 'Erreur !';
-			}
-		});
-
-	// url callback function for the layer
+	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
 		const selection = readCheckbox(options.selectorName);
 
@@ -651,16 +642,81 @@ function layerVector(opt) {
 			typeof selection == 'object' ? selection : [],
 			extent, resolution, projection
 		);
+
+		if (statusEl)
+			source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
+				if (!statusEl.textContent.includes('error'))
+					statusEl.textContent = '';
+
+				switch (evt.type) {
+					case 'featuresloadstart':
+						statusEl.textContent = 'Chargement...';
+						break;
+					case 'featuresloaderror':
+						statusEl.textContent = 'Erreur !';
+				}
+			});
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
-	memCheckbox(options.selectorName, function(selection) {
+	// Manage checkbox inputs having the same name
+	// Mem / recover the checkboxes in localStorage, url args or hash
+	// Manages a global flip-flop of the same named <input> checkboxes
+	if (inputEls)
+		for (let e = 0; e < inputEls.length; e++) {
+			// Set inputs following localStorage & args
+			inputEls[e].checked =
+				values.indexOf(inputEls[e].value) != -1 || // That one is declared
+				values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
+
+			// Compute the all check && init the localStorage if data has been given by the url
+			checkEl(inputEls[e]);
+
+			// Attach the action
+			inputEls[e].addEventListener('click', onClick);
+		}
+
+	function onClick(evt) {
+		checkEl(evt.target); // Do the "all" check verification
+
+		// Mem the data in the localStorage
+		const selection = readCheckbox(options.selectorName);
+
+		if (options.selectorName)
+			localStorage['myol_' + options.selectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
+
+		select(selection);
+	}
+
+	if (options.selectorName)
+		select(readCheckbox(options.selectorName));
+
+	function select(selection) {
 		const visible = typeof selection == 'object' ? selection.length : selection === true;
 
 		layer.setVisible(visible);
 		if (visible)
 			source.refresh();
-	});
+	}
+
+	// Check on <input> & set the "All" input accordingly
+	function checkEl(target) {
+		let allIndex = -1, // Index of the "all" <input> if any
+			allCheck = true; // Are all others checked ?
+
+		for (let e = 0; e < inputEls.length; e++) {
+			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
+				inputEls[e].checked = target.checked; // Force all the others to the same
+			else if (inputEls[e].value == 'on') // The "all" <input>
+				allIndex = e;
+			else if (!inputEls[e].checked)
+				allCheck = false; // Uncheck the "all" <input> if one other is unchecked
+		}
+
+		// Check the "all" <input> if all others are
+		if (allIndex != -1)
+			inputEls[allIndex].checked = allCheck;
+	}
 
 	// Callback function to define feature display from the properties received from the server
 	source.on('featuresloadend', function(evt) {
@@ -923,75 +979,6 @@ function readCheckbox(selectorName, withOn) {
 		if (inputEls[e].checked &&
 			(inputEls[e].value != 'on' || withOn)) // Avoid the first check in a list
 			selection.push(inputEls[e].value);
-
-	return selection;
-}
-
-/**
- * Manage checkbox inputs having the same name
- * selectorName {string}
- * callback {function(selection)} action when the button is clicked
- *
- * Mem / recover the checkboxes in localStorage, url args or hash
- * Manages a global flip-flop of the same named <input> checkboxes
- */
-function memCheckbox(selectorName, callback) {
-	const inputEls = document.getElementsByName(selectorName),
-		values = typeof localStorage['myol_' + selectorName] != 'undefined' ?
-		localStorage['myol_' + selectorName] :
-		readCheckbox(selectorName, true).join(',');
-
-	// Set the <inputs> accordingly with the localStorage or url args
-	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) {
-			// Set inputs following localStorage & args
-			inputEls[e].checked =
-				values.indexOf(inputEls[e].value) != -1 || // That one is declared
-				values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
-
-			// Compute the all check && init the localStorage if data has been given by the url
-			checkEl(inputEls[e]);
-
-			// Attach the action
-			inputEls[e].addEventListener('click', onClick);
-		}
-
-	function onClick(evt) {
-		checkEl(evt.target); // Do the "all" check verification
-
-		// Mem the data in the localStorage
-		const selection = readCheckbox(selectorName);
-
-		if (selectorName)
-			localStorage['myol_' + selectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
-
-		if (inputEls.length && typeof callback == 'function')
-			callback(selection);
-	}
-
-	// Check on <input> & set the "All" input accordingly
-	function checkEl(target) {
-		let allIndex = -1, // Index of the "all" <input> if any
-			allCheck = true; // Are all others checked ?
-
-		for (let e = 0; e < inputEls.length; e++) {
-			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
-				inputEls[e].checked = target.checked; // Force all the others to the same
-			else if (inputEls[e].value == 'on') // The "all" <input>
-				allIndex = e;
-			else if (!inputEls[e].checked)
-				allCheck = false; // Uncheck the "all" <input> if one other is unchecked
-		}
-
-		// Check the "all" <input> if all others are
-		if (allIndex != -1)
-			inputEls[allIndex].checked = allCheck;
-	}
-
-	const selection = readCheckbox(selectorName);
-
-	if (inputEls.length && typeof callback == 'function')
-		callback(selection);
 
 	return selection;
 }
