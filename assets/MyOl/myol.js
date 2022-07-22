@@ -522,18 +522,18 @@ function controlLayerSwitcher(layers, options) {
 	};
 
 	function selectBaseLayer(evt) {
-		// 1 seule couche
+		// Single layer
 		if (!evt || !evt.ctrlKey || this.value == localStorage.myol_baselayer) {
 			transparentBaseLayerName = '';
 			localStorage.myol_baselayer = this.value;
 		}
-		// Il y a une deuxième couche aprés celle existante
+		// There is a second layer after the existing one
 		else if (layerNames.indexOf(localStorage.myol_baselayer) <
 			layerNames.indexOf(this.value)) {
 			transparentBaseLayerName = this.value;
 			// localStorage.myol_baselayer don't change
 		}
-		// Il y a une deuxième couche avant celle existante
+		// There is a second layer before the existing one
 		else {
 			transparentBaseLayerName = localStorage.myol_baselayer;
 			localStorage.myol_baselayer = this.value;

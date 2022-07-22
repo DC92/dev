@@ -346,7 +346,7 @@ function controlGPS() {
 		}),
 	}));
 
-	control.setMap = function(map) {
+	control.setMap = function(map) { //HACK execute actions on Map init
 		//HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 

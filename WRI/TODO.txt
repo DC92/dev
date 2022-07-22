@@ -7,9 +7,11 @@ Carte nav affiche les massifs pour les gros massifs => zoom ?
 Manque lien administrateur dans le menu connecté
 Lien vers compte utilisateur sur petit écran
 Editeur massif : download ne marche pas ! (fichier vide)
-Ne nettoie pas les pictos de la carte en cas de modif
-N'affiche pas le massif modifié en cas de modif
 GPS : le triangle en haut reste affiché
+Retour à la page refferer après connexion
+Formulaire contact : nom utilisateur
+Pas de favicon dans S20 accueil FF
+? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -17,21 +19,17 @@ Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
 Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
 Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
-Lien vers … la page de liens (en menu)
-BUG ne voit pas le forum développement
 
 Accueil carte
-	installable ?
-	haut
-		nom du site
-		recherche
-		menu déplié ou replié
+	menu
 	carte / groupes de points
 	liste (ou choix des types de points)
 Point
 
 EVOLUTIONS
 ==========
+page GPS (ou similaire) comme un point d'entrée mobile
+
 http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
 https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
@@ -39,15 +37,15 @@ https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
 Couleur des pictos cabanes dont on n’a pas d’éléments pour dire qu’elles sont destinées à accueillir des randonneurs
 -	Picto cabane ou abri avec un 0 (comme aujourd’hui) similaire aux pictos de celles faites pour accueillir des randonneurs
 -	Picto cabane ou abri gris, mur noir avec 0 (urgence seulement) ou ? (on ne sait pas) ou X (fermé)
+Pictos geocaching
 
 Informations affichées pour les cabanes non destinées à y dormir
 -	Nom, position (carte), propriétaire / accessibilité, forum + bandeau expliquant que cette cabane n’est pas destinée à y dormir
+Auteur demande corrections
 
 dualité fiche-forum
+Fusion commentaire / forum : notion de post descriptif
 
-page GPS (ou similaire) comme un point d'entrée mobile
-
-Sur les massifs, nous avons eu des retours sur des points absents, alors qu'il suffisait juste de décocher la case "Massif uniquement". Ce n'est pas intuitif.
 Sur la visualisation d'un point, il arrive souvent que les contributeurs se perdent entre forum et commentaires, le paragraphe n'étant pas bien lu. Une piste serait d'intégrer le fil du forum à la page point.
 De manière générale, nous avons souvent mit en place des textes explicatifs pour apporter des précisions avec des liens rebondissants vers le wiki. Cette lecture peut décourager. Une option est d'utiliser plus fréquemment des icônes.
 Sur le forum, il arrive souvent que des questions soient posées en double, les recherches n'étant pas correctement effectuées.
@@ -55,23 +53,14 @@ La version mobile, parfois réclamée, est bien cachée
 Les données externes (PRC...) pourraient être mieux intégrées, en imaginant les intégrer directement aux fiches.
 Le formulaire n'est accessible facilement que depuis un ordinateur, et malheureusement l'ergonomie de Facebook ou autres rend la chose beaucoup plus aisés sur des groupes spécialisés dans ces espaces.
 La saisie en BBcode n'est plus fréquente, et nécessite donc de l'apprendre : une piste est d'utiliser du Markdown au gout du jour.
-
-
-TODO WRI
-========
-Retour à la page initiale après connexion
-Formulaire contact : nom utilisateur
-Fusion commentaire / forum : notion de post descriptif
-Pictos geocaching
-Pas de favicon dans S20 accueil FF
-Auteur demande corrections
-Liste users surs / utilitaire scan liens
-service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
-? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
-? historique posts phpbb wri (ext/...)
-	Paramétres inclusion posts dans points -> config.php
 L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté site pour ce qui est des quotes
 	https://dom.refuges.info/forum/viewtopic.php?f=4&t=6335&p=19629
+
+TOOLS
+=====
+? historique posts phpbb wri (ext/...)
+	Paramétres inclusion posts dans points -> config.php
+Liste users surs / utilitaire scan liens
 Déraciner le wiki / le mettre dans le forum
 Install ne vas plus marcher si config.php est là !
 

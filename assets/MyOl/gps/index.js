@@ -5,6 +5,8 @@ var map;
 const liTags = document.getElementsByTagName('li'), //TODO BUG trop de séléction (BUG WRI)
 	elListe = document.getElementById('liste');
 
+//TODO BUG (WRI) service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
+
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
 if (!location.href.match(/(https|localhost).*index/)) {
