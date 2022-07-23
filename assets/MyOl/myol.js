@@ -438,10 +438,11 @@ function layersDemo() {
  * Layer switcher
  * Need to include layerSwitcher.css
  */
-function controlLayerSwitcher(layers, options) {
-	options = options || {};
-
-	const control = new ol.control.Control({
+function controlLayerSwitcher(layers, opt) {
+	const options = Object.assign({
+			additionalSelectorId: 'additional-selector',
+		}, opt),
+		control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
 		baseLayers = Object.fromEntries(
@@ -450,9 +451,10 @@ function controlLayerSwitcher(layers, options) {
 		),
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
+
 	let transparentBaseLayerName = '';
 
-	// Get baselayer from url ?
+	// Get baselayer from url if any
 	if (baselayer)
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
@@ -494,8 +496,7 @@ function controlLayerSwitcher(layers, options) {
 
 			control.element.appendChild(selectionEl);
 			selectionEl.innerHTML =
-				'<input type="checkbox" name="baseLayer ' +
-				'"id="' + inputId + '" value="' + name + '" ' + ' />' +
+				'<input type="checkbox" name="baseLayer" id="' + inputId + '" value="' + name + '" ' + ' />' +
 				'<label for="' + inputId + '">' + name + '</label>';
 			selectionEl.firstChild.onclick = selectBaseLayer;
 			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
@@ -506,14 +507,11 @@ function controlLayerSwitcher(layers, options) {
 			}
 		}
 
-		displayBaseLayers(); // Init layers
+		// Init layers
+		displayBaseLayers();
 
 		// Attach html additional selector
-		const additionalSelector = document.getElementById(
-			options.additionalSelectorId ||
-			'additional-selector'
-		);
-
+		const additionalSelector = document.getElementById(options.additionalSelectorId);
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration
@@ -1467,15 +1465,14 @@ function layerOverpass(options) {
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
-function controlButton(options) {
-	options = Object.assign({
-		element: document.createElement('div'),
-		buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
-		className: 'ol-button',
-		activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
-	}, options);
-
-	const control = new ol.control.Control(options),
+function controlButton(opt) {
+	const options = Object.assign({
+			element: document.createElement('div'),
+			buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
+			className: 'ol-button',
+			activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
+		}, opt),
+		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
 	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
@@ -1538,18 +1535,24 @@ function controlButton(options) {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
-function controlPermalink(options) {
-	const aEl = document.createElement('a'),
+function controlPermalink(opt) {
+	const options = Object.assign({
+			init: true, // {true | false} use url hash or localStorage to position the map.
+			setUrl: false, // {true | false} Change url hash when moving the map.
+			display: false, // {true | false} Display permalink link the map.
+			hash: '?', // {?, #} the permalink delimiter after the url
+		}, opt),
 		control = new ol.control.Control({
 			element: document.createElement('div'),
 			render: render,
 		}),
+		aEl = document.createElement('a'),
+		// Get best value for all params
 		urlMod =
-		// zoom=<zoom>&lon=<lon>&lat=<lat>
+		// From the url ? or #
 		location.href.replace(
-			// map=<zoom>/<lon>/<lat>
-			/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/,
-			'zoom=$1&lon=$2&lat=$3'
+			/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/, // map=<zoom>/<lon>/<lat>
+			'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
 		) +
 		// Last values
 		'zoom=' + localStorage.myol_zoom +
@@ -1557,13 +1560,6 @@ function controlPermalink(options) {
 		'lat=' + localStorage.myol_lat +
 		// Default
 		'zoom=6&lon=2&lat=47';
-
-	options = Object.assign({
-		init: true, // {true | false} use url hash or localStorage to position the map.
-		setUrl: false, // {true | false} Change url hash when moving the map.
-		display: false, // {true | false} Display permalink link the map.
-		hash: '?', // {?, #} the permalink delimiter after the url
-	}, options);
 
 	if (options.display) {
 		control.element.className = 'ol-permalink';
@@ -1697,26 +1693,25 @@ function controlTilesBuffer(depth) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-function controlGeocoder(options) {
-	options = Object.assign({
-		title: 'Recherche sur la carte',
-	}, options);
-
+function controlGeocoder(opt) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return new ol.control.Control({
 			element: document.createElement('div'),
 		});
 
-	const geocoder = new Geocoder('nominatim', {
-		provider: 'osm',
-		lang: 'fr-FR',
-		autoComplete: false, // Else keep list of many others
-		keepOpen: true, // Else bug "no internet"
-		placeholder: options.title, // Initialization of the input field
-	});
+	const options = Object.assign({
+			title: 'Recherche sur la carte',
+		}, opt),
+		geocoder = new Geocoder('nominatim', {
+			provider: 'osm',
+			lang: 'fr-FR',
+			autoComplete: false, // Else keep list of many others
+			keepOpen: true, // Else bug "no internet"
+			placeholder: options.title, // Initialization of the input field
+		}),
+		buttonEl = geocoder.element.firstElementChild.firstElementChild;
 
 	// Move the button at the same level than the other control's buttons
-	const buttonEl = geocoder.element.firstElementChild.firstElementChild;
 	buttonEl.innerHTML = '&#x1F50D;';
 	buttonEl.title = options.title;
 	geocoder.element.appendChild(buttonEl);
@@ -1729,12 +1724,8 @@ function controlGeocoder(options) {
  * Requires controlButton
  */
 function controlGPS() {
-	let view, geolocation, nbLoc, position, heading, accuracy, altitude, speed;
-
 	// Display status, altitude & speed
-	const displayEl = document.createElement('div'),
-
-		control = controlButton({
+	const control = controlButton({
 			className: 'ol-button ol-gps',
 			label: '&#x2295;',
 			buttonBackgroundColors: [ // Define 4 states button
@@ -1744,26 +1735,8 @@ function controlGPS() {
 				'grey', // 3 : active, do not centered nor oriented
 			],
 			title: 'Centrer sur la position GPS',
-			activate: function(state) {
-				// Force https to enable geolocation except for //localhost
-				if (!location.href.match(/(https|localhost)/))
-					location.replace(document.location.href.replace('http:', 'https:'));
-
-				// Tune geolocation
-				if (geolocation) {
-					geolocation.setTracking(state !== 0);
-					graticuleLayer.setVisible(state !== 0);
-					nbLoc = 0;
-					if (!state && view) {
-						view.setRotation(0, 0); // Set north to top
-						displayEl.innerHTML = '';
-						displayEl.classList.remove('ol-control-gps');
-					}
-				}
-				ol.gpsPosition = null;
-			}
+			activate: activate,
 		}),
-
 		// Graticule
 		graticuleFeature = new ol.Feature(),
 		northGraticuleFeature = new ol.Feature(),
@@ -1782,7 +1755,10 @@ function controlGPS() {
 					width: 1,
 				}),
 			}),
-		});
+		}),
+		displayEl = document.createElement('div');
+
+	let view, geolocation, nbLoc, position, heading, accuracy, altitude, speed;
 
 	control.element.appendChild(displayEl);
 
@@ -1845,6 +1821,25 @@ function controlGPS() {
 			console.log('Geolocation error: ' + error.message);
 		});
 	};
+
+	function activate(state) {
+		// Force https to enable geolocation except for //localhost
+		if (!location.href.match(/(https|localhost)/))
+			location.replace(document.location.href.replace('http:', 'https:'));
+
+		// Tune geolocation
+		if (geolocation) {
+			geolocation.setTracking(state !== 0);
+			graticuleLayer.setVisible(state !== 0);
+			nbLoc = 0;
+			if (!state && view) {
+				view.setRotation(0, 0); // Set north to top
+				displayEl.innerHTML = '';
+				displayEl.classList.remove('ol-control-gps');
+			}
+		}
+		ol.gpsPosition = null;
+	}
 
 	function renderGPS() {
 		// Display data under the button
@@ -1939,19 +1934,18 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-function controlLoadGPX(options) {
-	options = Object.assign({
-		label: '&#x1F4C2;',
-		title: 'Visualiser un fichier GPX sur la carte',
-		activate: function() {
-			inputEl.click();
-		},
-	}, options);
-
-	const inputEl = document.createElement('input'),
+function controlLoadGPX(opt) {
+	const options = Object.assign({
+			label: '&#x1F4C2;',
+			title: 'Visualiser un fichier GPX sur la carte',
+			activate: function() {
+				inputEl.click();
+			},
+		}, opt),
+		control = controlButton(options),
+		inputEl = document.createElement('input'),
 		format = new ol.format.GPX(),
-		reader = new FileReader(),
-		control = controlButton(options);
+		reader = new FileReader();
 
 	inputEl.type = 'file';
 	inputEl.addEventListener('change', function() {
@@ -2018,31 +2012,31 @@ function controlLoadGPX(options) {
  * File downloader control
  * Requires controlButton
  */
-function controlDownload(options) {
-	options = Object.assign({
-		label: '&#x1F4E5;',
-		buttonBackgroundColors: ['white'],
-		className: 'ol-button ol-download',
-		title: 'Cliquer sur un format ci-dessous\n' +
-			'pour obtenir un fichier contenant\n' +
-			'les éléments visibles dans la fenêtre.\n' +
-			'(la liste peut être incomplète pour les grandes zones)',
-		question: '<span/>', // Invisible but generates a questionEl <div>
-		fileName: document.title || 'openlayers',
-		activate: download,
-	}, options);
+function controlDownload(opt) {
+	const options = Object.assign({
+			label: '&#x1F4E5;',
+			buttonBackgroundColors: ['white'],
+			className: 'ol-button ol-download',
+			title: 'Cliquer sur un format ci-dessous\n' +
+				'pour obtenir un fichier contenant\n' +
+				'les éléments visibles dans la fenêtre.\n' +
+				'(la liste peut être incomplète pour les grandes zones)',
+			question: '<span/>', // Invisible but generates a questionEl <div>
+			fileName: document.title || 'openlayers',
+			activate: download,
+		}, opt),
+		control = controlButton(options),
+		hiddenEl = document.createElement('a'),
+		formats = {
+			GPX: 'application/gpx+xml',
+			KML: 'vnd.google-earth.kml+xml',
+			GeoJSON: 'application/json',
+		};
 
-	const hiddenEl = document.createElement('a'),
-		control = controlButton(options);
 	hiddenEl.target = '_self';
 	hiddenEl.style = 'display:none';
 	document.body.appendChild(hiddenEl);
 
-	const formats = {
-		GPX: 'application/gpx+xml',
-		KML: 'vnd.google-earth.kml+xml',
-		GeoJSON: 'application/json',
-	};
 	for (let f in formats) {
 		const el = document.createElement('p');
 		el.onclick = download;
@@ -2231,7 +2225,11 @@ function layerMarker(options) {
 	// Initialise specific projection
 	if (typeof proj4 == 'function') {
 		// Swiss
-		proj4.defs('EPSG:21781', '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+		proj4.defs('EPSG:21781',
+			'+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 ' +
+			'+k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel ' +
+			'+towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs'
+		);
 
 		// UTM zones
 		for (let u = 1; u <= 60; u++) {

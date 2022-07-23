@@ -12,6 +12,7 @@ header('Service-Worker-Allowed: /');
 $url_path = str_replace (':', '../', @$_GET['url_path']);
 
 // Read service worker & replace some values
+//TODO BUG (WRI) service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
 $serviceWorkerCode = str_replace (
 	'index.html', $url_path.'index.php',
 	file_get_contents ('service-worker.js')

@@ -3,10 +3,11 @@
  * Need to include layerSwitcher.css
  */
 //BEST alt key to switch layers / transparency
-function controlLayerSwitcher(layers, options) {
-	options = options || {};
-
-	const control = new ol.control.Control({
+function controlLayerSwitcher(layers, opt) {
+	const options = Object.assign({
+			additionalSelectorId: 'additional-selector',
+		}, opt),
+		control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
 		baseLayers = Object.fromEntries(
@@ -15,9 +16,10 @@ function controlLayerSwitcher(layers, options) {
 		),
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
+
 	let transparentBaseLayerName = '';
 
-	// Get baselayer from url ?
+	// Get baselayer from url if any
 	if (baselayer)
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
@@ -60,8 +62,7 @@ function controlLayerSwitcher(layers, options) {
 
 			control.element.appendChild(selectionEl);
 			selectionEl.innerHTML =
-				'<input type="checkbox" name="baseLayer ' +
-				'"id="' + inputId + '" value="' + name + '" ' + ' />' +
+				'<input type="checkbox" name="baseLayer" id="' + inputId + '" value="' + name + '" ' + ' />' +
 				'<label for="' + inputId + '">' + name + '</label>';
 			selectionEl.firstChild.onclick = selectBaseLayer;
 			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
@@ -72,15 +73,12 @@ function controlLayerSwitcher(layers, options) {
 			}
 		}
 
-		displayBaseLayers(); // Init layers
+		// Init layers
+		displayBaseLayers();
 
 		// Attach html additional selector
-		const additionalSelector = document.getElementById(
-			options.additionalSelectorId ||
-			'additional-selector'
-		);
-
 		//BEST other id don't use the css
+		const additionalSelector = document.getElementById(options.additionalSelectorId);
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration

@@ -5,8 +5,6 @@ var map;
 const liTags = document.getElementsByTagName('li'), //TODO BUG trop de séléction (BUG WRI)
 	elListe = document.getElementById('liste');
 
-//TODO BUG (WRI) service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
-
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
 if (!location.href.match(/(https|localhost).*index/)) {
@@ -16,9 +14,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		location.pathname + (location.pathname.slice(-1) == '/' ? scriptName || 'index.html' : '') +
 		location.search);
 } else {
-	/**
-	 * Load service worker for web application install & updates
-	 */
+	// Load service worker for web application install & updates
 	if ('serviceWorker' in navigator)
 		navigator.serviceWorker.register(
 			typeof serviceWorkerName == 'undefined' ? 'service-worker.js' : serviceWorkerName, {
@@ -39,9 +35,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 				};
 		});
 
-	/**
-	 * OPENLAYERS
-	 */
+	// Manage the map
 	const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		'Avant le départ :\n' +
 		'- Enregistrez un marque-page ou installez l‘application web (explorateur -> options -> ajouter à l‘écran d‘accueil)\n' +
