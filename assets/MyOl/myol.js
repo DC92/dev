@@ -469,11 +469,11 @@ function controlLayerSwitcher(layers, opt) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// control.element is defined when attached to the map
-		control.element.className = 'ol-control ol-control-switcher';
+		control.element.className = 'ol-control ol-button-switcher';
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
-			control.element.classList.add('ol-control-switcher-open');
+			control.element.classList.add('ol-button-switcher-open');
 		};
 
 		// Hide the selector when the cursor is out of the selector
@@ -482,7 +482,7 @@ function controlLayerSwitcher(layers, opt) {
 				max_y = control.element.offsetHeight + 20;
 
 			if (evt.pixel[0] < max_x || evt.pixel[1] > max_y)
-				control.element.classList.remove('ol-control-switcher-open');
+				control.element.classList.remove('ol-button-switcher-open');
 		});
 
 		// Build html baselayers selectors
@@ -1491,14 +1491,14 @@ function controlButton(opt) {
 	if (options.question) {
 		control.questionEl = document.createElement('div');
 		control.questionEl.innerHTML = options.question;
-		control.questionEl.className = 'ol-control-hidden';
+		control.questionEl.className = 'ol-button-hidden';
 
 		control.element.appendChild(control.questionEl);
 		control.element.onmouseover = function() {
-			control.questionEl.className = 'ol-control-question';
+			control.questionEl.className = 'ol-Button-question';
 		};
 		control.element.onmouseout = function() {
-			control.questionEl.className = 'ol-control-hidden';
+			control.questionEl.className = 'ol-button-hidden';
 		};
 	}
 
@@ -1835,7 +1835,7 @@ function controlGPS() {
 			if (!state && view) {
 				view.setRotation(0, 0); // Set north to top
 				displayEl.innerHTML = '';
-				displayEl.classList.remove('ol-control-gps');
+				displayEl.classList.remove('ol-button-gps');
 			}
 		}
 		ol.gpsPosition = null;
@@ -1859,7 +1859,7 @@ function controlGPS() {
 		}
 
 		displayEl.innerHTML = displays.join(', ');
-		displayEl.classList[displays.length ? 'add' : 'remove']('ol-control-gps');
+		displayEl.classList[displays.length ? 'add' : 'remove']('ol-button-gps');
 
 		// Render position & graticule
 		if (control.state && position &&

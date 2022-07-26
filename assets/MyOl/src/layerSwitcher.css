@@ -1,31 +1,31 @@
-.ol-control-switcher {
+.ol-button-switcher {
 	position: static;
 	float: right;
 }
-.ol-control-switcher .single-layer span {
+.ol-button-switcher .single-layer span {
 	font-size: 0.7em;
 }
-.ol-control-switcher .single-layer input,
-.ol-control-switcher .double-layer span,
-.ol-control-switcher-open button,
-.ol-control-switcher:not(.ol-control-switcher-open) > hr,
-.ol-control-switcher:not(.ol-control-switcher-open) > div {
+.ol-button-switcher .single-layer input,
+.ol-button-switcher .double-layer span,
+.ol-button-switcher-open button,
+.ol-button-switcher:not(.ol-button-switcher-open) > hr,
+.ol-button-switcher:not(.ol-button-switcher-open) > div {
 	display: none;
 }
-.ol-control-switcher hr {
+.ol-button-switcher hr {
 	margin: 0;
 }
-.ol-control-switcher-open {
+.ol-button-switcher-open {
 	position: absolute;
 	right: 0;
 	max-height: 98%;
 	overflow: auto;
 }
-.ol-control-switcher div {
+.ol-button-switcher div {
 	padding-left: 5px;
 }
-.ol-control-switcher span,
-.ol-control-switcher label {
+.ol-button-switcher span,
+.ol-button-switcher label {
 	color: black;
 }
 

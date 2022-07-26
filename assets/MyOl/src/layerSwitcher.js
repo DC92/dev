@@ -24,6 +24,7 @@ function controlLayerSwitcher(layers, opt) {
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
 	// Build html transparency slider
+	//BEST fonction sur les terminaux tactiles
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -34,12 +35,12 @@ function controlLayerSwitcher(layers, opt) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// control.element is defined when attached to the map
-		control.element.className = 'ol-control ol-control-switcher';
+		control.element.className = 'ol-control ol-button-switcher';
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
 			//BEST open flip/flop on touchscreen devices
-			control.element.classList.add('ol-control-switcher-open');
+			control.element.classList.add('ol-button-switcher-open');
 		};
 
 		// Hide the selector when the cursor is out of the selector
@@ -48,7 +49,7 @@ function controlLayerSwitcher(layers, opt) {
 				max_y = control.element.offsetHeight + 20;
 
 			if (evt.pixel[0] < max_x || evt.pixel[1] > max_y)
-				control.element.classList.remove('ol-control-switcher-open');
+				control.element.classList.remove('ol-button-switcher-open');
 		});
 
 		// Build html baselayers selectors
