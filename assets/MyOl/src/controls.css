@@ -1,8 +1,5 @@
 /* Top aligned buttons */
 /* Container */
-.ol-button-hidden {
-	display: none;
-}
 .ol-zoom,
 .ol-full-screen,
 .ol-geocoder,
@@ -13,17 +10,20 @@
 	margin: 2px;
 	padding: 0 !important; /* No grey line around the button */
 }
+.ol-button-hidden {
+	display: none;
+}
 
 /* Button */
-.ol-control button,
-.ol-control button:focus {
+.ol-control button, /* Also for zoom, fullScreen, ... */
+.ol-control button:focus { /* Zoom, ... after have been clicked */
 	font-size: 18px !important;
 	color: black;
 	background-color: white;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	outline: 0;
 }
-.ol-control-billboard {
+.ol-button-submenu {
 	position: absolute;
 	top: 27px;
 	width: 100px;
@@ -31,16 +31,28 @@
 	background-color: white;
 	font-size: 14px;
 }
-.ol-control-billboard span {
+/*//TODO
+.ol-button:not(.ol-display-submenu) > div {
+	display: none;
+}
+.ol-display-submenu > div {
+	position: absolute;
+	top: 27px;
+	width: 100px;
+	padding: 1px;
+	background-color: white;
+	font-size: 14px;
+}
+*/
+.ol-button-submenu span {
 	cursor: pointer;
 }
-.ol-control button:hover,
-.ol-geocoder button:hover {
+.ol-control button:hover { /* Also for zoom, fullScreen, ... */
 	box-shadow: 1px 1px 10px black;
 	background-color: #d6fbff;
 }
-.ol-control button:active,
-.ol-geocoder button:active { /* Shift the button by 1px when clicked */
+.ol-control button:active, /* Shift the button by 1px when clicked */
+.ol-geocoder button:active {
 	position: relative !important;
 	top: 1px;
 	left: 1px;

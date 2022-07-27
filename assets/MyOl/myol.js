@@ -1475,7 +1475,7 @@ function controlButton(opt) {
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
-	control.element.className = 'ol-button ol-unselectable ol-control ' + options.className;
+	control.element.className = 'ol-control ' + options.className;
 	control.element.title = options.title; // {string} displayed when the control is hovered.
 	if (options.label)
 		buttonEl.innerHTML = options.label;
@@ -1483,24 +1483,39 @@ function controlButton(opt) {
 		control.element.appendChild(buttonEl);
 
 	buttonEl.addEventListener('click', function(evt) {
-		evt.preventDefault();
 		control.toggle();
+		evt.preventDefault();
 	});
 
-	// Add selectors below the button
-	if (options.question) {
-		control.questionEl = document.createElement('div');
-		control.questionEl.innerHTML = options.question;
-		control.questionEl.className = 'ol-button-hidden';
+	// Add submenu below the button
+	control.submenuEl = options.submenuEl || document.createElement('div');
+	control.submenuEl.className = 'ol-button-hidden';
+	control.element.appendChild(control.submenuEl);
 
-		control.element.appendChild(control.questionEl);
-		control.element.onmouseover = function() {
-			control.questionEl.className = 'ol-Button-question';
-		};
-		control.element.onmouseout = function() {
-			control.questionEl.className = 'ol-button-hidden';
-		};
-	}
+	if (options.submenuHTML)
+		control.submenuEl.innerHTML = options.submenuHTML;
+
+	control.element.onmouseover = function() {
+		control.submenuEl.className = 'ol-button-submenu';
+	};
+	control.element.onmouseout = function() {
+		control.submenuEl.className = 'ol-button-hidden';
+	};
+
+	/*
+	control.element.onmouseover = function(evt) {
+		control.element.classList.add( 'ol-display-submenu');
+		evt.preventDefault();
+	};
+	control.element.onmouseout = function(evt) {
+		control.element.classList.remove( 'ol-display-submenu');
+		evt.preventDefault();
+	};
+	control.element.ontouchstart = function(evt) {
+		control.element.classList.toggle( 'ol-display-submenu');
+		evt.preventDefault();
+	};
+	*/
 
 	// Toggle the button status & aspect
 	control.state = 0;
@@ -1726,7 +1741,7 @@ function controlGeocoder(opt) {
 function controlGPS() {
 	// Display status, altitude & speed
 	const control = controlButton({
-			className: 'ol-button ol-gps',
+			className: 'ol-control ol-gps',
 			label: '&#x2295;',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
@@ -2021,7 +2036,7 @@ function controlDownload(opt) {
 				'pour obtenir un fichier contenant\n' +
 				'les éléments visibles dans la fenêtre.\n' +
 				'(la liste peut être incomplète pour les grandes zones)',
-			question: '<span/>', // Invisible but generates a questionEl <div>
+			submenuHTML: '<span/>', // Invisible but generates a submenuEl <div>
 			fileName: document.title || 'openlayers',
 			activate: download,
 		}, opt),
@@ -2043,7 +2058,7 @@ function controlDownload(opt) {
 		el.innerHTML = f;
 		el.id = formats[f];
 		el.title = 'Obtenir un fichier ' + f;
-		control.questionEl.appendChild(el);
+		control.submenuEl.appendChild(el);
 	}
 
 	function download() { //formatName, mime
@@ -2105,7 +2120,7 @@ function controlPrint() {
 			'choisir l‘orientation,\n' +
 			'zoomer et déplacer,\n' +
 			'cliquer sur l‘icône imprimante.',
-		question: '<input type="radio" name="print-orientation" id="ol-po0" value="0" />' +
+		submenuHTML: '<input type="radio" name="print-orientation" id="ol-po0" value="0" />' +
 			'<label for="ol-po0">Portrait A4</label><br />' +
 			'<input type="radio" name="print-orientation" id="ol-po1" value="1" />' +
 			'<label for="ol-po1">Paysage A4</label>',
