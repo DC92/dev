@@ -31,7 +31,7 @@
 
 #additional-selector {
 	color: black;
-	background-color: rgb(162, 226, 255, 0.6);
+	background: rgb(162, 226, 255, 0.6);
 }
 #additional-selector ul {
 	margin: 0;

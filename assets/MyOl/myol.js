@@ -1489,37 +1489,25 @@ function controlButton(opt) {
 
 	// Add submenu below the button
 	control.submenuEl = options.submenuEl || document.createElement('div');
-	control.submenuEl.className = 'ol-button-hidden';
 	control.element.appendChild(control.submenuEl);
-
 	if (options.submenuHTML)
 		control.submenuEl.innerHTML = options.submenuHTML;
 
-	control.element.onmouseover = function() {
-		control.submenuEl.className = 'ol-button-submenu';
-	};
-	control.element.onmouseout = function() {
-		control.submenuEl.className = 'ol-button-hidden';
-	};
-
-	/*
-	control.element.onmouseover = function(evt) {
-		control.element.classList.add( 'ol-display-submenu');
+	control.element.addEventListener('mouseover', function(evt) {
+		control.element.classList.add('ol-display-submenu');
 		evt.preventDefault();
-	};
-	control.element.onmouseout = function(evt) {
-		control.element.classList.remove( 'ol-display-submenu');
+	});
+	control.element.addEventListener('mouseout', function(evt) {
+		control.element.classList.remove('ol-display-submenu');
 		evt.preventDefault();
-	};
-	control.element.ontouchstart = function(evt) {
-		control.element.classList.toggle( 'ol-display-submenu');
+	});
+	control.element.addEventListener('touchstart', function(evt) {
+		control.element.classList.toggle('ol-display-submenu');
 		evt.preventDefault();
-	};
-	*/
+	});
 
 	// Toggle the button status & aspect
 	control.state = 0;
-
 	control.toggle = function(newActive, group) {
 		// Toggle by default
 		if (newActive === undefined)
@@ -1741,7 +1729,7 @@ function controlGeocoder(opt) {
 function controlGPS() {
 	// Display status, altitude & speed
 	const control = controlButton({
-			className: 'ol-control ol-gps',
+			className: 'ol-control ol-button-gps',
 			label: '&#x2295;',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive

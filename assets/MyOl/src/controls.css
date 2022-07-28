@@ -3,35 +3,37 @@
 .ol-zoom,
 .ol-full-screen,
 .ol-geocoder,
-.ol-gps,
+.ol-button-gps,
 .ol-button {
 	position: static !important;
 	float: left;
 	margin: 2px;
 	padding: 0 !important; /* No grey line around the button */
 }
-.ol-button-hidden {
-	display: none;
-}
 
 /* Button */
-.ol-control button, /* Also for zoom, fullScreen, ... */
-.ol-control button:focus { /* Zoom, ... after have been clicked */
+.ol-control button { /* Also for zoom, fullScreen, ... */
 	font-size: 18px !important;
 	color: black;
-	background-color: white;
+	background: white;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	outline: 0;
 }
-.ol-button-submenu {
-	position: absolute;
-	top: 27px;
-	width: 100px;
-	padding: 1px;
-	background-color: white;
-	font-size: 14px;
+.ol-control button:hover,
+.ol-geocoder button:hover {
+	box-shadow: 1px 1px 10px black;
+	background: #d6fbff;
 }
-/*//TODO
+.ol-control button:focus { /* Zoom, fullScreen, ... after have been clicked */
+	background: white;
+}
+.ol-control button:active, /* Shift the button by 1px when clicked */
+.ol-geocoder button:active {
+	position: relative !important;
+	top: 1px;
+	left: 1px;
+}
+/* Submenu */
 .ol-button:not(.ol-display-submenu) > div {
 	display: none;
 }
@@ -40,22 +42,8 @@
 	top: 27px;
 	width: 100px;
 	padding: 1px;
-	background-color: white;
+	background: white;
 	font-size: 14px;
-}
-*/
-.ol-button-submenu span {
-	cursor: pointer;
-}
-.ol-control button:hover { /* Also for zoom, fullScreen, ... */
-	box-shadow: 1px 1px 10px black;
-	background-color: #d6fbff;
-}
-.ol-control button:active, /* Shift the button by 1px when clicked */
-.ol-geocoder button:active {
-	position: relative !important;
-	top: 1px;
-	left: 1px;
 }
 
 /* Full screen */
@@ -103,7 +91,7 @@
 	position: absolute;
 	top: 32px;
 	padding: 1px;
-	background-color: white;
+	background: white;
 }
 
 /* Download */
@@ -114,7 +102,7 @@
 
 /* Print */
 .ol-print:hover {
-	background-color: transparent;
+	background: transparent;
 }
 .ol-print button {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 25' style='stroke:black;'%3E%3Cpath d='M8 6l9 0 0 2-9 0z'/%3E%3Cpath d='M5 10l15 0 0 5-15 0z'/%3E%3Cpath d='M8 13l9 0 0 6-9 0z' style='fill:white;'/%3E%3C/svg%3E");
