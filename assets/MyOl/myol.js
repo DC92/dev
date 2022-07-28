@@ -1715,7 +1715,7 @@ function controlGeocoder(opt) {
 		buttonEl = geocoder.element.firstElementChild.firstElementChild;
 
 	// Move the button at the same level than the other control's buttons
-	buttonEl.innerHTML = '&#x1F50D;';
+	buttonEl.innerHTML = '&#128269;';
 	buttonEl.title = options.title;
 	geocoder.element.appendChild(buttonEl);
 
@@ -1730,7 +1730,7 @@ function controlGPS() {
 	// Display status, altitude & speed
 	const control = controlButton({
 			className: 'ol-control ol-button-gps',
-			label: '&#x2295;',
+			label: '&#8853;',
 			buttonBackgroundColors: [ // Define 4 states button
 				'white', // 0 : inactive
 				'orange', // 1 : waiting physical GPS sensor position & altitude
@@ -1939,7 +1939,7 @@ function controlGPS() {
  */
 function controlLoadGPX(opt) {
 	const options = Object.assign({
-			label: '&#x1F4C2;',
+			label: '&#128194;',
 			title: 'Visualiser un fichier GPX sur la carte',
 			activate: function() {
 				inputEl.click();
@@ -2017,7 +2017,7 @@ function controlLoadGPX(opt) {
  */
 function controlDownload(opt) {
 	const options = Object.assign({
-			label: '&#x1F4E5;',
+			label: '&#128229;',
 			buttonBackgroundColors: ['white'],
 			className: 'ol-button ol-download',
 			title: 'Cliquer sur un format ci-dessous\n' +
@@ -2103,6 +2103,7 @@ function controlDownload(opt) {
  */
 function controlPrint() {
 	const control = controlButton({
+		label: '&#128424;',
 		className: 'ol-button ol-print',
 		title: 'Pour imprimer la carte:\n' +
 			'choisir l‘orientation,\n' +
