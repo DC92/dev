@@ -1475,16 +1475,23 @@ function controlButton(opt) {
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
+	// Populate control & button
 	control.element.className = 'ol-control ' + options.className;
-	control.element.title = options.title; // {string} displayed when the control is hovered.
 	if (options.label)
 		buttonEl.innerHTML = options.label;
 	if (options.label !== null)
 		control.element.appendChild(buttonEl);
 
-	buttonEl.addEventListener('click', function(evt) {
-		control.toggle();
-		evt.preventDefault();
+	// Assign button actions
+	control.element.addEventListener('mouseover', function(evt) {
+		control.element.classList.add('ol-display-submenu');
+	});
+	control.element.addEventListener('mouseout', function(evt) {
+		control.element.classList.remove('ol-display-submenu');
+	});
+	control.element.addEventListener('touchend', function(evt) {
+		if (control.element.isEqualNode(evt.target.parentElement))
+			control.element.classList.toggle('ol-display-submenu');
 	});
 
 	// Add submenu below the button
@@ -1493,42 +1500,18 @@ function controlButton(opt) {
 	if (options.submenuHTML)
 		control.submenuEl.innerHTML = options.submenuHTML;
 
-	control.element.addEventListener('mouseover', function(evt) {
-		control.element.classList.add('ol-display-submenu');
-		evt.preventDefault();
-	});
-	control.element.addEventListener('mouseout', function(evt) {
-		control.element.classList.remove('ol-display-submenu');
-		evt.preventDefault();
-	});
-	control.element.addEventListener('touchstart', function(evt) {
-		control.element.classList.toggle('ol-display-submenu');
-		evt.preventDefault();
-	});
+	// Assign control.function to submenu elements events with attribute onChange="function" or onClickOrTouch="function"
+	for (let el of control.submenuEl.getElementsByTagName('*')) {
+		const action = el.getAttribute('onChange') || el.getAttribute('onClickOrTouch');
 
-	// Toggle the button status & aspect
-	control.state = 0;
-	control.toggle = function(newActive, group) {
-		// Toggle by default
-		if (newActive === undefined)
-			newActive = control.state + 1;
-
-		// Unselect all other controlButtons from the same group
-		if (newActive && options.group)
-			control.getMap().getControls().forEach(function(c) {
-				if (c != control &&
-					typeof c.toggle == 'function') // Only for controlButtons
-					c.toggle(0, options.group);
-			});
-
-		// Execute the requested change
-		if (control.state != newActive &&
-			(!group || group == options.group)) { // Only for the concerned controls
-			control.state = newActive % options.buttonBackgroundColors.length;
-			buttonEl.style.backgroundColor = options.buttonBackgroundColors[control.state];
-			options.activate(control.state);
-		}
-	};
+		if (action)
+			el.onclick = el.ontouch = el.onchange =
+			function(evt) {
+				// Check it at execution time to have control[action] defined
+				if (typeof control[action] == 'function')
+					control[action](evt);
+			}
+	}
 
 	return control;
 }
@@ -1696,28 +1679,34 @@ function controlTilesBuffer(depth) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-function controlGeocoder(opt) {
+function controlGeocoder() {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return new ol.control.Control({
 			element: document.createElement('div'),
 		});
 
-	const options = Object.assign({
-			title: 'Recherche sur la carte',
-		}, opt),
-		geocoder = new Geocoder('nominatim', {
+	const geocoder = new Geocoder('nominatim', {
 			provider: 'osm',
 			lang: 'fr-FR',
 			autoComplete: false, // Else keep list of many others
 			keepOpen: true, // Else bug "no internet"
-			placeholder: options.title, // Initialization of the input field
+			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 		}),
 		buttonEl = geocoder.element.firstElementChild.firstElementChild;
 
 	// Move the button at the same level than the other control's buttons
 	buttonEl.innerHTML = '&#128269;';
-	buttonEl.title = options.title;
 	geocoder.element.appendChild(buttonEl);
+
+	// Allow open on hover
+	geocoder.element.addEventListener('pointerover', function(evt) {
+		if (evt.pointerType == 'mouse')
+			geocoder.element.firstElementChild.classList.add('gcd-gl-expanded');
+	});
+	geocoder.element.addEventListener('pointerout', function(evt) {
+		if (evt.pointerType == 'mouse')
+			geocoder.element.firstElementChild.classList.remove('gcd-gl-expanded');
+	});
 
 	return geocoder;
 }
@@ -1937,24 +1926,19 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-function controlLoadGPX(opt) {
-	const options = Object.assign({
+function controlLoadGPX(options) {
+	const control = controlButton(Object.assign({
 			label: '&#128194;',
-			title: 'Visualiser un fichier GPX sur la carte',
-			activate: function() {
-				inputEl.click();
-			},
-		}, opt),
-		control = controlButton(options),
-		inputEl = document.createElement('input'),
-		format = new ol.format.GPX(),
-		reader = new FileReader();
+			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
+				'<input type="file" accept=".gpx" onChange="loadFile" />',
+		}, options)),
+		reader = new FileReader(),
+		format = new ol.format.GPX();
 
-	inputEl.type = 'file';
-	inputEl.addEventListener('change', function() {
-		if (inputEl.files)
-			reader.readAsText(inputEl.files[0]);
-	});
+	control.loadFile = function(evt) {
+		if (evt.type == 'change' && evt.target.files)
+			reader.readAsText(evt.target.files[0]);
+	}
 
 	reader.onload = function() {
 		const map = control.getMap(),
@@ -2007,7 +1991,11 @@ function controlLoadGPX(opt) {
 				size: map.getSize(),
 				padding: [5, 5, 5, 5],
 			});
+
+		// Close the submenu
+		control.element.classList.remove('ol-display-submenu');
 	};
+
 	return control;
 }
 
@@ -2020,38 +2008,24 @@ function controlDownload(opt) {
 			label: '&#128229;',
 			buttonBackgroundColors: ['white'],
 			className: 'ol-button ol-download',
-			title: 'Cliquer sur un format ci-dessous\n' +
-				'pour obtenir un fichier contenant\n' +
-				'les éléments visibles dans la fenêtre.\n' +
-				'(la liste peut être incomplète pour les grandes zones)',
-			submenuHTML: '<span/>', // Invisible but generates a submenuEl <div>
+			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
+				'contenant les éléments visibles dans la fenêtre:</p>' +
+				'<p><a onChange="download" id="GPX" mime="application/gpx+xml">GPX</a></p>' +
+				'<p><a onChange="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a></p>' +
+				'<p><a onChange="download" id="GeoJSON" mime="application/json">GeoJSON</a></p>' +
+				'<p>La liste peut être incomplète pour les grandes zones.</p>',
 			fileName: document.title || 'openlayers',
-			activate: download,
 		}, opt),
 		control = controlButton(options),
-		hiddenEl = document.createElement('a'),
-		formats = {
-			GPX: 'application/gpx+xml',
-			KML: 'vnd.google-earth.kml+xml',
-			GeoJSON: 'application/json',
-		};
+		hiddenEl = document.createElement('a');
 
 	hiddenEl.target = '_self';
 	hiddenEl.style = 'display:none';
 	document.body.appendChild(hiddenEl);
 
-	for (let f in formats) {
-		const el = document.createElement('p');
-		el.onclick = download;
-		el.innerHTML = f;
-		el.id = formats[f];
-		el.title = 'Obtenir un fichier ' + f;
-		control.submenuEl.appendChild(el);
-	}
-
-	function download() { //formatName, mime
-		const formatName = this.textContent || 'GPX',
-			mime = this.id,
+	control.download = function(evt) {
+		const formatName = evt.target.id,
+			mime = evt.target.getAttribute('mime'),
 			format = new ol.format[formatName](),
 			map = control.getMap();
 		let features = [],
@@ -2093,7 +2067,11 @@ function controlDownload(opt) {
 		hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
 		hiddenEl.href = URL.createObjectURL(file);
 		hiddenEl.click();
+
+		// Close the submenu
+		control.element.classList.remove('ol-display-submenu');
 	}
+
 	return control;
 }
 
@@ -2105,33 +2083,19 @@ function controlPrint() {
 	const control = controlButton({
 		label: '&#128424;',
 		className: 'ol-button ol-print',
-		title: 'Pour imprimer la carte:\n' +
-			'choisir l‘orientation,\n' +
-			'zoomer et déplacer,\n' +
-			'cliquer sur l‘icône imprimante.',
-		submenuHTML: '<input type="radio" name="print-orientation" id="ol-po0" value="0" />' +
+		submenuHTML: '<p>Imprimer la carte:</p>' +
+			'<p>-portrait ou paysage,</p>' +
+			'<p>-zoomer et déplacer,</p>' +
+			'<p>-imprimer.</p>' +
+			'<input type="radio" name="print-orientation" id="ol-po0" value="0" onChange="resizeDraftPrint" />' +
 			'<label for="ol-po0">Portrait A4</label><br />' +
-			'<input type="radio" name="print-orientation" id="ol-po1" value="1" />' +
-			'<label for="ol-po1">Paysage A4</label>',
-		activate: function() {
-			resizeDraft(control.getMap());
-			control.getMap().once('rendercomplete', function() {
-				window.print();
-				location.reload();
-			});
-		},
+			'<input type="radio" name="print-orientation" id="ol-po1" value="1" onChange="resizeDraftPrint"  />' +
+			'<label for="ol-po1">Paysage A4</label>' +
+			'<a onClickOrTouch="printMap">Imprimer</a>' +
+			'<a onclick="location.reload()">Annuler</a>',
 	});
 
-	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		const poEls = document.getElementsByName('print-orientation');
-
-		for (let i in poEls)
-			poEls[i].onchange = resizeDraft;
-	};
-
-	function resizeDraft() {
+	control.resizeDraftPrint = function() {
 		const map = control.getMap(),
 			mapEl = map.getTargetElement(),
 			poElcs = document.querySelectorAll('input[name=print-orientation]:checked'),
@@ -2167,6 +2131,14 @@ function controlPrint() {
 				setTimeout(function() { // Delay reload for FF & Opera
 					location.reload();
 				});
+		});
+	}
+
+	control.printMap = function() {
+		control.resizeDraftPrint();
+		control.getMap().once('rendercomplete', function() {
+			window.print();
+			location.reload();
 		});
 	}
 

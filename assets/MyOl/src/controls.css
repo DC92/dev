@@ -27,23 +27,34 @@
 .ol-control button:focus { /* Zoom, fullScreen, ... after have been clicked */
 	background: white;
 }
-.ol-control button:active, /* Shift the button by 1px when clicked */
-.ol-geocoder button:active {
-	position: relative !important;
-	top: 1px;
-	left: 1px;
-}
 /* Submenu */
-.ol-button:not(.ol-display-submenu) > div {
+.ol-button:not(.ol-display-submenu):not(.ol-display-submenu-touch) > div {
 	display: none;
 }
-.ol-display-submenu > div {
+.ol-display-submenu > div,
+.ol-display-submenu-touch > div {
 	position: absolute;
 	top: 27px;
-	width: 100px;
-	padding: 1px;
+	padding: 3px;
 	background: white;
 	font-size: 14px;
+}
+.ol-display-submenu a,
+.ol-display-submenu-touch a {
+	display: block;
+	color: blue;
+	cursor: pointer;
+}
+.ol-button:hover {
+	background: transparent;
+}
+.ol-button p {
+	margin: 0;
+	font-size: 12px;
+	font-family: Times New Roman;
+}
+.ol-button p span {
+	color: blue;
 }
 
 /* Full screen */
@@ -98,19 +109,6 @@
 .ol-download p {
 	margin: 0;
 	cursor: pointer;
-}
-
-/* Print */
-.ol-print:hover {
-	background: transparent;
-}
-.ol-print p {
-	margin: 0;
-	font-size: 12px;
-	font-family: Times New Roman;
-}
-.ol-print p span {
-	color: blue;
 }
 
 /* Other controls */

@@ -1,5 +1,7 @@
 BUG
 ===
+Found 2 elements with non-unique id #username: (login avec page menu)
+Si reset connexion : visage conneté / forum déconnecté
 Click logo ne va pas à l'accueil en dehors de span
 Input recherche déborde des petits ecrans
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
