@@ -83,7 +83,7 @@ function layerEditGeoJson(options) {
 			pixelTolerance: 16, // Default is 10
 			style: editStyle,
 		}),
-		controlModify = controlButton({
+		controlModify = controlButton({ //TODO redo with new controlButton
 			group: 'edit',
 			label: options.titleModify ? 'M' : null,
 			buttonBackgroundColors: ['white', '#ef3'],

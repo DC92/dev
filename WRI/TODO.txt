@@ -1,16 +1,12 @@
 BUG
 ===
-Found 2 elements with non-unique id #username: (login avec page menu)
-Si reset connexion : visage conneté / forum déconnecté
 Click logo ne va pas à l'accueil en dehors de span
 Input recherche déborde des petits ecrans
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 Carte nav affiche les massifs pour les gros massifs => zoom ?
-Manque lien administrateur dans le menu connecté
 Lien vers compte utilisateur sur petit écran
 Editeur massif : download ne marche pas ! (fichier vide)
 GPS : le triangle en haut reste affiché
-Retour à la page refferer après connexion
 Formulaire contact : nom utilisateur
 Pas de favicon dans S20 accueil FF
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */

@@ -26,10 +26,10 @@ function controlButton(opt) {
 		control.element.appendChild(buttonEl);
 
 	// Assign button actions
-	control.element.addEventListener('mouseover', function(evt) {
+	control.element.addEventListener('mouseover', function() {
 		control.element.classList.add('ol-display-submenu');
 	});
-	control.element.addEventListener('mouseout', function(evt) {
+	control.element.addEventListener('mouseout', function() {
 		control.element.classList.remove('ol-display-submenu');
 	});
 	control.element.addEventListener('touchend', function(evt) {
@@ -53,7 +53,7 @@ function controlButton(opt) {
 				// Check it at execution time to have control[action] defined
 				if (typeof control[action] == 'function')
 					control[action](evt);
-			}
+			};
 	}
 
 	return control;
@@ -261,20 +261,32 @@ function controlGeocoder() {
  * Requires controlButton
  */
 function controlGPS() {
-	// Display status, altitude & speed
-	const control = controlButton({
-			className: 'ol-control ol-button-gps',
-			label: '&#8853;', //BEST find a better symbol
-			buttonBackgroundColors: [ // Define 4 states button
-				'white', // 0 : inactive
-				'orange', // 1 : waiting physical GPS sensor position & altitude
-				'lime', // 2 : active, centered & oriented
-				'grey', // 3 : active, do not centered nor oriented
-				//BEST No orange wait position when no real GPS captor
-			],
-			title: 'Centrer sur la position GPS',
-			activate: activate,
+	const subMenu = location.href.match(/(https|localhost)/) ?
+		'<p>Localisation GPS:</p>' +
+		'<input type="radio" name="ol-gps" id="ol-gps0" value="0" checked="checked"' +
+		' onChange="changeOptions" />' +
+		'<label for="ol-gps0">Inactif</label><br />' +
+		'<input type="radio" name="ol-gps" id="ol-gps1" value="2" onChange="changeOptions" />' +
+		'<label for="ol-gps1">Suivre la position GPS</label><br />' +
+		'<input type="radio" name="ol-gps" id="ol-gps2" value="1" onChange="changeOptions" />' +
+		'<label for="ol-gps2">Suivre la position WiFi (1)</label><br />' +
+		'<input type="checkbox" name="ol-follow" value="1" onChange="changeOptions" />' +
+		'<label for="ol-follow">Centrer la carte</label><br />' +
+		'<input type="checkbox" name="ol-rotate" value="1" onChange="changeOptions" />' +
+		'<label for="ol-rotate">Orienter la carte</label>' +
+		'<p>(1) peut être plus rapide et plus précise en intérieur.</p>' :
+		// Si on est en http
+		'<p>L\'utilisation du GPS nécéssite de passer en https: <a href="' +
+		document.location.href.replace('http:', 'https:') +
+		'">OK<a> ?</p>',
+
+		// Display status, altitude & speed
+		control = controlButton({
+			className: 'ol-button ol-button-gps',
+			label: '&#8853;', // x2295
+			submenuHTML: '<div id="ol-gps-status" class="ol-display-under"></div>' + subMenu,
 		}),
+
 		// Graticule
 		graticuleFeature = new ol.Feature(),
 		northGraticuleFeature = new ol.Feature(),
@@ -317,7 +329,6 @@ function controlGPS() {
 	}));
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		//HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		view = map.getView();
@@ -350,10 +361,8 @@ function controlGPS() {
 
 		// Browser heading from the inertial & magnetic sensors
 		window.addEventListener('deviceorientationabsolute', function(evt) {
-			if (evt.absolute) { // Breaks support for non-absolute browsers, like firefox mobile
-				heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-				renderGPS();
-			}
+			heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			renderGPS();
 		});
 
 		geolocation.on('error', function(error) {
@@ -361,48 +370,35 @@ function controlGPS() {
 		});
 	};
 
-	function activate(state) {
-		// Force https to enable geolocation except for //localhost
-		if (!location.href.match(/(https|localhost)/))
-			location.replace(document.location.href.replace('http:', 'https:'));
-
+	control.changeOptions = function() {
 		// Tune geolocation
-		if (geolocation) {
-			geolocation.setTracking(state !== 0);
-			graticuleLayer.setVisible(state !== 0);
-			nbLoc = 0;
-			if (!state && view) {
-				view.setRotation(0, 0); // Set north to top
-				displayEl.innerHTML = '';
-				displayEl.classList.remove('ol-button-gps');
-			}
-		}
+		geolocation.setTracking(getState());
+		graticuleLayer.setVisible(getState());
+		nbLoc = 0;
 		ol.gpsPosition = null;
-	}
+		if (view && !getState())
+			view.setRotation(0, 0); // Reset north to top
+
+		// Close the submenu
+		control.element.classList.remove('ol-display-submenu');
+
+		renderGPS();
+	};
 
 	function renderGPS() {
-		// Display data under the button
-		let displays = [];
+		// Recheck follow & rotate at state 0
+		if (!getState())
+			document.getElementsByName('ol-follow')[0].checked =
+			document.getElementsByName('ol-rotate')[0].checked = true;
 
-		if (control.state) {
-			if (altitude)
-				displays.push(Math.round(altitude) + ' m');
-
-			if (!isNaN(speed))
-				displays.push(speed + ' km/h');
-
-			if (altitude === undefined)
-				displays = ['GPS sync...'];
-			else if (control.state == 1)
-				control.toggle(); // Go directly to state 2
-		}
-
-		displayEl.innerHTML = displays.join(', ');
-		displayEl.classList[displays.length ? 'add' : 'remove']('ol-button-gps');
+		// Don't rotate if map don't follow
+		if (!getState('follow'))
+			document.getElementsByName('ol-rotate')[0].checked = false;
 
 		// Render position & graticule
-		if (control.state && position &&
-			(control.state > 1 || altitude !== undefined)) { // Position on GPS signal only on state 1
+		if (getState() && position &&
+			(altitude !== undefined || getState() == 2) // Position on GPS signal only on state 1
+		) {
 			const map = control.getMap(),
 				// Estimate the viewport size to draw visible graticule
 				hg = map.getCoordinateFromPixel([0, 0]),
@@ -439,31 +435,46 @@ function controlGPS() {
 			if (accuracy)
 				geometry.push(accuracy);
 
-			if (control.state == 2) {
+			if (getState('follow')) {
 				// Center the map
 				view.setCenter(position);
 
-				if (!nbLoc) { // Only the first time after activation
+				if (!++nbLoc) // Only the first time after activation
 					view.setZoom(17); // Zoom on the area
-
-					map.dispatchEvent({
-						type: 'myol:ongpsactivate',
-					});
-				}
-
-				nbLoc++;
-
-				// Orientation
-				if (heading)
-					view.setRotation(
-						Math.PI / 180 * (heading - screen.orientation.angle), // Delivered ° reverse clockwize
-						0
-					);
 			}
+
+			// Orientation
+			if (getState('rotate'))
+				view.setRotation(
+					heading ?
+					Math.PI / 180 * (heading - screen.orientation.angle) // Delivered ° reverse clockwize
+					:
+					0);
 
 			// For other controls usage
 			ol.gpsPosition = position;
 		}
+
+		// Display data under the button
+		let status = 'GPS sync...';
+
+		if (altitude)
+			status = Math.round(altitude) + ' m';
+		if (!isNaN(speed))
+			status += ' ' + speed + ' km/h';
+
+		elStatus = document.getElementById('ol-gps-status');
+		if (elStatus)
+			elStatus.innerHTML = getState() ? status : '';
+	}
+
+	function getState(name) {
+		const options = document.getElementsByName('ol-' + (name || 'gps'));
+
+		for (let o = 0; o < options.length; o++)
+			if (options[o].checked) {
+				return parseInt(options[o].value);
+			}
 	}
 
 	return control;
@@ -488,7 +499,7 @@ function controlLoadGPX(options) {
 	control.loadFile = function(evt) {
 		if (evt.type == 'change' && evt.target.files)
 			reader.readAsText(evt.target.files[0]);
-	}
+	};
 
 	reader.onload = function() {
 		const map = control.getMap(),
@@ -562,8 +573,7 @@ function controlDownload(opt) {
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<p><a onChange="download" id="GPX" mime="application/gpx+xml">GPX</a></p>' +
 				'<p><a onChange="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a></p>' +
-				'<p><a onChange="download" id="GeoJSON" mime="application/json">GeoJSON</a></p>' +
-				'<p>La liste peut être incomplète pour les grandes zones.</p>',
+				'<p><a onChange="download" id="GeoJSON" mime="application/json">GeoJSON</a></p>',
 			fileName: document.title || 'openlayers', //BEST name from feature
 		}, opt),
 		control = controlButton(options),
@@ -620,7 +630,7 @@ function controlDownload(opt) {
 
 		// Close the submenu
 		control.element.classList.remove('ol-display-submenu');
-	}
+	};
 
 	return control;
 }
@@ -639,10 +649,10 @@ function controlPrint() {
 			'<p>-imprimer.</p>' +
 			'<input type="radio" name="print-orientation" id="ol-po0" value="0" onChange="resizeDraftPrint" />' +
 			'<label for="ol-po0">Portrait A4</label><br />' +
-			'<input type="radio" name="print-orientation" id="ol-po1" value="1" onChange="resizeDraftPrint"  />' +
+			'<input type="radio" name="print-orientation" id="ol-po1" value="1" onChange="resizeDraftPrint" />' +
 			'<label for="ol-po1">Paysage A4</label>' +
-			'<a onClickOrTouch="printMap">Imprimer</a>' +
-			'<a onclick="location.reload()">Annuler</a>',
+			'<p><a onClickOrTouch="printMap">Imprimer</a></p>' +
+			'<p><a onclick="location.reload()">Annuler</a></p>',
 	});
 
 	control.resizeDraftPrint = function() {
@@ -682,7 +692,7 @@ function controlPrint() {
 					location.reload();
 				});
 		});
-	}
+	};
 
 	control.printMap = function() {
 		control.resizeDraftPrint();
@@ -690,7 +700,7 @@ function controlPrint() {
 			window.print();
 			location.reload();
 		});
-	}
+	};
 
 	return control;
 }

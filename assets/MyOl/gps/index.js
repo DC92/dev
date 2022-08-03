@@ -114,10 +114,12 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		});
 
 	// Mask if GPS location is active
+/*//TODO DELETE
 	map.on('myol:ongpsactivate', function() {
 		if (elListe)
 			elListe.style.display = 'none';
 	});
+*/
 }
 
 function addLayer(url) {

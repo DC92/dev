@@ -37,10 +37,24 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		values =
-		typeof localStorage['myol_' + options.selectorName] != 'undefined' ?
+		values = typeof localStorage['myol_' + options.selectorName] != 'undefined' ?
 		localStorage['myol_' + options.selectorName] :
 		readCheckbox(options.selectorName, true).join(',');
+
+	if (statusEl)
+		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
+			if (!statusEl.textContent.includes('error'))
+				statusEl.textContent = '';
+
+			//BEST status hors limites zoom
+			switch (evt.type) {
+				case 'featuresloadstart':
+					statusEl.textContent = 'Chargement...';
+					break;
+				case 'featuresloaderror':
+					statusEl.textContent = 'Erreur !';
+			}
+		});
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
@@ -58,21 +72,6 @@ function layerVector(opt) {
 			typeof selection == 'object' ? selection : [],
 			extent, resolution, projection
 		);
-
-		if (statusEl)
-			source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
-				if (!statusEl.textContent.includes('error'))
-					statusEl.textContent = '';
-
-				//BEST status hors limites zoom
-				switch (evt.type) {
-					case 'featuresloadstart':
-						statusEl.textContent = 'Chargement...';
-						break;
-					case 'featuresloaderror':
-						statusEl.textContent = 'Erreur !';
-				}
-			});
 	}
 
 	// Modify a geoJson url argument depending on checkboxes

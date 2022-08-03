@@ -38,20 +38,23 @@
 	background: white;
 }
 /* Submenu */
-.ol-button:not(.ol-display-submenu):not(.ol-display-submenu-touch) > div {
+.ol-button:not(.ol-display-submenu):not(.ol-display-submenu-touch) > div *:not(.ol-display-under),
+.ol-display-under:empty,
+.ol-display-submenu .ol-display-under,
+.ol-display-submenu-touch .ol-display-under {
 	display: none;
 }
 .ol-display-submenu > div,
-.ol-display-submenu-touch > div {
+.ol-display-submenu-touch > div,
+.ol-display-under {
 	position: absolute;
-	top: 27px;
+	top: 29px;
 	padding: 3px;
 	background: white;
 	font-size: 14px;
 }
 .ol-display-submenu a,
 .ol-display-submenu-touch a {
-	display: block;
 	color: blue;
 	cursor: pointer;
 }
@@ -105,14 +108,6 @@
 .gcd-gl-result {
 	top: 60px !important;
 	left: 2px !important;
-}
-
-/* GPS */
-.ol-button-gps {
-	position: absolute;
-	top: 32px;
-	padding: 1px;
-	background: white;
 }
 
 /* Download */
