@@ -1720,19 +1720,22 @@ function controlGPS() {
 		'<input type="radio" name="ol-gps" id="ol-gps0" value="0" checked="checked"' +
 		' onChange="changeOptions" />' +
 		'<label for="ol-gps0">Inactif</label><br />' +
-		'<input type="radio" name="ol-gps" id="ol-gps1" value="2" onChange="changeOptions" />' +
-		'<label for="ol-gps1">Suivre la position GPS</label><br />' +
-		'<input type="radio" name="ol-gps" id="ol-gps2" value="1" onChange="changeOptions" />' +
-		'<label for="ol-gps2">Suivre la position WiFi (1)</label><br />' +
-		'<input type="checkbox" name="ol-follow" value="1" onChange="changeOptions" />' +
+		'<input type="radio" name="ol-gps" id="ol-gps1" value="1" onChange="changeOptions" />' +
+		'<label for="ol-gps1">Position GPS (1)</label><br />' +
+		'<input type="radio" name="ol-gps" id="ol-gps2" value="2" onChange="changeOptions" />' +
+		'<label for="ol-gps2">Position GPS ou WiFi (2)</label><br />' +
+		'<input type="checkbox" name="ol-follow" id="ol-follow" value="1" onChange="changeOptions" />' +
 		'<label for="ol-follow">Centrer la carte</label><br />' +
-		'<input type="checkbox" name="ol-rotate" value="1" onChange="changeOptions" />' +
-		'<label for="ol-rotate">Orienter la carte</label>' +
-		'<p>(1) peut être plus rapide et plus précise en intérieur.</p>' :
+		'<input type="checkbox" name="ol-rotate" id="ol-rotate" value="1" onChange="changeOptions" />' +
+		'<label for="ol-rotate">Orienter la carte (3)</label>' +
+		'<p>(1) plus précis en extérieur mais plus lent à initialiser, nécéssite un capteur GPS.</p>' +
+		'<p>(2) plus rapide (mais peut-être très faux au début en extérieur), ' +
+		'plus précis en intérieur, peut se passer de capteur GPS.</p>' +
+		'<p>(3) nécéssite un capteur magnétique et un explorateur le supportant.' +
+		'</p>' :
 		// Si on est en http
 		'<p>L\'utilisation du GPS nécéssite de passer en https: <a href="' +
-		document.location.href.replace('http:', 'https:') +
-		'">OK<a> ?</p>',
+		document.location.href.replace('http:', 'https:') + '">OK<a> ?</p>',
 
 		// Display status, altitude & speed
 		control = controlButton({
@@ -1824,11 +1827,25 @@ function controlGPS() {
 		});
 	};
 
-	control.changeOptions = function() {
+	control.changeOptions = function(evt) {
+		if (evt.type == 'click')
+			switch (evt.target.id) {
+				case 'ol-gps1':
+				case 'ol-gps2':
+				case 'ol-follow':
+					document.getElementsByName('ol-rotate')[0].checked = evt.target.checked;
+				case 'ol-rotate':
+					if (evt.target.checked)
+						document.getElementsByName('ol-follow')[0].checked = true;
+
+					if (view && !document.getElementsByName('ol-rotate')[0].checked)
+						view.setRotation(0, 0); // Reset north to top
+			}
+
 		// Tune geolocation
 		geolocation.setTracking(getState());
 		graticuleLayer.setVisible(getState());
-		nbLoc = 0;
+		nbLoc = -1;
 		ol.gpsPosition = null;
 		if (view && !getState())
 			view.setRotation(0, 0); // Reset north to top
@@ -1840,19 +1857,13 @@ function controlGPS() {
 	};
 
 	function renderGPS() {
-		// Recheck follow & rotate at state 0
-		if (!getState())
-			document.getElementsByName('ol-follow')[0].checked =
-			document.getElementsByName('ol-rotate')[0].checked = true;
-
-		// Don't rotate if map don't follow
-		if (!getState('follow'))
-			document.getElementsByName('ol-rotate')[0].checked = false;
+		let status = '';
 
 		// Render position & graticule
-		if (getState() && position &&
-			(altitude !== undefined || getState() == 2) // Position on GPS signal only on state 1
-		) {
+		if (getState() && position && (
+				altitude !== undefined || // State 1 requires GPS signal
+				getState() == 2 // State 2 may sync on indoor WiFi positionnung
+			)) {
 			const map = control.getMap(),
 				// Estimate the viewport size to draw visible graticule
 				hg = map.getCoordinateFromPixel([0, 0]),
@@ -1893,7 +1904,7 @@ function controlGPS() {
 				// Center the map
 				view.setCenter(position);
 
-				if (!++nbLoc) // Only the first time after activation
+				if (!nbLoc++) // Only the first time after activation
 					view.setZoom(17); // Zoom on the area
 			}
 
@@ -1907,19 +1918,16 @@ function controlGPS() {
 
 			// For other controls usage
 			ol.gpsPosition = position;
-		}
 
-		// Display data under the button
-		let status = 'GPS sync...';
+			// Display data under the button
+			if (altitude)
+				status = Math.round(altitude) + ' m';
+			if (!isNaN(speed))
+				status += ' ' + speed + ' km/h';
+		} else if (getState())
+			status = 'GPS sync...';
 
-		if (altitude)
-			status = Math.round(altitude) + ' m';
-		if (!isNaN(speed))
-			status += ' ' + speed + ' km/h';
-
-		elStatus = document.getElementById('ol-gps-status');
-		if (elStatus)
-			elStatus.innerHTML = getState() ? status : '';
+		document.getElementById('ol-gps-status').innerHTML = status;
 	}
 
 	function getState(name) {
