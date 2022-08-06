@@ -75,7 +75,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			liTags.length ? controlButton({
 				label: '&Xi;',
 				title: 'Choisir une trace dans la liste / fermer',
-				activate: function() {
+				activate: function() { //TODO DELETE
 					if (elListe)
 						elListe.style.display = elListe.style.display == 'none' ? 'block' : 'none';
 					window.scrollTo(0, 0);
@@ -93,7 +93,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			controlButton({
 				label: '?',
 				title: help,
-				activate: function() {
+				activate: function() { //TODO DELETE
 					alert(this.title);
 				},
 			}),

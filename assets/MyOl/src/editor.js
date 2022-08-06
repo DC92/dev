@@ -86,9 +86,9 @@ function layerEditGeoJson(options) {
 		controlModify = controlButton({ //TODO redo with new controlButton
 			group: 'edit',
 			label: options.titleModify ? 'M' : null,
-			buttonBackgroundColors: ['white', '#ef3'],
+			buttonBackgroundColors: ['white', '#ef3'], //TODO DELETE
 			title: options.titleModify,
-			activate: function(state) {
+			activate: function(state) { //TODO DELETE
 				activate(state, modify);
 			},
 		});
@@ -199,7 +199,7 @@ function layerEditGeoJson(options) {
 		}
 	});
 
-	function activate(state, inter) { // Callback at activation / desactivation, mandatory, no default
+	function activate(state, inter) { //TODO DELETE // Callback at activation / desactivation, mandatory, no default
 		if (state) {
 			layer.map_.addInteraction(inter);
 			layer.map_.addInteraction(snap); // Must be added after
@@ -212,8 +212,8 @@ function layerEditGeoJson(options) {
 	function controlDraw(options) {
 		const control = controlButton(Object.assign({
 				group: 'edit',
-				buttonBackgroundColors: ['white', '#ef3'],
-				activate: function(state) {
+				buttonBackgroundColors: ['white', '#ef3'], //TODO DELETE
+				activate: function(state) { //TODO DELETE
 					activate(state, interaction);
 				},
 			}, options)),

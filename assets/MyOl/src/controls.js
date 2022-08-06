@@ -4,62 +4,6 @@
  */
 
 /**
- * Control button
- * Abstract definition to be used by other control buttons definitions
- */
-//BEST left aligned buttons when screen vertical
-//TODO MOVE before the first controlButton call
-function controlButton(opt) {
-	const options = Object.assign({
-			element: document.createElement('div'),
-			buttonBackgroundColors: ['white', 'white'], // Also define the button states numbers
-			className: 'ol-button',
-			activate: function() {}, // Call back when the button is clicked. Argument = satus number (0, 1, ...)
-		}, opt),
-		control = new ol.control.Control(options),
-		buttonEl = document.createElement('button');
-
-	// Populate control & button
-	control.element.className = 'ol-control ' + options.className;
-	if (options.label)
-		buttonEl.innerHTML = options.label;
-	if (options.label !== null)
-		control.element.appendChild(buttonEl);
-
-	// Assign button actions
-	control.element.addEventListener('mouseover', function() {
-		control.element.classList.add('ol-display-submenu');
-	});
-	control.element.addEventListener('mouseout', function() {
-		control.element.classList.remove('ol-display-submenu');
-	});
-	control.element.addEventListener('touchend', function(evt) {
-		if (control.element.isEqualNode(evt.target.parentElement))
-			control.element.classList.toggle('ol-display-submenu');
-	});
-
-	// Add submenu below the button
-	control.submenuEl = options.submenuEl || document.createElement('div');
-	control.element.appendChild(control.submenuEl);
-	if (options.submenuHTML)
-		control.submenuEl.innerHTML = options.submenuHTML;
-
-	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
-	for (let el of control.submenuEl.getElementsByTagName('*'))
-		['OnClick', 'OnChange'].forEach(evtName => {
-			const evtFnc = el.getAttribute('ctrl' + evtName);
-			if (evtFnc)
-				el[evtName.toLowerCase()] = function(evt) {
-					// Check at execution time if control.function() is defined
-					if (typeof control[evtFnc] == 'function')
-						control[evtFnc](evt);
-				};
-		});
-
-	return control;
-}
-
-/**
  * Permalink control
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
@@ -208,7 +152,7 @@ function controlTilesBuffer(depth) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Action on each layer
-		//TODO too much load on basic browsing
+		//BEST too much load on basic browsing
 		map.on('precompose', function() {
 			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
@@ -240,7 +184,7 @@ function controlGeocoder() {
 		buttonEl = geocoder.element.firstElementChild.firstElementChild;
 
 	// Move the button at the same level than the other control's buttons
-	buttonEl.innerHTML = '&#128269;';
+	buttonEl.innerHTML = '&#x1F50D;';
 	geocoder.element.appendChild(buttonEl);
 
 	// Allow open on hover
@@ -254,6 +198,60 @@ function controlGeocoder() {
 	});
 
 	return geocoder;
+}
+
+/**
+ * Control button
+ * Abstract definition to be used by other control buttons definitions
+ */
+//BEST left aligned buttons when screen vertical
+function controlButton(opt) {
+	const options = Object.assign({
+			element: document.createElement('div'),
+			className: 'ol-button',
+		}, opt),
+		control = new ol.control.Control(options),
+		buttonEl = document.createElement('button');
+
+	// Populate control & button
+	control.element.className = 'ol-control ' + options.className;
+	if (options.label)
+		buttonEl.innerHTML = options.label;
+	if (options.label !== null)
+		control.element.appendChild(buttonEl);
+
+	// Assign button actions
+	control.element.addEventListener('mouseover', function() {
+		control.element.classList.add('ol-display-submenu');
+	});
+	control.element.addEventListener('mouseout', function() {
+		control.element.classList.remove('ol-display-submenu');
+	});
+	control.element.addEventListener('touchend', function(evt) {
+		if (control.element.isEqualNode(evt.target.parentElement))
+			control.element.classList.toggle('ol-display-submenu');
+	});
+
+	// Add submenu below the button
+	control.submenuEl = options.submenuEl || document.createElement('div');
+	control.element.appendChild(control.submenuEl);
+	if (options.submenuHTML)
+		control.submenuEl.innerHTML = options.submenuHTML;
+
+	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
+	for (let el of control.submenuEl.getElementsByTagName('*'))
+		['OnClick', 'OnChange'].forEach(evtName => {
+			const evtFnc = el.getAttribute('ctrl' + evtName);
+			if (evtFnc)
+				el[evtName.toLowerCase()] = function(evt) {
+					// Check at execution time if control.function() is defined
+					//BEST Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.
+					if (typeof control[evtFnc] == 'function')
+						control[evtFnc](evt);
+				};
+		});
+
+	return control;
 }
 
 /**
@@ -289,7 +287,7 @@ function controlGPS() {
 		// Display status, altitude & speed
 		control = controlButton({
 			className: 'ol-button ol-button-gps',
-			label: '&#8853;',
+			label: '&#x2295;',
 			submenuHTML: '<div id="ol-gps-status" class="ol-display-under"></div>' + subMenu,
 		}),
 
@@ -464,7 +462,7 @@ function controlGPS() {
 //BEST misc formats
 function controlLoadGPX(options) {
 	const control = controlButton(Object.assign({
-			label: '&#128194;',
+			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 		}, options)),
@@ -543,8 +541,7 @@ function controlLoadGPX(options) {
  */
 function controlDownload(opt) {
 	const options = Object.assign({
-			label: '&#128229;',
-			buttonBackgroundColors: ['white'],
+			label: '&#x1f4e5;',
 			className: 'ol-button ol-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
@@ -618,7 +615,7 @@ function controlDownload(opt) {
  */
 function controlPrint() {
 	const control = controlButton({
-		label: '&#128424;',
+		label: '&#x1F5A8;',
 		className: 'ol-button ol-print',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +
 			'<p>-Choisir portrait ou paysage,</p>' +
@@ -677,7 +674,7 @@ function controlPrint() {
 			window.print();
 			location.reload();
 		});
-	}
+	};
 
 	return control;
 }
