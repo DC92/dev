@@ -45,15 +45,19 @@ function controlButton(opt) {
 
 	// Assign control.function to submenu elements events with attribute onChange="function" or onClickOrTouch="function"
 	for (let el of control.submenuEl.getElementsByTagName('*')) {
-		const action = el.getAttribute('onChange') || el.getAttribute('onClickOrTouch');
+		let evtFnc = el.getAttribute('onClickOrTouch');
+		if (evtFnc)
+			el.onclick = el.ontouch = onEvt;
 
-		if (action)
-			el.onclick = el.ontouch = el.onchange =
-			function(evt) {
-				// Check it at execution time to have control[action] defined
-				if (typeof control[action] == 'function')
-					control[action](evt);
-			};
+		evtFnc = el.getAttribute('onChange');
+		if (evtFnc)
+			el.onchange = onEvt;
+
+		function onEvt(evt) {
+			// Check at execution time if control.function() is defined
+			if (typeof control[evtFnc] == 'function')
+				control[evtFnc](evt);
+		}
 	}
 
 	return control;
@@ -140,8 +144,8 @@ function controlMousePosition() {
 		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
 
 		coordinateFormat: function(mouse) {
-			if (ol.gpsPosition) {
-				const ll4326 = ol.proj.transform(ol.gpsPosition, 'EPSG:3857', 'EPSG:4326'),
+			if (ol.gpsValues.position) {
+				const ll4326 = ol.proj.transform(ol.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
 					distance = ol.sphere.getDistance(mouse, ll4326);
 
 				return distance < 1000 ?
@@ -263,25 +267,28 @@ function controlGeocoder() {
 function controlGPS() {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
-		'<input type="radio" name="ol-gps" id="ol-gps0" value="0" checked="checked"' +
-		' onChange="changeOptions" />' +
-		'<label for="ol-gps0">Inactif</label><br />' +
-		'<input type="radio" name="ol-gps" id="ol-gps1" value="1" onChange="changeOptions" />' +
-		'<label for="ol-gps1">Position GPS (1)</label><br />' +
-		'<input type="radio" name="ol-gps" id="ol-gps2" value="2" onChange="changeOptions" />' +
-		'<label for="ol-gps2">Position GPS ou WiFi (2)</label><br />' +
-		'<input type="checkbox" name="ol-follow" id="ol-follow" value="1" onChange="changeOptions" />' +
-		'<label for="ol-follow">Centrer la carte</label><br />' +
-		'<input type="checkbox" name="ol-rotate" id="ol-rotate" value="1" onChange="changeOptions" />' +
-		'<label for="ol-rotate">Orienter la carte (3)</label>' +
+		'<input type="radio" name="ol-gps-source" id="ol-gps-source0" value="0" onChange="renderGPS" checked="checked" />' +
+		'<label for="ol-gps-source0">Inactive</label><br />' +
+		'<input type="radio" name="ol-gps-source" id="ol-gps-source1" value="1" onChange="renderGPS" />' +
+		'<label for="ol-gps-source1">Position GPS (1)</label><br />' +
+		'<input type="radio" name="ol-gps-source" id="ol-gps-source2" value="2" onChange="renderGPS" />' +
+		'<label for="ol-gps-source2">Position GPS ou WiFi (2)</label><hr />' +
+
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" onChange="renderGPS" checked="checked" />' +
+		'<label for="ol-gps-display0">Centre et oriente (3) la carte</label><br />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display1" value="1" onChange="renderGPS" />' +
+		'<label for="ol-gps-display1">Centre la carte</label><br />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" onChange="renderGPS" />' +
+		'<label for="ol-gps-display2">Uniquement le colimateur</label><hr />' +
+
 		'<p>(1) plus précis en extérieur mais plus lent à initialiser, nécéssite un capteur GPS.</p>' +
 		'<p>(2) plus rapide (mais peut-être très faux au début en extérieur), ' +
 		'plus précis en intérieur, peut se passer de capteur GPS.</p>' +
 		'<p>(3) nécéssite un capteur magnétique et un explorateur le supportant.' +
 		'</p>' :
 		// Si on est en http
-		'<p>L\'utilisation du GPS nécéssite de passer en https: <a href="' +
-		document.location.href.replace('http:', 'https:') + '">OK<a> ?</p>',
+		'<p>L\'utilisation du GPS nécéssite de passer en https</p>' +
+		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
 		control = controlButton({
@@ -311,8 +318,6 @@ function controlGPS() {
 		}),
 		displayEl = document.createElement('div');
 
-	let view, geolocation, nbLoc, position, heading, accuracy, altitude, speed;
-
 	control.element.appendChild(displayEl);
 
 	graticuleFeature.setStyle(new ol.style.Style({
@@ -331,101 +336,78 @@ function controlGPS() {
 		}),
 	}));
 
+	let geolocation;
+	ol.gpsValues = {}; // Store the measures for internal use &or other controls
+
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		view = map.getView();
 		map.addLayer(graticuleLayer);
+		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom
 
 		geolocation = new ol.Geolocation({
-			projection: view.getProjection(),
+			projection: map.getView().getProjection(),
 			trackingOptions: {
 				enableHighAccuracy: true,
 				maximumAge: 1000,
 				timeout: 1000,
 			},
 		});
-
-		// Trigger position
-		geolocation.on('change:position', renderPosition);
-		map.on('moveend', renderPosition); // Refresh graticule after map zoom
-		function renderPosition() {
-			position = geolocation.getPosition();
-			accuracy = geolocation.getAccuracyGeometry();
-			renderGPS();
-		}
-
-		// Triggers data display
-		geolocation.on(['change:altitude', 'change:speed', 'change:tracking'], function() {
-			speed = Math.round(geolocation.getSpeed() * 36) / 10;
-			altitude = geolocation.getAltitude();
-			renderGPS();
+		geolocation.on('change', control.renderGPS);
+		geolocation.on('error', function(error) {
+			console.log('Geolocation error: ' + error.message);
 		});
 
 		// Browser heading from the inertial & magnetic sensors
 		window.addEventListener('deviceorientationabsolute', function(evt) {
-			heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			renderGPS();
-		});
-
-		geolocation.on('error', function(error) {
-			console.log('Geolocation error: ' + error.message);
+			ol.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			control.renderGPS(evt);
 		});
 	};
 
-	control.changeOptions = function(evt) {
-		if (evt.type == 'click')
-			switch (evt.target.id) {
-				case 'ol-gps1':
-				case 'ol-gps2':
-				case 'ol-follow':
-					document.getElementsByName('ol-rotate')[0].checked = evt.target.checked;
-				case 'ol-rotate':
-					if (evt.target.checked)
-						document.getElementsByName('ol-follow')[0].checked = true;
+	control.renderGPS = function(evt) {
+		const sourceStatus = parseInt(document.querySelector('input[name="ol-gps-source"]:checked').value),
+			displayStatus = parseInt(document.querySelector('input[name="ol-gps-display"]:checked').value);
 
-					if (view && !document.getElementsByName('ol-rotate')[0].checked)
-						view.setRotation(0, 0); // Reset north to top
-			}
+		// Tune the tracking level
+		if (evt.target.name == 'ol-gps-source') {
+			geolocation.setTracking(sourceStatus);
+			graticuleLayer.setVisible(sourceStatus);
+			ol.gpsValues = {}; // Reset the values
+		}
 
-		// Tune geolocation
-		geolocation.setTracking(getState());
-		graticuleLayer.setVisible(getState());
-		nbLoc = -1;
-		ol.gpsPosition = null;
-		if (view && !getState())
-			view.setRotation(0, 0); // Reset north to top
+		// Get geolocation values
+		['Position', 'AccuracyGeometry', 'Speed', 'Altitude'].forEach(valueName => {
+			const value = geolocation['get' + valueName]();
+			if (value)
+				ol.gpsValues[valueName.toLowerCase()] = value;
+		});
 
-		// Close the submenu
-		control.element.classList.remove('ol-display-submenu');
-
-		renderGPS();
-	};
-
-	function renderGPS() {
-		let status = '';
+		// L'état 1 ne prend que les positions du GPS (qui ont une altitude)
+		if (sourceStatus == 1 && !ol.gpsValues.altitude)
+			ol.gpsValues.position = null;
 
 		// Render position & graticule
-		if (getState() && position && (
-				altitude !== undefined || // State 1 requires GPS signal
-				getState() == 2 // State 2 may sync on indoor WiFi positionnung
-			)) {
-			const map = control.getMap(),
-				// Estimate the viewport size to draw visible graticule
-				hg = map.getCoordinateFromPixel([0, 0]),
-				bd = map.getCoordinateFromPixel(map.getSize()),
-				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
+		const map = control.getMap(),
+			view = map.getView(),
+			p = ol.gpsValues.position;
 
-				// The graticule
-				geometry = [
+		if (view && p) {
+			// Estimate the viewport size to draw visible graticule
+			const hg = map.getCoordinateFromPixel([0, 0]),
+				bd = map.getCoordinateFromPixel(map.getSize()),
+				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
+
+			// The graticule
+			geometry = [
 					new ol.geom.MultiLineString([
 						[
-							[position[0] - far, position[1]],
-							[position[0] + far, position[1]]
+							[p[0] - far, p[1]],
+							[p[0] + far, p[1]]
 						],
 						[
-							[position[0], position[1]],
-							[position[0], position[1] - far]
+							[p[0], p[1]],
+							[p[0], p[1] - far]
 						],
 					]),
 				],
@@ -433,56 +415,46 @@ function controlGPS() {
 				// Color north in red
 				northGeometry = [
 					new ol.geom.LineString([
-						[position[0], position[1]],
-						[position[0], position[1] + far]
+						[p[0], p[1]],
+						[p[0], p[1] + far]
 					]),
 				];
+
+			// The accuracy circle
+			if (ol.gpsValues.accuracygeometry)
+				geometry.push(ol.gpsValues.accuracygeometry);
 
 			graticuleFeature.setGeometry(new ol.geom.GeometryCollection(geometry));
 			northGraticuleFeature.setGeometry(new ol.geom.GeometryCollection(northGeometry));
 
-			// The accuracy circle
-			const accuracy = geolocation.getAccuracyGeometry();
-			if (accuracy)
-				geometry.push(accuracy);
-
-			if (getState('follow')) {
-				// Center the map
-				view.setCenter(position);
-
-				if (!nbLoc++) // Only the first time after activation
-					view.setZoom(17); // Zoom on the area
-			}
+			// Center the map
+			if (displayStatus < 2)
+				view.setCenter(p);
 
 			// Orientation
-			if (getState('rotate'))
-				view.setRotation(
-					heading ?
-					Math.PI / 180 * (heading - screen.orientation.angle) // Delivered ° reverse clockwize
-					:
-					0);
+			view.setRotation(
+				(ol.gpsValues.heading && displayStatus < 1) ?
+				Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) : // Delivered ° reverse clockwize
+				0);
 
-			// For other controls usage
-			ol.gpsPosition = position;
-
-			// Display data under the button
-			if (altitude)
-				status = Math.round(altitude) + ' m';
-			if (!isNaN(speed))
-				status += ' ' + speed + ' km/h';
-		} else if (getState())
-			status = 'GPS sync...';
-
-		document.getElementById('ol-gps-status').innerHTML = status;
-	}
-
-	function getState(name) {
-		const options = document.getElementsByName('ol-' + (name || 'gps'));
-
-		for (let o = 0; o < options.length; o++)
-			if (options[o].checked) {
-				return parseInt(options[o].value);
+			// Zoom on the area
+			if (!ol.gpsValues.isZoomed) { // Only the first time after activation
+				ol.gpsValues.isZoomed = true;
+				view.setZoom(17);
 			}
+		}
+
+		// Display data under the button
+		let status = p ? '' : 'GPS sync...';
+		if (ol.gpsValues.altitude)
+			status = Math.round(ol.gpsValues.altitude) + ' m';
+		if (ol.gpsValues.speed)
+			status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
+		document.getElementById('ol-gps-status').innerHTML = sourceStatus ? status : '';
+
+		// Close the submenu
+		if (evt.target.name) // Only when an input is hit
+			control.element.classList.remove('ol-display-submenu');
 	}
 
 	return control;
