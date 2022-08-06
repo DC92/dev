@@ -1499,22 +1499,17 @@ function controlButton(opt) {
 	if (options.submenuHTML)
 		control.submenuEl.innerHTML = options.submenuHTML;
 
-	// Assign control.function to submenu elements events with attribute onChange="function" or onClickOrTouch="function"
-	for (let el of control.submenuEl.getElementsByTagName('*')) {
-		let evtFnc = el.getAttribute('onClickOrTouch');
-		if (evtFnc)
-			el.onclick = el.ontouch = onEvt;
-
-		evtFnc = el.getAttribute('onChange');
-		if (evtFnc)
-			el.onchange = onEvt;
-
-		function onEvt(evt) {
-			// Check at execution time if control.function() is defined
-			if (typeof control[evtFnc] == 'function')
-				control[evtFnc](evt);
-		}
-	}
+	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
+	for (let el of control.submenuEl.getElementsByTagName('*'))
+		['OnClick', 'OnChange'].forEach(evtName => {
+			const evtFnc = el.getAttribute('ctrl' + evtName);
+			if (evtFnc)
+				el[evtName.toLowerCase()] = function(evt) {
+					// Check at execution time if control.function() is defined
+					if (typeof control[evtFnc] == 'function')
+						control[evtFnc](evt);
+				};
+		});
 
 	return control;
 }
@@ -1721,18 +1716,18 @@ function controlGeocoder() {
 function controlGPS() {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
-		'<input type="radio" name="ol-gps-source" id="ol-gps-source0" value="0" onChange="renderGPS" checked="checked" />' +
+		'<input type="radio" name="ol-gps-source" id="ol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="ol-gps-source0">Inactive</label><br />' +
-		'<input type="radio" name="ol-gps-source" id="ol-gps-source1" value="1" onChange="renderGPS" />' +
+		'<input type="radio" name="ol-gps-source" id="ol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-source1">Position GPS (1)</label><br />' +
-		'<input type="radio" name="ol-gps-source" id="ol-gps-source2" value="2" onChange="renderGPS" />' +
+		'<input type="radio" name="ol-gps-source" id="ol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-source2">Position GPS ou WiFi (2)</label><hr />' +
 
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" onChange="renderGPS" checked="checked" />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="ol-gps-display0">Centre et oriente (3) la carte</label><br />' +
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display1" value="1" onChange="renderGPS" />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-display1">Centre la carte</label><br />' +
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" onChange="renderGPS" />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-display2">Uniquement le colimateur</label><hr />' +
 
 		'<p>(1) plus précis en extérieur mais plus lent à initialiser, nécéssite un capteur GPS.</p>' +
@@ -1747,7 +1742,7 @@ function controlGPS() {
 		// Display status, altitude & speed
 		control = controlButton({
 			className: 'ol-button ol-button-gps',
-			label: '&#8853;', // x2295
+			label: '&#8853;',
 			submenuHTML: '<div id="ol-gps-status" class="ol-display-under"></div>' + subMenu,
 		}),
 
@@ -1821,13 +1816,17 @@ function controlGPS() {
 
 	control.renderGPS = function(evt) {
 		const sourceStatus = parseInt(document.querySelector('input[name="ol-gps-source"]:checked').value),
-			displayStatus = parseInt(document.querySelector('input[name="ol-gps-display"]:checked').value);
+			displayStatus = parseInt(document.querySelector('input[name="ol-gps-display"]:checked').value),
+			map = control.getMap(),
+			view = map.getView();
 
 		// Tune the tracking level
 		if (evt.target.name == 'ol-gps-source') {
 			geolocation.setTracking(sourceStatus);
 			graticuleLayer.setVisible(sourceStatus);
 			ol.gpsValues = {}; // Reset the values
+			if (sourceStatus && displayStatus == 2)
+				document.getElementById('ol-gps-display0').checked = true;
 		}
 
 		// Get geolocation values
@@ -1842,18 +1841,14 @@ function controlGPS() {
 			ol.gpsValues.position = null;
 
 		// Render position & graticule
-		const map = control.getMap(),
-			view = map.getView(),
-			p = ol.gpsValues.position;
-
-		if (view && p) {
+		if (view && ol.gpsValues.position) {
 			// Estimate the viewport size to draw visible graticule
-			const hg = map.getCoordinateFromPixel([0, 0]),
+			const p = ol.gpsValues.position,
+				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
-				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10;
-
-			// The graticule
-			geometry = [
+				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
+				// The graticule
+				geometry = [
 					new ol.geom.MultiLineString([
 						[
 							[p[0] - far, p[1]],
@@ -1865,7 +1860,6 @@ function controlGPS() {
 						],
 					]),
 				],
-
 				// Color north in red
 				northGeometry = [
 					new ol.geom.LineString([
@@ -1888,8 +1882,7 @@ function controlGPS() {
 			// Orientation
 			view.setRotation(
 				(ol.gpsValues.heading && displayStatus < 1) ?
-				Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) // Delivered ° reverse clockwize
-				:
+				Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) : // Delivered ° reverse clockwize
 				0);
 
 			// Zoom on the area
@@ -1900,7 +1893,7 @@ function controlGPS() {
 		}
 
 		// Display data under the button
-		let status = p ? '' : 'GPS sync...';
+		let status = ol.gpsValues.position ? '' : 'GPS sync...';
 		if (ol.gpsValues.altitude)
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 		if (ol.gpsValues.speed)
@@ -1910,7 +1903,7 @@ function controlGPS() {
 		// Close the submenu
 		if (evt.target.name) // Only when an input is hit
 			control.element.classList.remove('ol-display-submenu');
-	}
+	};
 
 	return control;
 }
@@ -1923,7 +1916,7 @@ function controlLoadGPX(options) {
 	const control = controlButton(Object.assign({
 			label: '&#128194;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
-				'<input type="file" accept=".gpx" onChange="loadFile" />',
+				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 		}, options)),
 		reader = new FileReader(),
 		format = new ol.format.GPX();
@@ -1974,8 +1967,10 @@ function controlLoadGPX(options) {
 
 		// Zoom the map on the added features
 		const extent = ol.extent.createEmpty();
+
 		for (let f in features)
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
+
 		if (ol.extent.isEmpty(extent))
 			alert('Fichier GPX vide');
 		else
@@ -2003,9 +1998,9 @@ function controlDownload(opt) {
 			className: 'ol-button ol-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
-				'<p><a onChange="download" id="GPX" mime="application/gpx+xml">GPX</a></p>' +
-				'<p><a onChange="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a></p>' +
-				'<p><a onChange="download" id="GeoJSON" mime="application/json">GeoJSON</a></p>',
+				'<a ctrlOnClick="download" id="GPX" mime="application/gpx+xml">GPX</a>' +
+				'<a ctrlOnClick="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
+				'<a ctrlOnClick="download" id="GeoJSON" mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers',
 		}, opt),
 		control = controlButton(options),
@@ -2075,16 +2070,16 @@ function controlPrint() {
 	const control = controlButton({
 		label: '&#128424;',
 		className: 'ol-button ol-print',
-		submenuHTML: '<p>Imprimer la carte:</p>' +
-			'<p>-portrait ou paysage,</p>' +
-			'<p>-zoomer et déplacer,</p>' +
+		submenuHTML: '<p>Pour imprimer la carte:</p>' +
+			'<p>-Choisir portrait ou paysage,</p>' +
+			'<p>-zoomer et déplacer la carte dans le format,</p>' +
 			'<p>-imprimer.</p>' +
-			'<input type="radio" name="print-orientation" id="ol-po0" value="0" onChange="resizeDraftPrint" />' +
+			'<input type="radio" name="print-orientation" id="ol-po0" value="0" ctrlOnChange="resizeDraftPrint" />' +
 			'<label for="ol-po0">Portrait A4</label><br />' +
-			'<input type="radio" name="print-orientation" id="ol-po1" value="1" onChange="resizeDraftPrint" />' +
+			'<input type="radio" name="print-orientation" id="ol-po1" value="1" ctrlOnChange="resizeDraftPrint" />' +
 			'<label for="ol-po1">Paysage A4</label>' +
-			'<p><a onClickOrTouch="printMap">Imprimer</a></p>' +
-			'<p><a onclick="location.reload()">Annuler</a></p>',
+			'<a onclick="printMap()">Imprimer</a>' +
+			'<a onclick="location.reload()">Annuler</a>',
 	});
 
 	control.resizeDraftPrint = function() {
@@ -2126,13 +2121,13 @@ function controlPrint() {
 		});
 	};
 
-	control.printMap = function() {
+	printMap = function() {
 		control.resizeDraftPrint();
 		control.getMap().once('rendercomplete', function() {
 			window.print();
 			location.reload();
 		});
-	};
+	}
 
 	return control;
 }

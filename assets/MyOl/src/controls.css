@@ -28,14 +28,12 @@
 	background: white;
 }
 /* Submenu */
-.ol-button:not(.ol-display-submenu):not(.ol-display-submenu-touch) > div *:not(.ol-display-under),
+.ol-button:not(.ol-display-submenu) > div *:not(.ol-display-under),
 .ol-display-under:empty,
-.ol-display-submenu .ol-display-under,
-.ol-display-submenu-touch .ol-display-under {
+.ol-display-submenu .ol-display-under {
 	display: none;
 }
 .ol-display-submenu > div,
-.ol-display-submenu-touch > div,
 .ol-display-under {
 	position: absolute;
 	top: 29px;
@@ -43,21 +41,18 @@
 	background: white;
 	font-size: 14px;
 }
-.ol-display-submenu a,
-.ol-display-submenu-touch a {
-	color: blue;
+.ol-display-submenu > div * {
+	margin: 3px 0;
+}
+.ol-display-submenu input,
+.ol-display-submenu label {
+	margin: 0 2px;
 	cursor: pointer;
 }
-.ol-button:hover {
-	background: transparent;
-}
-.ol-button p {
-	margin: 0;
-	font-size: 12px;
-	font-family: Times New Roman;
-}
-.ol-button p span {
+.ol-display-submenu a {
+	display: block;
 	color: blue;
+	cursor: pointer;
 }
 
 /* Full screen */
