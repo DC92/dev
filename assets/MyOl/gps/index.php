@@ -87,7 +87,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	<div id="gps-help">
 		<p>Pour utiliser les cartes et le GPS hors réseau:</p>
 		<p>Avant le départ:</p>
-		<p>- Enregistrez un marque-page ou installez l‘application web (explorateur -> options -> ajouter à l‘écran d‘accueil)</p>
+		<p>- Explorateur -> options -> ajouter à l‘écran d‘accueil (ou: installer)</p>
 		<p>- Choisissez une couche de carte</p>
 		<p>- Placez-vous au point de départ de votre randonnée</p>
 		<p>- Zoomez au niveau le plus détaillé que vous voulez mémoriser</p>
@@ -95,7 +95,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 		<p>- Recommencez avec les couches de cartes que vous voulez mémoriser</p>
 		<p>* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur quelques jours</p>
 		<p>Hors réseau :</p><hr/>
-		<p>- Ouvrez votre marque-page ou votre application</p>
+		<p>- Ouvrez le marque-page ou l'application</p>
 		<p>- Choisissez une trace du serveur en cliquant sur &#x1F6B6;</p>
 		<p>- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur &#x1F4C2;</p>
 		<p>- Lancez la localisation en cliquant sur &#x2295;</p><hr/>

@@ -366,17 +366,17 @@ function controlGPS() {
 	};
 
 	control.renderGPS = function(evt) {
-		const sourceStatus = parseInt(document.querySelector('input[name="ol-gps-source"]:checked').value),
-			displayStatus = parseInt(document.querySelector('input[name="ol-gps-display"]:checked').value),
+		const sourceLevel = parseInt(document.querySelector('input[name="ol-gps-source"]:checked').value),
+			displayLevel = parseInt(document.querySelector('input[name="ol-gps-display"]:checked').value),
 			map = control.getMap(),
 			view = map.getView();
 
 		// Tune the tracking level
 		if (evt.target.name == 'ol-gps-source') {
-			geolocation.setTracking(sourceStatus);
-			graticuleLayer.setVisible(sourceStatus);
+			geolocation.setTracking(sourceLevel > 0);
+			graticuleLayer.setVisible(sourceLevel > 0);
 			ol.gpsValues = {}; // Reset the values
-			if (sourceStatus && displayStatus == 0)
+			if (sourceLevel && displayLevel == 0)
 				document.getElementById('ol-gps-display2').checked = true;
 		}
 
@@ -388,11 +388,11 @@ function controlGPS() {
 		});
 
 		// L'état 1 ne prend que les positions du GPS (qui ont une altitude)
-		if (sourceStatus == 1 && !ol.gpsValues.altitude)
+		if (sourceLevel == 1 && !ol.gpsValues.altitude)
 			ol.gpsValues.position = null;
 
 		// Render position & graticule
-		if (view && ol.gpsValues.position) {
+		if (view && sourceLevel && ol.gpsValues.position) {
 			// Estimate the viewport size to draw visible graticule
 			const p = ol.gpsValues.position,
 				hg = map.getCoordinateFromPixel([0, 0]),
@@ -427,12 +427,12 @@ function controlGPS() {
 			northGraticuleFeature.setGeometry(new ol.geom.GeometryCollection(northGeometry));
 
 			// Center the map
-			if (displayStatus > 0)
+			if (displayLevel > 0)
 				view.setCenter(p);
 
 			// Orientation
 			view.setRotation(
-				(ol.gpsValues.heading && displayStatus > 1) ?
+				(ol.gpsValues.heading && displayLevel > 1) ?
 				Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) : // Delivered ° reverse clockwize
 				0);
 
@@ -449,7 +449,7 @@ function controlGPS() {
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 		if (ol.gpsValues.speed)
 			status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
-		document.getElementById('ol-gps-status').innerHTML = sourceStatus ? status : '';
+		document.getElementById('ol-gps-status').innerHTML = sourceLevel ? status : '';
 
 		// Close the submenu
 		if (evt.target.name) // Only when an input is hit

@@ -1,7 +1,7 @@
 /**
  * PWA
  */
-var map;
+var map, gpxLayer;
 const elListe = document.getElementById('gps-trace-list');
 
 // Force https to allow PWA and geolocation
@@ -11,7 +11,8 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		(location.hostname == 'localhost' ? 'http://' : 'https://') +
 		location.hostname +
 		location.pathname + (location.pathname.slice(-1) == '/' ? scriptName || 'index.html' : '') +
-		location.search);
+		location.search +
+		location.hash);
 } else {
 	// Load service worker for web application install & updates
 	if ('serviceWorker' in navigator)
@@ -84,9 +85,12 @@ function addGpxLayer(gpxArg) {
 	if (gpxFiles.includes(gpxArg.toLowerCase())) {
 		location.replace(location.href.replace(/#.*/, '') + '#' + gpxArg);
 
-		//TODO remove existing layers
+		// Remove existing layer
+		if (gpxLayer)
+			map.removeLayer(gpxLayer);
+
 		// Zoom the map on the added features when loaded
-		const layer = new ol.layer.Vector({
+		gpxLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
 				format: new ol.format.GPX(),
 				url: gpxArg + '.gpx',
@@ -99,8 +103,8 @@ function addGpxLayer(gpxArg) {
 			}),
 		});
 
-		layer.once('prerender', function() {
-			const features = layer.getSource().getFeatures(),
+		gpxLayer.once('prerender', function() {
+			const features = gpxLayer.getSource().getFeatures(),
 				extent = ol.extent.createEmpty();
 			for (let f in features)
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
@@ -110,7 +114,7 @@ function addGpxLayer(gpxArg) {
 				padding: [5, 5, 5, 5],
 			});
 		});
-		map.addLayer(layer);
+		map.addLayer(gpxLayer);
 
 		//HACK needed because the layer only becomes active when in the map area
 		map.getView().setZoom(1);
