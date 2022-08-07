@@ -3,63 +3,63 @@
  * Lines & polygons edit
  * Requires JSONparse, myol:onadd, controlButton (from src/controls.js file)
  */
-function layerEditGeoJson(options) {
-	options = Object.assign({
-		format: new ol.format.GeoJSON(),
-		projection: 'EPSG:3857',
-		geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
-		focus: false, // Zoom the map on the loaded features
-		snapLayers: [], // Vector layers to snap on
-		readFeatures: function() {
-			return options.format.readFeatures(
-				options.geoJson ||
-				JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
-					featureProjection: options.projection,
-				});
-		},
-		saveFeatures: function(coordinates, format) {
-			return format.writeFeatures(
-					source.getFeatures(
-						coordinates, format), {
+function layerEditGeoJson(opt) {
+	const options = Object.assign({
+			format: new ol.format.GeoJSON(),
+			projection: 'EPSG:3857',
+			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
+			focus: false, // Zoom the map on the loaded features
+			snapLayers: [], // Vector layers to snap on
+			readFeatures: function() {
+				return options.format.readFeatures(
+					options.geoJson ||
+					JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
 						featureProjection: options.projection,
-						decimals: 5,
-					})
-				.replace(/"properties":\{[^\}]*\}/, '"properties":null');
-		},
-		// Drag lines or Polygons
-		styleOptions: {
-			// Marker circle
-			image: new ol.style.Circle({
-				radius: 4,
+					});
+			},
+			saveFeatures: function(coordinates, format) {
+				return format.writeFeatures(
+						source.getFeatures(
+							coordinates, format), {
+							featureProjection: options.projection,
+							decimals: 5,
+						})
+					.replace(/"properties":\{[^\}]*\}/, '"properties":null');
+			},
+			// Drag lines or Polygons
+			styleOptions: {
+				// Marker circle
+				image: new ol.style.Circle({
+					radius: 4,
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 2,
+					}),
+				}),
+				// Editable lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 2,
 				}),
-			}),
-			// Editable lines or polygons border
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 2,
-			}),
-			// Editable polygons
-			fill: new ol.style.Fill({
-				color: 'rgba(0,0,255,0.2)',
-			}),
-		},
-		editStyleOptions: { // Hover / modify / create
-			// Editable lines or polygons border
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 4,
-			}),
-			// Editable polygons fill
-			fill: new ol.style.Fill({
-				color: 'rgba(255,0,0,0.3)',
-			}),
-		},
-	}, options);
+				// Editable polygons
+				fill: new ol.style.Fill({
+					color: 'rgba(0,0,255,0.2)',
+				}),
+			},
+			editStyleOptions: { // Hover / modify / create
+				// Editable lines or polygons border
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 4,
+				}),
+				// Editable polygons fill
+				fill: new ol.style.Fill({
+					color: 'rgba(255,0,0,0.3)',
+				}),
+			},
+		}, opt),
 
-	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		style = escapedStyle(options.styleOptions),
 		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
@@ -84,13 +84,9 @@ function layerEditGeoJson(options) {
 			style: editStyle,
 		}),
 		controlModify = controlButton({ //TODO redo with new controlButton
-			group: 'edit',
-			label: options.titleModify ? 'M' : null,
-			buttonBackgroundColors: ['white', '#ef3'], //TODO DELETE
-			title: options.titleModify,
-			activate: function(state) { //TODO DELETE
-				activate(state, modify);
-			},
+			label:  '&#x1F589;',
+			submenuHTML: '<p>Editer les lignes et polygones:</p>' +
+				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 		});
 
 	// Snap on vector layers
@@ -114,7 +110,7 @@ function layerEditGeoJson(options) {
 		// Add required controls
 		if (options.titleModify) {
 			map.addControl(controlModify);
-			controlModify.toggle(true);
+			//controlModify.toggle(true);
 		}
 		if (options.titleLine)
 			map.addControl(controlDraw({
@@ -210,12 +206,7 @@ function layerEditGeoJson(options) {
 	}
 
 	function controlDraw(options) {
-		const control = controlButton(Object.assign({
-				group: 'edit',
-				buttonBackgroundColors: ['white', '#ef3'], //TODO DELETE
-				activate: function(state) { //TODO DELETE
-					activate(state, interaction);
-				},
+		const control = controlButton(Object.assign({ //TODO DELETE
 			}, options)),
 			interaction = new ol.interaction.Draw(Object.assign({
 				style: editStyle,

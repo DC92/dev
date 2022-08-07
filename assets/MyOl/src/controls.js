@@ -213,12 +213,14 @@ function controlButton(opt) {
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
+	// Neutral: not displayed
+	if (!options.label)
+		return control;
+
 	// Populate control & button
 	control.element.className = 'ol-control ' + options.className;
-	if (options.label)
-		buttonEl.innerHTML = options.label;
-	if (options.label !== null)
-		control.element.appendChild(buttonEl);
+	buttonEl.innerHTML = options.label;
+	control.element.appendChild(buttonEl);
 
 	// Assign button actions
 	control.element.addEventListener('mouseover', function() {
@@ -233,10 +235,14 @@ function controlButton(opt) {
 	});
 
 	// Add submenu below the button
-	control.submenuEl = options.submenuEl || document.createElement('div');
+	if (options.submenuEl)
+		control.submenuEl = options.submenuEl;
+	else {
+		control.submenuEl = document.createElement('div');
+		if (options.submenuHTML)
+			control.submenuEl.innerHTML = options.submenuHTML;
+	}
 	control.element.appendChild(control.submenuEl);
-	if (options.submenuHTML)
-		control.submenuEl.innerHTML = options.submenuHTML;
 
 	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
 	for (let el of control.submenuEl.getElementsByTagName('*'))
@@ -694,6 +700,7 @@ function controlsCollection(options) {
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
 		controlPrint(),
+		controlButton(), // Neutral: not displayed
 
 		// Bottom left
 		controlLengthLine(),
