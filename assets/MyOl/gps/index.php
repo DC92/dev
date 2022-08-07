@@ -4,6 +4,7 @@
 https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
+<img class="fit-picture" src="../build.php">//TODO DEBUG
 <?php
 // Scan involved directories
 $url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
@@ -83,27 +84,29 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	}
 
 	// Add a gpx layers list
-	if (count ($gpx_files)) { ?>
-		<div id="liste">
-			<p>Cliquez sur le nom de la trace pour l'afficher :</p>
+	if ($gpx_files) { ?>
+		<div id="traceList">
+			<p>Cliquez sur une trace pour l'afficher :</p>
 			<ul>
-			<?php foreach ($gpx_files AS $gpx) { ?>
-				<li>
-					<a title="Cliquer pour afficher la trace"
-						onclick="addLayer('<?=$gpx?>')">
-						<?=ucfirst(pathinfo($gpx,PATHINFO_FILENAME))?>
-					</a>
-				</li>
-		<?php } ?>
+				<?php foreach ($gpx_files AS $gpx) { ?>
+					<li>
+						<a href="?<?=pathinfo($gpx,PATHINFO_FILENAME)?>">
+							<?=ucfirst(str_replace('_',' ',pathinfo($gpx,PATHINFO_FILENAME)))?>
+						</a>
+					</li>
+				<?php }
+				if ($_GET) { ?>
+					<li>
+						<a href=".">Effacer les traces</a>
+					</li>
+				<?php } ?>
 			</ul>
-			<p>Puis sur la cible pour afficher votre position.</p>
-			<p>Fermer : <a onclick="document.getElementById('liste').style.display='none'" title="Replier">&Xi;</a></p>
 		</div>
 	<?php } ?>
 
 	<div id="map"></div>
 
-	<?php // WRI
+	<?php // For WRI
 		if(file_exists ('footer.php'))
 			include 'footer.php';
 	?>

@@ -3,7 +3,7 @@
  */
 var map;
 const liTags = document.getElementsByTagName('li'), //TODO BUG trop de séléction (BUG WRI)
-	elListe = document.getElementById('liste');
+	elListe = document.getElementById('traceList');
 
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
@@ -23,19 +23,21 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			}
 		)
 		.then(function(registration) {
-			if (registration.active) // Avoid reload on first install
-				registration.onupdatefound = function() { // service-worker.js is changed
-					const installingWorker = registration.installing;
-					installingWorker.onstatechange = function() {
-						if (installingWorker.state == 'installed')
-							// The old content have been purged
-							// and the fresh content have been added to the cache.
-							location.reload();
+if (0) //TODO DEBUG
+				if (registration.active) // Avoid reload on first install
+					registration.onupdatefound = function() { // service-worker.js is changed
+						const installingWorker = registration.installing;
+						installingWorker.onstatechange = function() {
+							if (installingWorker.state == 'installed')
+								// The old content have been purged
+								// and the fresh content have been added to the cache.
+								location.reload();
+						};
 					};
-				};
 		});
 
 	// Manage the map
+	//TODO ne marche plus
 	const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
 		'Avant le départ :\n' +
 		'- Enregistrez un marque-page ou installez l‘application web (explorateur -> options -> ajouter à l‘écran d‘accueil)\n' +
@@ -71,26 +73,15 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			controlGeocoder(),
 			controlGPS(),
 
-			//BEST liste des traces dans le layerswitcher
-			liTags.length ? controlButton({
-				label: '&Xi;',
-				title: 'Choisir une trace dans la liste / fermer',
-				activate: function() { //TODO DELETE
-					if (elListe)
-						elListe.style.display = elListe.style.display == 'none' ? 'block' : 'none';
-					window.scrollTo(0, 0);
-					if (document.fullscreenElement)
-						document.exitFullscreen();
-				},
-			}) :
-			// No button display
-			new ol.control.Control({
-				element: document.createElement('div'),
+			// List of traces
+			controlButton({
+				label: elListe ? '&#x1F6B6;' : null,
+				submenuEl: elListe,
 			}),
 
 			controlLoadGPX(),
 			controlDownload(),
-			controlButton({
+			controlButton({ //TODO replace by hover / touch ?
 				label: '?',
 				title: help,
 				activate: function() { //TODO DELETE
@@ -110,19 +101,11 @@ if (!location.href.match(/(https|localhost).*index/)) {
 	// Add a gpx layer if any to be loaded
 	if (typeof gpxFile == 'string')
 		window.addEventListener('load', function() {
-			addLayer(gpxFile);
+			addGpxLayer(gpxFile);
 		});
-
-	// Mask if GPS location is active
-/*//TODO DELETE
-	map.on('myol:ongpsactivate', function() {
-		if (elListe)
-			elListe.style.display = 'none';
-	});
-*/
 }
 
-function addLayer(url) {
+function addGpxLayer(url) {
 	const layer = new ol.layer.Vector({
 		source: new ol.source.Vector({
 			format: new ol.format.GPX(),
@@ -152,9 +135,5 @@ function addLayer(url) {
 	map.addLayer(layer);
 
 	//HACK needed because the layer only becomes active when in the map area
-	map.getView().setZoom(1);
-
-	// Mask the local .gpx file list when one gpx is displayed
-	if (elListe)
-		elListe.style.display = 'none';
+	map.getView().setZoom(10); //TODO BUG COURANT => Don't work
 }

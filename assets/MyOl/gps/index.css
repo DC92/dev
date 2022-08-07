@@ -10,6 +10,9 @@ p, ul {
 li {
 	margin: 0.5em 0;
 }
-#liste a {
-	cursor: pointer;
+#traceList ul {
+	list-style-type: none;
+}
+#traceList a {
+	text-decoration: none;
 }

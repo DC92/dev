@@ -1667,12 +1667,14 @@ function controlButton(opt) {
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
+	// Neutral: not displayed
+	if (!options.label)
+		return control;
+
 	// Populate control & button
 	control.element.className = 'ol-control ' + options.className;
-	if (options.label)
-		buttonEl.innerHTML = options.label;
-	if (options.label !== null)
-		control.element.appendChild(buttonEl);
+	buttonEl.innerHTML = options.label;
+	control.element.appendChild(buttonEl);
 
 	// Assign button actions
 	control.element.addEventListener('mouseover', function() {
@@ -1687,10 +1689,14 @@ function controlButton(opt) {
 	});
 
 	// Add submenu below the button
-	control.submenuEl = options.submenuEl || document.createElement('div');
+	if (options.submenuEl)
+		control.submenuEl = options.submenuEl;
+	else {
+		control.submenuEl = document.createElement('div');
+		if (options.submenuHTML)
+			control.submenuEl.innerHTML = options.submenuHTML;
+	}
 	control.element.appendChild(control.submenuEl);
-	if (options.submenuHTML)
-		control.submenuEl.innerHTML = options.submenuHTML;
 
 	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
 	for (let el of control.submenuEl.getElementsByTagName('*'))
@@ -2144,6 +2150,7 @@ function controlsCollection(options) {
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
 		controlPrint(),
+		controlButton(), // Neutral: not displayed
 
 		// Bottom left
 		controlLengthLine(),
@@ -2349,63 +2356,63 @@ function layerMarker(options) {
  * Lines & polygons edit
  * Requires JSONparse, myol:onadd, controlButton (from src/controls.js file)
  */
-function layerEditGeoJson(options) {
-	options = Object.assign({
-		format: new ol.format.GeoJSON(),
-		projection: 'EPSG:3857',
-		geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
-		focus: false, // Zoom the map on the loaded features
-		snapLayers: [], // Vector layers to snap on
-		readFeatures: function() {
-			return options.format.readFeatures(
-				options.geoJson ||
-				JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
-					featureProjection: options.projection,
-				});
-		},
-		saveFeatures: function(coordinates, format) {
-			return format.writeFeatures(
-					source.getFeatures(
-						coordinates, format), {
+function layerEditGeoJson(opt) {
+	const options = Object.assign({
+			format: new ol.format.GeoJSON(),
+			projection: 'EPSG:3857',
+			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
+			focus: false, // Zoom the map on the loaded features
+			snapLayers: [], // Vector layers to snap on
+			readFeatures: function() {
+				return options.format.readFeatures(
+					options.geoJson ||
+					JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
 						featureProjection: options.projection,
-						decimals: 5,
-					})
-				.replace(/"properties":\{[^\}]*\}/, '"properties":null');
-		},
-		// Drag lines or Polygons
-		styleOptions: {
-			// Marker circle
-			image: new ol.style.Circle({
-				radius: 4,
+					});
+			},
+			saveFeatures: function(coordinates, format) {
+				return format.writeFeatures(
+						source.getFeatures(
+							coordinates, format), {
+							featureProjection: options.projection,
+							decimals: 5,
+						})
+					.replace(/"properties":\{[^\}]*\}/, '"properties":null');
+			},
+			// Drag lines or Polygons
+			styleOptions: {
+				// Marker circle
+				image: new ol.style.Circle({
+					radius: 4,
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 2,
+					}),
+				}),
+				// Editable lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 2,
 				}),
-			}),
-			// Editable lines or polygons border
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 2,
-			}),
-			// Editable polygons
-			fill: new ol.style.Fill({
-				color: 'rgba(0,0,255,0.2)',
-			}),
-		},
-		editStyleOptions: { // Hover / modify / create
-			// Editable lines or polygons border
-			stroke: new ol.style.Stroke({
-				color: 'red',
-				width: 4,
-			}),
-			// Editable polygons fill
-			fill: new ol.style.Fill({
-				color: 'rgba(255,0,0,0.3)',
-			}),
-		},
-	}, options);
+				// Editable polygons
+				fill: new ol.style.Fill({
+					color: 'rgba(0,0,255,0.2)',
+				}),
+			},
+			editStyleOptions: { // Hover / modify / create
+				// Editable lines or polygons border
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 4,
+				}),
+				// Editable polygons fill
+				fill: new ol.style.Fill({
+					color: 'rgba(255,0,0,0.3)',
+				}),
+			},
+		}, opt),
 
-	const geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
 		style = escapedStyle(options.styleOptions),
 		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
@@ -2430,13 +2437,9 @@ function layerEditGeoJson(options) {
 			style: editStyle,
 		}),
 		controlModify = controlButton({
-			group: 'edit',
-			label: options.titleModify ? 'M' : null,
-			buttonBackgroundColors: ['white', '#ef3'],
-			title: options.titleModify,
-			activate: function(state) {
-				activate(state, modify);
-			},
+			label:  '&#x1F589;',
+			submenuHTML: '<p>Editer les lignes et polygones:</p>' +
+				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 		});
 
 	// Snap on vector layers
@@ -2460,7 +2463,7 @@ function layerEditGeoJson(options) {
 		// Add required controls
 		if (options.titleModify) {
 			map.addControl(controlModify);
-			controlModify.toggle(true);
+			//controlModify.toggle(true);
 		}
 		if (options.titleLine)
 			map.addControl(controlDraw({
@@ -2555,11 +2558,6 @@ function layerEditGeoJson(options) {
 
 	function controlDraw(options) {
 		const control = controlButton(Object.assign({
-				group: 'edit',
-				buttonBackgroundColors: ['white', '#ef3'],
-				activate: function(state) {
-					activate(state, interaction);
-				},
 			}, options)),
 			interaction = new ol.interaction.Draw(Object.assign({
 				style: editStyle,
