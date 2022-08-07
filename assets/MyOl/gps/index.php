@@ -4,7 +4,6 @@
 https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
-<img class="fit-picture" src="../build.php">//TODO DEBUG
 <?php
 // Scan involved directories
 $url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
@@ -67,40 +66,21 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 	<?php
 	// List gpx files on the url directory
 	$gpx_files = glob ('*.gpx');
-	$gpx_args = $_GET ?: $gpx_files;
-
-	// Add a gpx layer if any arguments to the url
-	if (count ($gpx_args) == 1) {
-		$gpx_show =
-			@$gpx_args['gpx'] ?: // 1 : ?gpx=trace
-			str_replace ('.gpx', '', array_values($gpx_args)[0]) ?: // 3 : 1 gpx file in the directory
-			array_keys($gpx_args)[0]; // 2 : ?trace
-
-		if (in_array ($gpx_show.'.gpx', $gpx_files)) {
-	?>	<script>
-			var gpxFile = '<?=$gpx_show?>.gpx';
-		</script>
-	<?php }
-	}
-
-	// Add a gpx layers list
 	if ($gpx_files) { ?>
+		<script>
+			const gpxFiles = <?=strtolower(str_replace('.gpx','',json_encode($gpx_files)))?>;
+		</script>
 		<div id="gps-trace-list">
 			<p>Cliquez sur une trace pour l'afficher :</p>
-			<ul>
-				<?php foreach ($gpx_files AS $gpx) { ?>
-					<li>
-						<a href="?<?=pathinfo($gpx,PATHINFO_FILENAME)?>" title="Afficher et centrer">
-							<?=ucfirst(str_replace('_',' ',pathinfo($gpx,PATHINFO_FILENAME)))?>
-						</a>
-					</li>
-				<?php }
-				if ($_GET) { ?>
-					<li>
-						<a href=".">Effacer les traces</a>
-					</li>
-				<?php } ?>
-			</ul>
+			<?php foreach ($gpx_files AS $gpx) { ?>
+				<a title="Cliquer pour afficher la trace"
+					onclick="addGpxLayer('<?=pathinfo($gpx,PATHINFO_FILENAME)?>')">
+					<?=ucfirst(str_replace('_',' ',pathinfo($gpx,PATHINFO_FILENAME)))?>
+				</a>
+			<?php }
+			if ($_GET) { ?>
+				<br/><a href=".">Effacer les traces</a>
+			<?php } ?>
 		</div>
 	<?php } ?>
 
@@ -118,7 +98,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 		<p>- Ouvrez votre marque-page ou votre application</p>
 		<p>- Choisissez une trace du serveur en cliquant sur &#x1F6B6;</p>
 		<p>- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur &#x1F4C2;</p>
-		<p>- Lancez la localisation en cliquent sur &#x2295;</p><hr/>
+		<p>- Lancez la localisation en cliquant sur &#x2295;</p><hr/>
 		<p>* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet, fonctions réduites avec Firefox & Safari</p>
 		<p>* Cette application ne permet pas d‘enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée</p>

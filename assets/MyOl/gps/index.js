@@ -2,8 +2,7 @@
  * PWA
  */
 var map;
-const liTags = document.getElementsByTagName('li'), //TODO BUG trop de séléction (BUG WRI)
-	elListe = document.getElementById('gps-trace-list');
+const elListe = document.getElementById('gps-trace-list');
 
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
@@ -23,17 +22,16 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			}
 		)
 		.then(function(registration) {
-if (0) //TODO DEBUG
-				if (registration.active) // Avoid reload on first install
-					registration.onupdatefound = function() { // service-worker.js is changed
-						const installingWorker = registration.installing;
-						installingWorker.onstatechange = function() {
-							if (installingWorker.state == 'installed')
-								// The old content have been purged
-								// and the fresh content have been added to the cache.
-								location.reload();
-						};
+			if (registration.active) // Avoid reload on first install
+				registration.onupdatefound = function() { // service-worker.js is changed
+					const installingWorker = registration.installing;
+					installingWorker.onstatechange = function() {
+						if (installingWorker.state == 'installed')
+							// The old content have been purged
+							// and the fresh content have been added to the cache.
+							location.reload();
 					};
+				};
 		});
 
 	// Manage the map
@@ -78,37 +76,46 @@ if (0) //TODO DEBUG
 		}),
 	});
 
-	// Add a gpx layer if any to be loaded
-	if (typeof gpxFile == 'string')
-		map.once('postrender', function() {
-			// Zoom the map on the added features when loaded
-			const layer = new ol.layer.Vector({
-				source: new ol.source.Vector({
-					format: new ol.format.GPX(),
-					url: gpxFile,
-				}),
-				style: new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-						width: 2,
-					}),
-				}),
-			});
+	map.once('postrender', evt => addGpxLayer(location.hash.replace('#', '')));
+}
 
-			layer.once('prerender', function() {
-				const features = layer.getSource().getFeatures(),
-					extent = ol.extent.createEmpty();
-				for (let f in features)
-					ol.extent.extend(extent, features[f].getGeometry().getExtent());
-				map.getView().fit(extent, {
-					maxZoom: 17,
-					size: map.getSize(),
-					padding: [5, 5, 5, 5],
-				});
-			});
-			map.addLayer(layer);
+// Add a gpx layer from files in the same directory
+function addGpxLayer(gpxArg) {
+	if (gpxFiles.includes(gpxArg.toLowerCase())) {
+		location.replace(location.href.replace(/#.*/, '') + '#' + gpxArg);
 
-			//HACK needed because the layer only becomes active when in the map area
-			map.getView().setZoom(1);
+		//TODO remove existing layers
+		// Zoom the map on the added features when loaded
+		const layer = new ol.layer.Vector({
+			source: new ol.source.Vector({
+				format: new ol.format.GPX(),
+				url: gpxArg + '.gpx',
+			}),
+			style: new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
+				}),
+			}),
 		});
+
+		layer.once('prerender', function() {
+			const features = layer.getSource().getFeatures(),
+				extent = ol.extent.createEmpty();
+			for (let f in features)
+				ol.extent.extend(extent, features[f].getGeometry().getExtent());
+			map.getView().fit(extent, {
+				maxZoom: 17,
+				size: map.getSize(),
+				padding: [5, 5, 5, 5],
+			});
+		});
+		map.addLayer(layer);
+
+		//HACK needed because the layer only becomes active when in the map area
+		map.getView().setZoom(1);
+
+		// Close the submenu
+		document.getElementById('gps-trace-list').parentElement.classList.remove('ol-display-submenu');
+	}
 }

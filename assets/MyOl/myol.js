@@ -2437,7 +2437,7 @@ function layerEditGeoJson(opt) {
 			style: editStyle,
 		}),
 		controlModify = controlButton({
-			label:  '&#x1F589;',
+			label: '&#x1F589;',
 			submenuHTML: '<p>Editer les lignes et polygones:</p>' +
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 		});
