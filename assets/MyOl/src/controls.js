@@ -268,18 +268,18 @@ function controlGPS() {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
 		'<input type="radio" name="ol-gps-source" id="ol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="ol-gps-source0">Inactive</label><br />' +
+		'<label for="ol-gps-source0">Inactif</label><br />' +
 		'<input type="radio" name="ol-gps-source" id="ol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-source1">Position GPS (1)</label><br />' +
 		'<input type="radio" name="ol-gps-source" id="ol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-source2">Position GPS ou WiFi (2)</label><hr />' +
+		'<label for="ol-gps-source2">Position GPS ou IP (2)</label><hr />' +
 
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="ol-gps-display0">Centre et oriente (3) la carte</label><br />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" ctrlOnChange="renderGPS" />' +
+		'<label for="ol-gps-display0">Affiche le colimateur</label><br />' +
 		'<input type="radio" name="ol-gps-display" id="ol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-display1">Centre la carte</label><br />' +
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-display2">Uniquement le colimateur</label><hr />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" checked="checked" />' +
+		'<label for="ol-gps-display2">Centre et oriente la carte (3)</label><hr />' +
 
 		'<p>(1) plus précis en extérieur mais plus lent à initialiser, nécéssite un capteur GPS.</p>' +
 		'<p>(2) plus rapide (mais peut-être très faux au début en extérieur), ' +
@@ -287,7 +287,7 @@ function controlGPS() {
 		'<p>(3) nécéssite un capteur magnétique et un explorateur le supportant.' +
 		'</p>' :
 		// Si on est en http
-		'<p>L\'utilisation du GPS nécéssite de passer en https</p>' +
+		'<p>L\'utilisation du GPS nécéssite https</p>' +
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
@@ -376,8 +376,8 @@ function controlGPS() {
 			geolocation.setTracking(sourceStatus);
 			graticuleLayer.setVisible(sourceStatus);
 			ol.gpsValues = {}; // Reset the values
-			if (sourceStatus && displayStatus == 2)
-				document.getElementById('ol-gps-display0').checked = true;
+			if (sourceStatus && displayStatus == 0)
+				document.getElementById('ol-gps-display2').checked = true;
 		}
 
 		// Get geolocation values
@@ -427,12 +427,12 @@ function controlGPS() {
 			northGraticuleFeature.setGeometry(new ol.geom.GeometryCollection(northGeometry));
 
 			// Center the map
-			if (displayStatus < 2)
+			if (displayStatus > 0)
 				view.setCenter(p);
 
 			// Orientation
 			view.setRotation(
-				(ol.gpsValues.heading && displayStatus < 1) ?
+				(ol.gpsValues.heading && displayStatus > 1) ?
 				Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) : // Delivered ° reverse clockwize
 				0);
 

@@ -3,7 +3,7 @@
  */
 var map;
 const liTags = document.getElementsByTagName('li'), //TODO BUG trop de séléction (BUG WRI)
-	elListe = document.getElementById('traceList');
+	elListe = document.getElementById('gps-trace-list');
 
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
@@ -37,58 +37,38 @@ if (0) //TODO DEBUG
 		});
 
 	// Manage the map
-	//TODO ne marche plus
-	const help = 'Pour utiliser les cartes et le GPS hors réseau :\n' +
-		'Avant le départ :\n' +
-		'- Enregistrez un marque-page ou installez l‘application web (explorateur -> options -> ajouter à l‘écran d‘accueil)\n' +
-		'- Choisissez une couche de carte\n' +
-		'- Placez-vous au point de départ de votre randonnée\n' +
-		'- Zoomez au niveau le plus détaillé que vous voulez mémoriser\n' +
-		'- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles\n' +
-		'- Recommencez avec les couches de cartes que vous voulez mémoriser\n' +
-		'* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur quelques jours\n' +
-		'Hors réseau :\n' +
-		'- Ouvrez votre marque-page ou votre application\n' +
-		'- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur ▲\n' +
-		'* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet, fonctions réduites avec Firefox & Safari\n' +
-		'* Cette application ne permet pas d‘enregistrer le parcours\n' +
-		'* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée',
+	const controls = [
+		controlTilesBuffer(4),
+		controlLayerSwitcher(),
+		controlPermalink(),
 
-		controls = [
-			controlTilesBuffer(4),
-			controlLayerSwitcher(),
-			controlPermalink(),
+		new ol.control.Attribution({
+			collapseLabel: '>',
+		}),
+		new ol.control.ScaleLine(),
+		controlMousePosition(),
+		controlLengthLine(),
 
-			new ol.control.Attribution({
-				collapseLabel: '>',
-			}),
-			new ol.control.ScaleLine(),
-			controlMousePosition(),
-			controlLengthLine(),
+		new ol.control.Zoom(),
+		new ol.control.FullScreen({
+			tipLabel: 'Plein écran',
+		}),
+		controlGeocoder(),
+		controlGPS(),
 
-			new ol.control.Zoom(),
-			new ol.control.FullScreen({
-				tipLabel: 'Plein écran',
-			}),
-			controlGeocoder(),
-			controlGPS(),
+		// List of traces
+		controlButton({
+			label: elListe ? '&#x1F6B6;' : null,
+			submenuEl: elListe,
+		}),
 
-			// List of traces
-			controlButton({
-				label: elListe ? '&#x1F6B6;' : null,
-				submenuEl: elListe,
-			}),
-
-			controlLoadGPX(),
-			controlDownload(),
-			controlButton({ //TODO replace by hover / touch ?
-				label: '?',
-				title: help,
-				activate: function() { //TODO DELETE
-					alert(this.title);
-				},
-			}),
-		];
+		controlLoadGPX(),
+		controlDownload(),
+		controlButton({
+			label: '?',
+			submenuEl: document.getElementById('gps-help'),
+		}),
+	];
 
 	map = new ol.Map({
 		target: 'map',
@@ -100,40 +80,35 @@ if (0) //TODO DEBUG
 
 	// Add a gpx layer if any to be loaded
 	if (typeof gpxFile == 'string')
-		window.addEventListener('load', function() {
-			addGpxLayer(gpxFile);
+		map.once('postrender', function() {
+			// Zoom the map on the added features when loaded
+			const layer = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					format: new ol.format.GPX(),
+					url: gpxFile,
+				}),
+				style: new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+						width: 2,
+					}),
+				}),
+			});
+
+			layer.once('prerender', function() {
+				const features = layer.getSource().getFeatures(),
+					extent = ol.extent.createEmpty();
+				for (let f in features)
+					ol.extent.extend(extent, features[f].getGeometry().getExtent());
+				map.getView().fit(extent, {
+					maxZoom: 17,
+					size: map.getSize(),
+					padding: [5, 5, 5, 5],
+				});
+			});
+			map.addLayer(layer);
+
+			//HACK needed because the layer only becomes active when in the map area
+			map.getView().setZoom(1);
 		});
-}
-
-function addGpxLayer(url) {
-	const layer = new ol.layer.Vector({
-		source: new ol.source.Vector({
-			format: new ol.format.GPX(),
-			url: url,
-		}),
-		style: new ol.style.Style({
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 2,
-			}),
-		}),
-	});
-
-	// Zoom the map on the added features
-	layer.once('prerender', function() {
-		const features = layer.getSource().getFeatures(),
-			extent = ol.extent.createEmpty();
-		for (let f in features)
-			ol.extent.extend(extent, features[f].getGeometry().getExtent());
-		map.getView().fit(extent, {
-			maxZoom: 17,
-			size: map.getSize(),
-			padding: [5, 5, 5, 5],
-		});
-	});
-
-	map.addLayer(layer);
-
-	//HACK needed because the layer only becomes active when in the map area
-	map.getView().setZoom(10); //TODO BUG COURANT => Don't work
 }

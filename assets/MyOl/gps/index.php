@@ -85,12 +85,12 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 
 	// Add a gpx layers list
 	if ($gpx_files) { ?>
-		<div id="traceList">
+		<div id="gps-trace-list">
 			<p>Cliquez sur une trace pour l'afficher :</p>
 			<ul>
 				<?php foreach ($gpx_files AS $gpx) { ?>
 					<li>
-						<a href="?<?=pathinfo($gpx,PATHINFO_FILENAME)?>">
+						<a href="?<?=pathinfo($gpx,PATHINFO_FILENAME)?>" title="Afficher et centrer">
 							<?=ucfirst(str_replace('_',' ',pathinfo($gpx,PATHINFO_FILENAME)))?>
 						</a>
 					</li>
@@ -103,6 +103,27 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 			</ul>
 		</div>
 	<?php } ?>
+
+	<div id="gps-help">
+		<p>Pour utiliser les cartes et le GPS hors réseau:</p>
+		<p>Avant le départ:</p>
+		<p>- Enregistrez un marque-page ou installez l‘application web (explorateur -> options -> ajouter à l‘écran d‘accueil)</p>
+		<p>- Choisissez une couche de carte</p>
+		<p>- Placez-vous au point de départ de votre randonnée</p>
+		<p>- Zoomez au niveau le plus détaillé que vous voulez mémoriser</p>
+		<p>- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles</p>
+		<p>- Recommencez avec les couches de cartes que vous voulez mémoriser</p>
+		<p>* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur quelques jours</p>
+		<p>Hors réseau :</p><hr/>
+		<p>- Ouvrez votre marque-page ou votre application</p>
+		<p>- Choisissez une trace du serveur en cliquant sur &#x1F6B6;</p>
+		<p>- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur &#x1F4C2;</p>
+		<p>- Lancez la localisation en cliquent sur &#x2295;</p><hr/>
+		<p>* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet, fonctions réduites avec Firefox & Safari</p>
+		<p>* Cette application ne permet pas d‘enregistrer le parcours</p>
+		<p>* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée</p>
+
+	</div>
 
 	<div id="map"></div>
 

@@ -10,9 +10,13 @@ p, ul {
 li {
 	margin: 0.5em 0;
 }
-#traceList ul {
+#gps-trace-list ul {
 	list-style-type: none;
 }
-#traceList a {
+#gps-trace-list a {
 	text-decoration: none;
+}
+#gps-help {
+	left: 0;
+	width: 100%;
 }
