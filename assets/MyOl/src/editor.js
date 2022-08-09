@@ -1,7 +1,7 @@
 /**
  * geoJson lines & polygons display
  * Lines & polygons edit
- * Requires JSONparse, myol:onadd, controlButton (from src/controls.js file)
+ * Requires JSONparse, myol:onadd, controlButton (from src/controls.js)
  */
 function layerEditGeoJson(opt) {
 	const options = Object.assign({
@@ -28,7 +28,7 @@ function layerEditGeoJson(opt) {
 			},
 			// Drag lines or Polygons
 			styleOptions: {
-				// Marker circle
+				// Marker
 				image: new ol.style.Circle({
 					radius: 4,
 					stroke: new ol.style.Stroke({
@@ -36,23 +36,23 @@ function layerEditGeoJson(opt) {
 						width: 2,
 					}),
 				}),
-				// Editable lines or polygons border
+				// Lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 2,
 				}),
-				// Editable polygons
+				// Polygons
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,255,0.2)',
 				}),
 			},
 			editStyleOptions: { // Hover / modify / create
-				// Editable lines or polygons border
+				// Lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 4,
 				}),
-				// Editable polygons fill
+				// Polygons
 				fill: new ol.style.Fill({
 					color: 'rgba(255,0,0,0.3)',
 				}),
@@ -64,21 +64,21 @@ function layerEditGeoJson(opt) {
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
 				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" checked="checked" />' +
-				'<label for="ol-edit0">Modification</label><br />' +
+				'<label for="ol-edit0">Modification &#x1F58D;</label><br />' +
 				(!options.help[1] ? '' :
 					'<input type="radio" name="ol-edit" id="ol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit1">Création ligne</label><br />') +
+					'<label for="ol-edit1">Création ligne &#xD17;</label><br />') +
 				(!options.help[2] ? '' :
 					'<input type="radio" name="ol-edit" id="ol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit2">Création polygone</label>') +
+					'<label for="ol-edit2">Création polygone &#X23E2;</label>') +
 				'<hr /><div id="help-edit"></div>',
 		}),
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		style = escapedStyle(options.styleOptions),
-		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
+		displayStyle = new ol.style.Style(options.styleOptions),
+		editStyle = new ol.style.Style(options.editStyleOptions),
 
 		features = options.readFeatures(),
 		source = new ol.source.Vector({
@@ -88,7 +88,7 @@ function layerEditGeoJson(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20, // Editor & cursor : above the features
-			style: style,
+			style: displayStyle,
 		}),
 		interactions = [
 			new ol.interaction.Modify({ // 0 Modify 
@@ -153,7 +153,8 @@ function layerEditGeoJson(opt) {
 	});
 
 	// End of line & poly drawing
-	[1, 2].forEach(i => interactions[1].on(['drawend'], drawend));
+	[1, 2].forEach(i => interactions[i].on(['drawend'], drawend));
+
 	function drawend() {
 		// Warn source 'on change' to save the feature
 		// Don't do it now as it's not yet added to the source
@@ -225,7 +226,7 @@ function layerEditGeoJson(opt) {
 		control.getMap().addInteraction(interactions[3]); // Snap must be added after the others
 
 		//BEST control.getMap().getTargetElement().style.cursor = 'move';
-	}
+	};
 
 	// End of feature creation
 	source.on('change', function() { // Called all sliding long
@@ -256,25 +257,9 @@ function layerEditGeoJson(opt) {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(style);
+			hoveredFeature.setStyle(displayStyle);
 			hoveredFeature = null;
 		}
-	}
-
-	function escapedStyle(a, b, c) { //BEST RESORB ?
-		//BEST work with arguments
-		const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
-		return function(feature) {
-			return new ol.style.Style(Object.assign({
-					fill: defaultStyle.getFill(),
-					stroke: defaultStyle.getStroke(),
-					image: defaultStyle.getImage(),
-				},
-				typeof a == 'function' ? a(feature.getProperties()) : a,
-				typeof b == 'function' ? b(feature.getProperties()) : b,
-				typeof c == 'function' ? c(feature.getProperties()) : c
-			));
-		};
 	}
 
 	function optimiseEdited(deleteCoords) {
