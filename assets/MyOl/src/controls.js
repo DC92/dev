@@ -242,6 +242,7 @@ function controlButton(opt) {
 		if (options.submenuHTML)
 			control.submenuEl.innerHTML = options.submenuHTML;
 	}
+	control.submenuEl.classList.add('ol-submenu');
 	control.element.appendChild(control.submenuEl);
 
 	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
@@ -287,7 +288,7 @@ function controlGPS() {
 		'<p>(3) nécéssite un capteur magnétique et un explorateur le supportant.' +
 		'</p>' :
 		// Si on est en http
-		'<p>L\'utilisation du GPS nécéssite https</p>' +
+		'<p>L‘utilisation du GPS nécéssite https</p>' +
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
@@ -315,10 +316,7 @@ function controlGPS() {
 					width: 1,
 				}),
 			}),
-		}),
-		displayEl = document.createElement('div');
-
-	control.element.appendChild(displayEl);
+		});
 
 	graticuleFeature.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({

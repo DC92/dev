@@ -83,11 +83,21 @@ function layerEditGeoJson(opt) {
 			pixelTolerance: 16, // Default is 10
 			style: editStyle,
 		}),
-		controlModify = controlButton({ //TODO redo with new controlButton
-			label: '&#x1F589;',
-			submenuHTML: '<p>Editer les lignes et polygones:</p>' +
-				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-		});
+		control = controlButton({
+			className: 'ol-button ol-button-edit',
+			label: 'TBD', // To be defined by changeModeEdit
+			submenuHTML: '<p>Edition:</p>' +
+				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" checked="checked" />' +
+				'<label for="ol-edit0">Modification</label><br />' +
+				(!options.help[1] ? '' :
+					'<input type="radio" name="ol-edit" id="ol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
+					'<label for="ol-edit1">Création ligne</label><br />') +
+				(!options.help[2] ? '' :
+					'<input type="radio" name="ol-edit" id="ol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
+					'<label for="ol-edit2">Création polygone</label>') +
+				'<hr /><div id="help-edit"></div>',
+		}),
+		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;']; // Modify, Line, Polygon
 
 	// Snap on vector layers
 	options.snapLayers.forEach(function(layer) {
@@ -102,33 +112,34 @@ function layerEditGeoJson(opt) {
 	let hoveredFeature = null;
 
 	layer.once('myol:onadd', function(evt) {
-		const map = evt.map,
-			extent = ol.extent.createEmpty(); // For focus on all features calculation
+		const map = evt.map;
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
+		control.changeModeEdit(); // Display button & help
+		map.addControl(control);
 
-		// Add required controls
-		if (options.titleModify) {
-			map.addControl(controlModify);
-			//controlModify.toggle(true);
-		}
-		if (options.titleLine)
+		/*
+		if (options.titleLine)//TODO REFURBISH
 			map.addControl(controlDraw({
 				type: 'LineString',
 				label: 'L',
 				title: options.titleLine,
 			}));
-		if (options.titlePolygon)
+		if (options.titlePolygon)//TODO REFURBISH
 			map.addControl(controlDraw({
 				type: 'Polygon',
 				label: 'P',
 				title: options.titlePolygon,
 			}));
+		*/
 
 		// Zoom the map on the loaded features
 		if (options.focus && features.length) {
+			const extent = ol.extent.createEmpty(); // For focus on all features calculation
+
 			for (let f in features)
 				ol.extent.extend(extent, features[f].getGeometry().getExtent());
+
 			map.getView().fit(extent, {
 				maxZoom: options.focus,
 				size: map.getSize(),
@@ -146,9 +157,22 @@ function layerEditGeoJson(opt) {
 		map.on('pointermove', hover);
 	});
 
-	//BEST+ move only one summit when dragging
+	control.changeModeEdit = function(evt) {
+		const level = evt ? evt.target.value : 0;
+
+		// Change button
+		control.element.children[0].innerHTML = labels[level];
+
+		// Change specific help
+		document.getElementById('help-edit').innerHTML = options.help[level];
+
+		//BEST control.getMap().getTargetElement().style.cursor = 'move';
+		// Close the submenu
+		//	control.element.classList.remove('ol-display-submenu');
+	}
 
 	modify.on('modifyend', function(evt) {
+		//BEST+ move only one summit when dragging
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
 
 		// Mark last change time
@@ -195,6 +219,7 @@ function layerEditGeoJson(opt) {
 		}
 	});
 
+	/*
 	function activate(state, inter) { //TODO DELETE // Callback at activation / desactivation, mandatory, no default
 		if (state) {
 			layer.map_.addInteraction(inter);
@@ -216,7 +241,7 @@ function layerEditGeoJson(opt) {
 
 		interaction.on(['drawend'], function() {
 			// Switch on the main editor button
-			controlModify.toggle(true);
+			control.toggle(true);
 
 			// Warn source 'on change' to save the feature
 			// Don't do it now as it's not yet added to the source
@@ -224,6 +249,7 @@ function layerEditGeoJson(opt) {
 		});
 		return control;
 	}
+	*/
 
 	function hover(evt) {
 		let nbFeaturesAtPixel = 0;

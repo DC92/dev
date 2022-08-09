@@ -79,7 +79,7 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 				</a>
 			<?php }
 			if ($_GET) { ?>
-				<br/><a href=".">Effacer les traces</a>
+				<br /><a href=".">Effacer les traces</a>
 			<?php } ?>
 		</div>
 	<?php } ?>
@@ -94,15 +94,14 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 		<p>- Déplacez-vous suivant le trajet de votre randonnée suffisamment lentement pour charger toutes les dalles</p>
 		<p>- Recommencez avec les couches de cartes que vous voulez mémoriser</p>
 		<p>* Toutes les dalles visualisées une fois seront conservées dans le cache de l‘explorateur quelques jours</p>
-		<p>Hors réseau :</p><hr/>
+		<p>Hors réseau :</p><hr />
 		<p>- Ouvrez le marque-page ou l'application</p>
 		<p>- Choisissez une trace du serveur en cliquant sur &#x1F6B6;</p>
 		<p>- Si vous avez un fichier .gpx dans votre mobile, visualisez-le en cliquant sur &#x1F4C2;</p>
-		<p>- Lancez la localisation en cliquant sur &#x2295;</p><hr/>
+		<p>- Lancez la localisation en cliquant sur &#x2295;</p><hr />
 		<p>* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet, fonctions réduites avec Firefox & Safari</p>
 		<p>* Cette application ne permet pas d‘enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée</p>
-
 	</div>
 
 	<div id="map"></div>

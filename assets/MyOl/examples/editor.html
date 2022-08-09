@@ -20,6 +20,7 @@ Based on https://openlayers.org
 	<script src="../src/header.js"></script><!-- For myol:onadd & JSONparse -->
 	<link  href="../src/controls.css" type="text/css" rel="stylesheet">
 	<script src="../src/controls.js"></script>
+	<link  href="../src/editor.css" type="text/css" rel="stylesheet">
 	<script src="../src/editor.js"></script>
 
 	<style>
@@ -83,26 +84,25 @@ const snaplayer = new ol.layer.Vector({
 		//BEST généralilser les aides / traduction
 		geoJsonId: 'geojson',
 		snapLayers: [snaplayer],
-		titleModify: 'Modification d‘une ligne, d‘un polygone:\n' +
-			'Activer ce bouton (couleur jaune) puis\n' +
-			'Cliquer et déplacer un sommet pour modifier une ligne ou un polygone\n' +
-			'Cliquer sur un segment puis déplacer pour créer un sommet\n' +
-			'Alt+cliquer sur un sommet pour le supprimer\n' +
-			'Alt+cliquer sur un segment à supprimer dans une ligne pour la couper\n' +
-			'Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne\n' +
-			'Joindre les extrémités deux lignes pour les fusionner\n' +
-			'Joindre les extrémités d‘une ligne pour la transformer en polygone\n' +
-			'Ctrl+Alt+cliquer sur une ligne ou un polygone pour les supprimer',
-		titleLine: 'Création d‘une ligne:\n' +
-			'Activer ce bouton (couleur jaune) puis\n' +
-			'Cliquer sur la carte et sur chaque point désiré pour dessiner une ligne,\n' +
-			'double cliquer pour terminer.\n' +
-			'Cliquer sur une extrémité d‘une ligne pour l‘étendre',
-		titlePolygon: 'Création d‘un polygone:\n' +
-			'Activer ce bouton (couleur jaune) puis\n' +
-			'Cliquer sur la carte et sur chaque point désiré pour dessiner un polygone,\n' +
-			'double cliquer pour terminer.\n' +
-			'Si le nouveau polygone est entièrement compris dans un autre, il crée un "trou".',
+		help: [
+			// Modify
+			'<p>Cliquer et déplacer un sommet pour modifier une ligne ou un polygone</p>' +
+			'<p>Cliquer sur un segment puis déplacer pour créer un sommet</p>' +
+			'<p>Alt+cliquer sur un sommet pour le supprimer</p>' +
+			'<p>Alt+cliquer sur un segment à supprimer dans une ligne pour la couper</p>' +
+			'<p>Alt+cliquer sur un segment à supprimer d‘un polygone pour le transformer en ligne</p>' +
+			'<p>Joindre les extrémités deux lignes pour les fusionner</p>' +
+			'<p>Joindre les extrémités d‘une ligne pour la transformer en polygone</p>' +
+			'<p>Ctrl+Alt+cliquer sur une ligne ou le côté d‘un polygone pour les supprimer</p>',
+			// Line
+			'<p>Cliquer sur le début ou sur l‘extrémité d‘une ligne existante pour l‘étendre,' +
+			'<p>puis sur chaque point pour dessiner une ligne,</p>' +
+			'<p>double cliquer pour terminer.</p>',
+			// Polygon
+			'<p>Cliquer sur le premier sommet puis sur chaque sommet pour dessiner un polygone,</p>' +
+			'<p>double cliquer sur le dernier sommet pour terminer.</p>' +
+			'<p>Un polygone entièrement compris dans un autre crée un "trou".</p>',
+		],
 	});
 
 new ol.Map({

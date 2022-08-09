@@ -230,3 +230,9 @@
 #marker-coordinates:not(.epsg21781) .xy {
 	display: none;
 }
+
+/* FILE src/editor.css */
+.ol-button-edit .ol-submenu {
+	left: 0;
+	width: 100%;
+}
