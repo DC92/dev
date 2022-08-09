@@ -139,7 +139,7 @@ function layerMarker(options) {
 		}
 	}
 
-	layer.once('myol:onadd', function(evt) {
+	layer.once('myol:onadd', function(evt) { //BEST transform in control
 		const map = evt.map,
 			view = map.getView(),
 			pc = point.getCoordinates();

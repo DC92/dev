@@ -2352,7 +2352,7 @@ function layerMarker(options) {
 /**
  * geoJson lines & polygons display
  * Lines & polygons edit
- * Requires JSONparse, myol:onadd, controlButton (from src/controls.js file)
+ * Requires JSONparse, myol:onadd, controlButton (from src/controls.js)
  */
 function layerEditGeoJson(opt) {
 	const options = Object.assign({
@@ -2379,7 +2379,19 @@ function layerEditGeoJson(opt) {
 			},
 			// Drag lines or Polygons
 			styleOptions: {
-				// Marker circle
+				// Lines or polygons border
+				stroke: new ol.style.Stroke({
+					color: 'red',
+					width: 2,
+				}),
+				// Polygons
+				fill: new ol.style.Fill({
+					color: 'rgba(0,0,255,0.2)',
+				}),
+			},
+			// Hover / modify / create
+			editStyleOptions: {
+				// Edit position marker
 				image: new ol.style.Circle({
 					radius: 4,
 					stroke: new ol.style.Stroke({
@@ -2387,23 +2399,12 @@ function layerEditGeoJson(opt) {
 						width: 2,
 					}),
 				}),
-				// Editable lines or polygons border
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 2,
-				}),
-				// Editable polygons
-				fill: new ol.style.Fill({
-					color: 'rgba(0,0,255,0.2)',
-				}),
-			},
-			editStyleOptions: { // Hover / modify / create
-				// Editable lines or polygons border
+				// Lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
 					width: 4,
 				}),
-				// Editable polygons fill
+				// Polygons
 				fill: new ol.style.Fill({
 					color: 'rgba(255,0,0,0.3)',
 				}),
@@ -2412,8 +2413,8 @@ function layerEditGeoJson(opt) {
 
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		style = escapedStyle(options.styleOptions),
-		editStyle = escapedStyle(options.styleOptions, options.editStyleOptions),
+		displayStyle = new ol.style.Style(options.styleOptions),
+		editStyle = new ol.style.Style(options.editStyleOptions),
 
 		features = options.readFeatures(),
 		source = new ol.source.Vector({
@@ -2423,39 +2424,103 @@ function layerEditGeoJson(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20, // Editor & cursor : above the features
-			style: style,
+			style: displayStyle,
 		}),
-		snap = new ol.interaction.Snap({
-			source: source,
-			pixelTolerance: 7.5, // 6 + line width / 2 : default is 10
-		}),
-		modify = new ol.interaction.Modify({
-			source: source,
-			pixelTolerance: 16, // Default is 10
-			style: editStyle,
-		}),
+
 		control = controlButton({
 			className: 'ol-button ol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
 				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" checked="checked" />' +
-				'<label for="ol-edit0">Modification</label><br />' +
+				'<label for="ol-edit0">Modification &#x1F58D;</label><br />' +
 				(!options.help[1] ? '' :
 					'<input type="radio" name="ol-edit" id="ol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit1">Création ligne</label><br />') +
+					'<label for="ol-edit1">Création ligne &#xD17;</label><br />') +
 				(!options.help[2] ? '' :
 					'<input type="radio" name="ol-edit" id="ol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit2">Création polygone</label>') +
+					'<label for="ol-edit2">Création polygone &#X23E2;</label>') +
 				'<hr /><div id="help-edit"></div>',
 		}),
-		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;']; // Modify, Line, Polygon
+		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
+
+		interactions = [
+			new ol.interaction.Modify({ // 0 Modify 
+				source: source,
+				pixelTolerance: 16, // Default is 10
+				style: editStyle,
+			}),
+			new ol.interaction.Draw({ // 1 drawLine
+				style: editStyle,
+				source: source,
+				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
+				type: 'LineString',
+			}),
+			new ol.interaction.Draw({ // 2 drawPoly
+				style: editStyle,
+				source: source,
+				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
+				type: 'Polygon',
+			}),
+			new ol.interaction.Snap({ // 3 snap
+				source: source,
+				pixelTolerance: 7.5, // 6 + line width / 2 : default is 10
+			}),
+		];
+
+	// End of modify
+	interactions[0].on('modifyend', function(evt) {
+
+		// Mark last change time
+		localStorage.myol_lastChangeTime = new Date().getTime();
+
+		// Ctrl+Alt+click on segment : delete the line or poly
+		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
+			evt.mapBrowserEvent.originalEvent.altKey) {
+			const selectedFeatures = control.getMap().getFeaturesAtPixel(
+				evt.mapBrowserEvent.pixel, {
+					hitTolerance: 6, // Default is 0
+					layerFilter: function(l) {
+						return l.ol_uid == layer.ol_uid;
+					}
+				});
+
+			for (let f in selectedFeatures) // We delete the selected feature
+				source.removeFeature(selectedFeatures[f]);
+		}
+
+		// Alt+click on segment : delete the segment & split the line
+		const newFeature = interactions[3].snapTo(
+			evt.mapBrowserEvent.pixel,
+			evt.mapBrowserEvent.coordinate,
+			interactions[3].getMap()
+		);
+
+		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)
+			optimiseEdited(newFeature.vertex);
+
+		// Finish
+		optimiseEdited();
+		hoveredFeature = null; // Recover hovering
+	});
+
+	// End of line & poly drawing
+	[1, 2].forEach(i => interactions[i].on('drawend', drawEnd));
+
+	function drawEnd() {
+		// Warn source 'on change' to save the feature
+		// Don't do it now as it's not yet added to the source
+		source.modified = true;
+
+		// Reset interaction & button to modify
+		control.changeModeEdit();
+	}
 
 	// Snap on vector layers
 	options.snapLayers.forEach(function(layer) {
 		layer.getSource().on('change', function() {
 			const fs = layer.getSource().getFeatures();
 			for (let f in fs)
-				snap.addFeature(fs[f]);
+				interactions[3].addFeature(fs[f]);
 		});
 	});
 
@@ -2466,23 +2531,8 @@ function layerEditGeoJson(opt) {
 		const map = evt.map;
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
-		control.changeModeEdit(); // Display button & help
 		map.addControl(control);
-
-		/*
-		if (options.titleLine)
-			map.addControl(controlDraw({
-				type: 'LineString',
-				label: 'L',
-				title: options.titleLine,
-			}));
-		if (options.titlePolygon)
-			map.addControl(controlDraw({
-				type: 'Polygon',
-				label: 'P',
-				title: options.titlePolygon,
-			}));
-		*/
+		control.changeModeEdit(); // Display button & help
 
 		// Zoom the map on the loaded features
 		if (options.focus && features.length) {
@@ -2509,52 +2559,24 @@ function layerEditGeoJson(opt) {
 	});
 
 	control.changeModeEdit = function(evt) {
-		const level = evt ? evt.target.value : 0;
+		const level = evt ? evt.target.value : 0,
+			chidEls = control.element.children,
+			helpEditEl = document.getElementById('help-edit');
 
 		// Change button
-		control.element.children[0].innerHTML = labels[level];
+		if (chidEls)
+			chidEls[0].innerHTML = labels[level];
 
 		// Change specific help
-		document.getElementById('help-edit').innerHTML = options.help[level];
+		if (helpEditEl)
+			helpEditEl.innerHTML = options.help[level];
 
-		// Close the submenu
-		//	control.element.classList.remove('ol-display-submenu');
-	}
+		// Replace interactions
+		interactions.forEach(i => control.getMap().removeInteraction(i));
+		control.getMap().addInteraction(interactions[level]); // Add active interaction
+		control.getMap().addInteraction(interactions[3]); // Snap must be added after the others
 
-	modify.on('modifyend', function(evt) {
-
-		// Mark last change time
-		localStorage.myol_lastChangeTime = new Date().getTime();
-
-		// Ctrl+Alt+click on segment : delete the line or poly
-		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
-			evt.mapBrowserEvent.originalEvent.altKey) {
-			const selectedFeatures = layer.map_.getFeaturesAtPixel(
-				evt.mapBrowserEvent.pixel, {
-					hitTolerance: 6, // Default is 0
-					layerFilter: function(l) {
-						return l.ol_uid == layer.ol_uid;
-					}
-				});
-
-			for (let f in selectedFeatures) // We delete the selected feature
-				source.removeFeature(selectedFeatures[f]);
-		}
-
-		// Alt+click on segment : delete the segment & split the line
-		const newFeature = snap.snapTo(
-			evt.mapBrowserEvent.pixel,
-			evt.mapBrowserEvent.coordinate,
-			snap.getMap()
-		);
-
-		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)
-			optimiseEdited(newFeature.vertex);
-
-		// Finish
-		optimiseEdited();
-		hoveredFeature = null; // Recover hovering
-	});
+	};
 
 	// End of feature creation
 	source.on('change', function() { // Called all sliding long
@@ -2567,41 +2589,9 @@ function layerEditGeoJson(opt) {
 		}
 	});
 
-	/*
-	function activate(state, inter) {
-		if (state) {
-			layer.map_.addInteraction(inter);
-			layer.map_.addInteraction(snap); // Must be added after
-		} else {
-			layer.map_.removeInteraction(snap);
-			layer.map_.removeInteraction(inter);
-		}
-	}
-
-	function controlDraw(options) {
-		const control = controlButton(Object.assign({
-			}, options)),
-			interaction = new ol.interaction.Draw(Object.assign({
-				style: editStyle,
-				source: source,
-				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
-			}, options));
-
-		interaction.on(['drawend'], function() {
-			// Switch on the main editor button
-			control.toggle(true);
-
-			// Warn source 'on change' to save the feature
-			// Don't do it now as it's not yet added to the source
-			source.modified = true;
-		});
-		return control;
-	}
-	*/
-
 	function hover(evt) {
 		let nbFeaturesAtPixel = 0;
-		layer.map_.forEachFeatureAtPixel(evt.pixel, function(feature) {
+		control.getMap().forEachFeatureAtPixel(evt.pixel, function(feature) {
 			source.getFeatures().forEach(function(f) {
 				if (f.ol_uid == feature.ol_uid) {
 					nbFeaturesAtPixel++;
@@ -2617,24 +2607,9 @@ function layerEditGeoJson(opt) {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(style);
+			hoveredFeature.setStyle(displayStyle);
 			hoveredFeature = null;
 		}
-	}
-
-	function escapedStyle(a, b, c) {
-		const defaultStyle = new ol.layer.Vector().getStyleFunction()()[0];
-		return function(feature) {
-			return new ol.style.Style(Object.assign({
-					fill: defaultStyle.getFill(),
-					stroke: defaultStyle.getStroke(),
-					image: defaultStyle.getImage(),
-				},
-				typeof a == 'function' ? a(feature.getProperties()) : a,
-				typeof b == 'function' ? b(feature.getProperties()) : b,
-				typeof c == 'function' ? c(feature.getProperties()) : c
-			));
-		};
 	}
 
 	function optimiseEdited(deleteCoords) {

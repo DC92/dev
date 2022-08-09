@@ -28,14 +28,6 @@ function layerEditGeoJson(opt) {
 			},
 			// Drag lines or Polygons
 			styleOptions: {
-				// Marker
-				image: new ol.style.Circle({
-					radius: 4,
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 2,
-					}),
-				}),
 				// Lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
@@ -46,7 +38,16 @@ function layerEditGeoJson(opt) {
 					color: 'rgba(0,0,255,0.2)',
 				}),
 			},
-			editStyleOptions: { // Hover / modify / create
+			// Hover / modify / create
+			editStyleOptions: {
+				// Edit position marker
+				image: new ol.style.Circle({
+					radius: 4,
+					stroke: new ol.style.Stroke({
+						color: 'red',
+						width: 2,
+					}),
+				}),
 				// Lines or polygons border
 				stroke: new ol.style.Stroke({
 					color: 'red',
@@ -58,6 +59,22 @@ function layerEditGeoJson(opt) {
 				}),
 			},
 		}, opt),
+
+		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
+		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
+		displayStyle = new ol.style.Style(options.styleOptions),
+		editStyle = new ol.style.Style(options.editStyleOptions),
+
+		features = options.readFeatures(),
+		source = new ol.source.Vector({
+			features: features,
+			wrapX: false,
+		}),
+		layer = new ol.layer.Vector({
+			source: source,
+			zIndex: 20, // Editor & cursor : above the features
+			style: displayStyle,
+		}),
 
 		control = controlButton({
 			className: 'ol-button ol-button-edit',
@@ -75,21 +92,6 @@ function layerEditGeoJson(opt) {
 		}),
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 
-		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
-		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		displayStyle = new ol.style.Style(options.styleOptions),
-		editStyle = new ol.style.Style(options.editStyleOptions),
-
-		features = options.readFeatures(),
-		source = new ol.source.Vector({
-			features: features,
-			wrapX: false,
-		}),
-		layer = new ol.layer.Vector({
-			source: source,
-			zIndex: 20, // Editor & cursor : above the features
-			style: displayStyle,
-		}),
 		interactions = [
 			new ol.interaction.Modify({ // 0 Modify 
 				source: source,
@@ -153,9 +155,9 @@ function layerEditGeoJson(opt) {
 	});
 
 	// End of line & poly drawing
-	[1, 2].forEach(i => interactions[i].on(['drawend'], drawend));
+	[1, 2].forEach(i => interactions[i].on('drawend', drawEnd));
 
-	function drawend() {
+	function drawEnd() {
 		// Warn source 'on change' to save the feature
 		// Don't do it now as it's not yet added to the source
 		source.modified = true;
@@ -176,7 +178,7 @@ function layerEditGeoJson(opt) {
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null;
 
-	layer.once('myol:onadd', function(evt) {
+	layer.once('myol:onadd', function(evt) { //BEST transform in control
 		const map = evt.map;
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
