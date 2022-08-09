@@ -2615,8 +2615,8 @@ function layerEditGeoJson(opt) {
 	function optimiseEdited(deleteCoords) {
 		const coordinates = optimiseFeatures(
 			source.getFeatures(),
-			options.titleLine,
-			options.titlePolygon,
+			options.help[1],
+			options.help[2],
 			true,
 			true,
 			deleteCoords
