@@ -80,7 +80,7 @@ function layerEditGeoJson(opt) {
 			className: 'ol-button ol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
-				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" checked="checked" />' +
+				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
 				'<label for="ol-edit0">Modification &#x1F58D;</label><br />' +
 				(!options.help[1] ? '' :
 					'<input type="radio" name="ol-edit" id="ol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
@@ -212,11 +212,16 @@ function layerEditGeoJson(opt) {
 	control.changeModeEdit = function(evt) {
 		const level = evt ? evt.target.value : 0,
 			chidEls = control.element.children,
+			inputEditEl = document.getElementById('ol-edit' + level),
 			helpEditEl = document.getElementById('help-edit');
 
 		// Change button
 		if (chidEls)
 			chidEls[0].innerHTML = labels[level];
+
+		// Change button
+		if (inputEditEl)
+			inputEditEl.checked = true;
 
 		// Change specific help
 		if (helpEditEl)
