@@ -2,9 +2,11 @@
 // The other times an update is provided if the remote service-worker source md5 is different
 
 // The scope is set to the directory where the service worker script is located.
+var cacheName = 'myGpsCache';
+
 self.addEventListener('install', evt => {
 	evt.waitUntil(
-		caches.open('myGpsCache').then(cache => {
+		caches.open(cacheName).then(cache => {
 			return cache.addAll([
 				'index.html',
 				'index.css',
@@ -18,6 +20,19 @@ self.addEventListener('install', evt => {
 				'../myol.css',
 				'../myol.js',
 			]);
+		})
+	);
+});
+
+self.addEventListener('fetch', evt => {
+	evt.respondWith(
+		caches.match(evt.request).then(found => {
+			return found || fetch(evt.request).then(response => {
+				return caches.open(cacheName).then(cache => {
+					cache.put(evt.request, response.clone());
+					return response;
+				});
+			});
 		})
 	);
 });
