@@ -243,9 +243,10 @@ function layerBing(subLayer) {
 	if (mapKeys.bing) { // Don't display if no key provided
 		const layer = new ol.layer.Tile();
 
-		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is required
-		layer.on('change:visible', function() {
-			if (!layer.getSource()) {
+		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is visible
+		layer.on('change:visible', function(evt) {
+			if (evt.target.getVisible() && // When the layer becomes visible
+				!layer.getSource()) { // Only once
 				layer.setSource(new ol.source.BingMaps({
 					imagerySet: subLayer,
 					key: mapKeys.bing,
