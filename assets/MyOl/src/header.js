@@ -1,5 +1,4 @@
-// Validators adapters
-/* jshint esversion: 6 */
+// Minoring validators reporting
 if (!ol) var ol = {};
 
 /**

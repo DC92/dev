@@ -59,7 +59,7 @@ function layerMarker(options) {
 			localStorage.myol_lastChangeTime = new Date().getTime();
 
 		// Find changed input type from tne input id
-		const idMatch = this.id.match(/-([a-z]+)/);
+		const idMatch = this.id.match(/-([a-z]+)/); //BEST strict mode, 'this' will be undefined... and others
 		if (idMatch)
 			switch (idMatch[1]) {
 				case 'json':

@@ -8,8 +8,7 @@
  */
 
 /* FILE src/header.js */
-// Validators adapters
-/* jshint esversion: 6 */
+// Minoring validators reporting
 if (!ol) var ol = {};
 
 /**
@@ -2444,7 +2443,7 @@ function layerEditGeoJson(opt) {
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 
 		interactions = [
-			new ol.interaction.Modify({ // 0 Modify 
+			new ol.interaction.Modify({ // 0 Modify
 				source: source,
 				pixelTolerance: 16, // Default is 10
 				style: editStyle,

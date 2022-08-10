@@ -246,6 +246,7 @@ function controlButton(opt) {
 	control.element.appendChild(control.submenuEl);
 
 	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
+	//BEST functions declared within loop
 	for (let el of control.submenuEl.getElementsByTagName('*'))
 		['OnClick', 'OnChange'].forEach(evtName => {
 			const evtFnc = el.getAttribute('ctrl' + evtName);
