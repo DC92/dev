@@ -1727,11 +1727,11 @@ function controlGPS() {
 		'<input type="radio" name="ol-gps-source" id="ol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-source2">Position GPS ou IP (2)</label><hr />' +
 
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-display0">Affiche le colimateur</label><br />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
+		'<label for="ol-gps-display0">Carte libre</label><br />' +
 		'<input type="radio" name="ol-gps-display" id="ol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-display1">Centre la carte</label><br />' +
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" checked="checked" />' +
+		'<label for="ol-gps-display1">Centre la carte, nord en haut</label><br />' +
+		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-display2">Centre et oriente la carte (3)</label><hr />' +
 
 		'<p>(1) plus précis en extérieur mais plus lent à initialiser, nécéssite un capteur GPS.</p>' +
@@ -1787,7 +1787,7 @@ function controlGPS() {
 	}));
 
 	let geolocation;
-	ol.gpsValues = {}; // Store the measures for internal use &or other controls
+	ol.gpsValues = {}; // Store the measures for internal use & other controls
 
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
@@ -1826,6 +1826,8 @@ function controlGPS() {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(sourceLevel > 0);
 			ol.gpsValues = {}; // Reset the values
+			if (!sourceLevel)
+				document.getElementById('ol-gps-display0').checked = true;
 			if (sourceLevel && displayLevel == 0)
 				document.getElementById('ol-gps-display2').checked = true;
 		}
@@ -1881,10 +1883,12 @@ function controlGPS() {
 				view.setCenter(p);
 
 			// Orientation
-			view.setRotation(
-				(ol.gpsValues.heading && displayLevel > 1) ?
-				Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) : // Delivered ° reverse clockwize
-				0);
+			if (!sourceLevel || displayLevel == 1)
+				view.setRotation(0);
+			else if (ol.gpsValues.heading && displayLevel == 2)
+				view.setRotation(
+					Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) // Delivered ° reverse clockwize
+				);
 
 			// Zoom on the area
 			if (!ol.gpsValues.isZoomed) { // Only the first time after activation
