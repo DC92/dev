@@ -28,9 +28,9 @@ foreach (glob ($url_path.'*.gpx') as $gf) {
 }
 
 // Calculate a tag depending on the delivery (Total filemtime of cached files)
-$versionTag = 0;
+$deliveryTag = 0;
 foreach (glob ("{../*,../*/*,$url_path*}", GLOB_BRACE) as $f)
-	$versionTag += filemtime ($f);
+	$deliveryTag += filemtime ($f);
 
 // Display code
-echo "// Version tag $versionTag\n$serviceWorkerCode";
+echo "// Version tag $deliveryTag\n$serviceWorkerCode";

@@ -82,7 +82,8 @@ if (!location.href.match(/(https|localhost).*index/)) {
 
 // Add a gpx layer from files in the same directory
 function addGpxLayer(gpxArg) {
-	if (gpxFiles.includes(gpxArg.toLowerCase())) {
+	if (typeof gpxFiles == 'object' &&
+		gpxFiles.includes(gpxArg.toLowerCase())) {
 		location.replace(location.href.replace(/#.*/, '') + '#' + gpxArg);
 
 		// Remove existing layer
