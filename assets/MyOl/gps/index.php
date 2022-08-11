@@ -1,27 +1,26 @@
-<!DOCTYPE html>
-<!--
-© Dominique Cavailhez 2019
-https://github.com/Dominique92/MyOl
-Based on https://openlayers.org
--->
 <?php
+// Don't cache me
+header('Cache-Control: no-cache');
+header('Pragma: no-cache');
+header('Expires: '.date('r'));
+
 // Scan involved directories
 $url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
 $script_dirs  = explode ('/', str_replace ('\\', '/', __DIR__ .'/'));
 
 // Remove common part of the paths (except the last /)
-while (count ($url_dirs ) > 1 && count ($script_dirs ) > 1 &&
+while (count ($url_dirs) > 1 && count ($script_dirs) > 1 &&
 	$url_dirs [0] == $script_dirs [0]) {
-	array_shift ($url_dirs );
-	array_shift ($script_dirs );
+	array_shift ($url_dirs);
+	array_shift ($script_dirs);
 }
 
 // Url path from service-worker
 $url_path = str_replace ('../', ':', //HACK avoid http 406 error
-	str_repeat ('../', count ($script_dirs ) - 1) .implode ('/', $url_dirs));
+	str_repeat ('../', count ($script_dirs) - 1) .implode ('/', $url_dirs));
 
 // Gps scripts path from url
-$script_path = str_repeat ('../', count ($url_dirs ) - 1) .implode ('/', $script_dirs);
+$script_path = str_repeat ('../', count ($url_dirs) - 1) .implode ('/', $script_dirs);
 
 // Get manifest info
 $manifest_file = 'manifest.json';
@@ -31,9 +30,15 @@ $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 
 function file_tag ($rel_filename, $rel = false) {
 	global $script_path;
-	return ($rel?'':$script_path).$rel_filename.'?'.filemtime($rel_filename);
+	$abs_filename = ($rel ? '' : $script_path) .$rel_filename;
+	return $abs_filename.'?'.filemtime($abs_filename);
 }
-?>
+?><!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
 <html>
 <head>
 	<title><?=$manifest['name']?></title>
@@ -90,6 +95,7 @@ function file_tag ($rel_filename, $rel = false) {
 	<?php } ?>
 
 	<div id="gps-help">
+		<p><?=date('r')?> //TODO DELETE</p>
 		<p>Pour utiliser les cartes et le GPS hors réseau:</p>
 		<p>Avant le départ:</p>
 		<p>- Explorateur -> options -> ajouter à l‘écran d‘accueil (ou: installer)</p>

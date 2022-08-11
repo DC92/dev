@@ -2588,7 +2588,7 @@ function layerEditGeoJson(opt) {
 	};
 
 	// End of feature creation
-	source.on('change', function() { // Called all sliding long
+	source.on('change', function() { // Call all sliding long
 		if (source.modified) { // Awaiting adding complete to save it
 			source.modified = false; // To avoid loops
 
