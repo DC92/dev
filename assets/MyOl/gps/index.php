@@ -95,7 +95,6 @@ Based on https://openlayers.org
 	<?php } ?>
 
 	<div id="gps-help">
-		<p><?=date('r')?> //TODO DELETE</p>
 		<p>Pour utiliser les cartes et le GPS hors réseau:</p>
 		<p>Avant le départ:</p>
 		<p>- Explorateur -> options -> ajouter à l‘écran d‘accueil (ou: installer)</p>
@@ -113,6 +112,7 @@ Based on https://openlayers.org
 		<p>* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet, fonctions réduites avec Firefox & Safari</p>
 		<p>* Cette application ne permet pas d‘enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n‘est remontée ni mémorisée</p>
+		<p><?=date('r')?></p>
 	</div>
 
 	<div id="map"></div>
