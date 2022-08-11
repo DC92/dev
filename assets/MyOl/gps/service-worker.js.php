@@ -13,7 +13,7 @@ header('Service-Worker-Allowed: /');
 //HACK avoid http 406 error
 $url_path = str_replace (':', '../', @$_GET['url_path']);
 
-// Read service worker & replace some values
+// Read service worker code
 $serviceWorkerCode = file_get_contents ('service-worker.js');
 
 // Add GPX files in the url directory to the list of files to cache
