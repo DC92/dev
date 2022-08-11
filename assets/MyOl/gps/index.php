@@ -8,6 +8,8 @@ header('Expires: '.date('r'));
 $url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
 $script_dirs  = explode ('/', str_replace ('\\', '/', __DIR__ .'/'));
 
+date_default_timezone_set ('Europe/Paris');  
+
 // Remove common part of the paths (except the last /)
 while (count ($url_dirs) > 1 && count ($script_dirs) > 1 &&
 	$url_dirs [0] == $script_dirs [0]) {

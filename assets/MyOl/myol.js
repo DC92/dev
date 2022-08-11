@@ -2752,7 +2752,8 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 
 		// line & poly
 		else
-			flatCoord(lines, geom.getCoordinates(), deleteCoords); // Get lines or polyons as flat array of coordinates
+			// Get lines or polyons as flat array of coordinates
+			flatCoord(lines, geom.getCoordinates(), deleteCoords);
 	}
 
 	// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)

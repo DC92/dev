@@ -347,7 +347,8 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 			if (compareCoords(lines[a])) { // If this line is closed
 				// Split squeezed polygons
 				// Explore all summits combinaison
-				for (let i1 = 0; i1 < lines[a].length - 1; i1++) //BEST ??? Use « for » because of a bug in Edge
+				for (let i1 = 0; i1 < lines[a].length - 1; i1++)
+					//BEST ??? Use « for » because of a bug in Edge
 					for (let i2 = 0; i2 < i1; i2++)
 						if (lines[a][i1][0] == lines[a][i2][0] &&
 							lines[a][i1][1] == lines[a][i2][1]) { // Find 2 identical summits
@@ -400,7 +401,8 @@ function optimiseFeatures(features, withLines, withPolygons, merge, holes, delet
 
 		// line & poly
 		else
-			flatCoord(lines, geom.getCoordinates(), deleteCoords); // Get lines or polyons as flat array of coordinates
+			// Get lines or polyons as flat array of coordinates
+			flatCoord(lines, geom.getCoordinates(), deleteCoords);
 	}
 
 	// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)

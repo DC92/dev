@@ -10,6 +10,7 @@ self.addEventListener('install', evt => {
 		caches.open(cacheName).then(cache => {
 			return cache.addAll([
 				'index.html',
+				'index.php',
 				'index.css',
 				'index.js',
 				'manifest.json',
