@@ -24,42 +24,47 @@ $url_path = str_replace ('../', ':', //HACK avoid http 406 error
 $script_path = str_repeat ('../', count ($url_dirs ) - 1) .implode ('/', $script_dirs);
 
 // Get manifest info
-$manifest = json_decode (file_get_contents ('manifest.json'), true);
+$manifest_file = 'manifest.json';
+$manifest = json_decode (file_get_contents ($manifest_file), true);
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
+
+function file_tag ($rel_filename, $rel = false) {
+	global $script_path;
+	return ($rel?'':$script_path).$rel_filename.'?'.filemtime($rel_filename);
+}
 ?>
 <html>
 <head>
-	<meta name="viewport" content="width=device-width, user-scalable=no" />
 	<title><?=$manifest['name']?></title>
-	<link href="manifest.json" rel="manifest">
+	<link href="<?=file_tag($manifest_file,true)?>" rel="manifest">
 
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link href="<?=$icon_file?>" rel="icon" type="image/<?=$icon_type?>" />
-	<link href="<?=$icon_file?>" rel="apple-touch-icon" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+	<link href="<?=file_tag($icon_file,true)?>" rel="icon" type="image/<?=$icon_type?>" />
+	<link href="<?=file_tag($icon_file,true)?>" rel="apple-touch-icon" />
 
 	<!-- Openlayers -->
-	<link href="<?=@$script_path?>../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="<?=@$script_path?>../ol/ol.js"></script>
+	<link href="<?=file_tag('../ol/ol.css')?>" type="text/css" rel="stylesheet">
+	<script src="<?=file_tag('../ol/ol.js')?>"></script>
 
 	<!-- Recherche par nom -->
-	<link href="<?=@$script_path?>../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
-	<script src="<?=@$script_path?>../geocoder/ol-geocoder.js"></script>
+	<link href="<?=file_tag('../geocoder/ol-geocoder.min.css')?>" type="text/css" rel="stylesheet">
+	<script src="<?=file_tag('../geocoder/ol-geocoder.js')?>"></script>
 
 	<!-- My Openlayers -->
-	<link href="<?=@$script_path?>../myol.css" type="text/css" rel="stylesheet">
-	<script src="<?=@$script_path?>../myol.js"></script>
+	<link href="<?=file_tag('../myol.css')?>" type="text/css" rel="stylesheet">
+	<script src="<?=file_tag('../myol.js')?>"></script>
 
 	<!-- This app -->
-	<link href="<?=@$script_path?>index.css" type="text/css" rel="stylesheet">
-	<script src="<?=@$script_path?>index.js" defer="defer"></script>
+	<link href="<?=file_tag('index.css')?>" type="text/css" rel="stylesheet">
 	<script>
-		var serviceWorkerName = '<?=@$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
+		var serviceWorkerName = '<?=$script_path?>service-worker.js.php?url_path=<?=$url_path?>',
 			scope = '<?=$manifest['scope']?>',
 			scriptName = 'index.php',
 			mapKeys = <?=json_encode(@$mapKeys)?>;
 	</script>
+	<script src="<?=file_tag('index.js')?>" defer="defer"></script>
 </head>
 
 <body>

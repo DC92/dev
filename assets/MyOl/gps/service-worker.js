@@ -5,6 +5,7 @@
 var cacheName = 'myGpsCache';
 
 self.addEventListener('install', evt => {
+	caches.delete(cacheName);
 	evt.waitUntil(
 		caches.open(cacheName).then(cache => {
 			return cache.addAll([

@@ -77,7 +77,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		}),
 	});
 
-	map.once('postrender', evt => addGpxLayer(location.hash.replace('#', '')));
+	map.once('postrender', () => addGpxLayer(location.hash.replace('#', '')));
 }
 
 // Add a gpx layer from files in the same directory
