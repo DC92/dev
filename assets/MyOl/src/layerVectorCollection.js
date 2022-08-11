@@ -247,9 +247,9 @@ function layerOverpass(options) {
 			args = [];
 
 		// Convert selections on overpass_api language
-		for (let l = 0; l < selection.length; l++) { //BEST ??
+		for (let l = 0; l < selection.length; l++) {
 			const selections = selection[l].split('+');
-			for (let ls = 0; ls < selections.length; ls++) //BEST ??
+			for (let ls = 0; ls < selections.length; ls++)
 				args.push(
 					'node' + selections[ls] + bb + // Ask for nodes in the bbox
 					'way' + selections[ls] + bb // Also ask for areas

@@ -152,7 +152,7 @@ function controlTilesBuffer(depth) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Action on each layer
-		//BEST too much load on basic browsing
+		//TODO too much load on basic browsing
 		map.on('precompose', function() {
 			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
@@ -245,8 +245,8 @@ function controlButton(opt) {
 	control.submenuEl.classList.add('ol-submenu');
 	control.element.appendChild(control.submenuEl);
 
-	// Assign control.function to submenu elements events with attribute ctrlOnClic="function" or ctrlOnChange="function"
-	//BEST functions declared within loop
+	// Assign control.function to submenu elements events
+	// with attribute ctrlOnClic="function" or ctrlOnChange="function"
 	for (let el of control.submenuEl.getElementsByTagName('*'))
 		['OnClick', 'OnChange'].forEach(evtName => {
 			const evtFnc = el.getAttribute('ctrl' + evtName);

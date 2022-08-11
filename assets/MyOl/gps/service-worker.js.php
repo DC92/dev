@@ -7,9 +7,6 @@ header('Expires: '.date('r'));
 header('Content-Type: application/javascript');
 header('Service-Worker-Allowed: /');
 
-//TODO BUG : essaye de loader le service worker quand on revient à l'URL de base MyOl/
-//TODO BUG (WRI) service-worker.js.ph…/favicon_t384.svg:1 Uncaught (in promise) TypeError: Failed to fetch
-
 //HACK avoid http 406 error
 $url_path = str_replace (':', '../', @$_GET['url_path']);
 

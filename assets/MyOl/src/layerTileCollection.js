@@ -100,7 +100,7 @@ function layerIGN(options) {
 /**
  * Swisstopo https://api.geo.admin.ch/
  */
-//BEST : fall back out of valid area
+//BEST fall back out of valid area
 function layerSwissTopo(layer1) {
 	const projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],

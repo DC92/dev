@@ -24,7 +24,7 @@ function controlLayerSwitcher(layers, opt) {
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
 	// Build html transparency slider
-	//BEST fonction sur les terminaux tactiles
+	//BEST implement on touchscreen terminals
 	const rangeContainerEl = document.createElement('div');
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
@@ -39,7 +39,6 @@ function controlLayerSwitcher(layers, opt) {
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
-			//BEST open flip/flop on touchscreen devices
 			control.element.classList.add('ol-button-switcher-open');
 		};
 

@@ -79,7 +79,7 @@ function layerVector(opt) {
 	// Mem / recover the checkboxes in localStorage, url args or hash
 	// Manages a global flip-flop of the same named <input> checkboxes
 	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //BEST ?? HACK for doesn't work on element array
+		for (let e = 0; e < inputEls.length; e++) { //HACK for doesn't work on element array
 			// Set inputs following localStorage & args
 			inputEls[e].checked =
 				values.indexOf(inputEls[e].value) != -1 || // That one is declared
@@ -120,7 +120,7 @@ function layerVector(opt) {
 		let allIndex = -1, // Index of the "all" <input> if any
 			allCheck = true; // Are all others checked ?
 
-		for (let e = 0; e < inputEls.length; e++) { //BEST ??
+		for (let e = 0; e < inputEls.length; e++) {
 			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
 				inputEls[e].checked = target.checked; // Force all the others to the same
 			else if (inputEls[e].value == 'on') // The "all" <input>
