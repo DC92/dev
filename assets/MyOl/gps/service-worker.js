@@ -5,12 +5,24 @@
 var cacheName = 'myGpsCache';
 
 self.addEventListener('install', evt => {
-	caches.delete(cacheName);
+	console.log('PWA SW install');
+
+	// Delete caches
+	evt.waitUntil(
+		caches.keys().then((keyList) => {
+			return Promise.all(keyList.map(key => {
+				console.log('PWA SW caches.delete ' + key);
+				return caches.delete(key);
+			}));
+		})
+	);
+
+	// Reconstruct GPS cache
 	evt.waitUntil(
 		caches.open(cacheName).then(cache => {
+			console.log('PWA SW cache.addAll ' + cacheName);
 			return cache.addAll([
 				'index.html',
-				'index.php',
 				'index.css',
 				'index.js',
 				'manifest.json',
@@ -26,7 +38,10 @@ self.addEventListener('install', evt => {
 	);
 });
 
+// Get cached values
+/*//TODO DELETE ?
 self.addEventListener('fetch', evt => {
+	console.log('PWA SW fetch ' + evt.request.url);
 	evt.respondWith(
 		caches.match(evt.request).then(found => {
 			return found || fetch(evt.request).then(response => {
@@ -38,3 +53,4 @@ self.addEventListener('fetch', evt => {
 		})
 	);
 });
+*/

@@ -283,13 +283,15 @@ function controlGPS() {
 		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
 		'<label for="ol-gps-display2">Centre et oriente la carte (3)</label><hr />' +
 
-		'<p>(1) plus précis en extérieur mais plus lent à initialiser, nécéssite un capteur GPS.</p>' +
-		'<p>(2) plus rapide (mais peut-être très faux au début en extérieur), ' +
-		'plus précis en intérieur, peut se passer de capteur GPS.</p>' +
-		'<p>(3) nécéssite un capteur magnétique et un explorateur le supportant.' +
+		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		'nécessite un capteur et une réception GPS.</p>' +
+		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
+		'mais peut être très erroné à l&apos;initialisation en extérieur. ' +
+		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
+		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.' +
 		'</p>' :
 		// Si on est en http
-		'<p>L‘utilisation du GPS nécéssite https</p>' +
+		'<p>L&apos;utilisation du GPS nécessite https</p>' +
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
