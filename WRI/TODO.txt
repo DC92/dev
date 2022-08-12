@@ -2,7 +2,7 @@ TODO GPS
 ========
 Ajouter images/favicon.svg
 Fond carte mri en haut du switcher / forcer mri à l'init
-Pas de full screen si app installée
+Voir pourquoi il lance le service worker sur les autres pages
 
 BUG
 ===

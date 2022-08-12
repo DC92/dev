@@ -45,10 +45,12 @@ if (!location.href.match(/(https|localhost).*index/)) {
 
 	// Manage the map
 	const controls = [
+		// No button controls
 		controlTilesBuffer(4),
-		controlLayerSwitcher(),
+		controlLayerSwitcher(), //TODO specific list of layers (WRI)
 		controlPermalink(),
 
+		// Bottom
 		new ol.control.Attribution({
 			collapseLabel: '>',
 		}),
@@ -56,14 +58,12 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		controlMousePosition(),
 		controlLengthLine(),
 
+		// Top left
 		new ol.control.Zoom(),
-		new ol.control.FullScreen({
-			tipLabel: 'Plein écran',
-		}),
 		controlGeocoder(),
 		controlGPS(),
 
-		// List of traces
+		// List of tracks in the same directory
 		controlButton({
 			label: elListe ? '&#x1F6B6;' : null,
 			submenuEl: elListe,
@@ -71,6 +71,8 @@ if (!location.href.match(/(https|localhost).*index/)) {
 
 		controlLoadGPX(),
 		controlDownload(),
+
+		// Help
 		controlButton({
 			label: '?',
 			submenuEl: document.getElementById('gps-help'),
