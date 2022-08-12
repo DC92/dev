@@ -6,6 +6,7 @@ Pas de full screen si app installée
 
 BUG
 ===
+Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 Click logo ne va pas à l'accueil en dehors de span
 Input recherche déborde des petits ecrans
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!

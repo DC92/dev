@@ -1,9 +1,4 @@
 <?php
-// Don't cache me
-header('Cache-Control: no-cache');
-header('Pragma: no-cache');
-header('Expires: '.date('r'));
-
 // Scan involved directories
 $url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
 $script_dirs  = explode ('/', str_replace ('\\', '/', __DIR__ .'/'));

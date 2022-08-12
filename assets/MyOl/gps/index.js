@@ -23,16 +23,24 @@ if (!location.href.match(/(https|localhost).*index/)) {
 			}
 		)
 		.then(function(registration) {
-			if (registration.active) // Avoid reload on first install
+			if (registration.active) { // Avoid reload on first install
+				console.log('PWA SW registration.active');
+
 				registration.onupdatefound = function() { // service-worker.js is changed
+					console.log('PWA SW onupdatefound');
+
 					const installingWorker = registration.installing;
+
 					installingWorker.onstatechange = function() {
+						console.log('PWA SW installingWorker.onstatechange ' + installingWorker.state);
+
 						if (installingWorker.state == 'installed')
 							// The old content have been purged
 							// and the fresh content have been added to the cache.
 							location.reload();
 					};
 				};
+			}
 		});
 
 	// Manage the map
