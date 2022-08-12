@@ -286,7 +286,7 @@ function controlGPS() {
 		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
 		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
-		'mais peut être très erroné à l&apos;initialisation en extérieur. ' +
+		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
 		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
 		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.' +
 		'</p>' :
