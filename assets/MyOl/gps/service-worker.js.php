@@ -23,9 +23,13 @@ foreach (glob ($url_path.'*.gpx') as $gf) {
 }
 
 // Add tagged index.php to trigger update on index.php file changes
+$index_to_add = "\n\t\t\t\t'index.php',";
+if ($url_path) // The entry point is not in the library
+	$index_to_add .= "\n\t\t\t\t'{$url_path}index.php',";
+
 $serviceWorkerCode = str_replace (
-	"addAll([",
-	"addAll([\n\t\t\t\t'index.php',",
+	'addAll([',
+	'addAll(['.$index_to_add,
 	$serviceWorkerCode
 );
 
@@ -40,8 +44,8 @@ $serviceWorkerCode = preg_replace_callback(
 
 // Add non tagged index.php & favicon.png as defined on manifest.json
 $serviceWorkerCode = str_replace (
-	"addAll([",
-	"addAll([\n\t\t\t\t'index.php',\n\t\t\t\t'favicon.png',",
+	'addAll([',
+	'addAll(['.$index_to_add,
 	$serviceWorkerCode
 );
 

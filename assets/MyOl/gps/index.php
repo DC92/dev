@@ -110,7 +110,8 @@ Based on https://openlayers.org
 		<p>* Fonctionne bien sur Android avec Chrome, Edge, Samsung Internet, fonctions réduites avec Firefox & Safari</p>
 		<p>* Cette application ne permet pas d&apos;enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n&apos;est remontée ni mémorisée</p>
-		<hr /><p>Mise à jour: <?=date('d M Y H:i:s')?></p>
+		<hr /><p>Mise à jour: <?=date('d M Y H:i:s')?> @<?=$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']?>
+		</p>
 	</div>
 
 	<div id="map"></div>
