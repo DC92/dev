@@ -1696,7 +1696,6 @@ function controlButton(opt) {
 		if (options.submenuHTML)
 			control.submenuEl.innerHTML = options.submenuHTML;
 	}
-	control.submenuEl.classList.add('ol-submenu');
 	control.element.appendChild(control.submenuEl);
 
 	// Assign control.function to submenu elements events

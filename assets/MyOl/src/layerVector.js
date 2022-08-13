@@ -46,7 +46,7 @@ function layerVector(opt) {
 			if (!statusEl.textContent.includes('error'))
 				statusEl.textContent = '';
 
-			//BEST status hors limites zoom
+			//BEST status out of zoom bounds
 			switch (evt.type) {
 				case 'featuresloadstart':
 					statusEl.textContent = 'Chargement...';

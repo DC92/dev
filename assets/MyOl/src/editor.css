@@ -1,4 +1,4 @@
-.ol-button-edit .ol-submenu {
+.ol-button-edit > div {
 	left: 0;
 	width: 100%;
 }
