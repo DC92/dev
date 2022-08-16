@@ -46,6 +46,26 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<div class="selector">
+		<div>
+			Refuges.info
+			<input type="checkbox" name="wri-features" value="7,9,10" />
+			<p id="wri-features-status"></p>
+		</div>
+
+		<div>
+			Pyrenees-refuges.com
+			<input type="checkbox" name="prc-features" />
+			<p id="prc-features-status"></p>
+		</div>
+
+		<div>
+			Camptocamp.org
+			<input type="checkbox" name="c2c-features" />
+			<p><span id="c2c-features-status"></span> Only 100 features at a time</p>
+		</div>
+	</div>
+
+	<div class="selector">
 		Chemineur
 		<input type="checkbox" name="geobb-features" />
 		<p id="geobb-features-status"></p>
@@ -94,35 +114,13 @@ Based on https://openlayers.org
 		</ul>
 	</div>
 
-	<div>
-		Refuges.info
-		<input type="checkbox" name="wri-features" value="7,9,10" />
-		<p id="wri-features-status"></p>
-	</div>
-
-	<div>
-		Pyrenees-refuges.com
-		<input type="checkbox" name="prc-features" />
-		<p id="prc-features-status"></p>
-	</div>
-
-	<div>
-		Camptocamp.org
-		<input type="checkbox" name="c2c-features" />
-		<p><span id="c2c-features-status"></span> Only 100 features at a time</p>
-	</div>
-
 	<br style="clear:both" />
 
 	<script>
 const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		//center: ol.proj.transform([5.36, 44.935], 'EPSG:4326', 'EPSG:3857'), zoom: 11, // Crobache
-		//center: ol.proj.transform([7.331, 46.0185], 'EPSG:4326', 'EPSG:3857'), zoom: 16, // Caractères html dans titre
-		//center: ol.proj.transform([0, 43], 'EPSG:4326', 'EPSG:3857'), zoom: 10, // Pyrénées
-		//center: ol.proj.transform([5.5, 44.8], 'EPSG:4326', 'EPSG:3857'), zoom: 13, // Alpages
-		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'), zoom: 13, // Grenoble OSM
+		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'), zoom: 12, // Grenoble OSM
 	}),
 	layers: [
 		new ol.layer.Tile({
@@ -131,12 +129,32 @@ const map = new ol.Map({
 	],
 });
 
+// Refuges.info
+map.addLayer(layerWri({
+	//TODO revenir de dom à www
+	host: '//dom.refuges.info/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
+	selectorName: 'wri-features',
+	distance: 30,
+}));
+
+// Pyrenees-refuges.com
+map.addLayer(layerPyreneesRefuges({
+	selectorName: 'prc-features',
+	distance: 30,
+}));
+
+// CampToCamp
+map.addLayer(layerC2C({
+	selectorName: 'c2c-features',
+	distance: 30,
+}));
+
 // Chemineur
 if (0)
 	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
 	}));
-if (01) {
+else {
 	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
 		maxResolution: 100,
@@ -153,56 +171,19 @@ if (01) {
 }
 
 // Alpages.info
-if (01)
-	map.addLayer(layerGeoBB({
-		host: '//alpages.info/',
-		selectorName: 'alp-features',
-		argSelName: 'forums',
-		distance: 30,
-		attribution: 'Alpages',
-	}));
+map.addLayer(layerGeoBB({
+	host: '//alpages.info/',
+	selectorName: 'alp-features',
+	argSelName: 'forums',
+	distance: 30,
+	attribution: 'Alpages',
+}));
 
 // Overpass
-if (01)
-	map.addLayer(layerOverpass({
-		selectorName: 'osm-features',
-		distance: 30,
-	}));
-
-// Refuges.info
-if (0)
-	map.addLayer(layerWri({
-		selectorName: 'wri-features',
-	}));
-if (01) {
-	map.addLayer(layerWri({
-		selectorName: 'wri-features',
-		maxResolution: 100,
-		distance: 30,
-	}));
-	map.addLayer(layerWriAreas({
-		minResolution: 100,
-		selectorName: 'wri-features',
-	}));
-}
-
-// Pyrenees-refuges.com
-if (0)
-	map.addLayer(layerPyreneesRefuges({
-		selectorName: 'prc-features',
-	}));
-if (01)
-	map.addLayer(layerPyreneesRefuges({
-		selectorName: 'prc-features',
-		distance: 30,
-	}));
-
-// CampToCamp
-if (01)
-	map.addLayer(layerC2C({
-		selectorName: 'c2c-features',
-		distance: 30,
-	}));
+map.addLayer(layerOverpass({
+	selectorName: 'osm-features',
+	distance: 30,
+}));
 
 	</script>
 	<script src="print_script.js"></script>

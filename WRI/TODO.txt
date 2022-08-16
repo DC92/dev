@@ -33,7 +33,7 @@ Point
 
 EVOLUTIONS
 ==========
-page GPS (ou similaire) comme un point d'entrée mobile
+Revoir les symboles GARMIN
 
 http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
 https://www.refuges.info/forum/viewtopic.php?f=2&t=10687

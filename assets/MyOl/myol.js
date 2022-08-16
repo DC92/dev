@@ -1154,7 +1154,7 @@ function layerGeoBB(options) {
 				(options.selectorName ?
 					'&' + (options.argSelName || 'cat') + '=' + selection.join(',') :
 					'') +
-				// Refresh layer when data chenged
+				// Refresh layer when data changed
 				(localStorage.myol_lastChangeTime ?
 					'&v=' + localStorage.myol_lastChangeTime :
 					'') +
@@ -1204,12 +1204,12 @@ function layerWri(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
-			return options.host + 'api/bbox?nb_points=all' +
+			return options.host + 'api/bbox?nb_points=200' +
 				// Add layer features filters
 				(selection && selection.length ?
 					'&type_points=' + selection.join(',') :
 					'') +
-				// Refresh layer when data chenged
+				// Refresh layer when data changed
 				(localStorage.myol_lastChangeTime ?
 					'&v=' + localStorage.myol_lastChangeTime :
 					'') +
@@ -1221,8 +1221,8 @@ function layerWri(options) {
 				type: properties.type.valeur,
 				name: properties.nom,
 				icon: options.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
-				ele: properties.coord.alt,
-				capacity: properties.places.valeur,
+				ele: properties.coord ? properties.coord.alt : null,
+				capacity: properties.places ? properties.places.valeur : null,
 				url: options.noClick ? null : properties.lien,
 				attribution: 'Refuges.info',
 			};
@@ -1242,7 +1242,7 @@ function layerWriAreas(options) {
 		polygon: 1, // Massifs
 		urlFunction: function(options) {
 			return options.host + 'api/polygones?type_polygon=' + options.polygon +
-				// Refresh layer when data chenged
+				// Refresh layer when data changed
 				(localStorage.myol_lastChangeTime ?
 					'&v=' + localStorage.myol_lastChangeTime :
 					'');
