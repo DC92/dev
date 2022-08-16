@@ -3,8 +3,8 @@ Créer base
 Exporter base / créer et importer
 
 Copier phpBB sauf doc & config.php
-Copier assets/MyOl, MySlider & jquery-ui
-Copier ext/Dominique92/Chemineur, GeoBB, Images, MyPhpBB & VTTrack
+Copier assets/MyOl, MySlider, jquery-ui
+Copier ext/Dominique92/Chemineur, GeoBB, Images, MyPhpBB, VTTrack
 Copier ext/ext2/* ext
 Copier ext/cleantalk
 Copier gps/*
