@@ -1,3 +1,4 @@
+//TODO BUG click sur bouton carte recharge la page
 //TODO BUG : afficher quand même le picto de la fiche si la couche chem est désactivée
 
 //BEST token psw {S_LOGIN_REDIRECT}

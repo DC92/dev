@@ -21,6 +21,11 @@
 	padding: 0 !important; /* No grey line around the button */
 }
 
+/* PhpBB compatibility */
+.ol-overlaycontainer-stopevent > div:not(.ol-control) {
+	margin: 0;
+}
+
 /* Button */
 .ol-control button { /* Also for zoom, fullScreen, ... */
 	font-size: 18px !important;

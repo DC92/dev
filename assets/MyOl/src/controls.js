@@ -186,6 +186,7 @@ function controlGeocoder() {
 	// Move the button at the same level than the other control's buttons
 	buttonEl.innerHTML = '&#x1F50D;';
 	geocoder.element.appendChild(buttonEl);
+	geocoder.element.classList.add('ol-control');
 
 	// Allow open on hover
 	geocoder.element.addEventListener('pointerover', function(evt) {
@@ -699,12 +700,12 @@ function controlsCollection(options) {
 		// Top left
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
+		controlButton(), // Neutral: not displayed
 		controlGeocoder(),
 		controlGPS(options.controlGPS),
 		controlLoadGPX(),
 		controlDownload(options.controlDownload),
 		controlPrint(),
-		controlButton(), // Neutral: not displayed
 
 		// Bottom left
 		controlLengthLine(),

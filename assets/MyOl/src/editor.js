@@ -10,6 +10,7 @@ function layerEditGeoJson(opt) {
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 			focus: false, // Zoom the map on the loaded features
 			snapLayers: [], // Vector layers to snap on
+			help: ['Modification', 'Création ligne', 'Création polygone'],
 			readFeatures: function() {
 				return options.format.readFeatures(
 					options.geoJson ||

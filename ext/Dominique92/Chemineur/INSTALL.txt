@@ -2,22 +2,34 @@ Bloquer chem4
 Créer base
 Exporter base / créer et importer
 
-Télécharger phpBB sauf config.php doc/... ext/phpbb/...
-Télécharger cleantalk / https://github.com/CleanTalk/phpbb3.1-3.2-antispam
-Copier assets/MyOl, MySlider, jquery-ui
-Copier ext/Dominique92/Chemineur, GeoBB, Images, MyPhpBB, VTTrack
-Copier ext/ext2/* ext
-Copier gps/*
-Copier files/*
-Copier images/smilies/*
-Copier images/avatars/upload/*
+https://www.phpbb-fr.com/telechargements/
+Télécharger PhpBB pack complet sauf
+config.php
+doc/...
+ext/phpbb/...
 
+Télécharger cleantalk
+https://github.com/CleanTalk/phpbb3.1-3.2-antispam
+dans ext/cleantalk/...
+
+Télécharger DEV
+https://github.com/DC92/dev
+assets/MyOl, MySlider, jquery-ui
+ext/Dominique92/Chemineur, GeoBB, Images, MyPhpBB, VTTrack
+gps/*
+
+Télécharger de chemineur.fr
+files/*
+images/smilies/*
+images/avatars/upload/*
 config.php changer nom base
 
 /install -> Mettre à jour
 Delete /install
-admin -> Paramètres de cookie -> chemineur.fr
-admin -> Supprimer données OBSOLETS
-Delete ex ext2/...
+
+				admin -> Paramètres de cookie -> chemineur.fr
+				Copier ext/ext2/* ext
+				admin -> Supprimer données OBSOLETES
+				Delete ex ext2/...
 
 Test VTTrack.fr
