@@ -51,7 +51,7 @@ $couleurs[] = $couleurs[] = null;
 header ('Content-type: image/svg+xml');
 header ('Cache-Control: max-age=86000');
 header ('Access-Control-Allow-Origin: *');
-if (isset ($inconnu)) {
+if (isset ($inconnu) || !isset ($images)) {
 	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
 	$images = ['_404']; // Uniquement l'élément erreur 404
 }

@@ -287,7 +287,7 @@ function infos_points($conditions)
   $nb_points = 0;
   $points_isoles = [];
 
-  if ($limite && $req->format == 'geojson')
+  if ($limite && $req && $req->format == 'geojson')
   {
     // Détermination du nombre total de points et si on peut les mettre dans des clusters
     // On groupe les points dans des carrés de 0,1° (~10km) de latitude et longitude
