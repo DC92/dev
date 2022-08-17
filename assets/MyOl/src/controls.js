@@ -84,7 +84,7 @@ function controlMousePosition() {
 		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
 
 		coordinateFormat: function(mouse) {
-			if (ol.gpsValues.position) {
+			if (ol.gpsValues && ol.gpsValues.position) {
 				const ll4326 = ol.proj.transform(ol.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
 					distance = ol.sphere.getDistance(mouse, ll4326);
 

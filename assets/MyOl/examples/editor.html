@@ -30,6 +30,14 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
+		h4 {
+			margin: 1em 0 0 0 !important;
+		}
+		#help-edit-modify p,
+		#help-edit-line p,
+		#help-edit-poly p {
+			margin: 0;
+		}
 	</style>
 </head>
 
@@ -41,6 +49,37 @@ Based on https://openlayers.org
 	<p><a href="../src/editor.js">src/editor.js</a> adds lines & polygons edition facilities</p>
 
 	<div id="map"></div>
+
+	<h4>Modifier une ligne ou un polygone</h4>
+	<div id="help-edit-modify">
+		<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>
+		<p><u>Ajouter un sommet au milieu d'un segment:</u> cliquer le long du segment puis déplacer</p>
+		<p><u>Supprimer un sommet:</u> Alt+cliquer sur le sommet</p>
+		<p><u>Couper une ligne en deux:</u> Alt+cliquer sur le segment à supprimer</p>
+		<p><u>Transformer un polygone en ligne:</u> Alt+cliquer sur un côté</p>
+		<p><u>Fusionner deux lignes:</u> déplacer l'extrémité d'une ligne pour rejoindre l'autre</p>
+		<p><u>Transformer une ligne en polygone:</u> déplacer une extrémité pour rejoindre l'autre</p>
+		<p><u>Scinder un polygone:</u> joindre 2 sommets du polygone puis Alt+cliquer sur le sommet commun</p>
+		<p><u>Fusionner 2 polygones:</u> superposer un côté (entre 2 sommets consécutifs) 
+		de chaque polygone puis Alt+cliquer dessus</p>
+		<p><u>Supprimer une ligne ou un polygone:</u> Ctrl+Alt+cliquer sur un segment</p>
+	</div>
+	<h4>Créer une ligne</h4>
+	<div id="help-edit-line">
+		<p><u>Pour créer une ligne:</u></p>
+		<p>Cliquer sur l'emplacement du début</p>
+		<p>Puis sur chaque sommet</p>
+		<p>Double cliquer sur le dernier sommet pour terminer</p>
+		<p><hr/>Cliquer sur une extrémité d'une ligne existante pour l'étendre</p>
+	</div>
+	<h4>Créer un polygone</h4>
+	<div id="help-edit-poly">
+		<p><u>Pour créer un polygone:</u></p>
+		<p>Cliquer sur l'emplacement du premier sommet</p>
+		<p>Puis sur chaque sommet</p>
+		<p>Double cliquer sur le dernier sommet pour terminer</p>
+		<p><hr/>Un polygone entièrement compris dans un autre crée un "trou"</p>
+	</div>
 
 	<!-- Features editor -->
 	<input type="text" id="geojson" style="width:90%" value='{
@@ -85,30 +124,9 @@ const snaplayer = new ol.layer.Vector({
 		geoJsonId: 'geojson',
 		snapLayers: [snaplayer],
 		help: [
-			// Modify
-			'<p>Déplacer un sommet : cliquer sur le sommet et le déplacer</p>' +
-			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +
-			'<p>Supprimer un sommet : Alt+cliquer sur le sommet</p>' +
-			'<p>Couper une ligne en deux : Alt+cliquer sur le segment à supprimer</p>' +
-			'<p>Transformer un polygone en ligne : Alt+cliquer sur un côté</p>' +
-			'<p>Fusionner deux lignes : déplacer l&apos;extrémité d&apos;une ligne pour rejoindre l&apos;autre</p>' +
-			'<p>Transformer une ligne en polygone : déplacer une extrémité pour rejoindre l&apos;autre</p>' +
-			'<p>Scinder un polygone : joindre 2 sommets du polygone puis Alt+cliquer sur le sommet commun</p>' +
-			'<p>Fusionner 2 polygones : superposer un côté (entre 2 sommets consécutifs) ' +
-			'de chaque polygone puis alt+cliquer dessus</p>' +
-			'<p>Supprimer une ligne ou un polygone : Ctrl+Alt+cliquer sur un segment</p>',
-			// Line
-			'<p>Pour créer une ligne :</p>' +
-			'<p>Cliquer sur l&apos;emplacement du début</p>' +
-			'<p>Puis sur chaque sommet</p>' +
-			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
-			'<p><hr/>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre</p>',
-			// Polygon
-			'<p>Pour créer un polygone :</p>' +
-			'<p>Cliquer sur l&apos;emplacement du premier sommet</p>' +
-			'<p>Puis sur chaque sommet</p>' +
-			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
-			'<p><hr/>Un polygone entièrement compris dans un autre crée un "trou"</p>',
+			document.getElementById('help-edit-modify').innerHTML,
+			document.getElementById('help-edit-line').innerHTML,
+			document.getElementById('help-edit-poly').innerHTML,
 		],
 	});
 
