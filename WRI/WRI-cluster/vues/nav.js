@@ -61,7 +61,6 @@ const baseLayers = {
 					'&bbox=' + bbox.join(',');
 		},
 		selectorName: 'couche-wri',
-	//	maxResolution: 500, // La couche est affichée pour les résolutions < 500 Mercator map unit / pixel
 		distance: 30, // Clusterisation
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
@@ -75,16 +74,15 @@ const baseLayers = {
 		},
 	}),
 
-	// Affiche les massifs si résolution > 500
+	// Affiche les massifs
 	massifs = layerWriAreas({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
-	//	minResolution: 500,
 <?php if (!$vue->contenu) {?>
 		selectorName: 'couche-wri',
 <?php } ?>
 	}),
 
-	// La couche "contour" (du massif, de la zone)
+	// Affiche le contour d'un massif ou d'une zone
 	contour = layerVector({
 		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
 			'?massif=<?=$vue->polygone->id_polygone?>',
@@ -102,9 +100,9 @@ const baseLayers = {
 	layers = [
 		// Refuges.info
 		points,
+		massifs,
 <?php if ($vue->polygone->id_polygone) { ?>
 		contour,
-		massifs,
 <?php } ?>
 
 		// Overpass

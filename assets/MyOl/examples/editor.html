@@ -86,23 +86,29 @@ const snaplayer = new ol.layer.Vector({
 		snapLayers: [snaplayer],
 		help: [
 			// Modify
-			'<p>Cliquer et déplacer un sommet pour modifier une ligne ou un polygone</p>' +
-			'<p>Cliquer sur un segment puis déplacer pour créer un sommet</p>' +
-			'<p>Alt+cliquer sur un sommet pour le supprimer</p>' +
-			'<p>Alt+cliquer sur un segment à supprimer dans une ligne pour la couper</p>' +
-			'<p>Alt+cliquer sur un segment à supprimer d&apos;un polygone pour le transformer en ligne</p>' +
-			'<p>Joindre les extrémités de deux lignes pour les fusionner</p>' +
-			'<p>Joindre les extrémités d&apos;une ligne pour la transformer en polygone</p>' +
-			'<p>Ctrl+Alt+cliquer sur une ligne ou le côté d&apos;un polygone pour les supprimer</p>',
+			'<p>Déplacer un sommet : cliquer sur le sommet et le déplacer</p>' +
+			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +
+			'<p>Supprimer un sommet : Alt+cliquer sur le sommet</p>' +
+			'<p>Couper une ligne en deux : Alt+cliquer sur le segment à supprimer</p>' +
+			'<p>Transformer un polygone en ligne : Alt+cliquer sur un côté</p>' +
+			'<p>Fusionner deux lignes : déplacer l&apos;extrémité d&apos;une ligne pour rejoindre l&apos;autre</p>' +
+			'<p>Transformer une ligne en polygone : déplacer une extrémité pour rejoindre l&apos;autre</p>' +
+			'<p>Scinder un polygone : joindre 2 sommets du polygone puis Alt+cliquer sur le sommet commun</p>' +
+			'<p>Fusionner 2 polygones : superposer un côté (entre 2 sommets consécutifs) ' +
+			'de chaque polygone puis alt+cliquer dessus</p>' +
+			'<p>Supprimer une ligne ou un polygone : Ctrl+Alt+cliquer sur un segment</p>',
 			// Line
-			'<p>Cliquer sur la carte pour créer une nouvelle ligne,' +
-			'<p>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre,' +
-			'<p>puis sur chaque point pour dessiner la nouvelle ligne,</p>' +
-			'<p>double cliquer pour terminer.</p>',
+			'<p>Pour créer une ligne :</p>' +
+			'<p>Cliquer sur l&apos;emplacement du début</p>' +
+			'<p>Puis sur chaque sommet</p>' +
+			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
+			'<p><hr/>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre</p>',
 			// Polygon
-			'<p>Cliquer sur le premier sommet puis sur chaque sommet pour dessiner un polygone,</p>' +
-			'<p>double cliquer sur le dernier sommet pour terminer.</p>' +
-			'<p>Un polygone entièrement compris dans un autre crée un "trou".</p>',
+			'<p>Pour créer un polygone :</p>' +
+			'<p>Cliquer sur l&apos;emplacement du premier sommet</p>' +
+			'<p>Puis sur chaque sommet</p>' +
+			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
+			'<p><hr/>Un polygone entièrement compris dans un autre crée un "trou"</p>',
 		],
 	});
 

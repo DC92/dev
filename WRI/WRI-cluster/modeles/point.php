@@ -287,7 +287,9 @@ function infos_points($conditions)
   $nb_points = 0;
   $points_isoles = [];
 
-  if ($limite && $req && $req->format == 'geojson')
+  if ($limite &&
+    !$select_distance && !$champs_polygones && !$champs_en_plus &&
+    $req && $req->format == 'geojson')
   {
     // Détermination du nombre total de points et si on peut les mettre dans des clusters
     // On groupe les points dans des carrés de 0,1° (~10km) de latitude et longitude
@@ -320,6 +322,8 @@ SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom))
     // Si on est en dessous la limite on efface tout et on traitera tous les points
     if ($nb_points < $conditions->limite)
       $points = $points_isoles = array ();
+    else
+      $limite = ''; // Si on a clustérisé, on n'impose plus de limite
   }
 
   // TRAITEMENT DES POINTS INDIVIDUELLEMENT

@@ -54,16 +54,17 @@ if (mapType == 'line' && scriptName == 'posting')
 		focus: 15,
 		help: [
 			// Modify
-			'<p>Cliquer et déplacer un sommet pour modifier une ligne</p>' +
-			'<p>Cliquer sur un segment puis déplacer pour créer un sommet</p>' +
-			'<p>Alt+cliquer sur un sommet pour le supprimer</p>' +
-			'<p>Alt+cliquer sur un segment à supprimer dans une ligne pour la couper</p>' +
-			'<p>Joindre les extrémités de deux lignes pour les fusionner</p>' +
-			'<p>Ctrl+Alt+cliquer sur une ligne pour la supprimer</p>',
+			'<p>Déplacer un sommet : cliquer sur le sommet et le déplacer</p>' +
+			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +
+			'<p>Supprimer un sommet : Alt+cliquer sur le sommet</p>' +
+			'<p>Couper une ligne en deux : Alt+cliquer sur le segment à supprimer</p>' +
+			'<p>Fusionner deux lignes : déplacer l&apos;extrémité d&apos;une ligne pour rejoindre l&apos;autre</p>' +
+			'<p>Supprimer une ligne : Ctrl+Alt+cliquer sur un segment</p>',
 			// Line
-			'<p>Cliquer sur la carte pour créer une nouvelle ligne,' +
-			'<p>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre,' +
-			'<p>puis sur chaque point pour dessiner la nouvelle ligne,</p>' +
-			'<p>double cliquer pour terminer.</p>',
+			'<p>Pour créer une ligne :</p>' +
+			'<p>Cliquer sur l&apos;emplacement du début</p>' +
+			'<p>Puis sur chaque sommet</p>' +
+			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
+			'<p><hr/>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre</p>',
 		],
 	}));
