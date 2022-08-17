@@ -131,6 +131,6 @@ function addGpxLayer(gpxArg) {
 		map.getView().setZoom(1);
 
 		// Close the submenu
-		document.getElementById('gps-trace-list').parentElement.classList.remove('ol-display-submenu');
+		document.getElementById('gps-trace-list').parentElement.classList.remove('myol-display-submenu');
 	}
 }

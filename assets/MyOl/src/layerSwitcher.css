@@ -1,35 +1,35 @@
-.ol-button-switcher {
+.myol-button-switcher {
 	position: static;
 	float: right;
 }
-.ol-button-switcher .single-layer span {
+.myol-button-switcher .myol-single-layer span {
 	font-size: 0.7em;
 }
-.ol-button-switcher .single-layer input,
-.ol-button-switcher .double-layer span,
-.ol-button-switcher-open button,
-.ol-button-switcher:not(.ol-button-switcher-open) > hr,
-.ol-button-switcher:not(.ol-button-switcher-open) > div {
+.myol-button-switcher .myol-single-layer input,
+.myol-button-switcher .myol-double-layer span,
+.myol-button-switcher-open button,
+.myol-button-switcher:not(.myol-button-switcher-open) > hr,
+.myol-button-switcher:not(.myol-button-switcher-open) > div {
 	display: none;
 }
-.ol-button-switcher hr {
+.myol-button-switcher hr {
 	margin: 0;
 }
-.ol-button-switcher-open {
+.myol-button-switcher-open {
 	position: absolute;
 	right: 0;
 	max-height: 98%;
 	overflow: auto;
 }
-.ol-button-switcher div {
+.myol-button-switcher div {
 	padding-left: 5px;
 }
-.ol-button-switcher span,
-.ol-button-switcher label {
+.myol-button-switcher span,
+.myol-button-switcher label {
 	color: black;
 }
 
-#additional-selector {
+#additional-selector { /*//BEST BUG depends on options */
 	color: black;
 	background: rgb(162, 226, 255, 0.6);
 }

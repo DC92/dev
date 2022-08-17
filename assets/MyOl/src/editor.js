@@ -10,7 +10,7 @@ function layerEditGeoJson(opt) {
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 			focus: false, // Zoom the map on the loaded features
 			snapLayers: [], // Vector layers to snap on
-			help: ['Modification', 'Création ligne', 'Création polygone'],
+			help: ['Modification', 'New line', 'New polygon'],
 			readFeatures: function() {
 				return options.format.readFeatures(
 					options.geoJson ||
@@ -78,18 +78,18 @@ function layerEditGeoJson(opt) {
 		}),
 
 		control = controlButton({
-			className: 'ol-button ol-button-edit',
+			className: 'myol-button myol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
-				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
-				'<label for="ol-edit0">Modification &#x1F58D;</label><br />' +
+				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
+				'<label for="myol-edit0">Modification &#x1F58D;</label><br />' +
 				(!options.help[1] ? '' :
-					'<input type="radio" name="ol-edit" id="ol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit1">Création ligne &#xD17;</label><br />') +
+					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
+					'<label for="myol-edit1">Création ligne &#xD17;</label><br />') +
 				(!options.help[2] ? '' :
-					'<input type="radio" name="ol-edit" id="ol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit2">Création polygone &#X23E2;</label>') +
-				'<hr /><div id="help-edit"></div>',
+					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
+					'<label for="myol-edit2">Création polygone &#X23E2;</label>') +
+				'<hr /><div id="myol-help-edit"></div>',
 		}),
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 
@@ -213,8 +213,8 @@ function layerEditGeoJson(opt) {
 	control.changeModeEdit = function(evt) {
 		const level = evt ? evt.target.value : 0,
 			chidEls = control.element.children,
-			inputEditEl = document.getElementById('ol-edit' + level),
-			helpEditEl = document.getElementById('help-edit');
+			inputEditEl = document.getElementById('myol-edit' + level),
+			helpEditEl = document.getElementById('myol-help-edit');
 
 		// Change button
 		if (chidEls)

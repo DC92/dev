@@ -33,9 +33,9 @@ Based on https://openlayers.org
 		h4 {
 			margin: 1em 0 0 0 !important;
 		}
-		#help-edit-modify p,
-		#help-edit-line p,
-		#help-edit-poly p {
+		#myol-help-edit-modify p,
+		#myol-help-edit-line p,
+		#myol-help-edit-poly p {
 			margin: 0;
 		}
 	</style>
@@ -51,7 +51,7 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<h4>Modifier une ligne ou un polygone</h4>
-	<div id="help-edit-modify">
+	<div id="myol-help-edit-modify">
 		<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>
 		<p><u>Ajouter un sommet au milieu d'un segment:</u> cliquer le long du segment puis déplacer</p>
 		<p><u>Supprimer un sommet:</u> Alt+cliquer sur le sommet</p>
@@ -65,7 +65,7 @@ Based on https://openlayers.org
 		<p><u>Supprimer une ligne ou un polygone:</u> Ctrl+Alt+cliquer sur un segment</p>
 	</div>
 	<h4>Créer une ligne</h4>
-	<div id="help-edit-line">
+	<div id="myol-help-edit-line">
 		<p><u>Pour créer une ligne:</u></p>
 		<p>Cliquer sur l'emplacement du début</p>
 		<p>Puis sur chaque sommet</p>
@@ -73,7 +73,7 @@ Based on https://openlayers.org
 		<p><hr/>Cliquer sur une extrémité d'une ligne existante pour l'étendre</p>
 	</div>
 	<h4>Créer un polygone</h4>
-	<div id="help-edit-poly">
+	<div id="myol-help-edit-poly">
 		<p><u>Pour créer un polygone:</u></p>
 		<p>Cliquer sur l'emplacement du premier sommet</p>
 		<p>Puis sur chaque sommet</p>
@@ -124,9 +124,9 @@ const snaplayer = new ol.layer.Vector({
 		geoJsonId: 'geojson',
 		snapLayers: [snaplayer],
 		help: [
-			document.getElementById('help-edit-modify').innerHTML,
-			document.getElementById('help-edit-line').innerHTML,
-			document.getElementById('help-edit-poly').innerHTML,
+			document.getElementById('myol-help-edit-modify').innerHTML,
+			document.getElementById('myol-help-edit-line').innerHTML,
+			document.getElementById('myol-help-edit-poly').innerHTML,
 		],
 	});
 

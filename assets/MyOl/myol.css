@@ -13,8 +13,8 @@
 .ol-zoom,
 .ol-full-screen,
 .ol-geocoder,
-.ol-button-gps,
-.ol-button {
+.myol-button-gps,
+.myol-button {
 	position: static !important;
 	float: left;
 	margin: 2px;
@@ -34,7 +34,7 @@
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
 	outline: 0;
 }
-.ol-button > div {
+.myol-button > div {
 	max-height: calc(100% - 38px);
 	overflow: auto;
 	z-index: 30;
@@ -48,28 +48,28 @@
 	background: white;
 }
 /* Submenu */
-.ol-button:not(.ol-display-submenu) > div *:not(.ol-display-under),
-.ol-display-under:empty,
-.ol-display-submenu .ol-display-under {
+.myol-button:not(.myol-display-submenu) > div *:not(.myol-display-under),
+.myol-display-under:empty,
+.myol-display-submenu .myol-display-under {
 	display: none;
 }
-.ol-display-submenu > div,
-.ol-display-under {
+.myol-display-submenu > div,
+.myol-display-under {
 	position: absolute;
 	top: 29px;
 	padding: 3px;
 	background: white;
 	font-size: 14px;
 }
-.ol-display-submenu > div * {
+.myol-display-submenu > div * {
 	margin: 3px 0;
 }
-.ol-display-submenu input,
-.ol-display-submenu label {
+.myol-display-submenu input,
+.myol-display-submenu label {
 	margin: 5px;
 	cursor: pointer;
 }
-.ol-display-submenu a {
+.myol-display-submenu a {
 	display: block;
 	margin: 5px;
 	color: blue;
@@ -117,19 +117,19 @@
 }
 
 /* Download */
-.ol-download p {
+.myol-download p {
 	margin: 0;
 	cursor: pointer;
 }
 
 /* Other controls */
-.ol-permalink,
+.myol-permalink,
 .ol-attribution,
-.ol-coordinate,
-.ol-length-line {
+.myol-coordinate,
+.myol-length-line {
 	font-size: 12px;
 }
-.ol-coordinate {
+.myol-coordinate {
 	position: absolute;
 	bottom: 30px;
 	left: 8px;
@@ -138,7 +138,7 @@
 	background: rgba(0, 60, 136, 0.3);
 	color: white;
 }
-.ol-length-line {
+.myol-length-line {
 	position: absolute;
 	bottom: 52px;
 	left: 8px;
@@ -147,11 +147,11 @@
 	background: rgba(0, 60, 136, 0.3);
 	color: white;
 }
-.ol-coordinate:empty,
-.ol-length-line:empty {
+.myol-coordinate:empty,
+.myol-length-line:empty {
 	display: none;
 }
-.ol-permalink {
+.myol-permalink {
 	position: absolute;
 	bottom: 35px;
 	right: 0;
@@ -189,38 +189,38 @@
 }
 
 /* FILE src/layerSwitcher.css */
-.ol-button-switcher {
+.myol-button-switcher {
 	position: static;
 	float: right;
 }
-.ol-button-switcher .single-layer span {
+.myol-button-switcher .myol-single-layer span {
 	font-size: 0.7em;
 }
-.ol-button-switcher .single-layer input,
-.ol-button-switcher .double-layer span,
-.ol-button-switcher-open button,
-.ol-button-switcher:not(.ol-button-switcher-open) > hr,
-.ol-button-switcher:not(.ol-button-switcher-open) > div {
+.myol-button-switcher .myol-single-layer input,
+.myol-button-switcher .myol-double-layer span,
+.myol-button-switcher-open button,
+.myol-button-switcher:not(.myol-button-switcher-open) > hr,
+.myol-button-switcher:not(.myol-button-switcher-open) > div {
 	display: none;
 }
-.ol-button-switcher hr {
+.myol-button-switcher hr {
 	margin: 0;
 }
-.ol-button-switcher-open {
+.myol-button-switcher-open {
 	position: absolute;
 	right: 0;
 	max-height: 98%;
 	overflow: auto;
 }
-.ol-button-switcher div {
+.myol-button-switcher div {
 	padding-left: 5px;
 }
-.ol-button-switcher span,
-.ol-button-switcher label {
+.myol-button-switcher span,
+.myol-button-switcher label {
 	color: black;
 }
 
-#additional-selector {
+#additional-selector { /*
 	color: black;
 	background: rgb(162, 226, 255, 0.6);
 }
@@ -243,7 +243,7 @@
 }
 
 /* FILE src/editor.css */
-.ol-button-edit > div {
+.myol-button-edit > div {
 	left: 0;
 	width: 100%;
 }

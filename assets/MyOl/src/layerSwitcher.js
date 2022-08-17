@@ -5,7 +5,7 @@
 //BEST alt key to switch layers / transparency
 function controlLayerSwitcher(layers, opt) {
 	const options = Object.assign({
-			additionalSelectorId: 'additional-selector',
+			additionalSelectorId: 'additional-selector', //BEST no default / no options
 		}, opt),
 		control = new ol.control.Control({
 			element: document.createElement('div'),
@@ -35,11 +35,11 @@ function controlLayerSwitcher(layers, opt) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// control.element is defined when attached to the map
-		control.element.className = 'ol-control ol-button-switcher';
+		control.element.className = 'ol-control myol-button-switcher';
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
-			control.element.classList.add('ol-button-switcher-open');
+			control.element.classList.add('myol-button-switcher-open');
 		};
 
 		// Hide the selector when the cursor is out of the selector
@@ -48,7 +48,7 @@ function controlLayerSwitcher(layers, opt) {
 				max_y = control.element.offsetHeight + 20;
 
 			if (evt.pixel[0] < max_x || evt.pixel[1] > max_y)
-				control.element.classList.remove('ol-button-switcher-open');
+				control.element.classList.remove('myol-button-switcher-open');
 		});
 
 		// Build html baselayers selectors
@@ -61,7 +61,7 @@ function controlLayerSwitcher(layers, opt) {
 				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
 
 			control.element.appendChild(selectionEl);
-			selectionEl.innerHTML =
+			selectionEl.innerHTML = //BEST investigate if name="baseLayer" is necessary
 				'<input type="checkbox" name="baseLayer" id="' + inputId + '" value="' + name + '" ' + ' />' +
 				'<label for="' + inputId + '">' + name + '</label>';
 			selectionEl.firstChild.onclick = selectBaseLayer;
@@ -138,9 +138,9 @@ function controlLayerSwitcher(layers, opt) {
 					rangeContainerEl.firstChild.value / 100
 				);
 
-			rangeContainerEl.className = 'double-layer';
+			rangeContainerEl.className = 'myol-double-layer';
 		} else
-			rangeContainerEl.className = 'single-layer';
+			rangeContainerEl.className = 'myol-single-layer';
 	}
 
 	return control;

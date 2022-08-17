@@ -47,9 +47,9 @@ const baseLayers = {
 		geoJsonId: 'edit-json',
 		snapLayers: [contours],
 		help: [
-			document.getElementById('help-edit-modify').innerHTML,
+			document.getElementById('myol-help-edit-modify').innerHTML,
 			null, // Pas d'édition de ligne
-			document.getElementById('help-edit-poly').innerHTML,
+			document.getElementById('myol-help-edit-poly').innerHTML,
 		],
 		saveFeatures: function(coordinates, format) {
 			return format.writeGeometry(

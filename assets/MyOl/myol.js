@@ -469,11 +469,11 @@ function controlLayerSwitcher(layers, opt) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// control.element is defined when attached to the map
-		control.element.className = 'ol-control ol-button-switcher';
+		control.element.className = 'ol-control myol-button-switcher';
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
 		control.element.onmouseover = function() {
-			control.element.classList.add('ol-button-switcher-open');
+			control.element.classList.add('myol-button-switcher-open');
 		};
 
 		// Hide the selector when the cursor is out of the selector
@@ -482,7 +482,7 @@ function controlLayerSwitcher(layers, opt) {
 				max_y = control.element.offsetHeight + 20;
 
 			if (evt.pixel[0] < max_x || evt.pixel[1] > max_y)
-				control.element.classList.remove('ol-button-switcher-open');
+				control.element.classList.remove('myol-button-switcher-open');
 		});
 
 		// Build html baselayers selectors
@@ -571,9 +571,9 @@ function controlLayerSwitcher(layers, opt) {
 					rangeContainerEl.firstChild.value / 100
 				);
 
-			rangeContainerEl.className = 'double-layer';
+			rangeContainerEl.className = 'myol-double-layer';
 		} else
-			rangeContainerEl.className = 'single-layer';
+			rangeContainerEl.className = 'myol-single-layer';
 	}
 
 	return control;
@@ -1492,7 +1492,7 @@ function controlPermalink(opt) {
 		'zoom=6&lon=2&lat=47';
 
 	if (options.display) {
-		control.element.className = 'ol-permalink';
+		control.element.className = 'myol-permalink';
 		aEl.innerHTML = 'Permalink';
 		aEl.title = 'Generate a link with map zoom & position';
 		control.element.appendChild(aEl);
@@ -1537,7 +1537,7 @@ function controlPermalink(opt) {
 function controlMousePosition() {
 	return new ol.control.MousePosition({
 		projection: 'EPSG:4326',
-		className: 'ol-coordinate',
+		className: 'myol-coordinate',
 		undefinedHTML: String.fromCharCode(0),
 
 		coordinateFormat: function(mouse) {
@@ -1562,7 +1562,7 @@ function controlLengthLine() {
 	const control = new ol.control.Control({
 		element: document.createElement('div'), // div to display the measure
 	});
-	control.element.className = 'ol-length-line';
+	control.element.className = 'myol-length-line';
 
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
@@ -1663,7 +1663,7 @@ function controlGeocoder() {
 function controlButton(opt) {
 	const options = Object.assign({
 			element: document.createElement('div'),
-			className: 'ol-button',
+			className: 'myol-button',
 		}, opt),
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
@@ -1679,14 +1679,14 @@ function controlButton(opt) {
 
 	// Assign button actions
 	control.element.addEventListener('mouseover', function() {
-		control.element.classList.add('ol-display-submenu');
+		control.element.classList.add('myol-display-submenu');
 	});
 	control.element.addEventListener('mouseout', function() {
-		control.element.classList.remove('ol-display-submenu');
+		control.element.classList.remove('myol-display-submenu');
 	});
 	control.element.addEventListener('touchend', function(evt) {
 		if (control.element.isEqualNode(evt.target.parentElement))
-			control.element.classList.toggle('ol-display-submenu');
+			control.element.classList.toggle('myol-display-submenu');
 	});
 
 	// Add submenu below the button
@@ -1722,19 +1722,19 @@ function controlButton(opt) {
 function controlGPS() {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
-		'<input type="radio" name="ol-gps-source" id="ol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="ol-gps-source0">Inactif</label><br />' +
-		'<input type="radio" name="ol-gps-source" id="ol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-source1">Position GPS (1)</label><br />' +
-		'<input type="radio" name="ol-gps-source" id="ol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-source2">Position GPS ou IP (2)</label><hr />' +
+		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
+		'<label for="myol-gps-source0">Inactif</label><br />' +
+		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
+		'<label for="myol-gps-source1">Position GPS (1)</label><br />' +
+		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
+		'<label for="myol-gps-source2">Position GPS ou IP (2)</label><hr />' +
 
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="ol-gps-display0">Carte libre</label><br />' +
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-display1">Centre la carte, nord en haut</label><br />' +
-		'<input type="radio" name="ol-gps-display" id="ol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="ol-gps-display2">Centre et oriente la carte (3)</label><hr />' +
+		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
+		'<label for="myol-gps-display0">Carte libre</label><br />' +
+		'<input type="radio" name="myol-gps-display" id="myol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
+		'<label for="myol-gps-display1">Centre la carte, nord en haut</label><br />' +
+		'<input type="radio" name="myol-gps-display" id="myol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
+		'<label for="myol-gps-display2">Centre et oriente la carte (3)</label><hr />' +
 
 		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
@@ -1749,9 +1749,9 @@ function controlGPS() {
 
 		// Display status, altitude & speed
 		control = controlButton({
-			className: 'ol-button ol-button-gps',
+			className: 'myol-button myol-button-gps',
 			label: '&#x2295;',
-			submenuHTML: '<div id="ol-gps-status" class="ol-display-under"></div>' + subMenu,
+			submenuHTML: '<div id="myol-gps-status" class="myol-display-under"></div>' + subMenu,
 		}),
 
 		// Graticule
@@ -1820,20 +1820,20 @@ function controlGPS() {
 	};
 
 	control.renderGPS = function(evt) {
-		const sourceLevel = parseInt(document.querySelector('input[name="ol-gps-source"]:checked').value),
-			displayLevel = parseInt(document.querySelector('input[name="ol-gps-display"]:checked').value),
+		const sourceLevel = parseInt(document.querySelector('input[name="myol-gps-source"]:checked').value),
+			displayLevel = parseInt(document.querySelector('input[name="myol-gps-display"]:checked').value),
 			map = control.getMap(),
 			view = map.getView();
 
 		// Tune the tracking level
-		if (evt.target.name == 'ol-gps-source') {
+		if (evt.target.name == 'myol-gps-source') {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(sourceLevel > 0);
 			ol.gpsValues = {}; // Reset the values
 			if (!sourceLevel)
-				document.getElementById('ol-gps-display0').checked = true;
+				document.getElementById('myol-gps-display0').checked = true;
 			if (sourceLevel && displayLevel == 0)
-				document.getElementById('ol-gps-display2').checked = true;
+				document.getElementById('myol-gps-display2').checked = true;
 		}
 
 		// Get geolocation values
@@ -1907,11 +1907,11 @@ function controlGPS() {
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 		if (ol.gpsValues.speed)
 			status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
-		document.getElementById('ol-gps-status').innerHTML = sourceLevel ? status : '';
+		document.getElementById('myol-gps-status').innerHTML = sourceLevel ? status : '';
 
 		// Close the submenu
 		if (evt.target.name) // Only when an input is hit
-			control.element.classList.remove('ol-display-submenu');
+			control.element.classList.remove('myol-display-submenu');
 	};
 
 	return control;
@@ -1990,7 +1990,7 @@ function controlLoadGPX(options) {
 			});
 
 		// Close the submenu
-		control.element.classList.remove('ol-display-submenu');
+		control.element.classList.remove('myol-display-submenu');
 	};
 
 	return control;
@@ -2003,7 +2003,7 @@ function controlLoadGPX(options) {
 function controlDownload(opt) {
 	const options = Object.assign({
 			label: '&#x1f4e5;',
-			className: 'ol-button ol-download',
+			className: 'myol-button myol-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a ctrlOnClick="download" id="GPX" mime="application/gpx+xml">GPX</a>' +
@@ -2064,7 +2064,7 @@ function controlDownload(opt) {
 		hiddenEl.click();
 
 		// Close the submenu
-		control.element.classList.remove('ol-display-submenu');
+		control.element.classList.remove('myol-display-submenu');
 	};
 
 	return control;
@@ -2077,15 +2077,15 @@ function controlDownload(opt) {
 function controlPrint() {
 	const control = controlButton({
 		label: '&#x1F5A8;',
-		className: 'ol-button ol-print',
+		className: 'myol-button',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +
 			'<p>-imprimer.</p>' +
-			'<input type="radio" name="print-orientation" id="ol-po0" value="0" ctrlOnChange="resizeDraftPrint" />' +
-			'<label for="ol-po0">Portrait A4</label><br />' +
-			'<input type="radio" name="print-orientation" id="ol-po1" value="1" ctrlOnChange="resizeDraftPrint" />' +
-			'<label for="ol-po1">Paysage A4</label>' +
+			'<input type="radio" name="print-orientation" id="myol-po0" value="0" ctrlOnChange="resizeDraftPrint" />' +
+			'<label for="myol-po0">Portrait A4</label><br />' +
+			'<input type="radio" name="print-orientation" id="myol-po1" value="1" ctrlOnChange="resizeDraftPrint" />' +
+			'<label for="myol-po1">Paysage A4</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
 	});
@@ -2368,7 +2368,7 @@ function layerEditGeoJson(opt) {
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 			focus: false, // Zoom the map on the loaded features
 			snapLayers: [], // Vector layers to snap on
-			help: ['Modification', 'Création ligne', 'Création polygone'],
+			help: ['Modification', 'New line', 'New polygon'],
 			readFeatures: function() {
 				return options.format.readFeatures(
 					options.geoJson ||
@@ -2436,18 +2436,18 @@ function layerEditGeoJson(opt) {
 		}),
 
 		control = controlButton({
-			className: 'ol-button ol-button-edit',
+			className: 'myol-button myol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
-				'<input type="radio" name="ol-edit" id="ol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
-				'<label for="ol-edit0">Modification &#x1F58D;</label><br />' +
+				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
+				'<label for="myol-edit0">Modification &#x1F58D;</label><br />' +
 				(!options.help[1] ? '' :
-					'<input type="radio" name="ol-edit" id="ol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit1">Création ligne &#xD17;</label><br />') +
+					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
+					'<label for="myol-edit1">Création ligne &#xD17;</label><br />') +
 				(!options.help[2] ? '' :
-					'<input type="radio" name="ol-edit" id="ol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
-					'<label for="ol-edit2">Création polygone &#X23E2;</label>') +
-				'<hr /><div id="help-edit"></div>',
+					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
+					'<label for="myol-edit2">Création polygone &#X23E2;</label>') +
+				'<hr /><div id="myol-help-edit"></div>',
 		}),
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 
@@ -2569,8 +2569,8 @@ function layerEditGeoJson(opt) {
 	control.changeModeEdit = function(evt) {
 		const level = evt ? evt.target.value : 0,
 			chidEls = control.element.children,
-			inputEditEl = document.getElementById('ol-edit' + level),
-			helpEditEl = document.getElementById('help-edit');
+			inputEditEl = document.getElementById('myol-edit' + level),
+			helpEditEl = document.getElementById('myol-help-edit');
 
 		// Change button
 		if (chidEls)
