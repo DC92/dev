@@ -38,6 +38,7 @@ function layerMRI() {
  * Kompas (Austria)
  * Requires layerOSM
  */
+//TODO BUG don't work
 function layerKompass(subLayer) {
 	return layerOSM(
 		'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
@@ -117,7 +118,7 @@ function layerSwissTopo(layer1) {
 			maxResolution: 300,
 			source: new ol.source.WMTS(({
 				crossOrigin: 'anonymous',
-				url: '//wmts2{0-4}.geo.admin.ch/1.0.0/' + layer1 + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
+				url: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/' + layer1 + '/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
 				tileGrid: new ol.tilegrid.WMTS({
 					origin: ol.extent.getTopLeft(projectionExtent),
 					resolutions: resolutions,
@@ -329,8 +330,8 @@ function layersDemo() {
 		'ThF contraste': layerThunderforest('mobile-atlas'),
 
 		'OS light': layerOS('Light_3857'),
-		'OS road': layerOS('Road_3857'),
-		'Kompas': layerKompass('KOMPASS'),
+		'OS road': layerOS('Road_3857'), //TODO BUG
+		'Kompas': layerKompass('KOMPASS'), //TODO BUG
 
 		'Bing': layerBing('Road'),
 		'Bing hybrid': layerBing('AerialWithLabels'),
