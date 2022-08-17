@@ -48,6 +48,7 @@ const baseLayers = {
 
 	points = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
+		selectorName: 'couche-wri',
 		urlFunction: function(options, bbox, selection) {
 			const el = document.getElementById('selecteur-massif');
 
@@ -60,7 +61,6 @@ const baseLayers = {
 					'?type_points=' + selection.join(',') +
 					'&bbox=' + bbox.join(',');
 		},
-		selectorName: 'couche-wri',
 		distance: 30, // Clusterisation
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
@@ -74,35 +74,27 @@ const baseLayers = {
 		},
 	}),
 
-	// Affiche les massifs
-	massifs = layerWriAreas({
-		host: '<?=$config_wri["sous_dossier_installation"]?>',
-<?php if (!$vue->contenu) {?>
-		selectorName: 'couche-wri',
-<?php } ?>
-	}),
-
-	// Affiche le contour d'un massif ou d'une zone
-	contour = layerVector({
-		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
-			'?massif=<?=$vue->polygone->id_polygone?>',
-<?php if (!$vue->contenu) {?>
-		selectorName: 'couche-massif',
-<?php } ?>
-		style: new ol.style.Style({
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-				width: 2,
-			}),
-		}),
-	}),
-
 	layers = [
 		// Refuges.info
 		points,
-		massifs,
+		// Les massifs
+		layerWriAreas({
+			host: '<?=$config_wri["sous_dossier_installation"]?>',
+			selectorName: 'couche-massifs',
+		}),
+		// Contour d'un massif ou d'une zone
 <?php if ($vue->polygone->id_polygone) { ?>
-		contour,
+		layerVector({
+			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
+				'?massif=<?=$vue->polygone->id_polygone?>',
+			selectorName: 'couche-massif',
+			style: new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+					width: 2,
+				}),
+			}),
+		}),
 <?php } ?>
 
 		// Overpass
@@ -157,14 +149,21 @@ const baseLayers = {
 		}),
 		controls: controls,
 		layers: layers,
-	});
+	}),
+	massifsInput = document.getElementsByName('couche-massifs');
 
-	// Centrer sur la zone du polygone
-	<?if ($vue->polygone->id_polygone){?>
-		map.getView().fit(ol.proj.transformExtent([
-			<?=$vue->polygone->ouest?>,
-			<?=$vue->polygone->sud?>,
-			<?=$vue->polygone->est?>,
-			<?=$vue->polygone->nord?>,
-		], 'EPSG:4326', 'EPSG:3857'));
-	<?}?>
+// Initialiser l'affichage des massifs suivant le type de carte (zone ou massif)
+if (massifsInput) {
+	massifsInput[0].checked = <?=$vue->contenu?'true':'false'?>;
+	massifsInput[0].dispatchEvent(new Event('click'));
+}
+
+// Centrer sur la zone du polygone
+<?if ($vue->polygone->id_polygone) { ?>
+	map.getView().fit(ol.proj.transformExtent([
+		<?=$vue->polygone->ouest?>,
+		<?=$vue->polygone->sud?>,
+		<?=$vue->polygone->est?>,
+		<?=$vue->polygone->nord?>,
+	], 'EPSG:4326', 'EPSG:3857'));
+<? } ?>
