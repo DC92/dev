@@ -34,13 +34,16 @@ try {
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
 // localStorage
-let myolLocalArgs = [];
-for (let i = 0; i < localStorage.length; i++) {
-	myolLocalArgs.push(
-		localStorage.key(i) + ': ' +
-		localStorage.getItem(localStorage.key(i)));
+{
+	let datas = [];
+	for (let i = 0; i < localStorage.length; i++) {
+		datas.push(
+			localStorage.key(i) + ': ' +
+			localStorage.getItem(localStorage.key(i))
+		);
+	}
+	console.log('localStorage:\n' + datas.join('\n'));
 }
-console.log('localStorage:\n' + myolLocalArgs.join('\n'));
 
 /**
  * Warn layers when added to the map
@@ -80,6 +83,7 @@ if (window.PointerEvent === undefined) {
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
 }
+
 // Icon extension depending on the OS (IOS 12 dosn't support SVG)
 function iconCanvasExt() {
 	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
@@ -621,7 +625,7 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'),
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		safeSelectorName = options.selectorName.replaceAll(/[^a-z]/ig, ''),
+		safeSelectorName = options.selectorName ? options.selectorName.replaceAll(/[^a-z]/ig, '') : '',
 		values =
 		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
 		localStorage['myol_' + safeSelectorName] :

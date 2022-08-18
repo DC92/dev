@@ -26,14 +26,16 @@ try {
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
 // localStorage
-//BEST encapsulé dans une fonction
-let myolLocalArgs = [];
-for (let i = 0; i < localStorage.length; i++) {
-	myolLocalArgs.push(
-		localStorage.key(i) + ': ' +
-		localStorage.getItem(localStorage.key(i)));
+{
+	let datas = [];
+	for (let i = 0; i < localStorage.length; i++) {
+		datas.push(
+			localStorage.key(i) + ': ' +
+			localStorage.getItem(localStorage.key(i))
+		);
+	}
+	console.log('localStorage:\n' + datas.join('\n'));
 }
-console.log('localStorage:\n' + myolLocalArgs.join('\n'));
 
 /**
  * Warn layers when added to the map
@@ -76,6 +78,7 @@ if (window.PointerEvent === undefined) {
 	script.src = 'https://unpkg.com/elm-pep';
 	document.head.appendChild(script);
 }
+
 // Icon extension depending on the OS (IOS 12 dosn't support SVG)
 function iconCanvasExt() {
 	//BEST OBSOLETE navigator.userAgent => navigator.userAgentData

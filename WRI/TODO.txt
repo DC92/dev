@@ -1,8 +1,15 @@
 TODO GPS
 ========
-Ajouter images/favicon.svg
-Fond carte mri en haut du switcher / forcer mri à l'init
+Ajouter images/icones/favicon.svg
+GPS Fond carte mri en haut du switcher / forcer mri à l'init
 Voir pourquoi il lance le service worker sur les autres pages
+
+//TODO
+======
+Utiliser ol.loadingstrategy.bboxLimit ???
+arrivée massif points all on
+NAV coupler checkbox avec <label>
+API change limit in param cluster
 
 BUG
 ===
@@ -17,6 +24,10 @@ GPS : le triangle en haut reste affiché
 Formulaire contact : nom utilisateur
 Pas de favicon dans S20 accueil FF
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+
+BEST
+====
+N'afficher que les massifs qui ont des points
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================

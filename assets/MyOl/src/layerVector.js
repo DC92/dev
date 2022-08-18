@@ -37,7 +37,7 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		safeSelectorName = options.selectorName.replaceAll(/[^a-z]/ig, ''),
+		safeSelectorName = options.selectorName ? options.selectorName.replaceAll(/[^a-z]/ig, '') : '',
 		values =
 		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
 		localStorage['myol_' + safeSelectorName] :
