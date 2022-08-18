@@ -61,7 +61,7 @@ const baseLayers = {
 					'?type_points=' + selection.join(',') +
 					'&bbox=' + bbox.join(',');
 		},
-		distance: 30, // Clusterisation
+		distanceMinCluster: 30, // Clusterisation
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsLabel(properties.name, properties, true),
@@ -100,34 +100,34 @@ const baseLayers = {
 		// Overpass
 		layerOverpass({
 			selectorName: 'couche-osm',
-			distance: 30,
+			distanceMinCluster: 30,
 			maxResolution: 100,
 		}),
 
 		// Pyrenees-refuges.com
 		layerPyreneesRefuges({
 			selectorName: 'couche-prc',
-			distance: 30,
+			distanceMinCluster: 30,
 		}),
 
 		// CampToCamp
 		layerC2C({
 			selectorName: 'couche-c2c',
-			distance: 30,
+			distanceMinCluster: 30,
 		}),
 
 		// Chemineur
 		layerGeoBB({
 			selectorName: 'couche-chemineur',
 			maxResolution: 100,
-			distance: 30,
+			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 		}),
 		layerGeoBB({
 			selectorName: 'couche-chemineur',
 			subLayer: 'cluster',
 			minResolution: 100,
-			distance: 30,
+			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 		}),
 
@@ -136,7 +136,7 @@ const baseLayers = {
 			host: '//alpages.info/',
 			selectorName: 'couche-alpages',
 			argSelName: 'forums',
-			distance: 30,
+			distanceMinCluster: 30,
 			attribution: 'Alpages',
 		}),
 	],

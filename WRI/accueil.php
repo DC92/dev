@@ -264,7 +264,7 @@ function menuSelectCarte(el) {
 		}
 	}
 }
-menuSelectCarte(document.getElementById('new_carte_select'));
+menuSelectCarte(document.getElementById('new_carte_select')); //TODO protéger contre non trouvé
 </script>
 
 <hr/>
@@ -322,6 +322,7 @@ function menuSelect(el) {
 
 <script>
 const newsEl = document.getElementById('news_detail'); // Bloc où on affiche les news
+//TODO protéger contre non trouvé
 var contributions = []; // Les contributions reçues de l'API contribution
 
 // Tente d'afficher une new à la fin du bloc des news

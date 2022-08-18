@@ -181,22 +181,27 @@ function controlGeocoder() {
 			keepOpen: true, // Else bug "no internet"
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 		}),
-		buttonEl = geocoder.element.firstElementChild.firstElementChild;
+		controlEl = geocoder.element.firstElementChild,
+		buttonEl = controlEl ? controlEl.firstElementChild : null;
 
 	// Move the button at the same level than the other control's buttons
-	buttonEl.innerHTML = '&#x1F50D;';
-	geocoder.element.appendChild(buttonEl);
-	geocoder.element.classList.add('ol-control');
+	if (buttonEl) {
+		buttonEl.innerHTML = '&#x1F50D;';
+		geocoder.element.appendChild(buttonEl);
+		geocoder.element.classList.add('ol-control');
+	}
 
 	// Allow open on hover
-	geocoder.element.addEventListener('pointerover', function(evt) {
-		if (evt.pointerType == 'mouse')
-			geocoder.element.firstElementChild.classList.add('gcd-gl-expanded');
-	});
-	geocoder.element.addEventListener('pointerout', function(evt) {
-		if (evt.pointerType == 'mouse')
-			geocoder.element.firstElementChild.classList.remove('gcd-gl-expanded');
-	});
+	if (controlEl) {
+		geocoder.element.addEventListener('pointerover', function(evt) {
+			if (evt.pointerType == 'mouse')
+				controlEl.classList.add('gcd-gl-expanded');
+		});
+		geocoder.element.addEventListener('pointerout', function(evt) {
+			if (evt.pointerType == 'mouse')
+				controlEl.classList.remove('gcd-gl-expanded');
+		});
+	}
 
 	return geocoder;
 }
@@ -338,7 +343,8 @@ function controlGPS() {
 	}));
 
 	let geolocation;
-	ol.gpsValues = {}; // Store the measures for internal use & other controls
+	// Store the measures for internal use & other controls
+	ol.gpsValues = {}; //TODO bad solution
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
@@ -367,20 +373,25 @@ function controlGPS() {
 	};
 
 	control.renderGPS = function(evt) {
-		const sourceLevel = parseInt(document.querySelector('input[name="myol-gps-source"]:checked').value),
-			displayLevel = parseInt(document.querySelector('input[name="myol-gps-display"]:checked').value),
+		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
+			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
+			sourceLevel = sourceLevelEl ? sourceLevelEl.value : 0,
+			displayLevel = displayLevelEl ? displayLevelEl.value : 0,
 			map = control.getMap(),
-			view = map.getView();
+			view = map ? map.getView() : null,
+			display0El = document.getElementById('myol-gps-display0'),
+			display2El = document.getElementById('myol-gps-display2'),
+			statusEl = document.getElementById('myol-gps-status');
 
 		// Tune the tracking level
 		if (evt.target.name == 'myol-gps-source') {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(sourceLevel > 0);
 			ol.gpsValues = {}; // Reset the values
-			if (!sourceLevel)
-				document.getElementById('myol-gps-display0').checked = true;
-			if (sourceLevel && displayLevel == 0)
-				document.getElementById('myol-gps-display2').checked = true;
+			if (!sourceLevel && display0El)
+				display0El.checked = true;
+			if (sourceLevel && displayLevel == 0 && display2El)
+				display2El.checked = true;
 		}
 
 		// Get geolocation values
@@ -395,7 +406,7 @@ function controlGPS() {
 			ol.gpsValues.position = null;
 
 		// Render position & graticule
-		if (view && sourceLevel && ol.gpsValues.position) {
+		if (map && view && sourceLevel && ol.gpsValues.position) {
 			// Estimate the viewport size to draw visible graticule
 			const p = ol.gpsValues.position,
 				hg = map.getCoordinateFromPixel([0, 0]),
@@ -449,12 +460,13 @@ function controlGPS() {
 		}
 
 		// Display data under the button
-		let status = ol.gpsValues.position ? '' : 'GPS sync...';
+		let status = ol.gpsValues.position ? '' : 'GPS sync...'; //TODO BUG display au début
 		if (ol.gpsValues.altitude)
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 		if (ol.gpsValues.speed)
 			status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
-		document.getElementById('myol-gps-status').innerHTML = sourceLevel ? status : '';
+		if (statusEl)
+			statusEl.innerHTML = sourceLevel ? status : '';
 
 		// Close the submenu
 		if (evt.target.name) // Only when an input is hit
@@ -627,7 +639,7 @@ function controlDownload(opt) {
 function controlPrint() {
 	const control = controlButton({
 		label: '&#x1F5A8;',
-		className: 'myol-button', //TODO DELETE erradiqué ol-print
+		className: 'myol-button',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +

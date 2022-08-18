@@ -22,6 +22,8 @@ foreach (glob ($url_path.'*.gpx') as $gf) {
 	);
 }
 
+//TODO BUG Error while trying to use the following icon from the Manifest: http://localhost/dev/assets/MyOl/gps/favicon.png (Download error or resource isn't a valid image)
+
 // Add tagged index.php to trigger update on index.php file changes
 $index_to_add = "\n\t\t\t\t'index.php',";
 if ($url_path) // The entry point is not in the library

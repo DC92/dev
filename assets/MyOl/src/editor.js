@@ -282,6 +282,7 @@ function layerEditGeoJson(opt) {
 
 		// Recreate features
 		source.clear();
+
 		for (let l in coordinates.lines)
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.LineString(coordinates.lines[l]),

@@ -47,14 +47,13 @@ const baseLayers = {
 		geoJsonId: 'edit-json',
 		snapLayers: [contours],
 		help: [
-			document.getElementById('myol-help-edit-modify').innerHTML,
+			(document.getElementById('myol-help-edit-modify') || {}).innerHTML,
 			null, // Pas d'édition de ligne
-			document.getElementById('myol-help-edit-poly').innerHTML,
+			(document.getElementById('myol-help-edit-poly') || {}).innerHTML,
 		],
 		saveFeatures: function(coordinates, format) {
 			return format.writeGeometry(
-				new ol.geom.MultiPolygon(coordinates.polys),
-				{
+				new ol.geom.MultiPolygon(coordinates.polys), {
 					featureProjection: 'EPSG:3857',
 					decimals: 5,
 				});

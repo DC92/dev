@@ -16,7 +16,7 @@
 		map.addLayer(layerWri({
 			selectorName: 'wri-features',
 			maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
-			distance: 30, // Clusterisation
+			distanceMinCluster: 30, // Clusterisation
 		}));
 	});
 </script>

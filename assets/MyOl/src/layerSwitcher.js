@@ -24,8 +24,9 @@ function controlLayerSwitcher(layers, opt) {
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
 	// Build html transparency slider
-	//BEST implement on touchscreen terminals
+	//BEST implement on touch screen terminals
 	const rangeContainerEl = document.createElement('div');
+
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
 		'<span>Ctrl+click: multicouches</span>';

@@ -1,7 +1,7 @@
 if (typeof map !== 'undefined') {
 	map.addLayer(layerWri({
 		selectorName: 'wri-features',
-		distance: 30,
+		distanceMinCluster: 30,
 		zIndex: 6,
 	}));
 	map.addLayer(layerOverpass({
@@ -35,7 +35,7 @@ if (typeof map !== 'undefined') {
 	}));
 	map.addLayer(layerPyreneesRefuges({
 		selectorName: 'prc-features',
-		distance: 30,
+		distanceMinCluster: 30,
 		zIndex: 4,
 	}));
 	map.addLayer(layerC2C({
@@ -46,7 +46,7 @@ if (typeof map !== 'undefined') {
 		host: '//alpages.info/',
 		selectorName: 'alp-features',
 		argSelName: 'forums',
-		distance: 30,
+		distanceMinCluster: 30,
 		attribution: 'Alpages',
 		zIndex: 2,
 	}));

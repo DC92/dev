@@ -26,8 +26,10 @@ function layerGeoBB(options) {
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
-				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
+				icon: properties.type ?
+					options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
+				url: properties.id ?
+					options.host + 'viewtopic.php?t=' + properties.id : null,
 				attribution: options.attribution,
 			};
 		},
@@ -87,7 +89,7 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
 				url: options.noClick ? null : properties.lien,
-				attribution: 'Refuges.info',
+				attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
@@ -146,7 +148,7 @@ function layerPyreneesRefuges(options) {
 				url: properties.url,
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
-				attribution: 'Pyrenees-Refuges',
+				attribution: '<a href="https://pyrenees-refuges.com">Pyrenees-Refuges</a>',
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
@@ -182,7 +184,7 @@ function layerC2C(options) {
 					name: properties.locales[0].title,
 					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
-					attribution: 'CampToCamp',
+					attribution: '<a href="https://www.camptocamp.org">CampToCamp</a>',
 				},
 			});
 		}
@@ -310,7 +312,7 @@ function layerOverpass(options) {
 					ele: properties.ele,
 					capacity: properties.capacity,
 					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
-					attribution: 'osm',
+					attribution: '<a href="https://www.openstreetmap.org/">osm</a>',
 				};
 	}
 

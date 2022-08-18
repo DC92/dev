@@ -47,9 +47,15 @@ Based on https://openlayers.org
 
 	<div class="selector">
 		<div>
-			Refuges.info
+			Refuges.info<!-- //BEST coupler texte / check avec label & id -->
 			<input type="checkbox" name="wri-features" value="7,9,10" />
 			<p id="wri-features-status"></p>
+		</div>
+
+		<div>
+			Massifs
+			<input type="checkbox" name="wri-massifs" />
+			<p id="wri-massifs-status"></p>
 		</div>
 
 		<div>
@@ -120,7 +126,8 @@ Based on https://openlayers.org
 const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'), zoom: 12, // Grenoble OSM
+		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
+		zoom: 12, // Grenoble OSM
 	}),
 	layers: [
 		new ol.layer.Tile({
@@ -131,22 +138,26 @@ const map = new ol.Map({
 
 // Refuges.info
 map.addLayer(layerWri({
-	//TODO revenir de dom à www
-	host: '//dom.refuges.info/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
+	//BEST investiger pourquoi l'option host est prise par urlFunction & convertProperties
+	host: '//dom.refuges.info/', //TODO revenir de dom à www
 	selectorName: 'wri-features',
-	distance: 30,
+	distanceMinCluster: 30,
+}));
+map.addLayer(layerWriAreas({
+	host: '//dom.refuges.info/', //TODO revenir de dom à www
+	selectorName: 'wri-massifs',
 }));
 
 // Pyrenees-refuges.com
 map.addLayer(layerPyreneesRefuges({
 	selectorName: 'prc-features',
-	distance: 30,
+	distanceMinCluster: 30,
 }));
 
 // CampToCamp
 map.addLayer(layerC2C({
 	selectorName: 'c2c-features',
-	distance: 30,
+	distanceMinCluster: 30,
 }));
 
 // Chemineur
@@ -158,14 +169,14 @@ else {
 	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
 		maxResolution: 100,
-		distance: 30,
+		distanceMinCluster: 30,
 		attribution: 'Chemineur',
 	}));
 	map.addLayer(layerGeoBB({
 		selectorName: 'geobb-features',
 		subLayer: 'cluster',
 		minResolution: 100,
-		distance: 30,
+		distanceMinCluster: 30,
 		attribution: 'Chemineur',
 	}));
 }
@@ -175,16 +186,15 @@ map.addLayer(layerGeoBB({
 	host: '//alpages.info/',
 	selectorName: 'alp-features',
 	argSelName: 'forums',
-	distance: 30,
+	distanceMinCluster: 30,
 	attribution: 'Alpages',
 }));
 
 // Overpass
 map.addLayer(layerOverpass({
 	selectorName: 'osm-features',
-	distance: 30,
+	distanceMinCluster: 30,
 }));
-
 	</script>
 	<script src="print_script.js"></script>
 

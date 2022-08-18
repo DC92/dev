@@ -37,8 +37,10 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		values = typeof localStorage['myol_' + options.selectorName] != 'undefined' ?
-		localStorage['myol_' + options.selectorName] :
+		safeSelectorName = options.selectorName.replaceAll(/[^a-z]/ig, ''),
+		values =
+		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
+		localStorage['myol_' + safeSelectorName] :
 		readCheckbox(options.selectorName, true).join(',');
 
 	if (statusEl)
@@ -98,8 +100,8 @@ function layerVector(opt) {
 		// Mem the data in the localStorage
 		const selection = readCheckbox(options.selectorName);
 
-		if (options.selectorName)
-			localStorage['myol_' + options.selectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
+		if (safeSelectorName)
+			localStorage['myol_' + safeSelectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
 
 		select(selection);
 	}
@@ -171,13 +173,16 @@ function layerVector(opt) {
 	function displayStyle(feature, styleOptionsFunction) {
 		if (typeof styleOptionsFunction == 'function') {
 			const styleOptions = styleOptionsFunction(
-				feature, Object.assign(feature.getProperties(),
-					feature.display),
+				feature,
+				Object.assign(
+					feature.getProperties(),
+					feature.display
+				),
 				options
 			);
 
 			//HACK to render the html entities in the canvas
-			if (styleOptions && styleOptions.text) {
+			if (elLabel && styleOptions && styleOptions.text) {
 				elLabel.innerHTML = styleOptions.text.getText();
 
 				if (elLabel.innerHTML) {
@@ -302,13 +307,13 @@ function layerVectorCluster(options) {
 	const layer = layerVector(options);
 
 	// No clustering
-	if (!options.distance)
+	if (!options.distanceMinCluster)
 		return layer;
 
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			distance: options.distance,
+			distance: options.distanceMinCluster,
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
 		}),
@@ -330,10 +335,10 @@ function layerVectorCluster(options) {
 	let previousResolution;
 	clusterLayer.on('prerender', function(evt) {
 		const resolution = evt.frameState.viewState.resolution,
-			distance = resolution < 10 ? 0 : Math.min(options.distance, resolution);
+			distanceMinCluster = resolution < 10 ? 0 : Math.min(options.distanceMinCluster, resolution);
 
 		if (previousResolution != resolution) // Only when changed
-			clusterSource.setDistance(distance);
+			clusterSource.setDistance(distanceMinCluster);
 
 		previousResolution = resolution;
 	});

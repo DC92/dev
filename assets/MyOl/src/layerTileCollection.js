@@ -265,12 +265,12 @@ function layerBing(subLayer) {
  */
 function layersCollection() {
 	return {
-		'OSM outdoors': layerThunderforest('outdoors'),
-		'OpenTopo': layerOpenTopo(),
-		'OSM transport': layerThunderforest('transport'),
-		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM cyclo': layerOSM('//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'),
+		'OSM outdoors': layerThunderforest('outdoors'),
+		'OSM transport': layerThunderforest('transport'),
+		'OpenTopo': layerOpenTopo(),
+		'Refuges.info': layerMRI(),
 		'IGN TOP25': layerIGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
 			key: mapKeys.ign,
@@ -288,18 +288,17 @@ function layersCollection() {
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
-		//BEST what key for Cassini
-		'IGN Cassini': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
-			key: mapKeys.ign,
-		}),
+		/*'IGN Cassini': layerIGN({ //BEST BUG what key for Cassini ?
+					layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+					key: mapKeys.ign,
+				}),*/
 		'Cadastre': layerIGN({
 			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
+		//'Autriche': layerKompass('KOMPASS Touristik'), //TODO BUG don't work
 		'Angleterre': layerOS('Outdoor_3857'),
 		'Italie': layerIGM(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
@@ -330,8 +329,8 @@ function layersDemo() {
 		'ThF contraste': layerThunderforest('mobile-atlas'),
 
 		'OS light': layerOS('Light_3857'),
-		'OS road': layerOS('Road_3857'), //TODO BUG
-		'Kompas': layerKompass('KOMPASS'), //TODO BUG
+		'OS road': layerOS('Road_3857'),
+		//'Kompas': layerKompass('KOMPASS'), //TODO BUG
 
 		'Bing': layerBing('Road'),
 		'Bing hybrid': layerBing('AerialWithLabels'),

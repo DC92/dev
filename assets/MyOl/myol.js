@@ -8,7 +8,8 @@
  */
 
 /* FILE src/header.js */
-// Minoring validators reporting
+// Ease validators
+/* jshint esversion: 6 */
 if (!ol) var ol = {};
 
 /**
@@ -33,13 +34,13 @@ try {
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
 // localStorage
-let myol_localArgs = [];
+let myolLocalArgs = [];
 for (let i = 0; i < localStorage.length; i++) {
-	myol_localArgs.push(
+	myolLocalArgs.push(
 		localStorage.key(i) + ': ' +
 		localStorage.getItem(localStorage.key(i)));
 }
-console.log(myol_localArgs.join('\n'));
+console.log('localStorage:\n' + myolLocalArgs.join('\n'));
 
 /**
  * Warn layers when added to the map
@@ -350,12 +351,12 @@ function layerBing(subLayer) {
  */
 function layersCollection() {
 	return {
-		'OSM outdoors': layerThunderforest('outdoors'),
-		'OpenTopo': layerOpenTopo(),
-		'OSM transport': layerThunderforest('transport'),
-		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OSM cyclo': layerOSM('//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'),
+		'OSM outdoors': layerThunderforest('outdoors'),
+		'OSM transport': layerThunderforest('transport'),
+		'OpenTopo': layerOpenTopo(),
+		'Refuges.info': layerMRI(),
 		'IGN TOP25': layerIGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
 			key: mapKeys.ign,
@@ -373,17 +374,17 @@ function layersCollection() {
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
-		'IGN Cassini': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
-			key: mapKeys.ign,
-		}),
+		/*'IGN Cassini': layerIGN({
+					layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+					key: mapKeys.ign,
+				}),*/
 		'Cadastre': layerIGN({
 			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
+		//'Autriche': layerKompass('KOMPASS Touristik'),
 		'Angleterre': layerOS('Outdoor_3857'),
 		'Italie': layerIGM(),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
@@ -415,7 +416,7 @@ function layersDemo() {
 
 		'OS light': layerOS('Light_3857'),
 		'OS road': layerOS('Road_3857'),
-		'Kompas': layerKompass('KOMPASS'),
+		//'Kompas': layerKompass('KOMPASS'),
 
 		'Bing': layerBing('Road'),
 		'Bing hybrid': layerBing('AerialWithLabels'),
@@ -460,6 +461,7 @@ function controlLayerSwitcher(layers, opt) {
 
 	// Build html transparency slider
 	const rangeContainerEl = document.createElement('div');
+
 	rangeContainerEl.innerHTML =
 		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
 		'<span>Ctrl+click: multicouches</span>';
@@ -619,8 +621,10 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'),
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		values = typeof localStorage['myol_' + options.selectorName] != 'undefined' ?
-		localStorage['myol_' + options.selectorName] :
+		safeSelectorName = options.selectorName.replaceAll(/[^a-z]/ig, ''),
+		values =
+		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
+		localStorage['myol_' + safeSelectorName] :
 		readCheckbox(options.selectorName, true).join(',');
 
 	if (statusEl)
@@ -679,8 +683,8 @@ function layerVector(opt) {
 		// Mem the data in the localStorage
 		const selection = readCheckbox(options.selectorName);
 
-		if (options.selectorName)
-			localStorage['myol_' + options.selectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
+		if (safeSelectorName)
+			localStorage['myol_' + safeSelectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
 
 		select(selection);
 	}
@@ -751,12 +755,15 @@ function layerVector(opt) {
 	function displayStyle(feature, styleOptionsFunction) {
 		if (typeof styleOptionsFunction == 'function') {
 			const styleOptions = styleOptionsFunction(
-				feature, Object.assign(feature.getProperties(),
-					feature.display),
+				feature,
+				Object.assign(
+					feature.getProperties(),
+					feature.display
+				),
 				options
 			);
 
-			if (styleOptions && styleOptions.text) {
+			if (elLabel && styleOptions && styleOptions.text) {
 				elLabel.innerHTML = styleOptions.text.getText();
 
 				if (elLabel.innerHTML) {
@@ -879,13 +886,13 @@ function layerVectorCluster(options) {
 	const layer = layerVector(options);
 
 	// No clustering
-	if (!options.distance)
+	if (!options.distanceMinCluster)
 		return layer;
 
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			distance: options.distance,
+			distance: options.distanceMinCluster,
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
 		}),
@@ -907,10 +914,10 @@ function layerVectorCluster(options) {
 	let previousResolution;
 	clusterLayer.on('prerender', function(evt) {
 		const resolution = evt.frameState.viewState.resolution,
-			distance = resolution < 10 ? 0 : Math.min(options.distance, resolution);
+			distanceMinCluster = resolution < 10 ? 0 : Math.min(options.distanceMinCluster, resolution);
 
 		if (previousResolution != resolution) // Only when changed
-			clusterSource.setDistance(distance);
+			clusterSource.setDistance(distanceMinCluster);
 
 		previousResolution = resolution;
 	});
@@ -1163,8 +1170,10 @@ function layerGeoBB(options) {
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
-				icon: properties.type ? options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
-				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
+				icon: properties.type ?
+					options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
+				url: properties.id ?
+					options.host + 'viewtopic.php?t=' + properties.id : null,
 				attribution: options.attribution,
 			};
 		},
@@ -1224,7 +1233,7 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
 				url: options.noClick ? null : properties.lien,
-				attribution: 'Refuges.info',
+				attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
@@ -1283,7 +1292,7 @@ function layerPyreneesRefuges(options) {
 				url: properties.url,
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
-				attribution: 'Pyrenees-Refuges',
+				attribution: '<a href="https://pyrenees-refuges.com">Pyrenees-Refuges</a>',
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
@@ -1319,7 +1328,7 @@ function layerC2C(options) {
 					name: properties.locales[0].title,
 					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
-					attribution: 'CampToCamp',
+					attribution: '<a href="https://www.camptocamp.org">CampToCamp</a>',
 				},
 			});
 		}
@@ -1447,7 +1456,7 @@ function layerOverpass(options) {
 					ele: properties.ele,
 					capacity: properties.capacity,
 					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
-					attribution: 'osm',
+					attribution: '<a href="https://www.openstreetmap.org/">osm</a>',
 				};
 	}
 
@@ -1636,22 +1645,27 @@ function controlGeocoder() {
 			keepOpen: true, // Else bug "no internet"
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 		}),
-		buttonEl = geocoder.element.firstElementChild.firstElementChild;
+		controlEl = geocoder.element.firstElementChild,
+		buttonEl = controlEl ? controlEl.firstElementChild : null;
 
 	// Move the button at the same level than the other control's buttons
-	buttonEl.innerHTML = '&#x1F50D;';
-	geocoder.element.appendChild(buttonEl);
-	geocoder.element.classList.add('ol-control');
+	if (buttonEl) {
+		buttonEl.innerHTML = '&#x1F50D;';
+		geocoder.element.appendChild(buttonEl);
+		geocoder.element.classList.add('ol-control');
+	}
 
 	// Allow open on hover
-	geocoder.element.addEventListener('pointerover', function(evt) {
-		if (evt.pointerType == 'mouse')
-			geocoder.element.firstElementChild.classList.add('gcd-gl-expanded');
-	});
-	geocoder.element.addEventListener('pointerout', function(evt) {
-		if (evt.pointerType == 'mouse')
-			geocoder.element.firstElementChild.classList.remove('gcd-gl-expanded');
-	});
+	if (controlEl) {
+		geocoder.element.addEventListener('pointerover', function(evt) {
+			if (evt.pointerType == 'mouse')
+				controlEl.classList.add('gcd-gl-expanded');
+		});
+		geocoder.element.addEventListener('pointerout', function(evt) {
+			if (evt.pointerType == 'mouse')
+				controlEl.classList.remove('gcd-gl-expanded');
+		});
+	}
 
 	return geocoder;
 }
@@ -1791,7 +1805,8 @@ function controlGPS() {
 	}));
 
 	let geolocation;
-	ol.gpsValues = {}; // Store the measures for internal use & other controls
+	// Store the measures for internal use & other controls
+	ol.gpsValues = {};
 
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
@@ -1820,20 +1835,25 @@ function controlGPS() {
 	};
 
 	control.renderGPS = function(evt) {
-		const sourceLevel = parseInt(document.querySelector('input[name="myol-gps-source"]:checked').value),
-			displayLevel = parseInt(document.querySelector('input[name="myol-gps-display"]:checked').value),
+		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
+			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
+			sourceLevel = sourceLevelEl ? sourceLevelEl.value : 0,
+			displayLevel = displayLevelEl ? displayLevelEl.value : 0,
 			map = control.getMap(),
-			view = map.getView();
+			view = map ? map.getView() : null,
+			display0El = document.getElementById('myol-gps-display0'),
+			display2El = document.getElementById('myol-gps-display2'),
+			statusEl = document.getElementById('myol-gps-status');
 
 		// Tune the tracking level
 		if (evt.target.name == 'myol-gps-source') {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(sourceLevel > 0);
 			ol.gpsValues = {}; // Reset the values
-			if (!sourceLevel)
-				document.getElementById('myol-gps-display0').checked = true;
-			if (sourceLevel && displayLevel == 0)
-				document.getElementById('myol-gps-display2').checked = true;
+			if (!sourceLevel && display0El)
+				display0El.checked = true;
+			if (sourceLevel && displayLevel == 0 && display2El)
+				display2El.checked = true;
 		}
 
 		// Get geolocation values
@@ -1848,7 +1868,7 @@ function controlGPS() {
 			ol.gpsValues.position = null;
 
 		// Render position & graticule
-		if (view && sourceLevel && ol.gpsValues.position) {
+		if (map && view && sourceLevel && ol.gpsValues.position) {
 			// Estimate the viewport size to draw visible graticule
 			const p = ol.gpsValues.position,
 				hg = map.getCoordinateFromPixel([0, 0]),
@@ -1907,7 +1927,8 @@ function controlGPS() {
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 		if (ol.gpsValues.speed)
 			status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
-		document.getElementById('myol-gps-status').innerHTML = sourceLevel ? status : '';
+		if (statusEl)
+			statusEl.innerHTML = sourceLevel ? status : '';
 
 		// Close the submenu
 		if (evt.target.name) // Only when an input is hit
@@ -2637,6 +2658,7 @@ function layerEditGeoJson(opt) {
 
 		// Recreate features
 		source.clear();
+
 		for (let l in coordinates.lines)
 			source.addFeature(new ol.Feature({
 				geometry: new ol.geom.LineString(coordinates.lines[l]),

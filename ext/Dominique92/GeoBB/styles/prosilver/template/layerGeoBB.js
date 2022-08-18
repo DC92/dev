@@ -17,7 +17,7 @@ var map = new ol.Map({
 			host: '', // Relative address
 			selectorName: 'geobb-features',
 			maxResolution: 100,
-			distance: 30,
+			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 			noLabel: scriptName == 'posting',
 			noClick: scriptName == 'posting',
@@ -33,7 +33,7 @@ var map = new ol.Map({
 			subLayer: 'cluster',
 			selectorName: 'geobb-features',
 			minResolution: 100,
-			distance: 30,
+			distanceMinCluster: 30,
 			noLabel: scriptName == 'posting',
 			noClick: scriptName == 'posting',
 		}),

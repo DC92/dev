@@ -55,13 +55,13 @@ new ol.Map({
 		layerGeoBB({
 			selectorName: 'geobb-features',
 			maxResolution: 300,
-			distance: 30,
+			distanceMinCluster: 30,
 		}),
 		layerGeoBB({
 			selectorName: 'geobb-features',
 			subLayer: 'cluster',
 			minResolution: 300,
-			distance: 30,
+			distanceMinCluster: 30,
 		}),
 		layerMarker({
 			src: 'examples/images/viseur.png',

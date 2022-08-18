@@ -36,7 +36,7 @@ See a VECTOR LAYER DEMO [here](https://Dominique92.github.io/MyOl/examples/layer
 MISC CONTROLS
 =============
 See a CONTROL DEMO [here](https://Dominique92.github.io/MyOl/examples/controls.html)
-* Keep position, zoom & zoom on localstorage
+* Keep position, zoom & zoom on localStorage
 * Geocoder
 * Line length display
 * GPX upload & download

@@ -1,4 +1,5 @@
-// Minoring validators reporting
+// Ease validators
+/* jshint esversion: 6 */
 if (!ol) var ol = {};
 
 /**
@@ -25,13 +26,14 @@ try {
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
 // localStorage
-let myol_localArgs = [];
+//BEST encapsulé dans une fonction
+let myolLocalArgs = [];
 for (let i = 0; i < localStorage.length; i++) {
-	myol_localArgs.push(
+	myolLocalArgs.push(
 		localStorage.key(i) + ': ' +
 		localStorage.getItem(localStorage.key(i)));
 }
-console.log(myol_localArgs.join('\n'));
+console.log('localStorage:\n' + myolLocalArgs.join('\n'));
 
 /**
  * Warn layers when added to the map
