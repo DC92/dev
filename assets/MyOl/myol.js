@@ -1216,7 +1216,11 @@ function layerWri(options) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		urlFunction: function(options, bbox, selection) {
-			return options.host + 'api/bbox?nb_points=200' +
+			return options.host + 'api/bbox' +
+				// Ask cluster if needed
+				(options.cluster ?
+					'?cluster=true' :
+					'?nb_points=250') +
 				// Add layer features filters
 				(selection && selection.length ?
 					'&type_points=' + selection.join(',') :

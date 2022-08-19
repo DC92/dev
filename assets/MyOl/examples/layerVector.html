@@ -141,6 +141,14 @@ map.addLayer(layerWri({
 	//BEST investiger pourquoi l'option host est prise par urlFunction & convertProperties
 	host: '//dom.refuges.info/', //TODO revenir de dom à www
 	selectorName: 'wri-features',
+	maxResolution: 500,
+	distanceMinCluster: 30,
+}));
+map.addLayer(layerWri({
+	host: '//dom.refuges.info/', //TODO revenir de dom à www
+	selectorName: 'wri-features',
+	cluster: true,
+	minResolution: 500,
 	distanceMinCluster: 30,
 }));
 map.addLayer(layerWriAreas({
