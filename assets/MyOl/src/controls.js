@@ -20,10 +20,7 @@ function controlPermalink(opt) {
 			render: render,
 		}),
 		aEl = document.createElement('a'),
-		// Get best value for all params
-		urlMod =
-		// From the url ? or #
-		location.href.replace(
+		urlMod = location.href.replace( // Get value from params with priority url / ? / #
 			/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/, // map=<zoom>/<lon>/<lat>
 			'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
 		) +
