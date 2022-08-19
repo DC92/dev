@@ -1841,13 +1841,13 @@ function controlGPS() {
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
-			sourceLevel = sourceLevelEl ? sourceLevelEl.value : 0,
-			displayLevel = displayLevelEl ? displayLevelEl.value : 0,
-			map = control.getMap(),
-			view = map ? map.getView() : null,
 			display0El = document.getElementById('myol-gps-display0'),
 			display2El = document.getElementById('myol-gps-display2'),
-			statusEl = document.getElementById('myol-gps-status');
+			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, +|WiFi
+			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
+			statusEl = document.getElementById('myol-gps-status'),
+			map = control.getMap(),
+			view = map ? map.getView() : null;
 
 		// Tune the tracking level
 		if (evt.target.name == 'myol-gps-source') {
