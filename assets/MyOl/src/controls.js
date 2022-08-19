@@ -343,8 +343,7 @@ function controlGPS() {
 	}));
 
 	let geolocation;
-	// Store the measures for internal use & other controls
-	ol.gpsValues = {}; //TODO bad solution
+	ol.gpsValues = {}; // Store the measures for internal use & other controls
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
@@ -460,7 +459,7 @@ function controlGPS() {
 		}
 
 		// Display data under the button
-		let status = ol.gpsValues.position ? '' : 'GPS sync...'; //TODO BUG display au début
+		let status = ol.gpsValues.position ? '' : 'GPS sync...';
 		if (ol.gpsValues.altitude)
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 		if (ol.gpsValues.speed)

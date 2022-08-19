@@ -80,19 +80,18 @@ function layerVector(opt) {
 	// Manage checkbox inputs having the same name
 	// Mem / recover the checkboxes in localStorage, url args or hash
 	// Manages a global flip-flop of the same named <input> checkboxes
-	if (inputEls)
-		for (let e = 0; e < inputEls.length; e++) { //HACK for doesn't work on element array
-			// Set inputs following localStorage & args
-			inputEls[e].checked =
-				values.indexOf(inputEls[e].value) != -1 || // That one is declared
-				values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
+	for (let e = 0; e < inputEls.length; e++) { //HACK for doesn't work on element array
+		// Set inputs following localStorage & args
+		inputEls[e].checked =
+			values.indexOf(inputEls[e].value) != -1 || // That one is declared
+			values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
 
-			// Compute the all check && init the localStorage if data has been given by the url
-			checkEl(inputEls[e]);
+		// Compute the all check && init the localStorage if data has been given by the url
+		checkEl(inputEls[e]);
 
-			// Attach the action
-			inputEls[e].addEventListener('click', onClick);
-		}
+		// Attach the action
+		inputEls[e].addEventListener('click', onClick);
+	}
 
 	function onClick(evt) {
 		checkEl(evt.target); // Do the "all" check verification
@@ -132,7 +131,7 @@ function layerVector(opt) {
 		}
 
 		// Check the "all" <input> if all others are
-		if (allIndex != -1)
+		if (inputEls[allIndex])
 			inputEls[allIndex].checked = allCheck;
 	}
 
@@ -392,14 +391,14 @@ function layerVectorCluster(options) {
  * Return an array of the selected inputs
  */
 function readCheckbox(selectorName, withOn) {
-	const inputEls = document.getElementsByName(selectorName);
+	const inputEls = document.getElementsByName(selectorName),
+		selection = [];
 
 	// Specific case of a single on/off <input>
 	if (inputEls.length == 1)
 		return inputEls[0].checked ? [inputEls[0].value] : [];
 
 	// Read each <input> checkbox
-	const selection = [];
 	for (let e = 0; e < inputEls.length; e++)
 		if (inputEls[e].checked &&
 			(inputEls[e].value != 'on' || withOn)) // Avoid the first check in a list

@@ -153,7 +153,7 @@ const baseLayers = {
 	massifsInput = document.getElementsByName('couche-massifs');
 
 // Initialiser l'affichage des massifs suivant le type de carte (zone ou massif)
-if (massifsInput) {
+if (massifsInput.length) {
 	massifsInput[0].checked = <?=$vue->contenu?'true':'false'?>;
 	massifsInput[0].dispatchEvent(new Event('click'));
 }
