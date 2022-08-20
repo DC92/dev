@@ -25,16 +25,20 @@ try {
 } catch (err) { // to get Assert url
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
-// localStorage
+// Storages
 {
 	let datas = [];
-	for (let i = 0; i < localStorage.length; i++) {
-		datas.push(
-			localStorage.key(i) + ': ' +
-			localStorage.getItem(localStorage.key(i))
-		);
-	}
-	console.log('localStorage:\n' + datas.join('\n'));
+	['localStorage', 'sessionStorage'].forEach(s => {
+		if (window[s].length)
+			datas.push(s + ':');
+		for (let i = 0; i < window[s].length; i++) {
+			datas.push(
+				window[s].key(i) + ': ' +
+				window[s].getItem(window[s].key(i))
+			);
+		}
+	});
+	console.log(datas.join('\n'));
 }
 
 /**

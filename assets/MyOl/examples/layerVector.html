@@ -179,16 +179,19 @@ map.addLayer(layerC2C({
 // Chemineur
 if (0)
 	map.addLayer(layerGeoBB({
+		host: '//chemineur.fr/',
 		selectorName: 'geobb-features',
 	}));
 else {
 	map.addLayer(layerGeoBB({
+		host: '//chemineur.fr/',
 		selectorName: 'geobb-features',
 		maxResolution: 100,
 		distanceMinCluster: 30,
 		attribution: 'Chemineur',
 	}));
 	map.addLayer(layerGeoBB({
+		host: '//chemineur.fr/',
 		selectorName: 'geobb-features',
 		subLayer: 'cluster',
 		minResolution: 100,

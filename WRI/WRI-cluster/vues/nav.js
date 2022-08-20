@@ -119,12 +119,14 @@ const baseLayers = {
 
 		// Chemineur
 		layerGeoBB({
+			host: '//chemineur.fr/',
 			selectorName: 'selecteur-chemineur',
 			maxResolution: 100,
 			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 		}),
 		layerGeoBB({
+			host: '//chemineur.fr/',
 			selectorName: 'selecteur-chemineur',
 			subLayer: 'cluster',
 			minResolution: 100,

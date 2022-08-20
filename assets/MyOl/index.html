@@ -53,11 +53,13 @@ new ol.Map({
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
 		layerGeoBB({
+			host: '//chemineur.fr/',
 			selectorName: 'geobb-features',
 			maxResolution: 300,
 			distanceMinCluster: 30,
 		}),
 		layerGeoBB({
+			host: '//chemineur.fr/',
 			selectorName: 'geobb-features',
 			subLayer: 'cluster',
 			minResolution: 300,

@@ -7,22 +7,16 @@
  * Site chemineur.fr, alpages.info
  * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
-function layerGeoBB(options) {
+function layerGeoBB(opt) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/',
-		urlFunction: function(options, bbox, selection) {
-			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
-				'&layer=' + (options.subLayer || 'simple') +
-				// Add layer features filters
-				(options.selectorName ?
-					'&' + (options.argSelName || 'cat') + '=' + selection.join(',') :
-					'') +
-				// Refresh layer when data changed
-				(localStorage.myol_lastChangeTime ?
-					'&v=' + localStorage.myol_lastChangeTime :
-					'') +
-				// Bbox strategy
-				'&bbox=' + bbox.join(',');
+		argSelName: 'cat',
+		urlArgsFunction: function(options, bbox, selection) {
+			return {
+				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
+				limit: 10000,
+				[options.argSelName]: selection.join(','),
+				bbox: bbox.join(','),
+			};
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
@@ -59,32 +53,23 @@ function layerGeoBB(options) {
 				}
 			);
 		},
-	}, options));
+	}, opt));
 }
 
 /**
  * Site refuges.info
  */
-function layerWri(options) {
+function layerWri(opt) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
-		urlFunction: function(options, bbox, selection) {
-			return options.host + 'api/bbox' +
-				// Ask cluster if needed
-				(options.cluster ?
-					'?cluster=true' :
-					'?nb_points=250') +
-				// Add layer features filters
-				(selection && selection.length ?
-					'&type_points=' + selection.join(',') :
-					'') +
-				// Refresh layer when data changed
-				(localStorage.myol_lastChangeTime ?
-					'&v=' + localStorage.myol_lastChangeTime :
-					'') +
-				// Bbox strategy
-				'&bbox=' + bbox.join(',');
+		urlArgsFunction: function(options, bbox, selection) {
+			return {
+				url: options.host + 'api/bbox',
+				type_points: selection.join(','),
+				cluster: options.cluster,
+				bbox: bbox.join(','),
+			};
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
@@ -103,19 +88,18 @@ function layerWri(options) {
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, options));
+	}, opt));
 }
 
-function layerWriAreas(options) {
+function layerWriAreas(opt) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
-		urlFunction: function(options) {
-			return options.host + 'api/polygones?type_polygon=' + options.polygon +
-				// Refresh layer when data changed
-				(localStorage.myol_lastChangeTime ?
-					'&v=' + localStorage.myol_lastChangeTime :
-					'');
+		urlArgsFunction: function(options) {
+			return {
+				url: options.host + 'api/polygones',
+				type_polygon: options.polygon,
+			};
 		},
 		convertProperties: function(properties) {
 			return {
@@ -136,7 +120,7 @@ function layerWriAreas(options) {
 				styleOptionsPolygon(properties.color, 1)
 			);
 		},
-	}, options));
+	}, opt));
 }
 
 /**
@@ -201,8 +185,11 @@ function layerC2C(options) {
 	};
 
 	return layerVectorCluster(Object.assign({
-		urlFunction: function(options, bbox, selection, extent) {
-			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
+		urlArgsFunction: function(options, bbox, selection, extent) {
+			return {
+				url: 'https://api.camptocamp.org/waypoints',
+				bbox: extent.join(','),
+			};
 		},
 		format: format,
 		styleOptionsFunction: function(feature, properties) {
@@ -228,7 +215,7 @@ function layerOverpass(options) {
 			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
-			urlFunction: urlFunction,
+			urlArgsFunction: urlArgsFunction,
 			maxResolution: 50,
 			format: format,
 			convertProperties: convertProperties,
@@ -244,17 +231,19 @@ function layerOverpass(options) {
 
 	// List of acceptable tags in the request return
 	let tags = '';
-	for (let e in selectorEls)
-		tags += selectorEls[e].value;
-	tags = tags.replace('private', '');
 
-	function urlFunction(options, bbox, selection) {
+	for (let e in selectorEls)
+		if (selectorEls[e].value)
+			tags += selectorEls[e].value.replace('private', '');
+
+	function urlArgsFunction(options, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 
 		// Convert selections on overpass_api language
 		for (let l = 0; l < selection.length; l++) {
 			const selections = selection[l].split('+');
+
 			for (let ls = 0; ls < selections.length; ls++)
 				args.push(
 					'node' + selections[ls] + bb + // Ask for nodes in the bbox
@@ -262,11 +251,11 @@ function layerOverpass(options) {
 				);
 		}
 
-		return 'https://' + options.host + '/api/interpreter' +
-			'?data=[timeout:5];(' + // Not too much !
-			args.join('') +
-			');out center;'; // Add center of areas
-	}
+		return {
+			url: 'https://' + options.host + '/api/interpreter',
+			data: '[timeout:5];(' + args.join('') + ');out center;',
+		};
+	};
 
 	// Extract features from data when received
 	format.readFeatures = function(doc, opt) {

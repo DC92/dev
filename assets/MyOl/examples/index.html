@@ -81,6 +81,7 @@ new ol.Map({
 	layers: [
 		// Low map resolution : points
 		layerGeoBB({
+			host: '//chemineur.fr/',
 			selectorName: 'geobb-features',
 			maxResolution: 100,
 			distanceMinCluster: 30,
@@ -88,6 +89,7 @@ new ol.Map({
 		}),
 		// High map resolution : clusters
 		layerGeoBB({
+			host: '//chemineur.fr/',
 			subLayer: 'cluster',
 			selectorName: 'geobb-features',
 			minResolution: 100,

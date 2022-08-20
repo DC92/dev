@@ -56,7 +56,7 @@ function layerMarker(options) {
 	function onChange(evt) {
 		if (evt) // If a field has changed
 			// Mark last change time to be able to reload vector layer if changed
-			localStorage.myol_lastChangeTime = new Date().getTime();
+			sessionStorage.myol_lastChangeTime = Date.now();
 
 		// Find changed input type from tne input id
 		const idMatch = this.id.match(/-([a-z]+)/); //BEST strict mode, 'this' will be undefined... and others
@@ -161,7 +161,7 @@ function layerMarker(options) {
 			map.addInteraction(new ol.interaction.Pointer({
 				handleDownEvent: function(evt) {
 					// Mark last change time
-					localStorage.myol_lastChangeTime = new Date().getTime();
+					sessionStorage.myol_lastChangeTime = Date.now();
 
 					return map.getFeaturesAtPixel(evt.pixel, {
 						layerFilter: function(l) {

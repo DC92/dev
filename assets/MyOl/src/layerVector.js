@@ -9,7 +9,8 @@
  * Options:
  * selectorName : <input name="SELECTORNAME"> url arguments selector
  * selectorName : <TAG id="SELECTORNAME-status"></TAG> display loading status
- * urlFunction: function(options, bbox, selection, extent, resolution, projection) returning the XHR url
+ * urlArgsFunction: function(options, bbox, selection, extent, resolution, projection)
+   returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX
  * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
  * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
@@ -60,20 +61,31 @@ function layerVector(opt) {
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
-		const selection = readCheckbox(options.selectorName);
-
-		return options.urlFunction(
-			options, // Layer options
-			ol.proj.transformExtent( // BBox
+		const argsObj = options.urlArgsFunction(
+				options, // Layer options
+				ol.proj.transformExtent( // BBox
+					extent,
+					projection.getCode(), // Map projection
+					'EPSG:4326' // Received projection
+				).map(function(c) {
+					return c.toFixed(4); // Round to 4 digits
+				}),
+				readCheckbox(options.selectorName),
 				extent,
-				projection.getCode(), // Map projection
-				'EPSG:4326' // Received projection
-			).map(function(c) {
-				return c.toFixed(4); // Round to 4 digits
-			}),
-			typeof selection == 'object' ? selection : [],
-			extent, resolution, projection
-		);
+				resolution,
+				projection
+			),
+			argsArray = [];
+
+		// Add a version param to reload when modified
+		if (sessionStorage.myol_lastChangeTime)
+			argsObj.v = parseInt((sessionStorage.myol_lastChangeTime % 100000000) / 10000);
+
+		for (const a in argsObj)
+			if (a != 'url' && argsObj[a])
+				argsArray.push(a + '=' + argsObj[a]);
+
+		return argsObj.url + '?' + argsArray.join('&');
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
@@ -332,6 +344,7 @@ function layerVectorCluster(options) {
 
 	// Tune the clustering distance depending on the zoom level
 	let previousResolution;
+
 	clusterLayer.on('prerender', function(evt) {
 		const resolution = evt.frameState.viewState.resolution,
 			distanceMinCluster = resolution < 10 ? 0 : Math.min(options.distanceMinCluster, resolution);

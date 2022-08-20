@@ -33,16 +33,20 @@ try {
 } catch (err) { // to get Assert url
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
-// localStorage
+// Storages
 {
 	let datas = [];
-	for (let i = 0; i < localStorage.length; i++) {
-		datas.push(
-			localStorage.key(i) + ': ' +
-			localStorage.getItem(localStorage.key(i))
-		);
-	}
-	console.log('localStorage:\n' + datas.join('\n'));
+	['localStorage', 'sessionStorage'].forEach(s => {
+		if (window[s].length)
+			datas.push(s + ':');
+		for (let i = 0; i < window[s].length; i++) {
+			datas.push(
+				window[s].key(i) + ': ' +
+				window[s].getItem(window[s].key(i))
+			);
+		}
+	});
+	console.log(datas.join('\n'));
 }
 
 /**
@@ -597,7 +601,8 @@ function controlLayerSwitcher(layers, opt) {
  * Options:
  * selectorName : <input name="SELECTORNAME"> url arguments selector
  * selectorName : <TAG id="SELECTORNAME-status"></TAG> display loading status
- * urlFunction: function(options, bbox, selection, extent, resolution, projection) returning the XHR url
+ * urlArgsFunction: function(options, bbox, selection, extent, resolution, projection)
+   returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX
  * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
  * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
@@ -647,20 +652,31 @@ function layerVector(opt) {
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
-		const selection = readCheckbox(options.selectorName);
-
-		return options.urlFunction(
-			options, // Layer options
-			ol.proj.transformExtent( // BBox
+		const argsObj = options.urlArgsFunction(
+				options, // Layer options
+				ol.proj.transformExtent( // BBox
+					extent,
+					projection.getCode(), // Map projection
+					'EPSG:4326' // Received projection
+				).map(function(c) {
+					return c.toFixed(4); // Round to 4 digits
+				}),
+				readCheckbox(options.selectorName),
 				extent,
-				projection.getCode(), // Map projection
-				'EPSG:4326' // Received projection
-			).map(function(c) {
-				return c.toFixed(4); // Round to 4 digits
-			}),
-			typeof selection == 'object' ? selection : [],
-			extent, resolution, projection
-		);
+				resolution,
+				projection
+			),
+			argsArray = [];
+
+		// Add a version param to reload when modified
+		if (sessionStorage.myol_lastChangeTime)
+			argsObj.v = parseInt((sessionStorage.myol_lastChangeTime % 100000000) / 10000);
+
+		for (const a in argsObj)
+			if (a != 'url' && argsObj[a])
+				argsArray.push(a + '=' + argsObj[a]);
+
+		return argsObj.url + '?' + argsArray.join('&');
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
@@ -915,6 +931,7 @@ function layerVectorCluster(options) {
 
 	// Tune the clustering distance depending on the zoom level
 	let previousResolution;
+
 	clusterLayer.on('prerender', function(evt) {
 		const resolution = evt.frameState.viewState.resolution,
 			distanceMinCluster = resolution < 10 ? 0 : Math.min(options.distanceMinCluster, resolution);
@@ -1154,22 +1171,16 @@ function styleOptionsCluster(feature, properties) {
  * Site chemineur.fr, alpages.info
  * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
-function layerGeoBB(options) {
+function layerGeoBB(opt) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/',
-		urlFunction: function(options, bbox, selection) {
-			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
-				'&layer=' + (options.subLayer || 'simple') +
-				// Add layer features filters
-				(options.selectorName ?
-					'&' + (options.argSelName || 'cat') + '=' + selection.join(',') :
-					'') +
-				// Refresh layer when data changed
-				(localStorage.myol_lastChangeTime ?
-					'&v=' + localStorage.myol_lastChangeTime :
-					'') +
-				// Bbox strategy
-				'&bbox=' + bbox.join(',');
+		argSelName: 'cat',
+		urlArgsFunction: function(options, bbox, selection) {
+			return {
+				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
+				limit: 10000,
+				[options.argSelName]: selection.join(','),
+				bbox: bbox.join(','),
+			};
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
@@ -1206,32 +1217,23 @@ function layerGeoBB(options) {
 				}
 			);
 		},
-	}, options));
+	}, opt));
 }
 
 /**
  * Site refuges.info
  */
-function layerWri(options) {
+function layerWri(opt) {
 	return layerVectorCluster(Object.assign({
 		host: '//www.refuges.info/',
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
-		urlFunction: function(options, bbox, selection) {
-			return options.host + 'api/bbox' +
-				// Ask cluster if needed
-				(options.cluster ?
-					'?cluster=true' :
-					'?nb_points=250') +
-				// Add layer features filters
-				(selection && selection.length ?
-					'&type_points=' + selection.join(',') :
-					'') +
-				// Refresh layer when data changed
-				(localStorage.myol_lastChangeTime ?
-					'&v=' + localStorage.myol_lastChangeTime :
-					'') +
-				// Bbox strategy
-				'&bbox=' + bbox.join(',');
+		urlArgsFunction: function(options, bbox, selection) {
+			return {
+				url: options.host + 'api/bbox',
+				type_points: selection.join(','),
+				cluster: options.cluster,
+				bbox: bbox.join(','),
+			};
 		},
 		convertProperties: function(properties, feature, options) {
 			return {
@@ -1250,19 +1252,18 @@ function layerWri(options) {
 		hoverStyleOptionsFunction: function(feature, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, options));
+	}, opt));
 }
 
-function layerWriAreas(options) {
+function layerWriAreas(opt) {
 	return layerVector(Object.assign({
 		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
-		urlFunction: function(options) {
-			return options.host + 'api/polygones?type_polygon=' + options.polygon +
-				// Refresh layer when data changed
-				(localStorage.myol_lastChangeTime ?
-					'&v=' + localStorage.myol_lastChangeTime :
-					'');
+		urlArgsFunction: function(options) {
+			return {
+				url: options.host + 'api/polygones',
+				type_polygon: options.polygon,
+			};
 		},
 		convertProperties: function(properties) {
 			return {
@@ -1283,7 +1284,7 @@ function layerWriAreas(options) {
 				styleOptionsPolygon(properties.color, 1)
 			);
 		},
-	}, options));
+	}, opt));
 }
 
 /**
@@ -1348,8 +1349,11 @@ function layerC2C(options) {
 	};
 
 	return layerVectorCluster(Object.assign({
-		urlFunction: function(options, bbox, selection, extent) {
-			return 'https://api.camptocamp.org/waypoints?bbox=' + extent.join(',');
+		urlArgsFunction: function(options, bbox, selection, extent) {
+			return {
+				url: 'https://api.camptocamp.org/waypoints',
+				bbox: extent.join(','),
+			};
 		},
 		format: format,
 		styleOptionsFunction: function(feature, properties) {
@@ -1375,7 +1379,7 @@ function layerOverpass(options) {
 			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
-			urlFunction: urlFunction,
+			urlArgsFunction: urlArgsFunction,
 			maxResolution: 50,
 			format: format,
 			convertProperties: convertProperties,
@@ -1391,17 +1395,19 @@ function layerOverpass(options) {
 
 	// List of acceptable tags in the request return
 	let tags = '';
-	for (let e in selectorEls)
-		tags += selectorEls[e].value;
-	tags = tags.replace('private', '');
 
-	function urlFunction(options, bbox, selection) {
+	for (let e in selectorEls)
+		if (selectorEls[e].value)
+			tags += selectorEls[e].value.replace('private', '');
+
+	function urlArgsFunction(options, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 
 		// Convert selections on overpass_api language
 		for (let l = 0; l < selection.length; l++) {
 			const selections = selection[l].split('+');
+
 			for (let ls = 0; ls < selections.length; ls++)
 				args.push(
 					'node' + selections[ls] + bb + // Ask for nodes in the bbox
@@ -1409,11 +1415,11 @@ function layerOverpass(options) {
 				);
 		}
 
-		return 'https://' + options.host + '/api/interpreter' +
-			'?data=[timeout:5];(' + // Not too much !
-			args.join('') +
-			');out center;'; // Add center of areas
-	}
+		return {
+			url: 'https://' + options.host + '/api/interpreter',
+			data: '[timeout:5];(' + args.join('') + ');out center;',
+		};
+	};
 
 	// Extract features from data when received
 	format.readFeatures = function(doc, opt) {
@@ -2250,7 +2256,7 @@ function layerMarker(options) {
 	function onChange(evt) {
 		if (evt) // If a field has changed
 			// Mark last change time to be able to reload vector layer if changed
-			localStorage.myol_lastChangeTime = new Date().getTime();
+			sessionStorage.myol_lastChangeTime = Date.now();
 
 		// Find changed input type from tne input id
 		const idMatch = this.id.match(/-([a-z]+)/);
@@ -2355,7 +2361,7 @@ function layerMarker(options) {
 			map.addInteraction(new ol.interaction.Pointer({
 				handleDownEvent: function(evt) {
 					// Mark last change time
-					localStorage.myol_lastChangeTime = new Date().getTime();
+					sessionStorage.myol_lastChangeTime = Date.now();
 
 					return map.getFeaturesAtPixel(evt.pixel, {
 						layerFilter: function(l) {
@@ -2503,7 +2509,7 @@ function layerEditGeoJson(opt) {
 	interactions[0].on('modifyend', function(evt) {
 
 		// Mark last change time
-		localStorage.myol_lastChangeTime = new Date().getTime();
+		sessionStorage.myol_lastChangeTime = Date.now();
 
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
