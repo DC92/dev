@@ -45,14 +45,17 @@ const baseLayers = {
 			collapsed: false,
 		}),
 	],
+	wriInput = document.getElementById('selecteur-wri'),
+	massifInput = document.getElementById('selecteur-massif')
+	massifsInput = document.getElementById('selecteur-massifs'),
 
 	points = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
-		selectorName: 'couche-wri',
+			attribution:null,
+		selectorName: 'selecteur-wri',
+//TODO		massif:4,
 		urlFunction: function(options, bbox, selection) {
-			const el = document.getElementById('selecteur-massif');
-
-			if (el && el.checked)
+			if (massifInput && massifInput.checked)
 				return options.host + 'api/massif' +
 					'?massif=<?=$vue->polygone->id_polygone?>&'+
 					'type_points=' + selection.join(',');
@@ -61,16 +64,14 @@ const baseLayers = {
 					'?type_points=' + selection.join(',') +
 					'&bbox=' + bbox.join(',');
 		},
-		distanceMinCluster: 30, // Clusterisation
+		// Clusterisation
+		distanceMinCluster: 30,
+		// Ajout de l'étiquette
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsLabel(properties.name, properties, true),
 				styleOptionsIcon(properties.icon)
 			);
-		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			properties.attribution=null;
-			return styleOptionsFullLabel(properties);
 		},
 	}),
 
@@ -80,14 +81,14 @@ const baseLayers = {
 		// Les massifs
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectorName: 'couche-massifs',
+			selectorName: 'selecteur-massifs',
 		}),
 		// Contour d'un massif ou d'une zone
 <?php if ($vue->polygone->id_polygone) { ?>
 		layerVector({
 			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
 				'?massif=<?=$vue->polygone->id_polygone?>',
-			selectorName: 'couche-massif',
+			selectorName: 'selecteur-massif',
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -99,32 +100,32 @@ const baseLayers = {
 
 		// Overpass
 		layerOverpass({
-			selectorName: 'couche-osm',
+			selectorName: 'selecteur-osm',
 			distanceMinCluster: 30,
 			maxResolution: 100,
 		}),
 
 		// Pyrenees-refuges.com
 		layerPyreneesRefuges({
-			selectorName: 'couche-prc',
+			selectorName: 'selecteur-prc',
 			distanceMinCluster: 30,
 		}),
 
 		// CampToCamp
 		layerC2C({
-			selectorName: 'couche-c2c',
+			selectorName: 'selecteur-c2c',
 			distanceMinCluster: 30,
 		}),
 
 		// Chemineur
 		layerGeoBB({
-			selectorName: 'couche-chemineur',
+			selectorName: 'selecteur-chemineur',
 			maxResolution: 100,
 			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 		}),
 		layerGeoBB({
-			selectorName: 'couche-chemineur',
+			selectorName: 'selecteur-chemineur',
 			subLayer: 'cluster',
 			minResolution: 100,
 			distanceMinCluster: 30,
@@ -134,7 +135,7 @@ const baseLayers = {
 		// Alpages.info
 		layerGeoBB({
 			host: '//alpages.info/',
-			selectorName: 'couche-alpages',
+			selectorName: 'selecteur-alpages',
 			argSelName: 'forums',
 			distanceMinCluster: 30,
 			attribution: 'Alpages',
@@ -149,13 +150,20 @@ const baseLayers = {
 		}),
 		controls: controls,
 		layers: layers,
-	}),
-	massifsInput = document.getElementsByName('couche-massifs');
+	});
 
-// Initialiser l'affichage des massifs suivant le type de carte (zone ou massif)
-if (massifsInput.length) {
-	massifsInput[0].checked = <?=$vue->contenu?'true':'false'?>;
-	massifsInput[0].dispatchEvent(new Event('click'));
+// Initialiser l'affichage des points et des massifs suivant le type de carte (zone ou massif)
+if (wriInput) {
+	wriInput.checked = true;
+	wriInput.dispatchEvent(new Event('click'));
+}
+if (massifInput) {
+	massifInput.checked = true;
+	massifInput.dispatchEvent(new Event('click'));
+}
+if (massifsInput) {
+	massifsInput.checked = <?=$vue->contenu?'true':'false'?>;
+	massifsInput.dispatchEvent(new Event('click'));
 }
 
 // Centrer sur la zone du polygone

@@ -9,7 +9,7 @@
  */
 function layerGeoBB(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//chemineur.fr/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
+		host: '//chemineur.fr/',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'ext/Dominique92/GeoBB/gis.php?limit=10000' +
 				'&layer=' + (options.subLayer || 'simple') +
@@ -67,7 +67,8 @@ function layerGeoBB(options) {
  */
 function layerWri(options) {
 	return layerVectorCluster(Object.assign({
-		host: '//www.refuges.info/', //BEST investiger pourquoi c'est pris par urlFunction & convertProperties
+		host: '//www.refuges.info/',
+		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		urlFunction: function(options, bbox, selection) {
 			return options.host + 'api/bbox' +
 				// Ask cluster if needed
@@ -93,7 +94,7 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
 				url: options.noClick ? null : properties.lien,
-				attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
+				attribution: options.attribution,
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {
@@ -121,7 +122,6 @@ function layerWriAreas(options) {
 				name: properties.nom,
 				color: properties.couleur,
 				url: properties.lien,
-				attribution: null,
 			};
 		},
 		styleOptionsFunction: function(feature, properties) {

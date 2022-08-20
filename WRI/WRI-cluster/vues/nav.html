@@ -19,27 +19,27 @@
 			<ul>
 				<?php if ( $vue->polygone->id_polygone ){?>
 					<li>
-						<input id="selecteur-massif" name="couche-massif"
+						<input id="selecteur-massif" name="selecteur-massif"
 							onchange="points.getSource().getSource().refresh()"
 							type="checkbox" checked="checked" />
 						<label for="selecteur-massif"><?=$vue->polygone->nom_polygone?> uniquement</label>
 					</li><hr/>
 				<?php }?>
 				<li>
-					<label for="couche-wri">Tout</label>
-					<input type="checkbox" id="couche-wri" name="couche-wri" checked="checked" />
-					<span id="couche-wri-status"></span>
+					<label for="selecteur-wri">Tout</label>
+					<input type="checkbox" id="selecteur-wri" name="selecteur-wri" checked="checked" />
+					<span id="selecteur-wri-status"></span>
 				</li>
 				<?php foreach ($vue->types_point_affichables AS $type_affichable) { ?>
 					<li>
 						<input
-							id="couche-wri-<?=$type_affichable->id_point_type?>"
+							id="selecteur-wri-<?=$type_affichable->id_point_type?>"
 							type="checkbox"
-							name="couche-wri"
+							name="selecteur-wri"
 							value="<?=$type_affichable->id_point_type?>"
 							checked="checked"
 						/>
-						<label for="couche-wri-<?=$type_affichable->id_point_type?>">
+						<label for="selecteur-wri-<?=$type_affichable->id_point_type?>">
 							<img
 								id="icone_<?=$type_affichable->id_point_type?>"
 								src="<?=$config_wri['url_chemin_icones'].$config_wri['correspondance_type_icone'][replace_url($type_affichable->nom_type)]?>.svg"
@@ -51,9 +51,9 @@
 				<?php }?>
 			</ul>
 			<hr />
-			<input type="checkbox" id="couche-massifs" name="couche-massifs" />
-			<label for="couche-massifs">Massifs</label>
-			<span id="couche-massifs-status"></span>
+			<input type="checkbox" id="selecteur-massifs" name="selecteur-massifs" />
+			<label for="selecteur-massifs">Massifs</label>
+			<span id="selecteur-massifs-status"></span>
 			<hr />
 			<ul>Ctrl+click: nouvel onglet</ul>
 			<ul>Maj+click: nouvelle fenêtre</ul>
@@ -92,22 +92,22 @@
 			<div>
 				<ul>
 					<li>
-						<label for="couche-osm">Tout</label>
-						<input type="checkbox" id="couche-osm" name="couche-osm" />
-						<span id="couche-osm-status"></span>
+						<label for="selecteur-osm">Tout</label>
+						<input type="checkbox" id="selecteur-osm" name="selecteur-osm" />
+						<span id="selecteur-osm-status"></span>
 					</li>
 					<li>
-						<input type="checkbox" name="couche-osm" id="City Hall"
+						<input type="checkbox" name="selecteur-osm" id="City Hall"
 							value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />
 						<label for="City Hall">hôtel ou location</label>
 					</li>
 					<li>
-						<input type="checkbox" name="couche-osm" id="Campground"
+						<input type="checkbox" name="selecteur-osm" id="Campground"
 							value='["tourism"="camp_site"]' />
 						<label for="Campground">camping</label>
 					</li>
 					<li>
-						<input type="checkbox" name="couche-osm" id="Drinking Water"
+						<input type="checkbox" name="selecteur-osm" id="Drinking Water"
 							value='["natural"="spring"]+'.
 								'["amenity"="drinking_water|watering_place|fountain"]+'.
 								'["waterway"="water_point"]+'.
@@ -115,17 +115,17 @@
 						<label for="Drinking Water">point d'eau</label>
 					</li>
 					<li>
-						<input type="checkbox" name="couche-osm" id="Shopping Center"
+						<input type="checkbox" name="selecteur-osm" id="Shopping Center"
 							value='["shop"~"supermarket|convenience"]' />
 						<label for="Shopping Center">alimentation</label>
 					</li>
 					<li>
-						<input type="checkbox" name="couche-osm" id="Parking Area"
+						<input type="checkbox" name="selecteur-osm" id="Parking Area"
 							value='["amenity"="parking"]["access"!="private"]' />
 						<label for="Parking Area">parking</label>
 					</li>
 					<li>
-						<input type="checkbox" name="couche-osm" id="Ground Transportation"
+						<input type="checkbox" name="selecteur-osm" id="Ground Transportation"
 							value='["highway"="bus_stop"]' />
 						<label for="Ground Transportation">bus</label>
 					</li>
@@ -137,27 +137,27 @@
 			<legend>Autres sites</legend>
 			<ul>
 				<li>
-					<input type="checkbox" name="couche-prc" id="couche-prc" />
-					<label for="couche-prc">pyrenees-refuges.com</label>
-					<span id="couche-prc-status"></span>
+					<input type="checkbox" name="selecteur-prc" id="selecteur-prc" />
+					<label for="selecteur-prc">pyrenees-refuges.com</label>
+					<span id="selecteur-prc-status"></span>
 				</li>
 				<li>
-					<input type="checkbox" name="couche-c2c" id="couche-c2c" />
-					<label for="couche-c2c">camptocamp.org</label>
-					<span id="couche-c2c-status"></span>
+					<input type="checkbox" name="selecteur-c2c" id="selecteur-c2c" />
+					<label for="selecteur-c2c">camptocamp.org</label>
+					<span id="selecteur-c2c-status"></span>
 					(seuls les 100 premiers points sont affichés)
 				</li>
 				<li>
-					<input type="checkbox" name="couche-chemineur" id="couche-chemineur"
+					<input type="checkbox" name="selecteur-chemineur" id="selecteur-chemineur"
 						value="3,8,20,23" />
-					<label for="couche-chemineur">chemineur.fr</label>
-					<span id="couche-chemineur-status"></span>
+					<label for="selecteur-chemineur">chemineur.fr</label>
+					<span id="selecteur-chemineur-status"></span>
 				</li>
 				<li>
-					<input type="checkbox" name="couche-alpages" id="couche-alpages"
+					<input type="checkbox" name="selecteur-alpages" id="selecteur-alpages"
 						value="4,5" />
-					<label for="couche-alpages">alpages.info</label>
-					<span id="couche-alpages-status"></span>
+					<label for="selecteur-alpages">alpages.info</label>
+					<span id="selecteur-alpages-status"></span>
 				</li>
 			</ul>
 		</fieldset>
@@ -170,8 +170,8 @@
 				Modifier <?=$vue->polygone->art_def_poly?> <?=$vue->polygone->type_polygone?>
 				<?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?>
 			</a>
-			<input name="couche-massif" type="hidden" checked="checked" />
-			<input name="couche-massifs" type="hidden" checked="checked" />
+			<input name="selecteur-massif" type="hidden" checked="checked" />
+			<input name="selecteur-massifs" type="hidden" checked="checked" />
 		</fieldset>
 	<?php }?>
 
