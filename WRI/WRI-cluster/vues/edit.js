@@ -33,7 +33,7 @@ const baseLayers = {
 		}),
 	],
 
-	// Affiche en noir la limite de tous les massifs
+	// Affiche la limite de tous les massifs
 	contours = layerVector({
 		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		style: new ol.style.Style({

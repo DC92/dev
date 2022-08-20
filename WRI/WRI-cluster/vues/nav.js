@@ -51,7 +51,7 @@ const baseLayers = {
 
 	points = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
-			attribution:null,
+		attribution: null,
 		selectorName: 'selecteur-wri',
 //TODO		massif:4,
 		urlFunction: function(options, bbox, selection) {
@@ -64,7 +64,6 @@ const baseLayers = {
 					'?type_points=' + selection.join(',') +
 					'&bbox=' + bbox.join(',');
 		},
-		// Clusterisation
 		distanceMinCluster: 30,
 		// Ajout de l'étiquette
 		styleOptionsFunction: function(feature, properties) {
