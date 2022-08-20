@@ -321,11 +321,12 @@ SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom))
         $points_isoles[] = $raw->id_point;
       }
 
-    // On change le scope des points qu'il reste à traiter ensuite
-    if ( $points_isoles )
-      $conditions_sql.="\n\tAND id_point IN (".implode(',',$points_isoles).")";
-    else
-      return $points; // Sinon, c'est tout !
+    if ( !count($points_isoles) ) // S'il n'y a pas de points isolés, c'est tout !
+      return $points;
+
+    // Sinon, on change le scope des points qu'il reste à traiter
+    $conditions_sql.="\n\tAND id_point IN (".implode(',',$points_isoles).")";
+    $limite="";
   }
 
   $query_points="
