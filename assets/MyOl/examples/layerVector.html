@@ -33,6 +33,10 @@ Based on https://openlayers.org
 			border-right: solid;
 			padding: 5px
 		}
+		.selector input,
+		.selector label {
+			cursor: pointer;
+		}
 	</style>
 </head>
 
@@ -47,33 +51,33 @@ Based on https://openlayers.org
 
 	<div class="selector">
 		<div>
-			Refuges.info<!-- //BEST coupler texte / check avec label & id -->
-			<input type="checkbox" name="wri-features" value="7,9,10" />
+			<label for="wri-features">Refuges.info</label>
+			<input type="checkbox" name="wri-features" id="wri-features" value="7,9,10" />
 			<p id="wri-features-status"></p>
 		</div>
 
 		<div>
-			Massifs
-			<input type="checkbox" name="wri-massifs" />
+			<label for="wri-massifs">Massifs</label>
+			<input type="checkbox" name="wri-massifs" id="wri-massifs" />
 			<p id="wri-massifs-status"></p>
 		</div>
 
 		<div>
-			Pyrenees-refuges.com
-			<input type="checkbox" name="prc-features" />
+			<label for="prc-features">Pyrenees-refuges.com</label>
+			<input type="checkbox" name="prc-features" id="prc-features" />
 			<p id="prc-features-status"></p>
 		</div>
 
 		<div>
-			Camptocamp.org
-			<input type="checkbox" name="c2c-features" />
+			<label for="c2c-features">Camptocamp.org</label>
+			<input type="checkbox" name="c2c-features" id="c2c-features" />
 			<p><span id="c2c-features-status"></span> Only 100 features at a time</p>
 		</div>
 	</div>
 
 	<div class="selector">
-		Chemineur
-		<input type="checkbox" name="geobb-features" />
+		<label for="geobb-features">Chemineur</label>
+		<input type="checkbox" name="geobb-features" id="geobb-features" />
 		<p id="geobb-features-status"></p>
 		<ul>
 			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
@@ -89,8 +93,8 @@ Based on https://openlayers.org
 	</div>
 
 	<div class="selector">
-		Alpages.info
-		<input type="checkbox" name="alp-features" />
+		<label for="alp-features">Alpages.info</label>
+		<input type="checkbox" name="alp-features" id="alp-features" />
 		<p id="alp-features-status"></p>
 		<ul>
 			<li><input type="checkbox" name="alp-features" value="3" />Alpages</li>
@@ -101,8 +105,8 @@ Based on https://openlayers.org
 	</div>
 
 	<div class="selector">
-		Overpass (OSM services)
-		<input type="checkbox" name="osm-features" />
+		<label for="osm-features">Overpass (OSM services)</label>
+		<input type="checkbox" name="osm-features" id="osm-features" />
 		<p id="osm-features-status"></p>
 		<ul>
 			<li><input type="checkbox" name="osm-features" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
@@ -110,7 +114,12 @@ Based on https://openlayers.org
 			<li><input type="checkbox" name="osm-features" value='["building"="cabin"]' />Cabane non gardée</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
 			<li><input type="checkbox" name="osm-features" value='["tourism"="camp_site"]' />Camping</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />Point d'eau</li>
+			<li>
+				<input type="checkbox" name="osm-features"
+					value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'
+				/>
+				Point d'eau
+			</li>
 			<li><input type="checkbox" name="osm-features" value='["highway"="bus_stop"]' />Bus</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="restaurant"]' />Restaurant</li>

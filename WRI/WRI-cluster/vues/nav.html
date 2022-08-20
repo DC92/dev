@@ -22,32 +22,38 @@
 						<input id="selecteur-massif" name="couche-massif"
 							onchange="points.getSource().getSource().refresh()"
 							type="checkbox" checked="checked" />
-						<?=$vue->polygone->nom_polygone?> uniquement
+						<label for="selecteur-massif"><?=$vue->polygone->nom_polygone?> uniquement</label>
 					</li><hr/>
 				<?php }?>
-				<li>Tout
-					<input type="checkbox" name="couche-wri" checked="checked" />
+				<li>
+					<label for="couche-wri">Tout</label>
+					<input type="checkbox" id="couche-wri" name="couche-wri" checked="checked" />
 					<span id="couche-wri-status"></span>
 				</li>
 				<?php foreach ($vue->types_point_affichables AS $type_affichable) { ?>
 					<li>
 						<input
+							id="couche-wri-<?=$type_affichable->id_point_type?>"
 							type="checkbox"
 							name="couche-wri"
 							value="<?=$type_affichable->id_point_type?>"
 							checked="checked"
 						/>
-						<img
-							id="icone_<?=$type_affichable->id_point_type?>"
-							src="<?=$config_wri['url_chemin_icones'].$config_wri['correspondance_type_icone'][replace_url($type_affichable->nom_type)]?>.svg"
-							alt="icone de <?=$type_affichable->nom_type?>"
-						/>
-						<?=$type_affichable->nom_type?>
+						<label for="couche-wri-<?=$type_affichable->id_point_type?>">
+							<img
+								id="icone_<?=$type_affichable->id_point_type?>"
+								src="<?=$config_wri['url_chemin_icones'].$config_wri['correspondance_type_icone'][replace_url($type_affichable->nom_type)]?>.svg"
+								alt="icone de <?=$type_affichable->nom_type?>"
+							/>
+							<?=$type_affichable->nom_type?>
+						</label>
 					</li>
 				<?php }?>
 			</ul>
 			<hr />
-			<input type="checkbox" id="couche-massifs" name="couche-massifs" />Massifs &nbsp;
+			<input type="checkbox" id="couche-massifs" name="couche-massifs" />
+			<label for="couche-massifs">Massifs</label>
+			<span id="couche-massifs-status"></span>
 			<hr />
 			<ul>Ctrl+click: nouvel onglet</ul>
 			<ul>Maj+click: nouvelle fenêtre</ul>
@@ -56,30 +62,73 @@
 		<?php if ($vue->polygone->nom_polygone ) { ?>
 			<fieldset>
 				<legend>Téléchargements</legend>
-				Tous les points refuges.info <?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?><br/>
-					<a href="<?=$config_wri['sous_dossier_installation']?>api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx" title="Télécharger au format GPX complet">GPX</a> /
-					<a href="<?=$config_wri['sous_dossier_installation']?>api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_garmin" title="Télécharger au format GPX pour Garmin">Garmin</a> /
-					<a href="<?=$config_wri['sous_dossier_installation']?>api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml" title="Télécharger au format KML">KML</a>
+				Tous les points refuges.info
+				<?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?>
+				<br/>
+				<a href="<?=$config_wri['sous_dossier_installation']?>api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx"
+					title="Télécharger au format GPX complet">
+					GPX
+				</a> /
+				<a href="<?=$config_wri['sous_dossier_installation']?>api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=gpx_garmin"
+					title="Télécharger au format GPX pour Garmin">
+					Garmin
+				</a> /
+				<a href="<?=$config_wri['sous_dossier_installation']?>api/massif?massif=<?=$vue->polygone->id_polygone?>&nb_points=all&format=kml"
+					title="Télécharger au format KML">
+					KML
+				</a>
 			</fieldset>
 		<?php }?>
 
 		<fieldset>
 			<legend>
-				Services (<a href="https://overpass-turbo.eu/" target=_blank title="Points de la base OpensStreetmap">OSM</a>)
-				- disponible seulement pour les zoom forts
+				Services (
+				<a href="https://overpass-turbo.eu/"
+					target=_blank title="Points de la base OpensStreetmap">
+					OSM
+				</a>
+				) - disponible seulement pour les zoom forts
 			</legend>
 			<div>
 				<ul>
 					<li>
-						Tout <input type="checkbox" name="couche-osm" />
+						<label for="couche-osm">Tout</label>
+						<input type="checkbox" id="couche-osm" name="couche-osm" />
 						<span id="couche-osm-status"></span>
 					</li>
-					<li><input type="checkbox" name="couche-osm" id="City Hall" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />hôtel ou location</li>
-					<li><input type="checkbox" name="couche-osm" id="Campground" value='["tourism"="camp_site"]' />camping</li>
-					<li><input type="checkbox" name="couche-osm" id="Drinking Water" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]' />point d'eau</li>
-					<li><input type="checkbox" name="couche-osm" id="Shopping Center" value='["shop"~"supermarket|convenience"]' />alimentation</li>
-					<li><input type="checkbox" name="couche-osm" id="Parking Area" value='["amenity"="parking"]["access"!="private"]' />parking</li>
-					<li><input type="checkbox" name="couche-osm" id="Ground Transportation" value='["highway"="bus_stop"]' />bus</li>
+					<li>
+						<input type="checkbox" name="couche-osm" id="City Hall"
+							value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />
+						<label for="City Hall">hôtel ou location</label>
+					</li>
+					<li>
+						<input type="checkbox" name="couche-osm" id="Campground"
+							value='["tourism"="camp_site"]' />
+						<label for="Campground">camping</label>
+					</li>
+					<li>
+						<input type="checkbox" name="couche-osm" id="Drinking Water"
+							value='["natural"="spring"]+'.
+								'["amenity"="drinking_water|watering_place|fountain"]+'.
+								'["waterway"="water_point"]+'.
+								'["man_made"="water_well"]' />
+						<label for="Drinking Water">point d'eau</label>
+					</li>
+					<li>
+						<input type="checkbox" name="couche-osm" id="Shopping Center"
+							value='["shop"~"supermarket|convenience"]' />
+						<label for="Shopping Center">alimentation</label>
+					</li>
+					<li>
+						<input type="checkbox" name="couche-osm" id="Parking Area"
+							value='["amenity"="parking"]["access"!="private"]' />
+						<label for="Parking Area">parking</label>
+					</li>
+					<li>
+						<input type="checkbox" name="couche-osm" id="Ground Transportation"
+							value='["highway"="bus_stop"]' />
+						<label for="Ground Transportation">bus</label>
+					</li>
 				</ul>
 			</div>
 		</fieldset>
@@ -88,20 +137,26 @@
 			<legend>Autres sites</legend>
 			<ul>
 				<li>
-					<input type="checkbox" name="couche-prc" />pyrenees-refuges.com &nbsp;
+					<input type="checkbox" name="couche-prc" id="couche-prc" />
+					<label for="couche-prc">pyrenees-refuges.com</label>
 					<span id="couche-prc-status"></span>
 				</li>
 				<li>
-					<input type="checkbox" name="couche-c2c" />camptocamp.org &nbsp;
+					<input type="checkbox" name="couche-c2c" id="couche-c2c" />
+					<label for="couche-c2c">camptocamp.org</label>
 					<span id="couche-c2c-status"></span>
 					(seuls les 100 premiers points sont affichés)
 				</li>
 				<li>
-					<input type="checkbox" name="couche-chemineur" value="3,8,20,23" />chemineur.fr &nbsp;
+					<input type="checkbox" name="couche-chemineur" id="couche-chemineur"
+						value="3,8,20,23" />
+					<label for="couche-chemineur">chemineur.fr</label>
 					<span id="couche-chemineur-status"></span>
 				</li>
 				<li>
-					<input type="checkbox" name="couche-alpages" value="4,5" />alpages.info &nbsp;
+					<input type="checkbox" name="couche-alpages" id="couche-alpages"
+						value="4,5" />
+					<label for="couche-alpages">alpages.info</label>
 					<span id="couche-alpages-status"></span>
 				</li>
 			</ul>

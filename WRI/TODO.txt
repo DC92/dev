@@ -1,33 +1,26 @@
-TODO GPS
-========
-Ajouter images/icones/favicon.svg
-GPS Fond carte mri en haut du switcher / forcer mri à l'init
-Voir pourquoi il lance le service worker sur les autres pages
-
-//TODO
-======
-Utiliser ol.loadingstrategy.bboxLimit ???
-arrivée massif points all on
-NAV coupler checkbox avec <label>
-API change limit in param cluster
-
-BUG
-===
+//TODO BUG WRI
+==============
+Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 Click logo ne va pas à l'accueil en dehors de span
 Input recherche déborde des petits ecrans
-Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-Carte nav affiche les massifs pour les gros massifs => zoom ?
 Lien vers compte utilisateur sur petit écran
 Editeur massif : download ne marche pas ! (fichier vide)
-GPS : le triangle en haut reste affiché
 Formulaire contact : nom utilisateur
-Pas de favicon dans S20 accueil FF
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 
-BEST
-====
-N'afficher que les massifs qui ont des points
+//TODO WRI
+==========
+Refaire les couches points WRI dans WRI
+arrivée massif points all on
+N'afficher que les massifs contenant des points
+
+//TODO GPS WRI
+==============
+Ajouter images/icones/favicon.svg
+GPS Fond carte mri en haut du switcher / forcer mri à l'init
+Voir pourquoi il lance le service worker sur les autres pages
+Pas de favicon dans S20 accueil FF
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================

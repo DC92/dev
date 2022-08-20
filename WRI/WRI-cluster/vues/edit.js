@@ -53,7 +53,8 @@ const baseLayers = {
 		],
 		saveFeatures: function(coordinates, format) {
 			return format.writeGeometry(
-				new ol.geom.MultiPolygon(coordinates.polys), {
+				new ol.geom.MultiPolygon(coordinates.polys),
+				{
 					featureProjection: 'EPSG:3857',
 					decimals: 5,
 				});
