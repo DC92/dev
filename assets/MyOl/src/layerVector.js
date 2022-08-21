@@ -525,9 +525,9 @@ function styleOptionsLabel(text, properties, important) {
 	};
 
 	// For points
-	if (!properties.area){
-		styleTextOptions.	textBaseline= 'bottom';
-	styleTextOptions.		offsetY= -14; // Above the icon
+	if (!properties.area) {
+		styleTextOptions.textBaseline = 'bottom';
+		styleTextOptions.offsetY = -14; // Above the icon
 	}
 
 	return {

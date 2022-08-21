@@ -239,9 +239,11 @@
 				<label>Connexion</label>
 				<form method="post" class="connexion" action="<?=$config_wri['lien_forum']?>ucp.php?mode=login">
 					<li>
-						<input type="text" name="username" size="15" placeholder="Nom d’utilisateur">
+						<input type="text" name="username" size="15" placeholder="Nom d’utilisateur"
+							autocomplete="username">
 					</li><li>
-						<input type="password" name="password" size="15" placeholder="Mot de passe">
+						<input type="password" name="password" size="15"
+							placeholder="Mot de passe" autocomplete="current-password">
 					</li><li>
 						<input type="hidden" name="autologin" checked="checked">
 						<input type="hidden" name="creation_time" value="<?=$infos_identification->creation_time?>">
