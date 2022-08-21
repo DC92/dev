@@ -49,12 +49,38 @@ const baseLayers = {
 	massifInput = document.getElementById('selecteur-massif')
 	massifsInput = document.getElementById('selecteur-massifs'),
 
+
+
+/*
+// Refuges.info
+map.addLayer(layerWri({
+	host: '//dom.refuges.info/', //TODO revenir de dom à www
+	selectorName: 'wri-features',
+	maxResolution: 500,
+	distanceMinCluster: 30,
+}));
+map.addLayer(layerWri({
+	host: '//dom.refuges.info/', //TODO revenir de dom à www
+	selectorName: 'wri-features',
+	cluster: true,
+	minResolution: 500,
+	distanceMinCluster: 30,
+}));
+map.addLayer(layerWriAreas({
+	host: '//dom.refuges.info/', //TODO revenir de dom à www
+	selectorName: 'wri-massifs',
+}));
+*/
+
+
+
 	points = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
 		attribution: null,
 		selectorName: 'selecteur-wri',
+		//zIndex: 1000, // Points au dessus des massifs
 //TODO		massif:4,
-		urlFunction: function(options, bbox, selection) {
+		WurlFunction: function(options, bbox, selection) {
 			if (massifInput && massifInput.checked)
 				return options.host + 'api/massif' +
 					'?massif=<?=$vue->polygone->id_polygone?>&'+
@@ -74,20 +100,26 @@ const baseLayers = {
 		},
 	}),
 
+
+
+
+
 	layers = [
-		// Refuges.info
-		points,
 		// Les massifs
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
+<?php if ( !$vue->contenu ) { ?>
 			selectorName: 'selecteur-massifs',
+<?php } ?>
 		}),
 		// Contour d'un massif ou d'une zone
 <?php if ($vue->polygone->id_polygone) { ?>
 		layerVector({
 			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
 				'?massif=<?=$vue->polygone->id_polygone?>',
+<?php if ( !$vue->contenu ) { ?>
 			selectorName: 'selecteur-massif',
+<?php } ?>
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -96,6 +128,8 @@ const baseLayers = {
 			}),
 		}),
 <?php } ?>
+		// Refuges.info
+		points,
 
 		// Overpass
 		layerOverpass({

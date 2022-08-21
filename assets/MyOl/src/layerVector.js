@@ -18,12 +18,13 @@
  * source.Vector options : format, strategy, attributions, ...
  */
 function layerVector(opt) {
-	const options = Object.assign({
+	const options = {
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			styleOptionsClusterFunction: styleOptionsCluster,
-		}, opt),
+			...opt,
+		}, //TODO spread operator
 
 		// Source & layer
 		source = new ol.source.Vector(Object.assign({
@@ -38,7 +39,7 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		safeSelectorName = options.selectorName ? options.selectorName.replaceAll(/[^a-z]/ig, '') : '',
+		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
 		values =
 		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
 		localStorage['myol_' + safeSelectorName] :
@@ -229,6 +230,7 @@ function layerVector(opt) {
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
 				zIndex: 30, // Hover : above the the features
+				//BEST adapt hover zIndex to the concerned layer
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},

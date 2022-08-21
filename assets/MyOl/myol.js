@@ -610,12 +610,13 @@ function controlLayerSwitcher(layers, opt) {
  * source.Vector options : format, strategy, attributions, ...
  */
 function layerVector(opt) {
-	const options = Object.assign({
+	const options = {
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
 			styleOptionsClusterFunction: styleOptionsCluster,
-		}, opt),
+			...opt,
+		},
 
 		// Source & layer
 		source = new ol.source.Vector(Object.assign({
@@ -630,7 +631,7 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'),
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
-		safeSelectorName = options.selectorName ? options.selectorName.replaceAll(/[^a-z]/ig, '') : '',
+		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
 		values =
 		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
 		localStorage['myol_' + safeSelectorName] :

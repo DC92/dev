@@ -766,10 +766,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   }
 }
 
-/* Spécificité carte des zones */
-.nav_zone {
-  width: 100% !important;
-}
 /* Carte formulaire de modification */
 #carte-edit {
   float: right;
