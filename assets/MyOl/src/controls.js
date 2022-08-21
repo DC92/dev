@@ -9,12 +9,13 @@
  * Don't set view when you declare the map
  */
 function controlPermalink(opt) {
-	const options = Object.assign({
+	const options = {
 			init: true, // {true | false} use url hash or localStorage to position the map.
 			setUrl: false, // {true | false} Change url hash when moving the map.
 			display: false, // {true | false} Display permalink link the map.
 			hash: '?', // {?, #} the permalink delimiter after the url
-		}, opt),
+			...opt
+		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
 			render: render,
@@ -209,10 +210,11 @@ function controlGeocoder() {
  */
 //BEST left aligned buttons when screen vertical
 function controlButton(opt) {
-	const options = Object.assign({
+	const options = {
 			element: document.createElement('div'),
 			className: 'myol-button',
-		}, opt),
+			...opt
+		},
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
@@ -479,12 +481,14 @@ function controlGPS() {
 //BEST export / import names and links
 //BEST Chemineur dans MyOl => Traduction sym (symbole export GPS ?)
 //BEST misc formats
-function controlLoadGPX(options) {
-	const control = controlButton(Object.assign({
+function controlLoadGPX(opt) {
+	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-		}, options)),
+			...opt
+		},
+		control = controlButton(options),
 		reader = new FileReader(),
 		format = new ol.format.GPX();
 
@@ -559,7 +563,7 @@ function controlLoadGPX(options) {
  * Requires controlButton
  */
 function controlDownload(opt) {
-	const options = Object.assign({
+	const options = {
 			label: '&#x1f4e5;',
 			className: 'myol-button myol-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
@@ -568,7 +572,8 @@ function controlDownload(opt) {
 				'<a ctrlOnClick="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
 				'<a ctrlOnClick="download" id="GeoJSON" mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers', //BEST name from feature
-		}, opt),
+			...opt
+		},
 		control = controlButton(options),
 		hiddenEl = document.createElement('a');
 

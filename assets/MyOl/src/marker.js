@@ -10,10 +10,11 @@
 function layerMarker(options) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
-		layer = new ol.layer.Vector(Object.assign({
-			source: new ol.source.Vector({
-				features: [new ol.Feature(point)],
-			}),
+		source = new ol.source.Vector({
+			features: [new ol.Feature(point)],
+		}),
+		layer = new ol.layer.Vector({
+			source: source,
 			zIndex: 1,
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
@@ -21,7 +22,8 @@ function layerMarker(options) {
 					src: options.src,
 				}),
 			}),
-		}, options));
+			...options
+		});
 
 	// Initialise specific projection
 	if (typeof proj4 == 'function') {

@@ -8,7 +8,7 @@
  * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
 function layerGeoBB(opt) {
-	return layerVectorCluster(Object.assign({
+	return layerVectorCluster({
 		argSelName: 'cat',
 		urlArgsFunction: function(options, bbox, selection) {
 			return {
@@ -18,7 +18,7 @@ function layerGeoBB(opt) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, feature, options) {
+		convertProperties: function(properties, f, options) {
 			return {
 				icon: properties.type ?
 					options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
@@ -27,40 +27,34 @@ function layerGeoBB(opt) {
 				attribution: options.attribution,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				// Points
-				styleOptionsIcon(properties.icon),
-				// Polygons with color
-				styleOptionsPolygon(properties.color, 0.5),
-				// Lines
-				{
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-						width: 2,
-					}),
-				}
-			);
+		styleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsIcon(properties.icon), // Points
+				...styleOptionsPolygon(properties.color, 0.5), // Polygons with color
+				stroke: new ol.style.Stroke({ // Lines
+					color: 'blue',
+					width: 2,
+				}),
+			};
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties), {
-					// Lines
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 3,
-					}),
-				}
-			);
+		hoverStyleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsFullLabel(properties), // Labels
+				stroke: new ol.style.Stroke({ // Lines
+					color: 'red',
+					width: 3,
+				}),
+			};
 		},
-	}, opt));
+		...opt
+	});
 }
 
 /**
  * Site refuges.info
  */
 function layerWri(opt) {
-	return layerVectorCluster(Object.assign({
+	return layerVectorCluster({
 		host: '//www.refuges.info/',
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		urlArgsFunction: function(options, bbox, selection) {
@@ -71,7 +65,7 @@ function layerWri(opt) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, feature, options) {
+		convertProperties: function(properties, f, options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
@@ -82,17 +76,18 @@ function layerWri(opt) {
 				attribution: options.attribution,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
+		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIcon(properties.icon);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, opt));
+		...opt
+	});
 }
 
 function layerWriAreas(opt) {
-	return layerVector(Object.assign({
+	return layerVector({
 		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
 		urlArgsFunction: function(options) {
@@ -108,26 +103,27 @@ function layerWriAreas(opt) {
 				url: properties.lien,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5)
-			);
+		styleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsLabel(properties.name, properties),
+				...styleOptionsPolygon(properties.color, 0.5),
+			};
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsLabel(properties.name, properties, true),
-				styleOptionsPolygon(properties.color, 1)
-			);
+		hoverStyleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsLabel(properties.name, properties, true),
+				...styleOptionsPolygon(properties.color, 1),
+			};
 		},
-	}, opt));
+		...opt
+	});
 }
 
 /**
  * Site pyrenees-refuges.com
  */
 function layerPyreneesRefuges(options) {
-	return layerVectorCluster(Object.assign({
+	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		convertProperties: function(properties) {
@@ -139,24 +135,25 @@ function layerPyreneesRefuges(options) {
 				attribution: '<a href="https://pyrenees-refuges.com">Pyrenees-Refuges</a>',
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
+		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type_hebergement);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, options));
+		...options
+	});
 }
 
 /**
  * Site camptocamp.org
  */
-function layerC2C(options) {
+function layerC2C(opt) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
 
-	format.readFeatures = function(json, opts) {
+	format.readFeatures = function(json, options) {
 		const features = [],
 			objects = JSONparse(json);
 
@@ -180,25 +177,26 @@ function layerC2C(options) {
 				type: 'FeatureCollection',
 				features: features,
 			},
-			format.getReadOptions(json, opts)
+			format.getReadOptions(json, options)
 		);
 	};
 
-	return layerVectorCluster(Object.assign({
-		urlArgsFunction: function(options, bbox, selection, extent) {
+	return layerVectorCluster({
+		urlArgsFunction: function(o, b, s, extent) {
 			return {
 				url: 'https://api.camptocamp.org/waypoints',
 				bbox: extent.join(','),
 			};
 		},
 		format: format,
-		styleOptionsFunction: function(feature, properties) {
+		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, options));
+		...opt
+	});
 }
 
 /**
@@ -206,9 +204,9 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-function layerOverpass(options) {
+function layerOverpass(opt) {
 	const format = new ol.format.OSMXML(),
-		layer = layerVectorCluster(Object.assign({
+		options = {
 			//host: 'overpass-api.de',
 			//host: 'lz4.overpass-api.de',
 			//host: 'overpass.openstreetmap.fr', // Out of order
@@ -219,13 +217,15 @@ function layerOverpass(options) {
 			maxResolution: 50,
 			format: format,
 			convertProperties: convertProperties,
-			styleOptionsFunction: function(feature, properties) {
+			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
-			hoverStyleOptionsFunction: function(feature, properties) {
+			hoverStyleOptionsFunction: function(f, properties) {
 				return styleOptionsFullLabel(properties);
 			},
-		}, options)),
+			...opt
+		},
+		layer = layerVectorCluster(options),
 		statusEl = document.getElementById(options.selectorName),
 		selectorEls = document.getElementsByName(options.selectorName);
 
@@ -236,7 +236,7 @@ function layerOverpass(options) {
 		if (selectorEls[e].value)
 			tags += selectorEls[e].value.replace('private', '');
 
-	function urlArgsFunction(options, bbox, selection) {
+	function urlArgsFunction(o, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 

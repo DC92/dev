@@ -164,34 +164,31 @@ function layerThunderforest(subLayer) {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-function layerIGN(options) {
-	options = Object.assign({
-		format: 'image/jpeg',
-		style: 'normal',
-	}, options);
+function layerIGN(opt) {
+	let IGNresolutions = [],
+		IGNmatrixIds = [];
 
-	if (options.key) { // Don't display if no key provided
-		let IGNresolutions = [],
-			IGNmatrixIds = [];
+	for (let i = 0; i < 18; i++) {
+		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+		IGNmatrixIds[i] = i.toString();
+	}
 
-		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
-			IGNmatrixIds[i] = i.toString();
-		}
-
+	if (opt.key) // Don't display if no key provided
 		return new ol.layer.Tile({
-			source: new ol.source.WMTS(Object.assign({
-				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
+			source: new ol.source.WMTS({
+				url: 'https://wxs.ign.fr/' + opt.key + '/wmts',
+				style: 'normal',
 				matrixSet: 'PM',
+				format: 'image/jpeg',
+				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
 				tileGrid: new ol.tilegrid.WMTS({
 					origin: [-20037508, 20037508],
 					resolutions: IGNresolutions,
 					matrixIds: IGNmatrixIds,
 				}),
-				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-			}, options)),
+				...opt
+			}),
 		});
-	}
 }
 
 /**
@@ -413,7 +410,8 @@ function layersCollection() {
 }
 
 function layersDemo() {
-	return Object.assign(layersCollection(), {
+	return {
+		...layersCollection(),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 
 		'ThF cycle': layerThunderforest('cycle'),
@@ -439,7 +437,7 @@ function layersDemo() {
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
 		'Blank': new ol.layer.Tile(),
-	});
+	};
 }
 
 /* FILE src/layerSwitcher.js */
@@ -448,9 +446,10 @@ function layersDemo() {
  * Need to include layerSwitcher.css
  */
 function controlLayerSwitcher(layers, opt) {
-	const options = Object.assign({
+	const options = {
 			additionalSelectorId: 'additional-selector',
-		}, opt),
+			...opt
+		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
@@ -611,27 +610,27 @@ function controlLayerSwitcher(layers, opt) {
  */
 function layerVector(opt) {
 	const options = {
-			zIndex: 10, // Features : above the base layer (zIndex = 1)
+			styleOptionsClusterFunction: styleOptionsCluster,
+			...opt
+		},
+		source = new ol.source.Vector({
+			url: url,
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			styleOptionsClusterFunction: styleOptionsCluster,
-			...opt,
-		},
-
-		// Source & layer
-		source = new ol.source.Vector(Object.assign({
-			url: url,
-		}, options)),
-
-		layer = new ol.layer.Vector(Object.assign({
+			...options
+		}),
+		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
-		}, options)),
+			zIndex: 10, // Features : above the base layer (zIndex = 1)
+			...options
+		}),
 
 		elLabel = document.createElement('span'),
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
 		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
+
 		values =
 		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
 		localStorage['myol_' + safeSelectorName] :
@@ -775,11 +774,10 @@ function layerVector(opt) {
 	function displayStyle(feature, styleOptionsFunction) {
 		if (typeof styleOptionsFunction == 'function') {
 			const styleOptions = styleOptionsFunction(
-				feature,
-				Object.assign(
-					feature.getProperties(),
-					feature.display
-				),
+				feature, {
+					...feature.getProperties(),
+					...feature.display,
+				},
 				options
 			);
 
@@ -861,10 +859,10 @@ function layerVector(opt) {
 
 			if (feature && !options.noClick) {
 				const features = feature.get('features') || [feature],
-					display = Object.assign({},
-						features[0].getProperties(), // Get first or alone feature
-						features[0].display
-					),
+					display = {
+						...features[0].getProperties(), // Get first or alone feature
+						...features[0].display,
+					},
 					geom = feature.getGeometry();
 
 				// Set the cursor if hover a clicable feature
@@ -918,12 +916,13 @@ function layerVectorCluster(options) {
 		}),
 
 		// Clusterized layer
-		clusterLayer = new ol.layer.Vector(Object.assign({
+		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: clusterStyle,
 			visible: layer.getVisible(),
 			zIndex: layer.getZIndex(),
-		}, options));
+			...options
+		});
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
@@ -1111,11 +1110,10 @@ function styleOptionsLabel(text, properties, important) {
 	};
 
 	// For points
-	if (!properties.area)
-		Object.assign(styleTextOptions, {
-			textBaseline: 'bottom',
-			offsetY: -14, // Above the icon
-		});
+	if (!properties.area){
+		styleTextOptions.	textBaseline= 'bottom';
+	styleTextOptions.		offsetY= -14; // Above the icon
+	}
 
 	return {
 		text: new ol.style.Text(styleTextOptions),
@@ -1173,7 +1171,7 @@ function styleOptionsCluster(feature, properties) {
  * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
 function layerGeoBB(opt) {
-	return layerVectorCluster(Object.assign({
+	return layerVectorCluster({
 		argSelName: 'cat',
 		urlArgsFunction: function(options, bbox, selection) {
 			return {
@@ -1183,7 +1181,7 @@ function layerGeoBB(opt) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, feature, options) {
+		convertProperties: function(properties, f, options) {
 			return {
 				icon: properties.type ?
 					options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
@@ -1192,40 +1190,34 @@ function layerGeoBB(opt) {
 				attribution: options.attribution,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				// Points
-				styleOptionsIcon(properties.icon),
-				// Polygons with color
-				styleOptionsPolygon(properties.color, 0.5),
-				// Lines
-				{
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-						width: 2,
-					}),
-				}
-			);
+		styleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsIcon(properties.icon), // Points
+				...styleOptionsPolygon(properties.color, 0.5), // Polygons with color
+				stroke: new ol.style.Stroke({ // Lines
+					color: 'blue',
+					width: 2,
+				}),
+			};
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsFullLabel(properties), {
-					// Lines
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 3,
-					}),
-				}
-			);
+		hoverStyleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsFullLabel(properties), // Labels
+				stroke: new ol.style.Stroke({ // Lines
+					color: 'red',
+					width: 3,
+				}),
+			};
 		},
-	}, opt));
+		...opt
+	});
 }
 
 /**
  * Site refuges.info
  */
 function layerWri(opt) {
-	return layerVectorCluster(Object.assign({
+	return layerVectorCluster({
 		host: '//www.refuges.info/',
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		urlArgsFunction: function(options, bbox, selection) {
@@ -1236,7 +1228,7 @@ function layerWri(opt) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, feature, options) {
+		convertProperties: function(properties, f, options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
@@ -1247,17 +1239,18 @@ function layerWri(opt) {
 				attribution: options.attribution,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
+		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIcon(properties.icon);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, opt));
+		...opt
+	});
 }
 
 function layerWriAreas(opt) {
-	return layerVector(Object.assign({
+	return layerVector({
 		host: '//www.refuges.info/',
 		polygon: 1, // Massifs
 		urlArgsFunction: function(options) {
@@ -1273,26 +1266,27 @@ function layerWriAreas(opt) {
 				url: properties.lien,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsLabel(properties.name, properties),
-				styleOptionsPolygon(properties.color, 0.5)
-			);
+		styleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsLabel(properties.name, properties),
+				...styleOptionsPolygon(properties.color, 0.5),
+			};
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsLabel(properties.name, properties, true),
-				styleOptionsPolygon(properties.color, 1)
-			);
+		hoverStyleOptionsFunction: function(f, properties) {
+			return {
+				...styleOptionsLabel(properties.name, properties, true),
+				...styleOptionsPolygon(properties.color, 1),
+			};
 		},
-	}, opt));
+		...opt
+	});
 }
 
 /**
  * Site pyrenees-refuges.com
  */
 function layerPyreneesRefuges(options) {
-	return layerVectorCluster(Object.assign({
+	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		strategy: ol.loadingstrategy.all,
 		convertProperties: function(properties) {
@@ -1304,24 +1298,25 @@ function layerPyreneesRefuges(options) {
 				attribution: '<a href="https://pyrenees-refuges.com">Pyrenees-Refuges</a>',
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
+		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type_hebergement);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, options));
+		...options
+	});
 }
 
 /**
  * Site camptocamp.org
  */
-function layerC2C(options) {
+function layerC2C(opt) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
 
-	format.readFeatures = function(json, opts) {
+	format.readFeatures = function(json, options) {
 		const features = [],
 			objects = JSONparse(json);
 
@@ -1345,25 +1340,26 @@ function layerC2C(options) {
 				type: 'FeatureCollection',
 				features: features,
 			},
-			format.getReadOptions(json, opts)
+			format.getReadOptions(json, options)
 		);
 	};
 
-	return layerVectorCluster(Object.assign({
-		urlArgsFunction: function(options, bbox, selection, extent) {
+	return layerVectorCluster({
+		urlArgsFunction: function(o, b, s, extent) {
 			return {
 				url: 'https://api.camptocamp.org/waypoints',
 				bbox: extent.join(','),
 			};
 		},
 		format: format,
-		styleOptionsFunction: function(feature, properties) {
+		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-	}, options));
+		...opt
+	});
 }
 
 /**
@@ -1371,9 +1367,9 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-function layerOverpass(options) {
+function layerOverpass(opt) {
 	const format = new ol.format.OSMXML(),
-		layer = layerVectorCluster(Object.assign({
+		options = {
 			//host: 'overpass-api.de',
 			//host: 'lz4.overpass-api.de',
 			//host: 'overpass.openstreetmap.fr', // Out of order
@@ -1384,13 +1380,15 @@ function layerOverpass(options) {
 			maxResolution: 50,
 			format: format,
 			convertProperties: convertProperties,
-			styleOptionsFunction: function(feature, properties) {
+			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
-			hoverStyleOptionsFunction: function(feature, properties) {
+			hoverStyleOptionsFunction: function(f, properties) {
 				return styleOptionsFullLabel(properties);
 			},
-		}, options)),
+			...opt
+		},
+		layer = layerVectorCluster(options),
 		statusEl = document.getElementById(options.selectorName),
 		selectorEls = document.getElementsByName(options.selectorName);
 
@@ -1401,7 +1399,7 @@ function layerOverpass(options) {
 		if (selectorEls[e].value)
 			tags += selectorEls[e].value.replace('private', '');
 
-	function urlArgsFunction(options, bbox, selection) {
+	function urlArgsFunction(o, bbox, selection) {
 		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 
@@ -1489,12 +1487,13 @@ function layerOverpass(options) {
  * Don't set view when you declare the map
  */
 function controlPermalink(opt) {
-	const options = Object.assign({
+	const options = {
 			init: true, // {true | false} use url hash or localStorage to position the map.
 			setUrl: false, // {true | false} Change url hash when moving the map.
 			display: false, // {true | false} Display permalink link the map.
 			hash: '?', // {?, #} the permalink delimiter after the url
-		}, opt),
+			...opt
+		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
 			render: render,
@@ -1686,10 +1685,11 @@ function controlGeocoder() {
  * Abstract definition to be used by other control buttons definitions
  */
 function controlButton(opt) {
-	const options = Object.assign({
+	const options = {
 			element: document.createElement('div'),
 			className: 'myol-button',
-		}, opt),
+			...opt
+		},
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
@@ -1952,12 +1952,14 @@ function controlGPS() {
  * GPX file loader control
  * Requires controlButton
  */
-function controlLoadGPX(options) {
-	const control = controlButton(Object.assign({
+function controlLoadGPX(opt) {
+	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-		}, options)),
+			...opt
+		},
+		control = controlButton(options),
 		reader = new FileReader(),
 		format = new ol.format.GPX();
 
@@ -2032,7 +2034,7 @@ function controlLoadGPX(options) {
  * Requires controlButton
  */
 function controlDownload(opt) {
-	const options = Object.assign({
+	const options = {
 			label: '&#x1f4e5;',
 			className: 'myol-button myol-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
@@ -2041,7 +2043,8 @@ function controlDownload(opt) {
 				'<a ctrlOnClick="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
 				'<a ctrlOnClick="download" id="GeoJSON" mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers',
-		}, opt),
+			...opt
+		},
 		control = controlButton(options),
 		hiddenEl = document.createElement('a');
 
@@ -2212,10 +2215,11 @@ function controlsCollection(options) {
 function layerMarker(options) {
 	const els = [],
 		point = new ol.geom.Point([0, 0]),
-		layer = new ol.layer.Vector(Object.assign({
-			source: new ol.source.Vector({
-				features: [new ol.Feature(point)],
-			}),
+		source = new ol.source.Vector({
+			features: [new ol.Feature(point)],
+		}),
+		layer = new ol.layer.Vector({
+			source: source,
 			zIndex: 1,
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
@@ -2223,7 +2227,8 @@ function layerMarker(options) {
 					src: options.src,
 				}),
 			}),
-		}, options));
+			...options
+		});
 
 	// Initialise specific projection
 	if (typeof proj4 == 'function') {
@@ -2393,7 +2398,7 @@ function layerMarker(options) {
  * Requires JSONparse, myol:onadd, controlButton (from src/controls.js)
  */
 function layerEditGeoJson(opt) {
-	const options = Object.assign({
+	const options = {
 			format: new ol.format.GeoJSON(),
 			projection: 'EPSG:3857',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
@@ -2448,7 +2453,8 @@ function layerEditGeoJson(opt) {
 					color: 'rgba(255,0,0,0.3)',
 				}),
 			},
-		}, opt),
+			...opt
+		},
 
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',

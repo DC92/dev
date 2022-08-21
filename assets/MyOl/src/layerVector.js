@@ -19,27 +19,27 @@
  */
 function layerVector(opt) {
 	const options = {
-			zIndex: 10, // Features : above the base layer (zIndex = 1)
+			styleOptionsClusterFunction: styleOptionsCluster,
+			...opt
+		},
+		source = new ol.source.Vector({
+			url: url,
 			format: new ol.format.GeoJSON(),
 			strategy: ol.loadingstrategy.bbox,
-			styleOptionsClusterFunction: styleOptionsCluster,
-			...opt,
-		}, //TODO spread operator
-
-		// Source & layer
-		source = new ol.source.Vector(Object.assign({
-			url: url,
-		}, options)),
-
-		layer = new ol.layer.Vector(Object.assign({
+			...options
+		}),
+		layer = new ol.layer.Vector({
 			source: source,
 			style: style,
-		}, options)),
+			zIndex: 10, // Features : above the base layer (zIndex = 1)
+			...options
+		}),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		inputEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
 		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
+
 		values =
 		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
 		localStorage['myol_' + safeSelectorName] :
@@ -185,11 +185,10 @@ function layerVector(opt) {
 	function displayStyle(feature, styleOptionsFunction) {
 		if (typeof styleOptionsFunction == 'function') {
 			const styleOptions = styleOptionsFunction(
-				feature,
-				Object.assign(
-					feature.getProperties(),
-					feature.display
-				),
+				feature, {
+					...feature.getProperties(),
+					...feature.display,
+				},
 				options
 			);
 
@@ -275,10 +274,10 @@ function layerVector(opt) {
 
 			if (feature && !options.noClick) {
 				const features = feature.get('features') || [feature],
-					display = Object.assign({},
-						features[0].getProperties(), // Get first or alone feature
-						features[0].display
-					),
+					display = {
+						...features[0].getProperties(), // Get first or alone feature
+						...features[0].display,
+					},
 					geom = feature.getGeometry();
 
 				// Set the cursor if hover a clicable feature
@@ -332,12 +331,13 @@ function layerVectorCluster(options) {
 		}),
 
 		// Clusterized layer
-		clusterLayer = new ol.layer.Vector(Object.assign({
+		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: clusterStyle,
 			visible: layer.getVisible(),
 			zIndex: layer.getZIndex(),
-		}, options));
+			...options
+		});
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
@@ -525,11 +525,10 @@ function styleOptionsLabel(text, properties, important) {
 	};
 
 	// For points
-	if (!properties.area)
-		Object.assign(styleTextOptions, {
-			textBaseline: 'bottom',
-			offsetY: -14, // Above the icon
-		});
+	if (!properties.area){
+		styleTextOptions.	textBaseline= 'bottom';
+	styleTextOptions.		offsetY= -14; // Above the icon
+	}
 
 	return {
 		text: new ol.style.Text(styleTextOptions),

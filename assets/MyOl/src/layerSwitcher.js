@@ -4,9 +4,10 @@
  */
 //BEST alt key to switch layers / transparency
 function controlLayerSwitcher(layers, opt) {
-	const options = Object.assign({
+	const options = {
 			additionalSelectorId: 'additional-selector', //BEST no default / no options
-		}, opt),
+			...opt
+		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),

@@ -93,10 +93,10 @@ map.addLayer(layerWriAreas({
 		distanceMinCluster: 30,
 		// Ajout de l'étiquette
 		styleOptionsFunction: function(feature, properties) {
-			return Object.assign({},
-				styleOptionsLabel(properties.name, properties, true),
-				styleOptionsIcon(properties.icon)
-			);
+			return {
+				...styleOptionsLabel(properties.name, properties, true),
+				...styleOptionsIcon(properties.icon),
+			};
 		},
 	}),
 

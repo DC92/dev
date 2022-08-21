@@ -68,34 +68,31 @@ function layerThunderforest(subLayer) {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-function layerIGN(options) {
-	options = Object.assign({
-		format: 'image/jpeg',
-		style: 'normal',
-	}, options);
+function layerIGN(opt) {
+	let IGNresolutions = [],
+		IGNmatrixIds = [];
 
-	if (options.key) { // Don't display if no key provided
-		let IGNresolutions = [],
-			IGNmatrixIds = [];
+	for (let i = 0; i < 18; i++) {
+		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+		IGNmatrixIds[i] = i.toString();
+	}
 
-		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
-			IGNmatrixIds[i] = i.toString();
-		}
-
+	if (opt.key) // Don't display if no key provided
 		return new ol.layer.Tile({
-			source: new ol.source.WMTS(Object.assign({
-				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
+			source: new ol.source.WMTS({
+				url: 'https://wxs.ign.fr/' + opt.key + '/wmts',
+				style: 'normal',
 				matrixSet: 'PM',
+				format: 'image/jpeg',
+				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
 				tileGrid: new ol.tilegrid.WMTS({
 					origin: [-20037508, 20037508],
 					resolutions: IGNresolutions,
 					matrixIds: IGNmatrixIds,
 				}),
-				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-			}, options)),
+				...opt
+			}),
 		});
-	}
 }
 
 /**
@@ -319,7 +316,8 @@ function layersCollection() {
 }
 
 function layersDemo() {
-	return Object.assign(layersCollection(), {
+	return {
+		...layersCollection(),
 		'OSM': layerOSM('//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
 
 		'ThF cycle': layerThunderforest('cycle'),
@@ -345,5 +343,5 @@ function layersDemo() {
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
 		'Blank': new ol.layer.Tile(),
-	});
+	};
 }

@@ -4,7 +4,7 @@
  * Requires JSONparse, myol:onadd, controlButton (from src/controls.js)
  */
 function layerEditGeoJson(opt) {
-	const options = Object.assign({
+	const options = {
 			format: new ol.format.GeoJSON(),
 			projection: 'EPSG:3857',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
@@ -59,7 +59,8 @@ function layerEditGeoJson(opt) {
 					color: 'rgba(255,0,0,0.3)',
 				}),
 			},
-		}, opt),
+			...opt
+		},
 
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
