@@ -92,7 +92,8 @@ Based on https://openlayers.org
 	<?php } ?>
 
 	<div id="gps-help">
-		<p>Pour utiliser les cartes et le GPS hors réseau:</p>
+		<p>Pour utiliser les cartes et le GPS hors réseau, vous pouvez installer ce logiciel
+		et mettre des parties de cartes en cache.</p>
 		<hr /><p><u>Avant le départ:</u></p>
 		<p>- Explorateur -> options -> ajoutez à l'écran d'accueil (ou: installer)</p>
 		<p>Pour mémoriser un fond de carte:</p>

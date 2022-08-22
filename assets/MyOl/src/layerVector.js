@@ -229,7 +229,7 @@ function layerVector(opt) {
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
 				zIndex: 30, // Hover : above the the features
-				//BEST adapt hover zIndex to the concerned layer
+				//BEST adapt hover zIndex to the concerned layer => layer.setZIndex()
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},

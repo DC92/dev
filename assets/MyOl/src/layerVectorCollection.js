@@ -77,7 +77,6 @@ function layersGeoBB(opt) {
 function layerWri(opt) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
-		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		urlArgsFunction: function(options, bbox, selection) {
 			return {
 				url: options.host + (options.massif ? 'api/massif' : 'api/bbox'),
@@ -104,6 +103,7 @@ function layerWri(opt) {
 		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
+		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		...opt
 	});
 }

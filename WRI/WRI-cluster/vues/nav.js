@@ -37,87 +37,30 @@ const baseLayers = {
 		new ol.control.ScaleLine(),
 		controlPermalink({ // Permet de garder le même réglage de carte
 			display: true,
-<?php if ($vue->polygone->id_polygone) { ?>
-			init: false, // Ici, on cadrera plutôt sur le massif
-<?php } ?>
+			init: <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif
 		}),
 		new ol.control.Attribution({
 			collapsed: false,
 		}),
 	],
 	wriInput = document.getElementById('selecteur-wri'),
-	massifInput = document.getElementById('selecteur-massif')
+	massifInput = document.getElementById('selecteur-massif'),
 	massifsInput = document.getElementById('selecteur-massifs'),
 
-
-
-/*
-// Refuges.info
-map.addLayer(layerWri({
-	host: '//dom.refuges.info/', //TODO revenir de dom à www
-	selectorName: 'wri-features',
-	maxResolution: 500,
-	distanceMinCluster: 30,
-}));
-map.addLayer(layerWri({
-	host: '//dom.refuges.info/', //TODO revenir de dom à www
-	selectorName: 'wri-features',
-	cluster: true,
-	minResolution: 500,
-	distanceMinCluster: 30,
-}));
-map.addLayer(layerWriAreas({
-	host: '//dom.refuges.info/', //TODO revenir de dom à www
-	selectorName: 'wri-massifs',
-}));
-*/
-
-
-
-	points = layerWri({
-		host: '<?=$config_wri["sous_dossier_installation"]?>',
-		attribution: null,
-		//selectorName: 'selecteur-wri',
-		selectorName: 'selecteur-massif',
-		//zIndex: 1000, // Points au dessus des massifs
-//TODO		massif:4,
-		WurlFunction: function(options, bbox, selection) {
-			if (massifInput && massifInput.checked)
-				return options.host + 'api/massif' +
-					'?massif=<?=$vue->polygone->id_polygone?>&'+
-					'type_points=' + selection.join(',');
-			else
-				return options.host + 'api/bbox' +
-					'?type_points=' + selection.join(',') +
-					'&bbox=' + bbox.join(',');
-		},
-		distanceMinCluster: 30,
-		styleOptionsFunction: styleOptionsEtiquette,
-	}),
-
-
-
-
-
-
-
-
-	layers = [
-		// Les massifs
-		layerWriAreas({
+	layersPointsMassif = [
+		// Les points d'un massif
+		layerWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-<?php if ( !$vue->contenu ) { ?>
-			selectorName: 'reverse-wri',
-<?php } ?>
+			selectorName: 'selecteur-wri',
+			massif: <?=$vue->polygone->id_polygone?>,
+			nb_points: 'all',
+			distanceMinCluster: 30,
+			styleOptionsFunction: styleOptionsEtiquette,
+			attribution: null,
 		}),
-
-<?php if ($vue->polygone->id_polygone) { ?>
 		// Contour d'un massif ou d'une zone
 		layerVector({
 			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
-			<?php if ( !$vue->contenu ) { ?>
-				selectorName: 'selecteur-massif',
-			<?php } ?>
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -125,21 +68,24 @@ map.addLayer(layerWriAreas({
 				}),
 			}),
 		}),
+	],
 
-		// Les points d'un massif
-		layerWri({
-			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectorName: 'selecteur-massif',
-			massif:<?=$vue->polygone->id_polygone?>,
-			nb_points: 'all',
-			distanceMinCluster: 30,
-			styleOptionsFunction: styleOptionsEtiquette,
-			attribution: null,
-		}),
-<?php } ?>
+	// Points WRI avec bbox et cluster
+	layersPointsWri = layersWri({
+		host: '<?=$config_wri["sous_dossier_installation"]?>',
+		selectorName: 'selecteur-wri',
+	}),
 
+	layers = [
 		// Refuges.info
-	//	points,
+		...layersPointsMassif,
+		...layersPointsWri,
+
+		// Les massifs
+		layerWriAreas({
+			host: '<?=$config_wri["sous_dossier_installation"]?>',
+			selectorName: 'selecteur-massifs',
+		}),
 
 		// Overpass
 		layerOverpass({
@@ -161,19 +107,9 @@ map.addLayer(layerWriAreas({
 		}),
 
 		// Chemineur
-		layerGeoBB({
+		...layersGeoBB({
 			host: '//chemineur.fr/',
 			selectorName: 'selecteur-chemineur',
-			maxResolution: 100,
-			distanceMinCluster: 30,
-			attribution: 'Chemineur',
-		}),
-		layerGeoBB({
-			host: '//chemineur.fr/',
-			selectorName: 'selecteur-chemineur',
-			subLayer: 'cluster',
-			minResolution: 100,
-			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 		}),
 
@@ -197,18 +133,44 @@ map.addLayer(layerWriAreas({
 		layers: layers,
 	});
 
+if (massifsInput) {
+	massifsInput.checked = <?=$vue->contenu?'true':'false'?>;
+  selectionMassif(true);
+	massifsInput.dispatchEvent(new Event('click'));
+}
+
 // Initialiser l'affichage des points et des massifs suivant le type de carte (zone ou massif)
 if (wriInput) {
 	wriInput.checked = true;
-	wriInput.dispatchEvent(new Event('click'));
+	wriInput.dispatchEvent(new Event('click')); // Resynchronise le détail des types de points
 }
 if (massifInput) {
 	massifInput.checked = true;
-	massifInput.dispatchEvent(new Event('click'));
+	//massifInput.dispatchEvent(new Event('click'));
 }
+
+function selectionMassif(check) {
+	layersPointsMassif.forEach(l => l.setVisible(check));
+	layersPointsWri.forEach(l => l.setVisible(!check));
+}
+
+function styleOptionsEtiquette(feature, properties) {
+	return {
+		...styleOptionsLabel(properties.name, properties, true),
+		...styleOptionsIcon(properties.icon),
+	};
+}
+
+/*DCMM*/{var _r=' ',_v='<?=$vue->contenu?'true':'false'?>';if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+
+if(0)
 if (massifsInput) {
-	massifsInput.checked = <?=$vue->contenu?'true':'false'?>;
+<?php if ($vue->contenu) { ?>
+	massifsInput.checked = true;
+	selectionMassif(true);
 	massifsInput.dispatchEvent(new Event('click'));
+<?php } else { ?>
+<?php } ?>
 }
 
 // Centrer sur la zone du polygone
@@ -221,9 +183,3 @@ if (massifsInput) {
 	], 'EPSG:4326', 'EPSG:3857'));
 <? } ?>
 
-function styleOptionsEtiquette(feature, properties) {
-	return {
-		...styleOptionsLabel(properties.name, properties, true),
-		...styleOptionsIcon(properties.icon),
-	};
-}

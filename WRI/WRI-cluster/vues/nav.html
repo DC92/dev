@@ -22,7 +22,7 @@
 					<li>
 						<input type="checkbox"
 							id="selecteur-massif" name="selecteur-massif"
-							onchange="points.getSource().getSource().refresh()"
+							onchange="selectionMassif(this.checked)"
 							checked="checked" />
 						<label for="selecteur-massif"><?=$vue->polygone->nom_polygone?> uniquement</label>
 					</li><hr/>
@@ -52,12 +52,12 @@
 				<?php } ?>
 			</ul>
 			<hr />
-			<input type="checkbox" id="selecteur-massifs" name="selecteur-massifs" />
-			<label for="selecteur-massifs">Massifs</label>
-			<span id="selecteur-massifs-status"></span>
+				<input type="checkbox" id="selecteur-massifs" name="selecteur-massifs" />
+				<label for="selecteur-massifs">Massifs</label>
+				<span id="selecteur-massifs-status"></span>
 			<hr />
-			<ul>Ctrl+click: nouvel onglet</ul>
-			<ul>Maj+click: nouvelle fenêtre</ul>
+				<ul>Ctrl+click: nouvel onglet</ul>
+				<ul>Maj+click: nouvelle fenêtre</ul>
 		</fieldset>
 
 		<?php if ( $vue->polygone->id_polygone ) { ?>

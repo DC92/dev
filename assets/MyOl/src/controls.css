@@ -48,6 +48,9 @@
 	top: 29px;
 	padding: 3px;
 	background: white;
+	font-size: 16px;
+}
+.myol-display-submenu p {
 	font-size: 14px;
 }
 .myol-display-submenu > div * {

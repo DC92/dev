@@ -1240,7 +1240,6 @@ function layersGeoBB(opt) {
 function layerWri(opt) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
-		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		urlArgsFunction: function(options, bbox, selection) {
 			return {
 				url: options.host + (options.massif ? 'api/massif' : 'api/bbox'),
@@ -1267,6 +1266,7 @@ function layerWri(opt) {
 		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
+		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		...opt
 	});
 }
@@ -1794,9 +1794,9 @@ function controlGPS() {
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-source0">Inactif</label><br />' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-source1">Position GPS (1)</label><br />' +
+		'<label for="myol-gps-source1">Position GPS (1) Extérieur</label><br />' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-source2">Position GPS ou IP (2)</label><hr />' +
+		'<label for="myol-gps-source2">Position GPS ou IP (2) Intérieur</label><hr />' +
 
 		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-display0">Carte libre</label><br />' +
