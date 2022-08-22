@@ -20,9 +20,10 @@
 			<ul>
 				<?php if ( $vue->polygone->id_polygone ) { ?>
 					<li>
-						<input id="selecteur-massif" name="selecteur-massif"
+						<input type="checkbox"
+							id="selecteur-massif" name="selecteur-massif"
 							onchange="points.getSource().getSource().refresh()"
-							type="checkbox" checked="checked" />
+							checked="checked" />
 						<label for="selecteur-massif"><?=$vue->polygone->nom_polygone?> uniquement</label>
 					</li><hr/>
 				<?php } ?>
@@ -33,9 +34,8 @@
 				</li>
 				<?php foreach ($vue->types_point_affichables AS $type_affichable) { ?>
 					<li>
-						<input
+						<input type="checkbox"
 							id="selecteur-wri-<?=$type_affichable->id_point_type?>"
-							type="checkbox"
 							name="selecteur-wri"
 							value="<?=$type_affichable->id_point_type?>"
 							checked="checked"

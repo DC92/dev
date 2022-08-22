@@ -77,7 +77,8 @@ map.addLayer(layerWriAreas({
 	points = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
 		attribution: null,
-		selectorName: 'selecteur-wri',
+		//selectorName: 'selecteur-wri',
+		selectorName: 'selecteur-massif',
 		//zIndex: 1000, // Points au dessus des massifs
 //TODO		massif:4,
 		WurlFunction: function(options, bbox, selection) {
@@ -91,14 +92,11 @@ map.addLayer(layerWriAreas({
 					'&bbox=' + bbox.join(',');
 		},
 		distanceMinCluster: 30,
-		// Ajout de l'étiquette
-		styleOptionsFunction: function(feature, properties) {
-			return {
-				...styleOptionsLabel(properties.name, properties, true),
-				...styleOptionsIcon(properties.icon),
-			};
-		},
+		styleOptionsFunction: styleOptionsEtiquette,
 	}),
+
+
+
 
 
 
@@ -109,17 +107,17 @@ map.addLayer(layerWriAreas({
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 <?php if ( !$vue->contenu ) { ?>
-			selectorName: 'selecteur-massifs',
+			selectorName: 'reverse-wri',
 <?php } ?>
 		}),
-		// Contour d'un massif ou d'une zone
+
 <?php if ($vue->polygone->id_polygone) { ?>
+		// Contour d'un massif ou d'une zone
 		layerVector({
-			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones' +
-				'?massif=<?=$vue->polygone->id_polygone?>',
-<?php if ( !$vue->contenu ) { ?>
-			selectorName: 'selecteur-massif',
-<?php } ?>
+			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+			<?php if ( !$vue->contenu ) { ?>
+				selectorName: 'selecteur-massif',
+			<?php } ?>
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -127,9 +125,21 @@ map.addLayer(layerWriAreas({
 				}),
 			}),
 		}),
+
+		// Les points d'un massif
+		layerWri({
+			host: '<?=$config_wri["sous_dossier_installation"]?>',
+			selectorName: 'selecteur-massif',
+			massif:<?=$vue->polygone->id_polygone?>,
+			nb_points: 'all',
+			distanceMinCluster: 30,
+			styleOptionsFunction: styleOptionsEtiquette,
+			attribution: null,
+		}),
 <?php } ?>
+
 		// Refuges.info
-		points,
+	//	points,
 
 		// Overpass
 		layerOverpass({
@@ -210,3 +220,10 @@ if (massifsInput) {
 		<?=$vue->polygone->nord?>,
 	], 'EPSG:4326', 'EPSG:3857'));
 <? } ?>
+
+function styleOptionsEtiquette(feature, properties) {
+	return {
+		...styleOptionsLabel(properties.name, properties, true),
+		...styleOptionsIcon(properties.icon),
+	};
+}

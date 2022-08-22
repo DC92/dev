@@ -49,6 +49,27 @@ function layerGeoBB(opt) {
 		...opt
 	});
 }
+// Combined server clusterised (high resolutions) + not clusterised (low resolutions)
+// Use with spread operator ...layersGeoBB(options)
+function layersGeoBB(opt) {
+	const options = {
+		switchResolution: 100,
+		distanceMinCluster: 30,
+		...opt
+	};
+
+	return [
+		layerGeoBB({
+			maxResolution: options.switchResolution,
+			...options
+		}),
+		layerGeoBB({
+			subLayer: 'cluster',
+			minResolution: options.switchResolution,
+			...options
+		}),
+	];
+}
 
 /**
  * Site refuges.info
@@ -59,7 +80,8 @@ function layerWri(opt) {
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		urlArgsFunction: function(options, bbox, selection) {
 			return {
-				url: options.host + 'api/bbox',
+				url: options.host + (options.massif ? 'api/massif' : 'api/bbox'),
+				massif: options.massif,
 				type_points: selection.join(','),
 				cluster: options.cluster,
 				bbox: bbox.join(','),
@@ -84,6 +106,28 @@ function layerWri(opt) {
 		},
 		...opt
 	});
+}
+
+// Combined server clusterised (high resolutions) + not clusterised (low resolutions)
+// Use with spread operator ...layersWri(options)
+function layersWri(opt) {
+	const options = {
+		switchResolution: 500,
+		distanceMinCluster: 30,
+		...opt
+	};
+
+	return [
+		layerWri({
+			maxResolution: options.switchResolution,
+			...options
+		}),
+		layerWri({
+			cluster: true,
+			minResolution: options.switchResolution,
+			...options
+		}),
+	];
 }
 
 function layerWriAreas(opt) {
