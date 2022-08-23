@@ -5,7 +5,7 @@
 
 /**
  * Site chemineur.fr, alpages.info
- * subLayer: verbose (full data) | cluster (grouped points) | '' (simplified)
+ * layer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
 function layerGeoBB(opt) {
 	return layerVectorCluster({
@@ -14,6 +14,7 @@ function layerGeoBB(opt) {
 			return {
 				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
 				limit: 10000,
+				layer: options.layer,
 				[options.argSelName]: selection.join(','),
 				bbox: bbox.join(','),
 			};
@@ -64,7 +65,7 @@ function layersGeoBB(opt) {
 			...options
 		}),
 		layerGeoBB({
-			subLayer: 'cluster',
+			layer: 'cluster',
 			minResolution: options.switchResolution,
 			...options
 		}),

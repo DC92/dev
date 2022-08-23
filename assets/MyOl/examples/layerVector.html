@@ -76,20 +76,20 @@ Based on https://openlayers.org
 	</div>
 
 	<div class="selector">
-		<label for="geobb-features">Chemineur</label>
-		<input type="checkbox" name="geobb-features" id="geobb-features" />
+		<label for="chem-features">Chemineur</label>
+		<input type="checkbox" name="chem-features" id="chem-features" />
 		<ul>
-			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
-			<li><input type="checkbox" name="geobb-features" value="8" />Abri</li>
-			<li><input type="checkbox" name="geobb-features" value="20" />Alimentation</li>
-			<li><input type="checkbox" name="geobb-features" value="23" />Montagne</li>
-			<li><input type="checkbox" name="geobb-features" value="30" />Ferroviaire</li>
-			<li><input type="checkbox" name="geobb-features" value="40" />Transport</li>
-			<li><input type="checkbox" name="geobb-features" value="44" />Tourisme</li>
-			<li><input type="checkbox" name="geobb-features" value="58" />Naval</li>
-			<li><input type="checkbox" name="geobb-features" value="64" />Trace</li>
+			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="chem-features" value="20" />Alimentation</li>
+			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
+			<li><input type="checkbox" name="chem-features" value="30" />Ferroviaire</li>
+			<li><input type="checkbox" name="chem-features" value="40" />Transport</li>
+			<li><input type="checkbox" name="chem-features" value="44" />Tourisme</li>
+			<li><input type="checkbox" name="chem-features" value="58" />Naval</li>
+			<li><input type="checkbox" name="chem-features" value="64" />Trace</li>
 		</ul>
-		<p id="geobb-features-status"></p>
+		<p id="chem-features-status"></p>
 	</div>
 
 	<div class="selector">
@@ -160,7 +160,7 @@ const map = new ol.Map({
 		}),
 		...layersGeoBB({
 			host: '//chemineur.fr/',
-			selectorName: 'geobb-features',
+			selectorName: 'chem-features',
 			attribution: 'Chemineur',
 		}),
 		layerGeoBB({

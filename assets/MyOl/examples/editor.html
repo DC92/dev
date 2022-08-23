@@ -88,21 +88,21 @@ Based on https://openlayers.org
 			"type": "Feature",
 			"geometry": {
 				"type": "LineString",
-				"coordinates": [[-7.5,48],[-5.5,47.2],[-3.5,48]]
+				"coordinates": [[2.5,48],[4.5,47.2],[6.5,48]]
 			}
 		},{
 			"type": "Feature",
 			"geometry": {
 				"type": "LineString",
-				"coordinates": [[-4.5,47.2],[-2,44.5]]
+				"coordinates": [[5.5,47.2],[8,44.5]]
 			}
 		}, {
 			"type": "Feature",
 			"geometry": {
 				"type": "Polygon",
 				"coordinates": [
-					[[-5.5,47.2],[-3,44.5],[-8,44.5],[-5.5,47.2]],
-					[[-5.5,44.7],[-6.5,45.8],[-4.5,45.8],[-5.5,44.7]]
+					[[4.5,47.2],[7,44.5],[2,44.5],[4.5,47.2]],
+					[[4.5,44.7],[3.5,45.8],[5.5,45.8],[4.5,44.7]]
 				]
 			}
 		}]
@@ -111,7 +111,7 @@ Based on https://openlayers.org
 	<script>
 const snaplayer = new ol.layer.Vector({
 		source: new ol.source.Vector({
-			url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
 			format: new ol.format.GeoJSON(),
 		}),
 		style: new ol.style.Style({
@@ -133,7 +133,7 @@ const snaplayer = new ol.layer.Vector({
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: [-500000, 5800000],
+		center: [600000, 5800000],
 		zoom: 6,
 	}),
 	controls: [

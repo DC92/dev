@@ -53,11 +53,11 @@ Based on https://openlayers.org
 
 	<div id="additional-selector" >
 		<hr />
-		chemineur.fr <input type="checkbox" name="geobb-features" checked="checked" />
+		chemineur.fr <input type="checkbox" name="chem-features" checked="checked" />
 		<ul>
-			<li><input type="checkbox" name="geobb-features" value="3" />Refuge</li>
-			<li><input type="checkbox" name="geobb-features" value="8" />Abri</li>
-			<li><input type="checkbox" name="geobb-features" value="23" />Montagne</li>
+			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
 		</ul>
 	</div>
 
@@ -79,21 +79,11 @@ new ol.Map({
 	target: 'map',
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
-		// Low map resolution : points
-		layerGeoBB({
+		...layersGeoBB({
 			host: '//chemineur.fr/',
-			selectorName: 'geobb-features',
-			maxResolution: 100,
+			selectorName: 'chem-features',
 			distanceMinCluster: 30,
 			attribution: 'Chemineur',
-		}),
-		// High map resolution : clusters
-		layerGeoBB({
-			host: '//chemineur.fr/',
-			subLayer: 'cluster',
-			selectorName: 'geobb-features',
-			minResolution: 100,
-			distanceMinCluster: 30,
 		}),
 	],
 });

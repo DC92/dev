@@ -11,14 +11,14 @@ var map = new ol.Map({
 		})
 		.concat(controlLayerSwitcher()),
 
-	layers: [
+	layers: [ //TODO refurbish with layersGeoBB
 		// Low map resolution : points
 		layerGeoBB({
 			host: '', // Relative address
 			selectorName: 'geobb-features',
 			maxResolution: 100,
 			distanceMinCluster: 30,
-			attribution: 'Chemineur',
+			attribution: 'Chemineur', //TODO BUG marquage spécifique !
 			noLabel: scriptName == 'posting',
 			noClick: scriptName == 'posting',
 			hoverStyleOptionsFunction: function(feature, properties) {
@@ -30,7 +30,7 @@ var map = new ol.Map({
 		// High map resolution : clusters
 		layerGeoBB({
 			host: '', // Relative address
-			subLayer: 'cluster',
+			layer: 'cluster',
 			selectorName: 'geobb-features',
 			minResolution: 100,
 			distanceMinCluster: 30,

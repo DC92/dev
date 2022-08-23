@@ -52,18 +52,8 @@ new ol.Map({
 	}),
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
-		layerGeoBB({
+		...layersGeoBB({
 			host: '//chemineur.fr/',
-			selectorName: 'geobb-features',
-			maxResolution: 300,
-			distanceMinCluster: 30,
-		}),
-		layerGeoBB({
-			host: '//chemineur.fr/',
-			selectorName: 'geobb-features',
-			subLayer: 'cluster',
-			minResolution: 300,
-			distanceMinCluster: 30,
 		}),
 		layerMarker({
 			src: 'examples/images/viseur.png',
