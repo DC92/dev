@@ -36,7 +36,7 @@ function layerVector(opt) {
 		}),
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
-		inputEls = document.getElementsByName(options.selectorName),
+		selectorEls = document.getElementsByName(options.selectorName),
 		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
 		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
 
@@ -93,17 +93,17 @@ function layerVector(opt) {
 	// Manage checkbox inputs having the same name
 	// Mem / recover the checkboxes in localStorage, url args or hash
 	// Manages a global flip-flop of the same named <input> checkboxes
-	for (let e = 0; e < inputEls.length; e++) { //HACK for doesn't work on element array
+	for (let e = 0; e < selectorEls.length; e++) { //HACK for doesn't work on element array
 		// Set inputs following localStorage & args
-		inputEls[e].checked =
-			values.indexOf(inputEls[e].value) != -1 || // That one is declared
+		selectorEls[e].checked =
+			values.indexOf(selectorEls[e].value) != -1 || // That one is declared
 			values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
 
 		// Compute the all check && init the localStorage if data has been given by the url
-		checkEl(inputEls[e]);
+		checkEl(selectorEls[e]);
 
 		// Attach the action
-		inputEls[e].addEventListener('click', onClick);
+		selectorEls[e].addEventListener('click', onClick);
 	}
 
 	function onClick(evt) {
@@ -115,13 +115,13 @@ function layerVector(opt) {
 		if (safeSelectorName)
 			localStorage['myol_' + safeSelectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
 
-		select(selection);
+		refreshDisplay(selection);
 	}
 
 	if (options.selectorName)
-		select(readCheckbox(options.selectorName));
+		refreshDisplay(readCheckbox(options.selectorName));
 
-	function select(selection) {
+	function refreshDisplay(selection) {
 		const visible = typeof selection == 'object' ? selection.length : selection === true;
 
 		layer.setVisible(visible);
@@ -134,18 +134,18 @@ function layerVector(opt) {
 		let allIndex = -1, // Index of the "all" <input> if any
 			allCheck = true; // Are all others checked ?
 
-		for (let e = 0; e < inputEls.length; e++) {
+		for (let e = 0; e < selectorEls.length; e++) {
 			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
-				inputEls[e].checked = target.checked; // Force all the others to the same
-			else if (inputEls[e].value == 'on') // The "all" <input>
+				selectorEls[e].checked = target.checked; // Force all the others to the same
+			else if (selectorEls[e].value == 'on') // The "all" <input>
 				allIndex = e;
-			else if (!inputEls[e].checked)
+			else if (!selectorEls[e].checked)
 				allCheck = false; // Uncheck the "all" <input> if one other is unchecked
 		}
 
 		// Check the "all" <input> if all others are
-		if (inputEls[allIndex])
-			inputEls[allIndex].checked = allCheck;
+		if (selectorEls[allIndex])
+			selectorEls[allIndex].checked = allCheck;
 	}
 
 	// Callback function to define feature display from the properties received from the server
@@ -406,18 +406,18 @@ function layerVectorCluster(options) {
  * Return an array of the selected inputs
  */
 function readCheckbox(selectorName, withOn) {
-	const inputEls = document.getElementsByName(selectorName),
+	const selectorEls = document.getElementsByName(selectorName),
 		selection = [];
 
 	// Specific case of a single on/off <input>
-	if (inputEls.length == 1)
-		return inputEls[0].checked ? [inputEls[0].value] : [];
+	if (selectorEls.length == 1)
+		return selectorEls[0].checked ? [selectorEls[0].value] : [];
 
 	// Read each <input> checkbox
-	for (let e = 0; e < inputEls.length; e++)
-		if (inputEls[e].checked &&
-			(inputEls[e].value != 'on' || withOn)) // Avoid the first check in a list
-			selection.push(inputEls[e].value);
+	for (let e = 0; e < selectorEls.length; e++)
+		if (selectorEls[e].checked &&
+			(selectorEls[e].value != 'on' || withOn)) // Avoid the first check in a list
+			selection.push(selectorEls[e].value);
 
 	return selection;
 }
