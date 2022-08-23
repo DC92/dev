@@ -60,7 +60,8 @@
 	background: white;
 	font-size: 16px;
 }
-.myol-display-submenu p {
+.myol-display-submenu p,
+.myol-display-submenu span {
 	font-size: 14px;
 }
 .myol-display-submenu > div * {
