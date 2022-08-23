@@ -8,7 +8,8 @@
  *
  * Options:
  * selectorName : <input name="SELECTORNAME"> url arguments selector
- * selectorName : <TAG id="SELECTORNAME-status"></TAG> display loading status
+ * statusName : <TAG id="LAYER_STATUS_NAME"></TAG> display loading status |
+   <TAG id="SELECTOR_NAME-status"></TAG>
  * urlArgsFunction: function(options, bbox, selection, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX
@@ -20,6 +21,7 @@
 function layerVector(opt) {
 	const options = {
 			styleOptionsClusterFunction: styleOptionsCluster,
+			statusName: opt.selectorName ? opt.selectorName + '-status' : null,
 			...opt
 		},
 		source = new ol.source.Vector({
@@ -37,7 +39,7 @@ function layerVector(opt) {
 
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		selectorEls = document.getElementsByName(options.selectorName),
-		statusEl = document.getElementById(options.selectorName + '-status'), // XHR download tracking
+		statusEl = document.getElementById(options.statusName), // XHR download tracking
 		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
 
 		values =
@@ -62,31 +64,30 @@ function layerVector(opt) {
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
-		const argsObj = options.urlArgsFunction(
+		const args = options.urlArgsFunction(
 				options, // Layer options
 				ol.proj.transformExtent( // BBox
 					extent,
 					projection.getCode(), // Map projection
 					'EPSG:4326' // Received projection
-				).map(function(c) {
-					return c.toFixed(4); // Round to 4 digits
-				}),
+				)
+				.map(c => c.toFixed(4)), // Round to 4 digits
 				readCheckbox(options.selectorName),
 				extent,
 				resolution,
 				projection
 			),
-			argsArray = [];
+			query = [];
 
-		// Add a version param to reload when modified
+		// Add a version param depending on last change date to reload if modified
 		if (sessionStorage.myol_lastChangeTime)
-			argsObj.v = parseInt((sessionStorage.myol_lastChangeTime % 100000000) / 10000);
+			args.v = parseInt((sessionStorage.myol_lastChangeTime % 100000000) / 10000);
 
-		for (const a in argsObj)
-			if (a != 'url' && argsObj[a])
-				argsArray.push(a + '=' + argsObj[a]);
+		for (const a in args)
+			if (a != 'url' && args[a])
+				query.push(a + '=' + args[a]);
 
-		return argsObj.url + '?' + argsArray.join('&');
+		return args.url + '?' + query.join('&');
 	}
 
 	// Modify a geoJson url argument depending on checkboxes
