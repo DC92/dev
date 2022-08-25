@@ -3,14 +3,75 @@
  */
 
 /**
+ * Manage a collection of checkboxes with the same name
+ * There can be several selectors for one layer
+ * A selector can be used by several layers
+ * The checkbox without value check / uncheck the others
+ * Current selection is saved in window.localStorage
+ * name : input names
+ * callBack : callback function (this reset the checkboxes)
+ * You can force the values in window.localStorage[simplified name]
+ * Return return an array of selected values
+ */
+function selector(name, callBack) {
+	const selectorEls = [...document.getElementsByName(name)],
+		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
+		init = (localStorage[safeName] || '').split(',');
+
+	// Init
+	if (typeof callBack == 'function') {
+		selectorEls.forEach(el => {
+			el.checked = init.includes(el.value) || init.includes('all') || init.join(',') == el.value;
+			el.addEventListener('click', onClick);
+		});
+		onClick();
+	}
+
+	function onClick(evt) {
+		// Test the "all" box & set other boxes
+		if (evt && evt.target.value == 'all')
+			selectorEls
+			.forEach(el => el.checked = evt.target.checked);
+
+		// Test if all values are checked
+		const allChecked = selectorEls
+			.filter(el => !el.checked && el.value != 'all');
+
+		// Set the "all" box
+		selectorEls
+			.forEach(el => {
+				if (el.value == 'all')
+					el.checked = !allChecked.length;
+			});
+
+		// Save the current status
+		if (selection().length)
+			localStorage[safeName] = selection().join(',');
+		else
+			delete localStorage[safeName];
+
+		if (evt)
+			callBack(selection());
+	}
+
+	function selection() {
+		return selectorEls
+			.filter(el => el.checked && el.value != 'all')
+			.map(el => el.value);
+	}
+
+	return selection();
+}
+
+/**
  * Layer to display remote geoJson
  * Styles, icons & labels
  *
  * Options:
  * selectorName : <input name="SELECTORNAME"> url arguments selector
- * statusName : <TAG id="LAYER_STATUS_NAME"></TAG> display loading status |
-   <TAG id="SELECTOR_NAME-status"></TAG>
- * urlArgsFunction: function(options, bbox, selection, extent, resolution, projection)
+   can be several SELECTORNAME1,SELECTORNAME2,...
+   display loading status <TAG id="SELECTOR_NAME-status"></TAG>
+ * urlArgsFunction: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) who extract a list of data from the XHR to be available as feature.display.XXX
  * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
@@ -20,10 +81,15 @@
  */
 function layerVector(opt) {
 	const options = {
+			selectorName: '',
+			callBack: function() { // By default, visibility depends on the first selector only
+				layer.setVisible(selector(selectorsName[0]).length);
+				source.refresh();
+			},
 			styleOptionsClusterFunction: styleOptionsCluster,
-			statusName: opt.selectorName ? opt.selectorName + '-status' : null,
 			...opt
 		},
+		selectorsName = options.selectorName.split(','),
 		source = new ol.source.Vector({
 			url: url,
 			format: new ol.format.GeoJSON(),
@@ -36,17 +102,16 @@ function layerVector(opt) {
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options
 		}),
-
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
-		selectorEls = document.getElementsByName(options.selectorName),
-		statusEl = document.getElementById(options.statusName), // XHR download tracking
-		safeSelectorName = options.selectorName ? options.selectorName.replace(/[^a-z]/ig, '') : '',
+		statusEl = document.getElementById(selectorsName[0] + '-status'); // XHR download tracking
 
-		values =
-		typeof localStorage['myol_' + safeSelectorName] != 'undefined' ?
-		localStorage['myol_' + safeSelectorName] :
-		readCheckbox(options.selectorName, true).join(',');
+	// Setup the selector managers
+	selectorsName.map(name => selector(name, options.callBack));
 
+	// Init parameters depending on the selector
+	options.callBack();
+
+	// Display loading status
 	if (statusEl)
 		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
 			if (!statusEl.textContent.includes('error'))
@@ -72,10 +137,9 @@ function layerVector(opt) {
 					'EPSG:4326' // Received projection
 				)
 				.map(c => c.toFixed(4)), // Round to 4 digits
-				readCheckbox(options.selectorName),
+				selectorsName.map(name => selector(name).join(',')), // Array of string: selected values separated with ,
 				extent,
-				resolution,
-				projection
+				resolution
 			),
 			query = [];
 
@@ -88,65 +152,6 @@ function layerVector(opt) {
 				query.push(a + '=' + args[a]);
 
 		return args.url + '?' + query.join('&');
-	}
-
-	// Modify a geoJson url argument depending on checkboxes
-	// Manage checkbox inputs having the same name
-	// Mem / recover the checkboxes in localStorage, url args or hash
-	// Manages a global flip-flop of the same named <input> checkboxes
-	for (let e = 0; e < selectorEls.length; e++) { //HACK for doesn't work on element array
-		// Set inputs following localStorage & args
-		selectorEls[e].checked =
-			values.indexOf(selectorEls[e].value) != -1 || // That one is declared
-			values.split(',').indexOf('on') != -1; // The "all" (= "on") is set
-
-		// Compute the all check && init the localStorage if data has been given by the url
-		checkEl(selectorEls[e]);
-
-		// Attach the action
-		selectorEls[e].addEventListener('click', onClick);
-	}
-
-	function onClick(evt) {
-		checkEl(evt.target); // Do the "all" check verification
-
-		// Mem the data in the localStorage
-		const selection = readCheckbox(options.selectorName);
-
-		if (safeSelectorName)
-			localStorage['myol_' + safeSelectorName] = typeof selection == 'object' ? selection.join(',') : selection ? 'on' : '';
-
-		refreshDisplay(selection);
-	}
-
-	if (options.selectorName)
-		refreshDisplay(readCheckbox(options.selectorName));
-
-	function refreshDisplay(selection) {
-		const visible = typeof selection == 'object' ? selection.length : selection === true;
-
-		layer.setVisible(visible);
-		if (visible)
-			source.refresh();
-	}
-
-	// Check on <input> & set the "All" input accordingly
-	function checkEl(target) {
-		let allIndex = -1, // Index of the "all" <input> if any
-			allCheck = true; // Are all others checked ?
-
-		for (let e = 0; e < selectorEls.length; e++) {
-			if (target.value == 'on') // If the "all" <input> is checked (who has a default value = "on")
-				selectorEls[e].checked = target.checked; // Force all the others to the same
-			else if (selectorEls[e].value == 'on') // The "all" <input>
-				allIndex = e;
-			else if (!selectorEls[e].checked)
-				allCheck = false; // Uncheck the "all" <input> if one other is unchecked
-		}
-
-		// Check the "all" <input> if all others are
-		if (selectorEls[allIndex])
-			selectorEls[allIndex].checked = allCheck;
 	}
 
 	// Callback function to define feature display from the properties received from the server
@@ -213,7 +218,6 @@ function layerVector(opt) {
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
 	//BEST label attached to the cursor for lines & poly
-
 	//HACK attach an hover listener once when the map is defined
 	ol.Map.prototype.render = function() {
 		if (!this.hoverListenerInstalled && this.getView()) {
@@ -402,28 +406,6 @@ function layerVectorCluster(options) {
 }
 
 /**
- * Get checkboxes values of inputs having the same name
- * selectorName {string}
- * Return an array of the selected inputs
- */
-function readCheckbox(selectorName, withOn) {
-	const selectorEls = document.getElementsByName(selectorName),
-		selection = [];
-
-	// Specific case of a single on/off <input>
-	if (selectorEls.length == 1)
-		return selectorEls[0].checked ? [selectorEls[0].value] : [];
-
-	// Read each <input> checkbox
-	for (let e = 0; e < selectorEls.length; e++)
-		if (selectorEls[e].checked &&
-			(selectorEls[e].value != 'on' || withOn)) // Avoid the first check in a list
-			selection.push(selectorEls[e].value);
-
-	return selection;
-}
-
-/**
  * BBOX strategy when the url returns a limited number of features in the BBox
  * We do need to reload when the zoom in
  */
@@ -437,6 +419,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 /**
  * Some usefull style functions
  */
+
 // Get icon from an URL
 function styleOptionsIcon(iconUrl) {
 	if (iconUrl)

@@ -51,57 +51,44 @@ Based on https://openlayers.org
 
 	<div class="selector">
 		<div>
-			<label for="wri-features">Refuges.info</label>
-			<input type="checkbox" name="wri-features" id="wri-features" value="7,9,10" />
-			<p id="wri-features-status"></p>
-		</div>
-
-		<div>
+			<label for="prc-features">Pyrenees-refuges.com</label>
+			<input type="checkbox" name="prc-features" id="prc-features" />
+			<p id="prc-features-status"></p>
+		</div><div>
+			<label for="chem-features">Chemineur</label>
+			<input type="checkbox" name="chem-features" id="chem-features" value="3,8,20,23" />
+			<p id="chem-features-status"></p>
+		</div><div>
+			<label for="c2c-features">Camptocamp.org</label>
+			<input type="checkbox" name="c2c-features" id="c2c-features" />
+			<p><span id="c2c-features-status"></span> Only 100 features at a time</p>
+		</div><div>
+			<label for="alp-features">Alpages.info</label>
+			<input type="checkbox" name="alp-features" id="alp-features" value="4,5" />
+			<p id="alp-features-status"></p>
+		</div><div>
 			<label for="wri-massifs">Massifs</label>
 			<input type="checkbox" name="wri-massifs" id="wri-massifs" />
 			<p id="wri-massifs-status"></p>
 		</div>
-
-		<div>
-			<label for="prc-features">Pyrenees-refuges.com</label>
-			<input type="checkbox" name="prc-features" id="prc-features" />
-			<p id="prc-features-status"></p>
-		</div>
-
-		<div>
-			<label for="c2c-features">Camptocamp.org</label>
-			<input type="checkbox" name="c2c-features" id="c2c-features" />
-			<p><span id="c2c-features-status"></span> Only 100 features at a time</p>
-		</div>
 	</div>
 
 	<div class="selector">
-		<label for="chem-features">Chemineur</label>
-		<input type="checkbox" name="chem-features" id="chem-features" />
-		<ul>
-			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
-			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
-			<li><input type="checkbox" name="chem-features" value="20" />Alimentation</li>
-			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
-			<li><input type="checkbox" name="chem-features" value="30" />Ferroviaire</li>
-			<li><input type="checkbox" name="chem-features" value="40" />Transport</li>
-			<li><input type="checkbox" name="chem-features" value="44" />Tourisme</li>
-			<li><input type="checkbox" name="chem-features" value="58" />Naval</li>
-			<li><input type="checkbox" name="chem-features" value="64" />Trace</li>
-		</ul>
-		<p id="chem-features-status"></p>
-	</div>
-
-	<div class="selector">
-		<label for="alp-features">Alpages.info</label>
-		<input type="checkbox" name="alp-features" id="alp-features" />
-		<ul>
-			<li><input type="checkbox" name="alp-features" value="3" />Alpages</li>
-			<li><input type="checkbox" name="alp-features" value="4" checked="checked" />Cabane</li>
-			<li><input type="checkbox" name="alp-features" value="5" checked="checked" />Point d'eau</li>
-			<li><input type="checkbox" name="alp-features" value="6" />Internet</li>
-		</ul>
-		<p id="alp-features-status"></p>
+		<div>
+			<p><input type="checkbox" name="wri-massif" id="wri-massif" value="4" />
+			<label for="wri-massif">Vercors uniquement</label></p>
+			<label for="wri-features">Refuges.info</label>
+			<input type="checkbox" name="wri-features" id="wri-features" value="all" />
+			<ul>
+				<li><input type="checkbox" name="wri-features" value="7" />cabane non gardée</li>
+				<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
+				<li><input type="checkbox" name="wri-features" value="9" />gîte d'étape</li>
+				<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
+				<li><input type="checkbox" name="wri-features" value="6" />sommet</li>
+				<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
+			</ul>
+			<p id="wri-features-status"></p>
+		</div>
 	</div>
 
 	<div class="selector">
@@ -113,12 +100,7 @@ Based on https://openlayers.org
 			<li><input type="checkbox" name="osm-features" value='["building"="cabin"]' />Cabane non gardée</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
 			<li><input type="checkbox" name="osm-features" value='["tourism"="camp_site"]' />Camping</li>
-			<li>
-				<input type="checkbox" name="osm-features"
-					value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'
-				/>
-				Point d'eau
-			</li>
+			<li><input type="checkbox" name="osm-features" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'/>Point d'eau</li>
 			<li><input type="checkbox" name="osm-features" value='["highway"="bus_stop"]' />Bus</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
 			<li><input type="checkbox" name="osm-features" value='["amenity"="restaurant"]' />Restaurant</li>
@@ -132,6 +114,10 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script>
+// Force selectors
+localStorage['myol_wrifeatures'] = 'all';
+localStorage['myol_alpfeatures'] = '4,5';
+
 const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
@@ -139,12 +125,14 @@ const map = new ol.Map({
 		zoom: 12,
 	}),
 	layers: [
-		new ol.layer.Tile({
+		new ol.layer.Tile({ // Background layer
 			source: new ol.source.OSM(),
 		}),
-		...layersWri({ // Refuges.info
+		...layersCluster({ // Refuges.info (2 level layer depending on resolution)
 			host: '//dom.refuges.info/', //TODO revenir de dom à www
-			selectorName: 'wri-features',
+			layer: layerWri, //TODO : sélecteur de massif ne fonctionne pas en cluster au niveau du serveur
+			switchResolution: 500,
+			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
 		}),
 		layerWriAreas({ // Massifs
 			host: '//dom.refuges.info/', //TODO revenir de dom à www
@@ -156,10 +144,10 @@ const map = new ol.Map({
 		}),
 		layerC2C({ // CampToCamp
 			selectorName: 'c2c-features',
-			distanceMinCluster: 30,
 		}),
-		...layersGeoBB({
+		...layersCluster({
 			host: '//chemineur.fr/',
+			layer: layerGeoBB,
 			selectorName: 'chem-features',
 			attribution: 'Chemineur',
 		}),

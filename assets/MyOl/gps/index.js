@@ -62,18 +62,13 @@ if (!location.href.match(/(https|localhost).*index/)) {
 		new ol.control.Zoom(),
 		controlGeocoder(),
 		controlGPS(),
-
-		// List of tracks in the same directory
-		controlButton({
+		controlLoadGPX(),
+		controlDownload(),
+		controlButton({ // List of tracks in the same directory
 			label: elListe ? '&#x1F6B6;' : null,
 			submenuEl: elListe,
 		}),
-
-		controlLoadGPX(),
-		controlDownload(),
-
-		// Help
-		controlButton({
+		controlButton({ // Help
 			label: '?',
 			submenuEl: document.getElementById('gps-help'),
 		}),

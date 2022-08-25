@@ -79,10 +79,10 @@ new ol.Map({
 	target: 'map',
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
-		...layersGeoBB({
+		...layersCluster({
 			host: '//chemineur.fr/',
+			layer: layerGeoBB,
 			selectorName: 'chem-features',
-			distanceMinCluster: 30,
 			attribution: 'Chemineur',
 		}),
 	],

@@ -14,7 +14,7 @@ function layerGeoBB(opt) {
 			return {
 				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
 				limit: 10000,
-				layer: options.layer,
+				layer: options.cluster ? 'cluster' : null,
 				[options.argSelName]: selection.join(','),
 				bbox: bbox.join(','),
 			};
@@ -50,27 +50,6 @@ function layerGeoBB(opt) {
 		...opt
 	});
 }
-// Combined server clusterised (high resolutions) + not clusterised (low resolutions)
-// Use with spread operator ...layersGeoBB(options)
-function layersGeoBB(opt) {
-	const options = {
-		switchResolution: 100,
-		distanceMinCluster: 30,
-		...opt
-	};
-
-	return [
-		layerGeoBB({
-			maxResolution: options.switchResolution,
-			...options
-		}),
-		layerGeoBB({
-			layer: 'cluster',
-			minResolution: options.switchResolution,
-			...options
-		}),
-	];
-}
 
 /**
  * Site refuges.info
@@ -78,11 +57,11 @@ function layersGeoBB(opt) {
 function layerWri(opt) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
-		urlArgsFunction: function(options, bbox, selection) {
+		urlArgsFunction: function(options, bbox, selections) {
 			return {
-				url: options.host + (options.massif ? 'api/massif' : 'api/bbox'),
-				massif: options.massif,
-				type_points: selection.join(','),
+				url: options.host + (selections[1] ? 'api/massif' : 'api/bbox'),
+				type_points: selections[0],
+				massif: selections[1],
 				cluster: options.cluster,
 				bbox: bbox.join(','),
 			};
@@ -110,20 +89,20 @@ function layerWri(opt) {
 }
 
 // Combined server clusterised (high resolutions) + not clusterised (low resolutions)
-// Use with spread operator ...layersWri(options)
-function layersWri(opt) {
+// Use with spread operator ...layersGeoBB(options)
+function layersCluster(opt) {
 	const options = {
-		switchResolution: 500,
+		switchResolution: 100,
 		distanceMinCluster: 30,
 		...opt
 	};
 
 	return [
-		layerWri({
+		options.layer({
 			maxResolution: options.switchResolution,
 			...options
 		}),
-		layerWri({
+		options.layer({
 			cluster: true,
 			minResolution: options.switchResolution,
 			...options

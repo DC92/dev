@@ -276,9 +276,9 @@ function controlGPS() {
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-source0">Inactif</label><br />' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-source1">Position GPS <span>(1) Extérieur</span></label><br />' +
+		'<label for="myol-gps-source1">Position GPS <span>(1) extérieur</span></label><br />' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-source2">Position GPS ou IP <span>(2) Intérieur</span></label><hr />' +
+		'<label for="myol-gps-source2">Position GPS ou IP <span>(2) intérieur</span></label><hr />' +
 
 		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-display0">Carte libre</label><br />' +

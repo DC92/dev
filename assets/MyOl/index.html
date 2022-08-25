@@ -52,8 +52,11 @@ new ol.Map({
 	}),
 	controls: controlsCollection().concat(controlLayerSwitcher()),
 	layers: [
-		...layersGeoBB({
+		...layersCluster({
 			host: '//chemineur.fr/',
+			layer: layerGeoBB,
+			selectorName: 'chem-features',
+			attribution: 'Chemineur',
 		}),
 		layerMarker({
 			src: 'examples/images/viseur.png',
