@@ -49,18 +49,10 @@ new ol.Map({
 		}),
 	],
 	layers: [
-		layerWri({ // La couche des points
+		...layersCluster({ // Refuges.info (2 level layer depending on resolution)
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			attribution: null,
-			maxResolution: 500,
-			distanceMinCluster: 30,
-		}),
-		layerWri({ // La couche des clusters pour les hautes résolutions
-			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			attribution: null,
-			minResolution: 500,
-			cluster: true,
-			distanceMinCluster: 30,
+			layer: layerWri,
+			switchResolution: 500,
 		}),
 		layerMarker({ // Le cadre
 			prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...

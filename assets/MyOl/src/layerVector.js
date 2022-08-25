@@ -21,7 +21,10 @@ function selector(name, callBack) {
 	// Init
 	if (typeof callBack == 'function') {
 		selectorEls.forEach(el => {
-			el.checked = init.includes(el.value) || init.includes('all') || init.join(',') == el.value;
+			el.checked =
+				init.includes(el.value) ||
+				init.includes('all') ||
+				init.join(',') == el.value;
 			el.addEventListener('click', onClick);
 		});
 		onClick();
@@ -83,7 +86,10 @@ function layerVector(opt) {
 	const options = {
 			selectorName: '',
 			callBack: function() { // By default, visibility depends on the first selector only
-				layer.setVisible(selector(selectorsName[0]).length);
+				layer.setVisible(
+					selector(selectorsName[0]).length || // Something selected
+					!options.selectorName // No selector at all
+				);
 				source.refresh();
 			},
 			styleOptionsClusterFunction: styleOptionsCluster,

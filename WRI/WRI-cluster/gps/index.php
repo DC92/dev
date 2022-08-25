@@ -5,6 +5,32 @@ setcookie ('baselayer', 'Refuges.info');
 include ('../config_privee.php');
 $mapKeys = $config_wri['mapKeys'];
 
+$baseLayers = "{
+		'Refuges.info': layerMRI(),
+		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OpenTopo': layerOpenTopo(),
+		'Outdoors': layerThunderforest('outdoors'),
+		'IGN TOP25': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
+			key: mapKeys.ign,
+		}),
+		'IGN V2': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
+			key: 'essentiels', // The key for the free layers
+			format: 'image/png',
+		}),
+		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Autriche': layerKompass('KOMPASS Touristik'),
+		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Photo IGN': layerIGN({
+			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
+			key: 'essentiels',
+		}),
+		'Photo ArcGIS': layerArcGIS('World_Imagery'),
+		'Photo Bing': layerBing('Aerial'),
+		'Photo Google': layerGoogle('s'),
+	}";
+
 $no_tail = true;
 include ('../MyOl/gps/index.php');
 ?>
