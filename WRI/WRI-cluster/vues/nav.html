@@ -22,14 +22,14 @@
 					<li>
 						<input type="checkbox"
 							id="selecteur-massif" name="selecteur-massif"
-							onchange="selectionMassif(this.checked)"
-							checked="checked" />
+							value="<?=$vue->polygone->id_polygone?>"
+						/>
 						<label for="selecteur-massif"><?=$vue->polygone->nom_polygone?> uniquement</label>
 					</li><hr/>
 				<?php } ?>
 				<li>
 					<label for="selecteur-wri">Tout</label>
-					<input type="checkbox" id="selecteur-wri" name="selecteur-wri" checked="checked" />
+					<input type="checkbox" id="selecteur-wri" name="selecteur-wri" value="all" />
 					<span id="selecteur-wri-status"></span>
 				</li>
 				<?php foreach ($vue->types_point_affichables AS $type_affichable) { ?>
@@ -38,7 +38,6 @@
 							id="selecteur-wri-<?=$type_affichable->id_point_type?>"
 							name="selecteur-wri"
 							value="<?=$type_affichable->id_point_type?>"
-							checked="checked"
 						/>
 						<label for="selecteur-wri-<?=$type_affichable->id_point_type?>">
 							<img
@@ -94,7 +93,7 @@
 				<ul>
 					<li>
 						<label for="selecteur-osm">Tout</label>
-						<input type="checkbox" id="selecteur-osm" name="selecteur-osm" />
+						<input type="checkbox" id="selecteur-osm" name="selecteur-osm" value="all" />
 						<span id="selecteur-osm-status"></span>
 					</li>
 					<li>
@@ -149,14 +148,18 @@
 					(seuls les 100 premiers points sont affichés)
 				</li>
 				<li>
-					<input type="checkbox" name="selecteur-chemineur" id="selecteur-chemineur"
-						value="3,8,20,23" />
+					<input type="checkbox"
+						name="selecteur-chemineur" id="selecteur-chemineur"
+						value="3,8,20,23"
+					/>
 					<label for="selecteur-chemineur">chemineur.fr</label>
 					<span id="selecteur-chemineur-status"></span>
 				</li>
 				<li>
-					<input type="checkbox" name="selecteur-alpages" id="selecteur-alpages"
-						value="4,5" />
+					<input type="checkbox"
+						name="selecteur-alpages" id="selecteur-alpages"
+						value="4,5"
+					/>
 					<label for="selecteur-alpages">alpages.info</label>
 					<span id="selecteur-alpages-status"></span>
 				</li>

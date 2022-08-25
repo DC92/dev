@@ -1,3 +1,13 @@
+// Forçage de l'init des coches
+localStorage['myol_selecteurmassif'] = '<?=$vue->polygone->id_polygone?>';
+localStorage['myol_selecteurwri'] = 'all';
+localStorage['myol_selecteurmassifs'] =
+localStorage['myol_selecteurosm'] =
+localStorage['myol_selecteurprc'] =
+localStorage['myol_selecteurcc'] =
+localStorage['myol_selecteurchemineur'] =
+localStorage['myol_selecteuralpages'] = '';
+
 const baseLayers = {
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
@@ -43,24 +53,28 @@ const baseLayers = {
 			collapsed: false,
 		}),
 	],
-	wriInput = document.getElementById('selecteur-wri'),
-	massifInput = document.getElementById('selecteur-massif'),
-	massifsInput = document.getElementById('selecteur-massifs'),
 
-	layersPointsMassif = [
-		// Les points d'un massif
-		layerWri({
+	layers = [
+		// Refuges.info (2 level layer depending on resolution)
+		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectorName: 'selecteur-wri',
-			massif: <?=$vue->polygone->id_polygone?>,
-			nb_points: 'all',
-			distanceMinCluster: 30,
-			styleOptionsFunction: styleOptionsEtiquette,
-			attribution: null,
+			layer: layerWri,
+			switchResolution: 500, // Résolution à partir de laquelle le serveur sert des clusters
+			selectorName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
+			styleOptionsFunction: function (feature, properties) {
+				return {
+					...styleOptionsLabel(properties.name, properties, true),
+					...styleOptionsIcon(properties.icon),
+				};
+			},
+			attribution: '',
 		}),
+
 		// Contour d'un massif ou d'une zone
 		layerVector({
-			url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+			url: '<?=$config_wri["sous_dossier_installation"]?>' +
+				'api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+			selectorName: 'selecteur-massif',
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -68,18 +82,6 @@ const baseLayers = {
 				}),
 			}),
 		}),
-	],
-
-	// Points WRI avec bbox et cluster
-	layersPointsWri = layersWri({
-		host: '<?=$config_wri["sous_dossier_installation"]?>',
-		selectorName: 'selecteur-wri',
-	}),
-
-	layers = [
-		// Refuges.info
-		...layersPointsMassif,
-		...layersPointsWri,
 
 		// Les massifs
 		layerWriAreas({
@@ -107,8 +109,9 @@ const baseLayers = {
 		}),
 
 		// Chemineur
-		...layersGeoBB({
+		...layersCluster({
 			host: '//chemineur.fr/',
+			layer: layerGeoBB,
 			selectorName: 'selecteur-chemineur',
 			attribution: 'Chemineur',
 		}),
@@ -133,46 +136,6 @@ const baseLayers = {
 		layers: layers,
 	});
 
-if (massifsInput) {
-	massifsInput.checked = <?=$vue->contenu?'true':'false'?>;
-  selectionMassif(true);
-	massifsInput.dispatchEvent(new Event('click'));
-}
-
-// Initialiser l'affichage des points et des massifs suivant le type de carte (zone ou massif)
-if (wriInput) {
-	wriInput.checked = true;
-	wriInput.dispatchEvent(new Event('click')); // Resynchronise le détail des types de points
-}
-if (massifInput) {
-	massifInput.checked = true;
-	//massifInput.dispatchEvent(new Event('click'));
-}
-
-function selectionMassif(check) {
-	layersPointsMassif.forEach(l => l.setVisible(check));
-	layersPointsWri.forEach(l => l.setVisible(!check));
-}
-
-function styleOptionsEtiquette(feature, properties) {
-	return {
-		...styleOptionsLabel(properties.name, properties, true),
-		...styleOptionsIcon(properties.icon),
-	};
-}
-
-/*DCMM*/{var _r=' ',_v='<?=$vue->contenu?'true':'false'?>';if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-
-if(0)
-if (massifsInput) {
-<?php if ($vue->contenu) { ?>
-	massifsInput.checked = true;
-	selectionMassif(true);
-	massifsInput.dispatchEvent(new Event('click'));
-<?php } else { ?>
-<?php } ?>
-}
-
 // Centrer sur la zone du polygone
 <?if ($vue->polygone->id_polygone) { ?>
 	map.getView().fit(ol.proj.transformExtent([
@@ -182,4 +145,3 @@ if (massifsInput) {
 		<?=$vue->polygone->nord?>,
 	], 'EPSG:4326', 'EPSG:3857'));
 <? } ?>
-

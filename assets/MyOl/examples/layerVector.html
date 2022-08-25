@@ -93,7 +93,7 @@ Based on https://openlayers.org
 
 	<div class="selector">
 		<label for="osm-features">Overpass (OSM services)</label>
-		<input type="checkbox" name="osm-features" id="osm-features" />
+		<input type="checkbox" name="osm-features" id="osm-features" value="all" />
 		<ul>
 			<li><input type="checkbox" name="osm-features" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
 			<li><input type="checkbox" name="osm-features" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
@@ -158,7 +158,7 @@ const map = new ol.Map({
 			distanceMinCluster: 30,
 			attribution: 'Alpages',
 		}),
-		layerOverpass({
+		layerOverpass({ //TODO BUG selecteur tout KO
 			selectorName: 'osm-features',
 			distanceMinCluster: 30,
 		}),

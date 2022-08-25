@@ -53,6 +53,13 @@ new ol.Map({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
 			switchResolution: 500,
+			styleOptionsFunction: function (feature, properties) {
+				return {
+					...styleOptionsLabel(properties.name, properties, true),
+					...styleOptionsIcon(properties.icon),
+				};
+			},
+			attribution: '',
 		}),
 		layerMarker({ // Le cadre
 			prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...

@@ -1,5 +1,8 @@
 //TODO BUG WRI
 ==============
+GPS pictos WRI KO
+Le sélecteur de massif ne fonctionne pas en cluster au niveau du serveur
+Selecteur tout overpass KO
 Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 Click logo ne va pas à l'accueil en dehors de span
@@ -18,7 +21,7 @@ N'afficher que les massifs contenant des points
 //TODO GPS WRI
 ==============
 Ajouter images/icones/favicon.svg
-GPS Fond carte mri en haut du switcher / forcer mri à l'init
+Forcer mri à l'init
 Voir pourquoi il lance le service worker sur les autres pages
 Pas de favicon dans S20 accueil FF
 

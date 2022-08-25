@@ -24,31 +24,6 @@ $manifest_file = 'manifest.json';
 $manifest = json_decode (file_get_contents ($manifest_file), true);
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
-$baseLayers = "{
-		'Refuges.info': layerMRI(),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopo': layerOpenTopo(),
-		'Outdoors': layerThunderforest('outdoors'),
-		'IGN TOP25': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
-			key: mapKeys.ign,
-		}),
-		'IGN V2': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
-			key: 'essentiels', // The key for the free layers
-			format: 'image/png',
-		}),
-		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo IGN': layerIGN({
-			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
-			key: 'essentiels',
-		}),
-		'Photo ArcGIS': layerArcGIS('World_Imagery'),
-		'Photo Bing': layerBing('Aerial'),
-		'Photo Google': layerGoogle('s'),
-	}";
 
 function file_tag ($rel_filename, $rel = false) {
 	global $script_path;
