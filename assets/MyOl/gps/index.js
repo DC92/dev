@@ -47,7 +47,7 @@ if (!location.href.match(/(https|localhost).*index/)) {
 	const controls = [
 		// No button controls
 		controlTilesBuffer(4),
-		controlLayerSwitcher(), //TODO specific list of layers (WRI)
+		controlLayerSwitcher(baseLayers),
 		controlPermalink(),
 
 		// Bottom

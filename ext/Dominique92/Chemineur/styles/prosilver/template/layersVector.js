@@ -1,5 +1,6 @@
 if (typeof map !== 'undefined') {
 	map.addLayer(layerWri({
+		host: '//dom.refuges.info/', //TODO revenir de dom à www
 		selectorName: 'wri-features',
 		distanceMinCluster: 30,
 		zIndex: 6,

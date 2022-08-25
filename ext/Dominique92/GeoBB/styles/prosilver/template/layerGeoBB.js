@@ -11,33 +11,18 @@ var map = new ol.Map({
 		})
 		.concat(controlLayerSwitcher()),
 
-	layers: [ //TODO refurbish with layersGeoBB
-		// Low map resolution : points
-		layerGeoBB({
-			host: '', // Relative address
-			selectorName: 'geobb-features',
-			maxResolution: 100,
-			distanceMinCluster: 30,
-			attribution: 'Chemineur', //TODO BUG marquage spécifique !
-			noLabel: scriptName == 'posting',
-			noClick: scriptName == 'posting',
-			hoverStyleOptionsFunction: function(feature, properties) {
-				properties.attribution = null;
-				return styleOptionsFullLabel(properties);
-			},
-		}),
-
-		// High map resolution : clusters
-		layerGeoBB({
-			host: '', // Relative address
-			layer: 'cluster',
-			selectorName: 'geobb-features',
-			minResolution: 100,
-			distanceMinCluster: 30,
-			noLabel: scriptName == 'posting',
-			noClick: scriptName == 'posting',
-		}),
-	],
+	layers: layersCluster({
+		host: '', // Relative address
+		layer: layerGeoBB,
+		selectorName: 'geobb-features',
+		attribution: 'Chemineur',
+		noLabel: scriptName == 'posting',
+		noClick: scriptName == 'posting',
+		hoverStyleOptionsFunction: function(feature, properties) {
+			properties.attribution = null;
+			return styleOptionsFullLabel(properties);
+		},
+	}),
 });
 
 if (mapType == 'point')
