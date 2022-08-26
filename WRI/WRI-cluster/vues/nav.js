@@ -1,12 +1,14 @@
 // Forçage de l'init des coches
-localStorage['myol_selecteurmassif'] = '<?=$vue->polygone->id_polygone?>';
-localStorage['myol_selecteurwri'] = 'all';
-localStorage['myol_selecteurmassifs'] =
-localStorage['myol_selecteurosm'] =
-localStorage['myol_selecteurprc'] =
-localStorage['myol_selecteurcc'] =
-localStorage['myol_selecteurchemineur'] =
-localStorage['myol_selecteuralpages'] = '';
+<?php if ( $vue->polygone->id_polygone ) { ?>
+	// Supprime toutes les sélections
+	Object.keys(localStorage)
+		.filter(k => k.substring(0, 14) == 'myol_selecteur')
+		.forEach(k => localStorage.removeItem(k));
+
+	// Force tous les points et le contour
+	localStorage.setItem('myol_selecteurwri', 'all');
+	localStorage.setItem('myol_selecteurmassif', '<?=$vue->polygone->id_polygone?>');
+<?php } ?>
 
 const baseLayers = {
 		'Refuges.info': layerMRI(),

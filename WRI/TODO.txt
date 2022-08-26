@@ -12,7 +12,6 @@ BUGS WRI
 
 GPS WRI
 =======
-//TODOWRI Ajouter images/icones/favicon.svg
 //TODO BUG WRI Voir pourquoi il lance le service worker sur les autres pages
 //TODO BUG WRI Pas de favicon dans S20 accueil FF
 

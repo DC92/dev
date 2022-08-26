@@ -25,19 +25,19 @@ try {
 } catch (err) { // to get Assert url
 	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 }
-// Storages
+// Dump myol storages
 {
 	let datas = [];
+
 	['localStorage', 'sessionStorage'].forEach(s => {
 		if (window[s].length)
 			datas.push(s + ':');
-		for (let i = 0; i < window[s].length; i++) {
-			datas.push(
-				window[s].key(i) + ': ' +
-				window[s].getItem(window[s].key(i))
-			);
-		}
+
+		Object.keys(localStorage)
+			.filter(k => k.substring(0, 5) == 'myol_')
+			.forEach(k => datas.push(k + ': ' + window[s].getItem(k)));
 	});
+
 	console.log(datas.join('\n'));
 }
 
