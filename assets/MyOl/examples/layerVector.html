@@ -129,13 +129,13 @@ const map = new ol.Map({
 			source: new ol.source.OSM(),
 		}),
 		...layersCluster({ // Refuges.info (2 level layer depending on resolution)
-			host: '//dom.refuges.info/', //TODO revenir de dom à www
-			layer: layerWri, //TODO : sélecteur de massif ne fonctionne pas en cluster au niveau du serveur
+			host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
+			layer: layerWri,
 			switchResolution: 500,
 			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
 		}),
 		layerWriAreas({ // Massifs
-			host: '//dom.refuges.info/', //TODO revenir de dom à www
+			host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
 			selectorName: 'wri-massifs',
 		}),
 		layerPyreneesRefuges({
@@ -158,7 +158,7 @@ const map = new ol.Map({
 			distanceMinCluster: 30,
 			attribution: 'Alpages',
 		}),
-		layerOverpass({ //TODO BUG selecteur tout KO
+		layerOverpass({ //TODOWRI BUG selecteur tout KO
 			selectorName: 'osm-features',
 			distanceMinCluster: 30,
 		}),

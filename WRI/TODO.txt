@@ -1,31 +1,27 @@
-//TODO BUG WRI
-==============
-GPS pictos WRI KO
-Le sélecteur de massif ne fonctionne pas en cluster au niveau du serveur
-Selecteur tout overpass KO
-Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
-Click logo ne va pas à l'accueil en dehors de span
-Input recherche déborde des petits ecrans
-Lien vers compte utilisateur sur petit écran
-Editeur massif : download ne marche pas ! (fichier vide)
-Formulaire contact : nom utilisateur
-? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
-edit.js //controlDownload(), //TODO
+BUGS WRI
+========
+//TODOWRI GPS pictos WRI KO
+//TODOWRI Selecteur tout overpass KO
+//TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
+//TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
+//TODO BUG WRI Input recherche déborde des petits ecrans
+//TODO BUG WRI Lien vers compte utilisateur sur petit écran
+//TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide)
+//TODO BUG WRI Formulaire contact : nom utilisateur
+//TODO BUG WRI edit.js //controlDownload(),
+//TODO BUG WRI Revoir bandeau grandes fenêtres & logo
 
-//TODO WRI
+GPS WRI
+=======
+//TODOWRI Ajouter images/icones/favicon.svg
+//TODO BUG WRIVoir pourquoi il lance le service worker sur les autres pages
+//TODO BUG WRIPas de favicon dans S20 accueil FF
+
+//BEST WRI
 ==========
-Revoir bandeau grandes fenêtres & logo
-Refaire les couches points WRI dans WRI
-arrivée massif points all on
-N'afficher que les massifs contenant des points
-
-//TODO GPS WRI
-==============
-Ajouter images/icones/favicon.svg
-Forcer mri à l'init
-Voir pourquoi il lance le service worker sur les autres pages
-Pas de favicon dans S20 accueil FF
+//BEST WRI Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
+//BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+//BEST WRI N'afficher que les massifs contenant des points
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -94,7 +90,7 @@ Faire une fiche de tests
 
 AIDE TEST
 =========
-MultiPolygon multiple => WRI massif 3116 //TODO pas dans la base de tests WRI
+MultiPolygon multiple => WRI massif 3116 (plus dans la base de tests WRI)
 MultiPolygon avec trou => WRI massif 3127
 
 TRANSFERT WRI

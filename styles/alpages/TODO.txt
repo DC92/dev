@@ -1,7 +1,7 @@
-//TODO ALPAGES BEST recherche par département / commune
-//TODO TEST ALPAGES post modif mail inscription
-//TODO ALPAGES ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
-Accepter moderateur //TODO vrai sur ALPAGES ???
+//BEST ALPAGES BEST recherche par département / commune
+//BEST TEST ALPAGES post modif mail inscription
+//BEST ALPAGES ajouter une information automatique sur les fiches alpages : par exemple les liens pour les départements 04 et 05
+Accepter moderateur //BEST vrai sur ALPAGES ???
 	Administration -> MEMBRES ET GROUPES -> cocher -> Activer -> Envoyer
 	Administration -> Gérer les membres -> formulaire : Groupes -> Ajouter ce membre au groupe : Modérateurs globaux -> Définir comme groupe par défaut
 Migration MyOl

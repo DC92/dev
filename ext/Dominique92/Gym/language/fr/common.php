@@ -37,7 +37,7 @@ if (empty($lang) || !is_array($lang))
 // ’ « » “ ” …
 //
 
-//TODO BUG langue pas pris en compte / écrasement
+//BEST BUG langue pas pris en compte / écrasement
 
 $lang = array_merge($lang, array(
 	// Corrections du template prosilver
