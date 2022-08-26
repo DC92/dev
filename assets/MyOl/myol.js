@@ -1163,12 +1163,12 @@ function styleOptionsCluster(feature, properties) {
 function layerGeoBB(opt) {
 	return layerVectorCluster({
 		argSelName: 'cat',
-		urlArgsFunction: function(options, bbox, selection) {
+		urlArgsFunction: function(options, bbox, selections) {
 			return {
 				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
 				limit: 10000,
 				layer: options.cluster ? 'cluster' : null,
-				[options.argSelName]: selection.join(','),
+				[options.argSelName]: selections[0], // The 1st (and only selector)
 				bbox: bbox.join(','),
 			};
 		},
@@ -1414,18 +1414,19 @@ function layerOverpass(opt) {
 		if (selectorEls[e].value)
 			tags += selectorEls[e].value.replace('private', '');
 
-	function urlArgsFunction(o, bbox, selection) {
-		const bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
+	function urlArgsFunction(o, bbox, selections) {
+		const items = selections[0].split(','), // The 1st (and only selector)
+			bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 
-		// Convert selections on overpass_api language
-		for (let l = 0; l < selection.length; l++) {
-			const selections = selection[l].split('+');
+		// Convert selected items on overpass_api language
+		for (let l = 0; l < items.length; l++) {
+			const champs = items[l].split('+');
 
-			for (let ls = 0; ls < selections.length; ls++)
+			for (let ls = 0; ls < champs.length; ls++)
 				args.push(
-					'node' + selections[ls] + bb + // Ask for nodes in the bbox
-					'way' + selections[ls] + bb // Also ask for areas
+					'node' + champs[ls] + bb + // Ask for nodes in the bbox
+					'way' + champs[ls] + bb // Also ask for areas
 				);
 		}
 
@@ -1433,7 +1434,7 @@ function layerOverpass(opt) {
 			url: 'https://' + options.host + '/api/interpreter',
 			data: '[timeout:5];(' + args.join('') + ');out center;',
 		};
-	};
+	}
 
 	// Extract features from data when received
 	format.readFeatures = function(doc, opt) {

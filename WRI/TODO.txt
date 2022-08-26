@@ -1,7 +1,6 @@
 BUGS WRI
 ========
 //TODOWRI GPS pictos WRI KO
-//TODOWRI Selecteur tout overpass KO
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 //TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
 //TODO BUG WRI Input recherche déborde des petits ecrans
@@ -14,8 +13,8 @@ BUGS WRI
 GPS WRI
 =======
 //TODOWRI Ajouter images/icones/favicon.svg
-//TODO BUG WRIVoir pourquoi il lance le service worker sur les autres pages
-//TODO BUG WRIPas de favicon dans S20 accueil FF
+//TODO BUG WRI Voir pourquoi il lance le service worker sur les autres pages
+//TODO BUG WRI Pas de favicon dans S20 accueil FF
 
 //BEST WRI
 ==========

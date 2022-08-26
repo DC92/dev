@@ -118,7 +118,7 @@ Based on https://openlayers.org
 localStorage['myol_wrifeatures'] = 'all';
 localStorage['myol_alpfeatures'] = '4,5';
 
-const map = new ol.Map({
+new ol.Map({
 	target: 'map',
 	view: new ol.View({
 		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
@@ -158,7 +158,7 @@ const map = new ol.Map({
 			distanceMinCluster: 30,
 			attribution: 'Alpages',
 		}),
-		layerOverpass({ //TODOWRI BUG selecteur tout KO
+		layerOverpass({
 			selectorName: 'osm-features',
 			distanceMinCluster: 30,
 		}),
