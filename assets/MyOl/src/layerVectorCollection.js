@@ -63,6 +63,7 @@ function layerWri(opt) {
 				type_points: selections[0],
 				massif: selections[1],
 				cluster: options.cluster,
+				nb_points: 'all',
 				bbox: bbox.join(','),
 			};
 		},
