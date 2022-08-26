@@ -1,25 +1,13 @@
-BUGS WRI
-========
-//TODOWRI GPS pictos WRI KO
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-//TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
-//TODO BUG WRI Input recherche déborde des petits ecrans
-//TODO BUG WRI Lien vers compte utilisateur sur petit écran
-//TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide)
-//TODO BUG WRI Formulaire contact : nom utilisateur
-//TODO BUG WRI edit.js //controlDownload(),
-//TODO BUG WRI Revoir bandeau grandes fenêtres & logo
-
-GPS WRI
-=======
 //TODO BUG WRI Voir pourquoi il lance le service worker sur les autres pages
-//TODO BUG WRI Pas de favicon dans S20 accueil FF
+//TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
+//TODO BUG WRI Revoir bandeau grandes fenêtres & logo
+//TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
 
-//BEST WRI
-==========
 //BEST WRI Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 //BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 //BEST WRI N'afficher que les massifs contenant des points
+//BEST WRI Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -36,8 +24,6 @@ Point
 
 EVOLUTIONS
 ==========
-Revoir les symboles GARMIN
-
 http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
 https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 https://www.refuges.info/forum/viewtopic.php?f=2&t=11360

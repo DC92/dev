@@ -562,6 +562,8 @@ function controlLoadGPX(opt) {
  * File downloader control
  * Requires controlButton
  */
+//TODO incompatible avec clusters
+//TODO BUG n'exporte pas les polygones !
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',

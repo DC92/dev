@@ -19,7 +19,7 @@ const baseLayers = {
 		new ol.control.FullScreen(),
 		controlGeocoder(),
 		controlLoadGPX(),
-		//controlDownload(), //TODO
+		//controlDownload(), //TODO n'exporte pas les polygones
 		controlLayerSwitcher(baseLayers),
 		controlMousePosition(),
 		new ol.control.ScaleLine(),
