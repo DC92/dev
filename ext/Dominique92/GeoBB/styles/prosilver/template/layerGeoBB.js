@@ -38,7 +38,7 @@ if (mapType == 'line' && scriptName == 'posting')
 		geoJsonId: 'marker-json',
 		focus: 15,
 		help: [
-			//TODO mettre dans le html
+			//BEST mettre dans le html
 			// Modify
 			'<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>' +
 			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +

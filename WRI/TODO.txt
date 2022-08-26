@@ -11,9 +11,11 @@ Lien vers compte utilisateur sur petit écran
 Editeur massif : download ne marche pas ! (fichier vide)
 Formulaire contact : nom utilisateur
 ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+edit.js //controlDownload(), //TODO
 
 //TODO WRI
 ==========
+Revoir bandeau grandes fenêtres & logo
 Refaire les couches points WRI dans WRI
 arrivée massif points all on
 N'afficher que les massifs contenant des points

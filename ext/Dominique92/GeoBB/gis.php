@@ -6,7 +6,7 @@
 * @license GNU General Public License, version 2 (GPL-2.0)
 *
 */
-//TODO 5 décimales dans les traces
+//BEST 5 décimales dans les traces
 
 define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../';
@@ -35,6 +35,7 @@ $bbox_sql =
 	$bboxs[0].' '.$bboxs[1];
 
 // Temporary tool to generate all the clusters
+//BEST reprendre avec GROUP BY round(ST_X(geom)::numeric,1)
 if (0) {
 	$sql="
 		SELECT post_id, geo_cluster,

@@ -18,10 +18,10 @@
 
 <?php
 // Livre ouvert : limiter aussi en hauteur
-//TODO retour de fullscreen en cliquant sur l'image
-//TODO mesure d'audience
+//BEST retour de fullscreen en cliquant sur l'image
+//BEST mesure d'audience
 //BEST Texte technique en italique
-//TODO centrage image / titre dépend de la taille de la fenetre - idem n° pages
+//BEST centrage image / titre dépend de la taille de la fenetre - idem n° pages
 //BEST full screen : Centrer verticalement les textes dans la page
 //BEST table des mati?res
 
