@@ -76,7 +76,9 @@ const baseLayers = {
 		layerVector({
 			url: '<?=$config_wri["sous_dossier_installation"]?>' +
 				'api/polygones?massif=<?=$vue->polygone->id_polygone?>',
-			selectorName: 'selecteur-massif',
+			<?php if ( !$vue->contenu ) { ?>
+				selectorName: 'selecteur-massif',
+			<?php } ?>
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: 'blue',
@@ -88,7 +90,9 @@ const baseLayers = {
 		// Les massifs
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectorName: 'selecteur-massifs',
+			<?php if ( !$vue->contenu ) { ?>
+				selectorName: 'selecteur-massifs',
+			<?php } ?>
 		}),
 
 		// Overpass
