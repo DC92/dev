@@ -163,21 +163,36 @@ function layerVector(opt) {
 	// Callback function to define feature display from the properties received from the server
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
+			let feature = evt.features[f],
+				sourceGeometry = feature.getGeometry(),
+				// Explore GeometryCollection
+				geometries = sourceGeometry.getType() == 'GeometryCollection' ?
+				sourceGeometry.getGeometries() : [sourceGeometry];
+
+			// Add +- 1 random meter to each coordinate to separate the points having the same coordinates
+			geometries.forEach(g =>
+				if (g.getType() == 'Point')
+					g.setCoordinates([
+						g.getCoordinates()[0] + Math.random() * 4 - 2,
+						g.getCoordinates()[1] + Math.random() * 4 - 2,
+					])
+			);
+
 			// These options will be displayed by the hover response
 			//HACK attach this function to each feature to access it when hovering without layer context
-			evt.features[f].hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
+			feature.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
 			// Compute data to be used to display the feature
-			evt.features[f].display = typeof options.convertProperties == 'function' ?
+			feature.display = typeof options.convertProperties == 'function' ?
 				options.convertProperties(
-					evt.features[f].getProperties(),
-					evt.features[f],
+					feature.getProperties(),
+					feature,
 					options
 				) : {};
 
 			// Detect lines or polygons
-			evt.features[f].display.area =
-				ol.extent.getArea(evt.features[f].getGeometry().getExtent());
+			feature.display.area =
+				ol.extent.getArea(sourceGeometry.getExtent());
 		}
 	});
 

@@ -98,7 +98,6 @@ const baseLayers = {
 		// Overpass
 		layerOverpass({
 			selectorName: 'selecteur-osm',
-			distanceMinCluster: 30,
 			maxResolution: 100,
 		}),
 
