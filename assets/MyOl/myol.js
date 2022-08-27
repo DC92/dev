@@ -760,13 +760,13 @@ function layerVector(opt) {
 				sourceGeometry.getGeometries() : [sourceGeometry];
 
 			// Add +- 1 random meter to each coordinate to separate the points having the same coordinates
-			geometries.forEach(g =>
+			geometries.forEach(g => {
 				if (g.getType() == 'Point')
 					g.setCoordinates([
 						g.getCoordinates()[0] + Math.random() * 4 - 2,
 						g.getCoordinates()[1] + Math.random() * 4 - 2,
 					])
-			);
+			});
 
 			// These options will be displayed by the hover response
 			feature.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
@@ -1875,6 +1875,7 @@ function controlGPS() {
 		});
 	};
 
+	// Trigered by  <input ... ctrlOnChange="renderGPS" />
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
@@ -1910,7 +1911,7 @@ function controlGPS() {
 
 		// Render position & graticule
 		if (map && view && sourceLevel && ol.gpsValues.position) {
-			// Estimate the viewport size to draw visible graticule
+			// Estimate the viewport size to draw a visible graticule
 			const p = ol.gpsValues.position,
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),

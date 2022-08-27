@@ -170,13 +170,13 @@ function layerVector(opt) {
 				sourceGeometry.getGeometries() : [sourceGeometry];
 
 			// Add +- 1 random meter to each coordinate to separate the points having the same coordinates
-			geometries.forEach(g =>
+			geometries.forEach(g => {
 				if (g.getType() == 'Point')
 					g.setCoordinates([
 						g.getCoordinates()[0] + Math.random() * 4 - 2,
 						g.getCoordinates()[1] + Math.random() * 4 - 2,
 					])
-			);
+			});
 
 			// These options will be displayed by the hover response
 			//HACK attach this function to each feature to access it when hovering without layer context

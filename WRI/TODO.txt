@@ -1,9 +1,11 @@
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 //TODO BUG WRI Voir pourquoi il lance le service worker sur les autres pages
+//TODO BUG WRI Mobile Gps picto rando ne ferme pas les autres
 //TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
 //TODO BUG WRI Revoir bandeau grandes fenêtres & logo
 //TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
 
+//BEST WRI largeur point_formulaire_modification pour petits écrans
 //BEST WRI Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 //BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 //BEST WRI N'afficher que les massifs contenant des points

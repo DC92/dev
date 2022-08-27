@@ -272,6 +272,7 @@ function controlButton(opt) {
  */
 function controlGPS() {
 	const subMenu = location.href.match(/(https|localhost)/) ?
+		//BEST use .html content
 		'<p>Localisation GPS:</p>' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-source0">Inactif</label><br />' +
@@ -370,6 +371,7 @@ function controlGPS() {
 		});
 	};
 
+	// Trigered by  <input ... ctrlOnChange="renderGPS" />
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
@@ -405,7 +407,7 @@ function controlGPS() {
 
 		// Render position & graticule
 		if (map && view && sourceLevel && ol.gpsValues.position) {
-			// Estimate the viewport size to draw visible graticule
+			// Estimate the viewport size to draw a visible graticule
 			const p = ol.gpsValues.position,
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
