@@ -40,6 +40,13 @@ try {
 
 	console.log(datas.join('\n'));
 }
+// List service workers registered
+navigator.serviceWorker.getRegistrations().then(function(registrations) {
+	for (let registration of registrations) {
+		console.log('service-worker: ' + registration.active.scriptURL);
+		//registration.unregister();
+	}
+});
 
 /**
  * Warn layers when added to the map
