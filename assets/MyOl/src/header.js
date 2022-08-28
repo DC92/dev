@@ -12,7 +12,7 @@ if (!location.hash.indexOf('##'))
 	});
 //HACK use hash ### to route all console logs on alerts
 if (location.hash == '###')
-	console.debug = function(message) {
+	console.log = function(message) {
 		alert(message);
 	};
 
@@ -41,16 +41,17 @@ if (location.hash == '###')
 
 	// Registered service workers in the scope
 	navigator.serviceWorker.getRegistrations().then(registrations => {
-		if (registrations.length)
+		if (registrations.length) {
 			data.push('service-worker:');
 
-		for (let registration of registrations) {
-			data.push('  ' + registration.active.scriptURL);
-			//registration.unregister();
+			for (let registration of registrations) {
+				data.push('  ' + registration.active.scriptURL);
+				//registration.unregister();
+			}
 		}
 
 		// Final display
-		console.debug(data.join('\n'));
+		console.log(data.join('\n'));
 	});
 }
 
@@ -82,7 +83,7 @@ function JSONparse(json) {
 	try {
 		return JSON.parse(json);
 	} catch (returnCode) {
-		console.debug(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
 	}
 }
 

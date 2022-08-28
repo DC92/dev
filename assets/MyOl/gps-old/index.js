@@ -1,31 +1,53 @@
+/**
+ * PWA
+ */
+var map, gpxLayer;
+const elListe = document.getElementById('gps-trace-list');
+
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
-if (!location.href.match(/(https|localhost).*index/))
+if (!location.href.match(/(https|localhost).*index/)) {
 	location.replace(
 		(location.hostname == 'localhost' ? 'http://' : 'https://') +
 		location.hostname +
-		location.pathname + (location.pathname.slice(-1) == '/' ? 'index.php' : '') +
+		location.pathname + (location.pathname.slice(-1) == '/' ? scriptName || 'index.html' : '') +
 		location.search +
 		location.hash);
-
-// Load service worker for web application install & updates
-if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register('service-worker.js.php')
-	.then(registration => {
-		if (registration.active) // Avoid reload on first install
-			registration.onupdatefound = function() { // service-worker.js is changed
-				console.log('PWA onupdatefound\nunregister ' + registration.active.scriptURL);
-				registration.unregister(); // Clean everything
-				location.reload(); // Redo from start
+} else {
+	// Load service worker for web application install & updates
+	if ('serviceWorker' in navigator)
+		navigator.serviceWorker.register(
+			typeof serviceWorkerName == 'undefined' ? 'service-worker.js' : serviceWorkerName, {
+				// Max scope. Allow service worker to be in a different directory
+				scope: typeof scope == 'undefined' ? './' : scope,
 			}
-	});
+		)
+		.then(function(registration) {
+			if (registration.active) { // Avoid reload on first install
+				console.log('PWA SW registration.active');
 
-// Manage the map
-var elListe = document.getElementById('gps-trace-list')
-controls = [
+				registration.onupdatefound = function() { // service-worker.js is changed
+					console.log('PWA SW onupdatefound');
+
+					const installingWorker = registration.installing;
+
+					installingWorker.onstatechange = function() {
+						console.log('PWA SW installingWorker.onstatechange ' + installingWorker.state);
+
+						if (installingWorker.state == 'installed')
+							// The old content have been purged
+							// and the fresh content have been added to the cache.
+							location.reload();
+					};
+				};
+			}
+		});
+
+	// Manage the map
+	const controls = [
 		// No button controls
 		controlTilesBuffer(4),
-		controlLayerSwitcher(),
+		controlLayerSwitcher(baseLayers),
 		controlPermalink(),
 
 		// Bottom
@@ -50,19 +72,20 @@ controls = [
 			label: '?',
 			submenuEl: document.getElementById('gps-help'),
 		}),
-	],
+	];
+
 	map = new ol.Map({
 		target: 'map',
 		controls: controls,
 		view: new ol.View({
 			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 		}),
-	}),
-	gpxLayer;
+	});
+
+	map.once('postrender', () => addGpxLayer(location.hash.replace('#', '')));
+}
 
 // Add a gpx layer from files in the same directory
-map.once('postrender', () => addGpxLayer(location.hash.replace('#', '')));
-
 function addGpxLayer(gpxArg) {
 	if (typeof gpxFiles == 'object' &&
 		gpxFiles.includes(gpxArg.toLowerCase())) {

@@ -1,53 +1,27 @@
 <?php
-// Don't cache me
-header('Cache-Control: no-cache');
-header('Pragma: no-cache');
-header('Expires: '.date('r'));
-
 header('Content-Type: application/javascript');
-header('Service-Worker-Allowed: /');
 
-//HACK avoid http 406 error
-$url_path = str_replace (':', '../', @$_GET['url_path']);
+// Calculate a tag depending on the last dates of the files
+$tag = 0;
+foreach (glob ('{../*,../../*,../*/*}', GLOB_BRACE) AS $f)
+	$tag += filemtime($f);
+?>
+// The first time a user hits the page an install event is triggered.
+// The other times an update is provided if the service-worker source md5 is different
+// Version tag <?=$tag?> 
 
-// Read service worker code
-$serviceWorkerCode = file_get_contents ('service-worker.js');
-
-// Add GPX files in the url directory to the list of files to cache
-foreach (glob ($url_path.'*.gpx') as $gf) {
-	$serviceWorkerCode = str_replace (
-		"addAll([",
-		"addAll([\n\t\t\t\t'$gf',",
-		$serviceWorkerCode
-	);
-}
-
-// Add tagged index.php to trigger update on index.php file changes
-$index_to_add = "\n\t\t\t\t'index.php',";
-if ($url_path) // The entry point is not in the library
-	$index_to_add .= "\n\t\t\t\t'{$url_path}index.php',";
-
-$serviceWorkerCode = str_replace (
-	'addAll([',
-	'addAll(['.$index_to_add,
-	$serviceWorkerCode
+// Get cached values
+self.addEventListener('fetch', evt =>
+	evt.respondWith(
+		caches.match(evt.request)
+		.then(found => found ||
+			fetch(evt.request).then(response =>
+				caches.open('myGpsCache')
+				.then(cache => {
+					cache.put(evt.request, response.clone());
+					return response;
+				})
+			)
+		)
+	)
 );
-
-// Add date tag as arg to files to avoid caching changes
-$serviceWorkerCode = preg_replace_callback(
-	"/'([a-z0-9\.\/\-_]+\.[a-z]+)'/i",
-	function ($matches) {
-		return '"'.$matches[1].'?'.filemtime($matches[1]).'"';
-	},
-	$serviceWorkerCode
-);
-
-// Add non tagged index.php & favicon.png as defined on manifest.json
-$serviceWorkerCode = str_replace (
-	'addAll([',
-	'addAll(['.$index_to_add,
-	$serviceWorkerCode
-);
-
-// Display code
-echo $serviceWorkerCode;

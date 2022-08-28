@@ -1,0 +1,22 @@
+html, body, #map {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+p, ul {
+	margin: 0;
+}
+li {
+	margin: 0.5em 0;
+}
+#gps-trace-list ul {
+	list-style-type: none;
+}
+#gps-trace-list a {
+	text-decoration: none;
+}
+#gps-help {
+	left: 0;
+	width: 100%;
+}
