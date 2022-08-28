@@ -20,41 +20,47 @@ if (!location.hash.indexOf('##'))
 		alert(evt.filename + ' ' + evt.lineno + ':' + evt.colno + '\n' + evt.message);
 	});
 if (location.hash == '###')
-	console.log = function(message) {
+	console.debug = function(message) {
 		alert(message);
 	};
 
 /**
  * Display misc values
  */
-// OL version
-try {
-	new ol.style.Icon(); // Try incorrect action
-} catch (err) { // to get Assert url
-	console.log('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
-}
-// Dump myol storages
 {
-	let datas = [];
+	let data = [];
 
+	// OL version
+	try {
+		new ol.style.Icon(); // Try incorrect action
+	} catch (err) { // to get Assert url
+		data.push('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+	}
+
+	// myol storages in the subdomain
 	['localStorage', 'sessionStorage'].forEach(s => {
 		if (window[s].length)
-			datas.push(s + ':');
+			data.push(s + ':');
 
-		Object.keys(localStorage)
+		Object.keys(window[s])
 			.filter(k => k.substring(0, 5) == 'myol_')
-			.forEach(k => datas.push(k + ': ' + window[s].getItem(k)));
+			.forEach(k => data.push('  ' + k + ': ' + window[s].getItem(k)));
 	});
 
-	console.log(datas.join('\n'));
+	// Registered service workers in the scope
+	navigator.serviceWorker.getRegistrations().then(registrations => {
+		if (registrations.length)
+			data.push('service-worker:');
+
+		for (let registration of registrations) {
+			data.push('  ' + registration.active.scriptURL);
+			//registration.unregister();
+		}
+
+		// Final display
+		console.debug(data.join('\n'));
+	});
 }
-// List service workers registered
-navigator.serviceWorker.getRegistrations().then(function(registrations) {
-	for (let registration of registrations) {
-		console.log('service-worker: ' + registration.active.scriptURL);
-		//registration.unregister();
-	}
-});
 
 /**
  * Warn layers when added to the map
@@ -82,7 +88,7 @@ function JSONparse(json) {
 	try {
 		return JSON.parse(json);
 	} catch (returnCode) {
-		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
+		console.debug(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
 	}
 }
 
