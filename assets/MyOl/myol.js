@@ -2221,6 +2221,25 @@ function controlPrint() {
 }
 
 /**
+ * Help control
+ * Requires controlButton
+ * Display help contained in <TAG id="myol-help">
+ */
+function controlHelp(opt) {
+	const options = {
+			helpId: 'myol-help',
+			...opt
+		},
+		helpEl = document.getElementById(options.helpId);
+
+	if (helpEl)
+		return controlButton({
+			label: '?',
+			submenuEl: helpEl,
+		});
+}
+
+/**
  * Controls examples
  */
 function controlsCollection(options) {
@@ -2245,6 +2264,7 @@ function controlsCollection(options) {
 		// Bottom right
 		controlPermalink(options.permalink),
 		new ol.control.Attribution(),
+		controlHelp(options.help),
 	];
 }
 

@@ -9,6 +9,7 @@ if (!location.href.match(/(https|localhost).*index/))
 		location.hash);
 
 // Load service worker for web application install & updates
+if(0)//TODO DEBUG
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
 	.then(registration => {
@@ -21,8 +22,8 @@ if ('serviceWorker' in navigator)
 	});
 
 // Manage the map
-var elListe = document.getElementById('gps-trace-list')
-controls = [
+const elListe = document.getElementById('gps-trace-list'),
+	controls = [
 		// No button controls
 		controlTilesBuffer(4),
 		controlLayerSwitcher(),
@@ -42,6 +43,7 @@ controls = [
 		controlGPS(),
 		controlLoadGPX(),
 		controlDownload(),
+/*
 		controlButton({ // List of tracks in the same directory
 			label: elListe ? '&#x1F6B6;' : null,
 			submenuEl: elListe,
@@ -50,15 +52,16 @@ controls = [
 			label: '?',
 			submenuEl: document.getElementById('gps-help'),
 		}),
+*/
 	],
 	map = new ol.Map({
 		target: 'map',
-		controls: controls,
+		controls: controlsCollection().concat(controlLayerSwitcher()),
 		view: new ol.View({
 			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 		}),
-	}),
-	gpxLayer;
+	});
+let gpxLayer;
 
 // Add a gpx layer from files in the same directory
 map.once('postrender', () => addGpxLayer(location.hash.replace('#', '')));
