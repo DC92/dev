@@ -1,13 +1,13 @@
 // Forçage de l'init des coches
 <?php if ( $vue->polygone->id_polygone ) { ?>
-	// Supprime toutes les sélections
+	// Supprime toutes les sélections commençant par myol_selecteur
 	Object.keys(localStorage)
 		.filter(k => k.substring(0, 14) == 'myol_selecteur')
 		.forEach(k => localStorage.removeItem(k));
 
 	// Force tous les points et le contour
-	localStorage.setItem('myol_selecteurwri', 'all');
-	localStorage.setItem('myol_selecteurmassif', '<?=$vue->polygone->id_polygone?>');
+	localStorage.myol_selecteurwri = 'all';
+	localStorage.myol_selecteurmassif = <?=$vue->polygone->id_polygone?>;
 <?php } ?>
 
 const baseLayers = {
@@ -44,7 +44,9 @@ const baseLayers = {
 		controlLoadGPX(),
 		controlDownload(),
 		controlPrint(),
-		controlLayerSwitcher(baseLayers),
+		controlLayerSwitcher({
+			layers: baseLayers,
+		}),
 		controlMousePosition(),
 		new ol.control.ScaleLine(),
 		controlPermalink({ // Permet de garder le même réglage de carte

@@ -459,16 +459,16 @@ function layersDemo() {
  * Layer switcher
  * Need to include layerSwitcher.css
  */
-function controlLayerSwitcher(layers, opt) {
+function controlLayerSwitcher(opt) {
 	const options = {
-			additionalSelectorId: 'additional-selector',
+			layers: typeof layersCollection == 'function' ? layersCollection() : null,
 			...opt
 		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
 		baseLayers = Object.fromEntries(
-			Object.entries(layers || layersCollection())
+			Object.entries(options.layers)
 			.filter(([_, v]) => v != null) // Remove empty layers
 		),
 		layerNames = Object.keys(baseLayers),
@@ -1527,6 +1527,66 @@ function layerOverpass(opt) {
  */
 
 /**
+ * Control button
+ * Abstract definition to be used by other control buttons definitions
+ */
+function controlButton(opt) {
+	const options = {
+			element: document.createElement('div'),
+			className: 'myol-button',
+			...opt
+		},
+		control = new ol.control.Control(options),
+		buttonEl = document.createElement('button');
+
+	// Neutral: not displayed
+	if (!options.label)
+		return control;
+
+	// Populate control & button
+	control.element.className = 'ol-control ' + options.className;
+	buttonEl.innerHTML = options.label;
+	control.element.appendChild(buttonEl);
+
+	// Assign button actions
+	control.element.addEventListener('mouseover', function() {
+		control.element.classList.add('myol-display-submenu');
+	});
+	control.element.addEventListener('mouseout', function() {
+		control.element.classList.remove('myol-display-submenu');
+	});
+	control.element.addEventListener('touchend', function(evt) {
+		if (control.element.isEqualNode(evt.target.parentElement))
+			control.element.classList.toggle('myol-display-submenu');
+	});
+
+	// Add submenu below the button
+	if (options.submenuEl)
+		control.submenuEl = options.submenuEl;
+	else {
+		control.submenuEl = document.createElement('div');
+		if (options.submenuHTML)
+			control.submenuEl.innerHTML = options.submenuHTML;
+	}
+	control.element.appendChild(control.submenuEl);
+
+	// Assign control.function to submenu elements events
+	// with attribute ctrlOnClic="function" or ctrlOnChange="function"
+	for (let el of control.submenuEl.getElementsByTagName('*'))
+		['OnClick', 'OnChange'].forEach(evtName => {
+			const evtFnc = el.getAttribute('ctrl' + evtName);
+			if (evtFnc)
+				el[evtName.toLowerCase()] = function(evt) {
+					// Check at execution time if control.function() is defined
+					if (typeof control[evtFnc] == 'function')
+						control[evtFnc](evt);
+				};
+		});
+
+	return control;
+}
+
+/**
  * Permalink control
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
@@ -1598,7 +1658,7 @@ function controlPermalink(opt) {
 /**
  * Control to display the mouse position
  */
-function controlMousePosition() {
+function controlMousePosition(options) {
 	return new ol.control.MousePosition({
 		projection: 'EPSG:4326',
 		className: 'myol-coordinate',
@@ -1615,6 +1675,7 @@ function controlMousePosition() {
 			} else
 				return ol.coordinate.createStringXY(4)(mouse);
 		},
+		...options
 	});
 }
 
@@ -1623,9 +1684,8 @@ function controlMousePosition() {
  * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {
-	const control = new ol.control.Control({
-		element: document.createElement('div'), // div to display the measure
-	});
+	const control = controlButton();
+
 	control.element.className = 'myol-length-line';
 
 	control.setMap = function(map) {
@@ -1663,10 +1723,12 @@ function controlLengthLine() {
  * Control to display set preload of depth upper level tiles
  * This prepares the browser to become offline
  */
-function controlTilesBuffer(depth) {
-	const control = new ol.control.Control({
-		element: document.createElement('div'),
-	});
+function controlTilesBuffer(opt) {
+	const options = {
+			depth: 3,
+			...opt
+		},
+		control = controlButton();
 
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
@@ -1675,7 +1737,7 @@ function controlTilesBuffer(depth) {
 		map.on('precompose', function() {
 			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
-					layer.setPreload(depth);
+					layer.setPreload(options.depth);
 			});
 		});
 	};
@@ -1687,11 +1749,9 @@ function controlTilesBuffer(depth) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-function controlGeocoder() {
+function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
-		return new ol.control.Control({
-			element: document.createElement('div'),
-		});
+		return controlButton();
 
 	const geocoder = new Geocoder('nominatim', {
 			provider: 'osm',
@@ -1699,6 +1759,7 @@ function controlGeocoder() {
 			autoComplete: false, // Else keep list of many others
 			keepOpen: true, // Else bug "no internet"
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
+			...options
 		}),
 		controlEl = geocoder.element.firstElementChild,
 		buttonEl = controlEl ? controlEl.firstElementChild : null;
@@ -1726,70 +1787,10 @@ function controlGeocoder() {
 }
 
 /**
- * Control button
- * Abstract definition to be used by other control buttons definitions
- */
-function controlButton(opt) {
-	const options = {
-			element: document.createElement('div'),
-			className: 'myol-button',
-			...opt
-		},
-		control = new ol.control.Control(options),
-		buttonEl = document.createElement('button');
-
-	// Neutral: not displayed
-	if (!options.label)
-		return control;
-
-	// Populate control & button
-	control.element.className = 'ol-control ' + options.className;
-	buttonEl.innerHTML = options.label;
-	control.element.appendChild(buttonEl);
-
-	// Assign button actions
-	control.element.addEventListener('mouseover', function() {
-		control.element.classList.add('myol-display-submenu');
-	});
-	control.element.addEventListener('mouseout', function() {
-		control.element.classList.remove('myol-display-submenu');
-	});
-	control.element.addEventListener('touchend', function(evt) {
-		if (control.element.isEqualNode(evt.target.parentElement))
-			control.element.classList.toggle('myol-display-submenu');
-	});
-
-	// Add submenu below the button
-	if (options.submenuEl)
-		control.submenuEl = options.submenuEl;
-	else {
-		control.submenuEl = document.createElement('div');
-		if (options.submenuHTML)
-			control.submenuEl.innerHTML = options.submenuHTML;
-	}
-	control.element.appendChild(control.submenuEl);
-
-	// Assign control.function to submenu elements events
-	// with attribute ctrlOnClic="function" or ctrlOnChange="function"
-	for (let el of control.submenuEl.getElementsByTagName('*'))
-		['OnClick', 'OnChange'].forEach(evtName => {
-			const evtFnc = el.getAttribute('ctrl' + evtName);
-			if (evtFnc)
-				el[evtName.toLowerCase()] = function(evt) {
-					// Check at execution time if control.function() is defined
-					if (typeof control[evtFnc] == 'function')
-						control[evtFnc](evt);
-				};
-		});
-
-	return control;
-}
-
-/**
  * GPS control
  * Requires controlButton
  */
-function controlGPS() {
+function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
@@ -1875,6 +1876,7 @@ function controlGPS() {
 				enableHighAccuracy: true,
 				maximumAge: 1000,
 				timeout: 1000,
+				...options
 			},
 		});
 		geolocation.on('change', control.renderGPS);
@@ -2154,7 +2156,7 @@ function controlDownload(opt) {
  * Print control
  * Requires controlButton
  */
-function controlPrint() {
+function controlPrint(options) {
 	const control = controlButton({
 		label: '&#x1F5A8;',
 		className: 'myol-button',
@@ -2168,6 +2170,7 @@ function controlPrint() {
 			'<label for="myol-po1">Paysage A4</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
+		...options
 	});
 
 	control.resizeDraftPrint = function() {
@@ -2232,39 +2235,40 @@ function controlHelp(opt) {
 		},
 		helpEl = document.getElementById(options.helpId);
 
-	if (helpEl)
-		return controlButton({
-			label: '?',
-			submenuEl: helpEl,
-		});
+	return controlButton(!helpEl ? {} : {
+		label: '?',
+		submenuEl: helpEl,
+	});
 }
 
 /**
  * Controls examples
  */
-function controlsCollection(options) {
-	options = options || {};
+function controlsCollection(opt) {
+	const options = {
+		...opt
+	};
 
 	return [
 		// Top left
-		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
+		new ol.control.Zoom(options.Zoom),
+		new ol.control.FullScreen(options.FullScreen),
 		controlButton(), // Neutral: not displayed
-		controlGeocoder(),
-		controlGPS(options.controlGPS),
-		controlLoadGPX(),
-		controlDownload(options.controlDownload),
-		controlPrint(),
+		controlGeocoder(options.Geocoder),
+		controlGPS(options.GPS),
+		controlLoadGPX(options.LoadGPX),
+		controlDownload(options.Download),
+		controlPrint(options.Print),
 
 		// Bottom left
-		controlLengthLine(),
-		controlMousePosition(),
-		new ol.control.ScaleLine(),
+		controlLengthLine(options.LengthLine),
+		controlMousePosition(options.Mouseposition),
+		new ol.control.ScaleLine(options.ScaleLine),
 
 		// Bottom right
-		controlPermalink(options.permalink),
-		new ol.control.Attribution(),
-		controlHelp(options.help),
+		controlPermalink(options.Permalink),
+		new ol.control.Attribution(options.Attribution),
+		controlHelp(options.Help),
 	];
 }
 

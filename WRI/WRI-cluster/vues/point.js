@@ -37,7 +37,9 @@ new ol.Map({
 		new ol.control.FullScreen(),
 		controlGPS(),
 		controlPrint(),
-		controlLayerSwitcher(baseLayers),
+		controlLayerSwitcher({
+			layers: baseLayers,
+		}),
 		controlMousePosition(),
 		new ol.control.ScaleLine(),
 		controlPermalink({ // Permet de garder le même réglage de carte d'une page à l'autre

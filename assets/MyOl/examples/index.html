@@ -77,9 +77,11 @@ const mapKeys = {
 // Must be after the "map" tag
 new ol.Map({
 	target: 'map',
-	controls: controlsCollection().concat(controlLayerSwitcher()),
+	controls: controlsCollection().concat(controlLayerSwitcher({
+		additionalSelectorId: 'additional-selector',
+	})),
 	layers: [
-		...layersCluster({
+		...layersCluster({ //TODO BUG don't,work
 			host: '//chemineur.fr/',
 			layer: layerGeoBB,
 			selectorName: 'chem-features',

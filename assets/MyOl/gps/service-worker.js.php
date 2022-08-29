@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/javascript');
+header('Cache-Control: no-cache');
 
 // Calculate a tag depending on the last dates of the files
 $dirs = [
@@ -13,6 +14,9 @@ $tag = 0;
 foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
 	if (is_file ($f))
 		$tag += filemtime ($f);
+
+//TODO put GPX files in cache
+//TODO parameter manifest name, favicon & id
 ?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different

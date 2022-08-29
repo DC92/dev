@@ -20,7 +20,9 @@ const baseLayers = {
 		controlGeocoder(),
 		controlLoadGPX(),
 		//controlDownload(), //TODO n'exporte pas les polygones
-		controlLayerSwitcher(baseLayers),
+		controlLayerSwitcher({
+			layers: baseLayers,
+		}),
 		controlMousePosition(),
 		new ol.control.ScaleLine(),
 		controlPermalink({ // Permet de garder le même réglage de carte

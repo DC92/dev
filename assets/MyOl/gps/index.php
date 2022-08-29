@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<?php
+	header('Cache-Control: no-cache');
+?><!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
 https://github.com/Dominique92/MyOl
@@ -32,8 +34,21 @@ Install the service but upgrades the files only after the caches delay
 	<script src="../myol.js"></script>
 
 	<!-- This app -->
-	<link href="index.css" type="text/css" rel="stylesheet">
 	<script src="index.js" defer="defer"></script>
+	<script>
+		var controlOptions = {};
+	</script>
+	<style>
+		html, body, #map {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+		.ol-full-screen {
+			display: none;
+		}
+	</style>
 </head>
 
 <body>
