@@ -277,7 +277,7 @@ body {
 
 										/*Accueil * /
 										.section-index > div {
-											background: url('images/coin_ciel.jpg'); 
+											background: url('images/coin_ciel.jpg');
 											background-repeat: no-repeat ;
 											background-color: #5072BF !important;
 										}
@@ -335,7 +335,7 @@ body {
 
 										/*Points * /
 										.viewtopic-point {
-											background: url('images/pierre.jpg'); 
+											background: url('images/pierre.jpg');
 										}
 										.viewtopic-point > #wrap {
 											background-color: transparent;

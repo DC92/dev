@@ -19,7 +19,7 @@ if (location.hash == '###')
 /**
  * Display misc values
  */
-{
+(async function() {
 	let data = [];
 
 	// OL version
@@ -40,20 +40,33 @@ if (location.hash == '###')
 	});
 
 	// Registered service workers in the scope
-	navigator.serviceWorker.getRegistrations().then(registrations => {
-		if (registrations.length) {
-			data.push('service-worker:');
+	if ('serviceWorker' in navigator)
+		await navigator.serviceWorker.getRegistrations().then(registrations => {
+			if (registrations.length) {
+				data.push('service-worker:');
 
-			for (let registration of registrations) {
-				data.push('  ' + registration.active.scriptURL);
-				//registration.unregister();
+				for (let registration of registrations) {
+					if (registration.active)
+						data.push('  ' + registration.active.scriptURL);
+					//registration.unregister(); // For test purposes
+				}
+			}
+		});
+
+	await caches.keys().then(function(names) {
+		if (names.length) {
+			data.push('caches:');
+
+			for (let name of names) {
+				data.push('  ' + name);
+				//caches.delete(name); // For test purposes
 			}
 		}
-
-		// Final display
-		console.log(data.join('\n'));
 	});
-}
+
+	// Final display
+	console.log(data.join('\n'));
+})();
 
 /**
  * Warn layers when added to the map

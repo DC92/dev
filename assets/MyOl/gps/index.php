@@ -1,5 +1,6 @@
 <?php
 	header('Cache-Control: no-cache');
+file_put_contents('<br/>PWA.log', 'index.php '.date('r'), FILE_APPEND);
 ?><!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
@@ -18,23 +19,23 @@ Install the service but upgrades the files only after the caches delay
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0,
 		maximum-scale=1.0, user-scalable=no" />
-	<link href="favicon.png" rel="icon" type="image/png" />
-	<link href="favicon.png" rel="apple-touch-icon" />
+	<link href="favicon.png?<?=filemtime('favicon.png')?>" rel="icon" type="image/png" />
+	<link href="favicon.png?<?=filemtime('favicon.png')?>" rel="apple-touch-icon" />
 
 	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
+	<link href="../ol/ol.css?<?=filemtime('../ol/ol.css')?>" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js?<?=filemtime('../ol/ol.js')?>"></script>
 
 	<!-- Recherche par nom -->
-	<link href="../geocoder/ol-geocoder.min.css" type="text/css" rel="stylesheet">
-	<script src="../geocoder/ol-geocoder.js"></script>
+	<link href="../geocoder/ol-geocoder.min.css?<?=filemtime('../geocoder/ol-geocoder.min.css')?>" type="text/css" rel="stylesheet">
+	<script src="../geocoder/ol-geocoder.js?<?=filemtime('../geocoder/ol-geocoder.js')?>"></script>
 
 	<!-- My Openlayers -->
-	<link  href="../myol.css" type="text/css" rel="stylesheet">
-	<script src="../myol.js"></script>
+	<link  href="../myol.css?<?=filemtime('../myol.css')?>" type="text/css" rel="stylesheet">
+	<script src="../myol.js?<?=filemtime('../myol.js')?>"></script>
 
 	<!-- This app -->
-	<script src="index.js" defer="defer"></script>
+	<script src="index.js?<?=filemtime('index.js')?>" defer="defer"></script>
 	<script>
 		var controlOptions = {};
 	</script>

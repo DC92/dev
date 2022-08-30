@@ -5,7 +5,7 @@
 		<link rel="icon" type="image/svg+xml" href="/images/icones/favicon.svg">
 		<meta name="robots" content="all" />
 		<meta name="robots" content="index,follow" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<meta http-equiv="Content-Style-Type" content="text/css" />
 
@@ -303,7 +303,7 @@ function menuSelectAPropos(el) {
 }
 
 function menuSelect(el) {
-	loadNews(el.value); 
+	loadNews(el.value);
 /*DCMM*/{var _r=' ',_v=el.value;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
 
 	// Mem the selection in cookie

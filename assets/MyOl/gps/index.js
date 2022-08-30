@@ -8,15 +8,15 @@ if (!location.href.match(/(https|localhost).*index/))
 		location.search +
 		location.hash);
 
-// Load service worker for web application install & updates
+// Load service worker for web application, install & update
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
 	.then(registration => {
-		if (registration.active) // Avoid reload on first install
-			registration.onupdatefound = function() { // service-worker.js is changed
+		if (registration.active) // Avoid reinstall on first install
+			registration.onupdatefound = async function() { // service-worker.js is changed
 				console.log('PWA onupdatefound\nunregister ' + registration.active.scriptURL);
-				registration.unregister(); // Clean everything
-				location.reload(); // Redo from start
+				await registration.unregister(); // Clean everything
+				location.reload(); // Restart fresh install
 			}
 	});
 
