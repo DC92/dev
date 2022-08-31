@@ -97,7 +97,7 @@ localStorage['myol_wrifeatures'] = '7,9,10,23'; // Force les 4 premières cases 
 window.addEventListener('load', function() {
 	map.addLayer(layerWri({
 		selectorName: 'wri-features',
-		maxResolution: 300, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
+		maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
 	}));
 });
 </script>
