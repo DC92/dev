@@ -4,6 +4,7 @@ header('Cache-Control: no-cache');
 
 // Calculate a tag depending on the last dates of the files
 $dirs = [
+//TODO tag = last file date with format
 	'../*/*', // root/MyOl/*/* (includes --/MyOl/gps/*)
 	'../*', // root/MyOl/*
 	'../../*.gpx', // root/*.gpx GPS files in the root directory
@@ -16,7 +17,8 @@ foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
 		$tag += filemtime ($f);
 
 //TODO put GPX files in cache
-//TODO parameter manifest name, favicon & id
+//TODO parameter manifest name, favicon & id (for GPS appli)
+//TODO display last file date as version info
 ?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different

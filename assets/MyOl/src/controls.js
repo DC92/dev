@@ -732,7 +732,7 @@ function controlHelp(opt) {
  * Controls examples
  */
 function controlsCollection(opt) {
-	const options = {
+	const options = { //TODO all parameters via options
 		...opt
 	};
 

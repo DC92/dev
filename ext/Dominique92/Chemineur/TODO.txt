@@ -1,5 +1,5 @@
 //TODO BUG click sur bouton carte recharge la page
-//TODO BUG : afficher quand même le picto de la fiche si la couche chem est désactivée
+//TODO BUG : afficher le picto de la fiche même quand la couche chem est désactivée
 
 //BEST token psw {S_LOGIN_REDIRECT}
 //BEST inverser l'ordre des posts / SPECIALEMENT DIAPORAMAS !

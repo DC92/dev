@@ -1,5 +1,4 @@
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-//TODO BUG WRI Voir pourquoi il lance le service worker sur les autres pages
 //TODO BUG WRI Mobile Gps picto rando ne ferme pas les autres
 //TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
 //TODO BUG WRI Revoir bandeau grandes fenêtres & logo

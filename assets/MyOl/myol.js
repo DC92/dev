@@ -12,6 +12,7 @@
 /* jshint esversion: 6 */
 if (!ol) var ol = {};
 
+
 /**
  * Debug facilities on mobile
  */

@@ -4,7 +4,7 @@
  */
 //BEST alt key to switch layers / transparency
 function controlLayerSwitcher(opt) {
-	const options = {
+	const options = { //BEST all parameters via options including keys
 			layers: typeof layersCollection == 'function' ? layersCollection() : null,
 			...opt
 		},
@@ -54,6 +54,7 @@ function controlLayerSwitcher(opt) {
 		});
 
 		// Build html baselayers selectors
+		//BEST redo on the standard format (close while touching button)
 		for (let name in baseLayers) {
 			// Make all choices an array of layers
 			if (!baseLayers[name].length)
