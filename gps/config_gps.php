@@ -84,6 +84,4 @@ function addGpxLayer(gpxArg) {
 		fonctions réduites avec Firefox & Safari</p>
 	<p>* Cette application ne permet pas de visualiser ou d'enregistrer le parcours</p>
 	<p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
-	<hr /><p>Mise à jour: <?=date('d M Y H:i:s')?> @<?=$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']?>
-	</p>
 </div>

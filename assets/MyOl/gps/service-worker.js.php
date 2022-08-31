@@ -20,10 +20,12 @@ foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
 ?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
-// Version tag <?=$tag?>
+// Version tag <?=$tag?> ;
+console.log('version <?=$tag?>');
 
 self.addEventListener('install', async function() {
 	// Clean & reconstruct GPS cache
+	console.log('PWA replacing myGpsCache');
 	await caches.delete('myGpsCache');
 	await caches.open('myGpsCache')
 		.then(cache =>
@@ -31,7 +33,7 @@ self.addEventListener('install', async function() {
 				'favicon.png',
 			])
 		);
-	console.log('PWA myGpsCache added');
+	console.log('PWA myGpsCache replaced');
 });
 
 // Get cached values

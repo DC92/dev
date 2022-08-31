@@ -1,6 +1,5 @@
 <?php
 	header('Cache-Control: no-cache');
-file_put_contents('<br/>PWA.log', 'index.php '.date('r'), FILE_APPEND);
 ?><!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019

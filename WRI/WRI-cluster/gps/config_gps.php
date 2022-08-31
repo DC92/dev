@@ -4,38 +4,7 @@ setcookie ('baselayer', 'Refuges.info');
 
 include ('../config_privee.php');
 $mapKeys = $config_wri['mapKeys'];
-
 ?>
-
-<script>
-controlOptions.LayerSwitcher = {
-	layers: {
-		'Refuges.info': layerMRI(),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopo': layerOpenTopo(),
-		'Outdoors': layerThunderforest('outdoors'),
-		'IGN TOP25': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
-			key: mapKeys.ign,
-		}),
-		'IGN V2': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
-			key: 'essentiels', // The key for the free layers
-			format: 'image/png',
-		}),
-		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo IGN': layerIGN({
-			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
-			key: 'essentiels',
-		}),
-		'Photo ArcGIS': layerArcGIS('World_Imagery'),
-		'Photo Bing': layerBing('Aerial'),
-		'Photo Google': layerGoogle('s'),
-	},
-};
-</script>
 
 <div id="myol-help">
 	<p>Pour utiliser les cartes et le GPS hors réseau,
@@ -62,6 +31,75 @@ controlOptions.LayerSwitcher = {
 		fonctions réduites avec Firefox & Safari</p>
 	<p>* Cette application ne permet pas de visualiser ou d'enregistrer le parcours</p>
 	<p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
-	<hr /><p>Mise à jour: <?=date('d M Y H:i:s')?> @<?=$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']?>
-	</p>
 </div>
+
+<div id="additional-selector" >
+	<hr />
+	Dispo en zoom fort
+	<br />
+	<label for="wriall">Refuges.info<label>
+	<input type="checkbox" name="wri-features" id="wriall" value="all" />
+	<br />
+	<input type="checkbox" name="wri-features" id="wri7" value="7" />
+	<label for="wri7">Cabane<label>
+	<br />
+	<input type="checkbox" name="wri-features" id="wri10" value="10" />
+	<label for="wri10">Refuge<label>
+	<br />
+	<input type="checkbox" name="wri-features" id="wri9" value="9" />
+	<label for="wri9">Gîte<label>
+	<br />
+	<input type="checkbox" name="wri-features" id="wri23" value="23" />
+	<label for="wri23">Point d'eau<label>
+	<br />
+	<input type="checkbox" name="wri-features" id="wri6" value="6" />
+	<label for="wri6">Sommet<label>
+	<br />
+	<input type="checkbox" name="wri-features" id="wri3" value="3" />
+	<label for="wri3">Passage<label>
+	<br />
+	<input type="checkbox" name="wri-features" id="wri28" value="28" />
+	<label for="wri28">Bâtiment<label>
+</div>
+
+<script>
+// Couches de fond
+controlOptions.LayerSwitcher = {
+	layers: {
+		'Refuges.info': layerMRI(),
+		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OpenTopo': layerOpenTopo(),
+		'Outdoors': layerThunderforest('outdoors'),
+		'IGN TOP25': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
+			key: mapKeys.ign,
+		}),
+		'IGN V2': layerIGN({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
+			key: 'essentiels', // The key for the free layers
+			format: 'image/png',
+		}),
+		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Autriche': layerKompass('KOMPASS Touristik'),
+		'Espagne': layerSpain('mapa-raster', 'MTN'),
+		'Photo IGN': layerIGN({
+			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
+			key: 'essentiels',
+		}),
+		'Photo ArcGIS': layerArcGIS('World_Imagery'),
+		'Photo Bing': layerBing('Aerial'),
+		'Photo Google': layerGoogle('s'),
+	},
+	additionalSelectorId: 'additional-selector',
+};
+
+// Couche pictos WRI
+localStorage['myol_wrifeatures'] = '7,9,10,23';
+
+window.addEventListener('load', function() {
+	map.addLayer(layerWri({
+		selectorName: 'wri-features',
+		maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
+	}));
+});
+</script>

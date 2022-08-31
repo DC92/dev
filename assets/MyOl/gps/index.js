@@ -14,14 +14,14 @@ if ('serviceWorker' in navigator)
 	.then(registration => {
 		if (registration.active) // Avoid reinstall on first install
 			registration.onupdatefound = async function() { // service-worker.js is changed
-				console.log('PWA onupdatefound\nunregister ' + registration.active.scriptURL);
+				console.log('PWA onupdatefound\nunregistering ' + registration.active.scriptURL);
 				await registration.unregister(); // Clean everything
 				location.reload(); // Restart fresh install
 			}
 	});
 
 // Manage the map
-const map = new ol.Map({
+var map = new ol.Map({
 	target: 'map',
 	controls: controlsCollection(controlOptions)
 		.concat(controlLayerSwitcher(controlOptions.LayerSwitcher)),

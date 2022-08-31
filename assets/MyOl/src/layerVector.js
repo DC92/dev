@@ -175,7 +175,7 @@ function layerVector(opt) {
 					g.setCoordinates([
 						g.getCoordinates()[0] + Math.random() * 4 - 2,
 						g.getCoordinates()[1] + Math.random() * 4 - 2,
-					])
+					]);
 			});
 
 			// These options will be displayed by the hover response
