@@ -646,7 +646,7 @@ function controlDownload(opt) {
 function controlPrint(options) {
 	const control = controlButton({
 		label: '&#x1F5A8;',
-		className: 'myol-button',
+		className: 'myol-button myol-button-print',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +

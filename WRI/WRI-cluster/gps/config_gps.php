@@ -1,9 +1,5 @@
 <?php
-// Force la couche carte quand on lance le GPS
-setcookie ('baselayer', 'Refuges.info');
-
-include ('../config_privee.php');
-$mapKeys = $config_wri['mapKeys'];
+include ('../../config_privee.php');
 ?>
 
 <div id="myol-help">
@@ -64,6 +60,8 @@ $mapKeys = $config_wri['mapKeys'];
 
 <script>
 // Couches de fond
+var mapKeys = <?=json_encode($config_wri['mapKeys'])?>;
+
 controlOptions.LayerSwitcher = {
 	layers: {
 		'Refuges.info': layerMRI(),
@@ -94,12 +92,12 @@ controlOptions.LayerSwitcher = {
 };
 
 // Couche pictos WRI
-localStorage['myol_wrifeatures'] = '7,9,10,23';
+localStorage['myol_wrifeatures'] = '7,9,10,23'; // Force les 4 premières cases à l'init
 
 window.addEventListener('load', function() {
 	map.addLayer(layerWri({
 		selectorName: 'wri-features',
-		maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
+		maxResolution: 300, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
 	}));
 });
 </script>

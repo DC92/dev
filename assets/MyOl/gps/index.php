@@ -34,10 +34,11 @@ Install the service but upgrades the files only after the caches delay
 	<script src="../myol.js?<?=filemtime('../myol.js')?>"></script>
 
 	<!-- This app -->
-	<script src="index.js?<?=filemtime('index.js')?>" defer="defer"></script>
 	<script>
 		var controlOptions = {};
+		<?php include('index.js') ?>
 	</script>
+
 	<style>
 		html, body, #map {
 			margin: 0;
@@ -45,7 +46,8 @@ Install the service but upgrades the files only after the caches delay
 			width: 100%;
 			height: 100%;
 		}
-		.ol-full-screen {
+		.ol-full-screen,
+		.myol-button-print {
 			display: none;
 		}
 	</style>

@@ -21,11 +21,14 @@ if ('serviceWorker' in navigator)
 	});
 
 // Manage the map
-var map = new ol.Map({
-	target: 'map',
-	controls: controlsCollection(controlOptions)
-		.concat(controlLayerSwitcher(controlOptions.LayerSwitcher)),
-	view: new ol.View({
-		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
-	}),
+var map;
+window.addEventListener('load', function() {
+	map = new ol.Map({
+		target: 'map',
+		controls: controlsCollection(controlOptions)
+			.concat(controlLayerSwitcher(controlOptions.LayerSwitcher)),
+		view: new ol.View({
+			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+		}),
+	});
 });
