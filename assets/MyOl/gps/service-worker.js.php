@@ -8,8 +8,8 @@ $dirs = [
 	'../*/*', // root/MyOl/*/* (includes --/MyOl/gps/*)
 	'../*', // root/MyOl/*
 	'../../*.gpx', // root/*.gpx GPS files in the root directory
-	'../../config_gps.php', // root/config specific site in the root directory
-	'../../*/config_gps.php', // root/*/config specific site in any directory
+	'../../gps_addons.php', // root/config specific site in the root directory
+	'../../*/gps_addons.php', // root/*/config specific site in any directory
 ];
 $tag = 0;
 foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
@@ -19,6 +19,7 @@ foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
 //TODO put GPX files in cache
 //TODO parameter manifest name, favicon & id (for GPS appli)
 //TODO display last file date as version info
+//TODO PWA juste réinitialisé : à besoin d'internet la prochaine fois
 ?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different

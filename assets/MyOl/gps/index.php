@@ -34,28 +34,19 @@ Install the service but upgrades the files only after the caches delay
 	<script src="../myol.js?<?=filemtime('../myol.js')?>"></script>
 
 	<!-- This app -->
+	<style>
+		<?php include('index.css') ?>
+	</style>
 	<script>
 		var controlOptions = {};
 		<?php include('index.js') ?>
 	</script>
-
-	<style>
-		html, body, #map {
-			margin: 0;
-			padding: 0;
-			width: 100%;
-			height: 100%;
-		}
-		.ol-full-screen,
-		.myol-button-print {
-			display: none;
-		}
-	</style>
 </head>
 
 <body>
 	<?php
-	foreach (glob ('{../../config_gps.php,../../*/config_gps.php}', GLOB_BRACE) AS $f)
+	// Add specificities
+	foreach (glob ('{../../gps_addons.php,../../*/gps_addons.php}', GLOB_BRACE) AS $f)
 		include ($f);
 	?>
 

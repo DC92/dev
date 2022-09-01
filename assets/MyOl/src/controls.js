@@ -144,6 +144,7 @@ function controlMousePosition(options) {
 		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
 
 		coordinateFormat: function(mouse) {
+			//TODO find better than ol.gpsValues to share info
 			if (ol.gpsValues && ol.gpsValues.position) {
 				const ll4326 = ol.proj.transform(ol.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
 					distance = ol.sphere.getDistance(mouse, ll4326);
@@ -283,7 +284,7 @@ function controlGPS(options) {
 		'<label for="myol-gps-source2">Position GPS ou IP <span>(2) intérieur</span></label><hr />' +
 
 		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="myol-gps-display0">Carte libre</label><br />' +
+		'<label for="myol-gps-display0">Graticule, carte libre</label><br />' +
 		'<input type="radio" name="myol-gps-display" id="myol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
 		'<label for="myol-gps-display1">Centre la carte, nord en haut</label><br />' +
 		'<input type="radio" name="myol-gps-display" id="myol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
@@ -388,7 +389,7 @@ function controlGPS(options) {
 		// Tune the tracking level
 		if (evt.target.name == 'myol-gps-source') {
 			geolocation.setTracking(sourceLevel > 0);
-			graticuleLayer.setVisible(sourceLevel > 0);
+			graticuleLayer.setVisible(false);
 			ol.gpsValues = {}; // Reset the values
 			if (!sourceLevel && display0El)
 				display0El.checked = true;
@@ -459,14 +460,16 @@ function controlGPS(options) {
 				ol.gpsValues.isZoomed = true;
 				view.setZoom(17);
 			}
+			graticuleLayer.setVisible(true);
 		}
 
 		// Display data under the button
 		let status = ol.gpsValues.position ? '' : 'GPS sync...';
-		if (ol.gpsValues.altitude)
+		if (ol.gpsValues.altitude) {
 			status = Math.round(ol.gpsValues.altitude) + ' m';
-		if (ol.gpsValues.speed)
-			status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
+			if (ol.gpsValues.speed)
+				status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
+		}
 		if (statusEl)
 			statusEl.innerHTML = sourceLevel ? status : '';
 
@@ -514,12 +517,12 @@ function controlLoadGPX(opt) {
 
 		if (added !== false) { // If one used the feature
 			// Display the track on the map
-			const source = new ol.source.Vector({
+			const gpxSource = new ol.source.Vector({
 					format: format,
 					features: features,
 				}),
-				layer = new ol.layer.Vector({
-					source: source,
+				gpxLayer = new ol.layer.Vector({
+					source: gpxSource,
 					style: function(feature) {
 						const properties = feature.getProperties(),
 							styleOptions = {
@@ -537,7 +540,7 @@ function controlLoadGPX(opt) {
 						return new ol.style.Style(styleOptions);
 					},
 				});
-			map.addLayer(layer);
+			map.addLayer(gpxLayer);
 		}
 
 		// Zoom the map on the added features
@@ -571,7 +574,7 @@ function controlLoadGPX(opt) {
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
-			className: 'myol-button myol-download',
+			className: 'myol-button myol-button-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a ctrlOnClick="download" id="GPX" mime="application/gpx+xml">GPX</a>' +
@@ -601,10 +604,10 @@ function controlDownload(opt) {
 		else
 			map.getLayers().forEach(getFeatures);
 
-		function getFeatures(layer) {
-			if (layer.getSource() && layer.getSource().forEachFeatureInExtent) // For vector layers only
-				layer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!layer.marker_) //BEST find a better way to don't save the cursor
+		function getFeatures(savedLayer) {
+			if (savedLayer.getSource() && savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
+				savedLayer.getSource().forEachFeatureInExtent(extent, function(feature) {
+					if (!savedLayer.marker_) //BEST find a better way to don't save the cursor
 						features.push(feature);
 				});
 		}
