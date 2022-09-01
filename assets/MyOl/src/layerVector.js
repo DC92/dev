@@ -579,3 +579,25 @@ function styleOptionsCluster(feature, properties) {
 		}),
 	};
 }
+
+// Combined server clustered (high resolutions) + not clustered (low resolutions)
+// Use with spread operator ...layersGeoBB(options)
+function layersCluster(opt) {
+	const options = {
+		switchResolution: 100,
+		distanceMinCluster: 30,
+		...opt
+	};
+
+	return [
+		options.layer({
+			maxResolution: options.switchResolution,
+			...options
+		}),
+		options.layer({
+			cluster: true,
+			minResolution: options.switchResolution,
+			...options
+		}),
+	];
+}

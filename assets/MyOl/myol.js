@@ -1193,6 +1193,28 @@ function styleOptionsCluster(feature, properties) {
 	};
 }
 
+// Combined server clustered (high resolutions) + not clustered (low resolutions)
+// Use with spread operator ...layersGeoBB(options)
+function layersCluster(opt) {
+	const options = {
+		switchResolution: 100,
+		distanceMinCluster: 30,
+		...opt
+	};
+
+	return [
+		options.layer({
+			maxResolution: options.switchResolution,
+			...options
+		}),
+		options.layer({
+			cluster: true,
+			minResolution: options.switchResolution,
+			...options
+		}),
+	];
+}
+
 /* FILE src/layerVectorCollection.js */
 /**
  * This file implements various acces to geoJson services
@@ -1283,28 +1305,6 @@ function layerWri(opt) {
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		...opt
 	});
-}
-
-// Combined server clusterised (high resolutions) + not clusterised (low resolutions)
-// Use with spread operator ...layersGeoBB(options)
-function layersCluster(opt) {
-	const options = {
-		switchResolution: 100,
-		distanceMinCluster: 30,
-		...opt
-	};
-
-	return [
-		options.layer({
-			maxResolution: options.switchResolution,
-			...options
-		}),
-		options.layer({
-			cluster: true,
-			minResolution: options.switchResolution,
-			...options
-		}),
-	];
 }
 
 function layerWriAreas(opt) {

@@ -10,7 +10,11 @@
 	localStorage.myol_selecteurmassif = <?=$vue->polygone->id_polygone?>;
 <?php } ?>
 
-const baseLayers = {
+const mapId = 'carte-nav',
+	mapEl = document.getElementById(mapId),
+	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
+
+	baseLayers = {
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OpenTopo': layerOpenTopo(),
@@ -63,6 +67,10 @@ const baseLayers = {
 		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
+			strategy: ol.loadingstrategy.bboxLimit,
+			// Résolution à partir de laquelle le serveur sert des clusters (mercator unit / pixel)
+			switchResolution: Math.round(60000 / mapSize), 
+			distanceMinCluster: mapSize / 10, // Distance (en pixels sur l'écran) entre 2 cluster
 			selectorName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
 			styleOptionsFunction: function (feature, properties) {
 				return {
@@ -133,7 +141,7 @@ const baseLayers = {
 	],
 
 	map = new ol.Map({
-		target: 'carte-nav',
+		target: mapId,
 		view: new ol.View({
 			enableRotation: false,
 			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles

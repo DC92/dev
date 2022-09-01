@@ -1,4 +1,8 @@
-const baseLayers = {
+const mapId = 'carte-point',
+	mapEl = document.getElementById(mapId),
+	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
+
+	baseLayers = {
 		'Refuges.info': layerMRI(),
 		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
 		'OpenTopo': layerOpenTopo(),
@@ -25,7 +29,7 @@ const baseLayers = {
 	};
 
 new ol.Map({
-	target: 'carte-point',
+	target: mapId,
 	view: new ol.View({
 		center: ol.proj.fromLonLat([<?=$vue->point->longitude?>,<?=$vue->point->latitude?>]),
 		zoom: 13,
@@ -51,10 +55,13 @@ new ol.Map({
 		}),
 	],
 	layers: [
-		...layersCluster({ // Refuges.info (2 level layer depending on resolution)
+		// Refuges.info (2 level layer depending on resolution)
+		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
-			switchResolution: 500,
+			strategy: ol.loadingstrategy.bboxLimit,
+			switchResolution: Math.round(60000 / mapSize), 
+			distanceMinCluster: mapSize / 10, // Distance (en pixels sur l'écran) entre 2 cluster
 			styleOptionsFunction: function (feature, properties) {
 				return {
 					...styleOptionsLabel(properties.name, properties, true),
@@ -63,7 +70,9 @@ new ol.Map({
 			},
 			attribution: '',
 		}),
-		layerMarker({ // Le cadre
+
+		// Le cadre
+		layerMarker({
 			prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...
 			src: '<?=$config_wri["sous_dossier_installation"]?>images/cadre.svg',
 			focus: 15, // Centrer 
