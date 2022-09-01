@@ -171,7 +171,7 @@ Seule exception à ça, le cas du format "geojson" :
 Car c'est celui utilisé par la carte et que le fichier est généré par un json_encode($point) qui deviendrait trop gros pour les usages en mobilité et débit pourri.
 */
 foreach ($points_bruts as $i=>$point) {
-  if($point->nb_points) // cas des clusters
+  if(isset ($point->nb_points)) // cas des clusters
   {
     $points->$i = new stdClass();
     $points->$i->cluster = $point->nb_points;

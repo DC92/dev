@@ -287,10 +287,13 @@ function infos_points($conditions)
   if ( $conditions->cluster && 
     !$tables_en_plus ) // Si on croise avec un polygone ou autre, on ne culsterise pas car il y aura moins de points et ça évite une requette compliquée :)
   {
-    // Groupage des points dans des carrés de 0,1° (~10km) de latitude et longitude
+    // Groupage des points dans des carrés de 1/10 de la plus grande dimension de la carte visualisée
+    $nb_clusters_xy = 10;
+    $bbox = explode (',', $_REQUEST['bbox']);
+    $taille_cluster = max ($bbox[2] - $bbox[0], $bbox[3] - $bbox[1]) / $nb_clusters_xy;
     $query_clusters="
 SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom)) AS geojson,
-       round(ST_X(geom)::numeric,1) AS lon, round(ST_Y(geom)::numeric,1) AS lat
+       round(ST_X(geom)/$taille_cluster) AS lon, round(ST_Y(geom)/$taille_cluster) AS lat
   FROM points
   WHERE true $conditions_sql
   GROUP BY lon, lat
