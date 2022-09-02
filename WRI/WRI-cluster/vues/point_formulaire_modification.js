@@ -53,7 +53,7 @@ const baseLayers = {
 		src: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.svg',
 		focus: 15,
 		dragable: true,
-		zIndex: 10,
+		zIndex: 30, // Above points (zIndex = 10)
 	}),
 
 	layerPoints = layerWri({

@@ -92,6 +92,7 @@ function layerWri(opt) {
 function layerWriAreas(opt) {
 	return layerVector({
 		host: '//www.refuges.info/',
+		zIndex: 2, // Behind points
 		polygon: 1, // Massifs
 		urlArgsFunction: function(options) {
 			return {
@@ -113,9 +114,22 @@ function layerWriAreas(opt) {
 			};
 		},
 		hoverStyleOptionsFunction: function(f, properties) {
+			// Invert previous color
+			const colors = properties.color
+				.match(/([0-9a-f]{2})/ig)
+				.map(c =>
+					(255 - parseInt(c, 16))
+					.toString(16).padStart(2, '0')
+				)
+				.join('');
+
 			return {
 				...styleOptionsLabel(properties.name, properties, true),
-				...styleOptionsPolygon(properties.color, 1),
+				...styleOptionsPolygon('#' + colors, 0.3),
+				stroke: new ol.style.Stroke({
+					color: properties.color,
+					width: 3,
+				}),
 			};
 		},
 		...opt

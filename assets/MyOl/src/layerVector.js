@@ -254,8 +254,6 @@ function layerVector(opt) {
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
-				zIndex: 30, // Hover : above the the features
-				//BEST adapt hover zIndex to the concerned layer => layer.setZIndex()
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
@@ -281,8 +279,11 @@ function layerVector(opt) {
 				// Get the hovered feature
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
-					function(feature) {
-						return feature;
+					function(feature, layer) {
+						if (layer.getProperties().host) { // Not the hover layer
+							hoverLayer.setZIndex(layer.getZIndex() + 2)
+							return feature;
+						}
 					}, {
 						hitTolerance: 6, // Default 0
 					});
@@ -351,7 +352,7 @@ function layerVectorCluster(options) {
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			distance: options.distanceMinCluster,
+			//TODO DELETE distance: options.distanceMinCluster,
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
 		}),
@@ -374,8 +375,9 @@ function layerVectorCluster(options) {
 	let previousResolution;
 
 	clusterLayer.on('prerender', function(evt) {
-		const resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 10 ? 0 : Math.min(options.distanceMinCluster, resolution);
+		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
+			resolution = evt.frameState.viewState.resolution,
+			distanceMinCluster = resolution < 10 ? 0 : Math.min(size / 10, resolution);
 
 		if (previousResolution != resolution) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -537,7 +539,6 @@ function styleOptionsLabel(text, properties, important) {
 
 	return {
 		text: new ol.style.Text(styleTextOptions),
-		zIndex: 40, // Label : above the the features & editor
 	};
 }
 

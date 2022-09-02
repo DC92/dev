@@ -868,7 +868,6 @@ function layerVector(opt) {
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
 				source: hoverSource,
-				zIndex: 30, // Hover : above the the features
 				style: function(feature) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
@@ -894,8 +893,11 @@ function layerVector(opt) {
 				// Get the hovered feature
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
-					function(feature) {
-						return feature;
+					function(feature, layer) {
+						if (layer.getProperties().host) { // Not the hover layer
+							hoverLayer.setZIndex(layer.getZIndex() + 2)
+							return feature;
+						}
 					}, {
 						hitTolerance: 6, // Default 0
 					});
@@ -964,7 +966,7 @@ function layerVectorCluster(options) {
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			distance: options.distanceMinCluster,
+			//distance: options.distanceMinCluster,
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
 		}),
@@ -987,8 +989,9 @@ function layerVectorCluster(options) {
 	let previousResolution;
 
 	clusterLayer.on('prerender', function(evt) {
-		const resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 10 ? 0 : Math.min(options.distanceMinCluster, resolution);
+		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
+			resolution = evt.frameState.viewState.resolution,
+			distanceMinCluster = resolution < 10 ? 0 : Math.min(size / 10, resolution);
 
 		if (previousResolution != resolution) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -1150,7 +1153,6 @@ function styleOptionsLabel(text, properties, important) {
 
 	return {
 		text: new ol.style.Text(styleTextOptions),
-		zIndex: 40, // Label : above the the features & editor
 	};
 }
 
@@ -1310,6 +1312,7 @@ function layerWri(opt) {
 function layerWriAreas(opt) {
 	return layerVector({
 		host: '//www.refuges.info/',
+		zIndex: 2, // Behind points
 		polygon: 1, // Massifs
 		urlArgsFunction: function(options) {
 			return {
@@ -1331,9 +1334,22 @@ function layerWriAreas(opt) {
 			};
 		},
 		hoverStyleOptionsFunction: function(f, properties) {
+			// Invert previous color
+			const colors = properties.color
+				.match(/([0-9a-f]{2})/ig)
+				.map(c =>
+					(255 - parseInt(c, 16))
+					.toString(16).padStart(2, '0')
+				)
+				.join('');
+
 			return {
 				...styleOptionsLabel(properties.name, properties, true),
-				...styleOptionsPolygon(properties.color, 1),
+				...styleOptionsPolygon('#' + colors, 0.3),
+				stroke: new ol.style.Stroke({
+					color: properties.color,
+					width: 3,
+				}),
 			};
 		},
 		...opt
@@ -2306,7 +2322,7 @@ function layerMarker(options) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 1,
+			zIndex: 20, // Above points (zIndex = 10)
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
 					anchor: [0.5, 0.5],

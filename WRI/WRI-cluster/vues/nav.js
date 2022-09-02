@@ -85,6 +85,7 @@ const mapId = 'carte-nav',
 		layerVector({
 			url: '<?=$config_wri["sous_dossier_installation"]?>' +
 				'api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+			zIndex: 3, // Au dessus des massifs mais en dessous de son hover
 			<?php if ( !$vue->contenu ) { ?>
 				selectorName: 'selecteur-massif',
 			<?php } ?>
