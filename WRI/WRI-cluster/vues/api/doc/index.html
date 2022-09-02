@@ -95,9 +95,12 @@
                     </tr>
                     <tr>
                         <td>cluster</td>
-                        <td><span class="opt">Optionnel</span> Les points sont regroupés par carrés de 0,1° de latitude et longitude (environ 10 km). <span class="url">all</span> retournera un picto "cluster" (un cercle bleu avec le nombre de points regroupés) s'il y en a plusieurs et le point normal s'il n'y en a qu'un. Ce paramètre inhibe <b>nb_points</b>.</td>
-                        <td><span class="url">false</span></td>
-                        <td><span class="url">true</span>,<span class="url">false</span></td>
+                        <td><span class="opt">Optionnel</span> Les points sont regroupés par carrés de &lt;décimal&gt; degrès de latitude et longitude (environ 100 km pour 1°),
+						chacun représenté par un picto "cluster" (un cercle bleu avec le nombre de points regroupés)
+						ou le point normal s'il n'y en a qu'un.
+						<br/>Ce paramètre inhibe le paramètre <b>nb_points</b>.</td>
+                        <td><span class="url">Aucune</span></td>
+                        <td><span class="url">décimal, true (=0.3°)</span></td>
                     </tr>
                     <tr>
                         <td>detail</td>

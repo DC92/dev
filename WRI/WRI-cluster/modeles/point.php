@@ -287,16 +287,15 @@ function infos_points($conditions)
   if ( $conditions->cluster && 
     !$tables_en_plus ) // Si on croise avec un polygone ou autre, on ne culsterise pas car il y aura moins de points et ça évite une requette compliquée :)
   {
-    // Groupage des points dans des carrés de 1/10 de la plus grande dimension de la carte visualisée
-    $nb_clusters_xy = 10;
-    $bbox = explode (',', $_REQUEST['bbox']);
-    $taille_cluster = max ($bbox[2] - $bbox[0], $bbox[3] - $bbox[1]) / $nb_clusters_xy;
+    // Groupage des points dans des carrés de <cluster> degrés de latitude et longitude
+    if(!is_numeric($conditions->cluster))
+      $conditions->cluster=0.3;
     $query_clusters="
 SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom)) AS geojson,
-       round(ST_X(geom)/$taille_cluster) AS lon, round(ST_Y(geom)/$taille_cluster) AS lat
+       round(ST_X(geom)/{$conditions->cluster}) AS cluster_lon, round(ST_Y(geom)/{$conditions->cluster}) AS cluster_lat
   FROM points
   WHERE true $conditions_sql
-  GROUP BY lon, lat
+  GROUP BY cluster_lon, cluster_lat
   ";
     if ( ! ($res_clusters = $pdo->query($query_clusters)) )
       return erreur("Une erreur sur la requête est survenue",$query_clusters);
@@ -311,10 +310,7 @@ SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom))
 
         // Comme openlayers réclame un id pour gérer son affichage,
         // on calcule un id virtuel à partir des limites du cluster
-        $raw->id_point = intval(
-          ($raw->lon + 90) * 36000 + // (0 à 1800) * 3600
-          ($raw->lat + 180) * 10 // 0 à 3600
-        );
+        $raw->id_point = intval($raw->cluster_lon + ($raw->cluster_lat + 1000) * 2000);
 
         // Et on l'enregistre dans la liste des points
         $points[] = $raw;
