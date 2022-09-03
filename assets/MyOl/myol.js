@@ -971,6 +971,7 @@ function layerVectorCluster(options) {
 			source: clusterSource,
 			style: clusterStyle,
 			visible: layer.getVisible(),
+			limite: 50,
 			zIndex: layer.getZIndex(),
 			...options
 		});

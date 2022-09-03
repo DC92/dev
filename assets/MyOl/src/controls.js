@@ -144,7 +144,7 @@ function controlMousePosition(options) {
 		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
 
 		coordinateFormat: function(mouse) {
-			//TODO find better than ol.gpsValues to share info
+			//BEST find better than ol.gpsValues to share info
 			if (ol.gpsValues && ol.gpsValues.position) {
 				const ll4326 = ol.proj.transform(ol.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
 					distance = ol.sphere.getDistance(mouse, ll4326);
@@ -569,8 +569,8 @@ function controlLoadGPX(opt) {
  * File downloader control
  * Requires controlButton
  */
-//TODO incompatible avec clusters
-//TODO BUG n'exporte pas les polygones !
+//BEST incompatible avec clusters
+//TODO BUG WRI EDIT n'exporte pas les polygones !
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
@@ -735,7 +735,7 @@ function controlHelp(opt) {
  * Controls examples
  */
 function controlsCollection(opt) {
-	const options = { //TODO all parameters via options
+	const options = { //BEST all parameters via options
 		...opt
 	};
 

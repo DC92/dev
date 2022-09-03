@@ -11,20 +11,19 @@ $dirs = [
 	'../../gps_addons.php', // root/config specific site in the root directory
 	'../../*/gps_addons.php', // root/*/config specific site in any directory
 ];
-$tag = 0;
+$date = 0;
 foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
-	if (is_file ($f))
-		$tag += filemtime ($f);
+	if (is_file ($f) && $date <filemtime ($f))
+	  $date =filemtime ($f);
 
-//TODO put GPX files in cache
-//TODO parameter manifest name, favicon & id (for GPS appli)
-//TODO display last file date as version info
+//TODO GPS put GPX files in cache
+//TODO GPS parameter manifest name, favicon & id (for GPS appli)
+//TODO display version info
 //TODO PWA juste réinitialisé : à besoin d'internet la prochaine fois
 ?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
-// Version tag <?=$tag?> ;
-console.log('version <?=$tag?>');
+console.log('PWA version <?=date('ymdHi',$date)?>');
 
 self.addEventListener('install', async function() {
 	// Clean & reconstruct GPS cache

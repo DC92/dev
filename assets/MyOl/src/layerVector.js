@@ -357,6 +357,7 @@ function layerVectorCluster(options) {
 			source: clusterSource,
 			style: clusterStyle,
 			visible: layer.getVisible(),
+			limite: 50,
 			zIndex: layer.getZIndex(),
 			...options
 		});
@@ -582,7 +583,6 @@ function layersCluster(opt) {
 
 	return [
 		options.layer({
-			//TODO ne pas appeler bbox quand cluster serveur
 			maxResolution: options.switchResolution,
 			...options
 		}),
