@@ -14,28 +14,31 @@ $dirs = [
 $date = 0;
 foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
 	if (is_file ($f) && $date <filemtime ($f))
-	  $date =filemtime ($f);
+		$date =filemtime ($f);
+
+$tag = date('ymdHis',$date);
 
 //TODO GPS put GPX files in cache
 //TODO GPS parameter manifest name, favicon & id (for GPS appli)
 //TODO display version info
-//TODO PWA juste réinitialisé : à besoin d'internet la prochaine fois
 ?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
-console.log('PWA version <?=date('ymdHi',$date)?>');
+console.log('PWA version <?=$tag?>');
 
 self.addEventListener('install', async function() {
 	// Clean & reconstruct GPS cache
-	console.log('PWA replacing myGpsCache');
-	await caches.delete('myGpsCache');
+	await caches.delete('myGpsCache')
+		.then(() => console.log('PWA myGpsCache deleted'));
+
 	await caches.open('myGpsCache')
 		.then(cache =>
 			cache.addAll([
 				'favicon.png',
 			])
-		);
-	console.log('PWA myGpsCache replaced');
+			.then(() => console.log('PWA myGpsCache files added'))
+		)
+		.then(() => console.log('PWA myGpsCache opened'));
 });
 
 // Get cached values
