@@ -151,8 +151,8 @@ switch ($req->page) {
 if($req->nb_points != "all") {
     $params->limite = $req->nb_points;
 }
-if($req->cluster == "true") {
-    $params->cluster = true;
+if(is_numeric($req->cluster)) {
+    $params->cluster = $req->cluster;
 }
 if($req->type_points != "all") {
     $params->ids_types_point = str_replace($val->type_points, $val->type_points_id, $req->type_points);
