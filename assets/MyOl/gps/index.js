@@ -12,11 +12,18 @@ if (!location.href.match(/(https|localhost).*index/))
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
 	.then(registration => {
+		console.log('SW registered');
 		if (registration.active) // Avoid reinstall on first install
 			registration.onupdatefound = async function() { // service-worker.js is changed
-				console.log('PWA onupdatefound\nunregistering ' + registration.active.scriptURL);
-				await registration.unregister(); // Clean everything
-				location.reload(); // Restart fresh install
+				console.log('PWA update found');
+				// Clean everything
+				await registration.unregister()
+					.then(() => console.log('SW unregistered'));
+				// Reinstall now to be ready for further offline use
+				await navigator.serviceWorker.register('service-worker.js.php')
+					.then(() => console.log('New SW registered'));
+				// Restart to instant use of the new version
+				location.reload();
 			}
 	});
 
