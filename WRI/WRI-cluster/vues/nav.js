@@ -67,10 +67,8 @@ const mapId = 'carte-nav',
 		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
-			strategy: ol.loadingstrategy.bboxLimit,
 			// Résolution à partir de laquelle le serveur sert des clusters (mercator unit / pixel)
 			switchResolution: Math.round(60000 / mapSize), 
-			distanceMinCluster: mapSize / 10, // Distance (en pixels sur l'écran) entre 2 cluster
 			selectorName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
 			styleOptionsFunction: function (feature, properties) {
 				return {
@@ -114,13 +112,11 @@ const mapId = 'carte-nav',
 		// Pyrenees-refuges.com
 		layerPyreneesRefuges({
 			selectorName: 'selecteur-prc',
-			distanceMinCluster: 30,
 		}),
 
 		// CampToCamp
 		layerC2C({
 			selectorName: 'selecteur-c2c',
-			distanceMinCluster: 30,
 		}),
 
 		// Chemineur
@@ -136,7 +132,6 @@ const mapId = 'carte-nav',
 			host: '//alpages.info/',
 			selectorName: 'selecteur-alpages',
 			argSelName: 'forums',
-			distanceMinCluster: 30,
 			attribution: 'Alpages',
 		}),
 	],

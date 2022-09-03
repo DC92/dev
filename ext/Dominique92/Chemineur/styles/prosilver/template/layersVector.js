@@ -2,7 +2,6 @@ if (typeof map !== 'undefined') {
 	map.addLayer(layerWri({
 		host: '//dom.refuges.info/', //TODO revenir de dom à www
 		selectorName: 'wri-features',
-		distanceMinCluster: 30,
 		zIndex: 6,
 	}));
 	map.addLayer(layerOverpass({
@@ -36,7 +35,6 @@ if (typeof map !== 'undefined') {
 	}));
 	map.addLayer(layerPyreneesRefuges({
 		selectorName: 'prc-features',
-		distanceMinCluster: 30,
 		zIndex: 4,
 	}));
 	map.addLayer(layerC2C({
@@ -47,7 +45,6 @@ if (typeof map !== 'undefined') {
 		host: '//alpages.info/',
 		selectorName: 'alp-features',
 		argSelName: 'forums',
-		distanceMinCluster: 30,
 		attribution: 'Alpages',
 		zIndex: 2,
 	}));

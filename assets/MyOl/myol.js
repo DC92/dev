@@ -959,14 +959,9 @@ function layerVectorCluster(options) {
 	// Detailed layer
 	const layer = layerVector(options);
 
-	// No clustering
-	if (!options.distanceMinCluster)
-		return layer;
-
 	// Clusterized source
 	const clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			//distance: options.distanceMinCluster,
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
 		}),
@@ -991,7 +986,7 @@ function layerVectorCluster(options) {
 	clusterLayer.on('prerender', function(evt) {
 		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
 			resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 10 ? 0 : Math.min(size / 10, resolution);
+			distanceMinCluster = resolution < 10 ? 0 : Math.max(30, Math.min(size / 10, resolution));
 
 		if (previousResolution != resolution) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -1200,7 +1195,6 @@ function styleOptionsCluster(feature, properties) {
 function layersCluster(opt) {
 	const options = {
 		switchResolution: 100,
-		distanceMinCluster: 30,
 		...opt
 	};
 

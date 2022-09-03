@@ -124,6 +124,10 @@ new ol.Map({
 		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
 		zoom: 12,
 	}),
+	controls: [
+		new ol.control.Zoom(),
+		new ol.control.FullScreen(),
+	],
 	layers: [
 		new ol.layer.Tile({ // Background layer
 			source: new ol.source.OSM(),
@@ -139,7 +143,6 @@ new ol.Map({
 		}),
 		layerPyreneesRefuges({
 			selectorName: 'prc-features',
-			distanceMinCluster: 30,
 		}),
 		layerC2C({ // CampToCamp
 			selectorName: 'c2c-features',
@@ -154,12 +157,10 @@ new ol.Map({
 			host: '//alpages.info/',
 			selectorName: 'alp-features',
 			argSelName: 'forums',
-			distanceMinCluster: 30,
 			attribution: 'Alpages',
 		}),
 		layerOverpass({
 			selectorName: 'osm-features',
-			distanceMinCluster: 30,
 		}),
 	],
 });

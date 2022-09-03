@@ -59,9 +59,7 @@ new ol.Map({
 		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
-			strategy: ol.loadingstrategy.bboxLimit,
 			switchResolution: Math.round(60000 / mapSize), 
-			distanceMinCluster: mapSize / 10, // Distance (en pixels sur l'écran) entre 2 cluster
 			styleOptionsFunction: function (feature, properties) {
 				return {
 					...styleOptionsLabel(properties.name, properties, true),

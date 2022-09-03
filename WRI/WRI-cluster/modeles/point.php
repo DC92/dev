@@ -289,7 +289,7 @@ function infos_points($conditions)
   {
     // Groupage des points dans des carrés de <cluster> degrés de latitude et longitude
     if(!is_numeric($conditions->cluster))
-      $conditions->cluster=0.3;
+      $conditions->cluster=0.2; //TODO obliger paramètre numérique sans valeur par défaut
     $query_clusters="
 SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom)) AS geojson,
        round(ST_X(geom)/{$conditions->cluster}) AS cluster_lon, round(ST_Y(geom)/{$conditions->cluster}) AS cluster_lat
