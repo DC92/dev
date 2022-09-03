@@ -129,9 +129,12 @@ new ol.Map({
 		new ol.control.FullScreen(),
 	],
 	layers: [
-		new ol.layer.Tile({ // Background layer
+		// Background layer
+		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
+
+		// 	Features layers	
 		...layersCluster({ // Refuges.info (2 level layer depending on resolution)
 			host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
 			layer: layerWri,

@@ -54,12 +54,12 @@ function layerGeoBB(opt) {
 /**
  * Site refuges.info
  */
-function layerWri(opt) {
+function layerWri(options) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
-		urlArgsFunction: function(options, bbox, selections) {
+		urlArgsFunction: function(opt, bbox, selections) {
 			return {
-				url: options.host + (selections[1] ? 'api/massif' : 'api/bbox'),
+				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
 				type_points: selections[0],
 				massif: selections[1],
 				cluster: options.cluster,
@@ -67,15 +67,15 @@ function layerWri(opt) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, f, options) {
+		convertProperties: function(properties, f, opt) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
+				icon: opt.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
-				url: options.noClick ? null : properties.lien,
-				attribution: options.attribution,
+				url: opt.noClick ? null : properties.lien,
+				attribution: opt.attribution,
 			};
 		},
 		styleOptionsFunction: function(f, properties) {
@@ -85,19 +85,20 @@ function layerWri(opt) {
 			return styleOptionsFullLabel(properties);
 		},
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
-		...opt
+		...options
 	});
 }
 
-function layerWriAreas(opt) {
+function layerWriAreas(options) {
 	return layerVector({
 		host: '//www.refuges.info/',
-		zIndex: 2, // Behind points
+		strategy: ol.loadingstrategy.all,
 		polygon: 1, // Massifs
-		urlArgsFunction: function(options) {
+		zIndex: 2, // Behind points
+		urlArgsFunction: function(opt) {
 			return {
-				url: options.host + 'api/polygones',
-				type_polygon: options.polygon,
+				url: opt.host + 'api/polygones',
+				type_polygon: opt.polygon,
 			};
 		},
 		convertProperties: function(properties) {
@@ -132,7 +133,7 @@ function layerWriAreas(opt) {
 				}),
 			};
 		},
-		...opt
+		...options
 	});
 }
 

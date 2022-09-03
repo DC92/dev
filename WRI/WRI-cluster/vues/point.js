@@ -59,7 +59,6 @@ new ol.Map({
 		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
-			switchResolution: Math.round(60000 / mapSize), 
 			styleOptionsFunction: function (feature, properties) {
 				return {
 					...styleOptionsLabel(properties.name, properties, true),

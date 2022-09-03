@@ -367,17 +367,13 @@ function layerVectorCluster(options) {
 	});
 
 	// Tune the clustering distance depending on the zoom level
-	let previousDistance;
-
 	clusterLayer.on('prerender', function(evt) {
 		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
 			resolution = evt.frameState.viewState.resolution,
 			distanceMinCluster = resolution < 10 ? 0 : Math.max(50, size / 20);
 
-		if (previousDistance != distanceMinCluster) // Only when changed
+		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
-
-		previousDistance = distanceMinCluster;
 	});
 
 	// Generate a center point to manage clusterisations
@@ -591,8 +587,8 @@ function layersCluster(opt) {
 			...options
 		}),
 		options.layer({
-			cluster: 0.2,
 			minResolution: options.switchResolution,
+			cluster: 0.2,
 			...options
 		}),
 	];

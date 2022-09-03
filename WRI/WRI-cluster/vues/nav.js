@@ -67,8 +67,6 @@ const mapId = 'carte-nav',
 		...layersCluster({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			layer: layerWri,
-			// Résolution à partir de laquelle le serveur sert des clusters (mercator unit / pixel)
-			switchResolution: Math.round(60000 / mapSize), 
 			selectorName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
 			styleOptionsFunction: function (feature, properties) {
 				return {
