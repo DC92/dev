@@ -96,9 +96,10 @@ function layerVector(opt) {
 			...opt
 		},
 		selectorsName = options.selectorName.split(','),
+		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
 			url: url,
-			format: new ol.format.GeoJSON(),
+			format: format,
 			strategy: ol.loadingstrategy.bbox,
 			...options
 		}),
@@ -110,6 +111,27 @@ function layerVector(opt) {
 		}),
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		statusEl = document.getElementById(selectorsName[0] + '-status'); // XHR download tracking
+
+	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
+	format.readFeatures = function(doc, opt) {
+		const json = JSONparse(doc)
+
+		json.features.map(el => {
+			// Generate a pseudo id if none
+			if (!el.id)
+				el.id = JSON.stringify(el.properties).replace(/\D/g, '') % 987654;
+
+			if (el.geometry.type == 'Point '); {
+				const rnd = (el.id / 3.14).toString().split('.');
+
+				el.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
+				el.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
+			}
+			return el;
+		});
+
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
+	};
 
 	// Setup the selector managers
 	selectorsName.map(name => selector(name, options.callBack));
@@ -163,20 +185,7 @@ function layerVector(opt) {
 	// Callback function to define feature display from the properties received from the server
 	source.on('featuresloadend', function(evt) {
 		for (let f in evt.features) {
-			let feature = evt.features[f],
-				sourceGeometry = feature.getGeometry(),
-				// Explore GeometryCollection
-				geometries = sourceGeometry.getType() == 'GeometryCollection' ?
-				sourceGeometry.getGeometries() : [sourceGeometry];
-
-			// Add +- 1 random meter to each coordinate to separate the points having the same coordinates
-			geometries.forEach(g => {
-				if (g.getType() == 'Point')
-					g.setCoordinates([
-						g.getCoordinates()[0] + Math.random() * 4 - 2,
-						g.getCoordinates()[1] + Math.random() * 4 - 2,
-					]);
-			});
+			let feature = evt.features[f];
 
 			// These options will be displayed by the hover response
 			//HACK attach this function to each feature to access it when hovering without layer context
@@ -192,7 +201,7 @@ function layerVector(opt) {
 
 			// Detect lines or polygons
 			feature.display.area =
-				ol.extent.getArea(sourceGeometry.getExtent());
+				ol.extent.getArea(feature.getGeometry().getExtent());
 		}
 	});
 
@@ -342,22 +351,17 @@ function layerVector(opt) {
  * Clustering features
  */
 function layerVectorCluster(options) {
-	// Detailed layer
-	const layer = layerVector(options);
-
-	// Clusterized source
-	const clusterSource = new ol.source.Cluster({
+	const layer = layerVector(options), // Basic layer (with all the points)
+		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
+			distance: 50,
 		}),
-
-		// Clusterized layer
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: clusterStyle,
 			visible: layer.getVisible(),
-			limite: 50,
 			zIndex: layer.getZIndex(),
 			...options
 		});
@@ -371,7 +375,7 @@ function layerVectorCluster(options) {
 	clusterLayer.on('prerender', function(evt) {
 		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
 			resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 10 ? 0 : Math.max(50, size / 20);
+			distanceMinCluster = resolution < 20 ? 0 : Math.max(50, size / 50);
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
