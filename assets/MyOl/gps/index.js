@@ -39,6 +39,17 @@ var map,
 	controlOptions = {}; // To be updated by gps_addons.php before load
 
 window.addEventListener('load', function() {
+	// Display SW version
+	const helpEl = document.getElementById('myol-help');
+
+	if (!helpEl) {
+		const myHelpEl = document.createElement('div');
+		myHelpEl.id = 'myol-help';
+		myHelpEl.innerHTML = '<p>MyGPS ' + myolSWversion + '</p>';
+		document.body.appendChild(myHelpEl);
+	}
+
+	// Load the map
 	map = new ol.Map({
 		target: 'map',
 		controls: controlsCollection(controlOptions)
