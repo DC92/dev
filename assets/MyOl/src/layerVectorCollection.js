@@ -140,6 +140,7 @@ function layerWriAreas(options) {
 /**
  * Site pyrenees-refuges.com
  */
+//TODO BUG rame au chargement
 function layerPyreneesRefuges(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -166,6 +167,7 @@ function layerPyreneesRefuges(options) {
 /**
  * Site camptocamp.org
  */
+//TODO BUG pas d'étiquettes au survol
 function layerC2C(opt) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',

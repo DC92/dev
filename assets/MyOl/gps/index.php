@@ -47,8 +47,10 @@ Install the service but upgrades the files only after the caches delay
 
 	<div id="map"></div>
 
-	<div id="myol-gps-help">
-		<p>MyGPS <span class="myol-sw-version"></span></p>
+	<div style="display:none">
+		<div id="myol-gps-help">
+			<p>MyGPS <span class="myol-sw-version"></span></p>
+		</div>
 	</div>
 </body>
 </html>
