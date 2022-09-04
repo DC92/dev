@@ -10,7 +10,11 @@
 	<?php } ?>
 </div>
 
-<div id="carte-nav"></div>
+<div id="carte-nav"
+	<?php if ( $vue->contenu && !est_moderateur() ) { ?>
+		class="carte-nav-full"
+	<?php } ?>
+></div>
 
 <div id="selecteur-carte-nav" class="noprint">
 	<?php if ( !$vue->contenu ) { ?>

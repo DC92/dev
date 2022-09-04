@@ -4,6 +4,7 @@
 //TODO Le site de c’est https maintenant (pour sport sante)
 //BEST diaporama sur demande dans le post
 //BEST ??? masquer le texte dans les séances
+//BEST BUG Voir icone position sur carte dans GYM Chaville
 //BEST mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio
 //BEST carte tous points dans chaville

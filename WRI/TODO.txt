@@ -1,6 +1,4 @@
-//TODO BUG WRI colonne gauche nav/zone vide quand non connecté
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-//TODO BUG WRI Mobile Gps picto rando ne ferme pas les autres
 //TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
 //TODO BUG WRI Revoir bandeau grandes fenêtres & logo
 //TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
@@ -10,6 +8,7 @@
 //BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 //BEST WRI N'afficher que les massifs contenant des points
 //BEST WRI Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
+//BEST WRI ce text est paramétrable depuis le wiki
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================

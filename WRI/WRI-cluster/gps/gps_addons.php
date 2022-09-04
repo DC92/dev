@@ -2,6 +2,13 @@
 include ('../../config_privee.php');
 ?>
 
+<style>
+#wri-gps-help {
+	left: 0;
+	width: 100%;
+}
+</style>
+
 <div id="additional-selector" >
 	<hr />
 	Dispo en zoom fort
@@ -103,5 +110,12 @@ window.addEventListener('load', function() {
 		selectorName: 'wri-features',
 		maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
 	}));
+
+	map.addControl(
+		controlButton({
+			label: '&#127968;',
+			submenuHTML: '<p><a href="/">Retour à refuges.info</a></p>',
+		})
+	);
 });
 </script>

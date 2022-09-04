@@ -35,6 +35,7 @@ if ('serviceWorker' in navigator)
 	});
 
 // Manage the map
+//TODO BUG ??? Mobile Gps picto rando ne ferme pas les autres
 var map,
 	controlOptions = { // To be updated by gps_addons.php before load
 		Help: {

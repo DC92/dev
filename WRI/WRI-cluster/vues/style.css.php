@@ -747,6 +747,10 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     padding-left: 5px;
   }
 }
+.carte-nav-full {
+  width: 98.4% !important;
+  margin-right: 0.8% !important;
+}
 
 /* Carte de la page des points écrans */
 #container-carte-point {
