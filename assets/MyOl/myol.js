@@ -1206,7 +1206,7 @@ function layersCluster(opt) {
 		}),
 		options.layer({
 			minResolution: options.switchResolution,
-			cluster: 0.2,
+			cluster: 0.1,
 			...options
 		}),
 	];
@@ -1269,17 +1269,30 @@ function layerGeoBB(opt) {
 /**
  * Site refuges.info
  */
-function layerWri(options) {
+function layerWri(opt) {
+	const options = {
+		...opt
+	};
+
+	if (options.cluster)
+		options.strategy = ol.loadingstrategy.all;
+
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
 		urlArgsFunction: function(opt, bbox, selections) {
-			return {
+			const baseParams = {
 				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
 				type_points: selections[0],
 				massif: selections[1],
-				cluster: options.cluster,
 				nb_points: 'all',
+			};
+
+			return options.cluster ? {
+				cluster: options.cluster,
+				...baseParams
+			} : {
 				bbox: bbox.join(','),
+				...baseParams
 			};
 		},
 		convertProperties: function(properties, f, opt) {

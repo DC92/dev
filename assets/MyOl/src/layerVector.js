@@ -592,7 +592,7 @@ function layersCluster(opt) {
 		}),
 		options.layer({
 			minResolution: options.switchResolution,
-			cluster: 0.2,
+			cluster: 0.1,
 			...options
 		}),
 	];
