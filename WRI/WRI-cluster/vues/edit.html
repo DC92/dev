@@ -65,7 +65,8 @@
 			<label>
 				<?if (!$_GET['test_supprimer']) {?>
 					<p>
-						<a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>?test_supprimer=1">
+						<a id="supprimer-massif"
+							href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>?test_supprimer=1">
 							Supprimer <?=$vue->polygone->art_def_poly?> <?=$vue->polygone->type_polygone?>
 						</a>(définitif).
 					</p>

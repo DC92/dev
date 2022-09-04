@@ -156,10 +156,6 @@
 .ol-attribution button:focus {
 	font-size: 14px !important;
 }
-#myol-help {
-	left: 0;
-	width: 100%;
-}
 
 /* When printing, hide all controls except scale & attribution */
 @media print {

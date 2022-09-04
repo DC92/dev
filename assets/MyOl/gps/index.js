@@ -36,18 +36,16 @@ if ('serviceWorker' in navigator)
 
 // Manage the map
 var map,
-	controlOptions = {}; // To be updated by gps_addons.php before load
+	controlOptions = { // To be updated by gps_addons.php before load
+		Help: {
+			helpId: 'myol-gps-help',
+		},
+	};
 
 window.addEventListener('load', function() {
-	// Display SW version
-	const helpEl = document.getElementById('myol-help');
-
-	if (!helpEl) {
-		const myHelpEl = document.createElement('div');
-		myHelpEl.id = 'myol-help';
-		myHelpEl.innerHTML = '<p>MyGPS ' + myolSWversion + '</p>';
-		document.body.appendChild(myHelpEl);
-	}
+	// Dynamicaly set version number to helps
+	Array.from(document.getElementsByClassName('myol-sw-version'))
+		.forEach(el => el.innerHTML = myolSWversion);
 
 	// Load the map
 	map = new ol.Map({

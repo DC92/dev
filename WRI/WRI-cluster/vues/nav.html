@@ -172,7 +172,11 @@
 			<legend>Modifications</legend>
 			<?php if ( $vue->polygone->id_polygone ) { ?>
 				<p><a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>">
-					Modifier ou supprimer <?=$vue->polygone->art_def_poly?> <?=$vue->polygone->type_polygone?>
+					Modifier <?=$vue->polygone->art_def_poly?> <?=$vue->polygone->type_polygone?>
+					<?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?>
+				</a></p>
+				<p><a href="<?=$config_wri['sous_dossier_installation']?>edit/<?=$vue->polygone->id_polygone?>#supprimer-massif">
+					Supprimer <?=$vue->polygone->art_def_poly?> <?=$vue->polygone->type_polygone?>
 					<?=$vue->polygone->article_partitif?> <?=$vue->polygone->nom_polygone?>
 				</a></p>
 				<hr/>

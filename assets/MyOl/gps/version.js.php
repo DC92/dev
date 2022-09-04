@@ -15,4 +15,5 @@ foreach ($files AS $file)
 	if (is_file ($file) && $date < filemtime ($file))
 		$date = filemtime ($file);
 
+date_default_timezone_set ('Europe/Paris');
 echo 'var myolSWversion = "'.date('jMy G:i \vs',$date).count($files).'";';

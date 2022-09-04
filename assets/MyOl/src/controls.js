@@ -716,11 +716,10 @@ function controlPrint(options) {
 /**
  * Help control
  * Requires controlButton
- * Display help contained in <TAG id="myol-help">
+ * Display help contained in <TAG id="<options.helpId>">
  */
 function controlHelp(opt) {
 	const options = {
-			helpId: 'myol-help',
 			...opt
 		},
 		helpEl = document.getElementById(options.helpId);
