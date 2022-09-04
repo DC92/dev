@@ -12,30 +12,39 @@ if (!location.href.match(/(https|localhost).*index/))
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
 	.then(registration => {
-		console.log('SW registered');
+		console.log('PWA SW ' + myolSWversion + ' registered');
 		if (registration.active) // Avoid reinstall on first install
 			registration.onupdatefound = async function() { // service-worker.js is changed
 				console.log('PWA update found');
-				// Clean everything
+
+				// Clean the service worker
 				await registration.unregister()
 					.then(() => console.log('SW unregistered'));
+
 				// Reinstall now to be ready for further offline use
 				await navigator.serviceWorker.register('service-worker.js.php')
 					.then(() => console.log('New SW registered'));
+
+				// Clean the cache
+				await caches.delete('myGpsCache')
+					.then(() => console.log('PWA myGpsCache deleted'));
+
 				// Restart to instant use of the new version
 				location.reload();
 			}
 	});
 
 // Manage the map
-var map;
+var map,
+	controlOptions = {}; // To be updated by gps_addons.php before load
+
 window.addEventListener('load', function() {
 	map = new ol.Map({
 		target: 'map',
 		controls: controlsCollection(controlOptions)
 			.concat(controlLayerSwitcher(controlOptions.LayerSwitcher)),
 		view: new ol.View({
-			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+			constrainResolution: true, // Forces the zoom on the available tile's definition
 		}),
 	});
 });

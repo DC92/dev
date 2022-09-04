@@ -2,45 +2,16 @@
 header('Content-Type: application/javascript');
 header('Cache-Control: no-cache');
 
-// Calculate a tag depending on the last dates of the files
-$dirs = [
-	'../*/*', // root/MyOl/*/* (includes --/MyOl/gps/*)
-	'../*', // root/MyOl/*
-	'../../*.gpx', // root/*.gpx GPS files in the root directory
-	'../../gps_addons.php', // root/config specific site in the root directory
-	'../../*/gps_addons.php', // root/*/config specific site in any directory
-];
-$date = 0;
-foreach (glob ('{'.implode(',',$dirs).'}', GLOB_BRACE) AS $f)
-	if (is_file ($f) && $date < filemtime ($f))
-		$date = filemtime ($f);
-
-$tag = date ('ymdHis', $date);
-
-//TODO GPS put GPX files in cache
-//TODO GPS parameter name & favicon (for GPS appli)
-//TODO display version info
-?>
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
 
-self.addEventListener('install', async function() {
-	console.log('PWA install version <?=$tag?>');
+include ('version.js.php');
 
-	// Clean & reconstruct GPS cache
-	await caches.delete('myGpsCache')
-		.then(() => console.log('PWA myGpsCache deleted'));
+//TODO GPS put GPX files in cache
+//TODO GPS parameter name & favicon (for GPS appli)
+?>
 
-	await caches.open('myGpsCache')
-		.then(cache =>
-			cache.addAll([
-			])
-			.then(() => console.log('PWA myGpsCache files added'))
-		)
-		.then(() => console.log('PWA myGpsCache opened'));
-});
-
-// Get cached values
+// Cache all used files
 self.addEventListener('fetch', evt =>
 	evt.respondWith(
 		caches.match(evt.request)
