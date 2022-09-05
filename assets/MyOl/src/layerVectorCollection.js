@@ -7,25 +7,28 @@
  * Site chemineur.fr, alpages.info
  * layer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
-function layerGeoBB(opt) {
+function layerGeoBB(options) {
 	return layerVectorCluster({
-		argSelName: 'cat',
-		urlArgsFunction: function(options, bbox, selections) {
+		urlArgsFunction: function(opt, bbox, selections) {
 			return {
-				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
+				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
+				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
-				layer: options.cluster ? 'cluster' : null,
-				[options.argSelName]: selections[0], // The 1st (and only selector)
+				...opt.extraParams(bbox),
+			};
+		},
+		extraParams: function(bbox) {
+			return {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, f, options) {
+		convertProperties: function(properties, f, opt) {
 			return {
 				icon: properties.type ?
-					options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
+					opt.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
 				url: properties.id ?
-					options.host + 'viewtopic.php?t=' + properties.id : null,
-				attribution: options.attribution,
+					opt.host + 'viewtopic.php?t=' + properties.id : null,
+				attribution: opt.attribution,
 			};
 		},
 		styleOptionsFunction: function(f, properties) {
@@ -47,37 +50,49 @@ function layerGeoBB(opt) {
 				}),
 			};
 		},
-		...opt
+		...options
 	});
+}
+
+function layersGeoBB(options) {
+	return [
+		// Basic points
+		layerGeoBB({
+			maxResolution: 100,
+			...options
+		}),
+		// Clusterised layer
+		layerGeoBB({
+			minResolution: 100,
+			extraParams: function(bbox) {
+				return {
+					layer: 'cluster',
+					bbox: bbox.join(','),
+				}
+			},
+			...options
+		}),
+	];
 }
 
 /**
  * Site refuges.info
  */
-function layerWri(opt) {
-	const options = {
-		...opt
-	};
-
-	if (options.cluster)
-		options.strategy = ol.loadingstrategy.all;
-
+function layerWri(options) {
 	return layerVectorCluster({
-		host: '//www.refuges.info/',
+		host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
 		urlArgsFunction: function(opt, bbox, selections) {
-			const baseParams = {
+			return {
 				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
 				type_points: selections[0],
 				massif: selections[1],
 				nb_points: 'all',
+				...opt.extraParams(bbox),
 			};
-
-			return options.cluster ? {
-				cluster: options.cluster,
-				...baseParams
-			} : {
+		},
+		extraParams: function(bbox) {
+			return {
 				bbox: bbox.join(','),
-				...baseParams
 			};
 		},
 		convertProperties: function(properties, f, opt) {
@@ -100,6 +115,27 @@ function layerWri(opt) {
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		...options
 	});
+}
+
+function layersWri(options) {
+	return [
+		// Basic points
+		layerWri({
+			maxResolution: 100,
+			...options
+		}),
+		// Clusterised layer
+		layerWri({
+			minResolution: 100,
+			strategy: ol.loadingstrategy.all,
+			extraParams: function() {
+				return {
+					cluster: 0.1,
+				}
+			},
+			...options
+		}),
+	];
 }
 
 function layerWriAreas(options) {
@@ -153,7 +189,6 @@ function layerWriAreas(options) {
 /**
  * Site pyrenees-refuges.com
  */
-//TODO BUG rame au chargement
 function layerPyreneesRefuges(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',

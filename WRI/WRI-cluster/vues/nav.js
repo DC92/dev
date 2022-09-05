@@ -129,7 +129,7 @@ const mapId = 'carte-nav',
 		layerGeoBB({
 			host: '//alpages.info/',
 			selectorName: 'selecteur-alpages',
-			argSelName: 'forums',
+			argSelName: 'forums',//TODO obsolete
 			attribution: 'Alpages',
 		}),
 	],

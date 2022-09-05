@@ -1,6 +1,5 @@
 if (typeof map !== 'undefined') {
-	map.addLayer(layerWri({
-		host: '//dom.refuges.info/', //TODO revenir de dom à www
+	map.addLayer(layersWri({
 		selectorName: 'wri-features',
 		zIndex: 6,
 	}));
@@ -44,7 +43,7 @@ if (typeof map !== 'undefined') {
 	map.addLayer(layerGeoBB({
 		host: '//alpages.info/',
 		selectorName: 'alp-features',
-		argSelName: 'forums',
+		argSelName: 'forums',//TODO obsolete
 		attribution: 'Alpages',
 		zIndex: 2,
 	}));

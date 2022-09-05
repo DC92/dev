@@ -115,8 +115,8 @@ Based on https://openlayers.org
 
 	<script>
 // Force selectors
-localStorage['myol_wrifeatures'] = 'all';
-localStorage['myol_alpfeatures'] = '4,5';
+//localStorage['myol_wrifeatures'] = 'all';
+//localStorage['myol_alpfeatures'] = '4,5';
 
 new ol.Map({
 	target: 'map',
@@ -135,13 +135,10 @@ new ol.Map({
 		}),
 
 		// 	Features layers	
-		...layersCluster({ // Refuges.info (2 level layer depending on resolution)
-			host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
-			layer: layerWri,
+		...layersWri({ // Refuges.info (2 level layer depending on resolution)
 			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
 		}),
 		layerWriAreas({ // Massifs
-			host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
 			selectorName: 'wri-massifs',
 		}),
 		layerPyreneesRefuges({
@@ -150,16 +147,22 @@ new ol.Map({
 		layerC2C({ // CampToCamp
 			selectorName: 'c2c-features',
 		}),
-		...layersCluster({
+		...layersGeoBB({
 			host: '//chemineur.fr/',
-			layer: layerGeoBB,
 			selectorName: 'chem-features',
 			attribution: 'Chemineur',
 		}),
 		layerGeoBB({
+			//TODO vérifier paramètre nb_points=all
+			strategy : ol.loadingstrategy.all,
 			host: '//alpages.info/',
 			selectorName: 'alp-features',
-			argSelName: 'forums',
+			extraParams: function() {
+				return {
+				forums: '4,5',
+				}
+			},
+			argSelName: 'forums',//TODO obsolete
 			attribution: 'Alpages',
 		}),
 		layerOverpass({

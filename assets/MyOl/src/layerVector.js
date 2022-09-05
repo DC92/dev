@@ -112,27 +112,6 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'), //HACK to render the html entities in canvas
 		statusEl = document.getElementById(selectorsName[0] + '-status'); // XHR download tracking
 
-	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
-	format.readFeatures = function(doc, opt) {
-		const json = JSONparse(doc)
-
-		json.features.map(el => {
-			// Generate a pseudo id if none
-			if (!el.id)
-				el.id = JSON.stringify(el.properties).replace(/\D/g, '') % 987654;
-
-			if (el.geometry.type == 'Point '); {
-				const rnd = (el.id / 3.14).toString().split('.');
-
-				el.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
-				el.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
-			}
-			return el;
-		});
-
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
-	};
-
 	// Setup the selector managers
 	selectorsName.map(name => selector(name, options.callBack));
 
@@ -181,6 +160,27 @@ function layerVector(opt) {
 
 		return args.url + '?' + query.join('&');
 	}
+
+	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
+	format.readFeatures = function(doc, opt) {
+		const json = JSONparse(doc)
+
+		json.features.map(el => {
+			// Generate a pseudo id if none
+			if (!el.id)
+				el.id = JSON.stringify(el.properties).replace(/\D/g, '') % 987654;
+
+			if (el.geometry.type == 'Point ') {
+				const rnd = (el.id / 3.14).toString().split('.');
+
+				el.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
+				el.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
+			}
+			return el;
+		});
+
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
+	};
 
 	// Callback function to define feature display from the properties received from the server
 	source.on('featuresloadend', function(evt) {
@@ -350,13 +350,17 @@ function layerVector(opt) {
 /**
  * Clustering features
  */
-function layerVectorCluster(options) {
-	const layer = layerVector(options), // Basic layer (with all the points)
+function layerVectorCluster(opt) {
+	const options = {
+			distance: 50,
+			...opt
+		},
+		layer = layerVector(options), // Basic layer (with all the points)
 		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
-			distance: 50,
+			distance: options.distance,
 		}),
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
@@ -375,7 +379,7 @@ function layerVectorCluster(options) {
 	clusterLayer.on('prerender', function(evt) {
 		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
 			resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 20 ? 0 : Math.max(50, size / 50);
+			distanceMinCluster = resolution < 20 ? 0 : Math.max(options.distance, size / 25);
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -575,25 +579,4 @@ function styleOptionsCluster(feature, properties) {
 			font: '14px Calibri,sans-serif',
 		}),
 	};
-}
-
-// Combined server clustered (high resolutions) + not clustered (low resolutions)
-// Use with spread operator ...layersGeoBB(options)
-function layersCluster(opt) {
-	const options = {
-		switchResolution: 100,
-		...opt
-	};
-
-	return [
-		options.layer({
-			maxResolution: options.switchResolution,
-			...options
-		}),
-		options.layer({
-			minResolution: options.switchResolution,
-			cluster: 0.1,
-			...options
-		}),
-	];
 }

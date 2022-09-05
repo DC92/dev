@@ -201,6 +201,7 @@ header("Content-Type: application/json; UTF-8");
 header("Content-disposition: filename=geobb.json");
 
 // On transforme l'objet PHP en code geoJson
+//TODO comment : nb points
 echo json_encode ([
 	'type' => 'FeatureCollection',
 	'features' => $features,

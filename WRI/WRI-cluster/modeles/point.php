@@ -285,7 +285,7 @@ function infos_points($conditions)
       
   // CLUSTERISATION AU NIVEAU DU SERVEUR
   if ( $conditions->cluster && 
-    !$tables_en_plus ) // Si on croise avec un polygone ou autre, on ne culsterise pas car il y aura moins de points et ça évite une requette compliquée :)
+    !$tables_en_plus ) // Si on croise avec un polygone ou autre, on ne clusterise pas car il y aura moins de points et ça évite une requette compliquée :)
   {
     // Groupage des points dans des carrés de <cluster> degrés de latitude et longitude
     $query_clusters="
@@ -294,6 +294,7 @@ SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom))
   FROM points
   WHERE true $conditions_sql
   GROUP BY cluster_lon, cluster_lat
+  $limite
   ";
     if ( ! ($res_clusters = $pdo->query($query_clusters)) )
       return erreur("Une erreur sur la requête est survenue",$query_clusters);
@@ -324,7 +325,6 @@ SELECT count(*) AS nb_points, min(id_point) AS id_point, min(ST_AsGeoJSON(geom))
 
     // Sinon, on change le scope des points qu'il reste à traiter
     $conditions_sql.="\n\tAND id_point IN (".implode(',',$points_isoles).")";
-    $limite="";
   }
 
   $query_points="

@@ -50,17 +50,19 @@ $couleurs[] = $couleurs[] = null;
 // Génération du fichier SVG
 header ('Content-type: image/svg+xml');
 header ('Cache-Control: max-age=86000');
+header ('Access-Control-Allow-Headers: *');
 header ('Access-Control-Allow-Origin: *');
+
 if (isset ($inconnu)) {
 	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
 	$images = ['_404']; // Uniquement l'élément erreur 404
 }
 
-include ("_head.svg");
+include ('_head.svg');
 
 foreach ($images AS $element) {
 		echo PHP_EOL; // Jolie mise en page du fichier .svg
 		include ("elements/$element.svg");
 	}
 
-include ("_tail.svg");
+include ('_tail.svg');

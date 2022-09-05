@@ -55,6 +55,7 @@ if (location.hash == '###')
 			}
 		});
 
+	//TODO BUG caches non défini (si pas de caches ?)
 	await caches.keys().then(function(names) {
 		if (names.length) {
 			data.push('caches:');

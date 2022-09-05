@@ -731,27 +731,6 @@ function layerVector(opt) {
 		elLabel = document.createElement('span'),
 		statusEl = document.getElementById(selectorsName[0] + '-status'); // XHR download tracking
 
-	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
-	format.readFeatures = function(doc, opt) {
-		const json = JSONparse(doc)
-
-		json.features.map(el => {
-			// Generate a pseudo id if none
-			if (!el.id)
-				el.id = JSON.stringify(el.properties).replace(/\D/g, '') % 987654;
-
-			if (el.geometry.type == 'Point '); {
-				const rnd = (el.id / 3.14).toString().split('.');
-
-				el.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
-				el.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
-			}
-			return el;
-		});
-
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
-	};
-
 	// Setup the selector managers
 	selectorsName.map(name => selector(name, options.callBack));
 
@@ -799,6 +778,27 @@ function layerVector(opt) {
 
 		return args.url + '?' + query.join('&');
 	}
+
+	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
+	format.readFeatures = function(doc, opt) {
+		const json = JSONparse(doc)
+
+		json.features.map(el => {
+			// Generate a pseudo id if none
+			if (!el.id)
+				el.id = JSON.stringify(el.properties).replace(/\D/g, '') % 987654;
+
+			if (el.geometry.type == 'Point ') {
+				const rnd = (el.id / 3.14).toString().split('.');
+
+				el.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
+				el.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
+			}
+			return el;
+		});
+
+		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
+	};
 
 	// Callback function to define feature display from the properties received from the server
 	source.on('featuresloadend', function(evt) {
@@ -964,13 +964,17 @@ function layerVector(opt) {
 /**
  * Clustering features
  */
-function layerVectorCluster(options) {
-	const layer = layerVector(options), // Basic layer (with all the points)
+function layerVectorCluster(opt) {
+	const options = {
+			distance: 50,
+			...opt
+		},
+		layer = layerVector(options), // Basic layer (with all the points)
 		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			geometryFunction: geometryFunction,
 			createCluster: createCluster,
-			distance: 50,
+			distance: options.distance,
 		}),
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
@@ -989,7 +993,7 @@ function layerVectorCluster(options) {
 	clusterLayer.on('prerender', function(evt) {
 		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
 			resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 20 ? 0 : Math.max(50, size / 50);
+			distanceMinCluster = resolution < 20 ? 0 : Math.max(options.distance, size / 25);
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -1191,27 +1195,6 @@ function styleOptionsCluster(feature, properties) {
 	};
 }
 
-// Combined server clustered (high resolutions) + not clustered (low resolutions)
-// Use with spread operator ...layersGeoBB(options)
-function layersCluster(opt) {
-	const options = {
-		switchResolution: 100,
-		...opt
-	};
-
-	return [
-		options.layer({
-			maxResolution: options.switchResolution,
-			...options
-		}),
-		options.layer({
-			minResolution: options.switchResolution,
-			cluster: 0.1,
-			...options
-		}),
-	];
-}
-
 /* FILE src/layerVectorCollection.js */
 /**
  * This file implements various acces to geoJson services
@@ -1222,25 +1205,28 @@ function layersCluster(opt) {
  * Site chemineur.fr, alpages.info
  * layer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
-function layerGeoBB(opt) {
+function layerGeoBB(options) {
 	return layerVectorCluster({
-		argSelName: 'cat',
-		urlArgsFunction: function(options, bbox, selections) {
+		urlArgsFunction: function(opt, bbox, selections) {
 			return {
-				url: options.host + 'ext/Dominique92/GeoBB/gis.php',
+				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
+				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
-				layer: options.cluster ? 'cluster' : null,
-				[options.argSelName]: selections[0], // The 1st (and only selector)
+				...opt.extraParams(bbox),
+			};
+		},
+		extraParams: function(bbox) {
+			return {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, f, options) {
+		convertProperties: function(properties, f, opt) {
 			return {
 				icon: properties.type ?
-					options.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
+					opt.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
 				url: properties.id ?
-					options.host + 'viewtopic.php?t=' + properties.id : null,
-				attribution: options.attribution,
+					opt.host + 'viewtopic.php?t=' + properties.id : null,
+				attribution: opt.attribution,
 			};
 		},
 		styleOptionsFunction: function(f, properties) {
@@ -1262,37 +1248,49 @@ function layerGeoBB(opt) {
 				}),
 			};
 		},
-		...opt
+		...options
 	});
+}
+
+function layersGeoBB(options) {
+	return [
+		// Basic points
+		layerGeoBB({
+			maxResolution: 100,
+			...options
+		}),
+		// Clusterised layer
+		layerGeoBB({
+			minResolution: 100,
+			extraParams: function(bbox) {
+				return {
+					layer: 'cluster',
+					bbox: bbox.join(','),
+				}
+			},
+			...options
+		}),
+	];
 }
 
 /**
  * Site refuges.info
  */
-function layerWri(opt) {
-	const options = {
-		...opt
-	};
-
-	if (options.cluster)
-		options.strategy = ol.loadingstrategy.all;
-
+function layerWri(options) {
 	return layerVectorCluster({
-		host: '//www.refuges.info/',
+		host: '//dom.refuges.info/',
 		urlArgsFunction: function(opt, bbox, selections) {
-			const baseParams = {
+			return {
 				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
 				type_points: selections[0],
 				massif: selections[1],
 				nb_points: 'all',
+				...opt.extraParams(bbox),
 			};
-
-			return options.cluster ? {
-				cluster: options.cluster,
-				...baseParams
-			} : {
+		},
+		extraParams: function(bbox) {
+			return {
 				bbox: bbox.join(','),
-				...baseParams
 			};
 		},
 		convertProperties: function(properties, f, opt) {
@@ -1315,6 +1313,27 @@ function layerWri(opt) {
 		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
 		...options
 	});
+}
+
+function layersWri(options) {
+	return [
+		// Basic points
+		layerWri({
+			maxResolution: 100,
+			...options
+		}),
+		// Clusterised layer
+		layerWri({
+			minResolution: 100,
+			strategy: ol.loadingstrategy.all,
+			extraParams: function() {
+				return {
+					cluster: 0.1,
+				}
+			},
+			...options
+		}),
+	];
 }
 
 function layerWriAreas(options) {
