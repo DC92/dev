@@ -51,10 +51,13 @@ window.addEventListener('load', function() {
 	// Load the map
 	map = new ol.Map({
 		target: 'map',
-		controls: controlsCollection(controlOptions)
-			.concat(controlLayerSwitcher(controlOptions.LayerSwitcher)),
 		view: new ol.View({
 			constrainResolution: true, // Forces the zoom on the available tile's definition
 		}),
+		controls: controlsCollection(controlOptions)
+			.concat(controlLayerSwitcher(
+				layersCollection() //TODO need options to update it via controlOptions
+				//TODO Need to get keys
+			)),
 	});
 });

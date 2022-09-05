@@ -3,16 +3,12 @@
  * Need to include layerSwitcher.css
  */
 //BEST alt key to switch layers / transparency
-function controlLayerSwitcher(opt) {
-	const options = { //BEST all parameters via options including keys
-			layers: typeof layersCollection == 'function' ? layersCollection() : null,
-			...opt
-		},
-		control = new ol.control.Control({
+function controlLayerSwitcher(layers, additionalSelectorId) {
+	const control = new ol.control.Control({
 			element: document.createElement('div'),
 		}),
 		baseLayers = Object.fromEntries(
-			Object.entries(options.layers)
+			Object.entries(layers)
 			.filter(([_, v]) => v != null) // Remove empty layers
 		),
 		layerNames = Object.keys(baseLayers),
@@ -81,7 +77,7 @@ function controlLayerSwitcher(opt) {
 
 		// Attach html additional selector
 		//BEST other id don't use the css
-		const additionalSelector = document.getElementById(options.additionalSelectorId);
+		const additionalSelector = document.getElementById(additionalSelectorId);
 		if (additionalSelector) {
 			control.element.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration

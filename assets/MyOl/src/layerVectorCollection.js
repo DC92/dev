@@ -9,6 +9,7 @@
  */
 function layerGeoBB(options) {
 	return layerVectorCluster({
+		host: '//chemineur.fr/',
 		urlArgsFunction: function(opt, bbox, selections) {
 			return {
 				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
@@ -215,13 +216,12 @@ function layerPyreneesRefuges(options) {
 /**
  * Site camptocamp.org
  */
-//TODO BUG pas d'étiquettes au survol
-function layerC2C(opt) {
+function layerC2C(options) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
 
-	format.readFeatures = function(json, options) {
+	format.readFeatures = function(json, opt) {
 		const features = [],
 			objects = JSONparse(json);
 
@@ -245,7 +245,7 @@ function layerC2C(opt) {
 				type: 'FeatureCollection',
 				features: features,
 			},
-			format.getReadOptions(json, options)
+			format.getReadOptions(json, opt)
 		);
 	};
 
@@ -263,7 +263,7 @@ function layerC2C(opt) {
 		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-		...opt
+		...options
 	});
 }
 

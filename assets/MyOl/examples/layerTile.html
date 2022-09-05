@@ -41,7 +41,7 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<script>
-const mapKeys = {
+const keys = {
 	// Get your own (free) IGN key at https://geoservices.ign.fr/
 	ign: 'ngv5uf0uu1cafegv89kzr1o5',
 	// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
@@ -56,7 +56,8 @@ const mapKeys = {
 const map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: [700000, 5600000], zoom: 7, // Sud est
+		center: [700000, 5600000],
+		zoom: 7, // Sud est
 		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 	}),
 	controls: [
@@ -64,17 +65,16 @@ const map = new ol.Map({
 		new ol.control.Attribution({
 			collapsed: false,
 		}),
-		controlLayerSwitcher({
-			layers: layersDemo(),
-		}),
+		controlLayerSwitcher(layersDemo({
+			keys: keys,
+		})),
 	],
 });
 	</script>
 	<script src="print_script.js"></script>
 	<script>
-const v = map.getView();
-v.on('change:resolution', function() {
-	console.log('resolution = ' + Math.round(v.getResolutionForZoom(v.getZoom())));
+map.getView().on('change:resolution', function() {
+	console.log('resolution = ' + Math.round(map.getView().getResolutionForZoom(map.getView().getZoom())));
 });
 	</script>
 

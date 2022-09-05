@@ -32,6 +32,11 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
+		.selector {
+			float: left;
+			border-right: solid;
+			padding: 5px
+		}
 	</style>
 </head>
 
@@ -43,6 +48,16 @@ Based on https://openlayers.org
 	<div id="map"></div>
 	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
+	<div id="additional-selector" >
+		<hr />
+		chemineur.fr <input type="checkbox" name="chem-features" checked="checked" />
+		<ul>
+			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
+			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
+			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
+		</ul>
+	</div>
+
 	<script>
 // Must be after the <div id="map"> tag
 new ol.Map({
@@ -50,14 +65,13 @@ new ol.Map({
 	view: new ol.View({
 		enableRotation: false,
 	}),
-	controls: controlsCollection().concat(controlLayerSwitcher()),
+	controls: controlsCollection()
+		.concat(controlLayerSwitcher(
+			layersCollection(),
+			'additional-selector'
+		)),
 	layers: [
-		...layersCluster({
-			host: '//chemineur.fr/',
-			layer: layerGeoBB,
-			selectorName: 'chem-features',
-			attribution: 'Chemineur',
-		}),
+		...layersGeoBB(), // Chemineur
 		layerMarker({
 			src: 'examples/images/viseur.png',
 			dragable: true,

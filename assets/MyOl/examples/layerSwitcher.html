@@ -46,13 +46,28 @@ Based on https://openlayers.org
 
 	<script>
 // Vectorlayer
-const countries = new ol.layer.Vector({
-	source: new ol.source.Vector({
-		url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-		format: new ol.format.GeoJSON(),
-	}),
-	zIndex: 2, // Above the base layer
-});
+const baseLayers = {
+		Stamen: new ol.layer.Tile({
+			source: new ol.source.Stamen({
+				layer: 'terrain',
+			}),
+		}),
+		'OSM org': new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
+		Watercolor: new ol.layer.Tile({
+			source: new ol.source.Stamen({
+				layer: 'watercolor',
+			}),
+		}),
+	},
+	countries = new ol.layer.Vector({
+		source: new ol.source.Vector({
+			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
+			format: new ol.format.GeoJSON(),
+		}),
+		zIndex: 2, // Above the base layer
+	});
 
 new ol.Map({
 	target: 'map',
@@ -61,25 +76,7 @@ new ol.Map({
 		zoom: 5,
 	}),
 	controls: [
-		new ol.control.Zoom(),
-		controlLayerSwitcher({
-			layers: {
-				Stamen: new ol.layer.Tile({
-					source: new ol.source.Stamen({
-						layer: 'terrain',
-					}),
-				}),
-				'OSM org': new ol.layer.Tile({
-					source: new ol.source.OSM(),
-				}),
-				Watercolor: new ol.layer.Tile({
-					source: new ol.source.Stamen({
-						layer: 'watercolor',
-					}),
-				}),
-			},
-			additionalSelectorId: 'additional-selector',
-		}),
+		controlLayerSwitcher(baseLayers, 'additional-selector'),
 	],
 	layers: [countries],
 });

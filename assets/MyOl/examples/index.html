@@ -19,13 +19,14 @@ Based on https://openlayers.org
 	<!-- My Openlayers -->
 	<link  href="../src/controls.css" type="text/css" rel="stylesheet">
 	<link  href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
+	<link  href="../src/marker.css" type="text/css" rel="stylesheet">
 	<script src="../src/header.js"></script>
 	<script src="../src/layerTileCollection.js"></script>
 	<script src="../src/layerSwitcher.js"></script>
 	<script src="../src/layerVector.js"></script>
 	<script src="../src/layerVectorCollection.js"></script>
 	<script src="../src/controls.js"></script>
-	<script src="../src/editor.js"></script>
+	<script src="../src/marker.js"></script>
 
 	<style>
 		#map {
@@ -50,6 +51,7 @@ Based on https://openlayers.org
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
 
 	<div id="map"></div>
+	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
 	<div id="additional-selector" >
 		<hr />
@@ -62,7 +64,7 @@ Based on https://openlayers.org
 	</div>
 
 	<script>
-const mapKeys = {
+const keys = {
 	// Get your own (free) IGN key at https://geoservices.ign.fr/
 	ign: 'ngv5uf0uu1cafegv89kzr1o5',
 	// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
@@ -74,18 +76,22 @@ const mapKeys = {
 };
 	</script>
 	<script>
-// Must be after the "map" tag
+// Must be after the <div id="map"> tag
 new ol.Map({
 	target: 'map',
-	controls: controlsCollection().concat(controlLayerSwitcher({
-		additionalSelectorId: 'additional-selector',
-	})),
+	view: new ol.View({
+		enableRotation: false,
+	}),
+	controls: controlsCollection()
+		.concat(controlLayerSwitcher(
+			layersCollection(),
+			'additional-selector'
+		)),
 	layers: [
-		...layersCluster({ //TODO BUG don't,work
-			host: '//chemineur.fr/',
-			layer: layerGeoBB,
-			selectorName: 'chem-features',
-			attribution: 'Chemineur',
+		...layersGeoBB(), // Chemineur
+		layerMarker({
+			src: 'images/viseur.png',
+			dragable: true,
 		}),
 	],
 });

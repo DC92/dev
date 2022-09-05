@@ -289,7 +289,7 @@ function layerVector(opt) {
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature, layer) {
-						if (layer.getProperties().host) { // Not the hover layer
+						if (hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
 							hoverLayer.setZIndex(layer.getZIndex() + 2)
 							return feature;
 						}
@@ -444,6 +444,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 
 // Get icon from an URL
+//TODO BUG general : send cookies to server, event non secure
 function styleOptionsIcon(iconUrl) {
 	if (iconUrl)
 		return {

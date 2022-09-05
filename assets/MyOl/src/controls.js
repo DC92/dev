@@ -733,16 +733,13 @@ function controlHelp(opt) {
 /**
  * Controls examples
  */
-function controlsCollection(opt) {
-	const options = { //BEST all parameters via options
-		...opt
-	};
+function controlsCollection(options) {
+	options = options || {};
 
 	return [
 		// Top left
 		new ol.control.Zoom(options.Zoom),
 		new ol.control.FullScreen(options.FullScreen),
-		controlButton(), // Neutral: not displayed
 		controlGeocoder(options.Geocoder),
 		controlGPS(options.GPS),
 		controlLoadGPX(options.LoadGPX),
@@ -757,6 +754,13 @@ function controlsCollection(opt) {
 		// Bottom right
 		controlPermalink(options.Permalink),
 		new ol.control.Attribution(options.Attribution),
+	];
+}
+
+function controlDemo(options) {
+	return [
+		...controlsCollection(options),
+		controlButton(), // Neutral: not displayed
 		controlHelp(options.Help),
 	];
 }
