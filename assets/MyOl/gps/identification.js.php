@@ -1,7 +1,7 @@
 <?php
 header('Cache-Control: no-cache');
 
-// Calculate a version number depending on the files used by the PWA
+// Calculate a build number depending on the files used by the PWA
 $dirs = [
 	'../*/*', // root/MyOl/*/* (includes --/MyOl/gps/*)
 	'../*', // root/MyOl/*
@@ -16,4 +16,4 @@ foreach ($files AS $file)
 		$date = filemtime ($file);
 
 date_default_timezone_set ('Europe/Paris');
-echo 'var myolSWversion = "'.date('jMy G:i \vs',$date).count($files).'";';
+echo 'var myolSWbuild = "'.date('jMy G:i \vs',$date).count($files).'";';

@@ -54,9 +54,13 @@ if (location.hash == '###')
 				data.push('service-worker:');
 
 				for (let registration of registrations) {
-					if (registration.active)
+					if (registration.active) {
 						data.push('  ' + registration.active.scriptURL);
-					//registration.unregister(); // For test purposes
+
+						// TEMPORARY : Delete previous version of MyOl service worker
+						if (registration.active.scriptURL.includes('url_path'))
+							registration.unregister().then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
+					}
 				}
 			}
 		});
@@ -67,7 +71,10 @@ if (location.hash == '###')
 
 			for (let name of names) {
 				data.push('  ' + name);
-				//caches.delete(name); // For test purposes
+
+				// TEMPORARY : Delete previous version of MyOl cache
+				if (name == 'myGpsCache')
+					caches.delete(name);
 			}
 		}
 	});
