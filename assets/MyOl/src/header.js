@@ -2,8 +2,6 @@
 /* jshint esversion: 6 */ //BEST accept spread operator
 if (!ol) var ol = {};
 
-//TODO integration to GeoBB . Chemineur
-
 /**
  * Debug facilities on mobile
  */

@@ -37,7 +37,7 @@ function layerMRI(options) {
  * Kompas (Austria)
  * Requires layerOSM
  */
-//TODO BUG don't work
+//TODO layerKompass BUG don't work
 function layerKompass(opt) {
 	const options = {
 		subLayer: 'KOMPASS Touristik',
@@ -174,7 +174,7 @@ function layerSpain(opt) {
 /**
  * Italy IGM
  */
-function layerIGM(options) {
+function layerIGM() {
 	return [
 		subLayerIGM('IGM_25000', 'CB.IGM25000', 5, 10),
 		subLayerIGM('IGM_100000', 'MB.IGM100000', 10, 20),
@@ -193,7 +193,6 @@ function layerIGM(options) {
 					layers: layer,
 				},
 				attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
-				...options
 			}),
 		});
 	}
@@ -229,10 +228,16 @@ function layerOS(opt) {
 /**
  * ArcGIS (Esri)
  */
-function layerArcGIS(subLayer) {
+function layerArcGIS(opt) {
+	const options = {
+		host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
+		subLayer: 'World_Imagery',
+		...opt
+	};
+
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
-			url: 'https://server.arcgisonline.com/ArcGIS/rest/services/' + subLayer +
+			url: options.host + options.subLayer +
 				'/MapServer/tile/{z}/{y}/{x}',
 			maxZoom: 19,
 			attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
@@ -311,9 +316,8 @@ function layersCollection(options) {
 		'OSM cyclo': layerOSM({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
-		'OSM outdoors': layerThunderforest(options.thunderforest),
+		'OSM outdoors': layerThunderforest(),
 		'OSM transport': layerThunderforest({
-			...options.thunderforest,
 			subLayer: 'transport',
 		}),
 		'OpenTopo': layerOpenTopo(),
@@ -321,23 +325,19 @@ function layersCollection(options) {
 
 		'IGN TOP25': layerIGN(options.ign),
 		'IGN V2': layerIGN({
-			...options.ign,
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
 		'IGN cartes 1950': layerIGN({
-			...options.ign,
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950',
 			key: 'cartes/geoportail',
 		}),
 		'IGN E.M. 1820-66': layerIGN({
-			...options.ign,
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
 		'Cadastre': layerIGN({
-			...options.ign,
 			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
 			key: 'essentiels',
 			format: 'image/png',
@@ -345,25 +345,22 @@ function layersCollection(options) {
 		/*'IGN Cassini': layerIGN({ //BEST BUG what key for Cassini ?
 			...options.ign,
 					layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
-					key: options.keys.ign,
 				}),*/
 
-		'SwissTopo': layerSwissTopo(options.swissTopo),
-		//'Autriche': layerKompass(options.kompass), //TODO BUG don't work
-		'Angleterre': layerOS(options.os),
-		'Italie': layerIGM(options.igm),
-		'Espagne': layerSpain(options.spain),
+		'SwissTopo': layerSwissTopo(),
+		//'Autriche': layerKompass(), //TODO BUG don't work
+		'Angleterre': layerOS(),
+		'Italie': layerIGM(),
+		'Espagne': layerSpain(),
 
-		'Photo ArcGIS': layerArcGIS('World_Imagery'),
+		'Photo ArcGIS': layerArcGIS(),
 		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': layerGoogle('s'),
 		'Photo IGN': layerIGN({
-			...options.ign,
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
 			key: 'essentiels',
 		}),
 		'Photo IGN 1950-65': layerIGN({
-			...options.ign,
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965',
 			key: 'orthohisto/geoportail',
 			style: 'BDORTHOHISTORIQUE',
@@ -374,53 +371,46 @@ function layersCollection(options) {
 
 function layersDemo(options) {
 	return {
-		...layersCollection(options), // Benefit of layersCollection keys management as argument is passed by reference
+		...layersCollection(options),
+		// Benefit of layersCollection keys management as argument is passed by reference
+
 		'OSM': layerOSM({
 			url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 		}),
 
 		'ThF cycle': layerThunderforest({
-			...options.thunderforest,
 			subLayer: 'cycle',
 		}),
 		'ThF landscape': layerThunderforest({
-			...options.thunderforest,
 			subLayer: 'landscape',
 		}),
 		'ThF trains': layerThunderforest({
-			...options.thunderforest,
 			subLayer: 'pioneer',
 		}),
 		'ThF villes': layerThunderforest({
-			...options.thunderforest,
 			subLayer: 'neighbourhood',
 		}),
 		'ThF contraste': layerThunderforest({
-			...options.thunderforest,
 			subLayer: 'mobile-atlas',
 		}),
 
 		'OS light': layerOS({
-			...options.os,
 			subLayer: 'Light_3857',
 		}),
 		'OS road': layerOS({
-			...options.os,
 			subLayer: 'Road_3857',
 		}),
-		//'Kompas': layerKompass({...options.kompass,subLayer:'KOMPASS',}), //TODO BUG
+		//'Kompas': layerKompass({subLayer:'KOMPASS',}), //TODO BUG
 
 		'Bing': layerBing('Road'),
 		'Bing hybrid': layerBing('AerialWithLabels'),
 
 		'Photo Swiss': layerSwissTopo({
 			subLayer: 'ch.swisstopo.swissimage',
-			...options.swissTopo,
 		}),
 		'Photo Espagne': layerSpain({
 			server: 'pnoa-ma',
 			subLayer: 'OI.OrthoimageCoverage',
-			...options.spain
 		}),
 
 		'Google road': layerGoogle('m'),

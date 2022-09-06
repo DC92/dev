@@ -83,10 +83,10 @@ new ol.Map({
 		enableRotation: false,
 	}),
 	controls: controlsCollection()
-		.concat(controlLayerSwitcher(
-			layersCollection(),
-			'additional-selector'
-		)),
+		.concat(controlLayerSwitcher({
+			layers: layersCollection(),
+			additionalSelectorId: 'additional-selector',
+		})),
 	layers: [
 		...layersGeoBB(), // Chemineur
 		layerMarker({

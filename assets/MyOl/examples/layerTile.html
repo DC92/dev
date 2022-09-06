@@ -65,9 +65,11 @@ const map = new ol.Map({
 		new ol.control.Attribution({
 			collapsed: false,
 		}),
-		controlLayerSwitcher(layersDemo({
-			keys: keys,
-		})),
+		controlLayerSwitcher({
+			layers: layersDemo({
+				keys: keys,
+			}),
+		}),
 	],
 });
 	</script>

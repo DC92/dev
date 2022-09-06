@@ -35,7 +35,7 @@ if ('serviceWorker' in navigator)
 	});
 
 // Manage the map
-//TODO BUG ??? Mobile Gps picto rando ne ferme pas les autres
+//TODO GPS BUG ??? Mobile Gps picto rando ne ferme pas les autres
 var map,
 	controlOptions = { // To be updated by gps_addons.php before load
 		Help: {
@@ -55,9 +55,9 @@ window.addEventListener('load', function() {
 			constrainResolution: true, // Forces the zoom on the available tile's definition
 		}),
 		controls: controlsCollection(controlOptions)
-			.concat(controlLayerSwitcher(
-				layersCollection() //TODO need options to update it via controlOptions
-				//TODO Need to get keys
-			)),
+			.concat(controlLayerSwitcher({
+				layers: layersCollection(),
+				...controlOptions.layerSwitcher
+			})),
 	});
 });

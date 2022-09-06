@@ -76,7 +76,10 @@ new ol.Map({
 		zoom: 5,
 	}),
 	controls: [
-		controlLayerSwitcher(baseLayers, 'additional-selector'),
+		controlLayerSwitcher({
+			layers: baseLayers,
+			additionalSelectorId: 'additional-selector'
+		}),
 	],
 	layers: [countries],
 });
