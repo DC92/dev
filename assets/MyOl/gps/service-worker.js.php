@@ -1,15 +1,25 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors','on');
+
 header('Content-Type: application/javascript');
 header('Cache-Control: no-cache');
+
+include ('identification.js.php');
 
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
 
-include ('version.js.php');
-
 //TODO GPS put GPX files in cache
 //TODO GPS parameter name & favicon (for GPS appli)
 ?>
+self.addEventListener('install', evt => {
+	console.log('PWA SW install ' + evt.target.location + ' ' + myolSWbuild);
+
+	// Clean cache when PWA install or upgrades
+	caches.delete('myGpsCache')
+		.then(console.log('myGpsCache deleted'));
+});
 
 // Cache all used files
 self.addEventListener('fetch', evt =>

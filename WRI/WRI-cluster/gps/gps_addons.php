@@ -64,7 +64,7 @@ include ('../../config_privee.php');
 	<p>* Cette application ne permet pas de visualiser ou d'enregistrer le parcours</p>
 	<p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
 	<hr />
-	<p>MyOl/gps <span class="myol-sw-version"></span></p>
+	<p>MyOl/gps <span class="myol-sw-build"></span></p>
 </div>
 
 <script>

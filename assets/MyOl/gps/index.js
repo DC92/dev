@@ -12,40 +12,25 @@ if (!location.href.match(/(https|localhost).*index/))
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
 	.then(registration => {
-		console.log('PWA SW ' + myolSWbuild + ' registered');
-		if (registration.active) // Avoid reinstall on first install
-			registration.onupdatefound = async function() { // service-worker.js is changed
-				console.log('PWA update found');
-
-				// Clean the service worker
-				await registration.unregister()
-					.then(() => console.log('SW unregistered'));
-
-				// Reinstall now to be ready for further offline use
-				await navigator.serviceWorker.register('service-worker.js.php')
-					.then(() => console.log('New SW registered'));
-
-				// Clean the cache
-				await caches.delete('myGpsCache')
-					.then(() => console.log('PWA myGpsCache deleted'));
-
-				// Restart to instant use of the new version
-				location.reload();
-			}
-	});
+		console.log('PWA SW registered ' + myolSWbuild);
+		registration.onupdatefound = async function() { // service-worker.js is changed
+			console.log('PWA update found / reload');
+			location.reload();
+		}
+	})
 
 // Manage the map
 //TODO GPS BUG ??? Mobile Gps picto rando ne ferme pas les autres
-var map,
-	controlOptions = { // To be updated by gps_addons.php before load
-		Help: {
-			helpId: 'myol-gps-help',
-		},
-	};
-
 window.addEventListener('load', function() {
+	var map,
+		controlOptions = { // To be updated by gps_addons.php before load
+			Help: {
+				helpId: 'myol-gps-help',
+			},
+		};
+
 	// Dynamicaly set version number to helps
-	Array.from(document.getElementsByClassName('myol-sw-version'))
+	Array.from(document.getElementsByClassName('myol-sw-build'))
 		.forEach(el => el.innerHTML = myolSWbuild);
 
 	// Load the map

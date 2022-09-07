@@ -12,7 +12,7 @@ const elListe = document.getElementById('gps-trace-list');
 let gpxLayer;
 
 // Add a gpx layer from files in the same directory
-map.once('postrender', () => addGpxLayer(location.hash.replace('#', '')));
+map.once('postrender', () => addGpxLayer(location.hash.replace('#', '')));//TODO DELETE () => 
 
 function addGpxLayer(gpxArg) {
 	if (typeof gpxFiles == 'object' &&

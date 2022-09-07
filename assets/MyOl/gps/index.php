@@ -1,5 +1,7 @@
 <?php
-	header('Cache-Control: no-cache');
+error_reporting(E_ALL);
+ini_set('display_errors','on');
+header('Cache-Control: no-cache');
 ?><!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
@@ -35,7 +37,7 @@ Install the service but upgrades the files only after the caches delay
 
 	<!-- This app -->
 	<link  href="index.css?<?=filemtime('index.css')?>" type="text/css" rel="stylesheet">
-	<script src="version.js.php"></script>
+	<script src="identification.js.php"></script>
 	<script src="index.js?<?=filemtime('index.js')?>"></script>
 </head>
 
@@ -49,7 +51,7 @@ Install the service but upgrades the files only after the caches delay
 
 	<div style="display:none">
 		<div id="myol-gps-help">
-			<p>MyGPS <span class="myol-sw-version"></span></p>
+			<p>MyGPS <span class="myol-sw-build"></span></p>
 		</div>
 	</div>
 </body>
