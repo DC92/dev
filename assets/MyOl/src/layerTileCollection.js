@@ -371,8 +371,8 @@ function layersCollection(options) {
 
 function layersDemo(options) {
 	return {
-		...layersCollection(options),
 		// Benefit of layersCollection keys management as argument is passed by reference
+		...layersCollection(options),
 
 		'OSM': layerOSM({
 			url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',

@@ -444,7 +444,7 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  */
 
 // Get icon from an URL
-//TODO BUG general : send cookies to server, event non secure
+//BEST BUG general : send cookies to server, event non secure
 function styleOptionsIcon(iconUrl) {
 	if (iconUrl)
 		return {

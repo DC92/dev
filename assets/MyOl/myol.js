@@ -499,8 +499,8 @@ function layersCollection(options) {
 
 function layersDemo(options) {
 	return {
-		...layersCollection(options),
 		// Benefit of layersCollection keys management as argument is passed by reference
+		...layersCollection(options),
 
 		'OSM': layerOSM({
 			url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -1701,6 +1701,8 @@ function controlButton(opt) {
 	// Add submenu below the button
 	if (options.submenuEl)
 		control.submenuEl = options.submenuEl;
+	else if (options.submenuId)
+		control.submenuEl = document.getElementById(options.submenuId);
 	else {
 		control.submenuEl = document.createElement('div');
 		if (options.submenuHTML)
@@ -1718,6 +1720,8 @@ function controlButton(opt) {
 					// Check at execution time if control.function() is defined
 					if (typeof control[evtFnc] == 'function')
 						control[evtFnc](evt);
+
+					return false; // Don't continue on href
 				};
 		});
 
@@ -2140,25 +2144,38 @@ function controlGPS(options) {
  * GPX file loader control
  * Requires controlButton
  */
-function controlLoadGPX(opt) {
-	const options = {
-			label: '&#x1F4C2;',
-			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
-				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-			...opt
-		},
-		control = controlButton(options),
-		reader = new FileReader(),
-		format = new ol.format.GPX();
+function controlLoadGPX(options) {
+	const control = controlButton({
+		label: '&#x1F4C2;',
+		submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
+			'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
+		...options
+	});
 
-	control.loadFile = function(evt) {
-		if (evt.type == 'change' && evt.target.files)
-			reader.readAsText(evt.target.files[0]);
+	control.loadURL = async function(evt) {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', evt.target.href);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4 && xhr.status == 200)
+				loadText(xhr.responseText);
+		};
+		xhr.send();
 	};
 
-	reader.onload = function() {
+	control.loadFile = function(evt) {
+		const reader = new FileReader();
+
+		if (evt.type == 'change' && evt.target.files)
+			reader.readAsText(evt.target.files[0]);
+		reader.onload = function() {
+			loadText(reader.result);
+		}
+	};
+
+	function loadText(text) {
 		const map = control.getMap(),
-			features = format.readFeatures(reader.result, {
+			format = new ol.format.GPX(),
+			features = format.readFeatures(text, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 			}),
@@ -2384,7 +2401,10 @@ function controlHelp(opt) {
  * Controls examples
  */
 function controlsCollection(options) {
-	options = options || {};
+	options = {
+		supplementaryControls: [],
+		...options
+	};
 
 	return [
 		// Top left
@@ -2404,12 +2424,16 @@ function controlsCollection(options) {
 		// Bottom right
 		controlPermalink(options.Permalink),
 		new ol.control.Attribution(options.Attribution),
+
+		...options.supplementaryControls
 	];
 }
 
-function controlDemo(options) {
+function controlsDemo(options) {
 	return [
+		// Benefit of layersCollection keys management as argument is passed by reference
 		...controlsCollection(options),
+
 		controlButton(), // Neutral: not displayed
 		controlHelp(options.Help),
 	];

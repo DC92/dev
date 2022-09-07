@@ -36,9 +36,13 @@ Install the service but upgrades the files only after the caches delay
 	<script src="../myol.js?<?=filemtime('../myol.js')?>"></script>
 
 	<!-- This app -->
-	<link  href="index.css?<?=filemtime('index.css')?>" type="text/css" rel="stylesheet">
-	<script src="identification.js.php"></script>
-	<script src="index.js?<?=filemtime('index.js')?>"></script>
+	<style>
+		<?php include('index.css')?>
+	</style>
+	<script>
+		<?php include('identification.js.php')?>
+		<?php include('index.js')?>
+	</script>
 </head>
 
 <body>

@@ -21,14 +21,14 @@ if ('serviceWorker' in navigator)
 
 // Manage the map
 //TODO GPS BUG ??? Mobile Gps picto rando ne ferme pas les autres
-window.addEventListener('load', function() {
-	var map,
-		controlOptions = { // To be updated by gps_addons.php before load
-			Help: {
-				helpId: 'myol-gps-help',
-			},
-		};
+var map,
+	controlOptions = { // To be updated by gps_addons.php before load
+		Help: {
+			helpId: 'myol-gps-help',
+		},
+	};
 
+window.addEventListener('load', function() {
 	// Dynamicaly set version number to helps
 	Array.from(document.getElementsByClassName('myol-sw-build'))
 		.forEach(el => el.innerHTML = myolSWbuild);
