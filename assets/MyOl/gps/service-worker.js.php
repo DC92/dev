@@ -10,7 +10,6 @@ include ('identification.js.php');
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
 
-//TODO GPS put GPX files in cache
 //TODO GPS parameter name & favicon (for GPS appli)
 ?>
 self.addEventListener('install', evt => {
@@ -19,6 +18,14 @@ self.addEventListener('install', evt => {
 	// Clean cache when PWA install or upgrades
 	caches.delete('myGpsCache')
 		.then(console.log('myGpsCache deleted'));
+
+	// Create & populate the cache
+	evt.waitUntil(
+		caches.open('myGpsCache')
+		.then(cache => cache.addAll(myolGPXfiles)
+			.then(console.log('myGpsCache created, ' + myolGPXfiles.length + ' files added'))
+		)
+	);
 });
 
 // Cache all used files
