@@ -12,7 +12,7 @@ if (!location.href.match(/(https|localhost).*index/))
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register('service-worker.js.php')
 	.then(registration => {
-		console.log('PWA SW ' + myolSWversion + ' registered');
+		console.log('PWA SW ' + myolSWbuild + ' registered');
 		if (registration.active) // Avoid reinstall on first install
 			registration.onupdatefound = async function() { // service-worker.js is changed
 				console.log('PWA update found');
@@ -46,7 +46,7 @@ var map,
 window.addEventListener('load', function() {
 	// Dynamicaly set version number to helps
 	Array.from(document.getElementsByClassName('myol-sw-version'))
-		.forEach(el => el.innerHTML = myolSWversion);
+		.forEach(el => el.innerHTML = myolSWbuild);
 
 	// Load the map
 	map = new ol.Map({
