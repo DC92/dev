@@ -14,8 +14,15 @@ if ('serviceWorker' in navigator)
 	.then(registration => {
 		console.log('PWA SW registered ' + myolSWbuild);
 		registration.onupdatefound = async function() { // service-worker.js is changed
-			console.log('PWA update found / reload');
-			location.reload();
+			console.log('PWA update found');
+
+			const installingWorker = registration.installing;
+			installingWorker.addEventListener('statechange', () => {
+				if (installingWorker.state === 'installed') {
+					console.log('PWA update installed / reload');
+					location.reload();
+				}
+			});
 		}
 	})
 
