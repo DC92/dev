@@ -1,5 +1,8 @@
 <?php
-header('Cache-Control: no-cache');
+error_reporting(E_ALL);
+ini_set('display_errors','on');
+
+date_default_timezone_set ('Europe/Paris');
 
 // Calculate a build number depending on the files used by the PWA
 $dirs = [
@@ -19,8 +22,5 @@ foreach ($files AS $filename) {
 	if (pathinfo($filename, PATHINFO_EXTENSION) == 'gpx')
 		$gpx_files [] = $filename;
 }
-
-date_default_timezone_set ('Europe/Paris');
-echo
-	'var myolSWbuild = "'.date('jMy G:i \vs',$date).count($files).'",'.PHP_EOL.
-	'	myolGPXfiles = '.json_encode($gpx_files).';';
+$myol_SW_build = date ('jMy G:i \vs', $date) .count ($files);
+$myol_GPX_files = json_encode($gpx_files);

@@ -1,17 +1,17 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors','on');
-
-header('Content-Type: application/javascript');
 header('Cache-Control: no-cache');
+header('Pragma: no-cache');
+header('Content-Type: application/javascript');
+header('Service-Worker-Allowed: /');
 
-include ('identification.js.php');
+include ('common.php');
 
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
-
-//TODO GPS parameter name & favicon (for GPS appli)
 ?>
+var myolSWbuild = '<?=$myol_SW_build?>',
+	myolGPXfiles = <?=$myol_GPX_files?>;
+
 self.addEventListener('install', evt => {
 	console.log('PWA SW install ' + evt.target.location + ' ' + myolSWbuild);
 

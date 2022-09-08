@@ -10,7 +10,9 @@ if (!location.href.match(/(https|localhost).*index/))
 
 // Load service worker for web application, install & update
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register('service-worker.js.php')
+	navigator.serviceWorker.register(scriptPath + 'service-worker.js.php', {
+		scope: './'
+	})
 	.then(registration => {
 		console.log('PWA SW registered ' + myolSWbuild);
 		registration.onupdatefound = async function() { // service-worker.js is changed
@@ -27,18 +29,17 @@ if ('serviceWorker' in navigator)
 	})
 
 // Manage the map
-//TODO GPS BUG ??? Mobile Gps picto rando ne ferme pas les autres
 var map,
 	controlOptions = { // To be updated by gps_addons.php before load
 		Help: {
-			helpId: 'myol-gps-help',
+			helpId: 'myol-gps-help', //TODO REMOVE
 		},
 	};
 
 window.addEventListener('load', function() {
 	// Dynamicaly set version number to helps
 	Array.from(document.getElementsByClassName('myol-sw-build'))
-		.forEach(el => el.innerHTML = myolSWbuild);
+		.forEach(el => el.innerHTML = myolSWbuild); //TODO REPLACE BY js tag
 
 	// Load the map
 	map = new ol.Map({
@@ -48,7 +49,7 @@ window.addEventListener('load', function() {
 		}),
 		controls: controlsCollection(controlOptions)
 			.concat(controlLayerSwitcher({
-				layers: layersCollection(),
+				layers: layersCollection(), //TODO et si on en veut pas ?
 				...controlOptions.layerSwitcher
 			})),
 	});
