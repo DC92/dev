@@ -18,10 +18,10 @@ $manifest = json_decode (file_get_contents ('manifest.json'), true);
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
 
-function fl ($filename, $path = '') {
+function fl ($filename) {
 	return implode ('', [
 		(pathinfo($filename, PATHINFO_EXTENSION) == 'js' ? 'src' : 'href'),
-		 '="'.$path.$filename.'?'.filemtime($path.$filename).'"',
+		 '="'.$filename.'?'.filemtime($filename).'"',
 		(pathinfo($filename, PATHINFO_EXTENSION) == 'css' ? ' type="text/css" rel="stylesheet"' : ''),
 	]);
 }
@@ -44,16 +44,16 @@ Based on https://openlayers.org
 	<link <?=fl($icon_file)?> rel="apple-touch-icon" />
 
 	<!-- Openlayers -->
-	<script <?=fl('../ol/ol.js',$myol_path)?>></script>
-	<link <?=fl('../ol/ol.css',$myol_path)?>>
+	<script <?=fl($myol_path.'../ol/ol.js')?>></script>
+	<link <?=fl($myol_path.'../ol/ol.css')?>>
 
 	<!-- Recherche par nom -->
-	<script <?=fl('../geocoder/ol-geocoder.js',$myol_path)?>></script>
-	<link <?=fl('../geocoder/ol-geocoder.min.css',$myol_path)?>>
+	<script <?=fl($myol_path.'../geocoder/ol-geocoder.js')?>></script>
+	<link <?=fl($myol_path.'../geocoder/ol-geocoder.min.css')?>>
 
 	<!-- My Openlayers -->
-	<script <?=fl('../myol.js',$myol_path)?>></script>
-	<link <?=fl('../myol.css',$myol_path)?>>
+	<script <?=fl($myol_path.'../myol.js')?>></script>
+	<link <?=fl($myol_path.'../myol.css')?>>
 
 	<!-- This app -->
 	<script>
@@ -61,8 +61,8 @@ Based on https://openlayers.org
 	var scriptPath = '<?=$myol_path?>',
 		myolSWbuild = '<?=$myol_SW_build?>';
 	</script>
-	<script <?=fl('./index.js',$myol_path)?>></script>
-	<link <?=fl('./index.css',$myol_path)?>>
+	<script <?=fl($myol_path.'./index.js')?>></script>
+	<link <?=fl($myol_path.'./index.css')?>>
 </head>
 
 <body>

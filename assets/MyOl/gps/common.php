@@ -9,11 +9,10 @@ date_default_timezone_set ('Europe/Paris');
 
 // Calculate a build number depending on the files used by the PWA
 $dirs = [
+	//TODO redo with the 2 directories / pb for sw : n'a pas le scope !
 	'../*/*', // root/MyOl/*/* (includes --/MyOl/gps/*)
 	'../*', // root/MyOl/*
 	'../../*.gpx', // root/*.gpx GPS files in the root directory
-	'../../gps_addons.php', // root/config specific site in the root directory
-	'../../*/gps_addons.php', // root/*/config specific site in any directory
 ];
 $date = 0;
 $gpx_files = [];
