@@ -11,12 +11,16 @@ if (!location.href.match(/(https|localhost).*index/))
 // Load service worker for web application, install & update
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(scriptPath + 'service-worker.js.php', {
-		scope: './'
+		scope: './',
 	})
 	.then(registration => {
 		console.log('PWA SW registered ' + myolSWbuild);
 		registration.onupdatefound = async function() { // service-worker.js is changed
 			console.log('PWA update found');
+
+			if (registration.active) // If it's an upgrade
+				// completely unregister the previous SW to avoid old actions ongoing
+				registration.unregister().then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
 
 			const installingWorker = registration.installing;
 			installingWorker.addEventListener('statechange', () => {
@@ -30,11 +34,12 @@ if ('serviceWorker' in navigator)
 
 // Manage the map
 var map,
-	controlOptions = { // To be updated by gps_addons.php before load
+	controlOptions = {
 		Help: {
 			helpId: 'myol-gps-help', //TODO REMOVE
 		},
-	};
+		layerSwitcher: {}, //TODO REMOVE
+	}; // To be updated by gps_addons.php before load
 
 window.addEventListener('load', function() {
 	// Dynamicaly set version number to helps
@@ -45,11 +50,11 @@ window.addEventListener('load', function() {
 	map = new ol.Map({
 		target: 'map',
 		view: new ol.View({
-			constrainResolution: true, // Forces the zoom on the available tile's definition
+			constrainResolution: true, // Force zoom on the available tile's definition
 		}),
 		controls: controlsCollection(controlOptions)
 			.concat(controlLayerSwitcher({
-				layers: layersCollection(), //TODO et si on en veut pas ?
+				layers: controlOptions.layerSwitcher.layers || layersCollection(),
 				...controlOptions.layerSwitcher
 			})),
 	});
