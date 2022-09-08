@@ -1,5 +1,5 @@
 {
-	"name": "GPS refuges.info",
+	"name": "MyGPS",
 	"display": "fullscreen",
 	"scope": "./",
 	"start_url": "index.php",

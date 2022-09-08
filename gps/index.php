@@ -1,4 +1,5 @@
 <?php
+//TODO OBSOLETE DELETE 
 if (file_exists ('../config.php'))
 	include ('../config.php');
 

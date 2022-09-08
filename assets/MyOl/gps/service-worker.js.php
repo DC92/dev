@@ -1,10 +1,8 @@
 <?php
-header('Cache-Control: no-cache');
-header('Pragma: no-cache');
+include ('common.php');
+
 header('Content-Type: application/javascript');
 header('Service-Worker-Allowed: /');
-
-include ('common.php');
 
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different

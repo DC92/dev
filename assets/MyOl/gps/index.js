@@ -19,7 +19,7 @@ if ('serviceWorker' in navigator)
 			console.log('PWA update found');
 
 			if (registration.active) // If it's an upgrade
-				// completely unregister the previous SW to avoid old actions ongoing
+				// Completely unregister the previous SW to avoid old actions ongoing
 				registration.unregister().then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
 
 			const installingWorker = registration.installing;
@@ -33,19 +33,9 @@ if ('serviceWorker' in navigator)
 	})
 
 // Manage the map
-var map,
-	controlOptions = {
-		Help: {
-			helpId: 'myol-gps-help', //TODO REMOVE
-		},
-		layerSwitcher: {}, //TODO REMOVE
-	}; // To be updated by gps_addons.php before load
+var map;
 
 window.addEventListener('load', function() {
-	// Dynamicaly set version number to helps
-	Array.from(document.getElementsByClassName('myol-sw-build'))
-		.forEach(el => el.innerHTML = myolSWbuild); //TODO REPLACE BY js tag
-
 	// Load the map
 	map = new ol.Map({
 		target: 'map',
@@ -53,9 +43,6 @@ window.addEventListener('load', function() {
 			constrainResolution: true, // Force zoom on the available tile's definition
 		}),
 		controls: controlsCollection(controlOptions)
-			.concat(controlLayerSwitcher({
-				layers: controlOptions.layerSwitcher.layers || layersCollection(),
-				...controlOptions.layerSwitcher
-			})),
+			.concat(controlLayerSwitcher(controlOptions.layerSwitcher)),
 	});
 });

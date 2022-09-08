@@ -2,6 +2,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors','on');
 
+header('Cache-Control: no-cache');
+header('Pragma: no-cache');
+
 date_default_timezone_set ('Europe/Paris');
 
 // Calculate a build number depending on the files used by the PWA
