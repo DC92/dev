@@ -765,6 +765,7 @@ function controlsCollection(options) {
 		controlLoadGPX(options.LoadGPX),
 		controlDownload(options.Download),
 		controlPrint(options.Print),
+		controlHelp(options.Help),
 
 		// Bottom left
 		controlLengthLine(options.LengthLine),
@@ -776,15 +777,5 @@ function controlsCollection(options) {
 		new ol.control.Attribution(options.Attribution),
 
 		...options.supplementaryControls
-	];
-}
-
-function controlsDemo(options) {
-	return [
-		// Benefit of layersCollection keys management as argument is passed by reference
-		...controlsCollection(options),
-
-		controlButton(), // Neutral: not displayed
-		controlHelp(options.Help),
 	];
 }

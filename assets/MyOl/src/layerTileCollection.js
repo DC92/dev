@@ -298,7 +298,7 @@ function layerBing(subLayer) {
 /**
  * Tile layers examples
  */
-function layersCollection(options) {
+function layerTileCollection(options) {
 	options = options || {};
 	options.keys = options.keys || {};
 
@@ -371,8 +371,8 @@ function layersCollection(options) {
 
 function layersDemo(options) {
 	return {
-		// Benefit of layersCollection keys management as argument is passed by reference
-		...layersCollection(options),
+		// Benefit of layerTileCollection keys management as argument is passed by reference
+		...layerTileCollection(options),
 
 		'OSM': layerOSM({
 			url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',

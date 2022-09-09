@@ -1,5 +1,6 @@
 <?php
 include ('../MyOl/gps/index_header.php');
+//TODO pas de mise à jour si on change fichiers gpx / vérifier tous les fichiers
 ?>
 <style>
 	#myol-gps-help {
@@ -38,7 +39,6 @@ include ('../MyOl/gps/index_header.php');
 </div>
 
 <script>
-//TODO ce fichier n'est pas scanné pour les updates !
 var controlOptions = {
 	supplementaryControls: [
 		controlButton({
@@ -47,7 +47,7 @@ var controlOptions = {
 		}),
 	],
 	layerSwitcher: {
-		layers: layersCollection(),
+		layers: layerTileCollection(),
 	},
 };
 </script>

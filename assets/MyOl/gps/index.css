@@ -10,3 +10,7 @@ html, body, #map {
 .myol-button-print {
 	display: none;
 }
+#myol-gps-help {
+	left: 0;
+	width: 100%;
+}

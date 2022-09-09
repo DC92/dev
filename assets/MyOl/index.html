@@ -67,7 +67,7 @@ new ol.Map({
 	}),
 	controls: controlsCollection()
 		.concat(controlLayerSwitcher({
-			layers: layersCollection(),
+			layers: layerTileCollection(),
 			additionalSelectorId: 'additional-selector',
 		})),
 	layers: [

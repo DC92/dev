@@ -43,9 +43,18 @@ if ('serviceWorker' in navigator)
 	})
 
 // Manage the map
-var map;
+var map,
+	controlOptions = {
+		Help: {
+			helpId: 'myol-gps-help',
+		},
+		layerSwitcher: {},
+	};
 
 window.addEventListener('load', function() {
+	if (!controlOptions.layerSwitcher.layers)
+		controlOptions.layerSwitcher.layers = layerTileCollection(controlOptions.layerSwitcher);
+
 	// Load the map
 	map = new ol.Map({
 		target: 'map',

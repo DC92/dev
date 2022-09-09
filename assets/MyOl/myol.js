@@ -422,7 +422,7 @@ function layerBing(subLayer) {
 /**
  * Tile layers examples
  */
-function layersCollection(options) {
+function layerTileCollection(options) {
 	options = options || {};
 	options.keys = options.keys || {};
 
@@ -495,8 +495,8 @@ function layersCollection(options) {
 
 function layersDemo(options) {
 	return {
-		// Benefit of layersCollection keys management as argument is passed by reference
-		...layersCollection(options),
+		// Benefit of layerTileCollection keys management as argument is passed by reference
+		...layerTileCollection(options),
 
 		'OSM': layerOSM({
 			url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -2411,6 +2411,7 @@ function controlsCollection(options) {
 		controlLoadGPX(options.LoadGPX),
 		controlDownload(options.Download),
 		controlPrint(options.Print),
+		controlHelp(options.Help),
 
 		// Bottom left
 		controlLengthLine(options.LengthLine),
@@ -2422,16 +2423,6 @@ function controlsCollection(options) {
 		new ol.control.Attribution(options.Attribution),
 
 		...options.supplementaryControls
-	];
-}
-
-function controlsDemo(options) {
-	return [
-		// Benefit of layersCollection keys management as argument is passed by reference
-		...controlsCollection(options),
-
-		controlButton(), // Neutral: not displayed
-		controlHelp(options.Help),
 	];
 }
 
