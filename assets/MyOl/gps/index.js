@@ -27,7 +27,6 @@ if ('serviceWorker' in navigator)
 			console.log('PWA update found');
 
 			// Completely unregister the previous SW to avoid installed SW actions ongoing
-			//BEST reload 2 times whan update !
 			if (registration.active) { // If it's an upgrade
 				await navigator.serviceWorker.getRegistrations().then(registrations => {
 					if (registrations.length) {
