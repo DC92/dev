@@ -14,7 +14,15 @@ if ('serviceWorker' in navigator)
 		scope: './',
 	})
 	.then(registration => {
-		console.log('PWA SW registered ' + buildDate);//TODO REDO from SW url
+		if (registration.installing)
+			console.log('PWA SW installing ' + registration.installing.scriptURL);
+		else if (registration.waiting)
+			console.log('PWA SW waiting ' + registration.waiting.scriptURL);
+		else if (registration.active)
+			console.log('PWA SW waiting ' + registration.active.scriptURL);
+		else
+			console.log('PWA SW STATUS UNKNOWN');
+
 		registration.onupdatefound = async function() { // service-worker.js is changed
 			console.log('PWA update found');
 
@@ -34,6 +42,7 @@ if ('serviceWorker' in navigator)
 
 			// Wait for end of all actions & roboot
 			const installingWorker = registration.installing;
+
 			installingWorker.addEventListener('statechange', () => {
 				if (installingWorker.state === 'installed') {
 					console.log('PWA update installed / reload');

@@ -17,11 +17,10 @@ include ('common.php');
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
 ?>
-var buildDate = '<?=$build_date?>', // Trigger upgrade PWA
-	myolGPXfiles = <?=json_encode($gpx_files)?>;
+var myolGPXfiles = <?=json_encode($gpx_files)?>;
 
 self.addEventListener('install', evt => {
-	console.log('PWA SW install ' + evt.target.location + ' ' + buildDate);//TODO REDO from SW url
+	console.log('PWA SW install ' + evt.target.location);
 
 	// Clean cache when PWA install or upgrades
 	caches.delete('myGpsCache')

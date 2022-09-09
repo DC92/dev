@@ -111,5 +111,5 @@ Based on https://openlayers.org
 		<p>* Cette application ne permet pas de visualiser ou d'enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
 		<hr />
-		<!-- //TODO DELETE --><p style="font-size:0.7em">Mise à jour <?=$build_date.' @'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['REQUEST_URI']?></p>
+		<p style="font-size:0.7em">Mise à jour <?=$sw_instance.$build_date?></p>
 	</div>
