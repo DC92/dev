@@ -10,7 +10,7 @@ if (!location.href.match(/(https|localhost).*index/))
 
 // Load service worker for web application, install & update
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register(scriptPath + 'service-worker.js.php', {
+	navigator.serviceWorker.register(myolPath + 'service-worker.js.php?' + compressedStartPath, {
 		scope: './',
 	})
 	.then(registration => {
@@ -18,10 +18,20 @@ if ('serviceWorker' in navigator)
 		registration.onupdatefound = async function() { // service-worker.js is changed
 			console.log('PWA update found');
 
-			if (registration.active) // If it's an upgrade
-				// Completely unregister the previous SW to avoid old actions ongoing
-				registration.unregister().then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
+			// Completely unregister the previous SW to avoid installed SW actions ongoing
+			//BEST reload 2 times whan update !
+			if (registration.active) { // If it's an upgrade
+				await navigator.serviceWorker.getRegistrations().then(registrations => {
+					if (registrations.length) {
+						for (let reg of registrations)
+							if (reg.active && reg.active.scriptURL.includes('MyOl'))
+								reg.unregister()
+								.then(console.log('SW ' + reg.active.scriptURL + ' deleted'));
+					}
+				});
+			}
 
+			// Wait for end of all actions & roboot
 			const installingWorker = registration.installing;
 			installingWorker.addEventListener('statechange', () => {
 				if (installingWorker.state === 'installed') {

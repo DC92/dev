@@ -59,7 +59,8 @@ if (location.hash == '###')
 
 						// TEMPORARY : Delete previous version of MyOl service worker
 						if (registration.active.scriptURL.includes('url_path'))
-							registration.unregister().then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
+							registration.unregister()
+							.then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
 					}
 				}
 			}

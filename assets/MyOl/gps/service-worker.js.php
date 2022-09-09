@@ -1,8 +1,18 @@
 <?php
-include ('common.php');
+error_reporting(E_ALL);
+ini_set('display_errors','on');
 
+header('Cache-Control: no-cache');
+header('Pragma: no-cache');
 header('Content-Type: application/javascript');
 header('Service-Worker-Allowed: /');
+
+$start_path = $_SERVER['QUERY_STRING'] ?
+	str_replace (':', '../', $_SERVER['QUERY_STRING']).'/' :
+	'';
+$myol_path = '';
+
+include ('common.php');
 
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different

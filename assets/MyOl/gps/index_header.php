@@ -1,22 +1,36 @@
 <?php
-include ('common.php');
+error_reporting(E_ALL);
+ini_set('display_errors','on');
 
-// Get package info
-$url_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
-$script_dirs  = explode ('/', str_replace ('\\', '/', __DIR__ .'/'));
-// Remove common part of the paths (except the last /)
-while (count ($url_dirs) > 1 && count ($script_dirs) > 1 &&
-	$url_dirs [0] == $script_dirs [0]) {
-	array_shift ($url_dirs);
-	array_shift ($script_dirs);
-}
-// Gps scripts path from url
-$myol_path = str_repeat ('../', count ($url_dirs) - 1) .implode ('/', $script_dirs);
+header('Cache-Control: no-cache');
+header('Pragma: no-cache');
 
 // Get manifest info
 $manifest = json_decode (file_get_contents ('manifest.json'), true);
 $icon_file = $manifest['icons'][0]['src'];
 $icon_type = pathinfo ($icon_file, PATHINFO_EXTENSION);
+
+// Get package info
+$start_dirs  = explode ('/', str_replace ('index.php', '', $_SERVER['SCRIPT_FILENAME']));
+$myol_dirs  = explode ('/', str_replace ('\\', '/', __DIR__ .'/'));
+// Remove common part of the paths (except the last /)
+while (count ($start_dirs) > 1 && count ($myol_dirs) > 1 &&
+	$start_dirs [0] == $myol_dirs [0]) {
+	array_shift ($start_dirs);
+	array_shift ($myol_dirs);
+}
+
+// Url start path from service-worker
+$compressed_start_path =  str_replace (['..','/'], [':',''], //HACK avoid http 406 error
+	str_repeat ('../', count ($myol_dirs) - 1) .implode ('/', $start_dirs));
+
+// Url start path from index.php
+$start_path = '';
+
+// MyOl/gps scripts path from index.php
+$myol_path = str_repeat ('../', count ($start_dirs) - 1) .implode ('/', $myol_dirs);
+
+include ('common.php');
 
 function fl ($filename) {
 	return implode ('', [
@@ -25,7 +39,6 @@ function fl ($filename) {
 		(pathinfo($filename, PATHINFO_EXTENSION) == 'css' ? ' type="text/css" rel="stylesheet"' : ''),
 	]);
 }
-
 ?><!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
@@ -58,7 +71,8 @@ Based on https://openlayers.org
 	<!-- This app -->
 	<script>
 	// Vars for index.js
-	var scriptPath = '<?=$myol_path?>',
+	var myolPath = '<?=$myol_path?>',
+		compressedStartPath = '<?=$compressed_start_path?>',
 		myolSWbuild = '<?=$myol_SW_build?>';
 	</script>
 	<script <?=fl($myol_path.'./index.js')?>></script>

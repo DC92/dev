@@ -1,22 +1,16 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors','on');
-
-header('Cache-Control: no-cache');
-header('Pragma: no-cache');
-
-date_default_timezone_set ('Europe/Paris');
-
 // Calculate a build number depending on the files used by the PWA
 $dirs = [
-	//TODO redo with the 2 directories / pb for sw : n'a pas le scope !
-	'../*/*', // root/MyOl/*/* (includes --/MyOl/gps/*)
-	'../*', // root/MyOl/*
-	'../../*.gpx', // root/*.gpx GPS files in the root directory
+	$start_path.'*', // Files in the start dir
+	$myol_path.'../*', // MyOl/*
+	$myol_path.'../*/*', // MyOl/*/* (includes MyOl/gps/*)
 ];
+
 $date = 0;
 $gpx_files = [];
 $files = glob ('{'.implode(',',$dirs).'}', GLOB_BRACE);
+
+date_default_timezone_set ('Europe/Paris');
 foreach ($files AS $filename) {
 	if (is_file ($filename) && $date < filemtime ($filename))
 		$date = filemtime ($filename);
@@ -24,5 +18,6 @@ foreach ($files AS $filename) {
 	if (pathinfo($filename, PATHINFO_EXTENSION) == 'gpx')
 		$gpx_files [] = $filename;
 }
+
 $myol_SW_build = date ('jMy G:i \vs', $date) .count ($files);
 $myol_GPX_files = json_encode($gpx_files);
