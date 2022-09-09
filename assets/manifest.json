@@ -1,11 +1,10 @@
 {
-	"name": "MyGPS",
-	"id": "MyGPS",
+	"name": "GPS",
 	"display": "fullscreen",
 	"scope": "./",
 	"start_url": "index.php",
 	"icons": [{
-		"src": "favicon.png",
+		"src": "MyOl/gps/favicon.png",
 		"sizes": "225x225",
 		"type": "image/png"
 	}]

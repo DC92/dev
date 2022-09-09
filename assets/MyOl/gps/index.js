@@ -45,9 +45,6 @@ if ('serviceWorker' in navigator)
 // Manage the map
 var map,
 	controlOptions = {
-		Help: {
-			helpId: 'myol-gps-help',
-		},
 		layerSwitcher: {},
 	};
 

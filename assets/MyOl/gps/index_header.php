@@ -74,7 +74,7 @@ Based on https://openlayers.org
 	// Vars for index.js
 	var myolPath = '<?=$myol_path?>',
 		compressedStartPath = '<?=$compressed_start_path?>',
-		myolSWbuild = '<?=$myol_SW_build?>';
+		myolSWbuild = '<?=$myol_SW_build?>'; //TODO replace by SW file name
 	</script>
 	<script <?=fl($myol_path.'./index.js')?>></script>
 	<link <?=fl($myol_path.'./index.css')?>>
