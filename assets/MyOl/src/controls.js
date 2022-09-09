@@ -522,7 +522,7 @@ function controlLoadGPX(options) {
 			reader.readAsText(evt.target.files[0]);
 		reader.onload = function() {
 			loadText(reader.result);
-		}
+		};
 	};
 
 	function loadText(text) {
@@ -582,7 +582,7 @@ function controlLoadGPX(options) {
 
 		// Close the submenu
 		control.element.classList.remove('myol-display-submenu');
-	};
+	}
 
 	return control;
 }

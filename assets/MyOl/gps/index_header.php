@@ -21,8 +21,8 @@ while (count ($start_dirs) > 1 && count ($myol_dirs) > 1 &&
 }
 
 // Url start path from service-worker
-$compressed_start_path =  str_replace (['..','/'], [':',''], //HACK avoid http 406 error
-	str_repeat ('../', count ($myol_dirs) - 1) .implode ('/', $start_dirs));
+$reverse_path = str_repeat ('../', count ($myol_dirs) - 1) .implode ('/', $start_dirs);
+$sw_instance =  str_replace (['../','/'], [':','.'], $reverse_path); //HACK avoid http 406 error
 
 // Url start path from index.php
 $start_path = '';
@@ -73,8 +73,8 @@ Based on https://openlayers.org
 	<script>
 	// Vars for index.js
 	var myolPath = '<?=$myol_path?>',
-		compressedStartPath = '<?=$compressed_start_path?>',
-		myolSWbuild = '<?=$myol_SW_build?>'; //TODO replace by SW file name
+		swInstance = '<?=$sw_instance?>',
+		buildDate = '<?=$build_date?>';
 	</script>
 	<script <?=fl($myol_path.'./index.js')?>></script>
 	<link <?=fl($myol_path.'./index.css')?>>
@@ -82,7 +82,7 @@ Based on https://openlayers.org
 
 <body>
 	<div id="map"></div>
-	
+
 	<div id="myol-gps-help">
 		<p>Pour utiliser les cartes et le GPS hors réseau,
 			vous pouvez installer ce logiciel
@@ -111,5 +111,5 @@ Based on https://openlayers.org
 		<p>* Cette application ne permet pas de visualiser ou d'enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
 		<hr />
-		<p style="font-size:0.7em">Mise à jour <?=$myol_SW_build.' @'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['REQUEST_URI']?></p>
+		<!-- //TODO DELETE --><p style="font-size:0.7em">Mise à jour <?=$build_date.' @'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['REQUEST_URI']?></p>
 	</div>

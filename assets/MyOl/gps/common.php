@@ -19,5 +19,4 @@ foreach ($files AS $filename) {
 		$gpx_files [] = $filename;
 }
 
-$myol_SW_build = date ('jMy G:i \vs', $date) .count ($files);
-$myol_GPX_files = json_encode($gpx_files);
+$build_date = date ('jMy-G:i.\vs', $date) .count ($files);

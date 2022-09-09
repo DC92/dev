@@ -10,11 +10,11 @@ if (!location.href.match(/(https|localhost).*index/))
 
 // Load service worker for web application, install & update
 if ('serviceWorker' in navigator)
-	navigator.serviceWorker.register(myolPath + 'service-worker.js.php?' + compressedStartPath, {
+	navigator.serviceWorker.register(myolPath + 'service-worker.js.php?' + swInstance + buildDate, {
 		scope: './',
 	})
 	.then(registration => {
-		console.log('PWA SW registered ' + myolSWbuild);
+		console.log('PWA SW registered ' + buildDate);//TODO REDO from SW url
 		registration.onupdatefound = async function() { // service-worker.js is changed
 			console.log('PWA update found');
 
@@ -24,7 +24,8 @@ if ('serviceWorker' in navigator)
 				await navigator.serviceWorker.getRegistrations().then(registrations => {
 					if (registrations.length) {
 						for (let reg of registrations)
-							if (reg.active && reg.active.scriptURL.includes('MyOl'))
+							if (reg.active && reg.active.scriptURL.includes('MyOl') && // From this package
+								registration.active.scriptURL != reg.active.scriptURL) // Not the new one !
 								reg.unregister()
 								.then(console.log('SW ' + reg.active.scriptURL + ' deleted'));
 					}

@@ -163,7 +163,7 @@ function layerVector(opt) {
 
 	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
 	format.readFeatures = function(doc, opt) {
-		const json = JSONparse(doc)
+		const json = JSONparse(doc);
 
 		json.features.map(el => {
 			// Generate a pseudo id if none
@@ -290,7 +290,7 @@ function layerVector(opt) {
 					map.getEventPixel(originalEvent),
 					function(feature, layer) {
 						if (hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
-							hoverLayer.setZIndex(layer.getZIndex() + 2)
+							hoverLayer.setZIndex(layer.getZIndex() + 2);
 							return feature;
 						}
 					}, {

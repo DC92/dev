@@ -856,7 +856,7 @@ function layerVector(opt) {
 
 	// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
 	format.readFeatures = function(doc, opt) {
-		const json = JSONparse(doc)
+		const json = JSONparse(doc);
 
 		json.features.map(el => {
 			// Generate a pseudo id if none
@@ -979,7 +979,7 @@ function layerVector(opt) {
 					map.getEventPixel(originalEvent),
 					function(feature, layer) {
 						if (hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
-							hoverLayer.setZIndex(layer.getZIndex() + 2)
+							hoverLayer.setZIndex(layer.getZIndex() + 2);
 							return feature;
 						}
 					}, {
@@ -1342,7 +1342,7 @@ function layersGeoBB(options) {
 				return {
 					layer: 'cluster',
 					bbox: bbox.join(','),
-				}
+				};
 			},
 			...options
 		}),
@@ -1405,7 +1405,7 @@ function layersWri(options) {
 			extraParams: function() {
 				return {
 					cluster: 0.1,
-				}
+				};
 			},
 			...options
 		}),
@@ -2170,7 +2170,7 @@ function controlLoadGPX(options) {
 			reader.readAsText(evt.target.files[0]);
 		reader.onload = function() {
 			loadText(reader.result);
-		}
+		};
 	};
 
 	function loadText(text) {
@@ -2230,7 +2230,7 @@ function controlLoadGPX(options) {
 
 		// Close the submenu
 		control.element.classList.remove('myol-display-submenu');
-	};
+	}
 
 	return control;
 }

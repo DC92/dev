@@ -123,7 +123,7 @@ class listener implements EventSubscriberInterface
 
 			// Traduit les BBcodes
 			$row['message'] = generate_text_for_display (
-				$row['post_text'],			
+				$row['post_text'],
 				$row['bbcode_uid'],
 				$row['bbcode_bitfield'],
 				OPTION_FLAG_BBCODE + OPTION_FLAG_SMILIES + OPTION_FLAG_LINKS

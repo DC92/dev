@@ -69,7 +69,7 @@ function layersGeoBB(options) {
 				return {
 					layer: 'cluster',
 					bbox: bbox.join(','),
-				}
+				};
 			},
 			...options
 		}),
@@ -132,7 +132,7 @@ function layersWri(options) {
 			extraParams: function() {
 				return {
 					cluster: 0.1,
-				}
+				};
 			},
 			...options
 		}),
