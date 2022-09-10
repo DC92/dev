@@ -16,7 +16,7 @@ foreach ($files AS $filename) {
 		$date = filemtime ($filename);
 
 	if (pathinfo($filename, PATHINFO_EXTENSION) == 'gpx')
-		$gpx_files [] = $filename;
+		$gpx_files[] = $filename;
 }
 
 $build_date = date ('jMy-G:i.\vs', $date) .count ($files);

@@ -135,28 +135,27 @@ function iconCanvasExt() {
 function layerOSM(options) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
+			// url: mandatory
 			maxZoom: 21,
 			attributions: ol.source.OSM.ATTRIBUTION,
-			...options
+			...options // Include url
 		}),
 	});
 }
 
-function layerOpenTopo(options) {
+function layerOpenTopo() {
 	return layerOSM({
 		url: '//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
 		attributions: '<a href="https://opentopomap.org">OpenTopoMap</a> ' +
 			'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
 		maxZoom: 17,
-		...options
 	});
 }
 
-function layerMRI(options) {
+function layerMRI() {
 	return layerOSM({
 		url: '//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 		attributions: '<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">Refuges.info</a>',
-		...options
 	});
 }
 
@@ -164,37 +163,31 @@ function layerMRI(options) {
  * Kompas (Austria)
  * Requires layerOSM
  */
-function layerKompass(opt) {
-	const options = {
-		subLayer: 'KOMPASS Touristik',
-		...opt
-	};
-
+/*
+function layerKompass(options) {
 	return layerOSM({
 		url: 'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
 			'&Experience=ecmaps&MapStyle=' + options.subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
+		subLayer: 'KOMPASS Touristik',
 		attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
 		...options
 	});
 }
+*/
 
 /**
  * Thunderforest
  * Requires layerOSM
- * var mapKeys.thunderforest = Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com
  */
-function layerThunderforest(opt) {
-	const options = {
-		subLayer: 'outdoors',
-		...opt
-	};
-
-	if (options.key)
+function layerThunderforest(options) {
+	if (options&&options.key) // Don't display if no key
 		return layerOSM({
 			url: '//{a-c}.tile.thunderforest.com/' + options.subLayer +
 				'/{z}/{x}/{y}.png?apikey=' + options.key,
+			subLayer: 'outdoors',
+			//key: Get a key at https://manage.thunderforest.com/dashboard
 			attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
-			...options
+			...options // Include key
 		});
 }
 
@@ -203,12 +196,8 @@ function layerThunderforest(opt) {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-function layerIGN(opt) {
-	let options = {
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
-			...opt
-		},
-		IGNresolutions = [],
+function layerIGN(options) {
+	let IGNresolutions = [],
 		IGNmatrixIds = [];
 
 	for (let i = 0; i < 18; i++) {
@@ -216,10 +205,11 @@ function layerIGN(opt) {
 		IGNmatrixIds[i] = i.toString();
 	}
 
-	if (options.key) // Don't display if no key provided
+	if (options&&options.key) // Don't display if no key provided
 		return new ol.layer.Tile({
 			source: new ol.source.WMTS({
 				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
+				layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
 				style: 'normal',
 				matrixSet: 'PM',
 				format: 'image/jpeg',
@@ -229,7 +219,7 @@ function layerIGN(opt) {
 					resolutions: IGNresolutions,
 					matrixIds: IGNmatrixIds,
 				}),
-				...options
+				...options // Include key & layer
 			}),
 		});
 }
@@ -325,11 +315,11 @@ function layerIGM() {
 
 /**
  * Ordnance Survey : Great Britain
- * var mapKeys.os = Get your own (free) key at https://osdatahub.os.uk/
  */
 function layerOS(opt) {
 	const options = {
 		subLayer: 'Outdoor_3857',
+		// key: Get your own (free) key at https://osdatahub.os.uk/
 		...opt
 	};
 
@@ -344,7 +334,7 @@ function layerOS(opt) {
 					url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
 						'/{z}/{x}/{y}.png?key=' + options.key,
 					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
-					...options
+					...options // Include key
 				}),
 			}),
 		];
@@ -396,22 +386,18 @@ function layerGoogle(subLayer) {
 
 /**
  * Bing (Microsoft)
- * var mapKeys.bing = Get your own (free) key at https://docs.microsoft.com/en-us/bingmaps/getting-started/
+ * options.imagerySet: sublayer
+ * options.key: Get your own (free) key at https://docs.microsoft.com/en-us/bingmaps/getting-started/
+ * attributions: defined by source.BingMaps
  */
-function layerBing(subLayer) {
-	if (typeof mapKeys == 'undefined' || !mapKeys) mapKeys = {};
-
-	if (mapKeys.bing) { // Don't display if no key provided
+function layerBing(options) {
+	if (options.key) { // Don't display if no key provided
 		const layer = new ol.layer.Tile();
 
 		layer.on('change:visible', function(evt) {
 			if (evt.target.getVisible() && // When the layer becomes visible
 				!layer.getSource()) { // Only once
-				layer.setSource(new ol.source.BingMaps({
-					imagerySet: subLayer,
-					key: mapKeys.bing,
-					// Attributions: defined by source.BingMaps
-				}));
+				layer.setSource(new ol.source.BingMaps(options));
 			}
 		});
 
@@ -423,10 +409,11 @@ function layerBing(subLayer) {
  * Tile layers examples
  */
 function layerTileCollection(options) {
+	// Give benefit of the following to the caller via the as argument passed by reference
 	options = options || {};
 	options.keys = options.keys || {};
 
-	// Get keys from options.keys
+	// Keys can be on options.keys or on options.LAYER.key
 	for (let k in options.keys)
 		options[k] = {
 			key: options.keys[k],
@@ -440,8 +427,9 @@ function layerTileCollection(options) {
 		'OSM cyclo': layerOSM({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
-		'OSM outdoors': layerThunderforest(),
+		'OSM outdoors': layerThunderforest(options.thunderforest),
 		'OSM transport': layerThunderforest({
+			...options.thunderforest,
 			subLayer: 'transport',
 		}),
 		'OpenTopo': layerOpenTopo(),
@@ -473,12 +461,15 @@ function layerTileCollection(options) {
 
 		'SwissTopo': layerSwissTopo(),
 		//'Autriche': layerKompass(),
-		'Angleterre': layerOS(),
+		'Angleterre': layerOS(options.os),
 		'Italie': layerIGM(),
 		'Espagne': layerSpain(),
 
 		'Photo ArcGIS': layerArcGIS(),
-		'Photo Bing': layerBing('Aerial'),
+		'Photo Bing': layerBing({
+			...options.bing,
+			imagerySet: 'Aerial',
+		}),
 		'Photo Google': layerGoogle('s'),
 		'Photo IGN': layerIGN({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
@@ -495,7 +486,6 @@ function layerTileCollection(options) {
 
 function layersDemo(options) {
 	return {
-		// Benefit of layerTileCollection keys management as argument is passed by reference
 		...layerTileCollection(options),
 
 		'OSM': layerOSM({
@@ -503,31 +493,44 @@ function layersDemo(options) {
 		}),
 
 		'ThF cycle': layerThunderforest({
+			...options.thunderforest,
 			subLayer: 'cycle',
 		}),
 		'ThF landscape': layerThunderforest({
+			...options.thunderforest,
 			subLayer: 'landscape',
 		}),
 		'ThF trains': layerThunderforest({
+			...options.thunderforest,
 			subLayer: 'pioneer',
 		}),
 		'ThF villes': layerThunderforest({
+			...options.thunderforest,
 			subLayer: 'neighbourhood',
 		}),
 		'ThF contraste': layerThunderforest({
+			...options.thunderforest,
 			subLayer: 'mobile-atlas',
 		}),
 
 		'OS light': layerOS({
+			...options.os,
 			subLayer: 'Light_3857',
 		}),
 		'OS road': layerOS({
+			...options.os,
 			subLayer: 'Road_3857',
 		}),
 		//'Kompas': layerKompass({subLayer:'KOMPASS',}),
 
-		'Bing': layerBing('Road'),
-		'Bing hybrid': layerBing('AerialWithLabels'),
+		'Bing': layerBing({
+			...options.bing,
+			imagerySet: 'Road',
+		}),
+		'Bing hybrid': layerBing({
+			...options.bing,
+			imagerySet: 'AerialWithLabels',
+		}),
 
 		'Photo Swiss': layerSwissTopo({
 			subLayer: 'ch.swisstopo.swissimage',

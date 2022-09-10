@@ -284,6 +284,7 @@ function controlGeocoder(options) {
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content
+		//TODO oriente au nord même quand inactif
 		'<p>Localisation GPS:</p>' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-source0">Inactif</label><br />' +

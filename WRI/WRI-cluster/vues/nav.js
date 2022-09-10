@@ -64,9 +64,8 @@ const mapId = 'carte-nav',
 
 	layers = [
 		// Refuges.info (2 level layer depending on resolution)
-		...layersCluster({
+		...layersWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			layer: layerWri,
 			selectorName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
 			styleOptionsFunction: function (feature, properties) {
 				return {
@@ -118,18 +117,22 @@ const mapId = 'carte-nav',
 		}),
 
 		// Chemineur
-		...layersCluster({
+		...layersGeoBB({
 			host: '//chemineur.fr/',
-			layer: layerGeoBB,
 			selectorName: 'selecteur-chemineur',
 			attribution: 'Chemineur',
 		}),
 
 		// Alpages.info
 		layerGeoBB({
+			strategy: ol.loadingstrategy.all,
 			host: '//alpages.info/',
 			selectorName: 'selecteur-alpages',
-			argSelName: 'forums',//TODO obsolete
+			extraParams: function() {
+				return {
+					forums: '4,5',
+				}
+			},
 			attribution: 'Alpages',
 		}),
 	],

@@ -42,12 +42,13 @@ if ('serviceWorker' in navigator)
 			// Wait for end of all actions & roboot
 			const installingWorker = registration.installing;
 
-			installingWorker.addEventListener('statechange', () => {
-				if (installingWorker.state === 'installed') {
-					console.log('PWA update installed / reload');
-					location.reload();
-				}
-			});
+			if (installingWorker)
+				installingWorker.addEventListener('statechange', () => {
+					if (installingWorker.state === 'installed') {
+						console.log('PWA update installed / reload');
+						location.reload();
+					}
+				});
 		}
 	})
 
@@ -55,6 +56,9 @@ if ('serviceWorker' in navigator)
 var map,
 	controlOptions = { // To be customized by the specific index.php
 		layerSwitcher: {},
+		Help: {
+			submenuId: 'myol-gps-help',
+		}
 	};
 
 window.addEventListener('load', function() {

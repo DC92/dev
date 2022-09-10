@@ -7,9 +7,8 @@ header('Pragma: no-cache');
 header('Content-Type: application/javascript');
 header('Service-Worker-Allowed: /');
 
-$start_path = $_SERVER['QUERY_STRING'] ?
-	str_replace (':', '../', $_SERVER['QUERY_STRING']).'/' :
-	'';
+$sw_instance = preg_match ('/^[^0-9]*/', @$_SERVER['QUERY_STRING'], $matches);
+$start_path = str_replace (['.',':'], ['/','../'], $matches[0]);
 $myol_path = '';
 
 include ('common.php');
@@ -17,7 +16,9 @@ include ('common.php');
 // The first time a user hits the page an install event is triggered.
 // The other times an update is provided if the service-worker source md5 is different
 ?>
-var myolGPXfiles = <?=json_encode($gpx_files)?>;
+// Next available version : <?=$build_date?> (to trigger SW upgrade)
+
+var gpxFiles = <?=json_encode($gpx_files)?>;
 
 self.addEventListener('install', evt => {
 	console.log('PWA SW install ' + evt.target.location);
@@ -29,8 +30,8 @@ self.addEventListener('install', evt => {
 	// Create & populate the cache
 	evt.waitUntil(
 		caches.open('myGpsCache')
-		.then(cache => cache.addAll(myolGPXfiles)
-			.then(console.log('myGpsCache created, ' + myolGPXfiles.length + ' files added'))
+		.then(cache => cache.addAll(gpxFiles)
+			.then(console.log('myGpsCache created, ' + gpxFiles.length + ' files added'))
 		)
 	);
 });
