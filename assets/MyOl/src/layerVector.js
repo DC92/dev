@@ -289,7 +289,8 @@ function layerVector(opt) {
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature, layer) {
-						if (hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
+						if (layer &&
+							hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
 							hoverLayer.setZIndex(layer.getZIndex() + 2);
 							return feature;
 						}

@@ -29,7 +29,7 @@ const mapId = 'carte-nav',
 			format: 'image/png',
 		}),
 		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass('KOMPASS Touristik'),
+		//'Autriche': layerKompass('KOMPASS Touristik'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Photo IGN': layerIGN({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',

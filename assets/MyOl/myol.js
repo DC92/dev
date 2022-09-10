@@ -163,8 +163,7 @@ function layerMRI() {
  * Kompas (Austria)
  * Requires layerOSM
  */
-/*
-function layerKompass(options) {
+/*function layerKompass(options) {
 	return layerOSM({
 		url: 'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
 			'&Experience=ecmaps&MapStyle=' + options.subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
@@ -172,15 +171,14 @@ function layerKompass(options) {
 		attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
 		...options
 	});
-}
-*/
+}*/
 
 /**
  * Thunderforest
  * Requires layerOSM
  */
 function layerThunderforest(options) {
-	if (options&&options.key) // Don't display if no key
+	if (options && options.key) // Don't display if no key
 		return layerOSM({
 			url: '//{a-c}.tile.thunderforest.com/' + options.subLayer +
 				'/{z}/{x}/{y}.png?apikey=' + options.key,
@@ -205,7 +203,7 @@ function layerIGN(options) {
 		IGNmatrixIds[i] = i.toString();
 	}
 
-	if (options&&options.key) // Don't display if no key provided
+	if (options && options.key) // Don't display if no key provided
 		return new ol.layer.Tile({
 			source: new ol.source.WMTS({
 				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
@@ -391,7 +389,7 @@ function layerGoogle(subLayer) {
  * attributions: defined by source.BingMaps
  */
 function layerBing(options) {
-	if (options.key) { // Don't display if no key provided
+	if (options && options.key) { // Don't display if no key provided
 		const layer = new ol.layer.Tile();
 
 		layer.on('change:visible', function(evt) {
@@ -981,7 +979,8 @@ function layerVector(opt) {
 				feature = map.forEachFeatureAtPixel(
 					map.getEventPixel(originalEvent),
 					function(feature, layer) {
-						if (hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
+						if (layer &&
+							hoverLayer.ol_uid != layer.ol_uid) { // Not the hover layer
 							hoverLayer.setZIndex(layer.getZIndex() + 2);
 							return feature;
 						}

@@ -32,6 +32,7 @@ if ('serviceWorker' in navigator)
 					if (registrations.length) {
 						for (let reg of registrations)
 							if (reg.active && reg.active.scriptURL.includes('MyOl') && // From this package
+								//TODO GROS BUG : registration.active.scriptURL : c'est l'ancien, celui à détruire !
 								registration.active.scriptURL != reg.active.scriptURL) // Not the new one !
 								reg.unregister()
 								.then(console.log('SW ' + reg.active.scriptURL + ' deleted'));

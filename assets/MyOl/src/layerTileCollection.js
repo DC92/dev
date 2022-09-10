@@ -37,8 +37,7 @@ function layerMRI() {
  * Requires layerOSM
  */
 //TODO layerKompass BUG don't work
-/*
-function layerKompass(options) {
+/*function layerKompass(options) {
 	return layerOSM({
 		url: 'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
 			'&Experience=ecmaps&MapStyle=' + options.subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
@@ -46,8 +45,7 @@ function layerKompass(options) {
 		attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
 		...options
 	});
-}
-*/
+}*/
 
 /**
  * Thunderforest
@@ -266,7 +264,7 @@ function layerGoogle(subLayer) {
  * attributions: defined by source.BingMaps
  */
 function layerBing(options) {
-	if (options.key) { // Don't display if no key provided
+	if (options && options.key) { // Don't display if no key provided
 		const layer = new ol.layer.Tile();
 
 		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is visible

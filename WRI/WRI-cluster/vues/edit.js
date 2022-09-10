@@ -8,7 +8,7 @@ const baseLayers = {
 			key: 'essentiels', // The key for the free layers
 			format: 'image/png',
 		}),
-		'Autriche': layerKompass('KOMPASS Touristik'),
+		//'Autriche': layerKompass('KOMPASS Touristik'),
 		'Espagne': layerSpain('mapa-raster', 'MTN'),
 		'Photo ArcGIS': layerArcGIS('World_Imagery'),
 		'Photo Bing': layerBing('Aerial'),
