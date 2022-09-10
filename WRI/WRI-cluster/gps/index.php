@@ -1,3 +1,6 @@
 <?php
-header('Location: ../MyOl/gps/index.php');
-// On ne devrait plus arriver ici. Le GPS est en MyOl/gps
+include ('../MyOl/gps/index_header.php');
+//TODO pas de mise à jour si on change fichiers gpx / vérifier tous les fichiers
+?>
+</body>
+</html>

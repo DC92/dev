@@ -1692,6 +1692,23 @@ function controlButton(opt) {
 	if (!control.submenuEl || !control.submenuEl.innerHTML)
 		return control;
 
+	// Populate control & button
+	control.element.className = 'ol-control ' + options.className;
+	buttonEl.innerHTML = options.label;
+	control.element.appendChild(buttonEl);
+
+	// Assign button actions
+	control.element.addEventListener('mouseover', function() {
+		control.element.classList.add('myol-display-submenu');
+	});
+	control.element.addEventListener('mouseout', function() {
+		control.element.classList.remove('myol-display-submenu');
+	});
+	control.element.addEventListener('touchend', function(evt) {
+		if (control.element.isEqualNode(evt.target.parentElement))
+			control.element.classList.toggle('myol-display-submenu');
+	});
+
 	control.element.appendChild(control.submenuEl);
 
 	// Assign control.function to submenu elements events
@@ -1709,23 +1726,6 @@ function controlButton(opt) {
 				};
 		});
 
-
-	// Populate control & button
-	control.element.className = 'ol-control ' + options.className;
-	buttonEl.innerHTML = options.label;
-	control.element.appendChild(buttonEl);
-
-	// Assign button actions
-	control.element.addEventListener('mouseover', function() {
-		control.element.classList.add('myol-display-submenu');
-	});
-	control.element.addEventListener('mouseout', function() {
-		control.element.classList.remove('myol-display-submenu');
-	});
-	control.element.addEventListener('touchend', function(evt) {
-		if (control.element.isEqualNode(evt.target.parentElement))
-			control.element.classList.toggle('myol-display-submenu');
-	});
 	return control;
 }
 

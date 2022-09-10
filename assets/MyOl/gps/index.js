@@ -53,7 +53,7 @@ if ('serviceWorker' in navigator)
 
 // Manage the map
 var map,
-	controlOptions = {
+	controlOptions = { // To be customized by the specific index.php
 		layerSwitcher: {},
 	};
 
