@@ -1,8 +1,10 @@
 // Partie commune des cartes : les couches de fond et les contrôles
-function mapControls(page) {
-	const baseLayers = {
+function mapBaseLayers(page) {
+	return {
 		'Refuges.info': layerMRI(),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
+		'OSM fr': layerOSM({
+			url: '//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+		}),
 		'OpenTopo': layerOpenTopo(),
 		'Outdoors': layerThunderforest({
 			subLayer: 'outdoors',
@@ -28,6 +30,9 @@ function mapControls(page) {
 		'Photo Bing': layerBing('Aerial'),
 		'Photo Google': page == 'modif' ? null : layerGoogle('s'),
 	};
+}
+
+function mapControls(page) {
 
 	return [
 		new ol.control.Zoom(),
@@ -38,7 +43,7 @@ function mapControls(page) {
 		page == 'point' || page == 'modif' ? controlButton() : controlDownload(),
 		page == 'modif' ? controlButton() : controlPrint(),
 		controlLayerSwitcher({
-			layers: baseLayers,
+			layers: mapBaseLayers(page),
 		}),
 		controlMousePosition(),
 		new ol.control.ScaleLine(),

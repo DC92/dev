@@ -1,4 +1,3 @@
-//TODO debugger Kompass / Autriche
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 //TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
 //TODO BUG WRI Revoir bandeau grandes fenêtres & logo
