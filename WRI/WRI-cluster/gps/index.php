@@ -1,5 +1,3 @@
 <?php
-include ('../MyOl/gps/index_header.php');
+include ('../MyOl/gps/index.php');
 ?>
-</body>
-</html>

@@ -36,28 +36,34 @@ function layerMRI() {
  * Kompas (Austria)
  * Requires layerOSM
  */
-//TODO layerKompass BUG don't work
-/*function layerKompass(options) {
-	return layerOSM({
-		url: 'https://chemineur.fr/assets/proxy/?s=ecmaps.de&type=x-icon' + // Not available via https
-			'&Experience=ecmaps&MapStyle=' + options.subLayer + '&TileX={x}&TileY={y}&ZoomLevel={z}',
+function layerKompass(opt) {
+	const options = {
 		subLayer: 'KOMPASS Touristik',
+		...opt
+	};
+
+	return layerOSM({
+		url: options.key ?
+			'https://map{1-4}.kompass.de/{z}/{x}/{y}/' + options.subLayer + '?key=' + options.key : 'https://map{1-5}.tourinfra.com/tiles/kompass_osm/{z}/{x}/{y}.png',
 		attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
-		...options
 	});
-}*/
+}
 
 /**
  * Thunderforest
  * Requires layerOSM
  */
-function layerThunderforest(options) {
-	if (options && options.key) // Don't display if no key
+function layerThunderforest(opt) {
+	const options = {
+		subLayer: 'outdoors',
+		//key: Get a key at https://manage.thunderforest.com/dashboard
+		...opt
+	};
+
+	if (options.key) // Don't display if no key
 		return layerOSM({
 			url: '//{a-c}.tile.thunderforest.com/' + options.subLayer +
 				'/{z}/{x}/{y}.png?apikey=' + options.key,
-			subLayer: 'outdoors',
-			//key: Get a key at https://manage.thunderforest.com/dashboard
 			attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
 			...options // Include key
 		});
@@ -283,16 +289,7 @@ function layerBing(options) {
  * Tile layers examples
  */
 function layerTileCollection(options) {
-	// Give benefit of the following to the caller via the as argument passed by reference
 	options = options || {};
-	options.keys = options.keys || {};
-
-	// Keys can be on options.keys or on options.LAYER.key
-	for (let k in options.keys)
-		options[k] = {
-			key: options.keys[k],
-			...options[k]
-		};
 
 	return {
 		'OSM fr': layerOSM({
@@ -301,15 +298,15 @@ function layerTileCollection(options) {
 		'OSM cyclo': layerOSM({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
-		'OSM outdoors': layerThunderforest(options.thunderforest),
+		'OSM outdoors': layerThunderforest(options.thunderforest), // options include key
 		'OSM transport': layerThunderforest({
-			...options.thunderforest,
+			...options.thunderforest, // Include key
 			subLayer: 'transport',
 		}),
 		'OpenTopo': layerOpenTopo(),
 		'Refuges.info': layerMRI(),
 
-		'IGN TOP25': layerIGN(options.ign),
+		'IGN TOP25': layerIGN(options.ign), // options include key
 		'IGN V2': layerIGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
 			key: 'essentiels',
@@ -334,14 +331,14 @@ function layerTileCollection(options) {
 				}),*/
 
 		'SwissTopo': layerSwissTopo(),
-		//'Autriche': layerKompass(), //TODO BUG don't work
-		'Angleterre': layerOS(options.os),
+		'Autriche': layerKompass(), // No key
+		'Angleterre': layerOS(options.os), // options include key
 		'Italie': layerIGM(),
 		'Espagne': layerSpain(),
 
 		'Photo ArcGIS': layerArcGIS(),
 		'Photo Bing': layerBing({
-			...options.bing,
+			...options.bing, // Include key
 			imagerySet: 'Aerial',
 		}),
 		'Photo Google': layerGoogle('s'),
@@ -367,42 +364,49 @@ function layersDemo(options) {
 		}),
 
 		'ThF cycle': layerThunderforest({
-			...options.thunderforest,
+			...options.thunderforest, // Include key
 			subLayer: 'cycle',
 		}),
 		'ThF landscape': layerThunderforest({
-			...options.thunderforest,
+			...options.thunderforest, // Include key
 			subLayer: 'landscape',
 		}),
 		'ThF trains': layerThunderforest({
-			...options.thunderforest,
+			...options.thunderforest, // Include key
 			subLayer: 'pioneer',
 		}),
 		'ThF villes': layerThunderforest({
-			...options.thunderforest,
+			...options.thunderforest, // Include key
 			subLayer: 'neighbourhood',
 		}),
 		'ThF contraste': layerThunderforest({
-			...options.thunderforest,
+			...options.thunderforest, // Include key
 			subLayer: 'mobile-atlas',
 		}),
 
 		'OS light': layerOS({
-			...options.os,
+			...options.os, // Include key
 			subLayer: 'Light_3857',
 		}),
 		'OS road': layerOS({
-			...options.os,
+			...options.os, // Include key
 			subLayer: 'Road_3857',
 		}),
-		//'Kompas': layerKompass({subLayer:'KOMPASS',}), //TODO BUG
+		'Kompas topo': layerKompass({
+			...options.kompass, // Include key
+			subLayer: 'kompass_topo',
+		}),
+		'Kompas winter': layerKompass({
+			...options.kompass, // Include key
+			subLayer: 'kompass_winter',
+		}),
 
 		'Bing': layerBing({
-			...options.bing,
+			...options.bing, // Include key
 			imagerySet: 'Road',
 		}),
 		'Bing hybrid': layerBing({
-			...options.bing,
+			...options.bing, // Include key
 			imagerySet: 'AerialWithLabels',
 		}),
 

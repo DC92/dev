@@ -384,7 +384,7 @@ function controlGPS(options) {
 		});
 	};
 
-	// Trigered by  <input ... ctrlOnChange="renderGPS" />
+	// Trigered by <input ... ctrlOnChange="renderGPS" />
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),

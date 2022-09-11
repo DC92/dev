@@ -14,6 +14,7 @@ if ('serviceWorker' in navigator)
 		scope: './',
 	})
 	.then(registration => {
+		//BEST clarify this :
 		if (registration.installing)
 			console.log('PWA SW installing ' + registration.installing.scriptURL);
 		else if (registration.waiting)
@@ -31,11 +32,11 @@ if ('serviceWorker' in navigator)
 				await navigator.serviceWorker.getRegistrations().then(registrations => {
 					if (registrations.length) {
 						for (let reg of registrations)
-							if (reg.active && reg.active.scriptURL.includes('MyOl') && // From this package
-								//TODO GROS BUG : registration.active.scriptURL : c'est l'ancien, celui à détruire !
-								registration.active.scriptURL != reg.active.scriptURL) // Not the new one !
-								reg.unregister()
-								.then(console.log('SW ' + reg.active.scriptURL + ' deleted'));
+							//BEST need 3 reload to update
+							//BEST https://bitsofco.de/what-self-skipwaiting-does-to-the-service-worker-lifecycle/ 
+							//BEST https://stackoverflow.com/questions/59207110/in-a-pwa-is-there-a-way-to-check-for-a-waiting-service-worker-upgrade 
+							reg.unregister()
+							.then(console.log('SW ' + reg.active.scriptURL + ' deleted'));
 					}
 				});
 			}

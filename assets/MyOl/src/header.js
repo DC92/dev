@@ -68,7 +68,7 @@ if (location.hash == '###')
 	});
 
 	// Final display
-	console.log(data.join('\n'));
+	console.info(data.join('\n'));
 })();
 
 /**

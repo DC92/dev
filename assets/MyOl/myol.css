@@ -81,13 +81,13 @@
 
 /* Full screen */
 .ol-full-screen-false {
-  text-indent: -1em;
-  color: transparent !important;
+	text-indent: -1em;
+	color: transparent !important;
 }
 .ol-full-screen-false::after {
-  font-style: italic;
-  color: black !important;
-  content: "\21F3";
+	font-style: italic;
+	color: black !important;
+	content: "\21F3";
 }
 
 /* Geocodeur */
