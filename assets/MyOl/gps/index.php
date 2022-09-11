@@ -84,11 +84,9 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<div id="myol-gps-help">
-		<p>Pour utiliser les cartes et le GPS hors réseau,
-			vous pouvez installer ce logiciel
-			et mettre des parties de cartes en cache.</p>
+		<p>Vous pouvez utiliser ce GPS hors réseau en l'installant:</p>
 		<hr /><p><u>Avant le départ:</u></p>
-		<p>- Explorateur -> options -> ajoutez à l'écran d'accueil (ou: installer)</p>
+		<p>- Explorateur -> options -> ajoutez à l'écran d'accueil (ou installer)</p>
 		<p>Pour mémoriser un fond de carte:</p>
 		<p>- Choisissez un fond de carte</p>
 		<p>- Placez-vous au point de départ de votre randonnée</p>
@@ -111,7 +109,7 @@ Based on https://openlayers.org
 		<p>* Cette application ne permet pas de visualiser ou d'enregistrer le parcours</p>
 		<p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
 		<hr />
-		<p style="font-size:0.7em">Mise à jour <?=$sw_instance.$build_date?></p>
+		<p style="font-size:0.7em">Mise à jour <?=$sw_instance.$build_date?> @<?=$_SERVER['HTTP_HOST']?></p>
 	</div>
 <?php if (!isset ($notail)) { ?>
 </body>
