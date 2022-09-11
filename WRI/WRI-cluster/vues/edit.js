@@ -1,42 +1,5 @@
-const baseLayers = {
-		'Refuges.info': layerMRI(),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopo': layerOpenTopo(),
-		'Outdoors': layerThunderforest('outdoors'),
-		'IGN V2': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
-			key: 'essentiels', // The key for the free layers
-			format: 'image/png',
-		}),
-		//'Autriche': layerKompass('KOMPASS Touristik'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo ArcGIS': layerArcGIS('World_Imagery'),
-		'Photo Bing': layerBing('Aerial'),
-	},
-
-  controls = [
-		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
-		controlGeocoder(),
-		controlLoadGPX(),
-		//controlDownload(), //TODO n'exporte pas les polygones
-		controlLayerSwitcher({
-			layers: baseLayers,
-		}),
-		controlMousePosition(),
-		new ol.control.ScaleLine(),
-		controlPermalink({ // Permet de garder le même réglage de carte
-<?php if ($vue->polygone->id_polygone) { ?>
-			init: false, // Ici, on cadrera plutôt sur le massif
-<?php } ?>
-		}),
-		new ol.control.Attribution({
-			collapsed: false,
-		}),
-	],
-
-	// Affiche la limite de tous les massifs
-	contours = layerVector({
+// Affiche la limite de tous les massifs
+const contours = layerVector({
 		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		style: new ol.style.Style({
 			stroke: new ol.style.Stroke({
@@ -68,7 +31,14 @@ const baseLayers = {
 		view: new ol.View({
 			enableRotation: false,
 		}),
-		controls: controls,
+		controls: [
+			...mapControls('modif'),
+			controlPermalink({ // Permet de garder le même réglage de carte
+				<?php if ($vue->polygone->id_polygone) { ?>
+					init: false, // Ici, on cadrera plutôt sur le massif
+				<?php } ?>
+			}),
+		],
 		layers: [
 			contours,
 			editeur,

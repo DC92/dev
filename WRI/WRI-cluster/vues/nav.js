@@ -13,55 +13,6 @@
 const mapId = 'carte-nav',
 	mapEl = document.getElementById(mapId),
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
-
-	baseLayers = {
-		'Refuges.info': layerMRI(),
-		'OSM fr': layerOSM('//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'),
-		'OpenTopo': layerOpenTopo(),
-		'Outdoors': layerThunderforest('outdoors'),
-		'IGN TOP25': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
-			key: mapKeys.ign,
-		}),
-		'IGN V2': layerIGN({
-			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
-			key: 'essentiels', // The key for the free layers
-			format: 'image/png',
-		}),
-		'SwissTopo': layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		//'Autriche': layerKompass('KOMPASS Touristik'),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo IGN': layerIGN({
-			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
-			key: 'essentiels',
-		}),
-		'Photo ArcGIS': layerArcGIS('World_Imagery'),
-		'Photo Bing': layerBing('Aerial'),
-		'Photo Google': layerGoogle('s'),
-	},
-
-	controls = [
-		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
-		controlGeocoder(),
-		controlGPS(),
-		controlLoadGPX(),
-		controlDownload(),
-		controlPrint(),
-		controlLayerSwitcher({
-			layers: baseLayers,
-		}),
-		controlMousePosition(),
-		new ol.control.ScaleLine(),
-		controlPermalink({ // Permet de garder le même réglage de carte
-			display: true,
-			init: <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif
-		}),
-		new ol.control.Attribution({
-			collapsed: false,
-		}),
-	],
-
 	layers = [
 		// Refuges.info (2 level layer depending on resolution)
 		...layersWri({
@@ -143,7 +94,13 @@ const mapId = 'carte-nav',
 			enableRotation: false,
 			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 		}),
-		controls: controls,
+		controls: [
+			...mapControls('nav'),
+			controlPermalink({ // Permet de garder le même réglage de carte
+				display: true,
+				init: <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif
+			}),
+		],
 		layers: layers,
 	});
 

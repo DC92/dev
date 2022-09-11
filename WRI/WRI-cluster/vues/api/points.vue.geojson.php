@@ -13,17 +13,18 @@ headers_cache_api();
   "size": "<?=count((array)$points)?>",
   "features": 
   [
-   <?php
-foreach ($points as $j => $point) {
-  if ($j) echo ",";
+  <?php foreach ($points as $j => $point)
+  if ($points_geojson[$point->id]['geojson']) // Pour éviter un point sans poition (qui ne devrait pas arriver !)
+  {
+    if ($j) echo ","; // Ajoute une , entre les points sauf le premier
 ?> {
-      "type": "Feature",
-      "id": <?=$point->id?>,
-      "properties": <?=json_encode($point)?>,
-      "geometry": <?=$points_geojson[$point->id]['geojson']?>
+     "type": "Feature",
+     "id": <?=$point->id?>,
+     "properties": <?=json_encode($point)?>,
+     "geometry": <?=$points_geojson[$point->id]['geojson']?>
 
     }<?php
-    }
+  }
 ?>
 
   ]

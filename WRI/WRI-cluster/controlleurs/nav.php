@@ -30,6 +30,7 @@ $vue->css           [] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.min.
 $vue->java_lib_foot [] = $config_wri['url_chemin_ol'].'geocoder/ol-geocoder.js?'.filemtime($config_wri['chemin_ol'].'geocoder/ol-geocoder.js');
 $vue->css           [] = $config_wri['url_chemin_ol'].'myol.css?'.filemtime($config_wri['chemin_ol'].'myol.css');
 $vue->java_lib_foot [] = $config_wri['url_chemin_ol'].'myol.js?'.filemtime($config_wri['chemin_ol'].'myol.js');
+$vue->java_lib_foot [] = $config_wri['sous_dossier_installation'].'vues/_cartes.js?'.filemtime($config_wri['chemin_vues'].'_cartes.js');
 
 // Récupère les infos de type "méta informations" sur les points et les polygones
 $vue->infos_base = infos_base ();
