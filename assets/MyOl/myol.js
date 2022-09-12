@@ -703,70 +703,6 @@ function controlLayerSwitcher(options) {
  */
 
 /**
- * Manage a collection of checkboxes with the same name
- * There can be several selectors for one layer
- * A selector can be used by several layers
- * The checkbox without value check / uncheck the others
- * Current selection is saved in window.localStorage
- * name : input names
- * callBack : callback function (this reset the checkboxes)
- * You can force the values in window.localStorage[simplified name]
- * Return return an array of selected values
- */
-function selector(name, callBack) {
-	const selectorEls = [...document.getElementsByName(name)],
-		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
-		init = (localStorage[safeName] || '').split(',');
-
-	// Init
-	if (typeof callBack == 'function') {
-		selectorEls.forEach(el => {
-			el.checked =
-				init.includes(el.value) ||
-				init.includes('all') ||
-				init.join(',') == el.value;
-			el.addEventListener('click', onClick);
-		});
-		onClick();
-	}
-
-	function onClick(evt) {
-		// Test the "all" box & set other boxes
-		if (evt && evt.target.value == 'all')
-			selectorEls
-			.forEach(el => el.checked = evt.target.checked);
-
-		// Test if all values are checked
-		const allChecked = selectorEls
-			.filter(el => !el.checked && el.value != 'all');
-
-		// Set the "all" box
-		selectorEls
-			.forEach(el => {
-				if (el.value == 'all')
-					el.checked = !allChecked.length;
-			});
-
-		// Save the current status
-		if (selection().length)
-			localStorage[safeName] = selection().join(',');
-		else
-			delete localStorage[safeName];
-
-		if (evt)
-			callBack(selection());
-	}
-
-	function selection() {
-		return selectorEls
-			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value);
-	}
-
-	return selection();
-}
-
-/**
  * Layer to display remote geoJson
  * Styles, icons & labels
  *
@@ -1048,7 +984,8 @@ function layerVector(opt) {
  */
 function layerVectorCluster(opt) {
 	const options = {
-			distance: 50,
+			distance: 30, // Minimum distance between clusters
+			density: 1000, // Maximum number of displayed clusters
 			...opt
 		},
 		layer = layerVector(options), // Basic layer (with all the points)
@@ -1073,9 +1010,11 @@ function layerVectorCluster(opt) {
 
 	// Tune the clustering distance depending on the zoom level
 	clusterLayer.on('prerender', function(evt) {
-		const size = Math.max(evt.context.canvas.width, evt.context.canvas.height),
-			resolution = evt.frameState.viewState.resolution,
-			distanceMinCluster = resolution < 20 ? 0 : Math.max(options.distance, size / 25);
+		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
+			distanceMinCluster = Math.min(
+				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
+				Math.max(options.distance, Math.sqrt(surface / options.density))
+			);
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -1275,6 +1214,70 @@ function styleOptionsCluster(feature, properties) {
 			font: '14px Calibri,sans-serif',
 		}),
 	};
+}
+
+/**
+ * Manage a collection of checkboxes with the same name
+ * There can be several selectors for one layer
+ * A selector can be used by several layers
+ * The checkbox without value check / uncheck the others
+ * Current selection is saved in window.localStorage
+ * name : input names
+ * callBack : callback function (this reset the checkboxes)
+ * You can force the values in window.localStorage[simplified name]
+ * Return return an array of selected values
+ */
+function selector(name, callBack) {
+	const selectorEls = [...document.getElementsByName(name)],
+		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
+		init = (localStorage[safeName] || '').split(',');
+
+	// Init
+	if (typeof callBack == 'function') {
+		selectorEls.forEach(el => {
+			el.checked =
+				init.includes(el.value) ||
+				init.includes('all') ||
+				init.join(',') == el.value;
+			el.addEventListener('click', onClick);
+		});
+		onClick();
+	}
+
+	function onClick(evt) {
+		// Test the "all" box & set other boxes
+		if (evt && evt.target.value == 'all')
+			selectorEls
+			.forEach(el => el.checked = evt.target.checked);
+
+		// Test if all values are checked
+		const allChecked = selectorEls
+			.filter(el => !el.checked && el.value != 'all');
+
+		// Set the "all" box
+		selectorEls
+			.forEach(el => {
+				if (el.value == 'all')
+					el.checked = !allChecked.length;
+			});
+
+		// Save the current status
+		if (selection().length)
+			localStorage[safeName] = selection().join(',');
+		else
+			delete localStorage[safeName];
+
+		if (evt)
+			callBack(selection());
+	}
+
+	function selection() {
+		return selectorEls
+			.filter(el => el.checked && el.value != 'all')
+			.map(el => el.value);
+	}
+
+	return selection();
 }
 
 /* FILE src/layerVectorCollection.js */

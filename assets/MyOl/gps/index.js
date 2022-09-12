@@ -56,6 +56,7 @@ if ('serviceWorker' in navigator)
 
 // Manage the map
 var map,
+	layers = [],
 	controlOptions = { // To be customized by the specific index.php
 		layerSwitcher: {},
 		Help: {
@@ -75,5 +76,6 @@ window.addEventListener('load', function() {
 		}),
 		controls: controlsCollection(controlOptions)
 			.concat(controlLayerSwitcher(controlOptions.layerSwitcher)),
+		layers: layers,
 	});
 });
