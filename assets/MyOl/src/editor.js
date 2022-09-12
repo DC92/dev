@@ -1,7 +1,7 @@
 /**
  * geoJson lines & polygons display
  * Lines & polygons edit
- * Requires JSONparse, myol:onadd, controlButton (from src/controls.js)
+ * Requires JSONparse, controlButton (from src/controls.js)
  */
 function layerEditGeoJson(opt) {
 	const options = {
@@ -180,8 +180,8 @@ function layerEditGeoJson(opt) {
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null;
 
-	layer.once('myol:onadd', function(evt) { //BEST transform in control
-		const map = evt.map;
+	layer.once('prerender', function() { //BEST transform in control
+		const map = layer.get('map');
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
 		map.addControl(control);

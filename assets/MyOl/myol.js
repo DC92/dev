@@ -34,7 +34,8 @@ if (location.hash == '###')
 	try {
 		new ol.style.Icon(); // Try incorrect action
 	} catch (err) { // to get Assert url
-		data.push('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+		if (err.message)
+			data.push('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 	}
 
 	// myol storages in the subdomain
@@ -78,25 +79,6 @@ if (location.hash == '###')
 	// Final display
 	console.info(data.join('\n'));
 })();
-
-/**
- * Warn layers when added to the map
- */
-ol.Map.prototype.handlePostRender = function() {
-	ol.PluggableMap.prototype.handlePostRender.call(this);
-
-	const map = this;
-	map.getLayers().forEach(function(layer) {
-		if (!layer.map_) {
-			layer.map_ = map;
-
-			layer.dispatchEvent({
-				type: 'myol:onadd',
-				map: map,
-			});
-		}
-	});
-};
 
 /**
  * Json parsing errors log
@@ -880,14 +862,14 @@ function layerVector(opt) {
 	// on features of vector layers having the following properties :
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
-	ol.Map.prototype.render = function() {
-		if (!this.hoverListenerInstalled && this.getView()) {
-			this.hoverListenerInstalled = true;
-			initHover(this);
-		}
+	layer.once('prerender', function(evt) {
+		const map = layer.getMapInternal('map');
 
-		return ol.PluggableMap.prototype.render.call(this);
-	};
+		if (!map.hoverListenerInstalled) {
+			map.hoverListenerInstalled = true;
+			initHover(map);
+		}
+	});
 
 	function initHover(map) {
 		// Layer to display an hovered features
@@ -2439,7 +2421,6 @@ function controlsCollection(opt) {
 /* FILE src/marker.js */
 /**
  * Marker position display & edit
- * Requires myol:onadd
  * Options:
    src : url of the marker image
    prefix : id prefix of input/output values
@@ -2519,6 +2500,50 @@ function layerMarker(options) {
 			}
 	}
 
+	var view;
+	layer.once('prerender', function() {
+		const pc = point.getCoordinates(),
+			map = layer.get('map');
+		view = map.getView();
+
+		// Focus map on the marker
+		if (options.focus) {
+			if (pc[0] && pc[1])
+				view.setCenter(pc);
+			else
+				// If no position given, put the marker on the center of the visible map
+				changeLL(view.getCenter(), 'EPSG:3857');
+
+			view.setZoom(options.focus);
+		}
+
+		// Edit the marker position
+		if (options.dragable) {
+			// Drag the marker
+			map.addInteraction(new ol.interaction.Pointer({
+				handleDownEvent: function(evt) {
+					// Mark last change time
+					sessionStorage.myol_lastChangeTime = Date.now();
+
+					return map.getFeaturesAtPixel(evt.pixel, {
+						layerFilter: function(l) {
+							return l.ol_uid == layer.ol_uid;
+						}
+					}).length;
+				},
+				handleDragEvent: function(evt) {
+					changeLL(evt.coordinate, 'EPSG:3857');
+				},
+			}));
+
+			// Get the marker at the dblclick position
+			map.on('dblclick', function(evt) {
+				changeLL(evt.coordinate, 'EPSG:3857');
+				return false;
+			});
+		}
+	});
+
 	// Display values
 	function changeLL(ll, projection, focus) {
 		if (ll[0] && ll[1]) {
@@ -2534,8 +2559,8 @@ function layerMarker(options) {
 			point.setCoordinates(ll3857);
 
 			// Move the map
-			if (focus && layer.map_)
-				layer.map_.getView().setCenter(ll3857);
+			if (focus && view)
+				view.setCenter(ll3857);
 
 			// Populate inputs
 			els.lon.value = Math.round(ll4326[0] * 100000) / 100000;
@@ -2579,49 +2604,6 @@ function layerMarker(options) {
 		}
 	}
 
-	layer.once('myol:onadd', function(evt) {
-		const map = evt.map,
-			view = map.getView(),
-			pc = point.getCoordinates();
-
-		// Focus map on the marker
-		if (options.focus) {
-			if (pc[0] && pc[1])
-				view.setCenter(pc);
-			else
-				// If no position given, put the marker on the center of the visible map
-				changeLL(view.getCenter(), 'EPSG:3857');
-
-			view.setZoom(options.focus);
-		}
-
-		// Edit the marker position
-		if (options.dragable) {
-			// Drag the marker
-			map.addInteraction(new ol.interaction.Pointer({
-				handleDownEvent: function(evt) {
-					// Mark last change time
-					sessionStorage.myol_lastChangeTime = Date.now();
-
-					return map.getFeaturesAtPixel(evt.pixel, {
-						layerFilter: function(l) {
-							return l.ol_uid == layer.ol_uid;
-						}
-					}).length;
-				},
-				handleDragEvent: function(evt) {
-					changeLL(evt.coordinate, 'EPSG:3857');
-				},
-			}));
-
-			// Get the marker at the dblclick position
-			map.on('dblclick', function(evt) {
-				changeLL(evt.coordinate, 'EPSG:3857');
-				return false;
-			});
-		}
-	});
-
 	return layer;
 }
 
@@ -2629,7 +2611,7 @@ function layerMarker(options) {
 /**
  * geoJson lines & polygons display
  * Lines & polygons edit
- * Requires JSONparse, myol:onadd, controlButton (from src/controls.js)
+ * Requires JSONparse, controlButton (from src/controls.js)
  */
 function layerEditGeoJson(opt) {
 	const options = {
@@ -2806,8 +2788,8 @@ function layerEditGeoJson(opt) {
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null;
 
-	layer.once('myol:onadd', function(evt) {
-		const map = evt.map;
+	layer.once('prerender', function() {
+		const map = layer.get('map');
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
 		map.addControl(control);

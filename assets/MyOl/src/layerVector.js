@@ -185,14 +185,14 @@ function layerVector(opt) {
 	// url : go to a new URL when we click on the feature
 	//BEST label attached to the cursor for lines & poly
 	//HACK attach an hover listener once when the map is defined
-	ol.Map.prototype.render = function() {
-		if (!this.hoverListenerInstalled && this.getView()) {
-			this.hoverListenerInstalled = true;
-			initHover(this);
-		}
+	layer.once('prerender', function(evt) {
+		const map = layer.getMapInternal('map');
 
-		return ol.PluggableMap.prototype.render.call(this);
-	};
+		if (!map.hoverListenerInstalled) {
+			map.hoverListenerInstalled = true;
+			initHover(map);
+		}
+	});
 
 	function initHover(map) {
 		// Layer to display an hovered features

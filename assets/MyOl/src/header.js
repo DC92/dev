@@ -26,7 +26,8 @@ if (location.hash == '###')
 	try {
 		new ol.style.Icon(); // Try incorrect action
 	} catch (err) { // to get Assert url
-		data.push('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
+		if (err.message) //TODO find version 7.1.x
+			data.push('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
 	}
 
 	// myol storages in the subdomain
@@ -70,26 +71,6 @@ if (location.hash == '###')
 	// Final display
 	console.info(data.join('\n'));
 })();
-
-/**
- * Warn layers when added to the map
- */
-//BEST DELETE (used by marker.js & editor.js)
-ol.Map.prototype.handlePostRender = function() {
-	ol.PluggableMap.prototype.handlePostRender.call(this);
-
-	const map = this;
-	map.getLayers().forEach(function(layer) {
-		if (!layer.map_) {
-			layer.map_ = map;
-
-			layer.dispatchEvent({
-				type: 'myol:onadd',
-				map: map,
-			});
-		}
-	});
-};
 
 /**
  * Json parsing errors log

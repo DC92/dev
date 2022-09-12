@@ -1,6 +1,5 @@
 /**
  * Marker position display & edit
- * Requires myol:onadd
  * Options:
    src : url of the marker image
    prefix : id prefix of input/output values
@@ -81,6 +80,50 @@ function layerMarker(options) {
 			}
 	}
 
+	var view;
+	layer.once('prerender', function() { //BEST transform in control
+		const pc = point.getCoordinates(),
+			map = layer.get('map');
+		view = map.getView();
+
+		// Focus map on the marker
+		if (options.focus) {
+			if (pc[0] && pc[1])
+				view.setCenter(pc);
+			else
+				// If no position given, put the marker on the center of the visible map
+				changeLL(view.getCenter(), 'EPSG:3857');
+
+			view.setZoom(options.focus);
+		}
+
+		// Edit the marker position
+		if (options.dragable) {
+			// Drag the marker
+			map.addInteraction(new ol.interaction.Pointer({
+				handleDownEvent: function(evt) {
+					// Mark last change time
+					sessionStorage.myol_lastChangeTime = Date.now();
+
+					return map.getFeaturesAtPixel(evt.pixel, {
+						layerFilter: function(l) {
+							return l.ol_uid == layer.ol_uid;
+						}
+					}).length;
+				},
+				handleDragEvent: function(evt) {
+					changeLL(evt.coordinate, 'EPSG:3857');
+				},
+			}));
+
+			// Get the marker at the dblclick position
+			map.on('dblclick', function(evt) {
+				changeLL(evt.coordinate, 'EPSG:3857');
+				return false;
+			});
+		}
+	});
+
 	// Display values
 	function changeLL(ll, projection, focus) {
 		if (ll[0] && ll[1]) {
@@ -96,8 +139,8 @@ function layerMarker(options) {
 			point.setCoordinates(ll3857);
 
 			// Move the map
-			if (focus && layer.map_)
-				layer.map_.getView().setCenter(ll3857);
+			if (focus && view)
+				view.setCenter(ll3857);
 
 			// Populate inputs
 			els.lon.value = Math.round(ll4326[0] * 100000) / 100000;
@@ -140,49 +183,6 @@ function layerMarker(options) {
 			els.string.textContent = strings[els.select.value || 'dec'];
 		}
 	}
-
-	layer.once('myol:onadd', function(evt) { //BEST transform in control
-		const map = evt.map,
-			view = map.getView(),
-			pc = point.getCoordinates();
-
-		// Focus map on the marker
-		if (options.focus) {
-			if (pc[0] && pc[1])
-				view.setCenter(pc);
-			else
-				// If no position given, put the marker on the center of the visible map
-				changeLL(view.getCenter(), 'EPSG:3857');
-
-			view.setZoom(options.focus);
-		}
-
-		// Edit the marker position
-		if (options.dragable) {
-			// Drag the marker
-			map.addInteraction(new ol.interaction.Pointer({
-				handleDownEvent: function(evt) {
-					// Mark last change time
-					sessionStorage.myol_lastChangeTime = Date.now();
-
-					return map.getFeaturesAtPixel(evt.pixel, {
-						layerFilter: function(l) {
-							return l.ol_uid == layer.ol_uid;
-						}
-					}).length;
-				},
-				handleDragEvent: function(evt) {
-					changeLL(evt.coordinate, 'EPSG:3857');
-				},
-			}));
-
-			// Get the marker at the dblclick position
-			map.on('dblclick', function(evt) {
-				changeLL(evt.coordinate, 'EPSG:3857');
-				return false;
-			});
-		}
-	});
 
 	return layer;
 }
