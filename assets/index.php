@@ -6,7 +6,7 @@ $notail = true;
 ?>
 
 <script>
-	controlOptions.layerSwitcher.keys = {
+	controlOptions.layerSwitcher = {
 		// Get your own (free) IGN key at https://geoservices.ign.fr/
 		ign: {key: 'ngv5uf0uu1cafegv89kzr1o5'},
 		// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com/dashboard

@@ -81,7 +81,7 @@ function layersGeoBB(options) {
  */
 function layerWri(options) {
 	return layerVectorCluster({
-		host: '//dom.refuges.info/', //TODOWRI revenir de dom à www
+		host: '//www.refuges.info/',
 		urlArgsFunction: function(opt, bbox, selections) {
 			return {
 				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
