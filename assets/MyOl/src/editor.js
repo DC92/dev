@@ -180,7 +180,7 @@ function layerEditGeoJson(opt) {
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null;
 
-	layer.once('prerender', function() { //BEST transform in control
+	layer.once('prerender', function() { // Warning : only once for a map
 		const map = layer.get('map');
 
 		optimiseEdited(); // Treat the geoJson input as any other edit

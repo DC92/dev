@@ -18,6 +18,19 @@
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
+function layerVectorMultiple(options) { //TODO gros chantier !
+	const layer = new ol.layer.Vector(options);
+
+	//HACK attach an hover listener once when the map is defined
+	layer.once('prerender', function(evt) { // Warning : only once for a map
+		const map = layer.getMapInternal('map');
+
+		// Bla bla bla
+	});
+
+	return layer;
+}
+
 function layerVector(opt) {
 	const options = {
 			selectorName: '',
@@ -39,7 +52,7 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.bbox,
 			...options
 		}),
-		layer = new ol.layer.Vector({
+		layer = layerVectorMultiple({
 			source: source,
 			style: style,
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
@@ -161,12 +174,12 @@ function layerVector(opt) {
 					...feature.getProperties(),
 					...feature.display,
 				},
-				options
+				options //TODO options not defined in hover
 			);
 
 			//HACK to render the html entities in the canvas
 			if (elLabel && styleOptions && styleOptions.text) {
-				elLabel.innerHTML = styleOptions.text.getText();
+				elLabel.innerHTML = styleOptions.text.getText(); //TODO elLabel not defined in hover
 
 				if (elLabel.innerHTML) {
 					styleOptions.text.setText(
@@ -185,16 +198,17 @@ function layerVector(opt) {
 	// url : go to a new URL when we click on the feature
 	//BEST label attached to the cursor for lines & poly
 	//HACK attach an hover listener once when the map is defined
-	layer.once('prerender', function(evt) {
+	layer.once('prerender', function(evt) { // Warning : only once for a map
 		const map = layer.getMapInternal('map');
 
-		if (!map.hoverListenerInstalled) {
-			map.hoverListenerInstalled = true;
-			initHover(map);
-		}
+		map.addLayer(layerHover(map));
 	});
 
-	function initHover(map) {
+	/**
+	 * Global hovering functions layer
+	   To be declare once for a map
+	 */
+	function layerHover(map) {
 		// Layer to display an hovered features
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
@@ -203,8 +217,6 @@ function layerVector(opt) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
 			});
-
-		map.addLayer(hoverLayer);
 
 		// Leaving the map reset hovering
 		window.addEventListener('mousemove', function(evt) {
@@ -235,7 +247,7 @@ function layerVector(opt) {
 					});
 
 			// Update the display of hovered feature
-			if (map.hoveredFeature !== feature && !options.noLabel) {
+			if (map.hoveredFeature !== feature && !options.noLabel) { //TODO investigate why options / Takes the 1st layer options !
 				if (map.hoveredFeature)
 					hoverSource.clear();
 
@@ -245,7 +257,7 @@ function layerVector(opt) {
 				map.hoveredFeature = feature;
 			}
 
-			if (feature && !options.noClick) {
+			if (feature && !options.noClick) { //TODO investigate why options / Takes the 1st layer options !
 				const features = feature.get('features') || [feature],
 					display = {
 						...features[0].getProperties(), // Get first or alone feature
@@ -279,6 +291,7 @@ function layerVector(opt) {
 			} else
 				map.getViewport().style.cursor = '';
 		}
+		return hoverLayer;
 	}
 
 	return layer;
@@ -314,7 +327,7 @@ function layerVectorCluster(opt) {
 	});
 
 	// Tune the clustering distance depending on the zoom level
-	clusterLayer.on('prerender', function(evt) {
+	clusterLayer.on('prerender', function(evt) { // Warning : only once for a map
 		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
 			distanceMinCluster = Math.min(
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms

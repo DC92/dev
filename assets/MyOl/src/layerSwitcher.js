@@ -30,7 +30,7 @@ function controlLayerSwitcher(options) {
 	rangeContainerEl.firstChild.oninput = displayTransparencyRange;
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		ol.control.Control.prototype.setMap.call(this, map); //BEST resorb
 
 		// control.element is defined when attached to the map
 		control.element.className = 'ol-control myol-button-switcher';

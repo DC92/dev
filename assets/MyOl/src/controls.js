@@ -178,7 +178,7 @@ function controlLengthLine() {
 	control.element.className = 'myol-length-line';
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		ol.control.Control.prototype.setMap.call(this, map); //BEST resorb
 
 		map.on('pointermove', function(evt) {
 			control.element.innerHTML = ''; // Clear the measure if hover no feature
@@ -221,7 +221,7 @@ function controlTilesBuffer(opt) {
 		control = controlButton(); //HACK no button
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		ol.control.Control.prototype.setMap.call(this, map); //BEST resorb
 
 		// Action on each layer
 		//TODO too much load on basic browsing
@@ -358,7 +358,7 @@ function controlGPS(options) {
 	ol.gpsValues = {}; // Store the measures for internal use & other controls
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		ol.control.Control.prototype.setMap.call(this, map); //BEST resorb
 
 		map.addLayer(graticuleLayer);
 		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom

@@ -700,6 +700,18 @@ function controlLayerSwitcher(options) {
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
+function layerVectorMultiple(options) {
+	const layer = new ol.layer.Vector(options);
+
+	layer.once('prerender', function(evt) { // Warning : only once for a map
+		const map = layer.getMapInternal('map');
+
+		// Bla bla bla
+	});
+
+	return layer;
+}
+
 function layerVector(opt) {
 	const options = {
 			selectorName: '',
@@ -721,7 +733,7 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.bbox,
 			...options
 		}),
-		layer = new ol.layer.Vector({
+		layer = layerVectorMultiple({
 			source: source,
 			style: style,
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
@@ -862,16 +874,17 @@ function layerVector(opt) {
 	// on features of vector layers having the following properties :
 	// hover : text on top of the picture
 	// url : go to a new URL when we click on the feature
-	layer.once('prerender', function(evt) {
+	layer.once('prerender', function(evt) { // Warning : only once for a map
 		const map = layer.getMapInternal('map');
 
-		if (!map.hoverListenerInstalled) {
-			map.hoverListenerInstalled = true;
-			initHover(map);
-		}
+		map.addLayer(layerHover(map));
 	});
 
-	function initHover(map) {
+	/**
+	 * Global hovering functions layer
+	   To be declare once for a map
+	 */
+	function layerHover(map) {
 		// Layer to display an hovered features
 		const hoverSource = new ol.source.Vector(),
 			hoverLayer = new ol.layer.Vector({
@@ -880,8 +893,6 @@ function layerVector(opt) {
 					return displayStyle(feature, feature.hoverStyleOptionsFunction);
 				},
 			});
-
-		map.addLayer(hoverLayer);
 
 		// Leaving the map reset hovering
 		window.addEventListener('mousemove', function(evt) {
@@ -956,6 +967,7 @@ function layerVector(opt) {
 			} else
 				map.getViewport().style.cursor = '';
 		}
+		return hoverLayer;
 	}
 
 	return layer;
@@ -991,7 +1003,7 @@ function layerVectorCluster(opt) {
 	});
 
 	// Tune the clustering distance depending on the zoom level
-	clusterLayer.on('prerender', function(evt) {
+	clusterLayer.on('prerender', function(evt) { // Warning : only once for a map
 		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
 			distanceMinCluster = Math.min(
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
@@ -2501,7 +2513,7 @@ function layerMarker(options) {
 	}
 
 	var view;
-	layer.once('prerender', function() {
+	layer.once('prerender', function() { // Warning : only once for a map
 		const pc = point.getCoordinates(),
 			map = layer.get('map');
 		view = map.getView();
@@ -2788,7 +2800,7 @@ function layerEditGeoJson(opt) {
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null;
 
-	layer.once('prerender', function() {
+	layer.once('prerender', function() { // Warning : only once for a map
 		const map = layer.get('map');
 
 		optimiseEdited(); // Treat the geoJson input as any other edit

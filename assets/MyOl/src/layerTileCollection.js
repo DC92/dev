@@ -122,7 +122,7 @@ function layerSwissTopo(opt) {
 	}
 
 	return [
-		layerStamen('terrain', 300),
+		layerStamen('terrain', 300), //BEST declare another layer internaly
 		new ol.layer.Tile({
 			maxResolution: 300,
 			source: new ol.source.WMTS(({
