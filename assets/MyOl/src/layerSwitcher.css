@@ -23,15 +23,16 @@
 }
 .myol-button-switcher div {
 	padding-left: 5px;
+	background: white;
 }
 .myol-button-switcher span,
 .myol-button-switcher label {
 	color: black;
 }
 
-#additional-selector { /*//BEST BUG depends on options */
+#additional-selector {
 	color: black;
-	background: rgb(162, 226, 255, 0.6);
+	background: #a2e2ff;
 }
 #additional-selector ul {
 	margin: 0;

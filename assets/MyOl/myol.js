@@ -52,7 +52,7 @@ if (location.hash == '###')
 	if ('serviceWorker' in navigator)
 		await navigator.serviceWorker.getRegistrations().then(registrations => {
 			if (registrations.length) {
-				data.push('service-worker:');
+				data.push('service-workers:');
 
 				for (let registration of registrations) {
 					if (registration.active) {
@@ -543,6 +543,7 @@ function layersDemo(options) {
 function controlLayerSwitcher(options) {
 	const control = new ol.control.Control({
 			element: document.createElement('div'),
+			render: render,
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
@@ -565,10 +566,13 @@ function controlLayerSwitcher(options) {
 		'<span>Ctrl+click: multicouches</span>';
 	rangeContainerEl.firstChild.oninput = displayTransparencyRange;
 
-	control.setMap = function(map) {
-		ol.control.Control.prototype.setMap.call(this, map);
+	// HACK run when the control is attached to the map
+	function render(evt) {
+		if (control.element.innerHTML) return; // Only once
 
-		// control.element is defined when attached to the map
+		const map = evt.target;
+
+		// control.element is only defined when the control is attached to the map
 		control.element.className = 'ol-control myol-button-switcher';
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);

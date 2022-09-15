@@ -6,6 +6,7 @@
 function controlLayerSwitcher(options) {
 	const control = new ol.control.Control({
 			element: document.createElement('div'),
+			render: render,
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
@@ -22,6 +23,7 @@ function controlLayerSwitcher(options) {
 
 	// Build html transparency slider
 	//BEST implement on touch screen terminals
+	//BEST same button click / touch than other controls
 	const rangeContainerEl = document.createElement('div');
 
 	rangeContainerEl.innerHTML =
@@ -29,10 +31,13 @@ function controlLayerSwitcher(options) {
 		'<span>Ctrl+click: multicouches</span>';
 	rangeContainerEl.firstChild.oninput = displayTransparencyRange;
 
-	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map); //BEST resorb
+	// HACK run when the control is attached to the map
+	function render(evt) {
+		if (control.element.innerHTML) return; // Only once
 
-		// control.element is defined when attached to the map
+		const map = evt.target;
+
+		// control.element is only defined when the control is attached to the map
 		control.element.className = 'ol-control myol-button-switcher';
 		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
 		control.element.appendChild(rangeContainerEl);
