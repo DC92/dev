@@ -3,10 +3,17 @@
  * Need to include layerSwitcher.css
  */
 //BEST alt key to switch layers / transparency
+//BEST how do we do on touch terminal ?
 function controlLayerSwitcher(options) {
-	const control = new ol.control.Control({
-			element: document.createElement('div'),
+	const control = controlButton({
+			className: 'myol-button-switcher',
+			label: '&#x274F;',
+			submenuHTML: '<div id="myol-ls-range">' +
+				'<input type="range" title="Glisser pour faire varier la tranparence">' +
+				'<span>Ctrl+click: multicouches</span>' +
+				'</div>',
 			render: render,
+			...options
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
@@ -15,35 +22,20 @@ function controlLayerSwitcher(options) {
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
 
-	let transparentBaseLayerName = '';
+	let transparentBaseLayerName,
+		rangeContainerEl;
 
 	// Get baselayer from url if any
 	if (baselayer)
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
-	// Build html transparency slider
-	//BEST implement on touch screen terminals
-	//BEST same button click / touch than other controls
-	const rangeContainerEl = document.createElement('div');
-
-	rangeContainerEl.innerHTML =
-		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
-		'<span>Ctrl+click: multicouches</span>';
-	rangeContainerEl.firstChild.oninput = displayTransparencyRange;
-
 	// HACK run when the control is attached to the map
 	function render(evt) {
-		if (control.element.innerHTML) return; // Only once
+		if (!control.render) // Only once
+			return;
+		control.render = null;
 
 		const map = evt.target;
-
-		// control.element is only defined when the control is attached to the map
-		control.element.className = 'ol-control myol-button-switcher';
-		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
-		control.element.appendChild(rangeContainerEl);
-		control.element.onmouseover = function() {
-			control.element.classList.add('myol-button-switcher-open');
-		};
 
 		// Hide the selector when the cursor is out of the selector
 		map.on('pointermove', function(evt) {
@@ -54,8 +46,11 @@ function controlLayerSwitcher(options) {
 				control.element.classList.remove('myol-button-switcher-open');
 		});
 
+		// Build html transparency slider
+		rangeContainerEl = document.getElementById('myol-ls-range');
+		rangeContainerEl.firstChild.oninput = displayTransparencyRange;
+
 		// Build html baselayers selectors
-		//BEST redo on the standard format (close while touching button)
 		for (let name in baseLayers) {
 			// Make all choices an array of layers
 			if (!baseLayers[name].length)
@@ -64,9 +59,9 @@ function controlLayerSwitcher(options) {
 			const selectionEl = document.createElement('div'),
 				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
 
-			control.element.appendChild(selectionEl);
-			selectionEl.innerHTML = //BEST investigate if name="baseLayer" is necessary
-				'<input type="checkbox" name="baseLayer" id="' + inputId + '" value="' + name + '" ' + ' />' +
+			control.submenuEl.appendChild(selectionEl);
+			selectionEl.innerHTML =
+				'<input type="checkbox" id="' + inputId + '" value="' + name + '" ' + ' />' +
 				'<label for="' + inputId + '">' + name + '</label>';
 			selectionEl.firstChild.onclick = selectBaseLayer;
 			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
@@ -84,7 +79,7 @@ function controlLayerSwitcher(options) {
 		//BEST other id don't use the css
 		const additionalSelector = document.getElementById(options.additionalSelectorId);
 		if (additionalSelector) {
-			control.element.appendChild(additionalSelector);
+			control.submenuEl.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration
 			additionalSelector.style.display = '';
 		}

@@ -541,9 +541,15 @@ function layersDemo(options) {
  * Need to include layerSwitcher.css
  */
 function controlLayerSwitcher(options) {
-	const control = new ol.control.Control({
-			element: document.createElement('div'),
+	const control = controlButton({
+			className: 'myol-button-switcher',
+			label: '&#x274F;',
+			submenuHTML: '<div id="myol-ls-range">' +
+				'<input type="range" title="Glisser pour faire varier la tranparence">' +
+				'<span>Ctrl+click: multicouches</span>' +
+				'</div>',
 			render: render,
+			...options
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
@@ -552,33 +558,20 @@ function controlLayerSwitcher(options) {
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
 
-	let transparentBaseLayerName = '';
+	let transparentBaseLayerName,
+		rangeContainerEl;
 
 	// Get baselayer from url if any
 	if (baselayer)
 		localStorage.myol_baselayer = decodeURI(baselayer[1]);
 
-	// Build html transparency slider
-	const rangeContainerEl = document.createElement('div');
-
-	rangeContainerEl.innerHTML =
-		'<input type="range" id="layerSlider" title="Glisser pour faire varier la tranparence">' +
-		'<span>Ctrl+click: multicouches</span>';
-	rangeContainerEl.firstChild.oninput = displayTransparencyRange;
-
 	// HACK run when the control is attached to the map
 	function render(evt) {
-		if (control.element.innerHTML) return; // Only once
+		if (!control.render) // Only once
+			return;
+		control.render = null;
 
 		const map = evt.target;
-
-		// control.element is only defined when the control is attached to the map
-		control.element.className = 'ol-control myol-button-switcher';
-		control.element.innerHTML = '<button><i>&#x274F;</i></button>';
-		control.element.appendChild(rangeContainerEl);
-		control.element.onmouseover = function() {
-			control.element.classList.add('myol-button-switcher-open');
-		};
 
 		// Hide the selector when the cursor is out of the selector
 		map.on('pointermove', function(evt) {
@@ -589,6 +582,10 @@ function controlLayerSwitcher(options) {
 				control.element.classList.remove('myol-button-switcher-open');
 		});
 
+		// Build html transparency slider
+		rangeContainerEl = document.getElementById('myol-ls-range');
+		rangeContainerEl.firstChild.oninput = displayTransparencyRange;
+
 		// Build html baselayers selectors
 		for (let name in baseLayers) {
 			// Make all choices an array of layers
@@ -598,9 +595,9 @@ function controlLayerSwitcher(options) {
 			const selectionEl = document.createElement('div'),
 				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
 
-			control.element.appendChild(selectionEl);
+			control.submenuEl.appendChild(selectionEl);
 			selectionEl.innerHTML =
-				'<input type="checkbox" name="baseLayer" id="' + inputId + '" value="' + name + '" ' + ' />' +
+				'<input type="checkbox" id="' + inputId + '" value="' + name + '" ' + ' />' +
 				'<label for="' + inputId + '">' + name + '</label>';
 			selectionEl.firstChild.onclick = selectBaseLayer;
 			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
@@ -617,7 +614,7 @@ function controlLayerSwitcher(options) {
 		// Attach html additional selector
 		const additionalSelector = document.getElementById(options.additionalSelectorId);
 		if (additionalSelector) {
-			control.element.appendChild(additionalSelector);
+			control.submenuEl.appendChild(additionalSelector);
 			// Unmask the selector if it has been @ the declaration
 			additionalSelector.style.display = '';
 		}
@@ -1675,7 +1672,7 @@ function layerOverpass(opt) {
 function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
-			className: 'myol-button',
+			className: '',
 			...opt
 		},
 		control = new ol.control.Control(options),
@@ -1701,7 +1698,7 @@ function controlButton(opt) {
 		return control;
 
 	// Populate control & button
-	control.element.className = 'ol-control ' + options.className;
+	control.element.className = 'ol-control myol-button ' + options.className;
 	buttonEl.innerHTML = options.label;
 	control.element.appendChild(buttonEl);
 
@@ -1971,9 +1968,10 @@ function controlGPS(options) {
 
 		// Display status, altitude & speed
 		control = controlButton({
-			className: 'myol-button myol-button-gps',
+			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: '<div id="myol-gps-status" class="myol-display-under"></div>' + subMenu,
+			...options
 		}),
 
 		// Graticule
@@ -2250,7 +2248,7 @@ function controlLoadGPX(options) {
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
-			className: 'myol-button myol-button-download',
+			className: 'myol-button-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a ctrlOnClick="download" id="GPX" mime="application/gpx+xml">GPX</a>' +
@@ -2325,7 +2323,7 @@ function controlDownload(opt) {
 function controlPrint(options) {
 	const control = controlButton({
 		label: '&#x1F5A8;',
-		className: 'myol-button myol-button-print',
+		className: 'myol-button-print',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +
@@ -2705,7 +2703,7 @@ function layerEditGeoJson(opt) {
 		}),
 
 		control = controlButton({
-			className: 'myol-button myol-button-edit',
+			className: 'myol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
 				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +

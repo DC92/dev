@@ -196,50 +196,23 @@
 	position: static;
 	float: right;
 }
+.myol-button-switcher > button {
+	font-style: italic;
+}
+.myol-button-switcher input {
+	margin: 0;
+}
+.myol-button-switcher > * {
+	right: 0;
+}
 .myol-button-switcher .myol-single-layer span {
 	font-size: 0.7em;
 }
 .myol-button-switcher .myol-single-layer input,
-.myol-button-switcher .myol-double-layer span,
-.myol-button-switcher-open button,
-.myol-button-switcher:not(.myol-button-switcher-open) > hr,
-.myol-button-switcher:not(.myol-button-switcher-open) > div {
+.myol-button-switcher .myol-double-layer span {
 	display: none;
 }
-.myol-button-switcher hr {
-	margin: 0;
-}
-.myol-button-switcher-open {
-	position: absolute;
-	right: 0;
-	max-height: 98%;
-	overflow: auto;
-}
-.myol-button-switcher div {
-	padding-left: 5px;
-	background: white;
-}
-.myol-button-switcher span,
-.myol-button-switcher label {
-	color: black;
-}
 
-#additional-selector {
-	color: black;
-	background: #a2e2ff;
-}
-#additional-selector ul {
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
-}
-#additional-selector p {
-	margin: 0;
-	color: red;
-}
-#additional-selector hr {
-	border-color: black;
-}
 
 /* FILE src/marker.css */
 #marker-coordinates:not(.epsg21781) .xy {

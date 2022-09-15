@@ -11,7 +11,7 @@
 function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
-			className: 'myol-button',
+			className: '',
 			...opt
 		},
 		control = new ol.control.Control(options),
@@ -37,7 +37,7 @@ function controlButton(opt) {
 		return control;
 
 	// Populate control & button
-	control.element.className = 'ol-control ' + options.className;
+	control.element.className = 'ol-control myol-button ' + options.className;
 	buttonEl.innerHTML = options.label;
 	control.element.appendChild(buttonEl);
 
@@ -313,9 +313,10 @@ function controlGPS(options) {
 
 		// Display status, altitude & speed
 		control = controlButton({
-			className: 'myol-button myol-button-gps',
+			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: '<div id="myol-gps-status" class="myol-display-under"></div>' + subMenu,
+			...options
 		}),
 
 		// Graticule
@@ -597,7 +598,7 @@ function controlLoadGPX(options) {
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
-			className: 'myol-button myol-button-download',
+			className: 'myol-button-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a ctrlOnClick="download" id="GPX" mime="application/gpx+xml">GPX</a>' +
@@ -672,7 +673,7 @@ function controlDownload(opt) {
 function controlPrint(options) {
 	const control = controlButton({
 		label: '&#x1F5A8;',
-		className: 'myol-button myol-button-print',
+		className: 'myol-button-print',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +

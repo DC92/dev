@@ -18,6 +18,7 @@
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  */
+//TODO BUG : ne fait pas de hover s'il n'y a pas de couche massif !
 function layerVectorMultiple(options) { //TODO gros chantier !
 	const layer = new ol.layer.Vector(options);
 
