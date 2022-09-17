@@ -113,7 +113,6 @@ function layerVector(opt) {
 				feature.properties = {
 					...feature.properties,
 					...options.convertProperties(feature.properties, options),
-					//area: ol.extent.getArea(feature.geometry.getExtent()), //TODO Detect lines or polygons
 				};
 
 			// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
@@ -261,7 +260,7 @@ function styleOptionsIconChemineur(iconName) {
 }
 
 // Display a label with some data about the feature
-function styleOptionsFullLabel(properties) {
+function styleOptionsFullLabel(feature, properties) {
 	let text = [],
 		line = [];
 
@@ -305,15 +304,17 @@ function styleOptionsFullLabel(properties) {
 			text.push('&copy;' + properties.attribution);
 	}
 
-	return styleOptionsLabel(text.join('\n'), properties, true);
+	return styleOptionsLabel(text.join('\n'), feature, properties, true);
 }
 
 // Display a label with only the name
-function styleOptionsLabel(text, properties, important) {
+function styleOptionsLabel(text, feature, properties, important) {
+
 	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
 		styleTextOptions = {
-			textBaseline: 'bottom',
-			offsetY: -14, // Above the icon
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -14, // Above the icon
 			padding: [1, 1, 0, 3],
 			font: '14px Calibri,sans-serif',
 			fill: new ol.style.Fill({
@@ -332,13 +333,6 @@ function styleOptionsLabel(text, properties, important) {
 	//HACK to render the html entities in the canvas
 	elLabel.innerHTML = text;
 	styleTextOptions.text = elLabel.innerHTML;
-
-	// For points //TODO redo for lines & polys
-	/*
-	if (!properties.area) {
-		styleTextOptions.textBaseline = 'bottom';
-		styleTextOptions.offsetY = -14; // Above the icon
-	}*/
 
 	return {
 		text: new ol.style.Text(styleTextOptions),

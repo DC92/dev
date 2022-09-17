@@ -20,7 +20,7 @@ var map = new ol.Map({
 		noClick: scriptName == 'posting',
 		hoverStyleOptionsFunction: function(feature, properties) {
 			properties.attribution = null;
-			return styleOptionsFullLabel(properties);
+			return styleOptionsFullLabel(feature, properties);
 		},
 	}),
 });

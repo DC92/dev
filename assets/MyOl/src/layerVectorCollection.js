@@ -42,9 +42,9 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
+		hoverStyleOptionsFunction: function(feature, properties) {
 			return {
-				...styleOptionsFullLabel(properties), // Labels
+				...styleOptionsFullLabel(feature, properties), // Labels
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'red',
 					width: 3,
@@ -110,8 +110,8 @@ function layerWri(options) {
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIcon(properties.icon);
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
-			return styleOptionsFullLabel(properties);
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsFullLabel(feature, properties);
 		},
 		attribution: 'refuges.info',
 		...options
@@ -158,13 +158,13 @@ function layerWriAreas(options) {
 				url: properties.lien,
 			};
 		},
-		styleOptionsFunction: function(f, properties) {
+		styleOptionsFunction: function(feature, properties) {
 			return {
-				...styleOptionsLabel(properties.name, properties),
+				...styleOptionsLabel(properties.name, feature, properties),
 				...styleOptionsPolygon(properties.color, 0.5),
 			};
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
+		hoverStyleOptionsFunction: function(feature, properties) {
 			// Invert previous color
 			const colors = properties.color
 				.match(/([0-9a-f]{2})/ig)
@@ -175,7 +175,7 @@ function layerWriAreas(options) {
 				.join('');
 
 			return {
-				...styleOptionsLabel(properties.name, properties, true),
+				...styleOptionsLabel(properties.name, feature, properties, true),
 				...styleOptionsPolygon('#' + colors, 0.3),
 				stroke: new ol.style.Stroke({
 					color: properties.color,
@@ -206,8 +206,8 @@ function layerPyreneesRefuges(options) {
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type_hebergement);
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
-			return styleOptionsFullLabel(properties);
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsFullLabel(feature, properties);
 		},
 		...options
 	});
@@ -260,8 +260,8 @@ function layerC2C(options) {
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type);
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
-			return styleOptionsFullLabel(properties);
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsFullLabel(feature, properties);
 		},
 		...options
 	});
@@ -288,8 +288,8 @@ function layerOverpass(opt) {
 			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
-			hoverStyleOptionsFunction: function(f, properties) {
-				return styleOptionsFullLabel(properties);
+			hoverStyleOptionsFunction: function(feature, properties) {
+				return styleOptionsFullLabel(feature, properties);
 			},
 			...opt
 		},

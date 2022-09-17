@@ -796,7 +796,6 @@ function layerVector(opt) {
 				feature.properties = {
 					...feature.properties,
 					...options.convertProperties(feature.properties, options),
-					//area: ol.extent.getArea(feature.geometry.getExtent()),
 				};
 
 			// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
@@ -918,6 +917,149 @@ function layerVectorCluster(opt) {
 }
 
 /**
+ * Some usefull style functions
+ */
+
+// Get icon from an URL
+function styleOptionsIcon(iconUrl) {
+	if (iconUrl)
+		return {
+			image: new ol.style.Icon({
+				src: iconUrl,
+			}),
+		};
+}
+
+// Get icon from chemineur.fr
+function styleOptionsIconChemineur(iconName) {
+	if (iconName) {
+		const icons = iconName.split(' ');
+
+		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
+
+		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
+	}
+}
+
+// Display a label with some data about the feature
+function styleOptionsFullLabel(feature, properties) {
+	let text = [],
+		line = [];
+
+	// Cluster
+	if (properties.features || properties.cluster) {
+		let includeCluster = !!properties.cluster;
+
+		for (let f in properties.features) {
+			const name = properties.features[f].getProperties().name;
+			if (name)
+				text.push(name);
+			if (properties.features[f].getProperties().cluster)
+				includeCluster = true;
+		}
+		if (text.length == 0 || text.length > 6 || includeCluster)
+			text = ['Cliquer pour zoomer'];
+	}
+	// Feature
+	else {
+		// 1st line
+		if (properties.name)
+			text.push(properties.name);
+
+		// 2nd line
+		if (properties.ele)
+			line.push(parseInt(properties.ele) + ' m');
+		if (properties.capacity)
+			line.push(parseInt(properties.capacity) + '\u255E\u2550\u2555');
+		if (line.length)
+			text.push(line.join(', '));
+
+		// 3rd line
+		if (typeof properties.type == 'string' && properties.type)
+			text.push(
+				properties.type[0].toUpperCase() +
+				properties.type.substring(1).replace('_', ' ')
+			);
+
+		// 4rd line
+		if (properties.attribution)
+			text.push('&copy;' + properties.attribution);
+	}
+
+	return styleOptionsLabel(text.join('\n'), feature, properties, true);
+}
+
+// Display a label with only the name
+function styleOptionsLabel(text, feature, properties, important) {
+
+	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		styleTextOptions = {
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -14, // Above the icon
+			padding: [1, 1, 0, 3],
+			font: '14px Calibri,sans-serif',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'white',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				color: 'blue',
+				width: important ? 1 : 0.3,
+			}),
+			overflow: important,
+		};
+
+	elLabel.innerHTML = text;
+	styleTextOptions.text = elLabel.innerHTML;
+
+	return {
+		text: new ol.style.Text(styleTextOptions),
+	};
+}
+
+// Apply a color and transparency to a polygon
+function styleOptionsPolygon(color, transparency) { // color = #rgb, transparency = 0 to 1
+	if (color)
+		return {
+			fill: new ol.style.Fill({
+				color: 'rgba(' + [
+					parseInt(color.substring(1, 3), 16),
+					parseInt(color.substring(3, 5), 16),
+					parseInt(color.substring(5, 7), 16),
+					transparency || 1,
+				].join(',') + ')',
+			})
+		};
+}
+
+// Style of a cluster bullet (both local & server cluster
+function styleOptionsCluster(feature, properties) {
+	let nbClusters = parseInt(properties.cluster || 0);
+
+	for (let f in properties.features)
+		nbClusters += parseInt(properties.features[f].getProperties().cluster || 1);
+
+	return {
+		image: new ol.style.Circle({
+			radius: 14,
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			fill: new ol.style.Fill({
+				color: 'white',
+			}),
+		}),
+		text: new ol.style.Text({
+			text: nbClusters.toString(),
+			font: '14px Calibri,sans-serif',
+		}),
+	};
+}
+
+/**
  * Global hovering functions layer
    To be declared & added once for a map
  */
@@ -1012,154 +1154,6 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
 	this.bboxLimitResolution = resolution; // Mem resolution for further requests
 	return [extent];
 };
-
-/**
- * Some usefull style functions
- */
-
-// Get icon from an URL
-function styleOptionsIcon(iconUrl) {
-	if (iconUrl)
-		return {
-			image: new ol.style.Icon({
-				src: iconUrl,
-			}),
-		};
-}
-
-// Get icon from chemineur.fr
-function styleOptionsIconChemineur(iconName) {
-	if (iconName) {
-		const icons = iconName.split(' ');
-
-		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
-
-		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
-	}
-}
-
-// Display a label with some data about the feature
-function styleOptionsFullLabel(properties) {
-	let text = [],
-		line = [];
-
-	// Cluster
-	if (properties.features || properties.cluster) {
-		let includeCluster = !!properties.cluster;
-
-		for (let f in properties.features) {
-			const name = properties.features[f].getProperties().name;
-			if (name)
-				text.push(name);
-			if (properties.features[f].getProperties().cluster)
-				includeCluster = true;
-		}
-		if (text.length == 0 || text.length > 6 || includeCluster)
-			text = ['Cliquer pour zoomer'];
-	}
-	// Feature
-	else {
-		// 1st line
-		if (properties.name)
-			text.push(properties.name);
-
-		// 2nd line
-		if (properties.ele)
-			line.push(parseInt(properties.ele) + ' m');
-		if (properties.capacity)
-			line.push(parseInt(properties.capacity) + '\u255E\u2550\u2555');
-		if (line.length)
-			text.push(line.join(', '));
-
-		// 3rd line
-		if (typeof properties.type == 'string' && properties.type)
-			text.push(
-				properties.type[0].toUpperCase() +
-				properties.type.substring(1).replace('_', ' ')
-			);
-
-		// 4rd line
-		if (properties.attribution)
-			text.push('&copy;' + properties.attribution);
-	}
-
-	return styleOptionsLabel(text.join('\n'), properties, true);
-}
-
-// Display a label with only the name
-function styleOptionsLabel(text, properties, important) {
-	const elLabel = document.createElement('span'),
-		styleTextOptions = {
-			textBaseline: 'bottom',
-			offsetY: -14, // Above the icon
-			padding: [1, 1, 0, 3],
-			font: '14px Calibri,sans-serif',
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				color: 'blue',
-				width: important ? 1 : 0.3,
-			}),
-			overflow: important,
-		};
-
-	elLabel.innerHTML = text;
-	styleTextOptions.text = elLabel.innerHTML;
-
-	// For points
-	/*
-	if (!properties.area) {
-		styleTextOptions.textBaseline = 'bottom';
-		styleTextOptions.offsetY = -14; // Above the icon
-	}*/
-
-	return {
-		text: new ol.style.Text(styleTextOptions),
-	};
-}
-
-// Apply a color and transparency to a polygon
-function styleOptionsPolygon(color, transparency) { // color = #rgb, transparency = 0 to 1
-	if (color)
-		return {
-			fill: new ol.style.Fill({
-				color: 'rgba(' + [
-					parseInt(color.substring(1, 3), 16),
-					parseInt(color.substring(3, 5), 16),
-					parseInt(color.substring(5, 7), 16),
-					transparency || 1,
-				].join(',') + ')',
-			})
-		};
-}
-
-// Style of a cluster bullet (both local & server cluster
-function styleOptionsCluster(feature, properties) {
-	let nbClusters = parseInt(properties.cluster || 0);
-
-	for (let f in properties.features)
-		nbClusters += parseInt(properties.features[f].getProperties().cluster || 1);
-
-	return {
-		image: new ol.style.Circle({
-			radius: 14,
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
-			fill: new ol.style.Fill({
-				color: 'white',
-			}),
-		}),
-		text: new ol.style.Text({
-			text: nbClusters.toString(),
-			font: '14px Calibri,sans-serif',
-		}),
-	};
-}
 
 /**
  * Manage a collection of checkboxes with the same name
@@ -1270,9 +1264,9 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
+		hoverStyleOptionsFunction: function(feature, properties) {
 			return {
-				...styleOptionsFullLabel(properties), // Labels
+				...styleOptionsFullLabel(feature, properties), // Labels
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'red',
 					width: 3,
@@ -1338,8 +1332,8 @@ function layerWri(options) {
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIcon(properties.icon);
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
-			return styleOptionsFullLabel(properties);
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsFullLabel(feature, properties);
 		},
 		attribution: 'refuges.info',
 		...options
@@ -1386,13 +1380,13 @@ function layerWriAreas(options) {
 				url: properties.lien,
 			};
 		},
-		styleOptionsFunction: function(f, properties) {
+		styleOptionsFunction: function(feature, properties) {
 			return {
-				...styleOptionsLabel(properties.name, properties),
+				...styleOptionsLabel(properties.name, feature, properties),
 				...styleOptionsPolygon(properties.color, 0.5),
 			};
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
+		hoverStyleOptionsFunction: function(feature, properties) {
 			// Invert previous color
 			const colors = properties.color
 				.match(/([0-9a-f]{2})/ig)
@@ -1403,7 +1397,7 @@ function layerWriAreas(options) {
 				.join('');
 
 			return {
-				...styleOptionsLabel(properties.name, properties, true),
+				...styleOptionsLabel(properties.name, feature, properties, true),
 				...styleOptionsPolygon('#' + colors, 0.3),
 				stroke: new ol.style.Stroke({
 					color: properties.color,
@@ -1434,8 +1428,8 @@ function layerPyreneesRefuges(options) {
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type_hebergement);
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
-			return styleOptionsFullLabel(properties);
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsFullLabel(feature, properties);
 		},
 		...options
 	});
@@ -1488,8 +1482,8 @@ function layerC2C(options) {
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type);
 		},
-		hoverStyleOptionsFunction: function(f, properties) {
-			return styleOptionsFullLabel(properties);
+		hoverStyleOptionsFunction: function(feature, properties) {
+			return styleOptionsFullLabel(feature, properties);
 		},
 		...options
 	});
@@ -1516,8 +1510,8 @@ function layerOverpass(opt) {
 			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
-			hoverStyleOptionsFunction: function(f, properties) {
-				return styleOptionsFullLabel(properties);
+			hoverStyleOptionsFunction: function(feature, properties) {
+				return styleOptionsFullLabel(feature, properties);
 			},
 			...opt
 		},

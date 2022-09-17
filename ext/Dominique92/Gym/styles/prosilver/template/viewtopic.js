@@ -9,11 +9,11 @@ const layer = layerVector({
 		styleOptionsFunction: function(feature, properties) {
 			return Object.assign({},
 				styleOptionsIcon(properties.icon),
-				firstMenuLine ? null : styleOptionsLabel(properties.name, properties),
+				firstMenuLine ? null : styleOptionsLabel(properties.name, feature, properties),
 			);
 		},
 		hoverStyleOptionsFunction: function(feature, properties) {
-			return styleOptionsLabel(properties.name, properties);
+			return styleOptionsLabel(properties.name, feature, properties);
 		},
 	}),
 
