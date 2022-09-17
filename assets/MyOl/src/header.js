@@ -59,14 +59,15 @@ if (location.hash == '###')
 			}
 		});
 
-	await caches.keys().then(function(names) {
-		if (names.length) {
-			data.push('caches:');
+	if (typeof caches == 'object')
+		await caches.keys().then(function(names) {
+			if (names.length) {
+				data.push('caches:');
 
-			for (let name of names)
-				data.push('  ' + name);
-		}
-	});
+				for (let name of names)
+					data.push('  ' + name);
+			}
+		});
 
 	// Final display
 	console.info(data.join('\n'));

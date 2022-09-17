@@ -81,7 +81,7 @@ function layerMarker(options) {
 	}
 
 	var view;
-	layer.once('prerender', function() { // Warning : only once for a map
+	layer.once('prerender', function(evt) { // Warning : only once for a map
 		const pc = point.getCoordinates(),
 			map = layer.get('map');
 		view = map.getView();

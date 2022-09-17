@@ -23,7 +23,7 @@ function layerGeoBB(options) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, f, opt) {
+		convertProperties: function(properties, opt) {
 			return {
 				icon: properties.type ?
 					opt.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
@@ -96,7 +96,7 @@ function layerWri(options) {
 				bbox: bbox.join(','),
 			};
 		},
-		convertProperties: function(properties, f, opt) {
+		convertProperties: function(properties, opt) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
@@ -113,7 +113,7 @@ function layerWri(options) {
 		hoverStyleOptionsFunction: function(f, properties) {
 			return styleOptionsFullLabel(properties);
 		},
-		attribution: '<a href="https://www.refuges.info">Refuges.info</a>',
+		attribution: 'refuges.info',
 		...options
 	});
 }
@@ -200,7 +200,7 @@ function layerPyreneesRefuges(options) {
 				url: properties.url,
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
-				attribution: '<a href="https://pyrenees-refuges.com">Pyrenees-Refuges</a>',
+				attribution: 'Pyrenees-Refuges',
 			};
 		},
 		styleOptionsFunction: function(f, properties) {
@@ -237,7 +237,7 @@ function layerC2C(options) {
 					name: properties.locales[0].title,
 					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
-					attribution: '<a href="https://www.camptocamp.org">CampToCamp</a>',
+					attribution: 'campTOcamp',
 				},
 			});
 		}
@@ -365,7 +365,7 @@ function layerOverpass(opt) {
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
-	function convertProperties(properties, feature) {
+	function convertProperties(properties, feature) { // TODO rewrite in the format
 		for (let p in properties)
 			if (tags.indexOf(p) !== -1 && tags.indexOf(properties[p]) !== -1)
 				return {
@@ -374,7 +374,7 @@ function layerOverpass(opt) {
 					ele: properties.ele,
 					capacity: properties.capacity,
 					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
-					attribution: '<a href="https://www.openstreetmap.org/">osm</a>',
+					attribution: 'openstreetmap',
 				};
 	}
 

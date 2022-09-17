@@ -50,19 +50,20 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<div class="selector">
-		<div>
+		<p>
 			<label for="prc-features">Pyrenees-refuges.com</label>
 			<input type="checkbox" name="prc-features" id="prc-features" />
-			<p id="prc-features-status"></p>
-		</div><div>
+			<span id="prc-features-status"></span>
+		</p><p>
 			<label for="chem-features">Chemineur</label>
 			<input type="checkbox" name="chem-features" id="chem-features" value="3,8,20,23" />
-			<p id="chem-features-status"></p>
-		</div><div>
+			<span id="chem-features-status"></span>
+		</p><p>
 			<label for="c2c-features">Camptocamp.org</label>
 			<input type="checkbox" name="c2c-features" id="c2c-features" />
-			<p><span id="c2c-features-status"></span> Only 100 features at a time</p>
-		</div><div>
+			<span id="c2c-features-status"></span>
+			<p>Only 100 features at a time</p>
+		</p><div>
 			<label for="alp-features">Alpages.info</label>
 			<input type="checkbox" name="alp-features" id="alp-features" value="4,5" />
 			<p id="alp-features-status"></p>
@@ -164,6 +165,7 @@ new ol.Map({
 		layerOverpass({
 			selectorName: 'osm-features',
 		}),
+		layerHover(),
 	],
 });
 	</script>

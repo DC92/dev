@@ -195,8 +195,10 @@
 .myol-button-switcher {
 	position: static;
 	float: right;
+	background: transparent !important;
 }
 .myol-button-switcher > button {
+	margin: 0 0 20px 40px;
 	font-style: italic;
 }
 .myol-button-switcher input {

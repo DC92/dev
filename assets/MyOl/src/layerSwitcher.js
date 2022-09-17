@@ -83,7 +83,7 @@ function controlLayerSwitcher(options) {
 			// Unmask the selector if it has been @ the declaration
 			additionalSelector.style.display = '';
 		}
-	};
+	}
 
 	function selectBaseLayer(evt) {
 		// Single layer

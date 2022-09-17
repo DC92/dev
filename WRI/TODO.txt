@@ -1,14 +1,15 @@
+RUPTURES INTERFACE MyOl
+=======================
+//TODO layerHover(),
+//TODO selectors : status en span (1 seul caractère !)
+
+BUGS
+====
 //TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
+//TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
+//BEST WRI largeur point_formulaire_modification pour petits écrans
 //TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
 //TODO BUG WRI Revoir bandeau grandes fenêtres & logo
-//TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
-
-//BEST WRI largeur point_formulaire_modification pour petits écrans
-//BEST WRI Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
-//BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
-//BEST WRI N'afficher que les massifs contenant des points
-//BEST WRI Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
-//BEST WRI ce text est paramétrable depuis le wiki
 
 EVOLUTION WRI PAGE ACCUEIL
 ==========================
@@ -25,6 +26,12 @@ Point
 
 EVOLUTIONS
 ==========
+//BEST WRI N'afficher que les massifs contenant des points
+//BEST WRI Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
+//BEST WRI Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
+//BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+//BEST WRI ce text est paramétrable depuis le wiki
+
 http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
 https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
