@@ -1131,7 +1131,7 @@
         this.layer = $nominatim.layer;
       }
 
-      Control.call(this, { element: this.container });
+      return new Control({ element: this.container });
     }
 
     if ( Control ) Base.__proto__ = Control;
