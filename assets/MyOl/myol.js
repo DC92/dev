@@ -1506,7 +1506,6 @@ function layerOverpass(opt) {
 			urlArgsFunction: urlArgsFunction,
 			maxResolution: 50,
 			format: format,
-			convertProperties: convertProperties,
 			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
@@ -1551,7 +1550,24 @@ function layerOverpass(opt) {
 	// Extract features from data when received
 	format.readFeatures = function(doc, opt) {
 		// Transform an area to a node (picto) at the center of this area
-		for (let node = doc.documentElement.firstElementChild; node; node = node.nextSibling)
+
+		for (let node = doc.documentElement.firstElementChild; node; node = node.nextSibling) {
+
+			for (let tag = node.firstElementChild; tag; tag = tag.nextSibling)
+				if (tag.attributes) {
+					if (tags.indexOf(tag.getAttribute('k')) !== -1 &&
+						tags.indexOf(tag.getAttribute('v')) !== -1 &&
+						tag.getAttribute('k') != 'type') {
+						addTag(node, 'type', tag.getAttribute('v'));
+						// Only once for a node
+						addTag(node, 'url', 'https://www.openstreetmap.org/node/' + node.id);
+						addTag(node, 'attribution', 'osm');
+					}
+
+					if (tag.getAttribute('k') && tag.getAttribute('k').includes('capacity:'))
+						addTag(node, 'capacity', tag.getAttribute('v'));
+				}
+
 			if (node.nodeName == 'way') {
 				// Create a new 'node' element centered on the surface
 				const newNode = doc.createElement('node');
@@ -1573,32 +1589,24 @@ function layerOverpass(opt) {
 							newNode.appendChild(subTagNode.cloneNode());
 
 							// Add a tag to mem what node type it was (for link build)
-							const newTag = doc.createElement('tag');
-							newTag.setAttribute('k', 'nodetype');
-							newTag.setAttribute('v', node.nodeName);
-							newNode.appendChild(newTag);
+							addTag(newNode, 'nodetype', node.nodeName);
 						}
 					}
 			}
-		// Status 200 / error message
-		else if (node.nodeName == 'remark' && statusEl)
-			statusEl.textContent = node.textContent;
+			// Status 200 / error message
+			else if (node.nodeName == 'remark' && statusEl)
+				statusEl.textContent = node.textContent;
+		}
+
+		function addTag(node, k, v) {
+			const newTag = doc.createElement('tag');
+			newTag.setAttribute('k', k);
+			newTag.setAttribute('v', v);
+			node.appendChild(newTag);
+		}
 
 		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
-
-	function convertProperties(properties, feature) { // TODO rewrite in the format
-		for (let p in properties)
-			if (tags.indexOf(p) !== -1 && tags.indexOf(properties[p]) !== -1)
-				return {
-					type: properties[p],
-					name: properties.name || properties[p],
-					ele: properties.ele,
-					capacity: properties.capacity,
-					url: 'https://www.openstreetmap.org/node/' + feature.getId(),
-					attribution: 'openstreetmap',
-				};
-	}
 
 	return layer;
 }
