@@ -707,7 +707,7 @@ function layerVector(opt) {
 			selectorName: '',
 			callBack: function() {
 				layer.setVisible(
-					selector(selectorsName[0]).length || // By default, visibility depends on the first selector only
+					selector(selectorNames[0]).length || // By default, visibility depends on the first selector only
 					!options.selectorName // No selector at all
 				);
 				source.refresh();
@@ -715,7 +715,7 @@ function layerVector(opt) {
 			styleOptionsClusterFunction: styleOptionsCluster,
 			...opt
 		},
-		selectorsName = options.selectorName.split(','),
+		selectorNames = options.selectorName.split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
 			url: url,
@@ -729,13 +729,13 @@ function layerVector(opt) {
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options
 		}),
-		statusEl = document.getElementById(selectorsName[0] + '-status'); // XHR download tracking
+		statusEl = document.getElementById(selectorNames[0] + '-status'); // XHR download tracking
 
 	// Embark hover style to render hovering
 	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
 	// Setup the selector managers
-	selectorsName.map(name => selector(name, options.callBack));
+	selectorNames.map(name => selector(name, options.callBack));
 
 	// Init parameters depending on the selector
 	options.callBack();
@@ -765,7 +765,7 @@ function layerVector(opt) {
 					'EPSG:4326' // Received projection
 				)
 				.map(c => c.toFixed(4)), // Round to 4 digits
-				selectorsName.map(name => selector(name).join(',')), // Array of string: selected values separated with ,
+				selectorNames.map(name => selector(name).join(',')), // Array of string: selected values separated with ,
 				extent,
 				resolution
 			),
@@ -1552,7 +1552,7 @@ function layerOverpass(opt) {
 		// Transform an area to a node (picto) at the center of this area
 
 		for (let node = doc.documentElement.firstElementChild; node; node = node.nextSibling) {
-
+			// Translate attributes to standard MyOl
 			for (let tag = node.firstElementChild; tag; tag = tag.nextSibling)
 				if (tag.attributes) {
 					if (tags.indexOf(tag.getAttribute('k')) !== -1 &&
@@ -1568,8 +1568,8 @@ function layerOverpass(opt) {
 						addTag(node, 'capacity', tag.getAttribute('v'));
 				}
 
+			// Create a new 'node' element centered on the surface
 			if (node.nodeName == 'way') {
-				// Create a new 'node' element centered on the surface
 				const newNode = doc.createElement('node');
 				newNode.id = node.id;
 				doc.documentElement.appendChild(newNode);
@@ -1593,8 +1593,9 @@ function layerOverpass(opt) {
 						}
 					}
 			}
+
 			// Status 200 / error message
-			else if (node.nodeName == 'remark' && statusEl)
+			if (node.nodeName == 'remark' && statusEl)
 				statusEl.textContent = node.textContent;
 		}
 

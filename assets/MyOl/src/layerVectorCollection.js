@@ -330,7 +330,7 @@ function layerOverpass(opt) {
 		// Transform an area to a node (picto) at the center of this area
 
 		for (let node = doc.documentElement.firstElementChild; node; node = node.nextSibling) {
-
+			// Translate attributes to standard MyOl
 			for (let tag = node.firstElementChild; tag; tag = tag.nextSibling)
 				if (tag.attributes) {
 					if (tags.indexOf(tag.getAttribute('k')) !== -1 &&
@@ -346,8 +346,8 @@ function layerOverpass(opt) {
 						addTag(node, 'capacity', tag.getAttribute('v'));
 				}
 
+			// Create a new 'node' element centered on the surface
 			if (node.nodeName == 'way') {
-				// Create a new 'node' element centered on the surface
 				const newNode = doc.createElement('node');
 				newNode.id = node.id;
 				doc.documentElement.appendChild(newNode);
@@ -371,8 +371,9 @@ function layerOverpass(opt) {
 						}
 					}
 			}
+
 			// Status 200 / error message
-			else if (node.nodeName == 'remark' && statusEl)
+			if (node.nodeName == 'remark' && statusEl)
 				statusEl.textContent = node.textContent;
 		}
 

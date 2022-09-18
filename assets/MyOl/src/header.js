@@ -44,7 +44,7 @@ if (location.hash == '###')
 	if ('serviceWorker' in navigator)
 		await navigator.serviceWorker.getRegistrations().then(registrations => {
 			if (registrations.length) {
-				data.push('service-workers:'); //BEST BUG display event when we have no SW registered but not active
+				data.push('service-workers:'); //BEST BUG displayed event when we have nothing
 
 				for (let registration of registrations) {
 					if (registration.active) {

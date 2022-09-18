@@ -55,7 +55,7 @@ Based on https://openlayers.org
 
 	<div id="additional-selector" >
 		<hr />
-		chemineur.fr <input type="checkbox" name="chem-features" checked="checked" />
+		chemineur.fr <input type="checkbox" name="chem-features" value="all" />
 		<ul>
 			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
 			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
@@ -89,7 +89,7 @@ new ol.Map({
 		})),
 	layers: [
 		...layersGeoBB({ // Chemineur
-			selectorsName: 'chem-features', //TODO BUG pas de sélection
+			selectorName: 'chem-features',
 		}),
 		layerHover(),
 		layerMarker({

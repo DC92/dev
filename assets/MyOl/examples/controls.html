@@ -61,14 +61,52 @@ Based on https://openlayers.org
 	</div>
 
 	<script>
-//BEST features for controlDownload demo
-//BEST demo of controlLengthLine
+const geojsonObject = {
+		'type': 'FeatureCollection',
+		'features': [{
+				'type': 'Feature',
+				'geometry': {
+					'type': 'LineString',
+					'coordinates': [
+						[0, 58e5],
+						[4e5, 62e5],
+					],
+				},
+			},
+			{
+				'type': 'Feature',
+				'geometry': {
+					'type': 'Polygon',
+					'coordinates': [
+						[
+							[0, 62e5],
+							[4e5, 62e5],
+							[4e5, 58e5],
+							[0, 62e5],
+						],
+					],
+				},
+			},
+		],
+	},
+	vectorLayer = new ol.layer.Vector({
+		source: new ol.source.Vector({
+			features: new ol.format.GeoJSON().readFeatures(geojsonObject),
+		}),
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+		}),
+	});
+
 new ol.Map({
 	target: 'map',
 	layers: [
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
+		vectorLayer,
 	],
 	controls: controlsCollection({
 		permalink: {
