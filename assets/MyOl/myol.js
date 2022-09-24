@@ -28,15 +28,7 @@ if (location.hash == '###')
  * Display misc values
  */
 (async function() {
-	let data = [];
-
-	// OL version
-	try {
-		new ol.style.Icon(); // Try incorrect action
-	} catch (err) { // to get Assert url
-		if (err.message)
-			data.push('Ol ' + err.message.match('/v([0-9\.]+)/')[1]);
-	}
+	let data = ['Openlayers '+ol.version];
 
 	// myol storages in the subdomain
 	['localStorage', 'sessionStorage'].forEach(s => {
