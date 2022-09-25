@@ -17,10 +17,6 @@ function controlButton(opt) {
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
 
-	// Neutral: not displayed
-	if (!options.label)
-		return control;
-
 	// Add submenu below the button
 	if (options.submenuEl)
 		control.submenuEl = options.submenuEl;
@@ -32,28 +28,35 @@ function controlButton(opt) {
 			control.submenuEl.innerHTML = options.submenuHTML;
 	}
 
-	// Don't display the button if there is no submenu
-	if (!control.submenuEl || !control.submenuEl.innerHTML)
+	// Display the button only if there are label & submenu
+	if (options.label && control.submenuEl && control.submenuEl.innerHTML)
+		control.element.appendChild(control.submenuEl);
+	else
 		return control;
 
 	// Populate control & button
-	control.element.className = 'ol-control myol-button ' + options.className;
 	buttonEl.innerHTML = options.label;
 	control.element.appendChild(buttonEl);
+	control.element.className = 'ol-control myol-button ' + options.className;
 
 	// Assign button actions
-	control.element.addEventListener('mouseover', function() {
-		control.element.classList.add('myol-display-submenu');
-	});
-	control.element.addEventListener('mouseout', function() {
-		control.element.classList.remove('myol-display-submenu');
-	});
-	control.element.addEventListener('touchend', function(evt) {
-		if (control.element.isEqualNode(evt.target.parentElement))
-			control.element.classList.toggle('myol-display-submenu');
-	});
+	control.element.addEventListener('mouseover', action);
+	control.element.addEventListener('mouseout', action);
+	control.element.addEventListener('click', action);
 
-	control.element.appendChild(control.submenuEl);
+	function action(evt) {
+		if (evt.type == 'mouseover')
+			evt.currentTarget.classList.add('myol-button-hover');
+		else // mouseout & click
+			evt.currentTarget.classList.remove('myol-button-hover');
+
+		if (evt.type == 'click')
+			evt.currentTarget.classList.toggle('myol-button-selected');
+
+		for (let el of control.element.parentElement.getElementsByClassName('myol-button'))
+			if (el != control.element)
+				el.classList.remove('myol-button-selected');
+	}
 
 	// Assign control.function to submenu elements events
 	// with attribute ctrlOnClic="function" or ctrlOnChange="function"
@@ -315,7 +318,7 @@ function controlGPS(options) {
 		control = controlButton({
 			className: 'myol-button-gps',
 			label: '&#x2295;',
-			submenuHTML: '<div id="myol-gps-status" class="myol-display-under"></div>' + subMenu,
+			submenuHTML: subMenu,
 			...options
 		}),
 
@@ -337,7 +340,10 @@ function controlGPS(options) {
 					width: 1,
 				}),
 			}),
-		});
+		}),
+		statusEl = document.createElement('p');
+
+	control.element.appendChild(statusEl);
 
 	graticuleFeature.setStyle(new ol.style.Style({
 		stroke: new ol.style.Stroke({
@@ -393,7 +399,6 @@ function controlGPS(options) {
 			display2El = document.getElementById('myol-gps-display2'),
 			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, +|WiFi
 			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
-			statusEl = document.getElementById('myol-gps-status'),
 			map = control.getMap(),
 			view = map ? map.getView() : null;
 
@@ -475,7 +480,7 @@ function controlGPS(options) {
 		}
 
 		// Display data under the button
-		let status = ol.gpsValues.position ? '' : 'GPS sync...';
+		let status = ol.gpsValues.position ? '' : 'Sync...';
 		if (ol.gpsValues.altitude) {
 			status = Math.round(ol.gpsValues.altitude) + ' m';
 			if (ol.gpsValues.speed)
