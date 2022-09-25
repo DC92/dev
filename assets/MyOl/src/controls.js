@@ -243,6 +243,7 @@ function controlTilesBuffer(opt) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
+//TODO BUG ne cache pas les autres sous-menus
 function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return controlButton(); //HACK no button

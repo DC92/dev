@@ -31,10 +31,11 @@
 	color: black;
 	background: white;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	outline: 0;
 }
 .myol-button > div {
 	max-height: calc(100% - 38px);
+	opacity: 1;
+	transition: max-height 1s ease-in-out, opacity 1s ease-out;
 	overflow: auto;
 	z-index: 30;
 }
@@ -49,20 +50,21 @@
 
 /* Submenu */
 .myol-button:not(.myol-button-hover):not(.myol-button-selected) > div,
-.myol-button > *:empty  {
-	display: none;
+.myol-button > *:empty {
+	max-height: 0;
+	opacity: 0;
+	z-index: 29;
 }
 .myol-button > *:not(button) {
 	position: absolute;
-	top: 29px;
-	padding: 3px;
+	top: 30px;
 	background: white;
 	font-size: 16px;
 }
 .myol-button > p,
 .myol-button > div > * {
 	margin: 3px 0;
-	background: white;
+	padding: 0 3px;
 	font-size: 14px;
 }
 .myol-button > div > input,
