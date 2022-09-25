@@ -6,9 +6,13 @@
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
-function layerMarker(options) {
-	const els = [],
-		point = new ol.geom.Point([0, 0]),
+function layerMarker(opt) {
+	const options = {
+			position: [0, 0],
+			...opt
+		},
+		els = [],
+		point = new ol.geom.Point(options.position),
 		source = new ol.source.Vector({
 			features: [new ol.Feature(point)],
 		}),

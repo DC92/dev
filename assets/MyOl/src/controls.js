@@ -287,7 +287,6 @@ function controlGeocoder(options) {
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content
-		//TODO oriente au nord même quand inactif
 		'<p>Localisation GPS:</p>' +
 		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
 		'<label for="myol-gps-source0">Inactif</label><br />' +
@@ -420,7 +419,7 @@ function controlGPS(options) {
 				ol.gpsValues[valueName.toLowerCase()] = value;
 		});
 
-		// L'état 1 ne prend que les positions du GPS (qui ont une altitude)
+		// State 1 only takes positions from the GPS (which have an altitude)
 		if (sourceLevel == 1 && !ol.gpsValues.altitude)
 			ol.gpsValues.position = null;
 
@@ -477,7 +476,8 @@ function controlGPS(options) {
 				view.setZoom(17);
 			}
 			graticuleLayer.setVisible(true);
-		}
+		} else
+			view.setRotation(0); // Return to inactive state
 
 		// Display data under the button
 		let status = ol.gpsValues.position ? '' : 'Sync...';
@@ -599,7 +599,7 @@ function controlLoadGPX(options) {
  * Requires controlButton
  */
 //BEST BUG incompatible avec clusters
-//TODO BUG WRI EDIT n'exporte pas les polygones !
+//TODO BUG WRI EDIT n'exporte pas les polygones en GPX !
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
@@ -636,7 +636,7 @@ function controlDownload(opt) {
 		function getFeatures(savedLayer) {
 			if (savedLayer.getSource() && savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
 				savedLayer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!savedLayer.marker_) //BEST find a better way to don't save the cursor
+					if (!savedLayer.getProperties().dragable) // Don't save the cursor
 						features.push(feature);
 				});
 		}

@@ -21,6 +21,8 @@ Based on https://openlayers.org
 	<script src="../geocoder/ol-geocoder-debug.js"></script>
 
 	<!-- My Openlayers -->
+	<link href="../src/marker.css" type="text/css" rel="stylesheet">
+	<script src="../src/marker.js"></script>
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
 	<script src="../src/controls.js"></script>
 
@@ -107,6 +109,11 @@ new ol.Map({
 			source: new ol.source.OSM(),
 		}),
 		vectorLayer,
+		layerMarker({
+			position: [2e5, 60e5],
+			src: 'images/viseur.png',
+			dragable: true,
+		}),
 	],
 	controls: controlsCollection({
 		permalink: {

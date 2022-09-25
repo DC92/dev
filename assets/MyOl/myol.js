@@ -2020,7 +2020,7 @@ function controlGPS(options) {
 				ol.gpsValues[valueName.toLowerCase()] = value;
 		});
 
-		// L'état 1 ne prend que les positions du GPS (qui ont une altitude)
+		// State 1 only takes positions from the GPS (which have an altitude)
 		if (sourceLevel == 1 && !ol.gpsValues.altitude)
 			ol.gpsValues.position = null;
 
@@ -2077,7 +2077,8 @@ function controlGPS(options) {
 				view.setZoom(17);
 			}
 			graticuleLayer.setVisible(true);
-		}
+		} else
+			view.setRotation(0); // Return to inactive state
 
 		// Display data under the button
 		let status = ol.gpsValues.position ? '' : 'Sync...';
@@ -2231,7 +2232,7 @@ function controlDownload(opt) {
 		function getFeatures(savedLayer) {
 			if (savedLayer.getSource() && savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
 				savedLayer.getSource().forEachFeatureInExtent(extent, function(feature) {
-					if (!savedLayer.marker_)
+					if (!savedLayer.getProperties().dragable) // Don't save the cursor
 						features.push(feature);
 				});
 		}
@@ -2391,9 +2392,13 @@ function controlsCollection(opt) {
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
-function layerMarker(options) {
-	const els = [],
-		point = new ol.geom.Point([0, 0]),
+function layerMarker(opt) {
+	const options = {
+			position: [0, 0],
+			...opt
+		},
+		els = [],
+		point = new ol.geom.Point(options.position),
 		source = new ol.source.Vector({
 			features: [new ol.Feature(point)],
 		}),

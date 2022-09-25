@@ -7,18 +7,22 @@ RUPTURES INTERFACE MyOl
 
 BUGS
 ====
-//TODO BUG WRI Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-//TODO BUG WRI Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
-//BEST WRI largeur point_formulaire_modification pour petits écrans
-//TODO BUG WRI Click logo ne va pas à l'accueil en dehors de span
-//TODO BUG WRI Revoir bandeau grandes fenêtres & logo
+//TODO BUG Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
+//TODO BUG Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
+//TODO BUG Click logo ne va pas à l'accueil en dehors de span
+//TODO BUG Revoir bandeau grandes fenêtres & logo
+//BEST largeur point_formulaire_modification pour petits écrans
+//BEST https://bitsofco.de/what-self-skipwaiting-does-to-the-service-worker-lifecycle/ 
+//BEST https://stackoverflow.com/questions/59207110/in-a-pwa-is-there-a-way-to-check-for-a-waiting-service-worker-upgrade 
 
-EVOLUTION WRI PAGE ACCUEIL
+EVOLUTION PAGE ACCUEIL
 ==========================
-Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
-Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
-Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
-https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
+//BEST bandeau mot de passe oublié
+//BEST retrouver par le mail
+//BEST Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
+//BEST Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
+//BEST Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
+//BEST https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
 
 Accueil carte
 	menu
@@ -28,27 +32,30 @@ Point
 
 EVOLUTIONS
 ==========
-//BEST WRI N'afficher que les massifs contenant des points
-//BEST WRI Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
-//BEST WRI Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
-//BEST WRI ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
-//BEST WRI ce text est paramétrable depuis le wiki
+//BEST N'afficher que les massifs contenant des points
+//BEST Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
+//BEST Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
+//BEST ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
+//BEST ce text est paramétrable depuis le wiki
 
-http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
-https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
-https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
+//BEST https://www.educative.io/blog/5-minute-guide-to-push-notifications-in-pwa#implement 
+//BEST https://github.com/phpbb-seo/pwa/blob/main/event/main_listener.php 
 
-Couleur des pictos cabanes dont on n’a pas d’éléments pour dire qu’elles sont destinées à accueillir des randonneurs
+//BEST http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
+//BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
+//BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
+
+//BEST Couleur des pictos cabanes dont on n’a pas d’éléments pour dire qu’elles sont destinées à accueillir des randonneurs
 -	Picto cabane ou abri avec un 0 (comme aujourd’hui) similaire aux pictos de celles faites pour accueillir des randonneurs
 -	Picto cabane ou abri gris, mur noir avec 0 (urgence seulement) ou ? (on ne sait pas) ou X (fermé)
-Pictos geocaching
+//BEST Pictos geocaching
 
-Informations affichées pour les cabanes non destinées à y dormir
+//BEST Informations affichées pour les cabanes non destinées à y dormir
 -	Nom, position (carte), propriétaire / accessibilité, forum + bandeau expliquant que cette cabane n’est pas destinée à y dormir
 Auteur demande corrections
 
-dualité fiche-forum
-Fusion commentaire / forum : notion de post descriptif
+//BEST dualité fiche-forum
+-	Fusion commentaire / forum : notion de post descriptif
 
 Sur la visualisation d'un point, il arrive souvent que les contributeurs se perdent entre forum et commentaires, le paragraphe n'étant pas bien lu. Une piste serait d'intégrer le fil du forum à la page point.
 De manière générale, nous avons souvent mit en place des textes explicatifs pour apporter des précisions avec des liens rebondissants vers le wiki. Cette lecture peut décourager. Une option est d'utiliser plus fréquemment des icônes.
@@ -62,7 +69,7 @@ L'interprétation du "nouveau bbcode" plus riche semble moins bien passer coté 
 
 TOOLS
 =====
-? historique posts phpbb wri (ext/...)
+? historique posts phpbb (ext/...)
 	Paramétres inclusion posts dans points -> config.php
 Liste users surs / utilitaire scan liens
 Déraciner le wiki / le mettre dans le forum
@@ -84,8 +91,8 @@ Faire une fiche de tests
 
 AIDE TEST
 =========
-MultiPolygon multiple => WRI massif 3116 (plus dans la base de tests WRI)
-MultiPolygon avec trou => WRI massif 3127
+MultiPolygon multiple => massif 3116 (plus dans la base de tests WRI)
+MultiPolygon avec trou => massif 3127
 
 TRANSFERT WRI
 =============
