@@ -227,7 +227,7 @@ function controlTilesBuffer(opt) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Action on each layer
-		//TODO too much load on basic browsing
+		//BEST too much load on basic browsing
 		map.on('precompose', function() {
 			map.getLayers().forEach(function(layer) {
 				if (typeof layer.setPreload == 'function')
@@ -243,7 +243,6 @@ function controlTilesBuffer(opt) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
  */
-//TODO BUG ne cache pas les autres sous-menus
 function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return controlButton(); //HACK no button
@@ -271,6 +270,10 @@ function controlGeocoder(options) {
 		geocoder.element.addEventListener('pointerover', function(evt) {
 			if (evt.pointerType == 'mouse')
 				controlEl.classList.add('gcd-gl-expanded');
+
+			// Close other opened buttons
+			for (let el of document.getElementsByClassName('myol-button-selected'))
+				el.classList.remove('myol-button-selected');
 		});
 		geocoder.element.addEventListener('pointerout', function(evt) {
 			if (evt.pointerType == 'mouse')

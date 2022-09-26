@@ -1872,6 +1872,10 @@ function controlGeocoder(options) {
 		geocoder.element.addEventListener('pointerover', function(evt) {
 			if (evt.pointerType == 'mouse')
 				controlEl.classList.add('gcd-gl-expanded');
+
+			// Close other opened buttons
+			for (let el of document.getElementsByClassName('myol-button-selected'))
+				el.classList.remove('myol-button-selected');
 		});
 		geocoder.element.addEventListener('pointerout', function(evt) {
 			if (evt.pointerType == 'mouse')
