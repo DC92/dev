@@ -29,15 +29,16 @@ function controlButton(opt) {
 	}
 
 	// Display the button only if there are label & submenu
-	if (options.label && control.submenuEl && control.submenuEl.innerHTML)
-		control.element.appendChild(control.submenuEl);
-	else
+	if (!options.label || !control.submenuEl || !control.submenuEl.innerHTML)
 		return control;
 
 	// Populate control & button
 	buttonEl.innerHTML = options.label;
 	control.element.appendChild(buttonEl);
 	control.element.className = 'ol-control myol-button ' + options.className;
+
+	// Add submenu
+	control.element.appendChild(control.submenuEl);
 
 	// Assign button actions
 	control.element.addEventListener('mouseover', action);
