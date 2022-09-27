@@ -1,4 +1,13 @@
 if (typeof map !== 'undefined') {
+	
+	//TODO intégrer dans map=
+	/*
+		...layersWri({ // Refuges.info (2 level layer depending on resolution)
+			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
+		}),
+	*/
+
+
 	map.addLayer(layersWri({
 		selectorName: 'wri-features',
 		zIndex: 6,

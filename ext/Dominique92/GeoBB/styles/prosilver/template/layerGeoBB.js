@@ -4,13 +4,28 @@ var map = new ol.Map({
 		enableRotation: false,
 	}),
 
-	controls: controlsCollection({
+	controls: controlsCollection()
+		.concat(controlLayerSwitcher({
+			layers: layerTileCollection(),
+			additionalSelectorId: 'additional-selector',
+		})),
+
+/* //TODO DELETE
+	Wcontrols: controlsCollection({
 			permalink: {
 				display: mapType == 'index',
 			},
 		})
 		.concat(controlLayerSwitcher()),
+*/
+	layers: [
+		...layersGeoBB({ // Chemineur
+		selectorName: 'geobb-features',
+		}),
+		layerHover(),
+	],
 
+/* //TODO DELETE
 	layers: layersCluster({
 		host: '', // Relative address
 		layer: layerGeoBB,
@@ -23,6 +38,7 @@ var map = new ol.Map({
 			return styleOptionsFullLabel(feature, properties);
 		},
 	}),
+	*/
 });
 
 if (mapType == 'point')
