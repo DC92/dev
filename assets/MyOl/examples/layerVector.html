@@ -133,37 +133,33 @@ new ol.Map({
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
-
-		// 	Features layers
-		layersWri({ // Refuges.info (2 level layer depending on resolution)
-			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
-		}),
-		layerWriAreas({ // Massifs
-			selectorName: 'wri-massifs',
-		}),
-		layerPyreneesRefuges({
-			selectorName: 'prc-features',
-		}),
-		layerC2C({ // CampToCamp
-			selectorName: 'c2c-features',
-		}),
-		layersGeoBB({
-			selectorName: 'chem-features',
-			attribution: 'Chemineur',
-		}),
-		layerGeoBB({
-			strategy: ol.loadingstrategy.all,
-			host: '//alpages.info/',
-			selectorName: 'alp-features',
-			extraParams: function() {
-				return {
-					forums: '3,4,5',
-				}
+		...layerVectorCollection({
+			wri: {
+				selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
 			},
-			attribution: 'Alpages',
-		}),
-		layerOverpass({
-			selectorName: 'osm-features',
+			wriAreas: {
+				selectorName: 'wri-massifs',
+			},
+			pyreneesRefuges: {
+				selectorName: 'prc-features',
+			},
+			c2c: { // CampToCamp
+				selectorName: 'c2c-features',
+			},
+			chemineur: {
+				selectorName: 'chem-features',
+			},
+			alpages: {
+				selectorName: 'alp-features',
+				extraParams: function() {
+					return {
+						forums: '3,4,5',
+					}
+				},
+			},
+			osm: {
+				selectorName: 'osm-features',
+			},
 		}),
 	],
 });

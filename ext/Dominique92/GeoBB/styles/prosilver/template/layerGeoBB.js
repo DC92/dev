@@ -19,7 +19,7 @@ var map = new ol.Map({
 		.concat(controlLayerSwitcher()),
 */
 	layers: [
-		...layersGeoBB({ // Chemineur
+		layerClusterGeoBB({ // Chemineur
 		selectorName: 'geobb-features',
 		}),
 		layerHover(),

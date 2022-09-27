@@ -1270,7 +1270,7 @@ function layerGeoBB(options) {
 	});
 }
 
-function layersGeoBB(options) {
+function layerClusterGeoBB(options) {
 	const clusterLayer = layerGeoBB({
 		minResolution: 100,
 		extraParams: function(bbox) {
@@ -1331,7 +1331,7 @@ function layerWri(options) {
 	});
 }
 
-function layersWri(options) {
+function layerClusterWri(options) {
 	const clusterLayer = layerWri({
 		minResolution: 100,
 		strategy: ol.loadingstrategy.all,
@@ -1599,6 +1599,31 @@ function layerOverpass(opt) {
 	};
 
 	return layer;
+}
+
+/**
+ * Vectors layers examples
+ */
+function layerVectorCollection(options) {
+	options = options || {};
+
+	return [
+		layerClusterWri(options.wri),
+		layerWriAreas(options.wriAreas),
+		layerPyreneesRefuges(options.pyreneesRefuges),
+		layerC2C(options.c2c),
+		layerClusterGeoBB({
+			attribution: 'Chemineur',
+			...options.chemineur
+		}),
+		layerGeoBB({
+			strategy: ol.loadingstrategy.all,
+			host: '//alpages.info/',
+			attribution: 'Alpages',
+			...options.alpages
+		}),
+		layerOverpass(options.osm),
+	];
 }
 
 /* FILE src/controls.js */
