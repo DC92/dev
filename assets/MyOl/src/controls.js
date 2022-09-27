@@ -42,18 +42,19 @@ function controlButton(opt) {
 	// Assign button actions
 	control.element.addEventListener('mouseover', action);
 	control.element.addEventListener('mouseout', action);
-	control.element.addEventListener('click', action);
+	buttonEl.addEventListener('click', action);
 
 	function action(evt) {
 		if (evt.type == 'mouseover')
-			evt.currentTarget.classList.add('myol-button-hover');
+			control.element.classList.add('myol-button-hover');
 		else // mouseout & click
-			evt.currentTarget.classList.remove('myol-button-hover');
+			control.element.classList.remove('myol-button-hover');
 
-		if (evt.type == 'click')
-			evt.currentTarget.classList.toggle('myol-button-selected');
+		if (evt.type == 'click') // Mouse click & touch
+			control.element.classList.toggle('myol-button-selected');
 
-		for (let el of control.element.parentElement.getElementsByClassName('myol-button'))
+		// Close other open buttons
+		for (let el of document.getElementsByClassName('myol-button'))
 			if (el != control.element)
 				el.classList.remove('myol-button-selected');
 	}
