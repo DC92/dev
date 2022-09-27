@@ -62,7 +62,7 @@ Based on https://openlayers.org
 	<link <?=fl($myol_path.'../ol/ol.css')?>>
 
 	<!-- Recherche par nom -->
-	<script <?=fl($myol_path.'../geocoder/ol-geocoder-debug.js')?>></script>
+	<script <?=fl($myol_path.'../geocoder/ol-geocoder.js')?>></script>
 	<link <?=fl($myol_path.'../geocoder/ol-geocoder.min.css')?>>
 
 	<!-- My Openlayers -->

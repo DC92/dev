@@ -47,6 +47,12 @@ function layerVector(opt) {
 		}),
 		statusEl = document.getElementById(selectorNames[0] + '-status'); // XHR download tracking
 
+	layer.setMapInternal = function(map) { //HACK execute actions on Map init
+		ol.layer.Vector.prototype.setMapInternal.call(this, map);
+
+		listenHover(map);
+	};
+
 	// Embark hover style to render hovering
 	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
@@ -55,22 +61,6 @@ function layerVector(opt) {
 
 	// Init parameters depending on the selector
 	options.callBack();
-
-	// Display loading status
-	if (statusEl)
-		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
-			if (!statusEl.textContent.includes('error'))
-				statusEl.innerHTML = '';
-
-			//BEST status out of zoom bounds
-			switch (evt.type) {
-				case 'featuresloadstart':
-					statusEl.innerHTML = '&#8987;';
-					break;
-				case 'featuresloaderror':
-					statusEl.innerHTML = 'Erreur !';
-			}
-		});
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
@@ -98,6 +88,22 @@ function layerVector(opt) {
 
 		return args.url + '?' + query.join('&');
 	}
+
+	// Display loading status
+	if (statusEl)
+		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
+			if (!statusEl.textContent.includes('error'))
+				statusEl.innerHTML = '';
+
+			//BEST status out of zoom bounds
+			switch (evt.type) {
+				case 'featuresloadstart':
+					statusEl.innerHTML = '&#8987;';
+					break;
+				case 'featuresloaderror':
+					statusEl.innerHTML = 'Erreur !';
+			}
+		});
 
 	format.readFeatures = function(doc, opt) {
 		const json = JSONparse(doc);
@@ -171,7 +177,13 @@ function layerVectorCluster(opt) {
 			...options
 		});
 
-	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
+	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; //TODO KESAKO ?
+
+	clusterLayer.setMapInternal = function(map) { //HACK execute actions on Map init
+		ol.layer.Vector.prototype.setMapInternal.call(this, map);
+
+		listenHover(map);
+	};
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
@@ -223,9 +235,6 @@ function layerVectorCluster(opt) {
 	function clusterStyle(feature, resolution) {
 		const features = feature.get('features'),
 			style = layer.getStyleFunction();
-
-		if (features)
-			feature.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
 
 		return style(feature, resolution);
 	}
@@ -382,14 +391,12 @@ function styleOptionsCluster(feature, properties) {
  * Global hovering functions layer
    To be declared & added once for a map
  */
-function layerHover() {
-	const source = new ol.source.Vector(),
-		layer = new ol.layer.Vector({
-			source: source,
-		});
-
-	layer.setMapInternal = function(map) { //HACK execute actions on Map init
-		ol.layer.Vector.prototype.setMapInternal.call(this, map);
+function listenHover(map) {
+	if (!map.layerHover) {
+		const source = new ol.source.Vector(),
+			layer = new ol.layer.Vector({
+				source: source,
+			});
 
 		map.on(['pointermove', 'click'], (evt) => {
 			// Find hovered feature
@@ -448,19 +455,20 @@ function layerHover() {
 			if (!found)
 				source.clear();
 		});
-	};
 
-	// Leaving the map reset hovering
-	window.addEventListener('mousemove', function(evt) {
-		const divRect = layer.get('map').getTargetElement().getBoundingClientRect();
+		// Leaving the map reset hovering
+		window.addEventListener('mousemove', function(evt) {
+			const divRect = map.getTargetElement().getBoundingClientRect();
 
-		// The mouse is outside of the map
-		if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-			evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-			source.clear();
-	});
+			// The mouse is outside of the map
+			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+				source.clear();
+		});
 
-	return layer;
+		map.layerHover = layer;
+		map.addLayer(layer);
+	}
 }
 
 /**

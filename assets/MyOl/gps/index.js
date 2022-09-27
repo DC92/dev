@@ -76,7 +76,6 @@ window.addEventListener('load', function() {
 		}),
 		controls: controlsCollection(controlOptions)
 			.concat(controlLayerSwitcher(controlOptions.layerSwitcher)),
-		layers: layers
-			.concat(layerHover()),
+		layers: layers,
 	});
 });

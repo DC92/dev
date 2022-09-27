@@ -1,9 +1,7 @@
 RUPTURES INTERFACE MyOl
 =======================
-//TODO layerHover(),
 //TODO selectors : status en span (1 seul caractère !)
 //TODO delete ol.css.map
-//TODO geocoder/ol-geocoder.js => ol-geocoder-debug.js
 //TODO edit download
 
 BUGS
