@@ -3,6 +3,7 @@ RUPTURES INTERFACE MyOl
 //TODO selectors : status en span (1 seul caractère !)
 //TODO delete ol.css.map
 //TODO edit download
+//TODO ...layersWri => layersWri / ...layersGeoBB => layersGeoBB
 
 BUGS
 ====

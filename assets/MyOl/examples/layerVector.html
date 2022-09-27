@@ -135,7 +135,7 @@ new ol.Map({
 		}),
 
 		// 	Features layers
-		...layersWri({ // Refuges.info (2 level layer depending on resolution)
+		layersWri({ // Refuges.info (2 level layer depending on resolution)
 			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
 		}),
 		layerWriAreas({ // Massifs
@@ -147,7 +147,7 @@ new ol.Map({
 		layerC2C({ // CampToCamp
 			selectorName: 'c2c-features',
 		}),
-		...layersGeoBB({
+		layersGeoBB({
 			selectorName: 'chem-features',
 			attribution: 'Chemineur',
 		}),

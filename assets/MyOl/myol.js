@@ -726,17 +726,15 @@ function layerVector(opt) {
 	layer.setMapInternal = function(map) {
 		ol.layer.Vector.prototype.setMapInternal.call(this, map);
 
+		if (options.altLayer)
+			map.addLayer(options.altLayer);
+
 		listenHover(map);
 	};
 
-	// Embark hover style to render hovering
-	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
-
-	// Setup the selector managers
-	selectorNames.map(name => selector(name, options.callBack));
-
-	// Init parameters depending on the selector
-	options.callBack();
+	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
+	selectorNames.map(name => selector(name, options.callBack)); // Setup the selector managers
+	options.callBack(); // Init parameters depending on the selector
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
@@ -852,13 +850,8 @@ function layerVectorCluster(opt) {
 			...options
 		});
 
-	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
-
-	clusterLayer.setMapInternal = function(map) {
-		ol.layer.Vector.prototype.setMapInternal.call(this, map);
-
-		listenHover(map);
-	};
+	clusterLayer.setMapInternal = layer.setMapInternal;
+	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
@@ -1278,24 +1271,22 @@ function layerGeoBB(options) {
 }
 
 function layersGeoBB(options) {
-	return [
-		// Basic points
-		layerGeoBB({
-			maxResolution: 100,
-			...options
-		}),
-		// Clusterised layer
-		layerGeoBB({
-			minResolution: 100,
-			extraParams: function(bbox) {
-				return {
-					layer: 'cluster',
-					bbox: bbox.join(','),
-				};
-			},
-			...options
-		}),
-	];
+	const clusterLayer = layerGeoBB({
+		minResolution: 100,
+		extraParams: function(bbox) {
+			return {
+				layer: 'cluster',
+				bbox: bbox.join(','),
+			};
+		},
+		...options
+	});
+
+	return layerGeoBB({
+		maxResolution: 100,
+		altLayer: clusterLayer,
+		...options
+	});
 }
 
 /**
@@ -1341,24 +1332,22 @@ function layerWri(options) {
 }
 
 function layersWri(options) {
-	return [
-		// Basic points
-		layerWri({
-			maxResolution: 100,
-			...options
-		}),
-		// Clusterised layer
-		layerWri({
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			extraParams: function() {
-				return {
-					cluster: 0.1,
-				};
-			},
-			...options
-		}),
-	];
+	const clusterLayer = layerWri({
+		minResolution: 100,
+		strategy: ol.loadingstrategy.all,
+		extraParams: function() {
+			return {
+				cluster: 0.1,
+			};
+		},
+		...options
+	});
+
+	return layerWri({
+		maxResolution: 100,
+		altLayer: clusterLayer,
+		...options
+	});
 }
 
 function layerWriAreas(options) {

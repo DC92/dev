@@ -56,24 +56,22 @@ function layerGeoBB(options) {
 }
 
 function layersGeoBB(options) {
-	return [
-		// Basic points
-		layerGeoBB({
-			maxResolution: 100,
-			...options
-		}),
-		// Clusterised layer
-		layerGeoBB({
-			minResolution: 100,
-			extraParams: function(bbox) {
-				return {
-					layer: 'cluster',
-					bbox: bbox.join(','),
-				};
-			},
-			...options
-		}),
-	];
+	const clusterLayer = layerGeoBB({
+		minResolution: 100,
+		extraParams: function(bbox) {
+			return {
+				layer: 'cluster',
+				bbox: bbox.join(','),
+			};
+		},
+		...options
+	});
+
+	return layerGeoBB({
+		maxResolution: 100,
+		altLayer: clusterLayer,
+		...options
+	});
 }
 
 /**
@@ -119,24 +117,22 @@ function layerWri(options) {
 }
 
 function layersWri(options) {
-	return [
-		// Basic points
-		layerWri({
-			maxResolution: 100,
-			...options
-		}),
-		// Clusterised layer
-		layerWri({
-			minResolution: 100,
-			strategy: ol.loadingstrategy.all,
-			extraParams: function() {
-				return {
-					cluster: 0.1,
-				};
-			},
-			...options
-		}),
-	];
+	const clusterLayer = layerWri({
+		minResolution: 100,
+		strategy: ol.loadingstrategy.all,
+		extraParams: function() {
+			return {
+				cluster: 0.1,
+			};
+		},
+		...options
+	});
+
+	return layerWri({
+		maxResolution: 100,
+		altLayer: clusterLayer,
+		...options
+	});
 }
 
 function layerWriAreas(options) {

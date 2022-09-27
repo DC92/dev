@@ -50,17 +50,15 @@ function layerVector(opt) {
 	layer.setMapInternal = function(map) { //HACK execute actions on Map init
 		ol.layer.Vector.prototype.setMapInternal.call(this, map);
 
+		if (options.altLayer)
+			map.addLayer(options.altLayer);
+
 		listenHover(map);
 	};
 
-	// Embark hover style to render hovering
-	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction;
-
-	// Setup the selector managers
-	selectorNames.map(name => selector(name, options.callBack));
-
-	// Init parameters depending on the selector
-	options.callBack();
+	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
+	selectorNames.map(name => selector(name, options.callBack)); // Setup the selector managers
+	options.callBack(); // Init parameters depending on the selector
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
@@ -177,13 +175,8 @@ function layerVectorCluster(opt) {
 			...options
 		});
 
-	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; //TODO KESAKO ?
-
-	clusterLayer.setMapInternal = function(map) { //HACK execute actions on Map init
-		ol.layer.Vector.prototype.setMapInternal.call(this, map);
-
-		listenHover(map);
-	};
+	clusterLayer.setMapInternal = layer.setMapInternal; //HACK execute actions on Map init
+	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
