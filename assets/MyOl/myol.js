@@ -2242,6 +2242,25 @@ function controlDownload(opt) {
 				});
 		}
 
+		if (formatName == 'GPX')
+			// Transform *Polygons in linestrings
+			for (let f in features) {
+				const geometry = features[f].getGeometry();
+
+				if (geometry.getType().includes('Polygon')) {
+					geometry.getCoordinates().forEach(coords => {
+						if (typeof coords[0][0] == 'number')
+							// Polygon
+							features.push(new ol.Feature(new ol.geom.LineString(coords)));
+						else
+							// MultiPolygon
+							coords.forEach(subCoords =>
+								features.push(new ol.Feature(new ol.geom.LineString(subCoords)))
+							)
+					});
+				}
+			}
+
 		const data = format.writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',

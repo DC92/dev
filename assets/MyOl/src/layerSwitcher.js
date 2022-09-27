@@ -2,8 +2,7 @@
  * Layer switcher
  * Need to include layerSwitcher.css
  */
-//BEST alt key to switch layers / transparency
-//BEST how do we do on touch terminal ?
+//BEST how do we do on touch terminal ? alt key to switch layers / transparency
 function controlLayerSwitcher(options) {
 	const control = controlButton({
 			className: 'myol-button-switcher',

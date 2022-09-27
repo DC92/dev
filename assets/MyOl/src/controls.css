@@ -24,8 +24,8 @@
 }
 .myol-button > div {
 	max-height: calc(100% - 38px);
-	opacity: 1;
-	transition: max-height 0.8s ease-in, opacity 0.2s ease-out;
+	opacity: 0.8;
+	transition: max-height 0.5s ease-in, opacity 0.2s ease-out;
 	overflow: auto;
 	z-index: 30;
 }

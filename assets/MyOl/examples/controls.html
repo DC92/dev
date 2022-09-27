@@ -89,6 +89,30 @@ const geojsonObject = {
 					],
 				},
 			},
+			{
+				'type': 'Feature',
+				'geometry': {
+					'type': 'MultiPolygon',
+					'coordinates': [
+						[
+							[
+								[-2e6, 6e6],
+								[0, 6e6],
+								[0, 8e6],
+								[-2e6, 8e6],
+								[-2e6, 6e6],
+							],
+							[
+								[-1.5e6, 6.5e6],
+								[-0.5e6, 6.5e6],
+								[-0.5e6, 7.5e6],
+								[-1.5e6, 7.5e6],
+								[-1.5e6, 6.5e6],
+							],
+						],
+					],
+				},
+			},
 		],
 	},
 	vectorLayer = new ol.layer.Vector({
@@ -98,6 +122,9 @@ const geojsonObject = {
 		style: new ol.style.Style({
 			stroke: new ol.style.Stroke({
 				color: 'blue',
+			}),
+			fill: new ol.style.Fill({
+				color: 'rgba(0, 0, 255, 0.3)',
 			}),
 		}),
 	});

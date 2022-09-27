@@ -7,7 +7,6 @@
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
-//BEST left aligned buttons when screen vertical
 function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
@@ -507,7 +506,7 @@ function controlGPS(options) {
  * Requires controlButton
  */
 //BEST export / import names and links
-//BEST Chemineur dans MyOl => Traduction sym (symbole export GPS ?)
+//BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
 //BEST misc formats
 function controlLoadGPX(options) {
 	const control = controlButton({
@@ -603,8 +602,7 @@ function controlLoadGPX(options) {
  * File downloader control
  * Requires controlButton
  */
-//BEST BUG incompatible avec clusters
-//TODO BUG WRI EDIT n'exporte pas les polygones en GPX !
+//BEST BUG incompatible with clusters
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
@@ -645,6 +643,25 @@ function controlDownload(opt) {
 						features.push(feature);
 				});
 		}
+
+		if (formatName == 'GPX')
+			// Transform *Polygons in linestrings
+			for (let f in features) {
+				const geometry = features[f].getGeometry();
+
+				if (geometry.getType().includes('Polygon')) {
+					geometry.getCoordinates().forEach(coords => {
+						if (typeof coords[0][0] == 'number')
+							// Polygon
+							features.push(new ol.Feature(new ol.geom.LineString(coords)));
+						else
+							// MultiPolygon
+							coords.forEach(subCoords =>
+								features.push(new ol.Feature(new ol.geom.LineString(subCoords)))
+							)
+					});
+				}
+			}
 
 		const data = format.writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
