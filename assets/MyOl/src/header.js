@@ -20,7 +20,7 @@ if (location.hash == '###')
  * Display misc values
  */
 (async function() {
-	let data = ['Openlayers '+ol.version];
+	let data = ['Openlayers ' + ol.version];
 
 	// myol storages in the subdomain
 	['localStorage', 'sessionStorage'].forEach(s => {

@@ -41,7 +41,7 @@ if (typeof map !== 'undefined') {
 			telephone: 'Telephone',
 		},
 	}));
-	map.addLayer(layerPyreneesRefuges({
+	map.addLayer(layerPrc({
 		selectorName: 'select-prc',
 		zIndex: 4,
 	}));

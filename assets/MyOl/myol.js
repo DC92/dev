@@ -28,7 +28,7 @@ if (location.hash == '###')
  * Display misc values
  */
 (async function() {
-	let data = ['Openlayers '+ol.version];
+	let data = ['Openlayers ' + ol.version];
 
 	// myol storages in the subdomain
 	['localStorage', 'sessionStorage'].forEach(s => {
@@ -686,6 +686,7 @@ function controlLayerSwitcher(options) {
  * selectorName : <input name="SELECTORNAME"> url arguments selector
    can be several SELECTORNAME1,SELECTORNAME2,...
    display loading status <TAG id="SELECTOR_NAME-status"></TAG>
+ * callBack : selector function to call when selected 
  * urlArgsFunction: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
@@ -693,14 +694,14 @@ function controlLayerSwitcher(options) {
  * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
+ * altLayer : another layer to add to the map with this one (for resolution depending layers)
  */
 function layerVector(opt) {
 	const options = {
 			selectorName: '',
 			callBack: function() {
 				layer.setVisible(
-					selector(selectorNames[0]).length || // By default, visibility depends on the first selector only
-					!options.selectorName // No selector at all
+					selector(selectorNames[0]).length // By default, visibility depends on the first selector only
 				);
 				source.refresh();
 			},
@@ -1238,6 +1239,7 @@ function layerGeoBB(options) {
 				...opt.extraParams(bbox),
 			};
 		},
+		selectorName: 'select-chemineur',
 		extraParams: function(bbox) {
 			return {
 				bbox: bbox.join(','),
@@ -1313,6 +1315,7 @@ function layerWri(options) {
 				...opt.extraParams(bbox),
 			};
 		},
+		selectorName: 'select-wri',
 		extraParams: function(bbox) {
 			return {
 				bbox: bbox.join(','),
@@ -1375,6 +1378,7 @@ function layerWriAreas(options) {
 				type_polygon: opt.polygon,
 			};
 		},
+		selectorName: 'select-massifs',
 		convertProperties: function(properties) {
 			return {
 				name: properties.nom,
@@ -1414,9 +1418,10 @@ function layerWriAreas(options) {
 /**
  * Site pyrenees-refuges.com
  */
-function layerPyreneesRefuges(options) {
+function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+		selectorName: 'select-prc',
 		strategy: ol.loadingstrategy.all,
 		convertProperties: function(properties) {
 			return {
@@ -1480,6 +1485,7 @@ function layerC2C(options) {
 				bbox: extent.join(','),
 			};
 		},
+		selectorName: 'select-c2c',
 		format: format,
 		styleOptionsFunction: function(f, properties) {
 			return styleOptionsIconChemineur(properties.type);
@@ -1505,6 +1511,7 @@ function layerOverpass(opt) {
 			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
+			selectorName: 'select-osm',
 			maxResolution: 50,
 			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
@@ -1625,7 +1632,7 @@ function layerVectorCollection(options) {
 	return [
 		layerClusterWri(options.wri),
 		layerWriAreas(options.wriAreas),
-		layerPyreneesRefuges(options.pyreneesRefuges),
+		layerPrc(options.prc),
 		layerC2C(options.c2c),
 		layerClusterGeoBB({
 			attribution: 'Chemineur',
@@ -1634,6 +1641,7 @@ function layerVectorCollection(options) {
 		layerGeoBB({
 			strategy: ol.loadingstrategy.all,
 			host: '//alpages.info/',
+			selectorName: 'select-alpages',
 			attribution: 'Alpages',
 			...options.alpages
 		}),

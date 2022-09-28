@@ -10,6 +10,7 @@
  * selectorName : <input name="SELECTORNAME"> url arguments selector
    can be several SELECTORNAME1,SELECTORNAME2,...
    display loading status <TAG id="SELECTOR_NAME-status"></TAG>
+ * callBack : selector function to call when selected 
  * urlArgsFunction: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
@@ -17,14 +18,14 @@
  * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
  * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
+ * altLayer : another layer to add to the map with this one (for resolution depending layers)
  */
 function layerVector(opt) {
 	const options = {
 			selectorName: '',
 			callBack: function() {
 				layer.setVisible(
-					selector(selectorNames[0]).length || // By default, visibility depends on the first selector only
-					!options.selectorName // No selector at all
+					selector(selectorNames[0]).length // By default, visibility depends on the first selector only
 				);
 				source.refresh();
 			},
