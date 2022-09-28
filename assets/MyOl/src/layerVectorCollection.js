@@ -55,20 +55,24 @@ function layerGeoBB(options) {
 	});
 }
 
-function layerClusterGeoBB(options) {
-	const clusterLayer = layerGeoBB({
-		minResolution: 100,
-		extraParams: function(bbox) {
-			return {
-				layer: 'cluster',
-				bbox: bbox.join(','),
-			};
+function layerClusterGeoBB(opt) {
+	const options = {
+			transitionResolution: 100,
+			...opt
 		},
-		...options
-	});
+		clusterLayer = layerGeoBB({
+			minResolution: options.transitionResolution,
+			extraParams: function(bbox) {
+				return {
+					layer: 'cluster',
+					bbox: bbox.join(','),
+				};
+			},
+			...options
+		});
 
 	return layerGeoBB({
-		maxResolution: 100,
+		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
 		...options
 	});
@@ -116,20 +120,24 @@ function layerWri(options) {
 	});
 }
 
-function layerClusterWri(options) {
-	const clusterLayer = layerWri({
-		minResolution: 100,
-		strategy: ol.loadingstrategy.all,
-		extraParams: function() {
-			return {
-				cluster: 0.1,
-			};
+function layerClusterWri(opt) {
+	const options = {
+			transitionResolution: 100,
+			...opt
 		},
-		...options
-	});
+		clusterLayer = layerWri({
+			minResolution: options.transitionResolution,
+			strategy: ol.loadingstrategy.all,
+			extraParams: function() {
+				return {
+					cluster: 0.1,
+				};
+			},
+			...options
+		});
 
 	return layerWri({
-		maxResolution: 100,
+		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
 		...options
 	});
@@ -277,9 +285,7 @@ function layerOverpass(opt) {
 			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
-			urlArgsFunction: urlArgsFunction,
 			maxResolution: 50,
-			format: format,
 			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
@@ -288,7 +294,11 @@ function layerOverpass(opt) {
 			},
 			...opt
 		},
-		layer = layerVectorCluster(options),
+		layer = layerVectorCluster({
+			urlArgsFunction: urlArgsFunction,
+			format: format,
+			...options
+		}),
 		statusEl = document.getElementById(options.selectorName),
 		selectorEls = document.getElementsByName(options.selectorName);
 
@@ -389,6 +399,7 @@ function layerOverpass(opt) {
 /**
  * Vectors layers examples
  */
+//TODO normaliser les id selecteurs (et avec WRI)
 function layerVectorCollection(options) {
 	options = options || {};
 

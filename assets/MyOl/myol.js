@@ -726,10 +726,13 @@ function layerVector(opt) {
 	layer.setMapInternal = function(map) {
 		ol.layer.Vector.prototype.setMapInternal.call(this, map);
 
+		// Add the alternate layer if any
 		if (options.altLayer)
 			map.addLayer(options.altLayer);
 
-		listenHover(map);
+		// Add a layer to manage hovered features (once for a map)
+		if (!map.layerHover)
+			map.layerHover = layerHover(map);
 	};
 
 	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
@@ -1057,84 +1060,86 @@ function styleOptionsCluster(feature, properties) {
  * Global hovering functions layer
    To be declared & added once for a map
  */
-function listenHover(map) {
-	if (!map.layerHover) {
-		const source = new ol.source.Vector(),
-			layer = new ol.layer.Vector({
-				source: source,
-			});
+function layerHover(map) {
+	const source = new ol.source.Vector(),
+		layer = new ol.layer.Vector({
+			source: source,
+		});
 
-		map.on(['pointermove', 'click'], (evt) => {
-			// Find hovered feature
-			const found = map.forEachFeatureAtPixel(
+	map.addLayer(layer);
+
+	// Leaving the map reset hovering
+	window.addEventListener('mousemove', function(evt) {
+		const divRect = map.getTargetElement().getBoundingClientRect();
+
+		// The mouse is outside of the map
+		if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+			evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+			source.clear();
+	});
+
+	map.on(['pointermove', 'click'], (evt) => {
+		// Find hovered feature
+		const map = evt.target,
+			found = map.forEachFeatureAtPixel(
 				map.getEventPixel(evt.originalEvent),
-				function(hoveredFeature, hoveredLayer) {
-					const hoveredProperties = hoveredFeature.getProperties();
-
-					// Click on a feature
-					if (evt.type == 'click') {
-						if (hoveredProperties.url) {
-							// Open a new tag
-							if (evt.originalEvent.ctrlKey)
-								window.open(hoveredProperties.url, '_blank').focus();
-							else
-								// Open a new window
-								if (evt.originalEvent.shiftKey)
-									window.open(hoveredProperties.url, '_blank', 'resizable=yes').focus();
-								else
-									// Go on the same window
-									window.location.href = hoveredProperties.url;
-						}
-						// Cluster
-						else if (hoveredProperties.features)
-							map.getView().animate({
-								zoom: map.getView().getZoom() + 2,
-								center: hoveredProperties.geometry.getCoordinates(),
-							});
-					}
-
-					// Over the hover (Label ?)
-					if (hoveredLayer.ol_uid == layer.ol_uid)
-						return true; // Don't undisplay it
-
-					// Hover a feature
-					if (typeof hoveredLayer.hoverStyleOptionsFunction == 'function') {
-						source.clear();
-						source.addFeature(hoveredFeature);
-						layer.setStyle(new ol.style.Style(
-							hoveredLayer.hoverStyleOptionsFunction(
-								hoveredFeature,
-								hoveredProperties
-							)
-						));
-						layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
-
-						return hoveredFeature; // Don't continue
-					}
-				}, {
+				hoverFeature, {
 					hitTolerance: 6, // Default 0
 				}
 			);
 
-			// Erase existing hover if nothing found
-			map.getViewport().style.cursor = found ? 'pointer' : '';
-			if (!found)
+		// Erase existing hover if nothing found
+		map.getViewport().style.cursor = found ? 'pointer' : '';
+		if (!found)
+			source.clear();
+
+		function hoverFeature(hoveredFeature, hoveredLayer) {
+			const hoveredProperties = hoveredFeature.getProperties();
+
+			// Click on a feature
+			if (evt.type == 'click') {
+				if (hoveredProperties.url) {
+					// Open a new tag
+					if (evt.originalEvent.ctrlKey)
+						window.open(hoveredProperties.url, '_blank').focus();
+					else
+						// Open a new window
+						if (evt.originalEvent.shiftKey)
+							window.open(hoveredProperties.url, '_blank', 'resizable=yes').focus();
+						else
+							// Go on the same window
+							window.location.href = hoveredProperties.url;
+				}
+				// Cluster
+				else if (hoveredProperties.features)
+					map.getView().animate({
+						zoom: map.getView().getZoom() + 2,
+						center: hoveredProperties.geometry.getCoordinates(),
+					});
+			}
+
+			// Over the hover (Label ?)
+			if (hoveredLayer.ol_uid == layer.ol_uid)
+				return true; // Don't undisplay it
+
+			// Hover a feature
+			if (typeof hoveredLayer.hoverStyleOptionsFunction == 'function') {
 				source.clear();
-		});
+				source.addFeature(hoveredFeature);
+				layer.setStyle(new ol.style.Style(
+					hoveredLayer.hoverStyleOptionsFunction(
+						hoveredFeature,
+						hoveredProperties
+					)
+				));
+				layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
 
-		// Leaving the map reset hovering
-		window.addEventListener('mousemove', function(evt) {
-			const divRect = map.getTargetElement().getBoundingClientRect();
+				return hoveredFeature; // Don't continue
+			}
+		}
+	});
 
-			// The mouse is outside of the map
-			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				source.clear();
-		});
-
-		map.layerHover = layer;
-		map.addLayer(layer);
-	}
+	return layer;
 }
 
 /**
@@ -1270,20 +1275,24 @@ function layerGeoBB(options) {
 	});
 }
 
-function layerClusterGeoBB(options) {
-	const clusterLayer = layerGeoBB({
-		minResolution: 100,
-		extraParams: function(bbox) {
-			return {
-				layer: 'cluster',
-				bbox: bbox.join(','),
-			};
+function layerClusterGeoBB(opt) {
+	const options = {
+			transitionResolution: 100,
+			...opt
 		},
-		...options
-	});
+		clusterLayer = layerGeoBB({
+			minResolution: options.transitionResolution,
+			extraParams: function(bbox) {
+				return {
+					layer: 'cluster',
+					bbox: bbox.join(','),
+				};
+			},
+			...options
+		});
 
 	return layerGeoBB({
-		maxResolution: 100,
+		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
 		...options
 	});
@@ -1331,20 +1340,24 @@ function layerWri(options) {
 	});
 }
 
-function layerClusterWri(options) {
-	const clusterLayer = layerWri({
-		minResolution: 100,
-		strategy: ol.loadingstrategy.all,
-		extraParams: function() {
-			return {
-				cluster: 0.1,
-			};
+function layerClusterWri(opt) {
+	const options = {
+			transitionResolution: 100,
+			...opt
 		},
-		...options
-	});
+		clusterLayer = layerWri({
+			minResolution: options.transitionResolution,
+			strategy: ol.loadingstrategy.all,
+			extraParams: function() {
+				return {
+					cluster: 0.1,
+				};
+			},
+			...options
+		});
 
 	return layerWri({
-		maxResolution: 100,
+		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
 		...options
 	});
@@ -1492,9 +1505,7 @@ function layerOverpass(opt) {
 			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
-			urlArgsFunction: urlArgsFunction,
 			maxResolution: 50,
-			format: format,
 			styleOptionsFunction: function(f, properties) {
 				return styleOptionsIconChemineur(properties.type);
 			},
@@ -1503,7 +1514,11 @@ function layerOverpass(opt) {
 			},
 			...opt
 		},
-		layer = layerVectorCluster(options),
+		layer = layerVectorCluster({
+			urlArgsFunction: urlArgsFunction,
+			format: format,
+			...options
+		}),
 		statusEl = document.getElementById(options.selectorName),
 		selectorEls = document.getElementsByName(options.selectorName);
 

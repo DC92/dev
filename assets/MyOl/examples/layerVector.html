@@ -51,26 +51,26 @@ Based on https://openlayers.org
 
 	<div class="selector">
 		<p>
-			<label for="prc-features">Pyrenees-refuges.com</label>
-			<input type="checkbox" name="prc-features" id="prc-features" />
-			<span id="prc-features-status"></span>
+			<label for="select-prc">Pyrenees-refuges.com</label>
+			<input type="checkbox" name="select-prc" id="select-prc" />
+			<span id="select-prc-status"></span>
 		</p><p>
-			<label for="chem-features">Chemineur</label>
-			<input type="checkbox" name="chem-features" id="chem-features" value="3,8,20,23" />
-			<span id="chem-features-status"></span>
+			<label for="select-chemineur">Chemineur</label>
+			<input type="checkbox" name="select-chemineur" id="select-chemineur" value="3,8,20,23" />
+			<span id="select-chemineur-status"></span>
 		</p><p>
-			<label for="c2c-features">Camptocamp.org</label>
-			<input type="checkbox" name="c2c-features" id="c2c-features" />
-			<span id="c2c-features-status"></span>
+			<label for="select-c2c">Camptocamp.org</label>
+			<input type="checkbox" name="select-c2c" id="select-c2c" />
+			<span id="select-c2c-status"></span>
 			<p>Only 100 features at a time</p>
 		</p><div>
-			<label for="alp-features">Alpages.info</label>
-			<input type="checkbox" name="alp-features" id="alp-features" value="4,5" />
-			<p id="alp-features-status"></p>
+			<label for="select-alpages">Alpages.info</label>
+			<input type="checkbox" name="select-alpages" id="select-alpages" value="4,5" />
+			<p id="select-alpages-status"></p>
 		</div><div>
-			<label for="wri-massifs">Massifs</label>
-			<input type="checkbox" name="wri-massifs" id="wri-massifs" />
-			<p id="wri-massifs-status"></p>
+			<label for="select-massifs">Massifs</label>
+			<input type="checkbox" name="select-massifs" id="select-massifs" />
+			<p id="select-massifs-status"></p>
 		</div>
 	</div>
 
@@ -78,45 +78,45 @@ Based on https://openlayers.org
 		<div>
 			<p><input type="checkbox" name="wri-massif" id="wri-massif" value="4" />
 			<label for="wri-massif">Vercors uniquement</label></p>
-			<label for="wri-features">Refuges.info</label>
-			<input type="checkbox" name="wri-features" id="wri-features" value="all" />
+			<label for="select-wri">Refuges.info</label>
+			<input type="checkbox" name="select-wri" id="select-wri" value="all" />
 			<ul>
-				<li><input type="checkbox" name="wri-features" value="7" />cabane non gardée</li>
-				<li><input type="checkbox" name="wri-features" value="10" />refuge gardé</li>
-				<li><input type="checkbox" name="wri-features" value="9" />gîte d'étape</li>
-				<li><input type="checkbox" name="wri-features" value="23" />point d'eau</li>
-				<li><input type="checkbox" name="wri-features" value="6" />sommet</li>
-				<li><input type="checkbox" name="wri-features" value="3" />passage délicat</li>
+				<li><input type="checkbox" name="select-wri" value="7" />cabane non gardée</li>
+				<li><input type="checkbox" name="select-wri" value="10" />refuge gardé</li>
+				<li><input type="checkbox" name="select-wri" value="9" />gîte d'étape</li>
+				<li><input type="checkbox" name="select-wri" value="23" />point d'eau</li>
+				<li><input type="checkbox" name="select-wri" value="6" />sommet</li>
+				<li><input type="checkbox" name="select-wri" value="3" />passage délicat</li>
 			</ul>
-			<p id="wri-features-status"></p>
+			<p id="select-wri-status"></p>
 		</div>
 	</div>
 
 	<div class="selector">
-		<label for="osm-features">Overpass (OSM services)</label>
-		<input type="checkbox" name="osm-features" id="osm-features" value="all" />
+		<label for="select-osm">Overpass (OSM services)</label>
+		<input type="checkbox" name="select-osm" id="select-osm" value="all" />
 		<ul>
-			<li><input type="checkbox" name="osm-features" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
-			<li><input type="checkbox" name="osm-features" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
-			<li><input type="checkbox" name="osm-features" value='["building"="cabin"]' />Cabane non gardée</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
-			<li><input type="checkbox" name="osm-features" value='["tourism"="camp_site"]' />Camping</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'/>Point d'eau</li>
-			<li><input type="checkbox" name="osm-features" value='["highway"="bus_stop"]' />Bus</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="restaurant"]' />Restaurant</li>
-			<li><input type="checkbox" name="osm-features" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="toilets"]' />WC</li>
-			<li><input type="checkbox" name="osm-features" value='["amenity"="telephone"]' />Cabine téléphonique</li>
+			<li><input type="checkbox" name="select-osm" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
+			<li><input type="checkbox" name="select-osm" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
+			<li><input type="checkbox" name="select-osm" value='["building"="cabin"]' />Cabane non gardée</li>
+			<li><input type="checkbox" name="select-osm" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
+			<li><input type="checkbox" name="select-osm" value='["tourism"="camp_site"]' />Camping</li>
+			<li><input type="checkbox" name="select-osm" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'/>Point d'eau</li>
+			<li><input type="checkbox" name="select-osm" value='["highway"="bus_stop"]' />Bus</li>
+			<li><input type="checkbox" name="select-osm" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
+			<li><input type="checkbox" name="select-osm" value='["amenity"="restaurant"]' />Restaurant</li>
+			<li><input type="checkbox" name="select-osm" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
+			<li><input type="checkbox" name="select-osm" value='["amenity"="toilets"]' />WC</li>
+			<li><input type="checkbox" name="select-osm" value='["amenity"="telephone"]' />Cabine téléphonique</li>
 		</ul>
-		<p id="osm-features-status"></p>
+		<p id="select-osm-status"></p>
 	</div>
 
 	<br style="clear:both" />
 
 	<script>
 // Force selectors
-localStorage['myol_wrifeatures'] = 'all';
+localStorage.myol_selectwri = 'all';
 
 new ol.Map({
 	target: 'map',
@@ -135,22 +135,22 @@ new ol.Map({
 		}),
 		...layerVectorCollection({
 			wri: {
-				selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
+				selectorName: 'select-wri,wri-massif', // 2 selectors for one layer
 			},
 			wriAreas: {
-				selectorName: 'wri-massifs',
+				selectorName: 'select-massifs',
 			},
 			pyreneesRefuges: {
-				selectorName: 'prc-features',
+				selectorName: 'select-prc',
 			},
 			c2c: { // CampToCamp
-				selectorName: 'c2c-features',
+				selectorName: 'select-c2c',
 			},
 			chemineur: {
-				selectorName: 'chem-features',
+				selectorName: 'select-chemineur',
 			},
 			alpages: {
-				selectorName: 'alp-features',
+				selectorName: 'select-alpages',
 				extraParams: function() {
 					return {
 						forums: '3,4,5',
@@ -158,7 +158,7 @@ new ol.Map({
 				},
 			},
 			osm: {
-				selectorName: 'osm-features',
+				selectorName: 'select-osm',
 			},
 		}),
 	],

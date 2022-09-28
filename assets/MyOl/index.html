@@ -51,11 +51,11 @@ Based on https://openlayers.org
 
 	<div id="additional-selector" >
 		<hr />
-		chemineur.fr <input type="checkbox" name="chem-features" value="all" />
+		chemineur.fr <input type="checkbox" name="select-chemineur" value="all" />
 		<ul>
-			<li><input type="checkbox" name="chem-features" value="3" />Refuge</li>
-			<li><input type="checkbox" name="chem-features" value="8" />Abri</li>
-			<li><input type="checkbox" name="chem-features" value="23" />Montagne</li>
+			<li><input type="checkbox" name="select-chemineur" value="3" />Refuge</li>
+			<li><input type="checkbox" name="select-chemineur" value="8" />Abri</li>
+			<li><input type="checkbox" name="select-chemineur" value="23" />Montagne</li>
 		</ul>
 	</div>
 
@@ -73,7 +73,7 @@ new ol.Map({
 		})),
 	layers: [
 		layerClusterGeoBB({ // Chemineur
-			selectorName: 'chem-features',
+			selectorName: 'select-chemineur',
 		}),
 		layerMarker({
 			src: 'examples/images/viseur.png',

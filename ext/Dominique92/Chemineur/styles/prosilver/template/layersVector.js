@@ -3,17 +3,17 @@ if (typeof map !== 'undefined') {
 	//TODO intégrer dans map=
 	/*
 		layerClusterWri({ // Refuges.info (2 level layer depending on resolution)
-			selectorName: 'wri-features,wri-massif', // 2 selectors for one layer
+			selectorName: 'select-wri,wri-massif', // 2 selectors for one layer
 		}),
 	*/
 
 
 	map.addLayer(layerClusterWri({
-		selectorName: 'wri-features',
+		selectorName: 'select-wri',
 		zIndex: 6,
 	}));
 	map.addLayer(layerOverpass({
-		selectorName: 'osm-features',
+		selectorName: 'select-osm',
 		zIndex: 5,
 		symbols: {
 			hotel: 'City Hall',
@@ -42,16 +42,16 @@ if (typeof map !== 'undefined') {
 		},
 	}));
 	map.addLayer(layerPyreneesRefuges({
-		selectorName: 'prc-features',
+		selectorName: 'select-prc',
 		zIndex: 4,
 	}));
 	map.addLayer(layerC2C({
-		selectorName: 'c2c-features',
+		selectorName: 'select-c2c',
 		zIndex: 3,
 	}));
 	map.addLayer(layerGeoBB({
 		host: '//alpages.info/',
-		selectorName: 'alp-features',
+		selectorName: 'select-alpages',
 		argSelName: 'forums',//TODO obsolete
 		attribution: 'Alpages',
 		zIndex: 2,

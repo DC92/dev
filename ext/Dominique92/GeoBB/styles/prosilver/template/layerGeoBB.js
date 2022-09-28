@@ -20,7 +20,7 @@ var map = new ol.Map({
 */
 	layers: [
 		layerClusterGeoBB({ // Chemineur
-		selectorName: 'geobb-features',
+		selectorName: 'select-chemineur',
 		}),
 		layerHover(),
 	],
@@ -29,7 +29,7 @@ var map = new ol.Map({
 	layers: layersCluster({
 		host: '', // Relative address
 		layer: layerGeoBB,
-		selectorName: 'geobb-features',
+		selectorName: 'select-chemineur',
 		attribution: 'Chemineur',
 		noLabel: scriptName == 'posting',
 		noClick: scriptName == 'posting',

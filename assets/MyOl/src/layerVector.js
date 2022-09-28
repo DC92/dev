@@ -47,13 +47,17 @@ function layerVector(opt) {
 		}),
 		statusEl = document.getElementById(selectorNames[0] + '-status'); // XHR download tracking
 
-	layer.setMapInternal = function(map) { //HACK execute actions on Map init
+	layer.setMapInternal = function(map) {
+		//HACK execute actions on Map init
 		ol.layer.Vector.prototype.setMapInternal.call(this, map);
 
+		// Add the alternate layer if any
 		if (options.altLayer)
 			map.addLayer(options.altLayer);
 
-		listenHover(map);
+		// Add a layer to manage hovered features (once for a map)
+		if (!map.layerHover)
+			map.layerHover = layerHover(map);
 	};
 
 	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
@@ -384,84 +388,86 @@ function styleOptionsCluster(feature, properties) {
  * Global hovering functions layer
    To be declared & added once for a map
  */
-function listenHover(map) {
-	if (!map.layerHover) {
-		const source = new ol.source.Vector(),
-			layer = new ol.layer.Vector({
-				source: source,
-			});
+function layerHover(map) {
+	const source = new ol.source.Vector(),
+		layer = new ol.layer.Vector({
+			source: source,
+		});
 
-		map.on(['pointermove', 'click'], (evt) => {
-			// Find hovered feature
-			const found = map.forEachFeatureAtPixel(
+	map.addLayer(layer);
+
+	// Leaving the map reset hovering
+	window.addEventListener('mousemove', function(evt) {
+		const divRect = map.getTargetElement().getBoundingClientRect();
+
+		// The mouse is outside of the map
+		if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+			evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+			source.clear();
+	});
+
+	map.on(['pointermove', 'click'], (evt) => {
+		// Find hovered feature
+		const map = evt.target,
+			found = map.forEachFeatureAtPixel(
 				map.getEventPixel(evt.originalEvent),
-				function(hoveredFeature, hoveredLayer) {
-					const hoveredProperties = hoveredFeature.getProperties();
-
-					// Click on a feature
-					if (evt.type == 'click') {
-						if (hoveredProperties.url) {
-							// Open a new tag
-							if (evt.originalEvent.ctrlKey)
-								window.open(hoveredProperties.url, '_blank').focus();
-							else
-								// Open a new window
-								if (evt.originalEvent.shiftKey)
-									window.open(hoveredProperties.url, '_blank', 'resizable=yes').focus();
-								else
-									// Go on the same window
-									window.location.href = hoveredProperties.url;
-						}
-						// Cluster
-						else if (hoveredProperties.features)
-							map.getView().animate({
-								zoom: map.getView().getZoom() + 2,
-								center: hoveredProperties.geometry.getCoordinates(),
-							});
-					}
-
-					// Over the hover (Label ?)
-					if (hoveredLayer.ol_uid == layer.ol_uid)
-						return true; // Don't undisplay it
-
-					// Hover a feature
-					if (typeof hoveredLayer.hoverStyleOptionsFunction == 'function') {
-						source.clear();
-						source.addFeature(hoveredFeature);
-						layer.setStyle(new ol.style.Style(
-							hoveredLayer.hoverStyleOptionsFunction(
-								hoveredFeature,
-								hoveredProperties
-							)
-						));
-						layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
-
-						return hoveredFeature; // Don't continue
-					}
-				}, {
+				hoverFeature, {
 					hitTolerance: 6, // Default 0
 				}
 			);
 
-			// Erase existing hover if nothing found
-			map.getViewport().style.cursor = found ? 'pointer' : '';
-			if (!found)
+		// Erase existing hover if nothing found
+		map.getViewport().style.cursor = found ? 'pointer' : '';
+		if (!found)
+			source.clear();
+
+		function hoverFeature(hoveredFeature, hoveredLayer) {
+			const hoveredProperties = hoveredFeature.getProperties();
+
+			// Click on a feature
+			if (evt.type == 'click') {
+				if (hoveredProperties.url) {
+					// Open a new tag
+					if (evt.originalEvent.ctrlKey)
+						window.open(hoveredProperties.url, '_blank').focus();
+					else
+						// Open a new window
+						if (evt.originalEvent.shiftKey)
+							window.open(hoveredProperties.url, '_blank', 'resizable=yes').focus();
+						else
+							// Go on the same window
+							window.location.href = hoveredProperties.url;
+				}
+				// Cluster
+				else if (hoveredProperties.features)
+					map.getView().animate({
+						zoom: map.getView().getZoom() + 2,
+						center: hoveredProperties.geometry.getCoordinates(),
+					});
+			}
+
+			// Over the hover (Label ?)
+			if (hoveredLayer.ol_uid == layer.ol_uid)
+				return true; // Don't undisplay it
+
+			// Hover a feature
+			if (typeof hoveredLayer.hoverStyleOptionsFunction == 'function') {
 				source.clear();
-		});
+				source.addFeature(hoveredFeature);
+				layer.setStyle(new ol.style.Style(
+					hoveredLayer.hoverStyleOptionsFunction(
+						hoveredFeature,
+						hoveredProperties
+					)
+				));
+				layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
 
-		// Leaving the map reset hovering
-		window.addEventListener('mousemove', function(evt) {
-			const divRect = map.getTargetElement().getBoundingClientRect();
+				return hoveredFeature; // Don't continue
+			}
+		}
+	});
 
-			// The mouse is outside of the map
-			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				source.clear();
-		});
-
-		map.layerHover = layer;
-		map.addLayer(layer);
-	}
+	return layer;
 }
 
 /**

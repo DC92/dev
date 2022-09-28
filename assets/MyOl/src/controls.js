@@ -40,6 +40,7 @@ function controlButton(opt) {
 	control.element.appendChild(control.submenuEl);
 
 	// Assign button actions
+	//TODO close menu when click somewhere else
 	control.element.addEventListener('mouseover', action);
 	control.element.addEventListener('mouseout', action);
 	buttonEl.addEventListener('click', action);
@@ -396,6 +397,7 @@ function controlGPS(options) {
 	};
 
 	// Trigered by <input ... ctrlOnChange="renderGPS" />
+	//TODO close menu when the GPS locate
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),

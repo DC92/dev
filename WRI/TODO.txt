@@ -4,6 +4,7 @@ RUPTURES INTERFACE MyOl
 //TODO delete ol.css.map
 //TODO edit download
 //TODO ...layersWri => layerClusterWri / ...layersGeoBB => layerClusterGeoBB
+//TODO selecteur-... select-...
 
 BUGS
 ====
