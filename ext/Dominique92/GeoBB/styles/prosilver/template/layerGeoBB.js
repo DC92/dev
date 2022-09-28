@@ -33,9 +33,9 @@ var map = new ol.Map({
 		attribution: 'Chemineur',
 		noLabel: scriptName == 'posting',
 		noClick: scriptName == 'posting',
-		hoverStyleOptionsFunction: function(feature, properties) {
+		hoverStyleOptFnc: function(feature, properties) {
 			properties.attribution = null;
-			return styleOptionsFullLabel(feature, properties);
+			return styleOptFullLabel(feature, properties);
 		},
 	}),
 	*/

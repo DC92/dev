@@ -11,12 +11,12 @@
    can be several SELECTORNAME1,SELECTORNAME2,...
    display loading status <TAG id="SELECTOR_NAME-status"></TAG>
  * callBack : selector function to call when selected 
- * urlArgsFunction: function(layer_options, bbox, selections, extent, resolution, projection)
+ * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
- * styleOptionsFunction: function(feature, properties, options) returning options of the style of the features
- * styleOptionsClusterFunction: function(feature, properties, options) returning options of the style of the cluster bullets
- * hoverStyleOptionsFunction: function(feature, properties, options) returning options of the style when hovering the features
+ * styleOptFnc: function(feature, properties, options) returning options of the style of the features
+ * styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
+ * hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
  * source.Vector options : format, strategy, attributions, ...
  * altLayer : another layer to add to the map with this one (for resolution depending layers)
  */
@@ -29,7 +29,7 @@ function layerVector(opt) {
 				);
 				source.refresh();
 			},
-			styleOptionsClusterFunction: styleOptionsCluster,
+			styleOptClusterFnc: styleOptCluster,
 			...opt
 		},
 		selectorNames = options.selectorName.split(','),
@@ -61,13 +61,13 @@ function layerVector(opt) {
 			map.layerHover = layerHover(map);
 	};
 
-	layer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
+	layer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
 	selectorNames.map(name => selector(name, options.callBack)); // Setup the selector managers
 	options.callBack(); // Init parameters depending on the selector
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
-		const args = options.urlArgsFunction(
+		const args = options.urlArgsFnc(
 				options, // Layer options
 				ol.proj.transformExtent( // BBox
 					extent,
@@ -140,13 +140,13 @@ function layerVector(opt) {
 	// Style callback function for the layer
 	function style(feature) {
 		const properties = feature.getProperties(),
-			styleOptionsFunction = properties.features || properties.cluster ?
-			options.styleOptionsClusterFunction :
-			options.styleOptionsFunction;
+			styleOptFnc = properties.features || properties.cluster ?
+			options.styleOptClusterFnc :
+			options.styleOptFnc;
 
-		if (typeof styleOptionsFunction == 'function')
+		if (typeof styleOptFnc == 'function')
 			return new ol.style.Style(
-				styleOptionsFunction(
+				styleOptFnc(
 					feature,
 					properties
 				)
@@ -168,7 +168,7 @@ function layerVectorCluster(opt) {
 		layer = layerVector(options), // Basic layer (with all the points)
 		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			geometryFunction: geometryFunction,
+			geometryFunction: geometryFnc,
 			createCluster: createCluster,
 			distance: options.distance,
 		}),
@@ -181,7 +181,7 @@ function layerVectorCluster(opt) {
 		});
 
 	clusterLayer.setMapInternal = layer.setMapInternal; //HACK execute actions on Map init
-	clusterLayer.hoverStyleOptionsFunction = options.hoverStyleOptionsFunction; // Embark hover style to render hovering
+	clusterLayer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', function() {
@@ -201,7 +201,7 @@ function layerVectorCluster(opt) {
 	});
 
 	// Generate a center point to manage clusterisations
-	function geometryFunction(feature) {
+	function geometryFnc(feature) {
 		const extent = feature.getGeometry().getExtent(),
 			pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
 
@@ -246,7 +246,7 @@ function layerVectorCluster(opt) {
 
 // Get icon from an URL
 //BEST BUG general : send cookies to server, event non secure
-function styleOptionsIcon(iconUrl) {
+function styleOptIcon(iconUrl) {
 	if (iconUrl)
 		return {
 			image: new ol.style.Icon({
@@ -256,18 +256,18 @@ function styleOptionsIcon(iconUrl) {
 }
 
 // Get icon from chemineur.fr
-function styleOptionsIconChemineur(iconName) {
+function styleOptIconChemineur(iconName) {
 	if (iconName) {
 		const icons = iconName.split(' ');
 
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
 
-		return styleOptionsIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
+		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
 	}
 }
 
 // Display a label with some data about the feature
-function styleOptionsFullLabel(feature, properties) {
+function styleOptFullLabel(feature, properties) {
 	let text = [],
 		line = [];
 
@@ -311,11 +311,11 @@ function styleOptionsFullLabel(feature, properties) {
 			text.push('&copy;' + properties.attribution);
 	}
 
-	return styleOptionsLabel(text.join('\n'), feature, properties, true);
+	return styleOptLabel(text.join('\n'), feature, properties, true);
 }
 
 // Display a label with only the name
-function styleOptionsLabel(text, feature, properties, important) {
+function styleOptLabel(text, feature, properties, important) {
 
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
@@ -347,7 +347,7 @@ function styleOptionsLabel(text, feature, properties, important) {
 }
 
 // Apply a color and transparency to a polygon
-function styleOptionsPolygon(color, transparency) { // color = #rgb, transparency = 0 to 1
+function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 0 to 1
 	if (color)
 		return {
 			fill: new ol.style.Fill({
@@ -362,7 +362,7 @@ function styleOptionsPolygon(color, transparency) { // color = #rgb, transparenc
 }
 
 // Style of a cluster bullet (both local & server cluster
-function styleOptionsCluster(feature, properties) {
+function styleOptCluster(feature, properties) {
 	let nbClusters = parseInt(properties.cluster || 0);
 
 	for (let f in properties.features)
@@ -452,11 +452,11 @@ function layerHover(map) {
 				return true; // Don't undisplay it
 
 			// Hover a feature
-			if (typeof hoveredLayer.hoverStyleOptionsFunction == 'function') {
+			if (typeof hoveredLayer.hoverStyleOptFnc == 'function') {
 				source.clear();
 				source.addFeature(hoveredFeature);
 				layer.setStyle(new ol.style.Style(
-					hoveredLayer.hoverStyleOptionsFunction(
+					hoveredLayer.hoverStyleOptFnc(
 						hoveredFeature,
 						hoveredProperties
 					)

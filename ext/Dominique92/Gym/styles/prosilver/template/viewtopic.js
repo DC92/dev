@@ -6,14 +6,14 @@ const layer = layerVector({
 				url: 'viewtopic.php?p=' + properties.post_id,
 			};
 		},
-		styleOptionsFunction: function(feature, properties) {
+		styleOptFnc: function(feature, properties) {
 			return Object.assign({},
-				styleOptionsIcon(properties.icon),
-				firstMenuLine ? null : styleOptionsLabel(properties.name, feature, properties),
+				styleOptIcon(properties.icon),
+				firstMenuLine ? null : styleOptLabel(properties.name, feature, properties),
 			);
 		},
-		hoverStyleOptionsFunction: function(feature, properties) {
-			return styleOptionsLabel(properties.name, feature, properties);
+		hoverStyleOptFnc: function(feature, properties) {
+			return styleOptLabel(properties.name, feature, properties);
 		},
 	}),
 
