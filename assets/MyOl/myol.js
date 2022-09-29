@@ -1713,6 +1713,12 @@ function controlButton(opt) {
 				el.classList.remove('myol-button-selected');
 	}
 
+	// Close submenu when click or touch somewhere else
+	document.addEventListener('click', function(evt) {
+		if (document.elementFromPoint(evt.x, evt.y).tagName == 'CANVAS')
+			control.element.classList.remove('myol-button-selected');
+	});
+
 	// Assign control.function to submenu elements events
 	// with attribute ctrlOnClic="function" or ctrlOnChange="function"
 	for (let el of control.submenuEl.getElementsByTagName('*'))
@@ -1729,17 +1735,6 @@ function controlButton(opt) {
 		});
 
 	return control;
-}
-
-function checkLine(name, item, text, note, checked) {
-	return '<label for="myol-' + name + item + '">' +
-		'<input' +
-		' type="radio" name="myol-' + name + '"' +
-		' id="myol-' + name + item + '"' +
-		(checked ? ' checked="checked"' : '') +
-		' value="' + item + '" ctrlOnChange="change" />' +
-		text + (note ? ' <span>' + note + '</span>' : '') +
-		'</label>';
 }
 
 /**
@@ -1953,21 +1948,39 @@ function controlGeocoder(options) {
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
-		checkLine('gps-source', 0, 'Inactif', '', true) +
-		checkLine('gps-source', 1, 'Position GPS', '(1) extérieur') +
-		checkLine('gps-source', 2, 'Position GPS ou IP', '(2) intérieur') +
-		'<hr />' +
-		checkLine('gps-display', 0, 'Graticule, carte libre', '', true) +
-		checkLine('gps-display', 1, 'Centre la carte, nord en haut') +
-		checkLine('gps-display', 2, 'Centre et oriente la carte', '(3)') +
+		'<label for="myol-gps-source0">' +
+		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Inactif' +
+		'</label>' +
+		'<label for="myol-gps-source1">' +
+		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlonchange="renderGPS" />' +
+		'Position GPS <span>(1) extérieur</span>' +
+		'</label>' +
+		'<label for="myol-gps-source2">' +
+		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlonchange="renderGPS" />' +
+		'Position GPS ou IP <span>(2) intérieur</span>' +
+		'</label>' +
+		'<hr>' +
+		'<label for="myol-gps-display0">' +
+		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Graticule, carte libre' +
+		'</label>' +
+		'<label for="myol-gps-display1">' +
+		'<input type="radio" name="myol-gps-display" id="myol-gps-display1" value="1" ctrlonchange="renderGPS" />' +
+		'Centre la carte, nord en haut' +
+		'</label>' +
+		'<label for="myol-gps-display2">' +
+		'<input type="radio" name="myol-gps-display" id="myol-gps-display2" value="2" ctrlonchange="renderGPS" />' +
+		'Centre et oriente la carte <span>(3)</span>' +
+		'</label>' +
 
-		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		'<hr />' +
+		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
 		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
 		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
 		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
-		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.' +
-		'</p>' :
+		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.</p>' :
 		// Si on est en http
 		'<p>L&apos;utilisation du GPS nécessite https</p>' +
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
@@ -2026,7 +2039,7 @@ function controlGPS(options) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		map.addLayer(graticuleLayer);
-		map.on('moveend', control.change); // Refresh graticule after map zoom
+		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom
 
 		geolocation = new ol.Geolocation({
 			projection: map.getView().getProjection(),
@@ -2037,7 +2050,7 @@ function controlGPS(options) {
 				...options
 			},
 		});
-		geolocation.on('change', control.change);
+		geolocation.on('change', control.renderGPS);
 		geolocation.on('error', function(error) {
 			console.log('Geolocation error: ' + error.message);
 		});
@@ -2045,17 +2058,17 @@ function controlGPS(options) {
 		// Browser heading from the inertial & magnetic sensors
 		window.addEventListener('deviceorientationabsolute', function(evt) {
 			ol.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			control.change(evt);
+			control.renderGPS(evt);
 		});
 	};
 
-	// Trigered by <input ... ctrlOnChange="change" />
-	control.change = function(evt) {
+	// Trigered by <input ... ctrlOnChange="renderGPS" />
+	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
 			display0El = document.getElementById('myol-gps-display0'),
 			display2El = document.getElementById('myol-gps-display2'),
-			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, +|WiFi
+			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, GPS&WiFi
 			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
 			map = control.getMap(),
 			view = map ? map.getView() : null;
@@ -2133,6 +2146,10 @@ function controlGPS(options) {
 			if (!ol.gpsValues.isZoomed) { // Only the first time after activation
 				ol.gpsValues.isZoomed = true;
 				view.setZoom(17);
+
+				// Close submenu when GPS locates
+				control.element.classList.remove('myol-button-hover');
+				control.element.classList.remove('myol-button-selected');
 			}
 			graticuleLayer.setVisible(true);
 		} else
@@ -2356,14 +2373,18 @@ function controlPrint(options) {
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +
 			'<p>-imprimer.</p>' +
-			checkLine('po', 0, 'Portrait A4') +
-			checkLine('po', 1, 'Paysage A4') +
+			'<label for="myol-po0">' +
+			'<input type="radio" name="myol-po" id="myol-po0" value="0" ctrlonchange="resizeDraftPrint">Portrait A4' +
+			'</label>' +
+			'<label for="myol-po1">' +
+			'<input type="radio" name="myol-po" id="myol-po1" value="1" ctrlonchange="resizeDraftPrint">Paysage A4' +
+			'</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
 		...options
 	});
 
-	control.change = function() {
+	control.resizeDraftPrint = function() {
 		const map = control.getMap(),
 			mapEl = map.getTargetElement(),
 			poElcs = document.querySelectorAll('input[name=print-orientation]:checked'),
@@ -2403,7 +2424,7 @@ function controlPrint(options) {
 	};
 
 	printMap = function() {
-		control.change();
+		control.resizeDraftPrint();
 		control.getMap().once('rendercomplete', function() {
 			window.print();
 			location.reload();
