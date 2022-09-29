@@ -41,9 +41,6 @@ Based on https://openlayers.org
 			border-right: solid;
 			padding: 5px
 		}
-		#additional-selector ul {
-			margin: 3px;
-		}
 	</style>
 </head>
 
@@ -58,12 +55,10 @@ Based on https://openlayers.org
 
 	<div id="additional-selector" >
 		<hr />
-		chemineur.fr <input type="checkbox" name="select-chemineur" value="all" />
-		<ul>
-			<li><input type="checkbox" name="select-chemineur" value="3" />Refuge</li>
-			<li><input type="checkbox" name="select-chemineur" value="8" />Abri</li>
-			<li><input type="checkbox" name="select-chemineur" value="23" />Montagne</li>
-		</ul>
+		<label>chemineur.fr <input type="checkbox" name="select-chemineur" value="all" /></label>
+		<label><input type="checkbox" name="select-chemineur" value="3" />Refuge</label>
+		<label><input type="checkbox" name="select-chemineur" value="8" />Abri</label>
+		<label><input type="checkbox" name="select-chemineur" value="23" />Montagne</label>
 	</div>
 
 	<script>

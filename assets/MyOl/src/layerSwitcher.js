@@ -3,6 +3,7 @@
  * Need to include layerSwitcher.css
  */
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
+//BEST no lift when open/close submenu
 function controlLayerSwitcher(options) {
 	const control = controlButton({
 			className: 'myol-button-switcher',
@@ -60,8 +61,10 @@ function controlLayerSwitcher(options) {
 
 			control.submenuEl.appendChild(selectionEl);
 			selectionEl.innerHTML =
+				'<label for="' + inputId + '">' +
 				'<input type="checkbox" id="' + inputId + '" value="' + name + '" ' + ' />' +
-				'<label for="' + inputId + '">' + name + '</label>';
+				name +
+				'</label>';
 			selectionEl.firstChild.onclick = selectBaseLayer;
 			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
 

@@ -51,21 +51,31 @@
 	background: white;
 	font-size: 16px;
 }
-.myol-button > p,
-.myol-button > div > * {
+.myol-button p,
+.myol-button span {
 	margin: 3px 0;
 	padding: 0 3px;
 	font-size: 14px;
 }
-.myol-button > div > input,
-.myol-button > div > label,
-.myol-button > div > a {
-	margin: 5px;
+.myol-button label,
+.myol-button a {
+	display: block;
+	margin: 0;
+	padding: 2px 0;
 	cursor: pointer;
 }
-.myol-button > div > a {
-	display: block;
+.myol-button a {
 	color: blue;
+}
+.myol-button input {
+	margin: 0 3px;
+}
+.myol-button label:hover,
+.myol-button a:hover {
+	background: lightgray;
+}
+.myol-button hr {
+	margin: 1px;
 }
 
 /* Full screen */
@@ -108,13 +118,7 @@
 	left: 2px !important;
 }
 
-/* Download */
-.myol-button-download p {
-	margin: 0;
-	cursor: pointer;
-}
-
-/* Other controls */
+/* Non buttons controls */
 .myol-permalink,
 .ol-attribution,
 .myol-coordinate,

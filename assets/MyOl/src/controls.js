@@ -48,7 +48,7 @@ function controlButton(opt) {
 	function action(evt) {
 		if (evt.type == 'mouseover')
 			control.element.classList.add('myol-button-hover');
-		else // mouseout & click
+		else // mouseout | click
 			control.element.classList.remove('myol-button-hover');
 
 		if (evt.type == 'click') // Mouse click & touch
@@ -77,6 +77,17 @@ function controlButton(opt) {
 		});
 
 	return control;
+}
+
+function checkLine(name, item, text, note, checked) {
+	return '<label for="myol-' + name + item + '">' +
+		'<input' +
+		' type="radio" name="myol-' + name + '"' +
+		' id="myol-' + name + item + '"' +
+		(checked ? ' checked="checked"' : '') +
+		' value="' + item + '" ctrlOnChange="change" />' +
+		text + (note ? ' <span>' + note + '</span>' : '') +
+		'</label>';
 }
 
 /**
@@ -294,21 +305,16 @@ function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content
 		'<p>Localisation GPS:</p>' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="myol-gps-source0">Inactif</label><br />' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-source1">Position GPS <span>(1) extérieur</span></label><br />' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-source2">Position GPS ou IP <span>(2) intérieur</span></label><hr />' +
+		checkLine('gps-source', 0, 'Inactif', '', true) +
+		checkLine('gps-source', 1, 'Position GPS', '(1) extérieur') +
+		checkLine('gps-source', 2, 'Position GPS ou IP', '(2) intérieur') +
+		'<hr />' +
+		checkLine('gps-display', 0, 'Graticule, carte libre', '', true) +
+		checkLine('gps-display', 1, 'Centre la carte, nord en haut') +
+		checkLine('gps-display', 2, 'Centre et oriente la carte', '(3)') +
 
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlOnChange="renderGPS" checked="checked" />' +
-		'<label for="myol-gps-display0">Graticule, carte libre</label><br />' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display1" value="1" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-display1">Centre la carte, nord en haut</label><br />' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display2" value="2" ctrlOnChange="renderGPS" />' +
-		'<label for="myol-gps-display2">Centre et oriente la carte <span>(3)</span></label><hr />' +
-
-		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		//BEST put as html / option
+		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
 		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
 		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
@@ -373,7 +379,7 @@ function controlGPS(options) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		map.addLayer(graticuleLayer);
-		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom
+		map.on('moveend', control.change); // Refresh graticule after map zoom
 
 		geolocation = new ol.Geolocation({
 			projection: map.getView().getProjection(),
@@ -384,7 +390,7 @@ function controlGPS(options) {
 				...options
 			},
 		});
-		geolocation.on('change', control.renderGPS);
+		geolocation.on('change', control.change);
 		geolocation.on('error', function(error) {
 			console.log('Geolocation error: ' + error.message);
 		});
@@ -392,13 +398,13 @@ function controlGPS(options) {
 		// Browser heading from the inertial & magnetic sensors
 		window.addEventListener('deviceorientationabsolute', function(evt) {
 			ol.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			control.renderGPS(evt);
+			control.change(evt);
 		});
 	};
 
-	// Trigered by <input ... ctrlOnChange="renderGPS" />
+	// Trigered by <input ... ctrlOnChange="change" />
 	//TODO close menu when the GPS locate
-	control.renderGPS = function(evt) {
+	control.change = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
 			display0El = document.getElementById('myol-gps-display0'),
@@ -708,16 +714,14 @@ function controlPrint(options) {
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +
 			'<p>-imprimer.</p>' +
-			'<input type="radio" name="print-orientation" id="myol-po0" value="0" ctrlOnChange="resizeDraftPrint" />' +
-			'<label for="myol-po0">Portrait A4</label><br />' +
-			'<input type="radio" name="print-orientation" id="myol-po1" value="1" ctrlOnChange="resizeDraftPrint" />' +
-			'<label for="myol-po1">Paysage A4</label>' +
+			checkLine('po', 0, 'Portrait A4') +
+			checkLine('po', 1, 'Paysage A4') +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
 		...options
 	});
 
-	control.resizeDraftPrint = function() {
+	control.change = function() {
 		const map = control.getMap(),
 			mapEl = map.getTargetElement(),
 			poElcs = document.querySelectorAll('input[name=print-orientation]:checked'),
@@ -757,7 +761,7 @@ function controlPrint(options) {
 	};
 
 	printMap = function() {
-		control.resizeDraftPrint();
+		control.change();
 		control.getMap().once('rendercomplete', function() {
 			window.print();
 			location.reload();

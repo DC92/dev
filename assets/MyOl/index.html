@@ -37,9 +37,6 @@ Based on https://openlayers.org
 			border-right: solid;
 			padding: 5px
 		}
-		#additional-selector ul {
-			margin: 3px;
-		}
 	</style>
 </head>
 
@@ -47,19 +44,16 @@ Based on https://openlayers.org
 	<a style="float:right" href="examples/layerSwitcher.html">Layer switcher &#9654;</a>
 	<h1 style="margin:0">MyOl</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
-	<a style="float:right;margin-right:10px;text-decoration:none" href="build.php">&#9749;</a>
 
 	<div id="map"></div>
 	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
 	<div id="additional-selector" >
 		<hr />
-		chemineur.fr <input type="checkbox" name="select-chemineur" value="all" />
-		<ul>
-			<li><input type="checkbox" name="select-chemineur" value="3" />Refuge</li>
-			<li><input type="checkbox" name="select-chemineur" value="8" />Abri</li>
-			<li><input type="checkbox" name="select-chemineur" value="23" />Montagne</li>
-		</ul>
+		<label>chemineur.fr <input type="checkbox" name="select-chemineur" value="all" /></label>
+		<label><input type="checkbox" name="select-chemineur" value="3" />Refuge</label>
+		<label><input type="checkbox" name="select-chemineur" value="8" />Abri</label>
+		<label><input type="checkbox" name="select-chemineur" value="23" />Montagne</label>
 	</div>
 
 	<script>

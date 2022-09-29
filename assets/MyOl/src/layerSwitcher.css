@@ -1,20 +1,12 @@
 .myol-button-switcher {
-	position: static;
 	float: right;
-	background: transparent !important;
 }
 .myol-button-switcher > button {
-	margin: 0 0 20px 40px;
 	font-style: italic;
 }
-.myol-button-switcher input {
-	margin: 0;
-}
-.myol-button-switcher > * {
+.myol-button-switcher > div {
 	right: 0;
-}
-.myol-button-switcher .myol-single-layer span {
-	font-size: 0.7em;
+    overflow-y: scroll;
 }
 .myol-button-switcher .myol-single-layer input,
 .myol-button-switcher .myol-double-layer span {
