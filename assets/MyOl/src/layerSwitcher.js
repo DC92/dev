@@ -57,7 +57,7 @@ function controlLayerSwitcher(options) {
 				baseLayers[name] = [baseLayers[name]];
 
 			const selectionEl = document.createElement('div'),
-				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
+				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : ''); //BEST why not name ?
 
 			control.submenuEl.appendChild(selectionEl);
 			selectionEl.innerHTML =
@@ -65,8 +65,8 @@ function controlLayerSwitcher(options) {
 				'<input type="checkbox" id="' + inputId + '" value="' + name + '" ' + ' />' +
 				name +
 				'</label>';
-			selectionEl.firstChild.onclick = selectBaseLayer;
-			baseLayers[name].inputEl = selectionEl.firstChild; // Mem it for further ops
+			selectionEl.firstChild.firstChild.onclick = selectBaseLayer; //BEST resorb all firstChild
+			baseLayers[name].inputEl = selectionEl.firstChild.firstChild; // Mem it for further ops //BEST resorb
 
 			for (let l = 0; l < baseLayers[name].length; l++) {
 				baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
