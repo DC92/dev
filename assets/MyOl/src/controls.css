@@ -2,7 +2,6 @@
 /* Container */
 .ol-zoom,
 .ol-full-screen,
-.ol-geocoder,
 .myol-button {
 	position: static !important;
 	float: left;
@@ -29,13 +28,12 @@
 	overflow: auto;
 	z-index: 30;
 }
-.ol-control button:hover,
-.ol-geocoder button:hover {
-	box-shadow: 1px 1px 10px black;
-	background: #d6fbff;
+.myol-button-selected button,
+.myol-button div {
+	background: #d6fbff !important;
 }
-.ol-control button:focus { /* Zoom, fullScreen, ... after have been clicked */
-	background: white;
+.ol-control button:hover {
+	box-shadow: 1px 1px 10px black;
 }
 
 /* Submenu */
@@ -90,35 +88,30 @@
 }
 
 /* Geocodeur */
+.ol-geocoder {
+	/* Takes place in the MyOl button flow */
+	position: initial !important;
+	float: left;
+	font-size: 14.4px !important; /* For some mobiles */
+}
+.ol-geocoder .gcd-gl-expanded,
+.ol-geocoder .gcd-gl-control:hover {
+	width: 30.75px;
+	overflow:visible;
+}
 .ol-geocoder .gcd-gl-btn {
-	border-image-width: 0 !important;
-	top: 0 !important;
-	position: static !important;
 	height: 24.75px;
 	width: 24.75px;
-	margin: 1px;
-	border: 0;
-	padding: 0;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.65);
-	border-radius: 2px;
-	background: white;
 }
-.gcd-gl-control:not(.gcd-gl-expanded) {
-	display: none;
+.ol-geocoder .gcd-gl-input {
+	top: 32px;
+	left: 4px;
 }
-.gcd-gl-control,
-.gcd-gl-control:hover {
-	top: 27px;
-}
-.gcd-gl-input {
-	margin-left: -32px;
-}
-.gcd-gl-result {
-	top: 60px !important;
-	left: 2px !important;
+.ol-geocoder ul.gcd-gl-result {
+	top: 62px;
 }
 
-/* Non buttons controls */
+/* Buttonless controls */
 .myol-permalink,
 .ol-attribution,
 .myol-coordinate,

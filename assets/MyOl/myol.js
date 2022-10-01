@@ -1715,7 +1715,9 @@ function controlButton(opt) {
 
 	// Close submenu when click or touch somewhere else
 	document.addEventListener('click', function(evt) {
-		if (document.elementFromPoint(evt.x, evt.y).tagName == 'CANVAS')
+		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
+
+		if (hoveredEl && hoveredEl.tagName == 'CANVAS')
 			control.element.classList.remove('myol-button-selected');
 	});
 
@@ -1912,31 +1914,22 @@ function controlGeocoder(options) {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 			...options
 		}),
-		controlEl = geocoder.element.firstElementChild,
-		buttonEl = controlEl ? controlEl.firstElementChild : null;
+		controlEl = geocoder.element.firstElementChild;
 
-	// Move the button at the same level than the other control's buttons
-	if (buttonEl) {
-		buttonEl.innerHTML = '&#x1F50D;';
-		geocoder.element.appendChild(buttonEl);
-		geocoder.element.classList.add('ol-control');
-	}
-
-	// Allow open on hover
-	if (controlEl) {
-		geocoder.element.addEventListener('pointerover', function(evt) {
-			if (evt.pointerType == 'mouse')
-				controlEl.classList.add('gcd-gl-expanded');
-
-			// Close other opened buttons
+	// Close other opened buttons
+	geocoder.element.addEventListener('pointerover', function(evt) {
+		if (evt.pointerType == 'mouse')
 			for (let el of document.getElementsByClassName('myol-button-selected'))
 				el.classList.remove('myol-button-selected');
-		});
-		geocoder.element.addEventListener('pointerout', function(evt) {
-			if (evt.pointerType == 'mouse')
-				controlEl.classList.remove('gcd-gl-expanded');
-		});
-	}
+	});
+
+	// Close submenu when hover another button
+	document.addEventListener('pointerout', function(evt) {
+		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
+
+		if (hoveredEl && hoveredEl.tagName == 'BUTTON')
+			controlEl.classList.remove('gcd-gl-expanded');
+	});
 
 	return geocoder;
 }
