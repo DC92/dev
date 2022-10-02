@@ -250,31 +250,28 @@ function controlTilesBuffer(opt) {
 
 /**
  * Geocoder
- * Requires https://github.com/jonataswalker/ol-geocoder/tree/master/dist
+ * Requires https://github.com/jonataswalker/ol-geocoder/
  */
 function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return controlButton(); //HACK no button
 
 	const geocoder = new Geocoder('nominatim', {
-			provider: 'osm',
 			lang: 'fr-FR',
 			autoComplete: false, // Else keep list of many others
-			keepOpen: true, // Else bug "no internet"
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
+			keepOpen: true,
 			...options
 		}),
 		controlEl = geocoder.element.firstElementChild;
 
-	// Close other opened buttons
+	// Close other opened buttons when hover with a mouse
 	geocoder.element.addEventListener('pointerover', function(evt) {
-		if (evt.pointerType == 'mouse')
-			for (let el of document.getElementsByClassName('myol-button-selected'))
-				el.classList.remove('myol-button-selected');
+		for (let el of document.getElementsByClassName('myol-button-selected'))
+			el.classList.remove('myol-button-selected');
 	});
 
 	// Close submenu when hover another button
-	//TODO don't work on mobile
 	document.addEventListener('pointerout', function(evt) {
 		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
 

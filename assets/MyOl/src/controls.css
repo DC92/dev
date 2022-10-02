@@ -89,9 +89,10 @@
 
 /* Geocodeur */
 .ol-geocoder {
-	/* Takes place in the MyOl button flow */
 	position: initial !important;
 	float: left;
+	height: 30.75px; /* Takes place in the MyOl button flow */
+	width: 30.75px;
 	font-size: 14.4px !important; /* For some mobiles */
 }
 .ol-geocoder .gcd-gl-expanded,
@@ -107,8 +108,12 @@
 	top: 32px;
 	left: 4px;
 }
+.ol-geocoder .gcd-gl-reset {
+	display: none;
+}
 .ol-geocoder ul.gcd-gl-result {
 	top: 62px;
+	z-index: 99; /* For mobiles no interaction with animate */
 }
 
 /* Buttonless controls */
