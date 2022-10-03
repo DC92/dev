@@ -1,13 +1,7 @@
 if (typeof map !== 'undefined') {
-	
-	//TODO intégrer dans map=
-	/*
-		layerClusterWri({ // Refuges.info (2 level layer depending on resolution)
-			selectorName: 'select-wri,wri-massif', // 2 selectors for one layer
-		}),
-	*/
-
-
+	//TODO utilise layerVectorCollection / options
+	//TODO keys / IGN TOPO 25, ...
+	//TODO chemineur sur adresse relative c92.fr/t/chem6
 	map.addLayer(layerClusterWri({
 		selectorName: 'select-wri',
 		zIndex: 6,
@@ -52,7 +46,6 @@ if (typeof map !== 'undefined') {
 	map.addLayer(layerGeoBB({
 		host: '//alpages.info/',
 		selectorName: 'select-alpages',
-		argSelName: 'forums',//TODO obsolete
 		attribution: 'Alpages',
 		zIndex: 2,
 	}));
