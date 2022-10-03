@@ -38,10 +38,6 @@
 	overflow: auto;
 	z-index: 30;
 }
-.myol-button-selected button,
-.myol-button div {
-	background: #d6fbff !important;
-}
 .ol-control button:hover {
 	box-shadow: 1px 1px 10px black;
 }
@@ -58,6 +54,10 @@
 	top: 30px;
 	background: white;
 	font-size: 16px;
+}
+.myol-button-selected button,
+.myol-button div {
+	background: #d1e9ff;
 }
 .myol-button p,
 .myol-button span {
@@ -80,7 +80,7 @@
 }
 .myol-button label:hover,
 .myol-button a:hover {
-	background: lightgray;
+	background: #ffe8d1;
 }
 .myol-button hr {
 	margin: 1px;
@@ -201,11 +201,14 @@
 }
 .myol-button-switcher > div {
 	right: 0;
-    overflow-y: scroll;
+    overflow-y: scroll; /* Forced to avoid unexpected shifts */
 }
 .myol-button-switcher .myol-single-layer input,
 .myol-button-switcher .myol-double-layer span {
 	display: none;
+}
+.additional-selector {
+	background: #fcffd1 !important;
 }
 
 /* FILE src/marker.css */

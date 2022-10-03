@@ -581,22 +581,21 @@ function controlLayerSwitcher(options) {
 
 		// Build html baselayers selectors
 		for (let name in baseLayers) {
+			const labelEl = document.createElement('label');
+
+			labelEl.setAttribute('for', name);
+			labelEl.innerHTML = '<input type="checkbox" id="' + name + '" value="' + name + '" ' + ' />' + name;
+			labelEl.firstChild.onclick = selectBaseLayer;
+			control.submenuEl.appendChild(labelEl);
+
 			// Make all choices an array of layers
 			if (!baseLayers[name].length)
 				baseLayers[name] = [baseLayers[name]];
 
-			const selectionEl = document.createElement('div'),
-				inputId = 'l' + baseLayers[name][0].ol_uid + (name ? '-' + name : '');
+			// Mem it for further ops
+			baseLayers[name].inputEl = labelEl.firstChild;
 
-			control.submenuEl.appendChild(selectionEl);
-			selectionEl.innerHTML =
-				'<label for="' + inputId + '">' +
-				'<input type="checkbox" id="' + inputId + '" value="' + name + '" ' + ' />' +
-				name +
-				'</label>';
-			selectionEl.firstChild.firstChild.onclick = selectBaseLayer;
-			baseLayers[name].inputEl = selectionEl.firstChild.firstChild; // Mem it for further ops
-
+			// Display the selected layer
 			for (let l = 0; l < baseLayers[name].length; l++) {
 				baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
 				map.addLayer(baseLayers[name][l]);
@@ -607,11 +606,13 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers();
 
 		// Attach html additional selector
-		const additionalSelector = document.getElementById(options.additionalSelectorId);
-		if (additionalSelector) {
-			control.submenuEl.appendChild(additionalSelector);
+		const additionalSelectorEl = document.getElementById(options.additionalSelectorId);
+
+		if (additionalSelectorEl) {
+			additionalSelectorEl.classList.add('additional-selector');
+			control.submenuEl.appendChild(additionalSelectorEl);
 			// Unmask the selector if it has been @ the declaration
-			additionalSelector.style.display = '';
+			additionalSelectorEl.style.display = '';
 		}
 	}
 
