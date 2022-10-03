@@ -20,16 +20,15 @@ var map = new ol.Map({
 */
 	layers: [
 		layerClusterGeoBB({ // Chemineur
-		selectorName: 'select-chemineur',
+		//selectorName: 'select-chem',
 		}),
-		layerHover(),
 	],
 
 /* //TODO DELETE
 	layers: layersCluster({
 		host: '', // Relative address
 		layer: layerGeoBB,
-		selectorName: 'select-chemineur',
+		selectorName: 'select-chem',
 		attribution: 'Chemineur',
 		noLabel: scriptName == 'posting',
 		noClick: scriptName == 'posting',

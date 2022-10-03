@@ -4,42 +4,29 @@
  */
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
-		//BEST use .html content
 		'<p>Localisation GPS:</p>' +
-		'<label for="myol-gps-source0">' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlonchange="renderGPS" checked="checked" />' +
-		'Inactif' +
-		'</label>' +
-		'<label for="myol-gps-source1">' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlonchange="renderGPS" />' +
-		'Position GPS <span>(1) extérieur</span>' +
-		'</label>' +
-		'<label for="myol-gps-source2">' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlonchange="renderGPS" />' +
-		'Position GPS ou IP <span>(2) intérieur</span>' +
-		'</label>' +
-		'<hr>' +
-		'<label for="myol-gps-display0">' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlonchange="renderGPS" checked="checked" />' +
-		'Graticule, carte libre' +
-		'</label>' +
-		'<label for="myol-gps-display1">' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display1" value="1" ctrlonchange="renderGPS" />' +
-		'Centre la carte, nord en haut' +
-		'</label>' +
-		'<label for="myol-gps-display2">' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display2" value="2" ctrlonchange="renderGPS" />' +
-		'Centre et oriente la carte <span>(3)</span>' +
-		'</label>' +
+		'<label>' +
+		'<input type="radio" name="myol-gps-source" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Inactif</label><label>' +
+		'<input type="radio" name="myol-gps-source" value="1" ctrlonchange="renderGPS" />' +
+		'Position GPS <span>(1) extérieur</span></label><label>' +
+		'<input type="radio" name="myol-gps-source" value="2" ctrlonchange="renderGPS" />' +
+		'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
+		'<input type="radio" name="myol-gps-display" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Graticule, carte libre</label><label>' +
+		'<input type="radio" name="myol-gps-display" value="1" ctrlonchange="renderGPS" />' +
+		'Centre la carte, nord en haut</label><label>' +
+		'<input type="radio" name="myol-gps-display" value="2" ctrlonchange="renderGPS" />' +
+		'Centre et oriente la carte <span>(3)</span></label>' +
 
-		//BEST put as html / option
-		'<hr />' +
-		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		//BEST use .html content / option
+		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
 		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
 		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
 		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
 		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.</p>' :
+
 		// Si on est en http
 		'<p>L&apos;utilisation du GPS nécessite https</p>' +
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',

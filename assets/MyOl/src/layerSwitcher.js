@@ -54,8 +54,7 @@ function controlLayerSwitcher(options) {
 		for (let name in baseLayers) {
 			const labelEl = document.createElement('label');
 
-			labelEl.setAttribute('for', name);
-			labelEl.innerHTML = '<input type="checkbox" id="' + name + '" value="' + name + '" ' + ' />' + name;
+			labelEl.innerHTML = '<input type="checkbox" value="' + name + '" ' + ' />' + name;
 			labelEl.firstChild.onclick = selectBaseLayer; //BEST resorb all firstChild
 			control.submenuEl.appendChild(labelEl);
 

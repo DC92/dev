@@ -18,7 +18,7 @@ function layerGeoBB(options) {
 				...opt.extraParams(bbox),
 			};
 		},
-		selectorName: 'select-chemineur',
+		selectorName: 'select-chem',
 		extraParams: function(bbox) {
 			return {
 				bbox: bbox.join(','),

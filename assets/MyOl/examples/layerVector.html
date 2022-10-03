@@ -33,9 +33,15 @@ Based on https://openlayers.org
 			border-right: solid;
 			padding: 5px
 		}
-		.selector input,
-		.selector label {
+		.selector input {
 			cursor: pointer;
+		}
+		.selector label {
+			display: block;
+			cursor: pointer;
+		}
+		.selector label:hover {
+			background: lightgray;
 		}
 	</style>
 </head>
@@ -50,66 +56,78 @@ Based on https://openlayers.org
 	<div id="map"></div>
 
 	<div class="selector">
-		<p>
-			<label for="select-prc">Pyrenees-refuges.com</label>
-			<input type="checkbox" name="select-prc" id="select-prc" />
+		<label>
+			Pyrenees-refuges.com
+			<input type="checkbox" name="select-prc" />
 			<span id="select-prc-status"></span>
-		</p><p>
-			<label for="select-chemineur">Chemineur</label>
-			<input type="checkbox" name="select-chemineur" id="select-chemineur" value="3,8,20,23" />
-			<span id="select-chemineur-status"></span>
-		</p><p>
-			<label for="select-c2c">Camptocamp.org</label>
-			<input type="checkbox" name="select-c2c" id="select-c2c" />
+		</label>
+		<br />
+		<label>
+			Chemineur
+			<input type="checkbox" name="select-chem" value="3,8,20,23" />
+			<span id="select-chem-status"></span>
+		</label>
+		<br />
+		<label>
+			Camptocamp.org
+			<input type="checkbox" name="select-c2c" />
 			<span id="select-c2c-status"></span>
-			<p>Only 100 features at a time</p>
-		</p><div>
-			<label for="select-alpages">Alpages.info</label>
-			<input type="checkbox" name="select-alpages" id="select-alpages" value="4,5" />
-			<p id="select-alpages-status"></p>
-		</div><div>
-			<label for="select-massifs">Massifs</label>
-			<input type="checkbox" name="select-massifs" id="select-massifs" />
-			<p id="select-massifs-status"></p>
-		</div>
+		</label>
+		<div>Only 100 features at a time</div>
+		<br />
+		<label>
+			Alpages.info
+			<input type="checkbox" name="select-alpages" value="4,5" />
+			<span id="select-alpages-status"></span>
+		</label>
 	</div>
 
 	<div class="selector">
-		<div>
-			<p><input type="checkbox" name="wri-massif" id="wri-massif" value="4" />
-			<label for="wri-massif">Vercors uniquement</label></p>
-			<label for="select-wri">Refuges.info</label>
-			<input type="checkbox" name="select-wri" id="select-wri" value="all" />
-			<ul>
-				<li><input type="checkbox" name="select-wri" value="7" />cabane non gardée</li>
-				<li><input type="checkbox" name="select-wri" value="10" />refuge gardé</li>
-				<li><input type="checkbox" name="select-wri" value="9" />gîte d'étape</li>
-				<li><input type="checkbox" name="select-wri" value="23" />point d'eau</li>
-				<li><input type="checkbox" name="select-wri" value="6" />sommet</li>
-				<li><input type="checkbox" name="select-wri" value="3" />passage délicat</li>
-			</ul>
-			<p id="select-wri-status"></p>
-		</div>
+		<label>
+			Massifs
+			<input type="checkbox" name="select-massifs" />
+			<span id="select-massifs-status"></span>
+		</label>
 	</div>
 
 	<div class="selector">
-		<label for="select-osm">Overpass (OSM services)</label>
-		<input type="checkbox" name="select-osm" id="select-osm" value="all" />
-		<ul>
-			<li><input type="checkbox" name="select-osm" value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</li>
-			<li><input type="checkbox" name="select-osm" value='["tourism"="alpine_hut"]' />Refuge gardé</li>
-			<li><input type="checkbox" name="select-osm" value='["building"="cabin"]' />Cabane non gardée</li>
-			<li><input type="checkbox" name="select-osm" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</li>
-			<li><input type="checkbox" name="select-osm" value='["tourism"="camp_site"]' />Camping</li>
-			<li><input type="checkbox" name="select-osm" value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'/>Point d'eau</li>
-			<li><input type="checkbox" name="select-osm" value='["highway"="bus_stop"]' />Bus</li>
-			<li><input type="checkbox" name="select-osm" value='["amenity"="parking"]["access"!="private"]' />Parking</li>
-			<li><input type="checkbox" name="select-osm" value='["amenity"="restaurant"]' />Restaurant</li>
-			<li><input type="checkbox" name="select-osm" value='["shop"~"supermarket|convenience"]' />Alimentation</li>
-			<li><input type="checkbox" name="select-osm" value='["amenity"="toilets"]' />WC</li>
-			<li><input type="checkbox" name="select-osm" value='["amenity"="telephone"]' />Cabine téléphonique</li>
-		</ul>
-		<p id="select-osm-status"></p>
+		<label>
+			<input type="checkbox" name="wri-massif" value="4" />
+			Vercors uniquement
+		</label>
+		<label>
+			Refuges.info
+			<input type="checkbox" name="select-wri" value="all" />
+			<span id="select-wri-status"></span>
+		</label>
+		<label><input type="checkbox" name="select-wri" value="7" />cabane non gardée</label>
+		<label><input type="checkbox" name="select-wri" value="10" />refuge gardé</label>
+		<label><input type="checkbox" name="select-wri" value="9" />gîte d'étape</label>
+		<label><input type="checkbox" name="select-wri" value="23" />point d'eau</label>
+		<label><input type="checkbox" name="select-wri" value="6" />sommet</label>
+		<label><input type="checkbox" name="select-wri" value="3" />passage délicat</label>
+	</div>
+
+	<div class="selector">
+		<label>
+			Overpass (OSM services)
+			<input type="checkbox" name="select-osm" id="select-osm" value="all" />
+			<span id="select-osm-status"></span>
+		</label>
+		<label><input type="checkbox" name="select-osm"
+			value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</label>
+		<label><input type="checkbox" name="select-osm" value='["tourism"="alpine_hut"]' />Refuge gardé</label>
+		<label><input type="checkbox" name="select-osm" value='["building"="cabin"]' />Cabane non gardée</label>
+		<label><input type="checkbox" name="select-osm" value='["amenity"="shelter"]["shelter_type"="basic_hut"]' />Abri</label>
+		<label><input type="checkbox" name="select-osm" value='["tourism"="camp_site"]' />Camping</label>
+		<label><input type="checkbox" name="select-osm"
+			value='["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["natural"="spring"]+["man_made"="water_well"]'/>Point d'eau</label>
+		<label><input type="checkbox" name="select-osm" value='["highway"="bus_stop"]' />Bus</label>
+		<label><input type="checkbox" name="select-osm" value='["amenity"="parking"]["access"!="private"]' />Parking</label>
+		<label><input type="checkbox" name="select-osm" value='["amenity"="restaurant"]' />Restaurant</label>
+		<label><input type="checkbox" name="select-osm" value='["shop"~"supermarket|convenience"]' />Alimentation</label>
+		<label><input type="checkbox" name="select-osm" value='["amenity"="toilets"]' />WC</label>
+		<label><input type="checkbox" name="select-osm" value='["amenity"="telephone"]' />Cabine téléphonique</label>
 	</div>
 
 	<br style="clear:both" />

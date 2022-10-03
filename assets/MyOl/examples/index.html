@@ -56,10 +56,10 @@ Based on https://openlayers.org
 
 	<div id="additional-selector" >
 		<hr />
-		<label>chemineur.fr <input type="checkbox" name="select-chemineur" value="all" /></label>
-		<label><input type="checkbox" name="select-chemineur" value="3" />Refuge</label>
-		<label><input type="checkbox" name="select-chemineur" value="8" />Abri</label>
-		<label><input type="checkbox" name="select-chemineur" value="23" />Montagne</label>
+		<label>chemineur.fr <input type="checkbox" name="select-chem" value="all" /></label>
+		<label><input type="checkbox" name="select-chem" value="3" />Refuge</label>
+		<label><input type="checkbox" name="select-chem" value="8" />Abri</label>
+		<label><input type="checkbox" name="select-chem" value="23" />Montagne</label>
 	</div>
 
 	<script>
@@ -88,7 +88,7 @@ new ol.Map({
 		})),
 	layers: [
 		layerClusterGeoBB({ // Chemineur
-			selectorName: 'select-chemineur',
+			selectorName: 'select-chem',
 		}),
 		layerMarker({
 			src: 'images/viseur.png',

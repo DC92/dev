@@ -486,12 +486,8 @@ function controlPrint(options) {
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +
 			'<p>-imprimer.</p>' +
-			'<label for="myol-po0">' +
-			'<input type="radio" name="myol-po" id="myol-po0" value="0" ctrlonchange="resizeDraftPrint">Portrait A4' +
-			'</label>' +
-			'<label for="myol-po1">' +
-			'<input type="radio" name="myol-po" id="myol-po1" value="1" ctrlonchange="resizeDraftPrint">Paysage A4' +
-			'</label>' +
+			'<label><input type="radio" name="myol-po" value="0" ctrlonchange="resizeDraftPrint">Portrait A4</label>' +
+			'<label><input type="radio" name="myol-po" value="1" ctrlonchange="resizeDraftPrint">Paysage A4</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
 		...options

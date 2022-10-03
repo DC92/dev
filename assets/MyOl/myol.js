@@ -583,8 +583,7 @@ function controlLayerSwitcher(options) {
 		for (let name in baseLayers) {
 			const labelEl = document.createElement('label');
 
-			labelEl.setAttribute('for', name);
-			labelEl.innerHTML = '<input type="checkbox" id="' + name + '" value="' + name + '" ' + ' />' + name;
+			labelEl.innerHTML = '<input type="checkbox" value="' + name + '" ' + ' />' + name;
 			labelEl.firstChild.onclick = selectBaseLayer;
 			control.submenuEl.appendChild(labelEl);
 
@@ -1242,7 +1241,7 @@ function layerGeoBB(options) {
 				...opt.extraParams(bbox),
 			};
 		},
-		selectorName: 'select-chemineur',
+		selectorName: 'select-chem',
 		extraParams: function(bbox) {
 			return {
 				bbox: bbox.join(','),
@@ -2133,12 +2132,8 @@ function controlPrint(options) {
 			'<p>-Choisir portrait ou paysage,</p>' +
 			'<p>-zoomer et déplacer la carte dans le format,</p>' +
 			'<p>-imprimer.</p>' +
-			'<label for="myol-po0">' +
-			'<input type="radio" name="myol-po" id="myol-po0" value="0" ctrlonchange="resizeDraftPrint">Portrait A4' +
-			'</label>' +
-			'<label for="myol-po1">' +
-			'<input type="radio" name="myol-po" id="myol-po1" value="1" ctrlonchange="resizeDraftPrint">Paysage A4' +
-			'</label>' +
+			'<label><input type="radio" name="myol-po" value="0" ctrlonchange="resizeDraftPrint">Portrait A4</label>' +
+			'<label><input type="radio" name="myol-po" value="1" ctrlonchange="resizeDraftPrint">Paysage A4</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
 		...options
@@ -2247,39 +2242,27 @@ function controlsCollection(opt) {
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
-		'<label for="myol-gps-source0">' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source0" value="0" ctrlonchange="renderGPS" checked="checked" />' +
-		'Inactif' +
-		'</label>' +
-		'<label for="myol-gps-source1">' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source1" value="1" ctrlonchange="renderGPS" />' +
-		'Position GPS <span>(1) extérieur</span>' +
-		'</label>' +
-		'<label for="myol-gps-source2">' +
-		'<input type="radio" name="myol-gps-source" id="myol-gps-source2" value="2" ctrlonchange="renderGPS" />' +
-		'Position GPS ou IP <span>(2) intérieur</span>' +
-		'</label>' +
-		'<hr>' +
-		'<label for="myol-gps-display0">' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display0" value="0" ctrlonchange="renderGPS" checked="checked" />' +
-		'Graticule, carte libre' +
-		'</label>' +
-		'<label for="myol-gps-display1">' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display1" value="1" ctrlonchange="renderGPS" />' +
-		'Centre la carte, nord en haut' +
-		'</label>' +
-		'<label for="myol-gps-display2">' +
-		'<input type="radio" name="myol-gps-display" id="myol-gps-display2" value="2" ctrlonchange="renderGPS" />' +
-		'Centre et oriente la carte <span>(3)</span>' +
-		'</label>' +
+		'<label>' +
+		'<input type="radio" name="myol-gps-source" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Inactif</label><label>' +
+		'<input type="radio" name="myol-gps-source" value="1" ctrlonchange="renderGPS" />' +
+		'Position GPS <span>(1) extérieur</span></label><label>' +
+		'<input type="radio" name="myol-gps-source" value="2" ctrlonchange="renderGPS" />' +
+		'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
+		'<input type="radio" name="myol-gps-display" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Graticule, carte libre</label><label>' +
+		'<input type="radio" name="myol-gps-display" value="1" ctrlonchange="renderGPS" />' +
+		'Centre la carte, nord en haut</label><label>' +
+		'<input type="radio" name="myol-gps-display" value="2" ctrlonchange="renderGPS" />' +
+		'Centre et oriente la carte <span>(3)</span></label>' +
 
-		'<hr />' +
-		'<p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
 		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
 		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
 		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
 		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.</p>' :
+
 		// Si on est en http
 		'<p>L&apos;utilisation du GPS nécessite https</p>' +
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
