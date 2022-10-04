@@ -43,11 +43,10 @@
 }
 
 /* Submenu */
-.myol-button:not(.myol-button-hover):not(.myol-button-selected) > div,
+.myol-button:not(:hover):not(.myol-button-selected) > div,
 .myol-button > *:empty {
 	max-height: 0;
-	opacity: 0;
-	z-index: 29;
+	opacity: 0; /* For beauty of the transition */
 }
 .myol-button > *:not(button) {
 	position: absolute;
@@ -55,7 +54,7 @@
 	background: white;
 	font-size: 16px;
 }
-.myol-button-selected button,
+.myol-button-selected button, /* Coloring the button when touch selected */
 .myol-button div {
 	background: #d1e9ff;
 }

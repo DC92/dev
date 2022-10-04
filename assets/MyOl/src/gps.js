@@ -194,7 +194,6 @@ function controlGPS(options) {
 				view.setZoom(17);
 
 				// Close submenu when GPS locates
-				control.element.classList.remove('myol-button-hover');
 				control.element.classList.remove('myol-button-selected');
 			}
 			graticuleLayer.setVisible(true);
