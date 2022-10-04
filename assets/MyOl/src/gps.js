@@ -112,8 +112,7 @@ function controlGPS(options) {
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
-			display0El = document.getElementById('myol-gps-display0'),
-			display2El = document.getElementById('myol-gps-display2'),
+			displayEls = document.getElementsByName('myol-gps-display'),
 			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, GPS&WiFi
 			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
 			map = control.getMap(),
@@ -124,10 +123,10 @@ function controlGPS(options) {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(false);
 			ol.gpsValues = {}; // Reset the values
-			if (!sourceLevel && display0El)
-				display0El.checked = true;
-			if (sourceLevel && displayLevel == 0 && display2El)
-				display2El.checked = true;
+			if (!sourceLevel)
+				displayEls[0].checked = true;
+			if (sourceLevel && displayLevel == 0)
+				displayEls[2].checked = true;
 		}
 
 		// Get geolocation values

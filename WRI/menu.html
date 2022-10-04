@@ -1,93 +1,115 @@
-<style>
-.menu:not(:hover):not(.menu-selected) > * {
-	max-height: 0;
-	Wopacity: 0; /* For beauty of the transition */
-}
-.menu-selected {
-	background: #ddeeff; /* Coloring the button when touch selected */
-}
-.menu {
-	Wdisplay: inline-block;
-	Wfloat: left;
-	position: relative;
-}
-.menu ul li {
-	position: relative;
-	margin: 5px;
-}
-.menu > ul,
-.menu ul ul {
-	position: absolute;
-	margin: 0;
-	background: #ddeeff;
-	border: 1px black solid;
-	padding: 0;
-	list-style: none;
-}
-.menu ul ul {
-	top: 0;
-	left: calc(100% + 5px);
-	Wdisplay: none;
-}
-.Wmenu ul li:not(:hover) ul {
-	left: -300%;
-	Wwidth: 0;
-	Wopacity: 0; /* For beauty of the transition */
-}
-.menu li {
-	white-space: nowrap;
-}
-</style>
-
 <p>qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj </p>
 
 MENU :
-<span>
 <div class="menu">&#9776;
-<ul>
-	<li><a href="..">&#127968; Accueil</a></li>
-	<li>&#128276; Nouvelles</a>
-		<ul>
+	<ul>
+		<li><a href="..">&#127968; Accueil</a></li>
+		<li>
+			&#128276; Nouvelles</a>
 			<label>Informations récentes:</label>
-			<li>
+			<div>
 				<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles">
 				Toutes</a>
-			</li><li>
+			</div><div>
 				<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=points">
 				Points</a>
-			</li><li>
+			</div><div>
 				<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=refuges">
 				Cabanes</a>
-			</li><li>
+			</div><div>
 				<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=commentaires">
 				Commentaires</a>
-			</li><li>
+			</div><div>
 				<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=forums">
 				Forum</a>
-			</li><hr/><li>
-				<a href="<?=$config_wri['sous_dossier_installation']?>formulaire_rss">
+			</div><hr/><div>
+				<a href="<?=$config_wri['sous_dossier_installation']?>formdivaire_rss">
 				Flux RSS</a>
-			</li>
-		</ul>
-	</li>
-	<li><a href="..">&#127968; Accueil</a></li>
-	<li>&#127968; 4444
-		<ul>
-			<li>&#127968; 22222</li>
-			<li>&#127968; 33333</li>
-		</ul>
-	</li>
-	<div>&#127968; 5555</div>
-	<div>&#127968; 5555</div>
-	<div>&#127968; 5555</div>
-</ul>
+			</div>
+		</li>
+		<li><a href="..">&#127968; Accueil</a></li>
+		<li>&#127968; 4444
+			<div>
+				<div>&#127968; 22222</div>
+				<div>&#127968; 33333</div>
+			</div>
+		</li>
+		<li>&#127968; 5555</li>
+		<li>&#127968; 5555</li>
+		<li>&#127968; 5555</li>
+	</ul>
 </div>
-</span>
 
 &#128104;
 
 &#128100;
 refuges.info
+
+<style>
+.menu {
+	display: inline-block;
+	position: relative;
+}
+.menu:not(:hover):not(.menu-selected) > * {
+	max-height: 0;
+}
+.menu > ul {
+	position: absolute;
+	margin: 0;
+	background: #ddeeff;
+	border: 1px black sodivd;
+	padding: 0 5px;
+	list-style: none;
+	white-space: nowrap;
+	overflow: hidden;
+	transition: max-height 0.3s ease-in, opacity 0.3s ease-out;
+}
+
+
+
+
+
+.menu div > * {
+	display: none;
+}
+
+
+
+.Wmenu:not(:hover):not(.menu-selected) > * {
+	max-height: 0;
+	Wopacity: 0; /* For beauty of the transition */
+}
+.Wmenu-selected {
+	background: #ddeeff; /* Coloring the button when touch selected */
+}
+.Wmenu {
+	Wdisplay: inline-block;
+	Wfloat: left;
+	position: relative;
+}
+.Wmenu div div {
+	position: relative;
+	margin: 5px;
+}
+.Wmenu > div,
+.Wmenu div div {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+}
+.Wmenu div div {
+	top: 0;
+	left: calc(100% + 5px);
+	Wdisplay: none;
+}
+.Wmenu div div:not(:hover) div {
+	left: -300%;
+	Wwidth: 0;
+	Wopacity: 0; /* For beauty of the transition */
+}
+.Wmenu div {
+}
+</style>
 
 <br/>
 <p>qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj </p>
@@ -97,11 +119,13 @@ refuges.info
 <p>qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj qlmkg mqlfkj mldkfj zfj </p>
 
 <script>
-const menuEl = document.getElementsByClassName('menu')[0];
+const menuEls = document.getElementsByClassName('menu'),
+menuEl= menuEls[0];
+/*DCMM*/{var _r=' ',_v=menuEl;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
 
 // Assign button actions
-menuEl.addEventListener('mouseover', action);
-menuEl.addEventListener('mouseout', action);
+menuEl.addEventListener('mouseover', ()=>menuEl.classList.toggle('menu-selected'));
+//menuEl.addEventListener('mouseout', action);
 menuEl.addEventListener('click', action);
 
 function action(evt) {
@@ -113,7 +137,7 @@ function action(evt) {
 		menuEl.classList.remove('menu-hover');
 */
 	if (evt.type == 'click') // Mouse click & touch
-		menuEl.classList.toggle('menu-selected');
+		;
 
 	// Close other open buttons
 	for (let el of document.getElementsByClassName('menu'))

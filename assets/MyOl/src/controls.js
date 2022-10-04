@@ -40,21 +40,18 @@ function controlButton(opt) {
 	control.element.appendChild(control.submenuEl);
 
 	// Assign button actions
-	control.element.addEventListener('mouseover', action);
-	buttonEl.addEventListener('click', action);
-
-	function action(evt) {
-		if (evt.type == 'click') // Mouse click & touch
-			control.element.classList.toggle('myol-button-selected');
-
-		// Close other open buttons
+	buttonEl.addEventListener('click', () =>
+		control.element.classList.toggle('myol-button-selected')
+	);
+	// Close other open buttons when mouseover
+	control.element.addEventListener('mouseover', () => {
 		for (let el of document.getElementsByClassName('myol-button'))
 			if (el != control.element)
-				el.classList.remove('myol-button-selected');
-	}
+				el.classList.remove('myol-button-selected')
+	});
 
-	// Close submenu when click or touch somewhere else
-	document.addEventListener('click', function(evt) {
+	// Close submenu when click or touch on the map
+	document.addEventListener('click', evt => {
 		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
 
 		if (hoveredEl && hoveredEl.tagName == 'CANVAS')
@@ -186,7 +183,7 @@ function controlLengthLine() {
 	control.setMap = function(map) { //HACK execute actions on Map init
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		map.on('pointermove', function(evt) {
+		map.on('pointermove', evt => {
 			control.element.innerHTML = ''; // Clear the measure if hover no feature
 
 			// Find new features to hover
@@ -231,8 +228,8 @@ function controlTilesBuffer(opt) {
 
 		// Action on each layer
 		//BEST too much load on basic browsing
-		map.on('precompose', function() {
-			map.getLayers().forEach(function(layer) {
+		map.on('precompose', () => {
+			map.getLayers().forEach(layer => {
 				if (typeof layer.setPreload == 'function')
 					layer.setPreload(options.depth);
 			});
@@ -260,13 +257,13 @@ function controlGeocoder(options) {
 		controlEl = geocoder.element.firstElementChild;
 
 	// Close other opened buttons when hover with a mouse
-	geocoder.element.addEventListener('pointerover', function(evt) {
+	geocoder.element.addEventListener('pointerover', evt => {
 		for (let el of document.getElementsByClassName('myol-button-selected'))
 			el.classList.remove('myol-button-selected');
 	});
 
 	// Close submenu when hover another button
-	document.addEventListener('pointerout', function(evt) {
+	document.addEventListener('pointerout', evt => {
 		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
 
 		if (hoveredEl && hoveredEl.tagName == 'BUTTON')
@@ -413,7 +410,7 @@ function controlDownload(opt) {
 
 		function getFeatures(savedLayer) {
 			if (savedLayer.getSource() && savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
-				savedLayer.getSource().forEachFeatureInExtent(extent, function(feature) {
+				savedLayer.getSource().forEachFeatureInExtent(extent, feature => {
 					if (!savedLayer.getProperties().dragable) // Don't save the cursor
 						features.push(feature);
 				});

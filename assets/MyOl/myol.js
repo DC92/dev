@@ -1694,21 +1694,18 @@ function controlButton(opt) {
 	control.element.appendChild(control.submenuEl);
 
 	// Assign button actions
-	control.element.addEventListener('mouseover', action);
-	buttonEl.addEventListener('click', action);
-
-	function action(evt) {
-		if (evt.type == 'click') // Mouse click & touch
-			control.element.classList.toggle('myol-button-selected');
-
-		// Close other open buttons
+	buttonEl.addEventListener('click', () =>
+		control.element.classList.toggle('myol-button-selected')
+	);
+	// Close other open buttons when mouseover
+	control.element.addEventListener('mouseover', () => {
 		for (let el of document.getElementsByClassName('myol-button'))
 			if (el != control.element)
-				el.classList.remove('myol-button-selected');
-	}
+				el.classList.remove('myol-button-selected')
+	});
 
-	// Close submenu when click or touch somewhere else
-	document.addEventListener('click', function(evt) {
+	// Close submenu when click or touch on the map
+	document.addEventListener('click', evt => {
 		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
 
 		if (hoveredEl && hoveredEl.tagName == 'CANVAS')
@@ -1838,7 +1835,7 @@ function controlLengthLine() {
 	control.setMap = function(map) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
-		map.on('pointermove', function(evt) {
+		map.on('pointermove', evt => {
 			control.element.innerHTML = ''; // Clear the measure if hover no feature
 
 			// Find new features to hover
@@ -1881,8 +1878,8 @@ function controlTilesBuffer(opt) {
 		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Action on each layer
-		map.on('precompose', function() {
-			map.getLayers().forEach(function(layer) {
+		map.on('precompose', () => {
+			map.getLayers().forEach(layer => {
 				if (typeof layer.setPreload == 'function')
 					layer.setPreload(options.depth);
 			});
@@ -1910,13 +1907,13 @@ function controlGeocoder(options) {
 		controlEl = geocoder.element.firstElementChild;
 
 	// Close other opened buttons when hover with a mouse
-	geocoder.element.addEventListener('pointerover', function(evt) {
+	geocoder.element.addEventListener('pointerover', evt => {
 		for (let el of document.getElementsByClassName('myol-button-selected'))
 			el.classList.remove('myol-button-selected');
 	});
 
 	// Close submenu when hover another button
-	document.addEventListener('pointerout', function(evt) {
+	document.addEventListener('pointerout', evt => {
 		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
 
 		if (hoveredEl && hoveredEl.tagName == 'BUTTON')
@@ -2059,7 +2056,7 @@ function controlDownload(opt) {
 
 		function getFeatures(savedLayer) {
 			if (savedLayer.getSource() && savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
-				savedLayer.getSource().forEachFeatureInExtent(extent, function(feature) {
+				savedLayer.getSource().forEachFeatureInExtent(extent, feature => {
 					if (!savedLayer.getProperties().dragable) // Don't save the cursor
 						features.push(feature);
 				});
@@ -2342,8 +2339,7 @@ function controlGPS(options) {
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
-			display0El = document.getElementById('myol-gps-display0'),
-			display2El = document.getElementById('myol-gps-display2'),
+			displayEls = document.getElementsByName('myol-gps-display'),
 			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, GPS&WiFi
 			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
 			map = control.getMap(),
@@ -2354,10 +2350,10 @@ function controlGPS(options) {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(false);
 			ol.gpsValues = {}; // Reset the values
-			if (!sourceLevel && display0El)
-				display0El.checked = true;
-			if (sourceLevel && displayLevel == 0 && display2El)
-				display2El.checked = true;
+			if (!sourceLevel)
+				displayEls[0].checked = true;
+			if (sourceLevel && displayLevel == 0)
+				displayEls[2].checked = true;
 		}
 
 		// Get geolocation values
