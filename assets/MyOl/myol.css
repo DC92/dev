@@ -43,7 +43,7 @@
 }
 
 /* Submenu */
-.myol-button:not(:hover):not(.myol-button-selected) > div,
+.myol-button:not(.myol-button-hover):not(.myol-button-selected) > div,
 .myol-button > *:empty {
 	max-height: 0;
 	opacity: 0; /* For beauty of the transition */

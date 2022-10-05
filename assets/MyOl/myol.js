@@ -1694,15 +1694,24 @@ function controlButton(opt) {
 	control.element.appendChild(control.submenuEl);
 
 	// Assign button actions
-	buttonEl.addEventListener('click', () =>
-		control.element.classList.toggle('myol-button-selected')
-	);
-	// Close other open buttons when mouseover
-	control.element.addEventListener('mouseover', () => {
+	control.element.addEventListener('mouseover', action);
+	control.element.addEventListener('mouseout', action);
+	buttonEl.addEventListener('click', action);
+
+	function action(evt) {
+		if (evt.type == 'mouseover')
+			control.element.classList.add('myol-button-hover');
+		else // mouseout | click
+			control.element.classList.remove('myol-button-hover');
+
+		if (evt.type == 'click') // Mouse click & touch
+			control.element.classList.toggle('myol-button-selected');
+
+		// Close other open buttons
 		for (let el of document.getElementsByClassName('myol-button'))
 			if (el != control.element)
-				el.classList.remove('myol-button-selected')
-	});
+				el.classList.remove('myol-button-selected');
+	}
 
 	// Close submenu when click or touch on the map
 	document.addEventListener('click', evt => {
@@ -2420,6 +2429,7 @@ function controlGPS(options) {
 				view.setZoom(17);
 
 				// Close submenu when GPS locates
+				control.element.classList.remove('myol-button-hover');
 				control.element.classList.remove('myol-button-selected');
 			}
 			graticuleLayer.setVisible(true);
