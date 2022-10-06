@@ -1907,13 +1907,15 @@ function controlGeocoder(options) {
 		return controlButton();
 
 	const geocoder = new Geocoder('nominatim', {
-			lang: 'fr-FR',
-			autoComplete: false, // Else keep list of many others
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
-			keepOpen: true,
+			preventDefault: true,
 			...options
 		}),
 		controlEl = geocoder.element.firstElementChild;
+
+	geocoder.on('addresschosen', evt =>
+		evt.target.getMap().getView().fit(evt.bbox)
+	);
 
 	// Close other opened buttons when hover with a mouse
 	geocoder.element.addEventListener('pointerover', evt => {
