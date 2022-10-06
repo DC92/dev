@@ -318,7 +318,7 @@ body {
 }
 .gym .replie li ul li {
 	display: none;
-	white-space: nowrap ;
+	white-space: nowrap;
 }
 .gym .replie li:hover ul li,
 .gym .menu-select {

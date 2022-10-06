@@ -6,38 +6,9 @@ var map = new ol.Map({
 
 	controls: controlsCollection()
 		.concat(controlLayerSwitcher({
-			layers: layerTileCollection(),
+			layers: layerTileCollection(mapKeys),
 			additionalSelectorId: 'additional-selector',
 		})),
-
-/* //TODO DELETE
-	Wcontrols: controlsCollection({
-			permalink: {
-				display: mapType == 'index',
-			},
-		})
-		.concat(controlLayerSwitcher()),
-*/
-	layers: [
-		layerClusterGeoBB({ // Chemineur
-		//selectorName: 'select-chem',
-		}),
-	],
-
-/* //TODO DELETE
-	layers: layersCluster({
-		host: '', // Relative address
-		layer: layerGeoBB,
-		selectorName: 'select-chem',
-		attribution: 'Chemineur',
-		noLabel: scriptName == 'posting',
-		noClick: scriptName == 'posting',
-		hoverStyleOptFnc: function(feature, properties) {
-			properties.attribution = null;
-			return styleOptFullLabel(feature, properties);
-		},
-	}),
-	*/
 });
 
 if (mapType == 'point')
