@@ -81,7 +81,7 @@ function layerEditGeoJson(opt) {
 		control = controlButton({
 			className: 'myol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
-			submenuHTML: '<p>Edition:</p>' +
+			submenuHTML: '<p>Edition:</p>' + //BEST move in .html
 				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
 				'<label for="myol-edit0">Modification &#x1F58D;</label><br />' +
 				(!options.help[1] ? '' :

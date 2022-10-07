@@ -11,7 +11,9 @@ var map = new ol.Map({
 		})),
 });
 
-//TODO BUG ne focalise pas sur le point s'il n'est pas dans l'extent de la carte
+if (scriptName == 'posting')
+	map.layerHover = true; //HACK bloks all hovering
+
 if (mapType == 'point')
 	map.addLayer(layerMarker({
 		src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
@@ -19,13 +21,16 @@ if (mapType == 'point')
 		dragable: scriptName == 'posting',
 	}));
 
+if (mapType == 'line')
+	;//TODO focus on line extent (this is OK in edit line)
+
 if (mapType == 'line' && scriptName == 'posting')
+	//TODO BUG click on one icon reload the page
 	map.addLayer(layerEditGeoJson({
 		geoJsonId: 'marker-json',
 		focus: 15,
 		help: [
 			//BEST mettre dans le html
-			//TODO reprendre texte ?
 			// Modify
 			'<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>' +
 			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +
