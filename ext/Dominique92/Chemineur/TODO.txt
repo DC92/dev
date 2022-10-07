@@ -17,9 +17,9 @@
 //BEST ?? Les pictos ont disparu sur V3
 //BEST ?? Click sur une icone chem2 plante
 
-//BEST Voir forum Evolutions & bugs sur chemineur.fr
+// Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Scan des liens morts
-//BEST Erreurs d'attributions : https://chemineur.fr/viewtopic.php?t=11546
+//TODO Erreurs d'attributions : https://chemineur.fr/viewtopic.php?t=11546
 
 //BEST AIDE CHEM
 Un sujet est actif quand il y a eu des contributions récentes.

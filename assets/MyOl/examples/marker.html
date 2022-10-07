@@ -79,8 +79,8 @@ Based on https://openlayers.org
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: [200000, 5800000],
-		zoom: 6,
+		center: [300000, 5800000],
+		zoom: 8,
 	}),
 	layers: [
 		new ol.layer.Tile({
@@ -92,7 +92,7 @@ new ol.Map({
 		}),
 		layerMarker({
 			src: 'images/viseur.png',
-			focus: 15,
+			focus: 15, // Map zoom level
 			dragable: true,
 		}),
 	],

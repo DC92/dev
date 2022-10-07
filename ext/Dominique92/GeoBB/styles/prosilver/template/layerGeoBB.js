@@ -11,12 +11,12 @@ var map = new ol.Map({
 		})),
 });
 
+//TODO BUG ne focalise pas sur le point s'il n'est pas dans l'extent de la carte
 if (mapType == 'point')
 	map.addLayer(layerMarker({
 		src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
-		focus: 15,
+		focus: 15, // Map zoom level
 		dragable: scriptName == 'posting',
-		zIndex: 10,
 	}));
 
 if (mapType == 'line' && scriptName == 'posting')
@@ -25,6 +25,7 @@ if (mapType == 'line' && scriptName == 'posting')
 		focus: 15,
 		help: [
 			//BEST mettre dans le html
+			//TODO reprendre texte ?
 			// Modify
 			'<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>' +
 			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +

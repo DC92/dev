@@ -84,52 +84,52 @@ function layerMarker(opt) {
 			}
 	}
 
-	var view;
-	layer.once('prerender', function(evt) { // Warning : only once for a map
-		const pc = point.getCoordinates(),
-			map = layer.get('map');
-		view = map.getView();
+	layer.setMapInternal = function(map) {
+		map.once('loadstart', () => { // Hack to be noticed at map init
+			const pc = point.getCoordinates(),
+				view = map.getView();
 
-		// Focus map on the marker
-		if (options.focus) {
-			if (pc[0] && pc[1])
-				view.setCenter(pc);
-			else
-				// If no position given, put the marker on the center of the visible map
-				changeLL(view.getCenter(), 'EPSG:3857');
+			// Focus map on the marker
+			if (options.focus) {
+				if (pc[0] && pc[1])
+					view.setCenter(pc);
+				else
+					// If no position given, put the marker on the center of the visible map
+					changeLL(view.getCenter(), 'EPSG:3857', view);
 
-			view.setZoom(options.focus);
-		}
+				view.setZoom(options.focus);
+			}
 
-		// Edit the marker position
-		if (options.dragable) {
-			// Drag the marker
-			map.addInteraction(new ol.interaction.Pointer({
-				handleDownEvent: function(evt) {
-					// Mark last change time
-					sessionStorage.myol_lastChangeTime = Date.now();
+			// Edit the marker position
+			if (options.dragable) {
+				// Drag the marker
+				map.addInteraction(new ol.interaction.Pointer({
+					handleDownEvent: function(evt) {
+						// Mark last change time
+						sessionStorage.myol_lastChangeTime = Date.now();
 
-					return map.getFeaturesAtPixel(evt.pixel, {
-						layerFilter: function(l) {
-							return l.ol_uid == layer.ol_uid;
-						}
-					}).length;
-				},
-				handleDragEvent: function(evt) {
-					changeLL(evt.coordinate, 'EPSG:3857');
-				},
-			}));
+						return map.getFeaturesAtPixel(evt.pixel, {
+							layerFilter: function(l) {
+								return l.ol_uid == layer.ol_uid;
+							}
+						}).length;
+					},
+					handleDragEvent: function(evt) {
+						changeLL(evt.coordinate, 'EPSG:3857', view);
+					},
+				}));
 
-			// Get the marker at the dblclick position
-			map.on('dblclick', function(evt) {
-				changeLL(evt.coordinate, 'EPSG:3857');
-				return false;
-			});
-		}
-	});
+				// Get the marker at the dblclick position
+				map.on('dblclick', function(evt) {
+					changeLL(evt.coordinate, 'EPSG:3857', view);
+					return false;
+				});
+			}
+		});
+	};
 
 	// Display values
-	function changeLL(ll, projection, focus) {
+	function changeLL(ll, projection, focus, view) {
 		if (ll[0] && ll[1]) {
 			// Wrap +-180°
 			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);

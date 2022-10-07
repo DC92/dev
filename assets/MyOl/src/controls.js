@@ -162,7 +162,7 @@ function controlMousePosition(options) {
 	return new ol.control.MousePosition({
 		projection: 'EPSG:4326',
 		className: 'myol-coordinate',
-		undefinedHTML: String.fromCharCode(0), //HACK hide control when mouse is out of the map
+		placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
 
 		coordinateFormat: function(mouse) {
 			//BEST find better than ol.gpsValues to share info
