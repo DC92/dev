@@ -1,13 +1,13 @@
-//TODO redirect page initiale aprés modif
+//TODO Redirect page initiale aprés modif
 //TODO BUG saisie 2em ligne horaires avec balises dépassent
 //TODO BUG calcul heure de fin : Marche Nordique modérée / 1h30 tous les 15 jours	11h00 à 12h00
 //TODO Le site de c’est https maintenant (pour sport sante)
-//BEST diaporama sur demande dans le post
+//BEST Diaporama sur demande dans le post
 //BEST ??? masquer le texte dans les séances
 //BEST BUG Voir icone position sur carte dans GYM Chaville
-//BEST mesureur audience
+//BEST Mesureur audience
 	audiences synthétiques ?? > logs / youtube / visio
-//BEST carte tous points dans chaville
+//BEST Carte tous points dans chaville
 //BEST Lien gmaps / stretview
 //BEST Bouton imprimer calendier / style print
 //BEST BUG Diaporama pas vu depuis un moment => boucle rapidement
@@ -18,7 +18,7 @@
 	GYM bbcode photo/n° attachment
 //BEST Glissement latéral pages
 //BEST Initialiser posting lieu position carte sur Chaville
-//BEST convertir tous les non saisis "null" en off
+//BEST Convertir tous les non saisis "null" en off
 //BEST Sitemap / SEO
 
 RÉUNION CLAMART
@@ -26,8 +26,6 @@ Catégories (dans le tableau horaires)
 Récupérer le nom de domaine / fermer le support
 
 CHAVIL.GYM
-//BEST randos + GPS
-//BEST paie ident by forum
-//BEST paie ne marche pas en IE
-//BEST salaire : diffusion des attestations
-//BEST paie ne pas envoyer CC mail si connexion
+//BEST Randos + GPS
+//BEST Paie ident by forum
+//BEST Salaire : diffusion des attestations

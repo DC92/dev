@@ -1683,11 +1683,12 @@ function controlButton(opt) {
 			control.submenuEl.innerHTML = options.submenuHTML;
 	}
 
-	// Display the button only if there are label & submenu
+	// Display the button only if there are no label or submenu
 	if (!options.label || !control.submenuEl || !control.submenuEl.innerHTML)
 		return control;
 
 	// Populate control & button
+	buttonEl.setAttribute('type', 'button');
 	buttonEl.innerHTML = options.label;
 	control.element.appendChild(buttonEl);
 	control.element.className = 'ol-control myol-button ' + options.className;
