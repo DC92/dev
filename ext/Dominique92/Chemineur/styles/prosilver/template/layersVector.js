@@ -1,3 +1,14 @@
+// Force au moins une couche chemineur
+if (!localStorage.myol_selectchem && scriptName == 'index')
+	localStorage.myol_selectchem = 'all';
+
+// Activer la couche correspondant au topic
+if (typeof topic_category == 'string') {
+	const ls = (localStorage.myol_selectchem || '').split(',');
+	ls.push(topic_category);
+	localStorage.myol_selectchem = [...new Set(ls)];
+}
+
 if (typeof map !== 'undefined') {
 	layerVectorCollection({
 		chemineur: {

@@ -112,6 +112,7 @@ class listener implements EventSubscriberInterface
 		// Valeurs à assigner à tout le template (topic)
 		$topic_row = $this->geo_data[$post_id]; // The geo_ values
 		$topic_row['topic_first_post_id'] = $topic_first_post_id;
+		$topic_row['topic_category'] = $topic_data['parent_id'];
 
 		// How to display the topic
 		//BEST map on all posts (":xxxxx")
