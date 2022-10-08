@@ -4,11 +4,14 @@ var map = new ol.Map({
 		enableRotation: false,
 	}),
 
-	controls: controlsCollection()
-		.concat(controlLayerSwitcher({
-			layers: layerTileCollection(mapKeys),
-			additionalSelectorId: 'additional-selector',
-		})),
+	controls: controlsCollection({
+		Permalink: {
+			init: mapType != 'line' || scriptName != 'viewtopic',
+		},
+	}).concat(controlLayerSwitcher({
+		layers: layerTileCollection(mapKeys),
+		additionalSelectorId: 'additional-selector',
+	})),
 });
 
 if (scriptName == 'posting')
@@ -21,11 +24,21 @@ if (mapType == 'point')
 		dragable: scriptName == 'posting',
 	}));
 
-if (mapType == 'line')
-	;//TODO focus on line extent (this is OK in edit line)
+if (mapType == 'line' && scriptName == 'viewtopic') {
+	const features = new ol.format.GeoJSON().readFeatures(geo_json, {
+			featureProjection: "EPSG:3857",
+		}),
+		extent = ol.extent.createEmpty();
+
+	for (let f in features)
+		ol.extent.extend(extent, features[f].getGeometry().getExtent());
+
+	map.getView().fit(extent, {
+		maxZoom: 15,
+	});
+}
 
 if (mapType == 'line' && scriptName == 'posting')
-	//TODO BUG click on one icon reload the page
 	map.addLayer(layerEditGeoJson({
 		geoJsonId: 'marker-json',
 		focus: 15,

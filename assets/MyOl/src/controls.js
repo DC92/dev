@@ -94,6 +94,7 @@ function controlButton(opt) {
  */
 function controlPermalink(opt) {
 	const options = {
+			//BEST init with bbox option
 			init: true, // {true | false} use url hash or localStorage to position the map.
 			setUrl: false, // {true | false} Change url hash when moving the map.
 			display: false, // {true | false} Display permalink link the map.
@@ -363,7 +364,7 @@ function controlLoadGPX(options) {
 		// Zoom the map on the added features
 		const extent = ol.extent.createEmpty();
 
-		for (let f in features)
+		for (let f in features) //BEST try to create a geometry
 			ol.extent.extend(extent, features[f].getGeometry().getExtent());
 
 		if (ol.extent.isEmpty(extent))
@@ -371,7 +372,7 @@ function controlLoadGPX(options) {
 		else
 			map.getView().fit(extent, {
 				maxZoom: 17,
-				size: map.getSize(),
+				size: map.getSize(), //BEST necessary ?
 				padding: [5, 5, 5, 5],
 			});
 

@@ -29,7 +29,12 @@
 
 	<script>
 		var scriptName = '{SCRIPT_NAME}',
-			mapType = '{MAP_TYPE}',
-			mapKeys = {MAP_KEYS};
+<!-- IF GEO_JSON -->
+			geo_json = {GEO_JSON};
+<!-- ENDIF -->
+<!-- IF MAP_KEYS -->
+			mapKeys = {MAP_KEYS},
+<!-- ENDIF -->
+			mapType = '{MAP_TYPE}';
 	</script>
 <!-- ENDIF -->
