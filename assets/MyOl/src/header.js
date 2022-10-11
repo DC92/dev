@@ -1,5 +1,5 @@
 // Ease validators
-/* jshint esversion: 6 */ //BEST accept spread operator
+/* jshint esversion: 9 */
 if (!ol) var ol = {};
 
 /**

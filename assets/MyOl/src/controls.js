@@ -260,17 +260,28 @@ function controlGeocoder(options) {
 
 	const geocoder = new Geocoder('nominatim', {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
-			preventDefault: true,
+			//BEST DELETE ??? preventDefault: true,
 			...options
 		}),
 		controlEl = geocoder.element.firstElementChild;
+
+	geocoder.setMap = function(map) { //HACK
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		// Avoid submit a form if any including the map
+		const inputEl = document.getElementById('gcd-input-query');
+		if (inputEl)
+			inputEl.addEventListener('keypress', function(evt) {
+				evt.stopImmediatePropagation();
+			}, false);
+	};
 
 	geocoder.on('addresschosen', evt =>
 		evt.target.getMap().getView().fit(evt.bbox)
 	);
 
 	// Close other opened buttons when hover with a mouse
-	geocoder.element.addEventListener('pointerover', evt => {
+	geocoder.element.addEventListener('pointerover', () => {
 		for (let el of document.getElementsByClassName('myol-button-selected'))
 			el.classList.remove('myol-button-selected');
 	});
@@ -443,7 +454,7 @@ function controlDownload(opt) {
 							// MultiPolygon
 							coords.forEach(subCoords =>
 								features.push(new ol.Feature(new ol.geom.LineString(subCoords)))
-							)
+							);
 					});
 				}
 			}

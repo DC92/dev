@@ -5,8 +5,6 @@
  * @copyright (c) 2016 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
-
-//TODO BUG geocoder dont't accept enter on posting.php
 //TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
 //BEST calcul dénivelé / profil
 //BEST inversion de la trace
