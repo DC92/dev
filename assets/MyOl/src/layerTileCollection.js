@@ -297,6 +297,10 @@ function layerTileCollection(options) {
 		}),
 		'OpenTopo': layerOpenTopo(),
 		'OSM outdoors': layerThunderforest(options.thunderforest), // options include key
+		'OSM transports': layerThunderforest({
+			...options.thunderforest, // Include key
+			subLayer: 'transport',
+		}),
 		'OSM cyclo': layerOSM({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
@@ -364,10 +368,6 @@ function layersDemo(options) {
 		'ThF cycle': layerThunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'cycle',
-		}),
-		'ThF transport': layerThunderforest({
-			...options.thunderforest, // Include key
-			subLayer: 'transport',
 		}),
 		'ThF trains': layerThunderforest({
 			...options.thunderforest, // Include key
