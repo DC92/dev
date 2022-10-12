@@ -263,18 +263,14 @@ function controlGeocoder(options) {
 			//BEST DELETE ??? preventDefault: true,
 			...options
 		}),
-		controlEl = geocoder.element.firstElementChild;
+		controlEl = geocoder.element.firstElementChild,
+		inputEls = geocoder.element.getElementsByTagName('input');
 
-	geocoder.setMap = function(map) { //HACK
-		ol.control.Control.prototype.setMap.call(this, map);
-
-		// Avoid submit a form if any including the map
-		const inputEl = document.getElementById('gcd-input-query');
-		if (inputEl)
-			inputEl.addEventListener('keypress', function(evt) {
-				evt.stopImmediatePropagation();
-			}, false);
-	};
+	// Avoid submit a form including the map
+	if (inputEls)
+		inputEls[0].addEventListener('keypress', evt =>
+			evt.stopImmediatePropagation()
+		);
 
 	geocoder.on('addresschosen', evt =>
 		evt.target.getMap().getView().fit(evt.bbox)
