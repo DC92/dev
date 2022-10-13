@@ -76,13 +76,13 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers();
 
 		// Attach html additional selector
-		const additionalSelectorEl = document.getElementById(options.additionalSelectorId);
+		const addSelectEl = document.getElementById(options.addSelectId);
 
-		if (additionalSelectorEl) {
-			additionalSelectorEl.classList.add('additional-selector');
-			control.submenuEl.appendChild(additionalSelectorEl);
+		if (addSelectEl) {
+			addSelectEl.classList.add('add-select');
+			control.submenuEl.appendChild(addSelectEl);
 			// Unmask the selector if it has been @ the declaration
-			additionalSelectorEl.style.display = '';
+			addSelectEl.style.display = '';
 		}
 	}
 

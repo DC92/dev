@@ -28,19 +28,19 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
-		.selector {
+		.layer-select {
 			float: left;
 			border-right: solid;
 			padding: 5px
 		}
-		.selector input {
+		.layer-select input {
 			cursor: pointer;
 		}
-		.selector label {
+		.layer-select label {
 			display: block;
 			cursor: pointer;
 		}
-		.selector label:hover {
+		.layer-select label:hover {
 			background: lightgray;
 		}
 	</style>
@@ -55,20 +55,16 @@ Based on https://openlayers.org
 
 	<div id="map"></div>
 
-	<div class="selector">
+	<div class="layer-select">
 		<label>
 			Pyrenees-refuges.com
 			<input type="checkbox" name="select-prc" />
 			<span id="select-prc-status"></span>
-		</label>
-		<br />
-		<label>
+		</label><br /><label>
 			Chemineur
 			<input type="checkbox" name="select-chem" value="3,8,20,23" />
 			<span id="select-chem-status"></span>
-		</label>
-		<br />
-		<label>
+		</label><br /><label>
 			Camptocamp.org
 			<input type="checkbox" name="select-c2c" />
 			<span id="select-c2c-status"></span>
@@ -79,23 +75,18 @@ Based on https://openlayers.org
 			Alpages.info
 			<input type="checkbox" name="select-alpages" value="4,5" />
 			<span id="select-alpages-status"></span>
-		</label>
-	</div>
-
-	<div class="selector">
-		<label>
+		</label><br /><label>
 			Massifs
 			<input type="checkbox" name="select-massifs" />
 			<span id="select-massifs-status"></span>
 		</label>
 	</div>
 
-	<div class="selector">
+	<div class="layer-select">
 		<label>
-			<input type="checkbox" name="wri-massif" value="4" />
+			<input type="checkbox" name="select-massif" value="4" />
 			Vercors uniquement
-		</label>
-		<label>
+		</label><br /><label>
 			Refuges.info
 			<input type="checkbox" name="select-wri" value="all" />
 			<span id="select-wri-status"></span>
@@ -108,7 +99,7 @@ Based on https://openlayers.org
 		<label><input type="checkbox" name="select-wri" value="3" />passage délicat</label>
 	</div>
 
-	<div class="selector">
+	<div class="layer-select">
 		<label>
 			Overpass (OSM services)
 			<input type="checkbox" name="select-osm" id="select-osm" value="all" />
@@ -153,7 +144,7 @@ new ol.Map({
 		}),
 		...layerVectorCollection({
 			wri: {
-				selectorName: 'select-wri,wri-massif', // 2 selectors for one layer
+				selectName: 'select-wri,select-massif', // 2 selectors for one layer
 			},
 			alpages: {
 				extraParams: function() {

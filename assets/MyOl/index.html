@@ -32,7 +32,7 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
-		.selector {
+		.layer-select {
 			float: left;
 			border-right: solid;
 			padding: 5px
@@ -48,7 +48,7 @@ Based on https://openlayers.org
 	<div id="map"></div>
 	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
-	<div id="additional-selector" >
+	<div id="add-select" >
 		<hr />
 		<label>chemineur.fr <input type="checkbox" name="select-chem" value="all" /></label>
 		<label><input type="checkbox" name="select-chem" value="3" />Refuge</label>
@@ -66,11 +66,11 @@ new ol.Map({
 	controls: controlsCollection()
 		.concat(controlLayerSwitcher({
 			layers: layerTileCollection(),
-			additionalSelectorId: 'additional-selector',
+			addSelectId: 'add-select',
 		})),
 	layers: [
 		layerClusterGeoBB({ // Chemineur
-			selectorName: 'select-chem',
+			selectName: 'select-chem',
 		}),
 		layerMarker({
 			src: 'examples/images/viseur.png',

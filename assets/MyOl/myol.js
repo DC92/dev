@@ -607,13 +607,13 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers();
 
 		// Attach html additional selector
-		const additionalSelectorEl = document.getElementById(options.additionalSelectorId);
+		const addSelectEl = document.getElementById(options.addSelectId);
 
-		if (additionalSelectorEl) {
-			additionalSelectorEl.classList.add('additional-selector');
-			control.submenuEl.appendChild(additionalSelectorEl);
+		if (addSelectEl) {
+			addSelectEl.classList.add('add-select');
+			control.submenuEl.appendChild(addSelectEl);
 			// Unmask the selector if it has been @ the declaration
-			additionalSelectorEl.style.display = '';
+			addSelectEl.style.display = '';
 		}
 	}
 
@@ -687,10 +687,11 @@ function controlLayerSwitcher(options) {
  * Styles, icons & labels
  *
  * Options:
- * selectorName : <input name="SELECTORNAME"> url arguments selector
-   can be several SELECTORNAME1,SELECTORNAME2,...
-   display loading status <TAG id="SELECTOR_NAME-status"></TAG>
- * callBack : selector function to call when selected 
+ * selectName : <input name="SELECT_NAME"> url arguments selector
+   can be several SELECT_NAME_1,SELECT_NAME_2,...
+   display loading status <TAG id="SELECT_NAME-status"></TAG>
+   No selectName or no selector with this name will display the layer
+ * callBack : function to call when selected 
  * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
@@ -702,17 +703,18 @@ function controlLayerSwitcher(options) {
  */
 function layerVector(opt) {
 	const options = {
-			selectorName: '',
+			selectName: '',
 			callBack: function() {
 				layer.setVisible(
-					selector(selectorNames[0]).length // By default, visibility depends on the first selector only
+					// By default, visibility depends on the first selector only
+					selectVectorLayer(selectNames[0]).length
 				);
 				source.refresh();
 			},
 			styleOptClusterFnc: styleOptCluster,
 			...opt
 		},
-		selectorNames = options.selectorName.split(','),
+		selectNames = (options.selectName || '').split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
 			url: url,
@@ -726,7 +728,7 @@ function layerVector(opt) {
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options
 		}),
-		statusEl = document.getElementById(selectorNames[0] + '-status'); // XHR download tracking
+		statusEl = document.getElementById(selectNames[0] + '-status'); // XHR download tracking
 
 	layer.setMapInternal = function(map) {
 		ol.layer.Vector.prototype.setMapInternal.call(this, map);
@@ -741,7 +743,7 @@ function layerVector(opt) {
 	};
 
 	layer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
-	selectorNames.map(name => selector(name, options.callBack)); // Setup the selector managers
+	selectNames.map(name => selectVectorLayer(name, options.callBack)); // Setup the selector managers
 	options.callBack(); // Init parameters depending on the selector
 
 	// Default url callback function for the layer
@@ -754,7 +756,7 @@ function layerVector(opt) {
 					'EPSG:4326' // Received projection
 				)
 				.map(c => c.toFixed(4)), // Round to 4 digits
-				selectorNames.map(name => selector(name).join(',')), // Array of string: selected values separated with ,
+				selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
 				extent,
 				resolution
 			),
@@ -1169,14 +1171,18 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * You can force the values in window.localStorage[simplified name]
  * Return return an array of selected values
  */
-function selector(name, callBack) {
-	const selectorEls = [...document.getElementsByName(name)],
+function selectVectorLayer(name, callBack) {
+	const selectEls = [...document.getElementsByName(name)],
 		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
 		init = (localStorage[safeName] || '').split(',');
 
+	// No selectName or no selector with this name = 1 selector checked
+	if (!selectEls.length)
+		return [true];
+
 	// Init
 	if (typeof callBack == 'function') {
-		selectorEls.forEach(el => {
+		selectEls.forEach(el => {
 			el.checked =
 				init.includes(el.value) ||
 				init.includes('all') ||
@@ -1189,15 +1195,15 @@ function selector(name, callBack) {
 	function onClick(evt) {
 		// Test the "all" box & set other boxes
 		if (evt && evt.target.value == 'all')
-			selectorEls
+			selectEls
 			.forEach(el => el.checked = evt.target.checked);
 
 		// Test if all values are checked
-		const allChecked = selectorEls
+		const allChecked = selectEls
 			.filter(el => !el.checked && el.value != 'all');
 
 		// Set the "all" box
-		selectorEls
+		selectEls
 			.forEach(el => {
 				if (el.value == 'all')
 					el.checked = !allChecked.length;
@@ -1214,7 +1220,7 @@ function selector(name, callBack) {
 	}
 
 	function selection() {
-		return selectorEls
+		return selectEls
 			.filter(el => el.checked && el.value != 'all')
 			.map(el => el.value);
 	}
@@ -1243,7 +1249,7 @@ function layerGeoBB(options) {
 				...opt.extraParams(bbox),
 			};
 		},
-		selectorName: 'select-chem',
+		selectName: 'select-chem',
 		extraParams: function(bbox) {
 			return {
 				bbox: bbox.join(','),
@@ -1319,7 +1325,7 @@ function layerWri(options) {
 				...opt.extraParams(bbox),
 			};
 		},
-		selectorName: 'select-wri',
+		selectName: 'select-wri',
 		extraParams: function(bbox) {
 			return {
 				bbox: bbox.join(','),
@@ -1382,7 +1388,7 @@ function layerWriAreas(options) {
 				type_polygon: opt.polygon,
 			};
 		},
-		selectorName: 'select-massifs',
+		selectName: 'select-massifs',
 		convertProperties: function(properties) {
 			return {
 				name: properties.nom,
@@ -1425,7 +1431,7 @@ function layerWriAreas(options) {
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		selectorName: 'select-prc',
+		selectName: 'select-prc',
 		strategy: ol.loadingstrategy.all,
 		convertProperties: function(properties) {
 			return {
@@ -1489,7 +1495,7 @@ function layerC2C(options) {
 				bbox: extent.join(','),
 			};
 		},
-		selectorName: 'select-c2c',
+		selectName: 'select-c2c',
 		format: format,
 		styleOptFnc: function(f, properties) {
 			return styleOptIconChemineur(properties.type);
@@ -1515,7 +1521,7 @@ function layerOverpass(opt) {
 			host: 'overpass.kumi.systems',
 			//host: 'overpass.nchc.org.tw',
 
-			selectorName: 'select-osm',
+			selectName: 'select-osm',
 			maxResolution: 50,
 			styleOptFnc: function(f, properties) {
 				return styleOptIconChemineur(properties.type);
@@ -1530,15 +1536,15 @@ function layerOverpass(opt) {
 			format: format,
 			...options
 		}),
-		statusEl = document.getElementById(options.selectorName),
-		selectorEls = document.getElementsByName(options.selectorName);
+		statusEl = document.getElementById(options.selectName),
+		selectEls = document.getElementsByName(options.selectName);
 
 	// List of acceptable tags in the request return
 	let tags = '';
 
-	for (let e in selectorEls)
-		if (selectorEls[e].value)
-			tags += selectorEls[e].value.replace('private', '');
+	for (let e in selectEls)
+		if (selectEls[e].value)
+			tags += selectEls[e].value.replace('private', '');
 
 	function urlArgsFnc(o, bbox, selections) {
 		const items = selections[0].split(','), // The 1st (and only selector)
@@ -1645,7 +1651,7 @@ function layerVectorCollection(options) {
 		layerGeoBB({
 			strategy: ol.loadingstrategy.all,
 			host: '//alpages.info/',
-			selectorName: 'select-alpages',
+			selectName: 'select-alpages',
 			attribution: 'Alpages',
 			...options.alpages
 		}),

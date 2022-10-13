@@ -21,7 +21,7 @@ const marker = layerMarker({
 		styleOptFnc: function(feature, properties) {
 			return styleOptIcon(properties.icon); // Display only the icon
 		},
-		hoverStyleOptFnc: null, // Pour ne pas perturber l'édition par ces étiquettes intempestives
+		hoverstyleOptFnc: null, // Pour ne pas perturber l'édition par ces étiquettes intempestives
 	});
 
 new ol.Map({

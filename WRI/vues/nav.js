@@ -15,9 +15,9 @@ const mapId = 'carte-nav',
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
 	layers = [
 		// Refuges.info (2 level layer depending on resolution)
-		layerClusterWri({
+		...layersWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectorName: 'select-wri,select-massif', // 2 selectors for one layer
+			selectName: 'selec-wri,selec-massif', // 2 selectors for one layer
 			styleOptFnc: function (feature, properties) {
 				return {
 					...styleOptLabel(properties.name, properties, true),
@@ -33,7 +33,7 @@ const mapId = 'carte-nav',
 				'api/polygones?massif=<?=$vue->polygone->id_polygone?>',
 			zIndex: 3, // Au dessus des massifs mais en dessous de son hover
 			<?php if ( !$vue->contenu ) { ?>
-				selectorName: 'select-massif',
+				selectName: 'selec-massif',
 			<?php } ?>
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
@@ -47,20 +47,38 @@ const mapId = 'carte-nav',
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			<?php if ( !$vue->contenu ) { ?>
-				selectorName: 'select-massifs', //TODO BUG a reprendre
+				selectName: 'selec-massifs',
 			<?php } ?>
 		}),
 
-		layerOverpass(),
-		layerPrc(),
-		layerC2C(),
-		layerClusterGeoBB({
+		// Overpass
+		layerOverpass({
+			selectName: 'selec-osm',
+			maxResolution: 100,
+		}),
+
+		// Pyrenees-refuges.com
+		layerPyreneesRefuges({
+			selectName: 'selec-prc',
+		}),
+
+		// CampToCamp
+		layerC2C({
+			selectName: 'selec-c2c',
+		}),
+
+		// Chemineur
+		...layersGeoBB({
+			host: '//chemineur.fr/',
+			selectName: 'selec-chemineur',
 			attribution: 'Chemineur',
 		}),
-		layerGeoBB({ // Alpages.info
+
+		// Alpages.info
+		layerGeoBB({
 			strategy: ol.loadingstrategy.all,
 			host: '//alpages.info/',
-			selectorName: 'select-alpages',
+			selectName: 'selec-alpages',
 			extraParams: function() {
 				return {
 					forums: '4,5',

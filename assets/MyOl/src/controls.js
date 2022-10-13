@@ -260,7 +260,6 @@ function controlGeocoder(options) {
 
 	const geocoder = new Geocoder('nominatim', {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
-			//BEST DELETE ??? preventDefault: true,
 			...options
 		}),
 		controlEl = geocoder.element.firstElementChild;

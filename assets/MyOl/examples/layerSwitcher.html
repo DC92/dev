@@ -43,7 +43,7 @@ Based on https://openlayers.org
 
 	<div id="map"></div>
 
-	<div id="additional-selector" >
+	<div id="add-select" >
 		<hr />
 		<label>Countries <input type="checkbox" checked="checked" onChange="countries.setVisible(this.checked)" /></label>
 	</div>
@@ -82,7 +82,7 @@ new ol.Map({
 	controls: [
 		controlLayerSwitcher({
 			layers: baseLayers,
-			additionalSelectorId: 'additional-selector',
+			addSelectId: 'add-select',
 		}),
 	],
 	layers: [countries],

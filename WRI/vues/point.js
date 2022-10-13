@@ -19,7 +19,7 @@ new ol.Map({
 	],
 	layers: [
 		// Refuges.info (2 level layer depending on resolution)
-		layerClusterWri({
+		...layersWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			styleOptFnc: function (feature, properties) {
 				return {

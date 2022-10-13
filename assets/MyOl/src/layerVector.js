@@ -7,10 +7,11 @@
  * Styles, icons & labels
  *
  * Options:
- * selectorName : <input name="SELECTORNAME"> url arguments selector
-   can be several SELECTORNAME1,SELECTORNAME2,...
-   display loading status <TAG id="SELECTOR_NAME-status"></TAG>
- * callBack : selector function to call when selected 
+ * selectName : <input name="SELECT_NAME"> url arguments selector
+   can be several SELECT_NAME_1,SELECT_NAME_2,...
+   display loading status <TAG id="SELECT_NAME-status"></TAG>
+   No selectName or no selector with this name will display the layer
+ * callBack : function to call when selected 
  * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
@@ -22,17 +23,18 @@
  */
 function layerVector(opt) {
 	const options = {
-			selectorName: '',
+			selectName: '',
 			callBack: function() {
 				layer.setVisible(
-					selector(selectorNames[0]).length // By default, visibility depends on the first selector only
+					// By default, visibility depends on the first selector only
+					selectVectorLayer(selectNames[0]).length
 				);
 				source.refresh();
 			},
 			styleOptClusterFnc: styleOptCluster,
 			...opt
 		},
-		selectorNames = options.selectorName.split(','),
+		selectNames = (options.selectName || '').split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
 			url: url,
@@ -46,7 +48,7 @@ function layerVector(opt) {
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options
 		}),
-		statusEl = document.getElementById(selectorNames[0] + '-status'); // XHR download tracking
+		statusEl = document.getElementById(selectNames[0] + '-status'); // XHR download tracking
 
 	layer.setMapInternal = function(map) {
 		//HACK execute actions on Map init
@@ -62,7 +64,7 @@ function layerVector(opt) {
 	};
 
 	layer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
-	selectorNames.map(name => selector(name, options.callBack)); // Setup the selector managers
+	selectNames.map(name => selectVectorLayer(name, options.callBack)); // Setup the selector managers
 	options.callBack(); // Init parameters depending on the selector
 
 	// Default url callback function for the layer
@@ -75,7 +77,7 @@ function layerVector(opt) {
 					'EPSG:4326' // Received projection
 				)
 				.map(c => c.toFixed(4)), // Round to 4 digits
-				selectorNames.map(name => selector(name).join(',')), // Array of string: selected values separated with ,
+				selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
 				extent,
 				resolution
 			),
@@ -493,14 +495,18 @@ ol.loadingstrategy.bboxLimit = function(extent, resolution) {
  * You can force the values in window.localStorage[simplified name]
  * Return return an array of selected values
  */
-function selector(name, callBack) {
-	const selectorEls = [...document.getElementsByName(name)],
+function selectVectorLayer(name, callBack) {
+	const selectEls = [...document.getElementsByName(name)],
 		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
 		init = (localStorage[safeName] || '').split(',');
 
+	// No selectName or no selector with this name = 1 selector checked
+	if (!selectEls.length)
+		return [true];
+
 	// Init
 	if (typeof callBack == 'function') {
-		selectorEls.forEach(el => {
+		selectEls.forEach(el => {
 			el.checked =
 				init.includes(el.value) ||
 				init.includes('all') ||
@@ -513,15 +519,15 @@ function selector(name, callBack) {
 	function onClick(evt) {
 		// Test the "all" box & set other boxes
 		if (evt && evt.target.value == 'all')
-			selectorEls
+			selectEls
 			.forEach(el => el.checked = evt.target.checked);
 
 		// Test if all values are checked
-		const allChecked = selectorEls
+		const allChecked = selectEls
 			.filter(el => !el.checked && el.value != 'all');
 
 		// Set the "all" box
-		selectorEls
+		selectEls
 			.forEach(el => {
 				if (el.value == 'all')
 					el.checked = !allChecked.length;
@@ -538,7 +544,7 @@ function selector(name, callBack) {
 	}
 
 	function selection() {
-		return selectorEls
+		return selectEls
 			.filter(el => el.checked && el.value != 'all')
 			.map(el => el.value);
 	}

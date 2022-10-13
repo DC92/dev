@@ -700,19 +700,19 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   max-height: calc(100% - 65px); /* Pour ne pas trop déborder en bas */
   margin: 0 0.8%;
 }
-#select-carte-nav {
+#selec-carte-nav {
   padding-left: 1px;
 }
-#select-carte-nav P {
+#selec-carte-nav P {
   margin-top: 0;
   margin-bottom: 5px;
 }
-#select-carte-nav SPAN {
+#selec-carte-nav SPAN {
   font-size: .8em;
   font-style: oblique;
 }
-#select-carte-nav INPUT,
-#select-carte-nav LABEL {
+#selec-carte-nav INPUT,
+#selec-carte-nav LABEL {
   text-align: justify;
   cursor: pointer;
 }
@@ -729,7 +729,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     width: 67%;
     max-height: calc(100% - 75px);
   }
-  #select-carte-nav {
+  #selec-carte-nav {
     display: table-cell;
     width: 33%;
   }
@@ -741,7 +741,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     width: 75vw;
     height: 75vw;
   }
-  #select-carte-nav {
+  #selec-carte-nav {
     display: table-cell;
     width: 33%;
     padding-left: 5px;
