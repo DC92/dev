@@ -1913,12 +1913,11 @@ function controlGeocoder(options) {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 			...options
 		}),
-		controlEl = geocoder.element.firstElementChild,
-		inputEls = geocoder.element.getElementsByTagName('input');
+		controlEl = geocoder.element.firstElementChild;
 
-	// Avoid submit a form including the map
-	if (inputEls)
-		inputEls[0].addEventListener('keypress', evt =>
+	// Avoid submit of a form including the map
+	geocoder.element.getElementsByTagName('input')[0]
+		.addEventListener('keypress', evt =>
 			evt.stopImmediatePropagation()
 		);
 
