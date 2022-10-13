@@ -14,10 +14,10 @@ const mapId = 'carte-nav',
 	mapEl = document.getElementById(mapId),
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
 	layers = [
-		// Refuges.info (2 level layer depending on resolution)
-		...layersWri({
+		// Refuges.info (2 levels layer depending on resolution)
+		layerClusterWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectName: 'selec-wri,selec-massif', // 2 selectors for one layer
+			selectName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
 			styleOptFnc: function (feature, properties) {
 				return {
 					...styleOptLabel(properties.name, properties, true),
@@ -33,7 +33,7 @@ const mapId = 'carte-nav',
 				'api/polygones?massif=<?=$vue->polygone->id_polygone?>',
 			zIndex: 3, // Au dessus des massifs mais en dessous de son hover
 			<?php if ( !$vue->contenu ) { ?>
-				selectName: 'selec-massif',
+				selectName: 'selecteur-massif',
 			<?php } ?>
 			style: new ol.style.Style({
 				stroke: new ol.style.Stroke({
@@ -47,30 +47,30 @@ const mapId = 'carte-nav',
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			<?php if ( !$vue->contenu ) { ?>
-				selectName: 'selec-massifs',
+				selectName: 'selecteur-massifs',
 			<?php } ?>
 		}),
 
 		// Overpass
 		layerOverpass({
-			selectName: 'selec-osm',
+			selectName: 'selecteur-osm',
 			maxResolution: 100,
 		}),
 
 		// Pyrenees-refuges.com
-		layerPyreneesRefuges({
-			selectName: 'selec-prc',
+		layerPrc({
+			selectName: 'selecteur-prc',
 		}),
 
 		// CampToCamp
 		layerC2C({
-			selectName: 'selec-c2c',
+			selectName: 'selecteur-c2c',
 		}),
 
 		// Chemineur
-		...layersGeoBB({
+		layerClusterGeoBB({
 			host: '//chemineur.fr/',
-			selectName: 'selec-chemineur',
+			selectName: 'selecteur-chemineur',
 			attribution: 'Chemineur',
 		}),
 
@@ -78,7 +78,7 @@ const mapId = 'carte-nav',
 		layerGeoBB({
 			strategy: ol.loadingstrategy.all,
 			host: '//alpages.info/',
-			selectName: 'selec-alpages',
+			selectName: 'selecteur-alpages',
 			extraParams: function() {
 				return {
 					forums: '4,5',
