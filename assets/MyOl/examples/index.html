@@ -54,7 +54,7 @@ Based on https://openlayers.org
 	<div id="map"></div>
 	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
-	<div id="add-select" >
+	<div id="select-ext">
 		<hr />
 		<label>chemineur.fr <input type="checkbox" name="select-chem" value="all" /></label>
 		<label><input type="checkbox" name="select-chem" value="3" />Refuge</label>
@@ -84,7 +84,7 @@ new ol.Map({
 	controls: controlsCollection()
 		.concat(controlLayerSwitcher({
 			layers: layerTileCollection(layersKeys),
-			addSelectId: 'add-select',
+			selectExtId: 'select-ext',
 		})),
 	layers: [
 		layerClusterGeoBB({ // Chemineur

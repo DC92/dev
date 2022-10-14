@@ -607,13 +607,13 @@ function controlLayerSwitcher(options) {
 		displayBaseLayers();
 
 		// Attach html additional selector
-		const addSelectEl = document.getElementById(options.addSelectId);
+		const selectExtEl = document.getElementById(options.selectExtId);
 
-		if (addSelectEl) {
-			addSelectEl.classList.add('add-select');
-			control.submenuEl.appendChild(addSelectEl);
+		if (selectExtEl) {
+			selectExtEl.classList.add('select-ext');
+			control.submenuEl.appendChild(selectExtEl);
 			// Unmask the selector if it has been @ the declaration
-			addSelectEl.style.display = '';
+			selectExtEl.style.display = '';
 		}
 	}
 
@@ -690,7 +690,8 @@ function controlLayerSwitcher(options) {
  * selectName : <input name="SELECT_NAME"> url arguments selector
    can be several SELECT_NAME_1,SELECT_NAME_2,...
    display loading status <TAG id="SELECT_NAME-status"></TAG>
-   No selectName or no selector with this name will display the layer
+   No selectName will display the layer
+   No selector with selectName will hide the layer
  * callBack : function to call when selected 
  * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
@@ -706,8 +707,8 @@ function layerVector(opt) {
 			selectName: '',
 			callBack: function() {
 				layer.setVisible(
-					// By default, visibility depends on the first selector only
-					selectVectorLayer(selectNames[0]).length
+					!selectNames[0] || // No selector name
+					selectVectorLayer(selectNames[0]).length // By default, visibility depends on the first selector only
 				);
 				source.refresh();
 			},
@@ -1175,10 +1176,6 @@ function selectVectorLayer(name, callBack) {
 	const selectEls = [...document.getElementsByName(name)],
 		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
 		init = (localStorage[safeName] || '').split(',');
-
-	// No selectName or no selector with this name = 1 selector checked
-	if (!selectEls.length)
-		return [true];
 
 	// Init
 	if (typeof callBack == 'function') {

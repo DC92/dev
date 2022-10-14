@@ -23,7 +23,7 @@ new ol.Map({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			styleOptFnc: function (feature, properties) {
 				return {
-					...styleOptLabel(properties.name, properties, true),
+					...styleOptLabel(properties.name, feature, properties, true),
 					...styleOptIcon(properties.icon),
 				};
 			},

@@ -14,13 +14,13 @@ const mapId = 'carte-nav',
 	mapEl = document.getElementById(mapId),
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
 	layers = [
-		// Refuges.info (2 levels layer depending on resolution)
+		// Refuges.info (2 layers dependant de la resolution)
 		layerClusterWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			selectName: 'selecteur-wri,selecteur-massif', // 2 selectors for one layer
+			selectName: 'selecteur-wri,selecteur-massif', // 2 selecteurs pour une même couche
 			styleOptFnc: function (feature, properties) {
 				return {
-					...styleOptLabel(properties.name, properties, true),
+					...styleOptLabel(properties.name, feature, properties, true),
 					...styleOptIcon(properties.icon),
 				};
 			},

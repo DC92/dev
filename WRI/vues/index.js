@@ -7,7 +7,8 @@ new ol.Map({
 	layers: [
 		layerMRI(), // Fond de carte WRI
 		layerWriAreas({ // La couche "massifs"
-			host: '<?=$config_wri["sous_dossier_installation"]?>', // Use local layer
+			host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
+			selectName: null, // Toujours ouvert
 		}),
 	],
 	controls: [

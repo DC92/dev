@@ -10,7 +10,7 @@ var map = new ol.Map({
 		},
 	}).concat(controlLayerSwitcher({
 		layers: layerTileCollection(mapKeys),
-		addSelectId: 'add-select',
+		selectExtId: 'select-ext',
 	})),
 });
 

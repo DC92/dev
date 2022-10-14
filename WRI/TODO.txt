@@ -1,14 +1,11 @@
 RUPTURES INTERFACE MyOl
 =======================
-//TODO selectors : status en span (1 seul caractère !)
 //TODO delete ol.css.map
 //TODO edit download
-//TODO ...layersWri => layerClusterWri / ...layersGeoBB => layerClusterGeoBB
-//TODO selecteur-... select-...
-//TODO layerPyreneesRefuges -> layerPrc
 
 BUGS
 ====
+//TODO BUG API "coord": {"alt": 1191},
 //TODO BUG Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 //TODO BUG Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),
 //TODO BUG Click logo ne va pas à l'accueil en dehors de span

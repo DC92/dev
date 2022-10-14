@@ -5,23 +5,20 @@ include ('../MyOl/gps/index.php');
 $notail = true;
 ?>
 
-<div id="add-select" >
+<div id="select-ext">
 	<hr/>
 	<div>
-		<label for="selec-wri-7">Cabanes</label>
-		<input type="checkbox" id="selec-wri-7" name="selec-wri" value="7" />
-	</div>
-	<div>
-		<label for="selec-wri-10">Refuges</label>
-		<input type="checkbox" id="selec-wri-10" name="selec-wri" value="10" />
-	</div>
-	<div>
-		<label for="selec-wri-9">Gîtes</label>
-		<input type="checkbox" id="selec-wri-9" name="selec-wri" value="9" />
-	</div>
-	<div>
-		<label for="selec-wri-23">Eau</label>
-		<input type="checkbox" id="selec-wri-23" name="selec-wri" value="23" />
+		<label for="selecteur-wri-7">Cabanes</label>
+		<input type="checkbox" id="selecteur-wri-7" name="selecteur-wri" value="7" />
+	</div><div>
+		<label for="selecteur-wri-10">Refuges</label>
+		<input type="checkbox" id="selecteur-wri-10" name="selecteur-wri" value="10" />
+	</div><div>
+		<label for="selecteur-wri-9">Gîtes</label>
+		<input type="checkbox" id="selecteur-wri-9" name="selecteur-wri" value="9" />
+	</div><div>
+		<label for="selecteur-wri-23">Eau</label>
+		<input type="checkbox" id="selecteur-wri-23" name="selecteur-wri" value="23" />
 	</div>
 </div>
 
@@ -36,11 +33,11 @@ controlOptions.supplementaryControls = [
 	}),
 ];
 controlOptions.layerSwitcher.layers = mapBaseLayers('gps');
-controlOptions.layerSwitcher.additionalSelectorId = 'add-select';
+controlOptions.layerSwitcher.selectExtId = 'select-ext';
 
 layers.push(layerWri({
 	host: '/',
-	selectName: 'selec-wri',
+	selectName: 'selecteur-wri',
 }));
 </script>
 
