@@ -269,6 +269,7 @@ FORM#form_point.lien_syntaxe {
 FORM#form_point .booleen {
   clear: left;
   float:left;
+  max-width: calc(100% - 4px);
   width: 700px; 
   text-align: right;
   padding: 1px;
@@ -282,10 +283,14 @@ FORM#form_point .booleen LABEL {
   float: none;
   padding-left: 10px;
   }
+FORM#form_point .textarea {
+  width:100%;
+  }
 FORM#form_point TEXTAREA {
   clear: both;
   float: left;
-  width:650px;
+  max-width:680px;
+  width:100%;
   height:170px;
   }
 FORM#form_point LABEL.textarea SPAN {
@@ -300,6 +305,11 @@ FORM#form_export LABEL {
 #form_export FIELDSET FIELDSET:hover {  /* deco sur le fieldset actif, pour bien le differencier des autres */
   border: thin dotted black;
   }
+@media screen and (min-width: 800px) {
+  FORM#form_point .textarea {
+    min-width:680px;
+  }
+}
 
 FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
   clear: left;
@@ -342,9 +352,6 @@ IMG { /* images sans bordures */
   padding: 0px;
   }
 
-TEXTAREA {
-  max-width: 100%;
-}
 /*=========LIENS==========*/
 A:hover { /*met en valeur les liens qd on est dessus */
   background-color: #<?=$couleur_legende?>;

@@ -739,7 +739,7 @@ function layerVector(opt) {
 			map.addLayer(options.altLayer);
 
 		// Add a layer to manage hovered features (once for a map)
-		if (!map.layerHover)
+		if (!map.layerHover && !options.noHover)
 			map.layerHover = layerHover(map);
 	};
 
