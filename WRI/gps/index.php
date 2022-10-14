@@ -32,7 +32,7 @@ controlOptions.supplementaryControls = [
 		submenuHTML: '<p>Retour à <a href="/">Refuges.info</a></p>',
 	}),
 ];
-controlOptions.layerSwitcher.layers = mapBaseLayers('gps');
+controlOptions.layerSwitcher.layers = wriMapBaseLayers('gps');
 controlOptions.layerSwitcher.selectExtId = 'select-ext';
 
 layers.push(layerWri({

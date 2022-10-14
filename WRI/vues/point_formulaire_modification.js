@@ -17,6 +17,7 @@ const marker = layerMarker({
 	layerPoints = layerWri({
 		host: '<?=$config_wri["sous_dossier_installation"]?>',
 		maxResolution: 100, // La couche est affichée pour les résolutions < 100 Mercator map unit / pixel
+		selectName: null, // Toujours affiché
 		noClick: true, // Pour ne pas perturber l'édition par ces clicks intempestifs
 		styleOptFnc: function(feature, properties) {
 			return styleOptIcon(properties.icon); // Display only the icon
@@ -32,15 +33,15 @@ new ol.Map({
 		enableRotation: false,
 		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 	}),
-	controls: [
-		...mapControls('modif'),
-		controlPermalink({ // Permet de garder le même réglage de carte en création
+	controls: wriMapControls({
+		page: 'modif',
+		Permalink: { // Permet de garder le même réglage de carte en création
 			visible: false, // Mais on ne visualise pas le lien du permalink
 <?php if (!empty($point->id_point)) { ?>
 			init: false, // Ici, on utilisera plutôt la position du point si on est en modification
 <?php } ?>
-		}),
-	],
+		},
+	}),
 	layers: [
 		layerPoints,
 		marker,

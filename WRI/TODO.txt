@@ -1,10 +1,11 @@
 RUPTURES INTERFACE MyOl
 =======================
 //TODO delete ol.css.map
-//TODO edit download
 
 BUGS
 ====
+//TODO edit download : seulement la couche éditée !
+//TODO edit : myol.js:1129 : Cannot read properties of null (reading 'ol_uid')
 //TODO BUG API "coord": {"alt": 1191},
 //TODO BUG Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 //TODO BUG Editeur massif : download ne marche pas ! (fichier vide) edit.js //controlDownload(),

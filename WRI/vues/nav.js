@@ -14,7 +14,7 @@ const mapId = 'carte-nav',
 	mapEl = document.getElementById(mapId),
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
 	layers = [
-		// Refuges.info (2 layers dependant de la resolution)
+		// Refuges.info (2 couches dependant de la resolution)
 		layerClusterWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			selectName: 'selecteur-wri,selecteur-massif', // 2 selecteurs pour une même couche
@@ -46,9 +46,7 @@ const mapId = 'carte-nav',
 		// Les massifs
 		layerWriAreas({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			<?php if ( !$vue->contenu ) { ?>
-				selectName: 'selecteur-massifs',
-			<?php } ?>
+			selectName: '<?=$vue->contenu?"":"selecteur-massifs"?>',
 		}),
 
 		// Overpass
@@ -94,13 +92,13 @@ const mapId = 'carte-nav',
 			enableRotation: false,
 			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 		}),
-		controls: [
-			...mapControls('nav'),
-			controlPermalink({ // Permet de garder le même réglage de carte
+		controls: wriMapControls({
+			page: 'nav',
+			Permalink: { // Permet de garder le même réglage de carte
 				display: true,
 				init: <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif
-			}),
-		],
+			},
+		}),
 		layers: layers,
 	});
 
