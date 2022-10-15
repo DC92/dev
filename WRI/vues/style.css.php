@@ -261,16 +261,23 @@ LI {
 
 FORM#form_point FIELDSET {
   border: thin solid transparent;  /* pour les allergiques aux barrieres ;) */
+  padding: 0.75em 0;
   }
-FORM#form_point.lien_syntaxe { 
-  float:left;
-  width:150px;
+FORM#form_point .textarea {
+  width: 700px; 
+  min-width: 450px;
+  max-width: calc(100% - 8px);
+  }
+FORM#form_point .textarea LABEL,
+FORM#form_point .textarea TEXTAREA {
+  width: 100%; 
   }
 FORM#form_point .booleen {
   clear: left;
   float:left;
-  max-width: calc(100% - 4px);
   width: 700px; 
+  min-width: 450px;
+  max-width: calc(100% - 4px);
   text-align: right;
   padding: 1px;
   }
@@ -283,20 +290,6 @@ FORM#form_point .booleen LABEL {
   float: none;
   padding-left: 10px;
   }
-FORM#form_point .textarea {
-  width:100%;
-  }
-FORM#form_point TEXTAREA {
-  clear: both;
-  float: left;
-  max-width:680px;
-  width:100%;
-  height:170px;
-  }
-FORM#form_point LABEL.textarea SPAN {
-  clear: both;
-  float:left;
-  }
 FORM#form_export LABEL {
   clear: none;
   float: left;
@@ -305,12 +298,6 @@ FORM#form_export LABEL {
 #form_export FIELDSET FIELDSET:hover {  /* deco sur le fieldset actif, pour bien le differencier des autres */
   border: thin dotted black;
   }
-@media screen and (min-width: 800px) {
-  FORM#form_point .textarea {
-    min-width:680px;
-  }
-}
-
 FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
   clear: left;
   float: left;

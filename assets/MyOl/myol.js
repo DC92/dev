@@ -723,7 +723,7 @@ function layerVectorCluster(opt) {
 	});
 
 	// Tune the clustering distance depending on the zoom level
-	clusterLayer.on('prerender', function(evt) { // Warning : only once for a map
+	clusterLayer.on('prerender', function(evt) {
 		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
 			distanceMinCluster = Math.min(
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
@@ -2747,15 +2747,21 @@ function layerEditGeoJson(opt) {
 			className: 'myol-button-edit',
 			label: 'TBD', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
+				'<label for="myol-edit0">' +
 				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
-				'<label for="myol-edit0">Modification &#x1F58D;</label><br />' +
+				'Modification &#x1F58D;' +
+				'</label>' +
 				(!options.help[1] ? '' :
+					'<label for="myol-edit1">' +
 					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
-					'<label for="myol-edit1">Création ligne &#xD17;</label><br />') +
+					'Création ligne &#xD17;' +
+					'</label>') +
 				(!options.help[2] ? '' :
+					'<label for="myol-edit2">' +
 					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
-					'<label for="myol-edit2">Création polygone &#X23E2;</label>') +
-				'<hr /><div id="myol-help-edit"></div>',
+					'Création polygone &#X23E2;' +
+					'</label>') +
+				'<hr/><div id="myol-help-edit"></div>',
 		}),
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 
@@ -2843,12 +2849,11 @@ function layerEditGeoJson(opt) {
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null;
 
-	layer.once('prerender', function() { // Warning : only once for a map
-		const map = layer.get('map');
+	layer.setMapInternal = function(map) {
+		ol.layer.Vector.prototype.setMapInternal.call(this, map);
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
 		map.addControl(control);
-		control.changeModeEdit(); // Display button & help
 
 		// Zoom the map on the loaded features
 		if (options.focus && features.length) {
@@ -2872,7 +2877,7 @@ function layerEditGeoJson(opt) {
 		});
 
 		map.on('pointermove', hover);
-	});
+	};
 
 	control.changeModeEdit = function(evt) {
 		const level = evt ? evt.target.value : 0,

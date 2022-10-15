@@ -192,7 +192,7 @@ function layerVectorCluster(opt) {
 	});
 
 	// Tune the clustering distance depending on the zoom level
-	clusterLayer.on('prerender', function(evt) { // Warning : only once for a map
+	clusterLayer.on('prerender', function(evt) {
 		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
 			distanceMinCluster = Math.min(
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
