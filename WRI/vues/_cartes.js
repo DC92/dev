@@ -41,7 +41,7 @@ function wriMapControls(options) {
 		controlGeocoder(),
 		controlGPS(),
 		options.page == 'point' ? controlButton() : controlLoadGPX(),
-		controlDownload(),
+		options.page == 'nav' ? controlButton() : controlDownload(options.Download),
 		options.page == 'modif' ? controlButton() : controlPrint(),
 
 		// Haut droit

@@ -20,6 +20,7 @@ Based on https://openlayers.org
 	<script src="../src/header.js"></script><!-- For JSONparse -->
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
 	<script src="../src/controls.js"></script>
+	<script src="../src/files.js"></script><!-- Download demo -->
 	<link href="../src/editor.css" type="text/css" rel="stylesheet">
 	<script src="../src/editor.js"></script>
 
@@ -139,7 +140,9 @@ new ol.Map({
 	controls: [
 		new ol.control.Zoom(),
 		controlLoadGPX(),
-		controlDownload(),
+		controlDownload({
+			savedLayer: editor,
+		}),
 	],
 	layers: [
 		new ol.layer.Tile({

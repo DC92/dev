@@ -24,10 +24,11 @@ echo "TO myol.css</p>\n<p>";
 
 $js[] = get ('header.js');
 $js[] = get ('layerTileCollection.js');
-$js[] = get ('layerSwitcher.js');
 $js[] = get ('layerVector.js');
 $js[] = get ('layerVectorCollection.js');
 $js[] = get ('controls.js');
+$js[] = get ('layerSwitcher.js');
+$js[] = get ('files.js');
 $js[] = get ('gps.js');
 $js[] = get ('marker.js');
 $js[] = get ('editor.js');

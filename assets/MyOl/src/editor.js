@@ -304,7 +304,6 @@ function layerEditGeoJson(opt) {
 /**
  * Refurbish Lines & Polygons
  * Split lines having a summit at deleteCoords
- * Common to controlDownload & layerEditGeoJson
  */
 function optimiseFeatures(features, withLines, withPolygons, merge, holes, deleteCoords) {
 	const points = [],

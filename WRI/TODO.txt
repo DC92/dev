@@ -4,7 +4,6 @@ RUPTURES INTERFACE MyOl
 
 BUGS
 ====
-//TODO edit download : seulement la couche éditée !
 //TODO BUG Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
 //BEST BUG API "coord": {"alt": 1191},
 //BEST https://bitsofco.de/what-self-skipwaiting-does-to-the-service-worker-lifecycle/ 

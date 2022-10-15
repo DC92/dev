@@ -34,6 +34,9 @@ const contours = layerVector({
 		}),
 		controls: wriMapControls({
 			page: 'modif',
+			Download: {
+				savedLayer: editeur, // Obtenir uniquement le massif en cours d'édition
+			},
 			Permalink: {// Permet de garder le même réglage de carte
 <?php if ($vue->polygone->id_polygone) { ?>
 				init: false, // Ici, on cadrera plutôt sur le massif
