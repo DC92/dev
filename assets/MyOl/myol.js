@@ -360,8 +360,9 @@ function layerGoogle(subLayer) {
 /**
  * Bing (Microsoft)
  * options.imagerySet: sublayer
- * options.key: Get your own (free) key at https://docs.microsoft.com/en-us/bingmaps/getting-started/
- * attributions: defined by source.BingMaps
+ * options.key: Get your own (free) key at https://www.bingmapsportal.com
+ * Doc at: https://docs.microsoft.com/en-us/bingmaps/getting-started/
+ * attributions: defined by ol.source.BingMaps
  */
 function layerBing(options) {
 	if (options && options.key) { // Don't display if no key provided
