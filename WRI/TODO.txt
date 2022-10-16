@@ -4,10 +4,6 @@ RUPTURES INTERFACE MyOl
 
 BUGS
 ====
-//TODO BUG Cabane fermée, mais impossible de supprimer les "remarques" qui laissent penser le contraire.....!
-//BEST BUG API "coord": {"alt": 1191},
-//BEST https://bitsofco.de/what-self-skipwaiting-does-to-the-service-worker-lifecycle/ 
-//BEST https://stackoverflow.com/questions/59207110/in-a-pwa-is-there-a-way-to-check-for-a-waiting-service-worker-upgrade 
 
 EVOLUTION MENU
 ==============
@@ -27,6 +23,13 @@ Accueil carte
 	liste (ou choix des types de points)
 Point
 
+PWA ?
+=====
+//BEST https://bitsofco.de/what-self-skipwaiting-does-to-the-service-worker-lifecycle/ 
+//BEST https://stackoverflow.com/questions/59207110/in-a-pwa-is-there-a-way-to-check-for-a-waiting-service-worker-upgrade 
+//BEST https://www.educative.io/blog/5-minute-guide-to-push-notifications-in-pwa#implement 
+//BEST https://github.com/phpbb-seo/pwa/blob/main/event/main_listener.php 
+
 EVOLUTIONS
 ==========
 //BEST retrouver par le mail
@@ -35,10 +38,6 @@ EVOLUTIONS
 //BEST Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 //BEST ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 //BEST ce text est paramétrable depuis le wiki
-
-//BEST https://www.educative.io/blog/5-minute-guide-to-push-notifications-in-pwa#implement 
-//BEST https://github.com/phpbb-seo/pwa/blob/main/event/main_listener.php 
-
 //BEST http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
 //BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 //BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
