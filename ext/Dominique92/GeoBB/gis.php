@@ -36,6 +36,7 @@ $bbox_sql =
 
 // Temporary tool to generate all the clusters
 //BEST reprendre avec GROUP BY round(ST_X(geom)::numeric,1)
+//TODO pas groupir traces
 if (0) {
 	$sql="
 		SELECT post_id, geo_cluster,

@@ -152,8 +152,8 @@ $config_wri['defaut_max_jours_ajouts_recents']=7;
 // nombre de points ou commentaires renvoyés par défaut sur la page des nouvelles si on en veut "plus"
 $config_wri['defaut_max_page_nouvelles']=100;
 
-// distance (en mètres) d'une cabane cachée à laquelle on ne peut pas créer d'autres cabanes
-$config_wri['defaut_max_distance_cabane_cachee']=100;
+// distance d'une cabane cachée à laquelle on ne peut pas créer d'autres cabanes
+$config_wri['defaut_max_distance_cabane_cachee']=100; // en mètres
 
 
 /********** Lié au Forum / comptes / utilisateurs / login / users ************/
