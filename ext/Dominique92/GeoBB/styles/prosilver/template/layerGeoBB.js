@@ -39,7 +39,8 @@ if (mapType == 'line' && scriptName == 'viewtopic') {
 }
 
 if (mapType == 'line' && scriptName == 'posting')
-	map.addLayer(layerEditGeoJson({
+	//TODO save only layerEditGeoJson.layer
+	map.addControl(layerEditGeoJson({
 		geoJsonId: 'marker-json',
 		focus: 15,
 		help: [

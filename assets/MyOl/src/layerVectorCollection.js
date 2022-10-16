@@ -2,6 +2,7 @@
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
+//jshint esversion: 9
 
 /**
  * Site chemineur.fr, alpages.info

@@ -1,5 +1,5 @@
 // Affiche la limite de tous les massifs
-const contours = layerVector({
+const coucheContours = layerVector({
 		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		noHover: true,
 		style: new ol.style.Style({
@@ -9,9 +9,9 @@ const contours = layerVector({
 		}),
 	}),
 
-	editeur = layerEditGeoJson({
+	controleEditeur = layerEditGeoJson({
 		geoJsonId: 'edit-json',
-		snapLayers: [contours],
+		snapLayers: [coucheContours],
 		help: [
 			(document.getElementById('myol-help-edit-modify') || {}).innerHTML,
 			null, // Pas d'édition de ligne
@@ -35,7 +35,7 @@ const contours = layerVector({
 		controls: wriMapControls({
 			page: 'modif',
 			Download: {
-				savedLayer: editeur, // Obtenir uniquement le massif en cours d'édition
+				savedLayer: controleEditeur.layer, // Obtenir uniquement le massif en cours d'édition
 			},
 			Permalink: {// Permet de garder le même réglage de carte
 <?php if ($vue->polygone->id_polygone) { ?>
@@ -44,10 +44,11 @@ const contours = layerVector({
 			},
 		}),
 		layers: [
-			contours,
-			editeur,
+			coucheContours,
 		],
 	});
+
+map.addControl(controleEditeur);
 
 	// Centrer sur la zone du polygone
 	<?if ($vue->polygone->id_polygone){?>

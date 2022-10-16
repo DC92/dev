@@ -82,7 +82,6 @@ Based on https://openlayers.org
 		<p><hr/>Un polygone entièrement compris dans un autre crée un "trou"</p>
 	</div>
 
-	<!-- Features editor -->
 	<input type="text" id="geojson" style="width:90%" value='{
 		"type": "FeatureCollection",
 		"features": [{
@@ -120,8 +119,8 @@ const snaplayer = new ol.layer.Vector({
 		}),
 	}),
 
-	editor = layerEditGeoJson({
-		//BEST généraliser les aides / traduction
+	controlEditor = layerEditGeoJson({
+		//BEST generalize aids / translation
 		geoJsonId: 'geojson',
 		snapLayers: [snaplayer],
 		help: [
@@ -141,15 +140,15 @@ new ol.Map({
 		new ol.control.Zoom(),
 		controlLoadGPX(),
 		controlDownload({
-			savedLayer: editor,
+			savedLayer: controlEditor.layer,
 		}),
+		controlEditor,
 	],
 	layers: [
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
 		snaplayer,
-		editor,
 	],
 });
 	</script>

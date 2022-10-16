@@ -2,6 +2,8 @@
  * GPX file loader control
  * Requires controlButton
  */
+//jshint esversion: 9
+
 //BEST export / import names and links
 //BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
 //BEST misc formats

@@ -1,6 +1,7 @@
 /**
- * This module defines many WMTS EPSG:3857 tiles layers
+ * WMTS EPSG:3857 tiles layers
  */
+//jshint esversion: 9
 
 /**
  * Openstreetmap

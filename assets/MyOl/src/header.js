@@ -38,16 +38,9 @@ if (location.hash == '###')
 			if (registrations.length) {
 				data.push('service-workers:'); //BEST BUG displayed event when we have nothing
 
-				for (let registration of registrations) {
-					if (registration.active) {
+				for (let registration of registrations)
+					if (registration.active)
 						data.push('  ' + registration.active.scriptURL);
-
-						// TEMPORARY : Delete previous version of MyOl service worker
-						if (registration.active.scriptURL.includes('url_path'))
-							registration.unregister()
-							.then(console.log('SW ' + registration.active.scriptURL + ' deleted'));
-					}
-				}
 			}
 		});
 

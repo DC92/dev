@@ -2,6 +2,8 @@
  * GPS control
  * Requires controlButton
  */
+//jshint esversion: 9
+
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +

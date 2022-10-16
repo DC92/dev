@@ -39,7 +39,7 @@ function get ($file) {
 	echo "$file, ";
 	return "/* FILE src/$file */\n".
 		preg_replace (
-			'/\n?[ \t]*\/\/[A-Z][^\n]*/', '',
+			'/\n?[ \t]*\/\/([A-Z]|jshint)[^\n]*/', '',
 			file_get_contents ('src/'.$file)
 		);
 }

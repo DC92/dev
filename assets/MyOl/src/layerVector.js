@@ -1,6 +1,7 @@
 /**
- * This file adds some facilities to ol.layer.Vector
+ * Adds some facilities to ol.layer.Vector
  */
+//jshint esversion: 9
 
 /**
  * Layer to display remote geoJson
@@ -177,22 +178,23 @@ function layerVectorCluster(opt) {
 		}),
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
-			style: clusterStyle,
+			style: (feature, resolution) => layer.getStyleFunction()(feature, resolution),
 			visible: layer.getVisible(),
 			zIndex: layer.getZIndex(),
 			...options
 		});
 
+
 	clusterLayer.setMapInternal = layer.setMapInternal; //HACK execute actions on Map init
 	clusterLayer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
 
 	// Propagate setVisible following the selector status
-	layer.on('change:visible', function() {
-		clusterLayer.setVisible(this.getVisible());
-	});
+	layer.on('change:visible', () =>
+		clusterLayer.setVisible(layer.getVisible())
+	);
 
 	// Tune the clustering distance depending on the zoom level
-	clusterLayer.on('prerender', function(evt) {
+	clusterLayer.on('prerender', evt => {
 		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
 			distanceMinCluster = Math.min(
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
@@ -230,14 +232,6 @@ function layerVectorCluster(opt) {
 			geometry: point,
 			features: features
 		});
-	}
-
-	// Style callback function for the layer
-	function clusterStyle(feature, resolution) {
-		const features = feature.get('features'),
-			style = layer.getStyleFunction();
-
-		return style(feature, resolution);
 	}
 
 	return clusterLayer;
@@ -401,7 +395,7 @@ function layerHover(map) {
 	map.addLayer(layer);
 
 	// Leaving the map reset hovering
-	window.addEventListener('mousemove', function(evt) {
+	window.addEventListener('mousemove', evt => {
 		const divRect = map.getTargetElement().getBoundingClientRect();
 
 		// The mouse is outside of the map

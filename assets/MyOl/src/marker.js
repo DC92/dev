@@ -6,6 +6,8 @@
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
+//jshint esversion: 9
+
 function layerMarker(opt) {
 	const options = {
 			position: [0, 0],

@@ -2,6 +2,8 @@
  * Layer switcher
  * Need to include layerSwitcher.css
  */
+//jshint esversion: 9
+
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
 function controlLayerSwitcher(options) {
