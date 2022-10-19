@@ -313,7 +313,7 @@ function controlPrint(options) {
 	control.resizeDraftPrint = function() {
 		const map = control.getMap(),
 			mapEl = map.getTargetElement(),
-			poElcs = document.querySelectorAll('input[name=print-orientation]:checked'),
+			poElcs = document.querySelectorAll('input[name=myol-po]:checked'),
 			orientation = poElcs.length ? parseInt(poElcs[0].value) : 0;
 
 		mapEl.style.maxHeight = mapEl.style.maxWidth =
