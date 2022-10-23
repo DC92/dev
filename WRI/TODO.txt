@@ -1,7 +1,3 @@
-RUPTURES INTERFACE MyOl
-=======================
-//TODO delete ol.css.map
-
 BUGS
 ====
 
@@ -10,10 +6,10 @@ EVOLUTION MENU
 //TODO BUG Revoir bandeau grandes fenêtres & logo
 //TODO BUG Click logo ne va pas à l'accueil en dehors de span
 //BEST bandeau mot de passe oublié
+//BEST forum modérateurs dans le bandeau
 
 EVOLUTION PAGE ACCUEIL
 ======================
-//BEST Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
 //BEST Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
 //BEST Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 //BEST https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
@@ -32,6 +28,7 @@ PWA ?
 
 EVOLUTIONS
 ==========
+//BEST Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
 //BEST retrouver par le mail
 //BEST N'afficher que les massifs contenant des points
 //BEST Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)

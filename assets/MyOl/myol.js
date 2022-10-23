@@ -2242,6 +2242,7 @@ function controlDownload(opt) {
 /**
  * GPS control
  * Requires controlButton
+ * Need to include controls.js & controls.css
  */
 
 function controlGPS(options) {
