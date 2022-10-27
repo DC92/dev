@@ -49,8 +49,13 @@ if (location.hash == '###')
 			if (names.length) {
 				data.push('caches:');
 
-				for (let name of names)
+				for (let name of names) {
 					data.push('  ' + name);
+
+					// TEMPORARY : Delete previous version of MyOl cache
+					if (name == 'myGpsCache')
+						caches.delete(name);
+				}
 			}
 		});
 
