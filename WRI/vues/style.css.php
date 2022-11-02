@@ -3,7 +3,7 @@
 La seule et unique feuille de style CSS du site refuges.info
 
 Pourquoi une feuille de style en .php ?
-- le but c'est de faire un style dynamique selon la saison pour changer les couleurs ;-) 
+- le but c'est de faire un style dynamique selon la saison pour changer les couleurs ;-)
 ouais je sais, c'est franchement de la frime et ça sert à rien, mais si on ne peut plus s'amuser sur une projet
 bénévole ! -- sly
 
@@ -138,7 +138,7 @@ HTML {
   width: 100%; /* jmb 01/2008 , pour gmaps */
   height: 100%;
   }
-BODY { 
+BODY {
   margin: 0px; /* il le faut pour FF */
   width: 100%; /* jmb 01/2008 , pour gmaps */
   height: 100%;
@@ -203,8 +203,8 @@ H3 { /* titres de pages */
   font-weight: bold ;
   font-style: normal ;
   font-size: large;
-  padding: 0em 2em ; 
-  margin: 0em; 
+  padding: 0em 2em ;
+  margin: 0em;
   text-align: center;
   margin-bottom:3px;
   background-color: #<?=$couleur_decoration_titres?>;
@@ -264,18 +264,18 @@ FORM#form_point FIELDSET {
   padding: 0.75em 0;
   }
 FORM#form_point .textarea {
-  width: 700px; 
+  width: 700px;
   min-width: 450px;
   max-width: calc(100% - 8px);
   }
 FORM#form_point .textarea LABEL,
 FORM#form_point .textarea TEXTAREA {
-  width: 100%; 
+  width: 100%;
   }
 FORM#form_point .booleen {
   clear: left;
   float:left;
-  width: 700px; 
+  width: 700px;
   min-width: 450px;
   max-width: calc(100% - 4px);
   text-align: right;
@@ -344,8 +344,8 @@ A:hover { /*met en valeur les liens qd on est dessus */
   background-color: #<?=$couleur_legende?>;
   text-decoration: none;
   }
-/* 
-J'intègre également les class des liens du forum 
+/*
+J'intègre également les class des liens du forum
 en gros je veux tout de la même couleur
 */
 
@@ -353,7 +353,7 @@ A,A.mainmenu,A.nav,A.forumlink,A.cattitle,A.topictitle,A.postlink,A.gen,A.genmed
   color : #<?=$couleur_lien?>; /* en accord avec le thème du forum, et moins agressif */
   text-decoration: none;
   }
-  
+
 A:visited {
   color : #<?=$couleur_lien_visite?>;
   }
@@ -389,7 +389,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 
 /*=========LIENS==========*/
 .don {
-  text-decoration: underline; 
+  text-decoration: underline;
   margin-left: 450px;
   position: relative; top: 15px;
 }
@@ -403,157 +403,177 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 /*==================================================================*/
 /*  ENTETE DE PAGE : Logo, menus, identification                    */
 /*==================================================================*/
-/* Première ligne */
-.bandeau {
-	display: flex;
-	padding: 0;
-	/* Format pour tout le menu et sous-menus */
+.menu-haut * {
 	font-family: Times New Roman;
 	font-size: 18px;
-	line-height: 22px;
-	color: #<?=$couleur_lien?>;
 }
-.bandeau > li {
-	white-space: nowrap;
-	margin: 0;
-	border: 2px solid transparent;
-	border-radius: 10px;
-	padding: 10px 0;
+.menu-haut FORM LI {
+	margin: 5px 2px 10px 2px;
 }
-.bandeau > li span {
-	background: #<?=$couleur_fond?>;
-}
-/* Comportement du bandeau quand il rétrécit */
-.bandeau:not(.bandeau-noflex) > li {
-	flex-grow: 1;
-}
-.bandeau:not(.bandeau-noflex) > li.bandeau-etiquette-reduite {
-	overflow: hidden;
-}
-.bandeau:not(.bandeau-noflex) > li.bandeau-etiquette-cachee {
-	width: 24px;
-	overflow: hidden;
-	flex-shrink: 0;
-}
-.bandeau > li.sous-menu-ouvert {
-	border: 2px solid #<?=$couleur_lien?>;
-	background: #<?=$couleur_fond?>;
-}
-/* Logo */
-.bandeau > li:first-child {
-	padding: 0;
-	border: 0;
-}
-.bandeau > li:first-child p {
-	margin: 2px;
-	text-align: center;
-	font-size: 24px;
-}
-.bandeau > li:first-child span {
-	display: block;
-}
-.bandeau > li:first-child:hover,
-.bandeau > li:first-child:hover * {
-	border-radius: 10px;
-	color: #<?=$couleur_fond?>;
-	background: #<?=$couleur_lien?>;
-}
-/* Sous-menus */
-.bandeau > li ul {
-	/* On sort du flux pour s'incruster au dessus de la page */
-	position: absolute;
-	top: 44px;
-	z-index: 100; /* Pour passer au dessus des cartes */
-	/* On redéclare les couleurs car on est sorti du flux */
-	margin: 0 -2px;
-	border: 2px solid #<?=$couleur_lien?>;
-	border-radius: 0 10px 10px 10px;
-	padding: 5px;
-	background: #<?=$couleur_fond?>;
-	cursor: initial;
-}
-.bandeau > li:not(.sous-menu-ouvert) ul {
-	/* Flip flop sous menu par clic ou touch*/
-	display: none;
-}
-.bandeau > li ul.sous-menu-a-gauche {
-	left: 2px;
-}
-.bandeau > li ul.sous-menu-a-droite {
-	right: 2px;
-	border-radius: 10px;
-}
-.bandeau > li:last-child ul.sous-menu-a-droite {
-	border-top-right-radius: 0;
-}
-.bandeau > li ul label { /* Titre un sous-menu réduit à une icône */
-	margin-bottom: 3px;
-	color: #<?=$couleur_lien?>;
-	font-weight: bold;
-	text-decoration: underline;
-}
-.bandeau > li:not(.bandeau-etiquette-reduite):not(.bandeau-etiquette-cachee) ul label {
-	display: none;
-}
-.bandeau > li ul p {
-	margin: 0;
-	font-size: 14px;
-	color: #<?=$couleur_lien?>;
-}
-.bandeau a {
-	display: inline-block; /* Pour permettre :first-letter */
-	color: #<?=$couleur_lien?>; /* Pour couvrir un style du forum */
-}
-.bandeau a:first-letter { /* Pour les types de points */
-	text-transform: uppercase;
-}
-.bandeau > li ul li input {
-	font-size: 18px;
-	font-family: Times New Roman;
-	color: black;
-}
-.bandeau > li ul li .input-text {
-	width: calc(100vw - 47px);
-	max-width: 400px;
-}
-.bandeau .connexion p a:first-letter {
-	text-transform: lowercase;
-}
-/* Grandes fenêtres */
-@media screen and (min-width: 650px) {
-	.bandeau {
-		background-image: url('../images/bandeau-haut/titrehorizontal_<?=date('m')?>.png');
-		background-size: contain;
-		background-repeat: no-repeat;
+
+/* Fenêtres larges */
+@media screen and (min-width: 450px) {
+	/* Le bandeau */
+	.bandeau IMG {
+		display: block; /* Evite un espace en dessous */
 	}
-	.bandeau > li:first-child {
-		padding: 14px;
+	.bandeau FORM { /* Recherche */
+		position: absolute;
+		top: 9px;
+		right: 9px;
 	}
-	.bandeau > li:first-child p {
-		display: inline;
-		color: transparent;
+
+	/* Ligne de menus */
+	.menu-liste > UL {
+		display: flex;
+		justify-content: space-between;
+		padding: 0;
+	}
+	.menu-liste > SPAN,
+	.menu-titre {
+		display: none;
+	}
+	.menu-connexion {
+		float: right;
+	}
+	.menu-connexion UL {
+		right: 0;
+		border-radius: 10px 0 10px 10px !important;
+	}
+
+	/* Boutons */
+	.menu-bouton:not(.menu-liste) {
+		border: 2px solid transparent;
+		border-radius: 10px 10px 0 0;
+		padding: 2px;
+	}
+	.menu-bouton-seul {
+		border-radius: 10px !important;
+	}
+	.menu-touch,
+	.menu-hover {
+		border-color: #<?=$couleur_decoration_titres?> !important;
+	}
+
+	/* Blocs rétractables en dessous des boutons */
+	.menu-bouton:not(.menu-liste) > UL {
+		position: absolute;
+		margin: 2px 0 0 -4px;
+		padding: 0 4px;
+		border-radius: 0 10px 10px 10px;
+		border: 2px solid #<?=$couleur_decoration_titres?>;
+		background: #<?=$couleur_fond?>;
+		z-index: -10;
+		opacity: 0;
+	}
+	.menu-touch:not(.menu-liste) > UL,
+	.menu-hover:not(.menu-liste) > UL {
+		z-index: 1000;
+		opacity: 1;
+	}
+
+	/* Lignes des blocs rétractables */
+	.menu-bouton:not(.menu-liste) LI {
+		max-height: 0;
+		transition: max-height 0.2s ease-in;
+	}
+	.menu-touch:not(.menu-liste) LI,
+	.menu-hover:not(.menu-liste) LI {
+		max-height: 1.2em;
 	}
 }
-/* Petites fenêtres */
-@media screen and (max-width: 420px) {
-	.bandeau > li {
-		width: 24px;
-		color: transparent;
-		overflow: hidden;
-		flex-shrink: 0;
+
+/* On enlève les icones pour les fenêtres moyenes */
+@media screen and (min-width:450px) and (max-width:580px) {
+	.menu-bouton SPAN:first-child {
+		display: none;
 	}
-	.bandeau > li:first-letter {
-		color: initial; /* Pour caractère unicode */
+}
+
+/* On enlève le bandeau pour les fenêtres de faible hauteur */
+@media screen and (max-height: 450px) {
+	.bandeau,
+	.menu-bouton SPAN:first-child {
+		display: none;
 	}
-	.bandeau > li:first-child {
-		width: initial;
+}
+@media screen and (max-height: 450px) and (min-width:550px) {
+	.menu-titre {
+		display: block;
+		float: left;
+		padding: 6px;
+		font-size: 16px;
 	}
-	.bandeau > li:first-child p {
-		line-height: 5.2vw;
-		font-size: 5.7vw;
+}
+
+/* Fenêtres étroites */
+@media screen and (max-width: 449.9px) {
+	.bandeau,
+	.menu-liste HR,
+	.menu-connexion SPAN:nth-child(2) {
+		display: none;
 	}
-	.bandeau > li ul label {
-		display: block !important;
+	.menu-haut {
+		margin-bottom: 5px;
+	}
+	.menu-haut {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: space-between;
+		background: #<?=$couleur_decoration_titres?>;
+	}
+
+	/* Boutons */
+	DIV.menu-bouton > SPAN,
+	.menu-titre {
+		display: block;
+		padding: 5px;
+		font-size: 22px;
+		color: white !important;
+		cursor: pointer;
+	}
+	.menu-titre {
+		padding-top: 8px;
+	}
+
+	/* Blocs rétractables en dessous des boutons */
+	.menu-liste > UL,
+	.menu-connexion UL {
+		position: absolute;
+		Wmargin: 3px 0 0 -4px;
+		padding: 0 4px;
+		border-radius: 0 0 10px 10px;
+		border: 2px solid #<?=$couleur_decoration_titres?>;
+		background: #<?=$couleur_fond?>;
+		z-index: -10;
+		opacity: 0;
+	}
+	.menu-connexion UL {
+		right: 0;
+	}
+	.menu-liste.menu-touch > UL,
+	.menu-liste.menu-hover > UL,
+	.menu-connexion.menu-touch > UL,
+	.menu-connexion.menu-hover > UL {
+		z-index: 1000;
+		opacity: 1;
+	}
+
+	/* Lignes des blocs rétractables */
+	.menu-liste LI,
+	.menu-connexion LI {
+		max-height: 0;
+		transition: max-height 0.2s ease-in;
+	}
+	.menu-liste.menu-touch LI,
+	.menu-liste.menu-hover LI {
+		max-height: initial;
+	}
+	.menu-liste.menu-touch UL UL LI,
+	.menu-liste.menu-hover UL UL LI,
+	.menu-connexion.menu-touch LI,
+	.menu-connexion.menu-hover LI {
+		max-height: 1.2em;
 	}
 }
 
@@ -592,9 +612,9 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     margin: 20px;
   }
   .lien_ajout_commentaire A {
-    border-style: solid; 
-    border-color: #<?=$couleur_decoration_titres?>; 
-    padding-right: 0.5em; 
+    border-style: solid;
+    border-color: #<?=$couleur_decoration_titres?>;
+    padding-right: 0.5em;
     padding-left: 0.5em;
   }
 
@@ -635,9 +655,9 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
     margin: 1px 5px 1px 0px;
   }
   .photos {
-    float: left; 
-    margin: 1px; 
-    position: relative; 
+    float: left;
+    margin: 1px;
+    position: relative;
     max-width: 99.8%;
   }
   .text_sur_image {
@@ -769,13 +789,13 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
   float: right;
   width: 95vw;
   height: 95vw;
-  max-height: 450px; 
+  max-height: 450px;
 }
 /* Carte formulaire de modification présentation écrans */
 @media screen and (min-width: 800px) {
   #carte-edit {
-    width: 450px; 
-    height: 450px; 
+    width: 450px;
+    height: 450px;
   }
 }
 @media print {

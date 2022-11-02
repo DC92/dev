@@ -1,15 +1,10 @@
-BUGS
-====
-
-EVOLUTION MENU
-==============
-//TODO BUG Revoir bandeau grandes fenêtres & logo
-//TODO BUG Click logo ne va pas à l'accueil en dehors de span
-//BEST bandeau mot de passe oublié
-//BEST forum modérateurs dans le bandeau
+BUG
+===
+Déconnexion KO à partir de la page de modération (problème de racine)
 
 EVOLUTION PAGE ACCUEIL
 ======================
+//BEST La version mobile, parfois réclamée, est bien cachée
 //BEST Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
 //BEST Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 //BEST https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
@@ -29,20 +24,22 @@ PWA ?
 EVOLUTIONS
 ==========
 //BEST Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
-//BEST retrouver par le mail
 //BEST N'afficher que les massifs contenant des points
 //BEST Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)
 //BEST Revoir politique de dates d'expiration de fichiers. Spécialement vignettes / api/polygones?type_polygon=1
 //BEST ? FORM.wri LABEL { /* sans la classe WRI, ca fait foirer le forum PHPBB , et oui */
 //BEST ce text est paramétrable depuis le wiki
-//BEST http://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335
+//BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=9194#p31335 : plus épuré des textes rébarbatifs
 //BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 //BEST https://www.refuges.info/forum/viewtopic.php?f=2&t=11360
+//BEST La saisie en BBcode n'est plus fréquente, et nécessite donc de l'apprendre : une piste est d'utiliser du Markdown au gout du jour
+//BEST rendre WRI au gout du jour : une mise en forme plus soignée, un choix de charte graphique (cohérence sur les polices, logos, icônes, couleurs), retirer les indices d'anciennes technologies (nouveaux smileys), uniformiser le thème phpBB et celui de WRI.
 
 //BEST Couleur des pictos cabanes dont on n’a pas d’éléments pour dire qu’elles sont destinées à accueillir des randonneurs
 -	Picto cabane ou abri avec un 0 (comme aujourd’hui) similaire aux pictos de celles faites pour accueillir des randonneurs
 -	Picto cabane ou abri gris, mur noir avec 0 (urgence seulement) ou ? (on ne sait pas) ou X (fermé)
 //BEST Pictos geocaching
+//BEST Les données externes (PRC...) pourraient être mieux intégrées, en imaginant les intégrer directement aux fiches.
 
 //BEST Informations affichées pour les cabanes non destinées à y dormir
 -	Nom, position (carte), propriétaire / accessibilité, forum + bandeau expliquant que cette cabane n’est pas destinée à y dormir
@@ -50,6 +47,7 @@ Auteur demande corrections
 
 //BEST dualité fiche-forum
 -	Fusion commentaire / forum : notion de post descriptif
+-	il arrive souvent que les contributeurs se perdent entre forum et commentaires, le paragraphe n'étant pas bien lu. Une piste serait d'intégrer le fil du forum à la page point.
 
 Sur la visualisation d'un point, il arrive souvent que les contributeurs se perdent entre forum et commentaires, le paragraphe n'étant pas bien lu. Une piste serait d'intégrer le fil du forum à la page point.
 De manière générale, nous avons souvent mit en place des textes explicatifs pour apporter des précisions avec des liens rebondissants vers le wiki. Cette lecture peut décourager. Une option est d'utiliser plus fréquemment des icônes.

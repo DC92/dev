@@ -52,7 +52,7 @@ if (location.hash == '###')
 				for (let name of names) {
 					data.push('  ' + name);
 
-					// TEMPORARY : Delete previous version of MyOl cache
+					// TEMPORARY (til Jun,2023) : Delete previous version of MyOl cache
 					if (name == 'myGpsCache')
 						caches.delete(name);
 				}
