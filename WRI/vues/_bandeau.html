@@ -12,10 +12,11 @@
 </div>
 
 <div class="menu-haut">
-	<!-- L'ordre de niveau de menu est inversé pour faciliter le CSS -->
+	<!-- L'ordre du html est celui du menu pour petits terminaux -->
+	<!-- L'ordre d'affichage sur grands terminaux est donné par les attributs order: -->
 	<div class="menu-connexion menu-bouton">
 <?php if (est_connecte() && $infos_identification->username) { ?>
-		<span>&#128104;</span><span><?=$infos_identification->username?></span>
+		<span>&#128104;</span><span class="menu-large"><?=$infos_identification->username?></span>
 		<ul>
 			<li>
 	<?php if (!est_moderateur()) { ?>
@@ -88,7 +89,7 @@
 	} ?>
 		</ul>
 <?php } elseif ($_SERVER['REQUEST_SCHEME'] == 'http') { ?>
-		<span>&#128100;</span><span>Connexion</span>
+		<span>&#128100;</span><span class="menu-large">Connexion</span>
 		<ul>
 			<li>Pour vous connecter,</li>
 			<li>
@@ -99,7 +100,7 @@
 			</li>
 		</ul>
 <?php } else { ?>
-		<span>&#128100;</span><span>Connexion</span>
+		<span>&#128100;</span><span class="menu-large">Connexion</span>
 		<ul>
 			<form method="post" class="connexion"
 				action="<?=$config_wri['lien_forum']?>ucp.php?mode=login">
@@ -122,6 +123,10 @@
 			</form>
 			<hr/>
 			<li>
+				<a href="<?=lien_wiki('cookies')?>">
+					Utilisation des cookies
+				</a>
+			</li><li>
 				<a href="<?=$config_wri['lien_forum']?>app.php/user/forgot_password">
 					Mot de passe oublié
 				</a>
@@ -132,10 +137,6 @@
 			</li><li>
 				<a href="<?=$config_wri['lien_forum']?>ucp.php?mode=login">
 					Connexion avancée
-				</a>
-			</li><li>
-				<a href="<?=lien_wiki('cookies')?>">
-					Utilisation des cookies
 				</a>
 			</li>
 		</ul>
@@ -149,33 +150,11 @@
 	<div class="menu-liste menu-bouton">
 		<span>&#x2630;</span>
 		<ul>
-			<li class="menu-bouton" style="order:1" title="Les entrées les plus récentes">
-				<span>&#128276;</span><span>Nouvelles</span>
-				<ul>
-					<li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles">
-							Toutes
-						</a>
-					</li><li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=points">
-							Points
-						</a>
-					</li><li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=refuges">
-							Cabanes
-						</a>
-					</li><li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=commentaires">
-							Commentaires
-						</a>
-					</li>
-					<hr/>
-					<li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>formulaire_rss">
-							Flux RSS
-						</a>
-					</li>
-				</ul>
+			<li class="menu-bouton menu-bouton-seul" style="order:1">
+				<a href="<?=$config_wri['sous_dossier_installation']?>nouvelles?quoi=points"
+					title="Les entrées les plus récentes">
+					<span>&#128276;</span><span>Nouvelles</span>
+				</a>
 			</li>
 			<li class="menu-bouton menu-bouton-seul" style="order:2">
 				<a href="<?=$config_wri['sous_dossier_installation']?>point_ajout"
@@ -183,20 +162,24 @@
 					<span>&#128204;</span><span>Ajouter</span>
 				</a>
 			</li>
-			<li class="menu-bouton" style="order:3">
-				<span>&#127757;</span><span>Cartes</span>
+			<li class="menu-bouton menu-bouton-seul" style="order:3">
+				<a href="<?=$config_wri['sous_dossier_installation']?>nav"
+					title="Les points sur un fond de carte">
+					<span>&#127757;</span><span>Cartes</span>
+				</a>
+			</li>
+			<li class="menu-bouton menu-bouton-seul" style="order:4">
+				<a href="<?=$config_wri['lien_forum']?>"
+					 title="Forum de discussion entre utilisateurs et avec la modération">
+					<span>&#128172;</span><span>Forum</span>
+				</a>
+			</li>
+			<li class="menu-bouton" style="order:0">
+				<span class="menu-large">&#x1F3E0;</span><span class="menu-large">Accueil</span>
 				<ul>
 					<li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>nav">
-							Cartes géographiques
-						</a>
-					</li><li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>gps">
-							GPS
-						</a>
-					</li><li>
 						<a href="<?=$config_wri['sous_dossier_installation']?>">
-							Massifs
+							Page d'accueil
 						</a>
 					</li><li>
 						<a href="<?=$config_wri['sous_dossier_installation']?>point_formulaire_recherche"
@@ -209,32 +192,8 @@
 							Exportation de points
 						</a>
 					</li><li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>api/doc">
-							API développeur
-						</a>
-					</li>
-				</ul>
-			</li>
-			<li class="menu-bouton menu-bouton-seul" style="order:4">
-				<a href="<?=$config_wri['lien_forum']?>"
-					 title="Forum de discussion entre utilisateurs et avec la modération">
-					<span>&#128172;</span><span>Forum</span>
-				</a>
-			</li>
-			<li class="menu-bouton" style="order:0">
-				<span>&#x1F3E0;</span><span>Accueil</span>
-				<ul>
-					<li>
-						<a href="<?=$config_wri['sous_dossier_installation']?>">
-							Page d'accueil
-						</a>
-					</li><li>
-						<a href="<?=lien_wiki('index')?>">
-							Qui sommes nous ?
-						</a>
-					</li><li>
-						<a href="<?=lien_wiki('qui_est_refuges.info')?>">
-							Les intervenants
+						<a href="<?=$config_wri['sous_dossier_installation']?>gps">
+							Appli GPS refuges.info
 						</a>
 					</li><li>
 						<a href="<?=lien_wiki('prudence')?>">
@@ -247,14 +206,6 @@
 					</li><li>
 						<a href="<?=lien_wiki('liens')?>">
 							Liens
-						</a>
-					</li><li>
-						<a href="<?=lien_wiki('licence')?>">
-							Licence
-						</a>
-					</li><li>
-						<a href="<?=lien_wiki('contact')?>">
-							Contact
 						</a>
 					</li>
 				</ul>

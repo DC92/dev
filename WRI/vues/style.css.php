@@ -484,20 +484,20 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 }
 
 /* On enlève les icones pour les fenêtres moyenes */
-@media screen and (min-width:450px) and (max-width:580px) {
+@media screen and (min-width:450px) and (max-width:600px) {
 	.menu-bouton SPAN:first-child {
 		display: none;
 	}
 }
 
 /* On enlève le bandeau pour les fenêtres de faible hauteur */
-@media screen and (max-height: 450px) {
-	.bandeau,
-	.menu-bouton SPAN:first-child {
+@media screen and (max-height: 600px) {
+	.bandeau {
 		display: none;
 	}
 }
-@media screen and (max-height: 450px) and (min-width:550px) {
+/* On ajoute un sigle REFUGES.INFO quand on n'a pas de bandeau et la place */
+@media screen and (max-height: 600px) and (min-width:600px) {
 	.menu-titre {
 		display: block;
 		float: left;
@@ -505,12 +505,19 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 		font-size: 16px;
 	}
 }
+@media screen and (max-height: 600px) and (min-width:450px) and (max-width:700px) {
+	.menu-bouton SPAN:first-child {
+		display: none;
+	}
+}
 
 /* Fenêtres étroites */
 @media screen and (max-width: 449.9px) {
 	.bandeau,
-	.menu-liste HR,
-	.menu-connexion SPAN:nth-child(2) {
+	.menu-haut .menu-large,
+	W.menu-liste HR,
+	W.menu-liste LI SPAN,
+	W.menu-connexion SPAN:nth-child(2) {
 		display: none;
 	}
 	.menu-haut {
