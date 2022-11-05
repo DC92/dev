@@ -467,18 +467,18 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-bouton:not(.menu-liste) > UL {
 		position: absolute;
 		margin: 2px 0 0 -4px;
-		padding: 0 4px;
 		border-radius: 0 10px 10px 10px;
 		border: 2px solid #<?=$couleur_decoration_titres?>;
 		background: #<?=$couleur_fond?>;
-		z-index: -10;
+		padding: 0 4px;
 		opacity: 0;
+		z-index: -10;
 	}
 	.menu-touch:not(.menu-liste) > UL,
 	.menu-hover:not(.menu-liste) > UL,
 	.menu-hover:not(.menu-liste) > P {
-		z-index: 1000;
 		opacity: 1;
+		z-index: 1000;
 	}
 
 	/* Lignes des blocs rétractables */
@@ -496,7 +496,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 @media screen and (min-width:1200px) {
 	.menu-haut {
 		clear: none;
-		wmin-height: 50px;
 		padding: 7.5px;
 	}
 	.logo-haut {
@@ -578,10 +577,11 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-liste > UL,
 	.menu-connexion UL {
 		position: absolute;
-		padding: 0 4px;
 		border-radius: 0 0 10px 10px;
 		border: 2px solid #<?=$couleur_decoration_titres?>;
+		padding: 0 4px;
 		background: #<?=$couleur_fond?>;
+		white-space: nowrap;
 		z-index: -10;
 		opacity: 0;
 	}
@@ -592,8 +592,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-liste.menu-hover > UL,
 	.menu-connexion.menu-touch > UL,
 	.menu-connexion.menu-hover > UL {
-		z-index: 1000;
 		opacity: 1;
+		z-index: 1000;
 	}
 
 	/* Lignes des blocs rétractables */
