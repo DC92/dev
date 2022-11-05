@@ -143,11 +143,6 @@ BODY {
   width: 100%; /* jmb 01/2008 , pour gmaps */
   height: 100%;
   background-color: #<?=$couleur_fond?>;
- /*
-  background-image:url(../images/<?=$periode?>.gif);
-  background-repeat:no-repeat;
-  background-position: 60% top;
- */
   }
 /* zone de contenu */
 .contenu {
@@ -403,7 +398,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 /*==================================================================*/
 /*  ENTETE DE PAGE : Logo, menus, identification                    */
 /*==================================================================*/
-.menu-haut * {
+.bandeau-haut * {
 	font-family: Times New Roman;
 	font-size: 18px;
 }
@@ -414,13 +409,25 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 /* Fenêtres larges */
 @media screen and (min-width: 450px) {
 	/* Le bandeau */
-	.bandeau IMG {
-		display: block; /* Evite un espace en dessous */
+	.bandeau-haut {
+		background-image: url(../images/bandeau-haut/titrehorizontal_<?=date('m')?>.png);
+		background-repeat: no-repeat;
 	}
-	.bandeau FORM { /* Recherche */
-		position: absolute;
-		top: 9px;
-		right: 9px;
+	.logo-haut {
+		display: block;
+		float: left;
+		width: 300px;
+		height: 50px;
+	}
+	.logo-haut:hover {
+		background: transparent;
+	}
+	.recherche-haut {
+		float: right;
+		padding: 16px 10px;
+	}
+	.menu-haut {
+		clear: both;
 	}
 
 	/* Ligne de menus */
@@ -444,11 +451,11 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	/* Boutons */
 	.menu-bouton:not(.menu-liste) {
 		border: 2px solid transparent;
-		border-radius: 10px 10px 0 0;
+		border-radius: 10px;
 		padding: 2px;
 	}
-	.menu-bouton-seul {
-		border-radius: 10px !important;
+	.menu-bouton:not(.menu-liste):hover {
+		border-radius: 10px 10px 0 0;
 	}
 	.menu-touch,
 	.menu-hover {
@@ -456,6 +463,7 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 
 	/* Blocs rétractables en dessous des boutons */
+	.menu-bouton:not(.menu-liste) > P,
 	.menu-bouton:not(.menu-liste) > UL {
 		position: absolute;
 		margin: 2px 0 0 -4px;
@@ -467,7 +475,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 		opacity: 0;
 	}
 	.menu-touch:not(.menu-liste) > UL,
-	.menu-hover:not(.menu-liste) > UL {
+	.menu-hover:not(.menu-liste) > UL,
+	.menu-hover:not(.menu-liste) > P {
 		z-index: 1000;
 		opacity: 1;
 	}
@@ -479,12 +488,30 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 	.menu-touch:not(.menu-liste) LI,
 	.menu-hover:not(.menu-liste) LI {
-		max-height: 1.2em;
+		max-height: 2.2em;
+	}
+}
+
+/* On met tout sur une même ligne pour les très grandes fenêtres */
+@media screen and (min-width:1200px) {
+	.menu-haut {
+		clear: none;
+		wmin-height: 50px;
+		padding: 7.5px;
+	}
+	.logo-haut {
+		width: 25vw;
+	}
+	.menu-bouton:not(.menu-liste) {
+		background: #<?=$couleur_fond?>;
 	}
 }
 
 /* On enlève les icones pour les fenêtres moyenes */
 @media screen and (min-width:450px) and (max-width:600px) {
+	.logo-haut {
+		width: 220px;
+	}
 	.menu-bouton SPAN:first-child {
 		display: none;
 	}
@@ -492,10 +519,15 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 
 /* On enlève le bandeau pour les fenêtres de faible hauteur */
 @media screen and (max-height: 600px) {
-	.bandeau {
+	.bandeau-haut {
+		background-image: none;
+	}
+	.logo-haut,
+	.recherche-haut {
 		display: none;
 	}
 }
+
 /* On ajoute un sigle REFUGES.INFO quand on n'a pas de bandeau et la place */
 @media screen and (max-height: 600px) and (min-width:600px) {
 	.menu-titre {
@@ -513,11 +545,10 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 
 /* Fenêtres étroites */
 @media screen and (max-width: 449.9px) {
-	.bandeau,
+	.logo-haut,
+	.recherche-haut,
 	.menu-haut .menu-large,
-	W.menu-liste HR,
-	W.menu-liste LI SPAN,
-	W.menu-connexion SPAN:nth-child(2) {
+	.menu-bouton P {
 		display: none;
 	}
 	.menu-haut {
@@ -547,7 +578,6 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-liste > UL,
 	.menu-connexion UL {
 		position: absolute;
-		Wmargin: 3px 0 0 -4px;
 		padding: 0 4px;
 		border-radius: 0 0 10px 10px;
 		border: 2px solid #<?=$couleur_decoration_titres?>;
@@ -581,6 +611,24 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-connexion.menu-touch LI,
 	.menu-connexion.menu-hover LI {
 		max-height: 1.2em;
+	}
+
+	/* Utilisation du bandeau du forum pour les petites fenêtres */
+	#phpbb .logo-haut,
+	#phpbb .menu-titre {
+		display: none;
+	}
+	#phpbb .menu-haut {
+		/* Evite un espace en haut de page */
+		float: left;
+	}
+	#phpbb .menu-connexion {
+		position: absolute;
+		right: 0;
+	}
+	#phpbb .menu-liste {
+		position: absolute;
+		left: 0;
 	}
 }
 
