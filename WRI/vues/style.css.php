@@ -202,7 +202,8 @@ H3 { /* titres de pages */
   margin: 0em;
   text-align: center;
   margin-bottom:3px;
-  background-color: #<?=$couleur_decoration_titres?>;
+  color: white;
+  background-color: #<?=$couleur_lien?>;
   }
 H4 { /* sous titres */
   padding-top: 4px; /* sous FF, la padding par defo est immense */
@@ -399,8 +400,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 /*  ENTETE DE PAGE : Logo, menus, identification                    */
 /*==================================================================*/
 .bandeau-haut * {
-	font-family: Times New Roman;
-	font-size: 18px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 16px;
 }
 .menu-haut FORM LI {
 	margin: 5px 2px 10px 2px;
@@ -504,6 +505,10 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-bouton:not(.menu-liste) {
 		background: #<?=$couleur_fond?>;
 	}
+	.menu-connexion UL {
+		right: initial;
+		border-radius: 0 10px 10px 10px !important;
+	}
 }
 
 /* On enlève les icones pour les fenêtres moyenes */
@@ -527,16 +532,18 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 }
 
-/* On ajoute un sigle REFUGES.INFO quand on n'a pas de bandeau et la place */
+/* On ajoute un sigle Refuges.info quand on n'a pas de bandeau et la place */
 @media screen and (max-height: 600px) and (min-width:600px) {
 	.menu-titre {
 		display: block;
 		float: left;
 		padding: 6px;
-		font-size: 16px;
 	}
 }
 @media screen and (max-height: 600px) and (min-width:450px) and (max-width:700px) {
+	.menu-bouton SPAN {
+		line-height: 1.5em;
+	}
 	.menu-bouton SPAN:first-child {
 		display: none;
 	}
@@ -557,15 +564,16 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 		display: flex;
 		flex-direction: row-reverse;
 		justify-content: space-between;
-		background: #<?=$couleur_decoration_titres?>;
+		background: #<?=$couleur_lien?>;
 	}
 
 	/* Boutons */
 	DIV.menu-bouton > SPAN,
 	.menu-titre {
 		display: block;
-		padding: 5px;
-		font-size: 22px;
+		padding: 8px;
+		font-size: 20px;
+		font-weight: 700;
 		color: white !important;
 		cursor: pointer;
 	}
@@ -614,7 +622,16 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 
 	/* Utilisation du bandeau du forum pour les petites fenêtres */
-	#phpbb .logo-haut,
+	#phpbb .logo-haut {
+		display: block;
+		position: absolute;
+		height: 43px;
+		width: 70%;
+		margin: 0 15%;
+	}
+	#phpbb .logo-haut:hover {
+		background: transparent;
+	}
 	#phpbb .menu-titre {
 		display: none;
 	}
