@@ -401,7 +401,10 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 /*==================================================================*/
 .bandeau-haut * {
 	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-	font-size: 16px;
+	font-size: 18px;
+}
+.menu-bouton * {
+	font-family: Times New Roman;
 }
 .menu-haut FORM LI {
 	margin: 5px 2px 10px 2px;
@@ -425,7 +428,11 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 	.recherche-haut {
 		float: right;
-		padding: 16px 10px;
+		padding: 16px 0;
+		font-size: 16px;
+	}
+	.recherche-haut INPUT {
+		font-size: 16px;
 	}
 	.menu-haut {
 		clear: both;
@@ -477,7 +484,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 	.menu-touch:not(.menu-liste) > UL,
 	.menu-hover:not(.menu-liste) > UL,
-	.menu-hover:not(.menu-liste) > P {
+	.menu-hover:not(.menu-liste) > P,
+	.menu-hover:not(.menu-liste) > A {
 		opacity: 1;
 		z-index: 1000;
 	}
@@ -527,7 +535,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 		background-image: none;
 	}
 	.logo-haut,
-	.recherche-haut {
+	.recherche-haut,
+	.menu-titre SPAN {
 		display: none;
 	}
 }
@@ -551,10 +560,15 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 
 /* Fenêtres étroites */
 @media screen and (max-width: 449.9px) {
+	.bandeau-haut * {
+		font-size: 16px;
+	}
 	.logo-haut,
 	.recherche-haut,
 	.menu-haut .menu-large,
-	.menu-bouton P {
+	.menu-bouton P,
+	.headerbar,
+	body:not(#phpbb) .menu-titre SPAN {
 		display: none;
 	}
 	.menu-haut {
@@ -571,14 +585,17 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	DIV.menu-bouton > SPAN,
 	.menu-titre {
 		display: block;
-		padding: 8px;
+		padding: 0 8px 2px 8px;
 		font-size: 20px;
 		font-weight: 700;
 		color: white !important;
 		cursor: pointer;
 	}
 	.menu-titre {
-		padding-top: 8px;
+		padding-top: 2px;
+	}
+	.menu-titre SPAN {
+		font-size: 20px;
 	}
 
 	/* Blocs rétractables en dessous des boutons */
@@ -595,6 +612,9 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	}
 	.menu-connexion UL {
 		right: 0;
+	}
+	.menu-liste > UL {
+		padding-top: 3px;
 	}
 	.menu-liste.menu-touch > UL,
 	.menu-liste.menu-hover > UL,
@@ -618,34 +638,8 @@ A.infobulle:hover SPAN { /* qd on passe dessus, ca affiche */
 	.menu-liste.menu-hover UL UL LI,
 	.menu-connexion.menu-touch LI,
 	.menu-connexion.menu-hover LI {
+		padding: 1.5px 0;
 		max-height: 1.2em;
-	}
-
-	/* Utilisation du bandeau du forum pour les petites fenêtres */
-	#phpbb .logo-haut {
-		display: block;
-		position: absolute;
-		height: 43px;
-		width: 70%;
-		margin: 0 15%;
-	}
-	#phpbb .logo-haut:hover {
-		background: transparent;
-	}
-	#phpbb .menu-titre {
-		display: none;
-	}
-	#phpbb .menu-haut {
-		/* Evite un espace en haut de page */
-		float: left;
-	}
-	#phpbb .menu-connexion {
-		position: absolute;
-		right: 0;
-	}
-	#phpbb .menu-liste {
-		position: absolute;
-		left: 0;
 	}
 }
 
