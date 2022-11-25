@@ -377,7 +377,7 @@ function controlHelp(options) {
  */
 function controlsCollection(opt) {
 	options = {
-		supplementaryControls: [],
+		supplementaryControls: [], //BEST resorb
 		...opt
 	};
 

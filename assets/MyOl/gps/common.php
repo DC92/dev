@@ -6,11 +6,12 @@ $dirs = [
 	$myol_path.'../*/*', // MyOl/*/* (includes MyOl/gps/*)
 ];
 
+date_default_timezone_set ('Europe/Paris');
 $date = 0;
 $gpx_files = [];
 $files = glob ('{'.implode(',',$dirs).'}', GLOB_BRACE);
 
-date_default_timezone_set ('Europe/Paris');
+// List files to cache
 foreach ($files AS $filename) {
 	if (is_file ($filename) && $date < filemtime ($filename))
 		$date = filemtime ($filename);
@@ -19,4 +20,7 @@ foreach ($files AS $filename) {
 		$gpx_files[] = $filename;
 }
 
+//TODO Gps avec argument pour rando
+
+// Build version tag
 $build_date = date ('jMy-G:i.\vs', $date) .count ($files);

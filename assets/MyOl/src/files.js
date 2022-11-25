@@ -25,6 +25,7 @@ function controlLoadGPX(options) {
 		xhr.send();
 	};
 
+	// Load file on demand
 	control.loadFile = function(evt) {
 		const reader = new FileReader();
 
@@ -101,6 +102,8 @@ function controlLoadGPX(options) {
  * File downloader control
  * Requires controlButton
  */
+//BEST Possibilité d'inverser le tracé
+//BEST Montrer départ / arrivée
 //BEST BUG incompatible with clusters
 function controlDownload(opt) {
 	const options = {

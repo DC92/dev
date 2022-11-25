@@ -2076,6 +2076,7 @@ function controlLoadGPX(options) {
 		xhr.send();
 	};
 
+	// Load file on demand
 	control.loadFile = function(evt) {
 		const reader = new FileReader();
 

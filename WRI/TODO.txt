@@ -1,6 +1,14 @@
-BUG
-===
-Déconnexion KO à partir de la page de modération (problème de racine)
+BUGS
+====
+//TODO BUG connexion sous FF : efface le pavé connexion aprés avoir rempli avec les infos de connexion
+//TODO BUG Déconnexion KO à partir de la page de modération (problème de racine)
+//TODO BUG modifier cette fiche : ne réaffiche pas les coordonnées (FF)
+
+REMARQUES MENU
+==============
+//BEST standard titre bandeau page suivant vue y compris forum
+//BEST standard menus 16px sauf logo
+//BEST standard menus bouton droit
 
 EVOLUTION PAGE ACCUEIL
 ======================

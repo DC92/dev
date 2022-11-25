@@ -1,8 +1,6 @@
 <?php
-// Fichiers de c92.fr/gps
-include ('MyOl/gps/index.php');
-
 $notail = true;
+include ('MyOl/gps/index.php');
 ?>
 
 <script>
@@ -18,7 +16,7 @@ $notail = true;
 	};
 
 	controlOptions.supplementaryControls = [
-		<?php if (count ($gpx_files)) { ?>
+		<?php if (count ($gpx_files) > 1) { ?>
 			controlLoadGPX({
 				label: '&#x1F6B6;',
 				submenuHTML:
