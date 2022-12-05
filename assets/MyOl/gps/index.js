@@ -59,6 +59,9 @@ var map,
 	layers = [],
 	controlOptions = { // To be customized by the specific index.php
 		layerSwitcher: {},
+		LoadGPX: {
+			initFile: gpxParam,
+		},
 		Help: {
 			submenuId: 'myol-gps-help',
 		}
