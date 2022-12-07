@@ -3,12 +3,14 @@ BUGS
 //TODO BUG connexion sous FF : efface le pavé connexion aprés avoir rempli avec les infos de connexion
 //TODO BUG Déconnexion KO à partir de la page de modération (problème de racine)
 //TODO BUG modifier cette fiche : ne réaffiche pas les coordonnées (FF)
+//TODO modif champ lon/lat déplace le curseur mais pas la carte
 
 REMARQUES MENU
 ==============
 //BEST standard titre bandeau page suivant vue y compris forum
 //BEST standard menus 16px sauf logo
 //BEST standard menus bouton droit
+//BEST ombre sous menus
 
 EVOLUTION PAGE ACCUEIL
 ======================
@@ -31,6 +33,7 @@ PWA ?
 
 EVOLUTIONS
 ==========
+//BEST page forum d'une cabane : lien (Cliquer ici pour retourner sur la fiche de...)
 //BEST Ordre des posts https://www.refuges.info/forum/viewtopic.php?f=2&t=10326
 //BEST N'afficher que les massifs contenant des points
 //BEST Revoir les symboles GARMIN (Ajouter un symbole pour les clusters)

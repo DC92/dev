@@ -107,7 +107,7 @@
 .ol-geocoder .gcd-gl-expanded,
 .ol-geocoder .gcd-gl-control:hover {
 	width: 30.75px;
-	overflow: visible; /* TODO on img, video and canvas tags may cause them to produce visual content outside of the element bounds */
+	overflow: visible;
 }
 .ol-geocoder .gcd-gl-btn {
 	height: 24.75px;

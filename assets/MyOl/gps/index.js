@@ -77,7 +77,6 @@ window.addEventListener('load', function() {
 		view: new ol.View({
 			constrainResolution: true, // Force zoom on the available tile's definition
 		}),
-		//TODO add print button
 		controls: controlsCollection(controlOptions)
 			.concat(controlLayerSwitcher(controlOptions.layerSwitcher)),
 		layers: layers,

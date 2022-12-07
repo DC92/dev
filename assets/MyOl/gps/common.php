@@ -29,7 +29,5 @@ foreach (glob ('*.gpx') AS $filename) {
 if (count ($gpx_files) == 1 && !$gpx_param)
 	$gpx_param = $gpx_files[0];
 
-//TODO Gps avec argument pour rando
-
 // Build version tag
 $build_date = date ('jMy-G:i.\vs', $date) .count ($files);

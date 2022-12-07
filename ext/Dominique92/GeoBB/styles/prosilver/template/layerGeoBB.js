@@ -7,6 +7,7 @@ var map = new ol.Map({
 	controls: controlsCollection({
 		Permalink: {
 			init: mapType != 'line' || scriptName != 'viewtopic',
+			display: scriptName == 'index',
 		},
 	}).concat(controlLayerSwitcher({
 		layers: layerTileCollection(mapKeys),

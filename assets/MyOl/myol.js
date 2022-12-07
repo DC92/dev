@@ -2487,7 +2487,6 @@ function controlGPS(options) {
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
-
 function layerMarker(opt) {
 	const options = {
 			position: [0, 0],
@@ -2509,6 +2508,7 @@ function layerMarker(opt) {
 			}),
 			...options
 		});
+	let view;
 
 	// Initialise specific projection
 	if (typeof proj4 == 'function') {
@@ -2567,16 +2567,16 @@ function layerMarker(opt) {
 
 	layer.setMapInternal = function(map) {
 		map.once('loadstart', () => { // Hack to be noticed at map init
-			const pc = point.getCoordinates(),
-				view = map.getView();
+			view = map.getView();
+			const pc = point.getCoordinates();
 
-			// Focus map on the marker
-			if (options.focus) {
+			// Focus on the marker
+			if (options.focus && view) {
 				if (pc[0] && pc[1])
 					view.setCenter(pc);
 				else
 					// If no position given, put the marker on the center of the visible map
-					changeLL(view.getCenter(), 'EPSG:3857', view);
+					changeLL(view.getCenter(), 'EPSG:3857');
 
 				view.setZoom(options.focus);
 			}
@@ -2596,13 +2596,13 @@ function layerMarker(opt) {
 						}).length;
 					},
 					handleDragEvent: function(evt) {
-						changeLL(evt.coordinate, 'EPSG:3857', view);
+						changeLL(evt.coordinate, 'EPSG:3857');
 					},
 				}));
 
 				// Get the marker at the dblclick position
 				map.on('dblclick', function(evt) {
-					changeLL(evt.coordinate, 'EPSG:3857', view);
+					changeLL(evt.coordinate, 'EPSG:3857');
 					return false;
 				});
 			}
@@ -2610,8 +2610,12 @@ function layerMarker(opt) {
 	};
 
 	// Display values
-	function changeLL(ll, projection, focus, view) {
+	function changeLL(ll, projection, focus) {
 		if (ll[0] && ll[1]) {
+			// Protection against non-digital entries
+			ll[0] = ll[0].toString().replace(/[^0-9]+/, '.');
+			ll[1] = ll[1].toString().replace(/[^0-9]+/, '.');
+
 			// Wrap +-180°
 			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);
 
