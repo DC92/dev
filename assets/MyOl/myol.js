@@ -2613,8 +2613,8 @@ function layerMarker(opt) {
 	function changeLL(ll, projection, focus) {
 		if (ll[0] && ll[1]) {
 			// Protection against non-digital entries
-			ll[0] = ll[0].toString().replace(/[^0-9]+/, '.');
-			ll[1] = ll[1].toString().replace(/[^0-9]+/, '.');
+			ll[0] = ll[0].toString().replace(/[^-0-9]+/, '.');
+			ll[1] = ll[1].toString().replace(/[^-0-9]+/, '.');
 
 			// Wrap +-180°
 			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);
