@@ -134,12 +134,9 @@ class listener implements EventSubscriberInterface
 					!@$topic_row['geo_altitude'] &&
 					@$mapKeys['mapquest'])
 				{
-					$mapquest = 'http://open.mapquestapi.com/elevation/v1/profile?key='.
-						$mapKeys['mapquest'].
-						'&latLngCollection='.
-						$ll[2].','.$ll[1];
-					$mapquest_result =@file_get_contents ($mapquest) ;
-					preg_match('/"height":([-0-9]+)/', $mapquest_result, $match);
+					$api = "https://api.open-elevation.com/api/v1/lookup?locations={$ll[2]},{$ll[1]}";
+					$result = @file_get_contents ($api);
+					preg_match('/"elevation": ([-0-9]+)/', $result, $match);
 
 					// Update the template data
 					$topic_row['geo_altitude'] = $match && $match[1] > 0 ? $match[1].'~' : '~';
