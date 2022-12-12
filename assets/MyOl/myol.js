@@ -1707,9 +1707,9 @@ function controlLengthLine() {
 
 	function calculateLength(feature) {
 		if (feature) {
-			const geometry = feature.getGeometry();
-			length = ol.sphere.getLength(geometry);
-			let denivPos = 0,
+			let geometry = feature.getGeometry(),
+				length = ol.sphere.getLength(geometry),
+				denivPos = 0,
 				denivNeg = 0;
 
 			// Height difference calculation
