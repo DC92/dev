@@ -145,15 +145,16 @@ class listener implements EventSubscriberInterface
 					$topic_row['geo_altitude'] = '';
 					foreach ($result->results AS $k=>$v)
 						$topic_row['geo_altitude'] .= ($k?',':'').$v->elevation;
+					$topic_row['geo_altitude'] .= '~';
 
-					// Update the database for next time
+					// Update the database for the next time
 					$sql = "UPDATE phpbb_posts SET geo_altitude = '{$topic_row['geo_altitude']}' WHERE post_id = $post_id";
 					$this->db->sql_query($sql);
 				}
 
 				// Détermination du massif par refuges.info
 				if (array_key_exists ('geo_massif', $topic_row) && !$topic_row['geo_massif']) {
-					$f_wri_export = 'http://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.
+					$f_wri_export = 'https://www.refuges.info/api/polygones?type_polygon=1,10,11,17&bbox='.
 						$lls[1][0].','.$lls[2][0].','.$lls[1][0].','.$lls[2][0];
 					$wri_export = json_decode (@file_get_contents ($f_wri_export));
 
