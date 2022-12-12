@@ -183,7 +183,7 @@ function controlMousePosition(options) {
 }
 
 /**
- * Control to display the length of an hovered line
+ * Control to display the length & height difference of an hovered line
  * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {
@@ -206,15 +206,33 @@ function controlLengthLine() {
 
 	//BEST calculate distance to the ends
 	function calculateLength(feature) {
-		// Display the line length
 		if (feature) {
-			const length = ol.sphere.getLength(feature.getGeometry());
+			const geometry = feature.getGeometry();
+			length = ol.sphere.getLength(geometry);
+			let denivPos = 0,
+				denivNeg = 0;
 
+			// Height difference calculation
+			if (geometry.stride == 3)
+				for (let c = 5; c < geometry.flatCoordinates.length; c += 3) {
+					const d = geometry.flatCoordinates[c] - geometry.flatCoordinates[c - 3];
+
+					if (d > 0)
+						denivPos += d;
+					else
+						denivNeg -= d;
+				}
+
+			// Display
 			if (length) {
 				control.element.innerHTML =
+					// Line length
 					length < 1000 ?
 					(Math.round(length)) + ' m' :
-					(Math.round(length / 10) / 100) + ' km';
+					(Math.round(length / 10) / 100) + ' km' +
+					// Height difference
+					(denivPos ? ' +' + denivPos + ' m' : '') +
+					(denivNeg ? ' -' + denivNeg + ' m' : '');
 
 				return false; // Continue detection (for editor that has temporary layers)
 			}
