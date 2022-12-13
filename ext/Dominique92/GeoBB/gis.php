@@ -168,8 +168,21 @@ while ($row = $db->sql_fetchrow($result)) {
 			$properties['icon'] = $url_base .str_replace ('.png', '.svg', $row['forum_image']);
 	}
 
+	// Populate geojson elevations
+	global $elevations;
+	$elevations = explode (',', str_replace ('~', '', $row['geo_altitude']));
+	$geo_json = preg_replace_callback (
+		'/([-0-9.]+), ?([-0-9.]+)/',
+		function ($matches) {
+			global $elevations;
+			return $matches[0].', '.array_shift($elevations);
+		},
+		$row['geo_json']
+	);
+
+	$geophp = json_decode ($geo_json);
+
 	// Disjoin points having the same coordinate
-	$geophp = json_decode ($row['geo_json']);
 	$geophp = trunc ($geophp);
 	if ($geophp->type == 'Point') {
 		while (in_array (signature ($geophp->coordinates), $signatures))
