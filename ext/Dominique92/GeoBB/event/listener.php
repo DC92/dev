@@ -195,6 +195,19 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
+		// Populate geojson elevations
+		global $elevations;
+		$elevations = explode (',', $topic_row['geo_altitude']);
+
+		$topic_row['geo_json'] = preg_replace_callback (
+			'/([-0-9.]+), ?([-0-9.]+)/',
+			function ($matches) {
+				global $elevations;
+				return $matches[0].', '.array_shift($elevations);
+			},
+			$topic_row['geo_json']
+		);
+
 		// Remove the extra ~ before dispplay
 		foreach ($topic_row AS $k=>$v)
 			$topic_row[$k] = str_replace ('~', '', $v);
