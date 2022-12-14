@@ -114,9 +114,7 @@ function controlLoadGPX(opt) {
  * File downloader control
  * Requires controlButton
  */
-//BEST Possibilité d'inverser le tracé
-//BEST Montrer départ / arrivée
-//BEST BUG incompatible with clusters
+//TODO BUG incompatible with clusters
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',

@@ -6,7 +6,6 @@
 * @license GNU General Public License, version 2 (GPL-2.0)
 *
 */
-//BEST 5 décimales dans les traces
 
 define('IN_PHPBB', true);
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../../../';
@@ -35,7 +34,7 @@ $bbox_sql =
 	$bboxs[0].' '.$bboxs[1];
 
 // Temporary tool to generate all the clusters
-//BEST reprendre avec GROUP BY round(ST_X(geom)::numeric,1)
+//TODO reprendre avec GROUP BY round(ST_X(geom)::numeric,1)
 //TODO pas groupir traces
 if (0) {
 	$sql="
@@ -183,6 +182,7 @@ while ($row = $db->sql_fetchrow($result)) {
 	);
 
 	$geophp = json_decode ($geo_json);
+	//BEST 5 décimales dans les traces
 
 	// Disjoin points having the same coordinate
 	$geophp = trunc ($geophp);

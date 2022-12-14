@@ -1,6 +1,5 @@
 //BEST Token psw {S_LOGIN_REDIRECT}
 //BEST Inverser l'ordre des posts / SPECIALEMENT DIAPORAMAS !
-//BEST Purger la base des liens photos externes
 //BEST Permutations POSTS dans le template modération : déplacer les fichiers la permutation des posts => event/mcp_topic_postrow_post_before.html
 //BEST Ne pas afficher les points en doublon (flux wri, prc, c2c)
 //BEST Stockage images sur plus d'1 répertoire => ? plugin ?
@@ -11,7 +10,7 @@
 //BEST EDIT.log => Trace supprimer le sujet
 //BEST Améliorer référencement (-> Prat communal !)
 //BEST ext/GeoBB : ajouter les coordonnées au template print
-//BEST Ajouter bouton permutation sur page point chem / 	View film + permutation
+//BEST Ajouter bouton permutation sur page point chem / View film + permutation
 //BEST Coordonnéés V2 ? WRI: http://chemineur.fr/point/prc618
 //BEST BUG http://www.refuges.info/point/4965/ => http://chemineur.fr/point/20110623090825
 //BEST ?? Les pictos ont disparu sur V3

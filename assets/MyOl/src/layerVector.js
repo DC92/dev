@@ -245,7 +245,7 @@ function layerVectorCluster(opt) {
  */
 
 // Get icon from an URL
-//BEST BUG general : send cookies to server, event non secure
+//TODO BUG general : send cookies to server, event non secure
 function styleOptIcon(iconUrl) {
 	if (iconUrl)
 		return {

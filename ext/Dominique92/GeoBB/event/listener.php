@@ -6,8 +6,6 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 //TODO BUG Entre point puis transforme en ligne -> Reste le point qu’on ne peut pas enlever !
-//BEST calcul dénivelé / profil
-//BEST inversion de la trace
 
 namespace Dominique92\GeoBB\event;
 
@@ -179,7 +177,7 @@ class listener implements EventSubscriberInterface
 			}
 
 			// Calcul du cluster (managé par le serveur)
-			//BEST redo as WRI
+			//TODO redo as WRI
 			if (array_key_exists ('geo_cluster', $topic_row) && !$topic_row['geo_cluster']) {
 				$clusters_by_degree = 10;
 				$geo_center = json_decode (@$topic_row['geo_center']);

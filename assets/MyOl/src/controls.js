@@ -204,7 +204,6 @@ function controlLengthLine() {
 		});
 	};
 
-	//BEST calculate distance to the ends
 	function getFlatCoordinates(geometry) {
 		let fcs = [];
 
