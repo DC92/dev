@@ -189,6 +189,8 @@ function layerEditGeoJson(opt) {
 	interactions[0].on('modifyend', evt => {
 		//BEST move only one summit when dragging
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
+		//BEST display line directions
+		//BEST invert line directions
 
 		// Mark last change time
 		sessionStorage.myol_lastChangeTime = Date.now();

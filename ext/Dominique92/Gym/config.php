@@ -9,7 +9,6 @@ define('MYPHPBB_REMOVE_STATUS_STICKY', true);
 
 /* ??
 define('MYPHPBB_REDIRECT', true);
-define('MYPHPBB_BBCODE_INCLUDE', true);
 define('MYPHPBB_SHORTCUT', true);
 */
 
@@ -22,7 +21,6 @@ define('MYPHPBB_SORT_DIR', 'c');
 */
 
 /* Debug
-define('MYPHPBB_BBCODE_INCLUDE_TRACE', true);
 define('MYPHPBB_DUMP_TEMPLATE', true);
 */
 

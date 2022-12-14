@@ -168,14 +168,16 @@ while ($row = $db->sql_fetchrow($result)) {
 			$properties['icon'] = $url_base .str_replace ('.png', '.svg', $row['forum_image']);
 	}
 
-	// Populate geojson elevations
-	global $elevations;
-	$elevations = explode (',', str_replace ('~', '', $row['geo_altitude']));
+	// Populate geojson altitudes
+	global $altitudes;
+	$altitudes = explode (',', str_replace ('~', '', $row['geo_altitude']));
 	$geo_json = preg_replace_callback (
 		'/([-0-9.]+), ?([-0-9.]+)/',
 		function ($matches) {
-			global $elevations;
-			return $matches[0].', '.array_shift($elevations);
+			global $altitudes;
+			if (count ($altitudes))
+				$matches[0] .= ', '.array_shift($altitudes);
+			return $matches[0];
 		},
 		$row['geo_json']
 	);

@@ -1705,23 +1705,36 @@ function controlLengthLine() {
 		});
 	};
 
+	function getFlatCoordinates(geometry) {
+		let fcs = [];
+
+		if (geometry.stride == 3)
+			fcs = geometry.flatCoordinates;
+
+		if (geometry.getType() == 'GeometryCollection')
+			for (let g of geometry.getGeometries())
+				fcs.push(...getFlatCoordinates(g));
+
+		return fcs;
+	};
+
 	function calculateLength(feature) {
 		if (feature) {
 			let geometry = feature.getGeometry(),
 				length = ol.sphere.getLength(geometry),
+				fcs = getFlatCoordinates(geometry),
 				denivPos = 0,
 				denivNeg = 0;
 
 			// Height difference calculation
-			if (geometry.stride == 3)
-				for (let c = 5; c < geometry.flatCoordinates.length; c += 3) {
-					const d = geometry.flatCoordinates[c] - geometry.flatCoordinates[c - 3];
+			for (let c = 5; c < fcs.length; c += 3) {
+				const d = fcs[c] - fcs[c - 3];
 
-					if (d > 0)
-						denivPos += d;
-					else
-						denivNeg -= d;
-				}
+				if (d > 0)
+					denivPos += d;
+				else
+					denivNeg -= d;
+			}
 
 			// Display
 			if (length) {
