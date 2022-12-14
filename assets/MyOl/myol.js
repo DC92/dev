@@ -658,7 +658,7 @@ function layerVector(opt) {
 				};
 
 			// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
-			if (feature.geometry.type == 'Point ') {
+			if (feature.geometry && feature.geometry.type == 'Point ') {
 				const rnd = (feature.id / 3.14).toString().split('.');
 
 				feature.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
@@ -713,7 +713,6 @@ function layerVectorCluster(opt) {
 			...options
 		});
 
-
 	clusterLayer.setMapInternal = layer.setMapInternal;
 	clusterLayer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
 
@@ -736,18 +735,22 @@ function layerVectorCluster(opt) {
 
 	// Generate a center point to manage clusterisations
 	function geometryFnc(feature) {
-		const extent = feature.getGeometry().getExtent(),
-			pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
+		const geometry = feature.getGeometry();
 
-		// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
-		if (pixelSemiPerimeter > 200)
-			clusterSource.addFeature(feature);
-		else
-			return new ol.geom.Point(
-				ol.extent.getCenter(
-					feature.getGeometry().getExtent()
-				)
-			);
+		if (geometry) {
+			const extent = feature.getGeometry().getExtent(),
+				pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
+
+			// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
+			if (pixelSemiPerimeter > 200)
+				clusterSource.addFeature(feature);
+			else
+				return new ol.geom.Point(
+					ol.extent.getCenter(
+						feature.getGeometry().getExtent()
+					)
+				);
+		}
 	}
 
 	// Generate the features to render the cluster

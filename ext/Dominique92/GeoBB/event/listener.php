@@ -144,7 +144,7 @@ class listener implements EventSubscriberInterface
 					// Update the template data
 					$topic_row['geo_altitude'] = '';
 					foreach ($result->results AS $k=>$v)
-						$topic_row['geo_altitude'] .= ($k?',':'').$v->altitude;
+						$topic_row['geo_altitude'] .= ($k?',':'').$v->elevation;
 					$topic_row['geo_altitude'] .= '~';
 
 					// Update the database for the next time
@@ -195,20 +195,7 @@ class listener implements EventSubscriberInterface
 			}
 		}
 
-		// Populate geojson altitudes
-		global $altitudes;
-		$altitudes = explode (',', $topic_row['geo_altitude']);
-
-		$topic_row['geo_json'] = preg_replace_callback (
-			'/([-0-9.]+), ?([-0-9.]+)/',
-			function ($matches) {
-				global $altitudes;
-				return $matches[0].', '.array_shift($altitudes);
-			},
-			$topic_row['geo_json']
-		);
-
-		// Remove the extra ~ before dispplay
+		// Remove the extra ~ before display
 		foreach ($topic_row AS $k=>$v)
 			$topic_row[$k] = str_replace ('~', '', $v);
 

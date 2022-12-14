@@ -26,7 +26,8 @@ if (mapType == 'point')
 	}));
 
 if (mapType == 'line' && scriptName == 'viewtopic') {
-	const features = new ol.format.GeoJSON().readFeatures(geo_json, {
+	const geoJson = document.getElementById('marker-json'),
+		features = new ol.format.GeoJSON().readFeatures(geoJson.value, {
 			featureProjection: "EPSG:3857",
 		}),
 		extent = ol.extent.createEmpty();
