@@ -114,6 +114,7 @@ class listener implements EventSubscriberInterface
 
 			$txt .= "<a href='posting.php?mode=reply&f=3&t={$row['topic_id']}'>Ecrire un commentaire</a></div><br>";
 		}
+		$this->db->sql_freeresult($result);
 
 		$html = '';
 		foreach (explode ('<br>', $txt) AS $l) {

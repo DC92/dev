@@ -150,12 +150,13 @@ class listener implements EventSubscriberInterface
 
 			//TODO BUG voir pourquoi on a des filetime très négatifs
 			$filetime = max(0,(strtotime(@$exif['DateTimeOriginal']) ?: @$exif['FileDateTime'] ?: @$attachment['filetime']));
-			$this->db->sql_query (implode (' ', [
+			$sql = implode (' ', [
 				'UPDATE '.ATTACHMENTS_TABLE,
 				'SET exif = "'.implode (' ', $info ?: ['~']).'",',
 					'filetime = '.$filetime,
 				'WHERE attach_id = '.$attachment['attach_id']
-			]));
+			]);
+			$this->db->sql_query ($sql);
 		}
 
 		// Reduction de la taille de l'image
@@ -219,13 +220,13 @@ class listener implements EventSubscriberInterface
 	}
 
 	function add_sql_column ($table, $column, $type) {
-		$result = $this->db->sql_query(
-			"SHOW columns FROM $table LIKE '$column'"
-		);
-		if (!$this->db->sql_fetchrow($result))
-			$this->db->sql_query(
-				"ALTER TABLE $table ADD $column $type"
-			);
+		$sql = "SHOW columns FROM $table LIKE '$column'";
+		$result = $this->db->sql_query($sql);
+
+		if (!$this->db->sql_fetchrow($result)) {
+			$sql ="ALTER TABLE $table ADD $column $type" ;
+			$this->db->sql_query($sql);
+		}
 		$this->db->sql_freeresult($result);
 	}
 }

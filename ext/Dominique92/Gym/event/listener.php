@@ -101,6 +101,7 @@ class listener implements EventSubscriberInterface
 		$this->db->sql_freeresult($result);
 
 		// Lecture de la base
+		$menus = $une = $horaire = $en_horaire = $calendriers = $update_count = [];
 		$sql = "SELECT p.*,
 				f.forum_name, f.forum_desc,
 				acti.post_subject AS activite,
@@ -113,8 +114,6 @@ class listener implements EventSubscriberInterface
 				LEFT JOIN ".POSTS_TABLE." AS lieu ON (lieu.post_id = p.gym_lieu)
 			WHERE p.post_visibility = 1"; // Posts non supprimés
 		$result = $this->db->sql_query($sql);
-
-		$menus = $une = $horaire = $en_horaire = $calendriers = $update_count = [];
 		while ($row = $this->db->sql_fetchrow($result)) {
 			// Titre sans ses premiers chiffres
 			preg_match ('/[!0-9]* ?(.*)/', $row['post_subject'], $title);
@@ -412,11 +411,11 @@ class listener implements EventSubscriberInterface
 			$sql = 'SHOW columns FROM '.POSTS_TABLE.' LIKE "'.$column.'"';
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
 			if (!$row) {
 				$sql = 'ALTER TABLE '.POSTS_TABLE.' ADD '.$column.' TEXT';
 				$this->db->sql_query($sql);
 			}
+			$this->db->sql_freeresult($result);
 		}
 	}
 }

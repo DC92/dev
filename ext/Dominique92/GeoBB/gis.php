@@ -54,6 +54,7 @@ if (0) {
 		$sqlupd = "UPDATE phpbb_posts SET geo_cluster = $geo_cluster WHERE post_id = ".$row['post_id'];
 		$db->sql_query($sqlupd);
 	}
+	$this->db->sql_freeresult($result);
 }
 
 $data = $features = $signatures = $features = $light_features = [];
@@ -139,14 +140,13 @@ if (is_array ($sql_array ['WHERE'])) {
 	$sql_array ['WHERE'] = implode (' AND ', $sql_array ['WHERE']);
 }
 
-$sql = $db->sql_build_query('SELECT', $sql_array);
-$result = $db->sql_query_limit($sql, $limit);
-
 // Ajoute l'adresse complète aux images d'icones
 $request_scheme = explode ('/', getenv('REQUEST_SCHEME'));
 $request_uri = explode ('/ext/', getenv('REQUEST_URI'));
 $url_base = $request_scheme[0].'://'.getenv('SERVER_NAME').$request_uri[0].'/';
 
+$sql = $db->sql_build_query('SELECT', $sql_array);
+$result = $db->sql_query_limit($sql, $limit);
 while ($row = $db->sql_fetchrow($result)) {
 	$properties = [
 		'name' => $row['post_subject'],

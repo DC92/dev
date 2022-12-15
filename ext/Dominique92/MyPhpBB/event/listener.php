@@ -189,9 +189,9 @@ class listener implements EventSubscriberInterface
 				'    OR post_id  LIKE '.$vars['post_id'];
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
 			if ($row)
 				$vars['forum_id'] = $row['forum_id'];
+			$this->db->sql_freeresult($result);
 		}
 	}
 
@@ -334,11 +334,10 @@ class listener implements EventSubscriberInterface
 			$sql = 'SELECT post_id FROM '.POSTS_TABLE.' WHERE post_text LIKE "%shortcut%>'.$shortcut.'<%shortcut%"';
 			$result = $this->db->sql_query($sql);
 			$row = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-
 			if ($row)
 				echo '<meta http-equiv="refresh" content="0;URL=viewtopic.php?p='.
 					$row['post_id'].'">';
+			$this->db->sql_freeresult($result);
 		}
 	}
 }

@@ -224,8 +224,6 @@ class listener implements EventSubscriberInterface
 					' WHERE post_id = '.$post_data['post_id'];
 				$result = $this->db->sql_query($sql);
 				$row = $this->db->sql_fetchrow($result);
-				$this->db->sql_freeresult($result);
-
 				if ($row) {
 					// Protect empty lines
 					$geo_json = json_decode ($row['geo_json']);
@@ -238,6 +236,7 @@ class listener implements EventSubscriberInterface
 
 					$this->template->assign_vars (array_change_key_case ($row, CASE_UPPER));
 				}
+				$this->db->sql_freeresult($result);
 			}
 		}
 	}
@@ -285,9 +284,8 @@ class listener implements EventSubscriberInterface
 	}
 
 	function add_sql_column ($table, $column, $type) {
-		$result = $this->db->sql_query(
-			"SHOW columns FROM $table LIKE '$column'"
-		);
+		$sql ="SHOW columns FROM $table LIKE '$column'" ;
+		$result = $this->db->sql_query($sql);
 		if (!$this->db->sql_fetchrow($result))
 			$this->db->sql_query(
 				"ALTER TABLE $table ADD $column $type"
