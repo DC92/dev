@@ -5,8 +5,6 @@
 //BEST Diaporama sur demande dans le post
 //BEST ??? masquer le texte dans les séances
 //BEST BUG Voir icone position sur carte dans GYM Chaville
-//BEST Mesureur audience
-	audiences synthétiques ?? > logs / youtube / visio
 //BEST Carte tous points dans chaville
 //BEST Lien gmaps / stretview
 //BEST Bouton imprimer calendier / style print

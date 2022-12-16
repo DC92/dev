@@ -7,7 +7,6 @@
  * @copyright (c) 2020 Dominique Cavailhez
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
-//BEST mesureur d'audience
 //BEST Façon de saisir un fichier icone qui n’existe pas (file exists en PHP !)
 //BEST Ne pas démarrer les ext quand on installe
 //BEST Comment retourner un mail de création d'user à l'admin ?

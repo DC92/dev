@@ -61,7 +61,6 @@ class listener implements EventSubscriberInterface
 	*/
 	function common($vars) {
 		global $mapKeys;
-		//TODO DELETE ??? preg_match ('/Trident/', @$this->server['HTTP_USER_AGENT'], $match);
 		$this->template->assign_var ('MAP_KEYS', json_encode (@$mapKeys));
 	}
 
@@ -119,7 +118,7 @@ class listener implements EventSubscriberInterface
 			$topic_row['body_class'] = $view.' '.$view.'_'.$desc[2];
 
 			// Positions
-			preg_match_all ('/\[([-0-9.]+), ?([-0-9.]+)\]/', @$topic_row['geo_json'], $lls);
+			preg_match_all ('/\[(-?[0-9.]+), ?(-?[0-9.]+)\]/', @$topic_row['geo_json'], $lls);
 			if ($lls[0]) {
 				$topic_row['forum_image'] = $topic_data['forum_image'];
 				$topic_row['map_type'] = $desc[2];
@@ -172,22 +171,6 @@ class listener implements EventSubscriberInterface
 
 					// Update the database for next time
 					$sql = "UPDATE phpbb_posts SET geo_massif = '".addslashes ($topic_row['geo_massif'])."' WHERE post_id = $post_id";
-					$this->db->sql_query($sql);
-				}
-			}
-
-			// Calcul du cluster (managé par le serveur)
-			//TODO redo as WRI
-			if (array_key_exists ('geo_cluster', $topic_row) && !$topic_row['geo_cluster']) {
-				$clusters_by_degree = 10;
-				$geo_center = json_decode (@$topic_row['geo_center']);
-				if ($geo_center) {
-					$topic_row['geo_cluster'] =
-						intval ((180 + $geo_center->coordinates[0]) * $clusters_by_degree) * 360 * $clusters_by_degree +
-						intval ((180 + $geo_center->coordinates[1]) * $clusters_by_degree);
-
-					// Update the database for next time
-					$sql = "UPDATE phpbb_posts SET geo_cluster = '{$topic_row['geo_cluster']}' WHERE post_id = $post_id";
 					$this->db->sql_query($sql);
 				}
 			}
@@ -250,7 +233,7 @@ class listener implements EventSubscriberInterface
 		if (@$post['geom']) {
 			// Avoid wrap of the world
 			$geom = preg_replace_callback(
-				'/coordinates\"\:\[([-0-9.]+)/',
+				'/coordinates\"\:\[(-?[0-9.]+)/',
 				function ($matches) {
 					return 'coordinates":['.($matches[1] - round ($matches[1] / 360) * 360);
 				},
@@ -270,7 +253,6 @@ class listener implements EventSubscriberInterface
 	*/
 	function adm_page_header() {
 		$this->add_sql_column (POSTS_TABLE, 'geom', 'geometrycollection');
-		$this->add_sql_column (POSTS_TABLE, 'geo_cluster', 'int');
 		$this->add_sql_column (POSTS_TABLE, 'geo_massif', 'varchar(50)');
 		$this->add_sql_column (POSTS_TABLE, 'geo_altitude', 'text');
 

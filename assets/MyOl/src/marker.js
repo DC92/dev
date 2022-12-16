@@ -70,7 +70,7 @@ function layerMarker(opt) {
 		if (idMatch)
 			switch (idMatch[1]) {
 				case 'json':
-					const json = (els.json.value).match(/([-0-9\.]+)[, ]*([-0-9\.]+)/);
+					const json = (els.json.value).match(/(-?[0-9\.]+)[, ]*(-?[0-9\.]+)/);
 					if (json)
 						changeLL(json.slice(1), 'EPSG:4326', true);
 					break;

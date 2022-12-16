@@ -107,7 +107,7 @@ function controlPermalink(opt) {
 		}),
 		aEl = document.createElement('a'),
 		urlMod = location.href.replace( // Get value from params with priority url / ? / #
-			/map=([0-9\.]+)\/([-0-9\.]+)\/([-0-9\.]+)/, // map=<zoom>/<lon>/<lat>
+			/map=([0-9\.]+)\/(-?[0-9\.]+)\/(-?[0-9\.]+)/, // map=<zoom>/<lon>/<lat>
 			'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
 		) +
 		// Last values
@@ -134,8 +134,8 @@ function controlPermalink(opt) {
 			view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
 
 			view.setCenter(ol.proj.transform([
-				urlMod.match(/lon=([-0-9\.]+)/)[1],
-				urlMod.match(/lat=([-0-9\.]+)/)[1],
+				urlMod.match(/lon=(-?[0-9\.]+)/)[1],
+				urlMod.match(/lat=(-?[0-9\.]+)/)[1],
 			], 'EPSG:4326', 'EPSG:3857'));
 		}
 
