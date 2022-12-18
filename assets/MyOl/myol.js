@@ -884,7 +884,7 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 					parseInt(color.substring(5, 7), 16),
 					transparency || 1,
 				].join(',') + ')',
-			})
+			}),
 		};
 }
 
@@ -1116,6 +1116,17 @@ function layerGeoBB(options) {
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
+				}),
+				// Arrow at the end
+				text: new ol.style.Text({
+					text: '>',
+					placement: 'line',
+					rotateWithView: true,
+					scale: 2,
+					offsetY: 1.4,
+					fill: new ol.style.Fill({
+						color: 'blue',
+					}),
 				}),
 			};
 		},
@@ -2715,7 +2726,6 @@ function layerMarker(opt) {
  * geoJson lines & polygons edit
  * Requires JSONparse, controlButton (from src/controls.js)
  */
-
 function layerEditGeoJson(opt) {
 	const options = {
 			format: new ol.format.GeoJSON(),
@@ -2750,6 +2760,19 @@ function layerEditGeoJson(opt) {
 				// Polygons
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,255,0.2)',
+				}),
+				// Arrow at the end
+				text: new ol.style.Text({
+					text: '>',
+					placement: 'line',
+					textAlign: 'start',
+					rotateWithView: true,
+					scale: 2,
+					offsetX: 1.5,
+					offsetY: 1.4,
+					fill: new ol.style.Fill({
+						color: 'red',
+					}),
 				}),
 			},
 			// Hover / modify / create

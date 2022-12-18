@@ -3,7 +3,6 @@
  * Requires JSONparse, controlButton (from src/controls.js)
  */
 //jshint esversion: 9
-
 function layerEditGeoJson(opt) {
 	const options = {
 			format: new ol.format.GeoJSON(),
@@ -38,6 +37,19 @@ function layerEditGeoJson(opt) {
 				// Polygons
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,255,0.2)',
+				}),
+				// Arrow at the end
+				text: new ol.style.Text({
+					text: '>',
+					placement: 'line',
+					textAlign: 'start',
+					rotateWithView: true,
+					scale: 2,
+					offsetX: 1.5,
+					offsetY: 1.4,
+					fill: new ol.style.Fill({
+						color: 'red',
+					}),
 				}),
 			},
 			// Hover / modify / create
@@ -189,7 +201,6 @@ function layerEditGeoJson(opt) {
 	interactions[0].on('modifyend', evt => {
 		//BEST move only one summit when dragging
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
-		//TODO display line directions
 		//TODO invert line directions
 
 		// Mark last change time

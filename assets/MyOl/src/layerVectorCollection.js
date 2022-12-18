@@ -42,6 +42,17 @@ function layerGeoBB(options) {
 					color: 'blue',
 					width: 2,
 				}),
+				// Arrow at the end
+				text: new ol.style.Text({
+					text: '>',
+					placement: 'line',
+					rotateWithView: true,
+					scale: 2,
+					offsetY: 1.4,
+					fill: new ol.style.Fill({
+						color: 'blue',
+					}),
+				}),
 			};
 		},
 		hoverStyleOptFnc: function(feature, properties) {

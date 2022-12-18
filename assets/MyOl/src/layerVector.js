@@ -357,7 +357,7 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 					parseInt(color.substring(5, 7), 16),
 					transparency || 1,
 				].join(',') + ')',
-			})
+			}),
 		};
 }
 
