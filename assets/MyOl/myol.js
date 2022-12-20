@@ -2882,7 +2882,9 @@ function layerEditGeoJson(opt) {
 		];
 
 	// Manage hover to save modify actions integrity
-	let hoveredFeature = null;
+	let hoveredFeature = null,
+		deleteVertex = null,
+		reverseAtVertex = null;
 
 	control.layer = layer; // For user's usage
 
@@ -2970,11 +2972,14 @@ function layerEditGeoJson(opt) {
 		);
 
 		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)
-			optimiseEdited(newFeature.vertex);
+			deleteVertex = newFeature.vertex;
+
+		if (evt.mapBrowserEvent.originalEvent.shiftKey && newFeature)
+			reverseAtVertex = newFeature.vertex;
 
 		// Finish
 		optimiseEdited();
-		hoveredFeature = null; // Recover hovering
+		hoveredFeature = deleteVertex = reverseAtVertex = null;
 	});
 
 	// End of line & poly drawing
@@ -3030,14 +3035,13 @@ function layerEditGeoJson(opt) {
 		}
 	}
 
-	function optimiseEdited(deleteCoords) {
+	function optimiseEdited() {
 		const coordinates = optimiseFeatures(
 			source.getFeatures(),
 			options.help[1],
 			options.help[2],
 			true,
-			true,
-			deleteCoords
+			true
 		);
 
 		// Recreate features
@@ -3058,15 +3062,15 @@ function layerEditGeoJson(opt) {
 	}
 
 	// Refurbish Lines & Polygons
-	// Split lines having a summit at deleteCoords
-	function optimiseFeatures(features, withLines, withPolygons, merge, holes, deleteCoords) {
+	// Split lines having a summit at deleteVertex
+	function optimiseFeatures(features, withLines, withPolygons, merge, holes) {
 		const points = [],
 			lines = [],
 			polys = [];
 
 		// Get all edited features as array of coordinates
 		for (let f in features)
-			flatFeatures(features[f].getGeometry(), points, lines, polys, deleteCoords);
+			flatFeatures(features[f].getGeometry(), points, lines, polys);
 
 		for (let a in lines)
 			// Exclude 1 coordinate features (points)
@@ -3144,12 +3148,12 @@ function layerEditGeoJson(opt) {
 		};
 	}
 
-	function flatFeatures(geom, points, lines, polys, deleteCoords) {
+	function flatFeatures(geom, points, lines, polys) {
 		// Expand geometryCollection
 		if (geom.getType() == 'GeometryCollection') {
 			const geometries = geom.getGeometries();
 			for (let g in geometries)
-				flatFeatures(geometries[g], points, lines, polys, deleteCoords);
+				flatFeatures(geometries[g], points, lines, polys);
 		}
 		// Point
 		else if (geom.getType().match(/point$/i))
@@ -3158,24 +3162,37 @@ function layerEditGeoJson(opt) {
 		// line & poly
 		else
 			// Get lines or polyons as flat array of coordinates
-			flatCoord(lines, geom.getCoordinates(), deleteCoords);
+			flatCoord(lines, geom.getCoordinates());
 	}
 
 	// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)
-	// at the same level & split if one point = deleteCoords
-	function flatCoord(existingCoords, newCoords, deleteCoords) {
+	// at the same level & split if one point = deleteVertex
+	function flatCoord(existingCoords, newCoords) {
 		if (typeof newCoords[0][0] == 'object') // Multi*
 			for (let c1 in newCoords)
-				flatCoord(existingCoords, newCoords[c1], deleteCoords);
+				flatCoord(existingCoords, newCoords[c1]);
 		else {
-			existingCoords.push([]); // Add a new segment
+			// Reverse segment
+			let match = false,
+				reverseCords = [];
 
-			for (let c2 in newCoords)
-				if (deleteCoords && compareCoords(newCoords[c2], deleteCoords))
-					existingCoords.push([]); // Ignore this point and add a new segment
+			for (var c2 = newCoords.length; c2--;)
+				if (reverseAtVertex && compareCoords(newCoords[c2], reverseAtVertex))
+					match = true;
 				else
-					// Stack on the last existingCoords array
-					existingCoords[existingCoords.length - 1].push(newCoords[c2]);
+					reverseCords.push(newCoords[c2]);
+			if (match)
+				existingCoords.push(reverseCords); // Add reversed segment
+			else {
+				// Split segment
+				existingCoords.push([]); // Add a new segment
+				for (let c2 in newCoords)
+					if (deleteVertex && compareCoords(newCoords[c2], deleteVertex))
+						existingCoords.push([]); // Ignore this point and add a new segment
+					else
+						// Stack on the last existingCoords array
+						existingCoords[existingCoords.length - 1].push(newCoords[c2]);
+			}
 		}
 	}
 
