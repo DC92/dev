@@ -888,6 +888,33 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 		};
 }
 
+// Add an arrow following a line direction
+function styleOptArrow(feature, color) {
+	let g = feature.getGeometry();
+
+	if (g.getType() == 'Point')
+		return;
+
+	if (g.getType() == 'GeometryCollection')
+		g = g.getGeometries()[0];
+
+	const fc = g.flatCoordinates;
+
+	return {
+		text: new ol.style.Text({
+			text: fc[fc.length - g.stride] < fc[fc.length - g.stride * 2] ? '<' : '>',
+			placement: 'line',
+			textAlign: 'start',
+			scale: 2,
+			//offsetX: 1.4,
+			offsetY: 1.4,
+			fill: new ol.style.Fill({
+				color: color || 'red',
+			}),
+		}),
+	};
+}
+
 // Style of a cluster bullet (both local & server cluster
 function styleOptCluster(feature, properties) {
 	let nbClusters = parseInt(properties.cluster || 0);
@@ -1109,24 +1136,14 @@ function layerGeoBB(options) {
 				attribution: opt.attribution,
 			};
 		},
-		styleOptFnc: function(f, properties) {
+		styleOptFnc: function(feature, properties) {
 			return {
 				...styleOptIcon(properties.icon), // Points
 				...styleOptPolygon(properties.color, 0.5), // Polygons with color
+				...styleOptArrow(feature, 'blue'),
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
-				}),
-				// Arrow at the end
-				text: new ol.style.Text({
-					text: '>',
-					placement: 'line',
-					rotateWithView: true,
-					scale: 2,
-					offsetY: 1.4,
-					fill: new ol.style.Fill({
-						color: 'blue',
-					}),
 				}),
 			};
 		},

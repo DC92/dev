@@ -245,11 +245,11 @@ function layerVectorCluster(opt) {
  */
 
 // Get icon from an URL
-//TODO BUG general : send cookies to server, event non secure
 function styleOptIcon(iconUrl) {
 	if (iconUrl)
 		return {
 			image: new ol.style.Icon({
+				//TODO BUG general : send cookies to server, event non secure
 				src: iconUrl,
 			}),
 		};
@@ -359,6 +359,34 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 				].join(',') + ')',
 			}),
 		};
+}
+
+// Add an arrow following a line direction
+function styleOptArrow(feature, color) {
+	let g = feature.getGeometry();
+
+	if (g.getType() == 'Point')
+		return;
+
+	//BEST BUG set only the last coordinate pair of the the first geometry
+	if (g.getType() == 'GeometryCollection')
+		g = g.getGeometries()[0];
+
+	const fc = g.flatCoordinates;
+
+	return {
+		text: new ol.style.Text({
+			text: fc[fc.length - g.stride] < fc[fc.length - g.stride * 2] ? '<' : '>',
+			placement: 'line',
+			textAlign: 'start',
+			scale: 2,
+			//offsetX: 1.4, //BEST dont work with ol 7.1.0
+			offsetY: 1.4,
+			fill: new ol.style.Fill({
+				color: color || 'red',
+			}),
+		}),
+	};
 }
 
 // Style of a cluster bullet (both local & server cluster

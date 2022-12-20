@@ -34,24 +34,14 @@ function layerGeoBB(options) {
 				attribution: opt.attribution,
 			};
 		},
-		styleOptFnc: function(f, properties) {
+		styleOptFnc: function(feature, properties) {
 			return {
 				...styleOptIcon(properties.icon), // Points
 				...styleOptPolygon(properties.color, 0.5), // Polygons with color
+				...styleOptArrow(feature, 'blue'),
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
-				}),
-				// Arrow at the end
-				text: new ol.style.Text({
-					text: '>',
-					placement: 'line',
-					rotateWithView: true,
-					scale: 2,
-					offsetY: 1.4,
-					fill: new ol.style.Fill({
-						color: 'blue',
-					}),
 				}),
 			};
 		},
