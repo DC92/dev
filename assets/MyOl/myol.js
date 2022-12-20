@@ -889,7 +889,7 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 }
 
 // Add an arrow following a line direction
-function styleOptArrow(feature, color) {
+function styleOptArrow(feature, opt) {
 	let g = feature.getGeometry();
 
 	if (g.getType() == 'Point')
@@ -898,7 +898,11 @@ function styleOptArrow(feature, color) {
 	if (g.getType() == 'GeometryCollection')
 		g = g.getGeometries()[0];
 
-	const fc = g.flatCoordinates;
+	const options = {
+			color: 'red',
+			...opt
+		},
+		fc = g.flatCoordinates;
 
 	return {
 		text: new ol.style.Text({
@@ -909,7 +913,7 @@ function styleOptArrow(feature, color) {
 			//offsetX: 1.4,
 			offsetY: 1.4,
 			fill: new ol.style.Fill({
-				color: color || 'red',
+				color: options.color,
 			}),
 		}),
 	};
@@ -1140,7 +1144,9 @@ function layerGeoBB(options) {
 			return {
 				...styleOptIcon(properties.icon), // Points
 				...styleOptPolygon(properties.color, 0.5), // Polygons with color
-				...styleOptArrow(feature, 'blue'),
+				...styleOptArrow(feature, {
+					color: 'blue',
+				}),
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
@@ -2768,6 +2774,7 @@ function layerEditGeoJson(opt) {
 					.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 			},
 			// Drag lines or Polygons
+			styleOptionsFnc: function() {},
 			styleOptions: {
 				// Lines or polygons border
 				stroke: new ol.style.Stroke({
@@ -2777,19 +2784,6 @@ function layerEditGeoJson(opt) {
 				// Polygons
 				fill: new ol.style.Fill({
 					color: 'rgba(0,0,255,0.2)',
-				}),
-				// Arrow at the end
-				text: new ol.style.Text({
-					text: '>',
-					placement: 'line',
-					textAlign: 'start',
-					rotateWithView: true,
-					scale: 2,
-					offsetX: 1.5,
-					offsetY: 1.4,
-					fill: new ol.style.Fill({
-						color: 'red',
-					}),
 				}),
 			},
 			// Hover / modify / create
@@ -2839,8 +2833,18 @@ function layerEditGeoJson(opt) {
 
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		displayStyle = new ol.style.Style(options.styleOptions),
-		editStyle = new ol.style.Style(options.editStyleOptions),
+		displayStyle = function(feature) {
+			return new ol.style.Style({
+				...options.styleOptionsFnc(feature),
+				...options.styleOptions,
+			})
+		},
+		editStyle = function(feature) {
+			return new ol.style.Style({
+				...options.styleOptionsFnc(feature),
+				...options.editStyleOptions,
+			})
+		},
 
 		features = options.readFeatures(),
 		source = new ol.source.Vector({
@@ -2962,7 +2966,7 @@ function layerEditGeoJson(opt) {
 		const newFeature = interactions[3].snapTo(
 			evt.mapBrowserEvent.pixel,
 			evt.mapBrowserEvent.coordinate,
-			interactions[3].getMap()
+			control.getMap()
 		);
 
 		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)

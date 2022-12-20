@@ -362,7 +362,7 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 }
 
 // Add an arrow following a line direction
-function styleOptArrow(feature, color) {
+function styleOptArrow(feature, opt) {
 	let g = feature.getGeometry();
 
 	if (g.getType() == 'Point')
@@ -372,7 +372,11 @@ function styleOptArrow(feature, color) {
 	if (g.getType() == 'GeometryCollection')
 		g = g.getGeometries()[0];
 
-	const fc = g.flatCoordinates;
+	const options = {
+			color: 'red',
+			...opt
+		},
+		fc = g.flatCoordinates;
 
 	return {
 		text: new ol.style.Text({
@@ -383,7 +387,7 @@ function styleOptArrow(feature, color) {
 			//offsetX: 1.4, //BEST dont work with ol 7.1.0
 			offsetY: 1.4,
 			fill: new ol.style.Fill({
-				color: color || 'red',
+				color: options.color,
 			}),
 		}),
 	};

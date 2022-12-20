@@ -38,7 +38,9 @@ function layerGeoBB(options) {
 			return {
 				...styleOptIcon(properties.icon), // Points
 				...styleOptPolygon(properties.color, 0.5), // Polygons with color
-				...styleOptArrow(feature, 'blue'),
+				...styleOptArrow(feature, {
+					color: 'blue',
+				}),
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
