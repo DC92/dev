@@ -137,8 +137,8 @@ function layerEditGeoJson(opt) {
 
 	// Manage hover to save modify actions integrity
 	let hoveredFeature = null,
-		deleteVertex = null,
-		reverseAtVertex = null;
+		selectedVertex = null, // Vertex where to split a line if reverseLine = false
+		reverseLine = false; // Then reverse the segment where selectedVertex is
 
 	control.layer = layer; // For user's usage
 
@@ -201,7 +201,6 @@ function layerEditGeoJson(opt) {
 	interactions[0].on('modifyend', evt => {
 		//BEST move only one summit when dragging
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
-		//TODO invert line directions
 
 		// Mark last change time
 		sessionStorage.myol_lastChangeTime = Date.now();
@@ -229,14 +228,17 @@ function layerEditGeoJson(opt) {
 		);
 
 		if (evt.mapBrowserEvent.originalEvent.altKey && newFeature)
-			deleteVertex = newFeature.vertex;
+			selectedVertex = newFeature.vertex;
 
-		if (evt.mapBrowserEvent.originalEvent.shiftKey && newFeature)
-			reverseAtVertex = newFeature.vertex;
+		if (evt.mapBrowserEvent.originalEvent.shiftKey && newFeature) {
+			selectedVertex = newFeature.vertex;
+			reverseLine = true;
+		}
 
 		// Finish
 		optimiseEdited();
-		hoveredFeature = deleteVertex = reverseAtVertex = null;
+		hoveredFeature = selectedVertex = null;
+		reverseLine = false;
 	});
 
 	// End of line & poly drawing
@@ -319,7 +321,7 @@ function layerEditGeoJson(opt) {
 	}
 
 	// Refurbish Lines & Polygons
-	// Split lines having a summit at deleteVertex
+	// Split lines having a summit at selectedVertex
 	function optimiseFeatures(features, withLines, withPolygons, merge, holes) {
 		const points = [],
 			lines = [],
@@ -423,34 +425,30 @@ function layerEditGeoJson(opt) {
 	}
 
 	// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)
-	// at the same level & split if one point = deleteVertex
-	function flatCoord(existingCoords, newCoords) {
-		if (typeof newCoords[0][0] == 'object') // Multi*
-			for (let c1 in newCoords)
-				flatCoord(existingCoords, newCoords[c1]);
-		else {
-			// Reverse segment
-			let match = false,
-				reverseCords = [];
+	// at the same level & split if one point = selectedVertex
+	function flatCoord(lines, coords) {
+		const begCoords = []; // Coords before the selectedVertex
 
-			for (var c2 = newCoords.length; c2--;)
-				if (reverseAtVertex && compareCoords(newCoords[c2], reverseAtVertex))
-					match = true;
+		// Multi*
+		if (typeof coords[0][0] == 'object')
+			for (let c1 in coords)
+				flatCoord(lines, coords[c1]);
+
+		// 	LineString
+		else if (selectedVertex) {
+			while (coords.length) {
+				const c = coords.shift();
+				if (compareCoords(c, selectedVertex))
+					break; // Ignore this point and stop selection
 				else
-					reverseCords.push(newCoords[c2]);
-			if (match)
-				existingCoords.push(reverseCords); // Add reversed segment
-			else {
-				// Split segment
-				existingCoords.push([]); // Add a new segment
-				for (let c2 in newCoords)
-					if (deleteVertex && compareCoords(newCoords[c2], deleteVertex))
-						existingCoords.push([]); // Ignore this point and add a new segment
-					else
-						// Stack on the last existingCoords array
-						existingCoords[existingCoords.length - 1].push(newCoords[c2]);
+					begCoords.push(c);
 			}
-		}
+			if (reverseLine)
+				lines.push(begCoords.concat(coords).reverse());
+			else
+				lines.push(begCoords, coords);
+		} else
+			lines.push(coords);
 	}
 
 	function compareCoords(a, b) {
