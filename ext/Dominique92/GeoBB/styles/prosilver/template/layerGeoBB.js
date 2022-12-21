@@ -44,6 +44,7 @@ if (mapType == 'line' && scriptName == 'posting')
 	//TODO save only layerEditGeoJson.layer
 	map.addControl(layerEditGeoJson({
 		geoJsonId: 'marker-json',
+		styleOptionsFnc: styleOptArrow,
 		focus: 15,
 		help: [
 			//BEST mettre dans le html
@@ -52,6 +53,7 @@ if (mapType == 'line' && scriptName == 'posting')
 			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +
 			'<p>Supprimer un sommet : Alt+cliquer sur le sommet</p>' +
 			'<p>Couper une ligne en deux : Alt+cliquer sur le segment à supprimer</p>' +
+			'<p>Inverser la direction d&apos;une ligne: Shift+cliquer sur le segment à inverser</p>' +
 			'<p>Fusionner deux lignes : déplacer l&apos;extrémité d&apos;une ligne pour rejoindre l&apos;autre</p>' +
 			'<p>Supprimer une ligne : Ctrl+Alt+cliquer sur un segment</p>',
 			// Line
