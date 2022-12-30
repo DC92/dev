@@ -122,8 +122,8 @@ class listener implements EventSubscriberInterface
 			if ($lls[0]) {
 				$topic_row['forum_image'] = $topic_data['forum_image'];
 				$topic_row['map_type'] = $desc[2];
-				$topic_row['geo_lon'] = $lls[1]; // For OSM search link
-				$topic_row['geo_lat'] = $lls[2];
+				$topic_row['geo_lon'] = $lls[1][0]; // For OSM search link
+				$topic_row['geo_lat'] = $lls[2][0];
 				$post_row['LON_LAT'] = $lls[0];
 
 				// Altitude calculation

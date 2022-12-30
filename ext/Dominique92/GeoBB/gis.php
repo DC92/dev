@@ -18,8 +18,8 @@ $cat = request_var ('cat', ''); // List of categories of forums to include "1,2,
 $bbox = explode (',', request_var ('bbox', ''));
 $cluster_size = request_var ('cluster_size', 0.1); // ° Mercator
 $limit = request_var ('limit', 200); // Nombre de points maximum
-//TODO ? $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
-//TODO ? $select = request_var ('select', ''); // Post to display
+//BEST ? $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
+//BEST ? $select = request_var ('select', ''); // Post to display
 
 $request_scheme = explode ('/', getenv('REQUEST_SCHEME'));
 $request_uri = explode ('/ext/', getenv('REQUEST_URI'));
