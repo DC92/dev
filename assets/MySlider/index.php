@@ -14,9 +14,12 @@
 	foreach (glob('*.*g') AS $f)
 		$diapos[] = [$f, ''];
 
-//TODO Slider bouton départ / son / full
-//TODO Slider bouton son
-//TODO resize ImageMagick
+//BEST espace devrait revenir au format post
+//BEST Slider bouton départ / son / full
+//BEST Slider bouton son
+//BEST resize ImageMagick
+//BEST Diapo démarre sur une petite page puis défilement en full screen
+//BEST Ordre des diapos
 ?>
 
 <body>
