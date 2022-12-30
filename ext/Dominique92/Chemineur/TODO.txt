@@ -18,7 +18,6 @@
 
 // Voir forum Evolutions & bugs sur chemineur.fr
 //BEST Scan des liens morts
-//TODO Erreurs d'attributions : https://chemineur.fr/viewtopic.php?t=11546
 
 //BEST AIDE CHEM
 Un sujet est actif quand il y a eu des contributions récentes.

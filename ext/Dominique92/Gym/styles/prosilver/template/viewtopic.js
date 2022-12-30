@@ -1,5 +1,5 @@
 const layer = layerVector({
-		url: 'ext/Dominique92/GeoBB/gis.php', //TODO filtrer ceux dans l'horaire
+		url: 'ext/Dominique92/GeoBB/gis.php', //BEST filtrer ceux dans l'horaire
 		convertProperties: function(properties, feature, options) {
 			return {
 				icon: 'ext/Dominique92/GeoBB/icones/gym.svg',
