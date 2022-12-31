@@ -114,7 +114,7 @@ function controlLoadGPX(opt) {
  * File downloader control
  * Requires controlButton
  */
-//TODO BUG incompatible with clusters
+//BEST BUG incompatible with clusters
 function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
