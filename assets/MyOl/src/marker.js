@@ -49,7 +49,6 @@ function layerMarker(opt) {
 	}
 
 	// Collect all entries elements
-	//BEST element #xxx-coordinates not dependent of # prefix
 	['json', 'lon', 'lat', 'x', 'y', 'select', 'string'].forEach(i => {
 		els[i] = document.getElementById((options.prefix || 'marker') + '-' + i) || document.createElement('div');
 		els[i].onchange = onChange;
@@ -66,19 +65,12 @@ function layerMarker(opt) {
 			sessionStorage.myol_lastChangeTime = Date.now();
 
 		// Find changed input type from tne input id
-		const idMatch = (evt ? evt.target : this).id.match(/-([a-z]+)/); //TODO (evt ? evt.target : this)
-		//BEST strict mode, 'this' will be undefined... and others
+		const idMatch = (evt ? evt.target : this).id.match(/-([a-z]+)/);
+
 		if (idMatch)
 			switch (idMatch[1]) {
 				case 'json': // Init the field
-					const json = els.json.value.match(/(-?[0-9\.]+)[, ]*(-?[0-9\.]+)/);
-					//TODO DELETE ???					if (json)
-					changeLL(json.slice(1), 'EPSG:4326', true);
-					break;
-				case 'select': // Change the display format
-					const wwjson = els.json.value.match(/(-?[0-9\.]+)[, ]*(-?[0-9\.]+)/); //TODO regrouper
-					//TODO DELETE ???					if (wwjson)
-					changeLL(wwjson.slice(1), 'EPSG:4326'); //TODO simplifier
+					changeLL([...els.json.value.matchAll(/-?[0-9\.]+/g)], 'EPSG:4326', true);
 					break;
 				case 'lon': // Change lon / lat
 				case 'lat':
@@ -87,8 +79,10 @@ function layerMarker(opt) {
 				case 'x': // Change X / Y
 				case 'y':
 					//TODO dans ce cas, ne pas afficher X & Y					if (typeof proj4 == 'function')  
-					changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
+					changeLL([els.x.value, els.y.value], 'EPSG:21781', true);
 					break;
+				case 'select': // Change the display format
+					changeLL();
 			}
 	}
 
@@ -137,71 +131,75 @@ function layerMarker(opt) {
 	};
 
 	// Display values
-	function changeLL(ll, projection, focus) {
-		if (ll[0] && ll[1]) {
-			// Protection against non-digital entries
-			ll[0] = ll[0].toString().replace(/[^-0-9]+/, '.');
-			ll[1] = ll[1].toString().replace(/[^-0-9]+/, '.');
-
-			// Wrap +-180°
-			const bounds = ol.proj.transform([180, 85], 'EPSG:4326', projection);
-
-			ll[0] -= Math.round(ll[0] / bounds[0] / 2) * bounds[0] * 2;
-
-			const ll3857 = ol.proj.transform(ll, projection, 'EPSG:3857'),
-				ll4326 = ol.proj.transform(ll, projection, 'EPSG:4326');
-
-			// Move the marker
-			point.setCoordinates(ll3857);
-
-			// Move the map
-			if (focus && view)
-				view.setCenter(ll3857);
-
-			// Populate inputs
-			els.lon.value = Math.round(ll4326[0] * 100000) / 100000;
-			els.lat.value = Math.round(ll4326[1] * 100000) / 100000;
-			els.json.value = '{"type":"Point","coordinates":[' + els.lon.value + ',' + els.lat.value + ']}';
-
-			// Display
-			const strings = {
-				dec: 'Lon: ' + els.lon.value + ', Lat: ' + els.lat.value,
-				dms: ol.coordinate.toStringHDMS(ll4326),
-			};
-
-			{ //TODO DELETE ??? test si pas de proj4			if (typeof proj4 == 'function') {
-				// UTM zones
-				const z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
-					u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
-					llutm = ol.proj.transform(ll, projection, 'EPSG:' + u);
-
-				// Swiss
-				const ll21781 = ol.proj.transform(ll, projection, 'EPSG:21781');
-				els.x.value = Math.round(ll21781[0]);
-				els.y.value = Math.round(ll21781[1]);
-
-				// Display
-				strings.swiss = 'X=' + els.x.value + ', Y=' + els.y.value + ' (CH1903)';
-				strings.utm = ' UTM ' + z +
-					' E:' + Math.round(llutm[0]) + ' ' +
-					(llutm[1] > 0 ? 'N:' : 'S:') + Math.round(llutm[1] + (llutm[1] > 0 ? 0 : 10000000));
-
-				// Hide Swiss coordinates when out of extent
-				const inEPSG21781 = ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857),
-					swissEls = document.getElementsByClassName('xy');
-
-				document.querySelectorAll('.xy').forEach(el => {
-					el.style.display = inEPSG21781 ? '' : 'none';
-
-					// When not on the CH1903 extend, hide the choice 
-					if (!inEPSG21781 && els.select.value == 'swiss')
-						els.select.value = 'dec';
-				});
-			}
-
-			// Display selected format
-			els.string.textContent = strings[els.select.value || 'dec'];
+	function changeLL(pos, projection, focus) {
+		// If no position is given, use the marker's
+		if (!pos || pos.length < 2) {
+			pos = point.getCoordinates();
+			projection = 'EPSG:3857';
 		}
+
+		// Don't change if none entry
+		if (!pos[0] && !pos[1])
+			return;
+
+		const ll4326 = ol.proj.transform([
+			// Protection against non-digital entries / transform , into .
+			parseFloat(pos[0].toString().replace(/[^-0-9]+/, '.')),
+			parseFloat(pos[1].toString().replace(/[^-0-9]+/, '.'))
+		], projection, 'EPSG:4326');
+
+		ll4326[0] -= Math.round(ll4326[0] / 360) * 360; // Wrap +-180°
+
+		const ll3857 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
+			inEPSG21781 = typeof proj4 == 'function' &&
+			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857),
+			swissEls = document.getElementsByClassName('xy');
+
+		// Move the marker
+		point.setCoordinates(ll3857);
+
+		// Move the map
+		if (focus && view)
+			view.setCenter(ll3857);
+
+		// Populate inputs
+		els.lon.value = Math.round(ll4326[0] * 100000) / 100000;
+		els.lat.value = Math.round(ll4326[1] * 100000) / 100000;
+		els.json.value = '{"type":"Point","coordinates":[' + els.lon.value + ',' + els.lat.value + ']}';
+
+		// Display
+		const strings = {
+			dec: 'Lon: ' + els.lon.value + ', Lat: ' + els.lat.value,
+			dms: ol.coordinate.toStringHDMS(ll4326),
+		};
+
+		if (inEPSG21781) {
+			const ll21781 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
+				z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
+				u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
+				llutm = ol.proj.transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
+
+			// UTM zones
+			strings.utm = ' UTM ' + z +
+				' E:' + Math.round(llutm[0]) + ' ' +
+				(llutm[1] > 0 ? 'N:' : 'S:') + Math.round(llutm[1] + (llutm[1] > 0 ? 0 : 10000000));
+
+			// Swiss
+			els.x.value = Math.round(ll21781[0]);
+			els.y.value = Math.round(ll21781[1]);
+			strings.swiss = 'X=' + els.x.value + ', Y=' + els.y.value + ' (CH1903)';
+		}
+		// When not on the CH1903 extend, hide the choice 
+		else if (els.select.value == 'swiss')
+			els.select.value = 'dec';
+
+		// Hide Swiss coordinates when out of extent
+		document.querySelectorAll('.xy').forEach(el =>
+			el.style.display = inEPSG21781 ? '' : 'none'
+		);
+
+		// Display selected format
+		els.string.textContent = strings[els.select.value || 'dec'];
 	}
 
 	return layer;

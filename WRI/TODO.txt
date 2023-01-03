@@ -1,3 +1,7 @@
+RUPTURES INTERFACES
+===================
+//TODO celles de examples/marker.html
+
 BUGS
 ====
 //TODO BUG connexion sous FF : efface le pavé connexion aprés avoir rempli avec les infos de connexion
