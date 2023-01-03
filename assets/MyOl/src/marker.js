@@ -50,7 +50,7 @@ function layerMarker(opt) {
 
 	// Collect all entries elements
 	//BEST element #xxx-coordinates not dependent of # prefix
-	['json', 'lon', 'lat', 'x', 'y', 'coordinates', 'select', 'string'].forEach(i => {
+	['json', 'lon', 'lat', 'x', 'y', 'select', 'string'].forEach(i => {
 		els[i] = document.getElementById((options.prefix || 'marker') + '-' + i) || document.createElement('div');
 		els[i].onchange = onChange;
 	});
@@ -66,22 +66,28 @@ function layerMarker(opt) {
 			sessionStorage.myol_lastChangeTime = Date.now();
 
 		// Find changed input type from tne input id
-		const idMatch = this.id.match(/-([a-z]+)/); //BEST strict mode, 'this' will be undefined... and others
+		const idMatch = (evt ? evt.target : this).id.match(/-([a-z]+)/); //TODO (evt ? evt.target : this)
+		//BEST strict mode, 'this' will be undefined... and others
 		if (idMatch)
 			switch (idMatch[1]) {
-				case 'json':
-					const json = (els.json.value).match(/(-?[0-9\.]+)[, ]*(-?[0-9\.]+)/);
-					if (json)
-						changeLL(json.slice(1), 'EPSG:4326', true);
+				case 'json': // Init the field
+					const json = els.json.value.match(/(-?[0-9\.]+)[, ]*(-?[0-9\.]+)/);
+					//TODO DELETE ???					if (json)
+					changeLL(json.slice(1), 'EPSG:4326', true);
 					break;
-				case 'lon':
+				case 'select': // Change the display format
+					const wwjson = els.json.value.match(/(-?[0-9\.]+)[, ]*(-?[0-9\.]+)/); //TODO regrouper
+					//TODO DELETE ???					if (wwjson)
+					changeLL(wwjson.slice(1), 'EPSG:4326'); //TODO simplifier
+					break;
+				case 'lon': // Change lon / lat
 				case 'lat':
 					changeLL([els.lon.value, els.lat.value], 'EPSG:4326', true);
 					break;
-				case 'x':
+				case 'x': // Change X / Y
 				case 'y':
-					if (typeof proj4 == 'function') // x | y
-						changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
+					//TODO dans ce cas, ne pas afficher X & Y					if (typeof proj4 == 'function')  
+					changeLL([parseInt(els.x.value), parseInt(els.y.value)], 'EPSG:21781', true);
 					break;
 			}
 	}
@@ -163,7 +169,7 @@ function layerMarker(opt) {
 				dms: ol.coordinate.toStringHDMS(ll4326),
 			};
 
-			if (typeof proj4 == 'function') {
+			{ //TODO DELETE ??? test si pas de proj4			if (typeof proj4 == 'function') {
 				// UTM zones
 				const z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
 					u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
@@ -181,12 +187,16 @@ function layerMarker(opt) {
 					(llutm[1] > 0 ? 'N:' : 'S:') + Math.round(llutm[1] + (llutm[1] > 0 ? 0 : 10000000));
 
 				// Hide Swiss coordinates when out of extent
-				const epsg21781 = ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
+				const inEPSG21781 = ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857),
+					swissEls = document.getElementsByClassName('xy');
 
-				els.coordinates.classList[epsg21781 ? 'add' : 'remove']('epsg21781');
+				document.querySelectorAll('.xy').forEach(el => {
+					el.style.display = inEPSG21781 ? '' : 'none';
 
-				if (!epsg21781 && els.select.value == 'swiss')
-					els.select.value = 'dec';
+					// When not on the CH1903 extend, hide the choice 
+					if (!inEPSG21781 && els.select.value == 'swiss')
+						els.select.value = 'dec';
+				});
 			}
 
 			// Display selected format

@@ -22,7 +22,6 @@ Based on https://openlayers.org
 	<!-- My Openlayers -->
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
 	<script src="../src/controls.js"></script>
-	<link href="../src/marker.css" type="text/css" rel="stylesheet">
 	<script src="../src/marker.js"></script>
 
 	<style>
@@ -46,10 +45,10 @@ Based on https://openlayers.org
 
 	<!-- Fixed marker -->
 	<input type="hidden" id="cadre-json" value='{"type":"Point","coordinates":[2.34,48.86]}' /></p>
-	<p><b>Cadre :</b> <span id="cadre-string">sss</span></p>
+	<p><b>Cadre :</b> <span id="cadre-string"></span></p>
 
 	<!-- Draggable marker -->
-	<div id="marker-coordinates">
+	<div>
 		<p><b>Colimateur :</b>
 			<span id="marker-string"></span>
 			<select id="marker-select">
@@ -58,15 +57,13 @@ Based on https://openlayers.org
 				<option class="xy" value="swiss">Suisse</option>
 				<option value="utm">UTM</option>
 			</select>
-		</p>
-
-		<p><input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' /></p>
-		<p>
+		</p><p>
+			<input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' />
+		</p><p>
 			Longitude :
 			<input id="marker-lon" type="text" name="lon" size="12" maxlength="12" value="12" /> (WGS84)&nbsp;
 			<span class="xy"> / X : <input id="marker-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)</span>
-		</p>
-		<p>
+		</p><p>
 			Latitude :
 			<input id="marker-lat" type="text" name="lat" size="12" maxlength="12"> (WGS84)&nbsp;
 			<span class="xy"> / Y : <input id="marker-y" type="text" value="21" name="y" size="7" maxlength="12"></span>

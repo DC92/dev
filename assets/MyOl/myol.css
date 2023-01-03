@@ -210,11 +210,6 @@
 	background: #fcffd1 !important;
 }
 
-/* FILE src/marker.css */
-#marker-coordinates:not(.epsg21781) .xy {
-	display: none;
-}
-
 /* FILE src/editor.css */
 .myol-button-edit > div {
 	left: 0;
