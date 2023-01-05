@@ -544,7 +544,7 @@ function layersDemo(options) {
    display loading status <TAG id="SELECT_NAME-status"></TAG>
    No selectName will display the layer
    No selector with selectName will hide the layer
- * callBack : function to call when selected 
+ * callBack : function to call when selected
  * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
@@ -565,6 +565,7 @@ function layerVector(opt) {
 				source.refresh();
 			},
 			styleOptClusterFnc: styleOptCluster,
+			extraParams: function() {},
 			...opt
 		},
 		selectNames = (options.selectName || '').split(','),
@@ -614,10 +615,6 @@ function layerVector(opt) {
 				resolution
 			),
 			query = [];
-
-		// Add a version param depending on last change date to reload if modified
-		if (sessionStorage.myol_lastChangeTime)
-			args.v = parseInt((sessionStorage.myol_lastChangeTime % 100000000) / 10000);
 
 		for (const a in args)
 			if (a != 'url' && args[a])
@@ -1122,15 +1119,11 @@ function layerGeoBB(options) {
 				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
 				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
-				...opt.extraParams(bbox),
+				bbox: bbox.join(','),
+				...opt.extraParams()
 			};
 		},
 		selectName: 'select-chem',
-		extraParams: function(bbox) {
-			return {
-				bbox: bbox.join(','),
-			};
-		},
 		convertProperties: function(properties, opt) {
 			return {
 				icon: properties.type ?
@@ -1173,10 +1166,9 @@ function layerClusterGeoBB(opt) {
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
-			extraParams: function(bbox) {
+			extraParams: function() {
 				return {
 					layer: 'cluster',
-					bbox: bbox.join(','),
 				};
 			},
 			...options
@@ -1201,15 +1193,11 @@ function layerWri(options) {
 				type_points: selections[0],
 				massif: selections[1],
 				nb_points: 'all',
-				...opt.extraParams(bbox),
+				bbox: bbox.join(','),
+				...opt.extraParams()
 			};
 		},
 		selectName: 'select-wri',
-		extraParams: function(bbox) {
-			return {
-				bbox: bbox.join(','),
-			};
-		},
 		convertProperties: function(properties, opt) {
 			return {
 				type: properties.type.valeur,
@@ -2145,7 +2133,7 @@ function controlLoadGPX(opt) {
 		xhr.send();
 	};
 
-	// Load file at init		
+	// Load file at init
 	if (options.initFile) {
 		const xhr = new XMLHttpRequest();
 		xhr.open('GET', options.initFile);
@@ -2608,10 +2596,6 @@ function layerMarker(opt) {
 
 	// Read new values
 	function onChange(evt) {
-		if (evt) // If a field has changed
-			// Mark last change time to be able to reload vector layer if changed
-			sessionStorage.myol_lastChangeTime = Date.now();
-
 		// Find changed input type from tne input id
 		const idMatch = (evt ? evt.target : this).id.match(/-([a-z]+)/);
 
@@ -2654,9 +2638,6 @@ function layerMarker(opt) {
 				// Drag the marker
 				map.addInteraction(new ol.interaction.Pointer({
 					handleDownEvent: function(evt) {
-						// Mark last change time
-						sessionStorage.myol_lastChangeTime = Date.now();
-
 						return map.getFeaturesAtPixel(evt.pixel, {
 							layerFilter: function(l) {
 								return l.ol_uid == layer.ol_uid;
@@ -2736,7 +2717,7 @@ function layerMarker(opt) {
 			els.y.value = Math.round(ll21781[1]);
 			strings.swiss = 'X=' + els.x.value + ', Y=' + els.y.value + ' (CH1903)';
 		}
-		// When not on the CH1903 extend, hide the choice 
+		// When not on the CH1903 extend, hide the choice
 		else if (els.select.value == 'swiss')
 			els.select.value = 'dec';
 
@@ -2953,9 +2934,6 @@ function layerEditGeoJson(opt) {
 
 	// End of modify
 	interactions[0].on('modifyend', evt => {
-
-		// Mark last change time
-		sessionStorage.myol_lastChangeTime = Date.now();
 
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&

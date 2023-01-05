@@ -145,6 +145,11 @@ new ol.Map({
 		...layerVectorCollection({
 			wri: {
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
+				extraParams: function() {
+					return {
+						date: '20230105',
+					}
+				},
 			},
 			alpages: {
 				extraParams: function() {

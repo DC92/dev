@@ -60,10 +60,6 @@ function layerMarker(opt) {
 
 	// Read new values
 	function onChange(evt) {
-		if (evt) // If a field has changed
-			// Mark last change time to be able to reload vector layer if changed
-			sessionStorage.myol_lastChangeTime = Date.now();
-
 		// Find changed input type from tne input id
 		const idMatch = (evt ? evt.target : this).id.match(/-([a-z]+)/);
 
@@ -78,7 +74,6 @@ function layerMarker(opt) {
 					break;
 				case 'x': // Change X / Y
 				case 'y':
-					//TODO dans ce cas, ne pas afficher X & Y					if (typeof proj4 == 'function')  
 					changeLL([els.x.value, els.y.value], 'EPSG:21781', true);
 					break;
 				case 'select': // Change the display format
@@ -107,9 +102,6 @@ function layerMarker(opt) {
 				// Drag the marker
 				map.addInteraction(new ol.interaction.Pointer({
 					handleDownEvent: function(evt) {
-						// Mark last change time
-						sessionStorage.myol_lastChangeTime = Date.now();
-
 						return map.getFeaturesAtPixel(evt.pixel, {
 							layerFilter: function(l) {
 								return l.ol_uid == layer.ol_uid;
@@ -189,7 +181,7 @@ function layerMarker(opt) {
 			els.y.value = Math.round(ll21781[1]);
 			strings.swiss = 'X=' + els.x.value + ', Y=' + els.y.value + ' (CH1903)';
 		}
-		// When not on the CH1903 extend, hide the choice 
+		// When not on the CH1903 extend, hide the choice
 		else if (els.select.value == 'swiss')
 			els.select.value = 'dec';
 

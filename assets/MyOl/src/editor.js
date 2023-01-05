@@ -202,9 +202,6 @@ function layerEditGeoJson(opt) {
 		//BEST move only one summit when dragging
 		//BEST Ctrl+Alt+click on summit : delete the line or poly
 
-		// Mark last change time
-		sessionStorage.myol_lastChangeTime = Date.now();
-
 		// Ctrl+Alt+click on segment : delete the line or poly
 		if (evt.mapBrowserEvent.originalEvent.ctrlKey &&
 			evt.mapBrowserEvent.originalEvent.altKey) {

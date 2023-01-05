@@ -1,6 +1,7 @@
 RUPTURES INTERFACES
 ===================
 //TODO celles de examples/marker.html
+//TODO refaire localement myol_lastChangeTime (dernière date de modif)
 
 BUGS
 ====

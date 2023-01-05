@@ -13,7 +13,7 @@
    display loading status <TAG id="SELECT_NAME-status"></TAG>
    No selectName will display the layer
    No selector with selectName will hide the layer
- * callBack : function to call when selected 
+ * callBack : function to call when selected
  * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
@@ -34,6 +34,7 @@ function layerVector(opt) {
 				source.refresh();
 			},
 			styleOptClusterFnc: styleOptCluster,
+			extraParams: function() {},
 			...opt
 		},
 		selectNames = (options.selectName || '').split(','),
@@ -84,10 +85,6 @@ function layerVector(opt) {
 				resolution
 			),
 			query = [];
-
-		// Add a version param depending on last change date to reload if modified
-		if (sessionStorage.myol_lastChangeTime)
-			args.v = parseInt((sessionStorage.myol_lastChangeTime % 100000000) / 10000);
 
 		for (const a in args)
 			if (a != 'url' && args[a])

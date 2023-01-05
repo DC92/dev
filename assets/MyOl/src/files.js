@@ -26,7 +26,7 @@ function controlLoadGPX(opt) {
 		xhr.send();
 	};
 
-	// Load file at init		
+	// Load file at init
 	if (options.initFile) {
 		const xhr = new XMLHttpRequest();
 		xhr.open('GET', options.initFile);

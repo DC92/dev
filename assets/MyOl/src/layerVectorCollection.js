@@ -16,15 +16,11 @@ function layerGeoBB(options) {
 				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
 				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
-				...opt.extraParams(bbox),
+				bbox: bbox.join(','),
+				...opt.extraParams()
 			};
 		},
 		selectName: 'select-chem',
-		extraParams: function(bbox) {
-			return {
-				bbox: bbox.join(','),
-			};
-		},
 		convertProperties: function(properties, opt) {
 			return {
 				icon: properties.type ?
@@ -67,10 +63,9 @@ function layerClusterGeoBB(opt) {
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
-			extraParams: function(bbox) {
+			extraParams: function() {
 				return {
 					layer: 'cluster',
-					bbox: bbox.join(','),
 				};
 			},
 			...options
@@ -95,15 +90,11 @@ function layerWri(options) {
 				type_points: selections[0],
 				massif: selections[1],
 				nb_points: 'all',
-				...opt.extraParams(bbox),
+				bbox: bbox.join(','),
+				...opt.extraParams()
 			};
 		},
 		selectName: 'select-wri',
-		extraParams: function(bbox) {
-			return {
-				bbox: bbox.join(','),
-			};
-		},
 		convertProperties: function(properties, opt) {
 			return {
 				type: properties.type.valeur,

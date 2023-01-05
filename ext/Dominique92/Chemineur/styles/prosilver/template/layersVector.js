@@ -12,7 +12,7 @@ if (typeof topic_category == 'string') {
 if (typeof map !== 'undefined') {
 	layerVectorCollection({
 		chemineur: {
-			host: '', // Relative to this location 
+			host: '', // Relative to this location
 		}
 	}).forEach(l => map.addLayer(l));
 }
