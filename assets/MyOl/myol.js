@@ -81,21 +81,6 @@ function JSONparse(json) {
 }
 
 /**
- * IOS 12 support
- */
-if (window.PointerEvent === undefined) {
-	const script = document.createElement('script');
-	script.src = 'https://unpkg.com/elm-pep';
-	document.head.appendChild(script);
-}
-
-// Icon extension depending on the OS (IOS 12 dosn't support SVG)
-function iconCanvasExt() {
-	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
-	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
-}
-
-/**
  * WMTS EPSG:3857 tiles layers
  */
 
@@ -783,7 +768,7 @@ function styleOptIconChemineur(iconName) {
 
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
 
-		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
+		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
 }
 
@@ -1197,7 +1182,7 @@ function layerWri(options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
-				icon: opt.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
+				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
 				url: opt.noClick ? null : properties.lien,

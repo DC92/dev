@@ -259,7 +259,7 @@ function styleOptIconChemineur(iconName) {
 
 		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
 
-		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.' + iconCanvasExt());
+		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
 	}
 }
 

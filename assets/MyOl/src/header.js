@@ -73,20 +73,3 @@ function JSONparse(json) {
 		console.log(returnCode + ' parsing : "' + json + '" ' + new Error().stack);
 	}
 }
-
-/**
- * IOS 12 support
- */
-//HACK for pointer events (IOS < 13)
-if (window.PointerEvent === undefined) {
-	const script = document.createElement('script');
-	script.src = 'https://unpkg.com/elm-pep';
-	document.head.appendChild(script);
-}
-
-// Icon extension depending on the OS (IOS 12 dosn't support SVG)
-function iconCanvasExt() {
-	//BEST OBSOLETE navigator.userAgent => navigator.userAgentData
-	const iOSVersion = navigator.userAgent.match(/iPhone OS ([0-9]+)/);
-	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
-}

@@ -96,7 +96,7 @@ function layerWri(options) {
 			return {
 				type: properties.type.valeur,
 				name: properties.nom,
-				icon: opt.host + 'images/icones/' + properties.type.icone + '.' + iconCanvasExt(),
+				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
 				url: opt.noClick ? null : properties.lien,

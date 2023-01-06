@@ -12,7 +12,7 @@ var map = new ol.Map({
 	}).concat(controlLayerSwitcher({
 		layers: layerTileCollection(mapKeys),
 		selectExtId: 'select-ext',
-		//TODO GeoBB only : missing main layerVector/gis
+		//BEST Si on n'a que l'extension GeoBB, on n'a pas la couche gis.php
 	})),
 });
 
@@ -42,7 +42,7 @@ if (mapType == 'line' && scriptName == 'viewtopic') {
 }
 
 if (mapType == 'line' && scriptName == 'posting')
-	//TODO save only layerEditGeoJson.layer
+	//BEST save only layerEditGeoJson.layer
 	map.addControl(layerEditGeoJson({
 		geoJsonId: 'marker-json',
 		styleOptionsFnc: styleOptArrow,

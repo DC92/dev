@@ -19,7 +19,6 @@ $bbox = explode (',', request_var ('bbox', ''));
 $cluster_size = request_var ('cluster_size', 0.1); // ° Mercator
 $limit = request_var ('limit', 200); // Nombre de points maximum
 
-//TODO BUG https://chem6.c92.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg
 //BEST ? $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 //BEST ? $select = request_var ('select', ''); // Post to display
 

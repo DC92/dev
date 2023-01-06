@@ -311,7 +311,7 @@ class listener implements EventSubscriberInterface
 		}
 
 		/* DEBUG : Dump templates variables */
-		//TODO BUG dont work anymore
+		//BEST BUG dont work anymore
 		if(defined('MYPHPBB_DUMP_TEMPLATE') &&
 			$vars['name'] != 'attachment.html') {
 			ini_set('xdebug.var_display_max_depth', '1');
