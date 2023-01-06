@@ -36,7 +36,6 @@ if (location.hash == '###')
 			data.push(s + ':');
 
 		Object.keys(window[s])
-			.filter(k => k.substring(0, 5) == 'myol_')
 			.forEach(k => data.push('  ' + k + ': ' + window[s].getItem(k)));
 	});
 

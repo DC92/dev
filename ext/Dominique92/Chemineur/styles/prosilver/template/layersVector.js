@@ -10,12 +10,25 @@ if (typeof topic_category == 'string') {
 }
 
 if (typeof map !== 'undefined') {
+	// Generate a key unique on last 12 hours
+	const version = (localStorage.lastPostingDate % 43200).toString(36);
+
 	layerVectorCollection({
 		chemineur: {
 			host: '', // Relative to this location
+			extraParams: function() {
+				return {
+					// Reload layer if posting called between
+					//BEST move this to geoBB
+					v: version,
+				}
+			},
 		}
 	}).forEach(l => map.addLayer(l));
 }
+
+if (document.URL.includes('posting'))
+	localStorage.lastPostingDate = Math.floor(Date.now() / 1000); // In seconds epoch
 
 // Resize map
 if (jQuery.ui)

@@ -12,6 +12,7 @@ var map = new ol.Map({
 	}).concat(controlLayerSwitcher({
 		layers: layerTileCollection(mapKeys),
 		selectExtId: 'select-ext',
+		//TODO GeoBB only : missing main layerVector/gis
 	})),
 });
 

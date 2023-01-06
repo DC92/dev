@@ -18,6 +18,8 @@ $cat = request_var ('cat', ''); // List of categories of forums to include "1,2,
 $bbox = explode (',', request_var ('bbox', ''));
 $cluster_size = request_var ('cluster_size', 0.1); // ° Mercator
 $limit = request_var ('limit', 200); // Nombre de points maximum
+
+//TODO BUG https://chem6.c92.fr/ext/Dominique92/GeoBB/icones/Randonn%C3%A9e%20p%C3%A9destre.svg
 //BEST ? $priority = request_var ('priority', 0); // topic_id à affichage prioritaire
 //BEST ? $select = request_var ('select', ''); // Post to display
 
@@ -94,6 +96,30 @@ $sql="SELECT post_id, post_subject,
 $result = $db->sql_query($sql);
 while ($row = $db->sql_fetchrow($result)) {
 	$altitudes = explode (',', str_replace ('~', '', $row['geo_altitude']));
+
+	$properties = [
+		'id' => $row['topic_id'],
+		'post_id' => $row['post_id'],
+		'name' => $row['post_subject'],
+	];
+
+	if ($altitudes && $altitudes[0])
+		$properties['alt'] = $altitudes[0];
+
+	if ($layer == 'verbose') {
+		$properties['type'] = $row['forum_name'];
+		$properties['type_id'] = $row['forum_id'];
+		$properties['link'] = $url_base.'viewtopic.php?t='.$row['topic_id'];
+	}
+
+	// Ajoute l'adresse complète aux images d'icones
+	if ($row['forum_image']) {
+		preg_match ('/([^\/]+)\./', $row['forum_image'], $icon);
+		$properties['type'] = $icon[1];
+		if ($layer == 'verbose')
+			$properties['icon'] = $url_base .str_replace ('.png', '.svg', $row['forum_image']);
+	}
+
 	$geojson = preg_replace_callback (
 		'/(-?[0-9.]+), ?(-?[0-9.]+)/',
 		function ($m) {
@@ -110,27 +136,6 @@ while ($row = $db->sql_fetchrow($result)) {
 		},
 		$row['geojson']
 	);
-
-	$properties = [
-		'id' => $row['topic_id'],
-		'post_id' => $row['post_id'],
-		'name' => $row['post_subject'],
-	];
-	if ($altitudes[0])
-		$properties['alt'] = $altitudes[0];
-	if ($layer == 'verbose') {
-		$properties['type'] = $row['forum_name'];
-		$properties['type_id'] = $row['forum_id'];
-		$properties['link'] = $url_base.'viewtopic.php?t='.$row['topic_id'];
-	}
-
-	// Ajoute l'adresse complète aux images d'icones
-	if ($row['forum_image']) {
-		preg_match ('/([^\/]+)\./', $row['forum_image'], $icon);
-		$properties['type'] = $icon[1];
-		if ($layer == 'verbose')
-			$properties['icon'] = $url_base .str_replace ('.png', '.svg', $row['forum_image']);
-	}
 
 	$features[] = [
 		'type' => 'Feature',
