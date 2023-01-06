@@ -373,21 +373,24 @@ function styleOptArrow(feature, opt) {
 			color: 'red',
 			...opt
 		},
-		fc = g.flatCoordinates;
+		fc = g.flatCoordinates,
+		xn = fc.length - g.stride,
+		xn1 = xn - g.stride;
 
-	return {
-		text: new ol.style.Text({
-			text: fc[fc.length - g.stride] < fc[fc.length - g.stride * 2] ? '<' : '>',
-			placement: 'line',
-			textAlign: 'start',
-			scale: 2,
-			//offsetX: 1.4, //BEST dont work with ol 7.1.0
-			offsetY: 1.4,
-			fill: new ol.style.Fill({
-				color: options.color,
+	if (xn1 >= 0) // At least 2 points
+		return {
+			text: new ol.style.Text({
+				text: fc[xn] < fc[xn1] ? '<' : '>',
+				placement: 'line',
+				textAlign: 'start',
+				scale: 2,
+				//offsetX: 1.4, //BEST dont work with ol 7.1.0
+				offsetY: 1.4,
+				fill: new ol.style.Fill({
+					color: options.color,
+				}),
 			}),
-		}),
-	};
+		};
 }
 
 // Style of a cluster bullet (both local & server cluster

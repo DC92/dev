@@ -7,7 +7,6 @@
  * Please don't modify it : modify src/... & rebuild it !
  */
 
-/* FILE src/header.js */
 // Ease validators
 /* jshint esversion: 9 */
 if (!ol) var ol = {};
@@ -96,7 +95,6 @@ function iconCanvasExt() {
 	return iOSVersion && iOSVersion[1] < 13 ? 'png' : 'svg';
 }
 
-/* FILE src/layerTileCollection.js */
 /**
  * WMTS EPSG:3857 tiles layers
  */
@@ -528,7 +526,6 @@ function layersDemo(options) {
 	};
 }
 
-/* FILE src/layerVector.js */
 /**
  * Adds some facilities to ol.layer.Vector
  */
@@ -898,21 +895,24 @@ function styleOptArrow(feature, opt) {
 			color: 'red',
 			...opt
 		},
-		fc = g.flatCoordinates;
+		fc = g.flatCoordinates,
+		xn = fc.length - g.stride,
+		xn1 = xn - g.stride;
 
-	return {
-		text: new ol.style.Text({
-			text: fc[fc.length - g.stride] < fc[fc.length - g.stride * 2] ? '<' : '>',
-			placement: 'line',
-			textAlign: 'start',
-			scale: 2,
-			//offsetX: 1.4,
-			offsetY: 1.4,
-			fill: new ol.style.Fill({
-				color: options.color,
+	if (xn1 >= 0) // At least 2 points
+		return {
+			text: new ol.style.Text({
+				text: fc[xn] < fc[xn1] ? '<' : '>',
+				placement: 'line',
+				textAlign: 'start',
+				scale: 2,
+				//offsetX: 1.4,
+				offsetY: 1.4,
+				fill: new ol.style.Fill({
+					color: options.color,
+				}),
 			}),
-		}),
-	};
+		};
 }
 
 // Style of a cluster bullet (both local & server cluster
@@ -1100,7 +1100,6 @@ function selectVectorLayer(name, callBack) {
 	return selection();
 }
 
-/* FILE src/layerVectorCollection.js */
 /**
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
@@ -1525,7 +1524,6 @@ function layerVectorCollection(options) {
 	];
 }
 
-/* FILE src/controls.js */
 /**
  * Add some usefull controls
  * Need to include controls.css
@@ -1959,7 +1957,6 @@ function controlsCollection(opt) {
 	];
 }
 
-/* FILE src/layerSwitcher.js */
 /**
  * Layer switcher
  * Need to include layerSwitcher.css
@@ -2107,7 +2104,6 @@ function controlLayerSwitcher(options) {
 	return control;
 }
 
-/* FILE src/files.js */
 /**
  * GPX file loader control
  * Requires controlButton
@@ -2311,7 +2307,6 @@ function controlDownload(opt) {
 	return control;
 }
 
-/* FILE src/gps.js */
 /**
  * GPS control
  * Requires controlButton
@@ -2533,7 +2528,6 @@ function controlGPS(options) {
 	return control;
 }
 
-/* FILE src/marker.js */
 /**
  * Marker position display & edit
  * Options:
@@ -2732,7 +2726,6 @@ function layerMarker(opt) {
 	return layer;
 }
 
-/* FILE src/editor.js */
 /**
  * geoJson lines & polygons edit
  * Requires JSONparse, controlButton (from src/controls.js)

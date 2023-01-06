@@ -7,7 +7,6 @@
  * Please don't modify it : modify src/... & rebuild it !
  */
 
-/* FILE src/controls.css */
 /* Top aligned buttons */
 /* Container */
 .ol-zoom,
@@ -191,7 +190,6 @@
 	}
 }
 
-/* FILE src/layerSwitcher.css */
 .myol-button-switcher {
 	float: right;
 }
@@ -210,7 +208,6 @@
 	background: #fcffd1 !important;
 }
 
-/* FILE src/editor.css */
 .myol-button-edit > div {
 	left: 0;
 	width: 100%;
