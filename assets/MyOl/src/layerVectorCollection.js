@@ -16,17 +16,14 @@ function layerGeoBB(options) {
 				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
 				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
-				bbox: bbox.join(','),
+				bbox: options.strategy ? null : bbox.join(','),
 				...opt.extraParams()
 			};
 		},
 		selectName: 'select-chem',
 		convertProperties: function(properties, opt) {
 			return {
-				icon: properties.type ?
-					opt.host + 'ext/Dominique92/GeoBB/icones/' + properties.type + '.' + iconCanvasExt() : null,
-				url: properties.id ?
-					opt.host + 'viewtopic.php?t=' + properties.id : null,
+				url: properties.id ? opt.host + 'viewtopic.php?t=' + properties.id : null,
 				attribution: opt.attribution,
 			};
 		},
