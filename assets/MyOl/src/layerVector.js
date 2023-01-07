@@ -34,7 +34,7 @@ function layerVector(opt) {
 				source.refresh();
 			},
 			styleOptClusterFnc: styleOptCluster,
-			extraParams: function() {},
+			extraParams: function() {}, //BEST use also {} / merge members
 			...opt
 		},
 		selectNames = (options.selectName || '').split(','),

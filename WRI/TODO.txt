@@ -9,6 +9,7 @@ BUGS
 //TODO BUG Déconnexion KO à partir de la page de modération (problème de racine)
 //TODO BUG modifier cette fiche : ne réaffiche pas les coordonnées (FF)
 //TODO modif champ lon/lat déplace le curseur mais pas la carte
+//TODO Si vous spécifiez overflow: visible sur "img", "video" et "canvas", ces tags risquent de générer du contenu visuel en dehors des limites de l'élément.
 
 REMARQUES MENU
 ==============

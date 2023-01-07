@@ -198,7 +198,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 			<option value="&type=forums&ids_forum=4">Forums des refuges</option>
 			<option value="&type=forums&ids_forum=1">Forum La vie du site</option>
 			<option value="&type=forums&ids_forum=6">Forum Emplois</option>
-			<option value="&type=forums&ids_forum=2">Forum Logiciel</option><!-- //TODO bizare pas de posts -->
+			<option value="&type=forums&ids_forum=2">Forum Logiciel</option><!-- //BEST bizare pas de posts -->
 			<option value="&type=forums&ids_forum=5">Forum Divers</option>
 			<option value="&type=forums">Tous les forums</option>
 		</select>
