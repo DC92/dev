@@ -45,7 +45,7 @@ if (mapType == 'line' && scriptName == 'posting')
 	//BEST save only layerEditGeoJson.layer
 	map.addControl(layerEditGeoJson({
 		geoJsonId: 'marker-json',
-		styleOptionsFnc: styleOptArrow,
+		editorStyleOptionsFnc: styleOptArrow,
 		focus: 15,
 		help: [
 			//BEST mettre dans le html

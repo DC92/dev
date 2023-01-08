@@ -1,4 +1,5 @@
 // Force au moins une couche chemineur
+//TODO edit trace sans fond de trace
 if (!localStorage.myol_selectchem && scriptName == 'index')
 	localStorage.myol_selectchem = 'all';
 
