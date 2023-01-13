@@ -29,7 +29,7 @@ function layerGeoBB(options) {
 		},
 		styleOptFnc: function(feature, properties) {
 			return {
-				...styleOptIcon(properties.icon), // Points
+				...styleOptIcon(feature), // Points
 				...styleOptPolygon(properties.color, 0.5), // Polygons with color
 				...styleOptArrow(feature, {
 					color: 'blue',
@@ -103,9 +103,7 @@ function layerWri(options) {
 				attribution: opt.attribution,
 			};
 		},
-		styleOptFnc: function(f, properties) {
-			return styleOptIcon(properties.icon);
-		},
+		styleOptFnc: styleOptIcon,
 		hoverStyleOptFnc: function(feature, properties) {
 			return styleOptFullLabel(feature, properties);
 		},

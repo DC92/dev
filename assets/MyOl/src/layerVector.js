@@ -26,6 +26,7 @@
 function layerVector(opt) {
 	const options = {
 			selectName: '',
+			strategy: ol.loadingstrategy.bbox,
 			callBack: function() {
 				layer.setVisible(
 					!selectNames[0] || // No selector name
@@ -42,7 +43,6 @@ function layerVector(opt) {
 		source = new ol.source.Vector({
 			url: url,
 			format: format,
-			strategy: ol.loadingstrategy.bbox,
 			...options
 		}),
 		layer = new ol.layer.Vector({
@@ -85,6 +85,9 @@ function layerVector(opt) {
 				resolution
 			),
 			query = [];
+
+		if (options.strategy != ol.loadingstrategy.bbox)
+			args.bbox = null;
 
 		for (const a in args)
 			if (a != 'url' && args[a])
@@ -242,24 +245,31 @@ function layerVectorCluster(opt) {
  */
 
 // Get icon from an URL
-function styleOptIcon(iconUrl) {
-	if (iconUrl)
+function styleOptIcon(feature) {
+	const properties = feature.getProperties();
+
+	if (properties && properties.icon)
 		return {
 			image: new ol.style.Icon({
 				//TODO BUG general : send cookies to server, event non secure
-				src: iconUrl,
+				src: properties.icon,
 			}),
 		};
 }
 
 // Get icon from chemineur.fr
-function styleOptIconChemineur(iconName) {
+function styleOptIconChemineur(iconName) { //TODO iconName -> feature
 	if (iconName) {
 		const icons = iconName.split(' ');
 
-		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
-
-		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
+		return {
+			image: new ol.style.Icon({
+				//TODO BUG general : send cookies to server, event non secure
+				src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+					icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
+					'.svg',
+			}),
+		};
 	}
 }
 

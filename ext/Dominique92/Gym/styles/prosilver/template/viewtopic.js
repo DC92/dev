@@ -8,7 +8,7 @@ const layer = layerVector({
 		},
 		styleOptFnc: function(feature, properties) {
 			return Object.assign({},
-				styleOptIcon(properties.icon),
+				styleOptIcon(feature),
 				firstMenuLine ? null : styleOptLabel(properties.name, feature, properties),
 			);
 		},

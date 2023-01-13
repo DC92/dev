@@ -58,7 +58,6 @@ if (location.hash == '###')
 				for (let name of names) {
 					data.push('  ' + name);
 
-					// TEMPORARY (til Jun,2023) : Delete previous version of MyOl cache
 					if (name == 'myGpsCache')
 						caches.delete(name);
 				}
@@ -538,6 +537,7 @@ function layersDemo(options) {
 function layerVector(opt) {
 	const options = {
 			selectName: '',
+			strategy: ol.loadingstrategy.bbox,
 			callBack: function() {
 				layer.setVisible(
 					!selectNames[0] || // No selector name
@@ -554,7 +554,6 @@ function layerVector(opt) {
 		source = new ol.source.Vector({
 			url: url,
 			format: format,
-			strategy: ol.loadingstrategy.bbox,
 			...options
 		}),
 		layer = new ol.layer.Vector({
@@ -596,6 +595,9 @@ function layerVector(opt) {
 				resolution
 			),
 			query = [];
+
+		if (options.strategy != ol.loadingstrategy.bbox)
+			args.bbox = null;
 
 		for (const a in args)
 			if (a != 'url' && args[a])
@@ -752,11 +754,13 @@ function layerVectorCluster(opt) {
  */
 
 // Get icon from an URL
-function styleOptIcon(iconUrl) {
-	if (iconUrl)
+function styleOptIcon(feature) {
+	const properties = feature.getProperties();
+
+	if (properties && properties.icon)
 		return {
 			image: new ol.style.Icon({
-				src: iconUrl,
+				src: properties.icon,
 			}),
 		};
 }
@@ -766,9 +770,13 @@ function styleOptIconChemineur(iconName) {
 	if (iconName) {
 		const icons = iconName.split(' ');
 
-		iconName = icons[0] + (icons.length > 1 ? '_' + icons[1] : ''); // Limit to 2 type names & ' ' -> '_'
-
-		return styleOptIcon('//chemineur.fr/ext/Dominique92/GeoBB/icones/' + iconName + '.svg');
+		return {
+			image: new ol.style.Icon({
+				src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+					icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
+					'.svg',
+			}),
+		};
 	}
 }
 
@@ -1115,7 +1123,7 @@ function layerGeoBB(options) {
 		},
 		styleOptFnc: function(feature, properties) {
 			return {
-				...styleOptIcon(properties.icon), // Points
+				...styleOptIcon(feature), // Points
 				...styleOptPolygon(properties.color, 0.5), // Polygons with color
 				...styleOptArrow(feature, {
 					color: 'blue',
@@ -1189,9 +1197,7 @@ function layerWri(options) {
 				attribution: opt.attribution,
 			};
 		},
-		styleOptFnc: function(f, properties) {
-			return styleOptIcon(properties.icon);
-		},
+		styleOptFnc: styleOptIcon,
 		hoverStyleOptFnc: function(feature, properties) {
 			return styleOptFullLabel(feature, properties);
 		},
