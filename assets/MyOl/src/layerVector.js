@@ -257,22 +257,6 @@ function styleOptIcon(feature) {
 		};
 }
 
-// Get icon from chemineur.fr
-function styleOptIconChemineur(iconName) { //TODO iconName -> feature
-	if (iconName) {
-		const icons = iconName.split(' ');
-
-		return {
-			image: new ol.style.Icon({
-				//TODO BUG general : send cookies to server, event non secure
-				src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-					icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
-					'.svg',
-			}),
-		};
-	}
-}
-
 // Display a label with some data about the feature
 function styleOptFullLabel(feature, properties) {
 	let text = [],

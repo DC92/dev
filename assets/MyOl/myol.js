@@ -765,21 +765,6 @@ function styleOptIcon(feature) {
 		};
 }
 
-// Get icon from chemineur.fr
-function styleOptIconChemineur(iconName) {
-	if (iconName) {
-		const icons = iconName.split(' ');
-
-		return {
-			image: new ol.style.Icon({
-				src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-					icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
-					'.svg',
-			}),
-		};
-	}
-}
-
 // Display a label with some data about the feature
 function styleOptFullLabel(feature, properties) {
 	let text = [],
@@ -1104,13 +1089,12 @@ function selectVectorLayer(name, callBack) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster({
-		host: '//chemineur.fr/',
 		urlArgsFnc: function(opt, bbox, selections) {
 			return {
 				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
 				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
-				bbox: options.strategy ? null : bbox.join(','),
+				bbox: bbox.join(','),
 				...opt.extraParams()
 			};
 		},
@@ -1165,6 +1149,52 @@ function layerClusterGeoBB(opt) {
 	return layerGeoBB({
 		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
+		...options
+	});
+}
+
+/**
+ * Site chemineur.fr
+ */
+function layerChemineur(options) {
+	return layerClusterGeoBB({
+		host: '//chemineur.fr/',
+		convertProperties: function(properties, opt) {
+			return {
+				icon: chemIconUrl(properties.type),
+				attribution: 'Chemineur',
+			};
+		},
+		...options
+	});
+}
+
+// Get icon from chemineur.fr if we only have a type
+function chemIconUrl(type) {
+	if (type) {
+		const icons = type.split(' ');
+
+		return '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+			icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
+			'.svg';
+	}
+}
+
+/**
+ * Site alpages.info
+ */
+function layerAlpages(options) {
+	return layerGeoBB({
+		strategy: ol.loadingstrategy.all,
+		host: '//alpages.info/',
+		selectName: 'select-alpages',
+		convertProperties: function(properties, opt) {
+			return {
+				url: properties.id ? opt.host + 'viewtopic.php?t=' + properties.id : null,
+				icon: chemIconUrl(properties.type),
+				attribution: 'Alpages',
+			};
+		},
 		...options
 	});
 }
@@ -1289,15 +1319,14 @@ function layerPrc(options) {
 		convertProperties: function(properties) {
 			return {
 				type: properties.type_hebergement,
+				icon: chemIconUrl(properties.type_hebergement),
 				url: properties.url,
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
 				attribution: 'Pyrenees-Refuges',
 			};
 		},
-		styleOptFnc: function(f, properties) {
-			return styleOptIconChemineur(properties.type_hebergement);
-		},
+		styleOptFnc: styleOptIcon,
 		hoverStyleOptFnc: function(feature, properties) {
 			return styleOptFullLabel(feature, properties);
 		},
@@ -1326,6 +1355,7 @@ function layerC2C(options) {
 				geometry: JSONparse(properties.geometry.geom),
 				properties: {
 					type: properties.waypoint_type,
+					icon: chemIconUrl(properties.waypoint_type),
 					name: properties.locales[0].title,
 					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
@@ -1350,9 +1380,7 @@ function layerC2C(options) {
 		},
 		selectName: 'select-c2c',
 		format: format,
-		styleOptFnc: function(f, properties) {
-			return styleOptIconChemineur(properties.type);
-		},
+		styleOptFnc: styleOptIcon,
 		hoverStyleOptFnc: function(feature, properties) {
 			return styleOptFullLabel(feature, properties);
 		},
@@ -1366,8 +1394,7 @@ function layerC2C(options) {
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
 function layerOverpass(opt) {
-	const format = new ol.format.OSMXML(),
-		options = {
+	const options = {
 			//host: 'overpass-api.de',
 			//host: 'lz4.overpass-api.de',
 			//host: 'overpass.openstreetmap.fr', // Out of order
@@ -1376,14 +1403,13 @@ function layerOverpass(opt) {
 
 			selectName: 'select-osm',
 			maxResolution: 50,
-			styleOptFnc: function(f, properties) {
-				return styleOptIconChemineur(properties.type);
-			},
+			styleOptFnc: styleOptIcon,
 			hoverStyleOptFnc: function(feature, properties) {
 				return styleOptFullLabel(feature, properties);
 			},
 			...opt
 		},
+		format = new ol.format.OSMXML(),
 		layer = layerVectorCluster({
 			urlArgsFnc: urlArgsFnc,
 			format: format,
@@ -1433,6 +1459,7 @@ function layerOverpass(opt) {
 						tags.indexOf(tag.getAttribute('v')) !== -1 &&
 						tag.getAttribute('k') != 'type') {
 						addTag(node, 'type', tag.getAttribute('v'));
+						addTag(node, 'icon', chemIconUrl(tag.getAttribute('v')));
 						// Only once for a node
 						addTag(node, 'url', 'https://www.openstreetmap.org/node/' + node.id);
 						addTag(node, 'attribution', 'osm');
@@ -1497,18 +1524,9 @@ function layerVectorCollection(options) {
 		layerWriAreas(options.wriAreas),
 		layerPrc(options.prc),
 		layerC2C(options.c2c),
-		layerClusterGeoBB({
-			attribution: 'Chemineur',
-			...options.chemineur
-		}),
-		layerGeoBB({
-			strategy: ol.loadingstrategy.all,
-			host: '//alpages.info/',
-			selectName: 'select-alpages',
-			attribution: 'Alpages',
-			...options.alpages
-		}),
 		layerOverpass(options.osm),
+		layerChemineur(options.chemineur),
+		layerAlpages(options.alpages),
 	];
 }
 
