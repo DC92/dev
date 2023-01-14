@@ -202,7 +202,7 @@ function layerWriAreas(options) {
 		},
 		styleOptFnc: function(feature, properties) {
 			return {
-				...styleOptLabel(properties.name, feature, properties),
+				...styleOptLabel(feature),
 				...styleOptPolygon(properties.color, 0.5),
 			};
 		},
@@ -217,7 +217,7 @@ function layerWriAreas(options) {
 				.join('');
 
 			return {
-				...styleOptLabel(properties.name, feature, properties, true),
+				...styleOptLabel(feature),
 				...styleOptPolygon('#' + colors, 0.3),
 				stroke: new ol.style.Stroke({
 					color: properties.color,

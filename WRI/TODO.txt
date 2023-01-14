@@ -3,6 +3,7 @@ RUPTURES INTERFACES
 //TODO styleOptIcon(properties.icon) styleOptIcon(feature)
 //TODO DELETE id="marker-coordinates"
 //TODO refaire localement myol_lastChangeTime (dernière date de modif)
+//TODO styleOptLabel(properties.name, feature, properties, true) -> styleOptLabel(feature)
 
 BUGS
 ====

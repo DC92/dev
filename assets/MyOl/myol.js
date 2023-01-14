@@ -519,26 +519,22 @@ function layersDemo(options) {
  * Styles, icons & labels
  *
  * Options:
- * selectName : <input name="SELECT_NAME"> url arguments selector
    can be several SELECT_NAME_1,SELECT_NAME_2,...
    display loading status <TAG id="SELECT_NAME-status"></TAG>
    No selectName will display the layer
    No selector with selectName will hide the layer
- * callBack : function to call when selected
  * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
    returning an object describing the args. The .url member defines the url
  * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
  * styleOptFnc: function(feature, properties, options) returning options of the style of the features
  * styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
  * hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
- * source.Vector options : format, strategy, attributions, ...
- * altLayer : another layer to add to the map with this one (for resolution depending layers)
  */
 function layerVector(opt) {
 	const options = {
-			selectName: '',
+			selectName: '', // <input name="SELECT_NAME"> url arguments selector
 			strategy: ol.loadingstrategy.bbox,
-			callBack: function() {
+			callBack: function() { // Function called when selected
 				layer.setVisible(
 					!selectNames[0] || // No selector name
 					selectVectorLayer(selectNames[0]).length // By default, visibility depends on the first selector only
@@ -547,9 +543,10 @@ function layerVector(opt) {
 			},
 			styleOptClusterFnc: styleOptCluster,
 			extraParams: function() {},
+			// altLayer : another layer to add to the map with this one (for resolution depending layers)
 			...opt
 		},
-		selectNames = (options.selectName || '').split(','),
+		selectNames = options.selectName.split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
 			url: url,
@@ -766,7 +763,8 @@ function styleOptIcon(feature) {
 }
 
 // Display a label with some data about the feature
-function styleOptFullLabel(feature, properties) {
+function styleOptFullLabel(feature) {
+	const properties = feature.getProperties();
 	let text = [],
 		line = [];
 
@@ -809,14 +807,17 @@ function styleOptFullLabel(feature, properties) {
 		if (properties.attribution)
 			text.push('&copy;' + properties.attribution);
 	}
+	feature.setProperties({
+		'label': text.join('\n')
+	});
 
-	return styleOptLabel(text.join('\n'), feature, properties, true);
+	return styleOptLabel(feature);
 }
 
 // Display a label with only the name
-function styleOptLabel(text, feature, properties, important) {
-
-	const elLabel = document.createElement('span'),
+function styleOptLabel(feature) {
+	const properties = feature.getProperties(),
+		elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
 		styleTextOptions = {
 			textBaseline: area ? 'middle' : 'bottom',
@@ -831,12 +832,11 @@ function styleOptLabel(text, feature, properties, important) {
 			}),
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
-				width: important ? 1 : 0.3,
+				width: 0.3,
 			}),
-			overflow: important,
 		};
 
-	elLabel.innerHTML = text;
+	elLabel.innerHTML = properties.label || properties.name;
 	styleTextOptions.text = elLabel.innerHTML;
 
 	return {
@@ -894,7 +894,8 @@ function styleOptArrow(feature, opt) {
 }
 
 // Style of a cluster bullet (both local & server cluster
-function styleOptCluster(feature, properties) {
+function styleOptCluster(feature) {
+	const properties = feature.getProperties();
 	let nbClusters = parseInt(properties.cluster || 0);
 
 	for (let f in properties.features)
@@ -1281,7 +1282,7 @@ function layerWriAreas(options) {
 		},
 		styleOptFnc: function(feature, properties) {
 			return {
-				...styleOptLabel(properties.name, feature, properties),
+				...styleOptLabel(feature),
 				...styleOptPolygon(properties.color, 0.5),
 			};
 		},
@@ -1296,7 +1297,7 @@ function layerWriAreas(options) {
 				.join('');
 
 			return {
-				...styleOptLabel(properties.name, feature, properties, true),
+				...styleOptLabel(feature),
 				...styleOptPolygon('#' + colors, 0.3),
 				stroke: new ol.style.Stroke({
 					color: properties.color,

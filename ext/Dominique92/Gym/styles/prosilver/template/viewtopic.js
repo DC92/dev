@@ -6,15 +6,13 @@ const layer = layerVector({
 				url: 'viewtopic.php?p=' + properties.post_id,
 			};
 		},
-		styleOptFnc: function(feature, properties) {
+		styleOptFnc: function(feature ) {
 			return Object.assign({},
 				styleOptIcon(feature),
-				firstMenuLine ? null : styleOptLabel(properties.name, feature, properties),
+				firstMenuLine ? null : styleOptLabel(feature),
 			);
 		},
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptLabel(properties.name, feature, properties);
-		},
+		hoverStyleOptFnc: styleOptLabel,
 	}),
 
 	map = new ol.Map({
