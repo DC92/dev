@@ -17,7 +17,7 @@ function layerGeoBB(options) {
 				attribution: opt.attribution,
 			};
 		},
-		styleOptFnc: function(feature, properties) {
+		styleOptFnc: function(feature, properties) { //TODO resorb properties
 			return {
 				...styleOptIcon(feature), // Points
 				...styleOptPolygon(properties.color), // Polygons with color
@@ -30,7 +30,7 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		hoverStyleOptFnc: function(feature, properties) {
+		hoverStyleOptFnc: function(feature, properties) { //TODO resorb properties
 			return {
 				...styleOptFullLabel(feature, properties), // Labels
 				stroke: new ol.style.Stroke({ // Lines
@@ -77,13 +77,18 @@ function layerClusterGeoBB(opt) {
 /**
  * Site chemineur.fr
  */
-function layerChemineur(options) {
-	return layerClusterGeoBB({
+function layerChemineur(opt) {
+	const options = {
 		host: '//chemineur.fr/',
+		...opt
+	};
+
+	//TODO BUG pas de link sur cluster layer
+	return layerClusterGeoBB({
 		convertProperties: function(properties) {
 			return {
-				url: properties.link,
-				icon: chemIconUrl(properties.type), //TODO chemIconUrl(properties)
+				url: options.host + 'viewtopic.php?t=' + properties.id,
+				icon: chemIconUrl(properties.type),
 				attribution: 'Chemineur',
 			};
 		},
@@ -140,9 +145,7 @@ function layerWri(options) {
 			};
 		},
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptFullLabel(feature, properties);
-		},
+		hoverStyleOptFnc: styleOptFullLabel,
 		attribution: 'refuges.info',
 		...options,
 		urlParams: function(o, bbox, selections) {
@@ -198,13 +201,15 @@ function layerWriAreas(options) {
 				url: properties.lien,
 			};
 		},
-		styleOptFnc: function(feature, properties) {
+		styleOptFnc: function(feature, properties) { //TODO resorb properties
 			return {
 				...styleOptLabel(feature),
 				...styleOptPolygon(properties.color),
 			};
 		},
-		hoverStyleOptFnc: function(feature, properties) {
+		hoverStyleOptFnc: function(feature) {
+			const properties = feature.getProperties();
+
 			// Invert previous color
 			const colors = properties.color
 				.match(/([0-9a-f]{2})/ig)
@@ -246,9 +251,7 @@ function layerPrc(options) {
 			};
 		},
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptFullLabel(feature, properties);
-		},
+		hoverStyleOptFnc: styleOptFullLabel,
 		...options
 	});
 }
@@ -301,9 +304,7 @@ function layerC2C(options) {
 		selectName: 'select-c2c',
 		format: format,
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptFullLabel(feature, properties);
-		},
+		hoverStyleOptFnc: styleOptFullLabel,
 		...options
 	});
 }
@@ -324,9 +325,7 @@ function layerOverpass(opt) {
 			selectName: 'select-osm',
 			maxResolution: 50,
 			styleOptFnc: styleOptIcon,
-			hoverStyleOptFnc: function(feature, properties) {
-				return styleOptFullLabel(feature, properties);
-			},
+			hoverStyleOptFnc: styleOptFullLabel,
 			...opt
 		},
 		format = new ol.format.OSMXML(),

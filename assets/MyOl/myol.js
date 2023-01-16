@@ -519,12 +519,18 @@ function layersDemo(options) {
  */
 function layerVector(opt) {
 	const options = {
+			// host:'', // Url host
+			/* urlParams: { // Url parameters of the layer or function((layerOptions, bbox, selections, extent)
+				path: '', // Url path of the layer
+				key: value, // Key / values pairs to add as url parameters
+			}, */
 			selectName: '',
 			/* <input name="SELECT_NAME"> url arguments selector
-	can be several SELECT_NAME_1,SELECT_NAME_2,...
-	display loading status <TAG id="SELECT_NAME-status"></TAG>
-	no selectName will display the layer
-	no selector with selectName will hide the layer */
+				can be several SELECT_NAME_1,SELECT_NAME_2,...
+				display loading status <TAG id="SELECT_NAME-status"></TAG>
+				no selectName will display the layer
+				no selector with selectName will hide the layer
+			*/
 			callBack: function() { // Function called when the selector is actioned
 				layer.setVisible(
 					!selectNames[0] || // No selector name
@@ -534,28 +540,15 @@ function layerVector(opt) {
 			},
 			projection: 'EPSG:4326', // Received projection
 			strategy: ol.loadingstrategy.bbox,
-
 			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
+
 			// styleOptFnc: function(feature, properties, options) returning options of the style of the features
 			// styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
 			// hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
-			// noHover
 
 			styleOptClusterFnc: styleOptCluster,
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
-			...opt,
-			// host:'',// Url host
-			/*		urlParams:{// Url parameters of the layer
-						// path:'',// Url path of the layer
-						// Values can be a function(layerOptions, bbox, selections, extent)
-							bbox: function(o, bbox){return bbox.join(',')},
-							...opt.urlParams,
-							//...(typeof opt.urlParams=='function'?opt.urlParams(...args):opt.urlParams),
-					},*/
-			/* urlArgsFnc:
-			function(layer_options, bbox, selections, extent, resolution, projection)
-				returning an object describing the args. The .url member defines the url */
-
+			...opt
 		},
 
 		selectNames = options.selectName.split(','),
@@ -581,7 +574,7 @@ function layerVector(opt) {
 			map.addLayer(options.altLayer);
 
 		// Add a layer to manage hovered features (once for a map)
-		if (!map.layerHover && !options.noHover)
+		if (!map.layerHover)
 			map.layerHover = layerHover(map);
 	};
 
@@ -841,7 +834,6 @@ function styleOptLabel(feature, important) {
 				color: 'white',
 			}),
 			backgroundStroke: new ol.style.Stroke({
-				color: 'blue',
 				width: important ? 1 : 0.3,
 			}),
 			overflow: important,
@@ -1167,12 +1159,16 @@ function layerClusterGeoBB(opt) {
 /**
  * Site chemineur.fr
  */
-function layerChemineur(options) {
-	return layerClusterGeoBB({
+function layerChemineur(opt) {
+	const options = {
 		host: '//chemineur.fr/',
+		...opt
+	};
+
+	return layerClusterGeoBB({
 		convertProperties: function(properties) {
 			return {
-				url: properties.link,
+				url: options.host + 'viewtopic.php?t=' + properties.id,
 				icon: chemIconUrl(properties.type),
 				attribution: 'Chemineur',
 			};
@@ -1230,9 +1226,7 @@ function layerWri(options) {
 			};
 		},
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptFullLabel(feature, properties);
-		},
+		hoverStyleOptFnc: styleOptFullLabel,
 		attribution: 'refuges.info',
 		...options,
 		urlParams: function(o, bbox, selections) {
@@ -1294,7 +1288,9 @@ function layerWriAreas(options) {
 				...styleOptPolygon(properties.color),
 			};
 		},
-		hoverStyleOptFnc: function(feature, properties) {
+		hoverStyleOptFnc: function(feature) {
+			const properties = feature.getProperties();
+
 			// Invert previous color
 			const colors = properties.color
 				.match(/([0-9a-f]{2})/ig)
@@ -1336,9 +1332,7 @@ function layerPrc(options) {
 			};
 		},
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptFullLabel(feature, properties);
-		},
+		hoverStyleOptFnc: styleOptFullLabel,
 		...options
 	});
 }
@@ -1391,9 +1385,7 @@ function layerC2C(options) {
 		selectName: 'select-c2c',
 		format: format,
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: function(feature, properties) {
-			return styleOptFullLabel(feature, properties);
-		},
+		hoverStyleOptFnc: styleOptFullLabel,
 		...options
 	});
 }
@@ -1414,9 +1406,7 @@ function layerOverpass(opt) {
 			selectName: 'select-osm',
 			maxResolution: 50,
 			styleOptFnc: styleOptIcon,
-			hoverStyleOptFnc: function(feature, properties) {
-				return styleOptFullLabel(feature, properties);
-			},
+			hoverStyleOptFnc: styleOptFullLabel,
 			...opt
 		},
 		format = new ol.format.OSMXML(),

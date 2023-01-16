@@ -17,10 +17,8 @@ if (typeof map !== 'undefined') {
 	layerVectorCollection({
 		chemineur: {
 			host: '', // Relative to this location
-			urlParams: {
-				// Reload layer if posting called between
-				//BEST move this to geoBB
-				v: version,
+			urlParams: { //BEST move this to geoBB
+				v: version, // Reload layer if posting called between
 			},
 		}
 	}).forEach(l => map.addLayer(l));
