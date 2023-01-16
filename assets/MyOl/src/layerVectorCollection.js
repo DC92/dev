@@ -10,15 +10,6 @@
  */
 function layerGeoBB(options) {
 	return layerVectorCluster({
-		urlArgsFnc: function(opt, bbox, selections) {
-			return {
-				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only selector)
-				limit: 10000,
-				bbox: bbox.join(','),
-				...opt.extraParams()
-			};
-		},
 		selectName: 'select-chem',
 		convertProperties: function(properties, opt) {
 			return {
@@ -29,7 +20,7 @@ function layerGeoBB(options) {
 		styleOptFnc: function(feature, properties) {
 			return {
 				...styleOptIcon(feature), // Points
-				...styleOptPolygon(properties.color, 0.5), // Polygons with color
+				...styleOptPolygon(properties.color), // Polygons with color
 				...styleOptArrow(feature, {
 					color: 'blue',
 				}),
@@ -48,7 +39,18 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		...options
+		...options,
+		urlParams: function(opt, bbox, selections) {
+			return {
+				path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: selections[0], // The 1st (and only selector)
+				limit: 10000,
+				bbox: bbox.join(','),
+				...(typeof options.urlParams == 'function' ?
+					options.urlParams(options, bbox, selections) :
+					options.urlParams)
+			};
+		},
 	});
 }
 
@@ -59,10 +61,8 @@ function layerClusterGeoBB(opt) {
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
-			extraParams: function() {
-				return {
-					layer: 'cluster',
-				};
+			urlParams: {
+				layer: 'cluster',
 			},
 			...options
 		});
@@ -80,9 +80,10 @@ function layerClusterGeoBB(opt) {
 function layerChemineur(options) {
 	return layerClusterGeoBB({
 		host: '//chemineur.fr/',
-		convertProperties: function(properties, opt) {
+		convertProperties: function(properties) {
 			return {
-				icon: chemIconUrl(properties.type),
+				url: properties.link,
+				icon: chemIconUrl(properties.type), //TODO chemIconUrl(properties)
 				attribution: 'Chemineur',
 			};
 		},
@@ -126,16 +127,6 @@ function layerAlpages(options) {
 function layerWri(options) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
-		urlArgsFnc: function(opt, bbox, selections) {
-			return {
-				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
-				type_points: selections[0],
-				massif: selections[1],
-				nb_points: 'all',
-				bbox: bbox.join(','),
-				...opt.extraParams()
-			};
-		},
 		selectName: 'select-wri',
 		convertProperties: function(properties, opt) {
 			return {
@@ -153,7 +144,19 @@ function layerWri(options) {
 			return styleOptFullLabel(feature, properties);
 		},
 		attribution: 'refuges.info',
-		...options
+		...options,
+		urlParams: function(o, bbox, selections) {
+			return {
+				path: selections[1] ? 'api/massif' : 'api/bbox',
+				type_points: selections[0],
+				massif: selections[1],
+				nb_points: 'all',
+				bbox: bbox.join(','),
+				...(typeof options.urlParams == 'function' ?
+					options.urlParams(options, bbox, selections) :
+					options.urlParams)
+			};
+		},
 	});
 }
 
@@ -165,10 +168,8 @@ function layerClusterWri(opt) {
 		clusterLayer = layerWri({
 			minResolution: options.transitionResolution,
 			strategy: ol.loadingstrategy.all,
-			extraParams: function() {
-				return {
-					cluster: 0.1,
-				};
+			urlParams: {
+				cluster: 0.1,
 			},
 			...options
 		});
@@ -183,15 +184,12 @@ function layerClusterWri(opt) {
 function layerWriAreas(options) {
 	return layerVector({
 		host: '//www.refuges.info/',
-		strategy: ol.loadingstrategy.all,
-		polygon: 1, // Massifs
-		zIndex: 2, // Behind points
-		urlArgsFnc: function(opt) {
-			return {
-				url: opt.host + 'api/polygones',
-				type_polygon: opt.polygon,
-			};
+		urlParams: {
+			path: 'api/polygones',
+			type_polygon: 1, // Massifs
 		},
+		strategy: ol.loadingstrategy.all,
+		zIndex: 2, // Behind points
 		selectName: 'select-massifs',
 		convertProperties: function(properties) {
 			return {
@@ -203,7 +201,7 @@ function layerWriAreas(options) {
 		styleOptFnc: function(feature, properties) {
 			return {
 				...styleOptLabel(feature),
-				...styleOptPolygon(properties.color, 0.5),
+				...styleOptPolygon(properties.color),
 			};
 		},
 		hoverStyleOptFnc: function(feature, properties) {
@@ -217,7 +215,7 @@ function layerWriAreas(options) {
 				.join('');
 
 			return {
-				...styleOptLabel(feature),
+				...styleOptLabel(feature, true),
 				...styleOptPolygon('#' + colors, 0.3),
 				stroke: new ol.style.Stroke({
 					color: properties.color,
@@ -293,9 +291,10 @@ function layerC2C(options) {
 	};
 
 	return layerVectorCluster({
-		urlArgsFnc: function(o, b, s, extent) {
+		host: 'https://api.camptocamp.org/',
+		urlParams: function(o, b, s, extent) {
 			return {
-				url: 'https://api.camptocamp.org/waypoints',
+				path: 'waypoints',
 				bbox: extent.join(','),
 			};
 		},
@@ -316,11 +315,11 @@ function layerC2C(options) {
  */
 function layerOverpass(opt) {
 	const options = {
-			//host: 'overpass-api.de',
-			//host: 'lz4.overpass-api.de',
-			//host: 'overpass.openstreetmap.fr', // Out of order
-			host: 'overpass.kumi.systems',
-			//host: 'overpass.nchc.org.tw',
+			//host: 'https://overpass-api.de',
+			//host: 'https://lz4.overpass-api.de',
+			//host: 'https://overpass.openstreetmap.fr', // Out of order
+			//host: 'https://overpass.nchc.org.tw',
+			host: 'https://overpass.kumi.systems',
 
 			selectName: 'select-osm',
 			maxResolution: 50,
@@ -332,7 +331,7 @@ function layerOverpass(opt) {
 		},
 		format = new ol.format.OSMXML(),
 		layer = layerVectorCluster({
-			urlArgsFnc: urlArgsFnc,
+			urlParams: urlParams,
 			format: format,
 			...options
 		}),
@@ -346,7 +345,7 @@ function layerOverpass(opt) {
 		if (selectEls[e].value)
 			tags += selectEls[e].value.replace('private', '');
 
-	function urlArgsFnc(o, bbox, selections) {
+	function urlParams(o, bbox, selections) {
 		const items = selections[0].split(','), // The 1st (and only selector)
 			bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
@@ -363,7 +362,7 @@ function layerOverpass(opt) {
 		}
 
 		return {
-			url: 'https://' + options.host + '/api/interpreter',
+			path: '/api/interpreter',
 			data: '[timeout:5];(' + args.join('') + ');out center;',
 		};
 	}

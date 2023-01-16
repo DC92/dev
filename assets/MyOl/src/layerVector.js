@@ -4,37 +4,50 @@
 //jshint esversion: 9
 
 /**
- * Layer to display remote geoJson
- * Styles, icons & labels
- *
- * Options:
-   can be several SELECT_NAME_1,SELECT_NAME_2,...
-   display loading status <TAG id="SELECT_NAME-status"></TAG>
-   No selectName will display the layer
-   No selector with selectName will hide the layer
- * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
-   returning an object describing the args. The .url member defines the url
- * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
- * styleOptFnc: function(feature, properties, options) returning options of the style of the features
- * styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
- * hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
+ * Layer to display remote geoJson layer
  */
 function layerVector(opt) {
 	const options = {
-			selectName: '', // <input name="SELECT_NAME"> url arguments selector
-			strategy: ol.loadingstrategy.bbox,
-			callBack: function() { // Function called when selected
+			selectName: '',
+			/* <input name="SELECT_NAME"> url arguments selector
+	can be several SELECT_NAME_1,SELECT_NAME_2,...
+	display loading status <TAG id="SELECT_NAME-status"></TAG>
+	no selectName will display the layer
+	no selector with selectName will hide the layer */
+			callBack: function() { // Function called when the selector is actioned
 				layer.setVisible(
 					!selectNames[0] || // No selector name
 					selectVectorLayer(selectNames[0]).length // By default, visibility depends on the first selector only
 				);
 				source.refresh();
 			},
+			projection: 'EPSG:4326', // Received projection
+			strategy: ol.loadingstrategy.bbox,
+
+			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
+			// styleOptFnc: function(feature, properties, options) returning options of the style of the features
+			//TODO resorb OptFnc
+			// styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
+			// hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
+			// noHover
+
 			styleOptClusterFnc: styleOptCluster,
-			extraParams: function() {}, //BEST use also {} / merge members
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
-			...opt
+			...opt,
+			// host:'',// Url host
+			/*		urlParams:{// Url parameters of the layer
+						// path:'',// Url path of the layer
+						// Values can be a function(layerOptions, bbox, selections, extent)
+							bbox: function(o, bbox){return bbox.join(',')},
+							...opt.urlParams,
+							//...(typeof opt.urlParams=='function'?opt.urlParams(...args):opt.urlParams),
+					},*/
+			/* urlArgsFnc: //TODO DELETE
+			function(layer_options, bbox, selections, extent, resolution, projection)
+				returning an object describing the args. The .url member defines the url */
+
 		},
+
 		selectNames = options.selectName.split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
@@ -69,28 +82,26 @@ function layerVector(opt) {
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
-		const args = options.urlArgsFnc(
-				options, // Layer options
-				ol.proj.transformExtent( // BBox
-					extent,
-					projection.getCode(), // Map projection
-					'EPSG:4326' // Received projection
-				)
-				.map(c => c.toFixed(4)), // Round to 4 digits
-				selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
+		const bbox = ol.proj.transformExtent( // BBox
 				extent,
-				resolution
-			),
+				projection.getCode(), // Map projection
+				options.projection // Received projection
+			)
+			.map(c => c.toFixed(4)), // Round to 4 digits
+			selections = selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
+			urlParams = typeof options.urlParams == 'function' ?
+			options.urlParams(options, bbox, selections, extent) :
+			options.urlParams,
 			query = [];
 
-		if (options.strategy != ol.loadingstrategy.bbox)
-			args.bbox = null;
+		if (urlParams.bbox && !isFinite(urlParams.bbox[0]))
+			urlParams.bbox = null;
 
-		for (const a in args)
-			if (a != 'url' && args[a])
-				query.push(a + '=' + args[a]);
+		for (let k in urlParams)
+			if (k != 'path' && urlParams[k])
+				query.push(k + '=' + urlParams[k]);
 
-		return args.url + '?' + query.join('&');
+		return options.host + urlParams.path + '?' + query.join('&');
 	}
 
 	// Display loading status
@@ -308,7 +319,7 @@ function styleOptFullLabel(feature) {
 }
 
 // Display a label with only the name
-function styleOptLabel(feature) {
+function styleOptLabel(feature, important) {
 	const properties = feature.getProperties(),
 		elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
@@ -325,8 +336,9 @@ function styleOptLabel(feature) {
 			}),
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
-				width: 0.3,
+				width: important ? 1 : 0.3, //TODO resorb
 			}),
+			overflow: important,
 		};
 
 	//HACK to render the html entities in the canvas
@@ -347,7 +359,7 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 					parseInt(color.substring(1, 3), 16),
 					parseInt(color.substring(3, 5), 16),
 					parseInt(color.substring(5, 7), 16),
-					transparency || 1,
+					transparency || 0.5,
 				].join(',') + ')',
 			}),
 		};
@@ -355,34 +367,33 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 
 // Add an arrow following a line direction
 function styleOptArrow(feature, opt) {
-	let g = feature.getGeometry();
+	let geometry = feature.getGeometry();
 
-	if (g.getType() == 'Point')
+	if (geometry.getType() == 'Point')
 		return;
 
 	//BEST BUG set only the last coordinate pair of the the first geometry
-	if (g.getType() == 'GeometryCollection')
-		g = g.getGeometries()[0];
+	if (geometry.getType() == 'GeometryCollection')
+		geometry = geometry.getGeometries()[0];
 
 	const options = {
 			color: 'red',
 			...opt
 		},
-		fc = g.flatCoordinates,
-		xn = fc.length - g.stride,
-		xn1 = xn - g.stride;
+		lastIndex = geometry.flatCoordinates.length - geometry.stride, // Index of last point
+		beforeLastIndex = lastIndex - geometry.stride; // Index of before last point
 
-	if (xn1 >= 0) // At least 2 points
+	if (beforeLastIndex >= 0) // At least 2 points
 		return {
 			text: new ol.style.Text({
-				text: fc[xn] < fc[xn1] ? '<' : '>',
+				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>',
 				placement: 'line',
 				textAlign: 'start',
 				scale: 2,
 				//offsetX: 1.4, //BEST dont work with ol 7.1.0
 				offsetY: 1.4,
 				fill: new ol.style.Fill({
-					color: options.color,
+					color: options.color, //TODO get color from layer style (editor)
 				}),
 			}),
 		};

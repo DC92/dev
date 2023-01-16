@@ -515,37 +515,49 @@ function layersDemo(options) {
  */
 
 /**
- * Layer to display remote geoJson
- * Styles, icons & labels
- *
- * Options:
-   can be several SELECT_NAME_1,SELECT_NAME_2,...
-   display loading status <TAG id="SELECT_NAME-status"></TAG>
-   No selectName will display the layer
-   No selector with selectName will hide the layer
- * urlArgsFnc: function(layer_options, bbox, selections, extent, resolution, projection)
-   returning an object describing the args. The .url member defines the url
- * convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
- * styleOptFnc: function(feature, properties, options) returning options of the style of the features
- * styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
- * hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
+ * Layer to display remote geoJson layer
  */
 function layerVector(opt) {
 	const options = {
-			selectName: '', // <input name="SELECT_NAME"> url arguments selector
-			strategy: ol.loadingstrategy.bbox,
-			callBack: function() { // Function called when selected
+			selectName: '',
+			/* <input name="SELECT_NAME"> url arguments selector
+	can be several SELECT_NAME_1,SELECT_NAME_2,...
+	display loading status <TAG id="SELECT_NAME-status"></TAG>
+	no selectName will display the layer
+	no selector with selectName will hide the layer */
+			callBack: function() { // Function called when the selector is actioned
 				layer.setVisible(
 					!selectNames[0] || // No selector name
 					selectVectorLayer(selectNames[0]).length // By default, visibility depends on the first selector only
 				);
 				source.refresh();
 			},
+			projection: 'EPSG:4326', // Received projection
+			strategy: ol.loadingstrategy.bbox,
+
+			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
+			// styleOptFnc: function(feature, properties, options) returning options of the style of the features
+			// styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
+			// hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
+			// noHover
+
 			styleOptClusterFnc: styleOptCluster,
-			extraParams: function() {},
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
-			...opt
+			...opt,
+			// host:'',// Url host
+			/*		urlParams:{// Url parameters of the layer
+						// path:'',// Url path of the layer
+						// Values can be a function(layerOptions, bbox, selections, extent)
+							bbox: function(o, bbox){return bbox.join(',')},
+							...opt.urlParams,
+							//...(typeof opt.urlParams=='function'?opt.urlParams(...args):opt.urlParams),
+					},*/
+			/* urlArgsFnc:
+			function(layer_options, bbox, selections, extent, resolution, projection)
+				returning an object describing the args. The .url member defines the url */
+
 		},
+
 		selectNames = options.selectName.split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
@@ -579,28 +591,26 @@ function layerVector(opt) {
 
 	// Default url callback function for the layer
 	function url(extent, resolution, projection) {
-		const args = options.urlArgsFnc(
-				options, // Layer options
-				ol.proj.transformExtent( // BBox
-					extent,
-					projection.getCode(), // Map projection
-					'EPSG:4326' // Received projection
-				)
-				.map(c => c.toFixed(4)), // Round to 4 digits
-				selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
+		const bbox = ol.proj.transformExtent( // BBox
 				extent,
-				resolution
-			),
+				projection.getCode(), // Map projection
+				options.projection // Received projection
+			)
+			.map(c => c.toFixed(4)), // Round to 4 digits
+			selections = selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
+			urlParams = typeof options.urlParams == 'function' ?
+			options.urlParams(options, bbox, selections, extent) :
+			options.urlParams,
 			query = [];
 
-		if (options.strategy != ol.loadingstrategy.bbox)
-			args.bbox = null;
+		if (urlParams.bbox && !isFinite(urlParams.bbox[0]))
+			urlParams.bbox = null;
 
-		for (const a in args)
-			if (a != 'url' && args[a])
-				query.push(a + '=' + args[a]);
+		for (let k in urlParams)
+			if (k != 'path' && urlParams[k])
+				query.push(k + '=' + urlParams[k]);
 
-		return args.url + '?' + query.join('&');
+		return options.host + urlParams.path + '?' + query.join('&');
 	}
 
 	// Display loading status
@@ -815,7 +825,7 @@ function styleOptFullLabel(feature) {
 }
 
 // Display a label with only the name
-function styleOptLabel(feature) {
+function styleOptLabel(feature, important) {
 	const properties = feature.getProperties(),
 		elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
@@ -832,8 +842,9 @@ function styleOptLabel(feature) {
 			}),
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
-				width: 0.3,
+				width: important ? 1 : 0.3,
 			}),
+			overflow: important,
 		};
 
 	elLabel.innerHTML = properties.label || properties.name;
@@ -853,7 +864,7 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 					parseInt(color.substring(1, 3), 16),
 					parseInt(color.substring(3, 5), 16),
 					parseInt(color.substring(5, 7), 16),
-					transparency || 1,
+					transparency || 0.5,
 				].join(',') + ')',
 			}),
 		};
@@ -861,26 +872,25 @@ function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 
 
 // Add an arrow following a line direction
 function styleOptArrow(feature, opt) {
-	let g = feature.getGeometry();
+	let geometry = feature.getGeometry();
 
-	if (g.getType() == 'Point')
+	if (geometry.getType() == 'Point')
 		return;
 
-	if (g.getType() == 'GeometryCollection')
-		g = g.getGeometries()[0];
+	if (geometry.getType() == 'GeometryCollection')
+		geometry = geometry.getGeometries()[0];
 
 	const options = {
 			color: 'red',
 			...opt
 		},
-		fc = g.flatCoordinates,
-		xn = fc.length - g.stride,
-		xn1 = xn - g.stride;
+		lastIndex = geometry.flatCoordinates.length - geometry.stride, // Index of last point
+		beforeLastIndex = lastIndex - geometry.stride; // Index of before last point
 
-	if (xn1 >= 0) // At least 2 points
+	if (beforeLastIndex >= 0) // At least 2 points
 		return {
 			text: new ol.style.Text({
-				text: fc[xn] < fc[xn1] ? '<' : '>',
+				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>',
 				placement: 'line',
 				textAlign: 'start',
 				scale: 2,
@@ -1090,15 +1100,6 @@ function selectVectorLayer(name, callBack) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster({
-		urlArgsFnc: function(opt, bbox, selections) {
-			return {
-				url: opt.host + 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only selector)
-				limit: 10000,
-				bbox: bbox.join(','),
-				...opt.extraParams()
-			};
-		},
 		selectName: 'select-chem',
 		convertProperties: function(properties, opt) {
 			return {
@@ -1109,7 +1110,7 @@ function layerGeoBB(options) {
 		styleOptFnc: function(feature, properties) {
 			return {
 				...styleOptIcon(feature), // Points
-				...styleOptPolygon(properties.color, 0.5), // Polygons with color
+				...styleOptPolygon(properties.color), // Polygons with color
 				...styleOptArrow(feature, {
 					color: 'blue',
 				}),
@@ -1128,7 +1129,18 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		...options
+		...options,
+		urlParams: function(opt, bbox, selections) {
+			return {
+				path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: selections[0], // The 1st (and only selector)
+				limit: 10000,
+				bbox: bbox.join(','),
+				...(typeof options.urlParams == 'function' ?
+					options.urlParams(options, bbox, selections) :
+					options.urlParams)
+			};
+		},
 	});
 }
 
@@ -1139,10 +1151,8 @@ function layerClusterGeoBB(opt) {
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
-			extraParams: function() {
-				return {
-					layer: 'cluster',
-				};
+			urlParams: {
+				layer: 'cluster',
 			},
 			...options
 		});
@@ -1160,8 +1170,9 @@ function layerClusterGeoBB(opt) {
 function layerChemineur(options) {
 	return layerClusterGeoBB({
 		host: '//chemineur.fr/',
-		convertProperties: function(properties, opt) {
+		convertProperties: function(properties) {
 			return {
+				url: properties.link,
 				icon: chemIconUrl(properties.type),
 				attribution: 'Chemineur',
 			};
@@ -1206,16 +1217,6 @@ function layerAlpages(options) {
 function layerWri(options) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
-		urlArgsFnc: function(opt, bbox, selections) {
-			return {
-				url: opt.host + (selections[1] ? 'api/massif' : 'api/bbox'),
-				type_points: selections[0],
-				massif: selections[1],
-				nb_points: 'all',
-				bbox: bbox.join(','),
-				...opt.extraParams()
-			};
-		},
 		selectName: 'select-wri',
 		convertProperties: function(properties, opt) {
 			return {
@@ -1233,7 +1234,19 @@ function layerWri(options) {
 			return styleOptFullLabel(feature, properties);
 		},
 		attribution: 'refuges.info',
-		...options
+		...options,
+		urlParams: function(o, bbox, selections) {
+			return {
+				path: selections[1] ? 'api/massif' : 'api/bbox',
+				type_points: selections[0],
+				massif: selections[1],
+				nb_points: 'all',
+				bbox: bbox.join(','),
+				...(typeof options.urlParams == 'function' ?
+					options.urlParams(options, bbox, selections) :
+					options.urlParams)
+			};
+		},
 	});
 }
 
@@ -1245,10 +1258,8 @@ function layerClusterWri(opt) {
 		clusterLayer = layerWri({
 			minResolution: options.transitionResolution,
 			strategy: ol.loadingstrategy.all,
-			extraParams: function() {
-				return {
-					cluster: 0.1,
-				};
+			urlParams: {
+				cluster: 0.1,
 			},
 			...options
 		});
@@ -1263,15 +1274,12 @@ function layerClusterWri(opt) {
 function layerWriAreas(options) {
 	return layerVector({
 		host: '//www.refuges.info/',
-		strategy: ol.loadingstrategy.all,
-		polygon: 1, // Massifs
-		zIndex: 2, // Behind points
-		urlArgsFnc: function(opt) {
-			return {
-				url: opt.host + 'api/polygones',
-				type_polygon: opt.polygon,
-			};
+		urlParams: {
+			path: 'api/polygones',
+			type_polygon: 1, // Massifs
 		},
+		strategy: ol.loadingstrategy.all,
+		zIndex: 2, // Behind points
 		selectName: 'select-massifs',
 		convertProperties: function(properties) {
 			return {
@@ -1283,7 +1291,7 @@ function layerWriAreas(options) {
 		styleOptFnc: function(feature, properties) {
 			return {
 				...styleOptLabel(feature),
-				...styleOptPolygon(properties.color, 0.5),
+				...styleOptPolygon(properties.color),
 			};
 		},
 		hoverStyleOptFnc: function(feature, properties) {
@@ -1297,7 +1305,7 @@ function layerWriAreas(options) {
 				.join('');
 
 			return {
-				...styleOptLabel(feature),
+				...styleOptLabel(feature, true),
 				...styleOptPolygon('#' + colors, 0.3),
 				stroke: new ol.style.Stroke({
 					color: properties.color,
@@ -1373,9 +1381,10 @@ function layerC2C(options) {
 	};
 
 	return layerVectorCluster({
-		urlArgsFnc: function(o, b, s, extent) {
+		host: 'https://api.camptocamp.org/',
+		urlParams: function(o, b, s, extent) {
 			return {
-				url: 'https://api.camptocamp.org/waypoints',
+				path: 'waypoints',
 				bbox: extent.join(','),
 			};
 		},
@@ -1396,11 +1405,11 @@ function layerC2C(options) {
  */
 function layerOverpass(opt) {
 	const options = {
-			//host: 'overpass-api.de',
-			//host: 'lz4.overpass-api.de',
-			//host: 'overpass.openstreetmap.fr', // Out of order
-			host: 'overpass.kumi.systems',
-			//host: 'overpass.nchc.org.tw',
+			//host: 'https://overpass-api.de',
+			//host: 'https://lz4.overpass-api.de',
+			//host: 'https://overpass.openstreetmap.fr', // Out of order
+			//host: 'https://overpass.nchc.org.tw',
+			host: 'https://overpass.kumi.systems',
 
 			selectName: 'select-osm',
 			maxResolution: 50,
@@ -1412,7 +1421,7 @@ function layerOverpass(opt) {
 		},
 		format = new ol.format.OSMXML(),
 		layer = layerVectorCluster({
-			urlArgsFnc: urlArgsFnc,
+			urlParams: urlParams,
 			format: format,
 			...options
 		}),
@@ -1426,7 +1435,7 @@ function layerOverpass(opt) {
 		if (selectEls[e].value)
 			tags += selectEls[e].value.replace('private', '');
 
-	function urlArgsFnc(o, bbox, selections) {
+	function urlParams(o, bbox, selections) {
 		const items = selections[0].split(','), // The 1st (and only selector)
 			bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
@@ -1443,7 +1452,7 @@ function layerOverpass(opt) {
 		}
 
 		return {
-			url: 'https://' + options.host + '/api/interpreter',
+			path: '/api/interpreter',
 			data: '[timeout:5];(' + args.join('') + ');out center;',
 		};
 	}
