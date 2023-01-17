@@ -135,16 +135,31 @@ function layerWri(options) {
 		selectName: 'select-wri',
 		convertProperties: function(properties, opt) {
 			return {
-				type: properties.type.valeur,
+				url: opt.noClick ? null : properties.lien,
 				name: properties.nom,
+				/* //TODO
+				type: properties.type.valeur,
 				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord ? properties.coord.alt : null,
 				capacity: properties.places ? properties.places.valeur : null,
-				url: opt.noClick ? null : properties.lien,
-				attribution: opt.attribution,
+				attribution: opt.attribution, //TODO (at layer level)
+				*/
 			};
 		},
-		styleOptFnc: styleOptIcon,
+
+		displayStyle: function(feature) {
+			const properties = feature.getProperties();
+
+			if (properties.type)
+				return { //TODO packager
+					image: new ol.style.Icon({
+						//TODO BUG general : send cookies to server, event non secure
+						src: '//www.refuges.info/' + //TODO options.host
+							'images/icones/' + properties.type.icone + '.svg',
+					}),
+				};
+		},
+
 		hoverStyleOptFnc: styleOptFullLabel,
 		attribution: 'refuges.info',
 		...options,

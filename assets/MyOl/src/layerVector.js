@@ -8,10 +8,10 @@
  */
 function layerVector(opt) {
 	const options = {
-			// host:'', // Url host
+			// host: '', // Url host
 			/* urlParams: { // Url parameters of the layer or function((layerOptions, bbox, selections, extent)
 				path: '', // Url path of the layer
-				key: value, // Key / values pairs to add as url parameters
+				key: value, // key=values pairs to add as url parameters
 			}, */
 			selectName: '',
 			/* <input name="SELECT_NAME"> url arguments selector
@@ -27,16 +27,18 @@ function layerVector(opt) {
 				);
 				source.refresh();
 			},
-			projection: 'EPSG:4326', // Received projection
 			strategy: ol.loadingstrategy.bbox,
+			projection: 'EPSG:4326', // Received projection
 			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
+
+			//displayStyle: function (feature, properties), // returning the style options
 
 			//TODO resorb OptFnc
 			// styleOptFnc: function(feature, properties, options) returning options of the style of the features
 			// styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
 			// hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
+			//styleOptClusterFnc: styleOptCluster, //TODO ???
 
-			styleOptClusterFnc: styleOptCluster, //TODO ???
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
 			...opt
 		},
@@ -50,7 +52,9 @@ function layerVector(opt) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			style: style,
+			style: feature => new ol.style.Style(
+				options.displayStyle(feature, feature.getProperties())
+			),
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options
 		}),
@@ -142,22 +146,6 @@ function layerVector(opt) {
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
 	};
 
-	// Style callback function for the layer
-	function style(feature) {
-		const properties = feature.getProperties(),
-			styleOptFnc = properties.features || properties.cluster ? //TODO resorb
-			options.styleOptClusterFnc :
-			options.styleOptFnc;
-
-		if (typeof styleOptFnc == 'function')
-			return new ol.style.Style(
-				styleOptFnc(
-					feature,
-					properties
-				)
-			);
-	}
-
 	return layer;
 }
 
@@ -186,12 +174,10 @@ function layerVectorCluster(opt) {
 		});
 
 	clusterLayer.setMapInternal = layer.setMapInternal; //HACK execute actions on Map init
-	clusterLayer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
+	clusterLayer.hoverStyleOptFnc = layer.hoverStyleOptFnc; // Embark hover style to render hovering
 
 	// Propagate setVisible following the selector status
-	layer.on('change:visible', () =>
-		clusterLayer.setVisible(layer.getVisible())
-	);
+	layer.on('change:visible', () => clusterLayer.setVisible(layer.getVisible()));
 
 	// Tune the clustering distance depending on the zoom level
 	clusterLayer.on('prerender', evt => {
@@ -225,17 +211,55 @@ function layerVectorCluster(opt) {
 		}
 	}
 
-	// Generate the features to render the cluster
+	// Generate the features to render the clusters
 	function createCluster(point, features) {
+		let nbClusters = 0,
+			ownCluster = false,
+			names = [];
+
+		features.forEach(f => {
+			const p = f.getProperties();
+
+			nbClusters += parseInt(p.cluster) || 1;
+			if (p.cluster)
+				ownCluster = true;
+			if (p.name)
+				names.push(p.name);
+		});
+
 		// Single feature : display it
-		if (features.length == 1)
+		if (nbClusters == 1)
 			return features[0];
 
+		if (ownCluster || names.length > 5)
+			names = ['Cliquer pour zoomer'];
+
 		// Display a cluster point
-		return new ol.Feature({
-			geometry: point,
-			features: features
+		const clusterFeature = new ol.Feature({
+			geometry: point, // The gravity center of all the features into the cluster
+			cluster: nbClusters,
+			id: features[0].id, // Pseudo id = the id of the first feature in the cluster
+			name: names.join('\n'),
 		});
+
+		// Style the cluster feature
+		clusterFeature.setStyle(new ol.style.Style({
+			image: new ol.style.Circle({
+				radius: 14,
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+				fill: new ol.style.Fill({
+					color: 'white',
+				}),
+			}),
+			text: new ol.style.Text({
+				text: nbClusters.toString(),
+				font: '14px Calibri,sans-serif',
+			}),
+		}));
+
+		return clusterFeature;
 	}
 
 	return clusterLayer;
@@ -259,7 +283,7 @@ function styleOptIcon(feature) {
 }
 
 // Display a label with some data about the feature
-function styleOptFullLabel(feature) {
+function styleOptFullLabel(feature) { //TODO resorb
 	//BEST move on convertProperties
 	const properties = feature.getProperties();
 	let text = [],
@@ -312,7 +336,7 @@ function styleOptFullLabel(feature) {
 }
 
 // Display a label with only the name
-function styleOptLabel(feature, important) { //TODO resorb important
+function styleOptLabel(feature, important) { //TODO resorb argument important
 	const properties = feature.getProperties(),
 		elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
@@ -417,7 +441,7 @@ function styleOptCluster(feature) {
 }
 
 /**
- * Global hovering functions layer
+ * Global hovering & click layer
    To be declared & added once for a map
  */
 function layerHover(map) {
@@ -438,7 +462,7 @@ function layerHover(map) {
 			source.clear();
 	});
 
-	map.on(['pointermove', 'click'], (evt) => {
+	map.on(['pointermove', 'click'], evt => {
 		// Find hovered feature
 		const map = evt.target,
 			found = map.forEachFeatureAtPixel(
@@ -486,7 +510,7 @@ function layerHover(map) {
 			if (typeof hoveredLayer.hoverStyleOptFnc == 'function') {
 				source.clear();
 				source.addFeature(hoveredFeature);
-				layer.setStyle(new ol.style.Style(
+				layer.setStyle(new ol.style.Style( //TODO
 					hoveredLayer.hoverStyleOptFnc(
 						hoveredFeature,
 						hoveredProperties
