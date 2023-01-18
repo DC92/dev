@@ -30,7 +30,7 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		hoverStyleOptFnc: function(feature, properties) { //TODO resorb properties
+		hoverStyle: function(feature, properties, layer) {
 			return {
 				...styleOptFullLabel(feature, properties), // Labels
 				stroke: new ol.style.Stroke({ // Lines
@@ -133,34 +133,31 @@ function layerWri(options) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
 		selectName: 'select-wri',
-		convertProperties: function(properties, opt) {
+		convertProperties: function(properties, opt) { //TODO resorb opt ???
 			return {
-				url: opt.noClick ? null : properties.lien,
+				url: opt.noClick ? null : properties.lien, //TODO resorb
 				name: properties.nom,
-				/* //TODO
-				type: properties.type.valeur,
-				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord ? properties.coord.alt : null,
-				capacity: properties.places ? properties.places.valeur : null,
-				attribution: opt.attribution, //TODO (at layer level)
-				*/
 			};
 		},
-
-		displayStyle: function(feature) {
-			const properties = feature.getProperties();
-
+		displayStyle: function(feature, properties, layer) {
 			if (properties.type)
-				return { //TODO packager
+				return {
 					image: new ol.style.Icon({
-						//TODO BUG general : send cookies to server, event non secure
-						src: '//www.refuges.info/' + //TODO options.host
-							'images/icones/' + properties.type.icone + '.svg',
+						src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
 					}),
 				};
 		},
-
-		hoverStyleOptFnc: styleOptFullLabel,
+		hoverStyle: function(feature, properties, layer) {
+			return styleLabel(feature, agregateText([
+				properties.nom,
+				agregateText([
+					properties.coord && properties.coord.alt ? parseInt(properties.coord.alt) + ' m' : '',
+					properties.places && properties.places.valeur ? parseInt(properties.places.valeur) + '\u255E\u2550\u2555' : '',
+				], ', '),
+				properties.type ? properties.type.valeur : '',
+				layer.options.attribution,
+			]));
+		},
 		attribution: 'refuges.info',
 		...options,
 		urlParams: function(o, bbox, selections) {
@@ -222,7 +219,7 @@ function layerWriAreas(options) {
 				...styleOptPolygon(properties.color),
 			};
 		},
-		hoverStyleOptFnc: function(feature) {
+		hoverStyle: function(feature) {
 			const properties = feature.getProperties();
 
 			// Invert previous color
@@ -266,7 +263,7 @@ function layerPrc(options) {
 			};
 		},
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: styleOptFullLabel,
+		hoverStyle: styleOptFullLabel,
 		...options
 	});
 }
@@ -319,7 +316,7 @@ function layerC2C(options) {
 		selectName: 'select-c2c',
 		format: format,
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: styleOptFullLabel,
+		hoverStyle: styleOptFullLabel,
 		...options
 	});
 }
@@ -340,7 +337,7 @@ function layerOverpass(opt) {
 			selectName: 'select-osm',
 			maxResolution: 50,
 			styleOptFnc: styleOptIcon,
-			hoverStyleOptFnc: styleOptFullLabel,
+			hoverStyle: styleOptFullLabel,
 			...opt
 		},
 		format = new ol.format.OSMXML(),
@@ -445,6 +442,45 @@ function layerOverpass(opt) {
 	};
 
 	return layer;
+}
+
+// Display a label
+function styleLabel(feature, text, important) {
+	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		styleTextOptions = {
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -14, // Above the icon
+			padding: [1, 1, 0, 3],
+			font: '14px Calibri,sans-serif',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'white',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				width: important ? 1 : 0.3,
+			}),
+			overflow: important, // Display all labels when space available
+		};
+
+	//HACK to render the html entities in the canvas
+	elLabel.innerHTML = text;
+	styleTextOptions.text = elLabel.innerHTML;
+
+	return {
+		text: new ol.style.Text(styleTextOptions),
+	};
+}
+
+// Simplify & agreagte an array of lines
+function agregateText(lines, glue) {
+	return lines
+		.filter(Boolean) // Avoid empty lines
+		.map(l => l.toString().replace('_', ' ').trim())
+		.map(l => l[0].toUpperCase() + l.substring(1))
+		.join(glue || '\n');
 }
 
 /**

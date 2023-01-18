@@ -12,7 +12,7 @@ const layer = layerVector({
 				firstMenuLine ? null : styleOptLabel(feature),
 			);
 		},
-		hoverStyleOptFnc: styleOptLabel,
+		hoverStyle: styleOptLabel,
 	}),
 
 	map = new ol.Map({

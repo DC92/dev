@@ -519,10 +519,10 @@ function layersDemo(options) {
  */
 function layerVector(opt) {
 	const options = {
-			// host:'', // Url host
+			// host: '', // Url host
 			/* urlParams: { // Url parameters of the layer or function((layerOptions, bbox, selections, extent)
 				path: '', // Url path of the layer
-				key: value, // Key / values pairs to add as url parameters
+				key: value, // key=values pairs to add as url parameters
 			}, */
 			selectName: '',
 			/* <input name="SELECT_NAME"> url arguments selector
@@ -538,15 +538,11 @@ function layerVector(opt) {
 				);
 				source.refresh();
 			},
-			projection: 'EPSG:4326', // Received projection
 			strategy: ol.loadingstrategy.bbox,
+			projection: 'EPSG:4326', // Received projection
 			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
-
-			// styleOptFnc: function(feature, properties, options) returning options of the style of the features
-			// styleOptClusterFnc: function(feature, properties, options) returning options of the style of the cluster bullets
-			// hoverStyleOptFnc: function(feature, properties, options) returning options of the style when hovering the features
-
-			styleOptClusterFnc: styleOptCluster,
+			// displayStyle: function (feature, properties, layer) Returning the style options
+			// hoverStyle: function(feature, properties, layer) Returning options of the style when hovering the features
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
 			...opt
 		},
@@ -560,7 +556,9 @@ function layerVector(opt) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			style: style,
+			style: feature => new ol.style.Style(
+				options.displayStyle(feature, feature.getProperties(), layer)
+			),
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options
 		}),
@@ -578,7 +576,7 @@ function layerVector(opt) {
 			map.layerHover = layerHover(map);
 	};
 
-	layer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
+	layer.options = options;
 	selectNames.map(name => selectVectorLayer(name, options.callBack)); // Setup the selector managers
 	options.callBack(); // Init parameters depending on the selector
 
@@ -650,22 +648,6 @@ function layerVector(opt) {
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
 	};
 
-	// Style callback function for the layer
-	function style(feature) {
-		const properties = feature.getProperties(),
-			styleOptFnc = properties.features || properties.cluster ?
-			options.styleOptClusterFnc :
-			options.styleOptFnc;
-
-		if (typeof styleOptFnc == 'function')
-			return new ol.style.Style(
-				styleOptFnc(
-					feature,
-					properties
-				)
-			);
-	}
-
 	return layer;
 }
 
@@ -693,13 +675,11 @@ function layerVectorCluster(opt) {
 			...options
 		});
 
+	clusterLayer.options = options;
 	clusterLayer.setMapInternal = layer.setMapInternal;
-	clusterLayer.hoverStyleOptFnc = options.hoverStyleOptFnc; // Embark hover style to render hovering
 
 	// Propagate setVisible following the selector status
-	layer.on('change:visible', () =>
-		clusterLayer.setVisible(layer.getVisible())
-	);
+	layer.on('change:visible', () => clusterLayer.setVisible(layer.getVisible()));
 
 	// Tune the clustering distance depending on the zoom level
 	clusterLayer.on('prerender', evt => {
@@ -733,17 +713,55 @@ function layerVectorCluster(opt) {
 		}
 	}
 
-	// Generate the features to render the cluster
+	// Generate the features to render the clusters
 	function createCluster(point, features) {
+		let nbClusters = 0,
+			includeCluster = false,
+			names = [];
+
+		features.forEach(f => {
+			const properties = f.getProperties();
+
+			nbClusters += parseInt(properties.cluster) || 1;
+			if (properties.cluster)
+				includeCluster = true;
+			if (properties.name)
+				names.push(properties.name);
+		});
+
 		// Single feature : display it
-		if (features.length == 1)
+		if (nbClusters == 1)
 			return features[0];
 
+		if (includeCluster || names.length > 5)
+			names = ['Cliquer pour zoomer'];
+
 		// Display a cluster point
-		return new ol.Feature({
-			geometry: point,
-			features: features
+		const clusterFeature = new ol.Feature({
+			geometry: point, // The gravity center of all the features into the cluster
+			cluster: nbClusters,
+			id: features[0].id, // Pseudo id = the id of the first feature in the cluster
+			name: names.join('\n'),
 		});
+
+		// Style the cluster feature
+		clusterFeature.setStyle(new ol.style.Style({
+			image: new ol.style.Circle({
+				radius: 14,
+				stroke: new ol.style.Stroke({
+					color: 'blue',
+				}),
+				fill: new ol.style.Fill({
+					color: 'white',
+				}),
+			}),
+			text: new ol.style.Text({
+				text: nbClusters.toString(),
+				font: '14px Calibri,sans-serif',
+			}),
+		}));
+
+		return clusterFeature;
 	}
 
 	return clusterLayer;
@@ -785,31 +803,6 @@ function styleOptFullLabel(feature) {
 		if (text.length == 0 || text.length > 6 || includeCluster)
 			text = ['Cliquer pour zoomer'];
 	}
-	// Feature
-	else {
-		// 1st line
-		if (properties.name)
-			text.push(properties.name);
-
-		// 2nd line
-		if (properties.ele)
-			line.push(parseInt(properties.ele) + ' m');
-		if (properties.capacity)
-			line.push(parseInt(properties.capacity) + '\u255E\u2550\u2555');
-		if (line.length)
-			text.push(line.join(', '));
-
-		// 3rd line
-		if (typeof properties.type == 'string' && properties.type)
-			text.push(
-				properties.type[0].toUpperCase() +
-				properties.type.substring(1).replace('_', ' ')
-			);
-
-		// 4rd line
-		if (properties.attribution)
-			text.push('&copy;' + properties.attribution);
-	}
 	feature.setProperties({
 		'label': text.join('\n')
 	});
@@ -817,38 +810,9 @@ function styleOptFullLabel(feature) {
 	return styleOptLabel(feature);
 }
 
-// Display a label with only the name
-function styleOptLabel(feature, important) {
-	const properties = feature.getProperties(),
-		elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		styleTextOptions = {
-			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -14, // Above the icon
-			padding: [1, 1, 0, 3],
-			font: '14px Calibri,sans-serif',
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				width: important ? 1 : 0.3,
-			}),
-			overflow: important,
-		};
-
-	elLabel.innerHTML = properties.label || properties.name;
-	styleTextOptions.text = elLabel.innerHTML;
-
-	return {
-		text: new ol.style.Text(styleTextOptions),
-	};
-}
-
 // Apply a color and transparency to a polygon
-function styleOptPolygon(color, transparency) { // color = #rgb, transparency = 0 to 1
+function styleOptPolygon(color, transparency) {
+	// color = #rgb, transparency = 0 to 1
 	if (color)
 		return {
 			fill: new ol.style.Fill({
@@ -895,33 +859,8 @@ function styleOptArrow(feature, opt) {
 		};
 }
 
-// Style of a cluster bullet (both local & server cluster
-function styleOptCluster(feature) {
-	const properties = feature.getProperties();
-	let nbClusters = parseInt(properties.cluster || 0);
-
-	for (let f in properties.features)
-		nbClusters += parseInt(properties.features[f].getProperties().cluster || 1);
-
-	return {
-		image: new ol.style.Circle({
-			radius: 14,
-			stroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
-			fill: new ol.style.Fill({
-				color: 'white',
-			}),
-		}),
-		text: new ol.style.Text({
-			text: nbClusters.toString(),
-			font: '14px Calibri,sans-serif',
-		}),
-	};
-}
-
 /**
- * Global hovering functions layer
+ * Global hovering & click layer
    To be declared & added once for a map
  */
 function layerHover(map) {
@@ -942,7 +881,7 @@ function layerHover(map) {
 			source.clear();
 	});
 
-	map.on(['pointermove', 'click'], (evt) => {
+	map.on(['pointermove', 'click'], evt => {
 		// Find hovered feature
 		const map = evt.target,
 			found = map.forEachFeatureAtPixel(
@@ -975,7 +914,7 @@ function layerHover(map) {
 							window.location.href = hoveredProperties.url;
 				}
 				// Cluster
-				else if (hoveredProperties.features)
+				else if (hoveredProperties.cluster)
 					map.getView().animate({
 						zoom: map.getView().getZoom() + 2,
 						center: hoveredProperties.geometry.getCoordinates(),
@@ -987,19 +926,19 @@ function layerHover(map) {
 				return true; // Don't undisplay it
 
 			// Hover a feature
-			if (typeof hoveredLayer.hoverStyleOptFnc == 'function') {
-				source.clear();
-				source.addFeature(hoveredFeature);
-				layer.setStyle(new ol.style.Style(
-					hoveredLayer.hoverStyleOptFnc(
-						hoveredFeature,
-						hoveredProperties
-					)
-				));
-				layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
+			source.clear();
+			source.addFeature(hoveredFeature);
+			layer.setStyle(new ol.style.Style(
+				hoveredLayer.options.hoverStyle(
+					hoveredFeature,
+					hoveredProperties,
+					hoveredLayer
+				)
+			));
+			layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
 
-				return hoveredFeature; // Don't continue
-			}
+			return hoveredFeature; // Don't continue
+			//	}
 		}
 	});
 
@@ -1112,7 +1051,7 @@ function layerGeoBB(options) {
 				}),
 			};
 		},
-		hoverStyleOptFnc: function(feature, properties) {
+		hoverStyle: function(feature, properties, layer) {
 			return {
 				...styleOptFullLabel(feature, properties), // Labels
 				stroke: new ol.style.Stroke({ // Lines
@@ -1216,17 +1155,29 @@ function layerWri(options) {
 		selectName: 'select-wri',
 		convertProperties: function(properties, opt) {
 			return {
-				type: properties.type.valeur,
-				name: properties.nom,
-				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord ? properties.coord.alt : null,
-				capacity: properties.places ? properties.places.valeur : null,
 				url: opt.noClick ? null : properties.lien,
-				attribution: opt.attribution,
+				name: properties.nom,
 			};
 		},
-		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: styleOptFullLabel,
+		displayStyle: function(feature, properties, layer) {
+			if (properties.type)
+				return {
+					image: new ol.style.Icon({
+						src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
+					}),
+				};
+		},
+		hoverStyle: function(feature, properties, layer) {
+			return styleLabel(feature, agregateText([
+				properties.nom,
+				agregateText([
+					properties.coord && properties.coord.alt ? parseInt(properties.coord.alt) + ' m' : '',
+					properties.places && properties.places.valeur ? parseInt(properties.places.valeur) + '\u255E\u2550\u2555' : '',
+				], ', '),
+				properties.type ? properties.type.valeur : '',
+				layer.options.attribution,
+			]));
+		},
 		attribution: 'refuges.info',
 		...options,
 		urlParams: function(o, bbox, selections) {
@@ -1288,7 +1239,7 @@ function layerWriAreas(options) {
 				...styleOptPolygon(properties.color),
 			};
 		},
-		hoverStyleOptFnc: function(feature) {
+		hoverStyle: function(feature) {
 			const properties = feature.getProperties();
 
 			// Invert previous color
@@ -1332,7 +1283,7 @@ function layerPrc(options) {
 			};
 		},
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: styleOptFullLabel,
+		hoverStyle: styleOptFullLabel,
 		...options
 	});
 }
@@ -1385,7 +1336,7 @@ function layerC2C(options) {
 		selectName: 'select-c2c',
 		format: format,
 		styleOptFnc: styleOptIcon,
-		hoverStyleOptFnc: styleOptFullLabel,
+		hoverStyle: styleOptFullLabel,
 		...options
 	});
 }
@@ -1406,7 +1357,7 @@ function layerOverpass(opt) {
 			selectName: 'select-osm',
 			maxResolution: 50,
 			styleOptFnc: styleOptIcon,
-			hoverStyleOptFnc: styleOptFullLabel,
+			hoverStyle: styleOptFullLabel,
 			...opt
 		},
 		format = new ol.format.OSMXML(),
@@ -1511,6 +1462,44 @@ function layerOverpass(opt) {
 	};
 
 	return layer;
+}
+
+// Display a label
+function styleLabel(feature, text, important) {
+	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		styleTextOptions = {
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -14, // Above the icon
+			padding: [1, 1, 0, 3],
+			font: '14px Calibri,sans-serif',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'white',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				width: important ? 1 : 0.3,
+			}),
+			overflow: important, // Display all labels when space available
+		};
+
+	elLabel.innerHTML = text;
+	styleTextOptions.text = elLabel.innerHTML;
+
+	return {
+		text: new ol.style.Text(styleTextOptions),
+	};
+}
+
+// Simplify & agreagte an array of lines
+function agregateText(lines, glue) {
+	return lines
+		.filter(Boolean) // Avoid empty lines
+		.map(l => l.toString().replace('_', ' ').trim())
+		.map(l => l[0].toUpperCase() + l.substring(1))
+		.join(glue || '\n');
 }
 
 /**
@@ -1713,7 +1702,6 @@ function controlMousePosition(options) {
 
 /**
  * Control to display the length & height difference of an hovered line
- * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {
 	const control = controlButton();

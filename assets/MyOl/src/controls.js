@@ -184,7 +184,6 @@ function controlMousePosition(options) {
 
 /**
  * Control to display the length & height difference of an hovered line
- * option hoverStyle style the hovered feature
  */
 function controlLengthLine() {
 	const control = controlButton(); //HACK button not visible
