@@ -11,44 +11,44 @@
 function layerGeoBB(options) {
 	return layerVectorCluster({
 		selectName: 'select-chem',
-		convertProperties: function(properties, opt) {
-			return {
-				url: properties.id ? opt.host + 'viewtopic.php?t=' + properties.id : null,
-				attribution: opt.attribution,
-			};
+		...options,
+		convertProperties: function(properties) {
+			if (properties.id)
+				return {
+					url: options.host + 'viewtopic.php?t=' + properties.id,
+				};
 		},
-		styleOptFnc: function(feature, properties) { //TODO resorb properties
+		displayStyle: function(feature, properties) { //TODO resorb properties
 			return {
-				...styleOptIcon(feature), // Points
-				...styleOptPolygon(properties.color), // Polygons with color
-				...styleOptArrow(feature, {
-					color: 'blue',
-				}),
+				...styleOptIcon(feature), // Points //TODO resorb
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
 				}),
+				...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
 			};
 		},
 		hoverStyle: function(feature, properties, layer) {
 			return {
-				...styleOptFullLabel(feature, properties), // Labels
+				...styleLabel(feature, agregateText([
+					properties.name,
+					properties.alt ? parseInt(properties.alt) + ' m' : '',
+					properties.type,
+					'&copy;' + layer.options.attribution,
+				])),
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'red',
 					width: 3,
 				}),
 			};
 		},
-		...options,
 		urlParams: function(opt, bbox, selections) {
 			return {
 				path: 'ext/Dominique92/GeoBB/gis.php',
 				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
 				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ?
-					options.urlParams(options, bbox, selections) :
-					options.urlParams)
+				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
 			};
 		},
 	});
@@ -85,11 +85,11 @@ function layerChemineur(opt) {
 
 	//TODO BUG pas de link sur cluster layer
 	return layerClusterGeoBB({
+		attribution: 'Chemineur',
 		convertProperties: function(properties) {
 			return {
 				url: options.host + 'viewtopic.php?t=' + properties.id,
 				icon: chemIconUrl(properties.type),
-				attribution: 'Chemineur',
 			};
 		},
 		...options
@@ -112,16 +112,10 @@ function chemIconUrl(type) {
  */
 function layerAlpages(options) {
 	return layerGeoBB({
-		strategy: ol.loadingstrategy.all,
 		host: '//alpages.info/',
 		selectName: 'select-alpages',
-		convertProperties: function(properties, opt) {
-			return {
-				url: properties.id ? opt.host + 'viewtopic.php?t=' + properties.id : null,
-				icon: chemIconUrl(properties.type),
-				attribution: 'Alpages',
-			};
-		},
+		strategy: ol.loadingstrategy.all,
+		attribution: 'Alpages',
 		...options
 	});
 }
@@ -130,12 +124,12 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVectorCluster({ //TODO pas de cluster si appalé directement ???
+	return layerVectorCluster({ //TODO pas de cluster si appelé directement ???
 		host: '//www.refuges.info/',
 		selectName: 'select-wri',
-		convertProperties: function(properties, opt) { //TODO resorb opt ???
+		convertProperties: function(properties) {
 			return {
-				url: opt.noClick ? null : properties.lien, //TODO resorb
+				url: properties.lien,
 				name: properties.nom,
 			};
 		},
@@ -155,7 +149,7 @@ function layerWri(options) {
 					properties.places && properties.places.valeur ? parseInt(properties.places.valeur) + '\u255E\u2550\u2555' : '',
 				], ', '),
 				properties.type ? properties.type.valeur : '',
-				layer.options.attribution,
+				'&copy;' + layer.options.attribution,
 			]));
 		},
 		attribution: 'refuges.info',
@@ -167,9 +161,7 @@ function layerWri(options) {
 				massif: selections[1],
 				nb_points: 'all',
 				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ?
-					options.urlParams(options, bbox, selections) :
-					options.urlParams)
+				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
 			};
 		},
 	});
@@ -442,45 +434,6 @@ function layerOverpass(opt) {
 	};
 
 	return layer;
-}
-
-// Display a label
-function styleLabel(feature, text, important) {
-	const elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		styleTextOptions = {
-			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -14, // Above the icon
-			padding: [1, 1, 0, 3],
-			font: '14px Calibri,sans-serif',
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				width: important ? 1 : 0.3,
-			}),
-			overflow: important, // Display all labels when space available
-		};
-
-	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text;
-	styleTextOptions.text = elLabel.innerHTML;
-
-	return {
-		text: new ol.style.Text(styleTextOptions),
-	};
-}
-
-// Simplify & agreagte an array of lines
-function agregateText(lines, glue) {
-	return lines
-		.filter(Boolean) // Avoid empty lines
-		.map(l => l.toString().replace('_', ' ').trim())
-		.map(l => l[0].toUpperCase() + l.substring(1))
-		.join(glue || '\n');
 }
 
 /**
