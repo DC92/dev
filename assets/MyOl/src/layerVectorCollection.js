@@ -130,7 +130,7 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVectorCluster({
+	return layerVectorCluster({ //TODO pas de cluster si appalé directement ???
 		host: '//www.refuges.info/',
 		selectName: 'select-wri',
 		convertProperties: function(properties, opt) { //TODO resorb opt ???

@@ -36,7 +36,6 @@ function layerVector(opt) {
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
 			...opt
 		},
-
 		selectNames = options.selectName.split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
@@ -150,18 +149,23 @@ function layerVectorCluster(opt) {
 	const options = {
 			distance: 30, // Minimum distance between clusters
 			density: 1000, // Maximum number of displayed clusters
-			...opt
+			...opt,
+			hoverStyle: function(feature, properties, layer) {
+				return properties.cluster ?
+					styleLabel(feature, properties.label) :
+					opt.hoverStyle(feature, properties, layer);
+			}
 		},
-		layer = layerVector(options), // Basic layer (with all the points)
+		layer = layerVector(options), // Creates the basic layer (with all the points)
 		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
 			geometryFunction: geometryFnc,
 			createCluster: createCluster,
-			distance: options.distance,
+			...options
 		}),
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
-			style: (feature, resolution) => layer.getStyleFunction()(feature, resolution),
+			style: style,
 			visible: layer.getVisible(),
 			zIndex: layer.getZIndex(),
 			...options
@@ -172,6 +176,29 @@ function layerVectorCluster(opt) {
 
 	// Propagate setVisible following the selector status
 	layer.on('change:visible', () => clusterLayer.setVisible(layer.getVisible()));
+
+	function style(feature) {
+		const properties = feature.getProperties();
+
+		return new ol.style.Style(
+			properties.cluster ? {
+				image: new ol.style.Circle({
+					radius: 14,
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+					fill: new ol.style.Fill({
+						color: 'white',
+					}),
+				}),
+				text: new ol.style.Text({
+					text: properties.cluster.toString(),
+					font: '14px Calibri,sans-serif',
+				}),
+			} :
+			options.displayStyle(feature, properties, clusterLayer)
+		);
+	}
 
 	// Tune the clustering distance depending on the zoom level
 	clusterLayer.on('prerender', evt => {
@@ -209,7 +236,7 @@ function layerVectorCluster(opt) {
 	function createCluster(point, features) {
 		let nbClusters = 0,
 			includeCluster = false,
-			names = [];
+			lines = [];
 
 		features.forEach(f => {
 			const properties = f.getProperties();
@@ -218,42 +245,23 @@ function layerVectorCluster(opt) {
 			if (properties.cluster)
 				includeCluster = true;
 			if (properties.name)
-				names.push(properties.name);
+				lines.push(properties.name);
 		});
 
 		// Single feature : display it
 		if (nbClusters == 1)
 			return features[0];
 
-		if (includeCluster || names.length > 5)
-			names = ['Cliquer pour zoomer'];
+		if (includeCluster || lines.length > 5)
+			lines = ['Cliquer pour zoomer'];
 
 		// Display a cluster point
-		const clusterFeature = new ol.Feature({
+		return new ol.Feature({
 			geometry: point, // The gravity center of all the features into the cluster
 			cluster: nbClusters,
 			id: features[0].id, // Pseudo id = the id of the first feature in the cluster
-			name: names.join('\n'),
+			label: lines.join('\n'),
 		});
-
-		// Style the cluster feature
-		clusterFeature.setStyle(new ol.style.Style({
-			image: new ol.style.Circle({
-				radius: 14,
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-				fill: new ol.style.Fill({
-					color: 'white',
-				}),
-			}),
-			text: new ol.style.Text({
-				text: nbClusters.toString(),
-				font: '14px Calibri,sans-serif',
-			}),
-		}));
-
-		return clusterFeature;
 	}
 
 	return clusterLayer;
@@ -421,7 +429,6 @@ function layerHover(map) {
 				return true; // Don't undisplay it
 
 			// Hover a feature
-			//TODO DELETE ???	if (typeof hoveredLayer.options.hoverStyle == 'function') {
 			source.clear();
 			source.addFeature(hoveredFeature);
 			layer.setStyle(new ol.style.Style(
@@ -434,7 +441,6 @@ function layerHover(map) {
 			layer.setZIndex(hoveredLayer.getZIndex() + 2); // Tune the hoverLayer zIndex just above the hovered layer
 
 			return hoveredFeature; // Don't continue
-			//	}
 		}
 	});
 
