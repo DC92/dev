@@ -457,7 +457,6 @@ function styleLabel(feature, text, styleOptions) {
 				color: 'blue',
 			}),
 			...styleOptions,
-			//TODO in layers overflow: important, // Display all labels when space available
 		};
 
 	//HACK to render the html entities in the canvas

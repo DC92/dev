@@ -1210,12 +1210,13 @@ function layerWri(options) {
 				massif: selections[1],
 				nb_points: 'all',
 				bbox: bbox.join(','),
+				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
 			};
 		},
 		convertProperties: function(properties) {
 			return {
-				url: properties.lien,
 				name: properties.nom,
+				url: properties.lien,
 			};
 		},
 		displayStyle: function(feature, properties, layer) {
@@ -1262,6 +1263,8 @@ function layerClusterWri(opt) {
 }
 
 function layerWriAreas(options) {
+	const elLabel = document.createElement('span');
+
 	return layerVector({
 		host: '//www.refuges.info/',
 		urlParams: {
@@ -1272,34 +1275,47 @@ function layerWriAreas(options) {
 		...options,
 		convertProperties: function(properties) {
 			return {
-				name: properties.nom,
-				color: properties.couleur,
 				url: properties.lien,
 			};
 		},
-		styleOptFnc: function(feature, properties) {
+		displayStyle: function(feature, properties) {
+			elLabel.innerHTML = properties.nom;
 			return {
-				...styleOptLabel(feature),
-				...styleOptPolygon(properties.color),
+				text: new ol.style.Text({
+					text: elLabel.innerHTML,
+					padding: [1, -1, -1, 1],
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'white',
+					}),
+				}),
+				fill: new ol.style.Fill({
+					color: styleColor(properties.couleur, 0.3),
+				}),
 			};
 		},
-		hoverStyle: function(feature) {
-			const properties = feature.getProperties();
-
-			// Invert previous color
-			const colors = properties.color
-				.match(/([0-9a-f]{2})/ig)
-				.map(c =>
-					(255 - parseInt(c, 16))
-					.toString(16).padStart(2, '0')
-				)
-				.join('');
-
+		hoverStyle: function(feature, properties) {
+			elLabel.innerHTML = properties.nom;
 			return {
-				...styleOptLabel(feature, true),
-				...styleOptPolygon('#' + colors, 0.3),
+				text: new ol.style.Text({
+					text: elLabel.innerHTML,
+					padding: [0, 0, -1, 1],
+					font: '14px sans-serif',
+					fill: new ol.style.Fill({
+						color: 'black',
+					}),
+					backgroundFill: new ol.style.Fill({
+						color: 'white',
+					}),
+					overflow: true,
+				}),
+				fill: new ol.style.Fill({
+					color: styleColor(properties.couleur, 0.2, true),
+				}),
 				stroke: new ol.style.Stroke({
-					color: properties.color,
+					color: properties.couleur,
 					width: 3,
 				}),
 			};
@@ -1318,35 +1334,6 @@ function styleColor(color, transparency, revert) {
 		transparency || 1,
 	].join(',') + ')';
 }
-
-/*
-if(properties.color)
-			options.	fill= new ol.style.Fill({
-				color: styleColor(properties.color,0.5),
-				});
-			options.	stroke= new ol.style.Stroke({
-				color: styleColor(properties.color ),
-				});
-return options;
-		},
-		hoverStyle: function(feature, properties) {
-const options = {};
-
-if(properties.type)
-			options.	image= new ol.style.Icon({
-					src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +properties.type+'.svg',
-				});
-if(properties.color)
-			options.	fill= new ol.style.Fill({
-				color: styleColor(properties.color,0.5,true),
-				});
-			options.	WWWstroke= new ol.style.Stroke({
-				color: styleColor(properties.color ),
-				});
-return options;
-		},
-	});
-*/
 
 /**
  * Site pyrenees-refuges.com
@@ -1389,9 +1376,9 @@ function layerC2C(options) {
 				type: 'Feature',
 				geometry: JSONparse(properties.geometry.geom),
 				properties: {
+					name: properties.locales[0].title,
 					type: properties.waypoint_type,
 					icon: chemIconUrl(properties.waypoint_type),
-					name: properties.locales[0].title,
 					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
 					attribution: 'campTOcamp',
