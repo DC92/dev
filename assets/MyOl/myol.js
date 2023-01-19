@@ -556,7 +556,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			style: feature => new ol.style.Style(
-				options.displayStyle(feature, feature.getProperties(), layer)
+				layer.options.displayStyle(feature, feature.getProperties(), layer)
 			),
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options,
@@ -754,8 +754,8 @@ function layerVectorCluster(opt) {
 	function style(feature) {
 		const properties = feature.getProperties();
 
-		return new ol.style.Style(
-			properties.cluster ? {
+		if (properties.cluster)
+			return new ol.style.Style({
 				image: new ol.style.Circle({
 					radius: 14,
 					stroke: new ol.style.Stroke({
@@ -769,9 +769,9 @@ function layerVectorCluster(opt) {
 					text: properties.cluster.toString(),
 					font: '14px Calibri,sans-serif',
 				}),
-			} :
-			options.displayStyle(feature, properties, clusterLayer)
-		);
+			});
+		else
+			return layer.getStyleFunction()(feature);
 	}
 
 	return clusterLayer;
@@ -1073,11 +1073,12 @@ function styleOptPolygon(color, transparency) {
  */
 function layerGeoBB(options) {
 	return layerVectorCluster({
+		strategy: ol.loadingstrategy.bbox,
 		...options,
 		urlParams: function(opt, bbox, selections) {
 			return {
 				path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only selector)
+				cat: selections[0], // The 1st (and only) selector
 				limit: 10000,
 				bbox: bbox.join(','),
 				...options.urlParams,
@@ -1091,7 +1092,9 @@ function layerGeoBB(options) {
 		},
 		displayStyle: function(feature, properties) {
 			return {
-				...styleOptIcon(feature), // Points
+				image: properties.type ? new ol.style.Icon({
+					src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+				}) : null,
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
@@ -1454,7 +1457,7 @@ function layerOverpass(opt) {
 			tags += selectEls[e].value.replace('private', '');
 
 	function urlParams(o, bbox, selections) {
-		const items = selections[0].split(','), // The 1st (and only selector)
+		const items = selections[0].split(','), // The 1st (and only) selector
 			bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 

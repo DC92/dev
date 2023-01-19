@@ -46,7 +46,7 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			style: feature => new ol.style.Style(
-				options.displayStyle(feature, feature.getProperties(), layer)
+				layer.options.displayStyle(feature, feature.getProperties(), layer)
 			),
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
 			...options,
@@ -246,8 +246,8 @@ function layerVectorCluster(opt) {
 	function style(feature) {
 		const properties = feature.getProperties();
 
-		return new ol.style.Style(
-			properties.cluster ? {
+		if (properties.cluster)
+			return new ol.style.Style({
 				image: new ol.style.Circle({
 					radius: 14,
 					stroke: new ol.style.Stroke({
@@ -261,9 +261,9 @@ function layerVectorCluster(opt) {
 					text: properties.cluster.toString(),
 					font: '14px Calibri,sans-serif',
 				}),
-			} :
-			options.displayStyle(feature, properties, clusterLayer)
-		);
+			});
+		else
+			return layer.getStyleFunction()(feature);
 	}
 
 	return clusterLayer;

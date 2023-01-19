@@ -9,12 +9,14 @@
  * layer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
 function layerGeoBB(options) {
+	//TODO pourquoi prc sans sélecteur & 2 layers chemineur ?
 	return layerVectorCluster({
+		strategy: ol.loadingstrategy.bbox,
 		...options,
 		urlParams: function(opt, bbox, selections) {
 			return {
 				path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only selector)
+				cat: selections[0], // The 1st (and only) selector
 				limit: 10000,
 				bbox: bbox.join(','),
 				...options.urlParams,
@@ -26,9 +28,11 @@ function layerGeoBB(options) {
 					url: options.host + 'viewtopic.php?t=' + properties.id,
 				};
 		},
-		displayStyle: function(feature, properties) { //TODO resorb properties
+		displayStyle: function(feature, properties) {
 			return {
-				...styleOptIcon(feature), // Points //TODO resorb
+				image: properties.type ? new ol.style.Icon({
+					src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+				}) : null,
 				stroke: new ol.style.Stroke({ // Lines
 					color: 'blue',
 					width: 2,
@@ -83,8 +87,6 @@ function layerChemineur(opt) {
 		...opt,
 	};
 
-	//TODO BUG pas de link sur cluster layer
-	//TODO BUG pas d'icônes isolées sur cluster layer
 	return layerClusterGeoBB({
 		attribution: 'Chemineur',
 		...options,
@@ -396,7 +398,7 @@ function layerOverpass(opt) {
 			tags += selectEls[e].value.replace('private', '');
 
 	function urlParams(o, bbox, selections) {
-		const items = selections[0].split(','), // The 1st (and only selector)
+		const items = selections[0].split(','), // The 1st (and only) selector
 			bb = '(' + bbox[1] + ',' + bbox[0] + ',' + bbox[3] + ',' + bbox[2] + ');',
 			args = [];
 
