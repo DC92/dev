@@ -11,7 +11,7 @@ function layerVector(opt) {
 			// host: '', // Url host
 			/* urlParams: { // Url parameters of the layer or function((layerOptions, bbox, selections, extent)
 				path: '', // Url path of the layer
-				key: value, // key=values pairs to add as url parameters
+				key: value, // key=values pairs to add to the url as parameters
 			}, */
 			selectName: '',
 			/* <input name="SELECT_NAME"> url arguments selector
@@ -29,7 +29,7 @@ function layerVector(opt) {
 			},
 			strategy: ol.loadingstrategy.bbox,
 			projection: 'EPSG:4326', // Received projection
-			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
+			// convertProperties: function(properties, feature, options) convert some server properties to the one used by this package
 			// displayStyle: function (feature, properties, layer) Returning the style options
 			// hoverStyle: function(feature, properties, layer) Returning options of the style when hovering the features
 			//TODO resorb styleOptFnc: function(feature, properties, options)
@@ -84,6 +84,7 @@ function layerVector(opt) {
 			options.urlParams,
 			query = [];
 
+		// Don't send bbox parameter if no extent is available
 		if (urlParams.bbox && !isFinite(urlParams.bbox[0]))
 			urlParams.bbox = null;
 
@@ -241,6 +242,7 @@ function layerVectorCluster(opt) {
 		});
 	}
 
+	// Customize the cluster bullets style
 	function style(feature) {
 		const properties = feature.getProperties();
 
@@ -265,106 +267,6 @@ function layerVectorCluster(opt) {
 	}
 
 	return clusterLayer;
-}
-
-/**
- * Some usefull style functions
- */
-
-// Display a label
-function styleLabel(feature, text, important) {
-	const elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		styleTextOptions = {
-			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -14, // Above the icon
-			padding: [1, 1, 0, 3],
-			font: '14px Calibri,sans-serif',
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				width: important ? 1 : 0.3,
-			}),
-			overflow: important, // Display all labels when space available
-		};
-
-	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text;
-	styleTextOptions.text = elLabel.innerHTML;
-
-	return {
-		text: new ol.style.Text(styleTextOptions),
-	};
-}
-
-// Simplify & agreagte an array of lines
-function agregateText(lines, glue) {
-	return lines
-		.filter(Boolean) // Avoid empty lines
-		.map(l => l.toString().replace('_', ' ').trim())
-		.map(l => l[0].toUpperCase() + l.substring(1))
-		.join(glue || '\n');
-}
-
-// Get icon from an URL
-function styleOptIcon(feature) { //TODO resorb
-	const properties = feature.getProperties();
-
-	if (properties && properties.icon)
-		return {
-			image: new ol.style.Icon({
-				//TODO BUG general : send cookies to server, event non secure
-				src: properties.icon,
-			}),
-		};
-}
-
-// Display a label with some data about the feature
-function styleOptFullLabel(feature) { //TODO resorb
-	//BEST move on convertProperties
-	const properties = feature.getProperties();
-	let text = [],
-		line = [];
-
-	// Cluster
-	if (properties.features || properties.cluster) {
-		let includeCluster = !!properties.cluster;
-
-		for (let f in properties.features) {
-			const name = properties.features[f].getProperties().name;
-			if (name)
-				text.push(name);
-			if (properties.features[f].getProperties().cluster)
-				includeCluster = true;
-		}
-		if (text.length == 0 || text.length > 6 || includeCluster)
-			text = ['Cliquer pour zoomer'];
-	}
-	feature.setProperties({
-		'label': text.join('\n')
-	});
-
-	return styleOptLabel(feature);
-}
-
-// Apply a color and transparency to a polygon
-function styleOptPolygon(color, transparency) { //TODO resorb
-	// color = #rgb, transparency = 0 to 1
-	if (color)
-		return {
-			fill: new ol.style.Fill({
-				color: 'rgba(' + [
-					parseInt(color.substring(1, 3), 16),
-					parseInt(color.substring(3, 5), 16),
-					parseInt(color.substring(5, 7), 16),
-					transparency || 0.5,
-				].join(',') + ')',
-			}),
-		};
 }
 
 /**
@@ -531,4 +433,106 @@ function selectVectorLayer(name, callBack) {
 	}
 
 	return selection();
+}
+
+/**
+ * Some usefull style functions
+ */
+
+// Display a label
+// Used by cluster
+function styleLabel(feature, text, styleOptions) {
+	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		styleTextOptions = {
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -14, // Above the icon
+			padding: [1, 1, 0, 3],
+			font: '14px Calibri,sans-serif',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'white',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			...styleOptions,
+			//TODO in layers overflow: important, // Display all labels when space available
+		};
+
+	//HACK to render the html entities in the canvas
+	elLabel.innerHTML = text;
+	styleTextOptions.text = elLabel.innerHTML;
+
+	return {
+		text: new ol.style.Text(styleTextOptions),
+	};
+}
+
+// Simplify & agreagte an array of lines
+function agregateText(lines, glue) {
+	return lines
+		.filter(Boolean) // Avoid empty lines
+		.map(l => l.toString().replace('_', ' ').trim())
+		.map(l => l[0].toUpperCase() + l.substring(1))
+		.join(glue || '\n');
+}
+
+// Get icon from an URL
+function styleOptIcon(feature) { //TODO resorb
+	const properties = feature.getProperties();
+
+	if (properties && properties.icon)
+		return {
+			image: new ol.style.Icon({
+				//TODO BUG general : send cookies to server, event non secure
+				src: properties.icon,
+			}),
+		};
+}
+
+// Display a label with some data about the feature
+function styleOptFullLabel(feature) { //TODO resorb
+	//BEST move on convertProperties
+	const properties = feature.getProperties();
+	let text = [],
+		line = [];
+
+	// Cluster
+	if (properties.features || properties.cluster) {
+		let includeCluster = !!properties.cluster;
+
+		for (let f in properties.features) {
+			const name = properties.features[f].getProperties().name;
+			if (name)
+				text.push(name);
+			if (properties.features[f].getProperties().cluster)
+				includeCluster = true;
+		}
+		if (text.length == 0 || text.length > 6 || includeCluster)
+			text = ['Cliquer pour zoomer'];
+	}
+	feature.setProperties({
+		'label': text.join('\n')
+	});
+
+	return styleOptLabel(feature);
+}
+
+// Apply a color and transparency to a polygon
+function styleOptPolygon(color, transparency) { //TODO resorb
+	// color = #rgb, transparency = 0 to 1
+	if (color)
+		return {
+			fill: new ol.style.Fill({
+				color: 'rgba(' + [
+					parseInt(color.substring(1, 3), 16),
+					parseInt(color.substring(3, 5), 16),
+					parseInt(color.substring(5, 7), 16),
+					transparency || 0.5,
+				].join(',') + ')',
+			}),
+		};
 }

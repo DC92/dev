@@ -522,7 +522,7 @@ function layerVector(opt) {
 			// host: '', // Url host
 			/* urlParams: { // Url parameters of the layer or function((layerOptions, bbox, selections, extent)
 				path: '', // Url path of the layer
-				key: value, // key=values pairs to add as url parameters
+				key: value, // key=values pairs to add to the url as parameters
 			}, */
 			selectName: '',
 			/* <input name="SELECT_NAME"> url arguments selector
@@ -540,7 +540,7 @@ function layerVector(opt) {
 			},
 			strategy: ol.loadingstrategy.bbox,
 			projection: 'EPSG:4326', // Received projection
-			// convertProperties: function(properties, feature, options) convert some server properties to the one displayed by this package
+			// convertProperties: function(properties, feature, options) convert some server properties to the one used by this package
 			// displayStyle: function (feature, properties, layer) Returning the style options
 			// hoverStyle: function(feature, properties, layer) Returning options of the style when hovering the features
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
@@ -593,6 +593,7 @@ function layerVector(opt) {
 			options.urlParams,
 			query = [];
 
+		// Don't send bbox parameter if no extent is available
 		if (urlParams.bbox && !isFinite(urlParams.bbox[0]))
 			urlParams.bbox = null;
 
@@ -749,6 +750,7 @@ function layerVectorCluster(opt) {
 		});
 	}
 
+	// Customize the cluster bullets style
 	function style(feature) {
 		const properties = feature.getProperties();
 
@@ -773,103 +775,6 @@ function layerVectorCluster(opt) {
 	}
 
 	return clusterLayer;
-}
-
-/**
- * Some usefull style functions
- */
-
-// Display a label
-function styleLabel(feature, text, important) {
-	const elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		styleTextOptions = {
-			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -14, // Above the icon
-			padding: [1, 1, 0, 3],
-			font: '14px Calibri,sans-serif',
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				width: important ? 1 : 0.3,
-			}),
-			overflow: important, // Display all labels when space available
-		};
-
-	elLabel.innerHTML = text;
-	styleTextOptions.text = elLabel.innerHTML;
-
-	return {
-		text: new ol.style.Text(styleTextOptions),
-	};
-}
-
-// Simplify & agreagte an array of lines
-function agregateText(lines, glue) {
-	return lines
-		.filter(Boolean) // Avoid empty lines
-		.map(l => l.toString().replace('_', ' ').trim())
-		.map(l => l[0].toUpperCase() + l.substring(1))
-		.join(glue || '\n');
-}
-
-// Get icon from an URL
-function styleOptIcon(feature) {
-	const properties = feature.getProperties();
-
-	if (properties && properties.icon)
-		return {
-			image: new ol.style.Icon({
-				src: properties.icon,
-			}),
-		};
-}
-
-// Display a label with some data about the feature
-function styleOptFullLabel(feature) {
-	const properties = feature.getProperties();
-	let text = [],
-		line = [];
-
-	// Cluster
-	if (properties.features || properties.cluster) {
-		let includeCluster = !!properties.cluster;
-
-		for (let f in properties.features) {
-			const name = properties.features[f].getProperties().name;
-			if (name)
-				text.push(name);
-			if (properties.features[f].getProperties().cluster)
-				includeCluster = true;
-		}
-		if (text.length == 0 || text.length > 6 || includeCluster)
-			text = ['Cliquer pour zoomer'];
-	}
-	feature.setProperties({
-		'label': text.join('\n')
-	});
-
-	return styleOptLabel(feature);
-}
-
-// Apply a color and transparency to a polygon
-function styleOptPolygon(color, transparency) {
-	// color = #rgb, transparency = 0 to 1
-	if (color)
-		return {
-			fill: new ol.style.Fill({
-				color: 'rgba(' + [
-					parseInt(color.substring(1, 3), 16),
-					parseInt(color.substring(3, 5), 16),
-					parseInt(color.substring(5, 7), 16),
-					transparency || 0.5,
-				].join(',') + ')',
-			}),
-		};
 }
 
 /**
@@ -1039,6 +944,104 @@ function selectVectorLayer(name, callBack) {
 }
 
 /**
+ * Some usefull style functions
+ */
+
+// Display a label
+// Used by cluster
+function styleLabel(feature, text, styleOptions) {
+	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		styleTextOptions = {
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -14, // Above the icon
+			padding: [1, 1, 0, 3],
+			font: '14px Calibri,sans-serif',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'white',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			...styleOptions,
+		};
+
+	elLabel.innerHTML = text;
+	styleTextOptions.text = elLabel.innerHTML;
+
+	return {
+		text: new ol.style.Text(styleTextOptions),
+	};
+}
+
+// Simplify & agreagte an array of lines
+function agregateText(lines, glue) {
+	return lines
+		.filter(Boolean) // Avoid empty lines
+		.map(l => l.toString().replace('_', ' ').trim())
+		.map(l => l[0].toUpperCase() + l.substring(1))
+		.join(glue || '\n');
+}
+
+// Get icon from an URL
+function styleOptIcon(feature) {
+	const properties = feature.getProperties();
+
+	if (properties && properties.icon)
+		return {
+			image: new ol.style.Icon({
+				src: properties.icon,
+			}),
+		};
+}
+
+// Display a label with some data about the feature
+function styleOptFullLabel(feature) {
+	const properties = feature.getProperties();
+	let text = [],
+		line = [];
+
+	// Cluster
+	if (properties.features || properties.cluster) {
+		let includeCluster = !!properties.cluster;
+
+		for (let f in properties.features) {
+			const name = properties.features[f].getProperties().name;
+			if (name)
+				text.push(name);
+			if (properties.features[f].getProperties().cluster)
+				includeCluster = true;
+		}
+		if (text.length == 0 || text.length > 6 || includeCluster)
+			text = ['Cliquer pour zoomer'];
+	}
+	feature.setProperties({
+		'label': text.join('\n')
+	});
+
+	return styleOptLabel(feature);
+}
+
+// Apply a color and transparency to a polygon
+function styleOptPolygon(color, transparency) {
+	// color = #rgb, transparency = 0 to 1
+	if (color)
+		return {
+			fill: new ol.style.Fill({
+				color: 'rgba(' + [
+					parseInt(color.substring(1, 3), 16),
+					parseInt(color.substring(3, 5), 16),
+					parseInt(color.substring(5, 7), 16),
+					transparency || 0.5,
+				].join(',') + ')',
+			}),
+		};
+}
+
+/**
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
@@ -1051,6 +1054,15 @@ function layerGeoBB(options) {
 	return layerVectorCluster({
 		selectName: 'select-chem',
 		...options,
+		urlParams: function(opt, bbox, selections) {
+			return {
+				path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: selections[0], // The 1st (and only selector)
+				limit: 10000,
+				bbox: bbox.join(','),
+				...options.urlParams
+			};
+		},
 		convertProperties: function(properties) {
 			if (properties.id)
 				return {
@@ -1064,7 +1076,6 @@ function layerGeoBB(options) {
 					color: 'blue',
 					width: 2,
 				}),
-				...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
 			};
 		},
 		hoverStyle: function(feature, properties, layer) {
@@ -1079,15 +1090,6 @@ function layerGeoBB(options) {
 					color: 'red',
 					width: 3,
 				}),
-			};
-		},
-		urlParams: function(opt, bbox, selections) {
-			return {
-				path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only selector)
-				limit: 10000,
-				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
 			};
 		},
 	});
@@ -1165,6 +1167,17 @@ function layerWri(options) {
 	return layerVectorCluster({
 		host: '//www.refuges.info/',
 		selectName: 'select-wri',
+		attribution: 'refuges.info',
+		...options,
+		urlParams: function(o, bbox, selections) {
+			return {
+				path: selections[1] ? 'api/massif' : 'api/bbox',
+				type_points: selections[0],
+				massif: selections[1],
+				nb_points: 'all',
+				bbox: bbox.join(','),
+			};
+		},
 		convertProperties: function(properties) {
 			return {
 				url: properties.lien,
@@ -1189,18 +1202,6 @@ function layerWri(options) {
 				properties.type ? properties.type.valeur : '',
 				'&copy;' + layer.options.attribution,
 			]));
-		},
-		attribution: 'refuges.info',
-		...options,
-		urlParams: function(o, bbox, selections) {
-			return {
-				path: selections[1] ? 'api/massif' : 'api/bbox',
-				type_points: selections[0],
-				massif: selections[1],
-				nb_points: 'all',
-				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
-			};
 		},
 	});
 }

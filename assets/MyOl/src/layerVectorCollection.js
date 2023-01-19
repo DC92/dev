@@ -12,6 +12,15 @@ function layerGeoBB(options) {
 	return layerVectorCluster({
 		selectName: 'select-chem',
 		...options,
+		urlParams: function(opt, bbox, selections) {
+			return {
+				path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: selections[0], // The 1st (and only selector)
+				limit: 10000,
+				bbox: bbox.join(','),
+				...options.urlParams
+			};
+		},
 		convertProperties: function(properties) {
 			if (properties.id)
 				return {
@@ -25,7 +34,7 @@ function layerGeoBB(options) {
 					color: 'blue',
 					width: 2,
 				}),
-				...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
+				//TODO ??? ...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
 			};
 		},
 		hoverStyle: function(feature, properties, layer) {
@@ -40,15 +49,7 @@ function layerGeoBB(options) {
 					color: 'red',
 					width: 3,
 				}),
-			};
-		},
-		urlParams: function(opt, bbox, selections) {
-			return {
-				path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only selector)
-				limit: 10000,
-				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
+				//TODO ??? ...(typeof options.hoverStyle == 'function' ? options.hoverStyle(...arguments) : options.hoverStyle),
 			};
 		},
 	});
@@ -84,6 +85,7 @@ function layerChemineur(opt) {
 	};
 
 	//TODO BUG pas de link sur cluster layer
+	//TODO BUG pas d'icônes isolées sur cluster layer
 	return layerClusterGeoBB({
 		attribution: 'Chemineur',
 		convertProperties: function(properties) {
@@ -97,7 +99,7 @@ function layerChemineur(opt) {
 }
 
 // Get icon from chemineur.fr if we only have a type
-function chemIconUrl(type) {
+function chemIconUrl(type) { //TODO resorb
 	if (type) {
 		const icons = type.split(' ');
 
@@ -110,6 +112,7 @@ function chemIconUrl(type) {
 /**
  * Site alpages.info
  */
+//TODO BUG icones 16*16 d'origine
 function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
@@ -127,6 +130,18 @@ function layerWri(options) {
 	return layerVectorCluster({ //TODO pas de cluster si appelé directement ???
 		host: '//www.refuges.info/',
 		selectName: 'select-wri',
+		attribution: 'refuges.info',
+		...options,
+		urlParams: function(o, bbox, selections) {
+			return {
+				path: selections[1] ? 'api/massif' : 'api/bbox',
+				type_points: selections[0],
+				massif: selections[1],
+				nb_points: 'all',
+				bbox: bbox.join(','),
+				//TODO ??? ...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
+			};
+		},
 		convertProperties: function(properties) {
 			return {
 				url: properties.lien,
@@ -151,18 +166,6 @@ function layerWri(options) {
 				properties.type ? properties.type.valeur : '',
 				'&copy;' + layer.options.attribution,
 			]));
-		},
-		attribution: 'refuges.info',
-		...options,
-		urlParams: function(o, bbox, selections) {
-			return {
-				path: selections[1] ? 'api/massif' : 'api/bbox',
-				type_points: selections[0],
-				massif: selections[1],
-				nb_points: 'all',
-				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
-			};
 		},
 	});
 }
