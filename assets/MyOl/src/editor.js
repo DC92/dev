@@ -440,7 +440,7 @@ function layerEditGeoJson(opt) {
 				else
 					begCoords.push(c);
 			}
-			if (reverseLine)
+			if (reverseLine) //TODO BUG traite tous les segments
 				lines.push(begCoords.concat(coords).reverse());
 			else
 				lines.push(begCoords, coords);
@@ -457,4 +457,38 @@ function layerEditGeoJson(opt) {
 	}
 
 	return control;
+}
+
+// Add an arrow following a line direction
+function styleOptArrow(feature, opt) { //TODO integrate to the editor
+	let geometry = feature.getGeometry();
+
+	if (geometry.getType() == 'Point')
+		return;
+
+	//BEST BUG set only the last coordinate pair of the the first geometry
+	if (geometry.getType() == 'GeometryCollection')
+		geometry = geometry.getGeometries()[0];
+
+	const options = {
+			color: 'red',
+			...opt
+		},
+		lastIndex = geometry.flatCoordinates.length - geometry.stride, // Index of last point
+		beforeLastIndex = lastIndex - geometry.stride; // Index of before last point
+
+	if (beforeLastIndex >= 0) // At least 2 points
+		return {
+			text: new ol.style.Text({
+				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>',
+				placement: 'line',
+				textAlign: 'start',
+				scale: 2,
+				//offsetX: 1.4, //BEST dont work with ol 7.1.0
+				offsetY: 1.4,
+				fill: new ol.style.Fill({
+					color: options.color, //TODO get color from layer style (editor)
+				}),
+			}),
+		};
 }

@@ -872,39 +872,6 @@ function styleOptPolygon(color, transparency) {
 		};
 }
 
-// Add an arrow following a line direction
-function styleOptArrow(feature, opt) {
-	let geometry = feature.getGeometry();
-
-	if (geometry.getType() == 'Point')
-		return;
-
-	if (geometry.getType() == 'GeometryCollection')
-		geometry = geometry.getGeometries()[0];
-
-	const options = {
-			color: 'red',
-			...opt
-		},
-		lastIndex = geometry.flatCoordinates.length - geometry.stride, // Index of last point
-		beforeLastIndex = lastIndex - geometry.stride; // Index of before last point
-
-	if (beforeLastIndex >= 0) // At least 2 points
-		return {
-			text: new ol.style.Text({
-				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>',
-				placement: 'line',
-				textAlign: 'start',
-				scale: 2,
-				//offsetX: 1.4,
-				offsetY: 1.4,
-				fill: new ol.style.Fill({
-					color: options.color,
-				}),
-			}),
-		};
-}
-
 /**
  * Global hovering & click layer
    To be declared & added once for a map
@@ -3181,4 +3148,37 @@ function layerEditGeoJson(opt) {
 	}
 
 	return control;
+}
+
+// Add an arrow following a line direction
+function styleOptArrow(feature, opt) {
+	let geometry = feature.getGeometry();
+
+	if (geometry.getType() == 'Point')
+		return;
+
+	if (geometry.getType() == 'GeometryCollection')
+		geometry = geometry.getGeometries()[0];
+
+	const options = {
+			color: 'red',
+			...opt
+		},
+		lastIndex = geometry.flatCoordinates.length - geometry.stride, // Index of last point
+		beforeLastIndex = lastIndex - geometry.stride; // Index of before last point
+
+	if (beforeLastIndex >= 0) // At least 2 points
+		return {
+			text: new ol.style.Text({
+				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>',
+				placement: 'line',
+				textAlign: 'start',
+				scale: 2,
+				//offsetX: 1.4,
+				offsetY: 1.4,
+				fill: new ol.style.Fill({
+					color: options.color,
+				}),
+			}),
+		};
 }
