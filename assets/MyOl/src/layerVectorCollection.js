@@ -10,7 +10,6 @@
  */
 function layerGeoBB(options) {
 	return layerVectorCluster({
-		selectName: 'select-chem',
 		...options,
 		urlParams: function(opt, bbox, selections) {
 			return {
@@ -34,7 +33,7 @@ function layerGeoBB(options) {
 					color: 'blue',
 					width: 2,
 				}),
-				//TODO ??? ...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
+				...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
 			};
 		},
 		hoverStyle: function(feature, properties, layer) {
@@ -112,13 +111,23 @@ function chemIconUrl(type) { //TODO resorb
 /**
  * Site alpages.info
  */
-//TODO BUG icones 16*16 d'origine
 function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
-		selectName: 'select-alpages',
 		attribution: 'Alpages',
 		...options,
+		urlParams: {
+			forums: '4,5',
+			cat: null,
+		},
+		displayStyle: function(feature, properties) {
+			if (properties.type)
+				return {
+					image: new ol.style.Icon({
+						src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+					}),
+				};
+		}
 	});
 }
 
@@ -128,7 +137,6 @@ function layerAlpages(options) {
 function layerWri(options) {
 	return layerVectorCluster({ //TODO pas de cluster si appelé directement ???
 		host: '//www.refuges.info/',
-		selectName: 'select-wri',
 		strategy: ol.loadingstrategy.bbox,
 		attribution: 'refuges.info',
 		...options,
@@ -154,6 +162,7 @@ function layerWri(options) {
 					image: new ol.style.Icon({
 						src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
 					}),
+					...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
 				};
 		},
 		hoverStyle: function(feature, properties, layer) {
@@ -164,7 +173,7 @@ function layerWri(options) {
 					properties.places && properties.places.valeur ? parseInt(properties.places.valeur) + '\u255E\u2550\u2555' : '',
 				], ', '),
 				properties.type ? properties.type.valeur : '',
-				'&copy;' + layer.options.attribution,
+				layer.options.attribution ? '&copy;' + layer.options.attribution : '',
 			]));
 		},
 	});
@@ -198,7 +207,6 @@ function layerWriAreas(options) {
 			type_polygon: 1, // Massifs
 		},
 		zIndex: 2, // Behind points
-		selectName: 'select-massifs',
 		...options,
 		convertProperties: function(properties) {
 			return {
@@ -237,13 +245,53 @@ function layerWriAreas(options) {
 	});
 }
 
+// Build color and transparency
+function styleColor(color, transparency, revert) {
+	const colors = color
+		.match(/([0-9a-f]{2})/ig)
+		.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16));
+
+	return 'rgba(' + [
+		...colors,
+		transparency || 1,
+	].join(',') + ')';
+}
+
+/*
+if(properties.color)
+			options.	fill= new ol.style.Fill({
+				color: styleColor(properties.color,0.5),
+				});
+			options.	stroke= new ol.style.Stroke({
+				color: styleColor(properties.color ),
+				});
+return options;
+		},
+		hoverStyle: function(feature, properties) {
+const options = {};
+
+if(properties.type)
+			options.	image= new ol.style.Icon({
+					src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +properties.type+'.svg',
+				});
+if(properties.color)
+			options.	fill= new ol.style.Fill({
+				color: styleColor(properties.color,0.5,true),
+				});
+			options.	WWWstroke= new ol.style.Stroke({
+				color: styleColor(properties.color ),
+				});
+return options;
+		},
+	});
+*/
+
 /**
  * Site pyrenees-refuges.com
  */
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		selectName: 'select-prc',
 		//TODO ??? ...options,
 		convertProperties: function(properties) {
 			return {
@@ -299,10 +347,9 @@ function layerC2C(options) {
 
 	return layerVectorCluster({
 		host: 'https://api.camptocamp.org/',
-		selectName: 'select-c2c',
 		strategy: ol.loadingstrategy.bbox,
 		format: format,
-		//TODO ??? ...options,
+		...options,
 		urlParams: function(o, b, s, extent) {
 			return {
 				path: 'waypoints',
@@ -327,7 +374,6 @@ function layerOverpass(opt) {
 			//host: 'https://overpass.nchc.org.tw',
 			host: 'https://overpass.kumi.systems',
 			strategy: ol.loadingstrategy.bbox,
-			selectName: 'select-osm',
 			maxResolution: 50,
 			...opt,
 			styleOptFnc: styleOptIcon,

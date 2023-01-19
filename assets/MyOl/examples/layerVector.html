@@ -97,6 +97,10 @@ Based on https://openlayers.org
 		<label><input type="checkbox" name="select-wri" value="23" />point d'eau</label>
 		<label><input type="checkbox" name="select-wri" value="6" />sommet</label>
 		<label><input type="checkbox" name="select-wri" value="3" />passage délicat</label>
+		<br /><label>
+			<input type="checkbox" name="select-refuges" value="4" />
+			Style refuges.info
+		</label>
 	</div>
 
 	<div class="layer-select">
@@ -143,15 +147,37 @@ new ol.Map({
 			source: new ol.source.OSM(),
 		}),
 		...layerVectorCollection({
+			prc: {
+				selectName: 'select-prc',
+			},
+			chemineur: {
+				selectName: 'select-chem',
+			},
+			c2c: {
+				selectName: 'select-c2c',
+			},
+			alpages: {
+				selectName: 'select-alpages',
+			},
+			wriAreas: {
+				selectName: 'select-massifs',
+			},
 			wri: {
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
 			},
-			alpages: {
-				urlParams: {
-					forums: '4,5', //BEST BUG envoie quand même un cat=4,5 qui ne sert à rien
-				},
+			osm: {
+				selectName: 'select-osm',
 			},
-		}),
+		})
+		// WRI layer as in refuges.info
+		.concat(layerClusterWri({
+			selectName: 'select-refuges',
+			displayStyle: function(feature, properties) {
+				if (properties.name)
+					return styleLabel(feature, properties.name);
+			},
+			attribution: '',
+		}), ),
 	],
 });
 	</script>

@@ -478,6 +478,10 @@ function agregateText(lines, glue) {
 		.join(glue || '\n');
 }
 
+
+//TODO RESORB TODO RESORB TODO RESORB
+
+
 // Get icon from an URL
 function styleOptIcon(feature) { //TODO resorb
 	const properties = feature.getProperties();
@@ -517,6 +521,26 @@ function styleOptFullLabel(feature) { //TODO resorb
 	});
 
 	return styleOptLabel(feature);
+}
+
+// Apply a color and transparency to a polygon
+function stylePolygon(color, transparency, revert) {
+	if (color) {
+		const colors = color
+			.match(/([0-9a-f]{2})/ig)
+			.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16)),
+			rgba = 'rgba(' + [
+				...colors,
+				transparency || 1,
+			]
+			.join(',') + ')';
+
+		return {
+			fill: new ol.style.Fill({
+				color: rgba,
+			}),
+		};
+	}
 }
 
 // Apply a color and transparency to a polygon
