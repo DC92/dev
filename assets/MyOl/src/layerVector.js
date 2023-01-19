@@ -27,21 +27,21 @@ function layerVector(opt) {
 				);
 				source.refresh();
 			},
-			strategy: ol.loadingstrategy.bbox,
+			// strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			// convertProperties: function(properties, feature, options) convert some server properties to the one used by this package
 			// displayStyle: function (feature, properties, layer) Returning the style options
 			// hoverStyle: function(feature, properties, layer) Returning options of the style when hovering the features
 			//TODO resorb styleOptFnc: function(feature, properties, options)
 			// altLayer : another layer to add to the map with this one (for resolution depending layers)
-			...opt
+			...opt,
 		},
 		selectNames = options.selectName.split(','),
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
 			url: url,
 			format: format,
-			...options
+			...options,
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
@@ -49,7 +49,7 @@ function layerVector(opt) {
 				options.displayStyle(feature, feature.getProperties(), layer)
 			),
 			zIndex: 10, // Features : above the base layer (zIndex = 1)
-			...options
+			...options,
 		}),
 		statusEl = document.getElementById(selectNames[0] + '-status'); // XHR download tracking
 
@@ -162,14 +162,14 @@ function layerVectorCluster(opt) {
 			source: layer.getSource(),
 			geometryFunction: geometryFnc,
 			createCluster: createCluster,
-			...options
+			...options,
 		}),
 		clusterLayer = new ol.layer.Vector({
 			source: clusterSource,
 			style: style,
 			visible: layer.getVisible(),
 			zIndex: layer.getZIndex(),
-			...options
+			...options,
 		});
 
 	clusterLayer.options = options;
@@ -364,7 +364,7 @@ function layerHover(map) {
  * BBOX strategy when the url returns a limited number of features in the BBox
  * We do need to reload when the zoom in
  */
-ol.loadingstrategy.bboxLimit = function(extent, resolution) {
+ol.loadingstrategy.bboxLimit = function(extent, resolution) { //TODO utilisé ou ?
 	if (this.bboxLimitResolution > resolution) // When zoom in
 		this.refresh(); // Force the loading of all areas
 	this.bboxLimitResolution = resolution; // Mem resolution for further requests
@@ -438,9 +438,7 @@ function selectVectorLayer(name, callBack) {
 /**
  * Some usefull style functions
  */
-
-// Display a label
-// Used by cluster
+// Display a label (Used by cluster)
 function styleLabel(feature, text, styleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons

@@ -18,7 +18,7 @@ function layerGeoBB(options) {
 				cat: selections[0], // The 1st (and only selector)
 				limit: 10000,
 				bbox: bbox.join(','),
-				...options.urlParams
+				...options.urlParams,
 			};
 		},
 		convertProperties: function(properties) {
@@ -58,20 +58,20 @@ function layerGeoBB(options) {
 function layerClusterGeoBB(opt) {
 	const options = {
 			transitionResolution: 100,
-			...opt
+			...opt,
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
 			urlParams: {
 				layer: 'cluster',
 			},
-			...options
+			...options,
 		});
 
 	return layerGeoBB({
 		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
-		...options
+		...options,
 	});
 }
 
@@ -81,20 +81,20 @@ function layerClusterGeoBB(opt) {
 function layerChemineur(opt) {
 	const options = {
 		host: '//chemineur.fr/',
-		...opt
+		...opt,
 	};
 
 	//TODO BUG pas de link sur cluster layer
 	//TODO BUG pas d'icônes isolées sur cluster layer
 	return layerClusterGeoBB({
 		attribution: 'Chemineur',
+		...options,
 		convertProperties: function(properties) {
 			return {
-				url: options.host + 'viewtopic.php?t=' + properties.id,
+				url: options.host + 'viewtopic.php?t=' + properties.id, //TODO prendre layer.options.host
 				icon: chemIconUrl(properties.type),
 			};
 		},
-		...options
 	});
 }
 
@@ -117,9 +117,8 @@ function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
 		selectName: 'select-alpages',
-		strategy: ol.loadingstrategy.all,
 		attribution: 'Alpages',
-		...options
+		...options,
 	});
 }
 
@@ -130,6 +129,7 @@ function layerWri(options) {
 	return layerVectorCluster({ //TODO pas de cluster si appelé directement ???
 		host: '//www.refuges.info/',
 		selectName: 'select-wri',
+		strategy: ol.loadingstrategy.bbox,
 		attribution: 'refuges.info',
 		...options,
 		urlParams: function(o, bbox, selections) {
@@ -173,21 +173,20 @@ function layerWri(options) {
 function layerClusterWri(opt) {
 	const options = {
 			transitionResolution: 100,
-			...opt
+			...opt,
 		},
 		clusterLayer = layerWri({
 			minResolution: options.transitionResolution,
-			strategy: ol.loadingstrategy.all,
+			...options,
 			urlParams: {
 				cluster: 0.1,
 			},
-			...options
 		});
 
 	return layerWri({
 		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
-		...options
+		...options,
 	});
 }
 
@@ -198,9 +197,9 @@ function layerWriAreas(options) {
 			path: 'api/polygones',
 			type_polygon: 1, // Massifs
 		},
-		strategy: ol.loadingstrategy.all,
 		zIndex: 2, // Behind points
 		selectName: 'select-massifs',
+		...options,
 		convertProperties: function(properties) {
 			return {
 				name: properties.nom,
@@ -235,7 +234,6 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		...options
 	});
 }
 
@@ -246,7 +244,7 @@ function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		selectName: 'select-prc',
-		strategy: ol.loadingstrategy.all,
+		//TODO ??? ...options,
 		convertProperties: function(properties) {
 			return {
 				type: properties.type_hebergement,
@@ -259,7 +257,6 @@ function layerPrc(options) {
 		},
 		styleOptFnc: styleOptIcon,
 		hoverStyle: styleOptFullLabel,
-		...options
 	});
 }
 
@@ -302,17 +299,18 @@ function layerC2C(options) {
 
 	return layerVectorCluster({
 		host: 'https://api.camptocamp.org/',
+		selectName: 'select-c2c',
+		strategy: ol.loadingstrategy.bbox,
+		format: format,
+		//TODO ??? ...options,
 		urlParams: function(o, b, s, extent) {
 			return {
 				path: 'waypoints',
 				bbox: extent.join(','),
 			};
 		},
-		selectName: 'select-c2c',
-		format: format,
 		styleOptFnc: styleOptIcon,
 		hoverStyle: styleOptFullLabel,
-		...options
 	});
 }
 
@@ -328,18 +326,18 @@ function layerOverpass(opt) {
 			//host: 'https://overpass.openstreetmap.fr', // Out of order
 			//host: 'https://overpass.nchc.org.tw',
 			host: 'https://overpass.kumi.systems',
-
+			strategy: ol.loadingstrategy.bbox,
 			selectName: 'select-osm',
 			maxResolution: 50,
+			...opt,
 			styleOptFnc: styleOptIcon,
 			hoverStyle: styleOptFullLabel,
-			...opt
 		},
 		format = new ol.format.OSMXML(),
 		layer = layerVectorCluster({
 			urlParams: urlParams,
 			format: format,
-			...options
+			...options,
 		}),
 		statusEl = document.getElementById(options.selectName),
 		selectEls = document.getElementsByName(options.selectName);
