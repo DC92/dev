@@ -6,7 +6,6 @@
 
 /**
  * Site chemineur.fr, alpages.info
- * layer: verbose (full data) | cluster (grouped points) | '' (simplified)
  */
 function layerGeoBB(options) {
 	//TODO pourquoi prc sans sélecteur & 2 layers chemineur ?
@@ -31,6 +30,7 @@ function layerGeoBB(options) {
 		displayStyle: function(feature, properties) {
 			return {
 				image: properties.type ? new ol.style.Icon({
+					//TODO BUG general : send cookies to server, event non secure
 					src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
 				}) : null,
 				stroke: new ol.style.Stroke({ // Lines
@@ -156,27 +156,12 @@ function layerWri(options) {
 			return {
 				name: properties.nom,
 				url: properties.lien,
+				icon: '//www.refuges.info/' + //TODO calculer
+					'images/icones/' + properties.type.icone + '.svg',
+				ele: properties.coord ? properties.coord.alt : 0,
+				bed: properties.places ? properties.places.valeur : 0,
+				type: properties.type ? properties.type.valeur : '',
 			};
-		},
-		displayStyle: function(feature, properties, layer) {
-			if (properties.type)
-				return {
-					image: new ol.style.Icon({
-						src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
-					}),
-					...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
-				};
-		},
-		hoverStyle: function(feature, properties, layer) {
-			return styleLabel(feature, agregateText([
-				properties.nom,
-				agregateText([
-					properties.coord && properties.coord.alt ? parseInt(properties.coord.alt) + ' m' : '',
-					properties.places && properties.places.valeur ? parseInt(properties.places.valeur) + '\u255E\u2550\u2555' : '',
-				], ', '),
-				properties.type ? properties.type.valeur : '',
-				layer.options.attribution ? '&copy;' + layer.options.attribution : '',
-			]));
 		},
 	});
 }
@@ -262,37 +247,23 @@ function layerWriAreas(options) {
 	});
 }
 
-// Build color and transparency
-function styleColor(color, transparency, revert) {
-	const colors = color
-		.match(/([0-9a-f]{2})/ig)
-		.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16));
-
-	return 'rgba(' + [
-		...colors,
-		transparency || 1,
-	].join(',') + ')';
-}
-
 /**
  * Site pyrenees-refuges.com
  */
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		//TODO ??? ...options,
+		attribution: 'Pyrenees-Refuges',
 		convertProperties: function(properties) {
 			return {
 				type: properties.type_hebergement,
-				icon: chemIconUrl(properties.type_hebergement),
 				url: properties.url,
+				icon: chemIconUrl(properties.type_hebergement),
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
-				attribution: 'Pyrenees-Refuges',
 			};
 		},
-		styleOptFnc: styleOptIcon,
-		hoverStyle: styleOptFullLabel,
+		...options,
 	});
 }
 
@@ -486,4 +457,101 @@ function layerVectorCollection(options) {
 		layerChemineur(options.chemineur),
 		layerAlpages(options.alpages),
 	];
+}
+
+/**
+ * Some usefull style functions
+ */
+
+
+//TODO RESORB TODO RESORB TODO RESORB
+
+//TODO resorb styleOptFnc: function(feature, properties, options)
+
+
+// Build color and transparency
+function styleColor(color, transparency, revert) {
+	const colors = color
+		.match(/([0-9a-f]{2})/ig)
+		.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16));
+
+	return 'rgba(' + [
+		...colors,
+		transparency || 1,
+	].join(',') + ')';
+}
+
+// Get icon from an URL
+function styleOptIcon(feature) { //TODO resorb
+	const properties = feature.getProperties();
+
+	if (properties && properties.icon)
+		return {
+			image: new ol.style.Icon({
+				src: properties.icon,
+			}),
+		};
+}
+
+// Display a label with some data about the feature
+function styleOptFullLabel(feature) { //TODO resorb
+	//BEST move on convertProperties
+	const properties = feature.getProperties();
+	let text = [];
+
+	// Cluster
+	if (properties.features || properties.cluster) {
+		let includeCluster = !!properties.cluster;
+
+		for (let f in properties.features) {
+			const name = properties.features[f].getProperties().name;
+			if (name)
+				text.push(name);
+			if (properties.features[f].getProperties().cluster)
+				includeCluster = true;
+		}
+		if (text.length == 0 || text.length > 6 || includeCluster)
+			text = ['Cliquer pour zoomer'];
+	}
+	feature.setProperties({
+		'label': text.join('\n')
+	});
+
+	return styleOptLabel(feature);
+}
+
+// Apply a color and transparency to a polygon
+function stylePolygon(color, transparency, revert) {
+	if (color) {
+		const colors = color
+			.match(/([0-9a-f]{2})/ig)
+			.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16)),
+			rgba = 'rgba(' + [
+				...colors,
+				transparency || 1,
+			]
+			.join(',') + ')';
+
+		return {
+			fill: new ol.style.Fill({
+				color: rgba,
+			}),
+		};
+	}
+}
+
+// Apply a color and transparency to a polygon
+function styleOptPolygon(color, transparency) { //TODO resorb
+	// color = #rgb, transparency = 0 to 1
+	if (color)
+		return {
+			fill: new ol.style.Fill({
+				color: 'rgba(' + [
+					parseInt(color.substring(1, 3), 16),
+					parseInt(color.substring(3, 5), 16),
+					parseInt(color.substring(5, 7), 16),
+					transparency || 0.5,
+				].join(',') + ')',
+			}),
+		};
 }
