@@ -8,7 +8,6 @@
  * Site chemineur.fr, alpages.info
  */
 function layerGeoBB(options) {
-	//TODO pourquoi prc sans sélecteur & 2 layers chemineur ?
 	return layerVectorCluster({
 		strategy: ol.loadingstrategy.bbox,
 		...options,
@@ -18,41 +17,13 @@ function layerGeoBB(options) {
 				cat: selections[0], // The 1st (and only) selector
 				limit: 10000,
 				bbox: bbox.join(','),
-				...options.urlParams,
+				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams),
 			};
 		},
 		convertProperties: function(properties) {
-			if (properties.id)
-				return {
-					url: options.host + 'viewtopic.php?t=' + properties.id,
-				};
-		},
-		displayStyle: function(feature, properties) {
 			return {
-				image: properties.type ? new ol.style.Icon({
-					//TODO BUG general : send cookies to server, event non secure
-					src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
-				}) : null,
-				stroke: new ol.style.Stroke({ // Lines
-					color: 'blue',
-					width: 2,
-				}),
-				...(typeof options.displayStyle == 'function' ? options.displayStyle(...arguments) : options.displayStyle),
-			};
-		},
-		hoverStyle: function(feature, properties, layer) {
-			return {
-				...styleLabel(feature, agregateText([
-					properties.name,
-					properties.alt ? parseInt(properties.alt) + ' m' : '',
-					properties.type,
-					'&copy;' + layer.options.attribution,
-				])),
-				stroke: new ol.style.Stroke({ // Lines
-					color: 'red',
-					width: 3,
-				}),
-				//TODO ??? ...(typeof options.hoverStyle == 'function' ? options.hoverStyle(...arguments) : options.hoverStyle),
+				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
+				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties),
 			};
 		},
 	});
@@ -88,12 +59,12 @@ function layerChemineur(opt) {
 	};
 
 	return layerClusterGeoBB({
-		attribution: 'Chemineur',
 		...options,
 		convertProperties: function(properties) {
 			return {
 				url: options.host + 'viewtopic.php?t=' + properties.id, //TODO prendre layer.options.host
 				icon: chemIconUrl(properties.type),
+				attribution: '&copy;Chemineur',
 			};
 		},
 	});
@@ -116,11 +87,13 @@ function chemIconUrl(type) { //TODO resorb
 function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
-		attribution: 'Alpages',
 		...options,
 		urlParams: {
 			forums: '4,5',
 			cat: null,
+		},
+		convertProperties: {
+			attribution: '&copy;Alpages.info',
 		},
 		displayStyle: function(feature, properties) {
 			if (properties.type)
@@ -140,7 +113,6 @@ function layerWri(options) {
 	return layerVectorCluster({ //TODO cas de WRI sans cluster local ?
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
-		attribution: 'refuges.info',
 		...options,
 		urlParams: function(o, bbox, selections) {
 			return {
@@ -161,7 +133,7 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : 0,
 				bed: properties.places ? properties.places.valeur : 0,
 				type: properties.type ? properties.type.valeur : '',
-				attribution: '&copy;refuges.info',
+				attribution: '&copy;Refuges.info',
 				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
 			};
 		},
@@ -256,7 +228,6 @@ function layerWriAreas(options) {
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		attribution: 'Pyrenees-Refuges',
 		convertProperties: function(properties) {
 			return {
 				type: properties.type_hebergement,
@@ -264,6 +235,7 @@ function layerPrc(options) {
 				icon: chemIconUrl(properties.type_hebergement),
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
+				attribution: '&copy;Pyrenees-Refuges',
 			};
 		},
 		...options,
@@ -295,7 +267,7 @@ function layerC2C(options) {
 					icon: chemIconUrl(properties.waypoint_type),
 					ele: properties.elevation,
 					url: '//www.camptocamp.org/waypoints/' + properties.document_id,
-					attribution: 'campTOcamp',
+					attribution: '&copy;Camp2camp',
 				},
 			});
 		}
@@ -318,8 +290,6 @@ function layerC2C(options) {
 				bbox: extent.join(','),
 			};
 		},
-		styleOptFnc: styleOptIcon,
-		hoverStyle: styleOptFullLabel,
 	});
 }
 
@@ -394,7 +364,7 @@ function layerOverpass(opt) {
 						addTag(node, 'icon', chemIconUrl(tag.getAttribute('v')));
 						// Only once for a node
 						addTag(node, 'url', 'https://www.openstreetmap.org/node/' + node.id);
-						addTag(node, 'attribution', 'osm');
+						addTag(node, 'attribution', 'Osm');
 					}
 
 					if (tag.getAttribute('k') && tag.getAttribute('k').includes('capacity:'))

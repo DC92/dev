@@ -9,7 +9,7 @@
 function layerVector(opt) {
 	const options = {
 			host: '', // Url host
-			/* urlParams: { // Url parameters of the layer or function((layerOptions, bbox, selections, extent)
+			/* urlParams: function(layerOptions, bbox, selections, extent) {
 				path: '', // Url path of the layer
 				key: value, // key=values pairs to add to the url as parameters
 			}, */
@@ -147,6 +147,7 @@ function layerVector(opt) {
 	function displayStyle(feature, properties, layer) { // The style options
 		return {
 			image: properties.icon ? new ol.style.Icon({
+				//TODO BUG general : send cookies to server, event non secure		
 				src: properties.icon,
 			}) : null,
 			...(typeof opt.displayStyle == 'function' ? opt.displayStyle(...arguments) : opt.displayStyle),
