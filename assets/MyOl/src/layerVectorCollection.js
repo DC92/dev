@@ -250,6 +250,7 @@ function layerWriAreas(options) {
 /**
  * Site pyrenees-refuges.com
  */
+//TODO BUG http://chemineur.fr/ext/Dominique92/GeoBB/icones/refuge_garde.svg
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -462,12 +463,8 @@ function layerVectorCollection(options) {
 /**
  * Some usefull style functions
  */
-
-
 //TODO RESORB TODO RESORB TODO RESORB
-
 //TODO resorb styleOptFnc: function(feature, properties, options)
-
 
 // Build color and transparency
 function styleColor(color, transparency, revert) {

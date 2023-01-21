@@ -214,7 +214,7 @@ function controlLengthLine() {
 				fcs.push(...getFlatCoordinates(g));
 
 		return fcs;
-	};
+	}
 
 	//BEST calculate distance to the ends
 	function calculateLength(feature) {

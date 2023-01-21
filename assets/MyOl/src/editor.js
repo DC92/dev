@@ -91,13 +91,13 @@ function layerEditGeoJson(opt) {
 			return new ol.style.Style({
 				...options.styleOptionsFnc(feature),
 				...options.styleOptions,
-			})
+			});
 		},
 		editStyle = function(feature) {
 			return new ol.style.Style({
 				...options.styleOptionsFnc(feature),
 				...options.editStyleOptions,
-			})
+			});
 		},
 
 		features = options.readFeatures(),

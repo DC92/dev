@@ -1412,10 +1412,6 @@ function layerVectorCollection(options) {
  * Some usefull style functions
  */
 
-
-
-
-
 // Build color and transparency
 function styleColor(color, transparency, revert) {
 	const colors = color
@@ -1715,7 +1711,7 @@ function controlLengthLine() {
 				fcs.push(...getFlatCoordinates(g));
 
 		return fcs;
-	};
+	}
 
 	function calculateLength(feature) {
 		if (feature) {
@@ -2795,13 +2791,13 @@ function layerEditGeoJson(opt) {
 			return new ol.style.Style({
 				...options.styleOptionsFnc(feature),
 				...options.styleOptions,
-			})
+			});
 		},
 		editStyle = function(feature) {
 			return new ol.style.Style({
 				...options.styleOptionsFnc(feature),
 				...options.editStyleOptions,
-			})
+			});
 		},
 
 		features = options.readFeatures(),
