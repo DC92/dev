@@ -40,6 +40,7 @@ $alias = [
 	'port' => 'bateau',
 //	'ravitaillement' => 'ravitaillement',
 	'refuge' => 'cabane_red',
+	'refuge_garde' => 'cabane_red',
 	'restaurant' => 'cabane_white_blue_a9832.5',
 	'rond_point' => 'triangle_a8634.5.22',
 	'ruine' => 'triangle_grey_black_manqueunmur',

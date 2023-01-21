@@ -30,7 +30,7 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 10, // Above the base layer (zIndex = 1)
-			convertProperties: function(properties) {}, // Convert some server properties to the one used by this package
+			convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			altLayer: null, // Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 			displayStyle: displayStyle,
@@ -98,7 +98,7 @@ function layerVector(opt) {
 			if (typeof options.convertProperties == 'function')
 				jsonFeature.properties = {
 					...jsonFeature.properties,
-					...options.convertProperties(jsonFeature.properties),
+					...options.convertProperties(jsonFeature.properties, options),
 				};
 			else if (options.convertProperties)
 				jsonFeature.properties = {
@@ -128,9 +128,7 @@ function layerVector(opt) {
 			)
 			.map(c => c.toFixed(4)), // Round to 4 digits
 			selections = selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
-			urlParams = typeof options.urlParams == 'function' ?
-			options.urlParams(options, bbox, selections, extent) : //TODO resorb options
-			options.urlParams,
+			urlParams = typeof options.urlParams == 'function' ? options.urlParams(options, bbox, selections, extent) : options.urlParams,
 			query = [];
 
 		// Don't send bbox parameter if no extent is available
@@ -159,10 +157,10 @@ function layerVector(opt) {
 			...styleLabel(feature, agregateText([
 				properties.name,
 				agregateText([
-					properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : '',
-					properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : '',
+					properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+					properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
 				], ', '),
-				properties.type ? properties.type : '',
+				properties.type,
 				properties.attribution,
 			])),
 			zIndex: 20, // Above the main labels
@@ -333,10 +331,10 @@ function addMapListener(map) {
 			}
 
 			// Click on a feature
-			if (evt.type == 'click' && !hoveredLayer.options.noClick && hoveredFeature) {
+			if (evt.type == 'click' && hoveredFeature && !hoveredLayer.options.noClick) {
 				const hoveredProperties = hoveredFeature.getProperties();
 
-				if (hoveredProperties.url) {
+				if (hoveredProperties && hoveredProperties.url) {
 					// Open a new tag
 					if (evt.originalEvent.ctrlKey)
 						window.open(hoveredProperties.url, '_blank').focus();
@@ -430,7 +428,7 @@ function selectVectorLayer(name, callBack) {
 function styleLabel(feature, text, styleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		//BEST on peut aussi détecter la présence d'une icone
+		//TODO label follow the cursor when line or surface
 		styleTextOptions = {
 			textBaseline: area ? 'middle' : 'bottom',
 			offsetY: area ? 0 : -14, // Above the icon

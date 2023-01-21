@@ -541,7 +541,7 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 10, // Above the base layer (zIndex = 1)
-			convertProperties: function(properties) {}, // Convert some server properties to the one used by this package
+			convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			altLayer: null, // Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 			displayStyle: displayStyle,
@@ -607,7 +607,7 @@ function layerVector(opt) {
 			if (typeof options.convertProperties == 'function')
 				jsonFeature.properties = {
 					...jsonFeature.properties,
-					...options.convertProperties(jsonFeature.properties),
+					...options.convertProperties(jsonFeature.properties, options),
 				};
 			else if (options.convertProperties)
 				jsonFeature.properties = {
@@ -637,9 +637,7 @@ function layerVector(opt) {
 			)
 			.map(c => c.toFixed(4)), // Round to 4 digits
 			selections = selectNames.map(name => selectVectorLayer(name).join(',')), // Array of string: selected values separated with ,
-			urlParams = typeof options.urlParams == 'function' ?
-			options.urlParams(options, bbox, selections, extent) :
-			options.urlParams,
+			urlParams = typeof options.urlParams == 'function' ? options.urlParams(options, bbox, selections, extent) : options.urlParams,
 			query = [];
 
 		// Don't send bbox parameter if no extent is available
@@ -667,10 +665,10 @@ function layerVector(opt) {
 			...styleLabel(feature, agregateText([
 				properties.name,
 				agregateText([
-					properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : '',
-					properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : '',
+					properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+					properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
 				], ', '),
-				properties.type ? properties.type : '',
+				properties.type,
 				properties.attribution,
 			])),
 			zIndex: 20, // Above the main labels
@@ -841,10 +839,10 @@ function addMapListener(map) {
 			}
 
 			// Click on a feature
-			if (evt.type == 'click' && !hoveredLayer.options.noClick && hoveredFeature) {
+			if (evt.type == 'click' && hoveredFeature && !hoveredLayer.options.noClick) {
 				const hoveredProperties = hoveredFeature.getProperties();
 
-				if (hoveredProperties.url) {
+				if (hoveredProperties && hoveredProperties.url) {
 					// Open a new tag
 					if (evt.originalEvent.ctrlKey)
 						window.open(hoveredProperties.url, '_blank').focus();
@@ -972,7 +970,6 @@ function agregateText(lines, glue) {
 		.join(glue || '\n');
 }
 
-
 /**
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
@@ -1049,7 +1046,7 @@ function chemIconUrl(type) {
 	if (type) {
 		const icons = type.split(' ');
 
-		return '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+		return 'https://chemineur.fr/ext/Dominique92/GeoBB/icones/' +
 			icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
 			'.svg';
 	}
@@ -1073,7 +1070,7 @@ function layerAlpages(options) {
 			if (properties.type)
 				return {
 					image: new ol.style.Icon({
-						src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+						src: chemIconUrl(properties.type),
 					}),
 				};
 		}
@@ -1098,15 +1095,14 @@ function layerWri(options) {
 				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
 			};
 		},
-		convertProperties: function(properties) {
+		convertProperties: function(properties, opt) {
 			return {
 				name: properties.nom,
 				url: properties.lien,
-				icon: '//www.refuges.info/' +
-					'images/icones/' + properties.type.icone + '.svg',
+				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord ? properties.coord.alt : 0,
 				bed: properties.places ? properties.places.valeur : 0,
-				type: properties.type ? properties.type.valeur : '',
+				type: properties.type ? properties.type.valeur : null,
 				attribution: '&copy;Refuges.info',
 				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
 			};
@@ -1135,8 +1131,6 @@ function layerClusterWri(opt) {
 }
 
 function layerWriAreas(options) {
-	const elLabel = document.createElement('span');
-
 	return layerVector({
 		host: '//www.refuges.info/',
 		urlParams: {
@@ -1151,17 +1145,11 @@ function layerWriAreas(options) {
 			};
 		},
 		displayStyle: function(feature, properties) {
-			elLabel.innerHTML = properties.nom;
 			return {
-				text: new ol.style.Text({
-					text: elLabel.innerHTML,
+				...styleLabel(feature, properties.nom, {
 					padding: [1, -1, -1, 1],
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'white',
-					}),
+					backgroundStroke: null,
+					font: null,
 				}),
 				fill: new ol.style.Fill({
 					color: styleColor(properties.couleur, 0.3),
@@ -1169,26 +1157,18 @@ function layerWriAreas(options) {
 			};
 		},
 		hoverStyle: function(feature, properties) {
-			elLabel.innerHTML = properties.nom;
 			return {
-				text: new ol.style.Text({
-					text: elLabel.innerHTML,
+				...styleLabel(feature, properties.nom, {
 					padding: [0, 0, -1, 1],
 					font: '14px sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'white',
-					}),
-					overflow: true,
+					overflow: true, // Force display even if no place
 				}),
 				fill: new ol.style.Fill({
-					color: styleColor(properties.couleur, 0.2, true),
+					color: 'rgba(0,0,0,0)', // Transparent
 				}),
 				stroke: new ol.style.Stroke({
 					color: properties.couleur,
-					width: 3,
+					width: 2,
 				}),
 			};
 		},
@@ -1457,42 +1437,6 @@ function styleOptFullLabel(feature) {
 	});
 
 	return styleOptLabel(feature);
-}
-
-// Apply a color and transparency to a polygon
-function stylePolygon(color, transparency, revert) {
-	if (color) {
-		const colors = color
-			.match(/([0-9a-f]{2})/ig)
-			.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16)),
-			rgba = 'rgba(' + [
-				...colors,
-				transparency || 1,
-			]
-			.join(',') + ')';
-
-		return {
-			fill: new ol.style.Fill({
-				color: rgba,
-			}),
-		};
-	}
-}
-
-// Apply a color and transparency to a polygon
-function styleOptPolygon(color, transparency) {
-	// color = #rgb, transparency = 0 to 1
-	if (color)
-		return {
-			fill: new ol.style.Fill({
-				color: 'rgba(' + [
-					parseInt(color.substring(1, 3), 16),
-					parseInt(color.substring(3, 5), 16),
-					parseInt(color.substring(5, 7), 16),
-					transparency || 0.5,
-				].join(',') + ')',
-			}),
-		};
 }
 
 /**

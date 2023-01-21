@@ -62,7 +62,7 @@ function layerChemineur(opt) {
 		...options,
 		convertProperties: function(properties) {
 			return {
-				url: options.host + 'viewtopic.php?t=' + properties.id, //TODO prendre layer.options.host
+				url: options.host + 'viewtopic.php?t=' + properties.id,
 				icon: chemIconUrl(properties.type),
 				attribution: '&copy;Chemineur',
 			};
@@ -71,11 +71,11 @@ function layerChemineur(opt) {
 }
 
 // Get icon from chemineur.fr if we only have a type
-function chemIconUrl(type) { //TODO resorb
+function chemIconUrl(type) {
 	if (type) {
 		const icons = type.split(' ');
 
-		return '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+		return 'https://chemineur.fr/ext/Dominique92/GeoBB/icones/' +
 			icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
 			'.svg';
 	}
@@ -99,7 +99,7 @@ function layerAlpages(options) {
 			if (properties.type)
 				return {
 					image: new ol.style.Icon({
-						src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.type + '.svg',
+						src: chemIconUrl(properties.type),
 					}),
 				};
 		}
@@ -110,7 +110,7 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVectorCluster({ //TODO cas de WRI sans cluster local ?
+	return layerVectorCluster({ //BEST cas de WRI sans cluster local ?
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,
@@ -124,15 +124,14 @@ function layerWri(options) {
 				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
 			};
 		},
-		convertProperties: function(properties) {
+		convertProperties: function(properties, opt) {
 			return {
 				name: properties.nom,
 				url: properties.lien,
-				icon: '//www.refuges.info/' + //TODO calculer
-					'images/icones/' + properties.type.icone + '.svg',
+				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
 				ele: properties.coord ? properties.coord.alt : 0,
 				bed: properties.places ? properties.places.valeur : 0,
-				type: properties.type ? properties.type.valeur : '',
+				type: properties.type ? properties.type.valeur : null,
 				attribution: '&copy;Refuges.info',
 				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
 			};
@@ -161,8 +160,6 @@ function layerClusterWri(opt) {
 }
 
 function layerWriAreas(options) {
-	const elLabel = document.createElement('span'); //HACK to render the html entities in the canvas
-
 	return layerVector({
 		host: '//www.refuges.info/',
 		urlParams: {
@@ -177,17 +174,11 @@ function layerWriAreas(options) {
 			};
 		},
 		displayStyle: function(feature, properties) {
-			elLabel.innerHTML = properties.nom;
 			return {
-				text: new ol.style.Text({
-					text: elLabel.innerHTML,
+				...styleLabel(feature, properties.nom, {
 					padding: [1, -1, -1, 1],
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'white',
-					}),
+					backgroundStroke: null,
+					font: null,
 				}),
 				fill: new ol.style.Fill({
 					color: styleColor(properties.couleur, 0.3),
@@ -195,26 +186,18 @@ function layerWriAreas(options) {
 			};
 		},
 		hoverStyle: function(feature, properties) {
-			elLabel.innerHTML = properties.nom;
 			return {
-				text: new ol.style.Text({
-					text: elLabel.innerHTML,
+				...styleLabel(feature, properties.nom, {
 					padding: [0, 0, -1, 1],
 					font: '14px sans-serif',
-					fill: new ol.style.Fill({
-						color: 'black',
-					}),
-					backgroundFill: new ol.style.Fill({
-						color: 'white',
-					}),
-					overflow: true,
+					overflow: true, // Force display even if no place
 				}),
 				fill: new ol.style.Fill({
-					color: styleColor(properties.couleur, 0.2, true),
+					color: 'rgba(0,0,0,0)', // Transparent
 				}),
 				stroke: new ol.style.Stroke({
 					color: properties.couleur,
-					width: 3,
+					width: 2,
 				}),
 			};
 		},
@@ -224,7 +207,6 @@ function layerWriAreas(options) {
 /**
  * Site pyrenees-refuges.com
  */
-//TODO BUG http://chemineur.fr/ext/Dominique92/GeoBB/icones/refuge_garde.svg
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -487,40 +469,4 @@ function styleOptFullLabel(feature) { //TODO resorb
 	});
 
 	return styleOptLabel(feature);
-}
-
-// Apply a color and transparency to a polygon
-function stylePolygon(color, transparency, revert) {
-	if (color) {
-		const colors = color
-			.match(/([0-9a-f]{2})/ig)
-			.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16)),
-			rgba = 'rgba(' + [
-				...colors,
-				transparency || 1,
-			]
-			.join(',') + ')';
-
-		return {
-			fill: new ol.style.Fill({
-				color: rgba,
-			}),
-		};
-	}
-}
-
-// Apply a color and transparency to a polygon
-function styleOptPolygon(color, transparency) { //TODO resorb
-	// color = #rgb, transparency = 0 to 1
-	if (color)
-		return {
-			fill: new ol.style.Fill({
-				color: 'rgba(' + [
-					parseInt(color.substring(1, 3), 16),
-					parseInt(color.substring(3, 5), 16),
-					parseInt(color.substring(5, 7), 16),
-					transparency || 0.5,
-				].join(',') + ')',
-			}),
-		};
 }
