@@ -541,7 +541,7 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 10, // Above the base layer (zIndex = 1)
-			convertProperties: function(properties, feature, options) {}, // Convert some server properties to the one used by this package
+			convertProperties: function(properties) {}, // Convert some server properties to the one used by this package
 			altLayer: null, // Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 			displayStyle: displayStyle,
@@ -598,26 +598,31 @@ function layerVector(opt) {
 		const json = JSONparse(doc);
 
 		// For all features
-		json.features.map(feature => {
+		json.features.map(jsonFeature => {
 			// Generate a pseudo id if none
-			if (!feature.id)
-				feature.id = JSON.stringify(feature.properties).replace(/\D/g, '') % 987654;
+			if (!jsonFeature.id)
+				jsonFeature.id = JSON.stringify(jsonFeature.properties).replace(/\D/g, '') % 987654;
 
 			// Callback function to convert some server properties to the one displayed by this package
 			if (typeof options.convertProperties == 'function')
-				feature.properties = {
-					...feature.properties,
-					...options.convertProperties(feature.properties, options),
+				jsonFeature.properties = {
+					...jsonFeature.properties,
+					...options.convertProperties(jsonFeature.properties),
+				};
+			else if (options.convertProperties)
+				jsonFeature.properties = {
+					...jsonFeature.properties,
+					...options.convertProperties,
 				};
 
 			// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
-			if (feature.geometry && feature.geometry.type == 'Point ') {
-				const rnd = (feature.id / 3.14).toString().split('.');
+			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point ') {
+				const rnd = (jsonFeature.id / 3.14).toString().split('.');
 
-				feature.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
-				feature.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
+				jsonFeature.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
+				jsonFeature.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
 			}
-			return feature;
+			return jsonFeature;
 		});
 
 		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
@@ -819,14 +824,16 @@ function addMapListener(map) {
 					map.lastHoveredFeature.setStyle(null);
 
 				if (hoveredFeature) {
+					const hoveredProperties = hoveredFeature.getProperties();
+
 					hoveredFeature.setStyle([
 						new ol.style.Style({
-							...hoveredLayer.options.displayStyle(hoveredFeature, hoveredFeature.getProperties(), hoveredLayer),
+							...hoveredLayer.options.displayStyle(hoveredFeature, hoveredProperties, hoveredLayer),
 							// The hovering style can overload some styles options
-							...hoveredLayer.options.hoverStyle(hoveredFeature, hoveredFeature.getProperties(), hoveredLayer),
+							...hoveredLayer.options.hoverStyle(hoveredFeature, hoveredProperties, hoveredLayer),
 						}),
 						new ol.style.Style( // Need a separate style because of text option on the both
-							hoveredLayer.options.clusterStyle(hoveredFeature.getProperties()),
+							hoveredLayer.options.clusterStyle(hoveredProperties)
 						),
 					]);
 				}
@@ -834,8 +841,9 @@ function addMapListener(map) {
 			}
 
 			// Click on a feature
-			if (evt.type == 'click' && !hoveredLayer.options.noClick) {
+			if (evt.type == 'click' && !hoveredLayer.options.noClick && hoveredFeature) {
 				const hoveredProperties = hoveredFeature.getProperties();
+
 				if (hoveredProperties.url) {
 					// Open a new tag
 					if (evt.originalEvent.ctrlKey)
@@ -1123,7 +1131,7 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : 0,
 				bed: properties.places ? properties.places.valeur : 0,
 				type: properties.type ? properties.type.valeur : '',
-				attribution : '&copy;refuges.info',
+				attribution: '&copy;refuges.info',
 				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
 			};
 		},

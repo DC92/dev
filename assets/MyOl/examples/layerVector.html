@@ -172,6 +172,10 @@ new ol.Map({
 		// WRI layer as in refuges.info
 		.concat(layerClusterWri({
 			selectName: 'select-refuges',
+			displayStyle: function(feature, properties) {
+				if (properties.name)
+					return styleLabel(feature, properties.name);
+			},
 			convertProperties: {
 				attribution: null,
 			},

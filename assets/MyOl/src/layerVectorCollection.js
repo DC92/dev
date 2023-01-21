@@ -161,7 +161,7 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : 0,
 				bed: properties.places ? properties.places.valeur : 0,
 				type: properties.type ? properties.type.valeur : '',
-				attribution : '&copy;refuges.info',
+				attribution: '&copy;refuges.info',
 				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
 			};
 		},
