@@ -174,6 +174,11 @@ function layerWriAreas(options) {
 			};
 		},
 		displayStyle: function(feature, properties) {
+			// Build color and transparency
+			const colors = properties.couleur
+				.match(/([0-9a-f]{2})/ig)
+				.map(c => parseInt(c, 16));
+
 			return {
 				...styleLabel(feature, properties.nom, {
 					padding: [1, -1, -1, 1],
@@ -181,14 +186,14 @@ function layerWriAreas(options) {
 					font: null,
 				}),
 				fill: new ol.style.Fill({
-					color: styleColor(properties.couleur, 0.3),
+					color: 'rgba(' + colors.join(',') + ',0.3)'
 				}),
 			};
 		},
 		hoverStyle: function(feature, properties) {
 			return {
 				...styleLabel(feature, properties.nom, {
-					padding: [0, 0, -1, 1],
+					padding: [1, 0, -1, 2],
 					font: '14px sans-serif',
 					overflow: true, // Force display even if no place
 				}),
@@ -287,14 +292,12 @@ function layerOverpass(opt) {
 			//host: 'https://overpass.openstreetmap.fr', // Out of order
 			//host: 'https://overpass.nchc.org.tw',
 			host: 'https://overpass.kumi.systems',
-			strategy: ol.loadingstrategy.bbox,
 			maxResolution: 50,
 			...opt,
-			styleOptFnc: styleOptIcon,
-			hoverStyle: styleOptFullLabel,
 		},
 		format = new ol.format.OSMXML(),
 		layer = layerVectorCluster({
+			strategy: ol.loadingstrategy.bbox,
 			urlParams: urlParams,
 			format: format,
 			...options,
@@ -346,7 +349,7 @@ function layerOverpass(opt) {
 						addTag(node, 'icon', chemIconUrl(tag.getAttribute('v')));
 						// Only once for a node
 						addTag(node, 'url', 'https://www.openstreetmap.org/node/' + node.id);
-						addTag(node, 'attribution', 'Osm');
+						addTag(node, 'attribution', '&copy;OpenStreetMap');
 					}
 
 					if (tag.getAttribute('k') && tag.getAttribute('k').includes('capacity:'))
@@ -412,61 +415,4 @@ function layerVectorCollection(options) {
 		layerChemineur(options.chemineur),
 		layerAlpages(options.alpages),
 	];
-}
-
-/**
- * Some usefull style functions
- */
-//TODO RESORB TODO RESORB TODO RESORB
-//TODO resorb styleOptFnc: function(feature, properties, options)
-
-// Build color and transparency
-function styleColor(color, transparency, revert) {
-	const colors = color
-		.match(/([0-9a-f]{2})/ig)
-		.map(c => revert ? 255 - parseInt(c, 16) : parseInt(c, 16));
-
-	return 'rgba(' + [
-		...colors,
-		transparency || 1,
-	].join(',') + ')';
-}
-
-// Get icon from an URL
-function styleOptIcon(feature) { //TODO resorb
-	const properties = feature.getProperties();
-
-	if (properties && properties.icon)
-		return {
-			image: new ol.style.Icon({
-				src: properties.icon,
-			}),
-		};
-}
-
-// Display a label with some data about the feature
-function styleOptFullLabel(feature) { //TODO resorb
-	//BEST move on convertProperties
-	const properties = feature.getProperties();
-	let text = [];
-
-	// Cluster
-	if (properties.features || properties.cluster) {
-		let includeCluster = !!properties.cluster;
-
-		for (let f in properties.features) {
-			const name = properties.features[f].getProperties().name;
-			if (name)
-				text.push(name);
-			if (properties.features[f].getProperties().cluster)
-				includeCluster = true;
-		}
-		if (text.length == 0 || text.length > 6 || includeCluster)
-			text = ['Cliquer pour zoomer'];
-	}
-	feature.setProperties({
-		'label': text.join('\n')
-	});
-
-	return styleOptLabel(feature);
 }
