@@ -546,6 +546,7 @@ function layerVector(opt) {
 			...opt,
 			displayStyle: displayStyle,
 			hoverStyle: hoverStyle,
+			clusterStyle: clusterStyle,
 		},
 		selectNames = options.selectName.split(','),
 		statusEl = document.getElementById(selectNames[0] + '-status'), // XHR download tracking
@@ -557,9 +558,10 @@ function layerVector(opt) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			style: feature => new ol.style.Style(
-				options.displayStyle(feature, feature.getProperties(), layer)
-			),
+			style: feature => new ol.style.Style({
+				...options.displayStyle(feature, feature.getProperties(), layer),
+				...options.clusterStyle(feature.getProperties()),
+			}),
 			...options,
 		});
 
@@ -647,21 +649,7 @@ function layerVector(opt) {
 	}
 
 	function displayStyle(feature, properties, layer) { // The style options
-		return properties.cluster ? {
-			image: new ol.style.Circle({
-				radius: 14,
-				stroke: new ol.style.Stroke({
-					color: 'blue',
-				}),
-				fill: new ol.style.Fill({
-					color: 'white',
-				}),
-			}),
-			text: new ol.style.Text({
-				text: properties.cluster.toString(),
-				font: '14px Calibri,sans-serif',
-			}),
-		} : {
+		return {
 			image: properties.icon ? new ol.style.Icon({
 				src: properties.icon,
 			}) : null,
@@ -670,7 +658,7 @@ function layerVector(opt) {
 	}
 
 	function hoverStyle(feature, properties, layer) { // The hovering style options
-		return properties.cluster ? styleLabel(feature, properties.name) : {
+		return {
 			...styleLabel(feature, agregateText([
 				properties.name,
 				agregateText([
@@ -678,10 +666,30 @@ function layerVector(opt) {
 					properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : '',
 				], ', '),
 				properties.type ? properties.type : '',
-				opt.attribution ? '&copy;' + opt.attribution : '',
+				properties.attribution,
 			])),
+			zIndex: 20, // Above the main labels
 			...(typeof opt.hoverStyle == 'function' ? opt.hoverStyle(...arguments) : opt.hoverStyle),
 		};
+	}
+
+	function clusterStyle(properties) { // The clusters options
+		if (properties.cluster)
+			return {
+				image: new ol.style.Circle({
+					radius: 14,
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+					fill: new ol.style.Fill({
+						color: 'white',
+					}),
+				}),
+				text: new ol.style.Text({
+					text: properties.cluster.toString(),
+					font: '14px Calibri,sans-serif',
+				}),
+			};
 	}
 
 	return layer;
@@ -802,19 +810,24 @@ function addMapListener(map) {
 				}
 			);
 
+			// Setup the curseur
 			map.getViewport().style.cursor = hoveredFeature && !hoveredLayer.options.noClick ? 'pointer' : '';
 
+			// Change this feature only style (As the main style is a layer only style)
 			if (map.lastHoveredFeature != hoveredFeature) {
 				if (map.lastHoveredFeature)
 					map.lastHoveredFeature.setStyle(null);
 
 				if (hoveredFeature) {
 					hoveredFeature.setStyle([
-						hoveredLayer.getStyleFunction()(hoveredFeature),
 						new ol.style.Style({
+							...hoveredLayer.options.displayStyle(hoveredFeature, hoveredFeature.getProperties(), hoveredLayer),
+							// The hovering style can overload some styles options
 							...hoveredLayer.options.hoverStyle(hoveredFeature, hoveredFeature.getProperties(), hoveredLayer),
-							zIndex: 20,
 						}),
+						new ol.style.Style( // Need a separate style because of text option on the both
+							hoveredLayer.options.clusterStyle(hoveredFeature.getProperties()),
+						),
 					]);
 				}
 				map.lastHoveredFeature = hoveredFeature;
@@ -1110,6 +1123,8 @@ function layerWri(options) {
 				ele: properties.coord ? properties.coord.alt : 0,
 				bed: properties.places ? properties.places.valeur : 0,
 				type: properties.type ? properties.type.valeur : '',
+				attribution : '&copy;refuges.info',
+				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
 			};
 		},
 	});
