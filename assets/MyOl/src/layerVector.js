@@ -182,7 +182,7 @@ function layerVector(opt) {
 				}),
 				text: new ol.style.Text({
 					text: properties.cluster.toString(),
-					font: '14px Calibri,sans-serif',
+					font: '12px Verdana',
 				}),
 			};
 	}
@@ -304,6 +304,7 @@ function addMapListener(map) {
 					hitTolerance: 6, // Default 0
 				}
 			);
+			//TODO effacer label quand on quitte la carte
 
 			// Setup the curseur
 			map.getViewport().style.cursor = hoveredFeature && !hoveredLayer.options.noClick ? 'pointer' : '';
@@ -428,12 +429,11 @@ function selectVectorLayer(name, callBack) {
 function styleLabel(feature, text, styleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		//TODO label follow the cursor when line or surface
 		styleTextOptions = {
 			textBaseline: area ? 'middle' : 'bottom',
 			offsetY: area ? 0 : -14, // Above the icon
 			padding: [1, 1, 0, 3],
-			font: '14px Calibri,sans-serif',
+			font: '12px Verdana',
 			fill: new ol.style.Fill({
 				color: 'black',
 			}),

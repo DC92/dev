@@ -480,7 +480,7 @@ function styleOptArrow(feature, opt) { //TODO integrate to the editor
 	if (beforeLastIndex >= 0) // At least 2 points
 		return {
 			text: new ol.style.Text({
-				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>',
+				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>', //TODO rotateWithView ???
 				placement: 'line',
 				textAlign: 'start',
 				scale: 2,

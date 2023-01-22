@@ -52,20 +52,48 @@ function layerClusterGeoBB(opt) {
 /**
  * Site chemineur.fr
  */
-function layerChemineur(opt) {
-	const options = {
-		host: '//chemineur.fr/',
-		...opt,
-	};
-
+function layerChemineur(options) {
 	return layerClusterGeoBB({
+		host: '//chemineur.fr/',
 		...options,
-		convertProperties: function(properties) {
+		convertProperties: function(properties, opt) {
 			return {
-				url: options.host + 'viewtopic.php?t=' + properties.id,
+				url: opt.host + 'viewtopic.php?t=' + properties.id,
 				icon: chemIconUrl(properties.type),
 				attribution: '&copy;Chemineur',
+				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties),
 			};
+		},
+		displayStyle: function(feature, properties) {
+			return {
+				stroke: new ol.style.Stroke({ // Lines
+					color: 'blue',
+					width: 2,
+				}),
+			};
+		},
+		hoverStyle: function(feature, properties) { // Lines
+			const elLabel = document.createElement('span');
+
+			elLabel.innerHTML = properties.name;
+			if (ol.extent.getArea(feature.getGeometry().getExtent()))
+				return {
+					text: new ol.style.Text({
+						text: elLabel.innerHTML,
+						placement: 'line',
+						textBaseline: 'middle',
+						overflow: true,
+						offsetY: -8,
+						font: '12px Verdana',
+						fill: new ol.style.Fill({
+							color: 'blue',
+						}),
+						stroke: new ol.style.Stroke({
+							color: 'white',
+							width: 5,
+						}),
+					}),
+				};
 		},
 	});
 }
@@ -92,17 +120,12 @@ function layerAlpages(options) {
 			forums: '4,5',
 			cat: null,
 		},
-		convertProperties: {
-			attribution: '&copy;Alpages.info',
+		convertProperties: function(properties) {
+			return {
+				icon: chemIconUrl(properties.type),
+				attribution: '&copy;Alpages.info',
+			};
 		},
-		displayStyle: function(feature, properties) {
-			if (properties.type)
-				return {
-					image: new ol.style.Icon({
-						src: chemIconUrl(properties.type),
-					}),
-				};
-		}
 	});
 }
 
@@ -194,7 +217,7 @@ function layerWriAreas(options) {
 			return {
 				...styleLabel(feature, properties.nom, {
 					padding: [1, 0, -1, 2],
-					font: '14px sans-serif',
+					font: '12px Verdana',
 					overflow: true, // Force display even if no place
 				}),
 				fill: new ol.style.Fill({

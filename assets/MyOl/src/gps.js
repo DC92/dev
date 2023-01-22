@@ -43,7 +43,7 @@ function controlGPS(options) {
 		}),
 
 		// Graticule
-		graticuleFeature = new ol.Feature(),
+		graticuleFeature = new ol.Feature(), //TODO Use ol.layer.Graticule
 		northGraticuleFeature = new ol.Feature(),
 		graticuleLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
