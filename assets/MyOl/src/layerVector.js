@@ -29,7 +29,7 @@ function layerVector(opt) {
 			},
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
-			zIndex: 10, // Above the base layer (zIndex = 1)
+			zIndex: 10, // Above the background layers
 			convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			altLayer: null, // Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
@@ -145,7 +145,7 @@ function layerVector(opt) {
 	function displayStyle(feature, properties, layer) { // The style options
 		return {
 			image: properties.icon ? new ol.style.Icon({
-				//TODO BUG general : send cookies to server, event non secure		
+				//TODO BUG general : send cookies to the server, event non secure		
 				src: properties.icon,
 			}) : null,
 			...(typeof opt.displayStyle == 'function' ? opt.displayStyle(...arguments) : opt.displayStyle),
@@ -163,7 +163,6 @@ function layerVector(opt) {
 				properties.type,
 				properties.attribution,
 			])),
-			zIndex: 20, // Above the main labels
 			...(typeof opt.hoverStyle == 'function' ? opt.hoverStyle(...arguments) : opt.hoverStyle),
 		};
 	}
@@ -184,6 +183,7 @@ function layerVector(opt) {
 					text: properties.cluster.toString(),
 					font: '12px Verdana',
 				}),
+				zIndex: 10, // Above the background layers
 			};
 	}
 
@@ -296,27 +296,34 @@ function addMapListener(map) {
 			// Detect hovered fature
 			let hoveredLayer = null;
 			const hoveredFeature = map.forEachFeatureAtPixel(
-				map.getEventPixel(evt.originalEvent),
-				function(f, l) {
-					hoveredLayer = l;
-					return f;
-				}, {
-					hitTolerance: 6, // Default 0
-				}
-			);
-			//TODO effacer label quand on quitte la carte
+					map.getEventPixel(evt.originalEvent),
+					function(feature, layer) {
+						if (layer.options) {
+							hoveredLayer = layer;
+							return feature;
+						}
+					}, {
+						hitTolerance: 6, // Default 0
+					}
+				),
+				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {};
+
 
 			// Setup the curseur
-			map.getViewport().style.cursor = hoveredFeature && !hoveredLayer.options.noClick ? 'pointer' : '';
+			map.getViewport().style.cursor = hoveredFeature &&
+				(hoveredProperties.url || hoveredProperties.cluster) &&
+				!hoveredLayer.options.noClick ?
+				'pointer' :
+				'';
 
 			// Change this feature only style (As the main style is a layer only style)
 			if (map.lastHoveredFeature != hoveredFeature) {
 				if (map.lastHoveredFeature)
 					map.lastHoveredFeature.setStyle(null);
 
-				if (hoveredFeature) {
-					const hoveredProperties = hoveredFeature.getProperties();
+				map.lastHoveredFeature = hoveredFeature;
 
+				if (hoveredFeature) {
 					hoveredFeature.setStyle([
 						new ol.style.Style({
 							...hoveredLayer.options.displayStyle(hoveredFeature, hoveredProperties, hoveredLayer),
@@ -328,7 +335,6 @@ function addMapListener(map) {
 						),
 					]);
 				}
-				map.lastHoveredFeature = hoveredFeature;
 			}
 
 			// Click on a feature
@@ -354,6 +360,19 @@ function addMapListener(map) {
 						center: hoveredProperties.geometry.getCoordinates(),
 					});
 			}
+		});
+
+		// Leaving the map reset hovering
+		window.addEventListener('mousemove', evt => {
+			const divRect = map.getTargetElement().getBoundingClientRect();
+
+			// The mouse is outside of the map
+			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+				if (map.lastHoveredFeature) {
+					map.lastHoveredFeature.setStyle(null);
+					map.lastHoveredFeature = null;
+				}
 		});
 	}
 }
@@ -428,11 +447,17 @@ function selectVectorLayer(name, callBack) {
 // Display a label (Used by cluster)
 function styleLabel(feature, text, styleOptions) {
 	const elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		styleTextOptions = {
+		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
+
+	//HACK to render the html entities in the canvas
+	elLabel.innerHTML = text;
+
+	return {
+		text: new ol.style.Text({
+			text: elLabel.innerHTML,
 			textBaseline: area ? 'middle' : 'bottom',
 			offsetY: area ? 0 : -14, // Above the icon
-			padding: [1, 1, 0, 3],
+			padding: [1, 1, -1, 3],
 			font: '12px Verdana',
 			fill: new ol.style.Fill({
 				color: 'black',
@@ -444,14 +469,8 @@ function styleLabel(feature, text, styleOptions) {
 				color: 'blue',
 			}),
 			...styleOptions,
-		};
-
-	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text;
-	styleTextOptions.text = elLabel.innerHTML;
-
-	return {
-		text: new ol.style.Text(styleTextOptions),
+		}),
+		zIndex: 20, // Above features
 	};
 }
 

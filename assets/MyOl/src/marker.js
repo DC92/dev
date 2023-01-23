@@ -124,6 +124,7 @@ function layerMarker(opt) {
 
 	// Display values
 	function changeLL(pos, projection, focus) {
+		//BEST change the cursor
 		// If no position is given, use the marker's
 		if (!pos || pos.length < 2) {
 			pos = point.getCoordinates();
