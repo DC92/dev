@@ -445,7 +445,7 @@ function selectVectorLayer(name, callBack) {
  * Some usefull style functions
  */
 // Display a label (Used by cluster)
-function styleLabel(feature, text, styleOptions) {
+function styleLabel(feature, text, textStyleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -468,7 +468,7 @@ function styleLabel(feature, text, styleOptions) {
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
 			}),
-			...styleOptions,
+			...textStyleOptions,
 		}),
 		zIndex: 20, // Above features
 	};

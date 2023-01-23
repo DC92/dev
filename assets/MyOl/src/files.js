@@ -69,20 +69,17 @@ function controlLoadGPX(opt) {
 				gpxLayer = new ol.layer.Vector({
 					source: gpxSource,
 					style: function(feature) {
-						const properties = feature.getProperties(),
-							styleOptions = {
-								stroke: new ol.style.Stroke({
-									color: 'blue',
-									width: 3,
-								}),
-							};
+						const properties = feature.getProperties();
 
-						if (properties.sym)
-							styleOptions.image = new ol.style.Icon({
+						return new ol.style.Style({
+							stroke: new ol.style.Stroke({
+								color: 'blue',
+								width: 3,
+							}),
+							image: properties.sym ? new ol.style.Icon({
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.svg',
-							});
-
-						return new ol.style.Style(styleOptions);
+							}) : null,
+						});
 					},
 				});
 			map.addLayer(gpxLayer);

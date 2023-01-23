@@ -27,42 +27,8 @@ function layerEditGeoJson(opt) {
 						})
 					.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 			},
-			// Drag lines or Polygons
-			styleOptionsFnc: function() {},
-			styleOptions: {
-				// Lines or polygons border
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 2,
-				}),
-				// Polygons
-				fill: new ol.style.Fill({
-					color: 'rgba(0,0,255,0.2)',
-				}),
-			},
-			// Hover / modify / create
-			editStyleOptions: {
-				// Edit position marker
-				image: new ol.style.Circle({
-					radius: 4,
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 2,
-					}),
-				}),
-				// Lines or polygons border
-				stroke: new ol.style.Stroke({
-					color: 'red',
-					width: 4,
-				}),
-				// Polygons
-				fill: new ol.style.Fill({
-					color: 'rgba(255,0,0,0.3)',
-				}),
-			},
 			...opt
 		},
-
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 		control = controlButton({
 			className: 'myol-button-edit',
@@ -84,22 +50,55 @@ function layerEditGeoJson(opt) {
 					'</label>') +
 				'<hr/><div id="myol-help-edit"></div>',
 		}),
-
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		displayStyle = function(feature) {
-			return new ol.style.Style({
-				...options.styleOptionsFnc(feature),
-				...options.styleOptions,
-			});
-		},
+		displayStyle = new ol.style.Style({
+			// Lines or polygons border
+			stroke: new ol.style.Stroke({
+				color: 'red',
+				width: 2,
+			}),
+			// Polygons
+			fill: new ol.style.Fill({
+				color: 'rgba(0,0,255,0.2)',
+			}),
+		}),
 		editStyle = function(feature) {
-			return new ol.style.Style({
-				...options.styleOptionsFnc(feature),
-				...options.editStyleOptions,
-			});
-		},
+			const textStyle = {
+				scale: feature.getGeometry().getType() == 'LineString' ? 1.5 : 0,
+				placement: 'line',
+				textAlign: 'end',
+				text: 'D',
+				offsetY: -7,
+			};
 
+			return [
+				new ol.style.Style({
+					image: new ol.style.Circle({ // Marker
+						radius: 4,
+						stroke: new ol.style.Stroke({
+							color: 'red',
+							width: 2,
+						}),
+					}),
+					stroke: new ol.style.Stroke({ // Lines or polygons border
+						color: 'red',
+						width: 4,
+					}),
+					fill: new ol.style.Fill({ // Polygons
+						color: 'rgba(255,0,0,0.3)',
+					}),
+					text: new ol.style.Text(textStyle), // Direction
+				}),
+				new ol.style.Style({
+					text: new ol.style.Text({
+						...textStyle,
+						textAlign: 'start',
+						text: 'A',
+					}),
+				}),
+			];
+		},
 		features = options.readFeatures(),
 		source = new ol.source.Vector({
 			features: features,
@@ -110,7 +109,6 @@ function layerEditGeoJson(opt) {
 			zIndex: 20, // Editor & cursor : above the features
 			style: displayStyle,
 		}),
-
 		interactions = [
 			new ol.interaction.Modify({ // 0 Modify
 				source: source,
@@ -424,7 +422,8 @@ function layerEditGeoJson(opt) {
 	// Get all lines fragments (lines, polylines, polygons, multipolygons, hole polygons, ...)
 	// at the same level & split if one point = selectedVertex
 	function flatCoord(lines, coords) {
-		const begCoords = []; // Coords before the selectedVertex
+		let begCoords = [], // Coords before the selectedVertex
+			selectedLine = false;
 
 		// Multi*
 		if (typeof coords[0][0] == 'object')
@@ -435,12 +434,13 @@ function layerEditGeoJson(opt) {
 		else if (selectedVertex) {
 			while (coords.length) {
 				const c = coords.shift();
-				if (compareCoords(c, selectedVertex))
+				if (compareCoords(c, selectedVertex)) {
+					selectedLine = true;
 					break; // Ignore this point and stop selection
-				else
+				} else
 					begCoords.push(c);
 			}
-			if (reverseLine) //TODO BUG traite tous les segments
+			if (reverseLine && selectedLine)
 				lines.push(begCoords.concat(coords).reverse());
 			else
 				lines.push(begCoords, coords);
@@ -457,38 +457,4 @@ function layerEditGeoJson(opt) {
 	}
 
 	return control;
-}
-
-// Add an arrow following a line direction
-function styleOptArrow(feature, opt) { //TODO integrate to the editor
-	let geometry = feature.getGeometry();
-
-	if (geometry.getType() == 'Point')
-		return;
-
-	//BEST BUG set only the last coordinate pair of the the first geometry
-	if (geometry.getType() == 'GeometryCollection')
-		geometry = geometry.getGeometries()[0];
-
-	const options = {
-			color: 'red',
-			...opt
-		},
-		lastIndex = geometry.flatCoordinates.length - geometry.stride, // Index of last point
-		beforeLastIndex = lastIndex - geometry.stride; // Index of before last point
-
-	if (beforeLastIndex >= 0) // At least 2 points
-		return {
-			text: new ol.style.Text({
-				text: geometry.flatCoordinates[lastIndex] < geometry.flatCoordinates[beforeLastIndex] ? '<' : '>', //TODO rotateWithView ???
-				placement: 'line',
-				textAlign: 'start',
-				scale: 2,
-				//offsetX: 1.4, //BEST dont work with ol 7.1.0
-				offsetY: 1.4,
-				fill: new ol.style.Fill({
-					color: options.color, //TODO get color from layer style (editor)
-				}),
-			}),
-		};
 }

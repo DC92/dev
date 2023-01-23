@@ -14,7 +14,7 @@ function layerGeoBB(options) {
 		urlParams: function(opt, bbox, selections) {
 			return {
 				path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0], // The 1st (and only) selector
+				cat: selections[0] == 'on' ? null : selections[0], // The 1st (and only) selector
 				limit: 10000,
 				bbox: bbox.join(','),
 				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams),
