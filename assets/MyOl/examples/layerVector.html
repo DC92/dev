@@ -134,12 +134,13 @@ localStorage.myol_selectwri = 'all';
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
-		zoom: 12,
+		center: ol.proj.transform([5.64565, 45.20224], 'EPSG:4326', 'EPSG:3857'),
+		zoom: 15,
 	}),
 	controls: [
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
+		new ol.control.ScaleLine(),
 	],
 	layers: [
 		// Background layer
@@ -164,7 +165,8 @@ new ol.Map({
 			},
 			wri: {
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
-			},
+	host: '//dom.refuges.info/',
+	},
 			osm: {
 				selectName: 'select-osm',
 			},
@@ -182,6 +184,7 @@ new ol.Map({
 		})),
 	],
 });
+
 	</script>
 	<script src="print_script.js"></script>
 

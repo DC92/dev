@@ -30,7 +30,7 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 10, // Above the background layers
-			convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
+			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			altLayer: null, // Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 			displayStyle: displayStyle,
@@ -66,6 +66,7 @@ function layerVector(opt) {
 		if (options.altLayer)
 			map.addLayer(options.altLayer);
 
+		// Add the hovering listener to the map (once for one map)
 		addMapListener(map);
 	};
 
@@ -95,24 +96,17 @@ function layerVector(opt) {
 				jsonFeature.id = JSON.stringify(jsonFeature.properties).replace(/\D/g, '') % 987654;
 
 			// Callback function to convert some server properties to the one displayed by this package
-			if (typeof options.convertProperties == 'function')
-				jsonFeature.properties = {
-					...jsonFeature.properties,
-					...options.convertProperties(jsonFeature.properties, options),
-				};
-			else if (options.convertProperties)
-				jsonFeature.properties = {
-					...jsonFeature.properties,
-					...options.convertProperties,
-				};
+			jsonFeature.properties = {
+				...jsonFeature.properties,
+				...(typeof options.convertProperties == 'function' ?
+					options.convertProperties(jsonFeature.properties, options) :
+					options.convertProperties),
+			};
 
-			// Add +- 0.00005° (5m) random to each coordinate to separate the points having the same coordinates
-			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point ') {
-				const rnd = (jsonFeature.id / 3.14).toString().split('.');
+			// Add random to each coordinate to separate the colocated points
+			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
+				jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
 
-				jsonFeature.geometry.coordinates[0] += ('0.0000' + rnd[0]) - 0.00005;
-				jsonFeature.geometry.coordinates[1] += ('0.0000' + rnd[1]) - 0.00005;
-			}
 			return jsonFeature;
 		});
 
@@ -147,6 +141,7 @@ function layerVector(opt) {
 			image: properties.icon ? new ol.style.Icon({
 				//TODO BUG general : send cookies to the server, event non secure		
 				src: properties.icon,
+				anchor: [properties.id % 10 / 5 - 0.4, 0.5],
 			}) : null,
 			...(typeof opt.displayStyle == 'function' ? opt.displayStyle(...arguments) : opt.displayStyle),
 		};
@@ -195,8 +190,9 @@ function layerVector(opt) {
  */
 function layerVectorCluster(opt) {
 	const options = {
-			distance: 30, // Minimum distance between clusters
+			distance: 30, // Minimum distance (pixels) between clusters
 			density: 1000, // Maximum number of displayed clusters
+			minresolution: 5, // Min resolution where we clusterize
 			...opt,
 		},
 		layer = layerVector(options), // Creates the basic layer (with all the points)
@@ -222,11 +218,14 @@ function layerVectorCluster(opt) {
 
 	// Tune the clustering distance depending on the zoom level
 	clusterLayer.on('prerender', evt => {
-		const surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
+		let surface = evt.context.canvas.width * evt.context.canvas.height, // Map pixels number
 			distanceMinCluster = Math.min(
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
 				Math.max(options.distance, Math.sqrt(surface / options.density))
 			);
+
+		if (evt.frameState.viewState.resolution < options.minresolution)
+			distanceMinCluster = 0;
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -279,7 +278,7 @@ function layerVectorCluster(opt) {
 		return new ol.Feature({
 			geometry: point, // The gravity center of all the features into the cluster
 			cluster: nbClusters,
-			id: features[0].id, // Pseudo id = the id of the first feature in the cluster
+			id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
 			name: lines.join('\n'),
 		});
 	}
