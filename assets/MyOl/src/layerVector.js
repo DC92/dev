@@ -37,7 +37,7 @@ function layerVector(opt) {
 			hoverStyle: hoverStyle,
 			clusterStyle: clusterStyle,
 		},
-		selectNames = options.selectName.split(','),
+		selectNames = (options.selectName || '').split(','),
 		statusEl = document.getElementById(selectNames[0] + '-status'), // XHR download tracking
 		format = new ol.format.GeoJSON(),
 		source = new ol.source.Vector({
@@ -93,17 +93,22 @@ function layerVector(opt) {
 		json.features.map(jsonFeature => {
 			// Generate a pseudo id if none
 			if (!jsonFeature.id)
-				jsonFeature.id = JSON.stringify(jsonFeature.properties).replace(/\D/g, '') % 987654;
+				jsonFeature.id =
+				jsonFeature.properties.id || // Takes the one in properties
+				JSON.stringify(jsonFeature.properties).replace(/\D/g, '') % 987654; // Generate a pseudo id if none
 
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
+				anchor: [ // Randomise icon & label anchor
+					jsonFeature.id % 37 / 24 - 0.25,
+					jsonFeature.id / 37 % 37 / 24 - 0.25,
+				],
 				...jsonFeature.properties,
 				...(typeof options.convertProperties == 'function' ?
 					options.convertProperties(jsonFeature.properties, options) :
 					options.convertProperties),
 			};
-
-			// Add random to each coordinate to separate the colocated points
+			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
 			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
 				jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
 
@@ -141,7 +146,7 @@ function layerVector(opt) {
 			image: properties.icon ? new ol.style.Icon({
 				//TODO BUG general : send cookies to the server, event non secure		
 				src: properties.icon,
-				anchor: [properties.id % 10 / 5 - 0.4, 0.5],
+				anchor: properties.anchor || (0.5, 0.5),
 			}) : null,
 			...(typeof opt.displayStyle == 'function' ? opt.displayStyle(...arguments) : opt.displayStyle),
 		};
@@ -446,7 +451,8 @@ function selectVectorLayer(name, callBack) {
 // Display a label (Used by cluster)
 function styleLabel(feature, text, textStyleOptions) {
 	const elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
+		area = ol.extent.getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		anchor = feature.getProperties().anchor || [0.5, 0.5];
 
 	//HACK to render the html entities in the canvas
 	elLabel.innerHTML = text;
@@ -455,7 +461,7 @@ function styleLabel(feature, text, textStyleOptions) {
 		text: new ol.style.Text({
 			text: elLabel.innerHTML,
 			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -14, // Above the icon
+			offsetY: area ? 0 : anchor ? -anchor[1] * 24 : -14, // Above the icon
 			padding: [1, 1, -1, 3],
 			font: '12px Verdana',
 			fill: new ol.style.Fill({

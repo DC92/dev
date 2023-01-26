@@ -129,7 +129,7 @@ Based on https://openlayers.org
 
 	<script>
 // Force selectors
-localStorage.myol_selectwri = 'all';
+//localStorage.myol_selectwri = 'all';
 
 new ol.Map({
 	target: 'map',
@@ -164,15 +164,16 @@ new ol.Map({
 				selectName: 'select-massifs',
 			},
 			wri: {
+				host: '//dom.refuges.info/',
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
-	host: '//dom.refuges.info/',
-	},
+			},
 			osm: {
 				selectName: 'select-osm',
 			},
 		})
 		// WRI layer as in refuges.info
 		.concat(layerClusterWri({
+				host: '//dom.refuges.info/',
 			selectName: 'select-refuges',
 			displayStyle: function(feature, properties) {
 				if (properties.name)
@@ -184,7 +185,6 @@ new ol.Map({
 		})),
 	],
 });
-
 	</script>
 	<script src="print_script.js"></script>
 
