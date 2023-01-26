@@ -22,7 +22,6 @@ function layerMarker(opt) {
 			zIndex: 20, // Above points (zIndex = 10)
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
-					anchor: [0.5, 0.5],
 					src: options.src,
 				}),
 			}),

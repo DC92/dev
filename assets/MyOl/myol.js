@@ -654,7 +654,7 @@ function layerVector(opt) {
 		return {
 			image: properties.icon ? new ol.style.Icon({
 				src: properties.icon,
-				anchor: properties.anchor || (0.5, 0.5),
+				anchor: properties.anchor || [0.5, 0.5],
 			}) : null,
 			...(typeof opt.displayStyle == 'function' ? opt.displayStyle(...arguments) : opt.displayStyle),
 		};
@@ -766,34 +766,40 @@ function layerVectorCluster(opt) {
 
 	// Generate the features to render the clusters
 	function createCluster(point, features) {
-		let nbClusters = 0,
-			includeCluster = false,
-			lines = [];
+		if (features.length) {
+			let nbClusters = 0,
+				includeCluster = false,
+				lines = [];
 
-		features.forEach(f => {
-			const properties = f.getProperties();
+			features.forEach(f => {
+				const properties = f.getProperties();
 
-			nbClusters += parseInt(properties.cluster) || 1;
-			if (properties.cluster)
-				includeCluster = true;
-			if (properties.name)
-				lines.push(properties.name);
-		});
+				nbClusters += parseInt(properties.cluster) || 1;
+				if (properties.cluster)
+					includeCluster = true;
+				if (properties.name)
+					lines.push(properties.name);
+			});
 
-		// Single feature : display it
-		if (nbClusters == 1)
-			return features[0];
+			// Single feature : display it
+			if (nbClusters == 1)
+				return features[0];
 
-		if (includeCluster || lines.length > 5)
-			lines = ['Cliquer pour zoomer'];
+			if (includeCluster || lines.length > 5)
+				lines = ['Cliquer pour zoomer'];
 
-		// Display a cluster point
-		return new ol.Feature({
-			geometry: point, // The gravity center of all the features into the cluster
-			cluster: nbClusters,
-			id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
-			name: lines.join('\n'),
-		});
+			// Display a cluster point
+			return new ol.Feature({
+				geometry: point, // The gravity center of all the features into the cluster
+				cluster: nbClusters,
+				id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
+				name: lines.join('\n'),
+			});
+		} else // Bizarre : a cluster with n0 feature on it !
+			return new ol.Feature({
+				geometry: point,
+				features: features
+			});
 	}
 
 	return clusterLayer;
@@ -2459,7 +2465,6 @@ function layerMarker(opt) {
 			zIndex: 20, // Above points (zIndex = 10)
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
-					anchor: [0.5, 0.5],
 					src: options.src,
 				}),
 			}),
