@@ -135,7 +135,7 @@ new ol.Map({
 	target: 'map',
 	view: new ol.View({
 		center: ol.proj.transform([5.64565, 45.20224], 'EPSG:4326', 'EPSG:3857'),
-		zoom: 15,
+		zoom: 14,
 	}),
 	controls: [
 		new ol.control.Zoom(),
@@ -164,7 +164,7 @@ new ol.Map({
 				selectName: 'select-massifs',
 			},
 			wri: {
-				host: '//dom.refuges.info/',
+				host: '//dom.refuges.info/', //TODO FOR TEST !
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
 			},
 			osm: {

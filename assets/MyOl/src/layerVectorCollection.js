@@ -64,18 +64,18 @@ function layerChemineur(options) {
 				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties),
 			};
 		},
-		displayStyle: function(feature, properties) {
-			return {
-				stroke: new ol.style.Stroke({ // Lines
-					color: 'blue',
-					width: 2,
-				}),
-			};
+		displayStyle: {
+			// Lines
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+				width: 2,
+			}),
 		},
-		hoverStyle: function(feature, properties) { // Lines
+		hoverStyle: function(feature, properties) {
 			const elLabel = document.createElement('span');
-
 			elLabel.innerHTML = properties.name;
+
+			// Lines
 			if (ol.extent.getArea(feature.getGeometry().getExtent()))
 				return {
 					text: new ol.style.Text({
