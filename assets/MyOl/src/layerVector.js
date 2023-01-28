@@ -33,14 +33,13 @@ function layerVector(opt) {
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
-	
+
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						//TODO BUG general : send cookies to the server, event non secure		
 						src: properties.icon,
-						//anchor: properties.anchor || [0.5, 0.5],
 					}) : null,
 					//TODO lines ?
 					...functionLike(opt.displayStyle, ...arguments),
@@ -61,7 +60,6 @@ function layerVector(opt) {
 				};
 			},
 			clusterStyle: function(feature, properties, layer, resolution) {
-				//TODO (if resolution < 5) afficher lot de pictos
 				if (properties.cluster)
 					return {
 						image: new ol.style.Circle({
@@ -158,21 +156,16 @@ function layerVector(opt) {
 
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
-				/*//TODO DELETE
-					anchor: [ // Randomise icon & label anchor
-						jsonFeature.id % 37 / 24 - 0.25,
-						jsonFeature.id / 37 % 37 / 24 - 0.25,
-					],*/
 				...jsonFeature.properties,
 				...(typeof options.convertProperties == 'function' ?
 					options.convertProperties(jsonFeature.properties, options) :
 					options.convertProperties),
 			};
-			/*//TODO DELETE
-				// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
-				if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
-					jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
-			*/
+
+			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
+			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
+				jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
+
 			return jsonFeature;
 		});
 
@@ -212,7 +205,6 @@ function layerVectorCluster(opt) {
 	const options = {
 			distance: 30, // Minimum distance (pixels) between clusters
 			density: 1000, // Maximum number of displayed clusters
-			//TODO DELETE minresolution: 5, // Min resolution where we clusterize
 			...opt,
 		},
 		layer = layerVector(options), // Creates the basic layer (with all the points)
@@ -244,9 +236,8 @@ function layerVectorCluster(opt) {
 				Math.max(options.distance, Math.sqrt(surface / options.density))
 			);
 
-		//TODO DELETE
-		//		if (evt.frameState.viewState.resolution < options.minresolution)
-		//			distanceMinCluster = 0;
+		if (evt.frameState.viewState.resolution < options.minClusterResolution)
+			distanceMinCluster = 0;
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -274,12 +265,6 @@ function layerVectorCluster(opt) {
 
 	// Generate the features to render the clusters
 	function createCluster(point, features) {
-		/*if (!features.length) // Bizarre : a cluster with no feature on it !
-			return new ol.Feature({
-				geometry: point,
-				features: features
-			});*/ //TODO DELETE ???
-
 		let nbClusters = 0,
 			includeCluster = false,
 			lines = [];
@@ -355,17 +340,6 @@ function addMapListener(map) {
 
 				if (hoveredFeature)
 					hoveredFeature.setStyle(hoveredLayer.options.hoverStyleFunction); //BEST enlever .options
-				/*//TODO DELETE
-				hoveredFeature.setStyle((feature, resolution) =>  [
-					new ol.style.Style({
-						...functionLike(hoveredLayer.options.displayStyle,hoveredFeature, hoveredProperties, hoveredLayer, resolution),
-						// The hovering style can overload some styles options
-						...functionLike(hoveredLayer.options.hoverStyle,hoveredFeature, hoveredProperties, hoveredLayer, resolution),
-					}),
-					new ol.style.Style( // Need a separate style because of text option on the both
-						functionLike(hoveredLayer.options.clusterStyle,hoveredFeature, hoveredProperties, hoveredLayer, resolution)
-					),
-				]);*/
 			}
 
 			// Click on a feature
@@ -488,7 +462,7 @@ function styleLabel(feature, text, textStyleOptions) {
 		text: new ol.style.Text({
 			text: elLabel.innerHTML,
 			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : /*TODO DELETE anchor ? -anchor[1] * 24 :*/ -13, // Above the icon
+			offsetY: area ? 0 : -13, // Above the icon
 			padding: [1, 1, -1, 3],
 			font: '12px Verdana',
 			fill: new ol.style.Fill({

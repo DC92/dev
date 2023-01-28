@@ -544,13 +544,12 @@ function layerVector(opt) {
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
-	
+
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						src: properties.icon,
-						//anchor: properties.anchor || [0.5, 0.5],
 					}) : null,
 					...functionLike(opt.displayStyle, ...arguments),
 				};
@@ -664,21 +663,16 @@ function layerVector(opt) {
 
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
-				/*
-					anchor: [ // Randomise icon & label anchor
-						jsonFeature.id % 37 / 24 - 0.25,
-						jsonFeature.id / 37 % 37 / 24 - 0.25,
-					],*/
 				...jsonFeature.properties,
 				...(typeof options.convertProperties == 'function' ?
 					options.convertProperties(jsonFeature.properties, options) :
 					options.convertProperties),
 			};
-			/*
-				// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
-				if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
-					jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
-			*/
+
+			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
+			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
+				jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
+
 			return jsonFeature;
 		});
 
@@ -749,8 +743,8 @@ function layerVectorCluster(opt) {
 				Math.max(options.distance, Math.sqrt(surface / options.density))
 			);
 
-		//		if (evt.frameState.viewState.resolution < options.minresolution)
-		//			distanceMinCluster = 0;
+		if (evt.frameState.viewState.resolution < options.minClusterResolution)
+			distanceMinCluster = 0;
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -778,12 +772,6 @@ function layerVectorCluster(opt) {
 
 	// Generate the features to render the clusters
 	function createCluster(point, features) {
-		/*if (!features.length) // Bizarre : a cluster with no feature on it !
-			return new ol.Feature({
-				geometry: point,
-				features: features
-			});*/
-
 		let nbClusters = 0,
 			includeCluster = false,
 			lines = [];
@@ -859,17 +847,6 @@ function addMapListener(map) {
 
 				if (hoveredFeature)
 					hoveredFeature.setStyle(hoveredLayer.options.hoverStyleFunction);
-				/*
-				hoveredFeature.setStyle((feature, resolution) =>  [
-					new ol.style.Style({
-						...functionLike(hoveredLayer.options.displayStyle,hoveredFeature, hoveredProperties, hoveredLayer, resolution),
-						// The hovering style can overload some styles options
-						...functionLike(hoveredLayer.options.hoverStyle,hoveredFeature, hoveredProperties, hoveredLayer, resolution),
-					}),
-					new ol.style.Style( // Need a separate style because of text option on the both
-						functionLike(hoveredLayer.options.clusterStyle,hoveredFeature, hoveredProperties, hoveredLayer, resolution)
-					),
-				]);*/
 			}
 
 			// Click on a feature
@@ -990,7 +967,7 @@ function styleLabel(feature, text, textStyleOptions) {
 		text: new ol.style.Text({
 			text: elLabel.innerHTML,
 			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : /*TODO DELETE anchor ? -anchor[1] * 24 :*/ -13, // Above the icon
+			offsetY: area ? 0 : -13, // Above the icon
 			padding: [1, 1, -1, 3],
 			font: '12px Verdana',
 			fill: new ol.style.Fill({
@@ -1156,7 +1133,7 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVector({
+	return layerVectorCluster({
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,
@@ -1203,6 +1180,43 @@ function layerClusterWri(opt) {
 		altLayer: clusterLayer,
 		...options,
 	});
+}
+
+// The one used by refuges.info
+function layerWriWri(options) {
+	return layerClusterWri({
+		displayStyle: function(feature, properties, layer, resolution) {
+			const anchor = feature.getId() * 3.14 % 1.6 - .03,
+				coordinates = feature.getGeometry().getCoordinates(),
+				closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
+				distance = ol.sphere.getDistance(
+					ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
+					ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
+				);
+
+			if (distance > 16 * resolution)
+				return styleLabel(feature, properties.nom);
+
+			if (properties.icon) {
+				return {
+					...styleLabel(feature, properties.nom, {
+						offsetX: -anchor * 24 + 24,
+						offsetY: -anchor * 24 + 6,
+						textAlign: 'left',
+					}),
+					image: new ol.style.Icon({
+						src: properties.icon,
+						anchor: [anchor, anchor],
+					}),
+				};
+			}
+		},
+		convertProperties: {
+			attribution: null,
+		},
+		minClusterResolution: 5,
+		...options,
+	})
 }
 
 function layerWriAreas(options) {

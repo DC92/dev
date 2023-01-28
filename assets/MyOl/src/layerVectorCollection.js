@@ -133,7 +133,7 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVector({ //BEST cas de WRI sans cluster local ?
+	return layerVectorCluster({ //BEST cas de WRI sans cluster local ?
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,
@@ -180,6 +180,44 @@ function layerClusterWri(opt) {
 		altLayer: clusterLayer,
 		...options,
 	});
+}
+
+// The one used by refuges.info
+function layerWriWri(options) {
+	return layerClusterWri({
+		displayStyle: function(feature, properties, layer, resolution) {
+			const anchor = feature.getId() * 3.14 % 1.6 - .03,
+				coordinates = feature.getGeometry().getCoordinates(),
+				closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
+				distance = ol.sphere.getDistance(
+					ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
+					ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
+				);
+
+			if (distance > 16 * resolution)
+				return styleLabel(feature, properties.nom);
+
+			if (properties.icon) {
+				return {
+					...styleLabel(feature, properties.nom, {
+						offsetX: -anchor * 24 + 24,
+						offsetY: -anchor * 24 + 6,
+						textAlign: 'left',
+					}),
+					image: new ol.style.Icon({
+						src: properties.icon,
+						anchor: [anchor, anchor],
+					}),
+				};
+			}
+		},
+		//TODO label avec décallage
+		convertProperties: {
+			attribution: null,
+		},
+		minClusterResolution: 5,
+		...options,
+	})
 }
 
 function layerWriAreas(options) {

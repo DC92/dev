@@ -15,6 +15,7 @@ Based on https://openlayers.org
 	<!-- Openlayers -->
 	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
 	<script src="../ol/ol.js"></script>
+	<script src="../proj4/proj4-src.js"></script>
 
 	<!-- My Openlayers -->
 	<script src="../src/header.js"></script><!-- For JSONparse -->
@@ -134,8 +135,9 @@ Based on https://openlayers.org
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
+		center: ol.proj.transform([5.4278, 45.3163], 'EPSG:4326', 'EPSG:3857'),
 		center: ol.proj.transform([5.64565, 45.20224], 'EPSG:4326', 'EPSG:3857'),
-		zoom: 14,
+		zoom: 16,
 	}),
 	controls: [
 		new ol.control.Zoom(),
@@ -172,16 +174,9 @@ new ol.Map({
 			},
 		})
 		// WRI layer as in refuges.info
-		.concat(layerClusterWri({
-				host: '//dom.refuges.info/',
+		.concat(layerWriWri({
+			host: '//dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
-			displayStyle: function(feature, properties) {
-				if (properties.name)
-					return styleLabel(feature, properties.name);
-			},
-			convertProperties: {
-				attribution: null,
-			},
 		})),
 	],
 });
