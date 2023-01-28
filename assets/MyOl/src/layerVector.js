@@ -42,6 +42,7 @@ function layerVector(opt) {
 						src: properties.icon,
 						//anchor: properties.anchor || [0.5, 0.5],
 					}) : null,
+					//TODO lines ?
 					...functionLike(opt.displayStyle, ...arguments),
 				};
 			},
@@ -273,11 +274,11 @@ function layerVectorCluster(opt) {
 
 	// Generate the features to render the clusters
 	function createCluster(point, features) {
-		if (!features.length) // Bizarre : a cluster with no feature on it !
+		/*if (!features.length) // Bizarre : a cluster with no feature on it !
 			return new ol.Feature({
 				geometry: point,
 				features: features
-			});
+			});*/ //TODO DELETE ???
 
 		let nbClusters = 0,
 			includeCluster = false,
@@ -303,7 +304,7 @@ function layerVectorCluster(opt) {
 		// Display a cluster point
 		return new ol.Feature({
 			geometry: point, // The gravity center of all the features into the cluster
-			cluster: nbClusters,
+			cluster: nbClusters, //TODO voir pourquoi on ne met pas ça dans properties
 			id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
 			name: lines.join('\n'),
 			features: features,

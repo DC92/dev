@@ -133,7 +133,7 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVectorCluster({ //BEST cas de WRI sans cluster local ?
+	return layerVector({ //BEST cas de WRI sans cluster local ?
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,

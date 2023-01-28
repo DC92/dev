@@ -778,11 +778,11 @@ function layerVectorCluster(opt) {
 
 	// Generate the features to render the clusters
 	function createCluster(point, features) {
-		if (!features.length) // Bizarre : a cluster with no feature on it !
+		/*if (!features.length) // Bizarre : a cluster with no feature on it !
 			return new ol.Feature({
 				geometry: point,
 				features: features
-			});
+			});*/
 
 		let nbClusters = 0,
 			includeCluster = false,
@@ -1156,7 +1156,7 @@ function layerAlpages(options) {
  * Site refuges.info
  */
 function layerWri(options) {
-	return layerVectorCluster({
+	return layerVector({
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,
