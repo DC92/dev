@@ -556,15 +556,7 @@ function layerVector(opt) {
 			},
 			hoverStyle: function(feature, properties, layer, resolution) {
 				return {
-					...styleLabel(feature, agregateText([
-						properties.name,
-						agregateText([
-							properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-							properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-						], ', '),
-						properties.type,
-						properties.attribution,
-					])),
+					...styleLabelFull(feature, properties),
 					...functionLike(opt.hoverStyle, ...arguments),
 				};
 			},
@@ -985,6 +977,22 @@ function styleLabel(feature, text, textStyleOptions) {
 	};
 }
 
+function styleLabelFull(feature, properties, textStyleOptions) {
+	return styleLabel(
+		feature,
+		agregateText([
+			properties.name,
+			agregateText([
+				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+			], ', '),
+			properties.type,
+			properties.attribution,
+		]),
+		textStyleOptions,
+	);
+}
+
 // Simplify & agreagte an array of lines
 function agregateText(lines, glue) {
 	return lines
@@ -1075,7 +1083,7 @@ function layerChemineur(options) {
 			const elLabel = document.createElement('span');
 			elLabel.innerHTML = properties.name;
 
-			// Lines
+			// Lines labels
 			if (ol.extent.getArea(feature.getGeometry().getExtent()))
 				return {
 					text: new ol.style.Text({
@@ -1182,39 +1190,59 @@ function layerClusterWri(opt) {
 	});
 }
 
-// The one used by refuges.info
+// Specific format used by refuges.info
 function layerWriWri(options) {
+	function labelOptions(feature, properties, layer, resolution) {
+		const coordinates = feature.getGeometry().getCoordinates(),
+			closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
+			distance = ol.sphere.getDistance(
+				ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
+				ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
+			),
+			anchor = feature.getId() * 3.14 % 1.6 - .03;
+
+		if (distance < 16 * resolution &&
+			resolution < layer.options.minClusterResolution)
+			return {
+				offsetX: -anchor * 24 + 24,
+				offsetY: -anchor * 24 + 6,
+				textAlign: 'left',
+				zIndex: 50,
+				anchor: anchor,
+			};
+	}
+
 	return layerClusterWri({
+		// Specific formats to be added to the basic one
 		displayStyle: function(feature, properties, layer, resolution) {
-			const anchor = feature.getId() * 3.14 % 1.6 - .03,
-				coordinates = feature.getGeometry().getCoordinates(),
-				closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
-				distance = ol.sphere.getDistance(
-					ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
-					ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
-				);
+			const lo = labelOptions(feature, properties, layer, resolution);
 
-			if (distance > 16 * resolution)
-				return styleLabel(feature, properties.nom);
-
-			if (properties.icon) {
+			// Shift anchor of features too closed
+			if (properties.icon)
 				return {
-					...styleLabel(feature, properties.nom, {
-						offsetX: -anchor * 24 + 24,
-						offsetY: -anchor * 24 + 6,
-						textAlign: 'left',
-					}),
+					...styleLabel(feature, properties.nom, lo),
 					image: new ol.style.Icon({
 						src: properties.icon,
-						anchor: [anchor, anchor],
+						anchor: lo ? [lo.anchor, lo.anchor] : [0.5, 0.5],
 					}),
 				};
-			}
 		},
+		hoverStyle: function(feature, properties, layer, resolution) {
+			return styleLabelFull(
+				feature,
+				properties,
+				labelOptions(feature, properties, layer, resolution),
+			);
+		},
+
+		// Don't display attribution on labels
 		convertProperties: {
 			attribution: null,
 		},
+
+		// Don't cluster under resolution = 5
 		minClusterResolution: 5,
+
 		...options,
 	})
 }

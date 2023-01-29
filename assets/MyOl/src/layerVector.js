@@ -41,21 +41,12 @@ function layerVector(opt) {
 						//TODO BUG general : send cookies to the server, event non secure		
 						src: properties.icon,
 					}) : null,
-					//TODO lines ?
 					...functionLike(opt.displayStyle, ...arguments),
 				};
 			},
 			hoverStyle: function(feature, properties, layer, resolution) {
 				return {
-					...styleLabel(feature, agregateText([
-						properties.name,
-						agregateText([
-							properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-							properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-						], ', '),
-						properties.type,
-						properties.attribution,
-					])),
+					...styleLabelFull(feature, properties),
 					...functionLike(opt.hoverStyle, ...arguments),
 				};
 			},
@@ -289,7 +280,7 @@ function layerVectorCluster(opt) {
 		// Display a cluster point
 		return new ol.Feature({
 			geometry: point, // The gravity center of all the features into the cluster
-			cluster: nbClusters, //TODO voir pourquoi on ne met pas ça dans properties
+			cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
 			id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
 			name: lines.join('\n'),
 			features: features,
@@ -453,7 +444,6 @@ function selectVectorLayer(name, callBack) {
 function styleLabel(feature, text, textStyleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
-	//TODO DELETE anchor = feature.getProperties().anchor || [0.5, 0.5];
 
 	//HACK to render the html entities in the canvas
 	elLabel.innerHTML = text;
@@ -478,6 +468,22 @@ function styleLabel(feature, text, textStyleOptions) {
 		}),
 		zIndex: 20, // Above features
 	};
+}
+
+function styleLabelFull(feature, properties, textStyleOptions) {
+	return styleLabel(
+		feature,
+		agregateText([
+			properties.name,
+			agregateText([
+				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+			], ', '),
+			properties.type,
+			properties.attribution,
+		]),
+		textStyleOptions,
+	);
 }
 
 // Simplify & agreagte an array of lines
