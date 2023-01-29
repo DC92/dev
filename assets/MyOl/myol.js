@@ -540,7 +540,7 @@ function layerVector(opt) {
 			},
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
-			zIndex: 10, // Above the background layers
+			zIndex: 100, // Above the background layers
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
@@ -576,7 +576,6 @@ function layerVector(opt) {
 							text: properties.cluster.toString(),
 							font: '12px Verdana',
 						}),
-						zIndex: 10, // Above the background layers
 					};
 			},
 			// Hover style callback, embarked with the layer to be used by addMapListener
@@ -586,6 +585,7 @@ function layerVector(opt) {
 					new ol.style.Style({
 						...functionLike(options.displayStyle, ...args),
 						...functionLike(options.hoverStyle, ...args), // The hovering style can overload some styles options
+						zIndex:200,
 					}),
 					new ol.style.Style( // Need a separate style because of text option on the both
 						functionLike(options.clusterStyle, ...args)
@@ -656,9 +656,7 @@ function layerVector(opt) {
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
 				...jsonFeature.properties,
-				...(typeof options.convertProperties == 'function' ?
-					options.convertProperties(jsonFeature.properties, options) :
-					options.convertProperties),
+				...functionLike(options.convertProperties,jsonFeature.properties, options),
 			};
 
 			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
@@ -973,7 +971,6 @@ function styleLabel(feature, text, textStyleOptions) {
 			}),
 			...textStyleOptions,
 		}),
-		zIndex: 20, // Above features
 	};
 }
 
@@ -1019,19 +1016,17 @@ function layerGeoBB(options) {
 	return layerVectorCluster({
 		strategy: ol.loadingstrategy.bbox,
 		...options,
-		urlParams: function(opt, bbox, selections) {
-			return {
-				path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: selections[0] == 'on' ? null : selections[0], // The 1st (and only) selector
-				limit: 10000,
-				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams),
-			};
-		},
+		urlParams: (opt, bbox, selections) => ({
+			path: 'ext/Dominique92/GeoBB/gis.php',
+			cat: selections[0] == 'on' ? null : selections[0], // The 1st (and only) selector
+			limit: 10000,
+			bbox: bbox.join(','),
+			...functionLike(options.urlParams, ...arguments),
+		}),
 		convertProperties: function(properties) {
 			return {
 				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
-				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties),
+				...functionLike(options.convertProperties, ...arguments),
 			};
 		},
 	});
@@ -1064,14 +1059,12 @@ function layerChemineur(options) {
 	return layerClusterGeoBB({
 		host: '//chemineur.fr/',
 		...options,
-		convertProperties: function(properties, opt) {
-			return {
-				url: opt.host + 'viewtopic.php?t=' + properties.id,
-				icon: chemIconUrl(properties.type),
-				attribution: '&copy;Chemineur',
-				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties),
-			};
-		},
+		convertProperties: (properties, opt) => ({
+			url: opt.host + 'viewtopic.php?t=' + properties.id,
+			icon: chemIconUrl(properties.type),
+			attribution: '&copy;Chemineur',
+			...functionLike(options.convertProperties, ...arguments),
+		}),
 		displayStyle: {
 			// Lines
 			stroke: new ol.style.Stroke({
@@ -1152,7 +1145,7 @@ function layerWri(options) {
 				massif: selections[1],
 				nb_points: 'all',
 				bbox: bbox.join(','),
-				...(typeof options.urlParams == 'function' ? options.urlParams(...arguments) : options.urlParams)
+				...functionLike(options.urlParams, ...arguments),
 			};
 		},
 		convertProperties: function(properties, opt) {
@@ -1164,7 +1157,7 @@ function layerWri(options) {
 				bed: properties.places ? properties.places.valeur : 0,
 				type: properties.type ? properties.type.valeur : null,
 				attribution: '&copy;Refuges.info',
-				...(typeof options.convertProperties == 'function' ? options.convertProperties(...arguments) : options.convertProperties)
+				...functionLike(options.convertProperties, ...arguments),
 			};
 		},
 	});
@@ -1207,7 +1200,6 @@ function layerWriWri(options) {
 				offsetX: -anchor * 24 + 24,
 				offsetY: -anchor * 24 + 6,
 				textAlign: 'left',
-				zIndex: 50,
 				anchor: anchor,
 			};
 	}
@@ -1227,13 +1219,11 @@ function layerWriWri(options) {
 					}),
 				};
 		},
-		hoverStyle: function(feature, properties, layer, resolution) {
-			return styleLabelFull(
-				feature,
-				properties,
-				labelOptions(feature, properties, layer, resolution),
-			);
-		},
+		hoverStyle: (feature, properties, layer, resolution) => styleLabelFull(
+			feature,
+			properties,
+			labelOptions(...arguments),
+		),
 
 		// Don't display attribution on labels
 		convertProperties: {
@@ -1256,11 +1246,9 @@ function layerWriAreas(options) {
 		},
 		zIndex: 2, // Behind points
 		...options,
-		convertProperties: function(properties) {
-			return {
-				url: properties.lien,
-			};
-		},
+		convertProperties: properties => ({
+			url: properties.lien,
+		}),
 		displayStyle: function(feature, properties) {
 			// Build color and transparency
 			const colors = properties.couleur
@@ -1278,22 +1266,20 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		hoverStyle: function(feature, properties) {
-			return {
-				...styleLabel(feature, properties.nom, {
-					padding: [1, 0, -1, 2],
-					font: '12px Verdana',
-					overflow: true, // Force display even if no place
-				}),
-				fill: new ol.style.Fill({
-					color: 'rgba(0,0,0,0)', // Transparent
-				}),
-				stroke: new ol.style.Stroke({
-					color: properties.couleur,
-					width: 2,
-				}),
-			};
-		},
+		hoverStyle: (feature, properties) => ({
+			...styleLabel(feature, properties.nom, {
+				padding: [1, 0, -1, 2],
+				font: '12px Verdana',
+				overflow: true, // Force display even if no place
+			}),
+			fill: new ol.style.Fill({
+				color: 'rgba(0,0,0,0)', // Transparent
+			}),
+			stroke: new ol.style.Stroke({
+				color: properties.couleur,
+				width: 2,
+			}),
+		}),
 	});
 }
 
@@ -1303,16 +1289,14 @@ function layerWriAreas(options) {
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		convertProperties: function(properties) {
-			return {
-				type: properties.type_hebergement,
-				url: properties.url,
-				icon: chemIconUrl(properties.type_hebergement),
-				ele: properties.altitude,
-				capacity: properties.cap_ete,
-				attribution: '&copy;Pyrenees-Refuges',
-			};
-		},
+		convertProperties: properties => ({
+			type: properties.type_hebergement,
+			url: properties.url,
+			icon: chemIconUrl(properties.type_hebergement),
+			ele: properties.altitude,
+			capacity: properties.cap_ete,
+			attribution: '&copy;Pyrenees-Refuges',
+		}),
 		...options,
 	});
 }
@@ -1359,12 +1343,10 @@ function layerC2C(options) {
 		strategy: ol.loadingstrategy.bbox,
 		format: format,
 		...options,
-		urlParams: function(o, b, s, extent) {
-			return {
-				path: 'waypoints',
-				bbox: extent.join(','),
-			};
-		},
+		urlParams: (o, b, s, extent) => ({
+			path: 'waypoints',
+			bbox: extent.join(','),
+		}),
 	});
 }
 

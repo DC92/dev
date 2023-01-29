@@ -128,10 +128,10 @@ class listener implements EventSubscriberInterface
 
 				// Altitude calculation
 				if (array_key_exists ('geo_altitude', $topic_row) &&
+					$topic_row['forum_image'] && //TODO BUG trace : too large for GET parameter
 					!@$topic_row['geo_altitude'])
 				{
 					// Use free API
-					//TODO BUG trace : too large for GET parameter
 					$api = 'https://api.open-elevation.com/api/v1/lookup?locations=';
 					foreach ($lls[2] AS $k=>$lat) {
 						$lon = $lls[1][$k] -= round ($lls[1][$k] / 360) * 360; // Avoid wrap

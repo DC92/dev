@@ -29,7 +29,7 @@ function layerVector(opt) {
 			},
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
-			zIndex: 10, // Above the background layers
+			zIndex: 100, // Above the background layers
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
@@ -66,7 +66,6 @@ function layerVector(opt) {
 							text: properties.cluster.toString(),
 							font: '12px Verdana',
 						}),
-						zIndex: 10, // Above the background layers
 					};
 			},
 			// Hover style callback, embarked with the layer to be used by addMapListener
@@ -76,6 +75,7 @@ function layerVector(opt) {
 					new ol.style.Style({
 						...functionLike(options.displayStyle, ...args),
 						...functionLike(options.hoverStyle, ...args), // The hovering style can overload some styles options
+						zIndex:200,
 					}),
 					new ol.style.Style( // Need a separate style because of text option on the both
 						functionLike(options.clusterStyle, ...args)
@@ -148,9 +148,7 @@ function layerVector(opt) {
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
 				...jsonFeature.properties,
-				...(typeof options.convertProperties == 'function' ?
-					options.convertProperties(jsonFeature.properties, options) :
-					options.convertProperties),
+				...functionLike(options.convertProperties,jsonFeature.properties, options),
 			};
 
 			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
@@ -466,7 +464,6 @@ function styleLabel(feature, text, textStyleOptions) {
 			}),
 			...textStyleOptions,
 		}),
-		zIndex: 20, // Above features
 	};
 }
 
