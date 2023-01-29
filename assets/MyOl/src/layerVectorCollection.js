@@ -116,12 +116,10 @@ function layerAlpages(options) {
 			forums: '4,5',
 			cat: null,
 		},
-		convertProperties: function(properties) {
-			return {
-				icon: chemIconUrl(properties.type),
-				attribution: '&copy;Alpages.info',
-			};
-		},
+		convertProperties: properties => ({
+			icon: chemIconUrl(properties.type),
+			attribution: '&copy;Alpages.info',
+		}),
 	});
 }
 
@@ -133,28 +131,24 @@ function layerWri(options) {
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,
-		urlParams: function(o, bbox, selections) {
-			return {
-				path: selections[1] ? 'api/massif' : 'api/bbox',
-				type_points: selections[0],
-				massif: selections[1],
-				nb_points: 'all',
-				bbox: bbox.join(','),
-				...functionLike(options.urlParams, ...arguments),
-			};
-		},
-		convertProperties: function(properties, opt) {
-			return {
-				name: properties.nom,
-				url: properties.lien,
-				icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord ? properties.coord.alt : 0,
-				bed: properties.places ? properties.places.valeur : 0,
-				type: properties.type ? properties.type.valeur : null,
-				attribution: '&copy;Refuges.info',
-				...functionLike(options.convertProperties, ...arguments),
-			};
-		},
+		urlParams: (o, bbox, selections) => ({
+			path: selections[1] ? 'api/massif' : 'api/bbox',
+			type_points: selections[0],
+			massif: selections[1],
+			nb_points: 'all',
+			bbox: bbox.join(','),
+			...functionLike(options.urlParams, ...arguments),
+		}),
+		convertProperties: (properties, opt) => ({
+			name: properties.nom,
+			url: properties.lien,
+			icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
+			ele: properties.coord ? properties.coord.alt : 0,
+			bed: properties.places ? properties.places.valeur : 0,
+			type: properties.type ? properties.type.valeur : null,
+			attribution: '&copy;Refuges.info',
+			...functionLike(options.convertProperties, ...arguments),
+		}),
 	});
 }
 
@@ -187,7 +181,7 @@ function layerWriWri(options) {
 				ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
 				ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
 			),
-			anchor = feature.getId() * 3.14 % 1.6 - .03;
+			anchor = feature.getId() * 3.14 % 1.6 - .03; // Pseudo random anchor shift
 
 		if (distance < 16 * resolution &&
 			resolution < layer.options.minClusterResolution)
@@ -195,7 +189,7 @@ function layerWriWri(options) {
 				offsetX: -anchor * 24 + 24,
 				offsetY: -anchor * 24 + 6,
 				textAlign: 'left',
-				anchor: anchor,
+				anchor: anchor, //HACK embark for icon
 			};
 	}
 
@@ -214,11 +208,13 @@ function layerWriWri(options) {
 					}),
 				};
 		},
-		hoverStyle: (feature, properties, layer, resolution) => styleLabelFull(
-			feature,
-			properties,
-			labelOptions(...arguments),
-		),
+		hoverStyle: function(feature, properties, layer, resolution) {
+			return styleLabelFull(
+				feature,
+				properties,
+				labelOptions(...arguments),
+			);
+		},
 
 		// Don't display attribution on labels
 		convertProperties: {
