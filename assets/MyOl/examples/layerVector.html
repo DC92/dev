@@ -135,9 +135,8 @@ Based on https://openlayers.org
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: ol.proj.transform([5.4278, 45.3163], 'EPSG:4326', 'EPSG:3857'),
-		center: ol.proj.transform([5.64565, 45.20224], 'EPSG:4326', 'EPSG:3857'),
-		zoom: 16,
+		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
+		zoom: 12,
 	}),
 	controls: [
 		new ol.control.Zoom(),
@@ -174,7 +173,6 @@ new ol.Map({
 		})
 		// WRI layer as in refuges.info
 		.concat(layerClusterWri({
-			host: '//dom.refuges.info/', //TODO DELETE / BUG (feature null dans displayStyle)
 			selectName: 'select-refuges',
 			displayStyle: function(feature, properties) {
 				return styleLabel(feature, properties.nom); // Display a single label above each icon

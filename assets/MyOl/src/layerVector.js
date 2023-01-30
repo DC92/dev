@@ -30,30 +30,18 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 100, // Above the background layers
-			maxDegroupIcons: 5, // Resolution under there is no clusterisation
+			maxResolutionDegroup: 5, // Resolution below which there is no clustering
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 
 			// Default styles
-			displayStyle: function(feature, properties, l, resolution) {
-				// Disjoin too close icons
-				let anchor = 0.5;
-				if (resolution < layer.options.maxDegroupIcons) {
-					const coordinates = feature.getGeometry().getCoordinates(),
-						closest = l.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
-						distance = ol.sphere.getDistance(
-							ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
-							ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
-						);
-					anchor = (feature.getId() || feature.id) * 3.14 % 1.6 - .03; // Pseudo random anchor shift
-				}
-
+			displayStyle: function(feature, properties, layer, resolution) {
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						//TODO BUG general : send cookies to the server, event non secure		
 						src: properties.icon,
-						anchor: [anchor, 0.5],
+						anchor: [shiftAnchor(feature, resolution), 0.5],
 					}) : null,
 					...functionLike(opt.displayStyle, ...arguments),
 				};
@@ -198,6 +186,27 @@ function layerVector(opt) {
 		return options.host + urlParams.path + '?' + query.join('&');
 	}
 
+	// Pseudo randomly shift the anchor in the range -0.7 ... +1.7 if there is an other feature closest thant 24 px
+	function shiftAnchor(feature, resolution) {
+		if (resolution < options.maxResolutionDegroup) {
+			const featureCoords = feature.getGeometry().getCoordinates(),
+				closest = source.getClosestFeatureToCoordinate(featureCoords, f => f != feature)
+
+			if (closest) {
+				const closestCoords = closest.getGeometry().getCoordinates(),
+					distance = ol.sphere.getDistance(
+						ol.proj.transform(featureCoords, 'EPSG:3857', 'EPSG:4326'),
+						ol.proj.transform(closestCoords, 'EPSG:3857', 'EPSG:4326')
+					),
+					id = feature.getId() || feature.id;;
+
+				if (distance < resolution * 24) // 24 = size of the icons
+					return id * 3.14 % 1 + id % 2 * 1.4 - 0.7; // Pseudo random anchor shift
+			}
+		}
+		return 0.5;
+	}
+
 	return layer;
 }
 
@@ -239,7 +248,7 @@ function layerVectorCluster(opt) {
 				Math.max(options.distance, Math.sqrt(surface / options.density))
 			);
 
-		if (evt.frameState.viewState.resolution < layer.options.maxDegroupIcons)
+		if (evt.frameState.viewState.resolution < layer.options.maxResolutionDegroup)
 			distanceMinCluster = 0;
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
