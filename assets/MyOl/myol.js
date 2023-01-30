@@ -547,9 +547,22 @@ function layerVector(opt) {
 
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
+				// Disjoin too close icons
+				let anchor = 0.5;
+				if (resolution < layer.options.minClusterResolution) {
+					const coordinates = feature.getGeometry().getCoordinates(),
+						closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
+						distance = ol.sphere.getDistance(
+							ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
+							ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
+						);
+					anchor = (feature.getId() || feature.id) * 3.14 % 1.6 - .03; // Pseudo random anchor shift
+				}
+
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						src: properties.icon,
+						anchor: [anchor, 0.5],
 					}) : null,
 					...functionLike(opt.displayStyle, ...arguments),
 				};
@@ -560,7 +573,7 @@ function layerVector(opt) {
 					...functionLike(opt.hoverStyle, ...arguments),
 				};
 			},
-			clusterStyle: function(feature, properties, layer, resolution) {
+			clusterStyle: function(feature, properties) {
 				if (properties.cluster)
 					return {
 						image: new ol.style.Circle({
@@ -585,7 +598,7 @@ function layerVector(opt) {
 					new ol.style.Style({
 						...functionLike(options.displayStyle, ...args),
 						...functionLike(options.hoverStyle, ...args), // The hovering style can overload some styles options
-						zIndex:200,
+						zIndex: 200,
 					}),
 					new ol.style.Style( // Need a separate style because of text option on the both
 						functionLike(options.clusterStyle, ...args)
@@ -656,7 +669,7 @@ function layerVector(opt) {
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
 				...jsonFeature.properties,
-				...functionLike(options.convertProperties,jsonFeature.properties, options),
+				...functionLike(options.convertProperties, jsonFeature.properties, options),
 			};
 
 			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
@@ -702,6 +715,7 @@ function layerVectorCluster(opt) {
 	const options = {
 			distance: 30, // Minimum distance (pixels) between clusters
 			density: 1000, // Maximum number of displayed clusters
+			minClusterResolution: 5, // Resolution under there is no clusterisation
 			...opt,
 		},
 		layer = layerVector(options), // Creates the basic layer (with all the points)
@@ -1175,62 +1189,6 @@ function layerClusterWri(opt) {
 		altLayer: clusterLayer,
 		...options,
 	});
-}
-
-// Specific format used by refuges.info
-function layerWriWri(options) {
-	function labelOptions(feature, properties, layer, resolution) {
-		const coordinates = feature.getGeometry().getCoordinates(),
-			closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
-			distance = ol.sphere.getDistance(
-				ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
-				ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
-			),
-			anchor = feature.getId() * 3.14 % 1.6 - .03; // Pseudo random anchor shift
-
-		if (distance < 16 * resolution &&
-			resolution < layer.options.minClusterResolution)
-			return {
-				offsetX: -anchor * 24 + 24,
-				offsetY: -anchor * 24 + 6,
-				textAlign: 'left',
-				anchor: anchor,
-			};
-	}
-
-	return layerClusterWri({
-		// Specific formats to be added to the basic one
-		displayStyle: function(feature, properties, layer, resolution) {
-			const lo = labelOptions(feature, properties, layer, resolution);
-
-			// Shift anchor of features too closed
-			if (properties.icon)
-				return {
-					...styleLabel(feature, properties.nom, lo),
-					image: new ol.style.Icon({
-						src: properties.icon,
-						anchor: lo ? [lo.anchor, lo.anchor] : [0.5, 0.5],
-					}),
-				};
-		},
-		hoverStyle: function(feature, properties, layer, resolution) {
-			return styleLabelFull(
-				feature,
-				properties,
-				labelOptions(...arguments),
-			);
-		},
-
-		// Don't display attribution on labels
-		convertProperties: {
-			attribution: null,
-		},
-
-		// Don't cluster under resolution = 5
-		minClusterResolution: 5,
-
-		...options,
-	})
 }
 
 function layerWriAreas(options) {

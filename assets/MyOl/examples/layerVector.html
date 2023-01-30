@@ -166,7 +166,6 @@ new ol.Map({
 				selectName: 'select-massifs',
 			},
 			wri: {
-				host: '//dom.refuges.info/', //TODO FOR TEST !
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
 			},
 			osm: {
@@ -174,9 +173,15 @@ new ol.Map({
 			},
 		})
 		// WRI layer as in refuges.info
-		.concat(layerWriWri({
-			host: '//dom.refuges.info/', //TODO DELETE
+		.concat(layerClusterWri({
+			host: '//dom.refuges.info/', //TODO DELETE / BUG (feature null dans displayStyle)
 			selectName: 'select-refuges',
+			displayStyle: function(feature, properties) {
+				return styleLabel(feature, properties.nom); // Display a single label above each icon
+			},
+			convertProperties: {
+				attribution: null, // Don't display attribution on labels
+			},
 		})),
 	],
 });

@@ -172,62 +172,6 @@ function layerClusterWri(opt) {
 	});
 }
 
-// Specific format used by refuges.info
-function layerWriWri(options) {
-	function labelOptions(feature, properties, layer, resolution) {
-		const coordinates = feature.getGeometry().getCoordinates(),
-			closest = layer.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
-			distance = ol.sphere.getDistance(
-				ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
-				ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
-			),
-			anchor = feature.getId() * 3.14 % 1.6 - .03; // Pseudo random anchor shift
-
-		if (distance < 16 * resolution &&
-			resolution < layer.options.minClusterResolution)
-			return {
-				offsetX: -anchor * 24 + 24,
-				offsetY: -anchor * 24 + 6,
-				textAlign: 'left',
-				anchor: anchor, //HACK embark for icon
-			};
-	}
-
-	return layerClusterWri({
-		// Specific formats to be added to the basic one
-		displayStyle: function(feature, properties, layer, resolution) {
-			const lo = labelOptions(feature, properties, layer, resolution);
-
-			// Shift anchor of features too closed
-			if (properties.icon)
-				return {
-					...styleLabel(feature, properties.nom, lo),
-					image: new ol.style.Icon({
-						src: properties.icon,
-						anchor: lo ? [lo.anchor, lo.anchor] : [0.5, 0.5],
-					}),
-				};
-		},
-		hoverStyle: function(feature, properties, layer, resolution) {
-			return styleLabelFull(
-				feature,
-				properties,
-				labelOptions(...arguments),
-			);
-		},
-
-		// Don't display attribution on labels
-		convertProperties: {
-			attribution: null,
-		},
-
-		// Don't cluster under resolution = 5
-		minClusterResolution: 5,
-
-		...options,
-	})
-}
-
 function layerWriAreas(options) {
 	return layerVector({
 		host: '//www.refuges.info/',

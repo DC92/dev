@@ -30,16 +30,30 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 100, // Above the background layers
+			maxDegroupIcons: 5, // Resolution under there is no clusterisation
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 
 			// Default styles
-			displayStyle: function(feature, properties, layer, resolution) {
+			displayStyle: function(feature, properties, l, resolution) {
+				// Disjoin too close icons
+				let anchor = 0.5;
+				if (resolution < layer.options.maxDegroupIcons) {
+					const coordinates = feature.getGeometry().getCoordinates(),
+						closest = l.getSource().getClosestFeatureToCoordinate(coordinates, f => f != feature),
+						distance = ol.sphere.getDistance(
+							ol.proj.transform(coordinates, 'EPSG:3857', 'EPSG:4326'),
+							ol.proj.transform(closest.getGeometry().getCoordinates(), 'EPSG:3857', 'EPSG:4326'),
+						);
+					anchor = (feature.getId() || feature.id) * 3.14 % 1.6 - .03; // Pseudo random anchor shift
+				}
+
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						//TODO BUG general : send cookies to the server, event non secure		
 						src: properties.icon,
+						anchor: [anchor, 0.5],
 					}) : null,
 					...functionLike(opt.displayStyle, ...arguments),
 				};
@@ -50,7 +64,7 @@ function layerVector(opt) {
 					...functionLike(opt.hoverStyle, ...arguments),
 				};
 			},
-			clusterStyle: function(feature, properties, layer, resolution) {
+			clusterStyle: function(feature, properties) {
 				if (properties.cluster)
 					return {
 						image: new ol.style.Circle({
@@ -75,7 +89,7 @@ function layerVector(opt) {
 					new ol.style.Style({
 						...functionLike(options.displayStyle, ...args),
 						...functionLike(options.hoverStyle, ...args), // The hovering style can overload some styles options
-						zIndex:200,
+						zIndex: 200,
 					}),
 					new ol.style.Style( // Need a separate style because of text option on the both
 						functionLike(options.clusterStyle, ...args)
@@ -148,7 +162,7 @@ function layerVector(opt) {
 			// Callback function to convert some server properties to the one displayed by this package
 			jsonFeature.properties = {
 				...jsonFeature.properties,
-				...functionLike(options.convertProperties,jsonFeature.properties, options),
+				...functionLike(options.convertProperties, jsonFeature.properties, options),
 			};
 
 			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
@@ -225,7 +239,7 @@ function layerVectorCluster(opt) {
 				Math.max(options.distance, Math.sqrt(surface / options.density))
 			);
 
-		if (evt.frameState.viewState.resolution < options.minClusterResolution)
+		if (evt.frameState.viewState.resolution < layer.options.maxDegroupIcons)
 			distanceMinCluster = 0;
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
