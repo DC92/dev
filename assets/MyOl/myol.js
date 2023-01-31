@@ -548,12 +548,15 @@ function layerVector(opt) {
 
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
+				const close = isCloseFeature(feature, resolution);
+
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						src: properties.icon,
-						anchor: [shiftAnchor(feature, resolution), 0.5],
+						// Pseudo random -0.7 ... +1.7 anchor shift
+						anchor: [close ? close * 3.14 % 1 + close % 2 * 1.4 - 0.7 : 0.5, 0.5],
 					}) : null,
-					...functionLike(opt.displayStyle, ...arguments),
+					...functionLike(opt.displayStyle, ...arguments, close),
 				};
 			},
 			hoverStyle: function(feature, properties, layer, resolution) {
@@ -608,7 +611,7 @@ function layerVector(opt) {
 			source: source,
 			style: (feature, resolution) => new ol.style.Style({
 				...functionLike(options.displayStyle, feature, feature.getProperties(), layer, resolution),
-				...functionLike(options.clusterStyle, feature, feature.getProperties(), layer, resolution),
+				...functionLike(options.clusterStyle, feature, feature.getProperties()),
 			}),
 			...options,
 		});
@@ -695,7 +698,7 @@ function layerVector(opt) {
 	}
 
 	// Shift the anchor if there is an other feature closest than 24 px
-	function shiftAnchor(feature, resolution) {
+	function isCloseFeature(feature, resolution) {
 		const geometry = feature.getGeometry();
 
 		if (resolution < options.maxResolutionDegroup &&
@@ -711,15 +714,12 @@ function layerVector(opt) {
 					distance = ol.sphere.getDistance(
 						ol.proj.transform(featureCoords, 'EPSG:3857', 'EPSG:4326'),
 						ol.proj.transform(closestCoords, 'EPSG:3857', 'EPSG:4326')
-					),
-					id = feature.getId() || feature.id;
+					);
 
 				if (distance < resolution * 24) // Size of the icons
-					// Pseudo random -0.7 ... +1.7 anchor shift
-					return id * 3.14 % 1 + id % 2 * 1.4 - 0.7; 
+					return feature.getId() || feature.id; // Pseudo random
 			}
 		}
-		return 0.5;
 	}
 
 	return layer;
@@ -847,8 +847,7 @@ function addMapListener(map) {
 						hitTolerance: 6, // Default 0
 					}
 				),
-				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {},
-				resolution = evt.map.getView().getResolution();
+				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {};
 
 
 			// Setup the curseur

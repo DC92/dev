@@ -284,7 +284,7 @@ function layerEditGeoJson(opt) {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(displayStyle); //TODO devrait effacer le style / displayStyle n'a pas les bons arguments
+			hoveredFeature.setStyle(displayStyle); //TODO should clear style / displayStyle has wrong arguments
 			hoveredFeature = null;
 		}
 	}
