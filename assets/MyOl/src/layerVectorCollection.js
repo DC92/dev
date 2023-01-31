@@ -413,7 +413,6 @@ function layerVectorCollection(options) {
 
 	return [
 		layerClusterWri(options.wri),
-		layerWriAreas(options.wriAreas),
 		layerPrc(options.prc),
 		layerC2C(options.c2c),
 		layerOverpass(options.osm),

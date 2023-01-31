@@ -18,7 +18,7 @@ function layerVector(opt) {
 				can be several SELECT_NAME_1,SELECT_NAME_2,...
 				display loading status <TAG id="SELECT_NAME-status"></TAG>
 				no selectName will display the layer
-				no selector with selectName will hide the layer
+				selectName with no selector with this name will hide the layer
 			*/
 			callBack: function() { // Function called when the selector is actioned
 				layer.setVisible(
@@ -42,6 +42,7 @@ function layerVector(opt) {
 						//TODO BUG general : send cookies to the server, event non secure		
 						src: properties.icon,
 						anchor: [shiftAnchor(feature, resolution), 0.5],
+						//BEST also randomly vertical shift the label
 					}) : null,
 					...functionLike(opt.displayStyle, ...arguments),
 				};
@@ -186,11 +187,17 @@ function layerVector(opt) {
 		return options.host + urlParams.path + '?' + query.join('&');
 	}
 
-	// Pseudo randomly shift the anchor in the range -0.7 ... +1.7 if there is an other feature closest thant 24 px
+	// Shift the anchor if there is an other feature closest than 24 px
 	function shiftAnchor(feature, resolution) {
-		if (resolution < options.maxResolutionDegroup) {
-			const featureCoords = feature.getGeometry().getCoordinates(),
-				closest = source.getClosestFeatureToCoordinate(featureCoords, f => f != feature)
+		const geometry = feature.getGeometry();
+
+		if (resolution < options.maxResolutionDegroup &&
+			geometry.getType() == 'Point') {
+			const featureCoords = geometry.getCoordinates(),
+				closest = source.getClosestFeatureToCoordinate(
+					featureCoords,
+					f => f != feature && f.getGeometry().getType() == 'Point'
+				);
 
 			if (closest) {
 				const closestCoords = closest.getGeometry().getCoordinates(),
@@ -198,10 +205,11 @@ function layerVector(opt) {
 						ol.proj.transform(featureCoords, 'EPSG:3857', 'EPSG:4326'),
 						ol.proj.transform(closestCoords, 'EPSG:3857', 'EPSG:4326')
 					),
-					id = feature.getId() || feature.id;;
+					id = feature.getId() || feature.id;
 
-				if (distance < resolution * 24) // 24 = size of the icons
-					return id * 3.14 % 1 + id % 2 * 1.4 - 0.7; // Pseudo random anchor shift
+				if (distance < resolution * 24) // Size of the icons
+					// Pseudo random -0.7 ... +1.7 anchor shift
+					return id * 3.14 % 1 + id % 2 * 1.4 - 0.7; 
 			}
 		}
 		return 0.5;

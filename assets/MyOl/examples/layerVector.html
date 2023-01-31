@@ -161,18 +161,15 @@ new ol.Map({
 			alpages: {
 				selectName: 'select-alpages',
 			},
-			wriAreas: {
-				selectName: 'select-massifs',
-			},
 			wri: {
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
 			},
 			osm: {
 				selectName: 'select-osm',
 			},
-		})
+		}),
 		// WRI layer as in refuges.info
-		.concat(layerClusterWri({
+		layerClusterWri({
 			selectName: 'select-refuges',
 			displayStyle: function(feature, properties) {
 				return styleLabel(feature, properties.nom); // Display a single label above each icon
@@ -180,7 +177,11 @@ new ol.Map({
 			convertProperties: {
 				attribution: null, // Don't display attribution on labels
 			},
-		})),
+		}),
+		// WRI area layer for refuges.info
+		layerWriAreas({
+			selectName: 'select-massifs',
+		}),
 	],
 });
 	</script>
