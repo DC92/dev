@@ -548,15 +548,20 @@ function layerVector(opt) {
 
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
-				const close = isCloseFeature(feature, resolution);
+				const close = isCloseFeature(feature, resolution),
+					id = feature.getId() || feature.id || 0,
+					shift = close ?
+					id * 3.14 % 1 + id % 2 * 1.4 - 0.7 : // Pseudo random -0.7 ... +1.7
+					0.45 + id % 10 / 100; // Pseudo random 0.45 ... 0.55 for other layers superposition
 
 				return {
 					image: properties.icon ? new ol.style.Icon({
 						src: properties.icon,
-						// Pseudo random -0.7 ... +1.7 anchor shift
-						anchor: [close ? close * 3.14 % 1 + close % 2 * 1.4 - 0.7 : 0.5, 0.5],
+						anchor: [shift, 0.5],
 					}) : null,
-					...functionLike(opt.displayStyle, ...arguments, close),
+					...functionLike(opt.displayStyle, ...arguments, {
+						offsetY: close ? -(id % 30) : -13, // Random position of the label
+					}),
 				};
 			},
 			hoverStyle: function(feature, properties, layer, resolution) {
@@ -593,7 +598,7 @@ function layerVector(opt) {
 						zIndex: 200,
 					}),
 					new ol.style.Style( // Need a separate style because of text option on the both
-						functionLike(options.clusterStyle, ...args)
+						functionLike(options.clusterStyle, ...args),
 					),
 				];
 			}
@@ -717,7 +722,7 @@ function layerVector(opt) {
 					);
 
 				if (distance < resolution * 24) // Size of the icons
-					return feature.getId() || feature.id; // Pseudo random
+					return true;
 			}
 		}
 	}

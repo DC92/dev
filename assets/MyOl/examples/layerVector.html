@@ -174,10 +174,8 @@ new ol.Map({
 		layerClusterWri({
 			host: '//dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
-			displayStyle: function(feature, properties, layer, resolution, close) {
-				return styleLabel(feature, properties.nom, { // Display a single label above each icon
-					offsetY: close ? -8 - (close % 30) : -13, // Random position of the label
-				});
+			displayStyle: function(feature, properties, layer, resolution, textStyleOptions) {
+				return styleLabel(feature, properties.nom, textStyleOptions); // Display a single label above each icon
 			},
 			convertProperties: {
 				attribution: null, // Don't display attribution on labels
