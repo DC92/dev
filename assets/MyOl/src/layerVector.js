@@ -37,21 +37,45 @@ function layerVector(opt) {
 
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
-				const close = isCloseFeature(feature, resolution),
-					id = feature.getId() || feature.id || 0,
-					shift = close ?
-					id * 3.14 % 1 + id % 2 * 1.4 - 0.7 : // Pseudo random -0.7 ... +1.7
-					0.45 + id % 10 / 100; // Pseudo random 0.45 ... 0.55 for other layers superposition
+				const id = feature.getId() || feature.id || 0,
+					iConstyle = {},
+					labelStyle = {},
+					anchor = [0.5, 0.45 + id % 10 / 100], // Pseudo random 0.45 ... 0.55 to avoid other layers superposition
+					geometry = feature.getGeometry();
 
-				return {
-					image: properties.icon ? new ol.style.Icon({
+				// For points having an icon
+				if (properties.icon && !ol.extent.getArea(geometry.getExtent())) { 
+					if (resolution < options.maxResolutionDegroup) {
+						const featureCoords = geometry.getCoordinates(),
+							closest = source.getClosestFeatureToCoordinate(
+								featureCoords,
+								f => f != feature && // Not itself
+								!ol.extent.getArea(f.getGeometry().getExtent()) // Only points
+							);
+
+						if (closest) {
+							const closestCoords = closest.getGeometry().getCoordinates(),
+								distance = ol.sphere.getDistance(
+									ol.proj.transform(featureCoords, 'EPSG:3857', 'EPSG:4326'),
+									ol.proj.transform(closestCoords, 'EPSG:3857', 'EPSG:4326')
+								);
+
+							if (distance < resolution * 24) { // Size of the icons
+								anchor[0] = id * 3.14 % 1 + id % 2 * 1.4 - 0.7; // Pseudo random -0.7 ... +1.7
+								labelStyle.offsetY = -id % 30; // Random position of the label
+							}
+						}
+					}
+					iConstyle.image = new ol.style.Icon({
 						//TODO BUG general : send cookies to the server, event non secure		
 						src: properties.icon,
-						anchor: [shift, 0.5],
-					}) : null,
-					...functionLike(opt.displayStyle, ...arguments, {
-						offsetY: close ? -(id % 30) : -13, // Random position of the label
-					}),
+						anchor: anchor,
+					});
+				}
+
+				return {
+					...iConstyle,
+					...functionLike(opt.displayStyle, ...arguments, labelStyle),
 				};
 			},
 			hoverStyle: function(feature, properties, layer, resolution) {
@@ -193,31 +217,6 @@ function layerVector(opt) {
 				query.push(k + '=' + urlParams[k]);
 
 		return options.host + urlParams.path + '?' + query.join('&');
-	}
-
-	// Shift the anchor if there is an other feature closest than 24 px
-	function isCloseFeature(feature, resolution) {
-		const geometry = feature.getGeometry();
-
-		if (resolution < options.maxResolutionDegroup &&
-			geometry.getType() == 'Point') {
-			const featureCoords = geometry.getCoordinates(),
-				closest = source.getClosestFeatureToCoordinate(
-					featureCoords,
-					f => f != feature && f.getGeometry().getType() == 'Point'
-				);
-
-			if (closest) {
-				const closestCoords = closest.getGeometry().getCoordinates(),
-					distance = ol.sphere.getDistance(
-						ol.proj.transform(featureCoords, 'EPSG:3857', 'EPSG:4326'),
-						ol.proj.transform(closestCoords, 'EPSG:3857', 'EPSG:4326')
-					);
-
-				if (distance < resolution * 24) // Size of the icons
-					return true;
-			}
-		}
 	}
 
 	return layer;

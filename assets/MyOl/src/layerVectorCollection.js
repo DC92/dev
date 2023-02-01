@@ -4,9 +4,7 @@
  */
 //jshint esversion: 9
 
-/**
- * Site chemineur.fr, alpages.info
- */
+// chemineur.fr, alpages.info
 function layerGeoBB(options) {
 	return layerVectorCluster({
 		strategy: ol.loadingstrategy.bbox,
@@ -47,9 +45,7 @@ function layerClusterGeoBB(opt) {
 	});
 }
 
-/**
- * Site chemineur.fr
- */
+// chemineur.fr
 function layerChemineur(options) {
 	return layerClusterGeoBB({
 		host: '//chemineur.fr/',
@@ -105,9 +101,7 @@ function chemIconUrl(type) {
 	}
 }
 
-/**
- * Site alpages.info
- */
+// alpages.info
 function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
@@ -123,9 +117,7 @@ function layerAlpages(options) {
 	});
 }
 
-/**
- * Site refuges.info
- */
+// refuges.info
 function layerWri(options) {
 	return layerVectorCluster({ //BEST case of WRI without local cluster ?
 		host: '//www.refuges.info/',
@@ -218,9 +210,7 @@ function layerWriAreas(options) {
 	});
 }
 
-/**
- * Site pyrenees-refuges.com
- */
+// pyrenees-refuges.com
 function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -236,9 +226,7 @@ function layerPrc(options) {
 	});
 }
 
-/**
- * Site camptocamp.org
- */
+// camptocamp.org
 function layerC2C(options) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
@@ -405,9 +393,7 @@ function layerOverpass(opt) {
 	return layer;
 }
 
-/**
- * Vectors layers examples
- */
+// Vectors layers examples
 function layerVectorCollection(options) {
 	options = options || {};
 
