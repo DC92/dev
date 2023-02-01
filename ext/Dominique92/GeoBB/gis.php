@@ -94,7 +94,7 @@ $sql="SELECT post_id, post_subject,
 
 $result = $db->sql_query($sql);
 while ($row = $db->sql_fetchrow($result)) {
-	$altitudes = explode (',', str_replace ('~', '', $row['geo_altitude']));
+	$altitudes = array_filter (explode (',', str_replace ('~', '', $row['geo_altitude'])));
 
 	$properties = [
 		'id' => $row['topic_id'],
@@ -130,8 +130,10 @@ while ($row = $db->sql_fetchrow($result)) {
 
 			// Populate geojson altitudes
 			if (count ($altitudes))
-				$m[2] .= ', '.array_shift($altitudes);
-			return $m[1].','.$m[2];
+				$m[] = array_shift($altitudes);
+
+			unset ($m[0]);
+			return implode ($m, ',');
 		},
 		$row['geojson']
 	);

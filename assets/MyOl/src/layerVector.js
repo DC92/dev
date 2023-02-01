@@ -61,7 +61,7 @@ function layerVector(opt) {
 								);
 
 							if (distance < resolution * 24) { // Size of the icons
-								anchor[0] = id * 3.14 % 1 + id % 2 * 1.4 - 0.7; // Pseudo random -0.7 ... +1.7
+								anchor[0] = id * 3.14 % 1 + id % 2 * 1.2 - 0.6; // Pseudo random -0.6 ... +1.6
 								labelStyle.offsetY = -id % 30; // Random position of the label
 							}
 						}
