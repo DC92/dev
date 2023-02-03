@@ -44,7 +44,7 @@ function layerVector(opt) {
 					geometry = feature.getGeometry();
 
 				// For points having an icon
-				if (properties.icon && !ol.extent.getArea(geometry.getExtent())) { 
+				if (properties.icon && !ol.extent.getArea(geometry.getExtent())) {
 					if (resolution < options.maxResolutionDegroup) {
 						const featureCoords = geometry.getCoordinates(),
 							closest = source.getClosestFeatureToCoordinate(
@@ -336,7 +336,7 @@ function addMapListener(map) {
 			const hoveredFeature = map.forEachFeatureAtPixel(
 					map.getEventPixel(evt.originalEvent),
 					function(feature, layer) {
-						if (layer.options) {
+						if (layer && layer.options) {
 							hoveredLayer = layer;
 							return feature;
 						}
