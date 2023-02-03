@@ -8,11 +8,11 @@ const layer = layerVector({
 		},
 		styleOptFnc: function(feature ) {
 			return Object.assign({},
-				styleOptIcon(feature),
-				firstMenuLine ? null : styleOptLabel(feature),
+				styleOptIcon(feature), //TODO => ???
+				firstMenuLine ? null : styleOptLabel(feature), //TODO -> styleLabel(feature)
 			);
 		},
-		hoverStyle: styleOptLabel,
+		hoverStyle: styleOptLabel, //TODO -> styleLabel(feature)
 	}),
 
 	map = new ol.Map({

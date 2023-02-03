@@ -1,10 +1,7 @@
 RUPTURES INTERFACES
 ===================
-//TODO styleOptIcon(properties.icon) styleOptIcon(feature)
-//TODO DELETE id="marker-coordinates"
+//TODO zIndex du curseur sur modif
 //TODO refaire localement myol_lastChangeTime (dernière date de modif)
-//TODO styleOptLabel(properties.name, feature, properties, true) -> styleOptLabel(feature)
-//TODO extraParams -> urlParams (sans function)
 
 BUGS
 ====
