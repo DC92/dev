@@ -85,11 +85,13 @@ new ol.Map({
 	view: new ol.View({
 		enableRotation: false,
 	}),
-	controls: controlsCollection()
-		.concat(controlLayerSwitcher({
+	controls: [
+		...controlsCollection(),
+		controlLayerSwitcher({
 			layers: layerTileCollection(layersKeys),
 			selectExtId: 'select-ext',
-		})),
+		}),
+	],
 	layers: [
 		layerChemineur({
 			selectName: 'select-chem',

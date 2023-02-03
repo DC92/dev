@@ -1070,8 +1070,11 @@ function layerClusterGeoBB(opt) {
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
-			urlParams: {
-				layer: 'cluster',
+			urlParams: function(...arguments) {
+				return {
+					layer: 'cluster',
+					...functionLike(options.urlParams, ...arguments),
+				};
 			},
 			...options,
 		});

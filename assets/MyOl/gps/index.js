@@ -77,8 +77,10 @@ window.addEventListener('load', function() {
 		view: new ol.View({
 			constrainResolution: true, // Force zoom on the available tile's definition
 		}),
-		controls: controlsCollection(controlOptions)
-			.concat(controlLayerSwitcher(controlOptions.layerSwitcher)),
+		controls: [
+			...controlsCollection(controlOptions),
+			controlLayerSwitcher(controlOptions.layerSwitcher),
+		],
 		layers: layers,
 	});
 });

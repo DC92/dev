@@ -127,9 +127,11 @@ class listener implements EventSubscriberInterface
 				$post_row['LON_LAT'] = $lls[0];
 
 				// Altitude calculation
+				//TODO BUG si open-elevation trop long
 				if (array_key_exists ('geo_altitude', $topic_row) &&
 					$topic_row['forum_image'] && //TODO BUG trace : too large for GET parameter
 					!@$topic_row['geo_altitude'])
+					if(0)
 				{
 					// Use free API
 					$api = 'https://api.open-elevation.com/api/v1/lookup?locations=';
