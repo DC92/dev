@@ -152,6 +152,7 @@ function layerClusterWri(opt) {
 			transitionResolution: 100,
 			...opt,
 		},
+		// High resolutions
 		clusterLayer = layerWri({
 			minResolution: options.transitionResolution,
 			...options,
@@ -160,6 +161,7 @@ function layerClusterWri(opt) {
 			},
 		});
 
+	// Low resolutions
 	return layerWri({
 		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,

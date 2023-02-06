@@ -541,51 +541,26 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 100, // Above the background layers
-			maxResolutionDegroup: 5, // Resolution below which there is no clustering
+			maxResolutionDegroup: 5, // Resolution below which a cluster display a group of icons
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
-				const id = feature.getId() || feature.id || 0,
+				const id = feature.getId() || feature.id || feature.ol_uid,
 					iConstyle = {},
-					labelStyle = {},
-					anchor = [0.5, 0.45 + id % 10 / 100], // Pseudo random 0.45 ... 0.55 to avoid other layers superposition
 					geometry = feature.getGeometry();
 
 				// For points having an icon
-				if (properties.icon && !ol.extent.getArea(geometry.getExtent())) {
-					if (resolution < options.maxResolutionDegroup) {
-						const featureCoords = geometry.getCoordinates(),
-							closest = source.getClosestFeatureToCoordinate(
-								featureCoords,
-								f => f != feature && // Not itself
-								!ol.extent.getArea(f.getGeometry().getExtent()) // Only points
-							);
-
-						if (closest) {
-							const closestCoords = closest.getGeometry().getCoordinates(),
-								distance = ol.sphere.getDistance(
-									ol.proj.transform(featureCoords, 'EPSG:3857', 'EPSG:4326'),
-									ol.proj.transform(closestCoords, 'EPSG:3857', 'EPSG:4326')
-								);
-
-							if (distance < resolution * 24) { // Size of the icons
-								anchor[0] = id * 3.14 % 1 + id % 2 * 1.2 - 0.6; // Pseudo random -0.6 ... +1.6
-								labelStyle.offsetY = -id % 30; // Random position of the label
-							}
-						}
-					}
+				if (properties.icon && !ol.extent.getArea(geometry.getExtent()))
 					iConstyle.image = new ol.style.Icon({
 						src: properties.icon,
-						anchor: anchor,
 					});
-				}
 
 				return {
 					...iConstyle,
-					...functionLike(opt.displayStyle, ...arguments, labelStyle),
+					...functionLike(opt.displayStyle, ...arguments),
 				};
 			},
 			hoverStyle: function(feature, properties, layer, resolution) {
@@ -594,23 +569,43 @@ function layerVector(opt) {
 					...functionLike(opt.hoverStyle, ...arguments),
 				};
 			},
-			clusterStyle: function(feature, properties) {
-				if (properties.cluster)
-					return {
-						image: new ol.style.Circle({
-							radius: 14,
-							stroke: new ol.style.Stroke({
-								color: 'blue',
+			clusterStyles: function(feature, properties, layer, resolution) {
+				const styles = []; // Need separate styles to display several icons / labels
+
+				if (properties.cluster) {
+					if (resolution > options.maxResolutionDegroup)
+						// Cluster circle with number inside
+						styles.push(new ol.style.Style({
+							image: new ol.style.Circle({
+								radius: 14,
+								stroke: new ol.style.Stroke({
+									color: 'blue',
+								}),
+								fill: new ol.style.Fill({
+									color: 'white',
+								}),
 							}),
-							fill: new ol.style.Fill({
-								color: 'white',
+							text: new ol.style.Text({
+								text: properties.cluster.toString(),
+								font: '12px Verdana',
 							}),
-						}),
-						text: new ol.style.Text({
-							text: properties.cluster.toString(),
-							font: '12px Verdana',
-						}),
-					};
+						}));
+					else { // Spread icons under the label
+						let x = 0.85 + 0.35 * properties.cluster;
+
+						properties.features.forEach(f => {
+							const icon = f.getProperties().icon;
+							if (icon)
+								styles.push(new ol.style.Style({
+									image: new ol.style.Icon({
+										src: icon,
+										anchor: [x -= 0.7, 0.5],
+									})
+								}));
+						});
+					}
+				}
+				return styles;
 			},
 			// Hover style callback, embarked with the layer to be used by addMapListener
 			hoverStyleFunction: function(feature, resolution) {
@@ -621,9 +616,7 @@ function layerVector(opt) {
 						...functionLike(options.hoverStyle, ...args), // The hovering style can overload some styles options
 						zIndex: 200,
 					}),
-					new ol.style.Style( // Need a separate style because of text option on the both
-						functionLike(options.clusterStyle, ...args),
-					),
+					...functionLike(options.clusterStyles, ...args),
 				];
 			}
 		},
@@ -638,10 +631,12 @@ function layerVector(opt) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			style: (feature, resolution) => new ol.style.Style({
-				...functionLike(options.displayStyle, feature, feature.getProperties(), layer, resolution),
-				...functionLike(options.clusterStyle, feature, feature.getProperties()),
-			}),
+			style: (feature, resolution) => [
+				new ol.style.Style({
+					...functionLike(options.displayStyle, feature, feature.getProperties(), layer, resolution),
+				}),
+				...functionLike(options.clusterStyles, feature, feature.getProperties(), layer, resolution),
+			],
 			...options,
 		});
 
@@ -682,6 +677,7 @@ function layerVector(opt) {
 		// For all features
 		json.features.map(jsonFeature => {
 			// Generate a pseudo id if none
+			// This is important for non duplication of displayed features when bbox zooming
 			if (!jsonFeature.id)
 				jsonFeature.id =
 				jsonFeature.properties.id || // Takes the one in properties
@@ -692,10 +688,6 @@ function layerVector(opt) {
 				...jsonFeature.properties,
 				...functionLike(options.convertProperties, jsonFeature.properties, options),
 			};
-
-			// Add random epsilon to each coordinate uncluster the colocated points with distance = 0
-			if (jsonFeature.geometry && jsonFeature.geometry.type == 'Point')
-				jsonFeature.geometry.coordinates[0] += parseFloat('0.000000' + jsonFeature.id);
 
 			return jsonFeature;
 		});
@@ -766,9 +758,6 @@ function layerVectorCluster(opt) {
 				evt.frameState.viewState.resolution, // No clusterisation on low resolution zooms
 				Math.max(options.distance, Math.sqrt(surface / options.density))
 			);
-
-		if (evt.frameState.viewState.resolution < layer.options.maxResolutionDegroup)
-			distanceMinCluster = 0;
 
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
@@ -848,18 +837,29 @@ function addMapListener(map) {
 							return feature;
 						}
 					}, {
-						hitTolerance: 6, // Default 0
+						hitTolerance: 6, // For lines / Default 0
 					}
 				),
 				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {};
 
-
 			// Setup the curseur
 			map.getViewport().style.cursor = hoveredFeature &&
-				(hoveredProperties.url || hoveredProperties.cluster) &&
-				!hoveredLayer.options.noClick ?
-				'pointer' :
-				'';
+				(hoveredProperties.url || hoveredProperties.cluster) && !hoveredLayer.options.noClick ?
+				'pointer' : '';
+
+			// Detect feature of a disjoin cluster
+			if (hoveredFeature && hoveredProperties.cluster &&
+				map.getView().getResolution() < hoveredLayer.options.maxResolutionDegroup) {
+				const hoveredFeaturePixel = map.getPixelFromCoordinate(
+						hoveredFeature.getGeometry().getCoordinates()
+					),
+					deltaX = evt.originalEvent.x - hoveredFeaturePixel[0],
+					i = deltaX > 0 ? 1 : 0;
+
+				hoveredFeature.setStyle(
+					hoveredLayer.options.hoverStyleFunction(hoveredProperties.features[i])
+				);
+			}
 
 			// Change this feature only style (As the main style is a layer only style)
 			if (map.lastHoveredFeature != hoveredFeature) {
@@ -980,7 +980,7 @@ function selectVectorLayer(name, callBack) {
  * Some usefull style functions
  */
 // Display a label (Used by cluster)
-function styleLabel(feature, text, textStyleOptions) {
+function styleLabel(feature, text) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -1002,12 +1002,11 @@ function styleLabel(feature, text, textStyleOptions) {
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
 			}),
-			...textStyleOptions,
 		}),
 	};
 }
 
-function styleLabelFull(feature, properties, textStyleOptions) {
+function styleLabelFull(feature, properties) {
 	return styleLabel(
 		feature,
 		agregateText([
@@ -1019,7 +1018,6 @@ function styleLabelFull(feature, properties, textStyleOptions) {
 			properties.type,
 			properties.attribution,
 		]),
-		textStyleOptions,
 	);
 }
 
@@ -1190,6 +1188,7 @@ function layerClusterWri(opt) {
 			transitionResolution: 100,
 			...opt,
 		},
+		// High resolutions
 		clusterLayer = layerWri({
 			minResolution: options.transitionResolution,
 			...options,
@@ -1198,6 +1197,7 @@ function layerClusterWri(opt) {
 			},
 		});
 
+	// Low resolutions
 	return layerWri({
 		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
