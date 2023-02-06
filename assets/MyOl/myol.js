@@ -548,12 +548,10 @@ function layerVector(opt) {
 
 			// Default styles
 			displayStyle: function(feature, properties, layer, resolution) {
-				const id = feature.getId() || feature.id || feature.ol_uid,
-					iConstyle = {},
-					geometry = feature.getGeometry();
+				const iConstyle = {};
 
 				// For points having an icon
-				if (properties.icon && !ol.extent.getArea(geometry.getExtent()))
+				if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
 					iConstyle.image = new ol.style.Icon({
 						src: properties.icon,
 					});
@@ -594,14 +592,14 @@ function layerVector(opt) {
 						let x = 0.85 + 0.35 * properties.cluster;
 
 						properties.features.forEach(f => {
-							const icon = f.getProperties().icon;
-							if (icon)
+							const fStyle = layer.options.displayStyle(f, f.getProperties(), layer, resolution);
+
+							if (fStyle.image) {
+								fStyle.image.setAnchor([x -= 0.7, 0.5]);
 								styles.push(new ol.style.Style({
-									image: new ol.style.Icon({
-										src: icon,
-										anchor: [x -= 0.7, 0.5],
-									})
+									image: fStyle.image,
 								}));
+							}
 						});
 					}
 				}
@@ -609,14 +607,14 @@ function layerVector(opt) {
 			},
 			// Hover style callback, embarked with the layer to be used by addMapListener
 			hoverStyleFunction: function(feature, resolution) {
-				const args = [feature, feature.getProperties(), layer, resolution];
 				return [
 					new ol.style.Style({
-						...functionLike(options.displayStyle, ...args),
-						...functionLike(options.hoverStyle, ...args), // The hovering style can overload some styles options
+						...functionLike(options.displayStyle, feature, feature.getProperties(), layer, resolution),
+						// The hovering style can overload some styles options
+						...functionLike(options.hoverStyle, feature, feature.getProperties(), layer, resolution),
 						zIndex: 200,
 					}),
-					...functionLike(options.clusterStyles, ...args),
+					...functionLike(options.clusterStyles, feature, feature.getProperties(), layer, resolution),
 				];
 			}
 		},
