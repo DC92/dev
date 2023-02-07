@@ -174,7 +174,8 @@ new ol.Map({
 		layerClusterWri({
 			host: '//dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
-			displayStyle: function(feature, properties, layer, resolution) {
+			styleDisplay: function(feature, properties, layer, resolution) {
+				//TODO BUG pas si bullet cluster
 				return styleLabel(feature, properties.nom || properties.name); // Display a single label above each icon
 			},
 			convertProperties: {

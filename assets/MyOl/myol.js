@@ -547,74 +547,28 @@ function layerVector(opt) {
 			...opt,
 
 			// Default styles
-			displayStyle: function(feature, properties, layer, resolution) {
-				const iConstyle = {};
-
-				// For points having an icon
-				if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
-					iConstyle.image = new ol.style.Icon({
-						src: properties.icon,
-					});
-
+			styleDisplay: function(feature, properties, layer, resolution) {
 				return {
-					...iConstyle,
-					...functionLike(opt.displayStyle, ...arguments),
+					...styleIcon(...arguments),
+					...functionLike(opt.styleDisplay, ...arguments),
 				};
 			},
-			hoverStyle: function(feature, properties, layer, resolution) {
+			styleHover: function(feature, properties, layer, resolution) {
 				return {
 					...styleLabelFull(feature, properties),
-					...functionLike(opt.hoverStyle, ...arguments),
+					...functionLike(opt.styleHover, ...arguments),
 				};
-			},
-			clusterStyles: function(feature, properties, layer, resolution) {
-				const styles = []; // Need separate styles to display several icons / labels
-
-				if (properties.cluster) {
-					if (resolution > options.maxResolutionDegroup)
-						// Cluster circle with number inside
-						styles.push(new ol.style.Style({
-							image: new ol.style.Circle({
-								radius: 14,
-								stroke: new ol.style.Stroke({
-									color: 'blue',
-								}),
-								fill: new ol.style.Fill({
-									color: 'white',
-								}),
-							}),
-							text: new ol.style.Text({
-								text: properties.cluster.toString(),
-								font: '12px Verdana',
-							}),
-						}));
-					else { // Spread icons under the label
-						let x = 0.85 + 0.35 * properties.cluster;
-
-						properties.features.forEach(f => {
-							const fStyle = layer.options.displayStyle(f, f.getProperties(), layer, resolution);
-
-							if (fStyle.image) {
-								fStyle.image.setAnchor([x -= 0.7, 0.5]);
-								styles.push(new ol.style.Style({
-									image: fStyle.image,
-								}));
-							}
-						});
-					}
-				}
-				return styles;
 			},
 			// Hover style callback, embarked with the layer to be used by addMapListener
 			hoverStyleFunction: function(feature, resolution) {
 				return [
 					new ol.style.Style({
-						...functionLike(options.displayStyle, feature, feature.getProperties(), layer, resolution),
+						...functionLike(options.styleDisplay, feature, feature.getProperties(), layer, resolution),
 						// The hovering style can overload some styles options
-						...functionLike(options.hoverStyle, feature, feature.getProperties(), layer, resolution),
+						...functionLike(options.styleHover, feature, feature.getProperties(), layer, resolution),
 						zIndex: 200,
 					}),
-					...functionLike(options.clusterStyles, feature, feature.getProperties(), layer, resolution),
+					...functionLike(stylesCluster, feature, feature.getProperties(), layer, resolution),
 				];
 			}
 		},
@@ -631,9 +585,9 @@ function layerVector(opt) {
 			source: source,
 			style: (feature, resolution) => [
 				new ol.style.Style({
-					...functionLike(options.displayStyle, feature, feature.getProperties(), layer, resolution),
+					...functionLike(options.styleDisplay, feature, feature.getProperties(), layer, resolution),
 				}),
-				...functionLike(options.clusterStyles, feature, feature.getProperties(), layer, resolution),
+				...functionLike(stylesCluster, feature, feature.getProperties(), layer, resolution),
 			],
 			...options,
 		});
@@ -978,6 +932,15 @@ function selectVectorLayer(name, callBack) {
  * Some usefull style functions
  */
 // Display a label (Used by cluster)
+function styleIcon(feature, properties) {
+	if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
+		return {
+			image: new ol.style.Icon({
+				src: properties.icon,
+			}),
+		};
+}
+
 function styleLabel(feature, text) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
@@ -1026,6 +989,44 @@ function agregateText(lines, glue) {
 		.map(l => l.toString().replace('_', ' ').trim())
 		.map(l => l[0].toUpperCase() + l.substring(1))
 		.join(glue || '\n');
+}
+
+function stylesCluster(feature, properties, layer, resolution) {
+	let styles = [], // Need separate styles to display several icons / labels
+		x = 0.85 + 0.35 * properties.cluster;
+
+	if (properties.cluster) {
+		if (resolution < layer.options.maxResolutionDegroup)
+			// Spread icons under the label
+			properties.features.forEach(f => {
+				const fStyle = layer.options.styleDisplay(f, f.getProperties(), layer, resolution);
+
+				if (fStyle.image) {
+					fStyle.image.setAnchor([x -= 0.7, 0.5]);
+					styles.push(new ol.style.Style({
+						image: fStyle.image,
+					}));
+				}
+			});
+		else
+			// Cluster circle with number inside
+			styles.push(new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: 14,
+					stroke: new ol.style.Stroke({
+						color: 'blue',
+					}),
+					fill: new ol.style.Fill({
+						color: 'white',
+					}),
+				}),
+				text: new ol.style.Text({
+					text: properties.cluster.toString(),
+					font: '12px Verdana',
+				}),
+			}));
+	}
+	return styles;
 }
 
 // Return the value of result of function with arguments
@@ -1093,14 +1094,14 @@ function layerChemineur(options) {
 			attribution: '&copy;Chemineur',
 			...functionLike(options.convertProperties, ...arguments),
 		}),
-		displayStyle: {
+		styleDisplay: {
 			// Lines
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),
 		},
-		hoverStyle: function(feature, properties) {
+		styleHover: function(feature, properties) {
 			const elLabel = document.createElement('span');
 			elLabel.innerHTML = properties.name;
 
@@ -1215,7 +1216,7 @@ function layerWriAreas(options) {
 		convertProperties: properties => ({
 			url: properties.lien,
 		}),
-		displayStyle: function(feature, properties) {
+		styleDisplay: function(feature, properties) {
 			// Build color and transparency
 			const colors = properties.couleur
 				.match(/([0-9a-f]{2})/ig)
@@ -1232,7 +1233,7 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		hoverStyle: (feature, properties) => ({
+		styleHover: (feature, properties) => ({
 			...styleLabel(feature, properties.nom, {
 				padding: [1, 0, -1, 2],
 				font: '12px Verdana',
@@ -2696,7 +2697,7 @@ function layerEditGeoJson(opt) {
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		displayStyle = new ol.style.Style({
+		styleDisplay = new ol.style.Style({
 			// Lines or polygons border
 			stroke: new ol.style.Stroke({
 				color: 'red',
@@ -2751,7 +2752,7 @@ function layerEditGeoJson(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20, // Editor & cursor : above the features
-			style: displayStyle,
+			style: styleDisplay,
 		}),
 		interactions = [
 			new ol.interaction.Modify({ // 0 Modify
@@ -2926,7 +2927,7 @@ function layerEditGeoJson(opt) {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(displayStyle);
+			hoveredFeature.setStyle(styleDisplay);
 			hoveredFeature = null;
 		}
 	}

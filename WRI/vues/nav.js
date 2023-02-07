@@ -18,7 +18,7 @@ const mapId = 'carte-nav',
 		layerClusterWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			selectName: 'selecteur-wri,selecteur-massif', // 2 selecteurs pour une même couche
-			displayStyle: function(feature, properties, layer, resolution, textStyleOptions) {
+			styleDisplay: function(feature, properties, layer, resolution, textStyleOptions) {
 				return styleLabel(feature, properties.nom, textStyleOptions); // Etiquette simple par défaut
 			},
 			convertProperties: {
@@ -34,7 +34,7 @@ const mapId = 'carte-nav',
 			<?php if ( !$vue->contenu ) { ?>
 				selectName: 'selecteur-massif',
 			<?php } ?>
-			displayStyle: {
+			styleDisplay: {
 				stroke: new ol.style.Stroke({
 					color: 'blue',
 					width: 2,

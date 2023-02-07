@@ -59,14 +59,14 @@ function layerChemineur(options) {
 			attribution: '&copy;Chemineur',
 			...functionLike(options.convertProperties, ...arguments),
 		}),
-		displayStyle: {
+		styleDisplay: {
 			// Lines
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),
 		},
-		hoverStyle: function(feature, properties) {
+		styleHover: function(feature, properties) {
 			const elLabel = document.createElement('span');
 			elLabel.innerHTML = properties.name;
 
@@ -181,7 +181,7 @@ function layerWriAreas(options) {
 		convertProperties: properties => ({
 			url: properties.lien,
 		}),
-		displayStyle: function(feature, properties) {
+		styleDisplay: function(feature, properties) {
 			// Build color and transparency
 			const colors = properties.couleur
 				.match(/([0-9a-f]{2})/ig)
@@ -198,7 +198,7 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		hoverStyle: (feature, properties) => ({
+		styleHover: (feature, properties) => ({
 			...styleLabel(feature, properties.nom, {
 				padding: [1, 0, -1, 2],
 				font: '12px Verdana',

@@ -52,7 +52,7 @@ function layerEditGeoJson(opt) {
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		displayStyle = new ol.style.Style({
+		styleDisplay = new ol.style.Style({
 			// Lines or polygons border
 			stroke: new ol.style.Stroke({
 				color: 'red',
@@ -107,7 +107,7 @@ function layerEditGeoJson(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20, // Editor & cursor : above the features
-			style: displayStyle,
+			style: styleDisplay,
 		}),
 		interactions = [
 			new ol.interaction.Modify({ // 0 Modify
@@ -284,7 +284,7 @@ function layerEditGeoJson(opt) {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(displayStyle); //TODO should clear style / displayStyle has wrong arguments
+			hoveredFeature.setStyle(styleDisplay); //TODO should clear style / styleDisplay has wrong arguments
 			hoveredFeature = null;
 		}
 	}
