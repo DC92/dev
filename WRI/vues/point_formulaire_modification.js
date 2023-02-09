@@ -20,12 +20,12 @@ const marker = layerMarker({
 		selectName: null, // Toujours affiché
 		noClick: true, // Pour ne pas perturber l'édition par ces clicks intempestifs
 		// Etiquette simple par défaut
-		styleDisplay: function(feature, properties, layer, resolution, textStyleOptions) {
-			return styleLabel(feature, properties.nom, textStyleOptions);
+		styleOptionsDisplay: function(feature, properties, layer, resolution, textStyleOptions) {
+			return styleOptionsLabel(feature, properties.nom, textStyleOptions);
 		},
 		// Pour ne pas perturber l'édition par ces étiquettes intempestives
-		styleDisplay: function(feature, properties, layer, resolution, textStyleOptions) {
-			return styleLabel(feature, properties.nom, textStyleOptions); 
+		styleOptionsDisplay: function(feature, properties, layer, resolution, textStyleOptions) {
+			return styleOptionsLabel(feature, properties.nom, textStyleOptions); 
 		},
 	});
 

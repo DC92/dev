@@ -9,10 +9,10 @@ const layer = layerVector({
 		styleOptFnc: function(feature ) {
 			return Object.assign({},
 				styleOptIcon(feature), //TODO => ???
-				firstMenuLine ? null : styleOptLabel(feature), //TODO -> styleLabel(feature)
+				firstMenuLine ? null : styleOptLabel(feature), //TODO -> styleOptionsLabel(feature)
 			);
 		},
-		styleHover: styleOptLabel, //TODO -> styleLabel(feature)
+		styleOptionsHover: styleOptLabel, //TODO -> styleOptionsLabel(feature)
 	}),
 
 	map = new ol.Map({

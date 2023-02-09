@@ -30,40 +30,27 @@ function layerVector(opt) {
 			strategy: ol.loadingstrategy.all,
 			projection: 'EPSG:4326', // Received projection
 			zIndex: 100, // Above the background layers
-			maxResolutionDegroup: 5, // Resolution below which a cluster display a group of icons
 			// convertProperties: function(properties, options) {}, // Convert some server properties to the one used by this package
 			// altLayer: Another layer to add to the map with this one (for resolution depending layers)
 			...opt,
 
-			// Default styles
-			styleDisplay: function(feature, properties, layer, resolution) {
+			// Default style options
+			styleOptionsDisplay: function(feature, properties, layer, resolution) {
 				return {
-					...styleIcon(...arguments),
-					...functionLike(opt.styleDisplay, ...arguments),
+					...styleOptionsIcon(...arguments), // Default style
+					...functionLike(opt.styleOptionsDisplay, ...arguments),
 				};
 			},
-			styleHover: function(feature, properties, layer, resolution) {
+			styleOptionsHover: function(feature, properties, layer, resolution) {
 				//TODO BUG label is under other layers
-				return {
-					...styleLabelFull(feature, properties),
-					...functionLike(opt.styleHover, ...arguments),
+				return { // Each of these options can overwrite the previous
+					...functionLike(options.styleOptionsDisplay, ...arguments), // Non hover style
+					...styleOptionsLabelFull(...arguments), // Default hovering
+					...functionLike(opt.styleOptionsHover, ...arguments), // Overwrite when hovering
 				};
 			},
-			// Hover style callback, embarked with the layer to be used by addMapListener
-			hoverStyleFunction: function(feature, resolution) {
-				//TODO BUG ne retrouve pas l'étalement des icones quand hiver
-				return [
-					new ol.style.Style({
-						...functionLike(options.styleDisplay, feature, feature.getProperties(), layer, resolution),
-						// The hovering style can overload some styles options
-						...functionLike(options.styleHover, feature, feature.getProperties(), layer, resolution),
-						zIndex: 200,
-					}),
-					...functionLike(stylesCluster, feature, feature.getProperties(), layer, resolution),
-				];
-			}
 		},
-		// Other constants
+		// Other cons
 		selectNames = (options.selectName || '').split(','),
 		statusEl = document.getElementById(selectNames[0] + '-status'), // XHR download tracking
 		format = new ol.format.GeoJSON(),
@@ -75,10 +62,12 @@ function layerVector(opt) {
 		layer = new ol.layer.Vector({
 			source: source,
 			style: (feature, resolution) => [
-				new ol.style.Style({
-					...functionLike(options.styleDisplay, feature, feature.getProperties(), layer, resolution),
-				}),
-				...functionLike(stylesCluster, feature, feature.getProperties(), layer, resolution),
+				// One style with overwriting options
+				new ol.style.Style(
+					functionLike(options.styleOptionsDisplay, feature, feature.getProperties(), layer, resolution)
+				),
+				// Many styles to have several icons & labels
+				...functionLike(options.stylesDisplay, feature, feature.getProperties(), layer, resolution),
 			],
 			...options,
 		});
@@ -173,6 +162,8 @@ function layerVectorCluster(opt) {
 	const options = {
 			distance: 30, // Minimum distance (pixels) between clusters
 			density: 1000, // Maximum number of displayed clusters
+			maxResolutionDegroup: 5, // Resolution below which a cluster display a group of icons
+			stylesDisplay: stylesCluster, //TODO QUESTION how does it takes the heritage WriWri ?
 			...opt,
 		},
 		layer = layerVector(options), // Creates the basic layer (with all the points)
@@ -254,7 +245,7 @@ function layerVectorCluster(opt) {
 		// Display a cluster point
 		return new ol.Feature({
 			geometry: point, // The gravity center of all the features into the cluster
-			cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
+			cluster: nbClusters, //TODO voir pourquoi on ne met pas ça dans properties
 			id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
 			name: lines.join('\n'),
 			features: features,
@@ -270,11 +261,9 @@ function addMapListener(map) {
 		map.lastHoveredFeature = null;
 
 		map.on(['pointermove', 'click'], evt => {
-			// Detect hovered fature
-			let hoveredLayer = null;
-
 			// Find the first hovered feature
-			const hoveredFeature = map.forEachFeatureAtPixel(
+			let hoveredLayer = null,
+				hoveredFeature = map.forEachFeatureAtPixel(
 					map.getEventPixel(evt.originalEvent),
 					function(feature, layer) {
 						if (layer && layer.options) {
@@ -285,6 +274,8 @@ function addMapListener(map) {
 						hitTolerance: 6, // For lines / Default 0
 					}
 				),
+				indexHovered = null,
+				//styledFeature=hoveredFeature,// The feature that will receive the style
 				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {};
 
 			// Setup the curseur
@@ -296,26 +287,38 @@ function addMapListener(map) {
 			if (hoveredFeature && hoveredProperties.cluster &&
 				map.getView().getResolution() < hoveredLayer.options.maxResolutionDegroup) {
 				const hoveredFeaturePixel = map.getPixelFromCoordinate(
-						hoveredFeature.getGeometry().getCoordinates()
-					),
-					deltaX = evt.originalEvent.x - hoveredFeaturePixel[0],
-					i = deltaX > 0 ? 1 : 0; //TODO calcul de l'indice survolé
-				//TODO replace icon by list of icons
-
-				hoveredFeature.setStyle(
-					hoveredLayer.options.hoverStyleFunction(hoveredProperties.features[i])
+					hoveredFeature.getGeometry().getCoordinates()
 				);
+
+				// Calculate the feature index from the cursor position
+				indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
+					(evt.originalEvent.x - hoveredFeaturePixel[0] + 8.4 * hoveredProperties.cluster - 6) / 16.8
+				)));
 			}
 
 			// Change this feature only style (As the main style is a layer only style)
-			if (map.lastHoveredFeature != hoveredFeature) {
+			if (map.lastHoveredFeature != hoveredFeature ||
+				map.lastIndexHovered != indexHovered) {
 				if (map.lastHoveredFeature)
-					map.lastHoveredFeature.setStyle();
+					map.lastHoveredFeature.setStyle(); // Erase previous hover style
 
 				map.lastHoveredFeature = hoveredFeature;
+				map.lastIndexHovered = indexHovered;
 
-				if (hoveredFeature)
-					hoveredFeature.setStyle(hoveredLayer.options.hoverStyleFunction); //BEST enlever .options
+				const hoveredIndexProperties = indexHovered !== null ? {
+					...hoveredProperties.features[indexHovered].getProperties(),
+					icon: null,
+				} : hoveredProperties;
+
+				if (hoveredFeature) {
+					hoveredFeature.setStyle(
+						(feature, resolution) => [
+							new ol.style.Style( //TODO BUG zIndex not operating
+								functionLike(hoveredLayer.options.styleOptionsHover, hoveredFeature, hoveredIndexProperties, hoveredLayer, resolution)
+							),
+							...functionLike(hoveredLayer.options.stylesDisplay, hoveredFeature, hoveredProperties, hoveredLayer, resolution),
+						]);
+				}
 			}
 
 			// Click on a feature
@@ -426,7 +429,7 @@ function selectVectorLayer(name, callBack) {
  * Some usefull style functions
  */
 // Display a label (Used by cluster)
-function styleIcon(feature, properties) {
+function styleOptionsIcon(feature, properties) {
 	if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
 		return {
 			image: new ol.style.Icon({
@@ -436,7 +439,7 @@ function styleIcon(feature, properties) {
 		};
 }
 
-function styleLabel(feature, text) {
+function styleOptionsLabel(feature, text) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -463,8 +466,8 @@ function styleLabel(feature, text) {
 	};
 }
 
-function styleLabelFull(feature, properties) {
-	return styleLabel(
+function styleOptionsLabelFull(feature, properties) {
+	return styleOptionsLabel(
 		feature,
 		agregateText([
 			properties.name,
@@ -495,12 +498,12 @@ function stylesCluster(feature, properties, layer, resolution) {
 		if (resolution < layer.options.maxResolutionDegroup)
 			// Spread icons under the label
 			properties.features.forEach(f => {
-				const fStyle = layer.options.styleDisplay(f, f.getProperties(), layer, resolution);
+				const image = layer.getStyleFunction()(f, resolution)[0].getImage();
 
-				if (fStyle.image) {
-					fStyle.image.setAnchor([x -= 0.7, 0.5]);
+				if (image) {
+					image.setAnchor([x -= 0.7, 0.5]);
 					styles.push(new ol.style.Style({
-						image: fStyle.image,
+						image: image,
 					}));
 				}
 			});
@@ -527,5 +530,5 @@ function stylesCluster(feature, properties, layer, resolution) {
 
 // Return the value of result of function with arguments
 function functionLike(value, ...arguments) {
-	return typeof value == 'function' ? value(...arguments) : value;
+	return typeof value == 'function' ? value(...arguments) : value || [];
 }

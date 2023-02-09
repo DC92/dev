@@ -59,14 +59,14 @@ function layerChemineur(options) {
 			attribution: '&copy;Chemineur',
 			...functionLike(options.convertProperties, ...arguments),
 		}),
-		styleDisplay: {
+		styleOptionsDisplay: {
 			// Lines
 			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),
 		},
-		styleHover: function(feature, properties) {
+		styleOptionsHover: function(feature, properties) {
 			const elLabel = document.createElement('span');
 			elLabel.innerHTML = properties.name;
 
@@ -181,14 +181,14 @@ function layerWriAreas(options) {
 		convertProperties: properties => ({
 			url: properties.lien,
 		}),
-		styleDisplay: function(feature, properties) {
+		styleOptionsDisplay: function(feature, properties) {
 			// Build color and transparency
 			const colors = properties.couleur
 				.match(/([0-9a-f]{2})/ig)
 				.map(c => parseInt(c, 16));
 
 			return {
-				...styleLabel(feature, properties.nom, {
+				...styleOptionsLabel(feature, properties.nom, {
 					padding: [1, -1, -1, 1],
 					backgroundStroke: null,
 					font: null,
@@ -198,8 +198,8 @@ function layerWriAreas(options) {
 				}),
 			};
 		},
-		styleHover: (feature, properties) => ({
-			...styleLabel(feature, properties.nom, {
+		styleOptionsHover: (feature, properties) => ({
+			...styleOptionsLabel(feature, properties.nom, {
 				padding: [1, 0, -1, 2],
 				font: '12px Verdana',
 				overflow: true, // Force display even if no place

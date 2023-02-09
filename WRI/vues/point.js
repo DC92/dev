@@ -21,9 +21,9 @@ new ol.Map({
 		// Refuges.info (2 couches dependant de la resolution)
 		layerClusterWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			styleDisplay: function(feature, properties) {
+			styleOptionsDisplay: function(feature, properties) {
 				if (properties.name)
-					return styleLabel(feature, properties.name);
+					return styleOptionsLabel(feature, properties.name);
 			},
 			convertProperties: {
 				attribution: null,
