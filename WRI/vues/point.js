@@ -19,15 +19,8 @@ new ol.Map({
 	}),
 	layers: [
 		// Refuges.info (2 couches dependant de la resolution)
-		layerClusterWri({
+		layerWriWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
-			styleOptionsDisplay: function(feature, properties) {
-				if (properties.name)
-					return styleOptionsLabel(feature, properties.name);
-			},
-			convertProperties: {
-				attribution: null,
-			},
 		}),
 
 		// Le cadre

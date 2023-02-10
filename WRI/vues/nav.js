@@ -15,15 +15,9 @@ const mapId = 'carte-nav',
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
 	layers = [
 		// Refuges.info (2 couches dependant de la resolution)
-		layerClusterWri({
+		layerWriWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			selectName: 'selecteur-wri,selecteur-massif', // 2 selecteurs pour une même couche
-			styleOptionsDisplay: function(feature, properties, layer, resolution, textStyleOptions) {
-				return styleOptionsLabel(feature, properties.nom, textStyleOptions); // Etiquette simple par défaut
-			},
-			convertProperties: {
-				attribution: null,
-			},
 		}),
 
 		// Contour d'un massif ou d'une zone

@@ -19,7 +19,7 @@ function layerMarker(opt) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 20, // Above points (zIndex = 10)
+			zIndex: 1000, // Above points
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
 					src: options.src,

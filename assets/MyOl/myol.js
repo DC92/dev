@@ -782,8 +782,7 @@ function addMapListener(map) {
 						hitTolerance: 6, // For lines / Default 0
 					}
 				),
-				indexHovered = null,
-				//styledFeature=hoveredFeature,// The feature that will receive the style
+				styledFeature = hoveredFeature, // The feature that will receive the style
 				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {};
 
 			// Setup the curseur
@@ -795,36 +794,36 @@ function addMapListener(map) {
 			if (hoveredFeature && hoveredProperties.cluster &&
 				map.getView().getResolution() < hoveredLayer.options.maxResolutionDegroup) {
 				const hoveredFeaturePixel = map.getPixelFromCoordinate(
-					hoveredFeature.getGeometry().getCoordinates()
-				);
+						hoveredFeature.getGeometry().getCoordinates()
+					),
+					// Calculate the feature index from the cursor position
+					indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
+						(evt.originalEvent.x - hoveredFeaturePixel[0] + 8.4 * hoveredProperties.cluster - 6) / 16.8
+					)));
 
-				// Calculate the feature index from the cursor position
-				indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
-					(evt.originalEvent.x - hoveredFeaturePixel[0] + 8.4 * hoveredProperties.cluster - 6) / 16.8
-				)));
+				hoveredFeature = hoveredProperties.features[indexHovered];
 			}
 
 			// Change this feature only style (As the main style is a layer only style)
-			if (map.lastHoveredFeature != hoveredFeature ||
-				map.lastIndexHovered != indexHovered) {
-				if (map.lastHoveredFeature)
-					map.lastHoveredFeature.setStyle(); // Erase previous hover style
+			if (map.lastHoveredFeature != hoveredFeature ) {
+				if (map.lastStyledFeature)
+					map.lastStyledFeature.setStyle(); // Erase previous hover style
 
 				map.lastHoveredFeature = hoveredFeature;
-				map.lastIndexHovered = indexHovered;
+				map.lastStyledFeature = styledFeature;
 
-				const hoveredIndexProperties = indexHovered !== null ? {
-					...hoveredProperties.features[indexHovered].getProperties(),
-					icon: null,
-				} : hoveredProperties;
-
-				if (hoveredFeature) {
-					hoveredFeature.setStyle(
+				if (styledFeature) {
+					styledFeature.setStyle(
 						(feature, resolution) => [
-							new ol.style.Style(
-								functionLike(hoveredLayer.options.styleOptionsHover, hoveredFeature, hoveredIndexProperties, hoveredLayer, resolution)
+							new ol.style.Style({
+								...functionLike(hoveredLayer.options.styleOptionsHover,
+									hoveredFeature, hoveredFeature.getProperties(), hoveredLayer, resolution
+								),
+								zIndex: 200,
+							}),
+							...functionLike(hoveredLayer.options.stylesDisplay,
+								hoveredFeature, hoveredProperties, hoveredLayer, resolution
 							),
-							...functionLike(hoveredLayer.options.stylesDisplay, hoveredFeature, hoveredProperties, hoveredLayer, resolution),
 						]);
 				}
 			}
@@ -861,9 +860,9 @@ function addMapListener(map) {
 			// The mouse is outside of the map
 			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				if (map.lastHoveredFeature) {
-					map.lastHoveredFeature.setStyle();
-					map.lastHoveredFeature = null;
+				if (map.lastStyledFeature) {
+					map.lastStyledFeature.setStyle();
+					map.lastStyledFeature = null;
 				}
 		});
 	}
@@ -946,7 +945,7 @@ function styleOptionsIcon(feature, properties) {
 		};
 }
 
-function styleOptionsLabel(feature, text) {
+function styleOptionsLabel(feature, text, textStyleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -968,6 +967,7 @@ function styleOptionsLabel(feature, text) {
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
 			}),
+			...textStyleOptions,
 		}),
 	};
 }
@@ -1205,6 +1205,19 @@ function layerClusterWri(opt) {
 	return layerWri({
 		maxResolution: options.transitionResolution,
 		altLayer: clusterLayer,
+		...options,
+	});
+}
+
+function layerWriWri(options) {
+	return layerClusterWri({
+		styleOptionsDisplay: function(feature, properties, layer, resolution) {
+			if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
+				return styleOptionsLabel(feature, properties.nom || properties.name); // Display a single label above each icon
+		},
+		convertProperties: {
+			attribution: null, // Don't display attribution on labels
+		},
 		...options,
 	});
 }
@@ -2472,7 +2485,7 @@ function layerMarker(opt) {
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
-			zIndex: 20, // Above points (zIndex = 10)
+			zIndex: 1000, // Above points
 			style: new ol.style.Style({
 				image: new ol.style.Icon({
 					src: options.src,

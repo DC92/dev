@@ -169,6 +169,19 @@ function layerClusterWri(opt) {
 	});
 }
 
+function layerWriWri(options) {
+	return layerClusterWri({
+		styleOptionsDisplay: function(feature, properties, layer, resolution) {
+			if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
+				return styleOptionsLabel(feature, properties.nom || properties.name); // Display a single label above each icon
+		},
+		convertProperties: {
+			attribution: null, // Don't display attribution on labels
+		},
+		...options,
+	});
+}
+
 function layerWriAreas(options) {
 	return layerVector({
 		host: '//www.refuges.info/',
