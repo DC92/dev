@@ -11,7 +11,6 @@ const marker = layerMarker({
 		src: '<?=$config_wri["sous_dossier_installation"]?>images/viseur.svg',
 		focus: 15,
 		dragable: true,
-		zIndex: 30, // Above points (zIndex = 10)
 	}),
 
 	layerPoints = layerWri({

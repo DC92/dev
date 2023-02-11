@@ -765,8 +765,8 @@ function layerVectorCluster(opt) {
 
 // Add a listener to manage hovered features
 function addMapListener(map) {
-	if (typeof map.lastHoveredFeature == 'undefined') { // Once for a map
-		map.lastHoveredFeature = null;
+	if (typeof map.lastHover == 'undefined') { // Once for a map
+		map.lastHover = {};
 
 		map.on(['pointermove', 'click'], evt => {
 			// Find the first hovered feature
@@ -783,7 +783,8 @@ function addMapListener(map) {
 					}
 				),
 				styledFeature = hoveredFeature, // The feature that will receive the style
-				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {};
+				hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {},
+				noIconStyleOption = null;
 
 			// Setup the curseur
 			map.getViewport().style.cursor = hoveredFeature &&
@@ -802,15 +803,23 @@ function addMapListener(map) {
 					)));
 
 				hoveredFeature = hoveredProperties.features[indexHovered];
+				noIconStyleOption = {
+					image: null,
+				};
 			}
 
 			// Change this feature only style (As the main style is a layer only style)
-			if (map.lastHoveredFeature != hoveredFeature ) {
-				if (map.lastStyledFeature)
-					map.lastStyledFeature.setStyle(); // Erase previous hover style
+			if (map.lastHover.feature != hoveredFeature) {
+				if (map.lastHover.styledFeature)
+					map.lastHover.styledFeature.setStyle(); // Erase previous hover style
+				if (map.lastHover.layer)
+					map.lastHover.layer.setZIndex(100);
 
-				map.lastHoveredFeature = hoveredFeature;
-				map.lastStyledFeature = styledFeature;
+				map.lastHover = {
+					layer: hoveredLayer,
+					feature: hoveredFeature,
+					styledFeature: styledFeature,
+				};
 
 				if (styledFeature) {
 					styledFeature.setStyle(
@@ -819,12 +828,14 @@ function addMapListener(map) {
 								...functionLike(hoveredLayer.options.styleOptionsHover,
 									hoveredFeature, hoveredFeature.getProperties(), hoveredLayer, resolution
 								),
+								...noIconStyleOption,
 								zIndex: 200,
 							}),
 							...functionLike(hoveredLayer.options.stylesDisplay,
 								hoveredFeature, hoveredProperties, hoveredLayer, resolution
 							),
 						]);
+					hoveredLayer.setZIndex(200);
 				}
 			}
 
@@ -860,9 +871,10 @@ function addMapListener(map) {
 			// The mouse is outside of the map
 			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				if (map.lastStyledFeature) {
-					map.lastStyledFeature.setStyle();
-					map.lastStyledFeature = null;
+				if (map.lastHover.styledFeature) {
+					map.lastHover.styledFeature.setStyle();
+					map.lastHover.layer.setZIndex(100);
+					map.lastHover = {};
 				}
 		});
 	}
