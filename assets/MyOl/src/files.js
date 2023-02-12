@@ -12,7 +12,7 @@ function controlLoadGPX(opt) {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-			...opt
+			...opt,
 		},
 		control = controlButton(options);
 
@@ -122,7 +122,7 @@ function controlDownload(opt) {
 				'<a ctrlOnClick="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
 				'<a ctrlOnClick="download" id="GeoJSON" mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers', //BEST name from feature
-			...opt
+			...opt,
 		},
 		control = controlButton(options),
 		hiddenEl = document.createElement('a');

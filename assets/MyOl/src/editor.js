@@ -27,7 +27,7 @@ function layerEditGeoJson(opt) {
 						})
 					.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 			},
-			...opt
+			...opt,
 		},
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 		control = controlButton({

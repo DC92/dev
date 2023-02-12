@@ -39,7 +39,7 @@ function controlGPS(options) {
 			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: subMenu,
-			...options
+			...options,
 		}),
 
 		// Graticule
@@ -96,7 +96,7 @@ function controlGPS(options) {
 				enableHighAccuracy: true,
 				maximumAge: 1000,
 				timeout: 1000,
-				...options
+				...options,
 			},
 		});
 		geolocation.on('change', control.renderGPS);

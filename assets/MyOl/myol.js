@@ -120,7 +120,7 @@ function layerMRI() {
 function layerKompass(opt) {
 	const options = {
 		subLayer: 'KOMPASS Touristik',
-		...opt
+		...opt,
 	};
 
 	return layerOSM({
@@ -138,7 +138,7 @@ function layerThunderforest(opt) {
 	const options = {
 		subLayer: 'outdoors',
 		//key: Get a key at https://manage.thunderforest.com/dashboard
-		...opt
+		...opt,
 	};
 
 	if (options.key) // Don't display if no key
@@ -190,7 +190,7 @@ function layerSwissTopo(opt) {
 	const options = {
 			host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
 			subLayer: 'ch.swisstopo.pixelkarte-farbe',
-			...opt
+			...opt,
 		},
 		projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
@@ -217,7 +217,7 @@ function layerSwissTopo(opt) {
 				requestEncoding: 'REST',
 				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 			})),
-			...options
+			...options,
 		}),
 	];
 }
@@ -230,7 +230,7 @@ function layerSpain(opt) {
 		host: '//www.ign.es/wmts/',
 		server: 'mapa-raster',
 		subLayer: 'MTN',
-		...opt
+		...opt,
 	};
 
 	return new ol.layer.Tile({
@@ -240,7 +240,7 @@ function layerSpain(opt) {
 				'&style=default&tilematrixset=GoogleMapsCompatible' +
 				'&TileMatrix={z}&TileCol={x}&TileRow={y}',
 			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
-			...options
+			...options,
 		}),
 	});
 }
@@ -279,7 +279,7 @@ function layerOS(opt) {
 	const options = {
 		subLayer: 'Outdoor_3857',
 		// key: Get your own (free) key at https://osdatahub.os.uk/
-		...opt
+		...opt,
 	};
 
 	if (options.key)
@@ -306,7 +306,7 @@ function layerArcGIS(opt) {
 	const options = {
 		host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
 		subLayer: 'World_Imagery',
-		...opt
+		...opt,
 	};
 
 	return new ol.layer.Tile({
@@ -1490,7 +1490,7 @@ function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
 			className: '',
-			...opt
+			...opt,
 		},
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
@@ -1576,7 +1576,7 @@ function controlPermalink(opt) {
 			setUrl: false, // {true | false} Change url hash when moving the map.
 			display: false, // {true | false} Display permalink link the map.
 			hash: '?', // {?, #} the permalink delimiter after the url
-			...opt
+			...opt,
 		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
@@ -1654,7 +1654,7 @@ function controlMousePosition(options) {
 			} else
 				return ol.coordinate.createStringXY(4)(mouse);
 		},
-		...options
+		...options,
 	});
 }
 
@@ -1735,7 +1735,7 @@ function controlLengthLine() {
 function controlTilesBuffer(opt) {
 	const options = {
 			depth: 3,
-			...opt
+			...opt,
 		},
 		control = controlButton();
 
@@ -1764,7 +1764,7 @@ function controlGeocoder(options) {
 
 	const geocoder = new Geocoder('nominatim', {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
-			...options
+			...options,
 		}),
 		controlEl = geocoder.element.firstElementChild;
 
@@ -1811,7 +1811,7 @@ function controlPrint(options) {
 			'<label><input type="radio" name="myol-po" value="1" ctrlonchange="resizeDraftPrint">Paysage A4</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
-		...options
+		...options,
 	});
 
 	control.resizeDraftPrint = function() {
@@ -1872,7 +1872,7 @@ function controlPrint(options) {
 function controlHelp(options) {
 	return controlButton({
 		label: '?',
-		...options
+		...options,
 	});
 }
 
@@ -1880,9 +1880,9 @@ function controlHelp(options) {
  * Controls examples
  */
 function controlsCollection(opt) {
-	options = {
+	const options = {
 		supplementaryControls: [],
-		...opt
+		...opt,
 	};
 
 	return [
@@ -1923,7 +1923,7 @@ function controlLayerSwitcher(options) {
 				'<span>Ctrl+click: multicouches</span>' +
 				'</div>',
 			render: render,
-			...options
+			...options,
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
@@ -2066,7 +2066,7 @@ function controlLoadGPX(opt) {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-			...opt
+			...opt,
 		},
 		control = controlButton(options);
 
@@ -2175,7 +2175,7 @@ function controlDownload(opt) {
 				'<a ctrlOnClick="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
 				'<a ctrlOnClick="download" id="GeoJSON" mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers',
-			...opt
+			...opt,
 		},
 		control = controlButton(options),
 		hiddenEl = document.createElement('a');
@@ -2295,7 +2295,7 @@ function controlGPS(options) {
 			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: subMenu,
-			...options
+			...options,
 		}),
 
 		// Graticule
@@ -2352,7 +2352,7 @@ function controlGPS(options) {
 				enableHighAccuracy: true,
 				maximumAge: 1000,
 				timeout: 1000,
-				...options
+				...options,
 			},
 		});
 		geolocation.on('change', control.renderGPS);
@@ -2488,7 +2488,7 @@ function controlGPS(options) {
 function layerMarker(opt) {
 	const options = {
 			position: [0, 0],
-			...opt
+			...opt,
 		},
 		els = [],
 		point = new ol.geom.Point(options.position),
@@ -2503,7 +2503,7 @@ function layerMarker(opt) {
 					src: options.src,
 				}),
 			}),
-			...options
+			...options,
 		});
 	let view;
 
@@ -2621,8 +2621,7 @@ function layerMarker(opt) {
 
 		const ll3857 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
 			inEPSG21781 = typeof proj4 == 'function' &&
-			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857),
-			swissEls = document.getElementsByClassName('xy');
+			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
 		// Move the marker
 		point.setCoordinates(ll3857);
@@ -2702,7 +2701,7 @@ function layerEditGeoJson(opt) {
 						})
 					.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 			},
-			...opt
+			...opt,
 		},
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
 		control = controlButton({

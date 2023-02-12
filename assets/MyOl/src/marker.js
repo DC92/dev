@@ -10,7 +10,7 @@
 function layerMarker(opt) {
 	const options = {
 			position: [0, 0],
-			...opt
+			...opt,
 		},
 		els = [],
 		point = new ol.geom.Point(options.position),
@@ -25,7 +25,7 @@ function layerMarker(opt) {
 					src: options.src,
 				}),
 			}),
-			...options
+			...options,
 		});
 	let view;
 
@@ -144,8 +144,7 @@ function layerMarker(opt) {
 
 		const ll3857 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
 			inEPSG21781 = typeof proj4 == 'function' &&
-			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857),
-			swissEls = document.getElementsByClassName('xy');
+			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
 		// Move the marker
 		point.setCoordinates(ll3857);

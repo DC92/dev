@@ -15,7 +15,7 @@ function controlLayerSwitcher(options) {
 				'<span>Ctrl+click: multicouches</span>' +
 				'</div>',
 			render: render,
-			...options
+			...options,
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)

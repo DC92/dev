@@ -40,7 +40,7 @@ function layerMRI() {
 function layerKompass(opt) {
 	const options = {
 		subLayer: 'KOMPASS Touristik',
-		...opt
+		...opt,
 	};
 
 	return layerOSM({
@@ -58,7 +58,7 @@ function layerThunderforest(opt) {
 	const options = {
 		subLayer: 'outdoors',
 		//key: Get a key at https://manage.thunderforest.com/dashboard
-		...opt
+		...opt,
 	};
 
 	if (options.key) // Don't display if no key
@@ -111,7 +111,7 @@ function layerSwissTopo(opt) {
 	const options = {
 			host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
 			subLayer: 'ch.swisstopo.pixelkarte-farbe',
-			...opt
+			...opt,
 		},
 		projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 		resolutions = [],
@@ -138,7 +138,7 @@ function layerSwissTopo(opt) {
 				requestEncoding: 'REST',
 				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 			})),
-			...options
+			...options,
 		}),
 	];
 }
@@ -151,7 +151,7 @@ function layerSpain(opt) {
 		host: '//www.ign.es/wmts/',
 		server: 'mapa-raster',
 		subLayer: 'MTN',
-		...opt
+		...opt,
 	};
 
 	return new ol.layer.Tile({
@@ -161,7 +161,7 @@ function layerSpain(opt) {
 				'&style=default&tilematrixset=GoogleMapsCompatible' +
 				'&TileMatrix={z}&TileCol={x}&TileRow={y}',
 			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
-			...options
+			...options,
 		}),
 	});
 }
@@ -200,7 +200,7 @@ function layerOS(opt) {
 	const options = {
 		subLayer: 'Outdoor_3857',
 		// key: Get your own (free) key at https://osdatahub.os.uk/
-		...opt
+		...opt,
 	};
 
 	if (options.key)
@@ -227,7 +227,7 @@ function layerArcGIS(opt) {
 	const options = {
 		host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
 		subLayer: 'World_Imagery',
-		...opt
+		...opt,
 	};
 
 	return new ol.layer.Tile({

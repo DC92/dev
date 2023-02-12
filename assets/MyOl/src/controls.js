@@ -11,7 +11,7 @@ function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
 			className: '',
-			...opt
+			...opt,
 		},
 		control = new ol.control.Control(options),
 		buttonEl = document.createElement('button');
@@ -99,7 +99,7 @@ function controlPermalink(opt) {
 			setUrl: false, // {true | false} Change url hash when moving the map.
 			display: false, // {true | false} Display permalink link the map.
 			hash: '?', // {?, #} the permalink delimiter after the url
-			...opt
+			...opt,
 		},
 		control = new ol.control.Control({
 			element: document.createElement('div'),
@@ -178,7 +178,7 @@ function controlMousePosition(options) {
 			} else
 				return ol.coordinate.createStringXY(4)(mouse);
 		},
-		...options
+		...options,
 	});
 }
 
@@ -260,7 +260,7 @@ function controlLengthLine() {
 function controlTilesBuffer(opt) {
 	const options = {
 			depth: 3,
-			...opt
+			...opt,
 		},
 		control = controlButton(); //HACK no button
 
@@ -290,7 +290,7 @@ function controlGeocoder(options) {
 
 	const geocoder = new Geocoder('nominatim', {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
-			...options
+			...options,
 		}),
 		controlEl = geocoder.element.firstElementChild;
 
@@ -337,7 +337,7 @@ function controlPrint(options) {
 			'<label><input type="radio" name="myol-po" value="1" ctrlonchange="resizeDraftPrint">Paysage A4</label>' +
 			'<a onclick="printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
-		...options
+		...options,
 	});
 
 	control.resizeDraftPrint = function() {
@@ -398,7 +398,7 @@ function controlPrint(options) {
 function controlHelp(options) {
 	return controlButton({
 		label: '?',
-		...options
+		...options,
 	});
 }
 
@@ -406,9 +406,9 @@ function controlHelp(options) {
  * Controls examples
  */
 function controlsCollection(opt) {
-	options = {
+	const options = {
 		supplementaryControls: [], //BEST resorb
-		...opt
+		...opt,
 	};
 
 	return [
