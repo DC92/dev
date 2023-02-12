@@ -14,10 +14,18 @@ const mapId = 'carte-nav',
 	mapEl = document.getElementById(mapId),
 	mapSize = mapEl ? Math.max(mapEl.clientWidth, mapEl.clientHeight) : window.innerWidth,
 	layers = [
-		// Refuges.info (2 couches dependant de la resolution)
-		layerWriWri({
+		layerClusterWri({
 			host: '<?=$config_wri["sous_dossier_installation"]?>',
 			selectName: 'selecteur-wri,selecteur-massif', // 2 selecteurs pour une même couche
+			// Display a single label above each icon
+			styleOptionsDisplay: function(feature, properties, layer, resolution) {
+				//if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
+					return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
+			},
+			// Don't display attribution on labels
+			convertProperties: {
+				attribution: null,
+			},
 		}),
 
 		// Contour d'un massif ou d'une zone
