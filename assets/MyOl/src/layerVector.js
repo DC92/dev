@@ -332,10 +332,10 @@ function addMapListener(map) {
 			}
 
 			// Click on a feature
-			if (evt.type == 'click' && hoveredFeature && !hoveredLayer.options.noClick) {
+			if (evt.type == 'click' && hoveredFeature) {
 				const hoveredProperties = hoveredFeature.getProperties();
 
-				if (hoveredProperties && hoveredProperties.url) {
+				if (hoveredProperties && hoveredProperties.url && !hoveredLayer.options.noClick) {
 					// Open a new tag
 					if (evt.originalEvent.ctrlKey)
 						window.open(hoveredProperties.url, '_blank').focus();

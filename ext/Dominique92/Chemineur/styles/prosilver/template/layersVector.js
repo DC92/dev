@@ -18,6 +18,7 @@ if (typeof map !== 'undefined') {
 		chemineur: {
 			host: '', // Relative to this location
 			selectName: 'select-chem',
+			noClick: true,
 			urlParams: { //BEST move this to geoBB
 				v: version, // Reload layer if posting called between
 			},

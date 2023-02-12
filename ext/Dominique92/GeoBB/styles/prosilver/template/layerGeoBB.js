@@ -3,7 +3,6 @@ var map = new ol.Map({
 	view: new ol.View({
 		enableRotation: false,
 	}),
-
 	controls: [
 		...controlsCollection({
 			Permalink: {
@@ -18,9 +17,6 @@ var map = new ol.Map({
 		}),
 	],
 });
-
-if (scriptName == 'posting')
-	map.layerHover = true; //HACK bloks all hovering
 
 if (mapType == 'point')
 	map.addLayer(layerMarker({

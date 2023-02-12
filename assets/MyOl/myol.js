@@ -840,10 +840,10 @@ function addMapListener(map) {
 			}
 
 			// Click on a feature
-			if (evt.type == 'click' && hoveredFeature && !hoveredLayer.options.noClick) {
+			if (evt.type == 'click' && hoveredFeature) {
 				const hoveredProperties = hoveredFeature.getProperties();
 
-				if (hoveredProperties && hoveredProperties.url) {
+				if (hoveredProperties && hoveredProperties.url && !hoveredLayer.options.noClick) {
 					// Open a new tag
 					if (evt.originalEvent.ctrlKey)
 						window.open(hoveredProperties.url, '_blank').focus();
@@ -1223,12 +1223,14 @@ function layerClusterWri(opt) {
 
 function layerWriWri(options) {
 	return layerClusterWri({
+		// Display a single label above each icon
 		styleOptionsDisplay: function(feature, properties, layer, resolution) {
 			if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
-				return styleOptionsLabel(feature, properties.nom || properties.name); // Display a single label above each icon
+				return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
 		},
+		// Don't display attribution on labels
 		convertProperties: {
-			attribution: null, // Don't display attribution on labels
+			attribution: null,
 		},
 		...options,
 	});
