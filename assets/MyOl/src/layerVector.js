@@ -290,7 +290,7 @@ function addMapListener(map) {
 					),
 					// Calculate the feature index from the cursor position
 					indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
-						(evt.originalEvent.x - hoveredFeaturePixel[0] + 8.4 * hoveredProperties.cluster - 6) / 16.8
+						(evt.originalEvent.layerX - hoveredFeaturePixel[0]) / 21.6 + hoveredProperties.cluster / 2
 					)));
 
 				hoveredFeature = hoveredProperties.features[indexHovered];
@@ -504,7 +504,7 @@ function agregateText(lines, glue) {
 
 function stylesCluster(feature, properties, layer, resolution) {
 	let styles = [], // Need separate styles to display several icons / labels
-		x = 0.85 + 0.35 * properties.cluster;
+		x = 0.95 + 0.45 * properties.cluster;
 
 	if (properties.cluster) {
 		if (resolution < layer.options.maxResolutionDegroup)
@@ -513,7 +513,7 @@ function stylesCluster(feature, properties, layer, resolution) {
 				const image = layer.getStyleFunction()(f, resolution)[0].getImage();
 
 				if (image) {
-					image.setAnchor([x -= 0.7, 0.5]);
+					image.setAnchor([x -= 0.9, 0.5]);
 					styles.push(new ol.style.Style({
 						image: image,
 					}));
