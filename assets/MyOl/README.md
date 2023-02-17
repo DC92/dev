@@ -104,6 +104,5 @@ TESTED ON
 =========
 * windows 10 : Edge, FireFox, Chrome, Opera, Brave
 * Android (Samsung) : Samsung Internet, FireFox, Chrome, Brave, DuckDuckGo
-* iOS 12.5.6 (iPhone5s) : Safari 12.1, FireFox, Chrome
 * Linux : FireFox
 * NO SUPPORT ON Microsoft Internet Explorer
