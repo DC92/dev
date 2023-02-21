@@ -13,7 +13,7 @@ export default {
 		cjs(),
 		css({
               output: "dist/myol.css",
-              outputStyle: "compressed"
+			  minify: true,
           }),
 		externalGlobals({}),
 		terser()
