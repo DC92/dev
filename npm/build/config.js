@@ -1,7 +1,7 @@
-import node from "@rollup/plugin-node-resolve";
 import cjs from "@rollup/plugin-commonjs";
-import externalGlobals from "rollup-plugin-external-globals";
+import node from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
+import externalGlobals from "rollup-plugin-external-globals";
 import css from "rollup-plugin-import-css";
 
 export default {
@@ -11,11 +11,11 @@ export default {
 			browser: true
 		}),
 		cjs(),
-		css({
-              output: "dist/myol.css",
-			  minify: true,
-          }),
 		externalGlobals({}),
+		css({
+			output: "dist/myol.css",
+			minify: true,
+		}),
 		terser()
 	],
 	output: [{
