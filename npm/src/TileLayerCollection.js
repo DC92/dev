@@ -53,6 +53,23 @@ export class KompassMriTileLayer extends layerOSM { // Austria
 	}
 }
 
+export class ThunderforestTileLayer extends OsmTileLayer {
+	constructor(opt) {
+		const options = {
+			subLayer: 'outdoors',
+			//key: Get a key at https://manage.thunderforest.com/dashboard
+			...opt,
+		};
+
+		if (options.key) // Don't display if no key
+			super({
+				url: '//{a-c}.tile.thunderforest.com/' + options.subLayer + '/{z}/{x}/{y}.png?apikey=' + options.key,
+				attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
+				...options // Include key
+			});
+	}
+}
+
 // Tile layers examples
 export function collectionTileLayer(options) {
 	options = options || {};
@@ -60,8 +77,8 @@ export function collectionTileLayer(options) {
 	return {
 		'OSM fr': layerOSM(),
 		'OpenTopo': layerOpenTopo(),
-		'OSM outdoors': layerThunderforest(options.thunderforest), // options include key
-		'OSM transports': layerThunderforest({
+		'OSM outdoors': new ThunderforestTileLayer(options.thunderforest), // options include key
+		'OSM transports': new ThunderforestTileLayer({
 			...options.thunderforest, // Include key
 			subLayer: 'transport',
 		}),
@@ -82,7 +99,7 @@ export function collectionTileLayer(options) {
 		}),
 
 		'SwissTopo': layerSwissTopo(),
-		'Autriche': new myol.KompassMriTileLayer(), // No key
+		'Autriche': new KompassMriTileLayer(), // No key
 		'Angleterre': layerOS(options.os), // options include key
 		'Italie': layerIGM(),
 		'Espagne': layerSpain(),
@@ -127,23 +144,23 @@ export function demoTileLayer(options) {
 
 		'OSM': new OsmTileLayer(),
 
-		'ThF cycle': layerThunderforest({
+		'ThF cycle': new ThunderforestTileLayer({
 			...options.thunderforest, // Include key
 			subLayer: 'cycle',
 		}),
-		'ThF trains': layerThunderforest({
+		'ThF trains': new ThunderforestTileLayer({
 			...options.thunderforest, // Include key
 			subLayer: 'pioneer',
 		}),
-		'ThF villes': layerThunderforest({
+		'ThF villes': new ThunderforestTileLayer({
 			...options.thunderforest, // Include key
 			subLayer: 'neighbourhood',
 		}),
-		'ThF landscape': layerThunderforest({
+		'ThF landscape': new ThunderforestTileLayer({
 			...options.thunderforest, // Include key
 			subLayer: 'landscape',
 		}),
-		'ThF contraste': layerThunderforest({
+		'ThF contraste': new ThunderforestTileLayer({
 			...options.thunderforest, // Include key
 			subLayer: 'mobile-atlas',
 		}),
@@ -156,11 +173,11 @@ export function demoTileLayer(options) {
 			...options.os, // Include key
 			subLayer: 'Road_3857',
 		}),
-		'Kompas topo': new myol.KompassMriTileLayer({
+		'Kompas topo': new KompassMriTileLayer({
 			...options.kompass, // Include key
 			subLayer: 'kompass_topo',
 		}),
-		'Kompas winter': new myol.KompassMriTileLayer({
+		'Kompas winter': new KompassMriTileLayer({
 			...options.kompass, // Include key
 			subLayer: 'kompass_winter',
 		}),
