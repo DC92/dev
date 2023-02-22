@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="images/favicon.png" rel="icon" type="image/png" />
+	<link href="images/favicon.png" rel="apple-touch-icon" />
+
+	<!-- Openlayers -->
+	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- Proj4 projections Swiss -->
+	<script src="../proj4/proj4-src.js"></script>
+
+	<!-- My Openlayers -->
+	<link href="../src/controls.css" type="text/css" rel="stylesheet">
+	<script src="../src/controls.js"></script>
+	<script src="../src/marker.js"></script>
+
+	<style>
+		#map {
+			width: 100%;
+			max-width: 600px;
+			height: 80vw;
+			max-height: 400px;
+		}
+	</style>
+</head>
+
+<body>
+	<a style="float:right" href="editor.html">Editor &#9654;</a>
+	<a style="float:right;margin-right:15px" href="..">HOME</a>
+	<h1 style="margin:0">Position marker</h1>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+	<p><a href="../src/editor.js">src/editor.js</a> adds marker position display & edit</p>
+
+	<div id="map"></div>
+
+	<!-- Fixed marker -->
+	<input type="hidden" id="cadre-json" value='{"type":"Point","coordinates":[2.34,48.86]}' /></p>
+	<p><b>Cadre :</b> <span id="cadre-string"></span></p>
+
+	<!-- Draggable marker -->
+	<div>
+		<p><b>Colimateur :</b>
+			<span id="marker-string"></span>
+			<select id="marker-select">
+				<option value="dec" selected="selected">Degrés décimaux</option>
+				<option value="dms">Deg Min Sec</option>
+				<option class="xy" value="swiss">Suisse</option>
+				<option value="utm">UTM</option>
+			</select>
+		</p><p>
+			<input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' />
+		</p><p>
+			Longitude :
+			<input id="marker-lon" type="text" name="lon" size="12" maxlength="12" /> (WGS84)&nbsp;
+			<span class="xy"> / X : <input id="marker-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)</span>
+		</p><p>
+			Latitude :
+			<input id="marker-lat" type="text" name="lat" size="12" maxlength="12" /> (WGS84)&nbsp;
+			<span class="xy"> / Y : <input id="marker-y" type="text" name="y" size="7" maxlength="12"></span>
+		</p>
+	</div>
+
+	<p>Double clic sur la carte y déplace le curseur.</p>
+
+	<script>
+new ol.Map({
+	target: 'map',
+	controls: [
+		new ol.control.Zoom(),
+		controlMousePosition(),
+	],
+	view: new ol.View({
+		center: [300000, 5800000],
+		zoom: 8,
+	}),
+	layers: [
+		new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
+		layerMarker({
+			src: 'images/cadre.png',
+			prefix: 'cadre',
+		}),
+		layerMarker({
+			src: 'images/viseur.png',
+			focus: 15, // Map zoom level
+			dragable: true,
+		}),
+	],
+});
+	</script>
+	<script src="print_script.js"></script>
+
+	<h4 style="margin-bottom:0">Tests</h4>
+	<div>Look at fix marker & display</div>
+	<div>Move dragable marker</div>
+	<div>Center the map on the cusor</div>
+	<div>Move the cusor at the center of the map</div>
+</body>
+</html>

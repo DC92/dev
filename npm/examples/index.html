@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="images/favicon.png" rel="icon" type="image/png" />
+	<link href="images/favicon.png" rel="apple-touch-icon" />
+
+	<!-- Openlayers -->
+	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
+	<script src="../ol/ol.js"></script>
+
+	<!-- Recherche par nom -->
+	<link href="../geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
+	<script src="../geocoder/ol-geocoder-debug.js"></script>
+
+	<!-- My Openlayers -->
+	<link href="../src/controls.css" type="text/css" rel="stylesheet">
+	<link href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
+	<script src="../src/header.js"></script>
+	<script src="../src/layerTileCollection.js"></script>
+	<script src="../src/layerSwitcher.js"></script>
+	<script src="../src/layerVector.js"></script>
+	<script src="../src/layerVectorCollection.js"></script>
+	<script src="../src/controls.js"></script>
+	<script src="../src/files.js"></script>
+	<script src="../src/gps.js"></script>
+	<script src="../src/marker.js"></script>
+
+	<style>
+		#map {
+			clear: both;
+			width: 100%;
+			max-width: 600px;
+			height: 80vw;
+			max-height: 400px;
+		}
+		.layer-select {
+			float: left;
+			border-right: solid;
+			padding: 5px
+		}
+	</style>
+</head>
+
+<body>
+	<a style="float:right" href="layerSwitcher.html">Layer switcher &#9654;</a>
+	<a style="float:right;margin-right:15px" href="..">HOME</a>
+	<h1 style="margin:0">MyOl</h1>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+
+	<div id="map"></div>
+	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
+
+	<div id="select-ext">
+		<hr />
+		<label>chemineur.fr <input type="checkbox" name="select-chem" value="all" /></label>
+		<label><input type="checkbox" name="select-chem" value="3" />Refuge</label>
+		<label><input type="checkbox" name="select-chem" value="8" />Abri</label>
+		<label><input type="checkbox" name="select-chem" value="23" />Montagne</label>
+	</div>
+
+	<script>
+const layersKeys = {
+	// Get your own (free) IGN key at https://geoservices.ign.fr/
+	ign: {key: 'ngv5uf0uu1cafegv89kzr1o5'},
+	// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com/dashboard
+	thunderforest: {key: 'ee751f43b3af4614b01d1bce72785369'},
+	// Get your own (free) OS key at https://osdatahub.os.uk/
+	os: {key: 'P8MjahLAlyDAHXEH2engwXJG6KDYsVzF'},
+	// Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+	bing: {key: 'AldBMbaKNyat-j6CBRKxxH05uaxP7dvQu1RnMWCQEGGC3z0gjBu-bLniE_8WZvcC'},
+};
+	</script>
+	<script>
+// Must be after the <div id="map"> tag
+new ol.Map({
+	target: 'map',
+	view: new ol.View({
+		enableRotation: false,
+	}),
+	controls: [
+		...controlsCollection(),
+		controlLayerSwitcher({
+			layers: layerTileCollection(layersKeys),
+			selectExtId: 'select-ext',
+		}),
+	],
+	layers: [
+		layerChemineur({
+			selectName: 'select-chem',
+		}),
+		layerMarker({
+			src: 'images/viseur.png',
+			dragable: true,
+		}),
+	],
+});
+	</script>
+	<script src="print_script.js"></script>
+</body>
+</html>
