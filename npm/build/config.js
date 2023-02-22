@@ -8,7 +8,7 @@ export default {
 	input: "build/index.js",
 	plugins: [
 		node({
-			browser: true
+			browser: true,
 		}),
 		cjs(),
 		externalGlobals({}),
@@ -16,7 +16,7 @@ export default {
 			output: "dist/myol.css",
 			minify: true,
 		}),
-		terser()
+		terser(),
 	],
 	output: [{
 		name: "myol",

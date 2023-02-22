@@ -89,10 +89,10 @@ function JSONparse(json) {
 function layerOSM(options) {
 	return new ol.layer.Tile({
 		source: new ol.source.XYZ({
-			// url: mandatory
+			url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			maxZoom: 21,
 			attributions: ol.source.OSM.ATTRIBUTION,
-			...options // Include url
+			...options,
 		}),
 	});
 }
@@ -372,9 +372,7 @@ function layerTileCollection(options) {
 	options = options || {};
 
 	return {
-		'OSM fr': layerOSM({
-			url: '//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-		}),
+		'OSM fr': layerOSM(),
 		'OpenTopo': layerOpenTopo(),
 		'OSM outdoors': layerThunderforest(options.thunderforest), // options include key
 		'OSM transports': layerThunderforest({
