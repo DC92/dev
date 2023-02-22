@@ -1,4 +1,4 @@
-import TileLayer from 'ol/layer/Tile';
+import TileLayer from '../node_modules/ol/layer/Tile.js';
 
 // OpenStreetMap & co
 export class OsmTileLayer extends TileLayer {
@@ -52,7 +52,6 @@ export class KompassMriTileLayer extends layerOSM { // Austria
 		super(options);
 	}
 }
-
 
 // Tile layers examples
 export function collectionTileLayer(options) {

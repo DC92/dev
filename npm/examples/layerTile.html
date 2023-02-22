@@ -50,31 +50,35 @@ const layersKeys = {
 	kompass: {key: '2ba8c124-38b6-11e7-ade1-e0cb4e28e847'},
 };
 	</script>
-	<script>
-const map = new myol.Map({
+	<script type="module">
+import Map from '../node_modules/ol/Map.js';
+import View from '../node_modules/ol/View.js';
+import Attribution from '../node_modules/ol/control/Attribution';
+import Zoom from '../node_modules/ol/control/Zoom';
+import {demoTileLayer} from '../src/TileLayerCollection.js';
+
+const map = new Map({
 	target: 'map',
-	view: new myol.View({
-		center: [700000, 5600000],
-		zoom: 7, // Sud est
+	view: new View({
+		center: [700000, 5600000], // Sud est
+		zoom: 7,
 		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 	}),
 	controls: [
-		new myol.Zoom(),
-		new myol.Attribution({
+		new Zoom(),
+		new Attribution({
 			collapsed: false,
 		}),
 		controlLayerSwitcher({
-			layers: myol.demoTileLayer(layersKeys),
+			layers: demoTileLayer(layersKeys),
 		}),
 	],
 });
+map.getView().on('change:resolution', () =>
+	console.log('resolution = ' + Math.round(map.getView().getResolutionForZoom(map.getView().getZoom())))
+);
 	</script>
 	<script src="print_script.js"></script>
-	<script>
-map.getView().on('change:resolution', function() {
-	console.log('resolution = ' + Math.round(map.getView().getResolutionForZoom(map.getView().getZoom())));
-});
-	</script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Check all baselayers</div>

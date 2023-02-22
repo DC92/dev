@@ -5,8 +5,6 @@
 // openlayers.org
 import 'ol/ol.css';
 export {Map, View} from 'ol';
-export {default as TileLayer } from 'ol/layer/Tile.js';
-export {default as XYZ} from 'ol/source/XYZ';
 export {default as Attribution} from 'ol/control/Attribution';
 export {default as Zoom} from 'ol/control/Zoom';
 
