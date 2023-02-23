@@ -5,8 +5,8 @@ import externalGlobals from "rollup-plugin-external-globals";
 import css from "rollup-plugin-import-css";
 
 export default [{
-	// Compressed library
-	input: "build/index.js",
+	// Full myol / compressed library
+	input: "src/myol-index.js",
 	plugins: [
 		node({
 			browser: true,
@@ -27,8 +27,8 @@ export default [{
 		//inlineDynamicImports: true,
 	}],
 }, {
-	// Debug library
-	input: "build/index.js",
+	// Full myol / debug library
+	input: "src/myol-index.js",
 	plugins: [
 		node({
 			browser: true,
@@ -42,6 +42,39 @@ export default [{
 	output: [{
 		name: "myol",
 		file: "./dist/myol-debug.js",
+		format: "iife",
+	}],
+}, {
+	// Compressed library for refuges.info
+	input: "src/myol-wri.js",
+	plugins: [
+		node({
+			browser: true,
+		}),
+		cjs(),
+		externalGlobals({}),
+		terser(),
+	],
+	output: [{
+		name: "myol",
+		file: "./dist/myol-wri.js",
 		format: "umd",
+		sourcemap: true,
+		//inlineDynamicImports: true,
+	}],
+}, {
+	// Debug library for refuges.info
+	input: "src/myol-wri.js",
+	plugins: [
+		node({
+			browser: true,
+		}),
+		cjs(),
+		externalGlobals({}),
+	],
+	output: [{
+		name: "myol",
+		file: "./dist/myol-wri-debug.js",
+		format: "iife",
 	}],
 }];
