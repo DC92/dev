@@ -10,15 +10,23 @@
 
 // openlayers.org
 import 'ol/ol.css';
-export {Map, View} from 'ol';
+export * from 'ol';
 export {default as Attribution} from 'ol/control/Attribution';
 export {default as Zoom} from 'ol/control/Zoom';
 
 // MyOl
 import '../src/controls.css';
-import '../src/editor.css';
 import '../src/layerSwitcher.css';
+import '../src/editor.css';
+export * from '../src/Controls.js';
+export * from '../src/Files.js';
+export * from '../src/Geolocation.js';
+export * from '../src/Marker.js';
+export * from '../src/layerSwitcher.js';
 export * from '../src/TileLayerCollection.js';
+export * from '../src/VectorLayer.js';
+export * from '../src/VectorLayerCollection.js';
+export * from '../src/editor.js';
 
 // Geocoder
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';

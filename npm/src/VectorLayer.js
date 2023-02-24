@@ -1,12 +1,11 @@
 /**
  * Adds some facilities to ol.layer.Vector
  */
-//jshint esversion: 9
 
 /**
  * Layer to display remote geoJson layer
  */
-function layerVector(opt) {
+export function layerVector(opt) {
 	const options = {
 			host: '', // Url host
 			/* urlParams: function(layerOptions, bbox, selections, extent) {
@@ -105,27 +104,27 @@ function layerVector(opt) {
 		});
 
 	format.readFeatures = function(doc, opt) {
-		const json = JSONparse(doc);
-
-		// For all features
-		json.features.map(jsonFeature => {
-			// Generate a pseudo id if none
-			// This is important for non duplication of displayed features when bbox zooming
-			if (!jsonFeature.id)
-				jsonFeature.id =
-				jsonFeature.properties.id || // Takes the one in properties
-				JSON.stringify(jsonFeature.properties).replace(/\D/g, '') % 987654; // Generate a pseudo id if none
-
-			// Callback function to convert some server properties to the one displayed by this package
-			jsonFeature.properties = {
-				...jsonFeature.properties,
-				...functionLike(options.convertProperties, jsonFeature.properties, options),
-			};
-
-			return jsonFeature;
-		});
-
-		return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
+		try {
+			const json = JSON.parse(doc);
+			// For all features
+			json.features.map(jsonFeature => {
+				// Generate a pseudo id if none
+				// This is important for non duplication of displayed features when bbox zooming
+				if (!jsonFeature.id)
+					jsonFeature.id =
+					jsonFeature.properties.id || // Takes the one in properties
+					JSON.stringify(jsonFeature.properties).replace(/\D/g, '') % 987654; // Generate a pseudo id if none
+				// Callback function to convert some server properties to the one displayed by this package
+				jsonFeature.properties = {
+					...jsonFeature.properties,
+					...functionLike(options.convertProperties, jsonFeature.properties, options),
+				};
+				return jsonFeature;
+			});
+			return ol.format.GeoJSON.prototype.readFeatures.call(this, JSON.stringify(json), opt);
+		} catch (returnCode) {
+			console.error(returnCode + '\nParsing "' + doc + '"\n' + new Error().stack);
+		};
 	};
 
 	// Default url callback function for the layer
@@ -157,7 +156,7 @@ function layerVector(opt) {
 /**
  * Clustering features
  */
-function layerVectorCluster(opt) {
+export function layerVectorCluster(opt) {
 	const options = {
 			distance: 30, // Minimum distance (pixels) between clusters
 			density: 1000, // Maximum number of displayed clusters
@@ -255,7 +254,7 @@ function layerVectorCluster(opt) {
 }
 
 // Add a listener to manage hovered features
-function addMapListener(map) {
+export function addMapListener(map) {
 	if (typeof map.lastHover == 'undefined') { // Once for a map
 		map.lastHover = {};
 
@@ -383,7 +382,7 @@ function addMapListener(map) {
  * You can force the values in window.localStorage[simplified name]
  * Return return an array of selected values
  */
-function selectVectorLayer(name, callBack) {
+export function selectVectorLayer(name, callBack) {
 	const selectEls = [...document.getElementsByName(name)],
 		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
 		init = (localStorage[safeName] || '').split(',');
@@ -440,7 +439,7 @@ function selectVectorLayer(name, callBack) {
  * Some usefull style functions
  */
 // Display a label (Used by cluster)
-function styleOptionsIcon(feature, properties) {
+export function styleOptionsIcon(feature, properties) {
 	if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
 		return {
 			image: new ol.style.Icon({
@@ -450,7 +449,7 @@ function styleOptionsIcon(feature, properties) {
 		};
 }
 
-function styleOptionsLabel(feature, text, textStyleOptions) {
+export function styleOptionsLabel(feature, text, textStyleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -478,7 +477,7 @@ function styleOptionsLabel(feature, text, textStyleOptions) {
 	};
 }
 
-function styleOptionsLabelFull(feature, properties) {
+export function styleOptionsLabelFull(feature, properties) {
 	return styleOptionsLabel(
 		feature,
 		agregateText([
@@ -494,7 +493,7 @@ function styleOptionsLabelFull(feature, properties) {
 }
 
 // Simplify & agreagte an array of lines
-function agregateText(lines, glue) {
+export function agregateText(lines, glue) {
 	return lines
 		.filter(Boolean) // Avoid empty lines
 		.map(l => l.toString().replace('_', ' ').trim())
@@ -502,7 +501,7 @@ function agregateText(lines, glue) {
 		.join(glue || '\n');
 }
 
-function stylesCluster(feature, properties, layer, resolution) {
+export function stylesCluster(feature, properties, layer, resolution) {
 	let styles = [], // Need separate styles to display several icons / labels
 		x = 0.95 + 0.45 * properties.cluster;
 
@@ -541,6 +540,6 @@ function stylesCluster(feature, properties, layer, resolution) {
 }
 
 // Return the value of result of function with arguments
-function functionLike(value, ...arguments) {
-	return typeof value == 'function' ? value(...arguments) : value || [];
+export function functionLike(value, ...a) {
+	return typeof value == 'function' ? value(...a) : value || [];
 }

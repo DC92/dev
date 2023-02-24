@@ -2,10 +2,10 @@
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
-//jshint esversion: 9
+import {layerVector, layerVectorCluster, functionLike} from './VectorLayer.js';
 
 // chemineur.fr, alpages.info
-function layerGeoBB(options) {
+export function layerGeoBB(options) {
 	return layerVectorCluster({
 		strategy: ol.loadingstrategy.bbox,
 		...options,
@@ -25,14 +25,14 @@ function layerGeoBB(options) {
 	});
 }
 
-function layerClusterGeoBB(opt) {
+export function layerClusterGeoBB(opt) {
 	const options = {
 			transitionResolution: 100,
 			...opt,
 		},
 		clusterLayer = layerGeoBB({
 			minResolution: options.transitionResolution,
-			urlParams: function(...arguments) {
+			urlParams: function() {
 				return {
 					layer: 'cluster',
 					...functionLike(options.urlParams, ...arguments),
@@ -49,7 +49,7 @@ function layerClusterGeoBB(opt) {
 }
 
 // chemineur.fr
-function layerChemineur(options) {
+export function layerChemineur(options) {
 	return layerClusterGeoBB({
 		host: '//chemineur.fr/',
 		...options,
@@ -94,7 +94,7 @@ function layerChemineur(options) {
 }
 
 // Get icon from chemineur.fr if we only have a type
-function chemIconUrl(type) {
+export function chemIconUrl(type) {
 	if (type) {
 		const icons = type.split(' ');
 
@@ -105,7 +105,7 @@ function chemIconUrl(type) {
 }
 
 // alpages.info
-function layerAlpages(options) {
+export function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
 		...options,
@@ -121,7 +121,7 @@ function layerAlpages(options) {
 }
 
 // refuges.info
-function layerWri(options) {
+export function layerWri(options) {
 	return layerVectorCluster({ //BEST case of WRI without local cluster ?
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
@@ -147,7 +147,7 @@ function layerWri(options) {
 	});
 }
 
-function layerClusterWri(opt) {
+export function layerClusterWri(opt) {
 	const options = {
 			transitionResolution: 100,
 			...opt,
@@ -169,7 +169,7 @@ function layerClusterWri(opt) {
 	});
 }
 
-function layerWriAreas(options) {
+export function layerWriAreas(options) {
 	return layerVector({
 		host: '//www.refuges.info/',
 		urlParams: {
@@ -216,7 +216,7 @@ function layerWriAreas(options) {
 }
 
 // pyrenees-refuges.com
-function layerPrc(options) {
+export function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 		convertProperties: properties => ({
@@ -232,7 +232,7 @@ function layerPrc(options) {
 }
 
 // camptocamp.org
-function layerC2C(options) {
+export function layerC2C(options) {
 	const format = new ol.format.GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
@@ -283,7 +283,7 @@ function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-function layerOverpass(opt) {
+export function layerOverpass(opt) {
 	const options = {
 			//host: 'https://overpass-api.de',
 			//host: 'https://lz4.overpass-api.de',
@@ -399,7 +399,7 @@ function layerOverpass(opt) {
 }
 
 // Vectors layers examples
-function layerVectorCollection(options) {
+export function layerVectorCollection(options) {
 	options = options || {};
 
 	return [

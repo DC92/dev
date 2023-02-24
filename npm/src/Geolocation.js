@@ -3,8 +3,8 @@
  * Requires controlButton
  * Need to include controls.js & controls.css
  */
-//jshint esversion: 9
 
+// class GeolocationControl ...
 function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content / option

@@ -2,7 +2,6 @@
  * geoJson lines & polygons edit
  * Requires JSONparse, controlButton (from src/controls.js)
  */
-//jshint esversion: 9
 function layerEditGeoJson(opt) {
 	const options = {
 			format: new ol.format.GeoJSON(),
