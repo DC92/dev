@@ -7,7 +7,7 @@
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
-function controlButton(opt) {
+export function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
 			className: '',
@@ -92,7 +92,7 @@ function controlButton(opt) {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
-function controlPermalink(opt) {
+export function controlPermalink(opt) {
 	const options = {
 			//BEST init with bbox option
 			init: true, // {true | false} use url hash or localStorage to position the map.
@@ -160,7 +160,7 @@ function controlPermalink(opt) {
 /**
  * Control to display the mouse position
  */
-function controlMousePosition(options) {
+export function controlMousePosition(options) {
 	return new ol.control.MousePosition({
 		projection: 'EPSG:4326',
 		className: 'myol-coordinate',
@@ -185,7 +185,7 @@ function controlMousePosition(options) {
 /**
  * Control to display the length & height difference of an hovered line
  */
-function controlLengthLine() {
+export function controlLengthLine() {
 	const control = controlButton(); //HACK button not visible
 
 	control.element.className = 'myol-length-line';
@@ -257,7 +257,7 @@ function controlLengthLine() {
  * Control to display set preload of depth upper level tiles
  * This prepares the browser to become offline
  */
-function controlTilesBuffer(opt) {
+export function controlTilesBuffer(opt) {
 	const options = {
 			depth: 3,
 			...opt,
@@ -284,7 +284,7 @@ function controlTilesBuffer(opt) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/
  */
-function controlGeocoder(options) {
+export function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return controlButton(); //HACK no button
 
@@ -325,7 +325,7 @@ function controlGeocoder(options) {
  * Print control
  * Requires controlButton
  */
-function controlPrint(options) {
+export function controlPrint(options) {
 	const control = controlButton({
 		label: '&#x1F5A8;',
 		className: 'myol-button-print',
@@ -395,7 +395,7 @@ function controlPrint(options) {
  * Requires controlButton
  * Display help contained in <TAG id="<options.submenuId>">
  */
-function controlHelp(options) {
+export function controlHelp(options) {
 	return controlButton({
 		label: '?',
 		...options,
@@ -405,7 +405,7 @@ function controlHelp(options) {
 /**
  * Controls examples
  */
-function controlsCollection(opt) {
+export function controlsCollection(opt) {
 	const options = {
 		supplementaryControls: [], //BEST resorb
 		...opt,

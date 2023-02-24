@@ -3,10 +3,11 @@
  * Need to include layerSwitcher.css
  */
 //jshint esversion: 9
+import {controlButton} from '../src/Controls.js';
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
-function controlLayerSwitcher(options) {
+export function controlLayerSwitcher(options) {
 	const control = controlButton({
 			className: 'myol-button-switcher',
 			label: '&#x274F;',

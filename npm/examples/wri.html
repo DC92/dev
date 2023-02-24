@@ -6,7 +6,7 @@ Based on https://openlayers.org
 -->
 <html>
 <head>
-	<title>My layer switcher</title>
+	<title>My Openlayers</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
@@ -17,10 +17,9 @@ Based on https://openlayers.org
 	<script src="../ol/ol.js"></script>
 
 	<!-- My Openlayers -->
+	<script src="../src/header.js"></script><!-- For JSONparse -->
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<script src="../src/controls.js"></script>
-	<link href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<script src="../src/layerSwitcher.js"></script>
+	<script src="../src/controls.js"></script><!-- Upload / download demo -->
 
 	<style>
 		#map {
@@ -29,67 +28,70 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
+		h4 {
+			margin: 1em 0 0 0 !important;
+		}
 	</style>
 </head>
 
 <body>
-	<a style="float:right" href="tileLayer.html">Tile layer &#9654;</a>
+	<a style="float:right" href="../gps">GPS &#9654;</a>
 	<a style="float:right;margin-right:15px" href="..">HOME</a>
-	<h1 style="margin:0">Layer switcher</h1>
+	<h1 style="margin:0">Maps refuges.info</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
-	<p><a href="../src/layerSwitcher.js">src/layerSwitcher.js</a> add a tinny efficient layer switcher for both base & vector layers.</p>
 
 	<div id="map"></div>
 
-	<div id="select-ext">
-		<hr />
-		<label>Countries <input type="checkbox" checked="checked" onChange="countries.setVisible(this.checked)" /></label>
-	</div>
+	<h4>XXXXXXXXXXXXXXX</h4>
 
 	<script>
-// Vectorlayer
-const baseLayers = {
-		Stamen: new ol.layer.Tile({
-			source: new ol.source.Stamen({
-				layer: 'terrain',
-			}),
-		}),
-		'OSM org': new ol.layer.Tile({
-			source: new ol.source.OSM(),
-		}),
-		Watercolor: new ol.layer.Tile({
-			source: new ol.source.Stamen({
-				layer: 'watercolor',
-			}),
-		}),
-	},
-	countries = new ol.layer.Vector({
+const snaplayer = new ol.layer.Vector({
 		source: new ol.source.Vector({
 			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
 			format: new ol.format.GeoJSON(),
 		}),
-		zIndex: 2, // Above the base layer
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke(),
+		}),
+	}),
+
+	controlEditor = layerEditGeoJson({
+		//BEST generalize aids / translation
+		geoJsonId: 'geojson',
+		snapLayers: [snaplayer],
+		help: [
+			document.getElementById('myol-help-edit-modify').innerHTML,
+			document.getElementById('myol-help-edit-line').innerHTML,
+			document.getElementById('myol-help-edit-poly').innerHTML,
+		],
 	});
 
+//TODO mettre et tester les conctions de cartes WRI
 new ol.Map({
 	target: 'map',
 	view: new ol.View({
-		center: [700000, 5600000],
-		zoom: 5,
+		center: [600000, 5800000],
+		zoom: 6,
 	}),
 	controls: [
-		controlLayerSwitcher({
-			layers: baseLayers,
-			selectExtId: 'select-ext',
+		new ol.control.Zoom(),
+		controlLoadGPX(),
+		controlDownload({
+			savedLayer: controlEditor.layer,
 		}),
+		controlEditor,
 	],
-	layers: [countries],
+	layers: [
+		new ol.layer.Tile({
+			source: new ol.source.OSM(),
+		}),
+		snaplayer,
+	],
 });
 	</script>
 	<script src="print_script.js"></script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
-	<div>Change baselayer</div>
-	<div>Uncheck "Countries"</div>
+	<div>Do all actions of the button hover help</div>
 </body>
 </html>

@@ -12,9 +12,8 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-    <script src="../node_modules/ol/dist/ol.js"></script>
-    <script src="../../assets/MyOl/myol.js"></script>
 	<link href="../dist/myol.css" type="text/css" rel="stylesheet">
+    <script src="../node_modules/ol/dist/ol.js"></script>
 
 	<style>
 		#map {
@@ -27,9 +26,9 @@ Based on https://openlayers.org
 </head>
 
 <body>
-	<a style="float:right" href="vectorLayer.html">Layer vector &#9654;</a>
+	<a style="float:right" href="vectorLayer.html">Vector layer &#9654;</a>
 	<a style="float:right;margin-right:15px" href="..">HOME</a>
-	<h1 style="margin:0">Layer tile</h1>
+	<h1 style="margin:0">Tile layer</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
 	<p><a href="../src/layerTileCollection.js">src/layerTileCollection.js</a> defines a collection of tile baselayers</p>
 
@@ -54,6 +53,7 @@ import Map from '../node_modules/ol/Map.js';
 import View from '../node_modules/ol/View.js';
 import Attribution from '../node_modules/ol/control/Attribution';
 import Zoom from '../node_modules/ol/control/Zoom';
+import {controlLayerSwitcher} from '../src/LayerSwitcher.js';
 import {demoTileLayer} from '../src/TileLayerCollection.js';
 
 const map = new Map({
