@@ -1,6 +1,4 @@
-/**
- * Optimised library for refuges.info
- */
+// Optimised library for refuges.info
  
 import Map from '../node_modules/ol/Map.js';
 import View from '../node_modules/ol/View.js';
@@ -11,6 +9,7 @@ import {demoTileLayer} from '../src/TileLayerCollection.js';
 // Include geocoder code
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
+// Functions defining the maps of refuges.info
 //TODO mettre et tester les conctions de cartes WRI
 export var index = new Map({
 		target: 'map',

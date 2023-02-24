@@ -1,4 +1,5 @@
 import TileLayer from '../node_modules/ol/layer/Tile.js';
+import WMTS from '../node_modules/ol/source/WMTS.js';
 
 // OpenStreetMap & co
 export class OsmTileLayer extends TileLayer {
@@ -65,7 +66,7 @@ export class ThunderforestTileLayer extends OsmTileLayer {
 			super({
 				url: '//{a-c}.tile.thunderforest.com/' + options.subLayer + '/{z}/{x}/{y}.png?apikey=' + options.key,
 				attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
-				...options // Include key
+				...options, // Include key
 			});
 	}
 }
@@ -75,32 +76,35 @@ export class ThunderforestTileLayer extends OsmTileLayer {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-function layerIGN(options) {
-	let IGNresolutions = [],
-		IGNmatrixIds = [];
+export class IgnTileLayer extends TileLayer {
+	constructor(options) {
+		let IGNresolutions = [],
+			IGNmatrixIds = [];
 
-	for (let i = 0; i < 18; i++) {
-		IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
-		IGNmatrixIds[i] = i.toString();
-	}
+		for (let i = 0; i < 18; i++) {
+			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNmatrixIds[i] = i.toString();
+		}
 
-	if (options && options.key) // Don't display if no key provided
-		return new ol.layer.Tile({
-			source: new ol.source.WMTS({
-				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
-				layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
-				style: 'normal',
-				matrixSet: 'PM',
-				format: 'image/jpeg',
-				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-				tileGrid: new ol.tilegrid.WMTS({
-					origin: [-20037508, 20037508],
-					resolutions: IGNresolutions,
-					matrixIds: IGNmatrixIds,
+		if (options && options.key) // Don't display if no key provided
+			super({
+				source: new WMTS({
+					url: 'https://wxs.ign.fr/' + options.key + '/wmts',
+					layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
+					style: 'normal',
+					matrixSet: 'PM',
+					format: 'image/jpeg',
+					attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
+					tileGrid: new ol.tilegrid.WMTS({
+						origin: [-20037508, 20037508],
+						resolutions: IGNresolutions,
+						matrixIds: IGNmatrixIds,
+					}),
+					...options, // Include key & layer
 				}),
-				...options // Include key & layer
-			}),
-		});
+				...options,
+			});
+	}
 }
 
 /**
@@ -214,7 +218,7 @@ function layerOS(opt) {
 					url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
 						'/{z}/{x}/{y}.png?key=' + options.key,
 					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
-					...options // Include key
+					...options, // Include key
 				}),
 			}),
 		];
@@ -304,13 +308,13 @@ export function collectionTileLayer(options) {
 		}),
 		'Refuges.info': new MriTileLayer(),
 
-		'IGN TOP25': layerIGN(options.ign), // options include key
-		'IGN V2': layerIGN({
+		'IGN TOP25': new IgnTileLayer(options.ign), // options include key
+		'IGN V2': new IgnTileLayer({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
-		'IGN cartes 1950': layerIGN({
+		'IGN cartes 1950': new IgnTileLayer({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950',
 			key: 'cartes/geoportail',
 		}),
@@ -327,28 +331,28 @@ export function collectionTileLayer(options) {
 			...options.bing, // Include key
 			imagerySet: 'Aerial',
 		}),
-		'Photo IGN': layerIGN({
+		'Photo IGN': new IgnTileLayer({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
 			key: 'essentiels',
 		}),
 
-		'Photo IGN 1950-65': layerIGN({
+		'Photo IGN 1950-65': new IgnTileLayer({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965',
 			key: 'orthohisto/geoportail',
 			style: 'BDORTHOHISTORIQUE',
 			format: 'image/png',
 		}),
 
-		'IGN E.M. 1820-66': layerIGN({
+		'IGN E.M. 1820-66': new IgnTileLayer({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
-		'Cadastre': layerIGN({
+		'Cadastre': new IgnTileLayer({
 			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
-		/*'IGN Cassini': layerIGN({ //BEST BUG what key for Cassini ?
+		/*'IGN Cassini': new IgnTileLayer({ //BEST BUG what key for Cassini ?
 			...options.ign,
 					layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
 				}),*/
