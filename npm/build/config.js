@@ -6,7 +6,7 @@ import css from "rollup-plugin-import-css";
 
 export default [{
 	// Full myol / compressed library
-	input: "src/myol-index.js",
+	input: "build/index.js",
 	plugins: [
 		node({
 			browser: true,
@@ -28,7 +28,7 @@ export default [{
 	}],
 }, {
 	// Full myol / debug library
-	input: "src/myol-index.js",
+	input: "build/index.js",
 	plugins: [
 		node({
 			browser: true,
@@ -46,7 +46,7 @@ export default [{
 	}],
 }, {
 	// Compressed library for refuges.info
-	input: "src/myol-wri.js",
+	input: "build/wri.js",
 	plugins: [
 		node({
 			browser: true,
@@ -64,7 +64,7 @@ export default [{
 	}],
 }, {
 	// Debug library for refuges.info
-	input: "src/myol-wri.js",
+	input: "build/wri.js",
 	plugins: [
 		node({
 			browser: true,
