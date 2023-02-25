@@ -3,6 +3,11 @@ import node from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import externalGlobals from "rollup-plugin-external-globals";
 import css from "rollup-plugin-import-css";
+import {
+	readFileSync
+} from 'fs';
+
+const banner = readFileSync('./build/banner.js', 'utf-8')
 
 export default [{
 	// Full myol / compressed library
@@ -21,6 +26,7 @@ export default [{
 	],
 	output: [{
 		name: "myol",
+		banner,
 		file: "./dist/myol.js",
 		format: "umd",
 		sourcemap: true,
@@ -57,6 +63,7 @@ export default [{
 	],
 	output: [{
 		name: "myol",
+		banner,
 		file: "./dist/myol-wri.js",
 		format: "umd",
 		sourcemap: true,

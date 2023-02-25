@@ -1,6 +1,22 @@
-/**
- * Adds some facilities to ol.layer.Vector
- */
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+
+class MyVectorLayer extends VectorLayer {
+	constructor(options) {
+		super(options);
+	}
+
+	setMapInternal(map) {
+		// Attach one hover & click listener to each map
+		if (!(map.getListeners() || []).includes(mouseListener))
+			map.on(['pointermove', 'click'], mouseListener);
+
+		return super.setMapInternal(map);
+	}
+}
+
+function mouseListener(evt) {
+	console.log(evt.type);
+}
 
 /**
  * Layer to display remote geoJson layer
@@ -57,7 +73,7 @@ export function layerVector(opt) {
 			format: format,
 			...options,
 		}),
-		layer = new ol.layer.Vector({
+		layer = new MyVectorLayer({
 			source: source,
 			style: (feature, resolution) => [
 				// One style with overwriting options
@@ -77,7 +93,7 @@ export function layerVector(opt) {
 
 	layer.setMapInternal = function(map) {
 		//HACK execute actions on Map init
-		ol.layer.Vector.prototype.setMapInternal.call(this, map);
+		MyVectorLayer.prototype.setMapInternal.call(this, map);
 
 		// Add the alternate layer if any
 		if (options.altLayer)
