@@ -136,6 +136,7 @@ export class LayerWri extends MyVectorLayer {
 					type_points: 4,
 				}),
 				transitionResolution: 100,
+				minClusterResolution: 0,
 
 				slyleOptions: (_, properties) => {
 					if (properties.type)
@@ -161,7 +162,6 @@ export class LayerWri extends MyVectorLayer {
 		// Low resolutions layer
 		super({
 			maxResolution: options.transitionResolution,
-			minClusterResolution: 0,
 			altLayer: clusterLayer,
 			...options,
 		});

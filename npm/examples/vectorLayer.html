@@ -123,6 +123,14 @@ Based on https://openlayers.org
 
 	<script type="module">
 	
+import Map from '../node_modules/ol/Map.js';
+import View from '../node_modules/ol/View.js';
+import Tile from '../node_modules/ol/layer/Tile.js';
+import OSM from '../node_modules/ol/source/OSM.js';
+//import transform from '../node_modules/ol/proj/transform.js';
+import FullScreen from '../node_modules/ol/control/FullScreen.js';
+import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
+import Zoom from '../node_modules/ol/control/Zoom.js';
 import {LayerWri} from '../src/VectorLayerCollection.js';
 //import {layerVectorCluster, styleOptionsLabel} from '../src/VectorLayer.js';
 //import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
@@ -130,23 +138,24 @@ import {LayerWri} from '../src/VectorLayerCollection.js';
 // Force selectors
 //localStorage.myol_selectwri = 'all';
 
-new ol.Map({
+new Map({
 	target: 'map',
-	view: new ol.View({
+	view: new View({
 		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
 		center: ol.proj.transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'),
 		zoom: 12,
 		zoom: 15,
+		zoom: 8,
 	}),
 	controls: [
-		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
-		new ol.control.ScaleLine(),
+		new FullScreen(),
+		new ScaleLine(),
+		new Zoom(),
 	],
 	layers: [
 		// Background layer
-		new ol.layer.Tile({
-			source: new ol.source.OSM(),
+		new Tile({
+			source: new OSM(),
 		}),
 
 		new LayerWri({
