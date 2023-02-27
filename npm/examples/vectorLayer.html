@@ -48,6 +48,8 @@ Based on https://openlayers.org
 	<p><a href="../src/layerVector.js">src/layerVector.js</a> adds some facilities to ol.layer.Vector</p>
 
 	<div id="map"></div>
+	
+	Status : <span id="test-status">XX</span>
 
 	<div class="layer-select">
 		<label>
@@ -122,8 +124,10 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script type="module">
-import {layerVectorCluster, styleOptionsLabel} from '../src/VectorLayer.js';
-import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
+	
+import {MyVectorLayer} from '../src/VectorLayer.js';
+//import {layerVectorCluster, styleOptionsLabel} from '../src/VectorLayer.js';
+//import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
 
 // Force selectors
 //localStorage.myol_selectwri = 'all';
@@ -146,6 +150,17 @@ new ol.Map({
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
+		
+		new MyVectorLayer({
+			statusId: 'test-status',
+			host: 'https://dom.refuges.info/',
+			query : ()=>({
+				type_points: 4,
+				//nb_points: 'all',
+			}),
+		}),
+		
+		/*
 		...layerVectorCollection({
 			prc: {
 				selectName: 'select-prc',
@@ -184,6 +199,7 @@ new ol.Map({
 		layerWriAreas({
 			selectName: 'select-massifs',
 		}),
+		*/
 	],
 });
 	</script>

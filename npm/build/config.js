@@ -47,6 +47,7 @@ export default [{
 	],
 	output: [{
 		name: "myol",
+		banner,
 		file: "./dist/myol-debug.js",
 		format: "iife",
 	}],
@@ -63,7 +64,6 @@ export default [{
 	],
 	output: [{
 		name: "myol",
-		banner,
 		file: "./dist/myol-wri.js",
 		format: "umd",
 		sourcemap: true,

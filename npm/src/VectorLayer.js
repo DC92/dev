@@ -1,21 +1,220 @@
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import {
+	bbox
+} from '../node_modules/ol/loadingstrategy.js';
+import {
+	transformExtent
+} from '../node_modules/ol/proj.js';
+import Cluster from '../node_modules/ol/source/Cluster.js';
 import VectorLayer from '../node_modules/ol/layer/Vector.js';
 
-class MyVectorLayer extends VectorLayer {
-	constructor(options) {
+class MyVectorSource1 extends VectorSource {
+	//TODO Format / convertProperties
+	//TODO selector
+	constructor(opt) {
+		const options = {
+			strategy: bbox,
+			format: new GeoJSON(),
+			projection: 'EPSG:4326',
+
+			bbox: (extent, _, projection) => transformExtent(
+				extent,
+				projection.getCode(), // Map projection
+				options.projection // Received projection
+			).map(c => c.toFixed(4)), // Round to 4 digits
+
+			url: function() {
+				const query = options.query(...arguments),
+					url = options.host + query._path;
+				delete query._path;
+				if (options.strategy == bbox)
+					query.bbox = options.bbox(...arguments);
+				return url + '?' + new URLSearchParams(query).toString();
+			},
+			...opt
+		};
+
 		super(options);
+		this.options = options;
+
+		// Display loading status
+		const statusEl = document.getElementById(options.statusId); // XHR download tracking
+		if (statusEl)
+			this.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
+				if (!statusEl.textContent.includes('error'))
+					statusEl.innerHTML = '';
+
+				//BEST status out of zoom bounds
+				switch (evt.type) {
+					case 'featuresloadstart':
+						statusEl.innerHTML = '&#8987;';
+						break;
+					case 'featuresloaderror':
+						statusEl.innerHTML = 'Erreur !';
+				}
+			});
+	}
+}
+
+class MyVectorSource extends MyVectorSource1 {
+	constructor(opt) {
+		const options = {
+			...opt,
+			query: ( /*extent, resolution, projection*/ ) => ({
+				_path: 'api/bbox',
+				//type_points: 4,
+				//	pp:projection,
+				nb_points: 'all',
+				...opt.query(...arguments),
+			}),
+		};
+
+		super({
+			...options,
+		});
+	}
+}
+
+class MyVectorClusterSource extends Cluster {
+	constructor(options) {
+		// Full source
+		const fullSource = new MyVectorSource(options);
+
+		// Cluster source
+		super({
+			source: fullSource,
+
+			// Generate a center point where display the cluster
+			geometryFnc: feature => {
+				const geometry = feature.getGeometry();
+
+				if (geometry) {
+					const extent = feature.getGeometry().getExtent(),
+						pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
+
+					// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
+					if (pixelSemiPerimeter > 200)
+						this.addFeature(feature);
+					else
+						return new ol.geom.Point(
+							ol.extent.getCenter(
+								feature.getGeometry().getExtent()
+							)
+						);
+				}
+			},
+
+			// Generate the features to render the cluster
+			createCluster: (point, features) => {
+				let nbClusters = 0,
+					includeCluster = false,
+					lines = [];
+
+				features.forEach(f => {
+					const properties = f.getProperties();
+
+					nbClusters += parseInt(properties.cluster) || 1;
+					if (properties.cluster)
+						includeCluster = true;
+					if (properties.name)
+						lines.push(properties.name);
+				});
+
+				// Single feature : display it
+				if (nbClusters == 1)
+					return features[0];
+
+				if (includeCluster || lines.length > 5)
+					lines = ['Cliquer pour zoomer'];
+
+				// Display a cluster point
+				return new ol.Feature({
+					id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
+					name: lines.join('\n'),
+					geometry: point, // The gravity center of all the features into the cluster
+					features: features,
+					cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
+				});
+			},
+		});
+	}
+
+	hover(feature, properties, evt) {} //TODO
+}
+
+export class MyVectorLayer extends VectorLayer {
+	// style / hover
+	constructor(options) {
+		super({
+			//source: new MyVectorSource(options),
+			source: new MyVectorClusterSource(options),
+		});
 	}
 
 	setMapInternal(map) {
 		// Attach one hover & click listener to each map
-		if (!(map.getListeners() || []).includes(mouseListener))
-			map.on(['pointermove', 'click'], mouseListener);
+		if (!(map.getListeners() || []).includes(mapMouseListener)) {
+			map.on(['pointermove', 'click'], mapMouseListener);
 
+			// Leaving the map reset hovering
+			window.addEventListener('mousemove', evt => {
+				const divRect = map.getTargetElement().getBoundingClientRect();
+
+				// The mouse is outside of the map
+				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+					if (0)
+						if (map.lastHover.styledFeature) {
+							map.lastHover.styledFeature.setStyle();
+							map.lastHover.layer.setZIndex(100);
+							map.lastHover = {};
+						}
+			});
+		}
 		return super.setMapInternal(map);
 	}
+
+	hover(feature, properties, evt) {}
 }
 
-function mouseListener(evt) {
-	console.log(evt.type);
+function mapMouseListener(evt) {
+	// Find the first hovered feature
+	let hoveredLayer = null,
+		hoveredFeature = evt.map.forEachFeatureAtPixel(
+			evt.map.getEventPixel(evt.originalEvent),
+			function(feature, layer) {
+				if (layer && layer.options) {
+					hoveredLayer = layer;
+					return feature;
+				}
+			}, {
+				hitTolerance: 6, // For lines / Default 0
+			}
+		),
+		styledFeature = hoveredFeature, // The feature that will receive the style
+		hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {},
+		noIconStyleOption = null;
+
+	// Setup the curseur
+	evt.map.getViewport().style.cursor = hoveredFeature &&
+		(hoveredProperties.url || hoveredProperties.cluster) && !hoveredLayer.options.noClick ?
+		'pointer' : '';
+
+	if (hoveredFeature)
+	/*DCMM*/
+	{
+		var _r = ' ',
+			_v = hoveredLayer.ol_uid;
+		if (typeof _v == 'array' || typeof _v == 'object') {
+			for (let _i in _v)
+				if (typeof _v[_i] != 'function' && _v[_i]) _r += _i + '=' + typeof _v[_i] + ' ' + _v[_i] + ' ' + (_v[_i] && _v[_i].CLASS_NAME ? '(' + _v[_i].CLASS_NAME + ')' : '') + "\n"
+		} else _r += _v;
+		console.log(_r)
+	}
+
+	if (hoveredFeature)
+		hoveredLayer.hover(hoveredFeature, hoveredProperties, evt);
 }
 
 /**
@@ -86,7 +285,7 @@ export function layerVector(opt) {
 			...options,
 		});
 
-	layer.options = options; // Embark the options
+	//layer.options = options; // Embark the options
 
 	selectNames.map(name => selectVectorLayer(name, options.callBack)); // Setup the selector managers
 	options.callBack(); // Init parameters depending on the selector
@@ -102,7 +301,7 @@ export function layerVector(opt) {
 		// Add the hovering listener to the map (once for one map)
 		addMapListener(map);
 	};
-
+	/*
 	// Display loading status
 	if (statusEl)
 		source.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
@@ -118,7 +317,7 @@ export function layerVector(opt) {
 					statusEl.innerHTML = 'Erreur !';
 			}
 		});
-
+	*/
 	format.readFeatures = function(doc, opt) {
 		try {
 			const json = JSON.parse(doc);
@@ -145,6 +344,7 @@ export function layerVector(opt) {
 
 	// Default url callback function for the layer
 	function sourceUrl(extent, resolution, projection) {
+		/*
 		const bbox = ol.proj.transformExtent( // BBox
 				extent,
 				projection.getCode(), // Map projection
@@ -163,7 +363,8 @@ export function layerVector(opt) {
 			if (k != 'path' && urlParams[k])
 				query.push(k + '=' + urlParams[k]);
 
-		return options.host + urlParams.path + '?' + query.join('&');
+				return options.host + urlParams.path + '?' + query.join('&');
+		*/
 	}
 
 	return layer;
@@ -183,8 +384,8 @@ export function layerVectorCluster(opt) {
 		layer = layerVector(options), // Creates the basic layer (with all the points)
 		clusterSource = new ol.source.Cluster({
 			source: layer.getSource(),
-			geometryFunction: geometryFnc,
-			createCluster: createCluster,
+			//geometryFunction: geometryFnc,
+			//createCluster: createCluster,
 			...options,
 		}),
 		clusterLayer = new ol.layer.Vector({
@@ -212,7 +413,7 @@ export function layerVectorCluster(opt) {
 		if (clusterSource.getDistance() != distanceMinCluster) // Only when changed
 			clusterSource.setDistance(distanceMinCluster);
 	});
-
+	/*
 	// Generate a center point to manage clusterisations
 	function geometryFnc(feature) {
 		const geometry = feature.getGeometry();
@@ -265,16 +466,18 @@ export function layerVectorCluster(opt) {
 			features: features,
 		});
 	}
-
+	*/
 	return clusterLayer;
 }
 
 // Add a listener to manage hovered features
 export function addMapListener(map) {
+	return;
 	if (typeof map.lastHover == 'undefined') { // Once for a map
 		map.lastHover = {};
 
 		map.on(['pointermove', 'click'], evt => {
+			/*
 			// Find the first hovered feature
 			let hoveredLayer = null,
 				hoveredFeature = map.forEachFeatureAtPixel(
@@ -296,7 +499,7 @@ export function addMapListener(map) {
 			map.getViewport().style.cursor = hoveredFeature &&
 				(hoveredProperties.url || hoveredProperties.cluster) && !hoveredLayer.options.noClick ?
 				'pointer' : '';
-
+			*/
 			// Detect feature of a disjoin cluster
 			if (hoveredFeature && hoveredProperties.cluster &&
 				map.getView().getResolution() < hoveredLayer.options.maxResolutionDegroup) {
@@ -370,7 +573,7 @@ export function addMapListener(map) {
 					});
 			}
 		});
-
+		/*
 		// Leaving the map reset hovering
 		window.addEventListener('mousemove', evt => {
 			const divRect = map.getTargetElement().getBoundingClientRect();
@@ -384,6 +587,7 @@ export function addMapListener(map) {
 					map.lastHover = {};
 				}
 		});
+		*/
 	}
 }
 
