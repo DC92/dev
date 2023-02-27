@@ -1,15 +1,27 @@
 import VectorSource from '../node_modules/ol/source/Vector.js';
 import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
-import {
-	bbox
-} from '../node_modules/ol/loadingstrategy.js';
-import {
-	transformExtent
-} from '../node_modules/ol/proj.js';
 import Cluster from '../node_modules/ol/source/Cluster.js';
 import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import Point from '../node_modules/ol/geom/Point.js';
+import Feature from '../node_modules/ol/Feature.js';
+import {
+	bbox,
+} from '../node_modules/ol/loadingstrategy.js';
+import {
+	transformExtent,
+} from '../node_modules/ol/proj.js';
+import {
+	getCenter,
+} from '../node_modules/ol/extent.js';
+import {
+	Circle,
+	Fill,
+	Stroke,
+	Style,
+	Text,
+} from '../node_modules/ol/style.js';
 
-class MyVectorSource1 extends VectorSource {
+class MyVectorSource extends VectorSource {
 	//TODO Format / convertProperties
 	//TODO selector
 	constructor(opt) {
@@ -36,7 +48,6 @@ class MyVectorSource1 extends VectorSource {
 		};
 
 		super(options);
-		this.options = options;
 
 		// Display loading status
 		const statusEl = document.getElementById(options.statusId); // XHR download tracking
@@ -57,33 +68,10 @@ class MyVectorSource1 extends VectorSource {
 	}
 }
 
-class MyVectorSource extends MyVectorSource1 {
-	constructor(opt) {
-		const options = {
-			...opt,
-			query: ( /*extent, resolution, projection*/ ) => ({
-				_path: 'api/bbox',
-				//type_points: 4,
-				//	pp:projection,
-				nb_points: 'all',
-				...opt.query(...arguments),
-			}),
-		};
-
-		super({
-			...options,
-		});
-	}
-}
-
 class MyVectorClusterSource extends Cluster {
 	constructor(options) {
-		// Full source
-		const fullSource = new MyVectorSource(options);
-
-		// Cluster source
-		super({
-			source: fullSource,
+		super({ // Cluster source
+			source: new MyVectorSource(options), // Full source
 
 			// Generate a center point where display the cluster
 			geometryFnc: feature => {
@@ -97,11 +85,7 @@ class MyVectorClusterSource extends Cluster {
 					if (pixelSemiPerimeter > 200)
 						this.addFeature(feature);
 					else
-						return new ol.geom.Point(
-							ol.extent.getCenter(
-								feature.getGeometry().getExtent()
-							)
-						);
+						return new Point(getCenter(feature.getGeometry().getExtent()));
 				}
 			},
 
@@ -129,7 +113,7 @@ class MyVectorClusterSource extends Cluster {
 					lines = ['Cliquer pour zoomer'];
 
 				// Display a cluster point
-				return new ol.Feature({
+				return new Feature({
 					id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
 					name: lines.join('\n'),
 					geometry: point, // The gravity center of all the features into the cluster
@@ -139,20 +123,59 @@ class MyVectorClusterSource extends Cluster {
 			},
 		});
 	}
-
-	hover(feature, properties, evt) {} //TODO
 }
 
 export class MyVectorLayer extends VectorLayer {
-	// style / hover
 	constructor(options) {
 		super({
-			//source: new MyVectorSource(options),
-			source: new MyVectorClusterSource(options),
+			...options,
+			source: options.minClusterResolution === undefined ?
+				new MyVectorSource(options) : new MyVectorClusterSource(options),
+
+			style: function(feature, resolution) {
+				const properties = feature.getProperties();
+
+				// Normal style
+				if (!properties.cluster)
+					return new Style(options.slyleOptions(feature, properties, options, resolution));
+				else
+					// Cluster circle with number inside
+					if (resolution > options.minClusterResolution)
+						return new Style({
+							image: new Circle({
+								radius: 14,
+								stroke: new Stroke({
+									color: 'blue',
+								}),
+								fill: new Fill({
+									color: 'white',
+								}),
+							}),
+							text: new Text({
+								text: properties.cluster.toString(),
+								font: '12px Verdana',
+							}),
+						});
+					// Several icons for a cluster
+					else {
+						/*return [
+							// One style with overwriting options
+							new  Style(options.slyleOptions(...arguments)),
+							//...options.styles(...arguments), // Many styles to have several icons & labels
+						]*/
+					}
+			},
 		});
+		this.options = options;
 	}
 
+	//HACK execute actions on Map init
+	//TODO BUG n'est pas appelé
 	setMapInternal(map) {
+		// Add the alternate layer if any
+		if (this.options.altLayer)
+			map.addLayer(this.options.altLayer);
+
 		// Attach one hover & click listener to each map
 		if (!(map.getListeners() || []).includes(mapMouseListener)) {
 			map.on(['pointermove', 'click'], mapMouseListener);
@@ -164,6 +187,7 @@ export class MyVectorLayer extends VectorLayer {
 				// The mouse is outside of the map
 				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+					//TODO
 					if (0)
 						if (map.lastHover.styledFeature) {
 							map.lastHover.styledFeature.setStyle();
@@ -174,8 +198,6 @@ export class MyVectorLayer extends VectorLayer {
 		}
 		return super.setMapInternal(map);
 	}
-
-	hover(feature, properties, evt) {}
 }
 
 function mapMouseListener(evt) {
@@ -201,17 +223,7 @@ function mapMouseListener(evt) {
 		(hoveredProperties.url || hoveredProperties.cluster) && !hoveredLayer.options.noClick ?
 		'pointer' : '';
 
-	if (hoveredFeature)
-	/*DCMM*/
-	{
-		var _r = ' ',
-			_v = hoveredLayer.ol_uid;
-		if (typeof _v == 'array' || typeof _v == 'object') {
-			for (let _i in _v)
-				if (typeof _v[_i] != 'function' && _v[_i]) _r += _i + '=' + typeof _v[_i] + ' ' + _v[_i] + ' ' + (_v[_i] && _v[_i].CLASS_NAME ? '(' + _v[_i].CLASS_NAME + ')' : '') + "\n"
-		} else _r += _v;
-		console.log(_r)
-	}
+	//TODO hover
 
 	if (hoveredFeature)
 		hoveredLayer.hover(hoveredFeature, hoveredProperties, evt);
@@ -295,8 +307,8 @@ export function layerVector(opt) {
 		MyVectorLayer.prototype.setMapInternal.call(this, map);
 
 		// Add the alternate layer if any
-		if (options.altLayer)
-			map.addLayer(options.altLayer);
+		//if (options.altLayer)
+		//	map.addLayer(options.altLayer);
 
 		// Add the hovering listener to the map (once for one map)
 		addMapListener(map);

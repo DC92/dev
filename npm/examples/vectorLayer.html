@@ -48,33 +48,31 @@ Based on https://openlayers.org
 	<p><a href="../src/layerVector.js">src/layerVector.js</a> adds some facilities to ol.layer.Vector</p>
 
 	<div id="map"></div>
-	
-	Status : <span id="test-status">XX</span>
 
 	<div class="layer-select">
 		<label>
 			Pyrenees-refuges.com
 			<input type="checkbox" name="select-prc" />
-			<span id="select-prc-status"></span>
+			<span id="status-prc"></span>
 		</label><br /><label>
 			Chemineur
 			<input type="checkbox" name="select-chem" value="3,8,64" />
-			<span id="select-chem-status"></span>
+			<span id="status-chem"></span>
 		</label><br /><label>
 			Camptocamp.org
 			<input type="checkbox" name="select-c2c" />
-			<span id="select-c2c-status"></span>
+			<span id="status-c2c"></span>
 		</label>
 		<div>Only 100 features at a time</div>
 		<br />
 		<label>
 			Alpages.info
 			<input type="checkbox" name="select-alpages" value="4,5" />
-			<span id="select-alpages-status"></span>
+			<span id="status-alpages"></span>
 		</label><br /><label>
 			Massifs
 			<input type="checkbox" name="select-massifs" />
-			<span id="select-massifs-status"></span>
+			<span id="status-massifs"></span>
 		</label>
 	</div>
 
@@ -85,7 +83,7 @@ Based on https://openlayers.org
 		</label><br /><label>
 			Refuges.info
 			<input type="checkbox" name="select-wri" value="all" />
-			<span id="select-wri-status"></span>
+			<span id="status-wri"></span>
 		</label>
 		<label><input type="checkbox" name="select-wri" value="7" />cabane non gardée</label>
 		<label><input type="checkbox" name="select-wri" value="10" />refuge gardé</label>
@@ -103,7 +101,7 @@ Based on https://openlayers.org
 		<label>
 			Overpass (OSM services)
 			<input type="checkbox" name="select-osm" id="select-osm" value="all" />
-			<span id="select-osm-status"></span>
+			<span id="status-osm"></span>
 		</label>
 		<label><input type="checkbox" name="select-osm"
 			value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</label>
@@ -125,7 +123,7 @@ Based on https://openlayers.org
 
 	<script type="module">
 	
-import {MyVectorLayer} from '../src/VectorLayer.js';
+import {LayerWri} from '../src/VectorLayerCollection.js';
 //import {layerVectorCluster, styleOptionsLabel} from '../src/VectorLayer.js';
 //import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
 
@@ -150,16 +148,12 @@ new ol.Map({
 		new ol.layer.Tile({
 			source: new ol.source.OSM(),
 		}),
-		
-		new MyVectorLayer({
-			statusId: 'test-status',
+
+		new LayerWri({
 			host: 'https://dom.refuges.info/',
-			query : ()=>({
-				type_points: 4,
-				//nb_points: 'all',
-			}),
+			statusId: 'status-wri',
 		}),
-		
+
 		/*
 		...layerVectorCollection({
 			prc: {

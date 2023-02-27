@@ -2,7 +2,12 @@
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
-import {layerVector, layerVectorCluster, functionLike} from './VectorLayer.js';
+import {
+	MyVectorLayer,
+	layerVector,
+	layerVectorCluster,
+	functionLike
+} from './VectorLayer.js';
 
 // chemineur.fr, alpages.info
 export function layerGeoBB(options) {
@@ -121,6 +126,48 @@ export function layerAlpages(options) {
 }
 
 // refuges.info
+export class LayerWri extends MyVectorLayer {
+	constructor(opt) {
+		const options = {
+				host: 'https://www.refuges.info/',
+				query: () => ({
+					_path: 'api/bbox',
+					nb_points: 'all',
+					type_points: 4,
+				}),
+				transitionResolution: 100,
+
+				slyleOptions: (_, properties) => {
+					if (properties.type)
+						return {
+							image: new ol.style.Icon({
+								//TODO BUG general : send cookies to the server, event non secure		
+								src: 'https://www.refuges.info/images/icones/' + properties.type.icone + '.svg',
+							}),
+						};
+				},
+				...opt,
+			},
+			// High resolutions layer
+			clusterLayer = new MyVectorLayer({
+				minResolution: options.transitionResolution,
+				...options,
+				query: () => ({
+					...options.query(),
+					cluster: 0.1,
+				}),
+			});
+
+		// Low resolutions layer
+		super({
+			maxResolution: options.transitionResolution,
+			minClusterResolution: 0,
+			altLayer: clusterLayer,
+			...options,
+		});
+	}
+}
+
 export function layerWri(options) {
 	return layerVectorCluster({ //BEST case of WRI without local cluster ?
 		host: '//www.refuges.info/',
@@ -152,7 +199,7 @@ export function layerClusterWri(opt) {
 			transitionResolution: 100,
 			...opt,
 		},
-		// High resolutions
+		// High resolutions layer
 		clusterLayer = layerWri({
 			minResolution: options.transitionResolution,
 			...options,
