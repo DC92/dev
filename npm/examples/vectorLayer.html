@@ -132,7 +132,7 @@ import FullScreen from '../node_modules/ol/control/FullScreen.js';
 import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
 import Zoom from '../node_modules/ol/control/Zoom.js';
 import {LayerWri} from '../src/VectorLayerCollection.js';
-//import {layerVectorCluster, styleOptionsLabel} from '../src/VectorLayer.js';
+//import {layerVectorCluster, labelStyleOptions} from '../src/VectorLayer.js';
 //import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
 
 // Force selectors
@@ -191,7 +191,7 @@ new Map({
 			// Display a single label above each icon
 			styleOptionsDisplay: function(feature, properties, layer, resolution) {
 				if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
-					return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
+					return labelStyleOptions(feature, properties.nom || properties.name); // Points || clusters
 			},
 			// Don't display attribution on labels
 			convertProperties: {

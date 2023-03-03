@@ -138,15 +138,13 @@ export class LayerWri extends MyVectorLayer {
 				transitionResolution: 100,
 				minClusterResolution: 0,
 
-				slyleOptions: (_, properties) => {
-					if (properties.type)
-						return {
-							image: new ol.style.Icon({
-								//TODO BUG general : send cookies to the server, event non secure		
-								src: 'https://www.refuges.info/images/icones/' + properties.type.icone + '.svg',
-							}),
-						};
-				},
+				stylesOptions: properties => [{
+					image: new ol.style.Icon({
+						src: options.host + 'images/icones/' + properties.type.icone + '.svg',
+					}),
+				}],
+
+				click: properties => properties.lien,
 				...opt,
 			},
 			// High resolutions layer
@@ -235,7 +233,7 @@ export function layerWriAreas(options) {
 				.map(c => parseInt(c, 16));
 
 			return {
-				...styleOptionsLabel(feature, properties.nom, {
+				...labelStyleOptions(feature, properties.nom, {
 					padding: [1, -1, -1, 1],
 					backgroundStroke: null,
 					font: null,
@@ -246,7 +244,7 @@ export function layerWriAreas(options) {
 			};
 		},
 		styleOptionsHover: (feature, properties) => ({
-			...styleOptionsLabel(feature, properties.nom, {
+			...labelStyleOptions(feature, properties.nom, {
 				padding: [1, 0, -1, 2],
 				font: '12px Verdana',
 				overflow: true, // Force display even if no place

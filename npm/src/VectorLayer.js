@@ -26,43 +26,43 @@ class MyVectorSource extends VectorSource {
 	//TODO selector
 	constructor(opt) {
 		const options = {
-			strategy: bbox,
-			format: new GeoJSON(),
-			projection: 'EPSG:4326',
+				strategy: bbox,
+				format: new GeoJSON(),
+				projection: 'EPSG:4326',
 
-			bbox: (extent, _, projection) => transformExtent(
-				extent,
-				projection.getCode(), // Map projection
-				options.projection // Received projection
-			).map(c => c.toFixed(4)), // Round to 4 digits
+				bbox: (extent, _, projection) => transformExtent(
+					extent,
+					projection.getCode(), // Map projection
+					options.projection // Received projection
+				).map(c => c.toFixed(4)), // Round to 4 digits
 
-			url: function() {
-				const query = options.query(...arguments),
-					url = options.host + query._path;
-				delete query._path;
-				if (options.strategy == bbox)
-					query.bbox = options.bbox(...arguments);
-				return url + '?' + new URLSearchParams(query).toString();
+				url: function() {
+					const query = options.query(...arguments),
+						url = options.host + query._path;
+					delete query._path;
+					if (options.strategy == bbox)
+						query.bbox = options.bbox(...arguments);
+					return url + '?' + new URLSearchParams(query).toString();
+				},
+				...opt
 			},
-			...opt
-		};
+			statusEl = document.getElementById(options.statusId);
 
 		super(options);
 
 		// Display loading status
-		const statusEl = document.getElementById(options.statusId); // XHR download tracking
 		if (statusEl)
 			this.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
 				if (!statusEl.textContent.includes('error'))
 					statusEl.innerHTML = '';
 
-				//BEST status out of zoom bounds
 				switch (evt.type) {
 					case 'featuresloadstart':
 						statusEl.innerHTML = '&#8987;';
 						break;
 					case 'featuresloaderror':
 						statusEl.innerHTML = 'Erreur !';
+						//BEST status out of zoom bounds
 				}
 			});
 	}
@@ -126,75 +126,73 @@ class MyVectorClusterSource extends Cluster {
 }
 
 export class MyVectorLayer extends VectorLayer {
-	constructor(options) {
+	constructor(opt) {
+		const options = {
+			// Normal style
+			stylesOptions: properties => [{
+				image: new ol.style.Icon({
+					//TODO BUG general : send cookies to the server, event non secure		
+					src: properties.icon,
+				}),
+			}],
+			// Cluster circle with number inside
+			clusterStylesOptions: properties => [{
+				image: new Circle({
+					radius: 14,
+					stroke: new Stroke({
+						color: 'blue',
+					}),
+					fill: new Fill({
+						color: 'white',
+					}),
+				}),
+				text: new Text({
+					text: properties.cluster.toString(),
+					font: '12px Verdana',
+				}),
+			}],
+			// Several icons for a cluster
+			clusterDetailStylesOptions: function(properties, hover, options, feature, resolution) {
+				return {}; //TODO
+			},
+			...opt,
+		};
+
 		super({
 			...options,
 			source: options.minClusterResolution === undefined ?
 				new MyVectorSource(options) : new MyVectorClusterSource(options),
 
-			style: function(feature, resolution) {
-				const properties = feature.getProperties();
+			style: (feature, resolution, hover) => {
+				const properties = feature.getProperties(),
+					display = !properties.cluster ? 'stylesOptions' :
+					resolution > options.minClusterResolution ? 'clusterStylesOptions' :
+					'clusterDetailStylesOptions';
 
-				// Normal style
-				if (!properties.cluster)
-					return new Style(options.slyleOptions(feature, properties, options, resolution));
-				else
-					// Cluster circle with number inside
-					if (resolution > options.minClusterResolution)
-						return new Style({
-							image: new Circle({
-								radius: 14,
-								stroke: new Stroke({
-									color: 'blue',
-								}),
-								fill: new Fill({
-									color: 'white',
-								}),
-							}),
-							text: new Text({
-								text: properties.cluster.toString(),
-								font: '12px Verdana',
-							}),
-						});
-					// Several icons for a cluster
-					else {
-						/*return [
-							// One style with overwriting options
-							new  Style(options.slyleOptions(...arguments)),
-							//...options.styles(...arguments), // Many styles to have several icons & labels
-						]*/
-					}
+				return options[display](
+					properties,
+					hover,
+					options,
+					feature,
+					resolution
+				).map(o => new Style(o));
 			},
+
+			click: () => null,
 		});
 		this.options = options;
 	}
 
 	//HACK execute actions on Map init
-	//TODO BUG n'est pas appelé
 	setMapInternal(map) {
 		// Add the alternate layer if any
 		if (this.options.altLayer)
 			map.addLayer(this.options.altLayer);
 
 		// Attach one hover & click listener to each map
-		if (!(map.getListeners() || []).includes(mapMouseListener)) {
+		if (!(map.getListeners() || []).includes(mapMouseListener)) { // Only once for each map
 			map.on(['pointermove', 'click'], mapMouseListener);
-
-			// Leaving the map reset hovering
-			window.addEventListener('mousemove', evt => {
-				const divRect = map.getTargetElement().getBoundingClientRect();
-
-				// The mouse is outside of the map
-				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-					//TODO
-					if (0)
-						if (map.lastHover.styledFeature) {
-							map.lastHover.styledFeature.setStyle();
-							map.lastHover.layer.setZIndex(100);
-							map.lastHover = {};
-						}
-			});
+			window.addEventListener('mousemove', evt => windowMouseListener(evt, map));
 		}
 		return super.setMapInternal(map);
 	}
@@ -213,22 +211,90 @@ function mapMouseListener(evt) {
 			}, {
 				hitTolerance: 6, // For lines / Default 0
 			}
-		),
-		styledFeature = hoveredFeature, // The feature that will receive the style
-		hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {},
-		noIconStyleOption = null;
+		);
 
-	// Setup the curseur
-	evt.map.getViewport().style.cursor = hoveredFeature &&
-		(hoveredProperties.url || hoveredProperties.cluster) && !hoveredLayer.options.noClick ?
-		'pointer' : '';
+	evt.map.getViewport().style.cursor = '';
+	if (hoveredFeature) {
+		const hoveredProperties = hoveredFeature.getProperties(),
+			hoveredClickUrl = hoveredLayer.options.click(hoveredProperties);
 
-	//TODO hover
+		if (hoveredClickUrl || hoveredProperties.cluster)
+			evt.map.getViewport().style.cursor = 'pointer';
 
-	if (hoveredFeature)
-		hoveredLayer.hover(hoveredFeature, hoveredProperties, evt);
+		if (evt.type == 'click') {
+			if (hoveredClickUrl) {
+				// Open a new tag
+				if (evt.originalEvent.ctrlKey)
+					window.open(hoveredClickUrl, '_blank').focus();
+				else
+					// Open a new window
+					if (evt.originalEvent.shiftKey)
+						window.open(hoveredClickUrl, '_blank', 'resizable=yes').focus();
+					else
+						// Go on the same window
+						window.location.href = hoveredClickUrl;
+			}
+			// Cluster
+			if (hoveredProperties.cluster)
+				evt.map.getView().animate({
+					zoom: evt.map.getView().getZoom() + 2,
+					center: hoveredProperties.geometry.getCoordinates(),
+				});
+		} else { // pointermove
+			hoveredFeature.setStyle( //TODO
+				(feature, resolution) => [
+					new ol.style.Style({
+						...hoveredLayer.options.style(hoveredProperties, hoveredFeature, hoveredLayer.options, resolution),
+						...labelStyleOptions(hoveredFeature, 'text'),
+						zIndex: 200,
+					}),
+				]);
+		}
+	}
+
+	if (0) { /////////////// //TODO
+		const styledFeature = hoveredFeature, // The feature that will receive the style
+			//hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {},
+			noIconStyleOption = null; //TODO what is ???
+
+		// Setup the curseur
+		evt.map.getViewport().style.cursor =
+			hoveredClickUrl ?
+			'pointer' : '';
+
+		// Click on a feature
+		if (hoveredFeature && evt.type == 'click') {
+			if (hoveredProperties && hoveredProperties.url) {}
+		} else {
+
+
+			if (hoveredFeature != map.lastHoveredFeature) {
+				if (hoveredProperties.cluster) {} else {}
+
+				//hoveredLayer.hover(hoveredProperties, hoveredFeature, evt);
+			}
+		}
+	}
 }
 
+function windowMouseListener(evt, map) {
+	// Leaving the map reset hovering
+	const divRect = map.getTargetElement().getBoundingClientRect();
+
+	// The mouse is outside of the map
+	if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+		evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+		console.log('Out of map');
+	/* //TODO
+	if (map.lastHover.styledFeature) {
+		map.lastHover.styledFeature.setStyle();
+		map.lastHover.layer.setZIndex(100);
+		map.lastHover = {};
+	}
+	*/
+}
+
+/////////////////////////////////////////////////////////
 /**
  * Layer to display remote geoJson layer
  */
@@ -263,14 +329,14 @@ export function layerVector(opt) {
 			// Default style options
 			styleOptionsDisplay: function(feature, properties, layer, resolution) {
 				return {
-					...styleOptionsIcon(...arguments), // Default style
+					...iconStyleOptions(...arguments), // Default style
 					...functionLike(opt.styleOptionsDisplay, ...arguments),
 				};
 			},
 			styleOptionsHover: function(feature, properties, layer, resolution) {
 				return { // Each of these options can overwrite the previous
 					...functionLike(options.styleOptionsDisplay, ...arguments), // Non hover style
-					...styleOptionsLabelFull(...arguments), // Default hovering
+					...fullLabelStyleOptions(...arguments), // Default hovering
 					...functionLike(opt.styleOptionsHover, ...arguments), // Overwrite when hovering
 				};
 			},
@@ -562,28 +628,28 @@ export function addMapListener(map) {
 			}
 
 			// Click on a feature
-			if (evt.type == 'click' && hoveredFeature) {
-				const hoveredProperties = hoveredFeature.getProperties();
+			/*		if (evt.type == 'click' && hoveredFeature) {
+						const hoveredProperties = hoveredFeature.getProperties();
 
-				if (hoveredProperties && hoveredProperties.url && !hoveredLayer.options.noClick) {
-					// Open a new tag
-					if (evt.originalEvent.ctrlKey)
-						window.open(hoveredProperties.url, '_blank').focus();
-					else
-						// Open a new window
-						if (evt.originalEvent.shiftKey)
-							window.open(hoveredProperties.url, '_blank', 'resizable=yes').focus();
-						else
-							// Go on the same window
-							window.location.href = hoveredProperties.url;
-				}
-				// Cluster
-				if (hoveredProperties.cluster)
-					map.getView().animate({
-						zoom: map.getView().getZoom() + 2,
-						center: hoveredProperties.geometry.getCoordinates(),
-					});
-			}
+						if (hoveredProperties && hoveredProperties.url && !hoveredLayer.options.noClick) {
+							// Open a new tag
+							if (evt.originalEvent.ctrlKey)
+								window.open(hoveredProperties.url, '_blank').focus();
+							else
+								// Open a new window
+								if (evt.originalEvent.shiftKey)
+									window.open(hoveredProperties.url, '_blank', 'resizable=yes').focus();
+								else
+									// Go on the same window
+									window.location.href = hoveredProperties.url;
+						}
+						// Cluster
+						if (hoveredProperties.cluster)
+							map.getView().animate({
+								zoom: map.getView().getZoom() + 2,
+								center: hoveredProperties.geometry.getCoordinates(),
+							});
+					}*/
 		});
 		/*
 		// Leaving the map reset hovering
@@ -671,7 +737,7 @@ export function selectVectorLayer(name, callBack) {
  * Some usefull style functions
  */
 // Display a label (Used by cluster)
-export function styleOptionsIcon(feature, properties) {
+export function iconStyleOptions(feature, properties) {
 	if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
 		return {
 			image: new ol.style.Icon({
@@ -681,7 +747,7 @@ export function styleOptionsIcon(feature, properties) {
 		};
 }
 
-export function styleOptionsLabel(feature, text, textStyleOptions) {
+export function labelStyleOptions(feature, text, textStyleOptions) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -709,9 +775,8 @@ export function styleOptionsLabel(feature, text, textStyleOptions) {
 	};
 }
 
-export function styleOptionsLabelFull(feature, properties) {
-	return styleOptionsLabel(
-		feature,
+export function fullLabelStyleOptions(properties) {
+	return labelStyleOptions(
 		agregateText([
 			properties.name,
 			agregateText([
@@ -722,6 +787,32 @@ export function styleOptionsLabelFull(feature, properties) {
 			properties.attribution,
 		]),
 	);
+}
+
+function clusterStylesOptions(properties) {
+	return [{
+		image: new Circle({
+			radius: 14,
+			stroke: new Stroke({
+				color: 'blue',
+			}),
+			fill: new Fill({
+				color: 'white',
+			}),
+		}),
+		text: new Text({
+			text: properties.cluster.toString(),
+			font: '12px Verdana',
+		}),
+	}];
+}
+
+function clusterDetailStylesOptions(properties) {
+	/*return [
+		// One style with overwriting options
+		new  Style(options.styleOptions(...arguments)),
+		//...options.styles(...arguments), // Many styles to have several icons & labels
+	]*/
 }
 
 // Simplify & agreagte an array of lines
@@ -750,23 +841,23 @@ export function stylesCluster(feature, properties, layer, resolution) {
 					}));
 				}
 			});
-		else
-			// Cluster circle with number inside
-			styles.push(new ol.style.Style({
-				image: new ol.style.Circle({
-					radius: 14,
-					stroke: new ol.style.Stroke({
-						color: 'blue',
-					}),
-					fill: new ol.style.Fill({
-						color: 'white',
-					}),
-				}),
-				text: new ol.style.Text({
-					text: properties.cluster.toString(),
-					font: '12px Verdana',
-				}),
-			}));
+		/*		else
+					// Cluster circle with number inside
+					styles.push(new ol.style.Style({
+						image: new ol.style.Circle({
+							radius: 14,
+							stroke: new ol.style.Stroke({
+								color: 'blue',
+							}),
+							fill: new ol.style.Fill({
+								color: 'white',
+							}),
+						}),
+						text: new ol.style.Text({
+							text: properties.cluster.toString(),
+							font: '12px Verdana',
+						}),
+					}));*/
 	}
 	return styles;
 }
