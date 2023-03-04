@@ -122,7 +122,6 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script type="module">
-	
 import Map from '../node_modules/ol/Map.js';
 import View from '../node_modules/ol/View.js';
 import Tile from '../node_modules/ol/layer/Tile.js';
@@ -131,8 +130,13 @@ import OSM from '../node_modules/ol/source/OSM.js';
 import FullScreen from '../node_modules/ol/control/FullScreen.js';
 import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
 import Zoom from '../node_modules/ol/control/Zoom.js';
-import {LayerWri} from '../src/VectorLayerCollection.js';
-//import {layerVectorCluster, labelStyleOptions} from '../src/VectorLayer.js';
+import {
+	layerVectorCluster,
+	labelStyleOptions,
+} from '../src/VectorLayer.js';
+import {
+	LayerWri,
+} from '../src/VectorLayerCollection.js';
 //import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
 
 // Force selectors
@@ -144,8 +148,7 @@ new Map({
 		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
 		center: ol.proj.transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'),
 		zoom: 12,
-		zoom: 15,
-		zoom: 8,
+		//zoom: 15,
 	}),
 	controls: [
 		new FullScreen(),
@@ -160,7 +163,17 @@ new Map({
 
 		new LayerWri({
 			host: 'https://dom.refuges.info/',
+			selectName: 'select-wri',
 			statusId: 'status-wri',
+		}),
+		new LayerWri({
+			host: 'https://dom.refuges.info/',
+			selectName: 'select-refuges',
+			statusId: 'status-wri',
+			attribution: null,
+			stylesOptions: (properties, feature) => [
+				labelStyleOptions(feature, properties.nom),
+			],
 		}),
 
 		/*

@@ -133,7 +133,7 @@ export class MyVectorLayer extends VectorLayer {
 					src: properties.icon,
 				}),
 			}],*/
-			clusterStylesOptions: (properties, feature, hover, options) => [
+			clusterStylesOptions: (properties, feature, hover) => [
 				clusterStyleOptions(properties),
 				hover ? labelStyleOptions(feature, properties.name) : {},
 			],
@@ -161,7 +161,7 @@ export class MyVectorLayer extends VectorLayer {
 					hover,
 					options,
 					resolution
-				).map(o => new Style(o)); // Transform to Style
+				).map(so => new Style(so)); // Transform to Style
 			},
 			click: () => null, // No click by default
 			...options,
@@ -189,8 +189,8 @@ export class MyVectorLayer extends VectorLayer {
 					mouseListener({
 						map: map,
 						originalEvent: {
-							clientX: 1000000,
-							clientY: 1000000,
+							clientX: 10000,
+							clientY: 10000,
 						},
 					});
 			});

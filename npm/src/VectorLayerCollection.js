@@ -138,27 +138,33 @@ export class LayerWri extends MyVectorLayer {
 				}),
 				transitionResolution: 100,
 				minClusterResolution: 0,
-
-				stylesOptions: (properties, feature, hover, options) => {
-					return [{
-							image: new ol.style.Icon({
-								src: options.host + 'images/icones/' + properties.type.icone + '.svg',
-							}),
-							...labelStyleOptions(feature, properties.nom),
-						},
-						hover ? fullLabelStyleOptions({
-							name: properties.nom,
-							ele: properties.coord.alt,
-							bed: properties.places.valeur,
-							type: properties.type.valeur,
-							attribution: 'refuges.info',
-						}, feature) : {},
-					]
-				},
+				attribution: 'refuges.info',
 
 				click: properties => properties.lien,
 				name: properties => properties.nom,
+
 				...opt,
+				stylesOptions: (properties, feature, hover, options) => {
+					const so = hover ?
+						fullLabelStyleOptions({
+								name: properties.nom,
+								ele: properties.coord.alt,
+								bed: properties.places.valeur,
+								type: properties.type.valeur,
+								attribution: options.attribution,
+							},
+							feature
+						) :
+						opt.stylesOptions ?
+						opt.stylesOptions(properties, feature)[0] : {};
+
+					return [{
+						image: new ol.style.Icon({
+							src: options.host + 'images/icones/' + properties.type.icone + '.svg',
+						}),
+						...so,
+					}];
+				},
 			},
 			// High resolutions layer
 			clusterLayer = new MyVectorLayer({
