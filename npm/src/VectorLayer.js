@@ -97,11 +97,10 @@ class MyVectorClusterSource extends Cluster {
 				features.forEach(f => {
 					const properties = f.getProperties();
 
+					lines.push(options.name(properties));
 					nbClusters += parseInt(properties.cluster) || 1;
 					if (properties.cluster)
 						includeCluster = true;
-					if (properties.name)
-						lines.push(properties.name);
 				});
 
 				// Single feature : display it
@@ -114,8 +113,8 @@ class MyVectorClusterSource extends Cluster {
 				// Display a cluster point
 				return new Feature({
 					id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
-					name: lines.join('\n'),
-					geometry: point, // The gravity center of all the features into the cluster
+					name: agregateText(lines),
+					geometry: point, // The gravity center of all the features in the cluster
 					features: features,
 					cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
 				});
@@ -134,24 +133,12 @@ export class MyVectorLayer extends VectorLayer {
 					src: properties.icon,
 				}),
 			}],*/
-			// Cluster circle with number inside
-			clusterStylesOptions: properties => [{
-				image: new Circle({
-					radius: 14,
-					stroke: new Stroke({
-						color: 'blue',
-					}),
-					fill: new Fill({
-						color: 'white',
-					}),
-				}),
-				text: new Text({
-					text: properties.cluster.toString(),
-					font: '12px Verdana',
-				}),
-			}],
+			clusterStylesOptions: (properties, feature, hover, options) => [
+				clusterStyleOptions(properties),
+				hover ? labelStyleOptions(feature, properties.name) : {},
+			],
 			// Several icons for a cluster
-			clusterDetailStylesOptions: function(properties, hover, options, feature, resolution) {
+			clusterDetailStylesOptions: function(properties, feature, hover, options, resolution) {
 				return {}; //TODO
 			},
 			...opt,
@@ -167,15 +154,16 @@ export class MyVectorLayer extends VectorLayer {
 					resolution > options.minClusterResolution ? 'clusterStylesOptions' :
 					'clusterDetailStylesOptions';
 
+				// Function returning styles options
 				return options[display](
 					properties,
+					feature,
 					hover,
 					options,
-					feature,
 					resolution
-				).map(o => new Style(o));
+				).map(o => new Style(o)); // Transform to Style
 			},
-			click: () => null,
+			click: () => null, // No click by default
 			...options,
 		});
 
@@ -201,8 +189,8 @@ export class MyVectorLayer extends VectorLayer {
 					mouseListener({
 						map: map,
 						originalEvent: {
-							clientX: -1,
-							clientY: -1,
+							clientX: 1000000,
+							clientY: 1000000,
 						},
 					});
 			});
@@ -255,6 +243,9 @@ function mouseListener(evt) {
 				evt.map.getViewport().style.cursor =
 					hoveredClickUrl || hoveredProperties.cluster ? 'pointer' : '';
 
+				if (evt.map.lastHoveredFeature)
+					evt.map.lastHoveredFeature.setStyle();
+
 				// Set the feature style to the style function with the hover flag
 				hoveredFeature.setStyle((feature, resolution) =>
 					hoveredLayer.getStyleFunction()(feature, resolution, true)
@@ -266,6 +257,79 @@ function mouseListener(evt) {
 			evt.map.lastHoveredFeature.setStyle();
 	}
 	evt.map.lastHoveredFeature = hoveredFeature;
+}
+
+/**
+ * Some usefull style functions
+ */
+
+// Cluster circle with number inside
+function clusterStyleOptions(properties) {
+	return {
+		image: new Circle({
+			radius: 14,
+			stroke: new Stroke({
+				color: 'blue',
+			}),
+			fill: new Fill({
+				color: 'white',
+			}),
+		}),
+		text: new Text({
+			text: properties.cluster.toString(),
+			font: '12px Verdana',
+		}),
+	};
+}
+
+export function labelStyleOptions(feature, text, textStyleOptions) {
+	const elLabel = document.createElement('span'),
+		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
+
+	//HACK to render the html entities in the canvas
+	elLabel.innerHTML = text;
+
+	return {
+		text: new ol.style.Text({
+			text: elLabel.innerHTML,
+			textBaseline: area ? 'middle' : 'bottom',
+			offsetY: area ? 0 : -13, // Above the icon
+			padding: [1, 1, -1, 3],
+			font: '12px Verdana',
+			fill: new ol.style.Fill({
+				color: 'black',
+			}),
+			backgroundFill: new ol.style.Fill({
+				color: 'white',
+			}),
+			backgroundStroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+			...textStyleOptions, //TODO DELETE ???
+		}),
+	};
+}
+
+export function fullLabelStyleOptions(properties, feature) {
+	return labelStyleOptions(
+		feature, agregateText([
+			properties.name,
+			agregateText([
+				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+			], ', '),
+			properties.type,
+			properties.attribution,
+		]));
+}
+
+// Simplify & agreagte an array of lines
+function agregateText(lines, glue) {
+	return lines
+		.filter(Boolean) // Avoid empty lines
+		.map(l => l.toString().replace('_', ' ').trim())
+		.map(l => l[0].toUpperCase() + l.substring(1))
+		.join(glue || '\n');
 }
 
 /////////////////////////////////////////////////////////
@@ -310,7 +374,7 @@ export function layerVector(opt) {
 			styleOptionsHover: function(feature, properties, layer, resolution) {
 				return { // Each of these options can overwrite the previous
 					...functionLike(options.styleOptionsDisplay, ...arguments), // Non hover style
-					...fullLabelStyleOptions(...arguments), // Default hovering
+					...fullLabelStyleOptions3(...arguments), // Default hovering
 					...functionLike(opt.styleOptionsHover, ...arguments), // Overwrite when hovering
 				};
 			},
@@ -523,7 +587,7 @@ export function layerVectorCluster(opt) {
 }
 
 // Add a listener to manage hovered features
-export function addMapListener(map) {
+function addMapListener(map) {
 	return;
 	if (typeof map.lastHover == 'undefined') { // Once for a map
 		map.lastHover = {};
@@ -654,7 +718,7 @@ export function addMapListener(map) {
  * You can force the values in window.localStorage[simplified name]
  * Return return an array of selected values
  */
-export function selectVectorLayer(name, callBack) {
+function selectVectorLayer(name, callBack) {
 	const selectEls = [...document.getElementsByName(name)],
 		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
 		init = (localStorage[safeName] || '').split(',');
@@ -707,11 +771,8 @@ export function selectVectorLayer(name, callBack) {
 	return selection();
 }
 
-/**
- * Some usefull style functions
- */
 // Display a label (Used by cluster)
-export function iconStyleOptions(feature, properties) {
+function iconStyleOptions(feature, properties) {
 	if (properties.icon && !ol.extent.getArea(feature.getGeometry().getExtent()))
 		return {
 			image: new ol.style.Icon({
@@ -720,65 +781,18 @@ export function iconStyleOptions(feature, properties) {
 			}),
 		};
 }
+//properties, feature, hover, options, resolution
 
-export function labelStyleOptions(feature, text, textStyleOptions) {
-	const elLabel = document.createElement('span'),
-		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
-
-	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text;
-
-	return {
-		text: new ol.style.Text({
-			text: elLabel.innerHTML,
-			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -13, // Above the icon
-			padding: [1, 1, -1, 3],
-			font: '12px Verdana',
-			fill: new ol.style.Fill({
-				color: 'black',
-			}),
-			backgroundFill: new ol.style.Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new ol.style.Stroke({
-				color: 'blue',
-			}),
-			...textStyleOptions,
-		}),
-	};
-}
-
-export function fullLabelStyleOptions(properties) {
+function fullLabelStyleOptions3(properties) {
 	return labelStyleOptions(
+		properties.name,
 		agregateText([
-			properties.name,
-			agregateText([
-				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-			], ', '),
-			properties.type,
-			properties.attribution,
-		]),
+			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+			properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+		], ', '),
+		properties.type,
+		properties.attribution,
 	);
-}
-
-function clusterStylesOptions(properties) {
-	return [{
-		image: new Circle({
-			radius: 14,
-			stroke: new Stroke({
-				color: 'blue',
-			}),
-			fill: new Fill({
-				color: 'white',
-			}),
-		}),
-		text: new Text({
-			text: properties.cluster.toString(),
-			font: '12px Verdana',
-		}),
-	}];
 }
 
 function clusterDetailStylesOptions(properties) {
@@ -789,16 +803,7 @@ function clusterDetailStylesOptions(properties) {
 	]*/
 }
 
-// Simplify & agreagte an array of lines
-export function agregateText(lines, glue) {
-	return lines
-		.filter(Boolean) // Avoid empty lines
-		.map(l => l.toString().replace('_', ' ').trim())
-		.map(l => l[0].toUpperCase() + l.substring(1))
-		.join(glue || '\n');
-}
-
-export function stylesCluster(feature, properties, layer, resolution) {
+function stylesCluster(feature, properties, layer, resolution) {
 	let styles = [], // Need separate styles to display several icons / labels
 		x = 0.95 + 0.45 * properties.cluster;
 
@@ -837,6 +842,6 @@ export function stylesCluster(feature, properties, layer, resolution) {
 }
 
 // Return the value of result of function with arguments
-export function functionLike(value, ...a) {
+function functionLike(value, ...a) {
 	return typeof value == 'function' ? value(...a) : value || [];
 }

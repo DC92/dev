@@ -3,7 +3,7 @@
  * using MyOl/src/layerVector.js
  */
 import {
-	functionLike,
+	fullLabelStyleOptions,
 	labelStyleOptions,
 	layerVector,
 	layerVectorCluster,
@@ -139,14 +139,25 @@ export class LayerWri extends MyVectorLayer {
 				transitionResolution: 100,
 				minClusterResolution: 0,
 
-				stylesOptions: (properties, hover, options, feature) => [{
-					image: new ol.style.Icon({
-						src: options.host + 'images/icones/' + properties.type.icone + '.svg',
-					}),
-					...(hover ? labelStyleOptions(feature, 'text') : null),
-				}],
+				stylesOptions: (properties, feature, hover, options) => {
+					return [{
+							image: new ol.style.Icon({
+								src: options.host + 'images/icones/' + properties.type.icone + '.svg',
+							}),
+							...labelStyleOptions(feature, properties.nom),
+						},
+						hover ? fullLabelStyleOptions({
+							name: properties.nom,
+							ele: properties.coord.alt,
+							bed: properties.places.valeur,
+							type: properties.type.valeur,
+							attribution: 'refuges.info',
+						}, feature) : {},
+					]
+				},
 
 				click: properties => properties.lien,
+				name: properties => properties.nom,
 				...opt,
 			},
 			// High resolutions layer
@@ -457,4 +468,9 @@ export function layerVectorCollection(options) {
 		layerChemineur(options.chemineur),
 		layerAlpages(options.alpages),
 	];
+}
+
+// Return the value of result of function with arguments
+function functionLike(value, ...a) {
+	return typeof value == 'function' ? value(...a) : value || [];
 }
