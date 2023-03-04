@@ -3,10 +3,11 @@
  * using MyOl/src/layerVector.js
  */
 import {
-	MyVectorLayer,
+	functionLike,
+	labelStyleOptions,
 	layerVector,
 	layerVectorCluster,
-	functionLike
+	MyVectorLayer,
 } from './VectorLayer.js';
 
 // chemineur.fr, alpages.info
@@ -138,10 +139,11 @@ export class LayerWri extends MyVectorLayer {
 				transitionResolution: 100,
 				minClusterResolution: 0,
 
-				stylesOptions: properties => [{
+				stylesOptions: (properties, hover, options, feature) => [{
 					image: new ol.style.Icon({
 						src: options.host + 'images/icones/' + properties.type.icone + '.svg',
 					}),
+					...(hover ? labelStyleOptions(feature, 'text') : null),
 				}],
 
 				click: properties => properties.lien,

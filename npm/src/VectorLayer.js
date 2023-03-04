@@ -22,7 +22,6 @@ import {
 } from '../node_modules/ol/style.js';
 
 class MyVectorSource extends VectorSource {
-	//TODO Format / convertProperties
 	//TODO selector
 	constructor(opt) {
 		const options = {
@@ -129,12 +128,12 @@ export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
 			// Normal style
-			stylesOptions: properties => [{
+			/*stylesOptions: properties => [{
 				image: new ol.style.Icon({
 					//TODO BUG general : send cookies to the server, event non secure		
 					src: properties.icon,
 				}),
-			}],
+			}],*/
 			// Cluster circle with number inside
 			clusterStylesOptions: properties => [{
 				image: new Circle({
@@ -159,7 +158,6 @@ export class MyVectorLayer extends VectorLayer {
 		};
 
 		super({
-			...options,
 			source: options.minClusterResolution === undefined ?
 				new MyVectorSource(options) : new MyVectorClusterSource(options),
 
@@ -177,9 +175,10 @@ export class MyVectorLayer extends VectorLayer {
 					resolution
 				).map(o => new Style(o));
 			},
-
 			click: () => null,
+			...options,
 		});
+
 		this.options = options;
 	}
 
@@ -190,15 +189,29 @@ export class MyVectorLayer extends VectorLayer {
 			map.addLayer(this.options.altLayer);
 
 		// Attach one hover & click listener to each map
-		if (!(map.getListeners() || []).includes(mapMouseListener)) { // Only once for each map
-			map.on(['pointermove', 'click'], mapMouseListener);
-			window.addEventListener('mousemove', evt => windowMouseListener(evt, map));
+		if (!(map.getListeners() || []).includes(mouseListener)) { // Only once for each map
+			map.on(['pointermove', 'click'], mouseListener);
+			window.addEventListener('mousemove', evt => {
+				// Leaving the map reset hovering
+				const divRect = map.getTargetElement().getBoundingClientRect();
+
+				// The mouse is outside of the map
+				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+					mouseListener({
+						map: map,
+						originalEvent: {
+							clientX: -1,
+							clientY: -1,
+						},
+					});
+			});
 		}
 		return super.setMapInternal(map);
 	}
 }
 
-function mapMouseListener(evt) {
+function mouseListener(evt) {
 	// Find the first hovered feature
 	let hoveredLayer = null,
 		hoveredFeature = evt.map.forEachFeatureAtPixel(
@@ -213,13 +226,9 @@ function mapMouseListener(evt) {
 			}
 		);
 
-	evt.map.getViewport().style.cursor = '';
 	if (hoveredFeature) {
 		const hoveredProperties = hoveredFeature.getProperties(),
 			hoveredClickUrl = hoveredLayer.options.click(hoveredProperties);
-
-		if (hoveredClickUrl || hoveredProperties.cluster)
-			evt.map.getViewport().style.cursor = 'pointer';
 
 		if (evt.type == 'click') {
 			if (hoveredClickUrl) {
@@ -240,58 +249,23 @@ function mapMouseListener(evt) {
 					zoom: evt.map.getView().getZoom() + 2,
 					center: hoveredProperties.geometry.getCoordinates(),
 				});
-		} else { // pointermove
-			hoveredFeature.setStyle( //TODO
-				(feature, resolution) => [
-					new ol.style.Style({
-						...hoveredLayer.options.style(hoveredProperties, hoveredFeature, hoveredLayer.options, resolution),
-						...labelStyleOptions(hoveredFeature, 'text'),
-						zIndex: 200,
-					}),
-				]);
-		}
-	}
+		} else
+			// Hover
+			if (evt.map.lastHoveredFeature != hoveredFeature) {
+				evt.map.getViewport().style.cursor =
+					hoveredClickUrl || hoveredProperties.cluster ? 'pointer' : '';
 
-	if (0) { /////////////// //TODO
-		const styledFeature = hoveredFeature, // The feature that will receive the style
-			//hoveredProperties = hoveredFeature ? hoveredFeature.getProperties() : {},
-			noIconStyleOption = null; //TODO what is ???
-
-		// Setup the curseur
-		evt.map.getViewport().style.cursor =
-			hoveredClickUrl ?
-			'pointer' : '';
-
-		// Click on a feature
-		if (hoveredFeature && evt.type == 'click') {
-			if (hoveredProperties && hoveredProperties.url) {}
-		} else {
-
-
-			if (hoveredFeature != map.lastHoveredFeature) {
-				if (hoveredProperties.cluster) {} else {}
-
-				//hoveredLayer.hover(hoveredProperties, hoveredFeature, evt);
+				// Set the feature style to the style function with the hover flag
+				hoveredFeature.setStyle((feature, resolution) =>
+					hoveredLayer.getStyleFunction()(feature, resolution, true)
+				);
 			}
-		}
+	} else {
+		evt.map.getViewport().style.cursor = '';
+		if (evt.map.lastHoveredFeature)
+			evt.map.lastHoveredFeature.setStyle();
 	}
-}
-
-function windowMouseListener(evt, map) {
-	// Leaving the map reset hovering
-	const divRect = map.getTargetElement().getBoundingClientRect();
-
-	// The mouse is outside of the map
-	if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-		evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-		console.log('Out of map');
-	/* //TODO
-	if (map.lastHover.styledFeature) {
-		map.lastHover.styledFeature.setStyle();
-		map.lastHover.layer.setZIndex(100);
-		map.lastHover = {};
-	}
-	*/
+	evt.map.lastHoveredFeature = hoveredFeature;
 }
 
 /////////////////////////////////////////////////////////
