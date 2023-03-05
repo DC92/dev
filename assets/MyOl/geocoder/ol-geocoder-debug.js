@@ -1,8 +1,8 @@
 /*!
- * ol-geocoder - v5.0.0
- * A geocoder extension for OpenLayers.
- * https://github.com/jonataswalker/ol-geocoder
- * Built: Mon Sep 19 2022 12:52:03 GMT-0400 (Eastern Daylight Time)
+ * @kirtandesai/ol-geocoder - v5.0.3
+ * A geocoder extension compatible with OpenLayers v7.
+ * https://github.com/kirtan-desai/ol-geocoder
+ * Built: Thu Nov 17 2022 14:58:35 GMT-0500 (Eastern Standard Time)
  */
 
 (function (global, factory) {
@@ -120,17 +120,17 @@
   function mergeOptions(obj1, obj2) {
     const obj3 = {};
 
-    for (const key in obj1) {
+    Object.keys(obj1).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(obj1, key)) {
         obj3[key] = obj1[key];
       }
-    }
+    });
 
-    for (const key in obj2) {
+    Object.keys(obj2).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(obj2, key)) {
         obj3[key] = obj2[key];
       }
-    }
+    });
 
     return obj3;
   }
@@ -179,7 +179,7 @@
     return /^\d+$/u.test(str);
   }
 
-  /* eslint-disable optimize-regex/optimize-regex */
+  /* eslint-disable prefer-named-capture-group */
 
   /**
    * @param {Element|Array<Element>} element DOM node or array of nodes.
@@ -299,7 +299,6 @@
   }
 
   function classRegex(classname) {
-    // eslint-disable-next-line security/detect-non-literal-regexp
     return new RegExp(`(^|\\s+) ${classname} (\\s+|$)`, 'u');
   }
 
@@ -840,7 +839,6 @@
           this.query(value);
         }
       };
-      // eslint-disable-next-line unicorn/consistent-function-scoping
       const stopBubbling = (evt) => evt.stopPropagation();
       const reset = (evt) => {
         this.els.input.focus();

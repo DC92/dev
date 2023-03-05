@@ -1,8 +1,8 @@
 /*!
- * ol-geocoder - v5.0.0
- * A geocoder extension for OpenLayers.
- * https://github.com/jonataswalker/ol-geocoder
- * Built: Mon Sep 19 2022 12:52:03 GMT-0400 (Eastern Daylight Time)
+ * @kirtandesai/ol-geocoder - v5.0.3
+ * A geocoder extension compatible with OpenLayers v7.
+ * https://github.com/kirtan-desai/ol-geocoder
+ * Built: Thu Nov 17 2022 14:58:36 GMT-0500 (Eastern Standard Time)
  */
 .ol-touch .ol-control.gcd-gl-control button {
   font-size: 1.14em; }
@@ -229,14 +229,7 @@
   visibility: hidden; }
 
 .ol-geocoder .gcd-pseudo-rotate::after {
-  -webkit-animation: spin .7s linear infinite;
-          animation: spin .7s linear infinite; }
-
-@-webkit-keyframes spin {
-  from {
-    transform: rotate(0deg); }
-  to {
-    transform: rotate(360deg); } }
+  animation: spin .7s linear infinite; }
 
 @keyframes spin {
   from {

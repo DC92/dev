@@ -4,9 +4,9 @@
 		"build": "rollup -c build/config.js"
 	},
 	"dependencies": {
-		"ol": "7.2.2",
+		"ol": "7.3.0",
 		"@kirtandesai/ol-geocoder": "5.0.6",
-		"proj4": "^2.8.1"
+		"proj4": "2.8.1"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^22.0.2",

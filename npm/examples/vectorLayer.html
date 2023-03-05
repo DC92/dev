@@ -130,6 +130,7 @@ import OSM from '../node_modules/ol/source/OSM.js';
 import FullScreen from '../node_modules/ol/control/FullScreen.js';
 import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
 import Zoom from '../node_modules/ol/control/Zoom.js';
+import {VERSION} from '../node_modules/ol/util.js';
 import {
 	layerVectorCluster,
 	labelStyleOptions,
@@ -138,6 +139,8 @@ import {
 	LayerWri,
 } from '../src/VectorLayerCollection.js';
 //import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
+
+console.log ('OL V'+VERSION);
 
 // Force selectors
 //localStorage.myol_selectwri = 'all';
