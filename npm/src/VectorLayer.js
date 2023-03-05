@@ -38,12 +38,14 @@ class MyVectorSource extends VectorSource {
 				url: function() {
 					const query = options.query(...arguments),
 						url = options.host + query._path;
+
 					delete query._path;
 					if (options.strategy == bbox)
 						query.bbox = options.bbox(...arguments);
+
 					return url + '?' + new URLSearchParams(query).toString();
 				},
-				...opt
+				...opt,
 			},
 			statusEl = document.getElementById(options.statusId);
 
@@ -161,7 +163,7 @@ export class MyVectorLayer extends VectorLayer {
 					hover,
 					options,
 					resolution
-				).map(so => new Style(so)); // Transform to Style
+				).map(so => new Style(so)); // Transform to Style objects
 			},
 			click: () => null, // No click by default
 			...options,

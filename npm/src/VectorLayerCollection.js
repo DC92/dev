@@ -131,11 +131,6 @@ export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 				host: 'https://www.refuges.info/',
-				query: () => ({
-					_path: 'api/bbox',
-					nb_points: 'all',
-					type_points: 4,
-				}),
 				transitionResolution: 100,
 				minClusterResolution: 0,
 				attribution: 'refuges.info',
@@ -144,6 +139,14 @@ export class LayerWri extends MyVectorLayer {
 				name: properties => properties.nom,
 
 				...opt,
+
+				query: () => ({
+					_path: 'api/bbox',
+					nb_points: 'all',
+					type_points: 4,
+					...(opt.query ? opt.query() : null),
+				}),
+
 				stylesOptions: (properties, feature, hover, options) => {
 					const so = hover ?
 						fullLabelStyleOptions({
