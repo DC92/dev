@@ -22,7 +22,6 @@ import {
 } from '../node_modules/ol/style.js';
 
 class MyVectorSource extends VectorSource {
-	//TODO selector
 	constructor(opt) {
 		const options = {
 				strategy: bbox,
@@ -35,8 +34,8 @@ class MyVectorSource extends VectorSource {
 					options.projection // Received projection
 				).map(c => c.toFixed(4)), // Round to 4 digits
 
-				url: function() {
-					const query = options.query(...arguments),
+				url: function(extent, resolution, projection) {
+					const query = options.query(options, ...arguments),
 						url = options.host + query._path;
 
 					delete query._path;
@@ -44,12 +43,14 @@ class MyVectorSource extends VectorSource {
 						query.bbox = options.bbox(...arguments);
 
 					return url + '?' + new URLSearchParams(query).toString();
+					//TODO ne pas émettre les params vides (filter)
 				},
 				...opt,
 			},
 			statusEl = document.getElementById(options.statusId);
 
 		super(options);
+		options.source = this;
 
 		// Display loading status
 		if (statusEl)
@@ -69,7 +70,7 @@ class MyVectorSource extends VectorSource {
 	}
 }
 
-class MyVectorClusterSource extends Cluster {
+class MyClusterSource extends Cluster {
 	constructor(options) {
 		super({ // Cluster source
 			source: new MyVectorSource(options), // Full source
@@ -128,28 +129,6 @@ class MyVectorClusterSource extends Cluster {
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
-			// Normal style
-			/*stylesOptions: properties => [{
-				image: new ol.style.Icon({
-					//TODO BUG general : send cookies to the server, event non secure		
-					src: properties.icon,
-				}),
-			}],*/
-			clusterStylesOptions: (properties, feature, hover) => [
-				clusterStyleOptions(properties),
-				hover ? labelStyleOptions(feature, properties.name) : {},
-			],
-			// Several icons for a cluster
-			clusterDetailStylesOptions: function(properties, feature, hover, options, resolution) {
-				return {}; //TODO
-			},
-			...opt,
-		};
-
-		super({
-			source: options.minClusterResolution === undefined ?
-				new MyVectorSource(options) : new MyVectorClusterSource(options),
-
 			style: (feature, resolution, hover) => {
 				const properties = feature.getProperties(),
 					display = !properties.cluster ? 'stylesOptions' :
@@ -165,10 +144,32 @@ export class MyVectorLayer extends VectorLayer {
 					resolution
 				).map(so => new Style(so)); // Transform to Style objects
 			},
+			// Normal style
+			/*stylesOptions: properties => [{
+				image: new ol.style.Icon({
+					//TODO BUG general : send cookies to the server, event non secure		
+					src: properties.icon,
+				}),
+			}],*/
+			clusterStylesOptions: (properties, feature, hover) => [
+				clusterStyleOptions(properties),
+				hover ? labelStyleOptions(feature, properties.name) : {},
+			],
+			// Several icons for a cluster
+			clusterDetailStylesOptions: function(properties, feature, hover, options, resolution) {
+				return {}; //TODO
+			},
 			click: () => null, // No click by default
+			...opt,
+		};
+
+		super({
+			source: opt.minClusterResolution === undefined ?
+				new MyVectorSource(options) : new MyClusterSource(options),
 			...options,
 		});
 
+		//options.layer = this;
 		this.options = options;
 	}
 
@@ -259,6 +260,77 @@ function mouseListener(evt) {
 			evt.map.lastHoveredFeature.setStyle();
 	}
 	evt.map.lastHoveredFeature = hoveredFeature;
+}
+
+/**
+ * Manage a collection of checkboxes with the same name
+ * There can be several selectors for one layer
+ * A selector can be used by several layers
+ * The checkbox without value check / uncheck the others
+ * Current selection is saved in window.localStorage
+ * name : input names
+ * callBack : callback function (this reset the checkboxes)
+ * You can force the values in window.localStorage[simplified name]
+ * Return an array of selected values
+ */
+export function vectorLayerSelector(name, source) {
+	const selectEls = [...document.getElementsByName(name)],
+		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
+		init = (localStorage[safeName] || '').split(',');
+
+	// Init
+	/*if (typeof callBack == 'function')*/
+	{
+		selectEls.forEach(el => {
+			el.checked =
+				init.includes(el.value) ||
+				init.includes('all') ||
+				init.join(',') == el.value;
+			el.addEventListener('click', onClick);
+		});
+		onClick();
+	}
+
+	function onClick(evt) {
+		// Test the "all" box & set other boxes
+		if (evt && evt.target.value == 'all')
+			selectEls
+			.forEach(el => el.checked = evt.target.checked);
+
+		// Test if all values are checked
+		const allChecked = selectEls
+			.filter(el => !el.checked && el.value != 'all');
+
+		// Set the "all" box
+		selectEls
+			.forEach(el => {
+				if (el.value == 'all')
+					el.checked = !allChecked.length;
+			});
+
+		// Save the current status
+		if (selection().length)
+			localStorage[safeName] = selection().join(',');
+		else
+			delete localStorage[safeName];
+
+		if (evt)
+			source.refresh();
+	}
+
+	/*			layer.setVisible(
+					!selectNames[0] || // No selector name
+					selectVectorLayer(selectNames[0]).length // By default, visibility depends on the first selector only
+				);
+*/
+
+	function selection() {
+		return selectEls
+			.filter(el => el.checked && el.value != 'all')
+			.map(el => el.value);
+	}
+
+	return selection();
 }
 
 /**
@@ -707,70 +779,6 @@ function addMapListener(map) {
 		});
 		*/
 	}
-}
-
-/**
- * Manage a collection of checkboxes with the same name
- * There can be several selectors for one layer
- * A selector can be used by several layers
- * The checkbox without value check / uncheck the others
- * Current selection is saved in window.localStorage
- * name : input names
- * callBack : callback function (this reset the checkboxes)
- * You can force the values in window.localStorage[simplified name]
- * Return return an array of selected values
- */
-function selectVectorLayer(name, callBack) {
-	const selectEls = [...document.getElementsByName(name)],
-		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
-		init = (localStorage[safeName] || '').split(',');
-
-	// Init
-	if (typeof callBack == 'function') {
-		selectEls.forEach(el => {
-			el.checked =
-				init.includes(el.value) ||
-				init.includes('all') ||
-				init.join(',') == el.value;
-			el.addEventListener('click', onClick);
-		});
-		onClick();
-	}
-
-	function onClick(evt) {
-		// Test the "all" box & set other boxes
-		if (evt && evt.target.value == 'all')
-			selectEls
-			.forEach(el => el.checked = evt.target.checked);
-
-		// Test if all values are checked
-		const allChecked = selectEls
-			.filter(el => !el.checked && el.value != 'all');
-
-		// Set the "all" box
-		selectEls
-			.forEach(el => {
-				if (el.value == 'all')
-					el.checked = !allChecked.length;
-			});
-
-		// Save the current status
-		if (selection().length)
-			localStorage[safeName] = selection().join(',');
-		else
-			delete localStorage[safeName];
-
-		if (evt)
-			callBack(selection());
-	}
-
-	function selection() {
-		return selectEls
-			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value);
-	}
-
-	return selection();
 }
 
 // Display a label (Used by cluster)

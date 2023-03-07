@@ -130,17 +130,20 @@ import OSM from '../node_modules/ol/source/OSM.js';
 import FullScreen from '../node_modules/ol/control/FullScreen.js';
 import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
 import Zoom from '../node_modules/ol/control/Zoom.js';
-import {VERSION} from '../node_modules/ol/util.js';
+import {
+	VERSION
+} from '../node_modules/ol/util.js';
 import {
 	layerVectorCluster,
 	labelStyleOptions,
+	vectorLayerSelector,
 } from '../src/VectorLayer.js';
 import {
 	LayerWri,
 } from '../src/VectorLayerCollection.js';
 //import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
 
-console.log ('OL V'+VERSION);
+console.log('OL V' + VERSION);
 
 // Force selectors
 //localStorage.myol_selectwri = 'all';
@@ -168,8 +171,12 @@ new Map({
 			host: 'https://dom.refuges.info/',
 			selectName: 'select-wri',
 			statusId: 'status-wri',
+			query: options => ({
+				_path: 'api/massif',
+				massif: vectorLayerSelector('select-massif', options.source),
+			}),
 		}),
-		new LayerWri({
+/*		new LayerWri({
 			host: 'https://dom.refuges.info/',
 			selectName: 'select-refuges',
 			statusId: 'status-wri',
@@ -177,7 +184,7 @@ new Map({
 			stylesOptions: (properties, feature) => [
 				labelStyleOptions(feature, properties.nom),
 			],
-		}),
+		}),*/
 
 		/*
 		...layerVectorCollection({

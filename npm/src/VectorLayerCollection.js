@@ -8,6 +8,7 @@ import {
 	layerVector,
 	layerVectorCluster,
 	MyVectorLayer,
+	vectorLayerSelector,
 } from './VectorLayer.js';
 
 // chemineur.fr, alpages.info
@@ -140,12 +141,15 @@ export class LayerWri extends MyVectorLayer {
 
 				...opt,
 
-				query: () => ({
-					_path: 'api/bbox',
-					nb_points: 'all',
-					type_points: 4,
-					...(opt.query ? opt.query() : null),
-				}),
+				query: function(options) {
+					return {
+						_path: 'api/bbox',
+						nb_points: 'all',
+						type_points: 4,
+						type_points: vectorLayerSelector(options.selectName, options.source),
+						...(opt.query ? opt.query(...arguments) : null),
+					};
+				},
 
 				stylesOptions: (properties, feature, hover, options) => {
 					const so = hover ?
@@ -172,11 +176,15 @@ export class LayerWri extends MyVectorLayer {
 			// High resolutions layer
 			clusterLayer = new MyVectorLayer({
 				minResolution: options.transitionResolution,
+
 				...options,
-				query: () => ({
-					...options.query(),
-					cluster: 0.1,
-				}),
+
+				query: function() {
+					return {
+						cluster: 0.1,
+						...(options.query ? options.query(...arguments) : null),
+					};
+				},
 			});
 
 		// Low resolutions layer
