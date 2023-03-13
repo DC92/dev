@@ -148,6 +148,25 @@ console.log('OL V' + VERSION);
 // Force selectors
 //localStorage.myol_selectwri = 'all';
 
+const selecteurMassifs= new Selector( 'select-wri'),
+layerWri=new LayerWri({
+			host: 'https://dom.refuges.info/',//TODO DELETE
+			selectName: 'select-wri',
+			statusId: 'status-wri',
+			wwwwwwwwwwwwwwwwwwwquery: options => {
+				const massif = vectorLayerSelector('select-massif' /*, options.source*/ );
+
+				return massif == '' ? {
+					_path: 'api/bbox',
+				} : {
+					_path: 'api/massif',
+					massif: massif,
+				};
+			},
+		});
+
+		selecteurMassifs.setCallBackObject(layerWri);
+
 new Map({
 	target: 'map',
 	view: new View({
@@ -167,23 +186,9 @@ new Map({
 			source: new OSM(),
 		}),
 
-		new LayerWri({
-			host: 'https://dom.refuges.info/',
-			selectName: 'select-wri',
-			statusId: 'status-wri',
-			wwwwwwwwwwwwwwwwwwwquery: options => {
-				const massif = vectorLayerSelector('select-massif' /*, options.source*/ );
-
-				return massif == '' ? {
-					_path: 'api/bbox',
-				} : {
-					_path: 'api/massif',
-					massif: massif,
-				};
-			},
-		}),
+		layerWri,
 		/*new LayerWri({
-			host: 'https://dom.refuges.info/',
+			host: 'https://dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
 			statusId: 'status-wri',
 			attribution: null,

@@ -136,8 +136,8 @@ export class LayerWri extends MyVectorLayer {
 				minClusterResolution: 0,
 				attribution: 'refuges.info',
 				selector: new Selector(opt.selectName),
-				click: properties => properties.lien, //TODO ARCHI
-				name: properties => properties.nom, //TODO ARCHI
+				name: properties => properties.nom, // Function returning the name for cluster agregation
+				click: properties => properties.lien, // Function returning ulr to go on click
 
 				...opt,
 
@@ -145,7 +145,6 @@ export class LayerWri extends MyVectorLayer {
 					return {
 						_path: 'api/bbox',
 						nb_points: 'all',
-						//type_points: vectorLayerSelector(options.selectName, arguments[3]),
 						type_points: options.selector.getSelection(),
 						...(opt.query ? opt.query(...arguments) : null),
 					};
@@ -173,6 +172,7 @@ export class LayerWri extends MyVectorLayer {
 					}];
 				},
 			},
+
 			// High resolutions layer
 			clusterLayer = new MyVectorLayer({
 				minResolution: options.transitionResolution,

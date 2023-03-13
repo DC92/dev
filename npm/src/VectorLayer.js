@@ -1,18 +1,18 @@
-import VectorSource from '../node_modules/ol/source/Vector.js';
-import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
 import Cluster from '../node_modules/ol/source/Cluster.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import Point from '../node_modules/ol/geom/Point.js';
 import Feature from '../node_modules/ol/Feature.js';
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import Point from '../node_modules/ol/geom/Point.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import {
+	getCenter,
+} from '../node_modules/ol/extent.js';
 import {
 	bbox,
 } from '../node_modules/ol/loadingstrategy.js';
 import {
 	transformExtent,
 } from '../node_modules/ol/proj.js';
-import {
-	getCenter,
-} from '../node_modules/ol/extent.js';
 import {
 	Circle,
 	Fill,
@@ -43,7 +43,6 @@ class MyVectorSource extends VectorSource {
 						query.bbox = options.bbox(...arguments);
 
 					return url + '?' + new URLSearchParams(query).toString();
-					//TODO ne pas émettre les params vides (filter)
 				},
 
 				...opt,
@@ -147,22 +146,19 @@ export class MyVectorLayer extends VectorLayer {
 					resolution
 				).map(so => new Style(so)); // Transform to Style objects
 			},
-			// Normal style
-			/*stylesOptions: properties => [{
-				image: new ol.style.Icon({
-					//TODO BUG general : send cookies to the server, event non secure		
-					src: properties.icon,
-				}),
-			}],*/
+
+			// Circle with number for a cluster
 			clusterStylesOptions: (properties, feature, hover) => [
 				clusterStyleOptions(properties),
 				hover ? labelStyleOptions(feature, properties.name) : {},
 			],
+
 			// Several icons for a cluster
 			clusterDetailStylesOptions: function(properties, feature, hover, options, resolution) {
 				return {}; //TODO
 			},
 			click: () => null, // No click by default
+
 			...opt,
 		};
 
@@ -172,6 +168,7 @@ export class MyVectorLayer extends VectorLayer {
 			...options,
 		});
 
+		// Mem options for further use
 		this.options = options;
 	}
 
@@ -292,7 +289,7 @@ export class Selector {
 				this.init.includes(el.value) ||
 				this.init.includes('all') ||
 				this.init.join(',') == el.value;
-			el.addEventListener('click', evt => this.onClick(evt)); //TODO vérifier si pas doublon
+			el.addEventListener('click', evt => this.onClick(evt));
 		});
 
 		this.onClick(); // Init with "all"
@@ -360,7 +357,7 @@ function clusterStyleOptions(properties) {
 	};
 }
 
-export function labelStyleOptions(feature, text, textStyleOptions) {
+export function labelStyleOptions(feature, text /*, textStyleOptions*/ ) {
 	const elLabel = document.createElement('span'),
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -383,7 +380,7 @@ export function labelStyleOptions(feature, text, textStyleOptions) {
 			backgroundStroke: new ol.style.Stroke({
 				color: 'blue',
 			}),
-			...textStyleOptions, //TODO DELETE ???
+			//...textStyleOptions, //TODO DELETE ???
 		}),
 	};
 }
