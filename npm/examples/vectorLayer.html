@@ -122,13 +122,12 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script type="module">
-import Map from '../node_modules/ol/Map.js';
-import View from '../node_modules/ol/View.js';
-import Tile from '../node_modules/ol/layer/Tile.js';
-import OSM from '../node_modules/ol/source/OSM.js';
-//import transform from '../node_modules/ol/proj/transform.js';
 import FullScreen from '../node_modules/ol/control/FullScreen.js';
+import Map from '../node_modules/ol/Map.js';
+import OSM from '../node_modules/ol/source/OSM.js';
 import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
+import Tile from '../node_modules/ol/layer/Tile.js';
+import View from '../node_modules/ol/View.js';
 import Zoom from '../node_modules/ol/control/Zoom.js';
 import {
 	VERSION
@@ -141,31 +140,32 @@ import {
 import {
 	LayerWri,
 } from '../src/VectorLayerCollection.js';
-//import {layerClusterWri, layerWriAreas, layerVectorCollection} from '../src/VectorLayerCollection.js';
 
 console.log('OL V' + VERSION);
 
 // Force selectors
 //localStorage.myol_selectwri = 'all';
 
-const selecteurMassifs= new Selector( 'select-wri'),
-layerWri=new LayerWri({
-			host: 'https://dom.refuges.info/',//TODO DELETE
-			selectName: 'select-wri',
-			statusId: 'status-wri',
-			wwwwwwwwwwwwwwwwwwwquery: options => {
-				const massif = vectorLayerSelector('select-massif' /*, options.source*/ );
+const selecteurMassifs = new Selector('select-massif'),
+	layerWri = new LayerWri({
+		host: 'https://dom.refuges.info/', //TODO DELETE
+		selectName: 'select-wri',
+		statusId: 'status-wri',
+		query: options => {
+			const massif = selecteurMassifs.getSelection();
 
-				return massif == '' ? {
-					_path: 'api/bbox',
-				} : {
-					_path: 'api/massif',
-					massif: massif,
-				};
-			},
-		});
+			return massif.length ? {
+				_path: 'api/massif',
+				massif: massif,
+			} : {
+				_path: 'api/bbox',
+			};
+		},
+	});
 
-		selecteurMassifs.setCallBackObject(layerWri);
+selecteurMassifs.setCallBack(function(selection) {
+	layerWri.refresh(layerWri.getVisible());
+});
 
 new Map({
 	target: 'map',

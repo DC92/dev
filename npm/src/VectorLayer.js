@@ -123,7 +123,7 @@ class MyClusterSource extends Cluster {
 			},
 		});
 
-		// Redirect refresh method to the wrapped source
+		// Redirect the refresh method to the wrapped source
 		this.refresh = () => this.getSource().refresh();
 	}
 }
@@ -200,11 +200,14 @@ export class MyVectorLayer extends VectorLayer {
 		return super.setMapInternal(map);
 	}
 
-	// Callback to refresh the layer when the query change
-	callBack(selection) {
-		this.setVisible(selection.length);
-		if (selection.length)
+	// Refresh the layer when the query change
+	refresh(visible) {
+		this.setVisible(visible);
+		if (visible)
 			this.getSource().refresh();
+
+		if (this.options.altLayer)
+			this.options.altLayer.refresh(visible);
 	}
 }
 
@@ -274,13 +277,13 @@ function mouseListener(evt) {
  * The checkbox without value check / uncheck the others
  * Current selection is saved in window.localStorage
  * name : input names
- * callBackObject : object with a callBack function to call when initialised or clck
+ * callBack(selection) : function to call at init or clock / array of selected values
  * You can force the values in window.localStorage[simplified name]
  * Return an array of selected values
  */
 export class Selector {
-	constructor(name, callBackObject) {
-		this.callBackObject = callBackObject;
+	constructor(name, callBack) {
+		this.callBack = callBack;
 		this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
 		this.init = (localStorage[this.safeName] || '').split(',');
 		this.selectEls = [...document.getElementsByName(name)];
@@ -318,13 +321,13 @@ export class Selector {
 		else
 			delete localStorage[this.safeName];
 
-		if (this.callBackObject && typeof this.callBackObject.callBack == 'function')
-			this.callBackObject.callBack(this.getSelection());
+		if (typeof this.callBack == 'function')
+			this.callBack(this.getSelection());
 	}
 
-	setCallBackObject(callBackObject) {
-		this.callBackObject = callBackObject;
-		this.callBackObject.callBack(this.getSelection());
+	setCallBack(callBack) {
+		this.callBack = callBack;
+		callBack(this.getSelection());
 	}
 
 	getSelection() {

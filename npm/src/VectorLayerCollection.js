@@ -174,7 +174,7 @@ export class LayerWri extends MyVectorLayer {
 			},
 
 			// High resolutions layer
-			clusterLayer = new MyVectorLayer({
+			hightResolutionsLayer = new MyVectorLayer({
 				minResolution: options.transitionResolution,
 
 				...options,
@@ -190,11 +190,15 @@ export class LayerWri extends MyVectorLayer {
 		// Low resolutions layer
 		super({
 			maxResolution: options.transitionResolution,
-			altLayer: clusterLayer,
+			altLayer: hightResolutionsLayer,
 			...options,
 		});
 
-		options.selector.setCallBackObject(this);
+		const lowResolutionsLayer = this;
+
+		options.selector.setCallBack(function(selection) {
+			lowResolutionsLayer.refresh(selection.length);
+		});
 	}
 }
 
@@ -203,7 +207,7 @@ export function layerWri(options) {
 		host: '//www.refuges.info/',
 		strategy: ol.loadingstrategy.bbox,
 		...options,
-		urlParams: (o, bbox, selections) => ({
+		urlParams: (_, bbox, selections) => ({
 			path: selections[1] ? 'api/massif' : 'api/bbox',
 			type_points: selections[0],
 			massif: selections[1],
