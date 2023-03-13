@@ -94,6 +94,7 @@ Based on https://openlayers.org
 		<br /><label>
 			<input type="checkbox" name="select-refuges" value="4" />
 			Style refuges.info
+			<span id="status-refuges"></span>
 		</label>
 	</div>
 
@@ -187,16 +188,15 @@ new Map({
 		}),
 
 		layerWri,
-		/*new LayerWri({
+		new LayerWri({
 			host: 'https://dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
-			statusId: 'status-wri',
+			statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: (properties, feature) => [
 				labelStyleOptions(feature, properties.nom),
 			],
-		}),*/
-
+		}),
 		/*
 		...layerVectorCollection({
 			prc: {
