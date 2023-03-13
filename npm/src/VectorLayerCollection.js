@@ -8,7 +8,7 @@ import {
 	layerVector,
 	layerVectorCluster,
 	MyVectorLayer,
-	vectorLayerSelector,
+	Selector,
 } from './VectorLayer.js';
 
 // chemineur.fr, alpages.info
@@ -135,18 +135,18 @@ export class LayerWri extends MyVectorLayer {
 				transitionResolution: 100,
 				minClusterResolution: 0,
 				attribution: 'refuges.info',
-
-				click: properties => properties.lien,
-				name: properties => properties.nom,
+				selector: new Selector(opt.selectName),
+				click: properties => properties.lien, //TODO ARCHI
+				name: properties => properties.nom, //TODO ARCHI
 
 				...opt,
 
-				query: function(options) {
+				query: function() {
 					return {
 						_path: 'api/bbox',
 						nb_points: 'all',
-						type_points: 4,
-						type_points: vectorLayerSelector(options.selectName, options.source),
+						//type_points: vectorLayerSelector(options.selectName, arguments[3]),
+						type_points: options.selector.getSelection(),
 						...(opt.query ? opt.query(...arguments) : null),
 					};
 				},
@@ -193,6 +193,8 @@ export class LayerWri extends MyVectorLayer {
 			altLayer: clusterLayer,
 			...options,
 		});
+
+		options.selector.setCallBackObject(this);
 	}
 }
 

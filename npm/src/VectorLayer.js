@@ -45,12 +45,12 @@ class MyVectorSource extends VectorSource {
 					return url + '?' + new URLSearchParams(query).toString();
 					//TODO ne pas émettre les params vides (filter)
 				},
+
 				...opt,
 			},
 			statusEl = document.getElementById(options.statusId);
 
 		super(options);
-		options.source = this;
 
 		// Display loading status
 		if (statusEl)
@@ -73,7 +73,7 @@ class MyVectorSource extends VectorSource {
 class MyClusterSource extends Cluster {
 	constructor(options) {
 		super({ // Cluster source
-			source: new MyVectorSource(options), // Full source
+			source: new MyVectorSource(options), // Wrapped source
 
 			// Generate a center point where display the cluster
 			geometryFnc: feature => {
@@ -123,6 +123,9 @@ class MyClusterSource extends Cluster {
 				});
 			},
 		});
+
+		// Redirect refresh method to the wrapped source
+		this.refresh = () => this.getSource().refresh();
 	}
 }
 
@@ -164,12 +167,11 @@ export class MyVectorLayer extends VectorLayer {
 		};
 
 		super({
-			source: opt.minClusterResolution === undefined ?
+			source: options.minClusterResolution === undefined ?
 				new MyVectorSource(options) : new MyClusterSource(options),
 			...options,
 		});
 
-		//options.layer = this;
 		this.options = options;
 	}
 
@@ -199,6 +201,13 @@ export class MyVectorLayer extends VectorLayer {
 			});
 		}
 		return super.setMapInternal(map);
+	}
+
+	// Callback to refresh the layer when the query change
+	callBack(selection) {
+		this.setVisible(selection.length);
+		if (selection.length)
+			this.getSource().refresh();
 	}
 }
 
@@ -265,72 +274,67 @@ function mouseListener(evt) {
 /**
  * Manage a collection of checkboxes with the same name
  * There can be several selectors for one layer
- * A selector can be used by several layers
  * The checkbox without value check / uncheck the others
  * Current selection is saved in window.localStorage
  * name : input names
- * callBack : callback function (this reset the checkboxes)
+ * callBackObject : object with a callBack function to call when initialised or clck
  * You can force the values in window.localStorage[simplified name]
  * Return an array of selected values
  */
-export function vectorLayerSelector(name, source) {
-	const selectEls = [...document.getElementsByName(name)],
-		safeName = 'myol_' + name.replace(/[^a-z]/ig, ''),
-		init = (localStorage[safeName] || '').split(',');
-
-	// Init
-	/*if (typeof callBack == 'function')*/
-	{
-		selectEls.forEach(el => {
+export class Selector {
+	constructor(name, callBackObject) {
+		this.callBackObject = callBackObject;
+		this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
+		this.init = (localStorage[this.safeName] || '').split(',');
+		this.selectEls = [...document.getElementsByName(name)];
+		this.selectEls.forEach(el => {
 			el.checked =
-				init.includes(el.value) ||
-				init.includes('all') ||
-				init.join(',') == el.value;
-			el.addEventListener('click', onClick);
+				this.init.includes(el.value) ||
+				this.init.includes('all') ||
+				this.init.join(',') == el.value;
+			el.addEventListener('click', evt => this.onClick(evt)); //TODO vérifier si pas doublon
 		});
-		onClick();
+
+		this.onClick(); // Init with "all"
 	}
 
-	function onClick(evt) {
+	onClick(evt) {
 		// Test the "all" box & set other boxes
 		if (evt && evt.target.value == 'all')
-			selectEls
+			this.selectEls
 			.forEach(el => el.checked = evt.target.checked);
 
 		// Test if all values are checked
-		const allChecked = selectEls
+		const allChecked = this.selectEls
 			.filter(el => !el.checked && el.value != 'all');
 
 		// Set the "all" box
-		selectEls
+		this.selectEls
 			.forEach(el => {
 				if (el.value == 'all')
 					el.checked = !allChecked.length;
 			});
 
 		// Save the current status
-		if (selection().length)
-			localStorage[safeName] = selection().join(',');
+		if (this.getSelection().length)
+			localStorage[this.safeName] = this.getSelection().join(',');
 		else
-			delete localStorage[safeName];
+			delete localStorage[this.safeName];
 
-		if (evt)
-			source.refresh();
+		if (this.callBackObject && typeof this.callBackObject.callBack == 'function')
+			this.callBackObject.callBack(this.getSelection());
 	}
 
-	/*			layer.setVisible(
-					!selectNames[0] || // No selector name
-					selectVectorLayer(selectNames[0]).length // By default, visibility depends on the first selector only
-				);
-*/
+	setCallBackObject(callBackObject) {
+		this.callBackObject = callBackObject;
+		this.callBackObject.callBack(this.getSelection());
+	}
 
-	function selection() {
-		return selectEls
+	getSelection() {
+		return this.selectEls
 			.filter(el => el.checked && el.value != 'all')
 			.map(el => el.value);
 	}
-
-	return selection();
 }
 
 /**

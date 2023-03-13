@@ -136,7 +136,7 @@ import {
 import {
 	layerVectorCluster,
 	labelStyleOptions,
-	vectorLayerSelector,
+	Selector,
 } from '../src/VectorLayer.js';
 import {
 	LayerWri,
@@ -171,12 +171,18 @@ new Map({
 			host: 'https://dom.refuges.info/',
 			selectName: 'select-wri',
 			statusId: 'status-wri',
-			query: options => ({
-				_path: 'api/massif',
-				massif: vectorLayerSelector('select-massif', options.source),
-			}),
+			wwwwwwwwwwwwwwwwwwwquery: options => {
+				const massif = vectorLayerSelector('select-massif' /*, options.source*/ );
+
+				return massif == '' ? {
+					_path: 'api/bbox',
+				} : {
+					_path: 'api/massif',
+					massif: massif,
+				};
+			},
 		}),
-/*		new LayerWri({
+		/*new LayerWri({
 			host: 'https://dom.refuges.info/',
 			selectName: 'select-refuges',
 			statusId: 'status-wri',
