@@ -131,6 +131,7 @@ class MyClusterSource extends Cluster {
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
+			click: () => null, // No click by default
 			style: (feature, resolution, hover) => {
 				const properties = feature.getProperties(),
 					display = !properties.cluster ? 'stylesOptions' :
@@ -141,8 +142,8 @@ export class MyVectorLayer extends VectorLayer {
 				return options[display](
 					properties,
 					feature,
-					hover,
-					options,
+					this, // Layer
+					hover, // Boolean is hover style ?
 					resolution
 				).map(so => new Style(so)); // Transform to Style objects
 			},
@@ -153,11 +154,48 @@ export class MyVectorLayer extends VectorLayer {
 				hover ? labelStyleOptions(feature, properties.name) : {},
 			],
 
-			// Several icons for a cluster
-			clusterDetailStylesOptions: function(properties, feature, hover, options, resolution) {
-				return {}; //TODO
+
+			/*
+						// Detect feature of a disjoin cluster
+						if (hoveredFeature && hoveredProperties.cluster &&
+							map.getView().getResolution() < hoveredLayer.options.maxResolutionDegroup) {
+							const hoveredFeaturePixel = map.getPixelFromCoordinate(
+									hoveredFeature.getGeometry().getCoordinates()
+								),
+								// Calculate the feature index from the cursor position
+								indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
+									(evt.originalEvent.layerX - hoveredFeaturePixel[0]) / 21.6 + hoveredProperties.cluster / 2
+								)));
+
+							hoveredFeature = hoveredProperties.features[indexHovered];
+							noIconStyleOption = {
+								image: null,
+							};
+						}
+			*/
+
+
+			// Spread icons under the label
+			clusterDetailStylesOptions: function(properties, feature, layer, hover, resolution) {
+				let x = 0.95 + 0.45 * properties.cluster,
+					stylesOpt = [ // Need separate styles to display several icons / labels
+						hover ? {} :
+						labelStyleOptions(feature, properties.name),
+					];
+
+				properties.features.forEach(f => {
+					const image = layer.getStyleFunction()(f, resolution)[0].getImage();
+
+					if (image) {
+						image.setAnchor([x -= 0.9, 0.5]);
+						stylesOpt.push({
+							image: image,
+						});
+					}
+				});
+
+				return stylesOpt;
 			},
-			click: () => null, // No click by default
 
 			...opt,
 		};
@@ -174,6 +212,8 @@ export class MyVectorLayer extends VectorLayer {
 
 	//HACK execute actions on Map init
 	setMapInternal(map) {
+		this.map = map;
+
 		// Add the alternate layer if any
 		if (this.options.altLayer)
 			map.addLayer(this.options.altLayer);
@@ -197,6 +237,7 @@ export class MyVectorLayer extends VectorLayer {
 					});
 			});
 		}
+
 		return super.setMapInternal(map);
 	}
 
@@ -798,15 +839,15 @@ function iconStyleOptions(feature, properties) {
 //properties, feature, hover, options, resolution
 
 function fullLabelStyleOptions3(properties) {
-	return labelStyleOptions(
-		properties.name,
-		agregateText([
-			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-			properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-		], ', '),
-		properties.type,
-		properties.attribution,
-	);
+	/*	return labelStyleOptions(
+			properties.name,
+			agregateText([
+				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+			], ', '),
+			properties.type,
+			properties.attribution,
+		);*/
 }
 
 function clusterDetailStylesOptions(properties) {

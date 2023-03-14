@@ -133,7 +133,7 @@ export class LayerWri extends MyVectorLayer {
 		const options = {
 				host: 'https://www.refuges.info/',
 				transitionResolution: 100,
-				minClusterResolution: 0,
+				minClusterResolution: 50,
 				attribution: 'refuges.info',
 				selector: new Selector(opt.selectName),
 				name: properties => properties.nom, // Function returning the name for cluster agregation
@@ -150,14 +150,14 @@ export class LayerWri extends MyVectorLayer {
 					};
 				},
 
-				stylesOptions: (properties, feature, hover, options) => {
+				stylesOptions: (properties, feature, layer, hover) => {
 					const so = hover ?
 						fullLabelStyleOptions({
 								name: properties.nom,
 								ele: properties.coord.alt,
 								bed: properties.places.valeur,
 								type: properties.type.valeur,
-								attribution: options.attribution,
+								attribution: layer.options.attribution,
 							},
 							feature
 						) :
@@ -166,7 +166,7 @@ export class LayerWri extends MyVectorLayer {
 
 					return [{
 						image: new ol.style.Icon({
-							src: options.host + 'images/icones/' + properties.type.icone + '.svg',
+							src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
 						}),
 						...so,
 					}];
