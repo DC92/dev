@@ -131,8 +131,8 @@ class MyClusterSource extends Cluster {
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
-			click: () => null, // No click by default
-			style: (feature, resolution, hover) => {
+			clickUrl: () => null, // No click by default
+			style: (feature, resolution, hoveredSubFeature) => {
 				const properties = feature.getProperties(),
 					display = !properties.cluster ? 'stylesOptions' :
 					resolution > options.minClusterResolution ? 'clusterStylesOptions' :
@@ -143,43 +143,25 @@ export class MyVectorLayer extends VectorLayer {
 					properties,
 					feature,
 					this, // Layer
-					hover, // Boolean is hover style ?
+					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
 					resolution
 				).map(so => new Style(so)); // Transform to Style objects
 			},
 
 			// Circle with number for a cluster
-			clusterStylesOptions: (properties, feature, hover) => [
+			clusterStylesOptions: (properties, feature, hoveredSubFeature) => [
 				clusterStyleOptions(properties),
-				hover ? labelStyleOptions(feature, properties.name) : {},
+				hoveredSubFeature ? labelStyleOptions(feature, properties.name) : {},
 			],
 
-
-			/*
-						// Detect feature of a disjoin cluster
-						if (hoveredFeature && hoveredProperties.cluster &&
-							map.getView().getResolution() < hoveredLayer.options.maxResolutionDegroup) {
-							const hoveredFeaturePixel = map.getPixelFromCoordinate(
-									hoveredFeature.getGeometry().getCoordinates()
-								),
-								// Calculate the feature index from the cursor position
-								indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
-									(evt.originalEvent.layerX - hoveredFeaturePixel[0]) / 21.6 + hoveredProperties.cluster / 2
-								)));
-
-							hoveredFeature = hoveredProperties.features[indexHovered];
-							noIconStyleOption = {
-								image: null,
-							};
-						}
-			*/
-
-
 			// Spread icons under the label
-			clusterDetailStylesOptions: function(properties, feature, layer, hover, resolution) {
+			clusterDetailStylesOptions: function(properties, feature, layer, hoveredSubFeature, resolution) {
+				const hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
+
 				let x = 0.95 + 0.45 * properties.cluster,
 					stylesOpt = [ // Need separate styles to display several icons / labels
-						hover ? {} :
+						hoveredSubFeature ?
+						labelStyleOptions(hoveredSubFeature, hoveredSubProperties.name) :
 						labelStyleOptions(feature, properties.name),
 					];
 
@@ -212,7 +194,6 @@ export class MyVectorLayer extends VectorLayer {
 
 	//HACK execute actions on Map init
 	setMapInternal(map) {
-		this.map = map;
 
 		// Add the alternate layer if any
 		if (this.options.altLayer)
@@ -265,11 +246,26 @@ function mouseListener(evt) {
 			}, {
 				hitTolerance: 6, // For lines / Default 0
 			}
-		);
+		),
+		hoveredSubFeature = hoveredFeature;
 
 	if (hoveredFeature) {
-		const hoveredProperties = hoveredFeature.getProperties(),
-			hoveredClickUrl = hoveredLayer.options.click(hoveredProperties);
+		const hoveredProperties = hoveredFeature.getProperties();
+
+		if (hoveredProperties.cluster) {
+			// Calculate the feature index from the cursor position
+			const hoveredFeaturePixel = evt.map.getPixelFromCoordinate(
+					hoveredFeature.getGeometry().getCoordinates()
+				),
+				indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
+					(evt.originalEvent.layerX - hoveredFeaturePixel[0]) / 21.6 + hoveredProperties.cluster / 2
+				)));
+
+			hoveredSubFeature = hoveredProperties.features[indexHovered];
+		}
+
+		const hoveredSubProperties = hoveredSubFeature.getProperties(),
+			hoveredClickUrl = hoveredLayer.options.click(hoveredSubProperties);
 
 		if (evt.type == 'click') {
 			if (hoveredClickUrl) {
@@ -296,12 +292,13 @@ function mouseListener(evt) {
 				evt.map.getViewport().style.cursor =
 					hoveredClickUrl || hoveredProperties.cluster ? 'pointer' : '';
 
+				// Remove previous style
 				if (evt.map.lastHoveredFeature)
 					evt.map.lastHoveredFeature.setStyle();
 
 				// Set the feature style to the style function with the hover flag
 				hoveredFeature.setStyle((feature, resolution) =>
-					hoveredLayer.getStyleFunction()(feature, resolution, true)
+					hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
 				);
 			}
 	} else {

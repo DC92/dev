@@ -132,12 +132,12 @@ export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 				host: 'https://www.refuges.info/',
-				transitionResolution: 100,
+				transitionResolution: 100, //TODO rename
 				minClusterResolution: 50,
 				attribution: 'refuges.info',
 				selector: new Selector(opt.selectName),
 				name: properties => properties.nom, // Function returning the name for cluster agregation
-				click: properties => properties.lien, // Function returning ulr to go on click
+				clickUrl: properties => properties.lien, // Function returning ulr to go on click
 
 				...opt,
 
