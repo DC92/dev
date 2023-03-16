@@ -166,7 +166,7 @@ export class MyVectorLayer extends VectorLayer {
 					];
 
 				properties.features.forEach(f => {
-					const image = layer.getStyleFunction()(f, resolution)[0].getImage();
+					const image = layer.getStyleFunction()(f, resolution)[0].getImage(); //TODO protection
 
 					if (image) {
 						image.setAnchor([x -= 0.9, 0.5]);
@@ -250,6 +250,7 @@ function mouseListener(evt) {
 		hoveredSubFeature = hoveredFeature;
 
 	if (hoveredFeature) {
+		// Find sub feature from a detailed cluster
 		const hoveredProperties = hoveredFeature.getProperties();
 
 		if (hoveredProperties.cluster) {
@@ -265,7 +266,7 @@ function mouseListener(evt) {
 		}
 
 		const hoveredSubProperties = hoveredSubFeature.getProperties(),
-			hoveredClickUrl = hoveredLayer.options.click(hoveredSubProperties);
+			hoveredClickUrl = hoveredLayer.options.clickUrl(hoveredSubProperties);
 
 		if (evt.type == 'click') {
 			if (hoveredClickUrl) {
