@@ -162,7 +162,7 @@ export class LayerWri extends MyVectorLayer {
 							feature
 						) :
 						opt.stylesOptions ?
-						opt.stylesOptions(properties, feature)[0] : {};
+						opt.stylesOptions(properties, feature)[0] : {}; //TODO voir pourquoi le premier feature seulement ?
 
 					return [{
 						image: new ol.style.Icon({

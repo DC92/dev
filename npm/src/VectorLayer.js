@@ -132,51 +132,18 @@ export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
 			clickUrl: () => null, // No click by default
-			style: (feature, resolution, hoveredSubFeature) => {
-				const properties = feature.getProperties(),
-					display = !properties.cluster ? 'stylesOptions' :
-					resolution > options.minClusterResolution ? 'clusterStylesOptions' :
-					'clusterDetailStylesOptions';
 
-				// Function returning styles options
-				return options[display](
+			style: (feature, resolution, hoveredFeature) => {
+				const properties = feature.getProperties(),
+					stylesOptionsFunction = properties.cluster ? clusterStylesOptions : options.stylesOptions;
+
+				return stylesOptionsFunction( // Function returning styles options
 					properties,
 					feature,
 					this, // Layer
-					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
+					hoveredFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
 					resolution
 				).map(so => new Style(so)); // Transform to Style objects
-			},
-
-			// Circle with number for a cluster
-			clusterStylesOptions: (properties, feature, hoveredSubFeature) => [
-				clusterStyleOptions(properties),
-				hoveredSubFeature ? labelStyleOptions(feature, properties.name) : {},
-			],
-
-			// Spread icons under the label
-			clusterDetailStylesOptions: function(properties, feature, layer, hoveredSubFeature, resolution) {
-				const hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
-
-				let x = 0.95 + 0.45 * properties.cluster,
-					stylesOpt = [ // Need separate styles to display several icons / labels
-						hoveredSubFeature ?
-						labelStyleOptions(hoveredSubFeature, hoveredSubProperties.name) :
-						labelStyleOptions(feature, properties.name),
-					];
-
-				properties.features.forEach(f => {
-					const image = layer.getStyleFunction()(f, resolution)[0].getImage(); //TODO protection
-
-					if (image) {
-						image.setAnchor([x -= 0.9, 0.5]);
-						stylesOpt.push({
-							image: image,
-						});
-					}
-				});
-
-				return stylesOpt;
 			},
 
 			...opt,
@@ -199,25 +166,7 @@ export class MyVectorLayer extends VectorLayer {
 		if (this.options.altLayer)
 			map.addLayer(this.options.altLayer);
 
-		// Attach one hover & click listener to each map
-		if (!(map.getListeners() || []).includes(mouseListener)) { // Only once for each map
-			map.on(['pointermove', 'click'], mouseListener);
-			window.addEventListener('mousemove', evt => {
-				// Leaving the map reset hovering
-				const divRect = map.getTargetElement().getBoundingClientRect();
-
-				// The mouse is outside of the map
-				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-					mouseListener({
-						map: map,
-						originalEvent: {
-							clientX: 10000,
-							clientY: 10000,
-						},
-					});
-			});
-		}
+		attachMouseListener(map);
 
 		return super.setMapInternal(map);
 	}
@@ -233,11 +182,37 @@ export class MyVectorLayer extends VectorLayer {
 	}
 }
 
+// Hover & click management
+function attachMouseListener(map) {
+	// Attach one hover & click listener to each map
+	if (!(map.getListeners() || []).includes(mouseListener)) { // Only once for each map
+		map.on(['pointermove', 'click'], mouseListener);
+		window.addEventListener('mousemove', evt => {
+			// Leaving the map reset hovering
+			const divRect = map.getTargetElement().getBoundingClientRect();
+
+			// The mouse is outside of the map
+			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+				mouseListener({
+					map: map,
+					originalEvent: {
+						clientX: 10000, // Outside of the map
+						clientY: 10000,
+					},
+				});
+		});
+	}
+}
+
 function mouseListener(evt) {
-	// Find the first hovered feature
+	const map = evt.map,
+		resolution = map.getView().getResolution();
+
 	let hoveredLayer = null,
-		hoveredFeature = evt.map.forEachFeatureAtPixel(
-			evt.map.getEventPixel(evt.originalEvent),
+		// Find the first hovered feature
+		hoveredFeature = map.forEachFeatureAtPixel(
+			map.getEventPixel(evt.originalEvent),
 			function(feature, layer) {
 				if (layer && layer.options) {
 					hoveredLayer = layer;
@@ -250,19 +225,19 @@ function mouseListener(evt) {
 		hoveredSubFeature = hoveredFeature;
 
 	if (hoveredFeature) {
-		// Find sub feature from a detailed cluster
-		const hoveredProperties = hoveredFeature.getProperties();
+		// Find sub-feature from a detailed cluster
+		const hoveredProperties = hoveredFeature.getProperties(),
+			xCursor = map.getPixelFromCoordinate(
+				hoveredFeature.getGeometry().getCoordinates()
+			),
+			deltaXCursor = evt.originalEvent.layerX - xCursor[0];
 
-		if (hoveredProperties.cluster) {
-			// Calculate the feature index from the cursor position
-			const hoveredFeaturePixel = evt.map.getPixelFromCoordinate(
-					hoveredFeature.getGeometry().getCoordinates()
-				),
-				indexHovered = Math.max(0, Math.min(hoveredProperties.cluster - 1, Math.floor(
-					(evt.originalEvent.layerX - hoveredFeaturePixel[0]) / 21.6 + hoveredProperties.cluster / 2
-				)));
-
-			hoveredSubFeature = hoveredProperties.features[indexHovered];
+		if (hoveredProperties.features) {
+			hoveredSubFeature = hoveredProperties.features[0];
+			hoveredProperties.features.forEach(f => {
+				if (deltaXCursor < f.getProperties().xRight)
+					hoveredSubFeature = f;
+			});
 		}
 
 		const hoveredSubProperties = hoveredSubFeature.getProperties(),
@@ -282,32 +257,32 @@ function mouseListener(evt) {
 						window.location.href = hoveredClickUrl;
 			}
 			// Cluster
-			if (hoveredProperties.cluster)
-				evt.map.getView().animate({
-					zoom: evt.map.getView().getZoom() + 2,
+			if (hoveredSubProperties.cluster)
+				map.getView().animate({
+					zoom: map.getView().getZoom() + 2,
 					center: hoveredProperties.geometry.getCoordinates(),
 				});
 		} else
 			// Hover
-			if (evt.map.lastHoveredFeature != hoveredFeature) {
-				evt.map.getViewport().style.cursor =
+			if (map.lastHoveredFeature != hoveredSubFeature) {
+				map.getViewport().style.cursor =
 					hoveredClickUrl || hoveredProperties.cluster ? 'pointer' : '';
 
 				// Remove previous style
-				if (evt.map.lastHoveredFeature)
-					evt.map.lastHoveredFeature.setStyle();
+				if (map.lastHoveredFeature)
+					map.lastHoveredFeature.setStyle();
 
-				// Set the feature style to the style function with the hover flag
+				// Set the feature style to the style function with the hoveredFeature set
 				hoveredFeature.setStyle((feature, resolution) =>
 					hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
 				);
 			}
 	} else {
-		evt.map.getViewport().style.cursor = '';
-		if (evt.map.lastHoveredFeature)
-			evt.map.lastHoveredFeature.setStyle();
+		map.getViewport().style.cursor = '';
+		if (map.lastHoveredFeature)
+			map.lastHoveredFeature.setStyle();
 	}
-	evt.map.lastHoveredFeature = hoveredFeature;
+	map.lastHoveredFeature = hoveredSubFeature;
 }
 
 /**
@@ -379,24 +354,55 @@ export class Selector {
 /**
  * Some usefull style functions
  */
+function clusterStylesOptions(properties, feature, layer, hoveredSubFeature, resolution) {
+	const hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
 
-// Cluster circle with number inside
-function clusterStyleOptions(properties) {
-	return {
-		image: new Circle({
-			radius: 14,
-			stroke: new Stroke({
-				color: 'blue',
-			}),
-			fill: new Fill({
-				color: 'white',
-			}),
-		}),
-		text: new Text({
-			text: properties.cluster.toString(),
-			font: '12px Verdana',
-		}),
-	};
+	// Circle with number for a cluster
+	if (resolution > layer.options.minClusterResolution)
+		return [{
+				image: new Circle({
+					radius: 14,
+					stroke: new Stroke({
+						color: 'blue',
+					}),
+					fill: new Fill({
+						color: 'white',
+					}),
+				}),
+				text: new Text({
+					text: properties.cluster.toString(),
+					font: '12px Verdana',
+				}),
+			},
+			hoveredSubFeature ? labelStyleOptions(feature, properties.name) : {},
+		];
+
+	// Spread icons under the label
+	let x = 0.95 + 0.45 * properties.cluster,
+		stylesOpt = [ // Need separate styles to display several icons / labels
+			hoveredSubFeature ?
+			labelStyleOptions(hoveredSubFeature, hoveredSubProperties.name) :
+			labelStyleOptions(feature, properties.name),
+		];
+
+	properties.features.forEach(f => {
+		const image = layer.getStyleFunction()(f, resolution)[0].getImage(); //TODO protection
+
+		if (image) {
+			image.setAnchor([x -= 0.9, 0.5]);
+
+			// Mem the shift for hover detection
+			f.setProperties({
+				xRight: x * image.getImage().width,
+			}, true);
+
+			stylesOpt.push({
+				image: image,
+			});
+		}
+	});
+
+	return stylesOpt;
 }
 
 export function labelStyleOptions(feature, text /*, textStyleOptions*/ ) {
@@ -440,7 +446,7 @@ export function fullLabelStyleOptions(properties, feature) {
 		]));
 }
 
-// Simplify & agreagte an array of lines
+// Simplify & aggregate an array of lines
 function agregateText(lines, glue) {
 	return lines
 		.filter(Boolean) // Avoid empty lines
@@ -837,23 +843,6 @@ function iconStyleOptions(feature, properties) {
 //properties, feature, hover, options, resolution
 
 function fullLabelStyleOptions3(properties) {
-	/*	return labelStyleOptions(
-			properties.name,
-			agregateText([
-				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-			], ', '),
-			properties.type,
-			properties.attribution,
-		);*/
-}
-
-function clusterDetailStylesOptions(properties) {
-	/*return [
-		// One style with overwriting options
-		new  Style(options.styleOptions(...arguments)),
-		//...options.styles(...arguments), // Many styles to have several icons & labels
-	]*/
 }
 
 function stylesCluster(feature, properties, layer, resolution) {
