@@ -133,36 +133,32 @@ export class MyVectorLayer extends VectorLayer {
 		const options = {
 			clickUrl: () => null, // No click by default
 
-			style: (feature, resolution, hoveredFeature) => {
+			style: (feature, resolution, hoveredSubFeature) => {
 				const properties = feature.getProperties(),
 					stylesOptionsFunction = properties.cluster ? clusterStylesOptions : options.stylesOptions;
 
-				return stylesOptionsFunction( // Function returning styles options
-					properties,
+				return stylesOptionsFunction( // Function returning an array of styles options
 					feature,
+					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
 					this, // Layer
-					hoveredFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
 					resolution
-				).map(so => new Style(so)); // Transform to Style objects
+				).map(so => new Style(so)); // Transform to an array of Style objects
 			},
 
 			...opt,
 		};
 
 		super({
-			source: options.minClusterResolution === undefined ?
+			source: options.serverClusterMinResolution === undefined ?
 				new MyVectorSource(options) : new MyClusterSource(options),
 			...options,
 		});
 
-		// Mem options for further use
-		this.options = options;
+		this.options = options; // Mem for further use
 	}
 
 	//HACK execute actions on Map init
 	setMapInternal(map) {
-
-		// Add the alternate layer if any
 		if (this.options.altLayer)
 			map.addLayer(this.options.altLayer);
 
@@ -171,7 +167,7 @@ export class MyVectorLayer extends VectorLayer {
 		return super.setMapInternal(map);
 	}
 
-	// Refresh the layer when the query change
+	// Refresh the layer when the url need to change
 	refresh(visible) {
 		this.setVisible(visible);
 		if (visible)
@@ -354,11 +350,12 @@ export class Selector {
 /**
  * Some usefull style functions
  */
-function clusterStylesOptions(properties, feature, layer, hoveredSubFeature, resolution) {
-	const hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
+function clusterStylesOptions(feature, hoveredSubFeature, layer, resolution) {
+	const properties = feature.getProperties(),
+		hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
 
 	// Circle with number for a cluster
-	if (resolution > layer.options.minClusterResolution)
+	if (resolution > layer.options.serverClusterMinResolution)
 		return [{
 				image: new Circle({
 					radius: 14,
@@ -373,6 +370,7 @@ function clusterStylesOptions(properties, feature, layer, hoveredSubFeature, res
 					text: properties.cluster.toString(),
 					font: '12px Verdana',
 				}),
+				//TODO zIndex
 			},
 			hoveredSubFeature ? labelStyleOptions(feature, properties.name) : {},
 		];
@@ -840,10 +838,8 @@ function iconStyleOptions(feature, properties) {
 			}),
 		};
 }
-//properties, feature, hover, options, resolution
 
-function fullLabelStyleOptions3(properties) {
-}
+function fullLabelStyleOptions3(properties) {}
 
 function stylesCluster(feature, properties, layer, resolution) {
 	let styles = [], // Need separate styles to display several icons / labels

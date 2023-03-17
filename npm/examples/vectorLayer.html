@@ -189,12 +189,11 @@ new Map({
 
 		layerWri,
 		new LayerWri({
-			host: 'https://dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
 			statusId: 'status-refuges',
 			attribution: null,
-			stylesOptions: (properties, feature) => [
-				labelStyleOptions(feature, properties.nom),
+			stylesOptions:  feature => [
+				labelStyleOptions(feature, feature.getProperties().nom),
 			],
 		}),
 		/*

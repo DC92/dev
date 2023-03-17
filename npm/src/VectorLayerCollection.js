@@ -34,11 +34,11 @@ export function layerGeoBB(options) {
 
 export function layerClusterGeoBB(opt) {
 	const options = {
-			transitionResolution: 100,
+			disjoinClusterMaxResolution: 100,
 			...opt,
 		},
 		clusterLayer = layerGeoBB({
-			minResolution: options.transitionResolution,
+			minResolution: options.disjoinClusterMaxResolution,
 			urlParams: function() {
 				return {
 					layer: 'cluster',
@@ -49,7 +49,7 @@ export function layerClusterGeoBB(opt) {
 		});
 
 	return layerGeoBB({
-		maxResolution: options.transitionResolution,
+		maxResolution: options.disjoinClusterMaxResolution,
 		altLayer: clusterLayer,
 		...options,
 	});
@@ -131,9 +131,9 @@ export function layerAlpages(options) {
 export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
-				host: 'https://www.refuges.info/',
-				transitionResolution: 100, //TODO rename
-				minClusterResolution: 50,
+				host: 'https://dom.refuges.info/', //TODO -> www
+				disjoinClusterMaxResolution: 100,
+				serverClusterMinResolution: 50,
 				attribution: 'refuges.info',
 				selector: new Selector(opt.selectName),
 				name: properties => properties.nom, // Function returning the name for cluster agregation
@@ -141,17 +141,16 @@ export class LayerWri extends MyVectorLayer {
 
 				...opt,
 
-				query: function() {
-					return {
-						_path: 'api/bbox',
-						nb_points: 'all',
-						type_points: options.selector.getSelection(),
-						...(opt.query ? opt.query(...arguments) : null),
-					};
-				},
+				query: () => ({
+					_path: 'api/bbox',
+					nb_points: 'all',
+					type_points: options.selector.getSelection(),
+					...(opt.query ? opt.query(...arguments) : null),
+				}),
 
-				stylesOptions: (properties, feature, layer, hover) => {
-					const so = hover ?
+				stylesOptions: function(feature, hoveredSubFeature, layer) {
+					const properties = feature.getProperties();
+					const so = hoveredSubFeature ?
 						fullLabelStyleOptions({
 								name: properties.nom,
 								ele: properties.coord.alt,
@@ -162,7 +161,7 @@ export class LayerWri extends MyVectorLayer {
 							feature
 						) :
 						opt.stylesOptions ?
-						opt.stylesOptions(properties, feature)[0] : {}; //TODO voir pourquoi le premier feature seulement ?
+						opt.stylesOptions(...arguments)[0] : {}; //TODO voir pourquoi le premier feature seulement ?
 
 					return [{
 						image: new ol.style.Icon({
@@ -175,7 +174,7 @@ export class LayerWri extends MyVectorLayer {
 
 			// High resolutions layer
 			hightResolutionsLayer = new MyVectorLayer({
-				minResolution: options.transitionResolution,
+				minResolution: options.disjoinClusterMaxResolution,
 
 				...options,
 
@@ -189,7 +188,7 @@ export class LayerWri extends MyVectorLayer {
 
 		// Low resolutions layer
 		super({
-			maxResolution: options.transitionResolution,
+			maxResolution: options.disjoinClusterMaxResolution,
 			altLayer: hightResolutionsLayer,
 			...options,
 		});
@@ -230,12 +229,12 @@ export function layerWri(options) {
 
 export function layerClusterWri(opt) {
 	const options = {
-			transitionResolution: 100,
+			disjoinClusterMaxResolution: 100,
 			...opt,
 		},
 		// High resolutions layer
 		clusterLayer = layerWri({
-			minResolution: options.transitionResolution,
+			minResolution: options.disjoinClusterMaxResolution,
 			...options,
 			urlParams: {
 				cluster: 0.1,
@@ -244,7 +243,7 @@ export function layerClusterWri(opt) {
 
 	// Low resolutions
 	return layerWri({
-		maxResolution: options.transitionResolution,
+		maxResolution: options.disjoinClusterMaxResolution,
 		altLayer: clusterLayer,
 		...options,
 	});
