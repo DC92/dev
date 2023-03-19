@@ -31,7 +31,7 @@ class MyVectorSource extends VectorSource {
 				bbox: (extent, _, projection) => transformExtent(
 					extent,
 					projection.getCode(), // Map projection
-					options.projection // Received projection
+					options.projection, // Received projection
 				).map(c => c.toFixed(4)), // Round to 4 digits
 
 				url: function(extent, resolution, projection) {
@@ -232,15 +232,12 @@ function mouseListener(evt) {
 			),
 			deltaXCursor = evt.originalEvent.layerX - xCursor[0];
 
-		if (hoveredProperties.features) {
-			hoveredSubFeature = hoveredProperties.features[0];
+		if (hoveredProperties.features)
 			hoveredProperties.features.forEach(f => {
 				if (deltaXCursor < f.getProperties().xRight)
 					hoveredSubFeature = f;
 			});
-		}
 
-		//TODO BUG click on circle cluster shold not go
 		const hoveredSubProperties = hoveredSubFeature.getProperties(),
 			hoveredClickUrl = hoveredLayer.options.clickUrl(hoveredSubProperties);
 
@@ -283,7 +280,8 @@ function mouseListener(evt) {
 		if (map.lastHoveredFeature)
 			map.lastHoveredFeature.setStyle();
 	}
-	map.lastHoveredFeature = hoveredSubFeature;
+	map.lastHoveredFeature = hoveredFeature;
+	map.lastHoveredSubFeature = hoveredSubFeature;
 }
 
 /**

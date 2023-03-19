@@ -168,8 +168,8 @@ export class LayerWri extends MyVectorLayer {
 				}),
 
 				stylesOptions: function(feature, hoveredSubFeature, layer) {
-					const properties = feature.getProperties();
-					const so = hoveredSubFeature ?
+					const properties = (feature || hoveredSubFeature).getProperties(),
+						so = hoveredSubFeature ?
 						fullLabelStyleOptions({
 								name: properties.nom,
 								ele: properties.coord.alt,
