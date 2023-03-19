@@ -1,14 +1,27 @@
+import BingMaps from '../node_modules/ol/source/BingMaps.js';
+import OSM from '../node_modules/ol/source/OSM.js';
+import Stamen from '../node_modules/ol/source/Stamen.js';
+import TileGrid from '../node_modules/ol/tilegrid/TileGrid.js';
 import TileLayer from '../node_modules/ol/layer/Tile.js';
+import TileWMS from '../node_modules/ol/source/TileWMS.js';
 import WMTS from '../node_modules/ol/source/WMTS.js';
+import XYZ from '../node_modules/ol/source/XYZ.js';
+import {
+	getWidth,
+	getTopLeft
+} from '../node_modules/ol/extent.js';
+import {
+	get as getProjection
+} from '../node_modules/ol/proj.js';
 
 // OpenStreetMap & co
 export class OsmTileLayer extends TileLayer {
 	constructor(options) {
 		super({
-			source: new ol.source.XYZ({
+			source: new XYZ({
 				url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 				maxZoom: 21,
-				attributions: ol.source.OSM.ATTRIBUTION,
+				attributions: OSM.ATTRIBUTION,
 				...options,
 			}),
 			...options,
@@ -82,7 +95,7 @@ export class IgnTileLayer extends TileLayer {
 			IGNmatrixIds = [];
 
 		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNresolutions[i] = getWidth(getProjection('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 			IGNmatrixIds[i] = i.toString();
 		}
 
@@ -95,7 +108,7 @@ export class IgnTileLayer extends TileLayer {
 					matrixSet: 'PM',
 					format: 'image/jpeg',
 					attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-					tileGrid: new ol.tilegrid.WMTS({
+					tileGrid: new TileGrid({
 						origin: [-20037508, 20037508],
 						resolutions: IGNresolutions,
 						matrixIds: IGNmatrixIds,
@@ -117,25 +130,25 @@ function layerSwissTopo(opt) {
 			subLayer: 'ch.swisstopo.pixelkarte-farbe',
 			...opt,
 		},
-		projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
+		projectionExtent = getProjection('EPSG:3857').getExtent(),
 		resolutions = [],
 		matrixIds = [];
 
 	for (let r = 0; r < 18; ++r) {
-		resolutions[r] = ol.extent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
+		resolutions[r] = getWidth(projectionExtent) / 256 / Math.pow(2, r);
 		matrixIds[r] = r;
 	}
 
 	return [
 		layerStamen('terrain', 300), //BEST declare another layer internaly
-		new ol.layer.Tile({
+		new TileLayer({
 			maxResolution: 300,
-			source: new ol.source.WMTS(({
+			source: new WMTS(({
 				crossOrigin: 'anonymous',
 				url: options.host + options.subLayer +
 					'/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-				tileGrid: new ol.tilegrid.WMTS({
-					origin: ol.extent.getTopLeft(projectionExtent),
+				tileGrid: new TileGrid({
+					origin: getTopLeft(projectionExtent),
 					resolutions: resolutions,
 					matrixIds: matrixIds,
 				}),
@@ -158,8 +171,8 @@ function layerSpain(opt) {
 		...opt,
 	};
 
-	return new ol.layer.Tile({
-		source: new ol.source.XYZ({
+	return new TileLayer({
+		source: new XYZ({
 			url: options.host + options.server + '?layer=' + options.subLayer +
 				'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
 				'&style=default&tilematrixset=GoogleMapsCompatible' +
@@ -182,10 +195,10 @@ function layerIGM() {
 	];
 
 	function subLayerIGM(url, layer, minResolution, maxResolution) {
-		return new ol.layer.Tile({
+		return new TileLayer({
 			minResolution: minResolution,
 			maxResolution: maxResolution,
-			source: new ol.source.TileWMS({
+			source: new TileWMS({
 				url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it&type=png' + // Not available via https
 					'&map=/ms_ogc/WMS_v1.3/raster/' + url + '.map',
 				params: {
@@ -210,11 +223,11 @@ function layerOS(opt) {
 	if (options.key)
 		return [
 			layerStamen('terrain', 1700),
-			new ol.layer.Tile({
+			new TileLayer({
 				extent: [-1198263, 6365000, 213000, 8702260],
 				minResolution: 2,
 				maxResolution: 1700,
-				source: new ol.source.XYZ({
+				source: new XYZ({
 					url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
 						'/{z}/{x}/{y}.png?key=' + options.key,
 					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
@@ -234,8 +247,8 @@ function layerArcGIS(opt) {
 		...opt,
 	};
 
-	return new ol.layer.Tile({
-		source: new ol.source.XYZ({
+	return new TileLayer({
+		source: new XYZ({
 			url: options.host + options.subLayer +
 				'/MapServer/tile/{z}/{y}/{x}',
 			maxZoom: 19,
@@ -248,8 +261,8 @@ function layerArcGIS(opt) {
  * Stamen http://maps.stamen.com
  */
 function layerStamen(subLayer, minResolution) {
-	return new ol.layer.Tile({
-		source: new ol.source.Stamen({
+	return new TileLayer({
+		source: new Stamen({
 			layer: subLayer,
 		}),
 		minResolution: minResolution || 0,
@@ -260,8 +273,8 @@ function layerStamen(subLayer, minResolution) {
  * Google
  */
 function layerGoogle(subLayer) {
-	return new ol.layer.Tile({
-		source: new ol.source.XYZ({
+	return new TileLayer({
+		source: new XYZ({
 			url: '//mt{0-3}.google.com/vt/lyrs=' + subLayer + '&hl=fr&x={x}&y={y}&z={z}',
 			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
 		}),
@@ -277,13 +290,13 @@ function layerGoogle(subLayer) {
  */
 function layerBing(options) {
 	if (options && options.key) { // Don't display if no key provided
-		const layer = new ol.layer.Tile();
+		const layer = new TileLayer();
 
 		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is visible
 		layer.on('change:visible', function(evt) {
 			if (evt.target.getVisible() && // When the layer becomes visible
 				!layer.getSource()) { // Only once
-				layer.setSource(new ol.source.BingMaps(options));
+				layer.setSource(new BingMaps(options));
 			}
 		});
 
@@ -426,6 +439,6 @@ export function demoTileLayer(options) {
 		'Stamen': layerStamen('terrain'),
 		'Toner': layerStamen('toner'),
 		'Watercolor': layerStamen('watercolor'),
-		'Blank': new ol.layer.Tile(),
+		'Blank': new TileLayer(),
 	};
 }

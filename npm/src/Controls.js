@@ -7,13 +7,21 @@
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
+import Attribution from '../node_modules/ol/control/Attribution';
+import Control from '../node_modules/ol/control/Control';
+import FullScreen from '../node_modules/ol/control/FullScreen';
+import MousePosition from '../node_modules/ol/control/MousePosition';
+import MouseWheelZoom from '../node_modules/ol/interaction/MouseWheelZoom';
+import ScaleLine from '../node_modules/ol/control/ScaleLine';
+import Zoom from '../node_modules/ol/control/Zoom';
+
 export function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
 			className: '',
 			...opt,
 		},
-		control = new ol.control.Control(options),
+		control = new Control(options),
 		buttonEl = document.createElement('button');
 
 	// Add submenu below the button
@@ -101,7 +109,7 @@ export function controlPermalink(opt) {
 			hash: '?', // {?, #} the permalink delimiter after the url
 			...opt,
 		},
-		control = new ol.control.Control({
+		control = new Control({
 			element: document.createElement('div'),
 			render: render,
 		}),
@@ -161,7 +169,7 @@ export function controlPermalink(opt) {
  * Control to display the mouse position
  */
 export function controlMousePosition(options) {
-	return new ol.control.MousePosition({
+	return new MousePosition({
 		projection: 'EPSG:4326',
 		className: 'myol-coordinate',
 		placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
@@ -191,7 +199,7 @@ export function controlLengthLine() {
 	control.element.className = 'myol-length-line';
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		Control.prototype.setMap.call(this, map);
 
 		map.on('pointermove', evt => {
 			control.element.innerHTML = ''; // Clear the measure if hover no feature
@@ -265,7 +273,7 @@ export function controlTilesBuffer(opt) {
 		control = controlButton(); //HACK no button
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		Control.prototype.setMap.call(this, map);
 
 		// Action on each layer
 		//BEST too much load on basic browsing
@@ -366,7 +374,7 @@ export function controlPrint(options) {
 
 		// Finer zoom not dependent on the baselayer's levels
 		map.getView().setConstrainResolution(false);
-		map.addInteraction(new ol.interaction.MouseWheelZoom({
+		map.addInteraction(new MouseWheelZoom({
 			maxDelta: 0.1,
 		}));
 
@@ -413,8 +421,8 @@ export function controlsCollection(opt) {
 
 	return [
 		// Top left
-		new ol.control.Zoom(options.Zoom),
-		new ol.control.FullScreen(options.FullScreen),
+		new Zoom(options.Zoom),
+		new FullScreen(options.FullScreen),
 		controlGeocoder(options.Geocoder),
 		controlGPS(options.GPS),
 		controlLoadGPX(options.LoadGPX),
@@ -425,11 +433,11 @@ export function controlsCollection(opt) {
 		// Bottom left
 		controlLengthLine(options.LengthLine),
 		controlMousePosition(options.Mouseposition),
-		new ol.control.ScaleLine(options.ScaleLine),
+		new ScaleLine(options.ScaleLine),
 
 		// Bottom right
 		controlPermalink(options.Permalink),
-		new ol.control.Attribution(options.Attribution),
+		new Attribution(options.Attribution),
 
 		...options.supplementaryControls
 	];

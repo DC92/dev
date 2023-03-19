@@ -12,8 +12,9 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<link href="../dist/myol.css" type="text/css" rel="stylesheet">
-    <script src="../node_modules/ol/dist/ol.js"></script><!-- //TODO RESORB -->
+	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
+	<link href="../src/controls.css" type="text/css" rel="stylesheet">
+	<link href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
 	<style>
 		#map {
 			width: 100%;
@@ -48,12 +49,16 @@ const layersKeys = {
 };
 	</script>
 	<script type="module">
+import Attribution from '../node_modules/ol/control/Attribution';
 import Map from '../node_modules/ol/Map.js';
 import View from '../node_modules/ol/View.js';
-import Attribution from '../node_modules/ol/control/Attribution';
 import Zoom from '../node_modules/ol/control/Zoom';
-import {controlLayerSwitcher} from '../src/LayerSwitcher.js';
-import {demoTileLayer} from '../src/TileLayerCollection.js';
+import {
+	controlLayerSwitcher
+} from '../src/LayerSwitcher.js';
+import {
+	demoTileLayer
+} from '../src/TileLayerCollection.js';
 
 const map = new Map({
 	target: 'map',
@@ -72,6 +77,7 @@ const map = new Map({
 		}),
 	],
 });
+
 map.getView().on('change:resolution', () =>
 	console.log('resolution = ' + Math.round(map.getView().getResolutionForZoom(map.getView().getZoom())))
 );

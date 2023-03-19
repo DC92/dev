@@ -12,16 +12,10 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
-
-	<!-- My Openlayers -->
+	<script src="../node_modules/rbush/rbush.js"></script>
+	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<script src="../src/controls.js"></script>
 	<link href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<script src="../src/layerSwitcher.js"></script>
-
 	<style>
 		#map {
 			width: 100%;
@@ -43,37 +37,49 @@ Based on https://openlayers.org
 
 	<div id="select-ext">
 		<hr />
-		<label>Countries <input type="checkbox" checked="checked" onChange="countries.setVisible(this.checked)" /></label>
+		<label>Countries <input id="toggle-countries" type="checkbox" checked="checked" /></label>
 	</div>
 
-	<script>
+	<script type="module">
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import Map from '../node_modules/ol/Map.js';
+import OSM from '../node_modules/ol/source/OSM.js';
+import Stamen from '../node_modules/ol/source/Stamen.js';
+import Tile from '../node_modules/ol/layer/Tile.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import View from '../node_modules/ol/View.js';
+import {
+	controlLayerSwitcher
+} from '../src/LayerSwitcher.js';
+
 // Vectorlayer
 const baseLayers = {
-		Stamen: new ol.layer.Tile({
-			source: new ol.source.Stamen({
+		Stamen: new Tile({
+			source: new Stamen({
 				layer: 'terrain',
 			}),
 		}),
-		'OSM org': new ol.layer.Tile({
-			source: new ol.source.OSM(),
+		'OSM org': new Tile({
+			source: new OSM(),
 		}),
-		Watercolor: new ol.layer.Tile({
-			source: new ol.source.Stamen({
+		Watercolor: new Tile({
+			source: new Stamen({
 				layer: 'watercolor',
 			}),
 		}),
 	},
-	countries = new ol.layer.Vector({
-		source: new ol.source.Vector({
+	countries = new VectorLayer({
+		source: new VectorSource({
 			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-			format: new ol.format.GeoJSON(),
+			format: new GeoJSON(),
 		}),
 		zIndex: 2, // Above the base layer
 	});
 
-new ol.Map({
+new Map({
 	target: 'map',
-	view: new ol.View({
+	view: new View({
 		center: [700000, 5600000],
 		zoom: 5,
 	}),
@@ -84,6 +90,10 @@ new ol.Map({
 		}),
 	],
 	layers: [countries],
+});
+
+document.getElementById('toggle-countries').addEventListener('click', function(evt) {
+	countries.setVisible(this.checked);
 });
 	</script>
 	<script src="print_script.js"></script>
