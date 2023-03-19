@@ -12,9 +12,8 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<link href="../dist/myol-debug.css" type="text/css" rel="stylesheet">
-	<script src="../node_modules/ol/dist/ol.js"></script><!-- //TODO RESORB -->
 	<script src="../node_modules/rbush/rbush.js"></script>
+	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 	<style>
 		#map {
 			width: 100%;
@@ -131,7 +130,10 @@ import Tile from '../node_modules/ol/layer/Tile.js';
 import View from '../node_modules/ol/View.js';
 import Zoom from '../node_modules/ol/control/Zoom.js';
 import {
-	VERSION
+	transform,
+} from '../node_modules/ol/proj.js';
+import {
+	VERSION,
 } from '../node_modules/ol/util.js';
 import {
 	layerVectorCluster,
@@ -142,7 +144,7 @@ import {
 	LayerWri,
 } from '../src/VectorLayerCollection.js';
 
-console.log('OL V' + VERSION);
+console.log('OL V' + VERSION); //TODO move in index.html
 
 // Force selectors
 //localStorage.myol_selectwri = 'all';
@@ -171,8 +173,8 @@ selecteurMassifs.setCallBack(function(selection) {
 new Map({
 	target: 'map',
 	view: new View({
-		center: ol.proj.transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
-		center: ol.proj.transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'),
+		center: transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
+		center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'),
 		zoom: 12,
 		//zoom: 15,
 	}),

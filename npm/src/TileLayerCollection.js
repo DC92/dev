@@ -8,10 +8,10 @@ import WMTS from '../node_modules/ol/source/WMTS.js';
 import XYZ from '../node_modules/ol/source/XYZ.js';
 import {
 	getWidth,
-	getTopLeft
+	getTopLeft,
 } from '../node_modules/ol/extent.js';
 import {
-	get as getProjection
+	get as getProjection,
 } from '../node_modules/ol/proj.js';
 
 // OpenStreetMap & co
@@ -89,6 +89,7 @@ export class ThunderforestTileLayer extends OsmTileLayer {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
+//TODO BUG en module
 export class IgnTileLayer extends TileLayer {
 	constructor(options) {
 		let IGNresolutions = [],

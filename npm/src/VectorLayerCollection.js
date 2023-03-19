@@ -2,20 +2,32 @@
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
+import Fill from '../node_modules/ol/style/Fill.js';
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import Icon from '../node_modules/ol/style/Icon.js';
+import OSMXML from '../node_modules/ol/format/OSMXML.js';
+import Stroke from '../node_modules/ol/style/Stroke.js';
+import Text from '../node_modules/ol/style/Text.js';
+import {
+	getArea,
+} from '../node_modules/ol/extent.js';
+import {
+	bbox,
+} from '../node_modules/ol/loadingstrategy.js';
 import {
 	clusterSpreadStylesOptions,
 	fullLabelStyleOptions,
 	labelStyleOptions,
-	layerVector,
-	layerVectorCluster,
 	MyVectorLayer,
 	Selector,
 } from './VectorLayer.js';
 
+function layerVector() {} //TODO RESORB
+
 // chemineur.fr, alpages.info
 export function layerGeoBB(options) {
 	return layerVectorCluster({
-		strategy: ol.loadingstrategy.bbox,
+		strategy: bbox,
 		...options,
 		urlParams: (opt, bbox, selections) => ({
 			path: 'ext/Dominique92/GeoBB/gis.php',
@@ -69,7 +81,7 @@ export function layerChemineur(options) {
 		}),
 		styleOptionsDisplay: {
 			// Lines
-			stroke: new ol.style.Stroke({
+			stroke: new Stroke({
 				color: 'blue',
 				width: 2,
 			}),
@@ -79,19 +91,19 @@ export function layerChemineur(options) {
 			elLabel.innerHTML = properties.name;
 
 			// Lines labels
-			if (ol.extent.getArea(feature.getGeometry().getExtent()))
+			if (getArea(feature.getGeometry().getExtent()))
 				return {
-					text: new ol.style.Text({
+					text: new Text({
 						text: elLabel.innerHTML,
 						placement: 'line',
 						textBaseline: 'middle',
 						overflow: true,
 						offsetY: -8,
 						font: '12px Verdana',
-						fill: new ol.style.Fill({
+						fill: new Fill({
 							color: 'blue',
 						}),
-						stroke: new ol.style.Stroke({
+						stroke: new Stroke({
 							color: 'white',
 							width: 5,
 						}),
@@ -183,7 +195,7 @@ export class LayerWri extends MyVectorLayer {
 						opt.stylesOptions(...arguments)[0] : {}; //TODO voir pourquoi le premier feature seulement ?
 
 					return [{
-						image: new ol.style.Icon({
+						image: new Icon({
 							src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
 						}),
 						...so,
@@ -223,7 +235,7 @@ export class LayerWri extends MyVectorLayer {
 export function layerWri(options) {
 	return layerVectorCluster({ //BEST case of WRI without local cluster ?
 		host: '//www.refuges.info/',
-		strategy: ol.loadingstrategy.bbox,
+		strategy: bbox,
 		...options,
 		urlParams: (_, bbox, selections) => ({
 			path: selections[1] ? 'api/massif' : 'api/bbox',
@@ -269,6 +281,7 @@ export function layerClusterWri(opt) {
 }
 
 export function layerWriAreas(options) {
+	/*
 	return layerVector({
 		host: '//www.refuges.info/',
 		urlParams: {
@@ -292,7 +305,7 @@ export function layerWriAreas(options) {
 					backgroundStroke: null,
 					font: null,
 				}),
-				fill: new ol.style.Fill({
+				fill: new Fill({
 					color: 'rgba(' + colors.join(',') + ',0.3)'
 				}),
 			};
@@ -303,15 +316,16 @@ export function layerWriAreas(options) {
 				font: '12px Verdana',
 				overflow: true, // Force display even if no place
 			}),
-			fill: new ol.style.Fill({
+			fill: new Fill({
 				color: 'rgba(0,0,0,0)', // Transparent
 			}),
-			stroke: new ol.style.Stroke({
+			stroke: new Stroke({
 				color: properties.couleur,
 				width: 2,
 			}),
 		}),
 	});
+	*/
 }
 
 // pyrenees-refuges.com
@@ -332,7 +346,7 @@ export function layerPrc(options) {
 
 // camptocamp.org
 export function layerC2C(options) {
-	const format = new ol.format.GeoJSON({ // Format of received data
+	const format = new GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
 	});
 
@@ -367,7 +381,7 @@ export function layerC2C(options) {
 
 	return layerVectorCluster({
 		host: 'https://api.camptocamp.org/',
-		strategy: ol.loadingstrategy.bbox,
+		strategy: bbox,
 		format: format,
 		...options,
 		urlParams: (o, b, s, extent) => ({
@@ -392,9 +406,9 @@ export function layerOverpass(opt) {
 			maxResolution: 50,
 			...opt,
 		},
-		format = new ol.format.OSMXML(),
+		format = new OSMXML(),
 		layer = layerVectorCluster({
-			strategy: ol.loadingstrategy.bbox,
+			strategy: bbox,
 			urlParams: urlParams,
 			format: format,
 			...options,
@@ -491,7 +505,7 @@ export function layerOverpass(opt) {
 			node.appendChild(newTag);
 		}
 
-		return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
+		return OSMXML.prototype.readFeatures.call(this, doc, opt);
 	};
 
 	return layer;
