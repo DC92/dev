@@ -3,6 +3,7 @@
  * using MyOl/src/layerVector.js
  */
 import {
+	clusterSpreadStylesOptions,
 	fullLabelStyleOptions,
 	labelStyleOptions,
 	layerVector,
@@ -137,7 +138,25 @@ export class LayerWri extends MyVectorLayer {
 				attribution: 'refuges.info',
 				selector: new Selector(opt.selectName),
 				name: properties => properties.nom, // Function returning the name for cluster agregation
-				clickUrl: properties => properties.lien, // Function returning ulr to go on click
+				clickUrl: properties => properties.lien, // Function returning url to go on click
+				spreadClusterMaxResolution: 20,
+				clusterStylesOptions: clusterSpreadStylesOptions, //TODO
+
+				//TODO archi
+				wclusterStylesOptions: function(feature, hoveredSubFeature, layer, resolution) {
+					const hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
+
+					if (resolution > layer.options.serverClusterMinResolution)
+						return [
+							...clusterCircleStylesOptions(feature),
+							hoveredSubFeature ? labelStyleOptions(feature, hoveredSubProperties.name) : {},
+						];
+					else
+						return [
+							labelStyleOptions(hoveredSubFeature || feature),
+							...clusterSpreadStylesOptions(...arguments), //TODO BUG cluster hovered
+						];
+				},
 
 				...opt,
 

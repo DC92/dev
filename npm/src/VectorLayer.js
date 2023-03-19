@@ -131,19 +131,23 @@ class MyClusterSource extends Cluster {
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
-			clickUrl: () => null, // No click by default
+			// name: function(properties) returning the name for cluster agregation
+			// clickUrl: function(properties) returning url to go on click
+			// stylesOptions: function(...) returning the features style
+			// serverClusterMinResolution: resolution above which the server retruns clusters
+			spreadClusterMaxResolution: 0, // Resolution under which the clusters are displayed as separate icons
+			clusterStylesOptions: clusterCircleStylesOptions,
 
-			style: (feature, resolution, hoveredSubFeature) => {
-				const properties = feature.getProperties(),
-					stylesOptionsFunction = properties.cluster ? clusterStylesOptions : options.stylesOptions;
-
-				return stylesOptionsFunction( // Function returning an array of styles options
+			style: (feature, resolution, hoveredSubFeature) =>
+				(feature.getProperties().cluster ?
+					options.clusterStylesOptions :
+					options.stylesOptions)
+				( // Function returning an array of styles options
 					feature,
 					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
 					this, // Layer
 					resolution
-				).map(so => new Style(so)); // Transform to an array of Style objects
-			},
+				).map(so => new Style(so)), // Transform to an array of Style objects
 
 			...opt,
 		};
@@ -236,6 +240,7 @@ function mouseListener(evt) {
 			});
 		}
 
+		//TODO BUG click on circle cluster shold not go
 		const hoveredSubProperties = hoveredSubFeature.getProperties(),
 			hoveredClickUrl = hoveredLayer.options.clickUrl(hoveredSubProperties);
 
@@ -350,53 +355,54 @@ export class Selector {
 /**
  * Some usefull style functions
  */
-function clusterStylesOptions(feature, hoveredSubFeature, layer, resolution) {
-	const properties = feature.getProperties(),
-		hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
-
-	// Circle with number for a cluster
-	if (resolution > layer.options.serverClusterMinResolution)
-		return [{
-				image: new Circle({
-					radius: 14,
-					stroke: new Stroke({
-						color: 'blue',
-					}),
-					fill: new Fill({
-						color: 'white',
-					}),
+export function clusterCircleStylesOptions(feature, hoveredFeature) {
+	return [{
+			image: new Circle({
+				radius: 14,
+				stroke: new Stroke({
+					color: 'blue',
 				}),
-				text: new Text({
-					text: properties.cluster.toString(),
-					font: '12px Verdana',
+				fill: new Fill({
+					color: 'white',
 				}),
-				//TODO zIndex
-			},
-			hoveredSubFeature ? labelStyleOptions(feature, properties.name) : {},
-		];
+			}),
+			text: new Text({
+				text: feature.getProperties().cluster.toString(),
+				font: '12px Verdana',
+			}),
+			//TODO text zIndex ?
+		},
+		hoveredFeature ? labelStyleOptions(feature) : {},
+	];
+}
 
-	// Spread icons under the label
+export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
+	if (resolution > layer.options.serverClusterMinResolution ||
+		resolution > layer.options.spreadClusterMaxResolution)
+		return clusterCircleStylesOptions(...arguments);
+
+	const properties = feature.getProperties();
 	let x = 0.95 + 0.45 * properties.cluster,
-		stylesOpt = [ // Need separate styles to display several icons / labels
-			hoveredSubFeature ?
-			labelStyleOptions(hoveredSubFeature, hoveredSubProperties.name) :
-			labelStyleOptions(feature, properties.name),
-		];
+		stylesOpt = [];
 
 	properties.features.forEach(f => {
-		const image = layer.getStyleFunction()(f, resolution)[0].getImage(); //TODO protection
+		const styles = layer.getStyleFunction()(f, resolution);
 
-		if (image) {
-			image.setAnchor([x -= 0.9, 0.5]);
+		if (styles.length) {
+			const image = styles[0].getImage();
 
-			// Mem the shift for hover detection
-			f.setProperties({
-				xRight: x * image.getImage().width,
-			}, true);
+			if (image) {
+				image.setAnchor([x -= 0.9, 0.5]);
 
-			stylesOpt.push({
-				image: image,
-			});
+				// Mem the shift for hover detection
+				f.setProperties({
+					xRight: x * image.getImage().width,
+				}, true);
+
+				stylesOpt.push({
+					image: image,
+				});
+			}
 		}
 	});
 
@@ -408,7 +414,7 @@ export function labelStyleOptions(feature, text /*, textStyleOptions*/ ) {
 		area = ol.extent.getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
 	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text;
+	elLabel.innerHTML = text || feature.getProperties().name;
 
 	return {
 		text: new ol.style.Text({
