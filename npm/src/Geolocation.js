@@ -3,9 +3,12 @@
  * Requires controlButton
  * Need to include controls.js & controls.css
  */
+import {
+	controlButton,
+} from '../src/Controls.js';
 
 // class GeolocationControl ...
-function controlGPS(options) {
+export function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content / option
 		'<p>Localisation GPS:</p>' +

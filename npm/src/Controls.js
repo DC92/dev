@@ -14,6 +14,9 @@ import MousePosition from '../node_modules/ol/control/MousePosition';
 import MouseWheelZoom from '../node_modules/ol/interaction/MouseWheelZoom';
 import ScaleLine from '../node_modules/ol/control/ScaleLine';
 import Zoom from '../node_modules/ol/control/Zoom';
+import {
+	controlGPS,
+} from '../src/Geolocation.js';
 
 export function controlButton(opt) {
 	const options = {

@@ -2,18 +2,20 @@
  * This file implements various acces to geoJson services
  * using MyOl/src/layerVector.js
  */
-import Fill from '../node_modules/ol/style/Fill.js';
 import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
 import Icon from '../node_modules/ol/style/Icon.js';
 import OSMXML from '../node_modules/ol/format/OSMXML.js';
-import Stroke from '../node_modules/ol/style/Stroke.js';
-import Text from '../node_modules/ol/style/Text.js';
 import {
 	getArea,
 } from '../node_modules/ol/extent.js';
 import {
 	bbox,
 } from '../node_modules/ol/loadingstrategy.js';
+import {
+	Fill,
+	Stroke,
+	Text,
+} from '../node_modules/ol/style.js';
 import {
 	clusterSpreadStylesOptions,
 	fullLabelStyleOptions,
