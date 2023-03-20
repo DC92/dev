@@ -4,7 +4,7 @@
 import BingMaps from '../node_modules/ol/source/BingMaps.js';
 import OSM from '../node_modules/ol/source/OSM.js';
 import Stamen from '../node_modules/ol/source/Stamen.js';
-import TileGrid from '../node_modules/ol/tilegrid/TileGrid.js';
+import WMTSTileGrid from '../node_modules/ol/tilegrid/WMTS.js';
 import TileLayer from '../node_modules/ol/layer/Tile.js';
 import TileWMS from '../node_modules/ol/source/TileWMS.js';
 import WMTS from '../node_modules/ol/source/WMTS.js';
@@ -92,7 +92,6 @@ export class ThunderforestTileLayer extends OsmTileLayer {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-//TODO BUG en module
 export class IgnTileLayer extends TileLayer {
 	constructor(options) {
 		let IGNresolutions = [],
@@ -112,7 +111,7 @@ export class IgnTileLayer extends TileLayer {
 					matrixSet: 'PM',
 					format: 'image/jpeg',
 					attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-					tileGrid: new TileGrid({
+					tileGrid: new WMTSTileGrid({
 						origin: [-20037508, 20037508],
 						resolutions: IGNresolutions,
 						matrixIds: IGNmatrixIds,
@@ -151,7 +150,7 @@ function layerSwissTopo(opt) {
 				crossOrigin: 'anonymous',
 				url: options.host + options.subLayer +
 					'/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-				tileGrid: new TileGrid({
+				tileGrid: new WMTSTileGrid({
 					origin: getTopLeft(projectionExtent),
 					resolutions: resolutions,
 					matrixIds: matrixIds,
