@@ -154,23 +154,7 @@ export class LayerWri extends MyVectorLayer {
 				name: properties => properties.nom, // Function returning the name for cluster agregation
 				clickUrl: properties => properties.lien, // Function returning url to go on click
 				spreadClusterMaxResolution: 20,
-				clusterStylesOptions: clusterSpreadStylesOptions, //TODO
-
-				//TODO archi
-				wclusterStylesOptions: function(feature, hoveredSubFeature, layer, resolution) {
-					const hoveredSubProperties = (hoveredSubFeature || feature).getProperties();
-
-					if (resolution > layer.options.serverClusterMinResolution)
-						return [
-							...clusterCircleStylesOptions(feature),
-							hoveredSubFeature ? labelStyleOptions(feature, hoveredSubProperties.name) : {},
-						];
-					else
-						return [
-							labelStyleOptions(hoveredSubFeature || feature),
-							...clusterSpreadStylesOptions(...arguments), //TODO BUG cluster hovered
-						];
-				},
+				clusterStylesOptions: clusterSpreadStylesOptions,
 
 				...opt,
 
@@ -194,7 +178,7 @@ export class LayerWri extends MyVectorLayer {
 							feature
 						) :
 						opt.stylesOptions ?
-						opt.stylesOptions(...arguments)[0] : {}; //TODO voir pourquoi le premier feature seulement ?
+						opt.stylesOptions(...arguments)[0] : {}; // Only one Style there
 
 					return [{
 						image: new Icon({

@@ -2,7 +2,6 @@
  * Add some usefull controls
  * Need to include controls.css
  */
-//TODO BUG Circular dependencies Files.js, Geolocation.js -> Controls.js
 import Attribution from '../node_modules/ol/control/Attribution';
 import Control from '../node_modules/ol/control/Control';
 import FullScreen from '../node_modules/ol/control/FullScreen';
@@ -404,7 +403,7 @@ export function controlPrint(options) {
 		});
 	};
 
-	window.printMap = function() { //TODO resorb window
+	window.printMap = function() { //BEST resorb window
 		control.resizeDraftPrint();
 		control.getMap().once('rendercomplete', function() {
 			window.print();
@@ -441,6 +440,7 @@ export function controlsCollection(opt) {
 		new Zoom(options.Zoom),
 		new FullScreen(options.FullScreen),
 		controlGeocoder(options.Geocoder),
+		//TODO BUG Circular dependencies Files.js, Geolocation.js -> Controls.js
 		controlGPS(options.GPS),
 		controlLoadGPX(options.LoadGPX),
 		controlDownload(options.Download),
