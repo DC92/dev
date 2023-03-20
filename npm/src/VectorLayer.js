@@ -1,3 +1,6 @@
+/**
+ * This file adds facilities to vector layers 
+ */
 import Cluster from '../node_modules/ol/source/Cluster.js';
 import Feature from '../node_modules/ol/Feature.js';
 import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
@@ -23,7 +26,8 @@ import {
 	Text,
 } from '../node_modules/ol/style.js';
 
-class MyVectorSource extends VectorSource {
+// Source of geoJSON vector layers
+export class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
 				strategy: bbox,
@@ -71,7 +75,8 @@ class MyVectorSource extends VectorSource {
 	}
 }
 
-class MyClusterSource extends Cluster {
+// Clustered source
+export class MyClusterSource extends Cluster {
 	constructor(options) {
 		super({ // Cluster source
 			source: new MyVectorSource(options), // Wrapped source
@@ -130,6 +135,7 @@ class MyClusterSource extends Cluster {
 	}
 }
 
+// Facilities added vector layer
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
@@ -409,7 +415,7 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 	return stylesOpt;
 }
 
-export function labelStyleOptions(feature, text /*, textStyleOptions*/ ) {
+export function labelStyleOptions(feature, text) {
 	const elLabel = document.createElement('span'),
 		area = getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
 
@@ -432,7 +438,6 @@ export function labelStyleOptions(feature, text /*, textStyleOptions*/ ) {
 			backgroundStroke: new Stroke({
 				color: 'blue',
 			}),
-			//...textStyleOptions, //TODO DELETE ???
 		}),
 	};
 }

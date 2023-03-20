@@ -3,6 +3,19 @@
  * Requires controlButton
  * Need to include controls.js & controls.css
  */
+import Control from '../node_modules/ol/control/Control';
+import Feature from '../node_modules/ol/Feature.js';
+import Geolocation from '../node_modules/ol/Geolocation.js';
+import GeometryCollection from '../node_modules/ol/geom/GeometryCollection.js';
+import LineString from '../node_modules/ol/geom/LineString.js';
+import MultiLineString from '../node_modules/ol/geom/MultiLineString.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import {
+	Fill,
+	Stroke,
+	Style,
+} from '../node_modules/ol/style.js';
 import {
 	controlButton,
 } from '../src/Controls.js';
@@ -46,18 +59,18 @@ export function controlGPS(options) {
 		}),
 
 		// Graticule
-		graticuleFeature = new ol.Feature(), //BEST Use ol.layer.Graticule
-		northGraticuleFeature = new ol.Feature(),
-		graticuleLayer = new ol.layer.Vector({
-			source: new ol.source.Vector({
+		graticuleFeature = new Feature(), //BEST Use layer Graticule
+		northGraticuleFeature = new Feature(),
+		graticuleLayer = new VectorLayer({
+			source: new VectorSource({
 				features: [graticuleFeature, northGraticuleFeature],
 			}),
 			zIndex: 20, // Above the features
-			style: new ol.style.Style({
-				fill: new ol.style.Fill({
+			style: new Style({
+				fill: new Fill({
 					color: 'rgba(128,128,255,0.2)',
 				}),
-				stroke: new ol.style.Stroke({
+				stroke: new Stroke({
 					color: '#20b',
 					lineDash: [16, 14],
 					width: 1,
@@ -68,16 +81,16 @@ export function controlGPS(options) {
 
 	control.element.appendChild(statusEl);
 
-	graticuleFeature.setStyle(new ol.style.Style({
-		stroke: new ol.style.Stroke({
+	graticuleFeature.setStyle(new Style({
+		stroke: new Stroke({
 			color: '#000',
 			lineDash: [16, 14],
 			width: 1,
 		}),
 	}));
 
-	northGraticuleFeature.setStyle(new ol.style.Style({
-		stroke: new ol.style.Stroke({
+	northGraticuleFeature.setStyle(new Style({
+		stroke: new Stroke({
 			color: '#c00',
 			lineDash: [16, 14],
 			width: 1,
@@ -85,15 +98,15 @@ export function controlGPS(options) {
 	}));
 
 	let geolocation;
-	ol.gpsValues = {}; // Store the measures for internal use & other controls
+	window.gpsValues = {}; // Store the measures for internal use & other controls
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		Control.prototype.setMap.call(this, map);
 
 		map.addLayer(graticuleLayer);
 		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom
 
-		geolocation = new ol.Geolocation({
+		geolocation = new Geolocation({
 			projection: map.getView().getProjection(),
 			trackingOptions: {
 				enableHighAccuracy: true,
@@ -109,7 +122,7 @@ export function controlGPS(options) {
 
 		// Browser heading from the inertial & magnetic sensors
 		window.addEventListener('deviceorientationabsolute', function(evt) {
-			ol.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			window.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
 			control.renderGPS(evt);
 		});
 	};
@@ -128,7 +141,7 @@ export function controlGPS(options) {
 		if (evt.target.name == 'myol-gps-source') {
 			geolocation.setTracking(sourceLevel > 0);
 			graticuleLayer.setVisible(false);
-			ol.gpsValues = {}; // Reset the values
+			window.gpsValues = {}; // Reset the values
 			if (!sourceLevel)
 				displayEls[0].checked = true;
 			if (sourceLevel && displayLevel == 0)
@@ -139,23 +152,23 @@ export function controlGPS(options) {
 		['Position', 'AccuracyGeometry', 'Speed', 'Altitude'].forEach(valueName => {
 			const value = geolocation['get' + valueName]();
 			if (value)
-				ol.gpsValues[valueName.toLowerCase()] = value;
+				window.gpsValues[valueName.toLowerCase()] = value;
 		});
 
 		// State 1 only takes positions from the GPS (which have an altitude)
-		if (sourceLevel == 1 && !ol.gpsValues.altitude)
-			ol.gpsValues.position = null;
+		if (sourceLevel == 1 && !window.gpsValues.altitude)
+			window.gpsValues.position = null;
 
 		// Render position & graticule
-		if (map && view && sourceLevel && ol.gpsValues.position) {
+		if (map && view && sourceLevel && window.gpsValues.position) {
 			// Estimate the viewport size to draw a visible graticule
-			const p = ol.gpsValues.position,
+			const p = window.gpsValues.position,
 				hg = map.getCoordinateFromPixel([0, 0]),
 				bd = map.getCoordinateFromPixel(map.getSize()),
 				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
 				// The graticule
 				geometry = [
-					new ol.geom.MultiLineString([
+					new MultiLineString([
 						[
 							[p[0] - far, p[1]],
 							[p[0] + far, p[1]]
@@ -168,18 +181,18 @@ export function controlGPS(options) {
 				],
 				// Color north in red
 				northGeometry = [
-					new ol.geom.LineString([
+					new LineString([
 						[p[0], p[1]],
 						[p[0], p[1] + far]
 					]),
 				];
 
 			// The accuracy circle
-			if (ol.gpsValues.accuracygeometry)
-				geometry.push(ol.gpsValues.accuracygeometry);
+			if (window.gpsValues.accuracygeometry)
+				geometry.push(window.gpsValues.accuracygeometry);
 
-			graticuleFeature.setGeometry(new ol.geom.GeometryCollection(geometry));
-			northGraticuleFeature.setGeometry(new ol.geom.GeometryCollection(northGeometry));
+			graticuleFeature.setGeometry(new GeometryCollection(geometry));
+			northGraticuleFeature.setGeometry(new GeometryCollection(northGeometry));
 
 			// Center the map
 			if (displayLevel > 0)
@@ -188,14 +201,14 @@ export function controlGPS(options) {
 			// Orientation
 			if (!sourceLevel || displayLevel == 1)
 				view.setRotation(0);
-			else if (ol.gpsValues.heading && displayLevel == 2)
+			else if (window.gpsValues.heading && displayLevel == 2)
 				view.setRotation(
-					Math.PI / 180 * (ol.gpsValues.heading - screen.orientation.angle) // Delivered ° reverse clockwize
+					Math.PI / 180 * (window.gpsValues.heading - screen.orientation.angle) // Delivered ° reverse clockwize
 				);
 
 			// Zoom on the area
-			if (!ol.gpsValues.isZoomed) { // Only the first time after activation
-				ol.gpsValues.isZoomed = true;
+			if (!window.gpsValues.isZoomed) { // Only the first time after activation
+				window.gpsValues.isZoomed = true;
 				view.setZoom(17);
 
 				// Close submenu when GPS locates
@@ -207,11 +220,11 @@ export function controlGPS(options) {
 			view.setRotation(0); // Return to inactive state
 
 		// Display data under the button
-		let status = ol.gpsValues.position ? '' : 'Sync...';
-		if (ol.gpsValues.altitude) {
-			status = Math.round(ol.gpsValues.altitude) + ' m';
-			if (ol.gpsValues.speed)
-				status += ' ' + (Math.round(ol.gpsValues.speed * 36) / 10) + ' km/h';
+		let status = window.gpsValues.position ? '' : 'Sync...';
+		if (window.gpsValues.altitude) {
+			status = Math.round(window.gpsValues.altitude) + ' m';
+			if (window.gpsValues.speed)
+				status += ' ' + (Math.round(window.gpsValues.speed * 36) / 10) + ' km/h';
 		}
 		if (statusEl)
 			statusEl.innerHTML = sourceLevel ? status : '';

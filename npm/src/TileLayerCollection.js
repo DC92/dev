@@ -1,3 +1,6 @@
+/**
+ * This file implements various acces to tiles layers services
+ */
 import BingMaps from '../node_modules/ol/source/BingMaps.js';
 import OSM from '../node_modules/ol/source/OSM.js';
 import Stamen from '../node_modules/ol/source/Stamen.js';

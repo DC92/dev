@@ -2,11 +2,14 @@
  * GPX file loader control
  * Requires controlButton
  */
+import {
+	controlButton,
+} from '../src/Controls.js';
 
 //BEST export / import names and links
 //BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
 //BEST misc formats
-function controlLoadGPX(opt) {
+export function controlLoadGPX(opt) {
 	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
@@ -111,7 +114,7 @@ function controlLoadGPX(opt) {
  * Requires controlButton
  */
 //BEST BUG incompatible with clusters
-function controlDownload(opt) {
+export function controlDownload(opt) {
 	const options = {
 			label: '&#x1f4e5;',
 			className: 'myol-button-download',

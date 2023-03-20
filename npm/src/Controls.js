@@ -2,11 +2,7 @@
  * Add some usefull controls
  * Need to include controls.css
  */
-
-/**
- * Control button
- * Abstract definition to be used by other control buttons definitions
- */
+//TODO BUG Circular dependencies Files.js, Geolocation.js -> Controls.js
 import Attribution from '../node_modules/ol/control/Attribution';
 import Control from '../node_modules/ol/control/Control';
 import FullScreen from '../node_modules/ol/control/FullScreen';
@@ -15,9 +11,27 @@ import MouseWheelZoom from '../node_modules/ol/interaction/MouseWheelZoom';
 import ScaleLine from '../node_modules/ol/control/ScaleLine';
 import Zoom from '../node_modules/ol/control/Zoom';
 import {
+	createStringXY,
+} from '../node_modules/ol/coordinate.js';
+import {
+	transform,
+} from '../node_modules/ol/proj.js';
+import {
+	getDistance,
+	getLength,
+} from '../node_modules/ol/sphere.js';
+import {
+	controlLoadGPX,
+	controlDownload,
+} from '../src/Files.js';
+import {
 	controlGPS,
 } from '../src/Geolocation.js';
 
+/**
+ * Control button
+ * Abstract definition to be used by other control buttons definitions
+ */
 export function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),
@@ -144,7 +158,7 @@ export function controlPermalink(opt) {
 
 			view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
 
-			view.setCenter(ol.proj.transform([
+			view.setCenter(transform([
 				urlMod.match(/lon=(-?[0-9\.]+)/)[1],
 				urlMod.match(/lat=(-?[0-9\.]+)/)[1],
 			], 'EPSG:4326', 'EPSG:3857'));
@@ -152,7 +166,7 @@ export function controlPermalink(opt) {
 
 		// Set the permalink with current map zoom & position
 		if (view.getCenter()) {
-			const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+			const ll4326 = transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 				newParams = 'map=' +
 				(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
 				(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
@@ -178,16 +192,16 @@ export function controlMousePosition(options) {
 		placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
 
 		coordinateFormat: function(mouse) {
-			//BEST find better than ol.gpsValues to share info
-			if (ol.gpsValues && ol.gpsValues.position) {
-				const ll4326 = ol.proj.transform(ol.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
-					distance = ol.sphere.getDistance(mouse, ll4326);
+			//BEST find better than window.gpsValues to share info
+			if (window.gpsValues && window.gpsValues.position) {
+				const ll4326 = transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
+					distance = getDistance(mouse, ll4326);
 
 				return distance < 1000 ?
 					(Math.round(distance)) + ' m' :
 					(Math.round(distance / 10) / 100) + ' km';
 			} else
-				return ol.coordinate.createStringXY(4)(mouse);
+				return createStringXY(4)(mouse);
 		},
 		...options,
 	});
@@ -231,7 +245,7 @@ export function controlLengthLine() {
 	function calculateLength(feature) {
 		if (feature) {
 			let geometry = feature.getGeometry(),
-				length = ol.sphere.getLength(geometry),
+				length = getLength(geometry),
 				fcs = getFlatCoordinates(geometry),
 				denivPos = 0,
 				denivNeg = 0;
@@ -346,7 +360,7 @@ export function controlPrint(options) {
 			'<p>-imprimer.</p>' +
 			'<label><input type="radio" name="myol-po" value="0" ctrlonchange="resizeDraftPrint">Portrait A4</label>' +
 			'<label><input type="radio" name="myol-po" value="1" ctrlonchange="resizeDraftPrint">Paysage A4</label>' +
-			'<a onclick="printMap()">Imprimer</a>' +
+			'<a onclick="window.printMap()">Imprimer</a>' +
 			'<a onclick="location.reload()">Annuler</a>',
 		...options,
 	});
@@ -390,7 +404,7 @@ export function controlPrint(options) {
 		});
 	};
 
-	printMap = function() {
+	window.printMap = function() { //TODO resorb window
 		control.resizeDraftPrint();
 		control.getMap().once('rendercomplete', function() {
 			window.print();
