@@ -26,6 +26,7 @@ import {
 
 function layerVector() {} //TODO RESORB
 
+
 // chemineur.fr, alpages.info
 export function layerGeoBB(options) {
 	return layerVectorCluster({

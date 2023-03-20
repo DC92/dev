@@ -3,7 +3,7 @@
  * Requires controlButton
  * Need to include controls.js & controls.css
  */
-import Control from '../node_modules/ol/control/Control';
+import Control from '../node_modules/ol/control/Control.js';
 import Feature from '../node_modules/ol/Feature.js';
 import Geolocation from '../node_modules/ol/Geolocation.js';
 import GeometryCollection from '../node_modules/ol/geom/GeometryCollection.js';
@@ -19,6 +19,7 @@ import {
 import {
 	controlButton,
 } from '../src/Controls.js';
+
 
 // class GeolocationControl ...
 export function controlGPS(options) {

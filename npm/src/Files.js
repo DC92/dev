@@ -2,9 +2,27 @@
  * GPX file loader control
  * Requires controlButton
  */
+import Feature from '../node_modules/ol/Feature.js';
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import GPX from '../node_modules/ol/format/GPX.js';
+import Icon from '../node_modules/ol/style/Icon.js';
+import KML from '../node_modules/ol/format/KML.js';
+import LineString from '../node_modules/ol/geom/LineString.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import {
+	createEmpty,
+	extend,
+	isEmpty,
+} from '../node_modules/ol/extent.js';
+import {
+	Stroke,
+	Style,
+} from '../node_modules/ol/style.js';
 import {
 	controlButton,
 } from '../src/Controls.js';
+
 
 //BEST export / import names and links
 //BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
@@ -52,7 +70,7 @@ export function controlLoadGPX(opt) {
 
 	function loadText(text) {
 		const map = control.getMap(),
-			format = new ol.format.GPX(),
+			format = new GPX(),
 			features = format.readFeatures(text, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
@@ -64,21 +82,21 @@ export function controlLoadGPX(opt) {
 
 		if (added !== false) { // If one used the feature
 			// Display the track on the map
-			const gpxSource = new ol.source.Vector({
+			const gpxSource = new VectorSource({
 					format: format,
 					features: features,
 				}),
-				gpxLayer = new ol.layer.Vector({
+				gpxLayer = new VectorLayer({
 					source: gpxSource,
 					style: function(feature) {
 						const properties = feature.getProperties();
 
-						return new ol.style.Style({
-							stroke: new ol.style.Stroke({
+						return new Style({
+							stroke: new Stroke({
 								color: 'blue',
 								width: 3,
 							}),
-							image: properties.sym ? new ol.style.Icon({
+							image: properties.sym ? new Icon({
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.svg',
 							}) : null,
 						});
@@ -88,12 +106,12 @@ export function controlLoadGPX(opt) {
 		}
 
 		// Zoom the map on the added features
-		const extent = ol.extent.createEmpty();
+		const extent = createEmpty();
 
 		for (let f in features) //BEST try to create a geometry
-			ol.extent.extend(extent, features[f].getGeometry().getExtent());
+			extend(extent, features[f].getGeometry().getExtent());
 
-		if (ol.extent.isEmpty(extent))
+		if (isEmpty(extent))
 			alert('Fichier GPX vide');
 		else
 			map.getView().fit(extent, {
@@ -136,7 +154,7 @@ export function controlDownload(opt) {
 	control.download = function(evt) {
 		const formatName = evt.target.id,
 			mime = evt.target.getAttribute('mime'),
-			format = new ol.format[formatName](),
+			format = new [formatName](), //TODO BUG
 			map = control.getMap();
 		let features = [],
 			extent = map.getView().calculateExtent();
@@ -165,11 +183,11 @@ export function controlDownload(opt) {
 					geometry.getCoordinates().forEach(coords => {
 						if (typeof coords[0][0] == 'number')
 							// Polygon
-							features.push(new ol.Feature(new ol.geom.LineString(coords)));
+							features.push(new Feature(new LineString(coords)));
 						else
 							// MultiPolygon
 							coords.forEach(subCoords =>
-								features.push(new ol.Feature(new ol.geom.LineString(subCoords)))
+								features.push(new Feature(new LineString(subCoords)))
 							);
 					});
 				}

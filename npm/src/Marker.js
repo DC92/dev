@@ -6,21 +6,47 @@
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
-function layerMarker(opt) {
+import proj4 from '../node_modules/proj4/lib/index.js'; //TODO BUG
+
+import Feature from '../node_modules/ol/Feature.js';
+import Icon from '../node_modules/ol/style/Icon.js';
+import Point from '../node_modules/ol/geom/Point.js';
+import Pointer from '../node_modules/ol/interaction/Pointer.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import {
+	toStringHDMS,
+} from '../node_modules/ol/coordinate.js';
+import {
+	containsCoordinate,
+} from '../node_modules/ol/extent.js';
+import {
+	transform,
+} from '../node_modules/ol/proj.js';
+import {
+	register
+} from '../node_modules/ol/proj/proj4.js';
+import {
+	Style,
+} from '../node_modules/ol/style.js';
+
+
+// Layer to display a marker
+export function layerMarker(opt) {
 	const options = {
 			position: [0, 0],
 			...opt,
 		},
 		els = [],
-		point = new ol.geom.Point(options.position),
-		source = new ol.source.Vector({
-			features: [new ol.Feature(point)],
+		point = new Point(options.position),
+		source = new VectorSource({
+			features: [new Feature(point)],
 		}),
-		layer = new ol.layer.Vector({
+		layer = new VectorLayer({
 			source: source,
 			zIndex: 1000, // Above points
-			style: new ol.style.Style({
-				image: new ol.style.Icon({
+			style: new Style({
+				image: new Icon({
 					src: options.src,
 				}),
 			}),
@@ -43,7 +69,7 @@ function layerMarker(opt) {
 			proj4.defs('EPSG:' + (32700 + u), '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
 		}
 
-		ol.proj.proj4.register(proj4);
+		register(proj4);
 	}
 
 	// Collect all entries elements
@@ -98,7 +124,7 @@ function layerMarker(opt) {
 			// Edit the marker position
 			if (options.dragable) {
 				// Drag the marker
-				map.addInteraction(new ol.interaction.Pointer({
+				map.addInteraction(new Pointer({
 					handleDownEvent: function(evt) {
 						return map.getFeaturesAtPixel(evt.pixel, {
 							layerFilter: function(l) {
@@ -133,7 +159,7 @@ function layerMarker(opt) {
 		if (!pos[0] && !pos[1])
 			return;
 
-		const ll4326 = ol.proj.transform([
+		const ll4326 = transform([
 			// Protection against non-digital entries / transform , into .
 			parseFloat(pos[0].toString().replace(/[^-0-9]+/, '.')),
 			parseFloat(pos[1].toString().replace(/[^-0-9]+/, '.'))
@@ -141,9 +167,9 @@ function layerMarker(opt) {
 
 		ll4326[0] -= Math.round(ll4326[0] / 360) * 360; // Wrap +-180°
 
-		const ll3857 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
+		const ll3857 = transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
 			inEPSG21781 = typeof proj4 == 'function' &&
-			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
+			containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
 		// Move the marker
 		point.setCoordinates(ll3857);
@@ -160,14 +186,14 @@ function layerMarker(opt) {
 		// Display
 		const strings = {
 			dec: 'Lon: ' + els.lon.value + ', Lat: ' + els.lat.value,
-			dms: ol.coordinate.toStringHDMS(ll4326),
+			dms: toStringHDMS(ll4326),
 		};
 
 		if (inEPSG21781) {
-			const ll21781 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
+			const ll21781 = transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
 				z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
 				u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
-				llutm = ol.proj.transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
+				llutm = transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
 
 			// UTM zones
 			strings.utm = ' UTM ' + z +

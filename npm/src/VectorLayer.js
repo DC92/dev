@@ -26,6 +26,7 @@ import {
 	Text,
 } from '../node_modules/ol/style.js';
 
+
 // Source of geoJSON vector layers
 export class MyVectorSource extends VectorSource {
 	constructor(opt) {

@@ -12,17 +12,10 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
-
-	<!-- Proj4 projections Swiss -->
-	<script src="../proj4/proj4-src.js"></script>
-
-	<!-- My Openlayers -->
+	<script src="../node_modules/rbush/rbush.js"></script>
+	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<script src="../src/controls.js"></script>
-	<script src="../src/marker.js"></script>
+	<script src="../nodxe_modules/proj4/dist/proj4-src.js"></script>
 
 	<style>
 		#map {
@@ -72,20 +65,32 @@ Based on https://openlayers.org
 
 	<p>Double clic sur la carte y déplace le curseur.</p>
 
-	<script>
-new ol.Map({
+	<script type="module">
+import Map from '../node_modules/ol/Map.js';
+import OSM from '../node_modules/ol/source/OSM.js';
+import TileLayer from '../node_modules/ol/layer/Tile.js';
+import View from '../node_modules/ol/View.js';
+import Zoom from '../node_modules/ol/control/Zoom.js';
+import {
+	controlMousePosition,
+} from '../src/Controls.js';
+import {
+	layerMarker,
+} from '../src/Marker.js';
+
+new Map({
 	target: 'map',
 	controls: [
-		new ol.control.Zoom(),
+		new Zoom(),
 		controlMousePosition(),
 	],
-	view: new ol.View({
+	view: new View({
 		center: [300000, 5800000],
 		zoom: 8,
 	}),
 	layers: [
-		new ol.layer.Tile({
-			source: new ol.source.OSM(),
+		new TileLayer({
+			source: new OSM(),
 		}),
 		layerMarker({
 			src: 'images/cadre.png',

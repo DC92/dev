@@ -17,6 +17,7 @@ import {
 	get as getProjection,
 } from '../node_modules/ol/proj.js';
 
+
 // OpenStreetMap & co
 export class OsmTileLayer extends TileLayer {
 	constructor(options) {
@@ -289,7 +290,7 @@ function layerGoogle(subLayer) {
  * options.imagerySet: sublayer
  * options.key: Get your own (free) key at https://www.bingmapsportal.com
  * Doc at: https://docs.microsoft.com/en-us/bingmaps/getting-started/
- * attributions: defined by ol.source.BingMaps
+ * attributions: defined by source/BingMaps
  */
 function layerBing(options) {
 	if (options && options.key) { // Don't display if no key provided
