@@ -1,10 +1,36 @@
 /**
  * geoJson lines & polygons edit
- * Requires JSONparse, controlButton (from src/controls.js)
  */
-function layerEditGeoJson(opt) {
+import Control from '../node_modules/ol/control/Control.js';
+import Draw from '../node_modules/ol/interaction/Draw.js';
+import Feature from '../node_modules/ol/Feature.js';
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import LineString from '../node_modules/ol/geom/LineString.js';
+import Modify from '../node_modules/ol/interaction/Modify.js';
+import Polygon from '../node_modules/ol/geom/Polygon.js';
+import Snap from '../node_modules/ol/interaction/Snap.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import {
+	createEmpty,
+	extend,
+} from '../node_modules/ol/extent.js';
+import {
+	Circle,
+	Fill,
+	Stroke,
+	Style,
+	Text,
+} from '../node_modules/ol/style.js';
+import {
+	controlButton,
+} from '../src/controls.js';
+
+
+// Editor
+export function layerEditGeoJson(opt) {
 	const options = {
-			format: new ol.format.GeoJSON(),
+			format: new GeoJSON(),
 			projection: 'EPSG:3857',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 			focus: false, // Zoom the map on the loaded features
@@ -13,7 +39,7 @@ function layerEditGeoJson(opt) {
 			readFeatures: function() {
 				return options.format.readFeatures(
 					options.geoJson ||
-					JSONparse(geoJsonValue || '{"type":"FeatureCollection","features":[]}'), {
+					geoJsonValue || '{"type":"FeatureCollection","features":[]}', {
 						featureProjection: options.projection,
 					});
 			},
@@ -50,15 +76,15 @@ function layerEditGeoJson(opt) {
 				'<hr/><div id="myol-help-edit"></div>',
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
-		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',
-		styleDisplay = new ol.style.Style({
+		geoJsonValue = geoJsonEl ? JSON.parse(geoJsonEl.value) : '', //TODO JSONparse
+		styleDisplay = new Style({
 			// Lines or polygons border
-			stroke: new ol.style.Stroke({
+			stroke: new Stroke({
 				color: 'red',
 				width: 2,
 			}),
 			// Polygons
-			fill: new ol.style.Fill({
+			fill: new Fill({
 				color: 'rgba(0,0,255,0.2)',
 			}),
 		}),
@@ -72,25 +98,25 @@ function layerEditGeoJson(opt) {
 			};
 
 			return [
-				new ol.style.Style({
-					image: new ol.style.Circle({ // Marker
+				new Style({
+					image: new Circle({ // Marker
 						radius: 4,
-						stroke: new ol.style.Stroke({
+						stroke: new Stroke({
 							color: 'red',
 							width: 2,
 						}),
 					}),
-					stroke: new ol.style.Stroke({ // Lines or polygons border
+					stroke: new Stroke({ // Lines or polygons border
 						color: 'red',
 						width: 4,
 					}),
-					fill: new ol.style.Fill({ // Polygons
+					fill: new Fill({ // Polygons
 						color: 'rgba(255,0,0,0.3)',
 					}),
-					text: new ol.style.Text(textStyle), // Direction
+					text: new Text(textStyle), // Direction
 				}),
-				new ol.style.Style({
-					text: new ol.style.Text({
+				new Style({
+					text: new Text({
 						...textStyle,
 						textAlign: 'start',
 						text: 'A',
@@ -99,34 +125,34 @@ function layerEditGeoJson(opt) {
 			];
 		},
 		features = options.readFeatures(),
-		source = new ol.source.Vector({
+		source = new VectorSource({
 			features: features,
 			wrapX: false,
 		}),
-		layer = new ol.layer.Vector({
+		layer = new VectorLayer({
 			source: source,
 			zIndex: 20, // Editor & cursor : above the features
 			style: styleDisplay,
 		}),
 		interactions = [
-			new ol.interaction.Modify({ // 0 Modify
+			new Modify({ // 0 Modify
 				source: source,
 				pixelTolerance: 16, // Default is 10
 				style: editStyle,
 			}),
-			new ol.interaction.Draw({ // 1 drawLine
+			new Draw({ // 1 drawLine
 				style: editStyle,
 				source: source,
 				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
 				type: 'LineString',
 			}),
-			new ol.interaction.Draw({ // 2 drawPoly
+			new Draw({ // 2 drawPoly
 				style: editStyle,
 				source: source,
 				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
 				type: 'Polygon',
 			}),
-			new ol.interaction.Snap({ // 3 snap
+			new Snap({ // 3 snap
 				source: source,
 				pixelTolerance: 7.5, // 6 + line width / 2 : default is 10
 			}),
@@ -140,7 +166,7 @@ function layerEditGeoJson(opt) {
 	control.layer = layer; // For user's usage
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		Control.prototype.setMap.call(this, map);
 
 		optimiseEdited(); // Treat the geoJson input as any other edit
 		map.addLayer(layer);
@@ -148,10 +174,10 @@ function layerEditGeoJson(opt) {
 
 		// Zoom the map on the loaded features
 		if (options.focus && features.length) {
-			const extent = ol.extent.createEmpty(); // For focus on all features calculation
+			const extent = createEmpty(); // For focus on all features calculation
 
 			for (let f in features)
-				ol.extent.extend(extent, features[f].getGeometry().getExtent());
+				extend(extent, features[f].getGeometry().getExtent());
 
 			map.getView().fit(extent, {
 				maxZoom: options.focus,
@@ -301,12 +327,12 @@ function layerEditGeoJson(opt) {
 		source.clear();
 
 		for (let l in coordinates.lines)
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.LineString(coordinates.lines[l]),
+			source.addFeature(new Feature({
+				geometry: new LineString(coordinates.lines[l]),
 			}));
 		for (let p in coordinates.polys)
-			source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(coordinates.polys[p]),
+			source.addFeature(new Feature({
+				geometry: new Polygon(coordinates.polys[p]),
 			}));
 
 		// Save geometries in <EL> as geoJSON at every change
@@ -380,7 +406,7 @@ function layerEditGeoJson(opt) {
 		for (let p1 in polys) // Explore all Polygons combinaison
 			if (holes && // Make holes option
 				polys[p1]) {
-				const fs = new ol.geom.Polygon(polys[p1]);
+				const fs = new Polygon(polys[p1]);
 				for (let p2 in polys)
 					if (polys[p2] && p1 != p2) {
 						let intersects = true;

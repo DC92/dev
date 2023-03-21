@@ -10,7 +10,7 @@ import {demoTileLayer} from '../src/TileLayerCollection.js';
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
 // Functions defining the maps of refuges.info
-//TODO mettre et tester les conctions de cartes WRI
+//TODO mettre et tester les fonctions de cartes WRI
 export var index = new Map({
 		target: 'map',
 		view: new View({

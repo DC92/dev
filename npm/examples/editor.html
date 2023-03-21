@@ -12,17 +12,10 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
-
-	<!-- My Openlayers -->
-	<script src="../src/header.js"></script><!-- For JSONparse -->
+	<script src="../node_modules/rbush/rbush.js"></script>
+	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<script src="../src/controls.js"></script><!-- Upload / download demo -->
-	<script src="../src/files.js"></script><!-- Upload / download demo -->
 	<link href="../src/editor.css" type="text/css" rel="stylesheet">
-	<script src="../src/editor.js"></script>
 
 	<style>
 		#map {
@@ -146,14 +139,35 @@ Based on https://openlayers.org
 		}]
 	}' />
 
-	<script>
-const snaplayer = new ol.layer.Vector({
-		source: new ol.source.Vector({
+	<script type="module">
+import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
+import Map from '../node_modules/ol/Map.js';
+import OSM from '../node_modules/ol/source/OSM.js';
+import Tile from '../node_modules/ol/layer/Tile.js';
+import VectorLayer from '../node_modules/ol/layer/Vector.js';
+import VectorSource from '../node_modules/ol/source/Vector.js';
+import View from '../node_modules/ol/View.js';
+import Zoom from '../node_modules/ol/control/Zoom.js';
+import {
+	Stroke,
+	Style,
+} from '../node_modules/ol/style.js';
+import {
+	layerEditGeoJson,
+} from '../src/Editor.js';
+import {
+	controlLoadGPX,
+	controlDownload,
+} from '../src/Files.js';
+
+// Layers
+const snaplayer = new VectorLayer({
+		source: new VectorSource({
 			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-			format: new ol.format.GeoJSON(),
+			format: new GeoJSON(),
 		}),
-		style: new ol.style.Style({
-			stroke: new ol.style.Stroke(),
+		style: new Style({
+			stroke: new Stroke(),
 		}),
 	}),
 
@@ -168,14 +182,15 @@ const snaplayer = new ol.layer.Vector({
 		],
 	});
 
-new ol.Map({
+// Map
+new Map({
 	target: 'map',
-	view: new ol.View({
+	view: new View({
 		center: [600000, 5800000],
 		zoom: 6,
 	}),
 	controls: [
-		new ol.control.Zoom(),
+		new Zoom(),
 		controlLoadGPX(),
 		controlDownload({
 			savedLayer: controlEditor.layer,
@@ -183,8 +198,8 @@ new ol.Map({
 		controlEditor,
 	],
 	layers: [
-		new ol.layer.Tile({
-			source: new ol.source.OSM(),
+		new Tile({
+			source: new OSM(),
 		}),
 		snaplayer,
 	],
