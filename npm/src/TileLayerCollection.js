@@ -85,6 +85,7 @@ export class ThunderforestTileLayer extends OsmTileLayer {
 				attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
 				...options, // Include key
 			});
+			else super(); //TODO ???
 	}
 }
 
@@ -121,6 +122,7 @@ export class IgnTileLayer extends TileLayer {
 				}),
 				...options,
 			});
+			else super(); //TODO ???
 	}
 }
 

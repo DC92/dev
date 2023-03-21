@@ -10,6 +10,25 @@ import {
 const banner = readFileSync('./build/banner.js', 'utf-8')
 
 export default [{
+	// Test / debug library
+	input: "build/test.js",
+	plugins: [
+		node({
+			browser: true,
+		}),
+		cjs(),
+		externalGlobals({}),
+		css({
+			output: "dist/myol.css",
+		}),
+	],
+	output: [{
+		name: "myol",
+		banner,
+		file: "./dist/test.js",
+		format: "iife",
+	}],
+}, {
 	// Full myol / compressed library
 	input: "build/index.js",
 	plugins: [
@@ -20,7 +39,7 @@ export default [{
 		externalGlobals({}),
 		css({
 			output: "dist/myol.css",
-			minify: true,
+			//minify: true,
 		}),
 		terser(),
 	],
@@ -42,7 +61,7 @@ export default [{
 		cjs(),
 		externalGlobals({}),
 		css({
-			output: "dist/myol-debug.css",
+			output: "dist/myol.css",
 		}),
 	],
 	output: [{
