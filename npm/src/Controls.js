@@ -1,20 +1,21 @@
 /**
  * Add some usefull controls
- * Need to include controls.css
  */
-import Control from '../node_modules/ol/control/Control.js';
-import MousePosition from '../node_modules/ol/control/MousePosition.js';
-import MouseWheelZoom from '../node_modules/ol/interaction/MouseWheelZoom.js';
+import Control from 'ol/control/Control.js';
+import MousePosition from 'ol/control/MousePosition.js';
+import MouseWheelZoom from 'ol/interaction/MouseWheelZoom.js';
 import {
 	createStringXY,
-} from '../node_modules/ol/coordinate.js';
+} from 'ol/coordinate.js';
 import {
 	transform,
-} from '../node_modules/ol/proj.js';
+} from 'ol/proj.js';
 import {
 	getDistance,
 	getLength,
-} from '../node_modules/ol/sphere.js';
+} from 'ol/sphere.js';
+
+import './controls.css';
 
 
 /**

@@ -1,10 +1,12 @@
 // Optimised library for refuges.info
- 
-import Map from '../node_modules/ol/Map.js';
-import View from '../node_modules/ol/View.js';
-import Attribution from '../node_modules/ol/control/Attribution';
-import Zoom from '../node_modules/ol/control/Zoom';
-import {demoTileLayer} from '../src/TileLayerCollection.js';
+import Map from 'ol/Map.js';
+import View from 'ol/View.js';
+import Attribution from 'ol/control/Attribution';
+import Zoom from 'ol/control/Zoom';
+
+import {
+	demoTileLayer
+} from '../src/TileLayerCollection.js';
 
 // Include geocoder code
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';

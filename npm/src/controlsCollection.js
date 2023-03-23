@@ -2,11 +2,12 @@
  * Add some usefull controls
  * Need to include controls.css
  */
-import Attribution from '../node_modules/ol/control/Attribution.js';
-import FullScreen from '../node_modules/ol/control/FullScreen.js';
-import MousePosition from '../node_modules/ol/control/MousePosition.js';
-import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
-import Zoom from '../node_modules/ol/control/Zoom.js';
+import Attribution from 'ol/control/Attribution.js';
+import FullScreen from 'ol/control/FullScreen.js';
+import MousePosition from 'ol/control/MousePosition.js';
+import ScaleLine from 'ol/control/ScaleLine.js';
+import Zoom from 'ol/control/Zoom.js';
+
 import {
 	controlButton,
 	controlGeocoder,
@@ -14,14 +15,14 @@ import {
 	controlMousePosition,
 	controlPermalink,
 	controlPrint,
-} from '../src/Controls.js';
+} from './Controls.js';
 import {
 	controlLoadGPX,
 	controlDownload,
-} from '../src/Files.js';
+} from './Files.js';
 import {
 	controlGPS,
-} from '../src/Geolocation.js';
+} from './Geolocation.js';
 
 
 /**

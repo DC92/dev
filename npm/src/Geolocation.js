@@ -1,24 +1,24 @@
 /**
  * GPS control
- * Requires controlButton
- * Need to include controls.js & controls.css
+ * Need to include controls.css
  */
-import Control from '../node_modules/ol/control/Control.js';
-import Feature from '../node_modules/ol/Feature.js';
-import Geolocation from '../node_modules/ol/Geolocation.js';
-import GeometryCollection from '../node_modules/ol/geom/GeometryCollection.js';
-import LineString from '../node_modules/ol/geom/LineString.js';
-import MultiLineString from '../node_modules/ol/geom/MultiLineString.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import VectorSource from '../node_modules/ol/source/Vector.js';
+import Control from 'ol/control/Control.js';
+import Feature from 'ol/Feature.js';
+import Geolocation from 'ol/Geolocation.js';
+import GeometryCollection from 'ol/geom/GeometryCollection.js';
+import LineString from 'ol/geom/LineString.js';
+import MultiLineString from 'ol/geom/MultiLineString.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
 import {
 	Fill,
 	Stroke,
 	Style,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
+
 import {
 	controlButton,
-} from '../src/Controls.js';
+} from './Controls.js';
 
 
 // class GeolocationControl ...

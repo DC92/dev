@@ -6,29 +6,29 @@
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
-import proj4 from '../node_modules/proj4/lib/index.js'; //TODO BUG
+import proj4 from 'proj4/lib/index.js';
 
-import Feature from '../node_modules/ol/Feature.js';
-import Icon from '../node_modules/ol/style/Icon.js';
-import Point from '../node_modules/ol/geom/Point.js';
-import Pointer from '../node_modules/ol/interaction/Pointer.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import VectorSource from '../node_modules/ol/source/Vector.js';
+import Feature from 'ol/Feature.js';
+import Icon from 'ol/style/Icon.js';
+import Point from 'ol/geom/Point.js';
+import Pointer from 'ol/interaction/Pointer.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
 import {
 	toStringHDMS,
-} from '../node_modules/ol/coordinate.js';
+} from 'ol/coordinate.js';
 import {
 	containsCoordinate,
-} from '../node_modules/ol/extent.js';
+} from 'ol/extent.js';
 import {
 	transform,
-} from '../node_modules/ol/proj.js';
+} from 'ol/proj.js';
 import {
 	register
-} from '../node_modules/ol/proj/proj4.js';
+} from 'ol/proj/proj4.js';
 import {
 	Style,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
 
 
 // Layer to display a marker

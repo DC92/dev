@@ -1,27 +1,27 @@
 /**
  * GPX file loader control
- * Requires controlButton
  */
-import Feature from '../node_modules/ol/Feature.js';
-import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
-import GPX from '../node_modules/ol/format/GPX.js';
-import Icon from '../node_modules/ol/style/Icon.js';
-import KML from '../node_modules/ol/format/KML.js';
-import LineString from '../node_modules/ol/geom/LineString.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import VectorSource from '../node_modules/ol/source/Vector.js';
+import Feature from 'ol/Feature.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import GPX from 'ol/format/GPX.js';
+import Icon from 'ol/style/Icon.js';
+import KML from 'ol/format/KML.js';
+import LineString from 'ol/geom/LineString.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
 import {
 	createEmpty,
 	extend,
 	isEmpty,
-} from '../node_modules/ol/extent.js';
+} from 'ol/extent.js';
 import {
 	Stroke,
 	Style,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
+
 import {
 	controlButton,
-} from '../src/Controls.js';
+} from './Controls.js';
 
 
 //BEST export / import names and links

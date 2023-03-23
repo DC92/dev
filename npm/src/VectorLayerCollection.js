@@ -1,21 +1,21 @@
 /**
  * This file implements various acces to geoJson services
- * using MyOl/src/layerVector.js
  */
-import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
-import Icon from '../node_modules/ol/style/Icon.js';
-import OSMXML from '../node_modules/ol/format/OSMXML.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import Icon from 'ol/style/Icon.js';
+import OSMXML from 'ol/format/OSMXML.js';
 import {
 	getArea,
-} from '../node_modules/ol/extent.js';
+} from 'ol/extent.js';
 import {
 	bbox,
-} from '../node_modules/ol/loadingstrategy.js';
+} from 'ol/loadingstrategy.js';
 import {
 	Fill,
 	Stroke,
 	Text,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
+
 import {
 	clusterSpreadStylesOptions,
 	fullLabelStyleOptions,
@@ -23,8 +23,6 @@ import {
 	MyVectorLayer,
 	Selector,
 } from './VectorLayer.js';
-
-function layerVector() {} //TODO RESORB
 
 
 // chemineur.fr, alpages.info

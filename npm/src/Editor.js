@@ -1,30 +1,32 @@
 /**
  * geoJson lines & polygons edit
  */
-import Control from '../node_modules/ol/control/Control.js';
-import Draw from '../node_modules/ol/interaction/Draw.js';
-import Feature from '../node_modules/ol/Feature.js';
-import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
-import LineString from '../node_modules/ol/geom/LineString.js';
-import Modify from '../node_modules/ol/interaction/Modify.js';
-import Polygon from '../node_modules/ol/geom/Polygon.js';
-import Snap from '../node_modules/ol/interaction/Snap.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import VectorSource from '../node_modules/ol/source/Vector.js';
+import Control from 'ol/control/Control.js';
+import Draw from 'ol/interaction/Draw.js';
+import Feature from 'ol/Feature.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import LineString from 'ol/geom/LineString.js';
+import Modify from 'ol/interaction/Modify.js';
+import Polygon from 'ol/geom/Polygon.js';
+import Snap from 'ol/interaction/Snap.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
 import {
 	createEmpty,
 	extend,
-} from '../node_modules/ol/extent.js';
+} from 'ol/extent.js';
 import {
 	Circle,
 	Fill,
 	Stroke,
 	Style,
 	Text,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
+
+import './editor.css';
 import {
 	controlButton,
-} from '../src/controls.js';
+} from './controls.js';
 
 
 // Editor

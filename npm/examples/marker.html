@@ -12,10 +12,8 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<script src="../node_modules/rbush/rbush.js"></script>
 	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<script src="..//TODO/node_modules/proj4/dist/proj4-src.js"></script>
 
 	<style>
 		#map {
@@ -66,11 +64,11 @@ Based on https://openlayers.org
 	<p>Double clic sur la carte y déplace le curseur.</p>
 
 	<script type="module">
-import Map from '../node_modules/ol/Map.js';
-import OSM from '../node_modules/ol/source/OSM.js';
-import TileLayer from '../node_modules/ol/layer/Tile.js';
-import View from '../node_modules/ol/View.js';
-import Zoom from '../node_modules/ol/control/Zoom.js';
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import TileLayer from 'ol/layer/Tile.js';
+import View from 'ol/View.js';
+import Zoom from 'ol/control/Zoom.js';
 import {
 	controlMousePosition,
 } from '../src/Controls.js';
@@ -86,7 +84,7 @@ new Map({
 	],
 	view: new View({
 		center: [300000, 5800000],
-		zoom: 8,
+		zoom: 5,
 	}),
 	layers: [
 		new TileLayer({

@@ -12,7 +12,6 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<script src="../node_modules/rbush/rbush.js"></script>
 	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 
 	<style>
@@ -123,19 +122,19 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script type="module">
-import FullScreen from '../node_modules/ol/control/FullScreen.js';
-import Map from '../node_modules/ol/Map.js';
-import OSM from '../node_modules/ol/source/OSM.js';
-import ScaleLine from '../node_modules/ol/control/ScaleLine.js';
-import Tile from '../node_modules/ol/layer/Tile.js';
-import View from '../node_modules/ol/View.js';
-import Zoom from '../node_modules/ol/control/Zoom.js';
+import FullScreen from 'ol/control/FullScreen.js';
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import ScaleLine from 'ol/control/ScaleLine.js';
+import Tile from 'ol/layer/Tile.js';
+import View from 'ol/View.js';
+import Zoom from 'ol/control/Zoom.js';
 import {
 	transform,
-} from '../node_modules/ol/proj.js';
+} from 'ol/proj.js';
 import {
 	VERSION,
-} from '../node_modules/ol/util.js';
+} from 'ol/util.js';
 import {
 	labelStyleOptions,
 	Selector,

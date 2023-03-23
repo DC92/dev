@@ -1,10 +1,10 @@
 /**
  * Layer switcher
- * Need to include layerSwitcher.css
  */
+import './layerSwitcher.css';
 import {
 	controlButton,
-} from '../src/Controls.js';
+} from './Controls.js';
 
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency

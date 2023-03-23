@@ -13,12 +13,7 @@ Based on https://openlayers.org
 	<link href="examples/images/favicon.png" rel="apple-touch-icon" />
 
 	<link href="dist/myol.css" type="text/css" rel="stylesheet">
-	<script src="nodqqqqqe_modules/rbush/rbush.js"></script>
     <script src="dist/test.js"></script>
-<!--
-    <script src="node_modules/ol/dist/ol.js"></script>
-    <script src="../assets/MyOl/myol.js"></script>
--->
 
 	<style>
 		#map {
@@ -52,35 +47,7 @@ Based on https://openlayers.org
 		<label><input type="checkbox" name="select-chem" value="23" />Montagne</label>
 	</div>
 
-	<script>
-
-myol.map();
-
-/*
-new myol.Map({
-	target: 'map',
-	view: new myol.View({
-		enableRotation: false,
-	}),
-	controls: [
-		...myol.controlsCollection(),
-		controlLayerSwitcher({
-			layers: layerTileCollection(),
-			selectExtId: 'select-ext',
-		}),
-	],
-	layers: [
-		layerChemineur({
-			selectName: 'select-chem',
-		}),
-		layerMarker({
-			src: 'examples/images/viseur.png',
-			dragable: true,
-		}),
-	],
-});
-*/
-	</script>
+	<script>myol.map()</script>
 
 	<h1 style="clear:both">MyOl</h1>
 	<p>Js library adding some facilities to <a href="https://openlayers.org/">Openlayers</a></p>

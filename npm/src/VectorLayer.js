@@ -1,30 +1,30 @@
 /**
  * This file adds facilities to vector layers 
  */
-import Cluster from '../node_modules/ol/source/Cluster.js';
-import Feature from '../node_modules/ol/Feature.js';
-import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
-import Point from '../node_modules/ol/geom/Point.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import VectorSource from '../node_modules/ol/source/Vector.js';
+import Cluster from 'ol/source/Cluster.js';
+import Feature from 'ol/Feature.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import Point from 'ol/geom/Point.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
 import {
 	getArea,
 	getCenter,
-} from '../node_modules/ol/extent.js';
+} from 'ol/extent.js';
 import {
 	bbox,
 	all,
-} from '../node_modules/ol/loadingstrategy.js';
+} from 'ol/loadingstrategy.js';
 import {
 	transformExtent,
-} from '../node_modules/ol/proj.js';
+} from 'ol/proj.js';
 import {
 	Circle,
 	Fill,
 	Stroke,
 	Style,
 	Text,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
 
 
 // Source of geoJSON vector layers

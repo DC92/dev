@@ -1,21 +1,21 @@
 /**
  * This file implements various acces to tiles layers services
  */
-import BingMaps from '../node_modules/ol/source/BingMaps.js';
-import OSM from '../node_modules/ol/source/OSM.js';
-import Stamen from '../node_modules/ol/source/Stamen.js';
-import WMTSTileGrid from '../node_modules/ol/tilegrid/WMTS.js';
-import TileLayer from '../node_modules/ol/layer/Tile.js';
-import TileWMS from '../node_modules/ol/source/TileWMS.js';
-import WMTS from '../node_modules/ol/source/WMTS.js';
-import XYZ from '../node_modules/ol/source/XYZ.js';
+import BingMaps from 'ol/source/BingMaps.js';
+import OSM from 'ol/source/OSM.js';
+import Stamen from 'ol/source/Stamen.js';
+import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
+import TileLayer from 'ol/layer/Tile.js';
+import TileWMS from 'ol/source/TileWMS.js';
+import WMTS from 'ol/source/WMTS.js';
+import XYZ from 'ol/source/XYZ.js';
 import {
 	getWidth,
 	getTopLeft,
-} from '../node_modules/ol/extent.js';
+} from 'ol/extent.js';
 import {
 	get as getProjection,
-} from '../node_modules/ol/proj.js';
+} from 'ol/proj.js';
 
 
 // OpenStreetMap & co

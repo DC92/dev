@@ -2,7 +2,7 @@
  
 // openlayers.org
 import 'ol/ol.css';
-export * from '../node_modules/ol/index.js';
+export * from 'ol/index.js';
 
 // MyOl
 import '../src/controls.css';
@@ -23,5 +23,5 @@ export * from '../src/editor.js';
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
-import {VERSION} from '../node_modules/ol/util.js';
+import {VERSION} from 'ol/util.js';
 console.log('OL V' + VERSION);

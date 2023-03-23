@@ -12,7 +12,6 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<script src="../node_modules/rbush/rbush.js"></script>
 	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
 	<link href="../src/controls.css" type="text/css" rel="stylesheet">
 	<!--
@@ -63,17 +62,17 @@ Based on https://openlayers.org
 	</div>
 
 	<script type="module">
-import GeoJSON from '../node_modules/ol/format/GeoJSON.js';
-import VectorLayer from '../node_modules/ol/layer/Vector.js';
-import VectorSource from '../node_modules/ol/source/Vector.js';
-import OSM from '../node_modules/ol/source/OSM.js';
-import Map from '../node_modules/ol/Map.js';
-import TileLayer from '../node_modules/ol/layer/Tile.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
+import OSM from 'ol/source/OSM.js';
+import Map from 'ol/Map.js';
+import TileLayer from 'ol/layer/Tile.js';
 import {
 	Fill,
 	Stroke,
 	Style,
-} from '../node_modules/ol/style.js';
+} from 'ol/style.js';
 import {
 	controlsCollection,
 } from '../src/controlsCollection.js';
