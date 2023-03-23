@@ -1,6 +1,7 @@
 /**
  * This file adds facilities to vector layers 
  */
+import 'ol/ol.css';
 import Cluster from 'ol/source/Cluster.js';
 import Feature from 'ol/Feature.js';
 import GeoJSON from 'ol/format/GeoJSON.js';

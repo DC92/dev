@@ -1,6 +1,7 @@
 /**
  * Add some usefull controls
  */
+import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import MousePosition from 'ol/control/MousePosition.js';
 import MouseWheelZoom from 'ol/interaction/MouseWheelZoom.js';

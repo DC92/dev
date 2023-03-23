@@ -1,7 +1,7 @@
 /**
  * Layer switcher
  */
-import './layerSwitcher.css';
+import './layerSwitcher.css'; //TODO BUG icone à gauche
 import {
 	controlButton,
 } from './Controls.js';

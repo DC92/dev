@@ -1,6 +1,7 @@
 /**
  * GPX file loader control
  */
+import 'ol/ol.css';
 import Feature from 'ol/Feature.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import GPX from 'ol/format/GPX.js';

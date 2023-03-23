@@ -1,7 +1,7 @@
 /**
  * GPS control
- * Need to include controls.css
  */
+import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import Feature from 'ol/Feature.js';
 import Geolocation from 'ol/Geolocation.js';
@@ -15,6 +15,8 @@ import {
 	Stroke,
 	Style,
 } from 'ol/style.js';
+
+import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 
 import {
 	controlButton,

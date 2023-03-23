@@ -1,7 +1,7 @@
 /**
  * Add some usefull controls
- * Need to include controls.css
  */
+import 'ol/ol.css';
 import Attribution from 'ol/control/Attribution.js';
 import FullScreen from 'ol/control/FullScreen.js';
 import MousePosition from 'ol/control/MousePosition.js';

@@ -12,10 +12,6 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
-	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<link href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-
 	<style>
 		#map {
 			width: 100%;
@@ -41,6 +37,7 @@ Based on https://openlayers.org
 	</div>
 
 	<script type="module">
+import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import Map from 'ol/Map.js';
 import OSM from 'ol/source/OSM.js';
@@ -49,9 +46,11 @@ import Tile from 'ol/layer/Tile.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
 import View from 'ol/View.js';
+
 import {
 	controlLayerSwitcher
 } from '../src/LayerSwitcher.js';
+
 
 // Vectorlayer
 const baseLayers = {

@@ -1,6 +1,7 @@
 /**
  * This file implements various acces to geoJson services
  */
+import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import Icon from 'ol/style/Icon.js';
 import OSMXML from 'ol/format/OSMXML.js';

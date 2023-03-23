@@ -62,6 +62,7 @@ Based on https://openlayers.org
 	</div>
 
 	<script type="module">
+import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
@@ -73,12 +74,11 @@ import {
 	Stroke,
 	Style,
 } from 'ol/style.js';
+
 import {
 	controlsCollection,
 } from '../src/controlsCollection.js';
-import {
-	controlGPS,
-} from '../src/Geolocation.js';
+//TODO BUG pas de geocodeur
 
 
 const geojsonObject = {

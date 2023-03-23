@@ -1,6 +1,7 @@
 /**
  * geoJson lines & polygons edit
  */
+import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import Draw from 'ol/interaction/Draw.js';
 import Feature from 'ol/Feature.js';

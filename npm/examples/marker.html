@@ -12,9 +12,6 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
-	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-
 	<style>
 		#map {
 			width: 100%;
@@ -64,6 +61,7 @@ Based on https://openlayers.org
 	<p>Double clic sur la carte y déplace le curseur.</p>
 
 	<script type="module">
+import 'ol/ol.css';
 import Map from 'ol/Map.js';
 import OSM from 'ol/source/OSM.js';
 import TileLayer from 'ol/layer/Tile.js';

@@ -12,8 +12,6 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<link href="../node_modules/ol/ol.css" type="text/css" rel="stylesheet">
-
 	<style>
 		#map {
 			width: 100%;
@@ -122,6 +120,7 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script type="module">
+import 'ol/ol.css';
 import FullScreen from 'ol/control/FullScreen.js';
 import Map from 'ol/Map.js';
 import OSM from 'ol/source/OSM.js';
@@ -132,9 +131,7 @@ import Zoom from 'ol/control/Zoom.js';
 import {
 	transform,
 } from 'ol/proj.js';
-import {
-	VERSION,
-} from 'ol/util.js';
+
 import {
 	labelStyleOptions,
 	Selector,
@@ -143,10 +140,8 @@ import {
 	LayerWri,
 } from '../src/VectorLayerCollection.js';
 
-console.log('OL V' + VERSION); //TODO move in index.html
 
-// Force selectors
-//localStorage.myol_selectwri = 'all';
+//localStorage.myol_selectwri = 'all'; // Force selectors
 
 const selecteurMassifs = new Selector('select-massif'),
 	layerWri = new LayerWri({

@@ -1,4 +1,3 @@
-import 'ol/ol.css';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 
@@ -15,7 +14,7 @@ import {
 import {VERSION} from 'ol/util.js';
 console.log('OL V' + VERSION);
 
-export function map(){
+export default function (){
 	return new Map({
 		target: 'map',
 		view: new View({
