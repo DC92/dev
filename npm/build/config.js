@@ -1,46 +1,34 @@
-import cjs from '@rollup/plugin-commonjs';
 import node from '@rollup/plugin-node-resolve';
-import terser from '@rollup/plugin-terser';
-import externalGlobals from 'rollup-plugin-external-globals';
-import css from 'rollup-plugin-import-css';
+import cjs from '@rollup/plugin-commonjs'; // Convert CommonJS module into ES module
+import css from 'rollup-plugin-import-css'; // Collect css
+import terser from '@rollup/plugin-terser'; // Rollup plugin to minify generated es bundle
 import {
-	readFileSync
+	readFileSync, // Read banner file
 } from 'fs';
 
 const banner = readFileSync('./build/banner.js', 'utf-8')
 
 export default [{
-	// Test / debug library
-	input: 'build/test.js',
+	// Demo
+	input: 'examples/demo.js',
 	plugins: [
-		node({
-			browser: true,
-		}),
+		node(),
 		cjs(),
-		externalGlobals({}),
-		css({
-			output: 'dist/myol-test.css',
-		}),
+		css(),
 	],
 	output: [{
-		name: 'myol',
+		name: 'demo',
 		banner,
-		file: './dist/test.js',
+		file: './dist/demo.js',
 		format: 'iife',
 	}],
 }, {
 	// Full myol / compressed library
 	input: 'build/index.js',
 	plugins: [
-		node({
-			browser: true,
-		}),
+		node(),
 		cjs(),
-		externalGlobals({}),
-		css({
-			output: 'dist/myol.css',
-			//minify: true,
-		}),
+		css(),
 		terser(),
 	],
 	output: [{
@@ -49,17 +37,13 @@ export default [{
 		file: './dist/myol.js',
 		format: 'umd',
 		sourcemap: true,
-		//inlineDynamicImports: true,
 	}],
 }, {
 	// Full myol / debug library
 	input: 'build/index.js',
 	plugins: [
-		node({
-			browser: true,
-		}),
+		node(),
 		cjs(),
-		externalGlobals({}),
 		css({
 			output: 'dist/myol.css',
 		}),
@@ -74,11 +58,9 @@ export default [{
 	// Compressed library for refuges.info
 	input: 'build/wri.js',
 	plugins: [
-		node({
-			browser: true,
-		}),
+		node(),
 		cjs(),
-		externalGlobals({}),
+		css(),
 		terser(),
 	],
 	output: [{
@@ -86,17 +68,14 @@ export default [{
 		file: './dist/myol-wri.js',
 		format: 'umd',
 		sourcemap: true,
-		//inlineDynamicImports: true,
 	}],
 }, {
 	// Debug library for refuges.info
 	input: 'build/wri.js',
 	plugins: [
-		node({
-			browser: true,
-		}),
+		node(),
 		cjs(),
-		externalGlobals({}),
+		css(),
 	],
 	output: [{
 		name: 'myol',

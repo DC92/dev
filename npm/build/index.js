@@ -1,5 +1,6 @@
 // This file defines the contents of the myol.js myol.css, myol.js & myol.css libraries
- 
+//TODO Don't export all ol
+
 // openlayers.org
 import 'ol/ol.css';
 export * from 'ol/index.js';

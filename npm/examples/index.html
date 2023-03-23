@@ -12,27 +12,6 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
-
-	<!-- Recherche par nom -->
-	<link href="../geocoder/ol-geocoder.css" type="text/css" rel="stylesheet">
-	<script src="../geocoder/ol-geocoder-debug.js"></script>
-
-	<!-- My Openlayers -->
-	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<link href="../src/layerSwitcher.css" type="text/css" rel="stylesheet">
-	<script src="../src/header.js"></script>
-	<script src="../src/layerTileCollection.js"></script>
-	<script src="../src/layerSwitcher.js"></script>
-	<script src="../src/layerVector.js"></script>
-	<script src="../src/layerVectorCollection.js"></script>
-	<script src="../src/controls.js"></script>
-	<script src="../src/files.js"></script>
-	<script src="../src/gps.js"></script>
-	<script src="../src/marker.js"></script>
-
 	<style>
 		#map {
 			clear: both;
@@ -66,8 +45,10 @@ Based on https://openlayers.org
 		<label><input type="checkbox" name="select-chem" value="23" />Montagne</label>
 	</div>
 
-	<script>
-const layersKeys = {
+	<script type="module">
+import demo from '../examples/demo.js';
+
+demo({
 	// Get your own (free) IGN key at https://geoservices.ign.fr/
 	ign: {key: 'iejxbx4obzhco6c8klxrfbto'},
 	// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com/dashboard
@@ -76,33 +57,7 @@ const layersKeys = {
 	os: {key: 'P8MjahLAlyDAHXEH2engwXJG6KDYsVzF'},
 	// Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
 	bing: {key: 'AldBMbaKNyat-j6CBRKxxH05uaxP7dvQu1RnMWCQEGGC3z0gjBu-bLniE_8WZvcC'},
-};
-	</script>
-	<script>
-// Must be after the <div id="map"> tag
-new ol.Map({
-	target: 'map',
-	view: new ol.View({
-		enableRotation: false,
-	}),
-	controls: [
-		...controlsCollection(),
-		controlLayerSwitcher({
-			layers: layerTileCollection(layersKeys),
-			selectExtId: 'select-ext',
-		}),
-	],
-	layers: [
-		layerChemineur({
-			selectName: 'select-chem',
-		}),
-		layerMarker({
-			src: 'images/viseur.png',
-			dragable: true,
-		}),
-	],
 });
 	</script>
-	<script src="print_script.js"></script>
 </body>
 </html>

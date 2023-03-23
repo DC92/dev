@@ -1,3 +1,4 @@
+import 'ol/ol.css';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 
@@ -14,7 +15,7 @@ import {
 import {VERSION} from 'ol/util.js';
 console.log('OL V' + VERSION);
 
-export default function (){
+export default function (layersKeys){
 	return new Map({
 		target: 'map',
 		view: new View({
@@ -23,7 +24,7 @@ export default function (){
 		controls: [
 			...controlsCollection(),
 			controlLayerSwitcher({
-				layers: collectionTileLayer(),
+				layers: collectionTileLayer(layersKeys),
 			}),
 		],
 	});
