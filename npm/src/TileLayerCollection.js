@@ -86,7 +86,8 @@ export class ThunderforestTileLayer extends OsmTileLayer {
 				attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
 				...options, // Include key
 			});
-			else super(); //TODO ???
+		else
+			super();
 	}
 }
 
@@ -123,7 +124,8 @@ export class IgnTileLayer extends TileLayer {
 				}),
 				...options,
 			});
-			else super(); //TODO ???
+		else
+			super();
 	}
 }
 
@@ -339,10 +341,11 @@ export function collectionTileLayer(options) {
 			key: 'cartes/geoportail',
 		}),
 
-		'SwissTopo': layerSwissTopo(),
+		//TODO double layer 'SwissTopo': layerSwissTopo(),
 		'Autriche': new KompassMriTileLayer(), // No key
-		'Angleterre': layerOS(options.os), // options include key
-		'Italie': layerIGM(),
+		//TODO double layer 'Angleterre': layerOS(options.os), // options include key
+		//TODO double layer 'Italie': layerIGM(),
+
 		'Espagne': layerSpain(),
 
 		'Photo Google': layerGoogle('s'),

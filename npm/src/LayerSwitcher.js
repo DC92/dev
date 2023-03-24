@@ -22,7 +22,7 @@ export function controlLayerSwitcher(options) {
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
-			.filter(([_, v]) => v != null) // Remove empty layers
+			.filter(([_, v]) => v && v.getSource()) // Remove empty layers
 		),
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
