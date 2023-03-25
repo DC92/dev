@@ -23,7 +23,7 @@ import {
 } from './Controls.js';
 
 
-// class GeolocationControl ...
+//BEST make it a class GeolocationControl
 export function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content / option

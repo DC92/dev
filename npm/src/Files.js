@@ -28,6 +28,7 @@ import {
 //BEST export / import names and links
 //BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
 //BEST misc formats
+//BEST make it a class...
 export function controlLoadGPX(opt) {
 	const options = {
 			label: '&#x1F4C2;',

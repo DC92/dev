@@ -30,6 +30,7 @@ import {
  * Requires controlButton
  * Display help contained in <TAG id="<options.submenuId>">
  */
+//BEST make it a class
 export function controlHelp(options) {
 	return controlButton({
 		label: '?',
@@ -50,7 +51,7 @@ export function controlsCollection(opt) {
 		// Top left
 		new Zoom(options.Zoom),
 		new FullScreen(options.FullScreen),
-		controlGeocoder(options.Geocoder),
+		controlGeocoder(options.Geocoder), //TODO BUG pas de geocodeur
 		controlGPS(options.GPS),
 		controlLoadGPX(options.LoadGPX),
 		controlDownload(options.Download),

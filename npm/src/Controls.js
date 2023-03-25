@@ -23,6 +23,7 @@ import './controls.css';
  * Control button
  * Abstract definition to be used by other control buttons definitions
  */
+//BEST make it a class ... & others
 export function controlButton(opt) {
 	const options = {
 			element: document.createElement('div'),

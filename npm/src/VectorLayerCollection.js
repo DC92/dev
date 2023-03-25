@@ -27,6 +27,7 @@ import {
 
 
 // chemineur.fr, alpages.info
+//BEST make it a class
 export function layerGeoBB(options) {
 	return layerVectorCluster({
 		strategy: bbox,
@@ -47,6 +48,7 @@ export function layerGeoBB(options) {
 	});
 }
 
+//BEST make it a class
 export function layerClusterGeoBB(opt) {
 	const options = {
 			disjoinClusterMaxResolution: 100,
@@ -71,6 +73,7 @@ export function layerClusterGeoBB(opt) {
 }
 
 // chemineur.fr
+//BEST make it a class
 export function layerChemineur(options) {
 	return layerClusterGeoBB({
 		host: '//chemineur.fr/',
@@ -127,6 +130,7 @@ export function chemIconUrl(type) {
 }
 
 // alpages.info
+//BEST make it a class
 export function layerAlpages(options) {
 	return layerGeoBB({
 		host: '//alpages.info/',
@@ -146,7 +150,7 @@ export function layerAlpages(options) {
 export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
-				host: 'https://dom.refuges.info/', //TODO -> www
+				host: 'https://www.refuges.info/',
 				disjoinClusterMaxResolution: 100,
 				serverClusterMinResolution: 50,
 				attribution: 'refuges.info',
@@ -218,6 +222,7 @@ export class LayerWri extends MyVectorLayer {
 	}
 }
 
+//BEST make it a class
 export function layerWri(options) {
 	return layerVectorCluster({ //BEST case of WRI without local cluster ?
 		host: '//www.refuges.info/',
@@ -244,6 +249,7 @@ export function layerWri(options) {
 	});
 }
 
+//BEST make it a class
 export function layerClusterWri(opt) {
 	const options = {
 			disjoinClusterMaxResolution: 100,
@@ -266,6 +272,7 @@ export function layerClusterWri(opt) {
 	});
 }
 
+//BEST make it a class
 export function layerWriAreas(options) {
 	/*
 	return layerVector({
@@ -315,6 +322,7 @@ export function layerWriAreas(options) {
 }
 
 // pyrenees-refuges.com
+//BEST make it a class
 export function layerPrc(options) {
 	return layerVectorCluster({
 		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -331,6 +339,7 @@ export function layerPrc(options) {
 }
 
 // camptocamp.org
+//BEST make it a class
 export function layerC2C(options) {
 	const format = new GeoJSON({ // Format of received data
 		dataProjection: 'EPSG:3857',
@@ -382,6 +391,7 @@ export function layerC2C(options) {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
+//BEST make it a class
 export function layerOverpass(opt) {
 	const options = {
 			//host: 'https://overpass-api.de',

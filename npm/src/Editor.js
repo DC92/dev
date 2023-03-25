@@ -31,6 +31,7 @@ import {
 
 
 // Editor
+//BEST make it a class
 export function layerEditGeoJson(opt) {
 	const options = {
 			format: new GeoJSON(),
@@ -61,7 +62,8 @@ export function layerEditGeoJson(opt) {
 		control = controlButton({
 			className: 'myol-button-edit',
 			label: 'E', // To be defined by changeModeEdit
-			submenuHTML: '<p>Edition:</p>' + //BEST move in .html
+			submenuHTML: '<p>Edition:</p>' +
+				//BEST move in .html / generalize aids / translation
 				'<label for="myol-edit0">' +
 				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
 				'Modification &#x1F58D;' +
