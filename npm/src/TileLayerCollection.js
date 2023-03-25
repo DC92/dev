@@ -268,18 +268,23 @@ export class OSTileLayer extends LimitedTileLayer {
 			...opt,
 		};
 
-		super({
-			extent: [-1198263, 6365000, 213000, 8702260],
-			minResolution: 2,
-			maxResolution: 1700,
-			source: new XYZ({
-				url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
-					'/{z}/{x}/{y}.png?key=' + options.key,
-				attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
-				...options, // Include key
-			}),
-			...options,
-		});
+		if (options.key) // Don't display if no key
+			super({
+				extent: [-1198263, 6365000, 213000, 8702260],
+				minResolution: 2,
+				maxResolution: 1700,
+				source: new XYZ({
+					url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
+						'/{z}/{x}/{y}.png?key=' + options.key,
+					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
+					...options, // Include key
+				}),
+				...options,
+			});
+		else
+			super({
+				maxResolution: 0, // Layer not available for LayerSwitcher
+			});
 	}
 }
 
@@ -501,9 +506,7 @@ export function demoTileLayer(options) {
 			subLayer: 'OI.OrthoimageCoverage',
 		}),
 
-		'Google road': new GoogleTileLayer({
-			subLayers: 'm',
-		}),
+		'Google road': new GoogleTileLayer(),
 		'Google terrain': new GoogleTileLayer({
 			subLayers: 'p',
 		}),
