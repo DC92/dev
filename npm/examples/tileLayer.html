@@ -76,9 +76,9 @@ const map = new Map({
 	],
 });
 
-map.getView().on('change:resolution', () =>
-	console.log('resolution = ' + Math.round(map.getView().getResolutionForZoom(map.getView().getZoom())))
-);
+map.getView().on('change:resolution', function() {
+	console.log('resolution = ' + Math.round(this.getResolutionForZoom(this.getZoom())))
+});
 	</script>
 	<script src="print_script.js"></script>
 

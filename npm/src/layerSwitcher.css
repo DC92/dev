@@ -1,6 +1,6 @@
 /* LayerSwitcher */
 .myol-button-switcher {
-	float: right;
+	float: right !important;
 }
 .myol-button-switcher > button {
 	font-style: italic;

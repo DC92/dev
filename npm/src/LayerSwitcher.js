@@ -1,7 +1,7 @@
 /**
  * Layer switcher
  */
-import './layerSwitcher.css'; //TODO BUG icone à gauche
+import './layerSwitcher.css';
 import {
 	controlButton,
 } from './Controls.js';
@@ -9,6 +9,7 @@ import {
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
+//BEST make it a class
 export function controlLayerSwitcher(options) {
 	const control = controlButton({
 			className: 'myol-button-switcher',
@@ -22,7 +23,7 @@ export function controlLayerSwitcher(options) {
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
-			.filter(([_, v]) => v && v.getSource()) // Remove empty layers
+			.filter(([_, v]) => v.getMaxResolution()) //HACK Remove non valid layers
 		),
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);
@@ -63,18 +64,11 @@ export function controlLayerSwitcher(options) {
 			labelEl.firstChild.onclick = selectBaseLayer; //BEST resorb all firstChild
 			control.submenuEl.appendChild(labelEl);
 
-			// Make all choices an array of layers
-			if (!baseLayers[name].length)
-				baseLayers[name] = [baseLayers[name]];
+			baseLayers[name].setVisible(false); // Don't begin to get the tiles yet
+			map.addLayer(baseLayers[name]);
 
 			// Mem it for further ops
 			baseLayers[name].inputEl = labelEl.firstChild; //BEST resorb
-
-			// Display the selected layer
-			for (let l = 0; l < baseLayers[name].length; l++) {
-				baseLayers[name][l].setVisible(false); // Don't begin to get the tiles yet
-				map.addLayer(baseLayers[name][l]);
-			}
 		}
 
 		// Init layers
@@ -127,10 +121,8 @@ export function controlLayerSwitcher(options) {
 			baseLayers[name].inputEl.checked = visible;
 
 			// Make the right layers visible
-			for (let l = 0; l < baseLayers[name].length; l++) {
-				baseLayers[name][l].setVisible(visible);
-				baseLayers[name][l].setOpacity(1);
-			}
+			baseLayers[name].setVisible(visible);
+			baseLayers[name].setOpacity(1);
 		}
 
 		displayTransparencyRange();
