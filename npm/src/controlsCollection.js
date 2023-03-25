@@ -1,6 +1,8 @@
 /**
  * Add some usefull controls
  */
+
+// Openlayers
 import 'ol/ol.css';
 import Attribution from 'ol/control/Attribution.js';
 import FullScreen from 'ol/control/FullScreen.js';
@@ -8,6 +10,7 @@ import MousePosition from 'ol/control/MousePosition.js';
 import ScaleLine from 'ol/control/ScaleLine.js';
 import Zoom from 'ol/control/Zoom.js';
 
+// MyOl
 import {
 	controlButton,
 	controlGeocoder,

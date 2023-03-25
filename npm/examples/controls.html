@@ -62,6 +62,7 @@ Based on https://openlayers.org
 	</div>
 
 	<script type="module">
+// Openlayers
 import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import VectorLayer from 'ol/layer/Vector.js';
@@ -75,6 +76,11 @@ import {
 	Style,
 } from 'ol/style.js';
 
+// Geocoder
+import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
+import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
+
+// MyOl
 import {
 	controlsCollection,
 } from '../src/controlsCollection.js';

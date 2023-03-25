@@ -1,6 +1,8 @@
 /**
  * GPX file loader control
  */
+
+// Openlayers
 import 'ol/ol.css';
 import Feature from 'ol/Feature.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
@@ -20,6 +22,7 @@ import {
 	Style,
 } from 'ol/style.js';
 
+// MyOl
 import {
 	controlButton,
 } from './Controls.js';

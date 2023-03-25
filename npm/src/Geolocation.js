@@ -1,6 +1,8 @@
 /**
  * GPS control
  */
+
+// Openlayers
 import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import Feature from 'ol/Feature.js';
@@ -16,8 +18,10 @@ import {
 	Style,
 } from 'ol/style.js';
 
+// Geocoder
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 
+// MyOl
 import {
 	controlButton,
 } from './Controls.js';

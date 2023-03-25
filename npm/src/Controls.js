@@ -1,6 +1,8 @@
 /**
  * Add some usefull controls
  */
+
+// Openlayers
 import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import MousePosition from 'ol/control/MousePosition.js';
@@ -16,6 +18,7 @@ import {
 	getLength,
 } from 'ol/sphere.js';
 
+// MyOl
 import './controls.css';
 
 

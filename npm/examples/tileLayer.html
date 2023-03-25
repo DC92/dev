@@ -46,17 +46,21 @@ const layersKeys = {
 };
 	</script>
 	<script type="module">
+// Openlayers
 import 'ol/ol.css';
 import Attribution from 'ol/control/Attribution';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import Zoom from 'ol/control/Zoom';
+
+// MyOl
 import {
 	controlLayerSwitcher,
 } from '../src/LayerSwitcher.js';
 import {
 	demoTileLayer,
 } from '../src/TileLayerCollection.js';
+
 
 const map = new Map({
 	target: 'map',

@@ -61,18 +61,22 @@ Based on https://openlayers.org
 	<p>Double clic sur la carte y déplace le curseur.</p>
 
 	<script type="module">
+// Openlayers
 import 'ol/ol.css';
 import Map from 'ol/Map.js';
 import OSM from 'ol/source/OSM.js';
 import TileLayer from 'ol/layer/Tile.js';
 import View from 'ol/View.js';
 import Zoom from 'ol/control/Zoom.js';
+
+// MyOl
 import {
 	controlMousePosition,
 } from '../src/Controls.js';
 import {
 	layerMarker,
 } from '../src/Marker.js';
+
 
 new Map({
 	target: 'map',

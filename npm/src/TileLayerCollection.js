@@ -1,6 +1,8 @@
 /**
  * This file implements various acces to tiles layers services
  */
+
+// Openlayers
 import 'ol/ol.css';
 import BingMaps from 'ol/source/BingMaps.js';
 import OSM from 'ol/source/OSM.js';

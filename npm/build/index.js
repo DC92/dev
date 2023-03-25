@@ -1,7 +1,7 @@
 // This file defines the contents of the myol.js myol.css, myol.js & myol.css libraries
 //TODO Don't export all ol
 
-// openlayers.org
+// Openlayers
 import 'ol/ol.css';
 export * from 'ol/index.js';
 
@@ -24,5 +24,6 @@ export * from '../src/editor.js';
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
+// Debug
 import {VERSION} from 'ol/util.js';
 console.log('OL V' + VERSION);

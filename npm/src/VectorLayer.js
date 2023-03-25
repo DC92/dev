@@ -1,6 +1,8 @@
 /**
  * This file adds facilities to vector layers 
  */
+
+// Openlayers
 import 'ol/ol.css';
 import Cluster from 'ol/source/Cluster.js';
 import Feature from 'ol/Feature.js';

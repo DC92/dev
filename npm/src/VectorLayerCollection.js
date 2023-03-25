@@ -1,6 +1,8 @@
 /**
  * This file implements various acces to geoJson services
  */
+
+// Openlayers
 import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import Icon from 'ol/style/Icon.js';
@@ -17,6 +19,7 @@ import {
 	Text,
 } from 'ol/style.js';
 
+// MyOl
 import {
 	clusterSpreadStylesOptions,
 	fullLabelStyleOptions,

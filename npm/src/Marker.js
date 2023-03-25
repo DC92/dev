@@ -6,8 +6,11 @@
    focus : center & zoom on the marker
    dragable : can draw the marker to edit position
  */
+
+// Proj4.js
 import proj4 from 'proj4/lib/index.js';
 
+// Openlayers
 import 'ol/ol.css';
 import Feature from 'ol/Feature.js';
 import Icon from 'ol/style/Icon.js';

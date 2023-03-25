@@ -1,6 +1,8 @@
 /**
  * geoJson lines & polygons edit
  */
+
+// Openlayers
 import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import Draw from 'ol/interaction/Draw.js';
@@ -24,6 +26,7 @@ import {
 	Text,
 } from 'ol/style.js';
 
+// MyOl
 import './editor.css';
 import {
 	controlButton,
