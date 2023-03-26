@@ -1,5 +1,6 @@
 /**
- * This file implements various acces to tiles layers services
+ * TileLayerCollection.js
+ * Acces to tiles layers services
  */
 
 // Openlayers

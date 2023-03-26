@@ -1,5 +1,6 @@
 /**
- * This file implements various acces to geoJson services
+ * VectorLayerCollection.js
+ * Various acces to geoJson services
  */
 
 // Openlayers

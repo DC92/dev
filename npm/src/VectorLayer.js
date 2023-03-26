@@ -1,5 +1,6 @@
 /**
- * This file adds facilities to vector layers 
+ * VectorLayer.js
+ * Facilities to vector layers 
  */
 
 // Openlayers

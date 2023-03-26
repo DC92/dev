@@ -1,4 +1,5 @@
 /**
+ * Editor.js
  * geoJson lines & polygons edit
  */
 

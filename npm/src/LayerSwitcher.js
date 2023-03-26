@@ -1,5 +1,5 @@
 /**
- * Layer switcher
+ * LayerSwitcher.js
  */
 import './layerSwitcher.css';
 import {

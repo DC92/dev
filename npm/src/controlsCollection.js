@@ -1,4 +1,5 @@
 /**
+ * controlsCollection.js
  * Add some usefull controls
  */
 

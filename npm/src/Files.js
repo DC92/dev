@@ -1,4 +1,5 @@
 /**
+ * Files.js
  * GPX file loader control
  */
 

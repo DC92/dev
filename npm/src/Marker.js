@@ -1,4 +1,5 @@
 /**
+ * Marker.js
  * Marker position display & edit
  * Options:
    src : url of the marker image
