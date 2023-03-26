@@ -12,85 +12,310 @@ Based on https://openlayers.org
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
 
-	<!-- Openlayers -->
-	<link href="../ol/ol.css" type="text/css" rel="stylesheet">
-	<script src="../ol/ol.js"></script>
-
-	<!-- My Openlayers -->
-	<script src="../src/header.js"></script><!-- For JSONparse -->
-	<link href="../src/controls.css" type="text/css" rel="stylesheet">
-	<script src="../src/controls.js"></script><!-- Upload / download demo -->
+	<link href="../dist/myol-wri.css" type="text/css" rel="stylesheet">
+	<script src="../dist/myol-wri-debug.js"></script>
 
 	<style>
-		#map {
+		#carte-accueil,
+		#carte-point,
+		#carte-nav,
+		#carte-edit {
 			width: 100%;
 			max-width: 600px;
 			height: 80vw;
 			max-height: 400px;
 		}
-		h4 {
-			margin: 1em 0 0 0 !important;
-		}
 	</style>
 </head>
 
 <body>
-	<a style="float:right" href="../gps">GPS &#9654;</a>
-	<a style="float:right;margin-right:15px" href="..">HOME</a>
-	<h1 style="margin:0">Maps refuges.info</h1>
-	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+	<h2>Debug cartes refuges.info</h2>
+	<h4>/vues/index.js</h4>
+	<div id="carte-accueil"></div>
+	<h4>/vues/point.js</h4>
+	<div id="carte-point"></div>
+	<h4>/vues/nav.js</h4>
+	<div id="carte-nav"></div>
+	<h4>/vues/edit.js</h4>
+	<div id="carte-edit"></div>
 
-	<div id="map"></div>
+	<script type="module" defer>
+import myolModule from '../build/wri.js';
 
-	<h4>XXXXXXXXXXXXXXX</h4>
+// wri.html use build bundler
+if (window.location.hash)
+	// wri.html#debug use direct module import
+	myol = myolModule;
 
-	<script>
-const snaplayer = new ol.layer.Vector({
-		source: new ol.source.Vector({
-			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-			format: new ol.format.GeoJSON(),
+var mapKeys = {
+	"ign": "iejxbx4obzhco6c8klxrfbto",
+	"thunderforest": "23e2a2c890144e418ea89a5cc0555afe"
+};
+
+// /vues/_cartes.js
+function wriMapBaseLayers(page) {
+	return {
+		'Refuges.info': new myol.layer.MriTile(),
+		'OSM fr': new myol.layer.OsmTile(),
+		'OpenTopo': new myol.layer.TopoTile(),
+		'OSM outdoors': new myol.layer.ThunderforestTile({
+			key: mapKeys.thunderforest,
 		}),
-		style: new ol.style.Style({
-			stroke: new ol.style.Stroke(),
+		'IGN TOP25': new myol.layer.IgnTile({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
+			key: page == 'modif' ? null : mapKeys.ign,
 		}),
+		'IGN V2': new myol.layer.IgnTile({
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
+			key: 'essentiels', // La clé pour les couches publiques
+			format: 'image/png',
+		}),
+		'SwissTopo': page == 'modif' ? null : new myol.layer.SwissTopoTile(),
+		'Autriche': new myol.layer.KompassMriTile(),
+		'Espagne': new myol.layer.SpainTile(),
+		'Photo IGN': new myol.layer.IgnTile({
+			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
+			key: 'essentiels',
+		}),
+		'Photo ArcGIS': new myol.layer.ArcGisTile(),
+		'Photo Google': page == 'modif' ? null : new myol.layer.GoogleTile({
+			subLayers: 's',
+		}),
+	};
+}
+
+// /vues/_cartes.js
+function wriMapControls(options) {
+	return [
+		// Haut gauche
+		new myol.control.Zoom(),
+		new myol.control.FullScreen(),
+		//myol.control.Geocoder(),
+		myol.control.GPS(),
+		options.page == 'point' ? myol.control.Button() : myol.control.LoadGPX(),
+		options.page == 'nav' ? myol.control.Button() : myol.control.Download(options.Download),
+		options.page == 'modif' ? myol.control.Button() : myol.control.Print(),
+
+		// Haut droit
+		myol.control.LayerSwitcher({
+			layers: wriMapBaseLayers(options.page),
+		}),
+
+		// Bas gauche
+		myol.control.MousePosition(),
+		new myol.control.ScaleLine(),
+
+		// Bas droit
+		myol.control.Permalink(options.Permalink),
+		new myol.control.Attribution({
+			collapsed: false,
+		}),
+	];
+}
+
+
+// /vues/index.js
+new myol.Map({
+	target: 'carte-accueil',
+	view: new myol.View({
+		enableRotation: false,
+		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 	}),
-
-	controlEditor = layerEditGeoJson({
-		geoJsonId: 'geojson',
-		snapLayers: [snaplayer],
-		help: [
-			document.getElementById('myol-help-edit-modify').innerHTML,
-			document.getElementById('myol-help-edit-line').innerHTML,
-			document.getElementById('myol-help-edit-poly').innerHTML,
-		],
-	});
-
-//TODO mettre et tester les fonctions de cartes WRI
-new ol.Map({
-	target: 'map',
-	view: new ol.View({
-		center: [600000, 5800000],
-		zoom: 6,
-	}),
-	controls: [
-		new ol.control.Zoom(),
-		controlLoadGPX(),
-		controlDownload({
-			savedLayer: controlEditor.layer,
-		}),
-		controlEditor,
-	],
 	layers: [
-		new ol.layer.Tile({
-			source: new ol.source.OSM(),
+		new myol.layer.MriTile(), // Fond de carte WRI
+		/*
+				layerWriAreas({ // La couche "massifs"
+					host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
+				}),
+		*/
+	],
+	controls: [
+		new myol.control.Attribution({
+			collapsed: false,
 		}),
-		snaplayer,
+	],
+	// Centre la carte sur la zone souhaitée
+}).getView().fit(myol.proj.transformExtent([-5, 42, 8, 51], 'EPSG:4326', 'EPSG:3857'));
+
+
+// /vues/point.js
+new myol.Map({
+	target: 'carte-point',
+	view: new myol.View({
+		center: myol.proj.fromLonLat([5.50669, 44.98445]),
+		zoom: 13,
+		enableRotation: false,
+		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+	}),
+	controls: wriMapControls({
+		page: 'point',
+		Permalink: { // Permet de garder le même réglage de carte d'une page à l'autre
+			visible: false, // Mais on ne visualise pas le lien du permalink
+			init: false, // Ici, on utilisera plutôt la position du point
+		},
+	}),
+	layers: [
+		new myol.layer.MriTile(), // Fond de carte WRI
+		/*
+				layerClusterWri({
+					host: '<?=$config_wri["sous_dossier_installation"]?>',
+					// Display a single label above each icon
+					styleOptionsDisplay: function(feature, properties, layer, resolution) {
+						if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
+							return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
+					},
+					// Don't display attribution on labels
+					convertProperties: {
+						attribution: null,
+					},
+				}),
+		*/
+		// Le cadre
+		myol.layer.Marker({
+			prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...
+			src: '<?=$config_wri["sous_dossier_installation"]?>images/cadre.svg',
+			focus: 15, // Centrer 
+		}),
 	],
 });
-	</script>
-	<script src="print_script.js"></script>
 
-	<h4 style="margin-bottom:0">Tests</h4>
-	<div>Do all actions of the button hover help</div>
+
+// /vues/nav.js
+const layers = [
+		new myol.layer.MriTile(), // Fond de carte WRI
+		/*
+				layerClusterWri({
+					host: '<?=$config_wri["sous_dossier_installation"]?>',
+					selectName: 'selecteur-wri,selecteur-massif', // 2 selecteurs pour une même couche
+					// Display a single label above each icon
+					styleOptionsDisplay: function(feature, properties, layer, resolution) {
+						if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
+							return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
+					},
+					// Don't display attribution on labels
+					convertProperties: {
+						attribution: null,
+					},
+				}),
+
+				// Contour d'un massif ou d'une zone
+				layerVector({
+					url: '<?=$config_wri["sous_dossier_installation"]?>' +
+						'api/polygones?massif=<?=$vue->polygone->id_polygone?>',
+					zIndex: 3, // Au dessus des massifs mais en dessous de son hover
+					<?php if ( !$vue->contenu ) { ?>
+						selectName: 'selecteur-massif',
+					<?php } ?>
+					styleOptionsDisplay: {
+						stroke: new ol.style.Stroke({
+							color: 'blue',
+							width: 2,
+						}),
+					},
+				}),
+
+				// Les massifs
+				layerWriAreas({
+					host: '<?=$config_wri["sous_dossier_installation"]?>',
+					selectName: '<?=$vue->contenu?"":"selecteur-massifs"?>',
+				}),
+
+				// Overpass
+				layerOverpass({
+					selectName: 'selecteur-osm',
+					maxResolution: 100,
+				}),
+
+				// Pyrenees-refuges.com
+				layerPrc({
+					selectName: 'selecteur-prc',
+				}),
+
+				// CampToCamp
+				layerC2C({
+					selectName: 'selecteur-c2c',
+				}),
+
+				// Chemineur
+				layerChemineur({
+					selectName: 'selecteur-chemineur',
+				}),
+
+				// Alpages.info
+				layerAlpages({
+					selectName: 'selecteur-alpages',
+				}),
+		*/
+	],
+
+	map = new myol.Map({
+		target: 'carte-nav',
+		view: new myol.View({
+			enableRotation: false,
+			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+		}),
+		controls: wriMapControls({
+			page: 'nav',
+			Permalink: { // Permet de garder le même réglage de carte
+				display: true,
+				init: 'true', // On cadre le massif
+			},
+		}),
+		layers: layers,
+	});
+
+// /vues/edit.js
+// Affiche la limite de tous les massifs
+/*
+const coucheContours = layerVector({
+		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
+		noHover: true,
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: 'blue',
+			}),
+		}),
+	}),
+
+	controleEditeur = layerEditGeoJson({
+		geoJsonId: 'edit-json',
+		snapLayers: [coucheContours],
+		help: [
+			(document.getElementById('myol-help-edit-modify') || {}).innerHTML,
+			null, // Pas d'édition de ligne
+			(document.getElementById('myol-help-edit-poly') || {}).innerHTML,
+		],
+		saveFeatures: function(coordinates, format) {
+			return format.writeGeometry(
+				new ol.geom.MultiPolygon(coordinates.polys),
+				{
+					featureProjection: 'EPSG:3857',
+					decimals: 5,
+				});
+		},
+	});
+*/
+
+const mapEdit = new myol.Map({
+	target: 'carte-edit',
+	view: new myol.View({
+		enableRotation: false,
+	}),
+	controls: wriMapControls({
+		page: 'modif',
+		Download: {
+			//savedLayer: controleEditeur.layer, // Obtenir uniquement le massif en cours d'édition
+		},
+		Permalink: { // Permet de garder le même réglage de carte
+		},
+	}),
+	layers: [
+		new myol.layer.MriTile(), // Fond de carte WRI
+		//coucheContours,
+	],
+});
+
+//mapEdit.addControl(controleEditeur);
+	</script>
 </body>
 </html>
