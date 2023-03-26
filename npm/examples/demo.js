@@ -8,6 +8,9 @@ import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.js';
 
 // MyOl
+import '../src/controls.css';
+import '../src/layerSwitcher.css';
+import '../src/editor.css';
 import {
 	controlsCollection,
 } from '../src/controlsCollection.js';

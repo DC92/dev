@@ -14,7 +14,9 @@ export default [{
 	plugins: [
 		node(),
 		cjs(),
-		css(),
+		css({
+			output: 'dist/myol.css',
+		}),
 	],
 	output: [{
 		name: 'demo',
@@ -28,7 +30,9 @@ export default [{
 	plugins: [
 		node(),
 		cjs(),
-		css(),
+		css({
+			output: 'dist/myol.css',
+		}),
 		terser(),
 	],
 	output: [{
@@ -60,7 +64,9 @@ export default [{
 	plugins: [
 		node(),
 		cjs(),
-		css(),
+		css({
+			output: 'dist/myol.css',
+		}),
 		terser(),
 	],
 	output: [{
@@ -75,7 +81,9 @@ export default [{
 	plugins: [
 		node(),
 		cjs(),
-		css(),
+		css({
+			output: 'dist/myol.css',
+		}),
 	],
 	output: [{
 		name: 'myol',

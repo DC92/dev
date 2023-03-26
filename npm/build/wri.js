@@ -1,102 +1,65 @@
 // Openlayers
 import 'ol/ol.css';
 
-import Map from 'ol/Map.js';
-import View from 'ol/View.js';
-var myol = {
-	Map: Map,
-	View: View,
-}
-
 import Attribution from 'ol/control/Attribution';
 import FullScreen from 'ol/control/FullScreen';
-import ScaleLine from 'ol/control/ScaleLine';
-import Zoom from 'ol/control/Zoom';
-myol.control = {
-	Attribution: Attribution,
-	FullScreen: FullScreen,
-	ScaleLine: ScaleLine,
-	Zoom: Zoom,
-};
-
+import Map from 'ol/Map.js';
 import MultiPolygon from 'ol/geom/MultiPolygon';
-myol.geom = {
-	MultiPolygon: MultiPolygon,
-};
-
-import {
-	fromLonLat,
-	transformExtent,
-} from 'ol/proj.js';
-myol.proj = {
-	fromLonLat: fromLonLat,
-	transformExtent: transformExtent,
-};
-
+import ScaleLine from 'ol/control/ScaleLine';
 import Stroke from 'ol/style/Stroke';
-myol.style = {
-	Stroke: Stroke,
-};
+import View from 'ol/View.js';
+import Zoom from 'ol/control/Zoom';
+import * as proj from 'ol/proj.js';
 
 // MyOl
-import {
-	controlButton,
-	controlMousePosition,
-	controlPermalink,
-	controlPrint,
-} from '../src/Controls.js';
-import {
-	controlDownload,
-	controlLoadGPX,
-} from '../src/Files.js';
-import {
-	controlGPS,
-} from '../src/Geolocation.js';
-import {
-	controlLayerSwitcher,
-} from '../src/LayerSwitcher.js';
-myol.control = {
-	...myol.control,
-	Button: controlButton,
-	Download: controlDownload,
-	GPS: controlGPS,
-	LayerSwitcher: controlLayerSwitcher,
-	LoadGPX: controlLoadGPX,
-	MousePosition: controlMousePosition,
-	Permalink: controlPermalink,
-	Print: controlPrint,
-};
+import '../src/controls.css';
+import '../src/layerSwitcher.css';
+import '../src/editor.css';
+import * as controls from '../src/Controls.js';
+import * as files from '../src/Files.js';
+import * as geolocation from '../src/Geolocation.js';
+import * as layerswitcher from '../src/LayerSwitcher.js';
+import * as marker from '../src/Marker.js';
+import * as tilelayercollection from '../src/TileLayerCollection.js';
 
-import {
-	layerMarker,
-} from '../src/Marker.js';
-import {
-	ArcGisTileLayer,
-	GoogleTileLayer,
-	IgnTileLayer,
-	KompassMriTileLayer,
-	MriTileLayer,
-	OsmTileLayer,
-	SpainTileLayer,
-	SwissTopoTileLayer,
-	ThunderforestTileLayer,
-	TopoTileLayer,
-} from '../src/TileLayerCollection.js';
-myol.layer = {
-	ArcGisTile: ArcGisTileLayer,
-	GoogleTile: GoogleTileLayer,
-	IgnTile: IgnTileLayer,
-	KompassMriTile: KompassMriTileLayer,
-	Marker: layerMarker,
-	MriTile: MriTileLayer,
-	OsmTile: OsmTileLayer,
-	SpainTile: SpainTileLayer,
-	SwissTopoTile: SwissTopoTileLayer,
-	ThunderforestTile: ThunderforestTileLayer,
-	TopoTile: TopoTileLayer,
-};
-import {
-	LayerWri,
-} from '../src/VectorLayerCollection.js';
-
-export default myol;
+export default {
+	control: {
+		Attribution: Attribution,
+		Button: controls.controlButton,
+		Download: files.controlDownload,
+		FullScreen: FullScreen,
+		GPS: geolocation.controlGPS,
+		LayerSwitcher: layerswitcher.controlLayerSwitcher,
+		LoadGPX: files.controlLoadGPX,
+		MousePosition: controls.controlMousePosition,
+		Permalink: controls.controlPermalink,
+		Print: controls.controlPrint,
+		ScaleLine: ScaleLine,
+		Zoom: Zoom,
+	},
+	geom: {
+		MultiPolygon: MultiPolygon,
+	},
+	layer: {
+		ArcGisTile: tilelayercollection.ArcGisTileLayer,
+		GoogleTile: tilelayercollection.GoogleTileLayer,
+		IgnTile: tilelayercollection.IgnTileLayer,
+		KompassMriTile: tilelayercollection.KompassMriTileLayer,
+		Marker: marker.layerMarker,
+		MriTile: tilelayercollection.MriTileLayer,
+		OsmTile: tilelayercollection.OsmTileLayer,
+		SpainTile: tilelayercollection.SpainTileLayer,
+		SwissTopoTile: tilelayercollection.SwissTopoTileLayer,
+		ThunderforestTile: tilelayercollection.ThunderforestTileLayer,
+		TopoTile: tilelayercollection.TopoTileLayer,
+	},
+	Map: Map,
+	proj: {
+		fromLonLat: proj.fromLonLat,
+		transformExtent: proj.transformExtent,
+	},
+	style: {
+		Stroke: Stroke,
+	},
+	View: View,
+}
