@@ -21,7 +21,7 @@ export default [{
 	output: [{
 		name: 'demo',
 		banner,
-		file: './dist/demo.js',
+		file: 'dist/demo.js',
 		format: 'iife',
 	}],
 }, {
@@ -38,7 +38,7 @@ export default [{
 	output: [{
 		name: 'myol',
 		banner,
-		file: './dist/myol.js',
+		file: 'dist/myol.js',
 		format: 'umd',
 		sourcemap: true,
 	}],
@@ -55,7 +55,7 @@ export default [{
 	output: [{
 		name: 'myol',
 		banner,
-		file: './dist/myol-debug.js',
+		file: 'dist/myol-debug.js',
 		format: 'iife',
 	}],
 }, {
@@ -71,7 +71,7 @@ export default [{
 	],
 	output: [{
 		name: 'myol',
-		file: './dist/myol-wri.js',
+		file: 'dist/myol-wri.js',
 		format: 'umd',
 		sourcemap: true,
 	}],
@@ -87,7 +87,7 @@ export default [{
 	],
 	output: [{
 		name: 'myol',
-		file: './dist/myol-wri-debug.js',
+		file: 'dist/myol-wri-debug.js',
 		format: 'iife',
 	}],
 }];

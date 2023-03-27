@@ -1,5 +1,6 @@
 {
 	"name": "myol",
+	"type": "module",
 	"scripts": {
 		"build": "rollup -c build/config.js"
 	},

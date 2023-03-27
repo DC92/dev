@@ -25,6 +25,9 @@ Based on https://openlayers.org
 			height: 80vw;
 			max-height: 400px;
 		}
+		h4 {
+			margin-bottom: 0;
+		}
 	</style>
 </head>
 
@@ -156,6 +159,14 @@ new myol.Map({
 	}),
 	layers: [
 		new myol.layer.MriTile(), // Fond de carte WRI
+		new myol.layer.Wri({
+			//selectName: 'select-refuges',
+			//statusId: 'status-refuges',
+			attribution: null,
+			stylesOptions: feature => [
+				labelStyleOptions(feature, feature.getProperties().nom),
+			],
+		}),
 		/*
 				layerClusterWri({
 					host: '<?=$config_wri["sous_dossier_installation"]?>',
@@ -183,6 +194,14 @@ new myol.Map({
 // /vues/nav.js
 const layers = [
 		new myol.layer.MriTile(), // Fond de carte WRI
+		new myol.layer.Wri({
+			selectName: 'select-refuges',
+			statusId: 'status-refuges',
+			attribution: null,
+			stylesOptions: feature => [
+				labelStyleOptions(feature, feature.getProperties().nom),
+			],
+		}),
 		/*
 				layerClusterWri({
 					host: '<?=$config_wri["sous_dossier_installation"]?>',
@@ -265,8 +284,8 @@ const layers = [
 	});
 
 // /vues/edit.js
-// Affiche la limite de tous les massifs
 /*
+// Affiche la limite de tous les massifs
 const coucheContours = layerVector({
 		url: '<?=$config_wri["sous_dossier_installation"]?>api/polygones?type_polygon=1',
 		noHover: true,

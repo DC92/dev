@@ -18,9 +18,10 @@ import '../src/editor.css';
 import * as controls from '../src/Controls.js';
 import * as files from '../src/Files.js';
 import * as geolocation from '../src/Geolocation.js';
-import * as layerswitcher from '../src/LayerSwitcher.js';
+import * as layerSwitcher from '../src/LayerSwitcher.js';
 import * as marker from '../src/Marker.js';
-import * as tilelayercollection from '../src/TileLayerCollection.js';
+import * as tileLayerCollection from '../src/TileLayerCollection.js';
+import * as vectorLayerCollection from '../src/VectorLayerCollection.js';
 
 export default {
 	control: {
@@ -29,7 +30,7 @@ export default {
 		Download: files.controlDownload,
 		FullScreen: FullScreen,
 		GPS: geolocation.controlGPS,
-		LayerSwitcher: layerswitcher.controlLayerSwitcher,
+		LayerSwitcher: layerSwitcher.controlLayerSwitcher,
 		LoadGPX: files.controlLoadGPX,
 		MousePosition: controls.controlMousePosition,
 		Permalink: controls.controlPermalink,
@@ -41,17 +42,18 @@ export default {
 		MultiPolygon: MultiPolygon,
 	},
 	layer: {
-		ArcGisTile: tilelayercollection.ArcGisTileLayer,
-		GoogleTile: tilelayercollection.GoogleTileLayer,
-		IgnTile: tilelayercollection.IgnTileLayer,
-		KompassMriTile: tilelayercollection.KompassMriTileLayer,
+		ArcGisTile: tileLayerCollection.ArcGisTileLayer,
+		GoogleTile: tileLayerCollection.GoogleTileLayer,
+		IgnTile: tileLayerCollection.IgnTileLayer,
+		KompassMriTile: tileLayerCollection.KompassMriTileLayer,
 		Marker: marker.layerMarker,
-		MriTile: tilelayercollection.MriTileLayer,
-		OsmTile: tilelayercollection.OsmTileLayer,
-		SpainTile: tilelayercollection.SpainTileLayer,
-		SwissTopoTile: tilelayercollection.SwissTopoTileLayer,
-		ThunderforestTile: tilelayercollection.ThunderforestTileLayer,
-		TopoTile: tilelayercollection.TopoTileLayer,
+		MriTile: tileLayerCollection.MriTileLayer,
+		OsmTile: tileLayerCollection.OsmTileLayer,
+		SpainTile: tileLayerCollection.SpainTileLayer,
+		SwissTopoTile: tileLayerCollection.SwissTopoTileLayer,
+		ThunderforestTile: tileLayerCollection.ThunderforestTileLayer,
+		TopoTile: tileLayerCollection.TopoTileLayer,
+		Wri: vectorLayerCollection.LayerWri,
 	},
 	Map: Map,
 	proj: {
