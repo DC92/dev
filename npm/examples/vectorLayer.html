@@ -88,7 +88,8 @@ Based on https://openlayers.org
 		<label><input type="checkbox" name="select-wri" value="23" />point d'eau</label>
 		<label><input type="checkbox" name="select-wri" value="6" />sommet</label>
 		<label><input type="checkbox" name="select-wri" value="3" />passage délicat</label>
-		<br /><label>
+		<br />
+		<label>
 			<input type="checkbox" name="select-refuges" value="4" />
 			Style refuges.info
 			<span id="status-refuges"></span>
@@ -191,7 +192,7 @@ new Map({
 			statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
-				labelStyleOptions(feature, feature.getProperties().nom),
+				labelStyleOptions(feature),
 			],
 		}),
 		/*

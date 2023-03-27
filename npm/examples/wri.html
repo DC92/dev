@@ -36,6 +36,11 @@ Based on https://openlayers.org
 	<h4>/vues/index.js</h4>
 	<div id="carte-accueil"></div>
 	<h4>/vues/point.js</h4>
+	<label>
+		<input type="checkbox" name="select-refuges" value="4" checked="checked" /></input>
+		Style refuges.info
+		<span id="status-refuges"></span>
+	</label>
 	<div id="carte-point"></div>
 	<h4>/vues/nav.js</h4>
 	<div id="carte-nav"></div>
@@ -48,7 +53,7 @@ import myolModule from '../build/wri.js';
 // wri.html use build bundler
 if (window.location.hash)
 	// wri.html#debug use direct module import
-	myol = myolModule;
+	myol = myolModule; //TODO BUG don't work in /index.html
 
 var mapKeys = {
 	"ign": "iejxbx4obzhco6c8klxrfbto",
@@ -87,7 +92,6 @@ function wriMapBaseLayers(page) {
 	};
 }
 
-// /vues/_cartes.js
 function wriMapControls(options) {
 	return [
 		// Haut gauche
@@ -158,13 +162,12 @@ new myol.Map({
 		},
 	}),
 	layers: [
-		new myol.layer.MriTile(), // Fond de carte WRI
 		new myol.layer.Wri({
-			//selectName: 'select-refuges',
-			//statusId: 'status-refuges',
+			selectName: 'select-refuges',
+			statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
-				labelStyleOptions(feature, feature.getProperties().nom),
+				myol.styleOptions.label(feature),
 			],
 		}),
 		/*
@@ -184,7 +187,7 @@ new myol.Map({
 		// Le cadre
 		myol.layer.Marker({
 			prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...
-			src: '<?=$config_wri["sous_dossier_installation"]?>images/cadre.svg',
+			src: 'images/cadre.svg',
 			focus: 15, // Centrer 
 		}),
 	],
@@ -193,13 +196,12 @@ new myol.Map({
 
 // /vues/nav.js
 const layers = [
-		new myol.layer.MriTile(), // Fond de carte WRI
 		new myol.layer.Wri({
-			selectName: 'select-refuges',
-			statusId: 'status-refuges',
+			//selectName: 'select-refuges',
+			//statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
-				labelStyleOptions(feature, feature.getProperties().nom),
+				myol.styleOptions.label(feature),
 			],
 		}),
 		/*
@@ -329,7 +331,6 @@ const mapEdit = new myol.Map({
 		},
 	}),
 	layers: [
-		new myol.layer.MriTile(), // Fond de carte WRI
 		//coucheContours,
 	],
 });

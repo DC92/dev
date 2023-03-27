@@ -64,7 +64,7 @@ export function controlLayerSwitcher(options) {
 			labelEl.firstChild.onclick = selectBaseLayer; //BEST resorb all firstChild
 			control.submenuEl.appendChild(labelEl);
 
-			baseLayers[name].setVisible(false); // Don't begin to get the tiles yet
+			//TODO BUG ???			baseLayers[name].setVisible(false); // Don't begin to get the tiles yet
 			map.addLayer(baseLayers[name]);
 
 			// Mem it for further ops

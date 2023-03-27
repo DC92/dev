@@ -158,7 +158,7 @@ export class LayerWri extends MyVectorLayer {
 				disjoinClusterMaxResolution: 100,
 				serverClusterMinResolution: 50,
 				attribution: 'refuges.info',
-				selector: new Selector(opt.selectName),
+				selector: new Selector(opt.selectName), //TODO BUG don't dispach if no selector
 				name: properties => properties.nom, // Function returning the name for cluster agregation
 				clickUrl: properties => properties.lien, // Function returning url to go on click
 				spreadClusterMaxResolution: 20,
@@ -221,7 +221,7 @@ export class LayerWri extends MyVectorLayer {
 		const lowResolutionsLayer = this;
 
 		options.selector.setCallBack(function(selection) {
-			lowResolutionsLayer.refresh(selection.length);
+			//TODO BUG ???			lowResolutionsLayer.refresh(selection.length);
 		});
 	}
 }

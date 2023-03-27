@@ -310,7 +310,7 @@ function mouseListener(evt) {
 export class Selector {
 	constructor(name, callBack) {
 		this.callBack = callBack;
-		this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
+		this.safeName = ('myol_' + name).replace(/[^a-z]/ig, '');
 		this.init = (localStorage[this.safeName] || '').split(',');
 		this.selectEls = [...document.getElementsByName(name)];
 		this.selectEls.forEach(el => {
@@ -342,7 +342,7 @@ export class Selector {
 			});
 
 		// Save the current status
-		if (this.getSelection().length)
+		if (this.getSelection().length && name)
 			localStorage[this.safeName] = this.getSelection().join(',');
 		else
 			delete localStorage[this.safeName];

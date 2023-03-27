@@ -21,6 +21,7 @@ import * as geolocation from '../src/Geolocation.js';
 import * as layerSwitcher from '../src/LayerSwitcher.js';
 import * as marker from '../src/Marker.js';
 import * as tileLayerCollection from '../src/TileLayerCollection.js';
+import * as vectorlayer from '../src/VectorLayer.js';
 import * as vectorLayerCollection from '../src/VectorLayerCollection.js';
 
 export default {
@@ -40,6 +41,9 @@ export default {
 	},
 	geom: {
 		MultiPolygon: MultiPolygon,
+	},
+	styleOptions: {
+		label: vectorlayer.labelStyleOptions,
 	},
 	layer: {
 		ArcGisTile: tileLayerCollection.ArcGisTileLayer,
