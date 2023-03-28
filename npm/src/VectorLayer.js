@@ -299,29 +299,33 @@ function mouseListener(evt) {
 
 /**
  * Manage a collection of checkboxes with the same name
- * There can be several selectors for one layer
- * The checkbox without value check / uncheck the others
+ * name : name of all the rlated checkboxes
+ * The checkbox without value (all) check / uncheck the others
+ * Check all the checkboxes check the checkbox without value (all)
  * Current selection is saved in window.localStorage
- * name : input names
- * callBack(selection) : function to call at init or clock / array of selected values
  * You can force the values in window.localStorage[simplified name]
- * Return an array of selected values
+ * callBack(selection) : function to call at init or clock
+ * getSelection() : returns an array of selected values
+ * If there are no checkbox with this name, return []
+ * If no name is specified, return [true]
  */
 export class Selector {
 	constructor(name, callBack) {
-		this.callBack = callBack;
-		this.safeName = ('myol_' + name).replace(/[^a-z]/ig, '');
-		this.init = (localStorage[this.safeName] || '').split(',');
-		this.selectEls = [...document.getElementsByName(name)];
-		this.selectEls.forEach(el => {
-			el.checked =
-				this.init.includes(el.value) ||
-				this.init.includes('all') ||
-				this.init.join(',') == el.value;
-			el.addEventListener('click', evt => this.onClick(evt));
-		});
+		if (name) {
+			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
+			this.init = (localStorage[this.safeName] || '').split(',');
+			this.selectEls = [...document.getElementsByName(name)];
+			this.selectEls.forEach(el => {
+				el.checked =
+					this.init.includes(el.value) ||
+					this.init.includes('all') ||
+					this.init.join(',') == el.value;
+				el.addEventListener('click', evt => this.onClick(evt));
+			});
 
-		this.onClick(); // Init with "all"
+			this.onClick(); // Init with "all"
+		}
+		this.callBack = callBack;
 	}
 
 	onClick(evt) {
@@ -347,19 +351,21 @@ export class Selector {
 		else
 			delete localStorage[this.safeName];
 
-		if (typeof this.callBack == 'function')
-			this.callBack(this.getSelection());
+		if (evt)
+			this.setCallBack(this.callBack); // Call callBack
 	}
 
 	setCallBack(callBack) {
 		this.callBack = callBack;
-		callBack(this.getSelection());
+		if (typeof this.callBack == 'function')
+			callBack(this.getSelection());
 	}
 
 	getSelection() {
-		return this.selectEls
+		return this.safeName ?
+			this.selectEls
 			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value);
+			.map(el => el.value) : [true];
 	}
 }
 
