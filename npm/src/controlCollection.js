@@ -1,5 +1,5 @@
 /**
- * controlsCollection.js
+ * controlCollection.js
  * Add some usefull controls
  */
 
@@ -45,7 +45,7 @@ export function controlHelp(options) {
 /**
  * Controls examples
  */
-export function controlsCollection(opt) {
+export function controlCollection(opt) {
 	const options = {
 		supplementaryControls: [], //BEST resorb
 		...opt,

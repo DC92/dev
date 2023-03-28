@@ -378,7 +378,7 @@ export class BingTileLayer extends TileLayer {
 }
 
 // Tile layers examples
-export function collectionTileLayer(options) {
+export function tileLayerCollection(options) {
 	options = options || {};
 
 	return {
@@ -450,7 +450,7 @@ export function collectionTileLayer(options) {
 
 export function demoTileLayer(options) {
 	return {
-		...collectionTileLayer(options),
+		...tileLayerCollection(options),
 
 		'OSM': new OsmTileLayer(),
 

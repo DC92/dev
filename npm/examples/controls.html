@@ -27,7 +27,7 @@ Based on https://openlayers.org
 	<a style="float:right;margin-right:15px" href="..">HOME</a>
 	<h1 style="margin:0">Controls</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
-	<p><a href="../src/controls.js">src/controls.js</a> adds some usefull controls:
+	<p><a href="../src/Controls.js">src/Controls.js</a> usefull controls:
 		<ul>
 			<li>Full screen</li>
 			<li>Geocoder</li>
@@ -35,12 +35,16 @@ Based on https://openlayers.org
 			<li>Length of a line</li>
 		</ul>
 	</p>
-	<p><a href="../src/files.js">src/files.js</a> adds some file management controls:
+	<p><a href="../src/Files.js">src/Files.js</a> file management controls:
 		<ul>
 			<li>Load GPX file</li>
 			<li>Download GPX file</li>
 		</ul>
-	<p><a href="../src/gps.js">src/gps.js</a> adds GPS position controls:
+	<p><a href="../src/Geolocation.js">src/Geolocation.js</a> adds GPS position controls:
+		<ul>
+			<li>GPS</li>
+		</ul>
+	<p><a href="../src/controlCollection.js">src/controlCollection.js</a> adds GPS position controls:
 		<ul>
 			<li>GPS</li>
 		</ul>
@@ -75,8 +79,8 @@ import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
 // MyOl
 import {
-	controlsCollection,
-} from '../src/controlsCollection.js';
+	controlCollection,
+} from '../src/controlCollection.js';
 
 
 const geojsonObject = {
@@ -152,7 +156,7 @@ new Map({
 			source: new OSM(),
 		}),
 	],
-	controls: controlsCollection({
+	controls: controlCollection({
 		permalink: {
 			display: true,
 		},
@@ -162,7 +166,7 @@ new Map({
 	}),
 });
 	</script>
-	<script src="print_script.js"></script>
+	<script src="js/print_script.js"></script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Test each control</div>

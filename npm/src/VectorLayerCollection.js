@@ -512,7 +512,7 @@ export function layerOverpass(opt) {
 }
 
 // Vectors layers examples
-export function layerVectorCollection(options) {
+export function vectorLayerCollection(options) {
 	options = options || {};
 
 	return [

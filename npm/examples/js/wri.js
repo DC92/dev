@@ -1,61 +1,3 @@
-<!DOCTYPE html>
-<!--
-© Dominique Cavailhez 2019
-https://github.com/Dominique92/MyOl
-Based on https://openlayers.org
--->
-<html>
-<head>
-	<title>My Openlayers WRI</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="images/favicon.png" rel="icon" type="image/png" />
-	<link href="images/favicon.png" rel="apple-touch-icon" />
-
-	<link href="../dist/myol.css" type="text/css" rel="stylesheet">
-	<script src="../dist/myol.js"></script>
-
-	<style>
-		#carte-accueil,
-		#carte-point,
-		#carte-nav,
-		#carte-edit {
-			width: 100%;
-			max-width: 600px;
-			height: 80vw;
-			max-height: 400px;
-		}
-		h4 {
-			margin-bottom: 0;
-		}
-	</style>
-</head>
-
-<body>
-	<a style="float:right" href="wri-debug.html">WRI (modules) &#9654;</a>
-	<h2>Debug cartes refuges.info</h2>
-	<h4>/vues/index.js</h4>
-	<div id="carte-accueil"></div>
-	<h4>/vues/point.js</h4>
-	<label>
-		<input type="checkbox" name="select-refuges" value="4" checked="checked" /></input>
-		Style refuges.info
-		<span id="status-refuges"></span>
-	</label>
-	<div id="carte-point"></div>
-	<h4>/vues/nav.js</h4>
-	<div id="carte-nav"></div>
-	<h4>/vues/edit.js</h4>
-	<div id="carte-edit"></div>
-
-	<script type="module" defer>
-import myolModule from '../build/index.js'; //TODO BUG don't work in /index.html
-
-// wri.html use build bundler
-if (window.location.hash)
-	// wri.html#debug use direct module import
-	myol = myolModule;
-
 var mapKeys = {
 	"ign": "iejxbx4obzhco6c8klxrfbto",
 	"thunderforest": "23e2a2c890144e418ea89a5cc0555afe"
@@ -337,6 +279,3 @@ const mapEdit = new myol.Map({
 });
 
 //mapEdit.addControl(controleEditeur);
-	</script>
-</body>
-</html>

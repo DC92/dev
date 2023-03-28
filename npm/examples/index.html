@@ -41,8 +41,44 @@ Based on https://openlayers.org
 	</div>
 
 	<script type="module">
-import demo from '../examples/demo.js';
-demo();
+// Openlayers
+import 'ol/ol.css';
+import Map from 'ol/Map.js';
+import View from 'ol/View.js';
+
+// Geocoder
+//import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
+//import '@kirtandesai/ol-geocoder/dist/ol-geocoder.js';
+
+// MyOl
+import {
+	controlCollection,
+} from '../src/controlCollection.js';
+import {
+	controlLayerSwitcher,
+} from '../src/LayerSwitcher.js';
+import {
+	tileLayerCollection,
+} from '../src/TileLayerCollection.js';
+
+// Debug
+import {
+	VERSION
+} from 'ol/util.js';
+console.log('OL V' + VERSION);
+
+new Map({
+	target: 'map',
+	view: new View({
+		enableRotation: false,
+	}),
+	controls: [
+		...controlCollection(),
+		controlLayerSwitcher({
+			layers: tileLayerCollection(),
+		}),
+	],
+});
 	</script>
 </body>
 </html>
