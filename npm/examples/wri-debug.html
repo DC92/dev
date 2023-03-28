@@ -32,7 +32,8 @@ Based on https://openlayers.org
 </head>
 
 <body>
-	<a style="float:right" href="GPS.html">GPS &#9654;</a>
+	<a style="float:right" href="wri.html">WRI &#9654;</a>
+	<a style="float:right;margin-right:15px" href="..">HOME</a>
 	<h2>Debug cartes refuges.info</h2>
 	<h3>(Mode modules)</h3>
 	<h4>/vues/index.js</h4>
@@ -50,12 +51,7 @@ Based on https://openlayers.org
 	<div id="carte-edit"></div>
 
 	<script type="module" defer>
-import myolModule from '../build/index.js'; //TODO BUG don't work in /index.html
-
-// wri.html use build bundler
-if (window.location.hash)
-	// wri.html#debug use direct module import
-	myol = myolModule;
+import myol from '../build/index.js';
 
 var mapKeys = {
 	"ign": "iejxbx4obzhco6c8klxrfbto",

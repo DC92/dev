@@ -27,8 +27,7 @@ import * as tilelayercollection from '../src/TileLayerCollection.js';
 import * as vectorlayer from '../src/VectorLayer.js';
 import * as vectorlayercollection from '../src/VectorLayerCollection.js';
 
-// Geocoder
-//TODO
+// Geocoder //TODO
 //import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 //import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
