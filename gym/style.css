@@ -3,6 +3,48 @@ Theme Name: gym
 Template: twentytwentythree
 */
 
+/* Overwrite twentytwentythree */
+.wp-site-blocks {
+  padding: 0;
+}
+
+/* Efface les tables d'horaires */
+.wp-block-table {
+  display: none;
+}
+
+/* Banniere */
+.banniere {
+  height: 56px;
+  text-align: center;
+  background: #5826f4;
+}
+.banniere h1 {
+  margin: 0;
+  padding-top: 7px;
+  font-family: arial, sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+}
+.banniere img {
+  float: left;
+  height: 56px;
+}
+.banniere a {
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .banniere img {
+    display: none;
+  }
+}
+@media (max-width: 400px) {
+  .banniere h1 span {
+    display: none;
+  }
+}
+
 ul.menu {
   display: flex;
   flex-wrap: wrap;
@@ -50,8 +92,15 @@ ul.menu li:last-of-type ul {
 ul.menu li ul li {
   padding: 0 0.3em;
 }
+.crayon {
+  float: right;
+  margin: -100px 10px;
+  color: white;
+  text-decoration: none;
+}
 
 .horaires table {
+  margin-left: calc((10% - 60px));
   border: 4px solid hsl(103, 20%, 60%);
   border-collapse: collapse;
   background: hsl(103, 50%, 85%);
@@ -60,32 +109,32 @@ ul.menu li ul li {
   }
 }
 .horaires table:nth-of-type(2) {
-  margin-left: calc((10% - 60px));
+  margin-left: calc((10% - 60px) * 2);
   border-color: hsl(206, 20%, 60%);
   background: hsl(206, 50%, 85%);
 }
 .horaires table:nth-of-type(3) {
-  margin-left: calc((10% - 60px) * 2);
+  margin-left: calc((10% - 60px) * 3);
   border-color: hsl(309, 20%, 60%);
   background: hsl(309, 50%, 85%);
 }
 .horaires table:nth-of-type(4) {
-  margin-left: calc((10% - 60px) * 3);
+  margin-left: calc((10% - 60px) * 4);
   border-color: hsl(412, 20%, 60%);
   background: hsl(412, 50%, 85%);
 }
 .horaires table:nth-of-type(5) {
-  margin-left: calc((10% - 60px) * 4);
+  margin-left: calc((10% - 60px) * 5);
   border-color: hsl(55, 20%, 60%);
   background: hsl(515, 50%, 85%);
 }
 .horaires table:nth-of-type(6) {
-  margin-left: calc((10% - 60px) * 5);
+  margin-left: calc((10% - 60px) * 6);
   border-color: hsl(618, 20%, 60%);
   background: hsl(618, 50%, 85%);
 }
 .horaires table:nth-of-type(7) {
-  margin-left: calc((10% - 60px) * 6);
+  margin-left: calc((10% - 60px) * 7);
   border-color: hsl(721, 20%, 60%);
   background: hsl(721, 50%, 85%);
 }
