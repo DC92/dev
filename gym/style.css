@@ -92,12 +92,6 @@ ul.menu li:last-of-type ul {
 ul.menu li ul li {
   padding: 0 0.3em;
 }
-.crayon {
-  float: right;
-  margin: -100px 10px;
-  color: white;
-  text-decoration: none;
-}
 
 .horaires table {
   margin-left: calc((10% - 60px));
@@ -147,4 +141,10 @@ ul.menu li ul li {
   border: 1px dashed;
   padding: 0.2em;
   text-align: left;
+}
+
+.crayon {
+	float: right;
+  text-decoration: none;
+  padding: 0 0.2em;
 }

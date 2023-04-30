@@ -9,16 +9,17 @@
   </a>
 </div>
 
-[menu id=55]
+[edit_page]
+[menu]
 
 <script>
 // Inhibe le lien quand on touche pour ouvrir le sous-menu
 function clickMenu(evt, el) {
-    const parentClass = el.parentElement.classList.contains('open');
+	const parentClass = el.parentElement.classList.contains('open');
 
-    el.parentElement.classList.add('open');
+	el.parentElement.classList.add('open');
 
-    if (evt.pointerType == 'touch' && !parentClass)
-        return false;
+	if (evt.pointerType == 'touch' && !parentClass)
+		return false;
 }
 </script>

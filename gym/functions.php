@@ -24,13 +24,22 @@ function _block_template_favicon()
         PHP_EOL;
 }
 
+// Lien d'édition de la page
+add_shortcode("edit_page", "edit_page_function");
+function edit_page_function()
+{
+    global $post;
+
+    return "<a class=\"crayon\" title=\"Modification de la page\" href=\"" .
+        get_bloginfo("url") .
+        "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>";
+}
+
 // Menu haut de page
 add_shortcode("menu", "menu_function");
 function menu_function()
 {
     global $wpdb;
-
-    preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
     $pages = $wpdb->get_results("
 SELECT child.post_title, child.post_name,
@@ -43,7 +52,6 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
 ");
 
     $r = ['<ul class="menu">'];
-
     foreach ($pages as $p) {
         // Au changement de ligne
         if ($sous_menu != $p->parent_id) {
@@ -57,30 +65,8 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
 
         // Pour toutes les lignes
         $r[] = "\t\t\t<li><a href='/$p->post_name/' title='Voir la page'>$p->post_title</a></li>";
-
-        // Accueil
-        if (!count($page_url)) {
-            $id_edit = get_site_option("page_on_front");
-        }
-        // Catégorie
-        if ("/$p->parent_name/" == $page_url[0]) {
-            $id_edit = $p->parent_id;
-        }
-        // Entrée
-        if ("/$p->post_name/" == $page_url[0]) {
-            $id_edit = $p->ID;
-        }
     }
-
     $r[] = "\t\t</ul>\n\t</li>\n</ul>";
-    if ($id_edit) {
-        $r[] =
-            '<a class="crayon" title="Modification de la page" href="' .
-            get_bloginfo("url") .
-            "/wp-admin/post.php?&action=edit&post=" .
-            $id_edit .
-            '">&#9998;</a>';
-    }
 
     return implode(PHP_EOL, $r);
 }
