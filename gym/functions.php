@@ -33,7 +33,7 @@ function menu_function()
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
     $pages = $wpdb->get_results("
-SELECT child.*,
+SELECT child.post_title, child.post_name,
   parent.post_title AS parent_title,
   parent.post_name AS parent_name, parent.ID AS parent_id
 FROM wpgym_posts AS parent
@@ -46,17 +46,17 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
 
     foreach ($pages as $p) {
         // Au changement de ligne
-        if ($sous_menu != $p->post_parent) {
+        if ($sous_menu != $p->parent_id) {
             if ($sous_menu) {
                 $r[] = "\t\t</ul>\n\t</li>";
             }
-            $r[] = "\t<li>\n\t\t<a href='/$p->parent_name/'>$p->parent_title</a>\n\t\t<ul>";
+            $r[] = "\t<li>\n\t\t<a onclick=\"return clickMenu(event,this)\" href='/$p->parent_name/'>$p->parent_title</a>\n\t\t<ul>";
 
-            $sous_menu = $p->post_parent;
+            $sous_menu = $p->parent_id;
         }
 
         // Pour toutes les lignes
-        $r[] = "\t\t\t<li><a href='/$p->post_name/' title='Voir la page $p->post_title'>$p->post_title</a></li>";
+        $r[] = "\t\t\t<li><a href='/$p->post_name/' title='Voir la page'>$p->post_title</a></li>";
 
         // Accueil
         if (!count($page_url)) {
@@ -85,12 +85,6 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
     return implode(PHP_EOL, $r);
 }
 
-// Lien d'édition
-add_shortcode("edit_page", "edit_page_function");
-function edit_page_function()
-{
-}
-
 // Horaires
 add_shortcode("horaires", "horaires_function");
 function horaires_function()
@@ -108,9 +102,11 @@ function horaires_function()
 
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
-    $pages_publiees = $wpdb->get_results(
-        'SELECT * FROM wpgym_posts WHERE post_status = "publish"'
-    );
+    $pages_publiees = $wpdb->get_results("
+SELECT post_title, post_name, post_content
+FROM wpgym_posts
+WHERE post_status = 'publish'
+");
 
     foreach ($pages_publiees as $p) {
         $post_names[$p->post_title] = $p->post_name;

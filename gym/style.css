@@ -83,7 +83,7 @@ ul.menu li ul {
   padding-left: 0;
   background: inherit;
 }
-ul.menu li:not(:hover) ul {
+ul.menu li:not(.open):not(:hover) ul {
   display: none;
 }
 ul.menu li:last-of-type ul {

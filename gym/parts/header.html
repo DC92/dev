@@ -10,3 +10,15 @@
 </div>
 
 [menu id=55]
+
+<script>
+// Inhibe le lien quand on touche pour ouvrir le sous-menu
+function clickMenu(evt, el) {
+    const parentClass = el.parentElement.classList.contains('open');
+
+    el.parentElement.classList.add('open');
+
+    if (evt.pointerType == 'touch' && !parentClass)
+        return false;
+}
+</script>
