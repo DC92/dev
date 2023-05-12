@@ -143,8 +143,40 @@ ul.menu li ul li {
   text-align: left;
 }
 
+table.calendrier {
+  margin: 1em auto;
+  border: 2px solid grey !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  font-family: arial, sans-serif;
+}
+.calendrier tr:first-child td {
+  text-align: center;
+  font-weight: bold;
+}
+.calendrier td {
+  border: 1px solid grey;
+}
+.calendrier td:not(:first-child) {
+  padding: 0.25em;
+  width: 1.5em;
+  text-align: center;
+  color: #999;
+}
+.calendrier tr:not(:first-child) td {
+  text-transform: capitalize;
+}
+.calendrier .date_active {
+  background: #08babe;
+  color: white !important;
+  font-weight: bold;
+}
+
+.copyright {
+  text-align: center;
+}
 .crayon {
-	float: right;
-  text-decoration: none;
-  padding: 0 0.2em;
+  float: right;
+  padding: 1em;
+  color: white;
 }

@@ -1,4 +1,35 @@
 <?php
+$annee = 2023;
+$nom_jour = [
+    "lundi",
+    "mardi",
+    "mercredi",
+    "jeudi",
+    "vendredi",
+    "samedi",
+    "dimanche",
+];
+$nom_mois = [
+    1 => "janvier",
+    2 => "fevrier",
+    3 => "mars",
+    4 => "avril",
+    5 => "mai",
+    6 => "juin",
+    7 => "juillet",
+    8 => "aout",
+    9 => "septembre",
+    10 => "octobre",
+    11 => "novembre",
+    12 => "décembre",
+    13 => "janvier",
+    14 => "fevrier",
+    15 => "mars",
+    16 => "avril",
+    17 => "mai",
+    18 => "juin",
+];
+
 // Load correctly syles.css files
 add_action("wp_enqueue_scripts", "theme_enqueue_styles");
 function theme_enqueue_styles()
@@ -12,16 +43,6 @@ add_shortcode("get_info", "get_info_function");
 function get_info_function($args)
 {
     return get_bloginfo($args[0]);
-}
-
-// Add favicon
-add_action("wp_head", "_block_template_favicon", 1);
-function _block_template_favicon()
-{
-    echo '<link rel="icon" type="image/jpg" href="' .
-        get_stylesheet_directory_uri() .
-        '/images/icon.jpg" />' .
-        PHP_EOL;
 }
 
 // Lien d'édition de la page
@@ -62,7 +83,6 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
 
             $sous_menu = $p->parent_id;
         }
-
         // Pour toutes les lignes
         $r[] = "\t\t\t<li><a href='/$p->post_name/' title='Voir la page'>$p->post_title</a></li>";
     }
@@ -71,20 +91,76 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
     return implode(PHP_EOL, $r);
 }
 
+// Calendrier
+add_shortcode("calendrier", "calendrier_function");
+function calendrier_function()
+{
+    global $post, $annee, $nom_jour, $nom_mois;
+    date_default_timezone_set("Europe/Paris");
+
+    // Remplir des cases actives
+    preg_match_all("|<tr>.*</tr>|U", $post->post_content, $lignes);
+    foreach ($lignes[0] as $l) {
+        preg_match_all("|<td>(.*)</td>|U", $l, $colonnes);
+        if (count($colonnes) == 2 && is_numeric($colonnes[1][0])) {
+            foreach (explode(",", $colonnes[1][1]) as $jour) {
+                remplir_calendrier(
+                    $calendrier,
+                    $annee + ($colonnes[1][0] < 8 ? 1 : 0),
+                    $colonnes[1][0],
+                    $jour,
+                    "date_active"
+                );
+            }
+        }
+    }
+    // Remplir les autres cases
+    for ($j = 1; $j < 310; $j++) {
+        remplir_calendrier($calendrier, $annee, 9, $j, "");
+    }
+    // Afficher le calendrier
+    $r = [];
+    ksort($calendrier);
+    foreach ($calendrier as $k => $v) {
+        $r[] = "<table class=\"calendrier\">";
+        $r[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s</td></tr>";
+        ksort($v);
+        foreach ($v as $kv => $vv) {
+            if ($kv < 19) {
+                // N'affiche pas juillet
+                $r[] = "<tr><td>{$nom_mois[$kv]}</td>";
+                ksort($vv);
+                foreach ($vv as $kvv => $vvv) {
+                    $r[] = "<td class=\"$vvv\">$kvv</td>";
+                }
+                $r[] = "</tr>";
+            }
+        }
+        $r[] = "</table>";
+    }
+    $r[] = "</div>";
+    return implode(PHP_EOL, $r);
+}
+
+function remplir_calendrier(&$calendrier, $an, $mois, $jour, $set)
+{
+    global $annee;
+
+    $dateTime = new DateTime();
+    $dateTime->setDate($an, $mois, $jour);
+    $dt = explode(" ", $dateTime->format("Y N n j"));
+    $noj = $dt[1] - 1;
+    $nom = $dt[2] + ($dt[0] - $annee) * 12;
+    if (isset($calendrier[$noj]) || $set) {
+        $calendrier[$noj][$nom][$dt[3]] .= $set;
+    }
+}
+
 // Horaires
 add_shortcode("horaires", "horaires_function");
 function horaires_function()
 {
-    global $wpdb;
-    $jours_semaine = [
-        "lundi",
-        "mardi",
-        "mercredi",
-        "jeudi",
-        "vendredi",
-        "samedi",
-        "dimanche",
-    ];
+    global $wpdb, $nom_jour;
 
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
@@ -104,7 +180,7 @@ WHERE post_status = 'publish'
         foreach ($lignes[0] as $l) {
             preg_match_all("|<td>(.*)</td>|U", $l, $colonnes);
             $date = explode(" ", $colonnes[1][1], 2);
-            $no_jour = array_search(strtolower(trim($date[0])), $jours_semaine);
+            $no_jour = array_search(strtolower(trim($date[0])), $nom_jour);
 
             $ligne_horaire = [
                 '<a title="Voir l\'activité" href="' .
@@ -123,6 +199,7 @@ WHERE post_status = 'publish'
             ];
 
             if (
+                $no_jour &&
                 str_contains(
                     implode("/horaires/", $ligne_horaire),
                     $page_url[0]
@@ -138,10 +215,7 @@ WHERE post_status = 'publish'
 
         ksort($horaires);
         foreach ($horaires as $no_jour => $jour) {
-            $rj = [
-                "\t<table>",
-                "\t\t<caption>{$jours_semaine[$no_jour]}</caption>",
-            ];
+            $rj = ["\t<table>", "\t\t<caption>{$nom_jour[$no_jour]}</caption>"];
             ksort($jour);
             foreach ($jour as $heure) {
                 foreach ($heure as $ligne) {
