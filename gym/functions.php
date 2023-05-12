@@ -47,13 +47,15 @@ function get_info_function($args)
 
 // Lien d'édition de la page
 add_shortcode("edit_page", "edit_page_function");
-function edit_page_function()
+function edit_page_function($args)
 {
     global $post;
 
-    return "<a class=\"crayon\" title=\"Modification de la page\" href=\"" .
-        get_bloginfo("url") .
-        "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>";
+    if ($args || wp_get_current_user()->allcaps["edit_others_pages"]) {
+        return "<a class=\"crayon\" title=\"Modification de la page\" href=\"" .
+            get_bloginfo("url") .
+            "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>";
+    }
 }
 
 // Menu haut de page
@@ -91,71 +93,6 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
     return implode(PHP_EOL, $r);
 }
 
-// Calendrier
-add_shortcode("calendrier", "calendrier_function");
-function calendrier_function()
-{
-    global $post, $annee, $nom_jour, $nom_mois;
-    date_default_timezone_set("Europe/Paris");
-
-    // Remplir des cases actives
-    preg_match_all("|<tr>.*</tr>|U", $post->post_content, $lignes);
-    foreach ($lignes[0] as $l) {
-        preg_match_all("|<td>(.*)</td>|U", $l, $colonnes);
-        if (count($colonnes) == 2 && is_numeric($colonnes[1][0])) {
-            foreach (explode(",", $colonnes[1][1]) as $jour) {
-                remplir_calendrier(
-                    $calendrier,
-                    $annee + ($colonnes[1][0] < 8 ? 1 : 0),
-                    $colonnes[1][0],
-                    $jour,
-                    "date_active"
-                );
-            }
-        }
-    }
-    // Remplir les autres cases
-    for ($j = 1; $j < 310; $j++) {
-        remplir_calendrier($calendrier, $annee, 9, $j, "");
-    }
-    // Afficher le calendrier
-    $r = [];
-    ksort($calendrier);
-    foreach ($calendrier as $k => $v) {
-        $r[] = "<table class=\"calendrier\">";
-        $r[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s</td></tr>";
-        ksort($v);
-        foreach ($v as $kv => $vv) {
-            if ($kv < 19) {
-                // N'affiche pas juillet
-                $r[] = "<tr><td>{$nom_mois[$kv]}</td>";
-                ksort($vv);
-                foreach ($vv as $kvv => $vvv) {
-                    $r[] = "<td class=\"$vvv\">$kvv</td>";
-                }
-                $r[] = "</tr>";
-            }
-        }
-        $r[] = "</table>";
-    }
-    $r[] = "</div>";
-    return implode(PHP_EOL, $r);
-}
-
-function remplir_calendrier(&$calendrier, $an, $mois, $jour, $set)
-{
-    global $annee;
-
-    $dateTime = new DateTime();
-    $dateTime->setDate($an, $mois, $jour);
-    $dt = explode(" ", $dateTime->format("Y N n j"));
-    $noj = $dt[1] - 1;
-    $nom = $dt[2] + ($dt[0] - $annee) * 12;
-    if (isset($calendrier[$noj]) || $set) {
-        $calendrier[$noj][$nom][$dt[3]] .= $set;
-    }
-}
-
 // Horaires
 add_shortcode("horaires", "horaires_function");
 function horaires_function()
@@ -165,7 +102,7 @@ function horaires_function()
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
     $pages_publiees = $wpdb->get_results("
-SELECT post_title, post_name, post_content
+SELECT post_title, post_name, post_content, ID
 FROM wpgym_posts
 WHERE post_status = 'publish'
 ");
@@ -181,11 +118,16 @@ WHERE post_status = 'publish'
             preg_match_all("|<td>(.*)</td>|U", $l, $colonnes);
             $date = explode(" ", $colonnes[1][1], 2);
             $no_jour = array_search(strtolower(trim($date[0])), $nom_jour);
+            $edit = wp_get_current_user()->allcaps["edit_others_pages"]
+                ? "<a class=\"crayon\" title=\"Modification des séances\" href=\"" .
+                    get_bloginfo("url") .
+                    "/wp-admin/post.php?&action=edit&post={$p->ID}\">&#9998;</a>"
+                : "";
 
             $ligne_horaire = [
                 '<a title="Voir l\'activité" href="' .
                 get_bloginfo("url") .
-                "/{$p->post_name}/\">{$colonnes[1][0]}</a>",
+                "/{$p->post_name}/\">{$colonnes[1][0]}</a>$edit",
 
                 $date[1],
 
@@ -230,6 +172,71 @@ WHERE post_status = 'publish'
         }
         $r[] = "</div>";
         return implode(PHP_EOL, $r);
+    }
+}
+
+// Calendrier
+add_shortcode("calendrier", "calendrier_function");
+function calendrier_function()
+{
+    global $post, $annee, $nom_jour, $nom_mois;
+    date_default_timezone_set("Europe/Paris");
+
+    // Remplir des cases actives
+    preg_match_all("|<tr>.*</tr>|U", $post->post_content, $lignes);
+    foreach ($lignes[0] as $l) {
+        preg_match_all("|<td>(.*)</td>|U", $l, $colonnes);
+        if (count($colonnes) == 2 && is_numeric($colonnes[1][0])) {
+            foreach (explode(",", $colonnes[1][1]) as $jour) {
+                remplir_calendrier(
+                    $calendrier,
+                    $annee + ($colonnes[1][0] < 8 ? 1 : 0),
+                    $colonnes[1][0],
+                    $jour,
+                    "date_active"
+                );
+            }
+        }
+    }
+    // Remplir les autres cases
+    for ($j = 1; $j < 310; $j++) {
+        remplir_calendrier($calendrier, $annee, 9, $j, "");
+    }
+    // Afficher le calendrier
+    $r = [];
+    ksort($calendrier);
+    foreach ($calendrier as $k => $v) {
+        $r[] = "<table class=\"calendrier\">";
+        $r[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s [edit_page]</td></tr>";
+        ksort($v);
+        foreach ($v as $kv => $vv) {
+            if ($kv < 19) {
+                // N'affiche pas juillet
+                $r[] = "<tr><td>{$nom_mois[$kv]}</td>";
+                ksort($vv);
+                foreach ($vv as $kvv => $vvv) {
+                    $r[] = "<td class=\"$vvv\">$kvv</td>";
+                }
+                $r[] = "</tr>";
+            }
+        }
+        $r[] = "</table>";
+    }
+    $r[] = "</div>";
+    return implode(PHP_EOL, $r);
+}
+
+function remplir_calendrier(&$calendrier, $an, $mois, $jour, $set)
+{
+    global $annee;
+
+    $dateTime = new DateTime();
+    $dateTime->setDate($an, $mois, $jour);
+    $dt = explode(" ", $dateTime->format("Y N n j"));
+    $noj = $dt[1] - 1;
+    $nom = $dt[2] + ($dt[0] - $annee) * 12;
+    if (isset($calendrier[$noj]) || $set) {
+        $calendrier[$noj][$nom][$dt[3]] .= $set;
     }
 }
 

@@ -1,7 +1,5 @@
 <!-- LOGO FÉDÉ -->
 <div class="banniere">
-  [edit_page]
-
   <a class="logo" title="Sport Santé" href="https://www.sport-sante.fr/" target="_BLANK">
     <img src="[get_info stylesheet_directory]/images/logo.png" />
   </a>
@@ -13,8 +11,10 @@
 
 [menu]
 
+[edit_page connexion]
+
 <script>
-// Inhibe le lien quand on touche pour ouvrir le sous-menu
+// Inhibe le lien quand on touche pour ouvrir le sous-menu (mais pas quand on clique)
 function clickMenu(evt, el) {
 	const parentClass = el.parentElement.classList.contains('open');
 

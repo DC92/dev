@@ -4,6 +4,9 @@ Template: twentytwentythree
 */
 
 /* Overwrite twentytwentythree */
+.wp-block-group {
+  margin: 0 !important;
+}
 .wp-site-blocks {
   padding: 0;
 }
@@ -177,6 +180,6 @@ table.calendrier {
 }
 .crayon {
   float: right;
-  padding: 1em;
-  color: white;
+  padding: 0;
+  text-decoration: none;
 }
