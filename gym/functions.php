@@ -47,15 +47,12 @@ function get_info_function($args)
 
 // Lien d'édition de la page
 add_shortcode("edit_page", "edit_page_function");
-function edit_page_function($args)
+function edit_page_function()
 {
     global $post;
-
-    if ($args || wp_get_current_user()->allcaps["edit_others_pages"]) {
-        return "<a class=\"crayon\" title=\"Modification de la page\" href=\"" .
-            get_bloginfo("url") .
-            "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>";
-    }
+    return "<a class=\"crayon\" title=\"Modification de la page\" href=\"" .
+        get_bloginfo("url") .
+        "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>";
 }
 
 // Menu haut de page
@@ -119,7 +116,7 @@ WHERE post_status = 'publish'
             $date = explode(" ", $colonnes[1][1], 2);
             $no_jour = array_search(strtolower(trim($date[0])), $nom_jour);
             $edit = wp_get_current_user()->allcaps["edit_others_pages"]
-                ? "<a class=\"crayon\" title=\"Modification des séances\" href=\"" .
+                ? "<a class=\"crayon\" title=\"Modification de la séance\" href=\"" .
                     get_bloginfo("url") .
                     "/wp-admin/post.php?&action=edit&post={$p->ID}\">&#9998;</a>"
                 : "";
@@ -206,8 +203,13 @@ function calendrier_function()
     $r = [];
     ksort($calendrier);
     foreach ($calendrier as $k => $v) {
+        $edit = wp_get_current_user()->allcaps["edit_others_pages"]
+            ? "<a class=\"crayon\" title=\"Modification du calendrier\" href=\"" .
+                get_bloginfo("url") .
+                "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>"
+            : "";
         $r[] = "<table class=\"calendrier\">";
-        $r[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s [edit_page]</td></tr>";
+        $r[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s $edit</td></tr>";
         ksort($v);
         foreach ($v as $kv => $vv) {
             if ($kv < 19) {
