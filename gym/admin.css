@@ -1,0 +1,23 @@
+.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
+  opacity: 1;
+}
+.is-focus-mode
+  .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected,
+.is-focus-mode
+  .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected
+  .block-editor-block-list__block,
+.is-focus-mode
+  .block-editor-block-list__block.is-content-locked.has-child-selected,
+.is-focus-mode
+  .block-editor-block-list__block.is-content-locked.has-child-selected
+  .block-editor-block-list__block,
+.is-focus-mode
+  .block-editor-block-list__block:not(.has-child-selected)
+  .block-editor-block-list__block,
+.is-focus-mode
+  .block-editor-block-list__block:not(.has-child-selected).is-multi-selected,
+.is-focus-mode
+  .block-editor-block-list__block:not(.has-child-selected).is-selected {
+  border: solid grey;
+  padding: 5px;
+}

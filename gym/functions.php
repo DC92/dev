@@ -31,11 +31,21 @@ $nom_mois = [
 ];
 
 // Load correctly syles.css files
-add_action("wp_enqueue_scripts", "theme_enqueue_styles");
-function theme_enqueue_styles()
+add_action("wp_enqueue_scripts", "wp_enqueue_scripts_function");
+function wp_enqueue_scripts_function()
 {
     wp_register_style("style", get_stylesheet_uri());
     wp_enqueue_style("style");
+}
+
+// Réglage de l'opacité de l'éditeur
+add_action("admin_head", "admin_head_function");
+function admin_head_function()
+{
+    wp_enqueue_style(
+        "admin_css",
+        get_stylesheet_directory_uri() . "/admin.css"
+    );
 }
 
 // Use global urls in block templates (as defined in wp-includes/general-template.php)
