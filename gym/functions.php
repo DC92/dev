@@ -1,34 +1,15 @@
 <?php
 $annee = 2023;
-$nom_jour = [
-    "lundi",
-    "mardi",
-    "mercredi",
-    "jeudi",
-    "vendredi",
-    "samedi",
-    "dimanche",
-];
-$nom_mois = [
-    1 => "janvier",
-    2 => "fevrier",
-    3 => "mars",
-    4 => "avril",
-    5 => "mai",
-    6 => "juin",
-    7 => "juillet",
-    8 => "aout",
-    9 => "septembre",
-    10 => "octobre",
-    11 => "novembre",
-    12 => "décembre",
-    13 => "janvier",
-    14 => "fevrier",
-    15 => "mars",
-    16 => "avril",
-    17 => "mai",
-    18 => "juin",
-];
+$nom_jour = explode(
+    " ",
+    " lundi mardi mercredi jeudi vendredi samedi dimanche"
+);
+$nom_mois = explode(
+    " ",
+    " janvier fevrier mars avril mai juin" .
+        " juillet aout septembre octobre novembre décembre" .
+        " janvier fevrier mars avril mai juin"
+);
 
 // Load correctly syles.css files
 add_action("wp_enqueue_scripts", "wp_enqueue_scripts_function");
@@ -245,11 +226,10 @@ function remplir_calendrier(&$calendrier, $an, $mois, $jour, $set)
     $dateTime = new DateTime();
     $dateTime->setDate($an, $mois, $jour);
     $dt = explode(" ", $dateTime->format("Y N n j"));
-    $noj = $dt[1] - 1;
+    $noj = $dt[1];
     $nom = $dt[2] + ($dt[0] - $annee) * 12;
     if (isset($calendrier[$noj]) || $set) {
         $calendrier[$noj][$nom][$dt[3]] .= $set;
     }
 }
-
 ?>

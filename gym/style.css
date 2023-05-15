@@ -4,16 +4,35 @@ Template: twentytwentythree
 */
 
 /* Overwrite twentytwentythree */
-.wp-block-group {
+.wp-block-group,
+.wp-site-blocks,
+.has-global-padding,
+body .is-layout-flow > * + * {
   margin: 0 !important;
-}
-.wp-site-blocks {
-  padding: 0;
+  padding: 0 !important;
 }
 
-/* Efface les tables d'horaires */
-.wp-block-table {
+.copyright {
+  text-align: center;
+}
+.crayon {
+  float: right;
+  padding: 0;
+  text-decoration: none;
+}
+
+/* Contenu de la page */
+/* Titre de l'accueil de la première page */
+.home .wp-site-blocks h1.wp-block-post-title {
   display: none;
+}
+/* Titres à l'intérieur de la page */
+.wp-site-blocks h2.wp-block-heading {
+  padding: 0.2em;
+  border-radius: 0.2em;
+  background: #08babe;
+  color: white;
+  font-size: 1.1em;
 }
 
 /* Banniere */
@@ -139,11 +158,17 @@ ul.menu li ul li {
   margin-top: 0.7em;
   text-align: left;
   font-size: 120%;
+  font-weight: bold;
+  text-transform: capitalize;
 }
 .horaires td {
   border: 1px dashed;
   padding: 0.2em;
   text-align: left;
+}
+/* Efface les tableaux de saisie d'horaires */
+.wp-block-table {
+  display: none;
 }
 
 table.calendrier {
@@ -173,13 +198,4 @@ table.calendrier {
   background: #08babe;
   color: white !important;
   font-weight: bold;
-}
-
-.copyright {
-  text-align: center;
-}
-.crayon {
-  float: right;
-  padding: 0;
-  text-decoration: none;
 }

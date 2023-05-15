@@ -1,23 +1,22 @@
-.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
-  opacity: 1;
+/* Visualisation des blocks */
+.edit-post-visual-editor__post-title-wrapper h1,
+.wp-block-post-content.block-editor-block-list__layout > * {
+  border: 3px solid white;
+  opacity: 1 !important;
 }
-.is-focus-mode
-  .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected,
-.is-focus-mode
-  .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected
-  .block-editor-block-list__block,
-.is-focus-mode
-  .block-editor-block-list__block.is-content-locked.has-child-selected,
-.is-focus-mode
-  .block-editor-block-list__block.is-content-locked.has-child-selected
-  .block-editor-block-list__block,
-.is-focus-mode
-  .block-editor-block-list__block:not(.has-child-selected)
-  .block-editor-block-list__block,
-.is-focus-mode
-  .block-editor-block-list__block:not(.has-child-selected).is-multi-selected,
-.is-focus-mode
-  .block-editor-block-list__block:not(.has-child-selected).is-selected {
-  border: solid grey;
-  padding: 5px;
+.edit-post-visual-editor__post-title-wrapper h1:hover,
+.wp-block-post-content.block-editor-block-list__layout > *:hover {
+  border-color: grey;
+}
+/* Titres de la page */
+.edit-post-visual-editor__post-title-wrapper {
+  margin: 0 !important;
+}
+/* Titres à l'intérieur de la page */
+h2.block-editor-rich-text__editable {
+  padding: 0.2em;
+  border-radius: 0.2em;
+  background: #08babe;
+  color: white;
+  font-size: 1.1em;
 }
