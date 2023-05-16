@@ -48,37 +48,47 @@ function edit_page_function()
 
 // Menu haut de page
 add_shortcode("menu", "menu_function");
-function menu_function()
+function menu_function($args)
 {
-    global $wpdb;
+    global $wpdb, $post;
 
     $pages = $wpdb->get_results("
-SELECT child.post_title, child.post_name,
-  parent.post_title AS parent_title,
-  parent.post_name AS parent_name, parent.ID AS parent_id
+SELECT child.post_title, child.post_name, child.post_parent,
+  parent.post_title AS parent_title, parent.post_name AS parent_name
 FROM wpgym_posts AS parent
 JOIN wpgym_posts AS child ON parent.ID = child.post_parent
 WHERE parent.post_status = 'publish' AND child.post_status = 'publish'
 ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_title
 ");
 
-    $r = ['<ul class="menu">'];
+    $menu[] = '<ul class="menu">';
+    $liste[] = '<ul class="sous_pages">';
     foreach ($pages as $p) {
-        // Au changement de ligne
-        if ($sous_menu != $p->parent_id) {
+        // Au changement de sous-menu
+        if ($sous_menu != $p->post_parent) {
             if ($sous_menu) {
-                $r[] = "\t\t</ul>\n\t</li>";
+                $menu[] = "\t\t</ul>\n\t</li>";
             }
-            $r[] = "\t<li>\n\t\t<a onclick=\"return clickMenu(event,this)\" href='/$p->parent_name/'>$p->parent_title</a>\n\t\t<ul>";
+            $menu[] = "\t<li>\n\t\t<a onclick=\"return clickMenu(event,this)\" href='/$p->parent_name/'>$p->parent_title</a>\n\t\t<ul>";
 
-            $sous_menu = $p->parent_id;
+            $sous_menu = $p->post_parent;
         }
-        // Pour toutes les lignes
-        $r[] = "\t\t\t<li><a href='/$p->post_name/' title='Voir la page'>$p->post_title</a></li>";
-    }
-    $r[] = "\t\t</ul>\n\t</li>\n</ul>";
 
-    return implode(PHP_EOL, $r);
+        // Pour toutes les lignes
+        $menu[] = "\t\t\t<li><a href='/$p->post_name/' title='Voir la page'>$p->post_title</a></li>";
+
+        // Affichage de sous-catégories
+        if ($sous_menu == $post->ID) {
+            $liste[] =
+                "<li><a href=\"" .
+                get_bloginfo("url") .
+                "/$p->post_name/\">$p->post_title</a></li>";
+        }
+    }
+    $menu[] = "\t\t</ul>\n\t</li>\n</ul>";
+    $liste[] = "</ul>";
+
+    return implode(PHP_EOL, $args ? $liste : $menu);
 }
 
 // Horaires
@@ -141,7 +151,7 @@ WHERE post_status = 'publish'
     }
 
     if (count($horaires)) {
-        $r[] = "\n<div class=\"horaires\">";
+        $cal[] = "\n<div class=\"horaires\">";
 
         ksort($horaires);
         foreach ($horaires as $no_jour => $jour) {
@@ -156,10 +166,10 @@ WHERE post_status = 'publish'
                 }
             }
             $rj[] = "\t</table>";
-            $r[] = implode(PHP_EOL, $rj);
+            $cal[] = implode(PHP_EOL, $rj);
         }
-        $r[] = "</div>";
-        return implode(PHP_EOL, $r);
+        $cal[] = "</div>";
+        return implode(PHP_EOL, $cal);
     }
 }
 
@@ -191,7 +201,7 @@ function calendrier_function()
         remplir_calendrier($calendrier, $annee, 9, $j, "");
     }
     // Afficher le calendrier
-    $r = [];
+    $cal = [];
     ksort($calendrier);
     foreach ($calendrier as $k => $v) {
         $edit = wp_get_current_user()->allcaps["edit_others_pages"]
@@ -199,24 +209,24 @@ function calendrier_function()
                 get_bloginfo("url") .
                 "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>"
             : "";
-        $r[] = "<table class=\"calendrier\">";
-        $r[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s $edit</td></tr>";
+        $cal[] = "<table class=\"calendrier\">";
+        $cal[] = "<tr><td colspan=\"6\">Les {$nom_jour[$k]}s $edit</td></tr>";
         ksort($v);
         foreach ($v as $kv => $vv) {
             if ($kv < 19) {
                 // N'affiche pas juillet
-                $r[] = "<tr><td>{$nom_mois[$kv]}</td>";
+                $cal[] = "<tr><td>{$nom_mois[$kv]}</td>";
                 ksort($vv);
                 foreach ($vv as $kvv => $vvv) {
-                    $r[] = "<td class=\"$vvv\">$kvv</td>";
+                    $cal[] = "<td class=\"$vvv\">$kvv</td>";
                 }
-                $r[] = "</tr>";
+                $cal[] = "</tr>";
             }
         }
-        $r[] = "</table>";
+        $cal[] = "</table>";
     }
-    $r[] = "</div>";
-    return implode(PHP_EOL, $r);
+    $cal[] = "</div>";
+    return implode(PHP_EOL, $cal);
 }
 
 function remplir_calendrier(&$calendrier, $an, $mois, $jour, $set)

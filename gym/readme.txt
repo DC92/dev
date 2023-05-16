@@ -26,3 +26,8 @@ Ajoputer couleur à la mise en forme
 
 <meta http-equiv="refresh" content="0;https">
 [leaflet-map lng="2.19712" lat="48.81788"][leaflet-marker]
+
+MISE EN SERVICE
+===============
+Changer url
+Changer préfixe base wpgym_
