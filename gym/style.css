@@ -1,7 +1,7 @@
 /*
-Theme Name: gym
-Template: twentytwentythree
-*/
+    Theme Name: gym
+    Template: twentytwentythree
+    */
 
 /* Cadrage du contenu de la page */
 .wp-site-blocks,
@@ -26,7 +26,7 @@ Template: twentytwentythree
 }
 /* Titres à l'intérieur de la page */
 .wp-site-blocks h2.wp-block-heading, /* Prod */
-h2.block-editor-rich-text__editable /* Edit */ {
+    h2.block-editor-rich-text__editable /* Edit */ {
   padding: 0.2em;
   border-radius: 10px;
   background: #08babe;
@@ -188,7 +188,7 @@ ul.menu li ul li {
   text-align: left;
 }
 /* Efface les tableaux de saisie d'horaires */
-.wp-block-table {
+.wp-block-group .wp-block-table {
   display: none;
 }
 
@@ -234,6 +234,9 @@ table.calendrier {
   float: right;
   padding: 0;
   text-decoration: none;
+}
+header .crayon {
+  margin-top: -1em;
 }
 
 /* Admin : Visualisation des blocks */
