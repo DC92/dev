@@ -25,7 +25,7 @@ function admin_head_function()
 {
     wp_enqueue_style(
         "admin_css",
-        get_stylesheet_directory_uri() . "/admin.css"
+        get_stylesheet_directory_uri() . "/style.css"
     );
 }
 

@@ -3,18 +3,11 @@ Theme Name: gym
 Template: twentytwentythree
 */
 
-.copyright {
-  text-align: center;
-}
-.crayon {
-  float: right;
-  padding: 0;
-  text-decoration: none;
-}
-
 /* Cadrage du contenu de la page */
-.wp-site-blocks {
-  padding: 0;
+.wp-site-blocks,
+.has-global-padding,
+.wp-block-template-part div {
+  padding: 0 !important;
 }
 .is-layout-constrained
   > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
@@ -22,30 +15,23 @@ Template: twentytwentythree
 }
 .wp-block-group,
 .wp-block-template-part {
-  margin: 0 calc(max(0, 10% - 50px)) !important;
-  margin-top: 0 !important;
-  wmax-width: var(--wp--style--global--content-size) !important;
-  wmargin-left: auto;
-  wmargin-right: auto !important;
-}
-.wp-block-group div {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  margin: 0px calc(max(1%, 10% - 50px)) !important;
 }
 /* Titre de l'accueil de la première page */
 .home .wp-site-blocks h1.wp-block-post-title {
   display: none;
 }
 .wp-site-blocks h1.wp-block-post-title {
-  font-size: 3em;
+  font-size: 32px;
 }
 /* Titres à l'intérieur de la page */
-.wp-site-blocks h2.wp-block-heading {
+.wp-site-blocks h2.wp-block-heading, /* Prod */
+h2.block-editor-rich-text__editable /* Edit */ {
   padding: 0.2em;
-  border-radius: 0.2em;
+  border-radius: 10px;
   background: #08babe;
   color: white;
-  font-size: 1.1em;
+  font-size: 18px;
 }
 .wp-block-post-content p {
   text-align: justify;
@@ -99,6 +85,7 @@ Template: twentytwentythree
   }
 }
 
+/* Menu */
 ul.menu {
   display: flex;
   flex-wrap: wrap;
@@ -147,6 +134,7 @@ ul.menu li ul li {
   padding: 0 0.3em;
 }
 
+/* Horaires */
 .horaires table {
   clear: both;
   margin-left: calc(max(0px, 10% - 60px));
@@ -204,6 +192,7 @@ ul.menu li ul li {
   display: none;
 }
 
+/* Calendrier */
 table.calendrier {
   margin: 1em auto;
   border: 2px solid grey !important;
@@ -231,4 +220,29 @@ table.calendrier {
   background: #08babe;
   color: white !important;
   font-weight: bold;
+}
+
+/* Misc */
+.leaflet-map {
+  clear: both;
+  max-width: 100% !important;
+}
+.copyright {
+  text-align: center;
+}
+.crayon {
+  float: right;
+  padding: 0;
+  text-decoration: none;
+}
+
+/* Admin : Visualisation des blocks */
+.edit-post-visual-editor__post-title-wrapper h1,
+.wp-block-post-content.block-editor-block-list__layout > * {
+  border: 3px solid white;
+  opacity: 1 !important;
+}
+.edit-post-visual-editor__post-title-wrapper h1:hover,
+.wp-block-post-content.block-editor-block-list__layout > *:hover {
+  border-color: grey;
 }
