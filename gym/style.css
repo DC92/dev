@@ -3,15 +3,6 @@ Theme Name: gym
 Template: twentytwentythree
 */
 
-/* Overwrite twentytwentythree */
-.wp-block-group,
-.wp-site-blocks,
-.has-global-padding,
-body .is-layout-flow > * + * {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
 .copyright {
   text-align: center;
 }
@@ -21,10 +12,32 @@ body .is-layout-flow > * + * {
   text-decoration: none;
 }
 
-/* Contenu de la page */
+/* Cadrage du contenu de la page */
+.wp-site-blocks {
+  padding: 0;
+}
+.is-layout-constrained
+  > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+  max-width: initial !important;
+}
+.wp-block-group,
+.wp-block-template-part {
+  margin: 0 calc(max(0, 10% - 50px)) !important;
+  margin-top: 0 !important;
+  wmax-width: var(--wp--style--global--content-size) !important;
+  wmargin-left: auto;
+  wmargin-right: auto !important;
+}
+.wp-block-group div {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
 /* Titre de l'accueil de la première page */
 .home .wp-site-blocks h1.wp-block-post-title {
   display: none;
+}
+.wp-site-blocks h1.wp-block-post-title {
+  font-size: 3em;
 }
 /* Titres à l'intérieur de la page */
 .wp-site-blocks h2.wp-block-heading {
@@ -33,6 +46,25 @@ body .is-layout-flow > * + * {
   background: #08babe;
   color: white;
   font-size: 1.1em;
+}
+.wp-block-post-content p {
+  text-align: justify;
+}
+/* Images */
+.wp-block-image.alignleft {
+  margin: 1em 1em 1em 0 !important;
+}
+.wp-block-image.alignright {
+  margin: 1em 0 1em 1em !important;
+}
+.wp-block-image img {
+  border-radius: 1em;
+  max-width: 33vh;
+}
+@media screen and (max-width: 600px) {
+  .wp-block-image img {
+    display: none;
+  }
 }
 
 /* Banniere */
@@ -116,7 +148,8 @@ ul.menu li ul li {
 }
 
 .horaires table {
-  margin-left: calc((10% - 60px));
+  clear: both;
+  margin-left: calc(max(0px, 10% - 60px));
   border: 4px solid hsl(103, 20%, 60%);
   border-collapse: collapse;
   background: hsl(103, 50%, 85%);
@@ -125,32 +158,32 @@ ul.menu li ul li {
   }
 }
 .horaires table:nth-of-type(2) {
-  margin-left: calc((10% - 60px) * 2);
+  margin-left: calc(max(0px, (10% - 60px) * 2));
   border-color: hsl(206, 20%, 60%);
   background: hsl(206, 50%, 85%);
 }
 .horaires table:nth-of-type(3) {
-  margin-left: calc((10% - 60px) * 3);
+  margin-left: calc(max(0px, (10% - 60px) * 3));
   border-color: hsl(309, 20%, 60%);
   background: hsl(309, 50%, 85%);
 }
 .horaires table:nth-of-type(4) {
-  margin-left: calc((10% - 60px) * 4);
+  margin-left: calc(max(0px, (10% - 60px) * 4));
   border-color: hsl(412, 20%, 60%);
   background: hsl(412, 50%, 85%);
 }
 .horaires table:nth-of-type(5) {
-  margin-left: calc((10% - 60px) * 5);
+  margin-left: calc(max(0px, (10% - 60px) * 5));
   border-color: hsl(55, 20%, 60%);
   background: hsl(515, 50%, 85%);
 }
 .horaires table:nth-of-type(6) {
-  margin-left: calc((10% - 60px) * 6);
+  margin-left: calc(max(0px, (10% - 60px) * 6));
   border-color: hsl(618, 20%, 60%);
   background: hsl(618, 50%, 85%);
 }
 .horaires table:nth-of-type(7) {
-  margin-left: calc((10% - 60px) * 7);
+  margin-left: calc(max(0px, (10% - 60px) * 7));
   border-color: hsl(721, 20%, 60%);
   background: hsl(721, 50%, 85%);
 }

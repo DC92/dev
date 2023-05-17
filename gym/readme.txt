@@ -17,12 +17,8 @@ Options -> Préférences
 
 TODO
 ====
-Horaire déborde à gauche
-Page de l'équipe : liste des animateurs
-Style blocs liste dans l'éditeur
-Style blocs liste dans l'éditeur mode tablette ou mobile
-Style appliqué à la page d'édition
-Ajoputer couleur à la mise en forme
+Horaire déborde à gauche et à droite
+Style blocs liste dans l'éditeur et mode tablette ou mobile
 
 <meta http-equiv="refresh" content="0;https">
 [leaflet-map lng="2.19712" lat="48.81788"][leaflet-marker]
