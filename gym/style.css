@@ -13,8 +13,7 @@
   > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
   max-width: initial !important;
 }
-.wp-block-group,
-.wp-block-template-part {
+.wp-block-group {
   margin: 0px calc(max(1%, 10% - 50px)) !important;
 }
 /* Titre de l'accueil de la première page */
