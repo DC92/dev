@@ -50,13 +50,13 @@ function edit_page_function()
 add_shortcode("menu", "menu_function");
 function menu_function($args)
 {
-    global $wpdb, $post;
+    global $wpdb, $table_prefix, $post;
 
     $pages = $wpdb->get_results("
 SELECT child.post_title, child.post_name, child.post_parent,
   parent.post_title AS parent_title, parent.post_name AS parent_name
-FROM wpgym_posts AS parent
-JOIN wpgym_posts AS child ON parent.ID = child.post_parent
+FROM {$table_prefix}posts AS parent
+JOIN {$table_prefix}posts AS child ON parent.ID = child.post_parent
 WHERE parent.post_status = 'publish' AND child.post_status = 'publish'
 ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_title
 ");
@@ -95,13 +95,13 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
 add_shortcode("horaires", "horaires_function");
 function horaires_function()
 {
-    global $wpdb, $nom_jour;
+    global $wpdb, $table_prefix, $nom_jour;
 
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
     $pages_publiees = $wpdb->get_results("
 SELECT post_title, post_name, post_content, ID
-FROM wpgym_posts
+FROM {$table_prefix}posts
 WHERE post_status = 'publish'
 ");
 

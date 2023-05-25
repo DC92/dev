@@ -11,17 +11,22 @@ Sous domaine - SSL Let's Encrypt
 WP : install
 Copier ces fichiers dans /wp-content/themes/gym
 Supprimer toutes extension et thème autre que 23
-Installer "Leaflet Map", activer, mises à jour
 Installer "Block Editor Colors", ajouter le jaune #fff00
 Installer "Contact Form 7"
 Extensions -> Contact Form 7 -> Réglages
 Installer "Favicon by RealFaviconGenerator"
 Apparence -> Favicon (images/favicon.jpg)
+Installer "Leaflet Map"
 
+Toutes extensions : activer, activer les mises à jour
 Pour chaque compte éditeur
 Options -> Préférences
 -> Mise en lumière
 -> Afficher les libellés texte des boutons
+
+BOUTIQUE
+========
+Installer "WooCommerce"
 
 TODO
 ====
@@ -35,5 +40,4 @@ TAGS DANS LES PAGES
 MISE EN SERVICE
 ===============
 Changer url
-Changer préfixe base wpgym_
-
+SQL : wpgym_ -> wp_   2023.gym -> chaville.gym
