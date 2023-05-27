@@ -1,9 +1,6 @@
 # Chavil.gym.WP
-Theme WordPress sur base twentytwentythree pour afficher les cours de la Gym Volontaire de Chaville
-
-STATUT
-======
 EN COURS DE DEVELOPPEMENT
+Theme WordPress sur base twentytwentythree pour afficher les cours de la Gym Volontaire de Chaville
 
 INSTALL
 =======
@@ -17,16 +14,7 @@ Extensions -> Contact Form 7 -> Réglages
 Installer "Favicon by RealFaviconGenerator"
 Apparence -> Favicon (images/favicon.jpg)
 Installer "Leaflet Map"
-
 Toutes extensions : activer, activer les mises à jour
-Pour chaque compte éditeur
-Options -> Préférences
--> Mise en lumière
--> Afficher les libellés texte des boutons
-
-BOUTIQUE
-========
-Installer "WooCommerce"
 
 TODO
 ====

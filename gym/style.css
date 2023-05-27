@@ -36,6 +36,9 @@ Description: Theme WordPress sur base twentytwentythree pour la Gym Volontaire d
 .wp-block-post-content p {
   text-align: justify;
 }
+body .is-layout-constrained > * + * {
+  margin-block-start: 0.8rem !important;
+}
 /* Images */
 .wp-block-image.alignleft {
   margin: 1em 1em 1em 0 !important;
