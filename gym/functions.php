@@ -57,7 +57,8 @@ SELECT child.post_title, child.post_name, child.post_parent,
   parent.post_title AS parent_title, parent.post_name AS parent_name
 FROM {$table_prefix}posts AS parent
 JOIN {$table_prefix}posts AS child ON parent.ID = child.post_parent
-WHERE parent.post_status = 'publish' AND child.post_status = 'publish'
+WHERE parent.post_type = 'page'
+  AND parent.post_status = 'publish' AND child.post_status = 'publish'
 ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_title
 ");
 
