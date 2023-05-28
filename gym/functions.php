@@ -98,6 +98,16 @@ function horaires_function()
 {
     global $wpdb, $table_prefix, $nom_jour;
 
+    // Listage des produits
+    $liste_produits = $wpdb->get_results("
+SELECT posts.post_title, posts.post_name
+FROM {$table_prefix}wc_product_meta_lookup AS products
+JOIN {$table_prefix}posts AS posts ON products.product_id = posts.ID
+");
+    foreach ($liste_produits as $p) {
+        $produits[$p->post_title] = $p;
+    }
+
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
     $pages_publiees = $wpdb->get_results("
@@ -117,10 +127,25 @@ WHERE post_status = 'publish'
             preg_match_all("|<td>(.*)</td>|U", $l, $colonnes);
             $date = explode(" ", $colonnes[1][1], 2);
             $no_jour = array_search(strtolower(trim($date[0])), $nom_jour);
+
             $edit = wp_get_current_user()->allcaps["edit_others_pages"]
                 ? "<a class=\"crayon\" title=\"Modification de la séance\" href=\"" .
                     get_bloginfo("url") .
                     "/wp-admin/post.php?&action=edit&post={$p->ID}\">&#9998;</a>"
+                : "";
+
+			// Lien vers la page de commande
+            $product_name = str_replace(
+                "<br>",
+                " ",
+                implode(", ", $colonnes[1])
+            );
+            $panier = isset($produits[$product_name])
+                ? ' <a href="' .
+                    get_bloginfo("url") .
+                    "/produit/" .
+                    $produits[$product_name]->post_name .
+                    '" title="S\'inscrire"">&#128722;</a> '
                 : "";
 
             $ligne_horaire = [
@@ -128,7 +153,7 @@ WHERE post_status = 'publish'
                 get_bloginfo("url") .
                 "/{$p->post_name}/\">{$colonnes[1][0]}</a>$edit",
 
-                $date[1],
+                $date[1] . $panier,
 
                 '<a title="Voir le lieu" href="' .
                 get_bloginfo("url") .

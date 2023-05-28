@@ -241,6 +241,10 @@ table.calendrier {
 header .crayon {
   margin-top: -1em;
 }
+/* WooCommerce */
+.product img {
+  display: none;
+}
 
 /* Admin : Visualisation des blocks */
 .edit-post-visual-editor__post-title-wrapper h1,
