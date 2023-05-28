@@ -8,25 +8,28 @@ Sous domaine - SSL Let's Encrypt
 WP : install
 Copier ces fichiers dans /wp-content/themes/gym
 Supprimer toutes extension et thème autre que 23
+LiteSpeed Cache
 Installer "Block Editor Colors", ajouter le jaune #fff00
+Installer "Leaflet Map"
 Installer "Contact Form 7" (pour le formulaire de contact)
 Extensions -> Contact Form 7 -> Réglages
 Installer "Favicon by RealFaviconGenerator"
   Apparence -> Favicon (images/favicon.jpg)
-Installer "Leaflet Map"
-LiteSpeed Cache
-WP Dark Mode
+Installer "WP Dark Mode"
   Settings -> Cocher tout
-WooCommerce : créer produits et codes promo
-Woocommerce checkout manager (WooCommerce Commander directeur par QuadLayers)
+Installer "WooCommerce"
+  Créer produits
+    Produit simple / Virtuel
+    150
+    Inventaire : Vendre individuellement
+Installer "WooCommerce Extended Coupon Features FREE Par Soft79
+  Marketing -> Codes promo
+    Retirer le menu de code promo hérité
+    Restrictions d'usage -> min / max / Utilisation individuelle
+    Divers -> Coupon automatique / Appliquer silencieusement
+Installer "Woocommerce checkout manager (WooCommerce Commander directeur par QuadLayers)
   Définir date naissance et certificat médical (obligatoires)
   Désactiver Entreprise & Région
-  Produit simple / Virtuel
-  Inventaire : Vendre individuellement
-WooCommerce Extended Coupon Features FREE Par Soft79
-  Marketing -> Codes promo
-  Restrictions d'usage -> min / max / Utilisation individuelle
-  Divers -> Coupon automatique / Appliquer silencieusement
 
 Toutes extensions : activer, activer les mises à jour
 

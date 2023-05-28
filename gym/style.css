@@ -242,8 +242,12 @@ header .crayon {
   margin-top: -1em;
 }
 /* WooCommerce */
-.product img {
+.woocommerce img {
   display: none;
+}
+.woocommerce h1,
+.woocommerce h2 {
+  font-size: 1.2rem !important;
 }
 
 /* Admin : Visualisation des blocks */
