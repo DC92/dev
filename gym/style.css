@@ -77,6 +77,15 @@ body .is-layout-constrained > * + * {
 .banniere a {
   text-decoration: none;
 }
+.customer_account {
+  float: right;
+  margin: 20px 5px;
+  color: white;
+}
+.customer_account span,
+.customer_account_0 {
+  display: none;
+}
 @media (max-width: 600px) {
   .banniere img {
     display: none;
@@ -242,12 +251,25 @@ header .crayon {
   margin-top: -1em;
 }
 /* WooCommerce */
-.woocommerce img {
-  display: none;
+.woocommerce img,
+.woocommerce .woocommerce-form-coupon-toggle,
+.woocommerce .woocommerce-billing-fields h3,
+.woocommerce .wc-forward,
+.woocommerce .coupon,
+.wc-block-mini-cart__amount {
+  display: none !important;
 }
 .woocommerce h1,
 .woocommerce h2 {
   font-size: 1.2rem !important;
+}
+.wc-block-mini-cart__quantity-badge {
+  cursor: pointer !important;
+  color: white;
+}
+.wc-block-mini-cart {
+  float: right;
+  margin-top: 7px;
 }
 
 /* Admin : Visualisation des blocks */

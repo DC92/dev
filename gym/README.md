@@ -8,34 +8,38 @@ Sous domaine - SSL Let's Encrypt
 WP : install
 Copier ces fichiers dans /wp-content/themes/gym
 Supprimer toutes extension et thème autre que 23
-LiteSpeed Cache
+Installer "Anti-Spam by CleanTalk"
+  (Spam protection, AntiSpam, FireWall by CleanTalk)
+  Clé d'accès
 Installer "Block Editor Colors", ajouter le jaune #fff00
-Installer "Leaflet Map"
 Installer "Contact Form 7" (pour le formulaire de contact)
-Extensions -> Contact Form 7 -> Réglages
+  Extensions -> Contact Form 7 -> Réglages
 Installer "Favicon by RealFaviconGenerator"
   Apparence -> Favicon (images/favicon.jpg)
-Installer "WP Dark Mode"
-  Settings -> Cocher tout
+Installer "Leaflet Map"
+Installer "LiteSpeed Cache"
+Installer "Site Kit by Google"
 Installer "WooCommerce"
   Créer produits
     Produit simple / Virtuel
     150
     Inventaire : Vendre individuellement
-Installer "WooCommerce Extended Coupon Features FREE Par Soft79
+Installer "Woocommerce checkout manager (WooCommerce Commander directeur par QuadLayers)
+  Définir date naissance et certificat médical (obligatoires)
+  Désactiver Entreprise & Région
+Installer "WooCommerce Extended Coupon Features FREE" Par Soft79
   Marketing -> Codes promo
     Retirer le menu de code promo hérité
     Restrictions d'usage -> min / max / Utilisation individuelle
     Divers -> Coupon automatique / Appliquer silencieusement
-Installer "Woocommerce checkout manager (WooCommerce Commander directeur par QuadLayers)
-  Définir date naissance et certificat médical (obligatoires)
-  Désactiver Entreprise & Région
+Installer "WP Dark Mode"
+  Settings -> Cocher tout
 
 Toutes extensions : activer, activer les mises à jour
 
 TODO / BUGS
 ===========
-Refermer le sous-menu si on tappe ailleurs
+Refermer le sous-menu si on tape ailleurs
 Editeur : Style blocs liste en mode tablette ou mobile
 
 TAGS DANS LES PAGES

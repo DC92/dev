@@ -10,6 +10,7 @@ $nom_mois = explode(
         " juillet aout septembre octobre novembre décembre" .
         " janvier fevrier mars avril mai juin"
 );
+$boutique = true;
 
 // Load correctly syles.css files
 add_action("wp_enqueue_scripts", "wp_enqueue_scripts_function");
@@ -33,7 +34,11 @@ function admin_head_function()
 add_shortcode("get_info", "get_info_function");
 function get_info_function($args)
 {
-    return get_bloginfo($args[0]);
+    if ($args[0] == "current_user_id") {
+        return get_current_user_id();
+    } else {
+        return get_bloginfo($args[0]);
+    }
 }
 
 // Lien d'édition de la page
@@ -41,6 +46,7 @@ add_shortcode("edit_page", "edit_page_function");
 function edit_page_function()
 {
     global $post;
+
     return "<a class=\"crayon\" title=\"Modification de la page\" href=\"" .
         get_bloginfo("url") .
         "/wp-admin/post.php?&action=edit&post={$post->ID}\">&#9998;</a>";
@@ -96,11 +102,11 @@ ORDER BY parent.menu_order, parent.post_title, child.menu_order, child.post_titl
 add_shortcode("horaires", "horaires_function");
 function horaires_function()
 {
-    global $wpdb, $table_prefix, $nom_jour;
+    global $wpdb, $table_prefix, $nom_jour, $boutique;
 
     // Listage des produits
     $liste_produits = $wpdb->get_results("
-SELECT posts.post_title, posts.post_name
+SELECT ID, posts.post_title
 FROM {$table_prefix}wc_product_meta_lookup AS products
 JOIN {$table_prefix}posts AS posts ON products.product_id = posts.ID
 ");
@@ -111,7 +117,7 @@ JOIN {$table_prefix}posts AS posts ON products.product_id = posts.ID
     preg_match('|/[^/]+/$|', $_SERVER["REQUEST_URI"], $page_url);
 
     $pages_publiees = $wpdb->get_results("
-SELECT post_title, post_name, post_content, ID
+SELECT ID, post_title, post_name, post_content
 FROM {$table_prefix}posts
 WHERE post_status = 'publish'
 ");
@@ -134,19 +140,20 @@ WHERE post_status = 'publish'
                     "/wp-admin/post.php?&action=edit&post={$p->ID}\">&#9998;</a>"
                 : "";
 
-			// Lien vers la page de commande
+            // Lien vers la page de commande
             $product_name = str_replace(
                 "<br>",
                 " ",
                 implode(", ", $colonnes[1])
             );
-            $panier = isset($produits[$product_name])
-                ? ' <a href="' .
-                    get_bloginfo("url") .
-                    "/produit/" .
-                    $produits[$product_name]->post_name .
-                    '" title="S\'inscrire"">&#128722;</a> '
-                : "";
+            $panier =
+                $boutique && isset($produits[$product_name])
+                    ? ' <a href="' .
+                        get_bloginfo("url") .
+                        "?add-to-cart=" .
+                        $produits[$product_name]->ID .
+                        '" title="S\'inscrire"">&#128722;</a> '
+                    : "";
 
             $ligne_horaire = [
                 '<a title="Voir l\'activité" href="' .
