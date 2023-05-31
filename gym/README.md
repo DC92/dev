@@ -25,6 +25,8 @@ Installer "WooCommerce"
     150
     Inventaire : Vendre individuellement
 Installer "Woocommerce checkout manager (WooCommerce Commander directeur par QuadLayers)
+  Extensions -> WooCommerce Commander directeur -> Paramètres (Réglages)
+  Général -> Commandes -> Facturation : ajouter des champs
   Définir date naissance et certificat médical (obligatoires)
   Désactiver Entreprise & Région
 Installer "WooCommerce Extended Coupon Features FREE" Par Soft79
@@ -32,6 +34,7 @@ Installer "WooCommerce Extended Coupon Features FREE" Par Soft79
     Retirer le menu de code promo hérité
     Restrictions d'usage -> min / max / Utilisation individuelle
     Divers -> Coupon automatique / Appliquer silencieusement
+??? Installer "Multiples Roles"
 Installer "WP Dark Mode"
   Settings -> Cocher tout
 
@@ -39,8 +42,10 @@ Toutes extensions : activer, activer les mises à jour
 
 TODO / BUGS
 ===========
+Ne vois plus le chargement du certificat médical
 Refermer le sous-menu si on tape ailleurs
 Editeur : Style blocs liste en mode tablette ou mobile
+Lien direct commande : réaffiche l'accueil immédiatement si erreur
 
 TAGS DANS LES PAGES
 ===================

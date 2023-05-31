@@ -254,7 +254,7 @@ header .crayon {
 .woocommerce img,
 .woocommerce .woocommerce-form-coupon-toggle,
 .woocommerce .woocommerce-billing-fields h3,
-.woocommerce .wc-forward,
+/*.woocommerce .wc-forward, TODO */
 .woocommerce .coupon,
 .wc-block-mini-cart__amount {
   display: none !important;
