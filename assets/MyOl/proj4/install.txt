@@ -1,2 +1,2 @@
 https://github.com/proj4js/proj4js/releases/latest
-V2.7.2
+V2.9.0

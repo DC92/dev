@@ -20,8 +20,9 @@ import {
 } from 'ol/sphere';
 
 // Geocoder
+//TODO BUG avec Ol 7.4.0
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css'; // Before MyOl
-import Geocoder from '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug';
+//TODO //import Geocoder from '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug';
 
 // MyOl
 import './controls.css';
