@@ -19,9 +19,6 @@ import {
 	Style,
 } from 'ol/style.js';
 
-// Geocoder
-import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
-
 // MyOl
 import {
 	controlButton,

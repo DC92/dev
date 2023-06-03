@@ -34,28 +34,28 @@ Based on https://openlayers.org
 	<script type="module">
 // Openlayers
 import 'ol/ol.css';
-import Map from 'ol/Map.js';
-import View from 'ol/View.js';
+import Map from 'ol/Map';
+import View from 'ol/View';
 
 // Geocoder
 //import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
-//import '@kirtandesai/ol-geocoder/dist/ol-geocoder.js';
+//import '@kirtandesai/ol-geocoder/dist/ol-geocoder';
 
 // MyOl
 import {
 	controlCollection,
-} from '../src/controlCollection.js';
+} from '../src/controlCollection';
 import {
 	controlLayerSwitcher,
-} from '../src/LayerSwitcher.js';
+} from '../src/LayerSwitcher';
 import {
 	tileLayerCollection,
-} from '../src/TileLayerCollection.js';
+} from '../src/TileLayerCollection';
 
 // Debug
 import {
 	VERSION
-} from 'ol/util.js';
+} from 'ol/util';
 console.log('OL V' + VERSION);
 
 new Map({

@@ -6,6 +6,7 @@
   position: static !important;
   float: left;
   margin: 2px;
+  color: black;
   /* No grey line around the button */
   padding: 0 !important;
 }
@@ -49,7 +50,8 @@
 }
 /* Coloring the button when touch selected */
 .myol-button-selected button,
-.myol-button div {
+.myol-button div,
+.myol-button div * {
   background: #d1e9ff;
 }
 .myol-button p,
@@ -119,6 +121,9 @@
   top: 62px;
   /* For mobiles no interaction with animate */
   z-index: 99;
+}
+.ol-geocoder ul.gcd-gl-result a {
+  background: inherit;
 }
 
 /* Buttonless controls */

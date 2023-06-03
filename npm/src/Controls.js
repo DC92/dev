@@ -5,19 +5,23 @@
 
 // Openlayers
 import 'ol/ol.css';
-import Control from 'ol/control/Control.js';
-import MousePosition from 'ol/control/MousePosition.js';
-import MouseWheelZoom from 'ol/interaction/MouseWheelZoom.js';
+import Control from 'ol/control/Control';
+import MousePosition from 'ol/control/MousePosition';
+import MouseWheelZoom from 'ol/interaction/MouseWheelZoom';
 import {
 	createStringXY,
-} from 'ol/coordinate.js';
+} from 'ol/coordinate';
 import {
 	transform,
-} from 'ol/proj.js';
+} from 'ol/proj';
 import {
 	getDistance,
 	getLength,
-} from 'ol/sphere.js';
+} from 'ol/sphere';
+
+// Geocoder
+import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css'; // Before MyOl
+import Geocoder from '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug';
 
 // MyOl
 import './controls.css';

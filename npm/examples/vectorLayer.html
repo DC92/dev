@@ -101,25 +101,25 @@ Based on https://openlayers.org
 	<script type="module">
 // Openlayers
 import 'ol/ol.css';
-import FullScreen from 'ol/control/FullScreen.js';
-import Map from 'ol/Map.js';
-import OSM from 'ol/source/OSM.js';
-import ScaleLine from 'ol/control/ScaleLine.js';
-import Tile from 'ol/layer/Tile.js';
-import View from 'ol/View.js';
-import Zoom from 'ol/control/Zoom.js';
+import FullScreen from 'ol/control/FullScreen';
+import Map from 'ol/Map';
+import OSM from 'ol/source/OSM';
+import ScaleLine from 'ol/control/ScaleLine';
+import Tile from 'ol/layer/Tile';
+import View from 'ol/View';
+import Zoom from 'ol/control/Zoom';
 import {
 	transform,
-} from 'ol/proj.js';
+} from 'ol/proj';
 
 // MyOl
 import {
 	labelStyleOptions,
 	Selector,
-} from '../src/VectorLayer.js';
+} from '../src/VectorLayer';
 import {
 	LayerWri,
-} from '../src/VectorLayerCollection.js';
+} from '../src/VectorLayerCollection';
 
 
 //localStorage.myol_selectwri = 'all'; // Force selectors
