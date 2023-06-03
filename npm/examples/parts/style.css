@@ -4,6 +4,12 @@
     background: #222;
     color: white;
   }
+  .ol-viewport {
+    color: black;
+  }
+  .ol-viewport a {
+    background: initial;
+  }
 }
 
 .map {
