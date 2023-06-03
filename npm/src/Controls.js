@@ -309,6 +309,8 @@ export function controlTilesBuffer(opt) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/
  */
+//TODO BUG position trouvée KO
+//TODO index.html
 export function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return controlButton(); //HACK no button

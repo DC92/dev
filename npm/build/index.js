@@ -1,4 +1,5 @@
-// This file defines the contents of the myol.js & myol.css libraries
+// This file defines the contents of the dist/myol.css & dist/myol.js libraries
+// This contains all what is necessary for refuges.info & chemineur.fr websites
 
 // Openlayers
 import 'ol/ol.css';
@@ -13,9 +14,6 @@ import Zoom from 'ol/control/Zoom';
 import * as proj from 'ol/proj.js';
 
 // MyOl
-import '../src/controls.css';
-import '../src/layerSwitcher.css';
-import '../src/editor.css';
 import * as controls from '../src/Controls.js';
 import * as controlcollection from '../src/controlCollection.js';
 import * as editor from '../src/Editor.js';
@@ -26,10 +24,6 @@ import * as marker from '../src/Marker.js';
 import * as tilelayercollection from '../src/TileLayerCollection.js';
 import * as vectorlayer from '../src/VectorLayer.js';
 import * as vectorlayercollection from '../src/VectorLayerCollection.js';
-
-// Geocoder //TODO
-//import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
-//import '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug.js';
 
 export default {
 	control: {

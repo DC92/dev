@@ -55,7 +55,7 @@ export function controlCollection(opt) {
 		// Top left
 		new Zoom(options.Zoom),
 		new FullScreen(options.FullScreen),
-		controlGeocoder(options.Geocoder), //TODO BUG pas de geocodeur
+		controlGeocoder(options.Geocoder),
 		controlGPS(options.GPS),
 		controlLoadGPX(options.LoadGPX),
 		controlDownload(options.Download),
