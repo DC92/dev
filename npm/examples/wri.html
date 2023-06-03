@@ -14,21 +14,8 @@ Based on https://openlayers.org
 
 	<link href="../dist/myol.css" type="text/css" rel="stylesheet">
 	<script src="../dist/myol.js"></script>
-
-	<style>
-		#carte-accueil,
-		#carte-point,
-		#carte-nav,
-		#carte-edit {
-			width: 100%;
-			max-width: 600px;
-			height: 80vw;
-			max-height: 400px;
-		}
-		h4 {
-			margin-bottom: 0;
-		}
-	</style>
+	<link href="parts/style.css" rel="stylesheet">
+	<link href="parts/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -37,18 +24,18 @@ Based on https://openlayers.org
 	<h2>Debug cartes refuges.info</h2>
 	<h3>(Mode bundler)</h3>
 	<h4>/vues/index.js</h4>
-	<div id="carte-accueil"></div>
+	<div id="carte-accueil" class="map"></div>
 	<h4>/vues/point.js</h4>
 	<label>
 		<input type="checkbox" name="select-refuges" value="4" checked="checked" /></input>
 		Style refuges.info
 		<span id="status-refuges"></span>
 	</label>
-	<div id="carte-point"></div>
+	<div id="carte-point" class="map"></div>
 	<h4>/vues/nav.js</h4>
-	<div id="carte-nav"></div>
+	<div id="carte-nav" class="map"></div>
 	<h4>/vues/edit.js</h4>
-	<div id="carte-edit"></div>
+	<div id="carte-edit" class="map"></div>
 
 	<script type="module" defer>
 import myolModule from '../build/index.js'; //TODO BUG don't work in /index.html

@@ -1,0 +1,4 @@
+cd \wamp64\www\dev\npm
+npm install
+npm run build
+npx vite

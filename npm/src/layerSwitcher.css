@@ -1,18 +1,19 @@
 /* LayerSwitcher */
 .myol-button-switcher {
-	float: right !important;
+  float: right !important;
 }
 .myol-button-switcher > button {
-	font-style: italic;
+  font-style: italic;
 }
 .myol-button-switcher > div {
-	right: 0;
-    overflow-y: scroll; /* Forced to avoid unexpected shifts */
+  right: 0;
+  /* Forced to avoid unexpected shifts */
+  overflow-y: scroll;
 }
 .myol-button-switcher .myol-single-layer input,
 .myol-button-switcher .myol-double-layer span {
-	display: none;
+  display: none;
 }
 .select-ext {
-	background: #fcffd1 !important;
+  background: #fcffd1 !important;
 }

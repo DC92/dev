@@ -11,15 +11,7 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
-
-	<style>
-		#map {
-			width: 100%;
-			max-width: 600px;
-			height: 80vw;
-			max-height: 400px;
-		}
-	</style>
+	<link href="parts/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -29,7 +21,7 @@ Based on https://openlayers.org
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
 	<p><a href="../src/LayerSwitcher.js">src/LayerSwitcher.js</a> add a tinny efficient layer switcher for both base & vector layers.</p>
 
-	<div id="map"></div>
+	<div id="map" class="map"></div>
 
 	<div id="select-ext">
 		<hr />
@@ -97,7 +89,7 @@ document.getElementById('toggle-countries').addEventListener('click', function(e
 	countries.setVisible(this.checked);
 });
 	</script>
-	<script src="js/print_script.js"></script>
+	<script src="parts/print_script.js"></script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Change baselayer</div>

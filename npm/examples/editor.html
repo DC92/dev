@@ -11,23 +11,18 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
 	<link href="images/favicon.png" rel="apple-touch-icon" />
+	<link href="parts/style.css" rel="stylesheet">
 
 	<style>
-		#map {
-			width: 100%;
-			max-width: 600px;
-			height: 80vw;
-			max-height: 400px;
-		}
 /* //TODO ??
-		h4 {
-			margin: 1em 0 0 0 !important;
-		}
-		#myol-help-edit-modify p,
-		#myol-help-edit-line p,
-		#myol-help-edit-poly p {
-			margin: 0;
-		}
+h4 {
+	margin: 1em 0 0 0 !important;
+}
+#myol-help-edit-modify p,
+#myol-help-edit-line p,
+#myol-help-edit-poly p {
+	margin: 0;
+}
 */
 	</style>
 </head>
@@ -39,7 +34,7 @@ Based on https://openlayers.org
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
 	<p><a href="../src/Editor.js">src/Editor.js</a> lines & polygons edition facilities</p>
 
-	<div id="map"></div>
+	<div id="map" class="map"></div>
 
 	<h4>Modifier une ligne ou un polygone</h4>
 	<div id="myol-help-edit-modify">
@@ -206,7 +201,7 @@ new Map({
 	],
 });
 	</script>
-	<script src="js/print_script.js"></script>
+	<script src="parts/print_script.js"></script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Do all actions of the button hover help</div>

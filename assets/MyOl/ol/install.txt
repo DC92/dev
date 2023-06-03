@@ -1,3 +1,2 @@
 https://openlayers.org/download/
-v7.3.0-package.zip => /ol.css & /dist/ol.*
-v7.3.0
+v7.4.0-package.zip => /ol.css & /dist/ol.*
