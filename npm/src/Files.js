@@ -5,28 +5,28 @@
 
 // Openlayers
 import 'ol/ol.css';
-import Feature from 'ol/Feature.js';
-import GeoJSON from 'ol/format/GeoJSON.js';
-import GPX from 'ol/format/GPX.js';
-import Icon from 'ol/style/Icon.js';
-import KML from 'ol/format/KML.js';
-import LineString from 'ol/geom/LineString.js';
-import VectorLayer from 'ol/layer/Vector.js';
-import VectorSource from 'ol/source/Vector.js';
+import Feature from 'ol/Feature';
+import GeoJSON from 'ol/format/GeoJSON';
+import GPX from 'ol/format/GPX';
+import Icon from 'ol/style/Icon';
+import KML from 'ol/format/KML';
+import LineString from 'ol/geom/LineString';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import {
 	createEmpty,
 	extend,
 	isEmpty,
-} from 'ol/extent.js';
+} from 'ol/extent';
 import {
 	Stroke,
 	Style,
-} from 'ol/style.js';
+} from 'ol/style';
 
 // MyOl
 import {
 	controlButton,
-} from './Controls.js';
+} from './Controls';
 
 
 //BEST export / import names and links

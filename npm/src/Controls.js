@@ -21,8 +21,9 @@ import {
 
 // Geocoder
 //TODO BUG avec Ol 7.4.0
+//TODO don't work in index.html
 import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css'; // Before MyOl
-//TODO //import Geocoder from '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug';
+import Geocoder from '@kirtandesai/ol-geocoder/dist/ol-geocoder-debug';
 
 // MyOl
 import './controls.css';
@@ -310,8 +311,6 @@ export function controlTilesBuffer(opt) {
  * Geocoder
  * Requires https://github.com/jonataswalker/ol-geocoder/
  */
-//TODO BUG position trouvée KO
-//TODO index.html
 export function controlGeocoder(options) {
 	if (typeof Geocoder != 'function') // Vérify if geocoder is available
 		return controlButton(); //HACK no button

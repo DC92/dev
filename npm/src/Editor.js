@@ -5,33 +5,33 @@
 
 // Openlayers
 import 'ol/ol.css';
-import Control from 'ol/control/Control.js';
-import Draw from 'ol/interaction/Draw.js';
-import Feature from 'ol/Feature.js';
-import GeoJSON from 'ol/format/GeoJSON.js';
-import LineString from 'ol/geom/LineString.js';
-import Modify from 'ol/interaction/Modify.js';
-import Polygon from 'ol/geom/Polygon.js';
-import Snap from 'ol/interaction/Snap.js';
-import VectorLayer from 'ol/layer/Vector.js';
-import VectorSource from 'ol/source/Vector.js';
+import Control from 'ol/control/Control';
+import Draw from 'ol/interaction/Draw';
+import Feature from 'ol/Feature';
+import GeoJSON from 'ol/format/GeoJSON';
+import LineString from 'ol/geom/LineString';
+import Modify from 'ol/interaction/Modify';
+import Polygon from 'ol/geom/Polygon';
+import Snap from 'ol/interaction/Snap';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import {
 	createEmpty,
 	extend,
-} from 'ol/extent.js';
+} from 'ol/extent';
 import {
 	Circle,
 	Fill,
 	Stroke,
 	Style,
 	Text,
-} from 'ol/style.js';
+} from 'ol/style';
 
 // MyOl
 import './editor.css';
 import {
 	controlButton,
-} from './controls.js';
+} from './controls';
 
 
 // Editor

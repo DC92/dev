@@ -1,4 +1,5 @@
 // Print the inner code of the previous <script> tag
+//TODO don't work in VITE
 
 const scripts = document.getElementsByTagName('script'),
 	title = document.createElement('h4'),

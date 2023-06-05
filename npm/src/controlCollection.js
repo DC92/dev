@@ -5,11 +5,11 @@
 
 // Openlayers
 import 'ol/ol.css';
-import Attribution from 'ol/control/Attribution.js';
-import FullScreen from 'ol/control/FullScreen.js';
-import MousePosition from 'ol/control/MousePosition.js';
-import ScaleLine from 'ol/control/ScaleLine.js';
-import Zoom from 'ol/control/Zoom.js';
+import Attribution from 'ol/control/Attribution';
+import FullScreen from 'ol/control/FullScreen';
+import MousePosition from 'ol/control/MousePosition';
+import ScaleLine from 'ol/control/ScaleLine';
+import Zoom from 'ol/control/Zoom';
 
 // MyOl
 import {
@@ -19,14 +19,14 @@ import {
 	controlMousePosition,
 	controlPermalink,
 	controlPrint,
-} from './Controls.js';
+} from './Controls';
 import {
 	controlLoadGPX,
 	controlDownload,
-} from './Files.js';
+} from './Files';
 import {
 	controlGPS,
-} from './Geolocation.js';
+} from './Geolocation';
 
 
 /**
