@@ -1,6 +1,7 @@
 import node from '@rollup/plugin-node-resolve';
 import cjs from '@rollup/plugin-commonjs'; // Convert CommonJS module into ES module
 import css from 'rollup-plugin-import-css'; // Collect css
+import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser'; // Rollup plugin to minify generated es bundle
 import {
 	readFileSync, // Read banner file
@@ -17,6 +18,7 @@ export default [{
 		css({
 			output: 'dist/myol.css',
 		}),
+      json(),
 		terser(),
 	],
 	output: [{
@@ -35,6 +37,7 @@ export default [{
 		css({
 			output: 'dist/myol.css',
 		}),
+      json(),
 	],
 	output: [{
 		name: 'myol',
