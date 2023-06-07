@@ -11,22 +11,14 @@ Based on https://openlayers.org
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="examples/images/favicon.png" rel="icon" type="image/png" />
 	<link href="examples/images/favicon.png" rel="apple-touch-icon" />
-
 	<link href="dist/myol.css" type="text/css" rel="stylesheet">
     <script src="dist/myol-debug.js"></script>
-
 	<style>
 #map {
   clear: both;
   width: 100%;
   max-width: 600px;
-  height: 80vw;
-  max-height: 400px;
-}
-.layer-select {
-  float: left;
-  border-right: solid;
-  padding: 5px;
+  height: 400px;
 }
 	</style>
 </head>
@@ -37,15 +29,13 @@ Based on https://openlayers.org
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
 
 	<div id="map"></div>
-	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
-
-	<div id="select-ext" >
-		<hr />
+	<p id="select-ext" >
 		<label>chemineur.fr <input type="checkbox" name="select-chem" value="all" /></label>
 		<label><input type="checkbox" name="select-chem" value="3" />Refuge</label>
 		<label><input type="checkbox" name="select-chem" value="8" />Abri</label>
 		<label><input type="checkbox" name="select-chem" value="23" />Montagne</label>
-	</div>
+	</p>
+	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
 	<script>
 new myol.Map({

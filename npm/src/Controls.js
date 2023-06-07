@@ -21,8 +21,8 @@ import {
 
 // Geocoder
 //TODO BUG avec Ol 7.4.0
-//TODO don't work in index.html
-import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css'; // Before MyOl //TODO move in code area
+//BEST get it from github
+import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css'; // Before MyOl
 import Geocoder from '../geocoder/src/base';
 
 // MyOl

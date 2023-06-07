@@ -18,7 +18,7 @@ export default [{
 		css({
 			output: 'dist/myol.css',
 		}),
-      json(),
+		json(),
 		terser(),
 	],
 	output: [{
@@ -37,7 +37,7 @@ export default [{
 		css({
 			output: 'dist/myol.css',
 		}),
-      json(),
+		json(),
 	],
 	output: [{
 		name: 'myol',
