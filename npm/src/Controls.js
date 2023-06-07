@@ -19,12 +19,6 @@ import {
 	getLength,
 } from 'ol/sphere';
 
-// Geocoder
-//TODO BUG avec Ol 7.4.0
-//BEST get it from github
-import '@kirtandesai/ol-geocoder/dist/ol-geocoder.css'; // Before MyOl
-import Geocoder from '../geocoder/src/base';
-
 // MyOl
 import './controls.css';
 
@@ -305,47 +299,6 @@ export function controlTilesBuffer(opt) {
 	};
 
 	return control;
-}
-
-/**
- * Geocoder
- * Requires https://github.com/jonataswalker/ol-geocoder/
- */
-export function controlGeocoder(options) {
-	if (typeof Geocoder != 'function') // Vérify if geocoder is available
-		return controlButton(); //HACK no button
-
-	const geocoder = new Geocoder('nominatim', {
-			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
-			...options,
-		}),
-		controlEl = geocoder.element.firstElementChild;
-
-	// Avoid submit of a form including the map
-	geocoder.element.getElementsByTagName('input')[0]
-		.addEventListener('keypress', evt =>
-			evt.stopImmediatePropagation()
-		);
-
-	geocoder.on('addresschosen', evt =>
-		evt.target.getMap().getView().fit(evt.bbox)
-	);
-
-	// Close other opened buttons when hover with a mouse
-	geocoder.element.addEventListener('pointerover', () => {
-		for (let el of document.getElementsByClassName('myol-button-selected'))
-			el.classList.remove('myol-button-selected');
-	});
-
-	// Close submenu when hover another button
-	document.addEventListener('pointerout', evt => {
-		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
-
-		if (hoveredEl && hoveredEl.tagName == 'BUTTON')
-			controlEl.classList.remove('gcd-gl-expanded');
-	});
-
-	return geocoder;
 }
 
 /**

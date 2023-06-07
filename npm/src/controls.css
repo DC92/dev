@@ -90,37 +90,6 @@
   content: "\21F3";
 }
 
-/* Geocodeur */
-.ol-geocoder {
-  position: initial !important;
-  float: left;
-  font-size: 14.4px !important; /* For some mobiles */
-  width: 30.75px;
-  /* Takes place in the MyOl button flow */
-  height: 30.75px;
-}
-.ol-geocoder .gcd-gl-expanded,
-.ol-geocoder .gcd-gl-control:hover {
-  width: 30.75px;
-  overflow: visible;
-}
-.ol-geocoder .gcd-gl-btn {
-  height: 24.75px;
-  width: 24.75px;
-}
-.ol-geocoder .gcd-gl-input {
-  top: 32px;
-  left: 4px;
-}
-.ol-geocoder .gcd-gl-reset {
-  display: none;
-}
-.ol-geocoder ul.gcd-gl-result {
-  top: 62px;
-  /* For mobiles no interaction with animate */
-  z-index: 99;
-}
-
 /* Buttonless controls */
 .myol-permalink,
 .ol-attribution,

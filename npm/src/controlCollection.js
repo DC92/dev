@@ -14,7 +14,6 @@ import Zoom from 'ol/control/Zoom';
 // MyOl
 import {
 	controlButton,
-	controlGeocoder,
 	controlLengthLine,
 	controlMousePosition,
 	controlPermalink,
@@ -24,6 +23,9 @@ import {
 	controlLoadGPX,
 	controlDownload,
 } from './Files';
+import {
+	controlGeocoder,
+} from './Geocoder';
 import {
 	controlGPS,
 } from './Geolocation';
