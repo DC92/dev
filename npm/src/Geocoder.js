@@ -3,12 +3,10 @@
  * From https://github.com/jonataswalker/ol-geocoder
  * Corrected https://github.com/kirtan-desai/ol-geocoder
  */
-//TODO BUG avec Ol 7.4.0
-//BEST get it from github
 
 // Geocoder
-import '../geocoder/dist/ol-geocoder.css';
-import '../src/Geocoder.css';
+import '../node_modules/@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
+import '../src/Geocoder.css'; // After ol-geocoder.css
 import Geocoder from '../geocoder/src/base';
 
 // myol

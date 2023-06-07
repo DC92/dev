@@ -2,12 +2,14 @@ https://github.com/kirtan-desai/ol-geocoder
 4.1.2
 
 Patch src/nominatim.js
-//TODO RESORB (not in GITHUB)
+
 import {
-	transform,
-	transformExtent
+  transform,
+  transformExtent
 } from 'ol/proj';
-var proj = {
-	transform: transform,
-	transformExtent: transformExtent,
-};
+
+Remove "proj."
+
+        [bbox[2], bbox[0], bbox[3], bbox[1]], // SNWE -> WSEN
+
+//BEST get it from github
