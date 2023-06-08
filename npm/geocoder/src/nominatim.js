@@ -2,10 +2,7 @@ import LayerVector from 'ol/layer/Vector';
 import SourceVector from 'ol/source/Vector';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
-import {
-  transform,
-  transformExtent
-} from 'ol/proj';
+import { transform, transformExtent } from 'ol/proj';
 
 import { VARS, TARGET_TYPE, PROVIDERS, EVENT_TYPE } from '../konstants';
 

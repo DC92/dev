@@ -9,12 +9,6 @@ import '../node_modules/@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import '../src/Geocoder.css'; // After ol-geocoder.css
 import Geocoder from '../geocoder/src/base';
 
-// myol
-import {
-	controlButton,
-} from './Controls';
-
-
 export function controlGeocoder(options) {
 	const geocoder = new Geocoder('nominatim', {
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
