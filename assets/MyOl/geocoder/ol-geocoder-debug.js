@@ -1,8 +1,8 @@
 /*!
- * @kirtandesai/ol-geocoder - v5.0.3
+ * @kirtandesai/ol-geocoder - v5.0.6
  * A geocoder extension compatible with OpenLayers v7.
  * https://github.com/kirtan-desai/ol-geocoder
- * Built: Thu Nov 17 2022 14:58:35 GMT-0500 (Eastern Standard Time)
+ * Built: Thu Jun 08 2023 18:54:45 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 (function (global, factory) {
@@ -20,7 +20,6 @@
   var SourceVector__default = /*#__PURE__*/_interopDefaultLegacy(SourceVector);
   var Point__default = /*#__PURE__*/_interopDefaultLegacy(Point);
   var Feature__default = /*#__PURE__*/_interopDefaultLegacy(Feature);
-  var proj__default = /*#__PURE__*/_interopDefaultLegacy(proj);
 
   var containerId = "gcd-container";
   var buttonControlId = "gcd-button-control";
@@ -965,13 +964,13 @@
       const map = this.Base.getMap();
       const coord_ = [Number.parseFloat(place.lon), Number.parseFloat(place.lat)];
       const projection = map.getView().getProjection();
-      const coord = proj__default["default"].transform(coord_, 'EPSG:4326', projection);
+      const coord = proj.transform(coord_, 'EPSG:4326', projection);
 
       let { bbox } = place;
 
       if (bbox) {
-        bbox = proj__default["default"].transformExtent(
-          [bbox[2], bbox[1], bbox[3], bbox[0]], // NSWE -> WSEN
+        bbox = proj.transformExtent(
+          [bbox[2], bbox[0], bbox[3], bbox[1]], // SNWE -> WSEN
           'EPSG:4326',
           projection
         );
