@@ -31,7 +31,7 @@ import {
 } from 'ol/style.js';
 
 
-// Source of geoJSON vector layers
+// Facilities added source of geoJSON vector layers
 export class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {

@@ -34,7 +34,7 @@ import {
 //BEST make it a class
 export function layerGeoBB(options) {
 	return layerVectorCluster({
-		strategy: bbox,
+		//strategy: bbox,
 		...options,
 		urlParams: (opt, bbox, selections) => ({
 			path: 'ext/Dominique92/GeoBB/gis.php',
@@ -230,7 +230,7 @@ export class LayerWri extends MyVectorLayer {
 export function layerWri(options) {
 	return layerVectorCluster({ //BEST case of WRI without local cluster ?
 		host: '//www.refuges.info/',
-		strategy: bbox,
+		//strategy: bbox,
 		...options,
 		urlParams: (_, bbox, selections) => ({
 			path: selections[1] ? 'api/massif' : 'api/bbox',
@@ -380,7 +380,7 @@ export function layerC2C(options) {
 
 	return layerVectorCluster({
 		host: 'https://api.camptocamp.org/',
-		strategy: bbox,
+		//strategy: bbox,
 		format: format,
 		...options,
 		urlParams: (o, b, s, extent) => ({
@@ -408,7 +408,7 @@ export function layerOverpass(opt) {
 		},
 		format = new OSMXML(),
 		layer = layerVectorCluster({
-			strategy: bbox,
+			//strategy: bbox,
 			urlParams: urlParams,
 			format: format,
 			...options,
@@ -511,6 +511,11 @@ export function layerOverpass(opt) {
 	return layer;
 }
 
+// Return the value of result of function with arguments
+function functionLike(value, ...a) {
+	return typeof value == 'function' ? value(...a) : value || [];
+}
+
 // Vectors layers examples
 export function vectorLayerCollection(options) {
 	options = options || {};
@@ -523,9 +528,4 @@ export function vectorLayerCollection(options) {
 		layerChemineur(options.chemineur),
 		layerAlpages(options.alpages),
 	];
-}
-
-// Return the value of result of function with arguments
-function functionLike(value, ...a) {
-	return typeof value == 'function' ? value(...a) : value || [];
 }
