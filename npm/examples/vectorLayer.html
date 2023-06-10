@@ -118,6 +118,7 @@ import {
 	Selector,
 } from '../src/VectorLayer';
 import {
+	LayerGeoBB,
 	LayerWri,
 } from '../src/VectorLayerCollection';
 
@@ -164,6 +165,7 @@ new Map({
 			source: new OSM(),
 		}),
 
+		new LayerGeoBB(),
 		layerWri,
 		/*
 		new LayerWri({

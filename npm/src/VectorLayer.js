@@ -31,7 +31,7 @@ import {
 } from 'ol/style.js';
 
 
-// Facilities added source of geoJSON vector layers
+// geoJSON vector display
 export class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
@@ -68,13 +68,13 @@ export class MyVectorSource extends VectorSource {
 				if (!statusEl.textContent.includes('error'))
 					statusEl.innerHTML = '';
 
+				//BEST status out of zoom bounds
 				switch (evt.type) {
 					case 'featuresloadstart':
 						statusEl.innerHTML = '&#8987;';
 						break;
 					case 'featuresloaderror':
 						statusEl.innerHTML = 'Erreur !';
-						//BEST status out of zoom bounds
 				}
 			});
 	}
@@ -88,17 +88,17 @@ export class MyClusterSource extends Cluster {
 
 			// Generate a center point where display the cluster
 			geometryFnc: feature => {
-				const geometry = feature.getGeometry();
+				const geometry = feature.getGeometry(); //TODO GeometryCollection
 
 				if (geometry) {
-					const extent = feature.getGeometry().getExtent(),
+					const extent = feature.getGeometry().getExtent(), //TODO GeometryCollection
 						pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
 
 					// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
 					if (pixelSemiPerimeter > 200)
 						this.addFeature(feature);
 					else
-						return new Point(getCenter(feature.getGeometry().getExtent()));
+						return new Point(getCenter(feature.getGeometry().getExtent())); //TODO GeometryCollection
 				}
 			},
 
@@ -144,13 +144,21 @@ export class MyClusterSource extends Cluster {
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
-			// name: function(properties) returning the name for cluster agregation
-			// clickUrl: function(properties) returning url to go on click
-			// stylesOptions: function(...) returning the features style
-			// serverClusterMinResolution: resolution above which the server retruns clusters
+			/* Mandatory
+			host: 'https://chemineur.fr/',
+			query: () => ({_path: '...'}),
+			stylesOptions: (feature, hoveredSubFeature, layer) => ({}),
+			clickUrl: properties => properties.link,
+			*/
+
+			// Cluster options
 			spreadClusterMaxResolution: 0, // Resolution under which the clusters are displayed as separate icons
 			clusterStylesOptions: clusterCircleStylesOptions,
+			// serverClusterMinResolution: Resolution above which the server retruns clusters
+			// name: function(properties) Returning the name for cluster agregation
+			// attribution: '&copy;...',
 
+			// Generic
 			style: (feature, resolution, hoveredSubFeature) =>
 				(feature.getProperties().cluster ?
 					options.clusterStylesOptions :
@@ -160,7 +168,7 @@ export class MyVectorLayer extends VectorLayer {
 					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
 					this, // Layer
 					resolution
-				).map(so => new Style(so)), // Transform to an array of Style objects
+				).map(styleOptions => new Style(styleOptions)), // Transform to an array of Style objects
 
 			...opt,
 		};
@@ -240,10 +248,10 @@ function mouseListener(evt) {
 	if (hoveredFeature) {
 		// Find sub-feature from a detailed cluster
 		const hoveredProperties = hoveredFeature.getProperties(),
-			xCursor = map.getPixelFromCoordinate(
-				hoveredFeature.getGeometry().getCoordinates()
+			featurePosition = map.getPixelFromCoordinate(
+				getCenter(hoveredFeature.getGeometry().getExtent()) //TODO GeometryCollection
 			),
-			deltaXCursor = evt.originalEvent.layerX - xCursor[0];
+			deltaXCursor = evt.originalEvent.layerX - featurePosition[0];
 
 		if (hoveredProperties.features)
 			hoveredProperties.features.forEach(f => {
@@ -271,7 +279,7 @@ function mouseListener(evt) {
 			if (hoveredSubProperties.cluster)
 				map.getView().animate({
 					zoom: map.getView().getZoom() + 2,
-					center: hoveredProperties.geometry.getCoordinates(),
+					center: hoveredProperties.geometry.getCoordinates(), //TODO GeometryCollection
 				});
 		} else
 			// Hover
@@ -284,6 +292,7 @@ function mouseListener(evt) {
 					map.lastHoveredFeature.setStyle();
 
 				// Set the feature style to the style function with the hoveredFeature set
+				//TODO zIndex
 				hoveredFeature.setStyle((feature, resolution) =>
 					hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
 				);
@@ -426,12 +435,23 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 	return stylesOpt;
 }
 
-export function labelStyleOptions(feature, text) {
+export function labelStyleOptions(feature, ...args) {
 	const elLabel = document.createElement('span'),
-		area = getArea(feature.getGeometry().getExtent()); // Detect lines or polygons
+		area = getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
+		properties = {};
+
+	args.forEach(p => Object.assign(properties, p));
 
 	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text || feature.getProperties().name;
+	elLabel.innerHTML = agregateText([
+		properties.name,
+		agregateText([
+			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+			properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+		], ', '),
+		properties.type,
+		properties.attribution,
+	]);
 
 	return {
 		text: new Text({
@@ -451,19 +471,6 @@ export function labelStyleOptions(feature, text) {
 			}),
 		}),
 	};
-}
-
-export function fullLabelStyleOptions(properties, feature) {
-	return labelStyleOptions(
-		feature, agregateText([
-			properties.name,
-			agregateText([
-				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-			], ', '),
-			properties.type,
-			properties.attribution,
-		]));
 }
 
 // Simplify & aggregate an array of lines

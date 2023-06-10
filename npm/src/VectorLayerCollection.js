@@ -23,12 +23,43 @@ import {
 // MyOl
 import {
 	clusterSpreadStylesOptions,
-	fullLabelStyleOptions,
 	labelStyleOptions,
 	MyVectorLayer,
 	Selector,
 } from './VectorLayer.js';
 
+export class LayerGeoBB extends MyVectorLayer {
+	constructor(options) {
+		super({
+			host: 'https://chemineur.fr/',
+			query: () => ({
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: 3,
+			}),
+
+			clickUrl: properties => properties.link,
+			attribution: '&copy;chemineur.fr',
+
+			stylesOptions: function(feature, hoveredSubFeature, layer) {
+				const properties = (feature || hoveredSubFeature).getProperties();
+
+				return [{
+					image: new Icon({
+						src: properties.icon,
+					}),
+					...labelStyleOptions(feature, hoveredSubFeature ? {
+						...properties,
+						attribution: layer.options.attribution,
+					} : {
+						name: properties.name,
+					}),
+				}];
+			},
+
+			...options,
+		});
+	}
+};
 
 // chemineur.fr, alpages.info
 //BEST make it a class
@@ -157,7 +188,6 @@ export class LayerWri extends MyVectorLayer {
 				host: 'https://www.refuges.info/',
 				disjoinClusterMaxResolution: 100,
 				serverClusterMinResolution: 50,
-				attribution: 'refuges.info',
 				selector: new Selector(opt.selectName),
 				name: properties => properties.nom, // Function returning the name for cluster agregation
 				clickUrl: properties => properties.lien, // Function returning url to go on click
@@ -176,15 +206,13 @@ export class LayerWri extends MyVectorLayer {
 				stylesOptions: function(feature, hoveredSubFeature, layer) {
 					const properties = (feature || hoveredSubFeature).getProperties(),
 						so = hoveredSubFeature ?
-						fullLabelStyleOptions({
-								name: properties.nom,
-								ele: properties.coord.alt,
-								bed: properties.places.valeur,
-								type: properties.type.valeur,
-								attribution: layer.options.attribution,
-							},
-							feature
-						) :
+						labelStyleOptions(feature, {
+							name: properties.nom,
+							ele: properties.coord.alt,
+							bed: properties.places.valeur,
+							type: properties.type.valeur,
+							attribution: layer.options.attribution,
+						}, true) :
 						opt.stylesOptions ?
 						opt.stylesOptions(...arguments)[0] : {}; // Only one Style there
 
