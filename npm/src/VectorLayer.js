@@ -155,8 +155,10 @@ export class MyVectorLayer extends VectorLayer {
 			spreadClusterMaxResolution: 0, // Resolution under which the clusters are displayed as separate icons
 			clusterStylesOptions: clusterCircleStylesOptions,
 			// serverClusterMinResolution: Resolution above which the server retruns clusters
-			// name: function(properties) Returning the name for cluster agregation
+			// name: properties => the name for cluster agregation
 			// attribution: '&copy;...',
+
+			selector: opt.selectName ? new Selector(opt.selectName) : null,
 
 			// Generic
 			style: (feature, resolution, hoveredSubFeature) =>
@@ -178,8 +180,11 @@ export class MyVectorLayer extends VectorLayer {
 				new MyVectorSource(options) : new MyClusterSource(options),
 			...options,
 		});
-
 		this.options = options; // Mem for further use
+
+		if (options.selectName) {
+			options.selector.setCallBack(selection => this.refresh(selection.length));
+		}
 	}
 
 	//HACK execute actions on Map init
@@ -355,7 +360,7 @@ export class Selector {
 			});
 
 		// Save the current status
-		if (this.getSelection().length && name)
+		if (this.getSelection().length && this.safeName)
 			localStorage[this.safeName] = this.getSelection().join(',');
 		else
 			delete localStorage[this.safeName];
@@ -398,7 +403,7 @@ export function clusterCircleStylesOptions(feature, hoveredFeature) {
 			}),
 			//TODO text zIndex ?
 		},
-		hoveredFeature ? labelStyleOptions(feature) : {},
+		hoveredFeature ? labelStyleOptions(feature, feature.getProperties()) : {},
 	];
 }
 

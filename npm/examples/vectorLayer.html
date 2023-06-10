@@ -165,7 +165,10 @@ new Map({
 			source: new OSM(),
 		}),
 
-		new LayerGeoBB(),
+		new LayerGeoBB({
+			selectName: 'select-chem',
+			statusId: 'status-chem',
+		}),
 		layerWri,
 		/*
 		new LayerWri({

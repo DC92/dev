@@ -69,7 +69,7 @@ export function layerGeoBB(options) {
 		...options,
 		urlParams: (opt, bbox, selections) => ({
 			path: 'ext/Dominique92/GeoBB/gis.php',
-			cat: selections[0] == 'on' ? null : selections[0], // The 1st (and only) selector
+			cat: selections[0] == 'on' ? null : selections[0], // The 1ast (and only) selector
 			limit: 10000,
 			bbox: bbox.join(','),
 			...functionLike(options.urlParams, ...arguments),
@@ -188,7 +188,6 @@ export class LayerWri extends MyVectorLayer {
 				host: 'https://www.refuges.info/',
 				disjoinClusterMaxResolution: 100,
 				serverClusterMinResolution: 50,
-				selector: new Selector(opt.selectName),
 				name: properties => properties.nom, // Function returning the name for cluster agregation
 				clickUrl: properties => properties.lien, // Function returning url to go on click
 				spreadClusterMaxResolution: 20,
@@ -196,10 +195,10 @@ export class LayerWri extends MyVectorLayer {
 
 				...opt,
 
-				query: () => ({
+				query: options => ({
 					_path: 'api/bbox',
 					nb_points: 'all',
-					type_points: options.selector.getSelection(),
+					type_points: options.selector ? options.selector.getSelection() : null,
 					...(opt.query ? opt.query(...arguments) : null),
 				}),
 
@@ -244,12 +243,6 @@ export class LayerWri extends MyVectorLayer {
 			maxResolution: options.disjoinClusterMaxResolution,
 			altLayer: hightResolutionsLayer,
 			...options,
-		});
-
-		const lowResolutionsLayer = this;
-
-		options.selector.setCallBack(function(selection) {
-			lowResolutionsLayer.refresh(selection.length);
 		});
 	}
 }
