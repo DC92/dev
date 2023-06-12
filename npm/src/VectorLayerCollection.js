@@ -28,18 +28,13 @@ import {
 	Selector,
 } from './VectorLayer.js';
 
+// chemineur.fr
 export class LayerGeoBB extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: 'https://chemineur.fr/',
-			query: () => ({
-				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: 3,
-			}),
-
 			clickUrl: properties => properties.link,
 			attribution: '&copy;chemineur.fr',
-
 			stylesOptions: function(feature, hoveredSubFeature, layer) {
 				const properties = (feature || hoveredSubFeature).getProperties();
 
@@ -57,101 +52,15 @@ export class LayerGeoBB extends MyVectorLayer {
 			},
 
 			...options,
+
+			query: () => ({
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: 3, //TODO selecteur
+				...(options.query ? options.query(...arguments) : null),
+			}),
 		});
 	}
 };
-
-// chemineur.fr, alpages.info
-//BEST make it a class
-export function layerGeoBB(options) {
-	return layerVectorCluster({
-		//strategy: bbox,
-		...options,
-		urlParams: (opt, bbox, selections) => ({
-			path: 'ext/Dominique92/GeoBB/gis.php',
-			cat: selections[0] == 'on' ? null : selections[0], // The 1ast (and only) selector
-			limit: 10000,
-			bbox: bbox.join(','),
-			...functionLike(options.urlParams, ...arguments),
-		}),
-		convertProperties: function(properties) {
-			return {
-				url: properties.id ? options.host + 'viewtopic.php?t=' + properties.id : null,
-				...functionLike(options.convertProperties, ...arguments),
-			};
-		},
-	});
-}
-
-//BEST make it a class
-export function layerClusterGeoBB(opt) {
-	const options = {
-			disjoinClusterMaxResolution: 100,
-			...opt,
-		},
-		clusterLayer = layerGeoBB({
-			minResolution: options.disjoinClusterMaxResolution,
-			urlParams: function() {
-				return {
-					layer: 'cluster',
-					...functionLike(options.urlParams, ...arguments),
-				};
-			},
-			...options,
-		});
-
-	return layerGeoBB({
-		maxResolution: options.disjoinClusterMaxResolution,
-		altLayer: clusterLayer,
-		...options,
-	});
-}
-
-// chemineur.fr
-//BEST make it a class
-export function layerChemineur(options) {
-	return layerClusterGeoBB({
-		host: '//chemineur.fr/',
-		...options,
-		convertProperties: (properties, opt) => ({
-			url: opt.host + 'viewtopic.php?t=' + properties.id,
-			icon: chemIconUrl(properties.type),
-			attribution: '&copy;Chemineur',
-			...functionLike(options.convertProperties, ...arguments),
-		}),
-		styleOptionsDisplay: {
-			// Lines
-			stroke: new Stroke({
-				color: 'blue',
-				width: 2,
-			}),
-		},
-		styleOptionsHover: function(feature, properties) {
-			const elLabel = document.createElement('span');
-			elLabel.innerHTML = properties.name;
-
-			// Lines labels
-			if (getArea(feature.getGeometry().getExtent()))
-				return {
-					text: new Text({
-						text: elLabel.innerHTML,
-						placement: 'line',
-						textBaseline: 'middle',
-						overflow: true,
-						offsetY: -8,
-						font: '12px Verdana',
-						fill: new Fill({
-							color: 'blue',
-						}),
-						stroke: new Stroke({
-							color: 'white',
-							width: 5,
-						}),
-					}),
-				};
-		},
-	});
-}
 
 // Get icon from chemineur.fr if we only have a type
 export function chemIconUrl(type) {
@@ -165,20 +74,20 @@ export function chemIconUrl(type) {
 }
 
 // alpages.info
-//BEST make it a class
-export function layerAlpages(options) {
-	return layerGeoBB({
-		host: '//alpages.info/',
-		...options,
-		urlParams: {
-			forums: '4,5',
-			cat: null,
-		},
-		convertProperties: properties => ({
-			icon: chemIconUrl(properties.type),
-			attribution: '&copy;Alpages.info',
-		}),
-	});
+export class LayerAlpages extends LayerGeoBB {
+	constructor(options) {
+		super({
+			host: '//alpages.info/',
+			attribution: '&copy;alpages.info',
+			query: () => ({
+				forums: '4,5',
+				cat: null,
+				...(options.query ? options.query(...arguments) : null),
+			}),
+			//TODO style icon : use : chemIconUrl(properties.type)
+			...options,
+		});
+	}
 }
 
 // refuges.info

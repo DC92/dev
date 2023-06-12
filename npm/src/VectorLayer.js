@@ -49,7 +49,10 @@ export class MyVectorSource extends VectorSource {
 					const query = options.query(options, ...arguments),
 						url = options.host + query._path;
 
+					// Remove null atributes
+					Object.keys(query).forEach(k => !query[k] && delete query[k]);
 					delete query._path;
+
 					if (options.strategy == bbox)
 						query.bbox = options.bbox(...arguments);
 
@@ -58,7 +61,7 @@ export class MyVectorSource extends VectorSource {
 
 				...opt,
 			},
-			statusEl = document.getElementById(options.statusId);
+			statusEl = document.getElementById(options.selectName + '-status');
 
 		super(options);
 

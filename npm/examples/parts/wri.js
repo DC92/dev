@@ -109,7 +109,6 @@ new myol.Map({
 	layers: [
 		new myol.layer.Wri({
 			selectName: 'select-refuges',
-			statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
 				myol.styleOptions.label(feature),
@@ -143,7 +142,6 @@ new myol.Map({
 const layers = [
 		new myol.layer.Wri({
 			//selectName: 'select-refuges',
-			//statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
 				myol.styleOptions.label(feature),

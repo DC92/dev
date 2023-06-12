@@ -29,7 +29,7 @@ Based on https://openlayers.org
 	<label>
 		<input type="checkbox" name="select-refuges" value="4" checked="checked" /></input>
 		Style refuges.info
-		<span id="status-refuges"></span>
+		<span id="select-refuges-status"></span>
 	</label>
 	<div id="carte-point" class="map"></div>
 	<h4>/vues/nav.js</h4>
@@ -154,7 +154,6 @@ new myol.Map({
 	layers: [
 		new myol.layer.Wri({
 			selectName: 'select-refuges',
-			statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
 				myol.styleOptions.label(feature),
@@ -188,7 +187,6 @@ new myol.Map({
 const layers = [
 		new myol.layer.Wri({
 			//selectName: 'select-refuges',
-			//statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
 				myol.styleOptions.label(feature),

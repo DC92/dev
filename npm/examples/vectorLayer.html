@@ -27,26 +27,26 @@ Based on https://openlayers.org
 		<label>
 			Pyrenees-refuges.com
 			<input type="checkbox" name="select-prc" />
-			<span id="status-prc"></span>
+			<span id="select-prc-status"></span>
 		</label><br /><label>
 			Chemineur
 			<input type="checkbox" name="select-chem" value="3,8,64" />
-			<span id="status-chem"></span>
+			<span id="select-chem-status"></span>
 		</label><br /><label>
 			Camptocamp.org
 			<input type="checkbox" name="select-c2c" />
-			<span id="status-c2c"></span>
+			<span id="select-c2c-status"></span>
 		</label>
 		<div>Only 100 features at a time</div>
 		<br />
 		<label>
 			Alpages.info
 			<input type="checkbox" name="select-alpages" value="4,5" />
-			<span id="status-alpages"></span>
+			<span id="select-alpages-status"></span>
 		</label><br /><label>
 			Massifs
 			<input type="checkbox" name="select-massifs" />
-			<span id="status-massifs"></span>
+			<span id="select-massifs-status"></span>
 		</label>
 	</div>
 
@@ -57,7 +57,7 @@ Based on https://openlayers.org
 		</label><br /><label>
 			Refuges.info
 			<input type="checkbox" name="select-wri" value="all" />
-			<span id="status-wri"></span>
+			<span id="select-wri-status"></span>
 		</label>
 		<label><input type="checkbox" name="select-wri" value="7" />cabane non gardée</label>
 		<label><input type="checkbox" name="select-wri" value="10" />refuge gardé</label>
@@ -69,7 +69,7 @@ Based on https://openlayers.org
 		<label>
 			<input type="checkbox" name="select-refuges" value="4" />
 			Style refuges.info
-			<span id="status-refuges"></span>
+			<span id="select-refuges-status"></span>
 		</label>
 	</div>
 
@@ -77,7 +77,7 @@ Based on https://openlayers.org
 		<label>
 			Overpass (OSM services)
 			<input type="checkbox" name="select-osm" id="select-osm" value="all" />
-			<span id="status-osm"></span>
+			<span id="select-osm-status"></span>
 		</label>
 		<label><input type="checkbox" name="select-osm"
 			value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />Hôtel</label>
@@ -120,6 +120,7 @@ import {
 import {
 	LayerGeoBB,
 	LayerWri,
+	LayerAlpages,
 } from '../src/VectorLayerCollection';
 
 
@@ -129,7 +130,6 @@ const selecteurMassifs = new Selector('select-massif'),
 	layerWri = new LayerWri({
 		host: 'https://dom.refuges.info/', //TODO DELETE
 		selectName: 'select-wri',
-		statusId: 'status-wri',
 		query: options => {
 			const massif = selecteurMassifs.getSelection();
 
@@ -165,15 +165,16 @@ new Map({
 			source: new OSM(),
 		}),
 
-		new LayerGeoBB({
-			selectName: 'select-chem',
-			statusId: 'status-chem',
-		}),
 		layerWri,
+		new LayerGeoBB({ // Chemineur
+			selectName: 'select-chem',
+		}),
+		new LayerAlpages({ // Alpages.info
+			selectName: 'select-alpages',
+		}),
 		/*
 		new LayerWri({
 			selectName: 'select-refuges',
-			statusId: 'status-refuges',
 			attribution: null,
 			stylesOptions: feature => [
 				labelStyleOptions(feature),
