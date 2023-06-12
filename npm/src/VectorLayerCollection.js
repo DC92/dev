@@ -39,23 +39,28 @@ export class LayerGeoBB extends MyVectorLayer {
 				const properties = (feature || hoveredSubFeature).getProperties();
 
 				return [{
-					image: new Icon({
+					image: properties.icon ? new Icon({
 						src: properties.icon,
-					}),
-					...labelStyleOptions(feature, hoveredSubFeature ? {
-						...properties,
-						attribution: layer.options.attribution,
-					} : {
-						name: properties.name,
+					}) : null,
+					...labelStyleOptions(feature,
+						hoveredSubFeature ? {
+							...properties,
+							attribution: layer.options.attribution,
+						} : {
+							name: properties.name,
+						}),
+					stroke: new Stroke({
+						color: hoveredSubFeature ? 'red' : 'blue',
+						width: 2,
 					}),
 				}];
 			},
 
 			...options,
 
-			query: () => ({
+			query: opt => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: 3, //TODO selecteur
+				cat: opt.selector && opt.selector.getSelection() != 'on' ? opt.selector.getSelection() : null,
 				...(options.query ? options.query(...arguments) : null),
 			}),
 		});
@@ -80,11 +85,12 @@ export class LayerAlpages extends LayerGeoBB {
 			host: '//alpages.info/',
 			attribution: '&copy;alpages.info',
 			query: () => ({
-				forums: '4,5',
+				forums: '4,5', // Cabanes, points d'eau
 				cat: null,
 				...(options.query ? options.query(...arguments) : null),
 			}),
 			//TODO style icon : use : chemIconUrl(properties.type)
+
 			...options,
 		});
 	}

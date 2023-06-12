@@ -363,7 +363,7 @@ export class Selector {
 			});
 
 		// Save the current status
-		if (this.getSelection().length && this.safeName)
+		if (this.safeName && this.getSelection() && this.getSelection().length)
 			localStorage[this.safeName] = this.getSelection().join(',');
 		else
 			delete localStorage[this.safeName];
