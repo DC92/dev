@@ -461,24 +461,25 @@ export function labelStyleOptions(feature, ...args) {
 		properties.attribution,
 	]);
 
-	return {
-		text: new Text({
-			text: elLabel.innerHTML,
-			textBaseline: area ? 'middle' : 'bottom',
-			offsetY: area ? 0 : -13, // Above the icon
-			padding: [1, 1, -1, 3],
-			font: '12px Verdana',
-			fill: new Fill({
-				color: 'black',
+	if (properties.name)
+		return {
+			text: new Text({
+				text: elLabel.innerHTML,
+				textBaseline: area ? 'middle' : 'bottom',
+				offsetY: area ? 0 : -13, // Above the icon
+				padding: [1, 1, -1, 3],
+				font: '12px Verdana',
+				fill: new Fill({
+					color: 'black',
+				}),
+				backgroundFill: new Fill({
+					color: 'white',
+				}),
+				backgroundStroke: new Stroke({
+					color: 'blue',
+				}),
 			}),
-			backgroundFill: new Fill({
-				color: 'white',
-			}),
-			backgroundStroke: new Stroke({
-				color: 'blue',
-			}),
-		}),
-	};
+		};
 }
 
 // Simplify & aggregate an array of lines

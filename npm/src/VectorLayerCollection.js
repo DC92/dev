@@ -67,6 +67,45 @@ export class LayerGeoBB extends MyVectorLayer {
 	}
 };
 
+// alpages.info
+export class LayerAlpages extends LayerGeoBB {
+	constructor(options) {
+		super({
+			host: '//alpages.info/',
+			attribution: '&copy;alpages.info',
+
+			query: opt => ({
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: opt.selector && opt.selector.getSelection() != 'on' ? opt.selector.getSelection() : null,
+			}),
+
+			stylesOptions: function(feature, hoveredSubFeature, layer) {
+				const properties = feature.getProperties(),
+					so = {
+						image: properties.icon ? new Icon({
+							src: chemIconUrl(properties.type),
+						}) : null,
+						...labelStyleOptions(feature, {
+							name: hoveredSubFeature ? properties.name : null,
+							attribution: layer.options.attribution,
+						}),
+						fill: new Fill({
+							color: 'rgba(256,256,0,0.3)',
+						}),
+						stroke: hoveredSubFeature ? new Stroke({
+							color: 'green',
+						}) : null,
+					};
+
+				if (so.text) so.text.setOverflow(true);
+				return [so];
+			},
+
+			...options,
+		});
+	}
+}
+
 // Get icon from chemineur.fr if we only have a type
 export function chemIconUrl(type) {
 	if (type) {
@@ -75,24 +114,6 @@ export function chemIconUrl(type) {
 		return 'https://chemineur.fr/ext/Dominique92/GeoBB/icones/' +
 			icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
 			'.svg';
-	}
-}
-
-// alpages.info
-export class LayerAlpages extends LayerGeoBB {
-	constructor(options) {
-		super({
-			host: '//alpages.info/',
-			attribution: '&copy;alpages.info',
-			query: () => ({
-				forums: '4,5', // Cabanes, points d'eau
-				cat: null,
-				...(options.query ? options.query(...arguments) : null),
-			}),
-			//TODO style icon : use : chemIconUrl(properties.type)
-
-			...options,
-		});
 	}
 }
 
