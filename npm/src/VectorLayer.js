@@ -36,29 +36,10 @@ export class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
 				strategy: bbox,
+				bbox: bbox_,
+				url: url_,
 				format: new GeoJSON(),
 				projection: 'EPSG:4326',
-
-				bbox: (extent, _, projection) => transformExtent(
-					extent,
-					projection.getCode(), // Map projection
-					options.projection, // Received projection
-				).map(c => c.toFixed(4)), // Round to 4 digits
-
-				url: function(extent, resolution, projection) {
-					const query = options.query(options, ...arguments),
-						url = options.host + query._path;
-
-					// Remove null atributes
-					Object.keys(query).forEach(k => !query[k] && delete query[k]);
-					delete query._path;
-
-					if (options.strategy == bbox)
-						query.bbox = options.bbox(...arguments);
-
-					return url + '?' + new URLSearchParams(query).toString();
-				},
-
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
@@ -80,63 +61,91 @@ export class MyVectorSource extends VectorSource {
 						statusEl.innerHTML = 'Erreur !';
 				}
 			});
+
+		function bbox_(extent, _, mapProjection) {
+			return transformExtent(
+				extent,
+				mapProjection,
+				options.projection, // Received projection
+			).map(c => c.toFixed(4)); // Round to 4 digits
+		}
+
+		function url_(extent, resolution, projection) {
+			const query = options.query(options, ...arguments),
+				url = options.host + query._path;
+
+			// Remove null atributes
+			Object.keys(query).forEach(k => !query[k] && delete query[k]);
+			delete query._path;
+
+			if (options.strategy == bbox)
+				query.bbox = options.bbox(...arguments);
+
+			return url + '?' + new URLSearchParams(query).toString();
+		}
 	}
 }
 
 // Clustered source
 export class MyClusterSource extends Cluster {
 	constructor(options) {
-		super({ // Cluster source
-			source: new MyVectorSource(options), // Wrapped source
+		// Wrapped source
+		const wrappedSource = new MyVectorSource(options);
 
-			// Generate a center point where display the cluster
-			geometryFnc: feature => {
-				const geometry = feature.getGeometry(); //TODO GeometryCollection
-
-				if (geometry) {
-					const extent = feature.getGeometry().getExtent(), //TODO GeometryCollection
-						pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
-
-					// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
-					if (pixelSemiPerimeter > 200)
-						this.addFeature(feature);
-					else
-						return new Point(getCenter(feature.getGeometry().getExtent())); //TODO GeometryCollection
-				}
-			},
-
-			// Generate the features to render the cluster
-			createCluster: (point, features) => {
-				let nbClusters = 0,
-					includeCluster = false,
-					lines = [];
-
-				features.forEach(f => {
-					const properties = f.getProperties();
-
-					lines.push(options.name(properties));
-					nbClusters += parseInt(properties.cluster) || 1;
-					if (properties.cluster)
-						includeCluster = true;
-				});
-
-				// Single feature : display it
-				if (nbClusters == 1)
-					return features[0];
-
-				if (includeCluster || lines.length > 5)
-					lines = ['Cliquer pour zoomer'];
-
-				// Display a cluster point
-				return new Feature({
-					id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
-					name: agregateText(lines),
-					geometry: point, // The gravity center of all the features in the cluster
-					features: features,
-					cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
-				});
-			},
+		// Cluster source
+		super({
+			source: wrappedSource,
+			geometryFnc: geometryFnc_,
+			createCluster: createCluster_,
 		});
+
+		// Generate a center point where display the cluster
+		function geometryFnc_(feature) {
+			const geometry = feature.getGeometry(); //TODO GeometryCollection
+
+			if (geometry) {
+				const extent = feature.getGeometry().getExtent(), //TODO GeometryCollection
+					pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
+
+				// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
+				if (pixelSemiPerimeter > 200)
+					this.addFeature(feature);
+				else
+					return new Point(getCenter(feature.getGeometry().getExtent())); //TODO GeometryCollection
+			}
+		}
+
+		// Generate the features to render the cluster
+		function createCluster_(point, features) {
+			let nbClusters = 0,
+				includeCluster = false,
+				lines = [];
+
+			features.forEach(f => {
+				const properties = f.getProperties();
+
+				lines.push(options.name(properties));
+				nbClusters += parseInt(properties.cluster) || 1;
+				if (properties.cluster)
+					includeCluster = true;
+			});
+
+			// Single feature : display it
+			if (nbClusters == 1)
+				return features[0];
+
+			if (includeCluster || lines.length > 5)
+				lines = ['Cliquer pour zoomer'];
+
+			// Display a cluster point
+			return new Feature({
+				id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
+				name: agregateText(lines),
+				geometry: point, // The gravity center of all the features in the cluster
+				features: features,
+				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
+			});
+		}
 
 		// Redirect the refresh method to the wrapped source
 		this.refresh = () => this.getSource().refresh();
@@ -164,6 +173,7 @@ export class MyVectorLayer extends VectorLayer {
 			selector: opt.selectName ? new Selector(opt.selectName) : null,
 
 			// Generic
+			//BEST put in a function
 			style: (feature, resolution, hoveredSubFeature) =>
 				(feature.getProperties().cluster ?
 					options.clusterStylesOptions :
@@ -183,6 +193,7 @@ export class MyVectorLayer extends VectorLayer {
 				new MyVectorSource(options) : new MyClusterSource(options),
 			...options,
 		});
+
 		this.options = options; // Mem for further use
 
 		if (options.selectName) {
