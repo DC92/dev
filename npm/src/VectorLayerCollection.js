@@ -23,6 +23,8 @@ import {
 // MyOl
 import {
 	clusterSpreadStylesOptions,
+	concatenateStylesOptions,
+	geoBBStylesOptions,
 	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
@@ -35,28 +37,7 @@ export class LayerGeoBB extends MyVectorLayer {
 			host: 'https://chemineur.fr/',
 			clickUrl: properties => properties.link,
 			attribution: '&copy;chemineur.fr',
-			stylesOptions: function(feature, hoveredSubFeature, layer) {
-				const properties = (feature || hoveredSubFeature).getProperties();
-
-				return [{
-					image: properties.icon ? new Icon({
-						src: properties.icon,
-					}) : null,
-
-					...labelStylesOptions(feature,
-						hoveredSubFeature ? {
-							...properties,
-							attribution: layer.options.attribution,
-						} : {
-							name: properties.name,
-						}),
-
-					stroke: new Stroke({
-						color: hoveredSubFeature ? 'red' : 'blue',
-						width: 2,
-					}),
-				}];
-			},
+			stylesOptions: geoBBStylesOptions,
 
 			...options,
 
@@ -82,25 +63,14 @@ export class LayerAlpages extends LayerGeoBB {
 			}),
 
 			stylesOptions: function(feature, hoveredSubFeature, layer) {
-				const properties = feature.getProperties(),
-					so = {
-						image: properties.icon ? new Icon({
-							src: chemIconUrl(properties.type),
+				return concatenateStylesOptions(
+					geoBBStylesOptions(...arguments),
+					[{
+						image: feature.getProperties().icon ? new Icon({
+							src: chemIconUrl(feature.getProperties().type),
 						}) : null,
-						...labelStylesOptions(feature, {
-							name: hoveredSubFeature ? properties.name : null,
-							attribution: layer.options.attribution,
-						}),
-						fill: new Fill({
-							color: 'rgba(256,256,0,0.3)',
-						}),
-						stroke: hoveredSubFeature ? new Stroke({
-							color: 'green',
-						}) : null,
-					};
-
-				if (so.text) so.text.setOverflow(true);
-				return [so];
+					}],
+				);
 			},
 
 			...options,

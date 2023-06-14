@@ -8,6 +8,7 @@ import 'ol/ol.css';
 import Cluster from 'ol/source/Cluster.js';
 import Feature from 'ol/Feature.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
+import Icon from 'ol/style/Icon.js';
 import Point from 'ol/geom/Point.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
@@ -224,6 +225,30 @@ export class MyVectorLayer extends VectorLayer {
 		if (this.options.altLayer)
 			this.options.altLayer.refresh(visible);
 	}
+}
+
+/**
+  Styles Options are an array of objects containing style options
+  When concatenate, the first stylesOptions object is merged while the others are added
+*/
+export function concatenateStylesOptions() {
+	// First argument becomes the base of the result
+	const r = [...arguments[0]];
+
+	// Others arguments are added
+	for (var i = 1; i < arguments.length; i++) {
+		// First stylesOptions are concatenated
+		r[0] = {
+			...r[0],
+			...arguments[i][0],
+		};
+
+		// Other stylesOptions are added
+		for (var j = 1; j < arguments[i].length; j++) {
+			r.push(arguments[i][j]);
+		}
+	}
+	return r;
 }
 
 // Hover & click management
@@ -484,6 +509,7 @@ export function labelStylesOptions(feature, ...args) { //TODO feature, hoveredFe
 				offsetY: area ? 0 : -13, // Above the icon
 				padding: [1, 1, -1, 3],
 				font: '12px Verdana',
+				overflow: true, //TODO only on hover
 				fill: new Fill({
 					color: 'black',
 				}),
@@ -495,6 +521,33 @@ export function labelStylesOptions(feature, ...args) { //TODO feature, hoveredFe
 				}),
 			}),
 		};
+}
+
+export function geoBBStylesOptions(feature, hoveredSubFeature, layer) {
+	const properties = (feature || hoveredSubFeature).getProperties();
+
+	return [{
+		image: properties.icon ? new Icon({
+			src: properties.icon,
+		}) : null,
+
+		...labelStylesOptions(feature,
+			hoveredSubFeature ? {
+				...properties,
+				attribution: layer.options.attribution,
+			} : {
+				name: properties.name,
+			}),
+
+		stroke: new Stroke({
+			color: hoveredSubFeature ? 'red' : 'blue',
+			width: 2,
+		}),
+
+		fill: new Fill({
+			color: 'rgba(0,0,256,0.3)',
+		}),
+	}];
 }
 
 // Simplify & aggregate an array of lines
