@@ -197,8 +197,8 @@ export class MyVectorLayer extends VectorLayer {
 
 			// Function returning an array of styles options
 			return stylesOptionsFunction(
-					feature,
-					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
+					(hoveredSubFeature || feature).getProperties(),
+					hoveredSubFeature != undefined,
 					layer,
 					resolution)
 				// Transform to an array of Style objects
@@ -429,7 +429,7 @@ export class Selector {
 /**
  * Some usefull style functions
  */
-export function clusterCircleStylesOptions(feature, hoveredFeature) {
+export function clusterCircleStylesOptions(properties, hover) {
 	return [{
 			image: new Circle({
 				radius: 14,
@@ -441,12 +441,12 @@ export function clusterCircleStylesOptions(feature, hoveredFeature) {
 				}),
 			}),
 			text: new Text({
-				text: feature.getProperties().cluster.toString(),
+				text: properties.cluster.toString(),
 				font: '12px Verdana',
 			}),
 			//TODO text zIndex ?
 		},
-		hoveredFeature ? labelStylesOptions(feature, feature.getProperties()) : {},
+		labelStylesOptions(...arguments),
 	];
 }
 
@@ -483,15 +483,12 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 	return so;
 }
 
-export function labelStylesOptions(feature, ...args) { //TODO feature, hoveredFeature, layer??
+export function labelStylesOptions(properties, hover) {
 	const elLabel = document.createElement('span'),
-		area = getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
-		properties = {};
-
-	args.forEach(p => Object.assign(properties, p));
+		isPoint = !properties.geometry || properties.geometry.getType() == 'Point';
 
 	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = agregateText([
+	elLabel.innerHTML = hover ? agregateText([
 		properties.name,
 		agregateText([
 			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
@@ -499,17 +496,17 @@ export function labelStylesOptions(feature, ...args) { //TODO feature, hoveredFe
 		], ', '),
 		properties.type,
 		properties.attribution,
-	]);
+	]) : properties.label || null;
 
-	if (properties.name)
+	if (elLabel.innerHTML)
 		return {
 			text: new Text({
 				text: elLabel.innerHTML,
-				textBaseline: area ? 'middle' : 'bottom',
-				offsetY: area ? 0 : -13, // Above the icon
+				textBaseline: isPoint ? 'bottom' : 'middle',
+				offsetY: isPoint ? -13 : 0, // Above the icon
 				padding: [1, 1, -1, 3],
 				font: '12px Verdana',
-				overflow: true, //TODO only on hover
+				overflow: hover,
 				fill: new Fill({
 					color: 'black',
 				}),
@@ -523,24 +520,19 @@ export function labelStylesOptions(feature, ...args) { //TODO feature, hoveredFe
 		};
 }
 
-export function geoBBStylesOptions(feature, hoveredSubFeature, layer) {
-	const properties = (feature || hoveredSubFeature).getProperties();
-
+export function geoBBStylesOptions(properties, hover, layer) {
 	return [{
 		image: properties.icon ? new Icon({
 			src: properties.icon,
 		}) : null,
 
-		...labelStylesOptions(feature,
-			hoveredSubFeature ? {
-				...properties,
-				attribution: layer.options.attribution,
-			} : {
-				name: properties.name,
-			}),
+		...labelStylesOptions({
+			attribution: layer.options.attribution,
+			...properties,
+		}, hover),
 
 		stroke: new Stroke({
-			color: hoveredSubFeature ? 'red' : 'blue',
+			color: hover ? 'red' : 'blue',
 			width: 2,
 		}),
 

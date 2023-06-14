@@ -30,7 +30,9 @@ import {
 	Selector,
 } from './VectorLayer.js';
 
+
 // chemineur.fr
+//TODO cluster server
 export class LayerGeoBB extends MyVectorLayer {
 	constructor(options) {
 		super({
@@ -44,6 +46,7 @@ export class LayerGeoBB extends MyVectorLayer {
 			query: opt => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
 				cat: opt.selector && opt.selector.getSelection() != 'on' ? opt.selector.getSelection() : null,
+				//TODO put on selector : selector.getSelection() != 'on' 
 				...(options.query ? options.query(...arguments) : null),
 			}),
 		});
@@ -57,17 +60,12 @@ export class LayerAlpages extends LayerGeoBB {
 			host: '//alpages.info/',
 			attribution: '&copy;alpages.info',
 
-			query: opt => ({
-				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: opt.selector && opt.selector.getSelection() != 'on' ? opt.selector.getSelection() : null,
-			}),
-
-			stylesOptions: function(feature, hoveredSubFeature, layer) {
+			stylesOptions: function(properties, hover, layer) {
 				return concatenateStylesOptions(
 					geoBBStylesOptions(...arguments),
 					[{
-						image: feature.getProperties().icon ? new Icon({
-							src: chemIconUrl(feature.getProperties().type),
+						image: properties.type ? new Icon({
+							src: chemIconUrl(properties.type),
 						}) : null,
 					}],
 				);
@@ -90,6 +88,7 @@ export function chemIconUrl(type) {
 }
 
 // refuges.info
+//TODO cluster server
 export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
@@ -110,25 +109,21 @@ export class LayerWri extends MyVectorLayer {
 					...(opt.query ? opt.query(...arguments) : null),
 				}),
 
-				stylesOptions: function(feature, hoveredSubFeature, layer) {
-					const properties = (feature || hoveredSubFeature).getProperties(),
-						so = hoveredSubFeature ?
-						labelStylesOptions(feature, {
-							name: properties.nom,
+				stylesOptions: function(properties, hover, layer) {
+					return [{
+							image: new Icon({
+								src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
+							}),
+						},
+						labelStylesOptions({
+							label: properties.nom, // Non hover
+							name: properties.nom, // Hover properties...
 							ele: properties.coord.alt,
 							bed: properties.places.valeur,
 							type: properties.type.valeur,
 							attribution: layer.options.attribution,
-						}, true) :
-						opt.stylesOptions ?
-						opt.stylesOptions(...arguments)[0] : {}; // Only one Style there
-
-					return [{
-						image: new Icon({
-							src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
-						}),
-						...so,
-					}];
+						}, hover)
+					];
 				},
 			},
 
