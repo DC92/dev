@@ -45,8 +45,8 @@ export default {
 	geom: {
 		MultiPolygon: MultiPolygon,
 	},
-	styleOptions: {
-		label: vectorlayer.labelStyleOptions,
+	stylesOptions: {
+		label: vectorlayer.labelStylesOptions,
 	},
 	layer: {
 		ArcGisTile: tilelayercollection.ArcGisTileLayer,

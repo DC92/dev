@@ -99,6 +99,9 @@ export class MyClusterSource extends Cluster {
 			createCluster: createCluster_,
 		});
 
+		// Redirect the refresh method to the wrapped source
+		this.refresh = () => this.getSource().refresh();
+
 		// Generate a center point where display the cluster
 		function geometryFnc_(feature) {
 			const geometry = feature.getGeometry(); //TODO GeometryCollection
@@ -146,9 +149,6 @@ export class MyClusterSource extends Cluster {
 				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
 			});
 		}
-
-		// Redirect the refresh method to the wrapped source
-		this.refresh = () => this.getSource().refresh();
 	}
 }
 
@@ -156,12 +156,15 @@ export class MyClusterSource extends Cluster {
 export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
-			/* Mandatory
-			host: 'https://chemineur.fr/',
-			query: () => ({_path: '...'}),
-			stylesOptions: (feature, hoveredSubFeature, layer) => ({}),
-			clickUrl: properties => properties.link,
-			*/
+			// Mandatory
+			// host: 'https://chemineur.fr/',
+			// query: () => ({_path: '...'}),
+			// stylesOptions: (feature, hoveredSubFeature, layer) => ([{}]),
+			// clickUrl: properties => properties.link,
+
+			// Generic
+			selector: opt.selectName ? new Selector(opt.selectName) : null,
+			style: style_,
 
 			// Cluster options
 			spreadClusterMaxResolution: 0, // Resolution under which the clusters are displayed as separate icons
@@ -169,21 +172,6 @@ export class MyVectorLayer extends VectorLayer {
 			// serverClusterMinResolution: Resolution above which the server retruns clusters
 			// name: properties => the name for cluster agregation
 			// attribution: '&copy;...',
-
-			selector: opt.selectName ? new Selector(opt.selectName) : null,
-
-			// Generic
-			//BEST put in a function
-			style: (feature, resolution, hoveredSubFeature) =>
-				(feature.getProperties().cluster ?
-					options.clusterStylesOptions :
-					options.stylesOptions)
-				( // Function returning an array of styles options
-					feature,
-					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
-					this, // Layer
-					resolution
-				).map(styleOptions => new Style(styleOptions)), // Transform to an array of Style objects
 
 			...opt,
 		};
@@ -194,10 +182,26 @@ export class MyVectorLayer extends VectorLayer {
 			...options,
 		});
 
+		const layer = this;
 		this.options = options; // Mem for further use
 
 		if (options.selectName) {
 			options.selector.setCallBack(selection => this.refresh(selection.length));
+		}
+
+		function style_(feature, resolution, hoveredSubFeature) {
+			const stylesOptionsFunction = feature.getProperties().cluster ?
+				options.clusterStylesOptions :
+				options.stylesOptions;
+
+			// Function returning an array of styles options
+			return stylesOptionsFunction(
+					feature,
+					hoveredSubFeature, // undefined (normal style) | hovered feature | hovered feature in a cluster
+					layer,
+					resolution)
+				// Transform to an array of Style objects
+				.map(so => new Style(so));
 		}
 	}
 
@@ -417,7 +421,7 @@ export function clusterCircleStylesOptions(feature, hoveredFeature) {
 			}),
 			//TODO text zIndex ?
 		},
-		hoveredFeature ? labelStyleOptions(feature, feature.getProperties()) : {},
+		hoveredFeature ? labelStylesOptions(feature, feature.getProperties()) : {},
 	];
 }
 
@@ -428,7 +432,7 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 
 	const properties = feature.getProperties();
 	let x = 0.95 + 0.45 * properties.cluster,
-		stylesOpt = [];
+		so = [];
 
 	properties.features.forEach(f => {
 		const styles = layer.getStyleFunction()(f, resolution);
@@ -444,17 +448,17 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 					xRight: x * image.getImage().width,
 				}, true);
 
-				stylesOpt.push({
+				so.push({
 					image: image,
 				});
 			}
 		}
 	});
 
-	return stylesOpt;
+	return so;
 }
 
-export function labelStyleOptions(feature, ...args) {
+export function labelStylesOptions(feature, ...args) { //TODO feature, hoveredFeature, layer??
 	const elLabel = document.createElement('span'),
 		area = getArea(feature.getGeometry().getExtent()), // Detect lines or polygons
 		properties = {};

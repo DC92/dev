@@ -23,7 +23,7 @@ import {
 // MyOl
 import {
 	clusterSpreadStylesOptions,
-	labelStyleOptions,
+	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
 } from './VectorLayer.js';
@@ -42,13 +42,15 @@ export class LayerGeoBB extends MyVectorLayer {
 					image: properties.icon ? new Icon({
 						src: properties.icon,
 					}) : null,
-					...labelStyleOptions(feature,
+
+					...labelStylesOptions(feature,
 						hoveredSubFeature ? {
 							...properties,
 							attribution: layer.options.attribution,
 						} : {
 							name: properties.name,
 						}),
+
 					stroke: new Stroke({
 						color: hoveredSubFeature ? 'red' : 'blue',
 						width: 2,
@@ -85,7 +87,7 @@ export class LayerAlpages extends LayerGeoBB {
 						image: properties.icon ? new Icon({
 							src: chemIconUrl(properties.type),
 						}) : null,
-						...labelStyleOptions(feature, {
+						...labelStylesOptions(feature, {
 							name: hoveredSubFeature ? properties.name : null,
 							attribution: layer.options.attribution,
 						}),
@@ -141,7 +143,7 @@ export class LayerWri extends MyVectorLayer {
 				stylesOptions: function(feature, hoveredSubFeature, layer) {
 					const properties = (feature || hoveredSubFeature).getProperties(),
 						so = hoveredSubFeature ?
-						labelStyleOptions(feature, {
+						labelStylesOptions(feature, {
 							name: properties.nom,
 							ele: properties.coord.alt,
 							bed: properties.places.valeur,
@@ -247,14 +249,14 @@ export function layerWriAreas(options) {
 		convertProperties: properties => ({
 			url: properties.lien,
 		}),
-		styleOptionsDisplay: function(feature, properties) {
+		stylesOptionsDisplay: function(feature, properties) {
 			// Build color and transparency
 			const colors = properties.couleur
 				.match(/([0-9a-f]{2})/ig)
 				.map(c => parseInt(c, 16));
 
 			return {
-				...labelStyleOptions(feature, properties.nom, {
+				...labelStylesOptions(feature, properties.nom, {
 					padding: [1, -1, -1, 1],
 					backgroundStroke: null,
 					font: null,
@@ -264,8 +266,8 @@ export function layerWriAreas(options) {
 				}),
 			};
 		},
-		styleOptionsHover: (feature, properties) => ({
-			...labelStyleOptions(feature, properties.nom, {
+		stylesOptionsHover: (feature, properties) => ({
+			...labelStylesOptions(feature, properties.nom, {
 				padding: [1, 0, -1, 2],
 				font: '12px Verdana',
 				overflow: true, // Force display even if no place

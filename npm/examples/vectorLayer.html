@@ -114,7 +114,7 @@ import {
 
 // MyOl
 import {
-	labelStyleOptions,
+	//labelStylesOptions,
 	Selector,
 } from '../src/VectorLayer';
 import {
@@ -177,7 +177,7 @@ new Map({
 			selectName: 'select-refuges',
 			attribution: null,
 			stylesOptions: feature => [
-				labelStyleOptions(feature),
+				labelStylesOptions(feature),
 			],
 		}),
 		...vectorLayerCollection({
@@ -205,9 +205,9 @@ new Map({
 			host: '//dom.refuges.info/', //TODO DELETE
 			selectName: 'select-refuges',
 			// Display a single label above each icon
-			styleOptionsDisplay: function(feature, properties, layer, resolution) {
+			stylesOptionsDisplay: function(feature, properties, layer, resolution) {
 				if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
-					return labelStyleOptions(feature, properties.nom || properties.name); // Points || clusters
+					return labelStylesOptions(feature, properties.nom || properties.name); // Points || clusters
 			},
 			// Don't display attribution on labels
 			convertProperties: {
