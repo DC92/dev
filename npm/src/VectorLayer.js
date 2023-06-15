@@ -227,30 +227,6 @@ export class MyVectorLayer extends VectorLayer {
 	}
 }
 
-/**
-  Styles Options are an array of objects containing style options
-  When concatenate, the first stylesOptions object is merged while the others are added
-*/
-export function concatenateStylesOptions() {
-	// First argument becomes the base of the result
-	const r = [...arguments[0]];
-
-	// Others arguments are added
-	for (var i = 1; i < arguments.length; i++) {
-		// First stylesOptions are concatenated
-		r[0] = {
-			...r[0],
-			...arguments[i][0],
-		};
-
-		// Other stylesOptions are added
-		for (var j = 1; j < arguments[i].length; j++) {
-			r.push(arguments[i][j]);
-		}
-	}
-	return r;
-}
-
 // Hover & click management
 function attachMouseListener(map) {
 	// Attach one hover & click listener to each map
@@ -419,16 +395,81 @@ export class Selector {
 	}
 
 	getSelection() {
-		return this.safeName ?
+		if (!this.safeName)
+			return [true];
+
+		const selection =
 			this.selectEls
 			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value) : [true];
+			.map(el => el.value);
+
+		return selection == 'on' ? [null] : selection;
 	}
 }
 
 /**
  * Some usefull style functions
  */
+export function basicStylesOptions(properties, hover, layer) {
+	return [{
+		image: properties.icon ? new Icon({
+			src: properties.icon,
+		}) : null,
+
+		...labelStylesOptions({
+			attribution: layer.options.attribution,
+			...properties,
+		}, hover),
+
+		stroke: new Stroke({
+			color: hover ? 'red' : 'blue',
+			width: 2,
+		}),
+
+		fill: new Fill({
+			color: 'rgba(0,0,256,0.3)',
+		}),
+	}];
+}
+
+export function labelStylesOptions(properties, hover) {
+	const elLabel = document.createElement('span'),
+		isPoint = !properties.geometry || properties.geometry.getType() == 'Point';
+
+	//HACK to render the html entities in the canvas
+	elLabel.innerHTML = hover ? agregateText([
+		properties.name,
+		agregateText([
+			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+			properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+		], ', '),
+		properties.type,
+		properties.attribution,
+	]) : properties.label || null;
+
+	if (elLabel.innerHTML)
+		return {
+			text: new Text({
+				text: elLabel.innerHTML,
+				//TODO line & poly label following the cursor
+				textBaseline: isPoint ? 'bottom' : 'middle',
+				offsetY: isPoint ? -13 : 0, // Above the icon
+				padding: [1, 1, -1, 3],
+				font: '12px Verdana',
+				overflow: hover,
+				fill: new Fill({
+					color: 'black',
+				}),
+				backgroundFill: new Fill({
+					color: 'white',
+				}),
+				backgroundStroke: new Stroke({
+					color: 'blue',
+				}),
+			}),
+		};
+}
+
 export function clusterCircleStylesOptions(properties, hover) {
 	return [{
 			image: new Circle({
@@ -483,63 +524,28 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 	return so;
 }
 
-export function labelStylesOptions(properties, hover) {
-	const elLabel = document.createElement('span'),
-		isPoint = !properties.geometry || properties.geometry.getType() == 'Point';
+/**
+  Styles Options are an array of objects containing style options
+  When concatenate, the first stylesOptions object is merged while the others are added
+*/
+export function concatenateStylesOptions() {
+	// First argument becomes the base of the result
+	const r = [...arguments[0]];
 
-	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = hover ? agregateText([
-		properties.name,
-		agregateText([
-			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-			properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-		], ', '),
-		properties.type,
-		properties.attribution,
-	]) : properties.label || null;
-
-	if (elLabel.innerHTML)
-		return {
-			text: new Text({
-				text: elLabel.innerHTML,
-				textBaseline: isPoint ? 'bottom' : 'middle',
-				offsetY: isPoint ? -13 : 0, // Above the icon
-				padding: [1, 1, -1, 3],
-				font: '12px Verdana',
-				overflow: hover,
-				fill: new Fill({
-					color: 'black',
-				}),
-				backgroundFill: new Fill({
-					color: 'white',
-				}),
-				backgroundStroke: new Stroke({
-					color: 'blue',
-				}),
-			}),
+	// Others arguments are added
+	for (var i = 1; i < arguments.length; i++) {
+		// First stylesOptions are concatenated
+		r[0] = {
+			...r[0],
+			...arguments[i][0],
 		};
-}
 
-export function geoBBStylesOptions(properties, hover, layer) {
-	return [{
-		image: properties.icon ? new Icon({
-			src: properties.icon,
-		}) : null,
-
-		...labelStylesOptions({
-			attribution: layer.options.attribution,
-			...properties,
-		}, hover),
-
-		stroke: new Stroke({
-			color: hover ? 'red' : 'blue',
-			width: 2,
-		}),
-
-		fill: new Fill({
-			color: 'rgba(0,0,256,0.3)',
-		}),
-	}];
+		// Other stylesOptions are added
+		for (var j = 1; j < arguments[i].length; j++) {
+			r.push(arguments[i][j]);
+		}
+	}
+	return r;
 }
 
 // Simplify & aggregate an array of lines

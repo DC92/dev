@@ -22,9 +22,9 @@ import {
 
 // MyOl
 import {
+	basicStylesOptions,
 	clusterSpreadStylesOptions,
 	concatenateStylesOptions,
-	geoBBStylesOptions,
 	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
@@ -39,14 +39,15 @@ export class LayerGeoBB extends MyVectorLayer {
 			host: 'https://chemineur.fr/',
 			clickUrl: properties => properties.link,
 			attribution: '&copy;chemineur.fr',
-			stylesOptions: geoBBStylesOptions,
+			stylesOptions: basicStylesOptions,
+
+			//serverClusterMinResolution:50,
 
 			...options,
 
 			query: opt => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: opt.selector && opt.selector.getSelection() != 'on' ? opt.selector.getSelection() : null,
-				//TODO put on selector : selector.getSelection() != 'on' 
+				cat: opt.selector.getSelection(),
 				...(options.query ? options.query(...arguments) : null),
 			}),
 		});
@@ -54,15 +55,21 @@ export class LayerGeoBB extends MyVectorLayer {
 };
 
 // alpages.info
-export class LayerAlpages extends LayerGeoBB {
+export class LayerAlpages extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: '//alpages.info/',
 			attribution: '&copy;alpages.info',
+			clickUrl: properties => properties.link,
+
+			query: opt => ({
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				forums: opt.selector.getSelection(),
+			}),
 
 			stylesOptions: function(properties, hover, layer) {
 				return concatenateStylesOptions(
-					geoBBStylesOptions(...arguments),
+					basicStylesOptions(...arguments),
 					[{
 						image: properties.type ? new Icon({
 							src: chemIconUrl(properties.type),
