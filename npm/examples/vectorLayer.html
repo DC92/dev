@@ -117,7 +117,7 @@ import {
 	Selector,
 } from '../src/VectorLayer';
 import {
-	LayerGeoBB,
+	LayerChemineur,
 	LayerWri,
 	LayerAlpages,
 } from '../src/VectorLayerCollection';
@@ -165,20 +165,13 @@ new Map({
 		}),
 
 		layerWri,
-		new LayerGeoBB({ // Chemineur
+		new LayerChemineur({ // Chemineur
 			selectName: 'select-chem',
 		}),
 		new LayerAlpages({ // Alpages.info
 			selectName: 'select-alpages',
 		}),
 		/*
-		new LayerWri({
-			selectName: 'select-refuges',
-			attribution: null,
-			stylesOptions: feature => [
-				labelStylesOptions(feature),
-			],
-		}),
 		...vectorLayerCollection({
 			prc: {
 				selectName: 'select-prc',

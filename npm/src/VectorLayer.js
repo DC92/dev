@@ -128,7 +128,8 @@ export class MyClusterSource extends Cluster {
 			features.forEach(f => {
 				const properties = f.getProperties();
 
-				lines.push(options.name(properties));
+				if (typeof options.name == 'function')
+					lines.push(options.name(properties));
 				nbClusters += parseInt(properties.cluster) || 1;
 				if (properties.cluster)
 					includeCluster = true;
@@ -164,15 +165,15 @@ export class MyVectorLayer extends VectorLayer {
 			// clickUrl: properties => properties.link,
 
 			// Generic
+			// name: properties => the name for cluster agregation
+			// attribution: '&copy;...',
 			selector: opt.selectName ? new Selector(opt.selectName) : null,
 			style: style_,
 
-			// Cluster options
-			spreadClusterMaxResolution: 0, // Resolution under which the clusters are displayed as separate icons
+			// Local cluster options
+			serverClusterMinResolution: 50, // Resolution above which the server retruns clusters
+			spreadClusterMaxResolution: 20, // Resolution under which the clusters are displayed as separate icons
 			clusterStylesOptions: clusterCircleStylesOptions,
-			// serverClusterMinResolution: Resolution above which the server retruns clusters
-			// name: properties => the name for cluster agregation
-			// attribution: '&copy;...',
 
 			...opt,
 		};
@@ -180,6 +181,7 @@ export class MyVectorLayer extends VectorLayer {
 		super({
 			source: options.serverClusterMinResolution === undefined ?
 				new MyVectorSource(options) : new MyClusterSource(options),
+
 			...options,
 		});
 
@@ -224,6 +226,32 @@ export class MyVectorLayer extends VectorLayer {
 
 		if (this.options.altLayer)
 			this.options.altLayer.refresh(visible);
+	}
+}
+
+export class ServerClusterVectorLayer extends MyVectorLayer {
+	constructor(opt) {
+		const options = {
+				disjoinClusterMaxResolution: 100, //TODO ne fonctionne pas
+				...opt,
+			},
+
+			// High resolutions layer
+			hightResolutionsLayer = new MyVectorLayer({
+				minResolution: options.disjoinClusterMaxResolution,
+
+				...options,
+
+				query: options.clusterQuery,
+			});
+
+		// Low resolutions layer
+		super({
+			maxResolution: options.disjoinClusterMaxResolution,
+			altLayer: hightResolutionsLayer,
+
+			...options,
+		});
 	}
 }
 
@@ -492,7 +520,7 @@ export function clusterCircleStylesOptions(properties, hover) {
 }
 
 export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
-	if (resolution > layer.options.serverClusterMinResolution ||
+	if (resolution > layer.options.serverClusterMinResolution || //TODO bizarre
 		resolution > layer.options.spreadClusterMaxResolution)
 		return clusterCircleStylesOptions(...arguments);
 

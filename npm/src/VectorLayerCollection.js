@@ -28,12 +28,13 @@ import {
 	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
+	ServerClusterVectorLayer,
 } from './VectorLayer.js';
 
 
 // chemineur.fr
 //TODO cluster server
-export class LayerGeoBB extends MyVectorLayer {
+export class LayerChemineur extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
 			host: 'https://chemineur.fr/',
@@ -41,45 +42,61 @@ export class LayerGeoBB extends MyVectorLayer {
 			attribution: '&copy;chemineur.fr',
 			stylesOptions: basicStylesOptions,
 
-			//serverClusterMinResolution:50,
-
 			...options,
 
-			query: opt => ({
-				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: opt.selector.getSelection(),
-				...(options.query ? options.query(...arguments) : null),
-			}),
+			query: query_,
 		});
+
+		function query_(opt2) {
+			return {
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: opt2.selector.getSelection(),
+				...(options.query ? options.query(...arguments) : null),
+			};
+		}
+
+		function clusterQuery_(opt) { //TODO non utilisée
+			return {
+				layer: 'cluster',
+				...query_(opt),
+			};
+		}
 	}
 };
 
 // alpages.info
 export class LayerAlpages extends MyVectorLayer {
+	//TODO selector not memorized
+	//TODO ne pas clusteriser polygones (problème général)
 	constructor(options) {
 		super({
 			host: '//alpages.info/',
 			attribution: '&copy;alpages.info',
-			clickUrl: properties => properties.link,
-
-			query: opt => ({
-				_path: 'ext/Dominique92/GeoBB/gis.php',
-				forums: opt.selector.getSelection(),
-			}),
-
-			stylesOptions: function(properties, hover, layer) {
-				return concatenateStylesOptions(
-					basicStylesOptions(...arguments),
-					[{
-						image: properties.type ? new Icon({
-							src: chemIconUrl(properties.type),
-						}) : null,
-					}],
-				);
-			},
 
 			...options,
+
+			clickUrl: properties => properties.link,
+			query: query_,
+			stylesOptions: stylesOptions_,
 		});
+
+		function query_(opt) {
+			return {
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				forums: opt.selector.getSelection(),
+			};
+		}
+
+		function stylesOptions_(properties, hover, layer) {
+			return concatenateStylesOptions(
+				basicStylesOptions(...arguments),
+				[{
+					image: properties.type ? new Icon({
+						src: chemIconUrl(properties.type),
+					}) : null,
+				}],
+			);
+		}
 	}
 }
 
@@ -89,123 +106,63 @@ export function chemIconUrl(type) {
 		const icons = type.split(' ');
 
 		return 'https://chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-			icons[0] + (icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
+			icons[0] +
+			(icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
 			'.svg';
 	}
 }
 
 // refuges.info
-//TODO cluster server
-export class LayerWri extends MyVectorLayer {
-	constructor(opt) {
-		const options = {
-				host: 'https://www.refuges.info/',
-				disjoinClusterMaxResolution: 100,
-				serverClusterMinResolution: 50,
-				name: properties => properties.nom, // Function returning the name for cluster agregation
-				clickUrl: properties => properties.lien, // Function returning url to go on click
-				spreadClusterMaxResolution: 20,
-				clusterStylesOptions: clusterSpreadStylesOptions,
-
-				...opt,
-
-				query: options => ({
-					_path: 'api/bbox',
-					nb_points: 'all',
-					type_points: options.selector ? options.selector.getSelection() : null,
-					...(opt.query ? opt.query(...arguments) : null),
-				}),
-
-				stylesOptions: function(properties, hover, layer) {
-					return [{
-							image: new Icon({
-								src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
-							}),
-						},
-						labelStylesOptions({
-							label: properties.nom, // Non hover
-							name: properties.nom, // Hover properties...
-							ele: properties.coord.alt,
-							bed: properties.places.valeur,
-							type: properties.type.valeur,
-							attribution: layer.options.attribution,
-						}, hover)
-					];
-				},
-			},
-
-			// High resolutions layer
-			hightResolutionsLayer = new MyVectorLayer({
-				minResolution: options.disjoinClusterMaxResolution,
-
-				...options,
-
-				query: function() {
-					return {
-						cluster: 0.1,
-						...(options.query ? options.query(...arguments) : null),
-					};
-				},
-			});
-
-		// Low resolutions layer
+export class LayerWri extends ServerClusterVectorLayer {
+	constructor(options) {
 		super({
-			maxResolution: options.disjoinClusterMaxResolution,
-			altLayer: hightResolutionsLayer,
+			host: 'https://www.refuges.info/',
+			name: properties => properties.nom, // Function returning the name for cluster agregation
+			clickUrl: properties => properties.lien, // Function returning url to go on click
+
 			...options,
+
+			query: query_,
+			clusterQuery: clusterQuery_,
+			stylesOptions: stylesOptions_,
 		});
+
+		function query_(opt) {
+			return {
+				_path: 'api/bbox',
+				nb_points: 'all',
+				type_points: opt.selector ? opt.selector.getSelection() : null,
+				...(options.query ? options.query(...arguments) : null),
+			};
+		}
+
+		function clusterQuery_(opt) {
+			return {
+				cluster: 0.1,
+				...query_(opt),
+			};
+		}
+
+		function stylesOptions_(properties, hover, layer) {
+			return [{
+					image: new Icon({
+						src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
+					}),
+				},
+				labelStylesOptions({
+					label: properties.nom, // Non hover
+					name: properties.nom, // Hover properties...
+					ele: properties.coord.alt,
+					bed: properties.places.valeur,
+					type: properties.type.valeur,
+					attribution: layer.options.attribution,
+				}, hover)
+			];
+		}
 	}
 }
 
-//BEST make it a class
-export function layerWri(options) {
-	return layerVectorCluster({ //BEST case of WRI without local cluster ?
-		host: '//www.refuges.info/',
-		//strategy: bbox,
-		...options,
-		urlParams: (_, bbox, selections) => ({
-			path: selections[1] ? 'api/massif' : 'api/bbox',
-			type_points: selections[0],
-			massif: selections[1],
-			nb_points: 'all',
-			bbox: bbox.join(','),
-			...functionLike(options.urlParams, ...arguments),
-		}),
-		convertProperties: (properties, opt) => ({
-			name: properties.nom,
-			url: properties.lien,
-			icon: opt.host + 'images/icones/' + properties.type.icone + '.svg',
-			ele: properties.coord ? properties.coord.alt : 0,
-			bed: properties.places ? properties.places.valeur : 0,
-			type: properties.type ? properties.type.valeur : null,
-			attribution: '&copy;Refuges.info',
-			...functionLike(options.convertProperties, ...arguments),
-		}),
-	});
-}
-
-//BEST make it a class
-export function layerClusterWri(opt) {
-	const options = {
-			disjoinClusterMaxResolution: 100,
-			...opt,
-		},
-		// High resolutions layer
-		clusterLayer = layerWri({
-			minResolution: options.disjoinClusterMaxResolution,
-			...options,
-			urlParams: {
-				cluster: 0.1,
-			},
-		});
-
-	// Low resolutions
-	return layerWri({
-		maxResolution: options.disjoinClusterMaxResolution,
-		altLayer: clusterLayer,
-		...options,
-	});
-}
+/** RENEW RENEW RENEW RENEW RENEW RENEW */
 
 //BEST make it a class
 export function layerWriAreas(options) {
@@ -442,17 +399,12 @@ export function layerOverpass(opt) {
 	return layer;
 }
 
-// Return the value of result of function with arguments
-function functionLike(value, ...a) {
-	return typeof value == 'function' ? value(...a) : value || [];
-}
-
 // Vectors layers examples
 export function vectorLayerCollection(options) {
 	options = options || {};
 
 	return [
-		layerClusterWri(options.wri),
+		//layerClusterWri(options.wri),
 		layerPrc(options.prc),
 		layerC2C(options.c2c),
 		layerOverpass(options.osm),
