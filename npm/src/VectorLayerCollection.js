@@ -9,47 +9,39 @@ import GeoJSON from 'ol/format/GeoJSON.js';
 import Icon from 'ol/style/Icon.js';
 import OSMXML from 'ol/format/OSMXML.js';
 import {
-	getArea,
-} from 'ol/extent.js';
-import {
-	bbox,
-} from 'ol/loadingstrategy.js';
-import {
 	Fill,
 	Stroke,
-	Text,
 } from 'ol/style.js';
 
 // MyOl
 import {
 	basicStylesOptions,
-	clusterSpreadStylesOptions,
 	concatenateStylesOptions,
 	labelStylesOptions,
 	MyVectorLayer,
-	Selector,
 	ServerClusterVectorLayer,
 } from './VectorLayer.js';
 
 
 // chemineur.fr
-//TODO Cluster points isolés pas affichés
 export class LayerChemineur extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
-			host: 'https://chemineur.fr/',
+			host: '//chemineur.fr/',
 			attribution: '&copy;chemineur.fr',
 
 			...options,
 
 			query: query_,
 			clusterQuery: clusterQuery_,
+			stylesOptions: stylesOptions_,
 		});
 
 		function query_(opt) {
 			return {
 				_path: 'ext/Dominique92/GeoBB/gis.php',
 				cat: opt.selector.getSelection(),
+
 				...(options.query ? options.query(...arguments) : null),
 			};
 		}
@@ -57,21 +49,36 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 		function clusterQuery_() {
 			return {
 				layer: 'cluster',
+
 				...query_(...arguments),
 			};
+		}
+
+		function stylesOptions_(properties) {
+			return [{
+				...basicStylesOptions(...arguments),
+
+				image: new Icon({
+					src: chemIconUrl(properties.type),
+				}),
+			}];
 		}
 	}
 };
 
 // alpages.info
 export class LayerAlpages extends MyVectorLayer {
-	constructor(options) {
-		super({
+	constructor(opt) {
+		const options = {
 			host: '//alpages.info/',
 			attribution: '&copy;alpages.info',
 
+			...opt,
+		};
+		super({
 			...options,
-			clickUrl: properties => '//alpages.info/viewtopic.php?t=' + properties.id,
+
+			clickUrl: properties => options.host + 'viewtopic.php?t=' + properties.id,
 			query: query_,
 			stylesOptions: stylesOptions_,
 		});
@@ -96,23 +103,21 @@ export class LayerAlpages extends MyVectorLayer {
 	}
 }
 
-// Get icon from chemineur.fr if we only have a type
+// Get icon from chemineur.fr
 export function chemIconUrl(type) {
-	if (type) {
-		const icons = type.split(' ');
+	const icons = (type || 'a63').split(' ');
 
-		return 'https://chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-			icons[0] +
-			(icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
-			'.svg';
-	}
+	return '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
+		icons[0] +
+		(icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
+		'.svg';
 }
 
 // refuges.info
 export class LayerWri extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
-			host: 'https://www.refuges.info/',
+			host: '//www.refuges.info/',
 			name: properties => properties.nom, // Function returning the name for cluster agregation
 			clickUrl: properties => properties.lien, // Function returning url to go on click
 
@@ -128,6 +133,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 				_path: 'api/bbox',
 				nb_points: 'all',
 				type_points: opt.selector ? opt.selector.getSelection() : null,
+
 				...(options.query ? options.query(...arguments) : null),
 			};
 		}
@@ -135,6 +141,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 		function clusterQuery_() {
 			return {
 				cluster: 0.1,
+
 				...query_(...arguments),
 			};
 		}

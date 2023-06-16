@@ -13,12 +13,10 @@ import Point from 'ol/geom/Point.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
 import {
-	getArea,
 	getCenter,
 } from 'ol/extent.js';
 import {
 	bbox,
-	all,
 } from 'ol/loadingstrategy.js';
 import {
 	transformExtent,
@@ -41,6 +39,7 @@ export class MyVectorSource extends VectorSource {
 				url: url_,
 				format: new GeoJSON(),
 				projection: 'EPSG:4326',
+
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
@@ -158,14 +157,13 @@ export class MyVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
 			// Mandatory
-			// host: 'https://chemineur.fr/',
+			// host: '//chemineur.fr/',
 			// query: () => ({_path: '...'}),
+			name: properties => properties.name, // Function returning the name of the feature
 			stylesOptions: basicStylesOptions, // (feature, hoveredSubFeature, layer)
 			clickUrl: properties => properties.link, // Function returning the link to click
-			name: properties => properties.name, // Function returning the name of the feature
 
 			// Generic
-			// name: properties => the name for cluster agregation
 			// attribution: '&copy;...',
 			selector: opt.selectName ? new Selector(opt.selectName) : null,
 			style: style_,
@@ -232,24 +230,24 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 				serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
+
 				...opt,
 			},
 
 			// High resolutions layer
 			hightResolutionsLayer = new MyVectorLayer({
-				minResolution: options.serverClusterMinResolution,
-
 				...options,
 
+				minResolution: options.serverClusterMinResolution,
 				query: options.clusterQuery,
 			});
 
 		// Low resolutions layer
 		super({
+			...options,
+
 			maxResolution: options.serverClusterMinResolution,
 			altLayer: hightResolutionsLayer,
-
-			...options,
 		});
 	}
 }
