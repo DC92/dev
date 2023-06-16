@@ -75,10 +75,8 @@ export class MyVectorSource extends VectorSource {
 			const query = options.query(options, ...arguments),
 				url = options.host + query._path;
 
-			// Remove null atributes
-			Object.keys(query).forEach(k => !query[k] && delete query[k]);
+			Object.keys(query).forEach(k => query[k] == '' && delete query[k]); // Remove null atributes
 			delete query._path;
-
 			if (options.strategy == bbox)
 				query.bbox = options.bbox(...arguments);
 
@@ -105,7 +103,9 @@ export class MyClusterSource extends Cluster {
 
 		// Generate a center point where display the cluster
 		function geometryFnc_(feature) {
-			const geometry = feature.getGeometry(); //TODO GeometryCollection
+			//TODO don't work with lines or polys
+			const geometry = feature.getGeometry();
+			//TODO GeometryCollection
 
 			if (geometry) {
 				const extent = feature.getGeometry().getExtent(), //TODO GeometryCollection
@@ -128,8 +128,7 @@ export class MyClusterSource extends Cluster {
 			features.forEach(f => {
 				const properties = f.getProperties();
 
-				if (typeof options.name == 'function')
-					lines.push(options.name(properties));
+				lines.push(options.name(properties));
 				nbClusters += parseInt(properties.cluster) || 1;
 				if (properties.cluster)
 					includeCluster = true;
@@ -162,7 +161,8 @@ export class MyVectorLayer extends VectorLayer {
 			// host: 'https://chemineur.fr/',
 			// query: () => ({_path: '...'}),
 			// stylesOptions: (feature, hoveredSubFeature, layer) => ([{}]),
-			// clickUrl: properties => properties.link,
+			// clickUrl: properties => properties.link,// Function returning the link to click
+			name: properties => properties.name, // Function returning the name of the feature
 
 			// Generic
 			// name: properties => the name for cluster agregation
@@ -171,16 +171,19 @@ export class MyVectorLayer extends VectorLayer {
 			style: style_,
 
 			// Local cluster options
-			serverClusterMinResolution: 50, // Resolution above which the server retruns clusters
-			spreadClusterMaxResolution: 20, // Resolution under which the clusters are displayed as separate icons
-			clusterStylesOptions: clusterCircleStylesOptions,
+			// localClusterMinResolution: 50, // Resolution above which the browser clusterises
+			clusterStylesOptions: clusterCircleStylesOptions, //TODO standardiser
+
+			// Server cluster options
+			// serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
+			// clusterQuery: () => ({layer: 'cluster'}), // Additianal query parameters for clusterised layers
 
 			...opt,
 		};
 
 		super({
-			source: options.serverClusterMinResolution === undefined ?
-				new MyVectorSource(options) : new MyClusterSource(options),
+			source: options.localClusterMinResolution ?
+				new MyClusterSource(options) : new MyVectorSource(options),
 
 			...options,
 		});
@@ -229,16 +232,16 @@ export class MyVectorLayer extends VectorLayer {
 	}
 }
 
-export class ServerClusterVectorLayer extends MyVectorLayer {
+//TODO merge in MyVectorLayer
+export class wwwwwwwwwwMyVectorLayer extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
-				disjoinClusterMaxResolution: 100, //TODO ne fonctionne pas
 				...opt,
 			},
 
 			// High resolutions layer
 			hightResolutionsLayer = new MyVectorLayer({
-				minResolution: options.disjoinClusterMaxResolution,
+				minResolution: options.serverClusterMinResolution,
 
 				...options,
 
@@ -247,7 +250,7 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 
 		// Low resolutions layer
 		super({
-			maxResolution: options.disjoinClusterMaxResolution,
+			maxResolution: options.serverClusterMinResolution,
 			altLayer: hightResolutionsLayer,
 
 			...options,
@@ -520,8 +523,7 @@ export function clusterCircleStylesOptions(properties, hover) {
 }
 
 export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
-	if (resolution > layer.options.serverClusterMinResolution || //TODO bizarre
-		resolution > layer.options.spreadClusterMaxResolution)
+	if (resolution > layer.options.localClusterMinResolution)
 		return clusterCircleStylesOptions(...arguments);
 
 	const properties = feature.getProperties();

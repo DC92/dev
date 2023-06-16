@@ -28,22 +28,22 @@ import {
 	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
-	ServerClusterVectorLayer,
 } from './VectorLayer.js';
 
 
 // chemineur.fr
 //TODO cluster server
-export class LayerChemineur extends ServerClusterVectorLayer {
+export class LayerChemineur extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: 'https://chemineur.fr/',
-			clickUrl: properties => properties.link,
+			localClusterMinResolution: 50,
 			attribution: '&copy;chemineur.fr',
 			stylesOptions: basicStylesOptions,
 
 			...options,
 
+			clickUrl: properties => properties.link,
 			query: query_,
 		});
 
@@ -66,11 +66,11 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 
 // alpages.info
 export class LayerAlpages extends MyVectorLayer {
-	//TODO selector not memorized
 	//TODO ne pas clusteriser polygones (problème général)
 	constructor(options) {
 		super({
 			host: '//alpages.info/',
+			localClusterMinResolution: 50,
 			attribution: '&copy;alpages.info',
 
 			...options,
@@ -113,12 +113,13 @@ export function chemIconUrl(type) {
 }
 
 // refuges.info
-export class LayerWri extends ServerClusterVectorLayer {
+export class LayerWri extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: 'https://www.refuges.info/',
 			name: properties => properties.nom, // Function returning the name for cluster agregation
 			clickUrl: properties => properties.lien, // Function returning url to go on click
+			localClusterMinResolution: 50, // Resolution above which the browser clusterises
 
 			...options,
 
