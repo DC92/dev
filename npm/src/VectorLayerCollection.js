@@ -66,7 +66,6 @@ export class LayerChemineur extends MyVectorLayer {
 
 // alpages.info
 export class LayerAlpages extends MyVectorLayer {
-	//TODO ne pas clusteriser polygones (problème général)
 	constructor(options) {
 		super({
 			host: '//alpages.info/',

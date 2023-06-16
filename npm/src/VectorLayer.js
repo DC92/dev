@@ -75,7 +75,9 @@ export class MyVectorSource extends VectorSource {
 			const query = options.query(options, ...arguments),
 				url = options.host + query._path;
 
-			Object.keys(query).forEach(k => query[k] == '' && delete query[k]); // Remove null atributes
+			Object.keys(query).forEach(k =>
+				(query[k] == '' || query[k] == 'on') && delete query[k]
+			);
 			delete query._path;
 			if (options.strategy == bbox)
 				query.bbox = options.bbox(...arguments);
@@ -94,7 +96,7 @@ export class MyClusterSource extends Cluster {
 		// Cluster source
 		super({
 			source: wrappedSource,
-			geometryFnc: geometryFnc_,
+			geometryFunction: geometryFunction_,
 			createCluster: createCluster_,
 		});
 
@@ -102,20 +104,18 @@ export class MyClusterSource extends Cluster {
 		this.refresh = () => this.getSource().refresh();
 
 		// Generate a center point where display the cluster
-		function geometryFnc_(feature) {
-			//TODO don't work with lines or polys
+		function geometryFunction_(feature) {
 			const geometry = feature.getGeometry();
-			//TODO GeometryCollection
 
 			if (geometry) {
-				const extent = feature.getGeometry().getExtent(), //TODO GeometryCollection
+				const extent = feature.getGeometry().getExtent(),
 					pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
 
 				// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
 				if (pixelSemiPerimeter > 200)
 					this.addFeature(feature);
 				else
-					return new Point(getCenter(feature.getGeometry().getExtent())); //TODO GeometryCollection
+					return new Point(getCenter(feature.getGeometry().getExtent()));
 			}
 		}
 
@@ -172,7 +172,7 @@ export class MyVectorLayer extends VectorLayer {
 
 			// Local cluster options
 			// localClusterMinResolution: 50, // Resolution above which the browser clusterises
-			clusterStylesOptions: clusterCircleStylesOptions, //TODO standardiser
+			clusterStylesOptions: clusterStylesOptions, //TODO standardiser
 
 			// Server cluster options
 			// serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
@@ -304,7 +304,7 @@ function mouseListener(evt) {
 		// Find sub-feature from a detailed cluster
 		const hoveredProperties = hoveredFeature.getProperties(),
 			featurePosition = map.getPixelFromCoordinate(
-				getCenter(hoveredFeature.getGeometry().getExtent()) //TODO GeometryCollection
+				getCenter(hoveredFeature.getGeometry().getExtent())
 			),
 			deltaXCursor = evt.originalEvent.layerX - featurePosition[0];
 
@@ -334,7 +334,7 @@ function mouseListener(evt) {
 			if (hoveredSubProperties.cluster)
 				map.getView().animate({
 					zoom: map.getView().getZoom() + 2,
-					center: hoveredProperties.geometry.getCoordinates(), //TODO GeometryCollection
+					center: hoveredProperties.geometry.getCoordinates(),
 				});
 		} else
 			// Hover
@@ -386,7 +386,6 @@ export class Selector {
 					this.init.join(',') == el.value;
 				el.addEventListener('click', evt => this.onClick(evt));
 			});
-
 			this.onClick(); // Init with "all"
 		}
 		this.callBack = callBack;
@@ -426,15 +425,10 @@ export class Selector {
 	}
 
 	getSelection() {
-		if (!this.safeName)
-			return [true];
-
-		const selection =
+		return this.safeName ?
 			this.selectEls
 			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value);
-
-		return selection == 'on' ? [null] : selection;
+			.map(el => el.value) : [true];
 	}
 }
 
@@ -482,7 +476,7 @@ export function labelStylesOptions(properties, hover) {
 		return {
 			text: new Text({
 				text: elLabel.innerHTML,
-				//TODO line & poly label following the cursor
+				//BEST line & poly label following the cursor
 				textBaseline: isPoint ? 'bottom' : 'middle',
 				offsetY: isPoint ? -13 : 0, // Above the icon
 				padding: [1, 1, -1, 3],
@@ -501,7 +495,7 @@ export function labelStylesOptions(properties, hover) {
 		};
 }
 
-export function clusterCircleStylesOptions(properties, hover) {
+export function clusterStylesOptions(properties, hover) {
 	return [{
 			image: new Circle({
 				radius: 14,
@@ -522,9 +516,10 @@ export function clusterCircleStylesOptions(properties, hover) {
 	];
 }
 
+//TODO fusionner avec clusterStylesOptions
 export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 	if (resolution > layer.options.localClusterMinResolution)
-		return clusterCircleStylesOptions(...arguments);
+		return clusterStylesOptions(...arguments);
 
 	const properties = feature.getProperties();
 	let x = 0.95 + 0.45 * properties.cluster,
@@ -538,12 +533,9 @@ export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
 
 			if (image) {
 				image.setAnchor([x -= 0.9, 0.5]);
-
-				// Mem the shift for hover detection
-				f.setProperties({
+				f.setProperties({ // Mem the shift for hover detection
 					xRight: x * image.getImage().width,
 				}, true);
-
 				so.push({
 					image: image,
 				});
