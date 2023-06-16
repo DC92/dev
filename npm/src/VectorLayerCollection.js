@@ -28,37 +28,36 @@ import {
 	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
+	ServerClusterVectorLayer,
 } from './VectorLayer.js';
 
 
 // chemineur.fr
-//TODO cluster server
-export class LayerChemineur extends MyVectorLayer {
+//TODO Cluster points isolés pas affichés
+export class LayerChemineur extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
 			host: 'https://chemineur.fr/',
-			localClusterMinResolution: 50,
 			attribution: '&copy;chemineur.fr',
-			stylesOptions: basicStylesOptions,
 
 			...options,
 
-			clickUrl: properties => properties.link,
 			query: query_,
+			clusterQuery: clusterQuery_,
 		});
 
-		function query_(opt2) {
+		function query_(opt) {
 			return {
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: opt2.selector.getSelection(),
+				cat: opt.selector.getSelection(),
 				...(options.query ? options.query(...arguments) : null),
 			};
 		}
 
-		function clusterQuery_(opt) { //TODO non utilisée
+		function clusterQuery_() {
 			return {
 				layer: 'cluster',
-				...query_(opt),
+				...query_(...arguments),
 			};
 		}
 	}
@@ -69,12 +68,10 @@ export class LayerAlpages extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: '//alpages.info/',
-			localClusterMinResolution: 50,
 			attribution: '&copy;alpages.info',
 
 			...options,
-
-			clickUrl: properties => properties.link,
+			clickUrl: properties => '//alpages.info/viewtopic.php?t=' + properties.id,
 			query: query_,
 			stylesOptions: stylesOptions_,
 		});
@@ -112,13 +109,12 @@ export function chemIconUrl(type) {
 }
 
 // refuges.info
-export class LayerWri extends MyVectorLayer {
+export class LayerWri extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
 			host: 'https://www.refuges.info/',
 			name: properties => properties.nom, // Function returning the name for cluster agregation
 			clickUrl: properties => properties.lien, // Function returning url to go on click
-			localClusterMinResolution: 50, // Resolution above which the browser clusterises
 
 			...options,
 
@@ -136,10 +132,10 @@ export class LayerWri extends MyVectorLayer {
 			};
 		}
 
-		function clusterQuery_(opt) {
+		function clusterQuery_() {
 			return {
 				cluster: 0.1,
-				...query_(opt),
+				...query_(...arguments),
 			};
 		}
 

@@ -160,8 +160,8 @@ export class MyVectorLayer extends VectorLayer {
 			// Mandatory
 			// host: 'https://chemineur.fr/',
 			// query: () => ({_path: '...'}),
-			// stylesOptions: (feature, hoveredSubFeature, layer) => ([{}]),
-			// clickUrl: properties => properties.link,// Function returning the link to click
+			stylesOptions: basicStylesOptions, // (feature, hoveredSubFeature, layer)
+			clickUrl: properties => properties.link, // Function returning the link to click
 			name: properties => properties.name, // Function returning the name of the feature
 
 			// Generic
@@ -171,12 +171,8 @@ export class MyVectorLayer extends VectorLayer {
 			style: style_,
 
 			// Local cluster options
-			// localClusterMinResolution: 50, // Resolution above which the browser clusterises
+			localClusterMinResolution: 50, // Resolution above which the browser clusterises
 			clusterStylesOptions: clusterStylesOptions, //TODO standardiser
-
-			// Server cluster options
-			// serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
-			// clusterQuery: () => ({layer: 'cluster'}), // Additianal query parameters for clusterised layers
 
 			...opt,
 		};
@@ -232,10 +228,10 @@ export class MyVectorLayer extends VectorLayer {
 	}
 }
 
-//TODO merge in MyVectorLayer
-export class wwwwwwwwwwMyVectorLayer extends MyVectorLayer {
+export class ServerClusterVectorLayer extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
+				serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
 				...opt,
 			},
 
