@@ -234,16 +234,13 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 				serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
-
 				...opt,
 			},
 
 			// High resolutions layer
 			hightResolutionsLayer = new MyVectorLayer({
 				...options,
-
 				minResolution: options.serverClusterMinResolution,
-				query: options.clusterQuery,
 			});
 
 		// Low resolutions layer
@@ -253,6 +250,77 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 			maxResolution: options.serverClusterMinResolution,
 			altLayer: hightResolutionsLayer,
 		});
+	}
+}
+
+/**
+ * Manage a collection of checkboxes with the same name
+ * name : name of all the rlated checkboxes
+ * The checkbox without value (all) check / uncheck the others
+ * Check all the checkboxes check the checkbox without value (all)
+ * Current selection is saved in window.localStorage
+ * You can force the values in window.localStorage[simplified name]
+ * callBack(selection) : function to call at init or clock
+ * getSelection() : returns an array of selected values
+ * If there are no checkbox with this name, return []
+ * If no name is specified, return [true]
+ */
+export class Selector {
+	constructor(name, callBack) {
+		if (name) {
+			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
+			this.init = (localStorage[this.safeName] || '').split(',');
+			this.selectEls = [...document.getElementsByName(name)];
+			this.selectEls.forEach(el => {
+				el.checked =
+					this.init.includes(el.value) ||
+					this.init.includes('all') ||
+					this.init.join(',') == el.value;
+				el.addEventListener('click', evt => this.onClick(evt));
+			});
+			this.onClick(); // Init with "all"
+		}
+		this.callBack = callBack;
+	}
+
+	onClick(evt) {
+		// Test the "all" box & set other boxes
+		if (evt && evt.target.value == 'all')
+			this.selectEls
+			.forEach(el => el.checked = evt.target.checked);
+
+		// Test if all values are checked
+		const allChecked = this.selectEls
+			.filter(el => !el.checked && el.value != 'all');
+
+		// Set the "all" box
+		this.selectEls
+			.forEach(el => {
+				if (el.value == 'all')
+					el.checked = !allChecked.length;
+			});
+
+		// Save the current status
+		if (this.safeName && this.getSelection() && this.getSelection().length)
+			localStorage[this.safeName] = this.getSelection().join(',');
+		else
+			delete localStorage[this.safeName];
+
+		if (evt)
+			this.setCallBack(this.callBack); // Call callBack
+	}
+
+	setCallBack(callBack) {
+		this.callBack = callBack;
+		if (typeof this.callBack == 'function')
+			callBack(this.getSelection());
+	}
+
+	getSelection() {
+		return this.safeName ?
+			this.selectEls
+			.filter(el => el.checked && el.value != 'all')
+			.map(el => el.value) : [true];
 	}
 }
 
@@ -360,77 +428,6 @@ function mouseListener(evt) {
 }
 
 /**
- * Manage a collection of checkboxes with the same name
- * name : name of all the rlated checkboxes
- * The checkbox without value (all) check / uncheck the others
- * Check all the checkboxes check the checkbox without value (all)
- * Current selection is saved in window.localStorage
- * You can force the values in window.localStorage[simplified name]
- * callBack(selection) : function to call at init or clock
- * getSelection() : returns an array of selected values
- * If there are no checkbox with this name, return []
- * If no name is specified, return [true]
- */
-export class Selector {
-	constructor(name, callBack) {
-		if (name) {
-			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
-			this.init = (localStorage[this.safeName] || '').split(',');
-			this.selectEls = [...document.getElementsByName(name)];
-			this.selectEls.forEach(el => {
-				el.checked =
-					this.init.includes(el.value) ||
-					this.init.includes('all') ||
-					this.init.join(',') == el.value;
-				el.addEventListener('click', evt => this.onClick(evt));
-			});
-			this.onClick(); // Init with "all"
-		}
-		this.callBack = callBack;
-	}
-
-	onClick(evt) {
-		// Test the "all" box & set other boxes
-		if (evt && evt.target.value == 'all')
-			this.selectEls
-			.forEach(el => el.checked = evt.target.checked);
-
-		// Test if all values are checked
-		const allChecked = this.selectEls
-			.filter(el => !el.checked && el.value != 'all');
-
-		// Set the "all" box
-		this.selectEls
-			.forEach(el => {
-				if (el.value == 'all')
-					el.checked = !allChecked.length;
-			});
-
-		// Save the current status
-		if (this.safeName && this.getSelection() && this.getSelection().length)
-			localStorage[this.safeName] = this.getSelection().join(',');
-		else
-			delete localStorage[this.safeName];
-
-		if (evt)
-			this.setCallBack(this.callBack); // Call callBack
-	}
-
-	setCallBack(callBack) {
-		this.callBack = callBack;
-		if (typeof this.callBack == 'function')
-			callBack(this.getSelection());
-	}
-
-	getSelection() {
-		return this.safeName ?
-			this.selectEls
-			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value) : [true];
-	}
-}
-
-/**
  * Some usefull style functions
  */
 export function basicStylesOptions(properties, hover, layer) {
@@ -493,7 +490,7 @@ export function labelStylesOptions(properties, hover) {
 		};
 }
 
-export function clusterStylesOptions(properties, hover, layer, resolution) {
+export function clusterStylesOptions(properties, hoverProperties, layer, resolution) {
 	// Hi resolution : circle
 	if (resolution > layer.options.browserClusterMinResolution)
 		return [{
@@ -515,7 +512,7 @@ export function clusterStylesOptions(properties, hover, layer, resolution) {
 			labelStylesOptions(...arguments),
 		];
 
-	// Low resolution separate icons
+	// Low resolution : separate icons
 	let x = 0.95 + 0.45 * properties.cluster,
 		so = [];
 
@@ -538,6 +535,10 @@ export function clusterStylesOptions(properties, hover, layer, resolution) {
 			}
 		}
 	});
+
+	//TODO don't work : need translate properties
+	const ll = labelStylesOptions(hoverProperties);
+	so.push(ll);
 
 	return so;
 }

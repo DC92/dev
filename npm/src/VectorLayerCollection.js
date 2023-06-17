@@ -33,7 +33,6 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 			...options,
 
 			query: query_,
-			clusterQuery: clusterQuery_,
 			stylesOptions: stylesOptions_,
 		});
 
@@ -42,15 +41,8 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 				_path: 'ext/Dominique92/GeoBB/gis.php',
 				cat: opt.selector.getSelection(),
 
-				...(options.query ? options.query(...arguments) : null),
-			};
-		}
-
-		function clusterQuery_() {
-			return {
-				layer: 'cluster',
-
-				...query_(...arguments),
+				// For server cluster layer
+				layer: opt.altLayer ? null : 'cluster',
 			};
 		}
 
@@ -121,13 +113,12 @@ export class LayerWri extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
 			host: '//www.refuges.info/',
-			name: properties => properties.nom, // Function returning the name for cluster agregation
-			clickUrl: properties => properties.lien, // Function returning url to go on click
 
 			...options,
 
+			name: properties => properties.nom, // Function returning the name for cluster agregation
+			clickUrl: properties => properties.lien, // Function returning url to go on click
 			query: query_,
-			clusterQuery: clusterQuery_,
 			stylesOptions: stylesOptions_,
 		});
 
@@ -137,15 +128,8 @@ export class LayerWri extends ServerClusterVectorLayer {
 				nb_points: 'all',
 				type_points: opt.selector ? opt.selector.getSelection() : null,
 
-				...(options.query ? options.query(...arguments) : null),
-			};
-		}
-
-		function clusterQuery_() {
-			return {
-				cluster: 0.1,
-
-				...query_(...arguments),
+				// For server cluster layer
+				cluster: opt.altLayer ? null : 0.1,
 			};
 		}
 
@@ -156,6 +140,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 					}),
 				},
 				labelStylesOptions({
+					//TODO put in properties translation function
 					label: properties.nom, // Non hover
 					name: properties.nom, // Hover properties...
 					ele: properties.coord.alt,
