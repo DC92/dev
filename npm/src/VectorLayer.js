@@ -86,7 +86,9 @@ export class MyVectorSource extends VectorSource {
 	}
 }
 
-// Clustered source
+/* Browser clustered source
+   The layer use one sources to get the data & a cluster source to manages clusters
+*/
 export class MyClusterSource extends Cluster {
 	constructor(options) {
 		// Wrapped source
@@ -168,15 +170,14 @@ export class MyVectorLayer extends VectorLayer {
 			selector: opt.selectName ? new Selector(opt.selectName) : null,
 			style: style_,
 
-			// Local cluster options
-			localClusterMinResolution: 50, // Resolution above which the browser clusterises
-			clusterStylesOptions: clusterStylesOptions, //TODO standardiser
+			// Browser cluster options
+			browserClusterMinResolution: 50, // Resolution above which the browser clusterises
 
 			...opt,
 		};
 
 		super({
-			source: options.localClusterMinResolution ?
+			source: options.browserClusterMinResolution ?
 				new MyClusterSource(options) : new MyVectorSource(options),
 
 			...options,
@@ -191,17 +192,16 @@ export class MyVectorLayer extends VectorLayer {
 
 		function style_(feature, resolution, hoveredSubFeature) {
 			const stylesOptionsFunction = feature.getProperties().cluster ?
-				options.clusterStylesOptions :
+				clusterStylesOptions :
 				options.stylesOptions;
 
 			// Function returning an array of styles options
 			return stylesOptionsFunction(
-					(hoveredSubFeature || feature).getProperties(),
-					hoveredSubFeature != undefined,
+					feature.getProperties(),
+					hoveredSubFeature ? hoveredSubFeature.getProperties() : false,
 					layer,
 					resolution)
-				// Transform to an array of Style objects
-				.map(so => new Style(so));
+				.map(so => new Style(so)); // Transform into an array of Style objects
 		}
 	}
 
@@ -226,6 +226,10 @@ export class MyVectorLayer extends VectorLayer {
 	}
 }
 
+/* Server clustered source
+   This uses one layer to display the normal data at low resolutions
+   and another to get and display the clusters delivered by the server at hight resolutions
+*/
 export class ServerClusterVectorLayer extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
@@ -489,36 +493,34 @@ export function labelStylesOptions(properties, hover) {
 		};
 }
 
-export function clusterStylesOptions(properties, hover) {
-	return [{
-			image: new Circle({
-				radius: 14,
-				stroke: new Stroke({
-					color: 'blue',
+export function clusterStylesOptions(properties, hover, layer, resolution) {
+	// Hi resolution : circle
+	if (resolution > layer.options.browserClusterMinResolution)
+		return [{
+				image: new Circle({
+					radius: 14,
+					stroke: new Stroke({
+						color: 'blue',
+					}),
+					fill: new Fill({
+						color: 'white',
+					}),
 				}),
-				fill: new Fill({
-					color: 'white',
+				text: new Text({
+					text: properties.cluster.toString(),
+					font: '12px Verdana',
 				}),
-			}),
-			text: new Text({
-				text: properties.cluster.toString(),
-				font: '12px Verdana',
-			}),
-			//TODO text zIndex ?
-		},
-		labelStylesOptions(...arguments),
-	];
-}
+				//TODO text zIndex ?
+			},
+			labelStylesOptions(...arguments),
+		];
 
-//TODO fusionner avec clusterStylesOptions
-export function clusterSpreadStylesOptions(feature, _, layer, resolution) {
-	if (resolution > layer.options.localClusterMinResolution)
-		return clusterStylesOptions(...arguments);
-
-	const properties = feature.getProperties();
+	// Low resolution separate icons
 	let x = 0.95 + 0.45 * properties.cluster,
 		so = [];
 
+	//TODO wri : spread label noms
+	//TODO hover : spread full label
 	properties.features.forEach(f => {
 		const styles = layer.getStyleFunction()(f, resolution);
 

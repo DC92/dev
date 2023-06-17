@@ -54,14 +54,17 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 			};
 		}
 
-		function stylesOptions_(properties) {
-			return [{
-				...basicStylesOptions(...arguments),
-
-				image: new Icon({
-					src: chemIconUrl(properties.type),
-				}),
-			}];
+		function stylesOptions_(properties, _, layer) {
+			return concatenateStylesOptions(
+				basicStylesOptions(...arguments),
+				[{
+					image: new Icon({
+						src: properties.icon ? // For isolated points on server cluster
+							properties.icon : layer.options.host + 'ext/Dominique92/GeoBB/icones/' +
+							(properties.type || 'a63') + '.svg',
+					}),
+				}],
+			);
 		}
 	}
 };
@@ -78,8 +81,8 @@ export class LayerAlpages extends MyVectorLayer {
 		super({
 			...options,
 
-			clickUrl: properties => options.host + 'viewtopic.php?t=' + properties.id,
 			query: query_,
+			clickUrl: properties => options.host + 'viewtopic.php?t=' + properties.id,
 			stylesOptions: stylesOptions_,
 		});
 
@@ -90,13 +93,13 @@ export class LayerAlpages extends MyVectorLayer {
 			};
 		}
 
-		function stylesOptions_(properties, hover, layer) {
+		function stylesOptions_(properties) {
 			return concatenateStylesOptions(
 				basicStylesOptions(...arguments),
 				[{
-					image: properties.type ? new Icon({
-						src: chemIconUrl(properties.type),
-					}) : null,
+					image: new Icon({
+						src: chemIconUrl(properties.type), // Replace the alpages icon
+					}),
 				}],
 			);
 		}
