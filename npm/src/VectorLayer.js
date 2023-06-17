@@ -39,7 +39,6 @@ export class MyVectorSource extends VectorSource {
 				url: url_,
 				format: new GeoJSON(),
 				projection: 'EPSG:4326',
-
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
@@ -145,7 +144,7 @@ export class MyClusterSource extends Cluster {
 			// Display a cluster point
 			return new Feature({
 				id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
-				name: agregateText(lines),
+				name: agregateText(lines), //TODO make a properties.name
 				geometry: point, // The gravity center of all the features in the cluster
 				features: features,
 				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
@@ -179,7 +178,6 @@ export class MyVectorLayer extends VectorLayer {
 		super({
 			source: options.browserClusterMinResolution ?
 				new MyClusterSource(options) : new MyVectorSource(options),
-
 			...options,
 		});
 
@@ -246,7 +244,6 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 		// Low resolutions layer
 		super({
 			...options,
-
 			maxResolution: options.serverClusterMinResolution,
 			altLayer: hightResolutionsLayer,
 		});
@@ -348,8 +345,7 @@ function attachMouseListener(map) {
 }
 
 function mouseListener(evt) {
-	const map = evt.map,
-		resolution = map.getView().getResolution();
+	const map = evt.map;
 
 	let hoveredLayer = null,
 		// Find the first hovered feature
@@ -381,20 +377,20 @@ function mouseListener(evt) {
 			});
 
 		const hoveredSubProperties = hoveredSubFeature.getProperties(),
-			hoveredClickUrl = hoveredLayer.options.clickUrl(hoveredSubProperties);
+			hoveredLink = hoveredLayer.options.clickUrl(hoveredSubProperties);
 
 		if (evt.type == 'click') {
-			if (hoveredClickUrl) {
+			if (hoveredLink) {
 				// Open a new tag
 				if (evt.originalEvent.ctrlKey)
-					window.open(hoveredClickUrl, '_blank').focus();
+					window.open(hoveredLink, '_blank').focus();
 				else
 					// Open a new window
 					if (evt.originalEvent.shiftKey)
-						window.open(hoveredClickUrl, '_blank', 'resizable=yes').focus();
+						window.open(hoveredLink, '_blank', 'resizable=yes').focus();
 					else
 						// Go on the same window
-						window.location.href = hoveredClickUrl;
+						window.location.href = hoveredLink;
 			}
 			// Cluster
 			if (hoveredSubProperties.cluster)
@@ -406,7 +402,7 @@ function mouseListener(evt) {
 			// Hover
 			if (map.lastHoveredFeature != hoveredSubFeature) {
 				map.getViewport().style.cursor =
-					hoveredClickUrl || hoveredProperties.cluster ? 'pointer' : '';
+					hoveredLink || hoveredProperties.cluster ? 'pointer' : '';
 
 				// Remove previous style
 				if (map.lastHoveredFeature)

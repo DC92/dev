@@ -29,9 +29,7 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 		super({
 			host: '//chemineur.fr/',
 			attribution: '&copy;chemineur.fr',
-
 			...options,
-
 			query: query_,
 			stylesOptions: stylesOptions_,
 		});
@@ -67,13 +65,12 @@ export class LayerAlpages extends MyVectorLayer {
 		const options = {
 			host: '//alpages.info/',
 			attribution: '&copy;alpages.info',
-
 			...opt,
 		};
 		super({
 			...options,
-
 			query: query_,
+			//TODO no click in chemineur
 			clickUrl: properties => options.host + 'viewtopic.php?t=' + properties.id,
 			stylesOptions: stylesOptions_,
 		});
@@ -113,9 +110,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 	constructor(options) {
 		super({
 			host: '//www.refuges.info/',
-
 			...options,
-
 			name: properties => properties.nom, // Function returning the name for cluster agregation
 			clickUrl: properties => properties.lien, // Function returning url to go on click
 			query: query_,
