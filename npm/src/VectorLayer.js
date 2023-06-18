@@ -126,12 +126,16 @@ export class MyClusterSource extends Cluster {
 				lines = [];
 
 			features.forEach(f => {
-				const properties = f.getProperties();
+				let properties = f.getProperties();
 
-				lines.push(options.name(properties));
-				nbClusters += parseInt(properties.cluster) || 1;
 				if (properties.cluster)
 					includeCluster = true;
+				else
+					properties = options.convertProperties(properties);
+
+				lines.push(properties.name);
+				nbClusters += parseInt(properties.cluster) || 1;
+
 			});
 
 			// Single feature : display it
@@ -144,7 +148,7 @@ export class MyClusterSource extends Cluster {
 			// Display a cluster point
 			return new Feature({
 				id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
-				name: agregateText(lines), //TODO make a properties.name
+				name: agregateText(lines),
 				geometry: point, // The gravity center of all the features in the cluster
 				features: features,
 				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
@@ -160,12 +164,10 @@ export class MyVectorLayer extends VectorLayer {
 			// Mandatory
 			// host: '//chemineur.fr/',
 			// query: () => ({_path: '...'}),
-			name: properties => properties.name, // Function returning the name of the feature
+			convertProperties: () => {}, // Translate properties to standard MyOl
 			stylesOptions: basicStylesOptions, // (feature, hoveredSubFeature, layer)
-			clickUrl: properties => properties.link, // Function returning the link to click
 
 			// Generic
-			// attribution: '&copy;...',
 			selector: opt.selectName ? new Selector(opt.selectName) : null,
 			style: style_,
 
@@ -181,22 +183,24 @@ export class MyVectorLayer extends VectorLayer {
 			...options,
 		});
 
-		const layer = this;
+		const layer = this; // For use in functions
 		this.options = options; // Mem for further use
 
 		if (options.selectName) {
 			options.selector.setCallBack(selection => this.refresh(selection.length));
 		}
 
-		function style_(feature, resolution, hoveredSubFeature) {
-			const stylesOptionsFunction = feature.getProperties().cluster ?
+		function style_(feature, resolution, hoveredFeature) {
+			const properties = layer.getConvertProperties(feature),
+				hoveredProperties = layer.getConvertProperties(hoveredFeature),
+				stylesOptionsFunction = properties.cluster ?
 				clusterStylesOptions :
 				options.stylesOptions;
 
 			// Function returning an array of styles options
 			return stylesOptionsFunction(
-					feature.getProperties(),
-					hoveredSubFeature ? hoveredSubFeature.getProperties() : false,
+					properties,
+					hoveredProperties,
 					layer,
 					resolution)
 				.map(so => new Style(so)); // Transform into an array of Style objects
@@ -221,6 +225,18 @@ export class MyVectorLayer extends VectorLayer {
 
 		if (this.options.altLayer)
 			this.options.altLayer.refresh(visible);
+	}
+
+	// Get & convert properties of a feature
+	getConvertProperties(feature) {
+		if (feature) {
+			const properties = feature.getProperties();
+
+			if (properties.cluster)
+				return properties;
+			else
+				return this.options.convertProperties(properties);
+		}
 	}
 }
 
@@ -314,10 +330,12 @@ export class Selector {
 	}
 
 	getSelection() {
-		return this.safeName ?
-			this.selectEls
-			.filter(el => el.checked && el.value != 'all')
-			.map(el => el.value) : [true];
+		if (this.safeName)
+			return this.selectEls
+				.filter(el => el.checked && el.value != 'all')
+				.map(el => el.value);
+		else
+			return [true];
 	}
 }
 
@@ -347,14 +365,14 @@ function attachMouseListener(map) {
 function mouseListener(evt) {
 	const map = evt.map;
 
+	// Find the first hovered feature & layer
 	let hoveredLayer = null,
-		// Find the first hovered feature
 		hoveredFeature = map.forEachFeatureAtPixel(
 			map.getEventPixel(evt.originalEvent),
 			function(feature, layer) {
 				if (layer && layer.options) {
 					hoveredLayer = layer;
-					return feature;
+					return feature; // And stop the search
 				}
 			}, {
 				hitTolerance: 6, // For lines / Default 0
@@ -376,21 +394,20 @@ function mouseListener(evt) {
 					hoveredSubFeature = f;
 			});
 
-		const hoveredSubProperties = hoveredSubFeature.getProperties(),
-			hoveredLink = hoveredLayer.options.clickUrl(hoveredSubProperties);
+		const hoveredSubProperties = hoveredLayer.getConvertProperties(hoveredSubFeature);
 
 		if (evt.type == 'click') {
-			if (hoveredLink) {
+			if (hoveredSubProperties.link) {
 				// Open a new tag
 				if (evt.originalEvent.ctrlKey)
-					window.open(hoveredLink, '_blank').focus();
+					window.open(hoveredSubProperties.link, '_blank').focus();
 				else
 					// Open a new window
 					if (evt.originalEvent.shiftKey)
-						window.open(hoveredLink, '_blank', 'resizable=yes').focus();
+						window.open(hoveredSubProperties.link, '_blank', 'resizable=yes').focus();
 					else
 						// Go on the same window
-						window.location.href = hoveredLink;
+						window.location.href = hoveredSubProperties.link;
 			}
 			// Cluster
 			if (hoveredSubProperties.cluster)
@@ -402,7 +419,7 @@ function mouseListener(evt) {
 			// Hover
 			if (map.lastHoveredFeature != hoveredSubFeature) {
 				map.getViewport().style.cursor =
-					hoveredLink || hoveredProperties.cluster ? 'pointer' : '';
+					hoveredSubProperties.link || hoveredProperties.cluster ? 'pointer' : '';
 
 				// Remove previous style
 				if (map.lastHoveredFeature)
@@ -432,10 +449,7 @@ export function basicStylesOptions(properties, hover, layer) {
 			src: properties.icon,
 		}) : null,
 
-		...labelStylesOptions({
-			attribution: layer.options.attribution,
-			...properties,
-		}, hover),
+		...labelStylesOptions(...arguments),
 
 		stroke: new Stroke({
 			color: hover ? 'red' : 'blue',
@@ -486,7 +500,9 @@ export function labelStylesOptions(properties, hover) {
 		};
 }
 
-export function clusterStylesOptions(properties, hoverProperties, layer, resolution) {
+export function clusterStylesOptions(properties, _, layer, resolution) {
+	properties.attribution = null;
+
 	// Hi resolution : circle
 	if (resolution > layer.options.browserClusterMinResolution)
 		return [{
@@ -531,10 +547,6 @@ export function clusterStylesOptions(properties, hoverProperties, layer, resolut
 			}
 		}
 	});
-
-	//TODO don't work : need translate properties
-	const ll = labelStylesOptions(hoverProperties);
-	so.push(ll);
 
 	return so;
 }

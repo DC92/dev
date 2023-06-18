@@ -25,13 +25,16 @@ import {
 
 // chemineur.fr
 export class LayerChemineur extends ServerClusterVectorLayer {
-	constructor(options) {
-		super({
+	constructor(opt) {
+		const options = {
 			host: '//chemineur.fr/',
-			attribution: '&copy;chemineur.fr',
+			...opt,
+		};
+
+		super({
 			...options,
 			query: query_,
-			stylesOptions: stylesOptions_,
+			convertProperties: convertProperties_,
 		});
 
 		function query_(opt) {
@@ -44,17 +47,13 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 			};
 		}
 
-		function stylesOptions_(properties, _, layer) {
-			return concatenateStylesOptions(
-				basicStylesOptions(...arguments),
-				[{
-					image: new Icon({
-						src: properties.icon ? // For isolated points on server cluster
-							properties.icon : layer.options.host + 'ext/Dominique92/GeoBB/icones/' +
-							(properties.type || 'a63') + '.svg',
-					}),
-				}],
-			);
+		function convertProperties_(properties) {
+			return {
+				...properties,
+				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + (properties.type || 'a63') + '.svg',
+				link: options.host + 'viewtopic.php?t=' + properties.id,
+				attribution: '&copy;chemineur.fr',
+			};
 		}
 	}
 };
@@ -64,15 +63,13 @@ export class LayerAlpages extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//alpages.info/',
-			attribution: '&copy;alpages.info',
 			...opt,
 		};
+
 		super({
 			...options,
 			query: query_,
-			//TODO no click in chemineur
-			clickUrl: properties => options.host + 'viewtopic.php?t=' + properties.id,
-			stylesOptions: stylesOptions_,
+			convertProperties: convertProperties_,
 		});
 
 		function query_(opt) {
@@ -82,15 +79,13 @@ export class LayerAlpages extends MyVectorLayer {
 			};
 		}
 
-		function stylesOptions_(properties) {
-			return concatenateStylesOptions(
-				basicStylesOptions(...arguments),
-				[{
-					image: new Icon({
-						src: chemIconUrl(properties.type), // Replace the alpages icon
-					}),
-				}],
-			);
+		function convertProperties_(properties) {
+			return {
+				...properties,
+				icon: chemIconUrl(properties.type), // Replace the alpages icon
+				link: options.host + 'viewtopic.php?t=' + properties.id,
+				attribution: '&copy;alpages.info',
+			};
 		}
 	}
 }
@@ -107,14 +102,18 @@ export function chemIconUrl(type) {
 
 // refuges.info
 export class LayerWri extends ServerClusterVectorLayer {
-	constructor(options) {
-		super({
+	constructor(opt) {
+		const options = {
 			host: '//www.refuges.info/',
+			...opt,
+		};
+
+		super({
 			...options,
 			name: properties => properties.nom, // Function returning the name for cluster agregation
 			clickUrl: properties => properties.lien, // Function returning url to go on click
 			query: query_,
-			stylesOptions: stylesOptions_,
+			convertProperties: convertProperties_,
 		});
 
 		function query_(opt) {
@@ -128,22 +127,18 @@ export class LayerWri extends ServerClusterVectorLayer {
 			};
 		}
 
-		function stylesOptions_(properties, hover, layer) {
-			return [{
-					image: new Icon({
-						src: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
-					}),
-				},
-				labelStylesOptions({
-					//TODO put in properties translation function
-					label: properties.nom, // Non hover
-					name: properties.nom, // Hover properties...
-					ele: properties.coord.alt,
-					bed: properties.places.valeur,
-					type: properties.type.valeur,
-					attribution: layer.options.attribution,
-				}, hover)
-			];
+		function convertProperties_(properties) {
+			return {
+				...properties,
+				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				name: properties.nom,
+				ele: properties.coord.alt,
+				bed: properties.places.valeur,
+				type: properties.type.valeur,
+				link: properties.lien,
+				attribution: '&copy;refuges.info',
+				...(options.convertProperties ? options.convertProperties(...arguments) : null)
+			};
 		}
 	}
 }

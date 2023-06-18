@@ -139,6 +139,10 @@ const selecteurMassifs = new Selector('select-massif'),
 				_path: 'api/bbox',
 			};
 		},
+		convertProperties: properties => ({
+			label: properties.nom, // Display only the name whithout hovering 
+			attribution: null, // Don't display attribution
+		}),
 	});
 
 selecteurMassifs.setCallBack(function(selection) {
