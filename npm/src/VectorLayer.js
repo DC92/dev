@@ -498,7 +498,7 @@ export function labelStylesOptions(feature, _, hover, layer) {
 		};
 }
 
-export function clusterStylesOptions(feature, resolution, _, layer) {
+export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 	let properties = feature.getProperties();
 
 	if (!properties.cluster)
@@ -531,10 +531,8 @@ export function clusterStylesOptions(feature, resolution, _, layer) {
 	let x = 0.95 + 0.45 * properties.cluster,
 		so = [];
 
-	//TODO wri : spread label noms
-	//TODO hover : spread full label
 	properties.features.forEach(f => {
-		const styles = layer.getStyleFunction()(f, resolution); //TODO add hoverfeature
+		const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
 
 		if (styles.length) {
 			const image = styles[0].getImage();
@@ -548,6 +546,11 @@ export function clusterStylesOptions(feature, resolution, _, layer) {
 					image: image,
 				});
 			}
+
+			//TODO wri : non hover label on spread features
+			// Hover spread feature
+			if (hoverfeature)
+				so.push(labelStylesOptions(hoverfeature, resolution, hoverfeature, layer));
 		}
 	});
 
