@@ -191,19 +191,13 @@ export class MyVectorLayer extends VectorLayer {
 		}
 
 		function style_(feature, resolution, hoveredFeature) {
-			const properties = layer.getConvertProperties(feature),
-				hoveredProperties = layer.getConvertProperties(hoveredFeature),
+			const properties = feature.getProperties(),
 				stylesOptionsFunction = properties.cluster ?
 				clusterStylesOptions :
 				options.stylesOptions;
 
 			// Function returning an array of styles options
-			//TODO (feature, resolution, hoveredFeature, layer) {
-			return stylesOptionsFunction(
-					properties,
-					hoveredProperties,
-					layer,
-					resolution)
+			return stylesOptionsFunction(feature, resolution, hoveredFeature, layer)
 				.map(so => new Style(so)); // Transform into an array of Style objects
 		}
 	}
@@ -226,18 +220,6 @@ export class MyVectorLayer extends VectorLayer {
 
 		if (this.options.altLayer)
 			this.options.altLayer.refresh(visible);
-	}
-
-	// Get & convert properties of a feature
-	getConvertProperties(feature) {
-		if (feature) {
-			const properties = feature.getProperties();
-
-			if (properties.cluster)
-				return properties;
-			else
-				return this.options.convertProperties(properties);
-		}
 	}
 }
 
@@ -449,7 +431,12 @@ function mouseListener(evt) {
 /**
  * Some usefull style functions
  */
-export function basicStylesOptions(properties, hover, layer) {
+export function basicStylesOptions(feature, resolution, hover, layer) {
+	let properties = feature.getProperties();
+
+	if (!properties.cluster)
+		properties = layer.options.convertProperties(properties);
+
 	return [{
 		image: properties.icon ? new Icon({
 			src: properties.icon,
@@ -468,7 +455,12 @@ export function basicStylesOptions(properties, hover, layer) {
 	}];
 }
 
-export function labelStylesOptions(properties, hover) {
+export function labelStylesOptions(feature, _, hover, layer) {
+	let properties = feature.getProperties();
+
+	if (!properties.cluster)
+		properties = layer.options.convertProperties(properties);
+
 	const elLabel = document.createElement('span'),
 		isPoint = !properties.geometry || properties.geometry.getType() == 'Point';
 
@@ -506,7 +498,12 @@ export function labelStylesOptions(properties, hover) {
 		};
 }
 
-export function clusterStylesOptions(properties, _, layer, resolution) {
+export function clusterStylesOptions(feature, resolution, _, layer) {
+	let properties = feature.getProperties();
+
+	if (!properties.cluster)
+		properties = layer.options.convertProperties(properties);
+
 	properties.attribution = null;
 
 	// Hi resolution : circle
