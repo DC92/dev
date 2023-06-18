@@ -198,6 +198,7 @@ export class MyVectorLayer extends VectorLayer {
 				options.stylesOptions;
 
 			// Function returning an array of styles options
+			//TODO (feature, resolution, hoveredFeature, layer) {
 			return stylesOptionsFunction(
 					properties,
 					hoveredProperties,
@@ -378,7 +379,8 @@ function mouseListener(evt) {
 				hitTolerance: 6, // For lines / Default 0
 			}
 		),
-		hoveredSubFeature = hoveredFeature;
+		hoveredSubFeature = hoveredFeature,
+		hoveredSubProperties = {};
 
 	if (hoveredFeature) {
 		// Find sub-feature from a detailed cluster
@@ -394,7 +396,11 @@ function mouseListener(evt) {
 					hoveredSubFeature = f;
 			});
 
-		const hoveredSubProperties = hoveredLayer.getConvertProperties(hoveredSubFeature);
+		if (hoveredSubFeature) {
+			hoveredSubProperties = hoveredSubFeature.getProperties();
+			if (!hoveredSubProperties.cluster)
+				hoveredSubProperties = hoveredLayer.options.convertProperties(hoveredSubProperties);
+		}
 
 		if (evt.type == 'click') {
 			if (hoveredSubProperties.link) {
@@ -531,7 +537,7 @@ export function clusterStylesOptions(properties, _, layer, resolution) {
 	//TODO wri : spread label noms
 	//TODO hover : spread full label
 	properties.features.forEach(f => {
-		const styles = layer.getStyleFunction()(f, resolution);
+		const styles = layer.getStyleFunction()(f, resolution); //TODO add hoverfeature
 
 		if (styles.length) {
 			const image = styles[0].getImage();
