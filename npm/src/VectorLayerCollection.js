@@ -110,8 +110,6 @@ export class LayerWri extends ServerClusterVectorLayer {
 
 		super({
 			...options,
-			name: properties => properties.nom, // Function returning the name for cluster agregation
-			clickUrl: properties => properties.lien, // Function returning url to go on click
 			query: query_,
 			convertProperties: convertProperties_,
 		});
@@ -130,11 +128,11 @@ export class LayerWri extends ServerClusterVectorLayer {
 		function convertProperties_(properties) {
 			return {
 				...properties,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				icon: options.host + 'images/icones/' + (properties.type || {}).icone + '.svg',
 				name: properties.nom,
-				ele: properties.coord.alt,
-				bed: properties.places.valeur,
-				type: properties.type.valeur,
+				ele: (properties.coord || {}).alt,
+				bed: (properties.places || {}).valeur,
+				type: (properties.type || {}).valeur,
 				link: properties.lien,
 				attribution: '&copy;refuges.info',
 				...(options.convertProperties ? options.convertProperties(...arguments) : null)

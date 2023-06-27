@@ -126,16 +126,12 @@ export class MyClusterSource extends Cluster {
 				lines = [];
 
 			features.forEach(f => {
-				let properties = f.getProperties();
-
-				if (properties.cluster)
-					includeCluster = true;
-				else
-					properties = options.convertProperties(properties);
+				const properties = options.convertProperties(f.getProperties());
 
 				lines.push(properties.name);
 				nbClusters += parseInt(properties.cluster) || 1;
-
+				if (properties.cluster)
+					includeCluster = true;
 			});
 
 			// Single feature : display it
@@ -379,9 +375,7 @@ function mouseListener(evt) {
 			});
 
 		if (hoveredSubFeature) {
-			hoveredSubProperties = hoveredSubFeature.getProperties();
-			if (!hoveredSubProperties.cluster)
-				hoveredSubProperties = hoveredLayer.options.convertProperties(hoveredSubProperties);
+			hoveredSubProperties = hoveredLayer.options.convertProperties(hoveredSubProperties);
 		}
 
 		if (evt.type == 'click') {
@@ -432,10 +426,7 @@ function mouseListener(evt) {
  * Some usefull style functions
  */
 export function basicStylesOptions(feature, resolution, hover, layer) {
-	let properties = feature.getProperties();
-
-	if (!properties.cluster)
-		properties = layer.options.convertProperties(properties);
+	const properties = layer.options.convertProperties(feature.getProperties());
 
 	return [{
 		image: properties.icon ? new Icon({
@@ -456,13 +447,12 @@ export function basicStylesOptions(feature, resolution, hover, layer) {
 }
 
 export function labelStylesOptions(feature, _, hover, layer) {
-	let properties = feature.getProperties();
-
-	if (!properties.cluster)
-		properties = layer.options.convertProperties(properties);
-
-	const elLabel = document.createElement('span'),
+	const properties = layer.options.convertProperties(feature.getProperties()),
+		elLabel = document.createElement('span'),
 		isPoint = !properties.geometry || properties.geometry.getType() == 'Point';
+
+	if (properties.cluster)
+		properties.attribution = null;
 
 	//HACK to render the html entities in the canvas
 	elLabel.innerHTML = hover ? agregateText([
@@ -499,12 +489,7 @@ export function labelStylesOptions(feature, _, hover, layer) {
 }
 
 export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
-	let properties = feature.getProperties();
-
-	if (!properties.cluster)
-		properties = layer.options.convertProperties(properties);
-
-	properties.attribution = null;
+	const properties = layer.options.convertProperties(feature.getProperties());
 
 	// Hi resolution : circle
 	if (resolution > layer.options.browserClusterMinResolution)
@@ -548,6 +533,7 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 			}
 
 			//TODO wri : non hover label on spread features
+			//TODO wri : non hover label on all features !!!
 			// Hover spread feature
 			if (hoverfeature)
 				so.push(labelStylesOptions(hoverfeature, resolution, hoverfeature, layer));
