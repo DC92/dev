@@ -114,14 +114,17 @@ export class LayerWri extends ServerClusterVectorLayer {
 			convertProperties: convertProperties_,
 		});
 
-		function query_(opt) {
+		function query_(queryOptions) {
 			return {
 				_path: 'api/bbox',
 				nb_points: 'all',
-				type_points: opt.selector ? opt.selector.getSelection() : null,
+				type_points: queryOptions.selector ? queryOptions.selector.getSelection() : null,
 
 				// For server cluster layer
-				cluster: opt.altLayer ? null : 0.1,
+				cluster: queryOptions.altLayer ? null : 0.1,
+
+				// Specific inherited
+				...(opt.query ? opt.query(...arguments) : null),
 			};
 		}
 

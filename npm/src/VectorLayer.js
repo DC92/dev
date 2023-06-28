@@ -51,13 +51,13 @@ export class MyVectorSource extends VectorSource {
 				if (!statusEl.textContent.includes('error'))
 					statusEl.innerHTML = '';
 
-				//BEST status out of zoom bounds
 				switch (evt.type) {
 					case 'featuresloadstart':
 						statusEl.innerHTML = '&#8987;';
 						break;
 					case 'featuresloaderror':
 						statusEl.innerHTML = 'Erreur !';
+						//BEST status out of zoom bounds
 				}
 			});
 
@@ -70,13 +70,15 @@ export class MyVectorSource extends VectorSource {
 		}
 
 		function url_(extent, resolution, projection) {
+			//TODO BUG pourquoi est-il appelé 2 fois à l'init ?
 			const query = options.query(options, ...arguments),
 				url = options.host + query._path;
 
-			Object.keys(query).forEach(k =>
-				(query[k] == '' || query[k] == 'on') && delete query[k]
-			);
-			delete query._path;
+			Object.keys(query).forEach(k => {
+				if (k == '_path' || query[k] == 'on' || !query[k])
+					delete query[k];
+			});
+
 			if (options.strategy == bbox)
 				query.bbox = options.bbox(...arguments);
 
