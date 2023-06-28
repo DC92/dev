@@ -140,7 +140,7 @@ const selecteurMassifs = new Selector('select-massif'),
 			};
 		},
 		convertProperties: properties => ({
-			label: properties.nom, // Display only the name whithout hovering 
+			label: properties.name || properties.nom, // Display only the name whithout hovering 
 			attribution: null, // Don't display attribution
 		}),
 	});

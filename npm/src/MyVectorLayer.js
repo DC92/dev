@@ -74,8 +74,9 @@ export class MyVectorSource extends VectorSource {
 			const query = options.query(options, ...arguments),
 				url = options.host + query._path;
 
+			// Clean null & not relative parameters
 			Object.keys(query).forEach(k => {
-				if (k == '_path' || query[k] == 'on' || !query[k])
+				if (!query[k] || k == '_path' || query[k] == 'on')
 					delete query[k];
 			});
 
@@ -88,7 +89,7 @@ export class MyVectorSource extends VectorSource {
 }
 
 /* Browser clustered source
-   The layer use one sources to get the data & a cluster source to manages clusters
+   The layer use one source to get the data & a cluster source to manages clusters
 */
 export class MyClusterSource extends Cluster {
 	constructor(options) {
@@ -184,9 +185,8 @@ export class MyVectorLayer extends VectorLayer {
 		const layer = this; // For use in functions
 		this.options = options; // Mem for further use
 
-		if (options.selectName) {
+		if (options.selectName)
 			options.selector.setCallBack(selection => this.refresh(selection.length));
-		}
 
 		function style_(feature, resolution, hoveredFeature) {
 			const properties = feature.getProperties(),
@@ -376,9 +376,8 @@ function mouseListener(evt) {
 					hoveredSubFeature = f;
 			});
 
-		if (hoveredSubFeature) {
+		if (hoveredSubFeature)
 			hoveredSubProperties = hoveredLayer.options.convertProperties(hoveredSubProperties);
-		}
 
 		if (evt.type == 'click') {
 			if (hoveredSubProperties.link) {
@@ -491,56 +490,54 @@ export function labelStylesOptions(feature, _, hover, layer) {
 }
 
 export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
-
-	// Hi resolution : circle
-	if (resolution > layer.options.browserClusterMinResolution)
-		return [{
-				image: new Circle({
-					radius: 14,
-					stroke: new Stroke({
-						color: 'blue',
-					}),
-					fill: new Fill({
-						color: 'white',
-					}),
-				}),
-				text: new Text({
-					text: properties.cluster.toString(),
-					font: '12px Verdana',
-				}),
-				//TODO text zIndex ?
-			},
+	const properties = layer.options.convertProperties(feature.getProperties()),
+		so = [
 			labelStylesOptions(...arguments),
 		];
 
-	// Low resolution : separate icons
-	let x = 0.95 + 0.45 * properties.cluster,
-		so = [];
+	// Low resolution : separated icons
+	let x = 0.95 + 0.45 * properties.cluster;
 
-	properties.features.forEach(f => {
-		const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
+	// Hi resolution : circle
+	if (resolution > layer.options.browserClusterMinResolution)
+		so.push({
+			image: new Circle({
+				radius: 14,
+				stroke: new Stroke({
+					color: 'blue',
+				}),
+				fill: new Fill({
+					color: 'white',
+				}),
+			}),
+			text: new Text({
+				text: properties.cluster.toString(),
+				font: '12px Verdana',
+			}),
+			//TODO text zIndex ?
+		});
+	else
+		properties.features.forEach(f => {
+			const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
 
-		if (styles.length) {
-			const image = styles[0].getImage();
+			if (styles.length) {
+				const image = styles[0].getImage();
 
-			if (image) {
-				image.setAnchor([x -= 0.9, 0.5]);
-				f.setProperties({ // Mem the shift for hover detection
-					xRight: x * image.getImage().width,
-				}, true);
-				so.push({
-					image: image,
-				});
+				if (image) {
+					image.setAnchor([x -= 0.9, 0.5]);
+					f.setProperties({ // Mem the shift for hover detection
+						xRight: x * image.getImage().width,
+					}, true);
+					so.push({
+						image: image,
+					});
+				}
+
+				// Hover spread feature
+				if (hoverfeature)
+					so.push(labelStylesOptions(hoverfeature, resolution, hoverfeature, layer));
 			}
-
-			//TODO wri : non hover label on spread features
-			//TODO wri : non hover label on all features !!!
-			// Hover spread feature
-			if (hoverfeature)
-				so.push(labelStylesOptions(hoverfeature, resolution, hoverfeature, layer));
-		}
-	});
+		});
 
 	return so;
 }
