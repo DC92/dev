@@ -22,7 +22,7 @@ import * as geolocation from '../src/Geolocation.js';
 import * as layerswitcher from '../src/LayerSwitcher.js';
 import * as marker from '../src/Marker.js';
 import * as tilelayercollection from '../src/TileLayerCollection.js';
-import * as vectorlayer from '../src/VectorLayer.js';
+import * as vectorlayer from '../src/MyVectorLayer.js';
 import * as vectorlayercollection from '../src/VectorLayerCollection.js';
 
 export default {

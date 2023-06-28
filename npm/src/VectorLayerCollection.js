@@ -20,7 +20,7 @@ import {
 	labelStylesOptions,
 	MyVectorLayer,
 	ServerClusterVectorLayer,
-} from './VectorLayer.js';
+} from './MyVectorLayer.js';
 
 
 // chemineur.fr

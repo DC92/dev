@@ -1,5 +1,5 @@
 /**
- * VectorLayer.js
+ * MyVectorLayer.js
  * Facilities to vector layers 
  */
 
