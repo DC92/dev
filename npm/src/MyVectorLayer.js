@@ -394,6 +394,7 @@ function mouseListener(evt) {
 			}
 			// Cluster
 			if (hoveredSubProperties.cluster)
+				//TODO BUG click sur rond cluster
 				map.getView().animate({
 					zoom: map.getView().getZoom() + 2,
 					center: hoveredProperties.geometry.getCoordinates(),
@@ -495,6 +496,9 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 
 	// Hi resolution : circle
 	if (resolution > layer.options.browserClusterMinResolution) {
+		if (hoverfeature)
+			so.push(labelStylesOptions(...arguments));
+
 		so.push({
 			image: new Circle({
 				radius: 14,
@@ -511,12 +515,9 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 			}),
 			//TODO text zIndex ?
 		});
-
-		if (hoverfeature)
-			so.push(labelStylesOptions(...arguments));
-
 	} else {
 		// Low resolution : separated icons
+		//TODO detecte ckuster bien à gauche du dernier
 		let x = 0.95 + 0.45 * properties.cluster;
 
 		properties.features.forEach(f => {
@@ -534,14 +535,10 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 						image: image,
 					});
 				}
-
-				// Hover spread feature
-				if (hoverfeature)
-					so.push(labelStylesOptions(hoverfeature, resolution, hoverfeature, layer));
 			}
 		});
 
-		so.push(labelStylesOptions(...arguments));
+		so.push(labelStylesOptions(hoverfeature || feature, resolution, hoverfeature, layer));
 	}
 	return so;
 }
@@ -550,7 +547,7 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
   Styles Options are an array of objects containing style options
   When concatenate, the first stylesOptions object is merged while the others are added
 */
-export function concatenateStylesOptions() {
+export function concatenateStylesOptions() { //TODO DELETE
 	// First argument becomes the base of the result
 	const r = [...arguments[0]];
 

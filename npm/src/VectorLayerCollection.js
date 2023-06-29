@@ -5,19 +5,10 @@
 
 // Openlayers
 import 'ol/ol.css';
-import GeoJSON from 'ol/format/GeoJSON.js';
-import Icon from 'ol/style/Icon.js';
-import OSMXML from 'ol/format/OSMXML.js';
-import {
-	Fill,
-	Stroke,
-} from 'ol/style.js';
+import OSMXML from 'ol/format/OSMXML.js'; //TODO used ?
 
 // MyOl
 import {
-	basicStylesOptions,
-	concatenateStylesOptions,
-	labelStylesOptions,
 	MyVectorLayer,
 	ServerClusterVectorLayer,
 } from './MyVectorLayer.js';
@@ -33,29 +24,21 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 
 		super({
 			...options,
-			query: query_,
-			convertProperties: convertProperties_,
-		});
 
-		function query_(opt) {
-			return {
+			query: (queryOptions) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: opt.selector.getSelection(),
+				cat: queryOptions.selector.getSelection(),
+				layer: queryOptions.altLayer ? null : 'cluster', // For server cluster layer
+			}),
 
-				// For server cluster layer
-				layer: opt.altLayer ? null : 'cluster',
-			};
-		}
-
-		function convertProperties_(properties) {
-			return {
+			convertProperties: (properties) => ({
 				...properties,
 				icon: options.host + 'ext/Dominique92/GeoBB/icones/' +
 					(properties.type || 'a63') + '.svg',
 				link: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: '&copy;chemineur.fr',
-			};
-		}
+			}),
+		});
 	}
 };
 
@@ -69,25 +52,19 @@ export class LayerAlpages extends MyVectorLayer {
 
 		super({
 			...options,
-			query: query_,
-			convertProperties: convertProperties_,
-		});
 
-		function query_(opt) {
-			return {
+			query: (queryOptions) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				forums: opt.selector.getSelection(),
-			};
-		}
+				forums: queryOptions.selector.getSelection(),
+			}),
 
-		function convertProperties_(properties) {
-			return {
+			convertProperties: (properties) => ({
 				...properties,
 				icon: chemIconUrl(properties.type), // Replace the alpages icon
 				link: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: '&copy;alpages.info',
-			};
-		}
+			}),
+		});
 	}
 }
 
@@ -106,39 +83,32 @@ export class LayerWri extends ServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//www.refuges.info/',
-			convertProperties: () => {}, // For inheritance
 			...opt,
 		};
 
 		super({
 			...options,
-			query: query_,
-			convertProperties: convertProperties_,
-		});
 
-		function query_(queryOptions) {
-			return {
+			query: (queryOptions) => ({
 				_path: 'api/bbox',
 				nb_points: 'all',
 				type_points: queryOptions.selector ? queryOptions.selector.getSelection() : null,
+				cluster: queryOptions.altLayer ? null : 0.1, // For server cluster layer
+			}),
 
-				// For server cluster layer
-				cluster: queryOptions.altLayer ? null : 0.1,
-			};
-		}
-
-		function convertProperties_(properties) {
-			return {
+			convertProperties: (properties) => ({
 				...properties,
 				icon: options.host + 'images/icones/' + (properties.type || {}).icone + '.svg',
-				name: properties.nom,
+				name: properties.nom || properties.name,
 				ele: (properties.coord || {}).alt,
 				bed: (properties.places || {}).valeur,
 				type: (properties.type || {}).valeur,
 				link: properties.lien,
 				attribution: '&copy;refuges.info',
-				...options.convertProperties(properties), // Inherited
-			};
-		}
+				...(options.convertProperties ? // Inherited
+					options.convertProperties(properties) :
+					null),
+			}),
+		});
 	}
 }
