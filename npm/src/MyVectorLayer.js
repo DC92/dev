@@ -393,8 +393,7 @@ function mouseListener(evt) {
 						window.location.href = hoveredSubProperties.link;
 			}
 			// Cluster
-			if (hoveredSubProperties.cluster)
-				//TODO BUG click sur rond cluster
+			if (hoveredProperties.cluster)
 				map.getView().animate({
 					zoom: map.getView().getZoom() + 2,
 					center: hoveredProperties.geometry.getCoordinates(),
@@ -517,7 +516,7 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 		});
 	} else {
 		// Low resolution : separated icons
-		//TODO detecte ckuster bien à gauche du dernier
+		//TODO detecte cluster bien à gauche du dernier
 		let x = 0.95 + 0.45 * properties.cluster;
 
 		properties.features.forEach(f => {

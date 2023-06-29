@@ -82,7 +82,7 @@ export function chemIconUrl(type) {
 export class LayerWri extends ServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
-			host: '//www.refuges.info/',
+			host: '//dom.refuges.info/', //TODO www
 			...opt,
 		};
 
