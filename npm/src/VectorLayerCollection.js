@@ -50,7 +50,8 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 		function convertProperties_(properties) {
 			return {
 				...properties,
-				icon: options.host + 'ext/Dominique92/GeoBB/icones/' + (properties.type || 'a63') + '.svg',
+				icon: options.host + 'ext/Dominique92/GeoBB/icones/' +
+					(properties.type || 'a63') + '.svg',
 				link: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: '&copy;chemineur.fr',
 			};
@@ -105,6 +106,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//www.refuges.info/',
+			convertProperties: () => {}, // For inheritance
 			...opt,
 		};
 
@@ -122,9 +124,6 @@ export class LayerWri extends ServerClusterVectorLayer {
 
 				// For server cluster layer
 				cluster: queryOptions.altLayer ? null : 0.1,
-
-				// Specific inherited
-				...(opt.query ? opt.query(...arguments) : null),
 			};
 		}
 
@@ -138,7 +137,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 				type: (properties.type || {}).valeur,
 				link: properties.lien,
 				attribution: '&copy;refuges.info',
-				...(options.convertProperties ? options.convertProperties(...arguments) : null)
+				...options.convertProperties(properties), // Inherited
 			};
 		}
 	}

@@ -126,6 +126,7 @@ import {
 //localStorage.myol_selectwri = 'all'; // Force selectors
 
 const selecteurMassifs = new Selector('select-massif'),
+
 	layerWri = new LayerWri({
 		host: 'https://dom.refuges.info/', //TODO DELETE
 		selectName: 'select-wri',
@@ -139,10 +140,12 @@ const selecteurMassifs = new Selector('select-massif'),
 				_path: 'api/bbox',
 			};
 		},
+
 		convertProperties: properties => ({
-			label: properties.name || properties.nom, // Display only the name whithout hovering 
+			label: properties.nom || properties.name, // Always display the name
 			attribution: null, // Don't display attribution
 		}),
+
 	});
 
 selecteurMassifs.setCallBack(function(selection) {

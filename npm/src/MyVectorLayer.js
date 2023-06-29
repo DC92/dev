@@ -164,7 +164,7 @@ export class MyVectorLayer extends VectorLayer {
 			// host: '//chemineur.fr/',
 			// query: () => ({_path: '...'}),
 			convertProperties: () => {}, // Translate properties to standard MyOl
-			stylesOptions: basicStylesOptions, // (feature, hoveredSubFeature, layer)
+			stylesOptions: basicStylesOptions, // (feature, resolution, hover, layer)
 
 			// Generic
 			selector: opt.selectName ? new Selector(opt.selectName) : null,
@@ -491,15 +491,10 @@ export function labelStylesOptions(feature, _, hover, layer) {
 
 export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 	const properties = layer.options.convertProperties(feature.getProperties()),
-		so = [
-			labelStylesOptions(...arguments),
-		];
-
-	// Low resolution : separated icons
-	let x = 0.95 + 0.45 * properties.cluster;
+		so = [];
 
 	// Hi resolution : circle
-	if (resolution > layer.options.browserClusterMinResolution)
+	if (resolution > layer.options.browserClusterMinResolution) {
 		so.push({
 			image: new Circle({
 				radius: 14,
@@ -516,7 +511,14 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 			}),
 			//TODO text zIndex ?
 		});
-	else
+
+		if (hoverfeature)
+			so.push(labelStylesOptions(...arguments));
+
+	} else {
+		// Low resolution : separated icons
+		let x = 0.95 + 0.45 * properties.cluster;
+
 		properties.features.forEach(f => {
 			const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
 
@@ -539,6 +541,8 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 			}
 		});
 
+		so.push(labelStylesOptions(...arguments));
+	}
 	return so;
 }
 
