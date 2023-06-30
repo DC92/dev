@@ -10,6 +10,7 @@ import OSMXML from 'ol/format/OSMXML.js'; //TODO used ?
 // MyOl
 import {
 	MyVectorLayer,
+	Selector,
 	ServerClusterVectorLayer,
 } from './MyVectorLayer.js';
 
@@ -82,33 +83,46 @@ export function chemIconUrl(type) {
 export class LayerWri extends ServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
-			host: '//dom.refuges.info/', //TODO www
-			...opt,
-		};
+				host: '//dom.refuges.info/', //TODO www
+				convertProperties: () => {}, // For inheritance
+				...opt,
+			},
+			massifSelector = new Selector(opt.selectMassifName, () => layer.refresh());
 
 		super({
 			...options,
-
-			query: (queryOptions) => ({
-				_path: 'api/bbox',
-				nb_points: 'all',
-				type_points: queryOptions.selector ? queryOptions.selector.getSelection() : null,
-				cluster: queryOptions.altLayer ? null : 0.1, // For server cluster layer
-			}),
-
-			convertProperties: (properties) => ({
-				...properties,
-				icon: options.host + 'images/icones/' + (properties.type || {}).icone + '.svg',
-				name: properties.nom || properties.name,
-				ele: (properties.coord || {}).alt,
-				bed: (properties.places || {}).valeur,
-				type: (properties.type || {}).valeur,
-				link: properties.lien,
-				attribution: '&copy;refuges.info',
-				...(options.convertProperties ? // Inherited
-					options.convertProperties(properties) :
-					null),
-			}),
+			query: query_,
+			convertProperties: convertProperties_,
 		});
+
+		const layer = this; // For use in Selector callBack
+
+		function query_(queryOptions) {
+			const selection = massifSelector.getSelection();
+
+			return {
+				_path: selection.length ? 'api/massif' : 'api/bbox',
+				massif: selection,
+				nb_points: 'all',
+				type_points: queryOptions.selector.getSelection(),
+				cluster: queryOptions.altLayer ? null : 0.1, // For server cluster layer
+			};
+		}
+
+		function convertProperties_(properties) {
+			if (properties.type)
+				return {
+					...properties,
+					name: properties.nom,
+					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+					ele: properties.coord.alt,
+					bed: properties.places.valeur,
+					type: properties.type.valeur,
+					attribution: '&copy;refuges.info',
+					...options.convertProperties(properties), // Inheritance
+				};
+			else
+				return properties; // Clusters
+		}
 	}
 }

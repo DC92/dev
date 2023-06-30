@@ -76,7 +76,7 @@ export class MyVectorSource extends VectorSource {
 
 			// Clean null & not relative parameters
 			Object.keys(query).forEach(k => {
-				if (!query[k] || k == '_path' || query[k] == 'on')
+				if (k == '_path' || query[k] == 'on' || !query[k] || !query[k].toString())
 					delete query[k];
 			});
 
@@ -167,7 +167,7 @@ export class MyVectorLayer extends VectorLayer {
 			stylesOptions: basicStylesOptions, // (feature, resolution, hover, layer)
 
 			// Generic
-			selector: opt.selectName ? new Selector(opt.selectName) : null,
+			selector: new Selector(opt.selectName, () => layer.refresh()),
 			style: style_,
 
 			// Browser cluster options
@@ -184,9 +184,7 @@ export class MyVectorLayer extends VectorLayer {
 
 		const layer = this; // For use in functions
 		this.options = options; // Mem for further use
-
-		if (options.selectName)
-			options.selector.setCallBack(selection => this.refresh(selection.length));
+		layer.refresh();
 
 		function style_(feature, resolution, hoveredFeature) {
 			const properties = feature.getProperties(),
@@ -211,13 +209,15 @@ export class MyVectorLayer extends VectorLayer {
 	}
 
 	// Refresh the layer when the url need to change
-	refresh(visible) {
-		this.setVisible(visible);
-		if (visible)
+	refresh() {
+		const selection = this.options.selector.getSelection();
+
+		this.setVisible(selection.length);
+		if (selection.length)
 			this.getSource().refresh();
 
 		if (this.options.altLayer)
-			this.options.altLayer.refresh(visible);
+			this.options.altLayer.refresh();
 	}
 }
 
@@ -249,15 +249,14 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 
 /**
  * Manage a collection of checkboxes with the same name
- * name : name of all the rlated checkboxes
+ * name : name of all the related input checkbox
  * The checkbox without value (all) check / uncheck the others
  * Check all the checkboxes check the checkbox without value (all)
  * Current selection is saved in window.localStorage
  * You can force the values in window.localStorage[simplified name]
- * callBack(selection) : function to call at init or clock
+ * callBack(selection) : function to call at init or click
  * getSelection() : returns an array of selected values
- * If there are no checkbox with this name, return []
- * If no name is specified, return [true]
+ * If no name is specified or there are no checkbox with this name, return []
  */
 export class Selector {
 	constructor(name, callBack) {
@@ -266,15 +265,15 @@ export class Selector {
 			this.init = (localStorage[this.safeName] || '').split(',');
 			this.selectEls = [...document.getElementsByName(name)];
 			this.selectEls.forEach(el => {
+				el.addEventListener('click', evt => this.onClick(evt));
 				el.checked =
 					this.init.includes(el.value) ||
 					this.init.includes('all') ||
 					this.init.join(',') == el.value;
-				el.addEventListener('click', evt => this.onClick(evt));
 			});
+			this.callBack = callBack;
 			this.onClick(); // Init with "all"
 		}
-		this.callBack = callBack;
 	}
 
 	onClick(evt) {
@@ -295,28 +294,22 @@ export class Selector {
 			});
 
 		// Save the current status
-		if (this.safeName && this.getSelection() && this.getSelection().length)
+		if (this.safeName && this.getSelection().length)
 			localStorage[this.safeName] = this.getSelection().join(',');
 		else
 			delete localStorage[this.safeName];
 
-		if (evt)
-			this.setCallBack(this.callBack); // Call callBack
-	}
-
-	setCallBack(callBack) {
-		this.callBack = callBack;
-		if (typeof this.callBack == 'function')
-			callBack(this.getSelection());
+		if (evt && this.callBack)
+			this.callBack(this.getSelection());
 	}
 
 	getSelection() {
-		if (this.safeName)
+		if (this.selectEls)
 			return this.selectEls
 				.filter(el => el.checked && el.value != 'all')
 				.map(el => el.value);
-		else
-			return [true];
+
+		return [];
 	}
 }
 

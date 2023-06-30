@@ -101,74 +101,49 @@ Based on https://openlayers.org
 	<script type="module">
 // Openlayers
 import 'ol/ol.css';
-import FullScreen from 'ol/control/FullScreen';
 import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import Tile from 'ol/layer/Tile';
 import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
 import {
 	transform,
 } from 'ol/proj';
 
 // MyOl
 import {
-	Selector,
-} from '../src/MyVectorLayer';
-import {
-	LayerChemineur,
 	LayerWri,
+	LayerChemineur,
 	LayerAlpages,
 } from '../src/VectorLayerCollection';
 
 
 //localStorage.myol_selectwri = 'all'; // Force selectors
 
-const selecteurMassifs = new Selector('select-massif'),
-
-	layerWri = new LayerWri({
-		selectName: 'select-wri',
-		query: options => {
-			const massif = selecteurMassifs.getSelection();
-
-			return massif.length ? {
-				_path: 'api/massif',
-				massif: massif,
-			} : {
-				_path: 'api/bbox',
-			};
-		},
-
-		convertProperties: properties => ({
-			label: properties.nom || properties.name, // Always display the name
-			attribution: null, // Don't display attribution
-		}),
-
-	});
-
-selecteurMassifs.setCallBack(function(selection) {
-	layerWri.refresh(layerWri.getVisible());
-});
-
 new Map({
 	target: 'map',
 	view: new View({
-		center: transform([5.7, 45.2], 'EPSG:4326', 'EPSG:3857'),
 		center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'),
 		zoom: 12,
-		//zoom: 15,
 	}),
-	controls: [
-		new FullScreen(),
-		new Zoom(),
-	],
 	layers: [
 		// Background layer
 		new Tile({
 			source: new OSM(),
 		}),
 
-		layerWri,
+		// Vector layers
+		new LayerWri({
+			selectName: 'select-wri',
+			selectMassifName: 'select-massif',
+		}),
+		new LayerWri({
+			selectName: 'select-refuges',
+
+			convertProperties: properties => ({
+				label: properties.nom || properties.name, // Always display the name
+				attribution: null, // Don't display attribution
+			}),
+		}),
 		new LayerChemineur({ // Chemineur
 			selectName: 'select-chem',
 		}),
@@ -180,32 +155,14 @@ new Map({
 			prc: {
 				selectName: 'select-prc',
 			},
-			chemineur: {
-				selectName: 'select-chem',
-			},
 			c2c: {
 				selectName: 'select-c2c',
-			},
-			alpages: {
-				selectName: 'select-alpages',
 			},
 			wri: {
 				selectName: 'select-wri,select-massif', // 2 selectors for one layer
 			},
 			osm: {
 				selectName: 'select-osm',
-			},
-		}),
-		layerClusterWri({
-			selectName: 'select-refuges',
-			// Display a single label above each icon
-			stylesOptionsDisplay: function(feature, properties, layer, resolution) {
-				if (!properties.cluster || resolution < layer.options.maxResolutionDegroup)
-					return labelStylesOptions(feature, properties.nom || properties.name); // Points || clusters
-			},
-			// Don't display attribution on labels
-			convertProperties: {
-				attribution: null,
 			},
 		}),
 		// WRI area layer for refuges.info
