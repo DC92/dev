@@ -17,18 +17,18 @@ import {
 // MyOl
 import {
 	labelStylesOptions,
-	MyVectorLayer,
 	Selector,
-	ServerClusterVectorLayer,
+	MyVectorLayer,
 } from './MyVectorLayer.js';
 
 
 // chemineur.fr
-export class LayerChemineur extends ServerClusterVectorLayer {
+export class LayerChemineur extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//chemineur.fr/',
 			browserClusterMinResolution: 50,
+			serverClusterMinResolution: 100,
 			...opt,
 		};
 
@@ -90,11 +90,12 @@ export function chemIconUrl(type) {
 }
 
 // refuges.info
-export class LayerWri extends ServerClusterVectorLayer {
+export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 				host: '//dom.refuges.info/', //TODO www
 				browserClusterMinResolution: 50,
+				serverClusterMinResolution: 100,
 				convertProperties: () => {}, // For inheritance
 				...opt,
 			},
@@ -124,6 +125,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 			if (properties.type)
 				return {
 					...properties,
+					//TODO BUG in clusters
 					name: properties.nom,
 					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 					ele: properties.coord.alt,

@@ -91,7 +91,7 @@ class MyVectorSource extends VectorSource {
 /* Browser clustered source
    The layer use one source to get the data & a cluster source to manages clusters
 */
-class MyClusterSource extends Cluster {
+class BrowserClusterSource extends Cluster {
 	constructor(options) {
 		// Wrapped source
 		const wrappedSource = new MyVectorSource(options);
@@ -157,7 +157,7 @@ class MyClusterSource extends Cluster {
 }
 
 // Facilities added vector layer
-export class MyVectorLayer extends VectorLayer {
+class BrowserClusterVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
 			// Mandatory
@@ -177,7 +177,7 @@ export class MyVectorLayer extends VectorLayer {
 
 		super({
 			source: options.browserClusterMinResolution ?
-				new MyClusterSource(options) : new MyVectorSource(options),
+				new BrowserClusterSource(options) : new MyVectorSource(options),
 			...options,
 		});
 
@@ -224,15 +224,11 @@ export class MyVectorLayer extends VectorLayer {
    This uses one layer to display the normal data at low resolutions
    and another to get and display the clusters delivered by the server at hight resolutions
 */
-export class ServerClusterVectorLayer extends MyVectorLayer {
-	constructor(opt) {
-		const options = {
-				serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
-				...opt,
-			},
-
-			// High resolutions layer
-			hightResolutionsLayer = new MyVectorLayer({
+export class MyVectorLayer extends BrowserClusterVectorLayer {
+	constructor(options) {
+		// Resolution above which we ask clusters to the server
+		if (options.serverClusterMinResolution)
+			options.altLayer = new BrowserClusterVectorLayer({
 				...options,
 				minResolution: options.serverClusterMinResolution,
 			});
@@ -241,7 +237,6 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 		super({
 			...options,
 			maxResolution: options.serverClusterMinResolution,
-			altLayer: hightResolutionsLayer,
 		});
 	}
 }
