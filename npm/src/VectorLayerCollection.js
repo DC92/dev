@@ -6,9 +6,17 @@
 // Openlayers
 import 'ol/ol.css';
 import OSMXML from 'ol/format/OSMXML.js'; //TODO used ?
+import {
+	all,
+} from 'ol/loadingstrategy.js';
+import {
+	Fill,
+	Stroke,
+} from 'ol/style.js';
 
 // MyOl
 import {
+	labelStylesOptions,
 	MyVectorLayer,
 	Selector,
 	ServerClusterVectorLayer,
@@ -20,6 +28,7 @@ export class LayerChemineur extends ServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//chemineur.fr/',
+			browserClusterMinResolution: 50,
 			...opt,
 		};
 
@@ -48,6 +57,7 @@ export class LayerAlpages extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//alpages.info/',
+			browserClusterMinResolution: 50,
 			...opt,
 		};
 
@@ -84,6 +94,7 @@ export class LayerWri extends ServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
 				host: '//dom.refuges.info/', //TODO www
+				browserClusterMinResolution: 50,
 				convertProperties: () => {}, // For inheritance
 				...opt,
 			},
@@ -123,6 +134,51 @@ export class LayerWri extends ServerClusterVectorLayer {
 				};
 			else
 				return properties; // Clusters
+		}
+	}
+}
+
+export class layerWriAreas extends MyVectorLayer {
+	constructor(opt) {
+		const options = {
+			host: '//www.refuges.info/',
+			...opt,
+		};
+
+		super({
+			...options,
+			strategy: all,
+			query: () => ({
+				_path: 'api/polygones',
+				type_polygon: 1, // Massifs
+			}),
+			convertProperties: properties => ({
+				label: properties.nom,
+				name: properties.nom,
+				type: null,
+				attribution: null,
+			}),
+			stylesOptions: areasStylesOptions_,
+		});
+
+		function areasStylesOptions_(feature, _, hover) {
+			const properties = feature.getProperties(),
+				colors = properties.couleur
+				.match(/([0-9a-f]{2})/ig)
+				.map(c => parseInt(c, 16));
+
+			return [{
+				...labelStylesOptions(...arguments),
+
+				stroke: new Stroke({
+					color: hover ? properties.couleur : 'transparent',
+					width: 2,
+				}),
+
+				fill: new Fill({
+					color: 'rgba(' + colors.join(',') + ',0.3)'
+				}),
+			}];
 		}
 	}
 }

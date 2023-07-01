@@ -31,7 +31,7 @@ import {
 
 
 // geoJSON vector display
-export class MyVectorSource extends VectorSource {
+class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
 				strategy: bbox,
@@ -91,7 +91,7 @@ export class MyVectorSource extends VectorSource {
 /* Browser clustered source
    The layer use one source to get the data & a cluster source to manages clusters
 */
-export class MyClusterSource extends Cluster {
+class MyClusterSource extends Cluster {
 	constructor(options) {
 		// Wrapped source
 		const wrappedSource = new MyVectorSource(options);
@@ -163,15 +163,14 @@ export class MyVectorLayer extends VectorLayer {
 			// Mandatory
 			// host: '//chemineur.fr/',
 			// query: () => ({_path: '...'}),
-			convertProperties: () => {}, // Translate properties to standard MyOl
+			convertProperties: p => p, // Translate properties to standard MyOl
 			stylesOptions: basicStylesOptions, // (feature, resolution, hover, layer)
 
 			// Generic
 			selector: new Selector(opt.selectName, () => layer.refresh()),
 			style: style_,
 
-			// Browser cluster options
-			browserClusterMinResolution: 50, // Resolution above which the browser clusterises
+			// browserClusterMinResolution: 50, // Resolution above which the browser clusterises
 
 			...opt,
 		};
@@ -247,72 +246,6 @@ export class ServerClusterVectorLayer extends MyVectorLayer {
 	}
 }
 
-/**
- * Manage a collection of checkboxes with the same name
- * name : name of all the related input checkbox
- * The checkbox without value (all) check / uncheck the others
- * Check all the checkboxes check the checkbox without value (all)
- * Current selection is saved in window.localStorage
- * You can force the values in window.localStorage[simplified name]
- * callBack(selection) : function to call at init or click
- * getSelection() : returns an array of selected values
- * If no name is specified or there are no checkbox with this name, return []
- */
-export class Selector {
-	constructor(name, callBack) {
-		if (name) {
-			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
-			this.init = (localStorage[this.safeName] || '').split(',');
-			this.selectEls = [...document.getElementsByName(name)];
-			this.selectEls.forEach(el => {
-				el.addEventListener('click', evt => this.onClick(evt));
-				el.checked =
-					this.init.includes(el.value) ||
-					this.init.includes('all') ||
-					this.init.join(',') == el.value;
-			});
-			this.callBack = callBack;
-			this.onClick(); // Init with "all"
-		}
-	}
-
-	onClick(evt) {
-		// Test the "all" box & set other boxes
-		if (evt && evt.target.value == 'all')
-			this.selectEls
-			.forEach(el => el.checked = evt.target.checked);
-
-		// Test if all values are checked
-		const allChecked = this.selectEls
-			.filter(el => !el.checked && el.value != 'all');
-
-		// Set the "all" box
-		this.selectEls
-			.forEach(el => {
-				if (el.value == 'all')
-					el.checked = !allChecked.length;
-			});
-
-		// Save the current status
-		if (this.safeName && this.getSelection().length)
-			localStorage[this.safeName] = this.getSelection().join(',');
-		else
-			delete localStorage[this.safeName];
-
-		if (evt && this.callBack)
-			this.callBack(this.getSelection());
-	}
-
-	getSelection() {
-		if (this.selectEls)
-			return this.selectEls
-				.filter(el => el.checked && el.value != 'all')
-				.map(el => el.value);
-
-		return [];
-	}
-}
-
 // Hover & click management
 function attachMouseListener(map) {
 	// Attach one hover & click listener to each map
@@ -373,6 +306,7 @@ function mouseListener(evt) {
 			hoveredSubProperties = hoveredLayer.options.convertProperties(hoveredSubProperties);
 
 		if (evt.type == 'click') {
+			//TODO BUG click sur circle va à rien
 			if (hoveredSubProperties.link) {
 				// Open a new tag
 				if (evt.originalEvent.ctrlKey)
@@ -566,4 +500,70 @@ function agregateText(lines, glue) {
 		.map(l => l.toString().replace('_', ' ').trim())
 		.map(l => l[0].toUpperCase() + l.substring(1))
 		.join(glue || '\n');
+}
+
+/**
+ * Manage a collection of checkboxes with the same name
+ * name : name of all the related input checkbox
+ * The checkbox without value (all) check / uncheck the others
+ * Check all the checkboxes check the checkbox without value (all)
+ * Current selection is saved in window.localStorage
+ * You can force the values in window.localStorage[simplified name]
+ * callBack(selection) : function to call at init or click
+ * getSelection() : returns an array of selected values
+ * If no name is specified or there are no checkbox with this name, return []
+ */
+export class Selector {
+	constructor(name, callBack) {
+		if (name) {
+			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
+			this.init = (localStorage[this.safeName] || '').split(',');
+			this.selectEls = [...document.getElementsByName(name)];
+			this.selectEls.forEach(el => {
+				el.addEventListener('click', evt => this.onClick(evt));
+				el.checked =
+					this.init.includes(el.value) ||
+					this.init.includes('all') ||
+					this.init.join(',') == el.value;
+			});
+			this.callBack = callBack;
+			this.onClick(); // Init with "all"
+		}
+	}
+
+	onClick(evt) {
+		// Test the "all" box & set other boxes
+		if (evt && evt.target.value == 'all')
+			this.selectEls
+			.forEach(el => el.checked = evt.target.checked);
+
+		// Test if all values are checked
+		const allChecked = this.selectEls
+			.filter(el => !el.checked && el.value != 'all');
+
+		// Set the "all" box
+		this.selectEls
+			.forEach(el => {
+				if (el.value == 'all')
+					el.checked = !allChecked.length;
+			});
+
+		// Save the current status
+		if (this.safeName && this.getSelection().length)
+			localStorage[this.safeName] = this.getSelection().join(',');
+		else
+			delete localStorage[this.safeName];
+
+		if (evt && this.callBack)
+			this.callBack(this.getSelection());
+	}
+
+	getSelection() {
+		if (this.selectEls)
+			return this.selectEls
+				.filter(el => el.checked && el.value != 'all')
+				.map(el => el.value);
+
+		return [];
+	}
 }

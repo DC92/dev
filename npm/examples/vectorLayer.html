@@ -114,6 +114,7 @@ import {
 	LayerWri,
 	LayerChemineur,
 	LayerAlpages,
+	layerWriAreas,
 } from '../src/VectorLayerCollection';
 
 
@@ -144,10 +145,13 @@ new Map({
 				attribution: null, // Don't display attribution
 			}),
 		}),
-		new LayerChemineur({ // Chemineur
+		new layerWriAreas({
+			selectName: 'select-massifs',
+		}),
+		new LayerChemineur({
 			selectName: 'select-chem',
 		}),
-		new LayerAlpages({ // Alpages.info
+		new LayerAlpages({
 			selectName: 'select-alpages',
 		}),
 		/*
@@ -166,9 +170,6 @@ new Map({
 			},
 		}),
 		// WRI area layer for refuges.info
-		layerWriAreas({
-			selectName: 'select-massifs',
-		}),
 		*/
 	],
 });
