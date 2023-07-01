@@ -125,12 +125,12 @@ export class LayerWri extends MyVectorLayer {
 			if (properties.type)
 				return {
 					...properties,
-					//TODO BUG in clusters
 					name: properties.nom,
 					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 					ele: properties.coord.alt,
 					bed: properties.places.valeur,
 					type: properties.type.valeur,
+					link: properties.lien,
 					attribution: '&copy;refuges.info',
 					...options.convertProperties(properties), // Inheritance
 				};
@@ -141,15 +141,12 @@ export class LayerWri extends MyVectorLayer {
 }
 
 export class layerWriAreas extends MyVectorLayer {
-	constructor(opt) {
-		const options = {
-			host: '//www.refuges.info/',
-			...opt,
-		};
-
+	constructor(options) {
 		super({
-			...options,
+			host: '//www.refuges.info/',
 			strategy: all,
+			...options,
+
 			query: () => ({
 				_path: 'api/polygones',
 				type_polygon: 1, // Massifs
@@ -157,6 +154,7 @@ export class layerWriAreas extends MyVectorLayer {
 			convertProperties: properties => ({
 				label: properties.nom,
 				name: properties.nom,
+				link: properties.lien,
 				type: null,
 				attribution: null,
 			}),

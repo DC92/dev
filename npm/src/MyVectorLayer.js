@@ -279,52 +279,54 @@ function mouseListener(evt) {
 			}, {
 				hitTolerance: 6, // For lines / Default 0
 			}
-		),
-		hoveredSubFeature = hoveredFeature,
-		hoveredSubProperties = {};
+		);
 
+	// Find sub-feature from a detailed cluster
 	if (hoveredFeature) {
-		// Find sub-feature from a detailed cluster
-		const hoveredProperties = hoveredFeature.getProperties(),
-			featurePosition = map.getPixelFromCoordinate(
+		const featurePosition = map.getPixelFromCoordinate(
 				getCenter(hoveredFeature.getGeometry().getExtent())
 			),
-			deltaXCursor = evt.originalEvent.layerX - featurePosition[0];
+			deltaXCursor = evt.originalEvent.layerX - featurePosition[0],
+			p = hoveredFeature.getProperties();
 
-		if (hoveredProperties.features)
-			hoveredProperties.features.forEach(f => {
-				if (deltaXCursor < f.getProperties().xRight)
-					hoveredSubFeature = f;
+		if (p.features) {
+			p.features.forEach((f, k) => {
+				const p = f.getProperties();
+
+				if (p.xRight && (!k || deltaXCursor < p.xRight))
+					hoveredFeature = f;
 			});
+		}
 
-		if (hoveredSubFeature)
-			hoveredSubProperties = hoveredLayer.options.convertProperties(hoveredSubProperties);
+		const hoveredProperties = hoveredLayer.options.convertProperties(
+			hoveredFeature.getProperties()
+		);
 
 		if (evt.type == 'click') {
-			//TODO BUG click sur circle va à rien
-			if (hoveredSubProperties.link) {
-				// Open a new tag
-				if (evt.originalEvent.ctrlKey)
-					window.open(hoveredSubProperties.link, '_blank').focus();
-				else
-					// Open a new window
-					if (evt.originalEvent.shiftKey)
-						window.open(hoveredSubProperties.link, '_blank', 'resizable=yes').focus();
-					else
-						// Go on the same window
-						window.location.href = hoveredSubProperties.link;
-			}
 			// Cluster
 			if (hoveredProperties.cluster)
 				map.getView().animate({
 					zoom: map.getView().getZoom() + 2,
 					center: hoveredProperties.geometry.getCoordinates(),
 				});
+			// Link
+			else if (hoveredProperties.link) {
+				// Open a new tag
+				if (evt.originalEvent.ctrlKey)
+					window.open(hoveredProperties.link, '_blank').focus();
+				else
+					// Open a new window
+					if (evt.originalEvent.shiftKey)
+						window.open(hoveredProperties.link, '_blank', 'resizable=yes').focus();
+					else
+						// Go on the same window
+						window.location.href = hoveredProperties.link;
+			}
 		} else
 			// Hover
-			if (map.lastHoveredFeature != hoveredSubFeature) {
+			if (map.lastHoveredFeature != hoveredFeature) {
 				map.getViewport().style.cursor =
-					hoveredSubProperties.link || hoveredProperties.cluster ? 'pointer' : '';
+					hoveredProperties.link || hoveredProperties.cluster ? 'pointer' : '';
 
 				// Remove previous style
 				if (map.lastHoveredFeature)
@@ -333,16 +335,17 @@ function mouseListener(evt) {
 				// Set the feature style to the style function with the hoveredFeature set
 				//TODO zIndex
 				hoveredFeature.setStyle((feature, resolution) =>
-					hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
+					hoveredLayer.getStyleFunction()(feature, resolution, hoveredFeature)
 				);
 			}
 	} else {
 		map.getViewport().style.cursor = '';
 		if (map.lastHoveredFeature)
 			map.lastHoveredFeature.setStyle();
+		//TODO BUG no style for spread items
 	}
 	map.lastHoveredFeature = hoveredFeature;
-	map.lastHoveredSubFeature = hoveredSubFeature;
+	//map.lastHoveredFeature = hoveredFeature;
 }
 
 /**
@@ -438,7 +441,6 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 		});
 	} else {
 		// Low resolution : separated icons
-		//TODO detecte cluster bien à gauche du dernier
 		let x = 0.95 + 0.45 * properties.cluster;
 
 		properties.features.forEach(f => {
