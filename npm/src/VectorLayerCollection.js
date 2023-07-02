@@ -29,6 +29,7 @@ export class LayerChemineur extends MyVectorLayer {
 			host: '//chemineur.fr/',
 			browserClusterMinResolution: 50,
 			serverClusterMinResolution: 100,
+			featurePixelMinPerimeter: 300,
 			...opt,
 		};
 
@@ -58,6 +59,7 @@ export class LayerAlpages extends MyVectorLayer {
 		const options = {
 			host: '//alpages.info/',
 			browserClusterMinResolution: 50,
+			featurePixelMinPerimeter: 300,
 			...opt,
 		};
 

@@ -112,10 +112,11 @@ class BrowserClusterSource extends Cluster {
 
 			if (geometry) {
 				const extent = feature.getGeometry().getExtent(),
-					pixelSemiPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) / this.resolution;
+					featurePixelPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) *
+					2 / this.resolution;
 
-				// Don't cluster lines or polygons whose the extent perimeter is more than 400 pixels
-				if (pixelSemiPerimeter > 200)
+				// Don't cluster lines or polygons whose the extent perimeter is more than x pixels
+				if (featurePixelPerimeter > options.featurePixelMinPerimeter)
 					this.addFeature(feature);
 				else
 					return new Point(getCenter(feature.getGeometry().getExtent()));
@@ -429,28 +430,7 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 	const properties = layer.options.convertProperties(feature.getProperties()),
 		so = [];
 
-	// Hi resolution : circle
-	if (resolution > layer.options.browserClusterMinResolution) {
-		if (hoverfeature)
-			so.push(labelStylesOptions(...arguments));
-
-		so.push({
-			image: new Circle({
-				radius: 14,
-				stroke: new Stroke({
-					color: 'blue',
-				}),
-				fill: new Fill({
-					color: 'white',
-				}),
-			}),
-			text: new Text({
-				text: properties.cluster.toString(),
-				font: '12px Verdana',
-			}),
-			//TODO text zIndex ?
-		});
-	} else {
+	if (resolution > layer.options.spreadClusterMaxResolution) {
 		// Low resolution : separated icons
 		let x = 0.95 + 0.45 * properties.cluster;
 
@@ -473,6 +453,28 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 		});
 
 		so.push(labelStylesOptions(hoverfeature || feature, resolution, hoverfeature, layer));
+	}
+	// Hi resolution : circle
+	else {
+		if (hoverfeature)
+			so.push(labelStylesOptions(...arguments));
+
+		so.push({
+			image: new Circle({
+				radius: 14,
+				stroke: new Stroke({
+					color: 'blue',
+				}),
+				fill: new Fill({
+					color: 'white',
+				}),
+			}),
+			text: new Text({
+				text: properties.cluster.toString(),
+				font: '12px Verdana',
+			}),
+			//TODO text zIndex ?
+		});
 	}
 	return so;
 }

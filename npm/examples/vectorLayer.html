@@ -139,6 +139,7 @@ new Map({
 		}),
 		new LayerWri({
 			selectName: 'select-refuges',
+			spreadClusterMaxResolution: 20,
 
 			convertProperties: properties => ({
 				label: properties.nom || properties.name, // Always display the name
