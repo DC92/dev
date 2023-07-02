@@ -122,8 +122,8 @@ export class LayerWri extends MyVectorLayer {
 		}
 
 		function convertProperties_(properties) {
-			if (properties.type)
-				return {
+			if (properties.type) // Point
+				properties = {
 					...properties,
 					name: properties.nom,
 					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
@@ -132,10 +132,12 @@ export class LayerWri extends MyVectorLayer {
 					type: properties.type.valeur,
 					link: properties.lien,
 					attribution: '&copy;refuges.info',
-					...options.convertProperties(properties), // Inheritance
 				};
-			else
-				return properties; // Clusters
+
+			return {
+				...properties,
+				...options.convertProperties(properties), // Inheritance
+			};
 		}
 	}
 }

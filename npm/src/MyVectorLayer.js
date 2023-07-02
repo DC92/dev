@@ -271,81 +271,90 @@ function mouseListener(evt) {
 	let hoveredLayer = null,
 		hoveredFeature = map.forEachFeatureAtPixel(
 			map.getEventPixel(evt.originalEvent),
-			function(feature, layer) {
-				if (layer && layer.options) {
-					hoveredLayer = layer;
-					return feature; // And stop the search
+			function(f, l) {
+				if (l && l.options) {
+					hoveredLayer = l;
+					return f; // Return feature & stop the search
 				}
 			}, {
 				hitTolerance: 6, // For lines / Default 0
 			}
-		);
+		),
+		hoveredSubFeature = hoveredFeature;
 
-	// Find sub-feature from a detailed cluster
+	// Find sub-feature from a spread cluster
 	if (hoveredFeature) {
-		const featurePosition = map.getPixelFromCoordinate(
+		const hoveredProperties = hoveredLayer.options.convertProperties(
+				hoveredFeature.getProperties()
+			),
+			featurePosition = map.getPixelFromCoordinate(
 				getCenter(hoveredFeature.getGeometry().getExtent())
 			),
-			deltaXCursor = evt.originalEvent.layerX - featurePosition[0],
-			p = hoveredFeature.getProperties();
+			deltaXCursor = evt.originalEvent.layerX - featurePosition[0];
 
-		if (p.features) {
-			p.features.forEach((f, k) => {
+		if (hoveredProperties.features) {
+			hoveredProperties.features.forEach((f, k) => {
 				const p = f.getProperties();
 
-				if (p.xRight && (!k || deltaXCursor < p.xRight))
-					hoveredFeature = f;
+				if (p.xRight && // Only for spread features
+					(!k || // Item 0 up to the cluster bound
+						deltaXCursor > p.xRight))
+					hoveredSubFeature = f;
 			});
 		}
 
-		const hoveredProperties = hoveredLayer.options.convertProperties(
-			hoveredFeature.getProperties()
+		const hoveredSubProperties = hoveredLayer.options.convertProperties(
+			hoveredSubFeature.getProperties()
 		);
 
+		// Click
 		if (evt.type == 'click') {
-			// Cluster
-			if (hoveredProperties.cluster)
+			// Click link
+			if (hoveredSubProperties.link) {
+				// Open a new tag
+				if (evt.originalEvent.ctrlKey)
+					window.open(hoveredSubProperties.link, '_blank').focus();
+				else
+					// Open a new window
+					if (evt.originalEvent.shiftKey)
+						window.open(hoveredSubProperties.link, '_blank', 'resizable=yes').focus();
+					// Go on the same window
+					else
+						window.location.href = hoveredSubProperties.link;
+			}
+			// Click cluster
+			else if (hoveredProperties.cluster)
 				map.getView().animate({
 					zoom: map.getView().getZoom() + 2,
 					center: hoveredProperties.geometry.getCoordinates(),
 				});
-			// Link
-			else if (hoveredProperties.link) {
-				// Open a new tag
-				if (evt.originalEvent.ctrlKey)
-					window.open(hoveredProperties.link, '_blank').focus();
-				else
-					// Open a new window
-					if (evt.originalEvent.shiftKey)
-						window.open(hoveredProperties.link, '_blank', 'resizable=yes').focus();
-					else
-						// Go on the same window
-						window.location.href = hoveredProperties.link;
-			}
-		} else
-			// Hover
-			if (map.lastHoveredFeature != hoveredFeature) {
-				map.getViewport().style.cursor =
-					hoveredProperties.link || hoveredProperties.cluster ? 'pointer' : '';
+		}
+		// Hover
+		else if (map.lastHoveredSubFeature != hoveredSubFeature) {
+			map.getViewport().style.cursor =
+				hoveredProperties.link || hoveredProperties.cluster ?
+				'pointer' :
+				'';
 
-				// Remove previous style
-				if (map.lastHoveredFeature)
-					map.lastHoveredFeature.setStyle();
+			// Remove previous style
+			if (map.lastHoveredFeature)
+				map.lastHoveredFeature.setStyle();
 
-				// Set the feature style to the style function with the hoveredFeature set
-				//TODO zIndex
-				hoveredFeature.setStyle((feature, resolution) =>
-					hoveredLayer.getStyleFunction()(feature, resolution, hoveredFeature)
-				);
-			}
-	} else {
+			// Set the feature style to the style function with the hoveredFeature set
+			hoveredFeature.setStyle((feature, resolution) =>
+				hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
+			);
+			//TODO zIndex
+		}
+	}
+	// Reset Style & cursor
+	else {
 		map.getViewport().style.cursor = '';
 		if (map.lastHoveredFeature)
 			map.lastHoveredFeature.setStyle();
-		//TODO BUG no style for spread items
 	}
 	map.lastHoveredFeature = hoveredFeature;
-	//map.lastHoveredFeature = hoveredFeature;
+	map.lastHoveredSubFeature = hoveredSubFeature;
 }
 
 /**
