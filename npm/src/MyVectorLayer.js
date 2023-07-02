@@ -282,24 +282,26 @@ function mouseListener(evt) {
 		),
 		hoveredSubFeature = hoveredFeature;
 
-	// Find sub-feature from a spread cluster
 	if (hoveredFeature) {
 		const hoveredProperties = hoveredLayer.options.convertProperties(
 				hoveredFeature.getProperties()
 			),
 			featurePosition = map.getPixelFromCoordinate(
 				getCenter(hoveredFeature.getGeometry().getExtent())
-			),
-			deltaXCursor = evt.originalEvent.layerX - featurePosition[0];
+			);
 
-		if (hoveredProperties.features) {
-			hoveredProperties.features.forEach((f, k) => {
+		// Find sub-feature from a spread cluster
+		if (hoveredProperties.cluster) {
+			hoveredProperties.features.every(f => {
 				const p = f.getProperties();
 
-				if (p.xRight && // Only for spread features
-					(!k || // Item 0 up to the cluster bound
-						deltaXCursor > p.xRight))
+				// Only for spread clusters
+				if (p.xLeft)
 					hoveredSubFeature = f;
+
+				// Stop when found
+				return evt.originalEvent.layerX >
+					featurePosition[0] + p.xLeft;
 			});
 		}
 
@@ -309,8 +311,14 @@ function mouseListener(evt) {
 
 		// Click
 		if (evt.type == 'click') {
+			// Click cluster
+			if (hoveredProperties.cluster)
+				map.getView().animate({
+					zoom: map.getView().getZoom() + 2,
+					center: hoveredProperties.geometry.getCoordinates(),
+				});
 			// Click link
-			if (hoveredSubProperties.link) {
+			else if (hoveredSubProperties.link) {
 				// Open a new tag
 				if (evt.originalEvent.ctrlKey)
 					window.open(hoveredSubProperties.link, '_blank').focus();
@@ -322,12 +330,6 @@ function mouseListener(evt) {
 					else
 						window.location.href = hoveredSubProperties.link;
 			}
-			// Click cluster
-			else if (hoveredProperties.cluster)
-				map.getView().animate({
-					zoom: map.getView().getZoom() + 2,
-					center: hoveredProperties.geometry.getCoordinates(),
-				});
 		}
 		// Hover
 		else if (map.lastHoveredSubFeature != hoveredSubFeature) {
@@ -461,7 +463,7 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 				if (image) {
 					image.setAnchor([x -= 0.9, 0.5]);
 					f.setProperties({ // Mem the shift for hover detection
-						xRight: x * image.getImage().width,
+						xLeft: (1 - x) * image.getImage().width,
 					}, true);
 					so.push({
 						image: image,

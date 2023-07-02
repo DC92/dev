@@ -122,9 +122,8 @@ export class LayerWri extends MyVectorLayer {
 		}
 
 		function convertProperties_(properties) {
-			if (properties.type) // Point
+			if (!properties.cluster) // Points
 				properties = {
-					...properties,
 					name: properties.nom,
 					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
 					ele: properties.coord.alt,
