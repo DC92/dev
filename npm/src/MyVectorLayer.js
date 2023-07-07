@@ -162,7 +162,7 @@ class MyClusterSource extends Cluster {
 /**
  * Browser & server clustered layer
  */
-export class MyClusterVectorLayer extends VectorLayer {
+class MyBrowserVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
 			//browserClusterMinDistance:50, // Distance above which the browser clusterises
@@ -173,33 +173,20 @@ export class MyClusterVectorLayer extends VectorLayer {
 			...opt,
 		};
 
-		// Low resolutions layer
-		// Use a vector source to get the data
-		// or a cluster source and a vector source to manages clusters
 		super({
 			source: options.browserClusterMinDistance ?
-				new MyClusterSource(options) : new MyVectorSource(options),
+				new MyClusterSource(options) : // Use a cluster source and a vector source to manages clusters
+				new MyVectorSource(options), // or a vector source to get the data
 			maxResolution: options.serverClusterMinResolution,
 			style: style_,
 			...options,
 		});
 
-		// High resolutions server cluster layer
-		// Use one layer to display the normal data at low resolutions
-		// and another to get and display the clusters delivered by the server at hight resolutions
-		if (options.serverClusterMinResolution)
-			this.altLayer = new VectorLayer({
-				source: new MyClusterSource(options), // Always use cluster source ihn that case
-				minResolution: options.serverClusterMinResolution,
-				style: style_,
-				...options,
-			});
-
 		const layer = this; // For use in style function
+		this.options = options; // Mem for further use
 
 		function style_(feature, resolution, hoveredFeature) {
-			const properties = feature.getProperties(),
-				stylesOptionsFunction = properties.cluster ?
+			const stylesOptionsFunction = feature.getProperties().cluster ?
 				options.clusterStylesOptions :
 				options.stylesOptions;
 
@@ -208,17 +195,14 @@ export class MyClusterVectorLayer extends VectorLayer {
 				.map(so => new Style(so)); // Transform into an array of Style objects
 		}
 	}
-
-	//HACK execute actions on Map init
-	setMapInternal(map) {
-		if (this.altLayer)
-			map.addLayer(this.altLayer);
-
-		return super.setMapInternal(map);
+	/*
+	// Hide or call the url when selection change
+	refresh(visible) {//TODO
 	}
 
-	// Hide or call the url when selection change
-	refresh(visible) {
+	// Hide or call the url when the selection changes
+	refresh(visible) {//TODO
+	//return;
 		this.setVisible(visible);
 		if (visible) //TODO
 			this.getSource().refresh();
@@ -229,6 +213,31 @@ export class MyClusterVectorLayer extends VectorLayer {
 				this.altLayer.getSource().refresh();
 		}
 	}
+	*/
+}
+
+class MyClusterVectorLayer extends MyBrowserVectorLayer {
+	constructor(options) {
+		// Low resolutions layer to display the normal data
+		super(options);
+
+		// High resolutions layer to get and display the clusters delivered by the server at hight resolutions
+		if (options.serverClusterMinResolution)
+			this.altLayer = new MyBrowserVectorLayer({
+				maxResolution: undefined,
+				minResolution: options.serverClusterMinResolution,
+				...options,
+			});
+	}
+
+	//HACK execute actions on Map init
+	setMapInternal(map) {
+		if (this.altLayer)
+			map.addLayer(this.altLayer);
+
+		return super.setMapInternal(map);
+	}
+
 }
 
 /**
@@ -245,14 +254,18 @@ export class MyVectorLayer extends MyClusterVectorLayer {
 		};
 
 		super(options);
-		this.options = options; // Mem for further use
-		this.selector = new Selector(opt.selectName, selection => super.refresh(selection.length));
-	}
+		//this.selector = new Selector(opt.selectName/*, selection => super.refresh(selection.length)*/); //TODO
+		this.selector = new Selector(opt.selectName, toto);
+		this.setVisible(this.selector.getSelection().length);
 
-	refresh() { //TODO
-		super.refresh(this.selector.getSelection().length);
+		function toto(s) { //TODO
+		}
 	}
-
+	/*
+		refresh() { //TODO
+			super.refresh(this.selector.getSelection().length);
+		}
+	*/
 	//HACK execute actions on Map init
 	setMapInternal(map) {
 		attachMouseListener(map);
@@ -353,7 +366,7 @@ function mouseListener(evt) {
 			}
 		}
 		// Hover
-		else if (map.lastHoveredSubFeature != hoveredSubFeature) {
+		else if (hoveredSubFeature != map.lastHoveredSubFeature) {
 			map.getViewport().style.cursor =
 				hoveredProperties.link || hoveredProperties.cluster ?
 				'pointer' :
@@ -503,7 +516,7 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
   Styles Options are an array of objects containing style options
   When concatenate, the first stylesOptions object is merged while the others are added
 */
-export function concatenateStylesOptions() { //TODO DELETE
+function concatenateStylesOptions() { //TODO DELETE
 	// First argument becomes the base of the result
 	const r = [...arguments[0]];
 
@@ -585,7 +598,8 @@ export class Selector {
 			delete localStorage[this.safeName];
 
 		//if (evt && typeof this.callBack == 'function') //TODO
-		this.callBack(this.getSelection());
+		if (typeof this.callBack == 'function')
+			this.callBack(this.getSelection());
 	}
 
 	getSelection() {

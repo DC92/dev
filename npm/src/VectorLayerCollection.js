@@ -137,7 +137,7 @@ export class LayerWri extends MyVectorLayer {
 		this.massifSelector = new Selector(opt.selectMassifName, function(selection) {
 
 			//	this.refresh(this.selector.getSelection().length);
-			layer.refresh();
+			//layer.refresh(); //TODO
 		});
 
 
