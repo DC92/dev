@@ -3,7 +3,6 @@
  * Facilities to vector layers 
  */
 
-// Openlayers
 import 'ol/ol.css';
 import Cluster from 'ol/source/Cluster.js';
 import Feature from 'ol/Feature.js';
@@ -30,13 +29,19 @@ import {
 } from 'ol/style.js';
 
 
-// geoJSON vector display
+/**
+ * GeoJSON vector display
+ * url calculation
+ * display the loading status
+ */
 class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
+				// host: '',
+				// query: (options, extent, resolution, projection) => ({_path: '...'}),
+				url: url_,
 				strategy: bbox,
 				bbox: bbox_,
-				url: url_,
 				format: new GeoJSON(),
 				projection: 'EPSG:4326',
 				...opt,
@@ -61,16 +66,7 @@ class MyVectorSource extends VectorSource {
 				}
 			});
 
-		function bbox_(extent, _, mapProjection) {
-			return transformExtent(
-				extent,
-				mapProjection,
-				options.projection, // Received projection
-			).map(c => c.toFixed(4)); // Round to 4 digits
-		}
-
 		function url_(extent, resolution, projection) {
-			//TODO BUG pourquoi est-il appelé 2 fois à l'init ?
 			const query = options.query(options, ...arguments),
 				url = options.host + query._path;
 
@@ -85,26 +81,32 @@ class MyVectorSource extends VectorSource {
 
 			return url + '?' + new URLSearchParams(query).toString();
 		}
+
+		function bbox_(extent, _, mapProjection) {
+			return transformExtent(
+				extent,
+				mapProjection,
+				options.projection, // Received projection
+			).map(c => c.toFixed(4)); // Round to 4 digits
+		}
 	}
 }
 
-/* Browser clustered source
-   The layer use one source to get the data & a cluster source to manages clusters
-*/
-class BrowserClusterSource extends Cluster {
+/**
+ * Cluster source to manage clusters in the browser
+ */
+class MyClusterSource extends Cluster {
 	constructor(options) {
-		// Wrapped source
-		const wrappedSource = new MyVectorSource(options);
-
-		// Cluster source
 		super({
-			source: wrappedSource,
+			distance: options.browserClusterMinDistance,
+			source: new MyVectorSource(options), // Origin of mfeatures to cluster
 			geometryFunction: geometryFunction_,
 			createCluster: createCluster_,
 		});
 
 		// Redirect the refresh method to the wrapped source
-		this.refresh = () => this.getSource().refresh();
+		//TODO generate 2 url calls at init
+		//this.refresh = () => this.getSource().refresh();
 
 		// Generate a center point where display the cluster
 		function geometryFunction_(feature) {
@@ -116,7 +118,7 @@ class BrowserClusterSource extends Cluster {
 					2 / this.resolution;
 
 				// Don't cluster lines or polygons whose the extent perimeter is more than x pixels
-				if (featurePixelPerimeter > options.featurePixelMinPerimeter)
+				if (featurePixelPerimeter > options.browserClusterFeaturelMaxPerimeter)
 					this.addFeature(feature);
 				else
 					return new Point(getCenter(feature.getGeometry().getExtent()));
@@ -157,39 +159,48 @@ class BrowserClusterSource extends Cluster {
 	}
 }
 
-// Facilities added vector layer
-class BrowserClusterVectorLayer extends VectorLayer {
+/**
+ * Browser & server clustered layer
+ */
+export class MyClusterVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
-			// Mandatory
-			// host: '//chemineur.fr/',
-			// query: () => ({_path: '...'}),
-			convertProperties: p => p, // Translate properties to standard MyOl
+			//browserClusterMinDistance:50, // Distance above which the browser clusterises
+			//serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
+			//browserClusterFeaturelMaxPerimeter: 300, // Perimeter (in pixels) of a line or poly above which we do not cluster
 			stylesOptions: basicStylesOptions, // (feature, resolution, hover, layer)
-
-			// Generic
-			selector: new Selector(opt.selectName, () => layer.refresh()),
-			style: style_,
-
-			// browserClusterMinResolution: 50, // Resolution above which the browser clusterises
-
+			clusterStylesOptions: clusterStylesOptions,
 			...opt,
 		};
 
+		// Low resolutions layer
+		// Use a vector source to get the data
+		// or a cluster source and a vector source to manages clusters
 		super({
-			source: options.browserClusterMinResolution ?
-				new BrowserClusterSource(options) : new MyVectorSource(options),
+			source: options.browserClusterMinDistance ?
+				new MyClusterSource(options) : new MyVectorSource(options),
+			maxResolution: options.serverClusterMinResolution,
+			style: style_,
 			...options,
 		});
 
-		const layer = this; // For use in functions
-		this.options = options; // Mem for further use
-		layer.refresh();
+		// High resolutions server cluster layer
+		// Use one layer to display the normal data at low resolutions
+		// and another to get and display the clusters delivered by the server at hight resolutions
+		if (options.serverClusterMinResolution)
+			this.altLayer = new VectorLayer({
+				source: new MyClusterSource(options), // Always use cluster source ihn that case
+				minResolution: options.serverClusterMinResolution,
+				style: style_,
+				...options,
+			});
+
+		const layer = this; // For use in style function
 
 		function style_(feature, resolution, hoveredFeature) {
 			const properties = feature.getProperties(),
 				stylesOptionsFunction = properties.cluster ?
-				clusterStylesOptions :
+				options.clusterStylesOptions :
 				options.stylesOptions;
 
 			// Function returning an array of styles options
@@ -200,49 +211,58 @@ class BrowserClusterVectorLayer extends VectorLayer {
 
 	//HACK execute actions on Map init
 	setMapInternal(map) {
-		if (this.options.altLayer)
-			map.addLayer(this.options.altLayer);
-
-		attachMouseListener(map);
+		if (this.altLayer)
+			map.addLayer(this.altLayer);
 
 		return super.setMapInternal(map);
 	}
 
-	// Refresh the layer when the url need to change
-	refresh() {
-		const selection = this.options.selector.getSelection();
-
-		this.setVisible(selection.length);
-		if (selection.length)
+	// Hide or call the url when selection change
+	refresh(visible) {
+		this.setVisible(visible);
+		if (visible) //TODO
 			this.getSource().refresh();
 
-		if (this.options.altLayer)
-			this.options.altLayer.refresh();
+		if (this.altLayer) {
+			this.altLayer.setVisible(visible);
+			if (visible)
+				this.altLayer.getSource().refresh();
+		}
 	}
 }
 
-/* Server clustered source
-   This uses one layer to display the normal data at low resolutions
-   and another to get and display the clusters delivered by the server at hight resolutions
-*/
-export class MyVectorLayer extends BrowserClusterVectorLayer {
-	constructor(options) {
-		// Resolution above which we ask clusters to the server
-		if (options.serverClusterMinResolution)
-			options.altLayer = new BrowserClusterVectorLayer({
-				...options,
-				minResolution: options.serverClusterMinResolution,
-			});
+/**
+ * Facilities added vector layer
+ * Style customisation
+ * Hover & click management
+ */
+export class MyVectorLayer extends MyClusterVectorLayer {
+	constructor(opt) {
+		const options = {
+			convertProperties: p => p, // Translate properties to standard MyOl
 
-		// Low resolutions layer
-		super({
-			...options,
-			maxResolution: options.serverClusterMinResolution,
-		});
+			...opt,
+		};
+
+		super(options);
+		this.options = options; // Mem for further use
+		this.selector = new Selector(opt.selectName, selection => super.refresh(selection.length));
+	}
+
+	refresh() { //TODO
+		super.refresh(this.selector.getSelection().length);
+	}
+
+	//HACK execute actions on Map init
+	setMapInternal(map) {
+		attachMouseListener(map);
+		return super.setMapInternal(map);
 	}
 }
 
-// Hover & click management
+/**
+ * Hover & click management
+ */
 function attachMouseListener(map) {
 	// Attach one hover & click listener to each map
 	if (!(map.getListeners() || []).includes(mouseListener)) { // Only once for each map
@@ -386,8 +406,7 @@ export function basicStylesOptions(feature, resolution, hover, layer) {
 
 export function labelStylesOptions(feature, _, hover, layer) {
 	const properties = layer.options.convertProperties(feature.getProperties()),
-		elLabel = document.createElement('span'),
-		isPoint = !properties.geometry || properties.geometry.getType() == 'Point';
+		elLabel = document.createElement('span');
 
 	if (properties.cluster)
 		properties.attribution = null;
@@ -408,8 +427,8 @@ export function labelStylesOptions(feature, _, hover, layer) {
 			text: new Text({
 				text: elLabel.innerHTML,
 				//BEST line & poly label following the cursor
-				textBaseline: isPoint ? 'bottom' : 'middle',
-				offsetY: isPoint ? -13 : 0, // Above the icon
+				textBaseline: properties.icon ? 'bottom' : 'middle',
+				offsetY: properties.icon ? -13 : 0, // Above the icon
 				padding: [1, 1, -1, 3],
 				font: '12px Verdana',
 				overflow: hover,
@@ -434,23 +453,24 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 		// Low resolution : separated icons
 		let x = 0.95 + 0.45 * properties.cluster;
 
-		properties.features.forEach(f => {
-			const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
+		if (properties.features)
+			properties.features.forEach(f => {
+				const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
 
-			if (styles.length) {
-				const image = styles[0].getImage();
+				if (styles.length) {
+					const image = styles[0].getImage();
 
-				if (image) {
-					image.setAnchor([x -= 0.9, 0.5]);
-					f.setProperties({ // Mem the shift for hover detection
-						xLeft: (1 - x) * image.getImage().width,
-					}, true);
-					so.push({
-						image: image,
-					});
+					if (image) {
+						image.setAnchor([x -= 0.9, 0.5]);
+						f.setProperties({ // Mem the shift for hover detection
+							xLeft: (1 - x) * image.getImage().width,
+						}, true);
+						so.push({
+							image: image,
+						});
+					}
 				}
-			}
-		});
+			});
 
 		so.push(labelStylesOptions(hoverfeature || feature, resolution, hoverfeature, layer));
 	}
@@ -564,8 +584,8 @@ export class Selector {
 		else
 			delete localStorage[this.safeName];
 
-		if (evt && this.callBack)
-			this.callBack(this.getSelection());
+		//if (evt && typeof this.callBack == 'function') //TODO
+		this.callBack(this.getSelection());
 	}
 
 	getSelection() {

@@ -1,20 +1,3 @@
-// pyrenees-refuges.com
-//BEST make it a class
-export function layerPrc(options) {
-	return layerVectorCluster({
-		url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-		convertProperties: properties => ({
-			type: properties.type_hebergement,
-			url: properties.url,
-			icon: chemIconUrl(properties.type_hebergement),
-			ele: properties.altitude,
-			capacity: properties.cap_ete,
-			attribution: '&copy;Pyrenees-Refuges',
-		}),
-		...options,
-	});
-}
-
 // camptocamp.org
 //BEST make it a class
 export function layerC2C(options) {

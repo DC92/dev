@@ -27,25 +27,24 @@ export class LayerChemineur extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//chemineur.fr/',
-			browserClusterMinResolution: 50,
+			browserClusterMinDistance: 50,
 			serverClusterMinResolution: 100,
-			featurePixelMinPerimeter: 300,
+			browserClusterFeaturelMaxPerimeter: 300,
 			...opt,
 		};
 
 		super({
 			...options,
 
-			query: (queryOptions) => ({
+			query: (queryOptions, _, resolution) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: queryOptions.selector.getSelection(),
-				layer: queryOptions.altLayer ? null : 'cluster', // For server cluster layer
+				cat: this.selector.getSelection(),
+				layer: resolution < options.serverClusterMinResolution ? null : 'cluster', // For server cluster layer
 			}),
 
 			convertProperties: (properties) => ({
 				...properties,
-				icon: options.host + 'ext/Dominique92/GeoBB/icones/' +
-					(properties.type || 'a63') + '.svg',
+				icon: chemIconUrl(properties.type, options.host),
 				link: options.host + 'viewtopic.php?t=' + properties.id,
 				attribution: '&copy;chemineur.fr',
 			}),
@@ -53,13 +52,26 @@ export class LayerChemineur extends MyVectorLayer {
 	}
 };
 
+// Get icon from chemineur.fr
+export function chemIconUrl(type, host) {
+	if (type) {
+		const icons = type.split(' ');
+
+		return (host || '//chemineur.fr/') +
+			'ext/Dominique92/GeoBB/icones/' +
+			icons[0] +
+			(icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
+			'.svg';
+	}
+}
+
 // alpages.info
 export class LayerAlpages extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//alpages.info/',
-			browserClusterMinResolution: 50,
-			featurePixelMinPerimeter: 300,
+			browserClusterMinDistance: 50,
+			browserClusterFeaturelMaxPerimeter: 300,
 			...opt,
 		};
 
@@ -68,7 +80,7 @@ export class LayerAlpages extends MyVectorLayer {
 
 			query: (queryOptions) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				forums: queryOptions.selector.getSelection(),
+				forums: this.selector.getSelection(),
 			}),
 
 			convertProperties: (properties) => ({
@@ -81,27 +93,38 @@ export class LayerAlpages extends MyVectorLayer {
 	}
 }
 
-// Get icon from chemineur.fr
-export function chemIconUrl(type) {
-	const icons = (type || 'a63').split(' ');
+// pyrenees-refuges.com
+export class LayerPrc extends MyVectorLayer {
+	constructor(options) {
+		super({
+			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
+			strategy: all,
+			browserClusterMinDistance: 50,
+			...options,
 
-	return '//chemineur.fr/ext/Dominique92/GeoBB/icones/' +
-		icons[0] +
-		(icons.length > 1 ? '_' + icons[1] : '') + // Limit to 2 type names & ' ' -> '_'
-		'.svg';
+			convertProperties: (properties) => ({
+				...properties,
+				type: properties.type_hebergement,
+				icon: chemIconUrl(properties.type_hebergement),
+				ele: properties.altitude,
+				capacity: properties.cap_ete,
+				link: properties.url,
+				attribution: '&copy;Pyrenees-Refuges',
+			}),
+		});
+	}
 }
 
 // refuges.info
 export class LayerWri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
-				host: '//dom.refuges.info/', //TODO www
-				browserClusterMinResolution: 50,
-				serverClusterMinResolution: 100,
-				convertProperties: () => {}, // For inheritance
-				...opt,
-			},
-			massifSelector = new Selector(opt.selectMassifName, () => layer.refresh());
+			host: '//dom.refuges.info/', //TODO www
+			browserClusterMinDistance: 50,
+			serverClusterMinResolution: 100,
+			convertProperties: () => {}, // For inheritance
+			...opt,
+		};
 
 		super({
 			...options,
@@ -111,15 +134,22 @@ export class LayerWri extends MyVectorLayer {
 
 		const layer = this; // For use in Selector callBack
 
-		function query_(queryOptions) {
-			const selection = massifSelector.getSelection();
+		this.massifSelector = new Selector(opt.selectMassifName, function(selection) {
+
+			//	this.refresh(this.selector.getSelection().length);
+			layer.refresh();
+		});
+
+
+		function query_(queryOptions, _, resolution) {
+			const selectionMassif = layer.massifSelector.getSelection();
 
 			return {
-				_path: selection.length ? 'api/massif' : 'api/bbox',
-				massif: selection,
+				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
+				massif: selectionMassif,
 				nb_points: 'all',
-				type_points: queryOptions.selector.getSelection(),
-				cluster: queryOptions.altLayer ? null : 0.1, // For server cluster layer
+				type_points: layer.selector.getSelection(),
+				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
 			};
 		}
 

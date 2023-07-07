@@ -111,9 +111,10 @@ import {
 
 // MyOl
 import {
-	LayerWri,
-	LayerChemineur,
 	LayerAlpages,
+	LayerChemineur,
+	LayerPrc,
+	LayerWri,
 	layerWriAreas,
 } from '../src/VectorLayerCollection';
 
@@ -123,8 +124,9 @@ import {
 new Map({
 	target: 'map',
 	view: new View({
-		center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'),
-		zoom: 12,
+		center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Grenoble
+		//center: transform([1.2, 42.5], 'EPSG:4326', 'EPSG:3857'), // Ariège
+		zoom: 11,
 	}),
 	layers: [
 		// Background layer
@@ -133,13 +135,22 @@ new Map({
 		}),
 
 		// Vector layers
+		new LayerChemineur({
+			selectName: 'select-chem',
+		}),
+		new LayerAlpages({
+			selectName: 'select-alpages',
+		}),
+		new LayerPrc({
+			selectName: 'select-prc',
+		}),
 		new LayerWri({
 			selectName: 'select-wri',
 			selectMassifName: 'select-massif',
 		}),
-		new LayerWri({
+		new LayerWri({ // Specific display for refuges.info
 			selectName: 'select-refuges',
-			spreadClusterMaxResolution: 20,
+			spreadClusterMaxResolution: 20, //TODO BUG always display spread icons
 
 			convertProperties: properties => ({
 				label: properties.nom || properties.name, // Always display the name
@@ -149,17 +160,8 @@ new Map({
 		new layerWriAreas({
 			selectName: 'select-massifs',
 		}),
-		new LayerChemineur({
-			selectName: 'select-chem',
-		}),
-		new LayerAlpages({
-			selectName: 'select-alpages',
-		}),
+
 		/*
-		...vectorLayerCollection({
-			prc: {
-				selectName: 'select-prc',
-			},
 			c2c: {
 				selectName: 'select-c2c',
 			},
@@ -169,8 +171,6 @@ new Map({
 			osm: {
 				selectName: 'select-osm',
 			},
-		}),
-		// WRI area layer for refuges.info
 		*/
 	],
 });
