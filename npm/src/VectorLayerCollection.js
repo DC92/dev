@@ -129,17 +129,12 @@ export class LayerWri extends MyVectorLayer {
 		super({
 			...options,
 			query: query_,
-			convertProperties: convertProperties_,
+			convertProperties: convertProperties_, // This class
 		});
 
-		const layer = this; // For use in Selector callBack
+		this.massifSelector = new Selector(opt.selectMassifName, () => this.refresh(this.selector.getSelection().length, true));
 
-		this.massifSelector = new Selector(opt.selectMassifName, function(selection) {
-
-			//	this.refresh(this.selector.getSelection().length);
-			//layer.refresh(); //TODO
-		});
-
+		const layer = this; // For use in query_
 
 		function query_(queryOptions, _, resolution) {
 			const selectionMassif = layer.massifSelector.getSelection();
@@ -167,7 +162,7 @@ export class LayerWri extends MyVectorLayer {
 
 			return {
 				...properties,
-				...options.convertProperties(properties), // Inheritance
+				...options.convertProperties(properties), // Inherited
 			};
 		}
 	}
