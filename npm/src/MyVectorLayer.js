@@ -104,10 +104,6 @@ class MyClusterSource extends Cluster {
 			createCluster: createCluster_,
 		});
 
-		// Redirect the refresh method to the wrapped source
-		//TODO generate 2 url calls at init
-		//this.refresh = () => this.getSource().refresh();
-
 		// Generate a center point where display the cluster
 		function geometryFunction_(feature) {
 			const geometry = feature.getGeometry();
@@ -156,6 +152,9 @@ class MyClusterSource extends Cluster {
 				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
 			});
 		}
+
+		// Redirect the refresh method to the wrapped source
+		this.refresh = () => this.getSource().refresh();
 	}
 }
 
@@ -195,25 +194,14 @@ class MyBrowserVectorLayer extends VectorLayer {
 				.map(so => new Style(so)); // Transform into an array of Style objects
 		}
 	}
-	/*
-	// Hide or call the url when selection change
-	refresh(visible) {//TODO
-	}
 
 	// Hide or call the url when the selection changes
-	refresh(visible) {//TODO
-	//return;
+	refresh(visible, reload) {
 		this.setVisible(visible);
-		if (visible) //TODO
-			this.getSource().refresh();
 
-		if (this.altLayer) {
-			this.altLayer.setVisible(visible);
-			if (visible)
-				this.altLayer.getSource().refresh();
-		}
+		if (visible && reload)
+			this.getSource().refresh();
 	}
-	*/
 }
 
 class MyClusterVectorLayer extends MyBrowserVectorLayer {
@@ -238,6 +226,13 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
 		return super.setMapInternal(map);
 	}
 
+	// Propagate the refresh to the altLayer
+	refresh(visible, reload) {
+		super.refresh(visible, reload);
+
+		if (this.altLayer)
+			this.altLayer.refresh(visible, reload);
+	}
 }
 
 /**
@@ -246,29 +241,22 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
  * Hover & click management
  */
 export class MyVectorLayer extends MyClusterVectorLayer {
-	constructor(opt) {
-		const options = {
-			convertProperties: p => p, // Translate properties to standard MyOl
+	constructor(options) {
+		super({
+			//TODO ??? convertProperties: p => p, // Translate properties to standard MyOl
+			...options,
+		});
 
-			...opt,
-		};
-
-		super(options);
-		//this.selector = new Selector(opt.selectName/*, selection => super.refresh(selection.length)*/); //TODO
-		this.selector = new Selector(opt.selectName, toto);
-		this.setVisible(this.selector.getSelection().length);
-
-		function toto(s) { //TODO
-		}
+		this.selector = new Selector(options.selectName, selection => {
+			this.refresh(selection.length, true)
+		});
+		this.refresh(this.selector.getSelection().length); // Hide the layer if no selection at the init
 	}
-	/*
-		refresh() { //TODO
-			super.refresh(this.selector.getSelection().length);
-		}
-	*/
+
 	//HACK execute actions on Map init
 	setMapInternal(map) {
 		attachMouseListener(map);
+
 		return super.setMapInternal(map);
 	}
 }
@@ -597,8 +585,7 @@ export class Selector {
 		else
 			delete localStorage[this.safeName];
 
-		//if (evt && typeof this.callBack == 'function') //TODO
-		if (typeof this.callBack == 'function')
+		if (evt && typeof this.callBack == 'function')
 			this.callBack(this.getSelection());
 	}
 

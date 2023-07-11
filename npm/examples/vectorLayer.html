@@ -125,7 +125,6 @@ new Map({
 	target: 'map',
 	view: new View({
 		center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Grenoble
-		//center: transform([1.2, 42.5], 'EPSG:4326', 'EPSG:3857'), // Ariège
 		zoom: 11,
 	}),
 	layers: [
@@ -162,15 +161,15 @@ new Map({
 		}),
 
 		/*
-			c2c: {
-				selectName: 'select-c2c',
-			},
-			wri: {
-				selectName: 'select-wri,select-massif', // 2 selectors for one layer
-			},
-			osm: {
-				selectName: 'select-osm',
-			},
+		c2c: {
+			selectName: 'select-c2c',
+		},
+		wri: {
+			selectName: 'select-wri,select-massif', // 2 selectors for one layer
+		},
+		osm: {
+			selectName: 'select-osm',
+		},
 		*/
 	],
 });
