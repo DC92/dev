@@ -5,6 +5,7 @@
 
 // Openlayers
 import 'ol/ol.css';
+import GeoJSON from 'ol/format/GeoJSON.js';
 import OSMXML from 'ol/format/OSMXML.js'; //TODO used ?
 import {
 	all,
@@ -53,7 +54,7 @@ export class LayerChemineur extends MyVectorLayer {
 };
 
 // Get icon from chemineur.fr
-export function chemIconUrl(type, host) {
+function chemIconUrl(type, host) {
 	if (type) {
 		const icons = type.split(' ');
 
@@ -112,6 +113,55 @@ export class LayerPrc extends MyVectorLayer {
 				attribution: '&copy;Pyrenees-Refuges',
 			}),
 		});
+	}
+}
+
+// CampToCamp.org
+export class LayerC2C extends MyVectorLayer {
+	constructor(options) {
+		const format_ = new GeoJSON({ // Format of received data
+			dataProjection: 'EPSG:3857',
+		});
+
+		super({
+			host: 'https://api.camptocamp.org/',
+			query: () => ({
+				_path: 'waypoints',
+				wtyp: this.selector.getSelection(),
+			}),
+			projection: 'EPSG:3857',
+			format: format_,
+			browserClusterMinDistance: 50,
+			...options,
+		});
+
+		format_.readFeatures = function(json, opt) {
+			const features = [],
+				objects = JSON.parse(json);
+
+			for (let o in objects.documents) {
+				const properties = objects.documents[o];
+
+				features.push({
+					id: properties.document_id,
+					type: 'Feature',
+					geometry: JSON.parse(properties.geometry.geom),
+					properties: {
+						name: properties.locales[0].title,
+						type: properties.waypoint_type,
+						icon: chemIconUrl(properties.waypoint_type),
+						ele: properties.elevation,
+						link: '//www.camptocamp.org/waypoints/' + properties.document_id,
+						attribution: '&copy;Camp2camp',
+					},
+				});
+			}
+
+			return format_.readFeaturesFromObject({
+				type: 'FeatureCollection',
+				features: features,
+			});
+		};
 	}
 }
 

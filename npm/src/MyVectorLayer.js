@@ -42,13 +42,17 @@ class MyVectorSource extends VectorSource {
 				url: url_,
 				strategy: bbox,
 				bbox: bbox_,
-				format: new GeoJSON(),
 				projection: 'EPSG:4326',
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
 
-		super(options);
+		super({
+			format: new GeoJSON({
+				dataProjection: options.projection,
+			}),
+			...options,
+		});
 
 		// Display loading status
 		if (statusEl)
@@ -243,7 +247,7 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
 export class MyVectorLayer extends MyClusterVectorLayer {
 	constructor(options) {
 		super({
-			//TODO ??? convertProperties: p => p, // Translate properties to standard MyOl
+			convertProperties: p => p, // Translate properties to standard MyOl
 			...options,
 		});
 

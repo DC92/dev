@@ -34,7 +34,7 @@ Based on https://openlayers.org
 			<span id="select-chem-status"></span>
 		</label><br /><label>
 			Camptocamp.org
-			<input type="checkbox" name="select-c2c" />
+			<input type="checkbox" name="select-c2c" value="hut,shelter,gite,waterpoint,cave,waterfall,bivouac,camp_site" />
 			<span id="select-c2c-status"></span>
 		</label>
 		<div>Only 100 features at a time</div>
@@ -114,6 +114,7 @@ import {
 	LayerAlpages,
 	LayerChemineur,
 	LayerPrc,
+	LayerC2C,
 	LayerWri,
 	layerWriAreas,
 } from '../src/VectorLayerCollection';
@@ -147,6 +148,9 @@ new Map({
 			selectName: 'select-wri',
 			selectMassifName: 'select-massif',
 		}),
+		new LayerC2C({
+			selectName: 'select-c2c',
+		}),
 		new LayerWri({ // Specific display for refuges.info
 			selectName: 'select-refuges',
 			spreadClusterMaxResolution: 20, //TODO BUG always display spread icons
@@ -161,12 +165,6 @@ new Map({
 		}),
 
 		/*
-		c2c: {
-			selectName: 'select-c2c',
-		},
-		wri: {
-			selectName: 'select-wri,select-massif', // 2 selectors for one layer
-		},
 		osm: {
 			selectName: 'select-osm',
 		},
