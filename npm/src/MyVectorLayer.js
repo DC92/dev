@@ -372,7 +372,6 @@ function mouseListener(evt) {
 			hoveredFeature.setStyle((feature, resolution) =>
 				hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
 			);
-			//TODO zIndex
 		}
 	}
 	// Reset Style & cursor
@@ -447,6 +446,7 @@ export function labelStylesOptions(feature, _, hover, layer) {
 					color: 'blue',
 				}),
 			}),
+			zIndex: 100,
 		};
 }
 
@@ -498,17 +498,16 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 				text: properties.cluster.toString(),
 				font: '12px Verdana',
 			}),
-			//TODO text zIndex ?
 		});
 	}
 	return so;
 }
 
+//TODO DELETE
 /**
   Styles Options are an array of objects containing style options
   When concatenate, the first stylesOptions object is merged while the others are added
-*/
-function concatenateStylesOptions() { //TODO DELETE
+function concatenateStylesOptions() {
 	// First argument becomes the base of the result
 	const r = [...arguments[0]];
 
@@ -527,6 +526,7 @@ function concatenateStylesOptions() { //TODO DELETE
 	}
 	return r;
 }
+*/
 
 // Simplify & aggregate an array of lines
 function agregateText(lines, glue) {
