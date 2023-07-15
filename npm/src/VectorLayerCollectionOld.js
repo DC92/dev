@@ -132,3 +132,29 @@ export function vectorLayerCollection(options) {
 		layerAlpages(options.alpages),
 	];
 }
+
+
+//TODO DELETE
+/**
+  Styles Options are an array of objects containing style options
+  When concatenate, the first stylesOptions object is merged while the others are added
+function concatenateStylesOptions() {
+	// First argument becomes the base of the result
+	const r = [...arguments[0]];
+
+	// Others arguments are added
+	for (var i = 1; i < arguments.length; i++) {
+		// First stylesOptions are concatenated
+		r[0] = {
+			...r[0],
+			...arguments[i][0],
+		};
+
+		// Other stylesOptions are added
+		for (var j = 1; j < arguments[i].length; j++) {
+			r.push(arguments[i][j]);
+		}
+	}
+	return r;
+}
+*/

@@ -222,8 +222,7 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
 			});
 	}
 
-	//HACK execute actions on Map init
-	setMapInternal(map) {
+	setMapInternal(map) { //HACK execute actions on Map init
 		if (this.altLayer)
 			map.addLayer(this.altLayer);
 
@@ -247,7 +246,7 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
 export class MyVectorLayer extends MyClusterVectorLayer {
 	constructor(options) {
 		super({
-			convertProperties: p => p, // Translate properties to standard MyOl
+			convertProperties: p => p, // Translate properties to standard MyOl //TODO why not 
 			...options,
 		});
 
@@ -256,132 +255,135 @@ export class MyVectorLayer extends MyClusterVectorLayer {
 		});
 		this.refresh(this.selector.getSelection().length); // Hide the layer if no selection at the init
 	}
-
-	//HACK execute actions on Map init
-	setMapInternal(map) {
-		attachMouseListener(map);
-
-		return super.setMapInternal(map);
-	}
 }
 
 /**
  * Hover & click management
+ * Display the hovered feature with the hover style
+ * Go to the link property when click a feature
  */
-function attachMouseListener(map) {
-	// Attach one hover & click listener to each map
-	if (!(map.getListeners() || []).includes(mouseListener)) { // Only once for each map
-		map.on(['pointermove', 'click'], mouseListener);
+export class HoverLayer extends VectorLayer {
+	constructor() {
+		super({
+			source: new VectorSource(),
+			zIndex: 200,
+		});
+	}
+
+	// Attach an hover & click listener to the map
+	setMapInternal(map) { //HACK execute actions on Map init
+		// Basic listeners
+		map.on(['pointermove', 'click'], evt => this.mouseListener(evt));
+
+		// Leaving the map reset hovering
 		window.addEventListener('mousemove', evt => {
-			// Leaving the map reset hovering
 			const divRect = map.getTargetElement().getBoundingClientRect();
 
 			// The mouse is outside of the map
 			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				mouseListener({
-					map: map,
-					originalEvent: {
-						clientX: 10000, // Outside of the map
-						clientY: 10000,
-					},
-				});
+				this.getSource().clear()
 		});
+
+		return super.setMapInternal(map);
 	}
-}
 
-function mouseListener(evt) {
-	const map = evt.map;
+	mouseListener(evt) {
+		const map = evt.map,
+			source = this.getSource();
 
-	// Find the first hovered feature & layer
-	let hoveredLayer = null,
-		hoveredFeature = map.forEachFeatureAtPixel(
-			map.getEventPixel(evt.originalEvent),
-			function(f, l) {
-				if (l && l.options) {
-					hoveredLayer = l;
-					return f; // Return feature & stop the search
+		// Find the first hovered feature & layer
+		let hoveredLayer = null,
+			hoveredFeature = map.forEachFeatureAtPixel(
+				map.getEventPixel(evt.originalEvent),
+				function(f, l) {
+					if (l && l.options) {
+						hoveredLayer = l;
+						return f; // Return feature & stop the search
+					}
+				}, {
+					hitTolerance: 6, // For lines / Default 0
 				}
-			}, {
-				hitTolerance: 6, // For lines / Default 0
-			}
-		),
-		hoveredSubFeature = hoveredFeature;
-
-	if (hoveredFeature) {
-		const hoveredProperties = hoveredLayer.options.convertProperties(
-				hoveredFeature.getProperties()
 			),
-			featurePosition = map.getPixelFromCoordinate(
-				getCenter(hoveredFeature.getGeometry().getExtent())
+			hoveredSubFeature = hoveredFeature;
+
+		if (hoveredFeature) {
+			const hoveredProperties = hoveredLayer.options.convertProperties(
+					hoveredFeature.getProperties()
+				),
+				featurePosition = map.getPixelFromCoordinate(
+					getCenter(hoveredFeature.getGeometry().getExtent())
+				);
+
+			// Find sub-feature from a spread cluster
+			if (hoveredProperties.cluster) {
+				hoveredProperties.features.every(f => {
+					const p = f.getProperties();
+
+					// Only for spread clusters
+					if (p.xLeft)
+						hoveredSubFeature = f;
+
+					// Stop when found
+					return evt.originalEvent.layerX >
+						featurePosition[0] + p.xLeft;
+				});
+			}
+
+			const hoveredSubProperties = hoveredLayer.options.convertProperties(
+				hoveredSubFeature.getProperties()
 			);
 
-		// Find sub-feature from a spread cluster
-		if (hoveredProperties.cluster) {
-			hoveredProperties.features.every(f => {
-				const p = f.getProperties();
-
-				// Only for spread clusters
-				if (p.xLeft)
-					hoveredSubFeature = f;
-
-				// Stop when found
-				return evt.originalEvent.layerX >
-					featurePosition[0] + p.xLeft;
-			});
-		}
-
-		const hoveredSubProperties = hoveredLayer.options.convertProperties(
-			hoveredSubFeature.getProperties()
-		);
-
-		// Click
-		if (evt.type == 'click') {
-			// Click cluster
-			if (hoveredProperties.cluster)
-				map.getView().animate({
-					zoom: map.getView().getZoom() + 2,
-					center: hoveredProperties.geometry.getCoordinates(),
-				});
-			// Click link
-			else if (hoveredSubProperties.link) {
-				// Open a new tag
-				if (evt.originalEvent.ctrlKey)
-					window.open(hoveredSubProperties.link, '_blank').focus();
-				else
-					// Open a new window
-					if (evt.originalEvent.shiftKey)
-						window.open(hoveredSubProperties.link, '_blank', 'resizable=yes').focus();
-					// Go on the same window
+			// Click
+			if (evt.type == 'click') {
+				// Click cluster
+				if (hoveredProperties.cluster)
+					map.getView().animate({
+						zoom: map.getView().getZoom() + 2,
+						center: hoveredProperties.geometry.getCoordinates(),
+					});
+				// Click link
+				else if (hoveredSubProperties.link) {
+					// Open a new tag
+					if (evt.originalEvent.ctrlKey)
+						window.open(hoveredSubProperties.link, '_blank').focus();
 					else
-						window.location.href = hoveredSubProperties.link;
+						// Open a new window
+						if (evt.originalEvent.shiftKey)
+							window.open(hoveredSubProperties.link, '_blank', 'resizable=yes').focus();
+						// Go on the same window
+						else
+							window.location.href = hoveredSubProperties.link;
+				}
+			}
+			// Hover
+			else if (hoveredSubFeature != map.lastHoveredSubFeature) {
+				// Add the hovered feature to the hoverLayer
+				source.clear();
+				source.addFeature(hoveredSubFeature);
+
+				// Set style
+				this.setStyle(new Style(
+					labelStylesOptions(hoveredSubFeature, undefined, true, hoveredLayer)
+				));
+
+				// Set cursor
+				map.getViewport().style.cursor =
+					hoveredProperties.link || hoveredProperties.cluster ?
+					'pointer' :
+					'';
 			}
 		}
-		// Hover
-		else if (hoveredSubFeature != map.lastHoveredSubFeature) {
-			map.getViewport().style.cursor =
-				hoveredProperties.link || hoveredProperties.cluster ?
-				'pointer' :
-				'';
-
-			// Remove previous style
-			if (map.lastHoveredFeature)
-				map.lastHoveredFeature.setStyle();
-
-			// Set the feature style to the style function with the hoveredFeature set
-			hoveredFeature.setStyle((feature, resolution) =>
-				hoveredLayer.getStyleFunction()(feature, resolution, hoveredSubFeature)
-			);
+		// Reset hoverLayer, style & cursor
+		else {
+			source.clear();
+			this.setStyle();
+			map.getViewport().style.cursor = '';
 		}
+
+		// Mem hovered feature for next change
+		map.lastHoveredSubFeature = hoveredSubFeature;
 	}
-	// Reset Style & cursor
-	else {
-		map.getViewport().style.cursor = '';
-		if (map.lastHoveredFeature)
-			map.lastHoveredFeature.setStyle();
-	}
-	map.lastHoveredFeature = hoveredFeature;
-	map.lastHoveredSubFeature = hoveredSubFeature;
 }
 
 /**
@@ -416,7 +418,7 @@ export function labelStylesOptions(feature, _, hover, layer) {
 		properties.attribution = null;
 
 	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = hover ? agregateText([
+	elLabel.innerHTML = hover ? agregateText([ //TODO put that on convertProperties ???
 		properties.name,
 		agregateText([
 			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
@@ -502,31 +504,6 @@ export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
 	}
 	return so;
 }
-
-//TODO DELETE
-/**
-  Styles Options are an array of objects containing style options
-  When concatenate, the first stylesOptions object is merged while the others are added
-function concatenateStylesOptions() {
-	// First argument becomes the base of the result
-	const r = [...arguments[0]];
-
-	// Others arguments are added
-	for (var i = 1; i < arguments.length; i++) {
-		// First stylesOptions are concatenated
-		r[0] = {
-			...r[0],
-			...arguments[i][0],
-		};
-
-		// Other stylesOptions are added
-		for (var j = 1; j < arguments[i].length; j++) {
-			r.push(arguments[i][j]);
-		}
-	}
-	return r;
-}
-*/
 
 // Simplify & aggregate an array of lines
 function agregateText(lines, glue) {

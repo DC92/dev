@@ -111,6 +111,9 @@ import {
 
 // MyOl
 import {
+	HoverLayer,
+} from '../src/MyVectorLayer';
+import {
 	LayerAlpages,
 	LayerChemineur,
 	LayerPrc,
@@ -152,6 +155,7 @@ new Map({
 			selectName: 'select-c2c',
 		}),
 		new LayerWri({ // Specific display for refuges.info
+			//TODO BUG label
 			selectName: 'select-refuges',
 			spreadClusterMaxResolution: 20, //TODO BUG always display spread icons
 
@@ -169,6 +173,7 @@ new Map({
 			selectName: 'select-osm',
 		},
 		*/
+		new HoverLayer(),
 	],
 });
 	</script>
