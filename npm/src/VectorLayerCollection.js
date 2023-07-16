@@ -6,7 +6,7 @@
 // Openlayers
 import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON.js';
-import OSMXML from 'ol/format/OSMXML.js'; //TODO used ?
+import OSMXML from 'ol/format/OSMXML.js';
 import {
 	all,
 } from 'ol/loadingstrategy.js';

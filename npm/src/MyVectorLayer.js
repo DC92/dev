@@ -166,6 +166,7 @@ class MyClusterSource extends Cluster {
  * Browser & server clustered layer
  */
 class MyBrowserVectorLayer extends VectorLayer {
+	//TODO bug appelle 2 foids l'url
 	constructor(opt) {
 		const options = {
 			//browserClusterMinDistance:50, // Distance above which the browser clusterises
