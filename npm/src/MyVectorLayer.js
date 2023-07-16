@@ -72,16 +72,16 @@ class MyVectorSource extends VectorSource {
 
 		function url_(extent, resolution, projection) {
 			const query = options.query(options, ...arguments),
-				url = options.host + query._path;
+				url = options.host + query._path; // Mem _path
+
+			if (options.strategy == bbox)
+				query.bbox = options.bbox(...arguments);
 
 			// Clean null & not relative parameters
 			Object.keys(query).forEach(k => {
 				if (k == '_path' || query[k] == 'on' || !query[k] || !query[k].toString())
 					delete query[k];
 			});
-
-			if (options.strategy == bbox)
-				query.bbox = options.bbox(...arguments);
 
 			return url + '?' + new URLSearchParams(query).toString();
 		}
@@ -91,7 +91,7 @@ class MyVectorSource extends VectorSource {
 				extent,
 				mapProjection,
 				options.projection, // Received projection
-			).map(c => c.toFixed(4)); // Round to 4 digits
+			).map(c => c.toPrecision(6)); // Limit the number of digits
 		}
 	}
 }

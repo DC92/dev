@@ -114,12 +114,13 @@ import {
 	HoverLayer,
 } from '../src/MyVectorLayer';
 import {
+	LayerWri,
+	layerWriAreas,
 	LayerAlpages,
 	LayerChemineur,
 	LayerPrc,
 	LayerC2C,
-	LayerWri,
-	layerWriAreas,
+	LayerOverpass,
 } from '../src/VectorLayerCollection';
 
 
@@ -128,8 +129,9 @@ import {
 new Map({
 	target: 'map',
 	view: new View({
-		center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Grenoble
-		zoom: 11,
+		//center: transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Grenoble
+		center: transform([5.72, 45.17], 'EPSG:4326', 'EPSG:3857'), // Grenoble
+		zoom: 14,
 	}),
 	layers: [
 		// Background layer
@@ -138,21 +140,9 @@ new Map({
 		}),
 
 		// Vector layers
-		new LayerChemineur({
-			selectName: 'select-chem',
-		}),
-		new LayerAlpages({
-			selectName: 'select-alpages',
-		}),
-		new LayerPrc({
-			selectName: 'select-prc',
-		}),
 		new LayerWri({
 			selectName: 'select-wri',
 			selectMassifName: 'select-massif',
-		}),
-		new LayerC2C({
-			selectName: 'select-c2c',
 		}),
 		new LayerWri({ // Specific display for refuges.info
 			//TODO BUG label
@@ -168,11 +158,22 @@ new Map({
 			selectName: 'select-massifs',
 		}),
 
-		/*
-		osm: {
+		new LayerChemineur({
+			selectName: 'select-chem',
+		}),
+		new LayerAlpages({
+			selectName: 'select-alpages',
+		}),
+		new LayerPrc({
+			selectName: 'select-prc',
+		}),
+		new LayerC2C({
+			selectName: 'select-c2c',
+		}),
+		new LayerOverpass({
 			selectName: 'select-osm',
-		},
-		*/
+		}),
+
 		new HoverLayer(),
 	],
 });
