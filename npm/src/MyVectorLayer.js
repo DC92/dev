@@ -38,10 +38,10 @@ class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
 				// host: '',
-				// query: (options, extent, resolution, projection) => ({_path: '...'}),
-				url: url_,
+				// query: (extent, resolution, mapProjection) => ({_path: '...'}), // this = options
+				url: url_, // (extent, resolution, mapProjection)
 				strategy: bbox,
-				bbox: bbox_,
+				bbox: bbox_, // (extent, resolution, mapProjection)
 				projection: 'EPSG:4326',
 				...opt,
 			},
@@ -56,7 +56,7 @@ class MyVectorSource extends VectorSource {
 
 		// Display loading status
 		if (statusEl)
-			this.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], function(evt) {
+			this.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], evt => {
 				if (!statusEl.textContent.includes('error'))
 					statusEl.innerHTML = '';
 
@@ -65,28 +65,28 @@ class MyVectorSource extends VectorSource {
 						statusEl.innerHTML = '&#8987;';
 						break;
 					case 'featuresloaderror':
-						statusEl.innerHTML = 'Erreur !';
+						statusEl.innerHTML = '&#9888;';
 						//BEST status out of zoom bounds
 				}
 			});
 
-		function url_(extent, resolution, projection) {
-			const query = options.query(options, ...arguments),
-				url = options.host + query._path; // Mem _path
+		function url_() {
+			const args = options.query(...arguments),
+				url = options.host + args._path; // Mem _path
 
 			if (options.strategy == bbox)
-				query.bbox = options.bbox(...arguments);
+				args.bbox = options.bbox(...arguments);
 
 			// Clean null & not relative parameters
-			Object.keys(query).forEach(k => {
-				if (k == '_path' || query[k] == 'on' || !query[k] || !query[k].toString())
-					delete query[k];
+			Object.keys(args).forEach(k => {
+				if (k == '_path' || args[k] == 'on' || !args[k] || !args[k].toString())
+					delete args[k];
 			});
 
-			return url + '?' + new URLSearchParams(query).toString();
+			return url + '?' + new URLSearchParams(args).toString();
 		}
 
-		function bbox_(extent, _, mapProjection) {
+		function bbox_(extent, resolution, mapProjection) {
 			return transformExtent(
 				extent,
 				mapProjection,
@@ -188,7 +188,7 @@ class MyBrowserVectorLayer extends VectorLayer {
 		const layer = this; // For use in style function
 		this.options = options; // Mem for further use
 
-		function style_(feature, resolution, hoveredFeature) {
+		function style_(feature, resolution, hoveredFeature) { //TODO séparer style affichage : hover
 			const stylesOptionsFunction = feature.getProperties().cluster ?
 				options.clusterStylesOptions :
 				options.stylesOptions;
@@ -246,13 +246,14 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
 export class MyVectorLayer extends MyClusterVectorLayer {
 	constructor(options) {
 		super({
-			convertProperties: p => p, // Translate properties to standard MyOl //TODO why not 
+			convertProperties: p => p, // Translate properties to standard MyOl
 			...options,
 		});
 
 		this.selector = new Selector(options.selectName, selection => {
 			this.refresh(selection.length, true)
 		});
+
 		this.refresh(this.selector.getSelection().length); // Hide the layer if no selection at the init
 	}
 }
@@ -390,6 +391,7 @@ export class HoverLayer extends VectorLayer {
  * Some usefull style functions
  */
 export function basicStylesOptions(feature, resolution, hover, layer) {
+	//TODO BUG n'est pas apelé par hover ! (pas de rouge sur lignes & polygones
 	const properties = layer.options.convertProperties(feature.getProperties());
 
 	return [{

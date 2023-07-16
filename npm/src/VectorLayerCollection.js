@@ -33,7 +33,7 @@ export class LayerWri extends MyVectorLayer {
 			host: '//dom.refuges.info/', //TODO www
 			browserClusterMinDistance: 50,
 			serverClusterMinResolution: 100,
-			convertProperties: () => {}, // For inheritance
+			convertProperties: p => p, // For inheritance
 			...opt,
 		};
 
@@ -47,7 +47,7 @@ export class LayerWri extends MyVectorLayer {
 
 		const layer = this; // For use in query_
 
-		function query_(queryOptions, _, resolution) {
+		function query_(extent, resolution) {
 			const selectionMassif = layer.massifSelector.getSelection();
 
 			return {
@@ -136,7 +136,7 @@ export class LayerChemineur extends MyVectorLayer {
 		super({
 			...options,
 
-			query: (queryOptions, _, resolution) => ({
+			query: (extent, resolution) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
 				cat: this.selector.getSelection(),
 				layer: resolution < options.serverClusterMinResolution ? null : 'cluster', // For server cluster layer
@@ -178,7 +178,7 @@ export class LayerAlpages extends MyVectorLayer {
 		super({
 			...options,
 
-			query: (queryOptions) => ({
+			query: () => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
 				forums: this.selector.getSelection(),
 			}),
@@ -194,6 +194,7 @@ export class LayerAlpages extends MyVectorLayer {
 }
 
 // pyrenees-refuges.com
+//TODO bug rappelle url à chaque zoom ! (refresh ?)
 export class LayerPrc extends MyVectorLayer {
 	constructor(options) {
 		super({
@@ -278,8 +279,6 @@ export class LayerOverpass extends MyVectorLayer {
 		super({
 			//host: 'https://overpass-api.de',
 			//host: 'https://lz4.overpass-api.de',
-			//host: 'https://overpass.openstreetmap.fr', // Out of order
-			//host: 'https://overpass.nchc.org.tw',
 			host: 'https://overpass.kumi.systems',
 			query: query_,
 			bbox: () => null, // No bbox at the end of the url
@@ -290,7 +289,7 @@ export class LayerOverpass extends MyVectorLayer {
 
 		const layer = this;
 
-		function query_(queryOptions, extent, resolution, mapProjection) {
+		function query_(extent, resolution, mapProjection) {
 			const selections = layer.selector.getSelection(),
 				items = selections[0].split(','), // The 1st (and only) selector
 				ex4326 = transformExtent(extent, mapProjection, 'EPSG:4326').map(c => c.toPrecision(6)),
