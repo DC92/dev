@@ -26,102 +26,6 @@ import {
 } from './MyVectorLayer.js';
 
 
-// refuges.info
-export class LayerWri extends MyVectorLayer {
-	constructor(opt) {
-		const options = {
-			host: '//dom.refuges.info/', //TODO www
-			browserClusterMinDistance: 50,
-			serverClusterMinResolution: 100,
-			convertProperties: p => p, // For inheritance
-			...opt,
-		};
-
-		super({
-			...options,
-			query: query_,
-			convertProperties: convertProperties_, // This class
-		});
-
-		this.massifSelector = new Selector(opt.selectMassifName, () => this.refresh(this.selector.getSelection().length, true));
-
-		const layer = this; // For use in query_
-
-		function query_(extent, resolution) {
-			const selectionMassif = layer.massifSelector.getSelection();
-
-			return {
-				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				massif: selectionMassif,
-				nb_points: 'all',
-				type_points: layer.selector.getSelection(),
-				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
-			};
-		}
-
-		function convertProperties_(properties) {
-			if (!properties.cluster) // Points
-				properties = {
-					name: properties.nom,
-					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
-					ele: properties.coord.alt,
-					bed: properties.places.valeur,
-					type: properties.type.valeur,
-					link: properties.lien,
-					attribution: '&copy;refuges.info',
-				};
-
-			return {
-				...properties,
-				...options.convertProperties(properties), // Inherited
-			};
-		}
-	}
-}
-
-export class layerWriAreas extends MyVectorLayer {
-	constructor(options) {
-		super({
-			host: '//www.refuges.info/',
-			strategy: all,
-			...options,
-
-			query: () => ({
-				_path: 'api/polygones',
-				type_polygon: 1, // Massifs
-			}),
-			convertProperties: properties => ({
-				label: properties.nom,
-				name: properties.nom,
-				link: properties.lien,
-				type: null,
-				attribution: null,
-			}),
-			stylesOptions: areasStylesOptions_,
-		});
-
-		function areasStylesOptions_(feature, _, hover) {
-			const properties = feature.getProperties(),
-				colors = properties.couleur
-				.match(/([0-9a-f]{2})/ig)
-				.map(c => parseInt(c, 16));
-
-			return [{
-				...labelStylesOptions(...arguments),
-
-				stroke: new Stroke({
-					color: hover ? properties.couleur : 'transparent',
-					width: 2,
-				}),
-
-				fill: new Fill({
-					color: 'rgba(' + colors.join(',') + ',0.3)'
-				}),
-			}];
-		}
-	}
-}
-
 // chemineur.fr
 export class LayerChemineur extends MyVectorLayer {
 	constructor(opt) {
@@ -190,6 +94,105 @@ export class LayerAlpages extends MyVectorLayer {
 				attribution: '&copy;alpages.info',
 			}),
 		});
+	}
+}
+
+// refuges.info
+export class LayerWri extends MyVectorLayer {
+	constructor(opt) {
+		const options = {
+			host: '//dom.refuges.info/', //TODO www
+			browserClusterMinDistance: 50,
+			serverClusterMinResolution: 100,
+			convertProperties: p => p, // For inheritance //TODO explain
+			...opt,
+		};
+
+		super({
+			...options,
+			query: query_,
+			convertProperties: convertProperties_,
+		});
+
+		//TODO spécifique WRI
+		this.massifSelector = new Selector(opt.selectMassifName, () => this.refresh(this.selector.getSelection().length, true));
+
+		const layer = this; // For use in query_
+
+		function query_(extent, resolution) {
+			const selectionMassif = layer.massifSelector.getSelection(); //TODO spécifique WRI
+
+			return {
+				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
+				massif: selectionMassif, //TODO spécifique WRI
+				nb_points: 'all',
+				type_points: layer.selector.getSelection(),
+				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
+				//TODO inheritance (pour massifs)
+			};
+		}
+
+		function convertProperties_(properties) {
+			if (!properties.cluster) // Points
+				properties = {
+					name: properties.nom,
+					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+					ele: properties.coord.alt,
+					bed: properties.places.valeur,
+					type: properties.type.valeur,
+					link: properties.lien,
+					attribution: '&copy;refuges.info',
+				};
+
+			return {
+				...properties,
+				...options.convertProperties(properties), // Inherited
+			};
+		}
+	}
+}
+
+//TODO spécifique WRI
+export class layerWriAreas extends MyVectorLayer {
+	constructor(options) {
+		super({
+			host: '//www.refuges.info/',
+			strategy: all,
+			...options,
+
+			query: () => ({
+				_path: 'api/polygones',
+				type_polygon: 1, // Massifs
+			}),
+			convertProperties: properties => ({
+				label: properties.nom,
+				name: properties.nom,
+				link: properties.lien,
+				type: null,
+				attribution: null,
+			}),
+			stylesOptions: areasStylesOptions_,
+		});
+
+		function areasStylesOptions_(feature, _, hover) {
+			const properties = feature.getProperties(),
+				colors = properties.couleur
+				.match(/([0-9a-f]{2})/ig)
+				.map(c => parseInt(c, 16));
+
+			return [{
+				...labelStylesOptions(...arguments),
+
+				stroke: new Stroke({
+					color: hover ? properties.couleur : 'transparent',
+					width: 2,
+				}),
+
+				fill: new Fill({
+					color: 'rgba(' + colors.join(',') + ',0.3)'
+				}),
+			}];
+		}
 	}
 }
 
