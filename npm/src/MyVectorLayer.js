@@ -4,7 +4,7 @@
  */
 
 import 'ol/ol.css';
-//TODO verify if all is used
+//TODO verify if all are used
 import Cluster from 'ol/source/Cluster.js';
 import Feature from 'ol/Feature.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
@@ -181,7 +181,7 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 			...options,
 		});
 
-		this.options = options; // Mem for further use //TODO true ???
+		this.options = options; // Mem for further use
 	}
 
 	// Hide or call the url when the selection changes
@@ -368,19 +368,13 @@ export class HoverLayer extends VectorLayer {
 			}
 			// Hover
 			else if (hoveredSubFeature != map.lastHoveredSubFeature) {
-				// Add the hovered feature to the hoverLayer
 				source.clear();
 				source.addFeature(hoveredSubFeature);
 
-				// Set style
-				const st = {
-					'stroke-color': 'red',
-					'stroke-width': 4,
-					...labelStylesOptions(hoveredSubFeature, hoveredLayer, true),
-				};
-				this.setStyle([st]); //TODO
+				this.setStyle(
+					new Style(hoverStylesOptions(hoveredSubFeature, hoveredLayer))
+				);
 
-				// Set cursor
 				map.getViewport().style.cursor =
 					hoveredProperties.link || hoveredProperties.cluster ?
 					'pointer' :
@@ -390,7 +384,6 @@ export class HoverLayer extends VectorLayer {
 		// Reset hoverLayer, style & cursor
 		else {
 			source.clear();
-			//TODO ? this.setStyle();
 			map.getViewport().style.cursor = '';
 		}
 
@@ -424,34 +417,31 @@ export function basicStylesOptions(feature, layer) {
 }
 
 export function labelStylesOptions(feature, layer, hover) {
-	//TODO hover label style ? / display "label" ?
 	const properties = layer.options.convertProperties(feature.getProperties()),
-		elLabel = document.createElement('span');
-
-	if (properties.cluster)
-		properties.attribution = null;
+		elLabel = document.createElement('span'),
+		text = hover ? agregateText([
+			properties.name,
+			agregateText([
+				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+			], ', '),
+			properties.type,
+			properties.cluster ? null : properties.attribution,
+		]) : properties.label;
 
 	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = hover ? agregateText([ //TODO put that on convertProperties ???
-		properties.name,
-		agregateText([
-			properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-			properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-		], ', '),
-		properties.type,
-		properties.attribution,
-	]) : properties.label || null;
+	elLabel.innerHTML = text;
 
-	if (elLabel.innerHTML)
+	if (text)
 		return {
 			text: new Text({
 				text: elLabel.innerHTML,
-				//BEST line & poly label following the cursor
-				textBaseline: properties.icon ? 'bottom' : 'middle',
+				overflow: hover, // Display label if contained in polygon or on hover
+				textBaseline: properties.icon ? 'bottom' : 'middle', //TODO don't work with cluster circle
 				offsetY: properties.icon ? -13 : 0, // Above the icon
 				padding: [1, 1, -1, 3],
+				//BEST line & poly label following the cursor
 				font: '12px Verdana',
-				overflow: hover,
 				fill: new Fill({
 					color: 'black',
 				}),
@@ -514,10 +504,13 @@ export function spreadClusterStylesOptions(feature, layer) {
 }
 
 export function hoverStylesOptions(feature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
-	//TODO
-
-	return [labelStylesOptions(...arguments, true)];
+	return {
+		...labelStylesOptions(feature, layer, true),
+		stroke: new Stroke({
+			color: 'red',
+			width: 2,
+		}),
+	};
 }
 
 // Simplify & aggregate an array of lines
