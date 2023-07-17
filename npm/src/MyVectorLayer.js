@@ -235,14 +235,23 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 		const options = {
 			convertProperties: p => p, // Default : translate properties to standard MyOl (to be used in styles)
 
-			basicStylesOptions: basicStylesOptions, // (feature, resolution, options)
-			clusterStylesOptions: clusterStylesOptions, // (feature, resolution, options)
-			spreadClusterStylesOptions: spreadClusterStylesOptions, // (feature, resolution, options)
-			hoverStylesOptions: hoverStylesOptions, // (feature, resolution, options)
+			basicStylesOptions: basicStylesOptions, // (feature, layer)
+			clusterStylesOptions: clusterStylesOptions,
+			spreadClusterStylesOptions: spreadClusterStylesOptions,
+			hoverStylesOptions: hoverStylesOptions,
 			style: style_,
 
 			...opt,
 		};
+
+		super(options);
+
+		this.selector = new Selector(options.selectName, selection => {
+			this.refresh(selection.length, true)
+		});
+		this.refresh(this.selector.getSelection().length); // Hide the layer if no selection at the init
+
+		const layer = this;
 
 		function style_(feature, resolution) {
 			const stylesOptionsFunction = !feature.getProperties().cluster ?
@@ -252,17 +261,9 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 				options.clusterStylesOptions;
 
 			// Function returning an array of styles options
-			return stylesOptionsFunction(feature, resolution, options)
+			return stylesOptionsFunction(feature, layer)
 				.map(so => new Style(so)); // Transform into an array of Style objects
 		}
-
-		super(options);
-
-		this.selector = new Selector(options.selectName, selection => {
-			this.refresh(selection.length, true)
-		});
-
-		this.refresh(this.selector.getSelection().length); // Hide the layer if no selection at the init
 	}
 }
 
@@ -372,9 +373,12 @@ export class HoverLayer extends VectorLayer {
 				source.addFeature(hoveredSubFeature);
 
 				// Set style
-				this.setStyle(new Style(
-					labelStylesOptions(hoveredSubFeature, undefined, true, hoveredLayer)
-				));
+				const st = {
+					'stroke-color': 'red',
+					'stroke-width': 4,
+					...labelStylesOptions(hoveredSubFeature, hoveredLayer, true),
+				};
+				this.setStyle([st]); //TODO
 
 				// Set cursor
 				map.getViewport().style.cursor =
@@ -398,8 +402,8 @@ export class HoverLayer extends VectorLayer {
 /**
  * Some usefull style functions
  */
-export function basicStylesOptions(feature, resolution, options) {
-	const properties = options.convertProperties(feature.getProperties());
+export function basicStylesOptions(feature, layer) {
+	const properties = layer.options.convertProperties(feature.getProperties());
 
 	return [{
 		image: properties.icon ? new Icon({
@@ -419,10 +423,9 @@ export function basicStylesOptions(feature, resolution, options) {
 	}];
 }
 
-export function labelStylesOptions(feature, resolution, options) {
-	const hover = null; //TODO
-
-	const properties = options.convertProperties(feature.getProperties()),
+export function labelStylesOptions(feature, layer, hover) {
+	//TODO hover label style ? / display "label" ?
+	const properties = layer.options.convertProperties(feature.getProperties()),
 		elLabel = document.createElement('span');
 
 	if (properties.cluster)
@@ -481,14 +484,14 @@ export function clusterStylesOptions(feature) {
 	}];
 }
 
-export function spreadClusterStylesOptions(feature, resolution, options) {
+export function spreadClusterStylesOptions(feature, layer) {
 	let properties = feature.getProperties(),
 		x = 0.95 + 0.45 * properties.cluster,
 		so = [];
 
 	if (properties.features)
 		properties.features.forEach(f => {
-			const stylesOptions = options.basicStylesOptions(...arguments);
+			const stylesOptions = layer.options.basicStylesOptions(...arguments);
 
 			if (stylesOptions.length) {
 				const image = stylesOptions[0].image;
@@ -510,8 +513,11 @@ export function spreadClusterStylesOptions(feature, resolution, options) {
 	return so;
 }
 
-export function hoverStylesOptions(feature, resolution, options) {
+export function hoverStylesOptions(feature, layer) {
+	const properties = layer.options.convertProperties(feature.getProperties());
 	//TODO
+
+	return [labelStylesOptions(...arguments, true)];
 }
 
 // Simplify & aggregate an array of lines
