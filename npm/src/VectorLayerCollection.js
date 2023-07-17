@@ -46,7 +46,7 @@ export class LayerChemineur extends MyVectorLayer {
 				layer: resolution < options.serverClusterMinResolution ? null : 'cluster', // For server cluster layer
 			}),
 
-			convertProperties: (properties) => ({
+			convertProperties: properties => ({
 				...properties,
 				icon: chemIconUrl(properties.type, options.host),
 				link: options.host + 'viewtopic.php?t=' + properties.id,
@@ -87,7 +87,7 @@ export class LayerAlpages extends MyVectorLayer {
 				forums: this.selector.getSelection(),
 			}),
 
-			convertProperties: (properties) => ({
+			convertProperties: properties => ({
 				...properties,
 				icon: chemIconUrl(properties.type), // Replace the alpages icon
 				link: options.host + 'viewtopic.php?t=' + properties.id,
@@ -206,7 +206,7 @@ export class LayerPrc extends MyVectorLayer {
 			browserClusterMinDistance: 50,
 			...options,
 
-			convertProperties: (properties) => ({
+			convertProperties: properties => ({
 				...properties,
 				type: properties.type_hebergement,
 				icon: chemIconUrl(properties.type_hebergement),

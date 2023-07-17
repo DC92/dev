@@ -168,37 +168,20 @@ class MyClusterSource extends Cluster {
  * Browser & server clustered layer
  */
 class MyBrowserClusterVectorLayer extends VectorLayer {
-	constructor(opt) {
-		const options = {
-			//browserClusterMinDistance:50, // Distance above which the browser clusterises
-			//serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
-			//browserClusterFeaturelMaxPerimeter: 300, // Perimeter (in pixels) of a line or poly above which we do not cluster
-			stylesOptions: basicStylesOptions, // (feature, resolution, hover, layer)
-			clusterStylesOptions: clusterStylesOptions,
-			...opt,
-		};
-
+	constructor(options) {
 		super({
+			//browserClusterMinDistance:50, // Distance above which the browser clusterises
+			//browserClusterFeaturelMaxPerimeter: 300, // Perimeter (in pixels) of a line or poly above which we do not cluster
+
 			source: options.browserClusterMinDistance ?
 				new MyClusterSource(options) : // Use a cluster source and a vector source to manages clusters
 				new MyVectorSource(options), // or a vector source to get the data
 			maxResolution: options.serverClusterMinResolution,
-			style: style_,
+
 			...options,
 		});
 
-		const layer = this; // For use in style function
-		this.options = options; // Mem for further use
-
-		function style_(feature, resolution, hoveredFeature) { //TODO séparer style affichage : hover
-			const stylesOptionsFunction = feature.getProperties().cluster ?
-				options.clusterStylesOptions :
-				options.stylesOptions;
-
-			// Function returning an array of styles options
-			return stylesOptionsFunction(feature, resolution, hoveredFeature, layer)
-				.map(so => new Style(so)); // Transform into an array of Style objects
-		}
+		this.options = options; // Mem for further use //TODO true ???
 	}
 
 	// Hide or call the url when the selection changes
@@ -212,6 +195,8 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 
 class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	constructor(options) {
+		//serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
+
 		// Low resolutions layer to display the normal data
 		super(options);
 
@@ -242,13 +227,36 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 
 /**
  * Facilities added vector layer
+ * Style features
+ * Layer & features selector
  */
 export class MyVectorLayer extends MyServerClusterVectorLayer {
-	constructor(options) {
-		super({
-			convertProperties: p => p, // Translate properties to standard MyOl
-			...options,
-		});
+	constructor(opt) {
+		const options = {
+			convertProperties: p => p, // Default : translate properties to standard MyOl (to be used in styles)
+
+			basicStylesOptions: basicStylesOptions, // (feature, resolution, options)
+			clusterStylesOptions: clusterStylesOptions, // (feature, resolution, options)
+			spreadClusterStylesOptions: spreadClusterStylesOptions, // (feature, resolution, options)
+			hoverStylesOptions: hoverStylesOptions, // (feature, resolution, options)
+			style: style_,
+
+			...opt,
+		};
+
+		function style_(feature, resolution) {
+			const stylesOptionsFunction = !feature.getProperties().cluster ?
+				options.basicStylesOptions :
+				resolution > options.spreadClusterMaxResolution ?
+				options.spreadClusterStylesOptions :
+				options.clusterStylesOptions;
+
+			// Function returning an array of styles options
+			return stylesOptionsFunction(feature, resolution, options)
+				.map(so => new Style(so)); // Transform into an array of Style objects
+		}
+
+		super(options);
 
 		this.selector = new Selector(options.selectName, selection => {
 			this.refresh(selection.length, true)
@@ -390,9 +398,8 @@ export class HoverLayer extends VectorLayer {
 /**
  * Some usefull style functions
  */
-export function basicStylesOptions(feature, resolution, hover, layer) {
-	//TODO BUG n'est pas apelé par hover ! (pas de rouge sur lignes & polygones
-	const properties = layer.options.convertProperties(feature.getProperties());
+export function basicStylesOptions(feature, resolution, options) {
+	const properties = options.convertProperties(feature.getProperties());
 
 	return [{
 		image: properties.icon ? new Icon({
@@ -402,7 +409,7 @@ export function basicStylesOptions(feature, resolution, hover, layer) {
 		...labelStylesOptions(...arguments),
 
 		stroke: new Stroke({
-			color: hover ? 'red' : 'blue',
+			color: 'blue',
 			width: 2,
 		}),
 
@@ -412,8 +419,10 @@ export function basicStylesOptions(feature, resolution, hover, layer) {
 	}];
 }
 
-export function labelStylesOptions(feature, _, hover, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties()),
+export function labelStylesOptions(feature, resolution, options) {
+	const hover = null; //TODO
+
+	const properties = options.convertProperties(feature.getProperties()),
 		elLabel = document.createElement('span');
 
 	if (properties.cluster)
@@ -454,57 +463,55 @@ export function labelStylesOptions(feature, _, hover, layer) {
 		};
 }
 
-export function clusterStylesOptions(feature, resolution, hoverfeature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties()),
+export function clusterStylesOptions(feature) {
+	return [{
+		image: new Circle({
+			radius: 14,
+			stroke: new Stroke({
+				color: 'blue',
+			}),
+			fill: new Fill({
+				color: 'white',
+			}),
+		}),
+		text: new Text({
+			text: feature.getProperties().cluster.toString(),
+			font: '12px Verdana',
+		}),
+	}];
+}
+
+export function spreadClusterStylesOptions(feature, resolution, options) {
+	let properties = feature.getProperties(),
+		x = 0.95 + 0.45 * properties.cluster,
 		so = [];
 
-	if (resolution > layer.options.spreadClusterMaxResolution) {
-		// Low resolution : separated icons
-		let x = 0.95 + 0.45 * properties.cluster;
+	if (properties.features)
+		properties.features.forEach(f => {
+			const stylesOptions = options.basicStylesOptions(...arguments);
 
-		if (properties.features)
-			properties.features.forEach(f => {
-				const styles = layer.getStyleFunction()(f, resolution, hoverfeature);
+			if (stylesOptions.length) {
+				const image = stylesOptions[0].image;
 
-				if (styles.length) {
-					const image = styles[0].getImage();
-
-					if (image) {
-						image.setAnchor([x -= 0.9, 0.5]);
-						f.setProperties({ // Mem the shift for hover detection
-							xLeft: (1 - x) * image.getImage().width,
-						}, true);
-						so.push({
-							image: image,
-						});
-					}
+				if (image) {
+					image.setAnchor([x -= 0.9, 0.5]);
+					f.setProperties({ // Mem the shift for hover detection
+						xLeft: (1 - x) * image.getImage().width,
+					}, true);
+					so.push({
+						image: image,
+					});
 				}
-			});
-
-		so.push(labelStylesOptions(hoverfeature || feature, resolution, hoverfeature, layer));
-	}
-	// Hi resolution : circle
-	else {
-		if (hoverfeature)
-			so.push(labelStylesOptions(...arguments));
-
-		so.push({
-			image: new Circle({
-				radius: 14,
-				stroke: new Stroke({
-					color: 'blue',
-				}),
-				fill: new Fill({
-					color: 'white',
-				}),
-			}),
-			text: new Text({
-				text: properties.cluster.toString(),
-				font: '12px Verdana',
-			}),
+			}
 		});
-	}
+
+	so.push(labelStylesOptions(...arguments));
+
 	return so;
+}
+
+export function hoverStylesOptions(feature, resolution, options) {
+	//TODO
 }
 
 // Simplify & aggregate an array of lines
