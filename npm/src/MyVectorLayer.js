@@ -4,6 +4,7 @@
  */
 
 import 'ol/ol.css';
+//TODO verify if all is used
 import Cluster from 'ol/source/Cluster.js';
 import Feature from 'ol/Feature.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
@@ -158,6 +159,7 @@ class MyClusterSource extends Cluster {
 		}
 
 		// Redirect the refresh method to the wrapped source
+		//TODO BUG duplicate call at init & selector
 		this.refresh = () => this.getSource().refresh();
 	}
 }
@@ -165,8 +167,7 @@ class MyClusterSource extends Cluster {
 /**
  * Browser & server clustered layer
  */
-class MyBrowserVectorLayer extends VectorLayer {
-	//TODO bug appelle 2 foids l'url
+class MyBrowserClusterVectorLayer extends VectorLayer {
 	constructor(opt) {
 		const options = {
 			//browserClusterMinDistance:50, // Distance above which the browser clusterises
@@ -209,14 +210,14 @@ class MyBrowserVectorLayer extends VectorLayer {
 	}
 }
 
-class MyClusterVectorLayer extends MyBrowserVectorLayer {
+class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	constructor(options) {
 		// Low resolutions layer to display the normal data
 		super(options);
 
 		// High resolutions layer to get and display the clusters delivered by the server at hight resolutions
 		if (options.serverClusterMinResolution)
-			this.altLayer = new MyBrowserVectorLayer({
+			this.altLayer = new MyBrowserClusterVectorLayer({
 				maxResolution: undefined,
 				minResolution: options.serverClusterMinResolution,
 				...options,
@@ -241,10 +242,8 @@ class MyClusterVectorLayer extends MyBrowserVectorLayer {
 
 /**
  * Facilities added vector layer
- * Style customisation
- * Hover & click management
  */
-export class MyVectorLayer extends MyClusterVectorLayer {
+export class MyVectorLayer extends MyServerClusterVectorLayer {
 	constructor(options) {
 		super({
 			convertProperties: p => p, // Translate properties to standard MyOl
@@ -379,7 +378,7 @@ export class HoverLayer extends VectorLayer {
 		// Reset hoverLayer, style & cursor
 		else {
 			source.clear();
-			this.setStyle();
+			//TODO ? this.setStyle();
 			map.getViewport().style.cursor = '';
 		}
 
