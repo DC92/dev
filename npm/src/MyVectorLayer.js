@@ -13,6 +13,7 @@ import Point from 'ol/geom/Point.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
 import {
+	getArea,
 	getCenter,
 } from 'ol/extent.js';
 import {
@@ -109,7 +110,7 @@ class MyClusterSource extends Cluster {
 			createCluster: createCluster_,
 		});
 
-		// Generate a center point where display the cluster
+		// Generate a center point where to display the cluster
 		function geometryFunction_(feature) {
 			const geometry = feature.getGeometry();
 
@@ -368,12 +369,14 @@ export class HoverLayer extends VectorLayer {
 			}
 			// Hover
 			else if (hoveredSubFeature != map.lastHoveredSubFeature) {
-				source.clear();
-				source.addFeature(hoveredSubFeature);
+				const f = hoveredSubFeature.clone();
 
-				this.setStyle(
-					new Style(hoverStylesOptions(hoveredSubFeature, hoveredLayer))
+				f.setStyle(
+					new Style(hoverStylesOptions(f, hoveredLayer))
 				);
+
+				source.clear();
+				source.addFeature(f);
 
 				map.getViewport().style.cursor =
 					hoveredProperties.link || hoveredProperties.cluster ?
@@ -416,29 +419,21 @@ export function basicStylesOptions(feature, layer) {
 	}];
 }
 
-export function labelStylesOptions(feature, layer, hover) {
-	const properties = layer.options.convertProperties(feature.getProperties()),
-		elLabel = document.createElement('span'),
-		text = hover ? agregateText([
-			properties.name,
-			agregateText([
-				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-			], ', '),
-			properties.type,
-			properties.cluster ? null : properties.attribution,
-		]) : properties.label;
+export function labelStylesOptions(feature, layer) {
+	const properties = layer.options.convertProperties(feature.getProperties());
 
-	//HACK to render the html entities in the canvas
-	elLabel.innerHTML = text;
+	if (properties.label) {
+		const featureArea = getArea(feature.getGeometry().getExtent()),
+			elLabel = document.createElement('span');
 
-	if (text)
+		elLabel.innerHTML = properties.label; //HACK to render the html entities in the canvas
+
 		return {
 			text: new Text({
 				text: elLabel.innerHTML,
-				overflow: hover, // Display label if contained in polygon or on hover
-				textBaseline: properties.icon ? 'bottom' : 'middle', //TODO don't work with cluster circle
-				offsetY: properties.icon ? -13 : 0, // Above the icon
+				overflow: properties.overflow, // Display label even if not contained in polygon
+				textBaseline: featureArea ? 'middle' : 'bottom',
+				offsetY: featureArea ? 0 : -13, // Above the icon
 				padding: [1, 1, -1, 3],
 				//BEST line & poly label following the cursor
 				font: '12px Verdana',
@@ -454,9 +449,10 @@ export function labelStylesOptions(feature, layer, hover) {
 			}),
 			zIndex: 100,
 		};
+	}
 }
 
-export function clusterStylesOptions(feature) {
+export function clusterStylesOptions(feature, layer) {
 	return [{
 		image: new Circle({
 			radius: 14,
@@ -484,7 +480,7 @@ export function spreadClusterStylesOptions(feature, layer) {
 			const stylesOptions = layer.options.basicStylesOptions(...arguments);
 
 			if (stylesOptions.length) {
-				const image = stylesOptions[0].image;
+				const image = stylesOptions[0].image; //TODO test
 
 				if (image) {
 					image.setAnchor([x -= 0.9, 0.5]);
@@ -504,8 +500,24 @@ export function spreadClusterStylesOptions(feature, layer) {
 }
 
 export function hoverStylesOptions(feature, layer) {
+	const properties = layer.options.convertProperties(feature.getProperties());
+
+	feature.setProperties({
+		overflow: true, // Display label even if not contained in polygon
+		label: agregateText([
+			properties.name,
+			agregateText([
+				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+			], ', '),
+			properties.type,
+			properties.cluster ? null : properties.attribution,
+		]),
+	}, true);
+
 	return {
-		...labelStylesOptions(feature, layer, true),
+		...labelStylesOptions(feature, layer),
+
 		stroke: new Stroke({
 			color: 'red',
 			width: 2,

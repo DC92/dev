@@ -280,9 +280,9 @@ export class LayerOverpass extends MyVectorLayer {
 			selectEls = document.getElementsByName(options.selectName);
 
 		super({
-			//host: 'https://overpass-api.de',
+			host: 'https://overpass-api.de',
 			//host: 'https://lz4.overpass-api.de',
-			host: 'https://overpass.kumi.systems',
+			//host: 'https://overpass.kumi.systems',
 			query: query_,
 			bbox: () => null, // No bbox at the end of the url
 			format: format_,
