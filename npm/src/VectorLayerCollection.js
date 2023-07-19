@@ -5,18 +5,11 @@
 
 // Openlayers
 import 'ol/ol.css';
-import GeoJSON from 'ol/format/GeoJSON.js';
-import OSMXML from 'ol/format/OSMXML.js';
-import {
-	all,
-} from 'ol/loadingstrategy.js';
-import {
-	transformExtent,
-} from 'ol/proj.js';
-import {
-	Fill,
-	Stroke,
-} from 'ol/style.js';
+import GeoJSON from 'ol/format/GeoJSON';
+import OSMXML from 'ol/format/OSMXML';
+import * as loadingstrategy from 'ol/loadingstrategy';
+import * as proj from 'ol/proj';
+import * as style from 'ol/style';
 
 // MyOl
 import {
@@ -157,7 +150,7 @@ export class layerWriAreas extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: '//www.refuges.info/',
-			strategy: all,
+			strategy: loadingstrategy.all,
 			...options,
 
 			query: () => ({
@@ -186,12 +179,12 @@ export class layerWriAreas extends MyVectorLayer {
 			return [{
 				...labelStylesOptions(...arguments),
 
-				stroke: new Stroke({
+				stroke: new style.Stroke({
 					color: /*//TODOhover ? properties.couleur :*/ 'transparent',
 					width: 2,
 				}),
 
-				fill: new Fill({
+				fill: new style.Fill({
 					color: 'rgba(' + colors.join(',') + ',0.3)'
 				}),
 			}];
@@ -208,7 +201,7 @@ export class layerWriAreas extends MyVectorLayer {
 			return {
 				...layer.options.labelStylesOptions(feature, layer),
 
-				stroke: new Stroke({
+				stroke: new style.Stroke({
 					color: properties.couleur,
 					width: 2,
 				}),
@@ -223,7 +216,7 @@ export class LayerPrc extends MyVectorLayer {
 	constructor(options) {
 		super({
 			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-			strategy: all,
+			strategy: loadingstrategy.all,
 			browserClusterMinDistance: 50,
 			...options,
 
@@ -316,7 +309,7 @@ export class LayerOverpass extends MyVectorLayer {
 		function query_(extent, resolution, mapProjection) {
 			const selections = layer.selector.getSelection(),
 				items = selections[0].split(','), // The 1st (and only) selector
-				ex4326 = transformExtent(extent, mapProjection, 'EPSG:4326').map(c => c.toPrecision(6)),
+				ex4326 = proj.transformExtent(extent, mapProjection, 'EPSG:4326').map(c => c.toPrecision(6)),
 				bbox = '(' + ex4326[1] + ',' + ex4326[0] + ',' + ex4326[3] + ',' + ex4326[2] + ');',
 				args = [];
 

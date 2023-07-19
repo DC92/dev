@@ -5,30 +5,17 @@
 
 import 'ol/ol.css';
 //TODO verify if all are used
-import Cluster from 'ol/source/Cluster.js';
-import Feature from 'ol/Feature.js';
-import GeoJSON from 'ol/format/GeoJSON.js';
-import Icon from 'ol/style/Icon.js';
-import Point from 'ol/geom/Point.js';
-import VectorLayer from 'ol/layer/Vector.js';
-import VectorSource from 'ol/source/Vector.js';
-import {
-	getArea,
-	getCenter,
-} from 'ol/extent.js';
-import {
-	bbox,
-} from 'ol/loadingstrategy.js';
-import {
-	transformExtent,
-} from 'ol/proj.js';
-import { //TODO group ?
-	Circle,
-	Fill,
-	Stroke,
-	Style,
-	Text,
-} from 'ol/style.js';
+import Cluster from 'ol/source/Cluster';
+import Feature from 'ol/Feature';
+import GeoJSON from 'ol/format/GeoJSON';
+import Icon from 'ol/style/Icon';
+import Point from 'ol/geom/Point';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import * as extent from 'ol/extent';
+import * as loadingstrategy from 'ol/loadingstrategy';
+import * as proj from 'ol/proj';
+import * as style from 'ol/style';
 
 
 /**
@@ -42,7 +29,7 @@ class MyVectorSource extends VectorSource {
 				// host: '',
 				// query: (extent, resolution, mapProjection) => ({_path: '...'}), // this = options
 				url: url_, // (extent, resolution, mapProjection)
-				strategy: bbox,
+				strategy: loadingstrategy.bbox,
 				bbox: bbox_, // (extent, resolution, mapProjection)
 				projection: 'EPSG:4326',
 				...opt,
@@ -76,7 +63,7 @@ class MyVectorSource extends VectorSource {
 			const args = options.query(...arguments),
 				url = options.host + args._path; // Mem _path
 
-			if (options.strategy == bbox)
+			if (options.strategy == loadingstrategy.bbox)
 				args.bbox = options.bbox(...arguments);
 
 			// Clean null & not relative parameters
@@ -89,7 +76,7 @@ class MyVectorSource extends VectorSource {
 		}
 
 		function bbox_(extent, resolution, mapProjection) {
-			return transformExtent(
+			return proj.transformExtent(
 				extent,
 				mapProjection,
 				options.projection, // Received projection
@@ -115,15 +102,15 @@ class MyClusterSource extends Cluster {
 			const geometry = feature.getGeometry();
 
 			if (geometry) {
-				const extent = feature.getGeometry().getExtent(),
-					featurePixelPerimeter = (extent[2] - extent[0] + extent[3] - extent[1]) *
+				const ex = feature.getGeometry().getExtent(),
+					featurePixelPerimeter = (ex[2] - ex[0] + ex[3] - ex[1]) *
 					2 / this.resolution;
 
 				// Don't cluster lines or polygons whose the extent perimeter is more than x pixels
 				if (featurePixelPerimeter > options.browserClusterFeaturelMaxPerimeter)
 					this.addFeature(feature);
 				else
-					return new Point(getCenter(feature.getGeometry().getExtent()));
+					return new Point(extent.getCenter(feature.getGeometry().getExtent()));
 			}
 		}
 
@@ -261,7 +248,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 
 			// Function returning an array of styles options
 			return sof(feature, layer)
-				.map(so => new Style(so)); // Transform into an array of Style objects
+				.map(so => new style.Style(so)); // Transform into an array of Style objects
 		}
 	}
 }
@@ -321,7 +308,7 @@ export class HoverLayer extends VectorLayer {
 					hoveredFeature.getProperties()
 				),
 				featurePosition = map.getPixelFromCoordinate(
-					getCenter(hoveredFeature.getGeometry().getExtent())
+					extent.getCenter(hoveredFeature.getGeometry().getExtent())
 				);
 
 			// Find sub-feature from a spread cluster
@@ -370,7 +357,7 @@ export class HoverLayer extends VectorLayer {
 				const f = hoveredSubFeature.clone();
 
 				f.setStyle(
-					new Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
+					new style.Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
 				);
 
 				source.clear();
@@ -406,13 +393,13 @@ export function basicStylesOptions(feature, layer) {
 		}) : null,
 
 		// Lines
-		stroke: new Stroke({
+		stroke: new style.Stroke({
 			color: 'blue',
 			width: 2,
 		}),
 
 		// Areas
-		fill: new Fill({
+		fill: new style.Fill({
 			color: 'rgba(0,0,256,0.3)',
 		}),
 
@@ -425,13 +412,13 @@ export function labelStylesOptions(feature, layer) {
 	const properties = feature.getProperties();
 
 	if (properties.label) {
-		const featureArea = getArea(feature.getGeometry().getExtent()),
+		const featureArea = extent.getArea(feature.getGeometry().getExtent()),
 			elLabel = document.createElement('span');
 
 		elLabel.innerHTML = properties.label; //HACK to render the html entities in the canvas
 
 		return {
-			text: new Text({
+			text: new style.Text({
 				text: elLabel.innerHTML,
 				overflow: properties.overflow, // Display label even if not contained in polygon
 				textBaseline: featureArea ? 'middle' : 'bottom',
@@ -439,13 +426,13 @@ export function labelStylesOptions(feature, layer) {
 				padding: [1, 1, -1, 3],
 				//BEST line & poly label following the cursor
 				font: '12px Verdana',
-				fill: new Fill({
+				fill: new style.Fill({
 					color: 'black',
 				}),
-				backgroundFill: new Fill({
+				backgroundFill: new style.Fill({
 					color: 'white',
 				}),
-				backgroundStroke: new Stroke({
+				backgroundStroke: new style.Stroke({
 					color: 'blue',
 				}),
 			}),
@@ -456,16 +443,16 @@ export function labelStylesOptions(feature, layer) {
 
 export function clusterStylesOptions(feature, layer) {
 	return [{
-		image: new Circle({
+		image: new style.Circle({
 			radius: 14,
-			stroke: new Stroke({
+			stroke: new style.Stroke({
 				color: 'blue',
 			}),
-			fill: new Fill({
+			fill: new style.Fill({
 				color: 'white',
 			}),
 		}),
-		text: new Text({
+		text: new style.Text({
 			text: feature.getProperties().cluster.toString(),
 			font: '12px Verdana',
 		}),
@@ -520,7 +507,7 @@ export function hoverStylesOptions(feature, layer) {
 	return {
 		...labelStylesOptions(feature, layer),
 
-		stroke: new Stroke({
+		stroke: new style.Stroke({
 			color: 'red',
 			width: 2,
 		}),
