@@ -149,7 +149,6 @@ class MyClusterSource extends Cluster {
 		}
 
 		// Redirect the refresh method to the wrapped source
-		//TODO BUG duplicate call at init & selector
 		this.refresh = () => this.getSource().refresh();
 	}
 }
@@ -174,9 +173,10 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 		this.options = options; // Mem for further use
 	}
 
-	reload(visible) {
+	reload(visible, reload) {
 		this.setVisible(visible);
-		this.getSource().refresh();
+		if (visible && reload)
+			this.getSource().refresh();
 	}
 }
 
@@ -204,11 +204,11 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	}
 
 	// Propagate the reload to the altLayer
-	reload(visible) {
-		super.reload(visible);
+	reload(visible, reload) {
+		super.reload(visible, reload);
 
 		if (this.altLayer)
-			this.altLayer.reload(visible);
+			this.altLayer.reload(visible, reload);
 	}
 }
 
@@ -233,8 +233,8 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 
 		super(options);
 
-		this.selector = new Selector(options.selectName, selection => this.reload());
-		this.setVisible(this.selector.getSelection().length); // Hide the layer if no selection at the init //TODO BUG ne cache pas AltLayer !
+		this.selector = new Selector(options.selectName, selection => this.reload(true));
+		this.reload(); // Hide the layer if no selection at the init
 
 		const layer = this;
 
@@ -249,8 +249,8 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 		}
 	}
 
-	reload() {
-		super.reload(this.selector.getSelection().length);
+	reload(reload) {
+		super.reload(this.selector.getSelection().length, reload);
 	}
 }
 
