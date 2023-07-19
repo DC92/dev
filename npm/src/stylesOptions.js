@@ -1,5 +1,9 @@
 /**
  * Some usefull style functions
+ * These functions return an area of style options to be transformed into an area of Style
+ * They all take 2 arguments :
+ *   feature : to be displayed
+ *   layer : that owns the feature
  */
 
 import Icon from 'ol/style/Icon';
@@ -7,6 +11,7 @@ import * as extent from 'ol/extent';
 import * as style from 'ol/style';
 
 
+// Basic style to display a geo vector layer based on standard properties
 export function basic(feature, layer) {
 	const properties = layer.options.convertProperties(feature.getProperties());
 
@@ -32,6 +37,7 @@ export function basic(feature, layer) {
 	}];
 }
 
+// Display a label with properties.label
 export function label(feature, layer) {
 	const properties = feature.getProperties();
 
@@ -65,6 +71,7 @@ export function label(feature, layer) {
 	}
 }
 
+// Display a circle with the number of features on the cluster
 export function cluster(feature, layer) {
 	return [{
 		image: new style.Circle({
@@ -83,6 +90,7 @@ export function cluster(feature, layer) {
 	}];
 }
 
+// Display a line of features contained into a cluster
 export function spreadCluster(feature, layer) {
 	let properties = feature.getProperties(),
 		x = 0.95 + 0.45 * properties.cluster,
@@ -112,7 +120,8 @@ export function spreadCluster(feature, layer) {
 	return so;
 }
 
-export function hover(feature, layer) {
+// Display the detailed information of a cluster based on standard properties
+export function details(feature, layer) {
 	const properties = layer.options.convertProperties(feature.getProperties());
 
 	feature.setProperties({
@@ -128,8 +137,13 @@ export function hover(feature, layer) {
 		]),
 	}, true);
 
+	return label(feature, layer);
+}
+
+// Display the basic hovered features
+export function hover(feature, layer) {
 	return {
-		...label(feature, layer),
+		...details(feature, layer),
 
 		stroke: new style.Stroke({
 			color: 'red',
