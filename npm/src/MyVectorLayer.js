@@ -8,7 +8,6 @@ import 'ol/ol.css';
 import Cluster from 'ol/source/Cluster';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
-import Icon from 'ol/style/Icon';
 import Point from 'ol/geom/Point';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
@@ -16,6 +15,9 @@ import * as extent from 'ol/extent';
 import * as loadingstrategy from 'ol/loadingstrategy';
 import * as proj from 'ol/proj';
 import * as style from 'ol/style';
+
+// MyOl
+import * as stylesOptions from './stylesOptions';
 
 
 /**
@@ -139,7 +141,7 @@ class MyClusterSource extends Cluster {
 			// Display a cluster point
 			return new Feature({
 				id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
-				name: agregateText(lines),
+				name: stylesOptions.agregateText(lines),
 				geometry: point, // The gravity center of all the features in the cluster
 				features: features,
 				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
@@ -223,10 +225,10 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 		const options = {
 			convertProperties: p => p, // Default : translate properties to standard MyOl (to be used in styles)
 
-			basicStylesOptions: basicStylesOptions, // (feature, layer)
-			clusterStylesOptions: clusterStylesOptions,
-			spreadClusterStylesOptions: spreadClusterStylesOptions,
-			hoverStylesOptions: hoverStylesOptions,
+			basicStylesOptions: stylesOptions.basic, // (feature, layer)
+			clusterStylesOptions: stylesOptions.cluster,
+			spreadClusterStylesOptions: stylesOptions.spreadCluster,
+			hoverStylesOptions: stylesOptions.hover,
 			style: style_,
 
 			...opt,
@@ -378,149 +380,6 @@ export class HoverLayer extends VectorLayer {
 		// Mem hovered feature for next change
 		map.lastHoveredSubFeature = hoveredSubFeature;
 	}
-}
-
-/**
- * Some usefull style functions
- */
-export function basicStylesOptions(feature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
-
-	return [{
-		// Point
-		image: properties.icon ? new Icon({
-			src: properties.icon,
-		}) : null,
-
-		// Lines
-		stroke: new style.Stroke({
-			color: 'blue',
-			width: 2,
-		}),
-
-		// Areas
-		fill: new style.Fill({
-			color: 'rgba(0,0,256,0.3)',
-		}),
-
-		// properties.label if any
-		...labelStylesOptions(...arguments),
-	}];
-}
-
-export function labelStylesOptions(feature, layer) {
-	const properties = feature.getProperties();
-
-	if (properties.label) {
-		const featureArea = extent.getArea(feature.getGeometry().getExtent()),
-			elLabel = document.createElement('span');
-
-		elLabel.innerHTML = properties.label; //HACK to render the html entities in the canvas
-
-		return {
-			text: new style.Text({
-				text: elLabel.innerHTML,
-				overflow: properties.overflow, // Display label even if not contained in polygon
-				textBaseline: featureArea ? 'middle' : 'bottom',
-				offsetY: featureArea ? 0 : -13, // Above the icon
-				padding: [1, 1, -1, 3],
-				//BEST line & poly label following the cursor
-				font: '12px Verdana',
-				fill: new style.Fill({
-					color: 'black',
-				}),
-				backgroundFill: new style.Fill({
-					color: 'white',
-				}),
-				backgroundStroke: new style.Stroke({
-					color: 'blue',
-				}),
-			}),
-			zIndex: 100,
-		};
-	}
-}
-
-export function clusterStylesOptions(feature, layer) {
-	return [{
-		image: new style.Circle({
-			radius: 14,
-			stroke: new style.Stroke({
-				color: 'blue',
-			}),
-			fill: new style.Fill({
-				color: 'white',
-			}),
-		}),
-		text: new style.Text({
-			text: feature.getProperties().cluster.toString(),
-			font: '12px Verdana',
-		}),
-	}];
-}
-
-export function spreadClusterStylesOptions(feature, layer) {
-	let properties = feature.getProperties(),
-		x = 0.95 + 0.45 * properties.cluster,
-		so = [];
-
-	if (properties.features)
-		properties.features.forEach(f => {
-			const stylesOptions = layer.options.basicStylesOptions(...arguments);
-
-			if (stylesOptions.length) {
-				const image = stylesOptions[0].image; //TODO test
-
-				if (image) {
-					image.setAnchor([x -= 0.9, 0.5]);
-					f.setProperties({ // Mem the shift for hover detection
-						xLeft: (1 - x) * image.getImage().width,
-					}, true);
-					so.push({
-						image: image,
-					});
-				}
-			}
-		});
-
-	so.push(layer.options.labelStylesOptions(...arguments));
-
-	return so;
-}
-
-export function hoverStylesOptions(feature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
-
-	feature.setProperties({
-		overflow: true, // Display label even if not contained in polygon
-		label: agregateText([
-			properties.name,
-			agregateText([
-				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
-			], ', '),
-			properties.type,
-			properties.cluster ? null : properties.attribution,
-		]),
-	}, true);
-
-	return {
-		...labelStylesOptions(feature, layer),
-
-		stroke: new style.Stroke({
-			color: 'red',
-			width: 2,
-		}),
-	};
-}
-
-// Simplify & aggregate an array of lines
-function agregateText(lines, glue) {
-	return lines
-		.filter(Boolean) // Avoid empty lines
-		.map(l => l.toString().replace('_', ' ').trim())
-		.map(l => l[0].toUpperCase() + l.substring(1))
-		.join(glue || '\n');
 }
 
 /**

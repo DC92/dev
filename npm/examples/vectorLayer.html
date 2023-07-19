@@ -112,15 +112,7 @@ import * as proj from 'ol/proj';
 import {
 	HoverLayer,
 } from '../src/MyVectorLayer';
-import {
-	LayerWri,
-	layerWriAreas,
-	LayerAlpages,
-	LayerChemineur,
-	LayerPrc,
-	LayerC2C,
-	LayerOverpass,
-} from '../src/VectorLayerCollection';
+import * as myVector from '../src/VectorLayerCollection';
 
 
 //localStorage.myol_selectwri = 'all'; // Force selectors
@@ -139,11 +131,11 @@ new Map({
 		}),
 
 		// Vector layers
-		new LayerWri({
+		new myVector.Wri({
 			selectName: 'select-wri',
 			selectMassifName: 'select-massif',
 		}),
-		new LayerWri({ // Specific display for refuges.info
+		new myVector.Wri({ // Specific display for refuges.info
 			//TODO BUG label
 			selectName: 'select-refuges',
 			spreadClusterMaxResolution: 20, //TODO BUG always display spread icons
@@ -153,23 +145,23 @@ new Map({
 				attribution: null, // Don't display attribution
 			}),
 		}),
-		new layerWriAreas({
+		new myVector.WriAreas({
 			selectName: 'select-massifs',
 		}),
 
-		new LayerChemineur({
+		new myVector.Chemineur({
 			selectName: 'select-chem',
 		}),
-		new LayerAlpages({
+		new myVector.Alpages({
 			selectName: 'select-alpages',
 		}),
-		new LayerPrc({
+		new myVector.Prc({
 			selectName: 'select-prc',
 		}),
-		new LayerC2C({
+		new myVector.C2C({
 			selectName: 'select-c2c',
 		}),
-		new LayerOverpass({
+		new myVector.Overpass({
 			selectName: 'select-osm',
 		}),
 

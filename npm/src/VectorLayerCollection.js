@@ -12,15 +12,15 @@ import * as proj from 'ol/proj';
 import * as style from 'ol/style';
 
 // MyOl
+import * as stylesOptions from './stylesOptions';
 import {
-	labelStylesOptions,
-	Selector,
 	MyVectorLayer,
-} from './MyVectorLayer.js';
+	Selector,
+} from './MyVectorLayer';
 
 
 // chemineur.fr
-export class LayerChemineur extends MyVectorLayer {
+export class Chemineur extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//chemineur.fr/',
@@ -63,7 +63,7 @@ function chemIconUrl(type, host) {
 }
 
 // alpages.info
-export class LayerAlpages extends MyVectorLayer {
+export class Alpages extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//alpages.info/',
@@ -91,7 +91,7 @@ export class LayerAlpages extends MyVectorLayer {
 }
 
 // refuges.info
-export class LayerWri extends MyVectorLayer {
+export class Wri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//dom.refuges.info/', //TODO www
@@ -146,7 +146,7 @@ export class LayerWri extends MyVectorLayer {
 }
 
 //TODO spécifique WRI
-export class layerWriAreas extends MyVectorLayer {
+export class WriAreas extends MyVectorLayer {
 	constructor(options) {
 		super({
 			host: '//www.refuges.info/',
@@ -177,7 +177,7 @@ export class layerWriAreas extends MyVectorLayer {
 				.map(c => parseInt(c, 16));
 
 			return [{
-				...labelStylesOptions(...arguments),
+				...stylesOptions.label(...arguments),
 
 				stroke: new style.Stroke({
 					color: /*//TODOhover ? properties.couleur :*/ 'transparent',
@@ -199,7 +199,7 @@ export class layerWriAreas extends MyVectorLayer {
 			}, true);
 
 			return {
-				...layer.options.labelStylesOptions(feature, layer),
+				...stylesOptions.label(feature, layer),
 
 				stroke: new style.Stroke({
 					color: properties.couleur,
@@ -212,7 +212,7 @@ export class layerWriAreas extends MyVectorLayer {
 
 // pyrenees-refuges.com
 //TODO bug rappelle url à chaque zoom ! (refresh ?)
-export class LayerPrc extends MyVectorLayer {
+export class Prc extends MyVectorLayer {
 	constructor(options) {
 		super({
 			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
@@ -234,7 +234,7 @@ export class LayerPrc extends MyVectorLayer {
 }
 
 // CampToCamp.org
-export class LayerC2C extends MyVectorLayer {
+export class C2C extends MyVectorLayer {
 	constructor(options) {
 		const format_ = new GeoJSON({ // Format of received data
 			dataProjection: 'EPSG:3857',
@@ -287,7 +287,7 @@ export class LayerC2C extends MyVectorLayer {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
-export class LayerOverpass extends MyVectorLayer {
+export class Overpass extends MyVectorLayer {
 	constructor(options) {
 		const format_ = new OSMXML(),
 			statusEl = document.getElementById(options.selectName),
