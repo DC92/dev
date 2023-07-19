@@ -108,7 +108,7 @@ export class Wri extends MyVectorLayer {
 		});
 
 		//TODO spécifique WRI
-		this.massifSelector = new Selector(opt.selectMassifName, () => this.refresh(this.selector.getSelection().length, true));
+		this.massifSelector = new Selector(opt.selectMassifName, () => this.reload());
 
 		const layer = this; // For use in query_
 
@@ -117,7 +117,7 @@ export class Wri extends MyVectorLayer {
 
 			return {
 				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				massif: selectionMassif, //TODO spécifique WRI //TODO Don't work !! //TODO double layer selector !
+				massif: selectionMassif, //TODO spécifique WRI
 				nb_points: 'all',
 				type_points: layer.selector.getSelection(),
 				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer

@@ -98,7 +98,7 @@ export function spreadCluster(feature, layer) {
 
 	if (properties.features)
 		properties.features.forEach(f => {
-			const stylesOptions = layer.options.basic(...arguments);
+			const stylesOptions = layer.options.basicStylesOptions(...arguments);
 
 			if (stylesOptions.length) {
 				const image = stylesOptions[0].image; //TODO test

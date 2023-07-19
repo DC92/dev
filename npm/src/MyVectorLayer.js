@@ -1,6 +1,6 @@
 /**
  * MyVectorLayer.js
- * Facilities to vector layers 
+ * Facilities to vector layers
  */
 
 import 'ol/ol.css';
@@ -174,12 +174,9 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 		this.options = options; // Mem for further use
 	}
 
-	// Hide or call the url when the selection changes
-	refresh(visible, reload) {
+	reload(visible) {
 		this.setVisible(visible);
-
-		if (visible && reload)
-			this.getSource().refresh();
+		this.getSource().refresh();
 	}
 }
 
@@ -206,12 +203,12 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 		return super.setMapInternal(map);
 	}
 
-	// Propagate the refresh to the altLayer
-	refresh(visible, reload) {
-		super.refresh(visible, reload);
+	// Propagate the reload to the altLayer
+	reload(visible) {
+		super.reload(visible);
 
 		if (this.altLayer)
-			this.altLayer.refresh(visible, reload);
+			this.altLayer.reload(visible);
 	}
 }
 
@@ -236,10 +233,8 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 
 		super(options);
 
-		this.selector = new Selector(options.selectName, selection => {
-			this.refresh(selection.length, true)
-		});
-		this.refresh(this.selector.getSelection().length); // Hide the layer if no selection at the init
+		this.selector = new Selector(options.selectName, selection => this.reload());
+		this.setVisible(this.selector.getSelection().length); // Hide the layer if no selection at the init //TODO BUG ne cache pas AltLayer !
 
 		const layer = this;
 
@@ -252,6 +247,10 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 			return sof(feature, layer)
 				.map(so => new style.Style(so)); // Transform into an array of Style objects
 		}
+	}
+
+	reload() {
+		super.reload(this.selector.getSelection().length);
 	}
 }
 
