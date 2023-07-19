@@ -32,8 +32,8 @@ export class LayerChemineur extends MyVectorLayer {
 		const options = {
 			host: '//chemineur.fr/',
 			browserClusterMinDistance: 50,
-			serverClusterMinResolution: 100,
 			browserClusterFeaturelMaxPerimeter: 300,
+			serverClusterMinResolution: 100,
 			...opt,
 		};
 
@@ -124,7 +124,7 @@ export class LayerWri extends MyVectorLayer {
 
 			return {
 				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				massif: selectionMassif, //TODO spécifique WRI
+				massif: selectionMassif, //TODO spécifique WRI //TODO Don't work !! //TODO double layer selector !
 				nb_points: 'all',
 				type_points: layer.selector.getSelection(),
 				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
@@ -166,15 +166,18 @@ export class layerWriAreas extends MyVectorLayer {
 			}),
 			convertProperties: properties => ({
 				label: properties.nom,
-				name: properties.nom,
+				//	overflow:true,
+				//	name: properties.nom,
 				link: properties.lien,
-				type: null,
-				attribution: null,
+				couleur: properties.couleur,
+				//	type: null,
+				//	attribution: null,
 			}),
-			stylesOptions: areasStylesOptions_,
+			basicStylesOptions: areasStylesOptions_,
+			hoverStylesOptions: hoverStylesOptions_,
 		});
 
-		function areasStylesOptions_(feature, _, hover) {
+		function areasStylesOptions_(feature, layer) {
 			const properties = feature.getProperties(),
 				colors = properties.couleur
 				.match(/([0-9a-f]{2})/ig)
@@ -184,7 +187,7 @@ export class layerWriAreas extends MyVectorLayer {
 				...labelStylesOptions(...arguments),
 
 				stroke: new Stroke({
-					color: hover ? properties.couleur : 'transparent',
+					color: /*//TODOhover ? properties.couleur :*/ 'transparent',
 					width: 2,
 				}),
 
@@ -192,6 +195,24 @@ export class layerWriAreas extends MyVectorLayer {
 					color: 'rgba(' + colors.join(',') + ',0.3)'
 				}),
 			}];
+		}
+
+		function hoverStylesOptions_(feature, layer) {
+			const properties = layer.options.convertProperties(feature.getProperties());
+
+			feature.setProperties({
+				overflow: true, // Display label even if not contained in polygon
+				label: 'agregateText',
+			}, true);
+
+			return {
+				...layer.options.labelStylesOptions(feature, layer),
+
+				stroke: new Stroke({
+					color: properties.couleur,
+					width: 2,
+				}),
+			};
 		}
 	}
 }

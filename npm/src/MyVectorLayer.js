@@ -22,7 +22,7 @@ import {
 import {
 	transformExtent,
 } from 'ol/proj.js';
-import {
+import { //TODO group ?
 	Circle,
 	Fill,
 	Stroke,
@@ -171,8 +171,8 @@ class MyClusterSource extends Cluster {
 class MyBrowserClusterVectorLayer extends VectorLayer {
 	constructor(options) {
 		super({
-			//browserClusterMinDistance:50, // Distance above which the browser clusterises
-			//browserClusterFeaturelMaxPerimeter: 300, // Perimeter (in pixels) of a line or poly above which we do not cluster
+			//browserClusterMinDistance:50, // (pixels) distance above which the browser clusterises
+			//browserClusterFeaturelMaxPerimeter: 300, // (pixels) perimeter of a line or poly above which we do not cluster
 
 			source: options.browserClusterMinDistance ?
 				new MyClusterSource(options) : // Use a cluster source and a vector source to manages clusters
@@ -196,7 +196,7 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 
 class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	constructor(options) {
-		//serverClusterMinResolution: 100, // Resolution above which we ask clusters to the server
+		//serverClusterMinResolution: 100, // (map units per pixel) resolution above which we ask clusters to the server
 
 		// Low resolutions layer to display the normal data
 		super(options);
@@ -255,14 +255,12 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 		const layer = this;
 
 		function style_(feature, resolution) {
-			const stylesOptionsFunction = !feature.getProperties().cluster ?
-				options.basicStylesOptions :
-				resolution > options.spreadClusterMaxResolution ?
-				options.spreadClusterStylesOptions :
+			const sof = !feature.getProperties().cluster ? options.basicStylesOptions :
+				resolution > options.spreadClusterMaxResolution ? options.spreadClusterStylesOptions :
 				options.clusterStylesOptions;
 
 			// Function returning an array of styles options
-			return stylesOptionsFunction(feature, layer)
+			return sof(feature, layer)
 				.map(so => new Style(so)); // Transform into an array of Style objects
 		}
 	}
@@ -372,7 +370,7 @@ export class HoverLayer extends VectorLayer {
 				const f = hoveredSubFeature.clone();
 
 				f.setStyle(
-					new Style(hoverStylesOptions(f, hoveredLayer))
+					new Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
 				);
 
 				source.clear();
@@ -402,25 +400,29 @@ export function basicStylesOptions(feature, layer) {
 	const properties = layer.options.convertProperties(feature.getProperties());
 
 	return [{
+		// Point
 		image: properties.icon ? new Icon({
 			src: properties.icon,
 		}) : null,
 
-		...labelStylesOptions(...arguments),
-
+		// Lines
 		stroke: new Stroke({
 			color: 'blue',
 			width: 2,
 		}),
 
+		// Areas
 		fill: new Fill({
 			color: 'rgba(0,0,256,0.3)',
 		}),
+
+		// properties.label if any
+		...labelStylesOptions(...arguments),
 	}];
 }
 
 export function labelStylesOptions(feature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
+	const properties = feature.getProperties();
 
 	if (properties.label) {
 		const featureArea = getArea(feature.getGeometry().getExtent()),
@@ -494,7 +496,7 @@ export function spreadClusterStylesOptions(feature, layer) {
 			}
 		});
 
-	so.push(labelStylesOptions(...arguments));
+	so.push(layer.options.labelStylesOptions(...arguments));
 
 	return so;
 }
