@@ -85,6 +85,10 @@ class MyVectorSource extends VectorSource {
 			).map(c => c.toPrecision(6)); // Limit the number of digits
 		}
 	}
+
+	reload() {
+		this.refresh();
+	}
 }
 
 /**
@@ -147,9 +151,11 @@ class MyClusterSource extends Cluster {
 				cluster: nbClusters, //BEST voir pourquoi on ne met pas ça dans properties
 			});
 		}
+	}
 
-		// Redirect the refresh method to the wrapped source
-		this.refresh = () => this.getSource().refresh();
+	reload() {
+		// Reload the wrapped source
+		this.getSource().refresh();
 	}
 }
 
@@ -173,10 +179,10 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 		this.options = options; // Mem for further use
 	}
 
-	reload(visible, reload) {
+	reload(visible) {
 		this.setVisible(visible);
-		if (visible && reload)
-			this.getSource().refresh();
+		if (visible && this.state_) //TODO find better than this.state_
+			this.getSource().reload();
 	}
 }
 
@@ -204,11 +210,11 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	}
 
 	// Propagate the reload to the altLayer
-	reload(visible, reload) {
-		super.reload(visible, reload);
+	reload(visible) {
+		super.reload(visible);
 
 		if (this.altLayer)
-			this.altLayer.reload(visible, reload);
+			this.altLayer.reload(visible);
 	}
 }
 
@@ -233,7 +239,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 
 		super(options);
 
-		this.selector = new Selector(options.selectName, selection => this.reload(true));
+		this.selector = new Selector(options.selectName, () => this.reload());
 		this.reload(); // Hide the layer if no selection at the init
 
 		const layer = this;
@@ -249,8 +255,8 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 		}
 	}
 
-	reload(reload) {
-		super.reload(this.selector.getSelection().length, reload);
+	reload() {
+		super.reload(this.selector.getSelection().length);
 	}
 }
 
