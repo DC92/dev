@@ -14,22 +14,19 @@ Based on https://openlayers.org
 	<link href="parts/style.css" rel="stylesheet">
 
 	<script>
-	if (window.origin.split(':').length == 2) {
-		// apache (production)
-		document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
-		document.write('<script src="../dist/myol-debug.js"><&#47;script>');
-	} else {
-		// nmp (test vite)
-		document.write('<script src="../build/index.js" type="module"><&#47;script>');
-	}
-
-	window.onload = function() {
-/*DCMM*/{var _r='111 ',_v=window.myol ;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-	}
+		if (window.origin.split(':').length == 2) {
+			// apache (production)
+			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
+			document.write('<script src="../dist/myol.js"><&#47;script>');
+		}
 	</script>
-	<script src="parts/print_script.js"></script>
 	<script type="module">
+		// nmp (test vite)
+		import myol from '../build/index';
+		window.myol = myol;
 	</script>
+
+	<script src="parts/_cartes.js"></script>
 </head>
 
 <body>
@@ -43,5 +40,11 @@ Based on https://openlayers.org
 
 	<h4 style="clear:both;margin-bottom:0">Tests</h4>
 	<div>XXXXX</div>
+
+	<script>
+		window.onload = function() {
+/*DCMM*/{var _r='myol ',_v=myol ;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+		}
+	</script>
 </body>
 </html>
