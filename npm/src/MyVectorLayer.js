@@ -155,7 +155,7 @@ class MyClusterSource extends Cluster {
 
 	reload() {
 		// Reload the wrapped source
-		this.getSource().refresh();
+		this.getSource().reload();
 	}
 }
 
@@ -181,7 +181,7 @@ class MyBrowserClusterVectorLayer extends VectorLayer {
 
 	reload(visible) {
 		this.setVisible(visible);
-		if (visible && this.state_) //TODO find better than this.state_
+		if (visible && this.state_) //BEST find better than this.state_
 			this.getSource().reload();
 	}
 }
