@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers vector layers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="images/favicon.png" rel="icon" type="image/png" />
+	<link href="images/favicon.png" rel="apple-touch-icon" />
+	<link href="parts/style.css" rel="stylesheet">
+
+	<script>
+	if(window.origin.split(':').length == 2){// apache (production)
+	    document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
+	    document.write('<script src="../dist/myol-debug.js"><&#47;script>');
+	}else{// nmp (test vite)
+	    document.write('<script src="../build/index.js" type="module"><&#47;script>');
+	    document.write('');
+	    document.write('');
+	    document.write('');
+		
+		//const lib = require('../build/index') ;
+
+	}
+	
+	window.onload=function(){
+//*DCMM*/{var _r='111 ',_v=lib ;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+/*DCMM*/{var _r='111 ',_v=window.myol ;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+//*DCMM*/{var _r='111 ',_v=myol ;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+	}
+//*DCMM*/{var _r='333 ',_v=window;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
+	</script>
+	<script type="module">
+
+	   
+
+// Openlayers
+//import '../src/index.js';
+	</script>
+</head>
+
+<body>
+	<div class="ol-box">
+		TOTO
+	</div>
+</body>
+</html>

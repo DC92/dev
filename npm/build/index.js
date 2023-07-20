@@ -27,7 +27,7 @@ import * as stylesOptions from '../src/stylesOptions';
 import * as myvectorlayer from '../src/MyVectorLayer';
 import * as myVector from '../src/VectorLayerCollection';
 
-export default {
+const myol = {
 	control: {
 		Attribution: Attribution,
 		Button: controls.controlButton,
@@ -76,6 +76,9 @@ export default {
 	},
 	View: View,
 }
+
+export default myol;
+window.myol = myol;
 
 // Debug
 import {

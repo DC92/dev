@@ -16,14 +16,13 @@ Based on https://openlayers.org
 	<link href="../dist/myol.css" type="text/css" rel="stylesheet">
 	<script src="../dist/myol.js"></script>
 	<link href="parts/style.css" rel="stylesheet">
-	<link href="parts/style.css" rel="stylesheet">
 </head>
 
 <body>
-	<a style="float:right" href="wri.html">WRI &#9654;</a>
+	<a style="float:right" href="GPS.html">GPS &#9654;</a>
 	<a style="float:right;margin-right:15px" href="..">HOME</a>
 	<h2>Debug cartes refuges.info</h2>
-	<h3>(Mode modules)</h3>
+	<h3>(Mode bundler)</h3>
 	<h4>/vues/index.js</h4>
 	<div id="carte-accueil" class="map"></div>
 	<h4>/vues/point.js</h4>
@@ -39,7 +38,12 @@ Based on https://openlayers.org
 	<div id="carte-edit" class="map"></div>
 
 	<script type="module" defer>
-import myol from '../build/index';
+import myolModule from '../build/index'; //TODO BUG don't work in /index.html
+
+// wri.html use build bundler
+if (window.location.hash)
+	// wri.html#debug use direct module import
+	myol = myolModule;
 
 var mapKeys = {
 	"ign": "iejxbx4obzhco6c8klxrfbto",

@@ -3,7 +3,7 @@ var mapKeys = {
 	"thunderforest": "23e2a2c890144e418ea89a5cc0555afe"
 };
 
-//TODO mais dis donc, c'est utilisé où ?
+//TODO DELETE mais dis donc, c'est utilisé où ?
 
 // /vues/_cartes.js
 function wriMapBaseLayers(page) {
