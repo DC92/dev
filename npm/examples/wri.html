@@ -14,16 +14,17 @@ Based on https://openlayers.org
 	<link href="parts/style.css" rel="stylesheet">
 
 	<script>
+		// apache (production)
 		if (window.origin.split(':').length == 2) {
-			// apache (production)
 			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
 			document.write('<script src="../dist/myol.js"><&#47;script>');
 		}
 	</script>
 	<script type="module">
-		// nmp (test vite)
-		import myol from '../build/index';
-		window.myol = myol;
+		// vite nmp (test)
+		import myol from '../build/index'; // At this place, mysteriously do not import out of npm vite context
+		window.myol = myol; // Declare a myol global variable
+		// Next script must be type="module" to be run after tne import
 	</script>
 
 	<script src="parts/_cartes.js"></script>
@@ -34,17 +35,37 @@ Based on https://openlayers.org
 	<a style="float:right;margin-right:15px" href="..">HOME</a>
 	<h1 style="margin:0">Vector layer</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
-	<p><a href="../src/MyVectorLayer.js">src/MyVectorLayer.js</a> facilities to ol.layer.Vector</p>
+	<p><a href="../examples/parts/_cartes.js">vues/_cartes.js</a> test for refuges.info</p>
+	<p><a href="wri.html">src/wri.html</a> test for refuges.info</p>
 
-	<div class="ol-box">TOTO</div>
+	<h4>/vues/index.js</h4>
+	<div id="carte-accueil" class="map"></div>
+	<script type="module">
+		// /vues/index.js
+		new myol.Map({
+			target: 'carte-accueil',
+			view: new myol.View({
+				enableRotation: false,
+				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+			}),
+			layers: [
+				new myol.layer.Tile({
+					source: new myol.source.OSM(),
+				}),
+				new myol.layer.WriAreas({ // La couche "massifs"
+					//host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
+				}),
+			],
+			controls: [
+				new myol.control.Attribution({
+					collapsed: false,
+				}),
+			],
+			// Centre la carte sur la zone souhaitée
+		}).getView().fit(myol.proj.transformExtent([-5, 42, 8, 51], 'EPSG:4326', 'EPSG:3857'));
+	</script>
 
 	<h4 style="clear:both;margin-bottom:0">Tests</h4>
-	<div>XXXXX</div>
-
-	<script>
-		window.onload = function() {
-/*DCMM*/{var _r='myol ',_v=myol ;if(typeof _v=='array'||typeof _v=='object'){for(let _i in _v)if(typeof _v[_i]!='function'&&_v[_i])_r+=_i+'='+typeof _v[_i]+' '+_v[_i]+' '+(_v[_i]&&_v[_i].CLASS_NAME?'('+_v[_i].CLASS_NAME+')':'')+"\n"}else _r+=_v;console.log(_r)}
-		}
-	</script>
+	<div>//TODO TBD</div>
 </body>
 </html>

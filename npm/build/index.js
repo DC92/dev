@@ -3,16 +3,61 @@
 
 // Openlayers
 import 'ol/ol.css';
-import Attribution from 'ol/control/Attribution';
-import FullScreen from 'ol/control/FullScreen';
+
 import Map from 'ol/Map';
-import MultiPolygon from 'ol/geom/MultiPolygon';
-import ScaleLine from 'ol/control/ScaleLine';
-import Stroke from 'ol/style/Stroke';
 import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
+const myol = {
+	Map: Map,
+	View: View,
+};
+
+import Attribution from 'ol/control/Attribution';
+myol.control = {
+	Attribution: Attribution,
+};
+
 import * as proj from 'ol/proj';
+myol.proj = {
+	fromLonLat: proj.fromLonLat,
+	transformExtent: proj.transformExtent,
+};
+
+// MyOl
+//import * as myVectorLayer from '../src/MyVectorLayer';
+import * as vectorLayerCollection from '../src/VectorLayerCollection';
+myol.layer = {
+	WriAreas: vectorLayerCollection.WriAreas,
+};
+
+
+//TMP
+import OSM from 'ol/source/OSM';
+import Tile from 'ol/layer/Tile';
+myol.source = {
+	OSM: OSM,
+};
+myol.layer.Tile = Tile;
+//TMP
+
+
+export default myol;
+
+
+/*
+import FullScreen from 'ol/control/FullScreen';
+import ScaleLine from 'ol/control/ScaleLine';
+import Zoom from 'ol/control/Zoom';
+myol.	control:{
+		Attribution:Attribution,
+		FullScreenFullScreen:FullScreenFullScreen,
+		ScaleLine:ScaleLine,
+		Zoom:Zoom,
+	},
+
 import * as style from 'ol/style';
+
+import MultiPolygon from 'ol/geom/MultiPolygon';
+import Stroke from 'ol/style/Stroke';
 
 // MyOl
 import * as controls from '../src/Controls';
@@ -28,12 +73,13 @@ import * as myvectorlayer from '../src/MyVectorLayer';
 import * as myVector from '../src/VectorLayerCollection';
 
 export default {
+	...myol,
 	control: {
 		Attribution: Attribution,
-		Button: controls.controlButton,
-		Download: files.controlDownload,
+		//Button: controls.controlButton,
+		//Download: files.controlDownload,
 		FullScreen: FullScreen,
-		GPS: geolocation.controlGPS,
+		//GPS: geolocation.controlGPS,
 		LayerSwitcher: layerswitcher.controlLayerSwitcher,
 		LoadGPX: files.controlLoadGPX,
 		MousePosition: controls.controlMousePosition,
@@ -67,15 +113,12 @@ export default {
 		tileCollection: tilelayercollection.tileLayerCollection,
 	},
 	Map: Map,
-	proj: {
-		fromLonLat: proj.fromLonLat,
-		transformExtent: proj.transformExtent,
-	},
 	style: {
 		Stroke: Stroke,
 	},
 	View: View,
 }
+*/
 
 // Debug
 import {

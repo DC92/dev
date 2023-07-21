@@ -18,6 +18,7 @@
   max-width: 600px;
   height: 80vw;
   max-height: 400px;
+  background: #444;
 }
 
 /* MyVectorLayer */
@@ -35,4 +36,9 @@
 }
 .layer-select label:hover {
   background: lightgray;
+}
+
+/* wri */
+h4 {
+	margin-bottom: 0;
 }
