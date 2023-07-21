@@ -49,10 +49,8 @@ Based on https://openlayers.org
 				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 			}),
 			layers: [
-				new myol.layer.Tile({
-					source: new myol.source.OSM(),
-				}),
-				new myol.layer.WriAreas({ // La couche "massifs"
+				new myol.layer.tile.Mri( ),
+				new myol.layer.vector.WriAreas({ // La couche "massifs"
 					//host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
 				}),
 			],

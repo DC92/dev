@@ -50,7 +50,7 @@ import {
 	controlLayerSwitcher,
 } from '../src/LayerSwitcher';
 import {
-	demoTileLayer,
+	demo,
 } from '../src/TileLayerCollection';
 
 
@@ -67,7 +67,7 @@ const map = new Map({
 			collapsed: false,
 		}),
 		controlLayerSwitcher({
-			layers: demoTileLayer(layersKeys),
+			layers: demo(layersKeys),
 		}),
 	],
 });

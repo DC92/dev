@@ -6,8 +6,8 @@
 // Openlayers
 import 'ol/ol.css';
 import BingMaps from 'ol/source/BingMaps.js';
-import OSM from 'ol/source/OSM.js';
-import Stamen from 'ol/source/Stamen.js';
+import OSMSource from 'ol/source/OSM.js';
+import StamenSource from 'ol/source/Stamen.js';
 import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
 import TileLayer from 'ol/layer/Tile.js';
 import TileWMS from 'ol/source/TileWMS.js';
@@ -25,7 +25,7 @@ import {
 // Virtual class to replace invalid layer scope by a stub display
 class LimitedTileLayer extends TileLayer {
 	setMapInternal(map) { //HACK execute actions on Map init
-		const altlayer = new StamenTileLayer({
+		const altlayer = new Stamen({
 			minResolution: this.getMaxResolution(),
 		});
 
@@ -44,13 +44,13 @@ class LimitedTileLayer extends TileLayer {
 }
 
 // OpenStreetMap & co
-export class OsmTileLayer extends TileLayer {
+export class OSM extends TileLayer {
 	constructor(options) {
 		super({
 			source: new XYZ({
 				url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 				maxZoom: 21,
-				attributions: OSM.ATTRIBUTION,
+				attributions: OSMSource.ATTRIBUTION,
 				...options,
 			}),
 			...options,
@@ -58,7 +58,7 @@ export class OsmTileLayer extends TileLayer {
 	}
 }
 
-export class TopoTileLayer extends OsmTileLayer {
+export class Topo extends OSM {
 	constructor(options) {
 		super({
 			url: '//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
@@ -70,7 +70,7 @@ export class TopoTileLayer extends OsmTileLayer {
 	}
 }
 
-export class MriTileLayer extends OsmTileLayer {
+export class Mri extends OSM {
 	constructor(options) {
 		super({
 			url: '//maps.refuges.info/hiking/{z}/{x}/{y}.png',
@@ -80,7 +80,7 @@ export class MriTileLayer extends OsmTileLayer {
 	}
 }
 
-export class KompassMriTileLayer extends OsmTileLayer { // Austria
+export class Kompass extends OSM { // Austria
 	constructor(opt) {
 		const options = {
 			subLayer: 'KOMPASS Touristik',
@@ -96,7 +96,7 @@ export class KompassMriTileLayer extends OsmTileLayer { // Austria
 	}
 }
 
-export class ThunderforestTileLayer extends OsmTileLayer {
+export class Thunderforest extends OSM {
 	constructor(opt) {
 		const options = {
 			subLayer: 'outdoors',
@@ -122,7 +122,7 @@ export class ThunderforestTileLayer extends OsmTileLayer {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-export class IgnTileLayer extends TileLayer {
+export class IGN extends TileLayer {
 	constructor(options) {
 		let IGNresolutions = [],
 			IGNmatrixIds = [];
@@ -161,7 +161,7 @@ export class IgnTileLayer extends TileLayer {
  * Swisstopo https://api.geo.admin.ch/
  * Don't need key nor referer
  */
-export class SwissTopoTileLayer extends LimitedTileLayer {
+export class SwissTopo extends LimitedTileLayer {
 	constructor(opt) {
 		const options = {
 				host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
@@ -199,7 +199,7 @@ export class SwissTopoTileLayer extends LimitedTileLayer {
 /**
  * Spain
  */
-export class SpainTileLayer extends TileLayer {
+export class IgnES extends TileLayer {
 	constructor(opt) {
 		const options = {
 			host: '//www.ign.es/wmts/',
@@ -225,7 +225,7 @@ export class SpainTileLayer extends TileLayer {
 /**
  * Italy IGM
  */
-export class IGMTileLayer extends LimitedTileLayer {
+export class IGM extends LimitedTileLayer {
 	constructor(options) {
 		super({
 			source: new TileWMS({
@@ -263,7 +263,7 @@ export class IGMTileLayer extends LimitedTileLayer {
 /**
  * Ordnance Survey : Great Britain
  */
-export class OSTileLayer extends LimitedTileLayer {
+export class OS extends LimitedTileLayer {
 	constructor(opt) {
 		const options = {
 			subLayer: 'Outdoor_3857',
@@ -294,7 +294,7 @@ export class OSTileLayer extends LimitedTileLayer {
 /**
  * ArcGIS (Esri)
  */
-export class ArcGisTileLayer extends TileLayer {
+export class ArcGis extends TileLayer {
 	constructor(opt) {
 		const options = {
 			host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
@@ -318,10 +318,10 @@ export class ArcGisTileLayer extends TileLayer {
 /**
  * Stamen http://maps.stamen.com
  */
-export class StamenTileLayer extends TileLayer {
+export class Stamen extends TileLayer {
 	constructor(options) {
 		super({
-			source: new Stamen({
+			source: new StamenSource({
 				layer: 'terrain',
 				...options,
 			}),
@@ -333,7 +333,7 @@ export class StamenTileLayer extends TileLayer {
 /**
  * Google
  */
-export class GoogleTileLayer extends TileLayer {
+export class Google extends TileLayer {
 	constructor(opt) {
 		const options = {
 			subLayers: 'm', // Roads
@@ -358,7 +358,7 @@ export class GoogleTileLayer extends TileLayer {
  * Doc at: https://docs.microsoft.com/en-us/bingmaps/getting-started/
  * attributions: defined by source/BingMaps
  */
-export class BingTileLayer extends TileLayer {
+export class Bing extends TileLayer {
 	constructor(options) {
 		// Hide in LayerSwitcher if no key provided
 		if (!options.key)
@@ -378,149 +378,149 @@ export class BingTileLayer extends TileLayer {
 }
 
 // Tile layers examples
-export function tileLayerCollection(options) {
+export function collection(options) {
 	options = options || {};
 
 	return {
-		'OSM fr': new OsmTileLayer(),
-		'OpenTopo': new TopoTileLayer(),
-		'OSM outdoors': new ThunderforestTileLayer(options.thunderforest), // options include key
-		'OSM transports': new ThunderforestTileLayer({
+		'OSM fr': new OSM(),
+		'OpenTopo': new Topo(),
+		'OSM outdoors': new Thunderforest(options.thunderforest), // options include key
+		'OSM transports': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'transport',
 		}),
-		'OSM cyclo': new OsmTileLayer({
+		'OSM cyclo': new OSM({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
-		'Refuges.info': new MriTileLayer(),
+		'Refuges.info': new Mri(),
 
-		'IGN TOP25': new IgnTileLayer(options.ign), // options include key
-		'IGN V2': new IgnTileLayer({
+		'IGN TOP25': new IGN(options.ign), // options include key
+		'IGN V2': new IGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
-		'IGN cartes 1950': new IgnTileLayer({
+		'IGN cartes 1950': new IGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950',
 			key: 'cartes/geoportail',
 		}),
 
-		'SwissTopo': new SwissTopoTileLayer(),
-		'Autriche': new KompassMriTileLayer(), // No key
-		'Angleterre': new OSTileLayer(options.os), // options include key
-		'Italie': new IGMTileLayer(),
+		'SwissTopo': new SwissTopo(),
+		'Autriche': new Kompass(), // No key
+		'Angleterre': new OS(options.os), // options include key
+		'Italie': new IGM(),
 
-		'Espagne': new SpainTileLayer(),
+		'Espagne': new IgnES(),
 
-		'Photo Google': new GoogleTileLayer({
+		'Photo Google': new Google({
 			subLayers: 's',
 		}),
-		'Photo ArcGIS': new ArcGisTileLayer(),
-		'Photo Bing': new BingTileLayer({
+		'Photo ArcGIS': new ArcGis(),
+		'Photo Bing': new Bing({
 			...options.bing, // Include key
 			imagerySet: 'Aerial',
 		}),
-		'Photo IGN': new IgnTileLayer({
+		'Photo IGN': new IGN({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
 			key: 'essentiels',
 		}),
 
-		'Photo IGN 1950-65': new IgnTileLayer({
+		'Photo IGN 1950-65': new IGN({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965',
 			key: 'orthohisto/geoportail',
 			style: 'BDORTHOHISTORIQUE',
 			format: 'image/png',
 		}),
 
-		'IGN E.M. 1820-66': new IgnTileLayer({
+		'IGN E.M. 1820-66': new IGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
 			key: 'cartes/geoportail',
 		}),
-		'Cadastre': new IgnTileLayer({
+		'Cadastre': new IGN({
 			layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
 			key: 'essentiels',
 			format: 'image/png',
 		}),
-		/*'IGN Cassini': new IgnTileLayer({ //BEST BUG what key for Cassini ?
+		/*'IGN Cassini': new IGN({ //BEST BUG what key for Cassini ?
 			...options.ign,
 					layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
 				}),*/
 	};
 }
 
-export function demoTileLayer(options) {
+export function demo(options) {
 	return {
-		...tileLayerCollection(options),
+		...collection(options),
 
-		'OSM': new OsmTileLayer(),
+		'OSM': new OSM(),
 
-		'ThF cycle': new ThunderforestTileLayer({
+		'ThF cycle': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'cycle',
 		}),
-		'ThF trains': new ThunderforestTileLayer({
+		'ThF trains': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'pioneer',
 		}),
-		'ThF villes': new ThunderforestTileLayer({
+		'ThF villes': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'neighbourhood',
 		}),
-		'ThF landscape': new ThunderforestTileLayer({
+		'ThF landscape': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'landscape',
 		}),
-		'ThF contraste': new ThunderforestTileLayer({
+		'ThF contraste': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'mobile-atlas',
 		}),
 
-		'OS light': new OSTileLayer({
+		'OS light': new OS({
 			...options.os, // Include key
 			subLayer: 'Light_3857',
 		}),
-		'OS road': new OSTileLayer({
+		'OS road': new OS({
 			...options.os, // Include key
 			subLayer: 'Road_3857',
 		}),
-		'Kompas topo': new KompassMriTileLayer({
+		'Kompas topo': new Kompass({
 			...options.kompass, // Include key
 			subLayer: 'kompass_topo',
 		}),
-		'Kompas winter': new KompassMriTileLayer({
+		'Kompas winter': new Kompass({
 			...options.kompass, // Include key
 			subLayer: 'kompass_winter',
 		}),
 
-		'Bing': new BingTileLayer({
+		'Bing': new Bing({
 			...options.bing, // Include key
 			imagerySet: 'Road',
 		}),
-		'Bing hybrid': new BingTileLayer({
+		'Bing hybrid': new Bing({
 			...options.bing, // Include key
 			imagerySet: 'AerialWithLabels',
 		}),
 
-		'Photo Swiss': new SwissTopoTileLayer({
+		'Photo Swiss': new SwissTopo({
 			subLayer: 'ch.swisstopo.swissimage',
 		}),
-		'Photo Espagne': new SpainTileLayer({
+		'Photo Espagne': new IgnES({
 			server: 'pnoa-ma',
 			subLayer: 'OI.OrthoimageCoverage',
 		}),
 
-		'Google road': new GoogleTileLayer(),
-		'Google terrain': new GoogleTileLayer({
+		'Google road': new Google(),
+		'Google terrain': new Google({
 			subLayers: 'p',
 		}),
-		'Google hybrid': new GoogleTileLayer({
+		'Google hybrid': new Google({
 			subLayers: 's,h',
 		}),
-		'Stamen': new StamenTileLayer(),
-		'Toner': new StamenTileLayer({
+		'Stamen': new Stamen(),
+		'Toner': new Stamen({
 			layer: 'toner',
 		}),
-		'Watercolor': new StamenTileLayer({
+		'Watercolor': new Stamen({
 			layer: 'watercolor',
 		}),
 		'Blank': new TileLayer(),

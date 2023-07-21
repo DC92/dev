@@ -24,21 +24,12 @@ myol.proj = {
 
 // MyOl
 //import * as myVectorLayer from '../src/MyVectorLayer';
+import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
 myol.layer = {
-	WriAreas: vectorLayerCollection.WriAreas,
+	tile: tileLayercollection,
+	vector: vectorLayerCollection,
 };
-
-
-//TMP
-import OSM from 'ol/source/OSM';
-import Tile from 'ol/layer/Tile';
-myol.source = {
-	OSM: OSM,
-};
-myol.layer.Tile = Tile;
-//TMP
-
 
 export default myol;
 
@@ -67,7 +58,6 @@ import * as files from '../src/Files';
 import * as geolocation from '../src/Geolocation';
 import * as layerswitcher from '../src/LayerSwitcher';
 import * as marker from '../src/Marker';
-import * as tilelayercollection from '../src/TileLayerCollection';
 import * as stylesOptions from '../src/stylesOptions';
 import * as myvectorlayer from '../src/MyVectorLayer';
 import * as myVector from '../src/VectorLayerCollection';
@@ -97,20 +87,20 @@ export default {
 		label: stylesOptions.label,
 	},
 	layer: {
-		ArcGisTile: tilelayercollection.ArcGisTileLayer,
-		GoogleTile: tilelayercollection.GoogleTileLayer,
-		IgnTile: tilelayercollection.IgnTileLayer,
-		KompassMriTile: tilelayercollection.KompassMriTileLayer,
+		ArcGisTile: tileLayercollection.ArcGis,
+		GoogleTile: tileLayercollection.Google,
+		IgnTile: tileLayercollection.IGN,
+		KompassMriTile: tileLayercollection.Kompass,
 		Marker: marker.layerMarker,
-		MriTile: tilelayercollection.MriTileLayer,
-		OsmTile: tilelayercollection.OsmTileLayer,
-		SpainTile: tilelayercollection.SpainTileLayer,
-		SwissTopoTile: tilelayercollection.SwissTopoTileLayer,
-		ThunderforestTile: tilelayercollection.ThunderforestTileLayer,
-		TopoTile: tilelayercollection.TopoTileLayer,
+		MriTile: tileLayercollection.Mri,
+		OsmTile: tileLayercollection.OSM,
+		SpainTile: tileLayercollection.IgnES,
+		SwissTopoTile: tileLayercollection.SwissTopo,
+		ThunderforestTile: tileLayercollection.Thunderforest,
+		TopoTile: tileLayercollection.Topo,
 		Wri: myVector.Wri,
 
-		tileCollection: tilelayercollection.tileLayerCollection,
+		tileCollection: tileLayercollection.collection,
 	},
 	Map: Map,
 	style: {

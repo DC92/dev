@@ -43,7 +43,7 @@ import {
 	controlLayerSwitcher,
 } from '../src/LayerSwitcher';
 import {
-	tileLayerCollection,
+	collection,
 } from '../src/TileLayerCollection';
 
 // Debug
@@ -60,7 +60,7 @@ new Map({
 	controls: [
 		...controlCollection(),
 		controlLayerSwitcher({
-			layers: tileLayerCollection(),
+			layers: collection(),
 		}),
 	],
 });
