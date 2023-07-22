@@ -4,7 +4,6 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
 import Control from 'ol/control/Control';
 import MousePosition from 'ol/control/MousePosition';
 import MouseWheelZoom from 'ol/interaction/MouseWheelZoom';

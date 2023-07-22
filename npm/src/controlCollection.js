@@ -4,7 +4,6 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
 import Attribution from 'ol/control/Attribution';
 import FullScreen from 'ol/control/FullScreen';
 import MousePosition from 'ol/control/MousePosition';

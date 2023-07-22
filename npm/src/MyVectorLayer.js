@@ -3,7 +3,6 @@
  * Facilities to vector layers
  */
 
-//import 'ol/ol.css'; //TODO erradiquer de (presque) partout
 //TODO verify if all are used
 import Cluster from 'ol/source/Cluster';
 import Feature from 'ol/Feature';

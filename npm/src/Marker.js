@@ -12,7 +12,6 @@
 import proj4 from 'proj4/lib/index.js';
 
 // Openlayers
-import 'ol/ol.css';
 import Feature from 'ol/Feature.js';
 import Icon from 'ol/style/Icon.js';
 import Point from 'ol/geom/Point.js';

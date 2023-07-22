@@ -4,7 +4,6 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
 import BingMaps from 'ol/source/BingMaps.js';
 import OSMSource from 'ol/source/OSM.js';
 import StamenSource from 'ol/source/Stamen.js';

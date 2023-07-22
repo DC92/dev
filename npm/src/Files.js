@@ -4,7 +4,6 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import GPX from 'ol/format/GPX';

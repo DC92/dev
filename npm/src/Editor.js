@@ -4,7 +4,6 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
 import Control from 'ol/control/Control';
 import Draw from 'ol/interaction/Draw';
 import Feature from 'ol/Feature';

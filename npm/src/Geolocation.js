@@ -4,7 +4,6 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
 import Control from 'ol/control/Control.js';
 import Feature from 'ol/Feature.js';
 import Geolocation from 'ol/Geolocation.js';
