@@ -23,13 +23,21 @@ myol.proj = {
 };
 
 // MyOl
-//import * as myVectorLayer from '../src/MyVectorLayer';
 import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
 myol.layer = { //TODO mettre dans un répertoire scr/layer
 	tile: tileLayercollection,
 	vector: vectorLayerCollection,
 };
+
+import {
+	MyVectorLayer,
+	HoverLayer,
+	Selector,
+} from '../src/MyVectorLayer';
+myol.layer.VectorLayer = MyVectorLayer;
+myol.layer.Hover = HoverLayer;
+myol.Selector = Selector;
 
 export default myol;
 
@@ -39,7 +47,6 @@ import FullScreen from 'ol/control/FullScreen';
 import ScaleLine from 'ol/control/ScaleLine';
 import Zoom from 'ol/control/Zoom';
 myol.	control:{
-		Attribution:Attribution,
 		FullScreenFullScreen:FullScreenFullScreen,
 		ScaleLine:ScaleLine,
 		Zoom:Zoom,
@@ -60,12 +67,10 @@ import * as layerswitcher from '../src/LayerSwitcher';
 import * as marker from '../src/Marker';
 import * as stylesOptions from '../src/stylesOptions';
 import * as myvectorlayer from '../src/MyVectorLayer';
-import * as myVector from '../src/VectorLayerCollection';
 
 export default {
 	...myol,
 	control: {
-		Attribution: Attribution,
 		//Button: controls.controlButton,
 		//Download: files.controlDownload,
 		FullScreen: FullScreen,
@@ -92,21 +97,19 @@ export default {
 		IgnTile: tileLayercollection.IGN,
 		KompassMriTile: tileLayercollection.Kompass,
 		Marker: marker.layerMarker,
-		MriTile: tileLayercollection.Mri,
+		MriTile: tileLayercollection.MRI,
 		OsmTile: tileLayercollection.OSM,
 		SpainTile: tileLayercollection.IgnES,
 		SwissTopoTile: tileLayercollection.SwissTopo,
 		ThunderforestTile: tileLayercollection.Thunderforest,
 		TopoTile: tileLayercollection.Topo,
-		Wri: myVector.Wri,
+		WRI: myVector.WRI,
 
 		tileCollection: tileLayercollection.collection,
 	},
-	Map: Map,
 	style: {
 		Stroke: Stroke,
 	},
-	View: View,
 }
 */
 

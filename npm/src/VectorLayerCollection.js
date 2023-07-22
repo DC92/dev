@@ -83,7 +83,7 @@ export class Alpages extends MyVectorLayer {
 }
 
 // refuges.info
-export class Wri extends MyVectorLayer {
+export class WRI extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
 			host: '//www.refuges.info/',
@@ -127,26 +127,19 @@ export class Wri extends MyVectorLayer {
 }
 
 //TODO spécifique WRI
-//TODO Hide the layer if no selection at the init (massifs)
 export class WriAreas extends MyVectorLayer {
-	constructor(options) {
+	constructor() {
 		super({
 			host: '//www.refuges.info/',
 			strategy: loadingstrategy.all,
-			...options,
-
 			query: () => ({
 				_path: 'api/polygones',
 				type_polygon: 1, // Massifs
 			}),
-			addPropertiesOLD: properties => ({ //TODO
+			addProperties: properties => ({
 				label: properties.nom,
-				//	overflow:true,
-				//	name: properties.nom,
-				link: properties.lien,
 				couleur: properties.couleur,
-				//	type: null,
-				//	attribution: null,
+				link: properties.lien,
 			}),
 			basicStylesOptions: areasStylesOptions_,
 			hoverStylesOptions: hoverStylesOptions_,
@@ -161,11 +154,6 @@ export class WriAreas extends MyVectorLayer {
 			return [{
 				...stylesOptions.label(...arguments),
 
-				stroke: new style.Stroke({
-					color: /*//TODOhover ? properties.couleur :*/ 'transparent',
-					width: 2,
-				}),
-
 				fill: new style.Fill({
 					color: 'rgba(' + colors.join(',') + ',0.3)'
 				}),
@@ -176,8 +164,8 @@ export class WriAreas extends MyVectorLayer {
 			const properties = feature.getProperties();
 
 			feature.setProperties({
+				label: properties.nom,
 				overflow: true, // Display label even if not contained in polygon
-				label: 'agregateText',
 			}, true);
 
 			return {
@@ -193,8 +181,7 @@ export class WriAreas extends MyVectorLayer {
 }
 
 // pyrenees-refuges.com
-//TODO bug rappelle url à chaque zoom ! (refresh ?)
-export class Prc extends MyVectorLayer {
+export class PRC extends MyVectorLayer {
 	constructor(options) {
 		super({
 			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',

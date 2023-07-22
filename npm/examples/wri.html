@@ -27,7 +27,7 @@ Based on https://openlayers.org
 		// Next script must be type="module" to be run after the import
 	</script>
 
-	<script src="parts/_cartes.js"></script>
+	<script src="parts/_cartes.js" type="module"></script>
 </head>
 
 <body>
@@ -49,7 +49,8 @@ Based on https://openlayers.org
 				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 			}),
 			layers: [
-				new myol.layer.tile.Mri( ),
+				new myol.layer.tile.MRI( ),
+				new myol.layer.Hover(),
 				new myol.layer.vector.WriAreas({ // La couche "massifs"
 					//host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
 				}),

@@ -44,10 +44,6 @@ Based on https://openlayers.org
 			Alpages.info
 			<input type="checkbox" name="select-alpages" />
 			<span id="select-alpages-status"></span>
-		</label><br /><label>
-			Massifs
-			<input type="checkbox" name="select-massifs" />
-			<span id="select-massifs-status"></span>
 		</label>
 	</div>
 
@@ -122,7 +118,7 @@ new Map({
 	view: new View({
 		center: proj.transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Cabane double	
 		//center: proj.transform([5.72, 45.17], 'EPSG:4326', 'EPSG:3857'), // Grenoble
-		zoom: 11,
+		zoom: 8,
 	}),
 	layers: [
 		// Background layer
@@ -131,12 +127,12 @@ new Map({
 		}),
 
 		// Vector layers
-		new myVector.Wri({
+		new myVector.WRI({
 			host: '//dom.refuges.info/', //TODO www
 			selectName: 'select-wri',
 			selectMassifName: 'select-massif',
 		}),
-		new myVector.Wri({ // Specific display for refuges.info
+		new myVector.WRI({ // Specific display for refuges.info
 			//TODO BUG label
 			selectName: 'select-refuges',
 			spreadClusterMaxResolution: 20, //TODO BUG always display spread icons
@@ -146,18 +142,14 @@ new Map({
 				//attribution: null, // Don't display attribution
 			}),
 		}),
-		new myVector.WriAreas({
-			//selectName: 'select-massifs',
-		}),
 
 		new myVector.Chemineur({
-			host: '//dom.refuges.info/', //TODO www
 			selectName: 'select-chem',
 		}),
 		new myVector.Alpages({
 			selectName: 'select-alpages',
 		}),
-		new myVector.Prc({
+		new myVector.PRC({
 			selectName: 'select-prc',
 		}),
 		new myVector.C2C({

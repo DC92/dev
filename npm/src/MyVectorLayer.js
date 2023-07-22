@@ -441,6 +441,6 @@ export class Selector {
 				.filter(el => el.checked && el.value != 'all')
 				.map(el => el.value);
 
-		return [];
+		return [null];
 	}
 }

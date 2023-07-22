@@ -69,7 +69,7 @@ export class Topo extends OSM {
 	}
 }
 
-export class Mri extends OSM {
+export class MRI extends OSM {
 	constructor(options) {
 		super({
 			url: '//maps.refuges.info/hiking/{z}/{x}/{y}.png',
@@ -391,7 +391,7 @@ export function collection(options) {
 		'OSM cyclo': new OSM({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
-		'Refuges.info': new Mri(),
+		'Refuges.info': new MRI(),
 
 		'IGN TOP25': new IGN(options.ign), // options include key
 		'IGN V2': new IGN({
