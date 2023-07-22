@@ -3,7 +3,7 @@
  * Facilities to vector layers
  */
 
-import 'ol/ol.css';
+//import 'ol/ol.css'; //TODO erradiquer de (presque) partout
 //TODO verify if all are used
 import Cluster from 'ol/source/Cluster';
 import Feature from 'ol/Feature';
@@ -34,6 +34,7 @@ class MyVectorSource extends VectorSource {
 				strategy: loadingstrategy.bbox,
 				bbox: bbox_, // (extent, resolution, mapProjection)
 				projection: 'EPSG:4326',
+				addProperties: () => {}, // Add properties to each received features
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
@@ -45,21 +46,20 @@ class MyVectorSource extends VectorSource {
 			...options,
 		});
 
-		// Display loading status
-		if (statusEl)
-			this.on(['featuresloadstart', 'featuresloadend', 'featuresloaderror'], evt => {
-				if (!statusEl.textContent.includes('error'))
-					statusEl.innerHTML = '';
+		this.on(['featuresloadstart', 'featuresloaderror', 'featuresloadend'], evt => {
+			if (statusEl) statusEl.innerHTML =
+				evt.type == 'featuresloadstart' ? '&#8987;' :
+				evt.type == 'featuresloaderror' ? '&#9888;' :
+				'';
 
-				switch (evt.type) {
-					case 'featuresloadstart':
-						statusEl.innerHTML = '&#8987;';
-						break;
-					case 'featuresloaderror':
-						statusEl.innerHTML = '&#9888;';
-						//BEST status out of zoom bounds
-				}
-			});
+			// Modify received features properties
+			if (evt.type == 'featuresloadend')
+				evt.features.forEach(f =>
+					f.setProperties(options.addProperties(f.getProperties()),
+						true // Silent : add the feature without refresh the layer
+					)
+				);
+		});
 
 		function url_() {
 			const args = options.query(...arguments),
@@ -127,7 +127,7 @@ class MyClusterSource extends Cluster {
 				lines = [];
 
 			features.forEach(f => {
-				const properties = options.convertProperties(f.getProperties());
+				const properties = f.getProperties();
 
 				lines.push(properties.name);
 				nbClusters += parseInt(properties.cluster) || 1;
@@ -226,21 +226,18 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 export class MyVectorLayer extends MyServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
-			convertProperties: p => p, // Default : translate properties to standard MyOl (to be used in styles)
-
 			basicStylesOptions: stylesOptions.basic, // (feature, layer)
 			clusterStylesOptions: stylesOptions.cluster,
 			spreadClusterStylesOptions: stylesOptions.spreadCluster,
 			hoverStylesOptions: stylesOptions.hover,
 			style: style_,
-
 			...opt,
 		};
 
 		super(options);
 
 		this.selector = new Selector(options.selectName, () => this.reload());
-		this.reload(); // Hide the layer if no selection at the init
+		this.reload();
 
 		const layer = this;
 
@@ -311,9 +308,7 @@ export class HoverLayer extends VectorLayer {
 			hoveredSubFeature = hoveredFeature;
 
 		if (hoveredFeature) {
-			const hoveredProperties = hoveredLayer.options.convertProperties(
-					hoveredFeature.getProperties()
-				),
+			const hoveredProperties = hoveredFeature.getProperties(),
 				featurePosition = map.getPixelFromCoordinate(
 					extent.getCenter(hoveredFeature.getGeometry().getExtent())
 				);
@@ -333,9 +328,7 @@ export class HoverLayer extends VectorLayer {
 				});
 			}
 
-			const hoveredSubProperties = hoveredLayer.options.convertProperties(
-				hoveredSubFeature.getProperties()
-			);
+			const hoveredSubProperties = hoveredSubFeature.getProperties();
 
 			// Click
 			if (evt.type == 'click') {

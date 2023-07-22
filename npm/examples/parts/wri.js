@@ -123,7 +123,7 @@ new myol.Map({
 							return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
 					},
 					// Don't display attribution on labels
-					convertProperties: {
+					addPropertiesOLD: { //TODO
 						attribution: null,
 					},
 				}),
@@ -157,7 +157,7 @@ const layers = [
 							return styleOptionsLabel(feature, properties.nom || properties.name); // Points || clusters
 					},
 					// Don't display attribution on labels
-					convertProperties: {
+					addPropertiesOLD: { //TODO
 						attribution: null,
 					},
 				}),

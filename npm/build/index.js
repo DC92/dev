@@ -26,7 +26,7 @@ myol.proj = {
 //import * as myVectorLayer from '../src/MyVectorLayer';
 import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
-myol.layer = {
+myol.layer = { //TODO mettre dans un répertoire scr/layer
 	tile: tileLayercollection,
 	vector: vectorLayerCollection,
 };

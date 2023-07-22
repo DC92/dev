@@ -4,7 +4,8 @@
  */
 
 // Openlayers
-import 'ol/ol.css';
+//TODO verify if all are used
+//import 'ol/ol.css';
 import GeoJSON from 'ol/format/GeoJSON';
 import OSMXML from 'ol/format/OSMXML';
 import * as loadingstrategy from 'ol/loadingstrategy';
@@ -19,36 +20,6 @@ import {
 } from './MyVectorLayer';
 
 
-// chemineur.fr
-export class Chemineur extends MyVectorLayer {
-	constructor(opt) {
-		const options = {
-			host: '//chemineur.fr/',
-			browserClusterMinDistance: 50,
-			browserClusterFeaturelMaxPerimeter: 300,
-			serverClusterMinResolution: 100,
-			...opt,
-		};
-
-		super({
-			...options,
-
-			query: (extent, resolution) => ({
-				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: this.selector.getSelection(),
-				layer: resolution < options.serverClusterMinResolution ? null : 'cluster', // For server cluster layer
-			}),
-
-			convertProperties: properties => ({
-				...properties,
-				icon: chemIconUrl(properties.type, options.host),
-				link: options.host + 'viewtopic.php?t=' + properties.id,
-				attribution: '&copy;chemineur.fr',
-			}),
-		});
-	}
-};
-
 // Get icon from chemineur.fr
 function chemIconUrl(type, host) {
 	if (type) {
@@ -62,6 +33,29 @@ function chemIconUrl(type, host) {
 	}
 }
 
+// chemineur.fr
+export class Chemineur extends MyVectorLayer {
+	constructor(opt) {
+		const options = {
+			host: '//chemineur.fr/',
+			browserClusterMinDistance: 50,
+			browserClusterFeaturelMaxPerimeter: 300,
+			serverClusterMinResolution: 100,
+			attribution: '&copy;chemineur.fr',
+			...opt,
+		};
+
+		super({
+			...options,
+			query: (extent, resolution) => ({
+				_path: 'ext/Dominique92/GeoBB/gis.php',
+				cat: this.selector.getSelection(),
+				layer: resolution < options.serverClusterMinResolution ? null : 'cluster', // For server cluster layer
+			}),
+		});
+	}
+};
+
 // alpages.info
 export class Alpages extends MyVectorLayer {
 	constructor(opt) {
@@ -69,6 +63,7 @@ export class Alpages extends MyVectorLayer {
 			host: '//alpages.info/',
 			browserClusterMinDistance: 50,
 			browserClusterFeaturelMaxPerimeter: 300,
+			attribution: '&copy;alpages.info',
 			...opt,
 		};
 
@@ -80,11 +75,9 @@ export class Alpages extends MyVectorLayer {
 				forums: this.selector.getSelection(),
 			}),
 
-			convertProperties: properties => ({
-				...properties,
+			addProperties: properties => ({
 				icon: chemIconUrl(properties.type), // Replace the alpages icon
 				link: options.host + 'viewtopic.php?t=' + properties.id,
-				attribution: '&copy;alpages.info',
 			}),
 		});
 	}
@@ -94,17 +87,24 @@ export class Alpages extends MyVectorLayer {
 export class Wri extends MyVectorLayer {
 	constructor(opt) {
 		const options = {
-			host: '//dom.refuges.info/', //TODO www
+			host: '//www.refuges.info/',
 			browserClusterMinDistance: 50,
 			serverClusterMinResolution: 100,
-			convertProperties: p => p, // For inheritance //TODO explain
+			attribution: '&copy;refuges.info',
 			...opt,
 		};
 
 		super({
 			...options,
 			query: query_,
-			convertProperties: convertProperties_,
+			addProperties: properties => ({
+				name: properties.nom,
+				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+				ele: properties.coord.alt,
+				bed: properties.places.valeur,
+				type: properties.type.valeur,
+				link: properties.lien,
+			}),
 		});
 
 		//TODO spécifique WRI
@@ -124,28 +124,11 @@ export class Wri extends MyVectorLayer {
 				//TODO inheritance (pour massifs)
 			};
 		}
-
-		function convertProperties_(properties) {
-			if (!properties.cluster) // Points
-				properties = {
-					name: properties.nom,
-					icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
-					ele: properties.coord.alt,
-					bed: properties.places.valeur,
-					type: properties.type.valeur,
-					link: properties.lien,
-					attribution: '&copy;refuges.info',
-				};
-
-			return {
-				...properties,
-				...options.convertProperties(properties), // Inherited
-			};
-		}
 	}
 }
 
 //TODO spécifique WRI
+//TODO Hide the layer if no selection at the init (massifs)
 export class WriAreas extends MyVectorLayer {
 	constructor(options) {
 		super({
@@ -157,7 +140,7 @@ export class WriAreas extends MyVectorLayer {
 				_path: 'api/polygones',
 				type_polygon: 1, // Massifs
 			}),
-			convertProperties: properties => ({
+			addPropertiesOLD: properties => ({ //TODO
 				label: properties.nom,
 				//	overflow:true,
 				//	name: properties.nom,
@@ -191,7 +174,7 @@ export class WriAreas extends MyVectorLayer {
 		}
 
 		function hoverStylesOptions_(feature, layer) {
-			const properties = layer.options.convertProperties(feature.getProperties());
+			const properties = feature.getProperties();
 
 			feature.setProperties({
 				overflow: true, // Display label even if not contained in polygon
@@ -218,16 +201,15 @@ export class Prc extends MyVectorLayer {
 			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
 			strategy: loadingstrategy.all,
 			browserClusterMinDistance: 50,
+			attribution: '&copy;Pyrenees-Refuges',
 			...options,
 
-			convertProperties: properties => ({
-				...properties,
+			addProperties: properties => ({
 				type: properties.type_hebergement,
 				icon: chemIconUrl(properties.type_hebergement),
 				ele: properties.altitude,
 				capacity: properties.cap_ete,
 				link: properties.url,
-				attribution: '&copy;Pyrenees-Refuges',
 			}),
 		});
 	}
@@ -249,6 +231,7 @@ export class C2C extends MyVectorLayer {
 			projection: 'EPSG:3857',
 			format: format_,
 			browserClusterMinDistance: 50,
+			attribution: '&copy;Camp2camp',
 			...options,
 		});
 
@@ -269,7 +252,6 @@ export class C2C extends MyVectorLayer {
 						icon: chemIconUrl(properties.waypoint_type),
 						ele: properties.elevation,
 						link: '//www.camptocamp.org/waypoints/' + properties.document_id,
-						attribution: '&copy;Camp2camp',
 					},
 				});
 			}
@@ -352,7 +334,7 @@ export class Overpass extends MyVectorLayer {
 							addTag(node, 'icon', chemIconUrl(tag.getAttribute('v')));
 							// Only once for a node
 							addTag(node, 'url', 'https://www.openstreetmap.org/node/' + node.id);
-							addTag(node, 'attribution', '&copy;OpenStreetMap');
+							addTag(node, 'attribution', '&copy;OpenStreetMap'); //TODO move to layer.options
 						}
 
 						if (tag.getAttribute('k') && tag.getAttribute('k').includes('capacity:'))

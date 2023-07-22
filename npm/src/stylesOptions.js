@@ -6,6 +6,7 @@
  *   layer : that owns the feature
  */
 
+//TODO verify if all are used
 import Icon from 'ol/style/Icon';
 import * as extent from 'ol/extent';
 import * as style from 'ol/style';
@@ -13,7 +14,7 @@ import * as style from 'ol/style';
 
 // Basic style to display a geo vector layer based on standard properties
 export function basic(feature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
+	const properties = feature.getProperties();
 
 	return [{
 		// Point
@@ -122,7 +123,7 @@ export function spreadCluster(feature, layer) {
 
 // Display the detailed information of a cluster based on standard properties
 export function details(feature, layer) {
-	const properties = layer.options.convertProperties(feature.getProperties());
+	const properties = feature.getProperties();
 
 	feature.setProperties({
 		overflow: true, // Display label even if not contained in polygon
@@ -133,17 +134,17 @@ export function details(feature, layer) {
 				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
 			], ', '),
 			properties.type,
-			properties.cluster ? null : properties.attribution,
+			properties.cluster ? null : properties.attribution || layer.options.attribution,
 		]),
 	}, true);
 
-	return label(feature, layer);
+	return label(...arguments);
 }
 
 // Display the basic hovered features
 export function hover(feature, layer) {
 	return {
-		...details(feature, layer),
+		...details(...arguments),
 
 		stroke: new style.Stroke({
 			color: 'red',
