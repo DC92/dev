@@ -28,7 +28,7 @@ export function basic(feature, layer) {
 			width: 2,
 		}),
 
-		// Areas
+		// Polygons
 		fill: new style.Fill({
 			color: 'rgba(0,0,256,0.3)',
 		}),

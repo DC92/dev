@@ -126,60 +126,6 @@ export class WRI extends MyVectorLayer {
 	}
 }
 
-//TODO spécifique WRI
-export class WriAreas extends MyVectorLayer {
-	constructor() {
-		super({
-			host: '//www.refuges.info/',
-			strategy: loadingstrategy.all,
-			query: () => ({
-				_path: 'api/polygones',
-				type_polygon: 1, // Massifs
-			}),
-			addProperties: properties => ({
-				label: properties.nom,
-				couleur: properties.couleur,
-				link: properties.lien,
-			}),
-			basicStylesOptions: areasStylesOptions_,
-			hoverStylesOptions: hoverStylesOptions_,
-		});
-
-		function areasStylesOptions_(feature, layer) {
-			const properties = feature.getProperties(),
-				colors = properties.couleur
-				.match(/([0-9a-f]{2})/ig)
-				.map(c => parseInt(c, 16));
-
-			return [{
-				...stylesOptions.label(...arguments),
-
-				fill: new style.Fill({
-					color: 'rgba(' + colors.join(',') + ',0.3)'
-				}),
-			}];
-		}
-
-		function hoverStylesOptions_(feature, layer) {
-			const properties = feature.getProperties();
-
-			feature.setProperties({
-				label: properties.nom,
-				overflow: true, // Display label even if not contained in polygon
-			}, true);
-
-			return {
-				...stylesOptions.label(feature, layer),
-
-				stroke: new style.Stroke({
-					color: properties.couleur,
-					width: 2,
-				}),
-			};
-		}
-	}
-}
-
 // pyrenees-refuges.com
 export class PRC extends MyVectorLayer {
 	constructor(options) {

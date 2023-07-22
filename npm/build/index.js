@@ -6,14 +6,23 @@ import 'ol/ol.css';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
+import * as style from 'ol/style';
 const myol = {
 	Map: Map,
 	View: View,
+	style: style,
 };
+
 
 import Attribution from 'ol/control/Attribution';
 myol.control = {
 	Attribution: Attribution,
+};
+
+import * as loadingstrategy from 'ol/loadingstrategy';
+myol.loadingstrategy = {
+	all: loadingstrategy.all,
+	bbox: loadingstrategy.bbox,
 };
 
 import * as proj from 'ol/proj';
@@ -23,6 +32,9 @@ myol.proj = {
 };
 
 // MyOl
+import * as stylesOptions from '../src/stylesOptions';
+myol.stylesOptions = stylesOptions;
+
 import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
 myol.layer = { //TODO mettre dans un répertoire scr/layer
@@ -35,7 +47,7 @@ import {
 	HoverLayer,
 	Selector,
 } from '../src/MyVectorLayer';
-myol.layer.VectorLayer = MyVectorLayer;
+myol.layer.MyVectorLayer = MyVectorLayer;
 myol.layer.Hover = HoverLayer;
 myol.Selector = Selector;
 
@@ -65,7 +77,6 @@ import * as files from '../src/Files';
 import * as geolocation from '../src/Geolocation';
 import * as layerswitcher from '../src/LayerSwitcher';
 import * as marker from '../src/Marker';
-import * as stylesOptions from '../src/stylesOptions';
 import * as myvectorlayer from '../src/MyVectorLayer';
 
 export default {
@@ -87,9 +98,6 @@ export default {
 	},
 	geom: {
 		MultiPolygon: MultiPolygon,
-	},
-	stylesOptions: {
-		label: stylesOptions.label,
 	},
 	layer: {
 		ArcGisTile: tileLayercollection.ArcGis,
