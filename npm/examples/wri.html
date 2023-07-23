@@ -55,11 +55,39 @@ Based on https://openlayers.org
 	<p><a href="wri.html">src/wri.html</a> test for refuges.info</p>
 
 	<h4>/vues/nav.js</h4>
-	<label>
-		<input type="checkbox" name="select-massif" value="4" />
-		Vercors uniquement
-	</label>
 	<div id="carte-nav"></div>
+	<ul>
+		<li>
+			<input type="checkbox" id="select-massif" name="select-massif" value="4">
+			<label for="select-massif">Vercors uniquement</label>
+		</li><hr><li>
+			<label for="select-wri">Tout</label>
+			<input type="checkbox" id="select-wri" name="select-wri" value="all">
+			<span id="select-wri-status"></span>
+		</li><li>
+			<input type="checkbox" id="select-wri-7" name="select-wri" value="7">
+			<img id="icone_7" src="https://www.refuges.info//images/icones/cabane.svg" alt="icone de cabane non gardée">
+		</li><li>
+			<input type="checkbox" id="select-wri-10" name="select-wri" value="10">
+			<img id="icone_10" src="https://www.refuges.info//images/icones/cabane_red.svg" alt="icone de refuge gardé">
+		</li><li>
+			<input type="checkbox" id="select-wri-9" name="select-wri" value="9">
+			<img id="icone_9" src="https://www.refuges.info//images/icones/cabane_green.svg" alt="icone de gîte d'étape">
+		</li><li>
+			<input type="checkbox" id="select-wri-23" name="select-wri" value="23">
+			<img id="icone_23" src="https://www.refuges.info//images/icones/pointdeau.svg" alt="icone de point d'eau">
+		</li><li>
+			<input type="checkbox" id="select-wri-6" name="select-wri" value="6">
+			<img id="icone_6" src="https://www.refuges.info//images/icones/sommet.svg" alt="icone de sommet">
+		</li><li>
+			<input type="checkbox" id="select-wri-3" name="select-wri" value="3">
+			<img id="icone_3" src="https://www.refuges.info//images/icones/triangle_a33.10.svg" alt="icone de passage délicat">
+		</li><li>
+			<input type="checkbox" id="select-wri-28" name="select-wri" value="28">
+			<img id="icone_28" src="https://www.refuges.info//images/icones/cabane_white_black_a63.svg" alt="icone de bâtiment en montagne">
+		</li>
+	</ul>
+
 	<script type="module">
 		new myol.Map({
 			target: 'carte-nav',
@@ -69,6 +97,7 @@ Based on https://openlayers.org
 			layers: [
 				new myol.layer.tile.MRI(),
 				contourMassif,
+				pointsWRI,
 				new myol.layer.Hover(),
 			],
 			controls: [
@@ -77,7 +106,7 @@ Based on https://openlayers.org
 				}),
 			],
 			// Centre la carte sur la zone souhaitée
-		}).getView().fit(myol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
+		}).getView().fit(myol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));
 	</script>
 
 	<h4>/vues/index.js</h4>

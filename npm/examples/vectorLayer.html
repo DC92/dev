@@ -63,11 +63,6 @@ Based on https://openlayers.org
 		<label><input type="checkbox" name="select-wri" value="6" />sommet</label>
 		<label><input type="checkbox" name="select-wri" value="3" />passage délicat</label>
 		<br />
-		<label>
-			<input type="checkbox" name="select-refuges" value="4" />
-			Style refuges.info
-			<span id="select-refuges-status"></span>
-		</label>
 	</div>
 
 	<div class="layer-select">
@@ -127,27 +122,16 @@ new Map({
 		}),
 
 		// Vector layers
-		new myVector.WRI({
-			host: '//dom.refuges.info/', //TODO www
-			selectName: 'select-wri',
-			selectMassifName: 'select-massif',
-		}),
-		new myVector.WRI({ // Specific display for refuges.info
-			//TODO BUG label
-			selectName: 'select-refuges',
-			spreadClusterMaxResolution: 20, //TODO BUG always display spread icons
-
-			addPropertiesOLD: properties => ({ //TODO
-				label: properties.nom || properties.name, // Always display the name
-				//attribution: null, // Don't display attribution
-			}),
-		}),
-
 		new myVector.Chemineur({
 			selectName: 'select-chem',
 		}),
 		new myVector.Alpages({
 			selectName: 'select-alpages',
+		}),
+		new myVector.WRI({
+			host: '//dom.refuges.info/', //TODO www
+			selectName: 'select-wri',
+			selectMassifName: 'select-massif',
 		}),
 		new myVector.PRC({
 			selectName: 'select-prc',

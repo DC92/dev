@@ -84,43 +84,36 @@ export class Alpages extends MyVectorLayer {
 
 // refuges.info
 export class WRI extends MyVectorLayer {
-	constructor(opt) {
-		const options = {
+	constructor(options) {
+		super({
 			host: '//www.refuges.info/',
 			browserClusterMinDistance: 50,
 			serverClusterMinResolution: 100,
 			attribution: '&copy;refuges.info',
-			...opt,
-		};
 
-		super({
 			...options,
+
 			query: query_,
+
 			addProperties: properties => ({
 				name: properties.nom,
-				icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord.alt,
-				bed: properties.places.valeur,
-				type: properties.type.valeur,
+				icon: this.options.host + 'images/icones/' + properties.type.icone + '.svg',
+				ele: properties.coord ? properties.coord.alt : null,
+				bed: properties.places ? properties.places.valeur : null,
+				type: properties.type ? properties.type.valeur : null,
 				link: properties.lien,
 			}),
 		});
 
-		//TODO spécifique WRI
-		this.massifSelector = new Selector(opt.selectMassifName, () => this.reload());
-
-		const layer = this; // For use in query_
+		const layer = this; // For use in query_ //TODO optimise
+		//TODO BUG n'affiche pas la liste des points sur un cluster < 5
 
 		function query_(extent, resolution) {
-			const selectionMassif = layer.massifSelector.getSelection(); //TODO spécifique WRI
-
 			return {
-				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				massif: selectionMassif, //TODO spécifique WRI
+				_path: 'api/bbox',
 				nb_points: 'all',
 				type_points: layer.selector.getSelection(),
 				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
-				//TODO inheritance (pour massifs)
 			};
 		}
 	}
@@ -211,6 +204,7 @@ export class Overpass extends MyVectorLayer {
 			host: 'https://overpass-api.de',
 			//host: 'https://lz4.overpass-api.de',
 			//host: 'https://overpass.kumi.systems',
+			browserClusterMinDistance: 50,
 			query: query_,
 			bbox: () => null, // No bbox at the end of the url
 			format: format_,
@@ -303,6 +297,7 @@ export class Overpass extends MyVectorLayer {
 				if (node.nodeName == 'remark' && statusEl)
 					statusEl.textContent = node.textContent;
 			}
+			//TODO pas de link pour aller sur le site
 
 			function addTag(node, k, v) {
 				const newTag = doc.createElement('tag');
