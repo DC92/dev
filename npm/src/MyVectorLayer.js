@@ -241,12 +241,12 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 		const layer = this;
 
 		function style_(feature, resolution) {
+			// Function returning an array of styles options
 			const sof = !feature.getProperties().cluster ? options.basicStylesOptions :
 				resolution > options.spreadClusterMaxResolution ? options.spreadClusterStylesOptions :
 				options.clusterStylesOptions;
 
-			// Function returning an array of styles options
-			return sof(feature, layer)
+			return sof(feature, layer) // Call the styleOptions function
 				.map(so => new style.Style(so)); // Transform into an array of Style objects
 		}
 	}

@@ -1,70 +1,85 @@
- // La carte des massifs pour la page d'accueil
- class Massifs extends myol.layer.MyVectorLayer {
- 	constructor() {
- 		super({
- 			// Construction de l'url
- 			host: '//www.refuges.info/',
- 			query: () => ({
- 				_path: 'api/polygones',
- 				type_polygon: 1, // Massifs
+ // La carte des massifs colorés pour la page d'accueil
+ const massifsColores = new myol.layer.MyVectorLayer({
+ 	// Construction de l'url
+ 	host: '//www.refuges.info/',
+ 	//host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de CE serveur
+ 	query: () => ({
+ 		_path: 'api/polygones',
+ 		type_polygon: 1, // Massifs
+ 	}),
+ 	strategy: myol.loadingstrategy.all, // Pas de bbox
+
+ 	// Réception et traduction des données
+ 	addProperties: properties => ({
+ 		label: properties.nom, // Affichage du nom du massif si le polygone est assez grand
+ 		link: properties.lien, // Lien sur lequel cliquer
+ 	}),
+
+ 	// Affichage de base
+ 	basicStylesOptions: feature => {
+ 		// Conversion de la couleur en rgb pour pouvoir y ajouter la transparence
+ 		const rgb = feature.getProperties().couleur
+ 			.match(/([0-9a-f]{2})/ig)
+ 			.map(c => parseInt(c, 16));
+
+ 		return [{
+ 			// Etiquette
+ 			...myol.stylesOptions.label(feature),
+
+ 			// Affichage de la couleur du massif
+ 			fill: new myol.style.Fill({
+ 				// Transparence 0.3
+ 				color: 'rgba(' + rgb.join(',') + ',0.3)',
  			}),
- 			strategy: myol.loadingstrategy.all, // Pas de bbox
+ 		}];
+ 	},
 
- 			// Réception des données
- 			addProperties: properties => ({
- 				label: properties.nom,
- 				couleur: properties.couleur,
- 				link: properties.lien,
+ 	// Affichage au survol des massifs
+ 	hoverStylesOptions: feature => {
+ 		feature.setProperties({
+ 			overflow: true, // Affiche l'étiquette même si elle n'est pas contenue dans le polygone
+ 		}, true);
+
+ 		return {
+ 			// Etiquette (pour les cas où elle n'est pas déja affichée)
+ 			...myol.stylesOptions.label(feature),
+
+ 			// On renforce le contour du massif survolé
+ 			stroke: new myol.style.Stroke({
+ 				color: feature.getProperties().couleur,
+ 				width: 2,
  			}),
+ 		};
+ 	},
+ });
 
- 			// Affichage
- 			basicStylesOptions: areasStylesOptions_,
- 			hoverStylesOptions: hoverStylesOptions_,
- 		});
+ // Affiche le contout d'un massif pour la page nav
+ const contourMassif = new myol.layer.MyVectorLayer({
+ 	// Construction de l'url
+ 	host: '//www.refuges.info/',
+ 	//host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
+ 	query: () => ({
+ 		_path: 'api/polygones',
+ 		massif: contourMassif.selector.getSelection(),
+ 	}),
+ 	strategy: myol.loadingstrategy.all, // Pas de bbox
 
- 		// Affichage de base
- 		function areasStylesOptions_(feature, layer) {
- 			const properties = feature.getProperties(),
- 				// Calcul de la couleur rgb
- 				colors = properties.couleur
- 				.match(/([0-9a-f]{2})/ig)
- 				.map(c => parseInt(c, 16));
+ 	// Sélecteur d'affichage
+ 	selectName: 'select-massif',
 
- 			return [{
- 				// Etiquette
- 				...myol.stylesOptions.label(...arguments),
+ 	// Affichage de base
+ 	basicStylesOptions: () => [{
+ 		// Simple contour bleu
+ 		stroke: new myol.style.Stroke({
+ 			color: 'blue',
+ 			width: 2,
+ 		}),
+ 	}],
 
- 				// Affichage de la couleur du massif
- 				fill: new myol.style.Fill({
- 					// Transparence 0.3
- 					color: 'rgba(' + colors.join(',') + ',0.3)',
- 				}),
- 			}];
- 		}
+ 	// Pas d'actions au survol
+ 	hoverStylesOptions: () => {},
+ });
 
- 		// Affichage au survol des massifs
- 		function hoverStylesOptions_(feature, layer) {
- 			const properties = feature.getProperties();
-
- 			// Préparation de l'étiquette
- 			feature.setProperties({
- 				label: properties.nom,
- 				overflow: true, // Display label even if not contained in polygon
- 			}, true);
-
- 			return {
- 				// Etiquette
- 				...myol.stylesOptions.label(feature, layer),
-
- 				// ON renforce le contour du massif survolé
- 				stroke: new myol.style.Stroke({
- 					color: properties.couleur,
- 					width: 2,
- 				}),
- 			};
- 		}
- 	}
- }
 
  // Les couches de fond des cartes de refuges.info
  /*function wriMapBaseLayers(page) {

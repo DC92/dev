@@ -14,9 +14,18 @@ Based on https://openlayers.org
 	<link href="parts/style.css" rel="stylesheet">
 
 	<style>
+		h4 {
+			clear: both;
+			margin-bottom: 0;
+		}
 		#carte-accueil {
 			width: 650px;
 			height: 600px;
+		}
+		#carte-nav {
+			float: right;
+			width: 75vw;
+			height: 75vw;
 		}
 	</style>
 
@@ -45,20 +54,21 @@ Based on https://openlayers.org
 	<p><a href="../examples/parts/_cartes.js">vues/_cartes.js</a> test for refuges.info</p>
 	<p><a href="wri.html">src/wri.html</a> test for refuges.info</p>
 
-	<h4>/vues/index.js</h4>
-	<div id="carte-accueil"></div>
+	<h4>/vues/nav.js</h4>
+	<label>
+		<input type="checkbox" name="select-massif" value="4" />
+		Vercors uniquement
+	</label>
+	<div id="carte-nav"></div>
 	<script type="module">
-		// /vues/index.js
 		new myol.Map({
-			target: 'carte-accueil',
+			target: 'carte-nav',
 			view: new myol.View({
 				enableRotation: false,
 			}),
 			layers: [
 				new myol.layer.tile.MRI(),
-				new Massifs({
-					//host: '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de ce serveur
-				}),
+				contourMassif,
 				new myol.layer.Hover(),
 			],
 			controls: [
@@ -70,7 +80,30 @@ Based on https://openlayers.org
 		}).getView().fit(myol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
 	</script>
 
-	<h4 style="clear:both;margin-bottom:0">Tests</h4>
+	<h4>/vues/index.js</h4>
+	<div id="carte-accueil"></div>
+	<script type="module">
+		new myol.Map({
+			target: 'carte-accueil',
+			view: new myol.View({
+				enableRotation: false,
+			}),
+			layers: [
+				new myol.layer.tile.MRI(), // Fond de carte
+				massifsColores,
+				new myol.layer.Hover(), // Gère le survol du curseur
+			],
+			controls: [
+				// Attribution du fond de carte
+				new myol.control.Attribution({
+					collapsed: false,
+				}),
+			],
+			// Centre la carte sur la zone souhaitée
+		}).getView().fit(myol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
+	</script>
+
+	<h4>Tests</h4>
 	<div>//TODO TBD</div>
 </body>
 </html>
