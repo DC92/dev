@@ -30,8 +30,8 @@ Based on https://openlayers.org
 			<span id="select-prc-status"></span>
 		</label><br /><label>
 			Chemineur
-			<input type="checkbox" name="select-chem" value="3,8,64" />
-			<span id="select-chem-status"></span>
+			<input type="checkbox" name="select-chemineur" value="3,8,64" />
+			<span id="select-chemineur-status"></span>
 		</label><br /><label>
 			Camptocamp.org
 			<label><input type="checkbox" name="select-c2c" value="hut,shelter,gite,cave,bivouac,camp_site" />logement</label>
@@ -49,9 +49,6 @@ Based on https://openlayers.org
 
 	<div class="layer-select">
 		<label>
-			<input type="checkbox" name="select-massif" value="4" />
-			Vercors uniquement
-		</label><br /><label>
 			Refuges.info
 			<input type="checkbox" name="select-wri" value="all" />
 			<span id="select-wri-status"></span>
@@ -123,7 +120,7 @@ new Map({
 
 		// Vector layers
 		new myVector.Chemineur({
-			selectName: 'select-chem',
+			selectName: 'select-chemineur',
 		}),
 		new myVector.Alpages({
 			selectName: 'select-alpages',
@@ -131,7 +128,6 @@ new Map({
 		new myVector.WRI({
 			host: '//dom.refuges.info/', //TODO www
 			selectName: 'select-wri',
-			selectMassifName: 'select-massif',
 		}),
 		new myVector.PRC({
 			selectName: 'select-prc',

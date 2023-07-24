@@ -1,119 +1,121 @@
+const host = '//www.refuges.info/',
 //const host = '<?=$config_wri["sous_dossier_installation"]?>'; // Appeler la couche de CE serveur
-const host = '//www.refuges.info/';
 
-// La carte des massifs colorés pour la page d'accueil
-const massifsColores = new myol.layer.MyVectorLayer({
-	// Construction de l'url
-	host: host,
-	query: () => ({
-		_path: 'api/polygones',
-		type_polygon: 1, // Massifs
-	}),
-	strategy: myol.loadingstrategy.all, // Pas de bbox
+	// La carte des massifs colorés
+	optionsMassifsColores = {
+		// Construction de l'url
+		host: host,
+		query: () => ({
+			_path: 'api/polygones',
+			type_polygon: 1, // Massifs
+		}),
+		strategy: myol.loadingstrategy.all, // Pas de bbox
 
-	// Réception et traduction des données
-	addProperties: properties => ({
-		label: properties.nom, // Affichage du nom du massif si le polygone est assez grand
-		link: properties.lien, // Lien sur lequel cliquer
-	}),
+		// Réception et traduction des données
+		addProperties: properties => ({
+			label: properties.nom, // Affichage du nom du massif si le polygone est assez grand
+			link: properties.lien, // Lien sur lequel cliquer
+		}),
 
-	// Affichage de base
-	basicStylesOptions: feature => {
-		// Conversion de la couleur en rgb pour pouvoir y ajouter la transparence
-		const rgb = feature.getProperties().couleur
-			.match(/([0-9a-f]{2})/ig)
-			.map(c => parseInt(c, 16));
+		// Affichage de base
+		basicStylesOptions: feature => {
+			// Conversion de la couleur en rgb pour pouvoir y ajouter la transparence
+			const rgb = feature.getProperties().couleur
+				.match(/([0-9a-f]{2})/ig)
+				.map(c => parseInt(c, 16));
 
-		return [{
-			// Etiquette
-			...myol.stylesOptions.label(feature),
+			return [{
+				// Etiquette
+				...myol.stylesOptions.label(feature),
 
-			// Affichage de la couleur du massif
-			fill: new myol.style.Fill({
-				// Transparence 0.3
-				color: 'rgba(' + rgb.join(',') + ',0.3)',
-			}),
-		}];
+				// Affichage de la couleur du massif
+				fill: new myol.style.Fill({
+					// Transparence 0.3
+					color: 'rgba(' + rgb.join(',') + ',0.3)',
+				}),
+			}];
+		},
+
+		// Affichage au survol des massifs
+		hoverStylesOptions: feature => {
+			feature.setProperties({
+				overflow: true, // Affiche l'étiquette même si elle n'est pas contenue dans le polygone
+			}, true);
+
+			return {
+				// Etiquette (pour les cas où elle n'est pas déja affichée)
+				...myol.stylesOptions.label(feature),
+
+				// On renforce le contour du massif survolé
+				stroke: new myol.style.Stroke({
+					color: feature.getProperties().couleur,
+					width: 2,
+				}),
+			};
+		},
 	},
 
-	// Affichage au survol des massifs
-	hoverStylesOptions: feature => {
-		feature.setProperties({
-			overflow: true, // Affiche l'étiquette même si elle n'est pas contenue dans le polygone
-		}, true);
+	// Affiche le contour d'un massif pour la page nav
+	optionsContourMassif = {
+		// Construction de l'url
+		host: host,
+		query: () => ({
+			_path: 'api/polygones',
+			massif: contourMassif.selector.getSelection(),
+		}),
+		strategy: myol.loadingstrategy.all, // Pas de bbox
 
-		return {
-			// Etiquette (pour les cas où elle n'est pas déja affichée)
-			...myol.stylesOptions.label(feature),
+		// Sélecteur d'affichage
+		selectName: 'select-massif',
 
-			// On renforce le contour du massif survolé
+		// Affichage de base
+		basicStylesOptions: () => [{
+			// Simple contour bleu
 			stroke: new myol.style.Stroke({
-				color: feature.getProperties().couleur,
+				color: 'blue',
 				width: 2,
 			}),
-		};
+		}],
+
+		// Pas d'action au survol
+		hoverStylesOptions: () => {},
 	},
-});
 
-// Affiche le contout d'un massif pour la page nav
-const contourMassif = new myol.layer.MyVectorLayer({
-	// Construction de l'url
-	host: host,
-	query: () => ({
-		_path: 'api/polygones',
-		massif: contourMassif.selector.getSelection(),
-	}),
-	strategy: myol.loadingstrategy.all, // Pas de bbox
+	optionsPointsWRI = {
+		host: host,
+		browserClusterMinDistance: 50,
+		serverClusterMinResolution: 100,
+		selectName: 'select-wri',
 
-	// Sélecteur d'affichage
-	selectName: 'select-massif',
+		query: (extent, resolution) => {
+			const selectionMassif = contourMassif.selector.getSelection();
 
-	// Affichage de base
-	basicStylesOptions: () => [{
-		// Simple contour bleu
-		stroke: new myol.style.Stroke({
-			color: 'blue',
-			width: 2,
+			return {
+				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
+				type_points: pointsWRI.selector.getSelection(),
+				massif: selectionMassif,
+				nb_points: 'all',
+				cluster: resolution > pointsWRI.options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
+			};
+		},
+
+		addProperties: properties => ({
+			label: properties.nom, // Permanence de l'étiquette dès l'affichage de la carte
+			name: properties.nom, // Nom utilisé dans les listes affichées au survol des ronds des clusters
+			icon: host + 'images/icones/' + properties.type.icone + '.svg',
+			//TODO rapatrier fabrication étiquette
+			ele: properties.coord ? properties.coord.alt : null,
+			bed: properties.places ? properties.places.valeur : null,
+			type: properties.type ? properties.type.valeur : null,
+			link: properties.lien, // Lien sur lequel cliquer
 		}),
-	}],
+	};
 
-	// Pas d'action au survol
-	hoverStylesOptions: () => {},
-});
-
-const pointsWRI = new myol.layer.MyVectorLayer({
-	host: host,
-	browserClusterMinDistance: 50,
-	serverClusterMinResolution: 100,
-	selectName: 'select-wri',
-
-	query: (extent, resolution) => {
-		const selectionMassif = contourMassif.selector.getSelection();
-
-		return {
-			_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-			type_points: pointsWRI.selector.getSelection(),
-			massif: selectionMassif,
-			nb_points: 'all',
-			cluster: resolution > pointsWRI.options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
-		};
-	},
-
-	addProperties: properties => ({
-		label: properties.nom, // Permanence de l'étiquette dès l'affichage de la carte
-		name: properties.nom, // Nom utilisé dans les listes affichées au survol des ronds des clusters
-		icon: host + 'images/icones/' + properties.type.icone + '.svg',
-		//TODO rapatrier fabrication étiquette
-		ele: properties.coord ? properties.coord.alt : null,
-		bed: properties.places ? properties.places.valeur : null,
-		type: properties.type ? properties.type.valeur : null,
-		link: properties.lien, // Lien sur lequel cliquer
-	}),
-});
-
+const pointsWRI = new myol.layer.MyVectorLayer(optionsPointsWRI);
+const contourMassif = new myol.layer.MyVectorLayer(optionsContourMassif);
 // Recharger le sélecteur de massif la couche de point quand change
 contourMassif.selector.callbacks.push(() => pointsWRI.reload());
-
+//TODO mettre dans wri.html
 
 // Les couches de fond des cartes de refuges.info
 /*function wriMapBaseLayers(page) {
