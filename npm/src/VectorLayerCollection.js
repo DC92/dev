@@ -259,7 +259,7 @@ export class Overpass extends MyVectorLayer {
 							addTag(node, 'type', tag.getAttribute('v'));
 							addTag(node, 'icon', chemIconUrl(tag.getAttribute('v')));
 							// Only once for a node
-							addTag(node, 'url', 'https://www.openstreetmap.org/node/' + node.id);
+							addTag(node, 'link', 'https://www.openstreetmap.org/node/' + node.id);
 							addTag(node, 'attribution', '&copy;OpenStreetMap'); //TODO move to layer.options
 						}
 
@@ -297,7 +297,6 @@ export class Overpass extends MyVectorLayer {
 				if (node.nodeName == 'remark' && statusEl)
 					statusEl.textContent = node.textContent;
 			}
-			//TODO pas de link pour aller sur le site
 
 			function addTag(node, k, v) {
 				const newTag = doc.createElement('tag');
