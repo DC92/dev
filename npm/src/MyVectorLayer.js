@@ -45,20 +45,25 @@ class MyVectorSource extends VectorSource {
 			...options,
 		});
 
-		this.on(['featuresloadstart', 'featuresloaderror', 'featuresloadend'], evt => {
+		// Display loading satus
+		this.on(['featuresloadstart', 'featuresloadend', 'error', 'featuresloaderror'], evt => {
 			if (statusEl) statusEl.innerHTML =
 				evt.type == 'featuresloadstart' ? '&#8987;' :
-				evt.type == 'featuresloaderror' ? '&#9888;' :
-				'';
+				evt.type == 'featuresloadend' ? '' :
+				'&#9888;'; // Error
+		});
 
-			// Modify received features properties
-			if (evt.type == 'featuresloadend')
-				evt.features.forEach(f =>
+		// Compute properties when the layer is loaded & before the cluster layer is computed
+		this.on('change', () =>
+			this.getFeatures().forEach(f => {
+				if (!f._yetAdded) {
+					f._yetAdded = true;
 					f.setProperties(options.addProperties(f.getProperties()),
 						true // Silent : add the feature without refresh the layer
-					)
-				);
-		});
+					);
+				}
+			})
+		);
 
 		function url_() {
 			const args = options.query(...arguments),
@@ -81,7 +86,7 @@ class MyVectorSource extends VectorSource {
 				extent,
 				mapProjection,
 				options.projection, // Received projection
-			).map(c => c.toPrecision(6)); // Limit the number of digits
+			).map(c => c.toPrecision(6)); // Limit the number of digits (10 m)
 		}
 	}
 

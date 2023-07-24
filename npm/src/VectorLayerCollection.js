@@ -98,15 +98,14 @@ export class WRI extends MyVectorLayer {
 			addProperties: properties => ({
 				name: properties.nom,
 				icon: this.options.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord ? properties.coord.alt : null,
-				bed: properties.places ? properties.places.valeur : null,
-				type: properties.type ? properties.type.valeur : null,
+				ele: properties.coord.alt,
+				bed: properties.places.valeur,
+				type: properties.type.valeur,
 				link: properties.lien,
 			}),
 		});
 
 		const layer = this; // For use in query_ //TODO optimise
-		//TODO BUG n'affiche pas la liste des points sur un cluster < 5
 
 		function query_(extent, resolution) {
 			return {
