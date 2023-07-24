@@ -391,12 +391,12 @@ export class HoverLayer extends VectorLayer {
  * Check all the checkboxes check the checkbox without value (all)
  * Current selection is saved in window.localStorage
  * You can force the values in window.localStorage[simplified name]
- * callBack(selection) : function to call at init or click
+ * callback(selection) : function to call at init or click
  * getSelection() : returns an array of selected values
  * If no name is specified or there are no checkbox with this name, return []
  */
 export class Selector {
-	constructor(name, callBack) {
+	constructor(name, callback) {
 		if (name) {
 			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
 			this.init = (localStorage[this.safeName] || '').split(',');
@@ -408,7 +408,7 @@ export class Selector {
 					this.init.includes('all') ||
 					this.init.join(',') == el.value;
 			});
-			this.callBack = callBack;
+			this.callbacks = [callback];
 			this.onClick(); // Init with "all"
 		}
 	}
@@ -436,8 +436,9 @@ export class Selector {
 		else
 			delete localStorage[this.safeName];
 
-		if (evt && typeof this.callBack == 'function')
-			this.callBack(this.getSelection());
+		// Call the posted callbacks
+		if (evt)
+			this.callbacks.forEach(cb => cb(this.getSelection()));
 	}
 
 	getSelection() {

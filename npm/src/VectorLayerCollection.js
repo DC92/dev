@@ -15,7 +15,7 @@ import * as style from 'ol/style';
 import * as stylesOptions from './stylesOptions';
 import {
 	MyVectorLayer,
-	Selector,
+	//Selector,
 } from './MyVectorLayer';
 
 

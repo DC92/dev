@@ -89,7 +89,6 @@ const pointsWRI = new myol.layer.MyVectorLayer({
 
 	query: (extent, resolution) => {
 		const selectionMassif = contourMassif.selector.getSelection();
-		//TODO BUG devrait reloader quand le sélecteur massif change
 
 		return {
 			_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
@@ -111,6 +110,9 @@ const pointsWRI = new myol.layer.MyVectorLayer({
 		link: properties.lien, // Lien sur lequel cliquer
 	}),
 });
+
+// Recharger le sélecteur de massif la couche de point quand change
+contourMassif.selector.callbacks.push(() => pointsWRI.reload());
 
 
 // Les couches de fond des cartes de refuges.info
