@@ -152,8 +152,8 @@ import {
 	layerEditGeoJson,
 } from '../src/Editor';
 import {
-	controlLoadGPX,
-	controlDownload,
+	load,
+	download,
 } from '../src/Files';
 
 
@@ -187,8 +187,8 @@ new Map({
 	}),
 	controls: [
 		new Zoom(),
-		controlLoadGPX(),
-		controlDownload({
+		load(),
+		download({
 			savedLayer: controlEditor.layer,
 		}),
 		controlEditor,

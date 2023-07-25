@@ -16,11 +16,11 @@ import {
 	controlLengthLine,
 	controlMousePosition,
 	controlPermalink,
-	controlPrint,
+	print,
 } from './myControl';
 import {
-	controlLoadGPX,
-	controlDownload,
+	load,
+	download,
 } from './Files';
 import {
 	controlGeocoder,
@@ -58,9 +58,9 @@ export function controlCollection(opt) {
 		new FullScreen(options.FullScreen),
 		controlGeocoder(options.Geocoder),
 		controlGPS(options.GPS),
-		controlLoadGPX(options.LoadGPX),
-		controlDownload(options.Download),
-		controlPrint(options.Print),
+		load(options.load),
+		download(options.download),
+		print(options.Print),
 		controlHelp(options.Help),
 
 		// Bottom left

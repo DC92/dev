@@ -133,7 +133,7 @@ function wriMapControls(options) {
 		controlGPS(),
 		options.page == 'point' ? controlButton() : 
 		options.page == 'nav' ? controlButton() : download(options.Download),
-		options.page == 'modif' ? controlButton() : controlPrint(),
+		options.page == 'modif' ? controlButton() : print(),
 
 		// Haut droit
 		controlLayerSwitcher({

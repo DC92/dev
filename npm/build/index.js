@@ -61,7 +61,7 @@ const myol = {
 		LayerSwitcher: layerswitcher.controlLayerSwitcher,
 		MousePosition: controls.controlMousePosition,
 		Permalink: controls.controlPermalink,
-		Print: controls.controlPrint,
+		Print: controls.print,
 		collection: controlcollection.controlCollection,
 	*/
 

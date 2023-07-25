@@ -35,6 +35,7 @@ import {
 
 // Editor
 //BEST make it a class
+//TODO export as default
 export function layerEditGeoJson(opt) {
 	const options = {
 			format: new GeoJSON(),

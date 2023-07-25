@@ -38,18 +38,19 @@ Based on https://openlayers.org
 	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
 	<script>
-new myol.Map({
-	target: 'map',
-	view: new myol.View({
-		enableRotation: false,
-	}),
-	controls: [
-		...myol.control.collection(),
-		new myol.control.LayerSwitcher({
-			layers: myol.layer.tileCollection(),
-		}),
-	],
-});
+		const ol = myol.ol;
+		new ol.Map({
+			target: 'map',
+			view: new ol.View({
+				enableRotation: false,
+			}),
+			controls: [
+				...myol.control.collection(),
+				new myol.control.LayerSwitcher({
+					layers: myol.layer.tileCollection(),
+				}),
+			],
+		});
 	</script>
 
 	<h1 style="clear:both">MyOl</h1>

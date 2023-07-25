@@ -9,7 +9,8 @@ import {
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
-//BEST make it a class
+//TODO make it a class
+//TODO export as default
 export function controlLayerSwitcher(options) {
 	const control = controlButton({
 			className: 'myol-button-switcher',
