@@ -28,12 +28,13 @@ class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
 				// host: '',
-				// query: (extent, resolution, projection,options) => ({_path: '...'}), // this = options
+				// query: (extent, resolution, projection ,options) => ({_path: '...'}), // this = options
 				url: url_, // (extent, resolution, projection)
 				bbox: bbox_, // (extent, resolution, projection)
 				strategy: loadingstrategy.bbox,
 				projection: 'EPSG:4326',
 				addProperties: (properties) => {}, // (default) add properties to each received features
+
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
@@ -42,6 +43,7 @@ class MyVectorSource extends VectorSource {
 			format: new GeoJSON({
 				dataProjection: options.projection,
 			}),
+
 			...options,
 		});
 
@@ -202,6 +204,7 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 			this.altLayer = new MyBrowserClusterVectorLayer({
 				maxResolution: undefined,
 				minResolution: options.serverClusterMinResolution,
+
 				...options,
 			});
 	}
@@ -235,15 +238,17 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 			spreadClusterStylesOptions: stylesOptions.spreadCluster,
 			hoverStylesOptions: stylesOptions.hover,
 			style: style_,
+			selector: new Selector(opt.selectName),
+
 			...opt,
 		};
 
 		super(options);
 
-		this.selector = new Selector(options.selectName, () => this.reload());
+		options.selector.callbacks.push(() => this.reload());
 		this.reload();
 
-		const layer = this;
+		const layer = this; //TODO resorb
 
 		function style_(feature, resolution) {
 			// Function returning an array of styles options
@@ -257,7 +262,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 	}
 
 	reload() {
-		super.reload(this.selector.getSelection().length);
+		super.reload(this.options.selector.getSelection().length);
 	}
 }
 
@@ -396,7 +401,7 @@ export class HoverLayer extends VectorLayer {
  * If no name is specified or there are no checkbox with this name, return []
  */
 export class Selector {
-	constructor(name, callback) {
+	constructor(name) {
 		if (name) {
 			this.safeName = 'myol_' + name.replace(/[^a-z]/ig, '');
 			this.init = (localStorage[this.safeName] || '').split(',');
@@ -408,9 +413,9 @@ export class Selector {
 					this.init.includes('all') ||
 					this.init.join(',') == el.value;
 			});
-			this.callbacks = [callback];
 			this.onClick(); // Init with "all"
 		}
+		this.callbacks = [];
 	}
 
 	onClick(evt) {

@@ -34,20 +34,18 @@ function chemIconUrl(type, host) {
 // chemineur.fr
 export class Chemineur extends MyVectorLayer {
 	constructor(opt) {
-		const options = {
+		super({
 			host: '//chemineur.fr/',
 			browserClusterMinDistance: 50,
 			browserClusterFeaturelMaxPerimeter: 300,
 			serverClusterMinResolution: 100,
 			attribution: '&copy;chemineur.fr',
-			...opt,
-		};
 
-		super({
-			...options,
-			query: (extent, resolution) => ({
+			...opt,
+
+			query: (extent, resolution, projection, options) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				cat: this.selector.getSelection(),
+				cat: options.selector.getSelection(),
 				layer: resolution < options.serverClusterMinResolution ? null : 'cluster', // For server cluster layer
 			}),
 		});
@@ -57,25 +55,22 @@ export class Chemineur extends MyVectorLayer {
 // alpages.info
 export class Alpages extends MyVectorLayer {
 	constructor(opt) {
-		const options = {
+		super({
 			host: '//alpages.info/',
 			browserClusterMinDistance: 50,
 			browserClusterFeaturelMaxPerimeter: 300,
 			attribution: '&copy;alpages.info',
+
 			...opt,
-		};
 
-		super({
-			...options,
-
-			query: () => ({
+			query: (extent, resolution, projection, options) => ({
 				_path: 'ext/Dominique92/GeoBB/gis.php',
-				forums: this.selector.getSelection(),
+				forums: options.selector.getSelection(),
 			}),
 
 			addProperties: properties => ({
 				icon: chemIconUrl(properties.type), // Replace the alpages icon
-				link: options.host + 'viewtopic.php?t=' + properties.id,
+				link: this.options.host + 'viewtopic.php?t=' + properties.id,
 			}),
 		});
 	}
@@ -83,16 +78,21 @@ export class Alpages extends MyVectorLayer {
 
 // refuges.info
 export class WRI extends MyVectorLayer {
-	constructor(options) {
+	constructor(opt) {
 		super({
 			host: '//www.refuges.info/',
 			browserClusterMinDistance: 50,
 			serverClusterMinResolution: 100,
 			attribution: '&copy;refuges.info',
 
-			...options,
+			...opt,
 
-			query: query_,
+			query: (extent, resolution, projection, options) => ({
+				_path: 'api/bbox',
+				nb_points: 'all',
+				type_points: options.selector.getSelection(),
+				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
+			}),
 
 			addProperties: properties => ({
 				name: properties.nom,
@@ -103,17 +103,6 @@ export class WRI extends MyVectorLayer {
 				link: properties.lien,
 			}),
 		});
-
-		const layer = this; // For use in query_ //TODO optimise
-
-		function query_(extent, resolution) {
-			return {
-				_path: 'api/bbox',
-				nb_points: 'all',
-				type_points: layer.selector.getSelection(),
-				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
-			};
-		}
 	}
 }
 
@@ -125,6 +114,7 @@ export class PRC extends MyVectorLayer {
 			strategy: loadingstrategy.all,
 			browserClusterMinDistance: 50,
 			attribution: '&copy;Pyrenees-Refuges',
+
 			...options,
 
 			addProperties: properties => ({
@@ -147,14 +137,15 @@ export class C2C extends MyVectorLayer {
 
 		super({
 			host: 'https://api.camptocamp.org/',
-			query: () => ({
+			query: (extent, resolution, projection, options) => ({
 				_path: 'waypoints',
-				wtyp: this.selector.getSelection(),
+				wtyp: options.selector.getSelection(),
 			}),
 			projection: 'EPSG:3857',
 			format: format_,
 			browserClusterMinDistance: 50,
 			attribution: '&copy;Camp2camp',
+
 			...options,
 		});
 
@@ -207,13 +198,12 @@ export class Overpass extends MyVectorLayer {
 			bbox: () => null, // No bbox at the end of the url
 			format: format_,
 			maxResolution: 50,
+
 			...options,
 		});
 
-		const layer = this;
-
-		function query_(extent, resolution, projection) {
-			const selections = layer.selector.getSelection(),
+		function query_(extent, resolution, projection, options) {
+			const selections = options.selector.getSelection(),
 				items = selections[0].split(','), // The 1st (and only) selector
 				ex4326 = proj.transformExtent(extent, projection, 'EPSG:4326').map(c => c.toPrecision(6)),
 				bbox = '(' + ex4326[1] + ',' + ex4326[0] + ',' + ex4326[3] + ',' + ex4326[2] + ');',

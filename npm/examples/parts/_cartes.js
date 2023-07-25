@@ -59,9 +59,9 @@ const host = '//www.refuges.info/',
 	optionsContourMassif = {
 		// Construction de l'url
 		host: host,
-		query: () => ({
+		query: (extent, resolution, projection, options) => ({
 			_path: 'api/polygones',
-			massif: contourMassif.selector.getSelection(),
+			massif: options.selector.getSelection(),
 		}),
 		strategy: myol.loadingstrategy.all, // Pas de bbox
 
@@ -88,11 +88,11 @@ const host = '//www.refuges.info/',
 		selectName: 'select-wri',
 
 		query: (extent, resolution, projection, options) => {
-			const selectionMassif = contourMassif.selector.getSelection(); //TODO trouver comment lier dans wri.html
+			const selectionMassif = contourMassif.options.selector.getSelection(); //TODO trouver comment lier dans wri.html
 
 			return {
 				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				type_points: pointsWRI.selector.getSelection(), //TODO mettre le selecteur dans les options
+				type_points: options.selector.getSelection(),
 				massif: selectionMassif,
 				nb_points: 'all',
 				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
@@ -114,7 +114,7 @@ const host = '//www.refuges.info/',
 const pointsWRI = new myol.layer.MyVectorLayer(optionsPointsWRI);
 const contourMassif = new myol.layer.MyVectorLayer(optionsContourMassif);
 // Recharger le sélecteur de massif la couche de point quand change
-contourMassif.selector.callbacks.push(() => pointsWRI.reload());
+contourMassif.options.selector.callbacks.push(() => pointsWRI.reload());
 //TODO mettre dans wri.html
 
 // Les couches de fond des cartes de refuges.info
