@@ -30,7 +30,7 @@ import {
 import './editor.css';
 import {
 	controlButton,
-} from './controls';
+} from './myControl';
 
 
 // Editor

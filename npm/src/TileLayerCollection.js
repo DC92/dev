@@ -442,8 +442,8 @@ export function collection(options) {
 		}),
 		/*'IGN Cassini': new IGN({ //BEST BUG what key for Cassini ?
 			...options.ign,
-					layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
-				}),*/
+			layer: 'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+		}),*/
 	};
 }
 

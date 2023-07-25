@@ -19,7 +19,7 @@ import {
 } from 'ol/sphere';
 
 // MyOl
-import './controls.css';
+import './myControl.css';
 
 
 /**

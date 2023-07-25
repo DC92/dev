@@ -21,7 +21,7 @@ import {
 // MyOl
 import {
 	controlButton,
-} from './Controls.js';
+} from './myControl.js';
 
 
 //BEST make it a class GeolocationControl

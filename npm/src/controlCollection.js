@@ -17,7 +17,7 @@ import {
 	controlMousePosition,
 	controlPermalink,
 	controlPrint,
-} from './Controls';
+} from './myControl';
 import {
 	controlLoadGPX,
 	controlDownload,

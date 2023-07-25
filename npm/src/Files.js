@@ -25,7 +25,7 @@ import {
 // MyOl
 import {
 	controlButton,
-} from './Controls';
+} from './myControl';
 
 
 //BEST export / import names and links
