@@ -181,7 +181,6 @@ Based on https://openlayers.org
 			view: new ol.View({
 				enableRotation: false,
 			}),
-			//TODO ajouter les controles
 			layers: [
 				new myol.layer.tile.MRI(),
 				new myol.layer.MyVectorLayer({
@@ -209,11 +208,8 @@ Based on https://openlayers.org
 
 				new myol.layer.Hover(),
 			],
-			controls: [
-				new ol.control.Attribution({
-					collapsed: false,
-				}),
-			],
+			controls: wriMapControls(),
+			
 			// Centre la carte sur la zone souhaitée
 		}).getView().fit(ol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));
 	</script>

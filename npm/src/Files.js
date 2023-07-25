@@ -32,7 +32,7 @@ import {
 //BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
 //BEST misc formats
 //BEST make it a class...
-export function controlLoadGPX(opt) {
+export function load(opt) {
 	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
@@ -137,7 +137,7 @@ export function controlLoadGPX(opt) {
  * Requires controlButton
  */
 //BEST BUG incompatible with clusters
-export function controlDownload(opt) {
+export function download(opt) {
 	const options = {
 			label: '&#x1f4e5;',
 			className: 'myol-button-download',

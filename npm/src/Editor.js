@@ -198,7 +198,7 @@ export function layerEditGeoJson(opt) {
 		map.on('myol:onfeatureload', evt => {
 			source.addFeatures(evt.features);
 			optimiseEdited();
-			return false; // Warn controlLoadGPX that the editor got the included feature
+			return false; // Warn control.load that the editor got the included feature
 		});
 
 		map.on('pointermove', hover);

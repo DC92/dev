@@ -32,6 +32,8 @@ const ol = {
 };
 
 // MyOl
+import * as files from '../src/Files';
+import * as myControl from '../src/myControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
 import * as stylesOptions from '../src/stylesOptions';
 import * as tileLayercollection from '../src/TileLayerCollection';
@@ -47,6 +49,22 @@ const myol = {
 		tile: tileLayercollection,
 		vector: vectorLayerCollection,
 	},
+	control: { //TODO mettre dans un répertoire scr/control
+		load: files.load,
+		download: files.download,
+		print: myControl.print,
+	},
+
+	//Button: controls.controlButton,
+	//GPS: geolocation.controlGPS,
+	/*
+		LayerSwitcher: layerswitcher.controlLayerSwitcher,
+		MousePosition: controls.controlMousePosition,
+		Permalink: controls.controlPermalink,
+		Print: controls.controlPrint,
+		collection: controlcollection.controlCollection,
+	*/
+
 };
 
 export default myol;
@@ -73,15 +91,6 @@ import * as marker from '../src/Marker';
 
 export default {
 	control: {
-		//Button: controls.controlButton,
-		//Download: files.controlDownload,
-		//GPS: geolocation.controlGPS,
-		LayerSwitcher: layerswitcher.controlLayerSwitcher,
-		LoadGPX: files.controlLoadGPX,
-		MousePosition: controls.controlMousePosition,
-		Permalink: controls.controlPermalink,
-		Print: controls.controlPrint,
-		collection: controlcollection.controlCollection,
 	},
 	geom: {
 		MultiPolygon: MultiPolygon,

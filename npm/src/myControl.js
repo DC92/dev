@@ -304,7 +304,7 @@ export function controlTilesBuffer(opt) {
  * Print control
  * Requires controlButton
  */
-export function controlPrint(options) {
+export function print(options) {
 	const control = controlButton({
 		label: '&#x1F5A8;',
 		className: 'myol-button-print',

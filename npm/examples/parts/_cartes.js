@@ -118,6 +118,40 @@ const contourMassif = new myol.layer.MyVectorLayer(optionsContourMassif);
 contourMassif.options.selector.callbacks.push(() => pointsWRI.reload());
 //TODO mettre dans wri.html
 
+// Les controles des cartes de refuges.info
+function wriMapControls(options) {
+	return [
+		// Haut gauche
+		new ol.control.Zoom(),
+		new ol.control.FullScreen(),
+
+		myol.control.load(),
+		myol.control.download(),
+		myol.control.print(),
+		/*
+		controlGeocoder(),
+		controlGPS(),
+		options.page == 'point' ? controlButton() : 
+		options.page == 'nav' ? controlButton() : download(options.Download),
+		options.page == 'modif' ? controlButton() : controlPrint(),
+
+		// Haut droit
+		controlLayerSwitcher({
+			layers: wriMapBaseLayers(options.page),
+		}),
+		*/
+		// Bas gauche
+		//controlMousePosition(),
+		new ol.control.ScaleLine(),
+
+		// Bas droit
+		//controlPermalink(options.Permalink),
+		new ol.control.Attribution({
+			collapsed: false,
+		}),
+	];
+}
+
 // Les couches de fond des cartes de refuges.info
 /*function wriMapBaseLayers(page) {
 	return {
@@ -150,32 +184,4 @@ contourMassif.options.selector.callbacks.push(() => pointsWRI.reload());
 		'Photo Google': page == 'modif' ? null : layerGoogle('s'),
 	};
 }
-
-// Les controles des cartes de refuges.info
-function wriMapControls(options) {
-	return [
-		// Haut gauche
-		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
-		controlGeocoder(),
-		controlGPS(),
-		options.page == 'point' ? controlButton() : controlLoadGPX(),
-		options.page == 'nav' ? controlButton() : controlDownload(options.Download),
-		options.page == 'modif' ? controlButton() : controlPrint(),
-
-		// Haut droit
-		controlLayerSwitcher({
-			layers: wriMapBaseLayers(options.page),
-		}),
-
-		// Bas gauche
-		controlMousePosition(),
-		new ol.control.ScaleLine(),
-
-		// Bas droit
-		controlPermalink(options.Permalink),
-		new ol.control.Attribution({
-			collapsed: false,
-		}),
-	];
-}*/
+*/
