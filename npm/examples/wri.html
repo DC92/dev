@@ -57,9 +57,9 @@ Based on https://openlayers.org
 	<h4>/vues/index.js</h4>
 	<div id="carte-accueil"></div>
 	<script type="module">
-		new myol.Map({
+		new ol.Map({
 			target: 'carte-accueil',
-			view: new myol.View({
+			view: new ol.View({
 				enableRotation: false,
 			}),
 			layers: [
@@ -69,12 +69,12 @@ Based on https://openlayers.org
 			],
 			controls: [
 				// Attribution du fond de carte
-				new myol.control.Attribution({
+				new ol.control.Attribution({
 					collapsed: false,
 				}),
 			],
 			// Centre la carte sur la zone souhaitée
-		}).getView().fit(myol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
+		}).getView().fit(ol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
 	</script>
 
 	<h4>/vues/nav.js</h4>
@@ -176,9 +176,9 @@ Based on https://openlayers.org
 	</div>
 	
 	<script type="module">
-		new myol.Map({
+		new ol.Map({
 			target: 'carte-nav',
-			view: new myol.View({
+			view: new ol.View({
 				enableRotation: false,
 			}),
 			//TODO ajouter les controles
@@ -210,12 +210,12 @@ Based on https://openlayers.org
 				new myol.layer.Hover(),
 			],
 			controls: [
-				new myol.control.Attribution({
+				new ol.control.Attribution({
 					collapsed: false,
 				}),
 			],
 			// Centre la carte sur la zone souhaitée
-		}).getView().fit(myol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));
+		}).getView().fit(ol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));
 	</script>
 
 	<h4>Tests</h4>

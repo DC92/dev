@@ -1,5 +1,6 @@
 //const host = '<?=$config_wri["sous_dossier_installation"]?>'; // Appeler la couche de CE serveur
 const host = '//www.refuges.info/',
+	ol = myol.ol, // On récupère certaines fonctions natives Openlayers dans le bundle myol
 
 	// La carte des massifs colorés
 	optionsMassifsColores = {
@@ -9,7 +10,7 @@ const host = '//www.refuges.info/',
 			_path: 'api/polygones',
 			type_polygon: 1, // Massifs
 		}),
-		strategy: myol.loadingstrategy.all, // Pas de bbox
+		strategy: ol.loadingstrategy.all, // Pas de bbox
 
 		// Réception et traduction des données
 		addProperties: properties => ({
@@ -29,7 +30,7 @@ const host = '//www.refuges.info/',
 				...myol.stylesOptions.label(feature),
 
 				// Affichage de la couleur du massif
-				fill: new myol.style.Fill({
+				fill: new ol.style.Fill({
 					// Transparence 0.3
 					color: 'rgba(' + rgb.join(',') + ',0.3)',
 				}),
@@ -47,7 +48,7 @@ const host = '//www.refuges.info/',
 				...myol.stylesOptions.label(feature),
 
 				// On renforce le contour du massif survolé
-				stroke: new myol.style.Stroke({
+				stroke: new ol.style.Stroke({
 					color: feature.getProperties().couleur,
 					width: 2,
 				}),
@@ -63,7 +64,7 @@ const host = '//www.refuges.info/',
 			_path: 'api/polygones',
 			massif: options.selector.getSelection(),
 		}),
-		strategy: myol.loadingstrategy.all, // Pas de bbox
+		strategy: ol.loadingstrategy.all, // Pas de bbox
 
 		// Sélecteur d'affichage
 		selectName: 'select-massif',
@@ -71,7 +72,7 @@ const host = '//www.refuges.info/',
 		// Affichage de base
 		basicStylesOptions: () => [{
 			// Simple contour bleu
-			stroke: new myol.style.Stroke({
+			stroke: new ol.style.Stroke({
 				color: 'blue',
 				width: 2,
 			}),

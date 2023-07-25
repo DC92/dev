@@ -237,28 +237,25 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 			clusterStylesOptions: stylesOptions.cluster,
 			spreadClusterStylesOptions: stylesOptions.spreadCluster,
 			hoverStylesOptions: stylesOptions.hover,
-			style: style_,
 			selector: new Selector(opt.selectName),
 
 			...opt,
+
+			style: (feature, resolution) => {
+				// Function returning an array of styles options
+				const sof = !feature.getProperties().cluster ? options.basicStylesOptions :
+					resolution > options.spreadClusterMaxResolution ? options.spreadClusterStylesOptions :
+					options.clusterStylesOptions;
+
+				return sof(feature, this) // Call the styleOptions function
+					.map(so => new style.Style(so)); // Transform into an array of Style objects
+			},
 		};
 
 		super(options);
 
 		options.selector.callbacks.push(() => this.reload());
 		this.reload();
-
-		const layer = this; //TODO resorb
-
-		function style_(feature, resolution) {
-			// Function returning an array of styles options
-			const sof = !feature.getProperties().cluster ? options.basicStylesOptions :
-				resolution > options.spreadClusterMaxResolution ? options.spreadClusterStylesOptions :
-				options.clusterStylesOptions;
-
-			return sof(feature, layer) // Call the styleOptions function
-				.map(so => new style.Style(so)); // Transform into an array of Style objects
-		}
 	}
 
 	reload() {
