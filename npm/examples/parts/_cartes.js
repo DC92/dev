@@ -1,5 +1,5 @@
-const host = '//www.refuges.info/',
 //const host = '<?=$config_wri["sous_dossier_installation"]?>'; // Appeler la couche de CE serveur
+const host = '//www.refuges.info/',
 
 	// La carte des massifs colorés
 	optionsMassifsColores = {
@@ -87,15 +87,15 @@ const host = '//www.refuges.info/',
 		serverClusterMinResolution: 100,
 		selectName: 'select-wri',
 
-		query: (extent, resolution) => {
-			const selectionMassif = contourMassif.selector.getSelection();
+		query: (extent, resolution, projection, options) => {
+			const selectionMassif = contourMassif.selector.getSelection(); //TODO trouver comment lier dans wri.html
 
 			return {
 				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				type_points: pointsWRI.selector.getSelection(),
+				type_points: pointsWRI.selector.getSelection(), //TODO mettre le selecteur dans les options
 				massif: selectionMassif,
 				nb_points: 'all',
-				cluster: resolution > pointsWRI.options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
+				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
 			};
 		},
 

@@ -6,23 +6,24 @@ import 'ol/ol.css';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
+import * as loadingstrategy from 'ol/loadingstrategy';
 import * as style from 'ol/style';
 const myol = {
 	Map: Map,
 	View: View,
+	loadingstrategy: loadingstrategy,
 	style: style,
 };
 
-
 import Attribution from 'ol/control/Attribution';
+import FullScreen from 'ol/control/FullScreen';
+import ScaleLine from 'ol/control/ScaleLine';
+import Zoom from 'ol/control/Zoom';
 myol.control = {
 	Attribution: Attribution,
-};
-
-import * as loadingstrategy from 'ol/loadingstrategy';
-myol.loadingstrategy = {
-	all: loadingstrategy.all,
-	bbox: loadingstrategy.bbox,
+	FullScreen: FullScreen,
+	ScaleLine: ScaleLine,
+	Zoom: Zoom,
 };
 
 import * as proj from 'ol/proj';
@@ -35,39 +36,22 @@ myol.proj = {
 import * as stylesOptions from '../src/stylesOptions';
 myol.stylesOptions = stylesOptions;
 
-import * as tileLayercollection from '../src/TileLayerCollection';
+import * as myVectorLayer from '../src/MyVectorLayer';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
+import * as tileLayercollection from '../src/TileLayerCollection';
+myol.Selector = myVectorLayer.Selector;
 myol.layer = { //TODO mettre dans un répertoire scr/layer
+	MyVectorLayer: myVectorLayer.MyVectorLayer,
+	Hover: myVectorLayer.HoverLayer,
 	tile: tileLayercollection,
 	vector: vectorLayerCollection,
 };
 
-import {
-	MyVectorLayer,
-	HoverLayer,
-	Selector,
-} from '../src/MyVectorLayer';
-myol.layer.MyVectorLayer = MyVectorLayer;
-myol.layer.Hover = HoverLayer;
-myol.Selector = Selector;
-
-export default myol;
+export default myol; //TODO exporter ol & myol;
 
 
 /*
-import FullScreen from 'ol/control/FullScreen';
-import ScaleLine from 'ol/control/ScaleLine';
-import Zoom from 'ol/control/Zoom';
-myol.	control:{
-		FullScreenFullScreen:FullScreenFullScreen,
-		ScaleLine:ScaleLine,
-		Zoom:Zoom,
-	},
-
-import * as style from 'ol/style';
-
 import MultiPolygon from 'ol/geom/MultiPolygon';
-import Stroke from 'ol/style/Stroke';
 
 // MyOl
 import * as controls from '../src/Controls';
@@ -77,23 +61,17 @@ import * as files from '../src/Files';
 import * as geolocation from '../src/Geolocation';
 import * as layerswitcher from '../src/LayerSwitcher';
 import * as marker from '../src/Marker';
-import * as myvectorlayer from '../src/MyVectorLayer';
 
 export default {
-	...myol,
 	control: {
 		//Button: controls.controlButton,
 		//Download: files.controlDownload,
-		FullScreen: FullScreen,
 		//GPS: geolocation.controlGPS,
 		LayerSwitcher: layerswitcher.controlLayerSwitcher,
 		LoadGPX: files.controlLoadGPX,
 		MousePosition: controls.controlMousePosition,
 		Permalink: controls.controlPermalink,
 		Print: controls.controlPrint,
-		ScaleLine: ScaleLine,
-		Zoom: Zoom,
-
 		collection: controlcollection.controlCollection,
 	},
 	geom: {
@@ -112,11 +90,7 @@ export default {
 		ThunderforestTile: tileLayercollection.Thunderforest,
 		TopoTile: tileLayercollection.Topo,
 		WRI: myVector.WRI,
-
 		tileCollection: tileLayercollection.collection,
-	},
-	style: {
-		Stroke: Stroke,
 	},
 }
 */

@@ -28,12 +28,12 @@ class MyVectorSource extends VectorSource {
 	constructor(opt) {
 		const options = {
 				// host: '',
-				// query: (extent, resolution, mapProjection) => ({_path: '...'}), // this = options
-				url: url_, // (extent, resolution, mapProjection)
+				// query: (extent, resolution, projection,options) => ({_path: '...'}), // this = options
+				url: url_, // (extent, resolution, projection)
+				bbox: bbox_, // (extent, resolution, projection)
 				strategy: loadingstrategy.bbox,
-				bbox: bbox_, // (extent, resolution, mapProjection)
 				projection: 'EPSG:4326',
-				addProperties: () => {}, // Add properties to each received features
+				addProperties: (properties) => {}, // (default) add properties to each received features
 				...opt,
 			},
 			statusEl = document.getElementById(options.selectName + '-status');
@@ -66,7 +66,7 @@ class MyVectorSource extends VectorSource {
 		);
 
 		function url_() {
-			const args = options.query(...arguments),
+			const args = options.query(...arguments, options),
 				url = options.host + args._path; // Mem _path
 
 			if (options.strategy == loadingstrategy.bbox)
@@ -81,10 +81,10 @@ class MyVectorSource extends VectorSource {
 			return url + '?' + new URLSearchParams(args).toString();
 		}
 
-		function bbox_(extent, resolution, mapProjection) {
+		function bbox_(extent, resolution, projection) {
 			return proj.transformExtent(
 				extent,
-				mapProjection,
+				projection,
 				options.projection, // Received projection
 			).map(c => c.toPrecision(6)); // Limit the number of digits (10 m)
 		}

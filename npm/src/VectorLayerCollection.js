@@ -15,7 +15,6 @@ import * as style from 'ol/style';
 import * as stylesOptions from './stylesOptions';
 import {
 	MyVectorLayer,
-	//Selector,
 } from './MyVectorLayer';
 
 
@@ -213,10 +212,10 @@ export class Overpass extends MyVectorLayer {
 
 		const layer = this;
 
-		function query_(extent, resolution, mapProjection) {
+		function query_(extent, resolution, projection) {
 			const selections = layer.selector.getSelection(),
 				items = selections[0].split(','), // The 1st (and only) selector
-				ex4326 = proj.transformExtent(extent, mapProjection, 'EPSG:4326').map(c => c.toPrecision(6)),
+				ex4326 = proj.transformExtent(extent, projection, 'EPSG:4326').map(c => c.toPrecision(6)),
 				bbox = '(' + ex4326[1] + ',' + ex4326[0] + ',' + ex4326[3] + ',' + ex4326[2] + ');',
 				args = [];
 
