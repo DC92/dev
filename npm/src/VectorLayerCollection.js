@@ -198,7 +198,7 @@ export class Overpass extends MyVectorLayer {
 			bbox: () => null, // No bbox at the end of the url
 			format: format_,
 			maxResolution: 50,
-
+			attribution: '&copy;OpenStreetMap',
 			...options,
 		});
 
@@ -248,7 +248,6 @@ export class Overpass extends MyVectorLayer {
 							addTag(node, 'icon', chemIconUrl(tag.getAttribute('v')));
 							// Only once for a node
 							addTag(node, 'link', 'https://www.openstreetmap.org/node/' + node.id);
-							addTag(node, 'attribution', '&copy;OpenStreetMap'); //TODO move to layer.options
 						}
 
 						if (tag.getAttribute('k') && tag.getAttribute('k').includes('capacity:'))

@@ -1,9 +1,9 @@
-//const host = '<?=$config_wri["sous_dossier_installation"]?>'; // Appeler la couche de CE serveur
-const host = '//www.refuges.info/',
-	ol = myol.ol, // On récupère certaines fonctions natives Openlayers dans le bundle myol
+const ol = myol.ol, // On récupère certaines fonctions natives Openlayers dans le bundle myol
+	host = '//www.refuges.info/'; // '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de CE serveur
 
-	// La carte des massifs colorés
-	optionsMassifsColores = {
+// La couche des massifs colorés (accueil et couche carte nav)
+function layerMassifsColores(options) {
+	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
 		host: host,
 		query: () => ({
@@ -11,6 +11,7 @@ const host = '//www.refuges.info/',
 			type_polygon: 1, // Massifs
 		}),
 		strategy: ol.loadingstrategy.all, // Pas de bbox
+		...options,
 
 		// Réception et traduction des données
 		addProperties: properties => ({
@@ -54,10 +55,12 @@ const host = '//www.refuges.info/',
 				}),
 			};
 		},
-	},
+	});
+}
 
-	// Affiche le contour d'un massif pour la page nav
-	optionsContourMassif = {
+// Affiche le contour d'un massif pour la page nav
+function layerContourMassif(options) {
+	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
 		host: host,
 		query: (extent, resolution, projection, options) => ({
@@ -65,9 +68,7 @@ const host = '//www.refuges.info/',
 			massif: options.selector.getSelection(),
 		}),
 		strategy: ol.loadingstrategy.all, // Pas de bbox
-
-		// Sélecteur d'affichage
-		selectName: 'select-massif',
+		...options,
 
 		// Affichage de base
 		basicStylesOptions: () => [{
@@ -80,23 +81,25 @@ const host = '//www.refuges.info/',
 
 		// Pas d'action au survol
 		hoverStylesOptions: () => {},
-	},
+	});
+}
 
-	optionsPointsWRI = {
+function layerPointsWRI(options) {
+	const layer = new myol.layer.MyVectorLayer({
 		host: host,
 		browserClusterMinDistance: 50,
 		serverClusterMinResolution: 100,
-		selectName: 'select-wri',
+		...options,
 
-		query: (extent, resolution, projection, options) => {
-			const selectionMassif = contourMassif.options.selector.getSelection(); //TODO trouver comment lier dans wri.html
+		query: (extent, resolution, projection, opt) => {
+			const selectionMassif = options.selectMassif.getSelection();
 
 			return {
 				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				type_points: options.selector.getSelection(),
 				massif: selectionMassif,
+				type_points: opt.selector.getSelection(),
 				nb_points: 'all',
-				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
+				cluster: resolution > opt.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
 			};
 		},
 
@@ -110,13 +113,13 @@ const host = '//www.refuges.info/',
 			type: properties.type ? properties.type.valeur : null,
 			link: properties.lien, // Lien sur lequel cliquer
 		}),
-	};
+	});
 
-const pointsWRI = new myol.layer.MyVectorLayer(optionsPointsWRI);
-const contourMassif = new myol.layer.MyVectorLayer(optionsContourMassif);
-// Recharger le sélecteur de massif la couche de point quand change
-contourMassif.options.selector.callbacks.push(() => pointsWRI.reload());
-//TODO mettre dans wri.html
+	// Recharger la couche de points quand le sélecteur de massif change
+	options.selectMassif.callbacks.push(() => layer.reload());
+
+	return layer;
+}
 
 // Les controles des cartes de refuges.info
 function wriMapControls(options) {
