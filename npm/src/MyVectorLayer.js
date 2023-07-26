@@ -278,20 +278,24 @@ export class HoverLayer extends VectorLayer {
 
 	// Attach an hover & click listener to the map
 	setMapInternal(map) { //HACK execute actions on Map init
-		// Basic listeners
-		map.on(['pointermove', 'click'], evt => this.mouseListener(evt));
+		const mapEl = map.getTargetElement();
 
-		// Leaving the map reset hovering
-		window.addEventListener('mousemove', evt => {
-			const divRect = map.getTargetElement().getBoundingClientRect();
+		if (mapEl) {
+			// Basic listeners
+			map.on(['pointermove', 'click'], evt => this.mouseListener(evt));
 
-			// The mouse is outside of the map
-			if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
-				evt.clientY < divRect.top || divRect.bottom < evt.clientY)
-				this.getSource().clear()
-		});
+			// Leaving the map reset hovering
+			window.addEventListener('mousemove', evt => {
+				const divRect = mapEl.getBoundingClientRect();
 
-		return super.setMapInternal(map);
+				// The mouse is outside of the map
+				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
+					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
+					this.getSource().clear()
+			});
+
+			return super.setMapInternal(map);
+		}
 	}
 
 	mouseListener(evt) {

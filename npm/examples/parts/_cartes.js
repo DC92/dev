@@ -122,7 +122,28 @@ function layerPointsWRI(options) {
 }
 
 // Les controles des cartes de refuges.info
-function wriMapControls(options) {
+function couchesVectoriellesExternes() {
+	return [
+		new myol.layer.vector.Chemineur({
+			selectName: 'select-chemineur',
+		}),
+		new myol.layer.vector.Alpages({
+			selectName: 'select-alpages',
+		}),
+		new myol.layer.vector.PRC({
+			selectName: 'select-prc',
+		}),
+		new myol.layer.vector.C2C({
+			selectName: 'select-c2c',
+		}),
+		new myol.layer.vector.Overpass({
+			selectName: 'select-osm',
+		}),
+	];
+}
+
+// Les controles des cartes de refuges.info
+function controlesBasiques() {
 	return [
 		// Haut gauche
 		new ol.control.Zoom(),
@@ -131,18 +152,20 @@ function wriMapControls(options) {
 		myol.control.load(),
 		myol.control.download(),
 		myol.control.print(),
+
 		/*
 		controlGeocoder(),
 		controlGPS(),
 		options.page == 'point' ? controlButton() : 
 		options.page == 'nav' ? controlButton() : download(options.Download),
 		options.page == 'modif' ? controlButton() : print(),
+		*/
 
 		// Haut droit
-		controlLayerSwitcher({
-			layers: wriMapBaseLayers(options.page),
+		myol.control.layerSwitcher({
+			layers: myol.layer.tile.collection(),
 		}),
-		*/
+
 		// Bas gauche
 		//controlMousePosition(),
 		new ol.control.ScaleLine(),

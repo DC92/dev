@@ -39,9 +39,7 @@ import View from 'ol/View';
 import {
 	controlCollection,
 } from '../src/controlCollection';
-import {
-	controlLayerSwitcher,
-} from '../src/LayerSwitcher';
+import layerSwitcher from '../src/LayerSwitcher';
 import {
 	collection,
 } from '../src/TileLayerCollection';
@@ -59,7 +57,7 @@ new Map({
 	}),
 	controls: [
 		...controlCollection(),
-		controlLayerSwitcher({
+		layerSwitcher({
 			layers: collection(),
 		}),
 	],

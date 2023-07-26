@@ -10,8 +10,7 @@ import {
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
 //TODO make it a class
-//TODO export as default
-export function controlLayerSwitcher(options) {
+export default function layerSwitcher(options) {
 	const control = controlButton({
 			className: 'myol-button-switcher',
 			label: '&#x274F;',
@@ -24,7 +23,7 @@ export function controlLayerSwitcher(options) {
 		}),
 		baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
-			.filter(([_, v]) => v && v.getMaxResolution()) //HACK Remove non valid layers
+			.filter(([_, v]) => v && v.getMaxResolution()) //HACK Remove invalid layers
 		),
 		layerNames = Object.keys(baseLayers),
 		baselayer = location.href.match(/baselayer=([^\&]+)/);

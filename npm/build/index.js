@@ -32,6 +32,7 @@ const ol = {
 };
 
 // MyOl
+import layerSwitcher from '../src/LayerSwitcher';
 import * as files from '../src/Files';
 import * as myControl from '../src/myControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
@@ -39,8 +40,17 @@ import * as stylesOptions from '../src/stylesOptions';
 import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
 
+/*
+import * as controlCollection from '../src/controlCollection';
+import * as editor from '../src/Editor';
+import * as geocoder from '../src/Geocoder';
+import * as geolocation from '../src/Geolocation';
+import * as marker from '../src/Marker';
+*/
+
 const myol = {
-	ol: ol,
+	ol: ol, // Packing some original Openlayers functions
+
 	stylesOptions: stylesOptions,
 	Selector: myVectorLayer.Selector,
 	layer: { //TODO mettre dans un répertoire scr/layer
@@ -50,6 +60,7 @@ const myol = {
 		vector: vectorLayerCollection,
 	},
 	control: { //TODO mettre dans un répertoire scr/control
+		layerSwitcher: layerSwitcher,
 		load: files.load,
 		download: files.download,
 		print: myControl.print,
@@ -58,7 +69,6 @@ const myol = {
 	//Button: controls.controlButton,
 	//GPS: geolocation.controlGPS,
 	/*
-		LayerSwitcher: layerswitcher.controlLayerSwitcher,
 		MousePosition: controls.controlMousePosition,
 		Permalink: controls.controlPermalink,
 		Print: controls.print,
@@ -86,7 +96,6 @@ import * as controlcollection from '../src/controlCollection';
 import * as editor from '../src/Editor';
 import * as files from '../src/Files';
 import * as geolocation from '../src/Geolocation';
-import * as layerswitcher from '../src/LayerSwitcher';
 import * as marker from '../src/Marker';
 
 export default {

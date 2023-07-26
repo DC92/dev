@@ -41,9 +41,7 @@ import VectorSource from 'ol/source/Vector';
 import View from 'ol/View';
 
 // MyOl
-import {
-	controlLayerSwitcher
-} from '../src/LayerSwitcher';
+import layerSwitcher from '../src/LayerSwitcher';
 
 
 // Vectorlayer
@@ -77,7 +75,7 @@ new Map({
 		zoom: 5,
 	}),
 	controls: [
-		controlLayerSwitcher({
+		layerSwitcher({
 			layers: baseLayers,
 			selectExtId: 'select-ext',
 		}),
