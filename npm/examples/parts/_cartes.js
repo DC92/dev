@@ -149,13 +149,13 @@ function controlesBasiques() {
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
 
+		//myol.control.download(), //TODO pour autre page que nav
+		new myol.control.MyGeocoder(),
+		myol.control.gps(),
 		myol.control.load(),
-		myol.control.download(),
 		myol.control.print(),
 
 		/*
-		controlGeocoder(),
-		controlGPS(),
 		options.page == 'point' ? controlButton() : 
 		options.page == 'nav' ? controlButton() : download(options.Download),
 		options.page == 'modif' ? controlButton() : print(),

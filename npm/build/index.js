@@ -33,7 +33,9 @@ const ol = {
 
 // MyOl
 import layerSwitcher from '../src/LayerSwitcher';
+import MyGeocoder from '../src/MyGeocoder';
 import * as files from '../src/Files';
+import * as geolocation from '../src/Geolocation';
 import * as myControl from '../src/myControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
 import * as stylesOptions from '../src/stylesOptions';
@@ -43,9 +45,12 @@ import * as vectorLayerCollection from '../src/VectorLayerCollection';
 /*
 import * as controlCollection from '../src/controlCollection';
 import * as editor from '../src/Editor';
-import * as geocoder from '../src/Geocoder';
-import * as geolocation from '../src/Geolocation';
 import * as marker from '../src/Marker';
+Button: controls.controlButton,
+MousePosition: controls.controlMousePosition,
+Permalink: controls.controlPermalink,
+Print: controls.print,
+collection: controlcollection.controlCollection,
 */
 
 const myol = {
@@ -64,17 +69,9 @@ const myol = {
 		load: files.load,
 		download: files.download,
 		print: myControl.print,
+		gps: geolocation.gps,
+		MyGeocoder: MyGeocoder,
 	},
-
-	//Button: controls.controlButton,
-	//GPS: geolocation.controlGPS,
-	/*
-		MousePosition: controls.controlMousePosition,
-		Permalink: controls.controlPermalink,
-		Print: controls.print,
-		collection: controlcollection.controlCollection,
-	*/
-
 };
 
 export default myol;
@@ -95,7 +92,6 @@ import * as controls from '../src/Controls';
 import * as controlcollection from '../src/controlCollection';
 import * as editor from '../src/Editor';
 import * as files from '../src/Files';
-import * as geolocation from '../src/Geolocation';
 import * as marker from '../src/Marker';
 
 export default {
