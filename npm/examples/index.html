@@ -43,6 +43,8 @@ import layerSwitcher from '../src/LayerSwitcher';
 import {
 	collection,
 } from '../src/TileLayerCollection';
+import * as myVector from '../src/VectorLayerCollection';
+import * as marker from '../src/Marker';
 
 // Debug
 import {
@@ -59,6 +61,15 @@ new Map({
 		...controlCollection(),
 		layerSwitcher({
 			layers: collection(),
+		}),
+	],
+	layers: [
+		new myVector.Chemineur({
+			selectName: 'select-chem',
+		}),
+		marker.layerMarker({
+			src: 'images/viseur.png',
+			dragable: true,
 		}),
 	],
 });

@@ -167,10 +167,9 @@ function controlesBasiques() {
 
 		// Bas droit
 		//controlPermalink(options.Permalink),
-		new ol.control.Attribution({
+		new ol.control.Attribution({ //HACK ne marche pas si layerSwitcher est défini avant Attribution
 			collapsed: false,
 		}),
-		//TODO BUG : ne marche pas si layerSwitcher est défini avant Attribution
 
 		// Haut droit
 		myol.control.layerSwitcher({

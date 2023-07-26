@@ -237,7 +237,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 			clusterStylesOptions: stylesOptions.cluster,
 			spreadClusterStylesOptions: stylesOptions.spreadCluster,
 			hoverStylesOptions: stylesOptions.hover,
-			//zIndex: 100,// Above the tiles layers
+			zIndex: 100, // Above the tiles layers
 			selector: new Selector(opt.selectName),
 
 			...opt,
@@ -273,7 +273,7 @@ export class HoverLayer extends VectorLayer {
 	constructor() {
 		super({
 			source: new VectorSource(),
-			zIndex: 200,
+			zIndex: 200, // Above the vector layers
 		});
 	}
 
@@ -281,22 +281,22 @@ export class HoverLayer extends VectorLayer {
 	setMapInternal(map) { //HACK execute actions on Map init
 		const mapEl = map.getTargetElement();
 
-		if (mapEl) {
-			// Basic listeners
-			map.on(['pointermove', 'click'], evt => this.mouseListener(evt));
+		// Basic listeners
+		map.on(['pointermove', 'click'], evt => this.mouseListener(evt));
 
-			// Leaving the map reset hovering
-			window.addEventListener('mousemove', evt => {
+		// Leaving the map reset hovering
+		window.addEventListener('mousemove', evt => {
+			if (mapEl) {
 				const divRect = mapEl.getBoundingClientRect();
 
 				// The mouse is outside of the map
 				if (evt.clientX < divRect.left || divRect.right < evt.clientX ||
 					evt.clientY < divRect.top || divRect.bottom < evt.clientY)
 					this.getSource().clear()
-			});
+			}
+		});
 
-			return super.setMapInternal(map);
-		}
+		return super.setMapInternal(map);
 	}
 
 	mouseListener(evt) {

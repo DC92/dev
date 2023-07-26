@@ -61,12 +61,11 @@ const map = new Map({
 	}),
 	controls: [
 		new Zoom(),
+		new Attribution({ //HACK ne marche pas si layerSwitcher est défini avant Attribution
+			collapsed: false,
+		}),
 		layerSwitcher({
 			layers: demo(layersKeys),
-		}),
-		//TODO BUG : ne marche pas si layerSwitcher est défini avant Attribution
-		new Attribution({
-			collapsed: false,
 		}),
 	],
 });

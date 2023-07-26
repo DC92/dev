@@ -67,7 +67,6 @@ export function label(feature, layer) {
 					color: 'blue',
 				}),
 			}),
-			zIndex: 100,
 		};
 	}
 }
