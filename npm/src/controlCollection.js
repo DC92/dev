@@ -24,8 +24,8 @@ import {
 } from './Files';
 import MyGeocoder from './MyGeocoder';
 import {
-	gps,
-} from './Geolocation';
+	myGeolocation,
+} from './MyGeolocation';
 
 
 /**
@@ -55,7 +55,7 @@ export function controlCollection(opt) {
 		new Zoom(options.Zoom),
 		new FullScreen(options.FullScreen),
 		new MyGeocoder(options.Geocoder),
-		gps(options.GPS),
+		myGeolocation(options.Geolocation),
 		load(options.load),
 		download(options.download),
 		print(options.Print),

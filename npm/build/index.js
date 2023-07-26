@@ -35,7 +35,7 @@ const ol = {
 import layerSwitcher from '../src/LayerSwitcher';
 import MyGeocoder from '../src/MyGeocoder';
 import * as files from '../src/Files';
-import * as geolocation from '../src/Geolocation';
+import * as myGeolocation from '../src/MyGeolocation';
 import * as myControl from '../src/myControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
 import * as stylesOptions from '../src/stylesOptions';
@@ -69,7 +69,7 @@ const myol = {
 		load: files.load,
 		download: files.download,
 		print: myControl.print,
-		gps: geolocation.gps,
+		myGeolocation: myGeolocation.myGeolocation,
 		MyGeocoder: MyGeocoder,
 	},
 };

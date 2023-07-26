@@ -151,7 +151,7 @@ function controlesBasiques() {
 
 		//myol.control.download(), //TODO pour autre page que nav
 		new myol.control.MyGeocoder(),
-		myol.control.gps(),
+		myol.control.myGeolocation(),
 		myol.control.load(),
 		myol.control.print(),
 
