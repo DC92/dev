@@ -161,11 +161,6 @@ function controlesBasiques() {
 		options.page == 'modif' ? controlButton() : print(),
 		*/
 
-		// Haut droit
-		myol.control.layerSwitcher({
-			layers: myol.layer.tile.collection(),
-		}),
-
 		// Bas gauche
 		//controlMousePosition(),
 		new ol.control.ScaleLine(),
@@ -174,6 +169,12 @@ function controlesBasiques() {
 		//controlPermalink(options.Permalink),
 		new ol.control.Attribution({
 			collapsed: false,
+		}),
+		//TODO BUG : ne marche pas si layerSwitcher est défini avant Attribution
+
+		// Haut droit
+		myol.control.layerSwitcher({
+			layers: myol.layer.tile.collection(),
 		}),
 	];
 }

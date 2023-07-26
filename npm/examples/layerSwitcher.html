@@ -31,6 +31,7 @@ Based on https://openlayers.org
 	<script type="module">
 // Openlayers
 import 'ol/ol.css';
+import Attribution from 'ol/control/Attribution';
 import GeoJSON from 'ol/format/GeoJSON';
 import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
@@ -78,6 +79,10 @@ new Map({
 		layerSwitcher({
 			layers: baseLayers,
 			selectExtId: 'select-ext',
+		}),
+		//TODO BUG : ne marche pas si layerSwitcher est défini avant Attribution
+		new Attribution({
+			collapsed: false,
 		}),
 	],
 	layers: [countries],

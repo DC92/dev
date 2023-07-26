@@ -33,7 +33,7 @@ Based on https://openlayers.org
 		// apache (production)
 		if (window.origin.split(':').length == 2) {
 			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
-			document.write('<script src="../dist/myol.js"><&#47;script>');
+			document.write('<script src="../dist/myol-debug.js"><&#47;script>');
 		}
 	</script>
 	<script type="module">
@@ -62,16 +62,16 @@ new ol.Map({
 	view: new ol.View({
 		enableRotation: false,
 	}),
-	layers: [
-		new myol.layer.tile.MRI(), // Fond de carte
-		layerMassifsColores(),
-		new myol.layer.Hover(), // Gère le survol du curseur
-	],
 	controls: [
 		// Attribution du fond de carte
 		new ol.control.Attribution({
 			collapsed: false,
 		}),
+	],
+	layers: [
+		new myol.layer.tile.MRI(), // Fond de carte
+		layerMassifsColores(),
+		new myol.layer.Hover(), // Gère le survol du curseur
 	],
 	// Centre la carte sur la zone souhaitée
 }).getView().fit(ol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
@@ -189,6 +189,9 @@ new ol.Map({
 	view: new ol.View({
 		enableRotation: false,
 	}),
+	controls: [
+		...controlesBasiques(),
+	],
 	layers: [
 		new myol.layer.tile.MRI(),
 		layerMassifsColores({
@@ -198,9 +201,6 @@ new ol.Map({
 		pointsWRI,
 		...couchesVectoriellesExternes(),
 		new myol.layer.Hover(),
-	],
-	controls: [
-		...controlesBasiques(),
 	],
 	// Centre la carte sur la zone souhaitée
 }).getView().fit(ol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));

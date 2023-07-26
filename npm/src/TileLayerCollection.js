@@ -448,6 +448,8 @@ export function collection(options) {
 }
 
 export function demo(options) {
+	options = options || {};
+
 	return {
 		...collection(options),
 

@@ -138,11 +138,6 @@ const geojsonObject = {
 
 new Map({
 	target: 'map',
-	layers: [
-		new TileLayer({
-			source: new OSM(),
-		}),
-	],
 	controls: controlCollection({
 		permalink: {
 			display: true,
@@ -151,6 +146,11 @@ new Map({
 			submenuId: 'myol-help',
 		},
 	}),
+	layers: [
+		new TileLayer({
+			source: new OSM(),
+		}),
+	],
 });
 	</script>
 	<script src="parts/print_script.js"></script>

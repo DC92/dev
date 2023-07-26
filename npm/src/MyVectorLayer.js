@@ -237,6 +237,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 			clusterStylesOptions: stylesOptions.cluster,
 			spreadClusterStylesOptions: stylesOptions.spreadCluster,
 			hoverStylesOptions: stylesOptions.hover,
+			//zIndex: 100,// Above the tiles layers
 			selector: new Selector(opt.selectName),
 
 			...opt,
