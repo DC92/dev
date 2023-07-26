@@ -6,7 +6,7 @@
  *   layer : that owns the feature
  */
 
-//TODO verify if all are used
+//BEST verify if all are used
 import Icon from 'ol/style/Icon';
 import * as extent from 'ol/extent';
 import * as style from 'ol/style';

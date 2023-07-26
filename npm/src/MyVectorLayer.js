@@ -3,7 +3,7 @@
  * Facilities to vector layers
  */
 
-//TODO verify if all are used
+//BEST verify if all are used
 import Cluster from 'ol/source/Cluster';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';

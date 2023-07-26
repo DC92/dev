@@ -36,8 +36,8 @@ import {
 
 
 // Layer to display a marker
-//TODO make it a class
-//TODO export as default
+//BEST make it a class
+//BEST export as default
 export function layerMarker(opt) {
 	const options = {
 			position: [0, 0],

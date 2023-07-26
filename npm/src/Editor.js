@@ -35,7 +35,7 @@ import {
 
 // Editor
 //BEST make it a class
-//TODO export as default
+//BEST export as default
 export function layerEditGeoJson(opt) {
 	const options = {
 			format: new GeoJSON(),
@@ -85,7 +85,7 @@ export function layerEditGeoJson(opt) {
 				'<hr/><div id="myol-help-edit"></div>',
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
-		geoJsonValue = geoJsonEl ? JSON.parse(geoJsonEl.value) : '', //TODO JSONparse
+		geoJsonValue = geoJsonEl ? JSON.parse(geoJsonEl.value) : '', //BEST JSONparse
 		styleDisplay = new Style({
 			// Lines or polygons border
 			stroke: new Stroke({

@@ -48,7 +48,7 @@ export function controlHelp(options) {
  */
 export function controlCollection(opt) {
 	const options = {
-		supplementaryControls: [], //TODO resorb
+		supplementaryControls: [], //BEST resorb
 		...opt,
 	};
 

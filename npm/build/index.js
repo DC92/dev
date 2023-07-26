@@ -53,13 +53,13 @@ const myol = {
 
 	stylesOptions: stylesOptions,
 	Selector: myVectorLayer.Selector,
-	layer: { //TODO mettre dans un répertoire scr/layer
+	layer: { //BEST mettre dans un répertoire scr/layer
 		MyVectorLayer: myVectorLayer.MyVectorLayer,
 		Hover: myVectorLayer.HoverLayer,
 		tile: tileLayercollection,
 		vector: vectorLayerCollection,
 	},
-	control: { //TODO mettre dans un répertoire scr/control
+	control: { //BEST mettre dans un répertoire scr/control
 		layerSwitcher: layerSwitcher,
 		load: files.load,
 		download: files.download,
