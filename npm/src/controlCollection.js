@@ -34,7 +34,7 @@ import {
  * Display help contained in <TAG id="<options.submenuId>">
  */
 //BEST make it a class
-export function controlHelp(options) {
+export function Help(options) {
 	return controlButton({
 		label: '?',
 		...options,
@@ -44,7 +44,7 @@ export function controlHelp(options) {
 /**
  * Controls examples
  */
-export function controlCollection(opt) {
+export function collection(opt) {
 	const options = {
 		supplementaryControls: [], //BEST resorb
 		...opt,
@@ -59,7 +59,7 @@ export function controlCollection(opt) {
 		load(options.load),
 		download(options.download),
 		print(options.Print),
-		controlHelp(options.Help),
+		Help(options.Help),
 
 		// Bottom left
 		controlLengthLine(options.LengthLine),
@@ -73,3 +73,5 @@ export function controlCollection(opt) {
 		...options.supplementaryControls
 	];
 }
+
+export default collection;

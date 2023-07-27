@@ -97,9 +97,7 @@ import View from 'ol/View';
 import * as proj from 'ol/proj';
 
 // MyOl
-import {
-	HoverLayer,
-} from '../src/MyVectorLayer';
+import * as myVectorLayer from '../src/MyVectorLayer';
 import * as myVector from '../src/VectorLayerCollection';
 
 
@@ -139,7 +137,7 @@ new Map({
 			selectName: 'select-osm',
 		}),
 
-		new HoverLayer(),
+		new myVectorLayer.Hover(),
 	],
 });
 	</script>

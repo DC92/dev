@@ -269,7 +269,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
  * Display the hovered feature with the hover style
  * Go to the link property when click a feature
  */
-export class HoverLayer extends VectorLayer {
+export class Hover extends VectorLayer {
 	constructor() {
 		super({
 			source: new VectorSource(),
@@ -457,3 +457,5 @@ export class Selector {
 		return [null];
 	}
 }
+
+export default MyVectorLayer;

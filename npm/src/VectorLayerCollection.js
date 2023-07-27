@@ -12,10 +12,8 @@ import * as proj from 'ol/proj';
 import * as style from 'ol/style';
 
 // MyOl
+import MyVectorLayer from './MyVectorLayer';
 import * as stylesOptions from './stylesOptions';
-import {
-	MyVectorLayer,
-} from './MyVectorLayer';
 
 
 // Get icon from chemineur.fr

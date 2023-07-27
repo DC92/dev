@@ -46,8 +46,8 @@ Based on https://openlayers.org
 			}),
 			controls: [
 				...myol.control.collection(),
-				new myol.control.LayerSwitcher({
-					layers: myol.layer.tileCollection(),
+				myol.control.layerSwitcher({
+					layers: myol.layer.tile.collection(),
 				}),
 			],
 		});
