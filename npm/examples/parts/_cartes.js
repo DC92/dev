@@ -156,17 +156,17 @@ function controlesBasiques() {
 		myol.control.print(),
 
 		/*
-		options.page == 'point' ? controlButton() : 
-		options.page == 'nav' ? controlButton() : download(options.Download),
-		options.page == 'modif' ? controlButton() : print(),
+		options.page == 'point' ? myButton() : 
+		options.page == 'nav' ? myButton() : download(options.Download),
+		options.page == 'modif' ? myButton() : print(),
 		*/
 
 		// Bas gauche
-		//controlMousePosition(),
+		//mousePosition(),
 		new ol.control.ScaleLine(),
 
 		// Bas droit
-		//controlPermalink(options.Permalink),
+		//permalink(options.Permalink),
 		new ol.control.Attribution({ //HACK ne marche pas si layerSwitcher est défini avant Attribution
 			collapsed: false,
 		}),

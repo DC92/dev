@@ -12,30 +12,28 @@ import Zoom from 'ol/control/Zoom';
 
 // MyOl
 import {
-	controlButton,
-	controlLengthLine,
-	controlMousePosition,
-	controlPermalink,
+	myButton,
+	lengthLine,
+	mousePosition,
+	permalink,
 	print,
-} from './myControl';
+} from './MyControl';
 import {
 	load,
 	download,
 } from './Files';
 import MyGeocoder from './MyGeocoder';
-import {
-	myGeolocation,
-} from './MyGeolocation';
+import myGeolocation from './MyGeolocation';
 
 
 /**
  * Help control
- * Requires controlButton
+ * Requires myButton
  * Display help contained in <TAG id="<options.submenuId>">
  */
 //BEST make it a class
 export function Help(options) {
-	return controlButton({
+	return myButton({
 		label: '?',
 		...options,
 	});
@@ -62,12 +60,12 @@ export function collection(opt) {
 		Help(options.Help),
 
 		// Bottom left
-		controlLengthLine(options.LengthLine),
-		controlMousePosition(options.Mouseposition),
+		lengthLine(options.LengthLine),
+		mousePosition(options.Mouseposition),
 		new ScaleLine(options.ScaleLine),
 
 		// Bottom right
-		controlPermalink(options.Permalink),
+		permalink(options.Permalink),
 		new Attribution(options.Attribution),
 
 		...options.supplementaryControls

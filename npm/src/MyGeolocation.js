@@ -20,12 +20,12 @@ import {
 
 // MyOl
 import {
-	controlButton,
-} from './myControl.js';
+	myButton,
+} from './MyControl.js';
 
 
 //BEST make it a class GeolocationControl
-export function myGeolocation(options) {
+export default function myGeolocation(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content / option
 		'<p>Localisation GPS:</p>' +
@@ -55,7 +55,7 @@ export function myGeolocation(options) {
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
-		control = controlButton({
+		control = myButton({
 			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: subMenu,

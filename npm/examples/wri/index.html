@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers WRI</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="../images/favicon.png" rel="icon" type="image/png" />
+	<link href="../images/favicon.png" rel="apple-touch-icon" />
+	<link href="../parts/style.css" rel="stylesheet">
+
+	<style>
+		h4 {
+			clear: both;
+			margin-bottom: 0;
+		}
+		#carte-accueil {
+			width: 650px;
+			height: 600px;
+		}
+		#carte-nav {
+			float: right;
+			width: 75vw;
+			height: 75vw;
+		}
+	</style>
+
+	<script>
+		// apache (production)
+		if (window.origin.split(':').length == 2) {
+			document.write('<link href="../../dist/myol.css" type="text/css" rel="stylesheet">');
+			document.write('<script src="../../dist/myol-debug.js"><&#47;script>');
+		}
+	</script>
+	<script type="module">
+		// vite nmp (test)
+		import myol from '../../build/index'; // At this place, mysteriously do not import out of npm vite context
+		window.myol = myol; // Declare a myol global variable
+		// Next script must be defer to be run after the import
+	</script>
+
+	<script src="../parts/_cartes.js" defer></script>
+</head>
+
+<body>
+	<a style="float:right" href="nav.html">NAV &#9654;</a>
+	<a style="float:right;margin-right:15px" href="../..">HOME</a>
+	<h1 style="margin:0">Tests for refuges.info</h1>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+
+	<h4>/vues/index.html</h4>
+	<div id="carte-accueil"></div>
+	<script type="module">
+new ol.Map({
+	target: 'carte-accueil',
+	view: new ol.View({
+		enableRotation: false,
+	}),
+	controls: [
+		// Attribution du fond de carte
+		new ol.control.Attribution({
+			collapsed: false,
+		}),
+	],
+	layers: [
+		new myol.layer.tile.MRI(), // Fond de carte
+		layerMassifsColores(),
+		new myol.layer.Hover(), // Gère le survol du curseur
+	],
+	// Centre la carte sur la zone souhaitée
+}).getView().fit(ol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
+	</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<!--
+© Dominique Cavailhez 2019
+https://github.com/Dominique92/MyOl
+Based on https://openlayers.org
+-->
+<html>
+<head>
+	<title>My Openlayers WRI</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="../images/favicon.png" rel="icon" type="image/png" />
+	<link href="../images/favicon.png" rel="apple-touch-icon" />
+	<link href="../parts/style.css" rel="stylesheet">
+
+	<style>
+		h4 {
+			clear: both;
+			margin-bottom: 0;
+		}
+		#carte-accueil {
+			width: 650px;
+			height: 600px;
+		}
+		#carte-nav {
+			float: right;
+			width: 75vw;
+			height: 75vw;
+		}
+	</style>
+
+	<script>
+		// apache (production)
+		if (window.origin.split(':').length == 2) {
+			document.write('<link href="../../dist/myol.css" type="text/css" rel="stylesheet">');
+			document.write('<script src="../../dist/myol-debug.js"><&#47;script>');
+		}
+	</script>
+	<script type="module">
+		// vite nmp (test)
+		import myol from '../../build/index'; // At this place, mysteriously do not import out of npm vite context
+		window.myol = myol; // Declare a myol global variable
+		// Next script must be defer to be run after the import
+	</script>
+
+	<script src="../parts/_cartes.js" defer></script>
+</head>
+
+<body>
+	<a style="float:right" href="point.html">POINT &#9654;</a>
+	<a style="float:right;margin-right:15px" href="../..">HOME</a>
+	<h1 style="margin:0">Tests for refuges.info</h1>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+	<p><a href="../../examples/parts/_cartes.js">vues/_cartes.js</a> test for refuges.info</p>
+	<p><a href="nav.html">src/wri.html</a> test for refuges.info</p>
+
+	<h4>/vues/point_formulaire_modification.js</h4>
+	<div id="carte-accueil"></div>
+	<script type="module">
+new ol.Map({
+	target: 'carte-accueil',
+	view: new ol.View({
+		enableRotation: false,
+	}),
+	controls: [
+		// Attribution du fond de carte
+		new ol.control.Attribution({
+			collapsed: false,
+		}),
+	],
+	layers: [
+		new myol.layer.tile.MRI(), // Fond de carte
+		layerMassifsColores(),
+		new myol.layer.Hover(), // Gère le survol du curseur
+	],
+	// Centre la carte sur la zone souhaitée
+}).getView().fit(ol.proj.transformExtent([0, 42, 8, 47], 'EPSG:4326', 'EPSG:3857'));
+	</script>
+
+	<h4>/vues/modif.html</h4>
+	<div id="carte-nav"></div>
+	<ul>
+		<li>
+			<input type="checkbox" name="select-massif" value="4">
+			<label>Vercors uniquement</label>
+		</li><hr><li>
+			<label>Tout</label>
+			<input type="checkbox" name="select-wri" value="all">
+			<span id="select-wri-status"></span>
+		</li><li>
+			<input type="checkbox"  name="select-wri" value="7">
+			<img id="icone_7" src="https://www.refuges.info//images/icones/cabane.svg">
+		</li><li>
+			<input type="checkbox"  name="select-wri" value="10">
+			<img id="icone_10" src="https://www.refuges.info//images/icones/cabane_red.svg">
+		</li><li>
+			<input type="checkbox"  name="select-wri" value="9">
+			<img id="icone_9" src="https://www.refuges.info//images/icones/cabane_green.svg">
+		</li><li>
+			<input type="checkbox"  name="select-wri" value="23">
+			<img id="icone_23" src="https://www.refuges.info//images/icones/pointdeau.svg">
+		</li><li>
+			<input type="checkbox"  name="select-wri" value="6">
+			<img id="icone_6" src="https://www.refuges.info//images/icones/sommet.svg">
+		</li><li>
+			<input type="checkbox"  name="select-wri" value="3">
+			<img id="icone_3" src="https://www.refuges.info//images/icones/triangle_a33.10.svg">
+		</li><li>
+			<input type="checkbox" name="select-wri" value="28">
+			<img id="icone_28" src="https://www.refuges.info//images/icones/cabane_white_black_a63.svg">
+		</li>
+	</ul>
+
+	<div>
+		<input type="checkbox" name="select-massifs" />
+		<label>massifs</label>
+		<span id="select-massifs-status"></span>
+	</div>
+
+	<ul>OSM
+		<li>
+			<label>Tout</label>
+			<input type="checkbox" name="select-osm" value="all" />
+			<span id="select-osm-status"></span>
+		</li><li>
+			<input type="checkbox" name="select-osm" id="City Hall"
+				value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />
+			<label>hôtel</label>
+		</li><li>
+			<input type="checkbox" name="select-osm" id="Campground"
+				value='["tourism"="camp_site"]' />
+			<label>camping</label>
+		</li><li>
+			<input type="checkbox" name="select-osm" id="Drinking Water"
+				value='["natural"="spring"]+["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["man_made"="water_well"]' />
+			<label for="Drinking Water">point d'eau</label>
+		</li><li>
+			<input type="checkbox" name="select-osm" id="Shopping Center"
+				value='["shop"~"supermarket|convenience"]' />
+			<label for="Shopping Center">alimentation</label>
+		</li><li>
+			<input type="checkbox" name="select-osm" id="Parking Area"
+				value='["amenity"="parking"]["access"!="private"]' />
+			<label for="Parking Area">parking</label>
+		</li><li>
+			<input type="checkbox" name="select-osm" id="Ground Transportation"
+				value='["highway"="bus_stop"]' />
+			<label for="Ground Transportation">bus</label>
+		</li>
+	</ul>
+
+	<div>
+		<input type="checkbox"
+			name="select-chemineur" id="select-chemineur"
+			value="3,8,20,23"
+		/>
+		<label for="select-chemineur">chemineur.fr</label>
+		<span id="select-chemineur-status"></span>
+	</div><br/><div>
+		<input type="checkbox"
+			name="select-alpages" id="select-alpages"
+			value="4,5"
+		/>
+		<label for="select-alpages">alpages.info</label>
+		<span id="select-alpages-status"></span>
+	</div><br/><div>
+		<input type="checkbox" name="select-prc" id="select-prc" />
+		<label for="select-prc">pyrenees-refuges.com</label>
+		<span id="select-prc-status"></span>
+	</div><br/><div>
+		Camptocamp.org
+		<label><input type="checkbox" name="select-c2c" value="hut,shelter,gite,cave,bivouac,camp_site" />logement</label>
+		<label><input type="checkbox" name="select-c2c" value="waterpoint,waterfall" />point d'eau</label>
+		(seuls 100 points sont affichés)
+		<span id="select-c2c-status"></span>
+	</div>
+	
+	<script type="module">
+const contourMassif = new layerContourMassif({
+		selectName: 'select-massif',
+	}),
+	pointsWRI = new layerPointsWRI({
+		selectName: 'select-wri',
+		selectMassif: contourMassif.options.selector,
+	});
+
+new ol.Map({
+	target: 'carte-nav',
+	view: new ol.View({
+		enableRotation: false,
+	}),
+	controls: [
+		...controlesBasiques(),
+	],
+	layers: [
+		new myol.layer.tile.MRI(),
+		layerMassifsColores({
+			selectName: 'select-massifs',
+		}),
+		contourMassif,
+		pointsWRI,
+		...couchesVectoriellesExternes(),
+		new myol.layer.Hover(),
+	],
+	// Centre la carte sur la zone souhaitée
+}).getView().fit(ol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));
+	</script>
+
+	<h4>Tests</h4>
+	<div>//BEST TBD</div>
+</body>
+</html>

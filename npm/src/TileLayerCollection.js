@@ -527,5 +527,3 @@ export function demo(options) {
 		'Blank': new TileLayer(),
 	};
 }
-
-export default collection;

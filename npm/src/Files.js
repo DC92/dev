@@ -24,8 +24,8 @@ import {
 
 // MyOl
 import {
-	controlButton,
-} from './myControl';
+	myButton,
+} from './MyControl';
 
 
 //BEST export / import names and links
@@ -39,7 +39,7 @@ export function load(opt) {
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 			...opt,
 		},
-		control = controlButton(options);
+		control = myButton(options);
 
 	control.loadURL = async function(evt) {
 		const xhr = new XMLHttpRequest();
@@ -134,7 +134,7 @@ export function load(opt) {
 
 /**
  * File downloader control
- * Requires controlButton
+ * Requires myButton
  */
 //BEST BUG incompatible with clusters
 export function download(opt) {
@@ -149,7 +149,7 @@ export function download(opt) {
 			fileName: document.title || 'openlayers', //BEST name from feature
 			...opt,
 		},
-		control = controlButton(options),
+		control = myButton(options),
 		hiddenEl = document.createElement('a');
 
 	hiddenEl.target = '_self';

@@ -62,9 +62,7 @@ import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
 
 // MyOl
-import {
-	controlMousePosition,
-} from '../src/myControl';
+import *as myControl  from '../src/MyControl';
 import {
 	layerMarker,
 } from '../src/Marker';
@@ -74,7 +72,7 @@ new Map({
 	target: 'map',
 	controls: [
 		new Zoom(),
-		controlMousePosition(),
+		myControl.mousePosition(),
 	],
 	view: new View({
 		center: [300000, 5800000],

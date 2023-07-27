@@ -29,8 +29,8 @@ import {
 // MyOl
 import './editor.css';
 import {
-	controlButton,
-} from './myControl';
+	myButton,
+} from './MyControl';
 
 
 // Editor
@@ -63,7 +63,7 @@ export function layerEditGeoJson(opt) {
 			...opt,
 		},
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
-		control = controlButton({
+		control = myButton({
 			className: 'myol-button-edit',
 			label: 'E', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +

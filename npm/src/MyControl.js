@@ -19,7 +19,7 @@ import {
 } from 'ol/sphere';
 
 // MyOl
-import './myControl.css';
+import './MyControl.css';
 
 
 /**
@@ -27,7 +27,7 @@ import './myControl.css';
  * Abstract definition to be used by other control buttons definitions
  */
 //BEST make it a class ... & others
-export function controlButton(opt) {
+export function myButton(opt) {
 	const options = {
 			element: document.createElement('div'),
 			className: '',
@@ -112,7 +112,7 @@ export function controlButton(opt) {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
-export function controlPermalink(opt) {
+export function permalink(opt) {
 	const options = {
 			//BEST init with bbox option
 			init: true, // {true | false} use url hash or localStorage to position the map.
@@ -180,7 +180,7 @@ export function controlPermalink(opt) {
 /**
  * Control to display the mouse position
  */
-export function controlMousePosition(options) {
+export function mousePosition(options) {
 	return new MousePosition({
 		projection: 'EPSG:4326',
 		className: 'myol-coordinate',
@@ -205,8 +205,8 @@ export function controlMousePosition(options) {
 /**
  * Control to display the length & height difference of an hovered line
  */
-export function controlLengthLine() {
-	const control = controlButton(); //HACK button not visible
+export function lengthLine() {
+	const control = myButton(); //HACK button not visible
 
 	control.element.className = 'myol-length-line';
 
@@ -277,12 +277,12 @@ export function controlLengthLine() {
  * Control to display set preload of depth upper level tiles
  * This prepares the browser to become offline
  */
-export function controlTilesBuffer(opt) {
+export function tilesBuffer(opt) {
 	const options = {
 			depth: 3,
 			...opt,
 		},
-		control = controlButton(); //HACK no button
+		control = myButton(); //HACK no button
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		Control.prototype.setMap.call(this, map);
@@ -302,10 +302,10 @@ export function controlTilesBuffer(opt) {
 
 /**
  * Print control
- * Requires controlButton
+ * Requires myButton
  */
 export function print(options) {
-	const control = controlButton({
+	const control = myButton({
 		label: '&#x1F5A8;',
 		className: 'myol-button-print',
 		submenuHTML: '<p>Pour imprimer la carte:</p>' +

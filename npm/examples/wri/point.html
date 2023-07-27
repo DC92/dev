@@ -9,9 +9,9 @@ Based on https://openlayers.org
 	<title>My Openlayers WRI</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="images/favicon.png" rel="icon" type="image/png" />
-	<link href="images/favicon.png" rel="apple-touch-icon" />
-	<link href="parts/style.css" rel="stylesheet">
+	<link href="../images/favicon.png" rel="icon" type="image/png" />
+	<link href="../images/favicon.png" rel="apple-touch-icon" />
+	<link href="../parts/style.css" rel="stylesheet">
 
 	<style>
 		h4 {
@@ -32,30 +32,30 @@ Based on https://openlayers.org
 	<script>
 		// apache (production)
 		if (window.origin.split(':').length == 2) {
-			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
-			document.write('<script src="../dist/myol-debug.js"><&#47;script>');
+			document.write('<link href="../../dist/myol.css" type="text/css" rel="stylesheet">');
+			document.write('<script src="../../dist/myol-debug.js"><&#47;script>');
 		}
 	</script>
 	<script type="module">
 		// vite nmp (test)
-		import myol from '../build/index'; // At this place, mysteriously do not import out of npm vite context
+		import myol from '../../build/index'; // At this place, mysteriously do not import out of npm vite context
 		window.myol = myol; // Declare a myol global variable
 		// Next script must be defer to be run after the import
 	</script>
 
-	<script src="parts/_cartes.js" defer></script>
+	<script src="../parts/_cartes.js" defer></script>
 </head>
 
 <body>
 	<a style="float:right" href="GPS.html">GPS &#9654;</a>
-	<a style="float:right;margin-right:15px" href="..">HOME</a>
+	<a style="float:right;margin-right:15px" href="../..">HOME</a>
 	<h1 style="margin:0">Tests for refuges.info</h1>
 	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
-	<p><a href="../examples/parts/_cartes.js">vues/_cartes.js</a> test for refuges.info</p>
-	<p><a href="wri.html">src/wri.html</a> test for refuges.info</p>
+	<p><a href="../../examples/parts/_cartes.js">vues/_cartes.js</a> test for refuges.info</p>
+	<p><a href="nav.html">src/wri.html</a> test for refuges.info</p>
 
 	<h4>/vues/index.js</h4>
-	<div id="WWWcarte-accueil"></div>
+	<div id="carte-accueil"></div>
 	<script type="module">
 new ol.Map({
 	target: 'carte-accueil',

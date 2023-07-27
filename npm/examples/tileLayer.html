@@ -47,9 +47,7 @@ import Zoom from 'ol/control/Zoom';
 
 // MyOl
 import layerSwitcher from '../src/LayerSwitcher';
-import {
-	demo,
-} from '../src/TileLayerCollection';
+import * as tileLayerCollection from '../src/TileLayerCollection';
 
 
 const map = new Map({
@@ -65,7 +63,7 @@ const map = new Map({
 			collapsed: false,
 		}),
 		layerSwitcher({
-			layers: demo(layersKeys),
+			layers: tileLayerCollection.demo(layersKeys),
 		}),
 	],
 });
