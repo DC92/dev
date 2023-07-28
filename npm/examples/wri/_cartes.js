@@ -126,26 +126,18 @@ function controlesBasiques(page) {
 		// Haut gauche
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
-
-		//myol.control.download(), //TODO pour autre page que nav
 		new myol.control.MyGeocoder(),
 		myol.control.myGeolocation(),
-		myol.control.load(),
-		myol.control.print(),
-
-		/* ('nav')
-		options.page == 'point' ? myButton() : controlLoadGPX(),
-		options.page == 'nav' ? myButton() : download(options.Download),
-		options.page == 'modif' ? myButton() : print(),
-		*/
+		page == 'point' ? myol.control.myButton() : myol.control.load(),
+		page == 'nav' ? myol.control.myButton() : myol.control.download(),
+		page == 'modif' ? myol.control.myButton() : myol.control.print(),
 
 		// Bas gauche
 		new myol.control.mousePosition(),
 		new ol.control.ScaleLine(),
 
 		// Bas droit
-		//permalink(options.Permalink),
-		new ol.control.Attribution({ //HACK ne marche pas si layerSwitcher est défini avant Attribution
+		new ol.control.Attribution({ // Attribution doit être défini avant layerSwitcher
 			collapsed: false,
 		}),
 	];

@@ -107,6 +107,7 @@ export function myButton(opt) {
 	return control;
 }
 
+//TODO TEST sous npm
 /**
  * Permalink control
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
