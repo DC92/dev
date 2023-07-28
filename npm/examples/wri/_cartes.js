@@ -64,6 +64,7 @@ function layerContourMassif(options) {
 		host: host,
 		query: (extent, resolution, projection, options) => ({
 			_path: 'api/polygones',
+			type_polygon: 1, // Massifs
 			massif: options.selector.getSelection(),
 		}),
 		strategy: ol.loadingstrategy.all, // Pas de bbox
@@ -121,16 +122,16 @@ function layerPointsWRI(options) {
 }
 
 // Les controles des cartes de refuges.info
-function controlesBasiques(page) {
+function controlesCartes(page) {
 	return [
 		// Haut gauche
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
 		new myol.control.MyGeocoder(),
 		myol.control.myGeolocation(),
-		page == 'point' ? myol.control.myButton() : myol.control.load(),
-		page == 'nav' ? myol.control.myButton() : myol.control.download(),
-		page == 'modif' ? myol.control.myButton() : myol.control.print(),
+		'nav,edit'.includes(page) ? myol.control.load() : myol.control.myButton(),
+		'edit'.includes(page) ? myol.control.download() : myol.control.myButton(),
+		'nav'.includes(page) ? myol.control.print() : myol.control.myButton(),
 
 		// Bas gauche
 		new myol.control.mousePosition(),
@@ -144,7 +145,7 @@ function controlesBasiques(page) {
 }
 
 // Les couches vectorielles de refuges.info
-function couchesVectoriellesExternes(options) {
+function couchesVectoriellesExternes() {
 	return [
 		new myol.layer.vector.Chemineur({
 			selectName: 'select-chemineur',

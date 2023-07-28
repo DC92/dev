@@ -162,10 +162,10 @@ Based on https://openlayers.org
 	</div>
 	
 	<script type="module">
-		const contourMassif = new layerContourMassif({
+		const contourMassif = layerContourMassif({
 				selectName: 'select-massif',
 			}),
-			pointsWRI = new layerPointsWRI({
+			pointsWRI = layerPointsWRI({
 				selectName: 'select-wri',
 				selectMassif: contourMassif.options.selector,
 			});
@@ -176,7 +176,7 @@ Based on https://openlayers.org
 				enableRotation: false,
 			}),
 			controls: [
-				...controlesBasiques('nav'),
+				...controlesCartes('nav'),
 				myol.control.permalink({ // Permet de garder le même réglage de carte
 					display: true,
 					init: true, //<?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif

@@ -35,6 +35,7 @@ const ol = {
 import layerSwitcher from '../src/LayerSwitcher';
 import MyGeocoder from '../src/MyGeocoder';
 import myGeolocation from '../src/MyGeolocation';
+import editor from '../src/Editor';
 import * as controlCollection from '../src/controlCollection';
 import * as files from '../src/Files';
 import * as myControl from '../src/MyControl';
@@ -49,6 +50,7 @@ const myol = {
 	control: { //BEST mettre dans un répertoire scr/control
 		...controlCollection,
 		...myControl,
+		editor: editor,
 		...files,
 		layerSwitcher: layerSwitcher,
 		myGeolocation: myGeolocation,
