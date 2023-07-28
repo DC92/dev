@@ -1,5 +1,4 @@
-const ol = myol.ol, // On récupère certaines fonctions natives Openlayers dans le bundle myol
-	host = '//www.refuges.info/'; // '<?=$config_wri["sous_dossier_installation"]?>', // Appeler la couche de CE serveur
+const ol = myol.ol; // On récupère certaines fonctions natives Openlayers dans le bundle myol
 
 // La couche des massifs colorés (accueil et couche carte nav)
 function layerMassifsColores(options) {
@@ -121,6 +120,37 @@ function layerPointsWRI(options) {
 	return layer;
 }
 
+// Les controles des cartes de refuges.info
+function controlesBasiques(page) {
+	return [
+		// Haut gauche
+		new ol.control.Zoom(),
+		new ol.control.FullScreen(),
+
+		//myol.control.download(), //TODO pour autre page que nav
+		new myol.control.MyGeocoder(),
+		myol.control.myGeolocation(),
+		myol.control.load(),
+		myol.control.print(),
+
+		/* ('nav')
+		options.page == 'point' ? myButton() : controlLoadGPX(),
+		options.page == 'nav' ? myButton() : download(options.Download),
+		options.page == 'modif' ? myButton() : print(),
+		*/
+
+		// Bas gauche
+		new myol.control.mousePosition(),
+		new ol.control.ScaleLine(),
+
+		// Bas droit
+		//permalink(options.Permalink),
+		new ol.control.Attribution({ //HACK ne marche pas si layerSwitcher est défini avant Attribution
+			collapsed: false,
+		}),
+	];
+}
+
 // Les couches vectorielles de refuges.info
 function couchesVectoriellesExternes(options) {
 	return [
@@ -142,72 +172,35 @@ function couchesVectoriellesExternes(options) {
 	];
 }
 
-// Les controles des cartes de refuges.info
-function controlesBasiques(options) {
-	return [
-		// Haut gauche
-		new ol.control.Zoom(),
-		new ol.control.FullScreen(),
-
-		//myol.control.download(), //TODO pour autre page que nav
-		new myol.control.MyGeocoder(),
-		myol.control.myGeolocation(),
-		myol.control.load(),
-		myol.control.print(),
-
-		/*
-		options.page == 'point' ? myButton() : 
-		options.page == 'nav' ? myButton() : download(options.Download),
-		options.page == 'modif' ? myButton() : print(),
-		*/
-
-		// Bas gauche
-		//mousePosition(),
-		new ol.control.ScaleLine(),
-
-		// Bas droit
-		//permalink(options.Permalink),
-		new ol.control.Attribution({ //HACK ne marche pas si layerSwitcher est défini avant Attribution
-			collapsed: false,
-		}),
-
-		// Haut droit
-		myol.control.layerSwitcher({
-			layers: myol.layer.tile.collection(),
-		}),
-	];
-}
-
 // Les couches de fond des cartes de refuges.info
-/*function wriMapBaseLayers(page) {
+function fondsCarte(page, layersKeys) {
 	return {
-		'Refuges.info': layerMRI(),
-		'OSM fr': layerOSM({
+		'Refuges.info': new myol.layer.tile.MRI(),
+		'OSM fr': new myol.layer.tile.OSM({
 			url: '//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
 		}),
-		'OpenTopo': layerOpenTopo(),
-		'Outdoors': layerThunderforest({
+		'OpenTopo': new myol.layer.tile.OpenTopo(),
+		'Outdoors': new myol.layer.tile.Thunderforest({
 			subLayer: 'outdoors',
-			key: mapKeys.thunderforest,
+			key: layersKeys.thunderforest,
 		}),
-		'IGN TOP25': page == 'modif' ? null : layerIGN({
+		'IGN TOP25': page == 'modif' ? null : new myol.layer.tile.IGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
-			key: mapKeys.ign,
+			key: layersKeys.ign,
 		}),
-		'IGN V2': layerIGN({
+		'IGN V2': new myol.layer.tile.IGN({
 			layer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
 			key: 'essentiels', // La clé pour les couches publiques
 			format: 'image/png',
 		}),
-		'SwissTopo': page == 'modif' ? null : layerSwissTopo('ch.swisstopo.pixelkarte-farbe'),
-		'Autriche': layerKompass(),
-		'Espagne': layerSpain('mapa-raster', 'MTN'),
-		'Photo IGN': layerIGN({
+		'SwissTopo': page == 'modif' ? null : new myol.layer.tile.SwissTopo('ch.swisstopo.pixelkarte-farbe'),
+		'Autriche': new myol.layer.tile.Kompass(),
+		'Espagne': new myol.layer.tile.IgnES('mapa-raster', 'MTN'),
+		'Photo IGN': new myol.layer.tile.IGN({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
 			key: 'essentiels',
 		}),
-		'Photo ArcGIS': layerArcGIS('World_Imagery'),
-		'Photo Google': page == 'modif' ? null : layerGoogle('s'),
+		'Photo ArcGIS': new myol.layer.tile.ArcGIS('World_Imagery'),
+		'Photo Google': page == 'modif' ? null : new myol.layer.tile.Google('s'),
 	};
 }
-*/

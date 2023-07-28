@@ -57,7 +57,7 @@ export class OSM extends TileLayer {
 	}
 }
 
-export class Topo extends OSM {
+export class OpenTopo extends OSM {
 	constructor(options) {
 		super({
 			url: '//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
@@ -293,7 +293,7 @@ export class OS extends LimitedTileLayer {
 /**
  * ArcGIS (Esri)
  */
-export class ArcGis extends TileLayer {
+export class ArcGIS extends TileLayer {
 	constructor(opt) {
 		const options = {
 			host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
@@ -382,7 +382,7 @@ export function collection(options) {
 
 	return {
 		'OSM fr': new OSM(),
-		'OpenTopo': new Topo(),
+		'OpenTopo': new OpenTopo(),
 		'OSM outdoors': new Thunderforest(options.thunderforest), // options include key
 		'OSM transports': new Thunderforest({
 			...options.thunderforest, // Include key
@@ -414,7 +414,7 @@ export function collection(options) {
 		'Photo Google': new Google({
 			subLayers: 's',
 		}),
-		'Photo ArcGIS': new ArcGis(),
+		'Photo ArcGIS': new ArcGIS(),
 		'Photo Bing': new Bing({
 			...options.bing, // Include key
 			imagerySet: 'Aerial',
