@@ -121,8 +121,8 @@ function layerPointsWRI(options) {
 	return layer;
 }
 
-// Les controles des cartes de refuges.info
-function couchesVectoriellesExternes() {
+// Les couches vectorielles de refuges.info
+function couchesVectoriellesExternes(options) {
 	return [
 		new myol.layer.vector.Chemineur({
 			selectName: 'select-chemineur',
@@ -143,7 +143,7 @@ function couchesVectoriellesExternes() {
 }
 
 // Les controles des cartes de refuges.info
-function controlesBasiques() {
+function controlesBasiques(options) {
 	return [
 		// Haut gauche
 		new ol.control.Zoom(),
