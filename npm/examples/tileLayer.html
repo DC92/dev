@@ -24,53 +24,53 @@ Based on https://openlayers.org
 	<div id="map" class="map"></div>
 
 	<script>
-const layersKeys = {
-	// Get your own (free) IGN key at https://geoservices.ign.fr/
-	ign: {key: 'iejxbx4obzhco6c8klxrfbto'},
-	// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com/dashboard
-	thunderforest: {key: 'ee751f43b3af4614b01d1bce72785369'},
-	// Get your own (free) OS key at https://osdatahub.os.uk/
-	os: {key: 'P8MjahLAlyDAHXEH2engwXJG6KDYsVzF'},
-	// Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
-	bing: {key: 'AldBMbaKNyat-j6CBRKxxH05uaxP7dvQu1RnMWCQEGGC3z0gjBu-bLniE_8WZvcC'},
-	// Get your own key at http://www.kompass.de/livemap/
-	kompass: {key: '2ba8c124-38b6-11e7-ade1-e0cb4e28e847'},
-};
+		const layersKeys = {
+			// Get your own (free) IGN key at https://geoservices.ign.fr/
+			ign: {key: 'iejxbx4obzhco6c8klxrfbto'},
+			// Get your own (free) THUNDERFOREST key at https://manage.thunderforest.com/dashboard
+			thunderforest: {key: 'ee751f43b3af4614b01d1bce72785369'},
+			// Get your own (free) OS key at https://osdatahub.os.uk/
+			os: {key: 'P8MjahLAlyDAHXEH2engwXJG6KDYsVzF'},
+			// Get your own (free) BING key at https://www.microsoft.com/en-us/maps/create-a-bing-maps-key
+			bing: {key: 'AldBMbaKNyat-j6CBRKxxH05uaxP7dvQu1RnMWCQEGGC3z0gjBu-bLniE_8WZvcC'},
+			// Get your own key at http://www.kompass.de/livemap/
+			kompass: {key: '2ba8c124-38b6-11e7-ade1-e0cb4e28e847'},
+		};
 	</script>
 	<script type="module">
-// Openlayers
-import 'ol/ol.css';
-import Attribution from 'ol/control/Attribution';
-import Map from 'ol/Map';
-import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
+		// Openlayers
+		import 'ol/ol.css';
+		import Attribution from 'ol/control/Attribution';
+		import Map from 'ol/Map';
+		import View from 'ol/View';
+		import Zoom from 'ol/control/Zoom';
 
-// MyOl
-import layerSwitcher from '../src/LayerSwitcher';
-import * as tileLayerCollection from '../src/TileLayerCollection';
+		// MyOl
+		import LayerSwitcher from '../src/LayerSwitcher';
+		import * as tileLayerCollection from '../src/TileLayerCollection';
 
 
-const map = new Map({
-	target: 'map',
-	view: new View({
-		center: [700000, 5600000], // Sud est
-		zoom: 7,
-		constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
-	}),
-	controls: [
-		new Zoom(),
-		new Attribution({
-			collapsed: false,
-		}),
-		layerSwitcher({
-			layers: tileLayerCollection.demo(layersKeys),
-		}),
-	],
-});
+		const map = new Map({
+			target: 'map',
+			view: new View({
+				center: [700000, 5600000], // Sud est
+				zoom: 7,
+				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
+			}),
+			controls: [
+				new Zoom(),
+				new Attribution({
+					collapsed: false,
+				}),
+				new LayerSwitcher({
+					layers: tileLayerCollection.demo(layersKeys),
+				}),
+			],
+		});
 
-map.getView().on('change:resolution', function() {
-	console.log('resolution = ' + Math.round(this.getResolutionForZoom(this.getZoom())))
-});
+		map.getView().on('change:resolution', function() {
+			console.log('resolution = ' + Math.round(this.getResolutionForZoom(this.getZoom())))
+		});
 	</script>
 	<script src="parts/print_script.js"></script>
 

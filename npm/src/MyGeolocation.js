@@ -12,11 +12,7 @@ import LineString from 'ol/geom/LineString.js';
 import MultiLineString from 'ol/geom/MultiLineString.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
-import {
-	Fill,
-	Stroke,
-	Style,
-} from 'ol/style.js';
+import * as style from 'ol/style';
 
 // MyOl
 import {
@@ -25,7 +21,7 @@ import {
 
 
 //BEST make it a class GeolocationControl
-export default function myGeolocation(options) {
+export default function MyGeolocation(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		//BEST use .html content / option
 		'<p>Localisation GPS:</p>' +
@@ -70,11 +66,11 @@ export default function myGeolocation(options) {
 				features: [graticuleFeature, northGraticuleFeature],
 			}),
 			zIndex: 20, // Above the features
-			style: new Style({
-				fill: new Fill({
+			style: new style.Style({
+				fill: new style.Fill({
 					color: 'rgba(128,128,255,0.2)',
 				}),
-				stroke: new Stroke({
+				stroke: new style.Stroke({
 					color: '#20b',
 					lineDash: [16, 14],
 					width: 1,
@@ -85,16 +81,16 @@ export default function myGeolocation(options) {
 
 	control.element.appendChild(statusEl);
 
-	graticuleFeature.setStyle(new Style({
-		stroke: new Stroke({
+	graticuleFeature.setStyle(new style.Style({
+		stroke: new style.Stroke({
 			color: '#000',
 			lineDash: [16, 14],
 			width: 1,
 		}),
 	}));
 
-	northGraticuleFeature.setStyle(new Style({
-		stroke: new Stroke({
+	northGraticuleFeature.setStyle(new style.Style({
+		stroke: new style.Stroke({
 			color: '#c00',
 			lineDash: [16, 14],
 			width: 1,

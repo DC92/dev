@@ -32,7 +32,7 @@ import {
 //BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
 //BEST misc formats
 //BEST make it a class...
-export function load(opt) {
+export function Load(opt) {
 	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
@@ -81,7 +81,7 @@ export function load(opt) {
 				featureProjection: 'EPSG:3857',
 			}),
 			added = map.dispatchEvent({
-				type: 'myol:onfeatureload', // Warn layerEditGeoJson that we uploaded some features
+				type: 'myol:onfeatureload', // Warn Editor that we uploaded some features
 				features: features,
 			});
 
@@ -137,7 +137,7 @@ export function load(opt) {
  * Requires myButton
  */
 //BEST BUG incompatible with clusters
-export function download(opt) {
+export function Download(opt) {
 	const options = {
 			label: '&#x1f4e5;',
 			className: 'myol-button-download',

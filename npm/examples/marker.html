@@ -53,46 +53,44 @@ Based on https://openlayers.org
 	<p>Double clic sur la carte y déplace le curseur.</p>
 
 	<script type="module">
-// Openlayers
-import 'ol/ol.css';
-import Map from 'ol/Map';
-import OSM from 'ol/source/OSM';
-import TileLayer from 'ol/layer/Tile';
-import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
+		// Openlayers
+		import 'ol/ol.css';
+		import Map from 'ol/Map';
+		import OSM from 'ol/source/OSM';
+		import TileLayer from 'ol/layer/Tile';
+		import View from 'ol/View';
+		import Zoom from 'ol/control/Zoom';
 
-// MyOl
-import *as myControl  from '../src/MyControl';
-import {
-	layerMarker,
-} from '../src/Marker';
+		// MyOl
+		import Marker from '../src/Marker';
+		import * as myControl from '../src/MyControl';
 
 
-new Map({
-	target: 'map',
-	controls: [
-		new Zoom(),
-		myControl.mousePosition(),
-	],
-	view: new View({
-		center: [300000, 5800000],
-		zoom: 5,
-	}),
-	layers: [
-		new TileLayer({
-			source: new OSM(),
-		}),
-		layerMarker({
-			src: 'images/cadre.png',
-			prefix: 'cadre',
-		}),
-		layerMarker({
-			src: 'images/viseur.png',
-			focus: 15, // Map zoom level
-			dragable: true,
-		}),
-	],
-});
+		new Map({
+			target: 'map',
+			controls: [
+				new Zoom(),
+				myControl.mousePosition(),
+			],
+			view: new View({
+				center: [300000, 5800000],
+				zoom: 5,
+			}),
+			layers: [
+				new TileLayer({
+					source: new OSM(),
+				}),
+				new Marker({
+					src: 'images/cadre.png',
+					prefix: 'cadre',
+				}),
+				new Marker({
+					src: 'images/viseur.png',
+					focus: 15, // Map zoom level
+					dragable: true,
+				}),
+			],
+		});
 	</script>
 	<script src="parts/print_script.js"></script>
 

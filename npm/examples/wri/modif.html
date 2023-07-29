@@ -179,7 +179,7 @@ new ol.Map({
 const contourMassif = new layerContourMassif({
 		selectName: 'select-massif',
 	}),
-	pointsWRI = new layerPointsWRI({
+	pointsWRI = layerPointsWRI({
 		selectName: 'select-wri',
 		selectMassif: contourMassif.options.selector,
 	});

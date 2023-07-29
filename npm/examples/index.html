@@ -30,45 +30,43 @@ Based on https://openlayers.org
 	<input id="marker-json" size="50" value='{"type":"Point","coordinates":[2.34,48.86]}' />
 
 	<script type="module">
-// Openlayers
-import 'ol/ol.css';
-import Map from 'ol/Map';
-import View from 'ol/View';
+		// Openlayers
+		import 'ol/ol.css';
+		import Map from 'ol/Map';
+		import View from 'ol/View';
 
-// MyOl
-import controlCollection from '../src/controlCollection';
-import layerSwitcher from '../src/LayerSwitcher';
-import * as myVector from '../src/VectorLayerCollection';
-import * as marker from '../src/Marker';
-import * as tileLayerCollection from '../src/TileLayerCollection';
+		// MyOl
+		import controlCollection from '../src/controlCollection';
+		import LayerSwitcher from '../src/LayerSwitcher';
+		import Marker from '../src/Marker';
+		import * as myVector from '../src/VectorLayerCollection';
+		import * as tileLayerCollection from '../src/TileLayerCollection';
 
-// Debug
-import {
-	VERSION
-} from 'ol/util';
-console.log('OL V' + VERSION);
+		// Debug
+		import * as util from 'ol/util';
+		console.log('OL V' + util.VERSION);
 
-new Map({
-	target: 'map',
-	view: new View({
-		enableRotation: false,
-	}),
-	controls: [
-		...controlCollection(),
-		layerSwitcher({
-			layers: tileLayerCollection.collection(),
-		}),
-	],
-	layers: [
-		new myVector.Chemineur({
-			selectName: 'select-chem',
-		}),
-		marker.layerMarker({
-			src: 'images/viseur.png',
-			dragable: true,
-		}),
-	],
-});
+		new Map({
+			target: 'map',
+			view: new View({
+				enableRotation: false,
+			}),
+			controls: [
+				...controlCollection(),
+				new LayerSwitcher({
+					layers: tileLayerCollection.collection(),
+				}),
+			],
+			layers: [
+				new myVector.Chemineur({
+					selectName: 'select-chem',
+				}),
+				new Marker({
+					src: 'images/viseur.png',
+					dragable: true,
+				}),
+			],
+		});
 	</script>
 </body>
 </html>

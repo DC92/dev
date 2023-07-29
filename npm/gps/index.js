@@ -79,7 +79,7 @@ window.addEventListener('load', function() {
 		}),
 		controls: [
 			...controlsCollection(controlOptions),
-			layerSwitcher(controlOptions.layerSwitcher),
+			new LayerSwitcher(controlOptions.layerSwitcher),
 		],
 		layers: layers,
 	});

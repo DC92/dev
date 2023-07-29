@@ -18,12 +18,9 @@ import {
 	permalink,
 	print,
 } from './MyControl';
-import {
-	load,
-	download,
-} from './Files';
+import * as controlFiles from '../src/Files';
 import MyGeocoder from './MyGeocoder';
-import myGeolocation from './MyGeolocation';
+import MyGeolocation from './MyGeolocation';
 
 
 /**
@@ -53,9 +50,9 @@ export function collection(opt) {
 		new Zoom(options.Zoom),
 		new FullScreen(options.FullScreen),
 		new MyGeocoder(options.Geocoder),
-		myGeolocation(options.Geolocation),
-		load(options.load),
-		download(options.download),
+		new MyGeolocation(options.Geolocation),
+		new controlFiles.Load(options.load),
+		new controlFiles.Download(options.download),
 		print(options.Print),
 		Help(options.Help),
 

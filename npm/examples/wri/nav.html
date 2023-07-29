@@ -181,7 +181,7 @@ Based on https://openlayers.org
 					display: true,
 					init: true, //<?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif
 				}),
-				myol.control.layerSwitcher({
+				new myol.control.LayerSwitcher({
 					layers: fondsCarte('nav', layersKeys),
 				}),
 			],

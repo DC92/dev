@@ -14,17 +14,11 @@ import Polygon from 'ol/geom/Polygon';
 import Snap from 'ol/interaction/Snap';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import * as style from 'ol/style';
 import {
 	createEmpty,
 	extend,
 } from 'ol/extent';
-import {
-	Circle,
-	Fill,
-	Stroke,
-	Style,
-	Text,
-} from 'ol/style';
 
 // MyOl
 import './editor.css';
@@ -35,7 +29,7 @@ import {
 
 // Editor
 //BEST make it a class
-export default function layerEditGeoJson(opt) {
+export default function Editor(opt) {
 	const options = {
 			format: new GeoJSON(),
 			projection: 'EPSG:3857',
@@ -85,14 +79,14 @@ export default function layerEditGeoJson(opt) {
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? JSON.parse(geoJsonEl.value) : '', //BEST JSONparse
-		styleDisplay = new Style({
+		styleDisplay = new style.Style({
 			// Lines or polygons border
-			stroke: new Stroke({
+			stroke: new style.Stroke({
 				color: 'red',
 				width: 2,
 			}),
 			// Polygons
-			fill: new Fill({
+			fill: new style.Fill({
 				color: 'rgba(0,0,255,0.2)',
 			}),
 		}),
@@ -106,25 +100,25 @@ export default function layerEditGeoJson(opt) {
 			};
 
 			return [
-				new Style({
-					image: new Circle({ // Marker
+				new style.Style({
+					image: new style.Circle({ // Marker
 						radius: 4,
-						stroke: new Stroke({
+						stroke: new style.Stroke({
 							color: 'red',
 							width: 2,
 						}),
 					}),
-					stroke: new Stroke({ // Lines or polygons border
+					stroke: new style.Stroke({ // Lines or polygons border
 						color: 'red',
 						width: 4,
 					}),
-					fill: new Fill({ // Polygons
+					fill: new style.Fill({ // Polygons
 						color: 'rgba(255,0,0,0.3)',
 					}),
-					text: new Text(textStyle), // Direction
+					text: new style.Text(textStyle), // Direction
 				}),
-				new Style({
-					text: new Text({
+				new style.Style({
+					text: new style.Text({
 						...textStyle,
 						textAlign: 'start',
 						text: 'A',

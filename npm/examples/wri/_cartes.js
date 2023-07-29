@@ -128,9 +128,9 @@ function controlesCartes(page) {
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
 		new myol.control.MyGeocoder(),
-		myol.control.myGeolocation(),
-		'nav,edit'.includes(page) ? myol.control.load() : myol.control.myButton(),
-		'edit'.includes(page) ? myol.control.download() : myol.control.myButton(),
+		myol.control.MyGeolocation(),
+		'nav,edit'.includes(page) ? new myol.control.Load() : new myol.control.myButton(),
+		'edit'.includes(page) ? new myol.control.Download() : new myol.control.myButton(),
 		'nav'.includes(page) ? myol.control.print() : myol.control.myButton(),
 
 		// Bas gauche
@@ -138,7 +138,7 @@ function controlesCartes(page) {
 		new ol.control.ScaleLine(),
 
 		// Bas droit
-		new ol.control.Attribution({ // Attribution doit être défini avant layerSwitcher
+		new ol.control.Attribution({ // Attribution doit être défini avant LayerSwitcher
 			collapsed: false,
 		}),
 	];

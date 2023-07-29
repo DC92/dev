@@ -32,12 +32,13 @@ const ol = {
 };
 
 // MyOl
-import layerSwitcher from '../src/LayerSwitcher';
+import LayerSwitcher from '../src/LayerSwitcher';
+import Marker from '../src/Marker';
 import MyGeocoder from '../src/MyGeocoder';
-import myGeolocation from '../src/MyGeolocation';
+import MyGeolocation from '../src/MyGeolocation';
 import editor from '../src/Editor';
 import * as controlCollection from '../src/controlCollection';
-import * as files from '../src/Files';
+import * as controlFiles from '../src/Files';
 import * as myControl from '../src/MyControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
 import * as stylesOptions from '../src/stylesOptions';
@@ -51,14 +52,15 @@ const myol = {
 		...controlCollection,
 		...myControl,
 		editor: editor,
-		...files,
-		layerSwitcher: layerSwitcher,
-		myGeolocation: myGeolocation,
+		...controlFiles,
+		LayerSwitcher: LayerSwitcher,
+		MyGeolocation: MyGeolocation,
 		MyGeocoder: MyGeocoder,
 	},
 	layer: { //BEST mettre dans un répertoire scr/layer
 		MyVectorLayer: myVectorLayer.MyVectorLayer,
 		Hover: myVectorLayer.Hover,
+		Marker: Marker,
 		tile: tileLayercollection,
 		vector: vectorLayerCollection,
 	},
@@ -68,9 +70,6 @@ const myol = {
 
 export default myol;
 
-
 // Debug
-import {
-	VERSION
-} from 'ol/util';
-console.log('Ol V' + VERSION);
+import * as util from 'ol/util';
+console.log('OL V' + util.VERSION);

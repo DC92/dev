@@ -132,74 +132,69 @@ h4 {
 	}' />
 
 	<script type="module">
-// Openlayers
-import 'ol/ol.css';
-import GeoJSON from 'ol/format/GeoJSON';
-import Map from 'ol/Map';
-import OSM from 'ol/source/OSM';
-import Tile from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
-import {
-	Stroke,
-	Style,
-} from 'ol/style';
+		// Openlayers
+		import 'ol/ol.css';
+		import GeoJSON from 'ol/format/GeoJSON';
+		import Map from 'ol/Map';
+		import OSM from 'ol/source/OSM';
+		import Tile from 'ol/layer/Tile';
+		import VectorLayer from 'ol/layer/Vector';
+		import VectorSource from 'ol/source/Vector';
+		import View from 'ol/View';
+		import Zoom from 'ol/control/Zoom';
+		import {
+			Stroke,
+			Style,
+		} from 'ol/style';
 
-// MyOl
-import {
-	layerEditGeoJson,
-} from '../src/Editor';
-import {
-	load,
-	download,
-} from '../src/Files';
+		// MyOl
+		import Editor from '../src/Editor';
+		import * as controlFiles from '../src/Files';
 
 
-// Layers
-const snaplayer = new VectorLayer({
-		source: new VectorSource({
-			url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-			format: new GeoJSON(),
-		}),
-		style: new Style({
-			stroke: new Stroke(),
-		}),
-	}),
+		// Layers
+		const snaplayer = new VectorLayer({
+				source: new VectorSource({
+					url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
+					format: new GeoJSON(),
+				}),
+				style: new Style({
+					stroke: new Stroke(),
+				}),
+			}),
 
-	controlEditor = layerEditGeoJson({
-		geoJsonId: 'geojson',
-		snapLayers: [snaplayer],
-		help: [
-			document.getElementById('myol-help-edit-modify').innerHTML,
-			document.getElementById('myol-help-edit-line').innerHTML,
-			document.getElementById('myol-help-edit-poly').innerHTML,
-		],
-	});
+			controlEditor = new Editor({
+				geoJsonId: 'geojson',
+				snapLayers: [snaplayer],
+				help: [
+					document.getElementById('myol-help-edit-modify').innerHTML,
+					document.getElementById('myol-help-edit-line').innerHTML,
+					document.getElementById('myol-help-edit-poly').innerHTML,
+				],
+			});
 
-// Map
-new Map({
-	target: 'map',
-	view: new View({
-		center: [600000, 5800000],
-		zoom: 6,
-	}),
-	controls: [
-		new Zoom(),
-		load(),
-		download({
-			savedLayer: controlEditor.layer,
-		}),
-		controlEditor,
-	],
-	layers: [
-		new Tile({
-			source: new OSM(),
-		}),
-		snaplayer,
-	],
-});
+		// Map
+		new Map({
+			target: 'map',
+			view: new View({
+				center: [600000, 5800000],
+				zoom: 6,
+			}),
+			controls: [
+				new Zoom(),
+				new controlFiles.Load(),
+				new controlFiles.Download({
+					savedLayer: controlEditor.layer,
+				}),
+				controlEditor,
+			],
+			layers: [
+				new Tile({
+					source: new OSM(),
+				}),
+				snaplayer,
+			],
+		});
 	</script>
 	<script src="parts/print_script.js"></script>
 

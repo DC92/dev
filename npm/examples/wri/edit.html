@@ -189,7 +189,7 @@ Based on https://openlayers.org
         	controls: [
         		...controlesCartes('edit'),
         		//myol.control.permalink(options.Permalink), //TODO
-        		myol.control.layerSwitcher({
+        		new myol.control.LayerSwitcher({
         			layers: fondsCarte('edit', layersKeys),
         		}),
         	],
