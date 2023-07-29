@@ -5,13 +5,12 @@
 
 // Openlayers
 import Feature from 'ol/Feature';
-import GeoJSON from 'ol/format/GeoJSON';
-import GPX from 'ol/format/GPX';
 import Icon from 'ol/style/Icon';
-import KML from 'ol/format/KML';
 import LineString from 'ol/geom/LineString';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import * as olFormat from 'ol/format';
+
 import {
 	createEmpty,
 	extend,
@@ -75,7 +74,7 @@ export function Load(opt) {
 
 	function loadText(text) {
 		const map = control.getMap(),
-			format = new GPX(),
+			format = new format.GPX(),
 			features = format.readFeatures(text, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
@@ -159,7 +158,7 @@ export function Download(opt) {
 	control.download = function(evt) {
 		const formatName = evt.target.id,
 			mime = evt.target.getAttribute('mime'),
-			format = new [formatName](), //TODO BUG
+			format = new olFormat[formatName](),
 			map = control.getMap();
 		let features = [],
 			extent = map.getView().calculateExtent();

@@ -194,8 +194,11 @@ Based on https://openlayers.org
 				pointsWRI,
 				new myol.layer.Hover(),
 			],
-			// Centre la carte sur la zone souhaitée
-		}).getView().fit(ol.proj.transformExtent([5, 44.68, 5.72, 45.33], 'EPSG:4326', 'EPSG:3857'));
+        })
+		.getView().fit(ol.proj.transformExtent(
+        	[5, 44.68, 5.72, 45.33], // Centre la carte sur la zone souhaitée
+        	'EPSG:4326', 'EPSG:3857'
+        ));
 	</script>
 </body>
 </html>
