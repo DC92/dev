@@ -70,7 +70,7 @@ new ol.Map({
 	],
 	layers: [
 		new myol.layer.tile.MRI(), // Fond de carte
-		layerMassifsColores(),
+		coucheMassifsColores(),
 		new myol.layer.Hover(), // Gère le survol du curseur
 	],
 	// Centre la carte sur la zone souhaitée
@@ -174,12 +174,12 @@ new ol.Map({
 		(seuls 100 points sont affichés)
 		<span id="select-c2c-status"></span>
 	</div>
-	
+
 	<script type="module">
-const contourMassif = new layerContourMassif({
+const contourMassif = new coucheContourMassif({
 		selectName: 'select-massif',
 	}),
-	pointsWRI = layerPointsWRI({
+	pointsWRI = couchePointsWRI({
 		selectName: 'select-wri',
 		selectMassif: contourMassif.options.selector,
 	});
@@ -194,7 +194,7 @@ new ol.Map({
 	],
 	layers: [
 		new myol.layer.tile.MRI(),
-		layerMassifsColores({
+		coucheMassifsColores({
 			selectName: 'select-massifs',
 		}),
 		contourMassif,

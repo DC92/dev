@@ -88,58 +88,58 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<script type="module">
-// Openlayers
-import 'ol/ol.css';
-import Map from 'ol/Map';
-import OSM from 'ol/source/OSM';
-import Tile from 'ol/layer/Tile';
-import View from 'ol/View';
-import * as proj from 'ol/proj';
+		// Openlayers
+		import 'ol/ol.css';
+		import Map from 'ol/Map';
+		import OSM from 'ol/source/OSM';
+		import Tile from 'ol/layer/Tile';
+		import View from 'ol/View';
+		import * as proj from 'ol/proj';
 
-// MyOl
-import * as myVectorLayer from '../src/MyVectorLayer';
-import * as myVector from '../src/VectorLayerCollection';
+		// MyOl
+		import * as myVectorLayer from '../src/MyVectorLayer';
+		import * as myVector from '../src/VectorLayerCollection';
 
 
-//localStorage.myol_selectwri = 'all'; // Force selectors
+		//localStorage.myol_selectwri = 'all'; // Force selectors
 
-new Map({
-	target: 'map',
-	view: new View({
-		center: proj.transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Cabane double	
-		//center: proj.transform([5.72, 45.17], 'EPSG:4326', 'EPSG:3857'), // Grenoble
-		zoom: 11,
-	}),
-	layers: [
-		// Background layer
-		new Tile({
-			source: new OSM(),
-		}),
+		new Map({
+			target: 'map',
+			view: new View({
+				center: proj.transform([5.64711, 45.20281], 'EPSG:4326', 'EPSG:3857'), // Cabane double
+				//center: proj.transform([5.72, 45.17], 'EPSG:4326', 'EPSG:3857'), // Grenoble
+				zoom: 11,
+			}),
+			layers: [
+				// Background layer
+				new Tile({
+					source: new OSM(),
+				}),
 
-		// Vector layers
-		new myVector.Chemineur({
-			selectName: 'select-chemineur',
-		}),
-		new myVector.Alpages({
-			selectName: 'select-alpages',
-		}),
-		new myVector.WRI({
-			host: '//dom.refuges.info/', //TODO www
-			selectName: 'select-wri',
-		}),
-		new myVector.PRC({
-			selectName: 'select-prc',
-		}),
-		new myVector.C2C({
-			selectName: 'select-c2c',
-		}),
-		new myVector.Overpass({
-			selectName: 'select-osm',
-		}),
+				// Vector layers
+				new myVector.Chemineur({
+					selectName: 'select-chemineur',
+				}),
+				new myVector.Alpages({
+					selectName: 'select-alpages',
+				}),
+				new myVector.WRI({
+					host: '//dom.refuges.info/', //TODO www
+					selectName: 'select-wri',
+				}),
+				new myVector.PRC({
+					selectName: 'select-prc',
+				}),
+				new myVector.C2C({
+					selectName: 'select-c2c',
+				}),
+				new myVector.Overpass({
+					selectName: 'select-osm',
+				}),
 
-		new myVectorLayer.Hover(),
-	],
-});
+				new myVectorLayer.Hover(),
+			],
+		});
 	</script>
 	<script src="parts/print_script.js"></script>
 

@@ -1,7 +1,7 @@
 const ol = myol.ol; // On récupère certaines fonctions natives Openlayers dans le bundle myol
 
 // La couche des massifs colorés (accueil et couche carte nav)
-function layerMassifsColores(options) {
+function coucheMassifsColores(options) {
 	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
 		host: host,
@@ -58,7 +58,7 @@ function layerMassifsColores(options) {
 }
 
 // Affiche le contour d'un massif pour la page nav
-function layerContourMassif(options) {
+function coucheContourMassif(options) {
 	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
 		host: host,
@@ -84,8 +84,13 @@ function layerContourMassif(options) {
 	});
 }
 
-function layerPointsWRI(options) {
-	const layer = new myol.layer.MyVectorLayer({
+function couchePointsWRI(opt) {
+	const options = {
+		selectMassif: new myol.Selector(), // Defaut = pas de sélecteur de massif
+		...opt
+	};
+
+	layer = new myol.layer.MyVectorLayer({
 		host: host,
 		browserClusterMinDistance: 50,
 		serverClusterMinResolution: 100,
@@ -130,8 +135,8 @@ function controlesCartes(page) {
 		new myol.control.MyGeocoder(),
 		myol.control.MyGeolocation(),
 		'nav,edit'.includes(page) ? new myol.control.Load() : new myol.control.myButton(),
-		'edit'.includes(page) ? new myol.control.Download() : new myol.control.myButton(),
-		'nav'.includes(page) ? myol.control.print() : myol.control.myButton(),
+		'point,edit'.includes(page) ? new myol.control.Download() : new myol.control.myButton(),
+		'nav,point'.includes(page) ? myol.control.print() : myol.control.myButton(),
 
 		// Bas gauche
 		new myol.control.mousePosition(),

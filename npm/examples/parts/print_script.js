@@ -1,5 +1,5 @@
 // Print the inner code of the previous <script> tag
-//TODO don't work in VITE
+//BEST don't work in NPM VITE
 
 const scripts = document.getElementsByTagName('script'),
 	title = document.createElement('h4'),

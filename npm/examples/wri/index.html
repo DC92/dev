@@ -54,25 +54,25 @@ Based on https://openlayers.org
 	<div id="carte-accueil"></div>
 	<script type="module">
 		new ol.Map({
-			target: 'carte-accueil',
-			view: new ol.View({
-				enableRotation: false,
-			}),
-			controls: [
-				new ol.control.Attribution({ // Du fond de carte
-					collapsed: false,
+				target: 'carte-accueil',
+				view: new ol.View({
+					enableRotation: false,
 				}),
-			],
-			layers: [
-				new myol.layer.tile.MRI(), // Fond de carte
-				layerMassifsColores(), // Les massifs
-				new myol.layer.Hover(), // Gère le survol du curseur
-			],
-        })
-		.getView().fit(ol.proj.transformExtent(
-        	[5, 44.68, 5.72, 45.33], // Centre la carte sur la zone souhaitée
-        	'EPSG:4326', 'EPSG:3857'
-        ));
+				controls: [
+					new ol.control.Attribution({ // Du fond de carte
+						collapsed: false,
+					}),
+				],
+				layers: [
+					new myol.layer.tile.MRI(), // Fond de carte
+					coucheMassifsColores(), // Les massifs
+					new myol.layer.Hover(), // Gère le survol du curseur
+				],
+			})
+			.getView().fit(ol.proj.transformExtent(
+				[5, 44.68, 5.72, 45.33], // Centre la carte sur la zone souhaitée
+				'EPSG:4326', 'EPSG:3857'
+			));
 	</script>
 </body>
 </html>

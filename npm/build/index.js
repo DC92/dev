@@ -7,6 +7,7 @@ import 'ol/ol.css';
 import Attribution from 'ol/control/Attribution';
 import FullScreen from 'ol/control/FullScreen';
 import Map from 'ol/Map';
+import MultiPolygon from 'ol/geom/MultiPolygon';
 import ScaleLine from 'ol/control/ScaleLine';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
@@ -23,6 +24,9 @@ const ol = {
 		ScaleLine: ScaleLine,
 		Zoom: Zoom,
 	},
+	geom: {
+		MultiPolygon: MultiPolygon,
+	},
 	loadingstrategy: loadingstrategy,
 	proj: {
 		fromLonLat: proj.fromLonLat,
@@ -36,7 +40,7 @@ import LayerSwitcher from '../src/LayerSwitcher';
 import Marker from '../src/Marker';
 import MyGeocoder from '../src/MyGeocoder';
 import MyGeolocation from '../src/MyGeolocation';
-import editor from '../src/Editor';
+import Editor from '../src/Editor';
 import * as controlCollection from '../src/controlCollection';
 import * as controlFiles from '../src/Files';
 import * as myControl from '../src/MyControl';
@@ -50,17 +54,17 @@ const myol = {
 
 	control: { //BEST mettre dans un répertoire scr/control
 		...controlCollection,
-		...myControl,
-		editor: editor,
 		...controlFiles,
+		...myControl,
+		Editor: Editor,
 		LayerSwitcher: LayerSwitcher,
 		MyGeolocation: MyGeolocation,
 		MyGeocoder: MyGeocoder,
 	},
 	layer: { //BEST mettre dans un répertoire scr/layer
-		MyVectorLayer: myVectorLayer.MyVectorLayer,
 		Hover: myVectorLayer.Hover,
 		Marker: Marker,
+		MyVectorLayer: myVectorLayer.MyVectorLayer,
 		tile: tileLayercollection,
 		vector: vectorLayerCollection,
 	},
