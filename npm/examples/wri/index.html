@@ -38,10 +38,10 @@ Based on https://openlayers.org
 		// Next script must be defer to be run after the import
 	</script>
 
-	<script src="_cartes.js" defer></script>
 	<script>
 		const host = '//www.refuges.info/'; // '<?=$config_wri["sous_dossier_installation"]?>'; // Appeler la couche de CE serveur
 	</script>
+	<script src="_cartes.js" defer></script>
 </head>
 
 <body>
@@ -53,26 +53,7 @@ Based on https://openlayers.org
 	<h4>/vues/index.html</h4>
 	<div id="carte-accueil"></div>
 	<script type="module">
-		new ol.Map({
-				target: 'carte-accueil',
-				view: new ol.View({
-					enableRotation: false,
-				}),
-				controls: [
-					new ol.control.Attribution({ // Du fond de carte
-						collapsed: false,
-					}),
-				],
-				layers: [
-					new myol.layer.tile.MRI(), // Fond de carte
-					coucheMassifsColores(), // Les massifs
-					new myol.layer.Hover(), // Gère le survol du curseur
-				],
-			})
-			.getView().fit(ol.proj.transformExtent(
-				[5, 44.68, 5.72, 45.33], // Centre la carte sur la zone souhaitée
-				'EPSG:4326', 'EPSG:3857'
-			));
+		carteIndex([5, 44.68, 5.72, 45.33]);
 	</script>
 </body>
 </html>

@@ -162,43 +162,8 @@ Based on https://openlayers.org
 	</div>
 
 	<script type="module">
-		const contourMassif = coucheContourMassif({
-				selectName: 'select-massif',
-			}),
-			pointsWRI = couchePointsWRI({
-				selectName: 'select-wri',
-				selectMassif: contourMassif.options.selector,
-			});
-
-		new ol.Map({
-				target: 'carte-nav',
-				view: new ol.View({
-					enableRotation: false,
-				}),
-				controls: [
-					...controlesCartes('nav'),
-					myol.control.permalink({ // Permet de garder le même réglage de carte
-						display: true, // Affiche le lien
-						//init: <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif, s'il y a massif
-					}),
-					new myol.control.LayerSwitcher({
-						layers: fondsCarte('nav', layersKeys),
-					}),
-				],
-				layers: [
-					coucheMassifsColores({
-						selectName: 'select-massifs',
-					}),
-					...couchesVectoriellesExternes(),
-					contourMassif,
-					pointsWRI,
-					new myol.layer.Hover(),
-				],
-			})
-			.getView().fit(ol.proj.transformExtent(
-				[5, 44.68, 5.72, 45.33], // Centre la carte sur la zone souhaitée
-				'EPSG:4326', 'EPSG:3857'
-			));
+		const init = true; // <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif, s'il y a massif
+		carteNav([5, 44.68, 5.72, 45.33], init);
 	</script>
 </body>
 </html>
