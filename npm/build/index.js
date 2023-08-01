@@ -43,6 +43,7 @@ const ol = {
 	loadingstrategy: loadingstrategy,
 	proj: {
 		fromLonLat: proj.fromLonLat,
+		transform: proj.transform,
 		transformExtent: proj.transformExtent,
 	},
 	source: {

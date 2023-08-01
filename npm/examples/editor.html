@@ -10,8 +10,6 @@ Based on https://openlayers.org
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
-	<link href="images/favicon.png" rel="apple-touch-icon" />
-	<link href="parts/style.css" rel="stylesheet">
 
 	<style>
 		#myol-help-edit-modify p,
@@ -20,6 +18,68 @@ Based on https://openlayers.org
 			margin: 0;
 		}
 	</style>
+
+	<link href="parts/style.css" rel="stylesheet">
+	<!-- Simulation of importing myol -->
+	<script>
+		// apache (production)
+		if (window.origin.split(':').length == 2) {
+			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
+			document.write('<script src="../dist/myol-debug.js"><&#47;script>');
+		}
+	</script>
+	<script type="module">
+		// vite nmp (test)
+		import myol from '../build/index'; // At this place, mysteriously do not import out of npm vite context
+		window.myol = myol; // Declare a myol global variable
+	</script>
+
+	<!-- The next script must be defer or module to be run after the myol import -->
+	<script type="module">
+		// Layers
+		const snaplayer = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
+					format: new ol.format.GeoJSON(),
+				}),
+				style: new ol.style.Style({
+					stroke: new ol.style.Stroke(),
+				}),
+			}),
+
+			controlEditor = new myol.control.Editor({
+				geoJsonId: 'geojson',
+				snapLayers: [snaplayer],
+				help: [
+					document.getElementById('myol-help-edit-modify').innerHTML,
+					document.getElementById('myol-help-edit-line').innerHTML,
+					document.getElementById('myol-help-edit-poly').innerHTML,
+				],
+			});
+
+		// Map
+		new ol.Map({
+			target: 'map',
+			view: new ol.View({
+				center: [600000, 5800000],
+				zoom: 6,
+			}),
+			controls: [
+				new ol.control.Zoom(),
+				new myol.control.Load(),
+				new myol.control.Download({
+					savedLayer: controlEditor.layer,
+				}),
+				controlEditor,
+			],
+			layers: [
+				new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+				snaplayer,
+			],
+		});
+	</script>
 </head>
 
 <body>
@@ -125,75 +185,5 @@ Based on https://openlayers.org
 			}
 		}]
 	}' />
-
-	<script type="module">
-		// Openlayers
-		import 'ol/ol.css';
-		import GeoJSON from 'ol/format/GeoJSON';
-		import Map from 'ol/Map';
-		import OSM from 'ol/source/OSM';
-		import Tile from 'ol/layer/Tile';
-		import VectorLayer from 'ol/layer/Vector';
-		import VectorSource from 'ol/source/Vector';
-		import View from 'ol/View';
-		import Zoom from 'ol/control/Zoom';
-		import {
-			Stroke,
-			Style,
-		} from 'ol/style';
-
-		// MyOl
-		import Editor from '../src/Editor';
-		import * as controlFiles from '../src/Files';
-
-
-		// Layers
-		const snaplayer = new VectorLayer({
-				source: new VectorSource({
-					url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-					format: new GeoJSON(),
-				}),
-				style: new Style({
-					stroke: new Stroke(),
-				}),
-			}),
-
-			controlEditor = new Editor({
-				geoJsonId: 'geojson',
-				snapLayers: [snaplayer],
-				help: [
-					document.getElementById('myol-help-edit-modify').innerHTML,
-					document.getElementById('myol-help-edit-line').innerHTML,
-					document.getElementById('myol-help-edit-poly').innerHTML,
-				],
-			});
-
-		// Map
-		new Map({
-			target: 'map',
-			view: new View({
-				center: [600000, 5800000],
-				zoom: 6,
-			}),
-			controls: [
-				new Zoom(),
-				new controlFiles.Load(),
-				new controlFiles.Download({
-					savedLayer: controlEditor.layer,
-				}),
-				controlEditor,
-			],
-			layers: [
-				new Tile({
-					source: new OSM(),
-				}),
-				snaplayer,
-			],
-		});
-	</script>
-	<script src="parts/print_script.js"></script>
-
-	<h4 style="margin-bottom:0">Tests</h4>
-	<div>Do all actions of the button hover help</div>
 </body>
 </html>
