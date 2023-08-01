@@ -2,16 +2,14 @@
  * LayerSwitcher.js
  */
 import './layerSwitcher.css';
-import {
-	myButton,
-} from './MyControl.js';
+import * as myControl from './MyControl';
 
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
 //BEST make it a class
 export default function LayerSwitcher(options) {
-	const control = myButton({
+	const control = myControl.myButton({
 			className: 'myol-button-switcher',
 			label: '&#x274F;',
 			submenuHTML: '<div id="myol-ls-range">' +

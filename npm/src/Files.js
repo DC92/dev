@@ -9,22 +9,12 @@ import Icon from 'ol/style/Icon';
 import LineString from 'ol/geom/LineString';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import * as olExtent from 'ol/extent';
 import * as olFormat from 'ol/format';
-
-import {
-	createEmpty,
-	extend,
-	isEmpty,
-} from 'ol/extent';
-import {
-	Stroke,
-	Style,
-} from 'ol/style';
+import * as style from 'ol/style';
 
 // MyOl
-import {
-	myButton,
-} from './MyControl';
+import * as myControl from './MyControl';
 
 
 //BEST export / import names and links
@@ -38,7 +28,7 @@ export function Load(opt) {
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 			...opt,
 		},
-		control = myButton(options);
+		control = myControl.myButton(options);
 
 	control.loadURL = async function(evt) {
 		const xhr = new XMLHttpRequest();
@@ -95,8 +85,8 @@ export function Load(opt) {
 					style: function(feature) {
 						const properties = feature.getProperties();
 
-						return new Style({
-							stroke: new Stroke({
+						return new style.Style({
+							stroke: new style.Stroke({
 								color: 'blue',
 								width: 3,
 							}),
@@ -110,19 +100,20 @@ export function Load(opt) {
 		}
 
 		// Zoom the map on the added features
-		const extent = createEmpty();
+		const extent = olExtent.createEmpty();
 
 		for (let f in features) //BEST try to create a geometry
-			extend(extent, features[f].getGeometry().getExtent());
+			olExtent.extend(extent, features[f].getGeometry().getExtent());
 
-		if (isEmpty(extent))
+		if (olExtent.isEmpty(extent))
 			alert('Fichier GPX vide');
 		else
-			map.getView().fit(extent, {
-				maxZoom: 17,
-				size: map.getSize(), //BEST necessary ?
-				padding: [5, 5, 5, 5],
-			});
+			map.getView().fit(
+				extent, {
+					maxZoom: 17,
+					size: map.getSize(), //BEST necessary ?
+					padding: [5, 5, 5, 5],
+				});
 
 		// Close the submenu
 		control.element.classList.remove('myol-display-submenu');
@@ -133,7 +124,6 @@ export function Load(opt) {
 
 /**
  * File downloader control
- * Requires myButton
  */
 //BEST BUG incompatible with clusters
 export function Download(opt) {
@@ -148,7 +138,7 @@ export function Download(opt) {
 			fileName: document.title || 'openlayers', //BEST name from feature
 			...opt,
 		},
-		control = myButton(options),
+		control = myControl.myButton(options),
 		hiddenEl = document.createElement('a');
 
 	hiddenEl.target = '_self';

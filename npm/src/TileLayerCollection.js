@@ -4,21 +4,16 @@
  */
 
 // Openlayers
-import BingMaps from 'ol/source/BingMaps.js';
-import OSMSource from 'ol/source/OSM.js';
-import StamenSource from 'ol/source/Stamen.js';
-import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
-import TileLayer from 'ol/layer/Tile.js';
-import TileWMS from 'ol/source/TileWMS.js';
-import WMTS from 'ol/source/WMTS.js';
-import XYZ from 'ol/source/XYZ.js';
-import {
-	getWidth,
-	getTopLeft,
-} from 'ol/extent.js';
-import {
-	get as getProjection,
-} from 'ol/proj.js';
+import BingMaps from 'ol/source/BingMaps';
+import OSMSource from 'ol/source/OSM';
+import StamenSource from 'ol/source/Stamen';
+import WMTSTileGrid from 'ol/tilegrid/WMTS';
+import TileLayer from 'ol/layer/Tile';
+import TileWMS from 'ol/source/TileWMS';
+import WMTS from 'ol/source/WMTS';
+import XYZ from 'ol/source/XYZ';
+import * as olExtent from 'ol/extent';
+import * as proj from 'ol/proj';
 
 
 // Virtual class to replace invalid layer scope by a stub display
@@ -127,7 +122,7 @@ export class IGN extends TileLayer {
 			IGNmatrixIds = [];
 
 		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = getWidth(getProjection('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNresolutions[i] = olExtent.getWidth(proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 			IGNmatrixIds[i] = i.toString();
 		}
 
@@ -168,12 +163,12 @@ export class SwissTopo extends LimitedTileLayer {
 				maxResolution: 300, // Resolution limit above which we switch to a more global service
 				...opt,
 			},
-			projectionExtent = getProjection('EPSG:3857').getExtent(),
+			projectionExtent = proj.get('EPSG:3857').getExtent(),
 			resolutions = [],
 			matrixIds = [];
 
 		for (let r = 0; r < 18; ++r) {
-			resolutions[r] = getWidth(projectionExtent) / 256 / Math.pow(2, r);
+			resolutions[r] = olExtent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
 			matrixIds[r] = r;
 		}
 
@@ -183,7 +178,7 @@ export class SwissTopo extends LimitedTileLayer {
 				url: options.host + options.subLayer +
 					'/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
 				tileGrid: new WMTSTileGrid({
-					origin: getTopLeft(projectionExtent),
+					origin: olExtent.getTopLeft(projectionExtent),
 					resolutions: resolutions,
 					matrixIds: matrixIds,
 				}),

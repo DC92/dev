@@ -7,16 +7,9 @@
 import Control from 'ol/control/Control';
 import MousePosition from 'ol/control/MousePosition';
 import MouseWheelZoom from 'ol/interaction/MouseWheelZoom';
-import {
-	createStringXY,
-} from 'ol/coordinate';
-import {
-	transform,
-} from 'ol/proj';
-import {
-	getDistance,
-	getLength,
-} from 'ol/sphere';
+import * as coordinate from 'ol/coordinate';
+import * as proj from 'ol/proj';
+import * as sphere from 'ol/sphere';
 
 // MyOl
 import './MyControl.css';
@@ -154,7 +147,7 @@ export function permalink(opt) {
 
 			view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
 
-			view.setCenter(transform([
+			view.setCenter(proj.transform([
 				urlMod.match(/lon=(-?[0-9\.]+)/)[1],
 				urlMod.match(/lat=(-?[0-9\.]+)/)[1],
 			], 'EPSG:4326', 'EPSG:3857'));
@@ -162,7 +155,7 @@ export function permalink(opt) {
 
 		// Set the permalink with current map zoom & position
 		if (view.getCenter()) {
-			const ll4326 = transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+			const ll4326 = proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 				newParams = 'map=' +
 				(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
 				(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
@@ -190,14 +183,14 @@ export function mousePosition(options) {
 		coordinateFormat: function(mouse) {
 			//BEST find better than window.gpsValues to share info
 			if (window.gpsValues && window.gpsValues.position) {
-				const ll4326 = transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
-					distance = getDistance(mouse, ll4326);
+				const ll4326 = proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
+					distance = sphere.getDistance(mouse, ll4326);
 
 				return distance < 1000 ?
 					(Math.round(distance)) + ' m' :
 					(Math.round(distance / 10) / 100) + ' km';
 			} else
-				return createStringXY(4)(mouse);
+				return coordinate.createStringXY(4)(mouse);
 		},
 		...options,
 	});
@@ -241,7 +234,7 @@ export function lengthLine() {
 	function calculateLength(feature) {
 		if (feature) {
 			let geometry = feature.getGeometry(),
-				length = getLength(geometry),
+				length = sphere.getLength(geometry),
 				fcs = getFlatCoordinates(geometry),
 				denivPos = 0,
 				denivNeg = 0;
@@ -303,7 +296,6 @@ export function tilesBuffer(opt) {
 
 /**
  * Print control
- * Requires myButton
  */
 export function print(options) {
 	const control = myButton({

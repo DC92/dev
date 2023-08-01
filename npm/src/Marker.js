@@ -1,5 +1,5 @@
 /**
- * Marker.js
+ * Marker
  * Marker position display & edit
  * Options:
    src : url of the marker image
@@ -8,31 +8,21 @@
    dragable : can draw the marker to edit position
  */
 
-// Proj4.js
-import proj4 from 'proj4/lib/index.js';
+// Proj4
+import proj4Lib from 'proj4/lib/index';
 
 // Openlayers
-import Feature from 'ol/Feature.js';
-import Icon from 'ol/style/Icon.js';
-import Point from 'ol/geom/Point.js';
-import Pointer from 'ol/interaction/Pointer.js';
-import VectorLayer from 'ol/layer/Vector.js';
-import VectorSource from 'ol/source/Vector.js';
-import {
-	toStringHDMS,
-} from 'ol/coordinate.js';
-import {
-	containsCoordinate,
-} from 'ol/extent.js';
-import {
-	transform,
-} from 'ol/proj.js';
-import {
-	register
-} from 'ol/proj/proj4.js';
-import {
-	Style,
-} from 'ol/style.js';
+import Feature from 'ol/Feature';
+import Icon from 'ol/style/Icon';
+import Point from 'ol/geom/Point';
+import Pointer from 'ol/interaction/Pointer';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import * as coordinate from 'ol/coordinate';
+import * as olExtent from 'ol/extent';
+import * as olProj4 from 'ol/proj/proj4';
+import * as proj from 'ol/proj';
+import * as style from 'ol/style';
 
 
 // Layer to display a marker
@@ -50,7 +40,7 @@ export default function Marker(opt) {
 		layer = new VectorLayer({
 			source: source,
 			zIndex: 1000, // Above points
-			style: new Style({
+			style: new style.Style({
 				image: new Icon({
 					src: options.src,
 				}),
@@ -60,9 +50,9 @@ export default function Marker(opt) {
 	let view;
 
 	// Initialise specific projection
-	if (typeof proj4 == 'function') {
+	if (typeof proj4Lib == 'function') {
 		// Swiss
-		proj4.defs('EPSG:21781',
+		proj4Lib.defs('EPSG:21781',
 			'+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 ' +
 			'+k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel ' +
 			'+towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs'
@@ -70,11 +60,11 @@ export default function Marker(opt) {
 
 		// UTM zones
 		for (let u = 1; u <= 60; u++) {
-			proj4.defs('EPSG:' + (32600 + u), '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
-			proj4.defs('EPSG:' + (32700 + u), '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
+			proj4Lib.defs('EPSG:' + (32600 + u), '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
+			proj4Lib.defs('EPSG:' + (32700 + u), '+proj=utm +zone=' + u + ' +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
 		}
 
-		register(proj4);
+		olProj4.register(proj4Lib);
 	}
 
 	// Collect all entries elements
@@ -164,7 +154,7 @@ export default function Marker(opt) {
 		if (!pos[0] && !pos[1])
 			return;
 
-		const ll4326 = transform([
+		const ll4326 = proj.transform([
 			// Protection against non-digital entries / transform , into .
 			parseFloat(pos[0].toString().replace(/[^-0-9]+/, '.')),
 			parseFloat(pos[1].toString().replace(/[^-0-9]+/, '.'))
@@ -172,9 +162,9 @@ export default function Marker(opt) {
 
 		ll4326[0] -= Math.round(ll4326[0] / 360) * 360; // Wrap +-180°
 
-		const ll3857 = transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
-			inEPSG21781 = typeof proj4 == 'function' &&
-			containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
+		const ll3857 = proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
+			inEPSG21781 = typeof proj4Lib == 'function' &&
+			olExtent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
 		// Move the marker
 		point.setCoordinates(ll3857);
@@ -191,14 +181,14 @@ export default function Marker(opt) {
 		// Display
 		const strings = {
 			dec: 'Lon: ' + els.lon.value + ', Lat: ' + els.lat.value,
-			dms: toStringHDMS(ll4326),
+			dms: coordinate.toStringHDMS(ll4326),
 		};
 
 		if (inEPSG21781) {
-			const ll21781 = transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
+			const ll21781 = proj.transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
 				z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
 				u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
-				llutm = transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
+				llutm = proj.transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
 
 			// UTM zones
 			strings.utm = ' UTM ' + z +

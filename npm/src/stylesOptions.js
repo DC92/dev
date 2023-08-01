@@ -8,7 +8,7 @@
 
 //BEST verify if all are used
 import Icon from 'ol/style/Icon';
-import * as extent from 'ol/extent';
+import * as olExtent from 'ol/extent';
 import * as style from 'ol/style';
 
 
@@ -43,7 +43,7 @@ export function label(feature, layer) {
 	const properties = feature.getProperties();
 
 	if (properties.label) {
-		const featureArea = extent.getArea(feature.getGeometry().getExtent()),
+		const featureArea = olExtent.getArea(feature.getGeometry().getExtent()),
 			elLabel = document.createElement('span');
 
 		elLabel.innerHTML = properties.label; //HACK to render the html entities in the canvas

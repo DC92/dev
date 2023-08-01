@@ -4,20 +4,18 @@
  */
 
 // Openlayers
-import Control from 'ol/control/Control.js';
-import Feature from 'ol/Feature.js';
-import Geolocation from 'ol/Geolocation.js';
-import GeometryCollection from 'ol/geom/GeometryCollection.js';
-import LineString from 'ol/geom/LineString.js';
-import MultiLineString from 'ol/geom/MultiLineString.js';
-import VectorLayer from 'ol/layer/Vector.js';
-import VectorSource from 'ol/source/Vector.js';
+import Control from 'ol/control/Control';
+import Feature from 'ol/Feature';
+import Geolocation from 'ol/Geolocation';
+import GeometryCollection from 'ol/geom/GeometryCollection';
+import LineString from 'ol/geom/LineString';
+import MultiLineString from 'ol/geom/MultiLineString';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import * as style from 'ol/style';
 
 // MyOl
-import {
-	myButton,
-} from './MyControl.js';
+import * as myControl from './MyControl';
 
 
 //BEST make it a class GeolocationControl
@@ -51,7 +49,7 @@ export default function MyGeolocation(options) {
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
-		control = myButton({
+		control = myControl.myButton({
 			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: subMenu,
