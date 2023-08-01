@@ -6,9 +6,15 @@ import 'ol/ol.css';
 
 import Attribution from 'ol/control/Attribution';
 import FullScreen from 'ol/control/FullScreen';
+import GeoJSON from 'ol/format/GeoJSON';
 import Map from 'ol/Map';
 import MultiPolygon from 'ol/geom/MultiPolygon';
+import OSM from 'ol/source/OSM';
 import ScaleLine from 'ol/control/ScaleLine';
+import Stamen from 'ol/source/Stamen';
+import Tile from 'ol/layer/Tile';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
 import * as loadingstrategy from 'ol/loadingstrategy';
@@ -24,23 +30,35 @@ const ol = {
 		ScaleLine: ScaleLine,
 		Zoom: Zoom,
 	},
+	format: {
+		GeoJSON: GeoJSON,
+	},
 	geom: {
 		MultiPolygon: MultiPolygon,
+	},
+	layer: {
+		Tile: Tile,
+		Vector: VectorLayer,
 	},
 	loadingstrategy: loadingstrategy,
 	proj: {
 		fromLonLat: proj.fromLonLat,
 		transformExtent: proj.transformExtent,
 	},
+	source: {
+		OSM: OSM,
+		Stamen: Stamen,
+		Vector: VectorSource,
+	},
 	style: style,
 };
 
 // MyOl
+import Editor from '../src/Editor';
 import LayerSwitcher from '../src/LayerSwitcher';
 import Marker from '../src/Marker';
 import MyGeocoder from '../src/MyGeocoder';
 import MyGeolocation from '../src/MyGeolocation';
-import Editor from '../src/Editor';
 import * as controlCollection from '../src/controlCollection';
 import * as controlFiles from '../src/Files';
 import * as myControl from '../src/MyControl';
@@ -50,16 +68,14 @@ import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
 
 const myol = {
-	ol: ol, // Packing some original Openlayers functions
-
 	control: { //BEST mettre dans un répertoire scr/control
+		Editor: Editor,
+		LayerSwitcher: LayerSwitcher,
+		MyGeocoder: MyGeocoder,
+		MyGeolocation: MyGeolocation,
 		...controlCollection,
 		...controlFiles,
 		...myControl,
-		Editor: Editor,
-		LayerSwitcher: LayerSwitcher,
-		MyGeolocation: MyGeolocation,
-		MyGeocoder: MyGeocoder,
 	},
 	layer: { //BEST mettre dans un répertoire scr/layer
 		Hover: myVectorLayer.Hover,
@@ -72,7 +88,9 @@ const myol = {
 	stylesOptions: stylesOptions,
 };
 
+myol.ol = ol; // Packing Openlayers native functions in the bundle
 export default myol;
+window.ol = window.ol || ol; // Export Openlayers native functions as global
 
 // Debug
 import * as util from 'ol/util';

@@ -10,8 +10,70 @@ Based on https://openlayers.org
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
-	<link href="images/favicon.png" rel="apple-touch-icon" />
+
 	<link href="parts/style.css" rel="stylesheet">
+	<!-- Simulation of importing myol -->
+	<script>
+		// apache (production)
+		if (window.origin.split(':').length == 2) {
+			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
+			document.write('<script src="../dist/myol-debug.js"><&#47;script>');
+		}
+	</script>
+	<script type="module">
+		// vite nmp (test)
+		import myol from '../build/index'; // At this place, mysteriously do not import out of npm vite context
+		window.myol = myol; // Declare a myol global variable
+	</script>
+
+	<!-- The next script must be defer or module to be run after the myol import -->
+	<script type="module">
+		const baseLayers = {
+				Stamen: new ol.layer.Tile({
+					source: new ol.source.Stamen({
+						layer: 'terrain',
+					}),
+				}),
+				'OSM org': new ol.layer.Tile({
+					source: new ol.source.OSM(),
+				}),
+				Watercolor: new ol.layer.Tile({
+					source: new ol.source.Stamen({
+						layer: 'watercolor',
+					}),
+				}),
+			},
+			countries = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
+					format: new ol.format.GeoJSON(),
+				}),
+				zIndex: 2, // Above the base layer
+			});
+
+		new ol.Map({
+			target: 'map',
+			view: new ol.View({
+				center: [700000, 5600000],
+				zoom: 5,
+			}),
+			controls: [
+				new myol.control.LayerSwitcher({
+					layers: baseLayers,
+					selectExtId: 'select-ext',
+				}),
+				//TODO BUG : ne marche pas si LayerSwitcher est défini avant Attribution
+				new ol.control.Attribution({
+					collapsed: false,
+				}),
+			],
+			layers: [countries],
+		});
+
+		document.getElementById('toggle-countries').addEventListener('click', function(evt) {
+			countries.setVisible(this.checked);
+		});
+	</script>
 </head>
 
 <body>
@@ -27,72 +89,6 @@ Based on https://openlayers.org
 		<hr />
 		<label>Countries <input id="toggle-countries" type="checkbox" checked="checked" /></label>
 	</div>
-
-	<script type="module">
-		// Openlayers
-		import 'ol/ol.css';
-		import Attribution from 'ol/control/Attribution';
-		import GeoJSON from 'ol/format/GeoJSON';
-		import Map from 'ol/Map';
-		import OSM from 'ol/source/OSM';
-		import Stamen from 'ol/source/Stamen';
-		import Tile from 'ol/layer/Tile';
-		import VectorLayer from 'ol/layer/Vector';
-		import VectorSource from 'ol/source/Vector';
-		import View from 'ol/View';
-
-		// MyOl
-		import LayerSwitcher from '../src/LayerSwitcher';
-
-
-		// Vectorlayer
-		const baseLayers = {
-				Stamen: new Tile({
-					source: new Stamen({
-						layer: 'terrain',
-					}),
-				}),
-				'OSM org': new Tile({
-					source: new OSM(),
-				}),
-				Watercolor: new Tile({
-					source: new Stamen({
-						layer: 'watercolor',
-					}),
-				}),
-			},
-			countries = new VectorLayer({
-				source: new VectorSource({
-					url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
-					format: new GeoJSON(),
-				}),
-				zIndex: 2, // Above the base layer
-			});
-
-		new Map({
-			target: 'map',
-			view: new View({
-				center: [700000, 5600000],
-				zoom: 5,
-			}),
-			controls: [
-				new LayerSwitcher({
-					layers: baseLayers,
-					selectExtId: 'select-ext',
-				}),
-				//TODO BUG : ne marche pas si LayerSwitcher est défini avant Attribution
-				new Attribution({
-					collapsed: false,
-				}),
-			],
-			layers: [countries],
-		});
-
-		document.getElementById('toggle-countries').addEventListener('click', function(evt) {
-			countries.setVisible(this.checked);
-		});
-	</script>
-	<script src="parts/print_script.js"></script>
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Change baselayer</div>
