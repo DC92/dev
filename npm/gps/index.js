@@ -1,3 +1,4 @@
+//TODO all GPS to be reviewed
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
 if (!location.href.match(/(https|localhost).*index/))
