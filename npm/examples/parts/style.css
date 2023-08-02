@@ -40,5 +40,6 @@
 
 /* wri */
 h4 {
-	margin-bottom: 0;
+  clear: both;
+  margin-bottom: 0;
 }

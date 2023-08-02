@@ -1,10 +1,7 @@
-const ol = myol.ol; // On récupère certaines fonctions natives Openlayers dans le bundle myol
-
 // La couche des massifs colorés (accueil et couche carte nav)
 function coucheMassifsColores(options) {
 	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
-		host: host,
 		query: () => ({
 			_path: 'api/polygones',
 			type_polygon: 1, // Massifs
@@ -61,7 +58,6 @@ function coucheMassifsColores(options) {
 function coucheContourMassif(options) {
 	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
-		host: host,
 		query: (extent, resolution, projection, options) => ({
 			_path: 'api/polygones',
 			type_polygon: 1, // Massifs
@@ -84,14 +80,9 @@ function coucheContourMassif(options) {
 	});
 }
 
-function couchePointsWRI(opt) {
-	const options = {
+function couchePointsWRI(options) {
+	const layer = new myol.layer.MyVectorLayer({
 		selectMassif: new myol.Selector('no-selector'), // Defaut = pas de sélecteur de massif
-		...opt
-	};
-
-	layer = new myol.layer.MyVectorLayer({
-		host: host,
 		browserClusterMinDistance: 50,
 		serverClusterMinResolution: 100,
 		...options,
@@ -111,7 +102,7 @@ function couchePointsWRI(opt) {
 		addProperties: properties => ({
 			label: properties.nom, // Permanence de l'étiquette dès l'affichage de la carte
 			name: properties.nom, // Nom utilisé dans les listes affichées au survol des ronds des clusters
-			icon: host + 'images/icones/' + properties.type.icone + '.svg',
+			icon: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
 			//TODO rapatrier fabrication étiquette
 			ele: properties.coord ? properties.coord.alt : null,
 			bed: properties.places ? properties.places.valeur : null,
@@ -121,7 +112,7 @@ function couchePointsWRI(opt) {
 	});
 
 	// Recharger la couche de points quand le sélecteur de massif change
-	options.selectMassif.callbacks.push(() => layer.reload());
+	layer.options.selectMassif.callbacks.push(() => layer.reload());
 
 	return layer;
 }
@@ -187,30 +178,31 @@ function fondsCarte(page, layersKeys) {
 	};
 }
 
-// Le code d'affichage des différentes cartes
-function carteIndex(extent) {
-	return new ol.Map({
-			target: 'carte-accueil',
-			view: new ol.View({
-				enableRotation: false,
-			}),
-			controls: [
-				new ol.control.Attribution({ // Du fond de carte
-					collapsed: false,
-				}),
-			],
-			layers: [
-				new myol.layer.tile.MRI(), // Fond de carte
-				coucheMassifsColores(), // Les massifs
-				new myol.layer.Hover(), // Gère le survol du curseur
-			],
-		})
-		// Centre la carte sur la zone souhaitée
-		.getView().fit(ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857'));
+function couchesVectoriellesExternes() {
+	return [
+		new myol.layer.vector.Chemineur({
+			selectName: 'select-chemineur',
+		}),
+		new myol.layer.vector.Alpages({
+			selectName: 'select-alpages',
+		}),
+		new myol.layer.vector.PRC({
+			selectName: 'select-prc',
+		}),
+		new myol.layer.vector.C2C({
+			selectName: 'select-c2c',
+		}),
+		new myol.layer.vector.Overpass({
+			selectName: 'select-osm',
+		}),
+	];
 }
 
+// Le code d'affichage des différentes cartes
+/*
 function carteNav(extent, init) {
 	const contourMassif = coucheContourMassif({
+		host:host,
 			selectName: 'select-massif',
 		}),
 		pointsWRI = couchePointsWRI({
@@ -337,5 +329,5 @@ function cartePoint() {
 }
 
 function carteModif() {
-	return 0;
-}
+	return 0; //TODO
+}*/

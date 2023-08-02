@@ -89,9 +89,9 @@ const myol = {
 	stylesOptions: stylesOptions,
 };
 
+window.ol ||= ol; // Export Openlayers native functions as global if none already defined
 myol.ol = ol; // Packing Openlayers native functions in the bundle
 export default myol;
-window.ol = window.ol || ol; // Export Openlayers native functions as global
 
 // Debug
 import * as util from 'ol/util';

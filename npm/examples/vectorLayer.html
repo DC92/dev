@@ -10,24 +10,22 @@ Based on https://openlayers.org
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link href="images/favicon.png" rel="icon" type="image/png" />
-	<link href="images/favicon.png" rel="apple-touch-icon" />
 
 	<link href="parts/style.css" rel="stylesheet">
+
 	<!-- Simulation of importing myol -->
-	<script>
-		// apache (production)
+	<script> // apache (production)
 		if (window.origin.split(':').length == 2) {
 			document.write('<link href="../dist/myol.css" type="text/css" rel="stylesheet">');
 			document.write('<script src="../dist/myol-debug.js"><&#47;script>');
 		}
 	</script>
-	<script type="module">
-		// vite nmp (test)
+	<script type="module"> // vite nmp (test)
 		import myol from '../build/index'; // At this place, mysteriously do not import out of npm vite context
 		window.myol = myol; // Declare a myol global variable
 	</script>
 
-	<!-- The next script must be defer or module to be run after the myol import -->
+	<!-- The main script must be defer or module to be run after the myol import -->
 	<script type="module">
 		//localStorage.myol_selectwri = 'all'; // Force selectors
 
