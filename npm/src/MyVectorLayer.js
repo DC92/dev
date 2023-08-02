@@ -40,7 +40,7 @@ class MyVectorSource extends VectorSource {
 			statusEl = document.getElementById(options.selectName + '-status');
 
 		super({
-			format: new GeoJSON({
+			format: new GeoJSON({ //TODO treat & display JSON errors
 				dataProjection: options.projection,
 			}),
 

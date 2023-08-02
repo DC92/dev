@@ -2,11 +2,11 @@
 function coucheMassifsColores(options) {
 	return new myol.layer.MyVectorLayer({
 		// Construction de l'url
+		strategy: ol.loadingstrategy.all, // Pas de bbox
 		query: () => ({
 			_path: 'api/polygones',
 			type_polygon: 1, // Massifs
 		}),
-		strategy: ol.loadingstrategy.all, // Pas de bbox
 		...options,
 
 		// Réception et traduction des données
@@ -88,7 +88,7 @@ function couchePointsWRI(options) {
 		...options,
 
 		query: (extent, resolution, projection, opt) => {
-			const selectionMassif = options.selectMassif.getSelection();
+			const selectionMassif = layer.options.selectMassif.getSelection();
 
 			return {
 				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
@@ -125,8 +125,8 @@ function controlesCartes(page) {
 		new ol.control.FullScreen(),
 		new myol.control.MyGeocoder(),
 		myol.control.MyGeolocation(),
-		'nav,edit'.includes(page) ? new myol.control.Load() : new myol.control.myButton(),
-		'point,edit'.includes(page) ? new myol.control.Download() : new myol.control.myButton(),
+		'nav,edit,modif'.includes(page) ? new myol.control.Load() : new myol.control.myButton(),
+		'point,edit,modif'.includes(page) ? new myol.control.Download() : new myol.control.myButton(),
 		'nav,point'.includes(page) ? myol.control.print() : myol.control.myButton(),
 
 		// Bas gauche
@@ -197,137 +197,3 @@ function couchesVectoriellesExternes() {
 		}),
 	];
 }
-
-// Le code d'affichage des différentes cartes
-/*
-function carteNav(extent, init) {
-	const contourMassif = coucheContourMassif({
-		host:host,
-			selectName: 'select-massif',
-		}),
-		pointsWRI = couchePointsWRI({
-			selectName: 'select-wri',
-			selectMassif: contourMassif.options.selector,
-		}),
-		couchesVectoriellesExternes = [
-			new myol.layer.vector.Chemineur({
-				selectName: 'select-chemineur',
-			}),
-			new myol.layer.vector.Alpages({
-				selectName: 'select-alpages',
-			}),
-			new myol.layer.vector.PRC({
-				selectName: 'select-prc',
-			}),
-			new myol.layer.vector.C2C({
-				selectName: 'select-c2c',
-			}),
-			new myol.layer.vector.Overpass({
-				selectName: 'select-osm',
-			}),
-		];
-
-	return new ol.Map({
-			target: 'carte-nav',
-			view: new ol.View({
-				enableRotation: false,
-			}),
-			controls: [
-				...controlesCartes('nav'),
-				myol.control.permalink({ // Permet de garder le même réglage de carte
-					display: true, // Affiche le lien
-					init: init, // On cadre le massif, s'il y a massif
-				}),
-				new myol.control.LayerSwitcher({
-					layers: fondsCarte('nav', layersKeys),
-				}),
-			],
-			layers: [
-				coucheMassifsColores({
-					selectName: 'select-massifs',
-				}),
-				...couchesVectoriellesExternes,
-				contourMassif,
-				pointsWRI,
-				new myol.layer.Hover(),
-			],
-		})
-		// Centre la carte sur la zone souhaitée
-		.getView().fit(ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857'));
-}
-
-function carteEdit(extent) {
-	const coucheContours = coucheContourMassif(),
-		controlEditor = new myol.control.Editor({
-			geoJsonId: 'edit-json',
-			snapLayers: [coucheContours],
-			help: [
-				(document.getElementById('myol-help-edit-modify') || {}).innerHTML,
-				null, // Pas d'édition de ligne
-				(document.getElementById('myol-help-edit-poly') || {}).innerHTML,
-			],
-			saveFeatures: function(coordinates, format) {
-				return format.writeGeometry(
-					new ol.geom.MultiPolygon(coordinates.polys), {
-						featureProjection: 'EPSG:3857',
-						decimals: 5,
-					});
-			},
-		});
-
-	return new ol.Map({
-			target: 'carte-edit',
-			view: new ol.View({
-				enableRotation: false,
-			}),
-			controls: [
-				...controlesCartes('edit'),
-				//myol.control.permalink(options.Permalink), //TODO
-				new myol.control.LayerSwitcher({
-					layers: fondsCarte('edit', layersKeys),
-				}),
-				controlEditor,
-			],
-			layers: [
-				coucheContours,
-				new myol.layer.Hover(),
-			],
-		})
-		// Centre la carte sur la zone souhaitée
-		.getView().fit(ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857'));
-}
-
-function cartePoint() {
-	return new ol.Map({
-		target: 'carte-point',
-		view: new ol.View({
-			center: ol.proj.fromLonLat([5.50669, 44.98445]),
-			zoom: 13,
-			enableRotation: false,
-			constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
-		}),
-		controls: [
-			...controlesCartes('point'),
-			myol.control.permalink({ // Permet de garder le même réglage de carte
-				visible: false, // Mais on ne visualise pas le lien du permalink
-				init: false, // Ici, on utilisera plutôt la position du point
-			}),
-			new myol.control.LayerSwitcher({
-				layers: fondsCarte('point', layersKeys),
-			}),
-		],
-		layers: [
-			couchePointsWRI(),
-			// Le cadre
-			new myol.layer.Marker({
-				src: host + 'images/cadre.svg',
-				focus: 15,
-			}),
-			new myol.layer.Hover(),
-		],
-	});
-}
-
-function carteModif() {
-	return 0; //TODO
-}*/
