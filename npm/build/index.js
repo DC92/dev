@@ -60,8 +60,6 @@ import LayerSwitcher from '../src/LayerSwitcher';
 import Marker from '../src/Marker';
 import MyGeocoder from '../src/MyGeocoder';
 import MyGeolocation from '../src/MyGeolocation';
-import * as controlCollection from '../src/controlCollection';
-import * as controlFiles from '../src/Files';
 import * as myControl from '../src/MyControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
 import * as stylesOptions from '../src/stylesOptions';
@@ -74,8 +72,6 @@ const myol = {
 		LayerSwitcher: LayerSwitcher,
 		MyGeocoder: MyGeocoder,
 		MyGeolocation: MyGeolocation,
-		...controlCollection,
-		...controlFiles,
 		...myControl,
 	},
 	layer: { //BEST mettre dans un répertoire scr/layer
