@@ -1,3 +1,67 @@
+function couchePointsWRI(options) {
+	const layer = new myol.layer.MyVectorLayer({
+		selectMassif: new myol.Selector('no-selector'), // Defaut = pas de sélecteur de massif
+		browserClusterMinDistance: 50, // Distance (pixels) entre 2 icones en dessous de laquelle on affiche un cluster local
+		serverClusterMinResolution: 100, // Résolution de la carte (en mètres par pixels) au delà de laquelle on demande des clusters au serveur
+		...options,
+
+		// Calcul de l'url de l'API refuges?.info
+		query: (extent, resolution, projection, opt) => {
+			const selectionMassif = layer.options.selectMassif.getSelection();
+
+			return {
+				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
+				massif: selectionMassif,
+				type_points: opt.selector.getSelection(),
+				nb_points: 'all',
+				cluster: resolution > opt.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
+			};
+		},
+
+		// Traduction des propriétés reçues de WRI pour interprétation par MyVectorLayer
+		addProperties: properties => ({
+			label: properties.nom, // Permanence de l'étiquette dès l'affichage de la carte
+			name: properties.nom, // Nom utilisé dans les listes affichées au survol des ronds des clusters
+			icon: options.host + 'images/icones/' + properties.type.icone + '.svg',
+			link: properties.lien, // Lien sur lequel cliquer
+		}),
+
+		hoverStylesOptions: (feature, layer) => {
+			// Construction de l'étiquette détaillée
+			const properties = feature.getProperties(),
+				caracteristiques = [],
+				lignes = [];
+
+			// Si c'est un cluster, on affiche comme d'habitude
+			if (properties.cluster)
+				return myol.stylesOptions.hover(feature, layer);
+
+			// Calcul de la deuxième ligne
+			if (properties.coord && properties.coord.alt)
+				caracteristiques.push(parseInt(properties.coord.alt) + ' m');
+			if (properties.places && properties.places.valeur)
+				caracteristiques.push(parseInt(properties.places.valeur) + '\u255E\u2550\u2555');
+
+			// Calcul des lignes de l'étiquette
+			lignes.push(properties.name);
+			if (caracteristiques.length)
+				lignes.push(caracteristiques.join(','));
+			lignes.push(properties.type.valeur);
+
+			feature.setProperties({
+				label: lignes.join("\n"),
+			}, true);
+
+			return myol.stylesOptions.label(feature, layer);
+		},
+	});
+
+	// Recharger la couche de points quand le sélecteur de massif change
+	layer.options.selectMassif.callbacks.push(() => layer.reload());
+
+	return layer;
+}
+
 // La couche des massifs colorés (accueil et couche carte nav)
 function coucheMassifsColores(options) {
 	return new myol.layer.MyVectorLayer({
@@ -78,43 +142,6 @@ function coucheContourMassif(options) {
 		// Pas d'action au survol
 		hoverStylesOptions: () => {},
 	});
-}
-
-function couchePointsWRI(options) {
-	const layer = new myol.layer.MyVectorLayer({
-		selectMassif: new myol.Selector('no-selector'), // Defaut = pas de sélecteur de massif
-		browserClusterMinDistance: 50,
-		serverClusterMinResolution: 100,
-		...options,
-
-		query: (extent, resolution, projection, opt) => {
-			const selectionMassif = layer.options.selectMassif.getSelection();
-
-			return {
-				_path: selectionMassif.length ? 'api/massif' : 'api/bbox',
-				massif: selectionMassif,
-				type_points: opt.selector.getSelection(),
-				nb_points: 'all',
-				cluster: resolution > opt.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
-			};
-		},
-
-		addProperties: properties => ({
-			label: properties.nom, // Permanence de l'étiquette dès l'affichage de la carte
-			name: properties.nom, // Nom utilisé dans les listes affichées au survol des ronds des clusters
-			icon: layer.options.host + 'images/icones/' + properties.type.icone + '.svg',
-			//TODO rapatrier fabrication étiquette
-			ele: properties.coord ? properties.coord.alt : null,
-			bed: properties.places ? properties.places.valeur : null,
-			type: properties.type ? properties.type.valeur : null,
-			link: properties.lien, // Lien sur lequel cliquer
-		}),
-	});
-
-	// Recharger la couche de points quand le sélecteur de massif change
-	layer.options.selectMassif.callbacks.push(() => layer.reload());
-
-	return layer;
 }
 
 // Les controles des cartes de refuges.info

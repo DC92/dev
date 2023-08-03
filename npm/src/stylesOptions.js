@@ -129,8 +129,8 @@ export function details(feature, layer) {
 		label: agregateText([
 			properties.name,
 			agregateText([
-				properties.ele && properties.ele ? parseInt(properties.ele) + ' m' : null,
-				properties.bed && properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
+				properties.ele ? parseInt(properties.ele) + ' m' : null,
+				properties.bed ? parseInt(properties.bed) + '\u255E\u2550\u2555' : null,
 			], ', '),
 			properties.type,
 			properties.cluster ? null : properties.attribution || layer.options.attribution,
