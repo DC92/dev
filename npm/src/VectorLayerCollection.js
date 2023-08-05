@@ -92,14 +92,17 @@ export class WRI extends MyVectorLayer {
 				cluster: resolution > options.serverClusterMinResolution ? 0.1 : null, // For server cluster layer
 			}),
 
-			addProperties: properties => ({
-				name: properties.nom,
-				icon: this.options.host + 'images/icones/' + properties.type.icone + '.svg',
-				ele: properties.coord.alt,
-				bed: properties.places.valeur,
-				type: properties.type.valeur,
-				link: properties.lien,
-			}),
+			addProperties: properties => {
+				if (!properties.cluster)
+					return {
+						name: properties.nom,
+						icon: this.options.host + 'images/icones/' + properties.type.icone + '.svg',
+						ele: properties.coord.alt,
+						bed: properties.places.valeur,
+						type: properties.type.valeur,
+						link: properties.lien,
+					};
+			},
 		});
 	}
 }

@@ -299,6 +299,7 @@ export class Hover extends VectorLayer {
 
 	mouseListener(evt) {
 		const map = evt.map,
+			resolution = map.getView().getResolution(),
 			source = this.getSource();
 
 		// Find the first hovered feature & layer
@@ -323,9 +324,8 @@ export class Hover extends VectorLayer {
 				);
 
 			// Find sub-feature from a spread cluster
-			//TODO clic sur spreadCluster
-			//TODO label survol sur spreadCluster
-			if (hoveredProperties.cluster) {
+			if (hoveredProperties.cluster &&
+				resolution < hoveredLayer.options.spreadClusterMaxResolution) {
 				hoveredProperties.features.every(f => {
 					const p = f.getProperties();
 
@@ -344,10 +344,10 @@ export class Hover extends VectorLayer {
 			// Click
 			if (evt.type == 'click') {
 				// Click cluster
-				if (hoveredProperties.cluster)
+				if (hoveredSubProperties.cluster)
 					map.getView().animate({
 						zoom: map.getView().getZoom() + 2,
-						center: hoveredProperties.geometry.getCoordinates(),
+						center: hoveredSubProperties.geometry.getCoordinates(),
 					});
 				// Click link
 				else if (hoveredSubProperties.link) {
