@@ -234,8 +234,6 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
 			basicStylesOptions: stylesOptions.basic, // (feature, layer)
-			clusterStylesOptions: stylesOptions.cluster,
-			spreadClusterStylesOptions: stylesOptions.spreadCluster,
 			hoverStylesOptions: stylesOptions.hover,
 			zIndex: 100, // Above the tiles layers
 			selector: new Selector(opt.selectName),
@@ -245,8 +243,8 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 			style: (feature, resolution) => {
 				// Function returning an array of styles options
 				const sof = !feature.getProperties().cluster ? options.basicStylesOptions :
-					resolution > options.spreadClusterMaxResolution ? options.spreadClusterStylesOptions :
-					options.clusterStylesOptions;
+					resolution < opt.spreadClusterMaxResolution ? stylesOptions.spreadCluster :
+					stylesOptions.cluster;
 
 				return sof(feature, this) // Call the styleOptions function
 					.map(so => new style.Style(so)); // Transform into an array of Style objects
@@ -325,6 +323,8 @@ export class Hover extends VectorLayer {
 				);
 
 			// Find sub-feature from a spread cluster
+			//TODO clic sur spreadCluster
+			//TODO label survol sur spreadCluster
 			if (hoveredProperties.cluster) {
 				hoveredProperties.features.every(f => {
 					const p = f.getProperties();

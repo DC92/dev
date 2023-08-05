@@ -73,6 +73,7 @@ export function label(feature, layer) {
 
 // Display a circle with the number of features on the cluster
 export function cluster(feature, layer) {
+	//TODO pourquoi itère sur render ?
 	return [{
 		image: new style.Circle({
 			radius: 14,
@@ -94,30 +95,38 @@ export function cluster(feature, layer) {
 export function spreadCluster(feature, layer) {
 	let properties = feature.getProperties(),
 		x = 0.95 + 0.45 * properties.cluster,
-		so = [];
+		labelList = [],
+		stylesOptions = [];
 
-	if (properties.features)
-		properties.features.forEach(f => {
-			const stylesOptions = layer.options.basicStylesOptions(...arguments);
+	properties.features.forEach(f => {
+		const p = f.getProperties();
 
-			if (stylesOptions.length) {
-				const image = stylesOptions[0].image; //TODO test
-
-				if (image) {
-					image.setAnchor([x -= 0.9, 0.5]);
+		layer.options.basicStylesOptions(f, layer)
+			.forEach(so => {
+				if (so.image) {
+					so.image.setAnchor([x -= 0.9, 0.5]);
 					f.setProperties({ // Mem the shift for hover detection
-						xLeft: (1 - x) * image.getImage().width,
+						xLeft: (1 - x) * so.image.getImage().width,
 					}, true);
-					so.push({
-						image: image,
+					stylesOptions.push({
+						image: so.image,
 					});
 				}
-			}
-		});
+			});
 
-	so.push(layer.options.labelStylesOptions(...arguments));
+		if (p.label)
+			labelList.push(p.label);
+	});
 
-	return so;
+	if (labelList.length) {
+		feature.setProperties({ // Mem the shift for hover detection
+			label: labelList.join('\n'),
+		}, true);
+
+		stylesOptions.push(label(feature, layer));
+	}
+
+	return stylesOptions;
 }
 
 // Display the detailed information of a cluster based on standard properties

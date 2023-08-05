@@ -58,7 +58,7 @@ Based on https://openlayers.org
 		new ol.Map({
 			target: 'carte-point',
 			view: new ol.View({
-				center: ol.proj.fromLonLat([5.50669, 44.98445]), // ([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
+				center: ol.proj.fromLonLat([5.64711, 45.2035]), // ([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 				zoom: 13,
 				enableRotation: false,
 				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
@@ -75,7 +75,7 @@ Based on https://openlayers.org
 			],
 			layers: [
 				couchePointsWRI({
-					host: '//www.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
+					host: '//dom.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
 				}),
 				coucheCadre,
 				new myol.layer.Hover(),

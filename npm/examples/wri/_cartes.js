@@ -2,6 +2,7 @@ function couchePointsWRI(options) {
 	const layer = new myol.layer.MyVectorLayer({
 		selectMassif: new myol.Selector('no-selector'), // Defaut = pas de sélecteur de massif
 		browserClusterMinDistance: 50, // Distance (pixels) entre 2 icones en dessous de laquelle on affiche un cluster local
+		spreadClusterMaxResolution: 10,
 		serverClusterMinResolution: 100, // Résolution de la carte (en mètres par pixels) au delà de laquelle on demande des clusters au serveur
 		...options,
 
@@ -49,7 +50,7 @@ function couchePointsWRI(options) {
 			lignes.push(properties.type.valeur);
 
 			feature.setProperties({
-				label: lignes.join("\n"),
+				label: lignes.join('\n'),
 			}, true);
 
 			return myol.stylesOptions.label(feature, layer);

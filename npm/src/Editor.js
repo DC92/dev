@@ -307,7 +307,7 @@ export default function Editor(opt) {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && hoveredFeature) {
-			hoveredFeature.setStyle(styleDisplay); //TODO should clear style / styleDisplay has wrong arguments
+			hoveredFeature.setStyle(styleDisplay); //TODO editor should clear style / styleDisplay has wrong arguments
 			hoveredFeature = null;
 		}
 	}
