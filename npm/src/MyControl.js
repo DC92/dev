@@ -7,13 +7,19 @@
 import Attribution from 'ol/control/Attribution';
 import Control from 'ol/control/Control';
 import FullScreen from 'ol/control/FullScreen';
+import Icon from 'ol/style/Icon';
 import MousePosition from 'ol/control/MousePosition';
 import MouseWheelZoom from 'ol/interaction/MouseWheelZoom';
 import ScaleLine from 'ol/control/ScaleLine';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import Zoom from 'ol/control/Zoom';
 import * as coordinate from 'ol/coordinate';
+import * as olFormat from 'ol/format';
+import * as olExtent from 'ol/extent';
 import * as proj from 'ol/proj';
 import * as sphere from 'ol/sphere';
+import * as style from 'ol/style';
 
 // MyOl
 import './MyControl.css';
@@ -156,31 +162,40 @@ export function permalink(opt) {
 /**
  * Control to display the mouse position
  */
-export function mousePosition(options) {
-	return new MousePosition({
-		projection: 'EPSG:4326',
-		className: 'myol-coordinate',
-		placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
+export class MyMousePosition extends MousePosition {
+	constructor(options) {
+		super({
+			projection: 'EPSG:4326',
+			className: 'myol-coordinate',
+			placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
 
-		coordinateFormat: function(mouse) {
-			//BEST find better than window.gpsValues to share info
-			if (window.gpsValues && window.gpsValues.position) {
-				const ll4326 = proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
-					distance = sphere.getDistance(mouse, ll4326);
+			coordinateFormat: function(mouse) {
+				//BEST find better than window.gpsValues to share info
+				if (window.gpsValues && window.gpsValues.position) {
+					const ll4326 = proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
+						distance = sphere.getDistance(mouse, ll4326);
 
-				return distance < 1000 ?
-					(Math.round(distance)) + ' m' :
-					(Math.round(distance / 10) / 100) + ' km';
-			} else
-				return coordinate.createStringXY(4)(mouse);
-		},
-		...options,
-	});
+					return distance < 1000 ?
+						(Math.round(distance)) + ' m' :
+						(Math.round(distance / 10) / 100) + ' km';
+				} else
+					return coordinate.createStringXY(4)(mouse);
+			},
+			...options,
+		});
+	}
 }
 
 /**
  * Control to display the length & height difference of an hovered line
  */
+//TODO class
+export class LengthLine extends MyButton {
+	constructor(options) {
+		super({});
+	}
+}
+
 export function lengthLine() {
 	const control = new MyButton(); //HACK button not visible
 
@@ -253,6 +268,7 @@ export function lengthLine() {
  * Control to display set preload of depth upper level tiles
  * This prepares the browser to become offline
  */
+//TODO TEST
 export function tilesBuffer(opt) {
 	const options = {
 			depth: 3,
@@ -298,7 +314,7 @@ export class Print extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input,a')
 			.forEach(el => {
-				el.onclick ||= evt => this.change(evt);
+				el.onclick ||= evt => this.click(evt);
 			});
 
 		// To return without print
@@ -310,7 +326,7 @@ export class Print extends MyButton {
 		});
 	}
 
-	change(evt) {
+	click(evt) {
 		const map = this.getMap(),
 			mapEl = map.getTargetElement(),
 			poElcs = this.element.querySelectorAll('input:checked'), // Selected orientation inputs
@@ -350,54 +366,55 @@ export class Print extends MyButton {
 	}
 }
 
-export function Load(opt) {
-	//BEST export / import names and links
-	//BEST Chemineur symbols in MyOl => translation sym (export symbols GPS ?)
-	//BEST misc formats
-	const options = {
+/**
+ * GPX file loader control
+ */
+export class Load extends MyButton {
+	constructor(options) {
+		super({
 			label: '&#x1F4C2;',
-			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
-				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
-			...opt,
-		},
-		control = new MyButton(options);
+			submenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
+				'<input type="file" />',
+			...options ||= {},
+		});
 
-	control.loadURL = async function(evt) {
-		const xhr = new XMLHttpRequest();
-		xhr.open('GET', evt.target.href);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4 && xhr.status == 200)
-				loadText(xhr.responseText);
-		};
-		xhr.send();
-	};
+		// Register action listeners
+		this.element.querySelectorAll('input')
+			.forEach(el => {
+				el.onchange ||= evt => this.change(evt);
+			});
 
-	// Load file at init
-	if (options.initFile) {
-		const xhr = new XMLHttpRequest();
-		xhr.open('GET', options.initFile);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4 && xhr.status == 200)
-				loadText(xhr.responseText);
-		};
-		xhr.send();
+		// Load file at init
+		if (options.initFile) {
+			const xhr = new XMLHttpRequest();
+			xhr.open('GET', options.initFile);
+			xhr.onreadystatechange = () => {
+				if (xhr.readyState == 4 && xhr.status == 200)
+					this.loadText(xhr.responseText, 'GPX');
+			};
+			xhr.send();
+		}
+
+		this.reader = new FileReader();
 	}
 
-	// Load file on demand
-	control.loadFile = function(evt) {
-		const reader = new FileReader();
+	change(evt) {
+		if (evt.target.files) {
+			this.reader.readAsText(evt.target.files[0]);
 
-		if (evt.type == 'change' && evt.target.files)
-			reader.readAsText(evt.target.files[0]);
-		reader.onload = function() {
-			loadText(reader.result);
-		};
-	};
+			this.reader.onload = () => {
+				this.loadText(
+					this.reader.result,
+					evt.target.files[0].name.split('.').pop().toUpperCase()
+				);
+			};
+		}
+	}
 
-	function loadText(text) {
-		const map = control.getMap(),
-			format = new format.GPX(),
-			features = format.readFeatures(text, {
+	loadText(text, formatName) {
+		const map = this.getMap(),
+			loadFormat = new olFormat[formatName in olFormat ? formatName : 'GeoJSON'](),
+			features = loadFormat.readFeatures(text, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 			}),
@@ -409,7 +426,7 @@ export function Load(opt) {
 		if (added !== false) { // If one used the feature
 			// Display the track on the map
 			const gpxSource = new VectorSource({
-					format: format,
+					format: loadFormat,
 					features: features,
 				}),
 				gpxLayer = new VectorLayer({
@@ -423,35 +440,31 @@ export function Load(opt) {
 								width: 3,
 							}),
 							image: properties.sym ? new Icon({
+								//TODO compléter chemineur avec les symboles standards
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.svg',
 							}) : null,
 						});
 					},
 				});
+
 			map.addLayer(gpxLayer);
+
+			// Zoom the map on the added features
+			const fileExtent = gpxSource.getExtent();
+
+			if (olExtent.isEmpty(fileExtent))
+				alert('Fichier GPX vide');
+			else
+				map.getView().fit(
+					fileExtent, {
+						maxZoom: 17,
+						padding: [5, 5, 5, 5],
+					});
 		}
 
-		// Zoom the map on the added features
-		const extent = olExtent.createEmpty();
-
-		for (let f in features) //BEST try to create a geometry
-			olExtent.extend(extent, features[f].getGeometry().getExtent());
-
-		if (olExtent.isEmpty(extent))
-			alert('Fichier GPX vide');
-		else
-			map.getView().fit(
-				extent, {
-					maxZoom: 17,
-					size: map.getSize(), //BEST necessary ?
-					padding: [5, 5, 5, 5],
-				});
-
 		// Close the submenu
-		control.element.classList.remove('myol-display-submenu');
+		this.element.classList.remove('myol-display-submenu');
 	}
-
-	return control;
 }
 
 /**
@@ -480,7 +493,7 @@ export function Download(opt) {
 	control.download = function(evt) {
 		const formatName = evt.target.id,
 			mime = evt.target.getAttribute('mime'),
-			format = new olFormat[formatName](),
+			downloadFormat = new olFormat[formatName](),
 			map = control.getMap();
 		let features = [],
 			extent = map.getView().calculateExtent();
@@ -519,7 +532,7 @@ export function Download(opt) {
 				}
 			}
 
-		const data = format.writeFeatures(features, {
+		const data = downloadFormat.writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
 				featureProjection: 'EPSG:3857',
 				decimals: 5,
@@ -585,7 +598,7 @@ export function collection(opt) {
 
 		// Bottom left
 		lengthLine(options.LengthLine),
-		mousePosition(options.Mouseposition),
+		new MyMousePosition(options.MyMouseposition),
 		new ScaleLine(options.ScaleLine),
 
 		// Bottom right

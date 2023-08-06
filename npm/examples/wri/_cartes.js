@@ -158,7 +158,7 @@ function controlesCartes(page) {
 		'nav,point'.includes(page) ? new myol.control.Print() : new myol.control.MyButton(),
 
 		// Bas gauche
-		new myol.control.mousePosition(),
+		new myol.control.MyMousePosition(),
 		new ol.control.ScaleLine(),
 
 		// Bas droit
