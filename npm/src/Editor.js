@@ -51,7 +51,7 @@ export default function Editor(opt) {
 			...opt,
 		},
 		labels = ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
-		control = myControl.myButton({
+		control = new myControl.MyButton({
 			className: 'myol-button-edit',
 			label: 'E', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +

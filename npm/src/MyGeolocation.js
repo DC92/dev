@@ -49,7 +49,7 @@ export default function MyGeolocation(options) {
 		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
 		// Display status, altitude & speed
-		control = myControl.myButton({
+		control = new myControl.MyButton({
 			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: subMenu,

@@ -23,87 +23,64 @@ import MyGeolocation from './MyGeolocation';
 
 /**
  * Control button
- * Abstract definition to be used by other control buttons definitions
+ * Abstract class to be used by other control buttons definitions
  */
-//BEST make it a class ... & others
-export function myButton(opt) {
-	const options = {
+export class MyButton extends Control {
+	constructor(options) {
+		super({
 			element: document.createElement('div'),
 			className: '',
-			...opt,
-		},
-		control = new Control(options),
-		buttonEl = document.createElement('button');
+			...options ||= {},
+		});
 
-	// Add submenu below the button
-	if (options.submenuEl)
-		control.submenuEl = options.submenuEl;
-	else if (options.submenuId)
-		control.submenuEl = document.getElementById(options.submenuId);
-	else {
-		control.submenuEl = document.createElement('div');
-		if (options.submenuHTML)
-			control.submenuEl.innerHTML = options.submenuHTML;
+		// Add submenu below the button
+		if (options.submenuEl)
+			this.submenuEl = options.submenuEl;
+		else if (options.submenuId)
+			this.submenuEl = document.getElementById(options.submenuId);
+		else {
+			this.submenuEl = document.createElement('div');
+			if (options.submenuHTML)
+				this.submenuEl.innerHTML = options.submenuHTML;
+		}
+
+		// Display the button only if there are no label or submenu
+		if (options.label && this.submenuEl && this.submenuEl.innerHTML) {
+			// Create a button
+			const buttonEl = document.createElement('button');
+			buttonEl.setAttribute('type', 'button');
+			buttonEl.innerHTML = options.label;
+			buttonEl.addEventListener('click', evt => this.action(evt));
+
+			// Populate the control
+			this.element.className = 'ol-control myol-button ' + options.className;
+			this.element.addEventListener('mouseover', evt => this.action(evt));
+			this.element.addEventListener('mouseout', evt => this.action(evt));
+			this.element.appendChild(buttonEl); // Add the button
+			this.element.appendChild(this.submenuEl); // Add the submenu
+
+			// Close the submenu when click or touch on the map
+			document.addEventListener('click', evt => {
+				if (document.elementFromPoint(evt.x, evt.y).tagName == 'CANVAS')
+					this.element.classList.remove('myol-button-selected');
+			});
+		}
 	}
 
-	// Display the button only if there are no label or submenu
-	if (!options.label || !control.submenuEl || !control.submenuEl.innerHTML)
-		return control;
-
-	// Populate control & button
-	buttonEl.setAttribute('type', 'button');
-	buttonEl.innerHTML = options.label;
-	control.element.appendChild(buttonEl);
-	control.element.className = 'ol-control myol-button ' + options.className;
-
-	// Add submenu
-	control.element.appendChild(control.submenuEl);
-
-	// Assign button actions
-	control.element.addEventListener('mouseover', action);
-	control.element.addEventListener('mouseout', action);
-	buttonEl.addEventListener('click', action);
-
-	function action(evt) {
+	action(evt) {
 		if (evt.type == 'mouseover')
-			control.element.classList.add('myol-button-hover');
+			this.element.classList.add('myol-button-hover');
 		else // mouseout | click
-			control.element.classList.remove('myol-button-hover');
+			this.element.classList.remove('myol-button-hover');
 
 		if (evt.type == 'click') // Mouse click & touch
-			control.element.classList.toggle('myol-button-selected');
+			this.element.classList.toggle('myol-button-selected');
 
 		// Close other open buttons
 		for (let el of document.getElementsByClassName('myol-button'))
-			if (el != control.element)
+			if (el != this.element)
 				el.classList.remove('myol-button-selected');
 	}
-
-	// Close submenu when click or touch on the map
-	document.addEventListener('click', evt => {
-		const hoveredEl = document.elementFromPoint(evt.x, evt.y);
-
-		if (hoveredEl && hoveredEl.tagName == 'CANVAS')
-			control.element.classList.remove('myol-button-selected');
-	});
-
-	// Assign control.function to submenu elements events
-	// with attribute ctrlOnClic="function" or ctrlOnChange="function"
-	for (let el of control.submenuEl.getElementsByTagName('*'))
-		['OnClick', 'OnChange'].forEach(evtName => {
-			const evtFnc = el.getAttribute('ctrl' + evtName);
-			if (evtFnc)
-				el[evtName.toLowerCase()] = function(evt) {
-					// Check at execution time if control.function() is defined
-					//BEST Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.
-					if (typeof control[evtFnc] == 'function')
-						control[evtFnc](evt);
-
-					return false; // Don't continue on href
-				};
-		});
-
-	return control;
 }
 
 /**
@@ -205,7 +182,7 @@ export function mousePosition(options) {
  * Control to display the length & height difference of an hovered line
  */
 export function lengthLine() {
-	const control = myButton(); //HACK button not visible
+	const control = new MyButton(); //HACK button not visible
 
 	control.element.className = 'myol-length-line';
 
@@ -281,7 +258,7 @@ export function tilesBuffer(opt) {
 			depth: 3,
 			...opt,
 		},
-		control = myButton(); //HACK no button
+		control = new MyButton(); //HACK no button
 
 	control.setMap = function(map) { //HACK execute actions on Map init
 		Control.prototype.setMap.call(this, map);
@@ -302,34 +279,51 @@ export function tilesBuffer(opt) {
 /**
  * Print control
  */
-export function print(options) {
-	const control = myButton({
-		label: '&#x1F5A8;',
-		className: 'myol-button-print',
-		submenuHTML: '<p>Pour imprimer la carte:</p>' +
-			'<p>-Choisir portrait ou paysage,</p>' +
-			'<p>-zoomer et déplacer la carte dans le format,</p>' +
-			'<p>-imprimer.</p>' +
-			'<label><input type="radio" name="myol-po" value="0" ctrlonchange="resizeDraftPrint">Portrait A4</label>' +
-			'<label><input type="radio" name="myol-po" value="1" ctrlonchange="resizeDraftPrint">Paysage A4</label>' +
-			'<a onclick="window.printMap()">Imprimer</a>' +
-			'<a onclick="location.reload()">Annuler</a>',
-		...options,
-	});
+export class Print extends MyButton {
+	constructor(options) {
+		super({
+			label: '&#x1F5A8;',
+			className: 'myol-button-print',
+			submenuHTML: '<p>Pour imprimer la carte:</p>' +
+				'<p>-Choisir portrait ou paysage,</p>' +
+				'<p>-zoomer et déplacer la carte dans le format,</p>' +
+				'<p>-imprimer.</p>' +
+				'<label><input type="radio" value="0">Portrait A4</label>' +
+				'<label><input type="radio" value="1">Paysage A4</label>' +
+				'<a id="print">Imprimer</a>' +
+				'<a onclick="location.reload()">Annuler</a>',
+			...options,
+		});
 
-	control.resizeDraftPrint = function() {
-		const map = control.getMap(),
+		// Register action listeners
+		this.element.querySelectorAll('input,a')
+			.forEach(el => {
+				el.onclick ||= evt => this.change(evt);
+			});
+
+		// To return without print
+		document.addEventListener('keydown', function(evt) {
+			if (evt.key == 'Escape')
+				setTimeout(function() { // Delay reload for FF & Opera
+					location.reload();
+				});
+		});
+	}
+
+	change(evt) {
+		const map = this.getMap(),
 			mapEl = map.getTargetElement(),
-			poElcs = document.querySelectorAll('input[name=myol-po]:checked'),
-			orientation = poElcs.length ? parseInt(poElcs[0].value) : 0;
+			poElcs = this.element.querySelectorAll('input:checked'), // Selected orientation inputs
+			orientation = poElcs.length ? parseInt(poElcs[0].value) : 0; // Selected orientation or portrait
 
+		// Change map size & style
 		mapEl.style.maxHeight = mapEl.style.maxWidth =
 			mapEl.style.float = 'none';
 		mapEl.style.width = orientation == 0 ? '208mm' : '295mm';
 		mapEl.style.height = orientation == 0 ? '295mm' : '208mm';
 		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
 
-		// Set portrait / landscape
+		// Set style portrait / landscape
 		const styleSheet = document.createElement('style');
 		styleSheet.type = 'text/css';
 		styleSheet.innerText = '@page {size: ' + (orientation == 0 ? 'portrait' : 'landscape') + '}';
@@ -347,24 +341,13 @@ export function print(options) {
 			maxDelta: 0.1,
 		}));
 
-		// To return without print
-		document.addEventListener('keydown', function(evt) {
-			if (evt.key == 'Escape')
-				setTimeout(function() { // Delay reload for FF & Opera
-					location.reload();
-				});
-		});
-	};
-
-	window.printMap = function() { //BEST resorb window
-		control.resizeDraftPrint();
-		control.getMap().once('rendercomplete', function() {
-			window.print();
-			location.reload();
-		});
-	};
-
-	return control;
+		// Finally print if required
+		if (evt.target.id == 'print')
+			map.once('rendercomplete', () => {
+				window.print();
+				location.reload();
+			});
+	}
 }
 
 export function Load(opt) {
@@ -377,7 +360,7 @@ export function Load(opt) {
 				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
 			...opt,
 		},
-		control = myButton(options);
+		control = new MyButton(options);
 
 	control.loadURL = async function(evt) {
 		const xhr = new XMLHttpRequest();
@@ -487,7 +470,7 @@ export function Download(opt) {
 			fileName: document.title || 'openlayers', //BEST name from feature
 			...opt,
 		},
-		control = myButton(options),
+		control = new MyButton(options),
 		hiddenEl = document.createElement('a');
 
 	hiddenEl.target = '_self';
@@ -570,12 +553,14 @@ export function Download(opt) {
  * Help control
  * Display help contained in <TAG id="<options.submenuId>">
  */
-//BEST make it a class
-export function Help(options) {
-	return myButton({
-		label: '?',
-		...options,
-	});
+export class Help extends MyButton {
+	constructor(options) {
+		super({
+			label: '?',
+			submenuId: 'myol-help',
+			...options,
+		});
+	}
 }
 
 /**
@@ -595,8 +580,8 @@ export function collection(opt) {
 		new MyGeolocation(options.Geolocation),
 		new Load(options.load),
 		new Download(options.download),
-		print(options.Print),
-		Help(options.Help),
+		new Print(options.Print),
+		new Help(options.Help),
 
 		// Bottom left
 		lengthLine(options.LengthLine),

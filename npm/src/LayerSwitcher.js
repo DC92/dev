@@ -9,7 +9,7 @@ import * as myControl from './MyControl';
 //BEST no lift when open/close submenu
 //BEST make it a class
 export default function LayerSwitcher(options) {
-	const control = myControl.myButton({
+	const control = new myControl.MyButton({
 			className: 'myol-button-switcher',
 			label: '&#x274F;',
 			submenuHTML: '<div id="myol-ls-range">' +
