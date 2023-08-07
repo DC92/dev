@@ -15,11 +15,19 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Zoom from 'ol/control/Zoom';
 import * as coordinate from 'ol/coordinate';
-import * as olFormat from 'ol/format';
 import * as olExtent from 'ol/extent';
 import * as proj from 'ol/proj';
 import * as sphere from 'ol/sphere';
 import * as style from 'ol/style';
+
+import GeoJSON from 'ol/format/GeoJSON';
+import GPX from 'ol/format/GPX';
+import KML from 'ol/format/KML';
+const olFormat = {
+	GeoJSON: GeoJSON,
+	GPX: GPX,
+	KML: KML,
+}
 
 // MyOl
 import './MyControl.css';
@@ -375,7 +383,7 @@ export class Load extends MyButton {
 		super({
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
-				'<input type="file" />',
+				'<input type="file" accept=".gpx,.kml,.geojson" />',
 			...options ||= {},
 		});
 
@@ -481,9 +489,9 @@ export class Download extends MyButton {
 			className: 'myol-button-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
-				'<a id="GPX" mime="application/gpx+xml">GPX</a>' +
-				'<a id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
-				'<a id="GeoJSON" mime="application/json">GeoJSON</a>',
+				'<a mime="application/gpx+xml">GPX</a>' +
+				'<a mime="vnd.google-earth.kml+xml">KML</a>' +
+				'<a mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers', //BEST name from feature
 			...opt,
 		};
@@ -504,9 +512,9 @@ export class Download extends MyButton {
 
 	click(evt) {
 		const map = this.getMap(),
-			formatName = evt.target.id,
-			mime = evt.target.getAttribute('mime'),
-			downloadFormat = new olFormat[formatName]();
+			formatName = evt.target.innerText,
+			downloadFormat = new olFormat[formatName](),
+			mime = evt.target.getAttribute('mime');
 		let features = [],
 			extent = map.getView().calculateExtent();
 

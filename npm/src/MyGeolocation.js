@@ -2,6 +2,7 @@
  * Geolocation.js
  * GPS control
  */
+//TODO BUG (!) Circular dependency src/MyControl.js -> src/MyGeolocation.js -> src/MyControl.js
 
 // Openlayers
 import Control from 'ol/control/Control';

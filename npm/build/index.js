@@ -7,6 +7,8 @@ import 'ol/ol.css';
 import Attribution from 'ol/control/Attribution';
 import FullScreen from 'ol/control/FullScreen';
 import GeoJSON from 'ol/format/GeoJSON';
+import GPX from 'ol/format/GPX';
+import KML from 'ol/format/KML';
 import Map from 'ol/Map';
 import MultiPolygon from 'ol/geom/MultiPolygon';
 import OSM from 'ol/source/OSM';
@@ -32,6 +34,8 @@ const ol = {
 	},
 	format: {
 		GeoJSON: GeoJSON,
+		GPX: GPX,
+		KML: KML,
 	},
 	geom: {
 		MultiPolygon: MultiPolygon,
