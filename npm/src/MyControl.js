@@ -94,6 +94,7 @@ export class MyButton extends Control {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
+//TODO class
 export function permalink(opt) {
 	const options = {
 			//BEST init with bbox option
@@ -189,50 +190,34 @@ export class MyMousePosition extends MousePosition {
 /**
  * Control to display the length & height difference of an hovered line
  */
-//TODO class
 export class LengthLine extends MyButton {
 	constructor(options) {
-		super({});
+		super(); //HACK button not visible
+
+		this.element.className = 'myol-length-line';
 	}
-}
 
-export function lengthLine() {
-	const control = new MyButton(); //HACK button not visible
-
-	control.element.className = 'myol-length-line';
-
-	control.setMap = function(map) { //HACK execute actions on Map init
-		Control.prototype.setMap.call(this, map);
+	setMap(map) {
+		super.setMap(map);
 
 		map.on('pointermove', evt => {
-			control.element.innerHTML = ''; // Clear the measure if hover no feature
+			this.element.innerHTML = ''; // Clear the measure if hover no feature
 
 			// Find new features to hover
-			map.forEachFeatureAtPixel(evt.pixel, calculateLength, {
-				hitTolerance: 6, // Default is 0
-			});
+			map.forEachFeatureAtPixel(
+				evt.pixel,
+				feature => this.calculateLength(feature), {
+					hitTolerance: 6, // Default is 0
+				});
 		});
-	};
-
-	function getFlatCoordinates(geometry) {
-		let fcs = [];
-
-		if (geometry.stride == 3)
-			fcs = geometry.flatCoordinates;
-
-		if (geometry.getType() == 'GeometryCollection')
-			for (let g of geometry.getGeometries())
-				fcs.push(...getFlatCoordinates(g));
-
-		return fcs;
 	}
 
 	//BEST calculate distance to the ends
-	function calculateLength(feature) {
+	calculateLength(feature) {
 		if (feature) {
 			let geometry = feature.getGeometry(),
 				length = sphere.getLength(geometry),
-				fcs = getFlatCoordinates(geometry),
+				fcs = this.getFlatCoordinates(geometry),
 				denivPos = 0,
 				denivNeg = 0;
 
@@ -248,7 +233,7 @@ export function lengthLine() {
 
 			// Display
 			if (length) {
-				control.element.innerHTML =
+				this.element.innerHTML =
 					// Line length
 					length < 1000 ?
 					(Math.round(length)) + ' m' :
@@ -261,7 +246,19 @@ export function lengthLine() {
 			}
 		}
 	}
-	return control;
+
+	getFlatCoordinates(geometry) {
+		let fcs = [];
+
+		if (geometry.stride == 3)
+			fcs = geometry.flatCoordinates;
+
+		if (geometry.getType() == 'GeometryCollection')
+			for (let g of geometry.getGeometries())
+				fcs.push(...this.getFlatCoordinates(g));
+
+		return fcs;
+	}
 }
 
 /**
@@ -269,6 +266,7 @@ export function lengthLine() {
  * This prepares the browser to become offline
  */
 //TODO TEST
+//TODO class
 export function tilesBuffer(opt) {
 	const options = {
 			depth: 3,
@@ -473,6 +471,7 @@ export class Load extends MyButton {
  * File downloader control
  */
 //BEST BUG incompatible with clusters
+//TODO class
 export function Download(opt) {
 	const options = {
 			label: '&#x1f4e5;',
@@ -599,7 +598,7 @@ export function collection(opt) {
 		new Help(options.Help),
 
 		// Bottom left
-		lengthLine(options.LengthLine),
+		new LengthLine(options.LengthLine),
 		new MyMousePosition(options.MyMouseposition),
 		new ScaleLine(options.ScaleLine),
 
