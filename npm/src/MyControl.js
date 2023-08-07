@@ -94,70 +94,71 @@ export class MyButton extends Control {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
-//TODO class
-export function permalink(opt) {
-	const options = {
-			//BEST init with bbox option
-			init: true, // {true | false} use url hash or localStorage to position the map.
-			setUrl: false, // {true | false} Change url hash when moving the map.
-			display: false, // {true | false} Display permalink link the map.
-			hash: '?', // {?, #} the permalink delimiter after the url
-			...opt,
-		},
-		control = new Control({
+export class Permalink extends MyButton {
+	constructor(opt) {
+		const options = {
+				//BEST init with bbox option
+				init: true, // {true | false} use url hash or localStorage to position the map.
+				setUrl: false, // {true | false} Change url hash when moving the map.
+				display: false, // {true | false} Display permalink link the map.
+				hash: '?', // {?, #} the permalink delimiter after the url
+				...opt,
+			},
+			aEl = document.createElement('a'),
+			urlMod = location.href.replace( // Get value from params with priority url / ? / #
+				/map=([0-9\.]+)\/(-?[0-9\.]+)\/(-?[0-9\.]+)/, // map=<zoom>/<lon>/<lat>
+				'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
+			) +
+			// Last values
+			'zoom=' + localStorage.myol_zoom +
+			'lon=' + localStorage.myol_lon +
+			'lat=' + localStorage.myol_lat +
+			// Default
+			'zoom=6&lon=2&lat=47';
+
+		super({
 			element: document.createElement('div'),
 			render: render,
-		}),
-		aEl = document.createElement('a'),
-		urlMod = location.href.replace( // Get value from params with priority url / ? / #
-			/map=([0-9\.]+)\/(-?[0-9\.]+)\/(-?[0-9\.]+)/, // map=<zoom>/<lon>/<lat>
-			'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
-		) +
-		// Last values
-		'zoom=' + localStorage.myol_zoom +
-		'lon=' + localStorage.myol_lon +
-		'lat=' + localStorage.myol_lat +
-		// Default
-		'zoom=6&lon=2&lat=47';
+		});
 
-	if (options.display) {
-		control.element.className = 'myol-permalink';
-		aEl.innerHTML = 'Permalink';
-		aEl.title = 'Generate a link with map zoom & position';
-		control.element.appendChild(aEl);
-	}
-
-	function render(evt) { //HACK to get map object
-		const view = evt.map.getView();
-
-		// Set center & zoom at the init
-		if (options.init) {
-			options.init = false; // Only once
-
-			view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
-
-			view.setCenter(proj.transform([
-				urlMod.match(/lon=(-?[0-9\.]+)/)[1],
-				urlMod.match(/lat=(-?[0-9\.]+)/)[1],
-			], 'EPSG:4326', 'EPSG:3857'));
+		if (options.display) {
+			this.element.className = 'myol-permalink';
+			aEl.innerHTML = 'Permalink';
+			aEl.title = 'Generate a link with map zoom & position';
+			this.element.appendChild(aEl);
 		}
 
-		// Set the permalink with current map zoom & position
-		if (view.getCenter()) {
-			const ll4326 = proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
-				newParams = 'map=' +
-				(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
-				(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
-				(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
+		function render(evt) { //HACK to get map object
+			const view = evt.map.getView();
 
-			if (options.display)
-				aEl.href = options.hash + newParams;
+			// Set center & zoom at the init
+			if (options.init) {
+				options.init = false; // Only once
 
-			if (options.setUrl)
-				location.href = '#' + newParams;
+				view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
+
+				view.setCenter(proj.transform([
+					urlMod.match(/lon=(-?[0-9\.]+)/)[1],
+					urlMod.match(/lat=(-?[0-9\.]+)/)[1],
+				], 'EPSG:4326', 'EPSG:3857'));
+			}
+
+			// Set the permalink with current map zoom & position
+			if (view.getCenter()) {
+				const ll4326 = proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+					newParams = 'map=' +
+					(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
+					(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
+					(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
+
+				if (options.display)
+					aEl.href = options.hash + newParams;
+
+				if (options.setUrl)
+					location.href = '#' + newParams;
+			}
 		}
 	}
-	return control;
 }
 
 /**
@@ -588,23 +589,23 @@ export function collection(opt) {
 
 	return [
 		// Top left
-		new Zoom(options.Zoom),
-		new FullScreen(options.FullScreen),
-		new MyGeocoder(options.Geocoder),
-		new MyGeolocation(options.Geolocation),
+		new Zoom(options.zoom),
+		new FullScreen(options.fullScreen),
+		new MyGeocoder(options.geocoder),
+		new MyGeolocation(options.geolocation),
 		new Load(options.load),
 		new Download(options.download),
-		new Print(options.Print),
-		new Help(options.Help),
+		new Print(options.print),
+		new Help(options.help),
 
 		// Bottom left
-		new LengthLine(options.LengthLine),
-		new MyMousePosition(options.MyMouseposition),
-		new ScaleLine(options.ScaleLine),
+		new LengthLine(options.lengthLine),
+		new MyMousePosition(options.myMouseposition),
+		new ScaleLine(options.scaleLine),
 
 		// Bottom right
-		permalink(options.Permalink),
-		new Attribution(options.Attribution),
+		new Permalink(options.permalink),
+		new Attribution(options.attribution),
 
 		...options.supplementaryControls
 	];
