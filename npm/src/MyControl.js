@@ -414,9 +414,11 @@ export class Load extends MyButton {
 	loadText(text, formatName) {
 		const map = this.getMap(),
 			loadFormat = new olFormat[formatName in olFormat ? formatName : 'GeoJSON'](),
+			receivedLat = text.match(/lat="-?([0-9]+)/), // Received projection depending on the first value
+			receivedProjection = receivedLat.length && parseInt(receivedLat[1]) > 100 ? 'EPSG:3857' : 'EPSG:4326',
 			features = loadFormat.readFeatures(text, {
-				dataProjection: 'EPSG:4326',
-				featureProjection: 'EPSG:3857',
+				dataProjection: receivedProjection,
+				featureProjection: 'EPSG:3857', // Map projection
 			}),
 			added = map.dispatchEvent({
 				type: 'myol:onfeatureload', // Warn Editor that we uploaded some features
@@ -453,7 +455,7 @@ export class Load extends MyButton {
 			const fileExtent = gpxSource.getExtent();
 
 			if (olExtent.isEmpty(fileExtent))
-				alert('Fichier GPX vide');
+				alert('Ce fichier ne comporte pas de points ni de trace');
 			else
 				map.getView().fit(
 					fileExtent, {
