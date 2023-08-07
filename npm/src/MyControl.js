@@ -39,6 +39,8 @@ export class MyButton extends Control {
 			...options ||= {},
 		});
 
+		this.options = options; // Mem for further use
+
 		// Add submenu below the button
 		if (options.submenuEl)
 			this.submenuEl = options.submenuEl;
@@ -192,7 +194,7 @@ export class MyMousePosition extends MousePosition {
  * Control to display the length & height difference of an hovered line
  */
 export class LengthLine extends MyButton {
-	constructor(options) {
+	constructor() {
 		super(); //HACK button not visible
 
 		this.element.className = 'myol-length-line';
@@ -472,37 +474,45 @@ export class Load extends MyButton {
  * File downloader control
  */
 //BEST BUG incompatible with clusters
-//TODO class
-export function Download(opt) {
-	const options = {
+export class Download extends MyButton {
+	constructor(opt) {
+		const options = {
 			label: '&#x1f4e5;',
 			className: 'myol-button-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
-				'<a ctrlOnClick="download" id="GPX" mime="application/gpx+xml">GPX</a>' +
-				'<a ctrlOnClick="download" id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
-				'<a ctrlOnClick="download" id="GeoJSON" mime="application/json">GeoJSON</a>',
+				'<a id="GPX" mime="application/gpx+xml">GPX</a>' +
+				'<a id="KML" mime="vnd.google-earth.kml+xml">KML</a>' +
+				'<a id="GeoJSON" mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers', //BEST name from feature
 			...opt,
-		},
-		control = new MyButton(options),
-		hiddenEl = document.createElement('a');
+		};
 
-	hiddenEl.target = '_self';
-	hiddenEl.style = 'display:none';
-	document.body.appendChild(hiddenEl);
+		super(options);
 
-	control.download = function(evt) {
-		const formatName = evt.target.id,
+		this.hiddenEl = document.createElement('a');
+		this.hiddenEl.target = '_self';
+		this.hiddenEl.style = 'display:none';
+		document.body.appendChild(this.hiddenEl);
+
+		// Register action listeners
+		this.element.querySelectorAll('a')
+			.forEach(el => {
+				el.onclick = evt => this.click(evt);
+			});
+	}
+
+	click(evt) {
+		const map = this.getMap(),
+			formatName = evt.target.id,
 			mime = evt.target.getAttribute('mime'),
-			downloadFormat = new olFormat[formatName](),
-			map = control.getMap();
+			downloadFormat = new olFormat[formatName]();
 		let features = [],
 			extent = map.getView().calculateExtent();
 
 		// Get all visible features
-		if (options.savedLayer)
-			getFeatures(options.savedLayer);
+		if (this.options.savedLayer)
+			getFeatures(this.options.savedLayer);
 		else
 			map.getLayers().forEach(getFeatures);
 
@@ -547,21 +557,20 @@ export function Download(opt) {
 			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')
 			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData)/g, '\n\t$1')
 			.replace(/(<trkpt|<Data|<LineString|<\/?Polygon|<Style)/g, '\n\t\t$1')
-			.replace(/(<[a-z]+BoundaryIs)/g, '\n\t\t\t$1'),
+			.replace(/(<[a-z]+BoundaryIs)/g, '\n\t\t\t$1')
+			.replace(/ [cvx]/g, '\n\t$1'),
 
 			file = new Blob([data], {
 				type: mime,
 			});
 
-		hiddenEl.download = options.fileName + '.' + formatName.toLowerCase();
-		hiddenEl.href = URL.createObjectURL(file);
-		hiddenEl.click();
+		this.hiddenEl.download = this.options.fileName + '.' + formatName.toLowerCase();
+		this.hiddenEl.href = URL.createObjectURL(file);
+		this.hiddenEl.click();
 
 		// Close the submenu
-		control.element.classList.remove('myol-display-submenu');
-	};
-
-	return control;
+		this.element.classList.remove('myol-display-submenu');
+	}
 }
 
 /**
