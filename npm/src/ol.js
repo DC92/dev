@@ -37,6 +37,7 @@ export default {
 		Draw: interaction.Draw,
 		Modify: interaction.Modify,
 		MouseWheelZoom: interaction.MouseWheelZoom,
+		Pointer: interaction.Pointer,
 		Snap: interaction.Snap,
 	},
 	layer: {

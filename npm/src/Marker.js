@@ -8,20 +8,9 @@
    dragable : can draw the marker to edit position
  */
 
-// Proj4
 import proj4Lib from 'proj4/lib/index';
-
-// Openlayers
-import ol from '../src/ol'; //TODO
-
-import Feature from 'ol/Feature';
-import Icon from 'ol/style/Icon';
-import Point from 'ol/geom/Point';
-import Pointer from 'ol/interaction/Pointer';
-import * as coordinate from 'ol/coordinate';
+import ol from '../src/ol';
 import * as olProj4 from 'ol/proj/proj4';
-import * as proj from 'ol/proj';
-import * as style from 'ol/style';
 
 // Layer to display a marker
 //BEST make it a class
@@ -31,15 +20,15 @@ export default function Marker(opt) {
 			...opt,
 		},
 		els = [],
-		point = new Point(options.position),
+		point = new ol.geom.Point(options.position),
 		source = new ol.source.Vector({
-			features: [new Feature(point)],
+			features: [new ol.Feature(point)],
 		}),
 		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 1000, // Above points
-			style: new style.Style({
-				image: new Icon({
+			style: new ol.style.Style({
+				image: new ol.style.Icon({
 					src: options.src,
 				}),
 			}),
@@ -117,7 +106,7 @@ export default function Marker(opt) {
 			// Edit the marker position
 			if (options.dragable) {
 				// Drag the marker
-				map.addInteraction(new Pointer({
+				map.addInteraction(new ol.interaction.Pointer({
 					handleDownEvent: function(evt) {
 						return map.getFeaturesAtPixel(evt.pixel, {
 							layerFilter: function(l) {
@@ -152,7 +141,7 @@ export default function Marker(opt) {
 		if (!pos[0] && !pos[1])
 			return;
 
-		const ll4326 = proj.transform([
+		const ll4326 = ol.proj.transform([
 			// Protection against non-digital entries / transform , into .
 			parseFloat(pos[0].toString().replace(/[^-0-9]+/, '.')),
 			parseFloat(pos[1].toString().replace(/[^-0-9]+/, '.'))
@@ -160,7 +149,7 @@ export default function Marker(opt) {
 
 		ll4326[0] -= Math.round(ll4326[0] / 360) * 360; // Wrap +-180°
 
-		const ll3857 = proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
+		const ll3857 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
 			inEPSG21781 = typeof proj4Lib == 'function' &&
 			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
@@ -179,14 +168,14 @@ export default function Marker(opt) {
 		// Display
 		const strings = {
 			dec: 'Lon: ' + els.lon.value + ', Lat: ' + els.lat.value,
-			dms: coordinate.toStringHDMS(ll4326),
+			dms: ol.coordinate.toStringHDMS(ll4326),
 		};
 
 		if (inEPSG21781) {
-			const ll21781 = proj.transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
+			const ll21781 = ol.proj.transform(ll4326, 'EPSG:4326', 'EPSG:21781'),
 				z = Math.floor(ll4326[0] / 6 + 90) % 60 + 1,
 				u = 32600 + z + (ll4326[1] < 0 ? 100 : 0),
-				llutm = proj.transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
+				llutm = ol.proj.transform(ll3857, 'EPSG:4326', 'EPSG:' + u);
 
 			// UTM zones
 			strings.utm = ' UTM ' + z +
