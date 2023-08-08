@@ -59,5 +59,12 @@ export default {
 		Stamen: Stamen,
 		Vector: VectorSource,
 	},
-	style: style,
+	style: {
+		Circle: style.Circle,
+		Fill: style.Fill,
+		Icon: style.Icon,
+		Stroke: style.Stroke,
+		Style: style.Style,
+		Text: style.Text,
+	},
 };

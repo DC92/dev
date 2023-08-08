@@ -13,7 +13,6 @@ import * as style from 'ol/style';
 import ol from '../src/ol';
 import './MyControl.css';
 import MyGeocoder from './MyGeocoder';
-import MyGeolocation from './MyGeolocation';
 
 /**
  * Control button
@@ -57,7 +56,9 @@ export class MyButton extends ol.control.Control {
 
 			// Close the submenu when click or touch on the map
 			document.addEventListener('click', evt => {
-				if (document.elementFromPoint(evt.x, evt.y).tagName == 'CANVAS')
+				const el = document.elementFromPoint(evt.x, evt.y);
+
+				if (el && el.tagName == 'CANVAS')
 					this.element.classList.remove('myol-button-selected');
 			});
 		}
@@ -80,279 +81,232 @@ export class MyButton extends ol.control.Control {
 }
 
 /**
- * Permalink control
- * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
- * Don't set view when you declare the map
+ * Geolocation control
  */
-export class Permalink extends MyButton {
-	constructor(opt) {
-		const options = {
-				//BEST init with bbox option
-				init: true, // {true | false} use url hash or localStorage to position the map.
-				setUrl: false, // {true | false} Change url hash when moving the map.
-				display: false, // {true | false} Display permalink link the map.
-				hash: '?', // {?, #} the permalink delimiter after the url
-				...opt,
-			},
-			aEl = document.createElement('a'),
-			urlMod = location.href.replace( // Get value from params with priority url / ? / #
-				/map=([0-9\.]+)\/(-?[0-9\.]+)\/(-?[0-9\.]+)/, // map=<zoom>/<lon>/<lat>
-				'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
-			) +
-			// Last values
-			'zoom=' + localStorage.myol_zoom +
-			'lon=' + localStorage.myol_lon +
-			'lat=' + localStorage.myol_lat +
-			// Default
-			'zoom=6&lon=2&lat=47';
+//TODO resorb
+import Control from 'ol/control/Control';
+import Feature from 'ol/Feature';
+import Geolocation from 'ol/Geolocation';
+import GeometryCollection from 'ol/geom/GeometryCollection';
+import LineString from 'ol/geom/LineString';
+import MultiLineString from 'ol/geom/MultiLineString';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 
-		super({
-			element: document.createElement('div'),
-			render: render,
-		});
+export default function MyGeolocation(options) {
+	const subMenu = location.href.match(/(https|localhost)/) ?
+		//BEST use .html content / option
+		'<p>Localisation GPS:</p>' +
+		'<label>' +
+		'<input type="radio" name="myol-gps-source" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Inactif</label><label>' +
+		'<input type="radio" name="myol-gps-source" value="1" ctrlonchange="renderGPS" />' +
+		'Position GPS <span>(1) extérieur</span></label><label>' +
+		'<input type="radio" name="myol-gps-source" value="2" ctrlonchange="renderGPS" />' +
+		'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
+		'<input type="radio" name="myol-gps-display" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'Graticule, carte libre</label><label>' +
+		'<input type="radio" name="myol-gps-display" value="1" ctrlonchange="renderGPS" />' +
+		'Centre la carte, nord en haut</label><label>' +
+		'<input type="radio" name="myol-gps-display" value="2" ctrlonchange="renderGPS" />' +
+		'Centre et oriente la carte <span>(3)</span></label>' +
 
-		if (options.display) {
-			this.element.className = 'myol-permalink';
-			aEl.innerHTML = 'Permalink';
-			aEl.title = 'Generate a link with map zoom & position';
-			this.element.appendChild(aEl);
-		}
+		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		'nécessite un capteur et une réception GPS.</p>' +
+		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
+		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
+		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
+		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.</p>' :
 
-		function render(evt) { //HACK to get map object
-			const view = evt.map.getView();
+		// Si on est en http
+		'<p>L&apos;utilisation du GPS nécessite https</p>' +
+		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
 
-			// Set center & zoom at the init
-			if (options.init) {
-				options.init = false; // Only once
-
-				view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
-
-				view.setCenter(proj.transform([
-					urlMod.match(/lon=(-?[0-9\.]+)/)[1],
-					urlMod.match(/lat=(-?[0-9\.]+)/)[1],
-				], 'EPSG:4326', 'EPSG:3857'));
-			}
-
-			// Set the permalink with current map zoom & position
-			if (view.getCenter()) {
-				const ll4326 = proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
-					newParams = 'map=' +
-					(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
-					(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
-					(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
-
-				if (options.display)
-					aEl.href = options.hash + newParams;
-
-				if (options.setUrl)
-					location.href = '#' + newParams;
-			}
-		}
-	}
-}
-
-/**
- * Control to display the mouse position
- */
-export class MyMousePosition extends ol.control.MousePosition {
-	constructor(options) {
-		super({
-			projection: 'EPSG:4326',
-			className: 'myol-coordinate',
-			placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
-
-			coordinateFormat: function(mouse) {
-				//BEST find better than window.gpsValues to share info
-				if (window.gpsValues && window.gpsValues.position) {
-					const ll4326 = proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
-						distance = sphere.getDistance(mouse, ll4326);
-
-					return distance < 1000 ?
-						(Math.round(distance)) + ' m' :
-						(Math.round(distance / 10) / 100) + ' km';
-				} else
-					return coordinate.createStringXY(4)(mouse);
-			},
+		// Display status, altitude & speed
+		control = new MyButton({
+			className: 'myol-button-gps',
+			label: '&#x2295;',
+			submenuHTML: subMenu,
 			...options,
-		});
-	}
-}
+		}),
 
-/**
- * Control to display the length & height difference of an hovered line
- */
-export class LengthLine extends MyButton {
-	constructor() {
-		super(); //HACK button not visible
+		// Graticule
+		graticuleFeature = new Feature(), //BEST Use layer Graticule
+		northGraticuleFeature = new Feature(),
+		graticuleLayer = new ol.layer.Vector({
+			source: new VectorSource({
+				features: [graticuleFeature, northGraticuleFeature],
+			}),
+			zIndex: 20, // Above the features
+			style: new style.Style({
+				fill: new style.Fill({
+					color: 'rgba(128,128,255,0.2)',
+				}),
+				stroke: new style.Stroke({
+					color: '#20b',
+					lineDash: [16, 14],
+					width: 1,
+				}),
+			}),
+		}),
+		statusEl = document.createElement('p');
 
-		this.element.className = 'myol-length-line';
-	}
+	control.element.appendChild(statusEl);
 
-	setMap(map) {
-		super.setMap(map);
+	graticuleFeature.setStyle(new style.Style({
+		stroke: new style.Stroke({
+			color: '#000',
+			lineDash: [16, 14],
+			width: 1,
+		}),
+	}));
 
-		map.on('pointermove', evt => {
-			this.element.innerHTML = ''; // Clear the measure if hover no feature
+	northGraticuleFeature.setStyle(new style.Style({
+		stroke: new style.Stroke({
+			color: '#c00',
+			lineDash: [16, 14],
+			width: 1,
+		}),
+	}));
 
-			// Find new features to hover
-			map.forEachFeatureAtPixel(
-				evt.pixel,
-				feature => this.calculateLength(feature), {
-					hitTolerance: 6, // Default is 0
-				});
-		});
-	}
-
-	//BEST calculate distance to the ends
-	calculateLength(feature) {
-		if (feature) {
-			let geometry = feature.getGeometry(),
-				length = sphere.getLength(geometry),
-				fcs = this.getFlatCoordinates(geometry),
-				denivPos = 0,
-				denivNeg = 0;
-
-			// Height difference calculation
-			for (let c = 5; c < fcs.length; c += 3) {
-				const d = fcs[c] - fcs[c - 3];
-
-				if (d > 0)
-					denivPos += d;
-				else
-					denivNeg -= d;
-			}
-
-			// Display
-			if (length) {
-				this.element.innerHTML =
-					// Line length
-					length < 1000 ?
-					(Math.round(length)) + ' m' :
-					(Math.round(length / 10) / 100) + ' km' +
-					// Height difference
-					(denivPos ? ' +' + denivPos + ' m' : '') +
-					(denivNeg ? ' -' + denivNeg + ' m' : '');
-
-				return false; // Continue detection (for editor that has temporary layers)
-			}
-		}
-	}
-
-	getFlatCoordinates(geometry) {
-		let fcs = [];
-
-		if (geometry.stride == 3)
-			fcs = geometry.flatCoordinates;
-
-		if (geometry.getType() == 'GeometryCollection')
-			for (let g of geometry.getGeometries())
-				fcs.push(...this.getFlatCoordinates(g));
-
-		return fcs;
-	}
-}
-
-/**
- * Control to display set preload of depth upper level tiles
- * This prepares the browser to become offline
- */
-//TODO TEST
-//TODO class
-export function tilesBuffer(opt) {
-	const options = {
-			depth: 3,
-			...opt,
-		},
-		control = new MyButton(); //HACK no button
+	let geolocation;
+	window.gpsValues = {}; // Store the measures for internal use & other controls
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+		Control.prototype.setMap.call(this, map);
 
-		// Action on each layer
-		//BEST too much load on basic browsing
-		map.on('precompose', () => {
-			map.getLayers().forEach(layer => {
-				if (typeof layer.setPreload == 'function')
-					layer.setPreload(options.depth);
-			});
+		map.addLayer(graticuleLayer);
+		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom
+
+		geolocation = new Geolocation({
+			projection: map.getView().getProjection(),
+			trackingOptions: {
+				enableHighAccuracy: true,
+				maximumAge: 1000,
+				timeout: 1000,
+				...options,
+			},
+		});
+		geolocation.on('change', control.renderGPS);
+		geolocation.on('error', function(error) {
+			console.log('Geolocation error: ' + error.message);
+		});
+
+		// Browser heading from the inertial & magnetic sensors
+		window.addEventListener('deviceorientationabsolute', function(evt) {
+			window.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			control.renderGPS(evt);
 		});
 	};
 
+	// Trigered by <input ... ctrlOnChange="renderGPS" />
+	control.renderGPS = function(evt) {
+		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
+			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
+			displayEls = document.getElementsByName('myol-gps-display'),
+			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, GPS&WiFi
+			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
+			map = control.getMap(),
+			view = map ? map.getView() : null;
+
+		// Tune the tracking level
+		if (evt.target.name == 'myol-gps-source') {
+			geolocation.setTracking(sourceLevel > 0);
+			graticuleLayer.setVisible(false);
+			window.gpsValues = {}; // Reset the values
+			if (!sourceLevel)
+				displayEls[0].checked = true;
+			if (sourceLevel && displayLevel == 0)
+				displayEls[2].checked = true;
+		}
+
+		// Get geolocation values
+		['Position', 'AccuracyGeometry', 'Speed', 'Altitude'].forEach(valueName => {
+			const value = geolocation['get' + valueName]();
+			if (value)
+				window.gpsValues[valueName.toLowerCase()] = value;
+		});
+
+		// State 1 only takes positions from the GPS (which have an altitude)
+		if (sourceLevel == 1 && !window.gpsValues.altitude)
+			window.gpsValues.position = null;
+
+		// Render position & graticule
+		if (map && view && sourceLevel && window.gpsValues.position) {
+			// Estimate the viewport size to draw a visible graticule
+			const p = window.gpsValues.position,
+				hg = map.getCoordinateFromPixel([0, 0]),
+				bd = map.getCoordinateFromPixel(map.getSize()),
+				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
+				// The graticule
+				geometry = [
+					new MultiLineString([
+						[
+							[p[0] - far, p[1]],
+							[p[0] + far, p[1]]
+						],
+						[
+							[p[0], p[1]],
+							[p[0], p[1] - far]
+						],
+					]),
+				],
+				// Color north in red
+				northGeometry = [
+					new LineString([
+						[p[0], p[1]],
+						[p[0], p[1] + far]
+					]),
+				];
+
+			// The accuracy circle
+			if (window.gpsValues.accuracygeometry)
+				geometry.push(window.gpsValues.accuracygeometry);
+
+			graticuleFeature.setGeometry(new GeometryCollection(geometry));
+			northGraticuleFeature.setGeometry(new GeometryCollection(northGeometry));
+
+			// Center the map
+			if (displayLevel > 0)
+				view.setCenter(p);
+
+			// Orientation
+			if (!sourceLevel || displayLevel == 1)
+				view.setRotation(0);
+			else if (window.gpsValues.heading && displayLevel == 2)
+				view.setRotation(
+					Math.PI / 180 * (window.gpsValues.heading - screen.orientation.angle) // Delivered ° reverse clockwize
+				);
+
+			// Zoom on the area
+			if (!window.gpsValues.isZoomed) { // Only the first time after activation
+				window.gpsValues.isZoomed = true;
+				view.setZoom(17);
+
+				// Close submenu when GPS locates
+				control.element.classList.remove('myol-button-hover');
+				control.element.classList.remove('myol-button-selected');
+			}
+			graticuleLayer.setVisible(true);
+		} else
+			view.setRotation(0); // Return to inactive state
+
+		// Display data under the button
+		let status = window.gpsValues.position ? '' : 'Sync...';
+		if (window.gpsValues.altitude) {
+			status = Math.round(window.gpsValues.altitude) + ' m';
+			if (window.gpsValues.speed)
+				status += ' ' + (Math.round(window.gpsValues.speed * 36) / 10) + ' km/h';
+		}
+		if (statusEl)
+			statusEl.innerHTML = sourceLevel ? status : '';
+
+		// Close the submenu
+		if (evt.target.name) // Only when an input is hit
+			control.element.classList.remove('myol-display-submenu');
+	};
+
 	return control;
-}
-
-/**
- * Print control
- */
-export class Print extends MyButton {
-	constructor(options) {
-		super({
-			label: '&#x1F5A8;',
-			className: 'myol-button-print',
-			submenuHTML: '<p>Pour imprimer la carte:</p>' +
-				'<p>-Choisir portrait ou paysage,</p>' +
-				'<p>-zoomer et déplacer la carte dans le format,</p>' +
-				'<p>-imprimer.</p>' +
-				'<label><input type="radio" value="0">Portrait A4</label>' +
-				'<label><input type="radio" value="1">Paysage A4</label>' +
-				'<a id="print">Imprimer</a>' +
-				'<a onclick="location.reload()">Annuler</a>',
-			...options,
-		});
-
-		// Register action listeners
-		this.element.querySelectorAll('input,a')
-			.forEach(el => {
-				el.onclick ||= evt => this.click(evt);
-			});
-
-		// To return without print
-		document.addEventListener('keydown', function(evt) {
-			if (evt.key == 'Escape')
-				setTimeout(function() { // Delay reload for FF & Opera
-					location.reload();
-				});
-		});
-	}
-
-	click(evt) {
-		const map = this.getMap(),
-			mapEl = map.getTargetElement(),
-			poElcs = this.element.querySelectorAll('input:checked'), // Selected orientation inputs
-			orientation = poElcs.length ? parseInt(poElcs[0].value) : 0; // Selected orientation or portrait
-
-		// Change map size & style
-		mapEl.style.maxHeight = mapEl.style.maxWidth =
-			mapEl.style.float = 'none';
-		mapEl.style.width = orientation == 0 ? '208mm' : '295mm';
-		mapEl.style.height = orientation == 0 ? '295mm' : '208mm';
-		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
-
-		// Set style portrait / landscape
-		const styleSheet = document.createElement('style');
-		styleSheet.type = 'text/css';
-		styleSheet.innerText = '@page {size: ' + (orientation == 0 ? 'portrait' : 'landscape') + '}';
-		document.head.appendChild(styleSheet);
-
-		// Hide all but the map
-		document.body.appendChild(mapEl);
-		for (let child = document.body.firstElementChild; child !== null; child = child.nextSibling)
-			if (child.style && child !== mapEl)
-				child.style.display = 'none';
-
-		// Finer zoom not dependent on the baselayer's levels
-		map.getView().setConstrainResolution(false);
-		map.addInteraction(new ol.interaction.MouseWheelZoom({
-			maxDelta: 0.1,
-		}));
-
-		// Finally print if required
-		if (evt.target.id == 'print')
-			map.once('rendercomplete', () => {
-				window.print();
-				location.reload();
-			});
-	}
 }
 
 /**
@@ -562,6 +516,80 @@ export class Download extends MyButton {
 }
 
 /**
+ * Print control
+ */
+export class Print extends MyButton {
+	constructor(options) {
+		super({
+			label: '&#x1F5A8;',
+			className: 'myol-button-print',
+			submenuHTML: '<p>Pour imprimer la carte:</p>' +
+				'<p>-Choisir portrait ou paysage,</p>' +
+				'<p>-zoomer et déplacer la carte dans le format,</p>' +
+				'<p>-imprimer.</p>' +
+				'<label><input type="radio" value="0">Portrait A4</label>' +
+				'<label><input type="radio" value="1">Paysage A4</label>' +
+				'<a id="print">Imprimer</a>' +
+				'<a onclick="location.reload()">Annuler</a>',
+			...options,
+		});
+
+		// Register action listeners
+		this.element.querySelectorAll('input,a')
+			.forEach(el => {
+				el.onclick ||= evt => this.click(evt);
+			});
+
+		// To return without print
+		document.addEventListener('keydown', function(evt) {
+			if (evt.key == 'Escape')
+				setTimeout(function() { // Delay reload for FF & Opera
+					location.reload();
+				});
+		});
+	}
+
+	click(evt) {
+		const map = this.getMap(),
+			mapEl = map.getTargetElement(),
+			poElcs = this.element.querySelectorAll('input:checked'), // Selected orientation inputs
+			orientation = poElcs.length ? parseInt(poElcs[0].value) : 0; // Selected orientation or portrait
+
+		// Change map size & style
+		mapEl.style.maxHeight = mapEl.style.maxWidth =
+			mapEl.style.float = 'none';
+		mapEl.style.width = orientation == 0 ? '208mm' : '295mm';
+		mapEl.style.height = orientation == 0 ? '295mm' : '208mm';
+		map.setSize([mapEl.clientWidth, mapEl.clientHeight]);
+
+		// Set style portrait / landscape
+		const styleSheet = document.createElement('style');
+		styleSheet.type = 'text/css';
+		styleSheet.innerText = '@page {size: ' + (orientation == 0 ? 'portrait' : 'landscape') + '}';
+		document.head.appendChild(styleSheet);
+
+		// Hide all but the map
+		document.body.appendChild(mapEl);
+		for (let child = document.body.firstElementChild; child !== null; child = child.nextSibling)
+			if (child.style && child !== mapEl)
+				child.style.display = 'none';
+
+		// Finer zoom not dependent on the baselayer's levels
+		map.getView().setConstrainResolution(false);
+		map.addInteraction(new ol.interaction.MouseWheelZoom({
+			maxDelta: 0.1,
+		}));
+
+		// Finally print if required
+		if (evt.target.id == 'print')
+			map.once('rendercomplete', () => {
+				window.print();
+				location.reload();
+			});
+	}
+}
+
+/**
  * Help control
  * Display help contained in <TAG id="<options.submenuId>">
  */
@@ -573,6 +601,208 @@ export class Help extends MyButton {
 			...options,
 		});
 	}
+}
+
+/**
+ * Control to display the length & height difference of an hovered line
+ */
+export class LengthLine extends MyButton {
+	constructor() {
+		super(); //HACK button not visible
+
+		this.element.className = 'myol-length-line';
+	}
+
+	setMap(map) {
+		super.setMap(map);
+
+		map.on('pointermove', evt => {
+			this.element.innerHTML = ''; // Clear the measure if hover no feature
+
+			// Find new features to hover
+			map.forEachFeatureAtPixel(
+				evt.pixel,
+				feature => this.calculateLength(feature), {
+					hitTolerance: 6, // Default is 0
+				});
+		});
+	}
+
+	//BEST calculate distance to the ends
+	calculateLength(feature) {
+		if (feature) {
+			let geometry = feature.getGeometry(),
+				length = sphere.getLength(geometry),
+				fcs = this.getFlatCoordinates(geometry),
+				denivPos = 0,
+				denivNeg = 0;
+
+			// Height difference calculation
+			for (let c = 5; c < fcs.length; c += 3) {
+				const d = fcs[c] - fcs[c - 3];
+
+				if (d > 0)
+					denivPos += d;
+				else
+					denivNeg -= d;
+			}
+
+			// Display
+			if (length) {
+				this.element.innerHTML =
+					// Line length
+					length < 1000 ?
+					(Math.round(length)) + ' m' :
+					(Math.round(length / 10) / 100) + ' km' +
+					// Height difference
+					(denivPos ? ' +' + denivPos + ' m' : '') +
+					(denivNeg ? ' -' + denivNeg + ' m' : '');
+
+				return false; // Continue detection (for editor that has temporary layers)
+			}
+		}
+	}
+
+	getFlatCoordinates(geometry) {
+		let fcs = [];
+
+		if (geometry.stride == 3)
+			fcs = geometry.flatCoordinates;
+
+		if (geometry.getType() == 'GeometryCollection')
+			for (let g of geometry.getGeometries())
+				fcs.push(...this.getFlatCoordinates(g));
+
+		return fcs;
+	}
+}
+
+/**
+ * Control to display the mouse position
+ */
+export class MyMousePosition extends ol.control.MousePosition {
+	constructor(options) {
+		super({
+			projection: 'EPSG:4326',
+			className: 'myol-coordinate',
+			placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
+
+			coordinateFormat: function(mouse) {
+				//BEST find better than window.gpsValues to share info
+				if (window.gpsValues && window.gpsValues.position) {
+					const ll4326 = proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
+						distance = sphere.getDistance(mouse, ll4326);
+
+					return distance < 1000 ?
+						(Math.round(distance)) + ' m' :
+						(Math.round(distance / 10) / 100) + ' km';
+				} else
+					return coordinate.createStringXY(4)(mouse);
+			},
+			...options,
+		});
+	}
+}
+
+/**
+ * Permalink control
+ * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
+ * Don't set view when you declare the map
+ */
+export class Permalink extends MyButton {
+	constructor(opt) {
+		const options = {
+				//BEST init with bbox option
+				init: true, // {true | false} use url hash or localStorage to position the map.
+				setUrl: false, // {true | false} Change url hash when moving the map.
+				display: false, // {true | false} Display permalink link the map.
+				hash: '?', // {?, #} the permalink delimiter after the url
+				...opt,
+			},
+			aEl = document.createElement('a'),
+			urlMod = location.href.replace( // Get value from params with priority url / ? / #
+				/map=([0-9\.]+)\/(-?[0-9\.]+)\/(-?[0-9\.]+)/, // map=<zoom>/<lon>/<lat>
+				'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
+			) +
+			// Last values
+			'zoom=' + localStorage.myol_zoom +
+			'lon=' + localStorage.myol_lon +
+			'lat=' + localStorage.myol_lat +
+			// Default
+			'zoom=6&lon=2&lat=47';
+
+		super({
+			element: document.createElement('div'),
+			render: render,
+		});
+
+		if (options.display) {
+			this.element.className = 'myol-permalink';
+			aEl.innerHTML = 'Permalink';
+			aEl.title = 'Generate a link with map zoom & position';
+			this.element.appendChild(aEl);
+		}
+
+		function render(evt) { //HACK to get map object
+			const view = evt.map.getView();
+
+			// Set center & zoom at the init
+			if (options.init) {
+				options.init = false; // Only once
+
+				view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
+
+				view.setCenter(proj.transform([
+					urlMod.match(/lon=(-?[0-9\.]+)/)[1],
+					urlMod.match(/lat=(-?[0-9\.]+)/)[1],
+				], 'EPSG:4326', 'EPSG:3857'));
+			}
+
+			// Set the permalink with current map zoom & position
+			if (view.getCenter()) {
+				const ll4326 = proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+					newParams = 'map=' +
+					(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
+					(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
+					(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
+
+				if (options.display)
+					aEl.href = options.hash + newParams;
+
+				if (options.setUrl)
+					location.href = '#' + newParams;
+			}
+		}
+	}
+}
+
+/**
+ * Control to display set preload of depth upper level tiles
+ * This prepares the browser to become offline
+ */
+//TODO TEST
+//TODO class
+export function tilesBuffer(opt) {
+	const options = {
+			depth: 3,
+			...opt,
+		},
+		control = new MyButton(); //HACK no button
+
+	control.setMap = function(map) { //HACK execute actions on Map init
+		ol.control.Control.prototype.setMap.call(this, map);
+
+		// Action on each layer
+		//BEST too much load on basic browsing
+		map.on('precompose', () => {
+			map.getLayers().forEach(layer => {
+				if (typeof layer.setPreload == 'function')
+					layer.setPreload(options.depth);
+			});
+		});
+	};
+
+	return control;
 }
 
 /**

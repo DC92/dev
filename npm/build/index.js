@@ -5,7 +5,6 @@ import Editor from '../src/Editor';
 import LayerSwitcher from '../src/LayerSwitcher';
 import Marker from '../src/Marker';
 import MyGeocoder from '../src/MyGeocoder';
-import MyGeolocation from '../src/MyGeolocation';
 import * as myControl from '../src/MyControl';
 import * as myVectorLayer from '../src/MyVectorLayer';
 import * as stylesOptions from '../src/stylesOptions';
@@ -17,7 +16,6 @@ const myol = {
 		Editor: Editor,
 		LayerSwitcher: LayerSwitcher,
 		MyGeocoder: MyGeocoder,
-		MyGeolocation: MyGeolocation,
 		...myControl,
 	},
 	layer: { //BEST mettre dans un répertoire scr/layer
