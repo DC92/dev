@@ -3,21 +3,10 @@
  * Acces to tiles layers services
  */
 
-// Openlayers
-import BingMaps from 'ol/source/BingMaps';
-import OSMSource from 'ol/source/OSM';
-import StamenSource from 'ol/source/Stamen';
-import WMTSTileGrid from 'ol/tilegrid/WMTS';
-import TileLayer from 'ol/layer/Tile';
-import TileWMS from 'ol/source/TileWMS';
-import WMTS from 'ol/source/WMTS';
-import XYZ from 'ol/source/XYZ';
-import * as proj from 'ol/proj';
-
-import ol from '../src/ol'; //TODO
+import ol from '../src/ol';
 
 // Virtual class to replace invalid layer scope by a stub display
-class LimitedTileLayer extends TileLayer {
+class LimitedTileLayer extends ol.layer.Tile {
 	setMapInternal(map) { //HACK execute actions on Map init
 		const altlayer = new Stamen({
 			minResolution: this.getMaxResolution(),
@@ -38,13 +27,13 @@ class LimitedTileLayer extends TileLayer {
 }
 
 // OpenStreetMap & co
-export class OSM extends TileLayer {
+export class OSM extends ol.layer.Tile {
 	constructor(options) {
 		super({
-			source: new XYZ({
+			source: new ol.source.XYZ({
 				url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 				maxZoom: 21,
-				attributions: OSMSource.ATTRIBUTION,
+				attributions: ol.source.OSM.ATTRIBUTION,
 				...options,
 			}),
 			...options,
@@ -116,26 +105,26 @@ export class Thunderforest extends OSM {
  * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
-export class IGN extends TileLayer {
+export class IGN extends ol.layer.Tile {
 	constructor(options) {
 		let IGNresolutions = [],
 			IGNmatrixIds = [];
 
 		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = ol.extent.getWidth(proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 			IGNmatrixIds[i] = i.toString();
 		}
 
 		if (options && options.key) // Don't display if no key provided
 			super({
-				source: new WMTS({
+				source: new ol.source.WMTS({
 					url: 'https://wxs.ign.fr/' + options.key + '/wmts',
 					layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
 					style: 'normal',
 					matrixSet: 'PM',
 					format: 'image/jpeg',
 					attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-					tileGrid: new WMTSTileGrid({
+					tileGrid: new ol.tilegrid.WMTS({
 						origin: [-20037508, 20037508],
 						resolutions: IGNresolutions,
 						matrixIds: IGNmatrixIds,
@@ -163,7 +152,7 @@ export class SwissTopo extends LimitedTileLayer {
 				maxResolution: 300, // Resolution limit above which we switch to a more global service
 				...opt,
 			},
-			projectionExtent = proj.get('EPSG:3857').getExtent(),
+			projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
 			resolutions = [],
 			matrixIds = [];
 
@@ -173,11 +162,11 @@ export class SwissTopo extends LimitedTileLayer {
 		}
 
 		super({
-			source: new WMTS(({
+			source: new ol.source.WMTS(({
 				crossOrigin: 'anonymous',
 				url: options.host + options.subLayer +
 					'/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
-				tileGrid: new WMTSTileGrid({
+				tileGrid: new ol.tilegrid.WMTS({
 					origin: ol.extent.getTopLeft(projectionExtent),
 					resolutions: resolutions,
 					matrixIds: matrixIds,
@@ -193,7 +182,7 @@ export class SwissTopo extends LimitedTileLayer {
 /**
  * Spain
  */
-export class IgnES extends TileLayer {
+export class IgnES extends ol.layer.Tile {
 	constructor(opt) {
 		const options = {
 			host: '//www.ign.es/wmts/',
@@ -203,7 +192,7 @@ export class IgnES extends TileLayer {
 		};
 
 		super({
-			source: new XYZ({
+			source: new ol.source.XYZ({
 				url: options.host + options.server + '?layer=' + options.subLayer +
 					'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
 					'&style=default&tilematrixset=GoogleMapsCompatible' +
@@ -222,7 +211,7 @@ export class IgnES extends TileLayer {
 export class IGM extends LimitedTileLayer {
 	constructor(options) {
 		super({
-			source: new TileWMS({
+			source: new ol.source.TileWMS({
 				url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it', // Not available via https
 				attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
 				...options,
@@ -270,7 +259,7 @@ export class OS extends LimitedTileLayer {
 				extent: [-1198263, 6365000, 213000, 8702260],
 				minResolution: 2,
 				maxResolution: 1700,
-				source: new XYZ({
+				source: new ol.source.XYZ({
 					url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
 						'/{z}/{x}/{y}.png?key=' + options.key,
 					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
@@ -288,7 +277,7 @@ export class OS extends LimitedTileLayer {
 /**
  * ArcGIS (Esri)
  */
-export class ArcGIS extends TileLayer {
+export class ArcGIS extends ol.layer.Tile {
 	constructor(opt) {
 		const options = {
 			host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
@@ -297,7 +286,7 @@ export class ArcGIS extends TileLayer {
 		};
 
 		super({
-			source: new XYZ({
+			source: new ol.source.XYZ({
 				url: options.host + options.subLayer +
 					'/MapServer/tile/{z}/{y}/{x}',
 				maxZoom: 19,
@@ -312,10 +301,10 @@ export class ArcGIS extends TileLayer {
 /**
  * Stamen http://maps.stamen.com
  */
-export class Stamen extends TileLayer {
+export class Stamen extends ol.layer.Tile {
 	constructor(options) {
 		super({
-			source: new StamenSource({
+			source: new ol.source.Stamen({
 				layer: 'terrain',
 				...options,
 			}),
@@ -327,7 +316,7 @@ export class Stamen extends TileLayer {
 /**
  * Google
  */
-export class Google extends TileLayer {
+export class Google extends ol.layer.Tile {
 	constructor(opt) {
 		const options = {
 			subLayers: 'm', // Roads
@@ -335,7 +324,7 @@ export class Google extends TileLayer {
 		};
 
 		super({
-			source: new XYZ({
+			source: new ol.source.XYZ({
 				url: '//mt{0-3}.google.com/vt/lyrs=' + options.subLayers + '&hl=fr&x={x}&y={y}&z={z}',
 				attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
 				...options,
@@ -350,9 +339,9 @@ export class Google extends TileLayer {
  * options.imagerySet: sublayer
  * options.key: Get your own (free) key at https://www.bingmapsportal.com
  * Doc at: https://docs.microsoft.com/en-us/bingmaps/getting-started/
- * attributions: defined by source/BingMaps
+ * attributions: defined by ol/source/BingMaps
  */
-export class Bing extends TileLayer {
+export class Bing extends ol.layer.Tile {
 	constructor(options) {
 		// Hide in LayerSwitcher if no key provided
 		if (!options.key)
@@ -365,7 +354,7 @@ export class Bing extends TileLayer {
 		layer.on('change:visible', function(evt) {
 			if (evt.target.getVisible() && // When the layer becomes visible
 				!layer.getSource()) { // Only once
-				layer.setSource(new BingMaps(options));
+				layer.setSource(new ol.source.BingMaps(options));
 			}
 		});
 	}
@@ -471,11 +460,11 @@ export function demo(options) {
 			subLayer: 'mobile-atlas',
 		}),
 
-		'OS light': new OS({
+		'OS light': new OS({ //TODO DONT WORK
 			...options.os, // Include key
 			subLayer: 'Light_3857',
 		}),
-		'OS road': new OS({
+		'OS road': new OS({ //TODO DONT WORK
 			...options.os, // Include key
 			subLayer: 'Road_3857',
 		}),
@@ -519,6 +508,6 @@ export function demo(options) {
 		'Watercolor': new Stamen({
 			layer: 'watercolor',
 		}),
-		'Blank': new TileLayer(),
+		'Blank': new ol.layer.Tile(),
 	};
 }

@@ -7,6 +7,7 @@ import Feature from 'ol/Feature';
 import Geolocation from 'ol/Geolocation';
 import Map from 'ol/Map';
 import View from 'ol/View';
+import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import * as control from 'ol/control';
 import * as coordinate from 'ol/coordinate';
 import * as extent from 'ol/extent';
@@ -46,12 +47,19 @@ export default {
 	loadingstrategy: loadingstrategy,
 	proj: proj,
 	source: {
+		BingMaps: source.BingMaps,
 		Cluster: source.Cluster,
 		OSM: source.OSM,
 		Stamen: source.Stamen,
+		TileWMS: source.TileWMS,
 		Vector: source.Vector,
+		WMTS: source.WMTS,
+		XYZ: source.XYZ,
 	},
 	sphere: sphere,
 	style: style,
+	tilegrid: {
+		WMTS: WMTSTileGrid,
+	},
 	View: View,
 };
