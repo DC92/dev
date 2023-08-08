@@ -811,7 +811,7 @@ export function collection(opt) {
 		new ol.control.Zoom(options.zoom),
 		new ol.control.FullScreen(options.fullScreen),
 		new MyGeocoder(options.geocoder),
-		new MyGeolocation(options.geolocation), //TODO BUG (!) Circular dependency src/MyControl.js -> src/MyGeolocation.js -> src/MyControl.js
+		new MyGeolocation(options.geolocation),
 		new Load(options.load),
 		new Download(options.download),
 		new Print(options.print),

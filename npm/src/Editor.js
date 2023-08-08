@@ -3,20 +3,9 @@
  * geoJson lines & polygons edit
  */
 
-// Openlayers
-import Control from 'ol/control/Control';
-import Draw from 'ol/interaction/Draw';
-import Feature from 'ol/Feature';
-import GeoJSON from 'ol/format/GeoJSON';
-import LineString from 'ol/geom/LineString';
-import Modify from 'ol/interaction/Modify';
-import Polygon from 'ol/geom/Polygon';
-import Snap from 'ol/interaction/Snap';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import * as style from 'ol/style';
+import Control from 'ol/control/Control'; //TODO RESORB with class
 
-import ol from '../src/ol'; //TODO
+import ol from '../src/ol';
 import './editor.css';
 import * as myControl from './MyControl';
 
@@ -24,7 +13,7 @@ import * as myControl from './MyControl';
 //BEST make it a class
 export default function Editor(opt) {
 	const options = {
-			format: new GeoJSON(),
+			format: new ol.format.GeoJSON(),
 			projection: 'EPSG:3857',
 			geoJsonId: 'editable-json', // Option geoJsonId : html element id of the geoJson features to be edited
 			focus: false, // Zoom the map on the loaded features
@@ -72,14 +61,14 @@ export default function Editor(opt) {
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? JSON.parse(geoJsonEl.value) : '', //BEST JSONparse
-		styleDisplay = new style.Style({
+		styleDisplay = new ol.style.Style({
 			// Lines or polygons border
-			stroke: new style.Stroke({
+			stroke: new ol.style.Stroke({
 				color: 'red',
 				width: 2,
 			}),
 			// Polygons
-			fill: new style.Fill({
+			fill: new ol.style.Fill({
 				color: 'rgba(0,0,255,0.2)',
 			}),
 		}),
@@ -93,25 +82,25 @@ export default function Editor(opt) {
 			};
 
 			return [
-				new style.Style({
-					image: new style.Circle({ // Marker
+				new ol.style.Style({
+					image: new ol.style.Circle({ // Marker
 						radius: 4,
-						stroke: new style.Stroke({
+						stroke: new ol.style.Stroke({
 							color: 'red',
 							width: 2,
 						}),
 					}),
-					stroke: new style.Stroke({ // Lines or polygons border
+					stroke: new ol.style.Stroke({ // Lines or polygons border
 						color: 'red',
 						width: 4,
 					}),
-					fill: new style.Fill({ // Polygons
+					fill: new ol.style.Fill({ // Polygons
 						color: 'rgba(255,0,0,0.3)',
 					}),
-					text: new style.Text(textStyle), // Direction
+					text: new ol.style.Text(textStyle), // Direction
 				}),
-				new style.Style({
-					text: new style.Text({
+				new ol.style.Style({
+					text: new ol.style.Text({
 						...textStyle,
 						textAlign: 'start',
 						text: 'A',
@@ -120,34 +109,34 @@ export default function Editor(opt) {
 			];
 		},
 		features = options.readFeatures(),
-		source = new VectorSource({
+		source = new ol.source.Vector({
 			features: features,
 			wrapX: false,
 		}),
-		layer = new VectorLayer({
+		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 20, // Editor & cursor : above the features
 			style: styleDisplay,
 		}),
 		interactions = [
-			new Modify({ // 0 Modify
+			new ol.interaction.Modify({ // 0 Modify
 				source: source,
 				pixelTolerance: 16, // Default is 10
 				style: editStyle,
 			}),
-			new Draw({ // 1 drawLine
+			new ol.interaction.Draw({ // 1 drawLine
 				style: editStyle,
 				source: source,
 				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
 				type: 'LineString',
 			}),
-			new Draw({ // 2 drawPoly
+			new ol.interaction.Draw({ // 2 drawPoly
 				style: editStyle,
 				source: source,
 				stopClick: true, // Avoid zoom when you finish drawing by doubleclick
 				type: 'Polygon',
 			}),
-			new Snap({ // 3 snap
+			new ol.interaction.Snap({ // 3 snap
 				source: source,
 				pixelTolerance: 7.5, // 6 + line width / 2 : default is 10
 			}),
@@ -323,12 +312,12 @@ export default function Editor(opt) {
 		source.clear();
 
 		for (let l in coordinates.lines)
-			source.addFeature(new Feature({
-				geometry: new LineString(coordinates.lines[l]),
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.LineString(coordinates.lines[l]),
 			}));
 		for (let p in coordinates.polys)
-			source.addFeature(new Feature({
-				geometry: new Polygon(coordinates.polys[p]),
+			source.addFeature(new ol.Feature({
+				geometry: new ol.geom.Polygon(coordinates.polys[p]),
 			}));
 
 		// Save geometries in <EL> as geoJSON at every change
@@ -402,7 +391,7 @@ export default function Editor(opt) {
 		for (let p1 in polys) // Explore all Polygons combinaison
 			if (holes && // Make holes option
 				polys[p1]) {
-				const fs = new Polygon(polys[p1]);
+				const fs = new ol.geom.Polygon(polys[p1]);
 				for (let p2 in polys)
 					if (polys[p2] && p1 != p2) {
 						let intersects = true;

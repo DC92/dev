@@ -18,8 +18,6 @@ import Feature from 'ol/Feature';
 import Icon from 'ol/style/Icon';
 import Point from 'ol/geom/Point';
 import Pointer from 'ol/interaction/Pointer';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
 import * as coordinate from 'ol/coordinate';
 import * as olProj4 from 'ol/proj/proj4';
 import * as proj from 'ol/proj';
@@ -34,10 +32,10 @@ export default function Marker(opt) {
 		},
 		els = [],
 		point = new Point(options.position),
-		source = new VectorSource({
+		source = new ol.source.Vector({
 			features: [new Feature(point)],
 		}),
-		layer = new VectorLayer({
+		layer = new ol.layer.Vector({
 			source: source,
 			zIndex: 1000, // Above points
 			style: new style.Style({

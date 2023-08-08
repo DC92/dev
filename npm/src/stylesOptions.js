@@ -6,10 +6,7 @@
  *   layer : that owns the feature
  */
 
-import Icon from 'ol/style/Icon';
-import * as style from 'ol/style';
-
-import ol from '../src/ol'; //TODO
+import ol from '../src/ol';
 
 // Basic style to display a geo vector layer based on standard properties
 export function basic(feature, layer) {
@@ -17,18 +14,18 @@ export function basic(feature, layer) {
 
 	return [{
 		// Point
-		image: properties.icon ? new Icon({
+		image: properties.icon ? new ol.style.Icon({
 			src: properties.icon,
 		}) : null,
 
 		// Lines
-		stroke: new style.Stroke({
+		stroke: new ol.style.Stroke({
 			color: 'blue',
 			width: 2,
 		}),
 
 		// Polygons
-		fill: new style.Fill({
+		fill: new ol.style.Fill({
 			color: 'rgba(0,0,256,0.3)',
 		}),
 
@@ -48,7 +45,7 @@ export function label(feature, layer) {
 		elLabel.innerHTML = properties.label; //HACK to render the html entities in the canvas
 
 		return {
-			text: new style.Text({
+			text: new ol.style.Text({
 				text: elLabel.innerHTML,
 				overflow: properties.overflow, // Display label even if not contained in polygon
 				textBaseline: featureArea ? 'middle' : 'bottom',
@@ -56,13 +53,13 @@ export function label(feature, layer) {
 				padding: [1, 1, -1, 3],
 				//BEST line & poly label following the cursor
 				font: '12px Verdana',
-				fill: new style.Fill({
+				fill: new ol.style.Fill({
 					color: 'black',
 				}),
-				backgroundFill: new style.Fill({
+				backgroundFill: new ol.style.Fill({
 					color: 'white',
 				}),
-				backgroundStroke: new style.Stroke({
+				backgroundStroke: new ol.style.Stroke({
 					color: 'blue',
 				}),
 			}),
@@ -74,16 +71,16 @@ export function label(feature, layer) {
 export function cluster(feature, layer) {
 	//TODO pourquoi itère sur render ?
 	return [{
-		image: new style.Circle({
+		image: new ol.style.Circle({
 			radius: 14,
-			stroke: new style.Stroke({
+			stroke: new ol.style.Stroke({
 				color: 'blue',
 			}),
-			fill: new style.Fill({
+			fill: new ol.style.Fill({
 				color: 'white',
 			}),
 		}),
-		text: new style.Text({
+		text: new ol.style.Text({
 			text: feature.getProperties().cluster.toString(),
 			font: '12px Verdana',
 		}),
@@ -153,7 +150,7 @@ export function hover(feature, layer) {
 	return {
 		...details(...arguments),
 
-		stroke: new style.Stroke({
+		stroke: new ol.style.Stroke({
 			color: 'red',
 			width: 2,
 		}),

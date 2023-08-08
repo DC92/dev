@@ -12,7 +12,7 @@ import Geocoder from '../geocoder/src/base';
 export default class MyGeocoder extends Geocoder {
 	constructor(options) {
 		super('nominatim', {
-			provider: 'photon',
+			provider: 'photon', //TODO BUG no fit
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 			...options,
 		});

@@ -2,20 +2,7 @@
  * MyVectorLayer.js
  * Facilities to vector layers
  */
-
-//BEST verify if all are used
-import Cluster from 'ol/source/Cluster';
-import Feature from 'ol/Feature';
-import GeoJSON from 'ol/format/GeoJSON';
-import Point from 'ol/geom/Point';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import * as loadingstrategy from 'ol/loadingstrategy';
-import * as proj from 'ol/proj';
-import * as style from 'ol/style';
-
-// MyOl
-import ol from '../src/ol'; //TODO
+import ol from '../src/ol';
 import * as stylesOptions from './stylesOptions';
 
 /**
@@ -23,14 +10,14 @@ import * as stylesOptions from './stylesOptions';
  * url calculation
  * display the loading status
  */
-class MyVectorSource extends VectorSource {
+class MyVectorSource extends ol.source.Vector {
 	constructor(opt) {
 		const options = {
 				// host: '',
 				// query: (extent, resolution, projection ,options) => ({_path: '...'}), // this = options
 				url: url_, // (extent, resolution, projection)
 				bbox: bbox_, // (extent, resolution, projection)
-				strategy: loadingstrategy.bbox,
+				strategy: ol.loadingstrategy.bbox,
 				projection: 'EPSG:4326',
 				addProperties: (properties) => {}, // (default) add properties to each received features
 
@@ -39,7 +26,7 @@ class MyVectorSource extends VectorSource {
 			statusEl = document.getElementById(options.selectName + '-status');
 
 		super({
-			format: new GeoJSON({ //TODO treat & display JSON errors
+			format: new ol.format.GeoJSON({ //TODO treat & display JSON errors
 				dataProjection: options.projection,
 			}),
 
@@ -70,7 +57,7 @@ class MyVectorSource extends VectorSource {
 			const args = options.query(...arguments, options),
 				url = options.host + args._path; // Mem _path
 
-			if (options.strategy == loadingstrategy.bbox)
+			if (options.strategy == ol.loadingstrategy.bbox)
 				args.bbox = options.bbox(...arguments);
 
 			// Clean null & not relative parameters
@@ -83,7 +70,7 @@ class MyVectorSource extends VectorSource {
 		}
 
 		function bbox_(extent, resolution, projection) {
-			return proj.transformExtent(
+			return ol.proj.transformExtent(
 				extent,
 				projection,
 				options.projection, // Received projection
@@ -99,7 +86,7 @@ class MyVectorSource extends VectorSource {
 /**
  * Cluster source to manage clusters in the browser
  */
-class MyClusterSource extends Cluster {
+class MyClusterSource extends ol.source.Cluster {
 	constructor(options) {
 		super({
 			distance: options.browserClusterMinDistance,
@@ -121,7 +108,7 @@ class MyClusterSource extends Cluster {
 				if (featurePixelPerimeter > options.browserClusterFeaturelMaxPerimeter)
 					this.addFeature(feature);
 				else
-					return new Point(ol.extent.getCenter(feature.getGeometry().getExtent()));
+					return new ol.geom.Point(ol.extent.getCenter(feature.getGeometry().getExtent()));
 			}
 		}
 
@@ -148,7 +135,7 @@ class MyClusterSource extends Cluster {
 				lines = ['Cliquer pour zoomer'];
 
 			// Display a cluster point
-			return new Feature({
+			return new ol.Feature({
 				id: features[0].getId(), // Pseudo id = the id of the first feature in the cluster
 				name: stylesOptions.agregateText(lines),
 				geometry: point, // The gravity center of all the features in the cluster
@@ -167,7 +154,7 @@ class MyClusterSource extends Cluster {
 /**
  * Browser & server clustered layer
  */
-class MyBrowserClusterVectorLayer extends VectorLayer {
+class MyBrowserClusterVectorLayer extends ol.layer.Vector {
 	constructor(options) {
 		super({
 			//browserClusterMinDistance:50, // (pixels) distance above which the browser clusterises
@@ -246,7 +233,7 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
 					stylesOptions.cluster;
 
 				return sof(feature, this) // Call the styleOptions function
-					.map(so => new style.Style(so)); // Transform into an array of Style objects
+					.map(so => new ol.style.Style(so)); // Transform into an array of Style objects
 			},
 		};
 
@@ -266,10 +253,10 @@ export class MyVectorLayer extends MyServerClusterVectorLayer {
  * Display the hovered feature with the hover style
  * Go to the link property when click a feature
  */
-export class Hover extends VectorLayer {
+export class Hover extends ol.layer.Vector {
 	constructor() {
 		super({
-			source: new VectorSource(),
+			source: new ol.source.Vector(),
 			zIndex: 200, // Above the vector layers
 		});
 	}
@@ -367,7 +354,7 @@ export class Hover extends VectorLayer {
 				const f = hoveredSubFeature.clone();
 
 				f.setStyle(
-					new style.Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
+					new ol.style.Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
 				);
 
 				source.clear();
