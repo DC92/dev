@@ -9,10 +9,10 @@ import '../node_modules/@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import '../src/myGeocoder.css'; // After ol-geocoder.css
 import Geocoder from '../geocoder/src/base';
 
-
 export default class MyGeocoder extends Geocoder {
 	constructor(options) {
 		super('nominatim', {
+			provider: 'photon',
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 			...options,
 		});

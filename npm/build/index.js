@@ -12,7 +12,7 @@ import * as tileLayercollection from '../src/TileLayerCollection';
 import * as vectorLayerCollection from '../src/VectorLayerCollection';
 
 const myol = {
-	control: { //BEST mettre dans un répertoire scr/control
+	control: {
 		Editor: Editor,
 		LayerSwitcher: LayerSwitcher,
 		MyGeocoder: MyGeocoder,

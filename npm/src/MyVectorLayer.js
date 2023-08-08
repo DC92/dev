@@ -10,14 +10,13 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Point from 'ol/geom/Point';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import * as olExtent from 'ol/extent';
 import * as loadingstrategy from 'ol/loadingstrategy';
 import * as proj from 'ol/proj';
 import * as style from 'ol/style';
 
 // MyOl
+import ol from '../src/ol'; //TODO
 import * as stylesOptions from './stylesOptions';
-
 
 /**
  * GeoJSON vector display
@@ -122,7 +121,7 @@ class MyClusterSource extends Cluster {
 				if (featurePixelPerimeter > options.browserClusterFeaturelMaxPerimeter)
 					this.addFeature(feature);
 				else
-					return new Point(olExtent.getCenter(feature.getGeometry().getExtent()));
+					return new Point(ol.extent.getCenter(feature.getGeometry().getExtent()));
 			}
 		}
 
@@ -320,7 +319,7 @@ export class Hover extends VectorLayer {
 		if (hoveredFeature) {
 			const hoveredProperties = hoveredFeature.getProperties(),
 				featurePosition = map.getPixelFromCoordinate(
-					olExtent.getCenter(hoveredFeature.getGeometry().getExtent())
+					ol.extent.getCenter(hoveredFeature.getGeometry().getExtent())
 				);
 
 			// Find sub-feature from a spread cluster

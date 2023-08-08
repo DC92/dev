@@ -6,11 +6,10 @@
  *   layer : that owns the feature
  */
 
-//BEST verify if all are used
 import Icon from 'ol/style/Icon';
-import * as olExtent from 'ol/extent';
 import * as style from 'ol/style';
 
+import ol from '../src/ol'; //TODO
 
 // Basic style to display a geo vector layer based on standard properties
 export function basic(feature, layer) {
@@ -43,7 +42,7 @@ export function label(feature, layer) {
 	const properties = feature.getProperties();
 
 	if (properties.label) {
-		const featureArea = olExtent.getArea(feature.getGeometry().getExtent()),
+		const featureArea = ol.extent.getArea(feature.getGeometry().getExtent()),
 			elLabel = document.createElement('span');
 
 		elLabel.innerHTML = properties.label; //HACK to render the html entities in the canvas

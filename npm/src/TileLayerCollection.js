@@ -12,9 +12,9 @@ import TileLayer from 'ol/layer/Tile';
 import TileWMS from 'ol/source/TileWMS';
 import WMTS from 'ol/source/WMTS';
 import XYZ from 'ol/source/XYZ';
-import * as olExtent from 'ol/extent';
 import * as proj from 'ol/proj';
 
+import ol from '../src/ol'; //TODO
 
 // Virtual class to replace invalid layer scope by a stub display
 class LimitedTileLayer extends TileLayer {
@@ -122,7 +122,7 @@ export class IGN extends TileLayer {
 			IGNmatrixIds = [];
 
 		for (let i = 0; i < 18; i++) {
-			IGNresolutions[i] = olExtent.getWidth(proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
+			IGNresolutions[i] = ol.extent.getWidth(proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 			IGNmatrixIds[i] = i.toString();
 		}
 
@@ -168,7 +168,7 @@ export class SwissTopo extends LimitedTileLayer {
 			matrixIds = [];
 
 		for (let r = 0; r < 18; ++r) {
-			resolutions[r] = olExtent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
+			resolutions[r] = ol.extent.getWidth(projectionExtent) / 256 / Math.pow(2, r);
 			matrixIds[r] = r;
 		}
 
@@ -178,7 +178,7 @@ export class SwissTopo extends LimitedTileLayer {
 				url: options.host + options.subLayer +
 					'/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
 				tileGrid: new WMTSTileGrid({
-					origin: olExtent.getTopLeft(projectionExtent),
+					origin: ol.extent.getTopLeft(projectionExtent),
 					resolutions: resolutions,
 					matrixIds: matrixIds,
 				}),

@@ -29,28 +29,14 @@ function couchePointsWRI(options) {
 
 		hoverStylesOptions: (feature, layer) => {
 			// Construction de l'étiquette détaillée
-			const properties = feature.getProperties(),
-				caracteristiques = [],
-				lignes = [];
+			const properties = feature.getProperties();
 
 			// Si c'est un cluster, on affiche comme d'habitude
 			if (properties.cluster)
 				return myol.stylesOptions.hover(feature, layer);
 
-			// Calcul de la deuxième ligne
-			if (properties.coord && properties.coord.alt)
-				caracteristiques.push(parseInt(properties.coord.alt) + ' m');
-			if (properties.places && properties.places.valeur)
-				caracteristiques.push(parseInt(properties.places.valeur) + '\u255E\u2550\u2555');
-
-			// Calcul des lignes de l'étiquette
-			lignes.push(properties.name);
-			if (caracteristiques.length)
-				lignes.push(caracteristiques.join(','));
-			lignes.push(properties.type.valeur);
-
 			feature.setProperties({
-				label: lignes.join('\n'),
+				label: etiquetteComplette(properties),
 			}, true);
 
 			return myol.stylesOptions.label(feature, layer);
@@ -61,6 +47,26 @@ function couchePointsWRI(options) {
 	layer.options.selectMassif.callbacks.push(() => layer.reload());
 
 	return layer;
+}
+
+// fabrique le texte de l'étiquette à partir des propriétés reçues du serveur
+function etiquetteComplette(properties) {
+	const caracteristiques = [],
+		lignes = [];
+
+	// On calcule d'abord la deuxième ligne
+	if (properties.coord && properties.coord.alt)
+		caracteristiques.push(parseInt(properties.coord.alt) + ' m');
+	if (properties.places && properties.places.valeur)
+		caracteristiques.push(parseInt(properties.places.valeur) + '\u255E\u2550\u2555');
+
+	// Calcul des lignes de l'étiquette
+	lignes.push(properties.name);
+	if (caracteristiques.length)
+		lignes.push(caracteristiques.join(','));
+	lignes.push(properties.type.valeur);
+
+	return lignes.join('\n');
 }
 
 // La couche des massifs colorés (accueil et couche carte nav)
@@ -152,7 +158,7 @@ function controlesCartes(page) {
 		new ol.control.Zoom(),
 		new ol.control.FullScreen(),
 		new myol.control.MyGeocoder(),
-		myol.control.MyGeolocation(),
+		new myol.control.MyGeolocation(),
 		'nav,edit,modif'.includes(page) ? new myol.control.Load() : new myol.control.MyButton(),
 		'point,edit,modif'.includes(page) ? new myol.control.Download() : new myol.control.MyButton(),
 		'nav,point'.includes(page) ? new myol.control.Print() : new myol.control.MyButton(),

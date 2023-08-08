@@ -12,6 +12,8 @@
 import proj4Lib from 'proj4/lib/index';
 
 // Openlayers
+import ol from '../src/ol'; //TODO
+
 import Feature from 'ol/Feature';
 import Icon from 'ol/style/Icon';
 import Point from 'ol/geom/Point';
@@ -19,11 +21,9 @@ import Pointer from 'ol/interaction/Pointer';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import * as coordinate from 'ol/coordinate';
-import * as olExtent from 'ol/extent';
 import * as olProj4 from 'ol/proj/proj4';
 import * as proj from 'ol/proj';
 import * as style from 'ol/style';
-
 
 // Layer to display a marker
 //BEST make it a class
@@ -164,7 +164,7 @@ export default function Marker(opt) {
 
 		const ll3857 = proj.transform(ll4326, 'EPSG:4326', 'EPSG:3857'),
 			inEPSG21781 = typeof proj4Lib == 'function' &&
-			olExtent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
+			ol.extent.containsCoordinate([664577, 5753148, 1167741, 6075303], ll3857);
 
 		// Move the marker
 		point.setCoordinates(ll3857);

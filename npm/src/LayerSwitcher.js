@@ -4,7 +4,6 @@
 import './layerSwitcher.css';
 import * as myControl from './MyControl';
 
-
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST no lift when open/close submenu
 //BEST make it a class

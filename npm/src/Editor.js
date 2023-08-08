@@ -14,13 +14,11 @@ import Polygon from 'ol/geom/Polygon';
 import Snap from 'ol/interaction/Snap';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import * as olExtent from 'ol/extent';
 import * as style from 'ol/style';
 
-// MyOl
+import ol from '../src/ol'; //TODO
 import './editor.css';
 import * as myControl from './MyControl';
-
 
 // Editor
 //BEST make it a class
@@ -171,10 +169,10 @@ export default function Editor(opt) {
 
 		// Zoom the map on the loaded features
 		if (options.focus && features.length) {
-			const extent = olExtent.createEmpty(); // For focus on all features calculation
+			const extent = ol.extent.createEmpty(); // For focus on all features calculation
 
 			for (let f in features)
-				olExtent.extend(extent, features[f].getGeometry().getExtent());
+				ol.extent.extend(extent, features[f].getGeometry().getExtent());
 
 			map.getView().fit(
 				extent, {

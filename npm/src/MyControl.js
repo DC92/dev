@@ -3,13 +3,6 @@
  * Add some usefull controls
  */
 
-// Openlayers //TODO RESORB
-import * as coordinate from 'ol/coordinate';
-import * as olExtent from 'ol/extent';
-import * as proj from 'ol/proj';
-import * as sphere from 'ol/sphere';
-import * as style from 'ol/style';
-
 import ol from '../src/ol';
 import './MyControl.css';
 import MyGeocoder from './MyGeocoder';
@@ -82,137 +75,138 @@ export class MyButton extends ol.control.Control {
 
 /**
  * Geolocation control
+ * Display status, altitude & speed
  */
-//TODO resorb
-import Control from 'ol/control/Control';
-import Feature from 'ol/Feature';
-import Geolocation from 'ol/Geolocation';
-import GeometryCollection from 'ol/geom/GeometryCollection';
-import LineString from 'ol/geom/LineString';
-import MultiLineString from 'ol/geom/MultiLineString';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
+export class MyGeolocation extends MyButton {
+	constructor(opt) {
+		const options = {
+				...opt,
+			},
+			subMenu = location.href.match(/(https|localhost)/) ?
+			//BEST use .html content / option
+			'<p>Localisation GPS:</p>' +
+			'<label>' +
+			'<input type="radio" name="myol-gps-source" value="0" checked="checked" />' +
+			'Inactif</label><label>' +
+			'<input type="radio" name="myol-gps-source" value="1" />' +
+			'Position GPS <span>(1) extérieur</span></label><label>' +
+			'<input type="radio" name="myol-gps-source" value="2" />' +
+			'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
+			'<input type="radio" name="myol-gps-display" value="0" checked="checked" />' +
+			'Graticule, carte libre</label><label>' +
+			'<input type="radio" name="myol-gps-display" value="1" />' +
+			'Centre la carte, nord en haut</label><label>' +
+			'<input type="radio" name="myol-gps-display" value="2" />' +
+			'Centre et oriente la carte <span>(3)</span></label>' +
 
-export default function MyGeolocation(options) {
-	const subMenu = location.href.match(/(https|localhost)/) ?
-		//BEST use .html content / option
-		'<p>Localisation GPS:</p>' +
-		'<label>' +
-		'<input type="radio" name="myol-gps-source" value="0" ctrlonchange="renderGPS" checked="checked" />' +
-		'Inactif</label><label>' +
-		'<input type="radio" name="myol-gps-source" value="1" ctrlonchange="renderGPS" />' +
-		'Position GPS <span>(1) extérieur</span></label><label>' +
-		'<input type="radio" name="myol-gps-source" value="2" ctrlonchange="renderGPS" />' +
-		'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
-		'<input type="radio" name="myol-gps-display" value="0" ctrlonchange="renderGPS" checked="checked" />' +
-		'Graticule, carte libre</label><label>' +
-		'<input type="radio" name="myol-gps-display" value="1" ctrlonchange="renderGPS" />' +
-		'Centre la carte, nord en haut</label><label>' +
-		'<input type="radio" name="myol-gps-display" value="2" ctrlonchange="renderGPS" />' +
-		'Centre et oriente la carte <span>(3)</span></label>' +
+			'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+			'nécessite un capteur et une réception GPS.</p>' +
+			'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
+			'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
+			'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
+			'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.</p>' :
 
-		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
-		'nécessite un capteur et une réception GPS.</p>' +
-		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
-		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
-		'Utilise les position des points WiFi proches en plus du GPS dont il peut se passer.</p>' +
-		'<p>(3) nécessite un capteur magnétique et un explorateur le supportant.</p>' :
+			// Si on est en http
+			'<p>L&apos;utilisation du GPS nécessite https</p>' +
+			'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>';
 
-		// Si on est en http
-		'<p>L&apos;utilisation du GPS nécessite https</p>' +
-		'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>',
-
-		// Display status, altitude & speed
-		control = new MyButton({
+		super({
 			className: 'myol-button-gps',
 			label: '&#x2295;',
 			submenuHTML: subMenu,
 			...options,
-		}),
+		});
+
+// Add status display element
+		this.statusEl = document.createElement('p');
+		this.element.appendChild(this.statusEl);
+
+		// Register action listeners
+		this.element.querySelectorAll('input')
+			.forEach(el => {
+				 			el.onchange ||= evt => this.change(evt);
+			});
 
 		// Graticule
-		graticuleFeature = new Feature(), //BEST Use layer Graticule
-		northGraticuleFeature = new Feature(),
-		graticuleLayer = new ol.layer.Vector({
-			source: new VectorSource({
-				features: [graticuleFeature, northGraticuleFeature],
+		this.graticuleFeature = new ol.Feature(); //BEST Use layer Graticule
+		this.northGraticuleFeature = new ol.Feature();
+
+		this.graticuleLayer = new ol.layer.Vector({
+			source: new ol.source.Vector({
+				features: [this.graticuleFeature, this.northGraticuleFeature],
 			}),
 			zIndex: 20, // Above the features
-			style: new style.Style({
-				fill: new style.Fill({
+			style: new ol.style.Style({
+				fill: new ol.style.Fill({
 					color: 'rgba(128,128,255,0.2)',
 				}),
-				stroke: new style.Stroke({
+				stroke: new ol.style.Stroke({
 					color: '#20b',
 					lineDash: [16, 14],
 					width: 1,
 				}),
 			}),
-		}),
-		statusEl = document.createElement('p');
+		});
 
-	control.element.appendChild(statusEl);
+		this.graticuleFeature.setStyle(new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: '#000',
+				lineDash: [16, 14],
+				width: 1,
+			}),
+		}));
 
-	graticuleFeature.setStyle(new style.Style({
-		stroke: new style.Stroke({
-			color: '#000',
-			lineDash: [16, 14],
-			width: 1,
-		}),
-	}));
+		this.northGraticuleFeature.setStyle(new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: '#c00',
+				lineDash: [16, 14],
+				width: 1,
+			}),
+		}));
 
-	northGraticuleFeature.setStyle(new style.Style({
-		stroke: new style.Stroke({
-			color: '#c00',
-			lineDash: [16, 14],
-			width: 1,
-		}),
-	}));
+		window.gpsValues = {}; // Store the measures for internal use & other controls
 
-	let geolocation;
-	window.gpsValues = {}; // Store the measures for internal use & other controls
+		// Browser heading from the inertial & magnetic sensors
+		window.addEventListener('deviceorientationabsolute',  evt=> {
+			window.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
+			 		this.change(evt); 
+		});
+	}
 
-	control.setMap = function(map) { //HACK execute actions on Map init
-		Control.prototype.setMap.call(this, map);
+	setMap(map) {
+		super.setMap(map);
 
-		map.addLayer(graticuleLayer);
-		map.on('moveend', control.renderGPS); // Refresh graticule after map zoom
+		map.addLayer(this.graticuleLayer);
+		map.on('moveend', evt => this.change(evt)); // Refresh graticule after map zoom
 
-		geolocation = new Geolocation({
+		this.geolocation = new ol.Geolocation({
 			projection: map.getView().getProjection(),
 			trackingOptions: {
 				enableHighAccuracy: true,
 				maximumAge: 1000,
 				timeout: 1000,
-				...options,
+				...this.options, //TODO séparer les options pour Geolocation / et autres
 			},
 		});
-		geolocation.on('change', control.renderGPS);
-		geolocation.on('error', function(error) {
+		 this.geolocation.on('change', evt=>this.change(evt));
+		this.geolocation.on('error', function(error) {
 			console.log('Geolocation error: ' + error.message);
 		});
+	}
 
-		// Browser heading from the inertial & magnetic sensors
-		window.addEventListener('deviceorientationabsolute', function(evt) {
-			window.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			control.renderGPS(evt);
-		});
-	};
-
-	// Trigered by <input ... ctrlOnChange="renderGPS" />
-	control.renderGPS = function(evt) {
+	change(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
 			displayEls = document.getElementsByName('myol-gps-display'),
 			sourceLevel = sourceLevelEl ? parseInt(sourceLevelEl.value) : 0, // On/off, GPS, GPS&WiFi
 			displayLevel = displayLevelEl ? parseInt(displayLevelEl.value) : 0, // Graticule & sourceLevel
-			map = control.getMap(),
+			map = this.getMap(),
 			view = map ? map.getView() : null;
 
 		// Tune the tracking level
 		if (evt.target.name == 'myol-gps-source') {
-			geolocation.setTracking(sourceLevel > 0);
-			graticuleLayer.setVisible(false);
+			this.geolocation.setTracking(sourceLevel > 0);
+			this.graticuleLayer.setVisible(false);
 			window.gpsValues = {}; // Reset the values
 			if (!sourceLevel)
 				displayEls[0].checked = true;
@@ -222,7 +216,7 @@ export default function MyGeolocation(options) {
 
 		// Get geolocation values
 		['Position', 'AccuracyGeometry', 'Speed', 'Altitude'].forEach(valueName => {
-			const value = geolocation['get' + valueName]();
+			const value = this.geolocation['get' + valueName]();
 			if (value)
 				window.gpsValues[valueName.toLowerCase()] = value;
 		});
@@ -240,7 +234,7 @@ export default function MyGeolocation(options) {
 				far = Math.hypot(hg[0] - bd[0], hg[1] - bd[1]) * 10,
 				// The graticule
 				geometry = [
-					new MultiLineString([
+					new ol.geom.MultiLineString([
 						[
 							[p[0] - far, p[1]],
 							[p[0] + far, p[1]]
@@ -253,7 +247,7 @@ export default function MyGeolocation(options) {
 				],
 				// Color north in red
 				northGeometry = [
-					new LineString([
+					new ol.geom.LineString([
 						[p[0], p[1]],
 						[p[0], p[1] + far]
 					]),
@@ -263,8 +257,8 @@ export default function MyGeolocation(options) {
 			if (window.gpsValues.accuracygeometry)
 				geometry.push(window.gpsValues.accuracygeometry);
 
-			graticuleFeature.setGeometry(new GeometryCollection(geometry));
-			northGraticuleFeature.setGeometry(new GeometryCollection(northGeometry));
+			this.graticuleFeature.setGeometry(new ol.geom.GeometryCollection(geometry));
+			this.northGraticuleFeature.setGeometry(new ol.geom.GeometryCollection(northGeometry));
 
 			// Center the map
 			if (displayLevel > 0)
@@ -284,10 +278,10 @@ export default function MyGeolocation(options) {
 				view.setZoom(17);
 
 				// Close submenu when GPS locates
-				control.element.classList.remove('myol-button-hover');
-				control.element.classList.remove('myol-button-selected');
+				this.element.classList.remove('myol-button-hover');
+				this.element.classList.remove('myol-button-selected');
 			}
-			graticuleLayer.setVisible(true);
+			this.graticuleLayer.setVisible(true);
 		} else
 			view.setRotation(0); // Return to inactive state
 
@@ -298,15 +292,13 @@ export default function MyGeolocation(options) {
 			if (window.gpsValues.speed)
 				status += ' ' + (Math.round(window.gpsValues.speed * 36) / 10) + ' km/h';
 		}
-		if (statusEl)
-			statusEl.innerHTML = sourceLevel ? status : '';
+		if (this.statusEl)
+			this.statusEl.innerHTML = sourceLevel ? status : '';
 
 		// Close the submenu
 		if (evt.target.name) // Only when an input is hit
-			control.element.classList.remove('myol-display-submenu');
-	};
-
-	return control;
+			this.element.classList.remove('myol-display-submenu');
+	}
 }
 
 /**
@@ -379,8 +371,8 @@ export class Load extends MyButton {
 					style: function(feature) {
 						const properties = feature.getProperties();
 
-						return new style.Style({
-							stroke: new style.Stroke({
+						return new ol.style.Style({
+							stroke: new ol.style.Stroke({
 								color: 'blue',
 								width: 3,
 							}),
@@ -397,7 +389,7 @@ export class Load extends MyButton {
 			// Zoom the map on the added features
 			const fileExtent = gpxSource.getExtent();
 
-			if (olExtent.isEmpty(fileExtent))
+			if (ol.extent.isEmpty(fileExtent))
 				alert('Ce fichier ne comporte pas de points ni de trace');
 			else
 				map.getView().fit(
@@ -632,7 +624,7 @@ export class LengthLine extends MyButton {
 	calculateLength(feature) {
 		if (feature) {
 			let geometry = feature.getGeometry(),
-				length = sphere.getLength(geometry),
+				length = ol.sphere.getLength(geometry),
 				fcs = this.getFlatCoordinates(geometry),
 				denivPos = 0,
 				denivNeg = 0;
@@ -690,14 +682,14 @@ export class MyMousePosition extends ol.control.MousePosition {
 			coordinateFormat: function(mouse) {
 				//BEST find better than window.gpsValues to share info
 				if (window.gpsValues && window.gpsValues.position) {
-					const ll4326 = proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
-						distance = sphere.getDistance(mouse, ll4326);
+					const ll4326 = ol.proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
+						distance = ol.sphere.getDistance(mouse, ll4326);
 
 					return distance < 1000 ?
 						(Math.round(distance)) + ' m' :
 						(Math.round(distance / 10) / 100) + ' km';
 				} else
-					return coordinate.createStringXY(4)(mouse);
+					return ol.coordinate.createStringXY(4)(mouse);
 			},
 			...options,
 		});
@@ -752,7 +744,7 @@ export class Permalink extends MyButton {
 
 				view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
 
-				view.setCenter(proj.transform([
+				view.setCenter(ol.proj.transform([
 					urlMod.match(/lon=(-?[0-9\.]+)/)[1],
 					urlMod.match(/lat=(-?[0-9\.]+)/)[1],
 				], 'EPSG:4326', 'EPSG:3857'));
@@ -760,7 +752,7 @@ export class Permalink extends MyButton {
 
 			// Set the permalink with current map zoom & position
 			if (view.getCenter()) {
-				const ll4326 = proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+				const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
 					newParams = 'map=' +
 					(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
 					(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
