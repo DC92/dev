@@ -3,43 +3,23 @@
  * Add some usefull controls
  */
 
-// Openlayers
-import Attribution from 'ol/control/Attribution';
-import Control from 'ol/control/Control';
-import FullScreen from 'ol/control/FullScreen';
-import Icon from 'ol/style/Icon';
-import MousePosition from 'ol/control/MousePosition';
-import MouseWheelZoom from 'ol/interaction/MouseWheelZoom';
-import ScaleLine from 'ol/control/ScaleLine';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import Zoom from 'ol/control/Zoom';
+// Openlayers //TODO RESORB
 import * as coordinate from 'ol/coordinate';
 import * as olExtent from 'ol/extent';
 import * as proj from 'ol/proj';
 import * as sphere from 'ol/sphere';
 import * as style from 'ol/style';
 
-import GeoJSON from 'ol/format/GeoJSON';
-import GPX from 'ol/format/GPX';
-import KML from 'ol/format/KML';
-const olFormat = {
-	GeoJSON: GeoJSON,
-	GPX: GPX,
-	KML: KML,
-}
-
-// MyOl
+import ol from '../src/ol';
 import './MyControl.css';
 import MyGeocoder from './MyGeocoder';
 import MyGeolocation from './MyGeolocation';
-
 
 /**
  * Control button
  * Abstract class to be used by other control buttons definitions
  */
-export class MyButton extends Control {
+export class MyButton extends ol.control.Control {
 	constructor(options) {
 		super({
 			element: document.createElement('div'),
@@ -174,7 +154,7 @@ export class Permalink extends MyButton {
 /**
  * Control to display the mouse position
  */
-export class MyMousePosition extends MousePosition {
+export class MyMousePosition extends ol.control.MousePosition {
 	constructor(options) {
 		super({
 			projection: 'EPSG:4326',
@@ -286,7 +266,7 @@ export function tilesBuffer(opt) {
 		control = new MyButton(); //HACK no button
 
 	control.setMap = function(map) { //HACK execute actions on Map init
-		Control.prototype.setMap.call(this, map);
+		ol.control.Control.prototype.setMap.call(this, map);
 
 		// Action on each layer
 		//BEST too much load on basic browsing
@@ -362,7 +342,7 @@ export class Print extends MyButton {
 
 		// Finer zoom not dependent on the baselayer's levels
 		map.getView().setConstrainResolution(false);
-		map.addInteraction(new MouseWheelZoom({
+		map.addInteraction(new ol.interaction.MouseWheelZoom({
 			maxDelta: 0.1,
 		}));
 
@@ -422,9 +402,9 @@ export class Load extends MyButton {
 
 	loadText(text, formatName) {
 		const map = this.getMap(),
-			loadFormat = new olFormat[formatName in olFormat ? formatName : 'GeoJSON'](),
+			loadFormat = new ol.format[formatName in ol.format ? formatName : 'GeoJSON'](),
 			receivedLat = text.match(/lat="-?([0-9]+)/), // Received projection depending on the first value
-			receivedProjection = receivedLat.length && parseInt(receivedLat[1]) > 100 ? 'EPSG:3857' : 'EPSG:4326',
+			receivedProjection = receivedLat && receivedLat.length && parseInt(receivedLat[1]) > 100 ? 'EPSG:3857' : 'EPSG:4326',
 			features = loadFormat.readFeatures(text, {
 				dataProjection: receivedProjection,
 				featureProjection: 'EPSG:3857', // Map projection
@@ -436,11 +416,11 @@ export class Load extends MyButton {
 
 		if (added !== false) { // If one used the feature
 			// Display the track on the map
-			const gpxSource = new VectorSource({
+			const gpxSource = new ol.source.Vector({
 					format: loadFormat,
 					features: features,
 				}),
-				gpxLayer = new VectorLayer({
+				gpxLayer = new ol.layer.Vector({
 					source: gpxSource,
 					style: function(feature) {
 						const properties = feature.getProperties();
@@ -450,7 +430,7 @@ export class Load extends MyButton {
 								color: 'blue',
 								width: 3,
 							}),
-							image: properties.sym ? new Icon({
+							image: properties.sym ? new ol.style.Icon({
 								//TODO compléter chemineur avec les symboles standards
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.svg',
 							}) : null,
@@ -513,7 +493,7 @@ export class Download extends MyButton {
 	click(evt) {
 		const map = this.getMap(),
 			formatName = evt.target.innerText,
-			downloadFormat = new olFormat[formatName](),
+			downloadFormat = new ol.format[formatName](),
 			mime = evt.target.getAttribute('mime');
 		let features = [],
 			extent = map.getView().calculateExtent();
@@ -606,8 +586,8 @@ export function collection(opt) {
 
 	return [
 		// Top left
-		new Zoom(options.zoom),
-		new FullScreen(options.fullScreen),
+		new ol.control.Zoom(options.zoom),
+		new ol.control.FullScreen(options.fullScreen),
 		new MyGeocoder(options.geocoder),
 		new MyGeolocation(options.geolocation), //TODO BUG (!) Circular dependency src/MyControl.js -> src/MyGeolocation.js -> src/MyControl.js
 		new Load(options.load),
@@ -618,11 +598,11 @@ export function collection(opt) {
 		// Bottom left
 		new LengthLine(options.lengthLine),
 		new MyMousePosition(options.myMouseposition),
-		new ScaleLine(options.scaleLine),
+		new ol.control.ScaleLine(options.scaleLine),
 
 		// Bottom right
 		new Permalink(options.permalink),
-		new Attribution(options.attribution),
+		new ol.control.Attribution(options.attribution),
 
 		...options.supplementaryControls
 	];

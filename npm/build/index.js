@@ -1,62 +1,6 @@
 // This file defines the contents of the dist/myol.css & dist/myol libraries
 // This contains all what is necessary for refuges.info & chemineur.fr websites
 
-// Openlayers
-import 'ol/ol.css';
-
-import Attribution from 'ol/control/Attribution';
-import FullScreen from 'ol/control/FullScreen';
-import Map from 'ol/Map';
-import MultiPolygon from 'ol/geom/MultiPolygon';
-import OSM from 'ol/source/OSM';
-import ScaleLine from 'ol/control/ScaleLine';
-import Stamen from 'ol/source/Stamen';
-import Tile from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import View from 'ol/View';
-import Zoom from 'ol/control/Zoom';
-import * as format from 'ol/format';
-import * as loadingstrategy from 'ol/loadingstrategy';
-import * as proj from 'ol/proj';
-import * as style from 'ol/style';
-
-const ol = {
-	Map: Map,
-	View: View,
-	control: {
-		Attribution: Attribution,
-		FullScreen: FullScreen,
-		ScaleLine: ScaleLine,
-		Zoom: Zoom,
-	},
-	format: {
-		GeoJSON: format.GeoJSON,
-		GPX: format.GPX,
-		KML: format.KML,
-	},
-	geom: {
-		MultiPolygon: MultiPolygon,
-	},
-	layer: {
-		Tile: Tile,
-		Vector: VectorLayer,
-	},
-	loadingstrategy: loadingstrategy,
-	proj: {
-		fromLonLat: proj.fromLonLat,
-		transform: proj.transform,
-		transformExtent: proj.transformExtent,
-	},
-	source: {
-		OSM: OSM,
-		Stamen: Stamen,
-		Vector: VectorSource,
-	},
-	style: style,
-};
-
-// MyOl
 import Editor from '../src/Editor';
 import LayerSwitcher from '../src/LayerSwitcher';
 import Marker from '../src/Marker';
@@ -87,10 +31,11 @@ const myol = {
 	stylesOptions: stylesOptions,
 };
 
+import ol from '../src/ol';
 window.ol ||= ol; // Export Openlayers native functions as global if none already defined
 myol.ol = ol; // Packing Openlayers native functions in the bundle
 export default myol;
 
-// Debug
+// Trace in the console
 import * as util from 'ol/util';
 console.log('OL V' + util.VERSION);

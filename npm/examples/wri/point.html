@@ -65,7 +65,7 @@ Based on https://openlayers.org
 			}),
 			controls: [
 				...controlesCartes('point'),
-				myol.control.permalink({ // Permet de garder le même réglage de carte
+				new myol.control.Permalink({ // Permet de garder le même réglage de carte
 					visible: false, // Mais on ne visualise pas le lien du permalink
 					init: false, // Ici, on utilisera plutôt la position du point
 				}),

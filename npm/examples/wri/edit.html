@@ -76,7 +76,7 @@ Based on https://openlayers.org
 				}),
 				controls: [
 					...controlesCartes('edit'),
-					myol.control.permalink({ // Permet de garder le même réglage de carte
+					new myol.control.Permalink({ // Permet de garder le même réglage de carte
 						display: false, // Cache le lien
 						init: false, // <?=$vue->polygone->id_polygone?'false':'true'?>, // On cadre le massif, s'il y a massif
 					}),
