@@ -609,7 +609,7 @@ export function collection(opt) {
 		new Zoom(options.zoom),
 		new FullScreen(options.fullScreen),
 		new MyGeocoder(options.geocoder),
-		new MyGeolocation(options.geolocation),
+		new MyGeolocation(options.geolocation), //TODO BUG (!) Circular dependency src/MyControl.js -> src/MyGeolocation.js -> src/MyControl.js
 		new Load(options.load),
 		new Download(options.download),
 		new Print(options.print),

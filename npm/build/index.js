@@ -6,9 +6,6 @@ import 'ol/ol.css';
 
 import Attribution from 'ol/control/Attribution';
 import FullScreen from 'ol/control/FullScreen';
-import GeoJSON from 'ol/format/GeoJSON';
-import GPX from 'ol/format/GPX';
-import KML from 'ol/format/KML';
 import Map from 'ol/Map';
 import MultiPolygon from 'ol/geom/MultiPolygon';
 import OSM from 'ol/source/OSM';
@@ -19,6 +16,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import View from 'ol/View';
 import Zoom from 'ol/control/Zoom';
+import * as format from 'ol/format';
 import * as loadingstrategy from 'ol/loadingstrategy';
 import * as proj from 'ol/proj';
 import * as style from 'ol/style';
@@ -33,9 +31,9 @@ const ol = {
 		Zoom: Zoom,
 	},
 	format: {
-		GeoJSON: GeoJSON,
-		GPX: GPX,
-		KML: KML,
+		GeoJSON: format.GeoJSON,
+		GPX: format.GPX,
+		KML: format.KML,
 	},
 	geom: {
 		MultiPolygon: MultiPolygon,
