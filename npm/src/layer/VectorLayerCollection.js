@@ -12,7 +12,7 @@ import * as proj from 'ol/proj';
 import * as style from 'ol/style';
 
 // MyOl
-import ol from '../src/ol'; //TODO
+import ol from '../../src/ol'; //TODO
 import MyVectorLayer from './MyVectorLayer';
 import * as stylesOptions from './stylesOptions';
 

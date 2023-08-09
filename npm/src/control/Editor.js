@@ -5,9 +5,9 @@
 
 import Control from 'ol/control/Control'; //TODO RESORB with class
 
-import ol from '../src/ol';
-import './editor.css';
+import ol from '../../src/ol';
 import * as myControl from './MyControl';
+import './editor.css';
 
 // Editor
 //BEST make it a class

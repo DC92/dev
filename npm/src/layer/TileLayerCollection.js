@@ -3,7 +3,7 @@
  * Acces to tiles layers services
  */
 
-import ol from '../src/ol';
+import ol from '../../src/ol';
 
 // Virtual class to replace invalid layer scope by a stub display
 class LimitedTileLayer extends ol.layer.Tile {

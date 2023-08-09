@@ -6,7 +6,7 @@
  *   layer : that owns the feature
  */
 
-import ol from '../src/ol';
+import ol from '../../src/ol';
 
 // Basic style to display a geo vector layer based on standard properties
 export function basic(feature, layer) {

@@ -8,8 +8,8 @@
    dragable : can draw the marker to edit position
  */
 
+import ol from '../../src/ol';
 import proj4Lib from 'proj4/lib/index';
-import ol from '../src/ol';
 
 export default class Marker extends ol.layer.Vector {
 	constructor(opt) {

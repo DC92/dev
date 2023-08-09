@@ -1,5 +1,5 @@
 // Openlayers imports used in this package
-// Will be used in the sources & the build
+// Will be used both in the sources & the build
 
 import 'ol/ol.css';
 

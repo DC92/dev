@@ -3,9 +3,9 @@
  * Add some usefull controls
  */
 
-import ol from '../src/ol';
-import './MyControl.css';
+import ol from '../../src/ol';
 import MyGeocoder from './MyGeocoder';
+import './MyControl.css';
 
 /**
  * Control button
