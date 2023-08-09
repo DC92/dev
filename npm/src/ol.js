@@ -17,6 +17,7 @@ import * as interaction from 'ol/interaction';
 import * as layer from 'ol/layer';
 import * as loadingstrategy from 'ol/loadingstrategy';
 import * as proj from 'ol/proj';
+import * as projProj4 from 'ol/proj/proj4';
 import * as source from 'ol/source';
 import * as sphere from 'ol/sphere';
 import * as style from 'ol/style';
@@ -46,7 +47,10 @@ export default {
 	},
 	Map: Map,
 	loadingstrategy: loadingstrategy,
-	proj: proj,
+	proj: {
+		...proj,
+		proj4: projProj4,
+	},
 	source: {
 		BingMaps: source.BingMaps,
 		Cluster: source.Cluster,
