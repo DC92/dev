@@ -1,6 +1,11 @@
 https://github.com/kirtan-desai/ol-geocoder
 4.1.2
 
+Patch sur src/providers/osm.js
+	remove trailing /
+	url: 'https://nominatim.openstreetmap.org/search/',
+	url: 'https://nominatim.openstreetmap.org/search',
+
 Patch src/nominatim.js
 
 import {

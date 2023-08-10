@@ -14,7 +14,7 @@ export default class MyGeocoder extends Geocoder {
 		options ||= {};
 
 		super('nominatim', {
-			provider: options.provider || 'osm', //TODO BUG no fit / 'photon'
+			provider: options.provider || 'osm',
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 			...options,
 		});
