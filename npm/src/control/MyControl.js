@@ -37,14 +37,14 @@ export class MyButton extends ol.control.Control {
 			const buttonEl = document.createElement('button');
 			buttonEl.setAttribute('type', 'button');
 			buttonEl.innerHTML = options.label;
-			buttonEl.addEventListener('click', evt => this.onChange(evt));
+			buttonEl.addEventListener('click', evt => this.buttonAction(evt));
 
 			// Populate the control
 			this.element.className = 'ol-control myol-button' + (options.className ? ' ' + options.className : '');
 			this.element.appendChild(buttonEl); // Add the button
 			this.element.appendChild(this.submenuEl); // Add the submenu
-			this.element.addEventListener('mouseover', evt => this.onChange(evt));
-			this.element.addEventListener('mouseout', evt => this.onChange(evt));
+			this.element.addEventListener('mouseover', evt => this.buttonAction(evt));
+			this.element.addEventListener('mouseout', evt => this.buttonAction(evt));
 
 			// Close the submenu when click or touch on the map
 			document.addEventListener('click', evt => {
@@ -56,7 +56,7 @@ export class MyButton extends ol.control.Control {
 		}
 	}
 
-	onChange(evt) {
+	buttonAction(evt) {
 		if (evt.type == 'mouseover')
 			this.element.classList.add('myol-button-hover');
 		else // mouseout | click
@@ -123,7 +123,7 @@ export class MyGeolocation extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input')
 			.forEach(el => {
-				el.addEventListener('change', evt => this.onChange(evt));
+				el.addEventListener('change', evt => this.action(evt));
 			});
 
 		// Graticule
@@ -168,7 +168,7 @@ export class MyGeolocation extends MyButton {
 		// Browser heading from the inertial & magnetic sensors
 		window.addEventListener('deviceorientationabsolute', evt => {
 			window.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			this.onChange(evt);
+			this.action(evt);
 		});
 	}
 
@@ -176,7 +176,7 @@ export class MyGeolocation extends MyButton {
 		super.setMap(map);
 
 		map.addLayer(this.graticuleLayer);
-		map.on('moveend', evt => this.onChange(evt)); // Refresh graticule after map zoom
+		map.on('moveend', evt => this.action(evt)); // Refresh graticule after map zoom
 
 		this.geolocation = new ol.Geolocation({
 			projection: map.getView().getProjection(),
@@ -187,13 +187,13 @@ export class MyGeolocation extends MyButton {
 				...this.options, //TODO séparer les options pour Geolocation / et autres
 			},
 		});
-		this.geolocation.on('change', evt => this.onChange(evt));
+		this.geolocation.on('change', evt => this.action(evt));
 		this.geolocation.on('error', function(error) {
 			console.log('Geolocation error: ' + error.message);
 		});
 	}
 
-	onChange(evt) {
+	action(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
 			displayEls = document.getElementsByName('myol-gps-display'),
@@ -303,7 +303,6 @@ export class MyGeolocation extends MyButton {
 /**
  * GPX file loader control
  */
-//TODO dont work
 //TODO faire des tests down / load / ...
 export class Load extends MyButton {
 	constructor(options) {
@@ -317,7 +316,7 @@ export class Load extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input')
 			.forEach(el => {
-				el.addEventListener('change', evt => this.onChange(evt));
+				el.addEventListener('change', evt => this.action(evt));
 			});
 
 		// Load file at init
@@ -334,7 +333,7 @@ export class Load extends MyButton {
 		this.reader = new FileReader();
 	}
 
-	onChange(evt) {
+	action(evt) {
 		if (evt.target.files) {
 			this.reader.readAsText(evt.target.files[0]);
 
@@ -432,11 +431,11 @@ export class Download extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('a')
 			.forEach(el => {
-				el.addEventListener('click', evt => this.onClick(evt));
+				el.addEventListener('click', evt => this.action(evt));
 			});
 	}
 
-	onClick(evt) {
+	action(evt) {
 		const map = this.getMap(),
 			formatName = evt.target.innerText,
 			downloadFormat = new ol.format[formatName](),
@@ -529,7 +528,7 @@ export class Print extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input,a')
 			.forEach(el => {
-				el.addEventListener('click', evt => this.onClick(evt));
+				el.addEventListener('click', evt => this.action(evt));
 			});
 
 		// To return without print
@@ -541,7 +540,7 @@ export class Print extends MyButton {
 		});
 	}
 
-	onClick(evt) {
+	action(evt) {
 		const map = this.getMap(),
 			mapEl = map.getTargetElement(),
 			poElcs = this.element.querySelectorAll('input:checked'), // Selected orientation inputs
