@@ -8,6 +8,8 @@ import ol from '../../src/ol';
 // Virtual class to replace invalid layer scope by a stub display
 class LimitedTileLayer extends ol.layer.Tile {
 	setMapInternal(map) { //HACK execute actions on Map init
+		  super.setMapInternal(map);
+
 		const altlayer = new Stamen({
 			minResolution: this.getMaxResolution(),
 		});
@@ -21,8 +23,6 @@ class LimitedTileLayer extends ol.layer.Tile {
 			altlayer.setOpacity(this.getOpacity());
 			altlayer.setVisible(this.getVisible());
 		});
-
-		return super.setMapInternal(map);
 	}
 }
 
@@ -222,6 +222,8 @@ export class IGM extends LimitedTileLayer {
 	}
 
 	setMapInternal(map) { //HACK execute actions on Map init
+		  super.setMapInternal(map);
+
 		const view = map.getView(),
 			source = this.getSource();
 
@@ -238,8 +240,6 @@ export class IGM extends LimitedTileLayer {
 				layers: (layerResolution == 100000 ? 'MB.IGM' : 'CB.IGM') + layerResolution,
 			});
 		}
-
-		return super.setMapInternal(map);
 	}
 }
 

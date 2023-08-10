@@ -196,10 +196,10 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	}
 
 	setMapInternal(map) { //HACK execute actions on Map init
+		  super.setMapInternal(map);
+
 		if (this.altLayer)
 			map.addLayer(this.altLayer);
-
-		return super.setMapInternal(map);
 	}
 
 	// Propagate the reload to the altLayer
@@ -263,6 +263,8 @@ export class Hover extends ol.layer.Vector {
 
 	// Attach an hover & click listener to the map
 	setMapInternal(map) { //HACK execute actions on Map init
+		  super.setMapInternal(map);
+
 		const mapEl = map.getTargetElement();
 
 		// Basic listeners
@@ -279,8 +281,6 @@ export class Hover extends ol.layer.Vector {
 					this.getSource().clear()
 			}
 		});
-
-		return super.setMapInternal(map);
 	}
 
 	mouseListener(evt) {

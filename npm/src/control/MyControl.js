@@ -188,7 +188,7 @@ export class MyGeolocation extends MyButton {
 			},
 		});
 		this.geolocation.on('change', evt => this.action(evt));
-		this.geolocation.on('error', function(error) {
+		this.geolocation.on('error', error => {
 			console.log('Geolocation error: ' + error.message);
 		});
 	}
@@ -367,7 +367,7 @@ export class Load extends MyButton {
 				}),
 				gpxLayer = new ol.layer.Vector({
 					source: gpxSource,
-					style: function(feature) {
+					style: feature => {
 						const properties = feature.getProperties();
 
 						return new ol.style.Style({
@@ -446,9 +446,9 @@ export class Download extends MyButton {
 		if (this.options.savedLayer)
 			getFeatures(this.options.savedLayer);
 		else
-			map.getLayers().forEach(getFeatures);
+			map.getLayers().forEach(getFeatures); //TODO what about (args)
 
-		function getFeatures(savedLayer) {
+		function getFeatures(savedLayer) { //TODO put in method
 			if (savedLayer.getSource() &&
 				savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
 				savedLayer.getSource().forEachFeatureInExtent(extent, feature => {
@@ -533,7 +533,7 @@ export class Print extends MyButton {
 		// To return without print
 		document.addEventListener('keydown', evt => {
 			if (evt.key == 'Escape')
-				setTimeout(function() { // Delay reload for FF & Opera
+				setTimeout(() => { // Delay reload for FF & Opera
 					location.reload();
 				});
 		});
@@ -677,7 +677,7 @@ export class MyMousePosition extends ol.control.MousePosition {
 			className: 'myol-coordinate',
 			placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
 
-			coordinateFormat: function(mouse) {
+			coordinateFormat: mouse => {
 				//BEST find better than window.gpsValues to share info
 				if (window.gpsValues && window.gpsValues.position) {
 					const ll4326 = ol.proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
@@ -733,7 +733,7 @@ export class Permalink extends MyButton {
 			this.element.appendChild(aEl);
 		}
 
-		function render(evt) { //HACK to get map object
+		function render(evt) { //TODO use method render
 			const view = evt.map.getView();
 
 			// Set center & zoom at the init
