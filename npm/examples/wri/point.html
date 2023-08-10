@@ -49,12 +49,6 @@ Based on https://openlayers.org
 			kompass: {key: '2ba8c124-38b6-11e7-ade1-e0cb4e28e847'},
 		};
 
-		const coucheCadre = new myol.layer.Marker({
-			host: '//www.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
-			src: '../images/cadre.svg', // '<?=$config_wri["sous_dossier_installation"]?>images/cadre.svg',
-			focus: 15,
-		});
-
 		new ol.Map({
 			target: 'carte-point',
 			view: new ol.View({
@@ -74,10 +68,17 @@ Based on https://openlayers.org
 				}),
 			],
 			layers: [
+				// Les autres points refuges.info
 				couchePointsWRI({
 					host: '//dom.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
 				}),
-				coucheCadre,
+				// Le cadre rouge autour du point de la fiche
+				new myol.layer.Marker({
+					host: '//www.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
+					src: '../images/cadre.svg', // '<?=$config_wri["sous_dossier_installation"]?>images/cadre.svg',
+					prefix: 'marker', // S'interface avec les <TAG id="marker-xxx"...>
+					focus: 15,
+				}),
 				new myol.layer.Hover(),
 			],
 		});

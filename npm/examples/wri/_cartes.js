@@ -49,7 +49,7 @@ function couchePointsWRI(options) {
 	return layer;
 }
 
-// fabrique le texte de l'étiquette à partir des propriétés reçues du serveur
+// Fabrique le texte de l'étiquette à partir des propriétés reçues du serveur
 function etiquetteComplette(properties) {
 	const caracteristiques = [],
 		lignes = [];
@@ -212,6 +212,7 @@ function fondsCarte(page, layersKeys) {
 	};
 }
 
+// Les couches vectorielles importées des autres sites
 function couchesVectoriellesExternes() {
 	return [
 		new myol.layer.vector.Chemineur({

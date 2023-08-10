@@ -117,14 +117,14 @@ export class MyGeolocation extends MyButton {
 			...options,
 		});
 
-// Add status display element
+		// Add status display element
 		this.statusEl = document.createElement('p');
 		this.element.appendChild(this.statusEl);
 
 		// Register action listeners
 		this.element.querySelectorAll('input')
 			.forEach(el => {
-				 			el.onchange ||= evt => this.onChange(evt);
+				el.onchange ||= evt => this.onChange(evt);
 			});
 
 		// Graticule
@@ -167,9 +167,9 @@ export class MyGeolocation extends MyButton {
 		window.gpsValues = {}; // Store the measures for internal use & other controls
 
 		// Browser heading from the inertial & magnetic sensors
-		window.addEventListener('deviceorientationabsolute',  evt=> {
+		window.addEventListener('deviceorientationabsolute', evt => {
 			window.gpsValues.heading = evt.alpha || evt.webkitCompassHeading; // Android || iOS
-			 		this.onChange(evt); 
+			this.onChange(evt);
 		});
 	}
 
@@ -188,7 +188,7 @@ export class MyGeolocation extends MyButton {
 				...this.options, //TODO séparer les options pour Geolocation / et autres
 			},
 		});
-		 this.geolocation.on('change', evt=>this.onChange(evt));
+		this.geolocation.on('change', evt => this.onChange(evt));
 		this.geolocation.on('error', function(error) {
 			console.log('Geolocation error: ' + error.message);
 		});
@@ -304,6 +304,7 @@ export class MyGeolocation extends MyButton {
 /**
  * GPX file loader control
  */
+//TODO dont work
 export class Load extends MyButton {
 	constructor(options) {
 		super({
@@ -407,6 +408,7 @@ export class Load extends MyButton {
 /**
  * File downloader control
  */
+//TODO dont work
 //BEST BUG incompatible with clusters
 export class Download extends MyButton {
 	constructor(opt) {

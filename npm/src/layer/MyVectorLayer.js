@@ -353,9 +353,10 @@ export class Hover extends ol.layer.Vector {
 			else if (hoveredSubFeature != map.lastHoveredSubFeature) {
 				const f = hoveredSubFeature.clone();
 
-				f.setStyle(
-					new ol.style.Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
-				);
+				if (hoveredLayer.options && hoveredLayer.options.hoverStylesOptions)
+					f.setStyle(
+						new ol.style.Style(hoveredLayer.options.hoverStylesOptions(f, hoveredLayer))
+					);
 
 				source.clear();
 				source.addFeature(f);
