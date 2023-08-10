@@ -34,19 +34,18 @@ Based on https://openlayers.org
 
 	<!-- The main script must be defer or module to be run after the myol import -->
 	<script type="module">
-		// Layers
 		const snaplayer = new ol.layer.Vector({
 				source: new ol.source.Vector({
-					url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
+					url: 'images/switzerland.geojson',
 					format: new ol.format.GeoJSON(),
 				}),
 				style: new ol.style.Style({
 					stroke: new ol.style.Stroke(),
 				}),
 			}),
-
 			controlEditor = new myol.control.Editor({
 				geoJsonId: 'geojson',
+				geoJsonUrl: 'images/features.geojson',
 				snapLayers: [snaplayer],
 				help: [
 					document.getElementById('myol-help-edit-modify').innerHTML,
@@ -55,7 +54,6 @@ Based on https://openlayers.org
 				],
 			});
 
-		// Map
 		new ol.Map({
 			target: 'map',
 			view: new ol.View({
@@ -64,7 +62,7 @@ Based on https://openlayers.org
 			}),
 			controls: [
 				new ol.control.Zoom(),
-				new myol.control.Load(),
+				new myol.control.Load(), //TODO DONT WORK
 				new myol.control.Download({
 					savedLayer: controlEditor.layer,
 				}),
@@ -76,8 +74,7 @@ Based on https://openlayers.org
 				}),
 				snaplayer,
 			],
-		});
-	</script>
+		});	</script>
 </head>
 
 <body>
@@ -88,6 +85,11 @@ Based on https://openlayers.org
 	<p><a href="../src/Editor.js">src/Editor.js</a> lines & polygons edition facilities</p>
 
 	<div id="map" class="map"></div>
+
+	<input type="text" id="geojson" style="width:90%" value='{
+		"type": "LineString",
+		"coordinates": [[1, 47],[2.2, 47],[2.2, 48]]
+	}' />
 
 	<h4>Modifier une ligne ou un polygone</h4>
 	<div id="myol-help-edit-modify">
@@ -120,68 +122,5 @@ Based on https://openlayers.org
 		<p>Double cliquer sur le dernier sommet pour terminer</p>
 		<p><hr/>Un polygone entièrement compris dans un autre crée un "trou"</p>
 	</div>
-
-	<input type="text" id="geojson" style="width:90%" value='{
-		"type": "FeatureCollection",
-		"features": [{
-			"type": "Feature",
-			"geometry": {
-				"type": "LineString",
-				"coordinates": [[2.5,48],[4.5,47.2],[6.5,48]]
-			}
-		}, {
-			"type": "Feature",
-			"geometry": {
-				"type": "GeometryCollection",
-				"geometries": [{
-					"type": "LineString",
-					"coordinates": [
-						[1, 47],
-						[2.2, 47],
-						[2.2, 48]
-					]
-				}, {
-					"type": "LineString",
-					"coordinates": [
-						[3, 48],
-						[3.5, 48.3]
-					]
-				}, {
-					"type": "LineString",
-					"coordinates": [
-						[4, 48.3],
-						[3.6, 48]
-					]
-				}, {
-					"type": "LineString",
-					"coordinates": [
-						[4.6, 48.3],
-						[4.6, 48]
-					]
-				}, {
-					"type": "LineString",
-					"coordinates": [
-						[5, 48],
-						[5, 48.3]
-					]
-				}]
-			}
-		},{
-			"type": "Feature",
-			"geometry": {
-				"type": "LineString",
-				"coordinates": [[5.5,47.2],[8,44.5]]
-			}
-		}, {
-			"type": "Feature",
-			"geometry": {
-				"type": "Polygon",
-				"coordinates": [
-					[[4.5,47.2],[7,44.5],[2,44.5],[4.5,47.2]],
-					[[4.5,44.7],[3.5,45.8],[5.5,45.8],[4.5,44.7]]
-				]
-			}
-		}]
-	}' />
 </body>
 </html>

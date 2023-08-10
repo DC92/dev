@@ -174,9 +174,24 @@ export default function Editor(opt) {
 		// Add features loaded from GPX file
 		map.on('myol:onfeatureload', evt => {
 			source.addFeatures(evt.features);
-			optimiseEdited();
+			optimiseEdited(); //TODO fit on extent
 			return false; // Warn control.load that the editor got the included feature
 		});
+
+		// Add features in a separated file
+		//TODO merge with other functions
+		if (options.geoJsonUrl)
+			fetch(options.geoJsonUrl).then(response => {
+				response.json().then(result => {
+					map.dispatchEvent({
+						type: 'myol:onfeatureload',
+						features: new ol.format.GeoJSON().readFeatures(result, {
+							dataProjection: 'EPSG:4326',
+							featureProjection: map.getView().getProjection(),
+						}),
+					});
+				});
+			});
 
 		map.on('pointermove', hover);
 	};

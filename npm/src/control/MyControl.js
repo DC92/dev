@@ -360,7 +360,7 @@ export class Load extends MyButton {
 				features: features,
 			});
 
-		if (added !== false) { // If one used the feature
+		if (added !== false) { // If none used the feature
 			// Display the track on the map
 			const gpxSource = new ol.source.Vector({
 					format: loadFormat,
