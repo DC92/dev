@@ -303,7 +303,6 @@ export class MyGeolocation extends MyButton {
 /**
  * GPX file loader control
  */
-//TODO faire des tests down / load / ...
 export class Load extends MyButton {
 	constructor(options) {
 		super({
@@ -491,7 +490,7 @@ export class Download extends MyButton {
 			.replace(/(<name|<ele|<sym|<link|<type|<rtept|<\/?trkseg|<\/?ExtendedData)/g, '\n\t$1')
 			.replace(/(<trkpt|<Data|<LineString|<\/?Polygon|<Style)/g, '\n\t\t$1')
 			.replace(/(<[a-z]+BoundaryIs)/g, '\n\t\t\t$1')
-			.replace(/ [cvx]/g, '\n\t$1'),
+			.replace(/ ([cvx])/g, '\n\t$1'),
 
 			file = new Blob([data], {
 				type: mime,
