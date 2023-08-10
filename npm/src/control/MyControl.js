@@ -15,7 +15,6 @@ export class MyButton extends ol.control.Control {
 	constructor(options) {
 		super({
 			element: document.createElement('div'),
-			className: '',
 			...options ||= {},
 		});
 
@@ -41,11 +40,11 @@ export class MyButton extends ol.control.Control {
 			buttonEl.addEventListener('click', evt => this.onChange(evt));
 
 			// Populate the control
-			this.element.className = 'ol-control myol-button ' + options.className;
-			this.element.addEventListener('mouseover', evt => this.onChange(evt));
-			this.element.addEventListener('mouseout', evt => this.onChange(evt));
+			this.element.className = 'ol-control myol-button' + (options.className ? ' ' + options.className : '');
 			this.element.appendChild(buttonEl); // Add the button
 			this.element.appendChild(this.submenuEl); // Add the submenu
+			this.element.addEventListener('mouseover', evt => this.onChange(evt));
+			this.element.addEventListener('mouseout', evt => this.onChange(evt));
 
 			// Close the submenu when click or touch on the map
 			document.addEventListener('click', evt => {
@@ -124,7 +123,7 @@ export class MyGeolocation extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input')
 			.forEach(el => {
-				el.onchange ||= evt => this.onChange(evt);
+				el.addEventListener('change', evt => this.onChange(evt));
 			});
 
 		// Graticule
@@ -305,6 +304,7 @@ export class MyGeolocation extends MyButton {
  * GPX file loader control
  */
 //TODO dont work
+//TODO faire des tests down / load / ...
 export class Load extends MyButton {
 	constructor(options) {
 		super({
@@ -317,7 +317,7 @@ export class Load extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input')
 			.forEach(el => {
-				el.onchange ||= evt => this.onChange(evt);
+				el.addEventListener('change', evt => this.onChange(evt));
 			});
 
 		// Load file at init
@@ -408,13 +408,11 @@ export class Load extends MyButton {
 /**
  * File downloader control
  */
-//TODO dont work
 //BEST BUG incompatible with clusters
 export class Download extends MyButton {
 	constructor(opt) {
 		const options = {
 			label: '&#x1f4e5;',
-			className: 'myol-button-download',
 			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a mime="application/gpx+xml">GPX</a>' +
@@ -434,7 +432,7 @@ export class Download extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('a')
 			.forEach(el => {
-				el.onclick = evt => this.onClick(evt);
+				el.addEventListener('click', evt => this.onClick(evt));
 			});
 	}
 
@@ -470,11 +468,11 @@ export class Download extends MyButton {
 					geometry.getCoordinates().forEach(coords => {
 						if (typeof coords[0][0] == 'number')
 							// Polygon
-							features.push(new Feature(new LineString(coords)));
+							features.push(new ol.Feature(new ol.geom.LineString(coords)));
 						else
 							// MultiPolygon
 							coords.forEach(subCoords =>
-								features.push(new Feature(new LineString(subCoords)))
+								features.push(new ol.Feature(new ol.geom.LineString(subCoords)))
 							);
 					});
 				}
@@ -531,11 +529,11 @@ export class Print extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input,a')
 			.forEach(el => {
-				el.onclick ||= evt => this.onClick(evt);
+				el.addEventListener('click', evt => this.onClick(evt));
 			});
 
 		// To return without print
-		document.addEventListener('keydown', function(evt) {
+		document.addEventListener('keydown', evt => {
 			if (evt.key == 'Escape')
 				setTimeout(function() { // Delay reload for FF & Opera
 					location.reload();
@@ -828,6 +826,6 @@ export function collection(opt) {
 		new Permalink(options.permalink),
 		new ol.control.Attribution(options.attribution),
 
-		...options.supplementaryControls
+		...options.supplementaryControls,
 	];
 }

@@ -55,7 +55,7 @@ export default class Marker extends ol.layer.Vector {
 		this.els = [];
 		['json', 'lon', 'lat', 'x', 'y', 'select', 'string'].forEach(i => {
 			this.els[i] = document.getElementById((options.prefix) + '-' + i) || document.createElement('div');
-			this.els[i].onchange = evt => this.onChange(evt.target);
+			this.els[i].addEventListener('change', evt => this.onChange(evt.target));
 		});
 		// Initialise the position with existing entries values
 		this.onChange(this.els.lon);
