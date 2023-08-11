@@ -196,7 +196,7 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
 	}
 
 	setMapInternal(map) { //HACK execute actions on Map init
-		  super.setMapInternal(map);
+		super.setMapInternal(map);
 
 		if (this.altLayer)
 			map.addLayer(this.altLayer);
@@ -216,6 +216,8 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
  * Style features
  * Layer & features selector
  */
+//TODO document options
+//BEST separate source options
 export class MyVectorLayer extends MyServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {
@@ -263,7 +265,7 @@ export class Hover extends ol.layer.Vector {
 
 	// Attach an hover & click listener to the map
 	setMapInternal(map) { //HACK execute actions on Map init
-		  super.setMapInternal(map);
+		super.setMapInternal(map);
 
 		const mapEl = map.getTargetElement();
 
@@ -396,18 +398,18 @@ export class Selector {
 			this.init = (localStorage[this.safeName] || '').split(',');
 			this.selectEls = [...document.getElementsByName(name)];
 			this.selectEls.forEach(el => {
-				el.addEventListener('click', evt => this.onClick(evt));
+				el.addEventListener('click', evt => this.action(evt));
 				el.checked =
 					this.init.includes(el.value) ||
 					this.init.includes('all') ||
 					this.init.join(',') == el.value;
 			});
-			this.onClick(); // Init with "all"
+			this.action(); // Init with "all"
 		}
 		this.callbacks = [];
 	}
 
-	onClick(evt) {
+	action(evt) {
 		// Test the "all" box & set other boxes
 		if (evt && evt.target.value == 'all')
 			this.selectEls

@@ -10,7 +10,8 @@ import * as myControl from './MyControl';
 import './editor.css';
 
 // Editor
-//BEST make it a class
+//TODO make it a class
+//TODO document options
 export default function Editor(opt) {
 	const options = {
 			format: new ol.format.GeoJSON(),

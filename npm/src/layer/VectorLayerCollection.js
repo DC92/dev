@@ -30,6 +30,7 @@ function chemIconUrl(type, host) {
 }
 
 // chemineur.fr
+//TODO document options
 export class Chemineur extends MyVectorLayer {
 	constructor(opt) {
 		super({
@@ -51,6 +52,7 @@ export class Chemineur extends MyVectorLayer {
 };
 
 // alpages.info
+//TODO document options
 export class Alpages extends MyVectorLayer {
 	constructor(opt) {
 		super({
@@ -75,6 +77,7 @@ export class Alpages extends MyVectorLayer {
 }
 
 // refuges.info
+//TODO document options
 export class WRI extends MyVectorLayer {
 	constructor(opt) {
 		super({
@@ -108,6 +111,7 @@ export class WRI extends MyVectorLayer {
 }
 
 // pyrenees-refuges.com
+//TODO document options
 export class PRC extends MyVectorLayer {
 	constructor(options) {
 		super({
@@ -130,6 +134,7 @@ export class PRC extends MyVectorLayer {
 }
 
 // CampToCamp.org
+//TODO document options
 export class C2C extends MyVectorLayer {
 	constructor(options) {
 		const format_ = new GeoJSON({ // Format of received data
@@ -184,6 +189,7 @@ export class C2C extends MyVectorLayer {
  * From: https://openlayers.org/en/latest/examples/vector-osm.html
  * Doc: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
  */
+//TODO document options
 export class Overpass extends MyVectorLayer {
 	constructor(options) {
 		const format_ = new OSMXML(),

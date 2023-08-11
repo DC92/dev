@@ -5,10 +5,12 @@
 
 import ol from '../../src/ol';
 
+//BEST document options on each
+
 // Virtual class to replace invalid layer scope by a stub display
 class LimitedTileLayer extends ol.layer.Tile {
 	setMapInternal(map) { //HACK execute actions on Map init
-		  super.setMapInternal(map);
+		super.setMapInternal(map);
 
 		const altlayer = new Stamen({
 			minResolution: this.getMaxResolution(),
@@ -222,7 +224,7 @@ export class IGM extends LimitedTileLayer {
 	}
 
 	setMapInternal(map) { //HACK execute actions on Map init
-		  super.setMapInternal(map);
+		super.setMapInternal(map);
 
 		const view = map.getView(),
 			source = this.getSource();

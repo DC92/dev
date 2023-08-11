@@ -5,7 +5,8 @@ import * as myControl from './MyControl';
 import './layerSwitcher.css';
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
-//BEST keep open on click
+//BEST keep open on click (as other buttons)
+//TODO document options
 export default class LayerSwitcher extends myControl.MyButton {
 	constructor(options) {
 		super({

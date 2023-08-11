@@ -4,7 +4,7 @@
    position: [0, 0], Initial position of the marker
    src : url of the marker image
    prefix : id prefix of input/output values
-   focus : center & zoom on the marker
+   focus : number : center & value of zoom on the marker
    dragable : can draw the marker to edit position
  */
 
@@ -14,8 +14,6 @@ import proj4Lib from 'proj4/lib/index';
 export default class Marker extends ol.layer.Vector {
 	constructor(opt) {
 		const options = {
-			position: [0, 0],
-			// src: url of an image to represent the marker
 			prefix: 'marker',
 			zIndex: 1000, // Above points
 			...opt,
@@ -32,8 +30,6 @@ export default class Marker extends ol.layer.Vector {
 		});
 
 		this.options = options;
-		this.point = new ol.geom.Point(options.position);
-		//TODO move to setMapInternal
 
 		// Initialise specific projection
 		if (typeof proj4Lib == 'function') {
@@ -55,39 +51,31 @@ export default class Marker extends ol.layer.Vector {
 		this.els = [];
 		['json', 'lon', 'lat', 'x', 'y', 'select', 'string'].forEach(i => {
 			this.els[i] = document.getElementById((options.prefix) + '-' + i) || document.createElement('div');
-			this.els[i].addEventListener('change', evt => this.onChange(evt.target));
+			this.els[i].addEventListener('change', evt => this.action(evt.target));
 		});
-		// Initialise the position with existing entries values
-		this.onChange(this.els.lon);
-		this.onChange(this.els.json);
 	}
 
 	setMapInternal(map) {
 		super.setMapInternal(map);
 
 		map.once('loadstart', () => { // Hack to be noticed at map init
-			const pc = this.point.getCoordinates();
-
 			this.view = map.getView();
 
+			// Create the point at option position or map center
+			this.point = new ol.geom.Point(this.options.position || this.view.getCenter());
 			this.getSource().addFeature(new ol.Feature({
 				geometry: this.point,
 			}));
 
-			// Focus on the marker
-			if (this.options.focus) {
-				if (pc[0] && pc[1])
-					this.view.setCenter(pc);
-				else
-					// If no position given, put the marker on the center of the visible map
-					this.changeLL(this.view.getCenter(), 'EPSG:3857');
+			this.action(this.els.lon);
+			this.action(this.els.json);
 
+			if (this.options.focus)
 				this.view.setZoom(this.options.focus);
-			}
 
 			// Edit the marker position
 			if (this.options.dragable) {
-				// Drag the marker
+				//BEST change the cursor
 				map.addInteraction(new ol.interaction.Pointer({
 					handleDownEvent: evt => {
 						return map.getFeaturesAtPixel(evt.pixel, {
@@ -111,7 +99,7 @@ export default class Marker extends ol.layer.Vector {
 	}
 
 	// Read new values
-	onChange(el) {
+	action(el) {
 		// Find changed input type from tne input id
 		const idMatch = el.id.match(/-([a-z]+)/);
 
@@ -135,8 +123,7 @@ export default class Marker extends ol.layer.Vector {
 
 	// Display values
 	changeLL(pos, projection, focus) {
-		//BEST change the cursor
-		// If no position is given, use the marker's
+		// If no position is given, use the marker's (dragged)
 		if (!pos || pos.length < 2) {
 			pos = this.point.getCoordinates();
 			projection = 'EPSG:3857';
