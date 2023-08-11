@@ -1,13 +1,13 @@
 /**
  * LayerSwitcher.js
  */
-import * as myControl from './MyControl';
+import MyButton from './MyControl';
 import './layerSwitcher.css';
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST keep open on click (as other buttons)
-//TODO document options
-export default class LayerSwitcher extends myControl.MyButton {
+//BEST document options
+export default class LayerSwitcher extends MyButton {
 	constructor(options) {
 		super({
 			className: 'myol-button-switcher',

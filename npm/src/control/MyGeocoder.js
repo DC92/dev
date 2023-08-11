@@ -9,7 +9,7 @@ import '../../node_modules/@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import './myGeocoder.css'; // After ol-geocoder.css
 import Geocoder from '../../geocoder/src/base';
 
-//TODO document options
+//BEST document options
 export default class MyGeocoder extends Geocoder {
 	constructor(options) {
 		options ||= {};

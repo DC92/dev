@@ -11,7 +11,7 @@ import './MyControl.css';
  * Control button
  * Abstract class to be used by other control buttons definitions
  */
-export class MyButton extends ol.control.Control {
+export default class MyButton extends ol.control.Control {
 	constructor(options) {
 		super({
 			element: document.createElement('div'),
@@ -76,7 +76,7 @@ export class MyButton extends ol.control.Control {
  * Geolocation control
  * Display status, altitude & speed
  */
-//TODO document options
+//BEST document options
 export class MyGeolocation extends MyButton {
 	constructor(opt) {
 		const options = {
@@ -304,7 +304,7 @@ export class MyGeolocation extends MyButton {
 /**
  * GPX file loader control
  */
-//TODO document options
+//BEST document options
 export class Load extends MyButton {
 	constructor(options) {
 		super({
@@ -409,7 +409,7 @@ export class Load extends MyButton {
  * File downloader control
  */
 //BEST BUG incompatible with clusters
-//TODO document options
+//BEST document options
 export class Download extends MyButton {
 	constructor(opt) {
 		const options = {
@@ -511,7 +511,7 @@ export class Download extends MyButton {
 /**
  * Print control
  */
-//TODO document options
+//BEST document options
 export class Print extends MyButton {
 	constructor(options) {
 		super({
@@ -587,7 +587,7 @@ export class Print extends MyButton {
  * Help control
  * Display help contained in <TAG id="<options.submenuId>">
  */
-//TODO document options
+//BEST document options
 export class Help extends MyButton {
 	constructor(options) {
 		super({
@@ -601,7 +601,7 @@ export class Help extends MyButton {
 /**
  * Control to display the length & height difference of an hovered line
  */
-//TODO document options
+//BEST document options
 export class LengthLine extends MyButton {
 	constructor() {
 		super(); //HACK button not visible
@@ -676,7 +676,7 @@ export class LengthLine extends MyButton {
 /**
  * Control to display the mouse position
  */
-//TODO document options
+//BEST document options
 export class MyMousePosition extends ol.control.MousePosition {
 	constructor(options) {
 		super({
@@ -706,7 +706,7 @@ export class MyMousePosition extends ol.control.MousePosition {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
-//TODO document options
+//BEST document options
 export class Permalink extends MyButton {
 	constructor(opt) {
 		const options = {
@@ -780,7 +780,7 @@ export class Permalink extends MyButton {
  */
 //TODO TEST
 //TODO class
-//TODO document options
+//BEST document options
 export function tilesBuffer(opt) {
 	const options = {
 			depth: 3,

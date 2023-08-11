@@ -216,7 +216,7 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
  * Style features
  * Layer & features selector
  */
-//TODO document options
+//BEST document options
 //BEST separate source options
 export class MyVectorLayer extends MyServerClusterVectorLayer {
 	constructor(opt) {
