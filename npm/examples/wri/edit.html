@@ -18,6 +18,9 @@ Based on https://openlayers.org
 			width: 75vw;
 			height: 75vw;
 		}
+		#edit-json {
+			width:100%;
+		}
 	</style>
 
 	<!-- Simulation of importing myol -->
@@ -56,17 +59,11 @@ Based on https://openlayers.org
 				geoJsonId: 'edit-json',
 				snapLayers: [coucheContours],
 				help: [
-					(document.getElementById('myol-help-edit-modify') || {}).innerHTML,
+					document.getElementById('myol-help-edit-modify').innerHTML,
 					null, // Pas d'édition de ligne
-					(document.getElementById('myol-help-edit-poly') || {}).innerHTML,
+					document.getElementById('myol-help-edit-poly').innerHTML,
 				],
-				saveFeatures: function(coordinates, format) {
-					return format.writeGeometry(
-						new ol.geom.MultiPolygon(coordinates.polys), {
-							featureProjection: 'EPSG:3857',
-							decimals: 5,
-						});
-				},
+				featuresToSave: coordinates => new ol.geom.MultiPolygon(coordinates.polys), //TODO DONT WORK
 			}),
 
 			map = new ol.Map({
@@ -115,7 +112,25 @@ Based on https://openlayers.org
 	<h4>/vues/edit.html</h4>
 	<div id="carte-edit"></div>
 
-	<input type="hidden" id="edit-json" value='{
+	<label id="myol-help-edit-modify">
+		<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>
+		<p><u>Ajouter un sommet au milieu d'un côté:</u> cliquer le long du côté puis déplacer</p>
+		<p><u>Supprimer un sommet:</u> Alt+cliquer sur le sommet</p>
+		<p><u>Scinder un polygone:</u> joindre 2 sommets du polygone puis Alt+cliquer sur le sommet commun</p>
+			'de chaque polygone puis Alt+cliquer dessus</p>
+		<p><u>Supprimer un polygone:</u> Ctrl+Alt+cliquer sur un côté du polygone</p>
+	</label>
+	<hr/>
+	<label id="myol-help-edit-poly">
+		<p><u>Pour créer un polygone:</u></p>
+		<p>Cliquer sur le bouton &#x1F58D; et choisissez "Création polygone"</p>
+		<p>Cliquer sur l'emplacement du premier sommet</p>
+		<p>Puis sur chaque sommet</p>
+		<p>Double cliquer sur le dernier sommet pour terminer</p>
+		<hr/><p>Un polygone entièrement compris dans un autre crée un "trou"</p>
+	</label>
+
+	<input id="edit-json" type="text" value='{
 		"type": "MultiPolygon",
 		"coordinates": [
 			[
@@ -143,23 +158,5 @@ Based on https://openlayers.org
 			]
 		]
 	}' />
-
-	<label id="myol-help-edit-modify">
-		<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>
-		<p><u>Ajouter un sommet au milieu d'un côté:</u> cliquer le long du côté puis déplacer</p>
-		<p><u>Supprimer un sommet:</u> Alt+cliquer sur le sommet</p>
-		<p><u>Scinder un polygone:</u> joindre 2 sommets du polygone puis Alt+cliquer sur le sommet commun</p>
-			'de chaque polygone puis Alt+cliquer dessus</p>
-		<p><u>Supprimer un polygone:</u> Ctrl+Alt+cliquer sur un côté du polygone</p>
-	</label>
-	<hr/>
-	<label id="myol-help-edit-poly">
-		<p><u>Pour créer un polygone:</u></p>
-		<p>Cliquer sur le bouton &#x1F58D; et choisissez "Création polygone"</p>
-		<p>Cliquer sur l'emplacement du premier sommet</p>
-		<p>Puis sur chaque sommet</p>
-		<p>Double cliquer sur le dernier sommet pour terminer</p>
-		<hr/><p>Un polygone entièrement compris dans un autre crée un "trou"</p>
-	</label>
 </body>
 </html>

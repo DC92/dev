@@ -44,15 +44,7 @@ export default class Editor extends MyButton {
 			// geoJsonUrl: 'url.geojson', // url of geoJson features to be edited
 			help: ['Modification', 'New line', 'New polygon'],
 			labels: ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
-
-			saveFeatures: (coordinates, format) =>
-				format.writeFeatures(
-					this.source.getFeatures(coordinates, format), {
-						dataProjection: this.options.projection,
-						featureProjection: this.getMap().getView().getProjection(),
-						decimals: 5,
-					})
-				.replace(/"properties":\{[^\}]*\}/, '"properties":null'),
+			featuresToSave: coordinates => this.source.getFeatures(coordinates, this.options.format),
 
 			...options,
 		});
@@ -348,7 +340,13 @@ export default class Editor extends MyButton {
 
 		// Save geometries in <EL> as geoJSON at every change
 		if (this.geoJsonEl)
-			this.geoJsonEl.value = this.options.saveFeatures(coordinates, this.options.format);
+			this.geoJsonEl.value = this.options.format.writeFeatures(
+				this.options.featuresToSave(coordinates), {
+					dataProjection: this.options.projection,
+					featureProjection: this.getMap().getView().getProjection(),
+					decimals: 5,
+				})
+			.replace(/"properties":\{[^\}]*\}/, '"properties":null');
 	}
 
 	// Refurbish Lines & Polygons

@@ -11,7 +11,7 @@ import './MyControl.css';
  * Control button
  * Abstract class to be used by other control buttons definitions
  */
-export default class MyButton extends ol.control.Control {
+export class MyButton extends ol.control.Control {
 	constructor(options) {
 		super({
 			element: document.createElement('div'),
@@ -71,6 +71,7 @@ export default class MyButton extends ol.control.Control {
 				el.classList.remove('myol-button-selected');
 	}
 }
+export default MyButton;
 
 /**
  * Geolocation control
