@@ -63,7 +63,9 @@ Based on https://openlayers.org
 					null, // Pas d'édition de ligne
 					document.getElementById('myol-help-edit-poly').innerHTML,
 				],
-				featuresToSave: coordinates => new ol.geom.MultiPolygon(coordinates.polys), //TODO DONT WORK
+				featuresToSave: coordinates => [new ol.Feature({
+					geometry: new ol.geom.MultiPolygon(coordinates.polys),
+				})],
 			}),
 
 			map = new ol.Map({

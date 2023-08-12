@@ -235,7 +235,7 @@ export default class Editor extends MyButton {
 			scale: feature.getGeometry().getType() == 'LineString' ? 1.5 : 0,
 			placement: 'line',
 			textAlign: 'end',
-			text: 'D',
+			text: 'D', //BEST don't display A & D on polygons
 			offsetY: -7,
 		};
 
@@ -346,7 +346,7 @@ export default class Editor extends MyButton {
 					featureProjection: this.getMap().getView().getProjection(),
 					decimals: 5,
 				})
-			.replace(/"properties":\{[^\}]*\}/, '"properties":null');
+			.replace(/,"properties":(\{[^\}]*\}|null)/, '');
 	}
 
 	// Refurbish Lines & Polygons
