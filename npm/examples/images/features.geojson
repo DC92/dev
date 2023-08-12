@@ -17,13 +17,6 @@
 			"geometries": [{
 				"type": "LineString",
 				"coordinates": [
-					[1, 47],
-					[2.2, 47],
-					[2.2, 48]
-				]
-			}, {
-				"type": "LineString",
-				"coordinates": [
 					[3, 48],
 					[3.5, 48.3]
 				]
