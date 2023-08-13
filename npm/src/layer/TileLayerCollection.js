@@ -1,6 +1,6 @@
 /**
  * TileLayerCollection.js
- * Acces to tiles layers services
+ * Acces to various tiles layers services
  */
 
 import ol from '../../src/ol';
@@ -67,14 +67,14 @@ export class MRI extends OSM {
 
 export class Kompass extends OSM { // Austria
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 			subLayer: 'KOMPASS Touristik',
 			attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
-			...opt,
+			...opt, //TODO
 			url: 'https://map{1-5}.tourinfra.com/tiles/kompass_osm/{z}/{x}/{y}.png',
 		};
 
-		if (options.key)
+		if (options.key) //TODO refurbish
 			options.subLayer = 'https://map{1-4}.kompass.de/{z}/{x}/{y}/' + options.subLayer + '?key=' + options.key;
 
 		super(options);
@@ -83,7 +83,7 @@ export class Kompass extends OSM { // Austria
 
 export class Thunderforest extends OSM {
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 			subLayer: 'outdoors',
 			//key: Get a key at https://manage.thunderforest.com/dashboard
 			...opt,
@@ -96,7 +96,7 @@ export class Thunderforest extends OSM {
 				...options, // Include key
 			});
 		else
-			super({
+			super({ //BEST find better
 				maxResolution: 0, // Layer not available for LayerSwitcher
 			});
 	}
@@ -108,7 +108,7 @@ export class Thunderforest extends OSM {
  * doc : https://geoservices.ign.fr/services-web
  */
 export class IGN extends ol.layer.Tile {
-	constructor(options) {
+	constructor(options) { //TODO document options
 		let IGNresolutions = [],
 			IGNmatrixIds = [];
 
@@ -148,7 +148,7 @@ export class IGN extends ol.layer.Tile {
  */
 export class SwissTopo extends LimitedTileLayer {
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 				host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
 				subLayer: 'ch.swisstopo.pixelkarte-farbe',
 				maxResolution: 300, // Resolution limit above which we switch to a more global service
@@ -186,7 +186,7 @@ export class SwissTopo extends LimitedTileLayer {
  */
 export class IgnES extends ol.layer.Tile {
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 			host: '//www.ign.es/wmts/',
 			server: 'mapa-raster',
 			subLayer: 'MTN',
@@ -248,9 +248,10 @@ export class IGM extends LimitedTileLayer {
 /**
  * Ordnance Survey : Great Britain
  */
+//TODO Replacement layer out of bounds
 export class OS extends LimitedTileLayer {
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 			subLayer: 'Outdoor_3857',
 			// key: Get your own (free) key at https://osdatahub.os.uk/
 			...opt,
@@ -281,7 +282,7 @@ export class OS extends LimitedTileLayer {
  */
 export class ArcGIS extends ol.layer.Tile {
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 			host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
 			subLayer: 'World_Imagery',
 			...opt,
@@ -305,7 +306,7 @@ export class ArcGIS extends ol.layer.Tile {
  */
 export class Stamen extends ol.layer.Tile {
 	constructor(options) {
-		super({
+		super({ //TODO document options
 			source: new ol.source.Stamen({
 				layer: 'terrain',
 				...options,
@@ -320,7 +321,7 @@ export class Stamen extends ol.layer.Tile {
  */
 export class Google extends ol.layer.Tile {
 	constructor(opt) {
-		const options = {
+		const options = { //TODO document options
 			subLayers: 'm', // Roads
 			...opt,
 		};
@@ -344,7 +345,7 @@ export class Google extends ol.layer.Tile {
  * attributions: defined by ol/source/BingMaps
  */
 export class Bing extends ol.layer.Tile {
-	constructor(options) {
+	constructor(options) { //TODO document options
 		// Hide in LayerSwitcher if no key provided
 		if (!options.key)
 			options.maxResolution = 0;
@@ -365,7 +366,7 @@ export class Bing extends ol.layer.Tile {
 
 // Tile layers examples
 export function collection(options) {
-	options = options || {};
+	options ||= {};
 
 	return {
 		'OSM fr': new OSM(),
@@ -435,7 +436,7 @@ export function collection(options) {
 }
 
 export function demo(options) {
-	options = options || {};
+	options ||= {};
 
 	return {
 		...collection(options),
@@ -463,11 +464,11 @@ export function demo(options) {
 			subLayer: 'mobile-atlas',
 		}),
 
-		'OS light': new OS({ //TODO BUG don't work
+		'OS light': new OS({
 			...options.os, // Include key
 			subLayer: 'Light_3857',
 		}),
-		'OS road': new OS({ //TODO BUG don't work
+		'OS road': new OS({
 			...options.os, // Include key
 			subLayer: 'Road_3857',
 		}),

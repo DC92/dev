@@ -194,7 +194,7 @@ export class MyGeolocation extends MyButton {
 
 		this.geolocation = new ol.Geolocation({
 			projection: map.getView().getProjection(),
-
+			trackingOptions: this.options,
 			...this.options,
 		});
 		this.geolocation.on('change', evt => this.action(evt));
@@ -388,7 +388,7 @@ export class Load extends MyButton {
 						return new ol.style.Style({
 							stroke: new ol.style.Stroke({
 								color: 'blue',
-								width: 3,
+								width: 2,
 							}),
 							image: properties.sym ? new ol.style.Icon({
 								//TODO compléter chemineur avec les symboles standards
@@ -790,7 +790,7 @@ export class Permalink extends MyButton {
  * This prepares the browser to become offline
  */
 export function tilesBuffer(opt) { //TODO class & test
-//BEST document options
+	//BEST document options
 	const options = {
 			depth: 3,
 			...opt,

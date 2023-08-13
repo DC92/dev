@@ -13,12 +13,16 @@ import * as stylesOptions from './stylesOptions';
 class MyVectorSource extends ol.source.Vector {
 	constructor(opt) {
 		const options = {
-				// host: '',
-				// query: (extent, resolution, projection ,options) => ({_path: '...'}), // this = options
+				//TODO sort & document options
+				// url calculation
 				url: url_, // (extent, resolution, projection)
 				bbox: bbox_, // (extent, resolution, projection)
+				// host: '',
+				// query: (extent, resolution, projection ,options) => ({_path: '...'}),
+
 				strategy: ol.loadingstrategy.bbox,
 				projection: 'EPSG:4326',
+
 				addProperties: (properties) => {}, // (default) add properties to each received features
 
 				...opt,
