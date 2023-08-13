@@ -5,6 +5,7 @@
 
 // Openlayers
 //BEST verify if all are used
+//TODO get from ol...
 import GeoJSON from 'ol/format/GeoJSON';
 import OSMXML from 'ol/format/OSMXML';
 import * as loadingstrategy from 'ol/loadingstrategy';
@@ -12,7 +13,7 @@ import * as proj from 'ol/proj';
 import * as style from 'ol/style';
 
 // MyOl
-import ol from '../../src/ol'; //TODO
+import ol from '../../src/ol';
 import MyVectorLayer from './MyVectorLayer';
 import * as stylesOptions from './stylesOptions';
 

@@ -69,7 +69,7 @@ export function label(feature, layer) {
 
 // Display a circle with the number of features on the cluster
 export function cluster(feature, layer) {
-	//TODO pourquoi itère sur render ?
+	//TODO BUG pourquoi itère sur render ?
 	return [{
 		image: new ol.style.Circle({
 			radius: 14,

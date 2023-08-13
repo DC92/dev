@@ -1,24 +1,12 @@
 /**
  * Marker position display & edit
- * Options:
-   position: [0, 0], Initial position of the marker
-   src : url of the marker image
-   prefix : id prefix of input/output values
-   focus : number : center & value of zoom on the marker
-   dragable : can draw the marker to edit position
  */
 
 import ol from '../../src/ol';
 import proj4Lib from 'proj4/lib/index';
 
 export default class Marker extends ol.layer.Vector {
-	constructor(opt) {
-		const options = {
-			prefix: 'marker',
-			zIndex: 1000, // Above points
-			...opt,
-		};
-
+	constructor(options) {
 		super({
 			source: new ol.source.Vector(),
 			style: new ol.style.Style({
@@ -26,10 +14,23 @@ export default class Marker extends ol.layer.Vector {
 					src: options.src,
 				}),
 			}),
-			...options,
 		});
 
-		this.options = options;
+		this.options = {
+			// src, url of marker image
+			// position: [0, 0], Initial position of the marker (default : center of the map)
+			// dragable : can draw the marker to edit position
+			// focus : number : center & value of zoom on the marker
+			zIndex: 400, // Above points
+
+			prefix: 'marker', // Will take the values on
+			// marker-json, <input> json form
+			// marker-lon, marker-lat, // <input> longitude / latitude
+			// marker-x, marker-y', // <input> Swiss EPSG:21781
+			// marker-select, marker-string, select / display coords format
+
+			...options,
+		};
 
 		// Initialise specific projection
 		if (typeof proj4Lib == 'function') {
@@ -47,10 +48,10 @@ export default class Marker extends ol.layer.Vector {
 			ol.proj.proj4.register(proj4Lib);
 		}
 
-		// Register action listeners
+		// Register the action listeners
 		this.els = [];
 		['json', 'lon', 'lat', 'x', 'y', 'select', 'string'].forEach(i => {
-			this.els[i] = document.getElementById((options.prefix) + '-' + i) || document.createElement('div');
+			this.els[i] = document.getElementById(this.options.prefix + '-' + i) || document.createElement('div');
 			this.els[i].addEventListener('change', evt => this.action(evt.target));
 		});
 	}

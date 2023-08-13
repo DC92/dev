@@ -19,3 +19,7 @@
   top: 32px;
   left: 4px;
 }
+.ol-geocoder .gcd-gl-result {
+  top: 61px !important;
+  left: 66px !important;
+}

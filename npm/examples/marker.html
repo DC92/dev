@@ -79,8 +79,6 @@ Based on https://openlayers.org
 				<option value="utm">UTM</option>
 			</select>
 		</p><p>
-			<input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' />
-		</p><p>
 			Longitude :
 			<input id="marker-lon" type="text" name="lon" size="12" maxlength="12" /> (WGS84)&nbsp;
 			<span class="xy"> / X : <input id="marker-x" type="text" name="x" size="7" maxlength="12"> (CH 1903)</span>
@@ -88,10 +86,13 @@ Based on https://openlayers.org
 			Latitude :
 			<input id="marker-lat" type="text" name="lat" size="12" maxlength="12" /> (WGS84)&nbsp;
 			<span class="xy"> / Y : <input id="marker-y" type="text" name="y" size="7" maxlength="12"></span>
+		</p><p>
+			Double clic sur la carte y déplace le curseur.
+		</p><p>
+			<input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' />
 		</p>
 	</div>
-
-	<p>Double clic sur la carte y déplace le curseur.</p>
+	
 
 	<h4 style="margin-bottom:0">Tests</h4>
 	<div>Look at fix marker & display</div>

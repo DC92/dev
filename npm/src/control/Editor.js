@@ -3,20 +3,16 @@
  * geoJson lines & polygons edit
  */
 
-import Control from 'ol/control/Control'; //TODO RESORB with class
-
 import ol from '../../src/ol';
 import MyButton from './MyControl';
-import './editor.css';
 
 // Editor
 export default class Editor extends MyButton {
 	constructor(options) {
 		super({
 			// Mybutton options
-			className: 'myol-button-edit',
 			label: 'E', // To be defined by changeModeEdit
-			submenuHTML: '<p>Edition:</p>' +
+			subMenuHTML: '<p>Edition:</p>' +
 				//BEST move in .html / generalize aids / translation
 				'<label for="myol-edit0">' +
 				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
@@ -39,11 +35,10 @@ export default class Editor extends MyButton {
 			projection: 'EPSG:4326',
 			snapLayers: [], // Vector layers to snap on
 			focus: false, // Zoom the map on the loaded features
-
 			geoJsonId: 'editable-json', // id of an html element containing geoJson features to be edited
 			// geoJsonUrl: 'url.geojson', // url of geoJson features to be edited
-			help: ['Modification', 'New line', 'New polygon'],
 			labels: ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
+			help: ['Modification', 'New line', 'New polygon'],
 			featuresToSave: coordinates => this.source.getFeatures(coordinates, this.options.format),
 
 			...options,
@@ -57,7 +52,7 @@ export default class Editor extends MyButton {
 		this.layer = new ol.layer.Vector({
 			source: this.source,
 			style: this.displayStyle,
-			zIndex: 20, // Editor & cursor : above the features
+			zIndex: 400, // Editor & cursor : above the features
 		});
 
 		// Register action listeners
@@ -175,7 +170,7 @@ export default class Editor extends MyButton {
 		map.on('pointermove', evt => this.hover(evt));
 
 		// Add features loaded from GPX file
-		map.on('myol:onfeatureload', evt => { //TODO RESORB
+		map.on('myol:onfeatureload', evt => { //BEST RESORB
 			this.addFeatures(evt.features);
 			return false; // Warn control.load that the editor got the included feature
 		});
@@ -310,7 +305,7 @@ export default class Editor extends MyButton {
 
 		// If no more hovered, return to the normal style
 		if (!nbFeaturesAtPixel && !evt.originalEvent.buttons && this.hoveredFeature) {
-			this.hoveredFeature.setStyle(this.displayStyle); //TODO editor should clear style / displayStyle has wrong arguments
+			this.hoveredFeature.setStyle();
 			this.hoveredFeature = null;
 		}
 	}

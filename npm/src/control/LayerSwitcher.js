@@ -6,16 +6,17 @@ import './layerSwitcher.css';
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
 //BEST keep open on click (as other buttons)
-//BEST document options
 export default class LayerSwitcher extends MyButton {
 	constructor(options) {
 		super({
+			// MyButton options
 			className: 'myol-button-switcher',
 			label: '&#x274F;',
-			submenuHTML: '<div id="myol-ls-range">' +
+			subMenuHTML: '<div id="myol-ls-range">' +
 				'<input type="range" title="Glisser pour faire varier la tranparence">' +
 				'<span>Ctrl+click: multicouches</span>' +
 				'</div>',
+
 			...options,
 		});
 
@@ -29,7 +30,6 @@ export default class LayerSwitcher extends MyButton {
 		// Get baselayer from url if any
 		if (this.baselayer)
 			localStorage.myol_baselayer = decodeURI(this.baselayer[1]);
-
 	}
 
 	setMap(map) {
@@ -54,9 +54,8 @@ export default class LayerSwitcher extends MyButton {
 
 			labelEl.innerHTML = '<input type="checkbox" value="' + name + '" ' + ' />' + name;
 			labelEl.firstChild.onclick = evt => this.selectBaseLayer(evt); //BEST resorb all firstChild
-			this.submenuEl.appendChild(labelEl);
+			this.subMenuEl.appendChild(labelEl);
 
-			//TODO BUG ??? this.baselayers[name].setVisible(false); // Don't begin to get the tiles yet
 			map.addLayer(this.baselayers[name]);
 
 			// Mem it for further ops
@@ -71,7 +70,7 @@ export default class LayerSwitcher extends MyButton {
 
 		if (selectExtEl) {
 			selectExtEl.classList.add('select-ext');
-			this.submenuEl.appendChild(selectExtEl);
+			this.subMenuEl.appendChild(selectExtEl);
 			// Unmask the selector if it has been @ the declaration
 			selectExtEl.style.display = '';
 		}
@@ -120,7 +119,7 @@ export default class LayerSwitcher extends MyButton {
 		this.displayTransparencyRange();
 	}
 
-	displayTransparencyRange() { //TODO DONT WORK
+	displayTransparencyRange() { //TODO BUG don't work
 		if (this.transparentBaseLayerName) {
 			for (let l = 0; l < this.baselayers[this.transparentBaseLayerName].length; l++)
 				this.baselayers[this.transparentBaseLayerName][l].setOpacity(

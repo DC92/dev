@@ -14,25 +14,31 @@ import './MyControl.css';
 export class MyButton extends ol.control.Control {
 	constructor(options) {
 		super({
+			// ol.Control options
 			element: document.createElement('div'),
+
+			// MyButton options
+			// className : to be added to the control.element
+			// label : one unicode character to decorate the button
+			// subMenuId : id of an existing html containing the scrolling menu 
+			// subMenuHTML : html code of the scrolling menu 
+
 			...options ||= {},
 		});
 
 		this.options = options; // Mem for further use
 
 		// Add submenu below the button
-		if (options.submenuEl)
-			this.submenuEl = options.submenuEl;
-		else if (options.submenuId)
-			this.submenuEl = document.getElementById(options.submenuId);
+		if (options.subMenuId)
+			this.subMenuEl = document.getElementById(options.subMenuId);
 		else {
-			this.submenuEl = document.createElement('div');
-			if (options.submenuHTML)
-				this.submenuEl.innerHTML = options.submenuHTML;
+			this.subMenuEl = document.createElement('div');
+			if (options.subMenuHTML)
+				this.subMenuEl.innerHTML = options.subMenuHTML;
 		}
 
 		// Display the button only if there are no label or submenu
-		if (options.label && this.submenuEl && this.submenuEl.innerHTML) {
+		if (options.label && this.subMenuEl && this.subMenuEl.innerHTML) {
 			// Create a button
 			const buttonEl = document.createElement('button');
 			buttonEl.setAttribute('type', 'button');
@@ -42,7 +48,7 @@ export class MyButton extends ol.control.Control {
 			// Populate the control
 			this.element.className = 'ol-control myol-button' + (options.className ? ' ' + options.className : '');
 			this.element.appendChild(buttonEl); // Add the button
-			this.element.appendChild(this.submenuEl); // Add the submenu
+			this.element.appendChild(this.subMenuEl); // Add the submenu
 			this.element.addEventListener('mouseover', evt => this.buttonAction(evt));
 			this.element.addEventListener('mouseout', evt => this.buttonAction(evt));
 
@@ -77,13 +83,10 @@ export default MyButton;
  * Geolocation control
  * Display status, altitude & speed
  */
-//BEST document options
+//BEST separate file with import / export
 export class MyGeolocation extends MyButton {
-	constructor(opt) {
-		const options = {
-				...opt,
-			},
-			subMenu = location.href.match(/(https|localhost)/) ?
+	constructor(options) {
+		const subMenu = location.href.match(/(https|localhost)/) ?
 			//BEST use .html content / option
 			'<p>Localisation GPS:</p>' +
 			'<label>' +
@@ -112,9 +115,18 @@ export class MyGeolocation extends MyButton {
 			'<a href="' + document.location.href.replace('http:', 'https:') + '">Passer en https<a>';
 
 		super({
+			// MyButton options
 			className: 'myol-button-gps',
 			label: '&#x2295;',
-			submenuHTML: subMenu,
+			subMenuHTML: subMenu,
+			//TODO subMenuId: 'myol-gps',
+
+			// ol.Geolocation options
+			// https://www.w3.org/TR/geolocation/#position_options_interface
+			enableHighAccuracy: true,
+			maximumAge: 1000,
+			timeout: 1000,
+
 			...options,
 		});
 
@@ -136,7 +148,7 @@ export class MyGeolocation extends MyButton {
 			source: new ol.source.Vector({
 				features: [this.graticuleFeature, this.northGraticuleFeature],
 			}),
-			zIndex: 20, // Above the features
+			zIndex: 300, // Above the features
 			style: new ol.style.Style({
 				fill: new ol.style.Fill({
 					color: 'rgba(128,128,255,0.2)',
@@ -182,12 +194,8 @@ export class MyGeolocation extends MyButton {
 
 		this.geolocation = new ol.Geolocation({
 			projection: map.getView().getProjection(),
-			trackingOptions: {
-				enableHighAccuracy: true,
-				maximumAge: 1000,
-				timeout: 1000,
-				...this.options, //TODO séparer les options pour Geolocation / et autres
-			},
+
+			...this.options,
 		});
 		this.geolocation.on('change', evt => this.action(evt));
 		this.geolocation.on('error', error => {
@@ -305,14 +313,18 @@ export class MyGeolocation extends MyButton {
 /**
  * GPX file loader control
  */
-//BEST document options
 export class Load extends MyButton {
 	constructor(options) {
 		super({
+			// MyButton options
 			label: '&#x1F4C2;',
-			submenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
+			subMenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
 				'<input type="file" accept=".gpx,.kml,.geojson" />',
-			...options ||= {},
+
+			// Load options
+			// initFileUrl, url of a gpx file to be uploaded at the init
+
+			...options ||= {}, //HACK default when options is undefined
 		});
 
 		// Register action listeners
@@ -322,9 +334,9 @@ export class Load extends MyButton {
 			});
 
 		// Load file at init
-		if (options.initFile) {
+		if (options.initFileUrl) {
 			const xhr = new XMLHttpRequest();
-			xhr.open('GET', options.initFile);
+			xhr.open('GET', options.initFileUrl);
 			xhr.onreadystatechange = () => {
 				if (xhr.readyState == 4 && xhr.status == 200)
 					this.loadText(xhr.responseText, 'GPX');
@@ -410,21 +422,20 @@ export class Load extends MyButton {
  * File downloader control
  */
 //BEST BUG incompatible with clusters
-//BEST document options
 export class Download extends MyButton {
-	constructor(opt) {
-		const options = {
+	constructor(options) {
+		super({
+			// MyButton options
 			label: '&#x1f4e5;',
-			submenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
+			subMenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a mime="application/gpx+xml">GPX</a>' +
 				'<a mime="vnd.google-earth.kml+xml">KML</a>' +
 				'<a mime="application/json">GeoJSON</a>',
 			fileName: document.title || 'openlayers', //BEST name from feature
-			...opt,
-		};
 
-		super(options);
+			...options,
+		});
 
 		this.hiddenEl = document.createElement('a');
 		this.hiddenEl.target = '_self';
@@ -450,9 +461,9 @@ export class Download extends MyButton {
 		if (this.options.savedLayer)
 			getFeatures(this.options.savedLayer);
 		else
-			map.getLayers().forEach(getFeatures); //TODO what about (args)
+			map.getLayers().forEach(getFeatures); //BEST what about (args)
 
-		function getFeatures(savedLayer) { //TODO put in method
+		function getFeatures(savedLayer) { //BEST put in method
 			if (savedLayer.getSource() &&
 				savedLayer.getSource().forEachFeatureInExtent) // For vector layers only
 				savedLayer.getSource().forEachFeatureInExtent(extent, feature => {
@@ -512,13 +523,13 @@ export class Download extends MyButton {
 /**
  * Print control
  */
-//BEST document options
 export class Print extends MyButton {
 	constructor(options) {
 		super({
+			// MyButton options
 			label: '&#x1F5A8;',
 			className: 'myol-button-print',
-			submenuHTML: '<p>Pour imprimer la carte:</p>' +
+			subMenuHTML: '<p>Pour imprimer la carte:</p>' +
 				'<p>-Choisir portrait ou paysage,</p>' +
 				'<p>-zoomer et déplacer la carte dans le format,</p>' +
 				'<p>-imprimer.</p>' +
@@ -526,6 +537,7 @@ export class Print extends MyButton {
 				'<label><input type="radio" value="1">Paysage A4</label>' +
 				'<a id="print">Imprimer</a>' +
 				'<a onclick="location.reload()">Annuler</a>',
+
 			...options,
 		});
 
@@ -586,14 +598,15 @@ export class Print extends MyButton {
 
 /**
  * Help control
- * Display help contained in <TAG id="<options.submenuId>">
+ * Display help contained in <TAG id="<options.subMenuId>">
  */
-//BEST document options
 export class Help extends MyButton {
 	constructor(options) {
 		super({
+			// MyButton options
 			label: '?',
-			submenuId: 'myol-help',
+			subMenuId: 'myol-help',
+
 			...options,
 		});
 	}
@@ -602,7 +615,6 @@ export class Help extends MyButton {
 /**
  * Control to display the length & height difference of an hovered line
  */
-//BEST document options
 export class LengthLine extends MyButton {
 	constructor() {
 		super(); //HACK button not visible
@@ -677,12 +689,12 @@ export class LengthLine extends MyButton {
 /**
  * Control to display the mouse position
  */
-//BEST document options
 export class MyMousePosition extends ol.control.MousePosition {
 	constructor(options) {
 		super({
-			projection: 'EPSG:4326',
+			// From MousePosition options
 			className: 'myol-coordinate',
+			projection: 'EPSG:4326',
 			placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
 
 			coordinateFormat: mouse => {
@@ -697,6 +709,7 @@ export class MyMousePosition extends ol.control.MousePosition {
 				} else
 					return ol.coordinate.createStringXY(4)(mouse);
 			},
+
 			...options,
 		});
 	}
@@ -707,18 +720,30 @@ export class MyMousePosition extends ol.control.MousePosition {
  * "map" url hash or localStorage: zoom=<ZOOM> lon=<LON> lat=<LAT>
  * Don't set view when you declare the map
  */
-//BEST document options
 export class Permalink extends MyButton {
-	constructor(opt) {
-		const options = {
-				//BEST init with bbox option
-				init: true, // {true | false} use url hash or localStorage to position the map.
-				setUrl: false, // {true | false} Change url hash when moving the map.
-				display: false, // {true | false} Display permalink link the map.
-				hash: '?', // {?, #} the permalink delimiter after the url
-				...opt,
-			},
-			aEl = document.createElement('a'),
+	constructor(options) {
+		super({
+			// Permalink options
+			init: true, // {true | false} use url hash or localStorage to position the map.
+			setUrl: false, // {true | false} Change url hash when moving the map.
+			display: false, // {true | false} Display permalink link the map.
+			hash: '?', // {?, #} the permalink delimiter after the url
+			//BEST init with bbox option
+
+			...options,
+		});
+
+		if (this.options.display) {
+			this.element.className = 'myol-permalink';
+			this.aEl = document.createElement('a');
+			this.aEl.innerHTML = 'Permalink';
+			this.aEl.title = 'Generate a link with map zoom & position';
+			this.element.appendChild(this.aEl);
+		}
+	}
+
+	render(evt) {
+		const view = evt.map.getView(),
 			urlMod = location.href.replace( // Get value from params with priority url / ? / #
 				/map=([0-9\.]+)\/(-?[0-9\.]+)\/(-?[0-9\.]+)/, // map=<zoom>/<lon>/<lat>
 				'zoom=$1&lon=$2&lat=$3' // zoom=<zoom>&lon=<lon>&lat=<lat>
@@ -730,47 +755,32 @@ export class Permalink extends MyButton {
 			// Default
 			'zoom=6&lon=2&lat=47';
 
-		super({
-			element: document.createElement('div'),
-			render: render,
-		});
 
-		if (options.display) {
-			this.element.className = 'myol-permalink';
-			aEl.innerHTML = 'Permalink';
-			aEl.title = 'Generate a link with map zoom & position';
-			this.element.appendChild(aEl);
+		// Set center & zoom at the init
+		if (this.options.init) {
+			this.options.init = false; // Only once
+
+			view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
+
+			view.setCenter(ol.proj.transform([
+				urlMod.match(/lon=(-?[0-9\.]+)/)[1],
+				urlMod.match(/lat=(-?[0-9\.]+)/)[1],
+			], 'EPSG:4326', 'EPSG:3857'));
 		}
 
-		function render(evt) { //TODO use method render
-			const view = evt.map.getView();
+		// Set the permalink with current map zoom & position
+		if (view.getCenter()) {
+			const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
+				newParams = 'map=' +
+				(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
+				(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
+				(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
 
-			// Set center & zoom at the init
-			if (options.init) {
-				options.init = false; // Only once
+			if (this.options.display)
+				this.aEl.href = this.options.hash + newParams;
 
-				view.setZoom(urlMod.match(/zoom=([0-9\.]+)/)[1]);
-
-				view.setCenter(ol.proj.transform([
-					urlMod.match(/lon=(-?[0-9\.]+)/)[1],
-					urlMod.match(/lat=(-?[0-9\.]+)/)[1],
-				], 'EPSG:4326', 'EPSG:3857'));
-			}
-
-			// Set the permalink with current map zoom & position
-			if (view.getCenter()) {
-				const ll4326 = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326'),
-					newParams = 'map=' +
-					(localStorage.myol_zoom = Math.round(view.getZoom() * 10) / 10) + '/' +
-					(localStorage.myol_lon = Math.round(ll4326[0] * 10000) / 10000) + '/' +
-					(localStorage.myol_lat = Math.round(ll4326[1] * 10000) / 10000);
-
-				if (options.display)
-					aEl.href = options.hash + newParams;
-
-				if (options.setUrl)
-					location.href = '#' + newParams;
-			}
+			if (this.options.setUrl)
+				location.href = '#' + newParams;
 		}
 	}
 }
@@ -779,10 +789,8 @@ export class Permalink extends MyButton {
  * Control to display set preload of depth upper level tiles
  * This prepares the browser to become offline
  */
-//TODO TEST
-//TODO class
+export function tilesBuffer(opt) { //TODO class & test
 //BEST document options
-export function tilesBuffer(opt) {
 	const options = {
 			depth: 3,
 			...opt,

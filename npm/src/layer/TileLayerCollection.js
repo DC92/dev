@@ -353,6 +353,7 @@ export class Bing extends ol.layer.Tile {
 		const layer = this;
 
 		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is visible
+		//TODO BUG don't display when selected then page reloaded
 		layer.on('change:visible', function(evt) {
 			if (evt.target.getVisible() && // When the layer becomes visible
 				!layer.getSource()) { // Only once
@@ -462,11 +463,11 @@ export function demo(options) {
 			subLayer: 'mobile-atlas',
 		}),
 
-		'OS light': new OS({ //TODO DONT WORK
+		'OS light': new OS({ //TODO BUG don't work
 			...options.os, // Include key
 			subLayer: 'Light_3857',
 		}),
-		'OS road': new OS({ //TODO DONT WORK
+		'OS road': new OS({ //TODO BUG don't work
 			...options.os, // Include key
 			subLayer: 'Road_3857',
 		}),

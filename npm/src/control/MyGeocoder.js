@@ -9,13 +9,10 @@ import '../../node_modules/@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
 import './myGeocoder.css'; // After ol-geocoder.css
 import Geocoder from '../../geocoder/src/base';
 
-//BEST document options
 export default class MyGeocoder extends Geocoder {
 	constructor(options) {
-		options ||= {};
-
 		super('nominatim', {
-			provider: options.provider || 'osm',
+			// See https://github.com/kirtan-desai/ol-geocoder#user-content-api
 			placeholder: 'Recherche par nom sur la carte', // Initialization of the input field
 			...options,
 		});

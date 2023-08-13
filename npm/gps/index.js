@@ -61,10 +61,10 @@ var map,
 	controlOptions = { // To be customized by the specific index.php
 		layerSwitcher: {},
 		LoadGPX: {
-			initFile: gpxParam,
+			initFileUrl: gpxParam,
 		},
 		Help: {
-			submenuId: 'myol-gps-help',
+			subMenuId: 'myol-gps-help',
 		}
 	};
 
