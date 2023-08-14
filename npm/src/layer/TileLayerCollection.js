@@ -73,6 +73,7 @@ export class Kompass extends OpenStreetMap { // Austria
 			url: options.key ?
 				'https://map{1-4}.kompass.de/{z}/{x}/{y}/kompass_' + options.subLayer + '?key=' + options.key : // Specific
 				'https://map{1-5}.tourinfra.com/tiles/kompass_' + options.subLayer + '/{z}/{x}/{y}.png', // No key
+			hidden: !options.key && options.subLayer != 'osm', // For LayerSwitcher
 			attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
 
 			...options,
@@ -407,6 +408,10 @@ export function collection(options) {
 		'Autriche Kompass': new Kompass({
 			subLayer: 'osm', // No key
 		}),
+		'Kompas winter': new Kompass({
+			...options.kompass, // Include key
+			subLayer: 'winter',
+		}),
 		'Angleterre': new OS(options.os), // options include key
 		'Italie': new IGM(),
 
@@ -488,10 +493,6 @@ export function demo(options) {
 		'Kompas topo': new Kompass({
 			...options.kompass, // Include key
 			subLayer: 'topo',
-		}),
-		'Kompas winter': new Kompass({
-			...options.kompass, // Include key
-			subLayer: 'winter',
 		}),
 
 		'Bing': new Bing({
