@@ -22,7 +22,7 @@ export default class LayerSwitcher extends MyButton {
 
 		this.baselayers = Object.fromEntries(
 			Object.entries(options.layers)
-			.filter(([_, v]) => v && v.getMaxResolution()) //HACK Remove invalid layers
+			.filter(([_, v]) => v && !v.getProperties().hidden)
 		);
 		this.layerNames = Object.keys(this.baselayers);
 		this.baselayer = location.href.match(/this.baselayer=([^\&]+)/);
@@ -71,7 +71,7 @@ export default class LayerSwitcher extends MyButton {
 		if (selectExtEl) {
 			selectExtEl.classList.add('select-ext');
 			this.subMenuEl.appendChild(selectExtEl);
-			// Unmask the selector if it has been @ the declaration
+			// Unmask the selector if it has been at the declaration
 			selectExtEl.style.display = '';
 		}
 	}

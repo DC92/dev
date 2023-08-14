@@ -5,8 +5,6 @@
 
 import ol from '../../src/ol';
 
-//BEST document options on each
-
 // Virtual class to replace invalid layer scope by a stub display
 class LimitedTileLayer extends ol.layer.Tile {
 	setMapInternal(map) { //HACK execute actions on Map init
@@ -29,86 +27,83 @@ class LimitedTileLayer extends ol.layer.Tile {
 }
 
 // OpenStreetMap & co
-export class OSM extends ol.layer.Tile {
+export class OpenStreetMap extends ol.layer.Tile {
 	constructor(options) {
 		super({
 			source: new ol.source.XYZ({
 				url: '//{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 				maxZoom: 21,
 				attributions: ol.source.OSM.ATTRIBUTION,
+
 				...options,
 			}),
+
 			...options,
 		});
 	}
 }
 
-export class OpenTopo extends OSM {
+export class OpenTopo extends OpenStreetMap {
 	constructor(options) {
 		super({
 			url: '//{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			maxZoom: 17,
 			attributions: '<a href="https://opentopomap.org">OpenTopoMap</a> ' +
 				'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-			maxZoom: 17,
+
 			...options,
 		});
 	}
 }
 
-export class MRI extends OSM {
+export class MRI extends OpenStreetMap {
 	constructor(options) {
 		super({
 			url: '//maps.refuges.info/hiking/{z}/{x}/{y}.png',
 			attributions: '<a href="//wiki.openstreetmap.org/wiki/Hiking/mri">Refuges.info</a>',
+
 			...options,
 		});
 	}
 }
 
-export class Kompass extends OSM { // Austria
+export class Kompass extends OpenStreetMap { // Austria
 	constructor(opt) {
 		const options = { //TODO document options
+			url: 'https://map{1-5}.tourinfra.com/tiles/kompass_osm/{z}/{x}/{y}.png',
 			subLayer: 'KOMPASS Touristik',
 			attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
-			...opt, //TODO
-			url: 'https://map{1-5}.tourinfra.com/tiles/kompass_osm/{z}/{x}/{y}.png',
+
+			...opt,
 		};
 
-		if (options.key) //TODO refurbish
-			options.subLayer = 'https://map{1-4}.kompass.de/{z}/{x}/{y}/' + options.subLayer + '?key=' + options.key;
+		//if (options.key) //TODO refurbish / winter ??
+		options.url = 'https://map{1-4}.kompass.de/{z}/{x}/{y}/' + options.subLayer + '?key=' + options.key;
 
 		super(options);
 	}
 }
 
-export class Thunderforest extends OSM {
-	constructor(opt) {
-		const options = { //TODO document options
-			subLayer: 'outdoors',
-			//key: Get a key at https://manage.thunderforest.com/dashboard
-			...opt,
-		};
+export class Thunderforest extends OpenStreetMap {
+	constructor(options) {
+		super({
+			url: '//{a-c}.tile.thunderforest.com/' + options.subLayer + '/{z}/{x}/{y}.png?apikey=' + options.key,
+			// subLayer: 'outdoors', ...
+			// key: Get a key at https://manage.thunderforest.com/dashboard
+			hidden: !options.key, // For LayerSwitcher
+			attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
 
-		if (options.key) // Don't display if no key
-			super({
-				url: '//{a-c}.tile.thunderforest.com/' + options.subLayer + '/{z}/{x}/{y}.png?apikey=' + options.key,
-				attributions: '<a href="http://www.thunderforest.com">Thunderforest</a>',
-				...options, // Include key
-			});
-		else
-			super({ //BEST find better
-				maxResolution: 0, // Layer not available for LayerSwitcher
-			});
+			...options, // Include key
+		});
 	}
 }
 
 /**
  * IGN France
- * var options.key = Get your own (free)IGN key at https://geoservices.ign.fr/
  * doc : https://geoservices.ign.fr/services-web
  */
 export class IGN extends ol.layer.Tile {
-	constructor(options) { //TODO document options
+	constructor(options) {
 		let IGNresolutions = [],
 			IGNmatrixIds = [];
 
@@ -117,28 +112,32 @@ export class IGN extends ol.layer.Tile {
 			IGNmatrixIds[i] = i.toString();
 		}
 
-		if (options && options.key) // Don't display if no key provided
-			super({
-				source: new ol.source.WMTS({
-					url: 'https://wxs.ign.fr/' + options.key + '/wmts',
-					layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
-					style: 'normal',
-					matrixSet: 'PM',
-					format: 'image/jpeg',
-					attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
-					tileGrid: new ol.tilegrid.WMTS({
-						origin: [-20037508, 20037508],
-						resolutions: IGNresolutions,
-						matrixIds: IGNmatrixIds,
-					}),
-					...options, // Include key & layer
+		options ||= {};
+
+		super({
+			hidden: !options.key, // For LayerSwitcher
+			source: new ol.source.WMTS({
+				// WMTS options
+				url: 'https://wxs.ign.fr/' + options.key + '/wmts',
+				layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS', // Top 25
+				style: 'normal',
+				matrixSet: 'PM',
+				format: 'image/jpeg',
+				attributions: '&copy; <a href="http://www.geoportail.fr/" target="_blank">IGN</a>',
+				tileGrid: new ol.tilegrid.WMTS({
+					origin: [-20037508, 20037508],
+					resolutions: IGNresolutions,
+					matrixIds: IGNmatrixIds,
 				}),
-				...options,
-			});
-		else
-			super({
-				maxResolution: 0, // Layer not available for LayerSwitcher
-			});
+
+				// IGN options
+				// key, Get your own (free) IGN key at https://geoservices.ign.fr/
+
+				...options, // Include key & layer
+			}),
+
+			...options,
+		});
 	}
 }
 
@@ -148,10 +147,12 @@ export class IGN extends ol.layer.Tile {
  */
 export class SwissTopo extends LimitedTileLayer {
 	constructor(opt) {
-		const options = { //TODO document options
+		const options = {
 				host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
 				subLayer: 'ch.swisstopo.pixelkarte-farbe',
 				maxResolution: 300, // Resolution limit above which we switch to a more global service
+				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
+
 				...opt,
 			},
 			projectionExtent = ol.proj.get('EPSG:3857').getExtent(),
@@ -165,7 +166,6 @@ export class SwissTopo extends LimitedTileLayer {
 
 		super({
 			source: new ol.source.WMTS(({
-				crossOrigin: 'anonymous',
 				url: options.host + options.subLayer +
 					'/default/current/3857/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
 				tileGrid: new ol.tilegrid.WMTS({
@@ -174,8 +174,11 @@ export class SwissTopo extends LimitedTileLayer {
 					matrixIds: matrixIds,
 				}),
 				requestEncoding: 'REST',
-				attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
+				crossOrigin: 'anonymous',
+
+				...options,
 			})),
+
 			...options,
 		});
 	}
@@ -186,10 +189,12 @@ export class SwissTopo extends LimitedTileLayer {
  */
 export class IgnES extends ol.layer.Tile {
 	constructor(opt) {
-		const options = { //TODO document options
+		const options = {
 			host: '//www.ign.es/wmts/',
 			server: 'mapa-raster',
 			subLayer: 'MTN',
+			attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
+
 			...opt,
 		};
 
@@ -199,9 +204,10 @@ export class IgnES extends ol.layer.Tile {
 					'&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg' +
 					'&style=default&tilematrixset=GoogleMapsCompatible' +
 					'&TileMatrix={z}&TileCol={x}&TileRow={y}',
-				attributions: '&copy; <a href="http://www.ign.es/">IGN España</a>',
+
 				...options,
 			}),
+
 			...options,
 		});
 	}
@@ -216,9 +222,11 @@ export class IGM extends LimitedTileLayer {
 			source: new ol.source.TileWMS({
 				url: 'https://chemineur.fr/assets/proxy/?s=minambiente.it', // Not available via https
 				attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
+
 				...options,
 			}),
 			maxResolution: 120,
+
 			...options,
 		});
 	}
@@ -248,32 +256,31 @@ export class IGM extends LimitedTileLayer {
 /**
  * Ordnance Survey : Great Britain
  */
-//TODO Replacement layer out of bounds
+//BEST Replacement layer out of bounds
 export class OS extends LimitedTileLayer {
 	constructor(opt) {
-		const options = { //TODO document options
+		const options = {
 			subLayer: 'Outdoor_3857',
 			// key: Get your own (free) key at https://osdatahub.os.uk/
+			extent: [-1198263, 6365000, 213000, 8702260],
+			minResolution: 2,
+			maxResolution: 1700,
+			attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
+
 			...opt,
 		};
 
-		if (options.key) // Don't display if no key
-			super({
-				extent: [-1198263, 6365000, 213000, 8702260],
-				minResolution: 2,
-				maxResolution: 1700,
-				source: new ol.source.XYZ({
-					url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
-						'/{z}/{x}/{y}.png?key=' + options.key,
-					attributions: '&copy <a href="https://explore.osmaps.com">UK Ordnancesurvey maps</a>',
-					...options, // Include key
-				}),
-				...options,
-			});
-		else
-			super({
-				maxResolution: 0, // Layer not available for LayerSwitcher
-			});
+		super({
+			hidden: !options.key, // For LayerSwitcher
+			source: new ol.source.XYZ({
+				url: 'https://api.os.uk/maps/raster/v1/zxy/' + options.subLayer +
+					'/{z}/{x}/{y}.png?key=' + options.key,
+
+				...options, // Include key
+			}),
+
+			...options,
+		});
 	}
 }
 
@@ -282,9 +289,12 @@ export class OS extends LimitedTileLayer {
  */
 export class ArcGIS extends ol.layer.Tile {
 	constructor(opt) {
-		const options = { //TODO document options
+		const options = {
 			host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
 			subLayer: 'World_Imagery',
+			maxZoom: 19,
+			attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
+
 			...opt,
 		};
 
@@ -292,10 +302,10 @@ export class ArcGIS extends ol.layer.Tile {
 			source: new ol.source.XYZ({
 				url: options.host + options.subLayer +
 					'/MapServer/tile/{z}/{y}/{x}',
-				maxZoom: 19,
-				attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
+
 				...options,
 			}),
+
 			...options,
 		});
 	}
@@ -306,11 +316,13 @@ export class ArcGIS extends ol.layer.Tile {
  */
 export class Stamen extends ol.layer.Tile {
 	constructor(options) {
-		super({ //TODO document options
+		super({
 			source: new ol.source.Stamen({
 				layer: 'terrain',
+
 				...options,
 			}),
+
 			...options,
 		});
 	}
@@ -321,17 +333,20 @@ export class Stamen extends ol.layer.Tile {
  */
 export class Google extends ol.layer.Tile {
 	constructor(opt) {
-		const options = { //TODO document options
+		const options = {
 			subLayers: 'm', // Roads
+			attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
+
 			...opt,
 		};
 
 		super({
 			source: new ol.source.XYZ({
 				url: '//mt{0-3}.google.com/vt/lyrs=' + options.subLayers + '&hl=fr&x={x}&y={y}&z={z}',
-				attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
+
 				...options,
 			}),
+
 			...options,
 		});
 	}
@@ -339,26 +354,26 @@ export class Google extends ol.layer.Tile {
 
 /**
  * Bing (Microsoft)
- * options.imagerySet: sublayer
- * options.key: Get your own (free) key at https://www.bingmapsportal.com
  * Doc at: https://docs.microsoft.com/en-us/bingmaps/getting-started/
- * attributions: defined by ol/source/BingMaps
  */
 export class Bing extends ol.layer.Tile {
-	constructor(options) { //TODO document options
-		// Hide in LayerSwitcher if no key provided
-		if (!options.key)
-			options.maxResolution = 0;
+	constructor(options) {
+		super({
+			imagerySet: 'Road',
+			// key, Get your own (free) key at https://www.bingmapsportal.com
+			hidden: !options.key, // For LayerSwitcher
+			// attributions, defined by ol.source.BingMaps
 
-		super(options);
+			...options,
+		});
 		const layer = this;
 
 		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is visible
 		//TODO BUG don't display when selected then page reloaded
-		layer.on('change:visible', function(evt) {
+		this.on('change:visible', evt => {
 			if (evt.target.getVisible() && // When the layer becomes visible
-				!layer.getSource()) { // Only once
-				layer.setSource(new ol.source.BingMaps(options));
+				!this.getSource()) { // Only once
+				this.setSource(new ol.source.BingMaps(options));
 			}
 		});
 	}
@@ -369,14 +384,17 @@ export function collection(options) {
 	options ||= {};
 
 	return {
-		'OSM fr': new OSM(),
+		'OSM fr': new OpenStreetMap(),
 		'OpenTopo': new OpenTopo(),
-		'OSM outdoors': new Thunderforest(options.thunderforest), // options include key
+		'OSM outdoors': new Thunderforest({
+			...options.thunderforest, // Include key
+			subLayer: 'outdoors',
+		}),
 		'OSM transports': new Thunderforest({
 			...options.thunderforest, // Include key
 			subLayer: 'transport',
 		}),
-		'OSM cyclo': new OSM({
+		'OSM cyclo': new OpenStreetMap({
 			url: '//{a-c}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
 		}),
 		'Refuges.info': new MRI(),
@@ -393,7 +411,9 @@ export function collection(options) {
 		}),
 
 		'SwissTopo': new SwissTopo(),
-		'Autriche': new Kompass(), // No key
+		'Autriche': new Kompass({
+			key: null
+		}), // No key
 		'Angleterre': new OS(options.os), // options include key
 		'Italie': new IGM(),
 
@@ -441,7 +461,7 @@ export function demo(options) {
 	return {
 		...collection(options),
 
-		'OSM': new OSM(),
+		'OSM': new OpenStreetMap(),
 
 		'ThF cycle': new Thunderforest({
 			...options.thunderforest, // Include key
@@ -483,7 +503,6 @@ export function demo(options) {
 
 		'Bing': new Bing({
 			...options.bing, // Include key
-			imagerySet: 'Road',
 		}),
 		'Bing hybrid': new Bing({
 			...options.bing, // Include key

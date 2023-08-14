@@ -178,7 +178,7 @@ function controlesCartes(page) {
 function fondsCarte(page, layersKeys) {
 	return {
 		'Refuges.info': new myol.layer.tile.MRI(),
-		'OSM fr': new myol.layer.tile.OSM({
+		'OSM fr': new myol.layer.tile.OpenStreetMap({
 			url: '//{a-c}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
 		}),
 		'OpenTopo': new myol.layer.tile.OpenTopo(),
@@ -200,7 +200,7 @@ function fondsCarte(page, layersKeys) {
 			new myol.layer.tile.SwissTopo(
 				'ch.swisstopo.pixelkarte-farbe'
 			) : null,
-		'Autriche': new myol.layer.tile.Kompass(),
+		'Autriche': new myol.layer.tile.Kompass(), // No key
 		'Espagne': new myol.layer.tile.IgnES('mapa-raster', 'MTN'),
 		'Photo IGN': new myol.layer.tile.IGN({
 			layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
