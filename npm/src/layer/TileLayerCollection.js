@@ -68,19 +68,15 @@ export class MRI extends OpenStreetMap {
 }
 
 export class Kompass extends OpenStreetMap { // Austria
-	constructor(opt) {
-		const options = { //TODO document options
-			url: 'https://map{1-5}.tourinfra.com/tiles/kompass_osm/{z}/{x}/{y}.png',
-			subLayer: 'KOMPASS Touristik',
+	constructor(options) {
+		super({
+			url: options.key ?
+				'https://map{1-4}.kompass.de/{z}/{x}/{y}/kompass_' + options.subLayer + '?key=' + options.key : // Specific
+				'https://map{1-5}.tourinfra.com/tiles/kompass_' + options.subLayer + '/{z}/{x}/{y}.png', // No key
 			attributions: '<a href="http://www.kompass.de/livemap/">KOMPASS</a>',
 
-			...opt,
-		};
-
-		//if (options.key) //TODO refurbish / winter ??
-		options.url = 'https://map{1-4}.kompass.de/{z}/{x}/{y}/' + options.subLayer + '?key=' + options.key;
-
-		super(options);
+			...options,
+		});
 	}
 }
 
@@ -409,8 +405,8 @@ export function collection(options) {
 
 		'SwissTopo': new SwissTopo(),
 		'Autriche Kompass': new Kompass({
-			key: null
-		}), // No key
+			subLayer: 'osm', // No key
+		}),
 		'Angleterre': new OS(options.os), // options include key
 		'Italie': new IGM(),
 
@@ -491,11 +487,11 @@ export function demo(options) {
 		}),
 		'Kompas topo': new Kompass({
 			...options.kompass, // Include key
-			subLayer: 'kompass_topo',
+			subLayer: 'topo',
 		}),
 		'Kompas winter': new Kompass({
 			...options.kompass, // Include key
-			subLayer: 'kompass_winter',
+			subLayer: 'winter',
 		}),
 
 		'Bing': new Bing({

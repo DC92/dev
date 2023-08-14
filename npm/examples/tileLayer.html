@@ -43,8 +43,9 @@ Based on https://openlayers.org
 			new ol.Map({
 				target: 'map',
 				view: new ol.View({
-					center: [700000, 5600000], // Sud est
-					zoom: 7,
+					//center: [700000, 5600000], // Sud est
+					center: ol.proj.transform([13.68, 47.38], 'EPSG:4326', 'EPSG:3857'), // Glacier
+					zoom: 13,
 					constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 				}),
 				controls: [
