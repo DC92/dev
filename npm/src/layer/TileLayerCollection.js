@@ -354,27 +354,24 @@ export class Google extends ol.layer.Tile {
 
 /**
  * Bing (Microsoft)
- * Doc at: https://docs.microsoft.com/en-us/bingmaps/getting-started/
+ * Doc: https://docs.microsoft.com/en-us/bingmaps/getting-started/
  */
 export class Bing extends ol.layer.Tile {
 	constructor(options) {
 		super({
-			imagerySet: 'Road',
+			// imagerySet: 'Road',
 			// key, Get your own (free) key at https://www.bingmapsportal.com
 			hidden: !options.key, // For LayerSwitcher
 			// attributions, defined by ol.source.BingMaps
 
 			...options,
 		});
-		const layer = this;
 
 		//HACK : Avoid to call https://dev.virtualearth.net/... if no bing layer is visible
-		//TODO BUG don't display when selected then page reloaded
 		this.on('change:visible', evt => {
 			if (evt.target.getVisible() && // When the layer becomes visible
-				!this.getSource()) { // Only once
+				!this.getSource()) // Only once
 				this.setSource(new ol.source.BingMaps(options));
-			}
 		});
 	}
 }
@@ -411,7 +408,7 @@ export function collection(options) {
 		}),
 
 		'SwissTopo': new SwissTopo(),
-		'Autriche': new Kompass({
+		'Autriche Kompass': new Kompass({
 			key: null
 		}), // No key
 		'Angleterre': new OS(options.os), // options include key
@@ -503,6 +500,7 @@ export function demo(options) {
 
 		'Bing': new Bing({
 			...options.bing, // Include key
+			imagerySet: 'Road',
 		}),
 		'Bing hybrid': new Bing({
 			...options.bing, // Include key

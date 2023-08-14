@@ -20,11 +20,11 @@ export default class LayerSwitcher extends MyButton {
 			...options,
 		});
 
-		this.baselayers = Object.fromEntries(
+		this.baseLayers = Object.fromEntries(
 			Object.entries(options.layers)
 			.filter(([_, v]) => v && !v.getProperties().hidden)
 		);
-		this.layerNames = Object.keys(this.baselayers);
+		this.layerNames = Object.keys(this.baseLayers);
 		this.baselayer = location.href.match(/this.baselayer=([^\&]+)/);
 
 		// Get baselayer from url if any
@@ -48,18 +48,19 @@ export default class LayerSwitcher extends MyButton {
 		this.rangeContainerEl = document.getElementById('myol-ls-range');
 		this.rangeContainerEl.firstChild.oninput = () => this.displayTransparencyRange();
 
-		// Build html this.baselayers selectors
-		for (let name in this.baselayers) {
+		// Build html this.baseLayers selectors
+		for (let name in this.baseLayers) {
 			const labelEl = document.createElement('label');
 
 			labelEl.innerHTML = '<input type="checkbox" value="' + name + '" ' + ' />' + name;
 			labelEl.firstChild.onclick = evt => this.selectBaseLayer(evt); //BEST resorb all firstChild
 			this.subMenuEl.appendChild(labelEl);
 
-			map.addLayer(this.baselayers[name]);
+			this.baseLayers[name].setVisible(false); // Don't begin to get the tiles yet. Necessary for Bing
+			map.addLayer(this.baseLayers[name]);
 
 			// Mem it for further ops
-			this.baselayers[name].inputEl = labelEl.firstChild; //BEST resorb
+			this.baseLayers[name].inputEl = labelEl.firstChild; //BEST resorb
 		}
 
 		// Init layers
@@ -100,20 +101,20 @@ export default class LayerSwitcher extends MyButton {
 
 	displayBaseLayers() {
 		// Baselayer default is the first of the selection
-		if (!this.baselayers[localStorage.myol_baselayer])
+		if (!this.baseLayers[localStorage.myol_baselayer])
 			localStorage.myol_baselayer = this.layerNames[0];
 
-		for (let name in this.baselayers) {
+		for (let name in this.baseLayers) {
 			const visible =
 				name == localStorage.myol_baselayer ||
 				name == this.transparentBaseLayerName;
 
 			// Write the checks
-			this.baselayers[name].inputEl.checked = visible;
+			this.baseLayers[name].inputEl.checked = visible;
 
 			// Make the right layers visible
-			this.baselayers[name].setVisible(visible);
-			this.baselayers[name].setOpacity(1);
+			this.baseLayers[name].setVisible(visible);
+			this.baseLayers[name].setOpacity(1);
 		}
 
 		this.displayTransparencyRange();
@@ -121,8 +122,8 @@ export default class LayerSwitcher extends MyButton {
 
 	displayTransparencyRange() { //TODO BUG don't work
 		if (this.transparentBaseLayerName) {
-			for (let l = 0; l < this.baselayers[this.transparentBaseLayerName].length; l++)
-				this.baselayers[this.transparentBaseLayerName][l].setOpacity(
+			for (let l = 0; l < this.baseLayers[this.transparentBaseLayerName].length; l++)
+				this.baseLayers[this.transparentBaseLayerName][l].setOpacity(
 					this.rangeContainerEl.firstChild.value / 100
 				);
 

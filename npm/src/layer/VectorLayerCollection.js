@@ -3,16 +3,6 @@
  * Various acces to geoJson services
  */
 
-// Openlayers
-//BEST verify if all are used
-//TODO get from ol...
-import GeoJSON from 'ol/format/GeoJSON';
-import OSMXML from 'ol/format/OSMXML';
-import * as loadingstrategy from 'ol/loadingstrategy';
-import * as proj from 'ol/proj';
-import * as style from 'ol/style';
-
-// MyOl
 import ol from '../../src/ol';
 import MyVectorLayer from './MyVectorLayer';
 import * as stylesOptions from './stylesOptions';
@@ -117,7 +107,7 @@ export class PRC extends MyVectorLayer {
 	constructor(options) {
 		super({
 			url: 'https://www.pyrenees-refuges.com/api.php?type_fichier=GEOJSON',
-			strategy: loadingstrategy.all,
+			strategy: ol.loadingstrategy.all,
 			browserClusterMinDistance: 50,
 			attribution: '&copy;Pyrenees-Refuges',
 
@@ -138,7 +128,7 @@ export class PRC extends MyVectorLayer {
 //BEST document options
 export class C2C extends MyVectorLayer {
 	constructor(options) {
-		const format_ = new GeoJSON({ // Format of received data
+		const format_ = new ol.format.GeoJSON({ // Format of received data
 			dataProjection: 'EPSG:3857',
 		});
 
@@ -193,7 +183,7 @@ export class C2C extends MyVectorLayer {
 //BEST document options
 export class Overpass extends MyVectorLayer {
 	constructor(options) {
-		const format_ = new OSMXML(),
+		const format_ = new ol.format.OSMXML(),
 			statusEl = document.getElementById(options.selectName),
 			selectEls = document.getElementsByName(options.selectName);
 
@@ -300,7 +290,7 @@ export class Overpass extends MyVectorLayer {
 				node.appendChild(newTag);
 			}
 
-			return OSMXML.prototype.readFeatures.call(this, doc, opt);
+			return ol.format.OSMXML.prototype.readFeatures.call(this, doc, opt);
 		};
 	}
 }

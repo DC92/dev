@@ -9,5 +9,4 @@ myol.ol = ol; // Packing Openlayers native functions in the bundle
 export default myol;
 
 // Trace in the console
-import * as util from 'ol/util';
-console.log('OL V' + util.VERSION);
+console.log('OL V' + ol.util.VERSION);

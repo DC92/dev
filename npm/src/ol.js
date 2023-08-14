@@ -6,6 +6,7 @@ import 'ol/ol.css';
 import Feature from 'ol/Feature';
 import Geolocation from 'ol/Geolocation';
 import Map from 'ol/Map';
+import OSMXML from 'ol/format/OSMXML';
 import View from 'ol/View';
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import * as control from 'ol/control';
@@ -21,16 +22,18 @@ import * as projProj4 from 'ol/proj/proj4';
 import * as source from 'ol/source';
 import * as sphere from 'ol/sphere';
 import * as style from 'ol/style';
+import * as util from 'ol/util';
 
 export default {
 	control: control,
 	coordinate: coordinate,
 	extent: extent,
 	Feature: Feature,
-	format: { // Not all formats are used ...
+	format: { // Not all formats are used & the total file is big
 		GeoJSON: format.GeoJSON,
 		GPX: format.GPX,
 		KML: format.KML,
+		OSMXML: OSMXML,
 	},
 	Geolocation: Geolocation,
 	geom: geom,
@@ -65,6 +68,9 @@ export default {
 	style: style,
 	tilegrid: {
 		WMTS: WMTSTileGrid,
+	},
+	util: {
+		VERSION: util.VERSION,
 	},
 	View: View,
 };

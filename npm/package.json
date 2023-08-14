@@ -11,7 +11,7 @@
 	},
 	"devDependencies": {
 		"rollup": "latest",
-		"@rollup/plugin-json": "^4.1.0",
+		"@rollup/plugin-json": "latest",
 		"@rollup/plugin-commonjs": "latest",
 		"@rollup/plugin-node-resolve": "latest",
 		"rollup-plugin-import-css": "latest",

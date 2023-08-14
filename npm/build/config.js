@@ -16,7 +16,7 @@ export default [{
 		node(),
 		cjs(),
 		css({
-			output: 'dist/myol.css',
+			output: 'myol.css',
 		}),
 		json(),
 		terser(),
@@ -35,7 +35,7 @@ export default [{
 		node(),
 		cjs(),
 		css({
-			output: 'dist/myol.css',
+			output: 'myol.css',
 		}),
 		json(),
 	],
