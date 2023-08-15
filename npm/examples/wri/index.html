@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	<title>My Openlayers WRI</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="../images/favicon.png" rel="icon" type="image/png" />
+	<link href="../images/logo-dark.svg" rel="icon" type="image/svg" />
 
 	<link href="../style.css" rel="stylesheet">
 	<style>
@@ -39,7 +39,7 @@ Based on https://openlayers.org
 			target: 'carte-accueil',
 			view: new ol.View({
 				enableRotation: false,
-				center: [600000, 5600000],
+				center: ol.proj.transform([5.7, 45 ], 'EPSG:4326', 'EPSG:3857'), // Grenoble
 				zoom: 7,
 			}),
 			controls: [

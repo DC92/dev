@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	<title>My Openlayers layer switcher</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="images/favicon.png" rel="icon" type="image/png" />
+	<link href="images/logo-dark.svg" rel="icon" type="image/svg" />
 
 	<link href="style.css" rel="stylesheet">
 
@@ -53,7 +53,7 @@ Based on https://openlayers.org
 		new ol.Map({
 			target: 'map',
 			view: new ol.View({
-				center: [700000, 5600000],
+				center: ol.proj.transform([4, 47], 'EPSG:4326', 'EPSG:3857'), // France + Swiss
 				zoom: 5,
 			}),
 			controls: [

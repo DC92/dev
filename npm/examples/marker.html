@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	<title>My Openlayers markers</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="images/favicon.png" rel="icon" type="image/png" />
+	<link href="images/logo-dark.svg" rel="icon" type="image/svg" />
 
 	<link href="style.css" rel="stylesheet">
 
@@ -29,14 +29,14 @@ Based on https://openlayers.org
 	<script type="module">
 		new ol.Map({
 			target: 'map',
+			view: new ol.View({
+				center: ol.proj.transform([2, 47], 'EPSG:4326', 'EPSG:3857'), // France
+				zoom: 5,
+			}),
 			controls: [
 				new ol.control.Zoom(),
 				new myol.control.MyMousePosition(),
 			],
-			view: new ol.View({
-				center: [300000, 5800000],
-				zoom: 5,
-			}),
 			layers: [
 				new ol.layer.Tile({
 					source: new ol.source.OSM(),
@@ -47,7 +47,7 @@ Based on https://openlayers.org
 				}),
 				new myol.layer.Marker({
 					src: 'images/viseur.png',
-					focus: 15, // Map zoom level
+					focus: 15, // Overload position & zoom to marker
 					dragable: true,
 				}),
 			],
@@ -89,7 +89,7 @@ Based on https://openlayers.org
 		</p><p>
 			Double clic sur la carte y déplace le curseur.
 		</p><p>
-			<input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.14,46.2]}' />
+			<input id="marker-json" name="geojson" size="50" value='{"type":"Point","coordinates":[6.145,46.2]}' />
 		</p>
 	</div>
 

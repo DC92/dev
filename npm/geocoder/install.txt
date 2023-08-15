@@ -1,5 +1,6 @@
 https://github.com/kirtan-desai/ol-geocoder
-4.1.2
+Github 4.1.2
+Npm 5.0.6
 
 Patch sur src/providers/osm.js
 	remove trailing /

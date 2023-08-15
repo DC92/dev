@@ -69,6 +69,8 @@ export class MRI extends OpenStreetMap {
 
 export class Kompass extends OpenStreetMap { // Austria
 	constructor(options) {
+		options ||= {};
+
 		super({
 			url: options.key ?
 				'https://map{1-4}.kompass.de/{z}/{x}/{y}/kompass_' + options.subLayer + '?key=' + options.key : // Specific

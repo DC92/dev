@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	<title>My Openlayers tile layers</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="images/favicon.png" rel="icon" type="image/png" />
+	<link href="images/logo-dark.svg" rel="icon" type="image/svg" />
 
 	<link href="style.css" rel="stylesheet">
 
@@ -43,9 +43,8 @@ Based on https://openlayers.org
 			new ol.Map({
 				target: 'map',
 				view: new ol.View({
-					//center: [700000, 5600000], // Sud est
-					center: ol.proj.transform([13.68, 47.38], 'EPSG:4326', 'EPSG:3857'), // Glacier
-					zoom: 13,
+					center: ol.proj.transform([2, 47], 'EPSG:4326', 'EPSG:3857'), // France
+					zoom: 5,
 					constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
 				}),
 				controls: [

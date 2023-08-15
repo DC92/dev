@@ -9,7 +9,7 @@ Based on https://openlayers.org
 	<title>My Openlayers WRI</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="../images/favicon.png" rel="icon" type="image/png" />
+	<link href="../images/logo-dark.svg" rel="icon" type="image/svg" />
 
 	<link href="../style.css" rel="stylesheet">
 	<style>
@@ -47,7 +47,7 @@ Based on https://openlayers.org
 		new ol.Map({
 			target: 'carte-point',
 			view: new ol.View({
-				center: ol.proj.fromLonLat([5.64711, 45.2035]), // ([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
+				ol.proj.transform([5.6471, 45.2035], 'EPSG:4326', 'EPSG:3857'), // ([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 				zoom: 13,
 				enableRotation: false,
 				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
@@ -58,6 +58,7 @@ Based on https://openlayers.org
 					visible: false, // Mais on ne visualise pas le lien du permalink
 					init: false, // Ici, on utilisera plutôt la position du point
 				}),
+				//TODO BUG these layers init after the marker & hide it !
 				new myol.control.LayerSwitcher({
 					layers: fondsCarte('point', layersKeys),
 				}),
@@ -70,9 +71,8 @@ Based on https://openlayers.org
 				// Le cadre rouge autour du point de la fiche
 				//TODO display fields
 				new myol.layer.Marker({
-					host: '//www.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
-					src: '../images/cadre.svg', // '<?=$config_wri["sous_dossier_installation"]?>images/cadre.svg',
-					prefix: 'marker', // S'interface avec les <TAG id="marker-xxx"...>
+					src: '../images/cadre.svg',
+					prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...>
 					focus: 15,
 				}),
 				new myol.layer.Hover(),
@@ -89,5 +89,16 @@ Based on https://openlayers.org
 
 	<h4>/vues/point.html</h4>
 	<div id="carte-point"></div>
+	<br style="clear:both" />
+
+	<p><b>Colimateur :</b>
+		AA<span id="cadre-string"></span>ZZ
+		<select id="cadre-select">
+			<option value="dec" selected="selected">Degrés décimaux</option>
+			<option value="dms">Deg Min Sec</option>
+			<option class="xy" value="swiss">Suisse</option>
+			<option value="utm">UTM</option>
+		</select>
+	</p>
 </body>
 </html>

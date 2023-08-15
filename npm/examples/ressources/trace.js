@@ -2,7 +2,7 @@
  * Display misc values
  */
 (async function() {
-	let data = ['Openlayers ' + ol.util.VERSION];
+	let data = [];
 
 	// myol storages in the subdomain
 	['localStorage', 'sessionStorage'].forEach(s => {
@@ -30,13 +30,8 @@
 			if (names.length) {
 				data.push('caches:');
 
-				for (let name of names) {
+				for (let name of names)
 					data.push('  ' + name);
-
-					//BEST TEMPORARY (til Jun,2023) : Delete previous version of MyOl cache
-					if (name == 'myGpsCache')
-						caches.delete(name);
-				}
 			}
 		});
 
