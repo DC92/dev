@@ -36,6 +36,9 @@ Based on https://openlayers.org
 			controls: [
 				new ol.control.Zoom(),
 				new myol.control.MyMousePosition(),
+				new myol.control.LayerSwitcher({
+					layers: myol.layer.tile.collection(),
+				}),
 			],
 			layers: [
 				new ol.layer.Tile({
@@ -57,9 +60,9 @@ Based on https://openlayers.org
 
 <body>
 	<a style="float:right" href="editor.html">Next &#9654;</a>
-	<a style="float:right;margin-right:15px" href="..">HOME</a>
+	<a style="float:right;margin-right:15px" href="..">Home</a>
 	<h1 style="margin:0">Position marker</h1>
-	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">Github &#9654;</a>
 	<p><a href="../src/Editor.js">src/Editor.js</a> lines & polygons position display & edit</p>
 
 	<div id="map" class="map"></div>

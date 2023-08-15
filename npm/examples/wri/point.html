@@ -47,7 +47,7 @@ Based on https://openlayers.org
 		new ol.Map({
 			target: 'carte-point',
 			view: new ol.View({
-				ol.proj.transform([5.6471, 45.2035], 'EPSG:4326', 'EPSG:3857'), // ([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
+				center: ol.proj.transform([5.6471, 45.2035], 'EPSG:4326', 'EPSG:3857'), // ([<?=$vue->point->longitude?>, <?=$vue->point->latitude?>]),
 				zoom: 13,
 				enableRotation: false,
 				constrainResolution: true, // Force le zoom sur la définition des dalles disponibles
@@ -58,7 +58,6 @@ Based on https://openlayers.org
 					visible: false, // Mais on ne visualise pas le lien du permalink
 					init: false, // Ici, on utilisera plutôt la position du point
 				}),
-				//TODO BUG these layers init after the marker & hide it !
 				new myol.control.LayerSwitcher({
 					layers: fondsCarte('point', layersKeys),
 				}),
@@ -83,9 +82,9 @@ Based on https://openlayers.org
 
 <body>
 	<a style="float:right" href="modif.html">Next &#9654;</a>
-	<a style="float:right;margin-right:15px" href="./">WRI</a>
+	<a style="float:right;margin-right:15px" href="../../">Home</a>
 	<h1 style="margin:0">Point refuges.info</h1>
-	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">Github &#9654;</a>
 
 	<h4>/vues/point.html</h4>
 	<div id="carte-point"></div>

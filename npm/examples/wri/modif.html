@@ -68,8 +68,7 @@ Based on https://openlayers.org
 					host: '//www.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
 				}),
 				// Le viseur jaune pour modifier la position du point
-				//TODO display fields
-				//TODO BUG marker not visible
+				//TODO display fields at init (works when move)
 				new myol.layer.Marker({
 					src: '../images/viseur.svg',
 					prefix: 'marker', // S'interface avec les <TAG id="marker-xxx"...>
@@ -84,9 +83,9 @@ Based on https://openlayers.org
 
 <body>
 	<a style="float:right" href="../../gps">Next &#9654;</a>
-	<a style="float:right;margin-right:15px" href="./">WRI</a>
+	<a style="float:right;margin-right:15px" href="../../">Home</a>
 	<h1 style="margin:0">Modification point refuges.info</h1>
-	<a style="float:right" href="https://github.com/Dominique92/MyOl/">GITHUB &#9654;</a>
+	<a style="float:right" href="https://github.com/Dominique92/MyOl/">Github &#9654;</a>
 
 	<h4>/vues/point_formulaire_modification.html</h4>
 	<div id="carte-modif"></div>

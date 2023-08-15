@@ -6,17 +6,8 @@ import ol from '../../src/ol';
 import proj4Lib from 'proj4/lib/index';
 
 export default class Marker extends ol.layer.Vector {
-	constructor(options) {
-		super({
-			source: new ol.source.Vector(),
-			style: new ol.style.Style({
-				image: new ol.style.Icon({
-					src: options.src,
-				}),
-			}),
-		});
-
-		this.options = {
+	constructor(opt) {
+		const options = {
 			// src, url of marker image
 			// position: [0, 0], Initial position of the marker (default : center of the map)
 			// dragable : can draw the marker to edit position
@@ -29,8 +20,21 @@ export default class Marker extends ol.layer.Vector {
 			// marker-x, marker-y', // <input> Swiss EPSG:21781
 			// marker-select, marker-string, select / display coords format
 
-			...options,
+			...opt,
 		};
+
+		super({
+			source: new ol.source.Vector(options),
+			style: new ol.style.Style({
+				image: new ol.style.Icon({
+					src: options.src,
+				}),
+			}),
+
+			...options
+		});
+
+		this.options = options;
 
 		// Initialise specific projection
 		if (typeof proj4Lib == 'function') {
