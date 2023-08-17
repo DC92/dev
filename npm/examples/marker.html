@@ -33,13 +33,6 @@ Based on https://openlayers.org
 				center: ol.proj.transform([2, 47], 'EPSG:4326', 'EPSG:3857'), // France
 				zoom: 5,
 			}),
-			controls: [
-				new ol.control.Zoom(),
-				new myol.control.MyMousePosition(),
-				new myol.control.LayerSwitcher({
-					layers: myol.layer.tile.collection(),
-				}),
-			],
 			layers: [
 				new ol.layer.Tile({
 					source: new ol.source.OSM(),

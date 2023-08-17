@@ -7,12 +7,6 @@
 }
 .myol-button-switcher > div {
   right: 0;
-  /* Forced to avoid unexpected shifts */
-  overflow-y: scroll;
-}
-.myol-button-switcher .myol-single-layer input,
-.myol-button-switcher .myol-double-layer span {
-  display: none;
 }
 .select-ext {
   background: #fcffd1 !important;

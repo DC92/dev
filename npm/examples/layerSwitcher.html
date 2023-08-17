@@ -36,6 +36,10 @@ Based on https://openlayers.org
 				'OSM org': new ol.layer.Tile({
 					source: new ol.source.OSM(),
 				}),
+				'Null': null,
+				'Hidden': new ol.layer.Tile({
+					hidden: true,
+				}),
 				Watercolor: new ol.layer.Tile({
 					source: new ol.source.Stamen({
 						layer: 'watercolor',
