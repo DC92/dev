@@ -68,7 +68,6 @@ Based on https://openlayers.org
 					host: '//dom.refuges.info/', // '<?=$config_wri["sous_dossier_installation"]?>',
 				}),
 				// Le cadre rouge autour du point de la fiche
-				//TODO display fields
 				new myol.layer.Marker({
 					src: '../images/cadre.svg',
 					prefix: 'cadre', // S'interface avec les <TAG id="cadre-xxx"...>
@@ -91,7 +90,7 @@ Based on https://openlayers.org
 	<br style="clear:both" />
 
 	<p><b>Colimateur :</b>
-		AA<span id="cadre-string"></span>ZZ
+		<span id="cadre-string"></span>
 		<select id="cadre-select">
 			<option value="dec" selected="selected">Degrés décimaux</option>
 			<option value="dms">Deg Min Sec</option>

@@ -74,6 +74,7 @@ export default class Marker extends ol.layer.Vector {
 
 			this.action(this.els.lon);
 			this.action(this.els.json);
+			this.changeLL(); // Display anyway (if no lon | json)
 
 			if (this.options.focus)
 				this.view.setZoom(this.options.focus);
