@@ -5,7 +5,7 @@
  */
 
 // Geocoder
-import '../../node_modules/@kirtandesai/ol-geocoder/dist/ol-geocoder.css';
+import '../../geocoder/ol-geocoder.css';
 import './myGeocoder.css'; // After ol-geocoder.css
 import Geocoder from '../../geocoder/src/base';
 

@@ -6,6 +6,9 @@ https://github.com/kirtan-desai/ol-geocoder
 Github 4.1.2
 Npm 5.0.6
 
+.css from
+https://unpkg.com/@kirtandesai/ol-geocoder@5.0.6/dist/ol-geocoder.css
+
 Patch sur src/providers/osm.js
 	remove trailing /
 	url: 'https://nominatim.openstreetmap.org/search/',
