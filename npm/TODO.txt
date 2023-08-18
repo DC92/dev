@@ -2,3 +2,9 @@ cd \wamp64\www\dev\npm
 npm install
 npm run build
 npx vite
+
+//TODO package.json
+    "lint": "eslint --ext .js .",
+    "lint:fix": "npm run lint -- --fix",
+    "ci": "run-s build lint test:unit test:controls test:providers",
+    "test": "run-s build lint test:unit test:controls",
