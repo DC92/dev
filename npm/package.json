@@ -5,8 +5,8 @@
 		"build": "rollup -c build/config.js"
 	},
 	"dependencies": {
-		"ol": "7.5.1",
-		"proj4": "2.9.0"
+		"ol": "latest",
+		"proj4": "latest"
 	},
 	"devDependencies": {
 		"rollup": "latest",
