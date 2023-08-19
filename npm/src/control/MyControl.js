@@ -789,28 +789,26 @@ export class Permalink extends MyButton {
  * Control to display set preload of depth upper level tiles
  * This prepares the browser to become offline
  */
-export function tilesBuffer(opt) { //TODO class & test
-	//BEST document options
-	const options = {
-			depth: 3,
-			...opt,
-		},
-		control = new MyButton(); //HACK no button
+export class TilesBuffer extends MyButton {
+	constructor(options) {
+		super({
+			depth: 2,
+			...options,
+		});
+	}
 
-	control.setMap = function(map) { //HACK execute actions on Map init
-		ol.control.Control.prototype.setMap.call(this, map);
+	setMap(map) {
+		super.setMap(map);
 
 		// Action on each layer
 		//BEST too much load on basic browsing
 		map.on('precompose', () => {
 			map.getLayers().forEach(layer => {
 				if (typeof layer.setPreload == 'function')
-					layer.setPreload(options.depth);
+					layer.setPreload(this.options.depth);
 			});
 		});
-	};
-
-	return control;
+	}
 }
 
 /**
@@ -841,6 +839,9 @@ export function collection(opt) {
 		// Bottom right
 		new Permalink(options.permalink),
 		new ol.control.Attribution(options.attribution),
+
+		// Not visible
+		new TilesBuffer(options.tilesBuffer),
 
 		...options.supplementaryControls,
 	];
