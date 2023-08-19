@@ -9,6 +9,16 @@ if (!location.href.match(/(https|localhost).*index/))
 		location.search +
 		location.hash);
 
+//TODO saving lint
+const ol = {};
+const myolPath = null;
+const swInstance = null;
+const buildDate = null;
+const gpxParam = null;
+const controlsCollection = null;
+const LayerSwitcher = null;
+const layerTileCollection = null;
+
 // Load service worker for web application, install & update
 if ('serviceWorker' in navigator)
 	navigator.serviceWorker.register(myolPath + 'service-worker.js.php?' + swInstance + buildDate, {
@@ -56,8 +66,7 @@ if ('serviceWorker' in navigator)
 	});
 
 // Manage the map
-var map,
-	layers = [],
+var layers = [],
 	controlOptions = { // To be customized by the specific index.php
 		layerSwitcher: {},
 		LoadGPX: {
@@ -73,7 +82,7 @@ window.addEventListener('load', function() {
 		controlOptions.layerSwitcher.layers = layerTileCollection(controlOptions.layerSwitcher);
 
 	// Load the map
-	map = new ol.Map({
+	new ol.Map({
 		target: 'map',
 		view: new ol.View({
 			constrainResolution: true, // Force zoom on the available tile's definition

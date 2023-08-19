@@ -3,11 +3,11 @@
 	"type": "module",
 	"scripts": {
 		"build": "rollup -c build/config.js",
-		"lint": "npx eslint src/*.js && npx eslint src/*/*.js"
+		"lint": "npx eslint src/*.js && npx eslint src/*/*.js && npx eslint gps/*.js"
 	},
 	"dependencies": {
-		"ol": "latest",
-		"proj4": "latest"
+		"ol": "7.5.1",
+		"proj4": "2.9.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "latest",
@@ -15,8 +15,6 @@
 		"@rollup/plugin-node-resolve": "latest",
 		"@rollup/plugin-terser": "latest",
 		"eslint": "^8.47.0",
-		"eslint-plugin-react": "^7.33.2",
-		"react": "^18.2.0",
 		"rollup": "latest",
 		"rollup-plugin-import-css": "latest"
 	}
