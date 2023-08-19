@@ -5,7 +5,6 @@
 
 import ol from '../../src/ol';
 import MyVectorLayer from './MyVectorLayer';
-import * as stylesOptions from './stylesOptions';
 
 // Get icon from chemineur.fr
 function chemIconUrl(type, host) {
@@ -40,7 +39,7 @@ export class Chemineur extends MyVectorLayer {
 			}),
 		});
 	}
-};
+}
 
 // alpages.info
 //BEST document options
@@ -146,7 +145,7 @@ export class C2C extends MyVectorLayer {
 			...options,
 		});
 
-		format_.readFeatures = function(json, opt) {
+		format_.readFeatures = json => {
 			const features = [],
 				objects = JSON.parse(json);
 
@@ -203,7 +202,7 @@ export class Overpass extends MyVectorLayer {
 		function query_(extent, resolution, projection, options) {
 			const selections = options.selector.getSelection(),
 				items = selections[0].split(','), // The 1st (and only) selector
-				ex4326 = proj.transformExtent(extent, projection, 'EPSG:4326').map(c => c.toPrecision(6)),
+				ex4326 = ol.proj.transformExtent(extent, projection, 'EPSG:4326').map(c => c.toPrecision(6)),
 				bbox = '(' + ex4326[1] + ',' + ex4326[0] + ',' + ex4326[3] + ',' + ex4326[2] + ');',
 				args = [];
 

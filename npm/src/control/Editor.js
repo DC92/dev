@@ -211,7 +211,7 @@ export default class Editor extends MyButton {
 			);
 	}
 
-	displayStyle(feature) {
+	displayStyle() {
 		return new ol.style.Style({
 			// Lines or polygons border
 			stroke: new ol.style.Stroke({
@@ -284,7 +284,7 @@ export default class Editor extends MyButton {
 		this.interactions.forEach(i => this.getMap().removeInteraction(i));
 		this.getMap().addInteraction(this.interactions[level]); // Add active interaction
 		this.getMap().addInteraction(this.interactions[3]); // Snap must be added after the others
-	};
+	}
 
 	hover(evt) {
 		let nbFeaturesAtPixel = 0;
@@ -341,7 +341,7 @@ export default class Editor extends MyButton {
 					featureProjection: this.getMap().getView().getProjection(),
 					decimals: 5,
 				})
-			.replace(/,"properties":(\{[^\}]*\}|null)/, '');
+			.replace(/,"properties":(\{[^}]*}|null)/, '');
 	}
 
 	// Refurbish Lines & Polygons

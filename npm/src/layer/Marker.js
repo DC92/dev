@@ -112,7 +112,7 @@ export default class Marker extends ol.layer.Vector {
 		if (idMatch)
 			switch (idMatch[1]) {
 				case 'json': // Init the field
-					this.changeLL([...this.els.json.value.matchAll(/-?[0-9\.]+/g)], 'EPSG:4326', true);
+					this.changeLL([...this.els.json.value.matchAll(/-?[0-9.]+/g)], 'EPSG:4326', true);
 					break;
 				case 'lon': // Change lon / lat
 				case 'lat':

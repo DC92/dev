@@ -24,7 +24,7 @@ export default class LayerSwitcher extends MyButton {
 				this.layers[name] = options.layers[name];
 
 		// Get baselayer from url hash (#baselayer=...) if any
-		const bl = location.href.match(/baselayer=([^\&]+)/);
+		const bl = location.href.match(/baselayer=([^&]+)/);
 		if (bl)
 			localStorage.myol_baselayer = decodeURI(bl[1]);
 

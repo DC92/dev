@@ -30,12 +30,12 @@ export function basic(feature, layer) {
 		}),
 
 		// properties.label if any
-		...label(...arguments),
+		...label(feature, layer),
 	}];
 }
 
 // Display a label with properties.label
-export function label(feature, layer) {
+export function label(feature) {
 	const properties = feature.getProperties();
 
 	if (properties.label) {
@@ -68,7 +68,7 @@ export function label(feature, layer) {
 }
 
 // Display a circle with the number of features on the cluster
-export function cluster(feature, layer) {
+export function cluster(feature) {
 	//TODO BUG pourquoi itère sur render ?
 	return [{
 		image: new ol.style.Circle({
@@ -148,7 +148,7 @@ export function details(feature, layer) {
 // Display the basic hovered features
 export function hover(feature, layer) {
 	return {
-		...details(...arguments),
+		...details(feature, layer),
 
 		stroke: new ol.style.Stroke({
 			color: 'red',

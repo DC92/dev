@@ -23,7 +23,7 @@ class MyVectorSource extends ol.source.Vector {
 				strategy: ol.loadingstrategy.bbox,
 				projection: 'EPSG:4326',
 
-				addProperties: (properties) => {}, // (default) add properties to each received features
+				addProperties: () => {}, // (default) properties => {} add properties to each received features
 
 				...opt,
 			},
