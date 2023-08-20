@@ -37,7 +37,7 @@ export default class Editor extends MyButton {
 			focus: false, // Zoom the map on the loaded features
 			geoJsonId: 'editable-json', // id of an html element containing geoJson features to be edited
 			// geoJsonUrl: 'url.geojson', // url of geoJson features to be edited
-			labels: ['&#x1F58D;', '&#xD17;', '&#X23E2;'], // Modify, Line, Polygon
+			labels: ['&#128397;', '&#3351;', '&#9186;'], // Modify, Line, Polygon
 			help: ['Modification', 'New line', 'New polygon'],
 			featuresToSave: coordinates => this.source.getFeatures(coordinates, this.options.format),
 

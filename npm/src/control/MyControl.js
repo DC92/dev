@@ -110,7 +110,7 @@ export class MyGeolocation extends MyButton {
 		super({
 			// MyButton options
 			className: 'myol-button-gps',
-			label: '&#x2295;',
+			label: '&#8853;',
 			subMenuHTML: subMenu,
 			//TODO subMenuId: 'myol-gps',
 
@@ -310,7 +310,7 @@ export class Load extends MyButton {
 	constructor(options) {
 		super({
 			// MyButton options
-			label: '&#x1F4C2;',
+			label: '&#128194;',
 			subMenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
 				'<input type="file" accept=".gpx,.kml,.geojson" />',
 
@@ -419,7 +419,7 @@ export class Download extends MyButton {
 	constructor(options) {
 		super({
 			// MyButton options
-			label: '&#x1f4e5;',
+			label: '&#128229;',
 			subMenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
 				'contenant les éléments visibles dans la fenêtre:</p>' +
 				'<a mime="application/gpx+xml">GPX</a>' +
@@ -520,7 +520,7 @@ export class Print extends MyButton {
 	constructor(options) {
 		super({
 			// MyButton options
-			label: '&#x1F5A8;',
+			label: '&#128424;',
 			className: 'myol-button-print',
 			subMenuHTML: '<p>Pour imprimer la carte:</p>' +
 				'<p>-Choisir portrait ou paysage,</p>' +

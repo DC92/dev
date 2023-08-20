@@ -1,6 +1,7 @@
 {
 	"name": "GPS PWA",
 	"short_name": "GPS",
+	"id": "MyGPS",
 	"icons": [{
 		"src": "favicon.png",
 		"sizes": "64x64",
@@ -10,8 +11,9 @@
 		"sizes": "512x512",
 		"type": "image/png"
 	}],
-	"start_url": "index.html",
+	"start_url": "index.php",
 	"scope": "./",
+	"display": "fullscreen",
 	"background_color": "white",
 	"theme_color": "white",
 	"display": "standalone"
