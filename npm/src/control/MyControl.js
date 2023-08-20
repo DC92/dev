@@ -623,7 +623,6 @@ export function collection(opt) {
 		new Load(options.load),
 		new Download(options.download),
 		new Print(options.print),
-		new Help(options.help),
 
 		// Bottom left
 		new base.LengthLine(options.lengthLine),
@@ -633,9 +632,6 @@ export function collection(opt) {
 		// Bottom right
 		new base.Permalink(options.permalink),
 		new ol.control.Attribution(options.attribution),
-
-		// Not visible
-		new base.TilesBuffer(options.tilesBuffer),
 
 		...options.supplementaryControls,
 	];

@@ -29,11 +29,15 @@ Based on https://openlayers.org
 	<script type="module">
 		new ol.Map({
 			target: 'map',
-			controls: myol.control.collection({
-				permalink: {
-					display: true,
-				},
-			}),
+			controls: [
+				...myol.control.collection({
+					permalink: { //TODO retirer permalink de myol.control.collection
+						display: true,
+					},
+				}),
+				new myol.control.Help(),
+				new myol.control.TilesBuffer(),
+			],
 			layers: [
 				new ol.layer.Tile({
 					source: new ol.source.OSM(),

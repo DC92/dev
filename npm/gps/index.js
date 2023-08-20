@@ -7,6 +7,8 @@ var map = new ol.Map({
 	}),
 	controls: [
 		...myol.control.collection(),
+		new myol.control.Help(),
+		new myol.control.TilesBuffer(),
 		new myol.control.LayerSwitcher({
 			layers: myol.layer.tile.collection(),
 		}),

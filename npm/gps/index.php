@@ -53,7 +53,7 @@ Based on https://openlayers.org
   <body>
   <div id="map"></div>
 
-  <div id="myol-gps-help">
+  <div id="myol-help">
     <p>Vous pouvez utiliser ce GPS hors réseau en l'installant:</p>
     <hr /><p><u>Avant le départ:</u></p>
     <p>- Explorateur -> options -> ajoutez à l'écran d'accueil (ou installer)</p>
