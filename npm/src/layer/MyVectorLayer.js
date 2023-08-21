@@ -2,6 +2,7 @@
  * MyVectorLayer.js
  * Facilities to vector layers
  */
+
 import ol from '../../src/ol';
 import * as stylesOptions from './stylesOptions';
 

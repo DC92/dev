@@ -1,4 +1,6 @@
-// This file defines the myol.layer exports
+/**
+ * This file defines the myol.layer exports
+ */
 
 import Marker from './Marker';
 import * as myVectorLayer from './MyVectorLayer';

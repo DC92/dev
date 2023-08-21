@@ -4,7 +4,7 @@
  */
 
 import ol from '../../src/ol';
-import MyButton from './MyControl';
+import MyButton from './MyButton';
 
 //TODO test départ / arrivée semblent permutés par rapport à Visorando
 // Editor
