@@ -3,6 +3,7 @@
 
 import 'ol/ol.css';
 
+//TODO simplify to only external used functions
 import Feature from 'ol/Feature';
 import Geolocation from 'ol/Geolocation';
 import Map from 'ol/Map';

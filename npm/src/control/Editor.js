@@ -6,6 +6,7 @@
 import ol from '../../src/ol';
 import MyButton from './MyControl';
 
+//TODO test départ / arrivée semblent permutés par rapport à Visorando
 // Editor
 export default class Editor extends MyButton {
 	constructor(options) {

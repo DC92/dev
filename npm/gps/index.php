@@ -1,6 +1,12 @@
 <?php
-  header("Content-Type: text/html");
-  $gpx_files = [];
+header("Content-Type: text/html");
+
+// Find the directory where to load the myol package
+$myol_path = pathinfo(
+    glob("{../*/myol.*s,../*/*/myol.*s}", GLOB_BRACE)[0],
+    PATHINFO_DIRNAME
+);
+
 ?><!DOCTYPE html>
 <!--
 © Dominique Cavailhez 2019
@@ -36,24 +42,23 @@ Based on https://openlayers.org
     <!-- WEB APP manifest -->
     <link href="manifest.json" rel="manifest" />
 
-    <!-- Service worker -->
+    <!-- Service worker & global data -->
     <script>
-    if ("serviceWorker" in navigator)
-      navigator.serviceWorker.register("service-worker.js.php"); 
+		if ("serviceWorker" in navigator)
+			navigator.serviceWorker.register("service-worker.js.php");
     </script>
 
     <!-- App stylesheet + javascript -->
-    <link href="../dist/myol.css" rel="stylesheet" />
-    <script src="../dist/myol.js"></script>
+    <link href="<?=$myol_path?>/myol.css" rel="stylesheet" />
+    <script src="<?=$myol_path?>/myol.js"></script>
     <link href="index.css" rel="stylesheet" />
     <script src="index.js" defer></script>
-    <script src="../examples/ressources/trace.js"></script>
   </head>
   
   <body>
   <div id="map"></div>
 
-  <div id="myol-help">
+  <div id="myol-help-gps">
     <p>Vous pouvez utiliser ce GPS hors réseau en l'installant:</p>
     <hr /><p><u>Avant le départ:</u></p>
     <p>- Explorateur -> options -> ajoutez à l'écran d'accueil (ou installer)</p>
@@ -70,7 +75,7 @@ Based on https://openlayers.org
     <p>- Ouvrez le marque-page ou l'application</p>
     <p>- Si vous avez un fichier trace .gpx dans votre mobile, visualisez-le en cliquant sur &#x1F4C2;</p>
 <?php if (count ($gpx_files) > 1) { ?>
-    <p>- Si vous voulez suivre une trace du serveur, affichez là en cliquant sur &#x1F6B6;</p>
+    <p>- Si vous voulez suivre une trace du serveur, affichez là en cliquant sur &#128694;</p>
 <?php } ?>
     <p>- Lancez la localisation en cliquant sur &#x2295;</p>
     <hr />
@@ -80,5 +85,19 @@ Based on https://openlayers.org
     <p>* Aucune donnée ni géolocalisation n'est remontée ni mémorisée</p>
     <hr />
   </div>
+
+<?php
+  // Add a menu to load .gpx files included in the gps/... directory
+  $gpx_files = glob("{*.gpx,*/*.gpx}", GLOB_BRACE);
+
+  if($gpx_files) { ?>
+  <div id="myol-traces-gps">
+    <p>Afficher une randonnée</p>
+    <?php foreach($gpx_files as $f) { ?>
+      <p><a onclick="clickTrace('<?=$f?>')"><?=pathinfo($f,PATHINFO_FILENAME)?></a></p>
+    <?php } ?>
+  </div>
+<?php } ?>
+
   </body>
 </html>

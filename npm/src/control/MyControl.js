@@ -3,7 +3,7 @@
  * Add some usefull controls without buttons
  */
 
-import ol from '../../src/ol';
+import ol from '../../src/ol'; //TODO cme back to direct import (optim)
 import './MyControl.css';
 import * as base from './MyBaseControl.js';
 import MyGeocoder from './MyGeocoder';
@@ -76,7 +76,7 @@ export default MyButton;
  * Geolocation control
  * Display status, altitude & speed
  */
-//BEST separate file with import / export
+//TODO move to separate file
 export class MyGeolocation extends MyButton {
 	constructor(options) {
 		const subMenu = location.href.match(/(https|localhost)/) ?
@@ -323,7 +323,7 @@ export class Load extends MyButton {
 		// Register action listeners
 		this.element.querySelectorAll('input')
 			.forEach(el => {
-				el.addEventListener('change', evt => this.action(evt));
+				el.addEventListener('change', evt => this.loadUrl(evt.target.files[0]));
 			});
 
 		// Load file at init
@@ -340,17 +340,14 @@ export class Load extends MyButton {
 		this.reader = new FileReader();
 	}
 
-	action(evt) {
-		if (evt.target.files) {
-			this.reader.readAsText(evt.target.files[0]);
-
-			this.reader.onload = () => {
-				this.loadText(
-					this.reader.result,
-					evt.target.files[0].name.split('.').pop().toUpperCase()
-				);
-			};
-		}
+	loadUrl(url) {
+		this.reader.readAsText(url);
+		this.reader.onload = () => {
+			this.loadText(
+				this.reader.result,
+				url.name.split('.').pop().toUpperCase()
+			);
+		};
 	}
 
 	loadText(text, formatName) {
@@ -590,24 +587,9 @@ export class Print extends MyButton {
 }
 
 /**
- * Help control
- * Display help contained in <TAG id="<options.subMenuId>">
- */
-export class Help extends MyButton {
-	constructor(options) {
-		super({
-			// MyButton options
-			label: '?',
-			subMenuId: 'myol-help',
-
-			...options,
-		});
-	}
-}
-
-/**
  * Controls examples
  */
+//TODO move to collection.js
 export function collection(opt) {
 	const options = {
 		supplementaryControls: [], //BEST resorb

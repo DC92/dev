@@ -8,6 +8,7 @@ self.addEventListener('install', evt => {
 				'index.php',
 				'index.js',
 				'manifest.json',
+				/*OTHER_FILES*/
 			]);
 		})
 		.catch(err => console.error(err))

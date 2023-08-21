@@ -35,7 +35,10 @@ Based on https://openlayers.org
 						display: true,
 					},
 				}),
-				new myol.control.Help(),
+				new myol.control.MyButton({ // Help
+					label: '?',
+					subMenuId: 'myol-help',
+				}),
 				new myol.control.TilesBuffer(),
 			],
 			layers: [
