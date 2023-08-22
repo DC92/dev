@@ -59,10 +59,12 @@ export default class LayerSwitcher extends MyButton {
 		}
 
 		// Register action listeners
-		this.element.querySelectorAll('input')
-			.forEach(el => {
-				el.addEventListener('click', evt => this.action(evt));
-			});
+		this.element.querySelectorAll('input[name=baselayer]')
+			.forEach(el =>
+				el.addEventListener('click', evt =>
+					this.action(evt)
+				)
+			);
 
 		// Hide the selector when the cursor is out of the selector
 		map.on('pointermove', evt => {

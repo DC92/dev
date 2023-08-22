@@ -3,7 +3,7 @@
  * Display status, altitude & speed
  */
  
-import ol from '../../src/ol'; //TODO cme back to direct import (optim ???)
+import ol from '../../src/ol'; //TODO come back to direct import (optim ???)
 import './MyControl.css';
 import MyButton from './myButton';
 

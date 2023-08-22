@@ -4,6 +4,7 @@
  */
 
 import ol from '../../src/ol';
+import './myControl.css';
 
 /**
  * Control button
