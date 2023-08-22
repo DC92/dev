@@ -87,14 +87,16 @@ Based on https://openlayers.org
   </div>
 
 <?php
+  //TODO load gpx file at init if only one file
   // Add a menu to load .gpx files included in the gps/... directory
   $gpx_files = glob("{*.gpx,*/*.gpx}", GLOB_BRACE);
-
   if($gpx_files) { ?>
   <div id="myol-traces-gps">
     <p>Afficher une randonnée</p>
     <?php foreach($gpx_files as $f) { ?>
-      <p><a onclick="clickTrace('<?=$f?>')"><?=pathinfo($f,PATHINFO_FILENAME)?></a></p>
+      <p><a onclick="loadControl.loadUrl('<?=$f?>','<?=pathinfo($f,PATHINFO_EXTENSION)?>')">
+		<?=pathinfo($f,PATHINFO_FILENAME)?>
+	  </a></p>
     <?php } ?>
   </div>
 <?php } ?>

@@ -90,9 +90,9 @@ export class Load extends MyButton {
 
 		// Register action listeners
 		this.element.querySelectorAll('input')
-			.forEach(el => {
-				el.addEventListener('change', evt => this.loadUrl(evt.target.files[0]));
-			});
+			.forEach(el =>
+				el.addEventListener('change', evt => this.change(evt))
+			);
 
 		// Load file at init
 		if (options.initFileUrl) {
@@ -108,14 +108,25 @@ export class Load extends MyButton {
 		this.reader = new FileReader();
 	}
 
-	loadUrl(url) {
-		this.reader.readAsText(url);
+	change(evt) {
+		const blob = evt.target.files[0];
+
+		this.reader.readAsText(blob);
 		this.reader.onload = () => {
 			this.loadText(
 				this.reader.result,
-				url.name.split('.').pop().toUpperCase()
+				blob.name.split('.').pop().toUpperCase() // Extract extension to be used as format name
 			);
 		};
+	}
+
+	loadUrl(url) {
+		fetch(url)
+			.then(response => response.text())
+			.then(text => this.loadText(
+				text,
+				url.split('.').pop().toUpperCase()
+			));
 	}
 
 	loadText(text, formatName) {
@@ -125,7 +136,7 @@ export class Load extends MyButton {
 			receivedProjection = receivedLat && receivedLat.length && parseInt(receivedLat[1]) > 100 ? 'EPSG:3857' : 'EPSG:4326',
 			features = loadFormat.readFeatures(text, {
 				dataProjection: receivedProjection,
-				featureProjection: 'EPSG:3857', // Map projection
+				featureProjection: map.getView().getProjection(), // Map projection
 			}),
 			added = map.dispatchEvent({
 				type: 'myol:onfeatureload', // Warn Editor that we uploaded some features
@@ -251,7 +262,7 @@ export class Download extends MyButton {
 
 		const data = downloadFormat.writeFeatures(features, {
 				dataProjection: 'EPSG:4326',
-				featureProjection: 'EPSG:3857',
+				featureProjection: map.getView().getProjection(), // Map projection
 				decimals: 5,
 			})
 			// Beautify the output

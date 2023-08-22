@@ -53,7 +53,3 @@ navigator.serviceWorker.addEventListener('controllerchange', function() {
 		}),
 	);
 });
-
-function clickTrace(url) { //TODO mettre en inline
-	loadControl.loadUrl(url); //TODO BUG loadControl.loadUrl not a function
-}
