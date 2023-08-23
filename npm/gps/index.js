@@ -17,10 +17,6 @@ var loadControl = new myol.control.Load(),
 				label: '?',
 				subMenuId: 'myol-help-gps',
 			}),
-			new myol.control.MyButton({ // Load traces
-				label: '&#128694;',
-				subMenuId: 'myol-traces-gps',
-			}),
 
 			// Top right
 			new myol.control.LayerSwitcher({
@@ -46,13 +42,42 @@ navigator.serviceWorker.addEventListener('controllerchange', function() {
 	map.addControl(
 		new myol.control.MyButton({
 			label: '&#127381;',
-			subMenuHTML: "<p>Une nouvelle version</p>" +
-				"<p>ou de nouvelles traces</p>" +
-				"<p>sont disponibles.</p>" +
-				"<a href=''>Recharger la page</a>",
+			subMenuHTML: '<p>Une nouvelle version</p>' +
+				'<p>ou de nouvelles traces</p>' +
+				'<p>sont disponibles.</p>' +
+				'<a href="">Recharger la page</a>',
 		}),
 	);
 });
 
-// Load server .gpx file from url#name
-loadControl.loadUrl(location.hash.replace('#', '') + '.gpx');
+// Load server .gpx file from url #name (part of filename, case insensitive
+if (gpxFiles && location.hash)
+	loadControl.loadUrl(gpxFiles.find(s =>
+		s.toLowerCase()
+		.includes(
+			location.hash.replace('#', '')
+			.toLowerCase()
+		)
+	));
+
+// Add a menu to load .gpx files included in the gps/... directories
+if (gpxFiles) {
+	const tracesEl = document.getElementById('myol-traces-gps');
+
+	gpxFiles.forEach(f => {
+		const name = f.match(/([^\/]*)\./);
+
+		if (name)
+			tracesEl.insertAdjacentHTML(
+				'beforeend',
+				'<p><a onclick="loadControl.loadUrl(\'' + f + '\')">' + name[1] + '</a></p>'
+			);
+	});
+
+	map.addControl(
+		new myol.control.MyButton({
+			label: '&#128694;',
+			subMenuId: 'myol-traces-gps',
+		})
+	);
+}
