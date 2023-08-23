@@ -5,6 +5,7 @@ self.addEventListener('install', evt => {
 		caches.open('myGpsCache4').then(cache => {
 			console.log('open cache');
 			cache.addAll([
+				'index.html',
 				'index.php',
 				'index.js',
 				'manifest.json',

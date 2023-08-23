@@ -3,7 +3,7 @@
  * Add some usefull controls without buttons
  */
 
-import ol from '../../src/ol'; //TODO come back to direct import (optim ???)
+import ol from '../../src/ol'; //BEST ??? come back to direct import (optim ???)
 import MyControl from './MyControl.js';
 import './myButton.css';
 

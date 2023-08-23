@@ -11,10 +11,13 @@ $myol_path = pathinfo(
 $gpx_files = glob("{*.gpx,*/*.gpx}", GLOB_BRACE);
 
 echo str_replace(
-    ["service-worker.js", "../dist", "gpxFiles = []"],
+    ["service-worker.js", "../dist", "myol.js", "gpxFiles = []"],
     [
         "service-worker.js.php",
         $myol_path,
+        file_exists($myol_path . "/myol-debug.js")
+            ? "myol-debug.js"
+            : "myol.js",
         "gpxFiles = " . json_encode($gpx_files),
     ],
     file_get_contents("index.html")

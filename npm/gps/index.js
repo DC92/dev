@@ -1,5 +1,23 @@
-/* global ol, myol */
+/* global ol, myol, gpxFiles */ // eslint context
 
+// Force https to allow PWA and geolocation
+if (!location.href.match(/https|localhost/))
+	location.replace(location.href.replace('http://', 'https://'));
+
+// Ask to reload the PWA when a new version is loaded
+navigator.serviceWorker.addEventListener('controllerchange', function() {
+	map.addControl(
+		new myol.control.MyButton({
+			label: '&#127381;',
+			subMenuHTML: '<p>Une nouvelle version</p>' +
+				'<p>ou de nouvelles traces</p>' +
+				'<p>sont disponibles.</p>' +
+				'<a href="">Recharger la page</a>',
+		}),
+	);
+});
+
+// Map
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',
@@ -37,19 +55,6 @@ var loadControl = new myol.control.Load(),
 		],
 	});
 
-// Ask to reload the PWA when a new version is loaded
-navigator.serviceWorker.addEventListener('controllerchange', function() {
-	map.addControl(
-		new myol.control.MyButton({
-			label: '&#127381;',
-			subMenuHTML: '<p>Une nouvelle version</p>' +
-				'<p>ou de nouvelles traces</p>' +
-				'<p>sont disponibles.</p>' +
-				'<a href="">Recharger la page</a>',
-		}),
-	);
-});
-
 // Load server .gpx file from url #name (part of filename, case insensitive
 if (gpxFiles && location.hash)
 	loadControl.loadUrl(gpxFiles.find(s =>
@@ -65,7 +70,7 @@ if (gpxFiles) {
 	const tracesEl = document.getElementById('myol-traces-gps');
 
 	gpxFiles.forEach(f => {
-		const name = f.match(/([^\/]*)\./);
+		const name = f.match(/([^/]*)\./);
 
 		if (name)
 			tracesEl.insertAdjacentHTML(
