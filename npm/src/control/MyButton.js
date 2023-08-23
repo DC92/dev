@@ -100,7 +100,7 @@ export class Load extends MyButton {
 			xhr.open('GET', options.initFileUrl);
 			xhr.onreadystatechange = () => {
 				if (xhr.readyState == 4 && xhr.status == 200)
-					this.loadText(xhr.responseText, 'GPX');
+					this.loadText(xhr.responseText, options.initFileUrl);
 			};
 			xhr.send();
 		}
@@ -112,26 +112,19 @@ export class Load extends MyButton {
 		const blob = evt.target.files[0];
 
 		this.reader.readAsText(blob);
-		this.reader.onload = () => {
-			this.loadText(
-				this.reader.result,
-				blob.name.split('.').pop().toUpperCase() // Extract extension to be used as format name
-			);
-		};
+		this.reader.onload = () => this.loadText(this.reader.result, blob.name);
 	}
 
 	loadUrl(url) {
 		fetch(url)
 			.then(response => response.text())
-			.then(text => this.loadText(
-				text,
-				url.split('.').pop().toUpperCase()
-			));
+			.then(text => this.loadText(text, url));
 	}
 
-	loadText(text, formatName) {
+	loadText(text, url) {
 		const map = this.getMap(),
-			loadFormat = new ol.format[formatName in ol.format ? formatName : 'GeoJSON'](),
+			formatName = url.split('.').pop().toUpperCase(), // Extract extension to be used as format name
+			loadFormat = new ol.format[formatName in ol.format ? formatName : 'GeoJSON'](), // Find existing format
 			receivedLat = text.match(/lat="-?([0-9]+)/), // Received projection depending on the first value
 			receivedProjection = receivedLat && receivedLat.length && parseInt(receivedLat[1]) > 100 ? 'EPSG:3857' : 'EPSG:4326',
 			features = loadFormat.readFeatures(text, {
@@ -173,7 +166,7 @@ export class Load extends MyButton {
 			const fileExtent = gpxSource.getExtent();
 
 			if (ol.extent.isEmpty(fileExtent))
-				alert('Ce fichier ne comporte pas de points ni de trace');
+				alert(url + ' ne comporte pas de point ni de trace.');
 			else
 				map.getView().fit(
 					fileExtent, {

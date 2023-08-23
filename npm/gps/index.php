@@ -87,7 +87,7 @@ Based on https://openlayers.org
   </div>
 
 <?php
-  //TODO load gpx file at init if only one file
+  //TODO push this code in js & make a index.html for non apache sites
   // Add a menu to load .gpx files included in the gps/... directory
   $gpx_files = glob("{*.gpx,*/*.gpx}", GLOB_BRACE);
   if($gpx_files) { ?>

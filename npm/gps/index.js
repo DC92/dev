@@ -53,3 +53,6 @@ navigator.serviceWorker.addEventListener('controllerchange', function() {
 		}),
 	);
 });
+
+// Load server .gpx file from url#name
+loadControl.loadUrl(location.hash.replace('#', '') + '.gpx');
