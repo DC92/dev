@@ -1,8 +1,11 @@
+const cacheName = 'myGpsCache';
+
 self.addEventListener('install', evt => {
 	console.log('install');
+	caches.delete(cacheName);
 	self.skipWaiting();
 	evt.waitUntil(
-		caches.open('myGpsCache4').then(cache => {
+		caches.open(cacheName).then(cache => {
 			console.log('open cache');
 			cache.addAll([
 				'index.html',

@@ -1,8 +1,17 @@
 /* global ol, myol, gpxFiles */ // eslint context
 
-// Force https to allow PWA and geolocation
-if (!location.href.match(/https|localhost/))
-	location.replace(location.href.replace('http://', 'https://'));
+const url =
+	// Force https to allow PWA and geolocation
+	(location.hostname == 'localhost' ? 'http://' : 'https://') +
+	location.hostname +
+	location.pathname +
+	// Force full script name of short url to allow PWA
+	(location.href.search('index') == -1 ? 'index.php' : '') +
+	location.search +
+	location.hash;
+
+if (location.href != url)
+	location.replace(url);
 
 // Ask to reload the PWA when a new version is loaded
 navigator.serviceWorker.addEventListener('controllerchange', function() {
@@ -18,6 +27,7 @@ navigator.serviceWorker.addEventListener('controllerchange', function() {
 });
 
 // Map
+//TODO full screen => no status bar
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',

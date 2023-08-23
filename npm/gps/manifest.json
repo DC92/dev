@@ -15,6 +15,5 @@
 	"scope": "./",
 	"display": "fullscreen",
 	"background_color": "white",
-	"theme_color": "white",
-	"display": "standalone"
+	"theme_color": "white"
 }
