@@ -1,5 +1,8 @@
 /* global ol, myol, gpxFiles */ // eslint context
 
+// Load the service worker
+navigator.serviceWorker.register('service-worker.js');
+
 const url =
 	// Force https to allow PWA and geolocation
 	(location.hostname == 'localhost' ? 'http://' : 'https://') +
@@ -10,10 +13,12 @@ const url =
 	location.search +
 	location.hash;
 
+//BEST risk of loop !
 if (location.href != url)
 	location.replace(url);
 
 // Ask to reload the PWA when a new version is loaded
+//TODO only do it once !
 navigator.serviceWorker.addEventListener('controllerchange', function() {
 	map.addControl(
 		new myol.control.MyButton({

@@ -33,18 +33,13 @@ Based on https://openlayers.org
 		<!-- WEB APP manifest -->
 		<link href="manifest.json" rel="manifest" />
 
-		<!-- Service worker & global data -->
-		<script>
-			if ("serviceWorker" in navigator)
-				navigator.serviceWorker.register("service-worker.js");
-
-			const gpxFiles = [];
-		</script>
-
 		<!-- App stylesheet + javascript -->
 		<link href="../dist/myol.css" rel="stylesheet" />
 		<script src="../dist/myol.js"></script>
 		<link href="index.css" rel="stylesheet" />
+		<script>
+			const gpxFiles = []; //TODO resorb
+		</script>
 		<script src="index.js" defer></script>
 	</head>
 
