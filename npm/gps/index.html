@@ -4,7 +4,7 @@
 https://github.com/Dominique92/MyOl
 Based on https://openlayers.org
 -->
-<html lang="en">
+<html lang="fr">
 	<head>
 		<!-- "Usual" title charset description viewport -->
 		<title>GPS PWA</title>
@@ -12,7 +12,6 @@ Based on https://openlayers.org
 		<meta name="description" content="An offline GPS based on Progressive Web Application" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-		<!-- Icons & platform specific -->
 		<!-- Good old favicon -->
 		<link href="favicon.png" type="image/png" rel="icon" />
 
@@ -30,17 +29,15 @@ Based on https://openlayers.org
 		<meta name="msapplication-TileImage" content="icon-512.png" />
 		<meta name="msapplication-TileColor" content="#ffffff" />
 
-		<!-- WEB APP manifest -->
+		<!-- PWA -->
 		<link href="manifest.json" rel="manifest" />
+		<script>navigator.serviceWorker.register("js.php?service-worker")</script>
 
-		<!-- App stylesheet + javascript -->
+		<!-- App -->
 		<link href="../dist/myol.css" rel="stylesheet" />
 		<script src="../dist/myol.js"></script>
 		<link href="index.css" rel="stylesheet" />
-		<script>
-			const gpxFiles = []; //TODO resorb
-		</script>
-		<script src="index.js" defer></script>
+		<script src="js.php?index" defer></script>
 	</head>
 
 	<body>

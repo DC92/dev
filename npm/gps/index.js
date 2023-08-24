@@ -1,10 +1,7 @@
-/* global ol, myol, gpxFiles */ // eslint context
+/* global ol, myol */ // eslint context
 
-// Load the service worker
-navigator.serviceWorker.register('service-worker.js');
-
-const url =
-	// Force https to allow PWA and geolocation
+//TODO // Force https to allow PWA and geolocation
+/*const url =
 	(location.hostname == 'localhost' ? 'http://' : 'https://') +
 	location.hostname +
 	location.pathname +
@@ -16,19 +13,20 @@ const url =
 //BEST risk of loop !
 if (location.href != url)
 	location.replace(url);
+*/
+
+var gpxFiles = [ /*GPXFILES*/ ];
 
 // Ask to reload the PWA when a new version is loaded
-//TODO only do it once !
-navigator.serviceWorker.addEventListener('controllerchange', function() {
-	map.addControl(
-		new myol.control.MyButton({
-			label: '&#127381;',
-			subMenuHTML: '<p>Une nouvelle version</p>' +
-				'<p>ou de nouvelles traces</p>' +
-				'<p>sont disponibles.</p>' +
-				'<a href="">Recharger la page</a>',
-		}),
-	);
+//TODO display the control once when the server update
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+	new myol.control.MyButton({
+		label: '&#127381;',
+		subMenuHTML: '<p>Une nouvelle version</p>' +
+			'<p>ou de nouvelles traces</p>' +
+			'<p>sont disponibles.</p>' +
+			'<a href="">Recharger la page</a>',
+	});
 });
 
 // Map
