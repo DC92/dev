@@ -116,7 +116,8 @@ export class Load extends MyButton {
 	}
 
 	loadUrl(url) {
-		fetch(url)
+		if (url)
+			fetch(url)
 			.then(response => response.text())
 			.then(text => this.loadText(text, url));
 	}

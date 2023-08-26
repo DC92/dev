@@ -1,18 +1,30 @@
 // Last change LAST_CHANGE_TIME
+//TODO BUG content keep in cache
 
 const cacheName = 'myGpsCache';
 
 // Create/install cache
 self.addEventListener('install', evt => {
-	console.log('PWA install');
+	console.log('PWA install LAST_CHANGE_TIME');
 	caches.delete(cacheName)
-		.then(console.log(cacheName + ' deleted'))
+		.then(console.log('PWA ' + cacheName + ' deleted'))
 		.catch(err => console.error(err));
 	evt.waitUntil(
 		caches.open(cacheName)
 		.then(cache => {
 			console.log('PWA open cache ' + cacheName);
-			cache.addAll([ /*GPXFILES*/ ])
+			cache.addAll([
+					'index.html',
+					'index.css',
+					'dist/myol.css',
+					'dist/myol.js',
+					'js.php?index',
+					'favicon.png',
+					'icon-512.png',
+					'manifest.json',
+					//TODO BUG don't show list on button  
+					/*GPXFILES*/
+				])
 				.then(console.log('PWA end cache.addAll'))
 				.catch(err => console.error(err));
 		})
@@ -21,7 +33,8 @@ self.addEventListener('install', evt => {
 });
 
 // Claim control instantly
-self.addEventListener('activate', evt => {
+// Necessary to trigger controllerchange event
+self.addEventListener('activate', () => {
 	console.log('PWA activate');
 	self.clients.claim()
 		.then(console.log('PWA end clients.claim'))
@@ -35,18 +48,24 @@ self.addEventListener('fetch', evt => {
 		caches.match(evt.request)
 		.then(found => {
 			if (found) {
-				console.log('found ' + evt.request.url)
+				console.log('PWA cache found ' + evt.request.url)
 				return found;
 			} else {
 				return fetch(evt.request)
 					.then(response => {
+						console.log('PWA fetch ' + evt.request.url)
 						caches.open('myGpsCache')
 							.then(cache => {
-								console.log(response.type + ' ' + evt.request.url)
-								cache.put(evt.request, response.clone());
-								return response;
+
+								if (evt.request.url.includes('service-worker')) //TODO TEST -> delete
+									alert();
+
+								console.log('PWA cache ' + response.type + ' ' + evt.request.url)
+								cache.put(evt.request, response);
+								//		return response; //TODO BUG ne retrourne pas le fichier trouvé
 							})
 							.catch(err => console.error(err));
+						return response.clone(); //TODO BUG ne retrourne pas le fichier trouvé
 					})
 					.catch(err => console.error(err));
 			}

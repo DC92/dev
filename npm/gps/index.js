@@ -17,20 +17,11 @@ if (location.href != url)
 
 var gpxFiles = [ /*GPXFILES*/ ];
 
-// Ask to reload the PWA when a new version is loaded
-//TODO display the control once when the server update
-navigator.serviceWorker.addEventListener('controllerchange', () => {
-	new myol.control.MyButton({
-		label: '&#127381;',
-		subMenuHTML: '<p>Une nouvelle version</p>' +
-			'<p>ou de nouvelles traces</p>' +
-			'<p>sont disponibles.</p>' +
-			'<a href="">Recharger la page</a>',
-	});
-});
+console.log('MyGPS version LAST_CHANGE_TIME'); 
 
 // Map
 //TODO full screen => no status bar
+	console.log('Display map');
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',
@@ -69,14 +60,18 @@ var loadControl = new myol.control.Load(),
 	});
 
 // Load server .gpx file from url #name (part of filename, case insensitive
-if (gpxFiles && location.hash)
-	loadControl.loadUrl(gpxFiles.find(s =>
-		s.toLowerCase()
+if (location.hash) {
+	const initFileName = gpxFiles.find(fn =>
+		fn.toLowerCase()
 		.includes(
 			location.hash.replace('#', '')
 			.toLowerCase()
 		)
-	));
+	);
+
+	if (initFileName)
+		loadControl.loadUrl(initFileName);
+}
 
 // Add a menu to load .gpx files included in the gps/... directories
 if (gpxFiles) {
@@ -99,3 +94,18 @@ if (gpxFiles) {
 		})
 	);
 }
+
+// Ask to reload the PWA when a new version is loaded
+//TODO display the control once when the server update
+//TODO not always trigger when SW change
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+	console.log('PWA controllerchange');
+	map.addControl(
+	new myol.control.MyButton({
+		label: '&#127381;',
+		subMenuHTML: '<p>Une nouvelle version</p>' +
+			'<p>ou de nouvelles traces</p>' +
+			'<p>sont disponibles.</p>' +
+			'<a href="">Recharger la page</a>',
+	}));   
+});
