@@ -1,27 +1,18 @@
 /* global ol, myol */ // eslint context
 
-//TODO // Force https to allow PWA and geolocation
-/*const url =
-	(location.hostname == 'localhost' ? 'http://' : 'https://') +
-	location.hostname +
-	location.pathname +
-	// Force full script name of short url to allow PWA
-	(location.href.search('index') == -1 ? 'index.php' : '') +
-	location.search +
-	location.hash;
-
-//BEST risk of loop !
-if (location.href != url)
-	location.replace(url);
-*/
-
-var gpxFiles = [ /*GPXFILES*/ ];
-
-console.log('MyGPS version LAST_CHANGE_TIME'); 
+// Force https to allow PWA and geolocation
+// Force full script name of short url to allow PWA
+if (!location.href.match(/(https|localhost).*\/index.html/))
+	location.replace(
+		(location.hostname == 'localhost' ? 'http://' : 'https://') +
+		location.hostname +
+		location.pathname + (location.pathname.slice(-1) == '/' ? 'index.html' : '') +
+		location.search +
+		location.hash);
 
 // Map
-//TODO full screen => no status bar
-	console.log('Display map');
+//BEST full screen => no status bar
+console.log('Display map');
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',
@@ -60,9 +51,11 @@ var loadControl = new myol.control.Load(),
 	});
 
 // Load server .gpx file from url #name (part of filename, case insensitive
+var gpxFiles = [ /*GPXFILES*/ ];
+
 if (location.hash) {
-	const initFileName = gpxFiles.find(fn =>
-		fn.toLowerCase()
+	const initFileName = gpxFiles.find(fileName =>
+		fileName.toLowerCase()
 		.includes(
 			location.hash.replace('#', '')
 			.toLowerCase()
@@ -95,17 +88,19 @@ if (gpxFiles) {
 	);
 }
 
-// Ask to reload the PWA when a new version is loaded
+// Ask user to reload the PWA when a new version is loaded
 //TODO display the control once when the server update
 //TODO not always trigger when SW change
 navigator.serviceWorker.addEventListener('controllerchange', () => {
 	console.log('PWA controllerchange');
 	map.addControl(
-	new myol.control.MyButton({
-		label: '&#127381;',
-		subMenuHTML: '<p>Une nouvelle version</p>' +
-			'<p>ou de nouvelles traces</p>' +
-			'<p>sont disponibles.</p>' +
-			'<a href="">Recharger la page</a>',
-	}));   
+		new myol.control.MyButton({
+			label: '&#127381;',
+			subMenuHTML: '<p>Une nouvelle version</p>' +
+				'<p>ou de nouvelles traces</p>' +
+				'<p>sont disponibles.</p>' +
+				'<a href="">Recharger la page</a>',
+		}));
 });
+
+console.log('MyGPS version LAST_CHANGE_TIME');

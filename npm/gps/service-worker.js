@@ -18,7 +18,7 @@ self.addEventListener('install', evt => {
 					'index.css',
 					'dist/myol.css',
 					'dist/myol.js',
-					'js.php?index',
+					'js.php?include',
 					'favicon.png',
 					'icon-512.png',
 					'manifest.json',
@@ -48,19 +48,19 @@ self.addEventListener('fetch', evt => {
 		caches.match(evt.request)
 		.then(found => {
 			if (found) {
-				console.log('PWA cache found ' + evt.request.url)
+				//console.log('PWA cache found ' + evt.request.url)
 				return found;
 			} else {
 				return fetch(evt.request)
 					.then(response => {
-						console.log('PWA fetch ' + evt.request.url)
+						//console.log('PWA fetch ' + evt.request.url)
 						caches.open('myGpsCache')
 							.then(cache => {
 
 								if (evt.request.url.includes('service-worker')) //TODO TEST -> delete
 									alert();
 
-								console.log('PWA cache ' + response.type + ' ' + evt.request.url)
+								//console.log('PWA cache ' + response.type + ' ' + evt.request.url)
 								cache.put(evt.request, response);
 								//		return response; //TODO BUG ne retrourne pas le fichier trouvé
 							})
