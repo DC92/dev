@@ -13,18 +13,7 @@ self.addEventListener('install', evt => {
 		caches.open(cacheName)
 		.then(cache => {
 			console.log('PWA open cache ' + cacheName);
-			cache.addAll([
-					'index.html',
-					'index.css',
-					'dist/myol.css',
-					'dist/myol.js',
-					'js.php?include',
-					'favicon.png',
-					'icon-512.png',
-					'manifest.json',
-					//TODO BUG don't show list on button  
-					/*GPXFILES*/
-				])
+			cache.addAll([ /*GPXFILES*/ ]) // List of files not automatically opened
 				.then(console.log('PWA end cache.addAll'))
 				.catch(err => console.error(err));
 		})

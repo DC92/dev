@@ -67,6 +67,7 @@ if (location.hash) {
 }
 
 // Add a menu to load .gpx files included in the gps/... directories
+//TODO BUG don't show list on button
 if (gpxFiles) {
 	const tracesEl = document.getElementById('myol-traces-gps');
 
