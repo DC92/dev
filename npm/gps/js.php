@@ -2,13 +2,14 @@
 error_reporting(E_ALL);
 ini_set("display_errors", "on");
 
+$script_name = array_keys($_GET)[0] . ".js";
+
 header("Content-Type: application/javascript");
+header("Content-Disposition: attachment; filename=\"$script_name\"");
 header("Cache-Control: max-age=0");
 header("Cache-Control: no-cache");
 header("Pragma: no-cache");
 //TODO update timefile to the last package timefile
-
-$script_name = array_keys($_GET)[0] . ".js";
 
 // Display the last modified filetime to trigger the reload
 date_default_timezone_set("Europe/Paris");
