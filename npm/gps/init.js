@@ -58,7 +58,7 @@ var loadControl = new myol.control.Load(),
 			new ol.control.ScaleLine(),
 
 			// Bottom right
-			new myol.control.Permalink(), //TODO test
+			new myol.control.Permalink(),
 			new ol.control.Attribution(),
 
 			// No button

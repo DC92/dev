@@ -45,7 +45,6 @@ export function collection(opt) {
 		new ol.control.ScaleLine(options.scaleLine),
 
 		// Bottom right
-		new myControl.Permalink(options.permalink),
 		new ol.control.Attribution(options.attribution),
 
 		...options.supplementaryControls,

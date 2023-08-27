@@ -30,14 +30,13 @@ Based on https://openlayers.org
 		new ol.Map({
 			target: 'map',
 			controls: [
-				...myol.control.collection({
-					permalink: { //TODO retirer permalink de myol.control.collection
-						display: true,
-					},
-				}),
+				...myol.control.collection(),
 				new myol.control.MyButton({ // Help
 					label: '?',
 					subMenuId: 'myol-help',
+				}),
+				new myol.control.Permalink({
+					display: true,
 				}),
 				new myol.control.TilesBuffer(),
 			],
