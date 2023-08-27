@@ -1,5 +1,7 @@
 /* global ol, myol */ // eslint context
 
+console.log('MyGPS version LAST_CHANGE_TIME');
+
 // Force https to allow PWA and geolocation
 // Force full script name of short url to allow PWA
 if (!location.href.match(/(https|localhost).*\/index.html/))
@@ -10,9 +12,22 @@ if (!location.href.match(/(https|localhost).*\/index.html/))
 		location.search +
 		location.hash);
 
-// Map
-//BEST full screen => no status bar
-console.log('Display map');
+// Ask user to reload the PWA when a new version is loaded
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+	console.log('PWA controllerchange');
+	map.addControl(
+		new myol.control.MyButton({
+			label: '&#127381;',
+			subMenuHTML: '<p>Une nouvelle version</p>' +
+				'<p>ou de nouvelles traces</p>' +
+				'<p>sont disponibles.</p>' +
+				'<a href="">Recharger la page</a>',
+		}));
+}, {
+	once: true
+});
+
+// Display the mapap
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',
@@ -20,6 +35,7 @@ var loadControl = new myol.control.Load(),
 			constrainResolution: true, // Force zoom on the available tile's definition
 		}),
 		controls: [
+			//BEST full screen => no status bar
 			// Top left
 			//new ol.control.Zoom( ),
 			new myol.control.MyGeocoder(),
@@ -50,21 +66,8 @@ var loadControl = new myol.control.Load(),
 		],
 	});
 
-// Load server .gpx file from url #name (part of filename, case insensitive
+// Load .gpx files included in the gps directory
 var gpxFiles = [ /*GPXFILES*/ ];
-
-if (location.hash) {
-	const initFileName = gpxFiles.find(fileName =>
-		fileName.toLowerCase()
-		.includes(
-			location.hash.replace('#', '')
-			.toLowerCase()
-		)
-	);
-
-	if (initFileName)
-		loadControl.loadUrl(initFileName);
-}
 
 // Add a menu to load .gpx files included in the gps/... directories
 if (gpxFiles) {
@@ -88,19 +91,16 @@ if (gpxFiles) {
 	);
 }
 
-// Ask user to reload the PWA when a new version is loaded
-navigator.serviceWorker.addEventListener('controllerchange', () => {
-	console.log('PWA controllerchange');
-	map.addControl(
-		new myol.control.MyButton({
-			label: '&#127381;',
-			subMenuHTML: '<p>Une nouvelle version</p>' +
-				'<p>ou de nouvelles traces</p>' +
-				'<p>sont disponibles.</p>' +
-				'<a href="">Recharger la page</a>',
-		}));
-}, {
-	once: true
-});
+// Load server .gpx file from url #name (part of filename, case insensitive
+if (location.hash) {
+	const initFileName = gpxFiles.find(fileName =>
+		fileName.toLowerCase()
+		.includes(
+			location.hash.replace('#', '')
+			.toLowerCase()
+		)
+	);
 
-console.log('MyGPS version LAST_CHANGE_TIME');
+	if (initFileName)
+		loadControl.loadUrl(initFileName);
+}

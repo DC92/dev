@@ -31,7 +31,11 @@ Based on https://openlayers.org
 
 		<!-- PWA -->
 		<link href="manifest.json" rel="manifest" />
-		<script>navigator.serviceWorker.register("js.php?service-worker")</script>
+		<script>
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker.register("service-worker.js"); 
+			}
+		</script>
 
 		<!-- App -->
 		<!-- //TODO variable & in scope myol directory -->
