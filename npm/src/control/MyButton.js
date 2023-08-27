@@ -154,7 +154,6 @@ export class Load extends MyButton {
 								width: 2,
 							}),
 							image: properties.sym ? new ol.style.Icon({
-								//TODO compléter chemineur avec les symboles standards
 								src: '//chemineur.fr/ext/Dominique92/GeoBB/icones/' + properties.sym + '.svg',
 							}) : null,
 						});
