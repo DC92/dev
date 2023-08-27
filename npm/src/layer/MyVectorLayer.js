@@ -14,17 +14,16 @@ import * as stylesOptions from './stylesOptions';
 class MyVectorSource extends ol.source.Vector {
 	constructor(opt) {
 		const options = {
-				//TODO sort & document options
 				// url calculation
 				url: url_, // (extent, resolution, projection)
-				bbox: bbox_, // (extent, resolution, projection)
 				// host: '',
 				// query: (extent, resolution, projection ,options) => ({_path: '...'}),
-
+				bbox: bbox_, // (extent, resolution, projection)
 				strategy: ol.loadingstrategy.bbox,
 				projection: 'EPSG:4326',
 
-				addProperties: () => {}, // (default) properties => {} add properties to each received features
+				// add properties to each received features
+				addProperties: () => {}, // (default) properties => {}
 
 				...opt,
 			},
@@ -43,7 +42,7 @@ class MyVectorSource extends ol.source.Vector {
 			if (statusEl) statusEl.innerHTML =
 				evt.type == 'featuresloadstart' ? '&#8987;' :
 				evt.type == 'featuresloadend' ? '' :
-				'&#9888;'; // Error
+				'&#9888;'; // Symbol error
 		});
 
 		// Compute properties when the layer is loaded & before the cluster layer is computed
@@ -83,6 +82,7 @@ class MyVectorSource extends ol.source.Vector {
 		}
 	}
 
+	// Redirection for cluster.source compatibility
 	reload() {
 		this.refresh();
 	}

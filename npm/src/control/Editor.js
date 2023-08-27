@@ -6,7 +6,6 @@
 import ol from '../../src/ol';
 import MyButton from './MyButton';
 
-//TODO test départ / arrivée semblent permutés par rapport à Visorando
 // Editor
 export default class Editor extends MyButton {
 	constructor(options) {
@@ -230,37 +229,65 @@ export default class Editor extends MyButton {
 		const textStyle = {
 			scale: feature.getGeometry().getType() == 'LineString' ? 1.5 : 0,
 			placement: 'line',
-			textAlign: 'end',
-			text: 'D', //BEST don't display A & D on polygons
 			offsetY: -7,
 		};
 
-		return [
-			new ol.style.Style({
-				image: new ol.style.Circle({ // Marker
-					radius: 4,
-					stroke: new ol.style.Stroke({
-						color: 'red',
-						width: 2,
+		switch (feature.getGeometry().getType()) {
+			// Marker
+			case 'Point':
+				return [
+					new ol.style.Style({
+						image: new ol.style.Circle({
+							radius: 4,
+							stroke: new ol.style.Stroke({
+								color: 'red',
+								width: 2,
+							}),
+						}),
 					}),
-				}),
-				stroke: new ol.style.Stroke({ // Lines or polygons border
-					color: 'red',
-					width: 4,
-				}),
-				fill: new ol.style.Fill({ // Polygons
-					color: 'rgba(255,0,0,0.3)',
-				}),
-				text: new ol.style.Text(textStyle), // Direction
-			}),
-			new ol.style.Style({
-				text: new ol.style.Text({
-					...textStyle,
-					textAlign: 'start',
-					text: 'A',
-				}),
-			}),
-		];
+				];
+
+			case 'LineString':
+			case 'MultiLineString':
+				return [
+					new ol.style.Style({
+						stroke: new ol.style.Stroke({ // Lines or polygons border
+							color: 'red',
+							width: 4,
+						}),
+						fill: new ol.style.Fill({ // Polygons
+							color: 'rgba(255,0,0,0.3)',
+						}),
+						// Begining of line marking
+						text: new ol.style.Text({
+							...textStyle,
+							textAlign: 'start',
+							text: 'D',
+						}), // Direction
+					}),
+					// End of line marking
+					new ol.style.Style({
+						text: new ol.style.Text({
+							...textStyle,
+							textAlign: 'end',
+							text: 'A',
+						}),
+					}),
+				];
+
+			default: // Polygon & MultiPolygon
+				return [
+					new ol.style.Style({
+						stroke: new ol.style.Stroke({ // Lines or polygons border
+							color: 'red',
+							width: 4,
+						}),
+						fill: new ol.style.Fill({ // Polygons
+							color: 'rgba(255,0,0,0.3)',
+						}),
+					}),
+				];
+		}
 	}
 
 	changeModeEdit(evt) {
