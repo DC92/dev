@@ -42,7 +42,7 @@ export class MyGeolocation extends MyButton {
 			className: 'myol-button-gps',
 			label: '&#8853;',
 			subMenuHTML: subMenu,
-			//TODO subMenuId: 'myol-gps',
+			//BEST subMenuId: 'myol-gps',
 
 			// ol.Geolocation options
 			// https://www.w3.org/TR/geolocation/#position_options_interface
