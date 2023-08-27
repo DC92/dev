@@ -67,7 +67,6 @@ if (location.hash) {
 }
 
 // Add a menu to load .gpx files included in the gps/... directories
-//TODO BUG don't show list on button
 if (gpxFiles) {
 	const tracesEl = document.getElementById('myol-traces-gps');
 
@@ -90,8 +89,7 @@ if (gpxFiles) {
 }
 
 // Ask user to reload the PWA when a new version is loaded
-//TODO display the control once when the server update
-//TODO not always trigger when SW change
+//TODO BUG don't always trigger when SW change
 navigator.serviceWorker.addEventListener('controllerchange', () => {
 	console.log('PWA controllerchange');
 	map.addControl(
@@ -102,6 +100,8 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
 				'<p>sont disponibles.</p>' +
 				'<a href="">Recharger la page</a>',
 		}));
+}, {
+	once: true
 });
 
 console.log('MyGPS version LAST_CHANGE_TIME');

@@ -2,14 +2,12 @@
 error_reporting(E_ALL);
 ini_set("display_errors", "on");
 
-$script_name = array_keys($_GET)[0] . ".js";
-
 header("Content-Type: application/javascript");
-header("Content-Disposition: attachment; filename=\"$script_name\"");
-header("Cache-Control: max-age=0");
 header("Cache-Control: no-cache");
 header("Pragma: no-cache");
-//TODO update timefile to the last package timefile
+//TODO ??? update timefile to the last package timefile
+
+$script_name = array_keys($_GET)[0] . ".js";
 
 // Display the last modified filetime to trigger the reload
 date_default_timezone_set("Europe/Paris");
@@ -20,16 +18,12 @@ foreach (glob("{*,*/*,../*/myol.*s,../*/*/myol.*s}", GLOB_BRACE) as $f) {
 
 // List .gpx files included in the gps/... directory
 $gpx_files = glob("{*.gpx,*/*.gpx}", GLOB_BRACE);
+$gpx_files_list = str_replace(["[", "]"], PHP_EOL, json_encode($gpx_files));
 
 $replace = [
     "LAST_CHANGE_TIME" => date("Y-m-d H:i:s", $last_change_time),
-    "[/*GPXFILES*/]" => str_replace(
-        ",",
-        "," . PHP_EOL,
-        json_encode($gpx_files)
-    ),
+    "/*GPXFILES*/" => str_replace(",", "," . PHP_EOL, $gpx_files_list),
 ];
-
 echo str_replace(
     array_keys($replace),
     array_values($replace),
