@@ -89,7 +89,6 @@ if (gpxFiles) {
 }
 
 // Ask user to reload the PWA when a new version is loaded
-//TODO BUG don't always trigger when SW change
 navigator.serviceWorker.addEventListener('controllerchange', () => {
 	console.log('PWA controllerchange');
 	map.addControl(
