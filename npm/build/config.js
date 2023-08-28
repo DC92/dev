@@ -27,6 +27,11 @@ export default [{
 		file: 'dist/myol.js',
 		format: 'umd',
 		sourcemap: true,
+	},{
+		name: 'myol',
+		banner,
+		file: '../gps/myol/myol.js',
+		format: 'umd',
 	}],
 }, {
 	// Full myol / debug library
