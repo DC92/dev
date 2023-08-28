@@ -2,16 +2,6 @@
 
 console.log('MyGPS version LAST_CHANGE_TIME');
 
-// Force https to allow PWA and geolocation
-// Force full script name of short url to allow PWA
-if (!location.href.match(/(https|localhost).*\/index.html/))
-	location.replace(
-		(location.hostname == 'localhost' ? 'http://' : 'https://') +
-		location.hostname +
-		location.pathname + (location.pathname.slice(-1) == '/' ? 'index.html' : '') +
-		location.search +
-		location.hash);
-
 // Ask user to reload the PWA when a new version is loaded
 navigator.serviceWorker.addEventListener('controllerchange', () => {
 	console.log('PWA controllerchange');
@@ -28,7 +18,6 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
 });
 
 // Display the map
-//TODO map keys
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',

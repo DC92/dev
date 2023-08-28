@@ -32,9 +32,21 @@ Based on https://openlayers.org
 		<!-- PWA -->
 		<link href="manifest.json" rel="manifest">
 		<script>
-			if ("serviceWorker" in navigator) {
-				navigator.serviceWorker.register("js.php?service-worker"); 
+			// Force https & script name to be compliant with PWA
+			if (!location.href.match(/(https|localhost).*\/index.html/)) {
+				console.log('index.html reload');
+				location.replace(
+					(location.hostname == 'localhost' ? 'http://' : 'https://') +
+					location.hostname +
+					location.pathname + (location.pathname.slice(-1) == '/' ? 'index.html' : '') +
+					location.search +
+					location.hash);
 			}
+
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker.register("js.php?service-worker");
+			}
+
 			var layersKeys = {
 				ign: {key: "iejxbx4obzhco6c8klxrfbto"},
 				thunderforest: {key: "ee751f43b3af4614b01d1bce72785369"},
