@@ -9,14 +9,23 @@ header("Pragma: no-cache");
 $script_name = array_keys($_GET)[0] . ".js";
 
 // Display the last modified filetime to trigger the reload
+preg_match_all(
+    '/(href|src)="([^"]*)/',
+    file_get_contents("index.html"),
+    $index_includes
+);
+$dependencies = glob(
+    "{*,*/*," . join(",", $index_includes[2]) . "}",
+    GLOB_BRACE
+);
 date_default_timezone_set("Europe/Paris");
 $last_change_time = 0;
-foreach (glob("{*,*/*,../*/myol.*s,../*/*/myol.*s}", GLOB_BRACE) as $f) {
+foreach ($dependencies as $f) {
     $last_change_time = max($last_change_time, filemtime($f));
 }
 
-// List .gpx files included in the gps/... directory
-$gpx_files = glob("{*.gpx,*/*.gpx}", GLOB_BRACE);
+// List .gpx files included in the gpx directory
+$gpx_files = glob("gpx/*.gpx", GLOB_BRACE);
 $gpx_files_list = str_replace(["[", "]"], PHP_EOL, json_encode($gpx_files));
 
 $replace = [
