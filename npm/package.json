@@ -3,7 +3,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "rollup -c build/config.js",
-		"lint": "npx eslint src/*.js && npx eslint src/*/*.js && npx eslint gps/*.js"
+		"lint": "npx eslint src/*.js && npx eslint src/*/*.js"
 	},
 	"dependencies": {
 		"ol": "7.5.1",
