@@ -1,4 +1,4 @@
-/* global ol, myol */ // eslint context
+/* global ol, myol, layersKeys */ // eslint context
 
 console.log('MyGPS version LAST_CHANGE_TIME');
 
