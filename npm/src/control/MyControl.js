@@ -66,7 +66,7 @@ export class LengthLine extends MyControl {
 			}
 
 			// Display
-			//BEST BUG display length of GPS colimator
+			//TODO BUG display length of GPS colimator
 			if (length) {
 				this.element.innerHTML =
 					// Line length

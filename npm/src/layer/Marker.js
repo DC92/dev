@@ -81,7 +81,7 @@ export class Marker extends ol.layer.Vector {
 
 			// Edit the marker position
 			if (this.options.dragable) {
-				//BEST change the cursor
+				//TODO change the cursor
 				map.addInteraction(new ol.interaction.Pointer({
 					handleDownEvent: evt => {
 						return map.getFeaturesAtPixel(evt.pixel, {

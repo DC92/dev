@@ -9,7 +9,7 @@ import '../../geocoder/package/dist/ol-geocoder.css';
 import './myGeocoder.css'; // After ol-geocoder.css
 import Geocoder from '../../geocoder/code/src/base';
 
-//BEST BUG n'ouvre pas au survol
+//TODO BUG n'ouvre pas au survol
 export class MyGeocoder extends Geocoder {
 	constructor(options) {
 		super('nominatim', {

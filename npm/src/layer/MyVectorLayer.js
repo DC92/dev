@@ -30,7 +30,7 @@ class MyVectorSource extends ol.source.Vector {
 			statusEl = document.getElementById(options.selectName + '-status');
 
 		super({
-			format: new ol.format.GeoJSON({ //BEST treat & display JSON errors
+			format: new ol.format.GeoJSON({ //TODO treat & display JSON errors
 				dataProjection: options.projection,
 			}),
 
@@ -221,8 +221,8 @@ class MyServerClusterVectorLayer extends MyBrowserClusterVectorLayer {
  * Style features
  * Layer & features selector
  */
-//BEST document options
-//BEST separate source options
+//TODO document options
+//TODO ??? separate source options
 export class MyVectorLayer extends MyServerClusterVectorLayer {
 	constructor(opt) {
 		const options = {

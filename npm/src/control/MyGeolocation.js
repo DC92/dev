@@ -218,7 +218,7 @@ export class MyGeolocation extends MyButton {
 			view.setRotation(0); // Return to inactive state
 
 		// Display data under the button
-		let status = window.gpsValues.position ? '' : 'Sync...';
+		let status = window.gpsValues.position ? '' : 'Sync...'; //TODO BUG never see Sync...
 		if (window.gpsValues.altitude) {
 			status = Math.round(window.gpsValues.altitude) + ' m';
 			if (window.gpsValues.speed)
