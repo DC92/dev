@@ -69,7 +69,6 @@ export class MyButton extends MyControl {
 				el.classList.remove('myol-button-selected');
 	}
 }
-export default MyButton;
 
 /**
  * GPX file loader control
@@ -357,3 +356,5 @@ export class Print extends MyButton {
 			});
 	}
 }
+
+export default MyButton;

@@ -20,7 +20,6 @@ export class MyControl extends ol.control.Control {
 		this.options = options || {}; // Mem for further use
 	}
 }
-export default MyControl;
 
 /**
  * Control to display the length & height difference of an hovered line
@@ -67,6 +66,7 @@ export class LengthLine extends MyControl {
 			}
 
 			// Display
+			//BEST BUG display length of GPS colimator
 			if (length) {
 				this.element.innerHTML =
 					// Line length
@@ -93,35 +93,6 @@ export class LengthLine extends MyControl {
 				fcs.push(...this.getFlatCoordinates(g));
 
 		return fcs;
-	}
-}
-
-/**
- * Control to display the mouse position
- */
-export class MyMousePosition extends ol.control.MousePosition {
-	constructor(options) {
-		super({
-			// From MousePosition options
-			className: 'myol-coordinate',
-			projection: 'EPSG:4326',
-			placeholder: String.fromCharCode(0), // Hide control when mouse is out of the map
-
-			coordinateFormat: mouse => {
-				//BEST find better than window.gpsValues to share info
-				if (window.gpsValues && window.gpsValues.position) {
-					const ll4326 = ol.proj.transform(window.gpsValues.position, 'EPSG:3857', 'EPSG:4326'),
-						distance = ol.sphere.getDistance(mouse, ll4326);
-
-					return distance < 1000 ?
-						(Math.round(distance)) + ' m' :
-						(Math.round(distance / 10) / 100) + ' km';
-				} else
-					return ol.coordinate.createStringXY(4)(mouse);
-			},
-
-			...options,
-		});
 	}
 }
 
@@ -220,3 +191,5 @@ export class TilesBuffer extends MyControl {
 		});
 	}
 }
+
+export default MyControl;

@@ -7,7 +7,7 @@ import ol from '../../src/ol';
 import MyButton from './MyButton';
 
 // Editor
-export default class Editor extends MyButton {
+export class Editor extends MyButton {
 	constructor(options) {
 		super({
 			// Mybutton options
@@ -513,3 +513,5 @@ export default class Editor extends MyButton {
 		return a[0] == b[0] && a[1] == b[1]; // 2 coordinates
 	}
 }
+
+export default Editor;

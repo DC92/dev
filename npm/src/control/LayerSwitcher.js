@@ -6,8 +6,8 @@ import MyButton from './MyButton';
 import './layerSwitcher.css';
 
 //BEST how do we do on touch terminal ? alt key to switch layers / transparency
-//BEST keep selector open on click on the button (as other buttons)
-export default class LayerSwitcher extends MyButton {
+//BEST keep selector open when click on the button (as other buttons)
+export class LayerSwitcher extends MyButton {
 	constructor(options) {
 		super({
 			// MyButton options
@@ -113,3 +113,5 @@ export default class LayerSwitcher extends MyButton {
 			this.transparentlayer.setOpacity(this.sliderEl.value / 100);
 	}
 }
+
+export default LayerSwitcher;

@@ -5,7 +5,7 @@
 import ol from '../../src/ol';
 import proj4Lib from 'proj4/lib/index';
 
-export default class Marker extends ol.layer.Vector {
+export class Marker extends ol.layer.Vector {
 	constructor(opt) {
 		const options = {
 			// src, url of marker image
@@ -198,3 +198,5 @@ export default class Marker extends ol.layer.Vector {
 		this.els.string.textContent = strings[this.els.select.value || 'dec'];
 	}
 }
+
+export default Marker;

@@ -28,8 +28,8 @@ self.addEventListener('install', evt => {
 	);
 });
 
-// Serve required files
-// cache first, then browser cache, then network
+// Serves required files
+// Cache first, then browser cache, then network
 self.addEventListener('fetch', evt => {
 	//console.log('PWA fetch ' + evt.request.url);
 	evt.respondWith(
