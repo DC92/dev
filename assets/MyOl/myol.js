@@ -1949,7 +1949,7 @@ function controlLayerSwitcher(options) {
 		for (let name in baseLayers) {
 			const labelEl = document.createElement('label');
 
-			labelEl.innerHTML = '<input type="checkbox" value="' + name + '" ' + ' />' + name;
+			labelEl.innerHTML = '<input type="checkbox" value="' + name + '" ' + '>' + name;
 			labelEl.firstChild.onclick = selectBaseLayer;
 			control.submenuEl.appendChild(labelEl);
 
@@ -2050,7 +2050,7 @@ function controlLoadGPX(opt) {
 	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
-				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
+				'<input type="file" accept=".gpx" ctrlOnChange="loadFile">',
 			...opt,
 		},
 		control = controlButton(options);
@@ -2218,7 +2218,7 @@ function controlDownload(opt) {
 			})
 			// Beautify the output
 			.replace(/<[a-z]*>(0|null|[\[object Object\]|[NTZa:-]*)<\/[a-z]*>/g, '')
-			.replace(/<Data name="[a-z_]*"\/>|<Data name="[a-z_]*"><\/Data>|,"[a-z_]*":""/g, '')
+-			.replace(/<Data name="[a-z_]*"\/>|<Data name="[a-z_]*"><\/Data>|,"[a-z_]*":""/g, '')
 			.replace(/<Data name="copy"><value>[a-z_\.]*<\/value><\/Data>|,"copy":"[a-z_\.]*"/g, '')
 			.replace(/(<\/gpx|<\/?wpt|<\/?trk>|<\/?rte>|<\/kml|<\/?Document)/g, '\n$1')
 			.replace(/(<\/?Placemark|POINT|LINESTRING|POLYGON|<Point|"[a-z_]*":|})/g, '\n$1')
@@ -2251,20 +2251,20 @@ function controlGPS(options) {
 	const subMenu = location.href.match(/(https|localhost)/) ?
 		'<p>Localisation GPS:</p>' +
 		'<label>' +
-		'<input type="radio" name="myol-gps-source" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'<input type="radio" name="myol-gps-source" value="0" ctrlonchange="renderGPS" checked="checked">' +
 		'Inactif</label><label>' +
-		'<input type="radio" name="myol-gps-source" value="1" ctrlonchange="renderGPS" />' +
+		'<input type="radio" name="myol-gps-source" value="1" ctrlonchange="renderGPS">' +
 		'Position GPS <span>(1) extérieur</span></label><label>' +
-		'<input type="radio" name="myol-gps-source" value="2" ctrlonchange="renderGPS" />' +
+		'<input type="radio" name="myol-gps-source" value="2" ctrlonchange="renderGPS">' +
 		'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
-		'<input type="radio" name="myol-gps-display" value="0" ctrlonchange="renderGPS" checked="checked" />' +
+		'<input type="radio" name="myol-gps-display" value="0" ctrlonchange="renderGPS" checked="checked">' +
 		'Graticule, carte libre</label><label>' +
-		'<input type="radio" name="myol-gps-display" value="1" ctrlonchange="renderGPS" />' +
+		'<input type="radio" name="myol-gps-display" value="1" ctrlonchange="renderGPS">' +
 		'Centre la carte, nord en haut</label><label>' +
-		'<input type="radio" name="myol-gps-display" value="2" ctrlonchange="renderGPS" />' +
+		'<input type="radio" name="myol-gps-display" value="2" ctrlonchange="renderGPS">' +
 		'Centre et oriente la carte <span>(3)</span></label>' +
 
-		'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+		'<hr><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 		'nécessite un capteur et une réception GPS.</p>' +
 		'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
 		'mais peut être très erroné en extérieur à l&apos;initialisation. ' +
@@ -2352,7 +2352,7 @@ function controlGPS(options) {
 		});
 	};
 
-	// Trigered by <input ... ctrlOnChange="renderGPS" />
+	// Trigered by <input ... ctrlOnChange="renderGPS">
 	control.renderGPS = function(evt) {
 		const sourceLevelEl = document.querySelector('input[name="myol-gps-source"]:checked'),
 			displayLevelEl = document.querySelector('input[name="myol-gps-display"]:checked'),
@@ -2694,20 +2694,20 @@ function layerEditGeoJson(opt) {
 			label: 'E', // To be defined by changeModeEdit
 			submenuHTML: '<p>Edition:</p>' +
 				'<label for="myol-edit0">' +
-				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
+				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit">' +
 				'Modification &#x1F58D;' +
 				'</label>' +
 				(!options.help[1] ? '' :
 					'<label for="myol-edit1">' +
-					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
+					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit">' +
 					'Création ligne &#xD17;' +
 					'</label>') +
 				(!options.help[2] ? '' :
 					'<label for="myol-edit2">' +
-					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
+					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit">' +
 					'Création polygone &#X23E2;' +
 					'</label>') +
-				'<hr/><div id="myol-help-edit"></div>',
+				'<hr><div id="myol-help-edit"></div>',
 		}),
 		geoJsonEl = document.getElementById(options.geoJsonId), // Read data in an html element
 		geoJsonValue = geoJsonEl ? geoJsonEl.value : '',

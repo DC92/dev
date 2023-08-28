@@ -80,7 +80,7 @@ export class Load extends MyButton {
 			// MyButton options
 			label: '&#128194;',
 			subMenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
-				'<input type="file" accept=".gpx,.kml,.geojson" />',
+				'<input type="file" accept=".gpx,.kml,.geojson">',
 
 			// Load options
 			// initFileUrl, url of a gpx file to be uploaded at the init

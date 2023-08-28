@@ -15,20 +15,20 @@ export default class Editor extends MyButton {
 			subMenuHTML: '<p>Edition:</p>' +
 				//BEST move in .html / generalize aids / translation
 				'<label for="myol-edit0">' +
-				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit" />' +
+				'<input type="radio" name="myol-edit" id="myol-edit0" value="0" ctrlOnChange="changeModeEdit">' +
 				'Modification &#x1F58D;' +
 				'</label>' +
 				(!options.help[1] ? '' :
 					'<label for="myol-edit1">' +
-					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit" />' +
+					'<input type="radio" name="myol-edit" id="myol-edit1" value="1" ctrlOnChange="changeModeEdit">' +
 					'Création ligne &#xD17;' +
 					'</label>') +
 				(!options.help[2] ? '' :
 					'<label for="myol-edit2">' +
-					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit" />' +
+					'<input type="radio" name="myol-edit" id="myol-edit2" value="2" ctrlOnChange="changeModeEdit">' +
 					'Création polygone &#X23E2;' +
 					'</label>') +
-				'<hr/><div id="myol-help-edit"></div>',
+				'<hr><div id="myol-help-edit"></div>',
 
 			// Editor options
 			format: new ol.format.GeoJSON(),

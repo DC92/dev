@@ -8,8 +8,8 @@ Based on https://openlayers.org
 <head>
 	<title>My Openlayers WRI</title>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="../images/logo-dark.svg" rel="icon" type="image/svg" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="../images/logo-dark.svg" rel="icon" type="image/svg">
 
 	<link href="../style.css" rel="stylesheet">
 	<style>
@@ -138,7 +138,7 @@ Based on https://openlayers.org
 	</ul>
 
 	<div>
-		<input type="checkbox" name="select-massifs" />
+		<input type="checkbox" name="select-massifs">
 		<label>massifs</label>
 		<span id="select-massifs-status"></span>
 	</div>
@@ -146,31 +146,31 @@ Based on https://openlayers.org
 	<ul>OSM
 		<li>
 			<label>Tout</label>
-			<input type="checkbox" name="select-osm" value="all" />
+			<input type="checkbox" name="select-osm" value="all">
 			<span id="select-osm-status"></span>
 		</li><li>
 			<input type="checkbox" name="select-osm" id="City Hall"
-				value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]' />
+				value='["tourism"~"hotel|guest_house|chalet|hostel|apartment"]'>
 			<label>hôtel</label>
 		</li><li>
 			<input type="checkbox" name="select-osm" id="Campground"
-				value='["tourism"="camp_site"]' />
+				value='["tourism"="camp_site"]'>
 			<label>camping</label>
 		</li><li>
 			<input type="checkbox" name="select-osm" id="Drinking Water"
-				value='["natural"="spring"]+["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["man_made"="water_well"]' />
+				value='["natural"="spring"]+["amenity"="drinking_water|watering_place|fountain"]+["waterway"="water_point"]+["man_made"="water_well"]'>
 			<label for="Drinking Water">point d'eau</label>
 		</li><li>
 			<input type="checkbox" name="select-osm" id="Shopping Center"
-				value='["shop"~"supermarket|convenience"]' />
+				value='["shop"~"supermarket|convenience"]'>
 			<label for="Shopping Center">alimentation</label>
 		</li><li>
 			<input type="checkbox" name="select-osm" id="Parking Area"
-				value='["amenity"="parking"]["access"!="private"]' />
+				value='["amenity"="parking"]["access"!="private"]'>
 			<label for="Parking Area">parking</label>
 		</li><li>
 			<input type="checkbox" name="select-osm" id="Ground Transportation"
-				value='["highway"="bus_stop"]' />
+				value='["highway"="bus_stop"]'>
 			<label for="Ground Transportation">bus</label>
 		</li>
 	</ul>
@@ -179,24 +179,24 @@ Based on https://openlayers.org
 		<input type="checkbox"
 			name="select-chemineur" id="select-chemineur"
 			value="3,8,20,23"
-		/>
+		>
 		<label for="select-chemineur">chemineur.fr</label>
 		<span id="select-chemineur-status"></span>
-	</div><br/><div>
+	</div><br><div>
 		<input type="checkbox"
 			name="select-alpages" id="select-alpages"
 			value="4,5"
-		/>
+		>
 		<label for="select-alpages">alpages.info</label>
 		<span id="select-alpages-status"></span>
-	</div><br/><div>
-		<input type="checkbox" name="select-prc" id="select-prc" />
+	</div><br><div>
+		<input type="checkbox" name="select-prc" id="select-prc">
 		<label for="select-prc">pyrenees-refuges.com</label>
 		<span id="select-prc-status"></span>
-	</div><br/><div>
+	</div><br><div>
 		Camptocamp.org
-		<label><input type="checkbox" name="select-c2c" value="hut,shelter,gite,cave,bivouac,camp_site" />logement</label>
-		<label><input type="checkbox" name="select-c2c" value="waterpoint,waterfall" />point d'eau</label>
+		<label><input type="checkbox" name="select-c2c" value="hut,shelter,gite,cave,bivouac,camp_site">logement</label>
+		<label><input type="checkbox" name="select-c2c" value="waterpoint,waterfall">point d'eau</label>
 		(seuls 100 points sont affichés)
 		<span id="select-c2c-status"></span>
 	</div>

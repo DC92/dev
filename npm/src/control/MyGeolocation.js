@@ -13,20 +13,20 @@ export class MyGeolocation extends MyButton {
 			//BEST use .html content / option
 			'<p>Localisation GPS:</p>' +
 			'<label>' +
-			'<input type="radio" name="myol-gps-source" value="0" checked="checked" />' +
+			'<input type="radio" name="myol-gps-source" value="0" checked="checked">' +
 			'Inactif</label><label>' +
-			'<input type="radio" name="myol-gps-source" value="1" />' +
+			'<input type="radio" name="myol-gps-source" value="1">' +
 			'Position GPS <span>(1) extérieur</span></label><label>' +
-			'<input type="radio" name="myol-gps-source" value="2" />' +
+			'<input type="radio" name="myol-gps-source" value="2">' +
 			'Position GPS ou IP <span>(2) intérieur</span></label><hr><label>' +
-			'<input type="radio" name="myol-gps-display" value="0" checked="checked" />' +
+			'<input type="radio" name="myol-gps-display" value="0" checked="checked">' +
 			'Graticule, carte libre</label><label>' +
-			'<input type="radio" name="myol-gps-display" value="1" />' +
+			'<input type="radio" name="myol-gps-display" value="1">' +
 			'Centre la carte, nord en haut</label><label>' +
-			'<input type="radio" name="myol-gps-display" value="2" />' +
+			'<input type="radio" name="myol-gps-display" value="2">' +
 			'Centre et oriente la carte <span>(3)</span></label>' +
 
-			'<hr /><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
+			'<hr><p>(1) plus précis en extérieur mais plus lent à initialiser, ' +
 			'nécessite un capteur et une réception GPS.</p>' +
 			'<p>(2) plus précis et rapide en intérieur ou en zone urbaine ' +
 			'mais peut être très erroné en extérieur à l&apos;initialisation. ' +

@@ -40,7 +40,7 @@ export default class LayerSwitcher extends MyButton {
 
 		for (let name in this.layers) {
 			// Build html layers selectors
-			this.subMenuEl.insertAdjacentHTML('beforeend', '<label><input type="checkbox" name="baselayer" value="' + name + '" ' + ' />' + name + '</label>');
+			this.subMenuEl.insertAdjacentHTML('beforeend', '<label><input type="checkbox" name="baselayer" value="' + name + '">' + name + '</label>');
 
 			// Make layers available for display
 			this.layers[name].setVisible(false); // Don't begin to get the tiles yet (Necessary for Bing)

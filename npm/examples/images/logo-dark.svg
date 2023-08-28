@@ -12,12 +12,12 @@
     </g>
   </defs>
   <g fill="#FFFFFF" transform="translate(0 10)">
-    <use xlink:href="#layer"/>
+    <use xlink:href="#layer" />
   </g>
   <g fill="#333333">
-    <use xlink:href="#layer"/>
+    <use xlink:href="#layer" />
   </g>
   <g fill="#00AAFF" transform="translate(0 -10)">
-    <use xlink:href="#layer"/>
+    <use xlink:href="#layer" />
   </g>
 </svg>

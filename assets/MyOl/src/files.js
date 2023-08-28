@@ -11,7 +11,7 @@ function controlLoadGPX(opt) {
 	const options = {
 			label: '&#x1F4C2;',
 			submenuHTML: '<p>Importer un fichier au format GPX:</p>' +
-				'<input type="file" accept=".gpx" ctrlOnChange="loadFile" />',
+				'<input type="file" accept=".gpx" ctrlOnChange="loadFile">',
 			...opt,
 		},
 		control = controlButton(options);
