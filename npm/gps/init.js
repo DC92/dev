@@ -24,10 +24,11 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
 				'<a href="">Recharger la page</a>',
 		}));
 }, {
-	once: true
+	once: true,
 });
 
-// Display the mapap
+// Display the map
+//TODO map keys
 var loadControl = new myol.control.Load(),
 	map = new ol.Map({
 		target: 'map',
@@ -49,7 +50,7 @@ var loadControl = new myol.control.Load(),
 
 			// Top right
 			new myol.control.LayerSwitcher({
-				layers: myol.layer.tile.collection(),
+				layers: myol.layer.tile.collection(layersKeys),
 			}),
 
 			// Bottom left
