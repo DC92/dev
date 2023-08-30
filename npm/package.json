@@ -14,7 +14,7 @@
 		"@rollup/plugin-json": "latest",
 		"@rollup/plugin-node-resolve": "latest",
 		"@rollup/plugin-terser": "latest",
-		"eslint": "^8.47.0",
+		"eslint": "latest,
 		"rollup": "latest",
 		"rollup-plugin-import-css": "latest"
 	}
