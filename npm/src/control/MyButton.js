@@ -74,7 +74,7 @@ export class MyButton extends MyControl {
  * GPX file loader control
  */
 export class Load extends MyButton {
-	constructor(options) {
+	constructor(options = {}) {
 		super({
 			// MyButton options
 			label: '&#128194;',
@@ -84,7 +84,7 @@ export class Load extends MyButton {
 			// Load options
 			// initFileUrl, url of a gpx file to be uploaded at the init
 
-			...options ||= {}, //HACK default when options is undefined
+			...options, //HACK default when options is undefined
 		});
 
 		// Register action listeners

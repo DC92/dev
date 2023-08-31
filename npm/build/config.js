@@ -8,6 +8,7 @@ import {
 } from 'fs';
 
 const banner = readFileSync('./build/banner.js', 'utf-8');
+//TODO dist without ol...
 
 export default [{
 	// Full myol / compressed library

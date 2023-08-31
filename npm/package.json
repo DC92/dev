@@ -3,7 +3,8 @@
 	"type": "module",
 	"scripts": {
 		"build": "rollup -c build/config.js",
-		"lint": "npx eslint src/*.js && npx eslint src/*/*.js"
+		"lint": "npx eslint src/*.js src/*/*.js",
+		"beautify": "js-beautify -s=2 build/*.js examples/* examples/ressources/* examples/wri/* src/*.*s src/helpers/* src/providers/* package.json"
 	},
 	"dependencies": {
 		"ol": "7.5.1",
@@ -14,7 +15,8 @@
 		"@rollup/plugin-json": "latest",
 		"@rollup/plugin-node-resolve": "latest",
 		"@rollup/plugin-terser": "latest",
-		"eslint": "latest,
+		"eslint": "latest",
+		"js-beautify": "latest",
 		"rollup": "latest",
 		"rollup-plugin-import-css": "latest"
 	}

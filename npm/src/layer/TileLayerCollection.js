@@ -68,9 +68,7 @@ export class MRI extends OpenStreetMap {
 }
 
 export class Kompass extends OpenStreetMap { // Austria
-	constructor(options) {
-		options ||= {};
-
+	constructor(options = {}) {
 		super({
 			url: options.key ?
 				'https://map{1-4}.kompass.de/{z}/{x}/{y}/kompass_' + options.subLayer + '?key=' + options.key : // Specific
@@ -102,7 +100,7 @@ export class Thunderforest extends OpenStreetMap {
  * doc : https://geoservices.ign.fr/services-web
  */
 export class IGN extends ol.layer.Tile {
-	constructor(options) {
+	constructor(options = {}) {
 		let IGNresolutions = [],
 			IGNmatrixIds = [];
 
@@ -110,8 +108,6 @@ export class IGN extends ol.layer.Tile {
 			IGNresolutions[i] = ol.extent.getWidth(ol.proj.get('EPSG:3857').getExtent()) / 256 / Math.pow(2, i);
 			IGNmatrixIds[i] = i.toString();
 		}
-
-		options ||= {};
 
 		super({
 			hidden: !options.key, // For LayerSwitcher
@@ -376,9 +372,7 @@ export class Bing extends ol.layer.Tile {
 }
 
 // Tile layers examples
-export function collection(options) {
-	options ||= {};
-
+export function collection(options = {}) {
 	return {
 		'OSM fr': new OpenStreetMap(),
 		'OpenTopo': new OpenTopo(),
@@ -455,9 +449,7 @@ export function collection(options) {
 	};
 }
 
-export function demo(options) {
-	options ||= {};
-
+export function demo(options = {}) {
 	return {
 		...collection(options),
 

@@ -11,6 +11,7 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
 			subMenuHTML: '<p>Une nouvelle version</p>' +
 				'<p>ou de nouvelles traces</p>' +
 				'<p>sont disponibles.</p>' +
+				'<p>LAST_CHANGE_TIME</p>' + //TODO add LAST_CHANGE_TIME in the help
 				'<a href="">Recharger la page</a>',
 		}));
 }, {
