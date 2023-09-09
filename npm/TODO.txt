@@ -1,8 +1,0 @@
-cd \wamp64\www\dev\npm
-npm install
-npm run build
-npx vite
-
-npm run lint
-npm run build
-npx vite --force
