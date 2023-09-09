@@ -25,7 +25,7 @@
   "dependencies": {
     "ol": "latest",
     "proj4": "latest",
-    "@myol/geocoder": "latest"
+    "@myol/geocoder": "1.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "latest",

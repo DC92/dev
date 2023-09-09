@@ -11,3 +11,8 @@ npm init --scope=@dom92
 npm adduser myol
 npm whoami
 npm publish --access public
+
+Stub:
+    "@myol/geocoder": "1.0.1"
+
+npm unpublish @myol/geocoder@1.0.0
