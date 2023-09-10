@@ -128,7 +128,8 @@ export class SwissTopo extends ol.layer.Tile {
     const options = {
         host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
         subLayer: 'ch.swisstopo.pixelkarte-farbe',
-        maxResolution: 300, // Resolution limit above which we switch to a more global service
+        maxResolution: 2000, // Resolution limit above which we switch to a more global service
+        extent: [640000, 5730000, 1200000, 6100000],
         attributions: '&copy <a href="https://map.geo.admin.ch/">SwissTopo</a>',
 
         ...opt,
@@ -191,7 +192,8 @@ export class IGM extends ol.layer.Tile {
         attributions: '&copy <a href="http://www.pcn.minambiente.it/viewer/">IGM</a>',
         ...options,
       }),
-      maxResolution: 120,
+      maxResolution: 1200,
+      extent: [720000, 4380000, 2070000, 5970000],
       ...options,
     });
   }
@@ -228,9 +230,9 @@ export class OS extends ol.layer.Tile {
   constructor(options = {}) {
     super({
       hidden: !options.key, // For LayerSwitcher
-      extent: [-1198263, 6365000, 213000, 8702260],
       minResolution: 2,
       maxResolution: 1700,
+      extent: [-1198263, 6365000, 213000, 8702260],
       source: new ol.source.XYZ({
         url: 'https://api.os.uk/maps/raster/v1/zxy/' +
           (options.subLayer || 'Outdoor_3857') +
@@ -328,29 +330,6 @@ export class Bing extends ol.layer.Tile {
   }
 }
 
-// Layer to add to the map prior to any
-// to display as replacement when the displayed layer of resolution or extent is out of borns
-export class AltLayer extends StadiaMaps {
-  setMapInternal(map) { //HACK execute actions on Map init
-    super.setMapInternal(map);
-
-    map.on(['precompose'], () => {
-      const mapExtent = map.getView().calculateExtent(map.getSize());
-
-      this.setVisible(true); // Display it by default
-
-      map.getLayers().forEach(l => {
-        if (l.isVisible() &&
-          l != this &&
-          l.getSource().urls && // Is a tile layer
-          (!l.getExtent() || // The layer covers all the globe
-            ol.extent.containsExtent(l.getExtent(), mapExtent))) // The layer covers the map extent
-          this.setVisible(false); // Then, don't display the replacement layer
-      });
-    });
-  }
-}
-
 // Tile layers examples
 export function collection(options = {}) {
   return {
@@ -415,11 +394,15 @@ export function collection(options = {}) {
       key: 'orthohisto/geoportail',
       style: 'BDORTHOHISTORIQUE',
       format: 'image/png',
+      extent: [-580000, 506000, 1070000, 6637000],
+      maxResolution: 2000,
     }),
 
     'IGN E.M. 1820-66': new IGN({
       layer: 'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
       key: 'cartes/geoportail',
+      extent: [-580000, 506000, 1070000, 6637000],
+      maxResolution: 2000,
     }),
     'Cadastre': new IGN({
       layer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
