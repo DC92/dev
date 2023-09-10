@@ -10,7 +10,7 @@ export default class Download extends MyButton {
   constructor(options) {
     super({
       // MyButton options
-      label: '&#128229;',
+      label: '&#128427;',
       subMenuHTML: '<p>Cliquer sur un format ci-dessous pour obtenir un fichier ' +
         'contenant les éléments visibles dans la fenêtre:</p>' +
         '<a mime="application/gpx+xml">GPX</a>' +

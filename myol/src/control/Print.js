@@ -9,7 +9,7 @@ export default class Print extends MyButton {
   constructor(options) {
     super({
       // MyButton options
-      label: '&#9113;',
+      label: '&#128438;',
       className: 'myol-button-print',
       subMenuHTML: '<p>Pour imprimer la carte:</p>' +
         '<p>-Choisir portrait ou paysage,</p>' +

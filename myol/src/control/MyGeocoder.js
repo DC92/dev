@@ -12,6 +12,7 @@ import Geocoder from '@myol/geocoder/src/base';
 
 //TODO BUG n'ouvre pas au survol
 //TODO BUG n'affiche pas le picto envoi
+//TODO Use unicode char for the button &#128269; loupe
 export default class MyGeocoder extends Geocoder {
   constructor(options) {
     super('nominatim', {

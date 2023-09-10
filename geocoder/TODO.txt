@@ -17,8 +17,8 @@ remove
 TODO
 Afficher version / délivrer dans l'interface
 Clarifier livraison sources dans npm
-Use unicode char for the button
-Use myol style (unicode button)
+Use unicode char for the button &#128269; loupe
+Use myol style (button côte à côte)
 lint installé / compléter
 tests / compléter
 enlever sass
