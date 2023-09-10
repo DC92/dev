@@ -18,27 +18,6 @@ class XYZsource extends ol.layer.Tile {
   }
 }
 
-// Virtual class to replace invalid layer scope by a stub display
-class LimitedTileLayer extends ol.layer.Tile {
-  setMapInternal(map) { //HACK execute actions on Map init
-    super.setMapInternal(map);
-
-    const altlayer = new StadiaMaps({
-      minResolution: this.getMaxResolution(),
-    });
-
-    //TODO fall back out of valid area
-    map.addLayer(altlayer);
-    altlayer.setOpacity(this.getOpacity());
-    altlayer.setVisible(this.getVisible());
-
-    this.on(['change:opacity', 'change:visible'], function() {
-      altlayer.setOpacity(this.getOpacity());
-      altlayer.setVisible(this.getVisible());
-    });
-  }
-}
-
 // OpenStreetMap & co
 export class OpenStreetMap extends XYZsource {
   constructor(options) {
@@ -87,7 +66,7 @@ export class Kompass extends OpenStreetMap { // Austria
 }
 
 export class Thunderforest extends OpenStreetMap {
-  constructor(options) {
+  constructor(options = {}) {
     super({
       url: 'https://{a-c}.tile.thunderforest.com/' + options.subLayer + '/{z}/{x}/{y}.png?apikey=' + options.key,
       // subLayer: 'outdoors', ...
@@ -142,8 +121,9 @@ export class IGN extends ol.layer.Tile {
 /**
  * Swisstopo https://api.geo.admin.ch/
  * Don't need key nor referer
+ * API : https://api3.geo.admin.ch/services/sdiservices.html#wmts
  */
-export class SwissTopo extends LimitedTileLayer {
+export class SwissTopo extends ol.layer.Tile {
   constructor(opt) {
     const options = {
         host: 'https://wmts2{0-4}.geo.admin.ch/1.0.0/',
@@ -203,7 +183,7 @@ export class IgnES extends XYZsource {
 /**
  * Italy IGM
  */
-export class IGM extends LimitedTileLayer {
+export class IGM extends ol.layer.Tile {
   constructor(options) {
     super({
       source: new ol.source.TileWMS({
@@ -244,8 +224,8 @@ export class IGM extends LimitedTileLayer {
  */
 //BEST Replacement layer out of bounds
 //BEST XYZsource
-export class OS extends LimitedTileLayer {
-  constructor(options) {
+export class OS extends ol.layer.Tile {
+  constructor(options = {}) {
     super({
       hidden: !options.key, // For LayerSwitcher
       extent: [-1198263, 6365000, 213000, 8702260],
@@ -303,7 +283,7 @@ export class StadiaMaps extends ol.layer.Tile {
  * Get your own key at https://www.mapbox.com/
  */
 export class Maxbox extends XYZsource {
-  constructor(options) {
+  constructor(options = {}) {
     super({
       url: 'https://api.mapbox.com/v4/' + options.tileset + '/{z}/{x}/{y}@2x.webp?access_token=' + options.key,
       attributions: '&copy; <a href="https://mapbox.com/">Mapbox</a>',
@@ -330,7 +310,7 @@ export class Google extends XYZsource {
  * Doc: https://docs.microsoft.com/en-us/bingmaps/getting-started/
  */
 export class Bing extends ol.layer.Tile {
-  constructor(options) {
+  constructor(options = {}) {
     super({
       // imagerySet: 'Road',
       // key, Get your own (free) key at https://www.bingmapsportal.com
@@ -344,6 +324,29 @@ export class Bing extends ol.layer.Tile {
       if (evt.target.getVisible() && // When the layer becomes visible
         !this.getSource()) // Only once
         this.setSource(new ol.source.BingMaps(options));
+    });
+  }
+}
+
+// Layer to add to the map prior to any
+// to display as replacement when the displayed layer of resolution or extent is out of borns
+export class AltLayer extends StadiaMaps {
+  setMapInternal(map) { //HACK execute actions on Map init
+    super.setMapInternal(map);
+
+    map.on(['precompose'], () => {
+      const mapExtent = map.getView().calculateExtent(map.getSize());
+
+      this.setVisible(true); // Display it by default
+
+      map.getLayers().forEach(l => {
+        if (l.isVisible() &&
+          l != this &&
+          l.getSource().urls && // Is a tile layer
+          (!l.getExtent() || // The layer covers all the globe
+            ol.extent.containsExtent(l.getExtent(), mapExtent))) // The layer covers the map extent
+          this.setVisible(false); // Then, don't display the replacement layer
+      });
     });
   }
 }
@@ -494,9 +497,7 @@ export function demo(options = {}) {
     'Google hybrid': new Google({
       subLayers: 's,h',
     }),
-    'Toner': new StadiaMaps({
-      layer: 'stamen_toner_lite',
-    }),
+    'Toner': new StadiaMaps(), // layer: stamen_toner_lite
     'Watercolor': new StadiaMaps({
       layer: 'stamen_watercolor',
     }),
