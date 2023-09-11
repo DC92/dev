@@ -45,7 +45,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "ol": ">8.0.0"
+    "ol": ">6.15.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
