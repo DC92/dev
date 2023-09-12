@@ -164,13 +164,14 @@ export class SwissTopo extends ol.layer.Tile {
 /**
  * Spain
  */
+//TODO BUG charge couche Alt pour rien
 export class IgnES extends XYZsource {
   constructor(options) {
     super({
       host: 'https://www.ign.es/wmts/',
       server: 'mapa-raster',
       subLayer: 'MTN',
-      url: (o) => o.host + o.server + '?layer=' + o.subLayer +
+      url: o => o.host + o.server + '?layer=' + o.subLayer +
         '&Service=WMTS&Request=GetTile&Version=1.0.0' +
         '&Format=image/jpeg' +
         '&style=default&tilematrixset=GoogleMapsCompatible' +
@@ -248,13 +249,14 @@ export class OS extends ol.layer.Tile {
 /**
  * ArcGIS (Esri)
  */
+//TODO BUG charge couche Alt pour rien
 export class ArcGIS extends XYZsource {
   constructor(options) {
     super({
       host: 'https://server.arcgisonline.com/ArcGIS/rest/services/',
       subLayer: 'World_Imagery',
-      url: (o) => o.host + o.subLayer + '/MapServer/tile/{z}/{y}/{x}',
-      maxZoom: 19, //TODO revoir tous les maxZoom
+      url: o => o.host + o.subLayer + '/MapServer/tile/{z}/{y}/{x}',
+      maxZoom: 19, //TODO revoir tous les maxZoom / minResolution
       attributions: '&copy; <a href="https://www.arcgis.com/home/webmap/viewer.html">ArcGIS (Esri)</a>',
       ...options,
     });
@@ -296,11 +298,12 @@ export class Maxbox extends XYZsource {
 /**
  * Google
  */
+//TODO BUG charge couche Alt pour rien
 export class Google extends XYZsource {
   constructor(options) {
     super({
       subLayers: 'm', // Roads
-      url: (o) => 'https://mt{0-3}.google.com/vt/lyrs=' + o.subLayers + '&hl=fr&x={x}&y={y}&z={z}',
+      url: o => 'https://mt{0-3}.google.com/vt/lyrs=' + o.subLayers + '&hl=fr&x={x}&y={y}&z={z}',
       attributions: '&copy; <a href="https://www.google.com/maps">Google</a>',
       ...options,
     });

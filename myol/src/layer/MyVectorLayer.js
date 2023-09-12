@@ -30,7 +30,7 @@ class MyVectorSource extends ol.source.Vector {
       statusEl = document.getElementById(options.selectName + '-status');
 
     super({
-      format: new ol.format.GeoJSON({ //TODO treat & display JSON errors
+      format: new ol.format.GeoJSON({ //BEST treat & display JSON errors
         dataProjection: options.projection,
       }),
 

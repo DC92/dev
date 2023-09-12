@@ -17,7 +17,7 @@ export default class AltLayer extends layerTile.StadiaMaps {
       this.setVisible(true); // Display it by default
 
       map.getLayers().forEach(l => {
-        if (l.isVisible() &&
+        if (l.isVisible && l.isVisible() &&
           l != this &&
           l.getSource().urls && // Is a tile layer
           (!l.getExtent() || // The layer covers all the globe

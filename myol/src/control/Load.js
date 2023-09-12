@@ -9,7 +9,7 @@ export default class Load extends MyButton {
   constructor(options = {}) {
     super({
       // MyButton options
-      label: '&#128194;', //TODO trouver un autre symbole
+      label: '&#128194;',
       subMenuHTML: '<p>Importer un fichier de points ou de traces</p>' +
         '<input type="file" accept=".gpx,.kml,.geojson">',
 
