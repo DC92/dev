@@ -4,14 +4,14 @@ var map = new ol.Map({
 		enableRotation: false,
 	}),
 	controls: [
-		...controlsCollection({
+		...myol.control.collection({
 			Permalink: {
 				init: mapType != 'line' || scriptName != 'viewtopic',
 				display: scriptName == 'index',
 			},
 		}),
-		controlLayerSwitcher({
-			layers: layerTileCollection(mapKeys),
+		new myol.control.LayerSwitcher({
+			layers: myol.layer.tile.collection(mapKeys),
 			selectExtId: 'select-ext',
 			//BEST Si on n'a que l'extension GeoBB, on n'a pas la couche gis.php
 		}),
