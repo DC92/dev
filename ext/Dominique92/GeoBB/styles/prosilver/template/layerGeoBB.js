@@ -4,17 +4,19 @@ var map = new ol.Map({
 		enableRotation: false,
 	}),
 	controls: [
-		...myol.control.collection({
-			Permalink: {
-				init: mapType != 'line' || scriptName != 'viewtopic',
-				display: scriptName == 'index',
-			},
-		}),
+		...myol.control.collection(),
 		new myol.control.LayerSwitcher({
 			layers: myol.layer.tile.collection(mapKeys),
 			selectExtId: 'select-ext',
 			//BEST Si on n'a que l'extension GeoBB, on n'a pas la couche gis.php
 		}),
+		new myol.control.Permalink({
+			init: mapType != 'line' || scriptName != 'viewtopic',
+			display: scriptName == 'index',
+		}),
+	],
+	layers: [
+		new myol.layer.Hover(),
 	],
 });
 

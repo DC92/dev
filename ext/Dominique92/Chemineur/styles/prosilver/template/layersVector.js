@@ -12,9 +12,10 @@ if (typeof topic_category == 'string') {
 
 if (typeof map !== 'undefined') {
 	// Generate a key unique on the last 12 hours
-	const version = (localStorage.lastPostingDate % 43200).toString(36);
+	//TODO ? const version = (localStorage.lastPostingDate % 43200).toString(36);
 
-	layerVectorCollection({
+	myol.layer.vector.collection({
+			/*
 		chemineur: {
 			host: '', // Relative to this location
 			selectName: 'select-chem',
@@ -23,6 +24,7 @@ if (typeof map !== 'undefined') {
 				v: version, // Reload layer if posting called between
 			},
 		},
+			*/
 		wri: {
 			selectName: 'select-wri',
 		},
