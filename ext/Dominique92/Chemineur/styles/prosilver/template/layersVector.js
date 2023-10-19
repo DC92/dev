@@ -15,31 +15,31 @@ if (typeof map !== 'undefined') {
 	//TODO ? const version = (localStorage.lastPostingDate % 43200).toString(36);
 
 	myol.layer.vector.collection({
-			/*
-		chemineur: {
-			host: '', // Relative to this location
+		chemineur: new myol.layer.vector.Chemineur({
 			selectName: 'select-chem',
-			noClick: true,
+			host: '', // Relative to this location
+			/*
+			noClick: true, //TODO delete ?
 			urlParams: { //BEST move this to geoBB
 				v: version, // Reload layer if posting called between
 			},
-		},
 			*/
-		wri: {
+		}),
+		wri: new myol.layer.vector.WRI({
 			selectName: 'select-wri',
-		},
-		osm: {
-			selectName: 'select-osm',
-		},
-		prc: {
+		}),
+		prc: new myol.layer.vector.PRC({
 			selectName: 'select-prc',
-		},
-		c2c: {
+		}),
+		c2c: new myol.layer.vector.C2C({
 			selectName: 'select-c2c',
-		},
-		alpages: {
+		}),
+		osm: new myol.layer.vector.Overpass({
+			selectName: 'select-osm',
+		}),
+		alpages: new myol.layer.vector.Alpages({
 			selectName: 'select-alpages',
-		},
+		}),
 	}).forEach(l => map.addLayer(l));
 }
 

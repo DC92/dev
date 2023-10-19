@@ -1,3 +1,5 @@
+myol.trace();
+
 var map = new ol.Map({
 	target: 'map',
 	view: new ol.View({
@@ -21,7 +23,7 @@ var map = new ol.Map({
 });
 
 if (mapType == 'point')
-	map.addLayer(layerMarker({
+	map.addLayer(new myol.layer.Marker({
 		src: 'ext/Dominique92/GeoBB/styles/prosilver/theme/images/' + scriptName + '.svg',
 		focus: 15, // Map zoom level
 		dragable: scriptName == 'posting',
