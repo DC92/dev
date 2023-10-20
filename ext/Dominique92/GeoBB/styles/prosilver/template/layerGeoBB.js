@@ -10,7 +10,6 @@ var map = new ol.Map({
 		new myol.control.LayerSwitcher({
 			layers: myol.layer.tile.collection(mapKeys),
 			selectExtId: 'select-ext',
-			//BEST Si on n'a que l'extension GeoBB, on n'a pas la couche gis.php
 		}),
 		new myol.control.Permalink({
 			init: mapType != 'line' || scriptName != 'viewtopic',
@@ -18,6 +17,17 @@ var map = new ol.Map({
 		}),
 	],
 	layers: [
+		  new myol.layer.vector.GeoBB({
+			selectName: 'select-geobb',
+			host: '', // Relative to this location
+			noClick: scriptName == 'posting',  
+			noHover: scriptName == 'posting',  
+			/*
+			urlParams: { //BEST move this to geoBB
+				v: version, // Reload layer if posting called between
+			},
+			*/
+		}),
 		new myol.layer.Hover(),
 	],
 });
@@ -46,8 +56,10 @@ if (mapType == 'line' && scriptName == 'viewtopic') {
 
 if (mapType == 'line' && scriptName == 'posting')
 	//BEST save only layerEditGeoJson.layer
-	map.addControl(layerEditGeoJson({
+	map.addControl(new myol.layer.Editor({
 		geoJsonId: 'marker-json',
+       editOnly: 'line' ,
+		/*
 		focus: 15,
 		help: [
 			//BEST mettre dans le html
@@ -66,4 +78,5 @@ if (mapType == 'line' && scriptName == 'posting')
 			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
 			'<p><hr/>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre</p>',
 		],
+		*/
 	}));
