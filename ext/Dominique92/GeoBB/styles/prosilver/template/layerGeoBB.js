@@ -17,13 +17,13 @@ var map = new ol.Map({
 		}),
 	],
 	layers: [
-		  new myol.layer.vector.GeoBB({
+		new myol.layer.vector.GeoBB({
 			selectName: 'select-geobb',
 			host: '', // Relative to this location
-			noClick: scriptName == 'posting',  
-			noHover: scriptName == 'posting',  
+			noClick: scriptName == 'posting',
+			noHover: scriptName == 'posting',
 			/*
-			urlParams: { //BEST move this to geoBB
+			urlParams: { //BEST implement ???
 				v: version, // Reload layer if posting called between
 			},
 			*/
@@ -56,27 +56,7 @@ if (mapType == 'line' && scriptName == 'viewtopic') {
 
 if (mapType == 'line' && scriptName == 'posting')
 	//BEST save only layerEditGeoJson.layer
-	map.addControl(new myol.layer.Editor({
+	map.addLayer(new myol.layer.Editor({
 		geoJsonId: 'marker-json',
-       editOnly: 'line' ,
-		/*
-		focus: 15,
-		help: [
-			//BEST mettre dans le html
-			// Modify
-			'<p><u>Déplacer un sommet:</u> cliquer sur le sommet et le déplacer</p>' +
-			'<p>Ajouter un sommet au milieu d&apos;un segment : cliquer le long du segment puis déplacer</p>' +
-			'<p>Supprimer un sommet : Alt+cliquer sur le sommet</p>' +
-			'<p>Couper une ligne en deux : Alt+cliquer sur le segment à supprimer</p>' +
-			'<p>Inverser la direction d&apos;une ligne: Shift+cliquer sur le segment à inverser</p>' +
-			'<p>Fusionner deux lignes : déplacer l&apos;extrémité d&apos;une ligne pour rejoindre l&apos;autre</p>' +
-			'<p>Supprimer une ligne : Ctrl+Alt+cliquer sur un segment</p>',
-			// Line
-			'<p>Pour créer une ligne :</p>' +
-			'<p>Cliquer sur l&apos;emplacement du début</p>' +
-			'<p>Puis sur chaque sommet</p>' +
-			'<p>Double cliquer sur le dernier sommet pour terminer</p>' +
-			'<p><hr/>Cliquer sur une extrémité d&apos;une ligne existante pour l&apos;étendre</p>',
-		],
-		*/
+		editOnly: 'line',
 	}));
