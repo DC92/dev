@@ -129,8 +129,9 @@ while ($row = $db->sql_fetchrow($result)) {
 			$hack_positions[] = $m[1].$m[2];
 
 			// Populate geojson altitudes
-			if (count ($altitudes))
-				$m[] = array_shift($altitudes);
+			//BEST bug ol 8.2.0
+			//if (count ($altitudes))
+			//	$m[] = array_shift($altitudes);
 
 			unset ($m[0]);
 			return implode ($m, ',');
