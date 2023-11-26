@@ -1,4 +1,4 @@
-//TODO BUG : ferme menu du haut quand quitte la zone de carte (petites fenetres)
+//TODO BUG ferme menu du haut quand quitte la zone de carte (petites fenetres)
 //BEST Token psw {S_LOGIN_REDIRECT}
 //BEST Ne pas afficher les points en doublon (flux wri, prc, c2c)
 //BEST Stockage images sur plus d'1 répertoire => ? plugin ?
