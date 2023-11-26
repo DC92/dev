@@ -1,5 +1,20 @@
 myol.trace();
 
+// Force at least one layer
+if (!localStorage.myol_selectgeobb && scriptName == 'index')
+	localStorage.myol_selectgeobb = 'all';
+
+// Activate the layer corresponding to the topic
+if (typeof topic_category == 'string') {
+	const ls = (localStorage.myol_selectgeobb || '').split(',');
+	ls.push(topic_category);
+	localStorage.myol_selectgeobb = [...new Set(ls)];
+}
+
+// Desactivate trace layer when edit a trace
+if (mapType == 'line' && scriptName == 'posting')
+	localStorage.myol_selectgeobb = localStorage.myol_selectgeobb.toString().replace('64', '');
+
 var geobbLayer = new myol.layer.vector.GeoBB({
 		selectName: 'select-geobb',
 		host: '', // Relative to this location
@@ -64,3 +79,14 @@ if (mapType == 'line' && scriptName == 'viewtopic') {
 		maxZoom: 15,
 	});
 }
+
+// Resize map
+if (jQuery.ui)
+	$(map.getTargetElement()).resizable({
+		handles: 's,w,sw', // 2 sides and 1 corner
+
+		resize: function(event, ui) {
+			ui.position.left = ui.originalPosition.left; // Reste à droite de la page
+			map.updateSize(); // Repost all new <div>
+		},
+	});
