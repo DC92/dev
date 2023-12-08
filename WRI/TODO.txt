@@ -1,7 +1,3 @@
-RUPTURES INTERFACES
-===================
-//TODO refaire localement myol_lastChangeTime (dernière date de modif)
-
 BUGS
 ====
 //TODO BUG connexion sous FF : efface le pavé connexion aprés avoir rempli avec les infos de connexion
