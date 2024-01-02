@@ -3,9 +3,7 @@ BUGS
 //TODO BUG connexion sous FF : efface le pavé connexion aprés avoir rempli avec les infos de connexion
 //TODO BUG Déconnexion KO à partir de la page de modération (problème de racine)
 //TODO BUG modifier cette fiche : ne réaffiche pas les coordonnées (FF)
-//TODO modif champ lon/lat déplace le curseur mais pas la carte
 //TODO Si vous spécifiez overflow: visible sur "img", "video" et "canvas", ces tags risquent de générer du contenu visuel en dehors des limites de l'élément.
-//TODO c2c : access (parking)
 
 REMARQUES MENU
 ==============
@@ -16,7 +14,6 @@ REMARQUES MENU
 
 EVOLUTION PAGE ACCUEIL
 ======================
-//BEST La version mobile, parfois réclamée, est bien cachée
 //BEST Réduction des messages https://www.refuges.info/forum/viewtopic.php?f=2&t=9460
 //BEST Ergonomie https://www.refuges.info/forum/viewtopic.php?f=2&t=10687
 //BEST https://www.refuges.info/forum/viewtopic.php?f=1&t=11177
