@@ -1,3 +1,0 @@
-https://www.phpbb.com/customise/db/extension/googleanalytics/
-v1.0.6
-Admin -> GENERAL -> Configuration du forum -> ID Google Analytics :

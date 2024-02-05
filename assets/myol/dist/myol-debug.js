@@ -4,7 +4,7 @@
  * This package adds many features to Openlayer https://openlayers.org/
  * https://github.com/Dominique92/myol#readme
  * Based on https://openlayers.org
- * Built 31/12/2023 18:11:19 using npm run build from the src/... sources
+ * Built 01/02/2024 18:02:51 using npm run build from the src/... sources
  * Please don't modify it : modify src/... & npm run build !
  */
 
@@ -65326,8 +65326,6 @@ var myol = (function () {
    * Print control
    */
 
-  //TODO voir layerswitcher button en mode format
-  //TODO bug filtres print dans chem
 
   class Print extends Button {
     constructor(options) {
